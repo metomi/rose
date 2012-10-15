@@ -90,7 +90,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 raise ConfigProcessError([key], None, e)
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(target))
 
-        # Start pool of workers to create the files
+        # Start worker pool
         nproc = rose.config.default_node().get_value(
                 ["rose.config_processors.file", "nproc"],
                 default=self.NPROC)
@@ -98,79 +98,87 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             nproc = len(nodes)
         pool = Pool(processes=nproc)
 
-        # TODO: use pool of workers
+        # Use worker pool to do the work
+        results = []
         for key, node in sorted(nodes.items()):
-            target = key[len(self.PREFIX):]
+            result = pool.apply_async(_process_target, self, config, key, node)
+            results.append(result)
+        pool.close()
+        for result in results:
+            for message, type, level, prefix, clip in result.get():
+                self.manager.event_handler(message, type, level, prefix, clip)
 
-            # FIXME: this is not always necessary
-            content_value = node.get_value(["content"])
-            if content_value:
-                # Embedded content
+    def process_target(self, config, key, node):
+        target = key[len(self.PREFIX):]
+
+        # FIXME: this is not always necessary
+        content_value = node.get_value(["content"])
+        if content_value:
+            # Embedded content
+            if os.path.isdir(target):
+                self.manager.fs_util.delete(target)
+            target_file = open(target, 'wb')
+            contents = shlex.split(content_value)
+            for content in contents:
+                target_file.write(self.manager.process(
+                        config, content,
+                        [key, "content"], content_value))
+            target_file.close()
+            self.manager.event_handler(
+                    FileSystemEvent("content", target, " ".join(contents)))
+        else:
+            # Free format file
+            source_str = node.get_value(["source"], default="")
+            sources = []
+            for source in shlex.split(source_str):
+                try:
+                    source = env_var_process(source)
+                except UnboundEnvironmentVariableError as e:
+                    raise ConfigProcessError(
+                            [key, "source"], source_str, e)
+                sources.append(os.path.expanduser(source))
+            mode = node.get_value(["mode"])
+            if len(sources) == 1:
+                source = sources[0]
+                if mode == "symlink":
+                    self.manager.fs_util.symlink(source, target)
+                else:
+                    if os.path.exists(target):
+                        self.manager.fs_util.delete(target)
+                    self._source_export(source, target)
+                    self.manager.event_handler(
+                            FileSystemEvent("install", target, source))
+            elif len(sources) > 1 or len(sources) == 0 and mode != "mkdir":
                 if os.path.isdir(target):
                     self.manager.fs_util.delete(target)
                 target_file = open(target, 'wb')
-                contents = shlex.split(content_value)
-                for content in contents:
-                    target_file.write(self.manager.process(
-                            config, content,
-                            [key, "content"], content_value))
+                for source in sources:
+                    target_file.write(self._source_load(source))
                 target_file.close()
                 self.manager.event_handler(
-                        FileSystemEvent("content", target, " ".join(contents)))
+                        FileSystemEvent("install", target, source_str))
             else:
-                # Free format file
-                source_str = node.get_value(["source"], default="")
-                sources = []
-                for source in shlex.split(source_str):
-                    try:
-                        source = env_var_process(source)
-                    except UnboundEnvironmentVariableError as e:
-                        raise ConfigProcessError(
-                                [key, "source"], source_str, e)
-                    sources.append(os.path.expanduser(source))
-                mode = node.get_value(["mode"])
-                if len(sources) == 1:
-                    source = sources[0]
-                    if mode == "symlink":
-                        self.manager.fs_util.symlink(source, target)
-                    else:
-                        if os.path.exists(target):
-                            self.manager.fs_util.delete(target)
-                        self._source_export(source, target)
-                        self.manager.event_handler(
-                                FileSystemEvent("install", target, source))
-                elif len(sources) > 1 or len(sources) == 0 and mode != "mkdir":
-                    if os.path.isdir(target):
-                        self.manager.fs_util.delete(target)
-                    target_file = open(target, 'wb')
-                    for source in sources:
-                        target_file.write(self._source_load(source))
-                    target_file.close()
-                    self.manager.event_handler(
-                            FileSystemEvent("install", target, source_str))
+                if os.path.isdir(target):
+                    for name in os.listdir(target):
+                        path = os.path.join(target, name)
+                        self.manager.fs_util.delete(path)
                 else:
-                    if os.path.isdir(target):
-                        for name in os.listdir(target):
-                            path = os.path.join(target, name)
-                            self.manager.fs_util.delete(path)
-                    else:
-                        self.manager.fs_util.delete(target)
-                        self.manager.fs_util.makedirs(target)
+                    self.manager.fs_util.delete(target)
+                    self.manager.fs_util.makedirs(target)
 
-                # Checksum
-                checksum_expected = node.get_value(["checksum"])
-                if checksum_expected is not None:
-                    target_file = open(target)
-                    md5 = hashlib.md5()
-                    md5.update(target_file.read())
-                    checksum = md5.hexdigest()
-                    if checksum_expected and checksum_expected != checksum:
-                        e = UnmatchedChecksumError(checksum_expected, checksum)
-                        raise ConfigProcessError(
-                                [key, "checksum"], checksum_expected, e)
-                    target_file.close()
-                    self.manager.event_handler(ChecksumEvent(target, checksum))
-
+            # Checksum
+            checksum_expected = node.get_value(["checksum"])
+            if checksum_expected is not None:
+                target_file = open(target)
+                md5 = hashlib.md5()
+                md5.update(target_file.read())
+                checksum = md5.hexdigest()
+                if checksum_expected and checksum_expected != checksum:
+                    e = UnmatchedChecksumError(checksum_expected, checksum)
+                    raise ConfigProcessError(
+                            [key, "checksum"], checksum_expected, e)
+                target_file.close()
+                self.manager.event_handler(ChecksumEvent(target, checksum))
 
     def _source_export(self, source, target):
         """Export/copy a source file/directory in FS or FCM VC to a target."""
@@ -200,3 +208,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             return f.read()
         else:
             return open(source).read()
+
+
+def _process_target(processor, config, key, node):
+    events = []
+    def _process_target_event_handler(
+            message, type=None, level=None, prefix=None, clip=None):
+        events.append((message, type, level, prefix, clip))
+    processor.manager.event_handler.event_handler = _process_target_event_handler
+    processor.process_target(config, key, node)
+    processor.manager.event_handler.event_handler = None
+    return events
+

@@ -70,6 +70,7 @@ class Reporter(object):
                                  ReporterContext(self.TYPE_ERR, verbosity))
         self.contexts.setdefault("stdout",
                                  ReporterContext(self.TYPE_OUT, verbosity))
+        self.event_handler = None
         self.raise_on_exc = raise_on_exc
 
     def report(self, message, type=None, level=None, prefix=None, clip=None):
@@ -95,7 +96,13 @@ class Reporter(object):
         clip:
             The maximum charactar length of the message to print.    
 
+        If self.event_handler is defined, self.event_handler with all the
+        arguments and return its result instead.
+
         """
+        if self.event_handler is not None:
+            return self.event_handler(message, type, level, prefix, clip)
+
         if isinstance(message, Event):
             if type is None:
                 type = message.type
