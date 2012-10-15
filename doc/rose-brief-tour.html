@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide: A Brief Tour</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+</head>
+
+<body>
+  <div id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose User Guide: A Brief Tour</h1>
+
+    <div id="content"></div>
+
+    <h2 id="intro">Introduction</h2>
+
+    <p>This chapter of the Rose user guide attempts to introduce you to various
+    aspects of Rose by using a simple example. It assumes that Rose, <a href=
+    "http://hjoliver.github.com/cylc/">Cylc</a> and <a href=
+    "http://www.metoffice.gov.uk/research/collaboration/fcm/">FCM</a> are
+    already installed and configured correctly on your system.</p>
+
+    <p>Rose gives powerful command line utilities, and can be entirely used
+    within a terminal and text editor. Rose also contains graphical user
+    interfaces (GUIs) for optional use. We'll give a brief tour of the command
+    line interface, and then discuss the GUIs.</p>
+
+    <h2 id="cli">Command Line Tour</h2>
+
+    <p>This section takes us through the command line and text editor interface
+    to Rose.</p>
+
+    <h3>Create a Suite</h3>
+
+    <p>We'll begin by looking at whether a suite for this user guide is already
+    installed at your site. If so, you can simply copy it. Otherwise, you will
+    need to create a new suite and populate it.</p>
+
+    <p>Open a Linux/Unix terminal, issue the command:</p>
+    <pre class="shell">
+rosie lookup -Q title eq 'RUG brief tour'
+</pre>
+
+    <p>If it returns something like the following example, you can copy it into
+    a new suite:</p>
+    <pre>
+mo1-ro513/trunk@100     rosemary        rose    RUG brief tour
+</pre>
+
+    <p>Otherwise, you will have to create a new suite and populate it
+    yourself.</p>
+
+    <p>To create a new suite, and copy items from an existing suite, e.g.
+    <samp>mo1-ro513</samp>, issue the command:</p>
+    <pre class="shell">
+rosie copy mo1-ro513
+</pre>
+
+    <p>To create an empty new suite, issue the command:</p>
+    <pre class="shell">
+rosie create
+</pre>
+
+    <p>Both commands will prompt you to edit the suite discovery information
+    file. Edit the <em>project</em> and/or <em>title</em> settings if you want.
+    Save the file and exit the editor. A new suite will be created in the
+    version control system, with a local copy created (i.e. checked out) at
+    <samp>$HOME/roses/$ID</samp> where <var>$ID</var> is a unique ID for the
+    new suite.</p>
+
+    <h3>Populate and/or Modify the Suite</h3>
+
+    <p>Change directory to the local copy of the suite, if you have not already
+    done so. If you are not copying from an existing suite, populate your suite
+    by running the following commands:</p>
+    <pre class="shell">
+cd $HOME/roses/$ID # replace $ID with the ID of your new suite
+rose rug-brief-tour
+</pre>
+
+    <p>You will find the following files and sub-directories:</p>
+
+    <ul>
+      <li>A <kbd>rose-suite.conf</kbd> file: This is used to define suite
+      configurations outside of cylc. E.g. inputs to the cylc suite
+      configuration file, files to install at run time, etc. It is left empty
+      in this example suite.</li>
+
+      <li>A <kbd>suite.rc</kbd> file: This is used to define configurations in
+      a cylc suite. In this example, we are running 4 tasks: a task to build an
+      executable from a source file containing a <em>hello world</em> program,
+      and then 3 tasks in parallel to run the executable with 3 different sets
+      of application configurations.</li>
+
+      <li>Sub-directories:
+
+        <ul>
+          <li><kbd>app/</kbd>: This directory contains the configurations of
+          the <em>applications</em> run by the <em>tasks</em> of the suite. In
+          this example suite, the directory contains 3 sets of application
+          configurations for running the <em>hello world</em> program in 3
+          different modes.</li>
+
+          <li><kbd>etc/</kbd>: This directory contains miscellaneous files used
+          by tasks in the suite. In this example suite, the directory contains
+          the <kbd>fcm-make.cfg</kbd> file for the <var>fcm_make</var>
+          task.</li>
+
+          <li><kbd>src/</kbd>: This directory contains the source file of a
+          simple program that we shall run in this suite. Note: This directory
+          will not normally be present in a real scientific suite, as source
+          files are typically held in separate locations.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p>At this point, you may want to have a look at the files before moving on
+    to the next section. You may also want to commit any newly added files or
+    changes in your suite back to the central repository.</p>
+
+    <h3>Run the Suite</h3>
+
+    <p>Install and run the suite by using the following command:</p>
+    <pre class="shell">
+cd $HOME/roses/$ID # replace $ID with the ID of your new suite
+rose suite-run
+</pre>
+
+    <p>This will install your suite under <var>$HOME/cylc-run/$ID</var>, start
+    your suite with <code>cylc</code> and fire up <code>cylc gcontrol
+    $ID</code>. The suite should run successfully to completion.</p>
+
+    <p>Note: If you quit <code>cylc gcontrol</code> by mistake, you can restart
+    it by typing <code>cylc gcontrol $ID</code> on the command line.</p>
+
+    <h3>View the Output</h3>
+
+    <p>The output of your suite can be found at
+    <var>$HOME/cylc-run/$ID</var>.</p>
+
+    <p>The sub-directory <samp>log/</samp> contains the log files produced by
+    the suite. In particular, the <samp>log/job/</samp> directory contains the
+    STDOUT and STDERR from each task together with the script used to run the
+    task.</p>
+
+    <p>The sub-directory <samp>log/</samp> also contains a HTML-based viewer
+    which allows you to view the output from a completed suite via a web
+    browser. E.g.:</p>
+    <pre class="shell">
+cd $HOME/cylc-run/$ID # replace $ID with the ID of your new suite
+firefox log/index.html
+</pre>
+
+    <p>The <samp>share/</samp> sub-directory is used by the tasks in the suite
+    to share files. In this example suite, the build created by the
+    <var>fcm_make</var> task can be found here.</p>
+
+    <p>The <samp>work/</samp> sub-directory contains the working directory for
+    the tasks at their run times. It can be used by the tasks to create files
+    that are only relevant to the tasks.</p>
+
+    <p>Tidy up by removing your <samp>roses/$ID</samp> directory:</p>
+    <pre class="shell">
+rm -rf $HOME/roses/$ID # replace $ID with the ID of your new suite
+</pre>
+
+    <p>You can recover your suite at any time by running:</p>
+    <pre class="shell">
+rosie checkout $ID # replace $ID with the ID of your new suite
+</pre>
+
+    <p>For help with Rose and Rosie commands, see the 
+    <a href="rose-command.html">Command Reference</a>.</p>
+
+    <h2 id="gui">GUI Tour</h2>
+
+    <p>This section explores working using the Rose system GUIs. You should
+    complete the above command line tour before starting this one.</p>
+
+    <h3>Suite Discovery GUI</h3>
+
+    <p>We'll use the discovery GUI to find and checkout our example suite. Open
+    a Linux/Unix terminal and issue the command:</p>
+    <pre class="shell">
+rosie go
+</pre>
+
+    <p>You should see a list of your suites as rows in a table.</p>
+
+    <p>You could find other suites by changing the filter options using the
+    buttons and pressing 'Query', or using the toolbar search and searching for
+    text strings.</p>
+
+    <p>There are toolbar options to create and copy suites. Copying and other
+    actions can be done by right clicking on a suite.</p>
+
+    <p>Look at the list to find the row that has the suite $ID, project, and
+    title from the command line tour. If you double-click on it, your suite
+    will be checked out and then the Rose configuration editor GUI will be
+    launched.</p>
+
+    <p>Go ahead and double click on your suite.</p>
+
+    <h3>Config Editor GUI</h3>
+
+    <p>The config editor should have started up with a view of your suite.</p>
+
+    <p>You can see from the toolbar that you can perform actions like
+    <samp>Undo</samp>, <samp>Redo</samp> and <samp>Find</samp>.</p>
+
+    <p>On the left hand side is a panel containing a tree with named nodes. If
+    you expand these, you can see that this represents the suite and
+    application configurations. Each section in a configuration is (normally) a
+    node here. Navigate to the application section <samp>my_hello_saturn</samp>
+    -&gt; <samp>env</samp> and click on <samp>env</samp>.</p>
+
+    <p>A page should have launched in the right hand panel. This contains
+    widgets for altering the <samp>env</samp> section of the application
+    <samp>my_hello_saturn</samp>.</p>
+
+    <p>Try altering the value of some of the settings, either using the text
+    box or the spin (numeric) buttons. When the settings are a different value
+    to the saved ones, their names will change colour. You can
+    <samp>Undo</samp> and <samp>Redo</samp> your actions. You can also
+    <samp>Save</samp> your changes.</p>
+
+    <p>If you move the mouse over the setting names, you can see some
+    descriptive text. You can access further help by clicking the little menu
+    button next to the setting name and selecting <samp>Help</samp> or
+    <samp>Web Help</samp>.</p>
+
+    <p>Finally, you can run your suite by clicking the <samp>Suite Run</samp>
+    button on the toolbar or selecting Action -&gt; Run Suite -&gt; Default
+    from the top menu. This will invoke <code>rose suite-run</code>.</p>
+  </div>
+</body>
+</html>

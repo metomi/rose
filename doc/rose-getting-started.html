@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide: Getting Started</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+</head>
+
+<body>
+  <div id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose User Guide: Getting Started</h1>
+
+    <div id="content"></div>
+
+    <h2 id="intro">Introduction</h2>
+
+    <p>If Rose is not installed at your site, please refer to
+    <a href="rose-install.html">Rose: Installation</a> for detail.</p>
+
+    <p>Before using Rose, it is desirable to configure a few things for
+    yourself. If you have just installed Rose at your site, you should configure
+    it to meet your site requirements.</p>
+
+    <h2 id="user">User Configuration</h2>
+
+    <p>You can configure Rose by creating and editing a configuration file in
+    your homespace (your user config):</p>
+    <pre>
+~/.met-um/rose.conf
+</pre>
+
+    <p>The format of this file is documented in <a href=
+    "rose-configuration.html#site">user/site config</a>.</p>
+
+    <p>You can view the current configuration options of Rose by opening a
+    terminal and running:</p>
+    <pre>
+rose config
+</pre>
+
+    <p>You can override the options in these sections by entering your own
+    options in your user config file. For example, changing the default
+    graphical text editor can be done by putting the following lines in your
+    user config file:</p>
+    <pre>
+[external]
+geditor=gvim
+</pre>
+
+    <p>This will change the graphical text editor used by Rose to 'gvim'.</p>
+
+    <p>You can also override many internal constants of the rose config editor
+    and rosie go. To change the keyboard shortcut of the <samp>Find Next</samp>
+    action in the config editor to <kbd>F3</kbd>, put the following lines in
+    your user config file:</p>
+    <pre>
+[rose-config-edit]
+accel-find-next=F3
+</pre>
+
+    <p>This will be applied the next time you run the config editor.</p>
+
+    <h2 id="site">Site Configuration</h2>
+
+    <p>You can configure Rose for your site by editing the file in a Rose
+    distribution:</p>
+    <pre>
+etc/rose.conf
+</pre>
+
+    <p>The format of this file is documented in <a href=
+    "rose-configuration.html#site">user/site config</a>.</p>
+
+    <p>Essential setup includes changing the options in
+    <samp>[rose-host-select]</samp> and <samp>[rose-suite-run]</samp> to
+    appropriate hostnames. You should also probably change the path settings in
+    <samp>[rose-task-run]</samp> to their equivalent for your site.</p>
+
+    <p>If you are using Rosie, you will need to change the paths, urls, and
+    hostnames in the <samp>rosie</samp> sections as well.</p>
+
+    <p>You may want to make sure the default programs referred to in
+    <samp>[external]</samp> are sensible.</p>
+  </div>
+</body>
+</html>

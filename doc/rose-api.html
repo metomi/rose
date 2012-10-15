@@ -1,0 +1,1711 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Reference Guide: API</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+</head>
+
+<body>
+  <div id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose Reference Guide: API</h1>
+
+    <div id="content"></div>
+
+    <h2 id="intro">Introduction</h2>
+
+    <p>Rose is mainly implemented in <a href="www.python.org">Python</a> and
+    <a href="http://www.gnu.org/software/bash/">bash</a>.</p>
+
+    <p>The sub-sections below explain how to make use of various application
+    programming interfaces within Rose which are designed for extension. These
+    are useful for extending Rose components or creating standalone programs
+    that seek to manipulate Rose information.</p>
+
+    <p>Most of these interfaces require a good knowledge of Python.</p>
+
+    <h2 id="gtk">Rose GTK library</h2>
+
+    <p>The Rose/Rosie GUIs (such as the config editor) are written using the
+    Python bindings for the GTK GUI toolkit (<a href=
+    "www.pygtk.org">PyGTK</a>). You can write your own custom GTK widgets and
+    use them within Rose. They should live with the metadata under the
+    <code>lib/python/widget/</code> directory.</p>
+
+    <h3 id="gtk:config-edit:values">Value Widgets</h3>
+
+    <p>Value widgets are used for operating on the values of settings. In the
+    config editor, they appear next to the menu button and name label. There
+    are builtin value widgets in Rose such as text entry boxes, radio buttons,
+    and drop-down menus. These are chosen by the config editor based on
+    metadata - for example, if a setting has an integer type, the value widget
+    will be a spin button.</p>
+
+    <p>The config editor supports adding user-defined custom widgets which
+    replace the default widgets.</p>
+
+    <p>For example, you may wish to add widgets that deal with dates (e.g.
+    using something based on a <a href=
+    "http://developer.gnome.org/pygtk/stable/class-gtkcalendar.html">calendar</a>
+    widget) or use a <a href=
+    "http://www.pygtk.org/pygtk2tutorial/sec-RangeWidgetEample.html">slider</a>
+    widget for numbers. You may even want something that uses an image-based
+    interface such as a latitude-longitude chooser based on a map.</p>
+
+    <p>Normally, widgets will be placed within the metadata directory for the
+    suite or application. Widgets going into the Rose core should be added to
+    the <code>lib/python/rose/config_editor/valuewidget/</code> directory in a
+    Rose distribution.</p>
+
+    <h4 id="gtk:config-edit:values:example">Example</h4>
+
+    <p>This example uses the example suite from the <a href=
+    "rose-brief-tour.html">brief tour</a> and assumes you are familiar with it.
+    You should be using a <a href=
+    "http://en.wikipedia.org/wiki/POSIX">POSIX</a>-based system. Change
+    directory to your suite directory - recreate it if deleted.</p>
+
+    <p>We are going to develop a value widget for the app
+    <code>fred_hello_world</code>. Change directory to the suite directory,
+    then change directory to <code>app/fred_hello_world</code>.</p>
+
+    <p>The metadata for the app lives under the <code>meta</code> sub
+    directory. Our new widget will live with the metadata.</p>
+
+    <p>Create the directories <code>meta/lib/python/widget/</code> by
+    running:</p>
+    <pre class="shell">
+mkdir -p meta/lib/python/widget
+</pre>
+
+    <p>Create an empty file called <code>__init__.py</code> in the
+    directory:</p>
+    <pre class="shell">
+touch meta/lib/python/widget/__init__.py
+</pre>
+
+    <p>Create a file called <code>username.py</code> in the directory:</p>
+    <pre class="shell">
+touch meta/lib/python/widget/username.py
+</pre>
+
+    <p>Open <code>username.py</code> in a text editor and paste in the
+    following text:</p>
+    <pre>
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+This module contains value widgets for helping enter usernames.
+
+Classes:
+    UsernameValueWidget - makes a helpful widget for usernames.
+
+"""
+
+import gobject
+import pygtk
+pygtk.require('2.0')
+import gtk
+
+
+class UsernameValueWidget(gtk.HBox):
+
+    """This class generates a widget for entering usernames."""
+
+    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+        super(UsernameValueWidget, self).__init__(homogeneous=False, spacing=0)
+        self.value = value
+        self.metadata = metadata
+        self.set_value = set_value
+        self.hook = hook
+        self.entry = gtk.Entry()
+        self.entry.set_text(self.value)
+        self.entry.connect_after("paste-clipboard", self._setter)
+        self.entry.connect_after("key-release-event", self._setter)
+        self.entry.connect_after("button-release-event", self._setter)
+        self.entry.show()
+        self.pack_start(self.entry, expand=True, fill=True,
+                        padding=0)
+        self.entry.connect('focus-in-event',
+                           hook.trigger_scroll)
+        self.grab_focus = lambda : hook.get_focus(self.entry)
+
+    def _setter(self, *args):
+        """Alter the variable value and update status."""
+        self.value = self.entry.get_text()
+        self.set_value(self.value)
+        return False
+
+    def get_focus_index(self):
+        """Return the cursor position within the variable value."""
+        return self.entry.get_position()
+
+    def set_focus_index(self, focus_index=None):
+        """Set the cursor position within the variable value."""
+        if focus_index is None:
+            return False
+        self.entry.set_position(focus_index)
+</pre>
+
+    <p>This is a slimmed-down copy of the class
+    <code>rose.config_editor.valuewidget.text.RawValueWidget</code>. It
+    contains all the API calls you would normally ever need.</p>
+
+    <p>We are now going to extend the widget to be more useful.</p>
+
+    <p>Add the line:</p>
+    <pre>
+import pwd
+</pre>
+
+    <p>at the top of the file, so it looks like this:</p>
+    <pre>
+import pwd
+
+import gobject
+import pygtk
+pygtk.require('2.0')
+import gtk
+</pre>
+
+    <p>This is the Python library that we'll use in a minute.</p>
+
+    <p>Now we need to create a predictive text model by adding some data to our
+    <code>gtk.Entry</code> text widget.</p>
+
+    <p>We need to write our method <code>_set_completion</code>, and put it in
+    the main body of the class. This will retrieve usernames from the
+    <code>pwd.getpwall()</code> function and store them so they can be used by
+    the text widget <code>self.entry</code>:</p>
+    <pre>
+    def _set_completion(self):
+        # Return a predictive text model.
+        completion = gtk.EntryCompletion()
+        model = gtk.ListStore(str)
+        for username in [p.pw_name for p in pwd.getpwall()]:
+            model.append([username])
+        completion.set_model(model)
+        completion.set_text_column(0)
+        completion.set_inline_completion(True)
+        self.entry.set_completion(completion)
+</pre>
+
+    <p>We need to make sure this method gets called at the right time, so we
+    add the line:</p>
+    <pre>
+        gobject.idle_add(self._set_completion)
+</pre>
+
+    <p>in the <code>__init__</code> method as follows:</p>
+    <pre>
+        self.entry.show()
+        self.pack_start(self.entry, expand=True, fill=True,
+                        padding=0)
+</pre>
+
+    <p>becomes</p>
+    <pre>
+        self.entry.show()
+        gobject.idle_add(self._set_completion)
+        self.pack_start(self.entry, expand=True, fill=True,
+                        padding=0)
+</pre>
+
+    <p>We could just call <code>self._set_completion()</code> there, but this
+    would hang the config editor while the database is retrieved.</p>
+
+    <p>Instead, we've told GTK to fetch the predictive text model when it's
+    next idle (<a href=
+    "http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gobject--idle-add">gobject.idle_add</a>).
+    This means it will be run after it finishes loading the page, and will be
+    more-or-less invisible to the user. This is a better way to launch
+    something that may take a second or two. If it took any longer, we'd
+    probably want to use a separate <a href=
+    "http://docs.python.org/library/multiprocessing.html#module-multiprocessing">
+    process</a>.</p>
+
+    <p>Our file now looks like this:</p>
+    <pre>
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+This module contains value widgets for helping enter usernames.
+
+Classes:
+    UsernameValueWidget - makes a helpful widget for usernames.
+
+"""
+
+import pwd
+
+import gobject
+import pygtk
+pygtk.require('2.0')
+import gtk
+
+
+class UsernameValueWidget(gtk.HBox):
+
+    """This class generates a widget for entering usernames."""
+
+    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+        super(UsernameValueWidget, self).__init__(homogeneous=False, spacing=0)
+        self.value = value
+        self.metadata = metadata
+        self.set_value = set_value
+        self.hook = hook
+        self.entry = gtk.Entry()
+        self.entry.set_text(self.value)
+        self.entry.connect_after("paste-clipboard", self._setter)
+        self.entry.connect_after("key-release-event", self._setter)
+        self.entry.connect_after("button-release-event", self._setter)
+        self.entry.show()
+        gobject.idle_add(self._set_completion)
+        self.pack_start(self.entry, expand=True, fill=True,
+                        padding=0)
+        self.entry.connect('focus-in-event',
+                           hook.trigger_scroll)
+        self.grab_focus = lambda : hook.get_focus(self.entry)
+
+    def _set_completion(self):
+        # Return a predictive text model.
+        completion = gtk.EntryCompletion()
+        model = gtk.ListStore(str)
+        for username in [p.pw_name for p in pwd.getpwall()]:
+            model.append([username])
+        completion.set_model(model)
+        completion.set_text_column(0)
+        completion.set_inline_completion(True)
+        self.entry.set_completion(completion)
+
+    def _setter(self, *args):
+        """Alter the variable value and update status."""
+        self.value = self.entry.get_text()
+        self.set_value(self.value)
+        return False
+
+    def get_focus_index(self):
+        """Return the cursor position within the variable value."""
+        return self.entry.get_position()
+
+    def set_focus_index(self, focus_index=None):
+        """Set the cursor position within the variable value."""
+        if focus_index is None:
+            return False
+        self.entry.set_position(focus_index)
+</pre>
+
+    <p>Now we need to refer to it in the metadata to make use of it.</p>
+
+    <p>Open the file <code>meta/rose-meta.conf</code> in a text editor and add
+    the lines:</p>
+    <pre>
+[env=HELLO_GREETER]
+widget[config-edit] = username.UsernameValueWidget
+</pre>
+
+    <p>This means that we've set our widget up for the option
+    <code>HELLO_GREETER</code> under the section <code>env</code>. It will now
+    be used as the widget for this variable's value.</p>
+
+    <p>Try opening up the config editor in the application directory (where the
+    rose-app.conf is) by typing:</p>
+    <pre>
+rose edit
+</pre>
+
+    <p>at the command line. Navigate to the <code>env</code> page. You should
+    see your widget on the top right of the page! As you type, it should
+    provide helpful auto-completion of usernames. Try typing your own
+    username.</p>
+
+    <h4 id="gtk:config-edit:values:api">API Reference</h4>
+
+    <p>All value widgets, custom or core, use the same API. This means that a
+    good practical reference is the set of existing value widgets in the
+    package <code>rose.config_editor.valuewidget</code>.</p>
+
+    <p>The procedure for implementing a custom value widget is as follows:</p>
+
+    <p>Assign a <var>widget[config-edit]</var> attribute to the relevant
+    variable in the metadata configuration, e.g.</p>
+    <pre>
+[namelist:VerifConNL/ScalarAreaCodes]
+widget[config-edit]=module_name.AreaCodeChooser
+</pre>
+
+    <p>where the widget class lives in the module <var>module_name</var> under
+    <code>lib/python/widget/</code> in the metadata directory for the
+    application or suite. Modules are imported by the config editor on
+    demand.</p>
+
+    <p>This class should have a constructor of the form</p>
+    <pre>
+class AreaCodeChooser(gtk.HBox):
+
+    def __init__(self, value, metadata, set_value, hook, widget_args=None)
+</pre>
+
+    <p>with the following arguments</p>
+
+    <dl>
+      <dt><code>value</code></dt>
+
+      <dd>a string that represents the value that the widget should
+      display.</dd>
+
+      <dt><code>metadata</code></dt>
+
+      <dd>
+        <p>a map or dictionary of configuration metadata properties for this
+        value, such as</p>
+        <pre>
+{'type': 'integer', 'help': 'This is used to count something'}
+</pre>
+
+        <p>You may not need to use this information.</p>
+      </dd>
+
+      <dt><code>set_value</code></dt>
+
+      <dd>
+        <p>a function that should be called with a new string value of this
+        widget, e.g.</p>
+        <pre>
+set_value("20")
+</pre>
+      </dd>
+
+      <dt><code>hook</code></dt>
+
+      <dd>An instance of a class
+      <code>rose.config_editor.valuewidget.ValueWidgetHook</code> containing
+      callback functions that you should connect some of your widgets to.</dd>
+
+      <dt><code>widget_args</code></dt>
+
+      <dd>
+        is an optional argument that stores any text given after the widget in
+        the metadata:
+        <pre>
+widget[config-edit] = modulename.ClassName arg1 arg2 arg3 ...
+</pre>would give a <code>widget_args</code> of <code>"arg1 arg2 arg3
+..."</code>. This could help configure your widget - for example, for a table
+based widget, you might give the column names:
+        <pre>
+widget[config-edit] = table.TableValueWidget NAME ID WEIGHTING
+</pre>This means that you can write a generic widget and then configure it for
+different cases.
+      </dd>
+    </dl>
+
+    <p><code>hook</code> contains some callback functions that you should
+    implement:</p>
+
+    <dl>
+      <dt><code>hook.get_focus(widget) -&gt; None</code></dt>
+
+      <dd>
+        <p>which you should connect your top-level widget (<samp>self</samp>)
+        to as follows:</p>
+        <pre>
+    self.grab_focus = lambda: hook.get_focus(my_favourite_focus_widget)
+</pre>
+
+        <p>or define a method in your class</p>
+        <pre>
+def grab_focus(self):
+    """Override the focus method, so we can scroll to a particular widget."""
+    return hook.get_focus(my_favourite_focus_widget)
+</pre>
+
+        <p>which allows the correct widget
+        (<samp>my_favourite_focus_widget</samp>) in your container to receive
+        the focus such as a gtk.Entry (<code>my_favourite_focus_widget</code>)
+        and will also trigger a scroll action on a config editor page. This is
+        important to implement to get the proper global find functionality.</p>
+      </dd>
+
+      <dt><code>hook.trigger_scroll(widget) -&gt; None</code></dt>
+
+      <dd>
+        <p>accessed by</p>
+        <pre>
+    hook.trigger_scroll(my_favourite_focus_widget)
+</pre>
+
+        <p>This should be connected to the <code>focus-in-event</code> GTK
+        signal of your top-level widget (<samp>self</samp>):</p>
+        <pre>
+        self.entry.connect('focus-in-event',
+                           hook.trigger_scroll)
+        
+</pre>
+
+        <p>This also is used to trigger a config editor page scroll to your
+        widget.</p>
+      </dd>
+    </dl>
+
+    <p>You may implement the following optional methods for your widget, which
+    help to preserve cursor position when a widget is refreshed:</p>
+
+    <dl>
+      <dt><code>set_focus_index(focus_index) -&gt; None</code></dt>
+
+      <dd>
+        <p>A method that takes a number as an argument, which is the current
+        cursor position relative to the characters in the variable value:</p>
+        <pre>
+def set_focus_index(self, focus_index):
+    """Set the cursor position to focus_index."""
+    self.entry.set_position(focus_index)
+</pre>
+
+        <p>For example, a <code>focus_index</code> of <samp>0</samp> means that
+        your widget should set the cursor position to the beginning of the
+        value. A <code>focus_index</code> of <samp>4</samp> for a variable
+        value of <samp>Operational</samp> means that the cursor should be
+        placed between the <samp>r</samp> and the <samp>a</samp>.</p>
+
+        <p>This has no real meaning or importance for widgets that don't
+        display editable text. If you do not supply this method, the config
+        editor will attempt to do the right thing anyway.</p>
+      </dd>
+
+      <dt><code>get_focus_index() -&gt; focus_index</code></dt>
+
+      <dd>
+        <p>A method that takes no arguments and returns a number which is the
+        current cursor position relative to the characters in the variable
+        value:</p>
+        <pre>
+def get_focus_index(self):
+    """Return the cursor position."""
+    return self.entry.get_position()
+</pre>
+
+        <p>This has no real meaning or importance for widgets that don't
+        display editable text. If you do not supply this method, the config
+        editor will guess the cursor position anyway, based on the last change
+        to the variable value.</p>
+      </dd>
+
+      <dt><code>handle_type_error(is_in_error) -&gt; None</code></dt>
+
+      <dd>
+        <p>The default behaviour when a variable error is added or removed is
+        to re-instantiate the widget (refresh and redraw it). This can be
+        overridden by defining this method in your value widget class. It takes
+        a boolean <code>is_in_error</code> which is <samp>True</samp> if there
+        is a value (type) error and <samp>False</samp> otherwise:</p>
+        <pre>
+def handle_type_error(self, is_in_error):
+    """Change behaviour based on whether the variable is_in_error."""
+    icon_id = gtk.STOCK_DIALOG_ERROR if is_in_error else None
+    self.entry.set_icon_from_stock(0, gtk.STOCK_DIALOG_ERROR)       
+</pre>
+
+        <p>For example, this is used in a built-in widget for the quoted string
+        types <code>string</code> and <code>character</code>. The quotes around
+        the text are normally hidden, but the <code>handle_type_error</code>
+        shows them if there is an error. The method also keeps the keyboard
+        focus, which is the main purpose.</p>
+
+        <p>You may not have much need for this method, as the default error
+        flagging and cursor focus handling is normally sufficient.</p>
+      </dd>
+    </dl>
+
+    <p>All the existing variable value widgets are implemented using this API,
+    so a good resource is the modules within the
+    lib/python/rose/config_editor/valuewidget package.</p>
+
+    <h3 id="gtk:config-edit:pages">Config Editor Custom Pages</h3>
+
+    <p>A 'page' in the config editor is the container inside a tab or detached
+    tab that (by default) contains a table of variable widgets. The config
+    editor allows custom 'pages' to be defined that may or may not use the
+    standard set of variable widgets (menu button, name, value widget). This
+    allows any presentation of the underlying variable information.</p>
+
+    <p>For example, you may wish to present the variables in a more structured,
+    two-dimensional form rather than as a simple list. You may want to strip
+    down or add to the information presented by default - e.g. hiding names or
+    embedding widgets within a block of help text.</p>
+
+    <p>You may even wish to do something off-the-wall such as an <a href=
+    "http://code.google.com/p/jrfonseca/wiki/XDot">xdot-based</a> widget
+    set!</p>
+
+    <h4 id="gtk:config-edit:pages:api">API Reference</h4>
+
+    <p>The API for custom page widgets is fully functional, but importing them
+    using the meta-data is not yet implemented.</p>
+
+    <p>The procedure for generating a custom page widget is as follows:</p>
+
+    <p>Assign a <code>widget</code> option to the relevant namespace in the
+    metadata configuration, e.g.</p>
+    <pre>
+    [ns:namelist/STASHNUM]
+    widget[config-edit]=module_name.MyGreatBigTable
+</pre>
+
+    <p>The widget class should have a constructor of the form</p>
+    <pre>
+    class MyGreatBigTable(gtk.Table):
+
+        def __init__(self, real_variable_list, missing_variable_list,
+                     variable_functions_class_inst, show_modes_dict)
+</pre>
+
+    <p>The class can inherit from any <code>gtk.Container</code>-derived
+    class.</p>
+
+    <p>The constructor arguments are</p>
+
+    <dl>
+      <dt><code>real_variable_list</code></dt>
+
+      <dd>a list of the Variable objects (x.name, x.value, x.metadata, etc from
+      the [source:/rose/trunk/lib/python/rose/variable.py rose.variable]
+      module). These are the objects you will need to generate your widgets
+      around.</dd>
+
+      <dt><code>missing_variable_list</code></dt>
+
+      <dd>a list of 'missing' Variable objects that could be added to the
+      container. You will only need to worry about these if you plan to show
+      them by implementing the <code>'View Latent'</code> menu functionality
+      that we'll discuss further on.</dd>
+
+      <dt><code>variable_functions_class_inst</code></dt>
+
+      <dd>an instance of the class rose.config_editor.stack.VariableOperations.
+      This contains methods to operate on the variables. These will update the
+      undo stack and take care of any errors. These methods are the only ways
+      that you should write to the variable states or values. For
+      documentation, see the module
+      lib/python/rose/config_editor/stack.py.</dd>
+
+      <dt><code>show_modes_dict</code></dt>
+
+      <dd>
+        a dictionary that looks like this:
+        <pre>
+    show_modes_dict = {'latent': False, 'fixed': False, 'ignored': True, 'title': False}
+</pre>
+
+        <p>which could be ignored for most custom pages, as you need. The
+        meaning of the different keys in a non-custom page is:</p>
+
+        <dl>
+          <dt><code>'latent'</code></dt>
+
+          <dd>False means don't display widgets for variables in the metadata
+          or that have been deleted (the <code>variable_list.ghosts</code>
+          variables)</dd>
+
+          <dt><code>'fixed'</code></dt>
+
+          <dd>False means don't display widgets for variables if they only have
+          one value set in the metadata <code>values</code> option.</dd>
+
+          <dt><code>'ignored'</code></dt>
+
+          <dd>False means don't display widgets for variables if they're
+          ignored (in the configuration, but commented out).</dd>
+
+          <dt><code>'title'</code></dt>
+
+          <dd>Short for 'View with no title', False means show the title of a
+          variable, True means show the variable name instead.</dd>
+        </dl>
+
+        <p>If you wish to implement actions based on changes in these
+        properties (e.g. displaying and hiding fixed variables depending on the
+        'fixed' setting), the custom page widget should expose methods named
+        'show_' followed by the key. However, 'ignored' is handled separately
+        (more below). These methods should take a single boolean that indicates
+        the display status. For example:</p>
+        <pre>
+def show_fixed(self, should_show)
+</pre>
+
+        <p>The argument <code>should_show</code> is a boolean. If True, fixed
+        variables should be shown. If False, they should be hidden by your
+        custom container.</p>
+      </dd>
+    </dl>
+
+    <p>Refreshing the whole page in order to display a small change to a
+    variable (the default) can be undesirable. To deal with this, custom page
+    widgets can optionally expose some variable-change specific methods that do
+    this themselves. These take a single rose.variable.Variable instance as an
+    argument.</p>
+
+    <dl>
+      <dt><code>def add_variable_widget(self, variable) -&gt; None</code></dt>
+
+      <dd>will be called when a variable is created.</dd>
+
+      <dt><code>def reload_variable_widget(self, variable) -&gt;
+      None</code></dt>
+
+      <dd>will be called when a variable's status is changed, e.g. it goes into
+      an error state.</dd>
+
+      <dt><code>def remove_variable_widget(self, variable) -&gt;
+      None</code></dt>
+
+      <dd>will be called when a variable is removed.</dd>
+    </dl>
+
+    <p>If you take the step of using your own variable widgets, rather than the
+    VariableWidget class in lib/python/rose/config_editor/variable.py (the
+    default for normal config-edit pages), each variable-specific widget should
+    have an attribute <code>variable</code> set to their rose.variable.Variable
+    instance. You can implement 'ignored' status display by giving the widget a
+    method <code>set_ignored</code> which takes no arguments. This should
+    examine the <code>ignored_reason</code> dictionary attribute of the
+    widget's <code>variable</code> instance - the variable is ignored if this
+    is not empty. If the variable is ignored, the widget should indicate this
+    e.g. by greying out part of it.</p>
+
+    <p>All existing page widgets use this API, so a good resource is the
+    classes in lib/python/rose/config_editor/container.py.</p>
+
+    <p>Generally speaking, a visible change, click, or key press in the custom
+    page widget should make instant changes to variable value(s), and the value
+    that the user sees. Pages are treated as temporary, superficial views of
+    variable data, and changes are always assumed to be made directly to the
+    main copy of the configuration in memory (this is automatic when the
+    [source:/rose//trunk/lib/python/rose/config_editor/stack.py
+    rose.config_editor.stack.VariableOperations] methods are used, as they
+    should be). Closing the page shouldn't change, or lose, any data! The
+    custom class should return a gtk object to be packed into the page
+    framework, so it's best to subclass from an existing gtk Container type
+    such as gtk.VBox (or gtk.Table, in the example above).</p>
+
+    <p>In line with the general philosophy, metadata should not be critical to
+    page operations - it should be capable of displaying variables even when
+    they have no or very little metadata, and still make sense if some
+    variables are missing or new.</p>
+
+    <h2 id="macro">Rose Macros</h2>
+
+    <p>Rose macros manipulate or check configurations, often based on their
+    metadata. There are two types of macros:</p>
+
+    <ul>
+      <li>Checkers (validators) - check a configuration, perhaps using
+      metadata.</li>
+
+      <li>Changers (transformers) - change a configuration e.g. adding/removing
+      options.</li>
+    </ul>
+
+    <p>There are built-in rose macros that handle standard behaviour such as
+    trigger changing and type checking.</p>
+
+    <p>This section explains how to add your own custom macros to transform and
+    validate configurations. Macros should be written in Python. They can be
+    run within <code>rose config-edit</code> or via <code>rose
+    macro.</code></p>
+
+    <p>You should avoid writing checker macros if the checking can be expressed
+    via metadata.</p>
+
+    <h3 id="macro:location">Location</h3>
+
+    <p>A module containing macros should be stored under a directory
+    <code>lib/python/macros/</code> in the metadata for a configuration. This
+    directory should be a Python package.</p>
+
+    <p>When developing macros for Rose internals, macros should be placed in
+    the <code>rose.macros</code> package in the Rose Python library. They
+    should be referenced by the <code>lib/python/rose/macros/__init__.py</code>
+    classes and a call to them can be added in the
+    <code>lib/python/rose/config_editor/main.py</code> module if they need to
+    be run implicitly by the config editor.</p>
+
+    <h3 id="macro:code">Code</h3>
+
+    <h4 id="macro:code:examples">Examples</h4>
+
+    <p>These examples use the example suite from the <a href=
+    "rose-brief-tour.html">brief tour</a> which you should have familiarised
+    yourself with.</p>
+
+    <p>Change directory to your example suite directory.</p>
+
+    <p>We are going to develop a macro for the app
+    <code>fred_hello_world</code>. Change directory to
+    <code>app/fred_hello_world</code>.</p>
+
+    <p>The metadata for the app lives under the <code>meta</code> sub
+    directory. Our new macro will live with the metadata.</p>
+
+    <p>For this example, we want to check the value of the option
+    <var>env=WORLD</var> in our fred_hello_world application. Specifically, for
+    this example, we want our macro to give us an error if the 'world' is too
+    far away from Earth.</p>
+
+    <p>Create the directories <code>meta/lib/python/macros/</code> by
+    running:</p>
+    <pre class="shell">
+mkdir -p meta/lib/python/macros
+</pre>
+
+    <p>Create an empty file called <code>__init__.py</code> in the
+    directory:</p>
+    <pre class="shell">
+touch meta/lib/python/macros/__init__.py
+</pre>
+
+    <p>Create a file called <code>planet.py</code> in the directory:</p>
+    <pre class="shell">
+touch meta/lib/python/widget/planet.py
+</pre>
+
+    <p>Open <code>planet.py</code> in a text editor and paste in the following
+    text:</p>
+    <pre>
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import re
+import subprocess
+
+import rose.macro
+
+
+class PlanetChecker(rose.macro.MacroBase):
+
+    """Checks option values that refer to planets."""
+
+    opts_to_check = [("env", "WORLD")]
+
+    def validate(self, config, meta_config=None):
+        """Return a list of errors, if any."""
+        problem_list = []
+        for section, option in self.opts_to_check:
+            node = config.get([section, option])
+            if node is None or node.is_ignored():
+                continue
+            # Check the option value (node.value) here
+        return problem_list
+</pre>
+
+    <p>We need to check the value of the option. In this case we'll generate a
+    list of allowed 'planet' choices.</p>
+
+    <p>Add the line</p>
+    <pre>
+        allowed_planets = self._get_allowed_planets()
+</pre>
+
+    <p>at the top of the <code>validate</code> method, so it looks like
+    this:</p>
+    <pre>
+    def validate(self, config, meta_config=None):
+        """Return a list of errors if any."""
+        allowed_planets = self._get_allowed_planets()
+        problem_list = []
+</pre>
+
+    <p>Now add the method <code>_get_allowed_planets</code> to the class:</p>
+    <pre>
+    def _get_allowed_planets(self):
+        # Retrieve planets less than a certain distance away.
+        cmd_strings = ["wget", "-q", "-O", "-",
+                       "http://www.heavens-above.com/planetsummary.aspx"]
+        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
+        text = p.communicate()[0]
+        planets = re.findall("(\w+)&lt;/a&gt;",
+                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
+                                    r"\1", text))
+        distances = re.findall("([\d.]+)&lt;/td&gt;",
+                               re.sub('(?s)^.*(Range.*?Brightness).*$',
+                                      r"\1", text))
+        for planet, distance in zip(planets, distances):
+            if float(distance) &gt; 5.0:
+                planets.remove(planet)
+        planets += ["Earth"]  # Distance ~ 0
+        return planets
+</pre>
+
+    <p>This will give us a list of valid (nearby) solar system planets which
+    our configuration option should be in. If it isn't, we need to send a
+    message explaining the problem. Add:</p>
+    <pre>
+    error_text = "planet is too far away."
+</pre>
+
+    <p>at the top of the class, like this:</p>
+    <pre>
+class PlanetChecker(rose.macro.MacroBase):
+
+    """Checks option values that refer to planets."""
+
+    error_text = "planet is too far away."
+    opts_to_check = [("env", "WORLD")]
+
+    def validate(self, config, meta_config=None):
+    """Return a list of errors, if any."""
+        allowed_planets = self._get_allowed_planets()
+        problem_list = []
+</pre>
+
+    <p>Finally, we need to check if the configuration option is in the list, by
+    replacing</p>
+    <pre>
+            # Check the option value (node.value) here
+</pre>
+
+    <p>with</p>
+    <pre>
+            if node.value not in allowed_planets:
+                self.add_report(problem_list, section, option, node.value,
+                                self.error_text)
+</pre>
+
+    <p>which adds some information to the <code>problem_list</code> if the
+    option value is not a valid planet.</p>
+
+    <p>Your final macro should look like this:</p>
+    <pre>
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import re
+import subprocess
+
+import rose.macro
+
+
+class PlanetChecker(rose.macro.MacroBase):
+
+    """Checks option values that refer to planets."""
+
+    error_text = "planet is too far away."
+    opts_to_check = [("env", "WORLD")]
+
+    def validate(self, config, meta_config=None):
+        """Return a list of errors, if any."""
+        allowed_planets = self._get_allowed_planets()
+        problem_list = []
+        for section, option in self.opts_to_check:
+            node = config.get([section, option])
+            if node is None or node.is_ignored():
+                continue
+            if node.value not in allowed_planets:
+                self.add_report(problem_list, section, option, node.value,
+                                self.error_text)
+        return problem_list
+
+    def _get_allowed_planets(self):
+        # Retrieve planets less than a certain distance away.
+        cmd_strings = ["wget", "-q", "-O", "-",
+                       "http://www.heavens-above.com/planetsummary.aspx"]
+        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
+        text = p.communicate()[0]
+        planets = re.findall("(\w+)&lt;/a&gt;",
+                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
+                                    r"\1", text))
+        distances = re.findall("([\d.]+)&lt;/td&gt;",
+                               re.sub('(?s)^.*(Range.*?Brightness).*$',
+                                      r"\1", text))
+        for planet, distance in zip(planets, distances):
+            if float(distance) &gt; 5.0:
+                planets.remove(planet)
+        planets += ["Earth"]  # Distance ~ 0
+        return planets
+</pre>
+
+    <p>Your checker macro is now ready to use.</p>
+
+    <p>You can run it by running:</p>
+    <pre class="shell">
+rose edit
+</pre>
+
+    <p>in the application directory. Select the top menu Metadata, then the item
+    <var>fred_hello_world</var>, then the item
+    <var>planet.PlanetChecker.validate</var>.</p>
+
+    <p>It should either return an "OK" dialog, or give an error dialog using
+    the error text we wrote.</p>
+
+    <p>If there is an error, the variable should display an error icon on the
+    <var>env</var> page, which you can hover-over to get the error text. You
+    can remove the error by fixing the value and re-running your macro.</p>
+
+    <p>Try changing the value of <var>env=WORLD</var> to other solar system
+    planets and re-running the macro.</p>
+
+    <p>You can also run your macro from the command line in the application
+    directory by invoking <code>rose macro planet.PlanetChecker</code>.</p>
+
+    <p>We'll now make a macro that <em>changes</em> the configuration. Our
+    example will change the value of <var>env=WORLD</var> to something
+    else.</p>
+
+    <p>Open <code>planet.py</code> in a text editor and add the following
+    lines:</p>
+    <pre>
+class PlanetChanger(rose.macro.MacroBase):
+
+    """Switch between planets."""
+
+    change_text = '{0} to {1}'
+    opts_to_change = [("env", "WORLD")]
+    planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn",
+               "Uranus", "Neptune", "Eris", "Neptune", "Uranus", "Saturn",
+               "Jupiter", "Mars", "Earth", "Venus"]
+
+    def transform(self, config, meta_config=None):
+        """Transform configuration and return it with a list of changes."""
+        change_list = []
+        for section, option in self.opts_to_change:
+            node = config.get([section, option])
+            # Do something to the configuration.
+        return config, change_list
+</pre>
+
+    <p>We need to write some code to make some changes to the
+    configuration.</p>
+
+    <p>Replace the line</p>
+    <pre>
+            # Do something to the configuration.
+</pre>
+
+    <p>with</p>
+    <pre>
+            if node is None or node.is_ignored():
+                continue
+            if node.value not in self.planets:
+                old_planet = node.value
+                new_planet = self.planets[0]
+            else:
+                old_planet = node.value
+                index = self.planets.index(node.value)
+                if index == len(self.planets) - 1:
+                    new_index = 0
+                else:
+                    new_index = index + 1
+                new_planet = self.planets[new_index]
+            config.set([section, option], new_planet)
+</pre>
+
+    <p>This changes the option <var>env=WORLD</var> to the next planet on the
+    list. It will set it to the first planet on the list if it is something
+    else. It will skip it if it is missing or <var>ignored</var>.</p>
+
+    <p>We also need to add a change message to flag what we've changed.</p>
+
+    <p>Beneath</p>
+    <pre>
+            config.set([section, option], new_planet)
+</pre>
+
+    <p>add</p>
+    <pre>
+            message = self.change_text.format(old_planet, new_planet)
+            self.add_report(change_list, section, option, new_planet,
+                            message)
+</pre>
+
+    <p>This makes use of the template <code>self.change_text</code> at the top
+    of the class. The message will be used to provide more information to the
+    user about the change.</p>
+
+    <p>Your class should now look like this:</p>
+    <pre>
+class PlanetChanger(rose.macro.MacroBase):
+
+    """Switch between planets."""
+
+    change_text = '{0} to {1}'
+    opts_to_change = [("env", "WORLD")]
+    planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn",
+               "Uranus", "Neptune", "Eris", "Neptune", "Uranus", "Saturn",
+               "Jupiter", "Mars", "Earth", "Venus"]
+
+    def transform(self, config, meta_config=None):
+        """Transform configuration and return it with a list of changes."""
+        change_list = []
+        for section, option in self.opts_to_change:
+            node = config.get([section, option])
+            if node is None or node.is_ignored():
+                continue
+            if node.value not in self.planets:
+                old_planet = node.value
+                new_planet = self.planets[0]
+            else:
+                old_planet = node.value
+                index = self.planets.index(node.value)
+                if index == len(self.planets) - 1:
+                    new_index = 0
+                else:
+                    new_index = index + 1
+                new_planet = self.planets[new_index]
+            config.set([section, option], new_planet)
+            message = self.change_text.format(old_planet, new_planet)
+            self.add_report(change_list, section, option, new_planet,
+                            message)
+        return config, change_list
+</pre>
+
+    <p>Your transform macro is now ready to use.</p>
+
+    <p>You can run it by running:</p>
+    <pre class="shell">
+rose edit
+</pre>
+
+    <p>in the application directory. Select the top menu Metadata, then the item
+    <var>fred_hello_world</var>, then the item
+    <var>planet.PlanetChanger.transform</var>.</p>
+
+    <p>It should give a dialog explaining the changes it's made and asking for
+    permission to apply them. If you click <var>OK</var>, the changes will be
+    applied and the value of <var>env=WORLD</var> will be changed. You can
+    <var>Undo</var> and <var>Redo</var> macro changes.</p>
+
+    <p>Try running the macro once or twice more to see it change the
+    configuration.</p>
+
+    <p>You can also run your macro from the command line in the application
+    directory by invoking <code>rose macro planet.PlanetChanger</code>.</p>
+
+    <h4 id="macro:code:api">API Reference</h4>
+
+    <p>Macros should subclass from <code>rose.macro.MacroBase</code>. There are
+    two types of macro - checkers (validators) which do not alter a
+    configuration but provide error messages, and changers (transformers) which
+    return an altered configuration. A macro class can contain one or both of
+    these behaviours.</p>
+
+    <p>Your macro should provide a method called <code>validate</code> (for
+    <em>checking</em>) and/or a method called <code>transform</code> (for
+    <em>changing</em>). These methods should accept two
+    <code>rose.config.ConfigNode</code> instances as arguments - one is the
+    configuration, and one is the metadata configuration that provides
+    information about the configuration items.</p>
+
+    <p>A validator macro should look like:</p>
+    <pre>
+import rose.macro
+
+class SomeValidator(rose.macro.MacroBase):
+
+    """This does some kind of check."""
+
+    def validate(self, config, meta_config=None):
+        # Some check on config goes here, generates list_of_problems
+        return list_of_problems
+</pre>
+
+    <p>The returned list should be a list of rose.macro.MacroReport objects
+    containing the section, option, value, and warning strings for each
+    setting that is in error. These are initialised behind the scenes by
+    calling the inherited method <code>rose.macro.MacroBase.add_report</code>
+    via <code>self.add_report</code>. This has the form:</p>
+    <pre>
+    def add_report(self, report_list, section=None, option=None, value=None,
+                   info=None, is_warning=False):
+</pre>
+    <p>This means that you should call it with your problem list first, then
+    the relevant section, then the relevant option, then the relevant value,
+    then the relevant error message, and optionally a warning flag that
+    we'll discuss later. If the setting is a section, the option 
+    should be <code>None</code> and the value None. For example,</p>
+    <pre>
+    def validate(self, config, meta_config=None):
+        list_of_problems = []
+        editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
+        if editor_value != "sed":
+            self.add_report(list_of_problems,              # List to add to
+                            "env",                         # Section
+                            "MY_FAVOURITE_STREAM_EDITOR",  # Option
+                            editor_value,                  # Value
+                            "Should be 'sed'!")            # Message
+        return list_of_problems
+</pre>
+
+    <p>Validator macros have the option to give warnings, which do not count
+    as formal errors in the Rose config editor GUI. These should be used when
+    something <em>may</em> be wrong, such as warning when using an
+    advanced-developer-only option. They are invoked by passing a 6th argument
+    to <code>self.add_report</code>, <code>is_warning</code>, like so:</p>
+
+    <pre>
+            self.add_report(list_of_problems,
+                            "env",
+                            "MY_FAVOURITE_STREAM_EDITOR",
+                            editor_value,
+                            "Could be 'sed'",
+                            is_warning=True)
+</pre>
+
+    <p>A transformer macro should look like:</p>
+    <pre>
+import rose.macro
+
+class SomeTransformer(rose.macro.MacroBase):
+
+    """This does some kind of change to the config."""
+
+    def transform(self, config, meta_config=None):
+        # Some operation on config goes here, generates list_of_changes
+        return config, list_of_changes
+</pre>
+
+    <p>The returned list should be a list of 4-tuples containing the section,
+    option, value, and information strings for each setting that was changed
+    (e.g. added, removed, value changed). If the setting is a section, the
+    option should be <code>None</code> and the value None. If an option was
+    removed, the value should be the old value - otherwise it should be the new
+    one (added/changed). For example,</p>
+    <pre>
+    def transform(self, config, meta_config=None):
+        """Add some more snow control."""
+        list_of_changes = []
+        if config.get(["namelist:snowflakes"]) is None:
+            config.set(["namelist:snowflakes"])
+            list_of_changes.append(("namelist:snowflakes", None, None,
+                                    "Updated snow handling in time for Christmas"))
+            config.set(["namelist:snowflakes", "l_unique"], ".true.")
+            self.add_report(list_of_changes, "namelist:snowflakes",
+                            "l_unique", ".true.", "So far, anyway.")
+        return config, list_of_changes
+</pre>
+
+    <h2 id="rosie-ws">Rosie Web</h2>
+
+    <p>This section explains how to use the Rosie web service API. All Rosie
+    discovery services (e.g. <code>rosie search</code>, <code>rosie
+    go</code>, web page) use a <a href=
+    "http://en.wikipedia.org/wiki/Representational_state_transfer">RESTful</a>
+    API to interrogate a web server, which then interrogates an <a href=
+    "http://planetofcoders.com/rdbms/">RDBMS</a>. Returned data is encoded in
+    the <a href="http://www.json.org/">JSON</a> format.</p>
+
+    <p>You may wish to utilise the Python class
+    <code>rosie.ws_client.Client</code> as an alternative to this API.</p>
+
+    <h3 id="rosie-ws:location">Location</h3>
+
+    <p>The root url to access the rosie web API can be found in your rose site
+    configuration file as the value of
+    <var>[rosie-ws-client]ws-root-default</var>. To access the API for a given
+    repository with prefix PREFIX_NAME, you must select a format (the only
+    currently supported format is 'json') and use a url that looks like:
+    <pre>
+http://host/PREFIX_NAME/get_common_keys?format=json
+</pre>
+
+    <h3 id="rosie-ws:usage">Usage</h3>The API contains the following methods:
+
+    <dl>
+      <dt><code>get_common_keys</code></dt>
+
+      <dd>
+        returns the main property names stored for suites (e.g. idx, branch,
+        owner) and takes the format argument. For example, entering a URL in a
+        web browser:
+        <pre>
+http://host/mo1/json/get_common_keys?format=json
+</pre>
+
+        <p>may give</p>
+        <pre>
+["idx", "branch", "revision", "owner", "project", "title", "status"]  
+</pre>
+      </dd>
+
+      <dt><code>get_optional_keys</code></dt>
+
+      <dd>
+        returns all unique optional or user-defined property names given in
+        suite discovery information (e.g. access-list, tag-list) and takes the
+        format argument. For example, entering this URL in Firefox:
+        <pre>
+http://host/mo1/json/get_optional_keys?format=json
+</pre>
+
+        <p>may give</p>
+        <pre>
+["access-list", "description", "endgame_status", "operational_flag", "tag-list"]
+</pre>
+      </dd>
+
+      <dt><code>get_query_operators</code></dt>
+
+      <dd>
+        returns all the SQL-like operators used to compare column values that
+        you may use in queries (below) (e.g. <samp>eq</samp>, <samp>ne</samp>,
+        <samp>contains</samp>, <samp>like</samp>) and takes the format
+        argument. For example, entering this URL in a web browser:
+        <pre>
+http://host/mo1/json/get_query_operators?format=json
+</pre>
+
+        <p>may give</p>
+        <pre>
+["eq", "ge", "gt", "le", "lt", "ne", "contains", "endswith", "ilike", "like", "match", "startswith"]
+</pre>
+      </dd>
+
+      <dt><code>info</code></dt>
+
+      <dd>
+        returns an associative array of suite property key-value pairs, and
+        takes three suite arguments: idx, branch, revision to identify a suite
+        and the format argument. For example, entering this URL in a web browser:
+        <pre>
+http://host/mo1/json/info?idx=aa000&amp;branch=trunk&amp;revision=1&amp;format=json
+</pre>
+
+        <p>may give</p>
+        <pre>
+{"access-list": ["fred", "alice"], "author": "bob", "experiment": "HADGEM6", 
+ "date": 1340700481}
+</pre>
+
+        <p>revision is an optional argument.</p>
+      </dd>
+
+      <dt><code>query</code></dt>
+
+      <dd>
+        takes a list of queries <code>q</code> and the format argument. The
+        syntax of the query looks like:
+        <pre>
+CONJUNCTION+[OPEN_GROUP+]FIELD+OPERATOR+VALUE[+CLOSE_GROUP]
+</pre>
+
+        <p>where</p>
+
+        <dl>
+          <dt><code>CONJUNCTION</code></dt>
+
+          <dd><kbd>and</kbd> or <kbd>or</kbd></dd>
+
+          <dt><code>OPEN_GROUP</code></dt>
+
+          <dd>optional, one or more <kbd>(</kbd></dd>
+
+          <dt><code>FIELD</code></dt>
+
+          <dd>e.g. <var>idx</var> or <var>description</var></dd>
+
+          <dt><code>OPERATOR</code></dt>
+
+          <dd>e.g. <kbd>contains</kbd> or <kbd>between</kbd>, one of the
+          operators returned by <code>get_query_operators</code></dd>
+
+          <dt><code>VALUE</code></dt>
+
+          <dd>e.g. <samp>euro4m</samp> or <samp>200</samp></dd>
+
+          <dt><code>CLOSE_GROUP</code></dt>
+
+          <dd>optional, one or more <kbd>)</kbd></dd>
+        </dl>
+
+        <p>The first <code>CONJUNCTION</code> is technically superfluous. The
+        <code>OPEN_GROUP</code> and <code>CLOSE_GROUP</code> do not have to be
+        used. Entering this URL in a web browser:</p>
+        <pre>
+http://host/mo1/query?q=and+idx+endswith+78&amp;q=or+owner+eq+bob&amp;format=json
+</pre>
+
+        <p>may give</p>
+        <pre>
+[{"idx": "aa078", "branch": "trunk", "revision": 200, "owner": "fred",
+  "project": "fred's project.", "title": "fred's awesome suite",
+  "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"},
+ {"idx": "aa090", "branch": "trunk", "revision": 350, "owner": "bob",
+  "project": "var", "title": "A copy of var.vexcs.", "status": "M ",
+  "access-list": ["*"], "operational": "Y"}]
+</pre>
+
+        <p>This returned all current suites that have an idx that ends with
+        <samp>78</samp> and also all suites that have the owner
+        <samp>bob</samp>. Each suite is returned as an entry in a list - each
+        entry is an associative array of property name-value pairs. These 
+        pairs contain all database information about a suite.</p>
+
+        <p><code>query</code> also takes the optional argument
+        <code>all_revs</code> which switches on searching older revisions of
+        current suites and deleted suites. For example, entering this URL in a
+        web browser:</p>
+        <pre>
+http://host/mo1/json/query?q=and+idx+endswith+78&amp;all_revs&amp;format=json
+</pre>
+
+        <p>may give</p>
+        <pre>
+[{"idx": "aa078", "branch": "trunk", "revision": 120, "owner": "fred",
+  "project": "fred's project.", "title": "fred's new suite",
+  "status": "A "}
+ {"idx": "aa078", "branch": "trunk", "revision": 199, "owner": "fred",
+  "project": "fred's project.", "title": "fred's awesome suite",
+  "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"},
+ {"idx": "aa078", "branch": "trunk", "revision": 200, "owner": "fred",
+  "project": "fred's project.", "title": "fred's awesome suite",
+  "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"}]
+</pre>
+      </dd>
+
+      <dd>
+        <p>This returned all past and present suites that have an idx that ends
+        with <samp>78</samp>. You can see that older revisions of the
+        <samp>aa078</samp> suite appear.</p>
+      </dd>
+
+      <dd>
+        <p>You can also use parentheses in your search to group expressions.
+        For example, entering this URL in a web browser:</p>
+        <pre>
+http://host/mo1/json/query?q=and+(+owner+eq+bob&amp;q=or+owner+eq+fred+)&amp;q=and+project+eq+test&amp;format=json
+</pre>
+
+        <p>would search for all suites that are owned by <samp>bob</samp> or
+        <samp>fred</samp> that have the project <samp>test</samp>.</p>
+      </dd>
+
+      <dt><code>search</code></dt>
+
+      <dd>
+        takes any number of string arguments and the format argument and
+        returns a list of matching suites with properties in the same format
+        as <code>query</code>. The suite database is searched for suites with
+        any property with a value that contains any of the string arguments.
+        For example, entering this URL in a web browser:
+        <pre>
+http://host/mo1/json/search?var+bob+nowcast&amp;format=json
+</pre>
+
+        <p>may give</p>
+        <pre>
+[{"idx": "aa090", "branch": "trunk", "revision": 330, "owner": "bob",
+  "project": "um", "title": "A copy of um.alpra.", "status": "M ",
+  "description": "Bob's UM suite"},
+ {"idx": "aa092", "branch": "trunk", "revision": 340, "owner": "jim",
+  "project": "var", "title": "6D Quantum VAR.", "status": "M ", 
+  "location": "NAE"},
+ {"idx": "aa100", "branch": "trunk", "revision": 352, "owner": "ops_account",
+  "project": "nowcast", "title": "The operational Nowcast suite",
+  "status": "M ", "ensemble": "yes"}]
+</pre>
+
+        <p>This returned all suites that contain one or more of these search
+        terms. Each suite is returned as an entry in a list, and each entry is
+        an associative array of suite property name-value pairs. These pairs
+        contain all database information about a suite.</p>
+
+        <p><code>search</code> also takes the optional argument
+        <code>all_revs</code> in the same way as <code>query</code>, above.
+        This switches on searching older revisions of current suites and
+        deleted suites. For example, entering this URL in a web browser:</p>
+        <pre>
+http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
+</pre>
+
+        <p>may give</p>
+        <pre>
+[{"idx": "aa001", "branch": "trunk", "revision": 120, "owner": "bob",
+  "project": "useless", "title": "Bob's useless suite.", "status": "A "},
+ {"idx": "aa001", "branch": "trunk", "revision": 122, "owner": "bob",
+  "project": "useless", "title": "Bob's useless suite.", "status": "D "},
+ {"idx": "aa090", "branch": "trunk", "revision": 320, "owner": "bob",
+  "project": "um", "title": "A copy of um.alpra.", "status": "A "},
+ {"idx": "aa090", "branch": "trunk", "revision": 321, "owner": "bob",
+  "project": "um", "title": "A copy of um.alpra.", "status": "M "},
+ {"idx": "aa090", "branch": "trunk", "revision": 330, "owner": "bob",
+  "project": "um", "title": "A copy of um.alpra.", "status": "M "},
+ {"idx": "aa092", "branch": "trunk", "revision": 335, "owner": "jim",
+  "project": "var", "title": "6D Quantum VAR.", "status": "A "},
+ {"idx": "aa092", "branch": "trunk", "revision": 338, "owner": "jim",
+  "project": "var", "title": "6D Quantum VAR.", "status": "M ",
+  "location": "Africa"},
+ {"idx": "aa092", "branch": "trunk", "revision": 340, "owner": "jim",
+  "project": "var", "title": "6D Quantum VAR.", "status": "M ", 
+  "location": "NAE"}]
+      
+</pre>
+      </dd>
+
+      <dd>
+        <p>This returned all past and present suites that contained a match for
+        at least one of the search terms. Older versions of suites appear, and
+        you can also see a deleted suite (<samp>aa001</samp>).</p>
+      </dd>
+    </dl>
+
+    <h2 id="library">Rose Python Modules</h2>
+
+    <p>This gives some brief information about Rose python modules. For more
+    information, see the files themselves.</p>
+
+    <h3 id="library:rose">Rose Main Modules</h3>
+
+    <p>This section describes the modules under the
+    <code>lib/python/rose</code> package.</p>
+
+    <dl>
+      <dt><code>rose</code></dt>
+
+      <dd>(<code>__init__.py</code>) stores some constants used by Rose
+      programs.</dd>
+
+      <dt><code>rose.app_run</code></dt>
+
+      <dd>callable, invokes an application, setting up the environment and
+      files.</dd>
+
+      <dt><code>rose.config</code></dt>
+
+      <dd>callable, parses and dumps rose configuration files. Contains the
+      main configuration object <code>rose.config.ConfigNode</code> which is
+      manipulated in most rose programs.</dd>
+
+      <dt><code>rose.env</code></dt>
+
+      <dd>library, handles environment processing for
+      <code>rose.app_run</code>.</dd>
+
+      <dt><code>rose.formats</code></dt>
+
+      <dd>(package) contains modules that deal with supported format parsing.
+      The only current supported format is Fortran namelist, through
+      <code>rose.formats.namelist</code>.</dd>
+
+      <dt><code>rose.gtk</code></dt>
+
+      <dd>(package) contains modules that deal with generalised GTK operations.
+      Currently, the only important module is <code>rose.gtk.util</code> which
+      contains various useful dialog classes and an improved toolbar.</dd>
+
+      <dt><code>rose.macro</code></dt>
+
+      <dd>callable, runs internal and custom macros for an application or
+      suite.</dd>
+
+      <dt><code>rose.metadata_gen</code></dt>
+
+      <dd>callable, generates template metadata for an application.</dd>
+
+      <dt><code>rose.meta_type</code></dt>
+
+      <dd>classes for the various metadata types.</dd>
+
+      <dt><code>rose.namelist_dump</code></dt>
+
+      <dd>callable, dumps namelist files to a Rose configuration object.</dd>
+
+      <dt><code>rose.resource</code></dt>
+
+      <dd>library, locates files or directories.</dd>
+
+      <dt><code>rose.run_util</code></dt>
+
+      <dd>library, utilities for <code>rose.app_run</code></dd>
+
+      <dt><code>rose.suite_log_view_gen</code></dt>
+
+      <dd>callable, summarises suite output in a <a href=
+      "http://www.json.org">JSON</a> file used by the output viewer.</dd>
+
+      <dt><code>rose.variable</code></dt>
+
+      <dd>library, utilities for processing metadata and a basic data structure
+      used by the config editor to hold values and metadata for options.</dd>
+    </dl>
+
+    <h3 id="library:rose:config_edit">Rose Config Editor Modules</h3>
+
+    <p>This section describes the modules under the
+    <code>lib/python/rose/config_editor</code> package. These are specific to
+    the config editor.</p>
+
+    <dl>
+      <dt><code>rose.config_editor</code></dt>
+
+      <dd>(<code>__init__.py</code>) stores some constants used for display in
+      the config editor. All of these can be overridden using your user
+      config.</dd>
+
+      <dt><code>rose.config_editor.container</code>,
+      <code>rose.config_editor.keywidget</code>,
+      <code>rose.config_editor.menuwidget</code>,
+      <code>rose.config_editor.variable</code>,
+      <code>rose.config_editor.valuewidget</code> (package)</dt>
+
+      <dd>These contain GTK code that control the adding/removing/modifying of
+      options on a config editor tab. These can all be overridden using custom
+      widgets (especially <code>rose.config_editor.valuewidget</code>
+      modules).</dd>
+
+      <dt><code>rose.config_editor.loader</code></dt>
+
+      <dd>This controls the loading and retrieval of configuration data within
+      the config editor.</dd>
+
+      <dt><code>rose.config_editor.main</code></dt>
+
+      <dd>This contains the centralised main control code of the config editor
+      - updates, undo stack, etc.</dd>
+
+      <dt><code>rose.config_editor.menu</code></dt>
+
+      <dd>This module contains the menu for the config editor and various
+      menu-related functions such as adding and removing sections.</dd>
+
+      <dt><code>rose.config_editor.page</code></dt>
+
+      <dd>This module contains control code for each config editor tab, and
+      interfaces with <code>rose.config_editor.container</code>-like objects
+      (including custom pages).</dd>
+
+      <dt><code>rose.config_editor.panel</code></dt>
+
+      <dd>This creates and alters the GTK Treeview panel of the config
+      editor.</dd>
+
+      <dt><code>rose.config_editor.stack</code></dt>
+
+      <dd>This holds the <var>Undo</var> and <var>Redo</var> stack templates,
+      and contains various functions to alter variables. This is the main
+      functional interface for custom pages.</dd>
+
+      <dt><code>rose.config_editor.util</code></dt>
+
+      <dd>Various small utilities.</dd>
+
+      <dt><code>rose.config_editor.window</code></dt>
+
+      <dd>Creates the main GTK window of the config editor and provides
+      functions to launch dialogs.</dd>
+    </dl>
+
+    <h3 id="library:rose:macros">Rose Built-in Macro Modules</h3>
+
+    <p>The <code>lib/python/rose/macros</code> package contains built-in macros
+    that perform checking against metadata. Most of these are run each time
+    something changes in the config editor. They can be run on the command line
+    via <code>rose macro</code>.</p>
+
+    <dl>
+      <dt><code>rose.macros.compulsory</code></dt>
+
+      <dd>checks <var>compulsory</var> sections and options.</dd>
+
+      <dt><code>rose.macros.rule</code></dt>
+
+      <dd>checks <var>fail-if</var> and <var>warn-if</var> metadata
+      conditions</dd>
+
+      <dt><code>rose.macros.trigger</code></dt>
+
+      <dd>checks <var>trigger</var> validity and transforms configuration
+      ignored states.</dd>
+
+      <dt><code>rose.macros.value</code></dt>
+
+      <dd>checks <var>type</var>, <var>range</var>, <var>length</var>,
+      <var>pattern</var>, or <var>values</var> metadata</dd>
+    </dl>
+
+    <h3 id="library:rosie">Rosie Modules</h3>
+
+    <p>This section describes the modules under the
+    <code>lib/python/rosie</code> package.</p>
+
+    <dl>
+      <dt><code>rosie.browser</code></dt>
+
+      <dd>(package) GTK client code for rosie.</dd>
+
+      <dt><code>rosie.browser.history</code></dt>
+
+      <dd>Methods and classes for recording suite search history. Used by 
+      <code>rosie browse</code>.</dd>
+
+      <dt><code>rosie.browser.result</code></dt>
+
+      <dd>Custom widget with methods for displaying suite search results. Used 
+      by <code>rosie browse</code>.</dd>
+
+      <dt><code>rosie.browser.search</code></dt>
+
+      <dd>Contains a wrapper class for running suite searches. Used by 
+      <code>rosie browse</code>.</dd>
+
+      <dt><code>rosie.browser.status</code></dt>
+
+      <dd>Classes for getting and updating statuses for checked out suites. 
+      Used by <code>rosie browse</code>.</dd>
+      
+      <dt><code>rosie.browser.suite</code></dt>
+
+      <dd>Contains a wrapper class for handling the creation, copying, checking
+       out and deleting of suites. Used by <code>rosie browse</code>.</dd>      
+
+      <dt><code>rosie.browser.util</code></dt>
+
+      <dd>Library of widgets for <code>rosie.browser</code>.</dd>
+
+      <dt><code>rosie.db</code></dt>
+
+      <dd>Interface code to the suite database, called by the web server.</dd>
+
+      <dt><code>rosie.id</code></dt>
+
+      <dd>Callable, implements the <code>rosie id</code> command to identify
+      suites.</dd>
+
+      <dt><code>rosie.ws</code></dt>
+
+      <dd>Rosie web server code.</dd>
+
+      <dt><code>rosie.ws_client</code></dt>
+
+      <dd>Interface to the Rosie web server. Used by <code>rosie query</code>,
+      <code>rosie info</code>, <code>rosie search</code> and <code>rosie
+      browse</code>.</dd>
+
+      <dt><code>rosie.vc</code></dt>
+
+      <dd>Interface code to version control.</dd>
+    </dl>
+  </div>
+</body>
+</html>

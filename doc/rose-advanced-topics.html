@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide: Advanced Topics</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+</head>
+
+<body>
+  <div id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1 id="heading-main">Rose User Guide: Advanced Topics</h1>
+
+    <div id="content"></div>
+
+    <h2 id="intro">Introduction</h2>
+
+    <p>This chapter of the Rose user guide introduces advanced topics such as
+    developing metadata for Rose.</p>
+
+    <h2 id="meta">Configuration Metadata Development</h2>
+
+    <p>Configuration Metadata is used to provide information about settings in
+    Rose configurations. It is intended to help document your inputs, perform
+    automatic checking (including whether an input is needed), and to enhance
+    the interface to your configurations in e.g. the Rose config editor.</p>
+
+    <p>For reference and a fuller picture of Rose configuration metadata,
+    please refer to the <a href="rose-configuration.html#meta">Rose Reference Guide
+    &gt; Configuration Metadata</a>.</p>
+
+    <p>This example uses the Rose example suite from the <a href=
+    "rose-brief-tour.html">brief tour</a> and assumes that you are familiar
+    with it.</p>
+
+    <p>We are going to develop metadata for the app <code>my_hello_mars</code>.
+    Change directory to the suite directory, then change directory to
+    <code>app/my_hello_mars</code>.</p>
+
+    <p>Open the Rose application file (<code>rose-app.conf</code>) in this
+    directory. It should look like this:</p>
+    <pre>
+[command]
+default = hello.exe
+
+[env]
+LANG_JUPITER = Ionian
+MAX_TARGETS = 5
+WORLD = Mars
+
+</pre>
+
+    <p>Open the application in the Rose config editor:</p>
+    <pre class="shell">
+rose edit
+</pre>
+
+    <p>Look at the page <code>env</code>. The three options
+    <var>LANG_JUPITER</var>, <var>MAX_TARGETS</var>, <var>WORLD</var> appear in
+    raw form - there are no special widgets for the number in
+    <var>MAX_TARGETS</var> and no hover-over descriptions of the variables or
+    help. We actually haven't added any value over the raw text. Let's close
+    the config editor for now.</p>
+
+    <p>Let's create a metadata directory and start adding some information.</p>
+
+    <p>If we were in a hurry, we could use the <code>rose metadata-gen</code>
+    command which will populate a metadata configuration based on an
+    application or suite configuration. It can make educated guesses about
+    variable types as well (option <code>--auto-type</code>). This provides a
+    base for further development, and saves a lot of typing. We'll ignore it
+    for the purposes of this guide.</p>
+
+    <p>Create the sub directory <code>meta</code> in your application
+    directory:</p>
+    <pre class="shell">
+mkdir meta
+</pre>
+
+    <p>This is where Rose will look for our metadata by default. We'll add a
+    metadata file by running:</p>
+    <pre class="shell">
+touch meta/rose-meta.conf
+</pre>
+
+    <p>This is where the main metadata configuration lives. Open the file in a
+    text editor.</p>
+
+    <p>Let's provide some type information about <var>MAX_TARGETS</var>. The id
+    for this variable is <var>env=MAX_TARGETS</var>, so add a section into the
+    file.:</p>
+    <pre>
+[env=MAX_TARGETS]
+</pre>
+
+    <p>We can specify that it's an integer by giving it a type:</p>
+    <pre>
+[env=MAX_TARGETS]
+type = integer
+</pre>
+
+    <p>We could also improve the way it's displayed by giving it a title:</p>
+    <pre>
+[env=MAX_TARGETS]
+title = Max target number
+type = integer
+</pre>
+
+    <p>Now if we open the application in the config editor again, we see that
+    the value of <var>MAX_TARGETS</var> now appears in a special numeric
+    widget, and that the title has replaced the name. You can see the
+    difference easily by switching metadata off and on (toggle
+    <code>View</code> Menu -&gt; View Without Metadata).</p>
+
+    <p>Setting the type does more than change the widget - it also instructs
+    Rose to check that the input is valid for that type. If the value of
+    <var>MAX_TARGETS</var> was <samp>5.6</samp> or <samp>banana</samp>,
+    (anything non-integer) an error would be flagged.</p>
+
+    <p>We've set the type of <var>MAX_TARGETS</var> to <samp>integer</samp>,
+    but we haven't ruled out choices of integer that would crash our code, such
+    as negative integers. We need to restrict the number using a range -
+    add:</p>
+    <pre>
+[env=MAX_TARGETS]
+range = 0:
+title = Max target number
+type = integer
+</pre>
+
+    <p>This means that any integer less than zero will be flagged as a problem.
+    Try decreasing the value of <var>MAX_TARGETS</var> below zero. An error
+    will be flagged next to the variable and on the page list in the left hand
+    panel. If you change it to a positive or zero integer value, the error will
+    go away.</p>
+
+    <p>Let's now make <var>env=WORLD</var> less ambiguous. Create a section in
+    the metadata</p>
+    <pre>
+[env=WORLD]
+</pre>
+
+    <p>Add a title and description:</p>
+    <pre>
+[env=WORLD]
+description = Choose your target world to say hello to.
+title = World
+</pre>
+
+    <p>If you close and open the config editor again, (or switch the metadata
+    off and on), you'll see that <var>WORLD</var> now has some helpful
+    hover-over text when you move the mouse over the title.</p>
+
+    <p>We'll decide to be harsh about grammar and insist that the first letter
+    of <var>WORLD</var> be capitalised. To do this, we can use a very simple
+    regular expression - add:</p>
+    <pre>
+[env=WORLD]
+description = Choose your target world to say hello to.
+pattern = ^[A-Z]
+title = World
+</pre>
+
+    <p>If you change the first letter of the value of <var>WORLD</var> to
+    lowercase, an error will be flagged - you can change it back to fix it.</p>
+
+    <p>Alternatively, we could just give a list of valid world names - this
+    means we won't need a regular expression or any other type information.
+    Let's remove the pattern and add:</p>
+    <pre>
+[env=WORLD]
+description = Choose your target world to say hello to.
+title = World
+values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+</pre>
+
+    <p>(You may add or remove <samp>Pluto</samp> in line with your personal
+    preferences.)</p>
+
+    <p>Now when you open the application in the config editor, you'll get a
+    drop-down list of worlds to choose from. Isn't that nice! Rose will now
+    check <var>WORLD</var> in the future to make sure its value is in this
+    list.</p>
+
+    <p>Looking at the other variable in the configuration, it doesn't appear as
+    if we really need a Jupiter language <var>LANG_JUPITER</var> set when
+    <var>WORLD</var> is not <samp>Jupiter</samp>. Let's add a trigger to
+    automatically handle this:</p>
+    <pre>
+[env=WORLD]
+description = Choose your target world to say hello to.
+title = World
+trigger = env=LANG_JUPITER: Jupiter
+values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+</pre>
+
+    <p>This means that <var>LANG_JUPITER</var> will be <em>ignored</em> when
+    <var>WORLD</var> is not <samp>Jupiter</samp> - but it will be
+    <em>enabled</em> when it is. Ignored variables won't get passed into our
+    hello.exe application.</p>
+
+    <p>Set <var>WORLD</var> to <samp>Jupiter</samp> and either save and reopen
+    the config editor, or just switch metadata off and on.</p>
+
+    <p>Now when you change the value of <var>WORLD</var> to
+    <samp>Saturn</samp>, or any other planet, <var>LANG_JUPITER</var> will be
+    <em>ignored</em> and hidden by default in the config editor (you can show
+    it by selecting <code>View</code> Menu -&gt; View Ignored variables). If
+    you change it back to <samp>Jupiter</samp>, it will be <em>enabled</em> and
+    re-appear. When you've done that, change it to <samp>Earth</samp> and
+    save.</p>
+
+    <p>You can experiment with adding metadata to <var>LANG_JUPITER</var> if
+    you wish.</p>
+
+    <p>An important advantage of adding metadata is that it acts as a memory of
+    inputs. If you remove <var>WORLD</var> (in a text editor or using the
+    little button next to the title in the config editor) and save, any
+    information about the variable <var>WORLD</var> is lost from your physical
+    copy of the application. Close the config editor and check the application
+    file.</p>
+
+    <p>If you then re-open the <var>WORLD</var>-less application in the config
+    editor, you can navigate to the <code>env</code> page and see that it's
+    missing.</p>
+
+    <p>If you select <code>View</code> Menu -&gt; View Latent variables, any
+    variables that are in the metadata but aren't in the application will be
+    displayed - <var>WORLD</var> will reappear as a ghost! You can add the
+    variable back into the application by clicking on the button next to the
+    name and selecting <samp>Add</samp>. It will be added with a 'best guess'
+    value based on the metadata, which in this case will be
+    <samp>Mercury</samp>.</p>
+
+    <p>Let's add some proper help for <var>LANG_JUPITER</var> - Jovian
+    linguistics are notoriously difficult. Add:</p>
+    <pre>
+[env=LANG_JUPITER]
+help = This variable controls which language to use when saying hello
+     = to Jupiter.
+     =
+     = The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
+     =
+     = The Great Red Spot people are not worth it.
+</pre>
+
+    <p>If you open the application in the config editor, or switch metadata off
+    and on, you can now click on the title of <var>LANG_JUPITER</var> or use
+    the menu button to launch a help dialog.</p>
+
+    <p>Let's improve the look of the <code>page</code> by adding metadata for
+    the section:</p>
+    <pre>
+[env]
+description = Hello Environment
+help = These environment variables provide overrides for the hello.f90 program.
+     =
+     = Use these to say hello to other planets.
+title = Environment
+</pre>
+
+    <p>On reload of the config editor, this gives a hover-over text
+    (description) when the mouse is over the page name, and a menu option for
+    help for this section (right click on the page name).</p>
+
+    <p>We can also swap variables in and out of pages, regardless of whether
+    they belong in the <code>env</code> application section or not. Let's move
+    <var>LANG_JUPITER</var>. Add a namespace (ns):</p>
+    <pre>
+[env=LANG_JUPITER]
+help = This variable controls which language to use when saying hello
+     = to Jupiter.
+     =
+     = The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
+     =
+     = The Great Red Spot people are not worth it.
+ns = languages
+</pre>
+
+    <p>A reload of the config editor will show that <var>LANG_JUPITER</var> has
+    been moved to a different page called languages. This can be useful for
+    moving environment variables to their relevant namelists, or breaking up
+    large namelists into several sections.</p>
+
+    <p>Sometimes just having help or descriptions isn't enough, or there's a
+    more relevant resource page on the Web - in this case you can add a url
+    help:</p>
+    <pre>
+[env=LANG_JUPITER]
+help = This variable controls which language to use when saying hello
+     = to Jupiter.
+     =
+     = The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
+     =
+     = The Great Red Spot people are not worth it.
+ns = languages
+url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
+</pre>
+
+    <p>This can be accessed via the variable button menu (<var>Web Help</var>)
+    in the config editor on reload, or via clicking on the variable name when
+    there's no help.</p>
+
+    <p>We've finished! However, there are other things you can do with
+    configuration metadata. Make sure you have a good idea of when to use these
+    by consulting the <a href="rose-configuration.html#meta">Rose Reference Guide
+    &gt; Configuration Metadata</a>.</p>
+  </div>
+</body>
+</html>

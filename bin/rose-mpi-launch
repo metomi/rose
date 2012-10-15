@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#     Refer to COPYRIGHT.txt of this distribution for details.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-mpi-launch
+#
+# SYNOPSIS
+#     rose mpi-launch COMMAND [ARGUMENTS ...]
+#
+# ARGUMENTS
+#     COMMAND
+#         Command to call. Subsequent arguments are passed to the command.
+#
+# ENVIRONMENT VARIABLES
+#     optional ROSE_LAUNCHER
+#         Specifies the launcher program to run the prog.
+#
+#     optional ROSE_LAUNCH_INNER
+#         Specifies an inner wrapper to be run by launcher, can be set to ""
+#         to call the executable directly. Default is "$0 --inner".
+#
+#     optional ROSE_LAUNCHER_LIST
+#         Specifies an alternative list of launchers.
+#
+#     optional ROSE_LAUNCHER_MPICH
+#         Specifies the mpich launcher program to run the prog. Default is
+#         "mpiexec".
+#
+#     optional ROSE_LAUNCHER_PREOPTS
+#         Specifies the options to the launcher program to be inserted before
+#         the program name.
+#
+#     optional ROSE_LAUNCHER_POSTOPTS
+#         Specifies the options to the launcher program to be inserted after
+#         the program name.
+#       
+#     optional ROSE_LAUNCHER_ULIMIT_OPTS
+#         Specifies the arguments to ulimit. Setting this variable to "-a -s
+#         unlimited -d unlimited -a" results in "ulimit -a; ulimit -s unlimited;
+#         ulimit -d unlimited; ulimit -a"
+#
+#     optional NPROC
+#         Specifies the number of processors to run on. Default is 1.
+#
+# DESCRIPTION
+#     Provide a portable way to launch an MPI command.
+#
+# DIAGNOSTICS
+#     Return 0 on success, 1 or exit code of COMMAND on failure.
+#------------------------------------------------------------------------------
+. $(dirname $0)/../lib/bash/rose_init
+rose_init rose_log
+
+# ------------------------------------------------------------------------------
+if [[ ${1:-} == '--inner' ]]; then
+    shift 1
+    if [[ -n ${ROSE_LAUNCHER_ULIMIT_OPTS:-} ]]; then
+        while getopts 'HST:ab:c:d:e:f:i:l:m:n:p:q:r:s:t:u:v:x:' \
+            OPT $ROSE_LAUNCHER_ULIMIT_OPTS
+        do
+            case "$OPT" in
+              '?') return 1;;
+                *) ulimit -$OPT $OPTARG || return $?;;
+            esac
+        done
+    fi
+
+    exec "$@"
+fi
+
+# ------------------------------------------------------------------------------
+if (($# < 1)); then
+    rose_usage 1
+fi
+
+if ! COMMAND=$(type -P $1); then
+    err "$1: COMMAND not found"
+fi
+shift 1
+
+# TODO: search site configuration.
+ROSE_LAUNCHER_LIST=${ROSE_LAUNCHER_LIST:="poe ${ROSE_LAUNCHER_MPICH:-mpiexec} mpirun mpprun"}
+NPROC=${NPROC:=1}
+
+#-------------------------------------------------------------------------------
+# 1. Assign a value to ROSE_LAUNCHER if it is not already set.
+#-------------------------------------------------------------------------------
+if ! printenv ROSE_LAUNCHER >/dev/null; then
+    ROSE_LAUNCHER=
+    for LAUNCHER in $ROSE_LAUNCHER_LIST; do
+        if type -P $LAUNCHER >/dev/null; then
+            ROSE_LAUNCHER=$LAUNCHER
+            break
+        fi
+    done
+fi
+
+#-------------------------------------------------------------------------------
+# 2. Find the full path of ROSE_LAUNCHER and set up the pre/post options.
+#-------------------------------------------------------------------------------
+if [[ -n $ROSE_LAUNCHER ]]; then
+    # Path
+    if ! ROSE_LAUNCHER_PATH=$(type -P $ROSE_LAUNCHER); then
+        err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
+    fi
+    ROSE_LAUNCHER_PATH=$(type -P $ROSE_LAUNCHER)
+    ROSE_LAUNCHER=$ROSE_LAUNCHER_PATH
+    ROSE_LAUNCH_INNER=${ROSE_LAUNCH_INNER:-"$0 --inner"}
+    # Options
+    ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:=}
+    ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:=}
+    case $(basename $ROSE_LAUNCHER) in
+        mpirun)
+            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:="-v -np $NPROC"}
+            :;;
+        mpprun)
+            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:="-n $NPROC"}
+            :;;
+        mpiexec*)
+            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:="-n $NPROC"}
+            :;;
+    esac
+else
+    ROSE_LAUNCH_INNER=
+    ROSE_LAUNCHER_PREOPTS=
+    ROSE_LAUNCHER_POSTOPTS=
+fi
+
+#-------------------------------------------------------------------------------
+# 3. Launch the program.
+#-------------------------------------------------------------------------------
+exec \
+$ROSE_LAUNCHER \
+$ROSE_LAUNCHER_PREOPTS \
+$ROSE_LAUNCH_INNER \
+$COMMAND \
+$ROSE_LAUNCHER_POSTOPTS \
+"$@"

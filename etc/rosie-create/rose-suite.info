@@ -1,0 +1,29 @@
+#-------------------------------------------------------------------------------
+# SUITE DISCOVERY INFORMATION FILE
+#-------------------------------------------------------------------------------
+# The "owner", "project" and "title" fields are compulsory. Any KEY=VALUE pairs
+# can be added. The following are known to have special meanings:
+#
+# description: A long description of the suite. E.g.:
+# description=This is line 1 of the long description of the suite.
+#             This is line 2 of the long description of the suite.
+#             This is line 3 of the long description of the suite.
+#
+# tag-list: A list of keywords associated with the suite. E.g.:
+# tag-list=keyword-1 keyword-2
+#-------------------------------------------------------------------------------
+
+# User ID of the owner of the suite.
+# The owner has full commit access to the suite.
+# Only the owner can pass the suite's ownership to someone else.
+# Only the owner can delete the suite.
+owner=$OWNER
+
+# access-list: Restrict commit access to trunk to a list of users.
+access-list=*
+
+# The name of a project associated with the suite.
+project=$PROJECT
+
+# A short title for the suite.
+title=$TITLE

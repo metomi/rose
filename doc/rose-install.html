@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose: Installation</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+</head>
+
+<body>
+  <div id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose: Installation</h1>
+
+    <div id="content"></div>
+
+    <h2 id="requirements">System Requirements</h2>
+
+    <p>The main utilities of Rose are intended to run on a Unix/Linux system.
+    They are known to work on RHEL-6.1. A limited set of the Rose utilities are
+    known to work on AIX-7.1. Web based Rose utilities requires a web browser
+    compliant to XHTML 1.0, JavaScript 1.8 and CSS 2.1.</p>
+
+    <p>Rose is distributed as source, or in the form of a compressed tar file. If
+    it is a compressed tar file, un-pack the tar file into an appropriate location
+    on your system. Add the <samp>bin/</samp> directory into your <var>PATH</var>
+    environment variable. Once you have done this you should now have access to
+    the Rose user utilities, assuming that you have met the requirements described
+    in the below:</p>
+
+    <dl>
+      <dt><a href="http://www.gnu.org/software/bash/">GNU Bash</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> <code>rose</code>.</p>
+
+        <p><dfn>versions known to work:</dfn> 4.</p>
+      </dd>
+
+      <dt><a href="http://www.python.org/">Python</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> <code>rose</code>.</p>
+
+        <p><dfn>versions known to work:</dfn> 2.6, 2.7.</p>
+      </dd>
+
+      <dt>Python: <a href="http://pygtk.org">PyGTK</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> <code>rose config-edit</code> and <code>rosie
+        go</code>.</p>
+
+        <p><dfn>versions known to work:</dfn> 2.18.9.</p>
+
+        <p><dfn>requirements:</dfn> 2.12.</p>
+      </dd>
+
+      <dt>Python: <a href="http://www.cherrypy.org/">cherrypy</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> Rosie web service.</p>
+
+        <p><dfn>version known to work:</dfn> 3.2.2</p>
+
+        <p><dfn>recommended:</dfn> 3.2.</p>
+      </dd>
+
+      <dt>Python: <a href="http://jinja.pocoo.org/">jinja2</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> <code>rose suite-run</code>, <code>rose
+        macro</code>, Rosie web service.</p>
+
+        <p><dfn>version known to work:</dfn> 2.6.</p>
+
+        <p><dfn>required:</dfn> 2.6.</p>
+      </dd>
+
+      <dt>Python: <a href="http://docs.python-requests.org/">requests</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> Rosie web service client.</p>
+
+        <p><dfn>version known to work:</dfn> 0.11.1.</p>
+
+        <p><dfn>required:</dfn> 0.11.</p>
+      </dd>
+
+      <dt>Python: <a href=
+      "http://github.com/simplejson/simplejson/">simplejson</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> Rosie web service and its client.</p>
+
+        <p><dfn>version known to work:</dfn> 2.0.9.</p>
+
+        <p><dfn>required:</dfn> 1.1.</p>
+      </dd>
+
+      <dt>Python: <a href="http://www.sqlalchemy.org">sqlalchemy</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> Rosie web service.</p>
+
+        <p><dfn>version known to work:</dfn> 0.7.6.</p>
+
+        <p><dfn>required:</dfn> 0.6.9.</p>
+      </dd>
+
+      <dt><a href="http://cylc.github.com/cylc/">cylc</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> Rose, as the supported suite engine.</p>
+
+        <p><dfn>version known to work:</dfn> HEAD.</p>
+
+        <p><dfn>requirements:</dfn> HEAD.</p>
+      </dd>
+
+      <dt><a href="http://subversion.apache.org/">Subversion</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> Rosie, as the version control system.</p>
+
+        <p><dfn>version known to work:</dfn> 1.6.</p>
+
+        <p><dfn>requirements:</dfn> 1.6.</p>
+      </dd>
+
+      <dt><a href="http://www.metoffice.gov.uk/research/collaboration/fcm/">FCM</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> Rosie, as the normal wrapper on top of
+        Subversion; <code>rose suite-run</code> recognises FCM location
+        keywords in file configurations; <code>rose task-run</code> has built-in
+        task utilities for running <code>fcm make</code>.</p>
+
+        <p><dfn>version known to work:</dfn> HEAD.</p>
+
+        <p><dfn>requirements:</dfn> 2.2.</p>
+      </dd>
+    </dl>
+
+    <h2 id="rose">Configuring Rose</h2>
+
+    <p><samp>lib/bash/rose_init_site/</samp>: If you do not have root access to
+    install the required Python libraries, you may need to edit this file to
+    ensure Python libraries are included in the <var>PYTHONPATH</var>
+    environment variable.</p>
+
+    <p><samp>etc/rose.conf</samp>: You should edit this file to meet the
+    requirement of your site.</p>
+
+    <h2 id="rosie">Configuring Rosie</h2>
+
+    <p>Rosie is the optional suite storage and discovery system.</p>
+
+    <p>Rosie stores suites using Subversion repositories, with a web interface
+    for suite discovery and lookup. You'll need to select a machine to host the
+    Subversion repositories. This machine will also host the web server and
+    databases.</p>
+
+    <p>Login to your host, create one or more Subversion repositories.</p>
+
+    <p>If you want to use <a href=
+    "http://www.metoffice.gov.uk/research/collaboration/fcm">FCM</a> for your
+    version control, you should set a special property on the repository to
+    allow branching and merging with FCM in the Rosie convention. For a given
+    <samp>HOST</samp> (e.g. myhost001) and a given repository root name
+    <samp>NAME</samp> (e.g. roses_mo1), change into a new directory and enter
+    the following commands:</p>
+    <pre>
+svn co -q svn://${HOST}/${NAME}/
+svn ps fcm:layout -F - ${NAME} &lt;&lt;'__FCM_LAYOUT__'
+depth-project = 5
+depth-branch = 1
+depth-tag = 1
+dir-trunk = trunk
+dir-branch =
+dir-tag =
+level-owner-branch =
+level-owner-tag =
+template-branch =
+template-tag =
+__FCM_LAYOUT__
+svn ci -m 'fcm:layout: defined.' ${NAME}
+rm -rf ${NAME}
+</pre>
+
+    <p>Add the following hook scripts to the repository:</p>
+
+    <dl>
+      <dt><code>pre-commit</code></dt>
+
+      <dd>
+        <pre>
+#!/bin/bash
+exec $ROSE_HOME/sbin/rosa svn-pre-commit "$@"
+</pre>
+      </dd>
+
+      <dt><code>post-commit</code></dt>
+
+      <dd>
+        <pre>
+#!/bin/bash
+exec $ROSE_HOME/sbin/rosa svn-post-commit "$@"
+</pre>
+      </dd>
+    </dl>
+
+    <p>where <var>$ROSE_HOME</var> the root of your Rose installation.</p>
+
+    <p>Edit the <var>[rosie-*]</var> settings in <samp>etc/rose.conf</samp> to
+    point to your host machine and relevant paths such as the location for your
+    repository and database.</p>
+
+    <p>Once you have done that, create the Rosie database by running:</p>
+    <pre>
+$ROSE_HOME/sbin/rosa db-create
+</pre>
+
+    <p>Make sure that the account that runs the repository hooks has read/write
+    access to the database and database directory.</p>
+
+    <p>Start the web service by running:</p>
+    <pre>
+setsid sbin/rosa ws 0/dev/null 2&gt;&amp;1 &amp;
+</pre>
+
+    <p><em>TODO: Provide instruction for running Rosie web service run under
+    Apache mod_wsgi.</em></p>
+
+    <p>Hopefully, you should now have a working Rosie service. You can test it
+    by running:</p>
+    <pre>
+rosie create
+</pre>
+
+    <p>which will create the first suite in your repository, with an ID ending
+    in <samp>aa001</samp> - e.g. <samp>mo1-aa001</samp>. Locate it by
+    running:</p>
+    <pre>
+rosie lookup 001
+</pre>
+  </div>
+</body>
+</html>

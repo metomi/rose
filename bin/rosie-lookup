@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rosie lookup
+#
+# SYNOPSIS
+#     rosie lookup [OPTIONS] LOOKUP-TEXT ...
+#
+# DESCRIPTION
+#     Find suites in the suite discovery database.
+#
+#     Search for suites using either a query, search keyword or url and display 
+#     the information of the matching suites.
+#
+#     Unless an option is used to specify the lookup type the input is  
+#     interpreted by default as follows:
+#     - string beginning with "http": url
+#     - string not beginning with "http": search
+#
+#     The default output format includes a local working copy status field 
+#     (%local) in the first column.
+#     A blank field means there is no related suite checked out.
+#     "=" means that the suite is checked out at this branch and revision.
+#     "<" means that the suite is checked out but at an older revision.
+#     ">" means that the suite is checked out but at a newer revision.
+#     "S" means that the suite is checked out but on a different branch.
+#
+# OPTIONS
+#
+#     --all-revs
+#         Specify whether to search deleted suites and superceded suites.
+#
+#     --format=FORMAT; -f FORMAT
+#         Control the output format of the results using a string
+#         containing column names or properties preceded by %.
+#         For example: rosie lookup bfitz --format="%idx from %owner"
+#         might give: abc01 from bfitz
+#
+#     --prefix=PREFIX
+#         Specify the name of the suite repository to use.
+#
+#     --query; -Q
+#         Run the lookup as a query.
+#
+#     --quiet; -q
+#         Shorthand for --format="%idx".
+#
+#     --reverse; -r
+#         Reverse sort order.
+#
+#     --search; -S
+#         Run the lookup as a keyword search.
+#     
+#     --sort=FIELD; -s FIELD
+#         Sort results by the field FIELD instead of revision.
+#
+#     --url; -U
+#         Use a url for the lookup.
+#
+#     --verbose; -v
+#         Display full info for each returned suite.
+#-------------------------------------------------------------------------------
+exec python -m rosie.ws_client lookup "$@"

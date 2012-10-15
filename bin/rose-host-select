@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose host-select
+#
+# SYNOPSIS
+#     rose host-select [OPTIONS] [GROUP/HOST ...]
+#
+# DESCRIPTION
+#     Select a host from a set of groups or names by load or by random.
+#
+#     Use settings in $ROSE_HOME/etc/rose.conf and $HOME/.met-um/rose.conf to
+#     determine the ranking method.
+#
+#     Print the selected host name.
+#
+# OPTIONS
+#     --debug
+#         Print stack trace on error.
+#     --quiet, -q
+#         Decrement verbosity.
+#     --rank-method=METHOD[:METHOD-ARG]
+#         Specify the method for ranking a list of hosts. The method can be:
+#             "load" (by average load as reported by "uptime" divided by number
+#                     of processors):
+#                 If METHOD-ARG is specified, it must be "1", "5" or "15". The
+#                 default is to use the 15 minute load.
+#             "fs" (by % usage of a file system as reported by df):
+#                 METHOD-ARG must be a valid file system in all the given hosts
+#                 and host groups. The default is to use the "~" directory.
+#             "random"
+#     --threshold=[METHOD[:METHOD-ARG]:]VALUE
+#         Each of this option specifies a numeric value of a threshold of which
+#         the hosts must not exceed. Accepts the same METHOD and METHOD-ARG
+#         (and the same defaults) as the --rank-method=METHOD[:METHOD-ARG]
+#         option. (Obviously, the "random" method does not make sense in this
+#         case.) A host exceeding a threshold will be excluded from the ranking
+#         list.
+#     --verbose, -v
+#         Increment verbosity.
+#
+# CONFIGURATION
+#     The command reads its settings from the [rose-host-select] section in
+#     $ROSE_HOME/etc/rose.conf and $HOME/.met-um/rose.conf. All settings are
+#     optional. Valid settings are:
+#         default = GROUP/HOST ...
+#             The default arguments to use for this command.
+#         group{NAME} = GROUP/HOST ...
+#             Declare a named group of hosts.
+#         method{NAME} = METHOD[:METHOD-ARG]
+#             Declare the default ranking method for a group of hosts.
+#
+#     Type "rose config rose-host-select" to print settings.
+#-------------------------------------------------------------------------------
+exec python -m rose.host_select "$@"

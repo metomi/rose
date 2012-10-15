@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose suite-run
+#
+# SYNOPSIS
+#     rose suite-run [OPTIONS] [[--] CYLC-RUN-ARGS]
+#     # Install the suite in $PWD, and register it using basename of $PWD.
+#     rose suite-run
+#     # As above, but start the suite in simulation mode.
+#     rose suite-run -- --mode=simulation
+#     # Install the suite in $PWD, and register it as "my.suite".
+#     rose suite-run -N my.suite
+#     # Install the suite in "/dir/to/suite", and register it as "my.suite".
+#     rose suite-run -C /dir/to/my.suite
+#     # Equivalent to (cd /dir/to/my.suite && rose suite-run)
+#     rose suite-run -C /dir/to/suite -N my.suite
+#     # Equivalent to (cd /dir/to/suite && rose suite-run my.suite)
+#
+# DESCRIPTION
+#     Install and run a Cylc suite.
+#
+#     Install a suite (in $PWD), register it in cylc using the basename of the
+#     configuration directory or the option specified in --name=NAME. Invoke
+#     "cylc run" on it. Arguments (and options after --) are passed to "cylc
+#     run".
+#
+# OPTIONS
+#     --config=DIR, -C DIR
+#         Specify the configuration directory of the suite. (default=$PWD)
+#     --define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE
+#         Each of this overrides the [SECTION]KEY setting with a given VALUE.
+#         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
+#         or even --define=[!SECTION].
+#     --force, -f
+#         Reinstall the suite even if it is already running.
+#     --host=HOST
+#         Specify a host for running the suite.
+#     --install-only, -i
+#         Install the suite, but do not run it. (This option is implied if
+#         --force mode is specified and the suite is already running.)
+#     --name=NAME, -n NAME
+#         Specify the suite NAME in Cylc, instead of using the basename of the
+#         configuration directory.
+#     --new, -N
+#         (Re-)create working directories.
+#     --no-gcontrol
+#         Do not run "cylc gcontrol". Default is to run "cylc gcontrol" if the
+#         DISPLAY environment variable is defined.
+#     --no-overwrite
+#         Do not overwrite existing files.
+#     --opt-conf-key=KEY, -O KEY
+#         Each of this switches on an optional configuration identified by KEY.
+#     --quiet, -q
+#         Decrement verbosity.
+#     --verbose, -v
+#         Increment verbosity.
+#
+# SEE ALSO
+#     "cylc help gcontrol"
+#     "cylc help register"
+#     "cylc help run"
+#-------------------------------------------------------------------------------
+exec python -m rose.run suite "$@"

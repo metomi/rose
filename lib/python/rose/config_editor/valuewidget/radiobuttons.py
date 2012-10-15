@@ -1,0 +1,69 @@
+# -*- coding: utf-8 -*-
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+
+import pygtk
+pygtk.require('2.0')
+import gtk
+
+import rose.config_editor
+
+
+class RadioButtonsValueWidget(gtk.HBox):
+
+    """This is a class to represent a value as radio buttons."""
+
+    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+        super(RadioButtonsValueWidget, self).__init__(homogeneous=False,
+                                                      spacing=0)
+        self.value = value
+        self.metadata = metadata
+        self.set_value = set_value
+        self.hook = hook
+
+        var_values = metadata[rose.META_PROP_VALUES]
+        for k, item in enumerate(var_values):
+            button_label = str(item)
+            if k == 0:
+                radio_button = gtk.RadioButton(group=None,
+                                               label=button_label,
+                                               use_underline=False)
+                radio_button.real_value = item
+            else:
+                radio_button = gtk.RadioButton(group=radio_button,
+                                               label=button_label,
+                                               use_underline=False)
+                radio_button.real_value = item
+            radio_button.set_active(False)
+            if item == self.value:
+                radio_button.set_active(True)
+            radio_button.connect('toggled', self.setter)
+            self.pack_start(radio_button, False, False, 10)
+            radio_button.show()
+            radio_button.connect('focus-in-event',
+                                 self.hook.trigger_scroll)
+        self.grab_focus = lambda : self.hook.get_focus(radio_button)
+        if len(var_values) == 1 and self.value == var_values[0]:
+            radio_button.set_sensitive(False)
+
+    def setter(self, widget):
+        if widget.get_active():
+            self.value = widget.get_label()
+            self.set_value(self.value)
+        return False

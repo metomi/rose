@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+# NAME
+#     rose-config-edit
+#
+# SYNOPSIS
+#     rose-config-edit [OPTIONS]
+#
+# DESCRIPTION
+#     Launch the GTK+ GUI to edit a suite or application configuration.
+#
+# OPTIONS
+#     --config=DIR; -C DIR
+#        A path to either
+#        1) a directory containing a suite with a file named 
+#           'suite.rc' and a directory called 'app' containing 
+#           subdirectories with files named 'rose-app.conf',
+#           in the format specified in the Rose pages.
+#        2) a directory containing a single 'application' - a file named
+#           'rose-app.conf' and an optional subdirectory called 'file'
+#           with other application files.
+#     --meta-path=PATH; -M PATH
+#        Prepend PATH to the search path for metadata (look here first).
+#        This option can be used repeatedly to load multiple paths.
+#-------------------------------------------------------------------------------
+exec python -m rose.config_editor.main "$@"

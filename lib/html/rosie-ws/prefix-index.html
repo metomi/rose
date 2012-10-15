@@ -1,0 +1,508 @@
+<!--?xml version="1.0" encoding="utf-8"?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <style type="text/css">
+@import "{{ web_prefix }}/etc/DataTables/media/css/demo_table.css";
+@import "{{ web_prefix }}/etc/DataTables/extras/ColVis/media/css/ColVis.css";
+#body-header {
+    background: #060048;
+    color: white;
+    font-weight: bold;
+    height: 2.5em;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+#body-header a:link {
+    color: #ffcb00;
+}
+#body-header a:visited,
+#body-header a:hover,
+#body-header a:active {
+    color: #ffcb00;
+}
+#body-header h1 {
+    font-size: x-large;
+    margin: 0;
+    padding: 0;
+}
+#rosie-logo {
+    float: left;
+}
+#body-query {
+    background: #ffe;
+    border: thin solid #d0d0d0;
+    border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+    height: 7.3em;
+    overflow: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    scroll: auto;
+    top: 2.6em;
+}
+#query {
+    display: block;
+}
+#query-control > * {
+    margin-top: 0.1em;
+}
+#query-table {
+    float: left;
+    margin-right: 1em;
+}
+#query-table {
+    min-width: 20em;
+}
+.q_value {
+    max-width: 20em;
+}
+#body-main {
+    background: #eee;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    padding-top: 0.1em;
+    position: absolute;
+    right: 0;
+    top: 10em;
+}
+#interface-chooser {
+    font-size: small;
+    float: right;
+}
+#list-result-hint {
+    font-size: x-small;
+    margin: 0;
+    margin-bottom: 0.4em;
+}
+#list-result-hint kbd {
+    background: #fff;
+    padding: 0.1em;
+}
+#list-result {
+    left: 0;
+    position: absolute;
+    right: 15.3em;
+}
+#list-result > div {
+    margin: 0;
+    width: 100%;
+}
+#list-result table {
+    clear: both;
+    border-collapse: collapse;
+    width: 100%;
+}
+#list-result-table,
+#list-result-table td,
+#list-result-table th {
+    border: 1px solid #d0d0d0;
+    white-space: nowrap;
+}
+#list-result-table td {
+    border-bottom: 0;
+    border-top: 0;
+    padding: 0.5em;
+    font-size: small;
+    text-align: left;
+    white-space: nowrap;
+}
+#list-result-table th {
+    font-size: normal;
+    padding: 0.5em;
+    text-align: left;
+}
+#list-result-table_colvis * {
+    margin: 0.1em;
+    margin-right: 1px;
+}
+#list-result-table_colvis button {
+    padding: 0.1em;
+}
+#list-result-table_info {
+    float: left;
+    font-size: x-small;
+    margin: 0.1em;
+}
+#list-result-table_filter {
+    float: left;
+    font-size: small;
+    margin: 0.1em;
+    margin-top: 0.4em;
+    text-align: left;
+}
+#list-result-table .firstColumn {
+    text-align: left;
+}
+#list-result-table .ex_highlight,
+#list-result-table tbody,
+#list-result-table tr.even:hover,
+#list-result-table tr.even,
+#list-result-table td.highlighted {
+    background: #e3e3e3;
+}
+#list-result-table .ex_highlight,
+#list-result-table,
+#list-result-table tbody,
+#list-result-table tr.odd:hover,
+#list-result-table tr.odd,
+#list-result-table td.highlighted {
+    background: #e9e9e9;
+}
+#list-result-table tr.even {
+    background: #f3f3f3;
+}
+#list-result-table tr.odd,
+#list-result-table thead {
+    background: white;
+}
+#list-result-table tr.odd td.sorting_1 {
+    background: #e0e0e0;
+}
+#list-result-table tr.even td.sorting_1 {
+    background: #f0f0f0;
+}
+label {
+    font-size: small;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+}
+input[type=checkbox] {
+    margin: 0;
+    padding: 0;
+}
+</style>
+<script type="text/javascript" src="{{ web_prefix }}/etc/jquery/jquery.min.js">
+</script>
+<script type="text/javascript" src=
+"{{ web_prefix }}/etc/DataTables/media/js/jquery.dataTables.min.js">
+</script>
+<script type="text/javascript" src=
+"{{ web_prefix }}/etc/DataTables/extras/ColVis/media/js/ColVis.min.js">
+</script>
+<script type="text/javascript" charset="utf-8">
+var Rosie = {};
+Rosie.cookie_get = function(name) {
+    var cookies = document.cookie.split("; ");
+    var value = null;
+    $.each(cookies, function(i, item) {
+        var pair = item.split("=");
+        if (pair[0] == name) {
+            value = unescape(pair[1]);
+            return false;
+        }
+    });
+    return value;
+};
+Rosie.cookie_set = function(name, value) {
+    document.cookie = name + "=" + escape(value);
+};
+Rosie.query = function() {
+    var q = "";
+    var q_ubound = 0;
+    var q_open_groups = 0;
+    $("#query-table > tbody > tr").each(function(i) {
+        if (i > q_ubound) {
+            q_ubound = i;
+        }
+        var row = $(this);
+        var conjunction = $(".q_conjunction", row).val();
+        var group0 = $(".q_group0", row).val();
+        var key = $(".q_key", row).val();
+        var operator = $(".q_operator", row).val();
+        var value = encodeURIComponent($(".q_value", row).val());
+        var group1 = $(".q_group1", row).val();
+        if (i != 0) {
+            q += "&";
+        }
+        var filter_list = [conjunction, key, operator, value];
+        if (group0) {
+            filter_list.splice(1, 0, group0);
+            q_open_groups += group0.length
+        }
+        if (group1) {
+            filter_list.push(group1);
+            q_open_groups -= group1.length
+        }
+        q += "q=" + filter_list.join("+");
+        var suffix = row.attr("id").substr(1);
+    });
+    if ($("#query-all").attr("checked")) {
+        q += "&all_revs"
+    }
+    if (q_open_groups != 0) {
+        alert("Parenthesis error");
+        return
+    }
+    location = "query?" + q;
+};
+Rosie.query_add = function() {
+    var tbody = $("#query-table tbody");
+    var rows = $("> tr", tbody);
+    var row = rows.last().clone().appendTo(tbody);
+    var index = (Number(rows.last().attr("id").substr(2)) + 1).toString();
+    row.attr("id", "q_" + index);
+
+    $("select, input", row).each(function() {
+        $(this).attr("name", $(this).attr("class") + "_" + index);
+    });
+
+    $("select, button", row).removeAttr("disabled");
+    $("button", row).click(Rosie.query_remove);
+};
+Rosie.query_remove = function() {
+    $(this).closest("tr").remove();
+    var rows = $("#query-table > tbody > tr");
+    $(".q_conjunction", rows.first()).attr("disabled", "disabled");
+    if (rows.length == 1) {
+        rows.first().find("button").prop("disabled", "disabled");
+    }
+};
+Rosie.query_groups_toggle = function () {
+    var tbody = $("#query-table tbody");
+    var show_groups = $("#show-groups").is(":checked");
+    $("#query-table > tbody > tr").each(function(i) {
+        var row = $(this);
+        var group0 = $(".q_group0", row);
+        var group1 = $(".q_group1", row);
+        if (show_groups) {
+            group0.show();
+            group1.show();
+        }
+        else {
+            group0.hide();
+            group1.hide();
+        }
+        if (!show_groups && (group0.val() || group1.val())) {
+            $("#show-groups").attr("checked", "checked");
+            return Rosie.query_groups_toggle()
+        }
+    });
+};
+Rosie.show = function(method) {
+    $("#" + method).show();
+    $("form[id!=" + method + "]").hide()
+};
+$(function() {
+    var table = $("#list-result-table");
+    table.dataTable({
+        "aaSorting": [[2, "desc"]],
+        "bDeferRender": true,
+        "bDestroy": true,
+        "bInfiniteScroll": true,
+        "bPaginate": false,
+        "bProcessing": true,
+        "oColVis": {"activate": "mouseover", "aiExclude": [0]},
+        "oLanguage": {"sSearch": "Filter results:",
+                      "sZeroRecords": "No results found."},
+        "sDom": "<\"#list-result-table_colvis\"C>frltip"
+    });
+    if (location.search.length > 0) {
+        var method = location.pathname.split("/").pop();
+        Rosie.show(method);
+        if (method == "search" || method == "query") {
+            Rosie.cookie_set("method", method);
+            Rosie.cookie_set("method_params", location.search);
+        }
+    }
+    else {
+        Rosie.show("search");
+        var method = Rosie.cookie_get("method");
+        var method_params = Rosie.cookie_get("method_params");
+        if (method && method_params) {
+            location = method + method_params;
+        }
+    }
+    Rosie.query_groups_toggle();
+});
+</script>
+
+<title>{{ prefix }}: Rosie Web</title>
+</head>
+
+<body>
+<div id="body-header">
+  <div id="interface-chooser">
+    <a href="javascript: Rosie.show('search');">search</a>
+    |
+    <a href="javascript: Rosie.show('query');">query</a>
+  </div>
+  <img id="rosie-logo" src="{{ web_prefix }}/favicon.ico" alt="rosie"/>
+  <h1>{{ prefix }}: Rosie Web</h1>
+</div>
+
+<div id="body-query">
+  <form id="search" action="search">
+    <div>
+{% if s %}
+      <input id="s" type="text" name="s" value="{{ s }}" />
+{% else %}
+      <input id="s" type="text" name="s" />
+{% endif %}
+      <label for="search-all">all revisions</label>
+{% if all_revs %}
+      <input id="search-all" type="checkbox" name="all_revs"
+      checked="checked" />
+{% else %}
+      <input id="search-all" type="checkbox" name="all_revs" />
+{% endif %}
+      <input type="submit" value="search"/>
+    </div>
+  </form>
+  <form id="query" action="javascript:Rosie.query();">
+    <table id="query-table" summary="Query Table">
+      <tbody>
+{%- set group0_values = ["", "(", "((", "(((", "((((", "((((("] %}
+{%- set group1_values = ["", ")", "))", ")))", "))))", ")))))"] %}
+{%- if not filters %}
+{%- set filters = [["and", "", "", "", "", ""]] %}
+{%- endif %}
+{%- for filter in filters %}
+{%- set i = 0 %}
+        <tr id="q_{{ loop.index0 }}">
+          <td>
+{%- if loop.first %}
+            <select class="q_conjunction" name="q_conjunction_{{ loop.index0 }}"
+            disabled="disabled">
+{%- else %}
+            <select class="q_conjunction" name="q_conjunction_{{ loop.index0 }}">
+{%- endif %}
+{%- for conjunction in ["and", "or"] %}
+{%- if filter[i] == conjunction %}
+              <option selected="selected">{{ conjunction }}</option>
+{%- else %}
+              <option>{{ conjunction }}</option>
+{%- endif %}
+{%- endfor %}{# conjunction #}
+            </select>
+          </td>
+{%- set i = i + 1 %}
+          <td>
+            <select class="q_group0" name="q_group0_{{ loop.index0 }}">
+{%- for group0 in group0_values %}
+{%- if filter[i] == group0 and filter|length > 4 %}
+              <option selected="selected">{{ group0 }}</option>
+{%- else %}
+              <option>{{ group0 }}</option>
+{%- endif %}
+{%- endfor %}{# group0 #}
+            </select>
+          </td>
+{%- if filter[i] in group0_values %}
+{%- set i = i + 1 %}
+{%- endif %}
+          <td>
+            <select class="q_key" name="q_key_{{ loop.index0 }}">
+{%- for common_key in common_keys %}
+{%- if filter[i] == common_key %}
+              <option selected="selected">{{ common_key }}</option>
+{%- else %}
+              <option>{{ common_key }}</option>
+{%- endif %}{# common_key #}
+{%- endfor %}
+            </select>
+          </td>
+{%- set i = i + 1 %}
+          <td>
+            <select class="q_operator" name="q_operator_{{ loop.index0 }}">
+{%- for query_operator in query_operators %}
+{%- if filter[i] == query_operator %}
+              <option selected="selected">{{ query_operator }}</option>
+{%- else %}
+              <option>{{ query_operator }}</option>
+{%- endif %}
+{%- endfor %}{# query_operator #}
+            </select>
+          </td>
+{%- set i = i + 1 %}
+          <td>
+            <input type="text" class="q_value" name="q_value_{{ loop.index0 }}"
+            value="{{ filter[i] }}" />
+          </td>
+{%- set i = i + 1 %}
+          <td>
+            <select class="q_group1" name="q_group1_{{ loop.index0 }}">
+{%- for group1 in group1_values %}
+{%- if filter[i] == group1 %}
+              <option selected="selected">{{ group1 }}</option>
+{%- else %}
+              <option>{{ group1 }}</option>
+{%- endif %}
+{%- endfor %}{# group1 #}
+            </select>
+          </td>
+{%- if loop.first %}
+          <td><div><button type="button" disabled="disabled">-</button></div></td>
+{%- else %}
+          <td><div><button type="button">-</button></div></td>
+{%- endif %}
+        </tr>
+{%- endfor %}{# filter #}
+      </tbody>
+    </table>
+    <div id="query-control">
+      <button type="button" onclick="javascript: Rosie.query_add();">+</button>
+      <label for="query-all">all revisions</label>
+{%- if all_revs %}
+      <input id="query-all" type="checkbox" name="all_revs"
+      checked="checked" />
+{%- else %}
+      <input id="query-all" type="checkbox" name="all_revs" />
+{%- endif %}
+      <label for="show-groups">group controls</label>
+      <input id="show-groups" type="checkbox" name="show_groups"
+      onclick="javascript: Rosie.query_groups_toggle();"/>
+      <input type="submit" value="query" />
+    </div>
+  </form>
+</div>
+
+<div id="body-main">
+  <div id="list-result">
+    <table id="list-result-table" summary="List Result Table">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>branch</th>
+          <th>revision</th>
+          <th>owner</th>
+          <th>project</th>
+          <th>title</th>
+        </tr>
+      </thead>
+      <tbody>
+{%- if data %}
+{%- for item in data %}
+{%- set info = "%s-%s/%s@%s"|format(prefix, item.idx, item.branch, item.revision) %}
+{%- set info = info + " - " %}
+{%- for key, value in item|dictsort %}
+{%- if value is not none and key not in ["idx", "branch", "revision", "href", "owner", "project", "title"] %}
+{%- if "-list" in key %}
+{%- set value = value|join(" ") %}
+{%- endif %}
+{%- set info = info ~ key ~ ": " ~ value ~ " " %}
+{%- endif %}
+{%- if loop.last %}
+        <tr title="{{ info }}">
+{%- endif %}
+{%- endfor %}
+          <td><a href="{{ item.href }}">{{ prefix }}-{{ item.idx }}</a></td>
+{%- for col in ["branch", "revision", "owner", "project", "title"] %}
+          <td>{{ item[col] }}</td>
+{%- endfor %}
+        </tr>
+{%- endfor %}
+{%- endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

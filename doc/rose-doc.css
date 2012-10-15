@@ -1,0 +1,361 @@
+/**********************************************************************
+ * (C) British crown copyright 2012 Met Office.
+ * 
+ * This file is part of Rose, a framework for scientific suites.
+ * 
+ * Rose is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Rose is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Rose. If not, see <http://www.gnu.org/licenses/>.
+ *
+ **********************************************************************/
+
+/**********************************************************************
+ * CSS for Rose documents.
+ *
+ **********************************************************************/
+
+/**********************************************************************
+ * FOREGROUND COLOUR
+ *
+ **********************************************************************/
+a:link {
+    color: blue;
+}
+
+a:visited {
+    color: purple;
+}
+
+a:active,
+a:hover {
+    color: blue;
+}
+
+code,
+kbd,
+var {
+    color: navy;
+}
+
+.sectionlink:link,
+.sectionlink:visited {
+    color: black;
+}
+
+h1 {
+    color: #ffcb00;
+}
+
+#body-header {
+    color: white;
+}
+
+#body-header a:link {
+    color: #ffcb00;
+}
+
+#body-header a:visited,
+#body-header a:hover,
+#body-header a:active {
+    color: #ffcb00;
+}
+
+
+/**********************************************************************
+ * BACKGROUND COLOUR
+ *
+ **********************************************************************/
+h1 {
+    background: #060048;
+}
+code,
+kbd,
+pre,
+samp,
+.image {
+    background: #eee;
+}
+
+#body-header {
+    background: #060048;
+}
+
+.sectionlink:active,
+.sectionlink:hover {
+    background: #ddd;
+}
+
+.shell-prompt {
+    background: none;
+}
+
+
+/**********************************************************************
+ * BORDER
+ *
+ **********************************************************************/
+dl,
+kbd,
+pre,
+samp,
+.image {
+    border: thin solid #ddd;
+}
+
+h2 {
+    border-top: medium ridge #060048;
+}
+
+.shell {
+    border: thin outset black;
+}
+
+.shell-prompt,
+#content h2 {
+    border: none;
+}
+
+
+/**********************************************************************
+ * FONT
+ *
+ **********************************************************************/
+body {
+    font-family: sans-serif;
+}
+
+code,
+kbd,
+samp,
+var {
+    font-family: monospace;
+}
+
+h1 {
+    font-size: 200%;
+}
+
+h2 {
+    font-size: 175%;
+}
+
+h3 {
+    font-size: 150%;
+}
+
+h4,
+h5 {
+    font-size: medium;
+}
+
+address {
+    font-size: x-small;
+}
+
+address,
+var {
+    font-style: normal;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+dt,
+.shell-prompt,
+#body-header p {
+    font-weight: bold;
+}
+
+
+/**********************************************************************
+ * CLASSIFICATION
+ *
+ **********************************************************************/
+#fcm-content ul li {
+    list-style: none;
+}
+
+code,
+kbd,
+samp {
+    white-space: nowrap;
+}
+
+
+/**********************************************************************
+ * TEXT DECORATION
+ *
+ **********************************************************************/
+a:link {
+    text-decoration: underline;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+a:active,
+a:hover {
+    text-decoration: underline;
+}
+
+
+/**********************************************************************
+ * TEXT ALIGNMENT
+ *
+ **********************************************************************/
+address,
+h1 {
+    text-align: right;
+}
+
+
+/**********************************************************************
+ * DISPLAY
+ *
+ **********************************************************************/
+.sectionlink {
+    display: none;
+}
+
+:hover > .sectionlink {
+    display: inline;
+}
+
+/**********************************************************************
+ * BORDER-RADIUS
+ *
+ **********************************************************************/
+dl,
+pre,
+.image {
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+}
+
+.shell {
+    border-radius: 0;
+    -moz-border-radius: 0;
+}
+
+
+/**********************************************************************
+ * MARGIN
+ *
+ **********************************************************************/
+body,
+h1,
+h2,
+.shell-prompt,
+#body-header,
+#body-header img,
+#body-header p {
+    margin: 0;
+}
+
+img {
+    margin: 0.25em;
+}
+
+dl,
+dd {
+    margin-bottom: 0.5em;
+}
+
+dl {
+    margin-top: 0.5em;
+}
+
+.shell-prompt {
+    margin-right: 0.5em;
+}
+
+
+/**********************************************************************
+ * PADDING
+ *
+ **********************************************************************/
+h1 {
+    padding-top: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5 {
+    padding-bottom: 0.2em;
+}
+
+h2,
+h3,
+h4,
+h5 {
+    padding-top: 0.2em;
+}
+
+dl,
+li,
+pre,
+.image {
+    padding: 0.2em;
+}
+
+code,
+kbd,
+samp,
+var {
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+
+#body-header p {
+    padding-top: 0.5em;
+}
+
+
+/**********************************************************************
+ * POSITION AND FLOAT
+ *
+ **********************************************************************/
+.shell-prompt,
+#rose-icon {
+    float: left;
+}
+
+#body-header address {
+    float: right;
+}
+
+#body-header,
+#body-main {
+    position: absolute;
+}
+
+#body-main {
+    top: 3em;
+}
+
+
+/**********************************************************************
+ * HEIGHT AND WIDTH
+ *
+ **********************************************************************/
+#body-header {
+    height: 2.9em;
+    width: 100%;
+}
+
+#body-main {
+    width: 100%;
+}

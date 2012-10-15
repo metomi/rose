@@ -1,0 +1,16 @@
+[scheduling]
+    [[dependencies]]
+        graph = """
+            fcm_make => my_hello_world
+            fcm_make => my_hello_world_to_file
+            fcm_make => my_hello_earth
+            fcm_make => fred_hello_world
+            fcm_make => my_hello_mars
+        """
+[runtime]
+    [[root]]
+        command scripting = "sleep 10 && rose task-run -v"
+        [[[event hooks]]]
+            succeeded handler = "rose task-hook"
+            failed handler = "rose task-hook --shutdown"
+            submission failed handler = "rose task-hook --shutdown"

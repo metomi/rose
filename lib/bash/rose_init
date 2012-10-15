@@ -1,0 +1,58 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose_init
+#
+# SYNOPSIS
+#     . $ROSE_HOME/lib/bash/rose_init
+#     rose_init [FUNC ...]
+#
+# DESCRIPTION
+#     Initialise a bash script with the following:
+#     * "set -eu".
+#     * load the "rose_usage" function.
+#     * load any FUNC specified in the argument list.
+#-------------------------------------------------------------------------------
+function rose_init() {
+    set -eu
+    ROSE_NS=$(basename $0)
+    export ROSE_NS
+    ROSE_HOME_BIN=$(cd $(dirname $0) && pwd)
+    export ROSE_HOME_BIN
+    ROSE_HOME=${ROSE_HOME:-$(dirname $ROSE_HOME_BIN)}
+    export ROSE_HOME
+    if [[ -z ${ROSE_UTIL:-} ]]; then
+        ROSE_UTIL=$(basename $0)
+        ROSE_UTIL=${ROSE_UTIL#$ROSE_NS-}
+    fi
+    local LIB=$ROSE_HOME/lib/bash
+
+    if [[ -f $LIB/${FUNCNAME[0]}_site ]]; then
+        . $LIB/${FUNCNAME[0]}_site
+    fi
+
+    local ITEM=
+    for ITEM in rose_usage $@; do
+        local FILE=
+        for FILE in $(ls $LIB/$ITEM 2>/dev/null); do
+            . $FILE
+        done
+    done
+}

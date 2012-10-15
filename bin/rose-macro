@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-macro
+#
+# SYNOPSIS
+#     rose macro [OPTIONS] [MACRO_NAME ...]
+#
+# DESCRIPTION
+#     List or run macros associated with a suite or application.
+#
+# OPTION
+#     --all; -a
+#         List or run rose internal macros as well as metadata macros.
+#     --config=DIR; -C DIR
+#         Use configuration in DIR instead of $PWD.
+#     --meta-path=PATH; -M PATH
+#         Prepend PATH to the metadata search path.
+#     --non-interactive, --yes, -y
+#         Switch off interactive prompting (=answer yes to everything).
+#     --output=DIR; -O DIR
+#         The location of the output directory. Only meaningful if
+#         there is at least one transformer in the argument list.
+#     --quiet; -q
+#         Reduce verbosity.
+#     --validate; -V
+#         Prepend all validators to the argument list.
+#
+# ARGUMENTS
+#     MACRO_NAME ...
+#         A list of macro names to run. If no macro names are specified and
+#         --validate is not used, list all available macros. Otherwise, run
+#         the specified macro names.
+#-------------------------------------------------------------------------------
+exec python -m rose.macro "$@"

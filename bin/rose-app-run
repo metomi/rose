@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-app-run
+#
+# SYNOPSIS
+#     rose app-run [OPTIONS] [--] [COMMAND ...]
+#
+# DESCRIPTION
+#     Run an application according to its configuration.
+#
+#     Determine the command to run in this order:
+#     1. If COMMAND is specified, invoke the command.
+#     2. If the --command-key=KEY option is defined, invoke the command
+#        specified in [command]KEY.
+#     3. If the environment variable ROSE_TASK_NAME is defined and a setting in
+#        the [command] section has a key matching the value of the environment
+#        variable, then the value of the setting is used as the command.
+#     4. Invoke the command specified in [command]default.
+#
+# OPTION
+#     --config=DIR; -C DIR
+#         Specify the configuration directory of the application. (default=$PWD)
+#     --command-key=KEY; -c KEY
+#         Invoke the command specified in [command]KEY.
+#     --define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE
+#         Each of this overrides the [SECTION]KEY setting with a given VALUE.
+#         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
+#         or even --define=[!SECTION].
+#     --install-only; -i
+#         Install files only. Do not invoke the run.
+#     --new, -N
+#         Remove all items in $PWD before doing anything. This option only
+#         works with the --config=DIR option and if $PWD is not DIR.
+#     --no-overwrite
+#         Do not overwrite existing files.
+#     --opt-conf-key=KEY, -O KEY
+#         Each of this switches on an optional configuration identified by KEY.
+#     --quiet, -q
+#         Decrement verbosity.
+#     --verbose; -v
+#         Increment verbosity.
+#-------------------------------------------------------------------------------
+exec python -m rose.run app "$@"

@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+# NAME
+#     rosie go
+#
+# SYNOPSIS
+#     rosie go [OPTIONS] [SEARCH]
+#
+# DESCRIPTION
+#     Launch the Rosie client GTK+ GUI.
+#
+#     By default rosie go will display a list of all your locally checked out
+#     suites. This initial search displayed by rosie go can be set through the 
+#     [SEARCH] argument using either a query, search keyword or url.
+#
+#     Unless an option is used to specify the initial search type the input is  
+#     interpreted by default as follows:
+#     - string beginning with "http": url
+#     - string not beginning with "http": keyword search
+#
+# OPTIONS
+#     --prefix=PREFIX
+#         An alias specifying a different suite repository.
+#
+#     --all-revs
+#         Specify whether to search deleted suites and superceded suites.
+#
+#     --query; -Q
+#         Run the suite search specified by [SEARCH] as a query.
+#
+#     --search; -S
+#         Run the suite search specified by [SEARCH] as a keyword search.
+#     
+#     --url; -U
+#         Run the suite search specified by [SEARCH] as a url search.
+#
+# ARGUMENTS
+#     QUERY
+#         An optional search to be executed on startup.
+#-------------------------------------------------------------------------------
+exec python -m rosie.browser.main "$@"
+

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose suite-log-view
+#
+# SYNOPSIS
+#     rose suite-log-view [OPTIONS] [SUITE]
+#
+# DESCRIPTION
+#     Generate and browse the log view of SUITE.
+#
+#     Analyse the suite log to generate a JSON file for feeding into an HTML
+#     based viewer. SUITE should be a valid suite name. If not defined, use
+#     `basename $PWD`.
+#
+#     If the DISPLAY environment variable is defined. Launch the web browser to
+#     display the log view unless --no-web-browse is specified.
+#
+# OPTIONS
+#     --no-web-browse
+#         Do not open a web browser to display the log view.
+#-------------------------------------------------------------------------------
+exec python -m rose.suite_log_view "$@"

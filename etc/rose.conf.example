@@ -1,0 +1,132 @@
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# Rose site/user configuration example
+# To activate this file, place it at $ROSE_HOME/etc/rose.conf
+#-------------------------------------------------------------------------------
+
+# Configuration of external commands.
+#
+## Launch text editor (default=vi).
+#  editor=gvim -f
+## Launch graphical text editor (default=gedit).
+#  geditor=gvim -f
+## Launch graphical file system browser (default=nautilus).
+#  fs-browser=konqueror
+## The rsync command.
+#  rsync=rsync -a --exclude=.* --timeout=1800 --rsh='ssh -oBatchMode=yes'
+## The ssh command.
+#  ssh=ssh -oBatchMode=yes
+## Launch terminal (default=xterm).
+#  terminal=konsole
+[external]
+
+# Configuration specific to "rose config-edit".
+# See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
+#
+## Hyperlink to the user guide.
+#  help-url = http://host/rose/doc/
+## Hyperlink to the Rose project page.
+#  project-url = http://host/rose/
+[rose-config-edit]
+
+# Configuration specific to "rose host-select".
+# See $ROSE_HOME/bin/rose-host-select for detail.
+[rose-host-select]
+
+# Configuration specific to "rose suite-run".
+#
+## Hosts in [rose-host-select] section that can be used to run a suite.
+#  hosts=localhost
+## HOST-PATTERNS=DIR list, line delimited.
+## HOST-PATTERNS are glob patterns for matching host names.
+## DIR is the root location of a suite's "share" directory (default=$HOME)
+#  root-dir-share=hpc*=$DATADIR
+#                =*=$HOME
+## HOST-PATTERNS=DIR list, line delimited.
+## HOST-PATTERNS are glob patterns for matching host names.
+## DIR is the root location of a suite's "work" directory (default=$HOME)
+#  root-dir-work=hpc*=$WORKING
+#               =*=$DATADIR
+## HOST-PATTERNS=N list, line delimited.
+## HOST-PATTERNS are glob patterns for matching host names.
+## N is the maxium number of a suite's old "log" directory to keep. (default=5)
+#  num-log-max=hpc*=0
+#             =localhost=5
+## Maxium number of times to ping a suite to see if it is running (default=3)
+#  num-ping-try-max=3
+[rose-suite-run]
+
+# Configuration specific to "rose task-run".
+#
+## Items to prepend to the PATH environment variable
+#  path-prepend=/path/1 /path/2
+## Items to prepend to the a PATH-like environment variable, e.g. PYTHONPATH
+#  path-prepend.PYTHONPATH=
+[rose-task-run]
+
+# Calling "rose" on a remote host.
+#
+## Alternate path to "rose" for all hosts
+#  * =/path/to/rose
+## Alternate path to "rose" for a specific host
+#  hostname=/path/to/rose/at/hostname
+[rose-home-at]
+
+# Configuration specific to the databse of the Rosie web service server
+#
+## The database location of a given repository prefix
+#  db.PREFIX = URL
+## The path to the repository of a given prefix
+#  repos.PREFIX = URL
+[rosie-db]
+
+# Configuration specific to Rosie browse/go GUI
+# See the $ROSE_HOME/lib/python/rosie/browser/__init__.py for detail.
+#
+## Path to a picture containing the suite engine icon.
+#  icon-path-scheduler = /path/to/suite-engine/icon.png
+## Hyperlink to the user guide.
+#  help-url = http://host/rose/doc/
+## Hyperlink to the Rose project page.
+#  wiki-url = http://host/rose/
+[rosie-browse]
+
+# Configuration specific to Rosie client commands
+#
+## Root directory of local (working) copies of suites (default=$HOME/roses)
+#  local-copy-root = $HOME/roses
+## The default prefix
+#  prefix-default = name1
+## URL of the repository of an ID prefix
+#  prefix-location.PREFIX = URL
+## Source browser URL of the repository of an ID prefix
+#  prefix-web.PREFIX = URL
+[rosie-id]
+
+# Configuration specific to Rosie web service server
+#
+## Adhoc Rosie web server log directory
+#  log-dir = /path/to/log/directory
+[rosie-ws]
+
+# Configuration specific to Rosie client commands
+#
+## Root URL of the Rosie web server
+#  ws-root-default = http://host:port/
+[rosie-ws-client]

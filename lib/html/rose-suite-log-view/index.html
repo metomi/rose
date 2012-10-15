@@ -1,0 +1,440 @@
+<!--?xml version="1.0" encoding="utf-8"?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<style type="text/css">
+@import "html-lib/DataTables/media/css/demo_table.css";
+@import "html-lib/DataTables/extras/ColVis/media/css/ColVis.css";
+.fail {
+    color: red;
+    font-weight: bold;
+    
+}
+.pass {
+    color: green;
+    font-weight: bold;
+}
+#body-header {
+    background: #060048;
+    color: white;
+    font-weight: bold;
+    height: 2.5em;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+#body-header a:link {
+    color: #ffcb00;
+}
+#body-header a:visited,
+#body-header a:hover,
+#body-header a:active {
+    color: #ffcb00;
+}
+#body-header h1 {
+    font-size: x-large;
+    margin: 0.1em;
+    padding: 0;
+}
+#body-header p {
+    float: right;
+    font-size: small;
+    margin: 0.2em;
+    padding: 0;
+}
+#body-main {
+    background: #eee;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    padding-top: 0.1em;
+    position: absolute;
+    right: 0;
+    top: 2.5em;
+}
+table {
+    border-collapse: collapse;
+    clear: both;
+    margin: 0;
+    width: 100%
+}
+table,
+td,
+th {
+    border: 1px solid #d0d0d0;
+}
+td {
+    border-bottom: 0;
+    border-top: 0;
+    padding: 0.3em;
+    font-size: small;
+    white-space: nowrap;
+}
+th {
+    font-size: small;
+    padding: 0.3em;
+    text-align: left;
+}
+#task_list_colvis * {
+    margin: 0.1em;
+}
+#task_list_colvis button {
+    padding: 0.1em;
+}
+#task_list_info {
+    float: left;
+    font-size: x-small;
+    margin: 0.1em;
+}
+#task_list_filter {
+    float: left;
+    font-size: small;
+    margin: 0.1em;
+    margin-top: 0.4em;
+    text-align: left;
+}
+.firstColumn {
+    text-align: left;
+}
+.ex_highlight,
+#task_list,
+tbody,
+tr.even:hover,
+tr.even,
+td.highlighted {
+    background: #e3e3e3;
+}
+.ex_highlight,
+#task_list,
+tbody,
+tr.odd:hover,
+tr.odd,
+td.highlighted {
+    background: #e9e9e9;
+}
+tr.even {
+    background: #f3f3f3;
+}
+tr.odd,
+thead {
+    background: white;
+}
+tr.odd td.sorting_1 {
+    background: #e0e0e0;
+}
+tr.even td.sorting_1 {
+    background: #f0f0f0;
+}
+.submit-num {
+    float: right;
+    font-weight: bold;
+}
+</style>
+<script type="text/javascript" src="html-lib/jquery/jquery.min.js">
+</script>
+<script type="text/javascript" src=
+"html-lib/DataTables/media/js/jquery.dataTables.min.js">
+</script>
+<script type="text/javascript" src=
+"html-lib/DataTables/extras/ColVis/media/js/ColVis.min.js">
+</script>
+<script type="text/javascript" charset="utf-8">
+$(function() {
+    function err(data) {
+        alert("Could not load JOB.json");
+    }
+
+    /* Convert a time delta in seconds to a M:SS string. */
+    function timedelta2string(s) {
+        var minute = Math.floor(s / 60).toString();
+        var second = Math.round(s % 60).toString();
+        if (second.length == 1) {
+            second = "0" + second;
+        }
+        return minute + ":" + second;
+    }
+
+    /* Convert a time in seconds since epoch to an object
+     * containing the "date" string, the "time" string"
+     * and the date + time "string". */
+    function datetime2obj(s) {
+        var d = new Date(s * 1000).toISOString();
+        var dd = d.substr(0, d.indexOf("T"));
+        var dt = d.substr(d.indexOf("T") + 1, 8);
+        return {"date": dd, "time": dt, "string": dd + " " + dt};
+    }
+
+    /* Load the data into the HTML. */
+    function load(data) {
+        load_misc(data);
+        load_tasks(data);
+    }
+
+    /* Load the misc data into the HTML. */
+    function load_misc(data) {
+        var title_var = data["suite"];
+        document.title = title_var;
+        $("h1:first").text(title_var).attr("title", data["suite"]);
+        $("#body-header a[href^=\"source.html?path=\"]").each(function() {
+            var href = $(this).attr("href") + "\&suite=" + data["suite"];
+            $(this).attr("href", href);
+        });
+    }
+
+    /* Load the data of the tasks into the HTML. */
+    function load_tasks(data) {
+        var URL_PREFIX = "source.html?suite=" + data["suite"] + "\&path=";
+        var node = $("#task_list");
+        var task_keys = [];
+        for (var task_id in data["tasks"]) {
+            var task_data_list = data["tasks"][task_id];
+            $.each(task_data_list, function(submit_num, task_data) {
+                var row = $("<tr/>").appendTo($("tbody", node));
+                var cell;
+                /* Column 1: task%cycle (submit-n) */
+                cell = $("<td/>").appendTo(row).addClass("firstColumn")
+                if (task_data_list.length > 1) {
+                    var span = $("<span/>").appendTo(cell);
+                    span.addClass("submit-num");
+                    span.text("(" + (submit_num + 1).toString() + ")");
+                }
+                cell.append(task_id);
+
+                /* Column 2: submit-n */
+                cell = $("<td/>").appendTo(row);
+                cell.append((submit_num + 1).toString());
+
+                /* Column 3: status */
+                cell = $("<td/>").appendTo(row);
+                if (task_data["status"] != null) {
+                    var value = task_data["status"];
+                    if (task_data["signal"] && task_data["signal"] != "ERR") {
+                        value += " (" + task_data["signal"] + ")";
+                    }
+                    cell.append(value);
+                    cell.addClass(task_data["status"]);
+                }
+
+                /* Column 4: submit time */
+                var task_events = task_data["events"];
+                var date_submit = datetime2obj(task_events["submit"]);
+                cell = $("<td/>").appendTo(row);
+                cell.append(date_submit["string"]);
+
+                /* Column 5: queue time delta */
+                cell = $("<td/>").appendTo(row);
+                if (task_events["init"] != null) {
+                    var delta = task_events["init"] - task_events["submit"];
+                    cell.append(timedelta2string(delta));
+                }
+
+                /* Column 6, 7: init time, exit time */
+                $.each(["init", "exit"], function(i, key) {
+                    cell = $("<td/>").appendTo(row);
+                    if (task_events[key] != null) {
+                        var str = task_events[key];
+                        var obj = datetime2obj(task_events[key]);
+                        /* Remove the timestamp date if same as submit date */
+                        if (obj["date"] == date_submit["date"]) {
+                            str = obj["time"];
+                        }
+                        else {
+                            str = obj["string"];
+                        }
+                        cell.append(str);
+                    }
+                });
+
+                /* Column 8: run time delta */
+                cell = $("<td/>").appendTo(row);
+                if (task_events["init"] != null && task_events["exit"] != null) {
+                    var delta = task_events["exit"] - task_events["init"];
+                    cell.append(timedelta2string(delta));
+                }
+
+                /* Column 9, 10, 11: stdout file, stderr file, job script */
+                var FTS = task_data["files_time_stamp"];
+                var task_files = task_data["files"];
+                $.each(["out", "err", "script"], function(i, name) {
+                    cell = $("<td/>").appendTo(row);
+                    if (task_files[name] != null) {
+                        var file = "job/" + task_id + "-" + FTS;
+                        if (name != "script") {
+                            file += "." + name;
+                        }
+                        var content = "empty";
+                        var n_bytes = task_files[name]["n_bytes"];
+                        if (n_bytes > 0) {
+                            var file_uri = URL_PREFIX + encodeURIComponent(file);
+                            content = $("<a/>", {"href": file_uri}).append("view");
+                            content.attr("title", n_bytes.toString() + " byte(s)");
+                        }
+                        cell.append(content);
+                    }
+                });
+
+                /* Column 12: other files */
+                cell = $("<td/>").appendTo(row);
+                var files = [];
+                var indexed_files_data_map = {};
+                for (var name in task_files) {
+                    if (name in {"out": null, "err": null, "script": null}) {
+                        continue;
+                    }
+                    var match = name.match(/^(.*)\.(\d+)(\.html)?$/);
+                    if (match) {
+                        var head = match[1];
+                        if (head == null) {
+                            head = "";
+                        }
+                        var idx = match[2];
+                        var tail = match[3];
+                        if (tail == null) {
+                            tail = "";
+                        }
+                        var name = head + ".*" + tail;
+                        if (!(name in indexed_files_data_map)) {
+                            indexed_files_data_map[name] = {
+                                "head": head,
+                                "tail": tail,
+                                "list": [],
+                                "name": name};
+                            files.push(name);
+                        }
+                        indexed_files_data_map[name]["list"].push(Number(idx));
+                    }
+                    else {
+                        files.push(name);
+                    }
+                }
+                files.sort();
+                for (var i = 0; i < files.length; i++) {
+                    if (i > 0) {
+                        cell.append(" | ");
+                    }
+                    var name = files[i];
+                    if (name in indexed_files_data_map) {
+                        if (indexed_files_data_map[name]["list"].length == 1) {
+                            var d = indexed_files_data_map[name];
+                            name = d["head"] + "." + d["list"][0] + d["tail"];
+                            delete(indexed_files_data_map[name]);
+                        }
+                    }
+                    if (name in indexed_files_data_map) {
+                        var d = indexed_files_data_map[name];
+                        var select = $("<select/>").appendTo(cell);
+                        var root = "job/" + task_id + "-" + FTS + ".";
+                        var option = $("<option/>");
+                        option.attr("selected", "selected");
+                        option.attr("value", "");
+                        option.text(name);
+                        option.appendTo(select);
+                        var list = d["list"];
+                        list.sort(function(a, b) {return a - b});
+                        for (var idx = 0; idx < list.length; idx++) {
+                            var name_idx = list[idx].toString();
+                            var name = d["head"] + "." + name_idx + d["tail"];
+                            var file = root + name;
+                            var f;
+                            if (file.match(/\.html(?:\.\d+)?$/)) {
+                                f = function() {
+                                    location = (file).replace(/%/, "%25");
+                                };
+                            }
+                            else {
+                                f = function() {
+                                    var file_uri = encodeURIComponent(file);
+                                    location = URL_PREFIX + file_uri;
+                                };
+                            }
+                            var option = $("<option/>").appendTo(select);
+                            option.text(name);
+                            option.click(f);
+                        }
+                    }
+                    else {
+                        var n_bytes = task_files[name]["n_bytes"];
+                        if (n_bytes == 0) {
+                            var span = $("<span/>", {"title": "0 bytes"});
+                            span.text(name);
+                            cell.append(span);
+                        }
+                        else {
+                            var file = "job/" + task_id + "-" + FTS + "." + name;
+                            var anchor = $("<a/>");
+                            anchor.attr("title", n_bytes.toString() + " byte(s)");
+                            if (name.match(/\.html$/)) {
+                                anchor.attr("href", file.replace(/%/, "%25"));
+                                anchor.text(name);
+                            }
+                            else {
+                                var file_uri = encodeURIComponent(file);
+                                anchor.attr("href", URL_PREFIX + file_uri);
+                                anchor.text(name);
+                            }
+                            cell.append(anchor);
+                        }
+                    }
+                }
+            });
+        }
+        node.dataTable({
+            "aaSorting": [[3, "asc"]], /* See table columns */
+            "aoColumnDefs": [
+                {"bVisible": false, "aTargets": [1, 5, 6, 10]} /* See table columns */
+            ],
+            "bPaginate": false,
+            "bStateSave": true,
+            "oColVis": {"activate": "mouseover", "aiExclude": [0]},
+            "sDom": '<"#task_list_colvis"C>frltip',
+            "oLanguage": {"sSearch": "Filter results:"}
+        });
+    }
+
+    $.ajax({url: "JOB.json", dataType: "json", success: load, error: err});
+} );
+</script>
+</head>
+
+<body>
+<div id="body-header">
+<p>
+  <a href="source.html?path=rose-suite.version">rose-suite.version</a>
+| <a href="source.html?path=rose-suite-run.conf">rose-suite-run.conf</a>
+| <a href="source.html?path=rose-suite-run.log">rose
+suite-run log</a>
+| <a href="source.html?path=cylc-run.log">cylc run log</a>
+| <a href="source.html?path=suite/log">suite log</a>
+</p>
+
+<h1>Output for suite</h1>
+</div>
+
+<div id="body-main">
+<table id="task_list" summary="Task List">
+  <thead>
+    <tr>
+      <th class="firstColumn">Task%Cycle</th>
+      <th>Submit-N</th>
+      <th>Status</th>
+      <th>Time Submit</th>
+      <th>&Delta;t Queue</th>
+      <th>Time Run</th>
+      <th>Time Exit</th>
+      <th>&Delta;t Run</th>
+      <th>Out</th>
+      <th>Err</th>
+      <th>Script</th>
+      <th>Other Files</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</div>
+</body>
+</html>

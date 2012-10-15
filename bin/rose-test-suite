@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-test-suite
+#
+# SYNOPSIS
+#     rose test-suite [-v] [UTIL ...]
+#
+# DESCRIPTION
+#     Run the Rose test suite.
+#
+#     If no argument is specified, run available tests for all utilities.
+#     Otherwise, run only the tests for the utilities in the argument list.
+#
+# OPTIONS
+#     -v  Run tests in verbose mode, if applicable.
+#-------------------------------------------------------------------------------
+. $(dirname $0)/../lib/bash/rose_init
+rose_init
+ROSE_TEST=${ROSE_TEST:-$ROSE_HOME/t}
+UTIL_LIST="$(cd $ROSE_TEST && ls -d rose[-.]* | sed 's/^rose[-.]//')"
+ALT_UTIL_LIST="$(cd $ROSE_TEST && ls -d ros*)"
+#-------------------------------------------------------------------------------
+VERBOSE=
+if [[ -n ${1:-} && $1 == '-v' ]]; then
+    VERBOSE=$1
+    shift 1
+fi
+UTIL_LIST_ARG=${@:-$UTIL_LIST}
+#-------------------------------------------------------------------------------
+RC=0
+for UTIL in $UTIL_LIST_ARG; do
+    TEST_DIR=
+    if grep -q "^$UTIL$" <<<"$UTIL_LIST"; then
+        TEST_DIR=$ROSE_TEST/rose-$UTIL
+        if [[ ! -d $TEST_DIR ]]; then
+            TEST_DIR=$ROSE_TEST/rose.$UTIL
+        fi
+    elif grep -q "^$UTIL$" <<<"$ALT_UTIL_LIST"; then
+        TEST_DIR=$ROSE_TEST/$UTIL
+    fi
+    if [[ -n $TEST_DIR ]]; then
+        echo -e "[TEST-INIT] "$(basename $TEST_DIR)
+        TEST_RC=0
+        $TEST_DIR/tests $VERBOSE || TEST_RC=$?
+        if ((TEST_RC != 0)); then
+            RC=1
+        fi
+        echo -e "[TEST-EXIT] "$(basename $TEST_DIR)" ($TEST_RC)"
+    fi 
+done
+#-------------------------------------------------------------------------------
+exit $RC

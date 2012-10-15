@@ -1,0 +1,1162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Reference Guide: Configuration</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+</head>
+
+<body>
+  <div id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose Reference Guide: Configuration</h1>
+
+    <div id="content"></div>
+
+    <h2 id="goals">Goals</h2>
+
+    <p>Suite configurations should be portable between users (at least at the
+    same site). E.g.: another user should be able to run the same suite:</p>
+
+    <ul>
+      <li>without making ANY changes to it.</li>
+
+      <li>without having to add/modify things in their $HOME/.profile.</li>
+    </ul>
+
+    <p>Input configurations should be programming language neutral.</p>
+
+    <ul>
+      <li>Any processing logic should be application/version independent,
+      generic and future proof.</li>
+
+      <li>Data structure should be represented in formats easily understood and
+      manipulatable by a human and a computer.</li>
+    </ul>
+
+    <p>The life cycles of application configurations in a suite may differ from
+    that of the suite.</p>
+
+    <ul>
+      <li>The configuration of an application may be independent of the
+      suite.</li>
+
+      <li>The configuration of an application should be portable between
+      suitable suites.</li>
+    </ul>
+
+    <p>The configurations are independent of the utilities. For example, the
+    configuration metadata for the suite and application configurations will
+    drive the Rose config editor GUI, but will not be bound or restricted by
+    it.</p>
+
+    <h2 id="format">Configuration Format</h2>
+
+    <p>A configuration in Rose is normally represented by a directory with the
+    following:</p>
+
+    <ul>
+      <li>a configuration file in a modified <a href=
+      "http://en.wikipedia.org/wiki/INI_file">INI file</a> format.</li>
+
+      <li>(optionally) files containing data that cannot easily be represented
+      by the INI format.</li>
+    </ul>
+
+    <p>We have added the following conventions into our INI format:</p>
+
+    <ol>
+      <li>Only a hash <kbd>#</kbd> in the beginning of a line starts a comment.
+      Empty lines and lines with only white spaces are ignored. There is no
+      support for trailing comments. Comments are normally ignored when a
+      configuration file is loaded. However, some comments are loaded if the
+      following conditions are met:
+
+        <ul>
+          <li>Comment lines at the beginning of a configuration file up to but
+          not including the 1st blank line or the 1st setting are comment lines
+          associated with the file. They will re-appear at the top of the file
+          when it is re-dumped.</li>
+
+          <li>Comment lines between a blank line and the next setting, and the
+          comment lines between the previous setting and the next setting are
+          comments associated with the next setting. The comment lines
+          associated with a setting will re-appear before the setting when the
+          file is re-dumped.</li>
+        </ul>
+      </li>
+
+      <li>Only the equal sign <kbd>=</kbd> is used to delimit a key-value pair
+      &amp;dash; because the colon <kbd>:</kbd> may be used in keys of namelist
+      declarations.</li>
+
+      <li>A key-value pair declaration does not have to live under a section
+      declaration. Such a declaration lives directly under the <em>root</em>
+      level.</li>
+
+      <li>Key-value pair declarations following a line with only
+      <code>[]</code> are placed directly under the <em>root</em> level.</li>
+
+      <li>Declarations are case sensitive. When dealing with case-insensitive
+      inputs such as Fortran logicals or numbers in scientific notation,
+      lowercase values should be used.</li>
+
+      <li>Declarations start at column 1. Continuations start at column &gt;1.
+
+        <ul>
+          <li>Each line is stripped of leading and trailing spaces.</li>
+
+          <li>A newline <kbd>\n</kbd> character is prefixed to each
+          continuation line.</li>
+
+          <li>If a continuation line has a leading equal sign <kbd>=</kbd>
+          character, it is stripped from the line. This is useful for retaining
+          leading white spaces in a continuation line.</li>
+        </ul>
+      </li>
+
+      <li>A single exclamation <kbd>!</kbd> or a double exclamation
+      <kbd>!!</kbd> in front of a section (i.e. <code>[!SECTION]</code>) or
+      key=value pair (i.e. <code>!key=value</code>) denotes an ignored setting.
+
+        <ul>
+          <li>E.g. It will be ignored in run time but may be used by other Rose
+          utilities.</li>
+
+          <li>A single exclamation denotes a user-ignored setting.</li>
+
+          <li>A double exclamation denotes a program-ignored setting. E.g. rose
+          config-edit may use a double exclamation to switch off a setting
+          according to the setting metadata.</li>
+        </ul>
+      </li>
+
+      <li>If a section is declared twice in a file, the later section will
+      append settings to the earlier one. If the same key in the same section
+      is declared twice, the later value will override the earlier one. This
+      logic applies to the state of a setting as well.</li>
+
+      <li>Once the file is parsed, declaration ordering is insignificant. N.B.
+      Do not assume order of environment variables.</li>
+
+      <li>Values of settings accept syntax such as <code>$NAME</code> or
+      <code>${NAME}</code> for environment variable substitution.</li>
+    </ol>
+
+    <p>E.g.</p>
+    <pre>
+# This is line 1 of the comment for this file.
+# This is line 2 of the comment for this file.
+
+# This comment will be ignored.
+
+# This is a comment for section-1.
+[section-1]
+# This is a comment for key-1.
+key-1=value 1
+# This comment will be ignored.
+
+# This is line 1 of the comment for key-2.
+# This is line 2 of the comment for key-2.
+key-2=value 2 line 1
+      value 2 line 2
+# This is a comment for key-3.
+key-3=value 3 line 1
+     =    value 3 line 2 has leading identation.
+     =
+     =    value 3 line 3 is blank. This is line 4.
+
+# section-2 is user-ignored.
+[!section-2]
+key-4=value 4
+# ...
+
+[section-3]
+# key-5 is program ignored.
+!!key-5=value 5
+</pre>
+
+    <p>In this document, the shorthand <code>SECTION=KEY=VALUE</code> is used
+    to represent a <code>KEY=VALUE</code> pair in a <code>[SECTION]</code> of
+    an INI format file.</p>
+
+    <h2 id="site">Site and User Configuration</h2>
+
+    <p>Aspects of some Rose utilities can be configured per installation via
+    the site configuration file and per user via the user configuration file.
+    Any configuration in the site configuration overrides the default, and any
+    configuration in the user configuration overrides the site configuration
+    and the default. Rose expects these files to be in the modified INI format
+    described above. Rose utilities search for its site configuration at
+    <code>$ROSE_HOME/etc/rose.conf</code> where <var>$ROSE_HOME/bin/rose</var>
+    is the location of the <code>rose</code> command, and they search for the
+    user configuration at <code>$HOME/.met-um/rose.conf</code> where
+    <var>$HOME</var> is the home directory of the current user.</p>
+
+    <p><em>Allowed settings in the site and user configuration files will be
+    documented in a future version of this document. In the mean time, the
+    settings are documented as comments in the <code>etc/rose.conf</code> file
+    of each distribution of Rose.</em></p>
+
+    <h2 id="suite">Suite Configuration</h2>
+
+    <p>The configuration and functionality of a suite will usually be covered
+    by the use of <a href="http://hjoliver.github.com/cylc/">cylc</a>. In which
+    case, most of the suite configuration will live in the cylc
+    <samp>suite.rc</samp> file. Otherwise, a suite is just a directory of
+    files.</p>
+
+    <p>A suite directory may contain the following:</p>
+
+    <ul>
+      <li>A file called <samp>rose-suite.conf</samp>, a configuration file in
+      the modified INI format described above. It stores the information on how
+      to install the suite. See <a href="#suite.conf">below</a> for
+      detail.</li>
+
+      <li>A file called <samp>rose-suite.info</samp>, a configuration file in
+      the modified INI format described above. It describes the suite's purpose
+      and identity, e.g. the title, the description, the owner, the access
+      control list, and other information. Apart from a few standard fields, a
+      suite is free to store any information in this file. See <a href=
+      "#suite.info">below</a> for detail.</li>
+
+      <li>An <samp>app/</samp> directory of application configurations used by
+      the suite.</li>
+
+      <li>A <samp>bin/</samp> directory of scripts and utilities used by the
+      suite.</li>
+
+      <li>An <samp>etc/</samp> directory of other configurations and resources
+      used the suite. E.g. fcm make configurations.</li>
+
+      <li>a <samp>meta/</samp> directory containing the suite's configuration
+      metadata.</li>
+
+      <li>Other items, as long as they do not clash with the scheduler's
+      working directories. E.g. for a cylc suite, <samp>log*/</samp>,
+      <samp>share/</samp>, <samp>state/</samp> and <samp>work/</samp> should be
+      avoided.</li>
+    </ul>
+
+    <h3 id="suite.conf">Suite Configuration: Suite Installation</h3>
+
+    <p>The suite install configuration file <code>rose-suite.conf</code> should
+    contain the information on how to install the suite. It may have the
+    following sections and root level options:</p>
+
+    <dl>
+      <dt><code>[jinja2:suite.rc]</code></dt>
+
+      <dd>For a cylc suite, if <a href=
+      "http://jinja.pocoo.org/docs/">jinja2</a> assignments are required for
+      <samp>suite.rc</samp>, they may be defined as key=value pairs in the
+      <code>[jinja2:suite.rc]</code> section. The assignments will be inserted
+      after the <code>#!jinja2</code> line of the installed
+      <samp>suite.rc</samp> file.</dd>
+
+      <dt><code>[file:NAME]</code></dt>
+
+      <dd>
+        Specify a file/directory to be installed. <var>NAME</var> should be a
+        path relative to the run time <var>$PWD</var>.
+
+        <ul>
+          <li>E.g. <code>file:app/APP=source=LOCATION</code>.</li>
+
+          <li>See <a href="#appendix-file-creation-mode">Appendix: File
+          Creation Mode</a>.</li>
+        </ul>
+      </dd>
+    </dl>
+
+    <p>It may have the following top level (no section) options:</p>
+
+    <dl>
+      <dt><code>meta</code></dt>
+
+      <dd>Specify the configuration metadata for the suite. The section may be
+      used by various Rose utilities, such as the config editor GUI. It can be
+      used to specify the suite type.</dd>
+
+      <dt><code>num-log-max=LIST</code></dt>
+
+      <dd>A new line delimited list of <var>PATTERN=NUM</var> pairs. The
+      <var>PATTERN</var> should be a glob-like pattern for matching a host
+      name. the <var>NUM</var> should be the number of old <samp>log.*/</samp>
+      directories to keep in the run directory of the suite in the matching
+      host.</dd>
+
+      <dt><code>root-dir-share=LIST</code></dt>
+
+      <dd>A new line delimited list of <var>PATTERN=DIR</var> pairs. The
+      <var>PATTERN</var> should be a glob-like pattern for matching a host
+      name. The <var>DIR</var> should be the root directory where the suite's
+      share directory should be created.</dd>
+
+      <dt><code>root-dir-work=LIST</code></dt>
+
+      <dd>A new line delimited list of <var>PATTERN=DIR</var> pairs. The
+      <var>PATTERN</var> should be a glob-like pattern for matching a host
+      name. The <var>DIR</var> should be the root directory where the suite's
+      work directory for tasks should be created.</dd>
+    </dl>
+
+    <h3 id="suite.info">Suite Configuration: Suite Information</h3>
+
+    <p>The suite information file <code>rose-suite.info</code> should contain
+    the information on identify and the purpose of the suite. It has no
+    sections, only KEY=VALUE pairs. The <var>owner</var>, <var>project</var>
+    and <var>title</var> settings are compulsory. Otherwise, any KEY=VALUE
+    pairs can appear in this file. If the name of a KEY ends with
+    <kbd>-list</kbd>, the value is expected to be a space-delimited list. The
+    following keys are known to have special meanings:</p>
+
+    <dl>
+      <dt><code>owner</code></dt>
+
+      <dd>Specify the user ID of the owner of the suite. The owner has full
+      commit access to the suite. Only the owner can delete the suite or pass
+      the suite's ownership to someone else.</dd>
+
+      <dt><code>project</code></dt>
+
+      <dd>Specify the name of the project associated with the suite.</dd>
+
+      <dt><code>title</code></dt>
+
+      <dd>Specify a short title of the suite.</dd>
+
+      <dt><code>access-list</code></dt>
+
+      <dd>Specify a list of users with commit access to trunk of the suite. A
+      <kbd>*</kbd> in the list means that anyone can commit to the trunk of the
+      suite.</dd>
+
+      <dt><code>description</code></dt>
+
+      <dd>Specify a long description of the suite.</dd>
+
+      <dt><code>tag-list</code></dt>
+
+      <dd>Specify a list of keywords associated with the suite.</dd>
+    </dl>
+
+    <p><em>-to be finalised-</em></p>
+
+    <h2 id="app">Application Configuration</h2>
+
+    <p>The configuration of an application is represented by a directory. It
+    may contain the following:</p>
+
+    <ul>
+      <li>
+        <samp>rose-app.conf</samp>: a compulsory configuration file in the
+        modified INI format. See <a href="#app.conf">below</a> for detail. It
+        contains the following information:
+
+        <ul>
+          <li>the command(s) to run.</li>
+
+          <li>the metadata type for the application.</li>
+
+          <li>the list of environment variables.</li>
+
+          <li>other configurations that can be represented in un-ordered
+          key=value pairs, e.g. Fortran namelists.</li>
+        </ul>
+      </li>
+
+      <li>
+        <samp>file/</samp> directory: other input files, e.g.:
+
+        <ul>
+          <li>FCM configuration files (requires ordering of key=value
+          pairs).</li>
+
+          <li>STASH files.</li>
+
+          <li>other configuration files that require more than
+          section=key=value.</li>
+        </ul>
+      </li>
+
+      <li><samp>bin/</samp> directory for e.g. scripts and executables used by
+      the application at run time. If a <samp>bin/</samp> exists in the
+      application configuration, it will prepended to the <var>PATH</var>
+      environment variable at run time.</li>
+
+      <li><samp>meta/</samp> directory for the metadata of the
+      application.</li>
+
+      <li><samp>opt/</samp> directory for optional configuration files. An
+      optional configuration file contains additional configuration, which can
+      be selected at run time to override the configuration in
+      <samp>rose-app.conf</samp>. The name of each optional configuration
+      should follow the syntax <code>rose-app-NAME.conf</code>, where
+      <var>NAME</var> is a short name to describe the override functionality of
+      the optional configuration file.</li>
+    </ul>
+
+    <p>E.g. The application configuration directory may look like:</p>
+    <pre>
+./bin/
+./rose-app.conf
+./file/file1
+./file/file2
+./meta/rose-meta.conf
+./opt/rose-app-extra1.conf
+./opt/rose-app-extra2.conf
+...
+</pre>
+
+    <h3 id="app.conf">Application Configuration File</h3>
+
+    <p>The <samp>rose-app.conf</samp> contains a serialised data structure that
+    is an unordered map (sections=) of unordered maps (keys=values). There can
+    also be keys=values without a section, at the top level. The sections and
+    keys can be:</p>
+
+    <dl>
+      <dt><code>meta</code></dt>
+
+      <dd>Top level key that specifies the configuration metadata for the
+      application. This is ignored by the application runner, but may be used
+      by other Rose utilities, such as the config editor GUI. It can be used to
+      specify the application type.</dd>
+
+      <dt><code>[command]</code></dt>
+
+      <dd>Specify the command(s) to run. The default key can be used to define
+      the default command to run. Other keys can be used to define alternate
+      commands, which can be selected at run time.</dd>
+
+      <dt><code>[env]</code></dt>
+
+      <dd>Specify input environment variables to the command, in KEY=VALUE
+      pairs. The usual shell syntax can be used in values to reference
+      environment variables that are already defined when the application
+      runner is invoked. However, it is unsafe to reference other environment
+      variables defined in this section. Note: <var>UNDEF</var> is a special
+      variable that is always undefined at run time. Reference to it will cause
+      a failure at run time. It can be used to indicate that a value must be
+      overridden at run time. If the value of an environment variable setting
+      begins with a tilde <kbd>~</kbd>, all of the characters preceding the 1st
+      slash <kbd>/</kbd> are considered a <em>tilde-prefix</em>. Where
+      possible, a tilde-prefix is replaced with the home directory associated
+      with the specified login name at run time.</dd>
+
+      <dt><code>[etc]</code></dt>
+
+      <dd>Specify misc. settings. Currently, only UM defs for science sections
+      are thought to require this section.</dd>
+
+      <dt><code>[file:NAME]</code></dt>
+
+      <dd>
+        Specify a file/directory to be generated by the application runner at
+        run time. <var>NAME</var> should be a path relative to the run time
+        <var>$PWD</var>, or <samp>STDIN</samp>.
+
+        <ul>
+          <li>E.g. <code>file:app/APP=source=LOCATION</code>.</li>
+
+          <li>See <a href="#appendix-file-creation-mode">Appendix: File
+          Creation Mode</a>.</li>
+        </ul>
+      </dd>
+
+      <dt><code>[namelist:NAME]</code></dt>
+
+      <dd>Specify a namelist with the group name called <var>NAME</var>, which
+      can be referred to by the content section of a file. Each setting in a
+      namelist:NAME section is a KEY=VALUE pair exactly like a normal Fortran
+      namelist, but without the trailing comma.</dd>
+
+      <dt><code>[namelist:NAME(SORT-INDEX)]</code></dt>
+
+      <dd>
+        Same as [namelist:NAME] but:
+
+        <ul>
+          <li>It allows the content setting of a file to refer to all
+          <code>[namelist:NAME(SORT-INDEX)]</code> as
+          <code>namelist:NAME(:)</code>, and the namelist groups will be sorted
+          alphanumerically by the <var>SORT-INDEX</var>.</li>
+
+          <li>It allows different namelist files to have namelists with the
+          same group name. These will all inherit the same group configuration
+          metadata (from <code>[namelist:NAME]</code>).</li>
+        </ul>
+      </dd>
+
+      <dt><code>[namelist:NAME{CATEGORY}]</code> or
+      <code>[namelist:NAME{CATEGORY}(SORT-INDEX)]</code></dt>
+
+      <dd>
+        Same as [namelist:NAME(SORT-INDEX)] but:
+
+        <ul>
+          <li>An alternate way for grouping namelists. This allows the same
+          namelist to have different usage and configuration metadata according
+          to its category. Namelists will inherit configuration metadata from
+          their basic group <code>[namelist:NAME]</code> as well as from their
+          specific category <code>[namelist:NAME{CATEGORY}]</code>.</li>
+        </ul>
+      </dd>
+    </dl>
+
+    <h2 id="meta">Configuration Metadata</h2>
+
+    <p>A configuration metadata is itself a configuration. Each configuration
+    metadata is represented in a directory with the following:</p>
+
+    <ul>
+      <li><samp>rose-meta.conf</samp>, the main configuration file. See
+      <a href="#meta.conf"></a> for detail.</li>
+
+      <li>other files, e.g.:
+
+        <ul>
+          <li><samp>lib/python/widget/my_widget.py</samp> would be the location
+          of a custom widget.</li>
+
+          <li><samp>lib/python/macros/my_macro_validator.py</samp> would be the
+          location of a custom macro.</li>
+
+          <li><samp>etc/</samp> would contain any resources for the logics in
+          <samp>lib/python/</samp>, such as an icon for the custom widget.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p>Rose commands will do the following search for a named configuration
+    metadata directory:</p>
+
+    <ol>
+      <li>(Configuration metadata embedded in the <samp>meta/</samp> directory
+      of a suite or an application.)</li>
+
+      <li><code>rose</code> command line option <code>--meta-path=PATH[:PATH
+      ...]</code>.</li><!--li>the <code>meta=path=PATH</code> setting in
+      <samp>rose-suite.conf</samp>.</li-->
+
+      <li>The <code>meta=path=PATH</code> setting in the site and user
+      configuration.</li>
+    </ol>
+
+    <p>The configuration metadata that controls default behaviour will be
+    located in <samp>$ROSE_HOME/etc/metadata/</samp>.</p>
+
+    <h3 id="meta.conf">Configuration Metadata File</h3>
+
+    <p>The <samp>rose-meta.conf</samp> contains a serialised data structure
+    that is an unordered map (sections=) of unordered maps (keys=values).</p>
+
+    <p>The section name in a configuration metadata file should be a unique ID
+    to the relevant configuration setting. The syntax of the ID is
+    <code>SECTION-NAME=OPTION-NAME</code> or just <code>SECTION-NAME</code>.
+    For example, <samp>env=MY_ENV_NAME</samp> is the ID of an environment
+    variable called <var>MY_ENV_NAME</var> in an application configuration
+    file; <samp>namelist:something_nl=variable_name1</samp> is the ID of a
+    namelist variable called <var>variable_name1</var> in a namelist group
+    called <var>something_nl</var> in an application configuration file. If the
+    configuration metadata applies to a section in a configuration file, the ID
+    is just the section name.</p>
+
+    <p>Where multiple instances of a section are used in a configuration file,
+    ending in brackets with numbers, the metadata id should just be based on
+    the original section name (for example
+    <samp>namelist:extract_control(2)</samp> should be found in the metadata
+    under <samp>namelist:extract_control</samp>).</p>
+
+    <p>Finally, the configuration metadata may group settings in namespaces,
+    which may in term have common configuration metadata settings. The ID for a
+    namespace set in the metadata is <code>ns=NAME</code>, e.g.
+    <samp>ns=env/MyFavouriteEnvironmentVars</samp>.</p>
+
+    <p>The metadata for a configuration fall into 4 categories: sorting,
+    values, behaviour and help. They are be described separated below:</p>
+
+    <h4 id="meta.conf.sorting">Metadata for Sorting</h4>
+
+    <p>These configuration metadata are used for grouping and sorting the IDs
+    of the configurations.</p>
+
+    <dl>
+      <dt>ns</dt>
+
+      <dd>
+        <p>A forward slash <kbd>/</kbd> delimited hierarchical namespace for
+        the container of the setting, which overrides the default. The default
+        namespace for the setting is derived from the first part of the ID - by
+        splitting up the section name by colons <kbd>:</kbd> or forward slashes
+        <kbd>/</kbd>. For example, a configuration with an ID
+        <samp>namelist:var_minimise=niter_set</samp> would have the namespace
+        <samp>namelist/var_minimise</samp>. If a namespace is defined for a
+        section, it will become the default for all the settings in that
+        section.</p>
+
+        <p>The namespace is used by the config editor to group settings, so
+        that they can be placed in different pages. A namespace for a section
+        will become the default for all the settings in that section.</p>
+      </dd>
+
+      <dt>sort-key</dt>
+
+      <dd>
+        <p>A character string that can be used as a sort key for ordering the
+        setting within its namespace.</p>
+
+        <p>The sort-key is used by the config editor to group settings on a
+        page. Items with a sort-key will be sorted to the top of a name-space.
+        Items without a sort-key will be sorted after, in ascending order of
+        their IDs.</p>
+      </dd>
+    </dl>
+
+    <h4 id="meta.conf.value">Metadata for Values</h4>
+
+    <p>These configuration metadata are used to define the valid values of a
+    setting. A Rose utility such as the config editor can use these metadata to
+    display the correct widget for a setting and to check its input. However,
+    if the value of a setting contains a string that looks like an environment
+    variable, these metadata will normally be ignored.</p>
+
+    <dl>
+      <dt>type</dt>
+
+      <dd>
+        <p>The type/class of the setting. The type names are based on the
+        intrinsic Fortran types, such as <code>integer</code> and
+        <code>real</code>. Currently supported types are:</p>
+
+        <dl>
+          <dt><code>boolean</code></dt>
+
+          <dd>
+            <p><dfn>example option:</dfn> <samp>PRODUCE_THINGS=true</samp></p>
+
+            <p><dfn>description:</dfn> either <samp>true</samp> or
+            <samp>false</samp></p>
+
+            <p><dfn>usage:</dfn> environment variables, javascript/JSON
+            inputs</p>
+          </dd>
+
+          <dt><code>character</code></dt>
+
+          <dd>
+            <p><dfn>example option:</dfn> <samp>sea_colour='blue'</samp></p>
+
+            <p><dfn>description:</dfn> Fortran character type - a single quoted
+            string, single quotes escaped in pairs</p>
+
+            <p><dfn>usage:</dfn> Fortran character types</p>
+          </dd>
+
+          <dt><code>integer</code></dt>
+
+          <dd>
+            <p><dfn>example option:</dfn> <samp>num_lucky=5</samp></p>
+
+            <p><dfn>description:</dfn> generic integer type</p>
+
+            <p><dfn>usage:</dfn> any integer-type input</p>
+          </dd>
+
+          <dt><code>logical</code></dt>
+
+          <dd>
+            <p><dfn>example option:</dfn> <samp>l_spock=.true.</samp></p>
+
+            <p><dfn>description:</dfn> Fortran logical type - either
+            <samp>.true.</samp> or <samp>.false.</samp></p>
+
+            <p><dfn>usage:</dfn> Fortran logical types</p>
+          </dd>
+
+          <dt><code>quoted</code></dt>
+
+          <dd>
+            <p><dfn>example option:</dfn>
+            <samp>js_measure_cloud_mode="laser"</samp></p>
+
+            <p><dfn>description:</dfn> a double quoted string, double quotes
+            escaped with backslash</p>
+
+            <p><dfn>usage:</dfn> Inputs that require double quotes and allow
+            backslash escaping e.g. javascript/JSON inputs.</p>
+          </dd>
+
+          <dt><code>real</code></dt>
+
+          <dd>
+            <p><dfn>example option:</dfn> <samp>n_avogadro=6.02e23</samp></p>
+
+            <p><dfn>description:</dfn> Fortran real number type, generic
+            floating point numbers</p>
+
+            <p><dfn>usage:</dfn> Fortran real types, generic floating point
+            numbers. Scientific notation must use the "e" or "E" format.</p>
+
+            <p><dfn>comment:</dfn> Internally implemented within Rose using
+            Python's <a href=
+            "http://docs.python.org/library/stdtypes.html#typesnumeric">floating
+            point</a> specification.</p>
+          </dd>
+
+          <dt><code>raw</code></dt>
+
+          <dd>
+            <p><dfn>description:</dfn> placeholder used in derived type
+            specifications where none of the above types apply</p>
+
+            <p><dfn>usage:</dfn> only in derived types</p>
+          </dd>
+        </dl>
+
+        <p>Note that not all inputs need to have <code>type</code> defined. In
+        some cases using <code>values</code> or <code>pattern</code> is
+        better.</p>
+
+        <p>A derived type may be defined by a comma <kbd>,</kbd> separated list
+        of intrinsic types, e.g. <samp>integer, character, real,
+        integer</samp>. The default is a raw string.</p>
+      </dd>
+
+      <dt>length</dt>
+
+      <dd>
+        <p>Define the length of an array. If not present, the setting is
+        assumed to be a scalar. A positive integer defines a fixed length
+        array. A colon <kbd>:</kbd> defines a dynamic length array.</p>
+      </dd>
+
+      <dt>values</dt>
+
+      <dd>
+        <p>Define a comma <kbd>,</kbd> separated list of permitted values of a
+        setting (or an element in the setting if it is an array). This metadata
+        overrides the <code>type</code>, <code>range</code> and
+        <code>pattern</code> metadata.</p>
+
+        <p>For example, the config editor may use this list to determine the
+        widget to display the setting. It may display the choices using a set
+        of radio buttons if the list of values is small, or a drop down combon
+        box if the list of values is large. If the list only contains one
+        value, the config editor will expect the setting to always have this
+        value, and may display it as a special setting.</p>
+      </dd>
+
+      <dt>range</dt>
+
+      <dd>
+        <p>Specify a range of values. It can either be a simple comma
+        <kbd>,</kbd> separated list of allowed values, or a logical expression.
+        This metadata is only valid if <code>type</code> is either
+        <samp>integer</samp> or <samp>real</samp>.</p>
+
+        <p>A simple list may contain a mixture of allowed numbers and number
+        ranges such as <samp>1, 2, 4:8, 10:</samp>, (which means the value can
+        be 1, 2, between 4 and 8 inclusive, or any values greater than or equal
+        to 10.)</p>
+
+        <p>A logical expression uses a Python-like syntax and the variable
+        <var>this</var> to denote the value of the current setting, e.g.
+        <samp>this &lt;-1 and this &gt;1</samp>.</p>
+      </dd>
+
+      <dt>pattern</dt>
+
+      <dd>
+        <p>Specify a regular expression (Python's extended regular expression
+        syntax) that the value of the setting must match.</p>
+      </dd>
+
+      <dt>fail-if, warn-if</dt>
+
+      <dd>
+        <p>Specify a logical expression to validate the value of the current
+        setting with respect to other settings. If the logical expression
+        evaluates to true in a <code>fail-if</code> metadata, the system will
+        consider the setting in error. On the other hand, in a
+        <code>warn-if</code> metadata, the system will only issue a warning.
+        The logical expression uses a Python-like syntax. It can reference the
+        value of the current setting with the <var>this</var> variable and the
+        value of other settings with their IDs. E.g.:</p>
+        <pre>
+[namelist:test=my_test_var]
+fail-if = this &lt; namelist:test=control_lt_var
+</pre>
+
+        <p>means that an error will be flagged if the numeric value of
+        <var>my_test_var</var> is less than the numeric value of
+        <var>control_lt_var</var>.</p>
+        <pre>
+fail-if = this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this)
+</pre>
+
+        <p>shows a more complex operation, again with numeric values.</p>
+
+        <p>To check array elements, the ID should be expressed with a bracketed
+        index, as in the configuration:</p>
+        <pre>
+fail-if = this(2) != "'0A'" and this(4) == "'0A'"
+</pre>
+
+        <p>Array elements can also be checked using <code>any</code> and
+        <code>all</code>. E.g.:</p>
+        <pre>
+fail-if = any(namelist:test=ctrl_array &lt; this)
+fail-if = all(this == 0)
+</pre>
+
+        <p>Expressions can be chained together and brackets used:</p>
+        <pre>
+fail-if = this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'))
+</pre>
+
+        <p>Multiple failure conditions can be added, by using a semicolon as
+        the separator. This is essentially similar to chaining them together
+        with <code>or</code>, but the system can process each expression one by
+        one to target the error message.</p>
+        <pre>
+fail-if = this &gt; 0; this % 2 == 1; this * 3 &gt; 100
+</pre>
+
+        <p>You can add a message to the error or warning message to make it
+        clearer by adding a hash followed by the comment at the end of a
+        configuration metadata line:</p>
+        <pre>
+fail-if = any(namelist:test=ctrl_array % this == 0) # Needs to be common divisor for ctrl_array
+</pre>
+
+        <p>When using multiple failure conditions, different messages can be
+        added if they are placed on individual lines:</p>
+        <pre>
+fail-if = this &gt; 0; # Needs to be less than or equal to 0
+          this % 2 == 1; # Needs to be odd
+          this * 3 &gt; 100; # Needs to be more than 100/3.
+</pre>
+
+        <p>A slightly different usage of this functionality can do things like
+        warn of deprecated content:</p>
+        <pre>
+warn-if = True  # This option is deprecated
+</pre>
+
+        <p>This would always evaluate True and give a warning if the setting is
+        present.</p>
+      </dd>
+    </dl>
+
+    <h4 id="meta.conf.behaviour">Metadata for Behaviour</h4>
+
+    <p>These metadata are used to define how the setting should behave in
+    different states.</p>
+
+    <dl>
+      <dt>compulsory</dt>
+
+      <dd>
+        <p>A <kbd>true</kbd> value indicates that the setting should be
+        compulsory. If this flag is not set, the setting is optional.</p>
+
+        <p>Compulsory settings should be physically present in the
+        configuration at all times. Optional settings can be removed as the
+        user wishes. Compulsory settings may however be triggered ignored (see
+        below). For example, the config editor may issue a warning if a
+        compulsory setting is not defined. It may also hide a compulsory
+        variable that only has a single permitted value.</p>
+      </dd>
+
+      <dt>trigger</dt>
+
+      <dd>
+        <p>A setting has the following states:</p>
+
+        <ul>
+          <li>normal</li>
+
+          <li>user ignored (stored in the configuration file with a
+          <kbd>!</kbd> flag, ignored at run time)</li>
+
+          <li>logically ignored (stored in the configuration file with a
+          <kbd>!!</kbd> flag, ignored at runtime)</li>
+        </ul>
+
+        <p>If a setting is user ignored, the trigger will do nothing.
+        Otherwise:</p>
+
+        <ul>
+          <li>If the logic for a setting in the trigger is fulfilled, it will
+          cause the setting to be enabled.</li>
+
+          <li>If it is not, it will cause the setting to be logically
+          ignored.</li>
+        </ul>
+
+        <p>The trigger expression is a list of settings triggered by (different
+        values of) this setting. If the values are not given, the setting will
+        be triggered only if the current setting is enabled. The syntax for
+        giving values is the same as the setting "values" defined above. The
+        trigger syntax looks like:</p>
+        <pre>
+[namelist:trig_nl=trigger_variable]
+trigger = namelist:dep_nl=A;
+          namelist:dep_nl=B;
+          namelist:value_nl=X: 10;
+          env=Y: 20, 30, 40;
+          namelist:value_nl=Z: 20
+</pre>
+
+        <p>In this example:</p>
+
+        <ul>
+          <li>When <var>namelist:trig_nl=trigger_variable</var> is ignored, all
+          the variables in the trigger expression will be ignored, irrespective
+          of its value.</li>
+
+          <li>When <var>namelist:trig_nl=trigger_variable</var> is enabled,
+          <var>namelist:dep_nl=A</var> and <var>namelist:dep_nl=B</var> will
+          both be enabled, and the other variables <em>may</em> be enabled
+          according to its value:
+
+            <ul>
+              <li>When the value of the setting is not <samp>10</samp>,
+              <samp>20</samp>, <samp>30</samp>, or <samp>40</samp>,
+              <var>namelist:value_nl=X</var>, <var>env=Y</var> and
+              <var>namelist:value_nl=Z</var> will be ignored.</li>
+
+              <li>When the value of the setting is <samp>10</samp>,
+              <var>namelist:value_nl=X</var> will be enabled, but
+              <var>env=Y</var> and <var>namelist:value_nl=Z</var> will be
+              ignored.</li>
+
+              <li>When the value of the setting is <samp>20</samp>,
+              <var>env=Y</var> and <var>namelist:value_nl=Z</var> will be
+              enabled, but <var>namelist:value_nl=X</var> will be ignored.</li>
+
+              <li>When the value of the setting is <samp>30</samp>,
+              <var>env=Y</var> will be enabled, but
+              <var>namelist:value_nl=X</var> and <var>namelist:value_nl=Z</var>
+              will be ignored.</li>
+
+              <li>If the value of the setting contains an environment
+              variable-like string, e.g. <samp>${TEN_MULTIPLE}</samp>, all
+              three will be enabled.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <p>Settings mentioned in a in trigger expressions will have their
+        default state set to ignored unless explicitly triggered. The config
+        editor will issue warnings if variables or sections are in the
+        incorrect state when it loads a configuration. Triggering thereafter
+        will work as normal. Map expressions are not supported for derived type
+        or array type settings, because of the difficulty of expressing their
+        values.</p>
+
+        <p>Where multiple triggers act on a setting, the setting is triggered
+        only if all triggers are active (i.e. an <em>AND</em> relationship).
+        For example, for the two triggers here:</p>
+        <pre>
+[env=IS_WATER]
+trigger = env=IS_ICE: true
+
+[env=IS_COLD]
+trigger = env=IS_ICE: true
+</pre>
+
+        <p>the setting <var>env=IS_ICE</var> is only enabled if both
+        <var>env=IS_WATER</var> and <var>env=IS_COLD</var> are
+        <samp>true</samp> and enabled. Otherwise, it is ignored.</p>
+
+        <p>The trigger syntax also supports a logical expression in the same
+        format as range or fail-if metadata:</p>
+        <pre>
+[env=SNOWFLAKE_SIDES]
+trigger = env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
+          env=SILLY_SNOWFLAKE_GEOMETRY: this &lt; 2
+</pre>
+
+        <p>In this example, the setting
+        <var>env=CUSTOM_SNOWFLAKE_GEOMETRY</var> is enabled if
+        <var>env=SNOWFLAKE_SIDES</var> is enabled and not <samp>6</samp>.
+        <var>env=SILLY_SNOWFLAKE_GEOMETRY</var> is only enabled when
+        <var>env=SNOWFLAKE_SIDES</var> is enabled and less than <samp>2</samp>.
+        The logical expression syntax can be used with non-numeric variables in
+        the same way as the fail-if metadata.</p>
+      </dd>
+
+      <dt>duplicate</dt>
+
+      <dd>
+        <p>Allow duplicated copies of the setting. This is used for sections
+        where there may be more than one with the same metadata - for example
+        multiple namelist groups of the same name. If this setting is true for
+        a given name, the application configuration will accept multiple
+        namelist groups of this name. The config editor may then provide the
+        option to clone or copy a namelist to generate an additional namelist.
+        Otherwise, the config editor may issue warning for configuration
+        sections that are found with multiple copies or an index.</p>
+      </dd>
+
+      <dt>widget[gui-application]</dt>
+
+      <dd>
+        <p>Indicate that the gui-application (e.g. config-edit) should use a
+        special widget to display this setting.</p>
+
+        <p>E.g. If we want to use a slider instead of an entry box for a
+        floating point real number.</p>
+
+        <p>The widget may take space-delimited arguments which would be
+        specified after the widget name. E.g. to set up a hypothetical table
+        with named columns X, Y, VCT, and Level, we may do:</p>
+        <pre>
+widget[config-edit] = table X Y VCT Level
+</pre>
+      </dd>
+    </dl>
+
+    <h4 id="meta.conf.help">Metadata for Help</h4>
+
+    <p>These metadata provide help for a configuration.</p>
+
+    <dl>
+      <dt>url</dt>
+
+      <dd>
+        <p>A web URL containing help for the setting. For example:</p>
+        <pre>
+url = http://www-nwp/~frve/VER/view/dev/doc/GTDP5.html
+</pre>
+
+        <p>For example, the config editor will trigger a web browser to display
+        this when a variable name is clicked.</p>
+      </dd>
+
+      <dt>help</dt>
+
+      <dd>
+        <p>(Long) help for the setting. For example, the config editor will use
+        this in a popup dialog for a variable. Embedding variable ids in the
+        help string will allow links to the variables to be created within the
+        popup dialog box, e.g.</p>
+        <pre>
+help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
+ do something linear.
+</pre>
+      </dd>
+
+      <dt>description</dt>
+
+      <dd>
+        <p>(Medium) description for the setting. For example, the configuration
+        editor will use this as part of the hover over text.</p>
+      </dd>
+
+      <dt>title</dt>
+
+      <dd>
+        <p>(Short) title for the setting. For example, the config editor can
+        use this specification as the label of a setting, instead of the
+        variable name.</p>
+      </dd>
+    </dl>
+
+    <h2 id="appendix-file-creation-mode">Appendix: File Creation Mode</h2>
+
+    <p>A <code>[file:TARGET]</code> section may have the following
+    settings:</p>
+
+    <dl>
+      <dt><code>content</code></dt>
+
+      <dd>A space delimited list of sections in this configuration that are to
+      be used to generate the content of this file, e.g. a list of
+      <var>namelist:NAME</var> sections. The content setting overrides all
+      other settings of this file.</dd>
+
+      <dt><code>source</code></dt>
+
+      <dd>A list of sources for generating this file. A source represented by a
+      URL or a path with a @PEG revision is considered a version controlled
+      (VC) resource. VC resource may not be supported on all platforms.
+      Otherwise, it is a file system (FS) resource. If the value of a resource
+      begins with a tilde <kbd>~</kbd>, all of the characters preceding the 1st
+      slash <kbd>/</kbd> are considered a <em>tilde-prefix</em>. Where
+      possible, a tilde-prefix is replaced with the home directory associated
+      with the specified login name at run time.</dd>
+
+      <dt><code>checksum</code></dt>
+
+      <dd>The expected MD5 checksum of the target. If specified, the file
+      generation will fail if the actual checksum of the target does not match
+      with this setting. This setting is only meaningful if <var>TARGET</var>
+      is a regular file or a symbolic link to a regular file. N.B. An empty
+      value for checksum tells the system to report the target checksum in
+      verbose mode.</dd>
+
+      <dt><code>mode</code></dt>
+
+      <dd><kbd>auto</kbd> (default), <kbd>mkdir</kbd> or <kbd>symlink</kbd>.
+      See below.</dd>
+    </dl>
+
+    <p>The following is a list of all the supported usages:</p>
+
+    <dl>
+      <dt><code>content=CONTENT-LIST</code></dt>
+
+      <dd>Target is a file, and each <var>CONTENT</var> in
+      <var>CONTENT-LIST</var> is a reference to a section (group) in the
+      configuration file.</dd>
+
+      <dt><code>mode=auto,source=</code></dt>
+
+      <dd>Target is an empty file.</dd>
+
+      <dt><code>mode=mkdir,source=</code></dt>
+
+      <dd>Target is an empty directory.</dd>
+
+      <dt><code>mode=auto,source=SOURCE</code></dt>
+
+      <dd>Target is a copy or an export of the <var>SOURCE</var>.</dd>
+
+      <dt><code>mode=auto,source=SOURCE-LIST</code></dt>
+
+      <dd>Target is a regular file, created by concatenating the contents of
+      <var>SOURCE-LIST</var></dd>
+
+      <dt><code>mode=symlink,source=SOURCE</code></dt>
+
+      <dd>Target is created as a symlink of an FS <var>SOURCE</var>.</dd>
+    </dl>
+  </div>
+</body>
+</html>
