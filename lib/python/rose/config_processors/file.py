@@ -23,10 +23,11 @@ import hashlib
 from multiprocessing import Pool
 import os
 import re
+import rose.config
+from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.reporter import Event
-from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 import shlex
 import shutil
 import tempfile
@@ -60,6 +61,7 @@ class ChecksumEvent(Event):
 class ConfigProcessorForFile(ConfigProcessorBase):
 
     KEY = "file"
+    NPROC = 6
     RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
@@ -75,6 +77,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             if node is None:
                 raise ConfigProcessError(orig_keys, item)
             nodes[item] = node
+
+        if not nodes:
+            return
+
+        # Ensure that everything is overwritable
+        # Ensure that container directories exist
         for key, node in sorted(nodes.items()):
             target = key[len(self.PREFIX):]
             if os.path.exists(target) and kwargs.get("no_overwrite_mode"):
@@ -82,26 +90,36 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 raise ConfigProcessError([key], None, e)
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(target))
 
+        # Start pool of workers to create the files
+        nproc = rose.config.default_node().get_value(
+                ["rose.config_processors.file", "nproc"],
+                default=self.NPROC)
+        if nproc > len(nodes):
+            nproc = len(nodes)
+        pool = Pool(processes=nproc)
+
+        # TODO: use pool of workers
+        for key, node in sorted(nodes.items()):
+            target = key[len(self.PREFIX):]
+
             # FIXME: this is not always necessary
-            self.manager.fs_util.delete(target)
-            content_node = node.get(["content"], no_ignore=True)
-            if content_node:
+            content_value = node.get_value(["content"])
+            if content_value:
                 # Embedded content
                 if os.path.isdir(target):
                     self.manager.fs_util.delete(target)
                 target_file = open(target, 'wb')
-                contents = shlex.split(content_node.value)
+                contents = shlex.split(content_value)
                 for content in contents:
                     target_file.write(self.manager.process(
                             config, content,
-                            [key, "content"], content_node.value))
+                            [key, "content"], content_value))
                 target_file.close()
                 self.manager.event_handler(
                         FileSystemEvent("content", target, " ".join(contents)))
             else:
                 # Free format file
-                source_str = getattr(node.get(["source"], no_ignore=True),
-                                     "value", "")
+                source_str = node.get_value(["source"], default="")
                 sources = []
                 for source in shlex.split(source_str):
                     try:
@@ -110,8 +128,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         raise ConfigProcessError(
                                 [key, "source"], source_str, e)
                     sources.append(os.path.expanduser(source))
-                mode = getattr(node.get(["mode"], no_ignore=True),
-                               "value", None)
+                mode = node.get_value(["mode"])
                 if len(sources) == 1:
                     source = sources[0]
                     if mode == "symlink":
@@ -141,9 +158,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         self.manager.fs_util.makedirs(target)
 
                 # Checksum
-                checksum_node = node.get(["checksum"], no_ignore=True)
-                if checksum_node is not None:
-                    checksum_expected = checksum_node.value
+                checksum_expected = node.get_value(["checksum"])
+                if checksum_expected is not None:
                     target_file = open(target)
                     md5 = hashlib.md5()
                     md5.update(target_file.read())
