@@ -17,17 +17,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Process a file: section in a rose.config.ConfigNode."""
+"""Process "file:*" sections in a rose.config.ConfigNode."""
 
 import hashlib
+from multiprocessing import Pool
 import os
 import re
 from rose.env import env_var_process, UnboundEnvironmentVariableError
+from rose.fs_util import FileSystemEvent
 from rose.reporter import Event
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 import shlex
 import shutil
 import tempfile
+
+
+class FileOverwriteError(Exception):
+
+    """An exception raised in an attempt to overwrite an existing file.
+
+    This will only be raised in non-overwrite mode.
+
+    """
+
+    def __str__(self):
+        return ("%s: file already exists (and in no-overwrite mode)" %
+                self.args[0])
 
 
 class UnmatchedChecksumError(Exception):
@@ -36,117 +51,109 @@ class UnmatchedChecksumError(Exception):
         return ("Unmatched checksum, expected=%s, actual=%s" % tuple(self))
 
 
-class ConfigProcessFileEvent(Event):
-
-    IM_CONTENT = "IM_CONTENT"
-    IM_DIR = "IM_DIR"
-    IM_SYMLINK = "IM_SYMLINK"
-
-    def __init__(self, target, source_str, install_mode, checksum):
-        self.target = target
-        self.source_str = source_str
-        self.install_mode = install_mode
-        self.checksum = checksum
-        Event.__init__(self, target, source_str, install_mode, checksum)
+class ChecksumEvent(Event):
 
     def __str__(self):
-        out_mode = ""
-        if self.install_mode == self.IM_CONTENT:
-            out_mode = " <= (content) "
-        elif self.install_mode == self.IM_DIR:
-            out_mode = " <= (directory)"
-        elif self.install_mode == self.IM_SYMLINK:
-            out_mode = " <= (symlink) "
-        elif self.source_str:
-            out_mode = " <= "
-        ret = "install: %s%s%s" % (self.target, out_mode, self.source_str)
-        if self.checksum:
-            ret += "\nchecksum: %s: %s" % (self.target, self.checksum)
-        return ret
+        return "checksum: %s: %s" % self.args
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
 
+    KEY = "file"
     RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
 
-    def process(self, config, item, orig_keys=None, orig_value=None):
+    def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Install a file according to a section in "config"."""
-        if config.get([item], no_ignore=True) is None:
-            return
-        target = item[len("file:"):]
-        if os.path.isdir(target):
-            shutil.rmtree(target)
-        elif os.path.isfile(target):
-            os.unlink(target)
-        target_dir = os.path.dirname(target)
-        if target_dir and not os.path.isdir(target_dir):
-            os.makedirs(target_dir)
-        install_mode = None
-        checksum = None
-        keys = [item, "content"]
-        if config.get(keys, no_ignore=True):
-            value = config.get(keys).value
-            contents = shlex.split(value)
-            target_file = open(target, 'wb')
-            for content in contents:
-                s = self.manager.process(config, content, keys, value)
-                target_file.write(s)
-            target_file.close()
-            source_str = " ".join(contents)
-            install_mode = ConfigProcessFileEvent.IM_CONTENT
+        nodes = {}
+        if item == self.KEY:
+            for key, node in config.value.items():
+                if node.is_ignored() or not key.startswith(self.PREFIX):
+                    continue
+                nodes[key] = node
         else:
-            source_str = ""
-            keys = [item, "source"]
-            source_node = config.get([item, "source"], no_ignore=True)
-            if source_node:
-                source_str = source_node.value
-            sources = []
-            for source in shlex.split(source_str):
-                try:
-                    source = env_var_process(source)
-                except UnboundEnvironmentVariableError as e:
-                    raise ConfigProcessError(keys, source_node.value, e)
-                sources.append(os.path.expanduser(source))
-            mode = None
-            keys = [item, "mode"]
-            mode_node = config.get(keys, no_ignore=True)
-            if mode_node:
-                mode = mode_node.value
-            if len(sources) > 1:
+            node = config.get([item], no_ignore=True)
+            if node is None:
+                raise ConfigProcessError(orig_keys, item)
+            nodes[item] = node
+        for key, node in sorted(nodes.items()):
+            target = key[len(self.PREFIX):]
+            if os.path.exists(target) and kwargs.get("no_overwrite_mode"):
+                e = FileOverwriteError(target)
+                raise ConfigProcessError([key], None, e)
+            self.manager.fs_util.makedirs(self.manager.fs_util.dirname(target))
+
+            # FIXME: this is not always necessary
+            self.manager.fs_util.delete(target)
+            content_node = node.get(["content"], no_ignore=True)
+            if content_node:
+                # Embedded content
+                if os.path.isdir(target):
+                    self.manager.fs_util.delete(target)
                 target_file = open(target, 'wb')
-                for source in sources:
-                    target_file.write(self._source_load(source))
+                contents = shlex.split(content_node.value)
+                for content in contents:
+                    target_file.write(self.manager.process(
+                            config, content,
+                            [key, "content"], content_node.value))
                 target_file.close()
-            elif sources:
-                source = sources[0]
-                if mode == "symlink":
-                    os.stat(source)
-                    os.symlink(source, target)
-                    install_mode = ConfigProcessFileEvent.IM_SYMLINK
-                else:
-                    self._source_export(source, target)
-            elif mode == "mkdir":
-                os.mkdir(target)
-                install_mode = ConfigProcessFileEvent.IM_DIR
+                self.manager.event_handler(
+                        FileSystemEvent("content", target, " ".join(contents)))
             else:
-                open(target, 'wb').close()
-            keys = [item, "checksum"]
-            checksum_node = config.get(keys, no_ignore=True)
-            if checksum_node is not None:
-                checksum_expected = checksum_node.value
-                target_file = open(target)
-                md5 = hashlib.md5()
-                md5.update(target_file.read())
-                checksum = md5.hexdigest()
-                if checksum_expected and checksum_expected != checksum:
-                    e = UnmatchedChecksumError(checksum_expected, checksum)
-                    raise ConfigProcessError(keys, checksum_expected, e)
-                target_file.close()
-        event = ConfigProcessFileEvent(target,
-                                       source_str,
-                                       install_mode,
-                                       checksum)
-        self.manager.event_handler(event)
+                # Free format file
+                source_str = getattr(node.get(["source"], no_ignore=True),
+                                     "value", "")
+                sources = []
+                for source in shlex.split(source_str):
+                    try:
+                        source = env_var_process(source)
+                    except UnboundEnvironmentVariableError as e:
+                        raise ConfigProcessError(
+                                [key, "source"], source_str, e)
+                    sources.append(os.path.expanduser(source))
+                mode = getattr(node.get(["mode"], no_ignore=True),
+                               "value", None)
+                if len(sources) == 1:
+                    source = sources[0]
+                    if mode == "symlink":
+                        self.manager.fs_util.symlink(source, target)
+                    else:
+                        if os.path.exists(target):
+                            self.manager.fs_util.delete(target)
+                        self._source_export(source, target)
+                        self.manager.event_handler(
+                                FileSystemEvent("install", target, source))
+                elif len(sources) > 1 or len(sources) == 0 and mode != "mkdir":
+                    if os.path.isdir(target):
+                        self.manager.fs_util.delete(target)
+                    target_file = open(target, 'wb')
+                    for source in sources:
+                        target_file.write(self._source_load(source))
+                    target_file.close()
+                    self.manager.event_handler(
+                            FileSystemEvent("install", target, source_str))
+                else:
+                    if os.path.isdir(target):
+                        for name in os.listdir(target):
+                            path = os.path.join(target, name)
+                            self.manager.fs_util.delete(path)
+                    else:
+                        self.manager.fs_util.delete(target)
+                        self.manager.fs_util.makedirs(target)
+
+                # Checksum
+                checksum_node = node.get(["checksum"], no_ignore=True)
+                if checksum_node is not None:
+                    checksum_expected = checksum_node.value
+                    target_file = open(target)
+                    md5 = hashlib.md5()
+                    md5.update(target_file.read())
+                    checksum = md5.hexdigest()
+                    if checksum_expected and checksum_expected != checksum:
+                        e = UnmatchedChecksumError(checksum_expected, checksum)
+                        raise ConfigProcessError(
+                                [key, "checksum"], checksum_expected, e)
+                    target_file.close()
+                    self.manager.event_handler(ChecksumEvent(target, checksum))
 
 
     def _source_export(self, source, target):

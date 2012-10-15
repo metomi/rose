@@ -24,7 +24,9 @@ from rose.config_processor import ConfigProcessorBase
 
 class ConfigProcessorForJinja2(ConfigProcessorBase):
 
-    def process(self, config, item, orig_keys=None, orig_value=None):
+    KEY = "jinja2"
+
+    def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Return a Jinja2 template string for a section in "config"."""
         ret = ""
         section = config.get([item], no_ignore=True)

@@ -69,7 +69,7 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q \
     --define='[file:hello4]content=stuff:ing'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] file:hello4=content=stuff:ing: stuff:ing: unknown content
+[FAIL] file:hello4=content=stuff:ing: stuff: unknown content
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] install: hello1 <= ../config/file/hello1
 [INFO] install: hello2 <= ../config/file/hello2
-[INFO] install: hello3 <= (directory)
+[INFO] create: hello3
 [INFO] install: hello3/text <= ../config/file/hello3/text
 [INFO] command: cat hello1 hello2 hello3/text
 $OUT
@@ -120,7 +120,7 @@ touch hello1
 run_fail "$TEST_KEY" rose app-run --config=../config -q --no-overwrite
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] hello1: file already exists (and in no-overwrite mode)
+[FAIL] file:hello1: hello1: file already exists (and in no-overwrite mode)
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] install: hello1 <= ../config/file/hello1
 [INFO] install: hello2 <= ../config/file/hello2
-[INFO] install: hello3 <= (directory)
+[INFO] create: hello3
 [INFO] install: hello3/text <= ../config/file/hello3/text
 [INFO] command: cat hello1 hello2 hello3/text
 __CONTENT__
