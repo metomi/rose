@@ -80,6 +80,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "conf_dir",
                         "metavar": "DIR",
                         "help": "Use configuration in DIR instead of $PWD."}],
+               "confsource": [
+                       ["--confsource", "-c"],
+                       {"action": "store",
+                        "dest": "confsource",
+                        "help": "Specify root configuration directory."}],
                "cycle": [
                        ["--cycle", "-t"],
                        {"action": "store",
@@ -106,6 +111,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "defines",
                         "metavar": "[SECTION]KEY=VALUE",
                         "help": "Set [SECTION]KEY to VALUE."}],
+               "diffsource": [
+                       ["--diffsource", "-d"],
+                       {"action": "append",
+                        "dest": "diffsource",
+                        "help": "Add a branch."}],
                "files": [
                        ["--file", "-f"],
                        {"action": "append",
@@ -279,10 +289,20 @@ class RoseOptionParser(OptionParser):
                        ["--sort", "-s"],
                        {"metavar": "FIELD",
                         "help": "Sort result by FIELD."}],
+               "source": [
+                       ["--source", "-s"],
+                       {"action": "append",
+                        "dest": "source",
+                        "help": "Add a trunk."}],
                "suffix_delim": [
                        ["--suffix-delim"],
                        {"metavar": "DELIMITER",
                         "help": "Specify the suffix delimiter."}],
+               "task": [
+                       ["--task", "-t"],
+                       {"action": "append",
+                        "dest": "task",
+                        "help": "Switch a task on/off."}],
                "thresholds": [
                        ["--threshold"],
                        {"action": "append",
