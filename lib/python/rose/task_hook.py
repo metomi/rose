@@ -30,7 +30,7 @@ from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
 from smtplib import SMTP
 
-class TaskHook(object):
+class RoseSuiteHook(object):
 
     """Hook functionalities for a suite task."""
 
@@ -75,7 +75,7 @@ class TaskHook(object):
 
         # Send email notification if required
         if should_mail:
-            text = "See: %s/%s*\n" % (log_dir, task)
+            text = "See: file://%s/\n" % (log_dir)
             if hook_message:
                 text += "Message: " + hook_message + "\n"
             msg = MIMEText(text)
@@ -86,7 +86,10 @@ class TaskHook(object):
                 msg["Cc"] = ", ".join(mail_cc_list)
             else:
                 mail_cc_list = []
-            msg["Subject"] = "[%s] %s:%s" % (hook_event, suite, task)
+            tail = ""
+            if task:
+                tail = ":%s" % task
+            msg["Subject"] = "[%s] %s%s" % (hook_event, suite, tail)
             smtp = SMTP('localhost')
             smtp.sendmail(user, [user] + mail_cc_list, msg.as_string())
             smtp.quit()
@@ -113,9 +116,9 @@ def main():
     suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=report, popen=popen)
     args = suite_engine_proc.process_task_hook_args(*args, **vars(opts))
-    hook = TaskHook(event_handler=report,
-                    popen=popen,
-                    suite_engine_proc=suite_engine_proc)
+    hook = RoseSuiteHook(event_handler=report,
+                         popen=popen,
+                         suite_engine_proc=suite_engine_proc)
     hook(*args,
          should_mail=opts.mail,
          mail_cc_list=opts.mail_cc,

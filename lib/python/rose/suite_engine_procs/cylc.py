@@ -72,7 +72,10 @@ class CylcProcessor(SuiteEngineProcessor):
         For a local task, the 2nd element of the tuple is None.
 
         """
-        task_key = task.rsplit("%", 1)[0]
+        if task:
+            task_key = task.rsplit("%", 1)[0]
+        else:
+            task_key = "root"
         out, err = self.popen(
                 "cylc", "get-config", "-p", suite, "runtime", task_key)
         data = ast.literal_eval(out)
