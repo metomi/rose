@@ -195,7 +195,7 @@ class ReporterContext(object):
                 return Reporter.PREFIX_WARN
             else:
                 return Reporter.PREFIX_FAIL
-        elif callable(self.prefix):
+        if callable(self.prefix):
             return self.prefix(type, level)
         else:
             return self.prefix
