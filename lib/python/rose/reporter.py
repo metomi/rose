@@ -94,7 +94,7 @@ class Reporter(object):
             Prefix each line of the message with this prefix.
             Default is context dependent.
         clip:
-            The maximum charactar length of the message to print.    
+            The maximum length of the message to print.    
 
         If self.event_handler is defined, self.event_handler with all the
         arguments and return its result instead.
