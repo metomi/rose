@@ -64,19 +64,6 @@ class ConfigurationNotFoundError(Exception):
                 self.args[0])
 
 
-class FileOverwriteError(Exception):
-
-    """An exception raised in an attempt to overwrite an existing file.
-
-    This will only be raised in non-overwrite mode.
-
-    """
-
-    def __str__(self):
-        return ("%s: file already exists (and in no-overwrite mode)" %
-                self.args[0])
-
-
 class NewModeError(Exception):
 
     """An exception raised for --new when cwd is the config directory."""
@@ -145,12 +132,12 @@ class Runner(object):
         if popen is None:
             popen = RosePopener(event_handler)
         self.popen = popen
-        if config_pm is None:
-            config_pm = ConfigProcessorsManager(event_handler, popen)
-        self.config_pm = config_pm
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
+        if config_pm is None:
+            config_pm = ConfigProcessorsManager(event_handler, popen, fs_util)
+        self.config_pm = config_pm
         if host_selector is None:
             host_selector = HostSelector(event_handler, popen)
         self.host_selector = host_selector
@@ -312,7 +299,7 @@ class AppRunner(Runner):
         # Free format files not defined in the configuration file
         # TODO: review location
         conf_file_dir = os.path.join(conf_dir, rose.SUB_CONFIG_FILE_DIR)
-        file_section_prefix = rose.SUB_CONFIG_FILE_DIR + ":"
+        file_section_prefix = self.config_pm.get_processor("file").PREFIX
         if os.path.isdir(conf_file_dir):
             dirs = []
             files = []
@@ -338,14 +325,8 @@ class AppRunner(Runner):
         self.config_pm(config, "env")
 
         # Process Files
-        keys = []
-        for key, node in sorted(config.value.items()):
-            if node.is_ignored() or not key.startswith(file_section_prefix):
-                continue
-            target = key[len(file_section_prefix):]
-            if os.path.exists(target) and opts.no_overwrite_mode:
-                raise FileOverwriteError(target)
-            self.config_pm(config, key)
+        self.config_pm(config, "file",
+                       no_overwrite_mode=opts.no_overwrite_mode)
 
     def run_impl_main(self, config, opts, args, uuid, work_files):
         """Run the command. May be overridden by sub-classes."""
@@ -450,8 +431,7 @@ class SuiteRunner(Runner):
         else:
             if opts.new_mode:
                 self.fs_util.delete(suite_dir)
-            if not os.path.isdir(suite_dir):
-                os.makedirs(suite_dir)
+            self.fs_util.makedirs(suite_dir)
             cmd = self._get_cmd_rsync(suite_dir)
             self.popen(*cmd)
             os.chdir(suite_dir)
@@ -459,8 +439,7 @@ class SuiteRunner(Runner):
         # Housekeep log files
         if not opts.install_only_mode:
             self._run_init_dir_log(opts, suite_name, config)
-        if not os.path.isdir("log/suite"):
-            os.makedirs("log/suite")
+        self.fs_util.makedirs("log/suite")
 
         # Dump the actual configuration as rose-suite-run.conf
         rose.config.dump(config, "log/rose-suite-run.conf")
@@ -493,15 +472,9 @@ class SuiteRunner(Runner):
         # Process Environment Variables
         environ = self.config_pm(config, "env")
 
-        # Process Files: TODO: This is a potential bottleneck
-        keys = []
-        for key, node in sorted(config.value.items()):
-            if node.is_ignored() or not key.startswith("file:"):
-                continue
-            target = key[len("file:"):]
-            if os.path.exists(target) and opts.no_overwrite_mode:
-                raise FileOverwriteError(target)
-            self.config_pm(config, key)
+        # Process Files
+        self.config_pm(config, "file",
+                       no_overwrite_mode=opts.no_overwrite_mode)
 
         # Process Jinja2 configuration
         for key, node in sorted(config.value.items()):
@@ -698,8 +671,7 @@ class SuiteRunner(Runner):
         if item_path == item_path_source:
             if opts.new_mode:
                 self.fs_util.delete(name)
-            if not os.path.exists(name):
-                self.fs_util.makedirs(name)
+            self.fs_util.makedirs(name)
         else:
             if opts.new_mode:
                 self.fs_util.delete(item_path_source)
@@ -718,8 +690,7 @@ class SuiteRunner(Runner):
             self.handle_event("/" + r_opts["uuid"] + "\n", level=0)
         elif opts.new_mode:
             self.fs_util.delete(suite_dir_rel)
-        if not os.path.exists(suite_dir_rel):
-            os.makedirs(suite_dir_rel)
+        self.fs_util.makedirs(suite_dir_rel)
         os.chdir(suite_dir_rel)
         for name in ["share", "work"]:
             uuid_file = os.path.join(name, r_opts["uuid"])
@@ -733,8 +704,7 @@ class SuiteRunner(Runner):
                 self.handle_event("log/" + r_opts["uuid"] + "\n", level=0)
             else:
                 self._run_init_dir_log(opts, suite_name, r_opts=r_opts)
-        if not os.path.exists("log/suite"):
-            os.makedirs("log/suite")
+        self.fs_util.makedirs("log/suite")
 
     def _get_cmd_rsync(self, target, excludes=None, includes=None):
         """rsync relevant suite items to target."""
