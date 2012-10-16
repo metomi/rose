@@ -185,6 +185,7 @@ class ReporterContext(object):
         self.prefix = prefix
 
     def get_prefix(self, type, level):
+        """Return the prefix suitable for the message type and level."""
         if self.prefix is None:
             if type == Reporter.TYPE_OUT:
                 if level:
@@ -201,9 +202,11 @@ class ReporterContext(object):
             return self.prefix
 
     def is_closed(self):
+        """Return True if the context's handle is closed."""
         return self.handle.closed
 
     def write(self, message):
+        """Write the message to the context's handle."""
         return self.handle.write(message)
 
 
