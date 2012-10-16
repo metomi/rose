@@ -47,12 +47,14 @@ class FileOverwriteError(Exception):
 
 
 class UnmatchedChecksumError(Exception):
+    """An exception raised on an unmatched checksum."""
 
     def __str__(self):
         return ("Unmatched checksum, expected=%s, actual=%s" % tuple(self))
 
 
 class ChecksumEvent(Event):
+    """Report the checksum of a file."""
 
     def __str__(self):
         return "checksum: %s: %s" % self.args
@@ -65,7 +67,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
-        """Install a file according to a section in "config"."""
+        """Install files according to the file:* sections in "config"."""
         nodes = {}
         if item == self.KEY:
             for key, node in config.value.items():
@@ -101,14 +103,17 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # Use worker pool to do the work
         results = []
         for key, node in sorted(nodes.items()):
-            result = pool.apply_async(_process_target, self, config, key, node)
+            result = pool.apply_async(_process_target, [self, config, key, node])
             results.append(result)
         pool.close()
+        # N.B. Event messages will appear in the correct order, but not as each
+        #      call completes.
         for result in results:
             for message, type, level, prefix, clip in result.get():
                 self.manager.event_handler(message, type, level, prefix, clip)
 
     def process_target(self, config, key, node):
+        """Install a target according to a file:target section."""
         target = key[len(self.PREFIX):]
 
         # FIXME: this is not always necessary
@@ -210,13 +215,24 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             return open(source).read()
 
 
+class WorkerEventHandler(object):
+    """Temporary event handler in a function run by a pool worker process.
+
+    Events are collected in the self.events which is a list of tuples
+    representing the arguments the report method in an instance of
+    rose.reporter.Reporter.
+
+    """
+    def __init__(self):
+        self.events = []
+
+    def __call__(self, message, type=None, level=None, prefix=None, clip=None):
+        self.events.append((message, type, level, prefix, clip))
+
 def _process_target(processor, config, key, node):
-    events = []
-    def _process_target_event_handler(
-            message, type=None, level=None, prefix=None, clip=None):
-        events.append((message, type, level, prefix, clip))
-    processor.manager.event_handler.event_handler = _process_target_event_handler
+    """Pool worker for ConfigProcessorForFile.process."""
+    event_handler = WorkerEventHandler()
+    processor.manager.event_handler.event_handler = event_handler
     processor.process_target(config, key, node)
     processor.manager.event_handler.event_handler = None
-    return events
-
+    return event_handler.events
