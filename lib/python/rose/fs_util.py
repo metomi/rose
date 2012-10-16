@@ -29,8 +29,6 @@ class FileSystemEvent(Event):
 
     """An event raised on a file system operation."""
 
-    LEVEL = Event.V
-
     CHDIR = "chdir"
     CREATE = "create"
     DELETE = "delete"

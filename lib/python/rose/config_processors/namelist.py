@@ -38,7 +38,9 @@ class ConfigProcessNamelistEvent(Event):
 
 class ConfigProcessorForNamelist(ConfigProcessorBase):
 
-    def process(self, config, item, orig_keys=None, orig_value=None):
+    KEY = "namelist"
+
+    def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         if item.endswith("(:)"):
             name = item[0:-2]
             sections = filter(lambda key: key.startswith(name),

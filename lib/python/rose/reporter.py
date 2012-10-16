@@ -70,6 +70,7 @@ class Reporter(object):
                                  ReporterContext(self.TYPE_ERR, verbosity))
         self.contexts.setdefault("stdout",
                                  ReporterContext(self.TYPE_OUT, verbosity))
+        self.event_handler = None
         self.raise_on_exc = raise_on_exc
 
     def report(self, message, type=None, level=None, prefix=None, clip=None):
@@ -93,9 +94,15 @@ class Reporter(object):
             Prefix each line of the message with this prefix.
             Default is context dependent.
         clip:
-            The maximum charactar length of the message to print.    
+            The maximum length of the message to print.    
+
+        If self.event_handler is defined, self.event_handler with all the
+        arguments and return its result instead.
 
         """
+        if self.event_handler is not None:
+            return self.event_handler(message, type, level, prefix, clip)
+
         if isinstance(message, Event):
             if type is None:
                 type = message.type
@@ -120,8 +127,8 @@ class Reporter(object):
             if level > context.verbosity:
                 continue
             if prefix is None:
-                prefix = context.prefix
-            if callable(prefix):
+                prefix = context.get_prefix(type, level)
+            elif callable(prefix):
                 prefix = prefix(type, level)
             if msg is None:
                 if callable(message):
@@ -172,32 +179,38 @@ class ReporterContext(object):
         elif type == Reporter.TYPE_OUT:
             if handle is None:
                 handle = sys.stdout
-        if prefix is None:
-            prefix = self._default_prefix
         self.type = type
         self.handle = handle
         self.verbosity = verbosity
         self.prefix = prefix
 
-    def _default_prefix(self, type, level):
-        if type == Reporter.TYPE_OUT:
-            if level:
-                return Reporter.PREFIX_INFO
+    def get_prefix(self, type, level):
+        """Return the prefix suitable for the message type and level."""
+        if self.prefix is None:
+            if type == Reporter.TYPE_OUT:
+                if level:
+                    return Reporter.PREFIX_INFO
+                else:
+                    return ""
+            elif level > Reporter.FAIL:
+                return Reporter.PREFIX_WARN
             else:
-                return ""
-        elif level > Reporter.FAIL:
-            return Reporter.PREFIX_WARN
+                return Reporter.PREFIX_FAIL
+        if callable(self.prefix):
+            return self.prefix(type, level)
         else:
-            return Reporter.PREFIX_FAIL
+            return self.prefix
 
     def is_closed(self):
+        """Return True if the context's handle is closed."""
         return self.handle.closed
 
     def write(self, message):
+        """Write the message to the context's handle."""
         return self.handle.write(message)
 
 
-class ReporterContextQueue(object):
+class ReporterContextQueue(ReporterContext):
 
     """A context for the reporter object.
 
@@ -219,23 +232,17 @@ class ReporterContextQueue(object):
                  verbosity=Reporter.DEFAULT,
                  queue=None,
                  prefix=None):
+        ReporterContext.__init__(self, type, verbosity, None, prefix)
         if queue is None:
             queue = multiprocessing.Queue()
-        if prefix is None:
-            prefix = self._default_prefix
-        self.is_closed = lambda: False
-        self.type = type
         self.queue = queue
-        self.verbosity = verbosity
-        self.prefix = prefix
+        self.closed = False
 
-    def _default_prefix(self, type, level):
-        if type == Reporter.TYPE_OUT:
-            return Reporter.PREFIX_INFO
-        elif level > Reporter.FAIL:
-            return Reporter.PREFIX_WARN
-        else:
-            return Reporter.PREFIX_FAIL
+    def close(self):
+        self.closed = True
+
+    def is_closed(self):
+        return self.closed
 
     def write(self, message):
         self.queue.put(message, block=True, timeout=0.1)

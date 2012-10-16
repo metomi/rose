@@ -179,12 +179,12 @@ setup
 run_pass "$TEST_KEY" rose app-run --config=../config -i
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
-[INFO] install: empty-and-hello.nl <= (content) namelist:empty namelist:hello
-[INFO] install: empty.nl <= (content) namelist:empty
-[INFO] install: hello.nl <= (content) namelist:hello
-[INFO] install: shopping-list-2.nl <= (content) namelist:shopping_list(10) namelist:shopping_list(1)
-[INFO] install: shopping-list.nl <= (content) namelist:shopping_list(:)
-[INFO] install: vegetables.nl <= (content) namelist:vegetables{green}(:)
+[INFO] content: empty-and-hello.nl <= namelist:empty namelist:hello
+[INFO] content: empty.nl <= namelist:empty
+[INFO] content: hello.nl <= namelist:hello
+[INFO] content: shopping-list-2.nl <= namelist:shopping_list(10) namelist:shopping_list(1)
+[INFO] content: shopping-list.nl <= namelist:shopping_list(:)
+[INFO] content: vegetables.nl <= namelist:vegetables{green}(:)
 [INFO] command: mkdir out && cp *.nl out/
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
