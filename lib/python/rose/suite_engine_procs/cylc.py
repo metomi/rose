@@ -298,9 +298,13 @@ class CylcProcessor(SuiteEngineProcessor):
                         break
         return data
 
-    def process_task_hook_args(self, *args, **kwargs):
+    def process_suite_hook_args(self, *args, **kwargs):
         """Rearrange args for TaskHook.run."""
-        hook_event, suite, task, hook_message = args
+        task = None
+        if len(args) == 3:
+            hook_event, suite, hook_message = args
+        else:
+            hook_event, suite, task, hook_message = args
         return [suite, task, hook_event, hook_message]
 
     def run(self, suite_name, host=None, host_environ=None, *args):

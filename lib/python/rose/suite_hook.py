@@ -115,7 +115,7 @@ def main():
     popen = RosePopener(event_handler=report)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=report, popen=popen)
-    args = suite_engine_proc.process_task_hook_args(*args, **vars(opts))
+    args = suite_engine_proc.process_suite_hook_args(*args, **vars(opts))
     hook = RoseSuiteHook(event_handler=report,
                          popen=popen,
                          suite_engine_proc=suite_engine_proc)
