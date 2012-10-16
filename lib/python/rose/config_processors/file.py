@@ -93,9 +93,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(target))
 
         # Start worker pool
-        nproc = rose.config.default_node().get_value(
+        nproc = int(rose.config.default_node().get_value(
                 ["rose.config_processors.file", "nproc"],
-                default=self.NPROC)
+                default=self.NPROC))
         if nproc > len(nodes):
             nproc = len(nodes)
         pool = Pool(processes=nproc)
