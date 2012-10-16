@@ -98,8 +98,8 @@ class PageFormatTree(gtk.VBox):
             external_trigger_widget.set_active(True)
         return
 
-    def _checksum_toggle(self, check, var_widget):
-        """Only add the checksum if the check box is enabled."""
+    def _variable_toggle(self, check, var_widget):
+        """Only add the variable if the check box is enabled."""
         variable = var_widget.variable
         if check.get_active():
             if variable in self.ghost_data:
@@ -126,8 +126,11 @@ class PageFormatTree(gtk.VBox):
                 if var.name in int_vars:
                     self.var_ops.remove_var(var)
             for var in list(self.ghost_data):
-                if (var.name in ext_vars and
-                    (var.name != rose.FILE_VAR_CHECKSUM or var.value)):
+                if var.name in ext_vars:
+                    if ((var.name == rose.FILE_VAR_CHECKSUM and
+                         not var.value) or (var.name == rose.FILE_VAR_MODE and
+                         var.value == "auto")):
+                        continue
                     self.var_ops.add_var(var)
         elif self._state == "int":
             for var in list(self.panel_data):
@@ -159,22 +162,20 @@ class PageFormatTree(gtk.VBox):
                                      rose.FILE_VAR_MODE,
                                      rose.FILE_VAR_SOURCE]:
                 continue
+            is_ghost = (variable not in self.panel_data)
             widget = rose.config_editor.variable.VariableWidget(
-                                        variable, self.var_ops)
+                                        variable, self.var_ops,
+                                        is_ghost=is_ghost)
+            widget.set_sensitive(not is_ghost)
             widget.insert_into(table, self.MAX_COLS_SOURCE - 1, r + 1)
-            if variable.name == rose.FILE_VAR_CHECKSUM:
+            if variable.name in [rose.FILE_VAR_CHECKSUM, rose.FILE_VAR_MODE]:
                 check_button = gtk.CheckButton()
                 check_button.var_widget = widget
-                check_button.set_active(variable in self.panel_data)
+                check_button.set_active(not is_ghost)
                 check_button.connect(
                              'toggled',
-                             lambda c: self._checksum_toggle(c,
+                             lambda c: self._variable_toggle(c,
                                                              c.var_widget))
-                check_button.connect(
-                             'state-changed',
-                             lambda c, s: s != gtk.STATE_INSENSITIVE and
-                                          self._checksum_toggle(c,
-                                                                c.var_widget))
                 check_button.show()
                 table.attach(check_button,
                              self.MAX_COLS_SOURCE - 1, self.MAX_COLS_SOURCE,
