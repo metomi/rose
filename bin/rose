@@ -131,8 +131,11 @@ version)
     fi
     echo
     echo "Path: $ROSE_HOME"
-    (cd $ROSE_HOME && (svn info | sed '/^Path: /d') && svn status) 2>/dev/null \
-        || true
+    cd $ROSE_HOME
+    if [[ -d .git ]]; then
+        PAGER= git show 2>/dev/null
+        PAGER= git status 2>/dev/null
+    fi
     exit
     :;;
 esac
