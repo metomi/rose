@@ -5,7 +5,7 @@
     final cycle time   = 2013010200
     [[special tasks]]
     # These tasks are only run at the beginning of the suite
-        cold-start = fcm_make, locate_mars
+        cold-start = fcm_make
     [[dependencies]]
 
         # At 00:00, 06:00, 12:00, 18:00:
@@ -34,4 +34,4 @@
             submission failed handler = "rose task-hook --shutdown"
     
     [[locate_fred]]
-        command scripting = "sleep 10 && echo 'fred is at the '$(shuf -n 1 /usr/share/dict/words)"
+        command scripting = "sleep 10 && echo 'fred is at the '$(shuf -n 1 /usr/share/dict/words || echo 'pub')"

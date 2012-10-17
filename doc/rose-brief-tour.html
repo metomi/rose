@@ -122,12 +122,15 @@ rose rug-brief-tour
 
           <li><code>locate_fred</code>: a preparation task run each time before
           <code>fred_hello_world</code>.</li>
-        </ul>This is a <em>cycling</em> suite that repeats every 6 hours, with
-        the first cycle starting at 00:00, 1 January 2013 and the last cycle
-        starting 1 day later at 00:00, 2 January 2013. Cycling suites typically
-        need special start tasks to boot up - in our case,
+        </ul>
+
+        <p>This is a <em>cycling</em> suite that repeats every 6 hours, with
+        the first cycle starting at <samp>2013010100</samp> (00:00, 1 January
+        2013) and the last cycle starting 1 day later at
+        <samp>2013010200</samp> (00:00, 2 January 2013). Cycling suites
+        typically need special start tasks to boot up - in our case,
         <code>fcm_make</code> is run at the beginning of the suite, before any
-        cycles.
+        cycles.</p>
       </li>
 
       <li>Sub-directories:
