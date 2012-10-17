@@ -18,14 +18,16 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-task-hook
+#     rose-suite-hook
 #
 # SYNOPSIS
 #     # Cylc interface
-#     rose task-hook [OPTIONS] EVENT SUITE MSG
+#     rose suite-hook [OPTIONS] EVENT SUITE MSG
+#     rose task-hook [OPTIONS] EVENT SUITE TASK_ID MSG
 #
 # DESCRIPTION
-#     Provide a common event hook for a Cylc suite.
+#     Provide a common event hook for Cylc suites and tasks.
+#     * (Task event only) Pull remote task logs back to server host.
 #     * Generate suite log view.
 #     * Email user if --mail specified.
 #     * Shutdown suite if --shutdown specified.

@@ -17,33 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# NAME
-#     rose-task-hook
-#
-# SYNOPSIS
-#     # Cylc interface
-#     rose task-hook [OPTIONS] EVENT SUITE TASK_ID MSG
-#
-# DESCRIPTION
-#     Provide a common event hook for a Cylc task.
-#     * Pull remote task logs back to server host.
-#     * Generate suite log view.
-#     * Email user if --mail specified.
-#     * Shutdown suite if --shutdown specified.
-#
-# OPTIONS
-#     --debug
-#         Switch on debug mode.
-#     --mail-cc=LIST
-#         Only useful if the --mail-if=LIST option is specified. Specify a
-#         comma separated list of additional addresses to email.
-#     --mail
-#         Trigger an email notification to the user.
-#     --shutdown
-#         Trigger a shutdown of the suite.
-#     --quiet; -q
-#         Decrement verbosity.
-#     --verbose; -v
-#         Increment verbosity.
+# Alias of "rose suite-hook".
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_hook "$@"
+exec $(dirname $0)/rose-suite-hook "$@"
