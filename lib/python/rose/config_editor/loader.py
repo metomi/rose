@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""
-This module contains:
+"""This module contains:
+
 ConfigData -- class to store and process a directory into internal
 data structures
+
 """
 
 import atexit
@@ -57,6 +58,7 @@ class VarData(object):
         self.latent_save = latent_save_v_map
 
     def foreach(self, save=False, no_latent=False):
+        """Yield all (section, variables) tuples for real and latent."""
         if save:
             real = self.save
             latent = self.latent_save
@@ -70,6 +72,7 @@ class VarData(object):
                 yield section, variables
 
     def get_all(self, save=False, no_latent=False):
+        """Return all real and latent variables."""
         if save:
             real = self.save
             latent = self.latent_save
@@ -82,6 +85,7 @@ class VarData(object):
         return all_vars
 
     def get_var(self, section, option, save=False, no_latent=False):
+        """Return the variable specified by section, option."""
         var_id = section + rose.CONFIG_DELIMITER + option
         if save:
             nodes = [self.save, self.latent_save]
@@ -108,6 +112,7 @@ class SectData(object):
         self.latent_save = latent_save_sections
 
     def get_all(self, save=False, no_latent=False):
+        """Return all sections that match the save/latent criteria."""
         if save:
             real = self.save
             latent = self.latent_save
@@ -246,7 +251,8 @@ class ConfigDataManager(object):
                                                rose.TOP_CONFIG_NAME)
                     is_top_level = True
                 else:
-                    text = rose.config_editor.ERROR_NOT_FOUND.format(config_path)
+                    text = rose.config_editor.ERROR_NOT_FOUND.format(
+                                                              config_path)
                     title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
                     rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
                                              text, title)
@@ -359,7 +365,7 @@ class ConfigDataManager(object):
             meta_data.update({'id': setting_id})
             if section not in ['ns', 'file:*']:
                 latent_sect_map.update(
-                       {section: rose.section.Section(section, [], meta_data)})
+                      {section: rose.section.Section(section, [], meta_data)})
         return sect_map, latent_sect_map
 
     def load_vars_from_config(self, config_name, save=False):
@@ -1148,10 +1154,11 @@ class ConfigDataManager(object):
     def get_format_sections(self, config_name):
         """Return all format-like sections in the current data."""
         format_keys = []
-        for section in self.config[config_name].vars.now:
+        for section in self.config[config_name].sections.now:
             if (section not in format_keys and 
                 ':' in section and not section.startswith('file:')):
                 format_keys.append(section)
+        format_keys.sort(rose.config.sort_settings)
         return format_keys
 
     def get_icon_path_for_config(self, config_name):
