@@ -30,7 +30,7 @@ from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
 from smtplib import SMTP
 
-class TaskHook(object):
+class RoseSuiteHook(object):
 
     """Hook functionalities for a suite task."""
 
@@ -64,18 +64,22 @@ class TaskHook(object):
         4. If "should_shutdown", shut down the suite.
 
         """
-        log_dir, r_log_dir = self.suite_engine_proc.get_log_dirs(suite, task)
+        task_log_dir, r_task_log_dir = self.suite_engine_proc.get_log_dirs(
+                suite, task)
+
         # Retrieve log
-        if r_log_dir:
+        if task and r_task_log_dir:
             cmd = self.popen.get_cmd(
-                    "rsync", r_log_dir + "/" + task + "*", log_dir)
+                    "rsync", r_task_log_dir + "/" + task + "*", task_log_dir)
             self.popen(*cmd)
+
         # Generate suite log view
-        self.suite_log_view_generator(os.path.dirname(log_dir))
+        suite_log_dir = os.path.dirname(task_log_dir)
+        self.suite_log_view_generator(suite_log_dir)
 
         # Send email notification if required
         if should_mail:
-            text = "See: %s/%s*\n" % (log_dir, task)
+            text = "See: file://%s/index.html\n" % (suite_log_dir)
             if hook_message:
                 text += "Message: " + hook_message + "\n"
             msg = MIMEText(text)
@@ -86,7 +90,7 @@ class TaskHook(object):
                 msg["Cc"] = ", ".join(mail_cc_list)
             else:
                 mail_cc_list = []
-            msg["Subject"] = "[%s] %s:%s" % (hook_event, suite, task)
+            msg["Subject"] = "[%s] %s" % (hook_event, suite)
             smtp = SMTP('localhost')
             smtp.sendmail(user, [user] + mail_cc_list, msg.as_string())
             smtp.quit()
@@ -112,10 +116,10 @@ def main():
     popen = RosePopener(event_handler=report)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=report, popen=popen)
-    args = suite_engine_proc.process_task_hook_args(*args, **vars(opts))
-    hook = TaskHook(event_handler=report,
-                    popen=popen,
-                    suite_engine_proc=suite_engine_proc)
+    args = suite_engine_proc.process_suite_hook_args(*args, **vars(opts))
+    hook = RoseSuiteHook(event_handler=report,
+                         popen=popen,
+                         suite_engine_proc=suite_engine_proc)
     hook(*args,
          should_mail=opts.mail,
          mail_cc_list=opts.mail_cc,

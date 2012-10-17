@@ -72,7 +72,10 @@ class CylcProcessor(SuiteEngineProcessor):
         For a local task, the 2nd element of the tuple is None.
 
         """
-        task_key = task.rsplit("%", 1)[0]
+        if task:
+            task_key = task.rsplit("%", 1)[0]
+        else:
+            task_key = "root"
         out, err = self.popen(
                 "cylc", "get-config", "-p", suite, "runtime", task_key)
         data = ast.literal_eval(out)
@@ -295,9 +298,13 @@ class CylcProcessor(SuiteEngineProcessor):
                         break
         return data
 
-    def process_task_hook_args(self, *args, **kwargs):
+    def process_suite_hook_args(self, *args, **kwargs):
         """Rearrange args for TaskHook.run."""
-        hook_event, suite, task, hook_message = args
+        task = None
+        if len(args) == 3:
+            hook_event, suite, hook_message = args
+        else:
+            hook_event, suite, task, hook_message = args
         return [suite, task, hook_event, hook_message]
 
     def run(self, suite_name, host=None, host_environ=None, *args):
