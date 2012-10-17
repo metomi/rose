@@ -189,7 +189,7 @@ a.infotip:hover {
 a.infotip span {
     display: none
 }
-a.infotip:hover span {
+a.infotip:hover > span {
     border: #c0c0c0 1px dotted;
     padding: 5px 20px 5px 5px;
     display: block;
@@ -345,9 +345,13 @@ $(function() {
         }
     }
     Rosie.query_groups_toggle();
+    $(".infodate").each(function(i) {
+        var date_str = $(this).text();
+        d = new Date(date_str*1000).toLocaleString();
+        $(this).text(d);
+    });    
 });
 </script>
-
 <title>{{ prefix }}: Rosie Web</title>
 </head>
 
@@ -511,10 +515,15 @@ $(function() {
 {%- if "-list" in key %}
 {%- set value = value|join(" ") %}
 {%- endif %}
+{%- if key == "date" %}
+{%- set info = info ~ "<b>" ~ key ~ "</b>" ~ ": <text class='infodate'>" ~ value ~ "</text><br/>"  %}
+{%- else %}
 {%- set info = info ~ "<b>" ~ key ~ "</b>" ~ ": " ~ value ~ "<br/>"  %}
 {%- endif %}
+{%- endif %}
 {%- if loop.last %}
-        <tr><td><a class=infotip>?<span>{{info}}{{item.idx}}</span></a></td>
+        <tr><td><a class="infotip">?<span>{{info}}</span></a>
+        </td>
 {%- endif %}
 {%- endfor %}
           <td><a href="{{ item.href }}" class=tip>{{ prefix }}-{{ item.idx }}
