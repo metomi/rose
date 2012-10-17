@@ -143,6 +143,26 @@ tr.even td.sorting_1 {
 "html-lib/DataTables/extras/ColVis/media/js/ColVis.min.js">
 </script>
 <script type="text/javascript" charset="utf-8">
+/* Plug-in: sort by delta-time in minutes:seconds format. */
+jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+    "delta-time-m-s-pre": function(a) {
+        if ($.trim(a) == "") {
+            return 2147483647; // A big number
+        }
+        var m_and_s = a.split(":", 1);
+        return (Number(m_and_s[0]) * 60 + Number(m_and_s[1]));
+    },
+ 
+    "delta-time-m-s-asc": function(a, b) {
+        return a - b;
+    },
+ 
+    "delta-time-m-s-desc": function(a, b) {
+        return b - a;
+    }
+});
+
+/* The ready function */
 $(function() {
     function err(data) {
         alert("Could not load JOB.json");
@@ -336,24 +356,20 @@ $(function() {
                         var list = d["list"];
                         list.sort(function(a, b) {return a - b});
                         for (var idx = 0; idx < list.length; idx++) {
+                            var option = $("<option/>").appendTo(select);
                             var name_idx = list[idx].toString();
                             var name = d["head"] + "." + name_idx + d["tail"];
-                            var file = root + name;
-                            var f;
-                            if (file.match(/\.html(?:\.\d+)?$/)) {
-                                f = function() {
+                            option.text(name);
+                            option.click(function() {
+                                var file = root + $(this).text();
+                                if (file.match(/\.html(?:\.\d+)?$/)) {
                                     location = (file).replace(/%/, "%25");
-                                };
-                            }
-                            else {
-                                f = function() {
+                                }
+                                else {
                                     var file_uri = encodeURIComponent(file);
                                     location = URL_PREFIX + file_uri;
-                                };
-                            }
-                            var option = $("<option/>").appendTo(select);
-                            option.text(name);
-                            option.click(f);
+                                }
+                            });
                         }
                     }
                     else {
@@ -383,9 +399,21 @@ $(function() {
             });
         }
         node.dataTable({
-            "aaSorting": [[3, "asc"]], /* See table columns */
-            "aoColumnDefs": [
-                {"bVisible": false, "aTargets": [1, 5, 6, 10]} /* See table columns */
+            /* See columns of the task_list table */
+            "aaSorting": [[3, "asc"]],
+            "aoColumn": [
+                null,
+                {"bVisible": false, "sType": "numeric"},
+                null,
+                null,
+                {"sType": "delta-time-m-s"},
+                {"bVisible": false},
+                {"bVisible": false},
+                {"sType": "delta-time-m-s"},
+                null,
+                null,
+                {"bVisible": false},
+                null
             ],
             "bPaginate": false,
             "bStateSave": true,
