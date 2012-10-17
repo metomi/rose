@@ -178,6 +178,29 @@ input[type=checkbox] {
     margin: 0;
     padding: 0;
 }
+a.infotip {
+    border-bottom: 1px dashed;
+    text-decoration: none;
+}
+a.infotip:hover {
+    cursor: help;
+    position: relative;
+}
+a.infotip > span {
+    display: none;
+}
+a.infotip:hover > span {
+    border: #c0c0c0 1px dotted;
+    padding: 5px 20px 5px 5px;
+    display: block;
+    z-index: 100;
+    background: #ccf4ff no-repeat 100% 5%;
+    left: 0px;
+    margin: 10px;
+    position: absolute;
+    top: 10px;
+    text-decoration: none;
+}
 </style>
 <script type="text/javascript" src="{{ web_prefix }}/etc/jquery/jquery.min.js">
 </script>
@@ -321,9 +344,13 @@ $(function() {
         }
     }
     Rosie.query_groups_toggle();
+    $(".infodate").each(function(i) {
+        var date_str = $(this).text();
+        d = new Date(date_str*1000).toLocaleString();
+        $(this).text(d);
+    });    
 });
 </script>
-
 <title>{{ prefix }}: Rosie Web</title>
 </head>
 
@@ -469,6 +496,7 @@ $(function() {
     <table id="list-result-table" summary="List Result Table">
       <thead>
         <tr>
+          <th>?</th>
           <th>id</th>
           <th>branch</th>
           <th>revision</th>
@@ -480,20 +508,25 @@ $(function() {
       <tbody>
 {%- if data %}
 {%- for item in data %}
-{%- set info = "%s-%s/%s@%s"|format(prefix, item.idx, item.branch, item.revision) %}
-{%- set info = info + " - " %}
+{%- set info = "<strong>suite:</strong> %s-%s/%s@%s<br/>"|format(prefix, item.idx, item.branch, item.revision) %}
 {%- for key, value in item|dictsort %}
 {%- if value is not none and key not in ["idx", "branch", "revision", "href", "owner", "project", "title"] %}
 {%- if "-list" in key %}
 {%- set value = value|join(" ") %}
 {%- endif %}
-{%- set info = info ~ key ~ ": " ~ value ~ " " %}
+{%- if key == "date" %}
+{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": <span class='infodate'>" ~ value ~ "</span><br/>"  %}
+{%- else %}
+{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": " ~ value ~ "<br/>"  %}
+{%- endif %}
 {%- endif %}
 {%- if loop.last %}
-        <tr title="{{ info }}">
+        <tr><td><a class="infotip">?<span>{{info}}</span></a>
+        </td>
 {%- endif %}
 {%- endfor %}
-          <td><a href="{{ item.href }}">{{ prefix }}-{{ item.idx }}</a></td>
+          <td><a href="{{ item.href }}" class=tip>{{ prefix }}-{{ item.idx }}
+              </a></td>
 {%- for col in ["branch", "revision", "owner", "project", "title"] %}
           <td>{{ item[col] }}</td>
 {%- endfor %}
@@ -502,6 +535,7 @@ $(function() {
 {%- endif %}
       </tbody>
     </table>
+    <br/><br/><br/><br/><br/><br/><br/>
   </div>
 </div>
 </body>
