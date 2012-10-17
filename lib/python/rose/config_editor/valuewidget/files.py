@@ -53,7 +53,6 @@ class FileChooserValueWidget(gtk.HBox):
         self.open_button.connect("clicked", self.run_and_destroy)
         self.pack_end(self.open_button, expand=False, fill=False, padding=5)
         self.edit_button.set_sensitive(os.path.isfile(self.value))
-        self.set_internal(metadata.get(rose.META_PROP_TYPE) == "file_int")
 
     def generate_entry(self):
         self.entry = gtk.Entry()
@@ -92,22 +91,10 @@ class FileChooserValueWidget(gtk.HBox):
         self.pack_end(self.edit_button, expand=False, fill=False,
                       padding=rose.config_editor.SPACING_SUB_PAGE)
 
-    def set_internal(self, is_internal=False):
-        self.is_internal = is_internal
-        if self.is_internal:
-            self.entry.set_sensitive(False)
-            self.entry.set_sensitive = lambda b: False
-            self.open_button.set_sensitive(False)
-            self.open_button.set_sensitive = lambda b: False
-        else:
-            self.edit_button.set_sensitive(False)
-            self.edit_button.set_sensitive = lambda b: False
-
-
     def setter(self, widget):
         self.value = widget.get_text()
         self.set_value(self.value)
-        self.edit_button.set_sensitive(os.path.isfile(self.value))
+        self.edit_button.set_sensitive(True)
         return False
 
 
