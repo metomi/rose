@@ -180,14 +180,14 @@ input[type=checkbox] {
 }
 a.infotip {
     border-bottom: 1px dashed;
-    text-decoration: none
+    text-decoration: none;
 }
 a.infotip:hover {
     cursor: help;
-    position: relative
+    position: relative;
 }
-a.infotip span {
-    display: none
+a.infotip > span {
+    display: none;
 }
 a.infotip:hover > span {
     border: #c0c0c0 1px dotted;
@@ -199,7 +199,7 @@ a.infotip:hover > span {
     margin: 10px;
     position: absolute;
     top: 10px;
-    text-decoration: none
+    text-decoration: none;
 }
 </style>
 <script type="text/javascript" src="{{ web_prefix }}/etc/jquery/jquery.min.js">
@@ -515,7 +515,7 @@ $(function() {
 {%- set value = value|join(" ") %}
 {%- endif %}
 {%- if key == "date" %}
-{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": <text class='infodate'>" ~ value ~ "</text><br/>"  %}
+{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": <span class='infodate'>" ~ value ~ "</span><br/>"  %}
 {%- else %}
 {%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": " ~ value ~ "<br/>"  %}
 {%- endif %}
