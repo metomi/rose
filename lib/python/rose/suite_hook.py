@@ -90,7 +90,6 @@ class RoseSuiteHook(object):
                 msg["Cc"] = ", ".join(mail_cc_list)
             else:
                 mail_cc_list = []
-            tail = ""
             msg["Subject"] = "[%s] %s" % (hook_event, suite)
             smtp = SMTP('localhost')
             smtp.sendmail(user, [user] + mail_cc_list, msg.as_string())
