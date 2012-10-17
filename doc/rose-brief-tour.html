@@ -109,10 +109,29 @@ rose rug-brief-tour
       in this example suite.</li>
 
       <li>A <kbd>suite.rc</kbd> file: This is used to define configurations in
-      a cylc suite. In this example, we are running 4 tasks: a task to build an
-      executable from a source file containing a <em>hello world</em> program,
-      and then 3 tasks in parallel to run the executable with 3 different sets
-      of application configurations.</li>
+      a cylc suite. In this example, we are running:
+
+        <ul>
+          <li><code>fcm_make</code>: a task to build an executable from a
+          source file containing a <em>hello world</em> program</li>
+
+          <li><code>fred_hello_world</code>, <code>my_hello_mars</code>,
+          <code>my_hello_world</code>: Rose <em>applications</em> that invoke
+          the <em>hello world</em> executable using different
+          configurations.</li>
+
+          <li><code>locate_fred</code>: a preparation task run each time before
+          <code>fred_hello_world</code>.</li>
+        </ul>
+
+        <p>This is a <em>cycling</em> suite that repeats every 6 hours, with
+        the first cycle starting at <samp>2013010100</samp> (00:00, 1 January
+        2013) and the last cycle starting 1 day later at
+        <samp>2013010200</samp> (00:00, 2 January 2013). Cycling suites
+        typically need special start tasks to boot up - in our case,
+        <code>fcm_make</code> is run at the beginning of the suite, before any
+        cycles.</p>
+      </li>
 
       <li>Sub-directories:
 
@@ -150,10 +169,12 @@ rose suite-run
 
     <p>This will install your suite under <var>$HOME/cylc-run/$ID</var>, start
     your suite with <code>cylc</code> and fire up <code>cylc gcontrol
-    $ID</code>. The suite should run successfully to completion.</p>
+    $ID</code>. Experiment with different viewing options on the <code>cylc
+    gcontrol</code>toolbar. The suite should run successfully to
+    completion.</p>
 
     <p>Note: If you quit <code>cylc gcontrol</code> by mistake, you can restart
-    it by typing <code>cylc gcontrol $ID</code> on the command line.</p>
+    it by typing <code>rose suite-gcontrol $ID</code> on the command line.</p>
 
     <h3>View the Output</h3>
 
@@ -191,8 +212,8 @@ rm -rf $HOME/roses/$ID # replace $ID with the ID of your new suite
 rosie checkout $ID # replace $ID with the ID of your new suite
 </pre>
 
-    <p>For help with Rose and Rosie commands, see the 
-    <a href="rose-command.html">Command Reference</a>.</p>
+    <p>For help with Rose and Rosie commands, see the <a href=
+    "rose-command.html">Command Reference</a>.</p>
 
     <h2 id="gui">GUI Tour</h2>
 
