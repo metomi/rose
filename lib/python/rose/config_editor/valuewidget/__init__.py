@@ -26,7 +26,6 @@ import booltoggle
 import character
 import combobox
 import files
-import format
 import intspin
 import meta
 import radiobuttons
@@ -70,8 +69,6 @@ def chooser(value, metadata, error):
     if (m_values is None and m_length is None and
         m_type in ['logical', 'boolean']):
         return booltoggle.BoolToggleValueWidget
-    if m_type == 'formats':
-        return format.FormatsChooserValueWidget
     if m_length is None:
         if m_values is not None and len(m_values) <= 4:
             return radiobuttons.RadioButtonsValueWidget
