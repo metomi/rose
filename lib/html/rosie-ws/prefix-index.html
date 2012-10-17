@@ -197,7 +197,6 @@ a.infotip:hover > span {
     background: #ccf4ff no-repeat 100% 5%;
     left: 0px;
     margin: 10px;
-    width: 250px;
     position: absolute;
     top: 10px;
     text-decoration: none
@@ -509,16 +508,16 @@ $(function() {
       <tbody>
 {%- if data %}
 {%- for item in data %}
-{%- set info = "<b>Suite:</b> %s-%s/%s@%s<br/>"|format(prefix, item.idx, item.branch, item.revision) %}
+{%- set info = "<strong>suite:</strong> %s-%s/%s@%s<br/>"|format(prefix, item.idx, item.branch, item.revision) %}
 {%- for key, value in item|dictsort %}
 {%- if value is not none and key not in ["idx", "branch", "revision", "href", "owner", "project", "title"] %}
 {%- if "-list" in key %}
 {%- set value = value|join(" ") %}
 {%- endif %}
 {%- if key == "date" %}
-{%- set info = info ~ "<b>" ~ key ~ "</b>" ~ ": <text class='infodate'>" ~ value ~ "</text><br/>"  %}
+{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": <text class='infodate'>" ~ value ~ "</text><br/>"  %}
 {%- else %}
-{%- set info = info ~ "<b>" ~ key ~ "</b>" ~ ": " ~ value ~ "<br/>"  %}
+{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": " ~ value ~ "<br/>"  %}
 {%- endif %}
 {%- endif %}
 {%- if loop.last %}
