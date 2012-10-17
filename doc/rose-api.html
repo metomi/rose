@@ -696,7 +696,7 @@ def show_fixed(self, should_show)
     e.g. by greying out part of it.</p>
 
     <p>All existing page widgets use this API, so a good resource is the
-    classes in lib/python/rose/config_editor/container.py.</p>
+    modules in lib/python/rose/config_editor/pagewidget/.</p>
 
     <p>Generally speaking, a visible change, click, or key press in the custom
     page widget should make instant changes to variable value(s), and the value
@@ -1563,9 +1563,9 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       the config editor. All of these can be overridden using your user
       config.</dd>
 
-      <dt><code>rose.config_editor.container</code>,
-      <code>rose.config_editor.keywidget</code>,
+      <dt><code>rose.config_editor.keywidget</code>,
       <code>rose.config_editor.menuwidget</code>,
+      <code>rose.config_editor.pagewidget</code> (package),
       <code>rose.config_editor.variable</code>,
       <code>rose.config_editor.valuewidget</code> (package)</dt>
 
@@ -1592,7 +1592,7 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       <dt><code>rose.config_editor.page</code></dt>
 
       <dd>This module contains control code for each config editor tab, and
-      interfaces with <code>rose.config_editor.container</code>-like objects
+      interfaces with <code>rose.config_editor.pagewidget</code> objects
       (including custom pages).</dd>
 
       <dt><code>rose.config_editor.panel</code></dt>

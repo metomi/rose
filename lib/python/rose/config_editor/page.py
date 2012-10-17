@@ -26,7 +26,7 @@ pygtk.require('2.0')
 import gtk
 import pango
 
-import rose.config_editor.container
+import rose.config_editor.pagewidget
 import rose.config_editor.stack
 import rose.config_editor.util
 import rose.config_editor.variable
@@ -542,25 +542,26 @@ class ConfigPage(gtk.VBox):
                                    self.ghost_data,
                                    self.variable_ops,
                                    self.show_modes)
+        std_table = rose.config_editor.pagewidget.standard.PageTable
+        file_chooser = rose.config_editor.pagewidget.chooser.PageFormatTree
+        disc_table = rose.config_editor.pagewidget.standard.PageLatentTable
         if "/file/" in self.namespace:  # Don't like this!
-            self.main_container = rose.config_editor.container.FileVBox(
+            self.main_container = file_chooser(
                                        self.panel_data,
                                        self.ghost_data,
                                        self.variable_ops,
                                        self.show_modes,
                                        self.trigger_ask_for_config_keys)
         elif self.namespace == "/discovery":
-            self.main_container = rose.config_editor.container.LatentTable(
-                                       self.panel_data,
-                                       self.ghost_data,
-                                       self.variable_ops,
-                                       self.show_modes)
+            self.main_container = disc_table(self.panel_data,
+                                             self.ghost_data,
+                                             self.variable_ops,
+                                             self.show_modes)
         else:
-            self.main_container = rose.config_editor.container.Table(
-                                       self.panel_data,
-                                       self.ghost_data,
-                                       self.variable_ops,
-                                       self.show_modes)
+            self.main_container = std_table(self.panel_data,
+                                            self.ghost_data,
+                                            self.variable_ops,
+                                            self.show_modes)
 
     def validate_errors(self, variable_id=None):
         """Check if there are there errors in variables on this page."""

@@ -344,6 +344,12 @@ TITLE_FILE_PANEL = "Other files"
 SUMMARY_DATA_PANEL_IGNORED_MARKUP = "<b>{0}</b>"
 SUMMARY_DATA_PANEL_MAX_LEN = 15
 SUMMARY_DATA_PANEL_SECTION_TITLE = "Section"
+FILE_CONTENT_PANEL_EMPTY = "(empty)"
+FILE_CONTENT_PANEL_OPT_TIP = "Content available for file."
+FILE_CONTENT_PANEL_OPT_TITLE = "Available"
+FILE_CONTENT_PANEL_REMOVE = "Remove from list"
+FILE_CONTENT_PANEL_TIP = "Content included in file"
+FILE_CONTENT_PANEL_TITLE = "Content"
 
 # Tooltip (hover-over) text
 
