@@ -34,4 +34,6 @@
             submission failed handler = "rose task-hook --shutdown"
     
     [[locate_fred]]
-        command scripting = "sleep 10 && echo 'fred is at the '$(shuf -n 1 /usr/share/dict/words || echo 'pub')"
+        command scripting = """
+            sleep 10 && echo 'fred is in '$(find /usr/share/zoneinfo/[A-Z]*/ -type f -printf "%f\n" | shuf -n 1 || echo 'the pub')
+        """
