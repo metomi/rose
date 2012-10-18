@@ -398,6 +398,12 @@ class SuiteRunner(Runner):
             self.fs_util.chdir(opts.conf_dir)
             opts.conf_dir = None
 
+        # Automatic Rose constants
+        for k, v in {"ROSE_ORIG_HOST": socket.gethostname()}.items():
+            config.set(["env", k], v)
+            config.set(["jinja2:" + self.suite_engine_proc.SUITE_CONF, k],
+                       '"' + v + '"')
+
         suite_name = opts.name
         if not opts.name:
             suite_name = os.path.basename(os.getcwd())
@@ -470,12 +476,7 @@ class SuiteRunner(Runner):
         for name in ["share", "work"]:
             self._run_init_dir_work(opts, suite_name, name, config)
 
-        # Automatic Rose constants
-        constants = {"ROSE_ORIG_HOST": socket.gethostname()}
-
         # Process Environment Variables
-        for k, v in constants.items():
-            config.set(["env", k], v)
         environ = self.config_pm(config, "env")
 
         # Process Files
@@ -483,8 +484,6 @@ class SuiteRunner(Runner):
                        no_overwrite_mode=opts.no_overwrite_mode)
 
         # Process Jinja2 configuration
-        for k, v in constants.items():
-            config.set(["jinja2:" + self.suite_engine_proc.SUITE_CONF, k], v)
         self.config_pm(config, "jinja2")
 
         # Register the suite

@@ -21,6 +21,7 @@
 
 from rose.config_processor import ConfigProcessorBase
 import os
+from tempfile import TemporaryFile
 
 
 class ConfigProcessorForJinja2(ConfigProcessorBase):
@@ -41,7 +42,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             f.write("#!" + self.KEY + "\n")
             for k, n in sorted(node.value.items()):
                 if not n.is_ignored():
-                    f.write("{%% set %s=%s %%}\n" % (key, node.value))
+                    f.write("{%% set %s=%s %%}\n" % (k, n.value))
             for line in open(target):
                 if line.rstrip().lower() != ("#!" + self.KEY):
                     f.write(line)
