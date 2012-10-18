@@ -832,6 +832,7 @@ class ConfigDataManager(object):
             ns_sections.setdefault(ns, [])
             if sect not in ns_sections[ns]:
                 ns_sections[ns].append(sect)
+        var_ns_sections = copy.deepcopy(ns_sections)
         for section in config_data.sections.get_all():
             ns = self.get_default_namespace_for_section(
                                   section.name, config_name)
@@ -845,6 +846,9 @@ class ConfigDataManager(object):
                 metadata = self.get_metadata_for_config_id(ns_sections[ns][0],
                                                            config_name)
                 for key, value in metadata.items():
+                    if ns in var_ns_sections and key == rose.META_PROP_TITLE:
+                        # ns applies to variables, not a section - skip title.
+                        continue
                     self.namespace_meta_lookup[ns].setdefault(key, value)
         file_ns_bit = "/" + rose.SUB_CONFIG_FILE_DIR + "/"
         for ns, prop_map in self.namespace_meta_lookup.items():
