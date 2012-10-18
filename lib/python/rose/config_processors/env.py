@@ -33,12 +33,12 @@ class ConfigProcessorForEnv(ConfigProcessorBase):
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Export environment variables in an env section in "config"."""
-        if config.get([item], no_ignore=True) is None:
+        env_node = config.get([item], no_ignore=True)
+        if env_node is None:
             return
         if os.environ.has_key("UNDEF"):
             os.environ.pop("UNDEF")
         environ = {}
-        env_node = config.get([item], no_ignore=True)
         if env_node and not env_node.state:
             for key, node in env_node.value.iteritems():
                 if node.state:
