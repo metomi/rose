@@ -34,6 +34,7 @@ from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter, ReporterContext
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
+import socket
 import shutil
 import sys
 from tempfile import TemporaryFile
@@ -397,6 +398,12 @@ class SuiteRunner(Runner):
             self.fs_util.chdir(opts.conf_dir)
             opts.conf_dir = None
 
+        # Automatic Rose constants
+        for k, v in {"ROSE_ORIG_HOST": socket.gethostname()}.items():
+            config.set(["env", k], v)
+            config.set(["jinja2:" + self.suite_engine_proc.SUITE_CONF, k],
+                       '"' + v + '"')
+
         suite_name = opts.name
         if not opts.name:
             suite_name = os.path.basename(os.getcwd())
@@ -477,20 +484,7 @@ class SuiteRunner(Runner):
                        no_overwrite_mode=opts.no_overwrite_mode)
 
         # Process Jinja2 configuration
-        for key, node in sorted(config.value.items()):
-            if node.is_ignored() or not key.startswith("jinja2:"):
-                continue
-            target = key[len("jinja2:"):]
-            jinja2_str = self.config_pm(config, key)
-            if jinja2_str:
-                f = TemporaryFile()
-                f.write("#!jinja2\n" + jinja2_str)
-                for line in open(target):
-                    if line.rstrip().lower() != "#!jinja2":
-                        f.write(line)
-                f.seek(0)
-                open(target, "w").write(f.read())
-                f.close()
+        self.config_pm(config, "jinja2")
 
         # Register the suite
         self.suite_engine_proc.validate(suite_name)
@@ -624,10 +618,10 @@ class SuiteRunner(Runner):
                 continue
             for line in node.value.split("\n"):
                 pattern, value = line.strip().split("=", 1)
-                if pattern.startswith("jinja2:suite.rc:"):
-                    key = pattern[len("jinja2:suite.rc:"):]
-                    p_node = conf.get(["jinja2:suite.rc", key], no_ignore=True)
-                    # Values in "jinja2:suite.rc" section are quoted.
+                if pattern.startswith("jinja2:"):
+                    section, key = pattern.rsplit(":", 1)
+                    p_node = conf.get([section, key], no_ignore=True)
+                    # Values in "jinja2:*" section are quoted.
                     pattern = ast.literal_eval(p_node.value)
                 if fnmatchcase(host, pattern):
                     return value.strip()
