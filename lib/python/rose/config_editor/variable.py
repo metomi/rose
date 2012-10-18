@@ -114,21 +114,28 @@ class VariableWidget(object):
                 widget_path, widget_args = info[0], []
             files = self.var_ops.get_var_metadata_files(variable)
             lib = os.path.join("lib", "python", "widget")
+            is_builtin = False
             module_name = ".".join(widget_path.split(".")[:-1])
+            if module_name.startswith("rose."):
+                is_builtin = True
             class_name = widget_path.split(".")[-1]
             widget_fpath = os.path.join(lib, *widget_path.split(".")[:-1])
             widget_fpath += ".py"
             module_files = [f for f in files if f.endswith(widget_fpath)]
-            if not module_files:
+            if not module_files and not is_builtin:
                 self.handle_bad_valuewidget(w_val, variable, set_value)
             else:
-                module_dir = os.path.dirname(module_files.pop())
-                sys.path.insert(0, module_dir)
+                if not is_builtin:
+                    module_dir = os.path.dirname(module_files.pop())
+                    sys.path.insert(0, module_dir)
                 try:
-                    module = __import__(module_name)
+                    module = __import__(module_name, globals(), locals(),
+                                        [], 0)
                 except Exception as e:
                     self.handle_bad_valuewidget(str(e), variable, set_value)
                 else:
+                    for submodule in module_name.split(".")[1:]:
+                        module = getattr(module, submodule)
                     contents = inspect.getmembers(module)
                     for obj_name, obj in contents:
                         if obj_name == class_name and inspect.isclass(obj):
@@ -147,7 +154,8 @@ class VariableWidget(object):
                         text = rose.config_editor.ERROR_IMPORT_CLASS.format(
                                                                class_name)
                         self.handle_bad_valuewidget(text, variable, set_value)
-                sys.path.pop(0)
+                if not is_builtin:
+                    sys.path.pop(0)
         else:
             widget_maker = rose.config_editor.valuewidget.chooser(
                                 variable.value, variable.metadata,
