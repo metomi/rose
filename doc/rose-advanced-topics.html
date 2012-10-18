@@ -65,8 +65,8 @@
 default = hello.exe
 
 [env]
-LANG_JUPITER = Ionian
 MAX_TARGETS = 5
+LANG_JUPITER = Europan
 WORLD = Mars
 
 </pre>
@@ -131,7 +131,7 @@ type = integer
     the value of <var>MAX_TARGETS</var> now appears in a special numeric
     widget, and that the title has replaced the name. You can see the
     difference easily by switching metadata off and on (toggle
-    <code>View</code> Menu -&gt; View Without Metadata).</p>
+    <code>Metadata</code> Menu -&gt; Switch off Metadata).</p>
 
     <p>Setting the type does more than change the widget - it also instructs
     Rose to check that the input is valid for that type. If the value of
@@ -140,8 +140,8 @@ type = integer
 
     <p>We've set the type of <var>MAX_TARGETS</var> to <samp>integer</samp>,
     but we haven't ruled out choices of integer that would crash our code, such
-    as negative integers. We need to restrict the number using a range -
-    add:</p>
+    as negative integers. We need to restrict the number using a range. To do
+    this add a range as follows:</p>
     <pre>
 [env=MAX_TARGETS]
 range = 0:
@@ -150,10 +150,10 @@ type = integer
 </pre>
 
     <p>This means that any integer less than zero will be flagged as a problem.
-    Try decreasing the value of <var>MAX_TARGETS</var> below zero. An error
-    will be flagged next to the variable and on the page list in the left hand
-    panel. If you change it to a positive or zero integer value, the error will
-    go away.</p>
+    With the Metadata switched on, try decreasing the value of <var>MAX_TARGETS
+    </var> below zero. An error will be flagged next to the variable and on the
+    page list in the left hand panel. If you change it to an integer value of
+    zero or greater, the error will go away.</p>
 
     <p>Let's now make <var>env=WORLD</var> less ambiguous. Create a section in
     the metadata</p>
@@ -174,7 +174,7 @@ title = World
 
     <p>We'll decide to be harsh about grammar and insist that the first letter
     of <var>WORLD</var> be capitalised. To do this, we can use a very simple
-    regular expression - add:</p>
+    regular expression by adding a pattern:</p>
     <pre>
 [env=WORLD]
 description = Choose your target world to say hello to.
@@ -187,7 +187,7 @@ title = World
 
     <p>Alternatively, we could just give a list of valid world names - this
     means we won't need a regular expression or any other type information.
-    Let's remove the pattern and add:</p>
+    Let's remove the pattern and add a list of values:</p>
     <pre>
 [env=WORLD]
 description = Choose your target world to say hello to.
@@ -213,6 +213,8 @@ description = Choose your target world to say hello to.
 title = World
 trigger = env=LANG_JUPITER: Jupiter
 values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+
+[env=LANG_JUPITER]
 </pre>
 
     <p>This means that <var>LANG_JUPITER</var> will be <em>ignored</em> when
