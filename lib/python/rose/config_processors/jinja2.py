@@ -32,8 +32,8 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
         """Process jinja2:* sections in "config"."""
         for key, node in sorted(config.value.items()):
             if (node.is_ignored() or
-                    not key.startswith(self.PREFIX) or
-                    not node.value):
+                not key.startswith(self.PREFIX) or
+                not node.value):
                 continue
             target = key[len(self.PREFIX):]
             if not os.access(target, os.F_OK | os.R_OK | os.W_OK):
