@@ -35,7 +35,7 @@ class ChoicesValueWidget(gtk.HBox):
 
     """This represents a value as actual/available choices.
     
-    Arguments are standard, except for the custom widget_args argument,
+    Arguments are standard, except for the custom arg_str argument,
     set in the metadata. In this case we take a shell command-like
     syntax:
 
@@ -77,46 +77,26 @@ class ChoicesValueWidget(gtk.HBox):
     OPTIONS = {"all_group": [
                        ["--all-group"],
                        {"action": "store",
-                        "metavar": "CHOICE",
-                        "help": "Specify the CHOICE that includes all other" +
-                                " choices. For example: ALL, STANDARD."}],
+                        "metavar": "CHOICE"}],
                "choices": [
                        ["--choices"],
                        {"action": "append",
                         "default": [],
-                        "metavar": "CHOICE",
-                        "help": "Add a comma-delimited list of choice(s) " +
-                                "to the list of available choices for the " +
-                                "widget. This option can be used " +
-                                "repeatedly."}],
+                        "metavar": "CHOICE"}],
                "editable": [
                        ["--editable"],
                        {"action": "store_true",
-                        "default": False,
-                        "help": "Allow custom choices to be entered."}],
+                        "default": False}],
                "format": [
                        ["--format"],
                        {"action": "store",
-                        "metavar": "FORMAT",
-                        "help": "Specify a different format to convert the " +
-                                "list of included choices into the " + 
-                                "value.\n" +
-                                "The only supported format is 'python' " + 
-                                "which outputs the result of repr(my_list) " +
-                                " - e.g. VARIABLE=['A', 'B'].\n" +
-                                "If not specified, the format will default " +
-                                "to rose array standard e.g. " +
-                                "VARIABLE=A, B."}],
+                        "metavar": "FORMAT"}],
                "guess_groups": [
                        ["--guess-groups"],
                        {"action": "store_true",
-                        "default": False,
-                        "help": "Extrapolate inter-choice dependencies " +
-                                "from their names. For example, this would " +
-                                "guess that 'LINUX' would trigger " +
-                                "'LINUX_QUICK'."}]}
+                        "default": False}]}
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(ChoicesValueWidget, self).__init__(homogeneous=False,
                                                  spacing=0)
         self.value = value
@@ -127,7 +107,7 @@ class ChoicesValueWidget(gtk.HBox):
         self.opt_parser = rose.opt_parse.RoseOptionParser()
         self.opt_parser.OPTIONS = self.OPTIONS
         self.opt_parser.add_my_options(*self.OPTIONS.keys())
-        opts, args = self.opt_parser.parse_args(shlex.split(widget_args))
+        opts, args = self.opt_parser.parse_args(shlex.split(arg_str))
         self.all_group = opts.all_group
         self.groups = []
         for choices in opts.choices:

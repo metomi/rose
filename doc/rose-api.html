@@ -134,7 +134,7 @@ class UsernameValueWidget(gtk.HBox):
 
     """This class generates a widget for entering usernames."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(UsernameValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
@@ -270,7 +270,7 @@ class UsernameValueWidget(gtk.HBox):
 
     """This class generates a widget for entering usernames."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(UsernameValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
@@ -365,7 +365,7 @@ widget[config-edit]=module_name.AreaCodeChooser
     <pre>
 class AreaCodeChooser(gtk.HBox):
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None)
+    def __init__(self, value, metadata, set_value, hook, arg_str=None)
 </pre>
 
     <p>with the following arguments</p>
@@ -404,14 +404,14 @@ set_value("20")
       <code>rose.config_editor.valuewidget.ValueWidgetHook</code> containing
       callback functions that you should connect some of your widgets to.</dd>
 
-      <dt><code>widget_args</code></dt>
+      <dt><code>arg_str</code></dt>
 
       <dd>
         is an optional argument that stores any text given after the widget in
         the metadata:
         <pre>
 widget[config-edit] = modulename.ClassName arg1 arg2 arg3 ...
-</pre>would give a <code>widget_args</code> of <code>"arg1 arg2 arg3
+</pre>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
 ..."</code>. This could help configure your widget - for example, for a table
 based widget, you might give the column names:
         <pre>

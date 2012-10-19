@@ -31,7 +31,7 @@ class IntSpinButtonValueWidget(gtk.HBox):
 
     WARNING_MESSAGE = 'Warning:\n  variable value: {0}\n  widget value: {1}'
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(IntSpinButtonValueWidget, self).__init__(homogeneous=False,
                                                        spacing=0)
         self.value = value
