@@ -20,6 +20,8 @@
 """Process a section in a rose.config.ConfigNode into a Jinja2 template."""
 
 from rose.config_processor import ConfigProcessorBase
+import os
+from tempfile import TemporaryFile
 
 
 class ConfigProcessorForJinja2(ConfigProcessorBase):
@@ -27,11 +29,23 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
     KEY = "jinja2"
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
-        """Return a Jinja2 template string for a section in "config"."""
-        ret = ""
-        section = config.get([item], no_ignore=True)
-        if section is not None:
-            for key, node in sorted(section.value.items()):
-                if not node.is_ignored():
-                    ret += "{%% set %s=%s %%}\n" % (key, node.value)
-        return ret
+        """Process jinja2:* sections in "config"."""
+        for key, node in sorted(config.value.items()):
+            if (node.is_ignored() or
+                not key.startswith(self.PREFIX) or
+                not node.value):
+                continue
+            target = key[len(self.PREFIX):]
+            if not os.access(target, os.F_OK | os.R_OK | os.W_OK):
+                continue
+            f = TemporaryFile()
+            f.write("#!" + self.KEY + "\n")
+            for k, n in sorted(node.value.items()):
+                if not n.is_ignored():
+                    f.write("{%% set %s=%s %%}\n" % (k, n.value))
+            for line in open(target):
+                if line.rstrip().lower() != ("#!" + self.KEY):
+                    f.write(line)
+            f.seek(0)
+            open(target, "w").write(f.read())
+            f.close()
