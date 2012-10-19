@@ -278,6 +278,8 @@ class DAO(object):
         statement = from_obj.select(whereclause=where)
         rows = self._execute(statement)
         results = self._rows_to_maps(rows, list(from_obj.c))
+        if not results:
+            return []
         return results[0]
 
     def query(self, filters, all_revs=False):

@@ -44,9 +44,12 @@ class Lookup(object):
 
     def get_id_from_section_option(self, section, option):
         """Return a variable id from a section and option."""
-        var_id = section + rose.CONFIG_DELIMITER + option
-        self.section_option_id_lookup[var_id] = (section, option)
-        return var_id
+        if option is None:
+            id_ = section
+        else:
+            id_ = section + rose.CONFIG_DELIMITER + option
+        self.section_option_id_lookup[id_] = (section, option)
+        return id_
 
     def get_section_option_from_id(self, var_id):
         """Return a section and option from a variable id.
