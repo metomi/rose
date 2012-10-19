@@ -34,6 +34,8 @@
 #     - string beginning with "http": url
 #     - string not beginning with "http": search
 #
+#     If using a url remember to put it in quotes.
+#
 #     The default output format includes a local working copy status field 
 #     (%local) in the first column.
 #     A blank field means there is no related suite checked out.
