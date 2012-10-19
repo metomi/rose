@@ -29,7 +29,7 @@ class RadioButtonsValueWidget(gtk.HBox):
 
     """This is a class to represent a value as radio buttons."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(RadioButtonsValueWidget, self).__init__(homogeneous=False,
                                                       spacing=0)
         self.value = value

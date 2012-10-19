@@ -35,7 +35,7 @@ class FileChooserValueWidget(gtk.HBox):
 
     """This class displays a path, with an open dialog to define a new one."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(FileChooserValueWidget, self).__init__(homogeneous=False,
                                                      spacing=0)
         self.value = value
@@ -104,7 +104,7 @@ class FileEditorValueWidget(gtk.HBox):
 
     FILE_PROTOCOL = "file://{0}"
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(FileEditorValueWidget, self).__init__(homogeneous=False,
                                                      spacing=0)
         self.value = value
