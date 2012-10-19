@@ -463,12 +463,15 @@ def delete(argv):
                 skip_prompt = True
             elif response != 'y':
                 continue
-        try:
+        if opts.debug_mode:
             client.delete(arg, opts.local_only)
-        except (LocalCopyStatusError, RosePopenError) as e:
-            client.event_handler(e)
-            if not opts.force_mode:
-                sys.exit(1)
+        else:    
+            try:
+                client.delete(arg, opts.local_only)
+            except (LocalCopyStatusError, RosePopenError) as e:
+                client.event_handler(e)
+                if not opts.force_mode:
+                    sys.exit(1)
 
 
 def main():
