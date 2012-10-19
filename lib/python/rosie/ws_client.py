@@ -258,7 +258,7 @@ def lookup(argv):
             results, url = ws_client.search(args, all_revs=True)
         else:
             results, url = ws_client.search(args)
-    if results is not None:    
+    if results is not None:
         return _display_maps(opts, ws_client, results, url)
 
 
