@@ -27,6 +27,7 @@ import gtk
 
 import rose.config_editor
 import rose.gtk.choice
+import rose.opt_parse
 import rose.variable
 
 
@@ -42,17 +43,21 @@ class ChoicesValueWidget(gtk.HBox):
     #     rose.config_editor.valuewidget.choice.ChoicesValueWidget
     #
     # SYNOPSIS
-    #     rose...Widget [OPTIONS] [CHOICE ...] [CUSTOM_CHOICE_HINT? ...]
+    #     rose...Widget [OPTIONS] [CUSTOM_CHOICE_HINT ...]
     #
     # DESCRIPTION
     #     Represent available choices as a widget.
     #
     # OPTIONS
-    #     --all-group
-    #         The name of the CHOICE that includes all other CHOICES.
+    #     --all-group=CHOICE
+    #         The CHOICE that includes all other choices.
     #         For example: ALL, STANDARD
+    #     --choices=CHOICE1[,CHOICE2,CHOICE3...]
+    #         Add a comma-delimited list of choice(s) to the list of 
+    #         available choices for the widget.
+    #         This option can be used repeatedly.
     #     --editable
-    #         Allow custom choices to be entered that are not in CHOICE
+    #         Allow custom choices to be entered that are not in choices
     #     --format=FORMAT
     #         Specify a different format to convert the list of included
     #         choices into the variable value.
@@ -65,14 +70,51 @@ class ChoicesValueWidget(gtk.HBox):
     #         For example, this would guess that "LINUX" would trigger
     #         "LINUX_QUICK".
     #
-    # CHOICE
-    #     A valid, available choice for the user to select.
-    #     This cannot end with a question mark.
-    #
     # CUSTOM_CHOICE_HINT
-    #     A custom choice hint for the user, valid with --editable.
-    #     This must be suffixed with a question mark.
+    #     Optional custom choice hints for the user, valid with --editable.
     """
+
+    OPTIONS = {"all_group": [
+                       ["--all-group"],
+                       {"action": "store",
+                        "metavar": "CHOICE",
+                        "help": "Specify the CHOICE that includes all other" +
+                                " choices. For example: ALL, STANDARD."}],
+               "choices": [
+                       ["--choices"],
+                       {"action": "append",
+                        "default": [],
+                        "metavar": "CHOICE",
+                        "help": "Add a comma-delimited list of choice(s) " +
+                                "to the list of available choices for the " +
+                                "widget. This option can be used " +
+                                "repeatedly."}],
+               "editable": [
+                       ["--editable"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Allow custom choices to be entered."}],
+               "format": [
+                       ["--format"],
+                       {"action": "store",
+                        "metavar": "FORMAT",
+                        "help": "Specify a different format to convert the " +
+                                "list of included choices into the " + 
+                                "value.\n" +
+                                "The only supported format is 'python' " + 
+                                "which outputs the result of repr(my_list) " +
+                                " - e.g. VARIABLE=['A', 'B'].\n" +
+                                "If not specified, the format will default " +
+                                "to rose array standard e.g. " +
+                                "VARIABLE=A, B."}],
+               "guess_groups": [
+                       ["--guess-groups"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Extrapolate inter-choice dependencies " +
+                                "from their names. For example, this would " +
+                                "guess that 'LINUX' would trigger " +
+                                "'LINUX_QUICK'."}]}
 
     def __init__(self, value, metadata, set_value, hook, widget_args=None):
         super(ChoicesValueWidget, self).__init__(homogeneous=False,
@@ -82,31 +124,19 @@ class ChoicesValueWidget(gtk.HBox):
         self.set_value = set_value
         self.hook = hook
 
-        self.value_format = None
-        self.should_guess_groups = False
-        self.all_group = None
-        self.should_edit = False
-        widget_args = shlex.split(widget_args)
+        self.opt_parser = rose.opt_parse.RoseOptionParser()
+        self.opt_parser.OPTIONS = self.OPTIONS
+        self.opt_parser.add_my_options(*self.OPTIONS.keys())
+        opts, args = self.opt_parser.parse_args(shlex.split(widget_args))
+        self.all_group = opts.all_group
         self.groups = []
-        self.hints = []
-        for arg in list(widget_args):
-            if arg.startswith("--all-group="):
-                self.all_group = arg.replace("--all-group=", "", 1)
-                widget_args.remove(arg)
-            if arg == "--editable":
-                self.should_edit = True
-                widget_args.remove(arg)
-            if arg.startswith("--format="):
-                self.value_format = arg.replace("--format=", "", 1)
-                widget_args.remove(arg)
-            if arg == "--guess-groups":
-                self.should_guess_groups = True
-                widget_args.remove(arg)
-            if not arg.startswith("-"):
-                if arg.endswith("?"):
-                    self.hints.append(arg[:-1])
-                else:
-                    self.groups.append(arg)
+        for choices in opts.choices:
+            self.groups.extend(rose.variable.array_split(choices))
+        self.should_edit = opts.editable
+        self.value_format = opts.format
+        self.should_guess_groups = opts.guess_groups
+        self.hints = list(args)
+
         self.should_show_kinship = self._calc_should_show_kinship()
         list_vbox = gtk.VBox()
         list_vbox.show()
