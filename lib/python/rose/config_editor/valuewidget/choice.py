@@ -137,6 +137,11 @@ class ChoicesValueWidget(gtk.HBox):
             add_widget = self._get_add_widget()
             tree_vbox.pack_end(add_widget, expand=False, fill=False)
         self.pack_start(tree_vbox, expand=True, fill=True)
+        self._listview.connect('focus-in-event',
+                               self.hook.trigger_scroll)
+        self._treeview.connect('focus-in-event',
+                               self.hook.trigger_scroll)
+        self.grab_focus = lambda : self.hook.get_focus(self._listview)
 
     def _handle_search(self, name):
         return False
