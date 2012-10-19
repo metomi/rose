@@ -198,7 +198,6 @@ class MainController(object):
         loader_update(rose.config_editor.LOAD_DONE, self.data.top_level_name)
         self.perform_startup_check()
 
-
 #------------------ Setting up main component functions ----------------------
 
     def generate_toolbar(self):
