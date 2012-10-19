@@ -28,6 +28,7 @@ import gtk
 import rose.config
 import rose.config_editor.variable
 import rose.formats
+import rose.gtk.choice
 import rose.variable
 
 
@@ -190,10 +191,12 @@ class PageFormatTree(gtk.VBox):
         self._ok_content_sections = set([None])
         treeviews_hbox = gtk.HPaned()
         treeviews_hbox.show()
-        self._internal_value_listview = FileListView(
+        self._internal_value_listview = rose.gtk.choice.ChoicesListView(
                                       self._set_content_value_listview,
                                       self._get_included_sections,
                                       self._handle_search)
+        self._internal_value_listview.set_tooltip_text(
+                       rose.config_editor.FILE_CONTENT_PANEL_TIP)
         frame = gtk.Frame()
         frame.show()
         frame.add(self._internal_value_listview)
@@ -203,10 +206,13 @@ class PageFormatTree(gtk.VBox):
         value_eb = gtk.EventBox()
         value_eb.show()
         value_vbox.pack_start(value_eb, expand=True, fill=True)
-        self._internal_avail_treeview = FileTreeView(
+        self._internal_avail_treeview = rose.gtk.choice.ChoicesTreeView(
                            self._set_content_avail_treeview,
                            self._get_included_sections,
-                           self._get_available_sections)
+                           self._get_available_sections,
+                           self._get_groups)
+        self._internal_avail_treeview.set_tooltip_text(
+                       rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP)
         avail_frame = gtk.Frame()
         avail_frame.show()
         avail_frame.add(self._internal_avail_treeview)
@@ -232,6 +238,13 @@ class PageFormatTree(gtk.VBox):
         ok_content_sections.sort(rose.config.sort_settings)
         ok_content_sections.sort(self._sort_settings_duplicate)
         return ok_content_sections
+
+    def _get_groups(self, name, avail_names):
+        """Return any groups in avail_names that supercede name."""
+        name_all = name.rsplit("(", 1)[0]  + "(:)"
+        if name_all in avail_names and name != name_all:
+            return [name_all]
+        return []
 
     def _handle_search(self, name):
         """Trigger a search for a section."""
@@ -270,359 +283,3 @@ class PageFormatTree(gtk.VBox):
     def refresh(self, var_id=None):
         """Reload the container - don't need this at the moment."""
         pass
-
-
-class FileListView(gtk.TreeView):
-
-    """Class to hold and display an ordered list of strings.
-
-    set_value is a function, accepting a new value string.
-    get_data is a function that accepts no arguments and returns an
-    ordered list of included names to display.
-    handle_search is a function that accepts a name and triggers a
-    search for it.
-
-    """
-
-    def __init__(self, set_value, get_data, handle_search):
-        super(FileListView, self).__init__()
-        self._set_value = set_value
-        self._get_data = get_data
-        self._handle_search = handle_search
-        self.enable_model_drag_dest(
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_MOVE)
-        self.enable_model_drag_source(
-                  gtk.gdk.BUTTON1_MASK,
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_MOVE)
-        self.connect("drag-data-get", self._handle_drag_get)
-        self.connect_after("drag-data-received",
-                           self._handle_drag_received)
-        self.set_rules_hint(True)
-        self.set_tooltip_text(
-                       rose.config_editor.FILE_CONTENT_PANEL_TIP)
-        self.connect("row-activated", self._handle_activation)
-        self.show()
-        col = gtk.TreeViewColumn()
-        col.set_title(rose.config_editor.FILE_CONTENT_PANEL_TITLE)
-        cell_text = gtk.CellRendererText()
-        col.pack_start(cell_text, expand=True)
-        col.set_cell_data_func(cell_text, self._set_cell_text)
-        self.append_column(col)
-        self._populate()
-
-    def _handle_activation(self, treeview, path, col):
-        """Handle a click on the main list view - start a search."""
-        iter_ = treeview.get_model().get_iter(path)
-        name = treeview.get_model().get_value(iter_, 0)
-        self._handle_search(name)
-        return False
-
-    def _handle_button_press(self, treeview, event):
-        """Handle a right click event on the main list view."""
-        if not hasattr(event, "button") or event.button != 3:
-            return False
-        pathinfo = treeview.get_path_at_pos(int(event.x),
-                                            int(event.y))
-        if pathinfo is None:
-            return False
-        path, col, cell_x, cell_y = pathinfo
-        iter_ = treeview.get_model().get_iter(path)
-        name = treeview.get_model().get_value(iter_, 0)  
-        self._popup_menu(name, event)
-        return False
-
-    def _handle_drag_get(self, treeview, drag, sel, info, time):
-        """Handle an outgoing drag request."""
-        model, iter_ = treeview.get_selection().get_selected()
-        text = model.get_value(iter_, 0)
-        sel.set_text(text)
-        model.remove(iter_)  # Triggers the 'row-deleted' signal, sets value
-        if not model.iter_n_children(None):
-            model.append([rose.config_editor.FILE_CONTENT_PANEL_EMPTY])
-
-    def _handle_drag_received(self, treeview, drag, x, y, sel, info,
-                                       time):
-        """Handle an incoming drag request."""
-        if sel.data is None:
-            return False
-        drop_info = treeview.get_dest_row_at_pos(x, y)
-        model = treeview.get_model()
-        if drop_info:
-            path, position = drop_info
-            if (position == gtk.TREE_VIEW_DROP_BEFORE or
-                position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
-                model.insert(path[0], [sel.data])
-            else:
-                model.insert(path[0] + 1, [sel.data])
-        else:
-            model.append([sel.data])
-            path = None
-        self._handle_reordering(model, path)
-
-    def _handle_reordering(self, model, path):
-        """Handle a drag-and-drop rearrangement in the main list view."""
-        ok_values = []
-        iter_ = model.get_iter_first()
-        num_entries = model.iter_n_children(None)
-        while iter_ is not None:
-            name = model.get_value(iter_, 0)
-            next_iter = model.iter_next(iter_)
-            if name == rose.config_editor.FILE_CONTENT_PANEL_EMPTY:
-                if num_entries > 1:
-                    model.remove(iter_)
-            else:
-                ok_values.append(name)
-            iter_ = next_iter
-        new_value = " ".join(ok_values)
-        self._set_value(new_value)
-
-    def _populate(self):
-        """Populate the main list view."""
-        values = self._get_data()
-        model = gtk.ListStore(str)
-        if not values:
-            values = [rose.config_editor.FILE_CONTENT_PANEL_EMPTY]
-        for value in values:
-            model.append([value])
-        model.connect_after("row-deleted", self._handle_reordering)
-        self.set_model(model)
-
-    def _set_cell_text(self, column, cell, model, r_iter):
-        name = model.get_value(r_iter, 0)
-        if name == rose.config_editor.FILE_CONTENT_PANEL_EMPTY:
-            cell.set_property("markup", "<i>" + name + "</i>")
-        else:
-            cell.set_property("markup", "<b>" + name + "</b>")
-
-    def refresh(self):
-        """Update the model values."""
-        self._populate()
-
-
-class FileTreeView(gtk.TreeView):
-
-    """Class to hold and display a tree of content.
-
-    set_value is a function, accepting a new value string.
-    get_data is a function that accepts no arguments and returns a
-    list of included names.
-    get_available_data is a function that accepts no arguments and
-    returns a list of available names.
-
-    """
-
-    def __init__(self, set_value, get_data, get_available_data):
-        super(FileTreeView, self).__init__()
-        # Generate the 'available' sections view.
-        self._set_value = set_value
-        self._get_data = get_data
-        self._get_available_data = get_available_data
-        self.set_headers_visible(True)
-        self.set_rules_hint(True)
-        self.enable_model_drag_dest(
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_MOVE)
-        self.enable_model_drag_source(
-                  gtk.gdk.BUTTON1_MASK,
-                  [('text/plain', 0, 0)],
-                  gtk.gdk.ACTION_MOVE)
-        self.connect_after("button-release-event", self._handle_button)
-        self.connect("drag-begin", self._handle_drag_begin)
-        self.connect("drag-data-get", self._handle_drag_get)
-        self.connect("drag-end", self._handle_drag_end)
-        self._is_dragging = False
-        model = gtk.TreeStore(str, bool, bool)
-        self.set_model(model)
-        col = gtk.TreeViewColumn()
-        cell_toggle = gtk.CellRendererToggle()
-        cell_toggle.connect_after("toggled", self._handle_cell_toggle)
-        col.pack_start(cell_toggle, expand=False)
-        col.set_cell_data_func(cell_toggle, self._set_cell_state)
-        self.append_column(col)
-        col = gtk.TreeViewColumn()
-        col.set_title(rose.config_editor.FILE_CONTENT_PANEL_OPT_TITLE)
-        cell_text = gtk.CellRendererText()
-        col.pack_start(cell_text, expand=True)
-        col.set_cell_data_func(cell_text, self._set_cell_text)
-        self.append_column(col)
-        self.set_expander_column(col)
-        self.show()
-        self._populate()
-
-    def _populate(self):
-        """Populate the 'available' sections view."""
-        ok_content_sections = self._get_available_data()
-        self._ok_content_sections = set(ok_content_sections)
-        ok_values = self._get_data()
-        model = self.get_model()
-        sections_left = list(ok_content_sections)
-        level_iter = None
-        prev_name_all = None
-        self._name_iter_map = {}
-        while sections_left:
-            name = sections_left.pop(0)
-            name_base = name.rsplit("(", 1)[0]
-            name_all = name_base + "(:)"
-            is_in_value = name in ok_values
-            is_implicit = name_all in ok_values and name != name_all
-            if name == name_all:
-                iter_ = model.append(None, [name, is_in_value, is_implicit])
-                level_iter = iter_
-                prev_name_all = name_all
-            elif name_all != prev_name_all:
-                iter_ = model.append(None, [name, is_in_value, is_implicit])
-                level_iter = None
-            else:
-                iter_ = model.append(level_iter, [name, is_in_value,
-                                                  is_implicit])
-            self._name_iter_map[name] = iter_
-
-    def _realign(self):
-        """Refresh the states in the model."""
-        ok_values = self._get_data()
-        model = self.get_model()
-        for name, iter_ in self._name_iter_map.items():
-            is_in_value = name in ok_values
-            is_implicit = name.rsplit("(", 1)[0] + "(:)" in ok_values
-            if model.get_value(iter_, 1) != is_in_value:
-                model.set_value(iter_, 1, is_in_value)
-            if model.get_value(iter_, 2) != is_implicit:
-                model.set_value(iter_, 2, is_implicit)
-
-    def _set_cell_text(self, column, cell, model, r_iter):
-        """Set markup for a section depending on its status."""
-        section_name = model.get_value(r_iter, 0)
-        is_in_value = model.get_value(r_iter, 1)
-        is_implicit = model.get_value(r_iter, 2)
-        if section_name.endswith("(:)"):
-            r_iter = model.iter_children(r_iter)
-            while r_iter is not None:
-                if model.get_value(r_iter, 1) == True:
-                    is_in_value = True
-                    break
-                r_iter = model.iter_next(r_iter)
-        if is_in_value:
-            cell.set_property("markup", "<b>{0}</b>".format(section_name))
-            cell.set_property("sensitive", True)
-        elif is_implicit:
-            cell.set_property("markup", "{0}".format(section_name))
-            cell.set_property("sensitive", False)
-        else:
-            cell.set_property("markup", section_name)
-            cell.set_property("sensitive", True)
-
-    def _set_cell_state(self, column, cell, model, r_iter):
-        """Set the check box for a section depending on its status."""
-        is_in_value = model.get_value(r_iter, 1)
-        is_implicit = model.get_value(r_iter, 2)
-        if is_in_value:
-            cell.set_property("active", True)
-            cell.set_property("sensitive", True)
-        elif is_implicit:
-            cell.set_property("active", True)
-            cell.set_property("sensitive", False)
-        else:
-            cell.set_property("active", False)
-            cell.set_property("sensitive", True)
-            if not self._check_can_add(r_iter):
-                cell.set_property("sensitive", False)
- 
-    def _handle_drag_begin(self, widget, drag):
-        self._is_dragging = True
-
-    def _handle_drag_end(self, widget, drag):
-        self._is_dragging = False
-
-    def _handle_drag_get(self, treeview, drag, sel, info, time):
-        """Handle a drag data get."""
-        model, iter_ = treeview.get_selection().get_selected()
-        if not self._check_can_add(iter_):
-            return False
-        name = model.get_value(iter_, 0)
-        sel.set("text/plain", 8, name)
-
-    def _check_can_add(self, iter_):
-        """Check whether a name can be added to the data."""
-        model = self.get_model()
-        if model.get_value(iter_, 1) or model.get_value(iter_, 2):
-            return False
-        child_iter = model.iter_children(iter_)
-        while child_iter is not None:
-            if (model.get_value(child_iter, 1) or
-                model.get_value(child_iter, 2)):
-                return False
-            child_iter = model.iter_next(child_iter)
-        return True
-
-    def _handle_button(self, treeview, event):
-        """Connect a left click on the available section to a toggle."""
-        if event.button != 1 or self._is_dragging:
-            return False
-        pathinfo = treeview.get_path_at_pos(int(event.x),
-                                            int(event.y))
-        if pathinfo is None:
-            return False
-        path, col, cell_x, cell_y = pathinfo
-        iter_ = treeview.get_model().get_iter(path)
-        name = treeview.get_model().get_value(iter_, 0)
-        if treeview.get_columns().index(col) == 1:
-            self._handle_cell_toggle(None, path)
-
-    def _handle_cell_toggle(self, cell, path, should_turn_off=None):
-        """Change the content variable value here.
-        
-        cell is not used.
-        path is the name to turn off or on.
-        should_turn_off is as follows:
-               None - toggle based on the cell value
-               False - toggle on
-               True - toggle off
-
-        """
-        text_index = 0
-        model = self.get_model()
-        r_iter = model.get_iter(path)
-        this_name = model.get_value(r_iter, text_index)
-        ok_values = self._get_data()
-        model = self.get_model()
-        can_add = self._check_can_add(r_iter)
-        if ((should_turn_off is None or should_turn_off)
-            and this_name in ok_values):
-            ok_values.remove(this_name)
-            model.set_value(r_iter, 1, False)
-            if this_name.endswith("(:)"):
-                basename = this_name.rsplit("(", 1)[0]
-                self._toggle_internal_base(r_iter, basename, False)
-            self._set_value(" ".join(ok_values))
-        elif should_turn_off is None or not should_turn_off:
-            if not can_add:
-                return False
-            ok_values = ok_values + [this_name]
-            model.set_value(r_iter, 1, True)
-            if this_name.endswith("(:)"):
-                basename = this_name.rsplit("(", 1)[0]
-                self._toggle_internal_base(r_iter, basename, True)
-            self._set_value(" ".join(ok_values))
-        self._realign()
-        return False
-
-    def _toggle_internal_base(self, base_iter, base_name, added=False):
-        """Connect a toggle of xyz(:) to xyz(1), xyz(2), etc.
-        
-        base_iter is the iter pointing to xyz(:)
-        base_name is the name without brackets e.g. xyz
-        added is a boolean denoting toggle state
-
-        """
-        model = self.get_model()
-        iter_ = model.iter_children(base_iter)
-        while iter_ is not None:
-            model.set_value(iter_, 2, added)
-            iter_ = model.iter_next(iter_)
-        return False
-
-    def refresh(self):
-        """Refresh the model."""
-        self._realign()
