@@ -824,7 +824,7 @@ class ConfigDataManager(object):
                     value = meta_config[section][option].value
                     self.namespace_meta_lookup[namespace].update(
                                                             {option: value})
-        ns_sections = {}
+        ns_sections = {}  # Namespace-sections key value pairs.
         for variable in config_data.vars.get_all():
             ns = variable.metadata['full_ns']
             var_id = variable.metadata['id']
@@ -832,19 +832,28 @@ class ConfigDataManager(object):
             ns_sections.setdefault(ns, [])
             if sect not in ns_sections[ns]:
                 ns_sections[ns].append(sect)
+        default_ns_sections = {}
         for section in config_data.sections.get_all():
             ns = self.get_default_namespace_for_section(
                                   section.name, config_name)
             ns_sections.setdefault(ns, [])
             if section.name not in ns_sections[ns]:
                 ns_sections[ns].append(section.name)
+            default_ns_sections.setdefault(ns, [])
+            if section.name not in default_ns_sections[ns]:
+                default_ns_sections[ns].append(section.name)
         for ns in ns_sections:
             self.namespace_meta_lookup.setdefault(ns, {})
             self.namespace_meta_lookup[ns]['sections'] = ns_sections[ns]
             if len(ns_sections[ns]) == 1:
-                metadata = self.get_metadata_for_config_id(ns_sections[ns][0],
+                ns_section = ns_sections[ns][0]
+                metadata = self.get_metadata_for_config_id(ns_section,
                                                            config_name)
                 for key, value in metadata.items():
+                    if (ns_section not in default_ns_sections.get(ns, []) and
+                        key == rose.META_PROP_TITLE):
+                        # ns created from variables, not a section - no title.
+                        continue
                     self.namespace_meta_lookup[ns].setdefault(key, value)
         file_ns_bit = "/" + rose.SUB_CONFIG_FILE_DIR + "/"
         for ns, prop_map in self.namespace_meta_lookup.items():
