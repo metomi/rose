@@ -36,7 +36,7 @@ class ComboBoxValueWidget(gtk.HBox):
     FRAC_X_ALIGN = 0.9
     MAX_COLS = 5
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(ComboBoxValueWidget, self).__init__(homogeneous=False,
                                                   spacing=0)
         self.value = value

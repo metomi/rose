@@ -31,6 +31,7 @@ import meta
 import radiobuttons
 import text
 
+
 class ValueWidgetHook(object):
 
     """Provides hook functions for valuewidgets."""

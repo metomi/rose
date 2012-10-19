@@ -31,7 +31,7 @@ class QuotedTextValueWidget(gtk.HBox):
 
     """This class represents 'character' and 'quoted' types in an entry."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(QuotedTextValueWidget, self).__init__(homogeneous=False,
                                                    spacing=0)
         # Importing here prevents cyclic imports
