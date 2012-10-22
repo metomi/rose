@@ -384,7 +384,6 @@ def align(res, keys):
     if len(res) == 1:
         return res
     for k in keys:
-        unchanged = True
         max_len = max([len(res[i][k]) for i in range(len(res))])
         for r in res:
             if len(r[k]) < max_len:
