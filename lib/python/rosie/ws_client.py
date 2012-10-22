@@ -49,7 +49,7 @@ ERR_NO_TARGET_AT_REV = "{0}: target does not exist at this revision"
 ERR_SYNTAX = "Syntax error: {0}"
 ERR_USAGE = "rosie: incorrect usage"
 
-FORMAT_DEFAULT = "%local %suite\t%owner\t%project\t%title"
+FORMAT_DEFAULT = "%local %suite %owner %project %title"
 FORMAT_QUIET = "%suite"
 
 REC_COL_IN_FORMAT = re.compile("(?:^|[^%])%([\w-]+)")
@@ -379,6 +379,19 @@ def get_local_status(suites, prefix, idx, branch, revision):
     return status
 
 
+def align(res, keys):
+    """Function to align results to be displayed by display map"""
+    if len(res) == 1:
+        return res
+    for k in keys:
+        unchanged = True
+        max_len = max([len(res[i][k]) for i in range(len(res))])
+        for r in res:
+            if len(r[k]) < max_len:
+                r[k] = r[k] + " "*(max_len - len(r[k]))        
+    return res
+
+
 def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     """Display returned suite details."""
     report = Reporter(opts.verbosity - opts.quietness)
@@ -436,6 +449,14 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     dict_rows.sort(lambda x, y: cmp(x[opts.sort], y[opts.sort]))
     if opts.reverse:
         dict_rows.reverse()
+
+    keylist = []
+    for key, value in dict_rows[0].items():
+        if "%" + key in opts.format:
+            keylist.append(key)
+    
+    dict_rows = align(dict_rows, keylist)
+    
     for dict_row in dict_rows:
         out = opts.format
         for key, value in dict_row.items():
