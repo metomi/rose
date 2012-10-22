@@ -385,7 +385,6 @@ def align(res, keys):
         return res
     for k in keys:
         max_len = max([len(res[i].get(k,"%"+k)) for i in range(len(res))])
-        print str(k) + ": " + str(max_len)
         for r in res:
             r[k] = r.get(k, "%"+k) + " " * (max_len - len(r.get(k, "%"+k)))
     return res
