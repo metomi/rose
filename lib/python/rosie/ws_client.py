@@ -385,9 +385,10 @@ def align(res, keys):
         return res
     for k in keys:
         max_len = max([len(res[i][k]) for i in range(len(res))])
-        for r in res:
-            if len(r[k]) < max_len:
-                r[k] = r[k] + " "*(max_len - len(r[k]))        
+        if max_len > 0:
+            for r in res:
+                r[k] = r[k] + " " * (max_len - len(r[k]))
+                
     return res
 
 
