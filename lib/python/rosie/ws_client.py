@@ -384,11 +384,10 @@ def align(res, keys):
     if len(res) == 1:
         return res
     for k in keys:
-        max_len = max([len(res[i][k]) for i in range(len(res))])
-        if max_len > 0:
-            for r in res:
-                r[k] = r[k] + " " * (max_len - len(r[k]))
-                
+        max_len = max([len(res[i].get(k,"%"+k)) for i in range(len(res))])
+        print str(k) + ": " + str(max_len)
+        for r in res:
+            r[k] = r.get(k, "%"+k) + " " * (max_len - len(r.get(k, "%"+k)))
     return res
 
 
@@ -412,8 +411,11 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         opts.format = FORMAT_QUIET
     elif not opts.format:
         opts.format = FORMAT_DEFAULT
+    
+    all_keys = []
         
     common_keys = ws_client.get_common_keys()
+    all_keys += common_keys
     
     if local_suites == None:
         local_suites = get_local_suites(opts.prefix)
@@ -432,17 +434,14 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
                                                  dict_row["idx"],
                                                  dict_row["branch"],
                                                  dict_row["revision"])
+    all_keys += ["suite"]
+    all_keys += ["local"]
+                                                 
     more_keys = []
     for key in REC_COL_IN_FORMAT.findall(opts.format):
         if key not in ["suite"] + common_keys + ["local"]:
             more_keys.append(key)
-    if more_keys:
-        for dict_row in dict_rows:
-            info_rows = ws_client.info(dict_row["idx"],
-                                       dict_row["branch"],
-                                       dict_row["revision"])
-            for key, value in info_rows.items():
-                dict_row[key] = value
+
     if opts.sort is None or opts.sort not in (["suite"] + common_keys + 
                                                          more_keys):
         opts.sort = "revision"
@@ -450,8 +449,10 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     if opts.reverse:
         dict_rows.reverse()
 
+    all_keys += more_keys
+
     keylist = []
-    for key, value in dict_rows[0].items():
+    for key in all_keys:
         if "%" + key in opts.format:
             keylist.append(key)
     
