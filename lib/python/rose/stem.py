@@ -34,6 +34,99 @@ OPTIONS = ['confsource', 'diffsource', 'source', 'task', ]
 SUITE_RC_PREFIX = '[jinja2:suite.rc]'
 
 
+class ConfigSourceTreeSetEvent(Event):
+
+   """Event to report a source tree for config files."""
+   
+   LEVEL = Event.V
+   
+   def __repr__(self):
+       return "Using config files from source %s"%(self.args[0])
+
+   __str__ = __repr__
+
+
+class MultiplesTrunksSpecifiedException(Exception):
+
+    """Exception class when two trunks specified for the same project."""
+
+    def __init__(self, project):
+        self.project = project
+
+    def __repr__(self):
+        return "Attempted to add multiple trunks for project %s"%(self.project)
+
+    __str__ = __repr__
+
+
+class ProjectNotFoundException(Exception):
+
+    """Exception class when unable to determine project a source belongs to."""
+
+    def __init__(self, source, error=None):
+        self.source = source
+        self.error = error
+
+    def __repr__(self):
+        if self.error is not None:
+            return "Cannot ascertain project for source tree %s:\n%s"%(
+                      self.source, self.error) 
+        else:        
+            return "Cannot ascertain project for source tree %s"%(
+                    self.source) 
+
+    __str__ = __repr__
+
+
+class RoseSuiteConfNotFoundException(Exception):
+
+    """Exception class when unable to find rose-suite.conf."""
+
+    def __init__(self, location):
+        self.location = location
+
+    def __repr__(self):
+        return "\nCannot find a suite to run in %s"%(self.location)
+
+    __str__ = __repr__
+
+
+class SourceTreeAddedAsBranchEvent(Event):
+
+   """Event to report a source tree has been added as a branch."""
+   
+   LEVEL = Event.V
+   
+   def __repr__(self):
+       return "Source tree %s added as branch"%(self.args[0])
+
+   __str__ = __repr__
+
+
+class SourceTreeAddedAsTrunkEvent(Event):
+
+   """Event to report a source tree has been added as a trunk."""
+   
+   LEVEL = Event.V
+   
+   def __repr__(self):
+       return "Source tree %s added as trunk"%(self.args[0])
+
+   __str__ = __repr__
+
+
+class SuiteSelectionEvent(Event):
+
+   """Event to report a source tree for config files."""
+   
+   LEVEL = Event.V
+   
+   def __repr__(self):
+       return "Will run suite from %s"%(self.args[0])
+
+   __str__ = __repr__
+
+
 class StemRunner(object):
 
     """Set up options for running a STEM job through Rose."""
@@ -207,99 +300,6 @@ class StemRunner(object):
             self.opts.name = self._generate_name() 
             
         return self.opts
-
-
-class ConfigSourceTreeSetEvent(Event):
-
-   """Event to report a source tree for config files."""
-   
-   LEVEL = Event.V
-   
-   def __repr__(self):
-       return "Using config files from source %s"%(self.args[0])
-
-   __str__ = __repr__
-
-
-class MultiplesTrunksSpecifiedException(Exception):
-
-    """Exception class when two trunks specified for the same project."""
-
-    def __init__(self, project):
-        self.project = project
-
-    def __repr__(self):
-        return "Attempted to add multiple trunks for project %s"%(self.project)
-
-    __str__ = __repr__
-
-
-class ProjectNotFoundException(Exception):
-
-    """Exception class when unable to determine project a source belongs to."""
-
-    def __init__(self, source, error=None):
-        self.source = source
-        self.error = error
-
-    def __repr__(self):
-        if self.error is not None:
-            return "Cannot ascertain project for source tree %s:\n%s"%(
-                      self.source, self.error) 
-        else:        
-            return "Cannot ascertain project for source tree %s"%(
-                    self.source) 
-
-    __str__ = __repr__
-
-
-class RoseSuiteConfNotFoundException(Exception):
-
-    """Exception class when unable to find rose-suite.conf."""
-
-    def __init__(self, location):
-        self.location = location
-
-    def __repr__(self):
-        return "\nCannot find a suite to run in %s"%(self.location)
-
-    __str__ = __repr__
-
-
-class SourceTreeAddedAsBranchEvent(Event):
-
-   """Event to report a source tree has been added as a branch."""
-   
-   LEVEL = Event.V
-   
-   def __repr__(self):
-       return "Source tree %s added as branch"%(self.args[0])
-
-   __str__ = __repr__
-
-
-class SourceTreeAddedAsTrunkEvent(Event):
-
-   """Event to report a source tree has been added as a trunk."""
-   
-   LEVEL = Event.V
-   
-   def __repr__(self):
-       return "Source tree %s added as trunk"%(self.args[0])
-
-   __str__ = __repr__
-
-
-class SuiteSelectionEvent(Event):
-
-   """Event to report a source tree for config files."""
-   
-   LEVEL = Event.V
-   
-   def __repr__(self):
-       return "Will run suite from %s"%(self.args[0])
-
-   __str__ = __repr__
 
 
 def main():
