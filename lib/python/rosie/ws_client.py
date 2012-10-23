@@ -28,7 +28,6 @@ Functions:
 
 """
 
-
 import os
 import re
 import requests
@@ -163,7 +162,7 @@ class SuiteInfo(Event):
 
     def __str__(self):
         
-        time_format = "%Y-%m-%dT%H:%M:%SZ"    
+        time_format = "%Y-%m-%dT%H:%M:%S %Z"    
         dict_row = dict(self.args[0].items())
         out = ""
         out = out + "id: %s\n" % dict_row["idx"]
@@ -175,7 +174,7 @@ class SuiteInfo(Event):
                 if key == "date":    
                     out = (out + "\t" + key + ": " + 
                            time.strftime(time_format, 
-                                         time.gmtime(value)) + "\n") 
+                                         time.localtime(value)) + "\n") 
                 else:                                         
                     out = out + "\t" + key + ": " + str(value) + "\n"                                            
         return out
@@ -384,9 +383,19 @@ def align(res, keys):
     if len(res) == 1:
         return res
     for k in keys:
-        max_len = max([len(res[i].get(k,"%"+k)) for i in range(len(res))])
-        for r in res:
-            r[k] = r.get(k, "%"+k) + " " * (max_len - len(r.get(k, "%"+k)))
+        if k != "date":
+            try:
+                max_len = max([len(res[i].get(k,"%"+k)) 
+                               for i in range(len(res))])
+                for r in res:
+                    r[k] = r.get(k, "%"+k) + " " * (max_len - 
+                                                    len(r.get(k, "%"+k)))
+            except Exception:
+                pass
+        else:
+            time_format = "%Y-%m-%d %H:%M:%S %Z" #possibly put a T in
+            for r in res:
+                r[k] = time.strftime(time_format, time.localtime(r.get(k)))
     return res
 
 
@@ -434,7 +443,8 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
                                                  dict_row["branch"],
                                                  dict_row["revision"])
     all_keys += ["suite"]
-    all_keys += ["local"]
+    if check_local:
+        all_keys += ["local"]
                                                  
     more_keys = []
     for key in REC_COL_IN_FORMAT.findall(opts.format):
