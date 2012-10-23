@@ -386,12 +386,12 @@ def align(res, keys):
     for k in keys:
         if k != "date":
             try:
-                max_len = max([len(res[i].get(k,"%"+k)) 
+                max_len = max([len(res[i].get(k,"%" + k)) 
                                for i in range(len(res))])
                 for r in res:
-                    r[k] = r.get(k, "%"+k) + " " * (max_len - 
-                                                    len(r.get(k, "%"+k)))
-            except Exception:
+                    r[k] = r.get(k, "%" + k) + " " * (max_len -
+                                                      len(r.get(k, "%" + k)))
+            except (TypeError, KeyError):
                 pass
         else:
             time_format = "%Y-%m-%d %H:%M:%S %Z" #possibly put a T in
@@ -449,17 +449,15 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
                                                  
     more_keys = []
     for key in REC_COL_IN_FORMAT.findall(opts.format):
-        if key not in ["suite"] + common_keys + ["local"]:
+        if key not in all_keys:
             more_keys.append(key)
+    all_keys += more_keys
 
-    if opts.sort is None or opts.sort not in (["suite"] + common_keys + 
-                                                         more_keys):
+    if opts.sort is None or opts.sort not in all_keys:
         opts.sort = "revision"
     dict_rows.sort(lambda x, y: cmp(x[opts.sort], y[opts.sort]))
     if opts.reverse:
         dict_rows.reverse()
-
-    all_keys += more_keys
 
     keylist = []
     for key in all_keys:
