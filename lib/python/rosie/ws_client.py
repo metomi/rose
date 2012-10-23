@@ -49,7 +49,7 @@ ERR_NO_TARGET_AT_REV = "{0}: target does not exist at this revision"
 ERR_SYNTAX = "Syntax error: {0}"
 ERR_USAGE = "rosie: incorrect usage"
 
-FORMAT_DEFAULT = "%local %suite\t%owner\t%project\t%title"
+FORMAT_DEFAULT = "%local %suite %owner %project %title"
 FORMAT_QUIET = "%suite"
 
 REC_COL_IN_FORMAT = re.compile("(?:^|[^%])%([\w-]+)")
@@ -163,7 +163,7 @@ class SuiteInfo(Event):
 
     def __str__(self):
         
-        time_format = "%Y-%m-%dT%H:%M:%SZ"    
+        time_format = "%Y-%m-%dT%H:%M:%S %Z"    
         dict_row = dict(self.args[0].items())
         out = ""
         out = out + "id: %s\n" % dict_row["idx"]
@@ -175,7 +175,7 @@ class SuiteInfo(Event):
                 if key == "date":    
                     out = (out + "\t" + key + ": " + 
                            time.strftime(time_format, 
-                                         time.gmtime(value)) + "\n") 
+                                         time.localtime(value)) + "\n") 
                 else:                                         
                     out = out + "\t" + key + ": " + str(value) + "\n"                                            
         return out
@@ -379,6 +379,27 @@ def get_local_status(suites, prefix, idx, branch, revision):
     return status
 
 
+def align(res, keys):
+    """Function to align results to be displayed by display map"""
+    if len(res) == 1:
+        return res
+    for k in keys:
+        if k != "date":
+            try:
+                max_len = max([len(res[i].get(k,"%" + k)) 
+                               for i in range(len(res))])
+                for r in res:
+                    r[k] = r.get(k, "%" + k) + " " * (max_len -
+                                                      len(r.get(k, "%" + k)))
+            except (TypeError, KeyError):
+                pass
+        else:
+            time_format = "%Y-%m-%d %H:%M:%S %Z" #possibly put a T in
+            for r in res:
+                r[k] = time.strftime(time_format, time.localtime(r.get(k)))
+    return res
+
+
 def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     """Display returned suite details."""
     report = Reporter(opts.verbosity - opts.quietness)
@@ -399,8 +420,11 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         opts.format = FORMAT_QUIET
     elif not opts.format:
         opts.format = FORMAT_DEFAULT
+    
+    all_keys = []
         
     common_keys = ws_client.get_common_keys()
+    all_keys += common_keys
     
     if local_suites == None:
         local_suites = get_local_suites(opts.prefix)
@@ -419,23 +443,29 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
                                                  dict_row["idx"],
                                                  dict_row["branch"],
                                                  dict_row["revision"])
+    all_keys += ["suite"]
+    if check_local:
+        all_keys += ["local"]
+                                                 
     more_keys = []
     for key in REC_COL_IN_FORMAT.findall(opts.format):
-        if key not in ["suite"] + common_keys + ["local"]:
+        if key not in all_keys:
             more_keys.append(key)
-    if more_keys:
-        for dict_row in dict_rows:
-            info_rows = ws_client.info(dict_row["idx"],
-                                       dict_row["branch"],
-                                       dict_row["revision"])
-            for key, value in info_rows.items():
-                dict_row[key] = value
-    if opts.sort is None or opts.sort not in (["suite"] + common_keys + 
-                                                         more_keys):
+    all_keys += more_keys
+
+    if opts.sort is None or opts.sort not in all_keys:
         opts.sort = "revision"
     dict_rows.sort(lambda x, y: cmp(x[opts.sort], y[opts.sort]))
     if opts.reverse:
         dict_rows.reverse()
+
+    keylist = []
+    for key in all_keys:
+        if "%" + key in opts.format:
+            keylist.append(key)
+    
+    dict_rows = align(dict_rows, keylist)
+    
     for dict_row in dict_rows:
         out = opts.format
         for key, value in dict_row.items():
