@@ -22,10 +22,13 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
+import rose.config
 import rose.config_editor.variable
 import rose.formats
+import rose.variable
 
-class Table(gtk.Table):
+
+class PageTable(gtk.Table):
 
     """Return a widget table generated from panel_data.
 
@@ -40,9 +43,9 @@ class Table(gtk.Table):
     BORDER_WIDTH = rose.config_editor.SPACING_SUB_PAGE
 
     def __init__(self, panel_data, ghost_data, var_ops, show_modes):
-        super(Table, self).__init__(rows=self.MAX_ROWS,
-                                    columns=self.MAX_COLS,
-                                    homogeneous=False)
+        super(PageTable, self).__init__(rows=self.MAX_ROWS,
+                                     columns=self.MAX_COLS,
+                                     homogeneous=False)
         self.num_removes = 0
         self.panel_data = panel_data
         self.ghost_data = ghost_data
@@ -273,227 +276,7 @@ class Table(gtk.Table):
             done_variable_widgets.append(parent)
 
 
-class FileVBox(gtk.VBox):
-
-    """Return a custom container for file-level options."""
-
-    MAX_COLS_CONTENT = 2
-    MAX_COLS_SOURCE = 3
-    MAX_ROWS_CONTENT = 1
-    MAX_ROWS_SOURCE = 3
-    SPACING = rose.config_editor.SPACING_SUB_PAGE
-    CONTENT_LABEL = 'use internal data'
-    EMPTY_LABEL = 'file is empty'
-    RESOURCE_LABEL = 'use file from resource'
-
-    def __init__(self, panel_data, ghost_data, var_ops, show_modes,
-                 format_keys_func):
-        super(FileVBox, self).__init__(spacing=self.SPACING)
-        self.panel_data = panel_data
-        self.ghost_data = ghost_data
-        self.var_ops = var_ops
-        self.show_modes = show_modes
-        self.trigger_ask_for_config_keys = format_keys_func
-        format = [f for f in rose.formats.__dict__ if not f.startswith('__')]
-        original_data = self.panel_data
-        hbox = gtk.HBox(spacing=self.SPACING)
-        external_label = gtk.RadioButton(label=self.RESOURCE_LABEL)
-        self.external_frame = gtk.Frame()
-        self.external_frame.set_label_widget(external_label)
-        external_label.set_active(True)
-        if rose.FILE_VAR_SOURCE not in [x.name for x in self.panel_data]:
-            external_label.set_active(False)
-        external_label.connect('toggled',
-                               lambda b: self._type_toggle(b, table))
-        external_label.show()
-        table = self._make_and_insert_table()
-        if not external_label.get_active():
-            for widget in table.get_children():
-                widget.set_sensitive(False)
-        self.external_frame.show()
-        hbox.pack_start(self.external_frame, expand=True, fill=True,
-                        padding=self.SPACING)
-        hbox.show()
-        self.pack_start(hbox, expand=False, fill=False, padding=self.SPACING)
-        self.show()
-        for variable in self.panel_data + self.ghost_data:
-            if variable.name == rose.FILE_VAR_CONTENT:
-                break
-        else:
-            if not self.panel_data:
-                hbox.remove(self.external_frame)
-            return
-        content_format_frame = gtk.Frame()
-        content_format_label = gtk.RadioButton(external_label,
-                                               label=self.CONTENT_LABEL)
-        content_format_frame.set_label_widget(content_format_label)
-        content_format_frame.show()
-        content_format_label.show()
-        content_format_hbox = gtk.HBox(spacing=self.SPACING)
-        content_format_hbox.show()
-        content_format_table = gtk.Table(rows=self.MAX_ROWS_CONTENT,
-                                         columns=self.MAX_COLS_CONTENT,
-                                         homogeneous=False)
-        content_format_table.show()
-        for variable in self.panel_data + self.ghost_data:
-            if variable.name == rose.FILE_VAR_CONTENT:
-                break
-        variable.metadata.update(
-                 {rose.META_PROP_TYPE: rose.config_editor.FILE_TYPE_FORMATS})
-        config_key_func = (lambda:
-                           self.trigger_ask_for_config_keys())
-        variable.metadata.update({'values_getter': config_key_func})
-        for_widget = rose.config_editor.variable.VariableWidget(
-                                        variable, self.var_ops)
-        for_widget.insert_into(content_format_table,
-                               self.MAX_ROWS_CONTENT + 1,
-                               1)
-        for_widget.set_sensitive(False)
-        content_format_label.connect('toggled',
-                                     lambda b: self._type_toggle(
-                                                b, content_format_table))
-        content_format_frame.add(content_format_table)
-        content_format_hbox.pack_start(content_format_frame,
-                                       expand=True,
-                                       fill=True,
-                                       padding=self.SPACING)
-        self.pack_start(content_format_hbox, expand=False, fill=False,
-                        padding=self.SPACING)
-        empty_file_hbox = gtk.HBox()
-        empty_file_label = gtk.RadioButton(external_label,
-                                           label=self.EMPTY_LABEL)
-        empty_file_label.show()
-        empty_file_table = gtk.Table()
-        empty_file_table.show()
-        empty_file_hbox.pack_start(empty_file_label, expand=False,
-                                   fill=False, padding=self.SPACING)
-        empty_file_hbox.pack_start(empty_file_table, expand=True,
-                                   fill=True, padding=self.SPACING)
-        empty_file_hbox.show()
-        empty_file_label.connect('toggled',
-                                 lambda b: self._type_toggle(
-                                                    b, empty_file_table))
-        self.pack_start(empty_file_hbox, expand=False, fill=False,
-                        padding=self.SPACING)
-        for variable in self.panel_data + self.ghost_data:
-            if (variable.metadata.get(rose.META_PROP_COMPULSORY) ==
-                rose.META_PROP_VALUE_TRUE):
-                if (variable.name == rose.FILE_VAR_SOURCE or
-                    variable.name == rose.FILE_VAR_CHECKSUM or
-                    variable.name == rose.FILE_VAR_MODE):
-                    content_format_hbox.hide()
-                    empty_file_hbox.hide()
-                    break
-                elif variable.name == rose.FILE_VAR_CONTENT:
-                    hbox.hide()
-                    empty_file_hbox.hide()
-                    break
-        if (rose.FILE_VAR_SOURCE in [x.name for x in self.panel_data] and
-            (rose.FILE_VAR_SOURCE, '') not in
-            [(x.name, x.value) for x in self.panel_data]):
-            for variable in self.panel_data:
-                if (variable.name == rose.FILE_VAR_SOURCE and
-                    (variable.metadata.get(rose.META_PROP_TYPE) == 
-                     rose.config_editor.FILE_TYPE_INTERNAL)):
-                    content_format_label.set_sensitive(False)
-                    empty_file_label.set_sensitive(False)
-            external_label.set_active(True)
-        elif rose.FILE_VAR_CONTENT in [x.name for x in original_data]:
-            content_format_label.set_active(True)
-        else:
-            empty_file_label.set_active(True)
-        return
-
-    def _checksum_toggle(self, check, var_widget):
-        variable = var_widget.variable
-        if check.get_active():
-            if variable in self.ghost_data:
-                self.var_ops.add_var(variable)
-        else:
-            if variable in self.panel_data:
-                self.var_ops.remove_var(variable)
-        var_widget.update_status()
-
-    def _type_toggle(self, button, table):
-        if button.get_active():
-            for widget in table.get_children():
-                widget.set_sensitive(True)
-                var_keys = [x.name for x in self.panel_data]
-                if hasattr(widget.get_parent(), 'variable'):
-                    var = widget.get_parent().variable
-                    if (var.name not in var_keys and
-                        var.name != rose.FILE_VAR_CHECKSUM or 
-                        var.value != ''):
-                        self.var_ops.add_var(var)
-                        widget.get_parent().update_status()
-
-        else:
-            for widget in table.get_children():
-                widget.set_sensitive(False)
-                var_keys = [x.name for x in self.panel_data]
-                if hasattr(widget.get_parent(), 'variable'):
-                    var = widget.get_parent().variable
-                    if var.name in var_keys:
-                        self.var_ops.remove_var(widget.get_parent().variable)
-                        widget.get_parent().update_status()
-
-    def _make_and_insert_table(self):
-        table = gtk.Table(rows=self.MAX_ROWS_SOURCE,
-                          columns=self.MAX_COLS_SOURCE,
-                          homogeneous=False)
-        table.set_border_width(self.SPACING)
-        setattr(table, 'num_removes', 0)
-        r = 0
-        data = []
-        external_names_left = [rose.FILE_VAR_CHECKSUM, rose.FILE_VAR_MODE,
-                               rose.FILE_VAR_SOURCE]
-        variable_list = [v for v in self.panel_data + self.ghost_data]
-        my_cmp = lambda v1, v2: cmp(v1.name, v2.name)
-        variable_list.sort(my_cmp)
-        for variable in variable_list:
-            if (variable.name == rose.FILE_VAR_SOURCE and
-                (variable.metadata.get(rose.META_PROP_TYPE) == 
-                 rose.config_editor.FILE_TYPE_INTERNAL)):
-                external_names_left.remove(rose.FILE_VAR_MODE)
-                external_names_left.remove(rose.FILE_VAR_CHECKSUM)
-                break
-        for variable in variable_list:
-            if variable.name not in external_names_left:
-                continue
-            r += 1
-            external_names_left.remove(variable.name)
-            widget = rose.config_editor.variable.VariableWidget(
-                                        variable, self.var_ops)
-            widget.insert_into(table, self.MAX_COLS_SOURCE - 1, r + 1)
-            if variable.name == rose.FILE_VAR_CHECKSUM:
-                check_button = gtk.CheckButton()
-                check_button.var_widget = widget
-                check_button.set_active(variable in self.panel_data)
-                check_button.connect(
-                             'toggled',
-                             lambda c: self._checksum_toggle(c,
-                                                             c.var_widget))
-                check_button.connect(
-                             'state-changed',
-                             lambda c, s: s != gtk.STATE_INSENSITIVE and
-                                          self._checksum_toggle(c,
-                                                                c.var_widget))
-                check_button.show()
-                table.attach(check_button,
-                             self.MAX_COLS_SOURCE - 1, self.MAX_COLS_SOURCE,
-                             r + 1, r + 2,
-                             xoptions=gtk.SHRINK, yoptions=gtk.SHRINK)
-                                     
-        table.show()
-        self.external_frame.add(table)
-        return table
-
-    def refresh(self, var_id=None):
-        """Reload the container - don't need this at the moment."""
-        pass
-
-
-class LatentTable(gtk.Table):
+class PageLatentTable(gtk.Table):
 
     """Return a widget table generated from panel_data.
 
@@ -509,9 +292,9 @@ class LatentTable(gtk.Table):
     MAX_COLS = 3
 
     def __init__(self, panel_data, ghost_data, var_ops, show_modes):
-        super(LatentTable, self).__init__(rows=self.MAX_ROWS,
-                                    columns=self.MAX_COLS,
-                                    homogeneous=False)
+        super(PageLatentTable, self).__init__(rows=self.MAX_ROWS,
+                                     columns=self.MAX_COLS,
+                                     homogeneous=False)
         self.show()
         self.num_removes = 0
         self.panel_data = panel_data

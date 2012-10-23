@@ -23,19 +23,19 @@
 init <<'__CONFIG__'
 [namelist:near_cyclic_namelist]
 switch = .false.
-!!A = 2
-!!B = 2
-!!C = 2
-!!D = 2
-!!E = 2
-!!F = 2
+!!a = 2
+!!b = 2
+!!c = 2
+!!d = 2
+!!e = 2
+!!f = 2
 
 [namelist:dupl_nl(1)]
-A = .true.
+a = .true.
 
 [namelist:subject_nl]
-Atrig = 2
-Btrig = 3
+atrig = 2
+btrig = 3
 __CONFIG__
 #-------------------------------------------------------------------------------
 tests 12
@@ -46,32 +46,33 @@ setup
 init_meta <<__META_CONFIG__
 [namelist:near_cyclic_namelist=switch]
 type = logical
-trigger = namelist:near_cyclic_namelist=A: .true.
+trigger = namelist:near_cyclic_namelist=a: .true.
 
-[namelist:near_cyclic_namelist=A]
-trigger = namelist:near_cyclic_namelist=B;
-          namelist:near_cyclic_namelist=C;
-          namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=a]
+trigger = namelist:near_cyclic_namelist=b;
+          namelist:near_cyclic_namelist=c;
+          namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=B]
-trigger = namelist:near_cyclic_namelist=C;
-          namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=b]
+trigger = namelist:near_cyclic_namelist=c;
+          namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=C]
-trigger = namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=c]
+trigger = namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=D]
-trigger = namelist:near_cyclic_namelist=E; namelist:near_cyclic_namelist=F
+[namelist:near_cyclic_namelist=d]
+trigger = namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
 
-[namelist:near_cyclic_namelist=E]
-trigger = namelist:near_cyclic_namelist=F
+[namelist:near_cyclic_namelist=e]
+trigger = namelist:near_cyclic_namelist=f
 
-[namelist:near_cyclic_namelist=F]
+[namelist:near_cyclic_namelist=f]
 
 [namelist:dupl_nl]
 duplicate = true
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+cp $TEST_KEY.err /var/tmp/bfitz/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -82,25 +83,25 @@ setup
 init_meta <<__META_CONFIG__
 [namelist:near_cyclic_namelist=switch]
 type = logical
-trigger = namelist:near_cyclic_namelist=A: .true.
+trigger = namelist:near_cyclic_namelist=a: .true.
 
-[namelist:near_cyclic_namelist=A]
-trigger = namelist:near_cyclic_namelist=B;
-          namelist:near_cyclic_namelist=C;
-          namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=a]
+trigger = namelist:near_cyclic_namelist=b;
+          namelist:near_cyclic_namelist=c;
+          namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=B]
-trigger = namelist:near_cyclic_namelist=C;
-          namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=b]
+trigger = namelist:near_cyclic_namelist=c;
+          namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=C]
-trigger = namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=c]
+trigger = namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=D]
-trigger = namelist:near_cyclic_namelist=E; namelist:near_cyclic_namelist=F
+[namelist:near_cyclic_namelist=d]
+trigger = namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
 
-[namelist:near_cyclic_namelist=E]
-trigger = namelist:near_cyclic_namelist=F
+[namelist:near_cyclic_namelist=e]
+trigger = namelist:near_cyclic_namelist=f
 
 [namelist:dupl_nl]
 duplicate = true
@@ -109,7 +110,7 @@ run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [V] rose.macros.DefaultValidators: issues: 1
-    namelist:near_cyclic_namelist=F=2
+    namelist:near_cyclic_namelist=f=2
         No metadata entry found
 __CONTENT__
 teardown
@@ -120,27 +121,27 @@ setup
 init_meta <<__META_CONFIG__
 [namelist:near_cyclic_namelist=switch]
 type = logical
-trigger = namelist:near_cyclic_namelist=A: .true.
+trigger = namelist:near_cyclic_namelist=a: .true.
 
-[namelist:near_cyclic_namelist=A]
-trigger = namelist:near_cyclic_namelist=B;
-          namelist:near_cyclic_namelist=C;
-          namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=a]
+trigger = namelist:near_cyclic_namelist=b;
+          namelist:near_cyclic_namelist=c;
+          namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=B]
-trigger = namelist:near_cyclic_namelist=C;
-          namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=b]
+trigger = namelist:near_cyclic_namelist=c;
+          namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=C]
-trigger = namelist:near_cyclic_namelist=D
+[namelist:near_cyclic_namelist=c]
+trigger = namelist:near_cyclic_namelist=d
 
-[namelist:near_cyclic_namelist=D]
-trigger = namelist:near_cyclic_namelist=E; namelist:near_cyclic_namelist=F
+[namelist:near_cyclic_namelist=d]
+trigger = namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
 
-[namelist:near_cyclic_namelist=E]
-trigger = namelist:near_cyclic_namelist=F; namelist:near_cyclic_namelist=switch
+[namelist:near_cyclic_namelist=e]
+trigger = namelist:near_cyclic_namelist=f; namelist:near_cyclic_namelist=switch
 
-[namelist:near_cyclic_namelist=F]
+[namelist:near_cyclic_namelist=f]
 
 [namelist:dupl_nl]
 duplicate = true
@@ -150,7 +151,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [V] rose.macros.DefaultValidators: issues: 1
     namelist:near_cyclic_namelist=switch=.false.
-        Cyclic dependency detected: namelist:near_cyclic_namelist=A to namelist:near_cyclic_namelist=switch
+        Cyclic dependency detected: namelist:near_cyclic_namelist=a to namelist:near_cyclic_namelist=switch
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -161,14 +162,14 @@ init_meta <<__META_CONFIG__
 [namelist:dupl_nl]
 duplicate = true
 
-[namelist:dupl_nl=A]
-trigger = namelist:subject_nl=Atrig: .true.
+[namelist:dupl_nl=a]
+trigger = namelist:subject_nl=atrig: .true.
 __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [V] rose.macros.DefaultValidators: issues: 1
-    namelist:dupl_nl=A=None
+    namelist:dupl_nl=a=None
         Badly defined trigger - namelist:dupl_nl is 'duplicate'
 __CONTENT__
 teardown

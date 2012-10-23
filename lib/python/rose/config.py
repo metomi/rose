@@ -144,7 +144,7 @@ class ConfigNode(object):
                 yield (null_node_keys, node)
             else:
                 yield (node_keys, node)
-        
+
     def get(self, keys=[], no_ignore=False):
         """Return a node at the position of keys, if any.
 
@@ -174,6 +174,14 @@ class ConfigNode(object):
             else:
                 node = None
         return node
+
+    def get_value(self, keys=[], default=None):
+        """Return the value of a normal node at the position of keys, if any.
+
+        If the node does not exist or is ignored, return None.
+
+        """
+        return getattr(self.get(keys, no_ignore=True), "value", default)
 
     def set(self, keys=None, value=None, state=None, comments=None):
         """Set node properties at the position of keys, if any.

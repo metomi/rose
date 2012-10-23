@@ -34,7 +34,7 @@ class RawValueWidget(gtk.HBox):
 
     """This class generates a basic entry widget for an unformatted value."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(RawValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
@@ -91,7 +91,7 @@ class TextMultilineValueWidget(gtk.HBox):
 
     """This class displays text with multiple lines."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(TextMultilineValueWidget, self).__init__(homogeneous=False,
                                                        spacing=0)
         self.value = value

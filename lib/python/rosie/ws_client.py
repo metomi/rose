@@ -43,6 +43,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
 
+ERR_INVALID_URL = "Invalid url: {0}"
 ERR_NO_SUITES_FOUND = "{0}: no suites found."
 ERR_NO_TARGET_AT_REV = "{0}: target does not exist at this revision"
 ERR_SYNTAX = "Syntax error: {0}"
@@ -231,11 +232,15 @@ def lookup(argv):
     if opts.url:
         ws_client = Client()
         addr = args[0]
-        try:
+        if opts.debug_mode:
             results = ws_client.address_search(None,url=addr)
             url = addr
-        except QueryError as e:
-            results = []        
+        else:        
+            try:
+                results = ws_client.address_search(None,url=addr)
+                url = addr
+            except QueryError as e:
+                sys.exit(ERR_INVALID_URL.format(args[0]))
     elif opts.query:
         q = query_split(args)
         if q is None:
@@ -253,7 +258,7 @@ def lookup(argv):
             results, url = ws_client.search(args, all_revs=True)
         else:
             results, url = ws_client.search(args)
-    if results is not None:        
+    if results is not None:
         return _display_maps(opts, ws_client, results, url)
 
 

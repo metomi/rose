@@ -28,7 +28,7 @@ class FormatsChooserValueWidget(gtk.HBox):
 
     """This class allows the addition of section names to a variable value."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(FormatsChooserValueWidget, self).__init__(homogeneous=False,
                                                         spacing=0)
         self.value = value

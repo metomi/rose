@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-#-------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+#-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012 Met Office.
 # 
 # This file is part of Rose, a framework for scientific suites.
@@ -16,7 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
-# Alias of "rose suite-hook".
-#-------------------------------------------------------------------------------
-exec $(dirname $0)/rose-suite-hook "$@"
+#-----------------------------------------------------------------------------
+
+import chooser
+import standard

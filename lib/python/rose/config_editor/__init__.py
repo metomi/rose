@@ -132,12 +132,21 @@ VAR_MENU_URL = '_Web Help'
 
 # Button strings
 LABEL_EDIT = "edit"
+
 # Loading strings
 LOAD_CONFIG = "reading    "
 LOAD_DONE = "loading GUI"
 LOAD_METADATA = "configuring"
 LOAD_NUMBER_OF_EVENTS = 2
 LOAD_STATUSES = "checking   "
+
+# Widget strings
+
+CHOICE_LABEL_EMPTY = "(empty)"
+CHOICE_MENU_REMOVE = "Remove from list"
+CHOICE_TIP_ENTER_CUSTOM = "Enter a custom choice"
+CHOICE_TITLE_AVAILABLE = "Available"
+CHOICE_TITLE_INCLUDED = "Included"
 
 # Error and warning strings
 ERROR_ADD_FILE = "Could not add file {0}: {1}"
@@ -305,6 +314,7 @@ DIALOG_TITLE_CONFIG_CREATE = "Create configuration"
 DIALOG_TITLE_CRITICAL_ERROR = "Error"
 DIALOG_TITLE_EDIT_COMMENTS = "Edit comments for {0}"
 DIALOG_TITLE_ENABLE = "Enable section"
+DIALOG_TITLE_ERROR = "Error"
 DIALOG_TITLE_IGNORE = "Ignore section"
 DIALOG_TITLE_INFO = "Information"
 DIALOG_TITLE_OPEN = "Open configuration"
@@ -344,6 +354,8 @@ TITLE_FILE_PANEL = "Other files"
 SUMMARY_DATA_PANEL_IGNORED_MARKUP = "<b>{0}</b>"
 SUMMARY_DATA_PANEL_MAX_LEN = 15
 SUMMARY_DATA_PANEL_SECTION_TITLE = "Section"
+FILE_CONTENT_PANEL_OPT_TIP = "Content available for file."
+FILE_CONTENT_PANEL_TIP = "Content included in file"
 
 # Tooltip (hover-over) text
 

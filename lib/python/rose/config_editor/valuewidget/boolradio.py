@@ -30,7 +30,7 @@ class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
 
     """Produces 'true' and 'false' labelled radio buttons."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(radiobuttons.RadioButtonsValueWidget, self).__init__(
                                                           homogeneous=False,
                                                           spacing=0)

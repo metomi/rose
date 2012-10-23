@@ -64,7 +64,8 @@
     will be a spin button.</p>
 
     <p>The config editor supports adding user-defined custom widgets which
-    replace the default widgets.</p>
+    replace the default widgets. These have the same API, but live in the
+    metadata directories rather than the Rose source code.</p>
 
     <p>For example, you may wish to add widgets that deal with dates (e.g.
     using something based on a <a href=
@@ -134,7 +135,7 @@ class UsernameValueWidget(gtk.HBox):
 
     """This class generates a widget for entering usernames."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(UsernameValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
@@ -190,7 +191,7 @@ pygtk.require('2.0')
 import gtk
 </pre>
 
-    <p>This is the Python library that we'll use in a minute.</p>
+    <p>This adds the Python library that we'll use in a minute.</p>
 
     <p>Now we need to create a predictive text model by adding some data to our
     <code>gtk.Entry</code> text widget.</p>
@@ -270,7 +271,7 @@ class UsernameValueWidget(gtk.HBox):
 
     """This class generates a widget for entering usernames."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(UsernameValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
@@ -365,7 +366,7 @@ widget[config-edit]=module_name.AreaCodeChooser
     <pre>
 class AreaCodeChooser(gtk.HBox):
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None)
+    def __init__(self, value, metadata, set_value, hook, arg_str=None)
 </pre>
 
     <p>with the following arguments</p>
@@ -404,14 +405,14 @@ set_value("20")
       <code>rose.config_editor.valuewidget.ValueWidgetHook</code> containing
       callback functions that you should connect some of your widgets to.</dd>
 
-      <dt><code>widget_args</code></dt>
+      <dt><code>arg_str</code></dt>
 
       <dd>
         is an optional argument that stores any text given after the widget in
         the metadata:
         <pre>
 widget[config-edit] = modulename.ClassName arg1 arg2 arg3 ...
-</pre>would give a <code>widget_args</code> of <code>"arg1 arg2 arg3
+</pre>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
 ..."</code>. This could help configure your widget - for example, for a table
 based widget, you might give the column names:
         <pre>
@@ -591,9 +592,8 @@ def handle_type_error(self, is_in_error):
       <dt><code>real_variable_list</code></dt>
 
       <dd>a list of the Variable objects (x.name, x.value, x.metadata, etc from
-      the [source:/rose/trunk/lib/python/rose/variable.py rose.variable]
-      module). These are the objects you will need to generate your widgets
-      around.</dd>
+      the rose.variable module). These are the objects you will need to
+      generate your widgets around.</dd>
 
       <dt><code>missing_variable_list</code></dt>
 
@@ -616,7 +616,8 @@ def handle_type_error(self, is_in_error):
       <dd>
         a dictionary that looks like this:
         <pre>
-    show_modes_dict = {'latent': False, 'fixed': False, 'ignored': True, 'title': False}
+    show_modes_dict = {'latent': False, 'fixed': False, 'ignored': True,
+                       'user-ignored': False, 'title': False}
 </pre>
 
         <p>which could be ignored for most custom pages, as you need. The
@@ -638,6 +639,12 @@ def handle_type_error(self, is_in_error):
 
           <dd>False means don't display widgets for variables if they're
           ignored (in the configuration, but commented out).</dd>
+
+          <dt><code>'user-ignored'</code></dt>
+
+          <dd>(If <code>ignored</code> is False) False means don't display
+          widgets for user-ignored variables. True means always show
+          user-ignored variables.</dd>
 
           <dt><code>'title'</code></dt>
 
@@ -696,7 +703,7 @@ def show_fixed(self, should_show)
     e.g. by greying out part of it.</p>
 
     <p>All existing page widgets use this API, so a good resource is the
-    classes in lib/python/rose/config_editor/container.py.</p>
+    modules in lib/python/rose/config_editor/pagewidget/.</p>
 
     <p>Generally speaking, a visible change, click, or key press in the custom
     page widget should make instant changes to variable value(s), and the value
@@ -832,7 +839,7 @@ class PlanetChecker(rose.macro.MacroBase):
     this:</p>
     <pre>
     def validate(self, config, meta_config=None):
-        """Return a list of errors if any."""
+        """Return a list of errors, if any."""
         allowed_planets = self._get_allowed_planets()
         problem_list = []
 </pre>
@@ -953,8 +960,8 @@ class PlanetChecker(rose.macro.MacroBase):
 rose edit
 </pre>
 
-    <p>in the application directory. Select the top menu Metadata, then the item
-    <var>fred_hello_world</var>, then the item
+    <p>in the application directory. Select the top menu Metadata, then the
+    item <var>fred_hello_world</var>, then the item
     <var>planet.PlanetChecker.validate</var>.</p>
 
     <p>It should either return an "OK" dialog, or give an error dialog using
@@ -1088,8 +1095,8 @@ class PlanetChanger(rose.macro.MacroBase):
 rose edit
 </pre>
 
-    <p>in the application directory. Select the top menu Metadata, then the item
-    <var>fred_hello_world</var>, then the item
+    <p>in the application directory. Select the top menu Metadata, then the
+    item <var>fred_hello_world</var>, then the item
     <var>planet.PlanetChanger.transform</var>.</p>
 
     <p>It should give a dialog explaining the changes it's made and asking for
@@ -1132,19 +1139,20 @@ class SomeValidator(rose.macro.MacroBase):
 </pre>
 
     <p>The returned list should be a list of rose.macro.MacroReport objects
-    containing the section, option, value, and warning strings for each
-    setting that is in error. These are initialised behind the scenes by
-    calling the inherited method <code>rose.macro.MacroBase.add_report</code>
-    via <code>self.add_report</code>. This has the form:</p>
+    containing the section, option, value, and warning strings for each setting
+    that is in error. These are initialised behind the scenes by calling the
+    inherited method <code>rose.macro.MacroBase.add_report</code> via
+    <code>self.add_report</code>. This has the form:</p>
     <pre>
     def add_report(self, report_list, section=None, option=None, value=None,
                    info=None, is_warning=False):
 </pre>
+
     <p>This means that you should call it with your problem list first, then
     the relevant section, then the relevant option, then the relevant value,
-    then the relevant error message, and optionally a warning flag that
-    we'll discuss later. If the setting is a section, the option 
-    should be <code>None</code> and the value None. For example,</p>
+    then the relevant error message, and optionally a warning flag that we'll
+    discuss later. If the setting is a section, the option should be
+    <code>None</code> and the value None. For example,</p>
     <pre>
     def validate(self, config, meta_config=None):
         list_of_problems = []
@@ -1158,12 +1166,11 @@ class SomeValidator(rose.macro.MacroBase):
         return list_of_problems
 </pre>
 
-    <p>Validator macros have the option to give warnings, which do not count
-    as formal errors in the Rose config editor GUI. These should be used when
+    <p>Validator macros have the option to give warnings, which do not count as
+    formal errors in the Rose config editor GUI. These should be used when
     something <em>may</em> be wrong, such as warning when using an
     advanced-developer-only option. They are invoked by passing a 6th argument
     to <code>self.add_report</code>, <code>is_warning</code>, like so:</p>
-
     <pre>
             self.add_report(list_of_problems,
                             "env",
@@ -1198,8 +1205,9 @@ class SomeTransformer(rose.macro.MacroBase):
         list_of_changes = []
         if config.get(["namelist:snowflakes"]) is None:
             config.set(["namelist:snowflakes"])
-            list_of_changes.append(("namelist:snowflakes", None, None,
-                                    "Updated snow handling in time for Christmas"))
+            self.add_report(list_of_changes,
+                            "namelist:snowflakes", None, None,
+                            "Updated snow handling in time for Christmas")
             config.set(["namelist:snowflakes", "l_unique"], ".true.")
             self.add_report(list_of_changes, "namelist:snowflakes",
                             "l_unique", ".true.", "So far, anyway.")
@@ -1209,8 +1217,8 @@ class SomeTransformer(rose.macro.MacroBase):
     <h2 id="rosie-ws">Rosie Web</h2>
 
     <p>This section explains how to use the Rosie web service API. All Rosie
-    discovery services (e.g. <code>rosie search</code>, <code>rosie
-    go</code>, web page) use a <a href=
+    discovery services (e.g. <code>rosie search</code>, <code>rosie go</code>,
+    web page) use a <a href=
     "http://en.wikipedia.org/wiki/Representational_state_transfer">RESTful</a>
     API to interrogate a web server, which then interrogates an <a href=
     "http://planetofcoders.com/rdbms/">RDBMS</a>. Returned data is encoded in
@@ -1225,7 +1233,7 @@ class SomeTransformer(rose.macro.MacroBase):
     configuration file as the value of
     <var>[rosie-ws-client]ws-root-default</var>. To access the API for a given
     repository with prefix PREFIX_NAME, you must select a format (the only
-    currently supported format is 'json') and use a url that looks like:
+    currently supported format is 'json') and use a url that looks like:</p>
     <pre>
 http://host/PREFIX_NAME/get_common_keys?format=json
 </pre>
@@ -1240,7 +1248,7 @@ http://host/PREFIX_NAME/get_common_keys?format=json
         owner) and takes the format argument. For example, entering a URL in a
         web browser:
         <pre>
-http://host/mo1/json/get_common_keys?format=json
+http://host/PREFIX_NAME/get_common_keys?format=json
 </pre>
 
         <p>may give</p>
@@ -1256,7 +1264,7 @@ http://host/mo1/json/get_common_keys?format=json
         suite discovery information (e.g. access-list, tag-list) and takes the
         format argument. For example, entering this URL in Firefox:
         <pre>
-http://host/mo1/json/get_optional_keys?format=json
+http://host/PREFIX_NAME/get_optional_keys?format=json
 </pre>
 
         <p>may give</p>
@@ -1273,7 +1281,7 @@ http://host/mo1/json/get_optional_keys?format=json
         <samp>contains</samp>, <samp>like</samp>) and takes the format
         argument. For example, entering this URL in a web browser:
         <pre>
-http://host/mo1/json/get_query_operators?format=json
+http://host/PREFIX_NAME/get_query_operators?format=json
 </pre>
 
         <p>may give</p>
@@ -1287,15 +1295,17 @@ http://host/mo1/json/get_query_operators?format=json
       <dd>
         returns an associative array of suite property key-value pairs, and
         takes three suite arguments: idx, branch, revision to identify a suite
-        and the format argument. For example, entering this URL in a web browser:
+        and the format argument. For example, entering this URL in a web
+        browser:
         <pre>
-http://host/mo1/json/info?idx=aa000&amp;branch=trunk&amp;revision=1&amp;format=json
+http://host/PREFIX_NAME/info?idx=aa000&amp;branch=trunk&amp;revision=1&amp;format=json
 </pre>
 
         <p>may give</p>
         <pre>
-{"access-list": ["fred", "alice"], "author": "bob", "experiment": "HADGEM6", 
- "date": 1340700481}
+{"access-list": ["fred", "alice"], "author": "bob", "branch": "trunk", "date": 1340700481,
+ "experiment": "HADGEM6", "from_idx": null, "idx": "aa000", "project": "HADGEM5#123",
+ "revision": 1, "status": "M ", "title": "HADGEM5 replacement"}
 </pre>
 
         <p>revision is an optional argument.</p>
@@ -1343,7 +1353,7 @@ CONJUNCTION+[OPEN_GROUP+]FIELD+OPERATOR+VALUE[+CLOSE_GROUP]
         <code>OPEN_GROUP</code> and <code>CLOSE_GROUP</code> do not have to be
         used. Entering this URL in a web browser:</p>
         <pre>
-http://host/mo1/query?q=and+idx+endswith+78&amp;q=or+owner+eq+bob&amp;format=json
+http://host/PREFIX_NAME/query?q=and+idx+endswith+78&amp;q=or+owner+eq+bob&amp;format=json
 </pre>
 
         <p>may give</p>
@@ -1359,8 +1369,8 @@ http://host/mo1/query?q=and+idx+endswith+78&amp;q=or+owner+eq+bob&amp;format=jso
         <p>This returned all current suites that have an idx that ends with
         <samp>78</samp> and also all suites that have the owner
         <samp>bob</samp>. Each suite is returned as an entry in a list - each
-        entry is an associative array of property name-value pairs. These 
-        pairs contain all database information about a suite.</p>
+        entry is an associative array of property name-value pairs. These pairs
+        contain all database information about a suite.</p>
 
         <p><code>query</code> also takes the optional argument
         <code>all_revs</code> which switches on searching older revisions of
@@ -1394,7 +1404,7 @@ http://host/mo1/json/query?q=and+idx+endswith+78&amp;all_revs&amp;format=json
         <p>You can also use parentheses in your search to group expressions.
         For example, entering this URL in a web browser:</p>
         <pre>
-http://host/mo1/json/query?q=and+(+owner+eq+bob&amp;q=or+owner+eq+fred+)&amp;q=and+project+eq+test&amp;format=json
+http://host/PREFIX_NAME/query?q=and+(+owner+eq+bob&amp;q=or+owner+eq+fred+)&amp;q=and+project+eq+test&amp;format=json
 </pre>
 
         <p>would search for all suites that are owned by <samp>bob</samp> or
@@ -1405,12 +1415,12 @@ http://host/mo1/json/query?q=and+(+owner+eq+bob&amp;q=or+owner+eq+fred+)&amp;q=a
 
       <dd>
         takes any number of string arguments and the format argument and
-        returns a list of matching suites with properties in the same format
-        as <code>query</code>. The suite database is searched for suites with
-        any property with a value that contains any of the string arguments.
-        For example, entering this URL in a web browser:
+        returns a list of matching suites with properties in the same format as
+        <code>query</code>. The suite database is searched for suites with any
+        property with a value that contains any of the string arguments. For
+        example, entering this URL in a web browser:
         <pre>
-http://host/mo1/json/search?var+bob+nowcast&amp;format=json
+http://host/PREFIX_NAME/search?var+bob+nowcast&amp;format=json
 </pre>
 
         <p>may give</p>
@@ -1436,7 +1446,7 @@ http://host/mo1/json/search?var+bob+nowcast&amp;format=json
         This switches on searching older revisions of current suites and
         deleted suites. For example, entering this URL in a web browser:</p>
         <pre>
-http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
+http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 </pre>
 
         <p>may give</p>
@@ -1487,14 +1497,7 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       programs.</dd>
 
       <dt><code>rose.ana</code></dt>
-
-      <dd>callable, runs comparison between two files and reports differences.
-      </dd>
-
-      <dt><code>rose.app_run</code></dt>
-
-      <dd>callable, invokes an application, setting up the environment and
-      files.</dd>
+      <dd>callable, invokes an analysis engine for testing suites/apps.</dd>
 
       <dt><code>rose.config</code></dt>
 
@@ -1502,10 +1505,23 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       main configuration object <code>rose.config.ConfigNode</code> which is
       manipulated in most rose programs.</dd>
 
+      <dt><code>rose.config_processor</code></dt>
+
+      <dd>library, base class for rose configuration processing.</dd>
+
+      <dt><code>rose.config_processors</code></dt>
+
+      <dd>(package) subclasses for rose configuration processing.</dd>
+
       <dt><code>rose.env</code></dt>
 
       <dd>library, handles environment processing for
       <code>rose.app_run</code>.</dd>
+
+      <dt><code>rose.external</code></dt>
+
+      <dd>library, contains minimal wrapper functions for calling external
+      programs.</dd>
 
       <dt><code>rose.formats</code></dt>
 
@@ -1513,46 +1529,93 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       The only current supported format is Fortran namelist, through
       <code>rose.formats.namelist</code>.</dd>
 
+      <dt><code>rose.fs_util</code></dt>
+
+      <dd>library, file system utilities with event reporting.</dd>
+
       <dt><code>rose.gtk</code></dt>
 
-      <dd>(package) contains modules that deal with generalised GTK operations.
-      Currently, the only important module is <code>rose.gtk.util</code> which
-      contains various useful dialog classes and an improved toolbar.</dd>
+      <dd>(package) contains modules that deal with generic GTK operations and
+      contain shared widgets.</dd>
+
+      <dt><code>rose.host_select</code></dt>
+
+      <dd>callable, ranks and selects host machines.</dd>
 
       <dt><code>rose.macro</code></dt>
 
       <dd>callable, runs internal and custom macros for an application or
       suite.</dd>
 
+      <dt><code>rose.meta_type</code></dt>
+
+      <dd>library, classes for the various metadata <code>type</code>
+      groups.</dd>
+
       <dt><code>rose.metadata_gen</code></dt>
 
       <dd>callable, generates template metadata for an application.</dd>
-
-      <dt><code>rose.meta_type</code></dt>
-
-      <dd>classes for the various metadata types.</dd>
 
       <dt><code>rose.namelist_dump</code></dt>
 
       <dd>callable, dumps namelist files to a Rose configuration object.</dd>
 
+      <dt><code>rose.opt_parse</code></dt>
+
+      <dd>library, contains an <code>optparse.OptionParser</code> subclass. All
+      command-line option parsing in Rose should use this.</dd>
+
+      <dt><code>rose.popen</code></dt>
+
+      <dd>library, utilities for spawning and monitoring processes.</dd>
+
       <dt><code>rose.resource</code></dt>
 
       <dd>library, locates files or directories.</dd>
 
-      <dt><code>rose.run_util</code></dt>
+      <dt><code>rose.run</code></dt>
 
-      <dd>library, utilities for <code>rose.app_run</code></dd>
+      <dd>callable, contains classes for running suites, applications, tasks
+      and so on.</dd>
+
+      <dt><code>rose.section</code></dt>
+
+      <dd>library, contains section-specific data utilities. Counterpart of
+      <code>rose.variable</code>.</dd>
 
       <dt><code>rose.stem</code></dt>
 
       <dd>callable, converts user-friendly options for testing code into
       options for rose suite-run.</dd>
 
-      <dt><code>rose.suite_log_view_gen</code></dt>
+      <dt><code>rose.suite_engine_proc</code></dt>
 
-      <dd>callable, summarises suite output in a <a href=
-      "http://www.json.org">JSON</a> file used by the output viewer.</dd>
+      <dd>library, base class and utilities for interacting with a suite
+      engine.</dd>
+
+      <dt><code>rose.suite_engine_procs</code></dt>
+
+      <dd>(package) library for interacting with specific suite engines.</dd>
+
+      <dt><code>rose.suite_gcontrol</code></dt>
+
+      <dd>callable, launches a suite engine monitoring GUI for a suite.</dd>
+
+      <dt><code>rose.suite_hook</code></dt>
+
+      <dd>callable, reacts to suite engine events.</dd>
+
+      <dt><code>rose.suite_log_view</code></dt>
+
+      <dd>callable, sets up suite output for the output viewer.</dd>
+
+      <dt><code>rose.suite_scan</code></dt>
+
+      <dd>callable, scans for running suites.</dd>
+
+      <dt><code>rose.task_env</code></dt>
+
+      <dd>callable, provides an environment for a suite task.</dd>
 
       <dt><code>rose.variable</code></dt>
 
@@ -1573,9 +1636,9 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       the config editor. All of these can be overridden using your user
       config.</dd>
 
-      <dt><code>rose.config_editor.container</code>,
-      <code>rose.config_editor.keywidget</code>,
+      <dt><code>rose.config_editor.keywidget</code>,
       <code>rose.config_editor.menuwidget</code>,
+      <code>rose.config_editor.pagewidget</code> (package),
       <code>rose.config_editor.variable</code>,
       <code>rose.config_editor.valuewidget</code> (package)</dt>
 
@@ -1602,7 +1665,7 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       <dt><code>rose.config_editor.page</code></dt>
 
       <dd>This module contains control code for each config editor tab, and
-      interfaces with <code>rose.config_editor.container</code>-like objects
+      interfaces with <code>rose.config_editor.pagewidget</code> objects
       (including custom pages).</dd>
 
       <dt><code>rose.config_editor.panel</code></dt>
@@ -1636,7 +1699,12 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
     <dl>
       <dt><code>rose.macros.compulsory</code></dt>
 
-      <dd>checks <var>compulsory</var> sections and options.</dd>
+      <dd>checks/fixes <var>compulsory</var> sections and options</dd>
+
+      <dt><code>rose.macros.format</code></dt>
+
+      <dd>checks format-specific sections and options, using options in
+      <code>rose.formats</code> modules</dd>
 
       <dt><code>rose.macros.rule</code></dt>
 
@@ -1646,7 +1714,7 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       <dt><code>rose.macros.trigger</code></dt>
 
       <dd>checks <var>trigger</var> validity and transforms configuration
-      ignored states.</dd>
+      ignored states</dd>
 
       <dt><code>rose.macros.value</code></dt>
 
@@ -1662,32 +1730,36 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
     <dl>
       <dt><code>rosie.browser</code></dt>
 
-      <dd>(package) GTK client code for rosie.</dd>
+      <dd>(package) GTK client code for rosie (<code>rosie go</code>).</dd>
 
       <dt><code>rosie.browser.history</code></dt>
 
-      <dd>Methods and classes for recording suite search history. Used by 
-      <code>rosie browse</code>.</dd>
+      <dd>Methods and classes for recording suite search history. Used by
+      <code>rosie go</code>.</dd>
+
+      <dt><code>rosie.browser.main</code></dt>
+
+      <dd>Main control code for <code>rosie go</code>.</dd>
 
       <dt><code>rosie.browser.result</code></dt>
 
-      <dd>Custom widget with methods for displaying suite search results. Used 
-      by <code>rosie browse</code>.</dd>
+      <dd>Custom widget with methods for displaying suite search results. Used
+      by <code>rosie go</code>.</dd>
 
       <dt><code>rosie.browser.search</code></dt>
 
-      <dd>Contains a wrapper class for running suite searches. Used by 
-      <code>rosie browse</code>.</dd>
+      <dd>Contains a wrapper class for running suite searches. Used by
+      <code>rosie go</code>.</dd>
 
       <dt><code>rosie.browser.status</code></dt>
 
-      <dd>Classes for getting and updating statuses for checked out suites. 
-      Used by <code>rosie browse</code>.</dd>
-      
+      <dd>Classes for getting and updating statuses for checked out suites.
+      Used by <code>rosie go</code>.</dd>
+
       <dt><code>rosie.browser.suite</code></dt>
 
       <dd>Contains a wrapper class for handling the creation, copying, checking
-       out and deleting of suites. Used by <code>rosie browse</code>.</dd>      
+      out and deleting of suites. Used by <code>rosie go</code>.</dd>
 
       <dt><code>rosie.browser.util</code></dt>
 
@@ -1697,10 +1769,14 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>Interface code to the suite database, called by the web server.</dd>
 
-      <dt><code>rosie.id</code></dt>
+      <dt><code>rosie.suite_id</code></dt>
 
       <dd>Callable, implements the <code>rosie id</code> command to identify
       suites.</dd>
+
+      <dt><code>rosie.vc</code></dt>
+
+      <dd>Interface code to version control.</dd>
 
       <dt><code>rosie.ws</code></dt>
 
@@ -1711,10 +1787,6 @@ http://host/mo1/json/search?var+bob&amp;all_revs&amp;format=json
       <dd>Interface to the Rosie web server. Used by <code>rosie query</code>,
       <code>rosie info</code>, <code>rosie search</code> and <code>rosie
       browse</code>.</dd>
-
-      <dt><code>rosie.vc</code></dt>
-
-      <dd>Interface code to version control.</dd>
     </dl>
   </div>
 </body>

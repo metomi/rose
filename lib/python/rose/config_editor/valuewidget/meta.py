@@ -27,7 +27,7 @@ class MetaValueWidget(gtk.HBox):
 
     """This class generates an entry and button for a metadata flag value."""
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(MetaValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata

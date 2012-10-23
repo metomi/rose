@@ -42,7 +42,7 @@ class EntryArrayValueWidget(gtk.HBox):
     TIP_LEFT = "Move array element left"
     TIP_RIGHT = "Move array element right"
     
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(EntryArrayValueWidget, self).__init__(homogeneous=False,
                                                     spacing=0)
         self.value = value
@@ -419,7 +419,7 @@ class MixedArrayValueWidget(gtk.HBox):
     TIP_INVALID_ENTRY = "Invalid entry - not {0}"
     MIN_WIDTH_CHARS = 7
 
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(MixedArrayValueWidget, self).__init__(homogeneous=False,
                                                     spacing=0)
         self.value = value
@@ -735,7 +735,7 @@ class LogicalArrayValueWidget(gtk.HBox):
     TIP_ADD = 'Add array element'
     TIP_DEL = 'Delete array element'
     
-    def __init__(self, value, metadata, set_value, hook, widget_args=None):
+    def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(LogicalArrayValueWidget, self).__init__(homogeneous=False,
                                                       spacing=0)
         self.value = value
