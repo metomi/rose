@@ -34,13 +34,17 @@
 #     rose stem --source=$PWD -C ~/roses/mot-aa121 --task=myjob --task=yourjob
 #
 # OPTIONS
-#    All options of "rose suite-run" are supported. Additional options are:
+#     All options of "rose suite-run" are supported. Additional options are:
 #
-#  -c, --confsource - specify an alterate top-level source tree directory (which
-#                     may be used to locate 'fcm make' config files)
-#  -d, --diffsource - specify a source tree to add to the trunk using {diff}
-#  -s, --source     - specify a source tree to run as the trunk
-#  -t, --task       - specify a task name to switch on
+#     --confsource=DIR, -c DIR
+#         Specify an alterate top-level source tree directory. 
+#         This may be used to locate 'fcm make' config files.
+#     --diffsource=SOURCE, -d SOURCE
+#         Specify a source tree to add to the trunk as a branch.
+#     --source=SOURCE, -s SOURCE
+#         Specify a source tree to run as the trunk.
+#     --task=TASK, -t TASK
+#         Specify a task name or group to run.
 # 
 #-------------------------------------------------------------------------------
 exec python -m rose.stem "$@"
