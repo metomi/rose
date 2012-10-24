@@ -447,25 +447,25 @@ def main():
     try:
         if opts.to_origin:
             for arg in args:
-                report(str(Id(id_text=arg).to_origin()) + "\n", level=0)
+                report(str(SuiteId(id_text=arg).to_origin()) + "\n", level=0)
         elif opts.to_local_copy:
             for arg in args:
-                report(str(Id(id_text=arg).to_local_copy()) + "\n", level=0)
+                report(str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0)
         elif opts.to_output:
             for arg in args:
-                report(str(Id(id_text=arg).to_output()) + "\n", level=0)
+                report(str(SuiteId(id_text=arg).to_output()) + "\n", level=0)
         elif opts.to_web:
             for arg in args:
-                report(str(Id(id_text=arg).to_web()) + "\n", level=0)
+                report(str(SuiteId(id_text=arg).to_web()) + "\n", level=0)
         elif opts.latest:
-            report(str(Id.get_latest(prefix=arg)) + "\n", level=0)
+            report(str(SuiteId.get_latest(prefix=arg)) + "\n", level=0)
         elif opts.next:
-            report(str(Id.get_next(prefix=arg)) + "\n", level=0)
+            report(str(SuiteId.get_next(prefix=arg)) + "\n", level=0)
         else:
             if not arg:
                 arg = os.getcwd()
-            report(str(Id(location=arg)) + "\n", level=0)
-    except SuiteSuiteIdError as e:
+            report(str(SuiteId(location=arg)) + "\n", level=0)
+    except SuiteIdError as e:
         report(e)
         sys.exit(1)
 

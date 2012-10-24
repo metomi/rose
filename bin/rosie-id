@@ -48,4 +48,4 @@
 #     # Print next suite ID in the default repository
 #     rosie id --next
 #-------------------------------------------------------------------------------
-exec python -m rosie.id "$@"
+exec python -m rosie.suite_id "$@"
