@@ -18,14 +18,11 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-import Queue
 import ast
-import datetime
-import multiprocessing
+import functools
 import os
 import re
 import shlex
-import simplejson
 import subprocess
 import sys
 import threading
@@ -33,22 +30,18 @@ import time
 import urllib
 import webbrowser
 
-import gobject
-import gtk
-import pango
 import pygtk
 pygtk.require("2.0")
+import gtk
 
 import rose.config_editor
 import rose.config_editor.main
-import rose.macros
 import rose.env
 import rose.external
 import rose.gtk.run
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 import rose.resource
-import rose.run
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search
@@ -208,6 +201,19 @@ class MainWindow(gtk.Window):
         """Close down the history panel"""
         self.menubar.uimanager.get_widget(
              '/TopMenuBar/History/Show search history').set_active(False) 
+
+    def create_suite(self, config, from_id=None):
+        if config is None:
+            return
+        try:
+            new_id = self.suite_director.vc_client.create(config, from_id,
+                                         self.search_manager.ws_client.prefix)
+        except Exception as e:
+            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
+                                     type(e).__name__ + ": " + str(e))
+            return None
+        self.handle_checkout(id_=new_id)
+        self.repeat_last_request()
 
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
@@ -558,18 +564,7 @@ class MainWindow(gtk.Window):
     def handle_create(self, from_id=None):
         """Create a new suite."""
         config = self.suite_director.vc_client.generate_info_config(from_id)
-        config = self.handle_new_suite(config)
-        if config is None:
-            return
-        try:
-            new_id = self.suite_director.vc_client.create(config, from_id,
-                                         self.search_manager.ws_client.prefix)
-        except Exception as e:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     type(e).__name__ + ": " + str(e))
-            return None
-        self.handle_checkout(id_=new_id)
-        self.repeat_last_request()
+        self.handle_new_suite(config, from_id)
 
     def handle_delete(self, *args):
         """"Handles deletion of a suite."""
@@ -637,9 +632,11 @@ class MainWindow(gtk.Window):
         id_text = self.get_selected_suite_id()
         rose.external.launch_terminal(cwd=SuiteId(id_text).to_local_copy())
         
-    def handle_new_suite(self, config, window=None):
+    def handle_new_suite(self, config, from_id):
         """Handle creation of new suite."""
-        return self.suite_director.run_new_suite_wizard(config, self, window)
+        finish_func = functools.partial(self.create_suite, from_id=from_id)
+        return self.suite_director.run_new_suite_wizard(
+                          config, finish_func, self)
 
     def handle_next_search(self, *args):
         """Handles trying to run next search."""
@@ -1057,7 +1054,7 @@ class MainWindow(gtk.Window):
             args.extend([key, value])
         suite_local_copy = SuiteId(
                             self.get_selected_suite_id()).to_local_copy()
-        args.extend(["-C", suite_local_copy])
+        args = ["-C", suite_local_copy] + args
         rose.gtk.run.run_suite(*args)
         return False
 
