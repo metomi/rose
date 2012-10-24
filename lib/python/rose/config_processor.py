@@ -22,6 +22,7 @@
 from rose.env import UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
+from rose.scheme_processor import SchemeProcessor, UnknownSchemeError
 
 
 class UnknownContentError(Exception):
@@ -84,8 +85,6 @@ class ConfigProcessorsManager(object):
     """Manage the loading of config processors."""
 
     def __init__(self, event_handler=None, popen=None, fs_util=None):
-        if event_handler is None:
-            event_handler = self._dummy
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -95,26 +94,25 @@ class ConfigProcessorsManager(object):
         self.fs_util = fs_util
         self.processors = {}
 
-    def _dummy(self, *args, **kwargs):
-        pass
+    def handle_event(self, *args, **kwargs):
+        if callable(self.event_handler):
+            return self.event_handler(*args, **kwargs)
 
-    def get_processor(self, scheme, orig_keys=None, orig_value=None):
+    def get_processor(self, scheme):
         """Return the processor of a scheme."""
         if self.processors.get(scheme) is None:
             ns = __name__ + "s"
             try:
                 mod = __import__(ns + "." + scheme, fromlist=ns)
             except ImportError as e:
-                e = UnknownContentError(scheme)
-                raise ConfigProcessError(orig_keys, orig_value, e)
+                raise UnknownContentError(scheme)
             for v in vars(mod):
                 c = getattr(mod, v)
-                base = ConfigProcessorBase
-                if isinstance(c, type) and issubclass(c, base) and c != base:
+                if hasattr(c, "process") and getattr(c, "KEY", None) == scheme:
                     self.processors[scheme] = c(self)
                     break
             else:
-                raise ConfigProcessError(orig_keys, orig_value)
+                raise UnknownContentError(scheme)
         return self.processors[scheme]
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
@@ -129,6 +127,9 @@ class ConfigProcessorsManager(object):
         scheme = item
         if ":" in item:
             scheme = item.split(":", 1)[0]
-        processor = self.get_processor(scheme, orig_keys, orig_value)
+        try:
+            processor = self.get_processor(scheme)
+        except UnknownContentError as e:
+            raise ConfigProcessError(orig_keys, orig_value, e)
         return processor.process(config, item, orig_keys, orig_value, **kwargs)
     __call__ = process
