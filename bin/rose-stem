@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose stem
+#
+# SYNOPSIS
+#     rose stem [options]
+#
+# DESCRIPTION
+#     Run a suitable suite with a specified set of source tree(s). Default 
+#     values of some of these settings are suite-dependent, specified in the 
+#     rose-suite.conf file.
+#
+# EXAMPLES
+#     rose stem --diffsource=$PWD
+#     rose stem --source=fcm:source_tr@head --task=myjob
+#     rose stem --source=$PWD -C ~/roses/mot-aa121 --task=myjob --task=yourjob
+#
+# OPTIONS
+#     All options of "rose suite-run" are supported. Additional options are:
+#
+#     --confsource=DIR, -c DIR
+#         Specify an alterate top-level source tree directory. 
+#         This may be used to locate 'fcm make' config files.
+#     --diffsource=SOURCE, -d SOURCE
+#         Specify a source tree to add to the trunk as a branch.
+#     --source=SOURCE, -s SOURCE
+#         Specify a source tree to run as the trunk.
+#     --task=TASK, -t TASK
+#         Specify a task name or group to run.
+# 
+#-------------------------------------------------------------------------------
+exec python -m rose.stem "$@"
