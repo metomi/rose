@@ -67,6 +67,6 @@ class ConfigProcessorForNamelist(ConfigProcessorBase):
                 else:
                     nlg += "%s=%s,\n" % (key, value)
             nlg += "/" + "\n"
-            self.manager.event_handler(ConfigProcessNamelistEvent(nlg))
+            self.manager.handle_event(ConfigProcessNamelistEvent(nlg))
             ret += nlg
         return ret

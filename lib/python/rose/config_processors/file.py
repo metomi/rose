@@ -110,7 +110,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         #      call completes.
         for result in results:
             for message, type, level, prefix, clip in result.get():
-                self.manager.event_handler(message, type, level, prefix, clip)
+                self.manager.handle_event(message, type, level, prefix, clip)
 
     def process_target(self, config, key, node):
         """Install a target according to a file:target section."""
@@ -129,7 +129,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         config, content,
                         [key, "content"], content_value))
             target_file.close()
-            self.manager.event_handler(
+            self.manager.handle_event(
                     FileSystemEvent("content", target, " ".join(contents)))
         else:
             # Free format file
@@ -151,7 +151,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     if os.path.exists(target):
                         self.manager.fs_util.delete(target)
                     self._source_export(source, target)
-                    self.manager.event_handler(
+                    self.manager.handle_event(
                             FileSystemEvent("install", target, source))
             elif len(sources) > 1 or len(sources) == 0 and mode != "mkdir":
                 if os.path.isdir(target):
@@ -160,7 +160,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 for source in sources:
                     target_file.write(self._source_load(source))
                 target_file.close()
-                self.manager.event_handler(
+                self.manager.handle_event(
                         FileSystemEvent("install", target, source_str))
             else:
                 if os.path.isdir(target):
@@ -183,7 +183,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     raise ConfigProcessError(
                             [key, "checksum"], checksum_expected, e)
                 target_file.close()
-                self.manager.event_handler(ChecksumEvent(target, checksum))
+                self.manager.handle_event(ChecksumEvent(target, checksum))
 
     def _source_export(self, source, target):
         """Export/copy a source file/directory in FS or FCM VC to a target."""
@@ -213,6 +213,89 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             return f.read()
         else:
             return open(source).read()
+
+
+class LocationProcessorBase(object):
+    """Base class for a location processor."""
+
+    METHOD = None
+
+    def __init__(self, manager):
+        self.manager = manager
+
+    def handle_event(self, *args, **kwargs):
+        """Call self.event_handler with given arguments if possible."""
+        self.manager.handle_event(*args, **kwargs)
+
+    def can_pull(self, there):
+        return False
+
+    def can_push(self, there):
+        return False
+
+    def pull(self, here, there, **kwargs):
+        raise NotImplementedError()
+
+    def push(self, here, there, **kwargs):
+        raise NotImplementedError()
+
+
+class LocationProcessorManager(object):
+    """Manage location processors."""
+
+    def __init__(self, event_handler=None, popen=None, fs_util=None):
+        self.event_handler = event_handler
+        if popen is None:
+            popen = RosePopener(event_handler)
+        self.popen = popen
+        if fs_util is None:
+            fs_util = FileSystemUtil(event_handler)
+        self.fs_util = fs_util
+        self.processors = []
+        processors_dir = os.path.join(os.path.dirname(__file__),
+                                      "loc_processors")
+        ns = "rose.loc_processors"
+        cwd = os.getcwd()
+        os.chdir(processors_dir)
+        try:
+            for basename in glob("*.py"):
+                if basename.startswith("__"):
+                    continue
+                name = basename[0:-3]
+                try:
+                    mod = __import__(ns + "." + name, fromlist=ns)
+                except ImportError as e:
+                    continue
+                for c in vars(mod).values():
+                    if (getattr(c, "METHOD", None) is not None and
+                        hasattr(c, "can_pull") and hasattr(c, "pull") and
+                        hasattr(c, "can_push") and hasattr(c, "push")):
+                        self.processors[c.METHOD] = c(self)
+        finally:
+            os.chdir(cwd)
+
+    def handle_event(self, *args, **kwargs):
+        """Call self.event_handler with given arguments if possible."""
+        if callable(self.event_handler):
+            return self.event_handler(*args, **kwargs)
+
+    def get_processor(self, there, method=None, mode="pull"):
+        if self.processors.has_key(method):
+            return self.processors[method]
+        for processor in self.processors.values():
+            if (mode == "push" and processor.can_push(there) or
+                mode == "pull" and processor.can_pull(there)):
+                return processor
+        else:
+            raise KeyError((there, method, mode)) # TODO: need custom exception
+
+    def pull(self, here, there, method=None, **kwargs):
+        p = self.get_processor(there, method)
+        return p.pull(here, there, **kwargs)
+
+    def push(self, here, there, method=None, **kwargs):
+        p = self.get_processor(there, method, mode="push")
+        return p.push(here, there, **kwargs)
 
 
 class WorkerEventHandler(object):
