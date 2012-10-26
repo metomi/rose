@@ -23,6 +23,10 @@
 import rose.macro
 
 
+DOWNGRADE_METHOD = "downgrade"
+UPGRADE_METHOD = "upgrade"
+
+
 class MacroUpgrade(rose.macro.MacroBase):
 
     """Class derived from MacroBase to aid upgrade functionality."""
@@ -50,14 +54,14 @@ class MacroUpgrade(rose.macro.MacroBase):
             option = None
             if len(keys) > 1:
                 option = keys[1]
-            self.add_setting(changes, config, section, option,
+            self.add_setting(config, [section, option],
                              state=node.state, comments=node.comments)
         for keys, node in rem_config.walk():
             section = keys[0]
             option = None
             if len(keys) > 1:
                 option = keys[1]
-            self.remove_setting(changes, config, section, option)
+            self.remove_setting(config, [section, option])
 
     def _get_config_resources(self):
         # Get macro configuration resources.
@@ -77,65 +81,71 @@ class MacroUpgrade(rose.macro.MacroBase):
                 file_map.pop(key)
         return file_map
 
-    def add_setting(self, changes, config, section, name=None, value=None,
+    def add_setting(self, config, keys, value=None,
                     state=None, comments=None, info=None):
         """Add a setting to the configuration."""
-        id_ = self._get_id_from_section_option(section, name)
-        if name is not None and value is None:
+        section, option = self._get_section_option_from_keys(keys)
+        id_ = self._get_id_from_section_option(section, option)
+        if option is not None and value is None:
             value = ""
         if info is None:
-            if name is None:
+            if option is None:
                 info = self.INFO_ADDED_SECT
             else:
                 info = self.INFO_ADDED_VAR.format(value)
-        if name is not None and config.get([section]) is None:
-            self.add_section(changes, config, section)
-        if config.get([section, name]) is not None:
+        if option is not None and config.get([section]) is None:
+            self.add_setting(changes, config, section)
+        if config.get([section, option]) is not None:
             return False
         if value is not None and not isinstance(value, basestring):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(id_, value))
-        config.set([section, name], value=value, state=state,
+        config.set([section, option], value=value, state=state,
                    comments=comments)
-        self.add_report(changes, section, name, value, info)
+        self.add_report(section, option, value, info)
 
-    def get_value(self, config, section, name=None, no_ignore=False):
+    def get_value(self, config, keys, no_ignore=False):
         """Return the value of a setting."""
-        if config.get([section, name], no_ignore=no_ignore) is None:
+        section, option = self._get_section_option_from_keys(keys)
+        if config.get([section, option], no_ignore=no_ignore) is None:
             return None
-        return config.get([section, name]).value
+        return config.get([section, option]).value
 
-    def remove_setting(self, changes, config, section, name=None, info=None):
+    def remove_setting(self, config, keys, info=None):
         """Remove a setting from the configuration."""
-        if name is None:
+        section, option = self._get_section_option_from_keys(keys)
+        if option is None:
             if config.get([section]) is None:
                 return False
             option_node_pairs = config.walk([section])
-            for option, option_node in option_node_pairs:
-                self._remove_setting(changes, config, section, option, info)
-        return self._remove_setting(changes, config, section, name, info)
+            for opt, option_node in option_node_pairs:
+                self._remove_setting(changes, config, [section, opt], info)
+        return self._remove_setting(changes, config, [section, option], info)
 
-    def enable_setting(self, changes, config, section, name=None, info=None):
+    def enable_setting(self, config, keys, info=None):
         """Enable a setting in the configuration."""
-        return self._ignore_setting(changes, config, section, name,
+        section, option = self._get_section_option_from_keys(keys)
+        return self._ignore_setting(changes, config, [section, option],
                                     should_be_user_ignored=False, info)
 
-    def ignore_setting(self, changes, config, section, name=None, info=None):
+    def ignore_setting(self, config, keys, info=None):
         """User-ignore a setting in the configuration."""
-        return self._ignore_setting(changes, config, section, name,
+        section, option = self._get_section_option_from_keys(keys)
+        return self._ignore_setting(changes, config, [section, option],
                                     should_be_user_ignored=True, info)
 
-    def _ignore_setting(self, changes, config, section, name=None,
-                        should_be_user_ignored=False, info=None):
+    def _ignore_setting(self, config, keys, should_be_user_ignored=False,
+                        info=None):
         """Set the ignored state of a setting, if it exists."""
-        id_ = self._get_id_from_section_option(section, name)
-        if name is None:
+        section, option = self._get_section_option_from_keys(keys)
+        id_ = self._get_id_from_section_option(section, option)
+        if option is None:
             value = None
         else:
-            value = config.get([section, name]).value
-        if config.get([section, name]) is None:
+            value = config.get([section, option]).value
+        if config.get([section, option]) is None:
             return False
-        state = config.get([section, name]).state
+        state = config.get([section, option]).state
         if should_be_user_ignored:
             info_text = self.IGNORE
             new_state = rose.config.ConfigNode.STATE_USER_IGNORED
@@ -146,19 +156,23 @@ class MacroUpgrade(rose.macro.MacroBase):
             return False
         if info is None:
             info = info_text
-        config.set([section, name], state=new_state)
-        self.add_report(changes, section, name, value, info)
+        config.set([section, option], state=new_state)
+        self.add_report(section, option, value, info)
 
-    def _remove_setting(self, changes, config, section, name=None, info=None):
+    def _remove_setting(self, config, keys, info=None):
         """Remove a setting from the configuration, if it exists."""
-        id_ = self._get_id_from_section_option(section, name)
-        if config.get([section, name]) is None:
+        section, option = self._get_section_option_from_keys(keys)
+        id_ = self._get_id_from_section_option(section, option)
+        if config.get([section, option]) is None:
             return False
-        state = config.get([section, name]).state
+        state = config.get([section, option]).state
         if info is None:
             info = self.INFO_REMOVED
-        config.unset([section, name])
-        self.add_report(changes, section, name, None, info)
+        config.unset([section, option])
+        self.add_report(section, option, None, info)
+
+    def _get_section_option_from_keys(self, keys):
+        return (keys + [None])[:2]
 
 
 class MacroUpgradeManager(object):
@@ -170,7 +184,7 @@ class MacroUpgradeManager(object):
         self.downgrade = downgrade
         self.new_version = None
         opt_node = app_config.get([rose.CONFIG_SECT_TOP,
-                                  rose.CONFIG_OPT_META_TYPE], no_ignore=True)
+                                   rose.CONFIG_OPT_META_TYPE], no_ignore=True)
         tag_items = opt_node.value.split("/")
         if len(tag_items) > 1:
             self.tag = tag_items.pop(-1)
@@ -250,7 +264,7 @@ class MacroUpgradeManager(object):
 
     def transform(self, config, meta_config=None):
         """Transform a configuration by looping over upgrade macros."""
-        change_list = []
+        self.reports = []
         for macro in self.get_macros():
             if self.downgrade:
                 func = macro.downgrade
@@ -266,10 +280,11 @@ class MacroUpgradeManager(object):
             info = INFO_DOWNGRADED.format(self.tag, self.new_tag)
         else:
             info = INFO_UPGRADED.format(self.tag, self.new_tag)
-        report = MacroReport(rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE,
-                             new_value, info)
-        change_list += [report]  
-        return config, change_list
+        report = rose.macro.MacroReport(rose.CONFIG_SECT_TOP,
+                                        rose.CONFIG_OPT_META_TYPE,
+                                        new_value, info)
+        self.reports += [report]
+        return config, self.reports
 
     def _check_can_downgrade(self, macro_instance):
         # Check whether a macro instance supports a downgrade transform.
@@ -318,6 +333,7 @@ class MacroUpgradeManager(object):
                 # No more macros found.
                 break
 
+
 def run_upgrade_macros(app_config, meta_config, config_name, args,
                        opt_conf_dir, opt_downgrade, opt_non_interactive, 
                        opt_output_dir, opt_quietness):
@@ -354,4 +370,4 @@ def run_upgrade_macros(app_config, meta_config, config_name, args,
     macro_id = MACRO_OUTPUT_ID.format(method_id, config_name,
                                       upgrade_manager.get_name())
     rose.macro._handle_transform(app_config, new_config, change_list, macro_id,
-                       opt_conf_dir, opt_output_dir, opt_non_interactive)
+                                 opt_conf_dir, opt_output_dir, opt_non_interactive)

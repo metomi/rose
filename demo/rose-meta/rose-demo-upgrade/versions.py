@@ -14,19 +14,17 @@ class Upgrade272to273(rose.macro.MacroUpgrade):
     BEFORE_TAG = "27.2"
     AFTER_TAG = "27.3"
 
-    def transform(self, config, meta_config=None, downgrade=False):
-        changes = []
-        if downgrade:
-            self.remove_setting(changes, config, "env", "C")
-            self.remove_setting(changes, config, "env", "D")
-            self.add_setting(changes, config, "env", "A", "0")
-            self.add_setting(changes, config, "env", "B", "1")
-        else:
-            self.add_setting(changes, config, "env", "C", "0")
-            self.add_setting(changes, config, "env", "D", "1")
-            self.remove_setting(changes, config, "env", "A")
-            self.remove_setting(changes, config, "env", "B")
-        return config, changes
+            self.remove_setting(changes, config, ["env", "C"])
+            self.remove_setting(changes, config, ["env", "D"])
+            self.add_setting(changes, config, ["env", "A"], "0")
+            self.add_setting(changes, config, ["env", "B"], "1")
+
+    def upgrade(self, config, meta_config=None, downgrade=False):
+        self.add_setting(config, ["env", "C"], "0")
+        self.add_setting(config, ["env", "D"], "1")
+        self.remove_setting(config, ["env", "A"])
+        self.remove_setting(config, ["env", "B"])
+        return config, self.reports
 
 
 class Upgrade273to281(rose.macro.MacroUpgrade):
@@ -37,14 +35,12 @@ class Upgrade273to281(rose.macro.MacroUpgrade):
     AFTER_TAG = "28.1"
 
     def transform(self, config, meta_config=None, downgrade=False):
-        changes = []
         if downgrade:
-            self.add_setting(changes, config, "namelist:test_nl",
-                             "X", "0")
+            self.add_setting(config, ["namelist:test_nl", "X"], "0")
         else:
-            self.remove_setting(changes, config, "namelist:test_nl",
-                                "X", info="Remove for #2020")
-        return config, changes
+            self.remove_setting(config, ["namelist:test_nl", "X"],
+                                info="Remove for #2020")
+        return config, self.reports
 
 
 class Upgrade281to291(rose.macro.MacroUpgrade):
@@ -57,12 +53,11 @@ class Upgrade281to291(rose.macro.MacroUpgrade):
     def transform(self, config, meta_config=None, downgrade=False):
         changes = []
         if downgrade:
-            self.add_setting(changes, config, "namelist:test_nl",
-                             "C", "0")
+            self.add_setting(config, ["namelist:test_nl", "C"], "0")
         else:
-            self.remove_setting(changes, config, "namelist:test_nl",
-                                "C", info="Remove for #1668")
-        return config, changes
+            self.remove_setting(config, ["namelist:test_nl", "C"],
+                                info="Remove for #1668")
+        return config, self.reports
 
 
 class Upgrade291to292(rose.macro.MacroUpgrade):

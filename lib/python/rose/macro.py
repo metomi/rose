@@ -98,7 +98,9 @@ class MacroValidateError(Exception):
 class MacroBase(object):
 
     """Base class for macros for validating or transforming configurations."""
-    
+
+    reports = []  # A list of MacroReport instances for errors or changes
+
     def _get_section_option_from_id(self, var_id):
         """Return a configuration section and option from an id."""
         section_option = var_id.split(rose.CONFIG_DELIMITER, 1)
@@ -161,8 +163,8 @@ class MacroBase(object):
         """Standardise configuration syntax."""
         standard_format_config(config)
 
-    def add_report(self, report_list, *args, **kwargs):
-        report_list.append(MacroReport(*args, **kwargs))
+    def add_report(self, *args, **kwargs):
+        self.reports.append(MacroReport(*args, **kwargs))
 
 
 class MacroValidatorCollection(MacroBase):
@@ -174,15 +176,14 @@ class MacroValidatorCollection(MacroBase):
         super(MacroCollection, self).__init__()
 
     def validate(self, config, meta_config):
-        problem_list = []
         for macro_inst in self.macros:
             if not hasattr(macro_inst, VALIDATE_METHOD):
                 continue
             macro_method = getattr(macro_inst, VALIDATE_METHOD)
             p_list = macro_meth(config, meta_config)
             p_list.sort(self._sorter)
-            problem_list += p_list
-        return problem_list 
+            self.reports += p_list
+        return self.reports 
 
 
 class MacroTransformerCollection(MacroBase):
@@ -194,15 +195,14 @@ class MacroTransformerCollection(MacroBase):
         super(MacroCollection, self).__init__()
 
     def transform(self, config, meta_config=None):
-        change_list = []
         for macro_inst in self.macros:
             if not hasattr(macro_inst, TRANSFORM_METHOD):
                 continue
             macro_method = getattr(macro_inst, TRANSFORM_METHOD)
             config, c_list = macro_method(config, meta_config)
             c_list.sort(self._sorter)
-            change_list += c_list
-        return config, change_list
+            self.reports += c_list
+        return config, self.reports
 
 
 class MacroReport(object):
