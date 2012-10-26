@@ -1037,7 +1037,13 @@ trigger = env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
         specified after the widget name. E.g. to set up a hypothetical table
         with named columns X, Y, VCT, and Level, we may do:</p>
         <pre>
-widget[config-edit] = table X Y VCT Level
+widget[rose-config-edit] = table X Y VCT Level
+</pre>
+        <p>You may override to a Rose built-in widget by specifying a full
+        <code>rose</code> class path in Python - for example, to always show
+        radiobuttons for an option with <code>values</code> set:</p>
+        <pre>
+widget[rose-config-edit] = rose.config_editor.valuewidget.radiobuttons
 </pre>
       </dd>
     </dl>
