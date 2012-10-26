@@ -85,16 +85,15 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "TIME",
                         "help": "Specify current cycle time."}],
-               "cycle_offsets": [
-                       ["--cycle-offset", "-T"],
-                       {"action": "append",
-                        "dest": "cycle_offsets",
+               "cycle_interval": [
+                       ["--cycle-interval", "-I"],
+                       {"action": "store",
                         "metavar": "TIME-DELTA",
-                        "help": "Specify cycle offsets."}],
+                        "help": "Specify cycle interval."}],
                "default": [
                        ["--default"],
                        {"metavar": "VALUE",
-                        "help": "Specify a default value"}],
+                        "help": "specify a default value"}],
                "debug_mode": [
                        ["--debug"],
                        {"action": "store_true",
@@ -106,12 +105,17 @@ class RoseOptionParser(OptionParser):
                         "dest": "defines",
                         "metavar": "[SECTION]KEY=VALUE",
                         "help": "Set [SECTION]KEY to VALUE."}],
+               "downgrade": [
+                       ["--downgrade", "-d"],
+                       {"action": "store_true",
+                        "dest": "downgrade",
+                        "help": "Downgrade instead of upgrade."}],
                "files": [
                        ["--file", "-f"],
                        {"action": "append",
                         "dest": "files",
                         "metavar": "FILE",
-                        "help": "Specify the configuration file(s)."}],
+                        "help": "specify the configuration file(s)."}],
                "force_mode": [
                        ["--force", "-f"],
                        {"action": "store_true",
@@ -150,10 +154,6 @@ class RoseOptionParser(OptionParser):
                        ["--latest"],
                        {"action": "store_true",
                         "help": "Print the latest ID in the repository"}],
-               "local_only": [
-                       ["--local-only"],
-                       {"action": "store_true",
-                        "help": "Delete only the local copy of a suite"}],
                "lower": [
                        ["--lower", "-l"],
                        {"action": "store_const",
@@ -283,28 +283,22 @@ class RoseOptionParser(OptionParser):
                        ["--suffix-delim"],
                        {"metavar": "DELIMITER",
                         "help": "Specify the suffix delimiter."}],
-               "thresholds": [
-                       ["--threshold"],
-                       {"action": "append",
-                        "dest": "thresholds",
-                        "metavar": "METHOD:METHOD-ARG:NUMBER",
-                        "help": "Specify one or more threshold."}],
                "to_local_copy": [
                        ["--to-local-copy"],
                        {"action": "store_true",
-                        "help": "Convert ID to to the local copy path"}],
+                        "help": "convert ID to to the local copy path"}],
                "to_origin": [
                        ["--to-origin"],
                        {"action": "store_true", 
-                        "help": "Convert ID to the origin URL"}],
+                        "help": "convert ID to the origin URL"}],
                "to_output": [
                        ["--to-output"],
                        {"action": "store_true", 
-                        "help": "Get the ID output directory"}],
+                        "help": "get the ID output directory"}],
                "to_web": [
                        ["--to-web"],
                        {"action": "store_true", 
-                        "help": "Convert ID to the web source URL"}],
+                        "help": "convert ID to the web source URL"}],
                "upper": [
                        ["--upper", "-u"],
                        {"action": "store_const",

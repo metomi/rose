@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) Crown copyright Met Office. All rights reserved.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-upgrade
+#
+# SYNOPSIS
+#     rose upgrade [OPTIONS] [VERSION]
+#
+# DESCRIPTION
+#     Upgrade a configuration according to metadata upgrade macros.
+#
+# OPTION
+#     --config=DIR; -C DIR
+#         Use configuration in DIR instead of $PWD.
+#     --downgrade; -d;
+#         Downgrade the version instead of upgrade.
+#     --meta-path=PATH; -M PATH
+#         Prepend PATH to the metadata search path.
+#     --non-interactive, --yes, -y
+#         Switch off interactive prompting.
+#     --output=DIR; -O DIR
+#         The location of the output directory. Only meaningful if
+#         there is at least one transformer in the argument list.
+#     --quiet; -q
+#         Reduce verbosity.
+#
+# ARGUMENTS
+#     VERSION
+#         A version to change to. If no version is specified, prompt the user
+#         to enter one. If --non-interactive is used, use the latest version
+#         available.
+#-------------------------------------------------------------------------------
+exec python -m rose.macro "upgrade" "$@"

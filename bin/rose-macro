@@ -49,4 +49,4 @@
 #         --validate is not used, list all available macros. Otherwise, run
 #         the specified macro names.
 #-------------------------------------------------------------------------------
-exec python -m rose.macro "$@"
+exec python -m rose.macro "macro" "$@"
