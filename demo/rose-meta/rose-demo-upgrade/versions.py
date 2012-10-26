@@ -4,10 +4,10 @@
 # (C) Crown copyright Met Office. All rights reserved.
 #-----------------------------------------------------------------------------
 
-import rose.macro
+import rose.upgrade
 
 
-class Upgrade272to273(rose.macro.MacroUpgrade):
+class Upgrade272to273(rose.upgrade.MacroUpgrade):
 
     """Upgrade from 27.2 to 27.3."""
 
@@ -15,10 +15,10 @@ class Upgrade272to273(rose.macro.MacroUpgrade):
     AFTER_TAG = "27.3"
 
     def downgrade(self, config, meta_config=None):
-        self.remove_setting(changes, config, ["env", "C"])
-        self.remove_setting(changes, config, ["env", "D"])
-        self.add_setting(changes, config, ["env", "A"], "0")
-        self.add_setting(changes, config, ["env", "B"], "1")
+        self.remove_setting(config, ["env", "C"])
+        self.remove_setting(config, ["env", "D"])
+        self.add_setting(config, ["env", "A"], "0")
+        self.add_setting(config, ["env", "B"], "1")
         return config, self.reports
 
     def upgrade(self, config, meta_config=None):
@@ -29,7 +29,7 @@ class Upgrade272to273(rose.macro.MacroUpgrade):
         return config, self.reports
 
 
-class Upgrade273to281(rose.macro.MacroUpgrade):
+class Upgrade273to281(rose.upgrade.MacroUpgrade):
 
     """Upgrade from 27.3 to 28.1."""
 
@@ -46,7 +46,7 @@ class Upgrade273to281(rose.macro.MacroUpgrade):
         return config, self.reports
 
 
-class Upgrade281to291(rose.macro.MacroUpgrade):
+class Upgrade281to291(rose.upgrade.MacroUpgrade):
 
     """Upgrade from 28.1 to 29.1."""
 
@@ -63,7 +63,7 @@ class Upgrade281to291(rose.macro.MacroUpgrade):
         return config, self.reports
 
 
-class Upgrade291to292(rose.macro.MacroUpgrade):
+class Upgrade291to292(rose.upgrade.MacroUpgrade):
 
     """Upgrade from 29.1 to 29.2."""
 

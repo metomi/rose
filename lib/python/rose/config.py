@@ -240,6 +240,8 @@ class ConfigNode(object):
             return None
         keys = list(keys)
         key = keys.pop()
+        while keys and key is None:
+            key = keys.pop()
         try:
             return self.get(keys).value.pop(key)
         except:

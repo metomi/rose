@@ -34,11 +34,12 @@ import rose.config_editor.variable
 import rose.formats.namelist
 from rose.opt_parse import RoseOptionParser
 import rose.resource
+import rose.upgrade
 import rose.variable
 
 
-ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate"]
-ARG_DOWNGRADE = "downgrade"
+ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate",
+                               "downgrade", "upgrade"]
 ERROR_LOAD_CONFIG_DIR = "{0}: not an application directory.\n"
 ERROR_LOAD_MACRO = "Could not load macro {0}: {1}"
 ERROR_LOAD_METADATA_DIR = "Could not find metadata directory.\n"
@@ -47,10 +48,6 @@ ERROR_LOAD_META_PATH = "Could not find {0}\n"
 ERROR_LOAD_CONF_META_NODE = "Could not find meta flag"
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACROS = "Please specify a macro name.\n"
-ERROR_NO_VALID_VERSIONS = "No versions available."
-ERROR_UPGRADE_VERSION = "Invalid version: {0} should be one of {1}"
-INFO_DOWNGRADED = "Downgraded from {0} to {1}"
-INFO_UPGRADED = "Upgraded from {0} to {1}"
 MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"), "macros")
 MACRO_EXT = ".py"
 MACRO_OUTPUT_HELP = "    # {0}"
@@ -58,20 +55,11 @@ MACRO_OUTPUT_ID = "[{0}] {2}"
 MACRO_OUTPUT_TRANSFORM_CHANGES = "{0}: changes: {1}\n"
 MACRO_OUTPUT_VALIDATE_ISSUES = "{0}: issues: {1}\n"
 MACRO_OUTPUT_WARNING_ISSUES = "{0}: warnings: {1}\n"
-MACRO_UPGRADE_MODULE = "versions"
-MACRO_UPGRADE_RESOURCE_DIR = "etc"
-MACRO_UPGRADE_RESOURCE_FILE_ADD = "rose-macro-add.conf"
-MACRO_UPGRADE_RESOURCE_FILE_REMOVE = "rose-macro-remove.conf"
-NAME_DOWNGRADE = "Downgrade{0}-{1}"
-NAME_UPGRADE = "Upgrade{0}-{1}"
 REC_MODIFIER = re.compile(r"\{.+\}")
 REC_ID_STRIP_DUPL = re.compile(r"\([\d:, ]+\)")
 REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([\d:, ]+\))?$')
 PROBLEM_ENTRY = "    {0}={1}={2}\n        {3}\n"
 PROMPT_ACCEPT_CHANGES = "Accept y/n (default n)? "
-PROMPT_CHOOSE_VERSION = ("Eligible versions: {0}\n" +
-                         "Enter a version (or press <return> " +
-                         "for the last one): ")
 PROMPT_OK = "y"
 TRANSFORM_CHANGE = "    {0}={1}={2}\n        {3}"
 TRANSFORM_METHOD = "transform"
@@ -639,10 +627,10 @@ def main(mode):
     else:
         if len(args) > 1:
             sys.exit(opt_parser.get_usage())
-        run_upgrade_macros(app_config, meta_config, config_name, args,
-                           opts.conf_dir, opts.downgrade,
-                           opts.non_interactive,
-                           opts.output_dir, opts.quietness)
+        rose.upgrade.run_upgrade_macros(app_config, meta_config, config_name,
+                                        args, opts.conf_dir, opts.downgrade,
+                                        opts.non_interactive,
+                                        opts.output_dir, opts.quietness)
     sys.exit(0)
 
 if __name__ == "__main__":
