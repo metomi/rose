@@ -17,15 +17,15 @@ class Upgrade272to273(rose.macro.MacroUpgrade):
     def transform(self, config, meta_config=None, downgrade=False):
         changes = []
         if downgrade:
-            self.remove_option(changes, config, "env", "C")
-            self.remove_option(changes, config, "env", "D")
-            self.add_option(changes, config, "env", "A", "0")
-            self.add_option(changes, config, "env", "B", "1")
+            self.remove_setting(changes, config, "env", "C")
+            self.remove_setting(changes, config, "env", "D")
+            self.add_setting(changes, config, "env", "A", "0")
+            self.add_setting(changes, config, "env", "B", "1")
         else:
-            self.add_option(changes, config, "env", "C", "0")
-            self.add_option(changes, config, "env", "D", "1")
-            self.remove_option(changes, config, "env", "A")
-            self.remove_option(changes, config, "env", "B")
+            self.add_setting(changes, config, "env", "C", "0")
+            self.add_setting(changes, config, "env", "D", "1")
+            self.remove_setting(changes, config, "env", "A")
+            self.remove_setting(changes, config, "env", "B")
         return config, changes
 
 
@@ -39,11 +39,11 @@ class Upgrade273to281(rose.macro.MacroUpgrade):
     def transform(self, config, meta_config=None, downgrade=False):
         changes = []
         if downgrade:
-            self.add_option(changes, config, "namelist:test_nl",
-                            "X", "0")
+            self.add_setting(changes, config, "namelist:test_nl",
+                             "X", "0")
         else:
-            self.remove_option(changes, config, "namelist:test_nl",
-                               "X", info="Remove for #2020")
+            self.remove_setting(changes, config, "namelist:test_nl",
+                                "X", info="Remove for #2020")
         return config, changes
 
 
@@ -57,11 +57,11 @@ class Upgrade281to291(rose.macro.MacroUpgrade):
     def transform(self, config, meta_config=None, downgrade=False):
         changes = []
         if downgrade:
-            self.add_option(changes, config, "namelist:test_nl",
-                            "C", "0")
+            self.add_setting(changes, config, "namelist:test_nl",
+                             "C", "0")
         else:
-            self.remove_option(changes, config, "namelist:test_nl",
-                               "C", info="Remove for #1668")
+            self.remove_setting(changes, config, "namelist:test_nl",
+                                "C", info="Remove for #1668")
         return config, changes
 
 

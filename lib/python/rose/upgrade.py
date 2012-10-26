@@ -46,20 +46,18 @@ class MacroUpgrade(rose.macro.MacroBase):
         if downgrade:
             add_config, rem_config = rem_config, add_config
         for keys, node in add_config.walk():
-            if len(keys) == 2:
-                self.add_option(changes, config, keys[0], keys[1],
-                                state=node.state,
-                                comments=node.comments)
-            else:
-                self.add_section(changes, config, keys[0],
-                                 state=node.state,
-                                 comments=node.comments)
+            section = keys[0]
+            option = None
+            if len(keys) > 1:
+                option = keys[1]
+            self.add_setting(changes, config, section, option,
+                             state=node.state, comments=node.comments)
         for keys, node in rem_config.walk():
-            if len(keys) == 2:
-                self.remove_option(changes, config, keys[0], keys[1])
-            elif (not node.value.keys() or config.get(keys) is None or
-                  not config.get(keys).value.keys()):
-                self.remove_section(changes, config, keys[0])
+            section = keys[0]
+            option = None
+            if len(keys) > 1:
+                option = keys[1]
+            self.remove_setting(changes, config, section, option)
 
     def _get_config_resources(self):
         # Get macro configuration resources.
