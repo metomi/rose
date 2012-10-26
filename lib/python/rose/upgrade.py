@@ -79,60 +79,8 @@ class MacroUpgrade(rose.macro.MacroBase):
                 file_map.pop(key)
         return file_map
 
-    def add_section(self, changes, config, section, state=None, comments=None,
-                    info=None):
-        """Add a section to the configuration."""
-        return self._add_setting(changes, config, section, state=state,
-                                 comments=comments, info=info)
-
-    def add_option(self, changes, config, section, name, value=None,
-                   state=None, comments=None, info=None):
-        """Add a variable to the configuration."""
-        return self._add_setting(changes, config, section, name, value,
-                                 state=state, comments=comments, info=info)
-
-    def enable_section(self, changes, config, section, info=None):
-        """Set or unset the user-ignored flag for a section."""
-        return self._ignore_setting(changes, config, section,
-                                    should_be_user_ignored=False, info=info)
-
-    def enable_variable(self, changes, config, section, name, info=None):
-        """Set or unset the user-ignored flag for a variable."""
-        return self._ignore_setting(changes, config, section, name,
-                                    should_be_user_ignored=False, info=info)
-
-
-    def get_value(self, config, section, name=None, no_ignore=False):
-        """Return the value of a setting."""
-        if config.get([section, name], no_ignore=no_ignore) is None:
-            return None
-        return config.get([section, name]).value
-
-    def ignore_section(self, changes, config, section, info=None):
-        """Set or unset the user-ignored flag for a section."""
-        return self._ignore_setting(changes, config, section,
-                                    should_be_user_ignored=True, info=info)
-
-    def ignore_option(self, changes, config, section, name, info=None):
-        """Set or unset the user-ignored flag for a variable."""
-        return self._ignore_setting(changes, config, section, name,
-                                    should_be_user_ignored=True, info=info)
-
-    def remove_section(self, changes, config, section, info=None):
-        """Remove a section from the configuration, if it exists."""
-        if config.get([section]) is None:
-            return False
-        option_node_pairs = config.walk([section])
-        for option, option_node in option_node_pairs:
-            self.remove_option(changes, config, section, option)
-        return self._remove_setting(changes, config, section, info)
-
-    def remove_option(self, changes, config, section, name, info=None):
-        """Remove a variable from the configuration, if it exists."""
-        return self._remove_setting(changes, config, section, name, info)
-
-    def _add_setting(self, changes, config, section, name=None, value=None,
-                     state=None, comments=None, info=None):
+    def add_setting(self, changes, config, section, name=None, value=None,
+                    state=None, comments=None, info=None):
         """Add a setting to the configuration."""
         id_ = self._get_id_from_section_option(section, name)
         if name is not None and value is None:
@@ -152,6 +100,32 @@ class MacroUpgrade(rose.macro.MacroBase):
         config.set([section, name], value=value, state=state,
                    comments=comments)
         self.add_report(changes, section, name, value, info)
+
+    def get_value(self, config, section, name=None, no_ignore=False):
+        """Return the value of a setting."""
+        if config.get([section, name], no_ignore=no_ignore) is None:
+            return None
+        return config.get([section, name]).value
+
+    def remove_setting(self, changes, config, section, name=None, info=None):
+        """Remove a setting from the configuration."""
+        if name is None:
+            if config.get([section]) is None:
+                return False
+            option_node_pairs = config.walk([section])
+            for option, option_node in option_node_pairs:
+                self._remove_setting(changes, config, section, option, info)
+        return self._remove_setting(changes, config, section, name, info)
+
+    def enable_setting(self, changes, config, section, name=None, info=None):
+        """Enable a setting in the configuration."""
+        return self._ignore_setting(changes, config, section, name,
+                                    should_be_user_ignored=False, info)
+
+    def ignore_setting(self, changes, config, section, name=None, info=None):
+        """User-ignore a setting in the configuration."""
+        return self._ignore_setting(changes, config, section, name,
+                                    should_be_user_ignored=True, info)
 
     def _ignore_setting(self, changes, config, section, name=None,
                         should_be_user_ignored=False, info=None):
