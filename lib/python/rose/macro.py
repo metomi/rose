@@ -327,8 +327,7 @@ def get_macros_for_config(app_config=None,
         app_config = rose.config.ConfigNode()
     meta_path = load_meta_path(app_config, config_directory)
     if meta_path is None:
-        sys.stderr.write(ERROR_LOAD_METADATA)
-        sys.exit(2)
+        sys.exit(ERROR_LOAD_METADATA)
     meta_filepaths = []
     for dirpath, dirnames, filenames in os.walk(meta_path):
         if "/.svn" in dirpath:
@@ -616,8 +615,7 @@ def main(mode):
                                     rose.SUB_CONFIG_NAME)
     if (not os.path.exists(config_file_path) or
         not os.path.isfile(config_file_path)):
-        sys.stderr.write(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir))
-        sys.exit(2)
+        sys.exit(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir))
     # Load the configuration and the metadata macros.
     app_config = rose.config.load(config_file_path)
     standard_format_config(app_config)
@@ -627,8 +625,7 @@ def main(mode):
     meta_path = load_meta_path(app_config, opts.conf_dir)
     if meta_path is None:
         if mode == "macro":
-            sys.stderr.write(ERROR_LOAD_METADATA)
-            sys.exit(2)
+            sys.exit(ERROR_LOAD_METADATA)
     else:
         meta_config_path = os.path.join(meta_path, rose.META_CONFIG_NAME)
         if os.path.isfile(meta_config_path):

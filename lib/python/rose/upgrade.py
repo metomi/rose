@@ -38,7 +38,7 @@ class MacroUpgrade(rose.macro.MacroBase):
     INFO_REMOVED = "Removed"
     UPGRADE_RESOURCE_DIR = rose.macro.MACRO_UPGRADE_RESOURCE_DIR
 
-    def act_from_files(self, changes, config, downgrade=False):
+    def act_from_files(self, config, downgrade=False):
         """Parse a change configuration into actions."""
         res_map = self._get_config_resources()
         add_config = res_map.get(MACRO_UPGRADE_RESOURCE_FILE_ADD)
