@@ -647,14 +647,12 @@ class RosieDatabaseInitiator(object):
         youngest = int(self.popen("svnlook", "youngest", location)[0])
         util_home = ResourceLocator.default().get_util_home()
         rosa = os.path.join(util_home, "sbin", "rosa")
-        print "CALL", rosa
         revision = 1
         while revision <= youngest:
             out, err = self.popen(rosa, "svn-post-commit", location, str(revision))
-            print "OUT:", out
-            print "ERR:", err
             event = RosieDatabaseLoadEvent(prefix, revision, youngest)
             if revision == youngest:
+                # Check if any new revisions have been added.
                 youngest = int(self.popen("svnlook", "youngest", location)[0])
             if revision == youngest:
                 event.level = event.DEFAULT

@@ -52,6 +52,8 @@ ST_MODIFIED = "M"
 
 class DAO(object):
 
+    """Data Access Object for 'put' type operations."""
+
     T_CHANGESET = "changeset"
     T_MAIN = "main"
     T_OPTIONAL = "optional"
@@ -112,6 +114,7 @@ def svnlook(*args):
 
 
 def check_path_is_idx(path):
+    """Return whether the path contains a full idx."""
     names = path.split("/")
     if len(names) < LEN_ID + 1:
         return False
@@ -171,13 +174,11 @@ def main(repos, rev):
         if (idx == "ROSIE" and branch == "trunk" and
             path == branch_path + "/" + KNOWN_KEYS_FILE):
             new_keys = parse_known_keys(repos, path, rev)
-            print "new keys", new_keys
             if new_keys is not None:
                 try:
                     dao.insert(dao.T_META, name="known_keys", value=new_keys)
                 except al.exc.IntegrityError:
                     dao.update(dao.T_META, ("name",), name="known_keys", value=new_keys)
-                print " updated KEYS"
 
         if path.rstrip("/") == branch_path:
             if status[0] == ST_DELETED:
@@ -267,7 +268,6 @@ def main(repos, rev):
 
 def parse_known_keys(repos, file_path, rev):
     """Parse the file containing whitespace-separated known keys."""
-    print "PARSE", KNOWN_KEYS_FILE
     try:
         key_string = svnlook("cat", "-r", rev, repos, file_path)
         key_string = " ".join(shlex.split(key_string))

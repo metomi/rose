@@ -64,7 +64,6 @@ class PrefixRoot(object):
     """Serves the index page of the database of a given prefix."""
 
     def __init__(self, template_env, prefix, db_url):
-        print "Helloooooooooo"
         self.exposed = True
         self.template_env = template_env
         self.prefix = prefix
@@ -137,7 +136,7 @@ class PrefixRoot(object):
                         web_prefix=cherrypy.request.script_name,
                         prefix=self.prefix,
                         prefix_source_url=self.source_url,
-                        known_keys=self.dao.get_known_keys(self.prefix),
+                        known_keys=self.dao.get_known_keys(),
                         query_operators=self.dao.get_query_operators(),
                         all_revs=all_revs,
                         filters=filters,
