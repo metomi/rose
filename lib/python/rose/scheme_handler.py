@@ -36,6 +36,11 @@ class SchemeHandlersManager(object):
         args and kwargs are passed as *args, **kwargs to the constructor of
         each class.
 
+        A handler class should have a h.SCHEME attribute with a str value.
+        Optionally, it should have a h.can_handle(scheme, **kwargs) method that
+        returns a boolean value to indicate whether it can handle a given
+        scheme.
+
         """
         self.handlers = {}
         cwd = os.getcwd()
@@ -66,7 +71,7 @@ class SchemeHandlersManager(object):
         if self.handlers.has_key(scheme):
             return self.handlers[scheme]
 
-    def guess_handler(self, scheme):
+    def guess_handler(self, scheme, **kwargs):
         """Return a handler that can handle scheme.
 
         Return None if there is no handler with a matching scheme.
@@ -78,5 +83,5 @@ class SchemeHandlersManager(object):
         for handler in self.handlers.values():
             if (hasattr(handler, "can_handle") and
                 callable(handler.can_handle) and
-                handler.can_handle(scheme)):
+                handler.can_handle(scheme, **kwargs)):
                 return handler

@@ -28,7 +28,9 @@ from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.reporter import Event
+from rose.scheme_handler import SchemeHandlersManager
 import shlex
+import sqlite3
 import shutil
 import tempfile
 
@@ -66,6 +68,14 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     NPROC = 6
     RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
 
+    def __init__(self, *args, **kwargs):
+        ConfigProcessorBase.__init__(self, *args, **kwargs)
+        self.file_loc_handlers_manager = FileLocHandlersManager(
+                event_handler=self.manager.event_handler,
+                popen=self.manager.popen,
+                fs_util=self.manager.fs_util)
+        self.file_loc_dao = FileLocDAO()
+
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Install files according to the file:* sections in "config"."""
         nodes = {}
@@ -92,6 +102,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 raise ConfigProcessError([key], None, e)
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(target))
 
+        # Create database for information of locations that can be invariants
+        self.file_loc_dao.create()
+
         # Start worker pool
         nproc = int(rose.config.default_node().get_value(
                 ["rose.config_processors.file", "nproc"],
@@ -116,7 +129,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         """Install a target according to a file:target section."""
         target = key[len(self.PREFIX):]
 
-        # FIXME: this is not always necessary
         content_value = node.get_value(["content"])
         if content_value:
             # Embedded content
@@ -148,9 +160,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 if mode == "symlink":
                     self.manager.fs_util.symlink(source, target)
                 else:
-                    if os.path.exists(target):
-                        self.manager.fs_util.delete(target)
-                    self._source_export(source, target)
+                    #if os.path.exists(target):
+                    #    self.manager.fs_util.delete(target)
+                    loc = FileLoc(source)
+                    self.file_loc_handlers_manager.pull(target, loc)
                     self.manager.handle_event(
                             FileSystemEvent("install", target, source))
             elif len(sources) > 1 or len(sources) == 0 and mode != "mkdir":
@@ -158,7 +171,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     self.manager.fs_util.delete(target)
                 target_file = open(target, 'wb')
                 for source in sources:
-                    target_file.write(self._source_load(source))
+                    loc = FileLoc(source)
+                    f = self.file_loc_handlers_manager.load(loc)
+                    target_file.write(f.read())
                 target_file.close()
                 self.manager.handle_event(
                         FileSystemEvent("install", target, source_str))
@@ -171,7 +186,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     self.manager.fs_util.delete(target)
                     self.manager.fs_util.makedirs(target)
 
-            # Checksum
+            # Target MD5 checksum
             checksum_expected = node.get_value(["checksum"])
             if checksum_expected is not None:
                 target_file = open(target)
@@ -215,10 +230,48 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             return open(source).read()
 
 
-class LocationProcessorBase(object):
-    """Base class for a location processor."""
+class FileLoc(object):
+    """Represent the location of a (remote) file."""
 
-    METHOD = None
+    def __init__(self, name, scheme=None):
+        self.name = name
+        self.name_invariant = None
+        self.scheme = scheme
+
+    def __str__(self):
+        if self.name_invariant:
+            return self.name_invariant
+        else:
+            return self.name
+
+
+class FileLocDAO(object):
+    """DAO for information of locations that can be invariants."""
+
+    DB_FILE_NAME = ".rose-config_processors-file.db"
+
+    def create(self):
+        if not os.path.exists(self.DB_FILE_NAME):
+            conn = sqlite3.connect(self.DB_FILE_NAME)
+            c = conn.cursor()
+            c.execute("""CREATE TABLE paths(
+                          path TEXT,
+                          loc TEXT,
+                          UNIQUE(path, loc))""")
+            c.execute("""CREATE TABLE content(
+                          loc TEXT,
+                          path TEXT,
+                          value TEXT,
+                          UNIQUE(loc, path))""")
+            conn.commit()
+
+
+class FileLocHandlerBase(object):
+    """Base class for a file location handler."""
+
+    SCHEME = None
+    PULL_MODE = "PULL_MODE"
+    PUSH_MODE = "PUSH_MODE"
 
     def __init__(self, manager):
         self.manager = manager
@@ -227,23 +280,35 @@ class LocationProcessorBase(object):
         """Call self.event_handler with given arguments if possible."""
         self.manager.handle_event(*args, **kwargs)
 
-    def can_pull(self, there):
+    def can_handle(self, file_loc, mode=PULL_MODE):
+        """Return True if this handler can handle file_loc."""
         return False
 
-    def can_push(self, there):
-        return False
+    def load(self, file_loc, **kwargs):
+        """Return a temporary file handle to read a remote file_loc."""
+        f = tempfile.NamedTemporaryFile()
+        self.pull(f.name, file_loc)
+        f.seek(0)
+        return f
 
-    def pull(self, here, there, **kwargs):
+    def pull(self, file_path, file_loc, **kwargs):
+        """Pull remote file_loc to local file_path."""
         raise NotImplementedError()
 
-    def push(self, here, there, **kwargs):
+    def push(self, file_path, file_loc, **kwargs):
+        """Push local file_path to remote file_loc."""
         raise NotImplementedError()
 
 
-class LocationProcessorManager(object):
-    """Manage location processors."""
+class FileLocHandlersManager(SchemeHandlersManager):
+    """Manage location handlers."""
+
+    PULL_MODE = FileLocHandlerBase.PULL_MODE
+    PUSH_MODE = FileLocHandlerBase.PUSH_MODE
 
     def __init__(self, event_handler=None, popen=None, fs_util=None):
+        path = os.path.join(os.path.dirname(__file__), "file_loc_handlers")
+        SchemeHandlersManager.__init__(self, path, ["load", "pull", "push"])
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -251,51 +316,32 @@ class LocationProcessorManager(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        self.processors = []
-        processors_dir = os.path.join(os.path.dirname(__file__),
-                                      "loc_processors")
-        ns = "rose.loc_processors"
-        cwd = os.getcwd()
-        os.chdir(processors_dir)
-        try:
-            for basename in glob("*.py"):
-                if basename.startswith("__"):
-                    continue
-                name = basename[0:-3]
-                try:
-                    mod = __import__(ns + "." + name, fromlist=ns)
-                except ImportError as e:
-                    continue
-                for c in vars(mod).values():
-                    if (getattr(c, "METHOD", None) is not None and
-                        hasattr(c, "can_pull") and hasattr(c, "pull") and
-                        hasattr(c, "can_push") and hasattr(c, "push")):
-                        self.processors[c.METHOD] = c(self)
-        finally:
-            os.chdir(cwd)
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler with given arguments if possible."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def get_processor(self, there, method=None, mode="pull"):
-        if self.processors.has_key(method):
-            return self.processors[method]
-        for processor in self.processors.values():
-            if (mode == "push" and processor.can_push(there) or
-                mode == "pull" and processor.can_pull(there)):
-                return processor
+    def load(self, file_loc, **kwargs):
+        if file_loc.scheme:
+            p = self.get_handler(file_loc.scheme)
         else:
-            raise KeyError((there, method, mode)) # TODO: need custom exception
+            p = self.guess_handler(file_loc, mode=self.PULL_MODE)
+        return p.load(file_loc, **kwargs)
 
-    def pull(self, here, there, method=None, **kwargs):
-        p = self.get_processor(there, method)
-        return p.pull(here, there, **kwargs)
+    def pull(self, file_path, file_loc, **kwargs):
+        if file_loc.scheme:
+            p = self.get_handler(file_loc.scheme)
+        else:
+            p = self.guess_handler(file_loc, mode=self.PULL_MODE)
+        return p.pull(file_path, file_loc, **kwargs)
 
-    def push(self, here, there, method=None, **kwargs):
-        p = self.get_processor(there, method, mode="push")
-        return p.push(here, there, **kwargs)
+    def push(self, file_path, file_loc, **kwargs):
+        if file_loc.scheme:
+            p = self.get_handler(file_loc.scheme)
+        else:
+            p = self.guess_handler(file_loc, mode=self.PUSH_MODE)
+        return p.push(file_path, file_loc, **kwargs)
 
 
 class WorkerEventHandler(object):
