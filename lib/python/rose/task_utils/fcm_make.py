@@ -20,22 +20,24 @@
 """Task utility: run "fcm make"."""
 
 from rose.env import env_export
-from rose.run import AppRunner
+from rose.run import TaskUtilBase
 import os
 import sys
 
-class FCMMakeTaskUtil(AppRunner):
+class FCMMakeTaskUtil(TaskUtilBase):
 
     """Run "fcm make"."""
 
     CONFIG_IS_OPTIONAL = True
+    SCHEME = "fcm_make"
+    SCHEME2 = "fcm_make2"
 
     def can_handle(self, key):
-        return key.startswith("fcm_make") and not key.startswith("fcm_make2")
+        return key.startswith(self.SCHEME) and not key.startswith(self.SCHEME2)
 
     def run_impl_main(self, config, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props()
-        task2_name = "fcm_make2" + t.task_name.replace("fcm_make", "")
+        task2_name = self.SCHEME2 + t.task_name.replace(self.SCHEME, "")
         auth = self.suite_engine_proc.get_remote_auth(t.suite_name, task2_name)
         if auth is not None:
             target = "@".join(auth)

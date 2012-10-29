@@ -38,7 +38,7 @@ class ConfigProcessNamelistEvent(Event):
 
 class ConfigProcessorForNamelist(ConfigProcessorBase):
 
-    KEY = "namelist"
+    SCHEME = "namelist"
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         if item.endswith("(:)"):

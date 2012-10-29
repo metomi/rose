@@ -62,14 +62,14 @@ class ChecksumEvent(Event):
 
 class ConfigProcessorForFile(ConfigProcessorBase):
 
-    KEY = "file"
+    SCHEME = "file"
     NPROC = 6
     RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Install files according to the file:* sections in "config"."""
         nodes = {}
-        if item == self.KEY:
+        if item == self.SCHEME:
             for key, node in config.value.items():
                 if node.is_ignored() or not key.startswith(self.PREFIX):
                     continue

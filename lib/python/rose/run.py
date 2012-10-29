@@ -32,6 +32,7 @@ from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter, ReporterContext
+from rose.scheme_handler import SchemeHandlersManager
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
 import socket
@@ -108,6 +109,7 @@ class Runner(object):
     """Invoke a Rose application or a Rose suite."""
 
     CONFIG_IS_OPTIONAL = False
+    CONF_NAME = None
     NAME = None
     OPTIONS = []
     REC_OPT_DEFINE = re.compile(r"\A(?:\[([^\]]+)\])?([^=]+)?(?:=(.*))?\Z")
@@ -129,6 +131,8 @@ class Runner(object):
 
     def __init__(self, event_handler=None, popen=None, config_pm=None,
                  fs_util=None, host_selector=None, suite_engine_proc=None):
+        if not self.CONF_NAME:
+            self.CONF_NAME = self.NAME
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -165,7 +169,7 @@ class Runner(object):
         if conf_dir is None:
             conf_dir = os.getcwd()
         config = rose.config.ConfigNode()
-        source = os.path.join(conf_dir, "rose-" + self.NAME + ".conf")
+        source = os.path.join(conf_dir, "rose-" + self.CONF_NAME + ".conf")
         if self.CONFIG_IS_OPTIONAL:
             try:
                 rose.config.load(source, config)
@@ -177,7 +181,7 @@ class Runner(object):
         # Optional configuration files
         if opts.opt_conf_keys:
             for key in opts.opt_conf_keys:
-                source_base = "rose-" + self.NAME + "-" + key + ".conf"
+                source_base = "rose-" + self.CONF_NAME + "-" + key + ".conf"
                 source = os.path.join(conf_dir, "opt", source_base)
                 rose.config.load(source, config)
 
@@ -300,7 +304,7 @@ class AppRunner(Runner):
         # Free format files not defined in the configuration file
         # TODO: review location
         conf_file_dir = os.path.join(conf_dir, rose.SUB_CONFIG_FILE_DIR)
-        file_section_prefix = self.config_pm.get_processor("file").PREFIX
+        file_section_prefix = self.config_pm.get_handler("file").PREFIX
         if os.path.isdir(conf_file_dir):
             dirs = []
             files = []
@@ -732,6 +736,10 @@ class TaskRunner(Runner):
             "path_globs", "prefix_delim", "suffix_delim", "util_key"]
     PATH_GLOBS = ["share/fcm[_-]make*/*/bin"]
 
+    def __init__(self, *args, **kwargs):
+        Runner.__init__(self, *args, **kwargs)
+        self.task_utils_manager = TaskUtilsManager(*args, **kwargs)
+
     def run_impl(self, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props(
                 cycle=opts.cycle,
@@ -790,61 +798,18 @@ class TaskRunner(Runner):
             opts.conf_dir = os.path.join(t.suite_dir, "app", app_key)
 
         # Run a task util or an app
-        util = None
+        util_key = os.getenv("ROSE_TASK_UTIL")
         if opts.util_key:
-            util = self._get_task_util(opts.util_key)
-        elif os.getenv("ROSE_TASK_UTIL"):
-            util = self._get_task_util(os.getenv("ROSE_TASK_UTIL"))
+            util_key = opts.util_key
+        util = None
+        if util_key:
+            util = self.task_utils_manager.get_handler(util_key)
         if opts.auto_util_mode and util is None:
-            for key, u in reversed(sorted(self._get_task_utils().items())):
-                if u.can_handle(t.task_name):
-                    util = u
-                    break
+            util = self.task_utils_manager.guess_handler(t.task_name)
         if util is None:
             return self._run_app(opts, args)
         else:
             return util(opts, args)
-
-    def _get_task_util(self, key):
-        if not hasattr(self, "task_utils"):
-            self.task_utils = {}
-        if not self.task_utils.has_key(key):
-            ns = "rose.task_utils"
-            try:
-                mod = __import__(ns + "." + key, fromlist=ns)
-            except ImportError as e:
-                raise KeyError(key)
-            for c in vars(mod).values():
-                if isinstance(c, type):
-                    if hasattr(c, "can_handle") and hasattr(c, "run"):
-                        self.task_utils[key] = c(
-                                event_handler=self.event_handler,
-                                popen=self.popen,
-                                config_pm=self.config_pm,
-                                fs_util=self.fs_util,
-                                suite_engine_proc=self.suite_engine_proc)
-        return self.task_utils[key]
-
-    def _get_task_utils(self):
-        if not getattr(self, "task_utils_loaded", False):
-            if not hasattr(self, "task_utils"):
-                self.task_utils = {}
-            task_utils_dir = os.path.join(os.path.dirname(__file__),
-                                          "task_utils")
-            cwd = os.getcwd()
-            os.chdir(task_utils_dir)
-            try:
-                for name in glob("*.py"):
-                    if name.startswith("__"):
-                        continue
-                    try:
-                        self._get_task_util(name[0:-3])
-                    except KeyError as e:
-                        continue
-            finally:
-                os.chdir(cwd)
-            self.task_utils_loaded = True
-        return self.task_utils
 
     def _run_app(self, opts, args):
         if not hasattr(self, "app_runner"):
@@ -856,6 +821,34 @@ class TaskRunner(Runner):
                     fs_util=self.fs_util,
                     suite_engine_proc=self.suite_engine_proc)
         return self.app_runner(opts, args)
+
+
+class TaskUtilBase(AppRunner):
+
+    """Base class for a task util."""
+
+    CONF_NAME = AppRunner.NAME
+    NAME = None
+    SCHEME = None
+
+    def __init__(self, *args, **kwargs):
+        manager = kwargs.pop("manager")
+        AppRunner.__init__(self, *args, **kwargs)
+        self.manager = manager
+
+    def can_handle(self, key):
+        return key.startswith(self.SCHEME)
+
+    def run_impl_main(self, config, opts, args, uuid, work_files):
+        raise NotImplementedError()
+
+
+class TaskUtilsManager(SchemeHandlersManager):
+    """Load and select task utilities."""
+
+    def __init__(self, *args, **kwargs):
+        path = os.path.join(os.path.dirname(__file__), "task_utils")
+        SchemeHandlersManager.__init__(self, path, ["run"], *args, **kwargs)
 
 
 def main():

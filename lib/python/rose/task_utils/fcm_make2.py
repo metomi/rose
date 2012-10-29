@@ -19,22 +19,21 @@
 #-----------------------------------------------------------------------------
 """Task utility: run "fcm make" (continue)."""
 
-from rose.run import AppRunner
+from rose.run import TaskUtilBase
 import os
 import sys
 
-class FCMMake2TaskUtil(AppRunner):
+class FCMMake2TaskUtil(TaskUtilBase):
 
     """Run "fcm make" (continue)."""
 
     CONFIG_IS_OPTIONAL = True
-
-    def can_handle(self, key):
-        return key.startswith("fcm_make2")
+    SCHEME = "fcm_make2"
+    SCHEME1 = "fcm_make"
 
     def run_impl_main(self, config, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props()
-        task1_name = "fcm_make" + t.task_name.replace("fcm_make2", "")
+        task1_name = self.SCHEME1 + t.task_name.replace(self.SCHEME, "")
         dir = os.path.join(t.suite_dir, "share", task1_name)
         n_jobs = os.getenv("ROSE_TASK_N_JOBS", "4")
         cmd = "fcm make -C %s -j %s" % (dir, n_jobs)
