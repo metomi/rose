@@ -725,7 +725,7 @@ def show_fixed(self, should_show)
     <h2 id="macro">Rose Macros</h2>
 
     <p>Rose macros manipulate or check configurations, often based on their
-    metadata. There are two types of macros:</p>
+    metadata. There are three types of macros:</p>
 
     <ul>
       <li>Checkers (validators) - check a configuration, perhaps using
@@ -733,13 +733,19 @@ def show_fixed(self, should_show)
 
       <li>Changers (transformers) - change a configuration e.g. adding/removing
       options.</li>
+      
+      <li>Upgraders - these are special transformer macros for upgrading and
+      downgrading configurations.</li>
     </ul>
 
     <p>There are built-in rose macros that handle standard behaviour such as
     trigger changing and type checking.</p>
 
     <p>This section explains how to add your own custom macros to transform and
-    validate configurations. Macros should be written in Python. They can be
+    validate configurations. Upgrade macros are covered in a different section -
+    they are a special type of custom macro and are described in
+    <a href="rose-advanced-topics#upgrade">Advanced Topics</a>.
+    Macros should be written in Python. They can be
     run within <code>rose config-edit</code> or via <code>rose
     macro.</code></p>
 
