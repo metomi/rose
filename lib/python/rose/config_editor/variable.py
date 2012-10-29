@@ -326,25 +326,13 @@ class VariableWidget(object):
     def set_ignored(self):
         """Sets or unsets a custom ignored state for the widgets."""
         ign_map = self.variable.ignored_reason
+        self.keywidget.set_ignored()
         if ign_map != {}:
             # Technically ignored, but could just be ignored by section.
             self.is_ignored = True
-            if rose.variable.IGNORED_BY_SECTION in ign_map:
-                 stock_id = self.menuwidget.MENU_ICON_IGNORE_SECTION
-                 if rose.variable.IGNORED_BY_SYSTEM in ign_map:
-                     stock_id = (
-                           self.menuwidget.MENU_ICON_IGNORE_SYSTEM_SECTION)
-                 if rose.variable.IGNORED_BY_USER in ign_map:
-                     stock_id = self.menuwidget.MENU_ICON_IGNORE_USER_SECTION
-            elif rose.variable.IGNORED_BY_USER in ign_map:
-                 stock_id = self.menuwidget.MENU_ICON_IGNORE_USER
-            else:
-                 stock_id = self.menuwidget.MENU_ICON_IGNORE_SYSTEM
             if '"Ignore"' not in self.menuwidget.option_ui:
                 self.menuwidget.old_option_ui = self.menuwidget.option_ui
                 self.menuwidget.old_actions = self.menuwidget.actions
-            if 'ignore' not in self.menuwidget.button.stock_id:
-                self.menuwidget.old_stock_id = self.menuwidget.button.stock_id
             if ign_map.keys() == [rose.variable.IGNORED_BY_SECTION]:
                 # Not ignored in itself, so give Ignore option.
                 if '"Enable"' in self.menuwidget.option_ui:
@@ -362,8 +350,6 @@ class VariableWidget(object):
                     self.menuwidget.actions.append(
                                     ('Enable', gtk.STOCK_YES,
                                      rose.config_editor.VAR_MENU_ENABLE)) 
-            if not self.is_ghost and not self.variable.error:
-                self.menuwidget.button.set_stock_id(stock_id)
             self.update_status()
             self.set_sensitive(False)
         else:
@@ -374,10 +360,6 @@ class VariableWidget(object):
                                     '<menuitem action="Enable"/>',
                                     r'<menuitem action="Ignore"/>',
                                     self.menuwidget.option_ui)
-            if not self.is_ghost and not self.variable.error:
-                if hasattr(self.menuwidget, 'old_stock_id'):
-                    self.menuwidget.button.set_stock_id(
-                                    self.menuwidget.old_stock_id)
             self.update_status()
             if not self.is_ghost:
                 self.set_sensitive(True)

@@ -26,6 +26,7 @@ pygtk.require('2.0')
 import gtk
 
 import rose.config_editor
+import rose.variable
 
 
 class KeyWidget(gtk.HBox):
@@ -37,6 +38,8 @@ class KeyWidget(gtk.HBox):
                   gtk.STOCK_INFO,
              rose.config_editor.FLAG_TYPE_ERROR:
                   gtk.STOCK_DIALOG_WARNING,
+             rose.config_editor.FLAG_TYPE_FIXED:
+                  gtk.STOCK_MEDIA_PAUSE,
              rose.config_editor.FLAG_TYPE_OPTIONAL:
                   gtk.STOCK_ABOUT,
              rose.config_editor.FLAG_TYPE_NO_META:
@@ -58,6 +61,10 @@ class KeyWidget(gtk.HBox):
         self.show_title_on = show_title_on
         self.var_flags = []
         self._last_var_comments = None
+        self.ignored_label = gtk.Label()
+        self.ignored_label.show()
+        self.pack_start(self.ignored_label, expand=False, fill=False)
+        self.set_ignored()
         if self.my_variable.name != '':
             self.entry = gtk.Label()
             self.entry.set_alignment(
@@ -91,6 +98,17 @@ class KeyWidget(gtk.HBox):
         self.update_comment_display()
         self.entry.show()
         event_box.show()
+        
+    def set_ignored(self):
+        """Update the ignored display."""
+        self.ignored_label.set_markup(
+                     rose.variable.get_ignored_markup(self.my_variable))
+        hover_string = ""
+        if not self.my_variable.ignored_reason:
+            self.ignored_label.set_tooltip_text(None)
+        for key, value in sorted(self.my_variable.ignored_reason.items()):
+            hover_string += key + " " + value + "\n"
+        self.ignored_label.set_tooltip_text(hover_string.strip())
 
     def update_comment_display(self):
         """Update the display of variable comments."""

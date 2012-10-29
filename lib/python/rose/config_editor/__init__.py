@@ -389,7 +389,7 @@ VAR_COMMENT_TIP = "# {0}"
 VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
 VAR_MENU_TIP_ERROR = 'Error '
-VAR_MENU_TIP_FIXED = 'Fixed variable (only one allowed value)'
+VAR_FLAG_TIP_FIXED = 'Fixed variable (only one allowed value)'
 VAR_MENU_TIP_IGNORED = 'Ignored because {0}'
 VAR_MENU_TIP_LATENT = 'This variable could be added to the configuration.'
 VAR_MENU_TIP_WARNING = 'Warning '
@@ -399,12 +399,13 @@ VAR_WIDGET_ENV_INFO = 'Set to environment variable'
 
 FLAG_TYPE_DEFAULT = "Default flag"
 FLAG_TYPE_ERROR = "Error flag"
+FLAG_TYPE_FIXED = 'Fixed flag'
 FLAG_TYPE_OPTIONAL = "Optional flag"
 FLAG_TYPE_NO_META = "No metadata flag"
 
 # Relevant metadata properties
 
-META_PROP_WIDGET = "widget[config-edit]"
+META_PROP_WIDGET = "widget[rose-config-edit]"
 
 # Miscellaneous
 COPYRIGHT = '(C) British Crown Copyright 2012 Met Office.'
