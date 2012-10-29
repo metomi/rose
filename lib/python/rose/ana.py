@@ -622,9 +622,13 @@ def main():
     # Run the analysis
     tasks = analyse(tasks)
 
+    exit = 0
+
     # Print the results for the time being (until proper output is written)
     for task in tasks:
         print task
+        if task.numericstatus is not 0:
+            exit += 1
 
     # If user has write permission to current directory, output results to disk
     # to assist in debugging
@@ -632,6 +636,7 @@ def main():
         write_config("doneconfig.test",tasks)
         write_objects("test.pkl",tasks)
 
+    sys.exit(exit)
 
 if __name__ == "__main__":
     main()

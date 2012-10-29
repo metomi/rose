@@ -324,7 +324,7 @@ class UsernameValueWidget(gtk.HBox):
     the lines:</p>
     <pre>
 [env=HELLO_GREETER]
-widget[config-edit] = username.UsernameValueWidget
+widget[rose-config-edit] = username.UsernameValueWidget
 </pre>
 
     <p>This means that we've set our widget up for the option
@@ -350,11 +350,11 @@ rose edit
 
     <p>The procedure for implementing a custom value widget is as follows:</p>
 
-    <p>Assign a <var>widget[config-edit]</var> attribute to the relevant
+    <p>Assign a <var>widget[rose-config-edit]</var> attribute to the relevant
     variable in the metadata configuration, e.g.</p>
     <pre>
 [namelist:VerifConNL/ScalarAreaCodes]
-widget[config-edit]=module_name.AreaCodeChooser
+widget[rose-config-edit]=module_name.AreaCodeChooser
 </pre>
 
     <p>where the widget class lives in the module <var>module_name</var> under
@@ -411,12 +411,12 @@ set_value("20")
         is an optional argument that stores any text given after the widget in
         the metadata:
         <pre>
-widget[config-edit] = modulename.ClassName arg1 arg2 arg3 ...
+widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
 </pre>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
 ..."</code>. This could help configure your widget - for example, for a table
 based widget, you might give the column names:
         <pre>
-widget[config-edit] = table.TableValueWidget NAME ID WEIGHTING
+widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
 </pre>This means that you can write a generic widget and then configure it for
 different cases.
       </dd>
@@ -572,7 +572,7 @@ def handle_type_error(self, is_in_error):
     metadata configuration, e.g.</p>
     <pre>
     [ns:namelist/STASHNUM]
-    widget[config-edit]=module_name.MyGreatBigTable
+    widget[rose-config-edit]=module_name.MyGreatBigTable
 </pre>
 
     <p>The widget class should have a constructor of the form</p>
@@ -1497,7 +1497,6 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       programs.</dd>
 
       <dt><code>rose.ana</code></dt>
-
       <dd>callable, invokes an analysis engine for testing suites/apps.</dd>
 
       <dt><code>rose.config</code></dt>
@@ -1583,6 +1582,11 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>library, contains section-specific data utilities. Counterpart of
       <code>rose.variable</code>.</dd>
+
+      <dt><code>rose.stem</code></dt>
+
+      <dd>callable, converts user-friendly options for testing code into
+      options for rose suite-run.</dd>
 
       <dt><code>rose.suite_engine_proc</code></dt>
 
