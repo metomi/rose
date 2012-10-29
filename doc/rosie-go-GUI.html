@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Documentation</title>
+  <title>Rosie Go GUI User Guide</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
@@ -29,7 +29,7 @@
       Latest major update: 27 September 2012.
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
-    <p><a href=".">Rose Documentation</a></p>
+    <p><a href=".">Rosie Documentation</a></p>
   </div>
 
   <div id="body-main">
@@ -41,7 +41,7 @@
     
     Labelled screen capture with key.
     
-    <h2 id="suite-search">Finding Suites</h2>
+    <h2 id="suite-search">Locating Suites</h2>
 
     <h3 id="home">Checked out Suites</h3>
 
@@ -49,19 +49,41 @@
     local suites" button in the address bar. This will display a list of all 
     the suites you have copies of on your machine relating to the current 
     repository you are viewing. For help on switching to a different repository 
-    see <a href="#repo-change">here</a></p>
+    see <a href="#repo-change">here</a>.</p>
+    
+    <p>When running searches, suites you have copies of checked out will have 
+    an icon in the "local" column of the search results indicating the status
+    of the local copy e.g. modified, older, newer etc. If no icon is shown 
+    then no local copy of that suite has been found.</p>
 
     <h3 id="search">Search</h3>
     
-    Search
+    <p>The simplest method available for locating suites is to use the search 
+    function. Type a word or phrase into the search box and either click the 
+    search button or press <kbd>Enter</kbd> and a search will be run for suites
+    containing the entered word/phrase in <strong>any</strong> of their fields.
+    </p>
+    
+    <p>The same behaviour can also be obtained by typing search phrases in the 
+    address box - similar to many web browsers. Note that the search phrase 
+    entered in the address box should not begin "http" or it will be 
+    interpreted as a url. Should you wish to search for words/phrases beginning
+    "http" then you will need to use the search box.</p>
     
     <h3 id="query">Running a query</h3>
     
-    Query panel
+    <ol>
+        <li>Show/hide - Query panel</li>
+        <li>Set filter</li>
+        <li>Add filter</li>
+        <li>Remove filter</li>
+        <li>Clear all filters</li>
+        <li>Advanced controls for bracketed queries</li>
+    </ol>
     
     <h3 id="url">Using a url</h3>
     
-    Address bar
+    <p></p>
     
     <h3 id="history">Re-running past searches</h3>
     
@@ -115,25 +137,46 @@
     
     <h3 id="sort">Ordering results</h3>
 
-    Column sort
+    <p>Search results can be ordered by field in either ascending or descending
+    order. To do so, click on the column title for the field you wish to order
+    by so an arrow is displayed next to it indicating the order in which the 
+    field is being sorted.</p>
     
     <h3 id="column-view">Show/hide result fields</h3>
     
-    View menu
+    <p></p>
 
     <h3 id="all-revisions">Viewing all revisions of a suite</h3>
     
-    Tick box/view menu option
+    <p>To view all revisions of a suite in the repository you can either toggle
+    the "View all revisions" box in the toolbar or click "View -> toggle all 
+    revisions" and then run your search. Checking the "View all revisions" box 
+    will not update the current results.</p>
 
-    <h3 id="info">Getting more information</h3>
+    <h3 id="info">Getting more information about a suite</h3>
     
-    Hover over to get tooltip or r-click and then info
+    <p>To obtain more information about a suite in the search results you can 
+    do one of two things; hold your mouse over the suite to display the tooltip
+    containing more details or right click on the suite and click "info" in the
+    pop-up menu to display a dialog box containing further details.</p>
     
     <h2 id=other>Other features</h2>
+
+    <h3 id="refresh">Refresh results</h3>
+    
+    <p>From time to time you may find you want to refresh the search results 
+    being shown - perhaps as a result of collaborating on suite development.
+    To do so either click the refresh button on the address bar, or use the 
+    keyboard shortcut <kbd>F5</kbd>.</p>
     
     <h3 id="navigation">Search Navigation</h3>
     
-    Back and forward buttons, address bar drop-down.
+    <p>While <kbd>rosie go</kbd> is open it keeps track of the various searches
+    you run and allows you to navigate back to previous searches. By clicking 
+    on the back and forward arrows you can navigate through the searches you 
+    have run in the current session. Alternatively, you can make use of the 
+    keyboard shortcuts <kbd>Ctrl-left</kbd> and <kbd>Ctrl-right</kbd> to move
+    backwards and forwards respectively.
     
     <h3 id="repo-change">Switching Repository</h3>
     
