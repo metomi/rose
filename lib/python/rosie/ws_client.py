@@ -111,8 +111,8 @@ class Client(object):
         except ValueError:
             raise QueryError("%s: %s" % (method, kwargs))
     
-    def get_common_keys(self):
-        return self._get("get_common_keys")
+    def get_known_keys(self):
+        return self._get("get_known_keys")
 
     def get_optional_keys(self):
         return self._get("get_optional_keys")

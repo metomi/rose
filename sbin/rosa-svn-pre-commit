@@ -96,7 +96,8 @@ def main(repos, txn):
             if not re.compile(r"\A" + pattern + r"\Z").match(name):
                 is_bad = True
                 break
-        if is_bad:
+        
+        if is_bad and any([n != l for n, l in zip(names, "ROSIE")]):
             bad_changes.add((status, path))
             continue
 

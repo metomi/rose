@@ -64,6 +64,7 @@ class PrefixRoot(object):
     """Serves the index page of the database of a given prefix."""
 
     def __init__(self, template_env, prefix, db_url):
+        print "Helloooooooooo"
         self.exposed = True
         self.template_env = template_env
         self.prefix = prefix
@@ -108,10 +109,10 @@ class PrefixRoot(object):
             return simplejson.dumps(self.dao.info(idx, branch, revision))
 
     @cherrypy.expose
-    def get_common_keys(self, format=None):
+    def get_known_keys(self, format=None):
         """Return the names of the common fields."""
         if format == "json":
-            return simplejson.dumps(self.dao.get_common_keys())
+            return simplejson.dumps(self.dao.get_known_keys())
 
     @cherrypy.expose
     def get_query_operators(self, format=None):
@@ -132,15 +133,16 @@ class PrefixRoot(object):
                 s_id = SuiteId(id_text=self.prefix + "-" + item["idx"])
                 item["href"] = s_id.to_web()
         template = self.template_env.get_template("prefix-index.html")
-        return template.render(web_prefix=cherrypy.request.script_name,
-                               prefix=self.prefix,
-                               prefix_source_url=self.source_url,
-                               common_keys=self.dao.get_common_keys(),
-                               query_operators=self.dao.get_query_operators(),
-                               all_revs=all_revs,
-                               filters=filters,
-                               s=s,
-                               data=data)
+        return template.render(
+                        web_prefix=cherrypy.request.script_name,
+                        prefix=self.prefix,
+                        prefix_source_url=self.source_url,
+                        known_keys=self.dao.get_known_keys(self.prefix),
+                        query_operators=self.dao.get_query_operators(),
+                        all_revs=all_revs,
+                        filters=filters,
+                        s=s,
+                        data=data)
 
 
 def _query_parse_string(q_str):

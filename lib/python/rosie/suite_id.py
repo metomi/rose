@@ -133,6 +133,7 @@ class SuiteId(object):
                     return None
                 raise SuiteIdLatestError(prefix)
             dirs = filter(lambda line: line.endswith("/"), out.splitlines())
+            # Note - 'R/O/S/I/E' sorts to top for lowercase initial idx letter
             dir_url = dir_url + "/" + sorted(dirs)[-1].rstrip("/")
 
         # FIXME: not sure why a closure for "state" does not work here?

@@ -427,7 +427,7 @@ $(function() {
 {%- endif %}
           <td>
             <select class="q_key" name="q_key_{{ loop.index0 }}">
-{%- for common_key in common_keys %}
+{%- for common_key in known_keys %}
 {%- if filter[i] == common_key %}
               <option selected="selected">{{ common_key }}</option>
 {%- else %}

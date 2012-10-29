@@ -171,6 +171,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Send notification emails."}],
+               "meta_suite": [
+                       ["--meta-suite"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "ADMIN-ONLY: Create a special metadata "
+                                "suite."}],
                "meta_path": [
                        ["--meta-path", "-M"],
                        {"action": "append",

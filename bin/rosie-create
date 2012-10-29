@@ -35,6 +35,9 @@
 #         Specify a FILE containing the discovery information for the
 #         new suite. If FILE is -, read from STDIN. The default behaviour
 #         is to open an editor to add suite discovery information.
+#     --meta-suite
+#         (Admin-only) Create the special suite in the repository
+#         containing discovery metadata and known keys.
 #     --no-checkout
 #         Do not checkout a working copy of the newly created suite.
 #         Default is to checkout.
