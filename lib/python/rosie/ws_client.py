@@ -232,6 +232,9 @@ def lookup(argv):
     if opts.url:
         ws_client = Client()
         addr = args[0]
+        if not addr.endswith("&format=json"):
+            addr += "&format=json"
+        
         if opts.debug_mode:
             results = ws_client.address_search(None,url=addr)
             url = addr
@@ -479,6 +482,8 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
            report(suite, clip=terminal_cols)
         report(SuiteInfo(dict_row), prefix="")
     if url is not None:
+        if url.endswith("&format=json"):
+            url = url.replace("&format=json", "")
         report(URLEvent(url + "\n"), prefix="")
 
 
