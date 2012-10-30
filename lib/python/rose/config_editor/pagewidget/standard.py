@@ -51,15 +51,13 @@ class PageTable(gtk.Table):
         self.ghost_data = ghost_data
         self.var_ops = var_ops
         self.show_modes = show_modes
-        self.title_on = (not self.show_modes[
-                                  rose.config_editor.SHOW_MODE_NO_TITLE])
         r = 0
         for variable in self.panel_data:
             variablewidget = rose.config_editor.variable.VariableWidget(
                                                 variable,
                                                 self.var_ops,
                                                 is_ghost=False,
-                                                show_title=self.title_on)
+                                                show_modes=self.show_modes)
             variablewidget.insert_into(self, self.MAX_COLS, r + 1)
             if (self._should_hide_var_fixed(variable) and 
                 not variable.error):
@@ -72,7 +70,7 @@ class PageTable(gtk.Table):
                                                     variable,
                                                     self.var_ops,
                                                     is_ghost=True,
-                                                    show_title=self.title_on)
+                                                    show_modes=self.show_modes)
                 variablewidget.insert_into(self, self.MAX_COLS,
                                            ghost_r + r + 1)
                 variablewidget.set_sensitive(False)
@@ -85,7 +83,7 @@ class PageTable(gtk.Table):
                                                     variable,
                                                     self.var_ops,
                                                     is_ghost=True,
-                                                    show_title=self.title_on)
+                                                    show_modes=self.show_modes)
                 variablewidget.insert_into(self, self.MAX_COLS,
                                            ghost_r + r + 1)
                 variablewidget.set_sensitive(False)
@@ -110,7 +108,7 @@ class PageTable(gtk.Table):
                                                 variable,
                                                 self.var_ops,
                                                 is_ghost=False,
-                                                show_title=self.title_on)
+                                                show_modes=self.show_modes)
         for variablewidget, widget_row in widget_coordinate_list:
             if widget_row > row_above_new:
                 for child in self.get_children():
@@ -135,7 +133,7 @@ class PageTable(gtk.Table):
                                                 variable,
                                                 self.var_ops,
                                                 is_ghost,
-                                                show_title=self.title_on)
+                                                show_modes=self.show_modes)
         new_variablewidget.set_sensitive(not is_ghost)
         focus_dict = {"had_focus": False}
         for child in self.get_children():
@@ -195,7 +193,7 @@ class PageTable(gtk.Table):
                                                     variable,
                                                     self.var_ops,
                                                     is_ghost=True,
-                                                    show_title=self.title_on)
+                                                    show_modes=self.show_modes)
             new_variablewidget.set_sensitive(False)
             if (self._should_hide_var_fixed(variable) and 
                 not variable.error):
@@ -255,7 +253,7 @@ class PageTable(gtk.Table):
                                                     variable,
                                                     self.var_ops,
                                                     is_ghost=True,
-                                                    show_title=self.title_on)
+                                                    show_modes=self.show_modes)
                 variablewidget.insert_into(self, self.MAX_COLS, ghost_row + 1)
                 variablewidget.set_sensitive(False)
                 ghost_row = ghost_row + 1
@@ -265,14 +263,13 @@ class PageTable(gtk.Table):
                 if top_row >= ghost_row:
                     self.remove(child)
 
-    def show_title(self, title_off=False):
+    def show_mode_change(self, mode, mode_on=False):
         done_variable_widgets = []
-        self.title_on = not title_off
         for child in self.get_children():
             parent = child.get_parent()
             if parent in done_variable_widgets:
                 continue
-            parent.set_titled(not title_off)
+            parent.set_show_mode(mode, mode_on)
             done_variable_widgets.append(parent)
 
 
@@ -327,19 +324,18 @@ class PageLatentTable(gtk.Table):
                                                 variable,
                                                 self.var_ops,
                                                 is_ghost=is_ghost,
-                                                show_title=self.title_on)
+                                                show_modes=self.show_modes)
             variablewidget.insert_into(self, self.MAX_COLS, r + 1)
             variablewidget.set_sensitive(not is_ghost)
             r = r + 1
 
-    def show_title(self, title_off=False):
+    def show_mode_change(self, mode, mode_on=False):
         done_variable_widgets = []
-        self.title_on = not title_off
         for child in self.get_children():
             parent = child.get_parent()
             if parent in done_variable_widgets:
                 continue
-            parent.set_titled(not title_off)
+            parent.set_show_mode(mode, mode_on)
             done_variable_widgets.append(parent)
 
     def refresh(self, var_id=None):

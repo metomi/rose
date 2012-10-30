@@ -221,6 +221,8 @@ META_PROP_INTERNAL = '_internal'
 
 # Setting visibility modes
 SHOW_MODE_FIXED = 'fixed'
+SHOW_MODE_FLAG_OPTIONAL = 'flag:optional'
+SHOW_MODE_FLAG_NO_META = 'flag:no-meta'
 SHOW_MODE_IGNORED = 'ignored'
 SHOW_MODE_USER_IGNORED = 'user-ignored'
 SHOW_MODE_LATENT = 'latent'

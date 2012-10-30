@@ -617,7 +617,8 @@ def handle_type_error(self, is_in_error):
         a dictionary that looks like this:
         <pre>
     show_modes_dict = {'latent': False, 'fixed': False, 'ignored': True,
-                       'user-ignored': False, 'title': False}
+                       'user-ignored': False, 'title': False,
+                       'flag:optional': False, 'flag:no-meta': False}
 </pre>
 
         <p>which could be ignored for most custom pages, as you need. The
@@ -650,12 +651,22 @@ def handle_type_error(self, is_in_error):
 
           <dd>Short for 'View with no title', False means show the title of a
           variable, True means show the variable name instead.</dd>
+
+          <dt><code>'flag:optional'</code></dt>
+
+          <dd>True means indicate if a variable is <code>optional</code>,
+          and False means do not show an indicator.</dd>
+
+          <dt><code>'flag:no-meta'</code></dt>
+
+          <dd>True means indicate if a variable has any metadata content,
+          and False means do not show an indicator.</dd>
         </dl>
 
         <p>If you wish to implement actions based on changes in these
         properties (e.g. displaying and hiding fixed variables depending on the
-        'fixed' setting), the custom page widget should expose methods named
-        'show_' followed by the key. However, 'ignored' is handled separately
+        'fixed' setting), the custom page widget should expose a method named
+        'show_mode_change' followed by the key. However, 'ignored' is handled separately
         (more below). These methods should take a single boolean that indicates
         the display status. For example:</p>
         <pre>

@@ -51,14 +51,14 @@ class KeyWidget(gtk.HBox):
     
 
     def __init__(self, variable, var_ops, launch_help_func, update_func,
-                 show_title_on):
+                 show_modes):
         super(KeyWidget, self).__init__(homogeneous=False, spacing=0)
         self.my_variable = variable
         self.var_ops = var_ops
         self.meta = variable.metadata
         self.launch_help = launch_help_func
         self.update_status = update_func
-        self.show_title_on = show_title_on
+        self.show_modes = show_modes
         self.var_flags = []
         self._last_var_comments = None
         self.ignored_label = gtk.Label()
@@ -91,12 +91,10 @@ class KeyWidget(gtk.HBox):
         self.set_sensitive = self.entry.set_sensitive 
         event_box.connect('button-press-event',
                           lambda b, w: self.launch_help())
-        if 'title' in self.meta and self.show_title_on:
-            self.entry.set_text(self.meta['title'])
-        else:
-            self.entry.set_text(self.my_variable.name)
         self.update_comment_display()
         self.entry.show()
+        for key, value in self.show_modes.items():
+            self.set_show_mode(key, value)
         event_box.show()
         
     def set_ignored(self):
@@ -139,15 +137,32 @@ class KeyWidget(gtk.HBox):
         """Reload the contents - however, no need for this at present."""
         self.my_variable = variable
 
-    def set_show_title(self, should_show_title):
+    def set_show_mode(self, show_mode, should_show_mode):
+        """Set the display of a mode on or off."""
+        if show_mode == rose.config_editor.SHOW_MODE_NO_TITLE:
+            return self._set_show_title(not should_show_mode)
+        if show_mode == rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
+            if (should_show_mode and
+                self.meta.get(rose.META_PROP_COMPULSORY) !=
+                rose.META_PROP_VALUE_TRUE):
+                    return self.add_flag(
+                                rose.config_editor.FLAG_TYPE_OPTIONAL,
+                                rose.config_editor.VAR_FLAG_TIP_OPTIONAL)
+            return self.remove_flag(rose.config_editor.FLAG_TYPE_OPTIONAL)
+        if show_mode == rose.config_editor.SHOW_MODE_FLAG_NO_META:
+            if should_show_mode and len(self.meta) <= 2:
+                return self.add_flag(rose.config_editor.FLAG_TYPE_NO_META,
+                                     rose.config_editor.VAR_FLAG_TIP_NO_META)
+            return self.remove_flag(rose.config_editor.FLAG_TYPE_NO_META)
+
+    def _set_show_title(self, should_show_title):
         """Set the display of a variable title instead of the name."""
         if should_show_title:
-            if ('title' in self.meta and 
-                self.entry.get_text() != self.meta['title']):
-                self.entry.set_text(self.meta['title'])
-        else:
-            if self.entry.get_text() != self.my_variable.name:
-                self.entry.set_text(self.my_variable.name)
+            if (rose.META_PROP_TITLE in self.meta and 
+                self.entry.get_text() != self.meta[rose.META_PROP_TITLE]):
+                return self.entry.set_text(self.meta[rose.META_PROP_TITLE])
+        if self.entry.get_text() != self.my_variable.name:
+            self.entry.set_text(self.my_variable.name)
         
     def set_modified(self, is_modified):
         """Set the display of modified status in the text."""
@@ -181,24 +196,20 @@ class KeyWidget(gtk.HBox):
         self.var_flags.append(flag_type)
         stock_id = self.FLAG_ICON_MAP[flag_type]
         image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
+        image._flag_type = flag_type
         image.set_tooltip_text(tooltip_text)
         image.show()
         self.pack_end(image, expand=False, fill=False,
                       padding=rose.config_editor.SPACING_SUB_PAGE)
 
-    def clear_flags(self, just_this_flag_type=None):
-        """Remove the flags from the widget, or just one type of flag."""
-        if just_this_flag_type is not None:
-            flag_stock_id = self.FLAG_ICON_MAP[just_this_flag_type]
-            if just_this_flag_type not in self.var_flags:
-                return False
+    def remove_flag(self, flag_type):
+        """Remove the flag from the widget."""
         for widget in self.get_children():
-            if isinstance(widget, gtk.Image):
-                if just_this_flag_type is not None:
-                    if widget.get_stock()[0] != flag_stock_id:
-                        continue
-                    self.var_flags.remove(just_this_flag_type)
+            if (isinstance(widget, gtk.Image) and
+                getattr(widget, "_flag_type", None) == flag_type):
                 self.remove(widget)
+        if flag_type in self.var_flags:
+            self.var_flags.remove(flag_type)
         return True
 
     def launch_edit_comments(self, *args):

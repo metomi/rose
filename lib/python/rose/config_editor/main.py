@@ -100,7 +100,6 @@ class MainController(object):
         self.orphan_pages = []
         self.undo_stack = [] # Nothing to undo yet
         self.redo_stack = [] # Nothing to redo yet
-        self.var_flags = {} # No flags applied yet
         self.find_hist = {'regex': '', 'ids': []}
         self.util = rose.config_editor.util.Lookup()
         self.macros = {
@@ -168,6 +167,10 @@ class MainController(object):
         self.page_show_modes = {
              rose.config_editor.SHOW_MODE_FIXED:
              rose.config_editor.SHOULD_SHOW_FIXED,
+             rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
+             rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL,
+             rose.config_editor.SHOW_MODE_FLAG_NO_META:
+             rose.config_editor.SHOULD_SHOW_FLAG_NO_META,
              rose.config_editor.SHOW_MODE_IGNORED:
              rose.config_editor.SHOULD_SHOW_IGNORED,
              rose.config_editor.SHOW_MODE_USER_IGNORED:
@@ -289,13 +292,13 @@ class MainController(object):
                                      rose.config_editor.SHOW_MODE_NO_TITLE,
                                      m.get_active())),
                      ('/TopMenuBar/View/Flag no-metadata',
-                      lambda m: self.handle_flag(
-                                     rose.config_editor.FLAG_TYPE_NO_META,
-                                     m.get_active())),
+                      lambda m: self._set_page_show_modes(
+                                   rose.config_editor.SHOW_MODE_FLAG_NO_META,
+                                   m.get_active())),
                      ('/TopMenuBar/View/Flag optional',
-                      lambda m: self.handle_flag(
-                                     rose.config_editor.FLAG_TYPE_OPTIONAL,
-                                     m.get_active())),
+                      lambda m: self._set_page_show_modes(
+                                  rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
+                                  m.get_active())),
                      ('/TopMenuBar/Metadata/All V',
                       lambda m: self.handle.run_custom_macro(
                                      method_name=rose.macro.VALIDATE_METHOD)),
@@ -345,10 +348,6 @@ class MainController(object):
                     rose.config_editor.SHOULD_SHOW_IGNORED):
                     widget.set_sensitive(False)
             widget.connect('activate', action)
-        self.handle_flag(rose.config_editor.FLAG_TYPE_OPTIONAL,
-                         rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL)
-        self.handle_flag(rose.config_editor.FLAG_TYPE_NO_META,
-                         rose.config_editor.SHOULD_SHOW_FLAG_NO_META)
         page_menu = self.menubar.uimanager.get_widget("/TopMenuBar/Page")
         add_menuitem = self.menubar.uimanager.get_widget(
                                               "/TopMenuBar/Page/Add variable")
@@ -736,17 +735,6 @@ class MainController(object):
                         self.orphan_pages.remove(page)
 
 #------------------ Update functions -----------------------------------------
-
-    def handle_flag(self, flag_type, is_flag_active=False):
-        """Handle a change in variable flags."""
-        self.var_flags.update({flag_type: is_flag_active})
-        if flag_type == rose.config_editor.FLAG_TYPE_OPTIONAL:
-            self.handle.flag_optional(is_flag_active)
-        elif flag_type == rose.config_editor.FLAG_TYPE_NO_META:
-            self.handle.flag_no_metadata(is_flag_active)
-        self._generate_pagelist()
-        for page in self.pagelist:
-            page.update_flags()
 
     def _namespace_data_is_modified(self, namespace):
         config_name = self.util.split_full_ns(self.data, namespace)[0]
@@ -1498,8 +1486,6 @@ class MainController(object):
             self.update_all()
         if hasattr(self, 'menubar'):
             self.handle.load_macro_menu(self.menubar)
-        for flag_type, status in self.var_flags.items():
-            self.handle_flag(flag_type, status)
         namespaces_updated = []
         for config_name in configs:
             config_data = self.data.config[config_name]

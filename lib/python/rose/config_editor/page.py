@@ -750,22 +750,6 @@ class ConfigPage(gtk.VBox):
             else:
                 widget.update_status()
 
-    def update_flags(self, variable_ids=None):
-        """Reconstruct flags."""
-        if variable_ids is None:
-            variable_ids = [v.metadata['id'] for v in
-                            self.panel_data + self.ghost_data]
-        widget_list = self.get_main_variable_widgets()
-        for widget in widget_list:
-            if (hasattr(widget.get_parent(), 'variable') and
-                widget.get_parent().variable.metadata['id'] in variable_ids):
-                if hasattr(widget.get_parent(), 'update_flags'):
-                    widget.get_parent().update_flags()
-            elif (hasattr(widget, 'variable') and
-                widget.variable.metadata['id'] in variable_ids):
-                if hasattr(widget, 'update_flags'):
-                    widget.update_flags()
-
     def update_ignored(self):
         """Set variable widgets to 'ignored' or 'enabled' status."""
         new_tuples = []
