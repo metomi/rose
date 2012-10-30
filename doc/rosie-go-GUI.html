@@ -39,7 +39,19 @@
     
     <h2 id="layout">Rosie go layout</h2>
     
-    Labelled screen capture with key.
+    <img src="rosie_go_layout.png" alt="rosie go layout picture">
+
+    <p>
+    <ol>
+        <li>Menu Bar</li>
+        <li>Toolbar</li>
+        <li>Addressbar</li>
+        <li>History</li>
+        <li>Advanced search pane</li>
+        <li>Results</li>
+        <li>Statusbar</li>
+    </ol>
+    </p>
     
     <h2 id="suite-search">Locating suites</h2>
 
@@ -81,8 +93,8 @@
     
     <p>Queries are constructed by creating and combining filters comparing 
     suite properties to various values. Each filter takes up a row in the 
-    advanced search pane. Use the drop down boxes to set filter operators -  
-    "and" or "or" - property to be examined and the comparison operator to be 
+    advanced search pane. Use the drop down boxes to set filter operators,  
+    the property to be examined and the comparison operator to be 
     used. The value against which the property is to be compared against (using
     your selected comparison operator) should be entered in the value box.</p>
     
@@ -145,6 +157,11 @@
     of past searches (100 by default) so older, less used searches will 
     disappear from the history menu as new ones are run.</p>
     
+    <h3 id="view-revisions">Searching for all suite revisions</h3>
+    
+    <p>For details on how to search for all revisions of a suite rather than 
+    just the latest see <a href="#all-revisions">here</a>.
+    
     <h2 id="management">Suite management</h2>
     
     <h3 id="create">Creating a suite</h3>
@@ -162,7 +179,7 @@
     
     <p>To checkout a suite select it from the search results and click the 
     "Checkout" button on the toolbar. Alternatively, right click the 
-    suite and select "Checkout Suite".</p>
+    suite and select "Checkout Suite" from the popup menu.</p>
     
     <p>Suites you have copies of checked out on your machine can be identified
     by having an icon in the "local" column of the results table. You can also
@@ -174,7 +191,7 @@
     <p>To permanently delete <strong>all branches of, the trunk and any working
     copy of a suite</strong>, right click on the suite in search results and
     select "Delete Suite" from the pop-up menu. A dialog will then appear 
-    asking you to confirm the deletion.</p>
+    asking you to confirm you wish to go ahead with the deletion.</p>
     
     <p>To delete <strong>only your working copy</strong> of a suite right click
     on it and select "Delete Working Copy" and press OK in the dialog that 
@@ -201,10 +218,11 @@
 
     <h3 id="info">Getting more information about a suite</h3>
     
-    <p>To obtain more information about a suite in the search results you can 
-    do one of two things; hold your mouse over the suite to display the tooltip
-    containing more details or right click on the suite and click "info" in the
-    pop-up menu to display a dialog box containing further details.</p>
+    <p>To obtain more information about a suite listed in the search results 
+    you can do one of two things; hold your mouse over the suite to display a
+    tooltip containing more details or right click on the suite and click 
+    "info" in the pop-up menu to display a dialog box containing further 
+    details.</p>
     
     <h3 id="group">Grouping results by column</h3>
     
@@ -252,7 +270,7 @@
     you run and allows you to navigate back to previous searches. By clicking 
     on the back and forward arrows you can navigate through the searches you 
     have run in the current session. Alternatively, you can make use of the 
-    keyboard shortcuts <kbd>Ctrl-left</kbd> and <kbd>Ctrl-right</kbd> to move
+    keyboard shortcuts <kbd>Alt-left</kbd> and <kbd>Alt-right</kbd> to move
     backwards and forwards respectively.</p>
     
     <h3 id="repo-change">Switching repository</h3>
