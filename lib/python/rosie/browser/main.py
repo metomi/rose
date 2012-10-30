@@ -202,7 +202,8 @@ class MainWindow(gtk.Window):
         self.menubar.uimanager.get_widget(
              '/TopMenuBar/History/Show search history').set_active(False) 
 
-    def create_suite(self, config, from_id=None):
+    def _create_suite_hook(self, config, from_id=None):
+        """Hook function to create a suite from a configuration."""
         if config is None:
             return
         try:
@@ -564,7 +565,10 @@ class MainWindow(gtk.Window):
     def handle_create(self, from_id=None):
         """Create a new suite."""
         config = self.suite_director.vc_client.generate_info_config(from_id)
-        self.handle_new_suite(config, from_id)
+        finish_func = functools.partial(self._create_suite_hook,
+                                        from_id=from_id)
+        return self.suite_director.run_new_suite_wizard(
+                          config, finish_func, self)
 
     def handle_delete(self, *args):
         """"Handles deletion of a suite."""
@@ -631,12 +635,6 @@ class MainWindow(gtk.Window):
         """Launch a terminal at the current suite directory."""
         id_text = self.get_selected_suite_id()
         rose.external.launch_terminal(cwd=SuiteId(id_text).to_local_copy())
-        
-    def handle_new_suite(self, config, from_id):
-        """Handle creation of new suite."""
-        finish_func = functools.partial(self.create_suite, from_id=from_id)
-        return self.suite_director.run_new_suite_wizard(
-                          config, finish_func, self)
 
     def handle_next_search(self, *args):
         """Handles trying to run next search."""
