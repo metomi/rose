@@ -33,7 +33,7 @@
   </div>
 
   <div id="body-main">
-    <h1> Rosie Go GUI User Guide </h1>
+    <h1> Rosie go GUI user guide </h1>
 
     <div id="content"></div>
     
@@ -41,9 +41,9 @@
     
     Labelled screen capture with key.
     
-    <h2 id="suite-search">Locating Suites</h2>
+    <h2 id="suite-search">Locating suites</h2>
 
-    <h3 id="home">Checked out Suites</h3>
+    <h3 id="home">Checked out suites</h3>
 
     <p>To see what suites you have checked out on your machine click the "Show 
     local suites" button in the address bar. This will display a list of all 
@@ -61,8 +61,8 @@
     <p>The simplest method available for locating suites is to use the search 
     function. Type a word or phrase into the search box and either click the 
     search button or press <kbd>Enter</kbd> and a search will be run for suites
-    containing the entered word/phrase in <strong>any</strong> of their fields.
-    </p>
+    containing the entered word/phrase in <strong>any</strong> of their 
+    properties. Results are shown in the results panel.</p>
     
     <p>The same behaviour can also be obtained by typing search phrases in the 
     address box - similar to many web browsers. Note that the search phrase 
@@ -72,18 +72,48 @@
     
     <h3 id="query">Running a query</h3>
     
-    <ol>
-        <li>Show/hide - Query panel</li>
-        <li>Set filter</li>
-        <li>Add filter</li>
-        <li>Remove filter</li>
-        <li>Clear all filters</li>
-        <li>Advanced controls for bracketed queries</li>
-    </ol>
+    <p>Queries allow you to run more advanced suite searches, filtering results
+    based on the values of particular properties.</p>
+    
+    <p>If it is not already visible, the advanced search pane can be shown by 
+    clicking the "Show/hide the advanced search pane" button at the end of the 
+    address bar.</p>
+    
+    <p>Queries are constructed by creating and combining filters comparing 
+    suite properties to various values. Each filter takes up a row in the 
+    advanced search pane. Use the drop down boxes to set filter operators -  
+    "and" or "or" - property to be examined and the comparison operator to be 
+    used. The value against which the property is to be compared against (using
+    your selected comparison operator) should be entered in the value box.</p>
+    
+    <p>Additional filters can be added to the query by clicking the "Add 
+    filter" button. Similarly, individual filters can be removed by clicking 
+    the "Remove query filter" button found next to their value box. Should you
+    wish to remove all the filters click the "Clear filters" button.</p>
+    
+    <p>Once you are happy with the query you have set up, click the "Query" 
+    button to run it. As with running a search, results are shown in the 
+    results panel below.</p>
+    
+    <p>More complex queries can be constructed using brackets. To enable use of
+    bracketing click "View -> View advanced controls". Combo boxes will then be
+    added to the start and end of each filter allowing you to select the level 
+    of bracketing desired.</p>
     
     <h3 id="url">Using a url</h3>
     
-    <p></p>
+    <p>To search for suites using a url type the url into the address box and 
+    press enter. The relevant search will then be run and results displayed. 
+    Note that running a search with a url will search the repository <strong>
+    specified by the url</strong> rather than the one you currently have set.
+    </p>
+    
+    <p>Notice that after running a search or query the address box is updated 
+    with the url for that search or query. This can be copied and re-used in 
+    <kbd>rosie lookup</kbd> or shared with others so they can quickly run the 
+    same search by pasting the url into their address box or using it with 
+    <kbd>rosie lookup</kbd> rather than having to set up the same search by 
+    hand.</p>
     
     <h3 id="history">Re-running past searches</h3>
     
@@ -115,43 +145,59 @@
     of past searches (100 by default) so older, less used searches will 
     disappear from the history menu as new ones are run.</p>
     
-    <h2 id="management">Suite Management</h2>
+    <h2 id="management">Suite management</h2>
     
-    <h3 id="create">Creating a new suite</h3>
+    <h3 id="create">Creating a suite</h3>
     
-    Create suite and copy suite
+    <p>To create a <strong>new suite</strong> click "File -> New Suite". A
+    wizard will then launch for you to enter suite details and confirm suite 
+    creation.</p>
+    
+    <p>To create a suite <strong>from an existing suite</strong>, right click 
+    on the suite you wish to create from and click "Copy Suite". As with 
+    creating a new suite this will launch a wizard for you to edit suite 
+    details in.</p>
     
     <h3 id="checkout">Checking out an existing suite</h3>
     
-    Checkout
+    <p>To checkout a suite select it from the search results and click the 
+    "Checkout" button on the toolbar. Alternatively, right click the 
+    suite and select "Checkout Suite".</p>
+    
+    <p>Suites you have copies of checked out on your machine can be identified
+    by having an icon in the "local" column of the results table. You can also
+    see all suites you have checked out from the current repository by clicking
+    the "Show local suites" button on the address bar.</p>
     
     <h3 id="delete">Deleting a suite</h3>
     
-    Delete local and all
+    <p>To permanently delete <strong>all branches of, the trunk and any working
+    copy of a suite</strong>, right click on the suite in search results and
+    select "Delete Suite" from the pop-up menu. A dialog will then appear 
+    asking you to confirm the deletion.</p>
+    
+    <p>To delete <strong>only your working copy</strong> of a suite right click
+    on it and select "Delete Working Copy" and press OK in the dialog that 
+    appears. Note that if you have any uncommitted changes in your working copy
+    the option will be disabled until you either commit or revert the suite.
+    </p>
+    
+    <h3 id="edit">Editing a suite</h3>
+    
+    <p>To edit a suite you have checked out, right click on it and select "Edit
+    Suite". This will launch the <kbd>rose config-edit</kbd> GUI with that 
+    suite open.</p>
     
     <h3 id="run">Running a suite</h3>
     
-    Basic run and run with options
+    <p>To run a suite, select a suite from the results panel and press the
+    run suite button in the toolbar. If you would like to run a suite with some
+    arguments right click it and select "Run Suite ...". This will display a 
+    dialog box for entry of the desired arguments.</p>
+    
+    <p>N.B. you can only run suites you have checked out.</p>
     
     <h2 id="view">Viewing suite information</h2>
-    
-    <h3 id="sort">Ordering results</h3>
-
-    <p>Search results can be ordered by field in either ascending or descending
-    order. To do so, click on the column title for the field you wish to order
-    by so an arrow is displayed next to it indicating the order in which the 
-    field is being sorted.</p>
-    
-    <h3 id="column-view">Show/hide result fields</h3>
-    
-    <p></p>
-
-    <h3 id="all-revisions">Viewing all revisions of a suite</h3>
-    
-    <p>To view all revisions of a suite in the repository you can either toggle
-    the "View all revisions" box in the toolbar or click "View -> toggle all 
-    revisions" and then run your search. Checking the "View all revisions" box 
-    will not update the current results.</p>
 
     <h3 id="info">Getting more information about a suite</h3>
     
@@ -160,6 +206,37 @@
     containing more details or right click on the suite and click "info" in the
     pop-up menu to display a dialog box containing further details.</p>
     
+    <h3 id="group">Grouping results by column</h3>
+    
+    <p>To group results by column right click on a result in the column you 
+    wish to group by then click "Group Column" in the menu that appears. For 
+    example, to group by results by owner right click in the owner column and 
+    click "Group Column". To ungroup results right click on any of them and 
+    click "Ungroup" in the pop-up menu. Results may only be grouped by one 
+    column at a time.</p>
+    
+    <h3 id="sort">Ordering results</h3>
+
+    <p>Suite search results can be ordered by property in either ascending or 
+    descending order. To do so, click on the column title for the property you 
+    wish to order by so an arrow is displayed next to it indicating the order 
+    in which the property is being sorted.</p>
+    
+    <h3 id="column-view">Show/hide result properties</h3>
+    
+    <p>To show or hide columns displayed in the search results open the "View" 
+    menu and toggle the relevant check boxes on or off. The affected columns 
+    will then be either shown or hidden in the current results and those from 
+    subsequent searches. These settings will reset when you open a new
+    <kbd>rosie go</kbd> session.</p>
+
+    <h3 id="all-revisions">Viewing all revisions of a suite</h3>
+    
+    <p>To view all revisions of a suite in the repository you can either toggle
+    the "View all revisions" box in the toolbar or click "View -> toggle all 
+    revisions" and then run your search. Checking the "View all revisions" box 
+    will not update the current results.</p>
+
     <h2 id=other>Other features</h2>
 
     <h3 id="refresh">Refresh results</h3>
@@ -169,16 +246,16 @@
     To do so either click the refresh button on the address bar, or use the 
     keyboard shortcut <kbd>F5</kbd>.</p>
     
-    <h3 id="navigation">Search Navigation</h3>
+    <h3 id="navigation">Search navigation</h3>
     
     <p>While <kbd>rosie go</kbd> is open it keeps track of the various searches
     you run and allows you to navigate back to previous searches. By clicking 
     on the back and forward arrows you can navigate through the searches you 
     have run in the current session. Alternatively, you can make use of the 
     keyboard shortcuts <kbd>Ctrl-left</kbd> and <kbd>Ctrl-right</kbd> to move
-    backwards and forwards respectively.
+    backwards and forwards respectively.</p>
     
-    <h3 id="repo-change">Switching Repository</h3>
+    <h3 id="repo-change">Switching repository</h3>
     
     <p><kbd>rosie go</kbd> enables you to search for suites stored in different 
     repositories by allowing you to swap between different sources. To change 
@@ -190,6 +267,15 @@
     "X - rosie go", where X is the name of the repository - and from the data 
     source shown in the left hand side of the status bar at the bottom of the 
     window.</p>
+    
+    <h3 id="output">Viewing suite output</h3>
+    
+    <p>If you have run a suite and want to view its output select it in the 
+    results list, right click it and click view output. A web browser will be 
+    opened allowing you to look at the suite output. Alternatively, you can
+    select a suite and click the "View Output" button on the toolbar. If no
+    output is available to look at then the menu option and button will be 
+    greyed out.</p>
     
     </div>
   </div>
