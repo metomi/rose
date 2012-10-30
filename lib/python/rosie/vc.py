@@ -356,12 +356,11 @@ class Client(object):
         if from_project:
             info_config.set(["project"], from_project)
         else:
-            info_config.set(["project"], "%s's project" % owner)
+            info_config.set(["project"], "")
         if from_title:
             info_config.set(["title"], "Copy of %s: %s" % (from_id, from_title))
         else:
-            t = time.strftime("%Y-%m-%d.%H:%M:%S.%Z")
-            info_config.set(["title"], "%s's suite created on %s" % (owner, t))
+            info_config.set(["title"], "")
         return info_config
 
 
