@@ -495,7 +495,7 @@ def default_node(reset=False):
         _DEFAULT_CONFIG_NODE = ConfigNode()
         res_loc = ResourceLocator.default()
         files = [os.path.join(res_loc.get_util_home(), "etc", "rose.conf"),
-                 os.path.join(os.path.expanduser("~"), ".met-um", "rose.conf")]
+                 os.path.join(os.path.expanduser("~"), ".metomi", "rose.conf")]
         for file in files:
             if os.path.isfile(file) and os.access(file, os.R_OK):
                 load(file, _DEFAULT_CONFIG_NODE)
