@@ -541,7 +541,7 @@ class ConfigDataManager(object):
         for keylist in [[rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],
                         [rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_PROJECT]]:
             type_node = config.get(keylist, no_ignore=True)
-            if type_node is not None:
+            if type_node is not None and type_node.value:
                 return type_node.value
         return None
 

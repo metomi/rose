@@ -178,7 +178,10 @@ def load_meta_path(config=None, directory=None):
     if opt_node is None:
         opt_node = config.get([rose.CONFIG_SECT_TOP,
                                rose.CONFIG_OPT_PROJECT], no_ignore=True)
-    meta_path = "all" if opt_node is None else opt_node.value
+    if opt_node is None or not opt_node.value:
+        meta_path = "all"
+    else:
+        meta_path = opt_node.value
     meta_path = "etc/metadata/" + meta_path
     try:
         meta_path = locator.locate(meta_path)
