@@ -31,15 +31,13 @@ ERROR_NO_VALID_VERSIONS = "No versions available."
 ERROR_UPGRADE_VERSION = "Invalid version: {0} should be one of {1}"
 INFO_DOWNGRADED = "Downgraded from {0} to {1}"
 INFO_UPGRADED = "Upgraded from {0} to {1}"
+INFO_VERSIONS = "Eligible versions: {0}"
 MACRO_UPGRADE_MODULE = "versions"
 MACRO_UPGRADE_RESOURCE_DIR = "etc"
 MACRO_UPGRADE_RESOURCE_FILE_ADD = "rose-macro-add.conf"
 MACRO_UPGRADE_RESOURCE_FILE_REMOVE = "rose-macro-remove.conf"
 NAME_DOWNGRADE = "Downgrade{0}-{1}"
 NAME_UPGRADE = "Upgrade{0}-{1}"
-PROMPT_CHOOSE_VERSION = ("Eligible versions: {0}\n" +
-                         "Enter a version (or press <return> " +
-                         "for the last one): ")
 
 DOWNGRADE_METHOD = "downgrade"
 UPGRADE_METHOD = "upgrade"
@@ -369,16 +367,9 @@ def run_upgrade_macros(app_config, meta_config, config_name, args,
         sys.exit(ERROR_NO_VALID_VERSIONS)
     if args:
         user_choice = args[0]
-    elif opt_non_interactive:
-        user_choice = upgrade_manager.get_new_tag()
     else:
-        try:
-            user_choice = raw_input(PROMPT_CHOOSE_VERSION.format(ok_vn_text))
-        except EOFError:
-            sys.exit(1)
-        else:
-            if not user_choice.strip():
-                user_choice = upgrade_manager.get_new_tag()
+        print INFO_VERSIONS.format(ok_vn_text)
+        sys.exit()
     if user_choice not in ok_versions:
         sys.exit(ERROR_UPGRADE_VERSION.format(user_choice, ok_vn_text))
     upgrade_manager.set_new_tag(user_choice)
