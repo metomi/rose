@@ -143,6 +143,9 @@ class MainWindow(gtk.Window):
         self.local_updater.update_now()
         address_url = self.nav_bar.address_box.child.get_text()
 
+        if not address_url.endswith("&format=json"):
+            address_url += "&format=json"
+
         # if the url string doesn't begin with a valid prefix       
         if not (address_url.find("http://") == 0 or 
                 address_url.find("search?s=") == 0 or 
@@ -671,6 +674,9 @@ class MainWindow(gtk.Window):
                 items.update({"all_revs": ""})
             try:
                 results, url = self.search_manager.ws_query(filters, **items)
+                if url.endswith("&format=json"):
+                    url = url.replace("&format=json", "")
+                
                 self.nav_bar.address_box.child.set_text(url)   
                 if record == True:
                     recorded = self.hist.record_search("query", repr(filters), 
@@ -742,6 +748,8 @@ class MainWindow(gtk.Window):
             items.update({"all_revs": ""})
         try:
             results, url = self.search_manager.ws_search(search_text, **items)
+            if url.endswith("&format=json"):
+                url = url.replace("&format=json", "")
             self.nav_bar.address_box.child.set_text(url)
             if record == True:
                 recorded = self.hist.record_search("search", repr(search_text),
