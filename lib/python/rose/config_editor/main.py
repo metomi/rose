@@ -29,7 +29,6 @@ import copy
 import itertools
 import os
 import re
-from rose.opt_parse import RoseOptionParser
 import shutil
 import sre_constants
 import sys
@@ -68,6 +67,7 @@ import rose.config_editor.variable
 import rose.config_editor.window
 import rose.gtk.util
 import rose.macro
+from rose.opt_parse import RoseOptionParser
 import rose.resource
 import rose.macros
 
@@ -100,7 +100,7 @@ class MainController(object):
         self.orphan_pages = []
         self.undo_stack = [] # Nothing to undo yet
         self.redo_stack = [] # Nothing to redo yet
-        self.var_flags = {} # No flags applied yey
+        self.var_flags = {} # No flags applied yet
         self.find_hist = {'regex': '', 'ids': []}
         self.util = rose.config_editor.util.Lookup()
         self.macros = {
@@ -331,7 +331,11 @@ class MainController(object):
                            ('/TopMenuBar/View/View latent',
                             rose.config_editor.SHOULD_SHOW_LATENT),
                            ('/TopMenuBar/View/View without titles',
-                            rose.config_editor.SHOULD_SHOW_NO_TITLE)])
+                            rose.config_editor.SHOULD_SHOW_NO_TITLE),
+                           ('/TopMenuBar/View/Flag optional',
+                            rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL),
+                           ('/TopMenuBar/View/Flag no-metadata',
+                            rose.config_editor.SHOULD_SHOW_FLAG_NO_META)])
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
@@ -341,6 +345,10 @@ class MainController(object):
                     rose.config_editor.SHOULD_SHOW_IGNORED):
                     widget.set_sensitive(False)
             widget.connect('activate', action)
+        self.handle_flag(rose.config_editor.FLAG_TYPE_OPTIONAL,
+                         rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL)
+        self.handle_flag(rose.config_editor.FLAG_TYPE_NO_META,
+                         rose.config_editor.SHOULD_SHOW_FLAG_NO_META)
         page_menu = self.menubar.uimanager.get_widget("/TopMenuBar/Page")
         add_menuitem = self.menubar.uimanager.get_widget(
                                               "/TopMenuBar/Page/Add variable")
