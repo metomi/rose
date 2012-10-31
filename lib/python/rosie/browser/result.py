@@ -199,9 +199,8 @@ class DisplayBox(gtk.VBox):
     def update_result_info(self, id_tuple, result_map, local_status, 
                            search_manager, id_formatter): 
         """Update the cached info for a suite."""
-        prefix = search_manager.get_datasource()
         idx, branch, revision = id_tuple
-        id_text = id_formatter(prefix, idx, branch, revision)
+        id_text = id_formatter(idx, branch, revision)
         loc = STATUS_TIP[local_status]
         self._result_info[id_tuple] = id_text + "\n" + loc + "\n\n"
         for key in sorted(result_map):

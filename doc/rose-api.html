@@ -1298,13 +1298,13 @@ http://host/PREFIX_NAME/get_query_operators?format=json
         and the format argument. For example, entering this URL in a web
         browser:
         <pre>
-http://host/PREFIX_NAME/info?idx=aa000&amp;branch=trunk&amp;revision=1&amp;format=json
+http://host/PREFIX_NAME/info?idx=mo1-aa000&amp;branch=trunk&amp;revision=1&amp;format=json
 </pre>
 
         <p>may give</p>
         <pre>
 {"access-list": ["fred", "alice"], "author": "bob", "branch": "trunk", "date": 1340700481,
- "experiment": "HADGEM6", "from_idx": null, "idx": "aa000", "project": "HADGEM5#123",
+ "experiment": "HADGEM6", "from_idx": null, "idx": "mo1-aa000", "project": "HADGEM5#123",
  "revision": 1, "status": "M ", "title": "HADGEM5 replacement"}
 </pre>
 
@@ -1358,10 +1358,10 @@ http://host/PREFIX_NAME/query?q=and+idx+endswith+78&amp;q=or+owner+eq+bob&amp;fo
 
         <p>may give</p>
         <pre>
-[{"idx": "aa078", "branch": "trunk", "revision": 200, "owner": "fred",
+[{"idx": "mo1-aa078", "branch": "trunk", "revision": 200, "owner": "fred",
   "project": "fred's project.", "title": "fred's awesome suite",
   "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"},
- {"idx": "aa090", "branch": "trunk", "revision": 350, "owner": "bob",
+ {"idx": "mo1-aa090", "branch": "trunk", "revision": 350, "owner": "bob",
   "project": "var", "title": "A copy of var.vexcs.", "status": "M ",
   "access-list": ["*"], "operational": "Y"}]
 </pre>
@@ -1382,13 +1382,13 @@ http://host/mo1/json/query?q=and+idx+endswith+78&amp;all_revs&amp;format=json
 
         <p>may give</p>
         <pre>
-[{"idx": "aa078", "branch": "trunk", "revision": 120, "owner": "fred",
+[{"idx": "mo1-aa078", "branch": "trunk", "revision": 120, "owner": "fred",
   "project": "fred's project.", "title": "fred's new suite",
   "status": "A "}
- {"idx": "aa078", "branch": "trunk", "revision": 199, "owner": "fred",
+ {"idx": "mo1-aa078", "branch": "trunk", "revision": 199, "owner": "fred",
   "project": "fred's project.", "title": "fred's awesome suite",
   "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"},
- {"idx": "aa078", "branch": "trunk", "revision": 200, "owner": "fred",
+ {"idx": "mo1-aa078", "branch": "trunk", "revision": 200, "owner": "fred",
   "project": "fred's project.", "title": "fred's awesome suite",
   "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"}]
 </pre>
@@ -1425,13 +1425,13 @@ http://host/PREFIX_NAME/search?var+bob+nowcast&amp;format=json
 
         <p>may give</p>
         <pre>
-[{"idx": "aa090", "branch": "trunk", "revision": 330, "owner": "bob",
+[{"idx": "mo1-aa090", "branch": "trunk", "revision": 330, "owner": "bob",
   "project": "um", "title": "A copy of um.alpra.", "status": "M ",
   "description": "Bob's UM suite"},
- {"idx": "aa092", "branch": "trunk", "revision": 340, "owner": "jim",
+ {"idx": "mo1-aa092", "branch": "trunk", "revision": 340, "owner": "jim",
   "project": "var", "title": "6D Quantum VAR.", "status": "M ", 
   "location": "NAE"},
- {"idx": "aa100", "branch": "trunk", "revision": 352, "owner": "ops_account",
+ {"idx": "mo1-aa100", "branch": "trunk", "revision": 352, "owner": "ops_account",
   "project": "nowcast", "title": "The operational Nowcast suite",
   "status": "M ", "ensemble": "yes"}]
 </pre>
@@ -1451,22 +1451,22 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
         <p>may give</p>
         <pre>
-[{"idx": "aa001", "branch": "trunk", "revision": 120, "owner": "bob",
+[{"idx": "mo1-aa001", "branch": "trunk", "revision": 120, "owner": "bob",
   "project": "useless", "title": "Bob's useless suite.", "status": "A "},
- {"idx": "aa001", "branch": "trunk", "revision": 122, "owner": "bob",
+ {"idx": "mo1-aa001", "branch": "trunk", "revision": 122, "owner": "bob",
   "project": "useless", "title": "Bob's useless suite.", "status": "D "},
- {"idx": "aa090", "branch": "trunk", "revision": 320, "owner": "bob",
+ {"idx": "mo1-aa090", "branch": "trunk", "revision": 320, "owner": "bob",
   "project": "um", "title": "A copy of um.alpra.", "status": "A "},
- {"idx": "aa090", "branch": "trunk", "revision": 321, "owner": "bob",
+ {"idx": "mo1-aa090", "branch": "trunk", "revision": 321, "owner": "bob",
   "project": "um", "title": "A copy of um.alpra.", "status": "M "},
- {"idx": "aa090", "branch": "trunk", "revision": 330, "owner": "bob",
+ {"idx": "mo1-aa090", "branch": "trunk", "revision": 330, "owner": "bob",
   "project": "um", "title": "A copy of um.alpra.", "status": "M "},
- {"idx": "aa092", "branch": "trunk", "revision": 335, "owner": "jim",
+ {"idx": "mo1-aa092", "branch": "trunk", "revision": 335, "owner": "jim",
   "project": "var", "title": "6D Quantum VAR.", "status": "A "},
- {"idx": "aa092", "branch": "trunk", "revision": 338, "owner": "jim",
+ {"idx": "mo1-aa092", "branch": "trunk", "revision": 338, "owner": "jim",
   "project": "var", "title": "6D Quantum VAR.", "status": "M ",
   "location": "Africa"},
- {"idx": "aa092", "branch": "trunk", "revision": 340, "owner": "jim",
+ {"idx": "mo1-aa092", "branch": "trunk", "revision": 340, "owner": "jim",
   "project": "var", "title": "6D Quantum VAR.", "status": "M ", 
   "location": "NAE"}]
       

@@ -129,7 +129,7 @@ class PrefixRoot(object):
     def _render(self, all_revs=False, data=None, filters=None, s=None):
         if data:
             for item in data:
-                s_id = SuiteId(id_text=self.prefix + "-" + item["idx"])
+                s_id = SuiteId(id_text=item["idx"])
                 item["href"] = s_id.to_web()
         template = self.template_env.get_template("prefix-index.html")
         return template.render(web_prefix=cherrypy.request.script_name,

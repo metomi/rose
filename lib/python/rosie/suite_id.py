@@ -108,10 +108,10 @@ class SuiteId(object):
 
     """Represent a suite ID."""
 
-    FORMAT_ID = r"%s-%s"
+    FORMAT_IDX = r"%s-%s"
     FORMAT_VERSION = r"/%s@%s"
-    IDX_0 = "aa000"
-    IDX_LEN = len(IDX_0)
+    IDX_SHORT_0 = "aa000"
+    IDX_SHORT_LEN = len(IDX_SHORT_0)
     REC_ID = re.compile("\A(?:(\w+)-)?(\w+)(?:/([^\@/]+))?(?:@([^\@/]+))?\Z")
     BRANCH_TRUNK = "trunk"
     REV_HEAD = "HEAD"
@@ -124,7 +124,7 @@ class SuiteId(object):
         if not prefix:
             prefix = cls.get_prefix_default()
         dir_url = cls.get_prefix_location(prefix)
-        for i in range(cls.IDX_LEN - 1):
+        for i in range(cls.IDX_SHORT_LEN - 1):
             out = cls.svn("ls", dir_url)
             if out is None:
                 raise SuiteIdLatestError(prefix)
@@ -136,7 +136,7 @@ class SuiteId(object):
             dir_url = dir_url + "/" + sorted(dirs)[-1].rstrip("/")
 
         # FIXME: not sure why a closure for "state" does not work here?
-        state = {"idx": None, "stack": [], "try_text": False}
+        state = {"idx-short": None, "stack": [], "try_text": False}
 
         def _handle_tag0(state, name, attr_map):
             if state["idx"]:
@@ -148,27 +148,27 @@ class SuiteId(object):
                 and attr_map.get("action") == "A")
      
         def _handle_tag1(state, name):
-            if state["idx"]:
+            if state["idx-short"]:
                 return
             state["stack"].pop()
 
         def _handle_text(state, text):
-            if state["idx"] or not state["try_text"]:
+            if state["idx-short"] or not state["try_text"]:
                 return
-            names = text.strip().lstrip("/").split("/", cls.IDX_LEN)
-            if len(names) == cls.IDX_LEN:
-                idx = "".join(names[0:cls.IDX_LEN])
+            names = text.strip().lstrip("/").split("/", cls.IDX_SHORT_LEN)
+            if len(names) == cls.IDX_SHORT_LEN:
+                idx = "".join(names[0:cls.IDX_SHORT_LEN])
                 if cls.REC_ID.match(idx):
-                    state["idx"] = idx
+                    state["idx-short"] = idx
 
         parser = xml.parsers.expat.ParserCreate()
         parser.StartElementHandler = lambda *args: _handle_tag0(state, *args)
         parser.EndElementHandler = lambda *args: _handle_tag1(state, *args)
         parser.CharacterDataHandler = lambda *args: _handle_text(state, *args)
         parser.Parse(cls.svn("log", "--verbose", "--xml", dir_url))
-        if not state["idx"]:
+        if not state["idx-short"]:
             return None
-        return cls(id_text=cls.FORMAT_ID % (prefix, state["idx"]))
+        return cls(id_text=cls.FORMAT_IDX % (prefix, state["idx-short"])
 
     @classmethod
     def get_local_copy_root(cls):
@@ -189,9 +189,9 @@ class SuiteId(object):
         if id:
             return id.incr()
         elif prefix:
-            return cls(id_text=cls.FORMAT_ID % (prefix, cls.IDX_0))
+            return cls(id_text=cls.FORMAT_ID % (prefix, cls.IDX_SHORT_0))
         else:
-            return cls(id_text=cls.IDX_0)
+            return cls(id_text=cls.IDX_SHORT_0)
 
     @classmethod
     def get_output_root(cls):
@@ -269,7 +269,7 @@ class SuiteId(object):
             self._from_location(location)
 
     def __str__(self):
-        return self.FORMAT_ID % (self.prefix, self.idx)
+        return self.idx
 
     def __eq__(self, other):
         return (self.to_string_with_version() == other.to_string_with_version()
@@ -280,16 +280,20 @@ class SuiteId(object):
 
     __repr__ = __str__
 
+    def _get_idx_short(self):
+        return self.idx.split("-", 1)[1]
+
     def _from_id_text(self, id_text):
         match = self.REC_ID.match(id_text)
         if not match:
             raise SuiteIdTextError(id_text)
-        self.prefix, self.idx, self.branch, self.revision = match.groups()
+        self.prefix, idx_short, self.branch, self.revision = match.groups()
         if not self.prefix:
             config = rose.config.default_node()
             self.prefix = self.get_prefix_default()
             if not self.prefix:
                 raise SuiteIdPrefixError(id_text)
+        self.idx = self.FORMAT_IDX % (self.prefix, idx_short)
 
     def _from_location(self, location):
         """Return the ID of a location (origin URL or local copy path).
@@ -319,14 +323,14 @@ class SuiteId(object):
         else:
             raise SuiteIdPrefixError(location)
         names = path.lstrip("/").split("/", self.IDX_LEN + 1)
-        if len(names) < self.IDX_LEN:
+        if len(names) < self.IDX_SHORT_LEN:
             raise SuiteIdLocationError(location)
-        idx = "".join(names[0:self.IDX_LEN])
-        if not self.REC_ID.match(idx):
+        idx_short = "".join(names[0:self.IDX_SHORT_LEN])
+        if not self.REC_ID.match(idx_short):
             raise SuiteIdLocationError(location)
-        self.idx = idx
-        if len(names) > self.IDX_LEN:
-            self.branch = names[self.IDX_LEN]
+        self.idx = self.FORMAT_IDX %(self.prefix, idx_short)
+        if len(names) > self.IDX_SHORT_LEN:
+            self.branch = names[self.IDX_SHORT_LEN]
         if info_entry.has_key("commit:revision"):
             self.revision = info_entry["commit:revision"]
         self._set_statuses(location)
@@ -343,34 +347,35 @@ class SuiteId(object):
 
     def incr(self):
         """Return an SuiteId object that represents the ID after this ID."""
-        idx_chars = list(self.idx)
+        idx_short_chars = list(self._get_idx_short())
         incr_next = True
-        i = self.IDX_LEN
+        i = self.IDX_SHORT_LEN
         alphabet = string.lowercase
         while incr_next and i:
             i -= 1
             incr_next = False
-            if idx_chars[i].isdigit():
-                idx_chars[i] = str((int(idx_chars[i]) + 1) % 10)
-                incr_next = (idx_chars[i] == "0")
+            if idx_short_chars[i].isdigit():
+                idx_short_chars[i] = str((int(idx_short_chars[i]) + 1) % 10)
+                incr_next = (idx_short_chars[i] == "0")
             else:
-                index = alphabet.index(idx_chars[i])
+                index = alphabet.index(idx_short_chars[i])
                 new_index = (index + 1) % len(alphabet)
-                idx_chars[i] = alphabet[new_index]
+                idx_short_chars[i] = alphabet[new_index]
                 incr_next = (new_index == 0)
             if incr_next and i == 0:
                 raise SuiteIdOverflowError(self)
-        idx = "".join(idx_chars)
-        return self.__class__(id_text=self.FORMAT_ID % (self.prefix, idx))
+        idx_short = "".join(idx_short_chars)
+        return self.__class__(id_text=self.FORMAT_ID % (self.prefix, idx_short))
 
     def to_origin(self):
         """Return the origin URL of this ID."""
-        return self.get_prefix_location(self.prefix) + "/" + "/".join(self.idx)
+        return (self.get_prefix_location(self.prefix) + "/" +
+                "/".join(self._get_idx_short()))
 
     def to_local_copy(self):
         """Return the local copy path of this ID."""
         local_copy_root = self.get_local_copy_root()
-        return os.path.join(local_copy_root, "%s-%s" % (self.prefix, self.idx))
+        return os.path.join(local_copy_root, self.idx)
 
     def to_string_with_version(self):
         branch = self.branch
@@ -384,7 +389,7 @@ class SuiteId(object):
     def to_web(self):
         """Return the source browse URL for this suite."""
         prefix_source = self.get_prefix_web(self.prefix)
-        url = prefix_source + "/browser/" + "/".join(self.idx)
+        url = prefix_source + "/browser/" + "/".join(self._get_idx_short())
         branch = self.branch
         if not branch:
             branch = self.BRANCH_TRUNK

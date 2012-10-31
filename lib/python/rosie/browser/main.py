@@ -276,9 +276,9 @@ class MainWindow(gtk.Window):
         self.advanced_search_widget.display_filters[title] = not filters
         self.handle_update_treeview()
 
-    def format_suite_id(self, prefix, idx, branch, revision):
+    def format_suite_id(self, idx, branch, revision):
         """Convenience method for formatting the suite id."""
-        return "{0}-{1}/{2}@{3}".format(prefix, idx, branch, revision)
+        return "{0}/{1}@{2}".format(idx, branch, revision)
 
     def generate_menu(self):
         """Generate the top menu."""
