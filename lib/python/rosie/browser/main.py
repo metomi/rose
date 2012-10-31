@@ -154,14 +154,15 @@ class MainWindow(gtk.Window):
             self.handle_search(None)
         else:
             items = {}
+            
+            #set the all revisions to the setting specified *by the url*
+            self.history_menuitem.set_active("all_revs=" in address_url)
+            
             # convert partial addresses to full ones for purposes of searching
             if (address_url.find("search?s=") == 0 or 
                 address_url.find("query?q=") == 0):
                 address_url = (self.search_manager.ws_client.get_query_prefix()
                               + address_url)
-            # allow setting of all_revs via the address bar or front end
-            if self.search_history and address_url.find("all_revs") == -1:
-                items.update({"all_revs": ""})
             try:
                 items.update({"url": address_url})
                 results = self.search_manager.address_lookup(**items)
@@ -182,11 +183,14 @@ class MainWindow(gtk.Window):
                     else:                        
                         self.nav_bar.address_box.insert_text(0, address_url)
                         
-                    recorded = self.hist.record_search("url", 
-                                                       repr(address_url),
-                                                       self.search_history)
+                    recorded = self.hist.record_search(
+                                                "url", 
+                                                repr(address_url),
+                                                self.search_history)
                     if recorded == True:
-                        self.handle_record_search_ui("url", address_url, False)
+                        self.handle_record_search_ui("url", 
+                                                     address_url,
+                                                     self.search_history)
                 
             except rosie.ws_client.QueryError as e:
                 rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
@@ -221,6 +225,7 @@ class MainWindow(gtk.Window):
 
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
+        self.nav_bar.address_box.child.set_text("")
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
@@ -710,7 +715,9 @@ class MainWindow(gtk.Window):
 
     def handle_refresh(self, *args):
         """Handles refreshing the search results."""
-        if not self.nav_bar.address_box.child.get_text() == "":
+        if self.nav_bar.address_box.child.get_text() == "":
+            self.display_local_suites()
+        else:
              self.address_bar_lookup(None, False)
 
     def handle_run(self, *args):
