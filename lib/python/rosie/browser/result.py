@@ -281,6 +281,10 @@ class DisplayBox(gtk.VBox):
 
         old_sort_id, old_descending = self.treestore.get_sort_column_id()
 
+        if old_sort_id is not None:
+            cols = self.treeview.get_columns()
+            self.sort_title = cols[old_sort_id].get_widget().get_text()
+
         if old_descending is not None:
             self.descending = old_descending
         
@@ -289,9 +293,6 @@ class DisplayBox(gtk.VBox):
         cols = self.get_tree_columns()
         group_index = self.group_index
 
-        if old_sort_id is not None:        
-            self.sort_title = cols[old_sort_id]
-        
         if sort_title is not None:
             self.sort_title = sort_title
         
