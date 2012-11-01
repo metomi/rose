@@ -95,7 +95,8 @@ class KeyWidget(gtk.HBox):
         self.entry.show()
         for key, value in self.show_modes.items():
             self.set_show_mode(key, value)
-        if len(self.meta.get(rose.META_PROP_VALUES, [None, None])) == 1:
+        if (rose.META_PROP_VALUES in self.meta and
+            len(self.meta[rose.META_PROP_VALUES]) == 1):
             self.add_flag(rose.config_editor.FLAG_TYPE_FIXED,
                           rose.config_editor.VAR_FLAG_TIP_FIXED)
         event_box.show()
@@ -216,6 +217,7 @@ class KeyWidget(gtk.HBox):
         return True
 
     def launch_edit_comments(self, *args):
+        """Launch an edit comments dialog."""
         text = "\n".join(self.my_variable.comments)
         title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
                                    self.my_variable.metadata['id'])

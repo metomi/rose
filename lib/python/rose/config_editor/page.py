@@ -733,8 +733,9 @@ class ConfigPage(gtk.VBox):
 
     def react_to_show_modes(self, mode_key, is_mode_on):
         self.show_modes[mode_key] = is_mode_on
-        if hasattr(self.main_container, 'show_' + mode_key):
-            getattr(self.main_container, 'show_' + mode_key)(is_mode_on)
+        if hasattr(self.main_container, 'show_mode_change'):
+            react_func = getattr(self.main_container, 'show_mode_change')
+            react_func(mode_key, is_mode_on)
             self.update_ignored()
         elif mode_key in [rose.config_editor.SHOW_MODE_IGNORED,
                           rose.config_editor.SHOW_MODE_USER_IGNORED]:

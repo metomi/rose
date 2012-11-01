@@ -224,7 +224,7 @@ class PageTable(gtk.Table):
         return (variablewidget.is_ghost and
                 not self._is_var_compulsory(variablewidget.variable))
 
-    def show_fixed(self, should_show_fixed=False):
+    def _show_fixed(self, should_show_fixed=False):
         """Display or hide 'fixed' variables."""
         for child in self.get_children():
             variable = child.get_parent().variable
@@ -234,7 +234,7 @@ class PageTable(gtk.Table):
                 elif not variable.error:
                     child.get_parent().hide()
 
-    def show_latent(self, should_show_latent=False):
+    def _show_latent(self, should_show_latent=False):
         """Display or remove 'ghost' variables."""
         max_normal_row = 0
         for child in self.get_children():
@@ -271,6 +271,10 @@ class PageTable(gtk.Table):
                 continue
             parent.set_show_mode(mode, mode_on)
             done_variable_widgets.append(parent)
+        if mode == rose.config_editor.SHOW_MODE_LATENT:
+            self._show_latent(mode_on)
+        elif mode == rose.config_editor.SHOW_MODE_FIXED:
+            self._show_fixed(mode_on)
 
 
 class PageLatentTable(gtk.Table):

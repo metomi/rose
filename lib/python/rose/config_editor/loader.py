@@ -407,7 +407,6 @@ class ConfigDataManager(object):
             var_id = self.util.get_id_from_section_option(section, option)
             real_var_ids.append(var_id)
             meta_data = self.get_metadata_for_config_id(var_id, config_name)
-            flags = self.get_flags_for_metadata(meta_data)
             var_map.setdefault(section, [])
             var_map[section].append(rose.variable.Variable(
                                                   option,
@@ -415,7 +414,6 @@ class ConfigDataManager(object):
                                                   meta_data,
                                                   ignored_reason,
                                                   error={},
-                                                  flags=flags,
                                                   comments=cfg_comments))
         for setting_id, sect_node in meta_config.value.items():
             if sect_node.is_ignored():
@@ -441,15 +439,13 @@ class ConfigDataManager(object):
             if option is not None and section not in ['ns', 'file:*']:
                 value = rose.variable.get_value_from_metadata(meta_data)
                 latent_var_map.setdefault(section, [])
-                flags = self.get_flags_for_metadata(meta_data)
                 latent_var_map[section].append(
                                 rose.variable.Variable(
                                                option,
                                                value,
                                                meta_data,
                                                ignored_reason,
-                                               error={},
-                                               flags=flags))
+                                               error={}))
         return var_map, latent_var_map
 
     def dump_to_internal_config(self, config_name, only_this_ns=None):
@@ -989,32 +985,12 @@ class ConfigDataManager(object):
             return {'id': node_id}
         return rose.macro.get_metadata_for_config_id(node_id, meta_config)
 
-    def get_flags_for_metadata(self, metadata):
-        """Get a map of flags corresponding to the metadata."""
-        flags = {}
-        values = metadata.get(rose.META_PROP_VALUES)
-        if values is not None and len(rose.variable.array_split(values)) == 1:
-            flags.update({rose.config_editor.FLAG_TYPE_FIXED:
-                          rose.config_editor.VAR_FLAG_TIP_FIXED})
-        return flags
-
     def get_variable_by_id(self, var_id, config_name, save=False,
                            latent=False):
         """Return the matching variable or None."""
         sect, opt = self.util.get_section_option_from_id(var_id)
         return self.config[config_name].vars.get_var(sect, opt, save,
                                                      no_latent=not latent)
-
-    def clear_flag(self, flag_type, config_name=None):
-        """Remove a flag from configuration variables."""
-        if config_name is None:
-            configs = self.config.keys()
-        else:
-            configs = [config_name]
-        for name in configs:
-            for var in self.config[name].vars.get_all():
-                if flag_type in var.flags:
-                    var.flags.pop(flag_type)
 
 #------------------ Data model helper functions ------------------------------
 
