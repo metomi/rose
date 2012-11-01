@@ -59,7 +59,7 @@
 #         Specify a default value.
 #     --file=FILE, -f FILE
 #         Each of this specifies a configuration file. If none specified, read
-#         from $THIS/../etc/rose.conf and $HOME/.met-um/rose.conf (where $THIS
+#         from $THIS/../etc/rose.conf and $HOME/.metomi/rose.conf (where $THIS
 #         is the location of this command).
 #     --has, --quiet, -q
 #         Exit with 0 if the specified SECTION and/or OPTION exist in the
