@@ -353,7 +353,6 @@ class AppRunner(Runner):
         self.handle_event("command: %s" % command)
         if opts.install_only_mode:
             return
-        sys.stdout.flush()
         # TODO: allow caller of app_run to specify stdout and stderr?
         self.popen(command, shell=True, stdout=sys.stdout, stderr=sys.stderr)
 
