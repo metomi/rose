@@ -25,6 +25,7 @@ import rose.config
 from rose.reporter import Event
 import shlex
 from subprocess import Popen, PIPE
+import sys
 
 
 class RosePopenError(Exception):
@@ -172,6 +173,7 @@ class RosePopener(object):
         if isinstance(stdin, str):
             kwargs["stdin"] = PIPE
         self.handle_event(RosePopenEvent(args, stdin))
+        sys.stdout.flush()
         try:
             if kwargs.get("shell"):
                 p = Popen(args[0], **kwargs)
