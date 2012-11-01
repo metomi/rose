@@ -34,7 +34,6 @@ import rose.config_editor.variable
 import rose.formats.namelist
 from rose.opt_parse import RoseOptionParser
 import rose.resource
-import rose.upgrade
 import rose.variable
 
 
@@ -627,6 +626,7 @@ def main(mode):
     else:
         if len(args) > 1:
             sys.exit(opt_parser.get_usage())
+        import rose.upgrade
         rose.upgrade.run_upgrade_macros(app_config, meta_config, config_name,
                                         args, opts.conf_dir, opts.downgrade,
                                         opts.non_interactive,

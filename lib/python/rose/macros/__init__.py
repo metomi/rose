@@ -26,18 +26,20 @@ import inspect
 import rose.macro
 import compulsory
 import duplicate
+import format
 import rule
 import trigger
 import value
 
 
-MODULES = [compulsory, duplicate, rule, trigger, value]
+MODULES = [compulsory, duplicate, format, rule, trigger, value]
 
 
 class DefaultTransforms(rose.macro.MacroTransformerCollection):
 
     """Runs all the default fixers, such as trigger fixing."""
 
+    def __init__(self):
         macros = []
         macro_info_tuples = rose.macro.get_macro_class_methods(MODULES)
         for module_name, class_name, method, help in macro_info_tuples:
