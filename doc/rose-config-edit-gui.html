@@ -61,28 +61,30 @@ rose config-edit -C ~/my_suites/this_suite
     triangles to expand the tree, right click them to expand everything.</p>
 
     <p>Left click on the page name to open it as a tab in the main (right hand)
-     panel. Middle click to open a page as another tab (as in Firefox). You 
-     may right click on the tab label (at the top of the tab) to open a menu, 
-     and select 'Open in New Window' to detach the tab to a separate window.</p>
+    panel. Middle click to open a page as another tab (as in Firefox). You 
+    may right click on the tab label (at the top of the tab) to open a menu, 
+    and select <kbd>Open in New Window</kbd> to detach the tab to a separate 
+    window.</p>
 
-    <br>
-    
+    <p>    
     <img src="expand_tree.png" alt="expand tree image">
+    <br>
     <table>
     <tr><td>The arrow points to the 'expander' triangles that expand the list 
     of available pages. You can left or right click here.</td></tr>
     </table>
-    <br>
+    </p>
 
-    <br>
+    <p>
     <img src="launch_page.png" alt="launch page image">
+    <br>
     <table>
     <tr><td>The arrows in the figure point to (left to right) opening a page as
      a tab (left or middle click) and opening a tab in a new window (right 
      click on tab label).</td></tr>
     </table>
-    <br>
-
+    </p>
+    
     <h3 id="alter-setting">Alter a setting</h3>
 
     <p>Hovering over the setting name or title, or clicking it, will give 
@@ -97,50 +99,55 @@ rose config-edit -C ~/my_suites/this_suite
     using the menu button on the left hand side of the setting name or title. 
     This menu will also hold help information if it is available.</p>
 
-    <br>
+    <p>
     <img src="hover_and_alter.png" alt="hover and alter">
     <table>
     <tr><td>The arrows point to (left to right) the changed icons in the tree 
     panel, a menu button, and the name of a modified setting.</td></tr>
     </table>
-    <br>
-    <br>
+    </p>
 
     <h3 id="adding-settings"> Adding settings </h3>
 
-    <p>You can add a setting by selecting the 'Add' button on the toolbar. 
-    You can then choose between adding a blank variable (a new setting with no 
-    metadata specification) or adding from a list of available settings for 
-    this page. If you choose a blank variable, you must then enter the name 
+    <p>You can add a setting by selecting the <kbd>Add</kbd> button on the 
+    toolbar. You can then choose between adding a blank variable (a new setting
+    with no metadata specification) or adding from a list of available settings
+    for this page. If you choose a blank variable, you must then enter the name
     when the widget appears, using the entry box next to the menu button.</p>
 
     <p>Alternately, you can view a list of available settings for the page by 
-    selecting 'View -> View Latent' from the menu. You can then add them using 
-    their menu buttons (left hand widget next to the name or title).</p>
+    selecting <kbd>View -> View Latent</kbd> from the menu. You can then add 
+    them using their menu buttons (left hand widget next to the name or title).
+    </p>
 
-    <br>
+    <p>
     <img src="add_menu.png" alt="add menu image">
+    <br>
     <table>
     <tr><td>The arrows in the figure point to the options in the add menu.</td>
     </tr>
     </table>
-    <br>
+    </p>
 
+    <p>
     <img src="add_blank_variable.png" alt="add blank variable image">
+    <br>
     <table>
     <tr><td>The arrow points to the entry box that is used to give the new 
     variable a name.</tr></td>
     </table>
-    <br>
+    </p>
 
+    <p>
     <img src="add_from_latent.png" alt="add from latent image">
+    <br>
     <table>
     <tr><td>The arrows in the figure highlight (top to bottom) the menu that 
     can be used to add a latent setting, and the menu button that launches it.
     </td></tr>
     </table>
-    <br>
-
+    </p>
+    
     <h3 id="find-settings"> Finding settings </h3>
 
     <p>Settings can be found using the Find entry box in the toolbar, which 
@@ -151,32 +158,33 @@ rose config-edit -C ~/my_suites/this_suite
 </pre>
     <p>in the dialog box and press enter (or use the Find Next button).</p>
 
-    <p>To ignore case, pass the Python modifier '(?i)' before the rest of the 
-    expression:</p><pre>
+    <p>To ignore case, pass the Python modifier <code>(?i)</code> before the 
+    rest of the expression:</p><pre>
 (?i)^l.*rad$
 </pre>
 
     <h3 id="view-special">Viewing special settings</h3>
 
     <p>Some settings are hidden by default - these can be shown using the View 
-    menu. 'View Fixed' shows the settings that are only allowed to have one 
-    value according to the metadata. 'View Ignored' shows the settings that 
-    are currently 'commented-out'.</p>
+    menu. <kbd>View Fixed</kbd> shows the settings that are only allowed to 
+    have one value according to the metadata. <kbd>View Ignored</kbd> shows the
+    settings that are currently 'commented-out'.</p>
 
-    <br>
+    <p>
     <img src="fixed_ignored_variables.png" alt="fixed ignored variables image">
+    <br>
     <table>
     <tr><td>The figure shows (from top to bottom) a 'normal' variable, a 
     'fixed' variable, and an 'ignored' variable.</td></tr>
     </table>
-    <br>
+    </p>
 
     <h3 id="add-section">Adding a section</h3>
 
     <p>Navigate to the part of the tree (left hand tree panel) where you wish 
-    to add a section and right click on one of the names. Choose 'Add section' 
-    and type in the name in the dialog. You can then add settings to the 
-    section in the normal way.</p>
+    to add a section and right click on one of the names. Choose <kbd>Add 
+    section</kbd> and type in the name in the dialog. You can then add settings
+    to the section in the normal way.</p>
 
     <h3 id="clone-section"> Cloning a section </h3>
 
@@ -185,20 +193,21 @@ rose config-edit -C ~/my_suites/this_suite
     click on their page name in the left hand tree panel and select 
     'Clone section'.</p>
 
-    <br>
+    <p>
     <img src="clone_section.png" alt="clone section image">
+    <br>
     <table>
     <tr><td>The arrow points to the menu option that copies this page into a 
     new one.</td></tr>
     </table>
-    <br>
+    </p>
 
     <h3 id="remove-section">Removing a section or set of sections</h3>
 
     <p>Right click on the part of the tree (page name in the left hand tree 
-    panel) that you want to remove and click 'Remove'. This will remove all 
-    the settings belonging to the page and any child pages from the tree and 
-    configuration.</p>
+    panel) that you want to remove and click <kbd>Remove</kbd>. This will 
+    remove all the settings belonging to the page and any child pages from the 
+    tree and configuration.</p>
 
     <h3 id="page-help">Accessing page help</h3>
 
@@ -207,15 +216,15 @@ rose config-edit -C ~/my_suites/this_suite
 
     <h3 id="undoing"> Undoing changes </h3>
 
-    <p>You can undo your changes by pressing 'Undo' on the toolbar, or by 
-    clicking the 'Revert page to last save' button on the toolbar. Similarly, 
-    you can redo them by pressing 'Redo'.</p>
+    <p>You can undo your changes by pressing <kbd>Undo</kbd> on the toolbar, or
+    by clicking the <kbd>Revert page to last save</kbd> button on the toolbar. 
+    Similarly, you can redo them by pressing <kbd>Redo</kbd>.</p>
 
     <h3 id="saving">Saving changes</h3>
 
-    <p>Use the File->Save or the 'Save' button on the toolbar in the normal 
-    way. These options will be greyed out if there is no difference between 
-    the last saved state and the current one.</p>
+    <p>Use the <kbd>File->Save</kbd> or the <kbd>Save</kbd> button on the 
+    toolbar in the normal way. These options will be greyed out if there is no 
+    difference between the last saved state and the current one.</p>
 
     <h2 id="customisation">Customising the config-editor</h2>
 
@@ -249,10 +258,10 @@ colour-variable-changed = aquamarine
     <a href="https://github.com/metomi/rose/blob/master/lib/python/rose/config_editor/__init__.py">
     config_editor/__init__.py</a> file. Any of the colours specified there can 
     be changed easily. The allowed colour strings are specified in the X11 
-    rgb.txt file.</p>
+    <var>rgb.txt</var> file.</p>
 
     <p>Changes are not restricted to colours - any constants in this python 
-    module can be overridden in your rose.conf file (but be careful with some 
-    of them!).</p>
+    module can be overridden in your <var>rose.conf</var> file (but be careful 
+    with some of them!).</p>
 </div>
 </body>
