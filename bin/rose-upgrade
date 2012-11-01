@@ -32,4 +32,4 @@
 #         to enter one. If --non-interactive is used, use the latest version
 #         available.
 #-------------------------------------------------------------------------------
-exec python -m rose.macro "upgrade" "$@"
+exec python -m rose.upgrade "$@"

@@ -160,14 +160,14 @@ class MacroValidatorCollection(MacroBase):
 
     def __init__(self, *macros):
         self.macros = macros
-        super(MacroCollection, self).__init__()
+        super(MacroValidatorCollection, self).__init__()
 
     def validate(self, config, meta_config):
         for macro_inst in self.macros:
             if not hasattr(macro_inst, VALIDATE_METHOD):
                 continue
             macro_method = getattr(macro_inst, VALIDATE_METHOD)
-            p_list = macro_meth(config, meta_config)
+            p_list = macro_method(config, meta_config)
             p_list.sort(self._sorter)
             self.reports += p_list
         return self.reports 
@@ -179,7 +179,7 @@ class MacroTransformerCollection(MacroBase):
 
     def __init__(self, *macros):
         self.macros = macros
-        super(MacroCollection, self).__init__()
+        super(MacroTransformerCollection, self).__init__()
 
     def transform(self, config, meta_config=None):
         for macro_inst in self.macros:
@@ -423,19 +423,19 @@ def get_metadata_for_config_id(setting_id, meta_config):
 
 
 def run_macros(app_config, meta_config, config_name, macro_names,
-               opt_conf_dir, opt_all=False, opt_non_interactive=False,
+               opt_all=False, opt_conf_dir=None, opt_non_interactive=False,
                opt_output_dir=None, opt_validate_all=False,
                opt_quietness=False):
     """Run standard or custom macros for a configuration."""
 
+    should_include_system = opt_all
+    if macro_names:
+        should_include_system = True
+        
     macro_tuples, modules = get_macros_for_config(
                   app_config, opt_conf_dir,
                   return_modules=True,
                   include_system=should_include_system)
-
-    should_include_system = opt_all
-    if macro_names:
-        should_include_system = True
 
     # Add all validator macros to the run list if specified.
     if opt_validate_all:
@@ -521,8 +521,11 @@ def run_macros(app_config, meta_config, config_name, macro_names,
     if TRANSFORM_METHOD in macros_by_type:
         _run_transform_macros(macros_by_type[TRANSFORM_METHOD],
                               config_name, app_config, meta_config, modules,
-                              macro_tuples, summarise_all=False,
-                              opt_non_interactive=False, opt_output_dir=None)
+                              macro_tuples,
+                              opt_non_interactive=opt_non_interactive,
+                              opt_conf_dir=opt_conf_dir,
+                              opt_output_dir=opt_output_dir)
+    sys.exit(RC)
 
 
 def _run_transform_macros(macros, config_name, app_config, meta_config,
@@ -581,7 +584,8 @@ def dump_config(app_config, opt_conf_dir, opt_output_dir=None):
     rose.config.dump(app_config, file_path)
 
 
-def main(mode):
+def parse_macro_mode_args(mode="macro", argv=None):
+    """Parse options/arguments for rose macro and upgrade."""
     opt_parser = RoseOptionParser()
     options = ["conf_dir", "meta_path", "non_interactive", "output_dir"]
     if mode == "macro":
@@ -591,7 +595,14 @@ def main(mode):
     else:
         raise KeyError("Wrong mode: {0}".format(mode))
     opt_parser.add_my_options(*options)
-    opts, args = opt_parser.parse_args()
+    if argv is None:
+        opts, args = opt_parser.parse_args()
+    else:
+        opts, args = opt_parser.parse_args(argv)
+    opts, args = opt_parser.parse_args(argv)
+    if mode == "upgrade" and len(args) > 1:
+        sys.stderr.write(parser.get_usage())
+        return None
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     sys.path.append(os.getenv("ROSE_HOME"))
@@ -602,7 +613,8 @@ def main(mode):
                                     rose.SUB_CONFIG_NAME)
     if (not os.path.exists(config_file_path) or
         not os.path.isfile(config_file_path)):
-        sys.exit(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir))
+        sys.stderr.write(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir))
+        return None
     # Load the configuration and the metadata macros.
     app_config = rose.config.load(config_file_path)
     standard_format_config(app_config)
@@ -612,29 +624,26 @@ def main(mode):
     meta_path = load_meta_path(app_config, opts.conf_dir)
     if meta_path is None:
         if mode == "macro":
-            sys.exit(ERROR_LOAD_METADATA)
+            sys.stderr.write(ERROR_LOAD_METADATA)
+            return None
     else:
         meta_config_path = os.path.join(meta_path, rose.META_CONFIG_NAME)
         if os.path.isfile(meta_config_path):
             meta_config = rose.config.load(meta_config_path)
+    return app_config, meta_config, config_name, args, opts
 
-    if mode == "macro":
-        run_macros(app_config, meta_config, config_name, args,
-                   opts.all, opts.conf_dir,
-                   opts.non_interactive, opts.output_dir,
-                   opts.validate_all, opts.quietness)
-    else:
-        if len(args) > 1:
-            sys.exit(opt_parser.get_usage())
-        import rose.upgrade
-        rose.upgrade.run_upgrade_macros(app_config, meta_config, config_name,
-                                        args, opts.conf_dir, opts.downgrade,
-                                        opts.non_interactive,
-                                        opts.output_dir, opts.quietness)
-    sys.exit(0)
+
+def main():
+    """Run rose macro."""
+    return_objects = parse_macro_mode_args()
+    if return_objects is None:
+        sys.exit(1)
+    app_config, meta_config, config_name, args, opts = return_objects
+    run_macros(app_config, meta_config, config_name, args,
+               opts.all, opts.conf_dir,
+               opts.non_interactive, opts.output_dir,
+               opts.validate_all, opts.quietness)
+               
 
 if __name__ == "__main__":
-    mode = None
-    if len(sys.argv) > 1:
-        mode = sys.argv.pop(1)
-    main(mode)
+    main()

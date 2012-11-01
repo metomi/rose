@@ -54,8 +54,8 @@ class ValueChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config=None):
         """Return a list of errors if found, None otherwise."""
+        self.reports = []
         meta_config = self._load_meta_config(config, meta_config)
-        problem_list = []
         for node_keys, node in config.walk():
             if isinstance(node.value, dict):
                 continue
@@ -76,7 +76,7 @@ class ValueChecker(rose.macro.MacroBase):
             if goodness_id in self.good_value_meta_list:
                 continue
             if goodness_id in self.bad_value_meta_map:
-                self.add_report(problem_list, sect, key, value,
+                self.add_report(sect, key, value,
                                 self.bad_value_meta_map[goodness_id])
                 continue
             variable = rose.variable.Variable(key, value, metadata)
@@ -84,7 +84,7 @@ class ValueChecker(rose.macro.MacroBase):
             if not isinstance(value, basestring):
                 text = self.WARNING_NOT_STRING.format(repr(value))
                 self.bad_value_meta_map[goodness_id] = text
-                self.add_report(problem_list, sect, key, value, text)
+                self.add_report(sect, key, value, text)
                 continue
             num_elements = variable.metadata.get(rose.META_PROP_LENGTH, 1)
             if num_elements != 1:
@@ -107,13 +107,13 @@ class ValueChecker(rose.macro.MacroBase):
                                             len(val_list),
                                             num_elements * len(type_list))
                         self.bad_value_meta_map[goodness_id] = text
-                        self.add_report(problem_list, sect, key, value, text)
+                        self.add_report(sect, key, value, text)
                         continue
                     elif len(val_list) % len(type_list) != 0:
                         text = self.WARNING_INVALID_LENGTH.format(
                                             len(val_list))
                         self.bad_value_meta_map[goodness_id] = text
-                        self.add_report(problem_list, sect, key, value, text)
+                        self.add_report(sect, key, value, text)
                         continue
                 num_elements = len(val_list)
             skip_nulls = (metadata.get(rose.META_PROP_COMPULSORY) !=
@@ -131,7 +131,7 @@ class ValueChecker(rose.macro.MacroBase):
                             text = self.WARNING_WRONG_VALUE_FIXED.format(
                                                 val, meta_values[0])
                         self.bad_value_meta_map[goodness_id] = text
-                        self.add_report(problem_list, sect, key, value, text)
+                        self.add_report(sect, key, value, text)
                         break
             elif rose.META_PROP_TYPE in metadata:
                 meta_type = metadata[rose.META_PROP_TYPE]
@@ -140,10 +140,9 @@ class ValueChecker(rose.macro.MacroBase):
                     # A standard, non array variable.
                     for val in val_list:
                         try:
-                            if not self.meta_check(val, meta_type, sect, key,
-                                                   problem_list):
+                            if not self.meta_check(val, meta_type, sect, key):
                                 self.bad_value_meta_map[goodness_id] = (
-                                                    problem_list[-1].info)
+                                                    self.reports[-1].info)
                         except KeyError:
                             pass    
                     
@@ -164,10 +163,9 @@ class ValueChecker(rose.macro.MacroBase):
                         if skip_nulls and not val:
                             continue
                         try:
-                            if not self.meta_check(val, type_name, sect, key,
-                                                   problem_list):
+                            if not self.meta_check(val, type_name, sect, key):
                                 self.bad_value_meta_map[goodness_id] = (
-                                                    problem_list[-1].info)
+                                                    self.reports[-1].info)
                                 break
                         except KeyError:
                             pass 
@@ -181,7 +179,7 @@ class ValueChecker(rose.macro.MacroBase):
                     text = self.WARNING_BAD_PATTERN.format(
                                         value, pattern)
                     self.bad_value_meta_map[goodness_id] = text
-                    self.add_report(problem_list, sect, key, value, text)
+                    self.add_report(sect, key, value, text)
                     continue
             if rose.META_PROP_RANGE in metadata:
                 range_pat = metadata[rose.META_PROP_RANGE]
@@ -209,8 +207,7 @@ class ValueChecker(rose.macro.MacroBase):
                     for val in val_list:
                         if skip_nulls and not val:
                             continue
-                        if not self.meta_check(val, "real", sect, key,
-                                               problem_list):
+                        if not self.meta_check(val, "real", sect, key):
                             break
                         val_num = float(val)
                         if not self.range_func_map[range_pat](val_num):
@@ -220,29 +217,29 @@ class ValueChecker(rose.macro.MacroBase):
                             break
                 if not check_ok:
                     self.bad_value_meta_map[goodness_id] = text
-                    self.add_report(problem_list, sect, key, value, text)
-            if problem_list:
-                if (sect != problem_list[-1].section and
-                    key != problem_list[-1].option):
+                    self.add_report(sect, key, value, text)
+            if self.reports:
+                if (sect != self.reports[-1].section and
+                    key != self.reports[-1].option):
                     # Then this value correctly matches the metadata.
                     if goodness_id not in self.good_value_meta_list:
                         self.good_value_meta_list.append(goodness_id)
-        return problem_list
+        return self.reports
 
-    def meta_check(self, value, meta_type, sect, key, problem_list):
+    def meta_check(self, value, meta_type, sect, key):
         """Check function wrapper"""
         res = rose.meta_type.meta_type_checker(value, meta_type)
         if not res[0]:
-            self.add_report(problem_list, sect, key, value, res[1])
+            self.add_report(sect, key, value, res[1])
         return res[0]        
 
     def check_character(self, value):
         """Interface to check a 'character' type string."""
-        return self.meta_check(value, "character", "", "", [])
+        return self.meta_check(value, "character", "", "")
 
     def check_quoted(self, value):
         """Interface to check a "double quoted" type string."""
-        return self.meta_check(value, "quoted", "", "", [])
+        return self.meta_check(value, "quoted", "", "")
 
 
 class TypeFixer(rose.macro.MacroBase):
@@ -253,6 +250,7 @@ class TypeFixer(rose.macro.MacroBase):
 
     def transform(self, config, meta_config=None):
         """Transform configuration and return it with a list of changes."""
+        self.reports = []
         if meta_config is None:
             meta_config = self._load_meta_config(config, meta_config)
         checker = ValueChecker()
@@ -285,9 +283,8 @@ class TypeFixer(rose.macro.MacroBase):
             if value != old_value:
                 config.set([sect, opt], value, ignored_state)
                 text = self.WARNING_CHANGED_VALUE.format(old_value, value)
-                self.add_report(changes_list, sect, opt, value, text)
-        return config, changes_list
+                self.add_report(sect, opt, value, text)
+        return config, self.reports
 
     def meta_transform(self, value, meta_type):
         return rose.meta_type.meta_type_transform(value, meta_type)
-

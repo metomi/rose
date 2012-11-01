@@ -383,3 +383,18 @@ def run_upgrade_macros(app_config, meta_config, config_name, args,
                                                  upgrade_manager.get_name())
     rose.macro._handle_transform(app_config, new_config, change_list, macro_id,
                                  opt_conf_dir, opt_output_dir, opt_non_interactive)
+
+
+def main():
+    """Run rose upgrade."""
+    return_objects = rose.macro.parse_macro_mode_args("upgrade")
+    if return_objects is None:
+        sys.exit(1)
+    app_config, meta_config, config_name, args, opts = return_objects
+    run_upgrade_macros(app_config, meta_config, config_name,
+                       args, opts.conf_dir, opts.downgrade,
+                       opts.non_interactive, opts.output_dir,
+                       opts.quietness)
+
+if __name__ == "__main__":
+    main()

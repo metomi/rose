@@ -2012,7 +2012,7 @@ if __name__ == '__main__':
         for child_paths in [arg.split(":") for arg in opts.meta_path]:
             child_paths.reverse()
             for path in child_paths:
-                sys.path.insert(0, path)
+                sys.path.insert(0, os.path.abspath(path))
     if opts.conf_dir:
         os.chdir(opts.conf_dir)
     path = os.getcwd()
