@@ -95,6 +95,9 @@ class KeyWidget(gtk.HBox):
         self.entry.show()
         for key, value in self.show_modes.items():
             self.set_show_mode(key, value)
+        if len(self.meta.get(rose.META_PROP_VALUES, [None, None])) == 1:
+            self.add_flag(rose.config_editor.FLAG_TYPE_FIXED,
+                          rose.config_editor.VAR_FLAG_TIP_FIXED)
         event_box.show()
         
     def set_ignored(self):
