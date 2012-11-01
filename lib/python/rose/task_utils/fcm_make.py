@@ -42,10 +42,13 @@ class FCMMakeTaskUtil(AppRunner):
             target += ":" + os.path.join(t.suite_dir_rel, "share", t.task_name)
             # FIXME: name-space for environment variable?
             env_export("MIRROR_TARGET", target, self.event_handler)
-        cfg = os.path.join(t.suite_dir, "etc", t.task_name + ".cfg")
+        cfg_at_etc = os.path.join(t.suite_dir, "etc", t.task_name + ".cfg")
+        cfg = ""
+        if os.access(cfg_at_etc, os.F_OK | os.R_OK):
+            cfg = " -f %s" % cfg_at_etc
         dir = os.path.join(t.suite_dir, "share", t.task_name)
         n_jobs = os.getenv("ROSE_TASK_N_JOBS", "4")
-        cmd = "fcm make -f %s -C %s -j %s" % (cfg, dir, n_jobs)
+        cmd = "fcm make%s -C %s -j %s" % (cfg, dir, n_jobs)
         if os.getenv("ROSE_TASK_OPTIONS"):
             cmd += " " + os.getenv("ROSE_TASK_OPTIONS")
         if args:
