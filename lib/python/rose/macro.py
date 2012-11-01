@@ -221,7 +221,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False):
     if opt_node is None:
         opt_node = config.get([rose.CONFIG_SECT_TOP,
                                rose.CONFIG_OPT_PROJECT], no_ignore=True)
-    if opt_node is None:
+    if opt_node is None or not opt_node.value:
         meta_path = "etc/metadata/all"
     else:
         meta_path = opt_node.value

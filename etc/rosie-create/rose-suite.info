@@ -9,8 +9,7 @@
 #             This is line 2 of the long description of the suite.
 #             This is line 3 of the long description of the suite.
 #
-# tag-list: A list of keywords associated with the suite. E.g.:
-# tag-list=keyword-1 keyword-2
+# sub-project: A subdivision of "project", if relevant.
 #-------------------------------------------------------------------------------
 
 # User ID of the owner of the suite.
@@ -19,8 +18,15 @@
 # Only the owner can delete the suite.
 owner=$OWNER
 
-# access-list: Restrict commit access to trunk to a list of users.
+# access-list: A space-separated list of users with commit access to the trunk.
+# For example:
+# access-list=jane bob fred
 access-list=*
+
+# issue-list: A space-separated list of tickets/issues relevant to the suite.
+# For example:
+# issue-list=#4300 #4512
+issue-list=
 
 # The name of a project associated with the suite.
 project=$PROJECT

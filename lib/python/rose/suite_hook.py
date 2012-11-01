@@ -79,9 +79,12 @@ class RoseSuiteHook(object):
 
         # Send email notification if required
         if should_mail:
-            text = "See: file://%s/index.html\n" % (suite_log_dir)
+            text = ""
+            if task:
+                text += "Task: %s\n" % task
             if hook_message:
-                text += "Message: " + hook_message + "\n"
+                text += "Message: %s\n" % hook_message
+            text += "See: file://%s/index.html\n" % (suite_log_dir)
             msg = MIMEText(text)
             user = pwd.getpwuid(os.getuid()).pw_name
             msg["From"] = user
