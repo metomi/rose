@@ -18,14 +18,11 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-import Queue
 import ast
-import datetime
-import multiprocessing
+import functools
 import os
 import re
 import shlex
-import simplejson
 import subprocess
 import sys
 import threading
@@ -33,22 +30,18 @@ import time
 import urllib
 import webbrowser
 
-import gobject
-import gtk
-import pango
 import pygtk
 pygtk.require("2.0")
+import gtk
 
 import rose.config_editor
 import rose.config_editor.main
-import rose.macros
 import rose.env
 import rose.external
 import rose.gtk.run
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 import rose.resource
-import rose.run
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search
@@ -150,6 +143,9 @@ class MainWindow(gtk.Window):
         self.local_updater.update_now()
         address_url = self.nav_bar.address_box.child.get_text()
 
+        if not address_url.endswith("&format=json"):
+            address_url += "&format=json"
+
         # if the url string doesn't begin with a valid prefix       
         if not (address_url.find("http://") == 0 or 
                 address_url.find("search?s=") == 0 or 
@@ -208,6 +204,20 @@ class MainWindow(gtk.Window):
         """Close down the history panel"""
         self.menubar.uimanager.get_widget(
              '/TopMenuBar/History/Show search history').set_active(False) 
+
+    def _create_suite_hook(self, config, from_id=None):
+        """Hook function to create a suite from a configuration."""
+        if config is None:
+            return
+        try:
+            new_id = self.suite_director.vc_client.create(config, from_id,
+                                         self.search_manager.ws_client.prefix)
+        except Exception as e:
+            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
+                                     type(e).__name__ + ": " + str(e))
+            return None
+        self.handle_checkout(id_=new_id)
+        self.repeat_last_request()
 
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
@@ -558,18 +568,10 @@ class MainWindow(gtk.Window):
     def handle_create(self, from_id=None):
         """Create a new suite."""
         config = self.suite_director.vc_client.generate_info_config(from_id)
-        config = self.handle_new_suite(config)
-        if config is None:
-            return
-        try:
-            new_id = self.suite_director.vc_client.create(config, from_id,
-                                         self.search_manager.ws_client.prefix)
-        except Exception as e:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     type(e).__name__ + ": " + str(e))
-            return None
-        self.handle_checkout(id_=new_id)
-        self.repeat_last_request()
+        finish_func = functools.partial(self._create_suite_hook,
+                                        from_id=from_id)
+        return self.suite_director.run_new_suite_wizard(
+                          config, finish_func, self)
 
     def handle_delete(self, *args):
         """"Handles deletion of a suite."""
@@ -636,10 +638,6 @@ class MainWindow(gtk.Window):
         """Launch a terminal at the current suite directory."""
         id_text = self.get_selected_suite_id()
         rose.external.launch_terminal(cwd=SuiteId(id_text).to_local_copy())
-        
-    def handle_new_suite(self, config, window=None):
-        """Handle creation of new suite."""
-        return self.suite_director.run_new_suite_wizard(config, self, window)
 
     def handle_next_search(self, *args):
         """Handles trying to run next search."""
@@ -676,6 +674,9 @@ class MainWindow(gtk.Window):
                 items.update({"all_revs": ""})
             try:
                 results, url = self.search_manager.ws_query(filters, **items)
+                if url.endswith("&format=json"):
+                    url = url.replace("&format=json", "")
+                
                 self.nav_bar.address_box.child.set_text(url)   
                 if record == True:
                     recorded = self.hist.record_search("query", repr(filters), 
@@ -747,6 +748,8 @@ class MainWindow(gtk.Window):
             items.update({"all_revs": ""})
         try:
             results, url = self.search_manager.ws_search(search_text, **items)
+            if url.endswith("&format=json"):
+                url = url.replace("&format=json", "")
             self.nav_bar.address_box.child.set_text(url)
             if record == True:
                 recorded = self.hist.record_search("search", repr(search_text),
@@ -1057,7 +1060,7 @@ class MainWindow(gtk.Window):
             args.extend([key, value])
         suite_local_copy = SuiteId(
                             self.get_selected_suite_id()).to_local_copy()
-        args.extend(["-C", suite_local_copy])
+        args = ["-C", suite_local_copy] + args
         rose.gtk.run.run_suite(*args)
         return False
 
