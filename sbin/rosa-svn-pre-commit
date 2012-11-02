@@ -30,6 +30,7 @@
 import os
 import re
 import rose.config
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -38,6 +39,7 @@ import tempfile
 RE_ID_NAMES = [r"[a-z]", r"[a-z]", r"\d", r"\d", r"\d"]
 LEN_ID = len(RE_ID_NAMES)
 TRUNK_INFO_FILE = "trunk/rose-suite.info"
+TRUNK_KNOWN_KEYS_FILE = "trunk/rosie-keys"
 ST_ADD = "A"
 ST_DELETE = "D"
 ST_UPDATE = "U"
@@ -122,6 +124,16 @@ def main(repos, txn):
         # The rest are trunk changes in a suite
         path_head = "/".join(names[0:LEN_ID]) + "/"
         path_tail = path[len(path_head):]
+        
+        if ("".join(names[0:LEN_ID]) == "ROSIE" and
+            path_tail == TRUNK_KNOWN_KEYS_FILE):
+            try:
+                keys = svnlook("cat", "-t", txn, repos, path)
+                keys = " ".join(shlex.split(keys))
+            except BaseException as e:
+                sys.stderr.write(path + ": " + str(e) + "\n")
+                bad_changes.add((status, path))
+                continue
 
         # New suite trunk information file must have an owner
         if status == ST_ADD and path_tail == TRUNK_INFO_FILE:

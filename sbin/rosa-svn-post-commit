@@ -268,13 +268,8 @@ def main(repos, rev):
 
 def parse_known_keys(repos, file_path, rev):
     """Parse the file containing whitespace-separated known keys."""
-    try:
-        key_string = svnlook("cat", "-r", rev, repos, file_path)
-        key_string = " ".join(shlex.split(key_string))
-    except Exception as e:
-        sys.stderr.write(KNOWN_KEYS_FILE + ": " + str(e) + "\n")
-        return None
-    return key_string
+    key_string = svnlook("cat", "-r", rev, repos, file_path)
+    return " ".join(shlex.split(key_string))
 
 
 if __name__ == "__main__":
