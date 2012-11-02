@@ -24,17 +24,7 @@
 #     . $ROSE_HOME/lib/bash/rose_init_site
 #
 # DESCRIPTION
-#     Ugly part of rose_init. Implements site specified settings that need to be
-#     configured before "rose config" can even be used.
+#     Site specified PATH, PYTHONPATH, etc.
 #-------------------------------------------------------------------------------
-# Met Office HPC IBM Power 6: requires this version of python.
-if [[ ${PATH:-} != */opt/python/2.6.6/bin:* && -d /opt/python/2.6.6/bin ]]; then
-    PATH=/opt/python/2.6.6/bin:$PATH
-fi
-# Some Python modules are installed here.
-if [[ -z ${PYTHONPATH:-} ]]; then
-    PYTHONPATH=~fcm/lib/python
-elif [[ ${PYTHONPATH:-} != *~fcm/lib/python:* && -d ~fcm/lib/python ]]; then
-    PYTHONPATH=~fcm/lib/python:$PYTHONPATH
-fi
-export PATH PYTHONPATH
+#PYTHONPATH=/path/to/site/specific/python/lib:$PYTHONPATH
+#PATH=/path/to/site/specific/bin:$PATH
