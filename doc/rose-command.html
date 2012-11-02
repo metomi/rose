@@ -821,386 +821,404 @@
     <p><kbd>cylc help run</kbd></p>
 
 
-<h2><a NAME="rose-suite-scan">rose suite-scan</a></h2><br>
-<h3>NAME</h3>
+    <h2><a NAME="rose-suite-scan">rose suite-scan</a></h2>
+    <h3>NAME</h3>
+    <p><kbd>rose suite-scan</kbd></p>
+    
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rose suite-scan [HOST ...]</kbd></p>
 
-<kbd>    rose suite-scan</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>DESCRIPTION</h3>
+    <p>Scan for running suites.</p>
 
-<kbd>    rose suite-scan [HOST ...]</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p>If no HOST specified, use "[rose-suite-run] hosts" setting in site / user
+    configuration. If no configuration defined, use "localhost".</p>
 
-    Scan for running suites.<br>
-<br>
-    If no HOST specified, use "[rose-suite-run] hosts" setting in site / user<br>
-    configuration. If no configuration defined, use "localhost".<br>
-<br>
+    <h3>OPTIONS</h3>
+
+    <p>    
+    <dl>
+        <dt><kbd>--quiet, -q</kbd></dt>
+        <dd>Decrement verbosity.</dd>
+        <dt><kbd>--verbose, -v</kbd></dt>
+        <dd>Increment verbosity.</dd>
+    </dl>
+    </p>
+    
+    <h2><a NAME="rose-task-env">rose task-env</a></h2>
+
+    <h3>NAME</h3>
+    <p><kbd>rose-task-env</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+    <p>
+    <dl>
+        <dt><kbd>rose task-env [OPTIONS]</kbd></dt>
+        <dd>eval $(rose task-env)</dd>
+    </dl>
+    </p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Provide an environment for cycling suite task.</p>
+    
+    <p>Print KEY=VALUE of the following to the STDOUT:
+    <dl>
+        <dt>ROSE_SUITE_DIR</dt>
+        <dd>The path to the root directory of the running suite.</dd>
+        <dt>ROSE_SUITE_NAME</dt>
+        <dd>The name of the running suite.</dd>
+        <dt>ROSE_TASK_NAME</dt>
+        <dd>The name of the suite task.</dd>
+        <dt>ROSE_TASK_CYCLE_TIME</dt>
+        <dd>The cycle time of the suite task, if there is one.</dd>
+        <dt>ROSE_TASK_LOG_ROOT</dt>
+        <dd>The root path for log files of the suite task.</dd>
+        <dt>ROSE_DATA</dt>
+        <dd>The path to the data directory of the running suite.</dd>
+        <dt>ROSE_DATAC</dt>
+        <dd>The path to the data directory of this cycle time in the running suite.</dd>
+        <dt>ROSE_DATAC????</dt>
+        <dd>The path to the data directory of the cycle time with an offset
+        relative to the current cycle time. ???? is a duration:
+            <ul>
+                <li>A "__" (double underscore) prefix denotes a cycle time in the future.
+                    Otherwise, it is a cycle time in the past.</li>
+                <li>nW denotes n weeks.</li>
+                <li>n or nD denotes n days.</li>
+                <li>Tn or TnH denotes n hours.</li>
+                <li>TnM denotes n minutes.</li>
+                <li>TnS denotes s seconds.</li>
+            </ul>
+        E.g. ROSE_DATACT6H is the data directory of 6 hours before the
+             current cycle time.</dd>
+        <dd>E.g. ROSE_DATAC1D and ROSE_DATACT24H are both the data directory of 1
+             day before the current cycle time.</dd>
+        <dt>ROSE_TASK_PREFIX</dt>
+        <dd>The prefix in the task name.</dd>
+        <dt>ROSE_TASK_SUFFIX</dt>
+        <dd>The suffix in the task name.</dd>
+    </dl>
+    </p>
 <h3>OPTIONS</h3>
-<dl>
 
-<dt><kbd>    --quiet, -q</kbd></dt>
-<dd>        Decrement verbosity.</dd>
-<dt><kbd>    --verbose, -v</kbd></dt>
-<dd>        Increment verbosity.</dd>
-<dd></dd>
-</dl>
-<h2><a NAME="rose-task-env">rose task-env</a></h2><br>
-<h3>NAME</h3>
+    <p>
+    <dl>
+        <dt><kbd>--cycle=TIME, -t TIME</kbd></dt>
+        <dd>Specify the cycle time. If not defined, use the cycle time provided
+            by the suite environment. TIME can be in YYYYmmddHH format or a
+            TIME-DELTA string described in the --cycle-offset=TIME-DELTA option.</dd>
+        <dt><kbd>--cycle-offset=TIME-DELTA, -T TIME-DELTA</kbd></dt>
+        <dd>Specify one or more the cycle offsets to determine what
+            ROSE_DATAC???? environment variables to export. The TIME-DELTA
+            argument uses the syntax explained above in the ROSE_DATAC????
+            environment variable.<br>
+            E.g. --cycle-offset=T3H --cycle-offset=T6H will tell "rose task-env"
+            to export ROSE_DATACT3H and ROSE_DATACT6H.</dd>
+        <dt><kbd>--prefix-delim=DELIMITER</kbd></dt>
+        <dd>Specify the delimiter used to determine the task name prefix.
+            (Default="_")</dd>
+        <dt><kbd>--suffix-delim=DELIMITER</kbd></dt>
+        <dd>Specify the delimiter used to determine the task name suffix.
+            (Default="_")</dd>
+        <dt><kbd>--quiet, -q</kbd></dt>
+        <dd>Decrement verbosity.</dd>
+        <dt><kbd>--verbose; -v</kbd></dt>
+        <dd>Increment verbosity.</dd>
+    </dl>
+    </p>
+    
+    <h3>NOTE</h3>
 
-<kbd>    rose-task-env</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <p>Cycle time is expected to be in the YYYYmmdd[HH[MM]] format at the
+    moment. It would be desirable to move to an ISO 8601 compliant format,
+    e.g.  &lt;date&gt;[T&lt;time&gt;] where &lt;date&gt; is YYYYmmdd and &lt;time&gt; is HH[MM].</p>
 
-<kbd>    rose task-env [OPTIONS]</kbd><br>
-<br>
-    eval $(rose task-env)<br>
-<br>
-<h3>DESCRIPTION</h3>
+    <h2><a NAME="rose-task-hook">rose task-hook</a></h2>
+    
+    <h3>NAME</h3>
+    <p><kbd>rose-suite-hook</kbd></p>
 
-    Provide an environment for cycling suite task.<br>
-<br>
-    Print KEY=VALUE of the following to the STDOUT:<br>
-<br>
-    ROSE_SUITE_DIR<br>
-        The path to the root directory of the running suite.<br>
-    ROSE_SUITE_NAME<br>
-        The name of the running suite.<br>
-    ROSE_TASK_NAME<br>
-        The name of the suite task.<br>
-    ROSE_TASK_CYCLE_TIME<br>
-        The cycle time of the suite task, if there is one.<br>
-    ROSE_TASK_LOG_ROOT<br>
-        The root path for log files of the suite task.<br>
-    ROSE_DATA<br>
-        The path to the data directory of the running suite.<br>
-    ROSE_DATAC<br>
-        The path to the data directory of this cycle<br>
-        time in the running suite.<br>
-    ROSE_DATAC????<br>
-        The path to the data directory of the cycle time with an offset<br>
-        relative to the current cycle time. ???? is a duration:<br>
-            * A "__" (double underscore) prefix denotes a cycle time in the future.<br>
-              Otherwise, it is a cycle time in the past.<br>
-            * nW denotes n weeks.<br>
-              n or nD denotes n days.<br>
-              Tn or TnH denotes n hours.<br>
-              TnM denotes n minutes.<br>
-              TnS denotes s seconds.<br>
-        E.g. ROSE_DATACT6H is the data directory of 6 hours before the<br>
-             current cycle time.<br>
-        E.g. ROSE_DATAC1D and ROSE_DATACT24H are both the data directory of 1<br>
-             day before the current cycle time.<br>
-    ROSE_TASK_PREFIX<br>
-        The prefix in the task name.<br>
-    ROSE_TASK_SUFFIX<br>
-        The suffix in the task name.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <h3>SYNOPSIS</h3>
+    <p>Cylc interface</p>
+    
+    <p><kbd>rose suite-hook [OPTIONS] EVENT SUITE MSG</kbd></p>
 
-<dt><kbd>    --cycle=TIME, -t TIME</kbd></dt>
-<dd>        Specify the cycle time. If not defined, use the cycle time provided</dd>
-<dd>        by the suite environment. TIME can be in YYYYmmddHH format or a</dd>
-<dd>        TIME-DELTA string described in the --cycle-offset=TIME-DELTA option.</dd>
-<dt><kbd>    --cycle-offset=TIME-DELTA, -T TIME-DELTA</kbd></dt>
-<dd>        Specify one or more the cycle offsets to determine what</dd>
-<dd>        ROSE_DATAC???? environment variables to export. The TIME-DELTA</dd>
-<dd>        argument uses the syntax explained above in the ROSE_DATAC????</dd>
-<dd>        environment variable.</dd>
-<dd>        E.g. --cycle-offset=T3H --cycle-offset=T6H will tell "rose task-env"</dd>
-<dd>        to export ROSE_DATACT3H and ROSE_DATACT6H.</dd>
-<dt><kbd>    --prefix-delim=DELIMITER</kbd></dt>
-<dd>        Specify the delimiter used to determine the task name prefix.</dd>
-<dd>        (Default="_")</dd>
-<dt><kbd>    --suffix-delim=DELIMITER</kbd></dt>
-<dd>        Specify the delimiter used to determine the task name suffix.</dd>
-<dd>        (Default="_")</dd>
-<dt><kbd>    --quiet, -q</kbd></dt>
-<dd>        Decrement verbosity.</dd>
-<dt><kbd>    --verbose; -v</kbd></dt>
-<dd>        Increment verbosity.</dd>
-<dd></dd>
-</dl>
-<h3>NOTE</h3>
+    <h3>DESCRIPTION</h3>
 
-    Cycle time is expected to be in the YYYYmmdd[HH[MM]] format at the<br>
-    moment. It would be desirable to move to an ISO 8601 compliant format,<br>
-    e.g.  &lt;date&gt;[T&lt;time&gt;] where &lt;date&gt; is YYYYmmdd and &lt;time&gt; is HH[MM].<br>
-<br>
-<h2><a NAME="rose-task-hook">rose task-hook</a></h2><br>
-<h3>NAME</h3>
+    <p>Provide a common event hook for Cylc suites and tasks.
+    <ul>
+        <li>(Task event only) Pull remote task logs back to server host.</li>
+        <li>Generate suite log view.</li>
+        <li>Email user if --mail specified.</li>
+        <li>Shutdown suite if --shutdown specified.</li>
+    </ul>
 
-<kbd>    rose-suite-hook</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>OPTIONS</h3>
+    <p>
+    <dl>
+        <dt><kbd>--debug</kbd></dt>
+        <dd>Switch on debug mode.</dd>
+        <dt><kbd>--mail-cc=LIST</kbd></dt>
+        <dd>Only useful if the --mail-if=LIST option is specified. Specify a
+            comma separated list of additional addresses to email.</dd>
+        <dt><kbd>--mail</kbd></dt>
+        <dd>Trigger an email notification to the user.</dd>
+        <dt><kbd>--shutdown</kbd></dt>
+        <dd>Trigger a shutdown of the suite.</dd>
+        <dt><kbd>--quiet; -q</kbd></dt>
+        <dd>Decrement verbosity.</dd>
+        <dt><kbd>--verbose; -v</kbd></dt>
+        <dd>Increment verbosity.</dd>
+    </dl>
+    </p>
+    
+    <h2><a NAME="rose-task-run">rose task-run</a></h2>
+    
+    <h3>NAME</h3>
 
-    # Cylc interface<br>
-<kbd>    rose suite-hook [OPTIONS] EVENT SUITE MSG</kbd><br>
-<kbd>    rose task-hook [OPTIONS] EVENT SUITE TASK_ID MSG</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p><kbd>rose-task-run</kbd></p>
 
-    Provide a common event hook for Cylc suites and tasks.<br>
-    * (Task event only) Pull remote task logs back to server host.<br>
-    * Generate suite log view.<br>
-    * Email user if --mail specified.<br>
-    * Shutdown suite if --shutdown specified.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <h3>SYNOPSIS</h3>
 
-<dt><kbd>    --debug</kbd></dt>
-<dd>        Switch on debug mode.</dd>
-<dt><kbd>    --mail-cc=LIST</kbd></dt>
-<dd>        Only useful if the --mail-if=LIST option is specified. Specify a</dd>
-<dd>        comma separated list of additional addresses to email.</dd>
-<dt><kbd>    --mail</kbd></dt>
-<dd>        Trigger an email notification to the user.</dd>
-<dt><kbd>    --shutdown</kbd></dt>
-<dd>        Trigger a shutdown of the suite.</dd>
-<dt><kbd>    --quiet; -q</kbd></dt>
-<dd>        Decrement verbosity.</dd>
-<dt><kbd>    --verbose; -v</kbd></dt>
-<dd>        Increment verbosity.</dd>
-<dd></dd>
-</dl>
-<h2><a NAME="rose-task-run">rose task-run</a></h2><br>
-<h3>NAME</h3>
+    <p><kbd>rose task-run [OPTIONS] [--] [APP-COMMAND ...]</kbd></p>
+    
+    <h3>DESCRIPTION</h3>
 
-<kbd>    rose-task-run</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <p>Provide an environment to run a suite task.</p>
 
-<kbd>    rose task-run [OPTIONS] [--] [APP-COMMAND ...]</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p>Normally, the suite task will select a Rose application configuration
+    that has the same name as the task. This can be overridden by the
+    --app-key=KEY option or the ROSE_TASK_APP environment variable.</p>
 
-    Provide an environment to run a suite task.<br>
-<br>
-    Normally, the suite task will select a Rose application configuration<br>
-    that has the same name as the task. This can be overridden by the<br>
-    --app-key=KEY option or the ROSE_TASK_APP environment variable.<br>
-<br>
-    If --no-auto-util and --util-key=KEY is not specified, the task name will<br>
-    be passed to each built-in task utility to see if it is compatible with<br>
-    the utility. If so, it will run the task using the task utility instead<br>
-    of as a Rose application.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <p>If --no-auto-util and --util-key=KEY is not specified, the task name will
+    be passed to each built-in task utility to see if it is compatible with
+    the utility. If so, it will run the task using the task utility instead
+    of as a Rose application.</p>
 
-<dd>    All options of "rose app-run" and "rose task-env" are supported.</dd>
-<dd>    Additional options are:</dd>
-<dt><kbd>    --app-key=KEY</kbd></dt>
-<dd>        Specify a named application configuration.</dd>
-<dt><kbd>    --no-auto-util</kbd></dt>
-<dd>        Do not automatically select a task utility based on the task name.</dd>
-<dt><kbd>    --path=PATTERN, -P PATTERN</kbd></dt>
-<dd>        Each of this specify a glob pattern for paths to prepend to the PATH</dd>
-<dd>        environment variable. If a relative path is given, it is relative to</dd>
-<dd>        $ROSE_SUITE_DIR. An empty value resets the default and any previous</dd>
-<dd>        --path=PATTERN settings.</dd>
-<dd>        (default="share/fcm[_-]make*/*/bin")</dd>
-<dt><kbd>    --util-key=KEY</kbd></dt>
-<dd>        Specify a named task utility.</dd>
-<dd></dd>
-</dl>
-<h3>ENVIRONMENT</h3>
+    <h3>OPTIONS</h3>
+    
+    <p>
+    <dl>
+        <dd>All options of "rose app-run" and "rose task-env" are supported.</dd>
+        <dd>Additional options are:</dd>
+        <dt><kbd>--app-key=KEY</kbd></dt>
+        <dd>Specify a named application configuration.</dd>
+        <dt><kbd>--no-auto-util</kbd></dt>
+        <dd>Do not automatically select a task utility based on the task name.</dd>
+        <dt><kbd>--path=PATTERN, -P PATTERN</kbd></dt>
+        <dd>Each of this specify a glob pattern for paths to prepend to the PATH
+            environment variable. If a relative path is given, it is relative to
+            $ROSE_SUITE_DIR. An empty value resets the default and any previous</dd>
+        <dt>--path=PATTERN settings.</dt>
+        <dd>(default="share/fcm[_-]make*/*/bin")</dd>
+        <dt><kbd>--util-key=KEY</kbd></dt>
+        <dd>Specify a named task utility.</dd>
+    </dl>
+    </p>
+    
+    <h3>ENVIRONMENT</h3>
 
-    The following environment variables are used by "rose task-run":<br>
-<br>
-    ROSE_TASK_APP<br>
-        Specify a named application configuration.<br>
-    ROSE_TASK_UTIL<br>
-        Specify a named task utility.<br>
-<br>
-    The following environment variables are used by the "fcm_make" and<br>
-    "fcm_make2" built-in task utilities:<br>
-<br>
-    ROSE_TASK_N_JOBS<br>
-        The number of jobs to run in parallel in `fcm make`. (default=4)<br>
-    ROSE_TASK_OPTIONS<br>
-        Additional options and arguments for `fcm make` or `rose app-run`.<br>
-        (default='')<br>
-    ROSE_TASK_PRE_SCRIPT<br>
-        Source (. invoke) the specified script before running the main<br>
-        command. (default='')<br>
-<br>
-    All environment variables documented in "rose task-env" are passed to the<br>
-    application "rose task-run" runs.<br>
-<br>
-<h3>SEE</h3>
+    <p>The following environment variables are used by "rose task-run":
+    <dl>
+        <dt>ROSE_TASK_APP</dt>
+        <dd>Specify a named application configuration.</dd>
+        <dt>ROSE_TASK_UTIL</dt>
+        <dd>Specify a named task utility.</dd>
+    </dl>
+    </p>
+    
+    <p>The following environment variables are used by the "fcm_make" and
+    "fcm_make2" built-in task utilities:
+    <dl>
+        <dt>ROSE_TASK_N_JOBS</dt>
+        <dd>The number of jobs to run in parallel in `fcm make`. (default=4)</dd>
+        <dt>ROSE_TASK_OPTIONS</dt>
+        <dd>Additional options and arguments for `fcm make` or `rose app-run`.
+        (default='')</dd>
+        <dt>ROSE_TASK_PRE_SCRIPT</dt>
+        <dd>Source (. invoke) the specified script before running the main
+        command. (default='')</dd>
+    </dl>
+    </p>
 
-    rose app-run<br>
-    rose task-env<br>
-<br>
-<h2><a NAME="rose-test-suite">rose test-suite</a></h2><br>
-<h3>NAME</h3>
+    <p>All environment variables documented in "rose task-env" are passed to the
+    application "rose task-run" runs.</p>
 
-<kbd>    rose-test-suite</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>SEE ALSO</h3>
 
-<kbd>    rose test-suite [-v] [UTIL ...]</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p><kbd>rose app-run</kbd></p>
+    <p><kbd>rose task-env</kbd></p>
+    
+    <h2><a NAME="rose-test-suite">rose test-suite</a></h2>
 
-    Run the Rose test suite.<br>
-<br>
-    If no argument is specified, run available tests for all utilities.<br>
-    Otherwise, run only the tests for the utilities in the argument list.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <h3>NAME</h3>
+    <p><kbd>rose-test-suite</kbd></p>
 
-<dt><kbd>    -v  Run tests in verbose mode, if applicable.</kbd></dt>
-<dd></dd>
-</dl>
-<h2><a NAME="rosie-checkout">rosie checkout</a></h2><br>
-<h3>NAME</h3>
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rose test-suite [-v] [UTIL ...]</kbd></p>
 
-<kbd>    rosie checkout</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>DESCRIPTION</h3>
+    <p>Run the Rose test suite.</p>
 
-<kbd>    rosie checkout [OPTIONS] ID ...</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p>If no argument is specified, run available tests for all utilities.
+    Otherwise, run only the tests for the utilities in the argument list.</p>
 
-    Checkout local copies of suites.<br>
-<br>
-    For each ID in the argument list, checkout a working copy of the suite<br>
-    identified by ID to the standard location.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <h3>OPTIONS</h3>
+    
+    <p>
+    <dl>
+        <dt><kbd>-v</kbd></dt>
+        <dd>Run tests in verbose mode, if applicable.</dd>
+    </dl>
+    </p>
+    
+    <h2><a NAME="rosie-checkout">rosie checkout</a></h2>
+    
+    <h3>NAME</h3>
+    <p><kbd>rosie checkout</kbd></p>
 
-<dt><kbd>    --force, -f</kbd></dt>
-<dd>        If working copy for suite identified by ID already exists, remove it.</dd>
-<dd>        Continue to the next ID if checkout of a suite fails.</dd>
-<dt><kbd>    --quiet, -q</kbd></dt>
-<dd>        Decrement verbosity.</dd>
-<dt><kbd>    --verbose, -v</kbd></dt>
-<dd>        Increment verbosity.</dd>
-<dd></dd>
-</dl>
-<h2><a NAME="rosie-copy">rosie copy</a></h2><br>
-<h3>NAME</h3>
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rosie checkout [OPTIONS] ID ...</kbd></p>
 
-<kbd>    rosie create</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>DESCRIPTION</h3>
 
-<kbd>    rosie create [OPTIONS]</kbd><br>
-<kbd>    rosie copy [OPTIONS] FROM-ID</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p>Checkout local copies of suites.</p>
 
-    Create a new suite, and optionally copy items from an existing one.<br>
-<br>
-    Assign an ID and create the directory structure in the central repository<br>
-    for a new suite.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <p>For each ID in the argument list, checkout a working copy of the suite
+    identified by ID to the standard location.</p>
 
-<dt><kbd>    --info-file=FILE</kbd></dt>
-<dd>        Specify a FILE containing the discovery information for the</dd>
-<dd>        new suite. If FILE is -, read from STDIN. The default behaviour</dd>
-<dd>        is to open an editor to add suite discovery information.</dd>
-<dt><kbd>    --no-checkout</kbd></dt>
-<dd>        Do not checkout a working copy of the newly created suite.</dd>
-<dd>        Default is to checkout.</dd>
-<dt><kbd>    --non-interactive, --yes, -y</kbd></dt>
-<dd>        Switch off interactive prompting (=answer yes to everything)</dd>
-<dt><kbd>    --prefix=PREFIX</kbd></dt>
-<dd>        Specify the prefix (i.e. the suite repository) to use.</dd>
-<dd>        The default behaviour is to use the site default. </dd>
-<dt><kbd>    --quiet, -q</kbd></dt>
-<dd>        Decrement verbosity.</dd>
-<dt><kbd>    --verbose, -v</kbd></dt>
-<dd>        Increment verbosity.</dd>
-<dd></dd>
-</dl>
-<h2><a NAME="rosie-create">rosie create</a></h2><br>
-<h3>NAME</h3>
+    <h3>OPTIONS</h3>
 
-<kbd>    rosie create</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <p>
+    <dl>
+        <dt><kbd>--force, -f</kbd></dt>
+        <dd>If working copy for suite identified by ID already exists, remove it.
+        Continue to the next ID if checkout of a suite fails.</dd>
+        <dt><kbd>--quiet, -q</kbd></dt>
+        <dd>Decrement verbosity.</dd>
+        <dt><kbd>--verbose, -v</kbd></dt>
+        <dd>Increment verbosity.</dd>
+    </dl>
 
-<kbd>    rosie create [OPTIONS]</kbd><br>
-<kbd>    rosie copy [OPTIONS] FROM-ID</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <h2><a NAME="rosie-copy">rosie copy</a></h2>
+    
+    <h3>NAME</h3>
+    <p><kbd>rosie create</kbd></p>
 
-    Create a new suite, and optionally copy items from an existing one.<br>
-<br>
-    Assign an ID and create the directory structure in the central repository<br>
-    for a new suite.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <h3>SYNOPSIS</h3>
 
-<dt><kbd>    --info-file=FILE</kbd></dt>
-<dd>        Specify a FILE containing the discovery information for the</dd>
-<dd>        new suite. If FILE is -, read from STDIN. The default behaviour</dd>
-<dd>        is to open an editor to add suite discovery information.</dd>
-<dt><kbd>    --no-checkout</kbd></dt>
-<dd>        Do not checkout a working copy of the newly created suite.</dd>
-<dd>        Default is to checkout.</dd>
-<dt><kbd>    --non-interactive, --yes, -y</kbd></dt>
-<dd>        Switch off interactive prompting (=answer yes to everything)</dd>
-<dt><kbd>    --prefix=PREFIX</kbd></dt>
-<dd>        Specify the prefix (i.e. the suite repository) to use.</dd>
-<dd>        The default behaviour is to use the site default. </dd>
-<dt><kbd>    --quiet, -q</kbd></dt>
-<dd>        Decrement verbosity.</dd>
-<dt><kbd>    --verbose, -v</kbd></dt>
-<dd>        Increment verbosity.</dd>
-<dd></dd>
-</dl>
-<h2><a NAME="rosie-delete">rosie delete</a></h2><br>
-<h3>NAME</h3>
+    <p><kbd>rosie create [OPTIONS]</kbd></p>
+    <p><kbd>rosie copy [OPTIONS] FROM-ID</kbd></p>
 
-<kbd>    rosie delete</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>DESCRIPTION</h3>
 
-<kbd>    rosie delete [OPTIONS] [--] [ID ...]</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p>Create a new suite, and optionally copy items from an existing one.</p>
 
-    Delete suites.<br>
-<br>
-    Check the standard working copy location for a checked out suite<br>
-    matching ID and remove it if there is no uncommitted change (or if<br>
-    --force is specified).<br>
-<br>
-    Delete the suite directory structure from the HEAD of the central<br>
-    repository matching the ID.<br>
-<br>
-    If no ID is specified and $PWD is a working copy of a suite, use the ID<br>
-    of the suite in the working copy.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <p>Assign an ID and create the directory structure in the central repository
+    for a new suite.</p>
 
-<dt><kbd>    --force, -f</kbd></dt>
-<dd>        Remove working copies even if there are uncommitted changes.</dd>
-<dd>        Continue with the next ID if delete of a suite fails.</dd>
-<dt><kbd>    --local-only</kbd></dt>
-<dd>        Remove only the working copy of a suite.</dd>
-<dt><kbd>    --non-interactive, --yes, -y</kbd></dt>
-<dd>        Switch off interactive prompting (=answer yes to everything)</dd>
-<dt><kbd>    --quiet, -q</kbd></dt>
-<dd>        Decrement verbosity.</dd>
-<dt><kbd>    --verbose, -v</kbd></dt>
-<dd>        Increment verbosity.</dd>
-<dd></dd>
-</dl>
+    <h3>OPTIONS</h3>
+
+    <p>
+    <dl>
+        <dt><kbd>--info-file=FILE</kbd></dt>
+        <dd>Specify a FILE containing the discovery information for the
+            new suite. If FILE is -, read from STDIN. The default behaviour
+            is to open an editor to add suite discovery information.</dd>
+        <dt><kbd>--no-checkout</kbd></dt>
+        <dd>Do not checkout a working copy of the newly created suite.
+            Default is to checkout.</dd>
+        <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
+        <dd>Switch off interactive prompting (=answer yes to everything)</dd>
+        <dt><kbd>--prefix=PREFIX</kbd></dt>
+        <dd>Specify the prefix (i.e. the suite repository) to use.
+            The default behaviour is to use the site default.</dd>
+        <dt><kbd>--quiet, -q</kbd></dt>
+        <dd>Decrement verbosity.</dd>
+        <dt><kbd>--verbose, -v</kbd></dt>
+        <dd>Increment verbosity.</dd>
+    </dl>
+    </p>
+    
+    <h2><a NAME="rosie-create">rosie create</a></h2>
+    
+    <h3>NAME</h3>
+    <p><kbd>rosie create</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rosie create [OPTIONS]</kbd></p>
+    <p><kbd>rosie copy [OPTIONS] FROM-ID</kbd></p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Create a new suite, and optionally copy items from an existing one.</p>
+    
+    <p>Assign an ID and create the directory structure in the central repository
+    for a new suite.</p>
+
+    <h3>OPTIONS</h3>
+
+    <p>
+    <dl>
+        <dt><kbd>--info-file=FILE</kbd></dt>
+        <dd>Specify a FILE containing the discovery information for the
+            new suite. If FILE is -, read from STDIN. The default behaviour
+            is to open an editor to add suite discovery information.</dd>
+        <dt><kbd>--no-checkout</kbd></dt>
+        <dd>Do not checkout a working copy of the newly created suite.
+            Default is to checkout.</dd>
+        <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
+        <dd>Switch off interactive prompting (=answer yes to everything)</dd>
+        <dt><kbd>--prefix=PREFIX</kbd></dt>
+        <dd>Specify the prefix (i.e. the suite repository) to use.
+            The default behaviour is to use the site default. </dd>
+        <dt><kbd>--quiet, -q</kbd></dt>
+        <dd>Decrement verbosity.</dd>
+        <dt><kbd>--verbose, -v</kbd></dt>
+        <dd>Increment verbosity.</dd>
+    </dl>
+
+    <h2><a NAME="rosie-delete">rosie delete</a></h2>
+    
+    <h3>NAME</h3>
+    <p><kbd>rosie delete</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rosie delete [OPTIONS] [--] [ID ...]</kbd></p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Delete suites.</p>
+    
+    <p>Check the standard working copy location for a checked out suite
+    matching ID and remove it if there is no uncommitted change (or if
+    --force is specified).</p>
+
+    <p>Delete the suite directory structure from the HEAD of the central
+    repository matching the ID.</p>
+
+    <p>If no ID is specified and $PWD is a working copy of a suite, use the ID
+    of the suite in the working copy.</p>
+
+    <h3>OPTIONS</h3>
+
+    <p>    
+    <dl>
+        <dt><kbd>--force, -f</kbd></dt>
+        <dd>Remove working copies even if there are uncommitted changes.
+            Continue with the next ID if delete of a suite fails.</dd>
+        <dt><kbd>--local-only</kbd></dt>
+        <dd>Remove only the working copy of a suite.</dd>
+        <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
+        <dd>Switch off interactive prompting (=answer yes to everything)</dd>
+        <dt><kbd>--quiet, -q</kbd></dt>
+        <dd>Decrement verbosity.</dd>
+        <dt><kbd>--verbose, -v</kbd></dt>
+        <dd>Increment verbosity.</dd>
+    </dl>
+    </p>
+    
 <h2><a NAME="rosie-go">rosie go</a></h2><br>
 <h3>NAME</h3>
 
