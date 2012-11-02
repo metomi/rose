@@ -1,0 +1,35 @@
+#!jinja2
+[scheduling]
+    [[dependencies]]
+        graph = """
+            ns_trigger_tests => TRIGGER_NAMESPACE
+            TRIGGER_NAMESPACE:succeed-all => ns_succeed_all
+            TRIGGER_NAMESPACE:fail-all => ns_fail_all
+            TRIGGER_NAMESPACE:start-all => ns_start_all
+            TRIGGER_NAMESPACE:finish-all => ns_finish_all
+            TRIGGER_NAMESPACE:succeed-any => ns_succeed_any
+            TRIGGER_NAMESPACE:fail-any => ns_fail_any
+            TRIGGER_NAMESPACE:start-any => ns_start_any
+            TRIGGER_NAMESPACE:finish-any => ns_finish_any
+        """
+            
+# Add suite timeout event (& shutdown event?)
+[runtime]
+    [[root]]
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 10"
+        [[[job submission]]]
+            method = at
+        [[[event hooks]]]
+            succeeded handler = "rose task-hook"
+            failed handler = "rose task-hook"
+
+    [[TRIGGER_NAMESPACE]]
+    [[trigger_ns_ok]]
+        inherit = TRIGGER_NAMESPACE
+        command scripting = "echo I'm all right Jack; sleep 10; exit 0"
+    [[trigger_ns_delayed]]
+        inherit = TRIGGER_NAMESPACE
+        initial scripting = "echo Reticulating Splines...; sleep 30; exit 0"
+    [[trigger_ns_fail]]
+        inherit = TRIGGER_NAMESPACE
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 20; exit 1"

@@ -1,0 +1,36 @@
+#!jinja2
+[scheduling]
+    [[dependencies]]
+        graph = """
+            task_trigger_tests => task_A & task_B
+
+            task_A:succeed => task_A_succeeded
+            task_A:fail => task_A_failed
+            task_A:start => task_A_started
+            task_A:finish => task_A_finished
+            
+            task_B:succeed => task_B_succeeded
+            task_B:fail => task_B_failed
+            task_B:start => task_B_started
+            task_B:finish => task_B_finished
+        """
+            
+# Add suite timeout event (& shutdown event?)
+[runtime]
+    [[root]]
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 10"
+        [[[job submission]]]
+            method = at
+        [[[event hooks]]]
+            succeeded handler = "rose task-hook"
+            failed handler = "rose task-hook"
+
+    [[task_trigger_tests]]
+        title = "Demo of simple task triggers"
+
+    [[task_A]]
+        initial scripting = sleep 10
+    
+    [[task_B]]
+        initial scripting = sleep 15
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 20; exit 1"
