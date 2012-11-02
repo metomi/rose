@@ -48,6 +48,8 @@ class DisplayBox(gtk.VBox):
 
     """Custom widget for displaying search results"""
     
+    descending = None
+    sort_title = None
     query_rows = None
     group_index = None
     TREE_COLUMNS = 20 * [str] + [bool]
@@ -168,6 +170,7 @@ class DisplayBox(gtk.VBox):
         cols = cols[k: k + 1] + cols[0: k] + cols[k + 1:]
         sort_index = cols.index(column.get_widget().get_text())
         descending = (column.get_sort_order() == gtk.SORT_DESCENDING)
+        self.descending = descending
         self.update_treemodel(sort_index, descending) 
 
     def _handle_grouping(self, menuitem):
@@ -275,13 +278,34 @@ class DisplayBox(gtk.VBox):
             return
         query_rows = self.query_rows
         results = [q for q in query_rows]
+
+        old_sort_id, old_descending = self.treestore.get_sort_column_id()
+
+        if old_sort_id is not None:
+            cols = self.treeview.get_columns()
+            self.sort_title = cols[old_sort_id].get_widget().get_text()
+
+        if old_descending is not None:
+            self.descending = old_descending
+        
         for col in self.treeview.get_columns():
             self.treeview.remove_column(col)
         cols = self.get_tree_columns()
         group_index = self.group_index
+
+        if sort_title is not None:
+            self.sort_title = sort_title
+        
         if group_index is None:
-            sort_title = "revision"
-            descending = True
+            if sort_title is None:
+                if self.sort_title is None:
+                    sort_title = "revision"
+                else:
+                    sort_title = self.sort_title
+            if self.descending is None:        
+                descending = True
+            else:
+                descending = self.descending
         else:
             k = group_index
             cols = cols[k: k + 1] + cols[0: k] + cols[k + 1:]

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012 Met Office.
 # 
@@ -18,23 +18,33 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose_init_site
+#     rose stem
 #
 # SYNOPSIS
-#     . $ROSE_HOME/lib/bash/rose_init_site
+#     rose stem [options]
 #
 # DESCRIPTION
-#     Ugly part of rose_init. Implements site specified settings that need to be
-#     configured before "rose config" can even be used.
+#     Run a suitable suite with a specified set of source tree(s). Default 
+#     values of some of these settings are suite-dependent, specified in the 
+#     rose-suite.conf file.
+#
+# EXAMPLES
+#     rose stem --diffsource=$PWD
+#     rose stem --source=fcm:source_tr@head --task=myjob
+#     rose stem --source=$PWD -C ~/roses/mot-aa121 --task=myjob --task=yourjob
+#
+# OPTIONS
+#     All options of "rose suite-run" are supported. Additional options are:
+#
+#     --confsource=DIR, -c DIR
+#         Specify an alterate top-level source tree directory. 
+#         This may be used to locate 'fcm make' config files.
+#     --diffsource=SOURCE, -d SOURCE
+#         Specify a source tree to add to the trunk as a branch.
+#     --source=SOURCE, -s SOURCE
+#         Specify a source tree to run as the trunk.
+#     --task=TASK, -t TASK
+#         Specify a task name or group to run.
+# 
 #-------------------------------------------------------------------------------
-# Met Office HPC IBM Power 6: requires this version of python.
-if [[ ${PATH:-} != */opt/python/2.6.6/bin:* && -d /opt/python/2.6.6/bin ]]; then
-    PATH=/opt/python/2.6.6/bin:$PATH
-fi
-# Some Python modules are installed here.
-if [[ -z ${PYTHONPATH:-} ]]; then
-    PYTHONPATH=~fcm/lib/python
-elif [[ ${PYTHONPATH:-} != *~fcm/lib/python:* && -d ~fcm/lib/python ]]; then
-    PYTHONPATH=~fcm/lib/python:$PYTHONPATH
-fi
-export PATH PYTHONPATH
+exec python -m rose.stem "$@"

@@ -404,7 +404,7 @@ FLAG_TYPE_NO_META = "No metadata flag"
 
 # Relevant metadata properties
 
-META_PROP_WIDGET = "widget[config-edit]"
+META_PROP_WIDGET = "widget[rose-config-edit]"
 
 # Miscellaneous
 COPYRIGHT = '(C) British Crown Copyright 2012 Met Office.'
