@@ -33,7 +33,7 @@
   </div>
 
   <div id="body-main">
-    <h1> Rosie go GUI user guide </h1>
+    <h1> Rosie Go GUI User Guide </h1>
 
     <div id="content"></div>
     
@@ -44,7 +44,7 @@
 rosie go
 </pre>
     
-    <h2 id="layout">Rosie go layout</h2>
+    <h2 id="layout">Rosie Go Layout</h2>
     
     <p>
     <img src="rosie_go_layout.png" alt="rosie go layout picture">
@@ -60,17 +60,18 @@ rosie go
     </ol>
     </p>
     
-    <h2 id="suite-search">Locating suites</h2>
+    <h2 id="suite-search">Locating Suites</h2>
 
-    <h3 id="home">Checked out suites</h3>
+    <h3 id="home">Checked Out Suites</h3>
 
     <p>To see what suites you have checked out on your machine click the <kbd>
-    Show local suites</kbd> button in the address bar. This will display a list
-    of all the suites you have copies of on your machine relating to the current 
+    Show local suites</kbd> button in the address bar (usually represented 
+    using your system's home button icon). This will display a list
+    of all the suites you have checked out relating to the current 
     repository you are viewing. For help on switching to a different repository 
-    see <a href="#repo-change">here</a>.</p>
+    see <a href="#repo-change">Switching Repository</a>.</p>
     
-    <p>When running searches, suites you have copies of checked out will have 
+    <p>When running searches, suites you have checked out will have 
     an icon in the "local" column of the search results indicating the status
     of the local copy e.g. modified, older, newer etc. If no icon is shown 
     then no local copy of that suite has been found.</p>
@@ -85,11 +86,11 @@ rosie go
     
     <p>The same behaviour can also be obtained by typing search phrases in the 
     address box - similar to many web browsers. Note that the search phrase 
-    entered in the address box should not begin <code>http</code> or it will be 
-    interpreted as a url. Should you wish to search for words/phrases beginning
-    <code>http</code> then you will need to use the search box.</p>
+    entered in the address box should not begin with <code>http</code> or it 
+    will be interpreted as a url. Should you wish to search for words/phrases 
+    beginning <code>http</code> then you will need to use the search box.</p>
     
-    <h3 id="query">Running a query</h3>
+    <h3 id="query">Running a Query</h3>
     
     <p>Queries allow you to run more advanced suite searches, filtering results
     based on the values of particular properties.</p>
@@ -120,13 +121,13 @@ rosie go
     will then be added to the start and end of each filter allowing you to 
     select the level of bracketing desired.</p>
     
-    <h3 id="url">Using a url</h3>
+    <h3 id="url">Using a URL</h3>
     
-    <p>To search for suites using a url type the url into the address box and 
-    press enter. The relevant search will then be run and results displayed. 
-    Note that running a search with a url will search the repository <strong>
-    specified by the url</strong> rather than the one you currently have set.
-    </p>
+    <p>To search for suites using a url, type the url into the address box and 
+    press <kbd>enter</kbd>. The relevant search will then be run and results 
+    displayed. Note that running a search with a url will search the repository
+    <strong>specified by the url</strong> rather than the one you currently 
+    have set.</p>
     
     <p>Notice that after running a search or query the address box is updated 
     with the url for that search or query. This can be copied and re-used in 
@@ -135,7 +136,7 @@ rosie go
     <kbd>rosie lookup</kbd> rather than having to set up the same search by 
     hand.</p>
     
-    <h3 id="history">Re-running past searches</h3>
+    <h3 id="history">Re-running Past Searches</h3>
     
     <p>As you run various suite searches within <kbd>rosie go</kbd> they are 
     recorded in your search history. To view your history, either click 
@@ -146,7 +147,7 @@ rosie go
     of <kbd>rosie go</kbd> listing your past searches with their <strong>
     type</strong> - "search", "query" or "url", the <strong>parameters</strong>
     you used and whether or not you asked for <strong>all revisions</strong> 
-    of the returned suites to be shown.</p>
+    of the returned suites.</p>
     
     <p>You can order the results by type, parameters or whether you asked to 
     see all revisions by clicking on the relevent column head.</p>
@@ -165,38 +166,39 @@ rosie go
     of past searches (100 by default) so older, less used searches will 
     disappear from the history menu as new ones are run.</p>
     
-    <h3 id="view-revisions">Searching for all suite revisions</h3>
+    <h3 id="view-revisions">Searching for All Suite Revisions</h3>
     
     <p>For details on how to search for all revisions of a suite rather than 
-    just the latest see <a href="#all-revisions">here</a>.
+    just the latest see <a href="#all-revisions">Viewing All Revisions of a 
+    Suite</a>.
     
-    <h2 id="management">Suite management</h2>
+    <h2 id="management">Suite Management</h2>
     
-    <h3 id="create">Creating a suite</h3>
+    <h3 id="create">Creating a Suite</h3>
     
     <p>To create a <strong>new suite</strong> click <kbd>File -> New Suite</kbd>.
-    A wizard will then launch for you to enter suite details and confirm suite 
-    creation.</p>
+    A wizard will then launch for you to enter suite discovery information 
+    and confirm suite creation.</p>
     
     <p>To create a suite <strong>from an existing suite</strong>, right click 
     on the suite you wish to create from and click <kbd>Copy Suite</kbd>. As 
     with creating a new suite this will launch a wizard for you to edit suite 
-    details in.</p>
+    discovery information in.</p>
     
-    <h3 id="checkout">Checking out an existing suite</h3>
+    <h3 id="checkout">Checking Out an Existing Suite</h3>
     
     <p>To checkout a suite select it from the search results and click the 
     <kbd>Checkout</kbd> button on the toolbar. Alternatively, right click the 
     suite and select <kbd>Checkout Suite</kbd> from the popup menu.</p>
     
-    <p>Suites you have copies of checked out on your machine can be identified
+    <p>Suites you have checked out can be identified
     by having an icon in the "local" column of the results table. You can also
     see all suites you have checked out from the current repository by clicking
     the <kbd>Show local suites</kbd> button on the address bar.</p>
     
-    <h3 id="delete">Deleting a suite</h3>
+    <h3 id="delete">Deleting a Suite</h3>
     
-    <p>To permanently delete <strong>all branches of, the trunk and any working
+    <p>To delete <strong>all branches of, the trunk and any working
     copy of a suite</strong>, right click on the suite in search results and
     select <kbd>Delete Suite</kbd> from the pop-up menu. A dialog will then 
     appear asking you to confirm you wish to go ahead with the deletion.</p>
@@ -207,13 +209,13 @@ rosie go
     copy the option will be disabled until you either commit or revert the 
     suite.</p>
     
-    <h3 id="edit">Editing a suite</h3>
+    <h3 id="edit">Editing a Suite</h3>
     
     <p>To edit a suite you have checked out, right click on it and select 
     <kbd>Edit Suite</kbd>. This will launch the <kbd>rose config-edit</kbd> 
     GUI with that suite open.</p>
     
-    <h3 id="run">Running a suite</h3>
+    <h3 id="run">Running a Suite</h3>
     
     <p>To run a suite, select a suite from the results panel and press the
     run suite button in the toolbar. If you would like to run a suite with some
@@ -222,17 +224,17 @@ rosie go
     
     <p>N.B. you can only run suites you have checked out.</p>
     
-    <h2 id="view">Viewing suite information</h2>
+    <h2 id="view">Viewing Suite Information</h2>
 
-    <h3 id="info">Getting more information about a suite</h3>
+    <h3 id="info">Getting More Information About a Suite</h3>
     
     <p>To obtain more information about a suite listed in the search results 
     you can do one of two things; hold your mouse over the suite to display a
     tooltip containing more details or right click on the suite and click 
-    <kbd>info</kbd> in the pop-up menu to display a dialog box containing further 
+    <kbd>Info</kbd> in the pop-up menu to display a dialog box containing further 
     details.</p>
     
-    <h3 id="group">Grouping results by column</h3>
+    <h3 id="group">Grouping Results by Column</h3>
     
     <p>To group results by column right click on a result in the column you 
     wish to group by then click <kbd>Group Column</kbd> in the menu that 
@@ -241,14 +243,14 @@ rosie go
     any of them and click <kbd>Ungroup</kbd> in the pop-up menu. Results may 
     only be grouped by one column at a time.</p>
     
-    <h3 id="sort">Ordering results</h3>
+    <h3 id="sort">Ordering Results</h3>
 
     <p>Suite search results can be ordered by property in either ascending or 
     descending order. To do so, click on the column title for the property you 
     wish to order by so an arrow is displayed next to it indicating the order 
     in which the property is being sorted.</p>
     
-    <h3 id="column-view">Show/hide result properties</h3>
+    <h3 id="column-view">Show/Hide Result Properties</h3>
     
     <p>To show or hide columns displayed in the search results open the "View" 
     menu and toggle the relevant check boxes on or off. The affected columns 
@@ -256,16 +258,16 @@ rosie go
     subsequent searches. These settings will reset when you open a new
     <kbd>rosie go</kbd> session.</p>
 
-    <h3 id="all-revisions">Viewing all revisions of a suite</h3>
+    <h3 id="all-revisions">Viewing All Revisions of a Suite</h3>
     
     <p>To view all revisions of a suite in the repository you can either toggle
     the <kbd>View all revisions</kbd> box in the toolbar or click <kbd>View ->
     toggle all revisions</kbd> and then run your search. Checking the <kbd>View
     all revisions</kbd> box will not update the current results.</p>
 
-    <h2 id=other>Other features</h2>
+    <h2 id=other>Other Features</h2>
 
-    <h3 id="refresh">Refresh results</h3>
+    <h3 id="refresh">Refresh Results</h3>
     
     <p>From time to time you may find you want to refresh the search results 
     being shown - perhaps as a result of collaborating on suite development.
@@ -273,7 +275,7 @@ rosie go
     use the keyboard shortcut <kbd>F5</kbd>. Note that this re-runs the last 
     search you carried out, so any changes in the GUI won't be picked up.</p>
     
-    <h3 id="navigation">Search navigation</h3>
+    <h3 id="navigation">Search Navigation</h3>
     
     <p>While <kbd>rosie go</kbd> is open it keeps track of the various searches
     you run and allows you to navigate back to previous searches. By clicking 
@@ -282,7 +284,7 @@ rosie go
     keyboard shortcuts <kbd>Alt-left</kbd> and <kbd>Alt-right</kbd> to move
     backwards and forwards respectively.</p>
     
-    <h3 id="repo-change">Switching repository</h3>
+    <h3 id="repo-change">Switching Repository</h3>
     
     <p><kbd>rosie go</kbd> enables you to search for suites stored in different 
     repositories by allowing you to swap between different sources. To change 
@@ -295,14 +297,14 @@ rosie go
     the data source shown in the left hand side of the status bar at the bottom
     of the window.</p>
     
-    <h3 id="output">Viewing suite output</h3>
+    <h3 id="output">Viewing Suite Output</h3>
     
     <p>If you have run a suite and want to view its output select it in the 
     results list, right click it and click <kbd>View Output</kbd>. A web 
     browser will be opened allowing you to look at the suite output. 
-    Alternatively, you can a suite and click the <kbd>View Output</kbd> button 
-    on the toolbar. If no output is available to look at then the menu option 
-    and button will be greyed out.</p>
+    Alternatively, you can view a suite and click the <kbd>View Output</kbd> 
+    button on the toolbar. If no output is available to look at then the menu 
+    option and button will be greyed out.</p>
     
     </div>
   </div>
