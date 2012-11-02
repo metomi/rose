@@ -26,7 +26,7 @@ This module contains constants that are only used in the config editor.
 import ast
 import os
 
-import rose.config
+from rose.resource import ResourceLocator
 
 # Accelerators
 
@@ -418,8 +418,6 @@ PROJECT_URL = None
 UNTITLED_NAME = 'Untitled'
 VAR_ID_IN_CONFIG = 'Variable id {0} from the configuration {1}'
 
-override_config = rose.config.ConfigNode()
-
 
 def false_function(*args):
     """Return False, no matter what the arguments are."""
@@ -427,16 +425,17 @@ def false_function(*args):
 
 
 def load_override_config():
-    override_config = rose.config.default_node()
-    if override_config.get(["rose-config-edit"], no_ignore=True) is None:
+    conf = ResourceLocator.default().get_conf().get(["rose-config-edit"])
+    if conf is None:
         return
-    for option in override_config.get(["rose-config-edit"]).value.keys():
-        value = override_config.get(["rose-config-edit", option]).value
+    for key, node in conf.value.items():
+        if node.is_ignored():
+            continue
         try:
-            cast_value = ast.literal_eval(value)
+            cast_value = ast.literal_eval(node.value)
         except Exception:
-            cast_value = value
-        globals()[option.replace("-", "_").upper()] = cast_value
+            cast_value = node.value
+        globals()[key.replace("-", "_").upper()] = cast_value
 
 
 load_override_config()

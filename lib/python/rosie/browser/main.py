@@ -41,7 +41,7 @@ import rose.external
 import rose.gtk.run
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
-import rose.resource
+from rose.resource import ResourceLocator, ResourceError
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search
@@ -68,14 +68,14 @@ class MainWindow(gtk.Window):
 
         super(MainWindow, self).__init__()
         self.search_manager = rosie.browser.search.SearchManager(opts.prefix)        
-        self.config = rose.config.default_node()
-        locator = rose.resource.ResourceLocator(paths=sys.path)
+        locator = ResourceLocator(paths=sys.path)
+        self.config = locator.get_conf()
         icon_path = locator.locate(rosie.browser.ICON_PATH_WINDOW)
         self.set_icon_from_file(icon_path)
         try:
             self.sched_icon_path = locator.locate(
                                           rosie.browser.ICON_PATH_SCHEDULER)
-        except rose.resource.ResourceError:
+        except ResourceError:
             self.sched_icon_path = None
         self.query_rows = None
         self.adv_controls_on = rosie.browser.SHOULD_SHOW_ADVANCED_CONTROLS
