@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Config Editor GUI User Guide</title>
+  <title>Rose User Guide: Rose Config Edit</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
@@ -12,6 +12,8 @@
   <script type="text/javascript" src="jquery.min.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
 </script>
 </head>
 
@@ -25,18 +27,18 @@
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
       "license">Open Government Licence</a>.
       <br />
-      Latest major update: 27 September 2012.
+      <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
     <p><a href=".">Rose Documentation</a></p>
   </div>
 
   <div id="body-main">
-    <h1>Rose Config Editor GUI User Guide</h1>
+    <h1>Rose User Guide: Rose Config Edit</h1>
 
     <div id="content"></div>
 
-    <h2 id="run">How to Run the Config Editor</h2>
+    <h2 id="run">How to Run Rose Config Edit</h2>
 
     <p>In a suite or application directory, run:</p>
     <pre class='shell'>
@@ -48,8 +50,8 @@ rose config-edit
 rose config-edit -C ~/my_suites/this_suite
 </pre>
 
-    <h2 id="config-app">How to Configure an Application Using the Config
-    Editor</h2>
+    <h2 id="config-app">How to Configure an Application Using Rose Config 
+    Edit</h2>
 
     <h3 id="launch-page">Launch a Page</h3>
 
@@ -59,9 +61,8 @@ rose config-edit -C ~/my_suites/this_suite
     <p>Use the left hand panel to explore the tree of pages. Left click the
     triangles to expand the tree, right click them to expand everything.</p>
 
-    <p><img src="rose_edit_expand_tree.png" alt=
-    "expand tree image" /></p>
-
+    <p>    
+    <img src="rose-config-edit-expand-tree.png" alt="expand tree image"></p>
     <table>
       <tr>
         <td><em>The 'expander' triangles can expand the list of available
@@ -75,9 +76,8 @@ rose config-edit -C ~/my_suites/this_suite
     select <kbd>Open in New Window</kbd> to detach the tab to a separate
     window.</p>
 
-    <p><img src="rose_edit_launch_page.png" alt=
-    "launch page image" /></p>
-
+    <p>
+    <img src="rose-config-edit-launch-page.png" alt="launch page image"></p>
     <table>
       <tr>
         <td><em>You can launch a tab by clicking on a row in the left hand
@@ -100,8 +100,8 @@ rose config-edit -C ~/my_suites/this_suite
     using the menu button on the left hand side of the setting name or title.
     This menu will also hold help information if it is available.</p>
 
-    <p><img src="rose_edit_hover_and_alter.png" alt="hover and alter" /></p>
-
+    <p>
+    <img src="rose-config-edit-hover-and-alter.png" alt="hover and alter"></p>
     <table>
       <tr>
         <td><em>The blue disc icon in the page list indicates changed values,
@@ -119,8 +119,8 @@ rose config-edit -C ~/my_suites/this_suite
     for this page. If you choose a blank variable, you must then enter the name
     when the widget appears, using the entry box next to the menu button.</p>
 
-    <p><img src="rose_edit_add_menu.png" alt="add menu image" /></p>
-
+    <p>
+    <img src="rose-config-edit-add-menu.png" alt="add menu image"></p>
     <table>
       <tr>
         <td><em>The add menu, indicating which settings are available for this
@@ -129,9 +129,8 @@ rose config-edit -C ~/my_suites/this_suite
       </tr>
     </table>
 
-    <p><img src="rose_edit_add_blank_variable.png" alt=
-    "add blank variable image" /></p>
-
+    <p>
+    <img src="rose-config-edit-add-blank-var.png" alt="add blank variable image"></p>
     <table>
       <tr>
         <td><em>Entering a name for a custom setting, after selecting "Add
@@ -144,9 +143,9 @@ rose config-edit -C ~/my_suites/this_suite
     them using their menu buttons (left hand widget next to the name or
     title).</p>
 
-    <p><img src="rose_edit_add_latent_variable.png" alt=
-    "add from latent image" /></p>
-
+    <p>
+    <img src="rose-config-edit-add-latent-var.png" alt="add from latent image">
+    </p>
     <table>
       <tr>
         <td><em>Adding an available setting, using the <kbd>View -&gt; 
@@ -178,7 +177,7 @@ rose config-edit -C ~/my_suites/this_suite
     menu. <kbd>View Fixed</kbd> shows the settings that are only allowed to
     have one value according to the metadata.</p>
 
-    <p><img src="rose_edit_fixed_variables.png" alt=
+    <p><img src="rose-config-edit-fixed-vars.png" alt=
     "fixed ignored variables image" /></p>
 
     <table>
@@ -190,7 +189,7 @@ rose config-edit -C ~/my_suites/this_suite
     <p><kbd>View Ignored</kbd> shows the settings that are currently
     'commented-out'.</p>
 
-    <p><img src="rose_edit_ignored_variables.png" alt=
+    <p><img src="rose-config-edit-ignored-vars.png" alt=
     "fixed ignored variables image" /></p>
 
     <table>
@@ -295,7 +294,7 @@ rose config-edit -C ~/my_suites/this_suite
       </tr>
     </table>
 
-    <h2 id="customisation">Customising the Config-Editor</h2>
+    <h2 id="customisation">Customising Rose Config-Edit</h2>
 
     <h3 id="themes">Themes and Colours</h3>
 

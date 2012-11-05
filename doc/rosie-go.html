@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rosie Go GUI User Guide</title>
+  <title>Rose User Guide: Rosie Go</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
@@ -13,10 +13,11 @@
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
 </head>
 
 <body>
-
   <div id="body-header">
     <address>
       &copy; British Crown Copyright 2012
@@ -26,14 +27,14 @@
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
       "license">Open Government Licence</a>.
       <br />
-      Latest major update: 27 September 2012.
+      <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
     <p><a href=".">Rosie Documentation</a></p>
   </div>
 
   <div id="body-main">
-    <h1> Rosie Go GUI User Guide </h1>
+    <h1>Rose User Guide: Rosie Go</h1>
 
     <div id="content"></div>
     
@@ -46,20 +47,16 @@ rosie go
     
     <h2 id="layout">Rosie Go Layout</h2>
     
-    <p>
-    <img src="rosie_go_layout.png" alt="rosie go layout picture">
-    <br>
-    <em>
+    <p><img src="rosie-go-layout.png" alt="rosie go layout picture" /></p>
     <ol>
-        <li>Menubar</li>
-        <li>Toolbar</li>
-        <li>Addressbar</li>
-        <li>History</li>
-        <li>Advanced search pane</li>
-        <li>Results</li>
-        <li>Statusbar</li>
+        <li><em>Menubar</em></li>
+        <li><em>Toolbar</em></li>
+        <li><em>Addressbar</em></li>
+        <li><em>History</em></li>
+        <li><em>Advanced search pane</em></li>
+        <li><em>Results</em></li>
+        <li><em>Statusbar</em></li>
     </ol>
-    </em>
     </p>
     
     <h2 id="suite-search">Locating Suites</h2>
@@ -267,7 +264,7 @@ rosie go
     toggle all revisions</kbd> and then run your search. Checking the <kbd>View
     all revisions</kbd> box will not update the current results.</p>
 
-    <h2 id=other>Other Features</h2>
+    <h2 id="other">Other Features</h2>
 
     <h3 id="refresh">Refresh Results</h3>
     
@@ -290,7 +287,7 @@ rosie go
     
     <p><kbd>rosie go</kbd> enables you to search for suites stored in different 
     repositories by allowing you to swap between different sources. To change 
-    repository click on <kbd>Edit -> Data source</kbd> and then the name of the 
+    repository click on <kbd>Edit -&gt; Data source</kbd> and then the name of the 
     repository you wish to work with. On changing repository, <kbd>rosie 
     go</kbd> will display your checked out suites for that repository.</p>
     
@@ -307,6 +304,6 @@ rosie go
     Alternatively, you can view a suite and click the <kbd>View Output</kbd> 
     button on the toolbar. If no output is available to look at then the menu 
     option and button will be greyed out.</p>
-    
-    </div>
   </div>
+</body>
+</html>
