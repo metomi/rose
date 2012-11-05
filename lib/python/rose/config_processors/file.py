@@ -19,7 +19,7 @@
 #-----------------------------------------------------------------------------
 """Process "file:*" sections in a rose.config.ConfigNode."""
 
-import hashlib
+from hashlib import md5
 from multiprocessing import Pool
 import os
 import re
@@ -33,6 +33,7 @@ import shlex
 import sqlite3
 import shutil
 import tempfile
+from time import sleep
 
 
 class FileOverwriteError(Exception):
@@ -62,10 +63,77 @@ class ChecksumEvent(Event):
         return "checksum: %s: %s" % self.args
 
 
+class Location(object):
+    """Represent a (file/directory) location."""
+
+    def __init__(self, name):
+        self.name = name
+        self.name_orig = name
+        self.paths = None
+        self.cache = None # path to cache
+        self.is_up_to_date = False
+
+    def __cmp__(self, other):
+        return cmp(self.name, other.name)
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        if id(self) == id(other):
+            return True
+        return self.name == other.name and sorted(other.paths) == sorted(self.paths)
+
+    def __str__(self):
+        return self.name
+
+
+class LocationPath(object):
+    """Represent a sub-path in a location."""
+
+    def __init__(self, name):
+        self.name = name
+        self.checksum = None
+
+    def __cmp__(self, other):
+        return cmp(self.name, other.name) or cmp(self.checksum, other.checksum)
+
+    def __eq__(self, other):
+        return (self.name == other.name and self.checksum == other.checksum)
+
+    def __str__(self):
+        return self.name
+
+
+class LocalLocation(object):
+    """Represent a local (file/directory) location."""
+
+    def __init__(self, name, locs):
+        self.name = name
+        self.locs = None
+        self.paths = None
+        self.is_up_to_date = False
+
+    def __cmp__(self, other):
+        return cmp(self.name, other.name)
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        if id(self) == id(other):
+            return True
+        return (self.name == other.name and
+                sorted(self.paths) == sorted(other.paths) and
+                sorted(self.locs) == sorted(other.locs))
+
+    def __str__(self):
+        return self.name
+
+
 class ConfigProcessorForFile(ConfigProcessorBase):
 
     SCHEME = "file"
     NPROC = 6
+    POLL_DELAY = 0.05
     RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
 
     def __init__(self, *args, **kwargs):
@@ -74,7 +142,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 event_handler=self.manager.event_handler,
                 popen=self.manager.popen,
                 fs_util=self.manager.fs_util)
-        self.file_loc_dao = FileLocDAO()
+        self.loc_dao = LocDAO()
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Install files according to the file:* sections in "config"."""
@@ -96,22 +164,88 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # Ensure that everything is overwritable
         # Ensure that container directories exist
         for key, node in sorted(nodes.items()):
-            target = key[len(self.PREFIX):]
-            if os.path.exists(target) and kwargs.get("no_overwrite_mode"):
-                e = FileOverwriteError(target)
+            name = key[len(self.PREFIX):]
+            if os.path.exists(name) and kwargs.get("no_overwrite_mode"):
+                e = FileOverwriteError(name)
                 raise ConfigProcessError([key], None, e)
-            self.manager.fs_util.makedirs(self.manager.fs_util.dirname(target))
+            self.manager.fs_util.makedirs(self.manager.fs_util.dirname(name))
 
-        # Create database for information of locations that can be invariants
-        self.file_loc_dao.create()
+        # Create database to store information for incremental updates,
+        # if it does not already exist.
+        self.loc_dao.create()
+
+        # Parse each location and determine whether they require an update.
+        loc_map = {}
+        local_loc_map = {}
+        for key, node in sorted(nodes.items()):
+            locs_str = node.get_value("locations")
+            if locs_str is None:
+                continue
+            local_loc_name = key[len(self.PREFIX):]
+            locs = []
+            for name in shlex.split(locs_str):
+                loc_map[name] = Location(name)
+                locs.append(loc_map[name])
+            local_loc_map[local_loc_name] = LocalLocation(local_loc_name, locs)
+        pool = self._get_worker_pool(loc_map)
+        results = {}
+        for name, loc in loc_map.items():
+            # TODO: _loc_parse
+            result = pool.apply_async(_loc_parse, [self, config, name, loc])
+            results[name] = result
+        pool.close()
+        while results:
+            for name, result in results.items():
+                if not result.ready():
+                    continue
+                results.pop(name)
+                loc, args_of_events = result.get()
+                loc_map[name] = loc
+                for args_of_event in args_of_events:
+                    self.manager.handle_event(*args_of_event)
+            if results:
+                sleep(self.POLL_DELAY)
+
+        # Check whether each local "file" needs update.
+        for local_loc in local_loc_map.values():
+            if os.path.exists(local_loc.name):
+                for dirpath, dirnames, filenames in os.walk(local_loc.name):
+                    for i in reversed(range(len(dirnames))):
+                        dirname = dirnames[i]
+                        if dirname.startswith("."):
+                            dirnames.pop(i)
+                            continue
+                        local_loc.paths.append(
+                                LocationPath(os.path.join(dirpath, dirname)))
+                    for filename in filenames:
+                        local_loc.paths.append(
+                                LocationPath(os.path.join(dirpath, filename)))
+                        m = md5()
+                        f = open(filename)
+                        m.update(f.read())
+                        loc_path.checksum = m.hexdigest()
+                prev_local_loc = self.loc_dao.select(local_loc.name)
+                local_loc.is_up_to_date = (local_loc == prev_local_loc)
+            if not local_loc.is_up_to_date:
+                self.loc_dao.delete(local_loc.name)
+
+        # TODO: Update locations with workers.
+        #       New location.
+        #       Location is out of date or has unknown status.
+        #       Write contents to temporary files if necessary.
+        #       Determine checksums.
+        #       Return location of temporary files, and checksums.
+        #       Update DB.
+        # TODO: Rebuild each "local" file.
+        #       Copy from (cached) locations.
+        #       Determine checksums.
+        #       Update DB.
+        # TODO: Tidy up DB.
+        #       Remove entries related to unused locations.
+        #       Remove entries related to old local files.
 
         # Start worker pool
-        nproc = int(rose.config.default_node().get_value(
-                ["rose.config_processors.file", "nproc"],
-                default=self.NPROC))
-        if nproc > len(nodes):
-            nproc = len(nodes)
-        pool = Pool(processes=nproc)
+        pool = self._get_worker_pool(nodes)
 
         # Use worker pool to do the work
         results = []
@@ -190,15 +324,23 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             checksum_expected = node.get_value(["checksum"])
             if checksum_expected is not None:
                 target_file = open(target)
-                md5 = hashlib.md5()
-                md5.update(target_file.read())
-                checksum = md5.hexdigest()
+                m = md5()
+                m.update(target_file.read())
+                checksum = m.hexdigest()
                 if checksum_expected and checksum_expected != checksum:
                     e = UnmatchedChecksumError(checksum_expected, checksum)
                     raise ConfigProcessError(
                             [key, "checksum"], checksum_expected, e)
                 target_file.close()
                 self.manager.handle_event(ChecksumEvent(target, checksum))
+
+    def _get_worker_pool(self, items):
+        nproc = int(rose.config.default_node().get_value(
+                ["rose.config_processors.file", "nproc"],
+                default=self.NPROC))
+        if nproc > len(items):
+            nproc = len(items)
+        return Pool(processes=nproc)
 
     def _source_export(self, source, target):
         """Export/copy a source file/directory in FS or FCM VC to a target."""
@@ -245,8 +387,8 @@ class FileLoc(object):
             return self.name
 
 
-class FileLocDAO(object):
-    """DAO for information of locations that can be invariants."""
+class LocDAO(object):
+    """DAO for information for incremental updates."""
 
     DB_FILE_NAME = ".rose-config_processors-file.db"
 
@@ -254,15 +396,15 @@ class FileLocDAO(object):
         if not os.path.exists(self.DB_FILE_NAME):
             conn = sqlite3.connect(self.DB_FILE_NAME)
             c = conn.cursor()
-            c.execute("""CREATE TABLE paths(
-                          path TEXT,
+            c.execute("""CREATE TABLE file(
+                          name TEXT,
                           loc TEXT,
-                          UNIQUE(path, loc))""")
-            c.execute("""CREATE TABLE content(
-                          loc TEXT,
+                          UNIQUE(name, loc))""")
+            c.execute("""CREATE TABLE checksum(
+                          root TEXT,
                           path TEXT,
                           value TEXT,
-                          UNIQUE(loc, path))""")
+                          UNIQUE(root, path))""")
             conn.commit()
 
 
