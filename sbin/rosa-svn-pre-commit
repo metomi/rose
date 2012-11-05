@@ -127,11 +127,10 @@ def main(repos, txn):
         
         if ("".join(names[0:LEN_ID]) == "ROSIE" and
             path_tail == TRUNK_KNOWN_KEYS_FILE):
+            keys = svnlook("cat", "-t", txn, repos, path)
             try:
-                keys = svnlook("cat", "-t", txn, repos, path)
                 keys = " ".join(shlex.split(keys))
-            except BaseException as e:
-                sys.stderr.write(path + ": " + str(e) + "\n")
+            except ValueError:
                 bad_changes.add((status, path))
                 continue
 
