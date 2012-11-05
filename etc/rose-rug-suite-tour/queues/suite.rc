@@ -1,0 +1,25 @@
+#!jinja2
+[scheduling]
+    [[queues]]
+        [[[queue1]]]
+            limit = 2  # Only two members at one time
+            members = INTERNAL_QUEUES_TEST_NS
+    [[dependencies]]
+        graph = """
+                internal_queue_test => queued_task1 & queued_task2 & \
+                                       queued_task3 & queued_task4 & \
+                                       queued_task5
+                """
+    
+[runtime]
+    [[root]]
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 10"
+        [[[job submission]]]
+            method = at
+        [[[event hooks]]]
+            succeeded handler = "rose task-hook"
+            failed handler = "rose task-hook"
+
+    [[INTERNAL_QUEUES_TEST_NS]]
+    [[queued_task1, queued_task2, queued_task3, queued_task4, queued_task5]]
+        inherit = INTERNAL_QUEUES_TEST_NS

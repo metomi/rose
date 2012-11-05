@@ -1,0 +1,27 @@
+#!jinja2
+[scheduling]
+    [[dependencies]]
+        graph = """
+            retries_test => retry_test_task
+                """
+
+
+[runtime]
+    [[root]]
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 10"
+        [[[job submission]]]
+            method = at
+        [[[event hooks]]]
+            succeeded handler = "rose task-hook"
+            failed handler = "rose task-hook"
+
+    [[RETRY_TEST_NS]]
+    [[retry_test_task]]
+        inherit = RETRY_TEST_NS
+        retry delays = 0.1, 0.1, 0.1
+        command scripting = """
+                            sleep 10
+                            if (( CYLC_TASK_TRY_NUMBER < 3 )); then
+                                bin/false
+                            fi
+                            """

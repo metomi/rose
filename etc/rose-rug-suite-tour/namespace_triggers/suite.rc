@@ -2,15 +2,15 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            ns_trigger_tests => TRIGGER_NAMESPACE
-            TRIGGER_NAMESPACE:succeed-all => ns_succeed_all
-            TRIGGER_NAMESPACE:fail-all => ns_fail_all
-            TRIGGER_NAMESPACE:start-all => ns_start_all
-            TRIGGER_NAMESPACE:finish-all => ns_finish_all
-            TRIGGER_NAMESPACE:succeed-any => ns_succeed_any
-            TRIGGER_NAMESPACE:fail-any => ns_fail_any
-            TRIGGER_NAMESPACE:start-any => ns_start_any
-            TRIGGER_NAMESPACE:finish-any => ns_finish_any
+            ns_trigger_tests => NAMESPACE
+            NAMESPACE:succeed-all => ns_succeed_all
+            NAMESPACE:fail-all => ns_fail_all
+            NAMESPACE:start-all => ns_start_all
+            NAMESPACE:finish-all => ns_finish_all
+            NAMESPACE:succeed-any => ns_succeed_any
+            NAMESPACE:fail-any => ns_fail_any
+            NAMESPACE:start-any => ns_start_any
+            NAMESPACE:finish-any => ns_finish_any
         """
             
 # Add suite timeout event (& shutdown event?)
@@ -23,13 +23,14 @@
             succeeded handler = "rose task-hook"
             failed handler = "rose task-hook"
 
-    [[TRIGGER_NAMESPACE]]
-    [[trigger_ns_ok]]
-        inherit = TRIGGER_NAMESPACE
-        command scripting = "echo I'm all right Jack; sleep 10; exit 0"
-    [[trigger_ns_delayed]]
-        inherit = TRIGGER_NAMESPACE
-        initial scripting = "echo Reticulating Splines...; sleep 30; exit 0"
-    [[trigger_ns_fail]]
-        inherit = TRIGGER_NAMESPACE
-        command scripting = "echo Running on $(hostname) in $PWD; sleep 20; exit 1"
+    [[NAMESPACE]]
+    [[task_ok]]
+        inherit = NAMESPACE
+        command scripting = "sleep 10; echo Hurray\!;"
+    [[task_delayed]]
+        inherit = NAMESPACE
+        initial scripting = "echo submitting....; sleep 25"
+        command scripting = "sleep 10; echo Hurray\!;"
+    [[task_fail]]
+        inherit = NAMESPACE
+        command scripting = "sleep 20; echo Oh no\!; exit 1"
