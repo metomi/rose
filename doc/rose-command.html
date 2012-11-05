@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>Rose command listing</title>
-  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta id="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
@@ -34,6 +34,7 @@
   <div id="body-main">
     <h1>Rose command listing</h1>  
     
+    <h2 id="rose-cli-overview">Command Summary</h2>
     
     <p><kbd>rose</kbd> provides the following utilities:
     <dl>
@@ -105,7 +106,7 @@
     </dl>
     </p>
 
-    <h2><a NAME="rose-ana">rose ana</a></h2>
+    <h2 id="rose-ana">rose ana</h2>
     <h3>NAME</h3>
     <p><kbd>rose ana</kbd></p>
     <h3>SYNOPSIS</h3>
@@ -115,7 +116,7 @@
     <h3>OPTIONS</h3>
     <p>None so far</p>
 
-    <h2><a NAME="rose-app-run">rose app-run</a></h2>
+    <h2 id="rose-app-run">rose app-run</h2>
     <h3>NAME</h3>
     <p><kbd>rose-app-run</kbd></p>
     <h3>SYNOPSIS</h3>
@@ -161,7 +162,7 @@
     </dl>
     </p>
 
-    <h2><a NAME="rose-config">rose config</a></h2><br>
+    <h2 id="rose-config">rose config</hd>
     <h3>NAME</h3>
     <kbd>rose config</kbd>
     <h3>SYNOPSIS</h3>
@@ -215,7 +216,7 @@
         relevant.</dd>
     </dl>
     </p>
-    <h2><a NAME="rose-config-edit">rose config-edit</a></h2>
+    <h2 id="rose-config-edit">rose config-edit</h2>
     <h3>NAME</h3>
     <p><kbd>rose-config-edit</kbd></p>
     <h3>SYNOPSIS</h3>
@@ -243,7 +244,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-edit">rose edit</a></h2>
+    <h2 id="rose-edit">rose edit</h2>
     <h3>NAME</h3>
     <p><kbd>rose-config-edit</kbd></p>
     <h3>SYNOPSIS</h3>
@@ -271,7 +272,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-host-select">rose host-select</a></h2>
+    <h2 id="rose-host-select">rose host-select</h2>
     <h3>NAME</h3>
     <p><kbd>rose host-select</kbd></p>
     <h3>SYNOPSIS</h3>
@@ -334,7 +335,7 @@
     
     Type <kbd>rose config rose-host-select</kbd> to print settings.</p>
 
-    <h2><a NAME="rose-macro">rose macro</a></h2><br>
+    <h2 id="rose-macro">rose macro</hd>
 
     <h3>NAME</h3>
     <p><kbd>rose-macro</kbd></p>
@@ -374,7 +375,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-metadata-gen">rose metadata-gen</a></h2>
+    <h2 id="rose-metadata-gen">rose metadata-gen</h2>
     <h3>NAME</h3>
     <p><kbd>rose metadata-gen</kbd></p>
     <h3>SYNOPSIS</h3>
@@ -411,7 +412,7 @@
     </dl>
     </p>
 
-    <h2><a NAME="rose-mpi-launch">rose mpi-launch</a></h2><br>
+    <h2 id="rose-mpi-launch">rose mpi-launch</hd>
     <h3>NAME</h3>
     <p><kbd>rose-mpi-launch</kbd></p>
     <h3>SYNOPSIS</h3>
@@ -458,7 +459,7 @@
     <h3>DIAGNOSTICS</h3>
     <p>Return 0 on success, 1 or exit code of COMMAND on failure.</p>
 
-    <h2><a NAME="rose-namelist-dump">rose namelist-dump</a></h2>
+    <h2 id="rose-namelist-dump">rose namelist-dump</h2>
     <h3>NAME</h3>
     <p><kbd>rose-namelist-dump</kbd></p>
 
@@ -490,7 +491,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-rug-brief-tour">rose rug-brief-tour</a></h2>
+    <h2 id="rose-rug-brief-tour">rose rug-brief-tour</h2>
     <h3>NAME</h3>
     <p><kbd>rose-rug-brief-tour</kbd></p>
 
@@ -500,7 +501,7 @@
     <h3>DESCRIPTION</h3>
     <p>Populate the current directory for Rose User Guide: A Brief Tour.</p>
 
-    <h2><a NAME="rose-stem">rose stem</a></h2><br>
+    <h2 id="rose-stem">rose stem</hd>
     <h3>NAME</h3>
     <p><kbd>rose stem</kbd></p>
 
@@ -540,7 +541,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-suite-gcontrol">rose suite-gcontrol</a></h2>
+    <h2 id="rose-suite-gcontrol">rose suite-gcontrol</h2>
     <h3>NAME</h3>
     <p><kbd>rose suite-gcontrol</kbd></p>
 
@@ -572,7 +573,7 @@
         <dd>Increment verbosity.</dd>
     </dl>
     
-    <h2><a NAME="rose-suite-hook">rose suite-hook</a></h2>
+    <h2 id="rose-suite-hook">rose suite-hook</h2>
     <h3>NAME</h3>
     <p><kbd>rose-suite-hook</kbd></p>
 
@@ -610,7 +611,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-suite-init">rose suite-init</a></h2>
+    <h2 id="rose-suite-init">rose suite-init</h2>
     <h3>NAME</h3>
 
     <p><kbd>rose suite-run</kbd></p>
@@ -637,7 +638,7 @@
     <p>Install and run a Cylc suite.</p>
 
     <p>Install a suite (in $PWD), register it in Cylc using the basename of the
-    configuration directory or the option specified in --name=NAME. Invoke
+    configuration directory or the option specified in --id=NAME. Invoke
     "cylc run" on it. Arguments (and options after --) are passed to "cylc
     run".</p>
 
@@ -658,7 +659,7 @@
         <dt><kbd>--install-only, -i</kbd></dt>
         <dd>Install the suite, but do not run it. (This option is implied if
         --force mode is specified and the suite is already running.)</dd>
-        <dt><kbd>--name=NAME, -n NAME</kbd></dt>
+        <dt><kbd>--id=NAME, -n NAME</kbd></dt>
         <dd>Specify the suite NAME in Cylc, instead of using the basename of the
         configuration directory.</dd>
         <dt><kbd>--new, -N</kbd></dt>
@@ -701,7 +702,7 @@
     <p><kbd>cylc help register</kbd></p>
     <p><kbd>cylc help run</kbd></p>
 
-    <h2><a NAME="rose-suite-log-view">rose suite-log-view</a></h2>
+    <h2 id="rose-suite-log-view">rose suite-log-view</h2>
     
     <h3>NAME</h3>
     <p><kbd>rose suite-log-view</kbd></p>
@@ -728,7 +729,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-suite-run">rose suite-run</a></h2>
+    <h2 id="rose-suite-run">rose suite-run</h2>
     <h3>NAME</h3>
     <p><kbd>rose suite-run</kbd><p>
 
@@ -756,7 +757,7 @@
     <p>Install and run a Cylc suite.</p>
 
     <p>Install a suite (in $PWD), register it in Cylc using the basename of the
-    configuration directory or the option specified in --name=NAME. Invoke
+    configuration directory or the option specified in --id=NAME. Invoke
     "cylc run" on it. Arguments (and options after --) are passed to "cylc
     run".</p>
 
@@ -777,7 +778,7 @@
         <dt><kbd>--install-only, -i</kbd></dt>
         <dd>Install the suite, but do not run it. (This option is implied if
         --force mode is specified and the suite is already running.)</dd>
-        <dt><kbd>--name=NAME, -n NAME</kbd></dt>
+        <dt><kbd>--id=NAME, -n NAME</kbd></dt>
         <dd>Specify the suite NAME in Cylc, instead of using the basename of the
             configuration directory.</dd>
         <dt><kbd>--new, -N</kbd></dt>
@@ -821,7 +822,7 @@
     <p><kbd>cylc help run</kbd></p>
 
 
-    <h2><a NAME="rose-suite-scan">rose suite-scan</a></h2>
+    <h2 id="rose-suite-scan">rose suite-scan</h2>
     <h3>NAME</h3>
     <p><kbd>rose suite-scan</kbd></p>
     
@@ -845,7 +846,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-task-env">rose task-env</a></h2>
+    <h2 id="rose-task-env">rose task-env</h2>
 
     <h3>NAME</h3>
     <p><kbd>rose-task-env</kbd></p>
@@ -934,7 +935,7 @@
     moment. It would be desirable to move to an ISO 8601 compliant format,
     e.g.  &lt;date&gt;[T&lt;time&gt;] where &lt;date&gt; is YYYYmmdd and &lt;time&gt; is HH[MM].</p>
 
-    <h2><a NAME="rose-task-hook">rose task-hook</a></h2>
+    <h2 id="rose-task-hook">rose task-hook</h2>
     
     <h3>NAME</h3>
     <p><kbd>rose-suite-hook</kbd></p>
@@ -973,7 +974,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rose-task-run">rose task-run</a></h2>
+    <h2 id="rose-task-run">rose task-run</h2>
     
     <h3>NAME</h3>
 
@@ -1050,7 +1051,7 @@
     <p><kbd>rose app-run</kbd></p>
     <p><kbd>rose task-env</kbd></p>
     
-    <h2><a NAME="rose-test-suite">rose test-suite</a></h2>
+    <h2 id="rose-test-suite">rose test-suite</h2>
 
     <h3>NAME</h3>
     <p><kbd>rose-test-suite</kbd></p>
@@ -1073,7 +1074,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rosie-checkout">rosie checkout</a></h2>
+    <h2 id="rosie-checkout">rosie checkout</h2>
     
     <h3>NAME</h3>
     <p><kbd>rosie checkout</kbd></p>
@@ -1101,7 +1102,7 @@
         <dd>Increment verbosity.</dd>
     </dl>
 
-    <h2><a NAME="rosie-copy">rosie copy</a></h2>
+    <h2 id="rosie-copy">rosie copy</h2>
     
     <h3>NAME</h3>
     <p><kbd>rosie create</kbd></p>
@@ -1141,7 +1142,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rosie-create">rosie create</a></h2>
+    <h2 id="rosie-create">rosie create</h2>
     
     <h3>NAME</h3>
     <p><kbd>rosie create</kbd></p>
@@ -1179,7 +1180,7 @@
         <dd>Increment verbosity.</dd>
     </dl>
 
-    <h2><a NAME="rosie-delete">rosie delete</a></h2>
+    <h2 id="rosie-delete">rosie delete</h2>
     
     <h3>NAME</h3>
     <p><kbd>rosie delete</kbd></p>
@@ -1219,7 +1220,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rosie-go">rosie go</a></h2>
+    <h2 id="rosie-go">rosie go</h2>
     <h3>NAME</h3>
     <p><kbd>rosie go</kbd></p>
     
@@ -1266,7 +1267,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rosie-id">rosie id</a></h2>
+    <h2 id="rosie-id">rosie id</h2>
     
     <h3>NAME</h3>
     <p><kbd>rosie id</kbd></p>
@@ -1305,7 +1306,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rosie-lookup">rosie lookup</a></h2>
+    <h2 id="rosie-lookup">rosie lookup</h2>
     
     <h3>NAME</h3>
     <p><kbd>rosie lookup</kbd></p>
@@ -1369,7 +1370,7 @@
     </dl>
     </p>
     
-    <h2><a NAME="rosie-ls">rosie ls</a></h2>
+    <h2 id="rosie-ls">rosie ls</h2>
     
     <h3>NAME</h3>
     <p><kbd>rosie ls</kbd></p>
