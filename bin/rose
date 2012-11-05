@@ -90,7 +90,7 @@ if (($# > 0)); then
 fi
 
 case $UTIL in
-help)
+help|h|?|--help|-h)
     if (($# == 0)); then
         rose_usage
         echo
@@ -117,7 +117,7 @@ help)
     done
     exit $RC
     :;;
-version)
+version|--version|-V)
     ROSE_VERSION=$(sed '/ROSE_VERSION/!d; s/^.*="\(.*\)";$/\1/' \
         $ROSE_HOME/doc/rose-version.js)
     echo "$ROSE_VERSION ($ROSE_HOME)"
