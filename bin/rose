@@ -118,24 +118,9 @@ help)
     exit $RC
     :;;
 version)
-    awk '{
-        if (/^# NAME/) {
-            while (getline && !/^#$/) {
-                sub(/^# */, "");
-                print $0;
-            }
-        }
-    }' $0
-    if [[ -f $ROSE_HOME/etc/rose/version ]]; then
-        cat $ROSE_HOME/etc/rose/version
-    fi
-    echo
-    echo "Path: $ROSE_HOME"
-    cd $ROSE_HOME
-    if [[ -d .git ]]; then
-        PAGER= git show 2>/dev/null
-        PAGER= git status 2>/dev/null
-    fi
+    ROSE_VERSION=$(sed '/ROSE_VERSION/!d; s/^.*="\(.*\)";$/\1/' \
+        $ROSE_HOME/doc/rose-version.js)
+    echo "$ROSE_VERSION ($ROSE_HOME)"
     exit
     :;;
 esac
