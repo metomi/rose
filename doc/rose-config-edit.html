@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Config Editor GUI User Guide</title>
+  <title>Rose User Guide: Rose Config Edit</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
@@ -12,6 +12,8 @@
   <script type="text/javascript" src="jquery.min.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
 </script>
 </head>
 
@@ -26,18 +28,18 @@
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
       "license">Open Government Licence</a>.
       <br />
-      Latest major update: 27 September 2012.
+      <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
     <p><a href=".">Rose Documentation</a></p>
   </div>
 
   <div id="body-main">
-    <h1> Rose Config Editor GUI User Guide </h1>
+    <h1>Rose User Guide: Rose Config Edit</h1>
 
     <div id="content"></div>
 
-    <h2 id="run"> How to Run the Config Editor </h2>
+    <h2 id="run">How to Run Rose Config Edit</h2>
 
     <p>In a suite or application directory, run:</p>
     <pre class='shell'>
@@ -49,8 +51,8 @@ rose config-edit
 rose config-edit -C ~/my_suites/this_suite
 </pre>
 
-    <h2 id="config-app">How to Configure an Application Using the Config 
-    Editor</h2>
+    <h2 id="config-app">How to Configure an Application Using Rose Config 
+    Edit</h2>
 
     <h3 id="launch-page">Launch a Page</h3>
 
@@ -67,7 +69,7 @@ rose config-edit -C ~/my_suites/this_suite
     window.</p>
 
     <p>    
-    <img src="expand_tree.png" alt="expand tree image">
+    <img src="rose-config-edit-expand-tree.png" alt="expand tree image">
     <br>
     <table>
     <tr><td>The arrow points to the 'expander' triangles that expand the list 
@@ -76,7 +78,7 @@ rose config-edit -C ~/my_suites/this_suite
     </p>
 
     <p>
-    <img src="launch_page.png" alt="launch page image">
+    <img src="rose-config-edit-launch-page.png" alt="launch page image">
     <br>
     <table>
     <tr><td>The arrows in the figure point to (left to right) opening a page as
@@ -100,7 +102,7 @@ rose config-edit -C ~/my_suites/this_suite
     This menu will also hold help information if it is available.</p>
 
     <p>
-    <img src="hover_and_alter.png" alt="hover and alter">
+    <img src="rose-config-edit-hover-and-alter.png" alt="hover and alter">
     <table>
     <tr><td>The arrows point to (left to right) the changed icons in the tree 
     panel, a menu button, and the name of a modified setting.</td></tr>
@@ -116,12 +118,12 @@ rose config-edit -C ~/my_suites/this_suite
     when the widget appears, using the entry box next to the menu button.</p>
 
     <p>Alternately, you can view a list of available settings for the page by 
-    selecting <kbd>View -> View Latent</kbd> from the menu. You can then add 
+    selecting <kbd>View -&gt; View Latent</kbd> from the menu. You can then add 
     them using their menu buttons (left hand widget next to the name or title).
     </p>
 
     <p>
-    <img src="add_menu.png" alt="add menu image">
+    <img src="rose-config-edit-add-menu.png" alt="add menu image">
     <br>
     <table>
     <tr><td>The arrows in the figure point to the options in the add menu.</td>
@@ -130,7 +132,7 @@ rose config-edit -C ~/my_suites/this_suite
     </p>
 
     <p>
-    <img src="add_blank_variable.png" alt="add blank variable image">
+    <img src="rose-config-edit-add-blank-var.png" alt="add blank variable image">
     <br>
     <table>
     <tr><td>The arrow points to the entry box that is used to give the new 
@@ -139,7 +141,7 @@ rose config-edit -C ~/my_suites/this_suite
     </p>
 
     <p>
-    <img src="add_from_latent.png" alt="add from latent image">
+    <img src="rose-config-edit-add-latent-var.png" alt="add from latent image">
     <br>
     <table>
     <tr><td>The arrows in the figure highlight (top to bottom) the menu that 
@@ -171,7 +173,8 @@ rose config-edit -C ~/my_suites/this_suite
     settings that are currently 'commented-out'.</p>
 
     <p>
-    <img src="fixed_ignored_variables.png" alt="fixed ignored variables image">
+    <img src="rose-config-edit-fixed-and-ignored-vars.png"
+    alt="fixed ignored variables image">
     <br>
     <table>
     <tr><td>The figure shows (from top to bottom) a 'normal' variable, a 
@@ -194,7 +197,7 @@ rose config-edit -C ~/my_suites/this_suite
     'Clone section'.</p>
 
     <p>
-    <img src="clone_section.png" alt="clone section image">
+    <img src="rose-config-edit-clone-section.png" alt="clone section image">
     <br>
     <table>
     <tr><td>The arrow points to the menu option that copies this page into a 
@@ -226,7 +229,7 @@ rose config-edit -C ~/my_suites/this_suite
     toolbar in the normal way. These options will be greyed out if there is no 
     difference between the last saved state and the current one.</p>
 
-    <h2 id="customisation">Customising the Config-Editor</h2>
+    <h2 id="customisation">Customising Rose Config-Edit</h2>
 
     <h3 id="themes">Themes and Colours</h3>
 

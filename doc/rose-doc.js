@@ -69,4 +69,10 @@ $(function() {
             }
         });
     }
+
+    // Display version information
+    NODE = $("#rose-version");
+    if (NODE) {
+        NODE.text(ROSE_VERSION);
+    }
 });
