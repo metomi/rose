@@ -2,18 +2,26 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            ns_trigger_tests => NAMESPACE
-            NAMESPACE:succeed-all => ns_succeed_all
-            NAMESPACE:fail-all => ns_fail_all
-            NAMESPACE:start-all => ns_start_all
-            NAMESPACE:finish-all => ns_finish_all
-            NAMESPACE:succeed-any => ns_succeed_any
-            NAMESPACE:fail-any => ns_fail_any
-            NAMESPACE:start-any => ns_start_any
-            NAMESPACE:finish-any => ns_finish_any
+
+            # Start things off with ns_trigger_tests.
+            # Trigger all tasks belonging to TRIGGER_NS.
+
+            ns_trigger_tests => TRIGGER_NS
+
+
+            # Setup our triggers for TRIGGER_NS tasks.
+
+            TRIGGER_NS:succeed-all => ns_succeed_all
+            TRIGGER_NS:fail-all => ns_fail_all
+            TRIGGER_NS:start-all => ns_start_all
+            TRIGGER_NS:finish-all => ns_finish_all
+            TRIGGER_NS:succeed-any => ns_succeed_any
+            TRIGGER_NS:fail-any => ns_fail_any
+            TRIGGER_NS:start-any => ns_start_any
+            TRIGGER_NS:finish-any => ns_finish_any
+
         """
             
-# Add suite timeout event (& shutdown event?)
 [runtime]
     [[root]]
         command scripting = "echo Running on $(hostname) in $PWD; sleep 10"
@@ -23,14 +31,17 @@
             succeeded handler = "rose task-hook"
             failed handler = "rose task-hook"
 
-    [[NAMESPACE]]
+    [[TRIGGER_NS]]
+
     [[task_ok]]
-        inherit = NAMESPACE
+        inherit = TRIGGER_NS
         command scripting = "sleep 10; echo Hurray\!;"
+
     [[task_delayed]]
-        inherit = NAMESPACE
+        inherit = TRIGGER_NS
         initial scripting = "echo submitting....; sleep 25"
         command scripting = "sleep 10; echo Hurray\!;"
+
     [[task_fail]]
-        inherit = NAMESPACE
+        inherit = TRIGGER_NS
         command scripting = "sleep 20; echo Oh no\!; exit 1"

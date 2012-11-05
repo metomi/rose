@@ -2,13 +2,24 @@
 [scheduling]
     [[dependencies]]
         graph = """
+
+            # Start things off with task suicide_test.
             suicide_test => alpha & beta
+
+
+            # If alpha or beta fail, a recover task will start up.
+            # Otherwise, the recover task will suicide.
+            # alpha will succeed.
+            # beta will fail.
+
             alpha:fail => recover_alpha
             alpha => !recover_alpha  # recover_alpha will suicide if alpha is ok.
             alpha | recover_alpha => continue_alpha
+
             beta:fail => recover_beta
             beta => !recover_beta    # recover_beta will suicide if beta is ok.
             beta | recover_beta => continue_beta
+
                 """
 
 [runtime]
@@ -20,11 +31,5 @@
             succeeded handler = "rose task-hook"
             failed handler = "rose task-hook"
 
-    [[SUICIDE_TEST_NS]]
-
-    [[alpha, recover_alpha, continue_alpha, recover_beta, continue_beta]]
-        inherit = SUICIDE_TEST_NS
-
     [[beta]]
-        inherit = SUICIDE_TEST_NS
         command scripting = "sleep 15; echo Oh no\!; exit 1"

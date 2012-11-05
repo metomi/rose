@@ -2,13 +2,17 @@
 [scheduling]
     [[queues]]
         [[[queue1]]]
-            limit = 2  # Only two members at one time
-            members = INTERNAL_QUEUES_TEST_NS
+            limit = 2  # Only 2 members at one time.
+            members = INTERNAL_QUEUES_NS
     [[dependencies]]
         graph = """
+                # Start things off with internal_queue_test.
+                # queued_task* tasks will be run 2 at a time.
+
                 internal_queue_test => queued_task1 & queued_task2 & \
                                        queued_task3 & queued_task4 & \
                                        queued_task5
+
                 """
     
 [runtime]
@@ -20,6 +24,6 @@
             succeeded handler = "rose task-hook"
             failed handler = "rose task-hook"
 
-    [[INTERNAL_QUEUES_TEST_NS]]
+    [[INTERNAL_QUEUES_NS]]
     [[queued_task1, queued_task2, queued_task3, queued_task4, queued_task5]]
-        inherit = INTERNAL_QUEUES_TEST_NS
+        inherit = INTERNAL_QUEUES_NS

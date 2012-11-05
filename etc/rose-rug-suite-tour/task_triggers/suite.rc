@@ -2,7 +2,15 @@
 [scheduling]
     [[dependencies]]
         graph = """
+
+            # Start things off with task_trigger_tests.
+            # Task alpha will succeed.
+            # Task beta will fail.
+
             task_trigger_tests => alpha & beta
+
+
+            # Setup our alpha and beta trigger tasks.
 
             alpha:succeed => alpha_succeeded
             alpha:fail => alpha_failed
@@ -13,9 +21,9 @@
             beta:fail => beta_failed
             beta:start => beta_started
             beta:finish => beta_finished
+
         """
             
-# Add suite timeout event (& shutdown event?)
 [runtime]
     [[root]]
         command scripting = "echo Running on $(hostname) in $PWD; sleep 10"
@@ -24,9 +32,6 @@
         [[[event hooks]]]
             succeeded handler = "rose task-hook"
             failed handler = "rose task-hook"
-
-    [[task_trigger_tests]]
-        title = "Demo of simple task triggers"
 
     [[alpha]]
         initial scripting = sleep 10
