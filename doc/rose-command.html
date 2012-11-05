@@ -1219,208 +1219,202 @@
     </dl>
     </p>
     
-<h2><a NAME="rosie-go">rosie go</a></h2><br>
-<h3>NAME</h3>
+    <h2><a NAME="rosie-go">rosie go</a></h2>
+    <h3>NAME</h3>
+    <p><kbd>rosie go</kbd></p>
+    
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rosie go [OPTIONS] [SEARCH]</kbd></p>
 
-<kbd>    rosie go</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>DESCRIPTION</h3>
+    <p>Launch the Rosie client GTK+ GUI.</p>
 
-<kbd>    rosie go [OPTIONS] [SEARCH]</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p>By default rosie go will display a list of all your locally checked out
+    suites. This initial search displayed by rosie go can be set through the 
+    [SEARCH] argument using either a query, search keyword or url.</p>
 
-    Launch the Rosie client GTK+ GUI.<br>
-<br>
-    By default rosie go will display a list of all your locally checked out<br>
-    suites. This initial search displayed by rosie go can be set through the <br>
-    [SEARCH] argument using either a query, search keyword or url.<br>
-<br>
-    Unless an option is used to specify the initial search type the input is  <br>
-    interpreted by default as follows:<br>
-    - string beginning with "http": url<br>
-    - string not beginning with "http": keyword search<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <p>Unless an option is used to specify the initial search type the input is
+    interpreted by default as follows:
+    <ul>
+        <li>string beginning with "http": url</li>
+        <li>string not beginning with "http": keyword search</li>
+    </ul>
+    </p>
 
-<dt><kbd>    --prefix=PREFIX</kbd></dt>
-<dd>        An alias specifying a different suite repository.</dd>
-<dd></dd>
-<dt><kbd>    --all-revs</kbd></dt>
-<dd>        Specify whether to search deleted suites and superceded suites.</dd>
-<dd></dd>
-<dt><kbd>    --query; -Q</kbd></dt>
-<dd>        Run the suite search specified by [SEARCH] as a query.</dd>
-<dd></dd>
-<dt><kbd>    --search; -S</kbd></dt>
-<dd>        Run the suite search specified by [SEARCH] as a keyword search.</dd>
-<dd>    </dd>
-<dt><kbd>    --url; -U</kbd></dt>
-<dd>        Run the suite search specified by [SEARCH] as a url search.</dd>
-<dd></dd>
-</dl>
-<h3>ARGUMENTS</h3>
+    <h3>OPTIONS</h3>
 
-<dd>    QUERY</dd>
-<dd>        An optional search to be executed on startup.</dd>
-<dd></dd>
-<h2><a NAME="rosie-id">rosie id</a></h2><br>
-<h3>NAME</h3>
+    <p>
+    <dl>
+        <dt><kbd>--prefix=PREFIX</kbd></dt>
+        <dd>An alias specifying a different suite repository.</dd>
+        <dt><kbd>--all-revs</kbd></dt>
+        <dd>Specify whether to search deleted suites and superceded suites.</dd>
+        <dt><kbd>--query; -Q</kbd></dt>
+        <dd>Run the suite search specified by [SEARCH] as a query.</dd>
+        <dt><kbd>--search; -S</kbd></dt>
+        <dd>Run the suite search specified by [SEARCH] as a keyword search.</dd>
+        <dt><kbd>--url; -U</kbd></dt>
+        <dd>Run the suite search specified by [SEARCH] as a url search.</dd>
+    </dl>
+    </p>
+    
+    <h3>ARGUMENTS</h3>
+    <p>
+    <dl>
+        <dt>QUERY</dt>
+        <dd>An optional search to be executed on startup.</dd>
+    </dl>
+    </p>
+    
+    <h2><a NAME="rosie-id">rosie id</a></h2>
+    
+    <h3>NAME</h3>
+    <p><kbd>rosie id</kbd></p>
 
-<kbd>    rosie id</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rosie id [OPTIONS]</kbd></p>
+    
+    <h3>DESCRIPTION</h3>
 
-<kbd>    rosie id [OPTIONS]</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <p>Utility for working with suite IDs.</p>
 
-    Utility for working with suite IDs.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    <h3>OPTIONS</h3>
 
-<dd>    # Print the repository URL of a given suite ID</dd>
-<dd>    rosie id --to-origin mo1-abc45</dd>
-<dd>    # Print the local location of a given suite ID</dd>
-<dd>    rosie id --to-local-copy mo1-abc45</dd>
-<dd>    # Print the output directory of a given suite ID</dd>
-<dd>    rosie id --to-output mo1-abc45</dd>
-<dd>    # Print the web URL of a given suite ID</dd>
-<dd>    rosie id --to-web mo1-abc45</dd>
-<dd>    # Print suite ID of working copy in $PWD</dd>
-<dd>    rosie id</dd>
-<dd>    # Print suite ID of working copy in a directory</dd>
-<dd>    rosie id /path/to/working/copy</dd>
-<dd>    # Print suite ID of a given URL</dd>
-<dd>    rosie id svn://fcm1/rose_mo1_svn/a/b/c/4/5</dd>
-<dd>    # Print latest suite ID in the default repository</dd>
-<dd>    rosie id --latest</dd>
-<dd>    # Print latest suite ID in the given repository</dd>
-<dd>    rosie id --latest mot</dd>
-<dd>    # Print next suite ID in the default repository</dd>
-<dd>    rosie id --next</dd>
-<dd></dd>
-</dl>
-<h2><a NAME="rosie-lookup">rosie lookup</a></h2><br>
-<h3>NAME</h3>
+    <p>
+    <dl>
+        <dt>rosie id --to-origin mo1-abc45</dt>
+        <dd>Print the repository URL of a given suite ID</dd>
+        <dt>rosie id --to-local-copy mo1-abc45</dt>
+        <dd>Print the local location of a given suite ID</dd>
+        <dt>rosie id --to-output mo1-abc45</dt>
+        <dd>Print the output directory of a given suite ID</dd>
+        <dt>rosie id --to-web mo1-abc45</dt>
+        <dd>Print the web URL of a given suite ID</dd>
+        <dt>rosie id</dt>
+        <dd>Print suite ID of working copy in $PWD</dd>
+        <dt>rosie id /path/to/working/copy</dt>
+        <dd>Print suite ID of working copy in a directory</dd>
+        <dt>rosie id svn://fcm1/rose_mo1_svn/a/b/c/4/5</dt>
+        <dd>Print suite ID of a given URL</dd>
+        <dt>rosie id --latest</dt>
+        <dd>Print latest suite ID in the default repository</dd>
+        <dt>rosie id --latest mot</dt>
+        <dd>Print latest suite ID in the given repository</dd>
+        <dt>rosie id --next</dt>
+        <dd>Print next suite ID in the default repository</dd>
+    </dl>
+    </p>
+    
+    <h2><a NAME="rosie-lookup">rosie lookup</a></h2>
+    
+    <h3>NAME</h3>
+    <p><kbd>rosie lookup</kbd></p>
 
-<kbd>    rosie lookup</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rosie lookup [OPTIONS] LOOKUP-TEXT ...</kbd></p>
 
-<kbd>    rosie lookup [OPTIONS] LOOKUP-TEXT ...</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <h3>DESCRIPTION</h3>
+    <p>Find suites in the suite discovery database.</p>
 
-    Find suites in the suite discovery database.<br>
-<br>
-    Search for suites using either a query, search keyword or url and display <br>
-    the information of the matching suites.<br>
-<br>
-    Unless an option is used to specify the lookup type the input is  <br>
-    interpreted by default as follows:<br>
-    - string beginning with "http": url<br>
-    - string not beginning with "http": search<br>
-<br>
-    If using a url remember to put it in quotes.<br>
-<br>
-    The default output format includes a local working copy status field <br>
-    (%local) in the first column.<br>
-    A blank field means there is no related suite checked out.<br>
+    <p>Search for suites using either a query, search keyword or url and display 
+    the information of the matching suites.</p>
+
+    <p>Unless an option is used to specify the lookup type the input is 
+    interpreted by default as follows:
+    <ul>
+        <li>string beginning with "http": url</li>
+        <li>string not beginning with "http": search</li>
+    </ul>
+    </p>
+
+    <p>If using a url remember to put it in quotes.</p>
+
+    <p>The default output format includes a local working copy status field 
+    (%local) in the first column. A blank field means there is no related suite 
+    checked out.<br>
+    
     "=" means that the suite is checked out at this branch and revision.<br>
     "<" means that the suite is checked out but at an older revision.<br>
     ">" means that the suite is checked out but at a newer revision.<br>
     "S" means that the suite is checked out but on a different branch.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    </p>
+    
+    <h3>OPTIONS</h3>
 
-<dd></dd>
-<dt><kbd>    --all-revs</kbd></dt>
-<dd>        Specify whether to search deleted suites and superceded suites.</dd>
-<dd></dd>
-<dt><kbd>    --format=FORMAT; -f FORMAT</kbd></dt>
-<dd>        Control the output format of the results using a string</dd>
-<dd>        containing column names or properties preceded by %.</dd>
-<dd>        For example: rosie lookup daisy --format="%idx from %owner"</dd>
-<dd>        might give: abc01 from daisy</dd>
-<dd></dd>
-<dt><kbd>    --prefix=PREFIX</kbd></dt>
-<dd>        Specify the name of the suite repository to use.</dd>
-<dd></dd>
-<dt><kbd>    --query; -Q</kbd></dt>
-<dd>        Run the lookup as a query.</dd>
-<dd></dd>
-<dt><kbd>    --quiet; -q</kbd></dt>
-<dd>        Shorthand for --format="%idx".</dd>
-<dd></dd>
-<dt><kbd>    --reverse; -r</kbd></dt>
-<dd>        Reverse sort order.</dd>
-<dd></dd>
-<dt><kbd>    --search; -S</kbd></dt>
-<dd>        Run the lookup as a keyword search.</dd>
-<dd>    </dd>
-<dt><kbd>    --sort=FIELD; -s FIELD</kbd></dt>
-<dd>        Sort results by the field FIELD instead of revision.</dd>
-<dd></dd>
-<dt><kbd>    --url; -U</kbd></dt>
-<dd>        Use a url for the lookup.</dd>
-<dd></dd>
-<dt><kbd>    --verbose; -v</kbd></dt>
-<dd>        Display full info for each returned suite.</dd>
-<dd></dd>
-</dl>
-<h2><a NAME="rosie-ls">rosie ls</a></h2><br>
-<h3>NAME</h3>
+    <p>
+    <dl>
+        <dt><kbd>--all-revs</kbd></dt>
+        <dd>Specify whether to search deleted suites and superceded suites.</dd>
+        <dt><kbd>--format=FORMAT; -f FORMAT</kbd></dt>
+        <dd>Control the output format of the results using a string
+            containing column names or properties preceded by %.</dd>
+        <dd>For example: rosie lookup daisy --format="%idx from %owner"
+            might give: abc01 from daisy</dd>
+        <dt><kbd>--prefix=PREFIX</kbd></dt>
+        <dd>Specify the name of the suite repository to use.</dd>
+        <dt><kbd>--query; -Q</kbd></dt>
+        <dd>Run the lookup as a query.</dd>
+        <dt><kbd>--quiet; -q</kbd></dt>
+        <dd>Shorthand for --format="%idx".</dd>
+        <dt><kbd>--reverse; -r</kbd></dt>
+        <dd>Reverse sort order.</dd>
+        <dt><kbd>--search; -S</kbd></dt>
+        <dd>Run the lookup as a keyword search.</dd>
+        <dt><kbd>--sort=FIELD; -s FIELD</kbd></dt>
+        <dd>Sort results by the field FIELD instead of revision.</dd>
+        <dt><kbd>--url; -U</kbd></dt>
+        <dd>Use a url for the lookup.</dd>
+        <dt><kbd>--verbose; -v</kbd></dt>
+        <dd>Display full info for each returned suite.</dd>
+    </dl>
+    </p>
+    
+    <h2><a NAME="rosie-ls">rosie ls</a></h2>
+    
+    <h3>NAME</h3>
+    <p><kbd>rosie ls</kbd></p>
 
-<kbd>    rosie ls</kbd><br>
-<br>
-<h3>SYNOPSIS</h3>
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rosie ls [OPTIONS]</kbd></p>
 
-<kbd>    rosie ls [OPTIONS]</kbd><br>
-<br>
-<h3>DESCRIPTION</h3>
+    <h3>DESCRIPTION</h3>
 
-    List the local suites.<br>
-<br>
-    Search for locally checked out suites and print their details.<br>
-<br>
-    The default format includes a local working copy status field (%local)<br>
-    in the first column.<br>
-    A blank field means there is no related suite checked out.<br>
+    <p>List the local suites.</p>
+    
+    <p>Search for locally checked out suites and print their details.</p>
+
+    <p>The default format includes a local working copy status field (%local)
+    in the first column.</p>
+    
+    <p>A blank field means there is no related suite checked out.<br>
     "=" means that the suite is checked out at this branch and revision.<br>
     "<" means that the suite is checked out but at an older revision.<br>
     ">" means that the suite is checked out but at a newer revision.<br>
     "S" means that the suite is checked out but on a different branch.<br>
-<br>
-<h3>OPTIONS</h3>
-<dl>
+    </p>
 
-<dt><kbd>    --prefix=PREFIX</kbd></dt>
-<dd>        Display locally checked out suites from the specified suite </dd>
-<dd>        repository.</dd>
-<dd></dd>
-<dt><kbd>    --format=FORMAT; -f FORMAT</kbd></dt>
-<dd>        Control the output format of the results using a string</dd>
-<dd>        containing column names or properties preceded by %.</dd>
-<dd>        For example: rose suite-list --format="%idx from %owner"</dd>
-<dd>        might give: abc01 from bfitz</dd>
-<dd></dd>
-<dt><kbd>    --quiet; -q</kbd></dt>
-<dd>        Shorthand for --format="%idx".</dd>
-<dd></dd>
-<dt><kbd>    --reverse; -r</kbd></dt>
-<dd>        Reverse sort order.</dd>
-<dd>    </dd>
-<dt><kbd>    --sort=FIELD; -s FIELD</kbd></dt>
-<dd>        Sort results by the field FIELD instead of revision.</dd>
-<dd></dd>
-<dt><kbd>    --verbose; -v</kbd></dt>
-<dd>        Display full info for each returned suite.</dd>
-<dd></dd>
-</dl>
+    <h3>OPTIONS</h3>
+
+    <p>
+    <dl>
+        <dt><kbd>--prefix=PREFIX</kbd></dt>
+        <dd>Display locally checked out suites from the specified suite 
+        <dd>repository.</dd>
+        <dt><kbd>--format=FORMAT; -f FORMAT</kbd></dt>
+        <dd>Control the output format of the results using a string
+        containing column names or properties preceded by %.</dd>
+        <dd>For example: rose suite-list --format="%idx from %owner"
+        might give: abc01 from bfitz</dd>
+        <dt><kbd>--quiet; -q</kbd></dt>
+        <dd>Shorthand for --format="%idx".</dd>
+        <dt><kbd>--reverse; -r</kbd></dt>
+        <dd>Reverse sort order.</dd>
+        <dt><kbd>--sort=FIELD; -s FIELD</kbd></dt>
+        <dd>Sort results by the field FIELD instead of revision.</dd>
+        <dt><kbd>--verbose; -v</kbd></dt>
+        <dd>Display full info for each returned suite.</dd>
+    </dl>
+    </p>
 
 </div>
 </body>
