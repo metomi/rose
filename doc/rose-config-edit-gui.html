@@ -48,7 +48,7 @@ rose config-edit
     <pre class='shell'>
 rose config-edit -C ~/my_suites/this_suite
 </pre>
-
+    
     <h2 id="config-app">How to Configure an Application Using the Config 
     Editor</h2>
 
@@ -67,21 +67,21 @@ rose config-edit -C ~/my_suites/this_suite
     window.</p>
 
     <p>    
-    <img src="expand_tree.png" alt="expand tree image">
+    <img src="rose_edit_expand_tree.png" alt="expand tree image">
     <br>
     <table>
-    <tr><td>The arrow points to the 'expander' triangles that expand the list 
-    of available pages. You can left or right click here.</td></tr>
+    <tr><td><em>The 'expander' triangles can expand the list 
+    of available pages. You can left or right click here.</em></td></tr>
     </table>
     </p>
 
     <p>
-    <img src="launch_page.png" alt="launch page image">
+    <img src="rose_edit_launch_page.png" alt="launch page image">
     <br>
     <table>
-    <tr><td>The arrows in the figure point to (left to right) opening a page as
-     a tab (left or middle click) and opening a tab in a new window (right 
-     click on tab label).</td></tr>
+    <tr><td><em>You can launch a tab by clicking on a row in the left hand
+    navigation list (left or middle click), or open a tab in a new window
+    (right click on tab label).</em></td></tr>
     </table>
     </p>
     
@@ -100,10 +100,12 @@ rose config-edit -C ~/my_suites/this_suite
     This menu will also hold help information if it is available.</p>
 
     <p>
-    <img src="hover_and_alter.png" alt="hover and alter">
+    <img src="rose_edit_hover_and_alter.png" alt="hover and alter">
     <table>
-    <tr><td>The arrows point to (left to right) the changed icons in the tree 
-    panel, a menu button, and the name of a modified setting.</td></tr>
+    <tr><td><em>The blue disc icon in the page list indicates changed values,
+    as does the blue text at the mouse pointer. The hover-over text gives
+    more information and includes a description of the change
+    at the bottom.</em></td></tr>
     </table>
     </p>
 
@@ -121,30 +123,32 @@ rose config-edit -C ~/my_suites/this_suite
     </p>
 
     <p>
-    <img src="add_menu.png" alt="add menu image">
+    <img src="rose_edit_add_menu.png" alt="add menu image">
     <br>
     <table>
-    <tr><td>The arrows in the figure point to the options in the add menu.</td>
+    <tr><td><em>The add menu, indicating which settings are available for this
+    page. A setting with a custom name can also be added
+    ("Add blank variable").</em></td>
     </tr>
     </table>
     </p>
 
     <p>
-    <img src="add_blank_variable.png" alt="add blank variable image">
+    <img src="rose_edit_add_blank_variable.png" alt="add blank variable image">
     <br>
     <table>
-    <tr><td>The arrow points to the entry box that is used to give the new 
-    variable a name.</tr></td>
+    <tr><td><em>Entering a name for a custom setting, after selecting "Add blank
+    variable" from the above add menu.</em></td></tr>
     </table>
     </p>
 
     <p>
-    <img src="add_from_latent.png" alt="add from latent image">
+    <img src="rose_edit_add_latent_variable.png" alt="add from latent image">
     <br>
     <table>
-    <tr><td>The arrows in the figure highlight (top to bottom) the menu that 
-    can be used to add a latent setting, and the menu button that launches it.
-    </td></tr>
+    <tr><td><em>Adding an available setting, using the "View latent variables"
+    view option.</em></td>
+    </tr>
     </table>
     </p>
     
@@ -167,15 +171,24 @@ rose config-edit -C ~/my_suites/this_suite
 
     <p>Some settings are hidden by default - these can be shown using the View 
     menu. <kbd>View Fixed</kbd> shows the settings that are only allowed to 
-    have one value according to the metadata. <kbd>View Ignored</kbd> shows the
+    have one value according to the metadata.</p>
+
+    <p>
+    <img src="rose_edit_fixed_variables.png" alt="fixed ignored variables image">
+    <br>
+    <table>
+    <tr><td><em>The figure shows a 'fixed' variable.</em></td></tr>
+    </table>
+    </p>
+
+    <p><kbd>View Ignored</kbd> shows the
     settings that are currently 'commented-out'.</p>
 
     <p>
-    <img src="fixed_ignored_variables.png" alt="fixed ignored variables image">
+    <img src="rose_edit_ignored_variables.png" alt="fixed ignored variables image">
     <br>
     <table>
-    <tr><td>The figure shows (from top to bottom) a 'normal' variable, a 
-    'fixed' variable, and an 'ignored' variable.</td></tr>
+    <tr><td><em>The figure shows a 'user-ignored' variable.</em></td></tr>
     </table>
     </p>
 
@@ -192,15 +205,6 @@ rose config-edit -C ~/my_suites/this_suite
     same-name namelists). To speed up copying these sections, you can right 
     click on their page name in the left hand tree panel and select 
     'Clone section'.</p>
-
-    <p>
-    <img src="clone_section.png" alt="clone section image">
-    <br>
-    <table>
-    <tr><td>The arrow points to the menu option that copies this page into a 
-    new one.</td></tr>
-    </table>
-    </p>
 
     <h3 id="remove-section">Removing a Section or Set of Sections</h3>
 
@@ -226,6 +230,41 @@ rose config-edit -C ~/my_suites/this_suite
     toolbar in the normal way. These options will be greyed out if there is no 
     difference between the last saved state and the current one.</p>
 
+    <h2 id="layout">Config Editor Layout</h2>
+
+    <p>    
+    <img src="rose_edit_layout.png" alt="layout">
+    <br>
+    <table>
+    <tr><td><em>Layout:
+      <ol>
+        <li>Open</li>
+        <li>Save</li>
+        <li>File browser</li>
+        <li>Undo</li>
+        <li>Redo</li>
+        <li>Add setting to current page</li>
+        <li>Revert current page to last saved state</li>
+        <li>Find (regular expression)</li>
+        <li>Find Next</li>
+        <li>Validate</li>
+        <li>Run Suite</li>
+        <li>Run Suite (custom)</li>
+        <li>Navigation panel</li>
+        <li>Modified-since-last-save indicator (blue disc)</li>
+        <li>Highlighted row for the current page</li>
+        <li>Error indicator (red triangle)</li>
+        <li>Page tab (right click for menu)</li>
+        <li>Variable menu</li>
+        <li>Variable label</li>
+        <li>Variable value</li>
+        <li>Blue variable label for modified-since-last-save</li>
+        <li>Add available variable</li>
+      </ol></em>
+    </td></tr>
+    </table>
+    </p>
+
     <h2 id="customisation">Customising the Config-Editor</h2>
 
     <h3 id="themes">Themes and Colours</h3>
@@ -241,7 +280,7 @@ gnome-appearance-properties
     <a href="https://github.com/metomi/rose/blob/master/lib/python/rose/config_editor/__init__.py">
     config_editor/__init__.py</a> file. They can be overridden by creating a 
     file</p><pre>
-~/.met-um/rose.conf
+~/.metomi/rose.conf
 </pre>
     <p>in your home directory, if it doesn't already exist, and adding to it 
     in the following way:</p><pre>
