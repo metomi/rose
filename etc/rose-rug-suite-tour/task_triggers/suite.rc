@@ -2,17 +2,17 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            task_trigger_tests => task_A & task_B
+            task_trigger_tests => alpha & beta
 
-            task_A:succeed => task_A_succeeded
-            task_A:fail => task_A_failed
-            task_A:start => task_A_started
-            task_A:finish => task_A_finished
+            alpha:succeed => alpha_succeeded
+            alpha:fail => alpha_failed
+            alpha:start => alpha_started
+            alpha:finish => alpha_finished
             
-            task_B:succeed => task_B_succeeded
-            task_B:fail => task_B_failed
-            task_B:start => task_B_started
-            task_B:finish => task_B_finished
+            beta:succeed => beta_succeeded
+            beta:fail => beta_failed
+            beta:start => beta_started
+            beta:finish => beta_finished
         """
             
 # Add suite timeout event (& shutdown event?)
@@ -28,9 +28,9 @@
     [[task_trigger_tests]]
         title = "Demo of simple task triggers"
 
-    [[task_A]]
+    [[alpha]]
         initial scripting = sleep 10
     
-    [[task_B]]
+    [[beta]]
         initial scripting = sleep 15
         command scripting = "echo Running on $(hostname) in $PWD; sleep 20; exit 1"
