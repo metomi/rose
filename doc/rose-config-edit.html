@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide: Rose Config Edit</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+
+  <div id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose User Guide: Rose Config Edit</h1>
+
+    <div id="content"></div>
+
+    <h2 id="run">How to Run Rose Config Edit</h2>
+
+    <p>In a suite or application directory, run:</p>
+    <pre class='shell'>
+rose config-edit
+</pre>
+
+    <p> or point the config editor to a directory using <kbd>-C</kbd>:</p>
+    <pre class='shell'>
+rose config-edit -C ~/my_suites/this_suite
+</pre>
+
+    <h2 id="config-app">How to Configure an Application Using Rose Config 
+    Edit</h2>
+
+    <h3 id="launch-page">Launch a Page</h3>
+
+    <p>A page is a collection of settings on a single panel. Unless overridden 
+    in the metadata, each page represents a section in the configuration.</p>
+
+    <p>Use the left hand panel to explore the tree of pages. Left click the 
+    triangles to expand the tree, right click them to expand everything.</p>
+
+    <p>Left click on the page name to open it as a tab in the main (right hand)
+    panel. Middle click to open a page as another tab (as in Firefox). You 
+    may right click on the tab label (at the top of the tab) to open a menu, 
+    and select <kbd>Open in New Window</kbd> to detach the tab to a separate 
+    window.</p>
+
+    <p>    
+    <img src="rose-config-edit-expand-tree.png" alt="expand tree image">
+    <br>
+    <table>
+    <tr><td>The arrow points to the 'expander' triangles that expand the list 
+    of available pages. You can left or right click here.</td></tr>
+    </table>
+    </p>
+
+    <p>
+    <img src="rose-config-edit-launch-page.png" alt="launch page image">
+    <br>
+    <table>
+    <tr><td>The arrows in the figure point to (left to right) opening a page as
+     a tab (left or middle click) and opening a tab in a new window (right 
+     click on tab label).</td></tr>
+    </table>
+    </p>
+    
+    <h3 id="alter-setting">Alter a Setting</h3>
+
+    <p>Hovering over the setting name or title, or clicking it, will give 
+    more information about the setting if it is available.</p>
+
+    <p>Use the right hand side widget, next to the setting name or title, to 
+    alter the value of the setting. This should flag the setting as modified 
+    (blue name or title text). It should also flag the page name with a blue 
+    icon in the left hand tree panel.</p>
+
+    <p>You can remove the setting or toggle the commenting-out of the setting 
+    using the menu button on the left hand side of the setting name or title. 
+    This menu will also hold help information if it is available.</p>
+
+    <p>
+    <img src="rose-config-edit-hover-and-alter.png" alt="hover and alter">
+    <table>
+    <tr><td>The arrows point to (left to right) the changed icons in the tree 
+    panel, a menu button, and the name of a modified setting.</td></tr>
+    </table>
+    </p>
+
+    <h3 id="adding-settings"> Adding Settings </h3>
+
+    <p>You can add a setting by selecting the <kbd>Add</kbd> button on the 
+    toolbar. You can then choose between adding a blank variable (a new setting
+    with no metadata specification) or adding from a list of available settings
+    for this page. If you choose a blank variable, you must then enter the name
+    when the widget appears, using the entry box next to the menu button.</p>
+
+    <p>Alternately, you can view a list of available settings for the page by 
+    selecting <kbd>View -&gt; View Latent</kbd> from the menu. You can then add 
+    them using their menu buttons (left hand widget next to the name or title).
+    </p>
+
+    <p>
+    <img src="rose-config-edit-add-menu.png" alt="add menu image">
+    <br>
+    <table>
+    <tr><td>The arrows in the figure point to the options in the add menu.</td>
+    </tr>
+    </table>
+    </p>
+
+    <p>
+    <img src="rose-config-edit-add-blank-var.png" alt="add blank variable image">
+    <br>
+    <table>
+    <tr><td>The arrow points to the entry box that is used to give the new 
+    variable a name.</tr></td>
+    </table>
+    </p>
+
+    <p>
+    <img src="rose-config-edit-add-latent-var.png" alt="add from latent image">
+    <br>
+    <table>
+    <tr><td>The arrows in the figure highlight (top to bottom) the menu that 
+    can be used to add a latent setting, and the menu button that launches it.
+    </td></tr>
+    </table>
+    </p>
+    
+    <h3 id="find-settings"> Finding Settings </h3>
+
+    <p>Settings can be found using the Find entry box in the toolbar, which 
+    searches for a title, name, or value that matches the 
+    regular expression you entered. For example, to search for a setting whose 
+    name startswith 'l' and ends with 'rad', enter</p><pre>
+^l.*rad$
+</pre>
+    <p>in the dialog box and press enter (or use the Find Next button).</p>
+
+    <p>To ignore case, pass the Python modifier <code>(?i)</code> before the 
+    rest of the expression:</p><pre>
+(?i)^l.*rad$
+</pre>
+
+    <h3 id="view-special">Viewing Special Settings</h3>
+
+    <p>Some settings are hidden by default - these can be shown using the View 
+    menu. <kbd>View Fixed</kbd> shows the settings that are only allowed to 
+    have one value according to the metadata. <kbd>View Ignored</kbd> shows the
+    settings that are currently 'commented-out'.</p>
+
+    <p>
+    <img src="rose-config-edit-fixed-and-ignored-vars.png"
+    alt="fixed ignored variables image">
+    <br>
+    <table>
+    <tr><td>The figure shows (from top to bottom) a 'normal' variable, a 
+    'fixed' variable, and an 'ignored' variable.</td></tr>
+    </table>
+    </p>
+
+    <h3 id="add-section">Adding a Section</h3>
+
+    <p>Navigate to the part of the tree (left hand tree panel) where you wish 
+    to add a section and right click on one of the names. Choose <kbd>Add 
+    section</kbd> and type in the name in the dialog. You can then add settings
+    to the section in the normal way.</p>
+
+    <h3 id="clone-section"> Cloning a Section </h3>
+
+    <p>Some sections are effectively duplicates of one another (e.g. numbered 
+    same-name namelists). To speed up copying these sections, you can right 
+    click on their page name in the left hand tree panel and select 
+    'Clone section'.</p>
+
+    <p>
+    <img src="rose-config-edit-clone-section.png" alt="clone section image">
+    <br>
+    <table>
+    <tr><td>The arrow points to the menu option that copies this page into a 
+    new one.</td></tr>
+    </table>
+    </p>
+
+    <h3 id="remove-section">Removing a Section or Set of Sections</h3>
+
+    <p>Right click on the part of the tree (page name in the left hand tree 
+    panel) that you want to remove and click <kbd>Remove</kbd>. This will 
+    remove all the settings belonging to the page and any child pages from the 
+    tree and configuration.</p>
+
+    <h3 id="page-help">Accessing Page Help</h3>
+
+    <p>Page help can be accessed using either the left hand tree panel (right 
+    click on the page name) or the tab/page label (right click).</p>
+
+    <h3 id="undoing">Undoing Changes</h3>
+
+    <p>You can undo your changes by pressing <kbd>Undo</kbd> on the toolbar, or
+    by clicking the <kbd>Revert page to last save</kbd> button on the toolbar. 
+    Similarly, you can redo them by pressing <kbd>Redo</kbd>.</p>
+
+    <h3 id="saving">Saving Changes</h3>
+
+    <p>Use the <kbd>File->Save</kbd> or the <kbd>Save</kbd> button on the 
+    toolbar in the normal way. These options will be greyed out if there is no 
+    difference between the last saved state and the current one.</p>
+
+    <h2 id="customisation">Customising Rose Config-Edit</h2>
+
+    <h3 id="themes">Themes and Colours</h3>
+
+    <p>Themes will be picked up by default (this will be the desktop theme if 
+    you are running on a GNOME desktop) and can be altered by running</p><pre>
+gnome-appearance-properties
+</pre>
+
+    <p>There are a few hard coded colours in the config editor that should be 
+    overridden if the theme is substantially different from the standard blue 
+    widget/grey background. These live in the 
+    <a href="https://github.com/metomi/rose/blob/master/lib/python/rose/config_editor/__init__.py">
+    config_editor/__init__.py</a> file. They can be overridden by creating a 
+    file</p><pre>
+~/.met-um/rose.conf
+</pre>
+    <p>in your home directory, if it doesn't already exist, and adding to it 
+    in the following way:</p><pre>
+
+[config-edit]
+colour-valuewidget-base-selected = cyan
+colour-variable-text-val-env = khaki
+colour-variable-changed = aquamarine
+
+</pre>
+
+    <p>These option names are lowercased, hyphen-separated translations of the 
+    constants in the 
+    <a href="https://github.com/metomi/rose/blob/master/lib/python/rose/config_editor/__init__.py">
+    config_editor/__init__.py</a> file. Any of the colours specified there can 
+    be changed easily. The allowed colour strings are specified in the X11 
+    <var>rgb.txt</var> file.</p>
+
+    <p>Changes are not restricted to colours - any constants in this python 
+    module can be overridden in your <var>rose.conf</var> file (but be careful 
+    with some of them!).</p>
+</div>
+</body>

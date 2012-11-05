@@ -37,7 +37,7 @@
 # DESCRIPTION
 #     Install and run a Cylc suite.
 #
-#     Install a suite (in $PWD), register it in cylc using the basename of the
+#     Install a suite (in $PWD), register it in Cylc using the basename of the
 #     configuration directory or the option specified in --name=NAME. Invoke
 #     "cylc run" on it. Arguments (and options after --) are passed to "cylc
 #     run".
@@ -73,6 +73,18 @@
 #     --verbose, -v
 #         Increment verbosity.
 #
+# ENVIRONMENT VARIABLES
+#     "rose suite-run" provides the following environment variables to the suite.
+#
+#     ROSE_ORIG_HOST
+#         The name of the host where the "rose suite-run" command was invoked.
+#
+# JINJA2 VARIABLES
+#     "rose suite-run" provides the following Jinja2 variables to the suite.
+#
+#     ROSE_ORIG_HOST
+#         The name of the host where the "rose suite-run" command was invoked.
+#         
 # SEE ALSO
 #     "cylc help gcontrol"
 #     "cylc help register"
