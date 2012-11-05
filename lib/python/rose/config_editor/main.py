@@ -1463,7 +1463,7 @@ class MainController(object):
                 macros = []
             else:
                 meta_config = self.data.load_meta_config(config, directory)
-                meta_files = self.data.load_meta_files(config)
+                meta_files = self.data.load_meta_files(config, directory)
                 macros = rose.macro.load_meta_macro_modules(meta_files)
             config_data.meta = meta_config
             self.data.load_file_metadata(config_name)
