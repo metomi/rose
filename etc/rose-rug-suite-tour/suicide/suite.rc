@@ -4,6 +4,7 @@
         graph = """
 
             # Start things off with task suicide_test.
+
             suicide_test => alpha & beta
 
 
