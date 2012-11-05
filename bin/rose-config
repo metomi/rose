@@ -71,4 +71,4 @@
 #         If specified, the program will print ignored !OPTION=VALUE where
 #         relevant.
 #-------------------------------------------------------------------------------
-exec python -m rose.config "$@"
+exec python -m rose.config_cli "$@"
