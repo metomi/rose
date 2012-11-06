@@ -1250,25 +1250,26 @@ class SomeTransformer(rose.macro.MacroBase):
     repository with prefix PREFIX_NAME, you must select a format (the only
     currently supported format is 'json') and use a url that looks like:</p>
     <pre>
-http://host/PREFIX_NAME/get_common_keys?format=json
+http://host/PREFIX_NAME/get_known_keys?format=json
 </pre>
 
     <h3 id="rosie-ws:usage">Usage</h3>The API contains the following methods:
 
     <dl>
-      <dt><code>get_common_keys</code></dt>
+      <dt><code>get_known_keys</code></dt>
 
       <dd>
         returns the main property names stored for suites (e.g. idx, branch,
-        owner) and takes the format argument. For example, entering a URL in a
+        owner) plus any additional names specified in the site config and
+        takes the format argument. For example, entering a URL in a
         web browser:
         <pre>
-http://host/PREFIX_NAME/get_common_keys?format=json
+http://host/PREFIX_NAME/get_known_keys?format=json
 </pre>
 
         <p>may give</p>
         <pre>
-["idx", "branch", "revision", "owner", "project", "title", "status"]  
+["access-list", "idx", "issue-list", "branch", "owner", "project", "revision", "status",  "title"]  
 </pre>
       </dd>
 
@@ -1276,7 +1277,7 @@ http://host/PREFIX_NAME/get_common_keys?format=json
 
       <dd>
         returns all unique optional or user-defined property names given in
-        suite discovery information (e.g. access-list, tag-list) and takes the
+        suite discovery information and takes the
         format argument. For example, entering this URL in Firefox:
         <pre>
 http://host/PREFIX_NAME/get_optional_keys?format=json

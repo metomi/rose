@@ -267,7 +267,11 @@ class MainWindow(gtk.Window):
                                                 self.search_manager, 
                                                 self.format_suite_id)
             for key in result_columns:
-                results[-1].append(result_map.pop(key))
+                try:
+                    value = result_map.pop(key)
+                except KeyError:
+                    value = None
+                results[-1].append(value)
             results[-1].insert(0, local_status)
         self.handle_update_treeview(results)
         self.last_search_historical = self.search_history
@@ -340,7 +344,7 @@ class MainWindow(gtk.Window):
             widget = self.menubar.uimanager.get_widget(
                                   "/TopMenuBar/View/View " + title)
             if widget is not None:
-                widget.set_active(title not in rosie.browser.COLUMNS_HIDDEN)
+                widget.set_active(title in rosie.browser.COLUMNS_SHOWN)
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             widget.connect('activate', action)

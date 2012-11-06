@@ -112,8 +112,8 @@ class Client(object):
         except ValueError:
             raise QueryError("%s: %s" % (method, kwargs))
     
-    def get_common_keys(self):
-        return self._get("get_common_keys")
+    def get_known_keys(self):
+        return self._get("get_known_keys")
 
     def get_optional_keys(self):
         return self._get("get_optional_keys")
@@ -424,11 +424,8 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         opts.format = FORMAT_QUIET
     elif not opts.format:
         opts.format = FORMAT_DEFAULT
-    
-    all_keys = []
-        
-    common_keys = ws_client.get_common_keys()
-    all_keys += common_keys
+
+    all_keys = ws_client.get_known_keys()
     
     if local_suites == None:
         local_suites = get_local_suites(opts.prefix)
