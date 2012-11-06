@@ -580,7 +580,7 @@ class RosieDatabaseInitiator(object):
 
     def create(self, prefix):
         """Create database tables."""
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         url = conf.get(["rosie-db", "db." + prefix]).value
         try:
             engine = al.create_engine(url)
@@ -638,7 +638,8 @@ class RosieDatabaseInitiator(object):
 
     def load(self, prefix):
         """Load database contents from a repository."""
-        node = rose.config.default_node().get(["rosie-db", "repos." + prefix])
+        conf = ResourceLocator.default().get_conf()
+        node = conf.get(["rosie-db", "repos." + prefix])
         location = node.value
         location = os.path.abspath(location)
         if not os.path.exists(location):
@@ -664,8 +665,8 @@ class RosieDatabaseInitiator(object):
 def test_query_parsing(filters):
     """Test the ability of the query parser to generate logical expressions."""
     url = None
-    config = rose.config.default_node()
-    for key, node in reversed(config.get(["rosie-db"]).value.items()):
+    conf = ResourceLocator.default().get_conf()
+    for key, node in reversed(conf.get(["rosie-db"]).value.items()):
         if key.startswith("db.") and key[3:]:
             url = node.value
             break
@@ -676,13 +677,13 @@ def test_query_parsing(filters):
 
 def main():
     """rosa db-create."""
-    ws_config = rose.config.default_node().get(["rosie-db"])
+    db_conf = ResourceLocator.default().get_conf().get(["rosie-db"])
     databases = {}
-    if ws_config is not None:
+    if db_conf is not None:
         opts, args = RoseOptionParser().parse_args()
         reporter = Reporter(opts.verbosity - opts.quietness)
         init = RosieDatabaseInitiator(event_handler=reporter)
-        for key, node in ws_config.value.items():
+        for key, node in db_conf.value.items():
             if key.startswith("db."):
                 prefix = key.replace("db.", "", 1)
                 init(prefix)

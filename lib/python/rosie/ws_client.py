@@ -42,6 +42,7 @@ from rosie.suite_id import SuiteId, SuiteIdError
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
+from rose.resource import ResourceLocator
 
 ERR_INVALID_URL = "Invalid url: {0}"
 ERR_NO_SUITES_FOUND = "{0}: no suites found."
@@ -76,7 +77,7 @@ class Client(object):
 
     def __init__(self, root=None, prefix=None):
         if root is None:
-            config = rose.config.default_node()
+            config = ResourceLocator.default().get_conf()
             node = config.get(["rosie-ws-client", "ws-root-default"])
             root = node.value
         self.root = root

@@ -19,11 +19,11 @@
 #-----------------------------------------------------------------------------
 """Scan for running suites in suite hosts."""
 
-import rose.config
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter
+from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import sys
 
@@ -53,7 +53,7 @@ class SuiteScan(object):
     def scan(self, *args):
         """Scan for running suites (in args)."""
         if not args:
-            conf = rose.config.default_node()
+            conf = ResourceLocator.default().get_conf()
             node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
             if node is None:
                 args = ["localhost"]

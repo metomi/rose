@@ -20,10 +20,10 @@
 """Select an available host machine by load or by random."""
 
 from random import random
-import rose.config
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
+from rose.resource import ResourceLocator
 import sys
 from time import sleep, time
 
@@ -147,7 +147,7 @@ class HostSelector(object):
         If the default differs in hosts, use "load:15".
 
         """
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         if not names:
             node = conf.get(["rose-host-select", "default"],
                             no_ignore=True)
@@ -256,7 +256,7 @@ class HostSelector(object):
             host_proc_dict[host_name] = proc
 
         # Retrieve score for each host name
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         timeout_node = conf.get(["rose-host-select", "timeout"],
                                 no_ignore=True)
         timeout = getattr(timeout_node, "value", None)
