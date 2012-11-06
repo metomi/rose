@@ -27,7 +27,8 @@ import sys
 import rose.macro
 
 
-CURRENT_VERSION_MARKER = "* "
+BEST_VERSION_MARKER = "* "
+CURRENT_VERSION_MARKER = "= "
 ERROR_NO_VALID_VERSIONS = "No versions available."
 ERROR_UPGRADE_VERSION = "{0}: invalid version."
 INFO_DOWNGRADED = "Downgraded from {0} to {1}"
@@ -377,13 +378,18 @@ def main():
     if args:
         user_choice = args[0]
     else:
-        marker = CURRENT_VERSION_MARKER
-        display_versions = [" " * len(marker) + v for v in ok_versions]
+        best_mark = BEST_VERSION_MARKER
+        curr_mark = CURRENT_VERSION_MARKER
+        all_versions = [" " * len(curr_mark) + v for v in ok_versions]
         if opts.downgrade:
-            display_versions.append(marker + upgrade_manager.tag)
+            if all_versions:
+                all_versions[0] = best_mark + all_versions[0].lstrip()
+            all_versions.append(curr_mark + upgrade_manager.tag)
         else:
-            display_versions.insert(0, marker + upgrade_manager.tag)
-        print "\n".join(display_versions)
+            if all_versions:
+                all_versions[-1] = best_mark + all_versions[-1].lstrip()
+            all_versions.insert(0, curr_mark + upgrade_manager.tag)
+        print "\n".join(all_versions)
         sys.exit()
     if user_choice not in ok_versions:
         sys.exit(ERROR_UPGRADE_VERSION.format(user_choice))

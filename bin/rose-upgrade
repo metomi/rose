@@ -11,6 +11,10 @@
 # DESCRIPTION
 #     Upgrade a configuration according to metadata upgrade macros.
 #
+#     Alternatively, show the available versions for upgrade/downgrade:
+#         "=" indicates the current version.
+#         "*" indicates the default version to change to.
+#
 # OPTION
 #     --config=DIR; -C DIR
 #         Use configuration in DIR instead of $PWD.
@@ -28,8 +32,9 @@
 #
 # ARGUMENTS
 #     VERSION
-#         A version to change to. If no version is specified, prompt the user
-#         to enter one. If --non-interactive is used, use the latest version
-#         available.
+#         A version to change to. If no version is specified, show available
+#         versions. If --non-interactive is used, use the latest version
+#         available. If --non-interactive and --downgrade are used, use
+#         the earliest version available.
 #-------------------------------------------------------------------------------
 exec python -m rose.upgrade "$@"
