@@ -38,6 +38,7 @@ import time
 import sqlalchemy as al
 
 import rose.config
+from rose.resource import ResourceLocator
 
 DATE_FMT = "%Y-%m-%d %H:%M:%S %Z"
 RE_ID_NAMES = [r"[a-z]", r"[a-z]", r"\d", r"\d", r"\d"]
@@ -62,7 +63,8 @@ class DAO(object):
     
     def __init__(self, db_url):
         name = os.path.basename(repos).replace("roses_", "").replace("_svn", "")
-        url = rose.config.default_node().get(["rosie-db", "db." + name]).value
+        res_loc = ResourceLocator.default()
+        url = res_loc.get_conf().get_value(["rosie-db", "db." + name])
         engine = al.create_engine(db_url)
         self.connection = engine.connect()
         self.metadata = al.MetaData(engine)
@@ -128,8 +130,8 @@ def check_path_is_idx(path):
 
 def main(repos, rev):
     db_name = os.path.basename(repos).replace("roses_", "").replace("_svn", "")
-    config = rose.config.default_node()
-    dao = DAO(config.get(["rosie-db", "db." + db_name]).value)
+    conf = ResourceLocator.default().get_conf()
+    dao = DAO(conf.get_value(["rosie-db", "db." + db_name]))
     statuses = {}
     copies = {}
     author = svnlook("author", "-r", rev, repos).strip()
