@@ -51,6 +51,9 @@
         <dd>Run the given test config files through the analysis engine.</dd>
         <dt><a HREF="#rose-app-run">rose app-run</a></dt>
         <dd>Run an application according to its configuration.</dd>
+        <dt><a HREF="#rose-app-upgrade">rose app-upgrade</a></dt>
+        <dd>Upgrade or downgrade an application according to metadata.</dd>
+        </dd>
         <dt><a HREF="#rose-config">rose config</a></dt>
         <dd>Parse a set of rose configuration files.</dd>
         <dt><a HREF="#rose-config-edit">rose config-edit</a></dt>
@@ -179,7 +182,47 @@
         <dt><kbd>--verbose; -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
+
+    <h2 id="rose-app-upgrade">rose app-upgrade</h2>
+
+    <h3>NAME</h3>
+    <p><kbd>rose-app-upgrade</kbd></p>
+    <h3>SYNOPSIS</h3>
+    <p><kbd>rose app-upgrade [OPTIONS] [VERSION]</kbd></p>
+    <h3>DESCRIPTION</h3>
+    <p>Upgrade an application configuration using metadata upgrade macros.</p>
+    <p>Alternatively, show the available upgrade/downgrade versions:</p>
+    <ul>
+       <li><code>=</code> indicates the current version.</li>
+       <li><code>*</code> indicates the default version to change to.</li>
+    </ul>
+    <h3>OPTIONS</h3>
+    <dl>
+        <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+        <dd>Use configuration in <var>DIR</var> instead of <var>$PWD</var>.
+        </dd>
+        <dt><kbd>--downgrade; -d;</kbd>
+        <dd>Downgrade the version instead of upgrade.</dd>
+        <dt><kbd>--meta-path=PATH; -M PATH</kbd></dt>
+        <dd>Prepend <var>PATH</var> to the metadata search path.</dd>
+        <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
+        <dd>Switch off interactive prompting (=answer yes to everything).</dd>
+        <dt><kbd>--output=DIR; -O DIR</kbd></dt>
+        <dd>The location of the output directory. Only meaningful if
+            there is at least one transformer in the argument list.</dd>
+        <dt><kbd>--quiet; -q</kbd></dt>
+        <dd>Reduce verbosity.</dd>
+    </dl>
     
+    <h3>ARGUMENTS</h3>
+    <dl>
+        <dt><var>VERSION</var></dt>
+        <dd>A version to change to. If no version is specified, show available
+        versions. If <kbd>--non-interactive</kbd> is used, use the latest version
+        available. If <kbd>--non-interactive</kbd> and <kbd>--downgrade<kbd> are
+        used, use the earliest version available.</dd>
+    </dl>
+
     <h2 id="rose-config">rose config</h2>
     <h3>NAME</h3>
     <kbd>rose config</kbd>
