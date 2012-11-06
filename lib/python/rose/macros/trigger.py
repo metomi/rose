@@ -64,6 +64,7 @@ class TriggerMacro(rose.macro.MacroBase):
 
     def transform(self, config, meta_config=None):
         """Apply metadata trigger expressions to variables."""
+        self.reports = []
         meta_config = self._load_meta_config(config, meta_config)
         self._setup_triggers(meta_config)
         self.enabled_dict = {}
@@ -107,8 +108,8 @@ class TriggerMacro(rose.macro.MacroBase):
                     value = None
                 else:
                     value = node.value
-                self.add_report(change_list, section, option, value, info)
-        return config, change_list
+                self.add_report(section, option, value, info)
+        return config, self.reports
 
     def update(self, var_id, config, meta_config):
         """Update enabled and ignored ids starting with var_id."""
@@ -219,6 +220,7 @@ class TriggerMacro(rose.macro.MacroBase):
         return update_id_list
 
     def validate(self, config, meta_config=None):
+        self.reports = []
         if (not isinstance(meta_config, rose.config.ConfigNode) and
             meta_config is not None):
             meta_config = rose.config.load(meta_config)
@@ -360,9 +362,8 @@ class TriggerMacro(rose.macro.MacroBase):
         section, option = self._get_section_option_from_id(variable_id)
         node = config.get([section, option])
         value = None if node is None else node.value
-        reports = []
-        self.add_report(reports, section, option, value, error_string)
-        return reports
+        self.add_report(section, option, value, error_string)
+        return self.reports
 
     def _get_dup_sequence(self, id_list, child_id):
         """Check that the last two sequences for child_id are not equal."""

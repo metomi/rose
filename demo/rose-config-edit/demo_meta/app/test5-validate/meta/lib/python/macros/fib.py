@@ -16,6 +16,7 @@ class FibonacciChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config):
         """Validate an array containing integer elements."""
+        self.reports = []
         seq = [1, 1]
         problem_list = []
         section = "env"
@@ -34,10 +35,10 @@ class FibonacciChecker(rose.macro.MacroBase):
                     if i < 2:
                         continue
                     if element != int_elems[i - 1] + int_elems[i - 2]:
-                        self.add_report(problem_list, section, option, value,
+                        self.add_report(section, option, value,
                                         self.BAD_SEQUENCE)
                         break
         else:
-            self.add_report(problem_list, section, option, value,
+            self.add_report(section, option, value,
                             self.BAD_SEQUENCE)
-        return problem_list           
+        return self.reports
