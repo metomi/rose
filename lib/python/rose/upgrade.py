@@ -360,7 +360,10 @@ def run_upgrade_macros(app_config, meta_config, config_name, args,
                                    no_ignore=True)
     if meta_opt_node is None or len(meta_opt_node.value.split("/")) < 2:
         sys.exit(ERROR_LOAD_CONF_META_NODE)
-    upgrade_manager = MacroUpgradeManager(app_config, opt_downgrade)
+    try:
+        upgrade_manager = MacroUpgradeManager(app_config, opt_downgrade)
+    except OSError as e:
+        sys.exit(e)
     ok_versions = upgrade_manager.get_tags()
     ok_vn_text = " ".join(ok_versions)
     if not ok_versions:
