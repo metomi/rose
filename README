@@ -23,6 +23,9 @@ Licence. See doc/rose-terms-of-use.html and
 Licences for non-Rose works included in this distribution can be
 found in the licences/ directory.
 
+doc/jquery.min.js:
+    Unmodified external software library. See lib/html/external/jquery/.
+
 doc/rose-icon.png,
 etc/images/rose-icon.png,
 etc/images/rose-icon-trim.png,
