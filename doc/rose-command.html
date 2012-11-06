@@ -37,16 +37,15 @@
     <h1>Rose Command Line Interface</h1>  
     
     <h2 id="rose-cli-overview">Commands Overview</h2>
-    <p>
+    
     <ul>
         <li><a HREF="#rose-cmds">Rose Commands</a></li>
         <li><a HREF="#rosie-cmds">Rosie Commands</a></li>
     </ul>
-    </p>
     
     <h3 id="rose-cmds">Rose Commands</h3>
     
-    <p><kbd>rose</kbd> provides the following utilities:
+    <p><kbd>rose</kbd> provides the following utilities:</p>
     <dl>
         <dt><a HREF="#rose-ana">rose ana</a></dt>
         <dd>Run the given test config files through the analysis engine.</dd>
@@ -97,11 +96,10 @@
         <dt><a HREF="#rose-test-suite">rose test-suite</a></dt>
         <dd>Run the Rose test suite.</dd>
     </dl>
-    </p>
 
     <h3 id="rosie-cmds">Rosie Commands</h3>
 
-    <p><kbd>rosie</kbd> provides the following utilities:
+    <p><kbd>rosie</kbd> provides the following utilities:</p>
     <dl>
         <dt><a HREF="#rosie-checkout">rosie checkout</a></dt>
         <dd>Checkout local copies of suites.</dd>
@@ -121,7 +119,6 @@
         <dt><a HREF="#rosie-ls">rosie ls</a></dt>
         <dd>List the local suites.</dd>
     </dl>
-    </p>
 
     <h2 id="rose-ana">rose ana</h2>
     <h3>NAME</h3>
@@ -140,7 +137,7 @@
     <p><kbd>rose app-run [OPTIONS] [--] [COMMAND ...]</kbd></p>
     <h3>DESCRIPTION</h3>
     <p>Run an application according to its configuration.</p>
-    <p>Determine the command to run in this order:
+    <p>Determine the command to run in this order:</p>
     <ol>
         <li> If <var>COMMAND</var> is specified, invoke the command.</li>
         <li> If the <kbd>--command-key=KEY</kbd> option is defined, invoke the 
@@ -151,10 +148,9 @@
         used as the command.</li>
         <li> Invoke the command specified in <var>[command]default</var>.</li>
     </ol>
-    </p>
 
     <h3>OPTIONS</h3>
-    <p>
+
     <dl>
         <dt><kbd>--config=DIR; -C DIR</kbd></dt>
         <dd>Specify the configuration directory of the application. 
@@ -183,13 +179,12 @@
         <dt><kbd>--verbose; -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
-    </p>
-
-    <h2 id="rose-config">rose config</hd>
+    
+    <h2 id="rose-config">rose config</h2>
     <h3>NAME</h3>
     <kbd>rose config</kbd>
     <h3>SYNOPSIS</h3>
-    <p>
+    
     <dl>
         <dt><kbd>rose config SECTION OPTION</kbd></dt>
         <dd>Print the value of <var>OPTION</var> in <var>SECTION</var>.</dd>
@@ -214,7 +209,6 @@
         <dd>Combine the configurations in <var>FILE1</var> and 
         <var>FILE2</var>, and dump the result.</dd>
     </dl>
-    </p>
     
     <h3>DESCRIPTION</h3>
 
@@ -225,7 +219,6 @@
     <var>SECTION</var> and <var>OPTION</var> exist.</p>
 
     <h3>OPTIONS</h3>
-    <p>    
     <dl>
         <dt><kbd>--default</kbd></dt>
         <dd>Specify a default value.</dd>
@@ -245,7 +238,6 @@
         <dd>If specified, the program will print ignored 
         <var>!OPTION=VALUE</var> where relevant.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-config-edit">rose config-edit</h2>
     <h3>NAME</h3>
@@ -255,7 +247,6 @@
     <h3>DESCRIPTION</h3>
     <p>Launch the GTK+ GUI to edit a suite or application configuration.</p>
     <h3>OPTIONS</h3>
-    <p>
     <dl>
         <dt><kbd>--config=DIR; -C DIR</kbd></dt>
         <dd>A path to either
@@ -274,7 +265,6 @@
         <dd>Prepend <var>PATH</var> to the search path for metadata (look here 
         first). This option can be used repeatedly to load multiple paths.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-edit">rose edit</h2>
     <h3>NAME</h3>
@@ -284,7 +274,6 @@
     <h3>DESCRIPTION</h3>
     <p>Launch the GTK+ GUI to edit a suite or application configuration.</p>
     <h3>OPTIONS</h3>
-    <p>
     <dl>
         <dt><kbd>--config=DIR; -C DIR</kbd></dt>
         <dd>A path to either:
@@ -302,7 +291,6 @@
         <dd>Prepend PATH to the search path for metadata (look here first).
         This option can be used repeatedly to load multiple paths.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-host-select">rose host-select</h2>
     <h3>NAME</h3>
@@ -312,11 +300,9 @@
     <h3>DESCRIPTION</h3>
     <p>Select a host from a set of groups or names by load or by random.
     Use settings in <var>$ROSE_HOME/etc/rose.conf</var> and 
-    <var>$HOME/.metomi/rose.conf</var> to determine the ranking method.<p>
-    <p>Print the selected host name.<p>
-    
+    <var>$HOME/.metomi/rose.conf</var> to determine the ranking method.</p>
+    <p>Print the selected host name.</p>
     <h3>OPTIONS</h3>
-    <p>
     <dl>
         <dt><kbd>--debug</kbd></dt>
         <dd>Print stack trace on error.</dd>
@@ -326,18 +312,18 @@
         <dd>Specify the method for ranking a list of hosts. The method can be:
         <ul>
           <li><var>load</var> (by average load as reported by <kbd>uptime</kbd>
-          divided by number of processors):</li>
+          divided by number of processors):
           <ul>
             <li>If <var>METHOD-ARG</var> is specified, it must be "1", "5" or 
             "15". The default is to use the 15 minute load.</li>
-          </ul>
+          </ul></li>
           <li><var>fs</var> (by % usage of a file system as reported by 
-          <kbd>df</kbd>):</li>
+          <kbd>df</kbd>):
           <ul>
             <li><var>METHOD-ARG</var> must be a valid file system in all the 
             given hosts and host groups. The default is to use the <var>~</var>
             directory.</li>
-          </ul>
+          </ul></li>
           <li><var>random</var></li>
         </ul>
         </dd>
@@ -368,9 +354,9 @@
         <dd>Declare the default ranking method for a group of hosts.</dd>
     </dl>
     
-    Type <kbd>rose config rose-host-select</kbd> to print settings.</p>
+    <p>Type <kbd>rose config rose-host-select</kbd> to print settings.</p>
 
-    <h2 id="rose-macro">rose macro</hd>
+    <h2 id="rose-macro">rose macro</h2>
 
     <h3>NAME</h3>
     <p><kbd>rose-macro</kbd></p>
@@ -379,8 +365,6 @@
     <h3>DESCRIPTION</h3>
     <p>List or run macros associated with a suite or application.</p>
     <h3>OPTIONS</h3>
-
-    <p>
     <dl>
         <dt><kbd>--all; -a</kbd></dt>
         <dd>List or run rose internal macros as well as metadata macros.</dd>
@@ -399,17 +383,14 @@
         <dt><kbd>--validate; -V</kbd></dt>
         <dd>Prepend all validators to the argument list.</dd>
     </dl>
-    </p>
     
     <h3>ARGUMENTS</h3>
-    <p>
     <dl>
         <dt><var>MACRO_NAME ...</var></dt>
         <dd>A list of macro names to run. If no macro names are specified and
         <kbd>--validate</kbd> is not used, list all available macros. 
         Otherwise, run the specified macro names.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-metadata-gen">rose metadata-gen</h2>
     <h3>NAME</h3>
@@ -423,7 +404,6 @@
 
     <h3>OPTIONS</h3>
     
-    <p>
     <dl>
         <dt><kbd>--auto-type</kbd></dt>
         <dd>Add a 'best guess' for the <var>type</var> and <var>length</var> 
@@ -436,11 +416,9 @@
         <dd>A directory to output the metadata to. If not specified,
             output to the application or suite metadata directory.</dd>
     </dl>
-    </p>
     
     <h3>ARGUMENTS</h3>
 
-    <p>
     <dl>
         <dt><kbd>PROPERTY[=VALUE] ...</kbd></dt>
         <dd>One or more <var>key=value</var> pairs of properties to specify for
@@ -448,30 +426,26 @@
             is missing, the property will be set to a null string in each 
             setting.</dd>
     </dl>
-    </p>
 
-    <h2 id="rose-mpi-launch">rose mpi-launch</hd>
+    <h2 id="rose-mpi-launch">rose mpi-launch</h2>
     <h3>NAME</h3>
     <p><kbd>rose-mpi-launch</kbd></p>
     <h3>SYNOPSIS</h3>
     <p><kbd>rose mpi-launch COMMAND [ARGUMENTS ...]</kbd></p>
     <h3>ARGUMENTS</h3>
-    <p>
     <dl>
         <dt><var>COMMAND</var></dt>
         <dd>Command to call. Subsequent arguments are passed to the command.
         </dd>
     </dl>
-    </p>
     
     <h3>ENVIRONMENT</h3>
-    <p>
     <dl>
         <dt><kbd>optional ROSE_LAUNCHER</kbd></dt>
         <dd>Specifies the launcher program to run the prog.</dd>
         <dt><kbd>optional ROSE_LAUNCH_INNER</kbd></dt>
         <dd>Specifies an inner wrapper to be run by launcher, can be set to ""
-            to call the executable directly. Default is <var>$0 --inner</kbd>.
+            to call the executable directly. Default is <kbd>$0 --inner</kbd>.
             </dd>
         <dt><kbd>optional ROSE_LAUNCHER_LIST</kbd></dt>
         <dd>Specifies an alternative list of launchers.</dd>
@@ -486,12 +460,11 @@
         the program name.</dd>
         <dt><kbd>optional ROSE_LAUNCHER_ULIMIT_OPTS</kbd></dt>
         <dd>Specifies the arguments to ulimit. Setting this variable to 
-            <kbd>-a -s unlimited -d unlimited -a<kbd> results in <kbd>ulimit 
+            <kbd>-a -s unlimited -d unlimited -a</kbd> results in <kbd>ulimit 
             -a; ulimit -s unlimited; ulimit -d unlimited; ulimit -a</kbd></dd>
         <dt><kbd>optional NPROC</kbd></dt>
         <dd>Specifies the number of processors to run on. Default is 1.</dd>
     </dl>
-    </p>
     
     <h3>DESCRIPTION</h3>
     <p>Provide a portable way to launch an MPI command.</p>
@@ -517,7 +490,6 @@
     configuration.</p>
 
     <h3>OPTIONS</h3>
-    <p>
     <dl>
         <dt><kbd>--case=MODE</kbd></dt>
         <dd>Output names in lower case (<kbd>MODE="upper"</kbd>), upper case 
@@ -530,7 +502,6 @@
         <dt><kbd>-u, --upper</kbd></dt>
         <dd>Shorthand for <kbd>--case=upper</kbd>.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-rug-brief-tour">rose rug-brief-tour</h2>
     <h3>NAME</h3>
@@ -543,7 +514,7 @@
     <p>Populate the current directory for 
     <a HREF="./rose-brief-tour.html">Rose User Guide: A Brief Tour</a>.</p>
 
-    <h2 id="rose-stem">rose stem</hd>
+    <h2 id="rose-stem">rose stem</h2>
     <h3>NAME</h3>
     <p><kbd>rose stem</kbd></p>
 
@@ -558,17 +529,14 @@
 
     <h3>EXAMPLES</h3>
 
-    <p>
     <pre>
     rose stem --diffsource=$PWD
     rose stem --source=fcm:source_tr@head --task=myjob
     rose stem --source=$PWD -C ~/roses/mot-aa121 --task=myjob --task=yourjob
 </pre>
-    </p>
 
     <h3>OPTIONS</h3>
 
-    <p>
     All options of <a href="#rose-suite-run">rose suite-run</a> are supported. 
     Additional options are:
     <dl>
@@ -582,7 +550,6 @@
         <dt><kbd>--task=TASK, -t TASK</kbd></dt>
         <dd>Specify a task name or group to run.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-suite-gcontrol">rose suite-gcontrol</h2>
     <h3>NAME</h3>
@@ -606,7 +573,6 @@
 
     <h3>OPTIONS</h3>
 
-    <p>
     <dl>
         <dt><kbd>--host=HOST</kbd></dt>
         <dd>Specify a host.</dd>
@@ -626,7 +592,7 @@
 
     <h3>DESCRIPTION</h3>
 
-    <p>Provide a common event hook for Cylc suites and tasks.
+    <p>Provide a common event hook for Cylc suites and tasks.</p>
     <ul>
         <li>(Task event only) Pull remote task logs back to server host.</li>
         <li>Generate suite log view.</li>
@@ -636,7 +602,6 @@
 
     <h3>OPTIONS</h3>
 
-    <p>
     <dl>
         <dt><kbd>--debug</kbd></dt>
         <dd>Switch on debug mode.</dd>
@@ -652,14 +617,12 @@
         <dt><kbd>--verbose; -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-suite-init">rose suite-init</h2>
     <h3>NAME</h3>
 
     <p><kbd>rose suite-run</kbd></p>
     <h3>SYNOPSIS</h3>
-    <p>
     <dl>
         <dt><kbd>rose suite-run [OPTIONS] [[--] CYLC-RUN-ARGS]</kbd></dt>
         <dd>Install the suite in <var>$PWD</var>, and register it using 
@@ -673,13 +636,12 @@
         <dd>Install the suite in <var>/dir/to/suite</var>, and register it as 
         <var>my.suite</var>.</dd>
         <dt><kbd>rose suite-run -C /dir/to/my.suite</kbd></dt>
-        <dd>Equivalent to (<kbd>cd /dir/to/my.suite && rose suite-run</kbd>)
+        <dd>Equivalent to (<kbd>cd /dir/to/my.suite &amp;&amp; rose suite-run</kbd>)
         </dd>
         <dt><kbd>rose suite-run -C /dir/to/suite -N my.suite</kbd></dt>
         <dd>Equivalent to 
-        (<kbd>cd /dir/to/suite && rose suite-run my.suite</kbd>)</dd>
+        (<kbd>cd /dir/to/suite &amp;&amp; rose suite-run my.suite</kbd>)</dd>
     </dl>
-    </p>
 
     <h3>DESCRIPTION</h3>
 
@@ -692,7 +654,6 @@
 
     <h3>OPTIONS</h3>
 
-    <p>
     <dl>
         <dt><kbd>--config=DIR, -C DIR</kbd></dt>
         <dd>Specify the configuration directory of the suite. 
@@ -729,29 +690,26 @@
         <dt><kbd>--verbose, -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
-    </p>
     
     <h3>ENVIRONMENT</h3>
 
     <p><kbd>rose suite-run</kbd> provides the following environment variables 
-    to the suite:
+    to the suite:</p>
     <dl>
         <dt><var>ROSE_ORIG_HOST</var></dt>
         <dd>The name of the host where the <kbd>rose suite-run</kbd> command 
         was invoked.</dd>
     </dl>
-    </p>
     
     <h3>JINJA2</h3>
 
     <p><kbd>rose suite-run</kbd> provides the following Jinja2 variables to the
-    suite.
+    suite.</p>
     <dl>
         <dt><var>ROSE_ORIG_HOST</var></dt>
         <dd>The name of the host where the <kbd>rose suite-run</kbd> command 
         was invoked.</dd>
     </dl>
-    </p>
 
     <h3>SEE ALSO</h3>
 
@@ -780,20 +738,16 @@
     specified.</p>
     
     <h3>OPTIONS</h3>
-    <p>
     <dl>
         <dt><kbd>--no-web-browse</kbd></dt>
         <dd>Do not open a web browser to display the log view.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-suite-run">rose suite-run</h2>
     <h3>NAME</h3>
-    <p><kbd>rose suite-run</kbd><p>
+    <p><kbd>rose suite-run</kbd></p>
 
     <h3>SYNOPSIS</h3>
-    
-    <p>
     <dl>
         <dt><kbd>rose suite-run [OPTIONS] [[--] CYLC-RUN-ARGS]</kbd></dt>
         <dd>Install the suite in <var>$PWD</var>, and register it using 
@@ -807,13 +761,12 @@
         <dd>Install the suite in <var>/dir/to/suite</var>, and register it as 
         <var>my.suite</var>.</dd>
         <dt><kbd>rose suite-run -C /dir/to/my.suite</kbd></dt>
-        <dd>Equivalent to (<kbd>cd /dir/to/my.suite && rose suite-run</kbd>)
+        <dd>Equivalent to (<kbd>cd /dir/to/my.suite &amp;&amp; rose suite-run</kbd>)
         </dd>
         <dt><kbd>rose suite-run -C /dir/to/suite -N my.suite</kbd></dt>
         <dd>Equivalent to 
-        (<kbd>cd /dir/to/suite && rose suite-run my.suite</kbd>)</dd>
+        (<kbd>cd /dir/to/suite &amp;&amp; rose suite-run my.suite</kbd>)</dd>
     </dl>
-    </p>
 
     <h3>DESCRIPTION</h3>
 
@@ -825,8 +778,6 @@
     options after <kbd>--</kbd>) are passed to <kbd>cylc run</kbd>.</p>
 
     <h3>OPTIONS</h3>
-
-    <p>
     <dl>
         <dt><kbd>--config=DIR, -C DIR</kbd></dt>
         <dd>Specify the configuration directory of the suite. 
@@ -864,28 +815,25 @@
         <dt><kbd>--verbose, -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
-    </p>
     
     <h3>ENVIRONMENT</h3>
 
     <p><kbd>rose suite-run</kbd> provides the following environment variables 
-    to the suite:
+    to the suite:</p>
     <dl>
         <dt><var>ROSE_ORIG_HOST</var></dt>
         <dd>The name of the host where the <kbd>rose suite-run</kbd> command 
         was invoked.</dd>
     </dl>
-    </p>
     
     <h3>JINJA2</h3>
 
     <p><kbd>rose suite-run</kbd> provides the following Jinja2 variables to the 
-    suite:
-
+    suite:</p>
     <dl>
         <dt><var>ROSE_ORIG_HOST</var></dt>
         <dd>The name of the host where the <kbd>rose suite-run</kbd> command 
-        was invoked.<dd>
+        was invoked.</dd>
     </dl>
     
     <h3>SEE ALSO</h3>
@@ -910,15 +858,12 @@
     <var>localhost</var>.</p>
 
     <h3>OPTIONS</h3>
-
-    <p>    
     <dl>
         <dt><kbd>--quiet, -q</kbd></dt>
         <dd>Decrement verbosity.</dd>
         <dt><kbd>--verbose, -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-task-env">rose task-env</h2>
 
@@ -926,18 +871,16 @@
     <p><kbd>rose-task-env</kbd></p>
 
     <h3>SYNOPSIS</h3>
-    <p>
     <dl>
         <dt><kbd>rose task-env [OPTIONS]</kbd></dt>
         <dt><kbd>eval $(rose task-env)</kbd></dt>
     </dl>
-    </p>
 
     <h3>DESCRIPTION</h3>
 
     <p>Provide an environment for cycling suite task.</p>
     
-    <p>Print <var>KEY=VALUE</var> of the following to the <var>STDOUT</var>:
+    <p>Print <var>KEY=VALUE</var> of the following to the <var>STDOUT</var>:</p>
     <dl>
         <dt><var>ROSE_SUITE_DIR</var></dt>
         <dd>The path to the root directory of the running suite.</dd>
@@ -978,10 +921,8 @@
         <dt><var>ROSE_TASK_SUFFIX</var></dt>
         <dd>The suffix in the task name.</dd>
     </dl>
-    </p>
-<h3>OPTIONS</h3>
 
-    <p>
+    <h3>OPTIONS</h3>
     <dl>
         <dt><kbd>--cycle=TIME, -t TIME</kbd></dt>
         <dd>Specify the cycle time. If not defined, use the cycle time provided
@@ -992,7 +933,7 @@
         <dd>Specify one or more the cycle offsets to determine what
             <var>ROSE_DATAC????</var> environment variables to export. The 
             <var>TIME-DELTA</var> argument uses the syntax explained above in 
-            the <var>ROSE_DATAC????</var> environment variable.<br>
+            the <var>ROSE_DATAC????</var> environment variable.<br/>
             E.g. <kbd>--cycle-offset=T3H --cycle-offset=T6H</kbd> will tell 
             <kbd>rose task-env</kbd> to export <var>ROSE_DATACT3H</var> and 
             <var>ROSE_DATACT6H</var>.</dd>
@@ -1007,7 +948,6 @@
         <dt><kbd>--verbose; -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
-    </p>
     
     <h2 id="rose-task-run">rose task-run</h2>
     
@@ -1034,8 +974,6 @@
     the task utility instead of as a Rose application.</p>
 
     <h3>OPTIONS</h3>
-    
-    <p>
     <dl>
         <dd>All options of <kbd>rose app-run</kbd> and <kbd>rose task-env</kbd>
         are supported.</dd>
@@ -1053,21 +991,19 @@
         <dt><kbd>--util-key=KEY</kbd></dt>
         <dd>Specify a named task utility.</dd>
     </dl>
-    </p>
     
     <h3>ENVIRONMENT</h3>
 
-    <p>The following environment variables are used by <kbd>rose task-run</kbd>:
+    <p>The following environment variables are used by <kbd>rose task-run</kbd>:</p>
     <dl>
         <dt><var>ROSE_TASK_APP</var></dt>
         <dd>Specify a named application configuration.</dd>
         <dt><var>ROSE_TASK_UTIL</var></dt>
         <dd>Specify a named task utility.</dd>
     </dl>
-    </p>
     
     <p>The following environment variables are used by the <kbd>fcm_make</kbd> 
-    and <kbd>fcm_make2</kbd> built-in task utilities:
+    and <kbd>fcm_make2</kbd> built-in task utilities:</p>
     <dl>
         <dt><var>ROSE_TASK_N_JOBS</var></dt>
         <dd>The number of jobs to run in parallel in <kbd>fcm make</kbd>. 
@@ -1079,7 +1015,6 @@
         <dd>Source (<var>. invoke</var>) the specified script before running 
         the main command. (default='')</dd>
     </dl>
-    </p>
 
     <p>All environment variables documented in <kbd>rose task-env</kbd> are 
     passed to the application <kbd>rose task-run</kbd> runs.</p>
@@ -1104,13 +1039,10 @@
     Otherwise, run only the tests for the utilities in the argument list.</p>
 
     <h3>OPTIONS</h3>
-    
-    <p>
     <dl>
         <dt><kbd>-v</kbd></dt>
         <dd>Run tests in verbose mode, if applicable.</dd>
     </dl>
-    </p>
     
     <h2 id="rosie-checkout">rosie checkout</h2>
     
@@ -1128,8 +1060,6 @@
     the suite identified by <var>ID</var> to the standard location.</p>
 
     <h3>OPTIONS</h3>
-
-    <p>
     <dl>
         <dt><kbd>--force, -f</kbd></dt>
         <dd>If working copy for suite identified by <var>ID</var> already 
@@ -1160,7 +1090,6 @@
 
     <h3>OPTIONS</h3>
 
-    <p>
     <dl>
         <dt><kbd>--info-file=FILE</kbd></dt>
         <dd>Specify a <var>FILE</var> containing the discovery information for 
@@ -1180,7 +1109,6 @@
         <dt><kbd>--verbose, -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
-    </p>
     
     <h2 id="rosie-create">rosie create</h2>
     
@@ -1200,7 +1128,6 @@
 
     <h3>OPTIONS</h3>
 
-    <p>
     <dl>
         <dt><kbd>--info-file=FILE</kbd></dt>
         <dd>Specify a <var>FILE</var> containing the discovery information for 
@@ -1245,7 +1172,6 @@
 
     <h3>OPTIONS</h3>
 
-    <p>    
     <dl>
         <dt><kbd>--force, -f</kbd></dt>
         <dd>Remove working copies even if there are uncommitted changes.
@@ -1259,7 +1185,6 @@
         <dt><kbd>--verbose, -v</kbd></dt>
         <dd>Increment verbosity.</dd>
     </dl>
-    </p>
     
     <h2 id="rosie-go">rosie go</h2>
     <h3>NAME</h3>
@@ -1282,12 +1207,9 @@
         <li>string beginning with "http": url</li>
         <li>string not beginning with "http": keyword search</li>
     </ul>
-    If using a url remember to put it in quotes.
-    </p>
+    <p>If using a url remember to put it in quotes.</p>
 
     <h3>OPTIONS</h3>
-
-    <p>
     <dl>
         <dt><kbd>--prefix=PREFIX</kbd></dt>
         <dd>An alias specifying a different suite repository.</dd>
@@ -1304,15 +1226,12 @@
         <dd>Run the suite search specified by <var>[SEARCH]</var> as a url 
         search.</dd>
     </dl>
-    </p>
     
     <h3>ARGUMENTS</h3>
-    <p>
     <dl>
         <dt>QUERY</dt>
         <dd>An optional search to be executed on startup.</dd>
     </dl>
-    </p>
     
     <h2 id="rosie-id">rosie id</h2>
     
@@ -1328,7 +1247,6 @@
 
     <h3>OPTIONS</h3>
 
-    <p>
     <dl>
         <dt><kbd>rosie id --to-origin [ID]</kbd></dt>
         <dd>Print the repository URL of a given suite <var>ID</var></dd>
@@ -1336,14 +1254,14 @@
         <dd>Print the local location of a given suite <var>ID</var></dd>
         <dt><kbd>rosie id --to-output [ID]</kbd></dt>
         <dd>Print the output directory of a given suite <var>ID</var></dd>
-        <dt><kbd>rosie id --to-web [ID]</dt>
+        <dt><kbd>rosie id --to-web [ID]</kbd></dt>
         <dd>Print the web URL of a given suite <var>ID</var></dd>
         <dt><kbd>rosie id</kbd></dt>
         <dd>Print suite <var>ID</var> of working copy in <var>$PWD</var></dd>
         <dt><kbd>rosie id /path/to/working/copy</kbd></dt>
-        <dd>Print suite <var>ID<var> of working copy in a directory</dd>
+        <dd>Print suite <var>ID</var> of working copy in a directory</dd>
         <dt><kbd>rosie id svn://fcm1/rose_mo1_svn/a/b/c/4/5</kbd></dt>
-        <dd>Print suite <var>ID<var> of a given URL</dd>
+        <dd>Print suite <var>ID</var> of a given URL</dd>
         <dt><kbd>rosie id --latest</kbd></dt>
         <dd>Print latest suite <var>ID</var> in the default repository</dd>
         <dt><kbd>rosie id --latest mot</kbd></dt>
@@ -1351,7 +1269,6 @@
         <dt><kbd>rosie id --next</kbd></dt>
         <dd>Print next suite <var>ID</var> in the default repository</dd>
     </dl>
-    </p>
     
     <h2 id="rosie-lookup">rosie lookup</h2>
     
@@ -1368,28 +1285,26 @@
     display the information of the matching suites.</p>
 
     <p>Unless an option is used to specify the lookup type the input is 
-    interpreted by default as follows:
+    interpreted by default as follows:</p>
     <ul>
         <li>string beginning with "http": url</li>
         <li>string not beginning with "http": search</li>
     </ul>
-    </p>
 
     <p>If using a url remember to put it in quotes.</p>
 
     <p>The default output format includes a local working copy status field 
     (<kbd>%local</kbd>) in the first column. A blank field means there is no 
-    related suite checked out.<br>
+    related suite checked out.<br/>
     
-    "=" means that the suite is checked out at this branch and revision.<br>
-    "<" means that the suite is checked out but at an older revision.<br>
-    ">" means that the suite is checked out but at a newer revision.<br>
-    "S" means that the suite is checked out but on a different branch.<br>
+    "=" means that the suite is checked out at this branch and revision.<br/>
+    "<" means that the suite is checked out but at an older revision.<br/>
+    ">" means that the suite is checked out but at a newer revision.<br/>
+    "S" means that the suite is checked out but on a different branch.<br/>
     </p>
     
     <h3>OPTIONS</h3>
 
-    <p>
     <dl>
         <dt><kbd>--all-revs</kbd></dt>
         <dd>Specify whether to search deleted suites and superceded suites.
@@ -1418,7 +1333,6 @@
         <dt><kbd>--verbose; -v</kbd></dt>
         <dd>Display full info for each returned suite.</dd>
     </dl>
-    </p>
     
     <h2 id="rosie-ls">rosie ls</h2>
     
@@ -1437,16 +1351,15 @@
     <p>The default format includes a local working copy status field 
     (<kbd>%local</kbd>) in the first column.</p>
     
-    <p>A blank field means there is no related suite checked out.<br>
-    "=" means that the suite is checked out at this branch and revision.<br>
-    "<" means that the suite is checked out but at an older revision.<br>
-    ">" means that the suite is checked out but at a newer revision.<br>
-    "S" means that the suite is checked out but on a different branch.<br>
+    <p>A blank field means there is no related suite checked out.<br/>
+    "=" means that the suite is checked out at this branch and revision.<br/>
+    "<" means that the suite is checked out but at an older revision.<br/>
+    ">" means that the suite is checked out but at a newer revision.<br/>
+    "S" means that the suite is checked out but on a different branch.<br/>
     </p>
 
     <h3>OPTIONS</h3>
 
-    <p>
     <dl>
         <dt><kbd>--prefix=PREFIX</kbd></dt>
         <dd>Display locally checked out suites from the specified suite 
@@ -1466,7 +1379,6 @@
         <dt><kbd>--verbose; -v</kbd></dt>
         <dd>Display full info for each returned suite.</dd>
     </dl>
-    </p>
 
 </div>
 </body>
