@@ -70,8 +70,10 @@ class Location(object):
     def __init__(self, name):
         self.name = name
         self.name_orig = name
+        self.scheme = None
         self.paths = None
-        self.cache = None # path to cache
+        self.cache = None
+        self.refs = None
         self.is_up_to_date = False
 
     def __cmp__(self, other):
@@ -82,10 +84,21 @@ class Location(object):
             return False
         if id(self) == id(other):
             return True
-        return self.name == other.name and sorted(other.paths) == sorted(self.paths)
+        return (self.name == other.name and
+                self.paths == other.paths and
+                self.refs == other.refs)
 
     def __str__(self):
         return self.name
+
+    def update(self, other):
+        self.name = other.name
+        self.name_orig = other.name_orig
+        self.scheme = other.scheme
+        self.paths = other.paths
+        self.cache = other.cache
+        self.refs = other.refs
+        self.is_up_to_date = other.is_up_to_date
 
 
 class LocationPath(object):
@@ -100,31 +113,6 @@ class LocationPath(object):
 
     def __eq__(self, other):
         return (self.name == other.name and self.checksum == other.checksum)
-
-    def __str__(self):
-        return self.name
-
-
-class LocalLocation(object):
-    """Represent a local (file/directory) location."""
-
-    def __init__(self, name, locs):
-        self.name = name
-        self.locs = None
-        self.paths = None
-        self.is_up_to_date = False
-
-    def __cmp__(self, other):
-        return cmp(self.name, other.name)
-
-    def __eq__(self, other):
-        if other is None:
-            return False
-        if id(self) == id(other):
-            return True
-        return (self.name == other.name and
-                sorted(self.paths) == sorted(other.paths) and
-                sorted(self.locs) == sorted(other.locs))
 
     def __str__(self):
         return self.name
@@ -187,12 +175,13 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             for name in shlex.split(locs_str):
                 loc_map[name] = Location(name)
                 locs.append(loc_map[name])
-            local_loc_map[local_loc_name] = LocalLocation(local_loc_name, locs)
+            local_loc_map[local_loc_name] = Location(local_loc_name)
+            local_loc_map[local_loc_name].refs = sorted(locs)
         pool = self._get_worker_pool(loc_map)
         results = {}
         for name, loc in loc_map.items():
             # TODO: _loc_parse
-            result = pool.apply_async(_loc_parse, [self, config, name, loc])
+            result = pool.apply_async(_loc_parse, [self, config, loc])
             results[name] = result
         pool.close()
         while results:
@@ -201,7 +190,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     continue
                 results.pop(name)
                 loc, args_of_events = result.get()
-                loc_map[name] = loc
+                loc_map[name].update(loc)
                 for args_of_event in args_of_events:
                     self.manager.handle_event(*args_of_event)
             if results:
@@ -225,40 +214,63 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         f = open(filename)
                         m.update(f.read())
                         loc_path.checksum = m.hexdigest()
+                # TODO: LocDAO.select
                 prev_local_loc = self.loc_dao.select(local_loc.name)
                 local_loc.is_up_to_date = (local_loc == prev_local_loc)
             if not local_loc.is_up_to_date:
+                # TODO: LocDAO.delete
                 self.loc_dao.delete(local_loc.name)
 
-        # TODO: Update locations with workers.
-        #       New location.
-        #       Location is out of date or has unknown status.
-        #       Write contents to temporary files if necessary.
-        #       Determine checksums.
-        #       Return location of temporary files, and checksums.
-        #       Update DB.
-        # TODO: Rebuild each "local" file.
-        #       Copy from (cached) locations.
-        #       Determine checksums.
-        #       Update DB.
-        # TODO: Tidy up DB.
-        #       Remove entries related to unused locations.
-        #       Remove entries related to old local files.
-
-        # Start worker pool
-        pool = self._get_worker_pool(nodes)
-
-        # Use worker pool to do the work
-        results = []
-        for key, node in sorted(nodes.items()):
-            result = pool.apply_async(_process_target, [self, config, key, node])
-            results.append(result)
+        # Update locations with workers.
+        loc_map = {}
+        for local_loc in local_loc_map.values():
+            if local_loc.is_up_to_date:
+                continue
+            for loc in local_loc.refs:
+                loc_map[loc.name] = loc
+        pool = self._get_worker_pool(loc_map)
+        results = {}
+        for name, loc in loc_map.items():
+            # TODO: _loc_pull
+            result = pool.apply_async(_loc_pull, [self, config, loc])
+            results[name] = result
         pool.close()
-        # N.B. Event messages will appear in the correct order, but not as each
-        #      call completes.
-        for result in results:
-            for message, type, level, prefix, clip in result.get():
-                self.manager.handle_event(message, type, level, prefix, clip)
+        while results:
+            for name, result in results.items():
+                if not result.ready():
+                    continue
+                results.pop(name)
+                loc, args_of_events = result.get()
+                loc_map[name].update(loc)
+                # TODO: LocDAO.update
+                self.loc_dao.update(loc)
+                for args_of_event in args_of_events:
+                    self.manager.handle_event(*args_of_event)
+            if results:
+                sleep(self.POLL_DELAY)
+
+        # Rebuild each "local" file.
+        local_locs = [l if not l.is_up_to_date for l in local_loc_map.values()]
+        pool = self._get_worker_pool(local_locs)
+        results = {}
+        for local_loc in local_locs:
+            # TODO: _loc_install 
+            result = pool.apply_async(_loc_install, [self, config, local_loc]
+            results[name] = result
+        pool.close()
+        while results:
+            for name, result in results.items():
+                if not result.ready():
+                    continue
+                results.pop(name)
+                local_loc, args_of_events = result.get()
+                local_loc_map[name].update(local_loc)
+                # TODO: LocDAO.update
+                self.loc_dao.update(local_loc)
+                for args_of_event in args_of_events:
+                    self.manager.handle_event(*args_of_event)
+            if results:
+                sleep(self.POLL_DELAY)
 
     def process_target(self, config, key, node):
         """Install a target according to a file:target section."""
