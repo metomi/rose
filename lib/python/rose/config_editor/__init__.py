@@ -414,6 +414,7 @@ META_PROP_WIDGET = "widget[rose-config-edit]"
 
 # Miscellaneous
 COPYRIGHT = '(C) British Crown Copyright 2012 Met Office.'
+HELP_FILE = 'rose-config-edit.html'
 LAUNCH_COMMAND = 'rose config-edit'
 LAUNCH_COMMAND_CONFIG = 'rose config-edit -C'
 LAUNCH_SUITE_RUN = 'rose suite-run'
