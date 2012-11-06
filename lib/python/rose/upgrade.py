@@ -27,11 +27,11 @@ import sys
 import rose.macro
 
 
+CURRENT_VERSION_MARKER = "* "
 ERROR_NO_VALID_VERSIONS = "No versions available."
-ERROR_UPGRADE_VERSION = "Invalid version: {0} should be one of {1}"
+ERROR_UPGRADE_VERSION = "{0}: invalid version."
 INFO_DOWNGRADED = "Downgraded from {0} to {1}"
 INFO_UPGRADED = "Upgraded from {0} to {1}"
-INFO_VERSIONS = "Eligible versions: {0}"
 MACRO_UPGRADE_MODULE = "versions"
 MACRO_UPGRADE_RESOURCE_DIR = "etc"
 MACRO_UPGRADE_RESOURCE_FILE_ADD = "rose-macro-add.conf"
@@ -355,37 +355,7 @@ def run_upgrade_macros(app_config, meta_config, config_name, args,
                        opt_conf_dir, opt_downgrade, opt_non_interactive, 
                        opt_output_dir, opt_quietness):
     """CLI function to run upgrade/downgrade macros."""
-    meta_opt_node = app_config.get([rose.CONFIG_SECT_TOP,
-                                    rose.CONFIG_OPT_META_TYPE],
-                                   no_ignore=True)
-    if meta_opt_node is None or len(meta_opt_node.value.split("/")) < 2:
-        sys.exit(ERROR_LOAD_CONF_META_NODE)
-    try:
-        upgrade_manager = MacroUpgradeManager(app_config, opt_downgrade)
-    except OSError as e:
-        sys.exit(e)
-    ok_versions = upgrade_manager.get_tags()
-    ok_vn_text = " ".join(ok_versions)
-    if not ok_versions:
-        sys.exit(ERROR_NO_VALID_VERSIONS)
-    if args:
-        user_choice = args[0]
-    else:
-        print INFO_VERSIONS.format(ok_vn_text)
-        sys.exit()
-    if user_choice not in ok_versions:
-        sys.exit(ERROR_UPGRADE_VERSION.format(user_choice, ok_vn_text))
-    upgrade_manager.set_new_tag(user_choice)
-    macro_config = copy.deepcopy(app_config)
-    new_config, change_list = upgrade_manager.transform(
-                                      macro_config, meta_config)
-    method_id = UPGRADE_METHOD.upper()[0]
-    if opt_downgrade:
-        method_id = DOWNGRADE_METHOD.upper()[0]
-    macro_id = rose.macro.MACRO_OUTPUT_ID.format(method_id, config_name,
-                                                 upgrade_manager.get_name())
-    rose.macro._handle_transform(app_config, new_config, change_list, macro_id,
-                                 opt_conf_dir, opt_output_dir, opt_non_interactive)
+
 
 
 def main():
@@ -394,10 +364,41 @@ def main():
     if return_objects is None:
         sys.exit(1)
     app_config, meta_config, config_name, args, opts = return_objects
-    run_upgrade_macros(app_config, meta_config, config_name,
-                       args, opts.conf_dir, opts.downgrade,
-                       opts.non_interactive, opts.output_dir,
-                       opts.quietness)
+    meta_opt_node = app_config.get([rose.CONFIG_SECT_TOP,
+                                    rose.CONFIG_OPT_META_TYPE],
+                                   no_ignore=True)
+    if meta_opt_node is None or len(meta_opt_node.value.split("/")) < 2:
+        sys.exit(ERROR_LOAD_CONF_META_NODE)
+    try:
+        upgrade_manager = MacroUpgradeManager(app_config, opts.downgrade)
+    except OSError as e:
+        sys.exit(e)
+    ok_versions = upgrade_manager.get_tags()
+    if args:
+        user_choice = args[0]
+    else:
+        marker = CURRENT_VERSION_MARKER
+        display_versions = [" " * len(marker) + v for v in ok_versions]
+        if opts.downgrade:
+            display_versions.append(marker + upgrade_manager.tag)
+        else:
+            display_versions.insert(0, marker + upgrade_manager.tag)
+        print "\n".join(display_versions)
+        sys.exit()
+    if user_choice not in ok_versions:
+        sys.exit(ERROR_UPGRADE_VERSION.format(user_choice))
+    upgrade_manager.set_new_tag(user_choice)
+    macro_config = copy.deepcopy(app_config)
+    new_config, change_list = upgrade_manager.transform(
+                                      macro_config, meta_config)
+    method_id = UPGRADE_METHOD.upper()[0]
+    if opts.downgrade:
+        method_id = DOWNGRADE_METHOD.upper()[0]
+    macro_id = rose.macro.MACRO_OUTPUT_ID.format(method_id, config_name,
+                                                 upgrade_manager.get_name())
+    rose.macro._handle_transform(app_config, new_config, change_list,
+                                 macro_id, opts.conf_dir, opts.output_dir,
+                                 opts.non_interactive)
 
 if __name__ == "__main__":
     main()
