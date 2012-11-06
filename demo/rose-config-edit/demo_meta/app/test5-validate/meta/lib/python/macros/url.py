@@ -17,6 +17,7 @@ class URLChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config):
         """Validate a string containing a URL."""
+        self.reports = []
         seq = [1, 1]
         problem_list = []
         for section in config.value.keys():
@@ -33,7 +34,6 @@ class URLChecker(rose.macro.MacroBase):
                         connection = httplib.HTTPConnection(value, 80)
                         connection.request("HEAD", "")
                     except Exception as e:
-                        self.add_report(problem_list, section, option, value,
-                                        str(e))
+                        self.add_report(section, option, value, str(e))
                     connection.close()
-        return problem_list
+        return self.reports

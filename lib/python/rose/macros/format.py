@@ -19,7 +19,7 @@ class FormatChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
-        problem_list = []
+        self.reports = []
         for attr_name in dir(rose.formats):
             if attr_name.startswith("_"):
                 continue
@@ -27,9 +27,8 @@ class FormatChecker(rose.macro.MacroBase):
             if inspect.ismodule(attr) and hasattr(attr, VALIDATE_FUNC_NAME):
                 func = getattr(attr, VALIDATE_FUNC_NAME)
                 if inspect.isfunction(func):
-                    problem_list += func(config, meta_config,
-                                         self.add_report)
-        return problem_list
+                    func(config, meta_config, self.add_report)
+        return self.reports
 
 
 class FormatFixer(rose.macro.MacroBase):
@@ -38,7 +37,7 @@ class FormatFixer(rose.macro.MacroBase):
 
     def transform(self, config, meta_config=None):
         """Return a config and a list of changes, if any."""
-        changes_list = []
+        self.reports = []
         for attr_name in dir(rose.formats):
             if attr_name.startswith("_"):
                 continue
@@ -48,5 +47,4 @@ class FormatFixer(rose.macro.MacroBase):
                 if inspect.isfunction(func):
                     config, c_list = func(config, meta_config,
                                           self.add_report)
-                    changes_list += c_list
-        return config, changes_list
+        return config, self.reports

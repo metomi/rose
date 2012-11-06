@@ -369,7 +369,6 @@ def pretty_format(values):
 
 def validate_config(config, meta_config, add_report_func):
     """Validate a configuration."""
-    problem_list = []
     for keys, node in config.walk():
         section = keys[0]
         if not section.startswith("namelist:"):
@@ -383,6 +382,5 @@ def validate_config(config, meta_config, add_report_func):
             value = node.value
             is_error = (option.lower() != option)
         if is_error:
-            add_report_func(problem_list, section, option, value,
+            add_report_func(section, option, value,
                             ERROR_UPPERCASE, is_warning=True)
-    return problem_list
