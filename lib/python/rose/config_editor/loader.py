@@ -992,17 +992,6 @@ class ConfigDataManager(object):
         return self.config[config_name].vars.get_var(sect, opt, save,
                                                      no_latent=not latent)
 
-    def clear_flag(self, flag_type, config_name=None):
-        """Remove a flag from configuration variables."""
-        if config_name is None:
-            configs = self.config.keys()
-        else:
-            configs = [config_name]
-        for name in configs:
-            for var in self.config[name].vars.get_all():
-                if flag_type in var.flags:
-                    var.flags.pop(flag_type)
-
 #------------------ Data model helper functions ------------------------------
 
     def get_data_for_namespace(self, ns, from_saved=False):
