@@ -47,7 +47,7 @@ class VariableWidget(object):
 
     """
 
-    def __init__(self, variable, var_ops, is_ghost=False, show_title=True):
+    def __init__(self, variable, var_ops, is_ghost=False, show_modes={}):
         self.variable = variable
         self.key = variable.name
         self.value = variable.value
@@ -59,7 +59,7 @@ class VariableWidget(object):
                         rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
         self.hidden_colour = gtk.gdk.color_parse(
                         rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT)
-        self.keywidget = self.get_keywidget(variable, show_title)
+        self.keywidget = self.get_keywidget(variable, show_modes)
         self.generate_valuewidget(variable)
         self.is_inconsistent = False
         if 'type' in variable.error:
@@ -77,7 +77,7 @@ class VariableWidget(object):
         self.set_ignored()
         self.update_status()
 
-    def get_keywidget(self, variable, show_title):
+    def get_keywidget(self, variable, show_modes):
         """Creates the keywidget attribute, based on the variable name.
 
         Loads 'tooltips' or hover-over text based on the variable metadata.
@@ -88,7 +88,7 @@ class VariableWidget(object):
                              self.var_ops,
                              self.launch_help,
                              self.update_status,
-                             show_title)
+                             show_modes)
         widget.show()
         return widget
 
@@ -319,32 +319,20 @@ class VariableWidget(object):
         return (self.meta.get(rose.META_COMPULSORY) == 'true' and
                 self.is_ghost)
 
-    def set_titled(self, should_show_title):
-        """Sets or unsets the display of a title for a variable."""
-        self.keywidget.set_show_title(should_show_title)
+    def set_show_mode(self, show_mode, should_show_mode):
+        """Sets or unsets special displays for a variable."""
+        self.keywidget.set_show_mode(show_mode, should_show_mode)
         
     def set_ignored(self):
         """Sets or unsets a custom ignored state for the widgets."""
         ign_map = self.variable.ignored_reason
+        self.keywidget.set_ignored()
         if ign_map != {}:
             # Technically ignored, but could just be ignored by section.
             self.is_ignored = True
-            if rose.variable.IGNORED_BY_SECTION in ign_map:
-                 stock_id = self.menuwidget.MENU_ICON_IGNORE_SECTION
-                 if rose.variable.IGNORED_BY_SYSTEM in ign_map:
-                     stock_id = (
-                           self.menuwidget.MENU_ICON_IGNORE_SYSTEM_SECTION)
-                 if rose.variable.IGNORED_BY_USER in ign_map:
-                     stock_id = self.menuwidget.MENU_ICON_IGNORE_USER_SECTION
-            elif rose.variable.IGNORED_BY_USER in ign_map:
-                 stock_id = self.menuwidget.MENU_ICON_IGNORE_USER
-            else:
-                 stock_id = self.menuwidget.MENU_ICON_IGNORE_SYSTEM
             if '"Ignore"' not in self.menuwidget.option_ui:
                 self.menuwidget.old_option_ui = self.menuwidget.option_ui
                 self.menuwidget.old_actions = self.menuwidget.actions
-            if 'ignore' not in self.menuwidget.button.stock_id:
-                self.menuwidget.old_stock_id = self.menuwidget.button.stock_id
             if ign_map.keys() == [rose.variable.IGNORED_BY_SECTION]:
                 # Not ignored in itself, so give Ignore option.
                 if '"Enable"' in self.menuwidget.option_ui:
@@ -362,8 +350,6 @@ class VariableWidget(object):
                     self.menuwidget.actions.append(
                                     ('Enable', gtk.STOCK_YES,
                                      rose.config_editor.VAR_MENU_ENABLE)) 
-            if not self.is_ghost and not self.variable.error:
-                self.menuwidget.button.set_stock_id(stock_id)
             self.update_status()
             self.set_sensitive(False)
         else:
@@ -374,10 +360,6 @@ class VariableWidget(object):
                                     '<menuitem action="Enable"/>',
                                     r'<menuitem action="Ignore"/>',
                                     self.menuwidget.option_ui)
-            if not self.is_ghost and not self.variable.error:
-                if hasattr(self.menuwidget, 'old_stock_id'):
-                    self.menuwidget.button.set_stock_id(
-                                    self.menuwidget.old_stock_id)
             self.update_status()
             if not self.is_ghost:
                 self.set_sensitive(True)
@@ -386,7 +368,6 @@ class VariableWidget(object):
         """Handles variable modified status."""
         self.set_modified(self.var_ops.is_var_modified(self.variable))
         self.keywidget.update_comment_display()
-        self.update_flags()
 
     def set_modified(self, is_modified=True):
         """Applies or unsets a custom 'modified' state for the widgets."""
@@ -440,25 +421,6 @@ class VariableWidget(object):
         if not indicies:
             return None
         return indicies[-1]
-
-    def update_flags(self):
-        """Update flag markers according to variable info."""
-        for flag in self.keywidget.var_flags:
-            if flag not in self.variable.flags:
-                self.clear_flags(flag)
-        for flag, info in self.variable.flags.items():
-            if flag not in self.keywidget.var_flags:
-                self.add_flag(flag, info)
-
-    def add_flag(self, flag_type=None, tooltip_text=None):
-        """Append a flag to the variable widget."""
-        if flag_type is None:
-            flag_type = rose.config_editor.FLAG_TYPE_DEFAULT
-        self.keywidget.add_flag(flag_type, tooltip_text)
-
-    def clear_flags(self, just_this_flag_type=None):
-        """Remove all flags, or one specifically."""
-        self.keywidget.clear_flags(just_this_flag_type)
 
     def launch_help(self, text_or_url=None):
         if text_or_url is None:

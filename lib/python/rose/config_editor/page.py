@@ -733,8 +733,9 @@ class ConfigPage(gtk.VBox):
 
     def react_to_show_modes(self, mode_key, is_mode_on):
         self.show_modes[mode_key] = is_mode_on
-        if hasattr(self.main_container, 'show_' + mode_key):
-            getattr(self.main_container, 'show_' + mode_key)(is_mode_on)
+        if hasattr(self.main_container, 'show_mode_change'):
+            react_func = getattr(self.main_container, 'show_mode_change')
+            react_func(mode_key, is_mode_on)
             self.update_ignored()
         elif mode_key in [rose.config_editor.SHOW_MODE_IGNORED,
                           rose.config_editor.SHOW_MODE_USER_IGNORED]:
@@ -749,22 +750,6 @@ class ConfigPage(gtk.VBox):
                 widget.get_parent().update_status()
             else:
                 widget.update_status()
-
-    def update_flags(self, variable_ids=None):
-        """Reconstruct flags."""
-        if variable_ids is None:
-            variable_ids = [v.metadata['id'] for v in
-                            self.panel_data + self.ghost_data]
-        widget_list = self.get_main_variable_widgets()
-        for widget in widget_list:
-            if (hasattr(widget.get_parent(), 'variable') and
-                widget.get_parent().variable.metadata['id'] in variable_ids):
-                if hasattr(widget.get_parent(), 'update_flags'):
-                    widget.get_parent().update_flags()
-            elif (hasattr(widget, 'variable') and
-                widget.variable.metadata['id'] in variable_ids):
-                if hasattr(widget, 'update_flags'):
-                    widget.update_flags()
 
     def update_ignored(self):
         """Set variable widgets to 'ignored' or 'enabled' status."""
