@@ -28,8 +28,8 @@
         [[[job submission]]]
             method = at
         [[[event hooks]]]
-            succeeded handler = "rose task-hook"
-            failed handler = "rose task-hook"
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook --mail"  # Email on failure.
 
     [[TRIGGER_NS]]
 

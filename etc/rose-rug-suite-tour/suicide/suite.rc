@@ -29,8 +29,8 @@
         [[[job submission]]]
             method = at
         [[[event hooks]]]
-            succeeded handler = "rose task-hook"
-            failed handler = "rose task-hook"
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook"
 
     [[beta]]
         command scripting = "sleep 15; echo Oh no\!; exit 1"

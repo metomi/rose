@@ -22,8 +22,8 @@
         [[[job submission]]]
             method = at
         [[[event hooks]]]
-            succeeded handler = "rose task-hook"
-            failed handler = "rose task-hook"
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook"
 
     [[INTERNAL_QUEUES_NS]]
     [[queued_task1, queued_task2, queued_task3, queued_task4, queued_task5]]
