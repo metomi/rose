@@ -29,8 +29,6 @@ import copy
 import itertools
 import os
 import re
-from rose.opt_parse import RoseOptionParser
-from rose.resource import ResourceLocator
 import shutil
 import sre_constants
 import sys
@@ -69,6 +67,7 @@ import rose.config_editor.variable
 import rose.config_editor.window
 import rose.gtk.util
 import rose.macro
+import rose.opt_parse
 import rose.resource
 import rose.macros
 
@@ -101,7 +100,6 @@ class MainController(object):
         self.orphan_pages = []
         self.undo_stack = [] # Nothing to undo yet
         self.redo_stack = [] # Nothing to redo yet
-        self.var_flags = {} # No flags applied yey
         self.find_hist = {'regex': '', 'ids': []}
         self.util = rose.config_editor.util.Lookup()
         self.macros = {
@@ -169,6 +167,10 @@ class MainController(object):
         self.page_show_modes = {
              rose.config_editor.SHOW_MODE_FIXED:
              rose.config_editor.SHOULD_SHOW_FIXED,
+             rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
+             rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL,
+             rose.config_editor.SHOW_MODE_FLAG_NO_META:
+             rose.config_editor.SHOULD_SHOW_FLAG_NO_META,
              rose.config_editor.SHOW_MODE_IGNORED:
              rose.config_editor.SHOULD_SHOW_IGNORED,
              rose.config_editor.SHOW_MODE_USER_IGNORED:
@@ -290,13 +292,13 @@ class MainController(object):
                                      rose.config_editor.SHOW_MODE_NO_TITLE,
                                      m.get_active())),
                      ('/TopMenuBar/View/Flag no-metadata',
-                      lambda m: self.handle_flag(
-                                     rose.config_editor.FLAG_TYPE_NO_META,
-                                     m.get_active())),
+                      lambda m: self._set_page_show_modes(
+                                   rose.config_editor.SHOW_MODE_FLAG_NO_META,
+                                   m.get_active())),
                      ('/TopMenuBar/View/Flag optional',
-                      lambda m: self.handle_flag(
-                                     rose.config_editor.FLAG_TYPE_OPTIONAL,
-                                     m.get_active())),
+                      lambda m: self._set_page_show_modes(
+                                  rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
+                                  m.get_active())),
                      ('/TopMenuBar/Metadata/All V',
                       lambda m: self.handle.run_custom_macro(
                                      method_name=rose.macro.VALIDATE_METHOD)),
@@ -332,7 +334,11 @@ class MainController(object):
                            ('/TopMenuBar/View/View latent',
                             rose.config_editor.SHOULD_SHOW_LATENT),
                            ('/TopMenuBar/View/View without titles',
-                            rose.config_editor.SHOULD_SHOW_NO_TITLE)])
+                            rose.config_editor.SHOULD_SHOW_NO_TITLE),
+                           ('/TopMenuBar/View/Flag optional',
+                            rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL),
+                           ('/TopMenuBar/View/Flag no-metadata',
+                            rose.config_editor.SHOULD_SHOW_FLAG_NO_META)])
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
@@ -729,17 +735,6 @@ class MainController(object):
                         self.orphan_pages.remove(page)
 
 #------------------ Update functions -----------------------------------------
-
-    def handle_flag(self, flag_type, is_flag_active=False):
-        """Handle a change in variable flags."""
-        self.var_flags.update({flag_type: is_flag_active})
-        if flag_type == rose.config_editor.FLAG_TYPE_OPTIONAL:
-            self.handle.flag_optional(is_flag_active)
-        elif flag_type == rose.config_editor.FLAG_TYPE_NO_META:
-            self.handle.flag_no_metadata(is_flag_active)
-        self._generate_pagelist()
-        for page in self.pagelist:
-            page.update_flags()
 
     def _namespace_data_is_modified(self, namespace):
         config_name = self.util.split_full_ns(self.data, namespace)[0]
@@ -1491,8 +1486,6 @@ class MainController(object):
             self.update_all()
         if hasattr(self, 'menubar'):
             self.handle.load_macro_menu(self.menubar)
-        for flag_type, status in self.var_flags.items():
-            self.handle_flag(flag_type, status)
         namespaces_updated = []
         for config_name in configs:
             config_data = self.data.config[config_name]
@@ -1980,7 +1973,7 @@ def get_number_of_configs(config_directory_path=None):
 
 def load_site_config_path():
     """Load any metadata path specified in a user or site configuration."""
-    conf = ResourceLocator.default().get_conf()
+    conf = rose.resource.ResourceLocator.default().get_conf()
     path = conf.get_value([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_PATH])
     if path is not None:
         sys.path.insert(0, path)
@@ -1999,7 +1992,7 @@ if __name__ == '__main__':
                  rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE)
         sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
-    opt_parser = RoseOptionParser()
+    opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode")
     opts, args = opt_parser.parse_args()
     if args:
