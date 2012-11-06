@@ -34,9 +34,6 @@ import sre_constants
 import sys
 import warnings
 
-from rose.opt_parse import RoseOptionParser
-from rose.resource import ResourceLocator
-
 # Ignore add menu related warnings for now, but remove this later.
 warnings.filterwarnings('ignore',
                         'instance of invalid non-instantiatable type',
@@ -70,7 +67,7 @@ import rose.config_editor.variable
 import rose.config_editor.window
 import rose.gtk.util
 import rose.macro
-from rose.opt_parse import RoseOptionParser
+import rose.opt_parse
 import rose.resource
 import rose.macros
 
@@ -1976,7 +1973,7 @@ def get_number_of_configs(config_directory_path=None):
 
 def load_site_config_path():
     """Load any metadata path specified in a user or site configuration."""
-    conf = ResourceLocator.default().get_conf()
+    conf = rose.resource.ResourceLocator.default().get_conf()
     path = conf.get_value([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_PATH])
     if path is not None:
         sys.path.insert(0, path)
@@ -1995,7 +1992,7 @@ if __name__ == '__main__':
                  rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE)
         sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
-    opt_parser = RoseOptionParser()
+    opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode")
     opts, args = opt_parser.parse_args()
     if args:
