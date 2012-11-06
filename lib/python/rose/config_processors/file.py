@@ -28,6 +28,7 @@ from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.reporter import Event
+from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sqlite3
@@ -335,7 +336,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 self.manager.handle_event(ChecksumEvent(target, checksum))
 
     def _get_worker_pool(self, items):
-        nproc = int(rose.config.default_node().get_value(
+        nproc = int(ResourceLocator.default().get_conf().get_value(
                 ["rose.config_processors.file", "nproc"],
                 default=self.NPROC))
         if nproc > len(items):
