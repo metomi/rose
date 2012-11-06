@@ -178,7 +178,7 @@ TIP_TOOLBAR_VIEW_WEB = "View Web"
 
 # Window settings
 
-COLUMNS_HIDDEN = ["branch", "author", "date", "status", "from_idx"]
+COLUMNS_SHOWN = ["local", "idx", "revision", "owner", "title"]
 PREFIX_LEN = 5
 SIZE_WINDOW = (900, 600)
 SIZE_WINDOW_NEW_SUITE = (500, 400)
