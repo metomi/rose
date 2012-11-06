@@ -35,37 +35,29 @@ import value
 MODULES = [compulsory, duplicate, format, rule, trigger, value]
 
 
-class DefaultTransforms(rose.macro.MacroBase):
+class DefaultTransforms(rose.macro.MacroTransformerCollection):
 
     """Runs all the default fixers, such as trigger fixing."""
 
-    def transform(self, config, meta_config=None):
-        """Apply transforms within the macros package."""
-        change_list = []
-        get_id = self._get_id_from_section_option
+    def __init__(self):
+        macros = []
         macro_info_tuples = rose.macro.get_macro_class_methods(MODULES)
         for module_name, class_name, method, help in macro_info_tuples:
-            if method != rose.macro.TRANSFORM_METHOD:
-                    continue
             macro_name = ".".join([module_name, class_name])
-            for module in MODULES:
-                if module.__name__ == module_name:
-                    macro_inst = getattr(module, class_name)()
-                    macro_method = getattr(macro_inst, method)
-                    break
-            config, c_list = macro_method(config, meta_config)
-            c_list.sort(self._sorter)
-            change_list += c_list
-        return config, change_list
+            if method == rose.macro.TRANSFORM_METHOD:
+                for module in MODULES:
+                    if module.__name__ == module_name:
+                        macro_inst = getattr(module, class_name)()
+                        macros.append(macro_inst)
+        super(DefaultTransforms, self).__init__(*macros)
 
 
-class DefaultValidators(rose.macro.MacroBase):
+class DefaultValidators(rose.macro.MacroValidatorCollection):
 
     """Runs all the default checks, such as compulsory checking."""
 
-    def validate(self, config, meta_config):
-        """Apply validators within the macros package."""
-        problem_list = []
+    def __init__(self):
+        macros = []
         macro_info_tuples = rose.macro.get_macro_class_methods(MODULES)
         for module_name, class_name, method, help in macro_info_tuples:
             macro_name = ".".join([module_name, class_name])
@@ -73,9 +65,5 @@ class DefaultValidators(rose.macro.MacroBase):
                 for module in MODULES:
                     if module.__name__ == module_name:
                         macro_inst = getattr(module, class_name)()
-                        macro_meth = getattr(macro_inst, method)
-                        break
-                p_list = macro_meth(config, meta_config)
-                p_list.sort(self._sorter)
-                problem_list += p_list
-        return problem_list 
+                        macros.append(macro_inst)
+        super(DefaultValidators, self).__init__(*macros)

@@ -1459,7 +1459,7 @@ class MainController(object):
                 macros = []
             else:
                 meta_config = self.data.load_meta_config(config, directory)
-                meta_files = self.data.load_meta_files(config)
+                meta_files = self.data.load_meta_files(config, directory)
                 macros = rose.macro.load_meta_macro_modules(meta_files)
             config_data.meta = meta_config
             self.data.load_file_metadata(config_name)
@@ -2004,7 +2004,7 @@ if __name__ == '__main__':
         for child_paths in [arg.split(":") for arg in opts.meta_path]:
             child_paths.reverse()
             for path in child_paths:
-                sys.path.insert(0, path)
+                sys.path.insert(0, os.path.abspath(path))
     if opts.conf_dir:
         os.chdir(opts.conf_dir)
     path = os.getcwd()
