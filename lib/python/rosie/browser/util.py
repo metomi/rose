@@ -514,24 +514,19 @@ class AdvancedSearchWidget(gtk.VBox):
         self.adv_controls_on = adv_controls_on
         self.display_redrawer = display_redrawer
         try:
-            common_keys = search_manager.ws_client.get_common_keys()
-            optional_keys = search_manager.ws_client.get_optional_keys()
+            known_keys = search_manager.ws_client.get_known_keys()
             query_operators = search_manager.ws_client.get_query_operators()
         except rosie.ws_client.QueryError as e:
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
                                      str(e))
             sys.exit(str(e))
-        self.display_columns = ["local"] + common_keys
+        self.display_columns = ["local"] + known_keys
         self.display_filters = {}
         for column in self.display_columns:
             self.display_filters.update(
                          {column:
-                          column not in rosie.browser.COLUMNS_HIDDEN})
+                          column in rosie.browser.COLUMNS_SHOWN})
         self.filter_columns = [c for c in self.display_columns if c != "local"]
-        for prop_name in optional_keys:
-            if prop_name not in self.filter_columns:
-                self.filter_columns.append(prop_name)
-        self.filter_columns.sort()
         self.filter_exprs = []
         for operator in query_operators:
             self.filter_exprs.append(operator)

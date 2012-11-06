@@ -28,6 +28,7 @@ from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.reporter import Event
+from rose.resource import ResourceLocator
 import shlex
 import shutil
 import tempfile
@@ -93,7 +94,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(target))
 
         # Start worker pool
-        nproc = int(rose.config.default_node().get_value(
+        nproc = int(ResourceLocator.default().get_conf().get_value(
                 ["rose.config_processors.file", "nproc"],
                 default=self.NPROC))
         if nproc > len(nodes):

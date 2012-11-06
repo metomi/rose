@@ -32,31 +32,11 @@ class MenuWidget(gtk.HBox):
     """This class generates a button with a menu for variable actions."""
 
     MENU_ICON_ERRORS = 'rose-gtk-gnome-package-system-errors'
+    MENU_ICON_FILE = 'gtk-harddisk'
     MENU_ICON_WARNINGS = 'rose-gtk-gnome-package-system-warnings'
-    MENU_ICON_FILE = gtk.STOCK_HARDDISK
-    MENU_ICON_FIXED = 'rose-gtk-gnome-package-system-fixed'
-    MENU_ICON_FIXED_IGNORE_SECTION = ('rose-gtk-gnome-package-system'
-                                      '-fixed-ignored-section')
-    MENU_ICON_IGNORE_SECTION = 'rose-gtk-gnome-package-system-ignored-section'
-    MENU_ICON_IGNORE_SYSTEM = 'rose-gtk-gnome-package-system-ignored-trigger'
-    MENU_ICON_IGNORE_SYSTEM_SECTION = ('rose-gtk-gnome-package-system'
-                                        '-ignored-trigger-section')
-    MENU_ICON_IGNORE_USER = 'rose-gtk-gnome-package-system-ignored-user'
-    MENU_ICON_IGNORE_USER_SECTION = ('rose-gtk-gnome-package-system'
-                                     '-ignored-user-section')
-    MENU_ICON_LATENT = 'rose-gtk-gnome-package-system-ghost'
-    MENU_ICON_LATENT_ERRORS = 'rose-gtk-gnome-package-system-ghost-errors'
-    MENU_ICON_LATENT_WARNINGS = 'rose-gtk-gnome-package-system-ghost-warnings'
-    MENU_ICON_LATENT_FIXED = 'rose-gtk-gnome-package-system-ghost-fixed'
-    MENU_ICON_LATENT_FIXED_IGNORE_SECTION = ('rose-gtk-gnome-package-system'
-                                             '-ghost-fixed-ignored-section')
-    MENU_ICON_LATENT_IGNORE_SECTION = ('rose-gtk-gnome-package-system'
-                                       '-ghost-ignored-section')
-    MENU_ICON_LATENT_IGNORE_SYSTEM = ('rose-gtk-gnome-package-system'
-                                      '-ghost-ignored-trigger')
-    MENU_ICON_LATENT_IGNORE_SYSTEM_SECTION = ('rose-gtk-gnome-package-system'
-                                              '-ghost-ignored'
-                                              '-trigger-section')
+    MENU_ICON_LATENT = 'rose-gtk-gnome-add'
+    MENU_ICON_LATENT_ERRORS = 'rose-gtk-gnome-add-errors'
+    MENU_ICON_LATENT_WARNINGS = 'rose-gtk-gnome-add-warnings'
     MENU_ICON_NORMAL = 'rose-gtk-gnome-package-system-normal'
 
     def __init__(self, variable, var_ops, remove_func, update_func,
@@ -104,11 +84,6 @@ class MenuWidget(gtk.HBox):
         if (isinstance(var_type, basestring)
             and var_type.startswith('file')):
             menu_icon_id = self.MENU_ICON_FILE
-        if (isinstance(var_type, basestring)
-            and var_type == rose.config_editor.FILE_TYPE_TOP):
-            menu_icon_id = 'rose-exp-logo'
-        if len(var_values) == 1:
-            menu_icon_id = self.MENU_ICON_FIXED
         if variable.warning:
             if self.is_ghost:
                 menu_icon_id = self.MENU_ICON_LATENT_WARNINGS
@@ -188,15 +163,6 @@ class MenuWidget(gtk.HBox):
 
     def _set_hover_over(self, variable):
         hover_string = 'Variable options'
-        var_type = variable.metadata.get(rose.META_PROP_TYPE, '')
-        var_values = variable.metadata.get(rose.META_PROP_VALUES, range(2))
-        if len(var_values) == 1:
-            hover_string = rose.config_editor.VAR_MENU_TIP_FIXED
-        if variable.ignored_reason:
-            items = [k + ' ' + v for k, v in variable.ignored_reason.items()]
-            items.sort()
-            items = "\n".join(items)
-            hover_string = items
         if variable.warning:
             hover_string = rose.config_editor.VAR_MENU_TIP_WARNING
             for warn, warn_info in variable.warning.items():
@@ -342,6 +308,7 @@ class MenuWidget(gtk.HBox):
     def _edit_finish_hook(self, text):
         self.var_ops.set_var_comments(self.my_variable, text.splitlines())
         self.update_status()
+
 
 class CheckedMenuWidget(MenuWidget):
 

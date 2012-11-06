@@ -226,7 +226,8 @@ class Client(object):
         self.event_handler(LocalCopyCreateEvent(id))
         return id
 
-    def create(self, info_config, from_id=None, prefix=None):
+    def create(self, info_config, from_id=None, prefix=None,
+               create_meta_suite=False):
         """Create a suite.
 
         info_config should be a rose.config.ConfigNode object,
@@ -235,6 +236,7 @@ class Client(object):
         If from_id is defined, copy items from it.
         If prefix is defined, create the suite in the suite repository named by
         the prefix instead of the default one.
+        If create_meta_suite is True, create the special metadata suite.
         Return the SuiteId of the suite on success.
 
         """
@@ -245,7 +247,10 @@ class Client(object):
             prefix = from_id.prefix
         new_id = None
         while new_id is None:
-            new_id = SuiteId.get_next(prefix)
+            if create_meta_suite:
+                new_id = SuiteId(id_text="ROSIE")
+            else:
+                new_id = SuiteId.get_next(prefix)
             new_origin = new_id.to_origin() + "/" + new_id.BRANCH_TRUNK
             dir = self._get_work_dir()
             rose.config.dump(info_config, os.path.join(dir, "rose-suite.info"))
@@ -261,7 +266,8 @@ class Client(object):
             except RosePopenError as e:
                 try:
                     self.popen("svn", "info", new_origin)
-                    new_id = None
+                    if not create_meta_suite:
+                        new_id = None
                 except RosePopenError:
                     raise e
         if from_id is None:
@@ -384,8 +390,8 @@ def checkout(argv):
 def create(argv):
     """CLI function: create and copy."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("checkout_mode", "info_file", "prefix",
-                              "non_interactive")
+    opt_parser.add_my_options("checkout_mode", "info_file",
+                              "meta_suite", "non_interactive", "prefix")
     opts, args = opt_parser.parse_args(argv)
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
@@ -425,7 +431,7 @@ def create(argv):
         if response != 'y':
             sys.exit(1)
     try:
-        id = client.create(info_config, from_id, opts.prefix)
+        id = client.create(info_config, from_id, opts.prefix, opts.meta_suite)
     except (RosePopenError, SuiteInfoFieldError, SuiteIdOverflowError) as e:
         report(e)
         sys.exit(1)

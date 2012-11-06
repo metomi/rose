@@ -30,11 +30,11 @@ Functions:
 
 import os
 import re
-import rose.config
 import rose.env
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
+from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import string
 import sys
@@ -120,7 +120,7 @@ class SuiteId(object):
     @classmethod
     def get_latest(cls, prefix=None):
         """Return the previous (latest) ID in the suite repository."""
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         if not prefix:
             prefix = cls.get_prefix_default()
         dir_url = cls.get_prefix_location(prefix)
@@ -133,6 +133,7 @@ class SuiteId(object):
                     return None
                 raise SuiteIdLatestError(prefix)
             dirs = filter(lambda line: line.endswith("/"), out.splitlines())
+            # Note - 'R/O/S/I/E' sorts to top for lowercase initial idx letter
             dir_url = dir_url + "/" + sorted(dirs)[-1].rstrip("/")
 
         # FIXME: not sure why a closure for "state" does not work here?
@@ -173,7 +174,7 @@ class SuiteId(object):
     @classmethod
     def get_local_copy_root(cls):
         """Return the root directory for hosting the local suite copies."""
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", "local-copy-root"], no_ignore=True)
         if node:
             local_copy_root = node.value
@@ -196,7 +197,7 @@ class SuiteId(object):
     @classmethod
     def get_output_root(cls):
         """Return the root output directory for suites."""
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", "output-root"], no_ignore=True)
         if node:
             path = node.value
@@ -208,7 +209,7 @@ class SuiteId(object):
     @classmethod
     def get_prefix_default(cls):
         """Return the default prefix."""
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", "prefix-default"], no_ignore=True)
         if node is None:
             raise SuiteIdPrefixError()
@@ -220,7 +221,7 @@ class SuiteId(object):
         if prefix is None:
             prefix = cls.get_prefix_default()
         key = "prefix-location." + prefix
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", key], no_ignore=True)
         if node is None:
             raise SuiteIdPrefixError(prefix)
@@ -232,7 +233,7 @@ class SuiteId(object):
         locations.
         """
         ret = {}
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         rosie_id_node = config.get(["rosie-id"], no_ignore=True)
         if rosie_id_node is None:
             return ret
@@ -249,7 +250,7 @@ class SuiteId(object):
         if prefix is None:
             prefix = cls.get_prefix_default()
         key = "prefix-web." + prefix
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", key], no_ignore=True)
         if node is None:
             raise SuiteIdPrefixError(prefix)
@@ -286,7 +287,7 @@ class SuiteId(object):
             raise SuiteIdTextError(id_text)
         self.prefix, self.idx, self.branch, self.revision = match.groups()
         if not self.prefix:
-            config = rose.config.default_node()
+            config = ResourceLocator.default().get_conf()
             self.prefix = self.get_prefix_default()
             if not self.prefix:
                 raise SuiteIdPrefixError(id_text)

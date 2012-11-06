@@ -181,6 +181,20 @@ def _scan_string(string, delim=','):
         yield item
 
 
+def get_ignored_markup(variable):
+    """Return pango markup for a variable's ignored reason."""
+    markup = ""
+    if IGNORED_BY_SECTION in variable.ignored_reason:
+        markup += '^'
+    if IGNORED_BY_SYSTEM in variable.ignored_reason:
+        markup += rose.config.ConfigNode.STATE_SYST_IGNORED
+    elif IGNORED_BY_USER in variable.ignored_reason:
+        markup += rose.config.ConfigNode.STATE_USER_IGNORED
+    if markup:
+        markup = "<b>" + markup + "</b> "
+    return markup
+
+
 def _is_quote_state_change(string, index, quote_lookup, quote_state):
     letter = string[index]
     next_letter_is_same = False

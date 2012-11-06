@@ -20,11 +20,11 @@
 """Launch suite engine's control GUI from the correct suite host."""
 
 import os
-import rose.config
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Event, Reporter
+from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import sys
 
@@ -67,7 +67,7 @@ class SuiteControlGUILauncher(object):
         """Launch suite engine's control GUI."""
         if not host:
             # Try pinging for a running suite
-            conf = rose.config.default_node()
+            conf = ResourceLocator.default().get_conf()
             node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
             if node is not None:
                 hosts = self.suite_engine_proc.ping(

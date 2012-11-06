@@ -29,18 +29,22 @@
 
 import os
 import re
-import rose.config
+import shlex
 import subprocess
 import sys
-import sqlalchemy as al
 import tempfile
 import time
 
+import sqlalchemy as al
+
+import rose.config
+from rose.resource import ResourceLocator
 
 DATE_FMT = "%Y-%m-%d %H:%M:%S %Z"
 RE_ID_NAMES = [r"[a-z]", r"[a-z]", r"\d", r"\d", r"\d"]
 LEN_ID = len(RE_ID_NAMES)
 INFO_FILE = "rose-suite.info"
+KNOWN_KEYS_FILE = "rosie-keys"
 REC_COPY_INFO = re.compile("^\s+\(from\s([^\s]+)\)$")
 ST_ADDED = "A"
 ST_DELETED = "D"
@@ -49,14 +53,18 @@ ST_MODIFIED = "M"
 
 class DAO(object):
 
+    """Data Access Object for 'put' type operations."""
+
     T_CHANGESET = "changeset"
     T_MAIN = "main"
     T_OPTIONAL = "optional"
     T_MODIFIED = "modified"
+    T_META = "meta"
     
     def __init__(self, db_url):
         name = os.path.basename(repos).replace("roses_", "").replace("_svn", "")
-        url = rose.config.default_node().get(["rosie-db", "db." + name]).value
+        res_loc = ResourceLocator.default()
+        url = res_loc.get_conf().get_value(["rosie-db", "db." + name])
         engine = al.create_engine(db_url)
         self.connection = engine.connect()
         self.metadata = al.MetaData(engine)
@@ -68,6 +76,7 @@ class DAO(object):
         return self.tables[key]
 
     def delete(self, key, **kwargs):
+        """Perform a delete on table key, using kwargs to select rows."""
         table = self._get_table(key)
         where = None
         for col, value in kwargs.items():
@@ -77,12 +86,14 @@ class DAO(object):
                 where &= table.c[col] == value
         statement = table.delete(whereclause=where)
         self.connection.execute(statement)
-        
+
     def insert(self, key, **kwargs):
+        """Insert values kwargs into table key."""
         statement = self._get_table(key).insert().values(**kwargs)
         self.connection.execute(statement)
 
     def update(self, key, where_match_cols, **kwargs):
+        """Update the table 'key' with kwargs, using where_match_cols."""
         table = self._get_table(key)
         where = None
         for col in where_match_cols:
@@ -105,9 +116,12 @@ def svnlook(*args):
 
 
 def check_path_is_idx(path):
+    """Return whether the path contains a full idx."""
     names = path.split("/")
     if len(names) < LEN_ID + 1:
         return False
+    if "".join(names)[:LEN_ID] == "ROSIE":
+        return True
     for name, pattern in zip(names, RE_ID_NAMES):
         if not re.compile(r"\A" + pattern + r"\Z").match(name):
             return False
@@ -116,8 +130,8 @@ def check_path_is_idx(path):
 
 def main(repos, rev):
     db_name = os.path.basename(repos).replace("roses_", "").replace("_svn", "")
-    config = rose.config.default_node()
-    dao = DAO(config.get(["rosie-db", "db." + db_name]).value)
+    conf = ResourceLocator.default().get_conf()
+    dao = DAO(conf.get_value(["rosie-db", "db." + db_name]))
     statuses = {}
     copies = {}
     author = svnlook("author", "-r", rev, repos).strip()
@@ -158,6 +172,16 @@ def main(repos, rev):
                 del_branch = line.strip().rstrip("/")
                 statuses.setdefault((rev, idx, del_branch), {0: " ", 1: " "})
                 statuses[(rev, idx, del_branch)][0] = ST_DELETED
+ 
+        if (idx == "ROSIE" and branch == "trunk" and
+            path == branch_path + "/" + KNOWN_KEYS_FILE):
+            new_keys = parse_known_keys(repos, path, rev)
+            if new_keys is not None:
+                try:
+                    dao.insert(dao.T_META, name="known_keys", value=new_keys)
+                except al.exc.IntegrityError:
+                    dao.update(dao.T_META, ("name",), name="known_keys", value=new_keys)
+
         if path.rstrip("/") == branch_path:
             if status[0] == ST_DELETED:
                 statuses[(rev, idx, branch)][0] = ST_DELETED
@@ -228,6 +252,8 @@ def main(repos, rev):
         else:
             dao.update(dao.T_MAIN, ("idx", "branch"), idx=idx, branch=branch,
                        **items)
+
+    # End loop over changes, update statuses.
     for key, value in statuses.items():
         rev, idx, branch = key
         copy_idx = copies.get(key)
@@ -240,6 +266,12 @@ def main(repos, rev):
             dao.insert(dao.T_CHANGESET, revision=rev, idx=idx,
                        branch=branch, author=author, date=date,
                        status=status, from_idx=copy_idx)
+
+
+def parse_known_keys(repos, file_path, rev):
+    """Parse the file containing whitespace-separated known keys."""
+    key_string = svnlook("cat", "-r", rev, repos, file_path)
+    return " ".join(shlex.split(key_string))
 
 
 if __name__ == "__main__":

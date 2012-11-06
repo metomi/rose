@@ -41,7 +41,7 @@ import rose.external
 import rose.gtk.run
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
-import rose.resource
+from rose.resource import ResourceLocator, ResourceError
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search
@@ -68,14 +68,14 @@ class MainWindow(gtk.Window):
 
         super(MainWindow, self).__init__()
         self.search_manager = rosie.browser.search.SearchManager(opts.prefix)        
-        self.config = rose.config.default_node()
-        locator = rose.resource.ResourceLocator(paths=sys.path)
+        locator = ResourceLocator(paths=sys.path)
+        self.config = locator.get_conf()
         icon_path = locator.locate(rosie.browser.ICON_PATH_WINDOW)
         self.set_icon_from_file(icon_path)
         try:
             self.sched_icon_path = locator.locate(
                                           rosie.browser.ICON_PATH_SCHEDULER)
-        except rose.resource.ResourceError:
+        except ResourceError:
             self.sched_icon_path = None
         self.query_rows = None
         self.adv_controls_on = rosie.browser.SHOULD_SHOW_ADVANCED_CONTROLS
@@ -267,7 +267,11 @@ class MainWindow(gtk.Window):
                                                 self.search_manager, 
                                                 self.format_suite_id)
             for key in result_columns:
-                results[-1].append(result_map.pop(key))
+                try:
+                    value = result_map.pop(key)
+                except KeyError:
+                    value = None
+                results[-1].append(value)
             results[-1].insert(0, local_status)
         self.handle_update_treeview(results)
         self.last_search_historical = self.search_history
@@ -340,7 +344,7 @@ class MainWindow(gtk.Window):
             widget = self.menubar.uimanager.get_widget(
                                   "/TopMenuBar/View/View " + title)
             if widget is not None:
-                widget.set_active(title not in rosie.browser.COLUMNS_HIDDEN)
+                widget.set_active(title in rosie.browser.COLUMNS_SHOWN)
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             widget.connect('activate', action)
@@ -931,9 +935,8 @@ class MainWindow(gtk.Window):
             
     def launch_help(self, *args):
         """Launch a browser to open the help url."""
-        rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
-                                 "Help pages coming soon.",
-                                 "Coming soon")
+        webbrowser.open(rose.resource.ResourceLocator.default().get_doc_url() +
+                        rosie.browser.HELP_FILE)
         return False
     
     def pop_treeview_history(self):
