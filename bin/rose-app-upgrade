@@ -3,15 +3,15 @@
 # (C) Crown copyright Met Office. All rights reserved.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-upgrade
+#     rose-app-upgrade
 #
 # SYNOPSIS
-#     rose upgrade [OPTIONS] [VERSION]
+#     rose app-upgrade [OPTIONS] [VERSION]
 #
 # DESCRIPTION
-#     Upgrade a configuration according to metadata upgrade macros.
+#     Upgrade an application configuration using metadata upgrade macros.
 #
-#     Alternatively, show the available versions for upgrade/downgrade:
+#     Alternatively, show the available upgrade/downgrade versions:
 #         "=" indicates the current version.
 #         "*" indicates the default version to change to.
 #
