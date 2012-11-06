@@ -88,6 +88,12 @@
 #  hostname=/path/to/rose/at/hostname
 [rose-home-at]
 
+# Configuration specific to "rose ana"
+
+## Items to prepend to the search path for user methods
+## method-path=/path/1 /path2
+[rose-ana]
+
 # Configuration specific to the databse of the Rosie web service server
 #
 ## The database location of a given repository prefix

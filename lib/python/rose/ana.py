@@ -17,103 +17,338 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Implementation of 'rose ana', an analysis engine for Rose. 
+"""Implementation of 'rose ana', a comparison engine for Rose. """
 
-Synopsis: 
-
-   rose ana [config files]
-
-Given a series of INI-style config files, this analysis engine performs  each
-task in the file and returns pass or fail for the task (or a warning).
-
-Classes:
-    AnalysisTask - represents each individual task (pair of files to test)
-
-Functions:
-    analyse - given a list of AnalysisTask objects, this performs the analysis
-    load_tasks - load all the tasks from a given set of files
-    write_config - take a set of tasks and output a config file for them
-    write_objects - write objects out to disk using Pickle
-    read_objects - read objects stored using Pickle from disk 
-
-"""
-            
 
 # Standard Python modules
 import glob
+import inspect
 import os
-import pickle
 import re
-import subprocess
 import sys
 
 # Rose modules
 import rose.config
 import rose.env
+from rose.opt_parse import RoseOptionParser
+from rose.popen import RosePopener, RosePopenError
+from rose.reporter import Reporter, Event
 
 WARN = -1
 PASS = 0
 FAIL = 1
 
+OPTIONS = [ 'method_path' ]
+
+USRCOMPARISON_DIRNAME = 'comparisons'
+USRCOMPARISON_EXT = '.py'
 
 
-def analyse(tasks):
-    """Given a list of AnalysisTasks to perform, run them and set the results 
-       appropriately"""
+class DataLengthError(Exception):
 
-    myself = sys.modules[__name__]
-    for task in tasks:  
+    """An exception if KGO and result data are of different lengths"""
 
-        if hasattr(myself,task.extract):
-        # Internal AnalysisEngine extract+comparison test
+    def __init__(self, task):
+        self.resultlen = len(task.resultdata)
+        self.kgolen = len(task.kgo1data)
+        self.taskname = task.name
 
-            # Extract data from results and from kgoX
-            getattr(myself, task.extract)(task, "result")
-            for i in range(1, task.numkgofiles + 1):
-                var = "kgo" + str(i)
-                getattr(myself, task.extract)(task, var)
-
-            # Run the comparison
-            getattr(myself, task.comparison)(task)
+    def __repr__(self):
+        return "Task '%s': Result data has length %s "%( 
+             self.taskname, self.resultlen) + "but KGO data is of length %s"%(
+             self.kgolen)
+               
+    __str__ = __repr__
 
 
+class SystemCommandException(Exception):
+
+    """Exception for failures running system commands."""
+    
+    def __init__(self, command, error):
+        self.error = error
+        self.command = command
+        
+    def __repr__(self):
+        return "Problem running command '%s': %s"%(self.command, self.error)
+      
+    __str__ = __repr__
+
+
+class TaskCompletionEvent(Event):
+
+    """Event for completing a comparison from AnalysisTask."""
+ 
+    def __init__(self, task):
+        self.message = task.message
+        self.userstatus = task.userstatus
+        self.level = Event.DEFAULT
+        self.type = Event.TYPE_OUT
+        
+    def __repr__(self):
+        return "[%s] %s"%(self.userstatus, self.message)
+        
+    __str__ = __repr__
+
+
+class Analyse(object):
+
+    """A comparison engine for Rose."""
+
+    def __init__(self, opts, reporter=None, popen=None):
+        if reporter is None:
+            self.reporter = Reporter(opts.verbosity - opts.quietness)
         else:
-        # External program(s) doing test
+            self.reporter = reporter
+        if popen is None:
+            self.popen = RosePopener(event_handler = self.reporter)
+        else:
+            self.popen = popen
+        self.opts = opts
+        
+        modules = []
+        for path in self.opts.method_path:
+            for filename in glob.glob(path + '/*.py'):
+                modules.append(filename)
+        self.load_user_comparison_modules(modules)
 
-            # Command to run    
-            command         = task.extract
+    def analyse(self):
+        """Perform comparisons given a list of tasks."""
+        rc = 0
+        for task in self.tasks:  
+            if self.check_extract(task):
+            # Internal AnalysisEngine extract+comparison test
 
-            result = re.search(r"\$file", command)
-            # If the command contains $file, it is run separately for both the 
-            # KGO and the result files
-            if result:
-                # Replace $file token with resultfile or kgofile
-                resultcommand = _expand_tokens(command, task, "result")
-                kgocommand = _expand_tokens(command, task, "kgo1")
-                
-                # Run the command on the resultfile
-                task.resultdata = _run_command(resultcommand)
+                # Extract data from results and from kgoX
+                task = self.do_extract(task, "result")
+                for i in range(1, task.numkgofiles + 1):
+                    var = "kgo" + str(i)
+                    task = self.do_extract(task, var)
 
-                # Run the command on the KGO file
-                task.kgo1data = _run_command(kgocommand)
+                task = self.do_comparison(task)
             else:
-            # The command works on both files at the same time
-                # Replace tokens $kgofile and $resultfile for actual values
-                command = _expand_tokens(command, task)
+            # External program(s) doing test
 
-                # Run the command
-                task.resultdata = _run_command(command)
-                
-                
-          # Run the comparison
-            getattr(myself,task.comparison)(task)
+                # Command to run    
+                command         = task.extract
 
-    return tasks
+                result = re.search(r"\$file", command)
+                # If the command contains $file, it is run separately for both
+                # the KGO and the result files
+                if result:
+                    # Replace $file token with resultfile or kgofile
+                    resultcommand = self._expand_tokens(command, task, 
+                                                                  "result")
+                    kgocommand = self._expand_tokens(command, task, "kgo1")
+
+                    # Run the command on the resultfile
+                    task.resultdata = self._run_command(resultcommand)
+
+                    # Run the command on the KGO file
+                    task.kgo1data = self._run_command(kgocommand)
+                else:
+                # The command works on both files at the same time
+                    # Replace tokens $kgofile and $resultfile for actual values
+                    command = self._expand_tokens(command, task)
+
+                    # Run the command
+                    task.resultdata = self._run_command(command)
+
+              # Run the comparison
+                task = self.do_comparison(task)
+                
+            self.reporter(TaskCompletionEvent(task))
+            if task.numericstatus != PASS:
+                rc += 1
+        return rc, self.tasks
+
+    def check_extract(self, task):
+        """Check if an extract name is present in a user method."""
+        for module_name, class_name, method, help in self.user_methods:
+            if task.extract == class_name:
+                return True
+        return False
+
+    def do_comparison(self, task):
+        """Run the comparison."""
+        for module_name, class_name, method, help in self.user_methods:
+            comparison_name = ".".join([module_name, class_name])
+            if task.comparison == class_name:
+                for module in self.modules:
+                    if module.__name__ == module_name:
+                        comparison_inst = getattr(module, class_name)()
+                        comparison_meth = getattr(comparison_inst, 'run')(task)
+        return task    
+
+    def do_extract(self, task, var):
+        """Extract the specified data."""
+        for module_name, class_name, method, help in self.user_methods:
+            extract_name = ".".join([module_name, class_name])
+            if task.extract == class_name:
+                for module in self.modules:
+                    if module.__name__ == module_name:
+                        extract_inst = getattr(module, class_name)()
+                        extract_meth = getattr(extract_inst, 'run')(task, var)
+        return task
+
+    def _run_command(self, command):
+        """Run an external command using rose.popen."""
+        rc, output, stderr = self.popen.run(command, shell=True)
+        if rc != 0:
+            raise SystemCommandException(command, stderr)
+        output = "".join(output).splitlines()      
+        return output
+
+    def _expand_tokens(self, inputstring, task, var="none"):
+        """Expands tokens $resultfile, $file and $kgoXfile."""
+        # Replace result file
+        inputstring    = re.sub(r"\$resultfile", task.resultfile, inputstring)
+
+        # $kgofile should map to $kgo1file for backwards compatibility
+        inputstring    = re.sub(r"\$kgofile", task.kgo1file, inputstring)
+
+        # Do KGO files
+        for i in range(1, task.numkgofiles + 1):
+            var = "kgo" + str(i) + "file"
+            token = "$" + var
+            value = getattr(task, var)
+            inputstring = re.sub(token, value, inputstring)
+
+        result = re.search(r"\$file", inputstring)
+        if result:
+            filevar = var+"file"
+            filename = getattr(task, filevar)
+            inputstring    = re.sub(r"\$file", filename, inputstring)
+        return inputstring  
+
+    def _find_file(self, var, task):
+        """Finds a file given a variable name containing the filename.
+
+        Given a variable name and task object, this returns the filename it
+        points to, including expanding any * characters with glob.
+        """
+
+        filevar = var + "file"
+        if hasattr(task, filevar):
+            configvar = var + "fileconfig"
+            setattr(task, configvar, getattr(task, filevar))
+            filenames = glob.glob(rose.env.env_var_process(getattr(task, 
+                                                                  filevar)))
+            if len(filenames) > 0:
+                setattr(task, filevar, filenames[0])
+        return task
+
+    def load_tasks(self, files):
+        """Loads AnalysisTasks from files.
+
+        Given a list of files, return AnalysisTasks generated from those files.
+        This also expands environment variables in filenames, but saves the
+        original contents for use when writing out config files
+        """
+
+        tasks = []
+        for filename in files:
+            config = rose.config.load(filename)
+            for task in config.value.keys():
+                newtask = AnalysisTask()
+                newtask.name = task
+                if config.get([task, "resultfile"]):
+                    newtask.resultfile = config.get([task, "resultfile"])[:]
+                    newtask = self._find_file("result", newtask)
+                if config.get([task, "extract"]):
+                    newtask.extract = config.get([task, "extract"])[:]
+                if config.get([task,"comparison"]):
+                    newtask.comparison = config.get([task, "comparison"])[:]
+                if config.get([task, "tolerance"]):
+                    newtask.tolerance = config.get([task, "tolerance"])[:]
+                if config.get([task, "warnonfail"]):
+                    value = config.get([task, "warnonfail"])[:]
+                    if value.find("yes") > -1:
+                        newtask.warnonfail = True
+                    elif value.find("true") > -1:
+                        newtask.warnonfail = True
+                    else:
+                        newtask.warnonfail = False
+
+                # Allow for multiple KGO, e.g. kgo1file, kgo2file, for 
+                # statistical comparisons of results
+                for i in range(1, 100):
+                    kgovar = "kgo" + str(i)
+                    kgofilevar = kgovar + "file"
+                    if config.get([task, kgofilevar]):
+                        tempvar = config.get([task, kgofilevar])[:]
+                        setattr(newtask, kgofilevar, tempvar)
+                        newtask.numkgofiles += 1
+                        newtask = self._find_file(kgovar, newtask)
+                    else:
+                        break
+                tasks.append(newtask)
+        self.tasks = tasks        
+        return tasks
+
+    def load_user_comparison_modules(self, files):
+        """Import comparison modules and store them."""
+        modules = []
+        for filename in files:
+            directory = os.path.dirname(filename)
+            if (not directory.endswith(USRCOMPARISON_DIRNAME) or
+                not filename.endswith(USRCOMPARISON_EXT)):
+                continue
+            comparison_name = os.path.basename(filename).rpartition(
+                                                         USRCOMPARISON_EXT)[0]
+            sys.path.append(os.path.abspath(directory))
+            try:
+                modules.append(__import__(comparison_name))
+            except Exception as e:
+                self.reporter(e)
+            sys.path.pop()
+        modules.sort()
+        self.modules = modules
+
+        user_methods = []
+        for module in modules:
+            comparison_name = module.__name__
+            contents = inspect.getmembers(module)
+            for obj_name, obj in contents:
+                if not inspect.isclass:
+                    continue
+                att_name = 'run'
+                if (hasattr(obj, att_name) and 
+                                 callable(getattr(obj,att_name))):
+                    doc_string = obj.__doc__
+                    user_methods.append((comparison_name, obj_name, att_name, 
+                                         doc_string))
+        self.user_methods = user_methods      
+        return user_methods
+
+    def write_config(self, filename, tasks):
+        """Write an analysis config file based on a list of tasks provided"""
+        config = rose.config.ConfigNode()
+
+        for task in tasks:
+            sectionname = task.name
+            if task.resultfileconfig:
+                config.set([sectionname, "resultfile"], task.resultfileconfig)
+            for i in range(1, task.numkgofiles + 1):
+                origvar = "kgo" + str(i) + "fileconfig"
+                valvar  = "kgo" + str(i) + "file"
+                if hasattr(task, origvar):
+                    config.set([sectionname, valvar], getattr(task, origvar) )
+            if task.extract:
+                config.set([sectionname, "extract"], task.extract)
+            if task.comparison:
+                config.set([sectionname, "comparison"], task.comparison)
+            if task.tolerance:
+                config.set([sectionname,"tolerance"], task.tolerance)
+            if task.warnonfail:
+                config.set([sectionname, "warnonfail"], "true")
+        rose.config.dump(config, filename)
 
 
 class AnalysisTask(object):
-    """Class which completely describes an analysis task, including what to 
-    perform, any intermediate data, and the final status"""
+
+    """Class completely describes an analysis task."""
+
     def __init__(self):
 
 # Variables defined in config file  
@@ -127,8 +362,8 @@ class AnalysisTask(object):
         self.numkgofiles = 0        # Number of KGO files for multiple KGO 
                                     # processing
 
-# Variables to save settings before environment variable expansion (for writing
-# back to config file, rerunning, etc)
+# Variables to save settings before environment variable expansion (for 
+# writing back to config file, rerunning, etc)
         self.resultfileconfig = self.resultfile
         self.kgofileconfig = self.kgofile
 
@@ -137,20 +372,20 @@ class AnalysisTask(object):
         self.kgo1data = []          # Data from KGO file
 
 # Variables set by comparison methods
-        self.ok = False             # True if test didn't fail (useful as logical 
-                                    #   on whether to continue or abort)
+        self.ok = False             # True if test didn't fail (useful as 
+                                    # logical on whether to continue or abort)
         self.message = None         # User message
         self.userstatus = "UNTESTED"# User status
         self.numericstatus = WARN   # Numeric status (-1 = warn, 
                                     #                  0 = pass, 
                                     #                  1 = fail)
 
-# Methods for setting pass/fail/warn; all take an object of one of the success/
-# failure/warning classes as an argument, which all have a sensible user message
-# as the string representation of them.
-    def set_failure(self,message):
-        """Sets the status of the task to 'FAIL', unless 'warnonfail' is set 
-        in which case it sets the status to 'WARN'"""
+# Methods for setting pass/fail/warn; all take an object of one of the 
+# success/ failure/warning classes as an argument, which all have a sensible 
+# user message as the string representation of them.
+    def set_failure(self, message):
+        """Sets the status of the task to 'FAIL'."""
+
         if self.warnonfail:
             self.set_warning(message)
         else:
@@ -159,184 +394,30 @@ class AnalysisTask(object):
             self.userstatus = "FAIL"
             self.numericstatus = FAIL
 
-    def set_pass(self,message):
-        """Sets the status of the task to 'PASS'"""
+    def set_pass(self, message):
+        """Sets the status of the task to ' OK '"""
+
         self.ok = True
         self.message = message
-        self.userstatus = "PASS"
+        self.userstatus = " OK "
         self.numericstatus = PASS
 
-    def set_warning(self,message):
+    def set_warning(self, message):
         """Sets the status of the task to 'WARN'"""
+
         self.ok = True
         self.message = message
         self.userstatus = "WARN"    
         self.numericstatus = WARN
 
     def __repr__(self):
-        return "%s: %s"%(self.name,self.userstatus)
+        return "%s: %s"%(self.name, self.userstatus)
 
     __str__ = __repr__
 
 
-
-
-
-
-def um_initial_norms(task,variable):
-    """Return a list of initial norms given the contents of a UM leave file"""
-    filevar  = variable + "file"
-    filename = getattr(task, filevar)
-    numbers = _data_from_regexp(r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
-                               filename)
-    datavar  = variable + "data"
-    setattr(task, datavar, numbers)
-    return task
-
-
-def um_final_norms(task,variable):
-    """Return a list of final norms given the contents of a UM leave file"""
-    filevar  = variable + "file"
-    filename = getattr(task, filevar)
-    numbers = _data_from_regexp(r"Final\s*Absolute\s*Norm\s*:\s*(\S+)", 
-                               filename)
-    datavar  = variable + "data"
-    setattr(task, datavar, numbers)
-    return task
-
-
-def um_wallclock(task,variable):
-    """Return a list containing elapsed CPU time given the contents of a UM 
-    leave file"""
-    filevar  = variable + "file"
-    filename = getattr(task, filevar)
-    numbers = _data_from_regexp(r"Total Elapsed CPU Time:\s*(\S+)", filename)
-    datavar  = variable + "data"
-    setattr(task, datavar, numbers)
-    return task
-
-
-def extract(task,variable):
-    """Return the contents of a file (without newlines)"""
-    filevar  = variable + "file"
-    filename = getattr(task, filevar)
-    numbers = []
-    for line in open(filename):
-        numbers.append(line.rstrip())
-    datavar  = variable + "data"
-    setattr(task, datavar, numbers)
-    return task
-
-    
-def var_covls_theta_mean(task,variable):
-    """Return LS%theta means from VAR"""
-    filevar = variable + "file"
-    filename = getattr(task, filevar)
-    numbers = []
-    foundregion = 0
-    for line in open(Filename):
-        result = re.search(r"Var_CovSummaryPrint.*LS % theta", line)
-        if result:
-            foundregion = 1
-        else:
-            result = re.search(r"Var_CovSummaryPrint.*LS %", line)
-            if result:
-                foundregion = 0
-        if foundregion == 1:
-            result = re.search(r"^\s*\d+\s*(\S+)", line)
-            if result:
-                numbers.append(result.group(1))
-    datavar = variable + "data"
-    setattr(task, datavar, numbers)
-    return task
-
-
-
-
-
-
-def exact(task):
-    """Perform an exact comparison between the result and the KGO data"""
-    failures = 0
-    if len(task.resultdata) != len(task.kgo1data):
-        raise DataLengthError(task)
-    for val1, val2 in zip(task.resultdata, task.kgo1data):
-        if val1 != val2:
-            task.set_failure(ExactComparisonFailure(task))
-            return task
-        task.set_pass(ExactComparisonSuccess(task))
-    return task
-
-
-def within(task):
-    """Check that the results are within a specified tolerance (abs or 
-    percentage) of the KGO"""
-    failures = 0
-    if len(task.resultdata) != len(task.kgo1data):
-        raise DataLengthError(task)
-    for val1, val2 in zip(task.resultdata, task.kgo1data):
-        val1 = float(val1)
-        val2 = float(val2)
-        lwr = 0
-        upr = 0
-        result = re.search(r"%",task.tolerance) # Percentage or absolute 
-                                                # difference?
-        if result:
-            tol = float(re.sub(r"%", r"", task.tolerance))
-            lwr = val2 * (1.0 - 0.01 * tol)
-            upr = val2 * (1.0 + 0.01 * tol)
-        else:
-            lwr = val2 - float(task.tolerance)
-            upr = val2 + float(task.tolerance)
-        if val1 >= upr or val1 <= lwr:
-            task.set_failure(WithinComparisonFailure(task))
-            return task
-        task.set_pass(WithinComparisonSuccess(task))
-    return task
-
-      
-def cumf(task):
-    """Analyse the output from the UM small exec cumf"""
-    summaryfile = ""
-    for line in task.resultdata:
-        result = re.search(r"Summary in:\s*(\S*)", line)
-        if result:
-            task.cumfsummaryfile = result.group(1)
-    if task.cumfsummaryfile:
-        fh = open(task.cumfsummaryfile, "r")
-        task.cumfsummaryoutput = fh.readlines()
-        fh.close()
-        for line in task.cumfsummaryoutput:
-            result = re.search(r"files compare", line)
-            if result:
-                task.set_pass(CumfComparisonSuccess(task))
-        if not task.ok:
-            task.set_failure(CumfComparisonFailure(task))
-    else:
-        task.set_failure(CumfSummaryNotFoundFailure(task))      
-    return task    
-
-def cumf_warnheader(task):
-    """Analyse the output from the UM small exec cumf, but issue only a 
-    warning if only the header has changed"""
-    task = cumf(task)
-    if task.numericstatus == 0:
-        return task
-    for line in task.cumfsummaryoutput:
-        result = re.search(
-                   r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D", line)
-        if result:
-            task.set_warning(CumfComparisonHeaderWarning(task))
-    return task
-
-
-
-
-
-
-def _data_from_regexp(regexp, filename):
-    """Given a regular expression and filename, returns a list of matching text
-    from that file"""
+def data_from_regexp(regexp, filename):
+    """Returns a list of text matching a regexp from a given file."""
     numbers = []
     for line in open(filename):
         result = re.search(regexp, line)
@@ -345,298 +426,54 @@ def _data_from_regexp(regexp, filename):
     return numbers
 
 
-def _run_command(command):
-    """Run an external command using subprocess.Popen (to be replaced with
-    rose.popen in the future)"""
-    output = subprocess.Popen([command], shell=True, stdout=subprocess.PIPE
-                              ).communicate()[0]
-    output = "".join(output).splitlines()      
-    return output
-
-
-def _expand_tokens(inputstring, task, var="none"):
-    """Expands the tokens $resultfile, $file and $kgoXfile for the use in
-    external extract commands"""
-    
-    # Replace result file
-    inputstring    = re.sub(r"\$resultfile", task.resultfile, inputstring)
-
-    # $kgofile should map to $kgo1file for backwards compatibility
-    inputstring    = re.sub(r"\$kgofile", task.kgo1file, inputstring)
-    
-    # Do KGO files
-    for i in range(1, task.numkgofiles + 1):
-        var = "kgo" + str(i) + "file"
-        token = "$" + var
-        value = getattr(task, var)
-        inputstring = re.sub(token, value, inputstring)
-
-    result = re.search(r"\$file", inputstring)
-    if result:
-        filevar = var+"file"
-        filename = getattr(task, filevar)
-        inputstring    = re.sub(r"\$file", filename, inputstring)
-    return inputstring  
-
-
-def _find_file(var, task):
-    """Given a variable name and task object, this returns the filename it
-    points to, including expanding any * characters with glob."""
-    filevar = var + "file"
-    if hasattr(task, filevar):
-        configvar = var + "fileconfig"
-        setattr(task, configvar, getattr(task, filevar))
-        filenames = glob.glob(rose.env.env_var_process(getattr(task, filevar)))
-        if len(filenames) > 0:
-            setattr(task, filevar, filenames[0])
-    return task
-
-
-
-
-def load_tasks(files):
-    """Given a list of files, return AnalysisTasks generated from those files.
-    This also expands environment variables in filenames, but saves the
-    original contents for use when writing out config files
-    """
-    tasks = []
-    for filename in files:
-        config = rose.config.load(filename)
-        for task in config.value.keys():
-            newtask = AnalysisTask()
-            newtask.name = task
-            if config.get([task, "resultfile"]):
-                newtask.resultfile = config.get([task, "resultfile"])[:]
-                newtask = _find_file("result", newtask)
-            if config.get([task, "extract"]):
-                newtask.extract = config.get([task, "extract"])[:]
-            if config.get([task,"comparison"]):
-                newtask.comparison = config.get([task, "comparison"])[:]
-            if config.get([task, "tolerance"]):
-                newtask.tolerance = config.get([task, "tolerance"])[:]
-            if config.get([task, "warnonfail"]):
-                value = config.get([task, "warnonfail"])[:]
-                if value.find("yes") > -1:
-                    newtask.warnonfail = True
-                elif value.find("true") > -1:
-                    newtask.warnonfail = True
-                else:
-                    newtask.warnonfail = False
-                    
-            # Allow for multiple KGO, e.g. kgo1file, kgo2file, for statistical
-            # comparisons of results
-            for i in range(1, 100):
-                kgovar = "kgo" + str(i)
-                kgofilevar = kgovar + "file"
-                if config.get([task, kgofilevar]):
-                    tempvar = config.get([task, kgofilevar])[:]
-                    setattr(newtask, kgofilevar, tempvar)
-                    newtask.numkgofiles += 1
-                    newtask = _find_file(kgovar, newtask)
-                else:
-                    break
-            tasks.append(newtask)
-    return tasks
-
-
-def write_config(filename,tasks):
-    """Write an analysis config file based on a list of tasks provided"""
-    
-    config = rose.config.ConfigNode()
-    
-    for task in tasks:
-        sectionname = task.name
-        if task.resultfileconfig:
-            config.set([sectionname, "resultfile"], task.resultfileconfig)
-        for i in range(1, task.numkgofiles + 1):
-            origvar = "kgo" + str(i) + "fileconfig"
-            valvar  = "kgo" + str(i) + "file"
-            if hasattr(task, origvar):
-                config.set([sectionname, valvar], getattr(task, origvar) )
-        if task.extract:
-            config.set([sectionname, "extract"], task.extract)
-        if task.comparison:
-            config.set([sectionname, "comparison"], task.comparison)
-        if task.tolerance:
-            config.set([sectionname,"tolerance"], task.tolerance)
-        if task.warnonfail:
-            config.set([sectionname, "warnonfail"], "true")
-    rose.config.dump(config, filename)
-
-
-def write_objects(filename, obj, protocol=pickle.HIGHEST_PROTOCOL):
-    """Write a list of objects to disk using Pickle"""
-    outputfile = open(filename, "wb")
-    pickle.dump(obj, outputfile, protocol)
-    outputfile.close  
-
-
-def read_objects(filename):
-    """Read objects previously stored using Pickle from a file"""
-    inputfile = open(filename, "rb")
-    obj = pickle.load(inputfile)
-    inputfile.close
-    return obj
-
-
-
-     
-class ExactComparisonFailure(object):
-    """Class used if results do not match the KGO"""
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.kgofile = task.kgofile
-        self.extract = task.extract
-
-    def __repr__(self):
-        return "Data extracted using %s from files %s and %s are not equal"%(
-                self.extract, self.resultfile, self.kgofile)
-    __str__ = __repr__
-
-
-class ExactComparisonSuccess(object):
-    """Class used if results match the KGO"""
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.kgofile = task.kgofile
-        self.extract = task.extract
-
-    def __repr__(self):
-        return "Data extracted using %s from files %s and %s"%(
-               self.extract,self.resultfile,self.kgofile) + " are exactly equal"
-    __str__ = __repr__
-
-
-class WithinComparisonFailure(object):
-    """Class used if results are not within a certain amount of the KGO"""
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.kgofile = task.kgofile
-        self.extract = task.extract
-        self.tolerance = task.tolerance
-
-    def __repr__(self):
-        return "Data extracted using %s from files %s"%(
-               self.extract, self.resultfile) + " are not within %s "%(
-               self.tolerance) + " of that extracted from %s"%(
-               self.kgofile)
-    __str__ = __repr__
-
-
-class WithinComparisonSuccess(object):
-    """Class used if results are within a certain amount of the KGO"""
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.kgofile = task.kgofile
-        self.extract = task.extract
-        self.tolerance = task.tolerance
-
-    def __repr__(self):
-        return "Data extracted using %s from files %s"%(
-               self.extract, self.resultfile) +  " are within %s"%(
-               self.tolerance) + " of that extracted from %s"%(
-               self.kgofile)
-    __str__ = __repr__
-
-
-class CumfComparisonFailure(object):
-    """Class used if a cumf comparison fails"""
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.kgofile = task.kgofile
-        self.extract = task.extract
-
-    def __repr__(self):
-        return "Comparison of %s and %s shows files do not match"%(
-               self.resultfile, self.kgofile)
-    __str__ = __repr__
-
-
-class CumfComparisonSuccess(object):
-    """Class used if a cumf comparison succeeds"""
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.kgofile = task.kgofile
-        self.extract = task.extract
-
-    def __repr__(self):
-        return "Comparison of %s and %s shows files match"%(
-               self.resultfile, self.kgofile)
-    __str__ = __repr__
-
-
-class CumfComparisonHeaderWarning(object):
-    """Class used if cumf reports just the header of a file is different"""
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.kgofile = task.kgofile
-        self.extract = task.extract
-
-    def __repr__(self):
-        return "Comparison of %s and %s shows files do not match,"%(
-               self.resultfile, self.kgofile) + " however the data fields \
-               are identical"
-    __str__ = __repr__
-
-
-class CumfSummaryNotFoundFailure(object):
-    """Class used if there's a problem finding a cumf summary file"""
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.kgofile = task.kgofile
-        self.extract = task.extract
-        self.resultdata = task.resultdata
-
-    def __repr__(self):
-        return "Cannot ascertain cumf summary file from:\n%s"%( 
-               self.resultdata)
-    __str__ = __repr__
-
-
-class DataLengthError(Exception):
-    """An exception if the amount of data in the results doesn't match the 
-    length of data in the KGO"""
-    def __init__(self, task):
-        self.resultlen = len(task.resultdata)
-        self.kgolen = len(task.kgo1data)
-        self.taskname = task.name
-
-    def __repr__(self):
-        return "Task '%s': Result data has length %s "%( 
-               self.taskname, self.resultlen) + "but KGO data is of length %s"%(
-               self.kgolen)
-    __str__ = __repr__
-
-
-
-
 def main():
     """Implement the "rose ana" command"""
+
+    # Get config file option for user-specified method paths
+    method_paths = [ os.path.join(os.getenv('ROSE_HOME'), 'lib', 'python',
+                          'rose', USRCOMPARISON_DIRNAME) ]
+    conf = rose.config.default_node()
+    my_conf = conf.get(["rose-ana"], no_ignore=True)
+    for key, node in sorted(my_conf.value.items()):
+        if node.is_ignored() or key != "method-path":
+            continue
+        for item in node.value.split():
+            method_paths.append(item)
+
+    # Process options
+    opt_parser = RoseOptionParser()
+    option_keys = OPTIONS
+    opt_parser.add_my_options(*option_keys)
+    opts, args = opt_parser.parse_args()
+    if opts.method_path:
+        opts.method_path += method_paths
+    else:
+        opts.method_path = method_paths
+
     # Get filenames of .test files from command line
     # Maybe replace with proper options?
-    files = sys.argv[1:]
+    files = args
+
+    # Initialise the analysis engine
+    engine = Analyse(opts)
 
     # Load analysis tasks from files
-    tasks = load_tasks(files)
-
+    engine.load_tasks(files)
+    
+    rc = 0
     # Run the analysis
-    tasks = analyse(tasks)
-
-    exit = 0
-
-    # Print the results for the time being (until proper output is written)
-    for task in tasks:
-        print task
-        if task.numericstatus is not 0:
-            exit += 1
-
-    # If user has write permission to current directory, output results to disk
-    # to assist in debugging
-    if os.access(".",os.W_OK):
-        write_config("doneconfig.test",tasks)
-        write_objects("test.pkl",tasks)
-
-    sys.exit(exit)
+    
+    if opts.debug_mode:
+        rc, tasks = engine.analyse()
+    else:
+        try:
+            rc, tasks = engine.analyse()
+        except Exception as e:
+            engine.reporter(e)
+            if rc == 0:
+                rc = 1
+            
+    sys.exit(rc)
 
 if __name__ == "__main__":
     main()

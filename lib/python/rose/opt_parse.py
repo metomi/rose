@@ -186,6 +186,10 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "metavar": "PATH",
                         "help": "Prepend items to the metadata search path."}],
+               "method_path" : [
+                       ["--method-path", "-M"],
+                       {"action": "append",
+                        "help": "Preprend items to the method search path."}],
                "name": [
                        ["--name", "-n"],
                        {"action": "store",
