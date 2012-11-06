@@ -30,6 +30,7 @@ import itertools
 import os
 import re
 from rose.opt_parse import RoseOptionParser
+from rose.resource import ResourceLocator
 import shutil
 import sre_constants
 import sys
@@ -1979,12 +1980,10 @@ def get_number_of_configs(config_directory_path=None):
 
 def load_site_config_path():
     """Load any metadata path specified in a user or site configuration."""
-    opt_node = rose.config_editor.override_config.get(
-                           [rose.CONFIG_SECT_TOP,
-                            rose.CONFIG_OPT_META_PATH],
-                           no_ignore=True)
-    if opt_node is not None:
-        sys.path.insert(0, opt_node.value)
+    conf = ResourceLocator.default().get_conf()
+    path = conf.get_value([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_PATH])
+    if path is not None:
+        sys.path.insert(0, path)
 
 
 if __name__ == '__main__':

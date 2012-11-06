@@ -26,7 +26,7 @@ This module contains constants that are only used in the config editor.
 import ast
 import os
 
-import rose.config
+from rose.resource import ResourceLocator
 
 # Accelerators
 
@@ -217,18 +217,18 @@ SIZE_HISTORY = 100
 
 def load_override_config():
     """Load any overrides of the above settings."""
-    config = rose.config.default_node()
-    node = config.get(["rosie-browse"], no_ignore=True)
+    conf = ResourceLocator.default().get_conf()
+    node = conf.get(["rosie-browse"], no_ignore=True)
     if node is None:
         return
-    for option, opt_node in node.value.items():
-        if opt_node.is_ignored():
+    for key, node in node.value.items():
+        if node.is_ignored():
             continue
         try:
-            cast_value = ast.literal_eval(opt_node.value)
+            cast_value = ast.literal_eval(node.value)
         except Exception:
-            cast_value = opt_node.value
-        globals()[option.replace("-", "_").upper()] = cast_value
+            cast_value = node.value
+        globals()[key.replace("-", "_").upper()] = cast_value
 
 
 load_override_config()

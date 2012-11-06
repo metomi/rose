@@ -33,8 +33,8 @@ import jinja2
 import os
 import simplejson
 import sys
-import rose.config
 from rose.env import env_var_process
+from rose.resource import ResourceLocator
 import rosie.db
 from rosie.suite_id import SuiteId
 
@@ -68,7 +68,7 @@ class PrefixRoot(object):
         self.template_env = template_env
         self.prefix = prefix
         source_option = "prefix-web." + self.prefix
-        source_url_node = rose.config.default_node().get(
+        source_url_node = ResourceLocator.default().get_conf().get(
                                           ["rosie-id", source_option])
         self.source_url = ""
         if source_url_node is not None:
@@ -191,7 +191,7 @@ def start(is_main=False):
             os.environ[k] = v
 
     # CherryPy quick server configuration
-    rose_conf = rose.config.default_node()
+    rose_conf = ResourceLocator.default().get_conf()
     if is_main and rose_conf.get(["rosie-ws", "log-dir"]) is not None:
         node = rose_conf.get(["rosie-ws", "log-dir"])
         log_dir = env_var_process(os.path.expanduser(node.value))

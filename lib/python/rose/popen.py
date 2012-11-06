@@ -21,8 +21,8 @@
 
 import os
 import re
-import rose.config
 from rose.reporter import Event
+from rose.resource import ResourceLocator
 import shlex
 from subprocess import Popen, PIPE
 import sys
@@ -128,7 +128,7 @@ class RosePopener(object):
 
         """
         if not self.cmds.has_key(key):
-            root_node = rose.config.default_node()
+            root_node = ResourceLocator.default().get_conf()
             node = root_node.get(["external", key], no_ignore=True)
             if node is not None:
                 self.cmds[key] = shlex.split(node.value)

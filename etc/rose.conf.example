@@ -20,6 +20,10 @@
 # To activate this file, place it at $ROSE_HOME/etc/rose.conf
 #-------------------------------------------------------------------------------
 
+# Common site configuration.
+## URL to Rose documentation.
+#  rose-doc=http://host/rose/doc/
+
 # Configuration of external commands.
 #
 ## Launch text editor (default=vi).
