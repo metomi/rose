@@ -22,6 +22,7 @@ Convenient functions for searching resource files.
 """
 
 import os
+import rose.config
 import string
 import sys
 
@@ -54,6 +55,24 @@ class ResourceLocator(object):
             h = self.get_util_home()
             n = self.get_util_name("-")
             self.paths = [os.path.join(h, "etc", n), os.path.join(h, "etc")]
+        self.conf = None
+
+    def get_conf(self):
+        """Return the site/user configuration root node."""
+        if self.conf is None:
+            site_file = os.path.join(self.get_util_home(), "etc", "rose.conf")
+            user_file = os.path.join(
+                    os.path.expanduser("~"), ".metomi", "rose.conf")
+            self.conf = rose.config.ConfigNode()
+            for file in [site_file, user_file]:
+                if os.path.isfile(file) and os.access(file, os.R_OK):
+                    rose.config.load(file, self.conf)
+        return self.conf
+
+    def get_doc_url(self):
+        """Return the URL of Rose documentation."""
+        default = "file://%s/doc/" % self.get_util_home()
+        return self.get_conf().get_value(["rose-doc"], default=default)
 
     def get_synopsis(self):
         """Return the 1st line of SYNOPSIS in ROSE_HOME_BIN/ROSE_UTIL."""
