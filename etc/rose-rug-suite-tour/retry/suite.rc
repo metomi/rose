@@ -25,7 +25,7 @@
 
         # The task will be allowed to fail and resubmit three times.
         # The delay between the failure and the resubmission will be
-        # 0.1s each time.
+        # 0.1 minutes each time.
 
         retry delays = 0.1, 0.1, 0.1
 
