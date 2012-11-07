@@ -8,20 +8,27 @@
         cold-start = fcm_make
     [[dependencies]]
 
-        # At 00:00, 06:00, 12:00, 18:00:
         [[[ 0, 6, 12, 18 ]]]
+            # At 00:00, 06:00, 12:00, 18:00:
+            #
+            # my_hello_world is run after fcm_make or after the last cycle's
+            # my_hello_world
+            #
+            # locate_fred is run after fcm_make or after the last cycle's
+            # locate_fred
+            #
+            # fred_hello_world is run after locate_fred
             graph = """
-# my_hello_world is run after fcm_make or after the last cycle's my_hello_world
                 fcm_make | my_hello_world[T-6] => my_hello_world
-# locate_fred is run after fcm_make or after the last cycle's locate_fred
-# fred_hello_world is run after locate_fred
                 fcm_make | locate_fred[T-6] => locate_fred => fred_hello_world
             """
 
-        # At 00:00, 12:00:
         [[[ 0, 12 ]]]
+            # At 00:00, 12:00:
+            #
+            # my_hello_mars is run after fcm_make or after the last cycle's
+            # my_hello_mars
             graph = """
-# my_hello_mars is run after fcm_make or after the last cycle's my_hello_mars
                 fcm_make | my_hello_mars[T-12] => my_hello_mars
             """
 
