@@ -401,7 +401,8 @@ class MenuBar(object):
             self.ui_config_string = self.ui_config_string.replace(
                                             view, repl, 1)
             self.toggle_action_details.append(
-                                ("View _{0}_".format(key), None, "View " + key))
+                                ("View _{0}_".format(key), None, 
+                                 "View " + key.replace("_","__")))
     
     def set_accelerators(self, accel_dict):
         """Add the keyboard accelerators."""

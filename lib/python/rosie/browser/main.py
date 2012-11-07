@@ -291,7 +291,6 @@ class MainWindow(gtk.Window):
 
     def display_toggle(self, title):
         """Alter the display settings."""
-        print "Should be toggling %s"%title
         filters = self.advanced_search_widget.display_filters[title]
         self.advanced_search_widget.display_filters[title] = not filters
         self.handle_update_treeview()
@@ -330,18 +329,11 @@ class MainWindow(gtk.Window):
         for key in self.menubar.known_keys:
             address = "/TopMenuBar/View/View _{0}_".format(key)
             widget = self.menubar.uimanager.get_widget(address)
-            widget.column = key
-            widget.set_active(key in rosie.browser.COLUMNS_SHOWN)
-            widget.connect("toggled", self._handle_display_change)
-        
-        """    
-        for title in self.advanced_search_widget.display_columns:
-            widget = self.menubar.uimanager.get_widget(
-                                  "/TopMenuBar/View/View " + title)
             if widget is not None:
-                widget.set_active(title in rosie.browser.COLUMNS_SHOWN)
-        """
-                
+                widget.column = key
+                widget.set_active(key in rosie.browser.COLUMNS_SHOWN)
+                widget.connect("toggled", self._handle_display_change)
+        
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             widget.connect('activate', action)
