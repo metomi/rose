@@ -936,9 +936,8 @@ class MainWindow(gtk.Window):
             
     def launch_help(self, *args):
         """Launch a browser to open the help url."""
-        rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
-                                 "Help pages coming soon.",
-                                 "Coming soon")
+        webbrowser.open(rose.resource.ResourceLocator.default().get_doc_url() +
+                        rosie.browser.HELP_FILE)
         return False
     
     def pop_treeview_history(self):

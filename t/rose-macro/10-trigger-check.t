@@ -72,7 +72,6 @@ trigger = namelist:near_cyclic_namelist=f
 duplicate = true
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
-cp $TEST_KEY.err /var/tmp/bfitz/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

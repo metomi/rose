@@ -520,10 +520,9 @@ class ConfigDataManager(object):
                 return config_meta_dir
         value = self.get_config_meta_flag(config)
         if value is None:
-            meta_path = 'all'
+            meta_path = 'etc/metadata/all'
         else:
             meta_path = value
-        meta_path = 'etc/metadata/' + meta_path
         try:
             meta_path = self.locator.locate(meta_path)
         except rose.resource.ResourceError:
