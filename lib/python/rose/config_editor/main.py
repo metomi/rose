@@ -202,7 +202,6 @@ class MainController(object):
         self.perform_startup_check()
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
-            
 
 #------------------ Setting up main component functions ----------------------
 
