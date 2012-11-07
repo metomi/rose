@@ -291,6 +291,7 @@ class MainWindow(gtk.Window):
 
     def display_toggle(self, title):
         """Alter the display settings."""
+        print "Should be toggling %s"%title
         filters = self.advanced_search_widget.display_filters[title]
         self.advanced_search_widget.display_filters[title] = not filters
         self.handle_update_treeview()
@@ -301,27 +302,12 @@ class MainWindow(gtk.Window):
 
     def generate_menu(self):
         """Generate the top menu."""
-        self.menubar = rosie.browser.util.MenuBar()
+        self.menubar = rosie.browser.util.MenuBar(
+                                self.advanced_search_widget.display_columns)
         menu_list = [('/TopMenuBar/File/New Suite',
                       lambda m: self.handle_create()),
                      ('/TopMenuBar/File/Quit', self.handle_destroy),
                      ('/TopMenuBar/Edit/Preferences', lambda m: False),
-                     ('/TopMenuBar/View/View local',
-                      lambda m: self.display_toggle("local")),
-                     ('/TopMenuBar/View/View branch',
-                      lambda m: self.display_toggle("branch")),
-                     ('/TopMenuBar/View/View revision',
-                      lambda m: self.display_toggle("revision")),
-                     ('/TopMenuBar/View/View owner',
-                      lambda m: self.display_toggle("owner")),
-                     ('/TopMenuBar/View/View project',
-                      lambda m: self.display_toggle("project")),
-                     ('/TopMenuBar/View/View title',
-                      lambda m: self.display_toggle("title")),
-                     ('/TopMenuBar/View/View status',
-                      lambda m: self.display_toggle("status")),
-                     ('/TopMenuBar/View/View from idx',
-                      lambda m: self.display_toggle("from_idx")),
                      ('/TopMenuBar/View/View advanced controls',
                       self.toggle_advanced_controls),
                      ('/TopMenuBar/View/Include history',
@@ -340,11 +326,22 @@ class MainWindow(gtk.Window):
             widget.set_active(prefix == self.search_manager.get_datasource())
             widget.prefix_text = prefix
             widget.connect("toggled", self._handle_prefix_change)
+
+        for key in self.menubar.known_keys:
+            address = "/TopMenuBar/View/View _{0}_".format(key)
+            widget = self.menubar.uimanager.get_widget(address)
+            widget.column = key
+            widget.set_active(key in rosie.browser.COLUMNS_SHOWN)
+            widget.connect("toggled", self._handle_display_change)
+        
+        """    
         for title in self.advanced_search_widget.display_columns:
             widget = self.menubar.uimanager.get_widget(
                                   "/TopMenuBar/View/View " + title)
             if widget is not None:
                 widget.set_active(title in rosie.browser.COLUMNS_SHOWN)
+        """
+                
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             widget.connect('activate', action)
@@ -652,7 +649,11 @@ class MainWindow(gtk.Window):
         """Handles trying to run next search."""
         if self.nav_bar.next_search_button.get_property('sensitive'):
             self.handle_search_navigation(next=True)
-            
+    
+    def _handle_display_change(self, menuitem):
+        """Handles changing view options."""
+        self.display_toggle(menuitem.column)
+    
     def _handle_prefix_change(self, menuitem):
         """Handles changing the datasource."""
         if menuitem.get_active():

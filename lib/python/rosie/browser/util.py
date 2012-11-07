@@ -317,14 +317,6 @@ class MenuBar(object):
         <menuitem action="Preferences"/>
       </menu>
       <menu action="View">
-        <menuitem action="View local"/>
-        <menuitem action="View branch"/>
-        <menuitem action="View owner"/>
-        <menuitem action="View project"/>
-        <menuitem action="View title"/>
-        <menuitem action="View revision"/>
-        <menuitem action="View status"/>
-        <menuitem action="View from idx"/>
         <separator name="view-adv-control-sep"/>
         <menuitem action="View advanced controls"/>
         <separator name="view-hist-sep"/>
@@ -366,26 +358,7 @@ class MenuBar(object):
 
     radio_action_details = []
 
-    toggle_action_details = [('View local', None, 
-                              rosie.browser.TOGGLE_ACTION_VIEW_LOCAL),
-                             ('View branch', None, 
-                              rosie.browser.TOGGLE_ACTION_VIEW_BRANCH),
-                             ('View owner', None, 
-                              rosie.browser.TOGGLE_ACTION_VIEW_OWNER),
-                             ('View project', None, 
-                              rosie.browser.TOGGLE_ACTION_VIEW_PROJECT),
-                             ('View title', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_TITLE),
-                             ('View revision', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_REVISION),
-                             ('View author', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_AUTHOR),
-                             ('View date', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_DATE),
-                             ('View status', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_STATUS),
-                             ('View from idx', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_FROM_IDX),
+    toggle_action_details = [
                              ('View advanced controls', None,
                               'View advanced _controls'),
                              ('Include history', None,
@@ -394,10 +367,12 @@ class MenuBar(object):
                               rosie.browser.TOGGLE_ACTION_VIEW_SEARCH_HISTORY, 
                               rosie.browser.ACCEL_HISTORY_SHOW)]
 
-    def __init__(self):
+    def __init__(self, known_keys):
+        self.known_keys = known_keys
         self.uimanager = gtk.UIManager()
         self.actiongroup = gtk.ActionGroup('MenuBar')
         self.add_prefix_choices()
+        self.add_key_choices()
         self.actiongroup.add_actions(self.action_details)
         self.actiongroup.add_radio_actions(self.radio_action_details)
         self.actiongroup.add_toggle_actions(self.toggle_action_details)
@@ -416,7 +391,18 @@ class MenuBar(object):
                                             search, repl, 1)
             self.radio_action_details.append(
                               ("_{0}_".format(prefix), None, prefix))
-
+                              
+    def add_key_choices(self):
+        """Add the key choices."""
+        
+        for key in list(reversed(self.known_keys)):
+            view = '<menu action="View">'
+            repl = view + '<menuitem action="View _{0}_"/>'.format(key)
+            self.ui_config_string = self.ui_config_string.replace(
+                                            view, repl, 1)
+            self.toggle_action_details.append(
+                                ("View _{0}_".format(key), None, "View " + key))
+    
     def set_accelerators(self, accel_dict):
         """Add the keyboard accelerators."""
         self.accelerators = gtk.AccelGroup()
