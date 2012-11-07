@@ -182,15 +182,20 @@ class Runner(object):
                 source = os.path.join(conf_dir, "opt", source_base)
                 rose.config.load(source, config)
 
-        # Optional defines
+        # Optional defines/suite defines
         # N.B. In theory, we should write the values in "opts.defines" to
         # "config" directly. However, the values in "opts.defines" may contain
         # "ignore" flags. Rather than replicating the logic for parsing ignore
         # flags in here, it is actually easier to write the values in
         # "opts.defines" to a file and pass it to the loader to parse it.
-        if opts.defines:
+        # We do the same with opts.defines_suite.
+        if opts.defines or getattr(opts, "defines_suite", []):
             source = TemporaryFile()
-            for define in opts.defines:
+            defines = opts.defines
+            suite_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
+            for define in getattr(opts, "defines_suite", []):
+                defines.append("[" + suite_section + "]" + define)
+            for define in defines:
                 section, key, value = self.REC_OPT_DEFINE.match(define).groups()
                 if section is None:
                     section = ""
@@ -363,9 +368,9 @@ class SuiteRunner(Runner):
     NAME = "suite"
     NUM_LOG_MAX = 5
     NUM_PING_TRY_MAX = 3
-    OPTIONS = ["conf_dir", "defines", "force_mode", "gcontrol_mode", "host",
-               "install_only_mode", "name", "new_mode",
-               "no_overwrite_mode", "opt_conf_keys", "remote"]
+    OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
+               "gcontrol_mode", "host", "install_only_mode", "name",
+               "new_mode", "no_overwrite_mode", "opt_conf_keys", "remote"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
