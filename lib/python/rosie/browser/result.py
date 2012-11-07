@@ -180,12 +180,23 @@ class DisplayBox(gtk.VBox):
         else:
             self.group_index = self.get_tree_columns().index(menuitem.col_name)
 
+    def _set_date_cell(self, column, cell, model, r_iter):
+        """Set the date to human readable format"""
+        index = self.treeview.get_columns().index(column)
+        epoch = model.get_value(r_iter, index)
+        path = model.get_path(r_iter)
+        if epoch is not None:
+            date = datetime.datetime.fromtimestamp(float(epoch))
+        else:
+            date = None
+        cell.set_property('text', date)
+
     def _set_local_cell(self, column, cell, model, r_iter):
         """Set the icon for local status."""
         index = self.treeview.get_columns().index(column)
         status = model.get_value(r_iter, index)
         path = model.get_path(r_iter)
-        cell.set_property("stock-id", STATUS_ICON[status])   
+        cell.set_property("stock-id", STATUS_ICON[status])
 
     def _update_local_status_row(self, model, path, r_iter, data):
         """Update the status for a row of the treeview"""
@@ -341,6 +352,8 @@ class DisplayBox(gtk.VBox):
             col.set_sort_column_id(i)
             if title == "local":
                 col.set_cell_data_func(cell, self._set_local_cell)
+            elif title == "date":
+                col.set_cell_data_func(cell, self._set_date_cell)
             else:
                 col.add_attribute(cell, attribute='text', column=i)
                 if i == 0 and group_index is not None:
