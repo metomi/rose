@@ -385,7 +385,7 @@ def get_local_status(suites, prefix, idx, branch, revision):
 
 def align(res, keys):
     """Function to align results to be displayed by display map"""
-    if len(res) == 1:
+    if len(res) <= 1:
         return res
     for k in keys:
         if k != "date":
