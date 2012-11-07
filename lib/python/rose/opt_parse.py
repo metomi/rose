@@ -90,15 +90,16 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "TIME",
                         "help": "Specify current cycle time."}],
-               "cycle_interval": [
-                       ["--cycle-interval", "-I"],
-                       {"action": "store",
+               "cycle_offsets": [
+                       ["--cycle-offset", "-T"],
+                       {"action": "append",
+                        "dest": "cycle_offsets",
                         "metavar": "TIME-DELTA",
-                        "help": "Specify cycle interval."}],
+                        "help": "Specify cycle offsets."}],
                "default": [
                        ["--default"],
                        {"metavar": "VALUE",
-                        "help": "specify a default value"}],
+                        "help": "Specify a default value"}],
                "debug_mode": [
                        ["--debug"],
                        {"action": "store_true",
@@ -125,7 +126,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "dest": "files",
                         "metavar": "FILE",
-                        "help": "specify the configuration file(s)."}],
+                        "help": "Specify the configuration file(s)."}],
                "force_mode": [
                        ["--force", "-f"],
                        {"action": "store_true",
@@ -181,17 +182,16 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Send notification emails."}],
-               "meta_suite": [
-                       ["--meta-suite"],
-                       {"action": "store_true",
-                        "default": False,
-                        "help": "ADMIN-ONLY: Create a special metadata "
-                                "suite."}],
                "meta_path": [
                        ["--meta-path", "-M"],
                        {"action": "append",
                         "metavar": "PATH",
                         "help": "Prepend items to the metadata search path."}],
+               "meta_suite": [
+                       ["--meta-suite"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "ADMIN-ONLY: Create the metadata suite."}],
                "name": [
                        ["--name", "-n"],
                        {"action": "store",
@@ -318,19 +318,19 @@ class RoseOptionParser(OptionParser):
                "to_local_copy": [
                        ["--to-local-copy"],
                        {"action": "store_true",
-                        "help": "convert ID to to the local copy path"}],
+                        "help": "Convert ID to to the local copy path"}],
                "to_origin": [
                        ["--to-origin"],
                        {"action": "store_true", 
-                        "help": "convert ID to the origin URL"}],
+                        "help": "Convert ID to the origin URL"}],
                "to_output": [
                        ["--to-output"],
                        {"action": "store_true", 
-                        "help": "get the ID output directory"}],
+                        "help": "Get the ID output directory"}],
                "to_web": [
                        ["--to-web"],
                        {"action": "store_true", 
-                        "help": "convert ID to the web source URL"}],
+                        "help": "Convert ID to the web source URL"}],
                "upper": [
                        ["--upper", "-u"],
                        {"action": "store_const",
