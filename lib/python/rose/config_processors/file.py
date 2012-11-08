@@ -67,28 +67,34 @@ class ChecksumEvent(Event):
 class Loc(object):
     """Represent a location."""
 
+    TYPE_TREE = "tree"
+    TYPE_BLOB = "blob"
+
     def __init__(self, name, scheme=None, dep_locs=None):
         self.name = name
-        self.value = name
+        self.real_name = None
         self.scheme = scheme
         self.dep_locs = dep_locs
         self.mode = None
+        self.loc_type = None
         self.paths = None
         self.cache = None
         self.is_out_of_date = None # boolean
-        self.is_modified = None # boolean
 
     def __str__(self):
-        return self.name
+        if self.real_name and self.real_name != self.name:
+            return "%s (%s)" % (self.real_name, self.name)
+        else:
+            return self.name
 
     def update(self, other):
         self.name = other.name
-        self.name_orig = other.name_orig
+        self.real_name = other.real_name
         self.scheme = other.scheme
+        self.mode = other.mode
         self.paths = other.paths
         self.cache = other.cache
         self.is_out_of_date = other.is_out_of_date
-        self.is_modified = other.is_modified
 
 
 class LocPath(object):
@@ -132,6 +138,9 @@ class LocTask(object):
         self.state = other.state
         self.loc.update(other.loc)
 
+class LocTypeError(Exception):
+    def __str__(self):
+        return "%s <= %s, expected %s, got %s" % self.args
 
 class TaskManager(object):
     """Manage a set of LocTask objects and their states."""
@@ -351,8 +360,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Its invariant name.
         # * Whether it can be considered unchanged.
         for source in sources.values():
-            # TODO: self.source_parse
-            self.source_parse(config, source)
+            self._source_parse(config, source)
 
         # Inspect each target to see if it is out of date:
         # * Target does not already exist.
@@ -361,7 +369,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Target exists, but a source cannot be considered unchanged.
         for target in targets.values():
             if os.path.islink(target.name):
-                target.value = os.readlink(target.name)
+                target.real_name = os.readlink(target.name)
             elif os.path.isfile(target.name):
                 m = md5()
                 f = open(target.name)
@@ -384,17 +392,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         m.update(f.read())
                         target.paths.append(LocPath(file_path, m.hexdigest()))
                 target.paths.sort()
-            # TODO: LocDAO.select
             prev_target = self.loc_dao.select(target.name)
             target.is_out_of_date = (
                     not os.path.exists(target.name) or
                     prev_target is None or
                     prev_target.mode != target.mode or
-                    prev_target.value != target.value or
+                    prev_target.real_name != target.real_name or
                     prev_target.paths != target.paths or
                     any([s.is_out_of_date for s in target.dep_locs]))
             if target.is_out_of_date:
-                # TODO: LocDAO.delete
                 self.loc_dao.delete(target)
 
         # Set up tasks for rebuilding all out-of-date targets.
@@ -422,21 +428,44 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     def process_task(self, config, task):
         """Process a task, helper for process."""
         if task.task_key == self.T_INSTALL:
-            self._install_target(config, task.loc)
+            self._target_install(config, task.loc)
         elif task.task_key == self.T_PULL:
-            self._pull_source(config, task.loc)
+            self._source_pull(config, task.loc)
         task.state = task.ST_DONE
 
     def post_process_task(self, config, task):
-        # TODO: LocDAO.update
         self.loc_dao.update(task.loc)
 
-    def install_target(self, config, task):
-        for source in task.loc.dep_locs:
-            pass # TODO
-
-    def _pull_source(self, config, task):
+    def _source_parse(self, config, task):
         pass # TODO
+
+    def _source_pull(self, config, task):
+        pass # TODO
+
+    def _target_install(self, config, task):
+        f = None
+        is_first = True
+        for source in task.loc.dep_locs:
+            if target.loc_type is None:
+                target.loc_type = source.loc_type
+            elif target.loc_type != source.loc_type
+                raise LocTypeError(target.name, source.name, target.loc_type,
+                                   source.loc_type)
+            if target.loc_type == target.TYPE_BLOB:
+                if f is None:
+                    f = open(target.name, "wb")
+                f.write(open(source.cache).read())
+            else: # target.loc_type == target.TYPE_TREE
+                args = []
+                if is_first:
+                    self.manager.fs_util.makedirs(target.name)
+                    args.append("--delete-excluded")
+                args.extend(["--checksum", source.cache, target.name])
+                cmd = self.manager.popen.get_cmd("rsync", *args)
+                out, err = self.manager.popen(*cmd)
+            is_first = False
+        if f is not None:
+            f.close()
 
     def process_target(self, config, key, node):
         """Install a target according to a file:target section."""
@@ -554,30 +583,45 @@ class LocDAO(object):
 
     DB_FILE_NAME = ".rose-config_processors-file.db"
 
+    def __int__(self):
+        self.conn = None
+
+    def get_conn(self):
+        if self.conn is None:
+            self.conn = sqlite3.connect(self.DB_FILE_NAME)
+        return self.conn
+
     def create(self):
         """Create the database file if it does not exist."""
         if not os.path.exists(self.DB_FILE_NAME):
-            conn = sqlite3.connect(self.DB_FILE_NAME)
+            conn = self.get_conn()
             c = conn.cursor()
-            c.execute("""CREATE TABLE file(
+            c.execute("""CREATE TABLE locs(
                           name TEXT,
-                          loc TEXT,
-                          UNIQUE(name, loc))""")
-            c.execute("""CREATE TABLE checksum(
-                          root TEXT,
+                          real_name TEXT,
+                          scheme TEXT,
+                          mode TEXT,
+                          loc_type TEXT,
+                          PRIMARY KEY(name))""")
+            c.execute("""CREATE TABLE paths(
+                          name TEXT,
                           path TEXT,
-                          value TEXT,
-                          UNIQUE(root, path))""")
-            c.execute("""CREATE TABLE misc(
+                          checksum TEXT,
+                          UNIQUE(name, path))""")
+            c.execute("""CREATE TABLE dep_names(
                           name TEXT,
-                          key TEXT,
-                          value TEXT,
-                          UNIQUE(name, key))""")
+                          dep_name TEXT,
+                          UNIQUE(name, dep_name))""")
             conn.commit()
 
     def delete(self, loc):
         """Remove settings related to loc from the database."""
-        pass
+        conn = self.get_conn()
+        c = conn.cursor()
+        c.execute("""DELETE FROM locs WHERE name=?""", loc.name)
+        c.execute("""DELETE FROM dep_names WHERE name=?""", loc.name)
+        c.execute("""DELETE FROM paths WHERE name=?""", loc.name)
+        conn.commit()
 
     def select(self, name):
         """Query database for settings matching name.
@@ -585,11 +629,45 @@ class LocDAO(object):
         Reconstruct setting as a Loc object and return it.
  
         """
-        pass
+        conn = self.get_conn()
+        c = conn.cursor()
+
+        c.execute("""SELECT real_name,scheme,mode,loc_type FROM locs""" +
+                  """ WHERE name=?""", name)
+        row = c.fetchone()
+        if row is None:
+            return
+        loc = Loc(name)
+        loc.real_name, loc.scheme, loc.mode, loc.loc_type = row
+
+        c.execute("""SELECT path,checksum FROM paths WHERE name=?""", name)
+        for row in c:
+            path, checksum = row
+            if loc.paths is None:
+                loc.paths = []
+            loc.paths.append(LocPath(path, checksum))
+
+        c.execute("""SELECT dep_name FROM dep_names WHERE name=?""", name)
+        for row in c:
+            dep_name, = row
+            if loc.dep_locs is None:
+                loc.dep_locs = []
+            loc.dep_locs.append(self.select(dep_name))
 
     def update(self, loc):
         """Insert or update settings related to loc to the database."""
-        pass
+        conn = self.get_conn()
+        c = conn.cursor()
+        c.execute("""INSERT OR REPLACE INTO locs VALUES(?,?,?,?,?)""",
+                  loc.name, loc.real_name, loc.scheme, loc.mode, loc.loc_type)
+        if loc.paths:
+            for path in loc.paths:
+                c.execute("""INSERT OR REPLACE INTO paths VALUES(?,?,?)""",
+                          name, path.name, path.checksum)
+        if loc.dep_locs:
+            for dep_loc in loc.dep_locs:
+                c.execute("""INSERT OR REPLACE INTO dep_names VALUES(?,?)""",
+                          name, dep_loc.name)
 
 
 class FileLocHandlerBase(object):
@@ -668,12 +746,3 @@ class FileLocHandlersManager(SchemeHandlersManager):
         else:
             p = self.guess_handler(file_loc, mode=self.PUSH_MODE)
         return p.push(file_path, file_loc, **kwargs)
-
-
-def _process_target(processor, config, key, node):
-    """Pool worker for ConfigProcessorForFile.process."""
-    event_handler = WorkerEventHandler()
-    processor.manager.event_handler.event_handler = event_handler
-    processor.process_target(config, key, node)
-    processor.manager.event_handler.event_handler = None
-    return event_handler.events
