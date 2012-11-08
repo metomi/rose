@@ -858,6 +858,8 @@ class MainWindow(gtk.Window):
         output_path = os.path.join(output_dir, "index.html") 
         try:
             urllib.urlopen(output_path)
+            self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_LOG, 
+                                       instant=True)
         except IOError as e:
             if test:
                 return False
