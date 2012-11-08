@@ -824,24 +824,66 @@ def _handle_command_arg_response(dialog, response, run_hook, entry):
 def run_dialog(dialog_type, text, title=None, modal=True):
     """Run a simple dialog with an 'OK' button and some text."""
     parent_window = get_dialog_parent()
-    dialog = gtk.MessageDialog(type=dialog_type,
-                               buttons=gtk.BUTTONS_OK,
-                               parent=parent_window)
-    try:
-        pango.parse_markup(text)
-    except glib.GError:
-        try:
-            dialog.set_markup(safe_str(text))
-        except:
-            dialog.format_secondary_text(text)
-    else:
-        dialog.set_markup(text)
+    dialog = gtk.Dialog(parent=parent_window)
+    ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
+
+    #lookup the appropriate image for that dialog type
+    if dialog_type == gtk.MESSAGE_INFO:
+	    #Informational message
+	    stock_id = gtk.STOCK_DIALOG_INFO
+    elif dialog_type == gtk.MESSAGE_WARNING:
+	    #Nonfatal warning message
+	    stock_id = gtk.STOCK_DIALOG_WARNING
+    elif dialog_type == gtk.MESSAGE_QUESTION:
+	    #Question requiring a choice
+	    stock_id = gtk.STOCK_DIALOG_QUESTION
+    elif dialog_type == gtk.MESSAGE_ERROR:
+	    #Fatal error message
+	    stock_id = gtk.STOCK_DIALOG_ERROR
+	else:
+	    stock_id = None
+	
+	if stock_id is not None:
+        dialog.image = gtk.image_new_from_stock(stock_id,
+                                                gtk.ICON_SIZE_DIALOG)
+        dialog.image.show()
+    
+    dialog.label = gtk.Label(text)
+    dialog.label.show()
+    hbox = gtk.HBox()
+    
+    if stock_id is not None:
+        hbox.pack_start(dialog.image, expand=False, fill=False,
+                        padding=rose.config_editor.SPACING_PAGE)
+                        
+    hbox.pack_start(dialog.label, expand=False, fill=False,
+                    padding=rose.config_editor.SPACING_PAGE)
+    hbox.show()
+    
+    dialog.vbox.pack_end(hbox)
+    
+    #try:
+    #    pango.parse_markup(text)
+    #except glib.GError:
+    #    try:
+    #        dialog.set_markup(safe_str(text))
+    #    except:
+    #        dialog.format_secondary_text(text)
+    #else:
+    #    dialog.set_markup(text)
+    
     if "\n" in text:
         dialog.label.set_line_wrap(False)
     dialog.set_resizable(True)
     dialog.set_modal(modal)
     if title is not None:
         dialog.set_title(title)
+    max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
+    my_size = dialog.size_request()
+    new_size = [-1, -1]
+    for i in [0, 1]:
+        new_size[i] = min([my_size[i], max_size[i]])        
+    dialog.set_default_size(*new_size)
     dialog.run()
     dialog.destroy()
 
