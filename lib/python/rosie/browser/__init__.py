@@ -103,6 +103,7 @@ STATUS_FETCHING = "Fetching records..."
 STATUS_GOT = "{0} records found at {1}"
 STATUS_LOCAL_GOT = "{0} local suites found at {1}" 
 STATUS_NO_LOCAL_SUITES = "No local suites could be found {0}"
+STATUS_OPENING_HELP = "Opened help in browser"
 STATUS_SOURCE_CHANGED = "Data source changed to {0}"
 STATUS_UPDATE = "updating view..."
 

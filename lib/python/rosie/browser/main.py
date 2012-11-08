@@ -871,7 +871,7 @@ class MainWindow(gtk.Window):
     def handle_view_web(self, *args):
         """View a suite's web source URL."""
         this_id = SuiteId(id_text=self.get_selected_suite_id())
-        webbrowser.open(this_id.to_web())
+        webbrowser.open_new(this_id.to_web(), new=new, autoraise=True)
 
     def initial_filter(self, opts, args):
         """Get some initial results to display on startup."""
@@ -930,6 +930,8 @@ class MainWindow(gtk.Window):
         """Launch a browser to open the help url."""
         webbrowser.open(rose.resource.ResourceLocator.default().get_doc_url() +
                         rosie.browser.HELP_FILE)
+        self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_HELP, 
+                                       instant=True)
         return False
     
     def pop_treeview_history(self):
