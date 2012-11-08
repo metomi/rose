@@ -385,7 +385,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         target.paths.append(LocPath(file_path, m.hexdigest()))
                 target.paths.sort()
             # TODO: LocDAO.select
-            prev_target = self.loc_dao.select(target)
+            prev_target = self.loc_dao.select(target.name)
             target.is_out_of_date = (
                     not os.path.exists(target.name) or
                     prev_target is None or
@@ -432,7 +432,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         self.loc_dao.update(task.loc)
 
     def install_target(self, config, task):
-        pass # TODO
+        for source in task.loc.dep_locs:
+            pass # TODO
 
     def _pull_source(self, config, task):
         pass # TODO
@@ -554,6 +555,7 @@ class LocDAO(object):
     DB_FILE_NAME = ".rose-config_processors-file.db"
 
     def create(self):
+        """Create the database file if it does not exist."""
         if not os.path.exists(self.DB_FILE_NAME):
             conn = sqlite3.connect(self.DB_FILE_NAME)
             c = conn.cursor()
@@ -572,6 +574,22 @@ class LocDAO(object):
                           value TEXT,
                           UNIQUE(name, key))""")
             conn.commit()
+
+    def delete(self, loc):
+        """Remove settings related to loc from the database."""
+        pass
+
+    def select(self, name):
+        """Query database for settings matching name.
+        
+        Reconstruct setting as a Loc object and return it.
+ 
+        """
+        pass
+
+    def update(self, loc):
+        """Insert or update settings related to loc to the database."""
+        pass
 
 
 class FileLocHandlerBase(object):
