@@ -72,6 +72,7 @@ class Loc(object):
         self.value = name
         self.scheme = scheme
         self.dep_locs = dep_locs
+        self.mode = None
         self.paths = None
         self.cache = None
         self.is_out_of_date = None # boolean
@@ -287,8 +288,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     NPROC = 6
     POLL_DELAY = 0.05
     RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
-    TASK_KEY_INSTALL = "install"
-    TASK_KEY_PULL = "pull"
+    T_INSTALL = "install"
+    T_PULL = "pull"
 
     def __init__(self, *args, **kwargs):
         ConfigProcessorBase.__init__(self, *args, **kwargs)
@@ -300,12 +301,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def handle_event(self, *args):
         self.manager.handle_event(*args)
-
-    def set_event_handler(self, event_handler):
-        try:
-            self.manager.event_handler.event_handler = event_handler
-        except AttributeError:
-            pass
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Install files according to the file:* sections in "config"."""
@@ -342,19 +337,20 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         targets = {}
         for key, node in sorted(nodes.items()):
             content_str = node.get_value("content")
-            if content_str is None:
-                continue
-            target_name = key[len(self.PREFIX):]
+            name = key[len(self.PREFIX):]
             target_sources = []
-            for name in shlex.split(content_str):
-                sources[name] = Loc(name)
-                target_sources.append(sources[name])
-            targets[target_name] = Loc(target_name)
-            targets[target_name].dep_locs = sorted(target_sources)
+            if content_str is not None:
+                for n in shlex.split(content_str):
+                    sources[n] = Loc(n)
+                    target_sources.append(sources[n])
+            targets[name] = Loc(name)
+            targets[name].dep_locs = sorted(target_sources)
+            targets[name].mode = node.get_value("mode")
+
         # Where applicable, determine for each source:
         # * Its invariant name.
         # * Whether it can be considered unchanged.
-        for name, source in sources.items():
+        for source in sources.values():
             # TODO: self.source_parse
             self.source_parse(config, source)
 
@@ -364,8 +360,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Target exists, but does not match settings in database.
         # * Target exists, but a source cannot be considered unchanged.
         for target in targets.values():
-            # TODO: handle symlink
-            if os.path.isfile(target.name):
+            if os.path.islink(target.name):
+                target.value = os.readlink(target.name)
+            elif os.path.isfile(target.name):
                 m = md5()
                 f = open(target.name)
                 m.update(f.read())
@@ -392,6 +389,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             target.is_out_of_date = (
                     not os.path.exists(target.name) or
                     prev_target is None or
+                    prev_target.mode != target.mode or
+                    prev_target.value != target.value or
                     prev_target.paths != target.paths or
                     any([s.is_out_of_date for s in target.dep_locs]))
             if target.is_out_of_date:
@@ -403,23 +402,40 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         for target in targets.values():
             if not target.is_out_of_date:
                 continue
-            # TODO: handle mkdir, symlink, touch
-            tasks[target.name] = LocTask(target, self.TASK_KEY_INSTALL)
-            for source in target.dep_locs:
-                tasks[source.name] = LocTask(source, self.TASK_KEY_PULL)
+            if target.dep_locs:
+                if len(target.dep_locs) == 1 and target.mode == "symlink":
+                    self.manager.fs_util.symlink(target.dep_locs[0], target.name)
+                    self.loc_dao.update(target)
+                else:
+                    tasks[target.name] = LocTask(target, self.T_INSTALL)
+                    for source in target.dep_locs:
+                        tasks[source.name] = LocTask(source, self.T_PULL)
+            elif target.mode == "mkdir":
+                self.manager.fs_util.makedirs(target.name)
+                self.loc_dao.update(target)
+            else:
+                self.manager.fs_util.create(target.name)
+                self.loc_dao.update(target)
 
         TaskRunner(self)(config, TaskManager(tasks))
 
     def process_task(self, config, task):
-        if task.task_key == self.TASK_KEY_INSTALL:
-            self.loc_install(config, task.loc) # TODO
-        elif task.task_key == self.TASK_KEY_PULL:
-            self.loc_pull(config, task.loc) # TODO
+        """Process a task, helper for process."""
+        if task.task_key == self.T_INSTALL:
+            self._install_target(config, task.loc)
+        elif task.task_key == self.T_PULL:
+            self._pull_source(config, task.loc)
         task.state = task.ST_DONE
 
     def post_process_task(self, config, task):
         # TODO: LocDAO.update
         self.loc_dao.update(task.loc)
+
+    def install_target(self, config, task):
+        pass # TODO
+
+    def _pull_source(self, config, task):
+        pass # TODO
 
     def process_target(self, config, key, node):
         """Install a target according to a file:target section."""
@@ -525,6 +541,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         else:
             return open(source).read()
 
+    def set_event_handler(self, event_handler):
+        try:
+            self.manager.event_handler.event_handler = event_handler
+        except AttributeError:
+            pass
+
 
 class LocDAO(object):
     """DAO for information for incremental updates."""
@@ -544,6 +566,11 @@ class LocDAO(object):
                           path TEXT,
                           value TEXT,
                           UNIQUE(root, path))""")
+            c.execute("""CREATE TABLE misc(
+                          name TEXT,
+                          key TEXT,
+                          value TEXT,
+                          UNIQUE(name, key))""")
             conn.commit()
 
 

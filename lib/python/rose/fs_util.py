@@ -68,6 +68,14 @@ class FileSystemUtil(object):
         event = FileSystemEvent(FileSystemEvent.CHDIR, path + "/")
         self.handle_event(event)
 
+    def create(self, path):
+        """Create an empty file in path."""
+        if os.path.exists(path):
+            self.delete(path)
+        open(path, "wb").close()
+        event = FileSystemEvent(FileSystemEvent.CREATE, path)
+        self.handle_event(event)
+
     def delete(self, path):
         """Delete a file or a directory."""
 
@@ -137,4 +145,3 @@ class FileSystemUtil(object):
             os.symlink(source, target)
             event = FileSystemEvent(FileSystemEvent.SYMLINK, source, target)
             self.handle_event(event)
-
