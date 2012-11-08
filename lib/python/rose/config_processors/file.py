@@ -64,29 +64,18 @@ class ChecksumEvent(Event):
         return "checksum: %s: %s" % self.args
 
 
-class Location(object):
-    """Represent a (file/directory) location."""
+class Loc(object):
+    """Represent a location."""
 
-    def __init__(self, name):
+    def __init__(self, name, scheme=None, dep_locs=None):
         self.name = name
-        self.name_orig = name
-        self.scheme = None
+        self.value = name
+        self.scheme = scheme
+        self.dep_locs = dep_locs
         self.paths = None
         self.cache = None
-        self.refs = None
-        self.is_up_to_date = False
-
-    def __cmp__(self, other):
-        return cmp(self.name, other.name)
-
-    def __eq__(self, other):
-        if other is None:
-            return False
-        if id(self) == id(other):
-            return True
-        return (self.name == other.name and
-                self.paths == other.paths and
-                self.refs == other.refs)
+        self.is_out_of_date = None # boolean
+        self.is_modified = None # boolean
 
     def __str__(self):
         return self.name
@@ -97,11 +86,11 @@ class Location(object):
         self.scheme = other.scheme
         self.paths = other.paths
         self.cache = other.cache
-        self.refs = other.refs
-        self.is_up_to_date = other.is_up_to_date
+        self.is_out_of_date = other.is_out_of_date
+        self.is_modified = other.is_modified
 
 
-class LocationPath(object):
+class LocPath(object):
     """Represent a sub-path in a location."""
 
     def __init__(self, name):
@@ -118,12 +107,188 @@ class LocationPath(object):
         return self.name
 
 
+class LocTask(object):
+    """Represent a task for dealing with a location."""
+
+    ST_DONE = "ST_DONE"
+    #ST_FAILED = "ST_FAILED"
+    ST_PENDING = "ST_PENDING"
+    ST_READY = "ST_READY"
+    ST_WORKING = "ST_WORKING"
+
+    def __init__(self, loc, task_key):
+        self.loc = loc
+        self.task_key = None
+        self.name = loc.name
+        self.needed_by = {}
+        self.pending_for = {}
+        self.state = self.ST_READY
+
+    def __str__(self):
+        return "%s: %s" % (self.task_key, str(self.loc))
+
+    def update(self, other):
+        self.state = other.state
+        self.loc.update(other.loc)
+
+
+class TaskManager(object):
+    """Manage a set of LocTask objects and their states."""
+
+    def __init__(self, tasks, names=None):
+        """Initiate a location task manager.
+
+        tasks: A dict of all available tasks (task.name, task).
+        names: A list of keys in tasks to process.
+               If not set or empty, process all tasks.
+
+        """
+        self.tasks = tasks
+        self.ready_tasks = []
+        if not names:
+            names = tasks.keys()
+        for name in names:
+            self.ready_tasks.append(self.tasks[name])
+        self.working_tasks = {}
+
+    def get_task(self):
+        """Return the next task that requires processing."""
+        while self.ready_tasks:
+            task = self.ready_tasks.pop()
+            for dep_key, dep_task in task.pending_for.items():
+                if dep_task.state == dep_task.ST_DONE:
+                    task.pending_for.pop(dep_key)
+                    if dep_task.needed_by.has_key(task.name):
+                        dep_task.needed_by.pop(task.name)
+                else:
+                    dep_task.needed_by[task.name] = task
+                    if dep_task.state is None:
+                        dep_task.state = dep_task.ST_READY
+                        self.ready_tasks.append(dep_task)
+            if task.pending_for:
+                task.state = task.ST_PENDING
+            else:
+                self.working_tasks[task.name] = task
+                task.state = task.ST_WORKING
+                return task
+
+    def get_dead_tasks(self):
+        """Return pending tasks if there are no ready/working ones."""
+        if not self.has_tasks:
+            return [task if task.pending_for for task in self.tasks.values()]
+        return (not self.has_tasks and
+                any([task.pending_for for task in self.tasks.values()]))
+
+    def has_tasks(self):
+        """Return True if there are ready tasks or working tasks."""
+        return bool(self.ready_tasks) or bool(self.working_tasks)
+
+    def has_ready_tasks(self):
+        """Return True if there are ready tasks."""
+        return bool(self.ready_tasks)
+
+    def put_task(self, task_proxy):
+        """Tell the manager that a task has completed."""
+        task = self.working_tasks.pop(task_proxy.name)
+        task.update(task_proxy)
+        for up_key, up_task in task.needed_by.items():
+            task.needed_by.pop(up_key)
+            up_task.pending_for.pop(task.name)
+            if not up_task.pending_for:
+                self.ready_tasks.append(up_task)
+                up_task.state = up_task.ST_READY
+        return task
+
+
+class TaskRunner(object):
+    """Runs LocTask objects with pool of workers."""
+
+    NPROC = 6
+    POLL_DELAY = 0.05
+
+    def __init__(self, task_processor):
+        self.task_processor = task_processor
+        conf = ResourceLocator.default().get_conf()
+        self.nproc = int(conf.get_value(
+                ["rose.config_processors.file", "nproc"],
+                default=self.NPROC))
+
+    def run(self, config, task_manager):
+        nproc = self.nproc
+        if nproc > len(task_manager.tasks):
+            nproc = len(task_manager.tasks)
+        pool = Pool(processes=nproc)
+
+        results = {}
+        while task_manager.has_tasks():
+            # Process results, if any is ready
+            for name, result in results.items():
+                if result.ready():
+                    results.pop(name)
+                    task_proxy, args_of_events = result.get()
+                    for args_of_event in args_of_events:
+                        self.task_processor.handle_event(*args_of_event)
+                    task = task_manager.put_task(task_proxy)
+                    self.task_processor.post_process_task(config, task)
+            # Add some more tasks into the worker pool, as they are ready
+            while task_manager.has_ready_tasks():
+                task = task_manager.get_task()
+                if task is None:
+                    break
+                result = pool.apply_async(_loc_task_run,
+                                          [self.task_processor, config, task])
+                results[task.name] = result
+            if results:
+                sleep(self.POLL_DELAY)
+
+        dead_tasks = task_manager.get_dead_tasks()
+        if dead_tasks:
+            raise UnfinishedTasksError(dead_tasks)
+
+    __call__ = run
+
+
+class WorkerEventHandler(object):
+    """Temporary event handler in a function run by a pool worker process.
+
+    Events are collected in the self.events which is a list of tuples
+    representing the arguments the report method in an instance of
+    rose.reporter.Reporter.
+
+    """
+    def __init__(self):
+        self.events = []
+
+    def __call__(self, message, type=None, level=None, prefix=None, clip=None):
+        self.events.append((message, type, level, prefix, clip))
+
+
+def _loc_task_run(task_processor, task_proxy):
+    """Helper for LocTaskRunner."""
+    event_handler = WorkerEventHandler()
+    task_processor.set_event_handler(event_handler)
+    task_processor.process_task(task_proxy)
+    task_processor.set_event_handler(None)
+    return (task_proxy, event_handler.events)
+
+
+class UnfinishedTasksError(Exception):
+    """Error raised when there are no ready/working tasks but pending ones."""
+    def __str__(self):
+        ret = ""
+        for task in self.args:
+            ret += "[DEAD TASK] %s\n" % str(task)
+        return ret
+
+
 class ConfigProcessorForFile(ConfigProcessorBase):
 
     SCHEME = "file"
     NPROC = 6
     POLL_DELAY = 0.05
     RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
+    TASK_KEY_INSTALL = "install"
+    TASK_KEY_PULL = "pull"
 
     def __init__(self, *args, **kwargs):
         ConfigProcessorBase.__init__(self, *args, **kwargs)
@@ -132,6 +297,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 popen=self.manager.popen,
                 fs_util=self.manager.fs_util)
         self.loc_dao = LocDAO()
+
+    def handle_event(self, *args):
+        self.manager.handle_event(*args)
+
+    def set_event_handler(self, event_handler):
+        try:
+            self.manager.event_handler.event_handler = event_handler
+        except AttributeError:
+            pass
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Install files according to the file:* sections in "config"."""
@@ -163,114 +337,89 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # if it does not already exist.
         self.loc_dao.create()
 
-        # Parse each location and determine whether they require an update.
-        loc_map = {}
-        local_loc_map = {}
+        # Gets a list of sources and targets
+        sources = {}
+        targets = {}
         for key, node in sorted(nodes.items()):
-            locs_str = node.get_value("locations")
-            if locs_str is None:
+            content_str = node.get_value("content")
+            if content_str is None:
                 continue
-            local_loc_name = key[len(self.PREFIX):]
-            locs = []
-            for name in shlex.split(locs_str):
-                loc_map[name] = Location(name)
-                locs.append(loc_map[name])
-            local_loc_map[local_loc_name] = Location(local_loc_name)
-            local_loc_map[local_loc_name].refs = sorted(locs)
-        pool = self._get_worker_pool(loc_map)
-        results = {}
-        for name, loc in loc_map.items():
-            # TODO: _loc_parse
-            result = pool.apply_async(_loc_parse, [self, config, loc])
-            results[name] = result
-        pool.close()
-        while results:
-            for name, result in results.items():
-                if not result.ready():
-                    continue
-                results.pop(name)
-                loc, args_of_events = result.get()
-                loc_map[name].update(loc)
-                for args_of_event in args_of_events:
-                    self.manager.handle_event(*args_of_event)
-            if results:
-                sleep(self.POLL_DELAY)
+            target_name = key[len(self.PREFIX):]
+            target_sources = []
+            for name in shlex.split(content_str):
+                sources[name] = Loc(name)
+                target_sources.append(sources[name])
+            targets[target_name] = Loc(target_name)
+            targets[target_name].dep_locs = sorted(target_sources)
+        # Where applicable, determine for each source:
+        # * Its invariant name.
+        # * Whether it can be considered unchanged.
+        for name, source in sources.items():
+            # TODO: self.source_parse
+            self.source_parse(config, source)
 
-        # Check whether each local "file" needs update.
-        for local_loc in local_loc_map.values():
-            if os.path.exists(local_loc.name):
-                for dirpath, dirnames, filenames in os.walk(local_loc.name):
+        # Inspect each target to see if it is out of date:
+        # * Target does not already exist.
+        # * Target exists, but does not have a database entry.
+        # * Target exists, but does not match settings in database.
+        # * Target exists, but a source cannot be considered unchanged.
+        for target in targets.values():
+            # TODO: handle symlink
+            if os.path.isfile(target.name):
+                m = md5()
+                f = open(target.name)
+                m.update(f.read())
+                target.paths = [LocPath("", m.hexdigest())]
+            elif os.path.isdir(target.name):
+                target.paths = []
+                for dirpath, dirnames, filenames in os.walk(target.name):
                     for i in reversed(range(len(dirnames))):
                         dirname = dirnames[i]
                         if dirname.startswith("."):
                             dirnames.pop(i)
                             continue
-                        local_loc.paths.append(
-                                LocationPath(os.path.join(dirpath, dirname)))
+                        target.paths.append(
+                                LocPath(os.path.join(dirpath, dirname)))
                     for filename in filenames:
-                        local_loc.paths.append(
-                                LocationPath(os.path.join(dirpath, filename)))
                         m = md5()
-                        f = open(filename)
+                        file_path = os.path.join(dirpath, filename)
+                        f = open(file_path)
                         m.update(f.read())
-                        loc_path.checksum = m.hexdigest()
-                # TODO: LocDAO.select
-                prev_local_loc = self.loc_dao.select(local_loc.name)
-                local_loc.is_up_to_date = (local_loc == prev_local_loc)
-            if not local_loc.is_up_to_date:
+                        target.paths.append(LocPath(file_path, m.hexdigest()))
+                target.paths.sort()
+            # TODO: LocDAO.select
+            prev_target = self.loc_dao.select(target)
+            target.is_out_of_date = (
+                    not os.path.exists(target.name) or
+                    prev_target is None or
+                    prev_target.paths != target.paths or
+                    any([s.is_out_of_date for s in target.dep_locs]))
+            if target.is_out_of_date:
                 # TODO: LocDAO.delete
-                self.loc_dao.delete(local_loc.name)
+                self.loc_dao.delete(target)
 
-        # Update locations with workers.
-        loc_map = {}
-        for local_loc in local_loc_map.values():
-            if local_loc.is_up_to_date:
+        # Set up tasks for rebuilding all out-of-date targets.
+        tasks = {}
+        for target in targets.values():
+            if not target.is_out_of_date:
                 continue
-            for loc in local_loc.refs:
-                loc_map[loc.name] = loc
-        pool = self._get_worker_pool(loc_map)
-        results = {}
-        for name, loc in loc_map.items():
-            # TODO: _loc_pull
-            result = pool.apply_async(_loc_pull, [self, config, loc])
-            results[name] = result
-        pool.close()
-        while results:
-            for name, result in results.items():
-                if not result.ready():
-                    continue
-                results.pop(name)
-                loc, args_of_events = result.get()
-                loc_map[name].update(loc)
-                # TODO: LocDAO.update
-                self.loc_dao.update(loc)
-                for args_of_event in args_of_events:
-                    self.manager.handle_event(*args_of_event)
-            if results:
-                sleep(self.POLL_DELAY)
+            # TODO: handle mkdir, symlink, touch
+            tasks[target.name] = LocTask(target, self.TASK_KEY_INSTALL)
+            for source in target.dep_locs:
+                tasks[source.name] = LocTask(source, self.TASK_KEY_PULL)
 
-        # Rebuild each "local" file.
-        local_locs = [l if not l.is_up_to_date for l in local_loc_map.values()]
-        pool = self._get_worker_pool(local_locs)
-        results = {}
-        for local_loc in local_locs:
-            # TODO: _loc_install 
-            result = pool.apply_async(_loc_install, [self, config, local_loc]
-            results[name] = result
-        pool.close()
-        while results:
-            for name, result in results.items():
-                if not result.ready():
-                    continue
-                results.pop(name)
-                local_loc, args_of_events = result.get()
-                local_loc_map[name].update(local_loc)
-                # TODO: LocDAO.update
-                self.loc_dao.update(local_loc)
-                for args_of_event in args_of_events:
-                    self.manager.handle_event(*args_of_event)
-            if results:
-                sleep(self.POLL_DELAY)
+        TaskRunner(self)(config, TaskManager(tasks))
+
+    def process_task(self, config, task):
+        if task.task_key == self.TASK_KEY_INSTALL:
+            self.loc_install(config, task.loc) # TODO
+        elif task.task_key == self.TASK_KEY_PULL:
+            self.loc_pull(config, task.loc) # TODO
+        task.state = task.ST_DONE
+
+    def post_process_task(self, config, task):
+        # TODO: LocDAO.update
+        self.loc_dao.update(task.loc)
 
     def process_target(self, config, key, node):
         """Install a target according to a file:target section."""
@@ -347,14 +496,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 target_file.close()
                 self.manager.handle_event(ChecksumEvent(target, checksum))
 
-    def _get_worker_pool(self, items):
-        nproc = int(ResourceLocator.default().get_conf().get_value(
-                ["rose.config_processors.file", "nproc"],
-                default=self.NPROC))
-        if nproc > len(items):
-            nproc = len(items)
-        return Pool(processes=nproc)
-
     def _source_export(self, source, target):
         """Export/copy a source file/directory in FS or FCM VC to a target."""
         if source == target:
@@ -383,21 +524,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             return f.read()
         else:
             return open(source).read()
-
-
-class FileLoc(object):
-    """Represent the location of a (remote) file."""
-
-    def __init__(self, name, scheme=None):
-        self.name = name
-        self.name_invariant = None
-        self.scheme = scheme
-
-    def __str__(self):
-        if self.name_invariant:
-            return self.name_invariant
-        else:
-            return self.name
 
 
 class LocDAO(object):
@@ -498,20 +624,6 @@ class FileLocHandlersManager(SchemeHandlersManager):
             p = self.guess_handler(file_loc, mode=self.PUSH_MODE)
         return p.push(file_path, file_loc, **kwargs)
 
-
-class WorkerEventHandler(object):
-    """Temporary event handler in a function run by a pool worker process.
-
-    Events are collected in the self.events which is a list of tuples
-    representing the arguments the report method in an instance of
-    rose.reporter.Reporter.
-
-    """
-    def __init__(self):
-        self.events = []
-
-    def __call__(self, message, type=None, level=None, prefix=None, clip=None):
-        self.events.append((message, type, level, prefix, clip))
 
 def _process_target(processor, config, key, node):
     """Pool worker for ConfigProcessorForFile.process."""
