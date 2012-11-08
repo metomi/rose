@@ -167,12 +167,7 @@ class ConfigDataManager(object):
                     self.load_top_config(top_level_directory)
                     break
             else:
-                path = os.path.join(top_level_directory, rose.TOP_CONFIG_NAME)
-                text = rose.config_editor.ERROR_NOT_FOUND.format(path)
-                title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         text, title)
-                sys.exit(2)
+                self.load_top_config(None)
         elif not config_obj_dict:
             self.load_top_config(None)
         else:
