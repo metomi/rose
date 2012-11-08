@@ -866,12 +866,17 @@ class MainWindow(gtk.Window):
         else:
             if test:
                 return True
-            webbrowser.open(output_path)
+            webbrowser.open(output_path, new=True, autoraise=True)
+            self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_LOG, 
+                                       instant=True)
+
 
     def handle_view_web(self, *args):
         """View a suite's web source URL."""
         this_id = SuiteId(id_text=self.get_selected_suite_id())
-        webbrowser.open_new(this_id.to_web(), new=new, autoraise=True)
+        webbrowser.open_new(this_id.to_web(), new=True, autoraise=True)
+        self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_WEB, 
+                                       instant=True)
 
     def initial_filter(self, opts, args):
         """Get some initial results to display on startup."""
@@ -929,7 +934,7 @@ class MainWindow(gtk.Window):
     def launch_help(self, *args):
         """Launch a browser to open the help url."""
         webbrowser.open(rose.resource.ResourceLocator.default().get_doc_url() +
-                        rosie.browser.HELP_FILE)
+                        rosie.browser.HELP_FILE, new=True, autoraise=True)
         self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_HELP, 
                                        instant=True)
         return False
