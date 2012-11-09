@@ -67,6 +67,7 @@ class MainWindow(gtk.Window):
     def __init__(self, opts=None, args=None):
 
         super(MainWindow, self).__init__()
+        self.refresh_url = ""
         self.search_manager = rosie.browser.search.SearchManager(opts.prefix)        
         locator = ResourceLocator(paths=sys.path)
         self.config = locator.get_conf()
@@ -142,9 +143,7 @@ class MainWindow(gtk.Window):
         """Run a search based on the address bar."""
         self.local_updater.update_now()
         address_url = self.nav_bar.address_box.child.get_text()
-
-        if not address_url.endswith("&format=json"):
-            address_url += "&format=json"
+        self.refresh_url = address_url
 
         # if the url string doesn't begin with a valid prefix       
         if not (address_url.find("http://") == 0 or 
@@ -154,6 +153,9 @@ class MainWindow(gtk.Window):
             self.handle_search(None)
         else:
             items = {}
+
+            if not address_url.endswith("&format=json"):
+                address_url += "&format=json"
             
             #set the all revisions to the setting specified *by the url*
             self.history_menuitem.set_active("all_revs=" in address_url)
@@ -226,6 +228,7 @@ class MainWindow(gtk.Window):
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
         self.nav_bar.address_box.child.set_text("")
+        self.refresh_url = ""
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
@@ -679,7 +682,8 @@ class MainWindow(gtk.Window):
                 if url.endswith("&format=json"):
                     url = url.replace("&format=json", "")
                 
-                self.nav_bar.address_box.child.set_text(url)   
+                self.nav_bar.address_box.child.set_text(url)
+                self.refresh_url = url   
                 if record == True:
                     recorded = self.hist.record_search("query", repr(filters), 
                                                         self.search_history)
@@ -712,6 +716,7 @@ class MainWindow(gtk.Window):
 
     def handle_refresh(self, *args):
         """Handles refreshing the search results."""
+        self.nav_bar.address_box.child.set_text(self.refresh_url)
         if self.nav_bar.address_box.child.get_text() == "":
             self.display_local_suites()
         else:
@@ -755,6 +760,7 @@ class MainWindow(gtk.Window):
             if url.endswith("&format=json"):
                 url = url.replace("&format=json", "")
             self.nav_bar.address_box.child.set_text(url)
+            self.refresh_url = url
             if record == True:
                 recorded = self.hist.record_search("search", repr(search_text),
                                                    self.search_history)
@@ -866,12 +872,17 @@ class MainWindow(gtk.Window):
         else:
             if test:
                 return True
-            webbrowser.open(output_path)
+            webbrowser.open(output_path, new=True, autoraise=True)
+            self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_LOG, 
+                                       instant=True)
+
 
     def handle_view_web(self, *args):
         """View a suite's web source URL."""
         this_id = SuiteId(id_text=self.get_selected_suite_id())
-        webbrowser.open(this_id.to_web())
+        webbrowser.open(this_id.to_web(), new=True, autoraise=True)
+        self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_WEB, 
+                                       instant=True)
 
     def initial_filter(self, opts, args):
         """Get some initial results to display on startup."""
@@ -929,7 +940,9 @@ class MainWindow(gtk.Window):
     def launch_help(self, *args):
         """Launch a browser to open the help url."""
         webbrowser.open(rose.resource.ResourceLocator.default().get_doc_url() +
-                        rosie.browser.HELP_FILE)
+                        rosie.browser.HELP_FILE, new=True, autoraise=True)
+        self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_HELP, 
+                                       instant=True)
         return False
     
     def pop_treeview_history(self):
