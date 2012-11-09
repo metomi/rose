@@ -145,9 +145,6 @@ class MainWindow(gtk.Window):
         address_url = self.nav_bar.address_box.child.get_text()
         self.refresh_url = address_url
 
-        if not address_url.endswith("&format=json"):
-            address_url += "&format=json"
-
         # if the url string doesn't begin with a valid prefix       
         if not (address_url.find("http://") == 0 or 
                 address_url.find("search?s=") == 0 or 
@@ -156,6 +153,9 @@ class MainWindow(gtk.Window):
             self.handle_search(None)
         else:
             items = {}
+
+            if not address_url.endswith("&format=json"):
+                address_url += "&format=json"
             
             #set the all revisions to the setting specified *by the url*
             self.history_menuitem.set_active("all_revs=" in address_url)
