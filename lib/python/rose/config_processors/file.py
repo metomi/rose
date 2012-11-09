@@ -97,7 +97,7 @@ class Loc(object):
         self.is_out_of_date = other.is_out_of_date
 
 
-class LocPath(object):
+class PathInLoc(object):
     """Represent a sub-path in a location."""
 
     def __init__(self, name):
@@ -114,8 +114,18 @@ class LocPath(object):
         return self.name
 
 
-class LocTask(object):
-    """Represent a task for dealing with a location."""
+class LocTypeError(Exception):
+    """An exception raised when a location type is incorrect.
+
+    The location type is either a file blob or a directory tree.
+
+    """
+    def __str__(self):
+        return "%s <= %s, expected %s, got %s" % self.args
+
+
+class LocJobProxy(object):
+    """Represent the state of the job for updating a location."""
 
     ST_DONE = "ST_DONE"
     #ST_FAILED = "ST_FAILED"
@@ -123,137 +133,135 @@ class LocTask(object):
     ST_READY = "ST_READY"
     ST_WORKING = "ST_WORKING"
 
-    def __init__(self, loc, task_key):
+    def __init__(self, loc, action_key):
         self.loc = loc
-        self.task_key = None
+        self.action_key = None
         self.name = loc.name
         self.needed_by = {}
         self.pending_for = {}
         self.state = self.ST_READY
 
     def __str__(self):
-        return "%s: %s" % (self.task_key, str(self.loc))
+        return "%s: %s" % (self.action_key, str(self.loc))
 
     def update(self, other):
         self.state = other.state
         self.loc.update(other.loc)
 
-class LocTypeError(Exception):
-    def __str__(self):
-        return "%s <= %s, expected %s, got %s" % self.args
 
-class TaskManager(object):
-    """Manage a set of LocTask objects and their states."""
+class JobManager(object):
+    """Manage a set of LocJobProxy objects and their states."""
 
-    def __init__(self, tasks, names=None):
-        """Initiate a location task manager.
+    def __init__(self, jobs, names=None):
+        """Initiate a location job manager.
 
-        tasks: A dict of all available tasks (task.name, task).
-        names: A list of keys in tasks to process.
-               If not set or empty, process all tasks.
+        jobs: A dict of all available jobs (job.name, job).
+        names: A list of keys in jobs to process.
+               If not set or empty, process all jobs.
 
         """
-        self.tasks = tasks
-        self.ready_tasks = []
+        self.jobs = jobs
+        self.ready_jobs = []
         if not names:
-            names = tasks.keys()
+            names = jobs.keys()
         for name in names:
-            self.ready_tasks.append(self.tasks[name])
-        self.working_tasks = {}
+            self.ready_jobs.append(self.jobs[name])
+        self.working_jobs = {}
 
-    def get_task(self):
-        """Return the next task that requires processing."""
-        while self.ready_tasks:
-            task = self.ready_tasks.pop()
-            for dep_key, dep_task in task.pending_for.items():
-                if dep_task.state == dep_task.ST_DONE:
-                    task.pending_for.pop(dep_key)
-                    if dep_task.needed_by.has_key(task.name):
-                        dep_task.needed_by.pop(task.name)
+    def get_job(self):
+        """Return the next job that requires processing."""
+        while self.ready_jobs:
+            job = self.ready_jobs.pop()
+            for dep_key, dep_job in job.pending_for.items():
+                if dep_job.state == dep_job.ST_DONE:
+                    job.pending_for.pop(dep_key)
+                    if dep_job.needed_by.has_key(job.name):
+                        dep_job.needed_by.pop(job.name)
                 else:
-                    dep_task.needed_by[task.name] = task
-                    if dep_task.state is None:
-                        dep_task.state = dep_task.ST_READY
-                        self.ready_tasks.append(dep_task)
-            if task.pending_for:
-                task.state = task.ST_PENDING
+                    dep_job.needed_by[job.name] = job
+                    if dep_job.state is None:
+                        dep_job.state = dep_job.ST_READY
+                        self.ready_jobs.append(dep_job)
+            if job.pending_for:
+                job.state = job.ST_PENDING
             else:
-                self.working_tasks[task.name] = task
-                task.state = task.ST_WORKING
-                return task
+                self.working_jobs[job.name] = job
+                job.state = job.ST_WORKING
+                return job
 
-    def get_dead_tasks(self):
-        """Return pending tasks if there are no ready/working ones."""
-        if not self.has_tasks:
-            return [task if task.pending_for for task in self.tasks.values()]
-        return (not self.has_tasks and
-                any([task.pending_for for task in self.tasks.values()]))
+    def get_dead_jobs(self):
+        """Return pending jobs if there are no ready/working ones."""
+        if not self.has_jobs:
+            return [job if job.pending_for for job in self.jobs.values()]
+        return (not self.has_jobs and
+                any([job.pending_for for job in self.jobs.values()]))
 
-    def has_tasks(self):
-        """Return True if there are ready tasks or working tasks."""
-        return bool(self.ready_tasks) or bool(self.working_tasks)
+    def has_jobs(self):
+        """Return True if there are ready jobs or working jobs."""
+        return bool(self.ready_jobs) or bool(self.working_jobs)
 
-    def has_ready_tasks(self):
-        """Return True if there are ready tasks."""
-        return bool(self.ready_tasks)
+    def has_ready_jobs(self):
+        """Return True if there are ready jobs."""
+        return bool(self.ready_jobs)
 
-    def put_task(self, task_proxy):
-        """Tell the manager that a task has completed."""
-        task = self.working_tasks.pop(task_proxy.name)
-        task.update(task_proxy)
-        for up_key, up_task in task.needed_by.items():
-            task.needed_by.pop(up_key)
-            up_task.pending_for.pop(task.name)
-            if not up_task.pending_for:
-                self.ready_tasks.append(up_task)
-                up_task.state = up_task.ST_READY
-        return task
+    def put_job(self, job_proxy):
+        """Tell the manager that a job has completed."""
+        job = self.working_jobs.pop(job_proxy.name)
+        job.update(job_proxy)
+        for up_key, up_job in job.needed_by.items():
+            job.needed_by.pop(up_key)
+            up_job.pending_for.pop(job.name)
+            if not up_job.pending_for:
+                self.ready_jobs.append(up_job)
+                up_job.state = up_job.ST_READY
+        return job
 
 
-class TaskRunner(object):
-    """Runs LocTask objects with pool of workers."""
+class JobRunner(object):
+    """Runs LocJobProxy objects with pool of workers."""
 
     NPROC = 6
     POLL_DELAY = 0.05
 
-    def __init__(self, task_processor):
-        self.task_processor = task_processor
+    def __init__(self, job_processor):
+        self.job_processor = job_processor
         conf = ResourceLocator.default().get_conf()
         self.nproc = int(conf.get_value(
                 ["rose.config_processors.file", "nproc"],
                 default=self.NPROC))
 
-    def run(self, config, task_manager):
+    def run(self, job_manager, *args):
+        """Start the job runner with an instance of JobManager."""
         nproc = self.nproc
-        if nproc > len(task_manager.tasks):
-            nproc = len(task_manager.tasks)
+        if nproc > len(job_manager.jobs):
+            nproc = len(job_manager.jobs)
         pool = Pool(processes=nproc)
 
         results = {}
-        while task_manager.has_tasks():
+        while job_manager.has_jobs():
             # Process results, if any is ready
             for name, result in results.items():
                 if result.ready():
                     results.pop(name)
-                    task_proxy, args_of_events = result.get()
+                    job_proxy, args_of_events = result.get()
                     for args_of_event in args_of_events:
-                        self.task_processor.handle_event(*args_of_event)
-                    task = task_manager.put_task(task_proxy)
-                    self.task_processor.post_process_task(config, task)
-            # Add some more tasks into the worker pool, as they are ready
-            while task_manager.has_ready_tasks():
-                task = task_manager.get_task()
-                if task is None:
+                        self.job_processor.handle_event(*args_of_event)
+                    job = job_manager.put_job(job_proxy)
+                    self.job_processor.post_process_job(job, *args)
+            # Add some more jobs into the worker pool, as they are ready
+            while job_manager.has_ready_jobs():
+                job = job_manager.get_job()
+                if job is None:
                     break
-                result = pool.apply_async(_loc_task_run,
-                                          [self.task_processor, config, task])
-                results[task.name] = result
+                result = pool.apply_async(_loc_job_run,
+                                          [self.job_processor, job, *args])
+                results[job.name] = result
             if results:
                 sleep(self.POLL_DELAY)
 
-        dead_tasks = task_manager.get_dead_tasks()
-        if dead_tasks:
-            raise UnfinishedTasksError(dead_tasks)
+        dead_jobs = job_manager.get_dead_jobs()
+        if dead_jobs:
+            raise UnfinishedJobsError(dead_jobs)
 
     __call__ = run
 
@@ -273,21 +281,21 @@ class WorkerEventHandler(object):
         self.events.append((message, type, level, prefix, clip))
 
 
-def _loc_task_run(task_processor, task_proxy):
-    """Helper for LocTaskRunner."""
+def _loc_job_run(job_processor, job_proxy, *args):
+    """Helper for JobRunner."""
     event_handler = WorkerEventHandler()
-    task_processor.set_event_handler(event_handler)
-    task_processor.process_task(task_proxy)
-    task_processor.set_event_handler(None)
-    return (task_proxy, event_handler.events)
+    job_processor.set_event_handler(event_handler)
+    job_processor.process_job(job_proxy, *args)
+    job_processor.set_event_handler(None)
+    return (job_proxy, event_handler.events)
 
 
-class UnfinishedTasksError(Exception):
-    """Error raised when there are no ready/working tasks but pending ones."""
+class UnfinishedJobsError(Exception):
+    """Error raised when there are no ready/working jobs but pending ones."""
     def __str__(self):
         ret = ""
-        for task in self.args:
-            ret += "[DEAD TASK] %s\n" % str(task)
+        for job in self.args:
+            ret += "[DEAD TASK] %s\n" % str(job)
         return ret
 
 
@@ -302,17 +310,20 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def __init__(self, *args, **kwargs):
         ConfigProcessorBase.__init__(self, *args, **kwargs)
-        self.file_loc_handlers_manager = FileLocHandlersManager(
+        self.loc_handlers_manager = PullableLocHandlersManager(
                 event_handler=self.manager.event_handler,
                 popen=self.manager.popen,
                 fs_util=self.manager.fs_util)
         self.loc_dao = LocDAO()
 
     def handle_event(self, *args):
+        """Invoke event handler with *args, if there is one."""
         self.manager.handle_event(*args)
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Install files according to the file:* sections in "config"."""
+
+        # Find all the "file:*" nodes.
         nodes = {}
         if item == self.SCHEME:
             for key, node in config.value.items():
@@ -360,7 +371,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Its invariant name.
         # * Whether it can be considered unchanged.
         for source in sources.values():
-            self._source_parse(config, source)
+            self._source_parse(source, config.get(["loc:" + source.name]))
 
         # Inspect each target to see if it is out of date:
         # * Target does not already exist.
@@ -374,7 +385,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 m = md5()
                 f = open(target.name)
                 m.update(f.read())
-                target.paths = [LocPath("", m.hexdigest())]
+                target.paths = [PathInLoc("", m.hexdigest())]
             elif os.path.isdir(target.name):
                 target.paths = []
                 for dirpath, dirnames, filenames in os.walk(target.name):
@@ -384,13 +395,13 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                             dirnames.pop(i)
                             continue
                         target.paths.append(
-                                LocPath(os.path.join(dirpath, dirname)))
+                                PathInLoc(os.path.join(dirpath, dirname)))
                     for filename in filenames:
                         m = md5()
-                        file_path = os.path.join(dirpath, filename)
-                        f = open(file_path)
+                        filepath = os.path.join(dirpath, filename)
+                        f = open(filepath)
                         m.update(f.read())
-                        target.paths.append(LocPath(file_path, m.hexdigest()))
+                        target.paths.append(PathInLoc(filepath, m.hexdigest()))
                 target.paths.sort()
             prev_target = self.loc_dao.select(target.name)
             target.is_out_of_date = (
@@ -403,8 +414,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             if target.is_out_of_date:
                 self.loc_dao.delete(target)
 
-        # Set up tasks for rebuilding all out-of-date targets.
-        tasks = {}
+        # Set up jobs for rebuilding all out-of-date targets.
+        jobs = {}
         for target in targets.values():
             if not target.is_out_of_date:
                 continue
@@ -413,21 +424,21 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     self.manager.fs_util.symlink(target.dep_locs[0], target.name)
                     self.loc_dao.update(target)
                 else:
-                    tasks[target.name] = LocTask(target, self.T_INSTALL)
+                    jobs[target.name] = LocJobProxy(target, self.T_INSTALL)
                     for source in target.dep_locs:
-                        tasks[source.name] = LocTask(source, self.T_PULL)
+                        jobs[source.name] = LocJobProxy(source, self.T_PULL)
             elif target.mode == "mkdir":
                 self.manager.fs_util.makedirs(target.name)
                 self.loc_dao.update(target)
                 target.loc_type = target.TYPE_TREE
-                target.paths = [LocPath("", None)]
+                target.paths = [PathInLoc("", None)]
             else:
                 self.manager.fs_util.create(target.name)
                 self.loc_dao.update(target)
                 target.loc_type = target.TYPE_BLOB
-                target.paths = [LocPath("", md5().hexdigest())]
+                target.paths = [PathInLoc("", md5().hexdigest())]
 
-        TaskRunner(self)(config, TaskManager(tasks))
+        JobRunner(self)(JobManager(jobs), config)
 
         # Target checksum compare and report
         for target in targets.values():
@@ -444,28 +455,46 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             event = ChecksumEvent(target.name, checksum)
             self.handle_event(event)
 
-    def process_task(self, config, task):
-        """Process a task, helper for process."""
-        if task.task_key == self.T_INSTALL:
-            self._target_install(config, task.loc)
-        elif task.task_key == self.T_PULL:
-            self._source_pull(config, task.loc)
-        task.state = task.ST_DONE
+    def process_job(self, job, config):
+        """Process a job, helper for process."""
+        if job.action_key == self.T_INSTALL:
+            self._target_install(job.loc, config)
+        elif job.action_key == self.T_PULL:
+            self._source_pull(job.loc)
+        job.state = job.ST_DONE
 
-    def post_process_task(self, config, task):
-        self.loc_dao.update(task.loc)
+    def post_process_job(self, job, config):
+        self.loc_dao.update(job.loc)
 
-    def _source_parse(self, config, task):
-        pass # TODO
+    def _source_parse(self, source, config):
+        if config is not None:
+            scheme = config.get_value(["scheme"])
+            if scheme:
+                loc.scheme = scheme
+        self.loc_handlers_manager.parse(source)
+        prev_source = self.loc_dao.select(source.name)
+        source.is_out_of_date = (
+                not prev_source or
+                (not source.real_name and not source.paths) or
+                prev_source.scheme != source.scheme or
+                prev_source.loc_type != source.loc_type or
+                prev_source.real_name != source.real_name or
+                prev_source.paths != source.paths)
 
-    def _source_pull(self, config, task):
-        pass # TODO
+    def _source_pull(self, source):
+        self.loc_handlers_manager.pull(source)
 
-    def _target_install(self, config, task):
+    def _target_install(self, target, config):
+        """Install target.
+
+        Build target using its source(s).
+        Calculate the checksum(s) of (paths in) target.
+
+        """
         f = None
         is_first = True
         # Install target
-        for source in task.loc.dep_locs:
+        for source in job.loc.dep_locs:
             if target.loc_type is None:
                 target.loc_type = source.loc_type
             elif target.loc_type != source.loc_type
@@ -491,48 +520,20 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if target.loc_type == target.TYPE_BLOB:
             m = md5()
             m.update(open(target).read())
-            target.paths = [LocPath("", m.hexdigest())]
+            target.paths = [PathInLoc("", m.hexdigest())]
         else:
             target.paths = []
             for dirpath, dirnames, filenames in os.walk(target):
                 path = dirpath[len(target) + 1:]
-                target.paths.append(LocPath(path, None))
+                target.paths.append(PathInLoc(path, None))
                 for filename in filenames:
                     filepath = os.path.join(path, filename)
                     m = md5()
                     m.update(open(filepath).read())
-                    target.paths.append(LocPath(filepath, m.hexdigest()))
-
-    #def _source_export(self, source, target):
-    #    """Export/copy a source file/directory in FS or FCM VC to a target."""
-    #    if source == target:
-    #        return
-    #    elif self._source_is_fcm(source):
-    #        command = ["fcm", "export", "--quiet", source, target]
-    #        return self.manager.popen(*command)
-    #    elif os.path.isdir(source):
-    #        ignore = shutil.ignore_patterns(".*")
-    #        return shutil.copytree(source, target, ignore=ignore)
-    #    else:
-    #        return shutil.copyfile(source, target)
-
-
-    #def _source_is_fcm(self, source):
-    #    """Return true if source is an FCM version controlled resource."""
-    #    return self.RE_FCM_SRC.match(source) is not None
-
-
-    #def _source_load(self, source):
-    #    """Load and return the content of a source file in FS or FCM VC."""
-    #    if self._source_is_fcm(source):
-    #        f = tempfile.TemporaryFile()
-    #        self.manager.popen("fcm", "cat", source, stdout=f)
-    #        f.seek(0)
-    #        return f.read()
-    #    else:
-    #        return open(source).read()
+                    target.paths.append(PathInLoc(filepath, m.hexdigest()))
 
     def set_event_handler(self, event_handler):
+        """Sets the event handler, used by pool workers to capture events."""
         try:
             self.manager.event_handler.event_handler = event_handler
         except AttributeError:
@@ -606,7 +607,7 @@ class LocDAO(object):
             path, checksum = row
             if loc.paths is None:
                 loc.paths = []
-            loc.paths.append(LocPath(path, checksum))
+            loc.paths.append(PathInLoc(path, checksum))
 
         c.execute("""SELECT dep_name FROM dep_names WHERE name=?""", name)
         for row in c:
@@ -631,79 +632,44 @@ class LocDAO(object):
                           name, dep_loc.name)
 
 
-#class FileLocHandlerBase(object):
-#    """Base class for a file location handler."""
-#
-#    SCHEME = None
-#    PULL_MODE = "PULL_MODE"
-#    PUSH_MODE = "PUSH_MODE"
-#
-#    def __init__(self, manager):
-#        self.manager = manager
-#
-#    def handle_event(self, *args, **kwargs):
-#        """Call self.event_handler with given arguments if possible."""
-#        self.manager.handle_event(*args, **kwargs)
-#
-#    def can_handle(self, file_loc, mode=PULL_MODE):
-#        """Return True if this handler can handle file_loc."""
-#        return False
-#
-#    def load(self, file_loc, **kwargs):
-#        """Return a temporary file handle to read a remote file_loc."""
-#        f = tempfile.NamedTemporaryFile()
-#        self.pull(f.name, file_loc)
-#        f.seek(0)
-#        return f
-#
-#    def pull(self, file_path, file_loc, **kwargs):
-#        """Pull remote file_loc to local file_path."""
-#        raise NotImplementedError()
-#
-#    def push(self, file_path, file_loc, **kwargs):
-#        """Push local file_path to remote file_loc."""
-#        raise NotImplementedError()
-#
-#
-#class FileLocHandlersManager(SchemeHandlersManager):
-#    """Manage location handlers."""
-#
-#    PULL_MODE = FileLocHandlerBase.PULL_MODE
-#    PUSH_MODE = FileLocHandlerBase.PUSH_MODE
-#
-#    def __init__(self, event_handler=None, popen=None, fs_util=None):
-#        path = os.path.join(os.path.dirname(__file__), "file_loc_handlers")
-#        SchemeHandlersManager.__init__(self, path, ["load", "pull", "push"])
-#        self.event_handler = event_handler
-#        if popen is None:
-#            popen = RosePopener(event_handler)
-#        self.popen = popen
-#        if fs_util is None:
-#            fs_util = FileSystemUtil(event_handler)
-#        self.fs_util = fs_util
-#
-#    def handle_event(self, *args, **kwargs):
-#        """Call self.event_handler with given arguments if possible."""
-#        if callable(self.event_handler):
-#            return self.event_handler(*args, **kwargs)
-#
-#    def load(self, file_loc, **kwargs):
-#        if file_loc.scheme:
-#            p = self.get_handler(file_loc.scheme)
-#        else:
-#            p = self.guess_handler(file_loc, mode=self.PULL_MODE)
-#        return p.load(file_loc, **kwargs)
-#
-#    def pull(self, file_path, file_loc, **kwargs):
-#        if file_loc.scheme:
-#            p = self.get_handler(file_loc.scheme)
-#        else:
-#            p = self.guess_handler(file_loc, mode=self.PULL_MODE)
-#        return p.pull(file_path, file_loc, **kwargs)
-#
-#    def push(self, file_path, file_loc, **kwargs):
-#        if file_loc.scheme:
-#            p = self.get_handler(file_loc.scheme)
-#        else:
-#            p = self.guess_handler(file_loc, mode=self.PUSH_MODE)
-#        return p.push(file_path, file_loc, **kwargs)
+class PullableLocHandlersManager(SchemeHandlersManager):
+    """Manage location handlers."""
+
+    def __init__(self, event_handler=None, popen=None, fs_util=None):
+        path = os.path.join(os.path.dirname(__file__), "loc_handlers")
+        SchemeHandlersManager.__init__(self, path, ["parse", "pull"])
+        self.event_handler = event_handler
+        if popen is None:
+            popen = RosePopener(event_handler)
+        self.popen = popen
+        if fs_util is None:
+            fs_util = FileSystemUtil(event_handler)
+        self.fs_util = fs_util
+
+    def handle_event(self, *args, **kwargs):
+        """Call self.event_handler with given arguments if possible."""
+        if callable(self.event_handler):
+            return self.event_handler(*args, **kwargs)
+
+    def parse(self, loc):
+        """Parse loc.name, set loc.real_name, loc.scheme where possible."""
+        if loc.scheme:
+            p = self.get_handler(loc.scheme)
+        else:
+            p = self.guess_handler(loc)
+        return p.parse(loc)
+
+    def pull(self, loc):
+        """Pull a location to the local file system.
+
+        If loc.cache is defined, pull to the specified path.
+        Otherwise, pull to a temporary directory and set loc.cache.
+
+        Set loc.loc_type where possible.
+
+        """
+        if file_loc.scheme:
+            p = self.get_handler(loc.scheme)
+        else:
+            p = self.guess_handler(loc)
+        return p.pull(loc)

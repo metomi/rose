@@ -736,7 +736,9 @@ class TaskRunner(Runner):
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
-        self.task_utils_manager = TaskUtilsManager(*args, **kwargs)
+        path = os.path.join(os.path.dirname(__file__), "task_utils")
+        self.task_utils_manager = SchemeHandlersManager(path, ["run"], *args,
+                                                        **kwargs)
 
     def run_impl(self, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props(
@@ -839,14 +841,6 @@ class TaskUtilBase(AppRunner):
 
     def run_impl_main(self, config, opts, args, uuid, work_files):
         raise NotImplementedError()
-
-
-class TaskUtilsManager(SchemeHandlersManager):
-    """Load and select task utilities."""
-
-    def __init__(self, *args, **kwargs):
-        path = os.path.join(os.path.dirname(__file__), "task_utils")
-        SchemeHandlersManager.__init__(self, path, ["run"], *args, **kwargs)
 
 
 def main():
