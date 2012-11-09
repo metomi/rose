@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Reference Guide: Variables</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose Reference Guide: Variables</h1>
+
+    <div id="content"></div>
+
+    <dl>
+    <dt><var>NPROC</var></dt>
+      <dd>Specifies the number of processors to run on. Default is 1.</dd>    
+    <dt><var>ROSE_DATA</var></dt>
+      <dd>The path to the data directory of the running suite.</dd>
+    <dt><var>ROSE_DATAC</var></dt>
+      <dd>The path to the data directory of this cycle time in the running 
+      suite.</dd>
+    <dt><var>ROSE_DATAC????</var></dt>
+      <dd>The path to the data directory of the cycle time with an offset 
+      relative to the current cycle time. <var>????</var> is a duration:
+        <ul>
+          <li>A <var>__</var> (double underscore) prefix denotes a cycle time 
+          in the future. Otherwise, it is a cycle time in the past.</li>
+          <li><var>nW</var> denotes n weeks.</li>
+          <li><var>n</var> or <var>nD</var> denotes n days.</li>
+          <li><var>Tn</var> or <var>TnH</var> denotes n hours.</li>
+          <li><var>TnM</var> denotes n minutes.</li>
+          <li><var>TnS</var> denotes n seconds.</li>
+        </ul>
+          E.g. <var>ROSE_DATACT6H</var> is the data directory of 6 hours before
+          the current cycle time.<br/> 
+          E.g. <var>ROSE_DATAC1D</var> and <var>ROSE_DATACT24H</var> are both 
+          the data directory of 1 day before the current cycle time.
+      </dd>
+    <dt><var>ROSE_LAUNCH_INNER</var></dt>
+      <dd>Specifies an inner wrapper to be run by launcher, can be set to "" to
+      call the executable directly. Default is $0 --inner.</dd>
+    <dt><var>ROSE_LAUNCHER</var></dt>
+      <dd>Specifies the launcher program to run the prog.</dd>
+    <dt><var>ROSE_LAUNCHER_LIST</var></dt>
+      <dd>Specifies an alternative list of launchers.</dd>
+    <dt><var>ROSE_LAUNCHER_MPICH</var></dt>
+      <dd>Specifies the mpich launcher program to run the prog. Default is 
+      mpiexec.</dd>
+    <dt><var>ROSE_LAUNCHER_PREOPTS</var></dt>
+      <dd>Specifies the options to the launcher program to be inserted before 
+      the program name.</dd>
+    <dt><var>ROSE_LAUNCHER_POSTOPTS</var></dt>
+      <dd>Specifies the options to the launcher program to be inserted after 
+      the program name.</dd>
+    <dt><var>ROSE_LAUNCHER_ULIMIT_OPTS</var></dt>
+      <dd>Specifies the arguments to ulimit. Setting this variable to 
+      <kbd>-a -s unlimited -d unlimited -a</kbd> results in <kbd>ulimit -a;
+      ulimit -s unlimited; ulimit -d unlimited; ulimit -a</kbd></dd>
+    <dt><var>ROSE_ORIG_HOST</var></dt>
+      <dd>The name of the host where the <kbd>rose suite-run</kbd> command was 
+      invoked.</dd> 
+    <dt><var>ROSE_SUITE_DIR</var></dt>
+      <dd>The path to the root directory of the running suite.</dd>
+    <dt><var>ROSE_SUITE_NAME</var></dt>
+      <dd>The name of the running suite.</dd>
+    <dt><var>ROSE_TASK_APP</var></dt>
+      <dd>Specify a named application configuration.</dd>
+    <dt><var>ROSE_TASK_CYCLE_TIME</var></dt>
+      <dd>The cycle time of the suite task, if there is one.</dd>
+    <dt><var>ROSE_TASK_LOG_ROOT</var></dt>
+      <dd>The root path for log files of the suite task.</dd>
+    <dt><var>ROSE_TASK_N_JOBS</var></dt>
+      <dd>The number of jobs to run in parallel in fcm make. (default=4)</dd>
+    <dt><var>ROSE_TASK_NAME</var></dt>
+      <dd>The name of the suite task.</dd>
+    <dt><var>ROSE_TASK_OPTIONS</var></dt>
+      <dd>Additional options and arguments for fcm make or rose app-run. 
+      (default='')</dd>
+    <dt><var>ROSE_TASK_PRE_SCRIPT</var></dt>
+      <dd>Source (. invoke) the specified script before running the main 
+      command. (default='')</dd>
+    <dt><var>ROSE_TASK_PREFIX</var></dt>
+      <dd>The prefix in the task name.</dd>
+    <dt><var>ROSE_TASK_SUFFIX</var></dt>
+      <dd>The suffix in the task name.</dd>
+    <dt><var>ROSE_TASK_UTIL</var></dt>
+      <dd>Specify a named task utility.</dd>
+    </dl>
+ 
+    </div>
+  </div>
+</body>
+</html>
