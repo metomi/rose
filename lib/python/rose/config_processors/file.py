@@ -419,11 +419,30 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             elif target.mode == "mkdir":
                 self.manager.fs_util.makedirs(target.name)
                 self.loc_dao.update(target)
+                target.loc_type = target.TYPE_TREE
+                target.paths = [LocPath("", None)]
             else:
                 self.manager.fs_util.create(target.name)
                 self.loc_dao.update(target)
+                target.loc_type = target.TYPE_BLOB
+                target.paths = [LocPath("", md5().hexdigest())]
 
         TaskRunner(self)(config, TaskManager(tasks))
+
+        # Target checksum compare and report
+        for target in targets.values():
+            if not target.is_out_of_date or target.loc_type == target.TYPE_TREE:
+                continue
+            keys = [self.PREFIX + target.name, "checksum"]
+            checksum_expected = config.get_value(keys)
+            if checksum_expected is None:
+                continue
+            checksum = target.paths[0].checksum
+            if checksum_expected and checksum_expected != checksum:
+                e = UnmatchedChecksumError(checksum_expected, checksum)
+                raise ConfigProcessError(keys, checksum_expected, e)
+            event = ChecksumEvent(target.name, checksum)
+            self.handle_event(event)
 
     def process_task(self, config, task):
         """Process a task, helper for process."""
@@ -445,6 +464,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     def _target_install(self, config, task):
         f = None
         is_first = True
+        # Install target
         for source in task.loc.dep_locs:
             if target.loc_type is None:
                 target.loc_type = source.loc_type
@@ -467,109 +487,50 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if f is not None:
             f.close()
 
-    def process_target(self, config, key, node):
-        """Install a target according to a file:target section."""
-        target = key[len(self.PREFIX):]
-
-        content_value = node.get_value(["content"])
-        if content_value:
-            # Embedded content
-            if os.path.isdir(target):
-                self.manager.fs_util.delete(target)
-            target_file = open(target, 'wb')
-            contents = shlex.split(content_value)
-            for content in contents:
-                target_file.write(self.manager.process(
-                        config, content,
-                        [key, "content"], content_value))
-            target_file.close()
-            self.manager.handle_event(
-                    FileSystemEvent("content", target, " ".join(contents)))
+        # Calculate target checksum(s)
+        if target.loc_type == target.TYPE_BLOB:
+            m = md5()
+            m.update(open(target).read())
+            target.paths = [LocPath("", m.hexdigest())]
         else:
-            # Free format file
-            source_str = node.get_value(["source"], default="")
-            sources = []
-            for source in shlex.split(source_str):
-                try:
-                    source = env_var_process(source)
-                except UnboundEnvironmentVariableError as e:
-                    raise ConfigProcessError(
-                            [key, "source"], source_str, e)
-                sources.append(os.path.expanduser(source))
-            mode = node.get_value(["mode"])
-            if len(sources) == 1:
-                source = sources[0]
-                if mode == "symlink":
-                    self.manager.fs_util.symlink(source, target)
-                else:
-                    #if os.path.exists(target):
-                    #    self.manager.fs_util.delete(target)
-                    loc = FileLoc(source)
-                    self.file_loc_handlers_manager.pull(target, loc)
-                    self.manager.handle_event(
-                            FileSystemEvent("install", target, source))
-            elif len(sources) > 1 or len(sources) == 0 and mode != "mkdir":
-                if os.path.isdir(target):
-                    self.manager.fs_util.delete(target)
-                target_file = open(target, 'wb')
-                for source in sources:
-                    loc = FileLoc(source)
-                    f = self.file_loc_handlers_manager.load(loc)
-                    target_file.write(f.read())
-                target_file.close()
-                self.manager.handle_event(
-                        FileSystemEvent("install", target, source_str))
-            else:
-                if os.path.isdir(target):
-                    for name in os.listdir(target):
-                        path = os.path.join(target, name)
-                        self.manager.fs_util.delete(path)
-                else:
-                    self.manager.fs_util.delete(target)
-                    self.manager.fs_util.makedirs(target)
+            target.paths = []
+            for dirpath, dirnames, filenames in os.walk(target):
+                path = dirpath[len(target) + 1:]
+                target.paths.append(LocPath(path, None))
+                for filename in filenames:
+                    filepath = os.path.join(path, filename)
+                    m = md5()
+                    m.update(open(filepath).read())
+                    target.paths.append(LocPath(filepath, m.hexdigest()))
 
-            # Target MD5 checksum
-            checksum_expected = node.get_value(["checksum"])
-            if checksum_expected is not None:
-                target_file = open(target)
-                m = md5()
-                m.update(target_file.read())
-                checksum = m.hexdigest()
-                if checksum_expected and checksum_expected != checksum:
-                    e = UnmatchedChecksumError(checksum_expected, checksum)
-                    raise ConfigProcessError(
-                            [key, "checksum"], checksum_expected, e)
-                target_file.close()
-                self.manager.handle_event(ChecksumEvent(target, checksum))
-
-    def _source_export(self, source, target):
-        """Export/copy a source file/directory in FS or FCM VC to a target."""
-        if source == target:
-            return
-        elif self._source_is_fcm(source):
-            command = ["fcm", "export", "--quiet", source, target]
-            return self.manager.popen(*command)
-        elif os.path.isdir(source):
-            ignore = shutil.ignore_patterns(".*")
-            return shutil.copytree(source, target, ignore=ignore)
-        else:
-            return shutil.copyfile(source, target)
+    #def _source_export(self, source, target):
+    #    """Export/copy a source file/directory in FS or FCM VC to a target."""
+    #    if source == target:
+    #        return
+    #    elif self._source_is_fcm(source):
+    #        command = ["fcm", "export", "--quiet", source, target]
+    #        return self.manager.popen(*command)
+    #    elif os.path.isdir(source):
+    #        ignore = shutil.ignore_patterns(".*")
+    #        return shutil.copytree(source, target, ignore=ignore)
+    #    else:
+    #        return shutil.copyfile(source, target)
 
 
-    def _source_is_fcm(self, source):
-        """Return true if source is an FCM version controlled resource."""
-        return self.RE_FCM_SRC.match(source) is not None
+    #def _source_is_fcm(self, source):
+    #    """Return true if source is an FCM version controlled resource."""
+    #    return self.RE_FCM_SRC.match(source) is not None
 
 
-    def _source_load(self, source):
-        """Load and return the content of a source file in FS or FCM VC."""
-        if self._source_is_fcm(source):
-            f = tempfile.TemporaryFile()
-            self.manager.popen("fcm", "cat", source, stdout=f)
-            f.seek(0)
-            return f.read()
-        else:
-            return open(source).read()
+    #def _source_load(self, source):
+    #    """Load and return the content of a source file in FS or FCM VC."""
+    #    if self._source_is_fcm(source):
+    #        f = tempfile.TemporaryFile()
+    #        self.manager.popen("fcm", "cat", source, stdout=f)
+    #        f.seek(0)
+    #        return f.read()
+    #    else:
+    #        return open(source).read()
 
     def set_event_handler(self, event_handler):
         try:
@@ -670,79 +631,79 @@ class LocDAO(object):
                           name, dep_loc.name)
 
 
-class FileLocHandlerBase(object):
-    """Base class for a file location handler."""
-
-    SCHEME = None
-    PULL_MODE = "PULL_MODE"
-    PUSH_MODE = "PUSH_MODE"
-
-    def __init__(self, manager):
-        self.manager = manager
-
-    def handle_event(self, *args, **kwargs):
-        """Call self.event_handler with given arguments if possible."""
-        self.manager.handle_event(*args, **kwargs)
-
-    def can_handle(self, file_loc, mode=PULL_MODE):
-        """Return True if this handler can handle file_loc."""
-        return False
-
-    def load(self, file_loc, **kwargs):
-        """Return a temporary file handle to read a remote file_loc."""
-        f = tempfile.NamedTemporaryFile()
-        self.pull(f.name, file_loc)
-        f.seek(0)
-        return f
-
-    def pull(self, file_path, file_loc, **kwargs):
-        """Pull remote file_loc to local file_path."""
-        raise NotImplementedError()
-
-    def push(self, file_path, file_loc, **kwargs):
-        """Push local file_path to remote file_loc."""
-        raise NotImplementedError()
-
-
-class FileLocHandlersManager(SchemeHandlersManager):
-    """Manage location handlers."""
-
-    PULL_MODE = FileLocHandlerBase.PULL_MODE
-    PUSH_MODE = FileLocHandlerBase.PUSH_MODE
-
-    def __init__(self, event_handler=None, popen=None, fs_util=None):
-        path = os.path.join(os.path.dirname(__file__), "file_loc_handlers")
-        SchemeHandlersManager.__init__(self, path, ["load", "pull", "push"])
-        self.event_handler = event_handler
-        if popen is None:
-            popen = RosePopener(event_handler)
-        self.popen = popen
-        if fs_util is None:
-            fs_util = FileSystemUtil(event_handler)
-        self.fs_util = fs_util
-
-    def handle_event(self, *args, **kwargs):
-        """Call self.event_handler with given arguments if possible."""
-        if callable(self.event_handler):
-            return self.event_handler(*args, **kwargs)
-
-    def load(self, file_loc, **kwargs):
-        if file_loc.scheme:
-            p = self.get_handler(file_loc.scheme)
-        else:
-            p = self.guess_handler(file_loc, mode=self.PULL_MODE)
-        return p.load(file_loc, **kwargs)
-
-    def pull(self, file_path, file_loc, **kwargs):
-        if file_loc.scheme:
-            p = self.get_handler(file_loc.scheme)
-        else:
-            p = self.guess_handler(file_loc, mode=self.PULL_MODE)
-        return p.pull(file_path, file_loc, **kwargs)
-
-    def push(self, file_path, file_loc, **kwargs):
-        if file_loc.scheme:
-            p = self.get_handler(file_loc.scheme)
-        else:
-            p = self.guess_handler(file_loc, mode=self.PUSH_MODE)
-        return p.push(file_path, file_loc, **kwargs)
+#class FileLocHandlerBase(object):
+#    """Base class for a file location handler."""
+#
+#    SCHEME = None
+#    PULL_MODE = "PULL_MODE"
+#    PUSH_MODE = "PUSH_MODE"
+#
+#    def __init__(self, manager):
+#        self.manager = manager
+#
+#    def handle_event(self, *args, **kwargs):
+#        """Call self.event_handler with given arguments if possible."""
+#        self.manager.handle_event(*args, **kwargs)
+#
+#    def can_handle(self, file_loc, mode=PULL_MODE):
+#        """Return True if this handler can handle file_loc."""
+#        return False
+#
+#    def load(self, file_loc, **kwargs):
+#        """Return a temporary file handle to read a remote file_loc."""
+#        f = tempfile.NamedTemporaryFile()
+#        self.pull(f.name, file_loc)
+#        f.seek(0)
+#        return f
+#
+#    def pull(self, file_path, file_loc, **kwargs):
+#        """Pull remote file_loc to local file_path."""
+#        raise NotImplementedError()
+#
+#    def push(self, file_path, file_loc, **kwargs):
+#        """Push local file_path to remote file_loc."""
+#        raise NotImplementedError()
+#
+#
+#class FileLocHandlersManager(SchemeHandlersManager):
+#    """Manage location handlers."""
+#
+#    PULL_MODE = FileLocHandlerBase.PULL_MODE
+#    PUSH_MODE = FileLocHandlerBase.PUSH_MODE
+#
+#    def __init__(self, event_handler=None, popen=None, fs_util=None):
+#        path = os.path.join(os.path.dirname(__file__), "file_loc_handlers")
+#        SchemeHandlersManager.__init__(self, path, ["load", "pull", "push"])
+#        self.event_handler = event_handler
+#        if popen is None:
+#            popen = RosePopener(event_handler)
+#        self.popen = popen
+#        if fs_util is None:
+#            fs_util = FileSystemUtil(event_handler)
+#        self.fs_util = fs_util
+#
+#    def handle_event(self, *args, **kwargs):
+#        """Call self.event_handler with given arguments if possible."""
+#        if callable(self.event_handler):
+#            return self.event_handler(*args, **kwargs)
+#
+#    def load(self, file_loc, **kwargs):
+#        if file_loc.scheme:
+#            p = self.get_handler(file_loc.scheme)
+#        else:
+#            p = self.guess_handler(file_loc, mode=self.PULL_MODE)
+#        return p.load(file_loc, **kwargs)
+#
+#    def pull(self, file_path, file_loc, **kwargs):
+#        if file_loc.scheme:
+#            p = self.get_handler(file_loc.scheme)
+#        else:
+#            p = self.guess_handler(file_loc, mode=self.PULL_MODE)
+#        return p.pull(file_path, file_loc, **kwargs)
+#
+#    def push(self, file_path, file_loc, **kwargs):
+#        if file_loc.scheme:
+#            p = self.get_handler(file_loc.scheme)
+#        else:
+#            p = self.guess_handler(file_loc, mode=self.PUSH_MODE)
+#        return p.push(file_path, file_loc, **kwargs)
