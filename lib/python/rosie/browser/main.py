@@ -880,7 +880,7 @@ class MainWindow(gtk.Window):
     def handle_view_web(self, *args):
         """View a suite's web source URL."""
         this_id = SuiteId(id_text=self.get_selected_suite_id())
-        webbrowser.open_new(this_id.to_web(), new=True, autoraise=True)
+        webbrowser.open(this_id.to_web(), new=True, autoraise=True)
         self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_WEB, 
                                        instant=True)
 
