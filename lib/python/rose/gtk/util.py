@@ -823,29 +823,24 @@ def _handle_command_arg_response(dialog, response, run_hook, entry):
 
 def run_dialog(dialog_type, text, title=None, modal=True):
     """Run a simple dialog with an 'OK' button and some text."""
+
     parent_window = get_dialog_parent()
     dialog = gtk.Dialog(parent=parent_window)
     ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
 
-    #lookup the appropriate image for that dialog type
     if dialog_type == gtk.MESSAGE_INFO:
-	    #Informational message
-	    stock_id = gtk.STOCK_DIALOG_INFO
+        stock_id = gtk.STOCK_DIALOG_INFO
     elif dialog_type == gtk.MESSAGE_WARNING:
-	    #Nonfatal warning message
-	    stock_id = gtk.STOCK_DIALOG_WARNING
+        stock_id = gtk.STOCK_DIALOG_WARNING
     elif dialog_type == gtk.MESSAGE_QUESTION:
-	    #Question requiring a choice
-	    stock_id = gtk.STOCK_DIALOG_QUESTION
+        stock_id = gtk.STOCK_DIALOG_QUESTION
     elif dialog_type == gtk.MESSAGE_ERROR:
-	    #Fatal error message
-	    stock_id = gtk.STOCK_DIALOG_ERROR
-	else:
-	    stock_id = None
-	
-	if stock_id is not None:
-        dialog.image = gtk.image_new_from_stock(stock_id,
-                                                gtk.ICON_SIZE_DIALOG)
+        stock_id = gtk.STOCK_DIALOG_ERROR
+    else:
+        stock_id = None
+
+    if stock_id is not None: 
+        dialog.image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_DIALOG)
         dialog.image.show()
     
     dialog.label = gtk.Label(text)
@@ -953,6 +948,13 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     if "\n" in text:
         label.set_line_wrap(False)
     dialog.set_resizable(True)
+    
+    max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
+    my_size = dialog.size_request()
+    new_size = [-1, -1]
+    for i in [0, 1]:
+        new_size[i] = min([my_size[i], max_size[i]])        
+    dialog.set_default_size(*new_size)    
     dialog.show()
     label.set_selectable(True)
     button.grab_focus()
@@ -1140,14 +1142,23 @@ def run_edit_dialog(text, finish_hook=None, title=None):
                         parent=parent_window)
     dialog.set_default_size(*DIALOG_SIZE_PROCESS)
     dialog.set_border_width(DIALOG_SUB_PADDING)
+
+    scrolled_window = gtk.ScrolledWindow()
+    scrolled_window.set_border_width(10)  
+    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+
     text_buffer = gtk.TextBuffer()
     text_buffer.set_text(text)
     text_view = gtk.TextView()
     text_view.set_editable(True)
     text_view.show()
     text_view.set_buffer(text_buffer)
-    dialog.vbox.pack_start(text_view, expand=True, fill=True,
-                           padding=DIALOG_SUB_PADDING)
+
+    scrolled_window.add_with_viewport(text_view)
+    scrolled_window.show()
+
+    dialog.vbox.pack_start(scrolled_window, expand=True, fill=True,
+                           padding=0)
     get_text = lambda: text_buffer.get_text(text_buffer.get_start_iter(),
                                             text_buffer.get_end_iter())
     if finish_hook is None:
