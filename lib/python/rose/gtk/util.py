@@ -873,6 +873,7 @@ def run_dialog(dialog_type, text, title=None, modal=True):
     dialog.set_modal(modal)
     if title is not None:
         dialog.set_title(title)
+    #ensure the dialog size does not exceed the maximum allowed
     max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
     my_size = dialog.size_request()
     new_size = [-1, -1]
@@ -948,7 +949,7 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     if "\n" in text:
         label.set_line_wrap(False)
     dialog.set_resizable(True)
-    
+    #make sure the dialog size doesn't exceed the maximum - if so change it
     max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
     my_size = dialog.size_request()
     new_size = [-1, -1]
