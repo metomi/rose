@@ -38,6 +38,8 @@
 
     <div id="content"></div>
 
+    <var>The following rose variables are available:</var>
+
     <dl>
     <dt><var>NPROC</var></dt>
       <dd>Specifies the number of processors to run on. Default is 1.</dd>    
@@ -65,14 +67,14 @@
       </dd>
     <dt><var>ROSE_LAUNCH_INNER</var></dt>
       <dd>Specifies an inner wrapper to be run by launcher, can be set to "" to
-      call the executable directly. Default is $0 --inner.</dd>
+      call the executable directly. Default is <kbd>$0 --inner</kbd>.</dd>
     <dt><var>ROSE_LAUNCHER</var></dt>
       <dd>Specifies the launcher program to run the prog.</dd>
     <dt><var>ROSE_LAUNCHER_LIST</var></dt>
       <dd>Specifies an alternative list of launchers.</dd>
     <dt><var>ROSE_LAUNCHER_MPICH</var></dt>
       <dd>Specifies the mpich launcher program to run the prog. Default is 
-      mpiexec.</dd>
+      <var>mpiexec</var>.</dd>
     <dt><var>ROSE_LAUNCHER_PREOPTS</var></dt>
       <dd>Specifies the options to the launcher program to be inserted before 
       the program name.</dd>
@@ -97,11 +99,13 @@
     <dt><var>ROSE_TASK_LOG_ROOT</var></dt>
       <dd>The root path for log files of the suite task.</dd>
     <dt><var>ROSE_TASK_N_JOBS</var></dt>
-      <dd>The number of jobs to run in parallel in fcm make. (default=4)</dd>
+      <dd>The number of jobs to run in parallel in <kbd>fcm make</kbd>. 
+      (default=4)</dd>
     <dt><var>ROSE_TASK_NAME</var></dt>
       <dd>The name of the suite task.</dd>
     <dt><var>ROSE_TASK_OPTIONS</var></dt>
-      <dd>Additional options and arguments for fcm make or rose app-run. 
+      <dd>Additional options and arguments for <kbd>fcm make</kbd> or 
+      <kbd>rose app-run</kbd>. 
       (default='')</dd>
     <dt><var>ROSE_TASK_PRE_SCRIPT</var></dt>
       <dd>Source (. invoke) the specified script before running the main 
