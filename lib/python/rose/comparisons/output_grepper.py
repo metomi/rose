@@ -24,8 +24,7 @@ from rose.ana import DataLengthError, data_from_regexp
 REGEXPS = {
   'um_wallclock' : r"Total Elapsed CPU Time:\s*(\S+)",
   'um_initial_norms' : r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
-  'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)",
-          }
+  'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)", }
 
 class OutputGrepper(object):
     def run(self, task, variable):

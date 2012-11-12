@@ -22,13 +22,16 @@
 from rose.ana import DataLengthError
 import re
 
-DIFF_INDEX = { '#' : 10, 
-               'X' : 1, 
-               '0' : 0.1, 
-               'o' : 0.01,
-               ':' : 0,
-               '.' : -1,
-             }
+DIFF_INDEX = { "#" : 10, 
+               "X" : 1, 
+               "0" : 0.1, 
+               "o" : 0.01,
+               ":" : 0,
+               "." : -1, }
+OUTPUT_STRING = "Files %s: %s c.f. %s %s"
+PASS = "compare"
+FAIL = "differ"
+HEADER = "differ, however the data fields are identical"
 
 class Cumf(object):
     def run(self, task):
@@ -38,7 +41,7 @@ class Cumf(object):
             result = re.search(r"Summary in:\s*(\S*)", line)
             if result:
                 task.cumfsummaryfile = result.group(1)
-        if not hasattr(task, 'cumfsummaryfile'):
+        if not hasattr(task, "cumfsummaryfile"):
             task.set_failure(CumfSummaryNotFoundFailure(task))
             return task
         if task.cumfsummaryfile:
@@ -85,12 +88,11 @@ class CumfComparisonFailure(object):
         self.errors = task.errors
 
     def __repr__(self):
-        text = "Comparison of %s and %s shows files do not match"%(
-               self.resultfile, self.kgo1file)
+        errors = ""
         if self.errors:
             for error in self.errors:
-                text+="\n         %s: >%s%%"%(error, self.errors[error])
-        return text
+                errors += "\n         %s: >%s%%"%(error, self.errors[error])
+        return OUTPUT_STRING % (FAIL, self.resultfile, self.kgo1file, errors)
 
     __str__ = __repr__
 
@@ -105,8 +107,7 @@ class CumfComparisonSuccess(object):
         self.extract = task.extract
 
     def __repr__(self):
-        return "Cumf of %s and %s shows files match"%(
-               self.resultfile, self.kgo1file)
+        return OUTPUT_STRING % (PASS, self.resultfile, self.kgo1file, "")
 
     __str__ = __repr__
 
@@ -121,16 +122,14 @@ class CumfComparisonHeaderWarning(object):
         self.extract = task.extract
 
     def __repr__(self):
-        return "Cumf of %s and %s shows files do not match,"%(
-               self.resultfile, self.kgo1file) + " however the data fields \
-               are identical"
+        return OUTPUT_STRING % (HEADER, self.resultfile, self.kgo1file,  "")
 
     __str__ = __repr__
 
 
 class CumfSummaryNotFoundFailure(object):
 
-    """Class used if there's a problem finding a cumf summary file"""
+    """Class used if there is a problem finding a cumf summary file"""
 
     def __init__(self, task):
         self.resultfile = task.resultfile
@@ -147,7 +146,7 @@ class CumfSummaryNotFoundFailure(object):
 
 class CumfDiffNotFoundFailure(object):
 
-    """Class used if there's a problem finding a cumf diff file"""
+    """Class used if there is a problem finding a cumf diff file"""
 
     def __init__(self, task):
         self.resultfile = task.resultfile
@@ -169,7 +168,7 @@ def analyse_cumf_diff(task):
         result = re.search(r"Difference maps.*:\s*(\S*)", line)
         if result:
             task.cumfdifffile = result.group(1)
-    if not hasattr(task, 'cumfdifffile'):
+    if not hasattr(task, "cumfdifffile"):
         task.set_failure(CumfDiffNotFoundFailure(task))
         return task
     if task.cumfdifffile:
@@ -178,17 +177,17 @@ def analyse_cumf_diff(task):
         fh.close()
         fields = task.cumfdiffoutput.split("Field")
         for field in fields:
-            name = ''
-            result = re.search(r':.*:\s*(.*)', field)
+            name = ""
+            result = re.search(r":.*:\s*(.*)", field)
             if result:
                 name = result.group(1)
             if not name:
                 continue
-            result = re.search(r'OK', field)
+            result = re.search(r"OK", field)
             if result:
                 continue
             diffmap = get_diff_map(field)
-            max_error = DIFF_INDEX['.']
+            max_error = DIFF_INDEX["."]
             for character in diffmap:
                 if DIFF_INDEX[character] > max_error:
                     max_error = DIFF_INDEX[character]
@@ -206,12 +205,12 @@ def get_diff_map(field):
     diffmap = []
     inmap = 0
     for line in lines:
-        result = re.search(r'1234567890', line)
+        result = re.search(r"1234567890", line)
         if result:
             inmap = 1
-        result = re.search(r'->', line)
+        result = re.search(r"->", line)
         if result and inmap == 1:
-            mapline = re.sub(r'.*->', r'', line)
+            mapline = re.sub(r".*->", r"", line)
             diffmap += list(mapline)
     return diffmap
 

@@ -22,6 +22,10 @@
 import re
 from rose.ana import DataLengthError
 
+OUTPUT_STRING = "%s %s%% %s %s: File %s c.f. %s"
+PASS = "<="
+FAIL = ">"
+
 class Within(object):
     def run(self, task):
         """Check that the results are within a specified tolerance."""
@@ -42,7 +46,7 @@ class Within(object):
             else:
                 lwr = val2 - float(task.tolerance)
                 upr = val2 + float(task.tolerance)
-            if val1 >= upr or val1 <= lwr:
+            if  not lwr <= val1 <= upr:
                 task.set_failure(WithinComparisonFailure(task, val1, val2))
                 return task
             task.set_pass(WithinComparisonSuccess(task))
@@ -57,8 +61,8 @@ class WithinComparisonFailure(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
-        if hasattr(task, 'subextract'):
-            self.extract = self.extract + ':' + task.subextract
+        if hasattr(task, "subextract"):
+            self.extract = self.extract + ":" + task.subextract
         self.tolerance = task.tolerance
         try:
           self.val1 = float(val1)
@@ -67,14 +71,12 @@ class WithinComparisonFailure(object):
         except ValueError:
           self.val1 = val1
           self.val2 = val2
-          self.percentage = 'XX'
+          self.percentage = "XX"
 
     def __repr__(self):
-        return "Data extracted using %s from files %s"%(
-               self.extract, self.resultfile) + " are not within %s "%(
-               self.tolerance) + " of that extracted from %s"%(
-               self.kgo1file) + " (%s compared with %s, %s%% percent)"%(
-               self.val1, self.val2, self.percentage)
+        return OUTPUT_STRING % ( self.extract, self.percentage, FAIL, 
+                                 self.tolerance, self.resultfile, 
+                                 self.kgo1file,  )
 
     __str__ = __repr__
 
@@ -87,14 +89,13 @@ class WithinComparisonSuccess(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        if hasattr(task, "subextract"):
+            self.extract = self.extract + ":" + task.subextract
         self.tolerance = task.tolerance
 
     def __repr__(self):
-        return "Data extracted using %s from files %s"%(
-               self.extract, self.resultfile) +  " are within %s"%(
-               self.tolerance) + " of that extracted from %s"%(
-               self.kgo1file)
+        return OUTPUT_STRING % ( self.extract, "all", PASS, self.tolerance, 
+                                 self.resultfile, self.kgo1file )
 
     __str__ = __repr__
-
 

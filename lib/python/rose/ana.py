@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Implementation of 'rose ana', a comparison engine for Rose. """
+"""Implementation of "rose ana", a comparison engine for Rose."""
 
 
 # Standard Python modules
@@ -33,20 +33,23 @@ import rose.env
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
+from rose.resource import ResourceLocator
 
 WARN = -1
 PASS = 0
 FAIL = 1
 
-OPTIONS = [ 'method_path' ]
+MAX_KGO_FILES = 100
 
-USRCOMPARISON_DIRNAME = 'comparisons'
-USRCOMPARISON_EXT = '.py'
+OPTIONS = ["method_path"]
+
+USRCOMPARISON_DIRNAME = "comparisons"
+USRCOMPARISON_EXT = ".py"
 
 
 class DataLengthError(Exception):
 
-    """An exception if KGO and result data are of different lengths"""
+    """An exception if KGO and result data are of different lengths."""
 
     def __init__(self, task):
         self.resultlen = len(task.resultdata)
@@ -54,24 +57,9 @@ class DataLengthError(Exception):
         self.taskname = task.name
 
     def __repr__(self):
-        return "Task '%s': Result data has length %s "%( 
-            self.taskname, self.resultlen) + "but KGO data is of length %s"%(
-            self.kgolen)
+        return "Mismatch in data lengths in %s (%s and %s)" % (
+            self.taskname, self.resultlen, self.kgolen)
                
-    __str__ = __repr__
-
-
-class SystemCommandException(Exception):
-
-    """Exception for failures running system commands."""
-    
-    def __init__(self, command, error):
-        self.error = error
-        self.command = command
-        
-    def __repr__(self):
-        return "Problem running command '%s': %s"%(self.command, self.error)
-      
     __str__ = __repr__
 
 
@@ -86,7 +74,7 @@ class TaskCompletionEvent(Event):
         self.type = Event.TYPE_OUT
         
     def __repr__(self):
-        return "[%s] %s"%(self.userstatus, self.message)
+        return "[%s] %s" % (self.userstatus, self.message)
         
     __str__ = __repr__
 
@@ -108,7 +96,7 @@ class Analyse(object):
         
         modules = []
         for path in self.opts.method_path:
-            for filename in glob.glob(path + '/*.py'):
+            for filename in glob.glob(path + "/*.py"):
                 modules.append(filename)
         self.load_user_comparison_modules(modules)
 
@@ -177,7 +165,7 @@ class Analyse(object):
                 for module in self.modules:
                     if module.__name__ == module_name:
                         comparison_inst = getattr(module, class_name)()
-                        comparison_meth = getattr(comparison_inst, 'run')(task)
+                        comparison_meth = getattr(comparison_inst, "run")(task)
         return task    
 
     def do_extract(self, task, var):
@@ -188,37 +176,27 @@ class Analyse(object):
                 for module in self.modules:
                     if module.__name__ == module_name:
                         extract_inst = getattr(module, class_name)()
-                        extract_meth = getattr(extract_inst, 'run')(task, var)
+                        extract_meth = getattr(extract_inst, "run")(task, var)
         return task
 
     def _run_command(self, command):
         """Run an external command using rose.popen."""
-        rc, output, stderr = self.popen.run(command, shell=True)
-        if rc != 0:
-            raise SystemCommandException(command, stderr)
+        output, stderr = self.popen.run_ok(command, shell=True)
         output = "".join(output).splitlines()      
         return output
 
-    def _expand_tokens(self, inputstring, task, var="none"):
+    def _expand_tokens(self, inputstring, task, var=None):
         """Expands tokens $resultfile, $file and $kgoXfile."""
-        # Replace result file
-        inputstring    = re.sub(r"\$resultfile", task.resultfile, inputstring)
-
-        # $kgofile should map to $kgo1file for backwards compatibility
-        inputstring    = re.sub(r"\$kgofile", task.kgo1file, inputstring)
-
-        # Do KGO files
+        filename = ''
+        if var:
+            filename = getattr(task, var + "file")
+        expansions = { 'resultfile' : task.resultfile,
+                       'file' : filename}
         for i in range(1, task.numkgofiles + 1):
-            var = "kgo" + str(i) + "file"
-            token = "$" + var
-            value = getattr(task, var)
-            inputstring = re.sub(token, value, inputstring)
-
-        result = re.search(r"\$file", inputstring)
-        if result:
-            filevar = var+"file"
-            filename = getattr(task, filevar)
-            inputstring    = re.sub(r"\$file", filename, inputstring)
+            key = "kgo" + str(i) + "file"
+            value = getattr(task, key)
+            expansions[key] = value
+        inputstring = inputstring.format(**expansions)
         return inputstring  
 
     def _find_file(self, var, task):
@@ -252,33 +230,23 @@ class Analyse(object):
             for task in config.value.keys():
                 newtask = AnalysisTask()
                 newtask.name = task
-                if config.get([task, "resultfile"]):
-                    newtask.resultfile = config.get([task, "resultfile"])[:]
-                    newtask = self._find_file("result", newtask)
-                if config.get([task, "extract"]):
-                    newtask.extract = config.get([task, "extract"])[:]
-                    result = re.search(r':', newtask.extract)
-                    if result:
-                        newtask.subextract = re.sub(r'.*:\s*', r'', 
-                                            newtask.extract)
-                        newtask.extract = re.sub(r'\s*:.*', r'', 
-                                            newtask.extract)
-                if config.get([task,"comparison"]):
-                    newtask.comparison = config.get([task, "comparison"])[:]
-                if config.get([task, "tolerance"]):
-                    newtask.tolerance = config.get([task, "tolerance"])[:]
-                if config.get([task, "warnonfail"]):
-                    value = config.get([task, "warnonfail"])[:]
-                    if value.find("yes") > -1:
-                        newtask.warnonfail = True
-                    elif value.find("true") > -1:
-                        newtask.warnonfail = True
-                    else:
-                        newtask.warnonfail = False
+                newtask.resultfile = config.get_value([task, "resultfile"])
+                newtask = self._find_file("result", newtask)
+                newtask.extract = config.get_value([task, "extract"])
+                result = re.search(r":", newtask.extract)
+                if result:
+                    newtask.subextract = re.sub(r".*:\s*", r"", 
+                                        newtask.extract)
+                    newtask.extract = re.sub(r"\s*:.*", r"", 
+                                        newtask.extract)
+                newtask.comparison = config.get_value([task, "comparison"])
+                newtask.tolerance = config.get_value([task, "tolerance"])
+                newtask.warnonfail = config.get_value([task, "warnonfail"]) \
+                    in [ "yes", "true"]
 
                 # Allow for multiple KGO, e.g. kgo1file, kgo2file, for 
                 # statistical comparisons of results
-                for i in range(1, 100):
+                for i in range(1, MAX_KGO_FILES):
                     kgovar = "kgo" + str(i)
                     kgofilevar = kgovar + "file"
                     if config.get([task, kgofilevar]):
@@ -302,23 +270,21 @@ class Analyse(object):
                 continue
             comparison_name = os.path.basename(filename).rpartition(
                                 USRCOMPARISON_EXT)[0]
-            sys.path.append(os.path.abspath(directory))
+            sys.path.insert(0, os.path.abspath(directory))
             try:
                 modules.append(__import__(comparison_name))
             except Exception as e:
                 self.reporter(e)
-            sys.path.pop()
+            sys.path.pop(0)
         modules.sort()
         self.modules = modules
 
         user_methods = []
         for module in modules:
             comparison_name = module.__name__
-            contents = inspect.getmembers(module)
+            contents = inspect.getmembers(module, inspect.isclass)
             for obj_name, obj in contents:
-                if not inspect.isclass:
-                    continue
-                att_name = 'run'
+                att_name = "run"
                 if (hasattr(obj, att_name) and 
                     callable(getattr(obj,att_name))):
                     doc_string = obj.__doc__
@@ -343,7 +309,7 @@ class Analyse(object):
             if task.extract:
                 config.set([sectionname, "extract"], task.extract)
             if task.subextract:
-                config.set([sectionname, "extract"], task.extract + ':' +
+                config.set([sectionname, "extract"], task.extract + ":" +
                             task.subextract)            
             if task.comparison:
                 config.set([sectionname, "comparison"], task.comparison)
@@ -356,20 +322,38 @@ class Analyse(object):
 
 class AnalysisTask(object):
 
-    """Class completely describes an analysis task."""
+    """Class to completely describe an analysis task.
+    
+    Attributes:
+        name                    # Short description of test for the user
+        resultfile              # File generated by suite
+        kgo1file                # Known Good output file
+        comparison              # Comparison type
+        extract                 # Extract method
+        subextract              # Extract sub-type (if any)
+        tolerance               # Tolerance (optional in file)
+        warnonfail              # True if failure is just a warning 
+        numkgofiles             # Number of KGO files 
+        resultdata              # Data from result file
+        kgo1data                # Data from KGO file
+        ok                      # True if test didn"t fail 
+        message                 # User message
+        userstatus              # User status
+        numericstatus           # Numeric status
+    """
 
     def __init__(self):
 
 # Variables defined in config file  
-        self.name = None            # Short description of test for the user
-        self.resultfile = None      # File generated by suite
-        self.kgofile = None         # Known Good output file
-        self.comparison = None      # Comparison type
-        self.extract = None         # Extract method
-        self.tolerance = None       # Tolerance (optional in file)
-        self.warnonfail = False     # True if failure is just a warning 
-        self.numkgofiles = 0        # Number of KGO files for multiple KGO 
-                                    # processing
+        self.name = None
+        self.resultfile = None
+        self.kgofile = None
+        self.comparison = None
+        self.extract = None
+        self.tolerance = None
+        self.warnonfail = False
+        self.numkgofiles = 0
+                                    
 
 # Variables to save settings before environment variable expansion (for 
 # writing back to config file, rerunning, etc)
@@ -377,23 +361,21 @@ class AnalysisTask(object):
         self.kgofileconfig = self.kgofile
 
 # Data variables filled by extract methods
-        self.resultdata = []        # Data from result file
-        self.kgo1data = []          # Data from KGO file
+        self.resultdata = []
+        self.kgo1data = []
 
 # Variables set by comparison methods
-        self.ok = False             # True if test didn't fail (useful as 
-                                    # logical on whether to continue or abort)
-        self.message = None         # User message
-        self.userstatus = "UNTESTED"# User status
-        self.numericstatus = WARN   # Numeric status (-1 = warn, 
-                                    #                  0 = pass, 
-                                    #                  1 = fail)
+        self.ok = False
+                                    
+        self.message = None
+        self.userstatus = "UNTESTED"
+        self.numericstatus = WARN
 
 # Methods for setting pass/fail/warn; all take an object of one of the 
 # success/ failure/warning classes as an argument, which all have a sensible 
 # user message as the string representation of them.
     def set_failure(self, message):
-        """Sets the status of the task to 'FAIL'."""
+        """Sets the status of the task to "FAIL"."""
 
         if self.warnonfail:
             self.set_warning(message)
@@ -404,7 +386,7 @@ class AnalysisTask(object):
             self.numericstatus = FAIL
 
     def set_pass(self, message):
-        """Sets the status of the task to ' OK '"""
+        """Sets the status of the task to " OK "."""
 
         self.ok = True
         self.message = message
@@ -412,7 +394,7 @@ class AnalysisTask(object):
         self.numericstatus = PASS
 
     def set_warning(self, message):
-        """Sets the status of the task to 'WARN'"""
+        """Sets the status of the task to "WARN"."""
 
         self.ok = True
         self.message = message
@@ -420,7 +402,7 @@ class AnalysisTask(object):
         self.numericstatus = WARN
 
     def __repr__(self):
-        return "%s: %s"%(self.name, self.userstatus)
+        return "%s: %s" % (self.name, self.userstatus)
 
     __str__ = __repr__
 
@@ -439,14 +421,12 @@ def main():
     """Implement the "rose ana" command"""
 
     # Get config file option for user-specified method paths
-    method_paths = [ os.path.join(os.getenv('ROSE_HOME'), 'lib', 'python',
-                    'rose', USRCOMPARISON_DIRNAME) ]
-    conf = rose.config.default_node()
-    my_conf = conf.get(["rose-ana"], no_ignore=True)
-    for key, node in sorted(my_conf.value.items()):
-        if node.is_ignored() or key != "method-path":
-            continue
-        for item in node.value.split():
+    method_paths = [ os.path.join(os.path.dirname(__file__), 
+                     USRCOMPARISON_DIRNAME) ]
+    conf = ResourceLocator.default().get_conf()
+    my_conf = conf.get_value(["rose-ana", "method-path"])
+    if my_conf:
+        for item in my_conf.split():
             method_paths.append(item)
 
     # Process options
@@ -469,9 +449,8 @@ def main():
     # Load analysis tasks from files
     engine.load_tasks(files)
     
-    rc = 0
     # Run the analysis
-    
+    rc = 0
     if opts.debug_mode:
         rc, tasks = engine.analyse()
     else:
@@ -479,8 +458,7 @@ def main():
             rc, tasks = engine.analyse()
         except Exception as e:
             engine.reporter(e)
-            if rc == 0:
-                rc = 1
+            sys.exit(1)
             
     sys.exit(rc)
 

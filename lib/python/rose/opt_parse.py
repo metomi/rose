@@ -188,7 +188,7 @@ class RoseOptionParser(OptionParser):
                         "metavar": "PATH",
                         "help": "Prepend items to the metadata search path."}],
                "method_path" : [
-                       ["--method-path", "-M"],
+                       ["--method-path", "-p"],
                        {"action": "append",
                         "help": "Preprend items to the method search path."}],
                "meta_suite": [

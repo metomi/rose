@@ -21,6 +21,9 @@
 
 from rose.ana import DataLengthError
 
+OUTPUT_STRING = "%s %s: %s%%: File %s %s %s"
+PASS = "=="
+FAIL = "!="
 
 class Exact(object):
     def run(self, task): 
@@ -47,8 +50,8 @@ class ExactComparisonFailure(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
-        if hasattr(task, 'subextract'):
-            self.extract = self.extract + ':' + task.subextract
+        if hasattr(task, "subextract"):
+            self.extract = self.extract + ":" + task.subextract
         try:
             self.val1 = float(val1)
             self.val2 = float(val2)
@@ -56,15 +59,12 @@ class ExactComparisonFailure(object):
         except ValueError:
             self.val1 = val1
             self.val2 = val2
-            self.percentage = 'XX'
+            self.percentage = "XX"
         self.location = location
 
     def __repr__(self):
-        text = "Data extracted using %s from files %s and %s are not equal"%(
-                self.extract, self.resultfile, self.kgo1file)
-        text += " (%s != %s in position %s, %s%% change)"%(self.val1, 
-                      self.val2, self.location, self.percentage)
-        return text
+        return OUTPUT_STRING % ( self.extract, self.location, self.percentage,
+                                 self.resultfile, FAIL, self.kgo1file,)
 
     __str__ = __repr__
 
@@ -79,8 +79,7 @@ class ExactComparisonSuccess(object):
         self.extract = task.extract
 
     def __repr__(self):
-        return "Data extracted using %s from files %s and %s"%(
-               self.extract,self.resultfile,self.kgo1file) + \
-               " are exactly equal"
+        return OUTPUT_STRING % ( self.extract, "all", 0,
+                                 self.resultfile, PASS, self.kgo1file, )
 
     __str__ = __repr__
