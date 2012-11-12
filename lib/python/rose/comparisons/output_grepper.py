@@ -17,18 +17,22 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Extract UM initial norms from a .leave file."""
+"""Return a list of values matching a regular expression."""
 
 from rose.ana import DataLengthError, data_from_regexp
 
+REGEXPS = {
+  'um_wallclock' : r"Total Elapsed CPU Time:\s*(\S+)",
+  'um_initial_norms' : r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
+  'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)",
+          }
 
-class UMInitialNorms(object):
+class OutputGrepper(object):
     def run(self, task, variable):
-        """Return initial norms given the contents of a UM leave file"""
+        """Return a list of values matching a regular expression."""
         filevar  = variable + "file"
         filename = getattr(task, filevar)
-        numbers = data_from_regexp(r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
-                                   filename)
+        numbers = data_from_regexp(REGEXPS[task.subextract], filename)
         datavar  = variable + "data"
         setattr(task, datavar, numbers)
         return task

@@ -57,6 +57,8 @@ class WithinComparisonFailure(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        if hasattr(task, 'subextract'):
+            self.extract = self.extract + ':' + task.subextract
         self.tolerance = task.tolerance
         try:
           self.val1 = float(val1)

@@ -257,6 +257,12 @@ class Analyse(object):
                     newtask = self._find_file("result", newtask)
                 if config.get([task, "extract"]):
                     newtask.extract = config.get([task, "extract"])[:]
+                    result = re.search(r':', newtask.extract)
+                    if result:
+                        newtask.subextract = re.sub(r'.*:\s*', r'', 
+                                            newtask.extract)
+                        newtask.extract = re.sub(r'\s*:.*', r'', 
+                                            newtask.extract)
                 if config.get([task,"comparison"]):
                     newtask.comparison = config.get([task, "comparison"])[:]
                 if config.get([task, "tolerance"]):
@@ -336,6 +342,9 @@ class Analyse(object):
                     config.set([sectionname, valvar], getattr(task, origvar) )
             if task.extract:
                 config.set([sectionname, "extract"], task.extract)
+            if task.subextract:
+                config.set([sectionname, "extract"], task.extract + ':' +
+                            task.subextract)            
             if task.comparison:
                 config.set([sectionname, "comparison"], task.comparison)
             if task.tolerance:

@@ -47,6 +47,8 @@ class ExactComparisonFailure(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        if hasattr(task, 'subextract'):
+            self.extract = self.extract + ':' + task.subextract
         try:
             self.val1 = float(val1)
             self.val2 = float(val2)
