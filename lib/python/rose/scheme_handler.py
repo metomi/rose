@@ -21,20 +21,22 @@
 
 
 from glob import glob
+import inspect
 import os
 
 
 class SchemeHandlersManager(object):
     """Load and select from a group of related functional classes."""
 
-    def __init__(self, path, attribs=None, *args, **kwargs):
-        """Load modules in path and initialise classes with a SCHEME.
+    def __init__(self, paths, attrs=None, *args, **kwargs):
+        """Load modules in paths and initialise any classes with a SCHEME.
 
-        If attribs is specified, it should be a list of attributes the class
+        If attrs is specified, it should be a list of attributes the class
         has that do not have a None value.
 
         args and kwargs are passed as *args, **kwargs to the constructor of
-        each class.
+        each class. This manager will be passed to the constructor using the
+        keyword "manager".
 
         A handler class should have a h.SCHEME attribute with a str value.
         Optionally, it should have a h.can_handle(scheme, **kwargs) method that
@@ -44,23 +46,24 @@ class SchemeHandlersManager(object):
         """
         self.handlers = {}
         cwd = os.getcwd()
-        os.chdir(path)
-        try:
-            for name in glob("*.py"):
-                if name.startswith("__"):
-                    continue
-                mod = __import__(name[0:-3])
-                for c in vars(mod).values():
-                    scheme = getattr(c, "SCHEME", None)
-                    if (scheme is None or
-                        any([getattr(c, a, None) is None for a in attribs])):
+        for path in paths:
+            os.chdir(path) # assuming that "" is at the front of sys.path
+            try:
+                for file_name in glob("*.py"):
+                    if file_name.startswith("__"):
                         continue
-                    if self.handlers.has_key(scheme):
-                        raise ValueError(c)
-                    kwargs["manager"] = self
-                    self.handlers[scheme] = c(*args, **kwargs)
-        finally:
-            os.chdir(cwd)
+                    mod = __import__(file_name[0:-3])
+                    for name, c in inspect.getmembers(mod, inspect.isclass):
+                        scheme = getattr(c, "SCHEME", None)
+                        if (scheme is None or
+                            any([getattr(c, a, None) is None for a in attrs])):
+                            continue
+                        if self.handlers.has_key(scheme):
+                            raise ValueError(c) # Class with the same scheme
+                        kwargs["manager"] = self
+                        self.handlers[scheme] = c(*args, **kwargs)
+            finally:
+                os.chdir(cwd)
 
     def get_handler(self, scheme):
         """Return the handler with a matching scheme.
