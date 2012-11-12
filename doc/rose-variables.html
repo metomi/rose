@@ -38,19 +38,34 @@
 
     <div id="content"></div>
 
-    <p>The following rose variables are available:</p>
+    <h2 id="nproc"><var>NPROC</var></h2>
+    <h3>Description</h3>
+    <p>Specifies the number of processors to run on. Default is 1.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a></li>
+    </ul>
+    <h2 id="rose-data"><var>ROSE_DATA</var></h2>
+    <h3>Description</h3>
+    <p>The path to the data directory of the running suite.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
 
-    <dl>
-    <dt><var>NPROC</var></dt>
-      <dd>Specifies the number of processors to run on. Default is 1.</dd>    
-    <dt><var>ROSE_DATA</var></dt>
-      <dd>The path to the data directory of the running suite.</dd>
-    <dt><var>ROSE_DATAC</var></dt>
-      <dd>The path to the data directory of this cycle time in the running 
-      suite.</dd>
-    <dt><var>ROSE_DATAC????</var></dt>
-      <dd>The path to the data directory of the cycle time with an offset 
-      relative to the current cycle time. <var>????</var> is a duration:
+    <h2 id="rose-datac"><var>ROSE_DATAC</var></h2>
+    <h3>Description</h3>
+    <p>The path to the data directory of this cycle time in the running suite.
+    </p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
+    
+    <h2 id="rose-datac????"><var>ROSE_DATAC????</var></h2>
+    <h3>Description</h3>
+    <p>The path to the data directory of the cycle time with an offset 
+      relative to the current cycle time. <var>????</var> is a duration:</p>
         <ul>
           <li>A <var>__</var> (double underscore) prefix denotes a cycle time 
           in the future. Otherwise, it is a cycle time in the past.</li>
@@ -60,64 +75,208 @@
           <li><var>TnM</var> denotes n minutes.</li>
           <li><var>TnS</var> denotes n seconds.</li>
         </ul>
-          E.g. <var>ROSE_DATACT6H</var> is the data directory of 6 hours before
-          the current cycle time.<br/> 
-          E.g. <var>ROSE_DATAC1D</var> and <var>ROSE_DATACT24H</var> are both 
-          the data directory of 1 day before the current cycle time.
-      </dd>
-    <dt><var>ROSE_LAUNCH_INNER</var></dt>
-      <dd>Specifies an inner wrapper to be run by launcher, can be set to "" to
-      call the executable directly. Default is <kbd>$0 --inner</kbd>.</dd>
-    <dt><var>ROSE_LAUNCHER</var></dt>
-      <dd>Specifies the launcher program to run the prog.</dd>
-    <dt><var>ROSE_LAUNCHER_LIST</var></dt>
-      <dd>Specifies an alternative list of launchers.</dd>
-    <dt><var>ROSE_LAUNCHER_MPICH</var></dt>
-      <dd>Specifies the mpich launcher program to run the prog. Default is 
-      <var>mpiexec</var>.</dd>
-    <dt><var>ROSE_LAUNCHER_PREOPTS</var></dt>
-      <dd>Specifies the options to the launcher program to be inserted before 
-      the program name.</dd>
-    <dt><var>ROSE_LAUNCHER_POSTOPTS</var></dt>
-      <dd>Specifies the options to the launcher program to be inserted after 
-      the program name.</dd>
-    <dt><var>ROSE_LAUNCHER_ULIMIT_OPTS</var></dt>
-      <dd>Specifies the arguments to ulimit. Setting this variable to 
-      <kbd>-a -s unlimited -d unlimited -a</kbd> results in <kbd>ulimit -a;
-      ulimit -s unlimited; ulimit -d unlimited; ulimit -a</kbd></dd>
-    <dt><var>ROSE_ORIG_HOST</var></dt>
-      <dd>The name of the host where the <kbd>rose suite-run</kbd> command was 
-      invoked.</dd> 
-    <dt><var>ROSE_SUITE_DIR</var></dt>
-      <dd>The path to the root directory of the running suite.</dd>
-    <dt><var>ROSE_SUITE_NAME</var></dt>
-      <dd>The name of the running suite.</dd>
-    <dt><var>ROSE_TASK_APP</var></dt>
-      <dd>Specify a named application configuration.</dd>
-    <dt><var>ROSE_TASK_CYCLE_TIME</var></dt>
-      <dd>The cycle time of the suite task, if there is one.</dd>
-    <dt><var>ROSE_TASK_LOG_ROOT</var></dt>
-      <dd>The root path for log files of the suite task.</dd>
-    <dt><var>ROSE_TASK_N_JOBS</var></dt>
-      <dd>The number of jobs to run in parallel in <kbd>fcm make</kbd>. 
-      (default=4)</dd>
-    <dt><var>ROSE_TASK_NAME</var></dt>
-      <dd>The name of the suite task.</dd>
-    <dt><var>ROSE_TASK_OPTIONS</var></dt>
-      <dd>Additional options and arguments for <kbd>fcm make</kbd> or 
-      <kbd>rose app-run</kbd>. 
-      (default='')</dd>
-    <dt><var>ROSE_TASK_PRE_SCRIPT</var></dt>
-      <dd>Source (. invoke) the specified script before running the main 
-      command. (default='')</dd>
-    <dt><var>ROSE_TASK_PREFIX</var></dt>
-      <dd>The prefix in the task name.</dd>
-    <dt><var>ROSE_TASK_SUFFIX</var></dt>
-      <dd>The suffix in the task name.</dd>
-    <dt><var>ROSE_TASK_UTIL</var></dt>
-      <dd>Specify a named task utility.</dd>
-    </dl>
- 
+    <p>E.g. <var>ROSE_DATACT6H</var> is the data directory of 6 hours before
+    the current cycle time.<br/> 
+    E.g. <var>ROSE_DATAC1D</var> and <var>ROSE_DATACT24H</var> are both 
+    the data directory of 1 day before the current cycle time.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
+
+    <h2 id="rose-launch-inner"><var>ROSE_LAUNCH_INNER</var></h2>
+    <h3>Description</h3>
+    <p>Specifies an inner wrapper to be run by launcher, can be set to "" to
+    call the executable directly. Default is <kbd>$0 --inner</kbd>.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a>
+        </li>
+    </ul>
+    
+    <h2 id="rose-launcher"><var>ROSE_LAUNCHER</var></h2>
+    <h3>Description</h3>
+    <p>Specifies the launcher program to run the prog.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a>
+        </li>
+    </ul>    
+    
+    <h2 id="rose-launcher-list"><var>ROSE_LAUNCHER_LIST</var></h2>
+    <h3>Description</h3>
+    <p>Specifies an alternative list of launchers.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a>
+        </li>
+    </ul>     
+    
+    <h2 id="rose-launcher-mpich"><var>ROSE_LAUNCHER_MPICH</var></h2>
+    <h3>Description</h3>
+    <p>Specifies the mpich launcher program to run the prog. Default is 
+    <var>mpiexec</var>.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a>
+        </li>
+    </ul> 
+    
+    <h2 id="rose-launcher-preopts"><var>ROSE_LAUNCHER_PREOPTS</var></h2>
+    <h3>Description</h3>
+    <p>Specifies the options to the launcher program to be inserted before 
+    the program name.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a>
+        </li>
+    </ul> 
+
+    <h2 id="rose-launcher-postopts"><var>ROSE_LAUNCHER_POSTOPTS</var></h2>
+    <h3>Description</h3>
+    <p>Specifies the options to the launcher program to be inserted after the 
+    program name.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a>
+        </li>
+    </ul> 
+    
+    <h2 id="rose-launcher-ulimit-opts"><var>ROSE_LAUNCHER_ULIMIT_OPTS</var></h2>
+    <h3>Description</h3>
+    <p>Specifies the arguments to ulimit. Setting this variable to <kbd>-a -s 
+    unlimited -d unlimited -a</kbd> results in <kbd>ulimit -a; ulimit -s 
+    unlimited; ulimit -d unlimited; ulimit -a</kbd></p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a>
+        </li>
+    </ul>
+
+    <h2 id="rose-orig-host"><var>ROSE_ORIG_HOST</var></h2>
+    <h3>Description</h3>
+    <p>The name of the host where the <kbd>rose suite-run</kbd> command was 
+    invoked.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-suite-run">rose suite-run</a></li>
+    </ul>
+        
+    <h2 id="rose-suite-dir"><var>ROSE_SUITE_DIR</var></h2>
+    <h3>Description</h3>
+    <p>The path to the root directory of the running suite.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
+    
+    <h2 id="rose-suite-name"><var>ROSE_SUITE_NAME</var></h2>
+    <h3>Description</h3>
+    <p>The name of the running suite.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
+    
+    <h2 id="rose-task-app"><var>ROSE_TASK_APP</var></h2>
+    <h3>Description</h3>
+    <p>Specify a named application configuration.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-run">rose task-run</a></li>
+    </ul>
+    
+    <h2 id="rose-task-cycle-time"><var>ROSE_TASK_CYCLE_TIME</var></h2>
+    <h3>Description</h3>
+    <p>The cycle time of the suite task, if there is one.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
+    
+    <h2 id="rose-task-log-root"><var>ROSE_TASK_LOG_ROOT</var></h2>
+    <h3>Description</h3>
+    <p>The root path for log files of the suite task.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
+    
+    <h2 id="rose-task-n-jobs"><var>ROSE_TASK_N_JOBS</var></h2>
+    <h3>Description</h3>
+    <p>The number of jobs to run in parallel in <kbd>fcm make</kbd>. 
+    (default=4)</p>
+    <h3>Used By</h3>
+    <ul>
+        <li>fcm_make</li>
+        <li>fcm_make2</li>
+    </ul>
+        
+    <h2 id="rose-task-name"><var>ROSE_TASK_NAME</var></h2>
+    <h3>Description</h3>
+    <p>The name of the suite task.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-app-run">rose app-run</a></li>
+    </ul>
+    
+    <h2 id="rose-task-options"><var>ROSE_TASK_OPTIONS</var></h2>
+    <h3>Description</h3>
+    <p>Additional options and arguments for <kbd>fcm make</kbd> or 
+    <kbd>rose app-run</kbd>.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li>fcm_make</li>
+        <li>fcm_make2</li>
+    </ul>       
+    
+    <h2 id="rose-task-options"><var>ROSE_TASK_OPTIONS</var></h2>
+    <h3>Description</h3>
+    <p>Additional options and arguments for <kbd>fcm make</kbd>. 
+    (default='')</p>
+    <h3>Used By</h3>
+    <ul>
+        <li>fcm_make</li>
+        <li>fcm_make2</li>
+    </ul> 
+    
+    <h2 id="rose-task-pre-script"><var>ROSE_TASK_PRE_SCRIPT</var></h2>
+    <h3>Description</h3>
+    <p>Source (. invoke) the specified script before running the main 
+    command. (default='')</p>
+    <h3>Used By</h3>
+    <ul>
+        <li>fcm_make</li>
+        <li>fcm_make2</li>
+    </ul> 
+    
+    <h2 id="rose-task-prefix"><var>ROSE_TASK_PREFIX</var></h2>
+    <h3>Description</h3>
+    <p>The prefix in the task name.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>    
+    
+    <h2 id="rose-task-suffix"><var>ROSE_TASK_SUFFIX</var></h2>
+    <h3>Description</h3>
+    <p>The suffix in the task name.</p>
+    <h3>Provided By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
+    </ul>
+    
+    <h2 id="rose-task-util"><var>ROSE_TASK_UTIL</var></h2>
+    <h3>Description</h3>
+    <p>Specify a named task utility.</p>
+    <h3>Used By</h3>
+    <ul>
+        <li><a href="rose-command.html#rose-task-run">rose task-run</a></li>
+    </ul>
     </div>
   </div>
 </body>
