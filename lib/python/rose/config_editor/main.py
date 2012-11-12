@@ -200,6 +200,8 @@ class MainController(object):
         self.update_all()
         loader_update(rose.config_editor.LOAD_DONE, self.data.top_level_name)
         self.perform_startup_check()
+        if (self.data.top_level_directory is None and not self.data.config):
+            self.load_from_file()
 
 #------------------ Setting up main component functions ----------------------
 

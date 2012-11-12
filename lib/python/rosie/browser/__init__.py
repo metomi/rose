@@ -57,17 +57,7 @@ RESULT_MENU_VIEW_OUTPUT_SUITE = "View Output"
 RESULT_MENU_VIEW_SOURCE_SUITE = "View Web"
 
 TOGGLE_ACTION_VIEW_ALL_REVISIONS = 'Toggle view all revisions'
-TOGGLE_ACTION_VIEW_AUTHOR = 'View _author'
-TOGGLE_ACTION_VIEW_BRANCH = 'View _branch'
-TOGGLE_ACTION_VIEW_DATE = 'View _date'
-TOGGLE_ACTION_VIEW_FROM_IDX = 'View _from idx'
-TOGGLE_ACTION_VIEW_LOCAL = 'View _local'
-TOGGLE_ACTION_VIEW_OWNER = 'View _owner'
-TOGGLE_ACTION_VIEW_PROJECT = 'View _project'
-TOGGLE_ACTION_VIEW_REVISION = 'View _revision'
 TOGGLE_ACTION_VIEW_SEARCH_HISTORY = 'Show search history'
-TOGGLE_ACTION_VIEW_STATUS = 'View _status'
-TOGGLE_ACTION_VIEW_TITLE = 'View _title'
 
 TOP_MENU_ABOUT = '_About'
 TOP_MENU_CLEAR_HISTORY = 'Clear history'
@@ -113,6 +103,9 @@ STATUS_FETCHING = "Fetching records..."
 STATUS_GOT = "{0} records found at {1}"
 STATUS_LOCAL_GOT = "{0} local suites found at {1}" 
 STATUS_NO_LOCAL_SUITES = "No local suites could be found {0}"
+STATUS_OPENING_HELP = "Opened help in browser"
+STATUS_OPENING_LOG = "Opened suite output in browser"
+STATUS_OPENING_WEB = "Opened suite web view"
 STATUS_SOURCE_CHANGED = "Data source changed to {0}"
 STATUS_UPDATE = "updating view..."
 
