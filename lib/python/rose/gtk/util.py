@@ -1186,18 +1186,11 @@ def setup_stock_icons():
     """Setup any additional 'stock' icons."""
     new_icon_factory = gtk.IconFactory()
     locator = rose.resource.ResourceLocator(paths=sys.path)
-    for png_icon_name in ["gnome_package_system",
+    for png_icon_name in ["gnome_add",
+                          "gnome_add_errors",
+                          "gnome_add_warnings",
+                          "gnome_package_system",
                           "gnome_package_system_errors",
-                          "gnome_package_system_fixed",
-                          "gnome_package_system_ghost_fixed_ignored_section",
-                          "gnome_package_system_ghost",
-                          "gnome_package_system_ghost_errors",
-                          "gnome_package_system_ghost_warnings",
-                          "gnome_package_system_ignored_section",
-                          "gnome_package_system_ignored_trigger",
-                          "gnome_package_system_ignored_trigger_section",
-                          "gnome_package_system_ignored_user",
-                          "gnome_package_system_ignored_user_section",
                           "gnome_package_system_warnings"]:
         ifile = png_icon_name + ".png"
         istring = png_icon_name.replace("_", "-")

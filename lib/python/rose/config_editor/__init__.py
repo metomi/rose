@@ -26,7 +26,7 @@ This module contains constants that are only used in the config editor.
 import ast
 import os
 
-import rose.config
+from rose.resource import ResourceLocator
 
 # Accelerators
 
@@ -221,10 +221,15 @@ META_PROP_INTERNAL = '_internal'
 
 # Setting visibility modes
 SHOW_MODE_FIXED = 'fixed'
+SHOW_MODE_FLAG_OPTIONAL = 'flag:optional'
+SHOW_MODE_FLAG_NO_META = 'flag:no-meta'
 SHOW_MODE_IGNORED = 'ignored'
 SHOW_MODE_USER_IGNORED = 'user-ignored'
 SHOW_MODE_LATENT = 'latent'
 SHOW_MODE_NO_TITLE = 'title'
+
+SHOULD_SHOW_FLAG_OPTIONAL = False
+SHOULD_SHOW_FLAG_NO_META = False
 
 SHOULD_SHOW_ALL_COMMENTS = False
 SHOULD_SHOW_FIXED = False
@@ -386,10 +391,10 @@ TREE_PANEL_ERRORS = ' ({0} errors)'
 TREE_PANEL_MODIFIED = ' (modified)'
 TERMINAL_TIP_CLOSE = 'Close terminal'
 VAR_COMMENT_TIP = "# {0}"
+VAR_FLAG_TIP_FIXED = 'Fixed variable (only one allowed value)'
 VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
 VAR_MENU_TIP_ERROR = 'Error '
-VAR_MENU_TIP_FIXED = 'Fixed variable (only one allowed value)'
 VAR_MENU_TIP_IGNORED = 'Ignored because {0}'
 VAR_MENU_TIP_LATENT = 'This variable could be added to the configuration.'
 VAR_MENU_TIP_WARNING = 'Warning '
@@ -399,6 +404,7 @@ VAR_WIDGET_ENV_INFO = 'Set to environment variable'
 
 FLAG_TYPE_DEFAULT = "Default flag"
 FLAG_TYPE_ERROR = "Error flag"
+FLAG_TYPE_FIXED = 'Fixed flag'
 FLAG_TYPE_OPTIONAL = "Optional flag"
 FLAG_TYPE_NO_META = "No metadata flag"
 
@@ -408,6 +414,7 @@ META_PROP_WIDGET = "widget[rose-config-edit]"
 
 # Miscellaneous
 COPYRIGHT = '(C) British Crown Copyright 2012 Met Office.'
+HELP_FILE = 'rose-config-edit.html'
 LAUNCH_COMMAND = 'rose config-edit'
 LAUNCH_COMMAND_CONFIG = 'rose config-edit -C'
 LAUNCH_SUITE_RUN = 'rose suite-run'
@@ -418,8 +425,6 @@ PROJECT_URL = None
 UNTITLED_NAME = 'Untitled'
 VAR_ID_IN_CONFIG = 'Variable id {0} from the configuration {1}'
 
-override_config = rose.config.ConfigNode()
-
 
 def false_function(*args):
     """Return False, no matter what the arguments are."""
@@ -427,16 +432,17 @@ def false_function(*args):
 
 
 def load_override_config():
-    override_config = rose.config.default_node()
-    if override_config.get(["rose-config-edit"], no_ignore=True) is None:
+    conf = ResourceLocator.default().get_conf().get(["rose-config-edit"])
+    if conf is None:
         return
-    for option in override_config.get(["rose-config-edit"]).value.keys():
-        value = override_config.get(["rose-config-edit", option]).value
+    for key, node in conf.value.items():
+        if node.is_ignored():
+            continue
         try:
-            cast_value = ast.literal_eval(value)
+            cast_value = ast.literal_eval(node.value)
         except Exception:
-            cast_value = value
-        globals()[option.replace("-", "_").upper()] = cast_value
+            cast_value = node.value
+        globals()[key.replace("-", "_").upper()] = cast_value
 
 
 load_override_config()

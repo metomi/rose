@@ -35,7 +35,7 @@ class DuplicateChecker(rose.macro.MacroBase):
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
         meta_config = self._load_meta_config(config, meta_config)
-        problem_list = []
+        self.reports = []
         sections_with_duplicate = []
         for setting_id, sect_node in meta_config.value.items():
             if sect_node.is_ignored():
@@ -58,11 +58,11 @@ class DuplicateChecker(rose.macro.MacroBase):
             basic_section = rose.macro.REC_ID_STRIP.sub('', section)
             if basic_section in sections_with_duplicate:
                 if basic_section == section:
-                    self.add_report(problem_list, section, None, None,
+                    self.add_report(section, None, None,
                                     self.WARNING_DUPL_SECT_NO_NUM)
             elif section != basic_section:
                 if basic_section not in basic_sections_with_errors:
                     basic_sections_with_errors.append(basic_section)
-                    self.add_report(problem_list, section, None, None,
+                    self.add_report(section, None, None,
                                     self.WARNING_NUM_SECT_NO_DUPL)
-        return problem_list
+        return self.reports

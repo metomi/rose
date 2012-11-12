@@ -413,7 +413,7 @@ cd
             user = my_user
         if host is None or host == "localhost":
             host = my_host
-        elif "`" in host or "$(" in host:
+        elif "`" in host or "$" in host:
             command = ["bash", "-ec", "H=" + host + "; echo $H"]
             host = self.popen(*command)[0].strip()
         return (user, host, my_user, my_host)

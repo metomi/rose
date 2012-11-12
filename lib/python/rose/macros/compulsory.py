@@ -42,8 +42,8 @@ class CompulsoryChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
+        self.reports = []
         meta_config = self._load_meta_config(config, meta_config)
-        problem_list = []
         if not hasattr(self, 'section_to_basic_map'):
             self.section_to_basic_map = {}
             self.section_from_basic_map = {}
@@ -76,10 +76,10 @@ class CompulsoryChecker(rose.macro.MacroBase):
                         break
                 if node is None:
                     if option is None:
-                        self.add_report(problem_list, section, option, None,
+                        self.add_report(section, option, None,
                                         self.WARNING_COMPULSORY_SECT_MISSING)
                     else:
-                        self.add_report(problem_list, section, option, None,
+                        self.add_report(section, option, None,
                                         self.WARNING_COMPULSORY_OPT_MISSING)
                 elif option is not None:
                     for opt, opt_node in node.value.items():
@@ -89,15 +89,15 @@ class CompulsoryChecker(rose.macro.MacroBase):
                             option = opt
                             break
                     else:
-                        self.add_report(problem_list, section, option, None,
+                        self.add_report(section, option, None,
                                         self.WARNING_COMPULSORY_OPT_MISSING)
             if node is not None and node.state == node.STATE_USER_IGNORED:
                 value = node.value
                 if not isinstance(value, basestring):
                     value = None
-                self.add_report(problem_list, section, option, value,
+                self.add_report(section, option, value,
                                 self.WARNING_COMPULSORY_USER_IGNORED)
-        return problem_list
+        return self.reports
 
 
 class CompulsoryChanger(rose.macro.MacroBase):
@@ -114,7 +114,6 @@ class CompulsoryChanger(rose.macro.MacroBase):
 
     def transform(self, config, meta_config=None):
         """Return a config and a list of changes, if any."""
-        change_list = []
         checker = CompulsoryChecker()
         problem_list = checker.validate(config, meta_config)
         missing_sect_opts = []
@@ -126,7 +125,7 @@ class CompulsoryChanger(rose.macro.MacroBase):
         for sect, opt in missing_sect_opts:
             if opt is None:
                 config.set([sect])
-                self.add_report(change_list, sect, opt, None,
+                self.add_report(sect, opt, None,
                                 self.ADD_COMPULSORY_SECT)
                 continue
             var_id = self._get_id_from_section_option(sect, opt)
@@ -137,6 +136,6 @@ class CompulsoryChanger(rose.macro.MacroBase):
                 metadata.update({key: node.value})
             value = rose.variable.get_value_from_metadata(metadata)
             config.set([sect, opt], value)
-            self.add_report(change_list, sect, opt, value,
+            self.add_report(sect, opt, value,
                             self.ADD_COMPULSORY_OPT)
-        return config, change_list
+        return config, self.reports

@@ -55,8 +55,8 @@ class DataLengthError(Exception):
 
     def __repr__(self):
         return "Task '%s': Result data has length %s "%( 
-             self.taskname, self.resultlen) + "but KGO data is of length %s"%(
-             self.kgolen)
+            self.taskname, self.resultlen) + "but KGO data is of length %s"%(
+            self.kgolen)
                
     __str__ = __repr__
 
@@ -138,7 +138,7 @@ class Analyse(object):
                 if result:
                     # Replace $file token with resultfile or kgofile
                     resultcommand = self._expand_tokens(command, task, 
-                                                                  "result")
+                                                        "result")
                     kgocommand = self._expand_tokens(command, task, "kgo1")
 
                     # Run the command on the resultfile
@@ -154,7 +154,7 @@ class Analyse(object):
                     # Run the command
                     task.resultdata = self._run_command(command)
 
-              # Run the comparison
+                # Run the comparison
                 task = self.do_comparison(task)
                 
             self.reporter(TaskCompletionEvent(task))
@@ -233,7 +233,7 @@ class Analyse(object):
             configvar = var + "fileconfig"
             setattr(task, configvar, getattr(task, filevar))
             filenames = glob.glob(rose.env.env_var_process(getattr(task, 
-                                                                  filevar)))
+                        filevar)))
             if len(filenames) > 0:
                 setattr(task, filevar, filenames[0])
         return task
@@ -295,7 +295,7 @@ class Analyse(object):
                 not filename.endswith(USRCOMPARISON_EXT)):
                 continue
             comparison_name = os.path.basename(filename).rpartition(
-                                                         USRCOMPARISON_EXT)[0]
+                                USRCOMPARISON_EXT)[0]
             sys.path.append(os.path.abspath(directory))
             try:
                 modules.append(__import__(comparison_name))
@@ -314,10 +314,10 @@ class Analyse(object):
                     continue
                 att_name = 'run'
                 if (hasattr(obj, att_name) and 
-                                 callable(getattr(obj,att_name))):
+                    callable(getattr(obj,att_name))):
                     doc_string = obj.__doc__
                     user_methods.append((comparison_name, obj_name, att_name, 
-                                         doc_string))
+                                        doc_string))
         self.user_methods = user_methods      
         return user_methods
 
@@ -431,7 +431,7 @@ def main():
 
     # Get config file option for user-specified method paths
     method_paths = [ os.path.join(os.getenv('ROSE_HOME'), 'lib', 'python',
-                          'rose', USRCOMPARISON_DIRNAME) ]
+                    'rose', USRCOMPARISON_DIRNAME) ]
     conf = rose.config.default_node()
     my_conf = conf.get(["rose-ana"], no_ignore=True)
     for key, node in sorted(my_conf.value.items()):

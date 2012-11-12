@@ -32,6 +32,7 @@ from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter, ReporterContext
+from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
 import socket
@@ -349,7 +350,6 @@ class AppRunner(Runner):
         self.handle_event("command: %s" % command)
         if opts.install_only_mode:
             return
-        sys.stdout.flush()
         # TODO: allow caller of app_run to specify stdout and stderr?
         self.popen(command, shell=True, stdout=sys.stdout, stderr=sys.stderr)
 
@@ -412,7 +412,7 @@ class SuiteRunner(Runner):
         hosts = []
         if opts.host:
             hosts.append(opts.host)
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
         if node is None:
             known_hosts = ["localhost"]
@@ -574,9 +574,7 @@ class SuiteRunner(Runner):
 
             # Check that the suite is running
             keys = ["rose-suite-run", "num-ping-try-max"]
-            node = rose.config.default_node().get(keys, no_ignore=True)
-            num_ping_try_max = getattr(node, "value",
-                                       self.NUM_PING_TRY_MAX)
+            num_ping_try_max = conf.get_value(keys, self.NUM_PING_TRY_MAX)
             num_ping_try_max = int(num_ping_try_max)
             for num_ping_try in range(1, num_ping_try_max + 1):
                 if self.suite_engine_proc.ping(suite_name, [host]):
@@ -606,11 +604,11 @@ class SuiteRunner(Runner):
         """
         if r_opts is not None:
             return r_opts.get(key, default)
-        conf_items = [(config, []),
-                      (rose.config.default_node(), ["rose-suite-run"])]
         if host is None:
             host = "localhost"
-        for conf, keys in conf_items:
+        for conf, keys in [
+                (config, []),
+                (ResourceLocator.default().get_conf(), ["rose-suite-run"])]:
             if conf is None:
                 continue
             node = conf.get(keys + [key], no_ignore=True)
@@ -740,7 +738,7 @@ class TaskRunner(Runner):
                 suffix_delim=opts.suffix_delim)
 
         # Prepend PATH-like variable, site/user configuration
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         my_conf = conf.get(["rose-task-run"], no_ignore=True)
         for key, node in sorted(my_conf.value.items()):
             if node.is_ignored() or not key.startswith("path-prepend"):

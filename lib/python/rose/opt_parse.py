@@ -116,6 +116,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "dest": "diffsource",
                         "help": "Add a branch."}],
+               "downgrade": [
+                       ["--downgrade", "-d"],
+                       {"action": "store_true",
+                        "dest": "downgrade",
+                        "help": "Downgrade instead of upgrade."}],
                "files": [
                        ["--file", "-f"],
                        {"action": "append",
@@ -160,10 +165,6 @@ class RoseOptionParser(OptionParser):
                        ["--latest"],
                        {"action": "store_true",
                         "help": "Print the latest ID in the repository"}],
-               "local_only": [
-                       ["--local-only"],
-                       {"action": "store_true",
-                        "help": "Delete only the local copy of a suite"}],
                "lower": [
                        ["--lower", "-l"],
                        {"action": "store_const",
@@ -190,6 +191,11 @@ class RoseOptionParser(OptionParser):
                        ["--method-path", "-M"],
                        {"action": "append",
                         "help": "Preprend items to the method search path."}],
+               "meta_suite": [
+                       ["--meta-suite"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "ADMIN-ONLY: Create the metadata suite."}],
                "name": [
                        ["--name", "-n"],
                        {"action": "store",

@@ -26,7 +26,7 @@ This module contains constants that are only used in the config editor.
 import ast
 import os
 
-import rose.config
+from rose.resource import ResourceLocator
 
 # Accelerators
 
@@ -57,17 +57,7 @@ RESULT_MENU_VIEW_OUTPUT_SUITE = "View Output"
 RESULT_MENU_VIEW_SOURCE_SUITE = "View Web"
 
 TOGGLE_ACTION_VIEW_ALL_REVISIONS = 'Toggle view all revisions'
-TOGGLE_ACTION_VIEW_AUTHOR = 'View _author'
-TOGGLE_ACTION_VIEW_BRANCH = 'View _branch'
-TOGGLE_ACTION_VIEW_DATE = 'View _date'
-TOGGLE_ACTION_VIEW_FROM_IDX = 'View _from idx'
-TOGGLE_ACTION_VIEW_LOCAL = 'View _local'
-TOGGLE_ACTION_VIEW_OWNER = 'View _owner'
-TOGGLE_ACTION_VIEW_PROJECT = 'View _project'
-TOGGLE_ACTION_VIEW_REVISION = 'View _revision'
 TOGGLE_ACTION_VIEW_SEARCH_HISTORY = 'Show search history'
-TOGGLE_ACTION_VIEW_STATUS = 'View _status'
-TOGGLE_ACTION_VIEW_TITLE = 'View _title'
 
 TOP_MENU_ABOUT = '_About'
 TOP_MENU_CLEAR_HISTORY = 'Clear history'
@@ -113,6 +103,9 @@ STATUS_FETCHING = "Fetching records..."
 STATUS_GOT = "{0} records found at {1}"
 STATUS_LOCAL_GOT = "{0} local suites found at {1}" 
 STATUS_NO_LOCAL_SUITES = "No local suites could be found {0}"
+STATUS_OPENING_HELP = "Opened help in browser"
+STATUS_OPENING_LOG = "Opened suite output in browser"
+STATUS_OPENING_WEB = "Opened suite web view"
 STATUS_SOURCE_CHANGED = "Data source changed to {0}"
 STATUS_UPDATE = "updating view..."
 
@@ -178,7 +171,7 @@ TIP_TOOLBAR_VIEW_WEB = "View Web"
 
 # Window settings
 
-COLUMNS_HIDDEN = ["branch", "author", "date", "status", "from_idx"]
+COLUMNS_SHOWN = ["local", "idx", "revision", "owner", "title"]
 PREFIX_LEN = 5
 SIZE_WINDOW = (900, 600)
 SIZE_WINDOW_NEW_SUITE = (500, 400)
@@ -202,7 +195,7 @@ TITLE_INVALID_QUERY = "Error"
 COPYRIGHT = '(C) British Crown Copyright 2012 Met Office.'
 DEFAULT_QUERY = "list_my_suites"
 DELIM_KEYVAL = ": "
-HELP_URL = None
+HELP_FILE = "rosie-go.html"
 HISTORY_LOCATION = "~/.metomi/rosie-browse.history"
 ICON_PATH_WINDOW = 'etc/images/rosie-icon-trim.png'
 ICON_PATH_SCHEDULER = None
@@ -217,18 +210,18 @@ SIZE_HISTORY = 100
 
 def load_override_config():
     """Load any overrides of the above settings."""
-    config = rose.config.default_node()
-    node = config.get(["rosie-browse"], no_ignore=True)
+    conf = ResourceLocator.default().get_conf()
+    node = conf.get(["rosie-browse"], no_ignore=True)
     if node is None:
         return
-    for option, opt_node in node.value.items():
-        if opt_node.is_ignored():
+    for key, node in node.value.items():
+        if node.is_ignored():
             continue
         try:
-            cast_value = ast.literal_eval(opt_node.value)
+            cast_value = ast.literal_eval(node.value)
         except Exception:
-            cast_value = opt_node.value
-        globals()[option.replace("-", "_").upper()] = cast_value
+            cast_value = node.value
+        globals()[key.replace("-", "_").upper()] = cast_value
 
 
 load_override_config()

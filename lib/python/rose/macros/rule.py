@@ -56,7 +56,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config):
         """Validate against any rules found in the meta_config."""
-        problem_list = []
+        self.reports = []
         rule_data = {self.RULE_ERROR_NAME: {}, self.RULE_WARNING_NAME: {}}
         evaluator = RuleEvaluator()
         for setting_id, sect_node in meta_config.value.items():
@@ -103,10 +103,9 @@ class FailureRuleChecker(rose.macro.MacroBase):
                             info = self.RULE_MSG_FAIL_FORMAT.format(message,
                                                                     f_type,
                                                                     rule)
-                        self.add_report(
-                                 problem_list, section, option, value, info,
-                                 is_warning)
-        return problem_list
+                        self.add_report(section, option, value, info,
+                                        is_warning)
+        return self.reports
 
 
 class RuleEvaluator(rose.macro.MacroBase):

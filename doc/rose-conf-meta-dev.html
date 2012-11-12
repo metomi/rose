@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose User Guide: Advanced Topics</title>
+  <title>Rose User Guide: Configuration Metadata Development</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
@@ -12,6 +12,8 @@
   <script type="text/javascript" src="jquery.min.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
 </script>
 </head>
 
@@ -24,22 +26,19 @@
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
       "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
     <p><a href=".">Rose Documentation</a></p>
   </div>
 
   <div id="body-main">
-    <h1 id="heading-main">Rose User Guide: Advanced Topics</h1>
+    <h1>Rose User Guide: Configuration Metadata Development</h1>
 
     <div id="content"></div>
 
     <h2 id="intro">Introduction</h2>
-
-    <p>This chapter of the Rose user guide introduces advanced topics such as
-    developing metadata for Rose.</p>
-
-    <h2 id="meta">Configuration Metadata Development</h2>
 
     <p>Configuration Metadata is used to provide information about settings in
     Rose configurations. It is intended to help document your inputs, perform
@@ -50,9 +49,12 @@
     please refer to the <a href="rose-configuration.html#meta">Rose Reference Guide
     &gt; Configuration Metadata</a>.</p>
 
+    <h2 id="example">Example</h2>
+
     <p>This example uses the Rose example suite from the <a href=
     "rose-brief-tour.html">brief tour</a> and assumes that you are familiar
-    with it.</p>
+    with it and have it to hand. Otherwise, go back to the brief tour
+    and follow the instructions to check it out or recreate it.</p>
 
     <p>We are going to develop metadata for the app <code>my_hello_mars</code>.
     Change directory to the suite directory, then change directory to
@@ -127,10 +129,10 @@ title = Max target number
 type = integer
 </pre>
 
-    <p>Now if we open the application in the config editor again, we see that
-    the value of <var>MAX_TARGETS</var> now appears in a special numeric
-    widget, and that the title has replaced the name. You can see the
-    difference easily by switching metadata off and on (toggle
+    <p>Now if we save the file and open the application in the config editor
+    again, we see that the value of <var>MAX_TARGETS</var> now appears in a
+    special numeric widget, and that the title has replaced the name. You can 
+    see the difference easily by switching metadata off and on (toggle
     <code>Metadata</code> Menu -&gt; Switch off Metadata).</p>
 
     <p>Setting the type does more than change the widget - it also instructs
@@ -328,6 +330,12 @@ url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
     configuration metadata. Make sure you have a good idea of when to use these
     by consulting the <a href="rose-configuration.html#meta">Rose Reference Guide
     &gt; Configuration Metadata</a>.</p>
+
+    <h2 id="upgrade">Upgrade Macro Development</h2>
+
+    <p>Upgrade macros automate the process of updating configurations from one
+    version to the next, such as removing redundant settings or adding new
+    ones.</p>
   </div>
 </body>
 </html>

@@ -23,6 +23,9 @@ Licence. See doc/rose-terms-of-use.html and
 Licences for non-Rose works included in this distribution can be
 found in the licences/ directory.
 
+doc/jquery.min.js:
+    Unmodified external software library. See lib/html/external/jquery/.
+
 doc/rose-icon.png,
 etc/images/rose-icon.png,
 etc/images/rose-icon-trim.png,
@@ -34,8 +37,9 @@ etc/metadata/all/etc/images/icon.png:
     These icons are all derived from the public domain image at
     <http://www.clker.com/clipart-compass-rose-variation.html>.
 
+etc/images/rose-config-edit/gnome_add.png,
 etc/images/rose-config-edit/gnome_package_system.png:
-    This icon is part of the GNOME icon theme 2.28.0, licensed under
+    These icons are part of the GNOME icon theme 2.28.0, licensed under
     GPLv2. This theme was developed by:
         Ulisse Perusin <uli.peru@gmail.com>
         Riccardo Buzzotta <raozuzu@yahoo.it>
@@ -49,8 +53,10 @@ etc/images/rose-config-edit/gnome_package_system.png:
         Andreas Nilsson <nisses.mail@home.se>
         Jakub Steiner <jimmac@novell.com>
 
+etc/images/rose-config-edit/gnome_add_*,
 etc/images/rose-config-edit/gnome_package_system_*:
     These icons are derivative works produced from
+    etc/images/rose-config-edit/gnome_add.png or
     etc/images/rose-config-edit/gnome_package_system.png, and are
     distributed in their preferred PNG form.
 

@@ -28,13 +28,15 @@ Functions:
 """
 
 import os
+
+import sqlalchemy as al
+
 import rose.config
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 import rosie.suite_id
-import sqlalchemy as al
 
 
 def _col_by_key(table, key):
@@ -60,9 +62,6 @@ class DAO(object):
 
     """
 
-    CHANGESET_NOT_COMMON_COLS = ["author", "date"]
-    CHANGESET_INFO_COLS = ["author", "date"]
-
     QUERY_OP_ALIASES = {"eq": "__eq__", "ge": "__ge__", "gt": "__gt__",
                         "le": "__le__", "lt": "__lt__", "ne": "__ne__"}
 
@@ -80,7 +79,7 @@ class DAO(object):
         self.db_metadata = al.MetaData(self.db_engine)
         self.results = None
         self.tables = {}
-        for n in ["changeset", "main", "optional", "modified"]:
+        for n in ["changeset", "main", "optional", "modified", "meta"]:
             self.tables[n] = al.Table(n, self.db_metadata, autoload=True)
 
     def _execute(self, query):
@@ -231,16 +230,31 @@ class DAO(object):
         return change, return_cols
 
     def get_common_keys(self, *args):
-        """Return the names of the common fields."""
+        """Return the names of the main and changeset table fields."""
         self._connect()
         self.results = _col_keys(self.tables["main"])
         for col in self.tables["changeset"].c:
-            if col.key not in (self.results + self.CHANGESET_NOT_COMMON_COLS):
-                if col.key == "revision":
-                    index = self.results.index("branch") + 1
-                    self.results.insert(index, col.key)
-                else:
-                    self.results.append(col.key)
+            if col.key in self.results:
+                continue
+            if col.key == "revision":
+                index = self.results.index("branch") + 1
+                self.results.insert(index, col.key)
+            else:
+                self.results.append(col.key)
+        return self.results
+
+    def get_known_keys(self):
+        """Return all known field names."""
+        common_keys = self.get_common_keys()
+        self._connect()
+        where = (self.tables["meta"].c.name == "known_keys")
+        select = al.sql.select([self.tables["meta"].c.value],
+                               whereclause=where)
+        self.results = [r[0] for r in self._execute(select)]  # De-proxy.
+        if any(self.results):
+            self.results = self.results[0].split()  # shlex.split garbles it.
+        self.results = common_keys + self.results
+        self.results.sort()
         return self.results
 
     def get_optional_keys(self, *args):
@@ -249,10 +263,9 @@ class DAO(object):
         select = al.sql.select([self.tables["modified"].c.name])
         self._execute(select.distinct())
         self.results = [r.pop() for r in self.results]
-        for column_name in _col_keys(self.tables["main"]):
+        for column_name in self.get_common_keys():
             if column_name in self.results:
                 self.results.remove(column_name)
-        self.results += self.CHANGESET_INFO_COLS
         self.results.sort()
         return self.results
 
@@ -567,7 +580,7 @@ class RosieDatabaseInitiator(object):
 
     def create(self, prefix):
         """Create database tables."""
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         url = conf.get(["rosie-db", "db." + prefix]).value
         try:
             engine = al.create_engine(url)
@@ -610,6 +623,11 @@ class RosieDatabaseInitiator(object):
                     al.Column("name", db_string, nullable=False),
                     al.Column("old_value", db_string),
                     al.Column("new_value", db_string)))
+            tables.append(al.Table(
+                    "meta", metadata,
+                    al.Column("name", db_string, primary_key=True,
+                              nullable=False),
+                    al.Column("value", db_string)))
             for table in tables:
                 table.create(engine)
             connection = engine.connect()
@@ -620,7 +638,8 @@ class RosieDatabaseInitiator(object):
 
     def load(self, prefix):
         """Load database contents from a repository."""
-        node = rose.config.default_node().get(["rosie-db", "repos." + prefix])
+        conf = ResourceLocator.default().get_conf()
+        node = conf.get(["rosie-db", "repos." + prefix])
         location = node.value
         location = os.path.abspath(location)
         if not os.path.exists(location):
@@ -629,20 +648,25 @@ class RosieDatabaseInitiator(object):
         youngest = int(self.popen("svnlook", "youngest", location)[0])
         util_home = ResourceLocator.default().get_util_home()
         rosa = os.path.join(util_home, "sbin", "rosa")
-        for revision in range(1, youngest + 1):
-            self.popen(rosa, "svn-post-commit", location, str(revision))
+        revision = 1
+        while revision <= youngest:
+            out, err = self.popen(rosa, "svn-post-commit", location, str(revision))
             event = RosieDatabaseLoadEvent(prefix, revision, youngest)
+            if revision == youngest:
+                # Check if any new revisions have been added.
+                youngest = int(self.popen("svnlook", "youngest", location)[0])
             if revision == youngest:
                 event.level = event.DEFAULT
             self.handle_event(event)
+            revision += 1
         return revision
 
 
 def test_query_parsing(filters):
     """Test the ability of the query parser to generate logical expressions."""
     url = None
-    config = rose.config.default_node()
-    for key, node in reversed(config.get(["rosie-db"]).value.items()):
+    conf = ResourceLocator.default().get_conf()
+    for key, node in reversed(conf.get(["rosie-db"]).value.items()):
         if key.startswith("db.") and key[3:]:
             url = node.value
             break
@@ -653,13 +677,13 @@ def test_query_parsing(filters):
 
 def main():
     """rosa db-create."""
-    ws_config = rose.config.default_node().get(["rosie-db"])
+    db_conf = ResourceLocator.default().get_conf().get(["rosie-db"])
     databases = {}
-    if ws_config is not None:
+    if db_conf is not None:
         opts, args = RoseOptionParser().parse_args()
         reporter = Reporter(opts.verbosity - opts.quietness)
         init = RosieDatabaseInitiator(event_handler=reporter)
-        for key, node in ws_config.value.items():
+        for key, node in db_conf.value.items():
             if key.startswith("db."):
                 prefix = key.replace("db.", "", 1)
                 init(prefix)
