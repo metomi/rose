@@ -111,7 +111,7 @@ class VariableWidget(object):
             if len(info) > 1:
                 widget_path, widget_args = info
             else:
-                widget_path, widget_args = info[0], []
+                widget_path, widget_args = info[0], None
             files = self.var_ops.get_var_metadata_files(variable)
             lib = os.path.join("lib", "python", "widget")
             is_builtin = False

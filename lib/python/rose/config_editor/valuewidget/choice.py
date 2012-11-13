@@ -81,7 +81,7 @@ class ChoicesValueWidget(gtk.HBox):
                "choices": [
                        ["--choices"],
                        {"action": "append",
-                        "default": [],
+                        "default": None,
                         "metavar": "CHOICE"}],
                "editable": [
                        ["--editable"],
@@ -103,15 +103,16 @@ class ChoicesValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-
+        
         self.opt_parser = rose.opt_parse.RoseOptionParser()
         self.opt_parser.OPTIONS = self.OPTIONS
         self.opt_parser.add_my_options(*self.OPTIONS.keys())
         opts, args = self.opt_parser.parse_args(shlex.split(arg_str))
         self.all_group = opts.all_group
         self.groups = []
-        for choices in opts.choices:
-            self.groups.extend(rose.variable.array_split(choices))
+        if opts.choices is not None:
+            for choices in opts.choices:
+                self.groups.extend(rose.variable.array_split(choices))
         self.should_edit = opts.editable
         self.value_format = opts.format
         self.should_guess_groups = opts.guess_groups
