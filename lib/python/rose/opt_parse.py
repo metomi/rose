@@ -25,7 +25,11 @@ from rose.resource import ResourceLocator
 
 class RoseOptionParser(OptionParser):
 
-    """Option parser base class for Rose command utilities."""
+    """Option parser base class for Rose command utilities.
+    
+    Warning: do not use a list or dict as a default.
+
+    """
 
     OPTIONS = {"all": [
                        ["--all", "-a"],
