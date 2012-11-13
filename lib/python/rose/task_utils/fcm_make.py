@@ -30,7 +30,7 @@ class FCMMakeTaskUtil(TaskUtilBase):
 
     CONFIG_IS_OPTIONAL = True
     SCHEME = "fcm_make"
-    SCHEME2 = "fcm_make2"
+    SCHEME2 = SCHEME + "2"
 
     def can_handle(self, key):
         return key.startswith(self.SCHEME) and not key.startswith(self.SCHEME2)

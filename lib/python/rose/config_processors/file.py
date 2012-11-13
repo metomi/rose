@@ -460,7 +460,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if job.action_key == self.T_INSTALL:
             self._target_install(job.loc, config)
         elif job.action_key == self.T_PULL:
-            self._source_pull(job.loc)
+            self._source_pull(job.loc, config)
         job.state = job.ST_DONE
 
     def post_process_job(self, job, config):
@@ -481,8 +481,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 prev_source.real_name != source.real_name or
                 prev_source.paths != source.paths)
 
-    def _source_pull(self, source):
-        self.loc_handlers_manager.pull(source)
+    def _source_pull(self, source, config):
+        return self.loc_handlers_manager.pull(source)
+        # TODO: handle uncompression
 
     def _target_install(self, target, config):
         """Install target.

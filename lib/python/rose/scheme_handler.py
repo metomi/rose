@@ -38,7 +38,9 @@ class SchemeHandlersManager(object):
         each class. This manager will be passed to the constructor using the
         keyword "manager".
 
-        A handler class should have a h.SCHEME attribute with a str value.
+        Each handler class should have a h.SCHEME attribute with a str value if
+        it differs from the base name of the module.
+
         Optionally, it should have a h.can_handle(scheme, **kwargs) method that
         returns a boolean value to indicate whether it can handle a given
         scheme.
@@ -52,9 +54,10 @@ class SchemeHandlersManager(object):
                 for file_name in glob("*.py"):
                     if file_name.startswith("__"):
                         continue
-                    mod = __import__(file_name[0:-3])
-                    for name, c in inspect.getmembers(mod, inspect.isclass):
-                        scheme = getattr(c, "SCHEME", None)
+                    mod_name = file_name[0:-3]
+                    mod = __import__(mod_name)
+                    for key, c in inspect.getmembers(mod, inspect.isclass):
+                        scheme = getattr(c, "SCHEME", mod_name)
                         if (scheme is None or
                             any([getattr(c, a, None) is None for a in attrs])):
                             continue
