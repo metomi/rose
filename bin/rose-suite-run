@@ -48,7 +48,9 @@
 #     --define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE
 #         Each of this overrides the [SECTION]KEY setting with a given VALUE.
 #         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
-#         or even --define=[!SECTION].
+#         or even --define=[!SECTION]. See also --define-suite.
+#     --define-suite=KEY=VALUE, -S KEY=VALUE
+#         As --define, but with an implicit [SECTION] for suite variables.
 #     --force, -f
 #         Reinstall the suite even if it is already running.
 #     --host=HOST
