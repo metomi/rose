@@ -46,15 +46,15 @@
     the interface to your configurations in e.g. the Rose config editor.</p>
 
     <p>For reference and a fuller picture of Rose configuration metadata,
-    please refer to the <a href="rose-configuration.html#meta">Rose Reference Guide
-    &gt; Configuration Metadata</a>.</p>
+    please refer to the <a href="rose-configuration.html#meta">Rose Reference
+    Guide &gt; Configuration Metadata</a>.</p>
 
     <h2 id="example">Example</h2>
 
     <p>This example uses the Rose example suite from the <a href=
     "rose-brief-tour.html">brief tour</a> and assumes that you are familiar
-    with it and have it to hand. Otherwise, go back to the brief tour
-    and follow the instructions to check it out or recreate it.</p>
+    with it and have it to hand. Otherwise, go back to the brief tour and
+    follow the instructions to check it out or recreate it.</p>
 
     <p>We are going to develop metadata for the app <code>my_hello_mars</code>.
     Change directory to the suite directory, then change directory to
@@ -131,7 +131,7 @@ type = integer
 
     <p>Now if we save the file and open the application in the config editor
     again, we see that the value of <var>MAX_TARGETS</var> now appears in a
-    special numeric widget, and that the title has replaced the name. You can 
+    special numeric widget, and that the title has replaced the name. You can
     see the difference easily by switching metadata off and on (toggle
     <code>Metadata</code> Menu -&gt; Switch off Metadata).</p>
 
@@ -152,10 +152,10 @@ type = integer
 </pre>
 
     <p>This means that any integer less than zero will be flagged as a problem.
-    With the Metadata switched on, try decreasing the value of <var>MAX_TARGETS
-    </var> below zero. An error will be flagged next to the variable and on the
-    page list in the left hand panel. If you change it to an integer value of
-    zero or greater, the error will go away.</p>
+    With the Metadata switched on, try decreasing the value of
+    <var>MAX_TARGETS</var> below zero. An error will be flagged next to the
+    variable and on the page list in the left hand panel. If you change it to
+    an integer value of zero or greater, the error will go away.</p>
 
     <p>Let's now make <var>env=WORLD</var> less ambiguous. Create a section in
     the metadata</p>
@@ -224,16 +224,16 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     <em>enabled</em> when it is. Ignored variables won't get passed into our
     hello.exe application.</p>
 
-    <p>First set <var>WORLD</var> to <samp>Jupiter</samp>. After that, either
-    save and reopen the config editor, or just switch metadata off and on.</p>
+    <p>Set <var>WORLD</var> to <samp>Jupiter</samp>. Next, either save and
+    reopen the config editor, or just switch metadata off and on.</p>
 
     <p>Now when you change the value of <var>WORLD</var> to
     <samp>Saturn</samp>, or any other planet, <var>LANG_JUPITER</var> will be
     <em>ignored</em> and hidden by default in the config editor (you can show
-    it by selecting <code>View</code> Menu -&gt; View All Ignored variables).
-    If you change it back to <samp>Jupiter</samp>, it will be <em>enabled</em>
-    and re-appear.</p>
-    
+    it by selecting <kbd>View -&gt; View All Ignored Variables</kbd>). If you
+    change it back to <samp>Jupiter</samp>, it will be <em>enabled</em> and
+    re-appear.</p>
+
     <p>When you're done, change <var>WORLD</var> to <samp>Earth</samp> and
     save.</p>
 
@@ -330,8 +330,8 @@ url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
 
     <p>We've finished! However, there are other things you can do with
     configuration metadata. Make sure you have a good idea of when to use these
-    by consulting the <a href="rose-configuration.html#meta">Rose Reference Guide
-    &gt; Configuration Metadata</a>.</p>
+    by consulting the <a href="rose-configuration.html#meta">Rose Reference
+    Guide &gt; Configuration Metadata</a>.</p>
 
     <h2 id="upgrade">Upgrade Macro Development</h2>
 
