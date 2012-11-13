@@ -53,7 +53,6 @@ class EntryArrayValueWidget(gtk.HBox):
         self.max_length = self.metadata[rose.META_PROP_LENGTH]
 
         value_array = rose.variable.array_split(self.value)
-
         self.chars_width = max([len(v) for v in value_array] + [1]) + 1
         self.last_selected_src = None
         arr_type = self.metadata.get(rose.META_PROP_TYPE)
@@ -95,6 +94,7 @@ class EntryArrayValueWidget(gtk.HBox):
         return None
 
     def get_focus_index(self):
+        """Get the focus and position within the table of entries."""
         text = ''
         for entry in self.entries:
             val = entry.get_text()
@@ -109,7 +109,7 @@ class EntryArrayValueWidget(gtk.HBox):
         return None
 
     def set_focus_index(self, focus_index=None):
-        """Set the focus and position within the table."""
+        """Set the focus and position within the table of entries."""
         if focus_index is None:
             return
         value_array = rose.variable.array_split(self.value)
