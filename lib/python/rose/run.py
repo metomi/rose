@@ -182,20 +182,15 @@ class Runner(object):
                 source = os.path.join(conf_dir, "opt", source_base)
                 rose.config.load(source, config)
 
-        # Optional defines/suite defines
+        # Optional defines
         # N.B. In theory, we should write the values in "opts.defines" to
         # "config" directly. However, the values in "opts.defines" may contain
         # "ignore" flags. Rather than replicating the logic for parsing ignore
         # flags in here, it is actually easier to write the values in
         # "opts.defines" to a file and pass it to the loader to parse it.
-        # We do the same with opts.defines_suite.
-        if opts.defines or getattr(opts, "defines_suite", []):
+        if opts.defines:
             source = TemporaryFile()
-            defines = opts.defines
-            suite_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
-            for define in getattr(opts, "defines_suite", []):
-                defines.append("[" + suite_section + "]" + define)
-            for define in defines:
+            for define in opts.defines:
                 section, key, value = self.REC_OPT_DEFINE.match(define).groups()
                 if section is None:
                     section = ""
@@ -385,6 +380,13 @@ class SuiteRunner(Runner):
         if opts.conf_dir:
             self.fs_util.chdir(opts.conf_dir)
         opts.conf_dir = os.getcwd()
+
+        if opts.defines_suite:
+            suite_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
+            if not opts.defines:
+                opts.defines = []
+            for define in opts.defines_suite:
+                opts.defines.append("[" + suite_section + "]" + define)
 
         # --remote=KEY=VALUE,...
         if opts.remote:
