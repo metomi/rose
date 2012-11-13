@@ -67,6 +67,7 @@ class ChecksumEvent(Event):
 class Loc(object):
     """Represent a location."""
 
+    BLOB = ""
     TYPE_TREE = "tree"
     TYPE_BLOB = "blob"
 
@@ -86,6 +87,11 @@ class Loc(object):
             return "%s (%s)" % (self.real_name, self.name)
         else:
             return self.name
+
+    def add_path(self, *args):
+        if self.paths is None:
+            self.paths = []
+        self.paths.append(PathInLoc(*args))
 
     def update(self, other):
         self.name = other.name
@@ -385,7 +391,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 m = md5()
                 f = open(target.name)
                 m.update(f.read())
-                target.paths = [PathInLoc("", m.hexdigest())]
+                target.add_path(target.BLOB, m.hexdigest())
             elif os.path.isdir(target.name):
                 target.paths = []
                 for dirpath, dirnames, filenames in os.walk(target.name):
@@ -394,14 +400,13 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         if dirname.startswith("."):
                             dirnames.pop(i)
                             continue
-                        target.paths.append(
-                                PathInLoc(os.path.join(dirpath, dirname)))
+                        target.add_path(os.path.join(dirpath, dirname))
                     for filename in filenames:
                         m = md5()
                         filepath = os.path.join(dirpath, filename)
                         f = open(filepath)
                         m.update(f.read())
-                        target.paths.append(PathInLoc(filepath, m.hexdigest()))
+                        target.add_path(filepath, m.hexdigest())
                 target.paths.sort()
             prev_target = self.loc_dao.select(target.name)
             target.is_out_of_date = (
@@ -431,12 +436,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 self.manager.fs_util.makedirs(target.name)
                 self.loc_dao.update(target)
                 target.loc_type = target.TYPE_TREE
-                target.paths = [PathInLoc("", None)]
+                target.add_path(target.BLOB, None)
             else:
                 self.manager.fs_util.create(target.name)
                 self.loc_dao.update(target)
                 target.loc_type = target.TYPE_BLOB
-                target.paths = [PathInLoc("", md5().hexdigest())]
+                target.add_path(target.BLOB, md5().hexdigest())
 
         JobRunner(self)(JobManager(jobs), config)
 
@@ -521,17 +526,17 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if target.loc_type == target.TYPE_BLOB:
             m = md5()
             m.update(open(target).read())
-            target.paths = [PathInLoc("", m.hexdigest())]
+            target.add_path(target.BLOB, m.hexdigest())
         else:
             target.paths = []
             for dirpath, dirnames, filenames in os.walk(target):
                 path = dirpath[len(target) + 1:]
-                target.paths.append(PathInLoc(path, None))
+                target.add_path(path, None)
                 for filename in filenames:
                     filepath = os.path.join(path, filename)
                     m = md5()
                     m.update(open(filepath).read())
-                    target.paths.append(PathInLoc(filepath, m.hexdigest()))
+                    target.add_path(filepath, m.hexdigest())
 
     def set_event_handler(self, event_handler):
         """Sets the event handler, used by pool workers to capture events."""
@@ -608,7 +613,7 @@ class LocDAO(object):
             path, checksum = row
             if loc.paths is None:
                 loc.paths = []
-            loc.paths.append(PathInLoc(path, checksum))
+            loc.add_path(path, checksum)
 
         c.execute("""SELECT dep_name FROM dep_names WHERE name=?""", name)
         for row in c:
