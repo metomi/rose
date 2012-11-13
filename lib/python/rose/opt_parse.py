@@ -115,6 +115,12 @@ class RoseOptionParser(OptionParser):
                         "dest": "defines",
                         "metavar": "[SECTION]KEY=VALUE",
                         "help": "Set [SECTION]KEY to VALUE."}],
+               "defines_suite": [
+                       ["--define-suite", "-S"],
+                       {"action": "append",
+                        "dest": "defines_suite",
+                        "metavar": "KEY=VALUE",
+                        "help": "Set suite variable KEY to VALUE."}],
                "diffsource": [
                        ["--diffsource", "-d"],
                        {"action": "append",

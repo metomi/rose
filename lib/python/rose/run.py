@@ -367,9 +367,9 @@ class SuiteRunner(Runner):
     NAME = "suite"
     NUM_LOG_MAX = 5
     NUM_PING_TRY_MAX = 3
-    OPTIONS = ["conf_dir", "defines", "force_mode", "gcontrol_mode", "host",
-               "install_only_mode", "name", "new_mode",
-               "no_overwrite_mode", "opt_conf_keys", "remote"]
+    OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
+               "gcontrol_mode", "host", "install_only_mode", "name",
+               "new_mode", "no_overwrite_mode", "opt_conf_keys", "remote"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
@@ -384,6 +384,13 @@ class SuiteRunner(Runner):
         if opts.conf_dir:
             self.fs_util.chdir(opts.conf_dir)
         opts.conf_dir = os.getcwd()
+
+        if opts.defines_suite:
+            suite_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
+            if not opts.defines:
+                opts.defines = []
+            for define in opts.defines_suite:
+                opts.defines.append("[" + suite_section + "]" + define)
 
         # --remote=KEY=VALUE,...
         if opts.remote:
