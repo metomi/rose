@@ -460,7 +460,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if job.action_key == self.T_INSTALL:
             self._target_install(job.loc, config)
         elif job.action_key == self.T_PULL:
-            self._source_pull(job.loc)
+            self._source_pull(job.loc, config)
         job.state = job.ST_DONE
 
     def post_process_job(self, job, config):
@@ -481,8 +481,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 prev_source.real_name != source.real_name or
                 prev_source.paths != source.paths)
 
-    def _source_pull(self, source):
-        self.loc_handlers_manager.pull(source)
+    def _source_pull(self, source, config):
+        return self.loc_handlers_manager.pull(source)
+        # TODO: handle uncompression
 
     def _target_install(self, target, config):
         """Install target.
@@ -633,11 +634,16 @@ class LocDAO(object):
 
 
 class PullableLocHandlersManager(SchemeHandlersManager):
-    """Manage location handlers."""
+    """Manage location handlers.
+
+    Each location handler should have a SCHEME set to a unique string, the
+    "can_handle" method, the "parse" method and the "pull" methods.
+
+    """
 
     def __init__(self, event_handler=None, popen=None, fs_util=None):
         path = os.path.join(os.path.dirname(__file__), "loc_handlers")
-        SchemeHandlersManager.__init__(self, path, ["parse", "pull"])
+        SchemeHandlersManager.__init__(self, [path], ["parse", "pull"])
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)

@@ -29,7 +29,7 @@ class FCMMake2TaskUtil(TaskUtilBase):
 
     CONFIG_IS_OPTIONAL = True
     SCHEME = "fcm_make2"
-    SCHEME1 = "fcm_make"
+    SCHEME1 = SCHEME[0:-1]
 
     def run_impl_main(self, config, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props()
