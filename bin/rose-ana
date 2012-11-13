@@ -21,13 +21,14 @@
 #     rose ana
 #
 # SYNOPSIS
-#     rose ana FILENAMES
+#     rose ana [--method-path=/path/to/comparisons] FILENAMES
 #
 # DESCRIPTION
-#     Run the given test config files through the analysis engine.
-#
+#     Run the given test config files through the comparison engine.
 #
 # OPTIONS
-#     None so far
+#     --method-path=DIR, -p DIR
+#         Specify additional directories to locate extraction and comparison
+#         methods.
 #-------------------------------------------------------------------------------
 exec python -m rose.ana "$@"
