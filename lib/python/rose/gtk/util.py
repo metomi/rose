@@ -855,9 +855,15 @@ def run_dialog(dialog_type, text, title=None, modal=True):
         dialog.label.set_markup(text)
     dialog.label.show()
     hbox = gtk.HBox()
+    
     if stock_id is not None:
-        hbox.pack_start(dialog.image, expand=False, fill=False,
+        image_vbox = gtk.VBox()
+        image_vbox.pack_start(dialog.image, expand=False, fill=False,
+                              padding=DIALOG_PADDING)
+        image_vbox.show()
+        hbox.pack_start(image_vbox, expand=False, fill=False,
                         padding=rose.config_editor.SPACING_PAGE)
+                        
     scrolled_window = gtk.ScrolledWindow()
     scrolled_window.set_border_width(10)  
     scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
@@ -938,18 +944,19 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
             text = REC_DIALOG_HYPERLINK_ID_OR_URL.sub(
                                         DIALOG_MARKUP_URL_HTML, text)
             label.set_markup(text)
-            
     
     message_vbox.pack_start(label, expand=True, fill=True,
                             padding=DIALOG_PADDING)
-                            
     scrolled_window = gtk.ScrolledWindow()
     scrolled_window.set_border_width(DIALOG_PADDING)  
     scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
     scrolled_window.add_with_viewport(message_vbox)                        
     scrolled_window.child.set_shadow_type(gtk.SHADOW_NONE)
     scrolled_window.show()
-    main_hbox.pack_start(scrolled_window, expand=True, fill=True)
+    vbox = gtk.VBox()
+    vbox.pack_start(scrolled_window, expand=True, fill=True)
+    vbox.show()
+    main_hbox.pack_start(vbox, expand=True, fill=True)
     top_vbox.pack_start(main_hbox, expand=True, fill=True)
     # Insert the button
     button_box = gtk.HBox(spacing=DIALOG_PADDING)
@@ -1164,7 +1171,7 @@ def run_edit_dialog(text, finish_hook=None, title=None):
     dialog.set_border_width(DIALOG_SUB_PADDING)
 
     scrolled_window = gtk.ScrolledWindow()
-    scrolled_window.set_border_width(DIALOG_PADDING)  
+    scrolled_window.set_border_width(DIALOG_SUB_PADDING)  
     scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
 
     text_buffer = gtk.TextBuffer()
@@ -1182,7 +1189,6 @@ def run_edit_dialog(text, finish_hook=None, title=None):
                            padding=0)
     get_text = lambda: text_buffer.get_text(text_buffer.get_start_iter(),
                                             text_buffer.get_end_iter())
-
 
     max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
     min_size = DIALOG_SIZE_PROCESS  #defines the minimum acceptable size for
