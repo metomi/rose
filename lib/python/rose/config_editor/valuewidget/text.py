@@ -99,13 +99,10 @@ class TextMultilineValueWidget(gtk.HBox):
         self.set_value = set_value
         self.hook = hook
 
-        self.event_box = gtk.EventBox()
-        self.pack_start(self.event_box, expand=True)
-        self.event_box.show()
         self.entry_scroller = gtk.ScrolledWindow()
         self.entry_scroller.set_shadow_type(gtk.SHADOW_IN)
         self.entry_scroller.set_policy(gtk.POLICY_AUTOMATIC,
-                                  gtk.POLICY_NEVER)
+                                       gtk.POLICY_NEVER)
         self.entry_scroller.show()
         self.entrybuffer = gtk.TextBuffer()
         self.entrybuffer.set_text(self.value)
@@ -118,11 +115,25 @@ class TextMultilineValueWidget(gtk.HBox):
         self.entry_scroller.add(self.entry)
         self.grab_focus = lambda : self.hook.get_focus(self.entry)
         self.entrybuffer.connect('changed', self.setter)
-        self.event_box.add(self.entry_scroller)
+        self.pack_start(self.entry_scroller, expand=True, fill=True)
+
+    def get_focus_index(self):
+        """Return the cursor position within the variable value."""
+        mark = self.entrybuffer.get_insert()
+        iter_ = self.entrybuffer.get_iter_at_mark(mark)
+        return iter_.get_offset()
+
+    def set_focus_index(self, focus_index=None):
+        """Set the cursor position within the variable value."""
+        if focus_index is None:
+            return False
+        iter_ = self.entrybuffer.get_iter_at_offset(focus_index)
+        self.entrybuffer.place_cursor(iter_)
 
     def setter(self, widget):
         text = widget.get_text(widget.get_start_iter(),
                                widget.get_end_iter())
-        self.value = text
-        self.set_value(self.value)
+        if text != self.value:
+            self.value = text
+            self.set_value(self.value)
         return False
