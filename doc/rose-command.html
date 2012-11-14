@@ -1059,7 +1059,12 @@
       <dd>Each of this overrides the <var>[SECTION]KEY</var> setting with a
       given <var>VALUE</var>. Can be used to disable a setting using the syntax
       <kbd>--define=[SECTION]!KEY</kbd> or even
-      <kbd>--define=[!SECTION]</kbd>.</dd>
+      <kbd>--define=[!SECTION]</kbd>. See also <kbd>--suite-define</kbd>.</dd>
+
+      <dt><kbd>--define-suite=KEY=VALUE; -S KEY=VALUE</kbd></dt>
+
+      <dd>As <kbd>--define</kbd>, but with an implicit <var>[SECTION]</var>
+      for suite variables.</dd>
 
       <dt><kbd>--force, -f</kbd></dt>
 
