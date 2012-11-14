@@ -822,6 +822,7 @@ def _handle_command_arg_response(dialog, response, run_hook, entry):
 
 
 def run_dialog(dialog_type, text, title=None, modal=True):
+
     """Run a simple dialog with an 'OK' button and some text."""
     
     parent_window = get_dialog_parent()
@@ -899,6 +900,7 @@ def run_dialog(dialog_type, text, title=None, modal=True):
 
 def run_hyperlink_dialog(stock_id=None, text="", title=None,
                          search_func=lambda i: False):
+   
     """Run a dialog with inserted hyperlinks."""
     
     parent_window = get_dialog_parent()
@@ -1095,6 +1097,7 @@ def get_naming_dialog(label, checker, ok_tip=None,
                            padding=DIALOG_PADDING)
     return dialog, main_vbox, name_entry
 
+
 def _name_checker(entry, checker, ok_button, ok_tip, err_tip):
     good_colour = ok_button.style.text[gtk.STATE_NORMAL]
     bad_colour = gtk.gdk.color_parse(
@@ -1160,6 +1163,7 @@ def run_choices_dialog(text, choices, title=None):
 
 
 def run_edit_dialog(text, finish_hook=None, title=None):
+
     """Run a dialog for editing some text."""
     
     parent_window = get_dialog_parent()
@@ -1199,8 +1203,8 @@ def run_edit_dialog(text, finish_hook=None, title=None):
     start_size = dialog.size_request()
     scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)  
     end_size = dialog.size_request()
-    my_size = (max([start_size[0],end_size[0],min_size[0]])+20,
-               max([start_size[1],end_size[1],min_size[1]])+20)
+    my_size = (max([start_size[0], end_size[0], min_size[0]])+20,
+               max([start_size[1], end_size[1], min_size[1]])+20)
     new_size = [-1, -1]
     for i in [0, 1]:
         new_size[i] = min([my_size[i], max_size[i]])
@@ -1217,6 +1221,7 @@ def run_edit_dialog(text, finish_hook=None, title=None):
         finish_func = lambda: finish_hook(get_text().strip())
         dialog.connect("response", _handle_edit_dialog_response, finish_func)
         dialog.show()
+
 
 def _handle_edit_dialog_response(dialog, response, finish_hook):
     if response == gtk.RESPONSE_ACCEPT:
@@ -1254,6 +1259,7 @@ def set_exception_hook(keep_alive=False):
     sys.excepthook = (lambda c, i, t:
                       _handle_exception(c, i, t, prev_hook,
                                         keep_alive))
+
 
 def _handle_exception(exc_class, exc_inst, tback, hook, keep_alive):
     # Handle an uncaught exception.
