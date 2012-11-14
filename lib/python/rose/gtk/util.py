@@ -822,9 +822,7 @@ def _handle_command_arg_response(dialog, response, run_hook, entry):
 
 
 def run_dialog(dialog_type, text, title=None, modal=True):
-
     """Run a simple dialog with an 'OK' button and some text."""
-    
     parent_window = get_dialog_parent()
     dialog = gtk.Dialog(parent=parent_window)
     ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
@@ -900,9 +898,7 @@ def run_dialog(dialog_type, text, title=None, modal=True):
 
 def run_hyperlink_dialog(stock_id=None, text="", title=None,
                          search_func=lambda i: False):
-   
     """Run a dialog with inserted hyperlinks."""
-    
     parent_window = get_dialog_parent()
     dialog = gtk.Window()
     dialog.set_transient_for(parent_window)
@@ -1163,9 +1159,7 @@ def run_choices_dialog(text, choices, title=None):
 
 
 def run_edit_dialog(text, finish_hook=None, title=None):
-
     """Run a dialog for editing some text."""
-    
     parent_window = get_dialog_parent()
     dialog = gtk.Dialog(title,
                         buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
