@@ -851,7 +851,7 @@ def run_dialog(dialog_type, text, title=None, modal=True):
         try:
             dialog.label.set_markup(safe_str(text))
         except:
-            dialog.label.format_secondary_text(text)
+            dialog.label.set_text(text)
     else:
         dialog.label.set_markup(text)
     dialog.label.show()
