@@ -894,6 +894,7 @@ def run_dialog(dialog_type, text, title=None, modal=True):
 def run_hyperlink_dialog(stock_id=None, text="", title=None,
                          search_func=lambda i: False):
     """Run a dialog with inserted hyperlinks."""
+    
     parent_window = get_dialog_parent()
     dialog = gtk.Window()
     dialog.set_transient_for(parent_window)
@@ -912,7 +913,8 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     image.show()
     image_vbox.pack_start(image, expand=False, fill=False,
                           padding=DIALOG_PADDING)
-    main_hbox.pack_start(image_vbox, expand=False, fill=False)
+    main_hbox.pack_start(image_vbox, expand=False, fill=False, 
+                         padding=DIALOG_PADDING)
     # Apply the text
     message_vbox = gtk.VBox()
     message_vbox.show()
@@ -936,11 +938,19 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
             text = REC_DIALOG_HYPERLINK_ID_OR_URL.sub(
                                         DIALOG_MARKUP_URL_HTML, text)
             label.set_markup(text)
+            
+    
     message_vbox.pack_start(label, expand=True, fill=True,
                             padding=DIALOG_PADDING)
-    main_hbox.pack_start(message_vbox, expand=False, fill=True, 
-                         padding=DIALOG_PADDING)
-    top_vbox.pack_start(main_hbox, expand=False, fill=True)
+                            
+    scrolled_window = gtk.ScrolledWindow()
+    scrolled_window.set_border_width(DIALOG_PADDING)  
+    scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
+    scrolled_window.add_with_viewport(message_vbox)                        
+    scrolled_window.child.set_shadow_type(gtk.SHADOW_NONE)
+    scrolled_window.show()
+    main_hbox.pack_start(scrolled_window, expand=True, fill=True)
+    top_vbox.pack_start(main_hbox, expand=True, fill=True)
     # Insert the button
     button_box = gtk.HBox(spacing=DIALOG_PADDING)
     button_box.show()
@@ -961,7 +971,8 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     my_size = dialog.size_request()
     new_size = [-1, -1]
     for i in [0, 1]:
-        new_size[i] = min([my_size[i], max_size[i]])        
+        new_size[i] = min([my_size[i], max_size[i]])
+    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)        
     dialog.set_default_size(*new_size)    
     dialog.show()
     label.set_selectable(True)
@@ -1150,33 +1161,45 @@ def run_edit_dialog(text, finish_hook=None, title=None):
                                  gtk.STOCK_OK, gtk.RESPONSE_ACCEPT),
                         parent=parent_window)
 
-    #ensure a standard minimum size for edit dialogs
-    dialog.set_default_size(*DIALOG_SIZE_PROCESS)
     dialog.set_border_width(DIALOG_SUB_PADDING)
 
     scrolled_window = gtk.ScrolledWindow()
-    scrolled_window.set_border_width(10)  
+    scrolled_window.set_border_width(DIALOG_PADDING)  
     scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
 
     text_buffer = gtk.TextBuffer()
     text_buffer.set_text(text)
     text_view = gtk.TextView()
     text_view.set_editable(True)
-    text_view.show()
+    text_view.set_wrap_mode(gtk.WRAP_NONE)
     text_view.set_buffer(text_buffer)
+    text_view.show()
     
-    vbox = gtk.VBox()
-    vbox.pack_start(text_view, expand=True, fill=True, padding=0)
-    vbox.show()
-    
-    scrolled_window.add_with_viewport(vbox)
+    scrolled_window.add_with_viewport(text_view)
     scrolled_window.show()
 
     dialog.vbox.pack_start(scrolled_window, expand=True, fill=True,
                            padding=0)
     get_text = lambda: text_buffer.get_text(text_buffer.get_start_iter(),
                                             text_buffer.get_end_iter())
-                                            
+
+
+    max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
+    min_size = DIALOG_SIZE_PROCESS  #defines the minimum acceptable size for
+                                    #the edit dialog
+
+    #hacky solution to get "true" size for dialog
+    dialog.show()
+    start_size = dialog.size_request()
+    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)  
+    end_size = dialog.size_request()
+    my_size = (max([start_size[0],end_size[0],min_size[0]])+20,
+               max([start_size[1],end_size[1],min_size[1]])+20)
+    new_size = [-1, -1]
+    for i in [0, 1]:
+        new_size[i] = min([my_size[i], max_size[i]])
+    dialog.set_size_request(*new_size)
+
     if finish_hook is None:
         response = dialog.run()
         if response == gtk.RESPONSE_ACCEPT:
@@ -1188,15 +1211,6 @@ def run_edit_dialog(text, finish_hook=None, title=None):
         finish_func = lambda: finish_hook(get_text().strip())
         dialog.connect("response", _handle_edit_dialog_response, finish_func)
         dialog.show()
-    
-    #ensure the dialog size does not exceed the maximum allowed
-    max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
-    my_size = dialog.size_request()
-    new_size = [-1, -1]
-    for i in [0, 1]:
-        new_size[i] = min([my_size[i], max_size[i]])        
-    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    dialog.set_default_size(*new_size)
 
 def _handle_edit_dialog_response(dialog, response, finish_hook):
     if response == gtk.RESPONSE_ACCEPT:
