@@ -33,7 +33,7 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sqlite3
 import shutil
-import tempfile
+from tempfile import mkdtemp
 from time import sleep
 
 
@@ -199,8 +199,6 @@ class JobManager(object):
         """Return pending jobs if there are no ready/working ones."""
         if not self.has_jobs:
             return [job if job.pending_for for job in self.jobs.values()]
-        return (not self.has_jobs and
-                any([job.pending_for for job in self.jobs.values()]))
 
     def has_jobs(self):
         """Return True if there are ready jobs or working jobs."""
@@ -443,7 +441,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 target.loc_type = target.TYPE_BLOB
                 target.add_path(target.BLOB, md5().hexdigest())
 
-        JobRunner(self)(JobManager(jobs), config)
+        work_dir = mkdtemp()
+        JobRunner(self)(JobManager(jobs), config, work_dir)
+        self.manager.fs_util.delete(work_dir)
 
         # Target checksum compare and report
         for target in targets.values():
@@ -460,12 +460,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             event = ChecksumEvent(target.name, checksum)
             self.handle_event(event)
 
-    def process_job(self, job, config):
+    def process_job(self, job, config, work_dir):
         """Process a job, helper for process."""
         if job.action_key == self.T_INSTALL:
             self._target_install(job.loc, config)
         elif job.action_key == self.T_PULL:
-            self._source_pull(job.loc, config)
+            self._source_pull(job.loc, config, work_dir)
         job.state = job.ST_DONE
 
     def post_process_job(self, job, config):
@@ -486,8 +486,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 prev_source.real_name != source.real_name or
                 prev_source.paths != source.paths)
 
-    def _source_pull(self, source, config):
-        return self.loc_handlers_manager.pull(source)
+    def _source_pull(self, source, config, work_dir):
+        return self.loc_handlers_manager.pull(source, work_dir)
         # TODO: handle uncompression
 
     def _target_install(self, target, config):
@@ -647,14 +647,15 @@ class PullableLocHandlersManager(SchemeHandlersManager):
     """
 
     def __init__(self, event_handler=None, popen=None, fs_util=None):
-        path = os.path.join(os.path.dirname(__file__), "loc_handlers")
-        SchemeHandlersManager.__init__(self, [path], ["parse", "pull"])
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
-        self.popen = popen
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
+        rose_lib_path = fs_util.dirname(fs_util.dirname(__file__))
+        lib_path = os.path.join(rose_lib_path, "loc_handlers")
+        SchemeHandlersManager.__init__(self, [lib_path], ["parse", "pull"])
+        self.popen = popen
         self.fs_util = fs_util
 
     def handle_event(self, *args, **kwargs):
@@ -670,17 +671,14 @@ class PullableLocHandlersManager(SchemeHandlersManager):
             p = self.guess_handler(loc)
         return p.parse(loc)
 
-    def pull(self, loc):
-        """Pull a location to the local file system.
+    def pull(self, loc, work_dir):
+        """Pull a location to the local file system path under work_dir.
 
-        If loc.cache is defined, pull to the specified path.
-        Otherwise, pull to a temporary directory and set loc.cache.
-
-        Set loc.loc_type where possible.
+        Set loc.cache on success, normally a path under work_dir.
 
         """
         if file_loc.scheme:
             p = self.get_handler(loc.scheme)
         else:
             p = self.guess_handler(loc)
-        return p.pull(loc)
+        return p.pull(loc, work_dir)

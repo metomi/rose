@@ -19,9 +19,9 @@
 #-----------------------------------------------------------------------------
 """A handler of file system locations."""
 
-import errno
 from hashlib import md5
 import os
+from tempfile import mkdtemp
 
 class FileSystemLocHandler(object):
     """Handler of file system locations."""
@@ -30,33 +30,19 @@ class FileSystemLocHandler(object):
         self.manager = manager
 
     def can_handle(self, loc):
-        return True
+        pass # TODO
 
     def parse(self, loc):
         """Set loc.scheme, loc.loc_type, loc.paths."""
-        loc.scheme = "fs"
-        if os.path.isfile(loc.name):
-            loc.loc_type = loc.TYPE_BLOB
-            m = md5()
-            m.update(open(loc.name).read())
-            loc.add_path(loc.BLOB, m.hexdigest())
-        else os.path.isdir(loc.name):
-            loc.loc_type = loc.TYPE_TREE
-            for dirpath, dirnames, filenames in os.walk(loc.name):
-                for dirname in dirnames:
-                    loc.add_path(os.path.join(dirpath, dirname))
-                for filename in filenames:
-                    name = os.path.join(dirpath, filename)
-                    m = md5()
-                    m.update(open(name).read())
-                    loc.add_path(name, m.hexdigest())
+        loc.scheme = "svn"
+        pass # TODO
 
-    def pull(self, loc):
+    def pull(self, loc, work_dir):
         """If loc is in the file system, sets loc.cache to loc.name.
 
         Otherwise, raise an OSError.
 
         """
-        if not os.path.exists(loc.name):
-            raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), loc.name)
-        loc.cache = loc.name
+        base_name = md5().update(loc.real_name).hexdigest()
+        loc.cache = os.path.join(work_dir, base_name)
+        self.manager.popen("svn", "export", "-q", loc.real_name, loc.cache)
