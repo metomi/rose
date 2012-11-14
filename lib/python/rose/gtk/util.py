@@ -866,7 +866,7 @@ def run_dialog(dialog_type, text, title=None, modal=True):
                         padding=rose.config_editor.SPACING_PAGE)
                         
     scrolled_window = gtk.ScrolledWindow()
-    scrolled_window.set_border_width(10)  
+    scrolled_window.set_border_width(0)  
     scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
     vbox = gtk.VBox()
     vbox.pack_start(dialog.label, expand=True, fill=True)
