@@ -25,7 +25,11 @@ from rose.resource import ResourceLocator
 
 class RoseOptionParser(OptionParser):
 
-    """Option parser base class for Rose command utilities."""
+    """Option parser base class for Rose command utilities.
+    
+    Warning: do not use a list or dict as a default.
+
+    """
 
     OPTIONS = {"all": [
                        ["--all", "-a"],
@@ -111,6 +115,12 @@ class RoseOptionParser(OptionParser):
                         "dest": "defines",
                         "metavar": "[SECTION]KEY=VALUE",
                         "help": "Set [SECTION]KEY to VALUE."}],
+               "defines_suite": [
+                       ["--define-suite", "-S"],
+                       {"action": "append",
+                        "dest": "defines_suite",
+                        "metavar": "KEY=VALUE",
+                        "help": "Set suite variable KEY to VALUE."}],
                "diffsource": [
                        ["--diffsource", "-d"],
                        {"action": "append",
@@ -187,6 +197,10 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "metavar": "PATH",
                         "help": "Prepend items to the metadata search path."}],
+               "method_path" : [
+                       ["--method-path", "-p"],
+                       {"action": "append",
+                        "help": "Preprend items to the method search path."}],
                "meta_suite": [
                        ["--meta-suite"],
                        {"action": "store_true",
