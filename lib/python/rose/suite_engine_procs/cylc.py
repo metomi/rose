@@ -74,14 +74,14 @@ class CylcProcessor(SuiteEngineProcessor):
         For a local task, the 2nd element of the tuple is None.
 
         """
-        log_dir = self.get_suite_dir(suite, "log")
+        log_dir = self.get_suite_dir(suite, "log", "job")
         if task:
             task_key = task.rsplit("%", 1)[0]
         else:
             task_key = "root"
-        user, host = self.get_remote_auth(self, suite, task_key)
+        user, host = self.get_remote_auth(suite, task_key)
         if user and host:
-            suite_log_dir_rel = self.get_suite_dir_rel(suite, "log")
+            suite_log_dir_rel = self.get_suite_dir_rel(suite, "log", "job")
             return log_dir, "%s@%s:%s" % (user, host, suite_log_dir_rel)
         else:
             return log_dir, None
@@ -124,6 +124,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                        "runtime", task_name, "remote", "host")
         except RosePopenError:
             return
+        user_str = user_str.strip()
+        host_str = host_str.strip()
         user, host, my_user, my_host = self._parse_user_host(user_str,
                                                              host_str)
         if (my_user, my_host) == (user, host):
