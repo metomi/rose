@@ -508,7 +508,7 @@ class SplashScreen(gtk.Window):
             locator = rose.resource.ResourceLocator(paths=sys.path)
             icon_path = locator.locate('etc/images/rose-icon-trim.png')
             self.set_icon_from_file(icon_path)
-        except:
+        except ResourceError:
             pass
         self.modify_bg(gtk.STATE_NORMAL,
                        gtk.gdk.color_parse(self.BACKGROUND_COLOUR))
