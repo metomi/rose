@@ -140,7 +140,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 task, value = line.split(None, 1)
                 if not raw_auths.has_key(task):
                     raw_auths[task] = {"user": None, "host": None}
-                raw_auths[task][key] = ast.literal_eval(value)
+                raw_auths[task][key] = value
         my_user = pwd.getpwuid(os.getuid())[0]
         my_host = socket.gethostname()
         actual_hosts = {}
@@ -151,7 +151,7 @@ class CylcProcessor(SuiteEngineProcessor):
             if not actual_hosts.has_key(host):
                 user, actual_hosts[host] = self._parse_user_host(
                         user, host, my_user, my_host)[0:2]
-            if user is None:
+            if user in [None, "None"]:
                 user = my_user
             host = actual_hosts[host]
             if (user, host) != (my_user, my_host) and (user, host) not in auths:
@@ -415,9 +415,9 @@ cd
             my_user = pwd.getpwuid(os.getuid())[0]
         if my_host is None:
             my_host = socket.gethostname()
-        if user is None:
+        if user in [None, "None"]:
             user = my_user
-        if host is None or host == "localhost":
+        if host in [None, "None", "localhost"]:
             host = my_host
         elif "`" in host or "$" in host:
             command = ["bash", "-ec", "H=" + host + "; echo $H"]
