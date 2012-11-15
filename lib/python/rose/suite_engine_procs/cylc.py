@@ -23,6 +23,7 @@ import ast
 import os
 import pwd
 import re
+from rose.popen import RosePopenError
 from rose.suite_engine_proc \
         import SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
@@ -73,32 +74,17 @@ class CylcProcessor(SuiteEngineProcessor):
         For a local task, the 2nd element of the tuple is None.
 
         """
+        log_dir = self.get_suite_dir(suite, "log")
         if task:
             task_key = task.rsplit("%", 1)[0]
         else:
             task_key = "root"
-        out, err = self.popen(
-                "cylc", "get-config", "-p", suite, "runtime", task_key)
-        data = ast.literal_eval(out)
-        if data.has_key("log directory"):
-            log_dir = data["log directory"]
+        user, host = self.get_remote_auth(self, suite, task_key)
+        if user and host:
+            suite_log_dir_rel = self.get_suite_dir_rel(suite, "log")
+            return log_dir, "%s@%s:%s" % (user, host, suite_log_dir_rel)
         else:
-            log_dir = data["job submission"]["log directory"]
-
-        # Determine remote user@host:log-directory
-        r_log_dir = None
-        r_data = data.get("remote")
-        if r_data:
-            r_user, r_host, my_user, my_host = self._parse_user_host(
-                    r_data["owner"], r_data["host"])
-            if (my_user, my_host) != (r_user, r_host):
-                r_log_dir = r_data["log directory"]
-                if r_log_dir is None:
-                    my_passwd = pwd.getpwuid(os.getuid())
-                    r_log_dir = log_dir[len(my_passwd.pw_dir) + 1:]
-                r_log_dir = r_user + "@" + r_host + ":" + r_log_dir
-
-        return log_dir, r_log_dir
+            return log_dir, None
 
     def get_task_props_from_env(self):
         """Get attributes of a suite task from environment variables.
@@ -131,29 +117,37 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def get_remote_auth(self, suite_name, task_name):
         """Return (user, host) for a remote task in a suite."""
-        rc, out, err = self.popen.run("cylc", "get-config", "-p", suite_name,
-                                      "runtime", task_name, "remote")
-        if rc:
+        try:
+            user_str, err = self.popen("cylc", "get-config", "-p", suite_name,
+                                       "runtime", task_name, "remote", "owner")
+            host_str, err = self.popen("cylc", "get-config", "-p", suite_name,
+                                       "runtime", task_name, "remote", "host")
+        except RosePopenError:
             return
-        data = ast.literal_eval(out)
-        user, host, my_user, my_host = self._parse_user_host(
-                data["owner"], data["host"])
+        user, host, my_user, my_host = self._parse_user_host(user_str,
+                                                             host_str)
         if (my_user, my_host) == (user, host):
             return
         return (user, host)
 
     def get_remote_auths(self, suite_name):
         """Return a list of unique user@host for remote tasks in a suite."""
-        out, err = self.popen("cylc", "get-config", "-p", suite_name,
-                              "runtime")
+        raw_auths = {} # task: {"user": user, "host": host}
+        for c_key, key in [("owner", "user"), ("host", "host")]:
+            out, err = self.popen("cylc", "get-config", "-a",
+                                  suite_name, "remote", c_key)
+            for line in out.splitlines():
+                task, value = line.split(None, 1)
+                if not raw_auths.has_key(task):
+                    raw_auths[task] = {"user": None, "host": None}
+                raw_auths[task][key] = ast.literal_eval(value)
         my_user = pwd.getpwuid(os.getuid())[0]
         my_host = socket.gethostname()
-        auths = []
-        data = ast.literal_eval(out)
         actual_hosts = {}
-        for k, v in data.items():
-            user = v["remote"]["owner"]
-            host = v["remote"]["host"]
+        auths = []
+        for v in raw_auths.values():
+            user = v["user"]
+            host = v["host"]
             if not actual_hosts.has_key(host):
                 user, actual_hosts[host] = self._parse_user_host(
                         user, host, my_user, my_host)[0:2]
@@ -164,9 +158,22 @@ class CylcProcessor(SuiteEngineProcessor):
                 auths.append((user, host))
         return auths
 
-    def get_suite_dir_rel(self, suite_name):
-        """Return the relative path to the suite running directory."""
-        return os.path.join(self.RUN_DIR_REL_ROOT, suite_name)
+    def get_suite_dir(self, suite_name, *args):
+        """Return the path to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        """
+        return os.path.join(os.path.expanduser("~"),
+                            self.get_suite_dir_rel(suite_name, *args))
+
+    def get_suite_dir_rel(self, suite_name, *args):
+        """Return the relative path to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        """
+        return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callable."""
@@ -175,8 +182,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def launch_gcontrol(self, suite_name, host=None, *args):
         """Launch control GUI for a suite_name running at a host."""
-        log_dir = os.path.join(os.path.expanduser("~"),
-                               self.get_suite_dir_rel(suite_name), "log")
+        log_dir = self.get_suite_dir(suite_name, "log")
         if not host:
             # Try the "rose-suite.host" file in the suite log directory
             try:
@@ -345,7 +351,7 @@ done
 set -eu
 cd
 """
-            log_dir = os.path.join(self.get_suite_dir_rel(suite_name), "log")
+            log_dir = self.get_suite_dir_rel(suite_name, "log")
             bash_cmd_prefix += "mkdir -p %s\n" % log_dir
             bash_cmd_prefix += "cd %s\n" % log_dir
             if host_environ:
