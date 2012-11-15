@@ -136,6 +136,7 @@ class TaskProps(object):
     dir_data: path to suite data directory
     dir_data_cycle: path to suite data directory in this cycle time
     dir_data_cycle_offsets: dict of time offsets: paths to suite data directory
+    dir_etc: path to etc directory
 
     """
 
@@ -151,7 +152,8 @@ class TaskProps(object):
              "task_is_cold_start": "ROSE_TASK_IS_COLD_START",
              "dir_data": "ROSE_DATA",
              "dir_data_cycle": "ROSE_DATAC",
-             "dir_data_cycle_offsets": "ROSE_DATAC%s"}
+             "dir_data_cycle_offsets": "ROSE_DATAC%s",
+             "dir_etc": "ROSE_ETC"}
 
     def __init__(self, **kwargs):
         for key, env_key in self.ATTRS.items():
@@ -262,6 +264,10 @@ class SuiteEngineProcessor(object):
                             t.task_cycle_time, cycle_offset)
             else:
                 t.task_cycle_time = kwargs["cycle"]
+
+        # Etc directory
+        if os.path.exists(os.path.join(t.suite_dir, "etc")):
+            t.dir_etc = os.path.join(t.suite_dir, "etc")
 
         # Data directory: generic, current cycle, and previous cycle
         t.dir_data = os.path.join(t.suite_dir, "share", "data")
