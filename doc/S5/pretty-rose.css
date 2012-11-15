@@ -15,14 +15,9 @@ blockquote i {font-style: normal;}
 blockquote b {display: block; margin-top: 0.5em; font-weight: normal; font-size: smaller; font-style: normal;}
 blockquote b i {font-style: italic;}
 
-kbd {font-weight: bold; font-size: 1em;}
 sup {font-size: smaller; line-height: 1px;}
 
-.slide code {padding: 2px 0.25em; font-weight: bold; color: #533;}
-.slide code.bad, code del {color: red;}
-.slide code.old {color: silver;}
-.slide pre {padding: 0; margin: 0.25em 0 0.5em 0.5em; color: #533; font-size: 90%;}
-.slide pre code {display: block;}
+.slide pre {font-size: 75%}
 .slide ul {margin-left: 5%; margin-right: 7%; list-style: disc;}
 .slide li {margin-top: 0.75em; margin-right: 0;}
 .slide ul ul {line-height: 1;}
