@@ -563,34 +563,6 @@ class Handler(object):
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
         self.var_ops.search_for_var(config_name, setting_id)
 
-    def flag_no_metadata(self, should_flag=False):
-        """Apply or remove flags denoting variables with no metadata spec."""
-        flag_type = rose.config_editor.FLAG_TYPE_NO_META
-        for config_name in self.data.config:
-            config_data = self.data.config[config_name]
-            for var in config_data.vars.get_all():
-                # Only two props added to basic metadata - id & full_ns.
-                if flag_type in var.flags:
-                    var.flags.pop(flag_type)
-                if len(var.metadata) == 2 and should_flag:
-                    var.flags.update(
-                                {flag_type:
-                                rose.config_editor.VAR_FLAG_TIP_NO_META})
-
-    def flag_optional(self, should_flag=False):
-        """Apply or remove flags denoting optional variables."""
-        flag_type = rose.config_editor.FLAG_TYPE_OPTIONAL
-        for config_name in self.data.config:
-            config_data = self.data.config[config_name]
-            for var in config_data.vars.get_all():
-                if flag_type in var.flags:
-                    var.flags.pop(flag_type)
-                if (var.metadata.get(rose.META_PROP_COMPULSORY) !=
-                    rose.META_PROP_VALUE_TRUE and should_flag):
-                    var.flags.update(
-                                {flag_type:
-                                rose.config_editor.VAR_FLAG_TIP_OPTIONAL})
-
     def get_orphan_container(self, page):
         # Return a container with the page object inside.
         box = gtk.VBox()

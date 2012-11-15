@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) Crown copyright Met Office. All rights reserved.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-app-upgrade
+#
+# SYNOPSIS
+#     rose app-upgrade [OPTIONS] [VERSION]
+#
+# DESCRIPTION
+#     Upgrade an application configuration using metadata upgrade macros.
+#
+#     Alternatively, show the available upgrade/downgrade versions:
+#         "=" indicates the current version.
+#         "*" indicates the default version to change to.
+#
+# OPTION
+#     --config=DIR; -C DIR
+#         Use configuration in DIR instead of $PWD.
+#     --downgrade; -d;
+#         Downgrade the version instead of upgrade.
+#     --meta-path=PATH; -M PATH
+#         Prepend PATH to the metadata search path.
+#     --non-interactive, --yes, -y
+#         Switch off interactive prompting.
+#     --output=DIR; -O DIR
+#         The location of the output directory. Only meaningful if
+#         there is at least one transformer in the argument list.
+#     --quiet; -q
+#         Reduce verbosity.
+#
+# ARGUMENTS
+#     VERSION
+#         A version to change to. If no version is specified, show available
+#         versions. If --non-interactive is used, use the latest version
+#         available. If --non-interactive and --downgrade are used, use
+#         the earliest version available.
+#-------------------------------------------------------------------------------
+exec python -m rose.upgrade "$@"

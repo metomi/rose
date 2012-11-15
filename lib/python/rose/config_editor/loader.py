@@ -167,12 +167,7 @@ class ConfigDataManager(object):
                     self.load_top_config(top_level_directory)
                     break
             else:
-                path = os.path.join(top_level_directory, rose.TOP_CONFIG_NAME)
-                text = rose.config_editor.ERROR_NOT_FOUND.format(path)
-                title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         text, title)
-                sys.exit(2)
+                self.load_top_config(None)
         elif not config_obj_dict:
             self.load_top_config(None)
         else:
@@ -520,10 +515,9 @@ class ConfigDataManager(object):
                 return config_meta_dir
         value = self.get_config_meta_flag(config)
         if value is None:
-            meta_path = 'all'
+            meta_path = 'etc/metadata/all'
         else:
             meta_path = value
-        meta_path = 'etc/metadata/' + meta_path
         try:
             meta_path = self.locator.locate(meta_path)
         except rose.resource.ResourceError:
@@ -991,17 +985,6 @@ class ConfigDataManager(object):
         sect, opt = self.util.get_section_option_from_id(var_id)
         return self.config[config_name].vars.get_var(sect, opt, save,
                                                      no_latent=not latent)
-
-    def clear_flag(self, flag_type, config_name=None):
-        """Remove a flag from configuration variables."""
-        if config_name is None:
-            configs = self.config.keys()
-        else:
-            configs = [config_name]
-        for name in configs:
-            for var in self.config[name].vars.get_all():
-                if flag_type in var.flags:
-                    var.flags.pop(flag_type)
 
 #------------------ Data model helper functions ------------------------------
 

@@ -13,6 +13,8 @@
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
 </head>
 
 <body>
@@ -24,6 +26,8 @@
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
       "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
     <p><a href=".">Rose Documentation</a></p>
@@ -156,8 +160,8 @@ rose rug-brief-tour
     </ul>
 
     <p>At this point, you may want to have a look at the files before moving on
-    to the next section. You may also want to commit any newly added files or
-    changes in your suite back to the central repository.</p>
+    to the next section. You may also want to commit your suite back to the
+    central repository if you have newly created it or made any changes.</p>
 
     <h3>Run the Suite</h3>
 
@@ -206,7 +210,8 @@ firefox log/index.html
     the tasks at their run times. It can be used by the tasks to create files
     that are only relevant to the tasks.</p>
 
-    <p>Tidy up by removing your <samp>roses/$ID</samp> directory:</p>
+    <p>You should commit your suite if you have just created it or made any
+    changes. Tidy up by removing your <samp>roses/$ID</samp> directory:</p>
     <pre class="shell">
 rm -rf $HOME/roses/$ID # replace $ID with the ID of your new suite
 </pre>
@@ -234,9 +239,9 @@ rosie go
 
     <p>You should see a list of your suites as rows in a table.</p>
 
-    <p>You could find other suites by changing the filter options using the
-    buttons and pressing 'Query', or using the toolbar search and searching for
-    text strings.</p>
+    <p>You could find other suites by using the toolbar search and searching
+    for text strings, or using the advanced query panel (show it by clicking
+    the rightmost toolbar button).</p>
 
     <p>There are toolbar options to create and copy suites. Copying and other
     actions can be done by right clicking on a suite.</p>
@@ -277,7 +282,7 @@ rosie go
     <samp>Web Help</samp>.</p>
 
     <p>Finally, you can run your suite by clicking the <samp>Suite Run</samp>
-    button on the toolbar or selecting Action -&gt; Run Suite -&gt; Default
+    button on the toolbar or selecting Tools -&gt; Run Suite -&gt; Default
     from the top menu. This will invoke <code>rose suite-run</code>.</p>
   </div>
 </body>

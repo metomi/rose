@@ -54,13 +54,9 @@ What about the standard library ConfigParser? Well, it is problematic:
 
 """
 
-import copy
 import os.path
 import re
-from rose.env import env_var_escape, env_var_process, UnboundEnvironmentVariableError
-from rose.opt_parse import RoseOptionParser
-from rose.resource import ResourceLocator
-import string
+from rose.env import env_var_escape
 import sys
 
 
@@ -84,7 +80,6 @@ class ConfigNode(object):
         if comments is None:
             comments = []
         self.value = value
-        #self.value = copy.deepcopy(value)
         self.state = state
         self.comments = comments
 
@@ -240,6 +235,8 @@ class ConfigNode(object):
             return None
         keys = list(keys)
         key = keys.pop()
+        while keys and key is None:
+            key = keys.pop()
         try:
             return self.get(keys).value.pop(key)
         except:
@@ -322,6 +319,8 @@ class ConfigDumper(object):
                 self._string_node_dump(key, value, f, env_escape_ok)
         if f is not target:
             f.close()
+
+    __call__ = dump
 
     def _string_node_dump(self, key, node, f, env_escape_ok):
         state = node.state
@@ -459,6 +458,8 @@ class ConfigLoader(object):
             f.close()
         return node
 
+    __call__ = load
+
     def _comment_strip(self, line):
         return line.strip()[1:]
 
@@ -485,33 +486,16 @@ class SyntaxError(Exception):
     __str__ = __repr__
 
 
-_DEFAULT_CONFIG_NODE = None
-def default_node(reset=False):
-    """Return a node to represent the default (i.e. site/user) configuration.
-    Load the configuration on 1st call only, unless "reset" is True.
-    """
-    global _DEFAULT_CONFIG_NODE
-    if _DEFAULT_CONFIG_NODE is None or reset:
-        _DEFAULT_CONFIG_NODE = ConfigNode()
-        res_loc = ResourceLocator.default()
-        files = [os.path.join(res_loc.get_util_home(), "etc", "rose.conf"),
-                 os.path.join(os.path.expanduser("~"), ".metomi", "rose.conf")]
-        for file in files:
-            if os.path.isfile(file) and os.access(file, os.R_OK):
-                load(file, _DEFAULT_CONFIG_NODE)
-    return _DEFAULT_CONFIG_NODE
-
-
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,
          env_escape_ok=False):
     """See ConfigDumper.dump for detail."""
-    d = ConfigDumper()
-    return d.dump(root, target, sort_sections, sort_option_items, env_escape_ok)
+    return ConfigDumper()(root, target, sort_sections, sort_option_items,
+                          env_escape_ok)
 
 
 def load(source, root=None):
     """See ConfigLoader.load for detail."""
-    return ConfigLoader().load(source, root)
+    return ConfigLoader()(source, root)
 
 
 def sort_settings(setting_1, setting_2):
@@ -523,62 +507,3 @@ def sort_settings(setting_1, setting_2):
         if text_1 == text_2:
             return cmp(int(num_1), int(num_2))
     return cmp(setting_1, setting_2)
-
-
-def main():
-    """Implement the "rose config" command."""
-    opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("default", "files", "keys", "no_ignore")
-    opts, args = opt_parser.parse_args()
-    try:
-        if opts.files:
-            root_node = ConfigNode()
-            for file in opts.files:
-                if file == "-":
-                    load(sys.stdin, root_node)
-                    sys.stdin.close()
-                else:
-                    load(file, root_node)
-        else:
-            root_node = default_node()
-    except SyntaxError as e:
-        sys.exit(repr(e))
-    if opts.quietness:
-        if root_node.get(args, opts.no_ignore) is None:
-            sys.exit(1)
-    elif opts.keys_mode:
-        try:
-            keys = root_node.get(args, opts.no_ignore).value.keys()
-        except:
-            sys.exit(1)
-        keys.sort()
-        for key in keys:
-            print key
-    elif len(args) == 0:
-        dump(root_node)
-    else:
-        node = root_node.get(args, opts.no_ignore)
-        if node is not None and isinstance(node.value, dict):
-            keys = node.value.keys()
-            keys.sort()
-            for key in keys:
-                node_of_key = node.get([key], opts.no_ignore)
-                value = node_of_key.value
-                state = node_of_key.state
-                string = "%s%s=%s" % (state, key, value)
-                lines = string.splitlines()
-                print lines[0]
-                i_equal = len(state + key) + 1
-                for line in lines[1:]:
-                    print " " * i_equal + line
-        else:
-            if node is None:
-                if opts.default is None:
-                    sys.exit(1)
-                print opts.default
-            else:
-                print node.value
-
-
-if __name__ == "__main__":
-    main()

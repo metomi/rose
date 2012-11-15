@@ -48,6 +48,8 @@ class DisplayBox(gtk.VBox):
 
     """Custom widget for displaying search results"""
     
+    descending = None
+    sort_title = None
     query_rows = None
     group_index = None
     TREE_COLUMNS = 20 * [str] + [bool]
@@ -168,6 +170,7 @@ class DisplayBox(gtk.VBox):
         cols = cols[k: k + 1] + cols[0: k] + cols[k + 1:]
         sort_index = cols.index(column.get_widget().get_text())
         descending = (column.get_sort_order() == gtk.SORT_DESCENDING)
+        self.descending = descending
         self.update_treemodel(sort_index, descending) 
 
     def _handle_grouping(self, menuitem):
@@ -177,12 +180,23 @@ class DisplayBox(gtk.VBox):
         else:
             self.group_index = self.get_tree_columns().index(menuitem.col_name)
 
+    def _set_date_cell(self, column, cell, model, r_iter):
+        """Set the date to human readable format"""
+        index = self.treeview.get_columns().index(column)
+        epoch = model.get_value(r_iter, index)
+        path = model.get_path(r_iter)
+        if epoch is not None:
+            date = datetime.datetime.fromtimestamp(float(epoch))
+        else:
+            date = None
+        cell.set_property('text', date)
+
     def _set_local_cell(self, column, cell, model, r_iter):
         """Set the icon for local status."""
         index = self.treeview.get_columns().index(column)
         status = model.get_value(r_iter, index)
         path = model.get_path(r_iter)
-        cell.set_property("stock-id", STATUS_ICON[status])   
+        cell.set_property("stock-id", STATUS_ICON[status])
 
     def _update_local_status_row(self, model, path, r_iter, data):
         """Update the status for a row of the treeview"""
@@ -275,13 +289,34 @@ class DisplayBox(gtk.VBox):
             return
         query_rows = self.query_rows
         results = [q for q in query_rows]
+
+        old_sort_id, old_descending = self.treestore.get_sort_column_id()
+
+        if old_sort_id is not None:
+            cols = self.treeview.get_columns()
+            self.sort_title = cols[old_sort_id].get_widget().get_text()
+
+        if old_descending is not None:
+            self.descending = old_descending
+        
         for col in self.treeview.get_columns():
             self.treeview.remove_column(col)
         cols = self.get_tree_columns()
         group_index = self.group_index
+
+        if sort_title is not None:
+            self.sort_title = sort_title
+        
         if group_index is None:
-            sort_title = "revision"
-            descending = True
+            if sort_title is None:
+                if self.sort_title is None:
+                    sort_title = "revision"
+                else:
+                    sort_title = self.sort_title
+            if self.descending is None:        
+                descending = True
+            else:
+                descending = self.descending
         else:
             k = group_index
             cols = cols[k: k + 1] + cols[0: k] + cols[k + 1:]
@@ -317,6 +352,8 @@ class DisplayBox(gtk.VBox):
             col.set_sort_column_id(i)
             if title == "local":
                 col.set_cell_data_func(cell, self._set_local_cell)
+            elif title == "date":
+                col.set_cell_data_func(cell, self._set_date_cell)
             else:
                 col.add_attribute(cell, attribute='text', column=i)
                 if i == 0 and group_index is not None:

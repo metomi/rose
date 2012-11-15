@@ -20,6 +20,10 @@
 # To activate this file, place it at $ROSE_HOME/etc/rose.conf
 #-------------------------------------------------------------------------------
 
+# Common site configuration.
+## URL to Rose documentation.
+#  rose-doc=http://host/rose/doc/
+
 # Configuration of external commands.
 #
 ## Launch text editor (default=vi).
@@ -87,6 +91,12 @@
 ## Alternate path to "rose" for a specific host
 #  hostname=/path/to/rose/at/hostname
 [rose-home-at]
+
+# Configuration specific to "rose ana"
+
+## Items to prepend to the search path for user methods
+## method-path=/path/1 /path2
+[rose-ana]
 
 # Configuration specific to the databse of the Rosie web service server
 #

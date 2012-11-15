@@ -68,7 +68,7 @@ class URLChecker(rose.macro.MacroBase):
     def validate(self, config, meta_config):
         """Validate a string containing a URL."""
         seq = [1, 1]
-        self.problem_list = []
+        self.reports = []
         for section in config.value.keys():
             for option in config.get([section]).value.keys():
                 if "URL" not in option:
@@ -82,12 +82,12 @@ class URLChecker(rose.macro.MacroBase):
                     except Exception as e:
                         self._flag_problem(section, option, value, e)
                     connection.close()
-        return self.problem_list
-            
+        return self.reports
+
     def _flag_problem(self, sect, opt, val, e):
         # Add a setting to the list of problems.
         info = self.BAD_URL.format(val, e)
-        self.add_report(self.problem_list, sect, opt, val, info)
+        self.add_report(sect, opt, val, info)
 __MACRO__
 run_pass "$TEST_KEY" rose macro --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
@@ -138,7 +138,7 @@ class URLChecker(rose.macro.MacroBase):
     def validate(self, config, meta_config):
         """Validate a string containing a URL."""
         seq = [1, 1]
-        self.problem_list = []
+        self.reports = []
         for section in config.value.keys():
             for option in config.get([section]).value.keys():
                 if "URL" not in option:
@@ -152,12 +152,12 @@ class URLChecker(rose.macro.MacroBase):
                     except Exception as e:
                         self._flag_problem(section, option, value, e)
                     connection.close()
-        return self.problem_list
-            
+        return self.reports
+
     def _flag_problem(self, sect, opt, val, e):
         # Add a setting to the list of problems.
         info = self.BAD_URL.format(val, e)
-        self.add_report(self.problem_list, sect, opt, val, info)
+        self.add_report(sect, opt, val, info)
 __MACRO__
 run_fail "$TEST_KEY" rose macro --config=../config url.URLChecker
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null

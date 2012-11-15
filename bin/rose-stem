@@ -24,9 +24,10 @@
 #     rose stem [options]
 #
 # DESCRIPTION
-#     Run a suitable suite with a specified set of source tree(s). Default 
-#     values of some of these settings are suite-dependent, specified in the 
-#     rose-suite.conf file.
+#     Run a suitable suite with a specified set of source tree(s). 
+#
+#     Default values of some of these settings are suite-dependent, specified 
+#     in the rose-suite.conf file.
 #
 # EXAMPLES
 #     rose stem --diffsource=$PWD

@@ -45,7 +45,7 @@
 #         Control the output format of the results using a string
 #         containing column names or properties preceded by %.
 #         For example: rose suite-list --format="%idx from %owner"
-#         might give: abc01 from bfitz
+#         might give: abc01 from daisy
 #
 #     --quiet; -q
 #         Shorthand for --format="%idx".
