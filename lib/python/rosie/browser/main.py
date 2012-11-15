@@ -64,22 +64,31 @@ class MainWindow(gtk.Window):
 
     """The main window containing the database viewer."""
     
-    def __init__(self, opts=None, args=None):
+    def __init__(self, opts=None, args=None, splash_updater=None):
 
         super(MainWindow, self).__init__()
         self.refresh_url = ""
+        splash_updater(rosie.browser.SPLASH_LOADING.format(
+                                     rosie.browser.SPLASH_SEARCH_MANAGER),
+                       rosie.browser.PROGRAM_NAME)
         self.search_manager = rosie.browser.search.SearchManager(opts.prefix)        
         locator = ResourceLocator(paths=sys.path)
+        splash_updater(rosie.browser.SPLASH_LOADING.format(
+                                     rosie.browser.SPLASH_CONFIG), 
+                       rosie.browser.PROGRAM_NAME)
         self.config = locator.get_conf()
         icon_path = locator.locate(rosie.browser.ICON_PATH_WINDOW)
         self.set_icon_from_file(icon_path)
         try:
             self.sched_icon_path = locator.locate(
-                                          rosie.browser.ICON_PATH_SCHEDULER)
+                                           rosie.browser.ICON_PATH_SCHEDULER)
         except ResourceError:
             self.sched_icon_path = None
         self.query_rows = None
         self.adv_controls_on = rosie.browser.SHOULD_SHOW_ADVANCED_CONTROLS
+        splash_updater(rosie.browser.SPLASH_LOADING.format(
+                                     rosie.browser.SPLASH_HISTORY),
+                       rosie.browser.PROGRAM_NAME)
         self.search_history = False
         self.hist = rosie.browser.history.HistoryManager(
                     rosie.browser.HISTORY_LOCATION, rosie.browser.SIZE_HISTORY)
@@ -87,13 +96,22 @@ class MainWindow(gtk.Window):
         self.local_updater = rosie.browser.status.LocalStatusUpdater(
                                    self.handle_update_treemodel_local_status)
         self.repeat_last_request = lambda: None
+        splash_updater(rosie.browser.SPLASH_LOADING.format(
+                                     rosie.browser.SPLASH_SETUP_WINDOW),
+                       rosie.browser.PROGRAM_NAME)
         self.setup_window()
+        splash_updater(rosie.browser.SPLASH_LOADING.format(
+                                     rosie.browser.SPLASH_DIRECTOR),
+                       rosie.browser.PROGRAM_NAME)
         self.suite_director = rosie.browser.suite.SuiteDirector(
                                             event_handler=self.handle_vc_event)
         self.set_title(rosie.browser.TITLEBAR.format(
-                                     self.search_manager.get_datasource()))                                  
+                                     self.search_manager.get_datasource()))    
+        splash_updater(rosie.browser.SPLASH_INITIAL_QUERY,
+                       rosie.browser.PROGRAM_NAME)    
         self.initial_filter(opts, args)
         self.nav_bar.simple_search_entry.grab_focus()
+        splash_updater(rosie.browser.SPLASH_READY, rosie.browser.PROGRAM_NAME)
         self.show()
 
     def setup_window(self):
@@ -1211,7 +1229,7 @@ if __name__ == "__main__":
 
     opt_parser = RoseOptionParser().add_my_options("all_revs",
                                                    "prefix", "query", 
-                                                   "search", "url")   
+                                                   "search", "url")
     opts, args = opt_parser.parse_args()
 
     if not args:
@@ -1219,7 +1237,15 @@ if __name__ == "__main__":
     sys.path.append(os.getenv('ROSE_HOME'))
     rose.gtk.util.setup_stock_icons()
     rose.gtk.util.set_exception_hook()
-    MainWindow(opts, args)
+    
+    locator = rose.resource.ResourceLocator(paths=sys.path)
+    logo = locator.locate('etc/images/rose-splash-logo.png')
+
+    title = rosie.browser.PROGRAM_NAME
+    number_of_events = 6
+    splash_screen = rose.gtk.util.SplashScreen(logo, title, number_of_events)
+    
+    MainWindow(opts, args, splash_screen.update)
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
