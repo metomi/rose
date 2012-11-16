@@ -66,16 +66,20 @@
     <h2 id="intro">Introduction</h2>
 
     <p>Configuration Metadata is used to provide information about settings in
-    Rose configurations. It is intended to help document your inputs, perform
-    automatic checking (including whether an input is needed), and to enhance
-    the interface to your configurations in e.g. the Rose config editor.</p>
+    Rose configurations. It is intended to:</p>
+    <ul class="incremental">
+      <li>help document your inputs</li>
+      <li>perform automatic checking (including whether an input is needed)</li>
+      <li>enhance the interface to your configurations in e.g. the Rose config editor</li>
+    </ul>
+
     </div>
 
     <div class="slide">
     <h3 style="display:none">Introduction: reference</h3>
     <p>For reference and a fuller picture of Rose configuration metadata,
     please refer to the <a href="rose-configuration.html#meta">Rose Reference
-    Guide &gt; Configuration Metadata</a>.</p>
+    Guide: Configuration Metadata</a>.</p>
     </div>
 
     <div class="slide">
@@ -109,7 +113,7 @@ WORLD = Mars
 
     <div class="slide">
     <h3 style="display:none">Example: config editor</h3>   
-    <p>Open the application in the Rose config editor:</p>
+    <p>Open this application directory in the Rose config editor by typing:</p>
     <pre class="shell">
 rose edit
 </pre>
@@ -126,7 +130,8 @@ rose edit
     <h3 style="display:none">Example: metadata</h3>   
     <p>Let's create a metadata directory and start adding some information.</p>
 
-    <p>If we were in a hurry, we could use the <code>rose metadata-gen</code>
+    <p>If we were in a hurry, we could use the
+    <a href="rose-command.html#rose-metadata-gen">rose metadata-gen</a>
     command which will populate a metadata configuration based on an
     application or suite configuration. It can make educated guesses about
     variable types as well (option <code>--auto-type</code>). This provides a
@@ -187,7 +192,7 @@ type = integer
     again, we see that the value of <var>MAX_TARGETS</var> now appears in a
     special numeric widget, and that the title has replaced the name. You can
     see the difference easily by switching metadata off and on (toggle
-    <code>Metadata</code> Menu -&gt; Switch off Metadata).</p>
+    menu <kbd>Metadata -&gt; Switch off Metadata</kbd>).</p>
  
     <p>Setting the type does more than change the widget - it also instructs
     Rose to check that the input is valid for that type. If the value of
@@ -213,14 +218,14 @@ type = integer
     <h3 style="display:none">Example: view changes</h3>  
     <p>This means that any integer less than zero will be flagged as a problem.
     With the Metadata switched on, try decreasing the value of
-    <var>MAX_TARGETS</var> below zero. An error will be flagged next to the
+    <var>MAX_TARGETS</var> below 0. An error will be flagged next to the
     variable and on the page list in the left hand panel. If you change it to
-    an integer value of zero or greater, the error will go away.</p>
+    an integer value of 0 or greater, the error will go away.</p>
     </div>
 
     <div class="slide">
     <h3 style="display:none">Example: metadata description</h3>  
-    <p>Let's now make <var>env=WORLD</var> less ambiguous. Create a section in
+    <p>Let's now make the <var>WORLD</var> setting less ambiguous. Create a section in
     the metadata</p>
     <pre>
 [env=WORLD]
@@ -244,7 +249,7 @@ title = World
     <div class="slide">
     <h3 style="display:none">Example: metadata pattern</h3>  
     <p>We'll decide to be harsh about grammar and insist that the first letter
-    of <var>WORLD</var> be capitalised. To do this, we can use a very simple
+    of <var>WORLD</var> must be capitalised. To do this, we can use a very simple
     regular expression by adding a pattern:</p>
     <pre>
 [env=WORLD]
@@ -252,9 +257,18 @@ description = Choose your target world to say hello to.
 pattern = ^[A-Z]
 title = World
 </pre>
+    </div>
+    
+    <div class="slide">
+    <h3 style="display:none">Example: view changes</h3>
+    <p>Reload the config editor (metadata off/on or close and reopen) and change the first letter of the value of <var>WORLD</var> to
+    lowercase.</p>
+    
+    <p>You've now caused an error! The menu button next to the
+    <samp>World</samp> label will change colour and have hover-over text describing the error. There should be some error icons in the page list
+    as well.</p>
 
-    <p>If you change the first letter of the value of <var>WORLD</var> to
-    lowercase, an error will be flagged - you can change it back to fix it.</p>
+    <p>You can change the value back to fix it.</p>
     </div>
 
     <div class="slide">
@@ -303,7 +317,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     <p>This means that <var>LANG_JUPITER</var> will be <em>ignored</em> when
     <var>WORLD</var> is not <samp>Jupiter</samp> - but it will be
     <em>enabled</em> when it is. Ignored variables won't get passed into our
-    hello.exe application.</p>
+    <var>hello.exe</var> application.</p>
     </div>
 
     <div class="slide">
@@ -347,7 +361,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     editor, you can navigate to the <code>env</code> page and see that it's
     missing.</p>
 
-    <p>If you select <code>View</code> Menu -&gt; View Latent variables, any
+    <p>If you select the menu option <kbd>View -&gt; View Latent Variables</kbd>, any
     variables that are in the metadata but aren't in the application will be
     displayed - <var>WORLD</var> will reappear as a ghost! You can add the
     variable back into the application by clicking on the button next to the
@@ -404,7 +418,7 @@ title = Environment
 
     <p>We can also swap variables in and out of pages, regardless of whether
     they belong in the <code>env</code> application section or not. Let's move
-    <var>LANG_JUPITER</var>. Add a namespace (ns):</p>
+    <var>LANG_JUPITER</var>. Add a namespace (<var>ns</var>):</p>
     <pre>
 [env=LANG_JUPITER]
 help = This variable controls which language to use when saying hello
