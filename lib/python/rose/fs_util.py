@@ -32,6 +32,7 @@ class FileSystemEvent(Event):
     CHDIR = "chdir"
     CREATE = "create"
     DELETE = "delete"
+    INSTALL = "install"
     RENAME = "rename"
     SYMLINK = "symlink"
 
@@ -68,14 +69,6 @@ class FileSystemUtil(object):
         event = FileSystemEvent(FileSystemEvent.CHDIR, path + "/")
         self.handle_event(event)
 
-    def create(self, path):
-        """Create an empty file in path."""
-        if os.path.exists(path):
-            self.delete(path)
-        open(path, "wb").close()
-        event = FileSystemEvent(FileSystemEvent.CREATE, path)
-        self.handle_event(event)
-
     def delete(self, path):
         """Delete a file or a directory."""
 
@@ -101,6 +94,13 @@ class FileSystemUtil(object):
         else:
             return "."
 
+    def install(self, path):
+        """Create an empty file in path."""
+        if os.path.exists(path):
+            self.delete(path)
+        open(path, "wb").close()
+        event = FileSystemEvent(FileSystemEvent.INSTALL, path)
+        self.handle_event(event)
 
     def makedirs(self, path):
         """Wrap os.makedirs. Does nothing if directory exists."""

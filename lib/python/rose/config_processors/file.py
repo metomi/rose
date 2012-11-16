@@ -94,7 +94,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             location_str = None
             for k in ["location", "content", "source"]:
                 location_str = node.get_value([k])
-                break
+                if location_str is not None:
+                    break
             name = key[len(self.PREFIX):]
             target_sources = []
             if location_str is not None:
@@ -172,7 +173,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 target.loc_type = target.TYPE_TREE
                 target.add_path(target.BLOB, None)
             else:
-                self.manager.fs_util.create(target.name)
+                self.manager.fs_util.install(target.name)
                 self.loc_dao.update(target)
                 target.loc_type = target.TYPE_BLOB
                 target.add_path(target.BLOB, md5().hexdigest())
