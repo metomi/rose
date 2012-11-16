@@ -104,7 +104,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     target_sources.append(sources[n])
             targets[name] = Loc(name)
             targets[name].dep_locs = sorted(target_sources)
-            targets[name].mode = node.get_value("mode")
+            targets[name].mode = node.get_value(["mode"])
 
         # Where applicable, determine for each source:
         # * Its invariant name.
