@@ -29,6 +29,7 @@ from rose.reporter import Event
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
 import shlex
+from shutil import rmtree
 import sqlite3
 import sys
 from tempfile import mkdtemp
@@ -37,301 +38,10 @@ import traceback
 from urlparse import urlparse
 
 
-class FileOverwriteError(Exception):
-
-    """An exception raised in an attempt to overwrite an existing file.
-
-    This will only be raised in non-overwrite mode.
-
-    """
-
-    def __str__(self):
-        return ("%s: file already exists (and in no-overwrite mode)" %
-                self.args[0])
-
-
-class UnmatchedChecksumError(Exception):
-    """An exception raised on an unmatched checksum."""
-
-    def __str__(self):
-        return ("Unmatched checksum, expected=%s, actual=%s" % tuple(self))
-
-
-class ChecksumEvent(Event):
-    """Report the checksum of a file."""
-
-    def __str__(self):
-        return "checksum: %s: %s" % self.args
-
-
-class Loc(object):
-    """Represent a location."""
-
-    BLOB = ""
-    TYPE_TREE = "tree"
-    TYPE_BLOB = "blob"
-
-    def __init__(self, name, scheme=None, dep_locs=None):
-        self.name = name
-        self.real_name = None
-        self.scheme = scheme
-        self.dep_locs = dep_locs
-        self.mode = None
-        self.loc_type = None
-        self.paths = None
-        self.key = None
-        self.cache = None
-        self.is_out_of_date = None # boolean
-
-    def __str__(self):
-        ret = self.name
-        if self.real_name and self.real_name != self.name:
-            ret = "%s (%s)" % (self.real_name, self.name)
-        if self.dep_locs:
-            for dep_loc in self.dep_locs:
-                ret += "\n    location: %s" % str(dep_loc)
-        return ret
-
-    def add_path(self, *args):
-        if self.paths is None:
-            self.paths = []
-        self.paths.append(PathInLoc(*args))
-
-    def update(self, other):
-        self.name = other.name
-        self.real_name = other.real_name
-        self.scheme = other.scheme
-        self.mode = other.mode
-        self.paths = other.paths
-        self.key = other.key
-        self.cache = other.cache
-        self.is_out_of_date = other.is_out_of_date
-
-
-class PathInLoc(object):
-    """Represent a sub-path in a location."""
-
-    def __init__(self, name, checksum=None):
-        self.name = name
-        self.checksum = checksum
-
-    def __cmp__(self, other):
-        return cmp(self.name, other.name) or cmp(self.checksum, other.checksum)
-
-    def __eq__(self, other):
-        return (self.name == other.name and self.checksum == other.checksum)
-
-    def __str__(self):
-        return self.name
-
-
-class LocTypeError(Exception):
-    """An exception raised when a location type is incorrect.
-
-    The location type is either a file blob or a directory tree.
-
-    """
-    def __str__(self):
-        return "%s <= %s, expected %s, got %s" % self.args
-
-
-class LocJobProxy(object):
-    """Represent the state of the job for updating a location."""
-
-    ST_DONE = "ST_DONE"
-    #ST_FAILED = "ST_FAILED"
-    ST_PENDING = "ST_PENDING"
-    ST_READY = "ST_READY"
-    ST_WORKING = "ST_WORKING"
-
-    def __init__(self, loc, action_key):
-        self.loc = loc
-        self.action_key = action_key
-        self.name = loc.name
-        self.needed_by = {}
-        self.pending_for = {}
-        self.state = self.ST_READY
-
-    def __str__(self):
-        return "%s: %s" % (self.action_key, str(self.loc))
-
-    def update(self, other):
-        self.state = other.state
-        self.loc.update(other.loc)
-
-
-class JobEvent(Event):
-    """Event raised when a job completes."""
-    def __str__(self):
-        return str(self.args[0])
-
-
-class JobManager(object):
-    """Manage a set of LocJobProxy objects and their states."""
-
-    def __init__(self, jobs, names=None):
-        """Initiate a location job manager.
-
-        jobs: A dict of all available jobs (job.name, job).
-        names: A list of keys in jobs to process.
-               If not set or empty, process all jobs.
-
-        """
-        self.jobs = jobs
-        self.ready_jobs = []
-        if not names:
-            names = jobs.keys()
-        for name in names:
-            self.ready_jobs.append(self.jobs[name])
-        self.working_jobs = {}
-
-    def get_job(self):
-        """Return the next job that requires processing."""
-        while self.ready_jobs:
-            job = self.ready_jobs.pop()
-            for dep_key, dep_job in job.pending_for.items():
-                if dep_job.state == dep_job.ST_DONE:
-                    job.pending_for.pop(dep_key)
-                    if dep_job.needed_by.has_key(job.name):
-                        dep_job.needed_by.pop(job.name)
-                else:
-                    dep_job.needed_by[job.name] = job
-                    if dep_job.state is None:
-                        dep_job.state = dep_job.ST_READY
-                        self.ready_jobs.append(dep_job)
-            if job.pending_for:
-                job.state = job.ST_PENDING
-            else:
-                self.working_jobs[job.name] = job
-                job.state = job.ST_WORKING
-                return job
-
-    def get_dead_jobs(self):
-        """Return pending jobs if there are no ready/working ones."""
-        if not self.has_jobs:
-            jobs = []
-            for job in self.jobs.values():
-                if job.pending_for:
-                    jobs.append(job)
-            return jobs
-
-    def has_jobs(self):
-        """Return True if there are ready jobs or working jobs."""
-        return bool(self.ready_jobs) or bool(self.working_jobs)
-
-    def has_ready_jobs(self):
-        """Return True if there are ready jobs."""
-        return bool(self.ready_jobs)
-
-    def put_job(self, job_proxy):
-        """Tell the manager that a job has completed."""
-        job = self.working_jobs.pop(job_proxy.name)
-        job.update(job_proxy)
-        for up_key, up_job in job.needed_by.items():
-            job.needed_by.pop(up_key)
-            up_job.pending_for.pop(job.name)
-            if not up_job.pending_for:
-                self.ready_jobs.append(up_job)
-                up_job.state = up_job.ST_READY
-        return job
-
-
-class JobRunner(object):
-    """Runs LocJobProxy objects with pool of workers."""
-
-    NPROC = 6
-    POLL_DELAY = 0.05
-
-    def __init__(self, job_processor):
-        self.job_processor = job_processor
-        conf = ResourceLocator.default().get_conf()
-        self.nproc = int(conf.get_value(
-                ["rose.config_processors.file", "nproc"],
-                default=self.NPROC))
-
-    def run(self, job_manager, *args):
-        """Start the job runner with an instance of JobManager."""
-        nproc = self.nproc
-        if nproc > len(job_manager.jobs):
-            nproc = len(job_manager.jobs)
-        pool = Pool(processes=nproc)
-
-        results = {}
-        while job_manager.has_jobs():
-            # Process results, if any is ready
-            for name, result in results.items():
-                if result.ready():
-                    results.pop(name)
-                    job_proxy, args_of_events = result.get()
-                    for args_of_event in args_of_events:
-                        self.job_processor.handle_event(*args_of_event)
-                    job = job_manager.put_job(job_proxy)
-                    self.job_processor.post_process_job(job, *args)
-                    self.job_processor.handle_event(JobEvent(job))
-            # Add some more jobs into the worker pool, as they are ready
-            while job_manager.has_ready_jobs():
-                job = job_manager.get_job()
-                if job is None:
-                    break
-                loc_job_run_args = [self.job_processor, job] + list(args)
-                result = pool.apply_async(_loc_job_run, loc_job_run_args)
-                results[job.name] = result
-            if results:
-                sleep(self.POLL_DELAY)
-
-        dead_jobs = job_manager.get_dead_jobs()
-        if dead_jobs:
-            raise UnfinishedJobsError(dead_jobs)
-
-    __call__ = run
-
-
-class WorkerEventHandler(object):
-    """Temporary event handler in a function run by a pool worker process.
-
-    Events are collected in the self.events which is a list of tuples
-    representing the arguments the report method in an instance of
-    rose.reporter.Reporter.
-
-    """
-    def __init__(self):
-        self.events = []
-
-    def __call__(self, message, type=None, level=None, prefix=None, clip=None):
-        self.events.append((message, type, level, prefix, clip))
-
-
-def _loc_job_run(job_processor, job_proxy, *args):
-    """Helper for JobRunner."""
-    try:
-        event_handler = WorkerEventHandler()
-        job_processor.set_event_handler(event_handler)
-        job_processor.process_job(job_proxy, *args)
-        job_processor.set_event_handler(None)
-    except Exception as e:
-        traceback.print_exc(file=sys.stderr)
-        raise e
-    return (job_proxy, event_handler.events)
-
-
-class UnfinishedJobsError(Exception):
-    """Error raised when there are no ready/working jobs but pending ones."""
-    def __str__(self):
-        ret = ""
-        for job in self.args:
-            ret += "[DEAD TASK] %s\n" % str(job)
-        return ret
-
-
 class ConfigProcessorForFile(ConfigProcessorBase):
     """Processor for "file:*" sections in a rose.config.ConfigNode."""
 
     SCHEME = "file"
-    NPROC = 6
-    POLL_DELAY = 0.05
-    RE_FCM_SRC = re.compile(r"(?:\A[A-z][\w\+\-\.]*:)|(?:@[^/@]+\Z)")
-    T_INSTALL = "install"
-    T_PULL = "pull"
 
     def __init__(self, *args, **kwargs):
         ConfigProcessorBase.__init__(self, *args, **kwargs)
@@ -451,9 +161,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     self.manager.fs_util.symlink(target.dep_locs[0], target.name)
                     self.loc_dao.update(target)
                 else:
-                    jobs[target.name] = LocJobProxy(target, self.T_INSTALL)
+                    jobs[target.name] = JobProxy(target, JobProxy.INSTALL)
                     for source in target.dep_locs:
-                        job = LocJobProxy(source, self.T_PULL)
+                        job = JobProxy(source, JobProxy.PULL)
                         jobs[source.name] = job
                         jobs[target.name].pending_for[source.name] = job
             elif target.mode == "mkdir":
@@ -471,7 +181,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         try:
             JobRunner(self)(JobManager(jobs), config, work_dir)
         finally:
-            self.manager.fs_util.delete(work_dir)
+            rmtree(work_dir)
 
         # Target checksum compare and report
         for target in targets.values():
@@ -483,16 +193,16 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 continue
             checksum = target.paths[0].checksum
             if checksum_expected and checksum_expected != checksum:
-                e = UnmatchedChecksumError(checksum_expected, checksum)
+                e = ChecksumError(checksum_expected, checksum)
                 raise ConfigProcessError(keys, checksum_expected, e)
             event = ChecksumEvent(target.name, checksum)
             self.handle_event(event)
 
     def process_job(self, job, config, work_dir):
         """Process a job, helper for process."""
-        if job.action_key == self.T_INSTALL:
+        if job.action_key == job.INSTALL:
             self._target_install(job.loc, config, work_dir)
-        elif job.action_key == self.T_PULL:
+        elif job.action_key == job.PULL:
             self._source_pull(job.loc, config, work_dir)
         job.state = job.ST_DONE
 
@@ -568,6 +278,299 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             self.manager.event_handler.event_handler = event_handler
         except AttributeError:
             pass
+
+
+class ChecksumError(Exception):
+    """An exception raised on an unmatched checksum."""
+    def __str__(self):
+        return ("Unmatched checksum, expected=%s, actual=%s" % tuple(self))
+
+
+class ChecksumEvent(Event):
+    """Report the checksum of a file."""
+    def __str__(self):
+        return "checksum: %s: %s" % self.args
+
+
+class FileOverwriteError(Exception):
+    """An exception raised in an attempt to overwrite an existing file.
+
+    This will only be raised in non-overwrite mode.
+
+    """
+    def __str__(self):
+        return ("%s: file already exists (and in no-overwrite mode)" %
+                self.args[0])
+
+
+class JobEvent(Event):
+    """Event raised when a job completes."""
+    def __init__(self, job):
+        Event.__init__(self, job)
+        if job.action_key == job.PULL:
+            self.level = Event.V
+
+    def __str__(self):
+        return str(self.args[0])
+
+
+class JobManager(object):
+    """Manage a set of JobProxy objects and their states."""
+
+    def __init__(self, jobs, names=None):
+        """Initiate a location job manager.
+
+        jobs: A dict of all available jobs (job.name, job).
+        names: A list of keys in jobs to process.
+               If not set or empty, process all jobs.
+
+        """
+        self.jobs = jobs
+        self.ready_jobs = []
+        if not names:
+            names = jobs.keys()
+        for name in names:
+            self.ready_jobs.append(self.jobs[name])
+        self.working_jobs = {}
+
+    def get_job(self):
+        """Return the next job that requires processing."""
+        while self.ready_jobs:
+            job = self.ready_jobs.pop()
+            for dep_key, dep_job in job.pending_for.items():
+                if dep_job.state == dep_job.ST_DONE:
+                    job.pending_for.pop(dep_key)
+                    if dep_job.needed_by.has_key(job.name):
+                        dep_job.needed_by.pop(job.name)
+                else:
+                    dep_job.needed_by[job.name] = job
+                    if dep_job.state is None:
+                        dep_job.state = dep_job.ST_READY
+                        self.ready_jobs.append(dep_job)
+            if job.pending_for:
+                job.state = job.ST_PENDING
+            else:
+                self.working_jobs[job.name] = job
+                job.state = job.ST_WORKING
+                return job
+
+    def get_dead_jobs(self):
+        """Return pending jobs if there are no ready/working ones."""
+        if not self.has_jobs:
+            jobs = []
+            for job in self.jobs.values():
+                if job.pending_for:
+                    jobs.append(job)
+            return jobs
+
+    def has_jobs(self):
+        """Return True if there are ready jobs or working jobs."""
+        return bool(self.ready_jobs) or bool(self.working_jobs)
+
+    def has_ready_jobs(self):
+        """Return True if there are ready jobs."""
+        return bool(self.ready_jobs)
+
+    def put_job(self, job_proxy):
+        """Tell the manager that a job has completed."""
+        job = self.working_jobs.pop(job_proxy.name)
+        job.update(job_proxy)
+        for up_key, up_job in job.needed_by.items():
+            job.needed_by.pop(up_key)
+            up_job.pending_for.pop(job.name)
+            if not up_job.pending_for:
+                self.ready_jobs.append(up_job)
+                up_job.state = up_job.ST_READY
+        return job
+
+
+class JobProxy(object):
+    """Represent the state of the job for updating a location."""
+
+    INSTALL = "install"
+    PULL = "pull"
+
+    ST_DONE = "ST_DONE"
+    #ST_FAILED = "ST_FAILED"
+    ST_PENDING = "ST_PENDING"
+    ST_READY = "ST_READY"
+    ST_WORKING = "ST_WORKING"
+
+    def __init__(self, loc, action_key):
+        self.loc = loc
+        self.action_key = action_key
+        self.name = loc.name
+        self.needed_by = {}
+        self.pending_for = {}
+        self.state = self.ST_READY
+
+    def __str__(self):
+        return "%s: %s" % (self.action_key, str(self.loc))
+
+    def update(self, other):
+        """Update self.loc and self.state with the values of "other"."""
+        self.state = other.state
+        self.loc.update(other.loc)
+
+
+class JobRunner(object):
+    """Runs JobProxy objects with pool of workers."""
+
+    NPROC = 6
+    POLL_DELAY = 0.05
+
+    def __init__(self, job_processor):
+        self.job_processor = job_processor
+        conf = ResourceLocator.default().get_conf()
+        self.nproc = int(conf.get_value(
+                ["rose.config_processors.file", "nproc"],
+                default=self.NPROC))
+
+    def run(self, job_manager, *args):
+        """Start the job runner with an instance of JobManager."""
+        nproc = self.nproc
+        if nproc > len(job_manager.jobs):
+            nproc = len(job_manager.jobs)
+        pool = Pool(processes=nproc)
+
+        results = {}
+        while job_manager.has_jobs():
+            # Process results, if any is ready
+            for name, result in results.items():
+                if result.ready():
+                    results.pop(name)
+                    job_proxy, args_of_events = result.get()
+                    for args_of_event in args_of_events:
+                        self.job_processor.handle_event(*args_of_event)
+                    job = job_manager.put_job(job_proxy)
+                    self.job_processor.post_process_job(job, *args)
+                    self.job_processor.handle_event(JobEvent(job))
+            # Add some more jobs into the worker pool, as they are ready
+            while job_manager.has_ready_jobs():
+                job = job_manager.get_job()
+                if job is None:
+                    break
+                loc_job_run_args = [self.job_processor, job] + list(args)
+                result = pool.apply_async(_job_run, loc_job_run_args)
+                results[job.name] = result
+            if results:
+                sleep(self.POLL_DELAY)
+
+        dead_jobs = job_manager.get_dead_jobs()
+        if dead_jobs:
+            raise JobRunnerNotCompletedError(dead_jobs)
+
+    __call__ = run
+
+
+def _job_run(job_processor, job_proxy, *args):
+    """Helper for JobRunner."""
+    try:
+        event_handler = JobRunnerWorkerEventHandler()
+        job_processor.set_event_handler(event_handler)
+        job_processor.process_job(job_proxy, *args)
+        job_processor.set_event_handler(None)
+    except Exception as e:
+        traceback.print_exc(file=sys.stderr)
+        raise e
+    return (job_proxy, event_handler.events)
+
+
+class JobRunnerWorkerEventHandler(object):
+    """Temporary event handler in a function run by a pool worker process.
+
+    Events are collected in the self.events which is a list of tuples
+    representing the arguments the report method in an instance of
+    rose.reporter.Reporter.
+
+    """
+    def __init__(self):
+        self.events = []
+
+    def __call__(self, message, type=None, level=None, prefix=None, clip=None):
+        self.events.append((message, type, level, prefix, clip))
+
+
+class JobRunnerNotCompletedError(Exception):
+    """Error raised when there are no ready/working jobs but pending ones."""
+    def __str__(self):
+        ret = ""
+        for job in self.args:
+            ret += "[DEAD TASK] %s\n" % str(job)
+        return ret
+
+
+class Loc(object):
+    """Represent a location."""
+
+    BLOB = ""
+    TYPE_TREE = "tree"
+    TYPE_BLOB = "blob"
+
+    def __init__(self, name, scheme=None, dep_locs=None):
+        self.name = name
+        self.real_name = None
+        self.scheme = scheme
+        self.dep_locs = dep_locs
+        self.mode = None
+        self.loc_type = None
+        self.paths = None
+        self.key = None
+        self.cache = None
+        self.is_out_of_date = None # boolean
+
+    def __str__(self):
+        ret = self.name
+        if self.real_name and self.real_name != self.name:
+            ret = "%s (%s)" % (self.real_name, self.name)
+        if self.dep_locs:
+            for dep_loc in self.dep_locs:
+                ret += "\n    location: %s" % str(dep_loc)
+        return ret
+
+    def add_path(self, *args):
+        """Create and append a LocSubPath(*args) to this location."""
+        if self.paths is None:
+            self.paths = []
+        self.paths.append(LocSubPath(*args))
+
+    def update(self, other):
+        """Update the values of this location with the values of "other"."""
+        self.name = other.name
+        self.real_name = other.real_name
+        self.scheme = other.scheme
+        self.mode = other.mode
+        self.paths = other.paths
+        self.key = other.key
+        self.cache = other.cache
+        self.is_out_of_date = other.is_out_of_date
+
+
+class LocTypeError(Exception):
+    """An exception raised when a location type is incorrect.
+
+    The location type is either a file blob or a directory tree.
+
+    """
+    def __str__(self):
+        return "%s <= %s, expected %s, got %s" % self.args
+
+
+class LocSubPath(object):
+    """Represent a sub-path in a location."""
+
+    def __init__(self, name, checksum=None):
+        self.name = name
+        self.checksum = checksum
+
+    def __cmp__(self, other):
+        return cmp(self.name, other.name) or cmp(self.checksum, other.checksum)
+
+    def __eq__(self, other):
+        return (self.name == other.name and self.checksum == other.checksum)
+
+    def __str__(self):
+        return self.name
 
 
 class LocDAO(object):
