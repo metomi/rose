@@ -25,18 +25,16 @@ import os
 import re
 import rose.config
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
-from rose.env import env_var_process, UnboundEnvironmentVariableError
-from rose.fs_util import FileSystemEvent
 from rose.reporter import Event
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sqlite3
-import shutil
 import sys
 from tempfile import mkdtemp
 from time import sleep
 import traceback
+from urlparse import urlparse
 
 
 class FileOverwriteError(Exception):
@@ -86,10 +84,13 @@ class Loc(object):
         self.is_out_of_date = None # boolean
 
     def __str__(self):
+        ret = self.name
         if self.real_name and self.real_name != self.name:
-            return "%s (%s)" % (self.real_name, self.name)
-        else:
-            return self.name
+            ret = "%s (%s)" % (self.real_name, self.name)
+        if self.dep_locs:
+            for dep_loc in self.dep_locs:
+                ret += "\n    location: %s" % str(dep_loc)
+        return ret
 
     def add_path(self, *args):
         if self.paths is None:
@@ -398,7 +399,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Its invariant name.
         # * Whether it can be considered unchanged.
         for source in sources.values():
-            self._source_parse(source, config.get(["loc:" + source.name]))
+            self._source_parse(source, config)
 
         # Inspect each target to see if it is out of date:
         # * Target does not already exist.
@@ -467,8 +468,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 target.add_path(target.BLOB, md5().hexdigest())
 
         work_dir = mkdtemp()
-        JobRunner(self)(JobManager(jobs), config, work_dir)
-        self.manager.fs_util.delete(work_dir)
+        try:
+            JobRunner(self)(JobManager(jobs), config, work_dir)
+        finally:
+            self.manager.fs_util.delete(work_dir)
 
         # Target checksum compare and report
         for target in targets.values():
@@ -488,7 +491,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     def process_job(self, job, config, work_dir):
         """Process a job, helper for process."""
         if job.action_key == self.T_INSTALL:
-            self._target_install(job.loc, config)
+            self._target_install(job.loc, config, work_dir)
         elif job.action_key == self.T_PULL:
             self._source_pull(job.loc, config, work_dir)
         job.state = job.ST_DONE
@@ -497,11 +500,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         self.loc_dao.update(job.loc)
 
     def _source_parse(self, source, config):
-        if config is not None:
-            scheme = config.get_value(["scheme"])
-            if scheme:
-                loc.scheme = scheme
-        self.loc_handlers_manager.parse(source)
+        self.loc_handlers_manager.parse(source, config)
         prev_source = self.loc_dao.select(source.name)
         source.is_out_of_date = (
                 not prev_source or
@@ -512,10 +511,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 prev_source.paths != source.paths)
 
     def _source_pull(self, source, config, work_dir):
-        return self.loc_handlers_manager.pull(source, work_dir)
+        return self.loc_handlers_manager.pull(source, config, work_dir)
         # TODO: handle uncompression
 
-    def _target_install(self, target, config):
+    def _target_install(self, target, config, work_dir):
         """Install target.
 
         Build target using its source(s).
@@ -694,31 +693,33 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def parse(self, loc):
+    def parse(self, loc, config):
         """Parse loc.name.
         
         Set loc.real_name, loc.scheme, loc.loc_type, loc.key, loc.paths, etc.
         if relevant.
 
         """
-        if loc.scheme:
-            p = self.get_handler(loc.scheme)
-        else:
+        scheme = config.get_value(["loc:" + loc.name, "scheme"])
+        if scheme is None:
+            scheme = urlparse(loc.name).scheme
+        p = self.get_handler(scheme)
+        if p is None:
             p = self.guess_handler(loc)
         if p is None:
             raise ValueError(loc.name)
-        return p.parse(loc)
+        return p.parse(loc, config)
 
-    def pull(self, loc, work_dir):
+    def pull(self, loc, config, work_dir):
         """Pull a location to the local file system path under work_dir.
 
         Set loc.cache on success, normally a path under work_dir.
 
         """
-        if loc.scheme:
-            p = self.get_handler(loc.scheme)
-        else:
+        if loc.scheme is None:
             p = self.guess_handler(loc)
+        else:
+            p = self.get_handler(loc.scheme)
         if p is None:
             raise ValueError(loc.name)
-        return p.pull(loc, work_dir)
+        return p.pull(loc, config, work_dir)

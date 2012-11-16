@@ -43,10 +43,10 @@ class SvnLocHandler(object):
         if self.svn == self.FCM:
             schemes.append(self.FCM)
         return (urlparse(loc.name).scheme in schemes or
-                not os.exists(loc.name) and
+                not os.path.exists(loc.name) and
                 not self.manager.popen.run(self.svn, "info", loc.name)[0])
 
-    def parse(self, loc):
+    def parse(self, loc, config):
         """Set loc.real_name, loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEME
         xml_str, err = self.manager.popen(self.svn, "info", "--xml", loc.name)
@@ -58,7 +58,7 @@ class SvnLocHandler(object):
         loc.real_name = "%s@%s" % (info_entry["url"], info_entry["revision"])
         loc.key = info_entry["commit:revision"]
 
-    def pull(self, loc, work_dir):
+    def pull(self, loc, config, work_dir):
         """If loc is in the file system, sets loc.cache to loc.name.
 
         Otherwise, raise an OSError.
