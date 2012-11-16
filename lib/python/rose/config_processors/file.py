@@ -79,6 +79,7 @@ class Loc(object):
         self.mode = None
         self.loc_type = None
         self.paths = None
+        self.key = None
         self.cache = None
         self.is_out_of_date = None # boolean
 
@@ -99,6 +100,7 @@ class Loc(object):
         self.scheme = other.scheme
         self.mode = other.mode
         self.paths = other.paths
+        self.key = other.key
         self.cache = other.cache
         self.is_out_of_date = other.is_out_of_date
 
@@ -480,10 +482,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         prev_source = self.loc_dao.select(source.name)
         source.is_out_of_date = (
                 not prev_source or
-                (not source.real_name and not source.paths) or
+                (not source.key and not source.paths) or
                 prev_source.scheme != source.scheme or
                 prev_source.loc_type != source.loc_type or
-                prev_source.real_name != source.real_name or
+                prev_source.key != source.key or
                 prev_source.paths != source.paths)
 
     def _source_pull(self, source, config, work_dir):
@@ -570,6 +572,7 @@ class LocDAO(object):
                           scheme TEXT,
                           mode TEXT,
                           loc_type TEXT,
+                          key TEXT,
                           PRIMARY KEY(name))""")
             c.execute("""CREATE TABLE paths(
                           name TEXT,
@@ -600,13 +603,13 @@ class LocDAO(object):
         conn = self.get_conn()
         c = conn.cursor()
 
-        c.execute("""SELECT real_name,scheme,mode,loc_type FROM locs""" +
+        c.execute("""SELECT real_name,scheme,mode,loc_type,key FROM locs""" +
                   """ WHERE name=?""", name)
         row = c.fetchone()
         if row is None:
             return
         loc = Loc(name)
-        loc.real_name, loc.scheme, loc.mode, loc.loc_type = row
+        loc.real_name, loc.scheme, loc.mode, loc.loc_type, loc.key = row
 
         c.execute("""SELECT path,checksum FROM paths WHERE name=?""", name)
         for row in c:
@@ -627,7 +630,8 @@ class LocDAO(object):
         conn = self.get_conn()
         c = conn.cursor()
         c.execute("""INSERT OR REPLACE INTO locs VALUES(?,?,?,?,?)""",
-                  loc.name, loc.real_name, loc.scheme, loc.mode, loc.loc_type)
+                  loc.name, loc.real_name, loc.scheme, loc.mode, loc.loc_type,
+                  loc.key)
         if loc.paths:
             for path in loc.paths:
                 c.execute("""INSERT OR REPLACE INTO paths VALUES(?,?,?)""",
@@ -664,7 +668,12 @@ class PullableLocHandlersManager(SchemeHandlersManager):
             return self.event_handler(*args, **kwargs)
 
     def parse(self, loc):
-        """Parse loc.name, set loc.real_name, loc.scheme where possible."""
+        """Parse loc.name.
+        
+        Set loc.real_name, loc.scheme, loc.loc_type, loc.key, loc.paths, etc.
+        if relevant.
+
+        """
         if loc.scheme:
             p = self.get_handler(loc.scheme)
         else:

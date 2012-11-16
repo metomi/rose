@@ -91,7 +91,6 @@ class RosePopener(object):
                       "--rsh=ssh -oBatchMode=yes"],
             "ssh": ["ssh", "-oBatchMode=yes"],
             "terminal": ["xterm"]}
-
     ENVS_OF_CMDS = {"editor": ["VISUAL", "EDITOR"],
                     "geditor": ["VISUAL", "EDITOR"]}
 
