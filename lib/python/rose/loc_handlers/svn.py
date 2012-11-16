@@ -37,9 +37,8 @@ class SvnLocHandler(object):
         self.svn = self.SVN
         if self.manager.popen.which(self.FCM):
             self.svn = self.FCM
-        self.svn_info_xml_parser = SvnInfoXMLParser()
 
-    def can_handle(self, loc):
+    def can_pull(self, loc):
         schemes = [self.SVN, "svn+ssh"]
         if self.svn == self.FCM:
             schemes.append(self.FCM)
@@ -51,7 +50,7 @@ class SvnLocHandler(object):
         """Set loc.real_name, loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEME
         xml_str, err = self.manager.popen(self.svn, "info", "--xml", loc.name)
-        info_entry = self.svn_info_xml_parser(xml_str)
+        info_entry = SvnInfoXMLParser()(xml_str)
         if info_entry["kind"] == "dir":
             loc.loc_type = loc.TYPE_TREE
         else: # if info_entry ["kind"] == "file":
@@ -67,7 +66,9 @@ class SvnLocHandler(object):
         """
         if not loc.real_name:
             self.parse(loc)
-        base_name = md5().update(loc.real_name).hexdigest()
+        m = md5()
+        m.update(loc.real_name)
+        base_name = m.hexdigest()
         loc.cache = os.path.join(work_dir, base_name)
         self.manager.popen("svn", "export", "-q", loc.real_name, loc.cache)
 

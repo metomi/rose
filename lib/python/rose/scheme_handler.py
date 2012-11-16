@@ -23,13 +23,19 @@
 from glob import glob
 import inspect
 import os
+import sys
 
 
 class SchemeHandlersManager(object):
     """Load and select from a group of related functional classes."""
 
-    def __init__(self, paths, attrs=None, *args, **kwargs):
+    CAN_HANDLE = "can_handle"
+
+    def __init__(self, paths, attrs=None, can_handle=None, *args, **kwargs):
         """Load modules in paths and initialise any classes with a SCHEME.
+
+        Save handlers in the handlers attribute which is a dict of scheme:
+        handler.
 
         If attrs is specified, it should be a list of attributes the class
         has that do not have a None value.
@@ -47,9 +53,13 @@ class SchemeHandlersManager(object):
 
         """
         self.handlers = {}
+        if can_handle is None:
+            can_handle = self.CAN_HANDLE
+        self.can_handle = can_handle
         cwd = os.getcwd()
         for path in paths:
             os.chdir(path) # assuming that "" is at the front of sys.path
+            sys.path.insert(0, path)
             try:
                 for file_name in glob("*.py"):
                     if file_name.startswith("__"):
@@ -67,6 +77,7 @@ class SchemeHandlersManager(object):
                         self.handlers[scheme] = c(*args, **kwargs)
             finally:
                 os.chdir(cwd)
+                sys.path.pop(0)
 
     def get_handler(self, scheme):
         """Return the handler with a matching scheme.
@@ -74,20 +85,22 @@ class SchemeHandlersManager(object):
         Return None if there is no handler with a matching scheme.
 
         """
-        if self.handlers.has_key(scheme):
-            return self.handlers[scheme]
+        try:
+            if self.handlers.has_key(scheme):
+                return self.handlers[scheme]
+        except TypeError:
+            pass
 
-    def guess_handler(self, scheme, **kwargs):
-        """Return a handler that can handle scheme.
+    def guess_handler(self, item):
+        """Return a handler that can handle item.
 
         Return None if there is no handler with a matching scheme.
 
         """
-        handler = self.get_handler(scheme)
+        handler = self.get_handler(item)
         if handler:
             return handler
         for handler in self.handlers.values():
-            if (hasattr(handler, "can_handle") and
-                callable(handler.can_handle) and
-                handler.can_handle(scheme, **kwargs)):
+            can_handle = getattr(handler, self.can_handle, None)
+            if (callable(can_handle) and can_handle(item)):
                 return handler

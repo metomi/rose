@@ -86,7 +86,6 @@ class ConfigProcessorsManager(SchemeHandlersManager):
 
     def __init__(self, event_handler=None, popen=None, fs_util=None):
         path = os.path.join(os.path.dirname(__file__), "config_processors")
-        SchemeHandlersManager.__init__(self, [path], ["process"])
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -94,6 +93,7 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
+        SchemeHandlersManager.__init__(self, [path], ["process"])
 
     def handle_event(self, *args, **kwargs):
         if callable(self.event_handler):

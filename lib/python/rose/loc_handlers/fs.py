@@ -29,8 +29,8 @@ class FileSystemLocHandler(object):
     def __init__(self, manager):
         self.manager = manager
 
-    def can_handle(self, loc):
-        return True
+    def can_pull(self, loc):
+        return os.path.exists(loc.name)
 
     def parse(self, loc):
         """Set loc.scheme, loc.loc_type, loc.paths."""
@@ -40,7 +40,7 @@ class FileSystemLocHandler(object):
             m = md5()
             m.update(open(loc.name).read())
             loc.add_path(loc.BLOB, m.hexdigest())
-        else os.path.isdir(loc.name):
+        else: # os.path.isdir(loc.name):
             loc.loc_type = loc.TYPE_TREE
             for dirpath, dirnames, filenames in os.walk(loc.name):
                 for dirname in dirnames:

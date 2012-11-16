@@ -33,8 +33,10 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sqlite3
 import shutil
+import sys
 from tempfile import mkdtemp
 from time import sleep
+import traceback
 
 
 class FileOverwriteError(Exception):
@@ -108,9 +110,9 @@ class Loc(object):
 class PathInLoc(object):
     """Represent a sub-path in a location."""
 
-    def __init__(self, name):
+    def __init__(self, name, checksum=None):
         self.name = name
-        self.checksum = None
+        self.checksum = checksum
 
     def __cmp__(self, other):
         return cmp(self.name, other.name) or cmp(self.checksum, other.checksum)
@@ -143,7 +145,7 @@ class LocJobProxy(object):
 
     def __init__(self, loc, action_key):
         self.loc = loc
-        self.action_key = None
+        self.action_key = action_key
         self.name = loc.name
         self.needed_by = {}
         self.pending_for = {}
@@ -155,6 +157,12 @@ class LocJobProxy(object):
     def update(self, other):
         self.state = other.state
         self.loc.update(other.loc)
+
+
+class JobEvent(Event):
+    """Event raised when a job completes."""
+    def __str__(self):
+        return str(self.args[0])
 
 
 class JobManager(object):
@@ -200,7 +208,11 @@ class JobManager(object):
     def get_dead_jobs(self):
         """Return pending jobs if there are no ready/working ones."""
         if not self.has_jobs:
-            return [job if job.pending_for for job in self.jobs.values()]
+            jobs = []
+            for job in self.jobs.values():
+                if job.pending_for:
+                    jobs.append(job)
+            return jobs
 
     def has_jobs(self):
         """Return True if there are ready jobs or working jobs."""
@@ -254,13 +266,14 @@ class JobRunner(object):
                         self.job_processor.handle_event(*args_of_event)
                     job = job_manager.put_job(job_proxy)
                     self.job_processor.post_process_job(job, *args)
+                    self.job_processor.handle_event(JobEvent(job))
             # Add some more jobs into the worker pool, as they are ready
             while job_manager.has_ready_jobs():
                 job = job_manager.get_job()
                 if job is None:
                     break
-                result = pool.apply_async(_loc_job_run,
-                                          [self.job_processor, job, *args])
+                loc_job_run_args = [self.job_processor, job] + list(args)
+                result = pool.apply_async(_loc_job_run, loc_job_run_args)
                 results[job.name] = result
             if results:
                 sleep(self.POLL_DELAY)
@@ -289,10 +302,14 @@ class WorkerEventHandler(object):
 
 def _loc_job_run(job_processor, job_proxy, *args):
     """Helper for JobRunner."""
-    event_handler = WorkerEventHandler()
-    job_processor.set_event_handler(event_handler)
-    job_processor.process_job(job_proxy, *args)
-    job_processor.set_event_handler(None)
+    try:
+        event_handler = WorkerEventHandler()
+        job_processor.set_event_handler(event_handler)
+        job_processor.process_job(job_proxy, *args)
+        job_processor.set_event_handler(None)
+    except Exception as e:
+        traceback.print_exc(file=sys.stderr)
+        raise e
     return (job_proxy, event_handler.events)
 
 
@@ -306,6 +323,7 @@ class UnfinishedJobsError(Exception):
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
+    """Processor for "file:*" sections in a rose.config.ConfigNode."""
 
     SCHEME = "file"
     NPROC = 6
@@ -362,11 +380,14 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         sources = {}
         targets = {}
         for key, node in sorted(nodes.items()):
-            content_str = node.get_value("content")
+            location_str = None
+            for k in ["location", "content", "source"]:
+                location_str = node.get_value([k])
+                break
             name = key[len(self.PREFIX):]
             target_sources = []
-            if content_str is not None:
-                for n in shlex.split(content_str):
+            if location_str is not None:
+                for n in shlex.split(location_str):
                     sources[n] = Loc(n)
                     target_sources.append(sources[n])
             targets[name] = Loc(name)
@@ -431,7 +452,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 else:
                     jobs[target.name] = LocJobProxy(target, self.T_INSTALL)
                     for source in target.dep_locs:
-                        jobs[source.name] = LocJobProxy(source, self.T_PULL)
+                        job = LocJobProxy(source, self.T_PULL)
+                        jobs[source.name] = job
+                        jobs[target.name].pending_for[source.name] = job
             elif target.mode == "mkdir":
                 self.manager.fs_util.makedirs(target.name)
                 self.loc_dao.update(target)
@@ -470,7 +493,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             self._source_pull(job.loc, config, work_dir)
         job.state = job.ST_DONE
 
-    def post_process_job(self, job, config):
+    def post_process_job(self, job, config, *args):
         self.loc_dao.update(job.loc)
 
     def _source_parse(self, source, config):
@@ -502,10 +525,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         f = None
         is_first = True
         # Install target
-        for source in job.loc.dep_locs:
+        for source in target.dep_locs:
             if target.loc_type is None:
                 target.loc_type = source.loc_type
-            elif target.loc_type != source.loc_type
+            elif target.loc_type != source.loc_type:
                 raise LocTypeError(target.name, source.name, target.loc_type,
                                    source.loc_type)
             if target.loc_type == target.TYPE_BLOB:
@@ -527,11 +550,11 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # Calculate target checksum(s)
         if target.loc_type == target.TYPE_BLOB:
             m = md5()
-            m.update(open(target).read())
+            m.update(open(target.name).read())
             target.add_path(target.BLOB, m.hexdigest())
         else:
             target.paths = []
-            for dirpath, dirnames, filenames in os.walk(target):
+            for dirpath, dirnames, filenames in os.walk(target.name):
                 path = dirpath[len(target) + 1:]
                 target.add_path(path, None)
                 for filename in filenames:
@@ -553,7 +576,7 @@ class LocDAO(object):
 
     DB_FILE_NAME = ".rose-config_processors-file.db"
 
-    def __int__(self):
+    def __init__(self):
         self.conn = None
 
     def get_conn(self):
@@ -589,9 +612,9 @@ class LocDAO(object):
         """Remove settings related to loc from the database."""
         conn = self.get_conn()
         c = conn.cursor()
-        c.execute("""DELETE FROM locs WHERE name=?""", loc.name)
-        c.execute("""DELETE FROM dep_names WHERE name=?""", loc.name)
-        c.execute("""DELETE FROM paths WHERE name=?""", loc.name)
+        c.execute("""DELETE FROM locs WHERE name=?""", [loc.name])
+        c.execute("""DELETE FROM dep_names WHERE name=?""", [loc.name])
+        c.execute("""DELETE FROM paths WHERE name=?""", [loc.name])
         conn.commit()
 
     def select(self, name):
@@ -604,42 +627,45 @@ class LocDAO(object):
         c = conn.cursor()
 
         c.execute("""SELECT real_name,scheme,mode,loc_type,key FROM locs""" +
-                  """ WHERE name=?""", name)
+                  """ WHERE name=?""", [name])
         row = c.fetchone()
         if row is None:
             return
         loc = Loc(name)
         loc.real_name, loc.scheme, loc.mode, loc.loc_type, loc.key = row
 
-        c.execute("""SELECT path,checksum FROM paths WHERE name=?""", name)
+        c.execute("""SELECT path,checksum FROM paths WHERE name=?""", [name])
         for row in c:
             path, checksum = row
             if loc.paths is None:
                 loc.paths = []
             loc.add_path(path, checksum)
 
-        c.execute("""SELECT dep_name FROM dep_names WHERE name=?""", name)
+        c.execute("""SELECT dep_name FROM dep_names WHERE name=?""", [name])
         for row in c:
             dep_name, = row
             if loc.dep_locs is None:
                 loc.dep_locs = []
             loc.dep_locs.append(self.select(dep_name))
 
+        return loc
+
     def update(self, loc):
         """Insert or update settings related to loc to the database."""
         conn = self.get_conn()
         c = conn.cursor()
-        c.execute("""INSERT OR REPLACE INTO locs VALUES(?,?,?,?,?)""",
-                  loc.name, loc.real_name, loc.scheme, loc.mode, loc.loc_type,
-                  loc.key)
+        c.execute("""INSERT OR REPLACE INTO locs VALUES(?,?,?,?,?,?)""",
+                  [loc.name, loc.real_name, loc.scheme, loc.mode, loc.loc_type,
+                   loc.key])
         if loc.paths:
             for path in loc.paths:
                 c.execute("""INSERT OR REPLACE INTO paths VALUES(?,?,?)""",
-                          name, path.name, path.checksum)
+                          [loc.name, path.name, path.checksum])
         if loc.dep_locs:
             for dep_loc in loc.dep_locs:
                 c.execute("""INSERT OR REPLACE INTO dep_names VALUES(?,?)""",
-                          name, dep_loc.name)
+                          [loc.name, dep_loc.name])
+        conn.commit()
 
 
 class PullableLocHandlersManager(SchemeHandlersManager):
@@ -658,9 +684,10 @@ class PullableLocHandlersManager(SchemeHandlersManager):
             fs_util = FileSystemUtil(event_handler)
         rose_lib_path = fs_util.dirname(fs_util.dirname(__file__))
         lib_path = os.path.join(rose_lib_path, "loc_handlers")
-        SchemeHandlersManager.__init__(self, [lib_path], ["parse", "pull"])
         self.popen = popen
         self.fs_util = fs_util
+        SchemeHandlersManager.__init__(self, [lib_path], attrs=["parse", "pull"],
+                                       can_handle="can_pull")
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler with given arguments if possible."""
@@ -678,6 +705,8 @@ class PullableLocHandlersManager(SchemeHandlersManager):
             p = self.get_handler(loc.scheme)
         else:
             p = self.guess_handler(loc)
+        if p is None:
+            raise ValueError(loc.name)
         return p.parse(loc)
 
     def pull(self, loc, work_dir):
@@ -686,8 +715,10 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         Set loc.cache on success, normally a path under work_dir.
 
         """
-        if file_loc.scheme:
+        if loc.scheme:
             p = self.get_handler(loc.scheme)
         else:
             p = self.guess_handler(loc)
+        if p is None:
+            raise ValueError(loc.name)
         return p.pull(loc, work_dir)
