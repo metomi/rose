@@ -20,7 +20,7 @@
 """A handler of file system locations."""
 
 import errno
-from hashlib import md5
+from rose.checksum import get_checksum
 import os
 
 class FileSystemLocHandler(object):
@@ -35,21 +35,13 @@ class FileSystemLocHandler(object):
     def parse(self, loc, config):
         """Set loc.scheme, loc.loc_type, loc.paths."""
         loc.scheme = "fs"
-        if os.path.isfile(loc.name):
+        paths_and_checksums = get_checksum(loc.name)
+        for path, checksum in paths_and_checksums:
+            loc.add_path(path, checksum)
+        if len(paths_and_checksums) == 1 and paths_and_checksums[0][0] == "":
             loc.loc_type = loc.TYPE_BLOB
-            m = md5()
-            m.update(open(loc.name).read())
-            loc.add_path(loc.BLOB, m.hexdigest())
-        else: # os.path.isdir(loc.name):
+        else:
             loc.loc_type = loc.TYPE_TREE
-            for dirpath, dirnames, filenames in os.walk(loc.name):
-                for dirname in dirnames:
-                    loc.add_path(os.path.join(dirpath, dirname))
-                for filename in filenames:
-                    name = os.path.join(dirpath, filename)
-                    m = md5()
-                    m.update(open(name).read())
-                    loc.add_path(name, m.hexdigest())
 
     def pull(self, loc, config, work_dir):
         """If loc is in the file system, sets loc.cache to loc.name.

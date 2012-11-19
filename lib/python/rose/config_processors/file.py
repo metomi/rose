@@ -19,10 +19,10 @@
 #-----------------------------------------------------------------------------
 """Process "file:*" sections in a rose.config.ConfigNode."""
 
-from hashlib import md5
 from multiprocessing import Pool
 import os
 import re
+from rose.checksum import get_checksum
 import rose.config
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.reporter import Event
@@ -124,26 +124,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         for target in targets.values():
             if os.path.islink(target.name):
                 target.real_name = os.readlink(target.name)
-            elif os.path.isfile(target.name):
-                m = md5()
-                f = open(target.name)
-                m.update(f.read())
-                target.add_path(target.BLOB, m.hexdigest())
-            elif os.path.isdir(target.name):
-                target.paths = []
-                for dirpath, dirnames, filenames in os.walk(target.name):
-                    for i in reversed(range(len(dirnames))):
-                        dirname = dirnames[i]
-                        if dirname.startswith("."):
-                            dirnames.pop(i)
-                            continue
-                        target.add_path(os.path.join(dirpath, dirname))
-                    for filename in filenames:
-                        m = md5()
-                        filepath = os.path.join(dirpath, filename)
-                        f = open(filepath)
-                        m.update(f.read())
-                        target.add_path(filepath, m.hexdigest())
+            elif os.path.exists(target.name):
+                for path, checksum in get_checksum(target.name):
+                    target.add_path(path, checksum)
                 target.paths.sort()
             prev_target = self.loc_dao.select(target.name)
             target.is_out_of_date = (
@@ -151,9 +134,19 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     prev_target is None or
                     prev_target.mode != target.mode or
                     prev_target.real_name != target.real_name or
-                    prev_target.paths != target.paths or
-                    any([s.is_out_of_date for s in target.dep_locs]))
+                    len(prev_target.paths) != len(target.paths))
+            if not target.is_out_of_date:
+                for prev_path, path in zip(prev_target.paths, target.paths):
+                    if prev_path != path:
+                        target.is_out_of_date = True
+                        break
+            if not target.is_out_of_date:
+                for dep_loc in target.dep_locs:
+                    if dep_loc.is_out_of_date:
+                        target.is_out_of_date = True
+                        break
             if target.is_out_of_date:
+                target.paths = None
                 self.loc_dao.delete(target)
 
         # Set up jobs for rebuilding all out-of-date targets.
@@ -181,7 +174,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 self.manager.fs_util.install(target.name)
                 self.loc_dao.update(target)
                 target.loc_type = target.TYPE_BLOB
-                target.add_path(target.BLOB, md5().hexdigest())
+                for path, checksum in get_checksum(target.name):
+                    target.add_path(path, checksum)
 
         work_dir = mkdtemp()
         try:
@@ -221,6 +215,13 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def post_process_job(self, job, config, *args):
         self.loc_dao.update(job.loc)
+
+    def set_event_handler(self, event_handler):
+        """Sets the event handler, used by pool workers to capture events."""
+        try:
+            self.manager.event_handler.event_handler = event_handler
+        except AttributeError:
+            pass
 
     def _source_parse(self, source, config):
         self.loc_handlers_manager.parse(source, config)
@@ -262,7 +263,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 if is_first:
                     self.manager.fs_util.makedirs(target.name)
                     args.append("--delete-excluded")
-                args.extend(["--checksum", source.cache, target.name])
+                args.extend(["--checksum", source.cache + "/", target.name])
                 cmd = self.manager.popen.get_cmd("rsync", *args)
                 out, err = self.manager.popen(*cmd)
             is_first = False
@@ -270,27 +271,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             f.close()
 
         # Calculate target checksum(s)
-        if target.loc_type == target.TYPE_BLOB:
-            m = md5()
-            m.update(open(target.name).read())
-            target.add_path(target.BLOB, m.hexdigest())
-        else:
-            target.paths = []
-            for dirpath, dirnames, filenames in os.walk(target.name):
-                path = dirpath[len(target) + 1:]
-                target.add_path(path, None)
-                for filename in filenames:
-                    filepath = os.path.join(path, filename)
-                    m = md5()
-                    m.update(open(filepath).read())
-                    target.add_path(filepath, m.hexdigest())
-
-    def set_event_handler(self, event_handler):
-        """Sets the event handler, used by pool workers to capture events."""
-        try:
-            self.manager.event_handler.event_handler = event_handler
-        except AttributeError:
-            pass
+        for path, checksum in get_checksum(target.name):
+            target.add_path(path, checksum)
 
 
 class ChecksumError(Exception):
@@ -578,6 +560,9 @@ class LocSubPath(object):
 
     def __eq__(self, other):
         return (self.name == other.name and self.checksum == other.checksum)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def __str__(self):
         return self.name
