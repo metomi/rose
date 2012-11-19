@@ -68,8 +68,7 @@ class SvnLocHandler(object):
             self.parse(loc)
         m = md5()
         m.update(loc.real_name)
-        base_name = m.hexdigest()
-        loc.cache = os.path.join(work_dir, base_name)
+        loc.cache = os.path.join(work_dir, m.hexdigest())
         self.manager.popen("svn", "export", "-q", loc.real_name, loc.cache)
 
 

@@ -114,7 +114,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             try:
                 self._source_parse(source, config)
             except ValueError as e:
-                raise ConfigProcessError([key, "location"], source.name)
+                raise ConfigProcessError([key, "location"], source.name, e)
 
         # Inspect each target to see if it is out of date:
         # * Target does not already exist.
@@ -462,8 +462,14 @@ def _job_run(job_processor, job_proxy, *args):
     """Helper for JobRunner."""
     event_handler = JobRunnerWorkerEventHandler()
     job_processor.set_event_handler(event_handler)
-    job_processor.process_job(job_proxy, *args)
-    job_processor.set_event_handler(None)
+    try:
+        job_processor.process_job(job_proxy, *args)
+    except Exception as e:
+        #import traceback
+        #traceback.print_exc(e)
+        raise e
+    finally:
+        job_processor.set_event_handler(None)
     return (job_proxy, event_handler.events)
 
 
