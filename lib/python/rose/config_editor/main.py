@@ -1992,13 +1992,9 @@ if __name__ == '__main__':
     if args:
         opt_parser.print_usage(sys.stderr)
         sys.exit(2)
-    rose.macro.add_site_meta_path()
-    if opts.meta_path is not None:
-        opts.meta_path.reverse()
-        for child_paths in [arg.split(":") for arg in opts.meta_path]:
-            child_paths.reverse()
-            for path in child_paths:
-                sys.path.insert(0, os.path.abspath(path))
+    rose.macro.add_site_meta_paths()
+    rose.macro.add_env_meta_paths()
+    rose.macro.add_opt_meta_paths(opts.meta_path)
     if opts.conf_dir:
         os.chdir(opts.conf_dir)
     path = os.getcwd()

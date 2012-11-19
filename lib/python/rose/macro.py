@@ -205,12 +205,34 @@ class MacroReport(object):
         self.is_warning = is_warning
 
 
-def add_site_meta_path():
-    """Load any metadata path specified in a user or site configuration."""
+def add_site_meta_paths():
+    """Load any metadata paths specified in a user or site configuration."""
     conf = rose.resource.ResourceLocator.default().get_conf()
     path = conf.get_value([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_PATH])
     if path is not None:
-        sys.path.insert(0, os.path.expanduser(os.path.expandvars(path)))
+        for path in path.split(os.pathsep):
+            path = os.path.expanduser(os.path.expandvars(path))
+            sys.path.insert(0, os.path.abspath(path))
+
+
+def add_env_meta_paths():
+    """Load the environment variable ROSE_META_PATH, if defined."""
+    path = os.environ.get("ROSE_META_PATH")
+    if path is not None:
+        for path in path.split(os.pathsep):
+            path = os.path.expanduser(os.path.expandvars(path))
+            sys.path.insert(0, os.path.abspath(path))
+
+
+def add_opt_meta_paths(meta_paths):
+    """Load any metadata paths in a list of ":"-separated strings."""
+    if meta_paths is not None:
+        meta_paths.reverse()
+        for child_paths in [arg.split(os.pathsep) for arg in meta_paths]:
+            child_paths.reverse()
+            for path in child_paths:
+                path = os.path.expandvars(os.path.expanduser(path))
+                sys.path.insert(0, os.path.abspath(path))
 
 
 def load_meta_path(config=None, directory=None, is_upgrade=False,
@@ -645,8 +667,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     sys.path.append(os.getenv("ROSE_HOME"))
-    if opts.meta_path is not None:
-        sys.path = opts.meta_path + sys.path
+    add_opt_meta_paths(opts.meta_path)
     config_name = os.path.basename((os.path.abspath(opts.conf_dir)))
     config_file_path = os.path.join(opts.conf_dir,
                                     rose.SUB_CONFIG_NAME)
@@ -686,7 +707,8 @@ def _report_error(exception=None, text=""):
 
 def main():
     """Run rose macro."""
-    add_site_meta_path()
+    add_site_meta_paths()
+    add_env_meta_paths()
     return_objects = parse_macro_mode_args()
     if return_objects is None:
         sys.exit(1)
