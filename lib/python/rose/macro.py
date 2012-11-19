@@ -213,6 +213,13 @@ def add_site_meta_path():
         sys.path.insert(0, os.path.expanduser(os.path.expandvars(path)))
 
 
+def add_env_meta_path():
+    """Load the environment variable ROSE_META_PATH, if defined."""
+    env_meta_path = os.environ.get("ROSE_META_PATH")
+    if env_meta_path is not None:
+        sys.path.insert(0, env_meta_path)
+
+
 def load_meta_path(config=None, directory=None, is_upgrade=False,
                    locator=None):
     """Retrieve the path to the configuration metadata directory.
@@ -687,6 +694,7 @@ def _report_error(exception=None, text=""):
 def main():
     """Run rose macro."""
     add_site_meta_path()
+    add_env_meta_path()
     return_objects = parse_macro_mode_args()
     if return_objects is None:
         sys.exit(1)

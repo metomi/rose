@@ -1993,6 +1993,7 @@ if __name__ == '__main__':
         opt_parser.print_usage(sys.stderr)
         sys.exit(2)
     rose.macro.add_site_meta_path()
+    rose.macro.add_env_meta_path()
     if opts.meta_path is not None:
         opts.meta_path.reverse()
         for child_paths in [arg.split(":") for arg in opts.meta_path]:
