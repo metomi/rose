@@ -555,20 +555,24 @@ key-4=value 4
       </li>
     </ul>
 
-    <p>Rose commands will do the following search for a named configuration
-    metadata directory:</p>
+    <p>Rose utilities will do a path search for metadata using the following in
+    order of precedence:</p>
 
-    <ol>
-      <li>(Configuration metadata embedded in the <samp>meta/</samp> directory
-      of a suite or an application.)</li>
+    <ul>
+      <li>Configuration metadata embedded in the <samp>meta/</samp> directory
+      of a suite or an application.</li>
 
-      <li><code>rose</code> command line option <code>--meta-path=PATH[:PATH
-      ...]</code>.</li><!--li>the <code>meta=path=PATH</code> setting in
-      <samp>rose-suite.conf</samp>.</li-->
+      <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
 
-      <li>The <code>meta=path=PATH</code> setting in the site and user
-      configuration.</li>
-    </ol>
+      <li>The content of the <var>ROSE_META_PATH</var> environment
+      variable.</li>
+
+      <li>The <samp>meta-path</samp> setting in <a href=
+      "rose-configuration.html#site">site/user</a> configurations.</li>
+    </ul>
+
+    <p>See <a href="#appendix-metadata-location">Metadata Location</a> for more
+    details.</p>
 
     <p>The configuration metadata that controls default behaviour will be
     located in <samp>$ROSE_HOME/etc/metadata/</samp>.</p>
@@ -1043,6 +1047,7 @@ trigger = env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
         <pre>
 widget[rose-config-edit] = table X Y VCT Level
 </pre>
+
         <p>You may override to a Rose built-in widget by specifying a full
         <code>rose</code> class path in Python - for example, to always show
         radiobuttons for an option with <code>values</code> set:</p>
@@ -1167,6 +1172,201 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
 
       <dd>Target is created as a symlink of an FS <var>SOURCE</var>.</dd>
     </dl>
+
+    <h2 id="appendix-metadata-location">Appendix: Metadata Location</h2>
+
+    <p>Centralised Rose metadata is referred to with either the <var>meta</var>
+    or <var>project</var> top level flag in a configuration. It needs to live
+    in a system-global-readable location.</p>
+
+    <p>Rose utilities will do a path search for metadata using the following in
+    order of precedence:</p>
+
+    <ul>
+      <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
+
+      <li>The content of the <var>ROSE_META_PATH</var> environment
+      variable.</li>
+
+      <li>The <samp>meta-path</samp> setting in <a href="#site">site/user</a>
+      configurations.</li>
+    </ul>
+
+    <p>Each of the above settings can be a colon-separated list of paths.</p>
+
+    <p>Underneath each directory in the search path should be a hierarchy like
+    the following:</p>
+    <pre>
+${APP}/HEAD/
+${APP}/${VERSION}/
+${APP}/versions.py # i.e. the upgrade macros
+</pre>
+
+    <p>N.B. A Rose suite info is likely to have no versions.</p>
+
+    <p>Note that, in some cases, a number of different executables may share
+    the same application configuration metadata in which case APP is given a
+    name which covers all the uses.</p>
+
+    <p>The Rose team recommend placing metadata in a <samp>rose-meta</samp>
+    directory at the top of a project's source tree. Central metadata, if any,
+    at the <samp>meta-path</samp> location in the site configuration, should be
+    a collection of regularly-updated subdirectories from all of the relevant
+    projects' <samp>rose-meta</samp> directories.</p>
+
+    <p>For example, for a system <code>COFFEE</code>, with the following
+    directory structure:</p>
+    <pre>
+COFFEE/doc/
+...
+COFFEE/rose-meta/
+COFFEE/rose-meta/coffee-cappuccino/
+COFFEE/rose-meta/coffee-latte/
+COFFEE/rose-meta/coffee-mocha/
+</pre>
+
+    <p>and the system <code>CHOCOLATE</code>:</p>
+    <pre>
+CHOCOLATE/doc/
+...
+CHOCOLATE/rose-meta/
+CHOCOLATE/rose-meta/choc-dark/
+CHOCOLATE/rose-meta/choc-milk/
+</pre>
+
+    <p>and a site configuration with:</p>
+    <pre>
+meta-path = /path/to/rose-meta
+</pre>
+
+    <p>We would expect the following directories in
+    <samp>/path/to/rose-meta</samp>:</p>
+    <pre>
+/path/to/rose-meta/coffee-cappuccino/
+/path/to/rose-meta/coffee-latte/
+/path/to/rose-meta/coffee-mocha/
+/path/to/rose-meta/choc-dark/
+/path/to/rose-meta/choc-milk/
+</pre>
+
+    <h2 id="appendix-upgrade">Appendix: Upgrade and Versions</h2>
+
+    <p>Terminology:</p>
+
+    <dl>
+      <dt>The HEAD (i.e. development) version</dt>
+
+      <dd>The configuration metadata most relevant to the latest revision of
+      the source tree.</dd>
+
+      <dt>A named version</dt>
+
+      <dd>The configuration metadata most relevant to a release, or a
+      particular revision, of the software. This will normally be a copy of the
+      HEAD version at a given revision, although it may be updated with some
+      backward compatible fixes.</dd>
+    </dl>
+
+    <p>Each change in the HEAD version that requires an upgrade procedure
+    should introduce an upgrade macro. Each upgrade macro will provide the
+    following information:</p>
+
+    <ul>
+      <li>A tag of the configuration which can be applied by this macro (i.e.
+      the previous tag).</li>
+
+      <li>A tag of the configuration after the transformation.</li>
+    </ul>
+
+    <p>This allows our system to build up a chain if multiple upgrades need to
+    be applied. The tag can be any name, but will normally refer to the ticket
+    number that introduces the change.</p>
+
+    <p>Every new upgrade macro creates a new tagged version. A named version is
+    simply a tagged version for which a copy of the relevant configuration
+    metadata is made available.</p>
+
+    <p>Named versions for system releases are typically created at the end of
+    the release process. The associated upgrade macro is typically only
+    required in order to create the new name tag and, therefore, does not
+    normally alter the application configuration.</p>
+
+    <p>Application configurations can reference the configuration metadata
+    as follows:</p>
+    <pre>
+#!cfg
+# Refer to the HEAD version
+# (typically you wouldn't do this since no upgrade process is possible)
+meta = my-command
+
+# Refer to a named or tagged version
+meta = my-command/8.3
+meta = my-command/t123
+</pre>
+
+    <p>If a version is defined then the Rose utilities will first look for the
+    corresponding named version. If this cannot be found then the HEAD version
+    is used and, if an upgrade is available, a warning will be given to
+    indicate that the configuration metadata being used requires upgrade macros
+    to be run. If the version defined does not correspond to a tagged version
+    then a warning will be given.</p>
+
+    <h3 id="appendix-upgrade:named">When to create named versions</h3>
+
+    <p>One option is to create a new named version for each release of your
+    system. This makes it easy for users to understand. However, if there is a
+    new release which does not require a change to the metadata then you will
+    still have to create a new copy and force the user to go through a null
+    upgrade which may not be desirable. An alternative is to only create a new
+    named version at releases which require changes. The name then indicates
+    the metadata is relevant for a particular release and all subsequent
+    releases (unless an upgrade macro is available to a later release).</p>
+
+    <p>It is also possible to make any tagged version between releases a named
+    version, but it will usually be better not to. In which case, the user will
+    be using HEAD and will be prompted to upgrade (which is probably what you
+    want if you're not using a release).</p>
+
+    <h3 id="appendix-upgrade:share">Sharing metadata between different
+    executables</h3>
+
+    <p>If 2 different commands share the majority of their inputs then you may
+    choose to use the same configuration metadata for both commands. Any
+    differences (in terms of available inputs) can then be triggered by the
+    command in use. Whether this is desirable will partly depend on how many of
+    the inputs are shared.</p>
+
+    <p>One downside of sharing metadata is that your application configuration
+    may contain (ignored) settings which have no relevance to the command you
+    are using.</p>
+
+    <p>Note that we intend to introduce support for configuration metadata to
+    include / inherit from other metadata. This may mean that it makes sense to
+    have separate metadata for different commands even when the majority of
+    inputs are shared.</p>
+
+    <p>Another reason you may want to share metadata is if you have 2 related
+    commands which you want to configure using the same set of inputs (i.e. a
+    single application configuration).</p>
+
+    <p>This works by setting an alternate command in the application
+    configuration and then using the `--command-key` option to `rose
+    app-run`.</p>
+
+    <h3 id="appendix-upgrade:dev">Using development versions of upgrade
+    macros</h3>
+
+    <p>Users will be able to test out development versions of the upgrade
+    macros by adding a working copy of the relevant branch into their metadata
+    search path. However, care must be taken when doing this. Running the
+    upgrade macro will change the `meta` setting to refer to the new tag. If
+    the upgrade macro is subsequently changed or other upgrade macros are added
+    to the chain prior to this tag (because they get committed to the trunk
+    first) then this will result in application configurations which have not
+    gone through the correct upgrade process. Therefore, when using development
+    versions of the upgrade macros it is safest to not commit any resulting
+    changes (or to use a branch of the suite which you are happy to
+    discard).</p>
   </div>
 </body>
 </html>

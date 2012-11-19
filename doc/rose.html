@@ -25,7 +25,8 @@
       See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.<br />
+      "license">Open Government Licence</a>.
+      <br />
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
@@ -53,6 +54,9 @@
           <li><a href="rose-install.html#rose">Configuring Rose</a></li>
 
           <li><a href="rose-install.html#rosie">Configuring Rosie</a></li>
+
+          <li><a href="rose-install.html#meta">Storing Configuration
+          Metadata</a></li>
         </ul>
       </li>
 
@@ -132,11 +136,9 @@
                   Changes</a></li>
                 </ul>
               </li>
-              
-              <li>
-                <a href="rose-config-edit.html#layout">Rose Config Edit Layout
-                </a>
-              </li>
+
+              <li><a href="rose-config-edit.html#layout">Rose Config Edit
+              Layout</a></li>
 
               <li>
                 <a href="rose-config-edit.html#customisation">Customising Rose
@@ -244,7 +246,8 @@
 
               <li><a href="rose-conf-meta-dev.html#example">Example</a></li>
 
-              <li><a href="rose-conf-meta-dev.html#upgrade">Upgrade Macros</a></li>
+              <li><a href="rose-conf-meta-dev.html#upgrade">Upgrade
+              Macros</a></li>
             </ul>
           </li>
         </ul>
@@ -300,70 +303,97 @@
               <li><a href=
               "rose-configuration.html#appendix-file-creation-mode">Appendix:
               File Creation Mode</a></li>
+
+              <li><a href=
+              "rose-configuration.html#appendix-metadata-location">Appendix:
+              Metadata Location</a></li>
+
+              <li><a href="rose-configuration.html#appendix-upgrade">Appendix:
+              Upgrade and Versions</a></li>
             </ul>
           </li>
 
           <li>
             <a href="rose-command.html">CLI</a>
+
             <ul>
-                <li><a HREF="rose-command.html#rose-cli-overview">
-                    Overview</a></li>
-                <li><a HREF="rose-command.html#rose-ana">
-                    rose ana</a></li>
-                <li><a HREF="rose-command.html#rose-app-run">
-                    rose app-run</a></li>
-                <li><a HREF="rose-command.html#rose-config">
-                    rose config</a></li>
-                <li><a HREF="rose-command.html#rose-config-edit">
-                    rose config-edit</a></li>
-                <li><a HREF="rose-command.html#rose-edit">
-                    rose edit</a></li>
-                <li><a HREF="rose-command.html#rose-host-select">
-                    rose host-select</a></li>
-                <li><a HREF="rose-command.html#rose-macro">
-                    rose macro</a></li>
-                <li><a HREF="rose-command.html#rose-metadata-gen">
-                    rose metadata-gen</a></li>
-                <li><a HREF="rose-command.html#rose-mpi-launch">
-                    rose mpi-launch</a></li>
-                <li><a HREF="rose-command.html#rose-namelist-dump">
-                    rose namelist-dump</a></li>
-                <li><a HREF="rose-command.html#rose-rug-brief-tour">
-                    rose rug-brief-tour</a></li>
-                <li><a HREF="rose-command.html#rose-stem">
-                    rose stem</a></li>
-                <li><a HREF="rose-command.html#rose-suite-gcontrol">
-                    rose suite-gcontrol</a></li>
-                <li><a HREF="rose-command.html#rose-suite-hook">
-                    rose suite-hook</a></li>
-                <li><a HREF="rose-command.html#rose-suite-log-view">
-                    rose suite-log-view</a></li>
-                <li><a HREF="rose-command.html#rose-suite-run">
-                    rose suite-run</a></li>
-                <li><a HREF="rose-command.html#rose-suite-scan">
-                    rose suite-scan</a></li>
-                <li><a HREF="rose-command.html#rose-task-env">
-                    rose task-env</a></li>
-                <li><a HREF="rose-command.html#rose-task-run">
-                    rose task-run</a></li>
-                <li><a HREF="rose-command.html#rose-test-suite">
-                    rose test-suite</a></li>
-                <li><a HREF="rose-command.html#rosie-checkout">
-                    rosie checkout</a></li>
-                <li><a HREF="rose-command.html#rosie-copy">
-                    rosie copy</a></li>
-                <li><a HREF="rose-command.html#rosie-create">
-                    rosie create</a></li>
-                <li><a HREF="rose-command.html#rosie-delete">
-                    rosie delete</a></li>
-                <li><a HREF="rose-command.html#rosie-go">
-                    rosie go</a></li>
-                <li><a HREF="rose-command.html#rosie-id">
-                    rosie id</a></li>
-                <li><a HREF="rose-command.html#rosie-lookup">
-                    rosie lookup</a></li>
-                <li><a HREF="rose-command.html#rosie-ls">
-                    rosie ls</a></li>
+              <li><a href=
+              "rose-command.html#rose-cli-overview">Overview</a></li>
+
+              <li><a href="rose-command.html#rose-ana">rose ana</a></li>
+
+              <li><a href="rose-command.html#rose-app-run">rose
+              app-run</a></li>
+
+              <li><a href="rose-command.html#rose-config">rose config</a></li>
+
+              <li><a href="rose-command.html#rose-config-edit">rose
+              config-edit</a></li>
+
+              <li><a href="rose-command.html#rose-edit">rose edit</a></li>
+
+              <li><a href="rose-command.html#rose-host-select">rose
+              host-select</a></li>
+
+              <li><a href="rose-command.html#rose-macro">rose macro</a></li>
+
+              <li><a href="rose-command.html#rose-metadata-gen">rose
+              metadata-gen</a></li>
+
+              <li><a href="rose-command.html#rose-mpi-launch">rose
+              mpi-launch</a></li>
+
+              <li><a href="rose-command.html#rose-namelist-dump">rose
+              namelist-dump</a></li>
+
+              <li><a href="rose-command.html#rose-rug-brief-tour">rose
+              rug-brief-tour</a></li>
+
+              <li><a href="rose-command.html#rose-stem">rose stem</a></li>
+
+              <li><a href="rose-command.html#rose-suite-gcontrol">rose
+              suite-gcontrol</a></li>
+
+              <li><a href="rose-command.html#rose-suite-hook">rose
+              suite-hook</a></li>
+
+              <li><a href="rose-command.html#rose-suite-log-view">rose
+              suite-log-view</a></li>
+
+              <li><a href="rose-command.html#rose-suite-run">rose
+              suite-run</a></li>
+
+              <li><a href="rose-command.html#rose-suite-scan">rose
+              suite-scan</a></li>
+
+              <li><a href="rose-command.html#rose-task-env">rose
+              task-env</a></li>
+
+              <li><a href="rose-command.html#rose-task-run">rose
+              task-run</a></li>
+
+              <li><a href="rose-command.html#rose-test-suite">rose
+              test-suite</a></li>
+
+              <li><a href="rose-command.html#rosie-checkout">rosie
+              checkout</a></li>
+
+              <li><a href="rose-command.html#rosie-copy">rosie copy</a></li>
+
+              <li><a href="rose-command.html#rosie-create">rosie
+              create</a></li>
+
+              <li><a href="rose-command.html#rosie-delete">rosie
+              delete</a></li>
+
+              <li><a href="rose-command.html#rosie-go">rosie go</a></li>
+
+              <li><a href="rose-command.html#rosie-id">rosie id</a></li>
+
+              <li><a href="rose-command.html#rosie-lookup">rosie
+              lookup</a></li>
+
+              <li><a href="rose-command.html#rosie-ls">rosie ls</a></li>
             </ul>
           </li>
 
@@ -453,58 +483,93 @@
               </li>
             </ul>
           </li>
-          <li><a href="rose-variables.html">Variables</a>
+
+          <li>
+            <a href="rose-variables.html">Variables</a>
+
             <ul>
               <li><a href="rose-variables.html#NPROC">NPROC</a></li>
+
               <li><a href="rose-variables.html#ROSE_DATA">ROSE_DATA</a></li>
+
               <li><a href="rose-variables.html#ROSE_DATAC">ROSE_DATAC</a></li>
-              <li><a href="rose-variables.html#ROSE_DATAC_TIME">
-              ROSE_DATAC????</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_DATAC_TIME">ROSE_DATAC????</a></li>
+
               <li><a href="rose-variables.html#ROSE_ETC">ROSE_ETC</a></li>
+
               <li><a href="rose-variables.html#ROSE_HOME">ROSE_HOME</a></li>
-              <li><a href="rose-variables.html#ROSE_HOME_BIN">
-              ROSE_HOME_BIN</a></li>
-              <li><a href="rose-variables.html#ROSE_LAUNCH_INNER">
-              ROSE_LAUNCH_INNER</a></li>
-              <li><a href="rose-variables.html#ROSE_LAUNCHER">
-              ROSE_LAUNCHER</a></li>
-              <li><a href="rose-variables.html#ROSE_LAUNCHER_LIST">
-              ROSE_LAUNCHER_LIST</a></li>
-              <li><a href="rose-variables.html#ROSE_LAUNCHER_MPICH">
-              ROSE_LAUNCHER_MPICH</a></li>
-              <li><a href="rose-variables.html#ROSE_LAUNCHER_PREOPTS">
-              ROSE_LAUNCHER_PREOPTS</a></li>
-              <li><a href="rose-variables.html#ROSE_LAUNCHER_POSTOPTS">
-              ROSE_LAUNCHER_POSTOPTS</a></li>
-              <li><a href="rose-variables.html#ROSE_LAUNCHER_ULIMIT_OPTS">
-              ROSE_LAUNCHER_ULIMIT_OPTS</a></li>
-              <li><a href="rose-variables.html#ROSE_NS">ROSE_NS</a></li>
-              <li><a href="rose-variables.html#ROSE_ORIG_HOST">
-              ROSE_ORIG_HOST</a></li>
-              <li><a href="rose-variables.html#ROSE_SUITE_DIR">
-              ROSE_SUITE_DIR</a></li>
-              <li><a href="rose-variables.html#ROSE_SUITE_NAME">
-              ROSE_SUITE_NAME</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_APP">
-              ROSE_TASK_APP</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_CYCLE_TIME">
-              ROSE_TASK_CYCLE_TIME</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_LOG_ROOT">
-              ROSE_TASK_LOG_ROOT</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_N_JOBS">
-              ROSE_TASK_N_JOBS</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_NAME">
-              ROSE_TASK_NAME</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_OPTIONS">
-              ROSE_TASK_OPTIONS</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_PRE_SCRIPT">
-              ROSE_TASK_PRE_SCRIPT</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_PREFIX">
-              ROSE_TASK_PREFIX</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_SUFFIX">
-              ROSE_TASK_SUFFIX</a></li>
-              <li><a href="rose-variables.html#ROSE_TASK_UTIL">
-              ROSE_TASK_UTIL</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_HOME_BIN">ROSE_HOME_BIN</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_LAUNCH_INNER">ROSE_LAUNCH_INNER</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_LAUNCHER">ROSE_LAUNCHER</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_LAUNCHER_LIST">ROSE_LAUNCHER_LIST</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_LAUNCHER_MPICH">ROSE_LAUNCHER_MPICH</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_LAUNCHER_PREOPTS">ROSE_LAUNCHER_PREOPTS</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_LAUNCHER_POSTOPTS">ROSE_LAUNCHER_POSTOPTS</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_LAUNCHER_ULIMIT_OPTS">ROSE_LAUNCHER_ULIMIT_OPTS</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_META_PATH">ROSE_META_PATH</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_NS">ROSE_NS</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_ORIG_HOST">ROSE_ORIG_HOST</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_SUITE_DIR">ROSE_SUITE_DIR</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_SUITE_NAME">ROSE_SUITE_NAME</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_APP">ROSE_TASK_APP</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_CYCLE_TIME">ROSE_TASK_CYCLE_TIME</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_LOG_ROOT">ROSE_TASK_LOG_ROOT</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_N_JOBS">ROSE_TASK_N_JOBS</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_NAME">ROSE_TASK_NAME</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_OPTIONS">ROSE_TASK_OPTIONS</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_PRE_SCRIPT">ROSE_TASK_PRE_SCRIPT</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_PREFIX">ROSE_TASK_PREFIX</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_SUFFIX">ROSE_TASK_SUFFIX</a></li>
+
+              <li><a href=
+              "rose-variables.html#ROSE_TASK_UTIL">ROSE_TASK_UTIL</a></li>
+
               <li><a href="rose-variables.html#ROSE_UTIL">ROSE_UTIL</a></li>
             </ul>
           </li>

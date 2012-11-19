@@ -45,12 +45,12 @@
     known to work on AIX-7.1. Web based Rose utilities requires a web browser
     compliant to XHTML 1.0, JavaScript 1.8 and CSS 2.1.</p>
 
-    <p>Rose is distributed as source, or in the form of a compressed tar file. If
-    it is a compressed tar file, un-pack the tar file into an appropriate location
-    on your system. Add the <samp>bin/</samp> directory into your <var>PATH</var>
-    environment variable. Once you have done this you should now have access to
-    the Rose user utilities, assuming that you have met the requirements described
-    in the below:</p>
+    <p>Rose is distributed as source, or in the form of a compressed tar file.
+    If it is a compressed tar file, un-pack the tar file into an appropriate
+    location on your system. Add the <samp>bin/</samp> directory into your
+    <var>PATH</var> environment variable. Once you have done this you should
+    now have access to the Rose user utilities, assuming that you have met the
+    requirements described in the below:</p>
 
     <dl>
       <dt><a href="http://www.gnu.org/software/bash/">GNU Bash</a></dt>
@@ -152,13 +152,14 @@
         <p><dfn>requirements:</dfn> 1.6.</p>
       </dd>
 
-      <dt><a href="http://www.metoffice.gov.uk/research/collaboration/fcm/">FCM</a></dt>
+      <dt><a href=
+      "http://www.metoffice.gov.uk/research/collaboration/fcm/">FCM</a></dt>
 
       <dd>
         <p><dfn>used by:</dfn> Rosie, as the normal wrapper on top of
         Subversion; <code>rose suite-run</code> recognises FCM location
-        keywords in file configurations; <code>rose task-run</code> has built-in
-        task utilities for running <code>fcm make</code>.</p>
+        keywords in file configurations; <code>rose task-run</code> has
+        built-in task utilities for running <code>fcm make</code>.</p>
 
         <p><dfn>version known to work:</dfn> HEAD.</p>
 
@@ -268,6 +269,22 @@ rosie create
     <pre>
 rosie lookup 001
 </pre>
+
+    <h2 id="meta">Storing Configuration Metadata</h2>
+
+    <p>Some <a href="rose-configuration.html#meta">configuration metadata</a>
+    will need to be centrally stored in a globally readable location. Projects
+    using Rose will usually have metadata stored under a <samp>rose-meta</samp>
+    directory in their source tree, and this needs to be centrally located in
+    order to be retrieved by Rose utilities such as the config editor.</p>
+
+    <p>Each sub-directory under a <samp>rose-meta</samp> directory needs to be
+    replicated under a central location. The central location should be stored
+    as the value of the site configuration <samp>meta-path</samp> option.</p>
+
+    <p>For full details, see <a href=
+    "rose-configuration.html#appendix-metadata-location">Metadata
+    Location</a>.</p>
   </div>
 </body>
 </html>
