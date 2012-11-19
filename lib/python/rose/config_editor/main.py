@@ -1996,7 +1996,7 @@ if __name__ == '__main__':
     rose.macro.add_env_meta_path()
     if opts.meta_path is not None:
         opts.meta_path.reverse()
-        for child_paths in [arg.split(":") for arg in opts.meta_path]:
+        for child_paths in [arg.split(os.pathsep) for arg in opts.meta_path]:
             child_paths.reverse()
             for path in child_paths:
                 sys.path.insert(0, os.path.abspath(path))

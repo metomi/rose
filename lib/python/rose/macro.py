@@ -210,14 +210,16 @@ def add_site_meta_path():
     conf = rose.resource.ResourceLocator.default().get_conf()
     path = conf.get_value([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_PATH])
     if path is not None:
-        sys.path.insert(0, os.path.expanduser(os.path.expandvars(path)))
+        for path in path.split(os.pathsep):
+            sys.path.insert(0, os.path.expanduser(os.path.expandvars(path)))
 
 
 def add_env_meta_path():
     """Load the environment variable ROSE_META_PATH, if defined."""
-    env_meta_path = os.environ.get("ROSE_META_PATH")
-    if env_meta_path is not None:
-        sys.path.insert(0, env_meta_path)
+    path = os.environ.get("ROSE_META_PATH")
+    if path is not None:
+        for path in path.split(os.pathsep):
+            sys.path.insert(0, os.path.expanduser(os.path.expandvars(path)))
 
 
 def load_meta_path(config=None, directory=None, is_upgrade=False,
@@ -653,7 +655,11 @@ def parse_macro_mode_args(mode="macro", argv=None):
         opts.conf_dir = os.getcwd()
     sys.path.append(os.getenv("ROSE_HOME"))
     if opts.meta_path is not None:
-        sys.path = opts.meta_path + sys.path
+        opts.meta_path.reverse()
+        for child_paths in [arg.split(os.pathsep) for arg in opts.meta_path]:
+            child_paths.reverse()
+            for path in child_paths:
+                sys.path.insert(0, os.path.abspath(path))
     config_name = os.path.basename((os.path.abspath(opts.conf_dir)))
     config_file_path = os.path.join(opts.conf_dir,
                                     rose.SUB_CONFIG_NAME)
