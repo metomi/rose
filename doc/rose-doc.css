@@ -234,6 +234,10 @@ h1 {
     display: inline;
 }
 
+.alwayshidden {
+    display: none
+}
+
 /**********************************************************************
  * BORDER-RADIUS
  *

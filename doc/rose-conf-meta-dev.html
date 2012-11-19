@@ -81,7 +81,7 @@
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Introduction: reference</h3>
+      <h3 class="alwayshidden">Introduction: reference</h3>
 
       <p>For reference and a fuller picture of Rose configuration metadata,
       please refer to the <a href="rose-configuration.html#meta">Rose Reference
@@ -102,7 +102,7 @@
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: text editor</h3>
+      <h3 class="alwayshidden">Example: text editor</h3>
 
       <p>Open the Rose application file (<code>rose-app.conf</code>) in this
       directory. It should look like this:</p>
@@ -119,7 +119,7 @@ WORLD = Mars
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: config editor</h3>
+      <h3 class="alwayshidden">Example: config editor</h3>
 
       <p>Open this application directory in the Rose config editor by
       typing:</p>
@@ -136,7 +136,7 @@ rose edit
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata</h3>
+      <h3 class="alwayshidden">Example: metadata</h3>
 
       <p>Let's create a metadata directory and start adding some
       information.</p>
@@ -151,7 +151,7 @@ rose edit
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata directory</h3>
+      <h3 class="alwayshidden">Example: metadata directory</h3>
 
       <p>Create the sub directory <code>meta</code> in your application
       directory:</p>
@@ -170,7 +170,7 @@ touch meta/rose-meta.conf
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata setting</h3>
+      <h3 class="alwayshidden">Example: metadata setting</h3>
 
       <p>Let's provide some type information about <var>MAX_TARGETS</var>. The
       id for this variable is <var>env=MAX_TARGETS</var>, so add a section into
@@ -181,7 +181,7 @@ touch meta/rose-meta.conf
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata type</h3>
+      <h3 class="alwayshidden">Example: metadata type</h3>
 
       <p>We can specify that it's an integer by giving it a type:</p>
       <pre>
@@ -191,7 +191,7 @@ type = integer
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata title</h3>
+      <h3 class="alwayshidden">Example: metadata title</h3>
 
       <p>We could also improve the way it's displayed by giving it a title:</p>
       <pre>
@@ -202,7 +202,7 @@ type = integer
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>Now if we save the file and open the application in the config editor
       again, we see that the value of <var>MAX_TARGETS</var> now appears in a
@@ -217,7 +217,7 @@ type = integer
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata range</h3>
+      <h3 class="alwayshidden">Example: metadata range</h3>
 
       <p>We've set the type of <var>MAX_TARGETS</var> to <samp>integer</samp>,
       but we haven't ruled out choices of integer that would crash our code,
@@ -232,7 +232,7 @@ type = integer
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>This means that any integer less than zero will be flagged as a
       problem. With the Metadata switched on, try decreasing the value of
@@ -242,7 +242,7 @@ type = integer
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata description</h3>
+      <h3 class="alwayshidden">Example: metadata description</h3>
 
       <p>Let's now make the <var>WORLD</var> setting less ambiguous. Create a
       section in the metadata</p>
@@ -259,7 +259,7 @@ title = World
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>If you close and open the config editor again, (or switch the metadata
       off and on), you'll see that <var>WORLD</var> now has some helpful
@@ -267,7 +267,7 @@ title = World
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata pattern</h3>
+      <h3 class="alwayshidden">Example: metadata pattern</h3>
 
       <p>We'll decide to be harsh about grammar and insist that the first
       letter of <var>WORLD</var> must be capitalised. To do this, we can use a
@@ -281,7 +281,7 @@ title = World
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>Reload the config editor (metadata off/on or close and reopen) and
       change the first letter of the value of <var>WORLD</var> to
@@ -296,7 +296,7 @@ title = World
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata values</h3>
+      <h3 class="alwayshidden">Example: metadata values</h3>
 
       <p>Alternatively, we could just give a list of valid world names - this
       means we won't need a regular expression or any other type information.
@@ -313,7 +313,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>Now when you open the application in the config editor, you'll get a
       drop-down list of worlds to choose from. Isn't that nice! Rose will now
@@ -322,7 +322,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata trigger</h3>
+      <h3 class="alwayshidden">Example: metadata trigger</h3>
 
       <p>Looking at the other variable in the configuration, it doesn't appear
       as if we really need a Jupiter language <var>LANG_JUPITER</var> set when
@@ -340,7 +340,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata trigger explanation</h3>
+      <h3 class="alwayshidden">Example: metadata trigger explanation</h3>
 
       <p>This means that <var>LANG_JUPITER</var> will be <em>ignored</em> when
       <var>WORLD</var> is not <samp>Jupiter</samp> - but it will be
@@ -349,14 +349,14 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata trigger explanation</h3>
+      <h3 class="alwayshidden">Example: metadata trigger explanation</h3>
 
       <p>Set <var>WORLD</var> to <samp>Jupiter</samp>. Next, either save and
       reopen the config editor, or just switch metadata off and on.</p>
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>Now when you change the value of <var>WORLD</var> to
       <samp>Saturn</samp>, or any other planet, <var>LANG_JUPITER</var> will be
@@ -367,7 +367,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: add more metadata</h3>
+      <h3 class="alwayshidden">Example: add more metadata</h3>
 
       <p>When you're done, change <var>WORLD</var> to <samp>Earth</samp> and
       save.</p>
@@ -377,7 +377,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata memories</h3>
+      <h3 class="alwayshidden">Example: metadata memories</h3>
 
       <p>An important advantage of adding metadata is that it acts as a memory
       of inputs. If you remove <var>WORLD</var> (in a text editor or using the
@@ -388,7 +388,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata ghosts</h3>
+      <h3 class="alwayshidden">Example: metadata ghosts</h3>
 
       <p>If you then re-open the <var>WORLD</var>-less application in the
       config editor, you can navigate to the <code>env</code> page and see that
@@ -404,7 +404,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata help</h3>
+      <h3 class="alwayshidden">Example: metadata help</h3>
 
       <p>Let's add some proper help for <var>LANG_JUPITER</var> - Jovian
       linguistics are notoriously difficult. Add:</p>
@@ -420,7 +420,7 @@ help = This variable controls which language to use when saying hello
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>If you open the application in the config editor, or switch metadata
       off and on, you can now click on the title of <var>LANG_JUPITER</var> or
@@ -428,7 +428,7 @@ help = This variable controls which language to use when saying hello
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata for sections</h3>
+      <h3 class="alwayshidden">Example: metadata for sections</h3>
 
       <p>Let's improve the look of the <code>page</code> by adding metadata for
       the section:</p>
@@ -443,7 +443,7 @@ title = Environment
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>On reload of the config editor, this gives a hover-over text
       (description) when the mouse is over the page name, and a menu option for
@@ -451,7 +451,7 @@ title = Environment
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata namespace</h3>
+      <h3 class="alwayshidden">Example: metadata namespace</h3>
 
       <p>We can also swap variables in and out of pages, regardless of whether
       they belong in the <code>env</code> application section or not. Let's
@@ -469,7 +469,7 @@ ns = languages
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>A reload of the config editor will show that <var>LANG_JUPITER</var>
       has been moved to a different page called languages. This can be useful
@@ -478,7 +478,7 @@ ns = languages
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: metadata url</h3>
+      <h3 class="alwayshidden">Example: metadata url</h3>
 
       <p>Sometimes just having help or descriptions isn't enough, or there's a
       more relevant resource page on the Web - in this case you can add a url
@@ -497,7 +497,7 @@ url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: view changes</h3>
+      <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>This can be accessed via the variable button menu (<var>Web
       Help</var>) in the config editor on reload, or via clicking on the
@@ -505,7 +505,7 @@ url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Example: reference</h3>
+      <h3 class="alwayshidden">Example: reference</h3>
 
       <p>We've finished! However, there are other things you can do with
       configuration metadata. Make sure you have a good idea of when to use

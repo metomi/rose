@@ -74,7 +74,7 @@
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Introduction: Two Tours</h3>
+      <h3 class="alwayshidden">Introduction: Two Tours</h3>
 
       <p>Rose gives powerful command line utilities, and can be entirely used
       within a terminal and text editor. Rose also contains graphical user
@@ -98,7 +98,7 @@
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Create a Suite: lookup</h3>
+      <h3 class="alwayshidden">Create a Suite: lookup</h3>
 
       <p>Open a Linux/Unix terminal, issue the command:</p>
       <pre class="shell">
@@ -116,7 +116,7 @@ mo1-ro513/trunk@100     rosemary        rose    RUG brief tour
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Create a Suite: copy/create</h3>
+      <h3 class="alwayshidden">Create a Suite: copy/create</h3>
 
       <p>To create a new suite, and copy items from an existing suite, e.g.
       <samp>mo1-ro513</samp>, issue the command:</p>
@@ -135,7 +135,7 @@ rosie create
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Create a Suite: location</h3>A new suite will have been
+      <h3 class="alwayshidden">Create a Suite: location</h3>A new suite will have been
       created in the version control system, with a local copy created (i.e.
       checked out) at <samp>$HOME/roses/$ID</samp> where <var>$ID</var> is a
       unique ID for the new suite.
@@ -154,7 +154,7 @@ rose rug-brief-tour
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Populate and/or Modify the Suite: rose-suite.conf</h3>
+      <h3 class="alwayshidden">Populate and/or Modify the Suite: rose-suite.conf</h3>
 
       <p>You will find the following files and sub-directories:</p>
 
@@ -167,7 +167,7 @@ rose rug-brief-tour
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Populate and/or Modify the Suite: suite.rc</h3>
+      <h3 class="alwayshidden">Populate and/or Modify the Suite: suite.rc</h3>
 
       <ul>
         <li>A <kbd>suite.rc</kbd> file: This is used to define configurations
@@ -190,7 +190,7 @@ rose rug-brief-tour
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Populate and/or Modify the Suite: suite.rc purpose</h3>
+      <h3 class="alwayshidden">Populate and/or Modify the Suite: suite.rc purpose</h3>
 
       <p>This is a <em>cycling</em> suite that repeats every 6 hours, with the
       first cycle starting at <samp>2013010100</samp> (00:00, 1 January 2013)
@@ -201,7 +201,7 @@ rose rug-brief-tour
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Populate and/or Modify the Suite: sub-directories</h3>
+      <h3 class="alwayshidden">Populate and/or Modify the Suite: sub-directories</h3>
 
       <ul>
         <li>Sub-directories:
@@ -228,7 +228,7 @@ rose rug-brief-tour
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Populate and/or Modify the Suite: commit</h3>
+      <h3 class="alwayshidden">Populate and/or Modify the Suite: commit</h3>
 
       <p>At this point, you may want to have a look at the files before moving
       on to the next section. You may also want to commit your suite back to
@@ -253,7 +253,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Run the Suite: gcontrol</h3>
+      <h3 class="alwayshidden">Run the Suite: gcontrol</h3>
 
       <p>Note: If you quit <code>cylc gcontrol</code> by mistake, you can
       restart it by typing <code>rose suite-gcontrol $ID</code> on the command
@@ -261,7 +261,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Run the Suite: output</h3>
+      <h3 class="alwayshidden">Run the Suite: output</h3>
 
       <h3>View the Output</h3>
 
@@ -275,7 +275,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Run the Suite: output viewer</h3>
+      <h3 class="alwayshidden">Run the Suite: output viewer</h3>
 
       <p>The sub-directory <samp>log/</samp> also contains a HTML-based viewer
       which allows you to view the output from a completed suite via a web
@@ -291,7 +291,7 @@ firefox log/index.html
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Run the Suite: share and work directories</h3>
+      <h3 class="alwayshidden">Run the Suite: share and work directories</h3>
 
       <p>The <samp>share/</samp> sub-directory is used by the tasks in the
       suite to share files. In this example suite, the build created by the
@@ -303,7 +303,7 @@ firefox log/index.html
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Tidy up the Suite</h3>
+      <h3 class="alwayshidden">Tidy up the Suite</h3>
 
       <p>You should commit your suite if you have just created it or made any
       changes. Tidy up by removing your <samp>roses/$ID</samp> directory:</p>
@@ -318,7 +318,7 @@ rosie checkout $ID # replace $ID with your new suite ID
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Command Help</h3>
+      <h3 class="alwayshidden">Command Help</h3>
 
       <p>For help with Rose and Rosie commands, see the <a href=
       "rose-command.html">Command Reference</a>.</p>
@@ -345,7 +345,7 @@ rosie go
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Suite Discovery GUI: toolbar</h3>
+      <h3 class="alwayshidden">Suite Discovery GUI: toolbar</h3>
 
       <p>You could find other suites by using the toolbar search and searching
       for text strings, or using the advanced query panel (show it by clicking
@@ -356,7 +356,7 @@ rosie go
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Suite Discovery GUI: checkout and edit</h3>
+      <h3 class="alwayshidden">Suite Discovery GUI: checkout and edit</h3>
 
       <p>Look at the list to find the row that has the suite $ID, project, and
       title from the command line tour. If you double-click on it, your suite
@@ -378,7 +378,7 @@ rosie go
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Config Editor GUI: launch page</h3>
+      <h3 class="alwayshidden">Config Editor GUI: launch page</h3>
 
       <p>On the left hand side is a panel containing a tree with named nodes.
       If you expand these, you can see that this represents the suite and
@@ -388,7 +388,7 @@ rosie go
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Config Editor GUI: alter variable</h3>
+      <h3 class="alwayshidden">Config Editor GUI: alter variable</h3>
 
       <p>A page should have launched in the right hand panel. This contains
       widgets for altering the <samp>env</samp> section of the application
@@ -402,7 +402,7 @@ rosie go
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Config Editor GUI: help for variable</h3>
+      <h3 class="alwayshidden">Config Editor GUI: help for variable</h3>
 
       <p>If you move the mouse over the setting names, you can see some
       descriptive text. You can access further help by clicking the little menu
@@ -411,7 +411,7 @@ rosie go
     </div>
 
     <div class="slide">
-      <h3 style="display:none">Config Editor GUI: run suite</h3>
+      <h3 class="alwayshidden">Config Editor GUI: run suite</h3>
 
       <p>Finally, you can run your suite by clicking the <samp>Suite Run</samp>
       button on the toolbar or selecting <kbd>Tools -&gt; Run Suite -&gt;
