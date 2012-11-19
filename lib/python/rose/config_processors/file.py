@@ -108,13 +108,22 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             targets[name].mode = node.get_value(["mode"])
 
         # Where applicable, determine for each source:
-        # * Its invariant name.
+        # * Its real name.
+        # * The checksums of its paths.
         # * Whether it can be considered unchanged.
         for source in sources.values():
             try:
-                self._source_parse(source, config)
+                self.loc_handlers_manager.parse(source, config)
             except ValueError as e:
                 raise ConfigProcessError([key, "location"], source.name, e)
+            prev_source = self.loc_dao.select(source.name)
+            source.is_out_of_date = (
+                    not prev_source or
+                    (not source.key and not source.paths) or
+                    prev_source.scheme != source.scheme or
+                    prev_source.loc_type != source.loc_type or
+                    prev_source.key != source.key or
+                    prev_source.paths != source.paths)
 
         # Inspect each target to see if it is out of date:
         # * Target does not already exist.
@@ -207,13 +216,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             self.handle_event(event)
 
     def process_job(self, job, config, work_dir):
-        """Process a job, helper for process."""
+        """Process a job, helper for "process"."""
         for key, method in [(job.INSTALL, self._target_install),
                             (job.PULL, self._source_pull)]:
             if job.action_key == key:
                 return method(job.loc, config, work_dir)
 
     def post_process_job(self, job, config, *args):
+        """Post-process a successful job, helper for "process"."""
+        # TODO: auto decompression of tar, gzip, etc?
         self.loc_dao.update(job.loc)
 
     def set_event_handler(self, event_handler):
@@ -223,20 +234,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         except AttributeError:
             pass
 
-    def _source_parse(self, source, config):
-        self.loc_handlers_manager.parse(source, config)
-        prev_source = self.loc_dao.select(source.name)
-        source.is_out_of_date = (
-                not prev_source or
-                (not source.key and not source.paths) or
-                prev_source.scheme != source.scheme or
-                prev_source.loc_type != source.loc_type or
-                prev_source.key != source.key or
-                prev_source.paths != source.paths)
-
     def _source_pull(self, source, config, work_dir):
+        """Pulls a source to its cache in the work directory."""
+        # TODO: determine the cache location here?
         return self.loc_handlers_manager.pull(source, config, work_dir)
-        # TODO: handle uncompression
 
     def _target_install(self, target, config, work_dir):
         """Install target.
