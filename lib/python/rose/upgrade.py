@@ -212,8 +212,8 @@ class MacroUpgradeManager(object):
 
     def load_all_tags(self):
         """Load an ordered list of the available upgrade macros."""
-        meta_path = rose.macro.load_meta_path(self.app_config,
-                                              is_upgrade=True)
+        meta_path, warning = rose.macro.load_meta_path(self.app_config,
+                                                       is_upgrade=True)
         if meta_path is None:
             raise OSError(rose.macro.ERROR_LOAD_CONF_META_NODE)
         sys.path.append(os.path.abspath(meta_path))
