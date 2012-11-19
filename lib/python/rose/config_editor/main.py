@@ -1973,14 +1973,6 @@ def get_number_of_configs(config_directory_path=None):
     return number_to_load
 
 
-def load_site_config_path():
-    """Load any metadata path specified in a user or site configuration."""
-    conf = rose.resource.ResourceLocator.default().get_conf()
-    path = conf.get_value([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_PATH])
-    if path is not None:
-        sys.path.insert(0, path)
-
-
 if __name__ == '__main__':
     if (gtk.pygtk_version[0] < rose.config_editor.MIN_PYGTK_VERSION[0]
         or gtk.pygtk_version[1] < rose.config_editor.MIN_PYGTK_VERSION[1]):
@@ -2000,7 +1992,7 @@ if __name__ == '__main__':
     if args:
         opt_parser.print_usage(sys.stderr)
         sys.exit(2)
-    load_site_config_path()
+    rose.macro.add_site_meta_path()
     if opts.meta_path is not None:
         opts.meta_path.reverse()
         for child_paths in [arg.split(":") for arg in opts.meta_path]:

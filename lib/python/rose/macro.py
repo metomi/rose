@@ -41,9 +41,9 @@ ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate",
                                "downgrade", "upgrade"]
 ERROR_LOAD_CONFIG_DIR = "{0}: not an application directory.\n"
 ERROR_LOAD_MACRO = "Could not load macro {0}: {1}"
-ERROR_LOAD_METADATA_DIR = "Could not find metadata directory.\n"
-ERROR_LOAD_METADATA = "Could not load metadata {0}: {1}"
-ERROR_LOAD_META_PATH = "Could not find {0}\n"
+ERROR_LOAD_METADATA = "Could not load metadata {0}\n"
+ERROR_LOAD_CHOSEN_META_PATH = "Could not find metadata for {0}, using {1}\n"
+ERROR_LOAD_META_PATH = "Could not find metadata for {0}\n"
 ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACROS = "Please specify a macro name.\n"
@@ -205,15 +205,37 @@ class MacroReport(object):
         self.is_warning = is_warning
 
 
-def load_meta_path(config=None, directory=None, is_upgrade=False):
-    """Retrieve the path to the metadata."""
+def add_site_meta_path():
+    """Load any metadata path specified in a user or site configuration."""
+    conf = rose.resource.ResourceLocator.default().get_conf()
+    path = conf.get_value([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_PATH])
+    if path is not None:
+        sys.path.insert(0, os.path.expanduser(os.path.expandvars(path)))
+
+
+def load_meta_path(config=None, directory=None, is_upgrade=False,
+                   locator=None):
+    """Retrieve the path to the configuration metadata directory.
+
+    Arguments:
+        config - a rose config, perhaps with a meta= or project= flag
+        directory - the directory of the rose config file
+        is_upgrade - if True, load the path in an upgrade-specific way
+        locator - a rose.resource.ResourceLocator instance.
+
+    Returns the path to(or None) and a warning message (or None).
+
+    """
     if config is None:
         config = rose.config.ConfigNode()
+    warning = None
     if directory is not None and not is_upgrade:
         config_meta_dir = os.path.join(directory, rose.CONFIG_META_DIR)
-        if os.path.isdir(config_meta_dir):
-            return config_meta_dir
-    locator = rose.resource.ResourceLocator(paths=sys.path)
+        meta_file = os.path.join(config_meta_dir, rose.META_CONFIG_NAME)
+        if os.path.isfile(meta_file):
+            return config_meta_dir, warning
+    if locator is None:
+        locator = rose.resource.ResourceLocator(paths=sys.path)
     opt_node = config.get([rose.CONFIG_SECT_TOP,
                            rose.CONFIG_OPT_META_TYPE], no_ignore=True)
     ignore_meta_error = opt_node is None
@@ -221,27 +243,44 @@ def load_meta_path(config=None, directory=None, is_upgrade=False):
         opt_node = config.get([rose.CONFIG_SECT_TOP,
                                rose.CONFIG_OPT_PROJECT], no_ignore=True)
     if opt_node is None or not opt_node.value:
-        meta_path = "etc/metadata/all"
+        meta_keys = ["etc/metadata/all"]
     else:
-        meta_path = opt_node.value
+        key = opt_node.value
+        if "/" not in key:
+            key = key + "/" + rose.META_DEFAULT_VN_DIR
+        meta_keys = [key]
         if is_upgrade:
-            meta_path = meta_path.split("/")[0]
-        if not meta_path:
-            return None
-    try:
-        meta_path = locator.locate(meta_path)
-    except rose.resource.ResourceError:
-        if not ignore_meta_error:
-            sys.stderr.write(ERROR_LOAD_META_PATH.format(meta_path))
-        return None
-    return meta_path
+            meta_keys = key.split("/")[0]
+        else:
+            default_key = (key.rsplit("/", 1)[0] + "/" +
+                           rose.META_DEFAULT_VN_DIR)
+            if default_key != key:
+                meta_keys.append(default_key)
+    for i, meta_key in enumerate(meta_keys):
+        try:
+            meta_path = locator.locate(os.path.join(meta_key,
+                                                    rose.META_CONFIG_NAME))
+        except rose.resource.ResourceError:
+            continue
+        else:
+            if not ignore_meta_error and i > 0:
+                warning = ERROR_LOAD_CHOSEN_META_PATH.format(meta_keys[0],
+                                                             meta_keys[i])
+            return os.path.dirname(meta_path), warning
+    if not ignore_meta_error:
+        warning = ERROR_LOAD_META_PATH.format(meta_keys[0])
+    return None, warning
 
 
-def load_meta_config(config, directory=None):
+def load_meta_config(config, directory=None, error_handler=None):
     """Return the metadata config for a configuration."""
+    if error_handler is None:
+        error_handler = _report_error
     meta_config = rose.config.ConfigNode()
     meta_list = ['etc/metadata/all/' + rose.META_CONFIG_NAME]
-    config_meta_path = load_meta_path(config, directory)
+    config_meta_path, warning = load_meta_path(config, directory)
+    if warning is not None:
+        error_handler(text=warning)
     if config_meta_path is not None:
         path = os.path.join(config_meta_path, rose.META_CONFIG_NAME)
         if path not in meta_list:
@@ -253,14 +292,14 @@ def load_meta_config(config, directory=None):
     for meta_key in meta_list:
         try:
             meta_path = locator.locate(meta_key)
-        except rose.resource.ResourceError:
+        except rose.resource.ResourceError as e:
             if not ignore_meta_error:
-                sys.stderr.write(ERROR_LOAD_META_PATH.format(meta_path))
+                error_handler(text=ERROR_LOAD_META_PATH.format(meta_path))
         else:
             try:
                 meta_config = rose.config.load(meta_path, meta_config)
             except rose.config.SyntaxError as e:
-                sys.stderr.write(ERROR_LOAD_METADATA.format(meta_path, e))
+                error_handler(text=str(e))
     return meta_config
 
 
@@ -312,9 +351,9 @@ def get_macros_for_config(app_config=None,
     """Driver function to return macro names for a config object."""
     if app_config is None:
         app_config = rose.config.ConfigNode()
-    meta_path = load_meta_path(app_config, config_directory)
+    meta_path, warning = load_meta_path(app_config, config_directory)
     if meta_path is None:
-        sys.exit(ERROR_LOAD_METADATA)
+        sys.exit(ERROR_LOAD_METADATA.format(""))
     meta_filepaths = []
     for dirpath, dirnames, filenames in os.walk(meta_path):
         if "/.svn" in dirpath:
@@ -621,10 +660,13 @@ def parse_macro_mode_args(mode="macro", argv=None):
 
     # Load meta config if it exists.
     meta_config = None
-    meta_path = load_meta_path(app_config, opts.conf_dir)
+    meta_path, warning = load_meta_path(app_config, opts.conf_dir)
     if meta_path is None:
         if mode == "macro":
-            sys.stderr.write(ERROR_LOAD_METADATA)
+            text = ERROR_LOAD_METADATA.format("")
+            if warning:
+                text = warning
+            sys.stderr.write(text)
             return None
     else:
         meta_config_path = os.path.join(meta_path, rose.META_CONFIG_NAME)
@@ -633,8 +675,18 @@ def parse_macro_mode_args(mode="macro", argv=None):
     return app_config, meta_config, config_name, args, opts
 
 
+def _report_error(exception=None, text=""):
+    """This will be replaced by rose.reporter utilities."""
+    if text:
+        text += "\n"
+    if exception is not None:
+        text += type(exception).__name__ + ": " + str(exception) + "\n"
+    sys.stderr.write(text + "\n")
+
+
 def main():
     """Run rose macro."""
+    add_site_meta_path()
     return_objects = parse_macro_mode_args()
     if return_objects is None:
         sys.exit(1)
