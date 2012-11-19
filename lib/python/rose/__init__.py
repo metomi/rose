@@ -36,6 +36,7 @@ SUB_CONFIGS_DIR = 'app'
 SUB_CONFIG_FILE_DIR = 'file'
 INFO_CONFIG_NAME = 'rose-suite.info'
 TOP_CONFIG_NAME = 'rose-suite.conf'
+META_DEFAULT_VN_DIR = "HEAD"
 
 # Configuration specification names
 CONFIG_SECT_CMD = 'command'
