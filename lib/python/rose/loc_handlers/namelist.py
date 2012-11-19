@@ -24,7 +24,8 @@ from hashlib import md5
 import os
 import re
 import rose.config
-from rose.env import env_var_process
+from rose.config_processor import ConfigProcessError
+from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.reporter import Event
 
 
@@ -84,7 +85,10 @@ class NamelistLocHandler(object):
             for key, node in sorted(section_node.value.items()):
                 if node.state:
                     continue
-                value = env_var_process(node.value)
+                try:
+                    value = env_var_process(node.value)
+                except UnboundEnvironmentVariableError as e:
+                    raise ConfigProcessError([section, key], node.value, e)
                 nlg += "%s=%s,\n" % (key, value)
             nlg += "/" + "\n"
             f.write(nlg)

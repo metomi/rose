@@ -179,12 +179,20 @@ setup
 run_pass "$TEST_KEY" rose app-run --config=../config -i
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
-[INFO] content: empty-and-hello.nl <= namelist:empty namelist:hello
-[INFO] content: empty.nl <= namelist:empty
-[INFO] content: hello.nl <= namelist:hello
-[INFO] content: shopping-list-2.nl <= namelist:shopping_list(10) namelist:shopping_list(1)
-[INFO] content: shopping-list.nl <= namelist:shopping_list(:)
-[INFO] content: vegetables.nl <= namelist:vegetables{green}(:)
+[INFO] install: empty-and-hello.nl
+[INFO]     location: namelist:empty
+[INFO]     location: namelist:hello
+[INFO] install: vegetables.nl
+[INFO]     location: namelist:vegetables{green}(:)
+[INFO] install: hello.nl
+[INFO]     location: namelist:hello
+[INFO] install: shopping-list.nl
+[INFO]     location: namelist:shopping_list(:)
+[INFO] install: shopping-list-2.nl
+[INFO]     location: namelist:shopping_list(10)
+[INFO]     location: namelist:shopping_list(1)
+[INFO] install: empty.nl
+[INFO]     location: namelist:empty
 [INFO] command: mkdir out && cp *.nl out/
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -197,7 +205,7 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q \
     '--define=[file:shopping-list-3.nl]content=namelist:shopping_list'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] file:shopping-list-3.nl=content=namelist:shopping_list: namelist:shopping_list: unknown content
+[FAIL] file:shopping-list-3.nl=location=namelist:shopping_list: bad setting
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------

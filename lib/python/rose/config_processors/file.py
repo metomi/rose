@@ -34,7 +34,6 @@ import sqlite3
 import sys
 from tempfile import mkdtemp
 from time import sleep
-import traceback
 from urlparse import urlparse
 
 
@@ -99,9 +98,11 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             name = key[len(self.PREFIX):]
             target_sources = []
             if location_str is not None:
-                for n in shlex.split(location_str):
-                    sources[n] = Loc(n)
-                    target_sources.append(sources[n])
+                for source_name in shlex.split(location_str):
+                    if not sources.has_key(source_name):
+                        sources[source_name] = Loc(source_name)
+                    sources[source_name].used_by_names.append(name)
+                    target_sources.append(sources[source_name])
             targets[name] = Loc(name)
             targets[name].dep_locs = sorted(target_sources)
             targets[name].mode = node.get_value(["mode"])
@@ -110,7 +111,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Its invariant name.
         # * Whether it can be considered unchanged.
         for source in sources.values():
-            self._source_parse(source, config)
+            try:
+                self._source_parse(source, config)
+            except ValueError as e:
+                raise ConfigProcessError([key, "location"], source.name)
 
         # Inspect each target to see if it is out of date:
         # * Target does not already exist.
@@ -164,8 +168,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 else:
                     jobs[target.name] = JobProxy(target, JobProxy.INSTALL)
                     for source in target.dep_locs:
-                        job = JobProxy(source, JobProxy.PULL)
-                        jobs[source.name] = job
+                        if not jobs.has_key(source.name):
+                            jobs[source.name] = JobProxy(source, JobProxy.PULL)
+                        job = jobs[source.name]
                         jobs[target.name].pending_for[source.name] = job
             elif target.mode == "mkdir":
                 self.manager.fs_util.makedirs(target.name)
@@ -181,6 +186,14 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         work_dir = mkdtemp()
         try:
             JobRunner(self)(JobManager(jobs), config, work_dir)
+        except ValueError as e:
+            if e.args and jobs.has_key(e.args[0]):
+                job = jobs[e.args[0]]
+                if job.action_key == job.PULL:
+                    source = job.loc
+                    keys = [self.PREFIX + source.used_by_names[0], "location"]
+                    raise ConfigProcessError(keys, source.name)
+            raise e
         finally:
             rmtree(work_dir)
 
@@ -201,11 +214,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def process_job(self, job, config, work_dir):
         """Process a job, helper for process."""
-        if job.action_key == job.INSTALL:
-            self._target_install(job.loc, config, work_dir)
-        elif job.action_key == job.PULL:
-            self._source_pull(job.loc, config, work_dir)
-        job.state = job.ST_DONE
+        for key, method in [(job.INSTALL, self._target_install),
+                            (job.PULL, self._source_pull)]:
+            if job.action_key == key:
+                return method(job.loc, config, work_dir)
 
     def post_process_job(self, job, config, *args):
         self.loc_dao.update(job.loc)
@@ -366,7 +378,7 @@ class JobManager(object):
 
     def has_jobs(self):
         """Return True if there are ready jobs or working jobs."""
-        return bool(self.ready_jobs) or bool(self.working_jobs)
+        return (bool(self.ready_jobs) or bool(self.working_jobs))
 
     def has_ready_jobs(self):
         """Return True if there are ready jobs."""
@@ -376,6 +388,7 @@ class JobManager(object):
         """Tell the manager that a job has completed."""
         job = self.working_jobs.pop(job_proxy.name)
         job.update(job_proxy)
+        job.state = job.ST_DONE
         for up_key, up_job in job.needed_by.items():
             job.needed_by.pop(up_key)
             up_job.pending_for.pop(job.name)
@@ -410,7 +423,6 @@ class JobProxy(object):
 
     def update(self, other):
         """Update self.loc and self.state with the values of "other"."""
-        self.state = other.state
         self.loc.update(other.loc)
 
 
@@ -466,14 +478,10 @@ class JobRunner(object):
 
 def _job_run(job_processor, job_proxy, *args):
     """Helper for JobRunner."""
-    try:
-        event_handler = JobRunnerWorkerEventHandler()
-        job_processor.set_event_handler(event_handler)
-        job_processor.process_job(job_proxy, *args)
-        job_processor.set_event_handler(None)
-    except Exception as e:
-        traceback.print_exc(file=sys.stderr)
-        raise e
+    event_handler = JobRunnerWorkerEventHandler()
+    job_processor.set_event_handler(event_handler)
+    job_processor.process_job(job_proxy, *args)
+    job_processor.set_event_handler(None)
     return (job_proxy, event_handler.events)
 
 
@@ -518,6 +526,7 @@ class Loc(object):
         self.paths = None
         self.key = None
         self.cache = None
+        self.used_by_names = []
         self.is_out_of_date = None # boolean
 
     def __str__(self):

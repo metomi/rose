@@ -60,10 +60,10 @@ class ConfigProcessError(Exception):
                 setting_str += "=".join(list(self.keys))
             if self.value is not None:
                 setting_str += "=%s" % str(self.value)
-            e = str(self.e)
-            if e is None:
-                e = "bad setting"
-            return "%s: %s" % (setting_str, e)
+            e_str = str(self.e)
+            if self.e is None:
+                e_str = "bad setting"
+            return "%s: %s" % (setting_str, e_str)
 
 class ConfigProcessorBase(object):
 
