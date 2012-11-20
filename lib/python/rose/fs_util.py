@@ -105,6 +105,8 @@ class FileSystemUtil(object):
     def makedirs(self, path):
         """Wrap os.makedirs. Does nothing if directory exists."""
 
+        if os.path.isfile(path):
+            self.delete(path)
         # Attempt to handle race conditions
         while not os.path.isdir(path):
             try:

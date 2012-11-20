@@ -30,17 +30,22 @@ class RsyncLocHandler(object):
     def __init__(self, manager):
         self.manager = manager
         self.rsync = self.manager.popen.which("rsync")
+        self.bad_address = None
+        try:
+            self.bad_address = socket.gethostbyname("no-such-host")
+        except IOError:
+            pass
 
     def can_pull(self, loc):
         if self.rsync is None:
             return False
         host, path = loc.name.split(":", 1)
         try:
-            socket.gethostbyname(host)
+            address = socket.gethostbyname(host)
         except IOError:
             return False
         else:
-            return True
+            return self.bad_address is None or address != self.bad_address
 
     def parse(self, loc, config):
         """Set loc.scheme, loc.loc_type, loc.paths."""

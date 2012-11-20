@@ -102,8 +102,18 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     sources[source_name].used_by_names.append(name)
                     target_sources.append(sources[source_name])
             targets[name] = Loc(name)
-            targets[name].dep_locs = sorted(target_sources)
+            targets[name].dep_locs = target_sources
             targets[name].mode = node.get_value(["mode"])
+
+        # Determine the scheme of the location from configuration.
+        config_schemes_str = config.get_value(["schemes"])
+        config_schemes = [] # [(pattern, scheme), ...]
+        if config_schemes_str:
+            for line in config_schemes_str.splitlines():
+                p, s = line.split("=", 1)
+                p = p.strip()
+                s = s.strip()
+                config_schemes.append((p, s))
 
         # Where applicable, determine for each source:
         # * Its real name.
@@ -111,6 +121,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Whether it can be considered unchanged.
         for source in sources.values():
             try:
+                for p, s in config_schemes:
+                    if fnmatch(source.name, p):
+                        source.scheme = s
+                        break
                 self.loc_handlers_manager.parse(source, config)
             except ValueError as e:
                 raise ConfigProcessError([key, "source"], source.name, e)
@@ -121,7 +135,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     prev_source.scheme != source.scheme or
                     prev_source.loc_type != source.loc_type or
                     prev_source.key != source.key or
-                    prev_source.paths != source.paths)
+                    sorted(prev_source.paths) != sorted(source.paths))
 
         # Inspect each target to see if it is out of date:
         # * Target does not already exist.
@@ -184,19 +198,20 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 for path, checksum in get_checksum(target.name):
                     target.add_path(path, checksum)
 
-        work_dir = mkdtemp()
-        try:
-            JobRunner(self)(JobManager(jobs), config, work_dir)
-        except ValueError as e:
-            if e.args and jobs.has_key(e.args[0]):
-                job = jobs[e.args[0]]
-                if job.action_key == job.PULL:
-                    source = job.loc
-                    keys = [self.PREFIX + source.used_by_names[0], "source"]
-                    raise ConfigProcessError(keys, source.name)
-            raise e
-        finally:
-            rmtree(work_dir)
+        if jobs:
+            work_dir = mkdtemp()
+            try:
+                JobRunner(self)(JobManager(jobs), config, work_dir)
+            except ValueError as e:
+                if e.args and jobs.has_key(e.args[0]):
+                    job = jobs[e.args[0]]
+                    if job.action_key == job.PULL:
+                        source = job.loc
+                        keys = [self.PREFIX + source.used_by_names[0], "source"]
+                        raise ConfigProcessError(keys, source.name)
+                raise e
+            finally:
+                rmtree(work_dir)
 
         # Target checksum compare and report
         for target in targets.values():
@@ -257,6 +272,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                                    source.loc_type)
             if target.loc_type == target.TYPE_BLOB:
                 if f is None:
+                    if os.path.isdir(target.name):
+                        self.manager.fs_util.delete(target.name)
                     f = open(target.name, "wb")
                 f.write(open(source.cache).read())
             else: # target.loc_type == target.TYPE_TREE
@@ -707,27 +724,9 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         if relevant.
 
         """
-        # Determine the scheme of the location from configuration.
-        # 1. Specific to this location
-        loc_scheme_keys = ["loc:" + loc.name, "scheme"]
-        scheme = config.get_value(loc_scheme_keys)
-        # 2. General newline delimited list of pattern=scheme settings
-        if not scheme:
-            config_schemes_str = config.get_value(["schemes"])
-            config_schemes = [] # (pattern, scheme), ...
-            if config_schemes_str:
-                for line in config_schemes_str.splitlines():
-                    p, s = line.split("=", 1)
-                    p = p.strip()
-                    s = s.strip()
-                    config_schemes.append((p, s))
-            for p, s in config_schemes:
-                if fnmatch(loc.name, p):
-                    scheme = s
-                    break
-        if scheme:
+        if loc.scheme:
             # Scheme specified in the configuration.
-            handler = self.get_handler(scheme)
+            handler = self.get_handler(loc.scheme)
             if handler is None:
                 raise ValueError(loc.name)
         else:

@@ -1124,8 +1124,8 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
       section with a supported scheme in the current configuration, e.g. a
       <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
       supported scheme or be given sufficient information for the system to
-      determine its scheme, e.g. via a <samp>loc:LOC</samp> section or the
-      <code>schemes</code> setting described below.</dd>
+      determine its scheme, e.g. via the <code>schemes</code> setting described
+      below.</dd>
 
       <dt><code>checksum</code></dt>
 
@@ -1160,14 +1160,68 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
       <dt><code>mode=auto,source=SOURCE-LIST</code></dt>
 
       <dd>Target is created by concatenating the contents of
-      <var>SOURCE-LIST</var></dd>
+      <var>SOURCE-LIST</var>. The sources should either be all files or all
+      directories.</dd>
 
       <dt><code>mode=symlink,source=SOURCE</code></dt>
 
       <dd>Target is created as a symlink of an FS <var>SOURCE</var>.</dd>
     </dl>
 
-    <!-- TODO: []schemes setting, [loc:LOC] section. -->
+    <p>The <code>schemes</code> setting: While the system would attempt to
+    automatically detect the scheme of a source, the name of the source can
+    sometimes be ambiguous. E.g. A URL with a <samp>http</samp> scheme can be a
+    path in a version control system, or a path to a plain file. The root level
+    <code>schemes</code> setting can be used to help the system to do the right
+    thing. The general syntax of the value of the <code>schemes</code> setting
+    looks like:</p>
+
+    <pre>
+schemes=PATTERN-1=SCHEME-1
+       =PATTERN-2=SCHEME-2
+</pre>
+
+    <p>E.g.:</p>
+
+    <pre>
+schemes=hpc*:*=rsync
+       =http://host/svn-repos/*=svn
+</pre>
+
+    <p>In this example, a URI matching the pattern <samp>hpc*:*</samp> would
+    use the <code>rsync</code> scheme to pull the source to the current host,
+    and a URI matching the pattern <samp>http://host/svn-repos/*</samp> would
+    use the <code>svn</code> scheme. For all other URIs, the system will try to
+    make an intelligent guess.</p>
+    
+    <p>The system will always match a URI in the order as specified by the
+    setting to avoid ambiguity.</p>
+
+    <p>The system has built-in support for the following schemes:</p>
+
+    <dl>
+      <dt><code>fs</code></dt>
+
+      <dd>The file system scheme. If a URI looks like an existing path in the
+      file system, this scheme will be used.</dd> 
+
+      <dt><code>namelist</code></dt>
+
+      <dd>The namelist scheme. Refer to <code>namelist:NAME</code> sections in
+      the configuration file.</dd>
+
+      <dt><code>svn</code></dt>
+
+      <dd>The Subversion scheme. The location is a Subversion URL or an FCM
+      location keyword. A URI with these schemes <var>svn</var>,
+      <var>svn+ssh</var> and <var>fcm</var> are automatically recognised.</dd>
+
+      <dt><code>rsync</code></dt>
+
+      <dd>This scheme is useful for pulling a file or directory from a remote
+      host using <code>rsync</code> via <code>ssh</code>. A URI should have the
+      form <var>[USER@]HOST:PATH</var>.</dd>
+    </dl>
 
     <h2 id="appendix-metadata-location">Appendix: Metadata Location</h2>
 
