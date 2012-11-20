@@ -67,7 +67,7 @@ run_pass "$TEST_KEY" rose app-run \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] install: STDIN
-[INFO]     location: /etc/passwd
+[INFO]     source: /etc/passwd
 [INFO] command: cat <STDIN
 $(</etc/passwd)
 __CONTENT__
@@ -98,7 +98,7 @@ run_pass "$TEST_KEY" rose app-run -v \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] install: STDIN
-[INFO]     location: /etc/passwd
+[INFO]     source: /etc/passwd
 [INFO] checksum: STDIN: $MD5_EXP
 [INFO] command: cat <STDIN
 $(< /etc/passwd)

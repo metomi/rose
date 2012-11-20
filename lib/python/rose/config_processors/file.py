@@ -19,6 +19,8 @@
 #-----------------------------------------------------------------------------
 """Process "file:*" sections in a rose.config.ConfigNode."""
 
+from fnmatch import fnmatch
+from hashlib import md5
 from multiprocessing import Pool
 import os
 import re
@@ -90,15 +92,11 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         sources = {}
         targets = {}
         for key, node in sorted(nodes.items()):
-            location_str = None
-            for k in ["location", "content", "source"]:
-                location_str = node.get_value([k])
-                if location_str is not None:
-                    break
+            source_str = node.get_value(["source"])
             name = key[len(self.PREFIX):]
             target_sources = []
-            if location_str is not None:
-                for source_name in shlex.split(location_str):
+            if source_str is not None:
+                for source_name in shlex.split(source_str):
                     if not sources.has_key(source_name):
                         sources[source_name] = Loc(source_name)
                     sources[source_name].used_by_names.append(name)
@@ -115,7 +113,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             try:
                 self.loc_handlers_manager.parse(source, config)
             except ValueError as e:
-                raise ConfigProcessError([key, "location"], source.name, e)
+                raise ConfigProcessError([key, "source"], source.name, e)
             prev_source = self.loc_dao.select(source.name)
             source.is_out_of_date = (
                     not prev_source or
@@ -194,7 +192,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 job = jobs[e.args[0]]
                 if job.action_key == job.PULL:
                     source = job.loc
-                    keys = [self.PREFIX + source.used_by_names[0], "location"]
+                    keys = [self.PREFIX + source.used_by_names[0], "source"]
                     raise ConfigProcessError(keys, source.name)
             raise e
         finally:
@@ -236,8 +234,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def _source_pull(self, source, config, work_dir):
         """Pulls a source to its cache in the work directory."""
-        # TODO: determine the cache location here?
-        return self.loc_handlers_manager.pull(source, config, work_dir)
+        m = md5()
+        m.update(source.name)
+        source.cache = os.path.join(work_dir, m.hexdigest())
+        return self.loc_handlers_manager.pull(source, config)
 
     def _target_install(self, target, config, work_dir):
         """Install target.
@@ -524,7 +524,7 @@ class Loc(object):
             ret = "%s (%s)" % (self.real_name, self.name)
         if self.dep_locs:
             for dep_loc in self.dep_locs:
-                ret += "\n    location: %s" % str(dep_loc)
+                ret += "\n    source: %s" % str(dep_loc)
         return ret
 
     def add_path(self, *args):
@@ -680,6 +680,8 @@ class PullableLocHandlersManager(SchemeHandlersManager):
 
     """
 
+    DEFAULT_SCHEME = "fs"
+
     def __init__(self, event_handler=None, popen=None, fs_util=None):
         self.event_handler = event_handler
         if popen is None:
@@ -705,26 +707,44 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         if relevant.
 
         """
-        scheme = config.get_value(["loc:" + loc.name, "scheme"])
-        if scheme is None:
-            scheme = urlparse(loc.name).scheme
-        p = self.get_handler(scheme)
-        if p is None:
-            p = self.guess_handler(loc)
-        if p is None:
-            raise ValueError(loc.name)
-        return p.parse(loc, config)
-
-    def pull(self, loc, config, work_dir):
-        """Pull a location to the local file system path under work_dir.
-
-        Set loc.cache on success, normally a path under work_dir.
-
-        """
-        if loc.scheme is None:
-            p = self.guess_handler(loc)
+        # Determine the scheme of the location from configuration.
+        # 1. Specific to this location
+        loc_scheme_keys = ["loc:" + loc.name, "scheme"]
+        scheme = config.get_value(loc_scheme_keys)
+        # 2. General newline delimited list of pattern=scheme settings
+        if not scheme:
+            config_schemes_str = config.get_value(["schemes"])
+            config_schemes = [] # (pattern, scheme), ...
+            if config_schemes_str:
+                for line in config_schemes_str.splitlines():
+                    p, s = line.split("=", 1)
+                    p = p.strip()
+                    s = s.strip()
+                    config_schemes.append((p, s))
+            for p, s in config_schemes:
+                if fnmatch(loc.name, p):
+                    scheme = s
+                    break
+        if scheme:
+            # Scheme specified in the configuration.
+            handler = self.get_handler(scheme)
+            if handler is None:
+                raise ValueError(loc.name)
         else:
-            p = self.get_handler(loc.scheme)
-        if p is None:
-            raise ValueError(loc.name)
-        return p.pull(loc, config, work_dir)
+            # Scheme not specified in the configuration.
+            scheme = urlparse(loc.name).scheme
+            if scheme:
+                handler = self.get_handler(scheme)
+                if handler is None:
+                    handler = self.guess_handler(loc)
+                if handler is None:
+                    raise ValueError(loc.name)
+            else:
+                handler = self.get_handler(self.DEFAULT_SCHEME)
+        return handler.parse(loc, config)
+
+    def pull(self, loc, config):
+        """Pull loc to its cache."""
+        if loc.scheme is None:
+            self.parse(loc, config)
+        return self.get_handler(loc.scheme).pull(loc, config)

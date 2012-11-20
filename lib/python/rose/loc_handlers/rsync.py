@@ -19,7 +19,6 @@
 #-----------------------------------------------------------------------------
 """A handler of locations on remote hosts."""
 
-from hashlib import md5
 import os
 from rose.checksum import get_checksum
 import socket
@@ -78,15 +77,8 @@ class RsyncLocHandler(object):
                 checksum = None
             loc.add_path(name, checksum)
 
-    def pull(self, loc, config, work_dir):
-        """If loc is in the file system, sets loc.cache to loc.name.
-
-        Otherwise, raise an OSError.
-
-        """
-        m = md5()
-        m.update(loc.name)
-        loc.cache = os.path.join(work_dir, m.hexdigest())
+    def pull(self, loc, config):
+        """Run "rsync" to pull files or directories of loc to its cache."""
         name = loc.name
         if loc.loc_type == loc.TYPE_TREE:
             name = loc.name + "/"

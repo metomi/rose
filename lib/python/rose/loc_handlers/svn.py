@@ -19,7 +19,6 @@
 #-----------------------------------------------------------------------------
 """A handler of file system locations."""
 
-from hashlib import md5
 import os
 from tempfile import mkdtemp
 from urlparse import urlparse
@@ -30,7 +29,8 @@ class SvnLocHandler(object):
 
     FCM = "fcm"
     SVN = "svn"
-    SCHEME = SVN
+    SCHEMES = [SVN, "svn+ssh", FCM]
+    WEB_SCHEMES = ["http", "https", "file"]
 
     def __init__(self, manager):
         self.manager = manager
@@ -39,16 +39,16 @@ class SvnLocHandler(object):
             self.svn = self.FCM
 
     def can_pull(self, loc):
-        schemes = [self.SVN, "svn+ssh"]
-        if self.svn == self.FCM:
-            schemes.append(self.FCM)
-        return (urlparse(loc.name).scheme in schemes or
+        scheme = urlparse(loc.name).scheme
+        if scheme in self.SCHEMES:
+            return True
+        return (scheme in self.WEB_SCHEMES and
                 not os.path.exists(loc.name) and
                 not self.manager.popen.run(self.svn, "info", loc.name)[0])
 
     def parse(self, loc, config):
         """Set loc.real_name, loc.scheme, loc.loc_type."""
-        loc.scheme = self.SCHEME
+        loc.scheme = self.SCHEMES[0]
         xml_str, err = self.manager.popen(self.svn, "info", "--xml", loc.name)
         info_entry = SvnInfoXMLParser()(xml_str)
         if info_entry["kind"] == "dir":
@@ -59,16 +59,9 @@ class SvnLocHandler(object):
         loc.key = info_entry["commit:revision"]
 
     def pull(self, loc, config, work_dir):
-        """If loc is in the file system, sets loc.cache to loc.name.
-
-        Otherwise, raise an OSError.
-
-        """
+        """Run "svn export" to get loc to its cache."""
         if not loc.real_name:
             self.parse(loc)
-        m = md5()
-        m.update(loc.real_name)
-        loc.cache = os.path.join(work_dir, m.hexdigest())
         self.manager.popen("svn", "export", "-q", loc.real_name, loc.cache)
 
 

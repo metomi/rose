@@ -35,7 +35,8 @@ class FileSystemLocHandler(object):
     def parse(self, loc, config):
         """Set loc.scheme, loc.loc_type, loc.paths."""
         loc.scheme = "fs"
-        paths_and_checksums = get_checksum(loc.name)
+        name = os.path.expanduser(loc.name)
+        paths_and_checksums = get_checksum(name)
         for path, checksum in paths_and_checksums:
             loc.add_path(path, checksum)
         if len(paths_and_checksums) == 1 and paths_and_checksums[0][0] == "":
@@ -43,12 +44,13 @@ class FileSystemLocHandler(object):
         else:
             loc.loc_type = loc.TYPE_TREE
 
-    def pull(self, loc, config, work_dir):
+    def pull(self, loc, config):
         """If loc is in the file system, sets loc.cache to loc.name.
 
         Otherwise, raise an OSError.
 
         """
-        if not os.path.exists(loc.name):
-            raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), loc.name)
-        loc.cache = loc.name
+        name = os.path.expanduser(loc.name)
+        if not os.path.exists(name):
+            raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), name)
+        loc.cache = name

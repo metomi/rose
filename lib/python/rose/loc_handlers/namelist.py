@@ -53,18 +53,10 @@ class NamelistLocHandler(object):
         loc.scheme = self.SCHEME
         loc.loc_type = loc.TYPE_BLOB
 
-    def pull(self, loc, config, work_dir):
-        """If loc is in the file system, sets loc.cache to loc.name.
-
-        Otherwise, raise an OSError.
-
-        """
+    def pull(self, loc, config):
+        """Write namelist to loc.cache."""
         if not loc.loc_type:
             self.parse(loc, config)
-        m = md5()
-        m.update(loc.name)
-        base_name = m.hexdigest()
-        loc.cache = os.path.join(work_dir, base_name)
         f = open(loc.cache, "wb")
 
         if loc.name.endswith("(:)"):

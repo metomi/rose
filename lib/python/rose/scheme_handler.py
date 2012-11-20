@@ -34,22 +34,23 @@ class SchemeHandlersManager(object):
     def __init__(self, paths, attrs=None, can_handle=None, *args, **kwargs):
         """Load modules in paths and initialise any classes with a SCHEME.
 
-        Save handlers in the handlers attribute which is a dict of scheme:
-        handler.
+        Initialise each handler, and save it in self.handlers, which is a dict
+        of {scheme: handler, ...}.
 
         If attrs is specified, it should be a list of attributes the class
-        has that do not have a None value.
+        has that do not have None values.
 
         args and kwargs are passed as *args, **kwargs to the constructor of
         each class. This manager will be passed to the constructor using the
-        keyword "manager".
+        kwargs["manager"].
 
-        Each handler class should have a h.SCHEME attribute with a str value if
-        it differs from the base name of the module.
+        Each handler class may have a SCHEMES attribute (a list of str) or a
+        SCHEME attribute with a str value, which will be used as the keys to
+        self.handlers of this manager.
 
-        Optionally, it should have a h.can_handle(scheme, **kwargs) method that
-        returns a boolean value to indicate whether it can handle a given
-        scheme.
+        Optionally, a handler may have a h.can_handle(scheme, **kwargs) method
+        that returns a boolean value to indicate whether it can handle a given
+        value.
 
         """
         self.handlers = {}
@@ -61,20 +62,32 @@ class SchemeHandlersManager(object):
             os.chdir(path) # assuming that "" is at the front of sys.path
             sys.path.insert(0, path)
             try:
+                kwargs["manager"] = self
                 for file_name in glob("*.py"):
                     if file_name.startswith("__"):
                         continue
                     mod_name = file_name[0:-3]
                     mod = __import__(mod_name)
-                    for key, c in inspect.getmembers(mod, inspect.isclass):
-                        scheme = getattr(c, "SCHEME", mod_name)
-                        if (scheme is None or
-                            any([getattr(c, a, None) is None for a in attrs])):
+                    members = inspect.getmembers(mod, inspect.isclass)
+                    scheme0_default = None
+                    if len(members) == 1:
+                        scheme0_default = mod_name
+                    for key, c in members:
+                        if any([getattr(c, a, None) is None for a in attrs]):
                             continue
-                        if self.handlers.has_key(scheme):
-                            raise ValueError(c) # Class with the same scheme
-                        kwargs["manager"] = self
-                        self.handlers[scheme] = c(*args, **kwargs)
+                        handler = None
+                        scheme0 = getattr(c, "SCHEME", scheme0_default)
+                        schemes = []
+                        if scheme0 is not None:
+                            schemes = [scheme0]
+                        for scheme in getattr(c, "SCHEMES", schemes):
+                            if self.handlers.has_key(scheme):
+                                print scheme
+                                raise ValueError(c) # scheme already used
+                            kwargs["manager"] = self
+                            if handler is None:
+                                handler = c(*args, **kwargs)
+                            self.handlers[scheme] = handler
             finally:
                 os.chdir(cwd)
                 sys.path.pop(0)

@@ -1118,14 +1118,14 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
 
       <dt><code>source</code></dt>
 
-      <dd>A list of sources for generating this file. A source represented by a
-      URL or a path with a @PEG revision is considered a version controlled
-      (VC) resource. VC resource may not be supported on all platforms.
-      Otherwise, it is a file system (FS) resource. If the value of a resource
-      begins with a tilde <kbd>~</kbd>, all of the characters preceding the 1st
-      slash <kbd>/</kbd> are considered a <em>tilde-prefix</em>. Where
-      possible, a tilde-prefix is replaced with the home directory associated
-      with the specified login name at run time.</dd>
+      <dd>A space delimited list of sources for generating this file. A source
+      can be the path to a regular file or directory in the file system, or it
+      may be a URI to a resource. If a source is a URI, it may point to a
+      section with a supported scheme in the current configuration, e.g. a
+      <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
+      supported scheme or be given sufficient information for the system to
+      determine its scheme, e.g. via a <samp>loc:LOC</samp> section or the
+      <code>schemes</code> setting described below.</dd>
 
       <dt><code>checksum</code></dt>
 
@@ -1145,12 +1145,6 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
     <p>The following is a list of all the supported usages:</p>
 
     <dl>
-      <dt><code>content=CONTENT-LIST</code></dt>
-
-      <dd>Target is a file, and each <var>CONTENT</var> in
-      <var>CONTENT-LIST</var> is a reference to a section (group) in the
-      configuration file.</dd>
-
       <dt><code>mode=auto,source=</code></dt>
 
       <dd>Target is an empty file.</dd>
@@ -1161,17 +1155,19 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
 
       <dt><code>mode=auto,source=SOURCE</code></dt>
 
-      <dd>Target is a copy or an export of the <var>SOURCE</var>.</dd>
+      <dd>Target is a copy of <var>SOURCE</var>.</dd>
 
       <dt><code>mode=auto,source=SOURCE-LIST</code></dt>
 
-      <dd>Target is a regular file, created by concatenating the contents of
+      <dd>Target is created by concatenating the contents of
       <var>SOURCE-LIST</var></dd>
 
       <dt><code>mode=symlink,source=SOURCE</code></dt>
 
       <dd>Target is created as a symlink of an FS <var>SOURCE</var>.</dd>
     </dl>
+
+    <!-- TODO: []schemes setting, [loc:LOC] section. -->
 
     <h2 id="appendix-metadata-location">Appendix: Metadata Location</h2>
 
