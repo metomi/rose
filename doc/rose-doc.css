@@ -158,6 +158,10 @@ h5 {
     font-size: medium;
 }
 
+.caption {
+     font-size: small;
+}
+
 address {
     font-size: x-small;
 }
@@ -177,7 +181,6 @@ dt,
 #body-header p {
     font-weight: bold;
 }
-
 
 /**********************************************************************
  * CLASSIFICATION
