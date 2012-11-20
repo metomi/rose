@@ -529,7 +529,7 @@ class Loc(object):
         self.dep_locs = dep_locs
         self.mode = None
         self.loc_type = None
-        self.paths = None
+        self.paths = []
         self.key = None
         self.cache = None
         self.used_by_names = []
