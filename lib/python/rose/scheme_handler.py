@@ -82,7 +82,6 @@ class SchemeHandlersManager(object):
                             schemes = [scheme0]
                         for scheme in getattr(c, "SCHEMES", schemes):
                             if self.handlers.has_key(scheme):
-                                print scheme
                                 raise ValueError(c) # scheme already used
                             kwargs["manager"] = self
                             if handler is None:
