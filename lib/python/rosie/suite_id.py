@@ -396,9 +396,11 @@ class SuiteId(object):
 
     def to_output(self):
         """Return the output directory for this suite."""
-        output_root = self.get_output_root()
-        directory = os.path.join(output_root, str(self), "log")
-        return directory
+        suite_engine_proc = SuiteEngineProcessor.get_processor()
+        output_url = suite_engine_proc.get_suite_dir_as_url(str(self), "log")
+        if output_url.startswith("file://")
+            output_url += "index.html"
+        return output_url
 
 
 class ParseXML(object):

@@ -877,9 +877,8 @@ class MainWindow(gtk.Window):
         """View a suite's output, if any."""
         test = kwargs.get("test", False)
         path = kwargs.get("path", None)
-        output_dir = SuiteId(
-                     id_text=self.get_selected_suite_id(path)).to_output()
-        output_path = os.path.join(output_dir, "index.html") 
+        id_ = SuiteId(id_text=self.get_selected_suite_id(path))
+        output_path = id_.to_output()
         try:
             urllib.urlopen(output_path)
         except IOError as e:
