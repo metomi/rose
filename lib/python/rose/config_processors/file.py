@@ -21,22 +21,20 @@
 
 from fnmatch import fnmatch
 from hashlib import md5
-from multiprocessing import Pool
 import os
 import re
 from rose.checksum import get_checksum
 import rose.config
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
+from rose.job_runner import JobManager, JobProxy, JobRunner
 from rose.reporter import Event
-from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
 import shlex
 from shutil import rmtree
 import sqlite3
 import sys
 from tempfile import mkdtemp
-from time import sleep
 from urlparse import urlparse
 
 
@@ -105,9 +103,11 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     for source_name in shlex.split(source_str):
                         if not sources.has_key(source_name):
                             sources[source_name] = Loc(source_name)
+                            sources[source_name].action_key = Loc.A_SOURCE
                         sources[source_name].used_by_names.append(name)
                         target_sources.append(sources[source_name])
             targets[name] = Loc(name)
+            targets[name].action_key = Loc.A_INSTALL
             targets[name].dep_locs = target_sources
             targets[name].mode = node.get_value(["mode"])
 
@@ -183,13 +183,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 continue
             if target.dep_locs:
                 if len(target.dep_locs) == 1 and target.mode == "symlink":
-                    self.manager.fs_util.symlink(target.dep_locs[0], target.name)
+                    self.manager.fs_util.symlink(target.dep_locs[0],
+                                                 target.name)
                     self.loc_dao.update(target)
                 else:
-                    jobs[target.name] = JobProxy(target, JobProxy.INSTALL)
+                    jobs[target.name] = JobProxy(target)
                     for source in target.dep_locs:
                         if not jobs.has_key(source.name):
-                            jobs[source.name] = JobProxy(source, JobProxy.PULL)
+                            jobs[source.name] = JobProxy(source)
+                            jobs[source.name].event_level = Event.V
                         job = jobs[source.name]
                         jobs[target.name].pending_for[source.name] = job
             elif target.mode == "mkdir":
@@ -207,12 +209,17 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if jobs:
             work_dir = mkdtemp()
             try:
-                JobRunner(self)(JobManager(jobs), config, work_dir)
+                nproc_keys = ["rose.config_processors.file", "nproc"]
+                nproc_str = config.get_value(nproc_keys)
+                nproc = None
+                if nproc_str is not None:
+                    nproc = int(nproc_str)
+                JobRunner(self, nproc)(JobManager(jobs), config, work_dir)
             except ValueError as e:
                 if e.args and jobs.has_key(e.args[0]):
                     job = jobs[e.args[0]]
-                    if job.action_key == job.PULL:
-                        source = job.loc
+                    if job.context.action_key == Loc.A_SOURCE:
+                        source = job.context
                         keys = [self.PREFIX + source.used_by_names[0], "source"]
                         raise ConfigProcessError(keys, source.name)
                 raise e
@@ -236,15 +243,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def process_job(self, job, config, work_dir):
         """Process a job, helper for "process"."""
-        for key, method in [(job.INSTALL, self._target_install),
-                            (job.PULL, self._source_pull)]:
-            if job.action_key == key:
-                return method(job.loc, config, work_dir)
+        for key, method in [(Loc.A_INSTALL, self._target_install),
+                            (Loc.A_SOURCE, self._source_pull)]:
+            if job.context.action_key == key:
+                return method(job.context, config, work_dir)
 
     def post_process_job(self, job, config, *args):
         """Post-process a successful job, helper for "process"."""
         # TODO: auto decompression of tar, gzip, etc?
-        self.loc_dao.update(job.loc)
+        self.loc_dao.update(job.context)
 
     def set_event_handler(self, event_handler):
         """Sets the event handler, used by pool workers to capture events."""
@@ -322,208 +329,11 @@ class FileOverwriteError(Exception):
                 self.args[0])
 
 
-class JobEvent(Event):
-    """Event raised when a job completes."""
-    def __init__(self, job):
-        Event.__init__(self, job)
-        if job.action_key == job.PULL:
-            self.level = Event.V
-
-    def __str__(self):
-        return str(self.args[0])
-
-
-class JobManager(object):
-    """Manage a set of JobProxy objects and their states."""
-
-    def __init__(self, jobs, names=None):
-        """Initiate a location job manager.
-
-        jobs: A dict of all available jobs (job.name, job).
-        names: A list of keys in jobs to process.
-               If not set or empty, process all jobs.
-
-        """
-        self.jobs = jobs
-        self.ready_jobs = []
-        if not names:
-            names = jobs.keys()
-        for name in names:
-            self.ready_jobs.append(self.jobs[name])
-        self.working_jobs = {}
-
-    def get_job(self):
-        """Return the next job that requires processing."""
-        while self.ready_jobs:
-            job = self.ready_jobs.pop()
-            for dep_key, dep_job in job.pending_for.items():
-                if dep_job.state == dep_job.ST_DONE:
-                    job.pending_for.pop(dep_key)
-                    if dep_job.needed_by.has_key(job.name):
-                        dep_job.needed_by.pop(job.name)
-                else:
-                    dep_job.needed_by[job.name] = job
-                    if dep_job.state is None:
-                        dep_job.state = dep_job.ST_READY
-                        self.ready_jobs.append(dep_job)
-            if job.pending_for:
-                job.state = job.ST_PENDING
-            else:
-                self.working_jobs[job.name] = job
-                job.state = job.ST_WORKING
-                return job
-
-    def get_dead_jobs(self):
-        """Return pending jobs if there are no ready/working ones."""
-        if not self.has_jobs:
-            jobs = []
-            for job in self.jobs.values():
-                if job.pending_for:
-                    jobs.append(job)
-            return jobs
-
-    def has_jobs(self):
-        """Return True if there are ready jobs or working jobs."""
-        return (bool(self.ready_jobs) or bool(self.working_jobs))
-
-    def has_ready_jobs(self):
-        """Return True if there are ready jobs."""
-        return bool(self.ready_jobs)
-
-    def put_job(self, job_proxy):
-        """Tell the manager that a job has completed."""
-        job = self.working_jobs.pop(job_proxy.name)
-        job.update(job_proxy)
-        job.state = job.ST_DONE
-        for up_key, up_job in job.needed_by.items():
-            job.needed_by.pop(up_key)
-            up_job.pending_for.pop(job.name)
-            if not up_job.pending_for:
-                self.ready_jobs.append(up_job)
-                up_job.state = up_job.ST_READY
-        return job
-
-
-class JobProxy(object):
-    """Represent the state of the job for updating a location."""
-
-    INSTALL = "install"
-    PULL = "pull"
-
-    ST_DONE = "ST_DONE"
-    #ST_FAILED = "ST_FAILED"
-    ST_PENDING = "ST_PENDING"
-    ST_READY = "ST_READY"
-    ST_WORKING = "ST_WORKING"
-
-    def __init__(self, loc, action_key):
-        self.loc = loc
-        self.action_key = action_key
-        self.name = loc.name
-        self.needed_by = {}
-        self.pending_for = {}
-        self.state = self.ST_READY
-
-    def __str__(self):
-        return "%s: %s" % (self.action_key, str(self.loc))
-
-    def update(self, other):
-        """Update self.loc and self.state with the values of "other"."""
-        self.loc.update(other.loc)
-
-
-class JobRunner(object):
-    """Runs JobProxy objects with pool of workers."""
-
-    NPROC = 6
-    POLL_DELAY = 0.05
-
-    def __init__(self, job_processor):
-        self.job_processor = job_processor
-        conf = ResourceLocator.default().get_conf()
-        self.nproc = int(conf.get_value(
-                ["rose.config_processors.file", "nproc"],
-                default=self.NPROC))
-
-    def run(self, job_manager, *args):
-        """Start the job runner with an instance of JobManager."""
-        nproc = self.nproc
-        if nproc > len(job_manager.jobs):
-            nproc = len(job_manager.jobs)
-        pool = Pool(processes=nproc)
-
-        results = {}
-        while job_manager.has_jobs():
-            # Process results, if any is ready
-            for name, result in results.items():
-                if result.ready():
-                    results.pop(name)
-                    job_proxy, args_of_events = result.get()
-                    for args_of_event in args_of_events:
-                        self.job_processor.handle_event(*args_of_event)
-                    job = job_manager.put_job(job_proxy)
-                    self.job_processor.post_process_job(job, *args)
-                    self.job_processor.handle_event(JobEvent(job))
-            # Add some more jobs into the worker pool, as they are ready
-            while job_manager.has_ready_jobs():
-                job = job_manager.get_job()
-                if job is None:
-                    break
-                loc_job_run_args = [self.job_processor, job] + list(args)
-                result = pool.apply_async(_job_run, loc_job_run_args)
-                results[job.name] = result
-            if results:
-                sleep(self.POLL_DELAY)
-
-        dead_jobs = job_manager.get_dead_jobs()
-        if dead_jobs:
-            raise JobRunnerNotCompletedError(dead_jobs)
-
-    __call__ = run
-
-
-def _job_run(job_processor, job_proxy, *args):
-    """Helper for JobRunner."""
-    event_handler = JobRunnerWorkerEventHandler()
-    job_processor.set_event_handler(event_handler)
-    try:
-        job_processor.process_job(job_proxy, *args)
-    except Exception as e:
-        #import traceback
-        #traceback.print_exc(e)
-        raise e
-    finally:
-        job_processor.set_event_handler(None)
-    return (job_proxy, event_handler.events)
-
-
-class JobRunnerWorkerEventHandler(object):
-    """Temporary event handler in a function run by a pool worker process.
-
-    Events are collected in the self.events which is a list of tuples
-    representing the arguments the report method in an instance of
-    rose.reporter.Reporter.
-
-    """
-    def __init__(self):
-        self.events = []
-
-    def __call__(self, message, type=None, level=None, prefix=None, clip=None):
-        self.events.append((message, type, level, prefix, clip))
-
-
-class JobRunnerNotCompletedError(Exception):
-    """Error raised when there are no ready/working jobs but pending ones."""
-    def __str__(self):
-        ret = ""
-        for job in self.args:
-            ret += "[DEAD TASK] %s\n" % str(job)
-        return ret
-
-
 class Loc(object):
     """Represent a location."""
 
+    A_SOURCE = "source"
+    A_INSTALL = "install"
     BLOB = ""
     TYPE_TREE = "tree"
     TYPE_BLOB = "blob"
@@ -531,6 +341,7 @@ class Loc(object):
     def __init__(self, name, scheme=None, dep_locs=None):
         self.name = name
         self.real_name = None
+        self.action_key = None
         self.scheme = scheme
         self.dep_locs = dep_locs
         self.mode = None
@@ -547,7 +358,9 @@ class Loc(object):
             ret = "%s (%s)" % (self.real_name, self.name)
         if self.dep_locs:
             for dep_loc in self.dep_locs:
-                ret += "\n    source: %s" % str(dep_loc)
+                ret += "\n    %s" % str(dep_loc)
+        if self.action_key is not None:
+            ret = "%s: %s" % (self.action_key, ret)
         return ret
 
     def add_path(self, *args):
