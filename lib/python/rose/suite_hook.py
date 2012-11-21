@@ -84,7 +84,9 @@ class RoseSuiteHook(object):
                 text += "Task: %s\n" % task
             if hook_message:
                 text += "Message: %s\n" % hook_message
-            text += "See: file://%s/index.html\n" % (suite_log_dir)
+            url = self.suite_engine_proc.get_suite_dir_as_url(suite_log_dir,
+                                                              "index.html")
+            text += "See: %s\n" % (url)
             msg = MIMEText(text)
             user = pwd.getpwuid(os.getuid()).pw_name
             msg["From"] = user

@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 import os
 import re
 from rose.popen import RosePopener
+from rose.resource import ResourceLocator
 from rose.fs_util import FileSystemUtil
 
 class SuiteScanResult(object):
@@ -325,8 +326,49 @@ class SuiteEngineProcessor(object):
         """Return a list of (user, host) for remote tasks in a suite."""
         raise NotImplementedError()
 
-    def get_suite_dir_rel(self, suite_name):
-        """Return the relative path to the suite running directory."""
+    def get_suite_dir(self, suite_name, *args):
+        """Return the path to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        """
+        return os.path.join(os.path.expanduser("~"),
+                            self.get_suite_dir_rel(suite_name, *args))
+
+    def get_suite_dir_as_url(self, suite_name, *args):
+        """Return the URL to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        Use the "home-public-html" setting in the site/user configuration to
+        determine the URL.
+        If no such setting is defined, return the suite running directory as a
+        "file://" URL.
+
+        """
+        conf = ResourceLocator.default().get_conf()
+        value = conf.get_value("home-public-html")
+        if value is None:
+            return "file://" + self.get_suite_dir(suite_name, *args)
+        values = value.split(None, 1)
+        if len(values) == 1:
+            url_prefix = values[0]
+            public_html = ""
+        else:
+            url_prefix, public_html = values
+        home = os.path.expanduser("~")
+        dir_rel = self.get_suite_dir_rel(suite_name, *args)
+        if os.path.exists(os.path.join(home, public_html, dir_rel)):
+            return url_prefix + "/" + dir_rel
+        else:
+            return "file://" + self.get_suite_dir(suite_name, *args)
+
+    def get_suite_dir_rel(self, suite_name, *args):
+        """Return the relative path to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        """
         raise NotImplementedError()
 
     def handle_event(self, *args, **kwargs):

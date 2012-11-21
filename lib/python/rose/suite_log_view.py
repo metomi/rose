@@ -186,8 +186,10 @@ def suite_log_view(opts, args, report=None):
     gen()
     if os.getenv("DISPLAY") and opts.web_browser_mode:
         w = webbrowser.get()
-        gen.handle_event(WebBrowserEvent(w.name, "index.html"))
-        w.open_new_tab("index.html")
+        url = gen.suite_engine_proc.get_suite_dir_as_url(
+                name, "log", "index.html")
+        gen.handle_event(WebBrowserEvent(w.name, url))
+        w.open_new_tab(url)
 
 
 if __name__ == "__main__":
