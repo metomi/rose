@@ -116,12 +116,17 @@ class JobProxy(object):
     ST_READY = "ST_READY"
     ST_WORKING = "ST_WORKING"
 
-    def __init__(self, context, event_level=None):
+    def __init__(self, context, pending_for=None, event_level=None):
         """
         Initiate a new instance.
 
         context: The real context of this job, which must be serialisable.
                  The context will be processed by the job processor.
+                 The context should have a context.name attribute with a str
+                 value and a context.update(other) method that updates itself
+                 with the value of "other".
+        pending_for: A dict to map job (context) names and JobProxy objects
+                     that are required by this job.
         event_level: The job runner may raise an event when this job completes.
                      This tell the event handler only to report this event if
                      the current verbosity is higher than this level.
@@ -129,9 +134,9 @@ class JobProxy(object):
         """
         self.context = context
         self.name = context.name
+        self.pending_for = {}
         self.event_level = event_level
         self.needed_by = {}
-        self.pending_for = {}
         self.state = self.ST_READY
 
     def __str__(self):
