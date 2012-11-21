@@ -118,41 +118,34 @@ class CylcProcessor(SuiteEngineProcessor):
     def get_remote_auth(self, suite_name, task_name):
         """Return (user, host) for a remote task in a suite."""
         try:
-            user_str, err = self.popen("cylc", "get-config", "-p", suite_name,
-                                       "runtime", task_name, "remote", "owner")
-            host_str, err = self.popen("cylc", "get-config", "-p", suite_name,
-                                       "runtime", task_name, "remote", "host")
+            out, err = self.popen(
+                    "cylc", "get-config", "-o",
+                    "-i", "[runtime][%s][remote]owner" % task_name,
+                    "-i", "[runtime][%s][remote]host" % task_name,
+                    suite_name)
         except RosePopenError:
             return
-        user_str = user_str.strip()
-        host_str = host_str.strip()
-        user, host, my_user, my_host = self._parse_user_host(user_str,
-                                                             host_str)
+        u, h = out.strip().replace("*", " ").split(None, 1)
+        user, host, my_user, my_host = self._parse_user_host(u, h)
         if (my_user, my_host) == (user, host):
             return
         return (user, host)
 
     def get_remote_auths(self, suite_name):
         """Return a list of unique user@host for remote tasks in a suite."""
-        raw_auths = {} # task: {"user": user, "host": host}
-        for c_key, key in [("owner", "user"), ("host", "host")]:
-            out, err = self.popen("cylc", "get-config", "-a",
-                                  suite_name, "remote", c_key)
-            for line in out.splitlines():
-                task, value = line.split(None, 1)
-                if not raw_auths.has_key(task):
-                    raw_auths[task] = {"user": None, "host": None}
-                raw_auths[task][key] = value
         my_user = pwd.getpwuid(os.getuid())[0]
         my_host = socket.gethostname()
         actual_hosts = {}
         auths = []
-        for v in raw_auths.values():
-            user = v["user"]
-            host = v["host"]
+        out, err = self.popen("cylc", "get-config", "-ao",
+                              "-i", "[remote]owner",
+                              "-i", "[remote]host",
+                              suite_name)
+        for line in out.splitlines():
+            task, user, host = line.replace("*", " ").split(None, 2)
             if not actual_hosts.has_key(host):
-                user, actual_hosts[host] = self._parse_user_host(
-                        user, host, my_user, my_host)[0:2]
+                result = self._parse_user_host(user, host, my_user, my_host)
+                user, actual_hosts[host] = result[0:2]
             if user in [None, "None"]:
                 user = my_user
             host = actual_hosts[host]
