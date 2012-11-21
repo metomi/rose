@@ -397,9 +397,7 @@ class SuiteId(object):
     def to_output(self):
         """Return the output directory for this suite."""
         suite_engine_proc = SuiteEngineProcessor.get_processor()
-        output_url = suite_engine_proc.get_suite_dir_as_url(str(self), "log")
-        if output_url.startswith("file://")
-            output_url += "index.html"
+        output_url = suite_engine_proc.get_suite_log_url(str(self))
         return output_url
 
 

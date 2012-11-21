@@ -186,8 +186,7 @@ def suite_log_view(opts, args, report=None):
     gen()
     if os.getenv("DISPLAY") and opts.web_browser_mode:
         w = webbrowser.get()
-        url = gen.suite_engine_proc.get_suite_dir_as_url(
-                name, "log", "index.html")
+        url = gen.suite_engine_proc.get_suite_log_url(name)
         gen.handle_event(WebBrowserEvent(w.name, url))
         w.open_new_tab(url)
 
