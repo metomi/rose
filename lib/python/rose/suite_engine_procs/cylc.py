@@ -79,9 +79,10 @@ class CylcProcessor(SuiteEngineProcessor):
             task_key = task.rsplit("%", 1)[0]
         else:
             task_key = "root"
-        user, host = self.get_remote_auth(suite, task_key)
-        if user and host:
+        user_and_host = self.get_remote_auth(suite, task_key)
+        if user_and_host:
             suite_log_dir_rel = self.get_suite_dir_rel(suite, "log", "job")
+            user, host = user_and_host
             return log_dir, "%s@%s:%s" % (user, host, suite_log_dir_rel)
         else:
             return log_dir, None
@@ -116,7 +117,12 @@ class CylcProcessor(SuiteEngineProcessor):
                          task_is_cold_start=task_is_cold_start)
 
     def get_remote_auth(self, suite_name, task_name):
-        """Return (user, host) for a remote task in a suite."""
+        """
+        Return (user, host) for a remote task in a suite.
+
+        Or None if task does not run remotely.
+
+        """
         try:
             out, err = self.popen(
                     "cylc", "get-config", "-o",
