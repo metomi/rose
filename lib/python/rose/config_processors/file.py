@@ -27,6 +27,7 @@ import re
 from rose.checksum import get_checksum
 import rose.config
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
+from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.reporter import Event
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
@@ -92,15 +93,20 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         sources = {}
         targets = {}
         for key, node in sorted(nodes.items()):
-            source_str = node.get_value(["source"])
             name = key[len(self.PREFIX):]
             target_sources = []
-            if source_str is not None:
-                for source_name in shlex.split(source_str):
-                    if not sources.has_key(source_name):
-                        sources[source_name] = Loc(source_name)
-                    sources[source_name].used_by_names.append(name)
-                    target_sources.append(sources[source_name])
+            for k in ["content", "source"]:
+                source_str = node.get_value([k])
+                if source_str is not None:
+                    try:
+                        source_str = env_var_process(source_str)
+                    except UnboundEnvironmentVariableError as e:
+                        raise ConfigProcessError([key, k], source_str, e)
+                    for source_name in shlex.split(source_str):
+                        if not sources.has_key(source_name):
+                            sources[source_name] = Loc(source_name)
+                        sources[source_name].used_by_names.append(name)
+                        target_sources.append(sources[source_name])
             targets[name] = Loc(name)
             targets[name].dep_locs = target_sources
             targets[name].mode = node.get_value(["mode"])
