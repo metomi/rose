@@ -66,6 +66,8 @@
 #             Declare a named group of hosts.
 #         method{NAME} = METHOD[:METHOD-ARG]
 #             Declare the default ranking method for a group of hosts.
+#         thresholds{NAME} = [METHOD[:METHOD-ARG]:]VALUE ...
+#             Declare the default threshold(s) for a group of hosts.
 #
 #     Type "rose config rose-host-select" to print settings.
 #-------------------------------------------------------------------------------
