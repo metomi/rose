@@ -84,7 +84,7 @@ class RoseSuiteHook(object):
                 text += "Task: %s\n" % task
             if hook_message:
                 text += "Message: %s\n" % hook_message
-            url = self.suite_engine_proc.get_suite_log__url(suite)
+            url = self.suite_engine_proc.get_suite_log_url(suite)
             text += "See: %s\n" % (url)
             msg = MIMEText(text)
             user = pwd.getpwuid(os.getuid()).pw_name
