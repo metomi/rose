@@ -47,7 +47,7 @@ random_no = rand(clock)
 heading = random_no*2*pi
 
 ! This is how far we went, in radians:
-! (1 knot = 1 nautical mile * 1 hour)
+! (1 knot = 1 nautical mile / 1 hour)
 ang_distance = (speed_kn*dt_hr)/radius_earth_nm
 
 new_lat = asin(sin(lat)*cos(ang_distance) + &
