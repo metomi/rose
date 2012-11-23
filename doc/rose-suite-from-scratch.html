@@ -95,7 +95,7 @@
       <h3>Example program</h3>
 
       <p>Our Fortran program is <a href=
-      "../etc/rose-make-suite/dead_reckoning.f90">dead_reckoning.f90</a>, which
+      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a>, which
       (pretends to) calculate the new position of our ship.</p>
 
       <p>Spend a bit of time looking at this file.</p>
@@ -169,7 +169,7 @@ mkdir src
 </pre>
 
       <p>Copy the source code from <a href=
-      "../etc/rose-make-suite/dead_reckoning.f90">dead_reckoning.f90</a> into a
+      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a> into a
       file called <samp>src/dead_reckoning.f90</samp>.</p>
     </div>
 
@@ -316,7 +316,12 @@ fcm_make_navigate  navigate
 
 ./app/fcm_make_navigate:
 file  rose-app.conf
-
+</pre>
+    <p>(continued)</p>
+    </div>
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Contents (so far) continued</h3>
+<pre>
 ./app/fcm_make_navigate/file:
 fcm-make.cfg
 
@@ -443,6 +448,7 @@ touch suite.rc
       </ul>
     </div>
 
+  <div class="slide">
     <h3 class="alwayshidden">suite.rc explanation (continued)</h3>
 
     <ul class="incremental">
@@ -539,43 +545,7 @@ touch suite.rc
   <div class="slide">
     <h3>Checking the suite.rc</h3>
 
-    <p>Your suite.rc should now look like this:</p>
-    <pre>
-#!jinja2
-[cylc]
-    [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
-        timeout = 4320 # 3 days
-[scheduling]
-    initial cycle time = 2013060100
-    final cycle time   = 2013060300
-    [[special tasks]]
-        cold-start = fcm_make_navigate, write_start_position
-    [[dependencies]]
-
-        [[[ 0, 3, 6, 9, 12, 15, 18, 21 ]]]
-            graph = """
-                write_start_position &amp; fcm_make_navigate | navigate[T-3] =&gt; navigate
-            """
-[runtime]
-    [[root]]
-        command scripting = "rose task-run --verbose"
-        [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook --mail"
-           execution timeout handler = "rose suite-hook --mail"
-           submission timeout = 1440 # 24 hours
-           execution timeout  =  180 # 3 hours
-    [[navigate]]
-        [[[environment]]]
-            POS_FPATH = $CYLC_SUITE_SHARE_PATH/position
-            TIME_INTERVAL_HRS = 3
-    [[write_start_position]]
-        command scripting = "echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position"
-        
-</pre>
+    <p>Your suite.rc should now look like <a href="../etc/rose-suite-from-scratch/suite.rc">this</a>.</p>
   </div>
 
   <div class="slide">
@@ -587,14 +557,18 @@ touch suite.rc
       <li>analysed the Fortran program <samp>dead_reckoning.f90</samp></li>
 
       <li>created a blank suite with <code>rosie create</code></li>
-
+    </ul>
+ </div>
+ <div class="slide">
+    <h3 class="alwayshidden">Summary So Far (continued)</h3>
+    <ul class="incremental">
       <li>made an app configuration for <samp>dead_reckoning.f90</samp>, called
       <samp>navigate</samp>.</li>
 
       <li>made a build app configuration for it, called
       <samp>fcm_make_navigate</samp>.</li>
 
-      <li>made a suite.rc file</li>
+      <li>written a suite.rc file</li>
     </ul>
   </div>
 
@@ -620,5 +594,6 @@ rose suite-run
   <div class="slide">
     <h2>The End</h2>
   </div>
+</div>
 </body>
 </html>
