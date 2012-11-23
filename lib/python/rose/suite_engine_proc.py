@@ -363,7 +363,7 @@ class SuiteEngineProcessor(object):
         if os.path.exists(os.path.join(home, public_html, dir_rel)):
             return url_prefix + "/" + dir_rel
         else:
-            return log_index
+            return "file://" + log_index
 
     def get_suite_dir_rel(self, suite_name, *args):
         """Return the relative path to the suite running directory.
