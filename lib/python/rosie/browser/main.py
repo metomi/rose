@@ -877,22 +877,18 @@ class MainWindow(gtk.Window):
         """View a suite's output, if any."""
         test = kwargs.get("test", False)
         path = kwargs.get("path", None)
-        output_dir = SuiteId(
-                     id_text=self.get_selected_suite_id(path)).to_output()
-        output_path = os.path.join(output_dir, "index.html") 
+        id_ = SuiteId(id_text=self.get_selected_suite_id(path))
+        output_url = id_.to_output()
+        if test:
+            return (output_url is not None)
         try:
-            urllib.urlopen(output_path)
-        except IOError as e:
-            if test:
-                return False
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     str(e))
+            urllib.urlopen(output_url)
+        except (AttributeError, IOError) as e:
+            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR, str(e))
         else:
-            if test:
-                return True
-            webbrowser.open(output_path, new=True, autoraise=True)
+            webbrowser.open(output_url, new=True, autoraise=True)
             self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_LOG, 
-                                       instant=True)
+                                           instant=True)
 
 
     def handle_view_web(self, *args):

@@ -159,15 +159,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 auths.append((user, host))
         return auths
 
-    def get_suite_dir(self, suite_name, *args):
-        """Return the path to the suite running directory.
-
-        Extra args, if specified, are added to the end of the path.
-
-        """
-        return os.path.join(os.path.expanduser("~"),
-                            self.get_suite_dir_rel(suite_name, *args))
-
     def get_suite_dir_rel(self, suite_name, *args):
         """Return the relative path to the suite running directory.
 
