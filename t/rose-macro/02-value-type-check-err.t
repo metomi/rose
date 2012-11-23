@@ -379,8 +379,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         Not an integer: ''
     namelist:values_nl1=my_logical_array_null_comp=
         Not Fortran true/false: ''
-    namelist:values_nl1=my_quoted_array_null_comp=
-        Value '' isn't in a valid double quoted format
+    namelist:values_nl1=my_quoted_array_null_comp="a",,"c",
+        Array longer than max length: 4 instead of 3
     namelist:values_nl1=my_real_array_null_comp=
         Not a real number: ''
 __CONTENT__

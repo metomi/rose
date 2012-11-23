@@ -597,6 +597,10 @@
       <dt><kbd>method{NAME} = METHOD[:METHOD-ARG]</kbd></dt>
 
       <dd>Declare the default ranking method for a group of hosts.</dd>
+
+      <dt><kbd>thresholds{NAME} = [METHOD[:METHOD-ARG]:]VALUE</kbd></dt>
+
+      <dd>Declare the default threshold(s) for a group of hosts.</dd>
     </dl>
 
     <p>Type <kbd>rose config rose-host-select</kbd> to print settings.</p>
@@ -948,7 +952,7 @@
 
       <dt><kbd>--mail-cc=LIST</kbd></dt>
 
-      <dd>Only useful if the <kbd>--mail-if=LIST</kbd> option is specified.
+      <dd>Only useful if the <kbd>--mail</kbd> option is specified.
       Specify a comma separated list of additional addresses to email.</dd>
 
       <dt><kbd>--mail</kbd></dt>
