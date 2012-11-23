@@ -95,8 +95,8 @@
       <h3>Example program</h3>
 
       <p>Our Fortran program is <a href=
-      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a>, which
-      (pretends to) calculate the new position of our ship.</p>
+      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a>,
+      which (pretends to) calculate the new position of our ship.</p>
 
       <p>Spend a bit of time looking at this file.</p>
     </div>
@@ -169,8 +169,8 @@ mkdir src
 </pre>
 
       <p>Copy the source code from <a href=
-      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a> into a
-      file called <samp>src/dead_reckoning.f90</samp>.</p>
+      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a>
+      into a file called <samp>src/dead_reckoning.f90</samp>.</p>
     </div>
 
     <div class="slide">
@@ -317,11 +317,13 @@ fcm_make_navigate  navigate
 ./app/fcm_make_navigate:
 file  rose-app.conf
 </pre>
-    <p>(continued)</p>
+
+      <p>(continued)</p>
     </div>
+
     <div class="slide">
       <h3 class="alwayshidden">Suite Contents (so far) continued</h3>
-<pre>
+      <pre>
 ./app/fcm_make_navigate/file:
 fcm-make.cfg
 
@@ -448,152 +450,155 @@ touch suite.rc
       </ul>
     </div>
 
-  <div class="slide">
-    <h3 class="alwayshidden">suite.rc explanation (continued)</h3>
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc explanation (continued)</h3>
 
-    <ul class="incremental">
-      <li>We've made <samp>navigate</samp> run every 3 hours</li>
+      <ul class="incremental">
+        <li>We've made <samp>navigate</samp> run every 3 hours</li>
 
-      <li>We've configured the dependency between
-      <samp>fcm_make_navigate</samp> and <samp>navigate</samp>.</li>
-    </ul>
-  </div>
+        <li>We've configured the dependency between
+        <samp>fcm_make_navigate</samp> and <samp>navigate</samp>.</li>
+      </ul>
+    </div>
 
-  <div class="slide">
-    <h3>suite.rc runtime</h3>
+    <div class="slide">
+      <h3>suite.rc runtime</h3>
 
-    <p>Remember we need the environment variable <var>TIME_INTERVAL_HRS</var>,
-    <var>POS_FPATH</var> and the actual <samp>position</samp> file that
-    <var>POS_FPATH</var> refers to, with latitude and longitude, for
-    <samp>navigate</samp> to run.</p>
+      <p>Remember we need the environment variable
+      <var>TIME_INTERVAL_HRS</var>, <var>POS_FPATH</var> and the actual
+      <samp>position</samp> file that <var>POS_FPATH</var> refers to, with
+      latitude and longitude, for <samp>navigate</samp> to run.</p>
 
-    <p>We need to put this in the suite <samp>[runtime]</samp> directory under
-    a <samp>navigate</samp> sub section.</p>
-  </div>
+      <p>We need to put this in the suite <samp>[runtime]</samp> directory
+      under a <samp>navigate</samp> sub section.</p>
+    </div>
 
-  <div class="slide">
-    <h3 class="alwayshidden">suite.rc runtime environment</h3>
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc runtime environment</h3>
 
-    <p>Add these lines to the end of the <samp>suite.rc</samp> file:</p>
-    <pre>
+      <p>Add these lines to the end of the <samp>suite.rc</samp> file:</p>
+      <pre>
     [[navigate]]
         [[[environment]]]
             POS_FPATH = $CYLC_SUITE_SHARE_PATH/position
             TIME_INTERVAL_HRS = 3
 </pre>
-  </div>
+    </div>
 
-  <div class="slide">
-    <h3 class="alwayshidden">suite.rc runtime results</h3>
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc runtime results</h3>
 
-    <p>We've set the environment for the app <samp>navigate</samp>.
-    <var>POS_FPATH</var> is using an environment variable that cylc provides,
-    <var>CYLC_SUITE_SHARE_PATH</var> to define the file path to the lat/long
-    position file.</p>
+      <p>We've set the environment for the app <samp>navigate</samp>.
+      <var>POS_FPATH</var> is using an environment variable that cylc provides,
+      <var>CYLC_SUITE_SHARE_PATH</var> to define the file path to the lat/long
+      position file.</p>
 
-    <p><var>TIME_INTERVAL_HRS</var> is 3 because the app cycles every 3
-    hours.</p>
-  </div>
+      <p><var>TIME_INTERVAL_HRS</var> is 3 because the app cycles every 3
+      hours.</p>
+    </div>
 
-  <div class="slide">
-    <h3>suite.rc special task</h3>
+    <div class="slide">
+      <h3>suite.rc special task</h3>
 
-    <p>We need to add something that makes our <samp>$POS_FPATH</samp> position
-    file in the first place.</p>
+      <p>We need to add something that makes our <samp>$POS_FPATH</samp>
+      position file in the first place.</p>
 
-    <p>We won't bother with an app for this - we'll just write a little cylc
-    task.</p>
+      <p>We won't bother with an app for this - we'll just write a little cylc
+      task.</p>
 
-    <p>We'll add a task called <samp>write_start_position</samp>. Add it as a
-    cold start task by replacing the <samp>cold-start =
-    fcm_make_navigate</samp> line with:</p>
-    <pre>
+      <p>We'll add a task called <samp>write_start_position</samp>. Add it as a
+      cold start task by replacing the <samp>cold-start =
+      fcm_make_navigate</samp> line with:</p>
+      <pre>
         cold-start = fcm_make_navigate, write_start_position
 </pre>
-  </div>
+    </div>
 
-  <div class="slide">
-    <h3 class="alwayshidden">suite.rc special task dependency</h3>
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc special task dependency</h3>
 
-    <p>Replace the <samp>fcm_make_navigate | navigate[T-3] =&gt;
-    navigate</samp> line with:</p>
-    <pre>
+      <p>Replace the <samp>fcm_make_navigate | navigate[T-3] =&gt;
+      navigate</samp> line with:</p>
+      <pre>
                 write_start_position &amp; fcm_make_navigate | navigate[T-3] =&gt; navigate
 </pre>
 
-    <p>This is because we need both <samp>fcm_make_navigate</samp> and
-    <samp>write_start_position</samp> to run before cylc runs
-    <samp>navigate</samp>.</p>
-  </div>
+      <p>This is because we need both <samp>fcm_make_navigate</samp> and
+      <samp>write_start_position</samp> to run before cylc runs
+      <samp>navigate</samp>.</p>
+    </div>
 
-  <div class="slide">
-    <h3 class="alwayshidden">suite.rc special task runtime</h3>
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc special task runtime</h3>
 
-    <p>Finally, add these lines at the end of the <samp>suite.rc</samp>
-    file:</p>
-    <pre>
+      <p>Finally, add these lines at the end of the <samp>suite.rc</samp>
+      file:</p>
+      <pre>
     [[write_start_position]]
         command scripting = "echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position"
 </pre>
 
-    <p>This writes to the location we've set for <samp>navigate</samp> in
-    <var>POS_FPATH</var>, and sets our start coordinates to latitude
-    <samp>50.0</samp> north, <samp>3.0</samp> west. You can change these to
-    another location if you like.</p>
-  </div>
+      <p>This writes to the location we've set for <samp>navigate</samp> in
+      <var>POS_FPATH</var>, and sets our start coordinates to latitude
+      <samp>50.0</samp> north, <samp>3.0</samp> west. You can change these to
+      another location if you like.</p>
+    </div>
 
-  <div class="slide">
-    <h3>Checking the suite.rc</h3>
+    <div class="slide">
+      <h3>Checking the suite.rc</h3>
 
-    <p>Your suite.rc should now look like <a href="../etc/rose-suite-from-scratch/suite.rc">this</a>.</p>
-  </div>
+      <p>Your suite.rc should now look like <a href=
+      "../etc/rose-suite-from-scratch/suite.rc">this</a>.</p>
+    </div>
 
-  <div class="slide">
-    <h2>Summary So Far</h2>
+    <div class="slide">
+      <h2>Summary So Far</h2>
 
-    <p>So far we've:</p>
+      <p>So far we've:</p>
 
-    <ul class="incremental">
-      <li>analysed the Fortran program <samp>dead_reckoning.f90</samp></li>
+      <ul class="incremental">
+        <li>analysed the Fortran program <samp>dead_reckoning.f90</samp></li>
 
-      <li>created a blank suite with <code>rosie create</code></li>
-    </ul>
- </div>
- <div class="slide">
-    <h3 class="alwayshidden">Summary So Far (continued)</h3>
-    <ul class="incremental">
-      <li>made an app configuration for <samp>dead_reckoning.f90</samp>, called
-      <samp>navigate</samp>.</li>
+        <li>created a blank suite with <code>rosie create</code></li>
+      </ul>
+    </div>
 
-      <li>made a build app configuration for it, called
-      <samp>fcm_make_navigate</samp>.</li>
+    <div class="slide">
+      <h3 class="alwayshidden">Summary So Far (continued)</h3>
 
-      <li>written a suite.rc file</li>
-    </ul>
-  </div>
+      <ul class="incremental">
+        <li>made an app configuration for <samp>dead_reckoning.f90</samp>,
+        called <samp>navigate</samp>.</li>
 
-  <div class="slide">
-    <h2>Running our suite</h2>
+        <li>made a build app configuration for it, called
+        <samp>fcm_make_navigate</samp>.</li>
 
-    <p>Now our suite is ready to run.</p>
+        <li>written a suite.rc file</li>
+      </ul>
+    </div>
 
-    <p>Invoke <code>rose suite-run</code>:</p>
-    <pre class="shell">
+    <div class="slide">
+      <h2>Running our suite</h2>
+
+      <p>Now our suite is ready to run.</p>
+
+      <p>Invoke <code>rose suite-run</code>:</p>
+      <pre class="shell">
 rose suite-run
 </pre>
-  </div>
+    </div>
 
-  <div class="slide">
-    <h2>Extra work</h2>
+    <div class="slide">
+      <h2>Extra work</h2>
 
-    <p>You may want to experiment with adding metadata to your
-    <samp>navigate</samp> app, following the approach in the <a href=
-    "rose-conf-meta-dev.html">Metadata Development Guide</a>.</p>
-  </div>
+      <p>You may want to experiment with adding metadata to your
+      <samp>navigate</samp> app, following the approach in the <a href=
+      "rose-conf-meta-dev.html">Metadata Development Guide</a>.</p>
+    </div>
 
-  <div class="slide">
-    <h2>The End</h2>
+    <div class="slide">
+      <h2>The End</h2>
+    </div>
   </div>
-</div>
 </body>
 </html>
