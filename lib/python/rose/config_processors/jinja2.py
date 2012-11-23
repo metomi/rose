@@ -26,7 +26,7 @@ from tempfile import TemporaryFile
 
 class ConfigProcessorForJinja2(ConfigProcessorBase):
 
-    KEY = "jinja2"
+    SCHEME = "jinja2"
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Process jinja2:* sections in "config"."""
@@ -39,12 +39,12 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             if not os.access(target, os.F_OK | os.R_OK | os.W_OK):
                 continue
             f = TemporaryFile()
-            f.write("#!" + self.KEY + "\n")
+            f.write("#!" + self.SCHEME + "\n")
             for k, n in sorted(node.value.items()):
                 if not n.is_ignored():
                     f.write("{%% set %s=%s %%}\n" % (k, n.value))
             for line in open(target):
-                if line.rstrip().lower() != ("#!" + self.KEY):
+                if line.rstrip().lower() != ("#!" + self.SCHEME):
                     f.write(line)
             f.seek(0)
             open(target, "w").write(f.read())

@@ -31,6 +31,7 @@ Functions:
 import os
 import re
 import rose.env
+from rose.loc_handlers.svn import SvnInfoXMLParser
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
@@ -296,13 +297,12 @@ class SuiteId(object):
         """Return the ID of a location (origin URL or local copy path).
         """
         # FIXME: not sure why a closure for "state" does not work here?
-        info_parser = ParseXML()
+        info_parser = SvnInfoXMLParser()
         try:
-            state = info_parser.parse(self.svn("info", "--xml", location))
+            info_entry = info_parser.parse(self.svn("info", "--xml", location))
         except RosePopenError as e:
             raise SuiteIdLocationError(location)
 
-        info_entry = state["entry"]
         if not info_entry.has_key("url"):
             raise SuiteIdLocationError(location)
         root = info_entry["repository:root"]
@@ -398,38 +398,6 @@ class SuiteId(object):
         """Return the output directory for this suite."""
         suite_engine_proc = SuiteEngineProcessor.get_processor()
         return suite_engine_proc.get_suite_log_url(str(self))
-
-
-class ParseXML(object):
-
-    def __init__(self):
-        self.state = {"entry": {}, "index": None, "stack": []}
-        self.parser = xml.parsers.expat.ParserCreate()
-        self.parser.StartElementHandler = self._handle_tag0
-        self.parser.EndElementHandler = self._handle_tag1
-        self.parser.CharacterDataHandler = self._handle_text
-
-    def parse(self, text):
-        self.parser.Parse(text)
-        return self.state
-
-    def _handle_tag0(self, name, attr_map):
-        self.state["stack"].append(name)
-        self.state["index"] = ":".join(self.state["stack"][2:])
-        if self.state["entry"]:
-            self.state["entry"][self.state["index"]] = ""
-        for key, value in attr_map.items():
-            name = key
-            if self.state["index"]:
-                name = self.state["index"] + ":" + key
-            self.state["entry"][name] = value
-    
-    def _handle_tag1(self, name):
-        self.state["stack"].pop()
-
-    def _handle_text(self, text):
-        if self.state["index"]:
-            self.state["entry"][self.state["index"]] += text.strip()
 
 
 def main():
