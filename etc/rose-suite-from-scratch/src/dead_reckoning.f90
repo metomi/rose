@@ -62,7 +62,6 @@ if (l_verbose) then
     print*, "New position, me hearties:", new_lat, new_long
 end if
 
-print *, 
 open(1, file=pos_fpath, action='write')
 write(1, *) new_lat, new_long
 close(1)
