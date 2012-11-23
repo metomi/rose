@@ -24,6 +24,7 @@ sup {font-size: smaller; line-height: 1px;}
 .slide ul ul li {margin: .2em; font-size: 85%; list-style: square;}
 .slide img.leader {display: block; margin: 0 auto;}
 
+/*
 div#header, div#footer {background: #005; color: #AAB;
   font-family: Verdana, Helvetica, sans-serif;}
 div#header {background: #005 -16px 0 no-repeat;
@@ -31,6 +32,7 @@ div#header {background: #005 -16px 0 no-repeat;
 div#footer {font-size: 0.5em; font-weight: bold; padding: 1em 0;}
 #footer h1, #footer h2 {display: block; padding: 0 1em;}
 #footer h2 {font-style: italic;}
+*/
 
 div.long {font-size: 0.75em;}
 .slide h1 {position: absolute; top: 0.7em; left: 87px; z-index: 1;
@@ -48,12 +50,11 @@ html>body>body-header div#controls {position: fixed; padding: 0 0 1em 0;
 div#controls form {position: absolute; bottom: 0; right: 0; width: 100%;
   margin: 0; padding: 0;}
 #controls #navLinks a {padding: 0; margin: 0 0.5em; 
-  background: #005; border: none; color: #779; 
-  cursor: pointer;}
+  border: none; cursor: pointer;}
 #controls #navList {height: 1em;}
 #controls #navList #jumplist {position: absolute; bottom: 0; right: 0}
 
-#currentSlide {text-align: center; font-size: 0.5em; color: #449;}
+#currentSlide {text-align: center; font-size: 0.5em;}
 
 #slide0 {padding-top: 3.5em; font-size: 90%;}
 #slide0 h1 {position: static; margin: 1em 0 0; padding: 0;

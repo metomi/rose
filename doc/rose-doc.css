@@ -55,17 +55,17 @@ h1 {
     color: #ffcb00;
 }
 
-#body-header {
+.header-footer {
     color: white;
 }
 
-#body-header a:link {
+.header-footer a:link {
     color: #ffcb00;
 }
 
-#body-header a:visited,
-#body-header a:hover,
-#body-header a:active {
+.header-footer a:visited,
+.header-footer a:hover,
+.header-footer a:active {
     color: #ffcb00;
 }
 
@@ -85,7 +85,7 @@ samp,
     background: #eee;
 }
 
-#body-header {
+.header-footer {
     background: #060048;
 }
 
@@ -178,7 +178,7 @@ h4,
 h5,
 dt,
 .shell-prompt,
-#body-header p {
+.header-footer p {
     font-weight: bold;
 }
 
@@ -266,9 +266,9 @@ body,
 h1,
 h2,
 .shell-prompt,
-#body-header,
-#body-header img,
-#body-header p {
+.header-footer,
+.header-footer img,
+.header-footer p {
     margin: 0;
 }
 
@@ -327,7 +327,7 @@ var {
     padding-right: 0.2em;
 }
 
-#body-header p {
+.header-footer p {
     padding-top: 0.5em;
 }
 
@@ -341,11 +341,11 @@ var {
     float: left;
 }
 
-#body-header address {
+.header-footer address {
     float: right;
 }
 
-#body-header,
+.header-footer,
 #body-main {
     position: absolute;
 }
@@ -359,7 +359,7 @@ var {
  * HEIGHT AND WIDTH
  *
  **********************************************************************/
-#body-header {
+.header-footer {
     height: 2.9em;
     width: 100%;
 }
