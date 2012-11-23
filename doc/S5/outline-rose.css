@@ -5,7 +5,7 @@
 .layout div, #footer *, #currentSlide, #controlForm * {display: none; visibility: hidden}
  #footer, #controls, #controlForm, #navLinks, #toggle {
   display: inline; visibility: visible; margin: 0; padding: 0;}
- #footer {width: 30%; z-index: -100;}
+ #footer {width: 0%; z-index: -100;}
 #toggle {float: left}
 .layout div {float: right}
 .doc-toggle {width: 50%}
