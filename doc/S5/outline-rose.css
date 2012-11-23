@@ -7,6 +7,8 @@
   display: inline; visibility: visible; margin: 0; padding: 0;}
  #footer {width: 30%; z-index: -100;}
 #toggle {float: left}
+.layout div {float: right}
+.doc-toggle {width: 50%}
 /*html>body>body-header #toggle {position: fixed; top: 0; right: 0;} */
 
 /* making the outline look pretty-ish */

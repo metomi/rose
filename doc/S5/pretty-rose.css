@@ -74,10 +74,7 @@ html>body .external {border-bottom: none;}
 img.incremental {visibility: hidden;}
 .slide .current {color: #B02;}
 
-h2 {
-    border-top: none;
-}
-
+h2 {border-top: none;}
 /* diagnostics
 
 li:after {content: " [" attr(class) "]"; color: #F88;}

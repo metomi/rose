@@ -184,7 +184,7 @@ function toggle() {
 	if (!slides.disabled) {
 		slides.disabled = true;
 		outline.disabled = false;
-		document.getElementById('toggle').innerHTML = " slides ";
+		document.getElementById('toggle').innerHTML = " S5 slideshow ";
 		s5mode = false;
 		fontSize('1em');
 		for (var n = 0; n < smax; n++) {
@@ -194,7 +194,7 @@ function toggle() {
 	} else {
 		slides.disabled = false;
 		outline.disabled = true;
-		document.getElementById('toggle').innerHTML = " handout ";
+		document.getElementById('toggle').innerHTML = " single page ";
 		s5mode = true;
 		fontScale();
 		for (var n = 0; n < smax; n++) {
