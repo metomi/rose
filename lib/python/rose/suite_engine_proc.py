@@ -22,7 +22,9 @@
 from datetime import datetime, timedelta
 import os
 import re
+from rose.env import env_var_process
 from rose.popen import RosePopener
+from rose.resource import ResourceLocator
 from rose.fs_util import FileSystemUtil
 
 class SuiteScanResult(object):
@@ -325,8 +327,50 @@ class SuiteEngineProcessor(object):
         """Return a list of (user, host) for remote tasks in a suite."""
         raise NotImplementedError()
 
-    def get_suite_dir_rel(self, suite_name):
-        """Return the relative path to the suite running directory."""
+    def get_suite_dir(self, suite_name, *args):
+        """Return the path to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        """
+        return os.path.join(os.path.expanduser("~"),
+                            self.get_suite_dir_rel(suite_name, *args))
+
+    def get_suite_log_url(self, suite_name):
+        """Return the URL to the suite log directory.
+
+        Use the "home-public-html" setting in the site/user configuration to
+        determine the URL.
+        If no such setting is defined, return the suite running directory as a
+        "file://" URL.
+
+        """
+        log_index = self.get_suite_dir(suite_name, "log", "index.html")
+        if not os.path.exists(log_index):
+            return None
+        conf = ResourceLocator.default().get_conf()
+        value = conf.get_value(["rose-suite-log-view", "home-public-html"])
+        if value is None:
+            return "file://" + log_index
+        values = env_var_process(value).split(None, 1)
+        if len(values) == 1:
+            url_prefix = values[0]
+            public_html = ""
+        else:
+            url_prefix, public_html = values
+        home = os.path.expanduser("~")
+        dir_rel = self.get_suite_dir_rel(suite_name, "log")
+        if os.path.exists(os.path.join(home, public_html, dir_rel)):
+            return url_prefix + "/" + dir_rel
+        else:
+            return "file://" + log_index
+
+    def get_suite_dir_rel(self, suite_name, *args):
+        """Return the relative path to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        """
         raise NotImplementedError()
 
     def handle_event(self, *args, **kwargs):
