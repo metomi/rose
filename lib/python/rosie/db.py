@@ -586,7 +586,6 @@ class RosieDatabaseInitiator(object):
             engine = al.create_engine(url)
             metadata = al.MetaData()
             db_string = al.String(self.LEN_DB_STRING)
-            idx_string = al.String(rosie.suite_id.SuiteId.IDX_LEN)
             tables = []
             tables.append(al.Table(
                     "changeset", metadata,
@@ -597,10 +596,10 @@ class RosieDatabaseInitiator(object):
                     al.Column("idx", idx_string, nullable=False),
                     al.Column("branch", db_string, nullable=False),
                     al.Column("status", al.String(self.LEN_STATUS), nullable=False),
-                    al.Column("from_idx", idx_string)))
+                    al.Column("from_idx", db_string)))
             tables.append(al.Table(
                     "main", metadata,
-                    al.Column("idx", idx_string, primary_key=True, nullable=False),
+                    al.Column("idx", db_string, primary_key=True, nullable=False),
                     al.Column("branch", db_string, primary_key=True, nullable=False),
                     al.Column("owner", db_string, nullable=False),
                     al.Column("project", db_string, nullable=False),
