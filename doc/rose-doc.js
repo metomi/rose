@@ -30,11 +30,12 @@ $(function() {
             if (this.id == null || this.id == "") {
                 return;
             }
+            var tag_name = this.tagName.toLowerCase();
             // Add to table of content
-            while (CONTENT_INDEX_OF[this.tagName] < stack.length) {
+            while (CONTENT_INDEX_OF[tag_name] < stack.length) {
                 stack.shift();
             }
-            while (stack.length < CONTENT_INDEX_OF[this.tagName]) {
+            while (stack.length < CONTENT_INDEX_OF[tag_name]) {
                 var node = stack.length == 0 ? root : $("> :last-child", stack[0]);
                 stack.unshift($("<ul/>").appendTo(node));
             }
@@ -64,15 +65,23 @@ $(function() {
             if (this.href == null) {
                 return;
             }
-            var anchor = $("<a/>", {"class": "sign"}).append("+");
+            var img_exp = $(
+                "<img/>",
+                {"alt": "expand", "src": "rose-icon-expand.png"}
+            ).addClass("expand");
+            var img_col = $(
+                "<img/>",
+                {"alt": "collapse", "src": "rose-icon-collapse.png"}
+            ).addClass("collapse");
+            var anchor = $("<a/>").append(img_exp);
             anchor.insertBefore($(this));
             anchor.click(function() {
-                if ($(this).text() == "-") {
-                    anchor.text("+");
+                if ($("img", this).hasClass("collapse")) {
+                    $("img", this).replaceWith(img_exp);
                     node.next().hide();
                     return;
                 }
-                anchor.text("-");
+                $("img", this).replaceWith(img_col);
                 if (node.next().length) {
                     node.next().show();
                     return;
