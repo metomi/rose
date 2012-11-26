@@ -188,7 +188,8 @@ class MainWindow(object):
 
     def launch_help_dialog(self, somewidget=None):
         """Launch a browser to open the help url."""
-        webbrowser.open(rose.config_editor.HELP_URL)
+        webbrowser.open(rose.resource.ResourceLocator.default().get_doc_url() +
+                        rose.config_editor.HELP_FILE, new=True, autoraise=True)
         return False
 
     def launch_ignore_dialog(self, name_section_dict, prefs, is_ignored):

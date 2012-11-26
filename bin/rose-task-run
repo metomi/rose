@@ -65,8 +65,7 @@
 #     ROSE_TASK_N_JOBS
 #         The number of jobs to run in parallel in `fcm make`. (default=4)
 #     ROSE_TASK_OPTIONS
-#         Additional options and arguments for `fcm make` or `rose app-run`.
-#         (default='')
+#         Additional options and arguments for `fcm make`. (default='')
 #     ROSE_TASK_PRE_SCRIPT
 #         Source (. invoke) the specified script before running the main
 #         command. (default='')

@@ -20,10 +20,11 @@
 """Select an available host machine by load or by random."""
 
 from random import random
-import rose.config
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
+from rose.resource import ResourceLocator
+import shlex
 import sys
 from time import sleep, time
 
@@ -135,7 +136,7 @@ class HostSelector(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def expand(self, names=None, rank_method=None):
+    def expand(self, names=None, rank_method=None, thresholds=None):
         """Expand each name in names, and look up rank method for each name.
 
         names, if specified, should be a list of host names or known groups in
@@ -147,7 +148,7 @@ class HostSelector(object):
         If the default differs in hosts, use "load:15".
 
         """
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         if not names:
             node = conf.get(["rose-host-select", "default"],
                             no_ignore=True)
@@ -157,30 +158,45 @@ class HostSelector(object):
                 raise NoHostError()
 
         host_names = []
-        rank_methods = set()
+        rank_method_set = set()
+        thresholds_set = set()
         while names:
             name = names.pop()
             key = "group{" + name + "}"
-            node = conf.get(["rose-host-select", key], no_ignore=True)
-            if node is None:
+            value = conf.get_value(["rose-host-select", key])
+            if value is None:
                 host_names.append(name)
             else:
-                for v in node.value.split():
+                for v in value.split():
                     names.append(v)
                 if rank_method is None:
                     key = "method{" + name + "}"
-                    node = conf.get(["rose-host-select", key], no_ignore=True)
-                    if node is None:
-                        rank_methods.add(self.RANK_METHOD_DEFAULT)
+                    m = conf.get_value(["rose-host-select", key])
+                    if m is None:
+                        rank_method_set.add(self.RANK_METHOD_DEFAULT)
                     else:
-                        rank_methods.add(node.value)
+                        rank_method_set.add(m)
+                if thresholds is None:
+                    key = "thresholds{" + name + "}"
+                    t = conf.get_value(["rose-host-select", key])
+                    if t is None:
+                        thresholds_set.add(())
+                    else:
+                        thresholds_set.add(tuple(sorted(shlex.split(t))))
+                    
+
         # If default rank method differs in hosts, use load:15.
         if rank_method is None:
-            if len(rank_methods) == 1:
-                rank_method = rank_methods.pop()
+            if len(rank_method_set) == 1:
+                rank_method = rank_method_set.pop()
             else:
                 rank_method = self.RANK_METHOD_DEFAULT
-        return host_names, rank_method
+
+        if thresholds is None:
+            if len(thresholds_set) == 1:
+                thresholds = thresholds_set.pop()
+
+        return host_names, rank_method, thresholds
 
     def select(self, names=None, rank_method=None, thresholds=None):
         """Return a list. Element 0 is most desirable.
@@ -201,7 +217,8 @@ class HostSelector(object):
                     number that must be be exceeded.
         """
 
-        host_names, rank_method = self.expand(names, rank_method)
+        host_names, rank_method, thresholds = self.expand(names, rank_method,
+                                                          thresholds)
 
         # Load scorers, ranking and thresholds
         rank_method_arg = None
@@ -256,7 +273,7 @@ class HostSelector(object):
             host_proc_dict[host_name] = proc
 
         # Retrieve score for each host name
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         timeout_node = conf.get(["rose-host-select", "timeout"],
                                 no_ignore=True)
         timeout = getattr(timeout_node, "value", None)

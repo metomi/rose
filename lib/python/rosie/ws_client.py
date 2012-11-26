@@ -42,6 +42,7 @@ from rosie.suite_id import SuiteId, SuiteIdError
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
+from rose.resource import ResourceLocator
 
 ERR_INVALID_URL = "Invalid url: {0}"
 ERR_NO_SUITES_FOUND = "{0}: no suites found."
@@ -76,7 +77,7 @@ class Client(object):
 
     def __init__(self, root=None, prefix=None):
         if root is None:
-            config = rose.config.default_node()
+            config = ResourceLocator.default().get_conf()
             node = config.get(["rosie-ws-client", "ws-root-default"])
             root = node.value
         self.root = root
@@ -111,8 +112,8 @@ class Client(object):
         except ValueError:
             raise QueryError("%s: %s" % (method, kwargs))
     
-    def get_common_keys(self):
-        return self._get("get_common_keys")
+    def get_known_keys(self):
+        return self._get("get_known_keys")
 
     def get_optional_keys(self):
         return self._get("get_optional_keys")
@@ -232,6 +233,9 @@ def lookup(argv):
     if opts.url:
         ws_client = Client()
         addr = args[0]
+        if not addr.endswith("&format=json"):
+            addr += "&format=json"
+        
         if opts.debug_mode:
             results = ws_client.address_search(None,url=addr)
             url = addr
@@ -381,7 +385,7 @@ def get_local_status(suites, prefix, idx, branch, revision):
 
 def align(res, keys):
     """Function to align results to be displayed by display map"""
-    if len(res) == 1:
+    if len(res) <= 1:
         return res
     for k in keys:
         if k != "date":
@@ -420,11 +424,8 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         opts.format = FORMAT_QUIET
     elif not opts.format:
         opts.format = FORMAT_DEFAULT
-    
-    all_keys = []
-        
-    common_keys = ws_client.get_common_keys()
-    all_keys += common_keys
+
+    all_keys = ws_client.get_known_keys()
     
     if local_suites == None:
         local_suites = get_local_suites(opts.prefix)
@@ -478,6 +479,8 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
            report(suite, clip=terminal_cols)
         report(SuiteInfo(dict_row), prefix="")
     if url is not None:
+        if url.endswith("&format=json"):
+            url = url.replace("&format=json", "")
         report(URLEvent(url + "\n"), prefix="")
 
 

@@ -30,11 +30,12 @@ Functions:
 
 import os
 import re
-import rose.config
 import rose.env
+from rose.loc_handlers.svn import SvnInfoXMLParser
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
+from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import string
 import sys
@@ -120,7 +121,7 @@ class SuiteId(object):
     @classmethod
     def get_latest(cls, prefix=None):
         """Return the previous (latest) ID in the suite repository."""
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         if not prefix:
             prefix = cls.get_prefix_default()
         dir_url = cls.get_prefix_location(prefix)
@@ -133,6 +134,7 @@ class SuiteId(object):
                     return None
                 raise SuiteIdLatestError(prefix)
             dirs = filter(lambda line: line.endswith("/"), out.splitlines())
+            # Note - 'R/O/S/I/E' sorts to top for lowercase initial idx letter
             dir_url = dir_url + "/" + sorted(dirs)[-1].rstrip("/")
 
         # FIXME: not sure why a closure for "state" does not work here?
@@ -173,7 +175,7 @@ class SuiteId(object):
     @classmethod
     def get_local_copy_root(cls):
         """Return the root directory for hosting the local suite copies."""
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", "local-copy-root"], no_ignore=True)
         if node:
             local_copy_root = node.value
@@ -196,7 +198,7 @@ class SuiteId(object):
     @classmethod
     def get_output_root(cls):
         """Return the root output directory for suites."""
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", "output-root"], no_ignore=True)
         if node:
             path = node.value
@@ -208,7 +210,7 @@ class SuiteId(object):
     @classmethod
     def get_prefix_default(cls):
         """Return the default prefix."""
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", "prefix-default"], no_ignore=True)
         if node is None:
             raise SuiteIdPrefixError()
@@ -220,7 +222,7 @@ class SuiteId(object):
         if prefix is None:
             prefix = cls.get_prefix_default()
         key = "prefix-location." + prefix
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", key], no_ignore=True)
         if node is None:
             raise SuiteIdPrefixError(prefix)
@@ -232,7 +234,7 @@ class SuiteId(object):
         locations.
         """
         ret = {}
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         rosie_id_node = config.get(["rosie-id"], no_ignore=True)
         if rosie_id_node is None:
             return ret
@@ -249,7 +251,7 @@ class SuiteId(object):
         if prefix is None:
             prefix = cls.get_prefix_default()
         key = "prefix-web." + prefix
-        config = rose.config.default_node()
+        config = ResourceLocator.default().get_conf()
         node = config.get(["rosie-id", key], no_ignore=True)
         if node is None:
             raise SuiteIdPrefixError(prefix)
@@ -289,7 +291,7 @@ class SuiteId(object):
             raise SuiteIdTextError(id_text)
         self.prefix, idx_short, self.branch, self.revision = match.groups()
         if not self.prefix:
-            config = rose.config.default_node()
+            config = ResourceLocator.default().get_conf()
             self.prefix = self.get_prefix_default()
             if not self.prefix:
                 raise SuiteIdPrefixError(id_text)
@@ -299,13 +301,12 @@ class SuiteId(object):
         """Return the ID of a location (origin URL or local copy path).
         """
         # FIXME: not sure why a closure for "state" does not work here?
-        info_parser = ParseXML()
+        info_parser = SvnInfoXMLParser()
         try:
-            state = info_parser.parse(self.svn("info", "--xml", location))
+            info_entry = info_parser.parse(self.svn("info", "--xml", location))
         except RosePopenError as e:
             raise SuiteIdLocationError(location)
 
-        info_entry = state["entry"]
         if not info_entry.has_key("url"):
             raise SuiteIdLocationError(location)
         root = info_entry["repository:root"]
@@ -400,41 +401,8 @@ class SuiteId(object):
 
     def to_output(self):
         """Return the output directory for this suite."""
-        output_root = self.get_output_root()
-        directory = os.path.join(output_root, str(self), "log")
-        return directory
-
-
-class ParseXML(object):
-
-    def __init__(self):
-        self.state = {"entry": {}, "index": None, "stack": []}
-        self.parser = xml.parsers.expat.ParserCreate()
-        self.parser.StartElementHandler = self._handle_tag0
-        self.parser.EndElementHandler = self._handle_tag1
-        self.parser.CharacterDataHandler = self._handle_text
-
-    def parse(self, text):
-        self.parser.Parse(text)
-        return self.state
-
-    def _handle_tag0(self, name, attr_map):
-        self.state["stack"].append(name)
-        self.state["index"] = ":".join(self.state["stack"][2:])
-        if self.state["entry"]:
-            self.state["entry"][self.state["index"]] = ""
-        for key, value in attr_map.items():
-            name = key
-            if self.state["index"]:
-                name = self.state["index"] + ":" + key
-            self.state["entry"][name] = value
-    
-    def _handle_tag1(self, name):
-        self.state["stack"].pop()
-
-    def _handle_text(self, text):
-        if self.state["index"]:
-            self.state["entry"][self.state["index"]] += text.strip()
+        suite_engine_proc = SuiteEngineProcessor.get_processor()
+        return suite_engine_proc.get_suite_log_url(str(self))
 
 
 def main():

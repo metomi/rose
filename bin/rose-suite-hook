@@ -36,7 +36,7 @@
 #     --debug
 #         Switch on debug mode.
 #     --mail-cc=LIST
-#         Only useful if the --mail-if=LIST option is specified. Specify a
+#         Only useful if the --mail option is specified. Specify a
 #         comma separated list of additional addresses to email.
 #     --mail
 #         Trigger an email notification to the user.

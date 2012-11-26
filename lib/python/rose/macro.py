@@ -37,12 +37,14 @@ import rose.resource
 import rose.variable
 
 
-ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate"]
+ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate",
+                               "downgrade", "upgrade"]
 ERROR_LOAD_CONFIG_DIR = "{0}: not an application directory.\n"
 ERROR_LOAD_MACRO = "Could not load macro {0}: {1}"
-ERROR_LOAD_METADATA_DIR = "Could not find metadata directory.\n"
-ERROR_LOAD_METADATA = "Could not load metadata {0}: {1}"
-ERROR_LOAD_META_PATH = "Could not find {0}\n"
+ERROR_LOAD_METADATA = "Could not load metadata {0}\n"
+ERROR_LOAD_CHOSEN_META_PATH = "Could not find metadata for {0}, using {1}\n"
+ERROR_LOAD_META_PATH = "Could not find metadata for {0}\n"
+ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACROS = "Please specify a macro name.\n"
 MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"), "macros")
@@ -83,7 +85,9 @@ class MacroValidateError(Exception):
 class MacroBase(object):
 
     """Base class for macros for validating or transforming configurations."""
-    
+
+    reports = []  # A list of MacroReport instances for errors or changes
+
     def _get_section_option_from_id(self, var_id):
         """Return a configuration section and option from an id."""
         section_option = var_id.split(rose.CONFIG_DELIMITER, 1)
@@ -133,7 +137,7 @@ class MacroBase(object):
         root_dir = os.path.dirname(library_dir)
         # root_dir is the directory of the rose-meta.conf file.
         etc_path = os.path.join(root_dir, 'etc')
-        resource_path = os.path.join(etc_path, 'macro')
+        resource_path = os.path.join(etc_path, 'macros')
         resource_path = os.path.join(resource_path, macro_name)
         resource_path = os.path.join(resource_path, filename)
         return resource_path
@@ -146,8 +150,46 @@ class MacroBase(object):
         """Standardise configuration syntax."""
         standard_format_config(config)
 
-    def add_report(self, report_list, *args, **kwargs):
-        report_list.append(MacroReport(*args, **kwargs))
+    def add_report(self, *args, **kwargs):
+        self.reports.append(MacroReport(*args, **kwargs))
+
+
+class MacroValidatorCollection(MacroBase):
+
+    """Collate several macros into one."""
+
+    def __init__(self, *macros):
+        self.macros = macros
+        super(MacroValidatorCollection, self).__init__()
+
+    def validate(self, config, meta_config):
+        for macro_inst in self.macros:
+            if not hasattr(macro_inst, VALIDATE_METHOD):
+                continue
+            macro_method = getattr(macro_inst, VALIDATE_METHOD)
+            p_list = macro_method(config, meta_config)
+            p_list.sort(self._sorter)
+            self.reports += p_list
+        return self.reports 
+
+
+class MacroTransformerCollection(MacroBase):
+
+    """Collate several macros into one."""
+
+    def __init__(self, *macros):
+        self.macros = macros
+        super(MacroTransformerCollection, self).__init__()
+
+    def transform(self, config, meta_config=None):
+        for macro_inst in self.macros:
+            if not hasattr(macro_inst, TRANSFORM_METHOD):
+                continue
+            macro_method = getattr(macro_inst, TRANSFORM_METHOD)
+            config, c_list = macro_method(config, meta_config)
+            c_list.sort(self._sorter)
+            self.reports += c_list
+        return config, self.reports
 
 
 class MacroReport(object):
@@ -163,37 +205,104 @@ class MacroReport(object):
         self.is_warning = is_warning
 
 
-def load_meta_path(config=None, directory=None):
-    """Retrieve the path to the metadata."""
+def add_site_meta_paths():
+    """Load any metadata paths specified in a user or site configuration."""
+    conf = rose.resource.ResourceLocator.default().get_conf()
+    path = conf.get_value([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_PATH])
+    if path is not None:
+        for path in path.split(os.pathsep):
+            path = os.path.expanduser(os.path.expandvars(path))
+            sys.path.insert(0, os.path.abspath(path))
+
+
+def add_env_meta_paths():
+    """Load the environment variable ROSE_META_PATH, if defined."""
+    path = os.environ.get("ROSE_META_PATH")
+    if path is not None:
+        for path in path.split(os.pathsep):
+            path = os.path.expanduser(os.path.expandvars(path))
+            sys.path.insert(0, os.path.abspath(path))
+
+
+def add_opt_meta_paths(meta_paths):
+    """Load any metadata paths in a list of ":"-separated strings."""
+    if meta_paths is not None:
+        meta_paths.reverse()
+        for child_paths in [arg.split(os.pathsep) for arg in meta_paths]:
+            child_paths.reverse()
+            for path in child_paths:
+                path = os.path.expandvars(os.path.expanduser(path))
+                sys.path.insert(0, os.path.abspath(path))
+
+
+def load_meta_path(config=None, directory=None, is_upgrade=False,
+                   locator=None):
+    """Retrieve the path to the configuration metadata directory.
+
+    Arguments:
+        config - a rose config, perhaps with a meta= or project= flag
+        directory - the directory of the rose config file
+        is_upgrade - if True, load the path in an upgrade-specific way
+        locator - a rose.resource.ResourceLocator instance.
+
+    Returns the path to(or None) and a warning message (or None).
+
+    """
     if config is None:
         config = rose.config.ConfigNode()
-    if directory is not None:
+    warning = None
+    if directory is not None and not is_upgrade:
         config_meta_dir = os.path.join(directory, rose.CONFIG_META_DIR)
-        if os.path.isdir(config_meta_dir):
-            return config_meta_dir
-    locator = rose.resource.ResourceLocator(paths=sys.path)
+        meta_file = os.path.join(config_meta_dir, rose.META_CONFIG_NAME)
+        if os.path.isfile(meta_file):
+            return config_meta_dir, warning
+    if locator is None:
+        locator = rose.resource.ResourceLocator(paths=sys.path)
     opt_node = config.get([rose.CONFIG_SECT_TOP,
                            rose.CONFIG_OPT_META_TYPE], no_ignore=True)
     ignore_meta_error = opt_node is None
     if opt_node is None:
         opt_node = config.get([rose.CONFIG_SECT_TOP,
                                rose.CONFIG_OPT_PROJECT], no_ignore=True)
-    meta_path = "all" if opt_node is None else opt_node.value
-    meta_path = "etc/metadata/" + meta_path
-    try:
-        meta_path = locator.locate(meta_path)
-    except rose.resource.ResourceError:
-        if not ignore_meta_error:
-            sys.stderr.write(ERROR_LOAD_META_PATH.format(meta_path))
-        return None
-    return meta_path
+    if opt_node is None or not opt_node.value:
+        meta_keys = ["etc/metadata/all"]
+    else:
+        key = opt_node.value
+        if "/" not in key:
+            key = key + "/" + rose.META_DEFAULT_VN_DIR
+        meta_keys = [key]
+        if is_upgrade:
+            meta_keys = key.split("/")[0]
+        else:
+            default_key = (key.rsplit("/", 1)[0] + "/" +
+                           rose.META_DEFAULT_VN_DIR)
+            if default_key != key:
+                meta_keys.append(default_key)
+    for i, meta_key in enumerate(meta_keys):
+        try:
+            meta_path = locator.locate(os.path.join(meta_key,
+                                                    rose.META_CONFIG_NAME))
+        except rose.resource.ResourceError:
+            continue
+        else:
+            if not ignore_meta_error and i > 0:
+                warning = ERROR_LOAD_CHOSEN_META_PATH.format(meta_keys[0],
+                                                             meta_keys[i])
+            return os.path.dirname(meta_path), warning
+    if not ignore_meta_error:
+        warning = ERROR_LOAD_META_PATH.format(meta_keys[0])
+    return None, warning
 
 
-def load_meta_config(config, directory=None):
+def load_meta_config(config, directory=None, error_handler=None):
     """Return the metadata config for a configuration."""
+    if error_handler is None:
+        error_handler = _report_error
     meta_config = rose.config.ConfigNode()
     meta_list = ['etc/metadata/all/' + rose.META_CONFIG_NAME]
-    config_meta_path = load_meta_path(config, directory)
+    config_meta_path, warning = load_meta_path(config, directory)
+    if warning is not None:
+        error_handler(text=warning)
     if config_meta_path is not None:
         path = os.path.join(config_meta_path, rose.META_CONFIG_NAME)
         if path not in meta_list:
@@ -205,14 +314,14 @@ def load_meta_config(config, directory=None):
     for meta_key in meta_list:
         try:
             meta_path = locator.locate(meta_key)
-        except rose.resource.ResourceError:
+        except rose.resource.ResourceError as e:
             if not ignore_meta_error:
-                sys.stderr.write(ERROR_LOAD_META_PATH.format(meta_path))
+                error_handler(text=ERROR_LOAD_META_PATH.format(meta_path))
         else:
             try:
                 meta_config = rose.config.load(meta_path, meta_config)
             except rose.config.SyntaxError as e:
-                sys.stderr.write(ERROR_LOAD_METADATA.format(meta_path, e))
+                error_handler(text=str(e))
     return meta_config
 
 
@@ -264,10 +373,9 @@ def get_macros_for_config(app_config=None,
     """Driver function to return macro names for a config object."""
     if app_config is None:
         app_config = rose.config.ConfigNode()
-    meta_path = load_meta_path(app_config, config_directory)
+    meta_path, warning = load_meta_path(app_config, config_directory)
     if meta_path is None:
-        sys.stderr.write(ERROR_LOAD_METADATA)
-        sys.exit(2)
+        sys.exit(ERROR_LOAD_METADATA.format(""))
     meta_filepaths = []
     for dirpath, dirnames, filenames in os.walk(meta_path):
         if "/.svn" in dirpath:
@@ -375,49 +483,23 @@ def get_metadata_for_config_id(setting_id, meta_config):
     return metadata
 
 
-def main():
-    opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("all", "conf_dir", "meta_path",
-                              "non_interactive", "output_dir", "validate_all")
+def run_macros(app_config, meta_config, config_name, macro_names,
+               opt_all=False, opt_conf_dir=None, opt_non_interactive=False,
+               opt_output_dir=None, opt_validate_all=False,
+               opt_quietness=False):
+    """Run standard or custom macros for a configuration."""
 
-    opts, macro_names = opt_parser.parse_args()
-    if opts.conf_dir is None:
-        opts.conf_dir = os.getcwd()
-    sys.path.append(os.getenv("ROSE_HOME"))
-    if opts.meta_path is not None:
-        sys.path = opts.meta_path + sys.path
-    config_name = os.path.basename((os.path.abspath(opts.conf_dir)))
-    config_file_path = os.path.join(opts.conf_dir,
-                                    rose.SUB_CONFIG_NAME)
-    if (not os.path.exists(config_file_path) or
-        not os.path.isfile(config_file_path)):
-        sys.stderr.write(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir))
-        sys.exit(2)
-    # Load the configuration and the metadata macros.
-    app_config = rose.config.load(config_file_path)
-    standard_format_config(app_config)
-
-    should_include_system = opts.all
+    should_include_system = opt_all
     if macro_names:
         should_include_system = True
+        
     macro_tuples, modules = get_macros_for_config(
-                  app_config, opts.conf_dir,
+                  app_config, opt_conf_dir,
                   return_modules=True,
                   include_system=should_include_system)
 
-    # Load meta config if it exists.
-    meta_path = load_meta_path(app_config, opts.conf_dir)
-    if meta_path is None:
-        sys.stderr.write(ERROR_LOAD_METADATA)
-        sys.exit(2)
-    meta_config_path = os.path.join(meta_path, rose.META_CONFIG_NAME)
-    meta_config = None
-    if os.path.isfile(meta_config_path):
-        meta_config = rose.config.load(meta_config_path)
-    
-    
     # Add all validator macros to the run list if specified.
-    if opts.validate_all:
+    if opt_validate_all:
         for module_name, class_name, method, help in macro_tuples:
             if method == VALIDATE_METHOD:
                 macro_name = ".".join([module_name, class_name])
@@ -431,7 +513,7 @@ def main():
             macro_name = ".".join([module_name, class_name])
             macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], config_name,
                                               macro_name)
-            if opts.quietness:
+            if opt_quietness:
                 print macro_id
             else:
                 print macro_id
@@ -461,7 +543,7 @@ def main():
                                               macro_tuples)
         if config_problem_dict:
             RC = 1
-            if not opts.quietness:
+            if not opt_quietness:
                 problem_macros = config_problem_dict.keys()
                 problem_macros.sort()
                 for macro_name in problem_macros:
@@ -498,43 +580,144 @@ def main():
 
     # Run any transform macros.
     if TRANSFORM_METHOD in macros_by_type:
-        for transformer_macro in macros_by_type[TRANSFORM_METHOD]:
-            user_allowed_changes = False
-            macro_config = copy.deepcopy(app_config)
-            new_config, change_list = transform_config(macro_config,
-                                                       meta_config,
-                                                       transformer_macro,
-                                                       modules, macro_tuples)
-            method_id = TRANSFORM_METHOD.upper()[0]
-            macro_id = MACRO_OUTPUT_ID.format(method_id, config_name,
-                                              transformer_macro)
-            if change_list:
-                header = MACRO_OUTPUT_TRANSFORM_CHANGES
-                sys.stdout.write(header.format(macro_id, len(change_list)))
-                for rep in change_list:  # MacroReport instances
-                    out = TRANSFORM_CHANGE.format(
-                                rep.section, rep.option, rep.value, rep.info)
-                    sys.stdout.write(out + "\n")
-                if not opts.non_interactive:
-                    try:
-                        user_input = raw_input(PROMPT_ACCEPT_CHANGES)
-                    except EOFError:
-                        user_allowed_changes = False
-                    else:
-                        user_allowed_changes = (user_input == PROMPT_OK)
-            else:
-                 user_allowed_changes = False
-            if user_allowed_changes or opts.non_interactive:
-                app_config = new_config
-                pretty_format_config(app_config)
-                if opts.output_dir is None:
-                    rose.config.dump(app_config, config_file_path)
-                else:
-                    new_file_path = os.path.join(opts.output_dir,
-                                                 rose.SUB_CONFIG_NAME)
-                    rose.config.dump(app_config, new_file_path)
+        _run_transform_macros(macros_by_type[TRANSFORM_METHOD],
+                              config_name, app_config, meta_config, modules,
+                              macro_tuples,
+                              opt_non_interactive=opt_non_interactive,
+                              opt_conf_dir=opt_conf_dir,
+                              opt_output_dir=opt_output_dir)
     sys.exit(RC)
 
+
+def _run_transform_macros(macros, config_name, app_config, meta_config,
+                          modules, macro_tuples, opt_non_interactive=False,
+                          opt_conf_dir=None, opt_output_dir=None):
+    for transformer_macro in macros:
+        user_allowed_changes = False
+        macro_config = copy.deepcopy(app_config)
+        new_config, change_list = transform_config(macro_config,
+                                                   meta_config,
+                                                   transformer_macro,
+                                                   modules, macro_tuples)
+        method_id = TRANSFORM_METHOD.upper()[0]
+        macro_id = MACRO_OUTPUT_ID.format(method_id, config_name,
+                                          transformer_macro)
+        _handle_transform(app_config, new_config, change_list, macro_id,
+                          opt_conf_dir, opt_output_dir, opt_non_interactive)
+
+
+def _handle_transform(app_config, new_config, change_list, macro_id,
+                      opt_conf_dir, opt_output_dir, opt_non_interactive):
+    user_allowed_changes = False
+    if change_list:
+        header = MACRO_OUTPUT_TRANSFORM_CHANGES
+        sys.stdout.write(header.format(macro_id, len(change_list)))
+        for rep in change_list:  # MacroReport instances
+            out = TRANSFORM_CHANGE.format(
+                        rep.section, rep.option, rep.value, rep.info)
+            sys.stdout.write(out + "\n")
+        if not opt_non_interactive:
+            user_allowed_changes = _get_user_accept()
+    else:
+        user_allowed_changes = False
+    if user_allowed_changes or opt_non_interactive:
+        app_config = new_config
+        dump_config(app_config, opt_conf_dir, opt_output_dir)
+            
+
+def _get_user_accept():
+    try:
+        user_input = raw_input(PROMPT_ACCEPT_CHANGES)
+    except EOFError:
+        user_allowed_changes = False
+    else:
+        user_allowed_changes = (user_input == PROMPT_OK)
+    return user_allowed_changes
+
+
+def dump_config(app_config, opt_conf_dir, opt_output_dir=None):
+    pretty_format_config(app_config)
+    if opt_output_dir is None:
+        directory = opt_conf_dir
+    else:
+        directory = opt_output_dir
+    file_path = os.path.join(directory, rose.SUB_CONFIG_NAME)
+    rose.config.dump(app_config, file_path)
+
+
+def parse_macro_mode_args(mode="macro", argv=None):
+    """Parse options/arguments for rose macro and upgrade."""
+    opt_parser = RoseOptionParser()
+    options = ["conf_dir", "meta_path", "non_interactive", "output_dir"]
+    if mode == "macro":
+        options.extend(["all", "validate_all"])
+    elif mode == "upgrade":
+        options.extend(["downgrade"])
+    else:
+        raise KeyError("Wrong mode: {0}".format(mode))
+    opt_parser.add_my_options(*options)
+    if argv is None:
+        opts, args = opt_parser.parse_args()
+    else:
+        opts, args = opt_parser.parse_args(argv)
+    opts, args = opt_parser.parse_args(argv)
+    if mode == "upgrade" and len(args) > 1:
+        sys.stderr.write(parser.get_usage())
+        return None
+    if opts.conf_dir is None:
+        opts.conf_dir = os.getcwd()
+    sys.path.append(os.getenv("ROSE_HOME"))
+    add_opt_meta_paths(opts.meta_path)
+    config_name = os.path.basename((os.path.abspath(opts.conf_dir)))
+    config_file_path = os.path.join(opts.conf_dir,
+                                    rose.SUB_CONFIG_NAME)
+    if (not os.path.exists(config_file_path) or
+        not os.path.isfile(config_file_path)):
+        sys.stderr.write(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir))
+        return None
+    # Load the configuration and the metadata macros.
+    app_config = rose.config.load(config_file_path)
+    standard_format_config(app_config)
+
+    # Load meta config if it exists.
+    meta_config = None
+    meta_path, warning = load_meta_path(app_config, opts.conf_dir)
+    if meta_path is None:
+        if mode == "macro":
+            text = ERROR_LOAD_METADATA.format("")
+            if warning:
+                text = warning
+            sys.stderr.write(text)
+            return None
+    else:
+        meta_config_path = os.path.join(meta_path, rose.META_CONFIG_NAME)
+        if os.path.isfile(meta_config_path):
+            meta_config = rose.config.load(meta_config_path)
+    return app_config, meta_config, config_name, args, opts
+
+
+def _report_error(exception=None, text=""):
+    """This will be replaced by rose.reporter utilities."""
+    if text:
+        text += "\n"
+    if exception is not None:
+        text += type(exception).__name__ + ": " + str(exception) + "\n"
+    sys.stderr.write(text + "\n")
+
+
+def main():
+    """Run rose macro."""
+    add_site_meta_paths()
+    add_env_meta_paths()
+    return_objects = parse_macro_mode_args()
+    if return_objects is None:
+        sys.exit(1)
+    app_config, meta_config, config_name, args, opts = return_objects
+    run_macros(app_config, meta_config, config_name, args,
+               opts.all, opts.conf_dir,
+               opts.non_interactive, opts.output_dir,
+               opts.validate_all, opts.quietness)
+               
 
 if __name__ == "__main__":
     main()

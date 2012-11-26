@@ -167,12 +167,7 @@ class ConfigDataManager(object):
                     self.load_top_config(top_level_directory)
                     break
             else:
-                path = os.path.join(top_level_directory, rose.TOP_CONFIG_NAME)
-                text = rose.config_editor.ERROR_NOT_FOUND.format(path)
-                title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         text, title)
-                sys.exit(2)
+                self.load_top_config(None)
         elif not config_obj_dict:
             self.load_top_config(None)
         else:
@@ -512,36 +507,14 @@ class ConfigDataManager(object):
 
     def load_meta_path(self, config=None, directory=None):
         """Retrieve the path to the metadata."""
-        if config is None:
-            config = rose.config.ConfigNode()
-        if directory is not None:
-            config_meta_dir = os.path.join(directory, rose.CONFIG_META_DIR)
-            if os.path.isdir(config_meta_dir):
-                return config_meta_dir
-        value = self.get_config_meta_flag(config)
-        if value is None:
-            meta_path = 'all'
-        else:
-            meta_path = value
-        meta_path = 'etc/metadata/' + meta_path
-        try:
-            meta_path = self.locator.locate(meta_path)
-        except rose.resource.ResourceError:
-            if not self.get_config_is_discovery(config):
-                text = rose.config_editor.ERROR_NOT_FOUND.format(meta_path)
-                title = rose.config_editor.DIALOG_TITLE_META_LOAD_ERROR
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         text, title)
-            return None
-        else:
-            return meta_path
+        return rose.macro.load_meta_path(config, directory)
 
     def get_config_meta_flag(self, config):
         """Return the metadata id flag."""
         for keylist in [[rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],
                         [rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_PROJECT]]:
             type_node = config.get(keylist, no_ignore=True)
-            if type_node is not None:
+            if type_node is not None and type_node.value:
                 return type_node.value
         return None
 
@@ -553,42 +526,18 @@ class ConfigDataManager(object):
 
     def load_meta_config(self, config=None, directory=None):
         """Load the main metadata, and any specified in 'config'."""
-        should_warn = True
         if config is None:
             config = rose.config.ConfigNode()
-        else:
-            should_warn = not self.get_config_is_discovery(config)
-        meta_config = rose.config.ConfigNode()
-        meta_list = ['etc/metadata/all/' + rose.META_CONFIG_NAME]
-        config_meta_path = self.load_meta_path(config, directory)
-        if config_meta_path is not None:
-            meta_list.append(os.path.join(config_meta_path,
-                                          rose.META_CONFIG_NAME))
-        for meta_key in meta_list:
-            try:
-                meta_path = self.locator.locate(meta_key)
-            except rose.resource.ResourceError:
-                if should_warn:
-                    rose.gtk.util.run_dialog(
-                             rose.gtk.util.DIALOG_TYPE_ERROR,
-                             rose.config_editor.ERROR_ID_NOT_FOUND.format(
-                                                                   meta_key))
-            else:
-                try:
-                    meta_config = rose.config.load(meta_path, meta_config)
-                except rose.config.SyntaxError as e:
-                    rose.gtk.util.run_dialog(
-                                  rose.gtk.util.DIALOG_TYPE_ERROR,
-                                  rose.config_editor.ERROR_LOAD_SYNTAX +
-                                  meta_path + "\n" + str(e))
-        return meta_config
+        error_handler = rose.config_editor.util.launch_error_dialog
+        return rose.macro.load_meta_config(config, directory,
+                                           error_handler)
 
     def load_meta_files(self, config=None, directory=None):
         """Load the file paths of files within the metadata directory."""
         if config is None:
             config = rose.config.ConfigNode()
         meta_filepaths = []
-        meta_path = self.load_meta_path(config, directory)
+        meta_path, warning = self.load_meta_path(config, directory)
         if meta_path is None:
             return []
         try:
@@ -991,17 +940,6 @@ class ConfigDataManager(object):
         sect, opt = self.util.get_section_option_from_id(var_id)
         return self.config[config_name].vars.get_var(sect, opt, save,
                                                      no_latent=not latent)
-
-    def clear_flag(self, flag_type, config_name=None):
-        """Remove a flag from configuration variables."""
-        if config_name is None:
-            configs = self.config.keys()
-        else:
-            configs = [config_name]
-        for name in configs:
-            for var in self.config[name].vars.get_all():
-                if flag_type in var.flags:
-                    var.flags.pop(flag_type)
 
 #------------------ Data model helper functions ------------------------------
 

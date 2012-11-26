@@ -20,6 +20,10 @@
 # To activate this file, place it at $ROSE_HOME/etc/rose.conf
 #-------------------------------------------------------------------------------
 
+# Common site configuration.
+## URL to Rose documentation.
+#  rose-doc=http://host/rose/doc/
+
 # Configuration of external commands.
 #
 ## Launch text editor (default=vi).
@@ -45,11 +49,19 @@
 #  project-url = http://host/rose/
 [rose-config-edit]
 
-# Configuration specific to "rose host-select".
+# Configuration related to "rose host-select".
 # See $ROSE_HOME/bin/rose-host-select for detail.
 [rose-host-select]
 
-# Configuration specific to "rose suite-run".
+# Configuration related to "rose suite-log-view"
+#
+## Mapping $HOME/cylc-run/SUITE to a http:// URL.
+## E.g. If $HOME/public_html/cylc-run is a symlink of $HOME/cylc-run
+##      and $HOME/public_html/ is served as http://host/~$USER/:
+#  home-public-html = http://host/~$USER public_html
+[rose-suite-log-view]
+
+# Configuration related to "rose suite-run".
 #
 ## Hosts in [rose-host-select] section that can be used to run a suite.
 #  hosts=localhost
@@ -72,7 +84,7 @@
 #  num-ping-try-max=3
 [rose-suite-run]
 
-# Configuration specific to "rose task-run".
+# Configuration related to "rose task-run".
 #
 ## Items to prepend to the PATH environment variable
 #  path-prepend=/path/1 /path/2
@@ -88,7 +100,13 @@
 #  hostname=/path/to/rose/at/hostname
 [rose-home-at]
 
-# Configuration specific to the databse of the Rosie web service server
+# Configuration related to "rose ana"
+
+## Items to prepend to the search path for user methods
+## method-path=/path/1 /path2
+[rose-ana]
+
+# Configuration related to the databse of the Rosie web service server
 #
 ## The database location of a given repository prefix
 #  db.PREFIX = URL
@@ -96,7 +114,7 @@
 #  repos.PREFIX = URL
 [rosie-db]
 
-# Configuration specific to Rosie browse/go GUI
+# Configuration related to Rosie browse/go GUI
 # See the $ROSE_HOME/lib/python/rosie/browser/__init__.py for detail.
 #
 ## Path to a picture containing the suite engine icon.
@@ -107,7 +125,7 @@
 #  wiki-url = http://host/rose/
 [rosie-browse]
 
-# Configuration specific to Rosie client commands
+# Configuration related to Rosie client commands
 #
 ## Root directory of local (working) copies of suites (default=$HOME/roses)
 #  local-copy-root = $HOME/roses
@@ -119,13 +137,13 @@
 #  prefix-web.PREFIX = URL
 [rosie-id]
 
-# Configuration specific to Rosie web service server
+# Configuration related to Rosie web service server
 #
 ## Adhoc Rosie web server log directory
 #  log-dir = /path/to/log/directory
 [rosie-ws]
 
-# Configuration specific to Rosie client commands
+# Configuration related to Rosie client commands
 #
 ## Root URL of the Rosie web server
 #  ws-root-default = http://host:port/

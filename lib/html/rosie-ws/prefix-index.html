@@ -313,10 +313,35 @@ Rosie.show = function(method) {
     $("#" + method).show();
     $("form[id!=" + method + "]").hide()
 };
+unix_to_local_date = function(timestamp) {
+    return new Date(timestamp).toLocaleString();
+};
 $(function() {
     var table = $("#list-result-table");
+    var hidden_indicies = [];
+    var time_indicies = [];
+    var ok_cols = ["?", "id", "branch", "revision", "owner", "project", "title"];
+    $("#list-result-table thead th").each(function(i) {
+        var title = $(this).text();
+        if (ok_cols.indexOf(title) == -1) {
+            hidden_indicies.push(i);
+        }
+        if (title == "date") {
+            time_indicies.push(i);
+        }
+    });     
     table.dataTable({
-        "aaSorting": [[2, "desc"]],
+        "aaSorting": [[3, "desc"]],
+        "aoColumnDefs": [{"bVisible": false, "aTargets": hidden_indicies},
+                         {"fnRender": function( o, val )
+                              {
+                                  var timestamp = o.aData[o.iDataColumn]*1000;
+                                  return new Date(timestamp).toLocaleString();
+                              },
+                          "bUseRendered": false,
+                          "aTargets": time_indicies
+                         }
+                        ],
         "bDeferRender": true,
         "bDestroy": true,
         "bInfiniteScroll": true,
@@ -345,10 +370,10 @@ $(function() {
     }
     Rosie.query_groups_toggle();
     $(".infodate").each(function(i) {
-        var date_str = $(this).text();
-        d = new Date(date_str*1000).toLocaleString();
+        var timestamp = $(this).text()*1000;
+        d = new Date(timestamp).toLocaleString();
         $(this).text(d);
-    });    
+    });
 });
 </script>
 <title>{{ prefix }}: Rosie Web</title>
@@ -427,7 +452,7 @@ $(function() {
 {%- endif %}
           <td>
             <select class="q_key" name="q_key_{{ loop.index0 }}">
-{%- for common_key in common_keys %}
+{%- for common_key in known_keys %}
 {%- if filter[i] == common_key %}
               <option selected="selected">{{ common_key }}</option>
 {%- else %}
@@ -503,6 +528,11 @@ $(function() {
           <th>owner</th>
           <th>project</th>
           <th>title</th>
+{%- for other_col in known_keys %}
+{%- if other_col not in ["idx", "branch", "revision", "owner", "project", "title"] %}
+          <th>{{ other_col }}</th>
+{%- endif %}
+{% endfor %}
         </tr>
       </thead>
       <tbody>
@@ -529,6 +559,15 @@ $(function() {
               </a></td>
 {%- for col in ["branch", "revision", "owner", "project", "title"] %}
           <td>{{ item[col] }}</td>
+{%- endfor %}
+{%- for other_col in known_keys %}
+{%- if other_col not in ["idx", "branch", "revision", "owner", "project", "title"] %}
+{%- if other_col == "date" %}
+          <td class="datecell" title="value: {{ item[other_col] }}">{{ item[other_col] }}</td>
+{%- else %}
+          <td>{{ item[other_col] }}</td>
+{%- endif %}
+{%- endif %}
 {%- endfor %}
         </tr>
 {%- endfor %}

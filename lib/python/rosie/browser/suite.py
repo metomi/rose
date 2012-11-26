@@ -35,24 +35,6 @@ class SuiteDirector():
         self.last_vc_event = ""
         self.event_logged = False
         self.vc_client = rosie.vc.Client(event_handler=event_handler)
-
-    def _check_config(self, page_container, dialog):
-        page = page_container.get_children()[0]
-        if page.validate_errors():
-            ok_dialog = gtk.MessageDialog(
-                            parent=dialog,
-                            message_format=rosie.browser.LABEL_ERROR_DISCOVERY,
-                            type=gtk.MESSAGE_ERROR,
-                            buttons=gtk.BUTTONS_NONE)
-            ok_dialog.set_title(rosie.browser.TITLE_ERROR_DISCOVERY)
-            ok_dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
-            ok_dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
-            response = ok_dialog.run()
-            ok_dialog.destroy()
-            if response == gtk.RESPONSE_ACCEPT:
-                return dialog.response(response)
-            return None
-        return dialog.response(gtk.RESPONSE_ACCEPT)
         
     def checkout(self, *args, **kwargs):
         """Check out a suite."""
@@ -123,8 +105,8 @@ class SuiteDirector():
         
         return False
 
-        
-    def _edit_config(self, config, window, back_function):
+    def _edit_config(self, config, window, back_function, finish_function):
+        window.set_modal(False)
         project = config.get(["project"]).value
         config.set(["project"], project)
         meta_config = rose.macro.load_meta_config(config)
@@ -141,24 +123,21 @@ class SuiteDirector():
                              pluggable=True)
         page_box = editor.get_orphan_page("/discovery")
         page = page_box.get_children()[0]
-        for var_widget in page.get_main_variable_widgets():
-            if var_widget.get_parent().variable.name == "project":
-                var_widget.get_parent().valuewidget.set_sensitive(False)
-                break
         vbox = gtk.VBox()
         vbox.pack_start(page_box)
         vbox.show()
         ok_button = gtk.Button(stock=gtk.STOCK_OK)
         ok_button.connect(
                   "clicked",
-                  lambda b: self._check_config(page_box, window))
+                  lambda b: self._finish_config(page_box, window,
+                                                editor, finish_function))
         ok_button.show()
         back_button = gtk.Button(stock=gtk.STOCK_GO_BACK)
         back_button.connect("clicked", back_function)
         back_button.show()
         cancel_button = gtk.Button(stock=gtk.STOCK_CANCEL)
         cancel_button.connect("clicked",
-                              lambda b: window.response(gtk.RESPONSE_REJECT))
+                              lambda b: window.destroy())
         cancel_button.show()
         window.action_area.pack_start(cancel_button, expand=False, fill=False)
         window.action_area.pack_start(back_button, expand=False, fill=False)
@@ -176,29 +155,45 @@ class SuiteDirector():
         window.vbox.pack_start(hbox, expand=False, fill=False)
         window.vbox.pack_start(vbox, expand=True, fill=True)
         vbox.grab_focus()
-        response = window.run()
-        window.destroy()
-        if response == gtk.RESPONSE_ACCEPT:
-            config = editor.output_config_objects()['/discovery']
-            return config
-        elif response == gtk.RESPONSE_REJECT:
-            return None
-        return None
 
-    def run_new_suite_wizard(self, config, parent_window, window=None):
+    def _finish_config(self, page_container, window, editor, finish_function):
+        page = page_container.get_children()[0]
+        if page.validate_errors():
+            ok_dialog = gtk.MessageDialog(
+                           parent=dialog,
+                           message_format=rosie.browser.LABEL_ERROR_DISCOVERY,
+                           type=gtk.MESSAGE_ERROR,
+                           buttons=gtk.BUTTONS_NONE)
+            ok_dialog.set_title(rosie.browser.TITLE_ERROR_DISCOVERY)
+            ok_dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+            ok_dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+            response = ok_dialog.run()
+            ok_dialog.destroy()
+            if response != gtk.RESPONSE_ACCEPT:
+                return False
+        window.destroy()
+        config = editor.output_config_objects()['/discovery']
+        finish_function(config)
+
+    def run_new_suite_wizard(self, config, create_suite, parent_window,
+                             window=None):
         """Run the suite wizard."""
         if window is None:
             window = gtk.Dialog(title=rosie.browser.TITLE_NEW_SUITE_WIZARD,
                                 parent=parent_window)
-            window.set_default_size(500, 350)
+            window.set_default_size(*rosie.browser.SIZE_WINDOW_NEW_SUITE)
+            window.set_modal(False)
         project = self._select_project(config.get(["project"]).value, window)
         if project is None:
             window.destroy()
             return None
         config.set(["project"], project)
-        back_hook = lambda *a: self.run_new_suite_wizard(config, parent_window,
+        back_hook = lambda *a: self.run_new_suite_wizard(config,
+                                                         create_suite,
+                                                         parent_window,
                                                          window)
-        return self._edit_config(config, window, back_hook)
+        finish_hook = create_suite
+        self._edit_config(config, window, back_hook, finish_hook)
 
     def _select_project(self, project, window):
         for child in window.action_area:
@@ -211,7 +206,6 @@ class SuiteDirector():
         forward_button.connect("clicked",
                                lambda b: window.response(gtk.RESPONSE_ACCEPT))
         forward_button.show()
-        forward_button.set_sensitive(len(project))
         cancel_button = gtk.Button(stock=gtk.STOCK_CANCEL)
         cancel_button.connect("clicked",
                               lambda b: window.response(gtk.RESPONSE_REJECT))
@@ -223,12 +217,8 @@ class SuiteDirector():
         label.show()
         entry = gtk.Entry()
         entry.set_text(project)
-        entry.connect("changed",
-                      lambda w: forward_button.set_sensitive(
-                                                   len(w.get_text())))
         entry.connect("activate",
-                      lambda w: w.get_text() and
-                                window.response(gtk.RESPONSE_ACCEPT))
+                      lambda w: window.response(gtk.RESPONSE_ACCEPT))
         entry.show()
         label_hbox = gtk.HBox()
         label_hbox.pack_start(label, expand=False, fill=False)

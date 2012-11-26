@@ -31,7 +31,7 @@ run_pass "$TEST_KEY" rose namelist-dump <<'__CONTENT__'
 __CONTENT__
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [file:STDIN]
-content=namelist:name
+source=namelist:name
 
 [namelist:name]
 __CONTENT__
@@ -46,7 +46,7 @@ run_pass "$TEST_KEY" rose namelist-dump -u <<'__CONTENT__'
 __CONTENT__
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [file:STDIN]
-content=namelist:NAME
+source=namelist:NAME
 
 [namelist:NAME]
 __CONTENT__
@@ -61,7 +61,7 @@ run_pass "$TEST_KEY" rose namelist-dump -l <<'__CONTENT__'
 __CONTENT__
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [file:STDIN]
-content=namelist:name
+source=namelist:name
 
 [namelist:name]
 __CONTENT__
@@ -82,7 +82,7 @@ for i in $(seq 1 10); do
 done
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [file:STDIN]
-content=$CONTENT
+source=$CONTENT
 
 [namelist:name(1)]
 
@@ -125,10 +125,10 @@ __CONTENT__
 run_pass "$TEST_KEY" rose namelist-dump file1 file2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [file:file1]
-content=namelist:name1(1) namelist:name1(2) namelist:name2(1) namelist:name3(1) namelist:name4
+source=namelist:name1(1) namelist:name1(2) namelist:name2(1) namelist:name3(1) namelist:name4
 
 [file:file2]
-content=namelist:name2(2) namelist:name3(2) namelist:name2(3)
+source=namelist:name2(2) namelist:name3(2) namelist:name2(3)
 
 [namelist:name1(1)]
 

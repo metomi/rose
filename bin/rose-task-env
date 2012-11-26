@@ -59,6 +59,8 @@
 #              current cycle time.
 #         E.g. ROSE_DATAC1D and ROSE_DATACT24H are both the data directory of 1
 #              day before the current cycle time.
+#     ROSE_ETC
+#         The path to the etc directory of the running suite.
 #     ROSE_TASK_PREFIX
 #         The prefix in the task name.
 #     ROSE_TASK_SUFFIX

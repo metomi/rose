@@ -108,7 +108,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
             if len(groups_by_name[group.name.lower()]) > 1:
                 group_section += "(" + str(index_of_group[group]) + ")"
             group_sections.append(group_section)
-        config.set([section, "content"], " ".join(group_sections))
+        config.set([section, "source"], " ".join(group_sections))
 
     # Add namelist: sections
     for name, groups in groups_by_name.items():

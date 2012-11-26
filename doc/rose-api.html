@@ -13,6 +13,8 @@
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
 </head>
 
 <body>
@@ -24,6 +26,8 @@
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
       "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
     <p><a href=".">Rose Documentation</a></p>
@@ -617,7 +621,8 @@ def handle_type_error(self, is_in_error):
         a dictionary that looks like this:
         <pre>
     show_modes_dict = {'latent': False, 'fixed': False, 'ignored': True,
-                       'user-ignored': False, 'title': False}
+                       'user-ignored': False, 'title': False,
+                       'flag:optional': False, 'flag:no-meta': False}
 </pre>
 
         <p>which could be ignored for most custom pages, as you need. The
@@ -650,12 +655,22 @@ def handle_type_error(self, is_in_error):
 
           <dd>Short for 'View with no title', False means show the title of a
           variable, True means show the variable name instead.</dd>
+
+          <dt><code>'flag:optional'</code></dt>
+
+          <dd>True means indicate if a variable is <code>optional</code>,
+          and False means do not show an indicator.</dd>
+
+          <dt><code>'flag:no-meta'</code></dt>
+
+          <dd>True means indicate if a variable has any metadata content,
+          and False means do not show an indicator.</dd>
         </dl>
 
         <p>If you wish to implement actions based on changes in these
         properties (e.g. displaying and hiding fixed variables depending on the
-        'fixed' setting), the custom page widget should expose methods named
-        'show_' followed by the key. However, 'ignored' is handled separately
+        'fixed' setting), the custom page widget should expose a method named
+        'show_mode_change' followed by the key. However, 'ignored' is handled separately
         (more below). These methods should take a single boolean that indicates
         the display status. For example:</p>
         <pre>
@@ -725,7 +740,7 @@ def show_fixed(self, should_show)
     <h2 id="macro">Rose Macros</h2>
 
     <p>Rose macros manipulate or check configurations, often based on their
-    metadata. There are two types of macros:</p>
+    metadata. There are three types of macros:</p>
 
     <ul>
       <li>Checkers (validators) - check a configuration, perhaps using
@@ -733,13 +748,19 @@ def show_fixed(self, should_show)
 
       <li>Changers (transformers) - change a configuration e.g. adding/removing
       options.</li>
+      
+      <li>Upgraders - these are special transformer macros for upgrading and
+      downgrading configurations.</li>
     </ul>
 
     <p>There are built-in rose macros that handle standard behaviour such as
     trigger changing and type checking.</p>
 
     <p>This section explains how to add your own custom macros to transform and
-    validate configurations. Macros should be written in Python. They can be
+    validate configurations. Upgrade macros are covered in a different section -
+    they are a special type of custom macro and are described in
+    <a href="rose-advanced-topics#upgrade">Advanced Topics</a>.
+    Macros should be written in Python. They can be
     run within <code>rose config-edit</code> or via <code>rose
     macro.</code></p>
 
@@ -1235,25 +1256,26 @@ class SomeTransformer(rose.macro.MacroBase):
     repository with prefix PREFIX_NAME, you must select a format (the only
     currently supported format is 'json') and use a url that looks like:</p>
     <pre>
-http://host/PREFIX_NAME/get_common_keys?format=json
+http://host/PREFIX_NAME/get_known_keys?format=json
 </pre>
 
     <h3 id="rosie-ws:usage">Usage</h3>The API contains the following methods:
 
     <dl>
-      <dt><code>get_common_keys</code></dt>
+      <dt><code>get_known_keys</code></dt>
 
       <dd>
         returns the main property names stored for suites (e.g. idx, branch,
-        owner) and takes the format argument. For example, entering a URL in a
+        owner) plus any additional names specified in the site config and
+        takes the format argument. For example, entering a URL in a
         web browser:
         <pre>
-http://host/PREFIX_NAME/get_common_keys?format=json
+http://host/PREFIX_NAME/get_known_keys?format=json
 </pre>
 
         <p>may give</p>
         <pre>
-["idx", "branch", "revision", "owner", "project", "title", "status"]  
+["access-list", "idx", "issue-list", "branch", "owner", "project", "revision", "status",  "title"]  
 </pre>
       </dd>
 
@@ -1261,7 +1283,7 @@ http://host/PREFIX_NAME/get_common_keys?format=json
 
       <dd>
         returns all unique optional or user-defined property names given in
-        suite discovery information (e.g. access-list, tag-list) and takes the
+        suite discovery information and takes the
         format argument. For example, entering this URL in Firefox:
         <pre>
 http://host/PREFIX_NAME/get_optional_keys?format=json
@@ -1616,6 +1638,10 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <dt><code>rose.task_env</code></dt>
 
       <dd>callable, provides an environment for a suite task.</dd>
+
+      <dt><code>rose.upgrade</code></dt>
+
+      <dd>library, provides configuration upgrade functionality.</dd>
 
       <dt><code>rose.variable</code></dt>
 

@@ -134,8 +134,6 @@ def array_split(value, only_this_delim=None):
     delim = ","
     if only_this_delim is not None:
         delim = only_this_delim
-    if value.endswith(delim) and not value.endswith("\\" + delim):
-        value = value[:-1]
     if delim not in value and only_this_delim is None:
         delim = ' '
     return [i.strip() for i in _scan_string(value, delim)]
@@ -158,6 +156,7 @@ def _scan_string(string, delim=','):
     esc_char = "\\"
     was_escaped = False
     is_escaped = False
+    letter = None
     for i, letter in enumerate(string):
         if (letter in is_in_quotes and
             i not in skip_inds and
@@ -177,8 +176,24 @@ def _scan_string(string, delim=','):
             item = ''
         else:
             item += letter
-    if item != '':
+    if (item != '' or 
+        (letter == delim and not any(is_in_quotes.values()) and
+         not was_escaped)):
         yield item
+
+
+def get_ignored_markup(variable):
+    """Return pango markup for a variable's ignored reason."""
+    markup = ""
+    if IGNORED_BY_SECTION in variable.ignored_reason:
+        markup += '^'
+    if IGNORED_BY_SYSTEM in variable.ignored_reason:
+        markup += rose.config.ConfigNode.STATE_SYST_IGNORED
+    elif IGNORED_BY_USER in variable.ignored_reason:
+        markup += rose.config.ConfigNode.STATE_USER_IGNORED
+    if markup:
+        markup = "<b>" + markup + "</b> "
+    return markup
 
 
 def _is_quote_state_change(string, index, quote_lookup, quote_state):

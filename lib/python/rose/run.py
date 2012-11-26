@@ -32,6 +32,8 @@ from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter, ReporterContext
+from rose.resource import ResourceLocator
+from rose.scheme_handler import SchemeHandlersManager
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
 import socket
@@ -108,6 +110,7 @@ class Runner(object):
     """Invoke a Rose application or a Rose suite."""
 
     CONFIG_IS_OPTIONAL = False
+    CONF_NAME = None
     NAME = None
     OPTIONS = []
     REC_OPT_DEFINE = re.compile(r"\A(?:\[([^\]]+)\])?([^=]+)?(?:=(.*))?\Z")
@@ -129,6 +132,8 @@ class Runner(object):
 
     def __init__(self, event_handler=None, popen=None, config_pm=None,
                  fs_util=None, host_selector=None, suite_engine_proc=None):
+        if not self.CONF_NAME:
+            self.CONF_NAME = self.NAME
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -165,7 +170,7 @@ class Runner(object):
         if conf_dir is None:
             conf_dir = os.getcwd()
         config = rose.config.ConfigNode()
-        source = os.path.join(conf_dir, "rose-" + self.NAME + ".conf")
+        source = os.path.join(conf_dir, "rose-" + self.CONF_NAME + ".conf")
         if self.CONFIG_IS_OPTIONAL:
             try:
                 rose.config.load(source, config)
@@ -177,7 +182,7 @@ class Runner(object):
         # Optional configuration files
         if opts.opt_conf_keys:
             for key in opts.opt_conf_keys:
-                source_base = "rose-" + self.NAME + "-" + key + ".conf"
+                source_base = "rose-" + self.CONF_NAME + "-" + key + ".conf"
                 source = os.path.join(conf_dir, "opt", source_base)
                 rose.config.load(source, config)
 
@@ -300,7 +305,7 @@ class AppRunner(Runner):
         # Free format files not defined in the configuration file
         # TODO: review location
         conf_file_dir = os.path.join(conf_dir, rose.SUB_CONFIG_FILE_DIR)
-        file_section_prefix = self.config_pm.get_processor("file").PREFIX
+        file_section_prefix = self.config_pm.get_handler("file").PREFIX
         if os.path.isdir(conf_file_dir):
             dirs = []
             files = []
@@ -349,7 +354,6 @@ class AppRunner(Runner):
         self.handle_event("command: %s" % command)
         if opts.install_only_mode:
             return
-        sys.stdout.flush()
         # TODO: allow caller of app_run to specify stdout and stderr?
         self.popen(command, shell=True, stdout=sys.stdout, stderr=sys.stderr)
 
@@ -363,9 +367,9 @@ class SuiteRunner(Runner):
     NAME = "suite"
     NUM_LOG_MAX = 5
     NUM_PING_TRY_MAX = 3
-    OPTIONS = ["conf_dir", "defines", "force_mode", "gcontrol_mode", "host",
-               "install_only_mode", "name", "new_mode",
-               "no_overwrite_mode", "opt_conf_keys", "remote"]
+    OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
+               "gcontrol_mode", "host", "install_only_mode", "name",
+               "new_mode", "no_overwrite_mode", "opt_conf_keys", "remote"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
@@ -380,6 +384,13 @@ class SuiteRunner(Runner):
         if opts.conf_dir:
             self.fs_util.chdir(opts.conf_dir)
         opts.conf_dir = os.getcwd()
+
+        if opts.defines_suite:
+            suite_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
+            if not opts.defines:
+                opts.defines = []
+            for define in opts.defines_suite:
+                opts.defines.append("[" + suite_section + "]" + define)
 
         # --remote=KEY=VALUE,...
         if opts.remote:
@@ -412,7 +423,7 @@ class SuiteRunner(Runner):
         hosts = []
         if opts.host:
             hosts.append(opts.host)
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
         if node is None:
             known_hosts = ["localhost"]
@@ -574,9 +585,7 @@ class SuiteRunner(Runner):
 
             # Check that the suite is running
             keys = ["rose-suite-run", "num-ping-try-max"]
-            node = rose.config.default_node().get(keys, no_ignore=True)
-            num_ping_try_max = getattr(node, "value",
-                                       self.NUM_PING_TRY_MAX)
+            num_ping_try_max = conf.get_value(keys, self.NUM_PING_TRY_MAX)
             num_ping_try_max = int(num_ping_try_max)
             for num_ping_try in range(1, num_ping_try_max + 1):
                 if self.suite_engine_proc.ping(suite_name, [host]):
@@ -606,11 +615,11 @@ class SuiteRunner(Runner):
         """
         if r_opts is not None:
             return r_opts.get(key, default)
-        conf_items = [(config, []),
-                      (rose.config.default_node(), ["rose-suite-run"])]
         if host is None:
             host = "localhost"
-        for conf, keys in conf_items:
+        for conf, keys in [
+                (config, []),
+                (ResourceLocator.default().get_conf(), ["rose-suite-run"])]:
             if conf is None:
                 continue
             node = conf.get(keys + [key], no_ignore=True)
@@ -732,6 +741,12 @@ class TaskRunner(Runner):
             "path_globs", "prefix_delim", "suffix_delim", "util_key"]
     PATH_GLOBS = ["share/fcm[_-]make*/*/bin"]
 
+    def __init__(self, *args, **kwargs):
+        Runner.__init__(self, *args, **kwargs)
+        path = os.path.join(os.path.dirname(__file__), "task_utils")
+        self.task_utils_manager = SchemeHandlersManager(path, ["run"], *args,
+                                                        **kwargs)
+
     def run_impl(self, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props(
                 cycle=opts.cycle,
@@ -740,7 +755,7 @@ class TaskRunner(Runner):
                 suffix_delim=opts.suffix_delim)
 
         # Prepend PATH-like variable, site/user configuration
-        conf = rose.config.default_node()
+        conf = ResourceLocator.default().get_conf()
         my_conf = conf.get(["rose-task-run"], no_ignore=True)
         for key, node in sorted(my_conf.value.items()):
             if node.is_ignored() or not key.startswith("path-prepend"):
@@ -790,61 +805,18 @@ class TaskRunner(Runner):
             opts.conf_dir = os.path.join(t.suite_dir, "app", app_key)
 
         # Run a task util or an app
-        util = None
+        util_key = os.getenv("ROSE_TASK_UTIL")
         if opts.util_key:
-            util = self._get_task_util(opts.util_key)
-        elif os.getenv("ROSE_TASK_UTIL"):
-            util = self._get_task_util(os.getenv("ROSE_TASK_UTIL"))
+            util_key = opts.util_key
+        util = None
+        if util_key:
+            util = self.task_utils_manager.get_handler(util_key)
         if opts.auto_util_mode and util is None:
-            for key, u in reversed(sorted(self._get_task_utils().items())):
-                if u.can_handle(t.task_name):
-                    util = u
-                    break
+            util = self.task_utils_manager.guess_handler(t.task_name)
         if util is None:
             return self._run_app(opts, args)
         else:
             return util(opts, args)
-
-    def _get_task_util(self, key):
-        if not hasattr(self, "task_utils"):
-            self.task_utils = {}
-        if not self.task_utils.has_key(key):
-            ns = "rose.task_utils"
-            try:
-                mod = __import__(ns + "." + key, fromlist=ns)
-            except ImportError as e:
-                raise KeyError(key)
-            for c in vars(mod).values():
-                if isinstance(c, type):
-                    if hasattr(c, "can_handle") and hasattr(c, "run"):
-                        self.task_utils[key] = c(
-                                event_handler=self.event_handler,
-                                popen=self.popen,
-                                config_pm=self.config_pm,
-                                fs_util=self.fs_util,
-                                suite_engine_proc=self.suite_engine_proc)
-        return self.task_utils[key]
-
-    def _get_task_utils(self):
-        if not getattr(self, "task_utils_loaded", False):
-            if not hasattr(self, "task_utils"):
-                self.task_utils = {}
-            task_utils_dir = os.path.join(os.path.dirname(__file__),
-                                          "task_utils")
-            cwd = os.getcwd()
-            os.chdir(task_utils_dir)
-            try:
-                for name in glob("*.py"):
-                    if name.startswith("__"):
-                        continue
-                    try:
-                        self._get_task_util(name[0:-3])
-                    except KeyError as e:
-                        continue
-            finally:
-                os.chdir(cwd)
-            self.task_utils_loaded = True
-        return self.task_utils
 
     def _run_app(self, opts, args):
         if not hasattr(self, "app_runner"):
@@ -856,6 +828,26 @@ class TaskRunner(Runner):
                     fs_util=self.fs_util,
                     suite_engine_proc=self.suite_engine_proc)
         return self.app_runner(opts, args)
+
+
+class TaskUtilBase(AppRunner):
+
+    """Base class for a task util."""
+
+    CONF_NAME = AppRunner.NAME
+    NAME = None
+    SCHEME = None
+
+    def __init__(self, *args, **kwargs):
+        manager = kwargs.pop("manager")
+        AppRunner.__init__(self, *args, **kwargs)
+        self.manager = manager
+
+    def can_handle(self, key):
+        return key.startswith(self.SCHEME)
+
+    def run_impl_main(self, config, opts, args, uuid, work_files):
+        raise NotImplementedError()
 
 
 def main():
