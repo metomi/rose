@@ -136,7 +136,8 @@ body {
 code,
 kbd,
 samp,
-var {
+var,
+.sign {
     font-family: monospace;
 }
 
@@ -182,7 +183,7 @@ dt,
  * CLASSIFICATION
  *
  **********************************************************************/
-#fcm-content ul li {
+#main-content li {
     list-style: none;
 }
 

@@ -18,15 +18,15 @@
  *
  ******************************************************************************/
 $(function() {
-    var NODE;
-
-    // Table of content
-    NODE = $("#content");
-    if (NODE) {
-        var CONTENT_INDEX_OF = {"H2": 1, "H3": 2, "H4": 3, "H5": 4, "H6": 5};
+    // Generate table of content of a document.
+    function content_gen(root, d) {
+        if (d == null) {
+            d = $(document);
+        }
+        var CONTENT_INDEX_OF = {"h2": 1, "h3": 2, "h4": 3, "h5": 4, "h6": 5};
         var stack = [];
         var done_something = false;
-        $("#body-main").children("h2, h3, h4, h5, h6").each(function(i) {
+        $("#body-main", d).children("h2, h3, h4, h5, h6").each(function(i) {
             if (this.id == null || this.id == "") {
                 return;
             }
@@ -35,11 +35,11 @@ $(function() {
                 stack.shift();
             }
             while (stack.length < CONTENT_INDEX_OF[this.tagName]) {
-                var node = stack.length == 0 ? NODE : $("> :last-child", stack[0]);
+                var node = stack.length == 0 ? root : $("> :last-child", stack[0]);
                 stack.unshift($("<ul/>").appendTo(node));
             }
             stack[0].append($("<li/>").append(
-                $("<a/>", {"href": "#" + this.id}).html(this.innerHTML)
+                $("<a/>", {"href": "#" + this.id}).html($(this).text())
             ));
 
             // Add a section link as well
@@ -50,7 +50,50 @@ $(function() {
 
             done_something = true;
         });
-        if (done_something) {
+        return done_something;
+    }
+
+    var NODE;
+
+    // Top page table of content
+    NODE = $("#main-content");
+    if (NODE) {
+        $("a:only-child", NODE).each(function(i) {
+            var node = $(this);
+            var href = this.href;
+            if (this.href == null) {
+                return;
+            }
+            var anchor = $("<a/>", {"class": "sign"}).append("+");
+            anchor.insertBefore($(this));
+            anchor.click(function() {
+                if ($(this).text() == "-") {
+                    anchor.text("+");
+                    node.next().hide();
+                    return;
+                }
+                anchor.text("-");
+                if (node.next().length) {
+                    node.next().show();
+                    return;
+                }
+                var ul = $("<ul/>").insertAfter(node);
+                ul.append($("<li/>").append($("<em/>").text("loading...")));
+                $.get(href, function(data) {
+                    content_gen(ul.parent(), data);
+                    ul.remove();
+                }, "xml")
+                .error(function() {
+                    ul.remove();
+                });
+            });
+        });
+    }
+
+    // Table of content
+    NODE = $("#content");
+    if (NODE) {
+        if (content_gen(NODE)) {
             NODE.prepend($("<h2/>").text("Contents"));
         }
     }
