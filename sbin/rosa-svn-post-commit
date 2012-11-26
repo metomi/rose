@@ -115,8 +115,8 @@ def svnlook(*args):
     return out
 
 
-def check_path_is_idx(path):
-    """Return whether the path contains a full idx."""
+def check_path_is_sid(path):
+    """Return whether the path contains a suffix-id."""
     names = path.split("/")
     if len(names) < LEN_ID + 1:
         return False
@@ -151,30 +151,30 @@ def main(repos, rev):
     changes = svnlook("changed", "-r", rev, repos)
     for i, line in enumerate(changes.splitlines()):
         status, path = line.split(None, 1)
-        if not check_path_is_idx(path):
+        if not check_path_is_sid(path):
             continue
         names = path.split("/")
-        idx = "".join(names[0:LEN_ID])
-        full_idx = db_name + "-" + idx
+        sid = "".join(names[0:LEN_ID])
+        idx = db_name + "-" + sid
         branch = names[LEN_ID]
-        if i in path_copies and check_path_is_idx(path_copies[i]):
+        if i in path_copies and check_path_is_sid(path_copies[i]):
             copy_names = path_copies[i].split("/")
-            copy_idx = "".join(copy_names[:LEN_ID])
-            if copy_idx != idx:
-                copies.setdefault((rev, full_idx, branch), copy_idx)
+            copy_sid = "".join(copy_names[:LEN_ID])
+            if copy_sid != sid:
+                copies.setdefault((rev, idx, branch), copy_sid)
         
         if branch:
-            statuses.setdefault((rev, full_idx, branch), {0: " ", 1: " "})
-        branch_path = "/".join(idx) + "/" + branch
+            statuses.setdefault((rev, idx, branch), {0: " ", 1: " "})
+        branch_path = "/".join(sid) + "/" + branch
         info_file_path = branch_path + "/" + INFO_FILE
         if not branch and status[0] == ST_DELETED:
             out = svnlook("tree", "-r", str(int(rev) - 1), "-N", repos, path)
             for line in out.splitlines()[1:]:
                 del_branch = line.strip().rstrip("/")
-                statuses.setdefault((rev, full_idx, del_branch), {0: " ", 1: " "})
-                statuses[(rev, full_idx, del_branch)][0] = ST_DELETED
+                statuses.setdefault((rev, idx, del_branch), {0: " ", 1: " "})
+                statuses[(rev, idx, del_branch)][0] = ST_DELETED
  
-        if (idx == "ROSIE" and branch == "trunk" and
+        if (sid == "ROSIE" and branch == "trunk" and
             path == branch_path + "/" + KNOWN_KEYS_FILE):
             new_keys = parse_known_keys(repos, path, rev)
             if new_keys is not None:
@@ -185,13 +185,13 @@ def main(repos, rev):
 
         if path.rstrip("/") == branch_path:
             if status[0] == ST_DELETED:
-                statuses[(rev, full_idx, branch)][0] = ST_DELETED
+                statuses[(rev, idx, branch)][0] = ST_DELETED
                 continue
             if status[0] == ST_ADDED:
-                statuses[(rev, full_idx, branch)][0] = ST_ADDED
+                statuses[(rev, idx, branch)][0] = ST_ADDED
         if (len(path) > len(branch_path) and path != info_file_path and
-            statuses[(rev, full_idx, branch)][0].isspace()):
-            statuses[(rev, full_idx, branch)][0] = ST_MODIFIED
+            statuses[(rev, idx, branch)][0].isspace()):
+            statuses[(rev, idx, branch)][0] = ST_MODIFIED
         if status[0] == ST_DELETED or path != info_file_path:
             continue
         
@@ -216,18 +216,18 @@ def main(repos, rev):
                 continue
             new_node = config.get([key], no_ignore=True)
             if new_node is None:
-                statuses[(rev, full_idx, branch)].update({1: ST_MODIFIED})
+                statuses[(rev, idx, branch)].update({1: ST_MODIFIED})
                 dao.insert(dao.T_MODIFIED, name=key, old_value=node.value,
                            new_value=None, **items)
                 if key not in ["owner", "project", "title"]:
-                    dao.delete(dao.T_OPTIONAL, idx=full_idx, branch=branch, name=key)
+                    dao.delete(dao.T_OPTIONAL, idx=idx, branch=branch, name=key)
             elif node.value != new_node.value:
                 statuses[(rev, full_idx, branch)].update({1: ST_MODIFIED})
                 dao.insert(dao.T_MODIFIED, name=key, old_value=node.value,
                            new_value=new_node.value, **items)
                 if key not in ["owner", "project", "title"]:
-                    dao.update(dao.T_OPTIONAL, ("full_idx", "branch", "name"),
-                               idx=full_idx, branch=branch, name=key,
+                    dao.update(dao.T_OPTIONAL, ("idx", "branch", "name"),
+                               idx=idx, branch=branch, name=key,
                                value=new_node.value)
         for key, node in config.value.items():
             if node.is_ignored():
@@ -238,7 +238,7 @@ def main(repos, rev):
                 dao.insert(dao.T_MODIFIED, name=key, old_value=None,
                            new_value=node.value, **items)
                 if key not in ["owner", "project", "title"]:
-                    dao.insert(dao.T_OPTIONAL, idx=full_idx, branch=branch,
+                    dao.insert(dao.T_OPTIONAL, idx=idx, branch=branch,
                                name=key, value=node.value)
                 
         items = {}
@@ -246,30 +246,30 @@ def main(repos, rev):
             items[key] = config.get([key], no_ignore=True).value
         if status == ST_ADDED:
             try:
-                dao.insert(dao.T_MAIN, idx=full_idx, branch=branch, **items)
+                dao.insert(dao.T_MAIN, idx=idx, branch=branch, **items)
             except al.exc.IntegrityError:
-                dao.update(dao.T_MAIN, ("idx", "branch"), idx=full_idx, branch=branch,
+                dao.update(dao.T_MAIN, ("idx", "branch"), idx=idx, branch=branch,
                            **items)
         else:
-            dao.update(dao.T_MAIN, ("idx", "branch"), idx=full_idx, branch=branch,
+            dao.update(dao.T_MAIN, ("idx", "branch"), idx=idx, branch=branch,
                        **items)
 
     # End loop over changes, update statuses.
     for key, value in statuses.items():
-        rev, full_idx, branch = key
-        full_copy_idx = None
-        copy_idx = copies.get(key)
-        if copy_idx is not None:
-            full_copy_idx = db_name + "-" + copy_idx
+        rev, idx, branch = key
+        copy_idx = None
+        copy_sid = copies.get(key)
+        if copy_sid is not None:
+            copy_idx = db_name + "-" + copy_sid
         status = ""
         if value[0] == ST_ADDED:
             value[1] = " "
         for num in sorted(value.keys()):
             status += value[num]
         if not (status.isspace() and copy_idx is None):
-            dao.insert(dao.T_CHANGESET, revision=rev, idx=full_idx,
+            dao.insert(dao.T_CHANGESET, revision=rev, idx=idx,
                        branch=branch, author=author, date=date,
-                       status=status, from_idx=full_copy_idx)
+                       status=status, from_idx=copy_idx)
 
 
 def parse_known_keys(repos, file_path, rev):
