@@ -140,9 +140,18 @@
     <div class="slide">
       <h2>Create a Blank Suite</h2>
 
-      <p>We need to run <code>rosie create</code>, fill in suite information,
-      and answer <kbd>y</kbd> at the prompt. We then get a working copy of the
-      new suite in the <samp>$HOME/roses</samp> directory.</p>
+      <p>To start making our suite, we need to do the following:</p>
+
+      <ul>
+        <li>run <code>rosie create</code></li>
+
+        <li>write some (made up) suite information in the text file</li>
+
+        <li>answer <kbd>y</kbd> at the prompt.</li>
+      </ul>
+
+      <p>We then get a working copy of the new suite in the
+      <samp>$HOME/roses</samp> directory.</p>
     </div>
 
     <div class="slide">
@@ -163,9 +172,7 @@
     <div class="slide">
       <h3>Install the source</h3>
 
-      <p>We need to store the source code with our suite. That's not always
-      necessary - you could configure the <samp>rose-suite.conf</samp> file to
-      extract it at runtime.</p>
+      <p>We'll need to store the source code with our suite.</p>
 
       <p>Change directory to the suite and make a directory
       <samp>etc</samp>:</p>
@@ -346,21 +353,25 @@ dead_reckoning.f90
     <div class="slide">
       <h3 class="alwayshidden">Suite Contents Explained</h3>
 
-      <p>We have the source code, in <samp>src/dead_reckoning.f90</samp>.</p>
+      <p>We have:</p>
 
-      <p>We have the configuration for the source code,
-      <samp>app/navigate/</samp>.</p>
+      <ul class="incremental">
+        <li>the source code, in <samp>src/dead_reckoning.f90</samp>.</li>
 
-      <p>We have the configuration for the build of the source code,
-      <samp>app/fcm_make_navigate</samp>.</p>
+        <li>the configuration for the source code,
+        <samp>app/navigate/</samp>.</li>
+
+        <li>the configuration for the build of the source code,
+        <samp>app/fcm_make_navigate</samp>.</li>
+      </ul>
     </div>
 
     <div class="slide">
-      <h3>What's Missing?</h3>
+      <h3>What else do we need?</h3>
+
+      <p>We've told Rose how to run each application.</p>
 
       <ul class="incremental">
-        <li>We've told Rose how to run each application.</li>
-
         <li>We haven't told cylc how to run anything.</li>
       </ul>
     </div>
@@ -370,13 +381,15 @@ dead_reckoning.f90
 
       <p>We need to set up our suite so that it runs our applications.</p>
 
-      <p>First, create the file <samp>suite.rc</samp>:</p>
+      <p>First, create the file <samp>suite.rc</samp> in the root directory of
+      the suite (the same one as <samp>rose-suite.info</samp> and
+      <samp>rose-suite.conf</samp>):</p>
       <pre class="shell">
 touch suite.rc
 </pre>
 
       <p>Now, we'll open the file in a text editor and insert some standard
-      suite.rc stuff.</p>
+      suite.rc content.</p>
     </div>
 
     <div class="slide">
@@ -406,7 +419,7 @@ touch suite.rc
       <h3 class="alwayshidden">suite.rc - dependencies</h3>
 
       <p>That sets up our suite in the preferred way. Now we need to add some
-      stuff to run our applications.</p>
+      configuration to run our applications.</p>
 
       <p>We know the following about our dependencies:</p>
 
@@ -525,10 +538,15 @@ touch suite.rc
     <div class="slide">
       <h3 class="alwayshidden">suite.rc special task dependency</h3>
 
-      <p>Replace the <samp>fcm_make_navigate | navigate[T-3] =&gt;
-      navigate</samp> line with:</p>
+      <p>Replace the</p>
       <pre>
-                write_start_position &amp; fcm_make_navigate | navigate[T-3] =&gt; navigate
+               fcm_make_navigate | navigate[T-3] =&gt; navigate
+</pre>
+
+      <p>line with:</p>
+      <pre>
+                write_start_position &amp; \
+                fcm_make_navigate | navigate[T-3] =&gt; navigate
 </pre>
 
       <p>This is because we need both <samp>fcm_make_navigate</samp> and
@@ -543,7 +561,9 @@ touch suite.rc
       file:</p>
       <pre>
     [[write_start_position]]
-        command scripting = "echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position"
+        command scripting = """
+            echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position
+            """
 </pre>
 
       <p>This writes to the location we've set for <samp>navigate</samp> in
@@ -594,10 +614,18 @@ touch suite.rc
       <pre class="shell">
 rose suite-run
 </pre>
+
+      <p>If everything has been setup successfully, <code>cylc gcontrol</code>
+      will launch with your running suite.</p>
+
+      <p>You can look at the finished output by running:</p>
+      <pre class="shell">
+rose suite-log-view
+</pre>
     </div>
 
     <div class="slide">
-      <h2>Extra work</h2>
+      <h2>Next steps</h2>
 
       <p>You may want to experiment with adding metadata to your
       <samp>navigate</samp> app, following the approach in the <a href=
@@ -606,6 +634,12 @@ rose suite-run
 
     <div class="slide">
       <h2>The End</h2>
+
+      <p>For examples of more advanced cylc suite functionality, see <a href=
+      "../etc/rose-rug-suite-tour/">Suite Examples</a>.</p>
+
+      <p>For more information about suites, see the <a href=
+      "rose-overview-suites.html">Suite Overview</a>.</p>
     </div>
   </div>
 </body>
