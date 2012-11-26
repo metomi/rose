@@ -49,14 +49,17 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 event_handler=self.manager.event_handler,
                 popen=self.manager.popen,
                 fs_util=self.manager.fs_util)
-        self.loc_dao = LocDAO()
 
     def handle_event(self, *args):
         """Invoke event handler with *args, if there is one."""
         self.manager.handle_event(*args)
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
-        """Install files according to the file:* sections in "config"."""
+        """Install files according to the file:* sections in "config".
+
+        kwargs["no_overwrite_mode"]: fail if a target file already exists.
+
+        """
 
         # Find all the "file:*" nodes.
         nodes = {}
@@ -74,6 +77,30 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if not nodes:
             return
 
+        # Create database to store information for incremental updates,
+        # if it does not already exist.
+        loc_dao = LocDAO()
+        loc_dao.create()
+
+        cwd = os.getcwd()
+        file_install_root = config.get_value(
+                ["file-install-root"],
+                os.getenv("ROSE_FILE_INSTALL_ROOT", None))
+        if file_install_root:
+            file_install_root = env_var_process(file_install_root)
+            self.manager.fs_util.makedirs(file_install_root)
+            self.manager.fs_util.chdir(file_install_root)
+        try:
+            self._process(config, nodes, loc_dao,
+                          orig_keys=None, orig_value=None, **kwargs)
+        finally:
+            if cwd != os.getcwd():
+                self.manager.fs_util.chdir(cwd)
+
+
+    def _process(self, config, nodes, loc_dao,
+                 orig_keys=None, orig_value=None, **kwargs):
+        """Helper for self.process."""
         # Ensure that everything is overwritable
         # Ensure that container directories exist
         for key, node in sorted(nodes.items()):
@@ -82,10 +109,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 e = FileOverwriteError(name)
                 raise ConfigProcessError([key], None, e)
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(name))
-
-        # Create database to store information for incremental updates,
-        # if it does not already exist.
-        self.loc_dao.create()
 
         # Gets a list of sources and targets
         sources = {}
@@ -134,7 +157,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 self.loc_handlers_manager.parse(source, config)
             except ValueError as e:
                 raise ConfigProcessError([key, "source"], source.name, e)
-            prev_source = self.loc_dao.select(source.name)
+            prev_source = loc_dao.select(source.name)
             source.is_out_of_date = (
                     not prev_source or
                     (not source.key and not source.paths) or
@@ -155,7 +178,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 for path, checksum in get_checksum(target.name):
                     target.add_path(path, checksum)
                 target.paths.sort()
-            prev_target = self.loc_dao.select(target.name)
+            prev_target = loc_dao.select(target.name)
             target.is_out_of_date = (
                     not os.path.exists(target.name) or
                     prev_target is None or
@@ -174,7 +197,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         break
             if target.is_out_of_date:
                 target.paths = None
-                self.loc_dao.delete(target)
+                loc_dao.delete(target)
 
         # Set up jobs for rebuilding all out-of-date targets.
         jobs = {}
@@ -185,7 +208,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 if len(target.dep_locs) == 1 and target.mode == "symlink":
                     self.manager.fs_util.symlink(target.dep_locs[0],
                                                  target.name)
-                    self.loc_dao.update(target)
+                    loc_dao.update(target)
                 else:
                     jobs[target.name] = JobProxy(target)
                     for source in target.dep_locs:
@@ -196,12 +219,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         jobs[target.name].pending_for[source.name] = job
             elif target.mode == "mkdir":
                 self.manager.fs_util.makedirs(target.name)
-                self.loc_dao.update(target)
+                loc_dao.update(target)
                 target.loc_type = target.TYPE_TREE
                 target.add_path(target.BLOB, None)
             else:
                 self.manager.fs_util.install(target.name)
-                self.loc_dao.update(target)
+                loc_dao.update(target)
                 target.loc_type = target.TYPE_BLOB
                 for path, checksum in get_checksum(target.name):
                     target.add_path(path, checksum)
@@ -214,7 +237,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 nproc = None
                 if nproc_str is not None:
                     nproc = int(nproc_str)
-                JobRunner(self, nproc)(JobManager(jobs), config, work_dir)
+                job_runner = JobRunner(self, nproc)
+                job_runner(JobManager(jobs), config, loc_dao, work_dir)
             except ValueError as e:
                 if e.args and jobs.has_key(e.args[0]):
                     job = jobs[e.args[0]]
@@ -241,17 +265,16 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             event = ChecksumEvent(target.name, checksum)
             self.handle_event(event)
 
-    def process_job(self, job, config, work_dir):
+    def process_job(self, job, config, loc_dao, work_dir):
         """Process a job, helper for "process"."""
         for key, method in [(Loc.A_INSTALL, self._target_install),
                             (Loc.A_SOURCE, self._source_pull)]:
             if job.context.action_key == key:
                 return method(job.context, config, work_dir)
 
-    def post_process_job(self, job, config, *args):
+    def post_process_job(self, job, config, loc_dao, work_dir):
         """Post-process a successful job, helper for "process"."""
-        # TODO: auto decompression of tar, gzip, etc?
-        self.loc_dao.update(job.context)
+        loc_dao.update(job.context)
 
     def set_event_handler(self, event_handler):
         """Sets the event handler, used by pool workers to capture events."""
@@ -300,6 +323,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             is_first = False
         if f is not None:
             f.close()
+
+        # TODO: auto decompression of tar, gzip, etc?
 
         # Calculate target checksum(s)
         for path, checksum in get_checksum(target.name):
@@ -414,19 +439,20 @@ class LocSubPath(object):
 class LocDAO(object):
     """DAO for information for incremental updates."""
 
-    DB_FILE_NAME = ".rose-config_processors-file.db"
+    FILE_NAME = ".rose-config_processors-file.db"
 
     def __init__(self):
+        self.file_name = os.path.abspath(self.FILE_NAME)
         self.conn = None
 
     def get_conn(self):
         if self.conn is None:
-            self.conn = sqlite3.connect(self.DB_FILE_NAME)
+            self.conn = sqlite3.connect(self.file_name)
         return self.conn
 
     def create(self):
         """Create the database file if it does not exist."""
-        if not os.path.exists(self.DB_FILE_NAME):
+        if not os.path.exists(self.file_name):
             conn = self.get_conn()
             c = conn.cursor()
             c.execute("""CREATE TABLE locs(

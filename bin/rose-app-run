@@ -57,5 +57,9 @@
 #         Decrement verbosity.
 #     --verbose; -v
 #         Increment verbosity.
+#
+# ENVIRONMENT VARIABLES
+#     optional ROSE_FILE_INSTALL_ROOT
+#         If specified, change to the specified directory to install files.
 #-------------------------------------------------------------------------------
 exec python -m rose.run app "$@"
