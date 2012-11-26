@@ -3,9 +3,6 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="generator" content=
-  "HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" />
-
   <title>Rose Training: Suites</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -43,8 +40,7 @@
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
-
-    <table class="doc-toggle">
+    <table summary="header table" class="doc-toggle">
       <tr>
         <td>
           <p><a id="doc-home-link" href="." name="doc-home-link">Rose
@@ -126,7 +122,8 @@
 
         <li>Where things go when suites are run</li>
 
-        <li>Utilities - <kbd>fcm make</kbd>, housekeeping, <kbd>rose ana</kbd>...</li>
+        <li>Utilities - <kbd>fcm make</kbd>, housekeeping, <kbd>rose
+        ana</kbd>...</li>
 
         <li>In Depth Usage</li>
       </ul>
@@ -179,7 +176,8 @@
     </div>
 
     <div class="slide">
-    <h3>The cylc scheduling algorithm</h3>
+      <h3>The cylc scheduling algorithm</h3>
+
       <p>Scheduling - making sure tasks run in the correct order, at the
       correct time - is the core purpose of cylc. The <a href=
       "http://cylc.github.com/cylc/cug-htmlsu3.html">cylc scheduling
@@ -195,11 +193,11 @@
 
     <div class="slide">
     <h3 class="alwayshidden">single cycle</h3>
-    <p>Task dependencies - single cycle</p>
-   <img src=
+
+    <p>Task dependencies - single cycle</p><img src=
     "http://cylc.github.com/cylc/single/images/dep-one-cycle.png" width="40%"
     alt="single cycle dependencies" /></div>
-   
+
     <div class="slide">
     <h3 class="alwayshidden">scheduling cycling tasks</h3>
 
@@ -209,9 +207,10 @@
 
     <div class="slide">
     <h3 class="alwayshidden">cylc task pool</h3>
-    <p>How cylc sees task dependencies:</p>
-    <img src="http://cylc.github.com/cylc/single/images/task-pool.png" width="40%"
-    alt="cylc task pool"/> </div>
+
+    <p>How cylc sees task dependencies:</p><img src=
+    "http://cylc.github.com/cylc/single/images/task-pool.png" width="40%" alt=
+    "cylc task pool" /></div>
 
     <div class="slide">
     <h3 class="alwayshidden">A cycle isn't a prison</h3>
@@ -404,6 +403,7 @@ default = echo 'Hello World'
 
     <div class="slide">
       <h3>Cycling Dependencies</h3>
+
       <p>We can make this run as a cycling suite, repeating every 12 hours:</p>
       <pre>
 [scheduling]
@@ -439,8 +439,8 @@ default = echo 'Hello World'
 
       <p>If we had a lot of tasks using this setting, it might become quite
       duplicated across the <samp>suite.rc</samp> file. cylc supports the use
-      of a templating language, <a href="http://jinja.pocoo.org">Jinja2</a>,
-      to reduce duplication and provide some simple logic.</p>
+      of a templating language, <a href="http://jinja.pocoo.org">Jinja2</a>, to
+      reduce duplication and provide some simple logic.</p>
 
       <p>We can then write:</p>
       <pre>
@@ -451,9 +451,11 @@ default = echo 'Hello World'
         [[[remote]]]
             host = {{ COMPUTE_HOST }}
 </pre>
-     </div>
-     <div class="slide">
-       <h3 class="alwayshidden">Jinja2 shebang</h3>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Jinja2 shebang</h3>
+
       <p>We'll also need to add a <samp>#!jinja2</samp> shebang to the top of
       the suite.rc file.</p>
     </div>
@@ -485,12 +487,14 @@ COMPUTE_HOST = "voyager_1"
         timeout = 4320 # 3 days
 </pre>
 
-      <p>Here, when a suite times out, the user will receive an email (<kbd>--mail</kbd>)
-      and the suite will shutdown (<kbd>--shutdown</kbd>).</p>
+      <p>Here, when a suite times out, the user will receive an email
+      (<kbd>--mail</kbd>) and the suite will shutdown
+      (<kbd>--shutdown</kbd>).</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Hello World event hooks (continued)</h3>
+
       <p>We also need to add:</p>
       <pre>
 [runtime]
@@ -670,9 +674,10 @@ COMPUTE_HOST = "voyager_1"
         <li><var>ROSE_ETC</var>, etc directory of the running suite.</li>
       </ul>
     </div>
-    
+
     <div class="slide">
-       <h3 class="alwayshidden">Environment reference</h3>
+      <h3 class="alwayshidden">Environment reference</h3>
+
       <p>For more, see <a href="rose-command.html##rose-task-env">rose
       task-env</a> and the <a href=
       "http://cylc.github.com/cylc/single/cug-html.html">cylc
@@ -717,10 +722,10 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3>Good Practice</h3>
+      <h3>Good Practice</h3><img class="r-floater" src=
+      "http://upload.wikimedia.org/wikipedia/en/0/0b/Ben_Kenobi.jpg" alt=
+      "Ben Kenobi" /><br />
 
-      <img style="float:right" src="http://upload.wikimedia.org/wikipedia/en/0/0b/Ben_Kenobi.jpg" alt="Ben Kenobi"/>
-      <br/>
       <ul class="incremental">
         <li>Having read the cylc and Rose documentation <em>before writing the
         suite</em></li>
@@ -744,16 +749,10 @@ COMPUTE_HOST = "voyager_1"
       </ul>
     </div>
 
-<!--    <div class="handout">
-       <br/>
-       <br/>
-       <br/>
-    </div>  -->
-
     <div class="slide">
-      <h3>Bad practice</h3>
-
-      <img style="float:right; clear:right;" src="http://www.eyeonstarwars.com/trilogy/character/images/emperor2.jpg" alt="Emperor Palpatine"/>
+      <h3>Bad practice</h3><img class="r-floater" src=
+      "http://www.eyeonstarwars.com/trilogy/character/images/emperor2.jpg" alt=
+      "Emperor Palpatine" />
 
       <ul class="incremental">
         <li>Skipping the cylc and Rose documentation</li>
@@ -777,9 +776,9 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="handout">
-       <br/>
-       <br/>
-       <br/>
+      <br />
+      <br />
+      <br />
     </div>
 
     <div class="slide">
@@ -819,7 +818,12 @@ COMPUTE_HOST = "voyager_1"
         <li>Usually launched by <code>rose suite-run</code> or using <code>rose
         suite-gcontrol</code>.</li>
 
-        <li>Three views - <a href="http://cylc.github.com/cylc/single/screenshots/control2.png">graph</a>, <a href="http://cylc.github.com/cylc/single/screenshots/control1.png">dot</a> (square now!), <a href="http://cylc.github.com/cylc/single/screenshots/control1.png">tree</a></li>
+        <li>Three views - <a href=
+        "http://cylc.github.com/cylc/single/screenshots/control2.png">graph</a>,
+        <a href=
+        "http://cylc.github.com/cylc/single/screenshots/control1.png">dot</a>
+        (square now!), <a href=
+        "http://cylc.github.com/cylc/single/screenshots/control1.png">tree</a></li>
 
         <li>Easy stop/start interface</li>
 
@@ -833,8 +837,8 @@ COMPUTE_HOST = "voyager_1"
       <h2 id="output">rose output viewer</h2>
 
       <ul class="incremental">
-        <li>Stores suite output and presents it as web pages - view using <code>rose
-        suite-log-view</code>.</li>
+        <li>Stores suite output and presents it as web pages - view using
+        <code>rose suite-log-view</code>.</li>
 
         <li>Index web page is at
         <samp>$HOME/cylc-run/SUITE_NAME/log/index.html</samp>.</li>

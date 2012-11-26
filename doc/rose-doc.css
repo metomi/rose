@@ -171,6 +171,10 @@ var {
     font-style: normal;
 }
 
+.caption {
+    font-size: 50%;
+}
+
 h1,
 h2,
 h3,
@@ -336,6 +340,17 @@ var {
  * POSITION AND FLOAT
  *
  **********************************************************************/
+
+.l-floater {
+    clear: left;
+    float: left;
+}
+
+.r-floater {
+    clear: right;
+    float: right;
+}
+
 .shell-prompt,
 #rose-icon {
     float: left;

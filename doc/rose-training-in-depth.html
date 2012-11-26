@@ -40,8 +40,7 @@
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
-
-    <table class="doc-toggle">
+    <table summary="header table" class="doc-toggle">
       <tr>
         <td>
           <p><a id="doc-home-link" href="." name="doc-home-link">Rose
@@ -150,18 +149,19 @@ default = hello.exe
 </pre>
         </li>
       </ul>
-   </div>
-   
-   <div class="slide">
-     <h3 class="alwayshidden">Format continued</h3>
-       <p><samp>!</samp> or <samp>!!</samp> in front of a section
-        (<samp>![env]</samp>, <samp>!![env]</samp>) or option
-        (<samp>!MAX_TARGETS</samp>, <samp>!!MAX_TARGETS</samp>) means it is
-        <em>ignored</em> and will not be output when the configuration is
-        run.</p>
-   </div>
+    </div>
 
-   <div class="slide">
+    <div class="slide">
+      <h3 class="alwayshidden">Format continued</h3>
+
+      <p><samp>!</samp> or <samp>!!</samp> in front of a section
+      (<samp>![env]</samp>, <samp>!![env]</samp>) or option
+      (<samp>!MAX_TARGETS</samp>, <samp>!!MAX_TARGETS</samp>) means it is
+      <em>ignored</em> and will not be output when the configuration is
+      run.</p>
+    </div>
+
+    <div class="slide">
       <h3>rose-suite.info</h3>
 
       <p>Discovery information about the suite:</p>
@@ -280,8 +280,7 @@ type = logical
 [rose-suite-run]
 hosts = localhost
 num-ping-try-max = 10
-</pre>
-<br/>
+</pre><br />
       <pre>
 [rose-config-edit]
 should-show-ignored = True
@@ -328,9 +327,8 @@ should-show-ignored = True
         <li><kbd>rose suite-run -C /path/to/suite</kbd>: run a suite in a
         different directory than <samp>$PWD</samp>.</li>
 
-        <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>:
-        run with a different <samp>[jinja2:suite.rc]</samp> option
-        setting.</li>
+        <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>: run with a
+        different <samp>[jinja2:suite.rc]</samp> option setting.</li>
       </ul>
     </div>
 
@@ -403,7 +401,8 @@ should-show-ignored = True
     <div class="slide">
       <h3>Logical expression syntax</h3>
 
-      <p>There is a logical expression syntax for several metadata options. Here are some examples:</p>
+      <p>There is a logical expression syntax for several metadata options.
+      Here are some examples:</p>
       <pre>
 [namelist:run_snow=min_temp_water_supercool]
 range = this &gt; -48.3
@@ -428,19 +427,21 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
         "http://jinja.pocoo.org/docs/templates/#tests">jinja2</a>)</li>
 
         <li>You can refer to variables by id (e.g.
-        <samp>namelist:run_snow=max_ok_ice_fraction</samp>) and using <samp>this</samp>.</li>
+        <samp>namelist:run_snow=max_ok_ice_fraction</samp>) and using
+        <samp>this</samp>.</li>
       </ul>
-   </div>
-   
-   <div class="slide">
-     <h4 class="alwayshidden">Configuration Metadata - logic syntax arrays</h4>
-       <p>The syntax also has array element support via bracketed indicies (e.g.
-        <samp>this(2)</samp> or
-        <samp>namelist:run_snow=monthly_snowfall(12)</samp>).</p>
+    </div>
 
-        <p>There are <code>any</code> and <code>all</code> functions (e.g.
-        <samp>any(namelist:run_snow=monthly_snowfall) &gt;
-        10</samp>).</p>
+    <div class="slide">
+      <h4 class="alwayshidden">Configuration Metadata - logic syntax
+      arrays</h4>
+
+      <p>The syntax also has array element support via bracketed indicies (e.g.
+      <samp>this(2)</samp> or
+      <samp>namelist:run_snow=monthly_snowfall(12)</samp>).</p>
+
+      <p>There are <code>any</code> and <code>all</code> functions (e.g.
+      <samp>any(namelist:run_snow=monthly_snowfall) &gt; 10</samp>).</p>
     </div>
 
     <div class="slide">
@@ -456,10 +457,11 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
         <code>true</code> means that the setting should always be in the
         configuration, ignored or not.</dd>
       </dl>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">More Metadata Options - duplicate</h3>
+
       <dl>
         <dt><code>duplicate</code></dt>
 
@@ -476,7 +478,7 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
 
     <div class="slide">
       <h3 class="alwayshidden">More Metadata Options - warn-if/fail-if</h3>
-      
+
       <dl>
         <dt><code>warn-if</code>, <code>fail-if</code></dt>
 
@@ -491,14 +493,13 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
           <pre>
 fail-if = any(namelist:test=ctrl_array % this == 0)
 </pre>
-
         </dd>
-     </dl>
+      </dl>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">More Metadata Options - widget</h3>
-      
+
       <dl>
         <dt><code>widget</code></dt>
 
@@ -522,11 +523,12 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
         alter your application configurations. These are useful when applying a
         change that affects many settings - for example, a change in resolution
         or domain.</li>
-
+      </ul>
     </div>
 
     <div class="slide">
       <h4 class="alwayshidden">Macros continued</h4>
+
       <ul>
         <li><code>Upgrade</code> macros - upgrade or downgrade application
         configurations</li>
@@ -548,7 +550,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
 
     <p>You can set an icon in the metadata that is used in the config editor to
     distinguish configurations: put a file <samp>etc/icon.png</samp> in the
-    metadata directory.</p><img src="rose-icon.png" /></div>
+    metadata directory.</p><img alt="Rose Icon" src="rose-icon.png" /></div>
 
     <div class="slide">
       <h2>The Config Editor</h2>
@@ -622,8 +624,10 @@ rosie lookup bob test
 rosie lookup -Q owner eq bob and title contains test
 </pre>
     </div>
+
     <div class="slide">
       <h2>rosie ls</h2>
+
       <p><code>rosie ls</code> lists the suites currently checked out in a
       user's <code>roses</code> directory.</p>
     </div>
@@ -639,6 +643,7 @@ rosie lookup -Q owner eq bob and title contains test
         <li>More fun for all</li>
       </ul>
     </div>
+
     <div class="slide">
       <h2>Suite Usage/Design</h2>
 

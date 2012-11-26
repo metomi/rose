@@ -24,13 +24,6 @@
 </script>
   <script type="text/javascript" src="rose-version.js">
 </script>
-  <style type="text/css">
-/*<![CDATA[*/
-  p.c3 {font-size:50%}
-  img.c2 {float:right}
-  img.c1 {float:left}
-  /*]]>*/
-  </style>
 </head>
 
 <body>
@@ -47,8 +40,7 @@
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
-
-    <table class="doc-toggle">
+    <table summary="header table" class="doc-toggle">
       <tr>
         <td>
           <p><a id="doc-home-link" href="." name="doc-home-link">Rose
@@ -117,8 +109,8 @@
 
         <li>Traditional web page or slideshow format.</li>
 
-        <li>You can switch between the formats using the <code>S5 slideshow</code> or
-        <code>single page</code> links.</li>
+        <li>You can switch between the formats using the <code>S5
+        slideshow</code> or <code>single page</code> links.</li>
 
         <li>For more details see the <a href=
         "http://meyerweb.com/eric/tools/s5/">S5</a> website.</li>
@@ -177,13 +169,13 @@
         changed without taking the aircraft apart.</p>
       </div>
 
-      <table>
+      <table summary="'glass cockpit' images">
         <tr>
-          <td><img class="c1" src=
+          <td><img class="l-floater" src=
           "http://www.darkgovernment.com/images/f35-cockpit3.jpg" alt=
           "modern aircraft (F-35/JSF, ~2013) cockpit view" /></td>
 
-          <td><img class="c2" src=
+          <td><img class="r-floater" src=
           "http://www.blogcdn.com/www.engadget.com/media/2012/07/lockheeddsc05935.jpg"
           alt="modern aircraft (F-35/JSF, ~2013) HUD" /></td>
         </tr>
@@ -198,7 +190,7 @@
 
       <ul class="incremental">
         <li>as simple as possible</li>
-        
+
         <li>user-friendly - in particular for new users</li>
 
         <li>easier to port and share with collaborators</li>
@@ -213,14 +205,15 @@
       <h2>What is Rose?</h2>
 
       <p>Rose:</p>
+
       <ul class="incremental">
         <li>is a set of tools with open specifications.</li>
 
-        <li>provides a common solution for managing, configuring and
-        running suites of scientific applications.</li>
+        <li>provides a common solution for managing, configuring and running
+        suites of scientific applications.</li>
 
-        <li>uses the <a href="http://github.com/cylc/cylc">cylc</a> suite engine
-        to run suites.</li>
+        <li>uses the <a href="http://github.com/cylc/cylc">cylc</a> suite
+        engine to run suites.</li>
       </ul>
     </div>
 
@@ -228,13 +221,13 @@
       <h3 class="alwayshidden">What is Rose? continued 1</h3>
 
       <p>Rose:</p>
+
       <ul class="incremental">
         <li>uses simple, human readable and writable file formats.</li>
 
         <li>has optional GUIs.</li>
 
-        <li>is mostly written in Python, using the PyGTK library for
-        GUIs.</li>
+        <li>is mostly written in Python, using the PyGTK library for GUIs.</li>
       </ul>
     </div>
 
@@ -242,12 +235,13 @@
       <h3 class="alwayshidden">What is Rose? continued 2</h3>
 
       <p>Rose:</p>
+
       <ul class="incremental">
         <li>does not force the use of any specific version control system or
         working practice.</li>
 
-        <li>contains an optional system for managing suites, including
-        version control ("Rosie").</li>
+        <li>contains an optional system for managing suites, including version
+        control ("Rosie").</li>
 
         <li>is freely available.</li>
 
@@ -262,6 +256,7 @@
       problems.</q> - Homer Simpson.</p>
 
       <p>Rose is not:</p>
+
       <ul class="incremental">
         <li>alcohol.</li>
 
@@ -273,20 +268,21 @@
     </div>
 
     <div class="slide">
-      <h2>What is a Rose suite?</h2><img class="c2" src=
+      <h2>What is a Rose suite?</h2><img class="r-floater" src=
       "http://upload.wikimedia.org/wikipedia/commons/1/1c/Savoy_Hotel%2C_London.jpg"
       alt="hotel suites?" width="20%" />
 
       <p>A suite is:</p>
+
       <ul class="incremental">
-        <li>a runnable collection of one or more scientific
-        application configurations.</li>
+        <li>a runnable collection of one or more scientific application
+        configurations.</li>
 
-        <li>a way of running a standalone scientific application,
-        like a UM standalone job.</li>
+        <li>a way of running a standalone scientific application, like a UM
+        standalone job.</li>
 
-        <li>also a way of running a very large number of
-        inter-dependent scientific applications.</li>
+        <li>also a way of running a very large number of inter-dependent
+        scientific applications.</li>
       </ul>
     </div>
 
@@ -362,7 +358,7 @@
     <div class="slide">
     <h3 class="alwayshidden">What is cylc? example</h3>
 
-    <p class="c3">This is <code>cylc gcontrol</code>, the cylc
+    <p class="caption">This is <code>cylc gcontrol</code>, the cylc
     control/monitoring GUI.</p><img src=
     "http://cylc.github.com/cylc/screenshots/control2.png" alt="cylc gcontrol"
     width="60%" /></div>
@@ -406,8 +402,8 @@
       <h3 class="alwayshidden">What is a Rose application? contents
       (complex)</h3>
 
-      <p>It may also contain other sub-directories, which we'll cover
-      later (<code>meta</code> and <code>opts</code>).</p>
+      <p>It may also contain other sub-directories, which we'll cover later
+      (<code>meta</code> and <code>opts</code>).</p>
     </div>
 
     <div class="slide">
@@ -481,29 +477,31 @@ l_exclamation_mark=.true.,
       <h2>How do I change a Rose application?</h2>
 
       <ul class="incremental">
-      <li>You can edit the files and directories using the command line and a
-      text editor.</li>
-      <li>You can also edit the application using the Rose
-      configuration editor (config editor).</li>
+        <li>You can edit the files and directories using the command line and a
+        text editor.</li>
+
+        <li>You can also edit the application using the Rose configuration
+        editor (config editor).</li>
       </ul>
     </div>
+
     <div class="slide">
       <h3 class="alwayshidden">How do I change a Rose application? editor</h3>
+
       <p>The config editor is the Rose application and suite editing GUI.</p>
-      
-      <p>It is
-      automatically generated from the content in your suite and applications,
-      and uses metadata to improve presentation, add help, and do some
-      checking.</p>
+
+      <p>It is automatically generated from the content in your suite and
+      applications, and uses metadata to improve presentation, add help, and do
+      some checking.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">How do I change a Rose application?
-      screenshot</h3><img src="rose-config-edit-hover-and-alter.png" width="60%"
-      alt="config editor" />
+      screenshot</h3><img src="rose-config-edit-hover-and-alter.png" width=
+      "60%" alt="config editor" />
 
-      <p class="c3">This example image shows getting hover-over help for an
-      application setting in the config editor.</p>
+      <p class="caption">This example image shows getting hover-over help for
+      an application setting in the config editor.</p>
     </div>
 
     <div class="slide">
@@ -533,12 +531,10 @@ l_exclamation_mark=.true.,
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">How are Suites Stored and Managed?
-      Info</h3>
+      <h3 class="alwayshidden">How are Suites Stored and Managed? Info</h3>
 
-      <p>To make finding (and remembering) suite IDs easier, each suite
-      has a <code>rose-suite.info</code> file that describes the
-      suite.</p>
+      <p>To make finding (and remembering) suite IDs easier, each suite has a
+      <code>rose-suite.info</code> file that describes the suite.</p>
 
       <p>These usually look a bit like this:</p>
       <pre>
@@ -549,26 +545,24 @@ project=um
 title=Run XYZ for A, with improved B
 </pre>
 
-      <p>These properties are stored in a database that is queried using
-      Rosie utilities.</p>
+      <p>These properties are stored in a database that is queried using Rosie
+      utilities.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">How are Suites Stored and Managed?
-      GUI</h3>
+      <h3 class="alwayshidden">How are Suites Stored and Managed? GUI</h3>
 
-      <p class="c3">This is the <code>rosie go</code>
-      GUI.</p>
-      <img src="rosie-go-layout.png" alt="rosie go" width=
-      "60%" />
-      <p class="c3">1) Menu 2) Address bar 3) Search 4) Search History 5) Advanced Search 6) Search Results 7) Statusbar</p>
+      <p class="caption">This is the <code>rosie go</code> GUI.</p><img src=
+      "rosie-go-layout.png" alt="rosie go" width="60%" />
+
+      <p class="caption">1) Menu 2) Address bar 3) Search 4) Search History 5)
+      Advanced Search 6) Search Results 7) Statusbar</p>
     </div>
 
     <div class="slide">
       <h2>Running a simple suite</h2>
 
-      <p>(Demo) - if reading this offline, skip to the next
-      section.</p>
+      <p>(Demo) - if reading this offline, skip to the next section.</p>
     </div>
 
     <div class="slide">
@@ -577,16 +571,16 @@ title=Run XYZ for A, with improved B
       <p>The next step in the training:</p>
 
       <ul class="incremental">
-        <li>Take the <a href="rose-brief-tour.html">Brief
-        Tour</a></li>
+        <li>Take the <a href="rose-brief-tour.html">Brief Tour</a></li>
 
         <li>Go through the <a href="rose-conf-meta-dev.html">Metadata
         Development Guide</a></li>
 
-        <li>If super-keen: learn how to write custom macros and widgets
-        in the <a href="rose-api.html">API</a> guide.</li>
+        <li>If super-keen: learn how to write custom macros and widgets in the
+        <a href="rose-api.html">API</a> guide.</li>
       </ul>
     </div>
+
     <div class="slide">
       <h2>In Depth Topics</h2>
 
