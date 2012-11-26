@@ -118,7 +118,6 @@ class PageFormatTree(gtk.VBox):
         if self._state == new_state:
             return False
         self._state = new_state
-      
         ext_vars = [rose.FILE_VAR_SOURCE, rose.FILE_VAR_CHECKSUM,
                     rose.FILE_VAR_MODE]
         int_vars = [rose.FILE_VAR_CONTENT]
