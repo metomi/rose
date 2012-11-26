@@ -221,7 +221,7 @@ class VariableWidget(object):
                                  0, 1,
                                  row_index, row_index + 1,
                                  xoptions=gtk.SHRINK,
-                                 yoptions=gtk.SHRINK)
+                                 yoptions=gtk.FILL)
                 key_col = 1
             else:
                 key_col = 0
@@ -230,15 +230,13 @@ class VariableWidget(object):
                              row_index, row_index + 1,
                              xoptions=gtk.FILL,
                              yoptions=self.yoptions,
-                             xpadding=5,
-                             ypadding=5)
+                             xpadding=5)
             container.attach(self.valuewidget,
                              key_col + 1, num_columns,
                              row_index, row_index + 1,
                              xpadding=5,
                              xoptions=gtk.EXPAND|gtk.FILL,
-                             yoptions=self.yoptions,
-                             ypadding=5)
+                             yoptions=self.yoptions)
             self.valuewidget.trigger_scroll = (
                              lambda b, e: self.force_scroll(b, container))
             setattr(self, 'get_parent', lambda : container)

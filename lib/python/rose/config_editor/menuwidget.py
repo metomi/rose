@@ -27,7 +27,7 @@ import rose.config_editor
 import rose.config_editor.util
 
 
-class MenuWidget(gtk.HBox):
+class MenuWidget(gtk.VBox):
 
     """This class generates a button with a menu for variable actions."""
 
@@ -131,7 +131,11 @@ class MenuWidget(gtk.HBox):
         self._set_hover_over(variable)
         self.option_ui = option_ui
         self.actions = actions
-        self.pack_start(self.button, expand=False, fill=False, padding=0)
+        contents_hbox = gtk.HBox()
+        contents_hbox.show()
+        self.pack_start(contents_hbox, expand=False, fill=False)
+        contents_hbox.pack_start(self.button, expand=False, fill=False,
+                                 padding=0)
         self.button.connect(
                 "button-press-event",
                 lambda b, e: self._popup_option_menu(
@@ -327,8 +331,15 @@ class CheckedMenuWidget(MenuWidget):
         if (not self.is_ghost and
             meta.get(rose.META_PROP_COMPULSORY) == rose.META_PROP_VALUE_TRUE):
             self.checkbutton.set_sensitive(False)
-        self.pack_start(self.checkbutton, expand=False, fill=False, padding=0)
-        self.pack_start(self.button, expand=False, fill=False, padding=0)
+        top_align_vbox = gtk.VBox()
+        top_align_vbox.show()
+        contents_hbox = gtk.HBox()
+        contents_hbox.show()
+        self.pack_start(contents_hbox, expand=False, fill=False)
+        contents_hbox.pack_start(self.checkbutton, expand=False, fill=False,
+                                 padding=0)
+        contents_hbox.pack_start(self.button, expand=False, fill=False,
+                                 padding=0)
         self.checkbutton.connect("toggled", self.on_toggle)
         self.checkbutton.show()
 

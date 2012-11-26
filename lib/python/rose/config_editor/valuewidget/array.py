@@ -490,6 +490,7 @@ class MixedArrayValueWidget(gtk.HBox):
         self.insert_row(r + 1)
         self.normalise_width_widgets()
         self._decide_show_buttons()
+        self.setter()
         return False
 
     def get_focus_index(self):
@@ -563,6 +564,7 @@ class MixedArrayValueWidget(gtk.HBox):
         # Show or hide the add row and delete row buttons.
         if len(self.rows) >= self.num_rows and not self.unlimited:
             self.add_button.hide()
+            self.del_button.show()
         else:
             self.add_button.show()
         if len(self.rows) <= self.num_rows and not self.unlimited:
