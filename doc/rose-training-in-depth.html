@@ -328,7 +328,7 @@ should-show-ignored = True
         <li><kbd>rose suite-run -C /path/to/suite</kbd>: run a suite in a
         different directory than <samp>$PWD</samp>.</li>
 
-        <li><kbd>rose suite-run --define-suite=COMPUTE_HOST=marys_iphone</kbd>:
+        <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>:
         run with a different <samp>[jinja2:suite.rc]</samp> option
         setting.</li>
       </ul>
@@ -397,8 +397,6 @@ should-show-ignored = True
         <li>Macros</li>
 
         <li>Widgets</li>
-
-        <li>Icons!</li>
       </ul>
     </div>
 
@@ -435,16 +433,14 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
    </div>
    
    <div class="slide">
-     <h4 class="alwayshidden">Configuration Metadata - logic syntax arrays</h4> 
-       <ul class="incremental">
-        <li>Array element support via bracketed indicies (e.g.
+     <h4 class="alwayshidden">Configuration Metadata - logic syntax arrays</h4>
+       <p>The syntax also has array element support via bracketed indicies (e.g.
         <samp>this(2)</samp> or
-        <samp>namelist:run_snow=monthly_snowfall_amounts(12)</samp>).</li>
+        <samp>namelist:run_snow=monthly_snowfall(12)</samp>).</p>
 
-        <li><code>any</code> and <code>all</code> functions (e.g.
-        <samp>any(namelist:run_snow=monthly_snowfall_amounts) &gt;
-        10</samp>).</li>
-      </ul>
+        <p>There are <code>any</code> and <code>all</code> functions (e.g.
+        <samp>any(namelist:run_snow=monthly_snowfall) &gt;
+        10</samp>).</p>
     </div>
 
     <div class="slide">
@@ -456,7 +452,7 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
       <dl>
         <dt><code>compulsory</code></dt>
 
-        <dd>The most controversial metadata option. Setting it to
+        <dd>The most controversial metadata option! Setting it to
         <code>true</code> means that the setting should always be in the
         configuration, ignored or not.</dd>
       </dl>
@@ -527,13 +523,14 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
         change that affects many settings - for example, a change in resolution
         or domain.</li>
 
-        <li><code>Upgrade</code> macros - upgrade or downgrade application
-        configurations</li>
-      </ul>
     </div>
 
     <div class="slide">
       <h4 class="alwayshidden">Macros continued</h4>
+      <ul>
+        <li><code>Upgrade</code> macros - upgrade or downgrade application
+        configurations</li>
+      </ul>
 
       <p>You can find out how to write macros in the <a href=
       "rose-api.html#macro">API</a> documentation (includes a tutorial).</p>
@@ -547,7 +544,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     the <a href="rose-api.html#gtk">API</a> documentation (this also includes a
     tutorial).</p>
 
-    <h3>Icons</h3>
+    <h3>Icons!</h3>
 
     <p>You can set an icon in the metadata that is used in the config editor to
     distinguish configurations: put a file <samp>etc/icon.png</samp> in the
@@ -586,7 +583,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       <h3 class="alwayshidden">rose macro examples (continued)</h3>
 
       <p>Running <code>rose macro MY_MACRO</code> will run a macro called
-      MY_MACRO. In an example app in the rose distribution:</p>
+      <code>MY_MACRO</code>. In an example app in the rose distribution:</p>
       <pre class="shell">
 rose macro fib.FibonnaciChecker
 </pre>
@@ -610,7 +607,7 @@ rose macro fib.FibonnaciChecker
     </div>
 
     <div class="slide">
-      <h2>rosie lookup, rosie ls</h2>
+      <h2>rosie lookup</h2>
 
       <p><code>rosie lookup</code> queries the Rosie database (through a web
       API) to find suites. For example, running:</p>
@@ -618,13 +615,15 @@ rose macro fib.FibonnaciChecker
 rosie lookup bob test
 </pre>
 
-      <p>would basically return all suites that had "bob" or "test" in their
+      <p>would basically return all suites that had "bob" and "test" in their
       <samp>rose-suite.info</samp> files. You can also run more targeted
       queries such as:</p>
       <pre class="shell">
 rosie lookup -Q owner eq bob and title contains test
 </pre>
-
+    </div>
+    <div class="slide">
+      <h2>rosie ls</h2>
       <p><code>rosie ls</code> lists the suites currently checked out in a
       user's <code>roses</code> directory.</p>
     </div>

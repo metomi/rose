@@ -197,7 +197,9 @@
       applications:</p>
 
       <ul class="incremental">
-        <li>nice and user-friendly - in particular for new users</li>
+        <li>as simple as possible</li>
+        
+        <li>user-friendly - in particular for new users</li>
 
         <li>easier to port and share with collaborators</li>
 
@@ -210,13 +212,14 @@
     <div class="slide">
       <h2>What is Rose?</h2>
 
+      <p>Rose:</p>
       <ul class="incremental">
-        <li>Rose is a set of tools with open specifications.</li>
+        <li>is a set of tools with open specifications.</li>
 
-        <li>Rose provides a common solution for managing, configuring and
+        <li>provides a common solution for managing, configuring and
         running suites of scientific applications.</li>
 
-        <li>Rose uses the <a href="http://github.com/cylc/cylc">cylc</a> suite engine
+        <li>uses the <a href="http://github.com/cylc/cylc">cylc</a> suite engine
         to run suites.</li>
       </ul>
     </div>
@@ -224,12 +227,13 @@
     <div class="slide">
       <h3 class="alwayshidden">What is Rose? continued 1</h3>
 
+      <p>Rose:</p>
       <ul class="incremental">
-        <li>Rose uses simple, human readable and writable file formats.</li>
+        <li>uses simple, human readable and writable file formats.</li>
 
-        <li>Rose has optional GUIs.</li>
+        <li>has optional GUIs.</li>
 
-        <li>Rose is mostly written in Python, using the PyGTK library for
+        <li>is mostly written in Python, using the PyGTK library for
         GUIs.</li>
       </ul>
     </div>
@@ -237,18 +241,17 @@
     <div class="slide">
       <h3 class="alwayshidden">What is Rose? continued 2</h3>
 
+      <p>Rose:</p>
       <ul class="incremental">
-        <li>Using Rose does not force the use of any specific version control system or working
-        practice, but "Rosie" does.</li>
+        <li>does not force the use of any specific version control system or
+        working practice.</li>
 
-        <li>Rose is freely available.
+        <li>contains an optional system for managing suites, including
+        version control ("Rosie").</li>
 
-          <div class="handout">
-            This means free as in free beer <em>and</em> free licence.
-          </div>
-        </li>
+        <li>is freely available.</li>
 
-        <li>Rose lives on <a href="http://github.com/metomi/rose">github</a>.</li>
+        <li>lives on <a href="http://github.com/metomi/rose">github</a>.</li>
       </ul>
     </div>
 
@@ -258,13 +261,14 @@
       <p><q>Here's to alcohol: the cause of, and solution to, all of life's
       problems.</q> - Homer Simpson.</p>
 
+      <p>Rose is not:</p>
       <ul class="incremental">
-        <li>Rose isn't alcohol.</li>
+        <li>alcohol.</li>
 
-        <li>Rose isn't a disguise for a complicated application interface.</li>
+        <li>a disguise for a complicated application interface.</li>
 
-        <li>Rose doesn't submit jobs or monitor running suites - <a href=
-        "http://github.com/cylc/cylc">cylc</a> does.</li>
+        <li>a job submitter or suite monitor - that's the job of <a href=
+        "http://github.com/cylc/cylc">cylc</a>.</li>
       </ul>
     </div>
 
@@ -273,14 +277,15 @@
       "http://upload.wikimedia.org/wikipedia/commons/1/1c/Savoy_Hotel%2C_London.jpg"
       alt="hotel suites?" width="20%" />
 
+      <p>A suite is:</p>
       <ul class="incremental">
-        <li>A suite is a runnable collection of one or more scientific
+        <li>a runnable collection of one or more scientific
         application configurations.</li>
 
-        <li>A suite is a way of running a standalone scientific application,
+        <li>a way of running a standalone scientific application,
         like a UM standalone job.</li>
 
-        <li>A suite is also a way of running a very large number of
+        <li>also a way of running a very large number of
         inter-dependent scientific applications.</li>
       </ul>
     </div>
@@ -296,7 +301,7 @@
     <div class="slide">
       <h3 class="alwayshidden">What is a Rose suite? contents</h3>
 
-      <p>The directory contains:</p>
+      <p>The suite directory contains:</p>
 
       <ul class="incremental">
         <li>a <code>suite.rc</code> file, for configuring cylc</li>
@@ -402,14 +407,7 @@
       (complex)</h3>
 
       <p>It may also contain other sub-directories, which we'll cover
-      later:</p>
-
-      <ul class="incremental">
-        <li>an optional <code>meta</code> directory, for storing metadata.</li>
-
-        <li>an optional <code>opts</code> directory, for storing alternate
-        settings for the application.</li>
-      </ul>
+      later (<code>meta</code> and <code>opts</code>).</p>
     </div>
 
     <div class="slide">
@@ -482,11 +480,18 @@ l_exclamation_mark=.true.,
     <div class="slide">
       <h2>How do I change a Rose application?</h2>
 
-      <p>You can edit the files and directories using the command line and a
-      text editor. You can also edit the application using the Rose
-      configuration editor (config editor).</p>
-
-      <p>The config editor is the Rose application and suite editing GUI. It is
+      <ul class="incremental">
+      <li>You can edit the files and directories using the command line and a
+      text editor.</li>
+      <li>You can also edit the application using the Rose
+      configuration editor (config editor).</li>
+      </ul>
+    </div>
+    <div class="slide">
+      <h3 class="alwayshidden">How do I change a Rose application? editor</h3>
+      <p>The config editor is the Rose application and suite editing GUI.</p>
+      
+      <p>It is
       automatically generated from the content in your suite and applications,
       and uses metadata to improve presentation, add help, and do some
       checking.</p>
@@ -494,7 +499,7 @@ l_exclamation_mark=.true.,
 
     <div class="slide">
       <h3 class="alwayshidden">How do I change a Rose application?
-      editor</h3><img src="rose-config-edit-hover-and-alter.png" width="60%"
+      screenshot</h3><img src="rose-config-edit-hover-and-alter.png" width="60%"
       alt="config editor" />
 
       <p class="c3">This example image shows getting hover-over help for an
@@ -532,7 +537,7 @@ l_exclamation_mark=.true.,
       Info</h3>
 
       <p>To make finding (and remembering) suite IDs easier, each suite
-      has a <code>rose-suite.info</code>file that describes the
+      has a <code>rose-suite.info</code> file that describes the
       suite.</p>
 
       <p>These usually look a bit like this:</p>
@@ -553,8 +558,10 @@ title=Run XYZ for A, with improved B
       GUI</h3>
 
       <p class="c3">This is the <code>rosie go</code>
-      GUI.</p><img src="rosie-go-layout.png" alt="rosie go" width=
+      GUI.</p>
+      <img src="rosie-go-layout.png" alt="rosie go" width=
       "60%" />
+      <p class="c3">1) Menu 2) Address bar 3) Search 4) Search History 5) Advanced Search 6) Search Results 7) Statusbar</p>
     </div>
 
     <div class="slide">
