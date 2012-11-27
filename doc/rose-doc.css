@@ -103,16 +103,11 @@ samp,
  * OPACITY
  *
  **********************************************************************/
-.collapse {
-    opacity: 0.75;
+.collapse-expand {
+    opacity: 0.25;
 }
 
-.expand {
-    opacity: 0.75;
-}
-
-.collapse:hover,
-.expand:hover {
+.collapse-expand:hover {
     opacity: 1;
 }
 
@@ -200,6 +195,7 @@ dt,
  * CLASSIFICATION
  *
  **********************************************************************/
+#content li,
 #main-content li {
     list-style: none;
 }
@@ -238,8 +234,7 @@ h1 {
     text-align: right;
 }
 
-.collapse,
-.expand {
+.collapse-expand {
     vertical-align: bottom;
 }
 

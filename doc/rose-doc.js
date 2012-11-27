@@ -18,15 +18,87 @@
  *
  ******************************************************************************/
 $(function() {
+    var ALT_COLLAPSE = "collapse";
+    var ALT_EXPAND = "expand";
+    var ICON_COLLAPSE = "rose-icon-collapse.png";
+    var ICON_EXPAND = "rose-icon-expand.png";
+    var IS_MAIN = true;
+
+    // Toggle a collapse/expand image.
+    function collapse_expand_icon_toggle(anchor) {
+        var img = $("img", anchor);
+        if (img.attr("alt") == ALT_EXPAND) {
+            img.attr("alt", ALT_COLLAPSE);
+            img.attr("src", ICON_COLLAPSE);
+            anchor.siblings().filter("ul").show();
+        }
+        else { // if (img.attr("alt") == "collapse")
+            img.attr("alt", ALT_EXPAND);
+            img.attr("src", ICON_EXPAND);
+            anchor.siblings().filter("ul").hide();
+        }
+    }
+
+    // Add collapse/expand anchor to a ul tree.
+    function ul_collapse_expand(ul, is_main) {
+        var nodes = $("li", ul);
+        nodes.each(function(i) {
+            var li = $(this);
+            var li_anchor = li.children().first();
+            if (!li_anchor.is("a")) {
+                return;
+            }
+            var li_ul = $("> ul", li);
+            li_ul.hide();
+            var img = $("<img/>", {"alt": ALT_EXPAND, "src": ICON_EXPAND});
+            img.addClass("collapse-expand");
+            var anchor = $("<a/>").append(img);
+            li.prepend(anchor);
+            if (is_main) {
+                anchor.click(function() {
+                    $.get(
+                        li_anchor.attr("href"),
+                        function(data) {
+                            collapse_expand_icon_toggle(anchor);
+                            anchor.unbind("click");
+                            if (content_gen(li, data)) {
+                                ul_collapse_expand(li.children().filter("ul"));
+                                anchor.click(function() {
+                                    collapse_expand_icon_toggle(anchor);
+                                });
+                            }
+                            else {
+                                img.css("opacity", 0);
+                            }
+                        },
+                        "xml"
+                    )
+                    .error(function() {
+                        anchor.unbind("click");
+                        img.css("opacity", 0);
+                    }
+                });
+            }
+            else if (li_ul.length) {
+                anchor.click(function() {
+                    collapse_expand_icon_toggle(anchor);
+                });
+            }
+            else {
+                img.css("opacity", 0);
+            }
+        });
+    }
+
     // Generate table of content of a document.
     function content_gen(root, d) {
         if (d == null) {
-            d = $(document);
+            d = document;
         }
         var CONTENT_INDEX_OF = {"h2": 1, "h3": 2, "h4": 3, "h5": 4, "h6": 5};
         var stack = [];
         var done_something = false;
-        $("#body-main", d).children("h2, h3, h4, h5, h6").each(function(i) {
+        $("#body-main", $(d)).children("h2, h3, h4, h5, h6").each(function(i) {
             if (this.id == null || this.id == "") {
                 return;
             }
@@ -44,10 +116,12 @@ $(function() {
             ));
 
             // Add a section link as well
-            var section_link_anchor = $("<a/>", {"href": "#" + this.id});
-            section_link_anchor.addClass("sectionlink");
-            section_link_anchor.append("\xb6");
-            $(this).append(section_link_anchor);
+            if (d == document) {
+                var section_link_anchor = $("<a/>", {"href": "#" + this.id});
+                section_link_anchor.addClass("sectionlink");
+                section_link_anchor.append("\xb6");
+                $(this).append(section_link_anchor);
+            }
 
             done_something = true;
         });
@@ -59,50 +133,14 @@ $(function() {
     // Top page table of content
     NODE = $("#main-content");
     if (NODE) {
-        $("a:only-child", NODE).each(function(i) {
-            var node = $(this);
-            var href = this.href;
-            if (this.href == null) {
-                return;
-            }
-            var img_exp = $(
-                "<img/>",
-                {"alt": "expand", "src": "rose-icon-expand.png"}
-            ).addClass("expand");
-            var img_col = $(
-                "<img/>",
-                {"alt": "collapse", "src": "rose-icon-collapse.png"}
-            ).addClass("collapse");
-            var anchor = $("<a/>").append(img_exp);
-            anchor.insertBefore($(this));
-            anchor.click(function() {
-                if ($("img", this).hasClass("collapse")) {
-                    $("img", this).replaceWith(img_exp);
-                    node.next().hide();
-                    return;
-                }
-                $("img", this).replaceWith(img_col);
-                if (node.next().length) {
-                    node.next().show();
-                    return;
-                }
-                var ul = $("<ul/>").insertAfter(node);
-                ul.append($("<li/>").append($("<em/>").text("loading...")));
-                $.get(href, function(data) {
-                    content_gen(ul.parent(), data);
-                    ul.remove();
-                }, "xml")
-                .error(function() {
-                    ul.remove();
-                });
-            });
-        });
+        ul_collapse_expand(NODE, IS_MAIN);
     }
 
     // Table of content
     NODE = $("#content");
     if (NODE) {
         if (content_gen(NODE)) {
+            ul_collapse_expand(NODE);
             NODE.prepend($("<h2/>").text("Contents"));
         }
     }
