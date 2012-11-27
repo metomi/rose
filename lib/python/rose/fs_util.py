@@ -32,6 +32,7 @@ class FileSystemEvent(Event):
     CHDIR = "chdir"
     CREATE = "create"
     DELETE = "delete"
+    INSTALL = "install"
     RENAME = "rename"
     SYMLINK = "symlink"
 
@@ -93,10 +94,19 @@ class FileSystemUtil(object):
         else:
             return "."
 
+    def install(self, path):
+        """Create an empty file in path."""
+        if os.path.exists(path):
+            self.delete(path)
+        open(path, "wb").close()
+        event = FileSystemEvent(FileSystemEvent.INSTALL, path)
+        self.handle_event(event)
 
     def makedirs(self, path):
         """Wrap os.makedirs. Does nothing if directory exists."""
 
+        if os.path.isfile(path):
+            self.delete(path)
         # Attempt to handle race conditions
         while not os.path.isdir(path):
             try:
@@ -137,4 +147,3 @@ class FileSystemUtil(object):
             os.symlink(source, target)
             event = FileSystemEvent(FileSystemEvent.SYMLINK, source, target)
             self.handle_event(event)
-

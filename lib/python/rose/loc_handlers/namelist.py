@@ -20,39 +20,54 @@
 """Process namelist: sections in a rose.config.ConfigNode matching a name."""
 
 
+from hashlib import md5
+import os
 import re
 import rose.config
+from rose.config_processor import ConfigProcessError
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.reporter import Event
-from rose.config_processor \
-     import ConfigProcessError, ConfigProcessorBase, UnknownContentError
 
 
 RE_NAMELIST_GROUP = re.compile(r"\Anamelist:(\w+).*\Z")
 
 
-class ConfigProcessNamelistEvent(Event):
+class NamelistEvent(Event):
 
     LEVEL = Event.VV
 
 
-class ConfigProcessorForNamelist(ConfigProcessorBase):
+class NamelistLocHandler(object):
+    """Handler of namelists."""
 
-    KEY = "namelist"
+    SCHEME = "namelist"
 
-    def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
-        if item.endswith("(:)"):
-            name = item[0:-2]
-            sections = filter(lambda key: key.startswith(name),
-                                          config.value.keys())
+    def __init__(self, manager):
+        self.manager = manager
+
+    def can_pull(self, loc):
+        return loc.name.startswith(self.SCHEME + ":")
+
+    def parse(self, loc, config):
+        """Set loc.scheme, loc.loc_type."""
+        loc.scheme = self.SCHEME
+        loc.loc_type = loc.TYPE_BLOB
+
+    def pull(self, loc, config):
+        """Write namelist to loc.cache."""
+        if not loc.loc_type:
+            self.parse(loc, config)
+        f = open(loc.cache, "wb")
+
+        if loc.name.endswith("(:)"):
+            name = loc.name[0:-2]
+            sections = [k for k in config.value.keys() if k.startswith(name)]
         else:
-            sections = filter(lambda key: key == item, config.value.keys())
+            sections = [k for k in config.value.keys() if k == loc.name]
         if not sections:
-            e = UnknownContentError(item)
-            raise ConfigProcessError(orig_keys, orig_value, e)
-        if item.endswith("(:)"):
+            raise ValueError(loc.name)
+        if loc.name.endswith("(:)"):
             sections.sort(rose.config.sort_settings)
-        ret = ""
         for section in sections:
             section_node = config.get([section], no_ignore=True)
             if section_node.state:
@@ -60,13 +75,15 @@ class ConfigProcessorForNamelist(ConfigProcessorBase):
             group = RE_NAMELIST_GROUP.match(section).group(1)
             nlg = "&" + group + "\n"
             for key, node in sorted(section_node.value.items()):
+                if node.state:
+                    continue
                 try:
                     value = env_var_process(node.value)
                 except UnboundEnvironmentVariableError as e:
                     raise ConfigProcessError([section, key], node.value, e)
-                else:
-                    nlg += "%s=%s,\n" % (key, value)
+                nlg += "%s=%s,\n" % (key, value)
             nlg += "/" + "\n"
-            self.manager.event_handler(ConfigProcessNamelistEvent(nlg))
-            ret += nlg
-        return ret
+            f.write(nlg)
+            self.manager.handle_event(NamelistEvent(nlg))
+
+        f.close()

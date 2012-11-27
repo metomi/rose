@@ -91,7 +91,6 @@ class RosePopener(object):
                       "--rsh=ssh -oBatchMode=yes"],
             "ssh": ["ssh", "-oBatchMode=yes"],
             "terminal": ["xterm"]}
-
     ENVS_OF_CMDS = {"editor": ["VISUAL", "EDITOR"],
                     "geditor": ["VISUAL", "EDITOR"]}
 
@@ -194,5 +193,19 @@ class RosePopener(object):
         if rc:
             raise RosePopenError(args, rc, stdout, stderr, kwargs.get("stdin"))
         return stdout, stderr
+
+    def which(self, name):
+        """Search an executable file name in PATH, and return its full path.
+
+        If name is an absolute path and is an executable file, return name.
+        If name is not found in PATH, return None.
+
+        """
+        if os.path.isabs(name) and os.access(name, os.F_OK | os.X_OK):
+            return name
+        for d in os.getenv("PATH").split(os.pathsep):
+            file_name = os.path.join(d, name)
+            if os.access(file_name, os.F_OK | os.X_OK):
+                return file_name
 
     __call__ = run_ok
