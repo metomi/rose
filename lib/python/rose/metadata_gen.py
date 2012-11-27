@@ -46,11 +46,20 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
             continue
         if keylist == [rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE]:
             continue
-        meta_sect = rose.macro.REC_ID_STRIP.sub('', sect)
+        meta_sect = rose.macro.REC_ID_STRIP.sub("", sect)
+        modifier_sect = rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
         if sect and option is None:
             if meta_config.get([meta_sect]) is not None:
                 continue
             meta_config.set([meta_sect])
+            if meta_sect != sect and auto_type:
+                # Add duplicate = true at base and modifier level (if needed).
+                meta_config.set([meta_sect, rose.META_PROP_DUPLICATE],
+                                rose.META_PROP_VALUE_TRUE)
+                if (modifier_sect != sect and 
+                    meta_config.get([modifier_sect]) is None):
+                    meta_config.set([modifier_sect, rose.META_PROP_DUPLICATE],
+                                    rose.META_PROP_VALUE_TRUE)
             for prop_key, prop_value in prop_map.items():
                 meta_config.set([meta_sect, prop_key], prop_value)
         if option is None:
@@ -74,7 +83,6 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
 def type_gen(value):
     """Guess the type of a value.
     
-    This works for derived types, but not derived type arrays.
     Returns a tuple of type and length metadata values.
     
     """
@@ -103,6 +111,13 @@ def type_gen(value):
     if all([t == types[0] for t in types]):
         return types[0], str(length)
     length = 1
+    # Now make sure derived type arrays are correctly guessed.
+    # For example, types = ["A", "B", "A", "B"], length = 1
+    # should be types = ["A", "B"], length = 2
+    for i in range(2, len(types)):
+        if types[:i] * (len(types) / i) == types:
+            length = len(types) / i
+            types = types[:i]
     return ", ".join(types), str(length)
 
 

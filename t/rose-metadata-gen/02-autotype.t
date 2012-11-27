@@ -74,7 +74,8 @@ type=character
 type=character, real, integer, logical
 
 [namelist:testnl1=my_derived_array]
-type=character, real, integer, logical, character, real, integer, logical
+length=2
+type=character, real, integer, logical
 
 [namelist:testnl1=my_int]
 type=integer
@@ -100,19 +101,25 @@ length=3
 type=real
 
 [namelist:testnl2]
+duplicate=true
 
 [namelist:testnl2=my_int]
 type=integer
 
 [namelist:testnl3]
+duplicate=true
 
 [namelist:testnl3=my_real]
 type=real
 
 [namelist:testnl4]
+duplicate=true
 
 [namelist:testnl4=my_logical]
 type=logical
+
+[namelist:testnl4{mod1}]
+duplicate=true
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
