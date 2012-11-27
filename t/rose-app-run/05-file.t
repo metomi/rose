@@ -66,10 +66,10 @@ teardown
 TEST_KEY=$TEST_KEY_BASE-invalid-content
 setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q \
-    --define='[file:hello4]content=stuff:ing'
+    --define='[file:hello4]source=stuff:ing'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] file:hello4=content=stuff:ing: stuff: unknown content
+[FAIL] file:hello4=source=stuff:ing: stuff:ing
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -80,9 +80,12 @@ run_pass "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] create: hello3
-[INFO] install: hello1 <= ../config/file/hello1
-[INFO] install: hello2 <= ../config/file/hello2
-[INFO] install: hello3/text <= ../config/file/hello3/text
+[INFO] install: hello3/text
+[INFO]     source: ../config/file/hello3/text
+[INFO] install: hello2
+[INFO]     source: ../config/file/hello2
+[INFO] install: hello1
+[INFO]     source: ../config/file/hello1
 [INFO] command: cat hello1 hello2 hello3/text
 $OUT
 __CONTENT__
@@ -140,9 +143,12 @@ run_pass "$TEST_KEY" rose app-run --config=../config --install-only
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] create: hello3
-[INFO] install: hello1 <= ../config/file/hello1
-[INFO] install: hello2 <= ../config/file/hello2
-[INFO] install: hello3/text <= ../config/file/hello3/text
+[INFO] install: hello3/text
+[INFO]     source: ../config/file/hello3/text
+[INFO] install: hello2
+[INFO]     source: ../config/file/hello2
+[INFO] install: hello1
+[INFO]     source: ../config/file/hello1
 [INFO] command: cat hello1 hello2 hello3/text
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null

@@ -19,9 +19,11 @@
 #-----------------------------------------------------------------------------
 """Process named settings in rose.config.ConfigNode."""
 
+import os
 from rose.env import UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
+from rose.scheme_handler import SchemeHandlersManager
 
 
 class UnknownContentError(Exception):
@@ -58,34 +60,32 @@ class ConfigProcessError(Exception):
                 setting_str += "=".join(list(self.keys))
             if self.value is not None:
                 setting_str += "=%s" % str(self.value)
-            e = str(self.e)
-            if e is None:
-                e = "bad setting"
-            return "%s: %s" % (setting_str, e)
+            e_str = str(self.e)
+            if self.e is None:
+                e_str = "bad setting"
+            return "%s: %s" % (setting_str, e_str)
 
 class ConfigProcessorBase(object):
 
     """Base class for a config processor."""
 
-    KEY = None
+    SCHEME = None
     PREFIX = None
 
-    def __init__(self, manager=None):
-        self.manager = manager
-        if self.KEY is not None:
-            self.PREFIX = self.KEY + ":"
+    def __init__(self, *args, **kwargs):
+        self.manager = kwargs.pop("manager")
+        if self.SCHEME is not None:
+            self.PREFIX = self.SCHEME + ":"
 
     def process(self, config, item, orig_keys=None, orig_value=None):
         pass
 
 
-class ConfigProcessorsManager(object):
-
-    """Manage the loading of config processors."""
+class ConfigProcessorsManager(SchemeHandlersManager):
+    """Load and select config processors."""
 
     def __init__(self, event_handler=None, popen=None, fs_util=None):
-        if event_handler is None:
-            event_handler = self._dummy
+        path = os.path.join(os.path.dirname(__file__), "config_processors")
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -93,29 +93,11 @@ class ConfigProcessorsManager(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        self.processors = {}
+        SchemeHandlersManager.__init__(self, [path], ["process"])
 
-    def _dummy(self, *args, **kwargs):
-        pass
-
-    def get_processor(self, scheme, orig_keys=None, orig_value=None):
-        """Return the processor of a scheme."""
-        if self.processors.get(scheme) is None:
-            ns = __name__ + "s"
-            try:
-                mod = __import__(ns + "." + scheme, fromlist=ns)
-            except ImportError as e:
-                e = UnknownContentError(scheme)
-                raise ConfigProcessError(orig_keys, orig_value, e)
-            for v in vars(mod):
-                c = getattr(mod, v)
-                base = ConfigProcessorBase
-                if isinstance(c, type) and issubclass(c, base) and c != base:
-                    self.processors[scheme] = c(self)
-                    break
-            else:
-                raise ConfigProcessError(orig_keys, orig_value)
-        return self.processors[scheme]
+    def handle_event(self, *args, **kwargs):
+        if callable(self.event_handler):
+            return self.event_handler(*args, **kwargs)
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Process a named item in the config.
@@ -129,6 +111,9 @@ class ConfigProcessorsManager(object):
         scheme = item
         if ":" in item:
             scheme = item.split(":", 1)[0]
-        processor = self.get_processor(scheme, orig_keys, orig_value)
+        processor = self.get_handler(scheme)
+        if processor is None:
+            e = UnknownContentError(scheme)
+            raise ConfigProcessError(orig_keys, orig_value, e)
         return processor.process(config, item, orig_keys, orig_value, **kwargs)
     __call__ = process

@@ -58,7 +58,7 @@ array_element(-100:-10,-2:10,6:720)=1,
 __CONTENT__
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [file:STDIN]
-content=namelist:name
+source=namelist:name
 
 [namelist:name]
 array_element(-1)=1

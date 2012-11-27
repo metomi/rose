@@ -35,7 +35,7 @@ IS_WET = true
 !!USE_ICE = true
 
 [file:file1]
-content=namelist:nl1
+source=namelist:nl1
 
 [namelist:triggering_list]
 A_trig_B = .true.
@@ -430,7 +430,7 @@ USE_TRIGGERED_NAMELIST=true
 USE_TRIG_DUPL_NAMELIST_A=false
 
 [file:file1]
-content=namelist:nl1
+source=namelist:nl1
 
 [namelist:ignored_error_namelist]
 en_normal_var=normal
