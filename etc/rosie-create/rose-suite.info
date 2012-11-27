@@ -1,12 +1,9 @@
-#-------------------------------------------------------------------------------
-# SUITE DISCOVERY INFORMATION FILE
-#-------------------------------------------------------------------------------
-# The "owner", "project" and "title" fields are compulsory. Any KEY=VALUE pairs
-# can be added. Known fields include "description", "sub-project", and
-# "issue-list".
-#-------------------------------------------------------------------------------
-
 owner=$OWNER
 access-list=*
 project=$PROJECT
 title=$TITLE
+
+# Make changes ABOVE these lines.
+# The "owner", "project" and "title" fields are compulsory. Any KEY=VALUE pairs
+# can be added. Known fields include "description", "sub-project", and
+# "issue-list".
