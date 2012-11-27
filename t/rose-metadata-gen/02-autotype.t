@@ -35,7 +35,8 @@ my_real_array = 1.0, 2.0, 3.0
 my_logical = .false.
 my_logical_array = .false., .true., .false.
 my_derived = 'String', 1.0, 2, .false.
-my_derived_array = 'String1', 1.0, 2, .false., 'String2', 3.0, 4, .true.
+my_derived_array = 'String1', 1.0, 2, .false., 'String2', 3.0, 4, .true.,
+                   'String3', 5.0, 6, .false., 'String4', 7.0, 8, .true.
 
 [namelist:testnl2(1)]
 my_int = -3000
@@ -74,7 +75,7 @@ type=character
 type=character, real, integer, logical
 
 [namelist:testnl1=my_derived_array]
-length=2
+length=4
 type=character, real, integer, logical
 
 [namelist:testnl1=my_int]

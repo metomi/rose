@@ -118,6 +118,7 @@ def type_gen(value):
         if types[:i] * (len(types) / i) == types:
             length = len(types) / i
             types = types[:i]
+            break
     return ", ".join(types), str(length)
 
 
