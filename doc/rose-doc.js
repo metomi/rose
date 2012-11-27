@@ -76,7 +76,7 @@ $(function() {
                     .error(function() {
                         anchor.unbind("click");
                         img.css("opacity", 0);
-                    }
+                    });
                 });
             }
             else if (li_ul.length) {
