@@ -634,13 +634,40 @@ key-4=value 4
       <dt>sort-key</dt>
 
       <dd>
-        <p>A character string that can be used as a sort key for ordering the
-        setting within its namespace.</p>
+        <p>A character string that can be used as a sort key for ordering an
+        option within its namespace.</p>
+
+        <p>It can also be used to order sections and namespaces.</p>
 
         <p>The sort-key is used by the config editor to group settings on a
         page. Items with a sort-key will be sorted to the top of a name-space.
         Items without a sort-key will be sorted after, in ascending order of
         their IDs.</p>
+
+        <p>The sort procedure in pseudo code is a standard ASCII-based sort of
+        a list of <samp>setting_sort_key + "~" + setting_id</samp> strings. If
+        there is no <samp>setting_sort_key</samp>, null string will be
+        used.</p>
+
+        <p>For example, the following metadata:</p>
+        <pre>
+[env=apple]
+
+[env=banana]
+
+[env=cherry]
+sort-key = favourites-01
+
+[env=melon]
+sort-key = do-not-like-01
+
+[env=prune]
+sort-key = do-not-like-00
+</pre>
+
+        <p>would produce a sorting order of <samp>env=prune</samp>,
+        <samp>env=melon</samp>, <samp>env=cherry</samp>,
+        <samp>env=apple</samp>, <samp>env=banana</samp>.</p>
       </dd>
     </dl>
 
@@ -1175,14 +1202,12 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
     <code>schemes</code> setting can be used to help the system to do the right
     thing. The general syntax of the value of the <code>schemes</code> setting
     looks like:</p>
-
     <pre>
 schemes=PATTERN-1=SCHEME-1
        =PATTERN-2=SCHEME-2
 </pre>
 
     <p>E.g.:</p>
-
     <pre>
 schemes=hpc*:*=rsync
        =http://host/svn-repos/*=svn
@@ -1193,7 +1218,7 @@ schemes=hpc*:*=rsync
     and a URI matching the pattern <samp>http://host/svn-repos/*</samp> would
     use the <code>svn</code> scheme. For all other URIs, the system will try to
     make an intelligent guess.</p>
-    
+
     <p>The system will always match a URI in the order as specified by the
     setting to avoid ambiguity.</p>
 
@@ -1203,7 +1228,7 @@ schemes=hpc*:*=rsync
       <dt><code>fs</code></dt>
 
       <dd>The file system scheme. If a URI looks like an existing path in the
-      file system, this scheme will be used.</dd> 
+      file system, this scheme will be used.</dd>
 
       <dt><code>namelist</code></dt>
 
@@ -1341,8 +1366,8 @@ meta-path = /path/to/rose-meta
     required in order to create the new name tag and, therefore, does not
     normally alter the application configuration.</p>
 
-    <p>Application configurations can reference the configuration metadata
-    as follows:</p>
+    <p>Application configurations can reference the configuration metadata as
+    follows:</p>
     <pre>
 #!cfg
 # Refer to the HEAD version
