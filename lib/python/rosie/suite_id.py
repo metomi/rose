@@ -170,7 +170,7 @@ class SuiteId(object):
         parser.Parse(cls.svn("log", "--verbose", "--xml", dir_url))
         if not state["idx-sid"]:
             return None
-        return cls(id_text=cls.FORMAT_IDX % (prefix, state["idx-sid"])
+        return cls(id_text=cls.FORMAT_IDX % (prefix, state["idx-sid"]))
 
     @classmethod
     def get_local_copy_root(cls):

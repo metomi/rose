@@ -593,8 +593,10 @@ class RosieDatabaseInitiator(object):
                               primary_key=True),
                     al.Column("author", db_string, nullable=False),
                     al.Column("date", al.Integer, nullable=False),
-                    al.Column("idx", idx_string, nullable=False),
-                    al.Column("branch", db_string, nullable=False),
+                    al.Column("idx", db_string, nullable=False,
+                              primary_key=True),
+                    al.Column("branch", db_string, nullable=False,
+                              primary_key=True),
                     al.Column("status", al.String(self.LEN_STATUS), nullable=False),
                     al.Column("from_idx", db_string)))
             tables.append(al.Table(
@@ -608,7 +610,7 @@ class RosieDatabaseInitiator(object):
                     "optional", metadata,
                     al.Column("my_key", al.Integer, primary_key=True,
                               nullable=False, autoincrement=True),
-                    al.Column("idx", idx_string, nullable=False),
+                    al.Column("idx", db_string, nullable=False),
                     al.Column("branch", db_string, nullable=False),
                     al.Column("name", db_string, nullable=False),
                     al.Column("value", db_string)))
@@ -617,7 +619,7 @@ class RosieDatabaseInitiator(object):
                     al.Column("my_key", al.Integer, primary_key=True,
                               nullable=False, autoincrement=True),
                     al.Column("revision", al.Integer, nullable=False),
-                    al.Column("idx", idx_string, nullable=False),
+                    al.Column("idx", db_string, nullable=False),
                     al.Column("branch", db_string, nullable=False),
                     al.Column("name", db_string, nullable=False),
                     al.Column("old_value", db_string),

@@ -222,7 +222,7 @@ def main(repos, rev):
                 if key not in ["owner", "project", "title"]:
                     dao.delete(dao.T_OPTIONAL, idx=idx, branch=branch, name=key)
             elif node.value != new_node.value:
-                statuses[(rev, full_idx, branch)].update({1: ST_MODIFIED})
+                statuses[(rev, idx, branch)].update({1: ST_MODIFIED})
                 dao.insert(dao.T_MODIFIED, name=key, old_value=node.value,
                            new_value=new_node.value, **items)
                 if key not in ["owner", "project", "title"]:
@@ -234,7 +234,7 @@ def main(repos, rev):
                 continue
             old_node = old_config.get([key], no_ignore=True)
             if old_node is None:
-                statuses[(rev, full_idx, branch)].update({1: ST_MODIFIED})
+                statuses[(rev, idx, branch)].update({1: ST_MODIFIED})
                 dao.insert(dao.T_MODIFIED, name=key, old_value=None,
                            new_value=node.value, **items)
                 if key not in ["owner", "project", "title"]:
