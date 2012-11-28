@@ -52,6 +52,9 @@
 #         Specify a named task utility.
 #
 # ENVIRONMENT VARIABLES
+#     All environment variables of "rose app-run" and "rose task-env" are
+#     supported.
+#
 #     The following environment variables are used by "rose task-run":
 #
 #     ROSE_TASK_APP

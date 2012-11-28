@@ -29,7 +29,7 @@ from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 
 class ConfigProcessorForEnv(ConfigProcessorBase):
 
-    KEY = "env"
+    SCHEME = "env"
 
     def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
         """Export environment variables in an env section in "config"."""
