@@ -235,7 +235,7 @@ rose task-run -D '[env]!BAZ='
       of a command defined in the application configuration.</li>
     </ol>
 
-    <h3 id="rose-task-run.util.fcm_make">Task Utility: fcm make</h3>
+    <h3 id="rose-task-run.util.fcm_make">Task Utility: fcm_make</h3>
 
     <p>A pair of built-in task utilities are provided for running <code>fcm
     make</code>.</p>
@@ -268,6 +268,30 @@ rose task-run -D '[env]!BAZ='
     <code>fcm_make</code> task. The <var>ROSE_TASK_N_JOBS</var>,
     <var>ROSE_TASK_OPTIONS</var> and <var>ROSE_TASK_PRE_SCRIPT</var>
     environment variables can be used to modify its behaviour as above.</p>
+
+    <h3 id="rose-task-run.util.rose_install">Task Utility: rose_install</h3>
+
+    <p>This built-in utility behaves almost the same as the application
+    launcher. It will export the environment and install files, but will not
+    launch a command.</p>
+
+    <p>The <code>rose_install</code> utility will be invoked automatically if a
+    task has a name that starts with <code>rose_install*</code>.</p>
+
+    <p>By default, as for the application launcher, this task utility will use
+    the following logic to determine the root directory to install file targets
+    with a relative path:</p>
+    
+    <ol>
+      <li>If the setting <var>file-install-root=PATH</var> is specified (at the
+      root level) in the application configuration file, its value will be
+      used.</li>
+
+      <li>If the environment variable <var>ROSE_FILE_INSTALL_ROOT</var> is
+      specified, its value will be used.</li>
+
+      <li>Otherwise, the working directory of the task will be used.</li>
+    </ol>
 
     <h2 id="rose-task-env">rose task-env</h2>
 
