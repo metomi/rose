@@ -66,6 +66,7 @@ class VariableWidget(object):
             self._set_inconsistent(self.valuewidget, variable)
         self.errors = variable.error.keys()
         self.menuwidget = self.get_menuwidget(variable)
+        self.generate_labelwidget()
         self.yoptions = gtk.FILL
         self.force_signal_ids = []
         self.is_modified = False
@@ -91,6 +92,20 @@ class VariableWidget(object):
                              show_modes)
         widget.show()
         return widget
+
+    def generate_labelwidget(self):
+        """Creates the label widget, a composite of key and menu widgets."""
+        self.labelwidget = gtk.VBox()
+        self.labelwidget.show()
+        hbox = gtk.HBox()
+        hbox.show()
+        hbox.pack_start(self.menuwidget, expand=False, fill=False)
+        vbox = gtk.VBox()
+        vbox.show()
+        hbox.pack_start(vbox, expand=True, fill=True, padding=5)
+        vbox.pack_start(self.keywidget, expand=False, fill=True)
+        hbox.show()
+        self.labelwidget.pack_start(hbox, expand=False, fill=False)
 
     def _valuewidget_set_value(self, value):
         # This is called by a valuewidget to change the variable value.
@@ -202,7 +217,8 @@ class VariableWidget(object):
         menuwidget.show()
         return menuwidget
 
-    def insert_into(self, container, x_info=None, y_info=None):
+    def insert_into(self, container, x_info=None, y_info=None,
+                    no_menuwidget=False):
         """Inserts the child widgets of an instance into the 'container'.
 
         As PyGTK is not that introspective, we need arguments specifying where
@@ -211,28 +227,21 @@ class VariableWidget(object):
         These arguments are generically named x_info and y_info.
 
         """
+        if no_menuwidget:
+            if self.menuwidget in self.labelwidget.get_children():
+                self.labelwidget.remove(self.menuwidget)
+        if not hasattr(container, 'num_removes'):
+            setattr(container, 'num_removes', 0)
         if isinstance(container, gtk.Table):
-            num_columns = x_info
             row_index = y_info
-            if not hasattr(container, 'num_removes'):
-                setattr(container, 'num_removes', 0)
-            if num_columns > 2:
-                container.attach(self.menuwidget,
-                                 0, 1,
-                                 row_index, row_index + 1,
-                                 xoptions=gtk.SHRINK,
-                                 yoptions=gtk.FILL)
-                key_col = 1
-            else:
-                key_col = 0
-            container.attach(self.keywidget,
+            key_col = 0
+            container.attach(self.labelwidget,
                              key_col, key_col + 1,
                              row_index, row_index + 1,
-                             xoptions=gtk.FILL,
-                             yoptions=self.yoptions,
-                             xpadding=5)
+                             xoptions=gtk.EXPAND|gtk.FILL,
+                             yoptions=gtk.EXPAND)
             container.attach(self.valuewidget,
-                             key_col + 1, num_columns,
+                             key_col + 1, key_col + 2,
                              row_index, row_index + 1,
                              xpadding=5,
                              xoptions=gtk.EXPAND|gtk.FILL,
@@ -241,16 +250,12 @@ class VariableWidget(object):
                              lambda b, e: self.force_scroll(b, container))
             setattr(self, 'get_parent', lambda : container)
         elif isinstance(container, gtk.VBox):
-            num_items = x_info
-            container.pack_start(self.keywidget, expand=False, fill=True,
+            container.pack_start(self.labelwidget, expand=False, fill=True,
                                  padding=5)
             container.pack_start(self.valuewidget, expand=True, fill=True,
                                  padding=10)
             self.valuewidget.trigger_scroll = (
                              lambda b, e: self.force_scroll(b, container))
-            if num_items > 2:
-                container.pack_start(self.menuwidget, expand=False,
-                                     fill=False, padding=5)
             setattr(self, 'get_parent', lambda : container)
 
         return container
