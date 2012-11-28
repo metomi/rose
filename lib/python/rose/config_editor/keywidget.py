@@ -84,7 +84,7 @@ class KeyWidget(gtk.HBox):
         event_box.connect('leave-notify-event',
                           lambda b, w: self._handle_leave(b))
         self.pack_start(event_box, expand=True, fill=True,
-                                 padding=0)
+                        padding=0)
         self.comments_box = gtk.HBox()
         self.pack_start(self.comments_box, expand=False, fill=False)
         self.grab_focus = lambda : self.entry.grab_focus()
