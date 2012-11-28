@@ -167,8 +167,7 @@ class PageFormatTree(gtk.VBox):
                                         variable, self.var_ops,
                                         is_ghost=is_ghost)
             widget.set_sensitive(not is_ghost)
-            widget.insert_into(table, self.MAX_COLS_SOURCE - 1, r + 1,
-                               no_menuwidget=True)
+            widget.insert_into(table, self.MAX_COLS_SOURCE - 1, r + 1)
             if variable.name in [rose.FILE_VAR_CHECKSUM, rose.FILE_VAR_MODE]:
                 check_button = gtk.CheckButton()
                 check_button.var_widget = widget
