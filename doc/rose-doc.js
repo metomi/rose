@@ -56,12 +56,13 @@ $(function() {
             li.prepend(anchor);
             if (is_main) {
                 anchor.click(function() {
+                    var href = li_anchor.attr("href");
                     $.get(
-                        li_anchor.attr("href"),
+                        href,
                         function(data) {
                             collapse_expand_icon_toggle(anchor);
                             anchor.unbind("click");
-                            if (content_gen(li, data)) {
+                            if (content_gen(li, data, href)) {
                                 ul_collapse_expand(li.children().filter("ul"));
                                 anchor.click(function() {
                                     collapse_expand_icon_toggle(anchor);
@@ -91,7 +92,7 @@ $(function() {
     }
 
     // Generate table of content of a document.
-    function content_gen(root, d) {
+    function content_gen(root, d, d_href) {
         if (d == null) {
             d = document;
         }
@@ -111,8 +112,12 @@ $(function() {
                 var node = stack.length == 0 ? root : $("> :last-child", stack[0]);
                 stack.unshift($("<ul/>").appendTo(node));
             }
+            var href = "#" + this.id;
+            if (d_href) {
+                href = d_href + href;
+            }
             stack[0].append($("<li/>").append(
-                $("<a/>", {"href": "#" + this.id}).html($(this).text())
+                $("<a/>", {"href": href}).html($(this).text())
             ));
 
             // Add a section link as well
