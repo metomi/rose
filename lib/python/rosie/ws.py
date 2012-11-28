@@ -193,9 +193,9 @@ def start(is_main=False):
 
     # CherryPy quick server configuration
     rose_conf = ResourceLocator.default().get_conf()
-    if is_main and rose_conf.get(["rosie-ws", "log-dir"]) is not None:
-        node = rose_conf.get(["rosie-ws", "log-dir"])
-        log_dir = env_var_process(os.path.expanduser(node.value))
+    if is_main and rose_conf.get_value(["rosie-ws", "log-dir"]) is not None:
+        log_dir_value = rose_conf.get_value(["rosie-ws", "log-dir"])
+        log_dir = env_var_process(os.path.expanduser(log_dir_value))
         log_file = os.path.join(log_dir, "server.log")
         log_error_file = os.path.join(log_dir, "server.err.log")
         cherrypy.config["log.error_file"] = log_error_file
@@ -222,8 +222,9 @@ def start(is_main=False):
                     "tools.staticfile.on": True,
                     "tools.staticfile.filename": ICON_PATH}}
     if is_main:
+        port = int(rose_conf.get_value(["rosie-ws", "port"], 8080))
         config.update({"global": {"server.socket_host": "0.0.0.0",
-                                  "server.socket_port": int(8080)}})
+                                  "server.socket_port": port}})
 
     # Start server or return WSGI application
     if is_main:

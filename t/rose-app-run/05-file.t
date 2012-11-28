@@ -26,6 +26,7 @@ default = cat hello1 hello2 hello3/text
 test-empty = cat hello1 hello2 hello3/text && cmp hello4 /dev/null
 test-directory = cat hello1 hello2 hello3/text && test -d hello4/directory
 test-sources = cat hello1 hello2 hello3/text hello4/text
+test-root = cat $TEST_DIR/test-root/hello1 $TEST_DIR/test-root/hello2 $TEST_DIR/test-root/hello3/text
 __CONFIG__
 mkdir -p config/file
 cat >config/file/hello1 <<__CONTENT__
@@ -43,7 +44,7 @@ Hello and good bye.
 __CONTENT__
 OUT=$(cd config/file && cat hello1 hello2 hello3/text)
 #-------------------------------------------------------------------------------
-tests 30
+tests 47
 #-------------------------------------------------------------------------------
 # Normal mode with free format files.
 TEST_KEY=$TEST_KEY_BASE
@@ -86,6 +87,15 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO]     source: ../config/file/hello2
 [INFO] install: hello1
 [INFO]     source: ../config/file/hello1
+[INFO] command: cat hello1 hello2 hello3/text
+$OUT
+__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+# ... and in incremental mode
+TEST_KEY=$TEST_KEY_BASE-v1-incr
+run_pass "$TEST_KEY" rose app-run --config=../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
+[INFO] export PATH=$PATH
 [INFO] command: cat hello1 hello2 hello3/text
 $OUT
 __CONTENT__
@@ -155,6 +165,37 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.hello1" hello1 ../config/file/hello1
 file_cmp "$TEST_KEY.hello2" hello2 ../config/file/hello2
 file_cmp "$TEST_KEY.hello3" hello3/text ../config/file/hello3/text
+teardown
+#-------------------------------------------------------------------------------
+# Normal mode with an alternate install root, specified in the environment.
+TEST_KEY=$TEST_KEY_BASE-env-root
+setup
+ROSE_FILE_INSTALL_ROOT="$TEST_DIR/test-root" \
+TEST_DIR=$TEST_DIR \
+    run_pass "$TEST_KEY" \
+    rose app-run --config=../config -q --command-key=test-root
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+run_pass "$TEST_KEY.db" test -f ".rose-config_processors-file.db"
+run_pass "$TEST_KEY.hello1" test -f "$TEST_DIR/test-root/hello1"
+run_pass "$TEST_KEY.hello2" test -f "$TEST_DIR/test-root/hello2"
+run_pass "$TEST_KEY.hello3" test -f "$TEST_DIR/test-root/hello3/text"
+teardown
+#-------------------------------------------------------------------------------
+# Normal mode with an alternate install root, specified in the configuration.
+TEST_KEY=$TEST_KEY_BASE-conf-root
+setup
+TEST_DIR=$TEST_DIR \
+    run_pass "$TEST_KEY" \
+    rose app-run --config=../config -q --command-key=test-root \
+    -D "file-install-root=$TEST_DIR/test-root"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+cat "$TEST_KEY.err"
+run_pass "$TEST_KEY.db" test -f ".rose-config_processors-file.db"
+run_pass "$TEST_KEY.hello1" test -f "$TEST_DIR/test-root/hello1"
+run_pass "$TEST_KEY.hello2" test -f "$TEST_DIR/test-root/hello2"
+run_pass "$TEST_KEY.hello3" test -f "$TEST_DIR/test-root/hello3/text"
 teardown
 #-------------------------------------------------------------------------------
 exit

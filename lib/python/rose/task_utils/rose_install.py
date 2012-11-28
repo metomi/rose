@@ -17,33 +17,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
+"""Task utility: install files in a given location of a suite."""
 
-from rosie.ws_client import RosieWSClient
+from rose.run import TaskUtilBase
 
+class RoseInstallTaskUtil(TaskUtilBase):
 
-class SearchManager():
+    """Install files in a given location."""
 
-    """Wrapper class for running searches."""
+    SCHEME = "rose_install"
 
-    def __init__(self, prefix):
-        self.ws_client = RosieWSClient(prefix=prefix)
+    def can_handle(self, key):
+        return key.startswith(self.SCHEME)
 
-    def address_lookup(self, **items):
-        """Return search results for a url lookup."""
-        return self.ws_client.address_search(None, **items)
-
-    def get_datasource(self):
-        """Return the current datasource prefix."""
-        return self.ws_client.prefix 
-
-    def set_datasource(self, prefix):
-        """Set the datasource."""
-        self.ws_client = RosieWSClient(prefix=prefix)
-
-    def ws_query(self, filters, **items):
-        """Return search results for a query.""" 
-        return self.ws_client.query(filters, **items)
-    
-    def ws_search(self, search, **items):
-        """Return search results for a keyword search"""
-        return self.ws_client.search(search, **items)
+    def run_impl_main(self, config, opts, args, uuid, work_files):
+        pass

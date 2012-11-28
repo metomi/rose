@@ -58,7 +58,7 @@ class SvnLocHandler(object):
         loc.real_name = "%s@%s" % (info_entry["url"], info_entry["revision"])
         loc.key = info_entry["commit:revision"]
 
-    def pull(self, loc, config, work_dir):
+    def pull(self, loc, config):
         """Run "svn export" to get loc to its cache."""
         if not loc.real_name:
             self.parse(loc)
