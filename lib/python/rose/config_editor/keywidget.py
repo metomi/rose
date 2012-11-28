@@ -29,7 +29,7 @@ import rose.config_editor
 import rose.variable
 
 
-class KeyWidget(gtk.VBox):
+class KeyWidget(gtk.HBox):
 
     """This class generates a label or entry box for a variable name."""
 
@@ -63,10 +63,7 @@ class KeyWidget(gtk.VBox):
         self._last_var_comments = None
         self.ignored_label = gtk.Label()
         self.ignored_label.show()
-        contents_hbox = gtk.HBox()
-        contents_hbox.show()
-        self.pack_start(contents_hbox, expand=False, fill=False)
-        contents_hbox.pack_start(self.ignored_label, expand=False, fill=False)
+        self.pack_start(self.ignored_label, expand=False, fill=False)
         self.set_ignored()
         if self.my_variable.name != '':
             self.entry = gtk.Label()
@@ -85,10 +82,10 @@ class KeyWidget(gtk.VBox):
                           lambda b, w: self._handle_enter(b))
         event_box.connect('leave-notify-event',
                           lambda b, w: self._handle_leave(b))
-        contents_hbox.pack_start(event_box, expand=True, fill=True,
+        self.pack_start(event_box, expand=True, fill=True,
                                  padding=0)
         self.comments_box = gtk.HBox()
-        contents_hbox.pack_start(self.comments_box, expand=False, fill=False)
+        self.pack_start(self.comments_box, expand=False, fill=False)
         self.grab_focus = lambda : self.entry.grab_focus()
         self.set_sensitive(True)
         self.set_sensitive = self.entry.set_sensitive 

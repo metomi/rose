@@ -27,7 +27,7 @@ import rose.config_editor
 import rose.config_editor.util
 
 
-class MenuWidget(gtk.VBox):
+class MenuWidget(gtk.HBox):
 
     """This class generates a button with a menu for variable actions."""
 
@@ -131,11 +131,8 @@ class MenuWidget(gtk.VBox):
         self._set_hover_over(variable)
         self.option_ui = option_ui
         self.actions = actions
-        contents_hbox = gtk.HBox()
-        contents_hbox.show()
-        self.pack_start(contents_hbox, expand=False, fill=False)
-        contents_hbox.pack_start(self.button, expand=False, fill=False,
-                                 padding=0)
+        self.pack_start(self.button, expand=False, fill=False,
+                         padding=0)
         self.button.connect(
                 "button-press-event",
                 lambda b, e: self._popup_option_menu(

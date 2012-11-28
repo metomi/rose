@@ -97,15 +97,17 @@ class VariableWidget(object):
         """Creates the label widget, a composite of key and menu widgets."""
         self.labelwidget = gtk.VBox()
         self.labelwidget.show()
-        hbox = gtk.HBox()
-        hbox.show()
-        hbox.pack_start(self.menuwidget, expand=False, fill=False)
-        vbox = gtk.VBox()
-        vbox.show()
-        hbox.pack_start(vbox, expand=True, fill=True, padding=5)
-        vbox.pack_start(self.keywidget, expand=False, fill=True)
-        hbox.show()
-        self.labelwidget.pack_start(hbox, expand=False, fill=False)
+        table = gtk.Table(rows=2)
+        table.show()
+        table.attach(self.menuwidget, 0, 1, 0, 1, xoptions=gtk.SHRINK,
+                     yoptions=gtk.SHRINK)
+        table.attach(self.keywidget, 1, 2, 0, 1, xoptions=gtk.SHRINK,
+                     yoptions=gtk.SHRINK)
+        self.labelwidget.set_ignored = self.keywidget.set_ignored
+        self.labelwidget.pack_start(table, expand=False, fill=False)
+        event_box = gtk.EventBox()
+        event_box.show()
+        self.labelwidget.pack_start(event_box, expand=True, fill=True)
 
     def _valuewidget_set_value(self, value):
         # This is called by a valuewidget to change the variable value.
@@ -238,8 +240,8 @@ class VariableWidget(object):
             container.attach(self.labelwidget,
                              key_col, key_col + 1,
                              row_index, row_index + 1,
-                             xoptions=gtk.EXPAND|gtk.FILL,
-                             yoptions=gtk.EXPAND)
+                             xoptions=gtk.FILL,
+                             yoptions=gtk.EXPAND|gtk.FILL)
             container.attach(self.valuewidget,
                              key_col + 1, key_col + 2,
                              row_index, row_index + 1,
@@ -306,8 +308,7 @@ class VariableWidget(object):
 
     def get_children(self):
         """Method that returns child widgets - as in some gtk Objects."""
-        atts = [getattr(self, a) for a in self.__dict__]
-        return [a for a in atts if issubclass(type(a), gtk.Object)]
+        return [self.labelwidget, self.valuewidget]
 
     def hide(self):
         for widget in self.get_children():
@@ -384,10 +385,8 @@ class VariableWidget(object):
 
     def set_sensitive(self, is_sensitive=True):
         """Sets whether the widgets are grayed-out or 'insensitive'."""
-        for widget in self.get_children():
+        for widget in [self.keywidget, self.valuewidget]:
             widget.set_sensitive(is_sensitive)
-        if hasattr(self, 'menuwidget'):
-            self.menuwidget.set_sensitive(True)
         return False
 
     def grab_focus(self, focus_container=None, scroll_bottom=False,
