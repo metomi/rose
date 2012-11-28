@@ -229,9 +229,6 @@ class VariableWidget(object):
         These arguments are generically named x_info and y_info.
 
         """
-        if no_menuwidget:
-            if self.menuwidget in self.labelwidget.get_children():
-                self.labelwidget.remove(self.menuwidget)
         if not hasattr(container, 'num_removes'):
             setattr(container, 'num_removes', 0)
         if isinstance(container, gtk.Table):
