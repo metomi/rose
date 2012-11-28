@@ -36,6 +36,8 @@ test_var_mult_pass = 6
 test_var_mult_fail = 5
 control_mult_1 = 2
 control_mult_2 = 3
+test_substring_pass = "ABCCEFG"
+test_substring_fail = "ABCDEFG"
 
 [simple:array_test]
 test_array_pass = '0A', '0A', '0A', '0A'
@@ -116,6 +118,12 @@ fail-if = this != simple:scalar_test=control_mult_1 * simple:scalar_test=control
 [simple:scalar_test=test_var_mult_fail]
 type = real
 fail-if = this != simple:scalar_test=control_mult_1 * simple:scalar_test=control_mult_2
+
+[simple:scalar_test=test_substring_pass]
+fail-if = "D" in this
+
+[simple:scalar_test=test_substring_fail]
+fail-if = "D" in this
 
 [simple:array_test=test_array_pass]
 length = :
@@ -261,7 +269,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 15
+[V] rose.macros.DefaultValidators: issues: 16
     complex:array_test=test_var_all_ne_fail=6
         failed because: all(complex:array_test=control_array_all_ne != this)
     complex:array_test=test_var_any_lt_fail=6
@@ -286,6 +294,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         failed because: any(this == 0)
     simple:array_test=test_array_fail='0A', '2A', '0A', '0A'
         failed because: this(2) != "'0A'" and this(4) == "'0A'"
+    simple:scalar_test=test_substring_fail="ABCDEFG"
+        failed because: "D" in this
     simple:scalar_test=test_var_lt_control_fail=3
         failed because: this < simple:scalar_test=control_lt
     simple:scalar_test=test_var_mult_fail=5

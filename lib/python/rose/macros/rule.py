@@ -29,7 +29,7 @@ import rose.macro
 import rose.variable
 
 
-REC_EXPR_IS_THIS_RULE = re.compile("(?:^.*[^\w]|^)this[^\w].*([<>=]|in\s).*$")
+REC_EXPR_IS_THIS_RULE = re.compile("(?:^.*[^\w]|^)this(?:$|[^\w].*([<>=]|in\s).*$)")
 
 
 class RuleValueError(Exception):
