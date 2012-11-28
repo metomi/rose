@@ -275,8 +275,9 @@ rose task-run -D '[env]!BAZ='
     launcher. It will export the environment and install files, but will not
     launch a command.</p>
 
-    <p>The <code>rose_install</code> utility will be invoked automatically if a
-    task has a name that starts with <code>rose_install*</code>.</p>
+    <p>In automatic task utility selection mode, this utility will be invoked
+    automatically if a task has a name that starts with
+    <code>rose_install*</code>.</p>
 
     <p>By default, as for the application launcher, this task utility will use
     the following logic to determine the root directory to install file targets
