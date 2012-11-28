@@ -64,7 +64,7 @@
 #     --new, -N
 #         (Re-)create working directories.
 #     --no-gcontrol
-#         Do not run "cylc gcontrol". Default is to run "cylc gcontrol" if the
+#         Do not run "cylc gui". Default is to run "cylc gui" if the
 #         DISPLAY environment variable is defined.
 #     --no-overwrite
 #         Do not overwrite existing files.
@@ -88,7 +88,7 @@
 #         The name of the host where the "rose suite-run" command was invoked.
 #         
 # SEE ALSO
-#     "cylc help gcontrol"
+#     "cylc help gui"
 #     "cylc help register"
 #     "cylc help run"
 #-------------------------------------------------------------------------------
