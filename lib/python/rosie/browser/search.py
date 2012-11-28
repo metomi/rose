@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-import rosie.ws_client
+from rosie.ws_client import RosieWSClient
 
 
 class SearchManager():
@@ -26,7 +26,7 @@ class SearchManager():
     """Wrapper class for running searches."""
 
     def __init__(self, prefix):
-        self.ws_client = rosie.ws_client.Client(prefix=prefix)
+        self.ws_client = RosieWSClient(prefix=prefix)
 
     def address_lookup(self, **items):
         """Return search results for a url lookup."""
@@ -38,7 +38,7 @@ class SearchManager():
 
     def set_datasource(self, prefix):
         """Set the datasource."""
-        self.ws_client = rosie.ws_client.Client(prefix=prefix)
+        self.ws_client = RosieWSClient(prefix=prefix)
 
     def ws_query(self, filters, **items):
         """Return search results for a query.""" 
