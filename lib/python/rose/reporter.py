@@ -64,6 +64,8 @@ class Reporter(object):
     def __init__(self, verbosity=DEFAULT, contexts=None, raise_on_exc=False):
         """Create a reporter with contexts at a given verbosity."""
         self.contexts = {}
+        if verbosity < 0:
+            verbosity = 0
         if contexts is not None:
             self.contexts.update(contexts)
         self.contexts.setdefault("stderr",
