@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 """The web service client.
 
 Classes:
-    Client  - sends requests, retrieves data from the web server
+    RosieWSClient  - sends requests, retrieves data from the web server
 
 Functions:
     lookup  - run searches to retrieve suite properties
@@ -71,15 +71,14 @@ class QueryError(Exception):
     pass
 
 
-class Client(object):
+class RosieWSClient(object):
 
     """A Client for the Rosie Web Service."""
 
     def __init__(self, root=None, prefix=None):
         if root is None:
-            config = ResourceLocator.default().get_conf()
-            node = config.get(["rosie-ws-client", "ws-root-default"])
-            root = node.value
+            conf = ResourceLocator.default().get_conf()
+            root = conf.get_value(["rosie-ws-client", "ws-root-default"])
         self.root = root
         if prefix is None:
             prefix = SuiteId.get_prefix_default()
@@ -99,11 +98,11 @@ class Client(object):
             raise QueryError("%s: %s: %s" % (url, method, str(e)))
         except requests.exceptions.MissingSchema as e:
             raise QueryError("URL Error: %s" % (str(e)))
-            
+
         try:
             response.raise_for_status()
         except:
-            raise QueryError("%s: %s: %s" % (method, kwargs, response.status_code))
+            raise QueryError("%s: %s: %s" % (url, kwargs, response.status_code))
         try:
             if method in ["query", "search"]:
                 return simplejson.loads(response.text), response.url
@@ -111,7 +110,7 @@ class Client(object):
                 return simplejson.loads(response.text)
         except ValueError:
             raise QueryError("%s: %s" % (method, kwargs))
-    
+
     def get_known_keys(self):
         return self._get("get_known_keys")
 
@@ -120,7 +119,7 @@ class Client(object):
 
     def get_prefix(self):
         return self.prefix
-        
+
     def get_root(self):
         return self.root
 
@@ -141,13 +140,13 @@ class Client(object):
 
     def search(self, s, **kwargs):
         return self._get("search", s=s, **kwargs)
-        
+
     def address_search(self, a, **kwargs):
-        return self._get("address", a=a, **kwargs)    
+        return self._get("address", a=a, **kwargs)
 
 
 class URLEvent(Event):
-    
+
     def __str__(self):
         return "url: " + self.args[0]
 
@@ -159,12 +158,12 @@ class SuiteEvent(Event):
 
 
 class SuiteInfo(Event):
-    
+
     LEVEL = Event.V
 
     def __str__(self):
-        
-        time_format = "%Y-%m-%dT%H:%M:%S %Z"    
+
+        time_format = "%Y-%m-%dT%H:%M:%S %Z"
         dict_row = dict(self.args[0].items())
         out = ""
         out = out + "id: %s\n" % dict_row["idx"]
@@ -173,28 +172,28 @@ class SuiteInfo(Event):
             if key != "idx":
                 if value and isinstance(value, list):
                     value = " ".join(value)
-                if key == "date":    
-                    out = (out + "\t" + key + ": " + 
-                           time.strftime(time_format, 
-                                         time.localtime(value)) + "\n") 
-                else:                                         
-                    out = out + "\t" + key + ": " + str(value) + "\n"                                            
+                if key == "date":
+                    out = (out + "\t" + key + ": " +
+                           time.strftime(time_format,
+                                         time.localtime(value)) + "\n")
+                else:
+                    out = out + "\t" + key + ": " + str(value) + "\n"
         return out
 
 
 def local_suites(argv):
     """CLI command to list all the locally checked out suites"""
-    opt_parser = RoseOptionParser().add_my_options("format", "prefix", 
-                                                   "reverse", "sort")    
+    opt_parser = RoseOptionParser().add_my_options(
+            "format", "prefix", "reverse", "sort", "ws_root")
     opts, args = opt_parser.parse_args(argv)
 
-    ws_client = Client()
-    if opts.prefix is not None: 
+    ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
+    if opts.prefix is not None:
 
         results = get_local_suite_details(opts.prefix)
         return _display_maps(opts, ws_client, results)
     else:
-        id_list = get_local_suites()   
+        id_list = get_local_suites()
         if len(id_list) > 0:
             prefixes = []
             for id_ in id_list:
@@ -207,20 +206,19 @@ def local_suites(argv):
                     for id_ in id_list:
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
-            
+
                 results = get_local_suite_details(p, id_list)
                 opts.prefix = p
-                _display_maps(opts, ws_client, results, 
+                _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
         return
 
 
 def lookup(argv):
     """CLI command to run the various search types"""
-    opt_parser = RoseOptionParser().add_my_options("format", "all_revs",
-                                                   "prefix", "query", 
-                                                   "reverse", "search", "sort",
-                                                   "url")    
+    opt_parser = RoseOptionParser().add_my_options(
+            "all_revs", "format", "prefix", "query", "reverse", "search",
+            "sort", "url", "ws_root")
     opts, args = opt_parser.parse_args(argv)
     if not args:
         sys.exit(opt_parser.print_usage())
@@ -231,15 +229,15 @@ def lookup(argv):
             opts.search = True
     results = None
     if opts.url:
-        ws_client = Client()
+        ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
         addr = args[0]
         if not addr.endswith("&format=json"):
             addr += "&format=json"
-        
+
         if opts.debug_mode:
             results = ws_client.address_search(None,url=addr)
             url = addr
-        else:        
+        else:
             try:
                 results = ws_client.address_search(None,url=addr)
                 url = addr
@@ -251,13 +249,13 @@ def lookup(argv):
             sys.exit(ERR_SYNTAX.format(" ".join(args)))
         for i, p in enumerate(q):
             q[i] = " ".join(p)
-        ws_client = Client(prefix=opts.prefix)
+        ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
         if opts.all_revs:
             results, url = ws_client.query(q, all_revs=True)
         else:
             results, url = ws_client.query(q)
     elif opts.search:
-        ws_client = Client(prefix=opts.prefix)
+        ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
         if opts.all_revs:
             results, url = ws_client.search(args, all_revs=True)
         else:
@@ -317,49 +315,49 @@ def get_local_suite_details(prefix=None, id_list=None):
        a search or query.
        """
     if prefix == None:
-        return   
-    
-    if id_list == None:   
+        return
+
+    if id_list == None:
         id_list = get_local_suites()
-    
+
     if not id_list:
         return []
-    
+
     result_maps = []
     for id_ in id_list:
-    
+
         if id_.prefix == prefix:
-        
+
             local_copy_root = id_.get_local_copy_root()
-            info_file_path = os.path.join(local_copy_root, str(id_), 
+            info_file_path = os.path.join(local_copy_root, str(id_),
                                           rose.INFO_CONFIG_NAME)
             try:
                 id_config = rose.config.load(info_file_path)
             except Exception:
                 continue
-            
-            id_info_map = {u"idx": id_.idx, 
+
+            id_info_map = {u"idx": id_.idx,
                            u"branch": id_.branch,
                            u"revision": int(id_.revision)}
 
             id_info_map[u"title"] = id_config[u"title"].value
             id_info_map[u"owner"] = id_config[u"owner"].value
             id_info_map[u"project"] = id_config[u"project"].value
-            
+
             if id_.modified:
                 id_info_map[u"local"] = STATUS_MO
             else:
                 id_info_map[u"local"] = STATUS_OK
             id_info_map[u"status"] = None
             id_info_map[u"from_idx"] = None
-        
+
             for key, node in id_config.value.items():
                 if node.is_ignored():
                     continue
                 id_info_map.update({key: node.value})
-        
+
             result_maps.append(id_info_map)
-    
+
     return result_maps
 
 
@@ -390,7 +388,7 @@ def align(res, keys):
     for k in keys:
         if k != "date":
             try:
-                max_len = max([len(res[i].get(k,"%" + k)) 
+                max_len = max([len(res[i].get(k,"%" + k))
                                for i in range(len(res))])
                 for r in res:
                     r[k] = r.get(k, "%" + k) + " " * (max_len -
@@ -408,12 +406,12 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     """Display returned suite details."""
     report = Reporter(opts.verbosity - opts.quietness)
     popen = RosePopener(event_handler=report)
-    
+
     try:
         terminal_cols = int(popen('stty size', shell=True)[0].split()[1])
     except:
         terminal_cols = None
-    
+
     if terminal_cols == 0:
         terminal_cols = None
 
@@ -426,7 +424,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         opts.format = FORMAT_DEFAULT
 
     all_keys = ws_client.get_known_keys()
-    
+
     if local_suites == None:
         local_suites = get_local_suites(opts.prefix)
 
@@ -447,7 +445,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     all_keys += ["suite"]
     if check_local:
         all_keys += ["local"]
-                                                 
+
     more_keys = []
     for key in REC_COL_IN_FORMAT.findall(opts.format):
         if key not in all_keys:
@@ -464,9 +462,9 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     for key in all_keys:
         if "%" + key in opts.format:
             keylist.append(key)
-    
+
     dict_rows = align(dict_rows, keylist)
-    
+
     for dict_row in dict_rows:
         out = opts.format
         for key, value in dict_row.items():
@@ -475,7 +473,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         out = out.replace("%%", "%")
         out = out.expandtabs()
         suite = SuiteEvent(out.expandtabs() + "\n", level=0)
-        
+
         if (opts.verbosity - opts.quietness) <= report.DEFAULT:
            report(suite, clip=terminal_cols)
         report(SuiteInfo(dict_row), prefix="")
