@@ -275,6 +275,14 @@
       <dd>Increment verbosity.</dd>
     </dl>
 
+    <h3>ENVIRONMENT</h3>
+
+    <dl>
+      <dt><kbd>optional ROSE_FILE_INSTALL_ROOT</kbd></dt>
+
+      <dd>If specified, change to the specified directory to install files.</dd>
+    </dl>
+
     <h2 id="rose-app-upgrade">rose app-upgrade</h2>
 
     <h3>NAME</h3>
@@ -1334,12 +1342,12 @@
 
     <h3>OPTIONS</h3>
 
+    <p>All options of <kbd>rose app-run</kbd> and <kbd>rose task-env</kbd>
+    are supported.</p>
+
+    <p>Additional options are:</p>
+
     <dl>
-      <dd>All options of <kbd>rose app-run</kbd> and <kbd>rose task-env</kbd>
-      are supported.</dd>
-
-      <dd>Additional options are:</dd>
-
       <dt><kbd>--app-key=KEY</kbd></dt>
 
       <dd>Specify a named application configuration.</dd>
@@ -1363,6 +1371,9 @@
     </dl>
 
     <h3>ENVIRONMENT</h3>
+
+    <p>All environment variables of <kbd>rose app-run</kbd> and <kbd>rose
+    task-env</kbd> are supported.</p>
 
     <p>The following environment variables are used by <kbd>rose
     task-run</kbd>:</p>

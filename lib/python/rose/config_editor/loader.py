@@ -363,7 +363,8 @@ class ConfigDataManager(object):
                       {section: rose.section.Section(section, [], meta_data)})
         return sect_map, latent_sect_map
 
-    def load_vars_from_config(self, config_name, save=False):
+    def load_vars_from_config(self, config_name, just_this_section=None,
+                              save=False, update=False):
         """Return maps of variables from the configuration"""
         config_data = self.config[config_name]
         if save:
@@ -375,11 +376,23 @@ class ConfigDataManager(object):
             section_map = config_data.sections.now
             latent_section_map = config_data.sections.latent
         meta_config = config_data.meta
-        var_map = {}
-        latent_var_map = {}
+        if update:
+            if save:
+                var_map = config_data.vars.save
+                latent_var_map = config_data.vars.latent_save
+            else:
+                var_map = config_data.vars.now
+                latent_var_map = config_data.vars.latent
+        else:
+            var_map = {}
+            latent_var_map = {}
         meta_ns_ids = []
         real_var_ids = []
-        for keylist, node in config.walk():
+        if just_this_section is None:
+            key_nodes = config.walk()
+        else:
+            key_nodes = config.walk(keys=[just_this_section])
+        for keylist, node in key_nodes:
             if len(keylist) < 2:
                 continue
             section, option = keylist
@@ -403,6 +416,12 @@ class ConfigDataManager(object):
             real_var_ids.append(var_id)
             meta_data = self.get_metadata_for_config_id(var_id, config_name)
             var_map.setdefault(section, [])
+            if update:
+                id_list = [v.metadata['id'] for v in var_map[section]]
+                if var_id in id_list:
+                    for var in var_map[section]:
+                        if var.metadata['id'] == var_id:
+                            var_map[section].pop(i)
             var_map[section].append(rose.variable.Variable(
                                                   option,
                                                   node.value,
@@ -414,6 +433,8 @@ class ConfigDataManager(object):
             if sect_node.is_ignored():
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
+            if just_this_section is not None and section != just_this_section:
+                continue
             ignored_reason = {}
             sect_data = section_map.get(section)
             if sect_data is None:
@@ -434,6 +455,13 @@ class ConfigDataManager(object):
             if option is not None and section not in ['ns', 'file:*']:
                 value = rose.variable.get_value_from_metadata(meta_data)
                 latent_var_map.setdefault(section, [])
+                if update:
+                    id_list = [v.metadata['id'] for v in
+                               latent_var_map[section]]
+                    if setting_id in id_list:
+                        for var in latent_var_map[section]:
+                            if var.metadata['id'] == setting_id:
+                                latent_var_map[section].remove(var)
                 latent_var_map[section].append(
                                 rose.variable.Variable(
                                                option,
