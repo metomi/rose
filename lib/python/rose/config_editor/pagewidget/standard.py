@@ -44,8 +44,8 @@ class PageTable(gtk.Table):
 
     def __init__(self, panel_data, ghost_data, var_ops, show_modes):
         super(PageTable, self).__init__(rows=self.MAX_ROWS,
-                                     columns=self.MAX_COLS,
-                                     homogeneous=False)
+                                        columns=self.MAX_COLS,
+                                        homogeneous=False)
         self.num_removes = 0
         self.panel_data = panel_data
         self.ghost_data = ghost_data

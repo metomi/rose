@@ -70,6 +70,7 @@ class KeyWidget(gtk.HBox):
             self.entry.set_alignment(
                         self.LABEL_X_OFFSET,
                         self.entry.get_alignment()[1])
+            self.entry.set_text(self.my_variable.name)
         else:
             self.entry = gtk.Entry()
             self.entry.modify_text(gtk.STATE_NORMAL,
@@ -100,6 +101,7 @@ class KeyWidget(gtk.HBox):
             self.add_flag(rose.config_editor.FLAG_TYPE_FIXED,
                           rose.config_editor.VAR_FLAG_TIP_FIXED)
         event_box.show()
+        self.show()
         
     def set_ignored(self):
         """Update the ignored display."""
