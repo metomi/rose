@@ -141,6 +141,8 @@
 #
 ## Adhoc Rosie web server log directory
 #  log-dir = /path/to/log/directory
+## Adhoc Rosie web server port
+#  port = 8080
 [rosie-ws]
 
 # Configuration related to Rosie client commands
