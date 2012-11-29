@@ -514,8 +514,7 @@ class MainWindow(gtk.Window):
     def get_selected_suite_id(self, path=None):
         """Return the currently selected suite id in the rosie CLI format."""
         idx, branch, revision = self.display_box.get_suite_keys_treeview(path)
-        prefix = self.search_manager.get_datasource()
-        return self.format_suite_id(prefix, idx, branch, revision)
+        return self.format_suite_id(idx, branch, revision)
 
     def get_tree_columns(self):
         """Return the columns to display."""

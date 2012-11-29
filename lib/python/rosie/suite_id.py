@@ -287,7 +287,7 @@ class SuiteId(object):
         return self.idx.split("-", 1)[1]
 
     def _from_id_text(self, id_text):
-        match = self.REC_ID.match(id_text)
+        match = self.REC_IDX.match(id_text)
         if not match:
             raise SuiteIdTextError(id_text)
         self.prefix, self.sid, self.branch, self.revision = match.groups()
@@ -324,11 +324,11 @@ class SuiteId(object):
                 break
         else:
             raise SuiteIdPrefixError(location)
-        names = path.lstrip("/").split("/", self.IDX_LEN + 1)
+        names = path.lstrip("/").split("/", self.SID_LEN + 1)
         if len(names) < self.SID_LEN:
             raise SuiteIdLocationError(location)
         sid = "".join(names[0:self.SID_LEN])
-        if not self.REC_ID.match(sid):
+        if not self.REC_IDX.match(sid):
             raise SuiteIdLocationError(location)
         self.idx = self.FORMAT_IDX %(self.prefix, sid)
         self.sid = sid
