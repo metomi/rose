@@ -538,7 +538,7 @@ $(function() {
       <tbody>
 {%- if data %}
 {%- for item in data %}
-{%- set info = "<strong>suite:</strong> %s-%s/%s@%s<br/>"|format(prefix, item.idx, item.branch, item.revision) %}
+{%- set info = "<strong>suite:</strong> %s/%s@%s<br/>"|format(item.idx, item.branch, item.revision) %}
 {%- for key, value in item|dictsort %}
 {%- if value is not none and key not in ["idx", "branch", "revision", "href", "owner", "project", "title"] %}
 {%- if "-list" in key %}
@@ -555,7 +555,7 @@ $(function() {
         </td>
 {%- endif %}
 {%- endfor %}
-          <td><a href="{{ item.href }}" class=tip>{{ prefix }}-{{ item.idx }}
+          <td><a href="{{ item.href }}" class=tip>{{ item.idx }}
               </a></td>
 {%- for col in ["branch", "revision", "owner", "project", "title"] %}
           <td>{{ item[col] }}</td>

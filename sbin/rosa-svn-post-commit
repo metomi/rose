@@ -115,8 +115,8 @@ def svnlook(*args):
     return out
 
 
-def check_path_is_idx(path):
-    """Return whether the path contains a full idx."""
+def check_path_is_sid(path):
+    """Return whether the path contains a suffix-id."""
     names = path.split("/")
     if len(names) < LEN_ID + 1:
         return False
@@ -151,20 +151,21 @@ def main(repos, rev):
     changes = svnlook("changed", "-r", rev, repos)
     for i, line in enumerate(changes.splitlines()):
         status, path = line.split(None, 1)
-        if not check_path_is_idx(path):
+        if not check_path_is_sid(path):
             continue
         names = path.split("/")
-        idx = "".join(names[0:LEN_ID])
+        sid = "".join(names[0:LEN_ID])
+        idx = db_name + "-" + sid
         branch = names[LEN_ID]
-        if i in path_copies and check_path_is_idx(path_copies[i]):
+        if i in path_copies and check_path_is_sid(path_copies[i]):
             copy_names = path_copies[i].split("/")
-            copy_idx = "".join(copy_names[:LEN_ID])
-            if copy_idx != idx:
-                copies.setdefault((rev, idx, branch), copy_idx)
+            copy_sid = "".join(copy_names[:LEN_ID])
+            if copy_sid != sid:
+                copies.setdefault((rev, idx, branch), copy_sid)
         
         if branch:
             statuses.setdefault((rev, idx, branch), {0: " ", 1: " "})
-        branch_path = "/".join(idx) + "/" + branch
+        branch_path = "/".join(sid) + "/" + branch
         info_file_path = branch_path + "/" + INFO_FILE
         if not branch and status[0] == ST_DELETED:
             out = svnlook("tree", "-r", str(int(rev) - 1), "-N", repos, path)
@@ -173,7 +174,7 @@ def main(repos, rev):
                 statuses.setdefault((rev, idx, del_branch), {0: " ", 1: " "})
                 statuses[(rev, idx, del_branch)][0] = ST_DELETED
  
-        if (idx == "ROSIE" and branch == "trunk" and
+        if (sid == "ROSIE" and branch == "trunk" and
             path == branch_path + "/" + KNOWN_KEYS_FILE):
             new_keys = parse_known_keys(repos, path, rev)
             if new_keys is not None:
@@ -256,7 +257,10 @@ def main(repos, rev):
     # End loop over changes, update statuses.
     for key, value in statuses.items():
         rev, idx, branch = key
-        copy_idx = copies.get(key)
+        copy_idx = None
+        copy_sid = copies.get(key)
+        if copy_sid is not None:
+            copy_idx = db_name + "-" + copy_sid
         status = ""
         if value[0] == ST_ADDED:
             value[1] = " "
