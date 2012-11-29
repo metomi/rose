@@ -31,7 +31,7 @@ def main():
     opt_parser.add_my_options("cycle", "cycle_offsets",
                               "prefix_delim", "suffix_delim")
     opts, args = opt_parser.parse_args()
-    report = Reporter(opts.verbosity - opts.quietness)
+    report = Reporter(opts.verbosity - opts.quietness - 1)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=report)
     kwargs = {}
