@@ -317,9 +317,9 @@ class MainWindow(gtk.Window):
         self.advanced_search_widget.display_filters[title] = not filters
         self.handle_update_treeview()
 
-    def format_suite_id(self, prefix, idx, branch, revision):
+    def format_suite_id(self, idx, branch, revision):
         """Convenience method for formatting the suite id."""
-        return "{0}-{1}/{2}@{3}".format(prefix, idx, branch, revision)
+        return "{0}/{1}@{2}".format(idx, branch, revision)
 
     def generate_menu(self):
         """Generate the top menu."""
@@ -514,8 +514,7 @@ class MainWindow(gtk.Window):
     def get_selected_suite_id(self, path=None):
         """Return the currently selected suite id in the rosie CLI format."""
         idx, branch, revision = self.display_box.get_suite_keys_treeview(path)
-        prefix = self.search_manager.get_datasource()
-        return self.format_suite_id(prefix, idx, branch, revision)
+        return self.format_suite_id(idx, branch, revision)
 
     def get_tree_columns(self):
         """Return the columns to display."""
