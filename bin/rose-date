@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012 Met Office.
+#
+# This file is part of Rose, a framework for scientific suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-date
+#
+# SYNOPSIS
+#     rose date [OPTIONS] [DATE-TIME]
+#
+# DESCRIPTION
+#     Display the current or the specified DATE-TIME with an optional offset.
+#
+# OPTIONS
+#     --offset=OFFSET, -s OFFSET
+#         Specify an offset to add to the current or the specified DATE-TIME.
+#         OFFSET must be in the form nU where U is the unit (w for weeks, d for
+#         days, h for hours, m for minutes and s for seconds) and n is an
+#         positive or negative integer.
+#     --parse-format
+#         Specify a format for parsing DATE-TIME, which should be compatible
+#         with the format documented in strptime(3). If not specified, the
+#         system will attempt to parse DATE-TIME using the following formats:
+#         * ctime: "%a %b %d %H:%M:%S %Y"
+#         * Unix date: "%a %b %d %H:%M:%S %Z %Y"
+#         * ISO8601: "%Y-%m-%dT%H:%M:%S", "%Y%m%dT%H%M%S"
+#                    (with or without "%Z", "%z" at the end)
+#         * Cylc: "%Y%m%d%H"
+#     --parse-utc
+#         Parse date time in UTC instead of local time zone.
+#     --print-format
+#         Specify a format for printing the result. Default to the same format
+#         as the parse format.
+#     --print-utc
+#         Print date time in UTC instead of local time zone.
+#-------------------------------------------------------------------------------
+exec python -m rose.date "$@"
