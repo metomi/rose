@@ -743,9 +743,9 @@ class TaskRunner(Runner):
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
-        path = os.path.join(os.path.dirname(__file__), "task_utils")
+        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         self.task_utils_manager = SchemeHandlersManager(
-                [path], ["run"], None, *args, **kwargs)
+                [p], "rose.task_utils", ["run"], None, *args, **kwargs)
 
     def run_impl(self, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props(

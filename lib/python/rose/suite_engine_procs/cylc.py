@@ -35,6 +35,7 @@ class CylcProcessor(SuiteEngineProcessor):
     """Logic specific to the Cylc suite engine."""
 
     RUN_DIR_REL_ROOT = "cylc-run"
+    SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     SUITE_LOG = "suite/log"
 
