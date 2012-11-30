@@ -31,8 +31,13 @@ class SchemeHandlersManager(object):
 
     CAN_HANDLE = "can_handle"
 
-    def __init__(self, paths, attrs=None, can_handle=None, *args, **kwargs):
+    def __init__(self, paths, ns=None, attrs=None, can_handle=None,
+                 *args, **kwargs):
         """Load modules in paths and initialise any classes with a SCHEME.
+
+        If "ns" is not None, only modules under the specified name-space in
+        paths are searched and imported. ("ns" should be a str in the form
+        "a.b", which will be converted as "a/b" for path search.)
 
         Initialise each handler, and save it in self.handlers, which is a dict
         of {scheme: handler, ...}.
@@ -58,20 +63,24 @@ class SchemeHandlersManager(object):
             can_handle = self.CAN_HANDLE
         self.can_handle = can_handle
         cwd = os.getcwd()
+        ns_path = ""
+        if ns:
+            ns_path = os.path.join(*(ns.split("."))) + os.sep
         for path in paths:
             os.chdir(path) # assuming that "" is at the front of sys.path
             sys.path.insert(0, path)
             try:
                 kwargs["manager"] = self
-                for file_name in glob("*.py"):
+                for file_name in glob(ns_path + "*.py"):
                     if file_name.startswith("__"):
                         continue
-                    mod_name = file_name[0:-3]
-                    mod = __import__(mod_name)
+                    mod_path = file_name[0:-3]
+                    mod_name = mod_path.replace(os.sep, ".")
+                    mod = __import__(mod_name, fromlist=[""])
                     members = inspect.getmembers(mod, inspect.isclass)
                     scheme0_default = None
                     if len(members) == 1:
-                        scheme0_default = mod_name
+                        scheme0_default = os.path.basename(mod_path)
                     for key, c in members:
                         if any([getattr(c, a, None) is None for a in attrs]):
                             continue

@@ -548,14 +548,14 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
+        self.popen = popen
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
-        rose_lib_path = fs_util.dirname(fs_util.dirname(__file__))
-        lib_path = os.path.join(rose_lib_path, "loc_handlers")
-        self.popen = popen
         self.fs_util = fs_util
-        SchemeHandlersManager.__init__(self, [lib_path], attrs=["parse", "pull"],
-                                       can_handle="can_pull")
+        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        SchemeHandlersManager.__init__(
+                self, [p], ns="rose.loc_handlers", attrs=["parse", "pull"],
+                can_handle="can_pull")
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler with given arguments if possible."""
