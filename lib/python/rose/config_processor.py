@@ -24,6 +24,7 @@ from rose.env import UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
 from rose.scheme_handler import SchemeHandlersManager
+import sys
 
 
 class UnknownContentError(Exception):
@@ -85,7 +86,6 @@ class ConfigProcessorsManager(SchemeHandlersManager):
     """Load and select config processors."""
 
     def __init__(self, event_handler=None, popen=None, fs_util=None):
-        path = os.path.join(os.path.dirname(__file__), "config_processors")
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -93,7 +93,9 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        SchemeHandlersManager.__init__(self, [path], ["process"])
+        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        SchemeHandlersManager.__init__(
+                self, [p], "rose.config_processors", ["process"])
 
     def handle_event(self, *args, **kwargs):
         if callable(self.event_handler):

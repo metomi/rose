@@ -88,12 +88,17 @@ class ResourceLocator(object):
         except:
             return None
 
-    def get_util_home(self):
-        """Return ROSE_HOME or the dirname of the dirname of sys.argv[0]."""
+    def get_util_home(self, *args):
+        """Return ROSE_HOME or the dirname of the dirname of sys.argv[0].
+
+        If args are specified, they are added to the end of returned path.
+
+        """
         try:
-            return os.getenv("ROSE_HOME")
+            d = os.getenv("ROSE_HOME")
         except KeyError:
-            return os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
+            d = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
+        return os.path.join(d, *args)
 
     def get_util_name(self, separator=" "):
         """Return the name of the Rose utility, e.g. "rose app-run".

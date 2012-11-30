@@ -23,9 +23,11 @@ from datetime import datetime, timedelta
 import os
 import re
 from rose.env import env_var_process
+from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
 from rose.resource import ResourceLocator
-from rose.fs_util import FileSystemUtil
+from rose.scheme_handler import SchemeHandlersManager
+import sys
 
 class SuiteScanResult(object):
 
@@ -202,32 +204,25 @@ class SuiteEngineProcessor(object):
     RUN_DIR_REL_ROOT = None
     SUITE_LOG = None
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
-    _PROCESSORS = {}
+    SCHEME_HANDLER_MANAGER = None
+    SCHEME_DEFAULT = "cylc" # TODO: site configuration?
 
     @classmethod
     def get_processor(
-            cls, key="cylc", event_handler=None, popen=None, fs_util=None):
-        """Return a suite engine processor for the suite engine named by "key",
-        which must be a supported suite engine.
-        """
+            cls, key=None, event_handler=None, popen=None, fs_util=None):
+        """Return a processor for the suite engine named by "key"."""
 
-        # FIXME: default "key" should be None, and its default value should be
-        # FIXME: a site configuration.
+        if cls.SCHEME_HANDLER_MANAGER is None:
+            p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+            cls.SCHEME_HANDLER_MANAGER = SchemeHandlersManager(
+                    [p], ns="rose.suite_engine_procs", attrs=["SCHEME"],
+                    can_handle=None, event_handler=event_handler, popen=popen,
+                    fs_util=fs_util)
+        if key is None:
+            key = cls.SCHEME_DEFAULT
+        return cls.SCHEME_HANDLER_MANAGER.get_handler(key)
 
-        if not cls._PROCESSORS.has_key(key):
-            ns = "rose.suite_engine_procs"
-            try:
-                mod = __import__(ns + "." + key, fromlist=ns)
-            except ImportError as e:
-                raise NotImplementedError("suite-engine: " + key)
-            for c in vars(mod).values():
-                if isinstance(c, type) and issubclass(c, cls) and c != cls:
-                    p = c(event_handler=event_handler, popen=popen,
-                          fs_util=fs_util)
-                    cls._PROCESSORS[key] = p
-        return cls._PROCESSORS[key]
-
-    def __init__(self, event_handler=None, popen=None, fs_util=None):
+    def __init__(self, event_handler=None, popen=None, fs_util=None, **kwargs):
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
