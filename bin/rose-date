@@ -32,21 +32,19 @@
 #         OFFSET must be in the form nU where U is the unit (w for weeks, d for
 #         days, h for hours, m for minutes and s for seconds) and n is an
 #         positive or negative integer.
-#     --parse-format
+#     --parse-format=FORMAT, --format=FORMAT
 #         Specify a format for parsing DATE-TIME, which should be compatible
 #         with the format documented in strptime(3). If not specified, the
 #         system will attempt to parse DATE-TIME using the following formats:
 #         * ctime: "%a %b %d %H:%M:%S %Y"
 #         * Unix date: "%a %b %d %H:%M:%S %Z %Y"
 #         * ISO8601: "%Y-%m-%dT%H:%M:%S", "%Y%m%dT%H%M%S"
-#                    (with or without "%Z", "%z" at the end)
 #         * Cylc: "%Y%m%d%H"
-#     --parse-utc
-#         Parse date time in UTC instead of local time zone.
-#     --print-format
+#     --print-format=FORMAT
 #         Specify a format for printing the result. Default to the same format
 #         as the parse format.
-#     --print-utc
-#         Print date time in UTC instead of local time zone.
+#     --utc, -u
+#         Parse/print date time in UTC instead of local time zone.
+#         (Does not work at the moment.)
 #-------------------------------------------------------------------------------
 exec python -m rose.date "$@"

@@ -19,91 +19,89 @@
 #-----------------------------------------------------------------------------
 """Parse and format date and time."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
+import re
 from rose.opt_parse import RoseOptionParser
 
 
-class DateTimeParser(object):
-    """Parser of date time strings to datetime.datetime objects."""
-
-    FORMAT_STRS = {}
-
-    def __init__(self):
-        self.format_strs = self.FORMAT_STRS
-
-    def parse(self, s, format_str=None):
-        """Parse string "s" and return a 3-element tuple.
-        
-        The elements in the tuple are (datetime_s, format_key, format_str):
-        
-        datetime_s is the datetime object representation of "s".
-        format_key is the key of the format string used to parse "s".
-        format_str is the format string used to parse "s".
-
-        """
-        pass # TODO
-
-    __call__ = parse
+FORMATS = ["%a %b %d %H:%M:%S %Y",    # ctime
+           "%a %b %d %H:%M:%S %Z %Y", # Unix "date"
+           "%Y-%m-%dT%H:%M:%S",       # ISO8601, normal
+           "%Y%m%dT%H%M%S",           # ISO8601, abbr
+           "%Y%m%d%H"];               # Cylc
 
 
-class DateTimeFormatter(object):
-    """Format datetime.datetime objects to ."""
-    FORMAT_STR = "%a %b %d %H:%M:%S %Z %Y"
+UNITS = {"w": "weeks",
+         "d": "days",
+         "h": "hours",
+         "m": "minutes",
+         "s": "seconds"}
 
-    def __init__(self, format_str=None, is_utc=False):
-        if format_str is None:
-            format_str = FORMAT_STR
-        self.format_str = format_str
-        self.is_utc = is_utc
 
-    def format(self, d, format_str=None, is_utc=None):
-        """Format datetime object "d" to a string."""
-        if format_str is None:
-            format_str = self.format_str
-        if is_utc is None:
-            is_utc = self.is_utc
-        if is_utc:
-            tz = os.getenv("TZ", None)
-            os.environ["TZ"] = "UTC"
-        try:
-            return d.strftime(self.format_str)
-        finally:
-            if is_utc:
-                if tz:
-                    os.environ["TZ"] = tz
-                else:
-                    os.environ.pop("TZ")
+REC_OFFSET = re.compile(
+        r"""\A(?P<sign>[\+\-])?(?P<num>\d+)(?P<unit>[wdhms])\Z""", re.I)
+
+
+def date_shift(offsets=None, parse_format=None, print_format=None, *args):
+    """Return a date string with an offset.
+
+    If args specified, use args[0] as the date-time string. Otherwise, use
+    current time.
+
+    If offsets is specified, it should be a list of offsets that have the
+    format "[+/-]nU" where "n" is an integer, and U is a unit matching a key in
+    rose.date.UNITS.
+
+    If parse_format is specified, parse args[0] with the specified format.
+    Otherwise, parse args[0] with one of the format strings in
+    rose.date.FORMATS. The format should be a string compatible to strptime(3).
+
+    If print_format is specified, return a string as specified in the format.
+    Otherwise, use the parse_format.
+
+    """
+    # Parse
+    parse_formats = FORMATS
+    if parse_format:
+        parse_formats = [parse_format]
+    if not args or args[0] == "now":
+        d, parse_format = (datetime.now(), parse_formats[0])
+    else:
+        while parse_formats:
+            parse_format = parse_formats.pop(0)
+            try:
+                d = datetime.strptime(args[0], parse_format)
+                break
+            except ValueError as e:
+                if not parse_formats:
+                    raise e
+
+    # Offset
+    if offsets is not None:
+        for offset in offsets:
+            match = REC_OFFSET.match(offset.lower())
+            if not match:
+                raise ValueError(offset)
+            sign, num, unit = match.group("sign", "num", "unit")
+            num = int(num)
+            if sign == "-":
+                num = -num
+            key = UNITS[unit]
+            d += timedelta(**{key: num})
+
+    # Format
+    if print_format is None:
+        print_format = parse_format
+    return d.strftime(print_format)
 
 
 def main():
     """Implement "rose date"."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("offset", "parse_format", "parse_utc",
-                              "print_format", "print_utc")
+    opt_parser.add_my_options("offsets", "parse_format", "print_format")
     opts, args = opt_parser.parse_args()
-
-    if opts.parse_utc:
-        tz = os.getenv("TZ", None)
-        os.environ["TZ"] = "UTC"
-    try:
-        if args:
-            d = DateTimeParser().parse(args[0], opts.parse_format)
-        else:
-            d = datetime.now()
-    finally:
-        if is_utc:
-            if tz:
-                os.environ["TZ"] = tz
-            else:
-                os.environ.pop("TZ")
-
-    # TODO: d + offset
-    if opts.offset:
-        pass
-
-    print DateTimeFormatter().format(
-            d, format_str=opts.print_format, is_utc=opts.print_utc)
+    print date_shift(opts.offsets, opts.parse_format, opts.print_format, *args)
 
 
 if __name__ == "__main__":
