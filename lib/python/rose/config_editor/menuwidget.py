@@ -227,7 +227,7 @@ class MenuWidget(gtk.HBox):
                                           title, search_function))
         if 'action="Ignore"' in option_ui:
             ignore_item = uimanager.get_widget('/Options/Ignore')
-            if rose.config_editor.WARNING_TYPE_IGNORED in errors:
+            if rose.config_editor.WARNING_TYPE_ENABLED in errors:
                 # It is an enabled variable that should be trigger-ignored.
                 new_reason = {rose.variable.IGNORED_BY_SYSTEM:
                               rose.config_editor.IGNORED_STATUS_MANUAL}
