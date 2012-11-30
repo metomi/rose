@@ -400,7 +400,7 @@ function createControls() {
 
 function fontScale() {  // causes layout problems in FireFox that get fixed if browser's Reload is used; same may be true of other Gecko-based browsers
 	if (!s5mode) return false;
-	var vScale = 22;  // both yield 32 (after rounding) at 1024x768
+	var vScale = 24;  // both yield 32 (after rounding) at 1024x768. @benfitzpatrick: changed from 22 to 27
 	var hScale = 32;  // perhaps should auto-calculate based on theme's declared value?
 	if (window.innerHeight) {
 		var vSize = window.innerHeight;
