@@ -42,6 +42,7 @@ import rose.gtk.run
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator, ResourceError
+from rose.suite_engine_proc import SuiteEngineProcessor
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search
@@ -316,9 +317,9 @@ class MainWindow(gtk.Window):
         self.advanced_search_widget.display_filters[title] = not filters
         self.handle_update_treeview()
 
-    def format_suite_id(self, prefix, idx, branch, revision):
+    def format_suite_id(self, idx, branch, revision):
         """Convenience method for formatting the suite id."""
-        return "{0}-{1}/{2}@{3}".format(prefix, idx, branch, revision)
+        return "{0}/{1}@{2}".format(idx, branch, revision)
 
     def generate_menu(self):
         """Generate the top menu."""
@@ -418,7 +419,7 @@ class MainWindow(gtk.Window):
                                  "gtk.STOCK_DIRECTORY"),
                                 (rosie.browser.TIP_TOOLBAR_LAUNCH_TERMINAL,
                                  "gtk.STOCK_EXECUTE"),
-                                (rosie.browser.TIP_TOOLBAR_LAUNCH_SCHEDULER,
+                                (rosie.browser.TIP_TOOLBAR_LAUNCH_SUITE_GCONTROL,
                                  self.get_sched_toolitem)],
                        sep_on_name=[rosie.browser.TIP_TOOLBAR_COPY,
                                     rosie.browser.TIP_TOOLBAR_LAUNCH_TERMINAL])
@@ -438,7 +439,7 @@ class MainWindow(gtk.Window):
                      rosie.browser.TIP_TOOLBAR_LAUNCH_TERMINAL,
                      self.handle_launch_terminal)
         self.toolbar.set_widget_function(
-                     rosie.browser.TIP_TOOLBAR_LAUNCH_SCHEDULER,
+                     rosie.browser.TIP_TOOLBAR_LAUNCH_SUITE_GCONTROL,
                      self.handle_run_scheduler)
         custom_text = rose.config_editor.TOOLBAR_SUITE_RUN_MENU
         self.run_button = rose.gtk.util.CustomMenuButton(
@@ -458,7 +459,7 @@ class MainWindow(gtk.Window):
                               rosie.browser.TIP_TOOLBAR_VIEW_WEB,
                               rosie.browser.TIP_TOOLBAR_VIEW_OUTPUT,
                               rosie.browser.TIP_TOOLBAR_LAUNCH_TERMINAL,
-                              rosie.browser.TIP_TOOLBAR_LAUNCH_SCHEDULER]:
+                              rosie.browser.TIP_TOOLBAR_LAUNCH_SUITE_GCONTROL]:
             self.toolbar.set_widget_sensitive(toolitem_name, False)
         
         history_item = gtk.ToolItem()
@@ -513,8 +514,7 @@ class MainWindow(gtk.Window):
     def get_selected_suite_id(self, path=None):
         """Return the currently selected suite id in the rosie CLI format."""
         idx, branch, revision = self.display_box.get_suite_keys_treeview(path)
-        prefix = self.search_manager.get_datasource()
-        return self.format_suite_id(prefix, idx, branch, revision)
+        return self.format_suite_id(idx, branch, revision)
 
     def get_tree_columns(self):
         """Return the columns to display."""
@@ -754,9 +754,8 @@ class MainWindow(gtk.Window):
 
     def handle_run_scheduler(self, *args):
         """Run the scheduler for this suite."""
-        this_id = SuiteId(id_text=self.get_selected_suite_id())
-        cmd_string = rosie.browser.SCHEDULER_COMMAND.format(this_id)
-        subprocess.Popen(shlex.split(cmd_string))
+        this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
+        return SuiteEngineProcessor.get_processor().launch_gcontrol(this_id)
 
     def handle_search(self, widget=None, record=True, *args):
         """Get results that contain the values in the search widget."""
@@ -1014,7 +1013,7 @@ class MainWindow(gtk.Window):
                    ("Terminal", gtk.STOCK_EXECUTE,
                     rosie.browser.RESULT_MENU_LAUNCH_TERMINAL),
                    ("Scheduler", gtk.STOCK_MISSING_IMAGE,
-                    rosie.browser.RESULT_MENU_SCHEDULER),
+                    rosie.browser.RESULT_MENU_SUITE_GCONTROL),
                    ("Run", gtk.STOCK_MEDIA_PLAY,
                     rosie.browser.RESULT_MENU_RUN_SUITE),
                    ("Run custom", gtk.STOCK_MEDIA_PLAY,
@@ -1204,8 +1203,9 @@ class MainWindow(gtk.Window):
         self.toolbar.set_widget_sensitive("View Web", path is not None)
         self.toolbar.set_widget_sensitive("View Output", path is not None)
         self.toolbar.set_widget_sensitive("Launch Terminal", path is not None)
-        self.toolbar.set_widget_sensitive("Launch Scheduler",
-                                          path is not None)
+        self.toolbar.set_widget_sensitive(
+                rosie.browser.RESULT_MENU_SUITE_GCONTROL,
+                path is not None)
         if path is not None:
             status = self.display_box._get_treeview_path_status(path)
             can_edit = (status in [rosie.ws_client.STATUS_OK,
@@ -1217,7 +1217,8 @@ class MainWindow(gtk.Window):
             self.toolbar.set_widget_sensitive("View Output", has_output)
             self.toolbar.set_widget_sensitive("Launch Terminal",
                                               not can_checkout)
-            self.toolbar.set_widget_sensitive("Launch Scheduler", can_edit)
+            self.toolbar.set_widget_sensitive(
+                    rosie.browser.RESULT_MENU_SUITE_GCONTROL, can_edit)
             self.run_button.set_sensitive(can_edit)
 
 

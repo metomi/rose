@@ -35,6 +35,7 @@ class CylcProcessor(SuiteEngineProcessor):
     """Logic specific to the Cylc suite engine."""
 
     RUN_DIR_REL_ROOT = "cylc-run"
+    SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     SUITE_LOG = "suite/log"
 
@@ -178,12 +179,12 @@ class CylcProcessor(SuiteEngineProcessor):
         if not host:
             # Try the "rose-suite.host" file in the suite log directory
             try:
-                host_file = os.path.join(log_dir, "rose-suite.host")
+                host_file = os.path.join(log_dir, "rose-suite-run.host")
                 host = open(host_file).read().strip()
             except IOError:
                 host = "localhost"
-        fmt = r"nohup cylc gcontrol --host=%s %s %s 1>%s 2>&1 &"
-        log = os.path.join(log_dir, "cylc-gcontrol.log")
+        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1 &"
+        log = os.path.join(log_dir, "cylc-gui.log")
         args_str = self.popen.list_to_shell_str(args)
         self.popen(fmt % (host, suite_name, args_str, log), shell=True)
 

@@ -24,7 +24,7 @@ import gtk
 
 import rose.gtk.util
 import rosie.browser
-import rosie.vc
+from rosie.vc import RosieVCClient, LocalCopyStatusError
 
 
 class SuiteDirector():
@@ -34,7 +34,7 @@ class SuiteDirector():
     def __init__(self, event_handler):
         self.last_vc_event = ""
         self.event_logged = False
-        self.vc_client = rosie.vc.Client(event_handler=event_handler)
+        self.vc_client = RosieVCClient(event_handler=event_handler)
         
     def checkout(self, *args, **kwargs):
         """Check out a suite."""

@@ -41,7 +41,7 @@ class EntryArrayValueWidget(gtk.HBox):
     TIP_ELEMENT_CHAR = "Element {0}: '{1}'"
     TIP_LEFT = "Move array element left"
     TIP_RIGHT = "Move array element right"
-    
+
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(EntryArrayValueWidget, self).__init__(homogeneous=False,
                                                     spacing=0)
@@ -441,26 +441,7 @@ class MixedArrayValueWidget(gtk.HBox):
                     (gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU),
                     (gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)]
         self.make_log_image = lambda i: gtk.image_new_from_stock(*log_imgs[i])
-        if self.unlimited:
-            self.num_rows, rem = divmod(len(self.value_array), self.num_cols)
-            self.num_rows += [1, 0][rem == 0]
-        else:
-            self.num_rows = int(self.array_length)
-            num, rem = divmod(len(self.value_array), self.num_cols)
-            if self.num_rows == 0:
-               self.num_rows = 1
-        if rem != 0:
-            # Then there is an incorrect number of entries.
-            # Display as entry box.
-            self.num_rows = 1
-            self.unlimited = False
-            self.types_row = ['_error_']
-            self.value_array = [value]
-        if self.CHECK_NAME_IS_ELEMENT(metadata['id']):
-            self.num_rows = 1
-            self.unlimited = False
-        if self.num_rows == 0:
-            self.num_rows = 1
+        self.set_num_rows()
         self.entry_table = gtk.Table(rows=self.num_rows,
                                      columns=self.num_cols,
                                      homogeneous=False)
@@ -476,6 +457,33 @@ class MixedArrayValueWidget(gtk.HBox):
         self.pack_start(self.entry_table, expand=True, fill=True)
         self.show()
 
+    def set_num_rows(self):
+        """Derive the number of columns and rows."""
+        if self.CHECK_NAME_IS_ELEMENT(self.metadata['id']):
+            self.unlimited = False
+        if self.unlimited:
+            self.num_rows, rem = divmod(len(self.value_array), self.num_cols)
+            self.num_rows += [1, 0][rem == 0]
+            self.max_rows = sys.maxint
+        else:
+            self.num_rows = int(self.array_length)
+            num, rem = divmod(len(self.value_array), self.num_cols)
+            if self.num_rows == 0:
+               self.num_rows = 1
+            self.max_rows = self.num_rows
+        if rem != 0:
+            # Then there is an incorrect number of entries.
+            # Display as entry box.
+            self.num_rows = 1
+            self.max_rows = 1
+            self.unlimited = False
+            self.types_row = ['_error_']
+            self.value_array = [self.value]
+        if self.num_rows == 0:
+            self.num_rows = 1
+        if self.max_rows == 0:
+            self.max_rows = 1
+   
     def grab_focus(self):
         if self.entry_table.focus_child is None:
             self.hook.get_focus(self.rows[-1][-1])
@@ -487,7 +495,13 @@ class MixedArrayValueWidget(gtk.HBox):
         r = self.entry_table.child_get_property(self.rows[-1][-1],
                                                 'top-attach')
         self.entry_table.resize(r + 2, self.num_cols) 
-        self.insert_row(r + 1)
+        new_values = self.insert_row(r + 1)
+        if any(new_values):
+            self.value_array = self.value_array + new_values
+            self.value = rose.variable.array_join(self.value_array)
+            self.last_value = self.value
+            self.set_value(self.value)
+            self.set_num_rows()
         self.normalise_width_widgets()
         self._decide_show_buttons()
         return False
@@ -556,18 +570,19 @@ class MixedArrayValueWidget(gtk.HBox):
         self.value_array = self.value_array[:chop_index]
         self.value = rose.variable.array_join(self.value_array)
         self.set_value(self.value)
+        self.set_num_rows()
         self._decide_show_buttons()
         return False
 
     def _decide_show_buttons(self):
         # Show or hide the add row and delete row buttons.
-        if len(self.rows) >= self.num_rows and not self.unlimited:
+        if len(self.rows) >= self.max_rows and not self.unlimited:
             self.add_button.hide()
+            self.del_button.show()
         else:
             self.add_button.show()
-        if len(self.rows) <= self.num_rows and not self.unlimited:
-            self.del_button.hide()
-        elif len(self.rows) == 1:
+            self.del_button.show()
+        if len(self.rows) == 1:
             self.del_button.hide()
         else:
             self.add_button.show()
@@ -575,12 +590,18 @@ class MixedArrayValueWidget(gtk.HBox):
     def insert_row(self, row_index):
         """Create a row of widgets from type_list."""
         widget_list = []
+        new_values = []
         for c, el_piece_type in enumerate(self.types_row):
             unwrapped_index = row_index * self.num_cols + c
-            if unwrapped_index > len(self.value_array) - 1:
-                w_value = ''
+            value_index = unwrapped_index
+            while value_index > len(self.value_array) - 1:
+                value_index -= len(self.types_row)
+            if value_index < 0:
+                w_value = rose.variable.get_value_from_metadata(
+                               {rose.META_PROP_TYPE: el_piece_type})
             else:
-                w_value = self.value_array[unwrapped_index]
+                w_value = self.value_array[value_index]
+            new_values.append(w_value)
             hover_text = ''
             w_error = {}
             if el_piece_type in ['integer', 'real']:
@@ -608,6 +629,7 @@ class MixedArrayValueWidget(gtk.HBox):
             widget_list.append(widget)
         self.rows.append(widget_list)
         self.widgets.extend(widget_list)
+        return new_values
 
     def normalise_width_widgets(self):
         if not self.rows:

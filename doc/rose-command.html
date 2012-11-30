@@ -1103,8 +1103,8 @@
 
       <dt><kbd>--no-gcontrol</kbd></dt>
 
-      <dd>Do not run <kbd>cylc gcontrol</kbd>. Default is to run <kbd>cylc
-      gcontrol</kbd> if the <var>DISPLAY</var> environment variable is
+      <dd>Do not run <kbd>cylc gui</kbd>. Default is to run <kbd>cylc
+      gui</kbd> if the <var>DISPLAY</var> environment variable is
       defined.</dd>
 
       <dt><kbd>--no-overwrite</kbd></dt>
@@ -1151,7 +1151,7 @@
 
     <h3>SEE ALSO</h3>
 
-    <p><kbd>cylc help gcontrol</kbd></p>
+    <p><kbd>cylc help gui</kbd></p>
 
     <p><kbd>cylc help register</kbd></p>
 
@@ -1841,6 +1841,12 @@ abc01 from daisy
       <dt><kbd>--verbose; -v</kbd></dt>
 
       <dd>Display full info for each returned suite.</dd>
+
+      <dt><kbd>--ws-root=URL</kbd></dt>
+
+      <dd>Specify the root URL of a Rosie web service. (Override the setting in
+      the site/user configuration
+      <var>[rosie-ws-client]ws-root-default=URL</var>.)</dd>
     </dl>
 
     <h2 id="rosie-ls">rosie ls</h2>
@@ -1905,6 +1911,12 @@ abc01 from daisy
       <dt><kbd>--verbose; -v</kbd></dt>
 
       <dd>Display full info for each returned suite.</dd>
+
+      <dt><kbd>--ws-root=URL</kbd></dt>
+
+      <dd>Specify the root URL of a Rosie web service. (Override the setting in
+      the site/user configuration
+      <var>[rosie-ws-client]ws-root-default=URL</var>.)</dd>
     </dl>
   </div>
 </body>

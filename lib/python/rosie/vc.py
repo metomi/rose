@@ -163,7 +163,7 @@ class SuiteDeleteEvent(Event):
         return "%s: deleted" % id.to_origin()
 
 
-class Client(object):
+class RosieVCClient(object):
 
     """Client for version control functionalities."""
 
@@ -376,7 +376,7 @@ def checkout(argv):
     opts, args = opt_parser.parse_args(argv)
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
-    client = Client(event_handler=report, force_mode=opts.force_mode)
+    client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
     SuiteId.svn.event_handler = client.event_handler # FIXME: ugly?
     for arg in args:
         try:
@@ -395,7 +395,7 @@ def create(argv):
     opts, args = opt_parser.parse_args(argv)
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
-    client = Client(event_handler=report)
+    client = RosieVCClient(event_handler=report)
     SuiteId.svn.event_handler = client.event_handler # FIXME: ugly?
     from_id = None
     if args:
@@ -450,7 +450,7 @@ def delete(argv):
                                                    "local_only")
     opts, args = opt_parser.parse_args(argv)
     report = Reporter(opts.verbosity - opts.quietness)
-    client = Client(event_handler=report, force_mode=opts.force_mode)
+    client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
     SuiteId.svn.event_handler = client.event_handler # FIXME
     if not args:
         args.append(SuiteId(location=os.getcwd()))
