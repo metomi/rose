@@ -156,7 +156,7 @@ rosie create
       already done so. If you are not copying from an existing suite, populate
       your suite by running the following commands:</p>
       <pre class="shell">
-cd $HOME/roses/$ID # replace $ID with the ID of your new suite
+cd $HOME/roses/$ID # $ID should be your new suite id.
 rose rug-brief-tour
 </pre>
     </div>
@@ -259,18 +259,15 @@ rose suite-run
     <p>This will install your suite under <var>$HOME/cylc-run/$ID</var>, start
     your suite with <code>cylc</code> and fire up <code>cylc gui
     $ID</code>. Experiment with different viewing options on the <code>cylc
-    gui</code>toolbar. The suite should run successfully to
+    gui</code> toolbar. The suite should run successfully to
     completion.</p>
-
-    <p>Note: If you quit <code>cylc gui</code> by mistake, you can restart
-    it by typing <code>rose suite-gcontrol $ID</code> on the command line.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Run the Suite: gcontrol</h3>
+      <h3 class="alwayshidden">Run the Suite: cylc gui</h3>
 
-      <p>Note: If you quit <code>cylc gcontrol</code> by mistake, you can
-      restart it by typing <code>rose suite-gcontrol $ID</code> on the command
+      <p>Note: If you quit <code>cylc gui</code> by mistake, you can restart
+      it by typing <code>rose suite-gcontrol $ID</code> on the command
       line.</p>
     </div>
 
