@@ -24,14 +24,10 @@
 #
 # SYNOPSIS
 #     # "rose", "rosie" and "rosa" has the following interfaces:
-#     # Invoke a utility:
-#     rose UTIL [ARGS ...]
-#     # Print help and a list of available utilities:
-#     rose help
-#     # Print help for list of utilities.
-#     rose help UTIL ...
-#     # Print version information.
-#     rose version
+#     rose UTIL [ARGS ...] # Invoke a utility
+#     rose help            # Print help and list available utilities
+#     rose help UTIL ...   # Print help for UTIL ...
+#     rose version         # Print version information
 #
 # DESCRIPTION
 #     Simple launcher for utilities in the "rose", "rosie" or "rosa"
@@ -82,6 +78,15 @@ function help_util() {
     return
 }
 
+function print_version() {
+    local ROSE_VERSION=
+    if ! ROSE_VERSION=$(cd $ROSE_HOME && git describe 2>/dev/null); then
+        ROSE_VERSION=$(sed '/ROSE_VERSION/!d; s/^.*="\(.*\)";$/\1/' \
+            $ROSE_HOME/doc/rose-version.js)
+    fi
+    echo "Rose $ROSE_VERSION ($(readlink -f $ROSE_HOME))"
+}
+
 #-------------------------------------------------------------------------------
 UTIL="help"
 if (($# > 0)); then
@@ -92,20 +97,24 @@ fi
 case $UTIL in
 help|h|?|--help|-h)
     if (($# == 0)); then
-        rose_usage
-        echo
-        echo "$ROSE_NS provides the following utilities:"
-        for U in $(cd $ROSE_HOME_BIN && ls $ROSE_NS-*); do
-            NAME=$(sed "s/^$ROSE_NS-\\(.*\\)\$/\1/" <<<$U)
-            ALIAS=$(get_alias $NAME)
-            if [[ -n $ALIAS ]]; then
-                echo "    $NAME"
-                echo "        (=$ALIAS)"
-            else
-                echo "    $NAME"
-                sed '1,/^# DESCRIPTION$/d;{s/^# /    /;q;}' $ROSE_HOME_BIN/$U
-            fi
-        done
+        {
+            print_version
+            rose_usage
+            echo
+            echo "$ROSE_NS provides the following utilities:"
+            for U in $(cd $ROSE_HOME_BIN && ls $ROSE_NS-*); do
+                NAME=$(sed "s/^$ROSE_NS-\\(.*\\)\$/\1/" <<<$U)
+                ALIAS=$(get_alias $NAME)
+                if [[ -n $ALIAS ]]; then
+                    echo "    $NAME"
+                    echo "        (=$ALIAS)"
+                else
+                    echo "    $NAME"
+                    sed '1,/^# DESCRIPTION$/d;{s/^# /    /;q;}' \
+                        $ROSE_HOME_BIN/$U
+                fi
+            done
+        } | ${PAGER:-less}
         exit 0
     fi
     RC=0
@@ -118,9 +127,7 @@ help|h|?|--help|-h)
     exit $RC
     :;;
 version|--version|-V)
-    ROSE_VERSION=$(sed '/ROSE_VERSION/!d; s/^.*="\(.*\)";$/\1/' \
-        $ROSE_HOME/doc/rose-version.js)
-    echo "$ROSE_VERSION ($ROSE_HOME)"
+    print_version
     exit
     :;;
 esac
