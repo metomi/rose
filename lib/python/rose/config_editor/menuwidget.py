@@ -143,7 +143,8 @@ class MenuWidget(gtk.HBox):
         self._set_hover_over(variable)
         self.option_ui = option_ui
         self.actions = actions
-        self.pack_start(self.button, expand=False, fill=False, padding=0)
+        self.pack_start(self.button, expand=False, fill=False,
+                         padding=0)
         self.button.connect(
                 "button-press-event",
                 lambda b, e: self._popup_option_menu(

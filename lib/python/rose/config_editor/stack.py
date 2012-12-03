@@ -97,10 +97,9 @@ class SectionOperations(object):
         config_data.sections.now.update({section: new_section_data})
         config_data.config = self.__data.dump_to_internal_config(config_name)
         self.__data.load_file_metadata(config_name)
-        if not was_latent:
-            self.__data.load_vars_from_config(config_name,
-                                              just_this_section=section,
-                                              update=True)
+        self.__data.load_vars_from_config(config_name,
+                                          just_this_section=section,
+                                          update=True)
         self.__data.load_variable_namespaces(config_name)
         metadata = self.__data.get_metadata_for_config_id(section,
                                                           config_name)

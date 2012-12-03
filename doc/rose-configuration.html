@@ -497,9 +497,9 @@ key-4=value 4
       <dt><code>[namelist:NAME]</code></dt>
 
       <dd>Specify a namelist with the group name called <var>NAME</var>, which
-      can be referred to by the content section of a file. Each setting in a
-      namelist:NAME section is a KEY=VALUE pair exactly like a normal Fortran
-      namelist, but without the trailing comma.</dd>
+      can be referred to by a <code>source</code> setting of a file. Each
+      setting in a namelist:NAME section is a KEY=VALUE pair exactly like a
+      normal Fortran namelist, but without the trailing comma.</dd>
 
       <dt><code>[namelist:NAME(SORT-INDEX)]</code></dt>
 
@@ -507,8 +507,8 @@ key-4=value 4
         Same as [namelist:NAME] but:
 
         <ul>
-          <li>It allows the content setting of a file to refer to all
-          <code>[namelist:NAME(SORT-INDEX)]</code> as
+          <li>It allows the <code>source</code> setting of a file to refer to
+          all <code>[namelist:NAME(SORT-INDEX)]</code> as
           <code>namelist:NAME(:)</code>, and the namelist groups will be sorted
           alphanumerically by the <var>SORT-INDEX</var>.</li>
 
@@ -567,7 +567,7 @@ key-4=value 4
 
       <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
 
-      <li>The content of the <var>ROSE_META_PATH</var> environment
+      <li>The value of the <var>ROSE_META_PATH</var> environment
       variable.</li>
 
       <li>The <samp>meta-path</samp> setting in <a href=
@@ -1139,13 +1139,6 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
     settings:</p>
 
     <dl>
-      <dt><code>content</code></dt>
-
-      <dd>A space delimited list of sections in this configuration that are to
-      be used to generate the content of this file, e.g. a list of
-      <var>namelist:NAME</var> sections. The content setting overrides all
-      other settings of this file.</dd>
-
       <dt><code>source</code></dt>
 
       <dd>A space delimited list of sources for generating this file. A source
