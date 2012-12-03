@@ -30,6 +30,7 @@
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
+
     <p><a href=".">Rose Documentation</a></p>
   </div>
 
@@ -356,8 +357,8 @@ key-4=value 4
 
       <dd>Specify a list of users with commit access to trunk of the suite. A
       <kbd>*</kbd> in the list means that anyone can commit to the trunk of the
-      suite. Setting this blank or omitting the setting means that nobody
-      apart from the owner can commit to the trunk.</dd>
+      suite. Setting this blank or omitting the setting means that nobody apart
+      from the owner can commit to the trunk.</dd>
 
       <dt><code>description</code></dt>
 
@@ -366,9 +367,9 @@ key-4=value 4
       <dt><code>issue-list</code></dt>
 
       <dd>Specify a list of ticket IDs associated with the suite.</dd>
-      
+
       <dt><code>sub-project</code></dt>
-      
+
       <dd>Specify a sub-division of <code>project</code>, if applicable.</dd>
     </dl>
 
@@ -1446,117 +1447,211 @@ meta = my-command/t123
     changes (or to use a branch of the suite which you are happy to
     discard).</p>
 
-    <h2 id="appendix-upgrade">Appendix: Config Editor Ignored Mechanics</h2>
+    <h2 id="appendix-ignored-config-edit">Appendix: Config Editor Ignored
+    Mechanics</h2>
 
-    <p>State Table:</p>
+    <p>The following table describes the error and fixing mechanisms for
+    variable and section ignored state mismatches. This is the intended
+    behaviour of the config editor. The actual state is given as
+    <samp>State</samp> and the trigger-mechanism's expected state as
+    <samp>Trigger state</samp>.</p>
 
-<table border="1" summary="This table shows the different user options for each potential collection of states that are relevant to ignored/enabled.""">
-<caption><em>Possible states and user options for ignored/enabled variables.</em>
-<tr><th>State</th><th>Trigger state</th><th>Compulsory</th><th>Display Error?</th><th>User options</th><th>Notes</th></tr>
-<tr>
-<td rowspan=6>!!&nbsp;I<sub>T</sub> trigger ignored</td>
-        <td rowspan=2>I<sub>T</sub></td>
-            <td rowspan=1>compulsory</td>
-        <td rowspan=2>no</td>
-        <td rowspan=2>None</td>
-            <td rowspan=1>-</td>
-</tr>
-<tr>
-            <td rowspan=1>optional</td>
-            <td rowspan=1 style="font-size:small">config editor shows non-functional E option for implementation reasons. I<sub>U</sub> is possible as well, but creates a more confused state and presents an ignored option for an already-ignored setting</td>
-</tr>
-<tr>
-        <td rowspan=2>E</td>
-            <td rowspan=1>compulsory</td>
-        <td rowspan=2>error</td>
-            <td rowspan=2>E</td>
-            <td rowspan=1>-</td>
-</tr>
-<tr>
-            <td rowspan=1>optional</td>
-            <td rowspan=1 style="font-size:small">I<sub>U</sub> not given for above reasons.</td>
-</tr>
-<tr>
-        <td rowspan=2>not trigger</td>
-            <td rowspan=1>compulsory</td>
-            <td rowspan=1>error</td>
-            <td rowspan=2>E </td>
-            <td rowspan=1>-</td>
-</tr>
-<tr>
-            <td rowspan=1>optional</td>
-            <td rowspan=1>overlook</td>
-            <td rowspan=1 style="font-size:small">overlooking mainly in order to de-clutter the 'No Metadata' view. I<sub>U</sub> not given for above reasons.</td>
-</tr>
-<!-- Rectangular sub table completed, here -->
-<tr>
-<td rowspan=6>!&nbsp;&nbsp;I<sub>U</sub> user ignored</td>
-        <td rowspan=2>I<sub>T</sub></td>
-            <td rowspan=1>compulsory</td>
-            <td rowspan=1>overlook</td>
-        <td rowspan=2>None</td>
-            <td rowspan=1 style="font-size:small">same basic state, won't mess with trigger too much. macro will ask to fix this.</td>
-</tr>
-<tr>
-            <td rowspan=1>optional</td>
-            <td rowspan=1>no</td>
-<td rowspan=5>-</td>
-</tr>
-<tr>
-        <td rowspan=2>E</td>
-            <td rowspan=1>compulsory</td>
-            <td rowspan=1>error</td>
-    <td rowspan=4>E</td>
-</tr>
-<tr>
-            <td rowspan=1>optional</td>
-            <td rowspan=1>no</td>
-</tr>
-<tr>
-        <td rowspan=2>not trigger</td>
-            <td rowspan=1>compulsory</td>
-            <td rowspan=1>error</td>
-</tr>
-<tr>
-            <td rowspan=1>optional</td>
-            <td rowspan=1>no</td>
-</tr>
-<!-- Rectangular sub-table completed, here -->
-<tr>
-<td rowspan=6>&nbsp;&nbsp;&nbsp;E enabled</td>
-    <td rowspan=2>I<sub>T</sub></td>
-        <td rowspan=1>compulsory</td>
-    <td rowspan=2>error</td>
-    <td rowspan=2>I<sub>T</sub></td>
-        <td rowspan=1>-</td>
-</tr>
-<tr>
-        <td rowspan=1>optional</td>
-        <td rowspan=1 style="font-size:small">adding the I<sub>U</sub> option would be confusing.</td>
-</tr>
-<tr>
-    <td rowspan=2>E</td>
-        <td rowspan=1>compulsory</td>
-    <td rowspan=2>no</td>
-        <td rowspan=1>None</td>
-<td rowspan=4>-</td>
-</tr>
-<tr>
-        <td rowspan=1>optional</td>
-        <td rowspan=1>I<sub>U</sub></td>
-</tr>
-<tr>
-    <td rowspan=2>not trigger</td><!--trigger-->
-        <td rowspan=1>compulsory</td>
-    <td rowspan=2>no</td>
-        <td rowspan=1>None</td>
-</tr>
-<tr>
-        <td rowspan=1>optional</td>
-        <td rowspan=1>I<sub>U</sub></td>
-</tr>
-</table>
+    <p>The actual situations are considerably more varied, given
+    section-ignoring and latent variables - the table holds the most important
+    varieties.</p>
 
+    <table border="1" summary=
+    "This table shows the different user options for each potential collection of states that are relevant to ignored/enabled.">
+    <caption>
+        <em>A subset of possible states, errors, and fixes for ignored/enabled
+        variables.</em>
+      </caption>
+
+      <tr>
+        <th>State</th>
+
+        <th>Trigger state</th>
+
+        <th>Compulsory</th>
+
+        <th>Display Error?</th>
+
+        <th>User options</th>
+
+        <th>Notes</th>
+      </tr>
+
+      <tr>
+        <td rowspan="6">!!&nbsp;I<sub>T</sub> trigger ignored</td>
+
+        <td rowspan="2">I<sub>T</sub></td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="2">no</td>
+
+        <td rowspan="2">None</td>
+
+        <td rowspan="1">-</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1" class="caption">config editor shows non-functional E
+        option for implementation reasons. I<sub>U</sub> is possible as well,
+        but creates a more confused state and presents an ignored option for an
+        already-ignored setting</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">E</td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="2">error</td>
+
+        <td rowspan="2">E</td>
+
+        <td rowspan="1">-</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1" class="caption">I<sub>U</sub> not given for above
+        reasons.</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">not trigger</td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="1">error</td>
+
+        <td rowspan="2">E</td>
+
+        <td rowspan="1">-</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1">overlook</td>
+
+        <td rowspan="1" class="c1">overlooking mainly in order to de-clutter
+        the 'No Metadata' view. I<sub>U</sub> not given for above reasons.</td>
+      </tr>
+
+      <tr>
+        <td rowspan="6">!&nbsp;&nbsp;I<sub>U</sub> user ignored</td>
+
+        <td rowspan="2">I<sub>T</sub></td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="1">overlook</td>
+
+        <td rowspan="2">None</td>
+
+        <td rowspan="1" class="c1">same basic state, won't mess with trigger
+        too much. macro will ask to fix this.</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1">no</td>
+
+        <td rowspan="5">-</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">E</td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="1">error</td>
+
+        <td rowspan="4">E</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1">no</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">not trigger</td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="1">error</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1">no</td>
+      </tr>
+
+      <tr>
+        <td rowspan="6">&nbsp;&nbsp;&nbsp;E enabled</td>
+
+        <td rowspan="2">I<sub>T</sub></td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="2">error</td>
+
+        <td rowspan="2">I<sub>T</sub></td>
+
+        <td rowspan="1">-</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1" class="c1">adding the I<sub>U</sub> option would be
+        confusing.</td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">E</td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="2">no</td>
+
+        <td rowspan="1">None</td>
+
+        <td rowspan="4">-</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1">I<sub>U</sub></td>
+      </tr>
+
+      <tr>
+        <td rowspan="2">not trigger</td>
+
+        <td rowspan="1">compulsory</td>
+
+        <td rowspan="2">no</td>
+
+        <td rowspan="1">None</td>
+      </tr>
+
+      <tr>
+        <td rowspan="1">optional</td>
+
+        <td rowspan="1">I<sub>U</sub></td>
+      </tr>
+    </table>
   </div>
 </body>
 </html>
