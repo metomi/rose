@@ -220,13 +220,15 @@ class MainController(object):
                    (rose.config_editor.TOOLBAR_FIND, 'gtk.Entry'),
                    (rose.config_editor.TOOLBAR_FIND_NEXT, 'gtk.STOCK_FIND'),
                    (rose.config_editor.TOOLBAR_VALIDATE,
-                    'gtk.STOCK_DIALOG_QUESTION')],
+                    'gtk.STOCK_DIALOG_QUESTION'),
+                   (rose.config_editor.TOOLBAR_TRANSFORM,
+                    'gtk.STOCK_CONVERT')],
                 sep_on_name=[rose.config_editor.TOOLBAR_SAVE,
                              rose.config_editor.TOOLBAR_BROWSE,
                              rose.config_editor.TOOLBAR_REDO,
                              rose.config_editor.TOOLBAR_REVERT,
                              rose.config_editor.TOOLBAR_FIND_NEXT,
-                             rose.config_editor.TOOLBAR_VALIDATE])
+                             rose.config_editor.TOOLBAR_TRANSFORM])
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
@@ -237,6 +239,8 @@ class MainController(object):
         assign(rose.config_editor.TOOLBAR_FIND_NEXT, self._launch_find)
         assign(rose.config_editor.TOOLBAR_VALIDATE,
                self.handle.check_all_extra)
+        assign(rose.config_editor.TOOLBAR_TRANSFORM,
+               self.handle.transform_default)
         self.find_entry = self.toolbar.item_dict.get(
                                rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
@@ -304,6 +308,8 @@ class MainController(object):
                      ('/TopMenuBar/Metadata/All V',
                       lambda m: self.handle.run_custom_macro(
                                      method_name=rose.macro.VALIDATE_METHOD)),
+                     ('/TopMenuBar/Metadata/Autofix',
+                      lambda m: self.handle.transform_default()),
                      ('/TopMenuBar/Metadata/Extra checks',
                       lambda m: self.handle.check_fail_rules()),
                      ('/TopMenuBar/Metadata/Switch off metadata',
