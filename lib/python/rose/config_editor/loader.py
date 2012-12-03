@@ -601,13 +601,20 @@ class ConfigDataManager(object):
                 meta_config.value.pop(key)
 
     def load_ignored_data(self, config_name):
-        """Deal with ignored variables and sections."""
+        """Deal with ignored variables and sections.
+
+        In particular, this assigns errors based on incorrect ignore
+        state.
+
+        """
         self.trigger[config_name] = rose.macros.trigger.TriggerMacro()
         config = self.config[config_name].config
         sect_map = self.config[config_name].sections.now
+        latent_sect_map = self.config[config_name].sections.latent
         var_map = self.config[config_name].vars.now
         latent_var_map = self.config[config_name].vars.latent
         config_for_macro = rose.config.ConfigNode()
+        enabled_state = rose.config.ConfigNode.STATE_NORMAL
         user_ignored_state = rose.config.ConfigNode.STATE_USER_IGNORED
         syst_ignored_state = rose.config.ConfigNode.STATE_SYST_IGNORED
         # Deliberately reset state information in the macro config.
@@ -630,6 +637,10 @@ class ConfigDataManager(object):
         for variables in var_map.values():
             for variable in variables:
                 var_id_map.update({variable.metadata['id']: variable})
+        latent_var_id_map = {}
+        for variables in latent_var_map.values():
+             for variable in variables:
+                 latent_var_id_map.update({variable.metadata['id']: variable})
         trig_ids = self.trigger[config_name].trigger_family_lookup.keys()
         while trig_ids:
             var_id = trig_ids.pop()
@@ -651,75 +662,118 @@ class ConfigDataManager(object):
                         new_id = self.util.get_id_from_section_option(
                                                                section, opt)
                         trig_ids.append(new_id)
-
-        for section, sect_node in trig_config.value.items():
-            meta_node = meta_config.get([section], no_ignore=True)
-            if not isinstance(sect_node.value, dict):
-                option_items = [(section, sect_node)]
-                section = ""
+        id_node_map = {}
+        id_node_map.update(sect_map)
+        id_node_map.update(latent_sect_map)
+        id_node_map.update(var_id_map)
+        id_node_map.update(latent_var_id_map)
+        ignored_dict = self.trigger[config_name].ignored_dict
+        enabled_dict = self.trigger[config_name].enabled_dict
+        for setting_id, node_inst in id_node_map.items():
+            is_latent = False
+            section, option = self.util.get_section_option_from_id(setting_id)
+            is_section = (option is None)
+            if is_section:
+                if section not in sect_map:
+                    is_latent = True
             else:
-                option_items = sect_node.value.items()
-            if sect_node.state == syst_ignored_state:
-                # Trigger-ignored section
-                if not sect_map[section].ignored_reason:
-                    parents = self.trigger[config_name].ignored_dict.get(
-                                                        section, {})
-                    help_str = ", ".join(parents.values())
-                    sect_map[section].error.update(
-                         {rose.config_editor.WARNING_TYPE_ENABLED:
-                          (rose.config_editor.WARNING_NOT_IGNORED +
-                           help_str)})
-            elif sect_map[section].ignored_reason:
-                # User-ignored or enabled trigger state, ignored in config.
-                if (section in self.trigger[config_name].enabled_dict and
-                    section not in self.trigger[config_name].ignored_dict):
-                    # Enabled trigger state
-                    parents = self.trigger[config_name].enabled_dict[section]
+                if setting_id not in var_id_map:
+                    is_latent = True
+            trig_cfg_node = trig_config.get([section, option])
+            if trig_cfg_node is None:
+                # Latent variable or sections cannot be user-ignored.
+                if (setting_id in ignored_dict and
+                    setting_id not in enabled_dict):
+                    trig_cfg_state = syst_ignored_state
+                else:
+                    trig_cfg_state = enabled_state
+            else:
+                trig_cfg_state = trig_cfg_node.state
+            if (trig_cfg_state == enabled_state and
+                not node_inst.ignored_reason):
+                # For speed, skip the rest of the checking.
+                # Doc table: E -> E
+                continue
+            comp_val = node_inst.metadata.get(rose.META_PROP_COMPULSORY)
+            node_is_compulsory = comp_val == rose.META_PROP_VALUE_TRUE
+            ignored_reasons = node_inst.ignored_reason.keys()
+            if trig_cfg_state == syst_ignored_state:
+                # It should be trigger-ignored.
+                # Doc table: * -> I_t
+                info = ignored_dict.get(setting_id)
+                if rose.variable.IGNORED_BY_SYSTEM not in ignored_reasons:
+                    help_str = ", ".join(info.values())
+                    if rose.variable.IGNORED_BY_USER in ignored_reasons:
+                        # It is user-ignored but should be trigger-ignored.
+                        # Doc table: I_u -> I_t
+                        if node_is_compulsory:
+                            # Doc table: I_u -> I_t -> compulsory
+                            key = rose.config_editor.WARNING_TYPE_USER_IGNORED
+                            val = getattr(rose.config_editor,
+                                          WARNING_USER_NOT_TRIGGER_IGNORED)
+                            node_inst.warning.update({key: val})
+                        else:
+                            # Doc table: I_u -> I_t -> optional
+                            pass
+                    else:
+                        # It is not ignored at all.
+                        # Doc table: E -> I_t
+                        if is_latent:
+                            # Fix this for latent settings.
+                            node_inst.ignored_reason.update(
+                                 {rose.variable.IGNORED_BY_SYSTEM:
+                                  rose.config_editor.IGNORED_STATUS_CONFIG})
+                        else:
+                            # Flag an error for real settings.
+                            node_inst.error.update(
+                                 {rose.config_editor.WARNING_TYPE_ENABLED:
+                                  (rose.config_editor.WARNING_NOT_IGNORED +
+                                   help_str)})
+                else:
+                    # Otherwise, they both agree about trigger-ignored.
+                    # Doc table: I_t -> I_t
+                    pass
+            elif rose.variable.IGNORED_BY_SYSTEM in ignored_reasons:
+                # It should be enabled, but is trigger-ignored.
+                # Doc table: I_t
+                if (setting_id in enabled_dict and
+                    setting_id not in ignored_dict):
+                    # It is a valid trigger.
+                    # Doc table: I_t -> E
+                    parents = self.trigger[config_name].enabled_dict.get(
+                                                                setting_id)
                     help_str = (rose.config_editor.WARNING_NOT_ENABLED + 
-                                ',  '.join(parents.values()))
-                    err_type = rose.config_editor.WARNING_TYPE_IGNORED
-                    sect_map[section].error.update({err_type: help_str})
-                elif (rose.variable.IGNORED_BY_SYSTEM in
-                      sect_map[section].ignored_reason and
-                      meta_node is not None and
-                      meta_node.get(
-                      [rose.META_PROP_COMPULSORY],
-                      no_ignore=True).value == rose.META_PROP_VALUE_TRUE):
-                    # Section is trigger-ignored without a trigger.
+                                ', '.join(parents))
+                    err_type = rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED
+                    node_inst.error.update({err_type: help_str})
+                elif (setting_id not in enabled_dict and
+                      setting_id not in ignored_dict):
+                    # It is not a valid trigger.
+                    # Doc table: I_t -> not trigger
                     help_str = rose.config_editor.WARNING_NOT_TRIGGER
                     err_type = rose.config_editor.WARNING_TYPE_NOT_TRIGGER
-                    sect_map[section].error.update({err_type: help_str})
-            for option, opt_node in option_items:
-                value = opt_node.value
-                state = opt_node.state
-                var_id = self.util.get_id_from_section_option(section, option)
-                var = var_id_map[var_id]
-                ignored_reasons = var.ignored_reason.keys()
-                if (state == syst_ignored_state and
-                    rose.variable.IGNORED_BY_SYSTEM not in ignored_reasons and
-                    rose.variable.IGNORED_BY_USER not in ignored_reasons):
-                    parents = self.trigger[config_name].ignored_dict[var_id]
-                    help_str = ", ".join(parents.values())
-                    help_str = rose.config_editor.WARNING_NOT_IGNORED + help_str
-                    err_type = rose.config_editor.WARNING_TYPE_ENABLED
-                    var.error.update({err_type: help_str})
-                elif (state != syst_ignored_state and
-                      rose.variable.IGNORED_BY_SYSTEM in ignored_reasons):
-                    if var_id in self.trigger[config_name].enabled_dict:
-                        parents = self.trigger[config_name].enabled_dict[
-                                                                    var_id]
-                        help_str = (rose.config_editor.WARNING_NOT_ENABLED + 
-                                    ', '.join(parents))
-                        err_type = rose.config_editor.WARNING_TYPE_IGNORED
-                        var.error.update({err_type: help_str})
-                    elif (var_id not in
-                          self.trigger[config_name].ignored_dict and
-                          var.metadata.get(rose.META_PROP_COMPULSORY) ==
-                          rose.META_PROP_VALUE_TRUE):
-                        # Variable is trigger-ignored without a trigger.
-                        help_str = rose.config_editor.WARNING_NOT_TRIGGER
-                        err_type = rose.config_editor.WARNING_TYPE_NOT_TRIGGER
-                        var.error.update({err_type: help_str})
+                    node_inst.error.update({err_type: help_str})
+                    if node_is_compulsory:
+                        # This is an error for compulsory variables.
+                        # Doc table: I_t -> not trigger -> compulsory
+                        node_inst.error.update({err_type: help_str})
+                    else:
+                        # Overlook for optional variables.
+                        # Doc table: I_t -> not trigger -> optional
+                        pass
+            elif rose.variable.IGNORED_BY_USER in ignored_reasons:
+                # It possibly should be enabled, but is user-ignored.
+                # Doc table: I_u
+                # We've already covered I_u -> I_t
+                if node_is_compulsory:
+                    # Compulsory settings should not be user-ignored.
+                    # Doc table: I_u -> E -> compulsory
+                    # Doc table: I_u -> not trigger -> compulsory
+                    help_str = rose.config_editor.WARNING_NOT_USER_IGNORABLE
+                    err_type = rose.config_editor.WARNING_TYPE_USER_IGNORED
+                    node_inst.error.update({err_type: help_str})
+            # Remaining possibilities are not a problem:
+            # Doc table: E -> E, E -> not trigger
 
     def load_file_metadata(self, config_name):
         """Deal with file section variables."""
