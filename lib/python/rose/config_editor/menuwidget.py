@@ -96,7 +96,9 @@ class MenuWidget(gtk.HBox):
             menu_icon_id = self.MENU_ICON_FILE
         error_types = rose.config_editor.WARNING_TYPES_IGNORE
         if (set(error_types) & set(variable.error.keys()) or
-            set(error_types) & set(variable.warning.keys())):
+            set(error_types) & set(variable.warning.keys()) or
+            (rose.META_PROP_COMPULSORY in variable.error and
+             not self.is_ghost)):
             option_ui_middle = ("<menuitem action='Fix Ignore'/>" +
                                 "<separator name='sepFixIgnore'/>" +
                                 option_ui_middle)
