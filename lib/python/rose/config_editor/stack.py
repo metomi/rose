@@ -156,8 +156,8 @@ class SectionOperations(object):
         else:
             # Enable request for this section.
             # The section must not be justifiably triggered ignored.
-            ign_errors = [rose.config_editor.WARNING_TYPE_NOT_TRIGGER,
-                          rose.config_editor.WARNING_TYPE_IGNORED]
+            ign_errors = [e for e in rose.config_editor.WARNING_TYPES_IGNORE
+                          if e != rose.config_editor.WARNING_TYPE_ENABLE]
             my_errors = sect_data.error.keys()
             if (not override and
                 rose.variable.IGNORED_BY_SYSTEM in sect_data.ignored_reason

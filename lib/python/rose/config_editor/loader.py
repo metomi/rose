@@ -606,6 +606,9 @@ class ConfigDataManager(object):
         In particular, this assigns errors based on incorrect ignore
         state.
 
+        'Doc table' in the comments refers to
+        doc/rose-configuration.html#appendix-ignored-config-edit
+
         """
         self.trigger[config_name] = rose.macros.trigger.TriggerMacro()
         config = self.config[config_name].config
@@ -750,12 +753,11 @@ class ConfigDataManager(object):
                       setting_id not in ignored_dict):
                     # It is not a valid trigger.
                     # Doc table: I_t -> not trigger
-                    help_str = rose.config_editor.WARNING_NOT_TRIGGER
-                    err_type = rose.config_editor.WARNING_TYPE_NOT_TRIGGER
-                    node_inst.error.update({err_type: help_str})
                     if node_is_compulsory:
                         # This is an error for compulsory variables.
                         # Doc table: I_t -> not trigger -> compulsory
+                        help_str = rose.config_editor.WARNING_NOT_TRIGGER
+                        err_type = rose.config_editor.WARNING_TYPE_NOT_TRIGGER
                         node_inst.error.update({err_type: help_str})
                     else:
                         # Overlook for optional variables.
