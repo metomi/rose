@@ -373,6 +373,14 @@ class SuiteRunner(Runner):
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
+    def __init__(self, *args, **kwargs):
+        Runner.__init__(self, *args, **kwargs)
+        self.suite_log_view_gen = SuiteLogViewGenerator(
+                event_handler=self.event_handler,
+                fs_util=self.fs_util,
+                popen=self.popen,
+                suite_engine_proc=self.suite_engine_proc)
+
     def run_impl(self, opts, args, uuid, work_files):
         # Log file, temporary
         if hasattr(self.event_handler, "contexts"):
@@ -595,8 +603,7 @@ class SuiteRunner(Runner):
                 else:
                     event = SuitePingTryMaxEvent(num_ping_try_max)
                     self.event_handler(event)
-            suite_log_view_gen = SuiteLogViewGenerator(self.event_handler)
-            suite_log_view_gen()
+            self.suite_log_view_gen(suite_name)
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
