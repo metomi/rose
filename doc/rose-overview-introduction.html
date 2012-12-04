@@ -90,11 +90,17 @@
       <p>What's the point of the guide?</p>
 
       <ul class="incremental">
-        <li>Interactive/guided learning</li>
+        <li>Interactive/guided learning
 
-        <li>Examples for later reference</li>
+          <ul>
+            <li>the basis for training courses or independent work</li>
+          </ul>
+        </li>
 
-        <li>So the Rose team can visit nice places</li>
+        <li>Worked Examples</li>
+
+        <li>So the Rose team can be invited to nice places to present it
+        :)</li>
       </ul>
     </div>
 
@@ -113,7 +119,9 @@
         slideshow</code> or <code>single page</code> links.</li>
 
         <li>For more details see the <a href=
-        "http://meyerweb.com/eric/tools/s5/">S5</a> website.</li>
+        "http://meyerweb.com/eric/tools/s5/">S5 website</a> or the <a href=
+        "http://meyerweb.com/eric/tools/s5/features.html#controlchart">S5
+        Controls Reference</a>.</li>
       </ul>
     </div>
 
@@ -227,7 +235,8 @@
 
         <li>has optional GUIs.</li>
 
-        <li>is mostly written in Python, using the PyGTK library for GUIs.</li>
+        <li>contains an optional system for managing suites, including version
+        control ("Rosie").</li>
       </ul>
     </div>
 
@@ -237,11 +246,7 @@
       <p>Rose:</p>
 
       <ul class="incremental">
-        <li>does not force the use of any specific version control system or
-        working practice.</li>
-
-        <li>contains an optional system for managing suites, including version
-        control ("Rosie").</li>
+        <li>is mostly written in Python, using the PyGTK library for GUIs.</li>
 
         <li>is freely available.</li>
 
@@ -250,20 +255,14 @@
     </div>
 
     <div class="slide">
-      <h2>What isn't Rose?</h2>
+      <h3 class="alwayshidden">What is Rose? continued 3</h3>
 
-      <p><q>Here's to alcohol: the cause of, and solution to, all of life's
-      problems.</q> - Homer Simpson.</p>
-
-      <p>Rose is not:</p>
+      <p>Rose:</p>
 
       <ul class="incremental">
-        <li>alcohol.</li>
+        <li>exposes your application inputs for what they are</li>
 
-        <li>a disguise for a complicated application interface.</li>
-
-        <li>a job submitter or suite monitor - that's the job of <a href=
-        "http://github.com/cylc/cylc">cylc</a>.</li>
+        <li>cannot do magic :)</li>
       </ul>
     </div>
 
@@ -272,16 +271,16 @@
       "http://upload.wikimedia.org/wikipedia/commons/1/1c/Savoy_Hotel%2C_London.jpg"
       alt="hotel suites?" width="20%" />
 
-      <p>A suite is:</p>
+      <p>A suite:</p>
 
       <ul class="incremental">
-        <li>a runnable collection of one or more scientific application
+        <li>is a runnable collection of one or more scientific application
         configurations.</li>
 
-        <li>a way of running a standalone scientific application, like a UM
-        standalone job.</li>
+        <li>can simply be a way of running a single standalone scientific
+        application.</li>
 
-        <li>also a way of running a very large number of inter-dependent
+        <li>can also be a way of running a very large number of inter-dependent
         scientific applications.</li>
       </ul>
     </div>
@@ -302,8 +301,8 @@
       <ul class="incremental">
         <li>a <code>suite.rc</code> file, for configuring cylc</li>
 
-        <li>a <code>rose-suite.conf</code> file, for configuring a few parts of
-        the <code>suite.rc</code> file and installing static resources</li>
+        <li>a <code>rose-suite.conf</code> file, for configuring variables used
+        in the <code>suite.rc</code> file and installing static resources</li>
 
         <li>a <code>rose-suite.info</code> file, for describing the suite</li>
       </ul>
@@ -323,11 +322,11 @@
     <div class="slide">
       <h2>What is cylc?</h2>
 
-      <ul>
+      <ul class="incremental">
         <li>cylc is a suite engine or <em>metascheduler</em>.</li>
 
-        <li>cylc takes a suite and submits scientific applications when they
-        are ready to run.</li>
+        <li>cylc runs scientific applications when their dependencies are
+        satisfied.</li>
 
         <li>cylc is configured via a <code>suite.rc</code> file that lives in
         the top directory of a Rose suite.</li>
@@ -342,49 +341,69 @@
 
       <p>What's so special about cylc? Couldn't I just use a cron job?</p>
 
-      <ul>
+      <ul class="incremental">
         <li>cylc has a concise, easy-to-use configuration.</li>
 
         <li>cylc has a very clever algorithm for deciding when applications are
         ready to run.</li>
 
-        <li>cylc can catch up after outages, and can run ahead of time.</li>
-
         <li>cylc has nice utilities, including a GUI, for controlling and
         monitoring your suite.</li>
+
+        <li>Lots more features are described <a href=
+        "rose-overview-suites.html">later</a>.</li>
       </ul>
     </div>
 
     <div class="slide">
     <h3 class="alwayshidden">What is cylc? example</h3>
 
-    <p class="caption">This is <code>cylc gcontrol</code>, the cylc
-    control/monitoring GUI.</p><img src=
-    "http://cylc.github.com/cylc/screenshots/control2.png" alt="cylc gcontrol"
+    <p class="caption">This is the cylc control/monitoring GUI.</p><img src=
+    "http://cylc.github.com/cylc/screenshots/control2.png" alt="cylc GUI"
     width="60%" /></div>
 
     <div class="slide">
-      <h2>What is a Rose application?</h2>
+      <h2>What is a Rose application configuration?</h2>
+
+      <p>(Otherwise known as an app config)</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">What is a Rose app config?</h3>
+
+      <p>An app config:</p>
 
       <ul class="incremental">
-        <li>An application is a configuration for running a scientific
-        model.</li>
+        <li>can define how to run a scientific model.</li>
 
-        <li>An application describes how to run a command - what executable or
-        script to call, the environment variables, the input files (namelists,
-        etc)</li>
+        <li>describes how to run a command - what executable or script to call,
+        the environment variables, the input files (namelists, etc)</li>
 
-        <li>An application is a specification, and not tied to a version of the
-        model or tied to a GUI.</li>
+        <li>is a specification, and not tied to a version of the model or tied
+        to a GUI.</li>
 
-        <li>An application is simple to process and run.</li>
+        <li>is simple to process and run.</li>
       </ul>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">What is a Rose application? contents</h3>
+      <h3 class="alwayshidden">What is a Rose app config?</h3>
 
-      <p>A Rose application is a directory.</p>
+      <p>An app config:</p>
+
+      <ul class="incremental">
+        <li>is simple to edit</li>
+
+        <li>is simple to compare</li>
+
+        <li>is simple to review</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">What is a Rose app config? contents</h3>
+
+      <p>A Rose app config is a directory.</p>
 
       <p>The directory contains:</p>
 
@@ -399,7 +418,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">What is a Rose application? contents
+      <h3 class="alwayshidden">What is a Rose app config? contents
       (complex)</h3>
 
       <p>It may also contain other sub-directories, which we'll cover later
@@ -407,7 +426,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">What is a Rose application? example</h3>
+      <h3 class="alwayshidden">What is a Rose app config? example</h3>
 
       <p>Here's an example of a <code>rose-app.conf</code> file:</p>
       <pre>
@@ -418,7 +437,7 @@ default=hello.exe
 SUBJECT=world
 
 [file:hello_nl]
-content=namelist:hello
+source=namelist:hello
 
 [namelist:hello]
 l_exclamation_mark=.true.
@@ -426,10 +445,10 @@ l_exclamation_mark=.true.
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">What is a Rose application? result</h3>
+      <h3 class="alwayshidden">What is a Rose app config? result</h3>
 
-      <p>This will create a file <samp>hello_nl</samp> that looks like
-      this:</p>
+      <p>When Rose runs the app, it will create a file <samp>hello_nl</samp>
+      that looks like this:</p>
       <pre>
 &amp;hello
 l_exclamation_mark=.true.,
@@ -441,68 +460,71 @@ l_exclamation_mark=.true.,
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">What is a Rose application? metadata</h3>
+      <h3 class="alwayshidden">What is a Rose app config? metadata</h3>
 
-      <p>Applications can have <em>metadata</em>.</p>
+      <p>App configs can have <em>metadata</em>.</p>
 
-      <div class="handout">
-        Suites can also have metadata, but we'll cover this later.
-      </div>
+      <p>Suites can also have metadata, but we'll cover this <a href=
+      "rose-overview-suites.html">later</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">What is a Rose app config? metadata
+      continued</h3>
 
       <p>Metadata is:</p>
 
       <ul class="incremental">
-        <li>a way of providing information about application inputs.</li>
+        <li>a way of providing information about app config inputs.</li>
 
-        <li>used to drive a GUI for editing applications, but is not part of
-        the GUI itself.</li>
+        <li>used to drive a GUI for editing app configs, but is not part of the
+        GUI itself.</li>
 
-        <li>a simple specification defined in a similar format as the
-        application configuration.</li>
+        <li>a simple specification defined in a similar format to the app
+        config.</li>
       </ul>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">What is a Rose application? metadata
+      <h3 class="alwayshidden">What is a Rose app config? metadata
       location</h3>
 
-      <p>Metadata sometimes lives in the <code>meta</code> directory of an
-      application, but more often in a shared central location.</p>
+      <p>Metadata sometimes lives in the <code>meta</code> directory of an app
+      config, but more often in a shared central location.</p>
 
       <p>You'll be looking at metadata in the <a href=
       "rose-conf-meta-dev">Metadata Development Guide</a> later.</p>
     </div>
 
     <div class="slide">
-      <h2>How do I change a Rose application?</h2>
+      <h2>How do I change a Rose app config?</h2>
 
       <ul class="incremental">
         <li>You can edit the files and directories using the command line and a
         text editor.</li>
 
-        <li>You can also edit the application using the Rose configuration
+        <li>You can also edit the app config using the Rose configuration
         editor (config editor).</li>
       </ul>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">How do I change a Rose application? editor</h3>
+      <h3 class="alwayshidden">How do I change a Rose app config? editor</h3>
 
-      <p>The config editor is the Rose application and suite editing GUI.</p>
+      <p>The config editor is the Rose app config and suite editing GUI.</p>
 
-      <p>It is automatically generated from the content in your suite and
-      applications, and uses metadata to improve presentation, add help, and do
-      some checking.</p>
+      <p>Its input panels are automatically generated from the content in your
+      suite and app configs, and it uses metadata to improve presentation, add
+      help, and do some checking.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">How do I change a Rose application?
-      screenshot</h3><img src="rose-config-edit-hover-and-alter.png" width=
-      "60%" alt="config editor" />
+    <h3 class="alwayshidden">How do I change a Rose app config? screenshot</h3>
 
-      <p class="caption">This example image shows getting hover-over help for
-      an application setting in the config editor.</p>
-    </div>
+    <p class="caption">This example image shows getting hover-over help for an
+    app config setting in the config editor.</p><img src=
+    "rose-config-edit-hover-and-alter.png" width="60%" alt=
+    "config editor" /></div>
 
     <div class="slide">
       <h2>How are Rose Suites Stored and Managed?</h2>
@@ -510,10 +532,6 @@ l_exclamation_mark=.true.,
       <p>"Rosie" is the optional part of Rose that handles suite storage and
       discovery. It uses Subversion and a web-accessed database to version
       control and keep track of suites.</p>
-
-      <p>It's optional because not everyone loves Subversion the way we do
-      (note: the Rose team transferred to <a href=
-      "http://git-scm.com">git</a>).</p>
     </div>
 
     <div class="slide">
@@ -550,31 +568,30 @@ title=Run XYZ for A, with improved B
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">How are Suites Stored and Managed? GUI</h3>
+    <h3 class="alwayshidden">How are Suites Stored and Managed? GUI</h3>
 
-      <p class="caption">This is the <code>rosie go</code> GUI.</p><img src=
-      "rosie-go-layout.png" alt="rosie go" width="60%" />
+    <p class="caption">This is the <code>rosie go</code> GUI.</p>
 
-      <p class="caption">1) Menu 2) Address bar 3) Search 4) Search History 5)
-      Advanced Search 6) Search Results 7) Statusbar</p>
-    </div>
+    <p class="caption">1) Menu 2) Address bar 3) Search 4) Search History 5)
+    Advanced Search 6) Search Results 7) Statusbar</p><img src=
+    "rosie-go-layout.png" alt="rosie go" width="60%" /></div>
 
     <div class="slide">
       <h2>Running a simple suite</h2>
 
-      <p>(Demo) - if reading this offline, skip to the next section.</p>
+      <p>(Demo) - if this isn't part of a course, skip to the next section</p>
     </div>
 
     <div class="slide">
       <h2>Independent Learning</h2>
 
-      <p>The next step in the guide:</p>
+      <p>What to do now:</p>
 
       <ul class="incremental">
         <li>Take the <a href="rose-brief-tour.html">Brief Tour</a></li>
 
         <li>Go through the <a href="rose-conf-meta-dev.html">Metadata
-        Development Guide</a></li>
+        Tutorial</a></li>
 
         <li>If super-keen: learn how to write custom macros and widgets in the
         <a href="rose-api.html">API</a> guide.</li>
@@ -584,7 +601,8 @@ title=Run XYZ for A, with improved B
     <div class="slide">
       <h2>In Depth Topics</h2>
 
-      <p>See <a href="rose-overview-in-depth.html">In Depth Topics</a>.</p>
+      <p>See <a href="rose-overview-in-depth-topics.html">In Depth
+      Topics</a>.</p>
     </div>
   </div>
 </body>
