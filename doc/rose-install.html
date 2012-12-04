@@ -41,16 +41,20 @@
     <h2 id="requirements">System Requirements</h2>
 
     <p>The main utilities of Rose are intended to run on a Unix/Linux system.
-    They are known to work on RHEL-6.1. A limited set of the Rose utilities are
-    known to work on AIX-7.1. Web based Rose utilities requires a web browser
+    They are known to work on RHEL-6. A limited set of the Rose utilities are
+    known to work on AIX-7.1. Web based Rose utilities require a web browser
     compliant to XHTML 1.0, JavaScript 1.8 and CSS 2.1.</p>
 
-    <p>Rose is distributed as source, or in the form of a compressed tar file.
-    If it is a compressed tar file, un-pack the tar file into an appropriate
-    location on your system. Add the <samp>bin/</samp> directory into your
-    <var>PATH</var> environment variable. Once you have done this you should
-    now have access to the Rose user utilities, assuming that you have met the
-    requirements described in the below:</p>
+    <p>The source code for Rose is available via <a href=
+    "https://github.com/metomi/rose">github</a>. You can download a compressed
+    tar file containing the <a href=
+    "https://github.com/metomi/rose/archive/master.tar.gz">latest version</a>
+     or a <a href="https://github.com/metomi/rose/tags">released version</a>.
+    To install Rose, un-pack the tar file into an appropriate location on your
+    system. Add the <samp>bin/</samp> directory into your <var>PATH</var>
+    environment variable. Once you have done this you should now have access to
+    the Rose user utilities, assuming that you have met the requirements
+    described below:</p>
 
     <dl>
       <dt><a href="http://www.gnu.org/software/bash/">GNU Bash</a></dt>
@@ -58,7 +62,7 @@
       <dd>
         <p><dfn>used by:</dfn> <code>rose</code>.</p>
 
-        <p><dfn>versions known to work:</dfn> 4.</p>
+        <p><dfn>tested with version:</dfn> 4.</p>
       </dd>
 
       <dt><a href="http://www.python.org/">Python</a></dt>
@@ -66,7 +70,7 @@
       <dd>
         <p><dfn>used by:</dfn> <code>rose</code>.</p>
 
-        <p><dfn>versions known to work:</dfn> 2.6, 2.7.</p>
+        <p><dfn>tested with version:</dfn> 2.6.</p>
       </dd>
 
       <dt>Python: <a href="http://pygtk.org">PyGTK</a></dt>
@@ -75,9 +79,10 @@
         <p><dfn>used by:</dfn> <code>rose config-edit</code> and <code>rosie
         go</code>.</p>
 
-        <p><dfn>versions known to work:</dfn> 2.18.9.</p>
+        <p><dfn>tested with version:</dfn> 2.18.9.</p>
 
-        <p><dfn>requirements:</dfn> 2.12.</p>
+        <p><dfn>minimum version required:</dfn> 2.12 (some degraded
+        functionality).</p>
       </dd>
 
       <dt>Python: <a href="http://www.cherrypy.org/">cherrypy</a></dt>
@@ -85,9 +90,7 @@
       <dd>
         <p><dfn>used by:</dfn> Rosie web service.</p>
 
-        <p><dfn>version known to work:</dfn> 3.2.2</p>
-
-        <p><dfn>recommended:</dfn> 3.2.</p>
+        <p><dfn>tested with version:</dfn> 3.2.2</p>
       </dd>
 
       <dt>Python: <a href="http://jinja.pocoo.org/">jinja2</a></dt>
@@ -96,9 +99,9 @@
         <p><dfn>used by:</dfn> <code>rose suite-run</code>, <code>rose
         macro</code>, Rosie web service.</p>
 
-        <p><dfn>version known to work:</dfn> 2.6.</p>
+        <p><dfn>tested with version:</dfn> 2.6.</p>
 
-        <p><dfn>required:</dfn> 2.6.</p>
+        <p><dfn>minimum version required:</dfn> 2.6.</p>
       </dd>
 
       <dt>Python: <a href="http://docs.python-requests.org/">requests</a></dt>
@@ -106,9 +109,9 @@
       <dd>
         <p><dfn>used by:</dfn> Rosie web service client.</p>
 
-        <p><dfn>version known to work:</dfn> 0.11.1.</p>
+        <p><dfn>tested with version:</dfn> 0.11.1.</p>
 
-        <p><dfn>required:</dfn> 0.11.</p>
+        <p><dfn>minimum version required:</dfn> 0.11.</p>
       </dd>
 
       <dt>Python: <a href=
@@ -117,9 +120,9 @@
       <dd>
         <p><dfn>used by:</dfn> Rosie web service and its client.</p>
 
-        <p><dfn>version known to work:</dfn> 2.0.9.</p>
+        <p><dfn>tested with version:</dfn> 2.0.9.</p>
 
-        <p><dfn>required:</dfn> 1.1.</p>
+        <p><dfn>minimum version required:</dfn> 1.1.</p>
       </dd>
 
       <dt>Python: <a href="http://www.sqlalchemy.org">sqlalchemy</a></dt>
@@ -127,9 +130,9 @@
       <dd>
         <p><dfn>used by:</dfn> Rosie web service.</p>
 
-        <p><dfn>version known to work:</dfn> 0.7.6.</p>
+        <p><dfn>tested with version:</dfn> 0.7.6.</p>
 
-        <p><dfn>required:</dfn> 0.6.9.</p>
+        <p><dfn>minimum version required:</dfn> 0.6.9.</p>
       </dd>
 
       <dt><a href="http://cylc.github.com/cylc/">cylc</a></dt>
@@ -137,9 +140,9 @@
       <dd>
         <p><dfn>used by:</dfn> Rose, as the supported suite engine.</p>
 
-        <p><dfn>version known to work:</dfn> HEAD.</p>
+        <p><dfn>tested with version:</dfn> HEAD.</p>
 
-        <p><dfn>requirements:</dfn> HEAD.</p>
+        <p><dfn>minimum version required:</dfn> 5.0.</p>
       </dd>
 
       <dt><a href="http://subversion.apache.org/">Subversion</a></dt>
@@ -147,9 +150,9 @@
       <dd>
         <p><dfn>used by:</dfn> Rosie, as the version control system.</p>
 
-        <p><dfn>version known to work:</dfn> 1.6.</p>
+        <p><dfn>tested with version:</dfn> 1.6.</p>
 
-        <p><dfn>requirements:</dfn> 1.6.</p>
+        <p><dfn>minimum version required:</dfn> 1.6.</p>
       </dd>
 
       <dt><a href=
@@ -161,9 +164,9 @@
         keywords in file configurations; <code>rose task-run</code> has
         built-in task utilities for running <code>fcm make</code>.</p>
 
-        <p><dfn>version known to work:</dfn> HEAD.</p>
+        <p><dfn>tested with version:</dfn> HEAD.</p>
 
-        <p><dfn>requirements:</dfn> 2.2.</p>
+        <p><dfn>minimum version required:</dfn> 2.3.</p>
       </dd>
     </dl>
 
