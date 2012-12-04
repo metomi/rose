@@ -19,8 +19,11 @@
 #-----------------------------------------------------------------------------
 """This module contains:
 
+VarData -- class to store rose.variable.Variable instances
+SectData -- class to store rose.section.Section instances
 ConfigData -- class to store and process a directory into internal
 data structures
+ConfigDataManager -- class to load and process objects in ConfigData
 
 """
 
