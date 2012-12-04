@@ -515,7 +515,7 @@ class SuiteRunner(Runner):
             work_files.append(uuid_file)
 
         # Install items to user@host
-        auths = self.suite_engine_proc.get_remote_auths(suite_name)
+        auths = self.suite_engine_proc.get_tasks_auths(suite_name)
         queue = [] # [[pipe, command, stdin], ...]
         for user, host in sorted(auths):
             auth = user + "@" + host

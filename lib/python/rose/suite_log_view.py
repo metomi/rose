@@ -167,26 +167,28 @@ class SuiteLogViewGenerator(object):
         return self._chdir(self._update_task_log, suite_name, task_names)
 
     def _update_task_log(self, suite_name, task_names=None):
+        users_and_hosts_and_tasks = []
         if task_names:
             for task_name in task_names:
-                log_dir, r_log_dir = self.suite_engine_proc.get_log_dirs(
+                user_and_host = self.suite_engine_proc.get_task_auth(
                         suite_name, task_name)
-                if r_log_dir:
-                    cmd = self.popen.get_cmd(
-                            "rsync", r_log_dir + "/" + task + "*", log_dir)
-                    try:
-                        out, err = self.popen.run(*cmd)
-                    except RosePopenError as e:
-                        self.handle_event(e, level=Reporter.WARN)
+                if user_and_host is None:
+                    continue
+                user, host = user_and_host
+                users_and_hosts_and_tasks.append((user, host, task))
         else:
-            for user, host in self.suite_engine_proc.get_remote_auths():
-                r_log_dir = self.suite_engine_proc.get_suite_dir_rel("log", "job")
-                cmd = self.popen.get_cmd(
-                        "rsync", "%s@%s:%s/*" % (user, host, r_log_dir), "job")
-                try:
-                    out, err = self.popen.run(*cmd)
-                except RosePopenError as e:
-                    self.handle_event(e, level=Reporter.WARN)
+            for user, host in self.suite_engine_proc.get_tasks_auths():
+                users_and_hosts_and_tasks.append((user, host, ""))
+
+        log_dir_rel = self.suite_engine_proc.get_task_log_dir_rel(suite_name)
+        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+        for user, host, task in users_and_hosts_and_tasks:
+            r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, task)
+            cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
+            try:
+                out, err = self.popen.run(*cmd)
+            except RosePopenError as e:
+                self.handle_event(e, level=Reporter.WARN)
 
 
 def main():
@@ -212,6 +214,8 @@ def suite_log_view(opts, args, report=None):
     else:
         suite_name = os.path.basename(os.getcwd())
     if opts.full_mode:
+        gen.update_task_log(suite_name)
+    elif args:
         gen.update_task_log(suite_name, tasks=args)
     gen(suite_name)
     if os.getenv("DISPLAY") and opts.web_browser_mode:

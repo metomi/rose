@@ -38,7 +38,7 @@ class FCMMakeTaskUtil(TaskUtilBase):
     def run_impl_main(self, config, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props()
         task2_name = self.SCHEME2 + t.task_name.replace(self.SCHEME, "")
-        auth = self.suite_engine_proc.get_remote_auth(t.suite_name, task2_name)
+        auth = self.suite_engine_proc.get_task_auth(t.suite_name, task2_name)
         if auth is not None:
             target = "@".join(auth)
             target += ":" + os.path.join(t.suite_dir_rel, "share", t.task_name)

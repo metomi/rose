@@ -66,10 +66,8 @@ class RoseSuiteHook(object):
 
         """
         # Retrieve log
-        tasks = []
         if task:
-            tasks = [task]
-        self.suite_log_view_generator.update_task_log(suite, tasks)
+            self.suite_log_view_generator.update_task_log(suite, [task])
 
         # Generate suite log view
         self.suite_log_view_generator(suite)
