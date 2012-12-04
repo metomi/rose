@@ -2,10 +2,10 @@ program extract_compass_log
 implicit none
 character(31):: dt_hr_env
 character(255) :: pos_fpath
-real::heading, speed_kn=5.0, dt_hr
+double precision::heading, speed_kn=5.0, dt_hr
 real::random_no, rand
-real:: ang_distance, lat, long, new_lat, new_long
-real, parameter:: pi=3.141592654, radius_earth_nm=3443.89
+double precision:: ang_distance, lat, long, new_lat, new_long
+double precision, parameter:: pi=3.141592654, radius_earth_nm=3443.89
 integer:: code, clock
 logical::l_verbose=.false.
 namelist /report_nl/ l_verbose
@@ -45,6 +45,8 @@ read(dt_hr_env, *) dt_hr
 call system_clock(count=clock)
 random_no = rand(clock)
 heading = random_no*2*pi
+
+print*, "HEADING:", heading
 
 ! This is how far we went, in radians:
 ! (1 knot = 1 nautical mile / 1 hour)
