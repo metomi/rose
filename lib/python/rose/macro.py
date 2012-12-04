@@ -86,7 +86,8 @@ class MacroBase(object):
 
     """Base class for macros for validating or transforming configurations."""
 
-    reports = []  # A list of MacroReport instances for errors or changes
+    def __init__(self):
+        self.reports = []  # MacroReport instances for errors or changes
 
     def _get_section_option_from_id(self, var_id):
         """Return a configuration section and option from an id."""

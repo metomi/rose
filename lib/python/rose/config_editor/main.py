@@ -1420,12 +1420,31 @@ class MainController(object):
         """Update bar functionality like Undo and Redo."""
         if not hasattr(self, 'toolbar'):
             return False
-        self.toolbar.set_widget_sensitive('Undo', len(self.undo_stack) > 0)
-        self.toolbar.set_widget_sensitive('Redo', len(self.redo_stack) > 0)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_UNDO,
+                                          len(self.undo_stack) > 0)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_REDO,
+                                          len(self.redo_stack) > 0)
         self._get_menu_widget('/Undo').set_sensitive(len(self.undo_stack) > 0)
         self._get_menu_widget('/Redo').set_sensitive(len(self.redo_stack) > 0)
         self._get_menu_widget('/Find Next').set_sensitive(
                                             len(self.find_hist['ids']) > 0)
+        found_error = False
+        for config_name in self.data.config:
+            config_data = self.data.config[config_name]
+            for v in config_data.vars.get_all():
+                if v.error or v.warning:
+                    found_error = True
+                    break
+            else:
+                for s in config_data.sections.get_all():
+                    if s.error or s.warning:
+                        found_error = True
+                        break
+            if found_error:
+                break
+        self._get_menu_widget('/Autofix').set_sensitive(found_error)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_TRANSFORM,
+                                          found_error)
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
             now_vars = []

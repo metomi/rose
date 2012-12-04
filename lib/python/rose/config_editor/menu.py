@@ -807,6 +807,15 @@ class Handler(object):
                           rose.config_editor.IGNORED_STATUS_MACRO)
                 self.sect_ops.ignore_section(config_name, sect, True,
                                              override=True)
+            elif (triggers_ok and macro_node.state ==
+                  rose.config.ConfigNode.STATE_NORMAL and
+                  rose.variable.IGNORED_BY_SYSTEM in
+                  sect_data.ignored_reason):
+                sect_data.error.setdefault(
+                          rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED,
+                          rose.config_editor.IGNORED_STATUS_MACRO)
+                self.sect_ops.ignore_section(config_name, sect, False,
+                                             override=True)
         for item in var_changes:
             sect = item.section
             opt = item.option
@@ -851,6 +860,10 @@ class Handler(object):
                              {rose.variable.IGNORED_BY_SYSTEM:
                               rose.config_editor.IGNORED_STATUS_MACRO},
                              override=True)
+            elif (triggers_ok and macro_node.state ==
+                  rose.config.ConfigNode.STATE_NORMAL and
+                  rose.variable.IGNORED_BY_SYSTEM in var.ignored_reason):
+                self.var_ops.set_var_ignored(var, {}, override=True)
         for sect in sect_removes:
             self.sect_ops.remove_section(config_name, sect)
         self.apply_macro_transform(config_name, macro_type, changed_ids)
@@ -920,12 +933,12 @@ class Handler(object):
         sorter = rose.config.sort_settings
         to_id = lambda s: self.util.get_id_from_section_option(s.section,
                                                                s.option)
-        for config_name in self.data.config.keys():
+        for config_name in sorted(self.data.config.keys()):
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             macro = rose.macros.DefaultTransforms()
             config, change_list = macro.transform(macro_config, meta_config)
             change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
             self.handle_macro_transforms(
-                        config_name, "AutoFixer",
+                        config_name, "Autofixer.transform",
                         macro_config, change_list, triggers_ok=True)
