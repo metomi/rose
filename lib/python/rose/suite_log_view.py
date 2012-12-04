@@ -194,7 +194,7 @@ class SuiteLogViewGenerator(object):
 
 def main():
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("full_mode", "web_browser_mode") # TODO: full mode
+    opt_parser.add_my_options("full_mode", "web_browser_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
