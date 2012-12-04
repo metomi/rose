@@ -713,7 +713,7 @@ class ConfigDataManager(object):
                             # Doc table: I_u -> I_t -> compulsory
                             key = rose.config_editor.WARNING_TYPE_USER_IGNORED
                             val = getattr(rose.config_editor,
-                                          WARNING_USER_NOT_TRIGGER_IGNORED)
+                                          "WARNING_USER_NOT_TRIGGER_IGNORED")
                             node_inst.warning.update({key: val})
                         else:
                             # Doc table: I_u -> I_t -> optional
