@@ -17,4 +17,4 @@
  * along with Rose. If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-ROSE_VERSION="Rose 2012.11-dev";
+ROSE_VERSION="2012-11+";

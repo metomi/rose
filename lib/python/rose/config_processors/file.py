@@ -115,6 +115,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         targets = {}
         for key, node in sorted(nodes.items()):
             name = key[len(self.PREFIX):]
+            targets[name] = Loc(name)
+            targets[name].action_key = Loc.A_INSTALL
+            targets[name].mode = node.get_value(["mode"])
             target_sources = []
             for k in ["content", "source"]:
                 source_str = node.get_value([k])
@@ -124,15 +127,18 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     except UnboundEnvironmentVariableError as e:
                         raise ConfigProcessError([key, k], source_str, e)
                     for source_name in shlex.split(source_str):
-                        if not sources.has_key(source_name):
-                            sources[source_name] = Loc(source_name)
-                            sources[source_name].action_key = Loc.A_SOURCE
-                        sources[source_name].used_by_names.append(name)
-                        target_sources.append(sources[source_name])
-            targets[name] = Loc(name)
-            targets[name].action_key = Loc.A_INSTALL
+                        if targets[name].mode == "symlink":
+                            if targets[name].real_name:
+                                # Symlink mode can only have 1 source
+                                raise ConfigProcessError([key, k], source_str)
+                            targets[name].real_name = source_name
+                        else:
+                            if not sources.has_key(source_name):
+                                sources[source_name] = Loc(source_name)
+                                sources[source_name].action_key = Loc.A_SOURCE
+                            sources[source_name].used_by_names.append(name)
+                            target_sources.append(sources[source_name])
             targets[name].dep_locs = target_sources
-            targets[name].mode = node.get_value(["mode"])
 
         # Determine the scheme of the location from configuration.
         config_schemes_str = config.get_value(["schemes"])
@@ -172,29 +178,32 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Target exists, but does not match settings in database.
         # * Target exists, but a source cannot be considered unchanged.
         for target in targets.values():
-            if os.path.islink(target.name):
-                target.real_name = os.readlink(target.name)
-            elif os.path.exists(target.name):
-                for path, checksum in get_checksum(target.name):
-                    target.add_path(path, checksum)
-                target.paths.sort()
-            prev_target = loc_dao.select(target.name)
-            target.is_out_of_date = (
-                    not os.path.exists(target.name) or
-                    prev_target is None or
-                    prev_target.mode != target.mode or
-                    prev_target.real_name != target.real_name or
-                    len(prev_target.paths) != len(target.paths))
-            if not target.is_out_of_date:
-                for prev_path, path in zip(prev_target.paths, target.paths):
-                    if prev_path != path:
-                        target.is_out_of_date = True
-                        break
-            if not target.is_out_of_date:
-                for dep_loc in target.dep_locs:
-                    if dep_loc.is_out_of_date:
-                        target.is_out_of_date = True
-                        break
+            if target.real_name:
+                target.is_out_of_date = (
+                        not os.path.islink(target.name) or
+                        target.real_name != os.readlink(target.name))
+            else:
+                if os.path.exists(target.name):
+                    for path, checksum in get_checksum(target.name):
+                        target.add_path(path, checksum)
+                    target.paths.sort()
+                prev_target = loc_dao.select(target.name)
+                target.is_out_of_date = (
+                        not os.path.exists(target.name) or
+                        prev_target is None or
+                        prev_target.mode != target.mode or
+                        len(prev_target.paths) != len(target.paths))
+                if not target.is_out_of_date:
+                    for prev_path, path in zip(
+                            prev_target.paths, target.paths):
+                        if prev_path != path:
+                            target.is_out_of_date = True
+                            break
+                if not target.is_out_of_date:
+                    for dep_loc in target.dep_locs:
+                        if dep_loc.is_out_of_date:
+                            target.is_out_of_date = True
+                            break
             if target.is_out_of_date:
                 target.paths = None
                 loc_dao.delete(target)
@@ -204,24 +213,22 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         for target in targets.values():
             if not target.is_out_of_date:
                 continue
-            if target.dep_locs:
-                if len(target.dep_locs) == 1 and target.mode == "symlink":
-                    self.manager.fs_util.symlink(target.dep_locs[0],
-                                                 target.name)
-                    loc_dao.update(target)
-                else:
-                    jobs[target.name] = JobProxy(target)
-                    for source in target.dep_locs:
-                        if not jobs.has_key(source.name):
-                            jobs[source.name] = JobProxy(source)
-                            jobs[source.name].event_level = Event.V
-                        job = jobs[source.name]
-                        jobs[target.name].pending_for[source.name] = job
+            if target.mode == "symlink":
+                self.manager.fs_util.symlink(target.real_name, target.name)
+                loc_dao.update(target)
             elif target.mode == "mkdir":
                 self.manager.fs_util.makedirs(target.name)
                 loc_dao.update(target)
                 target.loc_type = target.TYPE_TREE
                 target.add_path(target.BLOB, None)
+            elif target.dep_locs:
+                jobs[target.name] = JobProxy(target)
+                for source in target.dep_locs:
+                    if not jobs.has_key(source.name):
+                        jobs[source.name] = JobProxy(source)
+                        jobs[source.name].event_level = Event.V
+                    job = jobs[source.name]
+                    jobs[target.name].pending_for[source.name] = job
             else:
                 self.manager.fs_util.install(target.name)
                 loc_dao.update(target)
@@ -548,14 +555,14 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
+        self.popen = popen
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
-        rose_lib_path = fs_util.dirname(fs_util.dirname(__file__))
-        lib_path = os.path.join(rose_lib_path, "loc_handlers")
-        self.popen = popen
         self.fs_util = fs_util
-        SchemeHandlersManager.__init__(self, [lib_path], attrs=["parse", "pull"],
-                                       can_handle="can_pull")
+        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        SchemeHandlersManager.__init__(
+                self, [p], ns="rose.loc_handlers", attrs=["parse", "pull"],
+                can_handle="can_pull")
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler with given arguments if possible."""

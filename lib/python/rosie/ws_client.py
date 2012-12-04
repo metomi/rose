@@ -431,8 +431,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     check_local = "%local" in opts.format
 
     for dict_row in dict_rows:
-        dict_row["suite"] = "%s-%s/%s@%s" % (
-                            opts.prefix,
+        dict_row["suite"] = "%s/%s@%s" % (
                             dict_row["idx"],
                             dict_row["branch"],
                             dict_row["revision"])
@@ -476,7 +475,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
 
         if (opts.verbosity - opts.quietness) <= report.DEFAULT:
            report(suite, clip=terminal_cols)
-        report(SuiteInfo(dict_row), prefix="")
+        report(SuiteInfo(dict_row), prefix=None)
     if url is not None:
         if url.endswith("&format=json"):
             url = url.replace("&format=json", "")
