@@ -177,7 +177,8 @@ class SuiteLogViewGenerator(object):
                 user, host = user_and_host
                 users_and_hosts_and_tasks.append((user, host, task))
         else:
-            for user, host in self.suite_engine_proc.get_tasks_auths():
+            users_and_hosts = self.suite_engine_proc.get_tasks_auths(suite_name)
+            for user, host in users_and_hosts:
                 users_and_hosts_and_tasks.append((user, host, ""))
 
         log_dir_rel = self.suite_engine_proc.get_task_log_dir_rel(suite_name)
@@ -186,7 +187,7 @@ class SuiteLogViewGenerator(object):
             r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, task)
             cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
             try:
-                out, err = self.popen.run(*cmd)
+                out, err = self.popen(*cmd)
             except RosePopenError as e:
                 self.handle_event(e, level=Reporter.WARN)
 
