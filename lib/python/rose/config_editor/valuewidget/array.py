@@ -433,7 +433,10 @@ class MixedArrayValueWidget(gtk.HBox):
         self.rows = []
         self.widgets = []
         self.unlimited = (metadata.get(rose.META_PROP_LENGTH) == ':')
-        self.array_length = metadata.get(rose.META_PROP_LENGTH, 1)
+        if self.unlimited:
+            self.array_length = 1
+        else:
+            self.array_length = metadata.get(rose.META_PROP_LENGTH, 1)
         self.num_cols = len(metadata[rose.META_PROP_TYPE])
         self.types_row = [t for t in
                           metadata[rose.META_PROP_TYPE]]

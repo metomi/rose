@@ -399,18 +399,9 @@ VAR_FLAG_TIP_FIXED = 'Fixed variable (only one allowed value)'
 VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
 VAR_MENU_TIP_ERROR = 'Error '
-VAR_MENU_TIP_IGNORED = 'Ignored because {0}'
 VAR_MENU_TIP_LATENT = 'This variable could be added to the configuration.'
 VAR_MENU_TIP_WARNING = 'Warning '
-VAR_MENU_TIP_ADD = 'Clicking here will add this variable'
-VAR_MENU_TIP_EDIT_COMMENTS = "Edit the configuration comments for this variable"
 VAR_MENU_TIP_FIX_IGNORE = "Auto-fix the variable's ignored state error"
-VAR_MENU_TIP_ENABLE = 'Enable this user-ignored variable'
-VAR_MENU_TIP_HELP = 'View help for this variable'
-VAR_MENU_TIP_IGNORE = 'User-Ignore this variable'
-VAR_MENU_TIP_INFO = 'View a summary of all information about this variable'
-VAR_MENU_TIP_REMOVE = 'Remove this variable from the configuration'
-VAR_MENU_TIP_URL = 'Launch web help for this variable'
 VAR_WIDGET_ENV_INFO = 'Set to environment variable'
 
 # Flags for variable widgets

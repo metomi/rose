@@ -206,13 +206,9 @@ class MenuWidget(gtk.HBox):
         uimanager.insert_action_group(actiongroup, pos=0)
         uimanager.add_ui_from_string(option_ui)
         remove_item = uimanager.get_widget('/Options/Remove')
-        remove_item.set_tooltip_text(
-               rose.config_editor.VAR_MENU_TIP_REMOVE)
         remove_item.connect("activate",
                             lambda b: self.trigger_remove())
         edit_item = uimanager.get_widget('/Options/Edit')
-        edit_item.set_tooltip_text(
-               rose.config_editor.VAR_MENU_TIP_EDIT_COMMENTS)
         edit_item.connect("activate", self.launch_edit)
         errors = self.my_variable.error.keys()
         warnings = self.my_variable.warning.keys()
@@ -252,8 +248,6 @@ class MenuWidget(gtk.HBox):
             if (self.my_variable.metadata.get(rose.META_PROP_COMPULSORY) == 
                 rose.META_PROP_VALUE_TRUE or self.is_ghost):
                 ignore_item.set_sensitive(False)
-            #ignore_item.set_tooltip_text(
-            #      rose.config_editor.VAR_MENU_TIP_IGNORE)
             # It is a non-trigger, optional, enabled variable.
             new_reason = {rose.variable.IGNORED_BY_USER:
                           rose.config_editor.IGNORED_STATUS_MANUAL}
@@ -263,8 +257,6 @@ class MenuWidget(gtk.HBox):
                                  self.my_variable, new_reason))
         elif "action='Enable'" in option_ui:
             enable_item = uimanager.get_widget('/Options/Enable')
-            #enable_item.set_tooltip_text(
-            #      rose.config_editor.VAR_MENU_TIP_ENABLE)
             enable_item.connect(
                         "activate",
                         lambda b: self.var_ops.set_var_ignored(
@@ -281,15 +273,11 @@ class MenuWidget(gtk.HBox):
             if enable_item is not None:
                 enable_item.set_sensitive(False)
         info_item = uimanager.get_widget('/Options/Info')
-        #info_item.set_tooltip_text(
-        #          rose.config_editor.VAR_MENU_TIP_INFO)
         info_item.connect("activate", self._launch_info_dialog)
         if (self.my_variable.metadata.get(rose.META_PROP_COMPULSORY) == 
             rose.META_PROP_VALUE_TRUE or self.is_ghost):
             remove_item.set_sensitive(False)
         help_item = uimanager.get_widget('/Options/Help')
-        #help_item.set_tooltip_text(
-        #          rose.config_editor.VAR_MENU_TIP_HELP)
         help_item.connect("activate",
                           lambda b: self.launch_help(
                                          self.my_variable.metadata['help']))
@@ -297,15 +285,11 @@ class MenuWidget(gtk.HBox):
             help_item.set_sensitive(False)
         url_item = uimanager.get_widget('/Options/Web Help')
         if url_item is not None and 'url' in self.my_variable.metadata:
-            #url_item.set_tooltip_text(
-            #      rose.config_editor.VAR_MENU_TIP_URL)
             url_item.connect("activate",
                              lambda b: self.launch_help(
                                             self.my_variable.metadata['url']))
         if self.is_ghost:
             add_item = uimanager.get_widget('/Options/Add')
-            #add_item.set_tooltip_text(
-            #      rose.config_editor.VAR_MENU_TIP_ADD)
             add_item.connect("activate",
                             lambda b: self._perform_add())
         option_menu = uimanager.get_widget('/Options')
