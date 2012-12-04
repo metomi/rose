@@ -164,7 +164,7 @@ length=3
 type=raw, logical, character, real
 length=:
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultTransforms
+run_pass "$TEST_KEY" rose macro --fix --non-interactive --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [T] rose.macros.DefaultTransforms: changes: 8
     namelist:values_nl1=my_boolean_array_any=true,false,true
