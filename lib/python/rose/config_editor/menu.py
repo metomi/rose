@@ -950,7 +950,7 @@ class Handler(object):
         sorter = rose.config.sort_settings
         to_id = lambda s: self.util.get_id_from_section_option(s.section,
                                                                s.option)
-        for config_name in sorted(self.data.config.keys()):
+        for config_name in config_keys:
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             macro = rose.macros.DefaultTransforms()

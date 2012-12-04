@@ -130,9 +130,9 @@ class SectionOperations(object):
         if is_ignored:
             # User-ignore request for this section.
             # The section must be enabled and optional.
-            if (not override and sect_data.ignored_reason or
+            if (not override and (sect_data.ignored_reason or
                 sect_data.metadata.get(rose.META_PROP_COMPULSORY) ==
-                rose.META_PROP_VALUE_TRUE):
+                rose.META_PROP_VALUE_TRUE)):
                 rose.gtk.util.run_dialog(
                         rose.gtk.util.DIALOG_TYPE_ERROR,
                         rose.config_editor.WARNING_CANNOT_USER_IGNORE.format(
