@@ -94,13 +94,13 @@ class MainWindow(gtk.Window):
         self.hist = rosie.browser.history.HistoryManager(
                     rosie.browser.HISTORY_LOCATION, rosie.browser.SIZE_HISTORY)
         self.last_search_historical = False
-        self.local_updater = rosie.browser.status.LocalStatusUpdater(
-                                   self.handle_update_treemodel_local_status)
         self.repeat_last_request = lambda: None
         splash_updater(rosie.browser.SPLASH_LOADING.format(
                                      rosie.browser.SPLASH_SETUP_WINDOW),
                        rosie.browser.PROGRAM_NAME)
         self.setup_window()
+        self.local_updater = rosie.browser.status.LocalStatusUpdater(
+                                   self.handle_update_treemodel_local_status)
         splash_updater(rosie.browser.SPLASH_LOADING.format(
                                      rosie.browser.SPLASH_DIRECTOR),
                        rosie.browser.PROGRAM_NAME)
