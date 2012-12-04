@@ -141,7 +141,7 @@ class SuiteId(object):
         state = {"idx-sid": None, "stack": [], "try_text": False}
 
         def _handle_tag0(state, name, attr_map):
-            if state["idx"]:
+            if state["idx-sid"]:
                 return
             state["stack"].append(name)
             state["try_text"] = (
@@ -191,7 +191,7 @@ class SuiteId(object):
         if id:
             return id.incr()
         elif prefix:
-            return cls(id_text=cls.FORMAT_ID % (prefix, cls.SID_0))
+            return cls(id_text=cls.FORMAT_IDX % (prefix, cls.SID_0))
         else:
             return cls(id_text=cls.SID_0)
 
@@ -368,7 +368,8 @@ class SuiteId(object):
             if incr_next and i == 0:
                 raise SuiteIdOverflowError(self)
         self.sid = "".join(sid_chars)
-        return self.__class__(id_text=self.FORMAT_ID % (self.prefix, self.sid))
+        return self.__class__(id_text=self.FORMAT_IDX % (self.prefix,
+                                                         self.sid))
 
     def to_origin(self):
         """Return the origin URL of this ID."""
