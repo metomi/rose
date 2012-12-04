@@ -416,6 +416,7 @@ class MainController(object):
         self.hyper_panel.send_clone_request = self.handle.clone_request
         self.hyper_panel.send_delete_request = self.handle.delete_request
         self.hyper_panel.send_edit_request = self.handle.edit_request
+        self.hyper_panel.send_fix_request = self.handle.fix_request
         self.hyper_panel.send_ignore_request = self.handle.ignore_request
         self.hyper_panel.send_info_request = self.handle.info_request
         self.hyper_panel.send_search_request = self.perform_find_by_ns_id

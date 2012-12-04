@@ -544,6 +544,14 @@ class Handler(object):
                                      config_name, section,t.splitlines())
         rose.gtk.util.run_edit_dialog(text, finish_hook=finish, title=title)
 
+    def fix_request(self, base_ns):
+        """Handle a request to auto-fix a configuration."""
+        if base_ns is None:
+            return False
+        base_ns = "/" + base_ns.lstrip("/")
+        config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+        self.transform_default(just_this_config_name=config_name)
+
     def info_request(self, base_ns):
         """Handle a request for namespace info."""
         if base_ns is None:
@@ -923,13 +931,22 @@ class Handler(object):
         rose.gtk.run.run_suite(*args)
         return False
 
-    def transform_default(self, *args):
+    def transform_default(self, just_this_config_name=None):
         """Run the Rose built-in transformer macros."""
+        if (just_this_config_name is not None and
+            just_this_config_name in self.data.config.keys()):
+            config_keys = [just_this_config_name]
+            text = rose.config_editor.DIALOG_LABEL_AUTOFIX
+        else:
+            config_keys = sorted(self.data.config.keys())
+            text = rose.config_editor.DIALOG_LABEL_AUTOFIX_ALL
         proceed = rose.gtk.util.run_dialog(
                                     rose.gtk.util.DIALOG_TYPE_WARNING,
-                                    rose.config_editor.DIALOG_LABEL_AUTOFIX,
+                                    text,
                                     rose.config_editor.DIALOG_TITLE_AUTOFIX,
                                     cancel=True)
+        if not proceed:
+            return False
         sorter = rose.config.sort_settings
         to_id = lambda s: self.util.get_id_from_section_option(s.section,
                                                                s.option)

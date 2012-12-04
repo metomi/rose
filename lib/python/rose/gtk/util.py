@@ -833,10 +833,10 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     """Run a simple dialog with an 'OK' button and some text."""
     parent_window = get_dialog_parent()
     dialog = gtk.Dialog(parent=parent_window)
-    ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
     if cancel:
         cancel_button = dialog.add_button(gtk.STOCK_CANCEL,
                                           gtk.RESPONSE_CANCEL)
+    ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
     if dialog_type == gtk.MESSAGE_INFO:
         stock_id = gtk.STOCK_DIALOG_INFO
     elif dialog_type == gtk.MESSAGE_WARNING:
