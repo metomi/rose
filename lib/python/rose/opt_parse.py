@@ -304,6 +304,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "KEY=VALUE",
                         "help": "(Internal option, do not use.)"}],
+               "restart_mode": [
+                       ["--restart"],
+                       {"action": "store_true",
+                        "default": False,
+                        "dest": "restart_mode",
+                        "help": "Restart the suite."}],
                "reverse": [
                        ["--reverse", "-r"],
                        {"action": "store_true",
