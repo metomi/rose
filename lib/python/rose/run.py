@@ -369,7 +369,8 @@ class SuiteRunner(Runner):
     NUM_PING_TRY_MAX = 3
     OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
                "gcontrol_mode", "host", "install_only_mode", "name",
-               "new_mode", "no_overwrite_mode", "opt_conf_keys", "remote"]
+               "new_mode", "no_overwrite_mode", "opt_conf_keys", "remote",
+               "restart_mode"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
@@ -588,7 +589,8 @@ class SuiteRunner(Runner):
                 host = self.host_selector(hosts)[0][0]
             self.handle_event(SuiteHostSelectEvent(suite_name, host))
             # FIXME: values in environ were expanded in the localhost
-            self.suite_engine_proc.run(suite_name, host, environ, *args)
+            self.suite_engine_proc.run(
+                    suite_name, host, environ, opts.restart_mode, args)
             open("rose-suite-run.host", "w").write(host + "\n")
 
             # Check that the suite is running

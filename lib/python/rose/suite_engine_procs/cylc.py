@@ -290,7 +290,8 @@ class CylcProcessor(SuiteEngineProcessor):
             hook_event, suite, task, hook_message = args
         return [suite, task, hook_event, hook_message]
 
-    def run(self, suite_name, host=None, host_environ=None, *args):
+    def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
+            args=None):
         """Invoke "cylc run" (in a specified host).
         
         The current working directory is assumed to be the suite log directory.
@@ -298,6 +299,7 @@ class CylcProcessor(SuiteEngineProcessor):
         suite_name: the name of the suite.
         host: the host to run the suite. "localhost" if None.
         host_environ: a dict of environment variables to export in host.
+        restart_mode: call "cylc restart" instead of "cylc run".
         args: arguments to pass to "cylc run".
  
         """
@@ -312,11 +314,15 @@ class CylcProcessor(SuiteEngineProcessor):
             if host in localhosts:
                 host = None
 
-        # Invoke "cylc run"
+        # Invoke "cylc run" or "cylc restart"
+        cylc_command = "run"
+        if restart_mode:
+            cylc_command = "restart"
         # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
         # that the log will be redirected back via "ssh" to the localhost.
-        bash_cmd = r"nohup cylc run %s %s 1>%s 2>&1 &" % (
-                suite_name, self.popen.list_to_shell_str(args), "cylc-run.log")
+        bash_cmd = r"nohup cylc %s %s %s 1>%s 2>&1 &" % (
+                cylc_command, suite_name, self.popen.list_to_shell_str(args),
+                "cylc-run.log")
         if host:
             bash_cmd_prefix = r"""#!/usr/bin/env bash
 for FILE in /etc/profile ~/.profile; do

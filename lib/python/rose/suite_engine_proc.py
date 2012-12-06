@@ -409,7 +409,8 @@ class SuiteEngineProcessor(object):
         """Rearrange args for TaskHook.run. Return the rearranged list."""
         raise NotImplementedError()
 
-    def run(self, suite_name, host_name=None, *args):
+    def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
+            args=None):
         """Start a suite (in a specified host)."""
         raise NotImplementedError()
 
