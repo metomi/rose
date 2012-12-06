@@ -19,8 +19,11 @@
 #-----------------------------------------------------------------------------
 """This module contains:
 
+VarData -- class to store rose.variable.Variable instances
+SectData -- class to store rose.section.Section instances
 ConfigData -- class to store and process a directory into internal
 data structures
+ConfigDataManager -- class to load and process objects in ConfigData
 
 """
 
@@ -995,7 +998,9 @@ class ConfigDataManager(object):
         """Return whether a namespace is mentioned in summary data."""
         ns_meta = self.namespace_meta_lookup.get(ns, {})
         if (ns_meta.get(rose.META_PROP_DUPLICATE) == rose.META_PROP_VALUE_TRUE
-            and not ns.split("/")[-1].isdigit()):
+            and not ns.split("/")[-1].isdigit() and
+            len([n for n in self.namespace_meta_lookup
+                 if n.startswith(ns)]) > 1):
             return True
         if ns.split("/")[-1] == rose.SUB_CONFIG_FILE_DIR:
             return True
