@@ -49,6 +49,10 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
         meta_sect = rose.macro.REC_ID_STRIP.sub("", sect)
         modifier_sect = rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
         if sect and option is None:
+            if (modifier_sect != meta_sect and
+                meta_config.get([modifier_sect]) is None):
+                meta_config.set([modifier_sect, rose.META_PROP_DUPLICATE],
+                                rose.META_PROP_VALUE_TRUE)
             if meta_config.get([meta_sect]) is not None:
                 continue
             meta_config.set([meta_sect])
@@ -56,10 +60,6 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
                 # Add duplicate = true at base and modifier level (if needed).
                 meta_config.set([meta_sect, rose.META_PROP_DUPLICATE],
                                 rose.META_PROP_VALUE_TRUE)
-                if (modifier_sect != sect and 
-                    meta_config.get([modifier_sect]) is None):
-                    meta_config.set([modifier_sect, rose.META_PROP_DUPLICATE],
-                                    rose.META_PROP_VALUE_TRUE)
             for prop_key, prop_value in prop_map.items():
                 meta_config.set([meta_sect, prop_key], prop_value)
         if option is None:

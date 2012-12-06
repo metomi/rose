@@ -220,13 +220,15 @@ class MainController(object):
                    (rose.config_editor.TOOLBAR_FIND, 'gtk.Entry'),
                    (rose.config_editor.TOOLBAR_FIND_NEXT, 'gtk.STOCK_FIND'),
                    (rose.config_editor.TOOLBAR_VALIDATE,
-                    'gtk.STOCK_DIALOG_QUESTION')],
+                    'gtk.STOCK_DIALOG_QUESTION'),
+                   (rose.config_editor.TOOLBAR_TRANSFORM,
+                    'gtk.STOCK_CONVERT')],
                 sep_on_name=[rose.config_editor.TOOLBAR_SAVE,
                              rose.config_editor.TOOLBAR_BROWSE,
                              rose.config_editor.TOOLBAR_REDO,
                              rose.config_editor.TOOLBAR_REVERT,
                              rose.config_editor.TOOLBAR_FIND_NEXT,
-                             rose.config_editor.TOOLBAR_VALIDATE])
+                             rose.config_editor.TOOLBAR_TRANSFORM])
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
@@ -237,6 +239,8 @@ class MainController(object):
         assign(rose.config_editor.TOOLBAR_FIND_NEXT, self._launch_find)
         assign(rose.config_editor.TOOLBAR_VALIDATE,
                self.handle.check_all_extra)
+        assign(rose.config_editor.TOOLBAR_TRANSFORM,
+               self.handle.transform_default)
         self.find_entry = self.toolbar.item_dict.get(
                                rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
@@ -304,6 +308,8 @@ class MainController(object):
                      ('/TopMenuBar/Metadata/All V',
                       lambda m: self.handle.run_custom_macro(
                                      method_name=rose.macro.VALIDATE_METHOD)),
+                     ('/TopMenuBar/Metadata/Autofix',
+                      lambda m: self.handle.transform_default()),
                      ('/TopMenuBar/Metadata/Extra checks',
                       lambda m: self.handle.check_fail_rules()),
                      ('/TopMenuBar/Metadata/Switch off metadata',
@@ -410,6 +416,7 @@ class MainController(object):
         self.hyper_panel.send_clone_request = self.handle.clone_request
         self.hyper_panel.send_delete_request = self.handle.delete_request
         self.hyper_panel.send_edit_request = self.handle.edit_request
+        self.hyper_panel.send_fix_request = self.handle.fix_request
         self.hyper_panel.send_ignore_request = self.handle.ignore_request
         self.hyper_panel.send_info_request = self.handle.info_request
         self.hyper_panel.send_search_request = self.perform_find_by_ns_id
@@ -1075,8 +1082,7 @@ class MainController(object):
             sect_data = config_sections.now.get(section)
             if sect_data is None:
                 sect_data = config_sections.latent[section]
-            for attribute in [rose.config_editor.WARNING_TYPE_ENABLED,
-                              rose.config_editor.WARNING_TYPE_IGNORED]:
+            for attribute in rose.config_editor.WARNING_TYPES_IGNORE:
                 if attribute in sect_data.error:
                     sect_data.error.pop(attribute)
             reason = sect_data.ignored_reason
@@ -1086,8 +1092,9 @@ class MainController(object):
                     # User-ignored but trigger-enabled
                     if (meta.get([section, rose.META_PROP_COMPULSORY]).value
                         == rose.META_PROP_VALUE_TRUE):
+                        # Doc table: I_u -> E -> compulsory
                         sect_data.error.update(
-                              {rose.config_editor.WARNING_TYPE_IGNORED:
+                              {rose.config_editor.WARNING_TYPE_USER_IGNORED:
                                rose.config_editor.WARNING_NOT_USER_IGNORABLE})
                 elif (rose.variable.IGNORED_BY_SYSTEM in reason):
                     # Normal trigger-enabled sections
@@ -1120,8 +1127,7 @@ class MainController(object):
                 triggered_ns_list.append(ns)
             if var_id == this_id:
                 continue
-            for attribute in [rose.config_editor.WARNING_TYPE_ENABLED,
-                              rose.config_editor.WARNING_TYPE_IGNORED]:
+            for attribute in rose.config_editor.WARNING_TYPES_IGNORE:
                 if attribute in var.error:
                     var.error.pop(attribute)
             if (var_id in trigger.enabled_dict and
@@ -1130,10 +1136,12 @@ class MainController(object):
                 if (rose.variable.IGNORED_BY_USER in
                     var.ignored_reason):
                     # User-ignored but trigger-enabled
+                    # Doc table: I_u -> E
                     if (var.metadata.get(rose.META_PROP_COMPULSORY) ==
                         rose.META_PROP_VALUE_TRUE):
+                        # Doc table: I_u -> E -> compulsory
                         var.error.update(
-                              {rose.config_editor.WARNING_TYPE_IGNORED:
+                              {rose.config_editor.WARNING_TYPE_USER_IGNORED:
                                rose.config_editor.WARNING_NOT_USER_IGNORABLE})
                 elif (rose.variable.IGNORED_BY_SYSTEM in
                       var.ignored_reason):
@@ -1414,12 +1422,31 @@ class MainController(object):
         """Update bar functionality like Undo and Redo."""
         if not hasattr(self, 'toolbar'):
             return False
-        self.toolbar.set_widget_sensitive('Undo', len(self.undo_stack) > 0)
-        self.toolbar.set_widget_sensitive('Redo', len(self.redo_stack) > 0)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_UNDO,
+                                          len(self.undo_stack) > 0)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_REDO,
+                                          len(self.redo_stack) > 0)
         self._get_menu_widget('/Undo').set_sensitive(len(self.undo_stack) > 0)
         self._get_menu_widget('/Redo').set_sensitive(len(self.redo_stack) > 0)
         self._get_menu_widget('/Find Next').set_sensitive(
                                             len(self.find_hist['ids']) > 0)
+        found_error = False
+        for config_name in self.data.config:
+            config_data = self.data.config[config_name]
+            for v in config_data.vars.get_all():
+                if v.error or v.warning:
+                    found_error = True
+                    break
+            else:
+                for s in config_data.sections.get_all():
+                    if s.error or s.warning:
+                        found_error = True
+                        break
+            if found_error:
+                break
+        self._get_menu_widget('/Autofix').set_sensitive(found_error)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_TRANSFORM,
+                                          found_error)
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
             now_vars = []
@@ -1688,29 +1715,12 @@ class MainController(object):
                             config_name,
                             'duplicate.DuplicateChecker.validate',
                             macro_config, problem_list, no_display=True)
-            # Format fixing and checking
-            format_fixer = rose.macros.format.FormatFixer()
-            macro_config, changes_list = format_fixer.transform(macro_config,
-                                                                meta_config)
-            if changes_list:
-                self.handle.handle_macro_transforms(
-                            config_name, "format.FormatFixer.transform",
-                            macro_config, changes_list)
-                macro_config = self.data.dump_to_internal_config(config_name)
             format_checker = rose.macros.format.FormatChecker()
             problem_list = format_checker.validate(macro_config, meta_config)
             if problem_list:
                 self.handle.handle_macro_validation(
                             config_name, 'format.FormatChecker.validate',
                             macro_config, problem_list)
-            # Value fixing
-            fixer = rose.macros.value.TypeFixer()
-            macro_config, changes_list = fixer.transform(
-                                              macro_config, meta_config)
-            if changes_list:
-                self.handle.handle_macro_transforms(config_name,
-                                                    'value.TypeFixer.transform',
-                                                    macro_config, changes_list)
                    
     def perform_error_check(self, namespace=None):
         """Loop through system macros and sum errors."""

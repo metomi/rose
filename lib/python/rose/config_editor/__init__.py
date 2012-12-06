@@ -84,6 +84,7 @@ TOP_MENU_METADATA = "_Metadata"
 TOP_MENU_METADATA_CHECK = "_Check fail-if, warn-if"
 TOP_MENU_METADATA_SWITCH_OFF = "_Switch off Metadata"
 TOP_MENU_METADATA_MACRO_ALL_V = "Check All _Validator Macros"
+TOP_MENU_METADATA_MACRO_AUTOFIX = "_Auto-fix all configurations"
 TOP_MENU_METADATA_MACRO_CONFIG = "{0}"
 TOP_MENU_TOOLS = "_Tools"
 TOP_MENU_TOOLS_BROWSER = "Launch _File Browser"
@@ -104,11 +105,13 @@ TOOLBAR_ADD = "Add to page..."
 TOOLBAR_REVERT = "Revert page to saved"
 TOOLBAR_FIND = "Find expression (regex)"
 TOOLBAR_FIND_NEXT = "Find next"
+TOOLBAR_TRANSFORM = "Auto-fix configurations (run built-in transform macros)"
 TOOLBAR_VALIDATE = "Check fail-if, warn-if, and run all validator macros"
 TOOLBAR_SUITE_RUN = "Run suite"
 TOOLBAR_SUITE_RUN_MENU = "Run suite ..."
 TREE_PANEL_TITLE = 'Index'
 TREE_PANEL_ADD_SECTION = '_Add new section...'
+TREE_PANEL_AUTOFIX_CONFIG = '_Auto-fix configuration'
 TREE_PANEL_CLONE_SECTION = '_Clone this section'
 TREE_PANEL_EDIT_SECTION = 'Edit section comments...'
 TREE_PANEL_ENABLE_SECTION = '_Enable a section...'
@@ -123,13 +126,13 @@ MACRO_MENU_ALL_VALIDATORS = "All Validators"
 MACRO_MENU_ALL_VALIDATORS_TIP = "Run all available validator macros."
 VAR_MENU_ADD = '_Add to configuration'
 VAR_MENU_EDIT_COMMENTS = "Edit _comments"
+VAR_MENU_FIX_IGNORE = "Auto-Fix Error"
 VAR_MENU_ENABLE = '_Enable'
 VAR_MENU_HELP = '_Help'
-VAR_MENU_IGNORE = '_Ignore'
+VAR_MENU_IGNORE = '_User-Ignore'
 VAR_MENU_INFO = 'I_nfo'
 VAR_MENU_REMOVE = '_Remove'
 VAR_MENU_URL = '_Web Help'
-
 # Button strings
 LABEL_EDIT = "edit"
 
@@ -206,10 +209,14 @@ WARNING_NOT_FOUND = 'No results'
 WARNING_NOT_FOUND_TITLE = "Couldn't find it"
 WARNING_NOT_IGNORED = 'Should be ignored '
 WARNING_NOT_TRIGGER = 'Not part of the trigger mechanism'
+WARNING_USER_NOT_TRIGGER_IGNORED = 'User-ignored, but should be trigger-ignored'
 WARNING_NOT_USER_IGNORABLE = 'User-ignored, but is compulsory'
 WARNING_TYPE_ENABLED = 'enabled'
-WARNING_TYPE_IGNORED = 'ignored'
+WARNING_TYPE_TRIGGER_IGNORED = 'trigger-ignored'
+WARNING_TYPE_USER_IGNORED = 'user-ignored'
 WARNING_TYPE_NOT_TRIGGER = 'trigger'
+WARNING_TYPES_IGNORE = [WARNING_TYPE_ENABLED, WARNING_TYPE_TRIGGER_IGNORED,
+                        WARNING_TYPE_USER_IGNORED, WARNING_TYPE_NOT_TRIGGER]
 
 # Special metadata 'type' values
 FILE_TYPE_FORMATS = 'formats'
@@ -292,6 +299,8 @@ DIALOG_BODY_MACRO_CHANGES_NUM_HEIGHT = 3  # > Number, needs more height.
 DIALOG_BODY_NL_CASE_CHANGE = ("Mixed-case names cause trouble in namelists." +
                               "\nSuggested: {0}")
 DIALOG_HELP_TITLE = "Help for {0}"
+DIALOG_LABEL_AUTOFIX = "Run built-in transform (fixer) macros?"
+DIALOG_LABEL_AUTOFIX_ALL = "Run built-in transform (fixer) macros for all configurations?"
 DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR = "Choose a section for the new variable:"
 DIALOG_LABEL_CHOOSE_SECTION_EDIT = "Choose a section to edit:"
 DIALOG_LABEL_CONFIG_CHOOSE_META = "Metadata id:"
@@ -314,6 +323,7 @@ DIALOG_TITLE_MACRO_TRANSFORM_NONE = "{0}"
 DIALOG_TITLE_MACRO_VALIDATE = "{0} - Issues for {1}"
 DIALOG_TITLE_MACRO_VALIDATE_NONE = "{0}"
 DIALOG_TITLE_ADD = "Add section"
+DIALOG_TITLE_AUTOFIX = "Automatic fixing"
 DIALOG_TITLE_CHOOSE_SECTION = "Choose section"
 DIALOG_TITLE_CONFIG_CREATE = "Create configuration"
 DIALOG_TITLE_CRITICAL_ERROR = "Error"
@@ -395,9 +405,9 @@ VAR_FLAG_TIP_FIXED = 'Fixed variable (only one allowed value)'
 VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
 VAR_MENU_TIP_ERROR = 'Error '
-VAR_MENU_TIP_IGNORED = 'Ignored because {0}'
 VAR_MENU_TIP_LATENT = 'This variable could be added to the configuration.'
 VAR_MENU_TIP_WARNING = 'Warning '
+VAR_MENU_TIP_FIX_IGNORE = "Auto-fix the variable's ignored state error"
 VAR_WIDGET_ENV_INFO = 'Set to environment variable'
 
 # Flags for variable widgets

@@ -27,42 +27,37 @@ class DuplicateChecker(rose.macro.MacroBase):
 
     """Returns settings whose duplicate status does not match their name."""
 
-    WARNING_DUPL_SECT_NO_NUM = ('Section is "duplicate", but '
-                                'has no index or modifier.')
-    WARNING_NUM_SECT_NO_DUPL = ('Section has an an index or modifier, but '
-                                'is not "duplicate"')
+    WARNING_DUPL_SECT_NO_NUM = ('incorrect "duplicate=true" metadata')
+    WARNING_NUM_SECT_NO_DUPL = ('{0} requires "duplicate=true" metadata')
 
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
         meta_config = self._load_meta_config(config, meta_config)
         self.reports = []
-        sections_with_duplicate = []
-        for setting_id, sect_node in meta_config.value.items():
-            if sect_node.is_ignored():
-                continue
-            section, option = self._get_section_option_from_id(setting_id)
-            if option is not None:
-                continue
-            for prop_opt, opt_node in sect_node.value.items():
-                if (prop_opt == rose.META_PROP_DUPLICATE and
-                    not opt_node.is_ignored() and
-                    opt_node.value == rose.META_PROP_VALUE_TRUE):
-                    sections_with_duplicate.append(setting_id)
-        basic_sections_with_errors = []
-        config_sections = config.value.keys()
-        config_sections.sort(rose.config.sort_settings)
-        for section in config_sections:
+        sect_error_no_dupl = {}
+        sect_keys = config.value.keys()
+        sorter = rose.config.sort_settings
+        sect_keys.sort(sorter)
+        for section in sect_keys:
             node = config.get([section])
             if not isinstance(node.value, dict):
                 continue
-            basic_section = rose.macro.REC_ID_STRIP.sub('', section)
-            if basic_section in sections_with_duplicate:
+            metadata = self.get_metadata_for_config_id(section, meta_config)
+            duplicate = metadata.get(rose.META_PROP_DUPLICATE)
+            is_duplicate = duplicate == rose.META_PROP_VALUE_TRUE
+            basic_section = rose.macro.REC_ID_STRIP.sub("", section)
+            if is_duplicate:
                 if basic_section == section:
                     self.add_report(section, None, None,
                                     self.WARNING_DUPL_SECT_NO_NUM)
             elif section != basic_section:
-                if basic_section not in basic_sections_with_errors:
-                    basic_sections_with_errors.append(basic_section)
+                if basic_section not in sect_error_no_dupl:
+                    sect_error_no_dupl.update({basic_section: 1})
+                    no_index_section = rose.macro.REC_ID_STRIP_DUPL.sub(
+                                                         "", section)
+                    if no_index_section != section:
+                        basic_section = no_index_section
+                    warning = self.WARNING_NUM_SECT_NO_DUPL
                     self.add_report(section, None, None,
-                                    self.WARNING_NUM_SECT_NO_DUPL)
+                                    warning.format(basic_section))
         return self.reports

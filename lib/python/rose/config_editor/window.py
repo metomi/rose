@@ -407,7 +407,7 @@ class MacroChangesDialog(gtk.Dialog):
         else:
             title = rose.config_editor.DIALOG_TITLE_MACRO_TRANSFORM
             button_list = [gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                           gtk.STOCK_OK, gtk.RESPONSE_ACCEPT]
+                           gtk.STOCK_APPLY, gtk.RESPONSE_ACCEPT]
         title = title.format(self.short_macro_name, self.short_config_name)
         button_list = tuple(button_list)
         super(MacroChangesDialog, self).__init__(buttons=button_list,

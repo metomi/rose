@@ -369,9 +369,18 @@ class SuiteRunner(Runner):
     NUM_PING_TRY_MAX = 3
     OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
                "gcontrol_mode", "host", "install_only_mode", "name",
-               "new_mode", "no_overwrite_mode", "opt_conf_keys", "remote"]
+               "new_mode", "no_overwrite_mode", "opt_conf_keys", "remote",
+               "restart_mode"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
+
+    def __init__(self, *args, **kwargs):
+        Runner.__init__(self, *args, **kwargs)
+        self.suite_log_view_gen = SuiteLogViewGenerator(
+                event_handler=self.event_handler,
+                fs_util=self.fs_util,
+                popen=self.popen,
+                suite_engine_proc=self.suite_engine_proc)
 
     def run_impl(self, opts, args, uuid, work_files):
         # Log file, temporary
@@ -507,7 +516,7 @@ class SuiteRunner(Runner):
             work_files.append(uuid_file)
 
         # Install items to user@host
-        auths = self.suite_engine_proc.get_remote_auths(suite_name)
+        auths = self.suite_engine_proc.get_tasks_auths(suite_name)
         queue = [] # [[pipe, command, stdin], ...]
         for user, host in sorted(auths):
             auth = user + "@" + host
@@ -580,7 +589,8 @@ class SuiteRunner(Runner):
                 host = self.host_selector(hosts)[0][0]
             self.handle_event(SuiteHostSelectEvent(suite_name, host))
             # FIXME: values in environ were expanded in the localhost
-            self.suite_engine_proc.run(suite_name, host, environ, *args)
+            self.suite_engine_proc.run(
+                    suite_name, host, environ, opts.restart_mode, args)
             open("rose-suite-run.host", "w").write(host + "\n")
 
             # Check that the suite is running
@@ -595,8 +605,7 @@ class SuiteRunner(Runner):
                 else:
                     event = SuitePingTryMaxEvent(num_ping_try_max)
                     self.event_handler(event)
-            suite_log_view_gen = SuiteLogViewGenerator(self.event_handler)
-            suite_log_view_gen()
+            self.suite_log_view_gen(suite_name)
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?

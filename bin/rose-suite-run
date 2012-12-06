@@ -72,6 +72,8 @@
 #         Each of this switches on an optional configuration identified by KEY.
 #     --quiet, -q
 #         Decrement verbosity.
+#     --restart
+#         Invoke "cylc restart" instead of "cylc run".
 #     --verbose, -v
 #         Increment verbosity.
 #

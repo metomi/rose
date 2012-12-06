@@ -231,12 +231,8 @@ class SuiteEngineProcessor(object):
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
 
-    def get_log_dirs(self, suite, task):
-        """
-        Return (log-directory, remote-log-directory) for a suite task.
-
-        remote-log-directory is None for a local task.
-        """
+    def get_task_log_dir_rel(self, suite):
+        """Return the relative path to the log directory for suite tasks."""
         raise NotImplementedError()
 
     def get_task_props(self, *args, **kwargs):
@@ -314,11 +310,11 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_remote_auth(self, suite_name, task_name):
+    def get_task_auth(self, suite_name, task_name):
         """Return (user, host) for a remote task in a suite."""
         raise NotImplementedError()
 
-    def get_remote_auths(self, suite_name):
+    def get_tasks_auths(self, suite_name):
         """Return a list of (user, host) for remote tasks in a suite."""
         raise NotImplementedError()
 
@@ -413,7 +409,8 @@ class SuiteEngineProcessor(object):
         """Rearrange args for TaskHook.run. Return the rearranged list."""
         raise NotImplementedError()
 
-    def run(self, suite_name, host_name=None, *args):
+    def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
+            args=None):
         """Start a suite (in a specified host)."""
         raise NotImplementedError()
 

@@ -74,7 +74,7 @@ class TriggerMacro(rose.macro.MacroBase):
         user_ignored = rose.config.ConfigNode.STATE_USER_IGNORED
         state_map = {enabled: 'enabled     ',
                      trig_ignored: 'trig-ignored',
-                     user_ignored: 'user-ignored'}       
+                     user_ignored: 'user-ignored'}
         change_list = []
         id_list = []
         prev_ignoreds = {trig_ignored: [], user_ignored: []}

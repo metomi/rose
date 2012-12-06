@@ -31,12 +31,7 @@ class RoseOptionParser(OptionParser):
 
     """
 
-    OPTIONS = {"all": [
-                       ["--all", "-a"],
-                       {"action": "store_true",
-                        "default": False,
-                        "help": "Apply all available items."}],
-               "all_revs": [
+    OPTIONS = {"all_revs": [
                        ["--all-revs"],
                        {"action": "store_true",
                         "default": False,
@@ -137,12 +132,22 @@ class RoseOptionParser(OptionParser):
                         "dest": "files",
                         "metavar": "FILE",
                         "help": "Specify the configuration file(s)."}],
+               "fix": [
+                     ["--fix", "-F"],
+                      {"action": "store_true",
+                       "dest": "fix",
+                       "help": "Fix the configuration."}],
                "force_mode": [
                        ["--force", "-f"],
                        {"action": "store_true",
                         "dest": "force_mode",
                         "help": ("Force file installation " +
                                  "even if it may be unsafe.")}],
+               "full_mode": [
+                       ["--full", "-f"],
+                       {"action": "store_true",
+                        "dest": "full_mode",
+                        "help": ("Full update.")}],
                "format": [
                        ["--format", "-f"],
                        {"metavar": "FORMAT",
@@ -304,6 +309,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "KEY=VALUE",
                         "help": "(Internal option, do not use.)"}],
+               "restart_mode": [
+                       ["--restart"],
+                       {"action": "store_true",
+                        "default": False,
+                        "dest": "restart_mode",
+                        "help": "Restart the suite."}],
                "reverse": [
                        ["--reverse", "-r"],
                        {"action": "store_true",
@@ -318,7 +329,7 @@ class RoseOptionParser(OptionParser):
                        ["--shutdown"],
                        {"action": "store_true",
                         "default": False,
-                        "help": "Trigger a suite shutdown."}],                                                  
+                        "help": "Trigger a suite shutdown."}],
                "sort": [
                        ["--sort", "-s"],
                        {"metavar": "FIELD",
