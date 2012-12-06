@@ -1714,29 +1714,12 @@ class MainController(object):
                             config_name,
                             'duplicate.DuplicateChecker.validate',
                             macro_config, problem_list, no_display=True)
-            # Format fixing and checking
-            format_fixer = rose.macros.format.FormatFixer()
-            macro_config, changes_list = format_fixer.transform(macro_config,
-                                                                meta_config)
-            if changes_list:
-                self.handle.handle_macro_transforms(
-                            config_name, "format.FormatFixer.transform",
-                            macro_config, changes_list)
-                macro_config = self.data.dump_to_internal_config(config_name)
             format_checker = rose.macros.format.FormatChecker()
             problem_list = format_checker.validate(macro_config, meta_config)
             if problem_list:
                 self.handle.handle_macro_validation(
                             config_name, 'format.FormatChecker.validate',
                             macro_config, problem_list)
-            # Value fixing
-            fixer = rose.macros.value.TypeFixer()
-            macro_config, changes_list = fixer.transform(
-                                              macro_config, meta_config)
-            if changes_list:
-                self.handle.handle_macro_transforms(config_name,
-                                                    'value.TypeFixer.transform',
-                                                    macro_config, changes_list)
                    
     def perform_error_check(self, namespace=None):
         """Loop through system macros and sum errors."""
