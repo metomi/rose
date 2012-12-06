@@ -67,26 +67,9 @@ class CylcProcessor(SuiteEngineProcessor):
 
     LOG_TASK_TIMESTAMP_THRESHOLD = 2.0
 
-    def get_log_dirs(self, suite, task):
-        """
-        Get the local and remote log directories for a suite task.
-
-        Return result as a 2-element tuple (local-dir, remote-dir).
-        For a local task, the 2nd element of the tuple is None.
-
-        """
-        log_dir = self.get_suite_dir(suite, "log", "job")
-        if task:
-            task_key = task.rsplit("%", 1)[0]
-        else:
-            task_key = "root"
-        user_and_host = self.get_remote_auth(suite, task_key)
-        if user_and_host:
-            suite_log_dir_rel = self.get_suite_dir_rel(suite, "log", "job")
-            user, host = user_and_host
-            return log_dir, "%s@%s:%s" % (user, host, suite_log_dir_rel)
-        else:
-            return log_dir, None
+    def get_task_log_dir_rel(self, suite):
+        """Return the relative path to the log directory for suite tasks."""
+        return self.get_suite_dir_rel(suite, "log", "job")
 
     def get_task_props_from_env(self):
         """Get attributes of a suite task from environment variables.
@@ -117,7 +100,7 @@ class CylcProcessor(SuiteEngineProcessor):
                          task_log_root=task_log_root,
                          task_is_cold_start=task_is_cold_start)
 
-    def get_remote_auth(self, suite_name, task_name):
+    def get_task_auth(self, suite_name, task_name):
         """
         Return (user, host) for a remote task in a suite.
 
@@ -138,7 +121,7 @@ class CylcProcessor(SuiteEngineProcessor):
             return
         return (user, host)
 
-    def get_remote_auths(self, suite_name):
+    def get_tasks_auths(self, suite_name):
         """Return a list of unique user@host for remote tasks in a suite."""
         my_user = pwd.getpwuid(os.getuid())[0]
         my_host = socket.gethostname()

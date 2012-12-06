@@ -143,6 +143,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "force_mode",
                         "help": ("Force file installation " +
                                  "even if it may be unsafe.")}],
+               "full_mode": [
+                       ["--full", "-f"],
+                       {"action": "store_true",
+                        "dest": "full_mode",
+                        "help": ("Full update.")}],
                "format": [
                        ["--format", "-f"],
                        {"metavar": "FORMAT",
@@ -318,7 +323,7 @@ class RoseOptionParser(OptionParser):
                        ["--shutdown"],
                        {"action": "store_true",
                         "default": False,
-                        "help": "Trigger a suite shutdown."}],                                                  
+                        "help": "Trigger a suite shutdown."}],
                "sort": [
                        ["--sort", "-s"],
                        {"metavar": "FIELD",
