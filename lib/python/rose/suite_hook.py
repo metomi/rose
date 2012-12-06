@@ -24,7 +24,7 @@ from email.mime.text import MIMEText
 import os
 import pwd
 from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener
+from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
@@ -45,6 +45,7 @@ class RoseSuiteHook(object):
         self.suite_engine_proc = suite_engine_proc
         self.suite_log_view_generator = SuiteLogViewGenerator(
                 event_handler=event_handler,
+                popen=popen,
                 suite_engine_proc=suite_engine_proc)
 
     def handle_event(self, *args, **kwargs):
@@ -64,18 +65,12 @@ class RoseSuiteHook(object):
         4. If "should_shutdown", shut down the suite.
 
         """
-        task_log_dir, r_task_log_dir = self.suite_engine_proc.get_log_dirs(
-                suite, task)
-
         # Retrieve log
-        if task and r_task_log_dir:
-            cmd = self.popen.get_cmd(
-                    "rsync", r_task_log_dir + "/" + task + "*", task_log_dir)
-            self.popen(*cmd)
+        if task:
+            self.suite_log_view_generator.update_task_log(suite, [task])
 
         # Generate suite log view
-        suite_log_dir = os.path.dirname(task_log_dir)
-        self.suite_log_view_generator(suite_log_dir)
+        self.suite_log_view_generator(suite)
 
         # Send email notification if required
         if should_mail:

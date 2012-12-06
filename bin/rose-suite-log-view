@@ -21,10 +21,13 @@
 #     rose suite-log-view
 #
 # SYNOPSIS
-#     rose suite-log-view [OPTIONS] [SUITE]
+#     rose suite-log-view [OPTIONS] [SUITE [TASK ...]]
 #
 # DESCRIPTION
 #     Generate and browse the log view of SUITE.
+#
+#     If one or more TASK is specified, re-sync their logs if they are
+#     submitted remotely.
 #
 #     Analyse the suite log to generate a JSON file for feeding into an HTML
 #     based viewer. SUITE should be a valid suite name. If not defined, use
@@ -36,5 +39,7 @@
 # OPTIONS
 #     --no-web-browse
 #         Do not open a web browser to display the log view.
+#     --full, -f
+#         Re-sync all remote task logs, regardless of the TASK arguments.
 #-------------------------------------------------------------------------------
 exec python -m rose.suite_log_view "$@"
