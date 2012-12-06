@@ -34,6 +34,7 @@
     font-size: small;
     margin: 0.2em;
     padding: 0;
+    text-align: right;
 }
 #loading {
     float: right;
@@ -66,6 +67,21 @@
 }
 .highlight {
     background: yellow;
+}
+#view {
+    background: #eee;
+    border: thin solid #ccc;
+    bottom: 0em;
+    display: block;
+    font-size: small;
+    margin: 0;
+    opacity: 0.3;
+    padding: 0.1em;
+    position: fixed;
+    right: 0;
+}
+#view:hover {
+    opacity: 1;
 }
 </style>
 <script type="text/javascript" src="html-lib/jquery/jquery.min.js">
@@ -119,7 +135,16 @@ $(function() {
     };
     var suite = get_opt("suite");
     var path = get_opt("path");
+    var text_mode = get_opt("text_mode");
     var path_url = decodeURIComponent(path);
+    $("#view-raw").attr("href", encodeURIComponent(path_url));
+    var href = location.pathname + "?suite=" + suite + "&path=" + path
+    if (text_mode) {
+        $("#view-mode").attr("href", href).text("HTML mode");
+    }
+    else {
+        $("#view-mode").attr("href", href + "&text_mode=1").text("text mode");
+    }
     var title = path_url.substring(path_url.lastIndexOf("/") + 1);
     title = title.replace(/-\d+\.\d+\.?/, " ") + " - " + suite;
     document.title = title;
@@ -132,7 +157,12 @@ $(function() {
             alert(errortype + ": could not load \"" + path + "\"");
         },
         success: function(data) {
-            $("#lines").html(data.replace(/\n/g, "<br/>"));
+            if (text_mode) {
+                $("#lines").text(data);
+            }
+            else {
+                $("#lines").html(data.replace(/\n/g, "<br/>"));
+            }
             if (data.length < AUTO_ADD_THRESHOLD) {
                 line_numbers_add(data, 0);
             }
@@ -155,6 +185,11 @@ $(function() {
 <h1 id="heading"></h1>
 </div>
 <div id="body-main">
+<p id="view">
+<a id="view-mode" href="#">text mode</a>
+|
+<a id="view-raw" href="#">raw</a>
+</p>
 <pre id="line_numbers">
 </pre>
 <pre id="lines">
