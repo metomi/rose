@@ -123,13 +123,13 @@ MACRO_MENU_ALL_VALIDATORS = "All Validators"
 MACRO_MENU_ALL_VALIDATORS_TIP = "Run all available validator macros."
 VAR_MENU_ADD = '_Add to configuration'
 VAR_MENU_EDIT_COMMENTS = "Edit _comments"
+VAR_MENU_FIX_IGNORE = "Auto-Fix Error"
 VAR_MENU_ENABLE = '_Enable'
 VAR_MENU_HELP = '_Help'
-VAR_MENU_IGNORE = '_Ignore'
+VAR_MENU_IGNORE = '_User-Ignore'
 VAR_MENU_INFO = 'I_nfo'
 VAR_MENU_REMOVE = '_Remove'
 VAR_MENU_URL = '_Web Help'
-
 # Button strings
 LABEL_EDIT = "edit"
 
@@ -206,10 +206,14 @@ WARNING_NOT_FOUND = 'No results'
 WARNING_NOT_FOUND_TITLE = "Couldn't find it"
 WARNING_NOT_IGNORED = 'Should be ignored '
 WARNING_NOT_TRIGGER = 'Not part of the trigger mechanism'
+WARNING_USER_NOT_TRIGGER_IGNORED = 'User-ignored, but should be trigger-ignored'
 WARNING_NOT_USER_IGNORABLE = 'User-ignored, but is compulsory'
 WARNING_TYPE_ENABLED = 'enabled'
-WARNING_TYPE_IGNORED = 'ignored'
+WARNING_TYPE_TRIGGER_IGNORED = 'trigger-ignored'
+WARNING_TYPE_USER_IGNORED = 'user-ignored'
 WARNING_TYPE_NOT_TRIGGER = 'trigger'
+WARNING_TYPES_IGNORE = [WARNING_TYPE_ENABLED, WARNING_TYPE_TRIGGER_IGNORED,
+                        WARNING_TYPE_USER_IGNORED, WARNING_TYPE_NOT_TRIGGER]
 
 # Special metadata 'type' values
 FILE_TYPE_FORMATS = 'formats'
@@ -395,9 +399,9 @@ VAR_FLAG_TIP_FIXED = 'Fixed variable (only one allowed value)'
 VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
 VAR_MENU_TIP_ERROR = 'Error '
-VAR_MENU_TIP_IGNORED = 'Ignored because {0}'
 VAR_MENU_TIP_LATENT = 'This variable could be added to the configuration.'
 VAR_MENU_TIP_WARNING = 'Warning '
+VAR_MENU_TIP_FIX_IGNORE = "Auto-fix the variable's ignored state error"
 VAR_WIDGET_ENV_INFO = 'Set to environment variable'
 
 # Flags for variable widgets

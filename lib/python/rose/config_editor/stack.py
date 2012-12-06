@@ -139,11 +139,14 @@ class SectionOperations(object):
                                         section),
                         rose.config_editor.WARNING_CANNOT_IGNORE_TITLE)
                 return
-            if rose.config_editor.WARNING_TYPE_ENABLED in sect_data.error:
-                sect_data.ignored_reason.update(
-                                  {rose.variable.IGNORED_BY_SYSTEM:
-                                   rose.config_editor.IGNORED_STATUS_MANUAL})
-                sect_data.error.pop(rose.config_editor.WARNING_TYPE_ENABLED)
+            for error in [rose.config_editor.WARNING_TYPE_USER_IGNORED,
+                          rose.config_editor.WARNING_TYPE_ENABLED]:
+                if error in sect_data.error:
+                    sect_data.ignored_reason.update(
+                              {rose.variable.IGNORED_BY_SYSTEM:
+                               rose.config_editor.IGNORED_STATUS_MANUAL})
+                    sect_data.error.pop(error)
+                    break
             else:
                 sect_data.ignored_reason.update(
                                   {rose.variable.IGNORED_BY_USER:
@@ -152,8 +155,8 @@ class SectionOperations(object):
         else:
             # Enable request for this section.
             # The section must not be justifiably triggered ignored.
-            ign_errors = [rose.config_editor.WARNING_TYPE_NOT_TRIGGER,
-                          rose.config_editor.WARNING_TYPE_IGNORED]
+            ign_errors = [e for e in rose.config_editor.WARNING_TYPES_IGNORE
+                          if e != rose.config_editor.WARNING_TYPE_ENABLED]
             my_errors = sect_data.error.keys()
             if (not override and
                 rose.variable.IGNORED_BY_SYSTEM in sect_data.ignored_reason
@@ -200,7 +203,7 @@ class SectionOperations(object):
         for ns in nses_to_do:
             self.trigger_update(ns)
             self.trigger_info_update(ns)
-                
+
     def remove_section(self, config_name, section, no_update=False):
         """Remove a section from this configuration."""
         config_data = self.__data.config[config_name]
@@ -350,6 +353,40 @@ class VariableOperations(object):
         if not no_update:
             self.trigger_update(variable.metadata['full_ns'])
 
+    def fix_var_ignored(self, variable):
+        """Fix any variable ignore state errors."""
+        ignored_reasons = variable.ignored_reason.keys()
+        new_reason_dict = {}  # Enable, by default.
+        old_reason = variable.ignored_reason.copy()
+        if rose.variable.IGNORED_BY_SECTION in old_reason:
+            # Preserve section-ignored status.
+            new_reason.setdefault(
+                            rose.variable.IGNORED_BY_SECTION,
+                            old_reason[rose.variable.IGNORED_BY_SECTION])
+        if rose.variable.IGNORED_BY_SYSTEM in ignored_reasons:
+            # Doc table I_t
+            if rose.config_editor.WARNING_TYPE_ENABLED in variable.error:
+                # Enable new_reason_dict.
+                # Doc table I_t -> E
+                pass
+            if rose.config_editor.WARNING_TYPE_NOT_TRIGGER in variable.error:
+                pass
+        elif rose.variable.IGNORED_BY_USER in ignored_reasons:
+            # Doc table I_u
+            if rose.config_editor.WARNING_TYPE_USER_IGNORED in variable.error:
+                # Enable new_reason_dict.
+                # Doc table I_u -> I_t -> *,
+                #           I_u -> E -> compulsory,
+                #           I_u -> not trigger -> compulsory
+                pass
+        else:
+            # Doc table E
+            if rose.config_editor.WARNING_TYPE_ENABLED in variable.error:
+                # Doc table E -> I_t -> *
+                new_reason_dict = {rose.variable.IGNORED_BY_SYSTEM:
+                                   rose.config_editor.IGNORED_STATUS_MANUAL}
+        self.set_var_ignored(variable, new_reason_dict)
+                
     def set_var_ignored(self, variable, new_reason_dict=None, override=False):
         """Set the ignored flag data for the variable.
         
@@ -381,16 +418,6 @@ class VariableOperations(object):
             if rose.config_editor.WARNING_TYPE_NOT_TRIGGER in variable.error:
                 variable.error.pop(
                          rose.config_editor.WARNING_TYPE_NOT_TRIGGER)
-            if (rose.config_editor.WARNING_TYPE_IGNORED not in 
-                variable.error and self.check_cannot_enable_setting(
-                                config_name, variable.metadata['id'])):
-                rose.gtk.util.run_dialog(
-                         rose.gtk.util.DIALOG_TYPE_ERROR,
-                         rose.config_editor.WARNING_CANNOT_ENABLE.format(
-                                            variable.metadata['id']),
-                         rose.config_editor.WARNING_CANNOT_ENABLE_TITLE)
-                variable.ignored_reason = old_reason
-                return
         if len(variable.ignored_reason.keys()) > len(old_reason.keys()):
             action_text = rose.config_editor.STACK_ACTION_IGNORED
             if (not old_reason and
@@ -399,9 +426,9 @@ class VariableOperations(object):
         else:
             action_text = rose.config_editor.STACK_ACTION_ENABLED
             if len(variable.ignored_reason.keys()) == 0:
-                if rose.config_editor.WARNING_TYPE_IGNORED in variable.error:
-                    variable.error.pop(
-                                   rose.config_editor.WARNING_TYPE_IGNORED)
+                for err_type in rose.config_editor.WARNING_TYPES_IGNORE:
+                    if err_type in variable.error:
+                        variable.error.pop(err_type)
         copy_var = variable.copy()
         self.__undo_stack.append(StackItem(variable.metadata['full_ns'],
                                            action_text,

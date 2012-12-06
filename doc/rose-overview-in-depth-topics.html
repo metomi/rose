@@ -1,0 +1,656 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Overview: In Depth Topics</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.
+      <br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <table summary="header table" class="doc-toggle">
+      <tr>
+        <td>
+          <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+          Documentation</a></p>
+        </td>
+
+        <td>
+          <div class="layout">
+            <div id="currentSlide">
+              <!-- DO NOT EDIT -->
+            </div>
+
+            <div id="controls">
+              <!-- DO NOT EDIT -->
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="content"></div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Overview: In Depth Topics</h1>
+    </div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>What are we covering?</p>
+
+      <ul class="incremental">
+        <li>Suites, Applications, Metadata</li>
+
+        <li>rose config-edit</li>
+
+        <li>rose macro</li>
+
+        <li>rosie go</li>
+
+        <li>rosie CLI</li>
+
+        <li>Future of Rose</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Suites</h2>
+    </div>
+
+    <div class="slide">
+    <h3 class="alwayshidden">Suite Hierarchy</h3>
+
+    <div class="handout">
+      <p>The typical suite hierarchy looks a bit like this:</p>
+    </div><img height="50%" width="60%" src="rose-suite-hierarchy.png" alt=
+    "rose suite hierarchy" /></div>
+
+    <div class="slide">
+      <h3>Suite Files</h3>
+
+      <p>There are (only) about 5+1 different types of Rose INI-style
+      files:</p>
+
+      <ul class="incremental">
+        <li>rose-suite.info - discovery information</li>
+
+        <li>rose-suite.conf - suite settings</li>
+
+        <li>rose-app.conf - app settings</li>
+
+        <li>rose-meta.conf - metadata for suite and app settings</li>
+
+        <li>rose.conf - site and user configuration of Rose</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Files (cylc)</h3>
+
+      <ul class="incremental">
+        <li>suite.rc - cylc suite</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3>Format</h3>
+
+      <ul class="incremental">
+        <li>See <a href="rose-configuration.html#format">Configuration
+        Format</a>.</li>
+
+        <li>modified INI format:
+          <pre>
+[command]
+default = hello.exe
+
+[env]
+!!MAX_TARGETS = 5
+
+![namelist:hello]
+</pre>
+        </li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Format continued</h3>
+
+      <p><samp>!</samp> or <samp>!!</samp> in front of a section
+      (<samp>![env]</samp>, <samp>!![env]</samp>) or option
+      (<samp>!MAX_TARGETS</samp>, <samp>!!MAX_TARGETS</samp>) means it is
+      <em>ignored</em> and will not be output when the configuration is
+      run.</p>
+    </div>
+
+    <div class="slide">
+      <h3>rose-suite.info</h3>
+
+      <p>Discovery information about the suite:</p>
+      <pre>
+access-list=bob helen mary 
+issue-list=#2231 #4076
+owner=fred
+project=um
+title=Run XYZ for A, with improved B
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>rose-suite.conf</h3>
+
+      <p>Holds <a href="rose-configuration.html#suite">suite-specific</a>
+      settings (more in a <a href="rose-overview-suites.html">later part</a>
+      of the documentation):</p>
+      <pre>
+[jinja2:suite.rc]
+COMPUTE_HOST = mayanstonecircle
+END_TIME = 20121221
+
+[file:app/goodbye_world]
+source = fcm:hello_tr/standard_apps/goodbye_world@25678
+
+[file:etc/fcm_make.cfg]
+source = /project/hello/fcm_make/mayanpwr0.1/fcm_make.cfg
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>rose-app.conf</h3>
+
+      <p>This configures a specific <a href=
+      "rose-configuration.html#app">application</a> in the suite, which is
+      usually a scientific model:</p>
+      <pre>
+# Holds bash commands to run (e.g. 'rsync X/ Y/', 'run.exe')
+[command]
+# The usual command:
+default = throw_snowball.exe
+# A different command, run using the option --command-key=recon:
+recon = reconfigure_snowball.exe
+
+# Environment variables set before the command is run
+[env]
+MAX_TARGETS = 5
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose-app.conf continued</h3>
+      <pre>
+  
+# A file that we want to be constructed.
+[file:local_orography]
+# The file to create a symlink to.
+source = /project/snowball/ctldata/orog_devon
+# mode can also be auto (usually =copy), or mkdir for directories.
+mode = symlink
+
+# Another file - this time built from our namelist.
+[file:snow_nl]
+contents = namelist:run_snow
+
+# Our namelist
+[namelist:run_snow]
+snow_consistency = 'good'
+slush_fraction = 0.1
+care_about_shape = .false.
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>rose-meta.conf</h3>
+
+      <p>This provides <a href="rose-configuration#meta">metadata</a> for a
+      configuration, and is used to drive the config editor GUI.</p>
+      <pre>
+[namelist:run_snow]
+help = This section holds options for configuring the snow
+     = retrieval dynamics.
+
+[namelist:run_snow=snow_consistency]
+title = Snow Consistency
+values = 'too dry', 'too icy', 'good'
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose-meta.conf continued</h3>
+      <pre>
+[namelist:run_snow=slush_fraction]
+description = This specifies the maximum acceptable mass
+ fraction of slush.
+title = Slush Fraction
+
+[namelist:run_snow=care_about_shape]
+help = If .true., we'll attempt to make the snowball
+     = like this:
+     = http://mrhonner.files.wordpress.com/2011/01/snowball-1.jpg
+     =
+     = Otherwise, it'll just be a heap.
+type = logical
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>rose.conf</h3>
+
+      <p>This is the <a href="rose-configuration.html#site">site/user</a>
+      configuration file, that controls how Rose tools behave.</p>
+
+      <p>An example site configuration snippet, and a user one:</p>
+      <pre>
+[rose-suite-run]
+hosts = localhost
+num-ping-try-max = 10
+</pre><br />
+      <pre>
+[rose-config-edit]
+should-show-ignored = True
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>suite.rc</h3>
+
+      <p>This is the cylc configuration file - we'll discuss it properly in a
+      <a href="rose-overview-suites.html">later part</a> of the documentation.
+      </p>
+      <pre>
+#!jinja2
+[scheduling]
+    [[dependencies]]
+        graph = """
+                tea_start =&gt; boil_kettle &amp; get_teabag &amp; \
+                             get_milk
+                boil_kettle &amp; get_teabag =&gt; pour_kettle
+                get_milk =&gt; pour_milk
+                pour_kettle &amp; pour_milk =&gt; stir
+                """
+...
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Running Suites</h3>
+
+      <p>Once you have a suite, you can run it on the command line by invoking
+      <kbd>rose suite-run</kbd> in the top-level suite directory. You can see
+      the available options by typing <kbd>rose help suite-run</kbd>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose suite-run options</h3>
+
+      <p>Some useful options for <kbd>rose suite-run</kbd> are:</p>
+
+      <ul class="incremental">
+        <li><kbd>rose suite-run -N alternate_suite_name</kbd>: run with a
+        different suite name, in a different output directory.</li>
+
+        <li><kbd>rose suite-run -C /path/to/suite</kbd>: run a suite in a
+        different directory than <samp>$PWD</samp>.</li>
+
+        <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>: run with a
+        different <samp>[jinja2:suite.rc]</samp> option setting.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose suite-run options (continued)</h3>
+
+      <ul class="incremental">
+        <li><kbd>rose suite-run --install-only</kbd>: construct all
+        rose-suite.conf files, but do not run</li>
+
+        <li><kbd>rose suite-run -- --mode=simulation</kbd>: (<kbd>cylc
+        run</kbd>option) execute all tasks/apps as 'sleep 10'.</li>
+
+        <li><kbd>rose suite-run -- --hold</kbd>: hold suite on startup</li>
+
+        <li><kbd>rose suite-run -v -v --debug</kbd>: debug/get more info</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Configuration Metadata</h2>
+
+      <p>Metadata for rose-suite.conf and rose-app.conf settings) can be
+      <a href="rose-configuration.html#meta">pointed to</a> by:</p>
+
+      <ul class="incremental">
+        <li>Having a <samp>meta/</samp> directory in a suite or an
+        application.</li>
+
+        <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
+
+        <li>The content of the <var>ROSE_META_PATH</var> environment
+        variable.</li>
+
+        <li>The <samp>meta-path</samp> setting in <a href=
+        "rose-configuration.html#site">site/user</a> configurations.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Configuration Metadata continued</h3>
+
+      <p>Metadata from (usually) subdirectories in the <samp>rose-meta</samp>
+      directory in a a project's source tree is stored at a central Rose
+      location - this is pointed to by the site configuration
+      <samp>meta-path</samp> option.</p>
+
+      <p>You can check out a branch of a project, change its metadata, and test
+      it by pointing <samp>meta-path</samp> at it (e.g. by running <code>rose
+      config-edit --meta-path=$HOME/branch/rose-meta</code>).</p>
+    </div>
+
+    <div class="slide">
+      <h2>Configuration Metadata - but fancier</h2>
+
+      <p>The <a href="rose-conf-meta-dev.html">Metadata Development Guide</a>
+      covered fundamental metadata usage - there is quite a lot more!</p>
+
+      <ul class="incremental">
+        <li>Logical expression syntax</li>
+
+        <li>More metadata options</li>
+
+        <li>Macros</li>
+
+        <li>Widgets</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3>Logical expression syntax</h3>
+
+      <p>There is a logical expression syntax for several metadata options.
+      Here are some examples:</p>
+      <pre>
+[namelist:run_snow=min_temp_water_supercool]
+range = this &gt; -48.3
+</pre><br />
+      <pre>
+[namelist:run_snow=slush_fraction]
+trigger = namelist:run_snow=max_num_slushballs: this &gt; 0.5
+</pre><br />
+      <pre>
+[namelist:run_snow=ice_fraction]
+warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
+</pre>
+    </div>
+
+    <div class="slide">
+      <h4 class="alwayshidden">Configuration Metadata - logic syntax</h4>
+
+      <p>More about the syntax:</p>
+
+      <ul class="incremental">
+        <li>It's vaguely Pythonic (actually <a href=
+        "http://jinja.pocoo.org/docs/templates/#tests">jinja2</a>)</li>
+
+        <li>You can refer to variables by id (e.g.
+        <samp>namelist:run_snow=max_ok_ice_fraction</samp>) and using
+        <samp>this</samp>.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h4 class="alwayshidden">Configuration Metadata - logic syntax
+      arrays</h4>
+
+      <p>The syntax also has array element support via bracketed indicies (e.g.
+      <samp>this(2)</samp> or
+      <samp>namelist:run_snow=monthly_snowfall(12)</samp>).</p>
+
+      <p>There are <code>any</code> and <code>all</code> functions (e.g.
+      <samp>any(namelist:run_snow=monthly_snowfall) &gt; 10</samp>).</p>
+    </div>
+
+    <div class="slide">
+      <h3>More Metadata Options</h3>
+
+      <p>See <a href="rose-configuration.html#meta.conf">Metadata
+      Reference</a>.</p>
+
+      <dl>
+        <dt><code>compulsory</code></dt>
+
+        <dd>The most controversial metadata option! Setting it to
+        <code>true</code> means that the setting should always be in the
+        configuration, ignored or not.</dd>
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">More Metadata Options - duplicate</h3>
+
+      <dl>
+        <dt><code>duplicate</code></dt>
+
+        <dd>Allow duplicated copies of the setting. This is used for sections
+        where there may be more than one with the same metadata - for example
+        multiple namelist groups of the same name.</dd>
+
+        <dt><code>sort-key</code></dt>
+
+        <dd>Used to order and group pages and variables in the config
+        editor.</dd>
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">More Metadata Options - warn-if/fail-if</h3>
+
+      <dl>
+        <dt><code>warn-if</code>, <code>fail-if</code></dt>
+
+        <dd>
+          These use the full logical syntax we just looked at. Unlike
+          <code>range</code> and <code>trigger</code>, they can use other
+          variable ids. This makes them slow, so they are only run on request
+          (config editor validate button/menu, rose macro).
+          <code>fail-if</code> will cause an error if the expression evaluates
+          true. <code>warn-if</code> is the same, but will flag up a warning
+          instead of an error. For example:
+          <pre>
+fail-if = any(namelist:test=ctrl_array % this == 0)
+</pre>
+        </dd>
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">More Metadata Options - widget</h3>
+
+      <dl>
+        <dt><code>widget</code></dt>
+
+        <dd>Used to set a custom or different built-in widget for the setting
+        (in the config editor).</dd>
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3>Macros</h3>
+
+      <p>Macros are written in Python and live with metadata under
+      <samp>lib/python/macros</samp>. There are three categories:</p>
+
+      <ul class="incremental">
+        <li><code>Validator</code> macros - <em>checking</em> macros that can
+        flag errors in your application configurations. Only used when metadata
+        is not enough.</li>
+
+        <li><code>Transformer</code> macros - <em>changing macros</em> that
+        alter your application configurations. These are useful when applying a
+        change that affects many settings - for example, a change in resolution
+        or domain.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h4 class="alwayshidden">Macros continued</h4>
+
+      <ul>
+        <li><code>Upgrade</code> macros - upgrade or downgrade application
+        configurations</li>
+      </ul>
+
+      <p>You can find out how to write macros in the <a href=
+      "rose-api.html#macro">API</a> documentation (includes a tutorial).</p>
+    </div>
+
+    <div class="slide">
+    <h3>Widgets</h3>
+
+    <p>You can replace widgets in the config editor with your own. These live
+    with metadata under <samp>lib/python/widget/</samp>. For more details, see
+    the <a href="rose-api.html#gtk">API</a> documentation (this also includes a
+    tutorial).</p>
+
+    <h3>Icons!</h3>
+
+    <p>You can set an icon in the metadata that is used in the config editor to
+    distinguish configurations: put a file <samp>etc/icon.png</samp> in the
+    metadata directory.</p><img alt="Rose Icon" src="rose-icon.png" /></div>
+
+    <div class="slide">
+      <h2>The Config Editor</h2>
+
+      <p>The config editor is the suite/application editor GUI.</p>
+
+      <p>Demo! If viewing offline, see the <a href=
+      "rose-config-edit.html">Config Editor Guide</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h2>rose macro</h2>
+
+      <p>This is the CLI equivalent (together with a text editor) of the config
+      editor. It applies Rose built-in macros to applications, plus any custom
+      macros defined in the metadata.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose macro examples</h3>
+
+      <p>Running <code>rose macro -a -V</code> in an application directory will
+      check against <em>all</em> (<code>-a</code>) built-in and custom
+      <em>validator</em> (<code>-V</code>) macros.</p>
+
+      <p>Running <code>rose macro rose.macros.DefaultTransforms</code> will
+      make Rose run the built-in transformer macros to fix your
+      application.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose macro examples (continued)</h3>
+
+      <p>Running <code>rose macro MY_MACRO</code> will run a macro called
+      <code>MY_MACRO</code>. In an example app in the rose distribution:</p>
+      <pre class="shell">
+rose macro fib.FibonnaciChecker
+</pre>
+
+      <p>produces:</p>
+      <pre>
+[V] fib.FibonacciChecker: issues: 1
+    env=INVALID_SEQUENCE=1, 1, 2, 3, 5, 8, 14
+        not the Fibonacci sequence
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2>Rosie Go</h2>
+
+      <p><code>rosie go</code> is the suite manager GUI. It acts as a hub for
+      all your suite work.</p>
+
+      <p>Demo! If viewing offline, see the <a href="rosie-go.html">Rosie Go
+      Guide</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h2>rosie lookup</h2>
+
+      <p><code>rosie lookup</code> queries the Rosie database (through a web
+      API) to find suites. For example, running:</p>
+      <pre class="shell">
+rosie lookup bob test
+</pre>
+
+      <p>would basically return all suites that had "bob" and "test" in their
+      <samp>rose-suite.info</samp> files. You can also run more targeted
+      queries such as:</p>
+      <pre class="shell">
+rosie lookup -Q owner eq bob and title contains test
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2>rosie ls</h2>
+
+      <p><code>rosie ls</code> lists the suites currently checked out in a
+      user's <code>roses</code> directory.</p>
+    </div>
+
+    <div class="slide">
+      <h2>Future of Rose</h2>
+
+      <ul class="incremental">
+        <li>More work for us</li>
+
+        <li>More work for you</li>
+
+        <li>More fun for all</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Suite Usage/Design</h2>
+
+      <p>See <a href="rose-overview-suites.html">Suites Overview</a>.</p>
+    </div>
+  </div>
+</body>
+</html>

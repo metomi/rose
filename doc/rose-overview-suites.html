@@ -1,0 +1,899 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Overview: Suites</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.
+      <br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <table summary="header table" class="doc-toggle">
+      <tr>
+        <td>
+          <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+          Documentation</a></p>
+        </td>
+
+        <td>
+          <div class="layout">
+            <div id="currentSlide">
+              <!-- DO NOT EDIT -->
+            </div>
+
+            <div id="controls">
+              <!-- DO NOT EDIT -->
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="content"></div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Overview: Suites</h1>
+    </div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>What is this?</p>
+
+      <ul class="incremental">
+        <li>This is guide material for developing and using Rose suites
+        under cylc.</li>
+
+        <li>A Rose suite is a collection of scientific task configurations (or
+        'applications') with a <q>common purpose</q><!-- (Hilary) -->.</li>
+
+        <li>cylc is a suite engine that drives task submission and
+        monitoring.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3>That's too abstract - what's cylc again?</h3>
+
+      <ul class="incremental">
+        <li>cylc makes your Rose stuff happen.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">What does this cover?</h3>
+
+      <p>What does this cover?</p>
+
+      <ul class="incremental">
+        <li>cylc background and philosophy</li>
+
+        <li>cylc basic usage</li>
+
+        <li>cylc capabilities</li>
+
+        <li>basic suite design</li>
+
+        <li>cylc gcontrol</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">What does this part cover? continued</h3>
+
+      <ul class="incremental">
+        <li>Rose output viewer</li>
+
+        <li>Where things go when suites are run</li>
+
+        <li>Utilities - <kbd>fcm make</kbd>, housekeeping, <kbd>rose
+        ana</kbd>...</li>
+
+        <li>In Depth Usage</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3>Disclaimer</h3>
+
+      <p>The best reference for cylc is the <a href=
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc User Guide</a> -
+      some of the following images are taken from there.</p>
+    </div>
+
+    <div class="slide">
+    <h2 id="background">Background</h2><img src=
+    "http://dvice.com/pics/Battlestar-Galactica-lifesize-Cylon.jpg" alt=
+    "cylc gcontrol" /></div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Background - NIWA</h3>
+
+      <p>cylc was originally developed by <a href=
+      "https://github.com/hjoliver">Hilary Oliver</a> at <a href=
+      "http://www.niwa.co.nz/">NIWA</a>. It runs their <a href=
+      "http://ecoconnect.niwa.co.nz/">EcoConnect</a> operational
+      suite.</p><img src=
+      "http://cylc.github.com/cylc/single/images/niwa-colour-small.png" alt=
+      "NIWA logo" />
+
+      <p>cylc was developed to provide a fast, automated way of scheduling
+      tasks so that a suite could <em>catch up</em> after outages.</p>
+    </div>
+
+    <div class="slide">
+    <h3>Background - ECOX</h3><img src=
+    "http://www.niwa.co.nz/sites/default/files/imagecache/PhotoGallery_ImageNodeFull/images/ecox-suite.png"
+    alt="ECOX" width="80%" /></div>
+
+    <div class="slide">
+      <h3>Background - current</h3>
+
+      <p>cylc is now a collaborative effort, involving the Met Office.</p>
+
+      <p>cylc is written in <a href="www.python.org">Python</a> and uses
+      <a href="www.pygtk.org">PyGTK</a> for its GUIs. It is open source and
+      licensed under <a href="http://www.gnu.org/licenses/gpl.html">GPL
+      v3</a>.</p>
+
+      <p>cylc lives on <a href="http://github.com/cylc/">github</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3>The cylc scheduling algorithm</h3>
+
+      <p>Scheduling - making sure tasks run in the correct order, at the
+      correct time - is the core purpose of cylc. The <a href=
+      "http://cylc.github.com/cylc/cug-htmlsu3.html">cylc scheduling
+      algorithm</a> is very simple, and very powerful:</p>
+
+      <ul class="incremental">
+        <li>Every task has input and output dependencies.</li>
+
+        <li>Each task checks the others to see if its inputs are satisfied - if
+        so, it runs.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+    <h3 class="alwayshidden">single cycle</h3>
+
+    <p>Task dependencies - single cycle</p><img src=
+    "http://cylc.github.com/cylc/single/images/dep-one-cycle.png" width="40%"
+    alt="single cycle dependencies" /></div>
+
+    <div class="slide">
+    <h3 class="alwayshidden">scheduling cycling tasks</h3>
+
+    <p>Most meteorological suites repeat over time (cycling):</p><img src=
+    "http://cylc.github.com/cylc/images/dep-multi-cycle.png" width="40%" alt=
+    "multi-cycle dependencies" /></div>
+
+    <div class="slide">
+    <h3 class="alwayshidden">cylc task pool</h3>
+
+    <p>How cylc sees task dependencies:</p><img src=
+    "http://cylc.github.com/cylc/single/images/task-pool.png" width="40%" alt=
+    "cylc task pool" /></div>
+
+    <div class="slide">
+    <h3 class="alwayshidden">A cycle isn't a prison</h3>
+
+    <p>A cycle isn't a prison - if tasks can run ahead of their cycle time,
+    they should:</p><img src=
+    "http://cylc.github.com/cylc/images/timeline-two.png" width="50%" alt=
+    "optimal task scheduling" /></div>
+
+    <div class="slide">
+      <h3>The suite.rc file</h3>
+
+      <p>cylc has a single file to configure the suite, the
+      <samp>suite.rc</samp> file. It configures:</p>
+
+      <ul class="incremental">
+        <li>Task dependencies, including times and dates</li>
+
+        <li>Task environment</li>
+
+        <li>Task scripting</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3>Hello World cylc suite</h3>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = """hello_world"""
+[runtime]
+    [[hello_world]]
+        command scripting = "echo 'Hello World'"
+</pre>
+
+      <p>This will run a cylc task called <samp>hello_world</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Hello World Rose suite</h3>
+
+      <p>Tasks are generic - they can be Rose applications, or generic commands
+      as above.</p>
+
+      <p>If we wanted to invoke a Rose application, we'd make an app called
+      <samp>hello_world</samp>, by making an <samp>app/hello_world</samp>
+      directory and creating a <samp>rose-app.conf</samp> file in there with
+      this content:</p>
+      <pre>
+[command]
+default = echo 'Hello World'
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Hello World rose task-run example</h3>
+
+      <p>We now have to change the <samp>[runtime]</samp> section to:</p>
+      <pre>
+[runtime]
+    [[hello_world]]
+        command scripting = "rose task-run"
+</pre>
+
+      <p><code>rose task-run</code> uses environment variables passed in by
+      cylc (like <var>CYLC_TASK_NAME</var>) to figure out which Rose
+      application to run. In this case, it'll be
+      <samp>app/hello_world</samp></p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Hello World rose task-run</h3>
+
+      <p><code>rose task-run</code> is reasonably generic, so we can put it as
+      the suite default (<samp>[[root]]</samp>)<samp>command scripting</samp>
+      by writing:</p>
+      <pre>
+[runtime]
+    [[root]]
+        command scripting = "rose task-run"
+</pre>
+
+      <p><samp>[[root]]</samp> contains default settings that all cylc tasks
+      inherit from. It is a special case of a cylc <code>family</code>.
+      Families contain shared settings for one or more tasks.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Families</h3>
+
+      <p>If we had two or more similar applications, we would use a proper cylc
+      family to hold shared settings.</p>
+
+      <p>Families can be used to reduce duplication between tasks.</p>
+
+      <p>Overriding family settings is possible.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Families example</h3>
+
+      <p>Here is a <samp>suite.rc</samp> <samp>[runtime]</samp> section snippet
+      for a suite with two similar applications, <samp>hello_eris</samp> and
+      <samp>hello_pluto</samp></p>
+      <pre>
+[runtime]
+    [[root]]
+        command scripting = "rose task-run"
+    [[FAM_HELLO]]
+        [[[environment]]]
+            IS_WORLD_A_PLANET = false # Shared env variable
+    [[hello_eris]]
+        inherit = FAM_HELLO
+    [[hello_pluto]]
+        inherit = FAM_HELLO
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Families and overrides</h3>
+
+      <p>Overriding family settings can be done under a task section:</p>
+      <pre>
+[runtime]
+    [[root]]
+        command scripting = "rose task-run"
+    [[FAM_HELLO]]
+        [[[environment]]]
+            IS_WORLD_A_PLANET = false  # Shared env variable
+    [[hello_eris]]
+        inherit = FAM_HELLO
+    [[hello_pluto]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            IS_WORLD_A_PLANET = true  # Not really.
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Shared Applications</h3>
+
+      <p>We've decided we don't need two Rose applications,
+      <samp>app/hello_eris</samp> and <samp>app/hello_pluto</samp> - the only
+      difference in the app configurations is the <var>WORLD</var> environment
+      variable.</p>
+
+      <p>We can use a single application, <samp>app/hello_world</samp>, but
+      keep our two tasks by using <var>ROSE_TASK_APP</var>. <code>rose
+      task-run</code> will read this environment variable value and use it to
+      run the Rose app. We can put the <var>WORLD</var> environment variable in
+      the <samp>suite.rc</samp> file.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Shared Applications example</h3>
+      <pre>
+[runtime]
+    [[root]]
+        command scripting = "rose task-run"
+    [[FAM_HELLO]]
+        [[[environment]]]
+            IS_WORLD_A_PLANET = false  # Shared env variable
+            ROSE_TASK_APP = hello_world
+    [[hello_eris]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Eris
+    [[hello_pluto]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Pluto
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Dependencies</h3>
+
+      <p>We haven't looked at the <samp>[scheduling]</samp> part of the
+      suite.rc yet.</p>
+
+      <p>Let's say <samp>hello_pluto</samp> must run and succeed before
+      <samp>hello_eris</samp>. We can put this in our
+      <samp>suite.rc</samp>:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "hello_pluto =&gt; hello_eris"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Cycling Dependencies</h3>
+
+      <p>We can make this run as a cycling suite, repeating every 12 hours:</p>
+      <pre>
+[scheduling]
+    initial cycle time = 2013010500  # 00:00, 5/1/2013
+    final cycle time = 2013010600    # 00:00, 6/1/2013
+    [[dependencies]]
+        [[[0, 12]]]  # run each day at 00:00 and 12:00
+            graph = "hello_pluto =&gt; hello_eris"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Remote hosts</h3>
+
+      <p>So far, both tasks run on the localhost - it is usually better to farm
+      off tasks to a remote host like a compute server or a
+      cluster/supercomputer.</p>
+
+      <p>You can set <samp>hello_eris</samp> to run on a given host by setting
+      <samp>[[remote]]</samp> section settings:</p>
+      <pre>
+    [[hello_eris]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Eris
+        [[[remote]]]
+            host = voyager_1
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Jinja2</h3>
+
+      <p>If we had a lot of tasks using this setting, it might become quite
+      duplicated across the <samp>suite.rc</samp> file. cylc supports the use
+      of a templating language, <a href="http://jinja.pocoo.org">Jinja2</a>, to
+      reduce duplication and provide some simple logic.</p>
+
+      <p>We can then write:</p>
+      <pre>
+    [[hello_eris]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Eris
+        [[[remote]]]
+            host = {{ COMPUTE_HOST }}
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Jinja2 shebang</h3>
+
+      <p>We'll also need to add a <samp>#!jinja2</samp> shebang to the top of
+      the suite.rc file.</p>
+    </div>
+
+    <div class="slide">
+      <h3>rose-suite.conf</h3>
+
+      <p>We can then store the value of <var>COMPUTE_HOST</var> in a central
+      location, the <samp>rose-suite.conf</samp> file:</p>
+      <pre>
+[jinja2:suite.rc]
+COMPUTE_HOST = "voyager_1"
+</pre>
+
+      <p>Rose will pass in this variable to cylc at runtime, which will fill in
+      the Jinja2 template.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Event hooks</h3>
+
+      <p>We also need to add some standard Rose <em>event hooks</em> to
+      construct the Rose output viewer (more later) and report or shutdown on
+      failure:</p>
+      <pre>
+[cylc]
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+</pre>
+
+      <p>Here, when a suite times out, the user will receive an email
+      (<kbd>--mail</kbd>) and the suite will shutdown
+      (<kbd>--shutdown</kbd>).</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Hello World event hooks (continued)</h3>
+
+      <p>We also need to add:</p>
+      <pre>
+[runtime]
+    [[root]]
+        command scripting = "rose task-run --verbose"
+        [[[event hooks]]]
+           succeeded handler = "rose suite-hook"
+           failed handler = "rose suite-hook --shutdown"
+           submission failed handler = "rose suite-hook --shutdown"
+           submission timeout handler = "rose suite-hook --mail"
+           execution timeout handler = "rose suite-hook --mail"
+           submission timeout = 1440 # 24 hours
+           execution timeout  =  180 # 3 hours
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Hello World Suite</h3>
+
+      <p>Our suite now looks like <a href=
+      "../etc/rose-overview-suites/suite.rc">this</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Dependency syntax</h3>
+
+      <p>Let's look at the syntax for configuring task dependencies.</p>
+
+      <p>To run a single task, A:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "A"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Dependency syntax A =&gt; B</h3>
+
+      <p>If task B depends on task A's output to run:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "A =&gt; B"
+</pre>
+
+      <p>If task C depends on both task A <em>and</em> task B:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "A &amp; B =&gt; C"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Dependency syntax A | B</h3>
+
+      <p>If task C depends on <em>either</em> task A <em>or</em> task B:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "A | B =&gt; C"
+</pre>
+
+      <p>If <em>both</em> task B <em>and</em> task C depend on task A:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "A =&gt; B &amp; C"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Dependency syntax B &amp; C</h3>
+
+      <p>If task B only runs when task A fails:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "A:fail =&gt; B"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Dependency Reference</h3>
+
+      <p>Full details of dependency configuration are in the <a href=
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc user guide</a>,
+      including:</p>
+
+      <ul class="incremental">
+        <li>family triggers - triggers based on groups</li>
+
+        <li>message triggers - triggers based on task output</li>
+
+        <li>suicide triggers - triggers that remove tasks</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3>Changing existing suites</h3>
+
+      <p>We'll use the example of the brief tour <a href=
+      "etc/rose-rug-brief-tour/suite.rc">suite.rc</a>.</p>
+
+      <p>How to change the initial and final cycle times:</p>
+      <pre>
+[scheduling]
+    initial cycle time = 2013010500  # CHANGE HERE
+    final cycle time = 2013010600    # CHANGE HERE
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Changing existing suites - changing hourly
+      times</h3>
+
+      <p>We'll use the example of the brief tour <a href=
+      "etc/rose-rug-brief-tour/suite.rc">suite.rc</a>.</p>
+
+      <p>How to change the hours during which a task runs:</p>
+      <pre>
+[scheduling]
+    initial cycle time = 2013010500
+    final cycle time = 2013010600
+    [[dependencies]]
+        [[[0, 12]]]  # CHANGE HERE
+            graph = "hello_pluto =&gt; hello_eris"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Changing existing suites - adding tasks</h3>
+
+      <p>How to add a task:</p>
+
+      <p>Configure its dependencies in the <samp>scheduling</samp> section:</p>
+      <pre>
+    [[dependencies]]
+        [[[0, 12]]]
+            graph = "hello_pluto =&gt; hello_eris &amp; hello_makemake"
+</pre>
+
+      <p>Configure any runtime for the new task (if needed):</p>
+      <pre>
+[runtime]
+    [[makemake]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Makemake
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3>Environment</h3>
+
+      <p>There are some useful environment variables that you can use in your
+      <samp>suite.rc</samp> file and Rose applications:</p>
+
+      <ul class="incremental">
+        <li><var>ROSE_SUITE_DIR</var>, root directory of the running
+        suite.</li>
+
+        <li><var>ROSE_TASK_NAME</var>, name of the suite task.</li>
+
+        <li><var>ROSE_DATA</var>, data directory of the suite.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Environment continued</h3>
+
+      <ul class="incremental">
+        <li><var>ROSE_DATAC</var>, data directory for tasks in this cycle
+        time.</li>
+
+        <li><var>ROSE_ETC</var>, etc directory of the running suite.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Environment reference</h3>
+
+      <p>For more, see <a href="rose-command.html##rose-task-env">rose
+      task-env</a> and the <a href=
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc
+      documentation</a>. Note: only use cylc environment variables in your
+      suite.rc file.</p>
+    </div>
+
+    <div class="slide">
+      <h3>cylc capabilities</h3>
+
+      <p>cylc has some nice capabilities:</p>
+
+      <ul class="incremental">
+        <li>inserting tasks at runtime</li>
+
+        <li>spawning tasks on-demand (asynchronous tasks)</li>
+
+        <li>limiting the number of tasks in a family running at any one time
+        (queues)</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">cylc capabilities (continued)</h3>
+
+      <ul class="incremental">
+        <li>automatically resubmitting failed tasks, optionally with different
+        environments or commands (retries)</li>
+
+        <li>giving manual control over the status of tasks</li>
+
+        <li>restarting suites</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="design">Suite Design</h2>
+
+      <p>See <a href=
+      "http://cylc.github.com/cylc/cug-htmlse14.html#x78-15300014">cylc suite
+      design principles</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Good Practice</h3><img class="r-floater" src=
+      "http://upload.wikimedia.org/wikipedia/en/0/0b/Ben_Kenobi.jpg" alt=
+      "Ben Kenobi" /><br />
+
+      <ul class="incremental">
+        <li>Having read the cylc and Rose documentation <em>before writing the
+        suite</em></li>
+
+        <li>Families</li>
+
+        <li>Condensing repeated settings or blocks with Jinja-2</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Good Practice (continued)</h3>
+
+      <ul class="incremental">
+        <li>Single, well-commented suite.rc file</li>
+
+        <li>Tasks = logical units</li>
+
+        <li>Using Rose standard environments, utilities, standard suite
+        templates</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3>Bad practice</h3><img class="r-floater" src=
+      "http://www.eyeonstarwars.com/trilogy/character/images/emperor2.jpg" alt=
+      "Emperor Palpatine" />
+
+      <ul class="incremental">
+        <li>Skipping the cylc and Rose documentation</li>
+
+        <li>Repeated runtime settings</li>
+
+        <li>Obfuscating the suite.rc with Jinja2</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Bad practice (continued)</h3>
+
+      <ul class="incremental">
+        <li>Using include files</li>
+
+        <li>Magical, black box tasks</li>
+
+        <li>Reinventing the (Rose) wheel</li>
+      </ul>
+    </div>
+
+    <div class="handout">
+      <br />
+      <br />
+      <br />
+    </div>
+
+    <div class="slide">
+      <h2 id="suite.rc">Standard suite contents</h2>
+
+      <p>A Rose suite should definitely contain the following lines:</p>
+      <pre>
+[cylc]
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 class="alwayshidden">Standard suite contents continued</h2>
+
+      <p>It <em>should</em> also contain these (or similar):</p>
+      <pre>
+    [[root]]
+        command scripting = "rose task-run --verbose"
+        [[[event hooks]]]
+           succeeded handler = "rose suite-hook"
+           failed handler = "rose suite-hook --shutdown"
+           submission failed handler = "rose suite-hook --shutdown"
+           submission timeout handler = "rose suite-hook --mail"
+           execution timeout handler = "rose suite-hook --mail"
+           submission timeout = 1440 # 24 hours
+           execution timeout  =  180 # 3 hours
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="gcontrol">cylc gcontrol</h2>
+
+      <ul class="incremental">
+        <li>Usually launched by <code>rose suite-run</code> or using <code>rose
+        suite-gcontrol</code>.</li>
+
+        <li>Three views - <a href=
+        "http://cylc.github.com/cylc/single/screenshots/control2.png">graph</a>,
+        <a href=
+        "http://cylc.github.com/cylc/single/screenshots/control1.png">dot</a>
+        (square now!), <a href=
+        "http://cylc.github.com/cylc/single/screenshots/control1.png">tree</a></li>
+
+        <li>Easy stop/start interface</li>
+
+        <li>Get task output,error,state</li>
+
+        <li>Manual trigger/reset of tasks</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="output">rose output viewer</h2>
+
+      <ul class="incremental">
+        <li>Stores suite output and presents it as web pages - view using
+        <code>rose suite-log-view</code>.</li>
+
+        <li>Index web page is at
+        <samp>$HOME/cylc-run/SUITE_NAME/log/index.html</samp>.</li>
+
+        <li>Usually generated by <code>rose suite-hook</code>.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="share">Suite share/work directories</h2>
+
+      <ul class="incremental">
+        <li>Usually symbolic links to a data directory.</li>
+
+        <li><samp>share</samp> usually contains builds and task output
+        files.</li>
+
+        <li><samp>work</samp> contains task <q>working</q> directories, e.g.
+        containing Rose application namelists and
+        <samp>rose-app-run.conf</samp></li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="utils">Suite Utilities</h2>
+
+      <ul class="incremental">
+        <li><kbd>fcm make</kbd> - invoked using a Rose application beginning
+        with <samp>fcm_make</samp>, with an <samp>fcm-make.cfg</samp> under the
+        <samp>file</samp> directory.</li>
+
+        <li><kbd>rose ana</kbd> - a Rose analysis engine, for comparing
+        output</li>
+
+        <li>Rose install/housekeeping</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="indepth">In Depth Usage</h2>
+
+      <p>Demo!</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="independent">Independent Learning</h2>
+
+      <ul class="incremental">
+        <li>Go through the <a href="rose-suite-from-scratch.html">Suites from
+        Scratch</a> guide.</li>
+
+        <li>Look at some example cylc functionality in <a href=
+        "../etc/rose-rug-suite-tour/">Rose Example Suites</a>.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

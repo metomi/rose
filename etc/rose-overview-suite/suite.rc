@@ -1,0 +1,36 @@
+#!jinja2
+[cylc]
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+[scheduling]
+    initial cycle time = 2013010500  # 00:00, 5/1/2013
+    final cycle time = 2013010600    # 00:00, 6/1/2013
+    [[dependencies]]
+        [[[0, 12]]]  # run each day at 00:00 and 12:00
+            graph = "hello_pluto => hello_eris"
+[runtime]
+    [[root]]
+        command scripting = "rose task-run"
+        [[[event hooks]]]
+           succeeded handler = "rose suite-hook"
+           failed handler = "rose suite-hook --shutdown"
+           submission failed handler = "rose suite-hook --shutdown"
+           submission timeout handler = "rose suite-hook --mail"
+           execution timeout handler = "rose suite-hook --mail"
+           submission timeout = 1440 # 24 hours
+           execution timeout  =  180 # 3 hours        
+    [[FAM_HELLO]]
+        [[[environment]]]
+            IS_WORLD_A_PLANET = false  # Shared env variable
+            ROSE_TASK_APP = hello_world
+    [[hello_eris]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Eris
+        [[[remote]]]
+            host = {{ COMPUTE_HOST }}
+    [[hello_pluto]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Pluto
