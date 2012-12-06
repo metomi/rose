@@ -466,16 +466,23 @@ def get_metadata_for_config_id(setting_id, meta_config):
     search_id = REC_ID_STRIP_DUPL.sub("", setting_id)
     no_modifier_id = REC_MODIFIER.sub("", search_id)
     if no_modifier_id != search_id:
+        # There is a modifier e.g. namelist:foo{bar}.
         node = meta_config.get([no_modifier_id], no_ignore=True)
+        # Get metadata for namelist:foo
         if node is not None:
             metadata.update(dict([(o, n.value) for o, n
                                     in node.value.items()]))
             if rose.META_PROP_TITLE in metadata:
                 metadata.pop(rose.META_PROP_TITLE)
+            if (setting_id != search_id and
+                rose.META_PROP_DUPLICATE in metadata):
+                # foo{bar}(1) cannot inherit duplicate from foo.
+                metadata.pop(rose.META_PROP_DUPLICATE)
     node = meta_config.get([search_id], no_ignore=True)
+    # If modifier, get metadata for namelist:foo{bar}
     if node is not None:
         metadata.update(dict([(o, n.value) for o, n
-                                in node.value.items()]))
+                               in node.value.items()]))
     if search_id != setting_id and rose.META_PROP_TITLE in metadata:
         # Individual items of an array should not steal its title
         metadata.pop(rose.META_PROP_TITLE)
