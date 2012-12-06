@@ -143,6 +143,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "force_mode",
                         "help": ("Force file installation " +
                                  "even if it may be unsafe.")}],
+               "full_mode": [
+                       ["--full", "-f"],
+                       {"action": "store_true",
+                        "dest": "full_mode",
+                        "help": ("Full update.")}],
                "format": [
                        ["--format", "-f"],
                        {"metavar": "FORMAT",
@@ -236,6 +241,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "no_overwrite_mode",
                         "help": "Do not overwrite existing files."}],
+               "offsets": [
+                       ["--offset", "-s"],
+                       {"action": "append",
+                        "dest": "offsets",
+                        "metavar": "OFFSET",
+                        "help": ("Specify an offset.")}],
                "opt_conf_keys": [
                        ["--opt-conf-key", "-O"],
                        {"action": "append",
@@ -255,6 +266,10 @@ class RoseOptionParser(OptionParser):
                         "dest": "output_file",
                         "metavar": "FILE",
                         "help": "Specify the name of the output file."}],
+               "parse_format": [
+                       ["--parse-format", "--format"],
+                       {"metavar": "FORMAT",
+                        "help": ("Specify the format for parsing.")}],
                "path_globs": [
                        ["--path", "-P"],
                        {"action": "append",
@@ -269,6 +284,10 @@ class RoseOptionParser(OptionParser):
                        ["--prefix-delim"],
                        {"metavar": "DELIMITER",
                         "help": "Specify the prefix delimiter."}],
+               "print_format": [
+                       ["--print-format"],
+                       {"metavar": "FORMAT",
+                        "help": ("Specify the format for printing.")}],
                "query": [
                        ["--query", "-Q"],
                        {"action": "store_true",
@@ -304,7 +323,7 @@ class RoseOptionParser(OptionParser):
                        ["--shutdown"],
                        {"action": "store_true",
                         "default": False,
-                        "help": "Trigger a suite shutdown."}],                                                  
+                        "help": "Trigger a suite shutdown."}],
                "sort": [
                        ["--sort", "-s"],
                        {"metavar": "FIELD",

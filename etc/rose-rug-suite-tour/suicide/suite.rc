@@ -1,0 +1,36 @@
+#!jinja2
+[scheduling]
+    [[dependencies]]
+        graph = """
+
+            # Start things off with task suicide_test.
+
+            suicide_test => alpha & beta
+
+
+            # If alpha or beta fail, a recover task will start up.
+            # Otherwise, the recover task will suicide.
+            # alpha will succeed.
+            # beta will fail.
+
+            alpha:fail => recover_alpha
+            alpha => !recover_alpha  # recover_alpha will suicide if alpha is ok.
+            alpha | recover_alpha => continue_alpha
+
+            beta:fail => recover_beta
+            beta => !recover_beta    # recover_beta will suicide if beta is ok.
+            beta | recover_beta => continue_beta
+
+                """
+
+[runtime]
+    [[root]]
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 10"
+        [[[job submission]]]
+            method = at
+        [[[event hooks]]]
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook"
+
+    [[beta]]
+        command scripting = "sleep 15; echo Oh no\!; exit 1"

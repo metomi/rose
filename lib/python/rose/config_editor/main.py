@@ -1082,8 +1082,7 @@ class MainController(object):
             sect_data = config_sections.now.get(section)
             if sect_data is None:
                 sect_data = config_sections.latent[section]
-            for attribute in [rose.config_editor.WARNING_TYPE_ENABLED,
-                              rose.config_editor.WARNING_TYPE_IGNORED]:
+            for attribute in rose.config_editor.WARNING_TYPES_IGNORE:
                 if attribute in sect_data.error:
                     sect_data.error.pop(attribute)
             reason = sect_data.ignored_reason
@@ -1093,8 +1092,9 @@ class MainController(object):
                     # User-ignored but trigger-enabled
                     if (meta.get([section, rose.META_PROP_COMPULSORY]).value
                         == rose.META_PROP_VALUE_TRUE):
+                        # Doc table: I_u -> E -> compulsory
                         sect_data.error.update(
-                              {rose.config_editor.WARNING_TYPE_IGNORED:
+                              {rose.config_editor.WARNING_TYPE_USER_IGNORED:
                                rose.config_editor.WARNING_NOT_USER_IGNORABLE})
                 elif (rose.variable.IGNORED_BY_SYSTEM in reason):
                     # Normal trigger-enabled sections
@@ -1127,8 +1127,7 @@ class MainController(object):
                 triggered_ns_list.append(ns)
             if var_id == this_id:
                 continue
-            for attribute in [rose.config_editor.WARNING_TYPE_ENABLED,
-                              rose.config_editor.WARNING_TYPE_IGNORED]:
+            for attribute in rose.config_editor.WARNING_TYPES_IGNORE:
                 if attribute in var.error:
                     var.error.pop(attribute)
             if (var_id in trigger.enabled_dict and
@@ -1137,10 +1136,12 @@ class MainController(object):
                 if (rose.variable.IGNORED_BY_USER in
                     var.ignored_reason):
                     # User-ignored but trigger-enabled
+                    # Doc table: I_u -> E
                     if (var.metadata.get(rose.META_PROP_COMPULSORY) ==
                         rose.META_PROP_VALUE_TRUE):
+                        # Doc table: I_u -> E -> compulsory
                         var.error.update(
-                              {rose.config_editor.WARNING_TYPE_IGNORED:
+                              {rose.config_editor.WARNING_TYPE_USER_IGNORED:
                                rose.config_editor.WARNING_NOT_USER_IGNORABLE})
                 elif (rose.variable.IGNORED_BY_SYSTEM in
                       var.ignored_reason):

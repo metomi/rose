@@ -22,6 +22,7 @@ import json
 import os
 from rose.fs_util import FileSystemUtil
 from rose.opt_parse import RoseOptionParser
+from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
 from rose.suite_engine_proc import SuiteEngineProcessor
 import shutil
@@ -75,12 +76,15 @@ class WebBrowserEvent(Event):
 class SuiteLogViewGenerator(object):
     """Generate the log view for a suite."""
 
-    def __init__(
-            self, event_handler=None, fs_util=None, suite_engine_proc=None):
+    def __init__(self, event_handler=None, fs_util=None, popen=None,
+                 suite_engine_proc=None):
         self.event_handler = event_handler
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler=event_handler)
         self.fs_util = fs_util
+        if popen is None:
+            popen = RosePopener(event_handler=event_handler)
+        self.popen = popen
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
                     event_handler=event_handler)
@@ -91,27 +95,27 @@ class SuiteLogViewGenerator(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def generate(self, suite_log_dir=None):
-        """Generate the log view for a suite.
-
-        If specified, "suite_log_dir" should be the log directory of a suite.
-        Otherwise, the current working directory should be the log directory of
-        a suite.
-
-        """
-        # Ensure that current working directory is preserved.
+    def _chdir(self, method, suite_name, *args, **kwargs):
+        """Ensure that current working directory is preserved."""
+        suite_log_dir = self.suite_engine_proc.get_suite_dir(suite_name, "log")
         cwd = os.getcwd()
         if suite_log_dir is not None:
             self.fs_util.chdir(suite_log_dir)
         try:
-            self._generate()
+            return method(suite_name, *args, **kwargs)
         finally:
             try:
                 self.fs_util.chdir(cwd)
             except OSError:
                 pass
 
-    def _generate(self):
+    def generate(self, suite_name):
+        """Generate the log view for a suite."""
+        return self._chdir(self._generate, suite_name)
+
+    __call__ = generate
+
+    def _generate(self, suite_name):
         if not os.path.exists(self.suite_engine_proc.SUITE_LOG):
             return
         ns = "rose-suite-log-view"
@@ -153,12 +157,44 @@ class SuiteLogViewGenerator(object):
                 suite_log_file_size = os.stat(suite_log_file).st_size
         finally:
             os.rmdir(lock)
-    __call__ = generate
+
+    def update_task_log(self, suite_name, task_names=None):
+        """Update the log(s) of tasks in suite_name.
+
+        If "task_names" is None, update the logs for all tasks.
+
+        """
+        return self._chdir(self._update_task_log, suite_name, task_names)
+
+    def _update_task_log(self, suite_name, task_names=None):
+        users_and_hosts_and_tasks = []
+        if task_names:
+            for task_name in task_names:
+                user_and_host = self.suite_engine_proc.get_task_auth(
+                        suite_name, task_name)
+                if user_and_host is None:
+                    continue
+                user, host = user_and_host
+                users_and_hosts_and_tasks.append((user, host, task))
+        else:
+            users_and_hosts = self.suite_engine_proc.get_tasks_auths(suite_name)
+            for user, host in users_and_hosts:
+                users_and_hosts_and_tasks.append((user, host, ""))
+
+        log_dir_rel = self.suite_engine_proc.get_task_log_dir_rel(suite_name)
+        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+        for user, host, task in users_and_hosts_and_tasks:
+            r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, task)
+            cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
+            try:
+                out, err = self.popen(*cmd)
+            except RosePopenError as e:
+                self.handle_event(e, level=Reporter.WARN)
 
 
 def main():
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("web_browser_mode")
+    opt_parser.add_my_options("full_mode", "web_browser_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -175,18 +211,17 @@ def main():
 def suite_log_view(opts, args, report=None):
     gen = SuiteLogViewGenerator(event_handler=report)
     if args:
-        name = args[0]
+        suite_name = args.pop(0)
     else:
-        name = os.path.basename(os.getcwd())
-    suite_log_dir = os.path.join(
-            os.path.expanduser("~"),
-            gen.suite_engine_proc.get_suite_dir_rel(name),
-            "log")
-    gen.fs_util.chdir(suite_log_dir)
-    gen()
+        suite_name = os.path.basename(os.getcwd())
+    if opts.full_mode:
+        gen.update_task_log(suite_name)
+    elif args:
+        gen.update_task_log(suite_name, tasks=args)
+    gen(suite_name)
     if os.getenv("DISPLAY") and opts.web_browser_mode:
         w = webbrowser.get()
-        url = gen.suite_engine_proc.get_suite_log_url(name)
+        url = gen.suite_engine_proc.get_suite_log_url(suite_name)
         gen.handle_event(WebBrowserEvent(w.name, url))
         w.open_new_tab(url)
 

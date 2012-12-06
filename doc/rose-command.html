@@ -18,7 +18,7 @@
 </head>
 
 <body>
-  <div id="body-header">
+  <div class="header-footer" id="body-header">
     <address>
       &copy; British Crown Copyright 2012
       <a href="http://www.metoffice.gov.uk">Met Office</a>.
@@ -70,9 +70,14 @@
       <dd>Launch the GTK+ GUI to edit a suite or application
       configuration.</dd>
 
-      <dt><a href="#rose-edit">rose edit</a></dt>
+      <dt><a href="#rose-date">rose date</a></dt>
 
       <dd>(=config-edit)</dd>
+
+      <dt><a href="#rose-edit">rose edit</a></dt>
+
+      <dd>Display the current or the specified DATE-TIME with an optional
+      offset.</dd>
 
       <dt><a href="#rose-host-select">rose host-select</a></dt>
 
@@ -440,7 +445,7 @@
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose-config-edit [OPTIONS]</kbd></p>
+    <p><kbd>rose config-edit [OPTIONS]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
@@ -472,45 +477,64 @@
       first). This option can be used repeatedly to load multiple paths.</dd>
     </dl>
 
-    <h2 id="rose-edit">rose edit</h2>
+    <h2 id="rose-date">rose date</h2>
 
     <h3>NAME</h3>
 
-    <p><kbd>rose-config-edit</kbd></p>
+    <p><kbd>rose-date</kbd></p>
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose-config-edit [OPTIONS]</kbd></p>
+    <p><kbd>rose date [OPTIONS] [DATE-TIME]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
-    <p>Launch the GTK+ GUI to edit a suite or application configuration.</p>
+    <p>Display the current or the specified DATE-TIME with an optional
+    offset.</p>
 
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+      <dt><kbd>--offset=OFFSET</kbd>, <kbd>-s OFFSET</kbd></dt>
 
-      <dd>
-        A path to either:
+      <dd>Specify an offset to add to the current or the specified
+      <var>DATE-TIME</var>.  <var>OFFSET</var> must be in the form <var>nU</var>
+      where <var>U</var> is the unit (<kbd>w</kbd> for weeks, <kbd>d</kbd> for
+      days, <kbd>h</kbd> for hours, <kbd>m</kbd> for minutes and <kbd>s</kbd>
+      for seconds) and <var>n</var> is an positive or negative integer. Multiple
+      offsets can be specified with multiple <kbd>--offset=OFFSET</kbd>
+      options.</dd>
 
-        <ol>
-          <li>a directory containing a suite with a file named
-          <var>suite.rc</var> and a directory called 'app' containing
-          subdirectories with files named <var>rose-app.conf</var>, in the
-          format specified in the Rose pages.</li>
+      <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>--format=FORMAT</kbd></dt>
 
-          <li>a directory containing a single "application" - a file named
-          <var>rose-app.conf</var> and an optional subdirectory called
-          <var>file</var> with other application files.</li>
-        </ol>
+      <dd>Specify a format for parsing <var>DATE-TIME</var>, which should be
+      compatible with the format documented in Python's <a href=
+      "http://docs.python.org/library/time.html#time.strftime">time.strftime</a>.
+      If not specified, the system will attempt to parse <var>DATE-TIME</var>
+      using the following formats:
+        <ul>
+          <li><dfn>ctime</dfn>: <samp>%a %b %d %H:%M:%S %Y</samp></li>
+          <li><dfn>Unix date</dfn>: <samp>%a %b %d %H:%M:%S %Z %Y</samp></li>
+          <li><dfn>ISO8601</dfn>: <samp>%Y-%m-%dT%H:%M:%S</samp>,
+          <samp>%Y%m%dT%H%M%S</samp></li>
+          <li><dfn>Cylc</dfn>: <samp>%Y%m%d%H</samp></li>
+        </ul>
       </dd>
 
-      <dt><kbd>--meta-path=PATH; -M PATH</kbd></dt>
+      <dt><kbd>--print-format=FORMAT</kbd></dt>
 
-      <dd>Prepend PATH to the search path for metadata (look here first). This
-      option can be used repeatedly to load multiple paths.</dd>
+      <dd>Specify a format for printing the result. Default to the same format
+      as the parse format.</dd>
+
+      <dt><kbd>--utc</kbd>, <kbd>-u</kbd></dt>
+
+      <dd>Parse/print date time in UTC instead of local time zone. (Does not
+      work at the moment.)</dd>
     </dl>
+
+    <h2 id="rose-edit">rose edit</h2>
+
+    <p>See <a href="#rose-config-edit">rose config-edit</a>.</p>
 
     <h2 id="rose-host-select">rose host-select</h2>
 

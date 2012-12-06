@@ -331,35 +331,31 @@ class VariableWidget(object):
         if ign_map != {}:
             # Technically ignored, but could just be ignored by section.
             self.is_ignored = True
-            if '"Ignore"' not in self.menuwidget.option_ui:
+            if "'Ignore'" not in self.menuwidget.option_ui:
                 self.menuwidget.old_option_ui = self.menuwidget.option_ui
                 self.menuwidget.old_actions = self.menuwidget.actions
             if ign_map.keys() == [rose.variable.IGNORED_BY_SECTION]:
                 # Not ignored in itself, so give Ignore option.
-                if '"Enable"' in self.menuwidget.option_ui:
+                if "'Enable'" in self.menuwidget.option_ui:
                     self.menuwidget.option_ui = re.sub(
-                                '<menuitem action="Enable"/>',
-                                r'<menuitem action="Ignore"/>',
+                                "<menuitem action='Enable'/>",
+                                r"<menuitem action='Ignore'/>",
                                 self.menuwidget.option_ui)
             else:
                 # Ignored in itself, so needs Enable option.
                 self.menuwidget.option_ui = re.sub(
-                                '<menuitem action="Ignore"/>',
-                                r'<menuitem action="Enable"/>',
+                                "<menuitem action='Ignore'/>",
+                                r"<menuitem action='Enable'/>",
                                 self.menuwidget.option_ui)
-                if 'Enable' not in [a[0] for a in self.menuwidget.actions]:
-                    self.menuwidget.actions.append(
-                                    ('Enable', gtk.STOCK_YES,
-                                     rose.config_editor.VAR_MENU_ENABLE)) 
             self.update_status()
             self.set_sensitive(False)
         else:
             # Enabled.
             self.is_ignored = False
-            if '"Enable"' in self.menuwidget.option_ui:
+            if "'Enable'" in self.menuwidget.option_ui:
                 self.menuwidget.option_ui = re.sub(
-                                    '<menuitem action="Enable"/>',
-                                    r'<menuitem action="Ignore"/>',
+                                    "<menuitem action='Enable'/>",
+                                    r"<menuitem action='Ignore'/>",
                                     self.menuwidget.option_ui)
             self.update_status()
             if not self.is_ghost:
