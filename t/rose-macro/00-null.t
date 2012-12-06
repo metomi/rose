@@ -62,7 +62,12 @@ init </dev/null
 TEST_KEY=$TEST_KEY_BASE-no-metadata
 setup
 run_pass "$TEST_KEY" rose macro -C ../config
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+[V] rose.macros.DefaultValidators
+    # Runs all the default checks, such as compulsory checking.
+[T] rose.macros.DefaultTransforms
+    # Runs all the default fixers, such as trigger fixing.
+__CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
@@ -71,7 +76,7 @@ init </dev/null
 init_meta </dev/null
 TEST_KEY=$TEST_KEY_BASE-null-metadata
 setup
-run_pass "$TEST_KEY" rose macro -aV -C ../config
+run_pass "$TEST_KEY" rose macro -V -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

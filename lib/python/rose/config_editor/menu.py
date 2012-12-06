@@ -83,6 +83,7 @@ class MenuBar(object):
       <menuitem action="Extra checks"/>
       <separator name="sep macro"/>
       <menuitem action="All V"/>
+      <menuitem action="Autofix"/>
       </menu>
       <menu action="Tools">
         <menu action="Run Suite">
@@ -156,6 +157,8 @@ class MenuBar(object):
                        rose.config_editor.TOP_MENU_METADATA),
                       ('All V', gtk.STOCK_DIALOG_QUESTION,
                        rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
+                      ('Autofix', gtk.STOCK_CONVERT,
+                       rose.config_editor.TOP_MENU_METADATA_MACRO_AUTOFIX),
                       ('Extra checks', gtk.STOCK_DIALOG_QUESTION,
                        rose.config_editor.TOP_MENU_METADATA_CHECK),
                       ('Tools', None,
@@ -541,6 +544,14 @@ class Handler(object):
                                      config_name, section,t.splitlines())
         rose.gtk.util.run_edit_dialog(text, finish_hook=finish, title=title)
 
+    def fix_request(self, base_ns):
+        """Handle a request to auto-fix a configuration."""
+        if base_ns is None:
+            return False
+        base_ns = "/" + base_ns.lstrip("/")
+        config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+        self.transform_default(just_this_config_name=config_name)
+
     def info_request(self, base_ns):
         """Handle a request for namespace info."""
         if base_ns is None:
@@ -742,15 +753,15 @@ class Handler(object):
                                                 macro_fullname))
 
     def handle_macro_transforms(self, config_name, macro_name,
-                                macro_config, change_list, no_display=False):
+                                macro_config, change_list, no_display=False,
+                                triggers_ok=False):
         """Calculate needed changes and apply them if prompted to.
         
         At the moment trigger-ignore of variables and sections is
         assumed to be the exclusive property of the Rose trigger
-        macro and is not allowed.
+        macro and is not allowed for any other macro.
         
         """
-        # TODO: Section stuff.
         if not change_list:
             return
         macro_type = ".".join(macro_name.split(".")[:-1])
@@ -795,6 +806,24 @@ class Handler(object):
                   sect_data.ignored_reason):
                 self.sect_ops.ignore_section(config_name, sect, True,
                                              override=True)
+            elif (triggers_ok and macro_node.state ==
+                  rose.config.ConfigNode.STATE_SYST_IGNORED and
+                  rose.variable.IGNORED_BY_SYSTEM not in
+                  sect_data.ignored_reason):
+                sect_data.error.setdefault(
+                          rose.config_editor.WARNING_TYPE_ENABLED,
+                          rose.config_editor.IGNORED_STATUS_MACRO)
+                self.sect_ops.ignore_section(config_name, sect, True,
+                                             override=True)
+            elif (triggers_ok and macro_node.state ==
+                  rose.config.ConfigNode.STATE_NORMAL and
+                  rose.variable.IGNORED_BY_SYSTEM in
+                  sect_data.ignored_reason):
+                sect_data.error.setdefault(
+                          rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED,
+                          rose.config_editor.IGNORED_STATUS_MACRO)
+                self.sect_ops.ignore_section(config_name, sect, False,
+                                             override=True)
         for item in var_changes:
             sect = item.section
             opt = item.option
@@ -831,6 +860,18 @@ class Handler(object):
                              {rose.variable.IGNORED_BY_USER:
                               rose.config_editor.IGNORED_STATUS_MACRO},
                              override=True)
+            elif (triggers_ok and macro_node.state ==
+                  rose.config.ConfigNode.STATE_SYST_IGNORED and
+                  rose.variable.IGNORED_BY_SYSTEM not in var.ignored_reason):
+                self.var_ops.set_var_ignored(
+                             var,
+                             {rose.variable.IGNORED_BY_SYSTEM:
+                              rose.config_editor.IGNORED_STATUS_MACRO},
+                             override=True)
+            elif (triggers_ok and macro_node.state ==
+                  rose.config.ConfigNode.STATE_NORMAL and
+                  rose.variable.IGNORED_BY_SYSTEM in var.ignored_reason):
+                self.var_ops.set_var_ignored(var, {}, override=True)
         for sect in sect_removes:
             self.sect_ops.remove_section(config_name, sect)
         self.apply_macro_transform(config_name, macro_type, changed_ids)
@@ -889,3 +930,32 @@ class Handler(object):
             args.extend([key, value])
         rose.gtk.run.run_suite(*args)
         return False
+
+    def transform_default(self, just_this_config_name=None):
+        """Run the Rose built-in transformer macros."""
+        if (just_this_config_name is not None and
+            just_this_config_name in self.data.config.keys()):
+            config_keys = [just_this_config_name]
+            text = rose.config_editor.DIALOG_LABEL_AUTOFIX
+        else:
+            config_keys = sorted(self.data.config.keys())
+            text = rose.config_editor.DIALOG_LABEL_AUTOFIX_ALL
+        proceed = rose.gtk.util.run_dialog(
+                                    rose.gtk.util.DIALOG_TYPE_WARNING,
+                                    text,
+                                    rose.config_editor.DIALOG_TITLE_AUTOFIX,
+                                    cancel=True)
+        if not proceed:
+            return False
+        sorter = rose.config.sort_settings
+        to_id = lambda s: self.util.get_id_from_section_option(s.section,
+                                                               s.option)
+        for config_name in config_keys:
+            macro_config = self.data.dump_to_internal_config(config_name)
+            meta_config = self.data.config[config_name].meta
+            macro = rose.macros.DefaultTransforms()
+            config, change_list = macro.transform(macro_config, meta_config)
+            change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+            self.handle_macro_transforms(
+                        config_name, "Autofixer.transform",
+                        macro_config, change_list, triggers_ok=True)

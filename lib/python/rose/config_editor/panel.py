@@ -473,6 +473,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             add_name = None
         else:
             add_name = "/" + self.get_name(path)
+        tree_model = self.tree.get_model()
+        tree_iter = None
+        if path is not None:
+            tree_iter = tree_model.get_iter(path)
         ui_config_string = """<ui> <popup name='Popup'>
                               <menuitem action="New"/>
                               <separator name="newconfigsep"/>
@@ -481,6 +485,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),
                    ('Add', gtk.STOCK_ADD,
                     rose.config_editor.TREE_PANEL_ADD_SECTION),
+                   ('Autofix', gtk.STOCK_CONVERT,
+                    rose.config_editor.TREE_PANEL_AUTOFIX_CONFIG),
                    ('Clone', gtk.STOCK_COPY,
                     rose.config_editor.TREE_PANEL_CLONE_SECTION),
                    ('Edit', gtk.STOCK_EDIT,
@@ -501,7 +507,15 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             name = self.get_name(path)
             cloneable = self.ask_can_clone(name)
             is_top = self.ask_is_top(name)
+            is_fixable = (is_top and tree_iter is not None and
+                          tree_model.get_value(tree_iter, 5) > 0)
             has_content = self.ask_has_content(name)
+            if is_fixable:
+                ui_config_string = ui_config_string.replace(
+                          """<separator name="newconfigsep"/>""",
+                          """<separator name="newconfigsep"/>
+                             <menuitem action="Autofix"/>
+                             <separator name="sepauto"/>""", 1)
             if cloneable:
                 ui_config_string += '<separator name="clonesep"/>'
                 ui_config_string += '<menuitem action="Clone"/>'
@@ -583,6 +597,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                 url_item.connect(
                             "activate",
                             lambda b: webbrowser.open(self.get_url(path)))
+            if is_fixable:
+                autofix_item = uimanager.get_widget('/Popup/Autofix')
+                autofix_item.connect("activate",
+                                     lambda b: self.send_fix_request(name))
             if not is_top:
                 del_names = self.get_subtree_names(path) + [name]
                 del_names = ['/' + d for d in del_names]
@@ -646,6 +664,9 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
     def send_edit_request(self, name):
         """Connect this at a higher level for comment edit requests."""
         pass
+
+    def send_fix_request(self, name):
+        """Connect this at a higher level for auto-fix requests."""
 
     def send_ignore_request(self, name, is_ignored):
         """Connect this at a higher level for section ignore/enable."""

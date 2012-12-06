@@ -89,7 +89,7 @@ type=boolean
 length=5
 type=boolean
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro -a --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -119,7 +119,7 @@ type=character
 length=4
 type=character
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -145,7 +145,7 @@ type=integer
 length=6
 type=integer
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -191,7 +191,7 @@ length=:
 type=real
 length=5
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro --validate --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -220,7 +220,7 @@ type=quoted
 length=4
 type=quoted
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -244,7 +244,7 @@ type=logical
 length=6
 type=logical
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -272,7 +272,7 @@ type=real, integer
 length=:
 
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -293,7 +293,7 @@ length=:
 [namelist:values_nl1=my_array_any_one]
 length=:
 __META_CONFIG__
-run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
