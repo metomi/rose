@@ -145,8 +145,14 @@ class Reporter(object):
                     context.write(msg_line + "\n")
             else:
                 if clip is not None:
-                    msg = msg[:clip]
-                context.write(msg)
+                    if msg.endswith("\n") and len(msg) > clip:
+                        insert_newline = True
+                        msg = msg[:-1]
+                    msg_line = msg[:clip]
+                if insert_newline:
+                    context.write(msg_line + "\n")
+                else:
+                    context.write(msg_line)
         if isinstance(message, Exception) and self.raise_on_exc:
             raise message
 
