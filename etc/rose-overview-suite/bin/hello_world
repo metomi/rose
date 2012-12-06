@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+import os
+
+world = os.environ["WORLD"]
+is_world_a_planet = os.environ["IS_WORLD_A_PLANET"]
+
+if is_world_a_planet == "true":
+    print "Greetings, honoured planet people of {0}".format(world)
+else:
+    print "Hi {0}".format(world)

@@ -1,0 +1,41 @@
+#!jinja2
+[scheduling]
+    [[dependencies]]
+        graph = """
+
+            # Start things off with task_trigger_tests.
+            # Task alpha will succeed.
+            # Task beta will fail.
+
+            task_trigger_tests => alpha & beta
+
+
+            # Setup our alpha and beta trigger tasks.
+
+            alpha:succeed => alpha_succeeded
+            alpha:fail => alpha_failed
+            alpha:start => alpha_started
+            alpha:finish => alpha_finished
+            
+            beta:succeed => beta_succeeded
+            beta:fail => beta_failed
+            beta:start => beta_started
+            beta:finish => beta_finished
+
+        """
+            
+[runtime]
+    [[root]]
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 10"
+        [[[job submission]]]
+            method = at
+        [[[event hooks]]]
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook --mail"  # Email on failure.
+
+    [[alpha]]
+        initial scripting = sleep 10
+    
+    [[beta]]
+        initial scripting = sleep 15
+        command scripting = "echo Running on $(hostname) in $PWD; sleep 20; exit 1"

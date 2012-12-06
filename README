@@ -26,6 +26,10 @@ found in the licences/ directory.
 doc/jquery.min.js:
     Unmodified external software library. See lib/html/external/jquery/.
 
+doc/S5:
+    Slightly modified version of S5, in the public domain.
+    See meyerweb.com/eric/tools/s5/.
+
 doc/rose-icon.png,
 etc/images/rose-icon.png,
 etc/images/rose-icon-trim.png,
