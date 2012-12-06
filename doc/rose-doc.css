@@ -55,17 +55,17 @@ h1 {
     color: #ffcb00;
 }
 
-#body-header {
+.header-footer {
     color: white;
 }
 
-#body-header a:link {
+.header-footer a:link {
     color: #ffcb00;
 }
 
-#body-header a:visited,
-#body-header a:hover,
-#body-header a:active {
+.header-footer a:visited,
+.header-footer a:hover,
+.header-footer a:active {
     color: #ffcb00;
 }
 
@@ -85,7 +85,7 @@ samp,
     background: #eee;
 }
 
-#body-header {
+.header-footer {
     background: #060048;
 }
 
@@ -123,6 +123,7 @@ samp,
 .image {
     border: thin solid #ddd;
 }
+
 
 h2 {
     border-top: medium ridge #060048;
@@ -170,6 +171,10 @@ h5 {
     font-size: medium;
 }
 
+.caption {
+     font-size: small;
+}
+
 address {
     font-size: x-small;
 }
@@ -179,6 +184,10 @@ var {
     font-style: normal;
 }
 
+.caption {
+    font-size: 50%;
+}
+
 h1,
 h2,
 h3,
@@ -186,10 +195,9 @@ h4,
 h5,
 dt,
 .shell-prompt,
-#body-header p {
+.header-footer p {
     font-weight: bold;
 }
-
 
 /**********************************************************************
  * CLASSIFICATION
@@ -251,6 +259,10 @@ h1 {
     display: inline;
 }
 
+.alwayshidden {
+    display: none
+}
+
 /**********************************************************************
  * BORDER-RADIUS
  *
@@ -276,9 +288,9 @@ body,
 h1,
 h2,
 .shell-prompt,
-#body-header,
-#body-header img,
-#body-header p {
+.header-footer,
+.header-footer img,
+.header-footer p {
     margin: 0;
 }
 
@@ -337,7 +349,7 @@ var {
     padding-right: 0.2em;
 }
 
-#body-header p {
+.header-footer p {
     padding-top: 0.5em;
 }
 
@@ -346,16 +358,27 @@ var {
  * POSITION AND FLOAT
  *
  **********************************************************************/
+
+.l-floater {
+    clear: left;
+    float: left;
+}
+
+.r-floater {
+    clear: right;
+    float: right;
+}
+
 .shell-prompt,
 #rose-icon {
     float: left;
 }
 
-#body-header address {
+.header-footer address {
     float: right;
 }
 
-#body-header,
+.header-footer,
 #body-main {
     position: absolute;
 }
@@ -369,7 +392,7 @@ var {
  * HEIGHT AND WIDTH
  *
  **********************************************************************/
-#body-header {
+.header-footer {
     height: 2.9em;
     width: 100%;
 }
