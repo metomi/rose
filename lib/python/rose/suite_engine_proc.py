@@ -414,7 +414,7 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
-            *args):
+            args=None):
         """Start a suite (in a specified host)."""
         raise NotImplementedError()
 

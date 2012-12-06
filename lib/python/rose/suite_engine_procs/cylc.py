@@ -308,7 +308,7 @@ class CylcProcessor(SuiteEngineProcessor):
         return [suite, task, hook_event, hook_message]
 
     def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
-            *args):
+            args=None):
         """Invoke "cylc run" (in a specified host).
         
         The current working directory is assumed to be the suite log directory.

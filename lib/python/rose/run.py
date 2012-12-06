@@ -582,7 +582,7 @@ class SuiteRunner(Runner):
             self.handle_event(SuiteHostSelectEvent(suite_name, host))
             # FIXME: values in environ were expanded in the localhost
             self.suite_engine_proc.run(
-                    suite_name, host, environ, opts.restart_mode, *args)
+                    suite_name, host, environ, opts.restart_mode, args)
             open("rose-suite-run.host", "w").write(host + "\n")
 
             # Check that the suite is running
