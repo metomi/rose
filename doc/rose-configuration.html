@@ -356,8 +356,8 @@ key-4=value 4
 
       <dd>Specify a list of users with commit access to trunk of the suite. A
       <kbd>*</kbd> in the list means that anyone can commit to the trunk of the
-      suite. Setting this blank or omitting the setting means that nobody
-      apart from the owner can commit to the trunk.</dd>
+      suite. Setting this blank or omitting the setting means that nobody apart
+      from the owner can commit to the trunk.</dd>
 
       <dt><code>description</code></dt>
 
@@ -366,9 +366,9 @@ key-4=value 4
       <dt><code>issue-list</code></dt>
 
       <dd>Specify a list of ticket IDs associated with the suite.</dd>
-      
+
       <dt><code>sub-project</code></dt>
-      
+
       <dd>Specify a sub-division of <code>project</code>, if applicable.</dd>
     </dl>
 
@@ -1438,6 +1438,317 @@ meta = my-command/t123
     versions of the upgrade macros it is safest to not commit any resulting
     changes (or to use a branch of the suite which you are happy to
     discard).</p>
+
+    <h2 id="appendix-ignored-config-edit">Appendix: Config Editor Ignored
+    Mechanics</h2>
+
+    <p>This describes the intended behaviour of the config editor when there is
+    an ignored state mismatch for a setting - e.g. a setting might be enabled
+    when it should be trigger-ignored.</p>
+
+    <p>The table contains error and fixing information for some varieties of
+    ignored state mismatches. The actual situations are considerably more
+    varied, given section-ignoring and latent variables - the table holds the
+    most important varieties.</p>
+    
+    <p>The <samp>State</samp> contains the actual states. The <samp>Trigger
+    State</samp> column contains the trigger-mechanism's expected states. The
+    states can be:</p>
+
+    <dl>
+      <dt class="trigger-ignored">I<sub>T</sub> - <var>!!</var></dt>
+
+      <dd>trigger ignored</dd>
+
+      <dt class="user-ignored">I<sub>U</sub> - <var>!</var></dt>
+
+      <dd>user ignored</dd>
+
+      <dt>E - (normal)</dt>
+
+      <dd>enabled</dd>
+    </dl>
+
+    <table summary=
+    "A subset of possible ignored/enabled states, errors and fixes">
+      <caption>
+        A subset of possible ignored/enabled states, errors and fixes
+      </caption>
+
+      <tr>
+        <th>State</th>
+
+        <th>Trigger State</th>
+
+        <th>Compulsory</th>
+
+        <th>Display Error?</th>
+
+        <th>User Options</th>
+
+        <th>Notes</th>
+      </tr>
+
+      <tr>
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>compulsory</td>
+
+        <td>no</td>
+
+        <td>None</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="odd">
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>optional</td>
+
+        <td>no</td>
+
+        <td>None</td>
+
+        <td>config editor shows non-functional E option for implementation
+        reasons. <span class="user-ignored">I<sub>U</sub></span> is possible as
+        well, but creates a more confused state and presents an ignored option
+        for an already-ignored setting</td>
+      </tr>
+
+      <tr>
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>E</td>
+
+        <td>compulsory</td>
+
+        <td class="fail">error</td>
+
+        <td>E</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="odd">
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>E</td>
+
+        <td>optional</td>
+
+        <td class="fail">error</td>
+
+        <td>E</td>
+
+        <td class="caption">I<sub>U</sub> not given for above
+        reasons.</td>
+      </tr>
+
+      <tr>
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td class="not-trigger">not trigger</td>
+
+        <td>compulsory</td>
+
+        <td class="fail">error</td>
+
+        <td>E</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="odd">
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td class="not-trigger">not trigger</td>
+
+        <td>optional</td>
+
+        <td class="warn">overlook</td>
+
+        <td>E</td>
+
+        <td>overlooking mainly in order to de-clutter the <kbd>No Metadata</kbd>
+        view.  <span class="user-ignored">I<sub>U</sub></span> not given for
+        above reasons.</td>
+      </tr>
+
+      <tr>
+        <td class="user-ignored">I<sub>U</sub></td>
+
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>compulsory</td>
+
+        <td class="warn">overlook</td>
+
+        <td>None</td>
+
+        <td>same basic state, won't mess with trigger
+        too much. macro will ask to fix this.</td>
+      </tr>
+
+      <tr class="odd">
+        <td class="user-ignored">I<sub>U</sub></td>
+
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>optional</td>
+
+        <td>no</td>
+
+        <td>None</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td class="user-ignored">I<sub>U</sub></td>
+
+        <td>E</td>
+
+        <td>compulsory</td>
+
+        <td class="fail">error</td>
+
+        <td>E</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="odd">
+        <td class="user-ignored">I<sub>U</sub></td>
+
+        <td>E</td>
+
+        <td>optional</td>
+
+        <td>no</td>
+
+        <td>E</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td class="user-ignored">I<sub>U</sub></td>
+
+        <td class="not-trigger">not trigger</td>
+
+        <td>compulsory</td>
+
+        <td class="fail">error</td>
+
+        <td>E</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="odd">
+        <td class="user-ignored">I<sub>U</sub></td>
+
+        <td class="not-trigger">not trigger</td>
+
+        <td>optional</td>
+
+        <td>no</td>
+
+        <td>E</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>E</td>
+
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>compulsory</td>
+
+        <td class="fail">error</td>
+
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="odd">
+        <td>E</td>
+
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>optional</td>
+
+        <td class="fail">error</td>
+
+        <td class="trigger-ignored">I<sub>T</sub></td>
+
+        <td>adding the <span class="user-ignored">I<sub>U</sub></span> option
+        would be confusing.</td>
+      </tr>
+
+      <tr>
+        <td>E</td>
+
+        <td>E</td>
+
+        <td>compulsory</td>
+
+        <td>no</td>
+
+        <td>None</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="odd">
+        <td>E</td>
+
+        <td>E</td>
+
+        <td>optional</td>
+
+        <td>no</td>
+
+        <td class="user-ignored">I<sub>U</sub></td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>E</td>
+
+        <td class="not-trigger">not trigger</td>
+
+        <td>compulsory</td>
+
+        <td>no</td>
+
+        <td>None</td>
+
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="odd">
+        <td>E</td>
+
+        <td class="not-trigger">not trigger</td>
+
+        <td>optional</td>
+
+        <td>no</td>
+
+        <td class="user-ignored">I<sub>U</sub></td>
+
+        <td>&nbsp;</td>
+      </tr>
+    </table>
   </div>
 </body>
 </html>
