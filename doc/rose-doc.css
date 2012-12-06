@@ -296,13 +296,12 @@ h1 {
     display: inline;
 }
 
-<<<<<<< HEAD
 pre {
     overflow: auto;
-=======
+}
+
 .alwayshidden {
     display: none
->>>>>>> master
 }
 
 /**********************************************************************
