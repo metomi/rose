@@ -99,7 +99,9 @@ $(function() {
         var CONTENT_INDEX_OF = {"h2": 1, "h3": 2, "h4": 3, "h5": 4, "h6": 5};
         var stack = [];
         var done_something = false;
-        $("#body-main", $(d)).children("h2, h3, h4, h5, h6").each(function(i) {
+        var headings = $("#body-main", $(d)).children("h2, h3, h4, h5, h6");
+        headings.push.apply(headings, $(".slide", $(d)).children("h2, h3, h4, h5, h6"));
+        headings.each(function(i) {
             if (this.id == null || this.id == "") {
                 return;
             }
