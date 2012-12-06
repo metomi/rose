@@ -828,12 +828,15 @@ def _handle_command_arg_response(dialog, response, run_hook, entry):
         run_hook(shlex.split(text))
 
 
-def run_dialog(dialog_type, text, title=None, modal=True):
+def run_dialog(dialog_type, text, title=None, modal=True,
+               cancel=False):
     """Run a simple dialog with an 'OK' button and some text."""
     parent_window = get_dialog_parent()
     dialog = gtk.Dialog(parent=parent_window)
+    if cancel:
+        cancel_button = dialog.add_button(gtk.STOCK_CANCEL,
+                                          gtk.RESPONSE_CANCEL)
     ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
-
     if dialog_type == gtk.MESSAGE_INFO:
         stock_id = gtk.STOCK_DIALOG_INFO
     elif dialog_type == gtk.MESSAGE_WARNING:
@@ -899,8 +902,10 @@ def run_dialog(dialog_type, text, title=None, modal=True):
         new_size[i] = min([my_size[i], max_size[i]])        
     scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     dialog.set_default_size(*new_size)
-    dialog.run()
+    ok_button.grab_focus()
+    response = dialog.run()
     dialog.destroy()
+    return (response == gtk.RESPONSE_OK)
 
 
 def run_hyperlink_dialog(stock_id=None, text="", title=None,

@@ -23,6 +23,7 @@ Module to list or run available custom macros for a configuration.
 It also stores macro base classes and macro library functions.
 
 """
+
 import copy
 import inspect
 import os
@@ -86,7 +87,8 @@ class MacroBase(object):
 
     """Base class for macros for validating or transforming configurations."""
 
-    reports = []  # A list of MacroReport instances for errors or changes
+    def __init__(self):
+        self.reports = []  # MacroReport instances for errors or changes
 
     def _get_section_option_from_id(self, var_id):
         """Return a configuration section and option from an id."""
@@ -491,19 +493,15 @@ def get_metadata_for_config_id(setting_id, meta_config):
 
 
 def run_macros(app_config, meta_config, config_name, macro_names,
-               opt_all=False, opt_conf_dir=None, opt_non_interactive=False,
-               opt_output_dir=None, opt_validate_all=False,
-               opt_quietness=False):
+               opt_conf_dir=None, opt_fix=False,
+               opt_non_interactive=False, opt_output_dir=None,
+               opt_validate_all=False, opt_quietness=False):
     """Run standard or custom macros for a configuration."""
-
-    should_include_system = opt_all
-    if macro_names:
-        should_include_system = True
         
     macro_tuples, modules = get_macros_for_config(
                   app_config, opt_conf_dir,
                   return_modules=True,
-                  include_system=should_include_system)
+                  include_system=True)
 
     # Add all validator macros to the run list if specified.
     if opt_validate_all:
@@ -513,7 +511,15 @@ def run_macros(app_config, meta_config, config_name, macro_names,
                 macro_names.insert(0, macro_name)
         if not macro_names:
             sys.exit(0)
-    
+    elif opt_fix:
+        for module_name, class_name, method, help in macro_tuples:
+            if module_name != rose.macros.__name__:
+                continue
+            if method == TRANSFORM_METHOD:
+                macro_name = ".".join([module_name, class_name])
+                macro_names.insert(0, macro_name)
+        if not macro_names:
+            sys.exit(0)
     # List all macros if none are given.
     if not macro_names:
         for module_name, class_name, method, help in macro_tuples:
@@ -657,7 +663,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
     opt_parser = RoseOptionParser()
     options = ["conf_dir", "meta_path", "non_interactive", "output_dir"]
     if mode == "macro":
-        options.extend(["all", "validate_all"])
+        options.extend(["fix", "validate_all"])
     elif mode == "upgrade":
         options.extend(["downgrade"])
     else:
@@ -721,7 +727,7 @@ def main():
         sys.exit(1)
     app_config, meta_config, config_name, args, opts = return_objects
     run_macros(app_config, meta_config, config_name, args,
-               opts.all, opts.conf_dir,
+               opts.conf_dir, opts.fix,
                opts.non_interactive, opts.output_dir,
                opts.validate_all, opts.quietness)
                

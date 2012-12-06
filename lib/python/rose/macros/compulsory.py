@@ -111,6 +111,7 @@ class CompulsoryChanger(rose.macro.MacroBase):
 
     ADD_COMPULSORY_SECT = ('Added compulsory section')
     ADD_COMPULSORY_OPT = ('Added compulsory option')
+    ADD_MISSING_SECT = ('Added section for compulsory option')
 
     def transform(self, config, meta_config=None):
         """Return a config and a list of changes, if any."""
@@ -128,6 +129,10 @@ class CompulsoryChanger(rose.macro.MacroBase):
                 self.add_report(sect, opt, None,
                                 self.ADD_COMPULSORY_SECT)
                 continue
+            if config.get([sect]) is None:
+                config.set([sect])
+                self.add_report(sect, None, None,
+                                self.ADD_MISSING_SECT)
             var_id = self._get_id_from_section_option(sect, opt)
             metadata = {}
             for key, node in meta_config.get([var_id]).value.items():

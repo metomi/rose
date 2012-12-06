@@ -31,12 +31,7 @@ class RoseOptionParser(OptionParser):
 
     """
 
-    OPTIONS = {"all": [
-                       ["--all", "-a"],
-                       {"action": "store_true",
-                        "default": False,
-                        "help": "Apply all available items."}],
-               "all_revs": [
+    OPTIONS = {"all_revs": [
                        ["--all-revs"],
                        {"action": "store_true",
                         "default": False,
@@ -137,6 +132,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "files",
                         "metavar": "FILE",
                         "help": "Specify the configuration file(s)."}],
+               "fix": [
+                     ["--fix", "-F"],
+                      {"action": "store_true",
+                       "dest": "fix",
+                       "help": "Fix the configuration."}],
                "force_mode": [
                        ["--force", "-f"],
                        {"action": "store_true",
