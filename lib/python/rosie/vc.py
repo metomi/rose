@@ -248,7 +248,11 @@ class RosieVCClient(object):
         new_id = None
         while new_id is None:
             if create_meta_suite:
-                new_id = SuiteId(id_text="ROSIE")
+                if prefix is None:
+                    new_id = SuiteId(id_text="ROSIE")
+                else:
+                    idx = SuiteId.FORMAT_IDX % (prefix, "ROSIE")
+                    new_id = SuiteId(id_text=idx)
             else:
                 new_id = SuiteId.get_next(prefix)
             new_origin = new_id.to_origin() + "/" + new_id.BRANCH_TRUNK

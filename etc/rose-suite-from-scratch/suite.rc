@@ -1,0 +1,36 @@
+#!jinja2
+[cylc]
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+[scheduling]
+    initial cycle time = 2013060100
+    final cycle time   = 2013060300
+    [[special tasks]]
+        cold-start = fcm_make_navigate, write_start_position
+    [[dependencies]]
+
+        [[[ 0, 3, 6, 9, 12, 15, 18, 21 ]]]
+            graph = """
+                write_start_position & \
+                fcm_make_navigate | navigate[T-3] => navigate
+            """
+[runtime]
+    [[root]]
+        command scripting = "rose task-run --verbose"
+        [[[event hooks]]]
+           succeeded handler = "rose suite-hook"
+           failed handler = "rose suite-hook --shutdown"
+           submission failed handler = "rose suite-hook --shutdown"
+           submission timeout handler = "rose suite-hook --mail"
+           execution timeout handler = "rose suite-hook --mail"
+           submission timeout = 1440 # 24 hours
+           execution timeout  =  180 # 3 hours
+    [[navigate]]
+        [[[environment]]]
+            POS_FPATH = $CYLC_SUITE_SHARE_PATH/position
+            TIME_INTERVAL_HRS = 3
+    [[write_start_position]]
+        command scripting = """
+            echo '50.0 -3.0' > $CYLC_SUITE_SHARE_PATH/position
+            """
