@@ -219,11 +219,11 @@ var {
     font-style: normal;
 }
 
-caption,
 .caption {
     font-size: 50%;
 }
 
+caption,
 h1,
 h2,
 h3,
