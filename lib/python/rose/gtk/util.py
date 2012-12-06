@@ -902,6 +902,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
         new_size[i] = min([my_size[i], max_size[i]])        
     scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     dialog.set_default_size(*new_size)
+    ok_button.grab_focus()
     response = dialog.run()
     dialog.destroy()
     return (response == gtk.RESPONSE_OK)
