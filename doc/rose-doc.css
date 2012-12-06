@@ -69,6 +69,26 @@ h1 {
     color: #ffcb00;
 }
 
+.not-trigger {
+    color: #5e2d79;
+}
+
+.trigger-ignored {
+    color: #070;
+}
+
+.user-ignored {
+    color: #d90;
+}
+
+.fail {
+    color: red;
+}
+
+.warn {
+    color: #ffc200;
+}
+
 
 /**********************************************************************
  * BACKGROUND COLOUR
@@ -77,10 +97,13 @@ h1 {
 h1 {
     background: #060048;
 }
+
+caption,
 code,
 kbd,
 pre,
 samp,
+th,
 .image {
     background: #eee;
 }
@@ -96,6 +119,10 @@ samp,
 
 .shell-prompt {
     background: none;
+}
+
+.odd {
+    background: #fafafa;
 }
 
 
@@ -136,6 +163,14 @@ h2 {
 .shell-prompt,
 #content h2 {
     border: none;
+}
+
+table,
+caption,
+td,
+th {
+    border: thin solid #ccc;
+    border-collapse: collapse;
 }
 
 
@@ -188,6 +223,7 @@ var {
     font-size: 50%;
 }
 
+caption,
 h1,
 h2,
 h3,
@@ -210,7 +246,8 @@ dt,
 
 code,
 kbd,
-samp {
+samp,
+th {
     white-space: nowrap;
 }
 
@@ -259,6 +296,10 @@ h1 {
     display: inline;
 }
 
+pre {
+    overflow: auto;
+}
+
 .alwayshidden {
     display: none
 }
@@ -267,6 +308,7 @@ h1 {
  * BORDER-RADIUS
  *
  **********************************************************************/
+caption,
 dl,
 pre,
 .image {
@@ -311,6 +353,14 @@ dl {
     margin-right: 0.5em;
 }
 
+caption {
+    margin-bottom: 0.2em;
+}
+
+table {
+    margin-top: 2em;
+}
+
 
 /**********************************************************************
  * PADDING
@@ -351,6 +401,12 @@ var {
 
 .header-footer p {
     padding-top: 0.5em;
+}
+
+caption,
+td,
+th {
+    padding: 0.1em;
 }
 
 
@@ -394,9 +450,11 @@ var {
  **********************************************************************/
 .header-footer {
     height: 2.9em;
-    width: 100%;
 }
 
-#body-main {
-    width: 100%;
+@media screen {
+    #body-header,
+    #body-main {
+        width: 100%;
+    }
 }

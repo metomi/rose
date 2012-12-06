@@ -760,8 +760,7 @@ class ConfigPage(gtk.VBox):
                                    variable.ignored_reason.copy()))
         target_widgets_done = []
         refresh_list = []
-        relevant_errs = [rose.config_editor.WARNING_TYPE_ENABLED,
-                         rose.config_editor.WARNING_TYPE_IGNORED]
+        relevant_errs = rose.config_editor.WARNING_TYPES_IGNORE
         for widget in self.get_main_variable_widgets():
             if hasattr(widget.get_parent(), 'variable'):
                 target = widget.get_parent()
