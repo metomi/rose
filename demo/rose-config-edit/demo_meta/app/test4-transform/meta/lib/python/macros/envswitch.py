@@ -15,7 +15,6 @@ class LogicalTransformer(rose.macro.MacroBase):
 
     def transform(self, config, meta_config=None):
         """Perform the transform operation on the env switch."""
-        change_list = []
         if config.get(["env", "TRANSFORM_SWITCH"]) is not None:
             value = config.get(["env", "TRANSFORM_SWITCH"]).value
             if value == rose.TYPE_BOOLEAN_VALUE_FALSE:
@@ -24,6 +23,5 @@ class LogicalTransformer(rose.macro.MacroBase):
                 new_value = rose.TYPE_BOOLEAN_VALUE_FALSE
             config.set(["env", "TRANSFORM_SWITCH"], new_value)
             info = self.WARNING_CHANGED_VALUE.format(value, new_value)
-            self.add_report(change_list, "env", "TRANSFORM_SWITCH", value,
-                            info)
-        return config, change_list
+            self.add_report("env", "TRANSFORM_SWITCH", value, info)
+        return config, self.reports

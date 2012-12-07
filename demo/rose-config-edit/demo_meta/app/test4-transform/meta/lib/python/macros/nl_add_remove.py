@@ -16,7 +16,6 @@ class NamelistAdderRemover(rose.macro.MacroBase):
 
     def transform(self, config, meta_config=None):
         """Perform the transform operation on the env switch."""
-        change_list = []
         section = "namelist:add_remove_nl"
         if config.get([section]) is not None:
             config.value.pop(section)
@@ -24,6 +23,5 @@ class NamelistAdderRemover(rose.macro.MacroBase):
         else:
             config.set([section])
             info = self.WARNING_ADDED.format(section)
-        self.add_report(change_list, section, None, None,
-                        info)
-        return config, change_list
+        self.add_report(section, None, None, info)
+        return config, self.reports

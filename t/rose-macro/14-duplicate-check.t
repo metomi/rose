@@ -51,7 +51,13 @@ duplicate = true
 [namelist:nl3]
 duplicate = true
 
+[namelist:nl3{modifier}]
+duplicate = true
+
 [namelist:nl4]
+duplicate = true
+
+[namelist:nl4{modifier}]
 duplicate = true
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
@@ -71,13 +77,13 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 4
     namelist:nl1=None=None
-        Section is "duplicate", but has no index or modifier.
+        incorrect "duplicate=true" metadata
     namelist:nl2(1)=None=None
-        Section has an an index or modifier, but is not "duplicate"
+        namelist:nl2 requires "duplicate=true" metadata
     namelist:nl3{modifier}=None=None
-        Section has an an index or modifier, but is not "duplicate"
+        namelist:nl3 requires "duplicate=true" metadata
     namelist:nl4{modifier}(1)=None=None
-        Section has an an index or modifier, but is not "duplicate"
+        namelist:nl4{modifier} requires "duplicate=true" metadata
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
