@@ -26,5 +26,5 @@ class NamelistIgnorer(rose.macro.MacroBase):
             else:
                 node.state = rose.config.ConfigNode.STATE_USER_IGNORED
                 info = self.WARNING_IGNORED.format(section)
-        self.add_report(change_list, section, None, None, info)
-        return config, change_list
+        self.add_report(section, None, None, info)
+        return config, self.reports

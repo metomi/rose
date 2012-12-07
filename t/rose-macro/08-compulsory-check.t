@@ -80,6 +80,9 @@ compulsory = true
 compulsory = true
 duplicate = true
 
+[namelist:compulsory_nl6{modifier}]
+duplicate = true
+
 [namelist:compulsory_nl6=my_var6]
 compulsory = true
 
