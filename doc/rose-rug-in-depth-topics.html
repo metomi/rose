@@ -38,35 +38,26 @@
       "license">Open Government Licence</a>.
       <br />
       <span id="rose-version"></span>
-    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+    </address>
 
-    <table summary="header table" class="doc-toggle">
-      <tr>
-        <td>
-          <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-          Documentation</a></p>
-        </td>
-
-        <td>
-          <div class="layout">
-            <div id="currentSlide">
-              <!-- DO NOT EDIT -->
-            </div>
-
-            <div id="controls">
-              <!-- DO NOT EDIT -->
-            </div>
-          </div>
-        </td>
-      </tr>
-    </table>
+    <div class="rose-link">
+    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+         Documentation</a></p>
+    </div>
+    <div id="currentSlide">
+        <!-- DO NOT EDIT -->
+    </div>
+    <div id="controls">
+        <!-- DO NOT EDIT -->
+    </div>
 
     <div class="header-footer" id="footer"></div>
   </div>
 
   <div id="body-main" class="presentation">
     <div class="slide">
-      <h1>Rose Overview: In Depth Topics</h1>
+      <h1>Rose User Guide: In Depth Topics</h1>
     </div>
 
     <div class="handout" id="content"></div>
@@ -178,7 +169,7 @@ title=Run XYZ for A, with improved B
       <h3>rose-suite.conf</h3>
 
       <p>Holds <a href="rose-configuration.html#suite">suite-specific</a>
-      settings (more in a <a href="rose-overview-suites.html">later part</a>
+      settings (more in a <a href="rose-rug-suites.html">later part</a>
       of the documentation):</p>
       <pre>
 [jinja2:suite.rc]
@@ -292,7 +283,7 @@ should-show-ignored = True
       <h3>suite.rc</h3>
 
       <p>This is the cylc configuration file - we'll discuss it properly in a
-      <a href="rose-overview-suites.html">later part</a> of the documentation.
+      <a href="rose-rug-suites.html">later part</a> of the documentation.
       </p>
       <pre>
 #!jinja2
@@ -386,7 +377,7 @@ should-show-ignored = True
     <div class="slide">
       <h2>Configuration Metadata - but fancier</h2>
 
-      <p>The <a href="rose-conf-meta-dev.html">Metadata Development Guide</a>
+      <p>The <a href="rose-rug-metadata-tutorial.html">Metadata Tutorial</a>
       covered fundamental metadata usage - there is quite a lot more!</p>
 
       <ul class="incremental">
@@ -559,8 +550,8 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
 
       <p>The config editor is the suite/application editor GUI.</p>
 
-      <p>Demo! If viewing offline, see the <a href=
-      "rose-config-edit.html">Config Editor Guide</a>.</p>
+      <p>Demo! If this isn't part of a course, see the <a href=
+      "rose-rug-config-edit.html">Config Editor Guide</a>.</p>
     </div>
 
     <div class="slide">
@@ -606,7 +597,7 @@ rose macro fib.FibonnaciChecker
       <p><code>rosie go</code> is the suite manager GUI. It acts as a hub for
       all your suite work.</p>
 
-      <p>Demo! If viewing offline, see the <a href="rosie-go.html">Rosie Go
+      <p>Demo! If viewing offline, see the <a href="rose-rug-rosie-go.html">Rosie Go
       Guide</a>.</p>
     </div>
 
@@ -644,12 +635,6 @@ rosie lookup -Q owner eq bob and title contains test
 
         <li>More fun for all</li>
       </ul>
-    </div>
-
-    <div class="slide">
-      <h2>Suite Usage/Design</h2>
-
-      <p>See <a href="rose-overview-suites.html">Suites Overview</a>.</p>
     </div>
   </div>
 </body>
