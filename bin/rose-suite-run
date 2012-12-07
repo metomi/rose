@@ -58,6 +58,17 @@
 #     --install-only, -i
 #         Install the suite, but do not run it. (This option is implied if
 #         --force mode is specified and the suite is already running.)
+#     --log-append
+#         Append to the existing log, if one exists.
+#         Implied by --run=reload|restart.
+#     --log-keep=DAYS
+#         Specify the number of days to keep log directories/archives.
+#         Do not housekeep if not specified.
+#     --log-name=NAME
+#         Specify a name for the log directory of the current run. If
+#         specified, it will create a symbolic link log.NAME to point to the
+#         log directory of the current run. Named log directories will not be
+#         automatically archived or housekept. Only works with --run=run.
 #     --name=NAME, -n NAME
 #         Specify the suite NAME in Cylc, instead of using the basename of the
 #         configuration directory.
@@ -66,14 +77,17 @@
 #     --no-gcontrol
 #         Do not run "cylc gui". Default is to run "cylc gui" if the
 #         DISPLAY environment variable is defined.
+#     --no-log-archive
+#         Do not archive (tar-gzip) old log directories.
 #     --no-overwrite
 #         Do not overwrite existing files.
 #     --opt-conf-key=KEY, -O KEY
 #         Each of this switches on an optional configuration identified by KEY.
 #     --quiet, -q
 #         Decrement verbosity.
-#     --restart
-#         Invoke "cylc restart" instead of "cylc run".
+#     --run=reload|restart|run
+#         Invoke "cylc reload|restart|run" according to this option.
+#         (default="run")
 #     --verbose, -v
 #         Increment verbosity.
 #

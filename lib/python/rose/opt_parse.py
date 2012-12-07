@@ -175,11 +175,36 @@ class RoseOptionParser(OptionParser):
                        ["--keys", "-k"],
                        {"action": "store_true",
                         "dest": "keys_mode",
-                        "help": "Print SECTION/OPTION keys only"}],
+                        "help": "Print SECTION/OPTION keys only."}],
                "latest": [
                        ["--latest"],
                        {"action": "store_true",
-                        "help": "Print the latest ID in the repository"}],
+                        "help": "Print the latest ID in the repository."}],
+               "log_archive_mode": [
+                       ["--no-log-archive"],
+                       {"action": "store_false",
+                        "default": True,
+                        "dest": "log_archive_mode",
+                        "help": "Do not archive old logs."}],
+               "log_keep": [
+                       ["--log-keep"],
+                       {"action": "store",
+                        "dest": "log_keep",
+                        "metavar": "DAYS",
+                        "help": "Specify number of days a log directory is" +
+                                " kept."}],
+               "log_name": [
+                       ["--log-name"],
+                       {"action": "store",
+                        "metavar": "NAME",
+                        "help": "Name the log directory of this run."}],
+               "log_open_mode": [
+                       ["--log-append"],
+                       {"action": "store_const",
+                        "const": "a",
+                        "default": "w",
+                        "dest": "log_open_mode",
+                        "help": "Append to log."}],
                "lower": [
                        ["--lower", "-l"],
                        {"action": "store_const",
@@ -309,12 +334,14 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "KEY=VALUE",
                         "help": "(Internal option, do not use.)"}],
-               "restart_mode": [
-                       ["--restart"],
-                       {"action": "store_true",
-                        "default": False,
-                        "dest": "restart_mode",
-                        "help": "Restart the suite."}],
+               "run_mode": [
+                       ["--run"],
+                       {"action": "store",
+                        "choices": ["reload", "restart", "run"],
+                        "default": "run",
+                        "dest": "run_mode",
+                        "metavar": "MODE",
+                        "help": "Specify run|restart|reload."}],
                "reverse": [
                        ["--reverse", "-r"],
                        {"action": "store_true",

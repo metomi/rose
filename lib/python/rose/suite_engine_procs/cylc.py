@@ -156,7 +156,8 @@ class CylcProcessor(SuiteEngineProcessor):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def launch_gcontrol(self, suite_name, host=None, *args):
+    def launch_gcontrol(
+            self, suite_name, host=None, log_open_mode=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
         log_dir = self.get_suite_dir(suite_name, "log")
         if not host:
@@ -166,10 +167,14 @@ class CylcProcessor(SuiteEngineProcessor):
                 host = open(host_file).read().strip()
             except IOError:
                 host = "localhost"
-        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1 &"
+        if log_open_mode not in ["w", "a"]:
+            log_open_mode = "w"
+        redirect_mode = {"w": ">", "a": ">>"}[log_open_mode]
+        fmt = r"nohup cylc gui --host=%s %s %s 1%s%s 2>&1 &"
         log = os.path.join(log_dir, "cylc-gui.log")
         args_str = self.popen.list_to_shell_str(args)
-        self.popen(fmt % (host, suite_name, args_str, log), shell=True)
+        self.popen(fmt % (host, suite_name, args_str, redirect_mode, log),
+                   shell=True)
 
     def ping(self, suite_name, hosts=None):
         """Return a list of host names where suite_name is running."""
@@ -290,8 +295,8 @@ class CylcProcessor(SuiteEngineProcessor):
             hook_event, suite, task, hook_message = args
         return [suite, task, hook_event, hook_message]
 
-    def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
-            args=None):
+    def run(self, suite_name, host=None, host_environ=None, run_mode=None,
+            log_open_mode=None, args=None):
         """Invoke "cylc run" (in a specified host).
         
         The current working directory is assumed to be the suite log directory.
@@ -299,7 +304,7 @@ class CylcProcessor(SuiteEngineProcessor):
         suite_name: the name of the suite.
         host: the host to run the suite. "localhost" if None.
         host_environ: a dict of environment variables to export in host.
-        restart_mode: call "cylc restart" instead of "cylc run".
+        run_mode: call "cylc restart|reload" instead of "cylc run".
         args: arguments to pass to "cylc run".
  
         """
@@ -315,14 +320,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 host = None
 
         # Invoke "cylc run" or "cylc restart"
-        cylc_command = "run"
-        if restart_mode:
-            cylc_command = "restart"
+        if run_mode not in ["reload", "restart", "run"]:
+            run_mode = "run"
+        if log_open_mode not in ["w", "a"]:
+            log_open_mode = "w"
+        redirect_mode = {"w": ">", "a": ">>"}[log_open_mode]
         # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
         # that the log will be redirected back via "ssh" to the localhost.
-        bash_cmd = r"nohup cylc %s %s %s 1>%s 2>&1 &" % (
-                cylc_command, suite_name, self.popen.list_to_shell_str(args),
-                "cylc-run.log")
+        bash_cmd = r"nohup cylc %s %s %s 1%s%s 2>&1 &" % (
+                run_mode, suite_name, self.popen.list_to_shell_str(args),
+                redirect_mode, "cylc-run.log")
         if host:
             bash_cmd_prefix = r"""#!/usr/bin/env bash
 for FILE in /etc/profile ~/.profile; do
