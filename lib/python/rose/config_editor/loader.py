@@ -391,12 +391,15 @@ class ConfigDataManager(object):
             latent_var_map = {}
         meta_ns_ids = []
         real_var_ids = []
+        basic_dupl_map = {}
         if just_this_section is None:
             key_nodes = config.walk()
         else:
             key_nodes = config.walk(keys=[just_this_section])
+            self._load_dupl_sect_map(basic_dupl_map, just_this_section)
         for keylist, node in key_nodes:
             if len(keylist) < 2:
+                self._load_dupl_sect_map(basic_dupl_map, keylist[0])
                 continue
             section, option = keylist
             ignored_reason = {}
@@ -432,10 +435,18 @@ class ConfigDataManager(object):
                                                   ignored_reason,
                                                   error={},
                                                   comments=cfg_comments))
-        for setting_id, sect_node in meta_config.value.items():
+        id_node_stack = meta_config.value.items()
+        while id_node_stack:
+            setting_id, sect_node = id_node_stack.pop(0)
             if sect_node.is_ignored():
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
+            if section in basic_dupl_map:
+                # There is a matching duplicate e.g. foo(3) or foo{bar}(1)
+                for dupl_section in basic_dupl_map[section]:
+                    dupl_id = self.util.get_id_from_section_option(
+                                               dupl_section, option)
+                    id_node_stack.insert(0, (dupl_id, sect_node))
             if just_this_section is not None and section != just_this_section:
                 continue
             ignored_reason = {}
@@ -473,6 +484,16 @@ class ConfigDataManager(object):
                                                ignored_reason,
                                                error={}))
         return var_map, latent_var_map
+
+    def _load_dupl_sect_map(self, basic_dupl_map, section):
+        basic_section = rose.macro.REC_ID_STRIP.sub("", section)
+        if basic_section != section:
+            basic_dupl_map.setdefault(basic_section, [])
+            basic_dupl_map[basic_section].append(section)
+            mod_section = rose.macro.REC_ID_STRIP_DUPL.sub("", section)
+            if mod_section != basic_section and mod_section != section:
+                basic_dupl_map.setdefault(mod_section, [])
+                basic_dupl_map[mod_section].append(section)
 
     def dump_to_internal_config(self, config_name, only_this_ns=None):
         """Return a rose.config.ConfigNode object from variable info."""
