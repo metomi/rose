@@ -1,6 +1,12 @@
-(C) British Crown Copyright 2012 Met Office.
+# Rose
 
 Rose is a framework for managing and running scientific suites.
+
+## Copyright
+
+British Crown Copyright 2012 Met Office.
+
+## Terms of Use
 
 Rose is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,16 +25,17 @@ Rose documentation is licensed under the British Open Government
 Licence. See doc/rose-terms-of-use.html and
 <http://www.nationalarchives.gov.uk/doc/open-government-licence/>
 
+## Acknowledgement
 
 Licences for non-Rose works included in this distribution can be
 found in the licences/ directory.
 
 doc/jquery.min.js:
-    Unmodified external software library. See lib/html/external/jquery/.
+* Unmodified external software library. See lib/html/external/jquery/.
 
-doc/S5:
-    Slightly modified version of S5, in the public domain.
-    See meyerweb.com/eric/tools/s5/.
+doc/S5/*:
+* Slightly modified version of S5, in the public domain.
+  See meyerweb.com/eric/tools/s5/.
 
 doc/rose-icon.png,
 etc/images/rose-icon.png,
@@ -38,33 +45,33 @@ etc/images/rose-splash-logo.png,
 etc/images/rosie-icon.png,
 etc/images/rosie-icon-trim.png,
 etc/metadata/all/etc/images/icon.png:
-    These icons are all derived from the public domain image at
-    <http://www.clker.com/clipart-compass-rose-variation.html>.
+* These icons are all derived from the public domain image at
+  <http://www.clker.com/clipart-compass-rose-variation.html>.
 
 etc/images/rose-config-edit/gnome_add.png,
 etc/images/rose-config-edit/gnome_package_system.png:
-    These icons are part of the GNOME icon theme 2.28.0, licensed under
-    GPLv2. This theme was developed by:
-        Ulisse Perusin <uli.peru@gmail.com>
-        Riccardo Buzzotta <raozuzu@yahoo.it>
-        Josef Vybíral <cornelius@vybiral.info>
-        Hylke Bons <h.bons@student.rug.nl>
-        Ricardo González <rick@jinlabs.com>
-        Lapo Calamandrei <calamandrei@gmail.com>
-        Rodney Dawes <dobey@novell.com>
-        Luca Ferretti <elle.uca@libero.it>
-        Tuomas Kuosmanen <tigert@gimp.org>
-        Andreas Nilsson <nisses.mail@home.se>
-        Jakub Steiner <jimmac@novell.com>
+* These icons are part of the GNOME icon theme 2.28.0, licensed under
+  GPLv2. This theme was developed by:
+  * Ulisse Perusin <uli.peru@gmail.com>
+  * Riccardo Buzzotta <raozuzu@yahoo.it>
+  * Josef Vybíral <cornelius@vybiral.info>
+  * Hylke Bons <h.bons@student.rug.nl>
+  * Ricardo González <rick@jinlabs.com>
+  * Lapo Calamandrei <calamandrei@gmail.com>
+  * Rodney Dawes <dobey@novell.com>
+  * Luca Ferretti <elle.uca@libero.it>
+  * Tuomas Kuosmanen <tigert@gimp.org>
+  * Andreas Nilsson <nisses.mail@home.se>
+  * Jakub Steiner <jimmac@novell.com>
 
 etc/images/rose-config-edit/gnome_add_*,
 etc/images/rose-config-edit/gnome_package_system_*:
-    These icons are derivative works produced from
-    etc/images/rose-config-edit/gnome_add.png or
-    etc/images/rose-config-edit/gnome_package_system.png, and are
+* These icons are derivative works produced from
+  * etc/images/rose-config-edit/gnome_add.png or
+  * etc/images/rose-config-edit/gnome_package_system.png, and are
     distributed in their preferred PNG form.
 
 lib/html/external/*:
-    These directories contain unmodified versions of external software
-    packages. Licences on usage and re-distribution are included for
-    each package. Please refer to them for detail.
+* These directories contain unmodified versions of external software
+  packages. Licences on usage and re-distribution are included for
+  each package. Please refer to them for detail.
