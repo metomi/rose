@@ -12,6 +12,10 @@
 /*html>body>body-header #toggle {position: fixed; top: 0; right: 0;} */
 
 /* making the outline look pretty-ish */
+
+address {float: right; width: 40%;}
+.rose-link {float: left; width: 40%;}
+#controls {margin-left: 5%; margin-right: 5%;}
 /*
 #slide0 h1, #slide0 h2, #slide0 h3, #slide0 h4 {border: none; margin: 0;}
 #slide0 h1 {padding-top: 1.5em;}
