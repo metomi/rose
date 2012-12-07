@@ -369,7 +369,7 @@ def main():
                                     rose.CONFIG_OPT_META_TYPE],
                                    no_ignore=True)
     if meta_opt_node is None or len(meta_opt_node.value.split("/")) < 2:
-        sys.exit(ERROR_LOAD_CONF_META_NODE)
+        sys.exit(rose.macro.ERROR_LOAD_CONF_META_NODE)
     try:
         upgrade_manager = MacroUpgradeManager(app_config, opts.downgrade)
     except OSError as e:
@@ -382,6 +382,7 @@ def main():
         curr_mark = CURRENT_VERSION_MARKER
         all_versions = [" " * len(curr_mark) + v for v in ok_versions]
         if opts.downgrade:
+            all_versions.reverse()
             if all_versions:
                 all_versions[0] = best_mark + all_versions[0].lstrip()
             all_versions.append(curr_mark + upgrade_manager.tag)
@@ -407,4 +408,6 @@ def main():
                                  opts.non_interactive)
 
 if __name__ == "__main__":
+    rose.macro.add_site_meta_paths()
+    rose.macro.add_env_meta_paths()
     main()
