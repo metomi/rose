@@ -274,22 +274,26 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
             key = key + "/" + rose.META_DEFAULT_VN_DIR
         meta_keys = [key]
         if is_upgrade:
-            meta_keys = key.split("/")[0]
+            meta_keys = [key.split("/")[0]]
         else:
             default_key = (key.rsplit("/", 1)[0] + "/" +
                            rose.META_DEFAULT_VN_DIR)
             if default_key != key:
                 meta_keys.append(default_key)
     for i, meta_key in enumerate(meta_keys):
+        path = os.path.join(meta_key, rose.META_CONFIG_NAME)
+        if is_upgrade:
+            path = meta_key
         try:
-            meta_path = locator.locate(os.path.join(meta_key,
-                                                    rose.META_CONFIG_NAME))
+            meta_path = locator.locate(path)
         except rose.resource.ResourceError:
             continue
         else:
             if not ignore_meta_error and i > 0:
                 warning = ERROR_LOAD_CHOSEN_META_PATH.format(meta_keys[0],
                                                              meta_keys[i])
+            if is_upgrade:
+                return meta_path, warning
             return os.path.dirname(meta_path), warning
     if not ignore_meta_error:
         warning = ERROR_LOAD_META_PATH.format(meta_keys[0])
