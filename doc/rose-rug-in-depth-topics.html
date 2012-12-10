@@ -136,7 +136,7 @@ default = hello.exe
 [env]
 !!MAX_TARGETS = 5
 
-![namelist:hello]
+[!namelist:hello]
 </pre>
         </li>
       </ul>
@@ -146,7 +146,7 @@ default = hello.exe
       <h3 class="alwayshidden">Format continued</h3>
 
       <p><samp>!</samp> or <samp>!!</samp> in front of a section
-      (<samp>![env]</samp>, <samp>!![env]</samp>) or option
+      (<samp>[!env]</samp>, <samp>[!!env]</samp>) or option
       (<samp>!MAX_TARGETS</samp>, <samp>!!MAX_TARGETS</samp>) means it is
       <em>ignored</em> and will not be output when the configuration is
       run.</p>
@@ -212,7 +212,7 @@ MAX_TARGETS = 5
 [file:local_orography]
 # The file to create a symlink to.
 source = /project/snowball/ctldata/orog_devon
-# mode can also be auto (usually =copy), or mkdir for directories.
+# mode can also be auto (usually =copy), or mkdir for dirs.
 mode = symlink
 
 # Another file - this time built from our namelist.
@@ -565,11 +565,10 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     <div class="slide">
       <h3 class="alwayshidden">rose macro examples</h3>
 
-      <p>Running <code>rose macro -a -V</code> in an application directory will
-      check against <em>all</em> (<code>-a</code>) built-in and custom
-      <em>validator</em> (<code>-V</code>) macros.</p>
+      <p>Running <code>rose macro --validate</code> in an application directory will
+      check against all built-in and custom <em>validator</em> macros.</p>
 
-      <p>Running <code>rose macro rose.macros.DefaultTransforms</code> will
+      <p>Running <code>rose macro --fix</code> will
       make Rose run the built-in transformer macros to fix your
       application.</p>
     </div>
