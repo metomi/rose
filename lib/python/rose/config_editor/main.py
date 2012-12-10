@@ -497,7 +497,7 @@ class MainController(object):
                 if not section.startswith(rose.SUB_CONFIG_FILE_DIR):
                     continue
                 for variable in variables:
-                    if variable.name != rose.FILE_VAR_CONTENT:
+                    if variable.name != rose.FILE_VAR_SOURCE:
                         continue
                     if (variable.value in [search_name, last_part] or
                         search_name in variable.value):

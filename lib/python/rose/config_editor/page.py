@@ -363,7 +363,7 @@ class ConfigPage(gtk.VBox):
             button_list.append(error_button)
             label_list.append(error_label)
         elif (self.see_also == '' or
-              rose.FILE_VAR_CONTENT not in self.see_also):
+              rose.FILE_VAR_SOURCE not in self.see_also):
             if (self.section is not None and 
                 self.section.name.startswith('namelist:')):
                 error_button = rose.gtk.util.CustomButton(
