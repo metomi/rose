@@ -51,7 +51,7 @@ class FileChooserValueWidget(gtk.HBox):
                                              tip_text="Browse for a filename")
         self.open_button.show()
         self.open_button.connect("clicked", self.run_and_destroy)
-        self.pack_end(self.open_button, expand=False, fill=False, padding=5)
+        self.pack_end(self.open_button, expand=False, fill=False)
         self.edit_button.set_sensitive(os.path.isfile(self.value))
 
     def generate_entry(self):
@@ -88,13 +88,12 @@ class FileChooserValueWidget(gtk.HBox):
         self.edit_button.connect(
                   "clicked",
                   lambda b: rose.external.launch_geditor(self.value))
-        self.pack_end(self.edit_button, expand=False, fill=False,
-                      padding=rose.config_editor.SPACING_SUB_PAGE)
+        self.pack_end(self.edit_button, expand=False, fill=False)
 
     def setter(self, widget):
         self.value = widget.get_text()
         self.set_value(self.value)
-        self.edit_button.set_sensitive(True)
+        self.edit_button.set_sensitive(os.path.isfile(self.value))
         return False
 
 
