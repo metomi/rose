@@ -121,6 +121,7 @@ class Reporter(object):
             level = self.DEFAULT
         msg = None
         for key, context in self.contexts.items():
+            insert_newline = False
             if context.is_closed():
                 self.contexts.pop(key) # remove contexts with closed file handles
                 continue
@@ -152,7 +153,7 @@ class Reporter(object):
                 if insert_newline:
                     context.write(msg_line + "\n")
                 else:
-                    context.write(msg_line)
+                    context.write(msg)
         if isinstance(message, Exception) and self.raise_on_exc:
             raise message
 
