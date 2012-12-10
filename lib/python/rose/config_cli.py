@@ -22,6 +22,7 @@
 from rose.config import ConfigDumper, ConfigLoader, ConfigNode
 from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator
+import rose.macro
 
 def main():
     """Implement the "rose config" command."""
@@ -37,6 +38,7 @@ def main():
                     sys.stdin.close()
                 else:
                     ConfigLoader()(file, root_node)
+                    print "Andy says the meta data is at: {0}".format(rose.macro.load_meta_path(directory=file))
         else:
             root_node = ResourceLocator.default().get_conf()
     except SyntaxError as e:
