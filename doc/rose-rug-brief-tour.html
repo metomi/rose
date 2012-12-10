@@ -150,8 +150,9 @@ rose rug-brief-tour
         in a cylc suite. In this example, we are running:
 
           <ul class="incremental">
-            <li><code>fcm_make</code>: a task to build an executable from a
-            source file containing a <em>hello world</em> program</li>
+            <li><code>fcm_make</code>: a special Rose application to build an
+            executable from a source file containing a <em>hello world</em>
+            program</li>
 
             <li><code>fred_hello_world</code>, <code>my_hello_mars</code>,
             <code>my_hello_world</code>: Rose <em>applications</em> that invoke
@@ -177,7 +178,7 @@ rose rug-brief-tour
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Populate the Suite: sub-directories</h3>
+      <h3 class="alwayshidden">Populate the Suite: sub-directories - app</h3>
 
       <ul>
         <li>Sub-directories:
@@ -185,15 +186,23 @@ rose rug-brief-tour
           <ul class="incremental">
             <li><kbd>app/</kbd>: This directory contains the configurations of
             the <em>applications</em> run by the <em>tasks</em> of the suite.
-            In this example suite, the directory contains 3 sets of application
-            configurations for running the <em>hello world</em> program in 3
-            different modes.</li>
+            In this example suite, the directory contains sets of application
+            configurations for running the <em>hello world</em> program in
+            different ways. Some of these are not used in the suite at the
+            moment. <kbd>app/fcm_make</kbd> is a special Rose application that
+            invokes <code>fcm make</code> using the configuration in
+            <kbd>app/fcm_make/file/fcm_make.cfg</kbd>.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
 
-            <li><kbd>etc/</kbd>: This directory contains miscellaneous files
-            used by tasks in the suite. In this example suite, the directory
-            contains the <kbd>fcm-make.cfg</kbd> file for the
-            <var>fcm_make</var> task.</li>
+    <div class="slide">
+      <h3 class="alwayshidden">Populate the Suite: sub-directories - src</h3>
 
+      <ul>
+        <li>Sub-directories:
+          <ul class="incremental">
             <li><kbd>src/</kbd>: This directory contains the source file of a
             simple program that we shall run in this suite. Note: This
             directory will not normally be present in a real scientific suite,
