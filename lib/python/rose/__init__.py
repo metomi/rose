@@ -79,6 +79,5 @@ TYPE_LOGICAL_TRUE_TITLE = 'true'
 
 # File variable names in the specification.
 FILE_VAR_CHECKSUM = 'checksum'
-FILE_VAR_CONTENT = 'content'
 FILE_VAR_MODE = 'mode'
 FILE_VAR_SOURCE = 'source'
