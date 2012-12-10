@@ -170,12 +170,13 @@ class SuiteLogViewGenerator(object):
         users_and_hosts_and_tasks = []
         if task_names:
             for task_name in task_names:
+                task_name_0 = task_name.split("%", 1)[0]
                 user_and_host = self.suite_engine_proc.get_task_auth(
-                        suite_name, task_name)
+                        suite_name, task_name_0)
                 if user_and_host is None:
                     continue
                 user, host = user_and_host
-                users_and_hosts_and_tasks.append((user, host, task))
+                users_and_hosts_and_tasks.append((user, host, task_name))
         else:
             users_and_hosts = self.suite_engine_proc.get_tasks_auths(suite_name)
             for user, host in users_and_hosts:
