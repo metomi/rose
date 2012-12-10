@@ -93,14 +93,14 @@
     <h3 class="alwayshidden">Suite Hierarchy</h3>
 
     <div class="handout">
-      <p>The typical suite hierarchy looks a bit like this:</p>
+      <p>A suite hierarchy can look a bit like this:</p>
     </div><img height="50%" width="60%" src="rose-suite-hierarchy.png" alt=
     "rose suite hierarchy" /></div>
 
     <div class="slide">
       <h3>Suite Files</h3>
 
-      <p>There are (only) about 5+1 different types of Rose INI-style
+      <p>There are (only) 5 different types of Rose INI-style
       files:</p>
 
       <ul class="incremental">
@@ -119,8 +119,11 @@
     <div class="slide">
       <h3 class="alwayshidden">Suite Files (cylc)</h3>
 
+      <p>There is also a cylc file, which is in a slightly different INI-based
+      format:</p>
+
       <ul class="incremental">
-        <li>suite.rc - cylc suite</li>
+        <li>suite.rc - cylc suite dependencies and configuration</li>
       </ul>
     </div>
 
@@ -347,15 +350,32 @@ should-show-ignored = True
       <h2 id="metadata">Configuration Metadata</h2>
 
       <p>Metadata for rose-suite.conf (and rose-app.conf settings) can be
-      <a href="rose-configuration.html#meta">pointed to</a> by:</p>
+      <a href="rose-configuration.html#meta">referenced</a> by:</p>
 
       <ul class="incremental">
-        <li>Having a <samp>meta/</samp> directory in a suite or an
+        <li><p>the <samp>meta</samp> flag in an app config,
+        e.g.:</p>
+        <pre>
+meta=rose-demo-upgrade/27.1
+</pre>
+        <p>which references centrally-stored metadata, looked up using the
+        <samp>meta-path</samp> user/site config setting.</p>
+        </li>
+      </ul>
+    </div>
+    <div class="slide">
+       <h3 class="alwayshidden">Configuration Metadata locations</h3>
+      
+      <p>You can store metadata in alternate locations, and reference it
+      using:</p>
+
+      <ul class="incremental">
+        <li>A <samp>meta/</samp> directory in a suite or an
         application.</li>
 
         <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
 
-        <li>The content of the <var>ROSE_META_PATH</var> environment
+        <li>The <var>ROSE_META_PATH</var> environment
         variable.</li>
 
         <li>The <samp>meta-path</samp> setting in <a href=
@@ -364,12 +384,21 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Configuration Metadata continued</h3>
+      <h3 class="alwayshidden">Configuration Metadata explanation</h3>
 
       <p>Metadata from (usually) subdirectories in the <samp>rose-meta</samp>
       directory in a a project's source tree is stored at a central Rose
-      location - this is pointed to by the site configuration
-      <samp>meta-path</samp> option.</p>
+      location - this location is pointed to by the site configuration
+      <samp>meta-path</samp> option (e.g.
+      <samp>/project/rose-metadata</samp>)</p>
+      
+      <p>The app config <samp>meta</samp> option configures which
+      subdirectories in a location to choose (e.g.
+      <samp>/project/rose-metadata/rose-demo-upgrade/27.1</samp>).</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Configuration Metadata branches</h3>   
 
       <p>You can check out a branch of a project, change its metadata, and test
       it by pointing <samp>meta-path</samp> at it (e.g. by running <code>rose
@@ -525,7 +554,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       <h4 class="alwayshidden">Macros continued</h4>
 
       <ul>
-        <li><code>Upgrade</code> macros - upgrade or downgrade application
+        <li><code>Upgrade</code> macros - upgrade (or downgrade) application
         configurations</li>
       </ul>
 

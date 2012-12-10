@@ -41,15 +41,18 @@
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
+
     <div id="currentSlide">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
+
     <div id="controls">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
 
     <div class="header-footer" id="footer"></div>
@@ -202,6 +205,7 @@ rose rug-brief-tour
 
       <ul>
         <li>Sub-directories:
+
           <ul class="incremental">
             <li><kbd>src/</kbd>: This directory contains the source file of a
             simple program that we shall run in this suite. Note: This
@@ -230,8 +234,8 @@ cd $HOME/roses/$ID # replace $ID with your suite ID
 rose suite-run
 </pre>
 
-      <p>This will install your suite under <var>$HOME/cylc-run/$ID</var>, start
-      your suite with <code>cylc</code> and fire up <code>cylc gui
+      <p>This will install your suite under <var>$HOME/cylc-run/$ID</var>,
+      start your suite with <code>cylc</code> and fire up <code>cylc gui
       $ID</code>.</p>
     </div>
 
@@ -245,9 +249,8 @@ rose suite-run
       status bar should indicate <samp>stopped with 'held'</samp>). You can now
       quit the <code>cylc gui</code>.</p>
 
-      <p>Note: If you quit <code>cylc gui</code> by mistake, you can restart
-      it by typing <code>rose suite-gcontrol $ID</code> on the command
-      line.</p>
+      <p>Note: If you quit <code>cylc gui</code> by mistake, you can restart it
+      by typing <code>rose suite-gcontrol $ID</code> on the command line.</p>
     </div>
 
     <div class="slide">
@@ -295,13 +298,12 @@ firefox log/index.html
     <div class="slide">
       <h3 class="alwayshidden">Tidy up the Suite</h3>
 
-      <p>You should commit your suite if you have just created it or made any
-      changes. Tidy up by removing your <samp>roses/$ID</samp> directory:</p>
+      <p>Commit your suite by running:</p>
       <pre class="shell">
-rm -rf $HOME/roses/$ID # replace $ID with your suite ID
+fcm commit
 </pre>
 
-      <p>You can recover your suite at any time by running:</p>
+      <p>You can checkout your suite at any time by running:</p>
       <pre class="shell">
 rosie checkout $ID # replace $ID with your suite ID
 </pre>
@@ -350,8 +352,7 @@ rosie go
 
       <p>Look at the list to find the row that has the suite $ID, project, and
       title from the command line tour. If you double-click on it, your suite
-      will be checked out and then the Rose configuration editor GUI will be
-      launched.</p>
+      will opened using the Rose configuration editor.</p>
 
       <p>Go ahead and double click on your suite. The config editor GUI will
       now launch.</p>
@@ -403,10 +404,19 @@ rosie go
     <div class="slide">
       <h3 class="alwayshidden">Config Editor GUI: run suite</h3>
 
-      <p>Finally, you can run your suite by clicking the <samp>Suite Run</samp>
-      button on the toolbar or selecting <kbd>Tools -&gt; Run Suite -&gt;
+      <p>You can run your suite by clicking the <samp>Suite Run</samp> button
+      on the toolbar or selecting <kbd>Tools -&gt; Run Suite -&gt;
       Default</kbd> from the top menu. This will invoke <code>rose
       suite-run</code>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Config Editor GUI: commit</h3>
+
+      <p>You can commit your suite by launching a terminal then typing
+      <samp>fcm commit</samp> in it, in the normal way. You can launch a
+      terminal from inside the GUI with <samp>Ctrl-T</samp> or by using the
+      menu: <kbd>Tools -&gt; Launch Terminal</kbd>.</p>
     </div>
 
     <div class="slide">
@@ -415,7 +425,8 @@ rosie go
       <p>You have finished the brief tour. Why not try the <a href=
       "rose-rug-metadata-tutorial.html">Metadata Tutorial</a> or read more
       about the GUIs at <a href="rose-rug-config-edit.html">Config Editor
-      Reference</a> and <a href="rose-rug-rosie-go.html">Rosie Go Reference</a>?</p>
+      Reference</a> and <a href="rose-rug-rosie-go.html">Rosie Go
+      Reference</a>?</p>
     </div>
   </div>
 </body>

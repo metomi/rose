@@ -33,7 +33,7 @@
         command scripting = "rose task-run -v"
         [[[remote]]]
             host = {{ ROSE_ORIG_HOST }}
-         # Begin Rose recommended event hook block
+        # Begin Rose recommended event hook block
         [[[event hooks]]]
            succeeded handler = "rose suite-hook"
            failed handler = "rose suite-hook --shutdown"
@@ -48,4 +48,4 @@
             sleep 10 && echo 'fred is in '$(find /usr/share/zoneinfo/[A-Z]*/ -type f -printf "%f\n" | shuf -n 1 || echo 'the pub')
         """
     [[fcm_make]]
-        command scripting = "sleep 10 && rose task-run -v"  # Slow down fcm make so we can see it run
+        pre-command scripting = "sleep 10"  # Slow down fcm make so we can see it run
