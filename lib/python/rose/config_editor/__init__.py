@@ -396,6 +396,7 @@ TIP_CONFIG_CHOOSE_NAME_ERROR = "Invalid directory name for the new config."
 TIP_ADD_TO_PAGE = 'Add to page...'
 TIP_REVERT_PAGE = 'Revert page to last save'
 TIP_SUITE_RUN_ARG = 'Enter extra suite run arguments'
+TIP_VALUE_ADD_URI = "Add a URI - for example a file path, or a web url"
 TREE_PANEL_ERROR = ' (1 error)'
 TREE_PANEL_ERRORS = ' ({0} errors)'
 TREE_PANEL_MODIFIED = ' (modified)'

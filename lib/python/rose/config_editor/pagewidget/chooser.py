@@ -27,6 +27,7 @@ import gtk
 
 import rose.config
 import rose.config_editor.variable
+import rose.config_editor.valuewidget
 import rose.formats
 import rose.gtk.choice
 import rose.variable
@@ -39,8 +40,7 @@ class PageFormatTree(gtk.VBox):
     MAX_COLS_SOURCE = 3
     MAX_ROWS_SOURCE = 3
     SPACING = rose.config_editor.SPACING_SUB_PAGE
-    FORMAT_LABEL = 'internal'
-    FILE_LABEL = 'external'
+    FORMAT_LABEL = 'hide formats'
     CONTENT_LABEL = 'sources'
     EMPTY_LABEL = 'empty'
 
@@ -55,6 +55,7 @@ class PageFormatTree(gtk.VBox):
         self._state = None
         formats = [f for f in rose.formats.__dict__ if not f.startswith('__')]
         self.formats = formats
+        self.formats_ok = None
         source_trigger_widget = gtk.RadioButton(label=self.CONTENT_LABEL)
         source_trigger_widget.connect_after(
                  'toggled', lambda b: self._toggle(b.get_active(), "int"))
@@ -122,47 +123,43 @@ class PageFormatTree(gtk.VBox):
                 self.var_ops.remove_var(var)
         return False
 
-    def _generate_source_table(self):
-        """Generate the table for the checksum, mode, source widgets."""
-        self.external_hbox.pack_start(table, expand=True, fill=True)
-        return table
+    def _toggle_formats(self, widget):
+        """Toggle the show/hide of the available format sections."""
+        self.formats_ok = not widget.get_active()
+        if widget.get_active():
+            self._source_avail_frame.hide()
+        else:
+            self._source_avail_frame.show()
 
     def _generate_source_table(self):
         """Generate the internal content tables."""
         self._ok_content_sections = set([None])
-        sources_now = self._get_included_sources()
-        format_sources = 0
-        for source in sources_now:
-            for format in self.formats:
-                if source.startswith(format + ":"):
-                    format_sources += 1
         if self.formats_ok is None:
-            self.formats_ok = bool(format_sources)
-        if self.files_ok is None:
-            self.files_ok = (format_sources < len(sources_now))
-        hbox = gtk.HBox()
-        hbox.show()
-        eb1 = gtk.EventBox()
-        eb1.show()
-        hbox.pack_start(eb1, expand=True, fill=True)  # Left pad.
-        format_check_button = gtk.CheckButton(label=self.FORMAT_LABEL)
-        format_check_button.set_active(has_format_sources)
-        format_check_button.connect('toggled', self._format_toggle)
-        format_check_button.show()
-        hbox.pack_start(format_check_button, expand=False, fill=False)
-        file_check_button = gtk.CheckButton(label=self.FILE_LABEL)
-        file_check_button.set_active(has_file_sources)
-        file_check_button.connect('toggled', self._file_toggle)
-        file_check_button.show()
-        hbox.pack_start(file_check_button, expand=False, fill=False)
-        eb2 = gtk.EventBox()
-        eb2.show()
-        hbox.pack_start(eb2, expand=True, fill=True)  # Right pad.
-        self.source_vbox.pack_start(hbox, expand=False, fill=False)
+            content_sections = self._get_included_sources()
+            num_format_sections = 0
+            for section in content_sections:
+                for format in self.formats:
+                    if section.startswith(format + ":"):
+                        num_format_sections += 1
+                        break
+                if num_format_sections > 0:
+                    break
+            self.formats_ok = (num_format_sections > 0)
+        
+        formats_check_button = gtk.CheckButton(self.FORMAT_LABEL)
+        formats_check_button.set_active(not self.formats_ok)
+        formats_check_button.connect("toggled", self._toggle_formats)
+        formats_check_button.show()
+        formats_check_hbox = gtk.HBox()
+        formats_check_hbox.show()
+        formats_check_hbox.pack_end(formats_check_button, expand=False,
+                                    fill=False)
+        self.source_vbox.pack_start(formats_check_hbox, expand=False,
+                                    fill=False)
         treeviews_hbox = gtk.HPaned()
         treeviews_hbox.show()
         self._source_value_listview = rose.gtk.choice.ChoicesListView(
-                                      self._set_content_value_listview,
+                                      self._set_source_value_listview,
                                       self._get_included_sources,
                                       self._handle_search)
         self._source_value_listview.set_tooltip_text(
@@ -176,19 +173,22 @@ class PageFormatTree(gtk.VBox):
         value_eb = gtk.EventBox()
         value_eb.show()
         value_vbox.pack_start(value_eb, expand=True, fill=True)
-        self._source_avail_treeview = rose.gtk.choice.ChoicesTreeView(
-                           self._set_content_avail_treeview,
-                           self._get_included_sources,
-                           self._get_available_sections,
-                           self._get_groups)
-        self._source_avail_treeview.set_tooltip_text(
-                       rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP)
-        avail_frame = gtk.Frame()
-        avail_frame.show()
-        avail_frame.add(self._source_avail_treeview)
+        self._source_avail_frame = gtk.Frame()
+        self._generate_source_avail_tree()
+        adder_value = ""
+        adder_metadata = {}
+        adder_set_value = lambda v: None
+        adder_hook = rose.config_editor.valuewidget.ValueWidgetHook()
+        adder = rose.config_editor.valuewidget.files.FileChooserValueWidget(
+                                   adder_value, adder_metadata,
+                                   adder_set_value, adder_hook)
+        adder.entry.connect("activate", self._add_file_source)
+        adder.entry.set_tooltip_text(rose.config_editor.TIP_VALUE_ADD_URI)
+        adder.show()
         treeviews_hbox.add1(value_vbox)
-        treeviews_hbox.add2(avail_frame)
+        treeviews_hbox.add2(self._source_avail_frame)
         self.source_vbox.pack_start(treeviews_hbox, expand=True, fill=True)
+        self.source_vbox.pack_start(adder, expand=True, fill=True)
         table = gtk.Table(rows=self.MAX_ROWS_SOURCE,
                           columns=self.MAX_COLS_SOURCE,
                           homogeneous=False)
@@ -226,21 +226,33 @@ class PageFormatTree(gtk.VBox):
         table.show()
         self.source_vbox.pack_start(table, expand=False, fill=False)
 
-    def _format_toggle(self, button):
-        self.formats_ok = button.get_active()
-
-    def _file_toggle(self, button):
-        self.files_ok = button.get_active()
+    def _generate_source_avail_tree(self):
+        """Generate an available choices widget."""
+        existing_widget = self._source_avail_frame.get_child()
+        if existing_widget is not None:
+            self._source_avail_frame.remove(existing_widget)
+        self._source_avail_treeview = rose.gtk.choice.ChoicesTreeView(
+                     self._set_source_avail_treeview,
+                     self._get_included_sources,
+                     self._get_available_sections,
+                     self._get_groups)
+        self._source_avail_treeview.set_tooltip_text(
+                       rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP)
+        self._source_avail_frame.show()
+        if not self.formats_ok:
+            self._source_avail_frame.hide()
+        self._source_avail_frame.add(self._source_avail_treeview)
 
     def _get_included_sources(self):
-        """Return sections included in the content variable."""
+        """Return sections included in the source variable."""
         variables = [v for v in self.panel_data + self.ghost_data]
         names = [v.name for v in variables]
         content_value = variables[names.index(rose.FILE_VAR_SOURCE)].value
         return shlex.split(content_value)
 
     def _get_available_sections(self):
-        """Return sections available to the content variable."""
+        """Return sections available to the source variable."""
+        ok_content_sections = []
         ok_content_sections = list(self.trigger_ask_for_config_keys())
         for section in ok_content_sections:
             if section.endswith(")"):
@@ -264,23 +276,40 @@ class PageFormatTree(gtk.VBox):
         ns = variables[0].metadata["full_ns"]
         self.var_ops.search_for_var(ns, name)
 
-    def _set_content_value_listview(self, new_value):
+    def _set_source_value_listview(self, new_value):
         """React to a set value request from the list view."""
-        self._set_content_value(new_value)
+        self._set_source_value(new_value)
         self._source_avail_treeview._realign()
 
-    def _set_content_avail_treeview(self, new_value):
+    def _set_source_avail_treeview(self, new_value):
         """React to a set value request from the tree view."""
-        self._set_content_value(new_value)
+        self._set_source_value(new_value)
         self._source_value_listview._populate()  
 
-    def _set_content_value(self, new_value):
-        """Set the content variable value."""
+    def _add_file_source(self, entry):
+        """Add a file to the sources list."""
+        url = entry.get_text()
+        if not url:
+            return False
         variables = [v for v in self.panel_data + self.ghost_data]
         names = [v.name for v in variables]
-        content_var = variables[names.index(rose.FILE_VAR_SOURCE)]
-        if content_var.value != new_value:
-            self.var_ops.set_var_value(content_var, new_value)
+        source_var = variables[names.index(rose.FILE_VAR_SOURCE)]
+        if source_var.value:
+            new_value = source_var.value + " " + url
+        else:
+            new_value = url
+        if source_var.value != new_value:
+            self.var_ops.set_var_value(source_var, new_value)
+            self._set_source_avail_treeview(new_value)
+            entry.set_text("")
+
+    def _set_source_value(self, new_value):
+        """Set the source variable value."""
+        variables = [v for v in self.panel_data + self.ghost_data]
+        names = [v.name for v in variables]
+        source_var = variables[names.index(rose.FILE_VAR_SOURCE)]
+        if source_var.value != new_value:
+            self.var_ops.set_var_value(source_var, new_value)
          
     def _sort_settings_duplicate(self, sect1, sect2):
         """Sort settings such that xyz(:) appears above xyz(1)."""
