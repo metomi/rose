@@ -40,8 +40,7 @@ class PageFormatTree(gtk.VBox):
     MAX_COLS_SOURCE = 3
     MAX_ROWS_SOURCE = 3
     SPACING = rose.config_editor.SPACING_SUB_PAGE
-    FORMAT_LABEL = 'hide formats'
-    CONTENT_LABEL = 'sources'
+    CONTENT_LABEL = 'source'
     EMPTY_LABEL = 'empty'
 
     def __init__(self, panel_data, ghost_data, var_ops, show_modes,
@@ -58,7 +57,7 @@ class PageFormatTree(gtk.VBox):
         self.formats_ok = None
         source_trigger_widget = gtk.RadioButton(label=self.CONTENT_LABEL)
         source_trigger_widget.connect_after(
-                 'toggled', lambda b: self._toggle(b.get_active(), "int"))
+                 'toggled', lambda b: self._toggle(b.get_active(), "source"))
         source_trigger_widget.show()
         empty_trigger_widget = gtk.RadioButton(source_trigger_widget,
                                                label=self.EMPTY_LABEL)
@@ -80,12 +79,13 @@ class PageFormatTree(gtk.VBox):
         self.pack_start(self.trigger_hbox, expand=False, fill=False)
         self.source_vbox = gtk.VBox()
         self.pack_start(self.source_vbox, expand=True, fill=True)
+        self._generate_source_table()
         self.show()
         if rose.FILE_VAR_SOURCE in [v.name for v in self.panel_data]:
-            self.source_vbox.show()
-            self._generate_source_table()
             source_trigger_widget.set_active(True)
+            self.source_vbox.show()
         else:
+            self.source_vbox.hide()
             empty_trigger_widget.set_active(True)
         return
 
@@ -118,9 +118,11 @@ class PageFormatTree(gtk.VBox):
                          var.value == "auto")):
                         continue
                     self.var_ops.add_var(var)
+            self.source_vbox.show()
         else:
             for var in list(self.panel_data):
                 self.var_ops.remove_var(var)
+            self.source_vbox.hide()
         return False
 
     def _toggle_formats(self, widget):
@@ -146,7 +148,8 @@ class PageFormatTree(gtk.VBox):
                     break
             self.formats_ok = (num_format_sections > 0)
         
-        formats_check_button = gtk.CheckButton(self.FORMAT_LABEL)
+        formats_check_button = gtk.CheckButton(
+                rose.config_editor.FILE_CONTENT_PANEL_FORMAT_LABEL)
         formats_check_button.set_active(not self.formats_ok)
         formats_check_button.connect("toggled", self._toggle_formats)
         formats_check_button.show()
@@ -161,7 +164,8 @@ class PageFormatTree(gtk.VBox):
         self._source_value_listview = rose.gtk.choice.ChoicesListView(
                                       self._set_source_value_listview,
                                       self._get_included_sources,
-                                      self._handle_search)
+                                      self._handle_search,
+                                      title=rose.FILE_VAR_SOURCE)
         self._source_value_listview.set_tooltip_text(
                        rose.config_editor.FILE_CONTENT_PANEL_TIP)
         frame = gtk.Frame()
@@ -235,7 +239,8 @@ class PageFormatTree(gtk.VBox):
                      self._set_source_avail_treeview,
                      self._get_included_sources,
                      self._get_available_sections,
-                     self._get_groups)
+                     self._get_groups,
+                     title=rose.config_editor.FILE_CONTENT_PANEL_TITLE)
         self._source_avail_treeview.set_tooltip_text(
                        rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP)
         self._source_avail_frame.show()
