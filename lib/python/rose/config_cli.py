@@ -48,7 +48,8 @@ def main():
                             fpath = meta_dir + "/rose-meta.conf"
                             ConfigLoader()(fpath, root_node)
                         else:
-                            root_node = None
+                            print "No metadata found for {0}".format(str(file))
+                            sys.exit(1)
         else:
             root_node = ResourceLocator.default().get_conf()
     except SyntaxError as e:
