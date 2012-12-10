@@ -396,6 +396,11 @@
 
       <dd>Combine the configurations in <var>FILE1</var> and <var>FILE2</var>,
       and dump the result.</dd>
+      
+      <dt><kbd>rose config --file=FILE --meta SECTION OPTION</kbd></dt>
+      
+      <dd>Print the value of <var>OPTION</var> in <var>SECTION</var> of the 
+      metadata associated with the specified config <var>FILE</var>.</dd>
     </dl>
 
     <h3>DESCRIPTION</h3>
@@ -430,6 +435,11 @@
       <dd>If specified, only print the <var>SECTION</var> keys in the
       configuration file or the <var>OPTION</var> keys in a
       <var>SECTION</var>.</dd>
+
+      <dt><kbd>--meta</kbd></dt>
+      
+      <dd>If specified, operate on the metadata associated with the 
+      configuration <var>FILE</var>.</dd>
 
       <dt><kbd>--print-ignored, -i</kbd></dt>
 

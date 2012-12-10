@@ -29,7 +29,7 @@ import sys
 def main():
     """Implement the "rose config" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("default", "files", "keys", "no_ignore")
+    opt_parser.add_my_options("default", "files", "keys", "no_ignore", "meta")
     opts, args = opt_parser.parse_args()
     try:
         if opts.files:
@@ -40,15 +40,15 @@ def main():
                     sys.stdin.close()
                 else:
                     ConfigLoader()(file, root_node)
-                    print type(file)
-                    print "/".join(file.split("/")[:-1])
-                    rel_path = "/".join(file.split("/")[:-1])
-                    print os.getcwd()
-                    print "Andy says the meta data is at: {0}".format(rose.macro.load_meta_path(config=root_node, directory=os.getcwd()+ "/" + rel_path)[0])
-                    meta = True
-                    
-                    if meta:
-                        ConfigLoader()(rose.macro.load_meta_path(config=root_node, directory=os.getcwd() + "/" + rel_path)[0] + "/rose-meta.conf", root_node)
+                    if opts.meta:
+                        rel_path = "/".join(file.split("/")[:-1])
+                        meta_dir = rose.macro.load_meta_path(config=root_node, 
+                                     directory=os.getcwd() + "/" + rel_path)[0]
+                        if meta_dir is not None:
+                            fpath = meta_dir + "/rose-meta.conf"
+                            ConfigLoader()(fpath, root_node)
+                        else:
+                            root_node = None
         else:
             root_node = ResourceLocator.default().get_conf()
     except SyntaxError as e:
