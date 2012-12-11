@@ -221,8 +221,10 @@ rose rug-brief-tour
 
       <p>At this point, you may want to have a look at the files before moving
       on to the next section. You may also want to commit your suite back to
-      the central repository if you have newly created it or made any
-      changes.</p>
+      the central repository by running:</p>
+      <pre class="shell">
+fcm commit
+</pre>
     </div>
 
     <div class="slide">
@@ -293,20 +295,6 @@ firefox log/index.html
       <p>The <samp>work/</samp> sub-directory contains the working directory
       for the tasks at their run times. It can be used by the tasks to create
       files that are only relevant to the tasks.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Tidy up the Suite</h3>
-
-      <p>Commit your suite by running:</p>
-      <pre class="shell">
-fcm commit
-</pre>
-
-      <p>You can checkout your suite at any time by running:</p>
-      <pre class="shell">
-rosie checkout $ID # replace $ID with your suite ID
-</pre>
     </div>
 
     <div class="slide">
