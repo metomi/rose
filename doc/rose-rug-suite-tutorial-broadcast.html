@@ -41,15 +41,18 @@
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
+
     <div id="currentSlide">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
+
     <div id="controls">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
 
     <div class="header-footer" id="footer"></div>
@@ -65,8 +68,8 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This part of the Rose user guide walks you through using
-      <code>cylc broadcast</code>.</p>
+      <p>This part of the Rose user guide walks you through using <code>cylc
+      broadcast</code>.</p>
 
       <p>This changes task runtime configuration in a running suite,
       on-the-fly.</p>
@@ -75,13 +78,13 @@
     <div class="slide">
       <h2>Purpose</h2>
 
-      <p><code>cylc broadcast</code> can be used to change any <samp>[runtime]</samp>
-      setting during a suite's run.</p>
-      
+      <p><code>cylc broadcast</code> can be used to change any
+      <samp>[runtime]</samp> setting during a suite's run.</p>
+
       <p>You could invoke it on the command line (e.g. as a manual response to
       a failure) or use it in a task script (e.g. as part of an auto-recovery
       task that fixes other tasks).</p>
-      
+
       <p><code>cylc broadcast</code> can also be used to communicate between
       tasks, where file-based communication is not appropriate.</p>
     </div>
@@ -90,9 +93,9 @@
       <h2 id="example">Example - CLI</h2>
 
       <p>We'll look at some example CLI usage first.</p>
-      
-      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a>
-      (or just a new directory) containing a blank <samp>rose-suite.conf</samp> and a
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory) containing a blank <samp>rose-suite.conf</samp> and a
       <samp>suite.rc</samp> file that looks like this:</p>
       <pre>
 [scheduling]
@@ -103,17 +106,18 @@
     [[dependencies]]
         [[[0]]]
             graph = """
-                startup | print_colour[T-24] => print_colour
+                startup | print_colour[T-24] =&gt; print_colour
             """
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Runtime</h3>
-      
+
       <p>This sets up a standard cycling suite.</p>
 
-      <p>Our daily task (<samp>print_colour</samp>) will need some runtime - add:</p>
+      <p>Our daily task (<samp>print_colour</samp>) will need some runtime -
+      add:</p>
       <pre>
 [runtime]
     [[root]]
@@ -130,10 +134,10 @@
     </div>
 
     <div class="slide">
-       <h3 class="alwayshidden">Running it</h3>
-     
+      <h3 class="alwayshidden">Running it</h3>
+
       <p>This will print some html with appropriate coloured text when run.</p>
-      
+
       <p>Change directory to the root of the suite.</p>
 
       <p>Run the suite using:</p>
@@ -141,50 +145,49 @@
 rose suite-run
 </pre>
     </div>
-    
-    <div class="slide">
-       <h3 class="alwayshidden">cylc broadcast</h3>
-       
-       <p>Now try running <code>cylc broadcast</code> to change the colour.
-       You'll need to substitute the name of your suite for $SUITE_ID.</p>
-       
-       <p>If the suite is not running on your local machine, you should add the option
-       <samp>--host=HOSTNAME</samp> where <samp>HOSTNAME</samp> is the
-       suite run host (look for <samp>will run on XXX</samp> in the
-       suite run output).</p>
 
-       <pre class="shell">
+    <div class="slide">
+      <h3 class="alwayshidden">cylc broadcast</h3>
+
+      <p>Now try running <code>cylc broadcast</code> to change the colour.
+      You'll need to substitute the name of your suite for $SUITE_ID.</p>
+
+      <p>If the suite is not running on your local machine, you should add the
+      option <samp>--host=HOSTNAME</samp> where <samp>HOSTNAME</samp> is the
+      suite run host (look for <samp>will run on XXX</samp> in the suite run
+      output).</p>
+      <pre class="shell">
 cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=red $SUITE_ID
 </pre>
     </div>
-    
-    <div class="slide">
-       <h3 class="alwayshidden">cylc broadcast continued</h3>
-       
-       <p>Try changing the colour to something else, e.g.:</p>
 
-       <pre class="shell">
+    <div class="slide">
+      <h3 class="alwayshidden">cylc broadcast continued</h3>
+
+      <p>Try changing the colour to something else, e.g.:</p>
+      <pre class="shell">
 cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=blue $SUITE_ID
 </pre>
     </div>
-    
+
     <div class="slide">
-       <h2 id="output">Output</h2>
-       
-       <p>You can see the results of your changes by looking at the output
-       viewer. Run:</p>
-       <pre class="shell">
+      <h2 id="output">Output</h2>
+
+      <p>You can see the results of your changes by looking at the output
+      viewer. Run:</p>
+      <pre class="shell">
 rose suite-log-view
 </pre>
-       <p>The output (<samp>out</samp>) of the <samp>print_colour</samp> tasks should have
-       some coloured text.</p>
+
+      <p>The output (<samp>out</samp>) of the <samp>print_colour</samp> tasks
+      should have some coloured text.</p>
     </div>
-    
+
     <div class="slide">
-       <h2>Further reading</h2>
-       
-       <p>For more information, run:</p>
-       <pre class="shell">
+      <h2>Further reading</h2>
+
+      <p>For more information, run:</p>
+      <pre class="shell">
 cylc help broadcast
 </pre>
     </div>

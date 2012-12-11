@@ -41,15 +41,18 @@
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
+
     <div id="currentSlide">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
+
     <div id="controls">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
 
     <div class="header-footer" id="footer"></div>
@@ -65,19 +68,19 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This part of the Rose user guide walks you through using
-      cylc queues.</p>
+      <p>This part of the Rose user guide walks you through using cylc
+      queues.</p>
 
-      <p>These can limit the number of tasks in a namespace 
-      submitted or running at any given time.</p>
+      <p>These can limit the number of tasks in a namespace submitted or
+      running at any given time.</p>
     </div>
 
     <div class="slide">
       <h2>Purpose</h2>
 
-      <p>queues are used to put a limit on the number of tasks that
-      will be active at any one time, even if their dependencies are satisfied.</p>
-      
+      <p>queues are used to put a limit on the number of tasks that will be
+      active at any one time, even if their dependencies are satisfied.</p>
+
       <p>This avoids swamping systems with too many tasks at once.</p>
     </div>
 
@@ -87,35 +90,35 @@
       <p>In this example, our suite manages a particularly understaffed
       restaurant.</p>
 
-      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a>
-      (or just a new directory) containing a blank <samp>rose-suite.conf</samp> and a
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory) containing a blank <samp>rose-suite.conf</samp> and a
       <samp>suite.rc</samp> file with the following contents:</p>
-   </div>
-   
+    </div>
+
     <div class="slide">
-      <h3 class="alwayshidden">Example scheduling</h2> 
+      <h3 class="alwayshidden">Example scheduling</h3>
       <pre>
 [scheduling]
     [[dependencies]]
         graph = """
-            open_restaurant => steak1 & steak2 & pasta1 & pasta2 & pasta3 & \
-                               pizza1 & pizza2 & pizza3 & pizza4
-            steak1 => ice_cream1
-            steak2 => cheesecake1
-            pasta1 => ice_cream2
-            pasta2 => sticky_toffee1
-            pasta3 => cheesecake2
-            pizza1 => ice_cream3
-            pizza2 => ice_cream4
-            pizza3 => sticky_toffee2
-            pizza4 => ice_cream5
+            open_restaurant =&gt; steak1 &amp; steak2 &amp; pasta1 &amp; pasta2 &amp; pasta3 &amp; \
+                               pizza1 &amp; pizza2 &amp; pizza3 &amp; pizza4
+            steak1 =&gt; ice_cream1
+            steak2 =&gt; cheesecake1
+            pasta1 =&gt; ice_cream2
+            pasta2 =&gt; sticky_toffee1
+            pasta3 =&gt; cheesecake2
+            pizza1 =&gt; ice_cream3
+            pizza2 =&gt; ice_cream4
+            pizza3 =&gt; sticky_toffee2
+            pizza4 =&gt; ice_cream5
         """
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Runtime</h3>
-      
+
       <p>We'll add some information in the <samp>[runtime]</samp> section:</p>
       <pre>
 [runtime]
@@ -134,25 +137,26 @@
     </div>
 
     <div class="slide">
-       <h3 class="alwayshidden">Overwhelming!</h3>
-     
-      <p>If run, all the <samp>steak</samp>, <samp>pasta</samp>, and <samp>pizza</samp>
-      tasks will be run at once, swiftly followed by all the <samp>ice_cream</samp>,
-      <samp>cheesecake</samp>, <samp>sticky_toffee</samp> tasks as the customers
-      order from the dessert menu.</p>
-      
-      <p>This will overwhelm our restaurant staff! The chef responsible for <samp>MAINS</samp>
-      can only handle 3 tasks at any given time, and the <samp>DESSERT</samp> chef
-      can only handle 2.</p>
-      
+      <h3 class="alwayshidden">Overwhelming!</h3>
+
+      <p>If run, all the <samp>steak</samp>, <samp>pasta</samp>, and
+      <samp>pizza</samp> tasks will be run at once, swiftly followed by all the
+      <samp>ice_cream</samp>, <samp>cheesecake</samp>,
+      <samp>sticky_toffee</samp> tasks as the customers order from the dessert
+      menu.</p>
+
+      <p>This will overwhelm our restaurant staff! The chef responsible for
+      <samp>MAINS</samp> can only handle 3 tasks at any given time, and the
+      <samp>DESSERT</samp> chef can only handle 2.</p>
+
       <p>We need to add some queues.</p>
     </div>
-    
+
     <div class="slide">
-       <h3 class="alwayshidden">Add queues</h3>
-     
-       <p>Replace the <samp>[scheduling]</samp> line with:</p>
-       <pre>
+      <h3 class="alwayshidden">Add queues</h3>
+
+      <p>Replace the <samp>[scheduling]</samp> line with:</p>
+      <pre>
 [scheduling]
     [[queues]]
         [[[mains_chef_queue]]]
@@ -162,11 +166,11 @@
             limit = 2  # Only 2 dessert dishes at one time.
             members = DESSERT
 </pre>
-    </div>    
+    </div>
 
-   <div class="slide">
-      <h3 class="alwayshidden">Running it</h3> 
-    
+    <div class="slide">
+      <h3 class="alwayshidden">Running it</h3>
+
       <p>Change directory to the root of the suite.</p>
 
       <p>Run the suite using:</p>
@@ -174,22 +178,23 @@
 rose suite-run
 </pre>
     </div>
-    
+
     <div class="slide">
-       <h3 class="alwayshidden">Results</h3>
-       
-       <p>When <code>cylc gui</code> starts up, you can see
-       that there are never more than 3 active <samp>MAINS</samp> tasks
-       running and never more than 2 active <samp>DESSERT</samp> tasks
-       running.</p>
-       
-       <p>The customers will obviously have to wait!</p>
+      <h3 class="alwayshidden">Results</h3>
+
+      <p>When <code>cylc gui</code> starts up, you can see that there are never
+      more than 3 active <samp>MAINS</samp> tasks running and never more than 2
+      active <samp>DESSERT</samp> tasks running.</p>
+
+      <p>The customers will obviously have to wait!</p>
     </div>
 
     <div class="slide">
-       <h2>Further Reading</h2>
-       
-       <p>For more information, see the <a href="http://cylc.github.com/cylc/single/cug-html.html">cylc user guide</a>.</p>
+      <h2>Further Reading</h2>
+
+      <p>For more information, see the <a href=
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc user
+      guide</a>.</p>
     </div>
   </div>
 </body>
