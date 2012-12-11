@@ -92,7 +92,7 @@
       <p>We'll look at some example CLI usage first.</p>
       
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a>
-      (or just a new directory) with a blank <samp>rose-suite.conf</samp> and a
+      (or just a new directory) containing a blank <samp>rose-suite.conf</samp> and a
       <samp>suite.rc</samp> file that looks like this:</p>
       <pre>
 [scheduling]
@@ -102,9 +102,9 @@
         cold-start = startup
     [[dependencies]]
         [[[0]]]
-        graph = """
-            startup | print_colour[T-24] => print_colour
-        """
+            graph = """
+                startup | print_colour[T-24] => print_colour
+            """
 </pre>
     </div>
 
@@ -113,11 +113,7 @@
       
       <p>This sets up a standard cycling suite.</p>
 
-      <p>Our daily task (<samp>print_colour</samp>) will need some runtime.</p>
-    </div>
-    
-    <div class="slide">
-      <h3 class="alwayshidden">Runtime excerpt</h3>
+      <p>Our daily task (<samp>print_colour</samp>) will need some runtime - add:</p>
       <pre>
 [runtime]
     [[root]]
@@ -136,7 +132,7 @@
     <div class="slide">
        <h3 class="alwayshidden">Running it</h3>
      
-      <p>This will print some html with appropriate coloured text.</p>
+      <p>This will print some html with appropriate coloured text when run.</p>
       
       <p>Change directory to the root of the suite.</p>
 
@@ -150,8 +146,9 @@ rose suite-run
        <h3 class="alwayshidden">cylc broadcast</h3>
        
        <p>Now try running <code>cylc broadcast</code> to change the colour.
-       You'll need to substitude the name of your suite for $SUITE_ID. If the
-       suite is not running on your local machine, you should add the option
+       You'll need to substitute the name of your suite for $SUITE_ID.</p>
+       
+       <p>If the suite is not running on your local machine, you should add the option
        <samp>--host=HOSTNAME</samp> where <samp>HOSTNAME</samp> is the
        suite run host (look for <samp>will run on XXX</samp> in the
        suite run output).</p>
@@ -179,8 +176,17 @@ cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=blue $SUIT
        <pre class="shell">
 rose suite-log-view
 </pre>
-       <p>The output of the <samp>print_colour</samp> tasks should have
+       <p>The output (<samp>out</samp>) of the <samp>print_colour</samp> tasks should have
        some coloured text.</p>
+    </div>
+    
+    <div class="slide">
+       <h2>Further reading</h2>
+       
+       <p>For more information, run:</p>
+       <pre class="shell">
+cylc help broadcast
+</pre>
     </div>
   </div>
 </body>
