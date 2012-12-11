@@ -80,13 +80,14 @@
         <li>rosie go</li>
 
         <li>rosie CLI</li>
-
-        <li>Future of Rose</li>
       </ul>
     </div>
 
     <div class="slide">
       <h2 id="suites">Suites</h2>
+      
+      <p>A Rose suite is a runnable collection of one or more Rose application
+        configurations, plus any miscellaneous scripts and resources.</p>
     </div>
 
     <div class="slide">
@@ -120,17 +121,15 @@
       <h3 class="alwayshidden">Suite Files (cylc)</h3>
 
       <p>There is also a cylc file, which is in a slightly different INI-based
-      format:</p>
-
-      <ul class="incremental">
-        <li>suite.rc - cylc suite dependencies and configuration</li>
-      </ul>
+      format - <samp>suite.rc</samp>. This holds cylc suite dependencies and
+      configuration.</p>
     </div>
 
     <div class="slide">
-      <h3>Format</h3>
+      <h3>Rose Configuration Format</h3>
 
       <ul class="incremental">
+      
         <li>See <a href="rose-configuration.html#format">Configuration
         Format</a>.</li>
 
@@ -185,8 +184,8 @@ END_TIME = 20121221
 [file:app/goodbye_world]
 source = fcm:hello_tr/standard_apps/goodbye_world@25678
 
-[file:app/fcm_make/file/fcm-make.cfg]
-source = /project/hello/fcm_make/mayanpwr0.1/fcm-make.cfg
+[file:etc/debug.glyph]
+source = /project/hello/mayanpwr0.1/debug.glyph
 </pre>
     </div>
 
@@ -286,8 +285,9 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
-      <h3>suite.rc</h3>
+      <h3>cylc suite.rc</h3>
 
+      <p><em>(Different format)</em></p>
       <p>This is the cylc configuration file - we'll discuss it properly in a
       <a href="rose-rug-suites.html">later part</a> of the documentation.</p>
       <pre>
