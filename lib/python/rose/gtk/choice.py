@@ -34,10 +34,12 @@ class ChoicesListView(gtk.TreeView):
     ordered list of included names to display.
     handle_search is a function that accepts a name and triggers a
     search for it.
+    title is displayed as the column header, if given.
 
     """
 
-    def __init__(self, set_value, get_data, handle_search, allow_edit=False):
+    def __init__(self, set_value, get_data, handle_search,
+                 title=rose.config_editor.CHOICE_TITLE_INCLUDED):
         super(ChoicesListView, self).__init__()
         self._set_value = set_value
         self._get_data = get_data
@@ -57,7 +59,7 @@ class ChoicesListView(gtk.TreeView):
         self.connect("row-activated", self._handle_activation)
         self.show()
         col = gtk.TreeViewColumn()
-        col.set_title(rose.config_editor.CHOICE_TITLE_INCLUDED)
+        col.set_title(title)
         cell_text = gtk.CellRendererText()
         col.pack_start(cell_text, expand=True)
         col.set_cell_data_func(cell_text, self._set_cell_text)
@@ -166,6 +168,7 @@ class ChoicesListView(gtk.TreeView):
     def _remove_iter(self, iter_):
         self.get_model().remove(iter_)
         self._handle_reordering()
+        self._populate()
 
     def _set_cell_text(self, column, cell, model, r_iter):
         name = model.get_value(r_iter, 0)
@@ -192,11 +195,13 @@ class ChoicesTreeView(gtk.TreeView):
     available names and returns groups that supercede name.
     get_is_implicit is an optional function that accepts a name and
     returns whether the name is implicitly included in the content.
+    title is displayed as the column header, if given.
 
     """
 
     def __init__(self, set_value, get_data, get_available_data,
-                 get_groups, get_is_implicit=None):
+                 get_groups, get_is_implicit=None,
+                 title=rose.config_editor.CHOICE_TITLE_AVAILABLE):
         super(ChoicesTreeView, self).__init__()
         # Generate the 'available' sections view.
         self._set_value = set_value
@@ -227,7 +232,7 @@ class ChoicesTreeView(gtk.TreeView):
         col.set_cell_data_func(cell_toggle, self._set_cell_state)
         self.append_column(col)
         col = gtk.TreeViewColumn()
-        col.set_title(rose.config_editor.CHOICE_TITLE_AVAILABLE)
+        col.set_title(title)
         cell_text = gtk.CellRendererText()
         col.pack_start(cell_text, expand=True)
         col.set_cell_data_func(cell_text, self._set_cell_text)

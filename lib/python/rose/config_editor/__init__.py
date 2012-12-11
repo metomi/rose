@@ -369,8 +369,10 @@ TITLE_FILE_PANEL = "Other files"
 SUMMARY_DATA_PANEL_IGNORED_MARKUP = "<b>{0}</b>"
 SUMMARY_DATA_PANEL_MAX_LEN = 15
 SUMMARY_DATA_PANEL_SECTION_TITLE = "Section"
-FILE_CONTENT_PANEL_OPT_TIP = "Content available for file."
-FILE_CONTENT_PANEL_TIP = "Content included in file"
+FILE_CONTENT_PANEL_FORMAT_LABEL = "Hide available sections"
+FILE_CONTENT_PANEL_OPT_TIP = "Items available for file source"
+FILE_CONTENT_PANEL_TIP = "Items included in file source"
+FILE_CONTENT_PANEL_TITLE = "Available sections"
 
 # Tooltip (hover-over) text
 
@@ -396,6 +398,7 @@ TIP_CONFIG_CHOOSE_NAME_ERROR = "Invalid directory name for the new config."
 TIP_ADD_TO_PAGE = 'Add to page...'
 TIP_REVERT_PAGE = 'Revert page to last save'
 TIP_SUITE_RUN_ARG = 'Enter extra suite run arguments'
+TIP_VALUE_ADD_URI = "Add a URI - for example a file path, or a web url"
 TREE_PANEL_ERROR = ' (1 error)'
 TREE_PANEL_ERRORS = ' ({0} errors)'
 TREE_PANEL_MODIFIED = ' (modified)'

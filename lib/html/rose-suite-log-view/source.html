@@ -136,8 +136,9 @@ $(function() {
     var suite = get_opt("suite");
     var path = get_opt("path");
     var text_mode = get_opt("text_mode");
-    var path_url = decodeURIComponent(path);
-    $("#view-raw").attr("href", encodeURIComponent(path_url));
+    var path_raw = decodeURIComponent(path);
+    var path_url = path_raw.replace(/%/, "%25");
+    $("#view-raw").attr("href", path_url);
     var href = location.pathname + "?suite=" + suite + "&path=" + path
     if (text_mode) {
         $("#view-mode").attr("href", href).text("HTML mode");
@@ -145,13 +146,13 @@ $(function() {
     else {
         $("#view-mode").attr("href", href + "&text_mode=1").text("text mode");
     }
-    var title = path_url.substring(path_url.lastIndexOf("/") + 1);
+    var title = path_raw.substring(path_raw.lastIndexOf("/") + 1);
     title = title.replace(/-\d+\.\d+\.?/, " ") + " - " + suite;
     document.title = title;
     $("#heading").text(title);
     $("#loading").text(ST_FILE_LOADING);
     $.ajax({
-        url : path_url.replace(/%/, "%25"),
+        url : path_url,
         dataType: "text",
         error: function(request, errortype, exception) {
             alert(errortype + ": could not load \"" + path + "\"");
