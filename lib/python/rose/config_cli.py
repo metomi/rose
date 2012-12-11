@@ -41,15 +41,14 @@ def main():
                 else:
                     if opts.meta:
                         rel_path = "/".join(file.split("/")[:-1])
-                        meta_dir = rose.macro.load_meta_path(config=root_node, 
+                        meta_dir = rose.macro.load_meta_path(config=root_node,
                                      directory=os.getcwd() + "/" + rel_path)[0]
                         if meta_dir is not None:
                             fpath = meta_dir + "/rose-meta.conf"
                             ConfigLoader()(fpath, root_node)
                         else:
                             print "No metadata found for {0}".format(str(file))
-                            sys.exit(1)
-                     else:
+                    else:
                         ConfigLoader()(file, root_node)
         else:
             root_node = ResourceLocator.default().get_conf()
