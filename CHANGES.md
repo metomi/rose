@@ -6,57 +6,52 @@
 
 Changes that has significant impact on user experience.
 
-metomi/rose#244
-* Tutorial: Added S5 slide show enabled documentation chapters.
+#244: Tutorial: Added S5 slide show enabled documentation chapters.
 
 ### Other Changes
 
 Changes that are worth mentioning.
 
-metomi/rose#249
-* rose config-edit: Fix duplicate errors.
+#271 rose metadata-gen: Removes some extraneous `duplicate` metadata.
 
-metomi/rose#248
-* rose-suite-log-view: Log file view:
-  * Added link to toggle between HTML and text.
-  * Added link to view raw text.
+#261, #263 rose config-edit: file `content` no longer supported.
 
-metomi/rose#242
-* rose suite-run: New --restart option to launch `cylc restart` instead of
-  `cylc run`.
+#257: rosie app-upgrade: fix various bugs.
 
-metomi/rose#241
-* rosie create: Allow alternate prefix for special metadata suite.
+#253: rose config-edit: fix modifier latent variables.
 
-metomi/rose#239
-* rose config-edit, rose-macro: Added auto fixer functionality.
+#252: rosie lookup: fix non-terminal display problem.
 
-metomi/rose#238
-* rose suite-log-view: New --full option to re-sync logs of remote tasks.
+#249: rose config-edit: Fix duplicate errors.
 
-metomi/rose#237
-* rosie go: Fixed start up error.
+#248: rose-suite-log-view: Log file view:
+* Added link to toggle between HTML and text.
+* Added link to view raw text.
 
-metomi/rose#236
-* rosie create: Fixed copy bug.
+#242: rose suite-run: New --restart option to launch `cylc restart` instead of
+`cylc run`.
 
-metomi/rose#235
-* Improved demo suite.
+#241: rosie create: Allow alternate prefix for special metadata suite.
 
-metomi/rose#233
-* rose config-edit: Better *ignored* errors and latent variable triggering.
+#239: rose config-edit, rose-macro: Added auto fixer functionality.
 
-metomi/rose#232
-* Installation Guide: Improved wording.
+#238: rose suite-log-view: New --full option to re-sync logs of remote tasks.
 
-metomi/rose#231
-* rose date: New command.
+#237: rosie go: Fixed start up error.
 
-metomi/rose#228
-* Reference Guide: Configuration: Remove deprecated syntax.
+#236: rosie create: Fixed copy bug.
 
-metomi/rose#227
-* rose: Improved CLI help and version display.
+#235: Improved demo suite.
+
+#233: rose config-edit: Better *ignored* errors and latent variable triggering.
+
+#232: Installation Guide: Improved wording.
+
+#231: rose date: New command.
+
+#228: Reference Guide: Configuration: Remove deprecated syntax.
+
+#227: rose: Improved CLI help and version display.
 
 ## Rose 2012-11 (2012-11-30)
 
