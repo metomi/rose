@@ -379,7 +379,8 @@ class SuiteRunner(Runner):
     OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
                "gcontrol_mode", "host", "install_only_mode",
                "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
-               "no_overwrite_mode", "opt_conf_keys", "remote", "run_mode"]
+               "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
+               "restart_mode", "run_mode"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 

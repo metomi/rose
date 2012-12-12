@@ -82,6 +82,10 @@
 #         Each of this switches on an optional configuration identified by KEY.
 #     --quiet, -q
 #         Decrement verbosity.
+#     --reload
+#         Shorthand for --run=reload.
+#     --restart
+#         Shorthand for --run=restart.
 #     --run=reload|restart|run
 #         Invoke "cylc reload|restart|run" according to this option.
 #         (default="run")

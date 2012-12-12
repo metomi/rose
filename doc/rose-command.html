@@ -1121,6 +1121,19 @@
       <dd>Specify the suite <var>NAME</var> in Cylc, instead of using the
       basename of the configuration directory.</dd>
 
+      <dt><kbd>--log-keep=DAYS</kbd></dt>
+
+      <dd>Specify the number of days to keep log directories/archives.
+      Do not housekeep if not specified.</dd>
+
+      <dt><kbd>--log-name=NAME</kbd></dt>
+
+      <dd>Specify a name for the log directory of the current run. If
+      specified, it will create a symbolic link <samp>log.NAME</samp> to point
+      to the log directory of the current run. Named log directories will not
+      be automatically archived or housekept. Only works with
+      <kbd>--run=run</kbd>.</dd>
+
       <dt><kbd>--new, -N</kbd></dt>
 
       <dd>(Re-)create working directories.</dd>
@@ -1130,6 +1143,10 @@
       <dd>Do not run <kbd>cylc gui</kbd>. Default is to run <kbd>cylc
       gui</kbd> if the <var>DISPLAY</var> environment variable is
       defined.</dd>
+
+      <dt><kbd>--no-log-archive</kbd></dt>
+
+      <dd>Do not archive (tar-gzip) old log directories.</dd>
 
       <dt><kbd>--no-overwrite</kbd></dt>
 
@@ -1147,6 +1164,20 @@
       <dt><kbd>--restart</kbd></dt>
 
       <dd>Invoke <kbd>cylc restart</kbd> instead of <kbd>cylc run</kbd>.</dd>
+
+      <dt><kbd>--reload</kbd></dt>
+
+      <dd>Shorthand for <kbd>--run=reload</kdb>.</dd>
+
+      <dt><kbd>--restart</kbd></dt>
+
+      <dd>Shorthand for --run=restart.</dd>
+
+      <dt><kbd>--run=reload|restart|run</kbd></dt>
+
+      <dd>Invoke <code>cylc reload</code>, <code>cylc restart</code> or
+      <code>cylc run</code> according to this option.
+      (default=<kbd>run</kbd>)</dd>
 
       <dt><kbd>--verbose, -v</kbd></dt>
 

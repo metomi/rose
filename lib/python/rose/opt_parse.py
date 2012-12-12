@@ -322,11 +322,23 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "METHOD",
                         "help": "Specify a ranking method."}],
+               "reload_mode": [
+                       ["--reload"],
+                       {"action": "store_const",
+                        "const": "reload",
+                        "dest": "run_mode",
+                        "help": "Shorthand for --run=reload."}],
                "remote": [
                        ["--remote"],
                        {"action": "store",
                         "metavar": "KEY=VALUE",
                         "help": "(Internal option, do not use.)"}],
+               "restart_mode": [
+                       ["--restart"],
+                       {"action": "store_const",
+                        "const": "restart",
+                        "dest": "run_mode",
+                        "help": "Shorthand for --run=restart."}],
                "run_mode": [
                        ["--run"],
                        {"action": "store",
