@@ -86,6 +86,14 @@ class SuiteHostSelectEvent(Event):
         return "%s: will run on %s" % self.args
 
 
+class SuiteLogArchiveEvent(Event):
+
+    """An event raised to report the archiving of a suite log directory."""
+
+    def __str__(self):
+        return "%s <= %s" % self.args
+
+
 class SuitePingTryMaxEvent(Event):
 
     """An event raised when the suite ping did not succeed after the maximum
@@ -305,7 +313,6 @@ class AppRunner(Runner):
             config.set(["env", "PATH"], os.getenv("PATH"))
 
         # Free format files not defined in the configuration file
-        # TODO: review location
         conf_file_dir = os.path.join(conf_dir, rose.SUB_CONFIG_FILE_DIR)
         file_section_prefix = self.config_pm.get_handler("file").PREFIX
         if os.path.isdir(conf_file_dir):
@@ -699,10 +706,11 @@ class SuiteRunner(Runner):
             for log in list(logs):
                 if os.path.isfile(log):
                     continue
-                f = tarfile.open(log + ".tar.gz", "w:gz")
+                log_tar_gz = log + ".tar.gz"
+                f = tarfile.open(log_tar_gz, "w:gz")
                 f.add(log)
                 f.close()
-                # TODO: Event?
+                self.handle_event(SuiteLogArchiveEvent(log_tar_gz, log))
                 self.fs_util.delete(log)
 
     def _run_init_dir_work(self, opts, suite_name, name, config=None,
