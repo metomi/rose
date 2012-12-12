@@ -780,7 +780,8 @@ def run_about_dialog(name=None, copyright=None,
     about_dialog = gtk.AboutDialog()
     about_dialog.set_transient_for(parent_window)
     about_dialog.set_name(name)
-    licence_path = os.path.join(os.getenv("ROSE_HOME"), "README")
+    licence_path = os.path.join(os.getenv("ROSE_HOME"),
+                                rose.FILEPATH_README)
     about_dialog.set_license(open(licence_path, "r").read())
     about_dialog.set_copyright(copyright)
     resource_loc = rose.resource.ResourceLocator(paths=sys.path)
