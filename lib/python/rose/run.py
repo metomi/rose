@@ -370,9 +370,9 @@ class SuiteRunner(Runner):
     NUM_LOG_MAX = 5
     NUM_PING_TRY_MAX = 3
     OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
-               "gcontrol_mode", "host", "install_only_mode", "log_append_mode",
-               "name", "new_mode", "no_overwrite_mode", "opt_conf_keys",
-               "remote", "run_mode"]
+               "gcontrol_mode", "host", "install_only_mode",
+               "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
+               "no_overwrite_mode", "opt_conf_keys", "remote", "run_mode"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
@@ -488,8 +488,7 @@ class SuiteRunner(Runner):
         if hasattr(self.event_handler, "contexts"):
             log_file_path = os.path.abspath(
                     os.path.join("log", "rose-suite-run.log"))
-            log_open_mode = getattr(opts, "log_open_mode", "w") + "b"
-            log_file = open(log_file_path, log_open_mode)
+            log_file = open(log_file_path, "ab")
             temp_log_file = self.event_handler.contexts[uuid].handle
             temp_log_file.seek(0)
             log_file.write(temp_log_file.read())
@@ -535,12 +534,11 @@ class SuiteRunner(Runner):
             # Build remote "rose suite-run" command
             rose_sr = rose_bin + " suite-run -v -v"
             rose_sr += " --name=" + suite_name
-            for key in ["new", "debug", "install-only"]:
+            for key in ["new", "debug", "install-only", "run"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:
                     rose_sr += " --" + key
-            host_confs = ["num-log-max",
-                          "root-dir-share",
+            host_confs = ["root-dir-share",
                           "root-dir-work"]
             rose_sr += " --remote=uuid=" + uuid
             for key in host_confs:
@@ -594,8 +592,7 @@ class SuiteRunner(Runner):
             self.handle_event(SuiteHostSelectEvent(suite_name, host))
             # FIXME: values in environ were expanded in the localhost
             self.suite_engine_proc.run(
-                    suite_name, host, environ, opts.run_mode,
-                    opts.log_open_mode, args)
+                    suite_name, host, environ, opts.run_mode, args)
             open("rose-suite-run.host", "w").write(host + "\n")
 
             # Check that the suite is running
@@ -615,8 +612,7 @@ class SuiteRunner(Runner):
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
         if os.getenv("DISPLAY") and opts.gcontrol_mode:
-            self.suite_engine_proc.launch_gcontrol(suite_name, host,
-                                                   opts.log_open_mode)
+            self.suite_engine_proc.launch_gcontrol(suite_name, host)
         return ret
 
     def _run_conf(
@@ -654,12 +650,7 @@ class SuiteRunner(Runner):
     def _run_init_dir_log(self, opts, suite_name, config=None, r_opts=None):
         """Create the suite's log/ directory. Housekeep, archive old ones."""
         # Do nothing in log append mode if log directory already exists
-        # TODO: change log_open_mode for run_mode=reload|restart
-        if r_opts is None:
-            log_open_mode = getattr(opts, "log_open_mode", "w")
-        else:
-            log_open_mode = r_opts.get("log_open_mode", "w")
-        if getattr(opts, "log_open_mode", "w") == "a" and os.path.isdir("log"):
+        if opts.run_mode in ["reload", "restart"] and os.path.isdir("log"):
             return
 
         # Log directory of this run

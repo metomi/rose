@@ -63,7 +63,7 @@ class SuiteControlGUILauncher(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def launch(self, suite_name, host=None, log_open_mode=None, *args):
+    def launch(self, suite_name, host=None, *args):
         """Launch suite engine's control GUI."""
         if not host:
             # Try pinging for a running suite
@@ -79,14 +79,14 @@ class SuiteControlGUILauncher(object):
                         self.handle_event(SuiteRunningOnMultipleHostsEvent(
                                 suite_name, hosts))
         return self.suite_engine_proc.launch_gcontrol(
-                suite_name, host, log_open_mode, args)
+                suite_name, host, args)
 
     __call__ = launch
 
 
 def main():
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("host", "log_open_mode")
+    opt_parser.add_my_options("host")
     opts, args = opt_parser.parse_args()
     event_handler = Reporter(opts.verbosity - opts.quietness)
     if args:
@@ -98,7 +98,7 @@ def main():
         launcher(suite_name, opts.host, *args)
     else:
         try:
-            launcher(suite_name, opts.host, opts.log_open_mode, *args)
+            launcher(suite_name, opts.host, *args)
         except Exception as e:
             event_handler(e)
             sys.exit(1)

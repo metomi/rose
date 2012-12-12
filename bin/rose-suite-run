@@ -58,9 +58,6 @@
 #     --install-only, -i
 #         Install the suite, but do not run it. (This option is implied if
 #         --force mode is specified and the suite is already running.)
-#     --log-append
-#         Append to the existing log, if one exists.
-#         Implied by --run=reload|restart.
 #     --log-keep=DAYS
 #         Specify the number of days to keep log directories/archives.
 #         Do not housekeep if not specified.

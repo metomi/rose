@@ -198,13 +198,6 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "NAME",
                         "help": "Name the log directory of this run."}],
-               "log_open_mode": [
-                       ["--log-append"],
-                       {"action": "store_const",
-                        "const": "a",
-                        "default": "w",
-                        "dest": "log_open_mode",
-                        "help": "Append to log."}],
                "lower": [
                        ["--lower", "-l"],
                        {"action": "store_const",

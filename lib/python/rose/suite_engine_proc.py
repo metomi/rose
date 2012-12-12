@@ -369,8 +369,7 @@ class SuiteEngineProcessor(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def launch_gcontrol(
-            self, suite_name, host=None, log_open_mode=None, *args):
+    def launch_gcontrol(self, suite_name, host=None, *args):
         """Launch control GUI for a suite_name running at a host."""
         raise NotImplementedError()
 
