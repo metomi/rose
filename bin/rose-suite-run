@@ -27,11 +27,11 @@
 #     # As above, but start the suite in simulation mode.
 #     rose suite-run -- --mode=simulation
 #     # Install the suite in $PWD, and register it as "my.suite".
-#     rose suite-run -N my.suite
+#     rose suite-run -n my.suite
 #     # Install the suite in "/dir/to/suite", and register it as "my.suite".
 #     rose suite-run -C /dir/to/my.suite
 #     # Equivalent to (cd /dir/to/my.suite && rose suite-run)
-#     rose suite-run -C /dir/to/suite -N my.suite
+#     rose suite-run -C /dir/to/suite -n my.suite
 #     # Equivalent to (cd /dir/to/suite && rose suite-run my.suite)
 #
 # DESCRIPTION

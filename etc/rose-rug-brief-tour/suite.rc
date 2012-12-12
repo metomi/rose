@@ -1,48 +1,51 @@
+#!jinja2
+[cylc]
+    # Begin Rose required event hook block
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+    # End Rose required event hook block
 [scheduling]
-    # The first cycle of the suite is at 00:00 on Jan 1 2013
-    initial cycle time = 2013010100
-    # The last cycle of the suite is at 00:00 on Jan 2 2013
-    final cycle time   = 2013010200
+    initial cycle time = 2013010100 # The first cycle of the suite is at 00:00 on Jan 1 2013
+    final cycle time   = 2013010200 # The last cycle of the suite is at 00:00 on Jan 2 2013
     [[special tasks]]
-    # These tasks are only run at the beginning of the suite
-        cold-start = fcm_make
+        cold-start = fcm_make # This task is only run at the beginning of the suite
     [[dependencies]]
 
-        [[[ 0, 6, 12, 18 ]]]
-            # At 00:00, 06:00, 12:00, 18:00:
-            #
-            # my_hello_world is run after fcm_make or after the last cycle's
-            # my_hello_world
-            #
-            # locate_fred is run after fcm_make or after the last cycle's
-            # locate_fred
-            #
-            # fred_hello_world is run after locate_fred
+        [[[ 0, 6, 12, 18 ]]] # Each day at 00:00, 06:00, 12:00, 18:00:
             graph = """
+                # my_hello_world is run after fcm_make or after the previous one finishes
                 fcm_make | my_hello_world[T-6] => my_hello_world
+
+                # locate_fred is run after fcm_make or after the previous one finishes
+                # fred_hello_world is run after locate_fred
                 fcm_make | locate_fred[T-6] => locate_fred => fred_hello_world
             """
 
-        [[[ 0, 12 ]]]
-            # At 00:00, 12:00:
-            #
-            # my_hello_mars is run after fcm_make or after the last cycle's
-            # my_hello_mars
+        [[[ 0, 12 ]]] # Each day at 00:00 and 12:00:
             graph = """
+                # my_hello_mars is run after fcm_make or after the previous one finishes
                 fcm_make | my_hello_mars[T-12] => my_hello_mars
             """
 
 [runtime]
     [[root]]
-        command scripting = "sleep 5 && rose task-run -v"
+        command scripting = "rose task-run -v"
         [[[remote]]]
             host = {{ ROSE_ORIG_HOST }}
+        # Begin Rose recommended event hook block
         [[[event hooks]]]
-            succeeded handler = "rose task-hook"
-            failed handler = "rose task-hook --shutdown"
-            submission failed handler = "rose task-hook --shutdown"
-    
+           succeeded handler = "rose suite-hook"
+           failed handler = "rose suite-hook --shutdown"
+           submission failed handler = "rose suite-hook --shutdown"
+           submission timeout handler = "rose suite-hook --mail"
+           execution timeout handler = "rose suite-hook --mail"
+           submission timeout = 1440 # 24 hours
+           execution timeout  =  180 # 3 hours
+        # End Rose recommended event hook block
     [[locate_fred]]
         command scripting = """
             sleep 10 && echo 'fred is in '$(find /usr/share/zoneinfo/[A-Z]*/ -type f -printf "%f\n" | shuf -n 1 || echo 'the pub')
         """
+    [[fcm_make]]
+        pre-command scripting = "sleep 10"  # Slow down fcm make so we can see it run

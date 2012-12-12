@@ -41,15 +41,18 @@
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
+
     <div id="currentSlide">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
+
     <div id="controls">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
 
     <div class="header-footer" id="footer"></div>
@@ -77,27 +80,28 @@
         <li>rosie go</li>
 
         <li>rosie CLI</li>
-
-        <li>Future of Rose</li>
       </ul>
     </div>
 
     <div class="slide">
       <h2 id="suites">Suites</h2>
+      
+      <p>A Rose suite is a runnable collection of one or more Rose application
+        configurations, plus any miscellaneous scripts and resources.</p>
     </div>
 
     <div class="slide">
     <h3 class="alwayshidden">Suite Hierarchy</h3>
 
     <div class="handout">
-      <p>The typical suite hierarchy looks a bit like this:</p>
+      <p>A suite hierarchy can look a bit like this:</p>
     </div><img height="50%" width="60%" src="rose-suite-hierarchy.png" alt=
     "rose suite hierarchy" /></div>
 
     <div class="slide">
       <h3>Suite Files</h3>
 
-      <p>There are (only) about 5+1 different types of Rose INI-style
+      <p>There are (only) 5 different types of Rose INI-style
       files:</p>
 
       <ul class="incremental">
@@ -116,15 +120,16 @@
     <div class="slide">
       <h3 class="alwayshidden">Suite Files (cylc)</h3>
 
-      <ul class="incremental">
-        <li>suite.rc - cylc suite</li>
-      </ul>
+      <p>There is also a cylc file, which is in a slightly different INI-based
+      format - <samp>suite.rc</samp>. This holds cylc suite dependencies and
+      configuration.</p>
     </div>
 
     <div class="slide">
-      <h3>Format</h3>
+      <h3>Rose Configuration Format</h3>
 
       <ul class="incremental">
+      
         <li>See <a href="rose-configuration.html#format">Configuration
         Format</a>.</li>
 
@@ -136,7 +141,7 @@ default = hello.exe
 [env]
 !!MAX_TARGETS = 5
 
-![namelist:hello]
+[!namelist:hello]
 </pre>
         </li>
       </ul>
@@ -146,7 +151,7 @@ default = hello.exe
       <h3 class="alwayshidden">Format continued</h3>
 
       <p><samp>!</samp> or <samp>!!</samp> in front of a section
-      (<samp>![env]</samp>, <samp>!![env]</samp>) or option
+      (<samp>[!env]</samp>, <samp>[!!env]</samp>) or option
       (<samp>!MAX_TARGETS</samp>, <samp>!!MAX_TARGETS</samp>) means it is
       <em>ignored</em> and will not be output when the configuration is
       run.</p>
@@ -169,8 +174,8 @@ title=Run XYZ for A, with improved B
       <h3>rose-suite.conf</h3>
 
       <p>Holds <a href="rose-configuration.html#suite">suite-specific</a>
-      settings (more in a <a href="rose-rug-suites.html">later part</a>
-      of the documentation):</p>
+      settings (more in a <a href="rose-rug-suites.html">later part</a> of the
+      documentation):</p>
       <pre>
 [jinja2:suite.rc]
 COMPUTE_HOST = mayanstonecircle
@@ -179,8 +184,8 @@ END_TIME = 20121221
 [file:app/goodbye_world]
 source = fcm:hello_tr/standard_apps/goodbye_world@25678
 
-[file:etc/fcm_make.cfg]
-source = /project/hello/fcm_make/mayanpwr0.1/fcm_make.cfg
+[file:etc/debug.glyph]
+source = /project/hello/mayanpwr0.1/debug.glyph
 </pre>
     </div>
 
@@ -212,7 +217,7 @@ MAX_TARGETS = 5
 [file:local_orography]
 # The file to create a symlink to.
 source = /project/snowball/ctldata/orog_devon
-# mode can also be auto (usually =copy), or mkdir for directories.
+# mode can also be auto (usually =copy), or mkdir for dirs.
 mode = symlink
 
 # Another file - this time built from our namelist.
@@ -280,11 +285,11 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
-      <h3>suite.rc</h3>
+      <h3>cylc suite.rc</h3>
 
+      <p><em>(Different format)</em></p>
       <p>This is the cylc configuration file - we'll discuss it properly in a
-      <a href="rose-rug-suites.html">later part</a> of the documentation.
-      </p>
+      <a href="rose-rug-suites.html">later part</a> of the documentation.</p>
       <pre>
 #!jinja2
 [scheduling]
@@ -314,7 +319,7 @@ should-show-ignored = True
       <p>Some useful options for <kbd>rose suite-run</kbd> are:</p>
 
       <ul class="incremental">
-        <li><kbd>rose suite-run -N alternate_suite_name</kbd>: run with a
+        <li><kbd>rose suite-run -n alternate_suite_name</kbd>: run with a
         different suite name, in a different output directory.</li>
 
         <li><kbd>rose suite-run -C /path/to/suite</kbd>: run a suite in a
@@ -345,15 +350,32 @@ should-show-ignored = True
       <h2 id="metadata">Configuration Metadata</h2>
 
       <p>Metadata for rose-suite.conf (and rose-app.conf settings) can be
-      <a href="rose-configuration.html#meta">pointed to</a> by:</p>
+      <a href="rose-configuration.html#meta">referenced</a> by:</p>
 
       <ul class="incremental">
-        <li>Having a <samp>meta/</samp> directory in a suite or an
+        <li><p>the <samp>meta</samp> flag in an app config,
+        e.g.:</p>
+        <pre>
+meta=rose-demo-upgrade/27.1
+</pre>
+        <p>which references centrally-stored metadata, looked up using the
+        <samp>meta-path</samp> user/site config setting.</p>
+        </li>
+      </ul>
+    </div>
+    <div class="slide">
+       <h3 class="alwayshidden">Configuration Metadata locations</h3>
+      
+      <p>You can store metadata in alternate locations, and reference it
+      using:</p>
+
+      <ul class="incremental">
+        <li>A <samp>meta/</samp> directory in a suite or an
         application.</li>
 
         <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
 
-        <li>The content of the <var>ROSE_META_PATH</var> environment
+        <li>The <var>ROSE_META_PATH</var> environment
         variable.</li>
 
         <li>The <samp>meta-path</samp> setting in <a href=
@@ -362,12 +384,21 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Configuration Metadata continued</h3>
+      <h3 class="alwayshidden">Configuration Metadata explanation</h3>
 
       <p>Metadata from (usually) subdirectories in the <samp>rose-meta</samp>
       directory in a a project's source tree is stored at a central Rose
-      location - this is pointed to by the site configuration
-      <samp>meta-path</samp> option.</p>
+      location - this location is pointed to by the site configuration
+      <samp>meta-path</samp> option (e.g.
+      <samp>/project/rose-metadata</samp>)</p>
+      
+      <p>The app config <samp>meta</samp> option configures which
+      subdirectories in a location to choose (e.g.
+      <samp>/project/rose-metadata/rose-demo-upgrade/27.1</samp>).</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Configuration Metadata branches</h3>   
 
       <p>You can check out a branch of a project, change its metadata, and test
       it by pointing <samp>meta-path</samp> at it (e.g. by running <code>rose
@@ -523,7 +554,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       <h4 class="alwayshidden">Macros continued</h4>
 
       <ul>
-        <li><code>Upgrade</code> macros - upgrade or downgrade application
+        <li><code>Upgrade</code> macros - upgrade (or downgrade) application
         configurations</li>
       </ul>
 
@@ -565,13 +596,11 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     <div class="slide">
       <h3 class="alwayshidden">rose macro examples</h3>
 
-      <p>Running <code>rose macro -a -V</code> in an application directory will
-      check against <em>all</em> (<code>-a</code>) built-in and custom
-      <em>validator</em> (<code>-V</code>) macros.</p>
+      <p>Running <code>rose macro --validate</code> in an application directory
+      will check against all built-in and custom <em>validator</em> macros.</p>
 
-      <p>Running <code>rose macro rose.macros.DefaultTransforms</code> will
-      make Rose run the built-in transformer macros to fix your
-      application.</p>
+      <p>Running <code>rose macro --fix</code> will make Rose run the built-in
+      transformer macros to fix your application.</p>
     </div>
 
     <div class="slide">
@@ -597,8 +626,8 @@ rose macro fib.FibonnaciChecker
       <p><code>rosie go</code> is the suite manager GUI. It acts as a hub for
       all your suite work.</p>
 
-      <p>Demo! If viewing offline, see the <a href="rose-rug-rosie-go.html">Rosie Go
-      Guide</a>.</p>
+      <p>Demo! If viewing offline, see the <a href=
+      "rose-rug-rosie-go.html">Rosie Go Guide</a>.</p>
     </div>
 
     <div class="slide">

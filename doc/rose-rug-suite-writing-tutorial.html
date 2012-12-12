@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose User Guide: Suite from Scratch</title>
+  <title>Rose User Guide: Suite Writing Tutorial</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -95,7 +95,7 @@
       <h3>Example program</h3>
 
       <p>Our Fortran program is <a href=
-      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a>,
+      "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90">dead_reckoning.f90</a>,
       which (pretends to) calculate the new position of our ship.</p>
 
       <p>Spend a bit of time looking at this file.</p>
@@ -176,7 +176,7 @@ mkdir src
 </pre>
 
       <p>Copy the source code from <a href=
-      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a>
+      "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90">dead_reckoning.f90</a>
       into a file called <samp>src/dead_reckoning.f90</samp>.</p>
     </div>
 
@@ -607,7 +607,7 @@ touch suite.rc
 rose suite-run
 </pre>
 
-      <p>If everything has been setup successfully, <code>cylc gcontrol</code>
+      <p>If everything has been setup successfully, <code>cylc gui</code>
       will launch with your running suite.</p>
 
       <p>You can look at the finished output by running:</p>
