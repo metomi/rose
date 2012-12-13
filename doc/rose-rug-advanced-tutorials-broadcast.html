@@ -130,7 +130,7 @@
     [[print_colour]]
         command scripting = """
             sleep 4
-            echo "Today's colour is <span style='color:"$COLOUR"'>"$COLOUR"</span>"
+            echo "Today's colour is &lt;span style='color:"$COLOUR"'&gt;"$COLOUR"&lt;/span&gt;"
         """
         [[[environment]]]
             COLOUR = green
