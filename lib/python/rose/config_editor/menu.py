@@ -628,13 +628,13 @@ class Handler(object):
                               rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
                                                            macro_fullname))
                 continue
-            if return_value:
-                sorter = rose.config.sort_settings
-                to_id = lambda s: self.util.get_id_from_section_option(
-                                                   s.section, s.option)
-                return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
-                self.handle_macro_validation(config_name, macro_fullname,
-                                             config, return_value)
+            sorter = rose.config.sort_settings
+            to_id = lambda s: self.util.get_id_from_section_option(
+                                                s.section, s.option)
+            return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+            self.handle_macro_validation(config_name, macro_fullname,
+                                         config, return_value,
+                                         no_display=(not return_value))
 
     def clear_page_menu(self, menubar, add_menuitem):
         """Clear all page add variable items."""
