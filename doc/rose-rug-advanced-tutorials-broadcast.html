@@ -86,7 +86,8 @@
       task that fixes other tasks).</p>
 
       <p><code>cylc broadcast</code> can also be used to communicate between
-      tasks, where file-based communication is not appropriate.</p>
+      tasks, where file-based communication is not appropriate. You should not
+      normally need to do this.</p>
     </div>
 
     <div class="slide">
@@ -112,17 +113,19 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Runtime</h3>
+      <h3 class="alwayshidden">Description</h3>
 
       <p>This sets up a standard cycling suite.</p>
 
-      <p>Our daily task (<samp>print_colour</samp>) will need some runtime -
+      <p>We have one daily task, <samp>print_colour</samp>, which prints some HTML output in a colour.</li>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Runtime</h3>
+      <p>It will need some runtime -
       add:</p>
       <pre>
 [runtime]
-    [[root]]
-        [[[event hooks]]]
-            succeeded handler = rose suite-hook
     [[print_colour]]
         command scripting = """
             sleep 4
@@ -134,9 +137,21 @@
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Runtime - cylc broadcast</h3>
+      <p>We need to set up the <samp>setup</samp> task now - replace
+      <samp>[runtime]</samp> with:</p>
+      <pre>
+[runtime]
+    [[setup]]
+        command scripting = """cylc broadcast -t 2013010500 -t 2013011500 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME"""
+</pre>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Running it</h3>
 
-      <p>This will print some html with appropriate coloured text when run.</p>
+      <p>The <samp>setup</samp> task will change the <samp>[[[environment]]]</samp> setting <samp>COLOUR</samp>
+      of <samp>print_colour</samp> for the <samp>2013010500</samp> and <samp>2013011500</p> cycle times.</p>
 
       <p>Change directory to the root of the suite.</p>
 
@@ -147,23 +162,51 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">cylc broadcast</h3>
+      <h2 id="output">Output</h2>
 
-      <p>Now try running <code>cylc broadcast</code> to change the colour.
-      You'll need to substitute the name of your suite for $SUITE_ID.</p>
+      <p>Once the suite has run, you can see the results of the <code>cylc broadcast</code> by
+      looking at <samp>print_colour</samp>'s standard out files (<samp>out</samp>) in the output viewer. Run:</p>
+      <pre class="shell">
+rose suite-log-view
+</pre>
 
-      <p>If the suite is not running on your local machine, you should add the
-      option <samp>--host=HOSTNAME</samp> where <samp>HOSTNAME</samp> is the
+      <p>The output (<samp>out</samp>) of the <samp>print_colour</samp> tasks
+      should have some blue text, except for the <samp>2013010500</samp> and <samp>2013011500</samp>
+      cycle times.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="cli">CLI</h2>
+
+      <p>You can also run <code>cylc broadcast</code> from the command line.</p>
+      
+      <p>Get rid of the <samp>setup</samp> task runtime:</p>
+      <pre>
+    [[setup]]
+        command scripting = """cylc broadcast -t 2013010500 -t 2013011500 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME"""
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Run CLI</h3>
+      <p>Run the suite again, and while it runs we'll try and change settings
+      using the <code>cylc broadcast</code> from the command line. You should replace
+      <samp>$SUITE_ID</samp> with the suite name, and if the suite is not running on your local machine, you should add the
+      option <samp>--host=$HOSTNAME</samp> where <samp>$HOSTNAME</samp> is the
       suite run host (look for <samp>will run on XXX</samp> in the suite run
       output).</p>
+      
+      <p>While the suite is running, run:</p>
       <pre class="shell">
-cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=red $SUITE_ID
+cylc broadcast --host=$HOSTNAME -n print_colour -s [environment]COLOUR=red $SUITE_ID
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">cylc broadcast continued</h3>
 
+      <p>This will change the <samp>COLOUR</samp> setting of <samp>print_colour</samp> for all cycle times.</p>
+      
       <p>Try changing the colour to something else, e.g.:</p>
       <pre class="shell">
 cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=blue $SUITE_ID
@@ -173,14 +216,14 @@ cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=blue $SUIT
     <div class="slide">
       <h2 id="output">Output</h2>
 
-      <p>You can see the results of your changes by looking at the output
+      <p>You can see the results of your command line changes by looking at the output
       viewer. Run:</p>
       <pre class="shell">
 rose suite-log-view
 </pre>
 
-      <p>The output (<samp>out</samp>) of the <samp>print_colour</samp> tasks
-      should have some coloured text.</p>
+      <p>The colour output should change after the suite cycle time when you
+      ran the command.</p>
     </div>
 
     <div class="slide">
