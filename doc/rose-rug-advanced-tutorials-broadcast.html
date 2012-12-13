@@ -3,9 +3,6 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="generator" content=
-  "HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" />
-
   <title>Rose Advanced Tutorial: cylc broadcast</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -32,11 +29,14 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      © British Crown Copyright 2012 <a href="http://www.metoffice.gov.uk">Met
-      Office</a>. See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.
+      <br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.<br />
+      "license">Open Government Licence</a>.
+      <br />
       <span id="rose-version"></span>
     </address>
 
@@ -157,10 +157,11 @@
 
       <p>The <samp>startup</samp> task will change the
       <samp>[[[environment]]]</samp> setting <samp>COLOUR</samp> of
-      <samp>print_colour</samp> for the <samp>2013010200</samp> and the <samp>2013010400</samp>
-      cycle times.</p>
-      
-      <p>The <code>cylc broadcast -d</code> command will list the current broadcast settings.</p>
+      <samp>print_colour</samp> for the <samp>2013010200</samp> and the
+      <samp>2013010400</samp> cycle times.</p>
+
+      <p>The <code>cylc broadcast -d</code> command will list the current
+      broadcast settings.</p>
 
       <p>Change directory to the root of the suite. Run the suite using:</p>
       <pre class="shell">
@@ -171,10 +172,9 @@ rose suite-run
     <div class="slide">
       <h2 id="results">Results</h2>
 
-      <p>Once the suite has run, you can see the results of the
-      <code>cylc broadcast</code> by looking at <samp>print_colour</samp>'s
-      standard out files (<samp>out</samp>) in the output viewer.
-      Run:</p>
+      <p>Once the suite has run, you can see the results of the <code>cylc
+      broadcast</code> by looking at <samp>print_colour</samp>'s standard out
+      files (<samp>out</samp>) in the output viewer. Run:</p>
       <pre class="shell">
 rose suite-log-view
 </pre>
@@ -200,12 +200,13 @@ rose suite-log-view
         """
 </pre>
     </div>
-    
-    <div class="slide">
-      <h2 id="cli">Example - cycle time extension</h2>
 
-      <p>We should make the suite run a bit longer by increasing <samp>final cycle time</samp>:</p>   
-    <pre>
+    <div class="slide">
+      <h2>Example - cycle time extension</h2>
+
+      <p>We should make the suite run a bit longer by increasing <samp>final
+      cycle time</samp>:</p>
+      <pre>
     final cycle time = 2013012500
 </pre>
     </div>
