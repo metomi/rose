@@ -633,7 +633,8 @@ class Handler(object):
                                                 s.section, s.option)
             return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
             self.handle_macro_validation(config_name, macro_fullname,
-                                         config, return_value)
+                                         config, return_value,
+                                         no_display=(not return_value))
 
     def clear_page_menu(self, menubar, add_menuitem):
         """Clear all page add variable items."""
