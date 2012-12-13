@@ -126,7 +126,7 @@
 [runtime]
     [[root]]
         [[[event hooks]]]
-            succeeded handler = rose suite-hook
+            succeeded handler = "rose suite-hook"
     [[print_colour]]
         command scripting = """
             sleep 4
@@ -144,6 +144,7 @@
       <samp>[runtime]</samp> with:</p>
       <pre>
 [runtime]
+    [[startup]]
         command scripting = """
             cylc broadcast -t 2013010200 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
             cylc broadcast -t 2013010400 -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME

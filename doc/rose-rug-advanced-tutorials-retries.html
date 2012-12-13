@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Retries</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.
+      <br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Retries</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through using cylc
+      retries.</p>
+
+      <p>This allows tasks to be automatically resubmitted after failure,
+      after a certain delay, and even with different behaviour.</p>
+    </div>
+
+    <div class="slide">
+      <h2>Purpose</h2>
+
+      <p>Retries can be useful for tasks that may occasionally fail
+      due to external events, and are routinely fixable when they do -
+      an example would be a task that is dependent on a system that
+      experiences temporary outages.</p>
+
+      <p>If a task fails, the cylc retry mechanism can resubmit it
+       after a pre-determined delay. An environment variable, <code>$CYLC_TASK_TRY_NUMBER</code>
+       is incremented and passed into the task - this means you can
+       write your task script so that it changes behaviour accordingly.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="example">Example</h2>
+
+      <p>Our example suite will control the use of the <a href="http://en.wikipedia.org/wiki/Holy_Hand_Grenade_of_Antioch">Holy Hand Grenade</a>.</p>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory) containing a blank <samp>rose-suite.conf</samp> and a
+      <samp>suite.rc</samp> file with the following contents:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = """
+            remove_holy_pin => wait_for_it => lobbest_thou_grenade
+        """
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Runtime</h3>
+
+      <p>We'll add some standard information in the <samp>[runtime]</samp> section:</p>
+      <pre>
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            failed handler = rose suite-hook
+            succeeded handler = rose suite-hook
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">App</h3>
+
+      <p>We need a <samp>wait_for_it</samp> app.</p>
+      
+      <p>Create a directory in your suite:</p>
+      <pre class="shell">
+mkdir -p app/wait_for_it
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">App file</h3>
+
+      <p>Create a file <samp>app/wait_for_it/rose-app.conf</samp> and
+      paste in the following contents:</p>
+      
+      <pre>
+[command]
+default = sleep 5; if [[ $CYLC_TASK_TRY_NUMBER -ge 3 ]]; then echo 'now chuck it!'; else exit 1; fi
+</pre>
+      
+      <p>We've written a command that will artifically fail our task (cylc sees a task as failed if it has a non-zero exit code). 
+      <code>$CYLC_TASK_TRY_NUMBER</code> is an environment variable that is incremented by 1 each time a task is 
+      retried, starting from <samp>1</samp>. This means that our task will artificially fail 2 times.</p>
+    </div>   
+    
+    <div class="slide">
+      <h3 class="alwayshidden">App Runtime</h3>
+      <p>We need to add a Rose snippet to get cylc to run our app - add these lines to
+      the end of your <samp>suite.rc</samp> file:</p>
+      <pre>
+    [[wait_for_it]]
+        command scripting = "rose task-run -v"
+</pre>
+    <div class="slide">
+      <h3 class="alwayshidden">Run without retry</h3>
+      <p>We can now just treat the app as a black box, that for some reason may need to be
+      retried at least 2 times to work.</p>
+      
+      <p>Let's see what happens when we run the suite as it is.</p>
+
+      <p>Make sure you are in the root directory of your suite.</p>
+
+      <p>Run the suite using:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+    </div>
+ 
+    <div class="slide">
+      <h3 class="alwayshidden">Results</h3>
+      <p>The suite should fail at the <samp>wait_for_it</samp> app.</p>
+
+      <p>We need to tell cylc to retry it a few times - replace the line <samp>[[wait_for_it]]</samp>
+      in the <samp>suite.rc</samp> file with:
+      <pre>
+    [[wait_for_it]]
+        retry delays = 0.1, 0.1, 0.1, 0.1, 0.1
+</pre>
+
+      <p>This means that if the <samp>wait_for_it</samp> app fails, cylc expects to retry it 5 times
+      before finally failing. Each retry will have a delay of <samp>0.1</samp> minutes.</p>
+      
+    <div class="slide">
+      <h3 class="alwayshidden">Results</h3>
+      <p><samp>retry delays</samp> can have varying amounts (e.g. <samp>retry delays = 0.25, 10, 60, 180</samp> to 
+      perform the first retry after 15 seconds, the second after 10 minutes, then an hour,
+      then three hours).</p>
+      
+      <p>We've chosen 0.1 minutes (6 seconds) because it's relatively easy
+      to observe for this example.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="running">Running it</h3>
+
+      <p>Now we'll try again.</p>
+
+      <p>Make sure you are in the root directory of your suite.</p>
+
+      <p>Run the suite using:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+
+      <p>What you should see is cylc retrying the <samp>wait_for_it</samp> app - it will
+      succeed on the third attempt and the suite will continue.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="output">Output Viewer</h3>
+
+      <p>If you go to the suite output (run <code>rose suite-log-view</code> in your root suite directory),
+      you can see the separate retry instances of the app.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Altering functionality</h3>
+      
+      <p>We can alter the behaviour of the app based on the number of retries.</p>
+      
+      <p>Open the <samp>app/wait_for_it/rose-app.conf</samp> file in a text editor and append the
+      following line:</p>
+      <pre>
+hurryup = echo 'hurry up and chuck it now!'
+</pre>
+      <p>This adds an alternative command to the app, that we know will work -
+      in real circumstances, you
+      might want a special environment variable or namelist option that, for example,
+      speeds up or debugs the application.</p>
+
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Command key</h3>
+      
+      <p>We can edit the <samp>command scripting</samp> to introduce different
+      behaviour based on <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
+      <pre>
+    [[wait_for_it]]
+        retry delays = 0.1, 0.1, 0.1, 0.1, 0.1
+        command scripting = """
+            if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
+                rose task-run -v --command-key=hurryup
+            else
+                rose task-run -v
+            fi
+            """
+      </pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Results</h3>
+      <p>Make sure you are in the root directory of your suite.</p>
+
+      <p>Run the suite using:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+      <p>This time, the app should behave differently on the second
+      retry and actually succeed.</p>
+    </div>
+
+    <div class="slide">
+      <h2>Further Reading</h2>
+
+      <p>For more information, see the <a href=
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc user
+      guide</a>.</p>
+    </div>
+  </div>
+</body>
+</html>
