@@ -118,8 +118,8 @@
 [runtime]
     [[root]]
         [[[event hooks]]]
-            failed handler = rose suite-hook
-            succeeded handler = rose suite-hook
+            failed handler = "rose suite-hook"
+            succeeded handler = "rose suite-hook"
 </pre>
     </div>
 
@@ -164,7 +164,7 @@ default = sleep 5; if [[ $CYLC_TASK_TRY_NUMBER -eq 3 ]]; then echo 'now chuck it
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Run without retry</h3>
+      <h2 id="running-no-retries">Running it without retries</h2>
 
       <p>We can now just treat the app as a black box, that for some reason may
       need to be retried twice before it works.</p>
@@ -180,7 +180,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Results</h3>
+      <h2 id="retry-delays">Results</h3>
 
       <p>The suite should fail at the <samp>wait_for_it</samp> app.</p>
 
@@ -197,7 +197,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Results</h3>
+      <h3 class="alwayshidden">Explanation</h3>
 
       <p><samp>retry delays</samp> can have varying amounts (e.g. <samp>retry
       delays = 0.25, 10, 60, 180</samp> to perform the first retry after 15
@@ -209,7 +209,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h2 id="running">Running it</h2>
+      <h2 id="running-retries">Running it with retries</h2>
 
       <p>Now we'll try again.</p>
 
@@ -219,13 +219,13 @@ rose suite-run
       <pre class="shell">
 rose suite-run
 </pre>
-
-      <p>What you should see is cylc retrying the <samp>wait_for_it</samp> app
-      - it will succeed on the third attempt and the suite will continue.</p>
     </div>
 
     <div class="slide">
-      <h2 id="output">Output Viewer</h2>
+      <h2 id="results-retries">Results</h2>
+
+      <p>What you should see is cylc retrying the <samp>wait_for_it</samp> app
+      - it will succeed on the third attempt and the suite will continue.</p>
 
       <p>If you go to the suite output (run <code>rose suite-log-view</code> in
       your root suite directory), you can see the separate retry instances of
@@ -265,7 +265,6 @@ hurryup = echo 'hurry up and chuck it now!'
                 rose task-run -v
             fi
             """
-      
 </pre>
     </div>
 
