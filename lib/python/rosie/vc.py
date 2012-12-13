@@ -36,11 +36,11 @@ import sys
 import tempfile
 import time
 
-
+DELETE_WARNING = ("WARNING: This will delete both local and repository " +
+                  "copies of your suite")
 PROMPT_CREATE = "Create? y/n (default n) "
 PROMPT_DELETE = "Delete {0}? y/n (default n) "
 PROMPT_DELETE_ALL = "Delete {0}? y/n/a (default n, a=yes-to-all) "
-
 
 class FileExistError(Exception):
     """Raised when a file exists and can't be overwritten.
@@ -465,6 +465,8 @@ def delete(argv):
     for arg in args:
         if not skip_prompt:
             try:
+                if not opts.local_only:
+                    print DELETE_WARNING
                 response = raw_input(prompt.format(arg))
             except EOFError:
                 continue
