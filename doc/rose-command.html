@@ -65,6 +65,10 @@
 
       <dd>Parse a set of rose configuration files.</dd>
 
+      <dt><a href="#rose-config">rose config-dump</a></dt>
+
+      <dd>Re-dump Rose configuration files in the common format.</dd>
+
       <dt><a href="#rose-config-edit">rose config-edit</a></dt>
 
       <dd>Launch the GTK+ GUI to edit a suite or application
@@ -435,6 +439,54 @@
 
       <dd>If specified, the program will print ignored <var>!OPTION=VALUE</var>
       where relevant.</dd>
+    </dl>
+
+    <h2 id="rose-config-dump">rose config-dump</h2>
+
+    <h3>NAME</h3><kbd>rose config-dump</kbd>
+
+    <h3>SYNOPSIS</h3>
+
+    <dl>
+      <dt><kbd>rose config-dump</kbd></dt>
+
+      <dd>Re-dump all Rose configuration files in the current directory.</dd>
+
+      <dt><kbd>rose config-dump -C /path/to/conf/dir</kbd></dt>
+
+      <dd>Re-dump all Rose configuration files in
+      <samp>/path/to/conf/dir</samp></dd>
+
+      <dt><kbd>rose config-dump -f /path/to/file1 -f /path/to/file2</kbd></dt>
+
+      <dd>Re-dump <samp>/path/to/file1</samp> and
+      <samp>/path/to/file2</samp></dd>
+    </dl>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Re-dump Rose configuration files in the common format.</p>
+ 
+    <p>Load and dump <var>rose-*.conf</var> files in place.</p>
+ 
+    <p>By default, it recursively loads and dumps all <var>rose-*.conf</var>
+    files in the current working directory.Parse a set of rose configuration
+    files.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+
+      <dd>Specify a configuration directory. (default=<var>$PWD</var>)</dd>
+
+      <dt><kbd>--file=FILE, -f FILE</kbd></dt>
+
+      <dd>Each of this specifies a configuration file.</dd>
+
+      <dt><kbd>--quiet, -q</kbd></dt>
+
+      <dd>Decrement verbosity. Do not report modified files.</dd>
     </dl>
 
     <h2 id="rose-config-edit">rose config-edit</h2>
