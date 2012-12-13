@@ -141,7 +141,7 @@ mkdir -p app/wait_for_it
       the following contents:</p>
       <pre>
 [command]
-default = sleep 5; if [[ $CYLC_TASK_TRY_NUMBER -ge 3 ]]; then echo 'now chuck it!'; else exit 1; fi
+default = sleep 5; if [[ $CYLC_TASK_TRY_NUMBER -eq 3 ]]; then echo 'now chuck it!'; else exit 1; fi
 </pre>
 
       <p>We've written a command that will artifically fail our task (cylc sees
@@ -167,7 +167,7 @@ default = sleep 5; if [[ $CYLC_TASK_TRY_NUMBER -ge 3 ]]; then echo 'now chuck it
       <h3 class="alwayshidden">Run without retry</h3>
 
       <p>We can now just treat the app as a black box, that for some reason may
-      need to be retried at least 2 times to work.</p>
+      need to be retried twice before it works.</p>
 
       <p>Let's see what happens when we run the suite as it is.</p>
 
@@ -233,7 +233,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Altering functionality</h3>
+      <h2 id="alter">Altering behaviour</h3>
 
       <p>We can alter the behaviour of the app based on the number of
       retries.</p>
