@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Queues</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.
+      <br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Queues</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through using cylc
+      queues.</p>
+
+      <p>These can limit the number of certain tasks that are submitted
+      or run at any given time.</p>
+    </div>
+
+    <div class="slide">
+      <h2>Purpose</h2>
+
+      <p>Queues are used to put a limit on the number of tasks that will be
+      active at any one time, even if their dependencies are satisfied.</p>
+
+      <p>This avoids swamping systems with too many tasks at once.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="example">Example</h2>
+
+      <p>In this example, our suite manages a particularly understaffed
+      restaurant.</p>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory) containing a blank <samp>rose-suite.conf</samp> and a
+      <samp>suite.rc</samp> file with the following contents:</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example scheduling</h3>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = """
+            open_restaurant =&gt; steak1 &amp; steak2 &amp; pasta1 &amp; pasta2 &amp; pasta3 &amp; \
+                               pizza1 &amp; pizza2 &amp; pizza3 &amp; pizza4
+            steak1 =&gt; ice_cream1
+            steak2 =&gt; cheesecake1
+            pasta1 =&gt; ice_cream2
+            pasta2 =&gt; sticky_toffee1
+            pasta3 =&gt; cheesecake2
+            pizza1 =&gt; ice_cream3
+            pizza2 =&gt; ice_cream4
+            pizza3 =&gt; sticky_toffee2
+            pizza4 =&gt; ice_cream5
+        """
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Runtime</h3>
+
+      <p>We'll add some information in the <samp>[runtime]</samp> section:</p>
+      <pre>
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            succeeded handler = rose suite-hook
+    [[MAINS]]
+    [[DESSERT]]
+    [[steak1,steak2,pasta1,pasta2,pasta3,pizza1,pizza2,pizza3,pizza4]]
+        inherit = MAINS
+    [[ice_cream1,ice_cream2,ice_cream3,ice_cream4,ice_cream5]]
+        inherit = DESSERT
+    [[cheesecake1,cheesecake2,sticky_toffee1,sticky_toffee2]]
+        inherit = DESSERT
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Overwhelming!</h3>
+
+      <p>Run the suite by changing directory to your new suite directory and
+      invoking:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+
+      <p>When <code>cylc gui</code> starts up, you will see that all the
+      <samp>steak</samp>, <samp>pasta</samp>, and <samp>pizza</samp> tasks
+      are run at once, swiftly followed by all the
+      <samp>ice_cream</samp>, <samp>cheesecake</samp>,
+      <samp>sticky_toffee</samp> tasks as the customers order from the dessert
+      menu.</p>
+    
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Overwhelming!</h3>
+
+      <p>This will overwhelm our restaurant staff! The chef responsible for
+      <samp>MAINS</samp> can only handle 3 tasks at any given time, and the
+      <samp>DESSERT</samp> chef can only handle 2.</p>
+
+      <p>We need to add some queues.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Add queues</h3>
+
+      <p>Replace the <samp>[scheduling]</samp> line with:</p>
+      <pre>
+[scheduling]
+    [[queues]]
+        [[[mains_chef_queue]]]
+            limit = 3  # Only 3 mains dishes at one time.
+            members = MAINS
+        [[[dessert_chef_queue]]]
+            limit = 2  # Only 2 dessert dishes at one time.
+            members = DESSERT
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Running it</h3>
+
+      <p>Make sure you are in the root directory of your suite.</p>
+
+      <p>Run the suite using:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Results</h3>
+
+      <p>When <code>cylc gui</code> starts up, you can see that there are now
+      never more than 3 active <samp>MAINS</samp> tasks running and never more than 2
+      active <samp>DESSERT</samp> tasks running.</p>
+
+      <p>The customers will obviously have to wait!</p>
+    </div>
+
+    <div class="slide">
+      <h2>Further Reading</h2>
+
+      <p>For more information, see the <a href=
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc user
+      guide</a>.</p>
+    </div>
+  </div>
+</body>
+</html>
