@@ -324,15 +324,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 cylc_command, suite_name, self.popen.list_to_shell_str(args),
                 "cylc-run.log")
         if host:
-            bash_cmd_prefix = r"""#!/usr/bin/env bash
-for FILE in /etc/profile ~/.profile; do
-    if [[ -f $FILE && -r $FILE ]]; then
-        . $FILE
-    fi
-done
-set -eu
-cd
-"""
+            bash_cmd_prefix = "set -eu\ncd\n"
             log_dir = self.get_suite_dir_rel(suite_name, "log")
             bash_cmd_prefix += "mkdir -p %s\n" % log_dir
             bash_cmd_prefix += "cd %s\n" % log_dir
@@ -341,7 +333,7 @@ cd
                     v = self.popen.list_to_shell_str([value])
                     bash_cmd_prefix += "%s=%s\n" % (key, v)
                     bash_cmd_prefix += "export %s\n" % (key)
-            ssh_cmd = self.popen.get_cmd("ssh", host, "bash")
+            ssh_cmd = self.popen.get_cmd("ssh", host, "bash", "--login")
             self.popen(*ssh_cmd, stdin=(bash_cmd_prefix + bash_cmd))
         else:
             self.popen(bash_cmd, shell=True)
