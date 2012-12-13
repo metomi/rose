@@ -542,10 +542,17 @@ class SuiteRunner(Runner):
             # Build remote "rose suite-run" command
             rose_sr = rose_bin + " suite-run -v -v"
             rose_sr += " --name=" + suite_name
-            for key in ["new", "debug", "install-only", "run"]:
+            for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:
                     rose_sr += " --" + key
+            if opts.log_keep:
+                rose_sr += " --log-keep=" + opts.log_keep
+            if opts.log_name:
+                rose_sr += " --log-name=" + opts.log_name
+            if not opts.log_archive_mode:
+                rose_sr += " --no-log-archive"
+            rose_sr += " --run=" + opts.run_mode
             host_confs = ["root-dir-share",
                           "root-dir-work"]
             rose_sr += " --remote=uuid=" + uuid
@@ -666,44 +673,39 @@ class SuiteRunner(Runner):
         now_log = "log." + now_str
         self.fs_util.makedirs(now_log)
         self.fs_util.symlink(now_log, "log")
-        if r_opts is None:
-            now_log_name = getattr(opts, "log_name", None)
-        else:
-            now_log_name = r_opts.get("log_name")
+        now_log_name = getattr(opts, "log_name", None)
         if now_log_name:
             self.fs_util.symlink(now_log, "log." + now_log_name)
 
         # Keep log for this run and named logs
-        logs = set(glob("log.*"))
+        logs = set(glob("log.*") + ["log"])
         for log in list(logs):
             if os.path.islink(log):
                 logs.remove(log)
-                logs.remove(os.readlink(log))
+                log_link = os.readlink(log)
+                if log_link in logs:
+                    logs.remove(log_link)
             
         # Housekeep old logs, if necessary
-        if r_opts is None:
-            log_keep = getattr(opts, "log_keep", None)
-        else:
-            log_keep = r_opts.get("log_keep")
+        log_keep = getattr(opts, "log_keep", None)
         if log_keep:
             t = time() - abs(float(log_keep)) * 86400.0
             for log in list(logs):
                 if os.path.isfile(log):
                     if t > os.stat(log).st_mtime:
                         self.fs_util.delete(log)
+                        logs.remove(log)
                 else:
                     for root, dirs, files in os.walk(log):
-                        if any([os.stat(f).st_mtime >= t for f in files]):
+                        if any([os.stat(os.path.join(root, f)).st_mtime >= t
+                                for f in files]):
                             break
                     else:
                         self.fs_util.delete(log)
+                        logs.remove(log)
 
         # Archive old logs, if necessary
-        if r_opts is None:
-            log_archive_mode = getattr(opts, "log_archive_mode", True)
-        else:
-            log_archive_mode = r_opts.get("log_archive_mode", True)
-        if log_archive_mode:
+        if getattr(opts, "log_archive_mode", True):
             for log in list(logs):
                 if os.path.isfile(log):
                     continue
