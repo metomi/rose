@@ -97,8 +97,8 @@
       <samp>suite.rc</samp> file that looks like this:</p>
       <pre>
 [scheduling]
-    initial cycle time = 2013010500
-    final cycle time = 2013012500
+    initial cycle time = 2013010100
+    final cycle time = 2013010500
     [[special tasks]]
         cold-start = startup
     [[dependencies]]
@@ -144,9 +144,10 @@
       <samp>[runtime]</samp> with:</p>
       <pre>
 [runtime]
-    [[startup]]
         command scripting = """
-            cylc broadcast -t 2013010500 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
+            cylc broadcast -t 2013010200 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
+            cylc broadcast -t 2013010400 -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
+            cylc broadcast -d $CYLC_SUITE_REG_NAME
         """
 </pre>
     </div>
@@ -156,12 +157,12 @@
 
       <p>The <samp>startup</samp> task will change the
       <samp>[[[environment]]]</samp> setting <samp>COLOUR</samp> of
-      <samp>print_colour</samp> for the <samp>2013010500</samp> cycle
-      time.</p>
+      <samp>print_colour</samp> for the <samp>2013010200</samp> and the <samp>2013010400</samp>
+      cycle times.</p>
+      
+      <p>The <code>cylc broadcast -d</code> command will list the current broadcast settings.</p>
 
-      <p>Change directory to the root of the suite.></p>
-
-      <p>Run the suite using:</p>
+      <p>Change directory to the root of the suite. Run the suite using:</p>
       <pre class="shell">
 rose suite-run
 </pre>
@@ -193,8 +194,19 @@ rose suite-log-view
       <pre>
     [[startup]]
         command scripting = """
-            cylc broadcast -t 2013010500 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
+            cylc broadcast -t 2013010200 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
+            cylc broadcast -t 2013010400 -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
+            cylc broadcast -d $CYLC_SUITE_REG_NAME
         """
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h2 id="cli">Example - cycle time extension</h2>
+
+      <p>We should make the suite run a bit longer by increasing <samp>final cycle time</samp>:</p>   
+    <pre>
+    final cycle time = 2013012500
 </pre>
     </div>
 
