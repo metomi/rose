@@ -180,6 +180,10 @@ class RoseOptionParser(OptionParser):
                        ["--latest"],
                        {"action": "store_true",
                         "help": "Print the latest ID in the repository"}],
+               "local_only": [
+                       ["--local-only"],
+                       {"action": "store_true",
+                        "help": "Delete only the local copy of a suite"}],
                "lower": [
                        ["--lower", "-l"],
                        {"action": "store_const",
