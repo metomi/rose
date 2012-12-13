@@ -37,11 +37,18 @@ import tempfile
 import time
 
 
-DELETE_WARNING = ("WARNING: This will delete both local and repository " +
+DELETE_WARNING = ("This will delete both local and repository " +
                   "copies of your suite")
 PROMPT_CREATE = "Create? y/n (default n) "
 PROMPT_DELETE = "Delete {0}? y/n (default n) "
 PROMPT_DELETE_ALL = "Delete {0}? y/n/a (default n, a=yes-to-all) "
+
+
+class DeleteWarning(Event):
+    """Raised when a user is about to delete a repository copy of a suite."""
+    TYPE = Event.TYPE_ERR    
+    def __str__(self):
+        return self.args[0]
 
 
 class FileExistError(Exception):
@@ -468,7 +475,7 @@ def delete(argv):
         if not skip_prompt:
             try:
                 if not opts.local_only:
-                    print DELETE_WARNING
+                    report(DeleteWarning(DELETE_WARNING))
                 response = raw_input(prompt.format(arg))
             except EOFError:
                 continue
