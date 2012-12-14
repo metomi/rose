@@ -517,10 +517,10 @@ class SuiteRunner(Runner):
 
         # Install items to user@host
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
-        queue = [] # [[pipe, command, stdin], ...]
+        queue = [] # [[pipe, command, "ssh"|"rsync"], ...]
         for user, host in sorted(auths):
             auth = user + "@" + host
-            command = self.popen.get_cmd("ssh", auth, "bash")
+            command = self.popen.get_cmd("ssh", auth, "bash", "--login", "-c")
             rose_bin = "rose"
             for h in [host, "*"]:
                 rose_home_node = conf.get(["rose-home-at", h],
@@ -544,25 +544,22 @@ class SuiteRunner(Runner):
                 if value is not None:
                     v = self.popen.list_to_shell_str([str(value)])
                     rose_sr += "," + key + "=" + v
-            stdin = ". /etc/profile 1>/dev/null 2>&1\n" + rose_sr
-            f = TemporaryFile()
-            f.write(stdin)
-            f.seek(0)
-            pipe = self.popen.run_bg(*command, stdin=f)
-            queue.append([pipe, command, stdin])
+            command += ["'" + rose_sr + "'"]
+            pipe = self.popen.run_bg(*command)
+            queue.append([pipe, command, "ssh"])
 
         while queue:
             sleep(self.SLEEP_PIPE)
-            pipe, command, stdin = queue.pop(0)
+            pipe, command, mode = queue.pop(0)
             if pipe.poll() is None:
-                queue.append([pipe, command, stdin]) # put it back at the end
+                queue.append([pipe, command, mode]) # put it back at the end
                 continue
             rc = pipe.wait()
             out, err = pipe.communicate()
             if rc:
-                raise RosePopenError(command, rc, out, err, stdin)
+                raise RosePopenError(command, rc, out, err)
             self.handle_event(out, level=Event.VV)
-            if stdin is None: # is the rsync command
+            if mode == "rsync":
                 continue
             for line in out.split("\n"):
                 if "/" + uuid == line.strip():
@@ -573,7 +570,7 @@ class SuiteRunner(Runner):
                     filters["excludes"].append(name + uuid)
                 target = auth + ":" + suite_dir_rel
                 cmd = self._get_cmd_rsync(target, **filters)
-                queue.append([self.popen.run_bg(*cmd), cmd, None])
+                queue.append([self.popen.run_bg(*cmd), cmd, "rsync"])
 
         # Start the suite
         self.fs_util.chdir("log")
