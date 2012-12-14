@@ -52,6 +52,12 @@ class AlreadyRunningError(Exception):
         return "%s: is already running on %s" % self.args
 
 
+class NotRunningError(Exception):
+    """An exception raised when a suite is not running."""
+    def __str__(self):
+        return "%s: is not running" % (self.args)
+
+
 class CommandNotDefinedError(Exception):
 
     """An exception raised when a command is not defined for an app."""
@@ -451,11 +457,15 @@ class SuiteRunner(Runner):
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
-        if self.suite_engine_proc.ping(suite_name, hosts):
-            if opts.force_mode:
-                opts.install_only_mode = True
-            else:
-                raise AlreadyRunningError(suite_name, hosts[0])
+        if opts.run_mode == "reload":
+            if not self.suite_engine_proc.ping(suite_name, hosts):
+                raise NotRunningError(suite_name)
+        else:
+            if self.suite_engine_proc.ping(suite_name, hosts):
+                if opts.force_mode:
+                    opts.install_only_mode = True
+                else:
+                    raise AlreadyRunningError(suite_name, hosts[0])
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
