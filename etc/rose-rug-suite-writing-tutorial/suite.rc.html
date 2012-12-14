@@ -1,3 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Suite Writing Tutorial suite.rc</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <div id="body-main">
+    <pre>
 #!jinja2
 [cylc]
     [[event hooks]]
@@ -11,8 +24,8 @@
     [[dependencies]]
         [[[ 0, 3, 6, 9, 12, 15, 18, 21 ]]]
             graph = """
-                write_start_position & \
-                fcm_make_navigate | navigate[T-3] => navigate
+                write_start_position &amp; \
+                fcm_make_navigate | navigate[T-3] =&gt; navigate
             """
 [runtime]
     [[root]]
@@ -31,5 +44,9 @@
             TIME_INTERVAL_HRS = 3
     [[write_start_position]]
         command scripting = """
-            echo '50.0 -3.0' > $CYLC_SUITE_SHARE_PATH/position
+            echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position
             """
+</pre>
+  </div>
+</body>
+</html>
