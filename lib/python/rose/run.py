@@ -20,6 +20,7 @@
 """Implement the "rose app-run" and "rose suite-run" commands."""
 
 import ast
+from datetime import datetime
 from fnmatch import fnmatchcase
 from glob import glob
 import os
@@ -39,8 +40,9 @@ from rose.suite_log_view import SuiteLogViewGenerator
 import socket
 import shutil
 import sys
+import tarfile
 from tempfile import TemporaryFile
-from time import sleep
+from time import time, sleep
 from uuid import uuid4
 
 
@@ -48,6 +50,12 @@ class AlreadyRunningError(Exception):
     """An exception raised when a suite is already running."""
     def __str__(self):
         return "%s: is already running on %s" % self.args
+
+
+class NotRunningError(Exception):
+    """An exception raised when a suite is not running."""
+    def __str__(self):
+        return "%s: is not running" % (self.args)
 
 
 class CommandNotDefinedError(Exception):
@@ -82,6 +90,14 @@ class SuiteHostSelectEvent(Event):
 
     def __str__(self):
         return "%s: will run on %s" % self.args
+
+
+class SuiteLogArchiveEvent(Event):
+
+    """An event raised to report the archiving of a suite log directory."""
+
+    def __str__(self):
+        return "%s <= %s" % self.args
 
 
 class SuitePingTryMaxEvent(Event):
@@ -303,7 +319,6 @@ class AppRunner(Runner):
             config.set(["env", "PATH"], os.getenv("PATH"))
 
         # Free format files not defined in the configuration file
-        # TODO: review location
         conf_file_dir = os.path.join(conf_dir, rose.SUB_CONFIG_FILE_DIR)
         file_section_prefix = self.config_pm.get_handler("file").PREFIX
         if os.path.isdir(conf_file_dir):
@@ -368,9 +383,10 @@ class SuiteRunner(Runner):
     NUM_LOG_MAX = 5
     NUM_PING_TRY_MAX = 3
     OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
-               "gcontrol_mode", "host", "install_only_mode", "name",
-               "new_mode", "no_overwrite_mode", "opt_conf_keys", "remote",
-               "restart_mode"]
+               "gcontrol_mode", "host", "install_only_mode",
+               "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
+               "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
+               "restart_mode", "run_mode"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
@@ -441,11 +457,15 @@ class SuiteRunner(Runner):
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
-        if self.suite_engine_proc.ping(suite_name, hosts):
-            if opts.force_mode:
-                opts.install_only_mode = True
-            else:
-                raise AlreadyRunningError(suite_name, hosts[0])
+        if opts.run_mode == "reload":
+            if not self.suite_engine_proc.ping(suite_name, hosts):
+                raise NotRunningError(suite_name)
+        else:
+            if self.suite_engine_proc.ping(suite_name, hosts):
+                if opts.force_mode:
+                    opts.install_only_mode = True
+                else:
+                    raise AlreadyRunningError(suite_name, hosts[0])
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
@@ -484,8 +504,9 @@ class SuiteRunner(Runner):
 
         # Move temporary log to permanent log
         if hasattr(self.event_handler, "contexts"):
-            log_base = "rose-suite-run.log"
-            log_file = open(os.path.join(os.getcwd(), "log", log_base), "w")
+            log_file_path = os.path.abspath(
+                    os.path.join("log", "rose-suite-run.log"))
+            log_file = open(log_file_path, "ab")
             temp_log_file = self.event_handler.contexts[uuid].handle
             temp_log_file.seek(0)
             log_file.write(temp_log_file.read())
@@ -535,8 +556,14 @@ class SuiteRunner(Runner):
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:
                     rose_sr += " --" + key
-            host_confs = ["num-log-max",
-                          "root-dir-share",
+            if opts.log_keep:
+                rose_sr += " --log-keep=" + opts.log_keep
+            if opts.log_name:
+                rose_sr += " --log-name=" + opts.log_name
+            if not opts.log_archive_mode:
+                rose_sr += " --no-log-archive"
+            rose_sr += " --run=" + opts.run_mode
+            host_confs = ["root-dir-share",
                           "root-dir-work"]
             rose_sr += " --remote=uuid=" + uuid
             for key in host_confs:
@@ -587,7 +614,7 @@ class SuiteRunner(Runner):
             self.handle_event(SuiteHostSelectEvent(suite_name, host))
             # FIXME: values in environ were expanded in the localhost
             self.suite_engine_proc.run(
-                    suite_name, host, environ, opts.restart_mode, args)
+                    suite_name, host, environ, opts.run_mode, args)
             open("rose-suite-run.host", "w").write(host + "\n")
 
             # Check that the suite is running
@@ -643,27 +670,58 @@ class SuiteRunner(Runner):
         return default
 
     def _run_init_dir_log(self, opts, suite_name, config=None, r_opts=None):
-        """Create the suite's log/ directory. Rotate old ones."""
-        num_log_max = self._run_conf(
-                "num-log-max", default=self.NUM_LOG_MAX,
-                config=config, r_opts=r_opts)
-        num_log_max = int(num_log_max)
-        for dir in glob("log.*"):
-            try:
-                if int(dir[4:]) >= num_log_max:
-                    self.fs_util.delete(dir)
-            except ValueError:
-                pass
-        for num_log in reversed(range(num_log_max + 1)):
-            name_log = "log"
-            if num_log:
-                name_log = "log." + str(num_log)
-            if os.path.exists(name_log):
-                if num_log >= num_log_max:
-                    self.fs_util.delete(name_log)
+        """Create the suite's log/ directory. Housekeep, archive old ones."""
+        # Do nothing in log append mode if log directory already exists
+        if opts.run_mode in ["reload", "restart"] and os.path.isdir("log"):
+            return
+
+        # Log directory of this run
+        now_str = datetime.now().strftime("%Y%m%dT%H%M%S")
+        now_log = "log." + now_str
+        self.fs_util.makedirs(now_log)
+        self.fs_util.symlink(now_log, "log")
+        now_log_name = getattr(opts, "log_name", None)
+        if now_log_name:
+            self.fs_util.symlink(now_log, "log." + now_log_name)
+
+        # Keep log for this run and named logs
+        logs = set(glob("log.*") + ["log"])
+        for log in list(logs):
+            if os.path.islink(log):
+                logs.remove(log)
+                log_link = os.readlink(log)
+                if log_link in logs:
+                    logs.remove(log_link)
+            
+        # Housekeep old logs, if necessary
+        log_keep = getattr(opts, "log_keep", None)
+        if log_keep:
+            t = time() - abs(float(log_keep)) * 86400.0
+            for log in list(logs):
+                if os.path.isfile(log):
+                    if t > os.stat(log).st_mtime:
+                        self.fs_util.delete(log)
+                        logs.remove(log)
                 else:
-                    name_log_1 = "log." + str(num_log + 1)
-                    self.fs_util.rename(name_log, name_log_1)
+                    for root, dirs, files in os.walk(log):
+                        if any([os.stat(os.path.join(root, f)).st_mtime >= t
+                                for f in files]):
+                            break
+                    else:
+                        self.fs_util.delete(log)
+                        logs.remove(log)
+
+        # Archive old logs, if necessary
+        if getattr(opts, "log_archive_mode", True):
+            for log in list(logs):
+                if os.path.isfile(log):
+                    continue
+                log_tar_gz = log + ".tar.gz"
+                f = tarfile.open(log_tar_gz, "w:gz")
+                f.add(log)
+                f.close()
+                self.handle_event(SuiteLogArchiveEvent(log_tar_gz, log))
+                self.fs_util.delete(log)
 
     def _run_init_dir_work(self, opts, suite_name, name, config=None,
                            r_opts=None):

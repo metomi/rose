@@ -175,15 +175,33 @@ class RoseOptionParser(OptionParser):
                        ["--keys", "-k"],
                        {"action": "store_true",
                         "dest": "keys_mode",
-                        "help": "Print SECTION/OPTION keys only"}],
+                        "help": "Print SECTION/OPTION keys only."}],
                "latest": [
                        ["--latest"],
                        {"action": "store_true",
-                        "help": "Print the latest ID in the repository"}],
+                        "help": "Print the latest ID in the repository."}],
                "local_only": [
                        ["--local-only"],
                        {"action": "store_true",
-                        "help": "Delete only the local copy of a suite"}],
+                        "help": "Delete only the local copy of a suite."}],
+               "log_archive_mode": [
+                       ["--no-log-archive"],
+                       {"action": "store_false",
+                        "default": True,
+                        "dest": "log_archive_mode",
+                        "help": "Do not archive old logs."}],
+               "log_keep": [
+                       ["--log-keep"],
+                       {"action": "store",
+                        "dest": "log_keep",
+                        "metavar": "DAYS",
+                        "help": "Specify number of days a log directory is" +
+                                " kept."}],
+               "log_name": [
+                       ["--log-name"],
+                       {"action": "store",
+                        "metavar": "NAME",
+                        "help": "Name the log directory of this run."}],
                "lower": [
                        ["--lower", "-l"],
                        {"action": "store_const",
@@ -308,6 +326,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "METHOD",
                         "help": "Specify a ranking method."}],
+               "reload_mode": [
+                       ["--reload"],
+                       {"action": "store_const",
+                        "const": "reload",
+                        "dest": "run_mode",
+                        "help": "Shorthand for --run=reload."}],
                "remote": [
                        ["--remote"],
                        {"action": "store",
@@ -315,10 +339,18 @@ class RoseOptionParser(OptionParser):
                         "help": "(Internal option, do not use.)"}],
                "restart_mode": [
                        ["--restart"],
-                       {"action": "store_true",
-                        "default": False,
-                        "dest": "restart_mode",
-                        "help": "Restart the suite."}],
+                       {"action": "store_const",
+                        "const": "restart",
+                        "dest": "run_mode",
+                        "help": "Shorthand for --run=restart."}],
+               "run_mode": [
+                       ["--run"],
+                       {"action": "store",
+                        "choices": ["reload", "restart", "run"],
+                        "default": "run",
+                        "dest": "run_mode",
+                        "metavar": "MODE",
+                        "help": "Specify run|restart|reload."}],
                "reverse": [
                        ["--reverse", "-r"],
                        {"action": "store_true",

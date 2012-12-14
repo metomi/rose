@@ -78,7 +78,7 @@ class SuiteControlGUILauncher(object):
                     if len(hosts) > 1:
                         self.handle_event(SuiteRunningOnMultipleHostsEvent(
                                 suite_name, hosts))
-        return self.suite_engine_proc.launch_gcontrol(suite_name, host, *args)
+        return self.suite_engine_proc.launch_gcontrol(suite_name, host, args)
 
     __call__ = launch
 
