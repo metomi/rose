@@ -559,7 +559,7 @@ class SuiteRunner(Runner):
             if rc:
                 raise RosePopenError(command, rc, out, err)
             self.handle_event(out, level=Event.VV)
-            if mode is "rsync":
+            if mode == "rsync":
                 continue
             for line in out.split("\n"):
                 if "/" + uuid == line.strip():
