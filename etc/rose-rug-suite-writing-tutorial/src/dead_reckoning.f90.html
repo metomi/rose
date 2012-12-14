@@ -1,3 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Suite Writing Tutorial dead_reckoning.f90</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <div id="body-main">
+    <pre>
 program extract_compass_log
 implicit none
 character(31):: dt_hr_env
@@ -52,10 +65,10 @@ print*, "HEADING:", heading
 ! (1 knot = 1 nautical mile / 1 hour)
 ang_distance = (speed_kn*dt_hr)/radius_earth_nm
 
-new_lat = asin(sin(lat)*cos(ang_distance) + &
+new_lat = asin(sin(lat)*cos(ang_distance) + &amp;
                cos(lat)*sin(ang_distance)*cos(heading))
-new_long = long + &
-           atan2(sin(heading)*sin(ang_distance)*cos(lat), &
+new_long = long + &amp;
+           atan2(sin(heading)*sin(ang_distance)*cos(lat), &amp;
                  cos(ang_distance)-sin(lat)*sin(new_lat))
 new_lat = (180.0/pi)*new_lat
 new_long = (180.0/pi)*new_long
@@ -68,3 +81,7 @@ open(1, file=pos_fpath, action='write')
 write(1, *) new_lat, new_long
 close(1)
 end program
+</pre>
+  </div>
+</body>
+</html>
