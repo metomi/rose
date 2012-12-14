@@ -46,8 +46,6 @@ call system_clock(count=clock)
 random_no = rand(clock)
 heading = random_no*2*pi
 
-print*, "HEADING:", heading
-
 ! This is how far we went, in radians:
 ! (1 knot = 1 nautical mile / 1 hour)
 ang_distance = (speed_kn*dt_hr)/radius_earth_nm
