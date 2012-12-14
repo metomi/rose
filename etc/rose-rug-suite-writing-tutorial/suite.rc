@@ -9,7 +9,6 @@
     [[special tasks]]
         cold-start = fcm_make_navigate, write_start_position
     [[dependencies]]
-
         [[[ 0, 3, 6, 9, 12, 15, 18, 21 ]]]
             graph = """
                 write_start_position & \
