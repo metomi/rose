@@ -60,7 +60,8 @@
 #         --force mode is specified and the suite is already running.)
 #     --log-keep=DAYS
 #         Specify the number of days to keep log directories/archives.
-#         Do not housekeep if not specified.
+#         Do not housekeep if not specified. Named log directories (created by
+#         --log-name=NAME in previous runs) will not be housekept.
 #     --log-name=NAME
 #         Specify a name for the log directory of the current run. If
 #         specified, it will create a symbolic link log.NAME to point to the
