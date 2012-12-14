@@ -181,8 +181,9 @@ rose suite-log-view
 </pre>
 
       <p>The output (<samp>out</samp>) of the <samp>print_colour</samp> tasks
-      should have some green text, except for the <samp>2013010500</samp> cycle
-      time where it should be blue.</p>
+      should have some green text, except for the <samp>2013010200</samp> cycle
+      time where it should be blue and <samp>2013010400</samp> where it should be
+      red.</p>
     </div>
 
     <div class="slide">
@@ -225,7 +226,7 @@ rose suite-log-view
 
       <p>While the suite is running, run:</p>
       <pre class="shell">
-cylc broadcast --host=$HOSTNAME -n print_colour -s [environment]COLOUR=red $SUITE_ID
+cylc broadcast --host=$HOSTNAME -n print_colour -s [environment]COLOUR=orange $SUITE_ID
 </pre>
     </div>
 
@@ -250,8 +251,8 @@ cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=purple $SU
 rose suite-log-view
 </pre>
 
-      <p>The colour output should change after the suite cycle time when you
-      ran the command.</p>
+      <p>The colour output should change after the suite cycle times when you
+      ran the commands.</p>
     </div>
 
     <div class="slide">
