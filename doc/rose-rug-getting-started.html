@@ -47,38 +47,47 @@
     yourself. If you have just installed Rose at your site, you should configure
     it to meet your site requirements.</p>
 
-    <h2 id="user">User Configuration</h2>
+    <p>The format of both the user and site configuration file is documented in
+    <a href="rose-configuration.html#site">user/site config</a>.</p>
 
-    <p>You can configure Rose by creating and editing a configuration file in
-    your homespace (your user config):</p>
-    <pre>
-~/.metomi/rose.conf
-</pre>
-
-    <p>The format of this file is documented in <a href=
-    "rose-configuration.html#site">user/site config</a>.</p>
-
-    <p>You can view the current configuration options of Rose by opening a
-    terminal and running:</p>
-    <pre>
+    <p>Rose combines the settings in the site configuration and the user
+    configuration at run time. You can view the actual setting by issuing the
+    command:</p>
+    <pre class="shell">
 rose config
 </pre>
 
-    <p>You can override the options in these sections by entering your own
-    options in your user config file. For example, changing the default
-    graphical text editor can be done by putting the following lines in your
-    user config file:</p>
-    <pre>
-[external]
-geditor=gvim
+    <h2 id="user">User Configuration</h2>
+
+    <p>You can configure Rose by creating and editing your user configuration
+    file at <var>~/.metomi/rose.conf</var>. E.g.:</p>
+
+    <pre class="shell">
+mkdir ~/.metomi
+${EDITOR:-vi} ~/.metomi/rose.conf
 </pre>
 
-    <p>This will change the graphical text editor used by Rose to 'gvim'.</p>
+    <p>Rose should work out of the box if it is configured correctly at your
+    site. However, you would probably want to change the <var>[external]
+    geditor</var> (the external text editor used by GUIs) and the
+    <var>[external] editor</var> (the external text editor used by CLI commands)
+    settings. If these settings are not defined in the user and site
+    configuration, the default external text editor used by GUIs is
+    <code>gedit</code>. The default external text editor used by CLI commands is
+    the value of the <var>VISUAL</var> or <var>EDITOR</var> environment
+    variable, or <code>vi</code> if neither environment variable is set.</p>
 
-    <p>You can also override many internal constants of the rose config editor
-    and rosie go. To change the keyboard shortcut of the <samp>Find Next</samp>
-    action in the config editor to <kbd>F3</kbd>, put the following lines in
-    your user config file:</p>
+    <p>E.g.:</p>
+    <pre>
+[external]
+editor=vim
+geditor=gvim -f
+</pre>
+
+    <p>You can also override many internal constants of the <code>rose config
+    edit</code> and <code>rosie go</code>. To change the keyboard shortcut of
+    the <samp>Find Next</samp> action in the config editor to <kbd>F3</kbd>, put
+    the following lines in your user config file:</p>
     <pre>
 [rose-config-edit]
 accel-find-next=F3
@@ -88,14 +97,8 @@ accel-find-next=F3
 
     <h2 id="site">Site Configuration</h2>
 
-    <p>You can configure Rose for your site by editing the file in a Rose
-    distribution:</p>
-    <pre>
-etc/rose.conf
-</pre>
-
-    <p>The format of this file is documented in <a href=
-    "rose-configuration.html#site">user/site config</a>.</p>
+    <p>You can configure Rose for your site by creating and editing the
+    <var>etc/rose.conf</var> file in a Rose distribution.</p>
 
     <p>Essential setup includes changing the options in
     <samp>[rose-host-select]</samp> and <samp>[rose-suite-run]</samp> to
