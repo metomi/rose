@@ -20,6 +20,7 @@
 
 import json
 import os
+from rose.config import ConfigLoader
 from rose.fs_util import FileSystemUtil
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
@@ -27,6 +28,7 @@ from rose.reporter import Event, Reporter
 from rose.suite_engine_proc import SuiteEngineProcessor
 import shutil
 import sys
+from time import time
 import webbrowser
 
 class LockEvent(Event):
@@ -148,7 +150,19 @@ class SuiteLogViewGenerator(object):
             suite_log_file_size_prev = None
             suite_log_file_size = os.stat(suite_log_file).st_size
             while suite_log_file_size != suite_log_file_size_prev:
-                data = self.suite_engine_proc.process_suite_log()
+                suite_info = {}
+                suite_info_file_name = self.suite_engine_proc.get_suite_dir(
+                        suite_name, "rose-suite.info")
+                if os.access(suite_info_file_name, os.F_OK | os.R_OK):
+                    info_conf = ConfigLoader()(suite_info_file_name)
+                    for key, node = info_conf.value.items():
+                        if not node.is_ignored:
+                            suite_info[key] = node.value
+                tasks = self.suite_engine_proc.process_suite_log(suite_name)
+                data = {"suite": suite_name,
+                        "suite_info": suite_info,
+                        "tasks": tasks,
+                        "updated_at": time()}
                 f = open("JOB.json", "w")
                 json.dump(data, f, indent=0)
                 f.close()

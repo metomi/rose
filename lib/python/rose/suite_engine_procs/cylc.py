@@ -197,31 +197,33 @@ class CylcProcessor(SuiteEngineProcessor):
 
         Locate task log files from the cylc suite log directory.
         Return a data structure that looks like:
-        {   task_id: [
-                {   "events": {
-                        "submit": <seconds-since-epoch>,
-                        "init": <seconds-since-epoch>,
-                        "queue": <delta-between-submit-and-init>,
-                        "exit": <seconds-since-epoch>,
-                        "elapsed": <delta-between-init-and-exit>,
+        {   <task_id>: {
+                "name": <name>,
+                "cycle_time": <cycle time string>,
+                "submits": [
+                    {   "events": {
+                            "submit": <seconds-since-epoch>,
+                            "init": <seconds-since-epoch>,
+                            "queue": <delta-between-submit-and-init>,
+                            "exit": <seconds-since-epoch>,
+                            "elapsed": <delta-between-init-and-exit>,
+                        },
+                        "files": {
+                            "script": {"n_bytes": <n_bytes>},
+                            "out": {"n_bytes": <n_bytes>},
+                            "err": {"n_bytes": <n_bytes>},
+                            # ... more files
+                        },
+                        "files_time_stamp": <seconds-since-epoch>,
+                        "status": <"pass"|"fail">,
                     },
-                    "files": {
-                        "script": {"n_bytes": <n_bytes>},
-                        "out": {"n_bytes": <n_bytes>},
-                        "err": {"n_bytes": <n_bytes>},
-                        # ... more files
-                    },
-                    "files_time_stamp": <seconds-since-epoch>,
-                    "status": <"pass"|"fail">,
-                },
-                # ... more re-submits of the task
-            ],
+                    # ... more re-submits of the task
+                ]
+            }
             # ... more task IDs
         }
-
         """
-        data = {"suite": os.path.basename(os.path.dirname(os.getcwd())),
-                "tasks": {}}
+        data = {}
         # Parse the suite log file
         for line in open(self.SUITE_LOG, "r"):
             for key, rec in self.REC_LOG_ENTRIES.items():
@@ -237,15 +239,20 @@ class CylcProcessor(SuiteEngineProcessor):
                 if search_result.groupdict().has_key("signal"):
                     signal = search_result.group("signal")
                 event_time = mktime(strptime(time_stamp, "%Y/%m/%d %H:%M:%S"))
-                task_data_list = data["tasks"].setdefault(task_id, [])
-                if not task_data_list or task_data_list[-1]["events"][event]:
-                    task_data_list.append({"events": {},
-                                           "status": None,
-                                           "files": {},
-                                           "files_time_stamp": None})
+                if not data.has_key(task_id):
+                    name, cycle_time = task_id.split("%", 1)
+                    data[task_id] = {"name": name,
+                                     "cycle_time": cycle_time,
+                                     "submits": []}
+                submits = data[task_id]["submits"]
+                if not submits or submits[-1]["events"][event]:
+                    submits.append({"events": {},
+                                    "status": None,
+                                    "files": {},
+                                    "files_time_stamp": None})
                     for name in ["submit", "init", "exit"]:
-                        task_data_list[-1]["events"][name] = None
-                task_data = task_data_list[-1]
+                        submits[-1]["events"][name] = None
+                task_data = submits[-1]
                 task_events = task_data["events"]
                 task_events[event] = event_time
                 if event == "exit":
@@ -254,7 +261,8 @@ class CylcProcessor(SuiteEngineProcessor):
                         task_data["signal"] = signal
                 break
         # Locate task log files
-        for task_id, task_data_list in data["tasks"].items():
+        for task_id, task_datum in data.items():
+            submits = task_datum["submits"]
             if not os.path.isdir("job"):
                 return
             for name in os.listdir("job"):
@@ -268,16 +276,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 if not key:
                     key = "script"
                 n_bytes = int(os.stat(os.path.join("job", name)).st_size)
-                for task_data in task_data_list:
-                    if task_data["files_time_stamp"] == time_stamp:
-                        task_data["files"][key] = {"n_bytes": n_bytes}
+                for submit in submits:
+                    if submit["files_time_stamp"] == time_stamp:
+                        submit["files"][key] = {"n_bytes": n_bytes}
                         break
-                    # The 1st element in task_data_list with a submit time
+                    # The 1st element in submits with a submit time
                     # within THRESHOLD seconds of the file name's time stamp.
-                    dt = abs(task_data["events"]["submit"] - float(time_stamp))
+                    dt = abs(submit["events"]["submit"] - float(time_stamp))
                     if dt <= self.LOG_TASK_TIMESTAMP_THRESHOLD:
-                        task_data["files"][key] = {"n_bytes": n_bytes}
-                        task_data["files_time_stamp"] = time_stamp
+                        submit["files"][key] = {"n_bytes": n_bytes}
+                        submit["files_time_stamp"] = time_stamp
                         break
         return data
 
