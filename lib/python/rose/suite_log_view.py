@@ -155,10 +155,10 @@ class SuiteLogViewGenerator(object):
                         suite_name, "rose-suite.info")
                 if os.access(suite_info_file_name, os.F_OK | os.R_OK):
                     info_conf = ConfigLoader()(suite_info_file_name)
-                    for key, node = info_conf.value.items():
-                        if not node.is_ignored:
+                    for key, node in info_conf.value.items():
+                        if not node.state:
                             suite_info[key] = node.value
-                tasks = self.suite_engine_proc.process_suite_log(suite_name)
+                tasks = self.suite_engine_proc.process_suite_log()
                 data = {"suite": suite_name,
                         "suite_info": suite_info,
                         "tasks": tasks,

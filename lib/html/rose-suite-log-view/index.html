@@ -56,6 +56,21 @@
     right: 0;
     top: 2.5em;
 }
+#body-main-top {
+    background: white;
+    border: thin solid #aaa;
+    font-size: xx-small;
+    padding: 0.2em;
+}
+#body-main-top address {
+    float: right;
+    font-style: normal;
+}
+#body-main-top p {
+    margin: 0;
+    margin-left: 0.5em;
+    padding: 0.1em;
+}
 table {
     border-collapse: collapse;
     clear: both;
@@ -205,9 +220,14 @@ $(function() {
         });
         $("#updated_at").text(datetime2obj(data["updated_at"])["string"]);
         for (var key in data["suite_info"]) {
-            $("#suite_info").append($("<dt/>").text(key));
-            $("#suite_info").append($("<dd/>").text(data["suite_info"][key]));
+            var p = $("<p/>").appendTo($("#suite_info"));
+            p.append($("<dfn/>").text(key + ": "));
+            p.append(data["suite_info"][key]);
         }
+        $("#suite_info").hide();
+        $("#suite_info_toggle").click(function() {
+            $("#suite_info").toggle();
+        });
     }
 
     /* Load the data of the tasks into the HTML. */
@@ -233,7 +253,6 @@ $(function() {
 
                 /* Column 2-3: name, cycle */
                 cell = $("<td/>").appendTo(row).text(task_name);
-                cell.append(task_name);
                 cell = $("<td/>").appendTo(row).text(cycle_time);
 
                 /* Column 4: submit-n */
@@ -412,7 +431,7 @@ $(function() {
         }
         node.dataTable({
             /* See columns of the task_list table */
-            "aaSorting": [[3, "asc"]],
+            "aaSorting": [[5, "asc"]],
             "aoColumn": [
                 null,
                 {"bVisible": false},
@@ -432,8 +451,8 @@ $(function() {
             "bPaginate": false,
             "bStateSave": true,
             "oColVis": {"activate": "mouseover", "aiExclude": [0]},
-            "sDom": '<"#task_list_colvis"C>frltip',
-            "oLanguage": {"sSearch": "Filter results:"}
+            "oLanguage": {"sSearch": "Filter results:"},
+            "sDom": '<"#task_list_colvis"C>frltip'
         });
     }
 
@@ -460,17 +479,17 @@ $(function() {
 </div>
 
 <div id="body-main">
-<address id="updated_at">
-</address>
-<div>
-  <a href="javascript:$('#suite_info').toggle();">toggle suite info</a>
-  <dl id="suite_info">
-  </dl>
+<div id="body-main-top">
+  <address>last updated: <span id="updated_at"></span></address>
+  <div>
+    <a id="suite_info_toggle" href="#">suite info</a>
+    <div id="suite_info"></div>
+  </div>
 </div>
 <table id="task_list" summary="Task List">
   <thead>
     <tr>
-      <th class="firstColumn">Task%Cycle</th>
+      <th class="firstColumn">Task Name%Cycle</th>
       <th>Name</th>
       <th>Cycle</th>
       <th>Submit-N</th>
