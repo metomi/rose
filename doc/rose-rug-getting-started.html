@@ -70,20 +70,20 @@ ${EDITOR:-vi} ~/.metomi/rose.conf
     <p>Rose should work out of the box if it is configured correctly at your
     site.</p>
     
-    <p>However, you would probably want to change the <var>[external]
-    geditor</var> (the external text editor used by GUIs) and the
-    <var>[external] editor</var> (the external text editor used by CLI commands)
-    settings. If these settings are not defined in the user and site
-    configuration, the default external text editor used by GUIs is
-    <code>gedit</code>. The default external text editor used by CLI commands is
-    the value of the <var>VISUAL</var> or <var>EDITOR</var> environment
-    variable, or <code>vi</code> if neither environment variable is set. If, for
-    example, you want to use <code>gvim</code> as your text editor, you would
-    add the following to your <var>~/.metomi/rose.conf</var>:</p>
+    <p>However, you may want to change the <var>[external] geditor</var> (the
+    external text editor used by GUIs) and the <var>[external] editor</var> (the
+    external text editor used by CLI commands) settings. If these settings are
+    not defined in the user and site configuration, the default external text
+    editor used by GUIs is <code>gedit</code>. The default external text editor
+    used by CLI commands is the value of the <var>VISUAL</var> or
+    <var>EDITOR</var> environment variable, or <code>vi</code> if neither
+    environment variable is set. If, for example, you want to use
+    <code>gvim</code> as your text editor, you would add the following to your
+    <var>~/.metomi/rose.conf</var>:</p>
 
     <pre>
 [external]
-editor=vim
+editor=gvim -f
 geditor=gvim -f
 </pre>
 
