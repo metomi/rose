@@ -22,7 +22,7 @@
 #     rose-mpi-launch
 #
 # SYNOPSIS
-#     rose mpi-launch COMMAND [ARGUMENTS ...]
+#     rose mpi-launch [OPTIONS] [--] COMMAND [ARGUMENTS ...]
 #
 # ARGUMENTS
 #     COMMAND
@@ -62,28 +62,69 @@
 # DESCRIPTION
 #     Provide a portable way to launch an MPI command.
 #
+# OPTIONS
+#     --debug
+#         Switch on xtrace, i.e. "set -x".
+#     --quiet, -q
+#         Decrement verbosity.
+#     --verbose, -v
+#         Increment verbosity. Print command on "-v" mode. Run "prinenv", "ldd"
+#         on a binary executable, and "ulimit -a" on "-v -v" mode.
+#
 # DIAGNOSTICS
 #     Return 0 on success, 1 or exit code of COMMAND on failure.
-#------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
 rose_init rose_log
 
 # ------------------------------------------------------------------------------
-if [[ ${1:-} == '--inner' ]]; then
-    shift 1
-    if [[ -n ${ROSE_LAUNCHER_ULIMIT_OPTS:-} ]]; then
-        while getopts 'HST:ab:c:d:e:f:i:l:m:n:p:q:r:s:t:u:v:x:' \
-            OPT $ROSE_LAUNCHER_ULIMIT_OPTS
-        do
-            case "$OPT" in
-              '?') return 1;;
-                *) ulimit -$OPT $OPTARG || return $?;;
-            esac
-        done
-    fi
-
-    exec "$@"
-fi
+while (($# > 0)); do
+    case $1 in
+    --debug)
+        shift 1
+        set -x
+        :;;
+    --inner)
+        shift 1
+        if [[ -n ${ROSE_LAUNCHER_ULIMIT_OPTS:-} ]]; then
+            while getopts 'HST:ab:c:d:e:f:i:l:m:n:p:q:r:s:t:u:v:x:' \
+                OPT $ROSE_LAUNCHER_ULIMIT_OPTS
+            do
+                case "$OPT" in
+                  '?') return 1;;
+                    *) ulimit -$OPT $OPTARG || return $?;;
+                esac
+            done
+        fi
+        if ((ROSE_VERBOSITY >= 3)); then
+            run ulimit -a
+        fi
+        info 2 exec "$@"
+        exec "$@"
+        :;;
+    -q) shift 1
+        ((--ROSE_VERBOSITY))
+        :;;
+    --quiet)
+        shift 1
+        ((--ROSE_VERBOSITY))
+        :;;
+    -v) shift 1
+        ((++ROSE_VERBOSITY))
+        :;;
+    --verbose)
+        shift 1
+        ((++ROSE_VERBOSITY))
+        :;;
+    --) shift 1
+        break
+        :;;
+    -*) rose_usage 1
+        :;;
+    *)  break
+        :;;
+    esac
+done
 
 # ------------------------------------------------------------------------------
 if (($# < 1)); then
@@ -95,9 +136,9 @@ if ! COMMAND=$(type -P $1); then
 fi
 shift 1
 
-# TODO: search site configuration.
-ROSE_LAUNCHER_LIST=${ROSE_LAUNCHER_LIST:="poe ${ROSE_LAUNCHER_MPICH:-mpiexec} mpirun mpprun"}
-NPROC=${NPROC:=1}
+# TODO: Site configuration?
+ROSE_LAUNCHER_LIST=${ROSE_LAUNCHER_LIST:-"poe ${ROSE_LAUNCHER_MPICH:-mpiexec} mpirun mpprun"}
+NPROC=${NPROC:-1}
 
 #-------------------------------------------------------------------------------
 # 1. Assign a value to ROSE_LAUNCHER if it is not already set.
@@ -122,19 +163,20 @@ if [[ -n $ROSE_LAUNCHER ]]; then
     fi
     ROSE_LAUNCHER_PATH=$(type -P $ROSE_LAUNCHER)
     ROSE_LAUNCHER=$ROSE_LAUNCHER_PATH
-    ROSE_LAUNCH_INNER=${ROSE_LAUNCH_INNER:-"$0 --inner"}
+    ROSE_LAUNCH_INNER=${ROSE_LAUNCH_INNER:-"${0}$(optv) --inner"}
     # Options
-    ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:=}
-    ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:=}
+    ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-}
+    ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:-}
+    # TODO: Site configuration?
     case $(basename $ROSE_LAUNCHER) in
         mpirun)
-            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:="-v -np $NPROC"}
+            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-"-v -np $NPROC"}
             :;;
         mpprun)
-            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:="-n $NPROC"}
+            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-"-n $NPROC"}
             :;;
         mpiexec*)
-            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:="-n $NPROC"}
+            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-"-n $NPROC"}
             :;;
     esac
 else
@@ -143,9 +185,22 @@ else
     ROSE_LAUNCHER_POSTOPTS=
 fi
 
+if ((ROSE_VERBOSITY >= 3)); then
+    info 3 printenv
+    printenv | sort
+    run ldd $COMMAND || true 2>/dev/null
+fi
+
 #-------------------------------------------------------------------------------
 # 3. Launch the program.
 #-------------------------------------------------------------------------------
+info 2 exec \
+$ROSE_LAUNCHER \
+$ROSE_LAUNCHER_PREOPTS \
+$ROSE_LAUNCH_INNER \
+$COMMAND \
+$ROSE_LAUNCHER_POSTOPTS \
+"$@"
 exec \
 $ROSE_LAUNCHER \
 $ROSE_LAUNCHER_PREOPTS \

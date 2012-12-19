@@ -72,15 +72,21 @@ function info() {
 }
 
 function optv() {
+    local OPT=
+    if [[ -o xtrace ]]; then
+        OPT=' --debug'
+    fi
     if (($ROSE_VERBOSITY > 1)); then
-        local OPT='--verbose'
+        OPT="$OPT --verbose"
         ((V = ROSE_VERBOSITY))
         while ((--V > 1)); do
             OPT="$OPT --verbose"
         done
-        echo $OPT
     elif (($ROSE_VERBOSITY <= 0)); then
-        echo '--quiet'
+        OPT="$OPT --quiet"
+    fi
+    if [[ -n $OPT ]]; then
+        echo "$OPT"
     fi
 }
 
