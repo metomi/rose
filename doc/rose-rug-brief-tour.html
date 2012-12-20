@@ -92,6 +92,24 @@
     </div>
 
     <div class="slide">
+      <h3>Before You Start</h3>
+
+      <p>You may want to configure Rose to use your favourite text editors.
+      E.g.:</p>
+
+      <pre class="shell">
+mkdir -p ~/.metomi
+cat &gt;&gt;~/.metomi/rose.conf &lt;&lt;'__CONF__'
+[external]
+# External text editor for CLI commands.
+editor=vim
+# External text editor for GUIs.
+geditor=gvim -f
+__CONF__
+</pre>
+    </div>
+
+    <div class="slide">
       <h3>Create a Suite</h3>
 
       <p>We'll begin by creating a suite for you to work with.</p>
