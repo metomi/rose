@@ -24,43 +24,12 @@
 # SYNOPSIS
 #     rose mpi-launch [OPTIONS] [--] COMMAND [ARGUMENTS ...]
 #
+# DESCRIPTION
+#     Provide a portable way to launch an MPI command.
+#
 # ARGUMENTS
 #     COMMAND
 #         Command to call. Subsequent arguments are passed to the command.
-#
-# ENVIRONMENT VARIABLES
-#     optional ROSE_LAUNCHER
-#         Specifies the launcher program to run the prog.
-#
-#     optional ROSE_LAUNCH_INNER
-#         Specifies an inner wrapper to be run by launcher, can be set to ""
-#         to call the executable directly. Default is "$0 --inner".
-#
-#     optional ROSE_LAUNCHER_LIST
-#         Specifies an alternative list of launchers.
-#
-#     optional ROSE_LAUNCHER_MPICH
-#         Specifies the mpich launcher program to run the prog. Default is
-#         "mpiexec".
-#
-#     optional ROSE_LAUNCHER_PREOPTS
-#         Specifies the options to the launcher program to be inserted before
-#         the program name.
-#
-#     optional ROSE_LAUNCHER_POSTOPTS
-#         Specifies the options to the launcher program to be inserted after
-#         the program name.
-#       
-#     optional ROSE_LAUNCHER_ULIMIT_OPTS
-#         Specifies the arguments to ulimit. Setting this variable to "-a -s
-#         unlimited -d unlimited -a" results in "ulimit -a; ulimit -s unlimited;
-#         ulimit -d unlimited; ulimit -a"
-#
-#     optional NPROC
-#         Specifies the number of processors to run on. Default is 1.
-#
-# DESCRIPTION
-#     Provide a portable way to launch an MPI command.
 #
 # OPTIONS
 #     --debug
@@ -68,8 +37,48 @@
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v
-#         Increment verbosity. Print command on "-v" mode. Run "prinenv", "ldd"
+#         Increment verbosity. Print command on "-v" mode. Run "printenv", "ldd"
 #         on a binary executable, and "ulimit -a" on "-v -v" mode.
+#
+# CONFIGURATION
+#     The command reads from the <var>[rose-mpi-launch]</var> section in
+#     "$ROSE_HOME/etc/rose.conf" and "$HOME/.metomi/rose.conf". All settings
+#     are optional. Valid settings are:
+#
+#     launcher-list=LIST
+#         Specify a list of launcher commands.
+#     launcher-preopts.LAUNCHER=OPTIONS
+#         Specify the default options of a LAUNCHER before the COMMAND.
+#     launcher-postopts.LAUNCHER=OPTIONS
+#         Specify the default options of a LAUNCHER after the COMMAND.
+#
+# ENVIRONMENT VARIABLES
+#     optional ROSE_LAUNCHER
+#         Specify the launcher program to run the prog.
+#
+#     optional ROSE_LAUNCH_INNER
+#         Specify an inner wrapper to be run by launcher, can be set to ""
+#         to call the executable directly. Default is "$0 --inner".
+#
+#     optional ROSE_LAUNCHER_LIST
+#         Specify an alternative list of launchers. Override launcher-list
+#         setting in configuration.
+#
+#     optional ROSE_LAUNCHER_PREOPTS
+#         Specify the options to the launcher program to be inserted before
+#         the program name.
+#
+#     optional ROSE_LAUNCHER_POSTOPTS
+#         Specify the options to the launcher program to be inserted after
+#         the program name.
+#       
+#     optional ROSE_LAUNCHER_ULIMIT_OPTS
+#         Specify the arguments to ulimit. Setting this variable to "-a -s
+#         unlimited -d unlimited -a" results in "ulimit -a; ulimit -s unlimited;
+#         ulimit -d unlimited; ulimit -a"
+#
+#     optional NPROC
+#         Specify the number of processors to run on. Default is 1.
 #
 # DIAGNOSTICS
 #     Return 0 on success, 1 or exit code of COMMAND on failure.
@@ -136,8 +145,8 @@ if ! COMMAND=$(type -P $1); then
 fi
 shift 1
 
-# TODO: Site configuration?
-ROSE_LAUNCHER_LIST=${ROSE_LAUNCHER_LIST:-"poe ${ROSE_LAUNCHER_MPICH:-mpiexec} mpirun mpprun"}
+ROSE_LAUNCHER_LIST=${ROSE_LAUNCHER_LIST:-$( \
+    rose config --default= $ROSE_NS launcher-list)}
 NPROC=${NPROC:-1}
 
 #-------------------------------------------------------------------------------
@@ -165,20 +174,11 @@ if [[ -n $ROSE_LAUNCHER ]]; then
     ROSE_LAUNCHER=$ROSE_LAUNCHER_PATH
     ROSE_LAUNCH_INNER=${ROSE_LAUNCH_INNER:-"${0}$(optv) --inner"}
     # Options
-    ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-}
-    ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:-}
-    # TODO: Site configuration?
-    case $(basename $ROSE_LAUNCHER) in
-        mpirun)
-            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-"-v -np $NPROC"}
-            :;;
-        mpprun)
-            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-"-n $NPROC"}
-            :;;
-        mpiexec*)
-            ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-"-n $NPROC"}
-            :;;
-    esac
+    ROSE_LAUNCHER_BASE=$(basename $ROSE_LAUNCHER)
+    ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-$( \
+        rose config -E --default= $ROSE_NS launcher-preopts.$ROSE_LAUNCHER_BASE)}
+    ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:-$( \
+        rose config -E --default= $ROSE_NS launcher-postopts.$ROSE_LAUNCHER_BASE)}
 else
     ROSE_LAUNCH_INNER=
     ROSE_LAUNCHER_PREOPTS=
