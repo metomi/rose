@@ -34,11 +34,15 @@ class SvnLocHandler(object):
 
     def __init__(self, manager):
         self.manager = manager
-        self.svn = self.SVN
-        if self.manager.popen.which(self.FCM):
-            self.svn = self.FCM
+        self.svn = None
+        for cmd in [self.FCM, self.SVN]:
+            if self.manager.popen.which(cmd):
+                self.svn = cmd
+                break
 
     def can_pull(self, loc):
+        if self.svn is None:
+            return False
         scheme = urlparse(loc.name).scheme
         if scheme in self.SCHEMES:
             return True

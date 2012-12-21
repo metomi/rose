@@ -493,13 +493,24 @@ class SuiteRunner(Runner):
 
         # Install version information file
         f = open("log/rose-suite.version", "wb")
-        for cmd in ["info", "status", "diff"]:
-            rc, out, err = self.popen.run("svn", cmd, suite_conf_dir)
-            if out:
-                ruler = "#" * 80 + "\n"
-                f.write(ruler + "# SVN %s\n" % cmd.upper() + ruler + out)
-            if rc: # If cmd fails once, chances are, it will fail again
-                break
+        for vcs, cmds in [("svn", ["info", "status", "diff"]),
+                          ("git", ["describe", "status", "diff"])]:
+            if not self.popen.which(vcs):
+                continue
+            cwd = os.getcwd()
+            os.chdir(suite_conf_dir)
+            try:
+                for cmd in cmds:
+                    rc, out, err = self.popen.run(vcs, cmd)
+                    if out:
+                        f.write("#" * 80 + "\n")
+                        f.write(("# %s %s\n" % (vcs, cmd)).upper())
+                        f.write("#" * 80 + "\n")
+                        f.write(out)
+                    if rc: # If cmd fails once, chances are, it will fail again
+                        break
+            finally:
+                os.chdir(cwd)
         f.close()
 
         # Move temporary log to permanent log
