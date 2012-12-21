@@ -39,10 +39,15 @@ class FCMMakeTaskUtil(TaskUtilBase):
     def run_impl_main(self, config, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props()
         task2_name = self.SCHEME2 + t.task_name.replace(self.SCHEME, "")
+
+        use_pwd = config.get_value(["use-pwd"]) in ["True", "true"]
         auth = self.suite_engine_proc.get_task_auth(t.suite_name, task2_name)
         if auth is not None:
-            target = "@".join(auth)
-            target += ":" + os.path.join(t.suite_dir_rel, "share", t.task_name)
+            target = "@".join(auth) + ":"
+            if use_pwd:
+                target += os.path.join(t.suite_dir_rel, "work", t.task_id)
+            else:
+                target += os.path.join(t.suite_dir_rel, "share", t.task_name)
             env_export("ROSE_TASK_MIRROR_TARGET", target, self.event_handler)
             # N.B. MIRROR_TARGET deprecated
             env_export("MIRROR_TARGET", target, self.event_handler)
@@ -53,8 +58,7 @@ class FCMMakeTaskUtil(TaskUtilBase):
             if os.access(c, os.F_OK | os.R_OK):
                 cmd += ["-f", c]
                 break
-        use_pwd = config.get_value(["use-pwd"])
-        if use_pwd in [None, "False", "false", "No", "no"]:
+        if not use_pwd:
             cmd += ["-C", os.path.join(t.suite_dir, "share", t.task_name)]
         cmd_opt_jobs = config.get_value(["opt.jobs"],
                                         os.getenv("ROSE_TASK_N_JOBS", "4"))

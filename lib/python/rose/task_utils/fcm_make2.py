@@ -34,20 +34,19 @@ class FCMMake2TaskUtil(TaskUtilBase):
 
     def get_app_key(self, task_name):
         if task_name.startswith(self.SCHEME):
-            return self.SCHEME1 + t.task_name.replace(self.SCHEME, "")
+            return self.SCHEME1 + task_name.replace(self.SCHEME, "")
         return task_name
 
     def run_impl_main(self, config, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props()
 
         cmd = ["fcm", "make"]
-        use_pwd = config.get_value(["use-pwd"])
-        if use_pwd in [None, "False", "false", "No", "no"]:
-            task1_name = self.SCHEME1 + t.task_name.replace(self.SCHEME, "")
-            cmd += ["-C", os.path.join(t.suite_dir, "share", task1_name)]
-        else:
+        if config.get_value(["use-pwd"]) in ["True", "true"]:
             task1_id = self.SCHEME1 + t.task_id.replace(self.SCHEME, "")
             cmd += ["-C", os.path.join(t.suite_dir, "work", task1_id)]
+        else:
+            task1_name = self.SCHEME1 + t.task_name.replace(self.SCHEME, "")
+            cmd += ["-C", os.path.join(t.suite_dir, "share", task1_name)]
         cmd_opt_jobs = config.get_value(["opt.jobs"],
                                         os.getenv("ROSE_TASK_N_JOBS", "4"))
         cmd += ["-j", cmd_opt_jobs]
