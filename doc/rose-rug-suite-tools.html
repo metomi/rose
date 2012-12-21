@@ -250,7 +250,7 @@ rose task-run -D '[env]!BAZ='
     task has a name that starts with <samp>fcm_make2*</samp>. If there is a Rose
     application configuration for its corresponding <samp>fcm_make*</samp> task,
     it will use its settings by default.</p>
-    
+
     <p>The <code>fcm_make</code> task utility expects a file
     <var>file/fcm-make.cfg</var> in its application configuration. It runs
     <code>fcm make</code> using this configuration file.</p>
@@ -265,16 +265,16 @@ rose task-run -D '[env]!BAZ='
     <p>You can configure these task utility with via environment variables or
     settings in <var>rose-app.conf</var>. (Settings in <var>rose-app.conf</var>
     overrides their equivalent environment variables.)</p>
-    
+
     <p><kbd>use-pwd=true</kbd>: By default, it changes the working directory to
     <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var>. This option will stop
     this, and the working directory is the normal working directory of the
     task.</p>
-    
-    <p><kbd>opt.jobs</kbd> or the environment variable
+
+    <p><kbd>opt.jobs=N</kbd> or the environment variable
     <var>ROSE_TASK_N_JOBS</var>: This can be used to control the number of
     processes <code>fcm make</code> would use in parallel. (default=4)</p>
-    
+
     <p><kbd>opts</kbd> or the environment variable <var>ROSE_TASK_OPTIONS</var>:
     This can be used to pass extra options to the <code>fcm make</code>
     command.</p>
@@ -292,7 +292,7 @@ rose task-run -D '[env]!BAZ='
     <p>By default, as for the application launcher, this task utility will use
     the following logic to determine the root directory to install file targets
     with a relative path:</p>
-    
+
     <ol>
       <li>If the setting <var>file-install-root=PATH</var> is specified (at the
       root level) in the application configuration file, its value will be
