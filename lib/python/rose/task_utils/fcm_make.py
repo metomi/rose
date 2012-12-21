@@ -22,6 +22,7 @@
 from rose.env import env_export
 from rose.run import TaskUtilBase
 import os
+import shlex
 import sys
 
 class FCMMakeTaskUtil(TaskUtilBase):
@@ -42,21 +43,23 @@ class FCMMakeTaskUtil(TaskUtilBase):
         if auth is not None:
             target = "@".join(auth)
             target += ":" + os.path.join(t.suite_dir_rel, "share", t.task_name)
-            # FIXME: name-space for environment variable?
+            env_export("ROSE_TASK_MIRROR_TARGET", target, self.event_handler)
+            # N.B. MIRROR_TARGET deprecated
             env_export("MIRROR_TARGET", target, self.event_handler)
-        cfg = ""
+
+        cmd = ["fcm", "make"]
         for c in [os.path.abspath("fcm-make.cfg"),
                   os.path.join(t.suite_dir, "etc", t.task_name + ".cfg")]:
             if os.access(c, os.F_OK | os.R_OK):
-                cfg = " -f %s" % c
+                cmd += ["-f", c]
                 break
-        dir = os.path.join(t.suite_dir, "share", t.task_name)
-        n_jobs = os.getenv("ROSE_TASK_N_JOBS", "4")
-        cmd = "fcm make%s -C %s -j %s" % (cfg, dir, n_jobs)
-        if os.getenv("ROSE_TASK_OPTIONS"):
-            cmd += " " + os.getenv("ROSE_TASK_OPTIONS")
-        if args:
-            cmd += " " + self.popen.list_to_shell_str(args)
-        if os.getenv("ROSE_TASK_PRE_SCRIPT"):
-            cmd = ". " + os.getenv("ROSE_TASK_PRE_SCRIPT") + " && " + cmd
-        self.popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+        use_pwd = config.get_value(["use-pwd"])
+        if use_pwd in [None, "False", "false", "No", "no"]:
+            cmd += ["-C", os.path.join(t.suite_dir, "share", t.task_name)]
+        cmd_opt_jobs = config.get_value(["opt.jobs"],
+                                        os.getenv("ROSE_TASK_N_JOBS", "4"))
+        cmd += ["-j", cmd_opt_jobs]
+        cmd_opts = config.get_value(["opts"], os.getenv("ROSE_TASK_OPTIONS"))
+        cmd += shlex.split(cmd_opts)
+        cmd += args
+        self.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
