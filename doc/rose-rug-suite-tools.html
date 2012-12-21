@@ -244,32 +244,40 @@ rose task-run -D '[env]!BAZ='
 
     <p>The <code>fcm_make</code> utility will be invoked automatically if a
     task has a name that starts with <code>fcm_make*</code> (but not
-    <code>fcm_make2*</code>). The task utility expects a file
-    <var>file/fcm-make.cfg</var> in its application configuration. It runs
-    <code>fcm make</code> using this configuration file in
-    <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var>. The environment variable
-    <var>ROSE_TASK_N_JOBS</var> can be used to control the number of processes
-    <code>fcm make</code> would use in parallel. (default=4) The environment
-    variable <var>ROSE_TASK_OPTIONS</var> can be used to pass extra options to
-    the <code>fcm make</code> command. The <code>fcm make</code> command is run
-    as a shell script. If extra command or environment is required for it, the
-    <var>ROSE_TASK_PRE_SCRIPT</var> environment variable can be specified to
-    point to a (bash compatible) shell script which will be sourced
-    (<code>.</code> invoke) by the shell before the <code>fcm make</code>
-    command. The <code>fcm make</code> task utility will also look for a
-    matching <code>fcm_make2*</code> task in the suite which would normally be
-    a continuation of the <code>fcm make</code> command as a separate
-    <var>USER@HOST</var>. If so, will export an environment variable
-    <var>MIRROR_TARGET</var> to the <code>fcm make</code> command to substitute
-    the mirror target.</p>
+    <code>fcm_make2*</code>).</p>
 
     <p>The <code>fcm_make2</code> utility will be invoked automatically if a
-    task has a name that starts with <code>fcm_make2*</code>. It runs in the
-    <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var> directory, and expects an
-    <var>fcm-make.cfg</var> to be already created by the matching
-    <code>fcm_make</code> task. The <var>ROSE_TASK_N_JOBS</var>,
-    <var>ROSE_TASK_OPTIONS</var> and <var>ROSE_TASK_PRE_SCRIPT</var>
-    environment variables can be used to modify its behaviour as above.</p>
+    task has a name that starts with <samp>fcm_make2*</samp>. If there is a Rose
+    application configuration for its corresponding <samp>fcm_make*</samp> task,
+    it will use its settings by default.</p>
+    
+    <p>The <code>fcm_make</code> task utility expects a file
+    <var>file/fcm-make.cfg</var> in its application configuration. It runs
+    <code>fcm make</code> using this configuration file.</p>
+
+    <p>The <code>fcm make</code> task utility will also look for a matching
+    <code>fcm_make2*</code> task in the suite which would normally be a
+    continuation of the <code>fcm make</code> command as a separate
+    <var>USER@HOST</var>. If so, will export an environment variable
+    <var>ROSE_TASK_MIRROR_TARGET</var> to the <code>fcm make</code> command to
+    substitute the mirror target.</p>
+
+    <p>You can configure these task utility with via environment variables or
+    settings in <var>rose-app.conf</var>. (Settings in <var>rose-app.conf</var>
+    overrides their equivalent environment variables.)</p>
+    
+    <p><kbd>use-pwd=true</kbd>: By default, it changes the working directory to
+    <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var>. This option will stop
+    this, and the working directory is the normal working directory of the
+    task.</p>
+    
+    <p><kbd>opt.jobs</kbd> or the environment variable
+    <var>ROSE_TASK_N_JOBS</var>: This can be used to control the number of
+    processes <code>fcm make</code> would use in parallel. (default=4)</p>
+    
+    <p><kbd>opts</kbd> or the environment variable <var>ROSE_TASK_OPTIONS</var>:
+    This can be used to pass extra options to the <code>fcm make</code>
+    command.</p>
 
     <h3 id="rose-task-run.util.rose_install">Task Utility: rose_install</h3>
 
