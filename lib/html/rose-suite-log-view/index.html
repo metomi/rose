@@ -56,6 +56,21 @@
     right: 0;
     top: 2.5em;
 }
+#body-main-top {
+    background: white;
+    border: thin solid #aaa;
+    font-size: xx-small;
+    padding: 0.2em;
+}
+#body-main-top address {
+    float: right;
+    font-style: normal;
+}
+#body-main-top p {
+    margin: 0;
+    margin-left: 0.5em;
+    padding: 0.1em;
+}
 table {
     border-collapse: collapse;
     clear: both;
@@ -203,6 +218,16 @@ $(function() {
             var href = $(this).attr("href") + "\&suite=" + data["suite"];
             $(this).attr("href", href);
         });
+        $("#updated_at").text(datetime2obj(data["updated_at"])["string"]);
+        for (var key in data["suite_info"]) {
+            var p = $("<p/>").appendTo($("#suite_info"));
+            p.append($("<dfn/>").text(key + ": "));
+            p.append(data["suite_info"][key]);
+        }
+        $("#suite_info").hide();
+        $("#suite_info_toggle").click(function() {
+            $("#suite_info").toggle();
+        });
     }
 
     /* Load the data of the tasks into the HTML. */
@@ -211,48 +236,54 @@ $(function() {
         var node = $("#task_list");
         var task_keys = [];
         for (var task_id in data["tasks"]) {
-            var task_data_list = data["tasks"][task_id];
-            $.each(task_data_list, function(submit_num, task_data) {
+            var task_name = data["tasks"][task_id]["name"]
+            var cycle_time = data["tasks"][task_id]["cycle_time"]
+            var submits = data["tasks"][task_id]["submits"];
+            $.each(submits, function(submit_num, submit_data) {
                 var row = $("<tr/>").appendTo($("tbody", node));
                 var cell;
                 /* Column 1: task%cycle (submit-n) */
                 cell = $("<td/>").appendTo(row).addClass("firstColumn")
-                if (task_data_list.length > 1) {
+                if (submits.length > 1) {
                     var span = $("<span/>").appendTo(cell);
                     span.addClass("submit-num");
                     span.text("(" + (submit_num + 1).toString() + ")");
                 }
                 cell.append(task_id);
 
-                /* Column 2: submit-n */
+                /* Column 2-3: name, cycle */
+                cell = $("<td/>").appendTo(row).text(task_name);
+                cell = $("<td/>").appendTo(row).text(cycle_time);
+
+                /* Column 4: submit-n */
                 cell = $("<td/>").appendTo(row);
                 cell.append((submit_num + 1).toString());
 
-                /* Column 3: status */
+                /* Column 5: status */
                 cell = $("<td/>").appendTo(row);
-                if (task_data["status"] != null) {
-                    var value = task_data["status"];
-                    if (task_data["signal"] && task_data["signal"] != "ERR") {
-                        value += " (" + task_data["signal"] + ")";
+                if (submit_data["status"] != null) {
+                    var value = submit_data["status"];
+                    if (submit_data["signal"] && submit_data["signal"] != "ERR") {
+                        value += " (" + submit_data["signal"] + ")";
                     }
                     cell.append(value);
-                    cell.addClass(task_data["status"]);
+                    cell.addClass(submit_data["status"]);
                 }
 
-                /* Column 4: submit time */
-                var task_events = task_data["events"];
+                /* Column 6: submit time */
+                var task_events = submit_data["events"];
                 var date_submit = datetime2obj(task_events["submit"]);
                 cell = $("<td/>").appendTo(row);
                 cell.append(date_submit["string"]);
 
-                /* Column 5: queue time delta */
+                /* Column 7: queue time delta */
                 cell = $("<td/>").appendTo(row);
                 if (task_events["init"] != null) {
                     var delta = task_events["init"] - task_events["submit"];
                     cell.append(timedelta2string(delta));
                 }
 
-                /* Column 6, 7: init time, exit time */
+                /* Column 8, 9: init time, exit time */
                 $.each(["init", "exit"], function(i, key) {
                     cell = $("<td/>").appendTo(row);
                     if (task_events[key] != null) {
@@ -269,16 +300,16 @@ $(function() {
                     }
                 });
 
-                /* Column 8: run time delta */
+                /* Column 10: run time delta */
                 cell = $("<td/>").appendTo(row);
                 if (task_events["init"] != null && task_events["exit"] != null) {
                     var delta = task_events["exit"] - task_events["init"];
                     cell.append(timedelta2string(delta));
                 }
 
-                /* Column 9, 10, 11: stdout file, stderr file, job script */
-                var FTS = task_data["files_time_stamp"];
-                var task_files = task_data["files"];
+                /* Column 11, 12, 13: stdout file, stderr file, job script */
+                var FTS = submit_data["files_time_stamp"];
+                var task_files = submit_data["files"];
                 $.each(["out", "err", "script"], function(i, name) {
                     cell = $("<td/>").appendTo(row);
                     if (task_files[name] != null) {
@@ -297,7 +328,7 @@ $(function() {
                     }
                 });
 
-                /* Column 12: other files */
+                /* Column 14: other files */
                 cell = $("<td/>").appendTo(row);
                 var files = [];
                 var indexed_files_data_map = {};
@@ -400,9 +431,11 @@ $(function() {
         }
         node.dataTable({
             /* See columns of the task_list table */
-            "aaSorting": [[3, "asc"]],
+            "aaSorting": [[5, "asc"]],
             "aoColumn": [
                 null,
+                {"bVisible": false},
+                {"bVisible": false},
                 {"bVisible": false, "sType": "numeric"},
                 null,
                 null,
@@ -418,8 +451,8 @@ $(function() {
             "bPaginate": false,
             "bStateSave": true,
             "oColVis": {"activate": "mouseover", "aiExclude": [0]},
-            "sDom": '<"#task_list_colvis"C>frltip',
-            "oLanguage": {"sSearch": "Filter results:"}
+            "oLanguage": {"sSearch": "Filter results:"},
+            "sDom": '<"#task_list_colvis"C>frltip'
         });
     }
 
@@ -446,10 +479,19 @@ $(function() {
 </div>
 
 <div id="body-main">
+<div id="body-main-top">
+  <address>last updated: <span id="updated_at"></span></address>
+  <div>
+    <a id="suite_info_toggle" href="#">suite info</a>
+    <div id="suite_info"></div>
+  </div>
+</div>
 <table id="task_list" summary="Task List">
   <thead>
     <tr>
-      <th class="firstColumn">Task%Cycle</th>
+      <th class="firstColumn">Task Name%Cycle</th>
+      <th>Name</th>
+      <th>Cycle</th>
       <th>Submit-N</th>
       <th>Status</th>
       <th>Time Submit</th>
