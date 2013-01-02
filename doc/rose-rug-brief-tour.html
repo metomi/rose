@@ -65,17 +65,21 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This chapter of the Rose user guide attempts to introduce you to
-      various aspects of Rose by using a simple example. It assumes that Rose,
-      <a href="http://hjoliver.github.com/cylc/">Cylc</a> and <a href=
-      "http://www.metoffice.gov.uk/research/collaboration/fcm/">FCM</a> are
-      already installed and configured correctly on your system.</p>
+      <p>This chapter of the Rose user guide attempts to introduce you to some
+      fundamental aspects of Rose. We use a relatively detailed example, but
+      most of these details will be covered in other parts of the user
+      guide.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Introduction: Getting Started</h3>
+      <h3 class="alwayshidden">Requirements</h3>
 
-      <p>If you have not done so already, please look at the <a href=
+      <p>This guide assumes that Rose, <a href=
+      "http://hjoliver.github.com/cylc/">Cylc</a> and <a href=
+      "http://www.metoffice.gov.uk/research/collaboration/fcm/">FCM</a> are
+      already installed and configured correctly on your system.</p>
+
+      <p>You should also have looked at the <a href=
       "rose-rug-getting-started.html">Getting Started</a> page.</p>
     </div>
 
@@ -93,23 +97,6 @@
 
       <p>This section takes us through the command line and text editor
       interface to Rose.</p>
-    </div>
-
-    <div class="slide">
-      <h3>Before You Start</h3>
-
-      <p>You may want to configure Rose to use your favourite text editors.
-      E.g.:</p>
-      <pre class="shell">
-mkdir -p ~/.metomi
-cat &gt;&gt;~/.metomi/rose.conf &lt;&lt;'__CONF__'
-[external]
-# External text editor for CLI commands.
-editor=vim
-# External text editor for GUIs.
-geditor=gvim -f
-__CONF__
-</pre>
     </div>
 
     <div class="slide">
