@@ -239,7 +239,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 if search_result.groupdict().has_key("signal"):
                     signal = search_result.group("signal")
                 event_time = mktime(strptime(time_stamp, "%Y/%m/%d %H:%M:%S"))
-                if not data.has_key(task_id):
+                if task_id not in data:
                     name, cycle_time = task_id.split("%", 1)
                     data[task_id] = {"name": name,
                                      "cycle_time": cycle_time,
