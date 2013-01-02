@@ -381,25 +381,29 @@ class SuiteEngineProcessor(object):
         """Parse the cylc suite log in $PWD for task events.
         Locate task log files from the cylc suite log directory.
         Return a data structure that looks like:
-        {   task_id: [
-                {   "events": {
-                        "submit": <seconds-since-epoch>,
-                        "init": <seconds-since-epoch>,
-                        "queue": <delta-between-submit-and-init>,
-                        "exit": <seconds-since-epoch>,
-                        "elapsed": <delta-between-init-and-exit>,
+        {   <task_id>: {
+                "name": <name>,
+                "cycle_time": <cycle time string>,
+                "submits": [
+                    {   "events": {
+                            "submit": <seconds-since-epoch>,
+                            "init": <seconds-since-epoch>,
+                            "queue": <delta-between-submit-and-init>,
+                            "exit": <seconds-since-epoch>,
+                            "elapsed": <delta-between-init-and-exit>,
+                        },
+                        "files": {
+                            "script": {"n_bytes": <n_bytes>},
+                            "out": {"n_bytes": <n_bytes>},
+                            "err": {"n_bytes": <n_bytes>},
+                            # ... more files
+                        },
+                        "files_time_stamp": <seconds-since-epoch>,
+                        "status": <"pass"|"fail">,
                     },
-                    "files": {
-                        "script": {"n_bytes": <n_bytes>},
-                        "out": {"n_bytes": <n_bytes>},
-                        "err": {"n_bytes": <n_bytes>},
-                        # ... more files
-                    },
-                    "files_time_stamp": <seconds-since-epoch>,
-                    "status": <"pass"|"fail">,
-                },
-                # ... more re-submits of the task
-            ],
+                    # ... more re-submits of the task
+                ]
+            }
             # ... more task IDs
         }
         """
