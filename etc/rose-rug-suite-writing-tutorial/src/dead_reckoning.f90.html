@@ -15,19 +15,20 @@ PROGRAM extract_compass_log
 IMPLICIT NONE
 CHARACTER(31)    :: dt_hr_env    ! No. of hours, from environment
 CHARACTER(255)   :: pos_fpath    ! File path to a position file with lat/long
-DOUBLE PRECISION :: ang_distance ! Angular distance travelled across Earth
-DOUBLE PRECISION :: dt_hr        ! No. of hours elapsed, from dt_hr_env
-DOUBLE PRECISION :: heading      ! Compass heading in radians
-DOUBLE PRECISION :: lat          ! Initial latitude
-DOUBLE PRECISION :: long         ! Initial longitude
-DOUBLE PRECISION :: new_lat      ! Final latitude
-DOUBLE PRECISION :: new_long     ! Final longitude
-DOUBLE PRECISION :: speed_kn=5.0 ! Speed in knots
-DOUBLE PRECISION, PARAMETER :: pi=3.141592654          ! pi
-DOUBLE PRECISION, PARAMETER :: radius_earth_nm=3443.89 ! Earth radius (nm)
 INTEGER:: code             ! iostat code
 INTEGER:: timevalues(8)    ! time values
+INTEGER, PARAMETER :: real64=SELECTED_REAL_KIND(15, 307)
 LOGICAL::l_verbose=.false. ! Verbosity setting in namelist
+REAL(KIND=real64) :: ang_distance ! Angular distance travelled across Earth
+REAL(KIND=real64) :: dt_hr        ! No. of hours elapsed, from dt_hr_env
+REAL(KIND=real64) :: heading      ! Compass heading in radians
+REAL(KIND=real64) :: lat          ! Initial latitude
+REAL(KIND=real64) :: long         ! Initial longitude
+REAL(KIND=real64) :: new_lat      ! Final latitude
+REAL(KIND=real64) :: new_long     ! Final longitude
+REAL(KIND=real64) :: speed_kn=5.0 ! Speed in knots
+REAL(KIND=real64), PARAMETER :: pi=3.141592654          ! pi
+REAL(KIND=real64), PARAMETER :: radius_earth_nm=3443.89 ! Earth radius (nm)
 
 NAMELIST /report_nl/ l_verbose
 
