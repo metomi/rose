@@ -21,6 +21,7 @@
 
 from rose.run import TaskUtilBase
 import os
+import shlex
 import sys
 
 class FCMMake2TaskUtil(TaskUtilBase):
@@ -31,16 +32,25 @@ class FCMMake2TaskUtil(TaskUtilBase):
     SCHEME = "fcm_make2"
     SCHEME1 = SCHEME[0:-1]
 
+    def get_app_key(self, task_name):
+        if task_name.startswith(self.SCHEME):
+            return self.SCHEME1 + task_name.replace(self.SCHEME, "")
+        return task_name
+
     def run_impl_main(self, config, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props()
-        task1_name = self.SCHEME1 + t.task_name.replace(self.SCHEME, "")
-        dir = os.path.join(t.suite_dir, "share", task1_name)
-        n_jobs = os.getenv("ROSE_TASK_N_JOBS", "4")
-        cmd = "fcm make -C %s -j %s" % (dir, n_jobs)
-        if os.getenv("ROSE_TASK_OPTIONS"):
-            cmd += " " + os.getenv("ROSE_TASK_OPTIONS")
-        if args:
-            cmd += " " + self.popen.list_to_shell_str(args)
-        if os.getenv("ROSE_TASK_PRE_SCRIPT"):
-            cmd = ". " + os.getenv("ROSE_TASK_PRE_SCRIPT") + " && " + cmd
-        self.popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+
+        cmd = ["fcm", "make"]
+        if config.get_value(["use-pwd"]) in ["True", "true"]:
+            task1_id = self.SCHEME1 + t.task_id.replace(self.SCHEME, "")
+            cmd += ["-C", os.path.join(t.suite_dir, "work", task1_id)]
+        else:
+            task1_name = self.SCHEME1 + t.task_name.replace(self.SCHEME, "")
+            cmd += ["-C", os.path.join(t.suite_dir, "share", task1_name)]
+        cmd_opt_jobs = config.get_value(["opt.jobs"],
+                                        os.getenv("ROSE_TASK_N_JOBS", "4"))
+        cmd += ["-j", cmd_opt_jobs]
+        cmd_opts = config.get_value(["opts"], os.getenv("ROSE_TASK_OPTIONS"))
+        cmd += shlex.split(cmd_opts)
+        cmd += args
+        self.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
