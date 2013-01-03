@@ -410,12 +410,16 @@ rosie go
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Config Editor GUI: run suite</h3>
+      <h3 class="alwayshidden">Config Editor GUI: save</h3>
 
-      <p>You can run your suite by clicking the <samp>Suite Run</samp> button
-      on the toolbar or selecting <kbd>Tools -&gt; Run Suite -&gt;
-      Default</kbd> from the top menu. This will invoke <code>rose
-      suite-run</code>.</p>
+      <p>The config editor acts as a specialist text editor for Rose INI files -
+      pressing Save in the config editor is the same as pressing it in gvim
+      or gedit.</p>
+      
+      <p>Rose INI files dumped through the config editor, <code>rose macro</code>, or
+      <code>rose config-dump</code> will be pretty-printed for consistency
+      (so diffs are possible), which may mean some extraneous whitespace is removed
+      and some sorting is performed if anything is out of place.</p>
     </div>
 
     <div class="slide">
@@ -425,6 +429,15 @@ rosie go
       <samp>fcm commit</samp> in it, in the normal way. You can launch a
       terminal from inside the GUI with <samp>Ctrl-T</samp> or by using the
       menu: <kbd>Tools -&gt; Launch Terminal</kbd>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Config Editor GUI: run suite</h3>
+
+      <p>You can run your suite by clicking the <samp>Run Suite</samp> button
+      on the toolbar or selecting <kbd>Tools -&gt; Run Suite -&gt;
+      Default</kbd> from the top menu. This will invoke <code>rose
+      suite-run</code>.</p>
     </div>
 
     <div class="slide">
