@@ -51,7 +51,18 @@ def main():
                     else:
                         ConfigLoader()(file, root_node)
         else:
-            root_node = ResourceLocator.default().get_conf()
+            if opts.meta:
+                root_node = ConfigNode()
+                meta_dir = rose.macro.load_meta_path(config=root_node,
+                                     directory=os.getcwd())[0]
+                if meta_dir is not None:
+                    fpath = meta_dir + "/rose-meta.conf"
+                    ConfigLoader()(fpath, root_node)
+                else:
+                    print "No metadata found"
+            else:
+                root_node = ResourceLocator.default().get_conf()
+            
     except SyntaxError as e:
         sys.exit(repr(e))
     if opts.quietness:
