@@ -85,7 +85,7 @@ def main():
                 if fpath is not None:
                     ConfigLoader()(fpath, root_node)
                 else:
-                    print "No metadata found."
+                    sys.exit("No metadata found.")
             else:
                 root_node = ResourceLocator.default().get_conf()
             
