@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Overview: Suites</title>
+  <title>Rose User Guide: Suites</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -113,8 +113,6 @@
 
       <ul class="incremental">
         <li>Rose output viewer</li>
-
-        <li>Where things go when suites are run</li>
 
         <li>Utilities - <kbd>fcm make</kbd>, housekeeping, <kbd>rose
         ana</kbd>...</li>
@@ -678,7 +676,6 @@ COMPUTE_HOST = "voyager_1"
     [[dependencies]]
         [[[0, 6, 12, 18]]]
             graph = "A[T-6]:fail =&gt; B"
-    
 </pre>
     </div>
 
@@ -714,51 +711,38 @@ COMPUTE_HOST = "voyager_1"
         <li>family triggers - triggers based on groups</li>
 
         <li>message triggers - triggers based on task output</li>
+
+        <li>clock-triggered tasks - tasks triggered at certain wallclock
+        times</li>
       </ul>
     </div>
 
     <div class="slide">
-      <h3>Often-configured parts of the suite.rc</h3>
+      <h3>cylc capabilities</h3>
 
-      <p>The initial and final cycle times:</p>
-      <pre>
-[scheduling]
-    initial cycle time = 2013010500
-    final cycle time = 2013010600
-</pre>
+      <p>cylc has some nice capabilities:</p>
+
+      <ul class="incremental">
+        <li>inserting tasks at runtime</li>
+
+        <li>spawning tasks on-demand (asynchronous tasks)</li>
+
+        <li>limiting the number of tasks in a family running at any one time
+        (queues)</li>
+      </ul>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Changing hourly
-      times</h3>
+      <h3 class="alwayshidden">cylc capabilities (continued)</h3>
 
-      <p>The hours during which a task runs:</p>
-      <pre>
-[scheduling]
-    initial cycle time = 2013010500
-    final cycle time = 2013010600
-    [[dependencies]]
-        [[[0, 12]]]  # Change here
-            graph = "hello_pluto =&gt; hello_eris"
-</pre>
-    </div>
+      <ul class="incremental">
+        <li>automatically resubmitting failed tasks, optionally with different
+        environments or commands (retries)</li>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Increasing wallclock</h3>
+        <li>giving manual control over the status of tasks</li>
 
-      <p>Increasing the wallclock limit of <code>loadleveler</code> jobs:</p>
-      <pre>
-[runtime]
-    [[TASK_NAME]]
-        [[[job submission]]]
-            method = loadleveler
-        [[[directives]]]
-            class            = serial
-            job_type         = serial
-            notification     = error
-            resources        = ConsumableMemory(5000)
-            wall_clock_limit = '1260,1200'  # Change here
-</pre>
+        <li>restarting suites</li>
+      </ul>
     </div>
 
     <div class="slide">
@@ -800,30 +784,47 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3>cylc capabilities</h3>
+      <h2 id="cylc-run">cylc-run directories</h2>
 
-      <p>cylc has some nice capabilities:</p>
+      <p>cylc keeps a runtime directory for each suite in
+      <samp>~/cylc-run/</samp>, which is updated when you run the suite.</p>
+
+      <p>It is a mirror of your suite directory structure and content, but with
+      some added cylc directories and symbolic links (e.g. <samp>share</samp>).
+      These hold things like installed files, current task statuses, and task
+      output.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">cylc-run directories: work/share</h3>
+
+      <p><samp>work</samp>, <samp>share</samp> sub-directories:</p>
 
       <ul class="incremental">
-        <li>inserting tasks at runtime</li>
+        <li>Usually symbolic links to data directories.</li>
 
-        <li>spawning tasks on-demand (asynchronous tasks)</li>
+        <li><samp>share</samp> usually contains builds and task output
+        files.</li>
 
-        <li>limiting the number of tasks in a family running at any one time
-        (queues)</li>
+        <li><samp>work</samp> contains task <q>working</q> directories, e.g.
+        containing Rose application namelists and
+        <samp>rose-app-run.conf</samp></li>
       </ul>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">cylc capabilities (continued)</h3>
+      <h3 class="alwayshidden">cylc-run directories: log/</h3>
+
+      <p><samp>log</samp>, <samp>log.*</samp> sub-directories:</p>
 
       <ul class="incremental">
-        <li>automatically resubmitting failed tasks, optionally with different
-        environments or commands (retries)</li>
+        <li>Used to store output, including error messages.</li>
 
-        <li>giving manual control over the status of tasks</li>
+        <li>Rose stores an <samp>index.html</samp> page (the output viewer)
+        under this directory.</li>
 
-        <li>restarting suites</li>
+        <li>The <samp>job/</samp> subdirectory contains task scripts and their
+        output and error.</li>
       </ul>
     </div>
 
@@ -844,7 +845,7 @@ COMPUTE_HOST = "voyager_1"
         <li>Having read the cylc and Rose documentation <em>before writing the
         suite</em></li>
 
-        <li>Families</li>
+        <li>Using families where appropriate</li>
 
         <li>Condensing repeated settings or blocks with Jinja-2</li>
       </ul>
@@ -881,9 +882,9 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Bad practice (continued)</h3>
 
       <ul class="incremental">
-        <li>Using include files</li>
+        <li>Overusing include files</li>
 
-        <li>Magical, black box tasks with suite-level complexity</li>
+        <li>Magical, black box tasks with suite-level functionality</li>
 
         <li>Reinventing the (Rose) wheel</li>
       </ul>
@@ -963,21 +964,6 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h2>Suite share/work directories</h2>
-
-      <ul class="incremental">
-        <li>Usually symbolic links to a data directory.</li>
-
-        <li><samp>share</samp> usually contains builds and task output
-        files.</li>
-
-        <li><samp>work</samp> contains task <q>working</q> directories, e.g.
-        containing Rose application namelists and
-        <samp>rose-app-run.conf</samp></li>
-      </ul>
-    </div>
-
-    <div class="slide">
       <h2 id="utils">Suite Utilities</h2>
 
       <ul class="incremental">
@@ -993,9 +979,19 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h2 id="indepth">In Depth Usage</h2>
+      <h2 id="disk">Tidying Up</h2>
 
-      <p>Demo!</p>
+      <p>You can delete a <samp>~/roses/SUITE_NAME</samp> directory in the
+      normal way (<samp>rm -rf</samp>), or run <samp>rosie delete --local-only
+      SUITE_NAME</samp>.</p>
+
+      <p><samp>share</samp> and <samp>work</samp> subdirectories/symbolic links
+      in your <samp>~/cylc-run/SUITE_NAME</samp> directory can hold a
+      substantial amount of suite resources.</p>
+
+      <p>You can get rid of your suite output in
+      <samp>~/cylc-run/SUITE_NAME</samp> by running <samp>cylc unregister
+      SUITE_NAME</samp>.</p>
     </div>
 
     <div class="slide">
@@ -1007,8 +1003,8 @@ COMPUTE_HOST = "voyager_1"
         <li>Go through the <a href="rose-rug-suite-writing-tutorial.html">Suite
         Writing Tutorial</a>.</li>
 
-        <li>Have a look at some of the <a href="rose-rug-advanced-tutorials.html">Advanced
-        Tutorials</a>.</li>
+        <li>Have a look at some of the <a href=
+        "rose-rug-advanced-tutorials.html">Advanced Tutorials</a>.</li>
       </ul>
     </div>
   </div>
