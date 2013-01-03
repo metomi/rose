@@ -156,7 +156,7 @@ class CylcProcessor(SuiteEngineProcessor):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def launch_gcontrol(self, suite_name, host=None, *args):
+    def launch_gcontrol(self, suite_name, host=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
         log_dir = self.get_suite_dir(suite_name, "log")
         if not host:
@@ -166,7 +166,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 host = open(host_file).read().strip()
             except IOError:
                 host = "localhost"
-        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1 &"
+        fmt = r"nohup cylc gui --host=%s %s %s 1>>%s 2>&1 &"
         log = os.path.join(log_dir, "cylc-gui.log")
         args_str = self.popen.list_to_shell_str(args)
         self.popen(fmt % (host, suite_name, args_str, log), shell=True)
@@ -197,31 +197,33 @@ class CylcProcessor(SuiteEngineProcessor):
 
         Locate task log files from the cylc suite log directory.
         Return a data structure that looks like:
-        {   task_id: [
-                {   "events": {
-                        "submit": <seconds-since-epoch>,
-                        "init": <seconds-since-epoch>,
-                        "queue": <delta-between-submit-and-init>,
-                        "exit": <seconds-since-epoch>,
-                        "elapsed": <delta-between-init-and-exit>,
+        {   <task_id>: {
+                "name": <name>,
+                "cycle_time": <cycle time string>,
+                "submits": [
+                    {   "events": {
+                            "submit": <seconds-since-epoch>,
+                            "init": <seconds-since-epoch>,
+                            "queue": <delta-between-submit-and-init>,
+                            "exit": <seconds-since-epoch>,
+                            "elapsed": <delta-between-init-and-exit>,
+                        },
+                        "files": {
+                            "script": {"n_bytes": <n_bytes>},
+                            "out": {"n_bytes": <n_bytes>},
+                            "err": {"n_bytes": <n_bytes>},
+                            # ... more files
+                        },
+                        "files_time_stamp": <seconds-since-epoch>,
+                        "status": <"pass"|"fail">,
                     },
-                    "files": {
-                        "script": {"n_bytes": <n_bytes>},
-                        "out": {"n_bytes": <n_bytes>},
-                        "err": {"n_bytes": <n_bytes>},
-                        # ... more files
-                    },
-                    "files_time_stamp": <seconds-since-epoch>,
-                    "status": <"pass"|"fail">,
-                },
-                # ... more re-submits of the task
-            ],
+                    # ... more re-submits of the task
+                ]
+            }
             # ... more task IDs
         }
-
         """
-        data = {"suite": os.path.basename(os.path.dirname(os.getcwd())),
-                "tasks": {}}
+        data = {}
         # Parse the suite log file
         for line in open(self.SUITE_LOG, "r"):
             for key, rec in self.REC_LOG_ENTRIES.items():
@@ -237,15 +239,20 @@ class CylcProcessor(SuiteEngineProcessor):
                 if search_result.groupdict().has_key("signal"):
                     signal = search_result.group("signal")
                 event_time = mktime(strptime(time_stamp, "%Y/%m/%d %H:%M:%S"))
-                task_data_list = data["tasks"].setdefault(task_id, [])
-                if not task_data_list or task_data_list[-1]["events"][event]:
-                    task_data_list.append({"events": {},
-                                           "status": None,
-                                           "files": {},
-                                           "files_time_stamp": None})
+                if task_id not in data:
+                    name, cycle_time = task_id.split("%", 1)
+                    data[task_id] = {"name": name,
+                                     "cycle_time": cycle_time,
+                                     "submits": []}
+                submits = data[task_id]["submits"]
+                if not submits or submits[-1]["events"][event]:
+                    submits.append({"events": {},
+                                    "status": None,
+                                    "files": {},
+                                    "files_time_stamp": None})
                     for name in ["submit", "init", "exit"]:
-                        task_data_list[-1]["events"][name] = None
-                task_data = task_data_list[-1]
+                        submits[-1]["events"][name] = None
+                task_data = submits[-1]
                 task_events = task_data["events"]
                 task_events[event] = event_time
                 if event == "exit":
@@ -254,7 +261,8 @@ class CylcProcessor(SuiteEngineProcessor):
                         task_data["signal"] = signal
                 break
         # Locate task log files
-        for task_id, task_data_list in data["tasks"].items():
+        for task_id, task_datum in data.items():
+            submits = task_datum["submits"]
             if not os.path.isdir("job"):
                 return
             for name in os.listdir("job"):
@@ -268,16 +276,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 if not key:
                     key = "script"
                 n_bytes = int(os.stat(os.path.join("job", name)).st_size)
-                for task_data in task_data_list:
-                    if task_data["files_time_stamp"] == time_stamp:
-                        task_data["files"][key] = {"n_bytes": n_bytes}
+                for submit in submits:
+                    if submit["files_time_stamp"] == time_stamp:
+                        submit["files"][key] = {"n_bytes": n_bytes}
                         break
-                    # The 1st element in task_data_list with a submit time
+                    # The 1st element in submits with a submit time
                     # within THRESHOLD seconds of the file name's time stamp.
-                    dt = abs(task_data["events"]["submit"] - float(time_stamp))
+                    dt = abs(submit["events"]["submit"] - float(time_stamp))
                     if dt <= self.LOG_TASK_TIMESTAMP_THRESHOLD:
-                        task_data["files"][key] = {"n_bytes": n_bytes}
-                        task_data["files_time_stamp"] = time_stamp
+                        submit["files"][key] = {"n_bytes": n_bytes}
+                        submit["files_time_stamp"] = time_stamp
                         break
         return data
 
@@ -290,7 +298,7 @@ class CylcProcessor(SuiteEngineProcessor):
             hook_event, suite, task, hook_message = args
         return [suite, task, hook_event, hook_message]
 
-    def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
+    def run(self, suite_name, host=None, host_environ=None, run_mode=None,
             args=None):
         """Invoke "cylc run" (in a specified host).
         
@@ -299,7 +307,7 @@ class CylcProcessor(SuiteEngineProcessor):
         suite_name: the name of the suite.
         host: the host to run the suite. "localhost" if None.
         host_environ: a dict of environment variables to export in host.
-        restart_mode: call "cylc restart" instead of "cylc run".
+        run_mode: call "cylc restart|reload" instead of "cylc run".
         args: arguments to pass to "cylc run".
  
         """
@@ -315,24 +323,15 @@ class CylcProcessor(SuiteEngineProcessor):
                 host = None
 
         # Invoke "cylc run" or "cylc restart"
-        cylc_command = "run"
-        if restart_mode:
-            cylc_command = "restart"
+        if run_mode not in ["reload", "restart", "run"]:
+            run_mode = "run"
         # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
         # that the log will be redirected back via "ssh" to the localhost.
-        bash_cmd = r"nohup cylc %s %s %s 1>%s 2>&1 &" % (
-                cylc_command, suite_name, self.popen.list_to_shell_str(args),
+        bash_cmd = r"nohup cylc %s %s %s 1>>%s 2>&1 &" % (
+                run_mode, suite_name, self.popen.list_to_shell_str(args),
                 "cylc-run.log")
         if host:
-            bash_cmd_prefix = r"""#!/usr/bin/env bash
-for FILE in /etc/profile ~/.profile; do
-    if [[ -f $FILE && -r $FILE ]]; then
-        . $FILE
-    fi
-done
-set -eu
-cd
-"""
+            bash_cmd_prefix = "set -eu\ncd\n"
             log_dir = self.get_suite_dir_rel(suite_name, "log")
             bash_cmd_prefix += "mkdir -p %s\n" % log_dir
             bash_cmd_prefix += "cd %s\n" % log_dir
@@ -341,7 +340,7 @@ cd
                     v = self.popen.list_to_shell_str([value])
                     bash_cmd_prefix += "%s=%s\n" % (key, v)
                     bash_cmd_prefix += "export %s\n" % (key)
-            ssh_cmd = self.popen.get_cmd("ssh", host, "bash")
+            ssh_cmd = self.popen.get_cmd("ssh", host, "bash", "--login")
             self.popen(*ssh_cmd, stdin=(bash_cmd_prefix + bash_cmd))
         else:
             self.popen(bash_cmd, shell=True)

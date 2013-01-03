@@ -65,11 +65,21 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This chapter of the Rose user guide attempts to introduce you to
-      various aspects of Rose by using a simple example. It assumes that Rose,
-      <a href="http://hjoliver.github.com/cylc/">Cylc</a> and <a href=
+      <p>This chapter of the Rose user guide attempts to introduce you to some
+      fundamental aspects of Rose. We use a relatively detailed example, but
+      don't worry too much about the details.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Requirements</h3>
+
+      <p>This guide assumes that Rose, <a href=
+      "http://hjoliver.github.com/cylc/">Cylc</a> and <a href=
       "http://www.metoffice.gov.uk/research/collaboration/fcm/">FCM</a> are
       already installed and configured correctly on your system.</p>
+
+      <p>You should also have looked at the <a href=
+      "rose-rug-getting-started.html#user">Getting Started (User)</a> page.</p>
     </div>
 
     <div class="slide">
@@ -91,46 +101,21 @@
     <div class="slide">
       <h3>Create a Suite</h3>
 
-      <p>We'll begin by looking at whether a suite for this user guide is
-      already installed at your site. If so, you can simply copy it. Otherwise,
-      you will need to create a new suite and populate it.</p>
+      <p>We'll begin by creating a suite for you to work with.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Create a Suite: lookup</h3>
-
-      <p>Open a Linux/Unix terminal, issue the command:</p>
-      <pre class="shell">
-rosie lookup -Q title eq 'RUG brief tour'
-</pre>
-
-      <p>If it returns something like the following example, you can copy it
-      into a new suite:</p>
-      <pre>
-mo1-ro513/trunk@100     rosemary        rose    RUG brief tour
-</pre>
-
-      <p>Otherwise, you will have to create a new suite and populate it
-      yourself.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Create a Suite: copy/create</h3>
-
-      <p>To create a new suite, and copy items from an existing suite, e.g.
-      <samp>mo1-ro513</samp>, issue the command:</p>
-      <pre class="shell">
-rosie copy mo1-ro513
-</pre>
+      <h3 class="alwayshidden">Create a Suite: create</h3>
 
       <p>To create an empty new suite, issue the command:</p>
       <pre class="shell">
 rosie create
 </pre>
 
-      <p>Both commands will prompt you to edit the suite discovery information
-      file. Edit the <em>project</em> and/or <em>title</em> settings if you
-      want. Save the file and exit the editor.</p>
+      <p>This command will prompt you to edit the suite discovery information
+      file. Edit the <em>project</em> (e.g. <samp>rug</samp>) and the
+      <em>title</em> settings (e.g. <samp>Brief tour</samp>). Save the file and
+      exit the editor.</p>
     </div>
 
     <div class="slide">
@@ -141,20 +126,18 @@ rosie create
     </div>
 
     <div class="slide">
-      <h3>Populate and/or Modify the Suite</h3>
+      <h3>Populate the Suite</h3>
 
-      <p>Change directory to the local copy of the suite, if you have not
-      already done so. If you are not copying from an existing suite, populate
-      your suite by running the following commands:</p>
+      <p>Change directory to the local copy of the suite and populate it by
+      running the following commands:</p>
       <pre class="shell">
-cd $HOME/roses/$ID # $ID should be your new suite id.
+cd $HOME/roses/$ID # replace $ID with your suite ID
 rose rug-brief-tour
 </pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Populate and/or Modify the Suite:
-      rose-suite.conf</h3>
+      <h3 class="alwayshidden">Populate the Suite: rose-suite.conf</h3>
 
       <p>You will find the following files and sub-directories:</p>
 
@@ -163,19 +146,23 @@ rose rug-brief-tour
         configurations outside of cylc. E.g. inputs to the cylc suite
         configuration file, files to install at run time, etc. It is left empty
         in this example suite.</li>
+
+        <li>A <kbd>rose-suite.info</kbd> file: This is the suite discovery
+        information file which you saw when you created the suite.</li>
       </ul>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Populate and/or Modify the Suite: suite.rc</h3>
+      <h3 class="alwayshidden">Populate the Suite: suite.rc</h3>
 
       <ul>
         <li>A <kbd>suite.rc</kbd> file: This is used to define configurations
         in a cylc suite. In this example, we are running:
 
           <ul class="incremental">
-            <li><code>fcm_make</code>: a task to build an executable from a
-            source file containing a <em>hello world</em> program</li>
+            <li><code>fcm_make</code>: a special Rose application to build an
+            executable from a source file containing a <em>hello world</em>
+            program</li>
 
             <li><code>fred_hello_world</code>, <code>my_hello_mars</code>,
             <code>my_hello_world</code>: Rose <em>applications</em> that invoke
@@ -190,20 +177,18 @@ rose rug-brief-tour
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Populate and/or Modify the Suite: suite.rc
-      purpose</h3>
+      <h3 class="alwayshidden">Populate the Suite: suite.rc purpose</h3>
 
       <p>This is a <em>cycling</em> suite that repeats every 6 hours, with the
       first cycle starting at <samp>2013010100</samp> (00:00, 1 January 2013)
       and the last cycle starting 1 day later at <samp>2013010200</samp>
       (00:00, 2 January 2013). Cycling suites typically need special start
       tasks to boot up - in our case, <code>fcm_make</code> is run at the
-      beginning of the suite, before any cycles.</p>
+      beginning of the suite, in the first cycle only.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Populate and/or Modify the Suite:
-      sub-directories</h3>
+      <h3 class="alwayshidden">Populate the Suite: sub-directories - app</h3>
 
       <ul>
         <li>Sub-directories:
@@ -211,15 +196,24 @@ rose rug-brief-tour
           <ul class="incremental">
             <li><kbd>app/</kbd>: This directory contains the configurations of
             the <em>applications</em> run by the <em>tasks</em> of the suite.
-            In this example suite, the directory contains 3 sets of application
-            configurations for running the <em>hello world</em> program in 3
-            different modes.</li>
+            In this example suite, the directory contains sets of application
+            configurations for running the <em>hello world</em> program in
+            different ways. Some of these are not used in the suite at the
+            moment. <kbd>app/fcm_make</kbd> is a special Rose application that
+            invokes <code>fcm make</code> using the configuration in
+            <kbd>app/fcm_make/file/fcm-make.cfg</kbd>.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
 
-            <li><kbd>etc/</kbd>: This directory contains miscellaneous files
-            used by tasks in the suite. In this example suite, the directory
-            contains the <kbd>fcm-make.cfg</kbd> file for the
-            <var>fcm_make</var> task.</li>
+    <div class="slide">
+      <h3 class="alwayshidden">Populate the Suite: sub-directories - src</h3>
 
+      <ul>
+        <li>Sub-directories:
+
+          <ul class="incremental">
             <li><kbd>src/</kbd>: This directory contains the source file of a
             simple program that we shall run in this suite. Note: This
             directory will not normally be present in a real scientific suite,
@@ -230,12 +224,17 @@ rose rug-brief-tour
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Populate and/or Modify the Suite: commit</h3>
+      <h3 class="alwayshidden">Populate the Suite: commit</h3>
 
       <p>At this point, you may want to have a look at the files before moving
       on to the next section. You may also want to commit your suite back to
-      the central repository if you have newly created it or made any
-      changes.</p>
+      the central repository by running:</p>
+      <pre class="shell">
+fcm commit
+</pre>
+
+      <p>after changing directory to the working copy of your suite
+      ($HOME/roses/$ID).</p>
     </div>
 
     <div class="slide">
@@ -243,23 +242,27 @@ rose rug-brief-tour
 
       <p>Install and run the suite by using the following command:</p>
       <pre class="shell">
-cd $HOME/roses/$ID # replace $ID with the ID of your new suite
+cd $HOME/roses/$ID # replace $ID with your suite ID
 rose suite-run
 </pre>
 
-    <p>This will install your suite under <var>$HOME/cylc-run/$ID</var>, start
-    your suite with <code>cylc</code> and fire up <code>cylc gui
-    $ID</code>. Experiment with different viewing options on the <code>cylc
-    gui</code> toolbar. The suite should run successfully to
-    completion.</p>
+      <p>This will install your suite under <var>$HOME/cylc-run/$ID</var>,
+      start your suite with <code>cylc</code> and fire up <code>cylc gui
+      $ID</code>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Run the Suite: cylc gui</h3>
 
-      <p>Note: If you quit <code>cylc gui</code> by mistake, you can restart
-      it by typing <code>rose suite-gcontrol $ID</code> on the command
-      line.</p>
+      <p>Whilst the suite is running you can explore the <code>cylc gui</code>.
+      Try experimenting with different viewing options using the toolbar.</p>
+
+      <p>The suite should run successfully to completion and shutdown (the
+      status bar should indicate <samp>stopped with 'held'</samp>). You can now
+      quit the <code>cylc gui</code>.</p>
+
+      <p>Note: If you quit <code>cylc gui</code> by mistake, you can restart it
+      by typing <code>rose suite-gcontrol $ID</code> on the command line.</p>
     </div>
 
     <div class="slide">
@@ -283,7 +286,7 @@ rose suite-run
       which allows you to view the output from a completed suite via a web
       browser. E.g.:</p>
       <pre class="shell">
-cd $HOME/cylc-run/$ID # replace $ID with the ID of your new suite
+cd $HOME/cylc-run/$ID # replace $ID with your suite ID
 firefox log/index.html
 </pre>
 
@@ -302,21 +305,6 @@ firefox log/index.html
       <p>The <samp>work/</samp> sub-directory contains the working directory
       for the tasks at their run times. It can be used by the tasks to create
       files that are only relevant to the tasks.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Tidy up the Suite</h3>
-
-      <p>You should commit your suite if you have just created it or made any
-      changes. Tidy up by removing your <samp>roses/$ID</samp> directory:</p>
-      <pre class="shell">
-rm -rf $HOME/roses/$ID # replace $ID with your new suite ID
-</pre>
-
-      <p>You can recover your suite at any time by running:</p>
-      <pre class="shell">
-rosie checkout $ID # replace $ID with your new suite ID
-</pre>
     </div>
 
     <div class="slide">
@@ -362,8 +350,7 @@ rosie go
 
       <p>Look at the list to find the row that has the suite $ID, project, and
       title from the command line tour. If you double-click on it, your suite
-      will be checked out and then the Rose configuration editor GUI will be
-      launched.</p>
+      will be opened using the Rose configuration editor.</p>
 
       <p>Go ahead and double click on your suite. The config editor GUI will
       now launch.</p>
@@ -415,19 +402,29 @@ rosie go
     <div class="slide">
       <h3 class="alwayshidden">Config Editor GUI: run suite</h3>
 
-      <p>Finally, you can run your suite by clicking the <samp>Suite Run</samp>
-      button on the toolbar or selecting <kbd>Tools -&gt; Run Suite -&gt;
+      <p>You can run your suite by clicking the <samp>Suite Run</samp> button
+      on the toolbar or selecting <kbd>Tools -&gt; Run Suite -&gt;
       Default</kbd> from the top menu. This will invoke <code>rose
       suite-run</code>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Config Editor GUI: commit</h3>
+
+      <p>You can commit your suite by launching a terminal then typing
+      <samp>fcm commit</samp> in it, in the normal way. You can launch a
+      terminal from inside the GUI with <samp>Ctrl-T</samp> or by using the
+      menu: <kbd>Tools -&gt; Launch Terminal</kbd>.</p>
     </div>
 
     <div class="slide">
       <h2>Further Reading</h2>
 
       <p>You have finished the brief tour. Why not try the <a href=
-      "rose-rug-metadata-tutorial0.html">Metadata Tutorial</a> or read more
+      "rose-rug-metadata-tutorial.html">Metadata Tutorial</a> or read more
       about the GUIs at <a href="rose-rug-config-edit.html">Config Editor
-      Reference</a> and <a href="rose-rug-rosie-go.html">Rosie Go Reference</a>?</p>
+      Reference</a> and <a href="rose-rug-rosie-go.html">Rosie Go
+      Reference</a>?</p>
     </div>
   </div>
 </body>

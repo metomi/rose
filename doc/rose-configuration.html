@@ -213,15 +213,25 @@ key-4=value 4
     configuration in the user configuration overrides the site configuration
     and the default. Rose expects these files to be in the modified INI format
     described above. Rose utilities search for its site configuration at
-    <code>$ROSE_HOME/etc/rose.conf</code> where <var>$ROSE_HOME/bin/rose</var>
+    <var>$ROSE_HOME/etc/rose.conf</var> where <var>$ROSE_HOME/bin/rose</var>
     is the location of the <code>rose</code> command, and they search for the
-    user configuration at <code>$HOME/.metomi/rose.conf</code> where
+    user configuration at <var>$HOME/.metomi/rose.conf</var> where
     <var>$HOME</var> is the home directory of the current user.</p>
 
     <p><em>Allowed settings in the site and user configuration files will be
     documented in a future version of this document. In the mean time, the
-    settings are documented as comments in the <code>etc/rose.conf</code> file
-    of each distribution of Rose.</em></p>
+    settings are documented as comments in the <var>etc/rose.conf.example</var>
+    file of each distribution of Rose.</em></p>
+
+    <p>You can also override many internal constants of the <code>rose config
+    edit</code> and <code>rosie go</code>. To change the keyboard shortcut of
+    the <samp>Find Next</samp> action in the config editor to <kbd>F3</kbd>, put
+    the following lines in your user config file, and the setting will apply the
+    next time you run <code>rose config-edit</code>:</p>
+    <pre>
+[rose-config-edit]
+accel-find-next=F3
+</pre>
 
     <h2 id="suite">Suite Configuration</h2>
 
@@ -255,7 +265,7 @@ key-4=value 4
       <li>An <samp>etc/</samp> directory of other configurations and resources
       used the suite. E.g. fcm make configurations.</li>
 
-      <li>a <samp>meta/</samp> directory containing the suite's configuration
+      <li>A <samp>meta/</samp> directory containing the suite's configuration
       metadata.</li>
 
       <li>Other items, as long as they do not clash with the scheduler's
@@ -603,7 +613,7 @@ key-4=value 4
     under <samp>namelist:extract_control</samp>).</p>
 
     <p>Finally, the configuration metadata may group settings in namespaces,
-    which may in term have common configuration metadata settings. The ID for a
+    which may in turn have common configuration metadata settings. The ID for a
     namespace set in the metadata is <code>ns=NAME</code>, e.g.
     <samp>ns=env/MyFavouriteEnvironmentVars</samp>.</p>
 

@@ -65,6 +65,10 @@
 
       <dd>Parse a set of rose configuration files.</dd>
 
+      <dt><a href="#rose-config">rose config-dump</a></dt>
+
+      <dd>Re-dump Rose configuration files in the common format.</dd>
+
       <dt><a href="#rose-config-edit">rose config-edit</a></dt>
 
       <dd>Launch the GTK+ GUI to edit a suite or application
@@ -72,12 +76,12 @@
 
       <dt><a href="#rose-date">rose date</a></dt>
 
-      <dd>(=config-edit)</dd>
+      <dd>Display the current or the specified DATE-TIME with an optional
+      offset.</dd>
 
       <dt><a href="#rose-edit">rose edit</a></dt>
 
-      <dd>Display the current or the specified DATE-TIME with an optional
-      offset.</dd>
+      <dd>(=config-edit)</dd>
 
       <dt><a href="#rose-host-select">rose host-select</a></dt>
 
@@ -454,6 +458,54 @@
 
       <dd>If specified, the program will print ignored <var>!OPTION=VALUE</var>
       where relevant.</dd>
+    </dl>
+
+    <h2 id="rose-config-dump">rose config-dump</h2>
+
+    <h3>NAME</h3><kbd>rose config-dump</kbd>
+
+    <h3>SYNOPSIS</h3>
+
+    <dl>
+      <dt><kbd>rose config-dump</kbd></dt>
+
+      <dd>Re-dump all Rose configuration files in the current directory.</dd>
+
+      <dt><kbd>rose config-dump -C /path/to/conf/dir</kbd></dt>
+
+      <dd>Re-dump all Rose configuration files in
+      <samp>/path/to/conf/dir</samp></dd>
+
+      <dt><kbd>rose config-dump -f /path/to/file1 -f /path/to/file2</kbd></dt>
+
+      <dd>Re-dump <samp>/path/to/file1</samp> and
+      <samp>/path/to/file2</samp></dd>
+    </dl>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Re-dump Rose configuration files in the common format.</p>
+ 
+    <p>Load and dump <var>rose-*.conf</var> files in place.</p>
+ 
+    <p>By default, it recursively loads and dumps all <var>rose-*.conf</var>
+    files in the current working directory.Parse a set of rose configuration
+    files.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+
+      <dd>Specify a configuration directory. (default=<var>$PWD</var>)</dd>
+
+      <dt><kbd>--file=FILE, -f FILE</kbd></dt>
+
+      <dd>Each of this specifies a configuration file.</dd>
+
+      <dt><kbd>--quiet, -q</kbd></dt>
+
+      <dd>Decrement verbosity. Do not report modified files.</dd>
     </dl>
 
     <h2 id="rose-config-edit">rose config-edit</h2>
@@ -1076,7 +1128,7 @@
       <dd>Install the suite in <var>$PWD</var>, and register it as
       <var>my.suite</var>.</dd>
 
-      <dt><kbd>rose suite-run -N my.suite</kbd></dt>
+      <dt><kbd>rose suite-run -n my.suite</kbd></dt>
 
       <dd>Install the suite in <var>/dir/to/suite</var>, and register it as
       <var>my.suite</var>.</dd>
@@ -1086,7 +1138,7 @@
       <dd>Equivalent to (<kbd>cd /dir/to/my.suite &amp;&amp; rose
       suite-run</kbd>)</dd>
 
-      <dt><kbd>rose suite-run -C /dir/to/suite -N my.suite</kbd></dt>
+      <dt><kbd>rose suite-run -C /dir/to/suite -n my.suite</kbd></dt>
 
       <dd>Equivalent to (<kbd>cd /dir/to/suite &amp;&amp; rose suite-run
       my.suite</kbd>)</dd>
@@ -1140,6 +1192,20 @@
       <dd>Specify the suite <var>NAME</var> in Cylc, instead of using the
       basename of the configuration directory.</dd>
 
+      <dt><kbd>--log-keep=DAYS</kbd></dt>
+
+      <dd>Specify the number of days to keep log directories/archives.  Do not
+      housekeep if not specified. Named log directories (created by
+      <kbd>--log-name=NAME</kbd> in previous runs) will not be housekept.</dd>
+
+      <dt><kbd>--log-name=NAME</kbd></dt>
+
+      <dd>Specify a name for the log directory of the current run. If
+      specified, it will create a symbolic link <var>log.NAME</var> to point
+      to the log directory of the current run. Named log directories will not
+      be automatically archived or housekept. Only works with
+      <kbd>--run=run</kbd>.</dd>
+
       <dt><kbd>--new, -N</kbd></dt>
 
       <dd>(Re-)create working directories.</dd>
@@ -1149,6 +1215,10 @@
       <dd>Do not run <kbd>cylc gui</kbd>. Default is to run <kbd>cylc
       gui</kbd> if the <var>DISPLAY</var> environment variable is
       defined.</dd>
+
+      <dt><kbd>--no-log-archive</kbd></dt>
+
+      <dd>Do not archive (tar-gzip) old log directories.</dd>
 
       <dt><kbd>--no-overwrite</kbd></dt>
 
@@ -1166,6 +1236,21 @@
       <dt><kbd>--restart</kbd></dt>
 
       <dd>Invoke <kbd>cylc restart</kbd> instead of <kbd>cylc run</kbd>.</dd>
+
+      <dt><kbd>--reload</kbd></dt>
+
+      <dd>Shorthand for <kbd>--run=reload</kdb>.</dd>
+
+      <dt><kbd>--restart</kbd></dt>
+
+      <dd>Shorthand for --run=restart.</dd>
+
+      <dt><kbd>--run=reload|restart|run</kbd></dt>
+
+      <dd>Invoke <code>cylc reload</code>, <code>cylc restart</code> or
+      <code>cylc run</code> according to this option.
+      See Cylc User Guide for detail.
+      (default=<kbd>run</kbd>)</dd>
 
       <dt><kbd>--verbose, -v</kbd></dt>
 
@@ -1311,7 +1396,7 @@
       <dd>E.g. <var>ROSE_DATAC1D</var> and <var>ROSE_DATACT24H</var> are both
       the data directory of 1 day before the current cycle time.</dd>
 
-      <dt><var>ROSE_ENV</var></dt>
+      <dt><var>ROSE_ETC</var></dt>
       
       <dd>The path to the etc directory of the running suite.</dd>
 
@@ -1387,6 +1472,10 @@
     see if it is compatible with the utility. If so, it will run the task using
     the task utility instead of as a Rose application.</p>
 
+    <p>More documentation on built-in task utilities can be found at
+    <a href="rose-rug-suite-tools.html#rose-task-run.util">Rose User Guide:
+    Suite Tools &gt; Task Utility Selection</a>.</p>
+
     <h3>OPTIONS</h3>
 
     <p>All options of <kbd>rose app-run</kbd> and <kbd>rose task-env</kbd>
@@ -1433,26 +1522,6 @@
       <dt><var>ROSE_TASK_UTIL</var></dt>
 
       <dd>Specify a named task utility.</dd>
-    </dl>
-
-    <p>The following environment variables are used by the <kbd>fcm_make</kbd>
-    and <kbd>fcm_make2</kbd> built-in task utilities:</p>
-
-    <dl>
-      <dt><var>ROSE_TASK_N_JOBS</var></dt>
-
-      <dd>The number of jobs to run in parallel in <kbd>fcm make</kbd>.
-      (default=4)</dd>
-
-      <dt><var>ROSE_TASK_OPTIONS</var></dt>
-
-      <dd>Additional options and arguments for <kbd>fcm make</kbd>. 
-      (default='')</dd>
-
-      <dt><var>ROSE_TASK_PRE_SCRIPT</var></dt>
-
-      <dd>Source (<var>. invoke</var>) the specified script before running the
-      main command. (default='')</dd>
     </dl>
 
     <p>All environment variables documented in <kbd>rose task-env</kbd> are

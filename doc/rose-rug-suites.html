@@ -41,15 +41,18 @@
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
+
     <div id="currentSlide">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
+
     <div id="controls">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
 
     <div class="header-footer" id="footer"></div>
@@ -68,8 +71,8 @@
       <p>What is this?</p>
 
       <ul class="incremental">
-        <li>This is guide material for developing and using Rose suites
-        under cylc.</li>
+        <li>This is guide material for developing and using Rose suites under
+        cylc.</li>
 
         <li>A Rose suite is a collection of scientific task configurations (or
         'applications') with a <q>common purpose</q><!-- (Hilary) -->.</li>
@@ -101,7 +104,7 @@
 
         <li>basic suite design</li>
 
-        <li>cylc gcontrol</li>
+        <li>cylc gui</li>
       </ul>
     </div>
 
@@ -129,9 +132,11 @@
     </div>
 
     <div class="slide">
-    <h2 id="background">Background</h2><img src=
+    <h2 id="background">Background</h2>
+
+    <p class="caption">cylc original name inspiration:</p><img src=
     "http://dvice.com/pics/Battlestar-Galactica-lifesize-Cylon.jpg" alt=
-    "cylc gcontrol" /></div>
+    "cylon from Battlestar Galactica" /></div>
 
     <div class="slide">
       <h3 class="alwayshidden">Background - NIWA</h3>
@@ -207,7 +212,8 @@
     <h3 class="alwayshidden">A cycle isn't a prison</h3>
 
     <p>A cycle isn't a prison - if tasks can run ahead of their cycle time,
-    they should:</p><img src=
+    they should. The image shows how a traditional cycle-fixed scheduler
+    operates (bottom) vs cylc (top).</p><img src=
     "http://cylc.github.com/cylc/images/timeline-two.png" width="50%" alt=
     "optimal task scheduling" /></div>
 
@@ -259,7 +265,8 @@ default = echo 'Hello World'
     <div class="slide">
       <h3 class="alwayshidden">Hello World rose task-run example</h3>
 
-      <p>We now have to change the <samp>[runtime]</samp> section to:</p>
+      <p>We would then have to change the <samp>[runtime]</samp> section
+      to:</p>
       <pre>
 [runtime]
     [[hello_world]]
@@ -292,12 +299,13 @@ default = echo 'Hello World'
     <div class="slide">
       <h3>Families</h3>
 
-      <p>If we had two or more similar applications, we would use a proper cylc
-      family to hold shared settings.</p>
+      <p>Families define shared configuration.</p>
 
       <p>Families can be used to reduce duplication between tasks.</p>
 
       <p>Overriding family settings is possible.</p>
+
+      <p>Single inheritance (for now).</p>
     </div>
 
     <div class="slide">
@@ -343,16 +351,16 @@ default = echo 'Hello World'
     <div class="slide">
       <h3>Shared Applications</h3>
 
-      <p>We've decided we don't need two Rose applications,
-      <samp>app/hello_eris</samp> and <samp>app/hello_pluto</samp> - the only
-      difference in the app configurations is the <var>WORLD</var> environment
-      variable.</p>
+      <p>In the last example, if we don't really need two Rose applications,
+      (<samp>app/hello_eris</samp> and <samp>app/hello_pluto</samp>) we can
+      create two tasks that share a single application, with some override
+      settings - in this example, a <var>WORLD</var> environment variable.</p>
 
-      <p>We can use a single application, <samp>app/hello_world</samp>, but
-      keep our two tasks by using <var>ROSE_TASK_APP</var>. <code>rose
-      task-run</code> will read this environment variable value and use it to
-      run the Rose app. We can put the <var>WORLD</var> environment variable in
-      the <samp>suite.rc</samp> file.</p>
+      <p>We reference our single application, <samp>app/hello_world</samp> by
+      using <var>ROSE_TASK_APP</var>. <code>rose task-run</code> will read this
+      environment variable value and use it to run the Rose app. We will put
+      the override setting (<var>WORLD</var>) in the <samp>suite.rc</samp>
+      file.</p>
     </div>
 
     <div class="slide">
@@ -409,11 +417,11 @@ default = echo 'Hello World'
     <div class="slide">
       <h3>Remote hosts</h3>
 
-      <p>So far, both tasks run on the localhost - it is usually better to farm
-      off tasks to a remote host like a compute server or a
+      <p>So far, both example tasks run on the localhost - it is usually better
+      to farm off tasks to a remote host like a compute server or a
       cluster/supercomputer.</p>
 
-      <p>You can set <samp>hello_eris</samp> to run on a given host by setting
+      <p>We could set <samp>hello_eris</samp> to run on a given host by setting
       <samp>[[remote]]</samp> section settings:</p>
       <pre>
     [[hello_eris]]
@@ -433,7 +441,7 @@ default = echo 'Hello World'
       of a templating language, <a href="http://jinja.pocoo.org">Jinja2</a>, to
       reduce duplication and provide some simple logic.</p>
 
-      <p>We can then write:</p>
+      <p>We could then write:</p>
       <pre>
     [[hello_eris]]
         inherit = FAM_HELLO
@@ -447,8 +455,8 @@ default = echo 'Hello World'
     <div class="slide">
       <h3 class="alwayshidden">Jinja2 shebang</h3>
 
-      <p>We'll also need to add a <samp>#!jinja2</samp> shebang to the top of
-      the suite.rc file.</p>
+      <p>This would also need a <samp>#!jinja2</samp> shebang to the top of the
+      suite.rc file.</p>
     </div>
 
     <div class="slide">
@@ -466,10 +474,61 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">rose-suite.conf advantages</h3>
+
+      <p>It's useful to keep commonly-changed variables in the
+      <samp>rose-suite.conf</samp> file, so users don't have to modify the
+      <samp>suite.rc</samp> itself.</p>
+
+      <p>You can also add proper metadata for them such as help, so they have a
+      nice interface in the config editor.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Jinja2 blocks</h3>
+
+      <p>Jinja2 can be used to collapse duplicated portions of configuration -
+      for example, in an ensemble context. You can use <code>if</code> and
+      <code>for</code> blocks, amongst other things:</p>
+      <pre>
+{%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
+    [[hello_{{ WORLD }}]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = {{ WORLD }}
+{%- endfor %}
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Jinja2 blocks result</h3>
+
+      <p>This gets expanded at runtime:</p>
+      <pre>
+    [[hello_eris]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = eris
+    [[hello_pluto]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = pluto
+    [[hello_makemake]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = makemake
+    [[hello_haumea]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = haumea
+</pre>
+    </div>
+
+    <div class="slide">
       <h3>Event hooks</h3>
 
-      <p>We also need to add some standard Rose <em>event hooks</em> to
-      construct the Rose output viewer (more later) and report or shutdown on
+      <p>Suites also need some standard Rose <em>event hooks</em> to construct
+      the Rose output viewer (more later) and report or shutdown on
       failure:</p>
       <pre>
 [cylc]
@@ -486,7 +545,7 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Hello World event hooks (continued)</h3>
 
-      <p>We also need to add:</p>
+      <p>They could also do with some recommended Rose event hooks:</p>
       <pre>
 [runtime]
     [[root]]
@@ -503,10 +562,35 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3>Hello World Suite</h3>
+      <h3>Job Submission</h3>
 
-      <p>Our suite now looks like <a href=
-      "../etc/rose-rug-suites/suite.rc">this</a>.</p>
+      <p>We may want to configure a job submission method, such as using
+      <code>LoadLeveler</code> (spelling is theirs):</p>
+      <pre>
+    [[hello_eris]]
+...
+        [[[job submission]]]
+            method = loadleveler
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Directives</h3>
+
+      <p>The job submission method may need configuration via
+      <code>directives</code>:</p>
+      <pre>
+    [[hello_eris]]
+...
+        [[[job submission]]]
+            method = loadleveler
+        [[[directives]]]
+            class            = serial
+            job_type         = serial
+            notification     = error
+            resources        = ConsumableMemory(5000)
+            wall_clock_limit = '1260,1200'
+</pre>
     </div>
 
     <div class="slide">
@@ -561,11 +645,61 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Dependency syntax B &amp; C</h3>
 
-      <p>If task B only runs when task A fails:</p>
+      <p>If task B only runs when task A <em>fails</em>:</p>
       <pre>
 [scheduling]
     [[dependencies]]
         graph = "A:fail =&gt; B"
+</pre>
+
+      <p>If task B runs after task A <em>starts</em>:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "A:start =&gt; B"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Dependency syntax A[T-6]</h3>
+
+      <p>In a cycling suite, with cycles every 6 hours, if task A depends on a
+      previous cycle's task A finishing:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        [[[0, 6, 12, 18]]]
+            graph = "A[T-6] =&gt; A"
+</pre>
+
+      <p>If task B depends on the previous cycle's task A failing:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        [[[0, 6, 12, 18]]]
+            graph = "A[T-6]:fail =&gt; B"
+    
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Dependency syntax ( A | B ) &amp; C</h3>
+
+      <p>If task D depends on either task A and task B finishing, together with
+      task C:</p>
+      <pre>
+[scheduling]
+    [[dependencies]]
+        graph = "( A | B ) &amp; C =&gt; D"
+</pre>
+
+      <p>If task B is not needed when task A succeeds, it can be <samp>suicide
+      triggered</samp>:</p>
+      <pre>
+
+[scheduling]
+    [[dependencies]]
+        graph = "A =&gt; !B"
 </pre>
     </div>
 
@@ -580,62 +714,50 @@ COMPUTE_HOST = "voyager_1"
         <li>family triggers - triggers based on groups</li>
 
         <li>message triggers - triggers based on task output</li>
-
-        <li>suicide triggers - triggers that remove tasks</li>
       </ul>
     </div>
 
     <div class="slide">
-      <h3>Changing existing suites</h3>
+      <h3>Often-configured parts of the suite.rc</h3>
 
-      <p>We'll use the example of the brief tour <a href=
-      "etc/rose-rug-brief-tour/suite.rc">suite.rc</a>.</p>
-
-      <p>How to change the initial and final cycle times:</p>
+      <p>The initial and final cycle times:</p>
       <pre>
 [scheduling]
-    initial cycle time = 2013010500  # CHANGE HERE
-    final cycle time = 2013010600    # CHANGE HERE
+    initial cycle time = 2013010500
+    final cycle time = 2013010600
 </pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Changing existing suites - changing hourly
+      <h3 class="alwayshidden">Changing hourly
       times</h3>
 
-      <p>We'll use the example of the brief tour <a href=
-      "etc/rose-rug-brief-tour/suite.rc">suite.rc</a>.</p>
-
-      <p>How to change the hours during which a task runs:</p>
+      <p>The hours during which a task runs:</p>
       <pre>
 [scheduling]
     initial cycle time = 2013010500
     final cycle time = 2013010600
     [[dependencies]]
-        [[[0, 12]]]  # CHANGE HERE
+        [[[0, 12]]]  # Change here
             graph = "hello_pluto =&gt; hello_eris"
 </pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Changing existing suites - adding tasks</h3>
+      <h3 class="alwayshidden">Increasing wallclock</h3>
 
-      <p>How to add a task:</p>
-
-      <p>Configure its dependencies in the <samp>scheduling</samp> section:</p>
-      <pre>
-    [[dependencies]]
-        [[[0, 12]]]
-            graph = "hello_pluto =&gt; hello_eris &amp; hello_makemake"
-</pre>
-
-      <p>Configure any runtime for the new task (if needed):</p>
+      <p>Increasing the wallclock limit of <code>loadleveler</code> jobs:</p>
       <pre>
 [runtime]
-    [[makemake]]
-        inherit = FAM_HELLO
-        [[[environment]]]
-            WORLD = Makemake
+    [[TASK_NAME]]
+        [[[job submission]]]
+            method = loadleveler
+        [[[directives]]]
+            class            = serial
+            job_type         = serial
+            notification     = error
+            resources        = ConsumableMemory(5000)
+            wall_clock_limit = '1260,1200'  # Change here
 </pre>
     </div>
 
@@ -662,18 +784,19 @@ COMPUTE_HOST = "voyager_1"
         <li><var>ROSE_DATAC</var>, data directory for tasks in this cycle
         time.</li>
 
-        <li><var>ROSE_ETC</var>, etc directory of the running suite.</li>
+        <li><var>ROSE_ETC</var>, etc directory of the running suite (if it
+        exists).</li>
       </ul>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Environment reference</h3>
 
-      <p>For more, see <a href="rose-command.html##rose-task-env">rose
+      <p>For more, see <a href="rose-command.html#rose-task-env">rose
       task-env</a> and the <a href=
       "http://cylc.github.com/cylc/single/cug-html.html">cylc
-      documentation</a>. Note: only use cylc environment variables in your
-      suite.rc file.</p>
+      documentation</a>. Note: usually, only cylc environment variables are
+      used in your suite.rc file.</p>
     </div>
 
     <div class="slide">
@@ -733,7 +856,7 @@ COMPUTE_HOST = "voyager_1"
       <ul class="incremental">
         <li>Single, well-commented suite.rc file</li>
 
-        <li>Tasks = logical units</li>
+        <li>Rerunnable tasks, doing one thing and doing it well</li>
 
         <li>Using Rose standard environments, utilities, standard suite
         templates</li>
@@ -760,7 +883,7 @@ COMPUTE_HOST = "voyager_1"
       <ul class="incremental">
         <li>Using include files</li>
 
-        <li>Magical, black box tasks</li>
+        <li>Magical, black box tasks with suite-level complexity</li>
 
         <li>Reinventing the (Rose) wheel</li>
       </ul>
@@ -803,7 +926,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h2 id="gcontrol">cylc gcontrol</h2>
+      <h2 id="gcontrol">cylc gui</h2>
 
       <ul class="incremental">
         <li>Usually launched by <code>rose suite-run</code> or using <code>rose
@@ -828,13 +951,14 @@ COMPUTE_HOST = "voyager_1"
       <h2 id="output">Output Viewer</h2>
 
       <ul class="incremental">
-        <li>Stores suite output and presents it as web pages - view using
-        <code>rose suite-log-view</code>.</li>
+        <li>Presents suite output as web pages - view using <code>rose
+        suite-log-view</code>.</li>
 
         <li>Index web page is at
         <samp>$HOME/cylc-run/SUITE_NAME/log/index.html</samp>.</li>
 
-        <li>Usually generated by <code>rose suite-hook</code>.</li>
+        <li>Usually generated by <code>rose suite-hook</code> - this fetches
+        the output files from remote hosts if needed.</li>
       </ul>
     </div>
 
@@ -878,11 +1002,13 @@ COMPUTE_HOST = "voyager_1"
       <h2 id="independent">Independent Learning</h2>
 
       <p>Next Steps:</p>
-      <ul class="incremental">
-        <li>Go through the <a href="rose-rug-suite-writing-tutorial.html">Suite Writing Tutorial</a>.</li>
 
-        <li>Look at some example cylc functionality in <a href=
-        "../etc/rose-rug-suite-tour/">Rose Example Suites</a>.</li>
+      <ul class="incremental">
+        <li>Go through the <a href="rose-rug-suite-writing-tutorial.html">Suite
+        Writing Tutorial</a>.</li>
+
+        <li>Have a look at some of the <a href="rose-rug-advanced-tutorials.html">Advanced
+        Tutorials</a>.</li>
       </ul>
     </div>
   </div>

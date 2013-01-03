@@ -173,7 +173,7 @@ touch meta/rose-meta.conf
 
       <p>Let's provide some type information about <var>MAX_TARGETS</var>. The
       id for this variable is <var>env=MAX_TARGETS</var>, so add a section into
-      the file.:</p>
+      the file:</p>
       <pre>
 [env=MAX_TARGETS]
 </pre>
@@ -228,16 +228,20 @@ range = 0:
 title = Max target number
 type = integer
 </pre>
+      <p>This means that any integer less than zero will be flagged as a
+      problem.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Example: view changes</h3>
 
-      <p>This means that any integer less than zero will be flagged as a
-      problem. With the Metadata switched on, try decreasing the value of
-      <var>MAX_TARGETS</var> below 0. An error will be flagged next to the
-      variable and on the page list in the left hand panel. If you change it to
-      an integer value of 0 or greater, the error will go away.</p>
+      <p>Reload the metadata (toggle menu <kbd>Metadata -&gt; Switch off
+      Metadata</kbd>).</p>
+
+      <p>Now try decreasing the value of <var>MAX_TARGETS</var> below 0. An
+      error will be flagged next to the variable and on the page list in the
+      left hand panel. If you change it to an integer value of 0 or greater, the
+      error will go away.</p>
     </div>
 
     <div class="slide">
@@ -260,9 +264,8 @@ title = World
     <div class="slide">
       <h3 class="alwayshidden">Example: view changes</h3>
 
-      <p>If you close and open the config editor again, (or switch the metadata
-      off and on), you'll see that <var>WORLD</var> now has some helpful
-      hover-over text when you move the mouse over the title.</p>
+      <p>If you reload the metadata you'll see that <var>WORLD</var> now has
+      some helpful hover-over text when you move the mouse over the title.</p>
     </div>
 
     <div class="slide">
@@ -282,9 +285,8 @@ title = World
     <div class="slide">
       <h3 class="alwayshidden">Example: view changes</h3>
 
-      <p>Reload the config editor (metadata off/on or close and reopen) and
-      change the first letter of the value of <var>WORLD</var> to
-      lowercase.</p>
+      <p>Reload the metadata and change the first letter of the value of
+      <var>WORLD</var> to lowercase.</p>
 
       <p>You've now caused an error! The menu button next to the
       <samp>World</samp> label will change colour and have hover-over text
@@ -314,10 +316,9 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     <div class="slide">
       <h3 class="alwayshidden">Example: view changes</h3>
 
-      <p>Now when you open the application in the config editor, you'll get a
-      drop-down list of worlds to choose from. Isn't that nice! Rose will now
-      check <var>WORLD</var> in the future to make sure its value is in this
-      list.</p>
+      <p>Reload the metadata and you now get a drop-down list of worlds to
+      choose from. Isn't that nice! Rose will now check <var>WORLD</var> in the
+      future to make sure its value is in this list.</p>
     </div>
 
     <div class="slide">
@@ -348,21 +349,14 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Example: metadata trigger explanation</h3>
-
-      <p>Set <var>WORLD</var> to <samp>Jupiter</samp>. Next, either save and
-      reopen the config editor, or just switch metadata off and on.</p>
-    </div>
-
-    <div class="slide">
       <h3 class="alwayshidden">Example: view changes</h3>
 
-      <p>Now when you change the value of <var>WORLD</var> to
-      <samp>Saturn</samp>, or any other planet, <var>LANG_JUPITER</var> will be
-      <em>ignored</em> and hidden by default in the config editor (you can show
-      it by selecting <kbd>View -&gt; View All Ignored Variables</kbd>). If you
-      change it back to <samp>Jupiter</samp>, it will be <em>enabled</em> and
-      re-appear.</p>
+      <p>Reload the metadata. Now when you change the value of <var>WORLD</var>
+      to <samp>Saturn</samp>, or any other planet, <var>LANG_JUPITER</var> will
+      be <em>ignored</em> and hidden by default in the config editor (you can
+      show it by selecting <kbd>View -&gt; View All Ignored Variables</kbd>). If
+      you change it back to <samp>Jupiter</samp>, it will be <em>enabled</em>
+      and re-appear.</p>
     </div>
 
     <div class="slide">
@@ -370,9 +364,6 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 
       <p>When you're done, change <var>WORLD</var> to <samp>Earth</samp> and
       save.</p>
-
-      <p>You can experiment with adding metadata to <var>LANG_JUPITER</var> if
-      you wish.</p>
     </div>
 
     <div class="slide">
@@ -397,9 +388,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
       Variables</kbd>, any variables that are in the metadata but aren't in the
       application will be displayed - <var>WORLD</var> will reappear as a
       ghost! You can add the variable back into the application by clicking on
-      the button next to the name and selecting <samp>Add</samp>. It will be
-      added with a 'best guess' value based on the metadata, which in this case
-      will be <samp>Mercury</samp>.</p>
+      the button next to the name and selecting <samp>Add</samp>.</p>
     </div>
 
     <div class="slide">
@@ -421,9 +410,9 @@ help = This variable controls which language to use when saying hello
     <div class="slide">
       <h3 class="alwayshidden">Example: view changes</h3>
 
-      <p>If you open the application in the config editor, or switch metadata
-      off and on, you can now click on the title of <var>LANG_JUPITER</var> or
-      use the menu button to launch a help dialog.</p>
+      <p>If you reload the metadata you can now click on the title of
+      <var>LANG_JUPITER</var> or use the menu button to launch a help dialog.
+      </p>
     </div>
 
     <div class="slide">
@@ -444,9 +433,9 @@ title = Environment
     <div class="slide">
       <h3 class="alwayshidden">Example: view changes</h3>
 
-      <p>On reload of the config editor, this gives a hover-over text
-      (description) when the mouse is over the page name, and a menu option for
-      help for this section (right click on the page name).</p>
+      <p>Reload the metadata and you should then have a modifed page name,
+      hover-over text (description) when the mouse is over the page name, and a
+      menu option for help for this section (right click on the page name).</p>
     </div>
 
     <div class="slide">
@@ -510,14 +499,6 @@ url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
       configuration metadata. Make sure you have a good idea of when to use
       these by consulting the <a href="rose-configuration.html#meta">Rose
       Reference Guide &gt; Configuration Metadata</a>.</p>
-    </div>
-
-    <div class="slide">
-      <h2 id="upgrade">Upgrade Macro Development</h2>
-
-      <p>Upgrade macros automate the process of updating configurations from
-      one version to the next, such as removing redundant settings or adding
-      new ones.</p>
     </div>
   </div>
 </body>

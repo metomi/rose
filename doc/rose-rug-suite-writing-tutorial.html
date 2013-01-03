@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose User Guide: Suite from Scratch</title>
+  <title>Rose User Guide: Suite Writing Tutorial</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -95,7 +95,7 @@
       <h3>Example program</h3>
 
       <p>Our Fortran program is <a href=
-      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a>,
+      "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>,
       which (pretends to) calculate the new position of our ship.</p>
 
       <p>Spend a bit of time looking at this file.</p>
@@ -167,7 +167,7 @@
       <p>We'll need to store the source code with our suite.</p>
 
       <p>Change directory to the suite and make a directory
-      <samp>etc</samp>:</p>
+      <samp>src</samp>:</p>
       <pre class="shell">
 cd ~/roses/$SUITE_ID
 </pre>
@@ -176,7 +176,7 @@ mkdir src
 </pre>
 
       <p>Copy the source code from <a href=
-      "../etc/rose-suite-from-scratch/src/dead_reckoning.f90">dead_reckoning.f90</a>
+      "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>
       into a file called <samp>src/dead_reckoning.f90</samp>.</p>
     </div>
 
@@ -202,8 +202,8 @@ dead_reckoning.f90
       <p>Let's make an application configuration for our fortran program. We
       can call it whatever we like - let's choose <samp>navigate</samp></p>
 
-      <p>Make a directory <samp>app</samp> in the same place as
-      <samp>etc</samp>:</p>
+      <p>Make a directory <samp>app</samp> in the root directory of the
+      suite:</p>
       <pre class="shell">
 mkdir app
 </pre>
@@ -252,10 +252,22 @@ touch app/navigate/rose-app.conf
 default = dead_reckoning.exe
 
 [file:report.nl]
-content = namelist:report_nl
+source = namelist:report_nl
 
 [namelist:report_nl]
 l_verbose = .true.
+</pre>
+
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Tidy app configuration (contents)</h3>
+
+      <p>To ensure that the file is stored in the normal format, issue the
+      command:</p>
+
+      <pre class="shell">
+rose config-dump
 </pre>
     </div>
 
@@ -568,7 +580,7 @@ touch suite.rc
       <h3>Checking the suite.rc</h3>
 
       <p>Your suite.rc should now look like <a href=
-      "../etc/rose-suite-from-scratch/suite.rc">this</a>.</p>
+      "../etc/rose-rug-suite-writing-tutorial/suite.rc.html">this</a>.</p>
     </div>
 
     <div class="slide">
@@ -607,7 +619,7 @@ touch suite.rc
 rose suite-run
 </pre>
 
-      <p>If everything has been setup successfully, <code>cylc gcontrol</code>
+      <p>If everything has been setup successfully, <code>cylc gui</code>
       will launch with your running suite.</p>
 
       <p>You can look at the finished output by running:</p>
@@ -627,11 +639,11 @@ rose suite-log-view
     <div class="slide">
       <h2>Further Reading</h2>
 
-      <p>For examples of more advanced cylc suite functionality, see <a href=
-      "../etc/rose-rug-suite-tour/">Suite Examples</a>.</p>
+      <p>For examples of more advanced cylc suite functionality, see the <a href=
+      "rose-rug-advanced-tutorials.html#suites">Advanced Suite Tutorials</a>.</p>
 
       <p>For more information about suites, see the <a href=
-      "rose-rug-suites.html">Suite Guide</a>.</p>
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc User Guide</a>.</p>
     </div>
   </div>
 </body>

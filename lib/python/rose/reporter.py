@@ -121,6 +121,7 @@ class Reporter(object):
             level = self.DEFAULT
         msg = None
         for key, context in self.contexts.items():
+            insert_newline = False
             if context.is_closed():
                 self.contexts.pop(key) # remove contexts with closed file handles
                 continue
@@ -145,8 +146,14 @@ class Reporter(object):
                     context.write(msg_line + "\n")
             else:
                 if clip is not None:
-                    msg = msg[:clip]
-                context.write(msg)
+                    if msg.endswith("\n") and len(msg) > clip:
+                        insert_newline = True
+                        msg = msg[:-1]
+                    msg_line = msg[:clip]
+                if insert_newline:
+                    context.write(msg_line + "\n")
+                else:
+                    context.write(msg)
         if isinstance(message, Exception) and self.raise_on_exc:
             raise message
 
