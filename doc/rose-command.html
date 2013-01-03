@@ -401,6 +401,10 @@
       
       <dd>Print the value of <var>OPTION</var> in <var>SECTION</var> of the 
       metadata associated with the specified config <var>FILE</var>.</dd>
+      
+      <dt><kbd>rose config --meta-key=FLAG</kbd></dt>
+      
+      <dd>Print the value of a specified metadata <var>FLAG<var>.</dd>
     </dl>
 
     <h3>DESCRIPTION</h3>
@@ -440,6 +444,11 @@
       
       <dd>If specified, operate on the metadata associated with the 
       configuration <var>FILE</var>.</dd>
+
+     <dt><kbd>--meta-key</kbd></dt>
+
+     <dd>If specified, prints the value of a specified metadata flag.
+     Cannot be used in conjunction with <kbd>--file</kbd>.</dd>
 
       <dt><kbd>--print-ignored, -i</kbd></dt>
 

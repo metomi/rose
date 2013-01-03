@@ -29,8 +29,19 @@ import sys
 def main():
     """Implement the "rose config" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("default", "files", "keys", "no_ignore", "meta")
+    opt_parser.add_my_options("default", "files", "keys", "no_ignore", "meta", 
+                              "meta_key")
     opts, args = opt_parser.parse_args()
+    rose.macro.add_site_meta_paths()
+    rose.macro.add_env_meta_paths()
+    
+    if opts.meta_key:
+        opts.meta = True
+    
+    if opts.files and opts.meta_key:
+        sys.stderr.write("Cannot specify both a file and meta key.")
+        return None
+        
     try:
         if opts.files:
             root_node = ConfigNode()
@@ -53,13 +64,15 @@ def main():
         else:
             if opts.meta:
                 root_node = ConfigNode()
+                if opts.meta_key:
+                    root_node.set(["meta"], opts.meta_key)
                 meta_dir = rose.macro.load_meta_path(config=root_node,
-                                     directory=os.getcwd())[0]
+                          directory=[os.getcwd(),None][bool(opts.meta_key)])[0]
                 if meta_dir is not None:
                     fpath = meta_dir + "/rose-meta.conf"
                     ConfigLoader()(fpath, root_node)
                 else:
-                    print "No metadata found"
+                    print "No metadata found."
             else:
                 root_node = ResourceLocator.default().get_conf()
             
