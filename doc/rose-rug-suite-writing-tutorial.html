@@ -313,6 +313,13 @@ l_verbose = .true.
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Add app configuration (explained)</h3>
+
+      <p>When the app is run, this will create our <samp>report.nl</samp> file
+      with the namelist inside, and invoke <samp>dead_reckoning.exe</samp>.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Tidy app configuration (contents)</h3>
 
       <p>To ensure that the file is stored in the normal format, issue the
@@ -320,6 +327,8 @@ l_verbose = .true.
       <pre class="shell">
 rose config-dump
 </pre>
+      <p>This prettifies the format by handling whitespace and sorting in a
+      consistent way.</p>
     </div>
 
     <div class="slide">
