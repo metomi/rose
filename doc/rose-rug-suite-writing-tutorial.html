@@ -3,6 +3,9 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+  <meta name="generator" content=
+  "HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" />
+
   <title>Rose User Guide: Suite Writing Tutorial</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -29,11 +32,14 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      © British Crown Copyright 2012 <a href="http://www.metoffice.gov.uk">Met
-      Office</a>. See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.
+      <br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.<br />
+      "license">Open Government Licence</a>.
+      <br />
       <span id="rose-version"></span>
     </address>
 
@@ -118,17 +124,17 @@
     <div class="slide">
       <h3 class="alwayshidden">dead_reckoning.f90</h3>
 
-      <p>Our Fortran program takes some initial position information (a file at
-      <samp>$POS_FPATH</samp>) and looks at the our <a href=
+      <p><samp>dead_reckoning.f90</samp> takes some initial position
+      information (a file at <samp>$POS_FPATH</samp>) and looks at the <a href=
       "http://en.wikipedia.org/wiki/Chip_log">log</a> (speedometer) and compass
-      history to calculate a new position, based on the elapsed time
-      <samp>$TIME_INTERVAL_HRS</samp>.</p>
+      history of the ship to calculate a new position, based on the elapsed
+      time <samp>$TIME_INTERVAL_HRS</samp>.</p>
 
       <p>The new position is written out to the file at
       <samp>$POS_FPATH</samp>, overwriting the previous content.</p>
 
-      <p>There's a namelist in a file <samp>report.nl</samp> that controls the
-      verbosity.</p>
+      <p>The verbosity of <samp>dead_reckoning.f90</samp> is controlled via a
+      namelist in a file <samp>report.nl</samp>.</p>
     </div>
 
     <div class="slide">
@@ -158,9 +164,8 @@
       <p>In this example, we'll run the compiled program as a proper Rose app.
       This means that environment variables can be set in the
       <samp>suite.rc</samp> or in our Rose app config. The
-      <samp>report.nl</samp> namelist file should probably be generated via the
-      app config (usually better than having a pre-existing file kicking
-      around).</p>
+      <samp>report.nl</samp> namelist file should be generated via the app
+      config.</p>
 
       <p>The input/output file needs to be outside the app, stored in the suite
       directory somewhere.</p>
@@ -198,7 +203,7 @@
 
       <p>In the new suite working copy, we see two files:</p>
 
-      <ul class="incremental">
+      <ul>
         <li><samp>rose-suite.conf</samp> (empty)</li>
 
         <li><samp>rose-suite.info</samp> (information that we just filled
@@ -278,6 +283,10 @@ mkdir app/navigate
         <li>An input (and output) file called <samp>position</samp> that stores
         the latitude and longitude.</li>
       </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Add app configuration (continued)</h3>
 
       <p>We've decided we'll setup the environment and the
       <samp>position</samp> file in the suite, so ignore them for now.</p>
@@ -616,8 +625,8 @@ touch suite.rc
             """
 </pre>
 
-      <p>This writes to the location we've set for <samp>navigate</samp> in
-      <var>POS_FPATH</var>, and sets our start coordinates to latitude
+      <p>This initialises our location for the <samp>navigate</samp> app via a
+      file (pointed to via <samp>$POS_FPATH</samp>). Our start coordinates are
       <samp>50.0</samp> north, <samp>3.0</samp> west. You can change these to
       another location if you like.</p>
     </div>
