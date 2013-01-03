@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Overview: In Depth Topics</title>
+  <title>Rose User Guide: In Depth Topics</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -57,7 +57,6 @@
 
     <div class="header-footer" id="footer"></div>
   </div>
-
   <div id="body-main" class="presentation">
     <div class="slide">
       <h1>Rose User Guide: In Depth Topics</h1>
@@ -85,9 +84,9 @@
 
     <div class="slide">
       <h2 id="suites">Suites</h2>
-      
+
       <p>A Rose suite is a runnable collection of one or more Rose application
-        configurations, plus any miscellaneous scripts and resources.</p>
+      configurations, plus any miscellaneous scripts and resources.</p>
     </div>
 
     <div class="slide">
@@ -101,8 +100,7 @@
     <div class="slide">
       <h3>Suite Files</h3>
 
-      <p>There are (only) 5 different types of Rose INI-style
-      files:</p>
+      <p>There are (only) 5 different types of Rose INI-style files:</p>
 
       <ul class="incremental">
         <li>rose-suite.info - discovery information</li>
@@ -129,7 +127,6 @@
       <h3>Rose Configuration Format</h3>
 
       <ul class="incremental">
-      
         <li>See <a href="rose-configuration.html#format">Configuration
         Format</a>.</li>
 
@@ -288,6 +285,7 @@ should-show-ignored = True
       <h3>cylc suite.rc</h3>
 
       <p><em>(Different format)</em></p>
+
       <p>This is the cylc configuration file - we'll discuss it properly in a
       <a href="rose-rug-suites.html">later part</a> of the documentation.</p>
       <pre>
@@ -353,30 +351,30 @@ should-show-ignored = True
       <a href="rose-configuration.html#meta">referenced</a> by:</p>
 
       <ul class="incremental">
-        <li><p>the <samp>meta</samp> flag in an app config,
-        e.g.:</p>
-        <pre>
+        <li>
+          <p>the <samp>meta</samp> flag in an app config, e.g.:</p>
+          <pre>
 meta=rose-demo-upgrade/27.1
 </pre>
-        <p>which references centrally-stored metadata, looked up using the
-        <samp>meta-path</samp> user/site config setting.</p>
+
+          <p>which references centrally-stored metadata, looked up using the
+          <samp>meta-path</samp> user/site config setting.</p>
         </li>
       </ul>
     </div>
+
     <div class="slide">
-       <h3 class="alwayshidden">Configuration Metadata locations</h3>
-      
+      <h3 class="alwayshidden">Configuration Metadata locations</h3>
+
       <p>You can store metadata in alternate locations, and reference it
       using:</p>
 
       <ul class="incremental">
-        <li>A <samp>meta/</samp> directory in a suite or an
-        application.</li>
+        <li>A <samp>meta/</samp> directory in a suite or an application.</li>
 
         <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
 
-        <li>The <var>ROSE_META_PATH</var> environment
-        variable.</li>
+        <li>The <var>ROSE_META_PATH</var> environment variable.</li>
 
         <li>The <samp>meta-path</samp> setting in <a href=
         "rose-configuration.html#site">site/user</a> configurations.</li>
@@ -391,14 +389,14 @@ meta=rose-demo-upgrade/27.1
       location - this location is pointed to by the site configuration
       <samp>meta-path</samp> option (e.g.
       <samp>/project/rose-metadata</samp>)</p>
-      
+
       <p>The app config <samp>meta</samp> option configures which
       subdirectories in a location to choose (e.g.
       <samp>/project/rose-metadata/rose-demo-upgrade/27.1</samp>).</p>
     </div>
-    
+
     <div class="slide">
-      <h3 class="alwayshidden">Configuration Metadata branches</h3>   
+      <h3 class="alwayshidden">Configuration Metadata branches</h3>
 
       <p>You can check out a branch of a project, change its metadata, and test
       it by pointing <samp>meta-path</samp> at it (e.g. by running <code>rose

@@ -96,7 +96,6 @@
 
       <p>You may want to configure Rose to use your favourite text editors.
       E.g.:</p>
-
       <pre class="shell">
 mkdir -p ~/.metomi
 cat &gt;&gt;~/.metomi/rose.conf &lt;&lt;'__CONF__'
@@ -243,6 +242,7 @@ rose rug-brief-tour
       <pre class="shell">
 fcm commit
 </pre>
+
       <p>after changing directory to the working copy of your suite
       ($HOME/roses/$ID).</p>
     </div>
@@ -412,14 +412,15 @@ rosie go
     <div class="slide">
       <h3 class="alwayshidden">Config Editor GUI: save</h3>
 
-      <p>The config editor acts as a specialist text editor for Rose INI files -
-      pressing Save in the config editor is the same as pressing it in gvim
+      <p>The config editor acts as a specialist text editor for Rose INI files
+      - pressing Save in the config editor is the same as pressing it in gvim
       or gedit.</p>
-      
-      <p>Rose INI files dumped through the config editor, <code>rose macro</code>, or
-      <code>rose config-dump</code> will be pretty-printed for consistency
-      (so diffs are possible), which may mean some extraneous whitespace is removed
-      and some sorting is performed if anything is out of place.</p>
+
+      <p>Rose INI files dumped through the config editor, <code>rose
+      macro</code>, or <code>rose config-dump</code> will be pretty-printed for
+      consistency (so diffs are possible), which may mean some extraneous
+      whitespace is removed and some sorting is performed if anything is out of
+      place.</p>
     </div>
 
     <div class="slide">
