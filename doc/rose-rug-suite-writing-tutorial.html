@@ -3,6 +3,9 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+  <meta name="generator" content=
+  "HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" />
+
   <title>Rose User Guide: Suite Writing Tutorial</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -80,14 +83,16 @@
       - your suite will be built around their inputs and their
       inter-dependencies.</p>
 
-      <p>This example supposes:</p>
+      <p>This example supposes:</p><img class="r-floater" src=
+      "http://images1.wikia.nocookie.net/__cb20080808224861/patrickobrian/images/0/0e/Master_commander_hms_surpri.jpg"
+      width="30%" alt="'HMS Surprise' replica tall ship" />
 
-      <img class="r-floater" src="http://images1.wikia.nocookie.net/__cb20080808224861/patrickobrian/images/0/0e/Master_commander_hms_surpri.jpg" width="30%" alt="'HMS Surprise' replica tall ship"/>
       <ul class="incremental">
         <li>We're on a sailing ship, making a passage</li>
 
-        <li>We're navigating using <a href="http://en.wikipedia.org/wiki/Dead_reckoning">dead reckoning</a> and some Fortran
-        code</li>
+        <li>We're navigating using <a href=
+        "http://en.wikipedia.org/wiki/Dead_reckoning">dead reckoning</a> and
+        some Fortran code</li>
       </ul>
     </div>
 
@@ -257,7 +262,6 @@ source = namelist:report_nl
 [namelist:report_nl]
 l_verbose = .true.
 </pre>
-
     </div>
 
     <div class="slide">
@@ -265,7 +269,6 @@ l_verbose = .true.
 
       <p>To ensure that the file is stored in the normal format, issue the
       command:</p>
-
       <pre class="shell">
 rose config-dump
 </pre>
@@ -619,13 +622,34 @@ touch suite.rc
 rose suite-run
 </pre>
 
-      <p>If everything has been setup successfully, <code>cylc gui</code>
-      will launch with your running suite.</p>
+      <p>If everything has been setup successfully, <code>cylc gui</code> will
+      launch with your running suite.</p>
 
       <p>You can look at the finished output by running:</p>
       <pre class="shell">
 rose suite-log-view
 </pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Visualising the data</h3>
+
+      <p>If you want a quick and easy way of visualising the output, try
+      replacing the line:</p>
+      <pre>
+  PRINT*, "New position, me hearties:",new_lat," ",new_long  
+</pre>
+
+      <p>in <samp>dead_reckoning.f90</samp> with</p>
+      <pre>
+  lat = (180.0/pi) * lat
+  long = (180.0/pi) * long
+  WRITE(*,'(A, F7.4, A, F7.4, A, F7.4, A, F7.4, A)') &amp;
+        "&lt;a href='http://maps.google.com/maps?q=",lat,"+",long,&amp;
+        "+to+",new_lat,"+",new_long,"'&gt;Ye chart!&lt;/a&gt;"
+</pre>
+
+      <p>You'll now get a useful link in your navigate task output.</p>
     </div>
 
     <div class="slide">
@@ -639,11 +663,13 @@ rose suite-log-view
     <div class="slide">
       <h2>Further Reading</h2>
 
-      <p>For examples of more advanced cylc suite functionality, see the <a href=
-      "rose-rug-advanced-tutorials.html#suites">Advanced Suite Tutorials</a>.</p>
+      <p>For examples of more advanced cylc suite functionality, see the
+      <a href="rose-rug-advanced-tutorials.html#suites">Advanced Suite
+      Tutorials</a>.</p>
 
       <p>For more information about suites, see the <a href=
-      "http://cylc.github.com/cylc/single/cug-html.html">cylc User Guide</a>.</p>
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc User
+      Guide</a>.</p>
     </div>
   </div>
 </body>
