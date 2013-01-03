@@ -92,7 +92,17 @@
     </div>
 
     <div class="slide">
-      <h3>Example program</h3>
+      <h3>Starting Out</h3>
+
+      <p>We need to analyse our program to figure out:</p>
+      <ul>
+        <li>what it needs to run</li>
+        <li>when it needs to run</li>
+      </ul>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">dead_reckoning.f90</h3>
 
       <p>Our Fortran program is <a href=
       "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>,
@@ -102,7 +112,18 @@
     </div>
 
     <div class="slide">
-      <h3>Analysing the example program</h3>
+      <h3 class="alwayshidden">dead_reckoning.f90</h3>
+
+      <p>Our Fortran program takes some initial position information (a file at <samp>$POS_FPATH</samp>)
+      and looks at the our <a href="http://en.wikipedia.org/wiki/Chip_log">log</a> (speedometer) and compass history to calculate a new position, based on the elapsed time <samp>$TIME_INTERVAL_HRS</samp>.</p>
+      
+      <p>The new position is written out to the file at <samp>$POS_FPATH</samp>, overwriting the previous content.</p>
+
+      <p>There's a namelist that controls the verbosity of this process.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Analysing the program</h3>
 
       <p>The inputs to <samp>dead_reckoning.f90</samp> are:</p>
 
@@ -120,7 +141,18 @@
     </div>
 
     <div class="slide">
-      <h3>Example dependencies</h3>
+      <h3>What it needs to run</h3>
+      
+      <p>This means that when we run the compiled program, we'll need
+      all these inputs to be present.</p>
+      
+      <p>In this example, we'll run the compiled program as a proper Rose app. This means that environment variables can be set in the <samp>suite.rc</samp> or in a Rose app config. The <samp>report.nl</samp> namelist file should probably be generated via an app config (usually better than having a pre-existing file kicking around).</p>
+      
+      <p>The input/output file needs to be outside the app, stored in the suite directory somewhere.</p>
+    </div>
+
+    <div class="slide">
+      <h3>When it needs to run</h3>
 
       <p>We want to run this program every 3 hours, on the hour - so there is a
       repeated dependency on the time or <code>cycle</code>.</p>
@@ -232,7 +264,7 @@ mkdir app/navigate
         the latitude and longitude.</li>
       </ul>
 
-      <p>We will setup the environment and the <samp>position</samp> file in
+      <p>We've decided we'll setup the environment and the <samp>position</samp> file in
       the suite, so ignore them for now.</p>
     </div>
 
@@ -373,10 +405,10 @@ dead_reckoning.f90
     <div class="slide">
       <h3>What else do we need?</h3>
 
-      <p>We've told Rose how to run each application.</p>
+      <p>We've told Rose how to run the build via the <samp>fcm_make_navigate</samp> app config,
+      and how to run the resultant executable via the <samp>navigate</samp> app config.</p>
 
-      <ul class="incremental">
-        <li>We haven't told cylc how to run anything.</li>
+      <p>We now need to link them together and handle the rest of the inputs, via cylc.</li>
       </ul>
     </div>
 
