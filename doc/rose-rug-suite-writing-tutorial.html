@@ -3,9 +3,6 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="generator" content=
-  "HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" />
-
   <title>Rose User Guide: Suite Writing Tutorial</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -539,6 +536,17 @@ touch suite.rc
         <li>We've configured the dependency between
         <samp>fcm_make_navigate</samp> and <samp>navigate</samp>.</li>
       </ul>
+    </div>
+
+    <div class="slide">
+      <h3>clock triggering</h3>
+
+      <p>If we were writing a real suite, we'd use the
+      <samp>clock-triggered</samp> <samp>special tasks</samp> setting in cylc
+      to make <samp>navigate</samp> trigger off the system wallclock time, and
+      adjust the start/end dates to be more current. However, this doesn't
+      matter for our example - and we don't want to wait 2 days for the suite
+      to finish!</p>
     </div>
 
     <div class="slide">
