@@ -803,7 +803,7 @@ class TaskRunner(Runner):
     OPTIONS = AppRunner.OPTIONS + [
             "app_key", "auto_util_mode", "cycle", "cycle_offsets",
             "path_globs", "prefix_delim", "suffix_delim", "util_key"]
-    PATH_GLOBS = ["share/fcm[_-]make*/*/bin"]
+    PATH_GLOBS = ["share/fcm[_-]make*/*/bin", "work/fcm[_-]make*/*/bin"]
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
@@ -859,16 +859,7 @@ class TaskRunner(Runner):
             if os.getenv(name) != value:
                 env_export(name, value, self.event_handler)
 
-        # Determine what app config to use
-        if not opts.conf_dir:
-            app_key = t.task_name
-            if opts.app_key:
-                app_key = opts.app_key
-            elif os.getenv("ROSE_TASK_APP"):
-                app_key = os.getenv("ROSE_TASK_APP")
-            opts.conf_dir = os.path.join(t.suite_dir, "app", app_key)
-
-        # Run a task util or an app
+        # Determine whether to run a task util or an app
         util_key = os.getenv("ROSE_TASK_UTIL")
         if opts.util_key:
             util_key = opts.util_key
@@ -877,6 +868,19 @@ class TaskRunner(Runner):
             util = self.task_utils_manager.get_handler(util_key)
         if opts.auto_util_mode and util is None:
             util = self.task_utils_manager.guess_handler(t.task_name)
+
+        # Determine what app config to use
+        if not opts.conf_dir:
+            app_key = t.task_name
+            if opts.app_key:
+                app_key = opts.app_key
+            elif os.getenv("ROSE_TASK_APP"):
+                app_key = os.getenv("ROSE_TASK_APP")
+            elif util and hasattr(util, "get_app_key"):
+                app_key = util.get_app_key(t.task_name)
+            opts.conf_dir = os.path.join(t.suite_dir, "app", app_key)
+
+        # Run the task util or the app
         if util is None:
             return self._run_app(opts, args)
         else:
