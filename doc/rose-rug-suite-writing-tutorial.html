@@ -29,27 +29,27 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.
-      <br />
+      © British Crown Copyright 2012 <a href="http://www.metoffice.gov.uk">Met
+      Office</a>. See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
+
     <div id="currentSlide">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
+
     <div id="controls">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
 
     <div class="header-footer" id="footer"></div>
@@ -80,14 +80,16 @@
       - your suite will be built around their inputs and their
       inter-dependencies.</p>
 
-      <p>This example supposes:</p>
+      <p>This example supposes:</p><img class="r-floater" src=
+      "http://images1.wikia.nocookie.net/__cb20080808224861/patrickobrian/images/0/0e/Master_commander_hms_surpri.jpg"
+      width="30%" alt="'HMS Surprise' replica tall ship" />
 
-      <img class="r-floater" src="http://images1.wikia.nocookie.net/__cb20080808224861/patrickobrian/images/0/0e/Master_commander_hms_surpri.jpg" width="30%" alt="'HMS Surprise' replica tall ship"/>
       <ul class="incremental">
         <li>We're on a sailing ship, making a passage</li>
 
-        <li>We're navigating using <a href="http://en.wikipedia.org/wiki/Dead_reckoning">dead reckoning</a> and some Fortran
-        code</li>
+        <li>We're navigating using <a href=
+        "http://en.wikipedia.org/wiki/Dead_reckoning">dead reckoning</a> and
+        some Fortran code</li>
       </ul>
     </div>
 
@@ -95,12 +97,14 @@
       <h3>Starting Out</h3>
 
       <p>We need to analyse our program to figure out:</p>
+
       <ul>
         <li>what it needs to run</li>
+
         <li>when it needs to run</li>
       </ul>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">dead_reckoning.f90</h3>
 
@@ -114,12 +118,17 @@
     <div class="slide">
       <h3 class="alwayshidden">dead_reckoning.f90</h3>
 
-      <p>Our Fortran program takes some initial position information (a file at <samp>$POS_FPATH</samp>)
-      and looks at the our <a href="http://en.wikipedia.org/wiki/Chip_log">log</a> (speedometer) and compass history to calculate a new position, based on the elapsed time <samp>$TIME_INTERVAL_HRS</samp>.</p>
-      
-      <p>The new position is written out to the file at <samp>$POS_FPATH</samp>, overwriting the previous content.</p>
+      <p>Our Fortran program takes some initial position information (a file at
+      <samp>$POS_FPATH</samp>) and looks at the our <a href=
+      "http://en.wikipedia.org/wiki/Chip_log">log</a> (speedometer) and compass
+      history to calculate a new position, based on the elapsed time
+      <samp>$TIME_INTERVAL_HRS</samp>.</p>
 
-      <p>There's a namelist that controls the verbosity of this process.</p>
+      <p>The new position is written out to the file at
+      <samp>$POS_FPATH</samp>, overwriting the previous content.</p>
+
+      <p>There's a namelist in a file <samp>report.nl</samp> that controls the
+      verbosity.</p>
     </div>
 
     <div class="slide">
@@ -142,13 +151,19 @@
 
     <div class="slide">
       <h3>What it needs to run</h3>
-      
-      <p>This means that when we run the compiled program, we'll need
-      all these inputs to be present.</p>
-      
-      <p>In this example, we'll run the compiled program as a proper Rose app. This means that environment variables can be set in the <samp>suite.rc</samp> or in a Rose app config. The <samp>report.nl</samp> namelist file should probably be generated via an app config (usually better than having a pre-existing file kicking around).</p>
-      
-      <p>The input/output file needs to be outside the app, stored in the suite directory somewhere.</p>
+
+      <p>This means that when we run the compiled program, we'll need all these
+      inputs to be present.</p>
+
+      <p>In this example, we'll run the compiled program as a proper Rose app.
+      This means that environment variables can be set in the
+      <samp>suite.rc</samp> or in our Rose app config. The
+      <samp>report.nl</samp> namelist file should probably be generated via the
+      app config (usually better than having a pre-existing file kicking
+      around).</p>
+
+      <p>The input/output file needs to be outside the app, stored in the suite
+      directory somewhere.</p>
     </div>
 
     <div class="slide">
@@ -264,8 +279,8 @@ mkdir app/navigate
         the latitude and longitude.</li>
       </ul>
 
-      <p>We've decided we'll setup the environment and the <samp>position</samp> file in
-      the suite, so ignore them for now.</p>
+      <p>We've decided we'll setup the environment and the
+      <samp>position</samp> file in the suite, so ignore them for now.</p>
     </div>
 
     <div class="slide">
@@ -289,7 +304,6 @@ source = namelist:report_nl
 [namelist:report_nl]
 l_verbose = .true.
 </pre>
-
     </div>
 
     <div class="slide">
@@ -297,7 +311,6 @@ l_verbose = .true.
 
       <p>To ensure that the file is stored in the normal format, issue the
       command:</p>
-
       <pre class="shell">
 rose config-dump
 </pre>
@@ -405,11 +418,12 @@ dead_reckoning.f90
     <div class="slide">
       <h3>What else do we need?</h3>
 
-      <p>We've told Rose how to run the build via the <samp>fcm_make_navigate</samp> app config,
-      and how to run the resultant executable via the <samp>navigate</samp> app config.</p>
+      <p>We've told Rose how to run the build via the
+      <samp>fcm_make_navigate</samp> app config, and how to run the resultant
+      executable via the <samp>navigate</samp> app config.</p>
 
-      <p>We now need to link them together and handle the rest of the inputs, via cylc.</li>
-      </ul>
+      <p>We now need to link them together and handle the rest of the inputs,
+      via cylc.</p>
     </div>
 
     <div class="slide">
@@ -651,8 +665,8 @@ touch suite.rc
 rose suite-run
 </pre>
 
-      <p>If everything has been setup successfully, <code>cylc gui</code>
-      will launch with your running suite.</p>
+      <p>If everything has been setup successfully, <code>cylc gui</code> will
+      launch with your running suite.</p>
 
       <p>You can look at the finished output by running:</p>
       <pre class="shell">
@@ -671,11 +685,13 @@ rose suite-log-view
     <div class="slide">
       <h2>Further Reading</h2>
 
-      <p>For examples of more advanced cylc suite functionality, see the <a href=
-      "rose-rug-advanced-tutorials.html#suites">Advanced Suite Tutorials</a>.</p>
+      <p>For examples of more advanced cylc suite functionality, see the
+      <a href="rose-rug-advanced-tutorials.html#suites">Advanced Suite
+      Tutorials</a>.</p>
 
       <p>For more information about suites, see the <a href=
-      "http://cylc.github.com/cylc/single/cug-html.html">cylc User Guide</a>.</p>
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc User
+      Guide</a>.</p>
     </div>
   </div>
 </body>
