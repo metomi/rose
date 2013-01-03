@@ -35,6 +35,9 @@
 #     the utility. If so, it will run the task using the task utility instead
 #     of as a Rose application.
 #
+#     More documentation on built-in task utilities can be found at Rose User
+#     Guide: Suite Tools > Task Utility Selection.
+#
 # OPTIONS
 #     All options of "rose app-run" and "rose task-env" are supported.
 #     Additional options are:
@@ -61,17 +64,6 @@
 #         Specify a named application configuration.
 #     ROSE_TASK_UTIL
 #         Specify a named task utility.
-#
-#     The following environment variables are used by the "fcm_make" and
-#     "fcm_make2" built-in task utilities:
-#
-#     ROSE_TASK_N_JOBS
-#         The number of jobs to run in parallel in `fcm make`. (default=4)
-#     ROSE_TASK_OPTIONS
-#         Additional options and arguments for `fcm make`. (default='')
-#     ROSE_TASK_PRE_SCRIPT
-#         Source (. invoke) the specified script before running the main
-#         command. (default='')
 #
 #     All environment variables documented in "rose task-env" are passed to the
 #     application "rose task-run" runs.
