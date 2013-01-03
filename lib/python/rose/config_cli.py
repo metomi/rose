@@ -26,6 +26,22 @@ import rose.macro
 import os
 import sys
 
+
+def get_meta_path(root_node, rel_path=None, meta_key=False):
+    if meta_key:
+        dir_path = None
+    elif rel_path:
+        dir_path = os.getcwd() + "/" + rel_path
+    else:
+        dir_path = os.getcwd()
+        
+    meta_dir = rose.macro.load_meta_path(config=root_node, directory=dir_path)[0]
+    if meta_dir is not None:
+        return meta_dir + "/rose-meta.conf"
+    else:
+        return None
+
+
 def main():
     """Implement the "rose config" command."""
     opt_parser = RoseOptionParser()
@@ -52,10 +68,8 @@ def main():
                 else:
                     if opts.meta:
                         rel_path = "/".join(file.split("/")[:-1])
-                        meta_dir = rose.macro.load_meta_path(config=root_node,
-                                     directory=os.getcwd() + "/" + rel_path)[0]
-                        if meta_dir is not None:
-                            fpath = meta_dir + "/rose-meta.conf"
+                        fpath = get_meta_path(root_node, rel_path)
+                        if fpath is not None:
                             ConfigLoader()(fpath, root_node)
                         else:
                             print "No metadata found for {0}".format(str(file))
@@ -66,10 +80,9 @@ def main():
                 root_node = ConfigNode()
                 if opts.meta_key:
                     root_node.set(["meta"], opts.meta_key)
-                meta_dir = rose.macro.load_meta_path(config=root_node,
-                          directory=[os.getcwd(),None][bool(opts.meta_key)])[0]
-                if meta_dir is not None:
-                    fpath = meta_dir + "/rose-meta.conf"
+                
+                fpath = get_meta_path(root_node, meta_key=opts.meta_key)    
+                if fpath is not None:
                     ConfigLoader()(fpath, root_node)
                 else:
                     print "No metadata found."
