@@ -115,23 +115,7 @@
       "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>,
       which (pretends to) calculate the new position of our ship.</p>
 
-      <p>Spend a bit of time looking at this file.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">dead_reckoning.f90</h3>
-
-      <p><samp>dead_reckoning.f90</samp> takes some initial position
-      information (a file at <samp>$POS_FPATH</samp>) and looks at the <a href=
-      "http://en.wikipedia.org/wiki/Chip_log">log</a> (speedometer) and compass
-      history of the ship to calculate a new position, based on the elapsed
-      time <samp>$TIME_INTERVAL_HRS</samp>.</p>
-
-      <p>The new position is written out to the file at
-      <samp>$POS_FPATH</samp>, overwriting the previous content.</p>
-
-      <p>The verbosity of <samp>dead_reckoning.f90</samp> is controlled via a
-      namelist in a file <samp>report.nl</samp>.</p>
+      <p>Have a look at this file.</p>
     </div>
 
     <div class="slide">
@@ -155,8 +139,8 @@
     <div class="slide">
       <h3>What it needs to run</h3>
 
-      <p>This means that when we run the compiled program, we'll need all these
-      inputs to be present.</p>
+      <p>When we run the compiled program, we'll need all these inputs to be
+      present.</p>
 
       <p>In this example, we'll run the compiled program as a proper Rose app.
       This means that environment variables can be set in the
@@ -377,6 +361,9 @@ steps = build
 build.source = $ROSE_SUITE_DIR/src/
 build.target{task} = link
 </pre>
+
+      <p>This is a minimal <code>fcm</code> configuration for building the
+      program.</p>
     </div>
 
     <div class="slide">
@@ -489,7 +476,8 @@ touch suite.rc
       <p>We know the following about our dependencies:</p>
 
       <ul class="incremental">
-        <li><samp>navigate</samp> should be run every 3 hours.</li>
+        <li><samp>navigate</samp> should be run every 3 hours, and it should
+        wait for the last instance to finish before it starts again.</li>
 
         <li><samp>fcm_make_navigate</samp> should be run once at the
         start.</li>
