@@ -36,10 +36,10 @@ def get_meta_path(root_node, rel_path=None, meta_key=False):
         dir_path = os.getcwd()
         
     meta_dir = rose.macro.load_meta_path(config=root_node, directory=dir_path)[0]
-    if meta_dir is not None:
-        return meta_dir + "/rose-meta.conf"
-    else:
+    if meta_dir is None:
         return None
+    else:
+        return meta_dir + "/rose-meta.conf"
 
 
 def main():
@@ -69,10 +69,10 @@ def main():
                     if opts.meta:
                         rel_path = "/".join(file.split("/")[:-1])
                         fpath = get_meta_path(root_node, rel_path)
-                        if fpath is not None:
-                            ConfigLoader()(fpath, root_node)
-                        else:
+                        if fpath is None:
                             print "No metadata found for {0}".format(str(file))
+                        else:
+                            ConfigLoader()(fpath, root_node)
                     else:
                         ConfigLoader()(file, root_node)
         else:
@@ -80,12 +80,12 @@ def main():
                 root_node = ConfigNode()
                 if opts.meta_key:
                     root_node.set(["meta"], opts.meta_key)
-                
-                fpath = get_meta_path(root_node, meta_key=opts.meta_key)    
-                if fpath is not None:
-                    ConfigLoader()(fpath, root_node)
-                else:
+                fpath = get_meta_path(root_node, meta_key=opts.meta_key)  
+                root_node.unset(["meta"])
+                if fpath is None:
                     sys.exit("No metadata found.")
+                else:
+                    ConfigLoader()(fpath, root_node)
             else:
                 root_node = ResourceLocator.default().get_conf()
             
