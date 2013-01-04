@@ -435,10 +435,21 @@ class SuiteRunner(Runner):
             opts.conf_dir = None
 
         # Automatic Rose constants
-        for k, v in {"ROSE_ORIG_HOST": socket.gethostname()}.items():
+        # ROSE_ORIG_HOST: originating host
+        # ROSE_VERSION: Rose version
+        # Suite engine version 
+        jinja2_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
+        rose_version = ResourceLocator.default().get_version()
+        # TODO: handle reload
+        suite_engine_key = self.suite_engine_proc.SCHEME.upper() + "_VERSION"
+        suite_engine_version = self.suite_engine_proc.get_version()
+        # TODO: handle reload
+        auto_items = {"ROSE_ORIG_HOST": socket.gethostname(),
+                      "ROSE_VERSION": ResourceLocator.default().get_version(),
+                      suite_engine_key: suite_engine_version}
+        for k, v in auto_items.items():
             config.set(["env", k], v)
-            config.set(["jinja2:" + self.suite_engine_proc.SUITE_CONF, k],
-                       '"' + v + '"')
+            config.set([jinja2_section, k], '"' + v + '"')
 
         suite_name = opts.name
         if not opts.name:
@@ -488,6 +499,17 @@ class SuiteRunner(Runner):
             self._run_init_dir_log(opts, suite_name, config)
         self.fs_util.makedirs("log/suite")
 
+        # Move temporary log to permanent log
+        if hasattr(self.event_handler, "contexts"):
+            log_file_path = os.path.abspath(
+                    os.path.join("log", "rose-suite-run.log"))
+            log_file = open(log_file_path, "ab")
+            temp_log_file = self.event_handler.contexts[uuid].handle
+            temp_log_file.seek(0)
+            log_file.write(temp_log_file.read())
+            self.event_handler.contexts[uuid].handle = log_file
+            temp_log_file.close()
+
         # Dump the actual configuration as rose-suite-run.conf
         rose.config.dump(config, "log/rose-suite-run.conf")
 
@@ -512,17 +534,6 @@ class SuiteRunner(Runner):
             finally:
                 os.chdir(cwd)
         f.close()
-
-        # Move temporary log to permanent log
-        if hasattr(self.event_handler, "contexts"):
-            log_file_path = os.path.abspath(
-                    os.path.join("log", "rose-suite-run.log"))
-            log_file = open(log_file_path, "ab")
-            temp_log_file = self.event_handler.contexts[uuid].handle
-            temp_log_file.seek(0)
-            log_file.write(temp_log_file.read())
-            self.event_handler.contexts[uuid].handle = log_file
-            temp_log_file.close()
 
         # Install share/work directories (local)
         for name in ["share", "work"]:
@@ -561,8 +572,8 @@ class SuiteRunner(Runner):
                     rose_bin = "%s/bin/rose" % (rose_home_node.value)
                     break
             # Build remote "rose suite-run" command
-            rose_sr = rose_bin + " suite-run -v -v"
-            rose_sr += " --name=" + suite_name
+            rose_sr = "ROSE_VERSION=%s %s" % (rose_version, rose_bin)
+            rose_sr += " suite-run -v -v --name=%s" % suite_name
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:

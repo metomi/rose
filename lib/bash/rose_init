@@ -33,17 +33,17 @@
 function rose_init() {
     set -eu
     ROSE_NS=$(basename $0)
-    export ROSE_NS
     ROSE_HOME_BIN=$(cd $(dirname $0) && pwd)
-    export ROSE_HOME_BIN
-    ROSE_HOME=${ROSE_HOME:-$(dirname $ROSE_HOME_BIN)}
-    export ROSE_HOME
-    if [[ -z ${ROSE_UTIL:-} ]]; then
-        ROSE_UTIL=$(basename $0)
-        ROSE_UTIL=${ROSE_UTIL#$ROSE_NS-}
+    ROSE_HOME_BIN=$(readlink -f $ROSE_HOME_BIN)
+    ROSE_HOME=$(dirname $ROSE_HOME_BIN)
+    eval $(grep 'ROSE_VERSION' doc/rose-version.js)
+    local DESC=
+    if DESC=$(cd $ROSE_HOME && git describe 2>/dev/null); then
+        ROSE_VERSION=$DESC
     fi
-    local LIB=$ROSE_HOME/lib/bash
+    export ROSE_HOME ROSE_HOME_BIN ROSE_NS ROSE_VERSION
 
+    local LIB=$ROSE_HOME/lib/bash
     if [[ -f $LIB/${FUNCNAME[0]}_site ]]; then
         . $LIB/${FUNCNAME[0]}_site
     fi

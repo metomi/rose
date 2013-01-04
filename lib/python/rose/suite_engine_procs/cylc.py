@@ -23,6 +23,7 @@ import ast
 import os
 import pwd
 import re
+import rose.config
 from rose.popen import RosePopenError
 from rose.suite_engine_proc \
         import SuiteEngineProcessor, SuiteScanResult, TaskProps
@@ -151,6 +152,11 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
+    def get_version(self):
+        """Return Cylc's version."""
+        out, err = self.popen("cylc", "--version")
+        return out.strip()
+
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
@@ -166,10 +172,18 @@ class CylcProcessor(SuiteEngineProcessor):
                 host = open(host_file).read().strip()
             except IOError:
                 host = "localhost"
-        fmt = r"nohup cylc gui --host=%s %s %s 1>>%s 2>&1 &"
+        conf_path = os.path.join(log_dir, "rose-suite-run.conf")
+        prefix = ""
+        if os.access(conf_path, os.F_OK | os.R_OK):
+            conf = rose.config.load(conf_path)
+            key = self.SCHEME.upper() + "_VERSION"
+            value = conf.get_value(["env", key])
+            if value:
+                prefix = "%s='%s' " % (key, value)
+        fmt = r"%snohup cylc gui --host=%s %s %s 1>>%s 2>&1 &"
         log = os.path.join(log_dir, "cylc-gui.log")
         args_str = self.popen.list_to_shell_str(args)
-        self.popen(fmt % (host, suite_name, args_str, log), shell=True)
+        self.popen(fmt % (prefix, host, suite_name, args_str, log), shell=True)
 
     def ping(self, suite_name, hosts=None):
         """Return a list of host names where suite_name is running."""

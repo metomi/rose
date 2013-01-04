@@ -364,6 +364,10 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
+    def get_version(self):
+        """Return the version string of the suite engine."""
+        raise NotImplementedError()
+
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
