@@ -70,9 +70,8 @@ def main():
                         rel_path = "/".join(fname.split("/")[:-1])
                         fpath = get_meta_path(root_node, rel_path)
                         if fpath is None:
-                            e = "No metadata found for {0}.\n".format(
-                                                               str(fname))
-                            sys.stderr.write(e)
+                            mask = "No metadata found for {0}.\n"
+                            sys.stderr.write(mask.format(str(fname)))
                         else:
                             ConfigLoader()(fpath, root_node)
                     else:
