@@ -32,6 +32,8 @@ Changes that have significant impact on user experience.
 
 Changes that are worth mentioning.
 
+\#313: rose config: added `--meta` and `--meta-key` options.
+
 \#299: rose task-run: the built-in `fcm_make(2)` task utilities can
 now be configured using Rose application configurations.
 * `fcm_make2*` task will automatically use `fcm_make*` task's application configuration.
