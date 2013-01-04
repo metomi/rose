@@ -4,7 +4,7 @@
 
 ### Highlight Changes
 
-Changes that has significant impact on user experience.
+Changes that have significant impact on user experience.
 
 \#244: Tutorial: Added S5 slide show enabled documentation chapters.
 * Improved brief tour of the system.
