@@ -23,25 +23,72 @@ from rose.config import ConfigDumper, ConfigLoader, ConfigNode
 from rose.env import env_var_process
 from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator
+import rose.macro
+import os
 import sys
+
+
+def get_meta_path(root_node, rel_path=None, meta_key=False):
+    if meta_key:
+        dir_path = None
+    elif rel_path:
+        dir_path = os.path.join(os.getcwd(), rel_path)
+    else:
+        dir_path = os.getcwd()
+        
+    meta_dir = rose.macro.load_meta_path(config=root_node, directory=dir_path)[0]
+    if meta_dir is None:
+        return None
+    else:
+        return os.path.join(meta_dir, "rose-meta.conf")
 
 def main():
     """Implement the "rose config" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options(
-            "default", "env_var_process_mode", "files", "keys", "no_ignore")
+    opt_parser.add_my_options("default", "env_var_process_mode", "files",
+                              "keys", "no_ignore", "meta", "meta_key")
     opts, args = opt_parser.parse_args()
+    rose.macro.add_site_meta_paths()
+    rose.macro.add_env_meta_paths()
+    
+    if opts.meta_key:
+        opts.meta = True
+    
+    if opts.files and opts.meta_key:
+        sys.exit("Cannot specify both a file and meta key.")
+        
     try:
         if opts.files:
             root_node = ConfigNode()
-            for file in opts.files:
-                if file == "-":
+            for fname in opts.files:
+                if fname == "-":
                     ConfigLoader()(sys.stdin, root_node)
                     sys.stdin.close()
                 else:
-                    ConfigLoader()(file, root_node)
+                    if opts.meta:
+                        rel_path = os.sep.join(fname.split(os.sep)[:-1])
+                        fpath = get_meta_path(root_node, rel_path)
+                        if fpath is None:
+                            mask = "No metadata found for {0}.\n"
+                            sys.exit(mask.format(str(fname)))
+                        else:
+                            ConfigLoader()(fpath, root_node)
+                    else:
+                        ConfigLoader()(fname, root_node)
         else:
-            root_node = ResourceLocator.default().get_conf()
+            if opts.meta:
+                root_node = ConfigNode()
+                if opts.meta_key:
+                    root_node.set(["meta"], opts.meta_key)
+                fpath = get_meta_path(root_node, meta_key=opts.meta_key)  
+                root_node.unset(["meta"])
+                if fpath is None:
+                    sys.exit("No metadata found.")
+                else:
+                    ConfigLoader()(fpath, root_node)
+            else:
+                root_node = ResourceLocator.default().get_conf()
+            
     except SyntaxError as e:
         sys.exit(repr(e))
     if opts.quietness:

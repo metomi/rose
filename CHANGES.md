@@ -4,7 +4,7 @@
 
 ### Highlight Changes
 
-Changes that has significant impact on user experience.
+Changes that have significant impact on user experience.
 
 \#244: Tutorial: Added S5 slide show enabled documentation chapters.
 * Improved brief tour of the system.
@@ -31,6 +31,8 @@ Changes that has significant impact on user experience.
 ### Other Changes
 
 Changes that are worth mentioning.
+
+\#313: rose config: added `--meta` and `--meta-key` options.
 
 \#299: rose task-run: the built-in `fcm_make(2)` task utilities can
 now be configured using Rose application configurations.

@@ -224,12 +224,21 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Send notification emails."}],
+               "meta": [
+                       ["--meta"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Operate on a config file's metadata."}],
+               "meta_key": [
+                       ["--meta-key"],
+                       {"metavar": "METAKEY",
+                        "help": "Specify a meta-key to search for."}],
                "meta_path": [
                        ["--meta-path", "-M"],
                        {"action": "append",
                         "metavar": "PATH",
                         "help": "Prepend items to the metadata search path."}],
-               "method_path" : [
+               "method_path": [
                        ["--method-path", "-p"],
                        {"action": "append",
                         "help": "Preprend items to the method search path."}],

@@ -48,6 +48,13 @@
 #     # Combine the configurations in FILE1 and FILE2, and dump the result.
 #     rose config --file=FILE1 --file=FILE2
 #
+#     # Print the value of OPTION in SECTION of the metadata associated with 
+#     # the specified config FILE
+#     rose config --file=FILE --meta SECTION OPTION
+#
+#     # Print the value of a specified metadata FLAG
+#     rose config --meta-key=FLAG
+#
 # DESCRIPTION
 #     Parse a set of rose configuration files.
 #
@@ -70,6 +77,12 @@
 #     --keys, -k
 #         If specified, only print the SECTION keys in the configuration file or
 #         the OPTION keys in a SECTION.
+#     --meta
+#         If specified, operate on the metadata associated with the 
+#         configuration FILE.
+#     --meta-key
+#         If specified, prints the value of a specified metadata flag.
+#         Cannot be used in conjunction with --file.
 #     --print-ignored, -i
 #         If specified, the program will print ignored !OPTION=VALUE where
 #         relevant.
