@@ -61,20 +61,22 @@ def main():
     try:
         if opts.files:
             root_node = ConfigNode()
-            for file in opts.files:
-                if file == "-":
+            for fname in opts.files:
+                if fname == "-":
                     ConfigLoader()(sys.stdin, root_node)
                     sys.stdin.close()
                 else:
                     if opts.meta:
-                        rel_path = "/".join(file.split("/")[:-1])
+                        rel_path = "/".join(fname.split("/")[:-1])
                         fpath = get_meta_path(root_node, rel_path)
                         if fpath is None:
-                            print "No metadata found for {0}".format(str(file))
+                            e = "No metadata found for {0}.\n".format(
+                                                               str(fname))
+                            sys.stderr.write(e)
                         else:
                             ConfigLoader()(fpath, root_node)
                     else:
-                        ConfigLoader()(file, root_node)
+                        ConfigLoader()(fname, root_node)
         else:
             if opts.meta:
                 root_node = ConfigNode()
