@@ -81,7 +81,9 @@
     <div class="slide">
       <h2 id="example">Example</h2>
 
-      <p>Our example suite will control a minor airport, with</p>
+      <p>Our example suite will control a minor airport</p>
+
+      <img class="r-floater" src="http://upload.wikimedia.org/wikipedia/commons/d/dc/Bora_Bora_Airport_AR_72.jpg" width="30%" alt="Bora-Bora Airport, French Polynesia (wikipedia)"/>   
 
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
       new directory) containing a blank <samp>rose-suite.conf</samp> and a
@@ -97,9 +99,6 @@
 
       <p>You can see we already have runtime information for two tasks,
       <samp>wait_return</samp> and <samp>assign_gate</samp>.
-      <samp>wait_return</samp> uses <code>cylc task message</code> to
-      communicate back to cylc, which can be seen in a <code>cylc gui</code>
-      view for easy human monitoring.</p>
     </div>
 
     <div class="slide">
@@ -122,10 +121,10 @@
 
       <p>The gate for boarding the flight is the same as the last flight's
       arrival gate (the aircraft doesn't move). We'd like to tell passengers
-      which gate to board at.</p>
+      which gate to board at in the <samp>boarding</samp> task.</p>
 
-      <p>This means we have to read the <samp>flight_gates</samp> file from the
-      last cycle's data directory.</p>
+      <p>This means that this task has to read the <samp>flight_gates</samp>
+      file from the last cycle's data directory.</p>
     </div>
 
     <div class="slide">
@@ -135,7 +134,7 @@
       directory, if we ask for it.</p>
 
       <p>We need to use the same <samp>environment scripting</samp> option, but
-      with a <samp>--cycle-offset=12h</samp> option - add this to your runtime
+      with a <samp>--cycle-offset=12H</samp> option - add this to your runtime
       section:</p>
       <pre>
     [[boarding]]
@@ -158,6 +157,7 @@
             sleep 5
         """
 </pre>
+      <p>This will report the correct gate.</p>
     </div>
 
     <div class="slide">
