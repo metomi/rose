@@ -41,15 +41,18 @@
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
+
     <div id="currentSlide">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
+
     <div id="controls">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
 
     <div class="header-footer" id="footer"></div>
@@ -94,17 +97,29 @@
     </div>
 
     <div class="slide">
-      <h3>Example program</h3>
+      <h3>Starting Out</h3>
+
+      <p>We need to analyse our program to figure out:</p>
+
+      <ul>
+        <li>what it needs to run</li>
+
+        <li>when it needs to run</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">dead_reckoning.f90</h3>
 
       <p>Our Fortran program is <a href=
       "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>,
       which (pretends to) calculate the new position of our ship.</p>
 
-      <p>Spend a bit of time looking at this file.</p>
+      <p>Have a look at this file.</p>
     </div>
 
     <div class="slide">
-      <h3>Analysing the example program</h3>
+      <h3>Analysing the program</h3>
 
       <p>The inputs to <samp>dead_reckoning.f90</samp> are:</p>
 
@@ -122,7 +137,23 @@
     </div>
 
     <div class="slide">
-      <h3>Example dependencies</h3>
+      <h3>What it needs to run</h3>
+
+      <p>When we run the compiled program, we'll need all these inputs to be
+      present.</p>
+
+      <p>In this example, we'll run the compiled program as a proper Rose app.
+      This means that environment variables can be set in the
+      <samp>suite.rc</samp> or in our Rose app config. The
+      <samp>report.nl</samp> namelist file should be generated via the app
+      config.</p>
+
+      <p>The input/output file needs to be outside the app, stored in the suite
+      directory somewhere.</p>
+    </div>
+
+    <div class="slide">
+      <h3>When it needs to run</h3>
 
       <p>We want to run this program every 3 hours, on the hour - so there is a
       repeated dependency on the time or <code>cycle</code>.</p>
@@ -153,7 +184,7 @@
 
       <p>In the new suite working copy, we see two files:</p>
 
-      <ul class="incremental">
+      <ul>
         <li><samp>rose-suite.conf</samp> (empty)</li>
 
         <li><samp>rose-suite.info</samp> (information that we just filled
@@ -233,9 +264,13 @@ mkdir app/navigate
         <li>An input (and output) file called <samp>position</samp> that stores
         the latitude and longitude.</li>
       </ul>
+    </div>
 
-      <p>We will setup the environment and the <samp>position</samp> file in
-      the suite, so ignore them for now.</p>
+    <div class="slide">
+      <h3 class="alwayshidden">Add app configuration (continued)</h3>
+
+      <p>We've decided we'll setup the environment and the
+      <samp>position</samp> file in the suite, so ignore them for now.</p>
     </div>
 
     <div class="slide">
@@ -262,6 +297,13 @@ l_verbose = .true.
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Add app configuration (explained)</h3>
+
+      <p>When the app is run, this will create our <samp>report.nl</samp> file
+      with the namelist inside, and invoke <samp>dead_reckoning.exe</samp>.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Tidy app configuration (contents)</h3>
 
       <p>To ensure that the file is stored in the normal format, issue the
@@ -269,6 +311,8 @@ l_verbose = .true.
       <pre class="shell">
 rose config-dump
 </pre>
+      <p>This prettifies the format by handling whitespace and sorting in a
+      consistent way.</p>
     </div>
 
     <div class="slide">
@@ -317,6 +361,9 @@ steps = build
 build.source = $ROSE_SUITE_DIR/src/
 build.target{task} = link
 </pre>
+
+      <p>This is a minimal <code>fcm</code> configuration for building the
+      program.</p>
     </div>
 
     <div class="slide">
@@ -373,11 +420,12 @@ dead_reckoning.f90
     <div class="slide">
       <h3>What else do we need?</h3>
 
-      <p>We've told Rose how to run each application.</p>
+      <p>We've told Rose how to run the build via the
+      <samp>fcm_make_navigate</samp> app config, and how to run the resultant
+      executable via the <samp>navigate</samp> app config.</p>
 
-      <ul class="incremental">
-        <li>We haven't told cylc how to run anything.</li>
-      </ul>
+      <p>We now need to link them together and handle the rest of the inputs,
+      via cylc.</p>
     </div>
 
     <div class="slide">
@@ -428,7 +476,8 @@ touch suite.rc
       <p>We know the following about our dependencies:</p>
 
       <ul class="incremental">
-        <li><samp>navigate</samp> should be run every 3 hours.</li>
+        <li><samp>navigate</samp> should be run every 3 hours, and it should
+        wait for the last instance to finish before it starts again.</li>
 
         <li><samp>fcm_make_navigate</samp> should be run once at the
         start.</li>
@@ -484,6 +533,17 @@ touch suite.rc
         <li>We've configured the dependency between
         <samp>fcm_make_navigate</samp> and <samp>navigate</samp>.</li>
       </ul>
+    </div>
+
+    <div class="slide">
+      <h3>clock triggering</h3>
+
+      <p>If we were writing a real suite, we'd use the
+      <samp>clock-triggered</samp> <samp>special tasks</samp> setting in cylc
+      to make <samp>navigate</samp> trigger off the system wallclock time, and
+      adjust the start/end dates to be more current. However, this doesn't
+      matter for our example - and we don't want to wait 2 days for the suite
+      to finish!</p>
     </div>
 
     <div class="slide">
@@ -570,8 +630,8 @@ touch suite.rc
             """
 </pre>
 
-      <p>This writes to the location we've set for <samp>navigate</samp> in
-      <var>POS_FPATH</var>, and sets our start coordinates to latitude
+      <p>This initialises our location for the <samp>navigate</samp> app via a
+      file (pointed to via <samp>$POS_FPATH</samp>). Our start coordinates are
       <samp>50.0</samp> north, <samp>3.0</samp> west. You can change these to
       another location if you like.</p>
     </div>
