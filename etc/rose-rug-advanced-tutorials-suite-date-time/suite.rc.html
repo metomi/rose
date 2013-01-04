@@ -38,7 +38,7 @@
         environment scripting = "eval $(rose task-env)"
         command scripting = """
              GATE="A"$((RANDOM%3))
-             echo "flight gate: $GATE" &gt; $ROSE_DATAC/flight_gate
+             echo "GATE=$GATE" &gt; $ROSE_DATAC/flight_gate
              cylc task message "Cleared to land, go to Gate $GATE"
              sleep 5
         """

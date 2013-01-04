@@ -153,7 +153,7 @@
       - add:</p>
       <pre>
         command scripting = """
-            GATE=$(sed "s/^.*: //" $ROSE_DATACT12H/flight_gate)
+            . $ROSE_DATACT12H/flight_gate
             cylc task message "Now boarding at Gate $GATE"
             sleep 5
         """
@@ -181,7 +181,7 @@
       block with:</p>
       <pre>
         command scripting = """
-            GATE=$(sed "s/^.*: //" $ROSE_DATACT12H/flight_gate)
+            . $ROSE_DATACT12H/flight_gate
             FLIGHT_TIME=$(rose date --print-format="%H:%M" $CYLC_TASK_CYCLE_TIME)
             cylc task message "Flight $FLIGHT_TIME now boarding at Gate $GATE"
             sleep 5
