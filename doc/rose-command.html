@@ -76,12 +76,12 @@
 
       <dt><a href="#rose-date">rose date</a></dt>
 
-      <dd>(=config-edit)</dd>
+      <dd>Display the current or the specified DATE-TIME with an optional
+      offset.</dd>
 
       <dt><a href="#rose-edit">rose edit</a></dt>
 
-      <dd>Display the current or the specified DATE-TIME with an optional
-      offset.</dd>
+      <dd>(=config-edit)</dd>
 
       <dt><a href="#rose-host-select">rose host-select</a></dt>
 
@@ -400,6 +400,15 @@
 
       <dd>Combine the configurations in <var>FILE1</var> and <var>FILE2</var>,
       and dump the result.</dd>
+      
+      <dt><kbd>rose config --file=FILE --meta SECTION OPTION</kbd></dt>
+      
+      <dd>Print the value of <var>OPTION</var> in <var>SECTION</var> of the 
+      metadata associated with the specified config <var>FILE</var>.</dd>
+      
+      <dt><kbd>rose config --meta-key=FLAG</kbd></dt>
+      
+      <dd>Print the value of a specified metadata <var>FLAG<var>.</dd>
     </dl>
 
     <h3>DESCRIPTION</h3>
@@ -434,6 +443,16 @@
       <dd>If specified, only print the <var>SECTION</var> keys in the
       configuration file or the <var>OPTION</var> keys in a
       <var>SECTION</var>.</dd>
+
+      <dt><kbd>--meta</kbd></dt>
+      
+      <dd>If specified, operate on the metadata associated with the 
+      configuration <var>FILE</var>.</dd>
+
+     <dt><kbd>--meta-key</kbd></dt>
+
+     <dd>If specified, prints the value of a specified metadata flag.
+     Cannot be used in conjunction with <kbd>--file</kbd>.</dd>
 
       <dt><kbd>--print-ignored, -i</kbd></dt>
 
@@ -1377,7 +1396,7 @@
       <dd>E.g. <var>ROSE_DATAC1D</var> and <var>ROSE_DATACT24H</var> are both
       the data directory of 1 day before the current cycle time.</dd>
 
-      <dt><var>ROSE_ENV</var></dt>
+      <dt><var>ROSE_ETC</var></dt>
       
       <dd>The path to the etc directory of the running suite.</dd>
 
@@ -1453,6 +1472,10 @@
     see if it is compatible with the utility. If so, it will run the task using
     the task utility instead of as a Rose application.</p>
 
+    <p>More documentation on built-in task utilities can be found at
+    <a href="rose-rug-suite-tools.html#rose-task-run.util">Rose User Guide:
+    Suite Tools &gt; Task Utility Selection</a>.</p>
+
     <h3>OPTIONS</h3>
 
     <p>All options of <kbd>rose app-run</kbd> and <kbd>rose task-env</kbd>
@@ -1499,26 +1522,6 @@
       <dt><var>ROSE_TASK_UTIL</var></dt>
 
       <dd>Specify a named task utility.</dd>
-    </dl>
-
-    <p>The following environment variables are used by the <kbd>fcm_make</kbd>
-    and <kbd>fcm_make2</kbd> built-in task utilities:</p>
-
-    <dl>
-      <dt><var>ROSE_TASK_N_JOBS</var></dt>
-
-      <dd>The number of jobs to run in parallel in <kbd>fcm make</kbd>.
-      (default=4)</dd>
-
-      <dt><var>ROSE_TASK_OPTIONS</var></dt>
-
-      <dd>Additional options and arguments for <kbd>fcm make</kbd>. 
-      (default='')</dd>
-
-      <dt><var>ROSE_TASK_PRE_SCRIPT</var></dt>
-
-      <dd>Source (<var>. invoke</var>) the specified script before running the
-      main command. (default='')</dd>
     </dl>
 
     <p>All environment variables documented in <kbd>rose task-env</kbd> are

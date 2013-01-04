@@ -689,6 +689,27 @@ rose suite-log-view
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Visualising the data</h3>
+
+      <p>If you want a quick and easy way of visualising the output, try
+      replacing the line:</p>
+      <pre>
+  PRINT*, "New position, me hearties:",new_lat," ",new_long  
+</pre>
+
+      <p>in <samp>dead_reckoning.f90</samp> with</p>
+      <pre>
+  lat = (180.0/pi) * lat
+  long = (180.0/pi) * long
+  WRITE(*,'(A, F7.4, A, F7.4, A, F7.4, A, F7.4, A)') &amp;
+        "&lt;a href='http://maps.google.com/maps?q=",lat,"+",long,&amp;
+        "+to+",new_lat,"+",new_long,"'&gt;Ye chart!&lt;/a&gt;"
+</pre>
+
+      <p>You'll now get a useful link in your navigate task output.</p>
+    </div>
+
+    <div class="slide">
       <h2>Next steps</h2>
 
       <p>You may want to experiment with adding metadata to your

@@ -4,9 +4,14 @@
 
 ### Highlight Changes
 
-Changes that has significant impact on user experience.
+Changes that have significant impact on user experience.
 
 \#244: Tutorial: Added S5 slide show enabled documentation chapters.
+* Improved brief tour of the system.
+* Metadata tutorial.
+* Suite writing tutorial.
+* In depth topics.
+* Advanced tutorials.
 
 \#165, #243: rose suite-run: run modes and new log directory mechanism:
 * Log directories no longer rotated.
@@ -26,6 +31,16 @@ Changes that has significant impact on user experience.
 ### Other Changes
 
 Changes that are worth mentioning.
+
+\#299: rose task-run: the built-in `fcm_make(2)` task utilities can
+now be configured using Rose application configurations.
+* `fcm_make2*` task will automatically use `fcm_make*` task's application configuration.
+* Support no directory change via the `use-pwd` option.
+* Introduce `ROSE_TASK_MIRROR_TARGET`. Deprecate `MIRROR_TARGET`.
+* Remove support for `ROSE_TASK_PRE_SCRIPT` - ask users to move to suite's pre command scripting.
+
+\#298: rose suite-run: fix failure if `svn` not installed.
+Also support generating version files for suites in a `git` repository.
 
 \#285: rose suite-run: simplify `ssh` commands with `bash --login`.
 

@@ -11,74 +11,89 @@
 <body>
   <div id="body-main">
     <pre>
-program extract_compass_log
-implicit none
-character(31):: dt_hr_env
-character(255) :: pos_fpath
-double precision::heading, speed_kn=5.0, dt_hr
-real::random_no, rand
-double precision:: ang_distance, lat, long, new_lat, new_long
-double precision, parameter:: pi=3.141592654, radius_earth_nm=3443.89
-integer:: code, clock
-logical::l_verbose=.false.
-namelist /report_nl/ l_verbose
+PROGRAM extract_compass_log
+IMPLICIT NONE
+CHARACTER(31)    :: dt_hr_env    ! No. of hours, from environment
+CHARACTER(255)   :: pos_fpath    ! File path to a position file with lat/long
+INTEGER:: code             ! iostat code
+INTEGER:: timevalues(8)    ! time values
+INTEGER, PARAMETER :: real64=SELECTED_REAL_KIND(15, 307)
+LOGICAL::l_verbose=.false. ! Verbosity setting in namelist
+REAL(KIND=real64) :: ang_distance ! Angular distance travelled across Earth
+REAL(KIND=real64) :: dt_hr        ! No. of hours elapsed, from dt_hr_env
+REAL(KIND=real64) :: heading      ! Compass heading in radians
+REAL(KIND=real64) :: lat          ! Initial latitude
+REAL(KIND=real64) :: long         ! Initial longitude
+REAL(KIND=real64) :: new_lat      ! Final latitude
+REAL(KIND=real64) :: new_long     ! Final longitude
+REAL(KIND=real64) :: speed_kn=5.0 ! Speed in knots
+REAL(KIND=real64), PARAMETER :: pi=3.141592654          ! pi
+REAL(KIND=real64), PARAMETER :: radius_earth_nm=3443.89 ! Earth radius (nm)
 
+NAMELIST /report_nl/ l_verbose
 
-call get_environment_variable("POS_FPATH", value=pos_fpath, status=code)
-if (code /= 0) then
-    write(0, *) "$POS_FPATH: not set."
-    stop 1
-end if
+! Get position file location via $POS_FPATH
+CALL get_environment_variable("POS_FPATH",value=pos_fpath,status=code)
+IF (code /= 0) THEN
+  WRITE(0,*) "$POS_FPATH: not set."
+  STOP 1
+END IF
 
-open(1, file=pos_fpath, action="read", iostat=code)
-if (code /= 0) then
-    write(0, *), pos_fpath, ": position file read failed."
-    stop 1
-end if
-read(1, *) lat, long
-close(1)
+! Read in starting latitude and longitude
+OPEN(1,file=pos_fpath,action="read",iostat=code)
+IF (code /= 0) THEN
+  WRITE(0,*) pos_fpath,": position file read failed."
+  STOP 1
+END IF
+READ(1,*) lat,long
+CLOSE(1)
 
-lat = (pi/180.0)*lat
-long = (pi/180.0)*long
+! Convert to radians, where they belong
+lat = (pi/180.0) * lat
+long = (pi/180.0) * long
 
-open(1, file="report.nl", action='read', status='old', iostat=code)
-if (code == 0) then
-    read(1, nml=report_nl)
-    close(1)
-end if
+! Read in our report_nl namelist
+OPEN(1,file="report.nl",action='read',status='old',iostat=code)
+IF (code == 0) THEN
+  READ(1,nml=report_nl)
+  CLOSE(1)
+END IF
 
-call get_environment_variable("TIME_INTERVAL_HRS", value=dt_hr_env, status=code)
-if (code /= 0) then
-    write(0, *) "$TIME_INTERVAL_HRS: not set"
-    stop 1
-end if
-read(dt_hr_env, *) dt_hr
+! Read in our time interval input
+CALL get_environment_variable("TIME_INTERVAL_HRS",value=dt_hr_env,status=code)
+IF (code /= 0) THEN
+  WRITE(0,*) "$TIME_INTERVAL_HRS: not set"
+  STOP 1
+END IF
+READ(dt_hr_env,*) dt_hr
 
-!Pretend to extract an average heading from the ship's compass
-call system_clock(count=clock)
-random_no = rand(clock)
-heading = random_no*2*pi
+! Pretend to extract an average heading from the ship's compass
+CALL date_and_time(VALUES=timevalues)
+heading = mod(1000 * timevalues(7) + timevalues(8), 60) * 2 * pi / 60
 
 ! This is how far we went, in radians:
 ! (1 knot = 1 nautical mile / 1 hour)
-ang_distance = (speed_kn*dt_hr)/radius_earth_nm
+ang_distance = (speed_kn*dt_hr) / radius_earth_nm
 
-new_lat = asin(sin(lat)*cos(ang_distance) + &amp;
-               cos(lat)*sin(ang_distance)*cos(heading))
+! Get the new latitude and longitude
+new_lat = ASIN(SIN(lat) * COS(ang_distance) + &amp;
+               COS(lat) * SIN(ang_distance) * COS(heading))
 new_long = long + &amp;
-           atan2(sin(heading)*sin(ang_distance)*cos(lat), &amp;
-                 cos(ang_distance)-sin(lat)*sin(new_lat))
-new_lat = (180.0/pi)*new_lat
-new_long = (180.0/pi)*new_long
+           ATAN2(SIN(heading) * SIN(ang_distance) * COS(lat), &amp;
+                 COS(ang_distance) - SIN(lat) * SIN(new_lat))
+new_lat = (180.0/pi) * new_lat
+new_long = (180.0/pi) * new_long
 
-if (l_verbose) then
-    print*, "New position, me hearties:", new_lat, new_long
-end if
+! Write to standard out, if high verbosity is switched on
+IF (l_verbose) THEN
+  PRINT*, "New position, me hearties:",new_lat," ",new_long
+END IF
 
-open(1, file=pos_fpath, action='write')
-write(1, *) new_lat, new_long
-close(1)
-end program
+! Overwrite position file with new lat and long
+OPEN(1,file=pos_fpath,action='write')
+WRITE(1,*) new_lat,new_long
+CLOSE(1)
+END PROGRAM
 </pre>
   </div>
 </body>
