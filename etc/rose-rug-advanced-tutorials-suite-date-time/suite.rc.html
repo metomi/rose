@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose User Guide - Suite Writing Tutorial suite.rc</title>
+  <title>Rose User Guide - Advanced Tutorials: Suite Date/Time Manipulation suite.rc</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
@@ -24,9 +24,9 @@
     [[dependencies]]
         [[[8, 20]]]
             graph = """
-                startup | arrival[T-12] => boarding
-                boarding => departure => wait_return
-                wait_return => assign_gate => arrival
+                startup | arrival[T-12] =&gt; boarding
+                boarding =&gt; departure =&gt; wait_return
+                wait_return =&gt; assign_gate =&gt; arrival
             """
 [runtime]
     [[root]]
@@ -38,7 +38,7 @@
         environment scripting = "eval $(rose task-env)"
         command scripting = """
              GATE="A"$((RANDOM%3))
-             echo "flight gate: $GATE" > $ROSE_DATAC/flight_gate
+             echo "flight gate: $GATE" &gt; $ROSE_DATAC/flight_gate
              cylc task message "Cleared to land, go to Gate $GATE"
              sleep 5
         """

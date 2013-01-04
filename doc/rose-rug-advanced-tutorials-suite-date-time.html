@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Advanced Tutorial: rose date</title>
+  <title>Rose Advanced Tutorial: Suite Date/Time Manipulation</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -60,7 +60,7 @@
 
   <div id="body-main" class="presentation">
     <div class="slide">
-      <h1>Rose Advanced Tutorial: rose date</h1>
+      <h1>Rose Advanced Tutorial: Suite Date/Time Manipulation</h1>
     </div>
 
     <div class="handout" id="content"></div>
@@ -68,23 +68,25 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This part of the Rose user guide walks you through manipulating date/time
-      information within a suite using utilities such as <code>rose date</code> and
-      environment variables like <samp>$ROSE_DATAC</samp>.</p>
+      <p>This part of the Rose user guide walks you through manipulating
+      date/time information within a suite using utilities such as <code>rose
+      date</code> and environment variables like <samp>$ROSE_DATAC</samp>.</p>
 
-      <p>This allows you to specify offsets in time from the current cycle time of
-      a task - for example, retrieving data from a previous cycle, 12 hours ago. You can also
-      translate times into different formats for use in your tasks.</p>
+      <p>This allows you to specify offsets in time from the current cycle time
+      of a task - for example, retrieving data from a previous cycle, 12 hours
+      ago. You can also translate times into different formats for use in your
+      tasks.</p>
     </div>
 
     <div class="slide">
       <h2 id="example">Example</h2>
 
-      <p>Our example suite will control a minor airport, with </p>
+      <p>Our example suite will control a minor airport, with</p>
 
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
       new directory) containing a blank <samp>rose-suite.conf</samp> and a
-      <samp>suite.rc</samp> file that looks like <a href="../etc/rose-rug-advanced-tutorials-rose-date/suite.rc.html">this</a>.</p>
+      <samp>suite.rc</samp> file that looks like <a href=
+      "../etc/rose-rug-advanced-tutorials-suite-date-time/suite.rc.html">this</a>.</p>
     </div>
 
     <div class="slide">
@@ -92,55 +94,63 @@
 
       <p>This is a skeleton suite that handles the departure and arrival of a
       single aircraft, twice a day.</p>
-      
-      <p>You can see we already have runtime information for two tasks,
-      <samp>wait_return</samp> and <samp>assign_gate</samp>. <samp>wait_return</samp>
-      uses <code>cylc task message</code> to communicate back to cylc, which
-      can be seen in a <code>cylc gui</code> view for easy human monitoring.</p>
-   </div>
 
-   <div class="slide">
+      <p>You can see we already have runtime information for two tasks,
+      <samp>wait_return</samp> and <samp>assign_gate</samp>.
+      <samp>wait_return</samp> uses <code>cylc task message</code> to
+      communicate back to cylc, which can be seen in a <code>cylc gui</code>
+      view for easy human monitoring.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Runtime</h3>
 
-      <p><samp>wait_return</samp> is a fancy 'sleep' task that
-      uses <code>cylc task message</code> to communicate back to cylc, which
-      can be seen in a <code>cylc gui</code> view for easy human monitoring.</p>
-      
-      <p><samp>assign_gate</samp> gets a random gate number and writes it
-      to a file (<samp>flight_gates</samp>). It uses the Rose environment variable
-      <samp>ROSE_DATAC</samp> provided by <code>rose task-env</code> in the <samp>environment scripting</samp>
-      runtime section. This points to a data directory for this particular cycle time, where the file will be written.</p>
-   </div>
-   
-   <div class="slide">
+      <p><samp>wait_return</samp> is a fancy 'sleep' task that uses <code>cylc
+      task message</code> to communicate back to cylc, which can be seen in a
+      <code>cylc gui</code> view for easy human monitoring.</p>
+
+      <p><samp>assign_gate</samp> gets a random gate number and writes it to a
+      file (<samp>flight_gates</samp>). It uses the Rose environment variable
+      <samp>ROSE_DATAC</samp> provided by <code>rose task-env</code> in the
+      <samp>environment scripting</samp> runtime section. This points to a data
+      directory for this particular cycle time, where the file will be
+      written.</p>
+    </div>
+
+    <div class="slide">
       <h3>Boarding</h3>
 
-      <p>The gate for boarding the flight is the same as the last flight's arrival gate (the aircraft doesn't move).
-      We'd like to tell passengers which gate to board at.</p>
-  
-      <p>This means we have to read the <samp>flight_gates</samp> file from the last cycle's data directory.</p>
-   </div>
-   
-   <div class="slide">
+      <p>The gate for boarding the flight is the same as the last flight's
+      arrival gate (the aircraft doesn't move). We'd like to tell passengers
+      which gate to board at.</p>
+
+      <p>This means we have to read the <samp>flight_gates</samp> file from the
+      last cycle's data directory.</p>
+    </div>
+
+    <div class="slide">
       <h3>rose task-env --cycle-offset</h3>
-      
-      <p>Rose will give us the environment variable for the last cycle's data directory, if we ask for it.</p>
-      
-      <p>We need to use the same <samp>environment scripting</samp> option, but with a
-      <samp>--cycle-offset=12h</samp> option - add this to your runtime section:</p>
+
+      <p>Rose will give us the environment variable for the last cycle's data
+      directory, if we ask for it.</p>
+
+      <p>We need to use the same <samp>environment scripting</samp> option, but
+      with a <samp>--cycle-offset=12h</samp> option - add this to your runtime
+      section:</p>
       <pre>
     [[boarding]]
         environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
 </pre>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">ROSE_DATAC???</h3>
-      
-      <p>The extra environment variable that this puts out
-      will be called <samp>$ROSE_DATACT12H</samp>.</p>
-      
-      <p>We can now refer to this in boarding's <samp>command scripting</samp> - add:</p>
+
+      <p>The extra environment variable that this puts out will be called
+      <samp>$ROSE_DATACT12H</samp>.</p>
+
+      <p>We can now refer to this in boarding's <samp>command scripting</samp>
+      - add:</p>
       <pre>
         command scripting = """
             GATE=$(sed "s/^.*: //" $ROSE_DATACT12H/flight_gate)
@@ -153,17 +163,20 @@
     <div class="slide">
       <h3>rose date</h3>
 
-      <p>We can also process the cylc environment variable <samp>$CYLC_TASK_CYCLE_TIME</samp>
-      in our tasks, using the date manipulation utility <a href="rose-command.html#rose-date">rose date</a>.</p>
-      
-      <p>This takes date strings and transmutes them into different formats and/or with
-      offsets in time.</p>
+      <p>We can also process the cylc environment variable
+      <samp>$CYLC_TASK_CYCLE_TIME</samp> in our tasks, using the date
+      manipulation utility <a href="rose-command.html#rose-date">rose
+      date</a>.</p>
+
+      <p>This takes date strings and transmutes them into different formats
+      and/or with offsets in time.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Using rose date</h3>
 
-      <p>Replace the boarding <samp>command scripting</samp> triple-quoted block with:</p>
+      <p>Replace the boarding <samp>command scripting</samp> triple-quoted
+      block with:</p>
       <pre>
         command scripting = """
             GATE=$(sed "s/^.*: //" $ROSE_DATACT12H/flight_gate)
@@ -175,21 +188,22 @@
         """
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Using rose date: explanation</h3>
-      
-      <p>We've used the <samp>--print-format</samp> option to <code>rose date</code>
-      to change the format of the date and time into something simple.</p>
 
-      <p>The suite won't run correctly until we setup our cold start task properly - 
-      add the following to your runtime section:</p>
+      <p>We've used the <samp>--print-format</samp> option to <code>rose
+      date</code> to change the format of the date and time into something
+      simple.</p>
+
+      <p>The suite won't run correctly until we setup our cold start task
+      properly - add the following to your runtime section:</p>
       <pre>
     [[startup]]
         environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
         command scripting = """
             GATE="A"$((RANDOM%3))
-            echo "flight gate: $GATE" > $ROSE_DATACT12H/flight_gate
+            echo "flight gate: $GATE" &gt; $ROSE_DATACT12H/flight_gate
             cylc task message "Starting gate: $GATE"
             sleep 5
          """
@@ -197,22 +211,23 @@
     </div>
 
     <div class="slide">
-      <h3 id="running-no-retries">Running the suite</h2>
+      <h3 id="running-no-retries">Running the suite</h3>
 
       <p>Try running the suite. It should run correctly over the cycle times,
-      and if you have the correct <code>cylc gui</code> view open, you'll see the cylc task messages
-      appear.</p>
-
+      and if you have the correct <code>cylc gui</code> view open, you'll see
+      the cylc task messages appear.</p>
     </div>
 
     <div class="slide">
       <h3>rose date --offset</h3>
 
-      <p><code>rose date</code> can be used to add or remove increments of time,
-      as well as change the output format.</p>
-      
-      <p>If you add the following lines to your runtime section, you can see how
-      you can use different offset units (days, hours) and quite complicated <a href="http://docs.python.org/library/time.html#time.strftime">formats</a>:</p>
+      <p><code>rose date</code> can be used to add or remove increments of
+      time, as well as change the output format.</p>
+
+      <p>If you add the following lines to your runtime section, you can see
+      how you can use different offset units (days, hours) and quite
+      complicated <a href=
+      "http://docs.python.org/library/time.html#time.strftime">formats</a>:</p>
     </div>
 
     <div class="slide">
@@ -226,21 +241,26 @@
             echo "Since we're crossing the International Date Line, our ETA is $ETA."
         """
 </pre>
-      <p>Try running the suite again and looking at the departure output using <code>rose suite-log-view</code>.</p>
+
+      <p>Try running the suite again and looking at the departure output using
+      <code>rose suite-log-view</code>.</p>
     </div>
 
     <div class="slide">
       <h2>Further Reading</h2>
 
       <p>For more information, see:</p>
-      
+
       <ul>
         <li><a href="rose-variables.html#ROSE_DATAC">ROSE_DATAC</a></li>
-        <li><a href="rose-variables.html#ROSE_DATAC_TIME">ROSE_DATAC???</a></li>
+
+        <li><a href=
+        "rose-variables.html#ROSE_DATAC_TIME">ROSE_DATAC???</a></li>
+
         <li><a href="rose-command.html#rose-date">rose date</a></li>
-        <li> the <a href=
-      "http://cylc.github.com/cylc/single/cug-html.html">cylc user
-      guide</a>.</li>
+
+        <li>the <a href="http://cylc.github.com/cylc/single/cug-html.html">cylc
+        user guide</a>.</li>
       </ul>
     </div>
   </div>
