@@ -130,6 +130,8 @@
       <pre>
     [[roll_doubles]]
         command scripting = """
+sleep 10
+RANDOM=$$  # Seed $RANDOM
 if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
     echo "doubles!"
 else
@@ -162,7 +164,7 @@ rose suite-run
       <samp>[[roll_doubles]]</samp> in the <samp>suite.rc</samp> file with:</p>
       <pre>
     [[roll_doubles]]
-        retry delays = 0.1, 0.1, 0.1, 0.1, 0.1
+        retry delays = 5*0.1
 </pre>
 
       <p>This means that if the <samp>roll_doubles</samp> task fails, cylc
@@ -185,9 +187,7 @@ rose suite-run
     <div class="slide">
       <h2 id="running-retries">Running it with retries</h2>
 
-      <p>Now we'll try again - stop the running suite.</p>
-
-      <p>Run the suite using:</p>
+      <p>Stop the running suite and re-run the suite using:</p>
       <pre class="shell">
 rose suite-run
 </pre>
