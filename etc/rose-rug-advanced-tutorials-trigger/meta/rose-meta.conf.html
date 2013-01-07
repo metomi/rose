@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Advanced Tutorials: Suite Date/Time Manipulation suite.rc</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <div id="body-main">
+    <pre>
+[env]
+
+[env=BUDGET]
+type=integer
+
+[file:order.nl]
+
+[namelist:pizza_order]
+
+[namelist:pizza_order=extra_chicken]
+type=logical
+
+[namelist:pizza_order=extra_pepperoni]
+type=logical
+
+[namelist:pizza_order=no_bbq_sauce]
+type=logical
+
+[namelist:pizza_order=no_mushrooms]
+type=logical
+
+[namelist:pizza_order=pizza_type]
+sort-key=00-type
+values='Veggie Supreme', 'Pepperoni', 'BBQ Chicken'
+
+[namelist:pizza_order=truffle]
+values='none', 'white', 'black'
+
+[namelist:side_order]
+
+[namelist:side_order=garlic_bread]
+type=logical
+
+[namelist:side_order=soft_drink]
+type=logical
+</pre>
+  </div>
+</body>
+</html>

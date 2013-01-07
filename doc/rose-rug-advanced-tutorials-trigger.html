@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: trigger</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.
+      <br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: trigger</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through using the
+      <a href="rose-configuration.html#meta.conf.behaviour">Configuration Metadata</a>
+      setting <samp>trigger</samp>.</p>
+
+      <p>This is used to decide whether settings are relevant, based on the value or
+      state of other settings.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="purpose">Purpose</h2>
+
+      <p><samp>trigger</samp> is fundamentally intended to cut down the amount
+      of irrelevant settings presented to the user.</p>
+
+      <p>Irrelevant (<samp>ignored</samp> or <samp>trigger-ignored</samp>)
+      settings do not get included in output files at runtime. In effect, they
+      are commented out (<samp>!</samp> or <samp>!!</samp> prefix in Rose
+      configurations).</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="example">Example</h2>
+
+      <p>In this example, we'll be ordering pizza.</p>
+
+      <p>Create a new directory, containing a <samp>rose-app.conf</samp> file
+      that looks like <a href="../etc/rose-rug-advanced-tutorials-trigger/rose-app.conf.html">this</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example Metadata</h3>
+      
+      <p>We'll add some metadata to make it nice. Create a <samp>meta</samp>
+      sub-directory with a <samp>rose-meta.conf</samp> file that looks like
+      <a href="../etc/rose-rug-advanced-tutorials-trigger/meta/rose-meta.conf.html">this</a>.</p>
+      
+      <p>Once you've done that, run <samp>rose edit</samp> in the application
+      directory and navigate around the pages.</p>
+      
+      <p>There are quite a lot of settings that are only relevant in certain contexts -
+      for example, <samp>namelist:pizza_order=extra_chicken</samp> is pretty irrelevant
+      if we're ordering a <samp>'Veggie Supreme'</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Adding Triggers</h3>
+
+      <p>Let's add some <samp>trigger</samp> information.</p>
+      
+      <p>Under <samp>[namelist:pizza_order=pizza_type]</samp>, add:</p>
+      <pre>
+trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
+        namelist:pizza_order=extra_pepperoni: 'Pepperoni', 'BBQ Chicken'
+</pre>
+      <p>This states which values of <samp>pizza_type</samp> are relevant for
+      which settings. This means that <samp>extra_chicken</samp> is only
+      relevant when <samp>pizza_type</samp> is 'BBQ Chicken' - otherwise, it
+      should be in an <samp>ignored</samp> state.</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Adding Triggers - ignored sections</h3>
+      
+      <p>We should also make sure we don't order over our budget - in particular,
+      we should only order truffle toppings when our budget is pretty big! Add
+      the following to <samp>[env=BUDGET]</samp>:</p>
+      <pre>
+trigger=namelist:pizza_order=truffle: this > 25;
+        namelist:side_order: this >= 10
+</pre>
+      <p>What we've done here is used a small subset of the Rose configuration
+      metadata logical syntax to specify a range of
+      allowed values (the <samp>this > 25</samp> part).
+      Here, <samp>this</samp> is a placeholder for the value
+      of <samp>env=BUDGET</samp>; the expression syntax is essentially
+      Pythonic.</p>
+      
+      <p>We've specified a section <samp>namelist:side_order</samp> in the
+      trigger - this means that the whole section and its options will be
+      <samp>ignored</samp> when the value of <samp>env=BUDGET</samp> is below
+      <samp>10</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Fixing triggers</h3>
+      
+      <p>If we load the config editor (or reload the metadata) again, we
+      should get some trigger errors. These essentially say that some of
+      our settings are in the wrong state now - in our case, they should be
+      <samp>trigger-ignored</samp>.</p>
+      
+      <p>You can fix them on the command line by running
+      <code>rose macro --fix</code> or <code>rose macro -F</code> - this is
+      what you would do if you were working with a text editor and made
+      changes to values.</p>
+      
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Fixing triggers in the config editor</h3>
+      
+      <p>As we're in the config editor, you can run "Autofix". You can do this
+      in a couple of ways:</p>
+      
+      <ul>
+        <li>the toolbar button</li>
+        <li>the <kbd>Metadata -&gt; Autofix all configurations</kbd> menu</li>
+        <li>the right click menu for the root page in the left hand tree panel</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3>Results</h3>
+      
+      <p>If you accept the changes, the state of these settings will be
+      corrected - if you go to the page, you'll see that they've vanished!
+      They're actually just commented out, and viewable via the menu
+      <kbd>View -&gt; All Ignored Variables</kbd>.</p>
+      
+      <p>Try altering the values of <samp>namelist:pizza_order=pizza_type</samp>
+      and <samp>env=BUDGET</samp>. This should enable and trigger-ignore different
+      settings. When <samp>env=BUDGET</samp> is below 10, the <samp>namelist:side_order</samp>
+      section will be <samp>trigger-ignored</samp>, and the <samp>garlic_bread</samp> and <samp>soft_drink</samp>
+      will be <samp>section-ignored</samp> - ignored because their parent section
+      is ignored, rather than anything directly relevant to them.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Multiple Inheritance</h3>
+      
+      <p>More than one setting can decide whether something is relevant. In that case,
+      the subject is relevant only if all the parents agree that it is - an AND relationship.</p>
+      
+      <p>For example, we have a missing dependency for <samp>namelist:pizza_order=truffle</samp> -
+      clearly that's only relevant when <samp>namelist:pizza_order=no_mushrooms</samp> is <samp>.false.</samp>.
+      Open the metadata file in a text editor, and add the following to the
+      <samp>[namelist:pizza_order=no_mushrooms]</samp> metadata section:</p>
+      <pre>
+trigger=namelist:pizza_order=truffle: .false.
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h3>State Triggering</h3>
+      
+      <p>Triggering is not just based on values - if a setting is missing or <samp>trigger-ignored</samp>,
+      any settings that it triggers will be <samp>trigger-ignored</samp> by default.</p>
+      
+      <p>We can see this by setting:<
+      This means that the <samp>namelist:pizza_order=truffle</samp> option will only
+      be enabled when <samp>env=BUDGET</samp> is greater than <samp>25</samp> (our older trigger)
+      <strong>and</strong> <samp>namelist:pizza_order=no_mushrooms</samp> is <samp>.false.</samp>.</p>
+      
+      <p>Save the metadata file and reload the metadata in the config editor, and test it
+      for yourself.</p>
+    </div>
+
+    <div class="slide">
+      <h2>Further Reading</h2>
+
+      <p>For more information, see the <a href=
+      "http://cylc.github.com/cylc/single/cug-html.html">cylc user
+      guide</a>.</p>
+    </div>
+  </div>
+</body>
+</html>
