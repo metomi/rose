@@ -77,11 +77,10 @@ class ConfigurationNotFoundError(Exception):
 
 class NewModeError(Exception):
 
-    """An exception raised for --new when cwd is the config directory."""
+    """An exception raised for --new mode is not supported."""
 
     def __str__(self):
-        s = "%s: is the configuration directory, --new mode not supported."
-        return s % self.args[0]
+        return "%s=%s, --new mode not supported." % self.args
 
 
 class SuiteHostSelectEvent(Event):
@@ -483,12 +482,13 @@ class SuiteRunner(Runner):
         suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
 
         suite_conf_dir = os.getcwd()
-        if os.getcwd() == suite_dir:
-            if opts.new_mode:
-                raise NewModeError(os.getcwd())
-        else:
-            if opts.new_mode:
-                self.fs_util.delete(suite_dir)
+        if opts.new_mode:
+            if os.getcwd() == suite_dir:
+                raise NewModeError("PWD", os.getcwd())
+            elif opts.run_mode in ["reload", "restart"]:
+                raise NewModeError("--run", opts.run_mode)
+            self.fs_util.delete(suite_dir)
+        if os.getcwd() != suite_dir:
             self.fs_util.makedirs(suite_dir)
             cmd = self._get_cmd_rsync(suite_dir)
             self.popen(*cmd)
@@ -498,17 +498,6 @@ class SuiteRunner(Runner):
         if not opts.install_only_mode:
             self._run_init_dir_log(opts, suite_name, config)
         self.fs_util.makedirs("log/suite")
-
-        # Move temporary log to permanent log
-        if hasattr(self.event_handler, "contexts"):
-            log_file_path = os.path.abspath(
-                    os.path.join("log", "rose-suite-run.log"))
-            log_file = open(log_file_path, "ab")
-            temp_log_file = self.event_handler.contexts[uuid].handle
-            temp_log_file.seek(0)
-            log_file.write(temp_log_file.read())
-            self.event_handler.contexts[uuid].handle = log_file
-            temp_log_file.close()
 
         # Dump the actual configuration as rose-suite-run.conf
         rose.config.dump(config, "log/rose-suite-run.conf")
@@ -534,6 +523,17 @@ class SuiteRunner(Runner):
             finally:
                 os.chdir(cwd)
         f.close()
+
+        # Move temporary log to permanent log
+        if hasattr(self.event_handler, "contexts"):
+            log_file_path = os.path.abspath(
+                    os.path.join("log", "rose-suite-run.log"))
+            log_file = open(log_file_path, "ab")
+            temp_log_file = self.event_handler.contexts[uuid].handle
+            temp_log_file.seek(0)
+            log_file.write(temp_log_file.read())
+            self.event_handler.contexts[uuid].handle = log_file
+            temp_log_file.close()
 
         # Install share/work directories (local)
         for name in ["share", "work"]:
