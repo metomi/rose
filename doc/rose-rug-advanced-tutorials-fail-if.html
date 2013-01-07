@@ -77,7 +77,7 @@
     </div>
 
     <div class="slide">
-      <h2>Purpose</h2>
+      <h2 id="purpose">Purpose</h2>
 
       <p><samp>fail-if</samp> and <samp>warn-if</samp> are intended to handle
       the evaluation of complex relationships between settings, without having
@@ -97,7 +97,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Syntax</h3>
+      <h2 id="syntax">Syntax</h2>
 
       <p>The syntax is Pythonic, and relies on <a href=
       "http://jinja.pocoo.org">Jinja2</a> to actually evaluate relationships
@@ -123,7 +123,7 @@ fail-if=namelist:coffee=daily_min &lt;= this &lt;= namelist:coffee=daily_max
     </div>
 
     <div class="slide">
-      <h2>Example</h2>
+      <h2 id="example">Example</h2>
 
       <p>We'll use the example of a rocket launch.</p>
 
@@ -163,7 +163,7 @@ specific_impulse_s=311.0
     <div class="slide">
     <h3 class="alwayshidden">Explanation</h3>
 
-    <p>This app configuration controls the liftoff of a particular rocket: the
+    <p>This app configuration controls the liftoff of a particular rocket - in our case, the
     <a href="http://en.wikipedia.org/wiki/Apollo_Lunar_Module">Lunar Module</a>
     (Apollo Program spacecraft).</p>
 
@@ -207,8 +207,8 @@ fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEE
 
       <p>This states the relationship between these settings (a rearrangement
       of the <a href="http://en.wikipedia.org/wiki/Rocket_equation">Tsiolkovsky
-      rocket equation</a>. The rocket must have a sufficient ratio of fuel to
-      rocket mass, with a sufficiently fast exhaust velocity (<samp>9.8 *
+      rocket equation</a>). The rocket must have a sufficient ratio of fuel to
+      rocket mass, with a sufficiently fast exhaust velocity (=<samp>9.8 *
       namelist:rocket=specific_impulse_s</samp>) to get to the orbital speed
       <samp>env=ORBITAL_SPEED_MS</samp>.</p>
     </div>
@@ -322,7 +322,7 @@ warn-if=this(1) &lt; 75 or this(2) &lt; 75
 
       <p>We can change the <samp>warn-if</samp> setting to:</p>
       <pre>
-warn-if=any(this) &lt; 75
+warn-if=any(this &lt; 75)
 </pre>
 
       <p>which will flag a warning if any <samp>battery_levels</samp> array
@@ -337,8 +337,8 @@ warn-if=any(this) &lt; 75
       them to give clearer error/warning messages. Using our
       <samp>battery_levels</samp> example again, change the setting to:</p>
       <pre>
-warn-if=any(this) &lt; 75;
-        all(this) &gt; 95
+warn-if=any(this &lt; 75);
+        all(this &gt; 95)
 </pre>
 
       <p>This gives a warning if any elements are less than 75, and a separate
@@ -351,8 +351,8 @@ warn-if=any(this) &lt; 75;
 
       <p>You can add separate helper messages for each expression:</p>
       <pre>
-warn-if=any(this) &lt; 75;  # Battery level low
-        all(this) &gt; 95   # Don't over-charge!
+warn-if=any(this &lt; 75);  # Battery level low
+        all(this &gt; 95)   # Don't over-charge!
 </pre>
 
       <p>Try adding the above lines to the metadata, saving, and playing about
@@ -367,7 +367,7 @@ warn-if=any(this) &lt; 75;  # Battery level low
     "Apollo 11 Lunar Module, returning from the surface of the Moon" /></div>
 
     <div class="slide">
-      <h2>Further reading</h2>
+      <h2 id="furtherreading">Further reading</h2>
 
       <p>For more information, see the metadata <a href=
       "rose-configuration.html#meta.conf.value">reference page</a>.</p>
