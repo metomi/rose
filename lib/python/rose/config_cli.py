@@ -21,7 +21,6 @@
 
 from rose.config import ConfigDumper, ConfigLoader, ConfigNode
 from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 import rose.macro
@@ -58,7 +57,6 @@ def main():
                               "meta_key")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
-    popen = RosePopener(event_handler=report)
 
     rose.macro.add_site_meta_paths()
     rose.macro.add_env_meta_paths()
