@@ -31,7 +31,6 @@ import re
 import sys
 
 import rose.config
-import rose.config_editor.variable
 import rose.formats.namelist
 from rose.opt_parse import RoseOptionParser
 import rose.resource
