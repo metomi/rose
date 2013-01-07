@@ -22,25 +22,34 @@
 from rose.config import ConfigDumper, ConfigLoader, ConfigNode
 from rose.env import env_var_process
 from rose.opt_parse import RoseOptionParser
+from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 import rose.macro
 import os
 import sys
 
 
+class NoMetadata(Event):
+    LEVEL = Event.WARN
+    TYPE = Event.TYPE_ERR
+    def __str__(self):
+        return self.args[0]
+
+
 def get_meta_path(root_node, rel_path=None, meta_key=False):
     if meta_key:
         dir_path = None
     elif rel_path:
-        dir_path = os.path.join(os.getcwd(), rel_path)
+        dir_path = os.path.abspath(rel_path)
     else:
         dir_path = os.getcwd()
-        
-    meta_dir = rose.macro.load_meta_path(config=root_node, directory=dir_path)[0]
+    meta_dir = rose.macro.load_meta_path(config=root_node,
+                                         directory=dir_path)[0]
     if meta_dir is None:
         return None
     else:
         return os.path.join(meta_dir, "rose-meta.conf")
+
 
 def main():
     """Implement the "rose config" command."""
@@ -48,9 +57,11 @@ def main():
     opt_parser.add_my_options("default", "env_var_process_mode", "files",
                               "keys", "no_ignore", "meta", "meta_key")
     opts, args = opt_parser.parse_args()
+    report = Reporter(opts.verbosity - opts.quietness)
+
     rose.macro.add_site_meta_paths()
     rose.macro.add_env_meta_paths()
-    
+
     if opts.meta_key:
         opts.meta = True
     
@@ -69,8 +80,8 @@ def main():
                         rel_path = os.sep.join(fname.split(os.sep)[:-1])
                         fpath = get_meta_path(root_node, rel_path)
                         if fpath is None:
-                            mask = "No metadata found for {0}.\n"
-                            sys.exit(mask.format(str(fname)))
+                            msg = "No metadata found for %s.\n" % str(fname)
+                            report(NoMetadata(msg))
                         else:
                             ConfigLoader()(fpath, root_node)
                     else:
