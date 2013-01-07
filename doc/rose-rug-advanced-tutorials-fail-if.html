@@ -69,10 +69,11 @@
       <h2 id="intro">Introduction</h2>
 
       <p>This tutorial walks you through using the metadata settings
-      <samp>fail-if</samp> and <samp>warn-if</samp> (<a href="rose-configuration.html#meta.conf.value">reference page</a>).</p>
+      <samp>fail-if</samp> and <samp>warn-if</samp> (<a href=
+      "rose-configuration.html#meta.conf.value">reference page</a>).</p>
 
-      <p>These allow errors and warnings to be flagged based on complex
-      logical expressions, which can involve multiple settings.</p>
+      <p>These allow errors and warnings to be flagged based on complex logical
+      expressions, which can involve multiple settings.</p>
     </div>
 
     <div class="slide">
@@ -81,27 +82,27 @@
       <p><samp>fail-if</samp> and <samp>warn-if</samp> are intended to handle
       the evaluation of complex relationships between settings, without having
       to write <a href="rose-api.html#macro">custom macros</a>.</p>
-      
-      <p>As with any complex setting, they should only be used when
-      really necessary.</p>
+
+      <p>As with any complex setting, they should only be used when really
+      necessary.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Purpose - continued</h3>
 
-      <p><samp>fail-if</samp> and <samp>warn-if</samp> are invoked on-demand in the config editor, as they can take
-      longer to evaluate than other metadata settings such as
-      <samp>range</samp> which can be done on-the-fly when a value
-      changes.</p>
+      <p><samp>fail-if</samp> and <samp>warn-if</samp> are invoked on-demand in
+      the config editor, as they can take longer to evaluate than other
+      metadata settings such as <samp>range</samp> which can be done on-the-fly
+      when a value changes.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Syntax</h3>
 
-      <p>The syntax is Pythonic, and relies on
-      <a href="http://jinja.pocoo.org">Jinja2</a> to actually evaluate
-      relationships between values, after some initial pre-processing.</p>
-      
+      <p>The syntax is Pythonic, and relies on <a href=
+      "http://jinja.pocoo.org">Jinja2</a> to actually evaluate relationships
+      between values, after some initial pre-processing.</p>
+
       <p>You can reference setting values by using their ids - for example:</p>
       <pre>
 fail-if=namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume
@@ -117,23 +118,22 @@ fail-if=namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume
 [namelist:coffee=daily_amount]
 fail-if=namelist:coffee=daily_min &lt;= this &lt;= namelist:coffee=daily_max
 </pre>
-      <p>There is also some array shorthand, which we'll demonstrate
-      later.</p>
+
+      <p>There is also some array shorthand, which we'll demonstrate later.</p>
     </div>
 
     <div class="slide">
       <h2>Example</h2>
 
-      <p>We'll use the example of a rocket launch.</a>
-      
+      <p>We'll use the example of a rocket launch.</p>
+
       <p>Create a new, blank directory containing a <samp>rose-app.conf</samp>
       file that looks like this:</p>
     </div>
 
     <div class="slide">
-       <h3 class="alwayshidden">rose-app.conf</h3>
-       
-       <pre>
+      <h3 class="alwayshidden">rose-app.conf</h3>
+      <pre>
 [command]
 default=launch.exe
 
@@ -150,152 +150,153 @@ fuelless_weight_kg=2353.0
 specific_impulse_s=311.0
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3>Metadata</h3>
-      
-      <p>We'll also want some basic metadata in place - create a <samp>meta</samp>
-      subdirectory containing a <samp>rose-meta.conf</samp> file that looks like
-      <a href="../etc/rose-rug-advanced-tutorials-fail-if/meta/rose-meta.conf.html">this</a>.</p>
+
+      <p>We'll also want some basic metadata in place - create a
+      <samp>meta</samp> subdirectory containing a <samp>rose-meta.conf</samp>
+      file that looks like <a href=
+      "../etc/rose-rug-advanced-tutorials-fail-if/meta/rose-meta.conf.html">this</a>.</p>
     </div>
-    
+
     <div class="slide">
-      <h3 class="alwayshidden">Explanation</h3>
-      
-      <p>This app configuration controls the liftoff of a particular rocket:
-      the
-      <a href="http://en.wikipedia.org/wiki/Apollo_Lunar_Module">Lunar Module</a>
-      (Apollo Program spacecraft).</p>
-      
-      <p>If the ratio of rocket fuel to total weight is too high, or the
-      efficiency of the rocket
-      (<a href="http://en.wikipedia.org/wiki/Specific_impulse">specific impulse</a>)
-      is too low, the Lunar Module will never make it off the Moon.</p>
-   
-      <img class="r-floater" src=
-      "http://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apollo16LM.jpg/533px-Apollo16LM.jpg"
-      width="20%" alt="Apollo 11 Lunar Module, returning from the surface of the Moon" />
-   </div>
-   
-   <div class="slide">
+    <h3 class="alwayshidden">Explanation</h3>
+
+    <p>This app configuration controls the liftoff of a particular rocket: the
+    <a href="http://en.wikipedia.org/wiki/Apollo_Lunar_Module">Lunar Module</a>
+    (Apollo Program spacecraft).</p>
+
+    <p>If the ratio of rocket fuel to total weight is too high, or the
+    efficiency of the rocket (<a href=
+    "http://en.wikipedia.org/wiki/Specific_impulse">specific impulse</a>) is
+    too low, the Lunar Module will never make it off the Moon.</p><img class=
+    "r-floater" src=
+    "http://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apollo16LM.jpg/533px-Apollo16LM.jpg"
+    width="20%" alt=
+    "Apollo 11 Lunar Module, returning from the surface of the Moon" /></div>
+
+    <div class="slide">
       <h3 class="alwayshidden">rose edit</h3>
 
-      <p>Try running <code>rose edit</code> in the app directory. You should be able
-      to navigate between the pages and view the help and description for the
-      settings.</p>
+      <p>Try running <code>rose edit</code> in the app directory. You should be
+      able to navigate between the pages and view the help and description for
+      the settings.</p>
     </div>
 
     <div class="slide">
       <h3>Setting up fail-if</h3>
-      
+
       <p>We want to be able to flag an error based on a combination of the
       rocket settings and the necessary orbital velocity
-      (<samp>env=ORBITAL_VELOCITY_MS</samp>). We need to set some <samp>fail-if</samp>
-      metadata on one of these settings - as it's evaluated on-demand, it doesn't matter
-      which one we choose.</p>
-      
+      (<samp>env=ORBITAL_VELOCITY_MS</samp>). We need to set some
+      <samp>fail-if</samp> metadata on one of these settings - as it's
+      evaluated on-demand, it doesn't matter which one we choose.</p>
+
       <p>Open the <samp>meta/rose-meta.conf</samp> file in a text editor.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">fail-if metadata</h3>
-      
+
       <p>Add the following lines to the metadata section
       <samp>namelist:rocket=total_weight_kg</samp>:</p>
       <pre>
 fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))
 </pre>
-      <p>This states the relationship between these settings (a rearrangement of
-      the <a href="http://en.wikipedia.org/wiki/Rocket_equation">Tsiolkovsky rocket
-      equation</a>. The rocket must have a sufficient ratio of fuel to rocket mass,
-      with a sufficiently fast exhaust velocity (<samp>9.8 * namelist:rocket=specific_impulse_s</samp>)
-      to get to the orbital speed <samp>env=ORBITAL_SPEED_MS</samp>.</p>
+
+      <p>This states the relationship between these settings (a rearrangement
+      of the <a href="http://en.wikipedia.org/wiki/Rocket_equation">Tsiolkovsky
+      rocket equation</a>. The rocket must have a sufficient ratio of fuel to
+      rocket mass, with a sufficiently fast exhaust velocity (<samp>9.8 *
+      namelist:rocket=specific_impulse_s</samp>) to get to the orbital speed
+      <samp>env=ORBITAL_SPEED_MS</samp>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">config edit</h3>
-      
-      <p>Save the metadata file and then reload the config editor metadata.
-      You can ask Rose to evaluate the fail-if condition by either pressing
-      the toolbar button ("Check fail-if ...") or clicking the menu
-      <kbd>Metadata -&gt; Check fail-if, warn-if</kbd>.</p>
-      
+
+      <p>Save the metadata file and then reload the config editor metadata. You
+      can ask Rose to evaluate the fail-if condition by either pressing the
+      toolbar button ("Check fail-if ...") or clicking the menu <kbd>Metadata
+      -&gt; Check fail-if, warn-if</kbd>.</p>
+
       <p>Hopefully, this should not flag any errors, as these are the Apollo
-      mission parameters!</p> 
+      mission parameters!</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">config edit, fail-if errors</h3>
-      
+
       <p>Try adding a few more moonrocks. Add <samp>1000.0</samp> to the values
       of <samp>total_weight_kg</samp> and <samp>fuelless_weight_kg</samp>,
       retaining the decimal place in the values (<samp>.0</samp>).</p>
-      
-      <p>Re-run the check by clicking <kbd>Metadata -&gt;
-      Check fail-if, warn-if</kbd>. An error dialog will appear, and the 
+
+      <p>Re-run the check by clicking <kbd>Metadata -&gt; Check fail-if,
+      warn-if</kbd>. An error dialog will appear, and the
       <samp>total_weight_kg</samp> setting will have an error flag.</p>
-      
-      <p>However, neither of these are very informative, other than quoting
-      the metadata.</p>
+
+      <p>However, neither of these are very informative, other than quoting the
+      metadata.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">config edit, fail-if errors</h3>
-      
+
       <p>Change the fail-if line to:</p>
       <pre>
 fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))  # Fuel mass ratio or specific impulse too low to achieve orbit.
 </pre>
 
-      <p>If you reload the metadata and run the check again, the error
-      messages will include the helpful text.</p>
+      <p>If you reload the metadata and run the check again, the error messages
+      will include the helpful text.</p>
     </div>
-
 
     <div class="slide">
       <h3 class="alwayshidden">Playing around</h3>
-      
+
       <p>Try changing the <samp>env=ORBITAL_SPEED_MS</samp> value (read the
       help). How much more fuel would it take to use the Lunar Module to get
       into Martian orbit?</p>
-      
+
       <p>You can also check the <samp>fail-if</samp> metadata by running
-      <code>rose macro --validate</code> or <code>rose macro -V</code> in
-      a terminal, inside the app directory.</p>
+      <code>rose macro --validate</code> or <code>rose macro -V</code> in a
+      terminal, inside the app directory.</p>
     </div>
 
     <div class="slide">
       <h3>warn-if</h3>
-      
+
       <p>The <samp>warn-if</samp> metadata setting is exactly the same as
-      <samp>fail-if</samp>, but gives out warnings instead of errors - from
-      a user perspective, this means something like "Watch out" rather than
-      "This is wrong".</p>
+      <samp>fail-if</samp>, but gives out warnings instead of errors - from a
+      user perspective, this means something like "Watch out" rather than "This
+      is wrong".</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">warn-if</h3>
-      
+
       <p>Let's try adding something for
       <samp>namelist:rocket=battery_levels</samp>.</p>
-      
+
       <p>Open the metadata file <samp>meta/rose-meta.conf</samp> in a text
       editor, and add this line to the
       <samp>[namelist:rocket=battery_levels]</samp> section:</p>
       <pre>
 warn-if=namelist:rocket=battery_levels(1) &lt; 75 or namelist:rocket=battery_levels(2) &lt; 75
 </pre>
+
       <p>This uses a special syntax for referencing the individual array
       elements in <samp>battery_levels</samp>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">warn-if</h3>
-      
+
       <p>If the first array element value and/or the second array element value
-      of <samp>battery_levels</samp> is less than 75% full, a warning
-      will be produced when the check is run.</p>
-      
+      of <samp>battery_levels</samp> is less than 75% full, a warning will be
+      produced when the check is run.</p>
+
       <p>We already know the shorthand syntax <samp>this</samp>, so rephrase
       the metadata to:</p>
       <pre>
@@ -305,71 +306,71 @@ warn-if=this(1) &lt; 75 or this(2) &lt; 75
 
     <div class="slide">
       <h3 class="alwayshidden">any/all</h3>
-      
+
       <p>Save the metadata file and then reload the config editor metadata.
-      Click <kbd>Metadata -&gt; Check fail-if, warn-if</kbd> - a warning
-      dialog should appear, and there should be a warning flag for the
+      Click <kbd>Metadata -&gt; Check fail-if, warn-if</kbd> - a warning dialog
+      should appear, and there should be a warning flag for the
       <samp>battery_levels</samp> option.</p>
-      
+
       <p>For large arrays, it can sometimes be convenient to use whole-array
       operations - the <samp>fail-if</samp> and <samp>warn-if</samp> syntax
       includes <samp>any()</samp> and <samp>all()</samp>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">any example</h3>
-      
+
       <p>We can change the <samp>warn-if</samp> setting to:</p>
       <pre>
 warn-if=any(this) &lt; 75
 </pre>
-      <p>which will flag a warning if any <samp>battery_levels</samp>
-      array element values are less than 75.</p>
+
+      <p>which will flag a warning if any <samp>battery_levels</samp> array
+      element values are less than 75.</p>
     </div>
-    
+
     <div class="slide">
       <h3>Multiple expressions</h3>
-      
-      <p>In both <samp>fail-if</samp> and <samp>warn-if</samp>, expressions
-      can be chained using the Python operator <samp>or</samp>, or you can
-      separate them to give clearer error/warning messages. Using our
+
+      <p>In both <samp>fail-if</samp> and <samp>warn-if</samp>, expressions can
+      be chained using the Python operator <samp>or</samp>, or you can separate
+      them to give clearer error/warning messages. Using our
       <samp>battery_levels</samp> example again, change the setting to:</p>
       <pre>
 warn-if=any(this) &lt; 75;
         all(this) &gt; 95
 </pre>
-      <p>This gives a warning if any elements are less than 75,
-      and a separate warning if all elements are greater than 95 (we don't
-      want to cook the batteries!).</p>
+
+      <p>This gives a warning if any elements are less than 75, and a separate
+      warning if all elements are greater than 95 (we don't want to cook the
+      batteries!).</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Multiple expressions and messages</h3>
-      
+
       <p>You can add separate helper messages for each expression:</p>
       <pre>
 warn-if=any(this) &lt; 75;  # Battery level low
         all(this) &gt; 95   # Don't over-charge!
 </pre>
-      <p>Try adding the above lines to the metadata, saving, and playing
-      about with the array numbers in the config editor and re-running
-      the fail-if/warn-if check.</p>
+
+      <p>Try adding the above lines to the metadata, saving, and playing about
+      with the array numbers in the config editor and re-running the
+      fail-if/warn-if check.</p>
     </div>
-    
+
     <div class="slide">
-      <h3 class="alwayshidden">The End</h3>
-       
-      <img class="l-floater" src=
-      "http://www.nasa.gov/centers/langley/images/content/69666main_Apollo-fig7.gif"
-      width="60%" alt="Apollo 11 Lunar Module, returning from the surface of the Moon" />
-    
-    </div>
- 
+    <h3 class="alwayshidden">The End</h3><img class="l-floater" src=
+    "http://www.nasa.gov/centers/langley/images/content/69666main_Apollo-fig7.gif"
+    width="60%" alt=
+    "Apollo 11 Lunar Module, returning from the surface of the Moon" /></div>
+
     <div class="slide">
       <h2>Further reading</h2>
 
-      <p>For more information, see the metadata
-      <a href="rose-configuration.html#meta.conf.value">reference page</a>.</p>
+      <p>For more information, see the metadata <a href=
+      "rose-configuration.html#meta.conf.value">reference page</a>.</p>
     </div>
   </div>
 </body>
