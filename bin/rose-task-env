@@ -93,5 +93,12 @@
 #     Cycle time is expected to be in the YYYYmmdd[HH[MM]] format at the
 #     moment. It would be desirable to move to an ISO 8601 compliant format,
 #     e.g.  <date>[T<time>] where <date> is YYYYmmdd and <time> is HH[MM].
+#
+# USAGE IN SUITES
+#     rose task-env can be used to make environment variables available to a
+#     suite by defining its suite.rc environment scripting option as:
+#
+#     environment scripting = "eval $(rose task-env)"
+#
 #-------------------------------------------------------------------------------
 exec python -m rose.task_env "$@"
