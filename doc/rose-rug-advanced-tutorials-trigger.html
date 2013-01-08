@@ -106,13 +106,12 @@
       <a href=
       "../etc/rose-rug-advanced-tutorials-trigger/meta/rose-meta.conf.html">this</a>.</p>
 
-      <p>Once you've done that, run <samp>rose edit</samp> in the application
+      <p>Once you've done that, run <code>rose edit</code> in the application
       directory and navigate around the pages.</p>
 
       <p>There are quite a lot of settings that are only relevant in certain
-      contexts - for example, <samp>namelist:pizza_order=extra_chicken</samp>
-      is pretty irrelevant if we're ordering a <samp>'Veggie
-      Supreme'</samp>.</p>
+      contexts - for example, <var>namelist:pizza_order=extra_chicken</var> is
+      pretty irrelevant if we're ordering a <samp>'Veggie Supreme'</samp>.</p>
     </div>
 
     <div class="slide">
@@ -126,12 +125,11 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken'
 </pre>
 
-      <p>This states which values of <samp>pizza_type</samp> are relevant for
-      which settings. This means that <samp>extra_chicken</samp> is only
-      relevant when <samp>pizza_type</samp> is 'BBQ Chicken' - otherwise, it
-      should be in an <samp>ignored</samp> state.
-      <samp>pepperoni_multiple</samp> is relevant for more than one value of
-      <samp>pizza_type</samp>.</p>
+      <p>This states which values of <var>pizza_type</var> are relevant for
+      which settings. This means that <var>extra_chicken</var> is only relevant
+      when <var>pizza_type</var> is <samp>'BBQ Chicken'</samp> - otherwise, it
+      should be in an <samp>ignored</samp> state. <var>pepperoni_multiple</var>
+      is relevant for more than one value of <var>pizza_type</var>.</p>
     </div>
 
     <div class="slide">
@@ -148,7 +146,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
       <p>What we've done here is used a small subset of the Rose configuration
       metadata logical syntax to specify a range of allowed values (the
       <samp>this &gt; 25</samp> part). Here, <samp>this</samp> is a placeholder
-      for the value of <samp>env=BUDGET</samp>; the expression syntax is
+      for the value of <var>env=BUDGET</var>; the expression syntax is
       essentially <a href=
       "rose-rug-in-depth-topics.html#logicsyntax">Pythonic</a>.</p>
     </div>
@@ -156,11 +154,11 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     <div class="slide">
       <h3 class="alwayshidden">Adding Triggers - sections</h3>
 
-      <p>We've also specified a section <samp>namelist:side_order</samp> in the
+      <p>We've also specified a section <var>namelist:side_order</var> in the
       trigger, which is perfectly valid - this means that the whole section and
       its options will be <samp>ignored</samp> when the value of
-      <samp>env=BUDGET</samp> is below <samp>10</samp>. The truffle option will
-      be ignored unless <samp>env=BUDGET</samp> is more than 25.</p>
+      <var>env=BUDGET</var> is below <samp>10</samp>. The truffle option will
+      be ignored unless <var>env=BUDGET</var> is more than 25.</p>
     </div>
 
     <div class="slide">
@@ -206,15 +204,15 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     <div class="slide">
       <h3 class="alwayshidden">Results - changing things</h3>
 
-      <p>Try altering the values of
-      <samp>namelist:pizza_order=pizza_type</samp> and <samp>env=BUDGET</samp>
-      - with <kbd>View -&gt; All Ignored Variables</kbd> on and off. This
-      should enable and trigger-ignore different settings.</p>
+      <p>Try altering the values of <var>namelist:pizza_order=pizza_type</var>
+      and <var>env=BUDGET</var> - with <kbd>View -&gt; All Ignored
+      Variables</kbd> on and off. This should enable and trigger-ignore
+      different settings.</p>
 
-      <p>When <samp>env=BUDGET</samp> is below 10, the
-      <samp>namelist:side_order</samp> section will be
-      <samp>trigger-ignored</samp>, and the <samp>garlic_bread</samp> and
-      <samp>soft_drink</samp> will be <samp>section-ignored</samp> - ignored
+      <p>When <var>env=BUDGET</var> is below 10, the
+      <var>namelist:side_order</var> section will be
+      <samp>trigger-ignored</samp>, and the <var>garlic_bread</var> and
+      <var>soft_drink</var> will be <samp>section-ignored</samp> - ignored
       because their parent section is ignored.</p>
     </div>
 
@@ -237,10 +235,9 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
       is - an AND relationship.</p>
 
       <p>For example, we already have one trigger for
-      <samp>namelist:pizza_order=truffle</samp> (<samp>env=BUDGET</samp>) - but
-      it should also only be relevant when
-      <samp>namelist:pizza_order=no_mushrooms</samp> is
-      <samp>.false.</samp>.</p>
+      <var>namelist:pizza_order=truffle</var> (<var>env=BUDGET</var>) - but it
+      should also only be relevant when
+      <var>namelist:pizza_order=no_mushrooms</var> is <samp>.false.</samp>.</p>
     </div>
 
     <div class="slide">
@@ -252,11 +249,10 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
 trigger=namelist:pizza_order=truffle: .false.
 </pre>
 
-      <p>This means that the <samp>namelist:pizza_order=truffle</samp> option
-      will only be enabled when <samp>env=BUDGET</samp> is greater than
+      <p>This means that the <var>namelist:pizza_order=truffle</var> option
+      will only be enabled when <var>env=BUDGET</var> is greater than
       <samp>25</samp> (our older trigger) <strong>and</strong>
-      <samp>namelist:pizza_order=no_mushrooms</samp> is
-      <samp>.false.</samp>.</p>
+      <var>namelist:pizza_order=no_mushrooms</var> is <samp>.false.</samp>.</p>
     </div>
 
     <div class="slide">
@@ -281,7 +277,7 @@ trigger=namelist:pizza_order=truffle: .false.
     <div class="slide">
       <h3 class="alwayshidden">Cascading Triggering example</h3>
 
-      <p>We can see this by replacing the <samp>env=BUDGET</samp> trigger
+      <p>We can see this by replacing the <var>env=BUDGET</var> trigger
       with:</p>
       <pre>
 trigger=namelist:pizza_order=truffle: this &gt; 25;
@@ -289,19 +285,19 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
         namelist:pizza_order=pizza_type: this &gt;= 5
 </pre>
 
-      <p>When <samp>env=BUDGET</samp> is less than 5,
-      <samp>namelist:pizza_order=pizza_type</samp> will be
+      <p>When <var>env=BUDGET</var> is less than 5,
+      <var>namelist:pizza_order=pizza_type</var> will be
       <samp>trigger-ignored</samp>. This means that all of its triggered
-      settings like <samp>namelist:pizza_order=extra_chicken</samp> are
+      settings like <var>namelist:pizza_order=extra_chicken</var> are
       irrelevant and will also be <samp>trigger-ignored</samp>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Cascading Triggering continued</h3>
 
-      <p>Save, reload, and try changing <samp>env=BUDGET</samp> below
+      <p>Save, reload, and try changing <var>env=BUDGET</var> below
       <samp>5</samp> to see what it does to the options in
-      <samp>namelist:pizza_order</samp>.</p>
+      <var>namelist:pizza_order</var>.</p>
     </div>
 
     <div class="slide">
@@ -311,8 +307,8 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
       express a value or range of values in a trigger expression.</p>
 
       <p>Quite often you only want a setting to be <samp>trigger-ignored</samp>
-      or enabled purely based on the availability of another setting - whether it
-      is present and whether it is <samp>trigger-ignored</samp>. You might
+      or enabled purely based on the availability of another setting - whether
+      it is present and whether it is <samp>trigger-ignored</samp>. You might
       not care what particular value it has.</p>
     </div>
 
@@ -341,32 +337,31 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         namelist:pizza_order=dip_type
 </pre>
 
-      <p>This means that <samp>namelist:pizza_order=dip_type</samp> is
-      dependent on <samp>namelist:pizza_order=pizza_type</samp>, and will only
-      be ignored when that is ignored - but the value of
-      <samp>pizza_type</samp> doesn't matter to it.</p>
+      <p>This means that <var>namelist:pizza_order=dip_type</var> is dependent
+      on <var>namelist:pizza_order=pizza_type</var>, and will only be ignored
+      when that is ignored - but the value of <var>pizza_type</var> doesn't
+      matter to it.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Triggering (non-value) example continued</h3>
 
       <p>Save the file and reload the metadata in the config editor. We'll need
-      to add the <samp>namelist:pizza_order=dip_type</samp> to use it properly:
-      you can do this from the <samp>namelist:pizza_order</samp> page in a
-      couple of ways (e.g. <kbd>Add</kbd> toolbar button, right click page
-      menu), but it's more informative to do it via enabling the
-      <kbd>View</kbd> menu option <kbd>View Latent Variables</kbd>.</p>
+      to add the <var>namelist:pizza_order=dip_type</var> to use it properly:
+      you can do this from the <var>namelist:pizza_order</var> page in a couple
+      of ways (e.g. <kbd>Add</kbd> toolbar button, right click page menu), but
+      it's more informative to do it via enabling the <kbd>View</kbd> menu
+      option <kbd>View Latent Variables</kbd>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Triggering (non-value) latent variables</h3>
 
-      <p>After enabling the view, you should see <samp>extra_dip</samp> appear
-      as an option that could be added. It will already have the correct
-      triggered state (the same state as
-      <samp>namelist:pizza_order=pizza_type</samp>) - verify for yourself that
-      this works! You can then just add it via the menu button for the
-      option.</p>
+      <p>After enabling the view, you should see <var>extra_dip</var> appear as
+      an option that could be added. It will already have the correct triggered
+      state (the same state as <var>namelist:pizza_order=pizza_type</var>) -
+      verify for yourself that this works! You can then just add it via the
+      menu button for the option.</p>
     </div>
 
     <div class="slide">
