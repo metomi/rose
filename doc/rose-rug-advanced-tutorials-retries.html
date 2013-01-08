@@ -213,10 +213,12 @@ rose suite-run
       using <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
       <pre>
         command scripting = """
+sleep 10
 if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
    echo "doubles!"  # Cheat!
    exit 0
 fi
+RANDOM=$$
 if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
     echo "doubles!"
 else
