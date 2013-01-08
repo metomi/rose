@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Advanced Tutorials: Custom Macro planet.py</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <div id="body-main">
+    <pre>
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import re
+import subprocess
+
+import rose.macro
+
+
+class PlanetChecker(rose.macro.MacroBase):
+
+    """Checks option values that refer to planets."""
+
+    opts_to_check = [("env", "WORLD")]
+
+    def validate(self, config, meta_config=None):
+        """Return a list of errors, if any."""
+        problem_list = []
+        for section, option in self.opts_to_check:
+            node = config.get([section, option])
+            if node is None or node.is_ignored():
+                continue
+            # Check the option value (node.value) here
+        return problem_list
+</pre>
+  </div>
+</body>
+</html>
