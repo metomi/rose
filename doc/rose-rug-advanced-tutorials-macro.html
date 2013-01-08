@@ -206,7 +206,10 @@ touch meta/lib/python/widget/planet.py
 </pre>
 
     <p>at the top of the class, like this:</p>
-    <div class="handout">(continued)</div></p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Error text example</h3>
     <pre>
 class PlanetChecker(rose.macro.MacroBase):
 
@@ -220,7 +223,10 @@ class PlanetChecker(rose.macro.MacroBase):
         allowed_planets = self._get_allowed_planets()
         problem_list = []
 </pre>
-
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Check</h3>
     <p>Finally, we need to check if the configuration option is in the list, by
     replacing</p>
     <pre>
@@ -233,60 +239,21 @@ class PlanetChecker(rose.macro.MacroBase):
                 self.add_report(problem_list, section, option, node.value,
                                 self.error_text)
 </pre>
-
-    <p>which adds some information to the <code>problem_list</code> if the
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Check explanation</h3>
+    <p>This adds some information to the <code>problem_list</code> if the
     option value is not a valid planet.</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Check final macro</h3>
+    <p>Your final macro should look like <a href="../etc/rose-rug-advanced-tutorials-macro/planet.py.validate.html">this</a>:</p>
+    </div>
 
-    <p>Your final macro should look like this:</p>
-    <pre>
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import re
-import subprocess
-
-import rose.macro
-
-
-class PlanetChecker(rose.macro.MacroBase):
-
-    """Checks option values that refer to planets."""
-
-    error_text = "planet is too far away."
-    opts_to_check = [("env", "WORLD")]
-
-    def validate(self, config, meta_config=None):
-        """Return a list of errors, if any."""
-        allowed_planets = self._get_allowed_planets()
-        problem_list = []
-        for section, option in self.opts_to_check:
-            node = config.get([section, option])
-            if node is None or node.is_ignored():
-                continue
-            if node.value not in allowed_planets:
-                self.add_report(problem_list, section, option, node.value,
-                                self.error_text)
-        return problem_list
-
-    def _get_allowed_planets(self):
-        # Retrieve planets less than a certain distance away.
-        cmd_strings = ["wget", "-q", "-O", "-",
-                        "http://www.heavens-above.com/planetsummary.aspx"]
-        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
-        text = p.communicate()[0]
-        planets = re.findall("(\w+)&lt;/a&gt;",
-                                re.sub('(?s)^.*(tablehead.*?ascension).*$',
-                                    r"\1", text))
-        distances = re.findall("([\d.]+)&lt;/td&gt;",
-                                re.sub('(?s)^.*(Range.*?Brightness).*$',
-                                        r"\1", text))
-        for planet, distance in zip(planets, distances):
-            if float(distance) &gt; 5.0:
-                planets.remove(planet)
-        planets += ["Earth"]  # Distance ~ 0
-        return planets
-</pre>
-
+    <div class="slide">
+      <h3>Results</h3>
     <p>Your checker macro is now ready to use.</p>
 
     <p>You can run it by running:</p>
@@ -297,46 +264,42 @@ rose edit
     <p>in the application directory. Select the top menu Metadata, then the
     item <var>fred_hello_world</var>, then the item
     <var>planet.PlanetChecker.validate</var>.</p>
-
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Errors</h3>
     <p>It should either return an "OK" dialog, or give an error dialog using
-    the error text we wrote.</p>
+    the error text we wrote - it will depend on the current Earth-Sun-Jupiter
+    positions!</p>
 
     <p>If there is an error, the variable should display an error icon on the
     <var>env</var> page, which you can hover-over to get the error text. You
     can remove the error by fixing the value and re-running your macro.</p>
+    </div>
 
+    <div class="slide">
+      <h3 class="alwayshidden">Re-running</h3>
     <p>Try changing the value of <var>env=WORLD</var> to other solar system
     planets and re-running the macro.</p>
 
     <p>You can also run your macro from the command line in the application
-    directory by invoking <code>rose macro planet.PlanetChecker</code>.</p>
+    directory by invoking:</p>
+    <pre class="shell">
+rose macro planet.PlanetChecker
+</pre>
+    </div>
 
+    <div class="slide">
+      <h3>Transformer example</h3>
     <p>We'll now make a macro that <em>changes</em> the configuration. Our
     example will change the value of <var>env=WORLD</var> to something
     else.</p>
 
-    <p>Open <code>planet.py</code> in a text editor and add the following
-    lines:</p>
-    <pre>
-class PlanetChanger(rose.macro.MacroBase):
-
-    """Switch between planets."""
-
-    change_text = '{0} to {1}'
-    opts_to_change = [("env", "WORLD")]
-    planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn",
-                "Uranus", "Neptune", "Eris", "Neptune", "Uranus", "Saturn",
-                "Jupiter", "Mars", "Earth", "Venus"]
-
-    def transform(self, config, meta_config=None):
-        """Transform configuration and return it with a list of changes."""
-        change_list = []
-        for section, option in self.opts_to_change:
-            node = config.get([section, option])
-            # Do something to the configuration.
-        return config, change_list
-</pre>
-
+    <p>Open <code>planet.py</code> in a text editor and append <a href="../etc/rose-rug-advanced-tutorials-macro/planet.py.transform-start.html">this text</a>.</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Editing</h3>
     <p>We need to write some code to make some changes to the
     configuration.</p>
 
@@ -345,7 +308,11 @@ class PlanetChanger(rose.macro.MacroBase):
             # Do something to the configuration.
 </pre>
 
-    <p>with</p>
+    <p>with:</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Editing - text</h3>
     <pre>
             if node is None or node.is_ignored():
                 continue
@@ -362,13 +329,19 @@ class PlanetChanger(rose.macro.MacroBase):
                 new_planet = self.planets[new_index]
             config.set([section, option], new_planet)
 </pre>
-
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Editing explanation</h3>
     <p>This changes the option <var>env=WORLD</var> to the next planet on the
     list. It will set it to the first planet on the list if it is something
     else. It will skip it if it is missing or <var>ignored</var>.</p>
 
     <p>We also need to add a change message to flag what we've changed.</p>
-
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">Change report</h3>
     <p>Beneath</p>
     <pre>
             config.set([section, option], new_planet)
@@ -380,48 +353,23 @@ class PlanetChanger(rose.macro.MacroBase):
             self.add_report(change_list, section, option, new_planet,
                             message)
 </pre>
-
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">Change report explanation</h3>   
     <p>This makes use of the template <code>self.change_text</code> at the top
     of the class. The message will be used to provide more information to the
     user about the change.</p>
 
-    <p>Your class should now look like this:</p>
-    <pre>
-class PlanetChanger(rose.macro.MacroBase):
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">Results</h3>
+    <p>Your class should now look like <a href="../etc/rose-rug-advanced-tutorials-macro/planet.py.transform.html">this</a>.</p>
+    </div>
 
-    """Switch between planets."""
-
-    change_text = '{0} to {1}'
-    opts_to_change = [("env", "WORLD")]
-    planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn",
-                "Uranus", "Neptune", "Eris", "Neptune", "Uranus", "Saturn",
-                "Jupiter", "Mars", "Earth", "Venus"]
-
-    def transform(self, config, meta_config=None):
-        """Transform configuration and return it with a list of changes."""
-        change_list = []
-        for section, option in self.opts_to_change:
-            node = config.get([section, option])
-            if node is None or node.is_ignored():
-                continue
-            if node.value not in self.planets:
-                old_planet = node.value
-                new_planet = self.planets[0]
-            else:
-                old_planet = node.value
-                index = self.planets.index(node.value)
-                if index == len(self.planets) - 1:
-                    new_index = 0
-                else:
-                    new_index = index + 1
-                new_planet = self.planets[new_index]
-            config.set([section, option], new_planet)
-            message = self.change_text.format(old_planet, new_planet)
-            self.add_report(change_list, section, option, new_planet,
-                            message)
-        return config, change_list
-</pre>
-
+    <div class="slide">
+       <h3 class="alwayshidden">Running it</h3>
     <p>Your transform macro is now ready to use.</p>
 
     <p>You can run it by running:</p>
@@ -432,6 +380,10 @@ rose edit
     <p>in the application directory. Select the top menu Metadata, then the
     item <var>fred_hello_world</var>, then the item
     <var>planet.PlanetChanger.transform</var>.</p>
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">Results explanation</h3>
 
     <p>It should give a dialog explaining the changes it's made and asking for
     permission to apply them. If you click <var>OK</var>, the changes will be
@@ -440,6 +392,20 @@ rose edit
 
     <p>Try running the macro once or twice more to see it change the
     configuration.</p>
+    </div>
 
+    <div class="slide">
+       <h3 class="alwayshidden">Command line</h3>
     <p>You can also run your macro from the command line in the application
     directory by invoking <code>rose macro planet.PlanetChanger</code>.</p>
+    </div>
+    
+    <div class="slide">
+      <h2>Further Reading</h2>
+
+      <p>For more information, see the <a href=
+      "rose-api.html#macro">Rose API reference</a>.</p>
+    </div>
+  </div>
+</body>
+</html>
