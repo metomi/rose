@@ -67,114 +67,115 @@
 
     <div class="slide">
       <h2 id="intro">Introduction</h2>
-      
-      <p>This tutorial walks you through developing <a href="rose-api.html#macro">custom macros</a>
-      - Python plugin code that provides extra checking or applies changes.</p>
-      
-      <p>This covers the development of checking (<strong>validator</strong>) and
-      changing (<strong>transformer</strong>) macros.</p>
-      
+
+      <p>This tutorial walks you through developing <a href=
+      "rose-api.html#macro">custom macros</a> - Python plugin code that
+      provides extra checking or applies changes.</p>
+
+      <p>This covers the development of checking (<strong>validator</strong>)
+      and changing (<strong>transformer</strong>) macros.</p>
     </div>
-    
+
     <div class="slide">
       <h2 id="purpose">Purpose</h2>
-      
-      <p>Macros are used in Rose to report problems with a configuration, and to
-      change it. Nearly all metadata mechanics (checking vs metadata settings,
-      and changing - e.g. <samp>trigger</samp>) are performed within Rose by 
-      Rose built-in macros.</p>
-      
-      <p>Custom macros are user-defined, but follow exactly
-      the same API - they are just in a different filespace location. They can
-      be invoked via the command line (<code>rose macro</code>) or from within
-      the <kbd>Metadata</kbd> menu in the config editor.</p>
+
+      <p>Macros are used in Rose to report problems with a configuration, and
+      to change it. Nearly all metadata mechanics (checking vs metadata
+      settings, and changing - e.g. <samp>trigger</samp>) are performed within
+      Rose by Rose built-in macros.</p>
+
+      <p>Custom macros are user-defined, but follow exactly the same API - they
+      are just in a different filespace location. They can be invoked via the
+      command line (<code>rose macro</code>) or from within the
+      <kbd>Metadata</kbd> menu in the config editor.</p>
     </div>
 
     <div class="slide">
       <h2 id="example">Example</h2>
-   
-    <p>These examples use the example suite from the <a href=
-    "rose-rug-brief-tour.html">brief tour</a> which you should have familiarised
-    yourself with.</p>
 
-    <p>Change directory to that example suite directory, or recreate it.</p>
+      <p>These examples use the example suite from the <a href=
+      "rose-rug-brief-tour.html">brief tour</a> which you should have
+      familiarised yourself with.</p>
+
+      <p>Change directory to that example suite directory, or recreate it.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Location</h3>
-      
-    <p>We are going to develop a macro for the app
-    <code>fred_hello_world</code>. Change directory to
-    <code>app/fred_hello_world</code>.</p>
 
-    <p>The metadata for the app lives under the <code>meta</code> sub
-    directory. Our new macro will live with the metadata.</p>
+      <p>We are going to develop a macro for the app
+      <code>fred_hello_world</code>. Change directory to
+      <code>app/fred_hello_world</code>.</p>
+
+      <p>The metadata for the app lives under the <code>meta</code> sub
+      directory. Our new macro will live with the metadata.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Explanation</h3>
 
-    <p>For this example, we want to check the value of the option
-    <samp>env=WORLD</samp> in our fred_hello_world application. Specifically, for
-    this example, we want our macro to give us an error if the 'world' is too
-    far away from Earth.</p>
+      <p>For this example, we want to check the value of the option
+      <samp>env=WORLD</samp> in our fred_hello_world application. Specifically,
+      for this example, we want our macro to give us an error if the 'world' is
+      too far away from Earth.</p>
 
-    <p>Create the directories <code>meta/lib/python/macros/</code> by
-    running:</p>
-    <pre class="shell">
+      <p>Create the directories <code>meta/lib/python/macros/</code> by
+      running:</p>
+      <pre class="shell">
 mkdir -p meta/lib/python/macros
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">File Creation</h3>
-    <p>Create an empty file called <code>__init__.py</code> in the
-    directory:</p>
-    <pre class="shell">
+
+      <p>Create an empty file called <code>__init__.py</code> in the
+      directory:</p>
+      <pre class="shell">
 touch meta/lib/python/macros/__init__.py
 </pre>
 
-    <p>Create a file called <code>planet.py</code> in the directory:</p>
-    <pre class="shell">
+      <p>Create a file called <code>planet.py</code> in the directory:</p>
+      <pre class="shell">
 touch meta/lib/python/widget/planet.py
 </pre>
     </div>
-    
+
     <div class="slide">
-       <h3 class="alwayshidden">File Content</h3>
-       
-    <p>Open <code>planet.py</code> in a text editor and paste in this
-    <a href="../etc/rose-rug-advanced-tutorials-macro/planet.py.start.html">text</a>.</p>
+      <h3>Validator macro</h3>
 
-    <p>We need to check the value of the option (<samp>env=WORLD</samp>) in our app
-    configuration.</p>
-    
-    <p>In this case we'll generate a list of allowed 'planet' choices.</p>
+      <p>Open <code>planet.py</code> in a text editor and paste in this
+      <a href="../etc/rose-rug-advanced-tutorials-macro/planet.py.start.html">text</a>.</p>
 
+      <p>We need to check the value of the option (<samp>env=WORLD</samp>) in
+      our app configuration.</p>
+
+      <p>In this case we'll generate a list of allowed 'planet' choices.</p>
     </div>
-    
+
     <div class="slide">
-       <h3 class="alwayshidden">File Editing</h3>
-    <p>Call a method to get the choices by adding the line</p>
-    <pre>
+      <h3 class="alwayshidden">File Editing</h3>
+
+      <p>Call a method to get the choices by adding the line</p>
+      <pre>
         allowed_planets = self._get_allowed_planets()
 </pre>
 
-    <p>at the top of the <code>validate</code> method, so it looks like
-    this:</p>
-    <pre>
+      <p>at the top of the <code>validate</code> method, so it looks like
+      this:</p>
+      <pre>
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
         allowed_planets = self._get_allowed_planets()
         problem_list = []
 </pre>
     </div>
-    
-    <div class="slide">
-       <h3 class="alwayshidden">Adding a method</h3>
 
-    <p>Now add the method <code>_get_allowed_planets</code> to the class:</p>
-    <pre>
+    <div class="slide">
+      <h3 class="alwayshidden">Adding a method</h3>
+
+      <p>Now add the method <code>_get_allowed_planets</code> to the class:</p>
+      <pre>
     def _get_allowed_planets(self):
         # Retrieve planets less than a certain distance away.
         cmd_strings = ["wget", "-q", "-O", "-",
@@ -194,23 +195,23 @@ touch meta/lib/python/widget/planet.py
         return planets
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Error text</h3>
-      
-    <p>This will give us a list of valid (nearby) solar system planets which
-    our configuration option should be in. If it isn't, we need to send a
-    message explaining the problem. Add:</p>
-    <pre>
+
+      <p>This will give us a list of valid (nearby) solar system planets which
+      our configuration option should be in. If it isn't, we need to send a
+      message explaining the problem. Add:</p>
+      <pre>
     error_text = "planet is too far away."
 </pre>
 
-    <p>at the top of the class, like this:</p>
+      <p>at the top of the class, like this:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Error text example</h3>
-    <pre>
+      <pre>
 class PlanetChecker(rose.macro.MacroBase):
 
     """Checks option values that refer to planets."""
@@ -224,96 +225,107 @@ class PlanetChecker(rose.macro.MacroBase):
         problem_list = []
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Check</h3>
-    <p>Finally, we need to check if the configuration option is in the list, by
-    replacing</p>
-    <pre>
+
+      <p>Finally, we need to check if the configuration option is in the list,
+      by replacing</p>
+      <pre>
             # Check the option value (node.value) here
 </pre>
 
-    <p>with</p>
-    <pre>
+      <p>with</p>
+      <pre>
             if node.value not in allowed_planets:
                 self.add_report(problem_list, section, option, node.value,
                                 self.error_text)
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Check explanation</h3>
-    <p>This adds some information to the <code>problem_list</code> if the
-    option value is not a valid planet.</p>
+
+      <p>This adds some information to the <code>problem_list</code> if the
+      option value is not a valid planet.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Check final macro</h3>
-    <p>Your final macro should look like <a href="../etc/rose-rug-advanced-tutorials-macro/planet.py.validate.html">this</a>:</p>
+
+      <p>Your final macro should look like <a href=
+      "../etc/rose-rug-advanced-tutorials-macro/planet.py.validate.html">this</a>:</p>
     </div>
 
     <div class="slide">
       <h3>Results</h3>
-    <p>Your checker macro is now ready to use.</p>
 
-    <p>You can run it by running:</p>
-    <pre class="shell">
+      <p>Your validator macro is now ready to use.</p>
+
+      <p>You can run it by running:</p>
+      <pre class="shell">
 rose edit
 </pre>
 
-    <p>in the application directory. Select the top menu Metadata, then the
-    item <var>fred_hello_world</var>, then the item
-    <var>planet.PlanetChecker.validate</var>.</p>
+      <p>in the application directory. Select the top menu Metadata, then the
+      item <var>fred_hello_world</var>, then the item
+      <var>planet.PlanetChecker.validate</var>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Errors</h3>
-    <p>It should either return an "OK" dialog, or give an error dialog using
-    the error text we wrote - it will depend on the current Earth-Sun-Jupiter
-    positions!</p>
 
-    <p>If there is an error, the variable should display an error icon on the
-    <var>env</var> page, which you can hover-over to get the error text. You
-    can remove the error by fixing the value and re-running your macro.</p>
+      <p>It should either return an "OK" dialog, or give an error dialog using
+      the error text we wrote - it will depend on the current Earth-Sun-Jupiter
+      positions!</p>
+
+      <p>If there is an error, the variable should display an error icon on the
+      <var>env</var> page, which you can hover-over to get the error text. You
+      can remove the error by fixing the value and re-running your macro.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Re-running</h3>
-    <p>Try changing the value of <var>env=WORLD</var> to other solar system
-    planets and re-running the macro.</p>
 
-    <p>You can also run your macro from the command line in the application
-    directory by invoking:</p>
-    <pre class="shell">
+      <p>Try changing the value of <var>env=WORLD</var> to other solar system
+      planets and re-running the macro.</p>
+
+      <p>You can also run your macro from the command line in the application
+      directory by invoking:</p>
+      <pre class="shell">
 rose macro planet.PlanetChecker
 </pre>
     </div>
 
     <div class="slide">
-      <h3>Transformer example</h3>
-    <p>We'll now make a macro that <em>changes</em> the configuration. Our
-    example will change the value of <var>env=WORLD</var> to something
-    else.</p>
+      <h3>Transformer macro</h3>
 
-    <p>Open <code>planet.py</code> in a text editor and append <a href="../etc/rose-rug-advanced-tutorials-macro/planet.py.transform-start.html">this text</a>.</p>
+      <p>We'll now make a macro that <em>changes</em> the configuration. Our
+      example will change the value of <var>env=WORLD</var> to something
+      else.</p>
+
+      <p>Open <code>planet.py</code> in a text editor and append <a href=
+      "../etc/rose-rug-advanced-tutorials-macro/planet.py.transform-start.html">
+      this text</a>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Editing</h3>
-    <p>We need to write some code to make some changes to the
-    configuration.</p>
 
-    <p>Replace the line</p>
-    <pre>
+      <p>We need to write some code to make some changes to the
+      configuration.</p>
+
+      <p>Replace the line</p>
+      <pre>
             # Do something to the configuration.
 </pre>
 
-    <p>with:</p>
+      <p>with:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Editing - text</h3>
-    <pre>
+      <pre>
             if node is None or node.is_ignored():
                 continue
             if node.value not in self.planets:
@@ -330,81 +342,87 @@ rose macro planet.PlanetChecker
             config.set([section, option], new_planet)
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Editing explanation</h3>
-    <p>This changes the option <var>env=WORLD</var> to the next planet on the
-    list. It will set it to the first planet on the list if it is something
-    else. It will skip it if it is missing or <var>ignored</var>.</p>
 
-    <p>We also need to add a change message to flag what we've changed.</p>
+      <p>This changes the option <var>env=WORLD</var> to the next planet on the
+      list. It will set it to the first planet on the list if it is something
+      else. It will skip it if it is missing or <var>ignored</var>.</p>
+
+      <p>We also need to add a change message to flag what we've changed.</p>
     </div>
-    
+
     <div class="slide">
-       <h3 class="alwayshidden">Change report</h3>
-    <p>Beneath</p>
-    <pre>
+      <h3 class="alwayshidden">Change report</h3>
+
+      <p>Beneath</p>
+      <pre>
             config.set([section, option], new_planet)
 </pre>
 
-    <p>add</p>
-    <pre>
+      <p>add</p>
+      <pre>
             message = self.change_text.format(old_planet, new_planet)
             self.add_report(change_list, section, option, new_planet,
                             message)
 </pre>
     </div>
-    
-    <div class="slide">
-       <h3 class="alwayshidden">Change report explanation</h3>   
-    <p>This makes use of the template <code>self.change_text</code> at the top
-    of the class. The message will be used to provide more information to the
-    user about the change.</p>
 
-    </div>
-    
     <div class="slide">
-       <h3 class="alwayshidden">Results</h3>
-    <p>Your class should now look like <a href="../etc/rose-rug-advanced-tutorials-macro/planet.py.transform.html">this</a>.</p>
+      <h3 class="alwayshidden">Change report explanation</h3>
+
+      <p>This makes use of the template <code>self.change_text</code> at the
+      top of the class. The message will be used to provide more information to
+      the user about the change.</p>
     </div>
 
     <div class="slide">
-       <h3 class="alwayshidden">Running it</h3>
-    <p>Your transform macro is now ready to use.</p>
+      <h3 class="alwayshidden">Results</h3>
 
-    <p>You can run it by running:</p>
-    <pre class="shell">
+      <p>Your class should now look like <a href=
+      "../etc/rose-rug-advanced-tutorials-macro/planet.py.transform.html">this</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Running it</h3>
+
+      <p>Your transform macro is now ready to use.</p>
+
+      <p>You can run it by running:</p>
+      <pre class="shell">
 rose edit
 </pre>
 
-    <p>in the application directory. Select the top menu Metadata, then the
-    item <var>fred_hello_world</var>, then the item
-    <var>planet.PlanetChanger.transform</var>.</p>
-    </div>
-    
-    <div class="slide">
-       <h3 class="alwayshidden">Results explanation</h3>
-
-    <p>It should give a dialog explaining the changes it's made and asking for
-    permission to apply them. If you click <var>OK</var>, the changes will be
-    applied and the value of <var>env=WORLD</var> will be changed. You can
-    <var>Undo</var> and <var>Redo</var> macro changes.</p>
-
-    <p>Try running the macro once or twice more to see it change the
-    configuration.</p>
+      <p>in the application directory. Select the top menu Metadata, then the
+      item <var>fred_hello_world</var>, then the item
+      <var>planet.PlanetChanger.transform</var>.</p>
     </div>
 
     <div class="slide">
-       <h3 class="alwayshidden">Command line</h3>
-    <p>You can also run your macro from the command line in the application
-    directory by invoking <code>rose macro planet.PlanetChanger</code>.</p>
+      <h3 class="alwayshidden">Results explanation</h3>
+
+      <p>It should give a dialog explaining the changes it's made and asking
+      for permission to apply them. If you click <var>OK</var>, the changes
+      will be applied and the value of <var>env=WORLD</var> will be changed.
+      You can <var>Undo</var> and <var>Redo</var> macro changes.</p>
+
+      <p>Try running the macro once or twice more to see it change the
+      configuration.</p>
     </div>
-    
+
+    <div class="slide">
+      <h3 class="alwayshidden">Command line</h3>
+
+      <p>You can also run your macro from the command line in the application
+      directory by invoking <code>rose macro planet.PlanetChanger</code>.</p>
+    </div>
+
     <div class="slide">
       <h2>Further Reading</h2>
 
-      <p>For more information, see the <a href=
-      "rose-api.html#macro">Rose API reference</a>.</p>
+      <p>For more information, see the <a href="rose-api.html#macro">Rose API
+      reference</a>.</p>
     </div>
   </div>
 </body>
