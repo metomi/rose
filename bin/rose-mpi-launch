@@ -153,7 +153,7 @@ export NPROC=${NPROC:-1}
 # 0. ROSE_LAUNCHER_MPICH is deprecated. Alternative launchers should be
 # specified in build specific scripts using ROSE_LAUNCHER
 #-------------------------------------------------------------------------------
-ROSE_LAUNCHER_LIST="$ROSE_LAUNCHER_MPICH $ROSE_LAUNCHER_LIST"
+ROSE_LAUNCHER_LIST="${ROSE_LAUNCHER_MPICH:-} $ROSE_LAUNCHER_LIST"
 
 #-------------------------------------------------------------------------------
 # 1. Assign a value to ROSE_LAUNCHER if it is not already set.
@@ -177,7 +177,9 @@ if [[ -n $ROSE_LAUNCHER ]]; then
         err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
     fi
     ROSE_LAUNCHER=$ROSE_LAUNCHER_PATH
-    ROSE_LAUNCH_INNER=${ROSE_LAUNCH_INNER:-"${0}$(optv) --inner"}
+    if ! printenv ROSE_LAUNCH_INNER >/dev/null; then
+         ROSE_LAUNCH_INNER="${0}$(optv) --inner"
+    fi
     # Options
     ROSE_LAUNCHER_BASE=$(basename $ROSE_LAUNCHER)
     ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-$( \
