@@ -190,7 +190,7 @@ specific_impulse_s=311.0
 
       <p>We want to be able to flag an error based on a combination of the
       rocket settings and the necessary orbital velocity
-      (<samp>env=ORBITAL_VELOCITY_MS</samp>). We need to set some
+      (<var>env=ORBITAL_VELOCITY_MS</var>). We need to set some
       <samp>fail-if</samp> metadata on one of these settings - as it's
       evaluated on-demand, it doesn't matter which one we choose.</p>
 
@@ -201,7 +201,7 @@ specific_impulse_s=311.0
       <h3 class="alwayshidden">fail-if metadata</h3>
 
       <p>Add the following lines to the metadata section
-      <samp>namelist:rocket=total_weight_kg</samp>:</p>
+      <samp>[namelist:rocket=total_weight_kg]</samp>:</p>
       <pre>
 fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))
 </pre>
@@ -211,7 +211,7 @@ fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEE
       rocket equation</a>). The rocket must have a sufficient ratio of fuel to
       rocket mass, with a sufficiently fast exhaust velocity (=<samp>9.8 *
       namelist:rocket=specific_impulse_s</samp>) to get to the orbital speed
-      <samp>env=ORBITAL_SPEED_MS</samp>.</p>
+      <var>env=ORBITAL_SPEED_MS</var>.</p>
     </div>
 
     <div class="slide">
@@ -230,12 +230,12 @@ fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEE
       <h3 class="alwayshidden">config edit, fail-if errors</h3>
 
       <p>Try adding a few more moonrocks. Add <samp>1000.0</samp> to the values
-      of <samp>total_weight_kg</samp> and <samp>fuelless_weight_kg</samp>,
+      of <var>total_weight_kg</var> and <var>fuelless_weight_kg</var>,
       retaining the decimal place in the values (<samp>.0</samp>).</p>
 
       <p>Re-run the check by clicking <kbd>Metadata -&gt; Check fail-if,
       warn-if</kbd>. An error dialog will appear, and the
-      <samp>total_weight_kg</samp> setting will have an error flag.</p>
+      <var>total_weight_kg</var> setting will have an error flag.</p>
 
       <p>However, neither of these are very informative, other than quoting the
       metadata.</p>
@@ -275,7 +275,7 @@ fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEE
       <h3 class="alwayshidden">warn-if</h3>
 
       <p>Let's try adding something for
-      <samp>namelist:rocket=battery_levels</samp>.</p>
+      <var>namelist:rocket=battery_levels</var>.</p>
 
       <p>Open the metadata file <samp>meta/rose-meta.conf</samp> in a text
       editor, and add this line to the
@@ -285,14 +285,14 @@ warn-if=namelist:rocket=battery_levels(1) &lt; 75 or namelist:rocket=battery_lev
 </pre>
 
       <p>This uses a special syntax for referencing the individual array
-      elements in <samp>battery_levels</samp>.</p>
+      elements in <var>battery_levels</var>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">warn-if</h3>
 
       <p>If the first array element value and/or the second array element value
-      of <samp>battery_levels</samp> is less than 75% full, a warning will be
+      of <var>battery_levels</var> is less than 75% full, a warning will be
       produced when the check is run.</p>
 
       <p>We already know the shorthand syntax <samp>this</samp>, so rephrase
@@ -308,7 +308,7 @@ warn-if=this(1) &lt; 75 or this(2) &lt; 75
       <p>Save the metadata file and then reload the config editor metadata.
       Click <kbd>Metadata -&gt; Check fail-if, warn-if</kbd> - a warning dialog
       should appear, and there should be a warning flag for the
-      <samp>battery_levels</samp> option.</p>
+      <var>battery_levels</var> option.</p>
 
       <p>For large arrays, it can sometimes be convenient to use whole-array
       operations - the <samp>fail-if</samp> and <samp>warn-if</samp> syntax
@@ -323,7 +323,7 @@ warn-if=this(1) &lt; 75 or this(2) &lt; 75
 warn-if=any(this &lt; 75)
 </pre>
 
-      <p>which will flag a warning if any <samp>battery_levels</samp> array
+      <p>which will flag a warning if any <var>battery_levels</var> array
       element values are less than 75.</p>
     </div>
 
@@ -333,7 +333,7 @@ warn-if=any(this &lt; 75)
       <p>In both <samp>fail-if</samp> and <samp>warn-if</samp>, expressions can
       be chained using the Python operator <samp>or</samp>, or you can separate
       them to give clearer error/warning messages. Using our
-      <samp>battery_levels</samp> example again, change the setting to:</p>
+      <var>battery_levels</var> example again, change the setting to:</p>
       <pre>
 warn-if=any(this &lt; 75);
         all(this &gt; 95)
