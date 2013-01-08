@@ -68,74 +68,78 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This tutorial walks you through using custom widget plugins
-      to the Rose config editor.</p>
+      <p>This tutorial walks you through using custom widget plugins to the
+      Rose config editor.</p>
 
-      <p>These allow users to define their own bespoke widgets that
-      can help improve usability in specialised situations.</p>
+      <p>These allow users to define their own bespoke widgets that can help
+      improve usability in specialised situations.</p>
     </div>
 
     <div class="slide">
       <h2 id="example">Example</h2>
 
-    <p>This example uses the example suite from the <a href=
-    "rose-rug-brief-tour.html">brief tour</a> and assumes you are familiar with it.
-    Change directory to your suite directory or recreate it if has been deleted.</p>
+      <p>This example uses the example suite from the <a href=
+      "rose-rug-brief-tour.html">brief tour</a> and assumes you are familiar
+      with it. Change directory to your suite directory or recreate it if has
+      been deleted.</p>
 
-    <p>We are going to develop a value widget for the app
-    <code>fred_hello_world</code>. Change directory to the suite directory,
-    then change directory to <code>app/fred_hello_world</code>.</p>
-
+      <p>We are going to develop a value widget for the app
+      <code>fred_hello_world</code>. Change directory to the suite directory,
+      then change directory to <code>app/fred_hello_world</code>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Metadata Directory</h3>
-    <p>The metadata for the app lives under the <code>meta</code> sub
-    directory. Our new widget will live with the metadata.</p>
 
-    <p>Create the directories <code>meta/lib/python/widget/</code> by
-    running:</p>
-    <pre class="shell">
+      <p>The metadata for the app lives under the <code>meta</code> sub
+      directory. Our new widget will live with the metadata.</p>
+
+      <p>Create the directories <code>meta/lib/python/widget/</code> by
+      running:</p>
+      <pre class="shell">
 mkdir -p meta/lib/python/widget
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Metadata Code Files</h3>
-    <p>Create an empty file called <code>__init__.py</code> in the
-    directory:</p>
-    <pre class="shell">
+
+      <p>Create an empty file called <code>__init__.py</code> in the
+      directory:</p>
+      <pre class="shell">
 touch meta/lib/python/widget/__init__.py
 </pre>
 
-    <p>Create a file called <code>username.py</code> in the directory:</p>
-    <pre class="shell">
+      <p>Create a file called <code>username.py</code> in the directory:</p>
+      <pre class="shell">
 touch meta/lib/python/widget/username.py
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 id="start">Initial Code</h3>
-      
-    <p>Open <code>username.py</code> in a text editor and paste in this
-    <a href="../etc/rose-rug-advanced-tutorials-widget/username.py.start.html">text</a>.</p>
 
-    <p>This is a slimmed-down copy of the class
-    <code>rose.config_editor.valuewidget.text.RawValueWidget</code>. It
-    contains all the API calls you would normally ever need.</p>
+      <p>Open <code>username.py</code> in a text editor and paste in this
+      <a href=
+      "../etc/rose-rug-advanced-tutorials-widget/username.py.start.html">text</a>.</p>
 
-    <p>We are now going to extend the widget to be more useful.</p>
+      <p>This is a slimmed-down copy of the class
+      <code>rose.config_editor.valuewidget.text.RawValueWidget</code>. It
+      contains all the API calls you would normally ever need.</p>
+
+      <p>We are now going to extend the widget to be more useful.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Importing a Library</h3>
-    <p>Add the line:</p>
-    <pre>
+
+      <p>Add the line:</p>
+      <pre>
 import pwd
 </pre>
 
-    <p>at the top of the file, so it looks like this:</p>
-    <pre>
+      <p>at the top of the file, so it looks like this:</p>
+      <pre>
 import pwd
 
 import gobject
@@ -144,27 +148,27 @@ pygtk.require('2.0')
 import gtk
 </pre>
 
-    <p>This adds the Python library that we'll use in a minute.</p>
+      <p>This adds the Python library that we'll use in a minute.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Completion</h3>
 
-    <p>Now we need to create a predictive text model by adding some data to our
-    <code>gtk.Entry</code> text widget.</p>
+      <p>Now we need to create a predictive text model by adding some data to
+      our <code>gtk.Entry</code> text widget.</p>
 
-    <p>We need to write our method <code>_set_completion</code>, and put it in
-    the main body of the class. This will retrieve usernames from the
-    <code>pwd.getpwall()</code> function and store them so they can be used by
-    the text widget <code>self.entry</code>.</p>
-    
+      <p>We need to write our method <code>_set_completion</code>, and put it
+      in the main body of the class. This will retrieve usernames from the
+      <code>pwd.getpwall()</code> function and store them so they can be used
+      by the text widget <code>self.entry</code>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Completion Method</h3>
-      
-      <p>Add the following method to the class (append to the bottom of the file):</p>
-    <pre>
+
+      <p>Add the following method to the class (append to the bottom of the
+      file):</p>
+      <pre>
     def _set_completion(self):
         # Return a predictive text model.
         completion = gtk.EntryCompletion()
@@ -177,89 +181,93 @@ import gtk
         self.entry.set_completion(completion)
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Calling the Method</h3>
-    <p>We need to make sure this method gets called at the right time, so we
-    add the line:</p>
-    <pre>
+
+      <p>We need to make sure this method gets called at the right time, so we
+      add the line:</p>
+      <pre>
         gobject.idle_add(self._set_completion)
 </pre>
 
-    <p>in the <code>__init__</code> method as follows:</p>
-    <pre>
+      <p>in the <code>__init__</code> method as follows:</p>
+      <pre>
         self.entry.show()
         self.pack_start(self.entry, expand=True, fill=True,
                         padding=0)
 </pre>
 
-    <p>becomes</p>
-    <pre>
+      <p>becomes</p>
+      <pre>
         self.entry.show()
         gobject.idle_add(self._set_completion)
         self.pack_start(self.entry, expand=True, fill=True,
                         padding=0)
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Explaining the Call</h3>
-    
-    <p>We could just call <code>self._set_completion()</code> there, but this
-    would hang the config editor while the database is retrieved.</p>
 
-    <p>Instead, we've told GTK to fetch the predictive text model when it's
-    next idle (<a href=
-    "http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gobject--idle-add">gobject.idle_add</a>).
-    This means it will be run after it finishes loading the page, and will be
-    more-or-less invisible to the user. This is a better way to launch
-    something that may take a second or two. If it took any longer, we'd
-    probably want to use a separate <a href=
-    "http://docs.python.org/library/multiprocessing.html#module-multiprocessing">
-    process</a>.</p>
+      <p>We could just call <code>self._set_completion()</code> there, but this
+      would hang the config editor while the database is retrieved.</p>
+
+      <p>Instead, we've told GTK to fetch the predictive text model when it's
+      next idle (<a href=
+      "http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gobject--idle-add">gobject.idle_add</a>).
+      This means it will be run after it finishes loading the page, and will be
+      more-or-less invisible to the user. This is a better way to launch
+      something that may take a second or two. If it took any longer, we'd
+      probably want to use a separate <a href=
+      "http://docs.python.org/library/multiprocessing.html#module-multiprocessing">
+      process</a>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 id="summary">Code Summary</h3>
-    <p>Our file should now look like
-    <a href="../etc/rose-rug-advanced-topics-widget/username.py.html">this</a>.</p>
 
-    <p>Now we need to refer to it in the metadata to make use of it.</p>
+      <p>Our file should now look like <a href=
+      "../etc/rose-rug-advanced-topics-widget/username.py.html">this</a>.</p>
+
+      <p>Now we need to refer to it in the metadata to make use of it.</p>
     </div>
-    
+
     <div class="slide">
       <h3 id="reference">Referencing the Widget</h3>
 
-    <p>Open the file <code>meta/rose-meta.conf</code> in a text editor and add
-    the lines:</p>
-    <pre>
+      <p>Open the file <code>meta/rose-meta.conf</code> in a text editor and
+      add the lines:</p>
+      <pre>
 [env=HELLO_GREETER]
 widget[rose-config-edit] = username.UsernameValueWidget
 </pre>
 
-    <p>This means that we've set our widget up for the option
-    <code>HELLO_GREETER</code> under the section <code>env</code>. It will now
-    be used as the widget for this variable's value.</p>
+      <p>This means that we've set our widget up for the option
+      <code>HELLO_GREETER</code> under the section <code>env</code>. It will
+      now be used as the widget for this variable's value.</p>
     </div>
-    
+
     <div class="slide">
       <h3 id="results">Results</h3>
-    <p>Try opening up the config editor in the application directory (where the
-    rose-app.conf is) by typing:</p>
-    <pre>
+
+      <p>Try opening up the config editor in the application directory (where
+      the rose-app.conf is) by typing:</p>
+      <pre>
 rose edit
 </pre>
 
-    <p>at the command line. Navigate to the <code>env</code> page. You should
-    see your widget on the top right of the page! As you type, it should
-    provide helpful auto-completion of usernames. Try typing your own
-    username.</p>
+      <p>at the command line. Navigate to the <code>env</code> page. You should
+      see your widget on the top right of the page! As you type, it should
+      provide helpful auto-completion of usernames. Try typing your own
+      username.</p>
     </div>
-    
+
     <div class="slide">
       <h2 id="further">Further Reading</h2>
 
-      <p>For more information, see the <a href="rose-api.html#gtk:config-edit:values:api">API reference</a>.</p>
+      <p>For more information, see the <a href=
+      "rose-api.html#gtk:config-edit:values:api">API reference</a>.</p>
     </div>
   </div>
 </body>
