@@ -41,15 +41,15 @@ class PlanetChecker(rose.macro.MacroBase):
     def _get_allowed_planets(self):
         # Retrieve planets less than a certain distance away.
         cmd_strings = ["wget", "-q", "-O", "-",
-                        "http://www.heavens-above.com/planetsummary.aspx"]
+                       "http://www.heavens-above.com/planetsummary.aspx"]
         p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
         text = p.communicate()[0]
         planets = re.findall("(\w+)&lt;/a&gt;",
-                                re.sub('(?s)^.*(tablehead.*?ascension).*$',
+                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
                                     r"\1", text))
         distances = re.findall("([\d.]+)&lt;/td&gt;",
-                                re.sub('(?s)^.*(Range.*?Brightness).*$',
-                                        r"\1", text))
+                               re.sub('(?s)^.*(Range.*?Brightness).*$',
+                                      r"\1", text))
         for planet, distance in zip(planets, distances):
             if float(distance) &gt; 5.0:
                 planets.remove(planet)

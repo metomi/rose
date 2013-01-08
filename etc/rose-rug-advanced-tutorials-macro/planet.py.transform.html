@@ -18,8 +18,7 @@ class PlanetChanger(rose.macro.MacroBase):
     change_text = '{0} to {1}'
     opts_to_change = [("env", "WORLD")]
     planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn",
-                "Uranus", "Neptune", "Eris", "Neptune", "Uranus", "Saturn",
-                "Jupiter", "Mars", "Earth", "Venus"]
+                "Uranus", "Neptune", "Eris"]
 
     def transform(self, config, meta_config=None):
         """Transform configuration and return it with a list of changes."""

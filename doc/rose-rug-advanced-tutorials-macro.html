@@ -70,7 +70,7 @@
 
       <p>This tutorial walks you through developing <a href=
       "rose-api.html#macro">custom macros</a> - Python plugin code that
-      provides extra checking or applies changes.</p>
+      provides extra checking or applies changes to a configuration.</p>
 
       <p>This covers the development of checking (<strong>validator</strong>)
       and changing (<strong>transformer</strong>) macros.</p>
@@ -137,7 +137,7 @@ touch meta/lib/python/macros/__init__.py
 
       <p>Create a file called <code>planet.py</code> in the directory:</p>
       <pre class="shell">
-touch meta/lib/python/widget/planet.py
+touch meta/lib/python/macros/planet.py
 </pre>
     </div>
 
@@ -178,15 +178,15 @@ touch meta/lib/python/widget/planet.py
     def _get_allowed_planets(self):
         # Retrieve planets less than a certain distance away.
         cmd_strings = ["wget", "-q", "-O", "-",
-                        "http://www.heavens-above.com/planetsummary.aspx"]
+                       "http://www.heavens-above.com/planetsummary.aspx"]
         p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
         text = p.communicate()[0]
         planets = re.findall("(\w+)&lt;/a&gt;",
-                                re.sub('(?s)^.*(tablehead.*?ascension).*$',
+                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
                                     r"\1", text))
         distances = re.findall("([\d.]+)&lt;/td&gt;",
-                                re.sub('(?s)^.*(Range.*?Brightness).*$',
-                                        r"\1", text))
+                               re.sub('(?s)^.*(Range.*?Brightness).*$',
+                                      r"\1", text))
         for planet, distance in zip(planets, distances):
             if float(distance) &gt; 5.0:
                 planets.remove(planet)
@@ -251,7 +251,7 @@ class PlanetChecker(rose.macro.MacroBase):
       <h3 class="alwayshidden">Check final macro</h3>
 
       <p>Your final macro should look like <a href=
-      "../etc/rose-rug-advanced-tutorials-macro/planet.py.validate.html">this</a>:</p>
+      "../etc/rose-rug-advanced-tutorials-macro/planet.py.validate.html">this</a>.</p>
     </div>
 
     <div class="slide">
@@ -259,12 +259,15 @@ class PlanetChecker(rose.macro.MacroBase):
 
       <p>Your validator macro is now ready to use.</p>
 
-      <p>You can run it by running:</p>
+      <p>Run the config editor by typing:</p>
       <pre class="shell">
 rose edit
 </pre>
 
-      <p>in the application directory. Select the top menu Metadata, then the
+      <p>in the application directory. Navigate to the <var>env</var>
+      page, and change the option <var>env=WORLD</var> to <samp>Jupiter</samp>.</p>
+      
+      To run the macro, select the top menu Metadata, then the
       item <var>fred_hello_world</var>, then the item
       <var>planet.PlanetChecker.validate</var>.</p>
     </div>
@@ -273,8 +276,8 @@ rose edit
       <h3 class="alwayshidden">Errors</h3>
 
       <p>It should either return an "OK" dialog, or give an error dialog using
-      the error text we wrote - it will depend on the current Earth-Sun-Jupiter
-      positions!</p>
+      the error text we wrote - it will depend on the current Earth-Jupiter
+      distance.</p>
 
       <p>If there is an error, the variable should display an error icon on the
       <var>env</var> page, which you can hover-over to get the error text. You
