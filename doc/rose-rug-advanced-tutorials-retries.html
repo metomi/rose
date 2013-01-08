@@ -93,9 +93,8 @@
     <div class="slide">
       <h2 id="example">Example</h2>
 
-      <p>Our example suite will control the use of the <a href=
-      "http://en.wikipedia.org/wiki/Holy_Hand_Grenade_of_Antioch">Holy Hand
-      Grenade</a>.</p>
+      <p>Our example suite will simulate trying to roll doubles using two
+      dice.</p>
 
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
       new directory) containing a blank <samp>rose-suite.conf</samp> and a
@@ -104,7 +103,7 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            remove_holy_pin =&gt; wait_for_it =&gt; lobbest_thou_grenade
+            start =&gt; roll_doubles =&gt; win
         """
 </pre>
     </div>
@@ -124,50 +123,26 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">App</h3>
+      <h3 class="alwayshidden">Task Runtime</h3>
 
-      <p>We need a <samp>wait_for_it</samp> app.</p>
-
-      <p>Create a directory in your suite:</p>
-      <pre class="shell">
-mkdir -p app/wait_for_it
-</pre>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">App file</h3>
-
-      <p>Create a file <samp>app/wait_for_it/rose-app.conf</samp> and paste in
-      the following contents:</p>
+      <p>We need to add a rolling doubles task - add these lines to the end of
+      your <samp>suite.rc</samp> file:</p>
       <pre>
-[command]
-default = sleep 5; if [[ $CYLC_TASK_TRY_NUMBER -eq 3 ]]; then echo 'now chuck it!'; else exit 1; fi
-</pre>
-
-      <p>We've written a command that will artifically fail our task (cylc sees
-      a task as failed if it has a non-zero exit code).
-      <code>$CYLC_TASK_TRY_NUMBER</code> is an environment variable that is
-      incremented by 1 each time a task is retried, starting from
-      <samp>1</samp>. This means that our task will artificially fail 2
-      times.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">App Runtime</h3>
-
-      <p>We need to add a Rose snippet to get cylc to run our app - add these
-      lines to the end of your <samp>suite.rc</samp> file:</p>
-      <pre>
-    [[wait_for_it]]
-        command scripting = "rose task-run -v"
+    [[roll_doubles]]
+        command scripting = """
+sleep 10
+RANDOM=$$  # Seed $RANDOM
+if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
+    echo "doubles!"
+else
+    exit 1
+fi
+        """
 </pre>
     </div>
 
     <div class="slide">
       <h2 id="running-no-retries">Running it without retries</h2>
-
-      <p>We can now just treat the app as a black box, that for some reason may
-      need to be retried twice before it works.</p>
 
       <p>Let's see what happens when we run the suite as it is.</p>
 
@@ -180,18 +155,19 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h2 id="retry-delays">Results</h3>
+      <h2 id="retry-delays">Results</h2>
 
-      <p>The suite should fail at the <samp>wait_for_it</samp> app.</p>
+      <p>Unless you're lucky, the suite should fail at the
+      <samp>roll_doubles</samp> task.</p>
 
       <p>We need to tell cylc to retry it a few times - replace the line
-      <samp>[[wait_for_it]]</samp> in the <samp>suite.rc</samp> file with:</p>
+      <samp>[[roll_doubles]]</samp> in the <samp>suite.rc</samp> file with:</p>
       <pre>
-    [[wait_for_it]]
-        retry delays = 0.1, 0.1, 0.1, 0.1, 0.1
+    [[roll_doubles]]
+        retry delays = 5*0.1
 </pre>
 
-      <p>This means that if the <samp>wait_for_it</samp> app fails, cylc
+      <p>This means that if the <samp>roll_doubles</samp> task fails, cylc
       expects to retry it 5 times before finally failing. Each retry will have
       a delay of <samp>0.1</samp> minutes.</p>
     </div>
@@ -211,11 +187,7 @@ rose suite-run
     <div class="slide">
       <h2 id="running-retries">Running it with retries</h2>
 
-      <p>Now we'll try again.</p>
-
-      <p>Make sure you are in the root directory of your suite.</p>
-
-      <p>Run the suite using:</p>
+      <p>Stop the running suite and re-run the suite using:</p>
       <pre class="shell">
 rose suite-run
 </pre>
@@ -224,62 +196,48 @@ rose suite-run
     <div class="slide">
       <h2 id="results-retries">Results</h2>
 
-      <p>What you should see is cylc retrying the <samp>wait_for_it</samp> app
-      - it will succeed on the third attempt and the suite will continue.</p>
+      <p>What you should see is cylc retrying the <samp>roll_doubles</samp>
+      task. Hopefully, it will succeed (about a 1 in 3 <a href=
+      "http://en.wikipedia.org/wiki/E_%28mathematical_constant%29">chance of
+      every task failing</a>) and the suite will continue.</p>
 
       <p>If you go to the suite output (run <code>rose suite-log-view</code> in
       your root suite directory), you can see the separate retry instances of
-      the app.</p>
+      the task.</p>
     </div>
 
     <div class="slide">
-      <h2 id="alter">Altering behaviour</h3>
+      <h2 id="alter">Altering behaviour</h2>
 
-      <p>We can alter the behaviour of the app based on the number of
-      retries.</p>
-
-      <p>Open the <samp>app/wait_for_it/rose-app.conf</samp> file in a text
-      editor and append the following line:</p>
+      <p>We can alter the behaviour of the task based on the number of retries,
+      using <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
       <pre>
-hurryup = echo 'hurry up and chuck it now!'
-</pre>
-
-      <p>This adds an alternative command to the app, that we know will work -
-      in real circumstances, you might want a special environment variable or
-      namelist option that, for example, speeds up or debugs the
-      application.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Command key</h3>
-
-      <p>We can edit the <samp>command scripting</samp> to introduce different
-      behaviour based on <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
-      <pre>
-    [[wait_for_it]]
-        retry delays = 0.1, 0.1, 0.1, 0.1, 0.1
         command scripting = """
-            if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
-                rose task-run -v --command-key=hurryup
-            else
-                rose task-run -v
-            fi
-            """
+sleep 10
+if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
+   echo "doubles!"  # Cheat!
+   exit 0
+fi
+RANDOM=$$
+if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
+    echo "doubles!"
+else
+    exit 1
+fi
+        """
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Results</h3>
 
-      <p>Make sure you are in the root directory of your suite.</p>
-
-      <p>Run the suite using:</p>
+      <p>If your suite is still running, stop it. Run it again using:</p>
       <pre class="shell">
 rose suite-run
 </pre>
 
-      <p>This time, the app should behave differently on the second retry and
-      actually succeed.</p>
+      <p>This time, the task should definitely succeed before the third
+      retry.</p>
     </div>
 
     <div class="slide">
