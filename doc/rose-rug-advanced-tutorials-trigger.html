@@ -120,19 +120,20 @@
       <p>Under <samp>[namelist:pizza_order=pizza_type]</samp>, add:</p>
       <pre>
 trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
-        namelist:pizza_order=extra_pepperoni: 'Pepperoni', 'BBQ Chicken'
+        namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken'
 </pre>
       <p>This states which values of <samp>pizza_type</samp> are relevant for
       which settings. This means that <samp>extra_chicken</samp> is only
       relevant when <samp>pizza_type</samp> is 'BBQ Chicken' - otherwise, it
-      should be in an <samp>ignored</samp> state.</p>
+      should be in an <samp>ignored</samp> state. <samp>pepperoni_multiple</samp>
+      is relevant for more than one value of <samp>pizza_type</samp>.</p>
     </div>
     
     <div class="slide">
-      <h3 class="alwayshidden">Adding Triggers - ignored sections</h3>
+      <h3 class="alwayshidden">Adding Logical Expression Triggers</h3>
       
-      <p>We should also make sure we don't order over our budget - in particular,
-      we should only order truffle toppings when our budget is pretty big! Add
+      <p>We should also make sure we don't order over our budget,
+      especially by splashing out on truffles. Add
       the following to <samp>[env=BUDGET]</samp>:</p>
       <pre>
 trigger=namelist:pizza_order=truffle: this > 25;
@@ -143,12 +144,18 @@ trigger=namelist:pizza_order=truffle: this > 25;
       allowed values (the <samp>this > 25</samp> part).
       Here, <samp>this</samp> is a placeholder for the value
       of <samp>env=BUDGET</samp>; the expression syntax is essentially
-      Pythonic.</p>
-      
-      <p>We've specified a section <samp>namelist:side_order</samp> in the
-      trigger - this means that the whole section and its options will be
-      <samp>ignored</samp> when the value of <samp>env=BUDGET</samp> is below
-      <samp>10</samp>.</p>
+      <a href="rose-rug-in-depth-topics.html#logicsyntax">Pythonic</a>.</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Adding Triggers - sections</h3>
+ 
+      <p>We've also specified a section <samp>namelist:side_order</samp> in the
+      trigger, which is perfectly valid - this means that the whole section
+      and its options will be <samp>ignored</samp> when the value of <samp>env=BUDGET</samp> is below
+      <samp>10</samp>. The truffle option will be ignored unless <samp>env=BUDGET</samp>
+      is more than 25.</p>
+
     </div>
 
     <div class="slide">
@@ -169,7 +176,7 @@ trigger=namelist:pizza_order=truffle: this > 25;
     <div class="slide">
       <h3 class="alwayshidden">Fixing triggers in the config editor</h3>
       
-      <p>As we're in the config editor, you can run "Autofix". You can do this
+      <p>Similarly, you can run "Autofix" in the config editor. You can do this
       in a couple of ways:</p>
       
       <ul>
@@ -177,6 +184,8 @@ trigger=namelist:pizza_order=truffle: this > 25;
         <li>the <kbd>Metadata -&gt; Autofix all configurations</kbd> menu</li>
         <li>the right click menu for the root page in the left hand tree panel</li>
       </ul>
+      
+      <p>Run "Autofix".</p>
     </div>
 
     <div class="slide">
@@ -186,13 +195,31 @@ trigger=namelist:pizza_order=truffle: this > 25;
       corrected - if you go to the page, you'll see that they've vanished!
       They're actually just commented out, and viewable via the menu
       <kbd>View -&gt; All Ignored Variables</kbd>.</p>
-      
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Results - changing things</h3>
       <p>Try altering the values of <samp>namelist:pizza_order=pizza_type</samp>
-      and <samp>env=BUDGET</samp>. This should enable and trigger-ignore different
-      settings. When <samp>env=BUDGET</samp> is below 10, the <samp>namelist:side_order</samp>
+      and <samp>env=BUDGET</samp> - with <kbd>View -&gt; All Ignored Variables</kbd> on and off.
+      This should enable and trigger-ignore different
+      settings.</p>
+      
+      <p>When <samp>env=BUDGET</samp> is below 10, the <samp>namelist:side_order</samp>
       section will be <samp>trigger-ignored</samp>, and the <samp>garlic_bread</samp> and <samp>soft_drink</samp>
       will be <samp>section-ignored</samp> - ignored because their parent section
-      is ignored, rather than anything directly relevant to them.</p>
+      is ignored.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Results - hover-over</h3>
+      
+      <p>You can get more information about why an option is ignored in the config editor
+      by hovering over its ignored flag, or looking at the option's menu button
+      <kbd>Info</kbd> entry.</p>
+      
+      <p>Setting ids mentioned in the Info dialog are usually clickable links,
+      so you can go directly to the relevant id.</p>
+
     </div>
 
     <div class="slide">
@@ -201,36 +228,132 @@ trigger=namelist:pizza_order=truffle: this > 25;
       <p>More than one setting can decide whether something is relevant. In that case,
       the subject is relevant only if all the parents agree that it is - an AND relationship.</p>
       
-      <p>For example, we have a missing dependency for <samp>namelist:pizza_order=truffle</samp> -
-      clearly that's only relevant when <samp>namelist:pizza_order=no_mushrooms</samp> is <samp>.false.</samp>.
-      Open the metadata file in a text editor, and add the following to the
+      <p>For example, we already have one trigger for <samp>namelist:pizza_order=truffle</samp> (<samp>env=BUDGET</samp>) - but it should also only be relevant when <samp>namelist:pizza_order=no_mushrooms</samp> is <samp>.false.</samp>.</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Multiple Inheritance example</h3>
+      
+      <p>Open the metadata file in a text editor, and add the following to the
       <samp>[namelist:pizza_order=no_mushrooms]</samp> metadata section:</p>
       <pre>
 trigger=namelist:pizza_order=truffle: .false.
 </pre>
-    </div>
-    
-    <div class="slide">
-      <h3>State Triggering</h3>
-      
-      <p>Triggering is not just based on values - if a setting is missing or <samp>trigger-ignored</samp>,
-      any settings that it triggers will be <samp>trigger-ignored</samp> by default.</p>
-      
-      <p>We can see this by setting:<
-      This means that the <samp>namelist:pizza_order=truffle</samp> option will only
+     
+      <p>This means that the <samp>namelist:pizza_order=truffle</samp> option will only
       be enabled when <samp>env=BUDGET</samp> is greater than <samp>25</samp> (our older trigger)
       <strong>and</strong> <samp>namelist:pizza_order=no_mushrooms</samp> is <samp>.false.</samp>.</p>
+
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Multiple Inheritance testing</h3> 
       
       <p>Save the metadata file and reload the metadata in the config editor, and test it
       for yourself.</p>
     </div>
 
     <div class="slide">
+      <h3>Cascading Triggering</h3>
+      
+      <p>Triggering is not just based on values - if a setting is missing or <samp>trigger-ignored</samp>,
+      any settings that it triggers will be <samp>trigger-ignored</samp> by default.</p>
+      
+      <p>This is another way of saying if something is irrelevant, all the settings that depend
+      on it should also be irrelevant. This means that triggers can act in a cascade - A triggers
+      B triggers C.</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Cascading Triggering example</h3>
+      
+      <p>We can see this by replacing the <samp>env=BUDGET</samp> trigger with:</p>
+      <pre>
+trigger=namelist:pizza_order=truffle: this > 25;
+        namelist:side_order: this >= 10;
+        namelist:pizza_order=pizza_type: this >= 5
+</pre>
+      <p>When <samp>env=BUDGET</samp> is less than 5, <samp>namelist:pizza_order=pizza_type</samp>
+      will be <samp>trigger-ignored</samp>. This means that all of its triggered settings like
+      <samp>namelist:pizza_order=extra_chicken</samp> are irrelevant and will also be
+      <samp>trigger-ignored</samp>.</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Cascading Triggering continued</h3>
+      
+      <p>Save, reload, and try changing <samp>env=BUDGET</samp> below <samp>5</samp>
+      to see what it does to the options in <samp>namelist:pizza_order</samp>.</p>
+    
+    </div>
+
+    <div class="slide">
+      <h3>Triggering (state)</h3>
+
+      <p>There's also another way to express a trigger - you don't have
+      to express a value or range of values in a trigger
+      expression.</p>
+      
+      <p>Quite often you only want a setting to be <samp>trigger-ignored</samp>
+      or enabled purely based on the availability of another setting - is it present and enabled?
+      You might not care what particular value it has.</p>
+    </div>
+   
+    <div class="slide">
+      <h3 class="alwayshidden">Triggering (non-value)</h3>
+      
+      <p>This can be expressed by adding a trigger but omitting the value part
+      of the syntax. Let's add an option that we can use.</p>
+      
+      <p>Add a new variable in the metadata by adding these lines to the
+      metadata file:</p>
+      <pre>
+[namelist:pizza_order=dip_type]
+values='Garlic','Sour Cream','Salsa','Brown Sauce','Mustard'
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Triggering (non-value) example</h3>
+      
+      <p>We should add a trigger expression as well - replace the <samp>[namelist:pizza_order=pizza_type]</samp>
+      trigger with:</p>
+      <pre>
+trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
+        namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
+        namelist:pizza_order=dip_type
+</pre>
+      <p>This means that <samp>namelist:pizza_order=dip_type</samp> is dependent
+      on <samp>namelist:pizza_order=pizza_type</samp>, and will only
+      be ignored when that is ignored - but the value of <samp>pizza_type</samp> doesn't matter to it.</p>
+
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Triggering (non-value) example continued</h3>
+      
+      <p>Save the file and reload the metadata in the config editor. We'll need
+      to add the <samp>namelist:pizza_order=dip_type</samp> to use it properly:
+      you can do this from the <samp>namelist:pizza_order</samp> page in a
+      couple of ways (e.g. <kbd>Add</kbd> toolbar button, right click page menu),
+      but it's more informative to do it via enabling the <kbd>View</kbd> menu option
+      <kbd>View Latent Variables</kbd>.</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Triggering (non-value) latent variables</h3>
+ 
+      <p>After enabling the view, you should see <samp>extra_dip</samp> appear as
+      an option that could be added. It will already have the correct triggered
+      state (the same state as <samp>namelist:pizza_order=pizza_type</samp>) -
+      verify for yourself that this works! You can then just add it via the
+      menu button for the option.</p> 
+    </div>
+
+    <div class="slide">
       <h2>Further Reading</h2>
 
-      <p>For more information, see the <a href=
-      "http://cylc.github.com/cylc/single/cug-html.html">cylc user
-      guide</a>.</p>
+      <p>For more information, see the <a href="rose-configuration.html#meta.conf.behaviour">Configuration Metadata Reference</a>.</p>
     </div>
   </div>
 </body>
