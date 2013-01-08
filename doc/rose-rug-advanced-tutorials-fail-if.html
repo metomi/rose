@@ -141,7 +141,7 @@ default=launch.exe
 ORBITAL_SPEED_MS=1683.0
 
 [file:rocket_settings.nl]
-source=rocket
+source=namelist:rocket
 
 [namelist:rocket]
 battery_levels=80, 60
@@ -254,15 +254,12 @@ fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEE
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Playing around</h3>
-
-      <p>Try changing the <samp>env=ORBITAL_SPEED_MS</samp> value (read the
-      help). How much more fuel would it take to use the Lunar Module to get
-      into Martian orbit?</p>
+      <h3 class="alwayshidden">rose macro -V</h3>
 
       <p>You can also check the <samp>fail-if</samp> metadata by running
       <code>rose macro --validate</code> or <code>rose macro -V</code> in a
-      terminal, inside the app directory.</p>
+      terminal, inside the app directory. Try saving the configuration
+      in a failed state, and then run the command.</p>
     </div>
 
     <div class="slide">
