@@ -203,7 +203,7 @@ specific_impulse_s=311.0
       <p>Add the following lines to the metadata section
       <samp>[namelist:rocket=total_weight_kg]</samp>:</p>
       <pre>
-fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))
+fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))
 </pre>
 
       <p>This states the relationship between these settings (a rearrangement
@@ -229,9 +229,8 @@ fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEE
     <div class="slide">
       <h3 class="alwayshidden">config edit, fail-if errors</h3>
 
-      <p>Try adding a few more moonrocks. Add <samp>1000.0</samp> to the values
-      of <var>total_weight_kg</var> and <var>fuelless_weight_kg</var>,
-      retaining the decimal place in the values (<samp>.0</samp>).</p>
+      <p>Try adding a few more moonrocks. Add <samp>1000</samp> to the values
+      of <var>total_weight_kg</var> and <var>fuelless_weight_kg</var>.</p>
 
       <p>Re-run the check by clicking <kbd>Metadata -&gt; Check fail-if,
       warn-if</kbd>. An error dialog will appear, and the
@@ -246,7 +245,7 @@ fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEE
 
       <p>Change the fail-if line to:</p>
       <pre>
-fail-if=this / namelist:rocket=fuelless_weight_kg &lt; 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))  # Fuel mass ratio or specific impulse too low to achieve orbit.
+fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))  # Fuel mass ratio or specific impulse too low to achieve orbit.
 </pre>
 
       <p>If you reload the metadata and run the check again, the error messages
