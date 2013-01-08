@@ -369,7 +369,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def shutdown(self, suite_name, host=None, args=None):
         """Shut down the suite."""
-        command = ["cylc", "shutdown"]
+        command = ["cylc", "shutdown", "--force"]
         if host:
             command += ["--host=%s" % host]
         if args:

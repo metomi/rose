@@ -42,7 +42,7 @@ import rose.gtk.run
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator, ResourceError
-from rose.suite_control import SuiteControlCommand
+from rose.suite_control import SuiteControl
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search

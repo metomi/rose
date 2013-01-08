@@ -96,7 +96,7 @@ class RoseSuiteHook(object):
 
         # Shut down if required
         if should_shutdown:
-            self.suite_engine_proc.shutdown(suite, args=["--force"])
+            self.suite_engine_proc.shutdown(suite)
 
     __call__ = run
         
