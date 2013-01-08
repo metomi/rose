@@ -28,13 +28,12 @@ class PlanetChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
-        problem_list = []
         for section, option in self.opts_to_check:
             node = config.get([section, option])
             if node is None or node.is_ignored():
                 continue
             # Check the option value (node.value) here
-        return problem_list
+        return self.reports
 </pre>
   </div>
 </body>

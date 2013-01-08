@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Advanced Tutorials: Custom Macro planet.py</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <div id="body-main">
+    <pre>
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import re
+import subprocess
+
+import rose.macro
+
+
+class PlanetChecker(rose.macro.MacroBase):
+
+    """Checks option values that refer to planets."""
+
+    error_text = "planet is too far away."
+    opts_to_check = [("env", "WORLD")]
+
+    def validate(self, config, meta_config=None):
+        """Return a list of errors, if any."""
+        allowed_planets = self._get_allowed_planets()
+        for section, option in self.opts_to_check:
+            node = config.get([section, option])
+            if node is None or node.is_ignored():
+                continue
+            if node.value not in allowed_planets:
+                self.add_report(section, option, node.value, self.error_text)
+        return self.reports
+
+    def _get_allowed_planets(self):
+        # Retrieve planets less than a certain distance away.
+        cmd_strings = ["wget", "-q", "-O", "-",
+                        "http://www.heavens-above.com/planetsummary.aspx"]
+        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
+        text = p.communicate()[0]
+        planets = re.findall("(\w+)&lt;/a&gt;",
+                                re.sub('(?s)^.*(tablehead.*?ascension).*$',
+                                    r"\1", text))
+        distances = re.findall("([\d.]+)&lt;/td&gt;",
+                                re.sub('(?s)^.*(Range.*?Brightness).*$',
+                                        r"\1", text))
+        for planet, distance in zip(planets, distances):
+            if float(distance) &gt; 5.0:
+                planets.remove(planet)
+        planets += ["Earth"]  # Distance ~ 0
+        return planets
+</pre>
+  </div>
+</body>
+</html>

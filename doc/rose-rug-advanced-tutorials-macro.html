@@ -167,7 +167,6 @@ touch meta/lib/python/widget/planet.py
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
         allowed_planets = self._get_allowed_planets()
-        problem_list = []
 </pre>
     </div>
 
@@ -222,7 +221,6 @@ class PlanetChecker(rose.macro.MacroBase):
     def validate(self, config, meta_config=None):
     """Return a list of errors, if any."""
         allowed_planets = self._get_allowed_planets()
-        problem_list = []
 </pre>
     </div>
 
@@ -238,8 +236,7 @@ class PlanetChecker(rose.macro.MacroBase):
       <p>with</p>
       <pre>
             if node.value not in allowed_planets:
-                self.add_report(problem_list, section, option, node.value,
-                                self.error_text)
+                self.add_report(section, option, node.value, self.error_text)
 </pre>
     </div>
 
@@ -364,8 +361,7 @@ rose macro planet.PlanetChecker
       <p>add</p>
       <pre>
             message = self.change_text.format(old_planet, new_planet)
-            self.add_report(change_list, section, option, new_planet,
-                            message)
+            self.add_report(section, option, new_planet, message)
 </pre>
     </div>
 
