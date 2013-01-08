@@ -11,7 +11,6 @@
 <body>
   <div id="body-main">
     <pre>
-
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
@@ -53,17 +52,6 @@ class UsernameValueWidget(gtk.HBox):
                            hook.trigger_scroll)
         self.grab_focus = lambda : hook.get_focus(self.entry)
 
-    def _set_completion(self):
-        # Return a predictive text model.
-        completion = gtk.EntryCompletion()
-        model = gtk.ListStore(str)
-        for username in [p.pw_name for p in pwd.getpwall()]:
-            model.append([username])
-        completion.set_model(model)
-        completion.set_text_column(0)
-        completion.set_inline_completion(True)
-        self.entry.set_completion(completion)
-
     def _setter(self, *args):
         """Alter the variable value and update status."""
         self.value = self.entry.get_text()
@@ -79,6 +67,18 @@ class UsernameValueWidget(gtk.HBox):
         if focus_index is None:
             return False
         self.entry.set_position(focus_index)
+
+    def _set_completion(self):
+        # Return a predictive text model.
+        completion = gtk.EntryCompletion()
+        model = gtk.ListStore(str)
+        for username in [p.pw_name for p in pwd.getpwall()]:
+            model.append([username])
+        completion.set_model(model)
+        completion.set_text_column(0)
+        completion.set_inline_completion(True)
+        self.entry.set_completion(completion)
+
 </pre>
   </div>
 </body>
