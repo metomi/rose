@@ -115,7 +115,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Adding Triggers</h3>
+      <h3 id="add-trigger">Adding Triggers</h3>
 
       <p>Let's add some <samp>trigger</samp> information.</p>
 
@@ -152,7 +152,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Adding Triggers - sections</h3>
+      <h3 class="alwayshidden">Adding Triggers for Sections</h3>
 
       <p>We've also specified a section <var>namelist:side_order</var> in the
       trigger, which is perfectly valid - this means that the whole section and
@@ -162,7 +162,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3>Fixing triggers</h3>
+      <h3 id="fix-trigger">Fixing Trigger Errors</h3>
 
       <p>If we load the config editor (or reload the metadata) again, we should
       get some trigger errors. These essentially say that some of our settings
@@ -175,7 +175,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Fixing triggers in the config editor</h3>
+      <h3 class="alwayshidden">Fixing Trigger Errors in the Config Editor</h3>
 
       <p>Similarly, you can run "Autofix" in the config editor. You can do this
       in a couple of ways:</p>
@@ -193,7 +193,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3>Results</h3>
+      <h3 id="results">Results</h3>
 
       <p>If you accept the changes, the state of these settings will be
       corrected - if you go to the page, you'll see that they've vanished!
@@ -202,7 +202,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Results - changing things</h3>
+      <h3 class="alwayshidden">Results - Changing Settings</h3>
 
       <p>Try altering the values of <var>namelist:pizza_order=pizza_type</var>
       and <var>env=BUDGET</var> - with <kbd>View -&gt; All Ignored
@@ -217,7 +217,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Results - hover-over</h3>
+      <h3 class="alwayshidden">Results - Hover-over</h3>
 
       <p>You can get more information about why an option is ignored in the
       config editor by hovering over its ignored flag, or looking at the
@@ -228,7 +228,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3>Multiple Inheritance</h3>
+      <h3 id="multiple">Multiple Inheritance</h3>
 
       <p>More than one setting can decide whether something is relevant. In
       that case, the subject is relevant only if all the parents agree that it
@@ -241,7 +241,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Multiple Inheritance example</h3>
+      <h3 class="alwayshidden">Multiple Inheritance Example</h3>
 
       <p>Open the metadata file in a text editor, and add the following to the
       <samp>[namelist:pizza_order=no_mushrooms]</samp> metadata section:</p>
@@ -256,14 +256,14 @@ trigger=namelist:pizza_order=truffle: .false.
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Multiple Inheritance testing</h3>
+      <h3 class="alwayshidden">Multiple Inheritance Testing</h3>
 
       <p>Save the metadata file and reload the metadata in the config editor,
       and test it for yourself.</p>
     </div>
 
     <div class="slide">
-      <h3>Cascading Triggering</h3>
+      <h3 id="cascade">Cascading Triggering</h3>
 
       <p>Triggering is not just based on values - if a setting is missing or
       <samp>trigger-ignored</samp>, any settings that it triggers will be
@@ -275,7 +275,7 @@ trigger=namelist:pizza_order=truffle: .false.
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Cascading Triggering example</h3>
+      <h3 class="alwayshidden">Cascading Triggering Example</h3>
 
       <p>We can see this by replacing the <var>env=BUDGET</var> trigger
       with:</p>
@@ -293,7 +293,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Cascading Triggering continued</h3>
+      <h3 class="alwayshidden">Cascading Triggering Continued</h3>
 
       <p>Save, reload, and try changing <var>env=BUDGET</var> below
       <samp>5</samp> to see what it does to the options in
@@ -301,7 +301,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3>Triggering based on state</h3>
+      <h3 id="state">Triggering Based on State</h3>
 
       <p>There's also another way to express a trigger - you don't have to
       express a value or range of values in a trigger expression.</p>
@@ -313,7 +313,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Triggering (non-value)</h3>
+      <h3 class="alwayshidden">Triggering Based on State - Syntax</h3>
 
       <p>This can be expressed by adding a trigger but omitting the value part
       of the syntax. Let's add an option that we can use.</p>
@@ -327,7 +327,7 @@ values='Garlic','Sour Cream','Salsa','Brown Sauce','Mustard'
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Triggering (non-value) example</h3>
+      <h3 class="alwayshidden">Triggering Based on State - Example</h3>
 
       <p>We should add a trigger expression as well - replace the
       <samp>[namelist:pizza_order=pizza_type]</samp> trigger with:</p>
@@ -344,7 +344,7 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Triggering (non-value) example continued</h3>
+      <h3 class="alwayshidden">View Latent Variables</h3>
 
       <p>Save the file and reload the metadata in the config editor. We'll need
       to add the <var>namelist:pizza_order=dip_type</var> to use it properly:
@@ -355,7 +355,7 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Triggering (non-value) latent variables</h3>
+      <h3 class="alwayshidden">Adding a Latent Variable</h3>
 
       <p>After enabling the view, you should see <var>extra_dip</var> appear as
       an option that could be added. It will already have the correct triggered
@@ -365,7 +365,7 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
     </div>
 
     <div class="slide">
-      <h2>Further Reading</h2>
+      <h2 id="further">Further Reading</h2>
 
       <p>For more information, see the <a href=
       "rose-configuration.html#meta.conf.behaviour">Configuration Metadata
