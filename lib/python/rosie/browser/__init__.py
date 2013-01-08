@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
-# (C) British Crown Copyright 2012 Met Office.
+# (C) British Crown Copyright 2012-3 Met Office.
 # 
 # This file is part of Rose, a framework for scientific suites.
 # 
@@ -192,7 +192,7 @@ TITLE_HISTORY_NAVIGATION_ERROR = "History navigation error"
 TITLE_INVALID_QUERY = "Error"
 
 # Miscellaneous
-COPYRIGHT = '(C) British Crown Copyright 2012 Met Office.'
+COPYRIGHT = '(C) British Crown Copyright 2012-3 Met Office.'
 DEFAULT_QUERY = "list_my_suites"
 DELIM_KEYVAL = ": "
 HELP_FILE = "rose-rug-rosie-go.html"
