@@ -22,7 +22,7 @@
 #
 # SYNOPSIS
 #     rose suite-gcontrol [OPTIONS] [SUITE]
-#     rose suite-gcontrol [OPTIONS] -- GCONTROL-ARGS SUITE
+#     rose suite-gcontrol [OPTIONS] -- EXTRA-ARGS SUITE
 #
 # DESCRIPTION
 #     Launch suite engine's suite control GUI for a suite.
@@ -42,4 +42,4 @@
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_gcontrol "$@"
+exec python -m rose.suite_control gcontrol "$@"

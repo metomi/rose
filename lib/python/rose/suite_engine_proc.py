@@ -369,7 +369,7 @@ class SuiteEngineProcessor(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def launch_gcontrol(self, suite_name, host=None, args=None):
+    def gcontrol(self, suite_name, host=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
         raise NotImplementedError()
 
@@ -423,7 +423,7 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def shutdown(self, suite):
+    def shutdown(self, suite_name, host=None, args=None):
         """Shut down the suite."""
         raise NotImplementedError()
 

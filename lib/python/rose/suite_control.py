@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Launch suite engine's control GUI from the correct suite host."""
+"""Launch suite engine's control commands from the correct suite host."""
 
 import os
 from rose.host_select import HostSelector
@@ -40,9 +40,9 @@ class SuiteRunningOnMultipleHostsEvent(Event):
                                                         ", ".join(hosts))
 
 
-class SuiteControlGUILauncher(object):
+class SuiteControl(object):
 
-    """Launch suite engine's control GUI from the correct suite host."""
+    """Launch suite engine's control commands from the correct suite host."""
 
     def __init__(self, event_handler=None, popen=None, suite_engine_proc=None,
                  host_selector=None):
@@ -63,24 +63,33 @@ class SuiteControlGUILauncher(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def launch(self, suite_name, host=None, *args):
+    def gcontrol(self, suite_name, host=None, *args):
         """Launch suite engine's control GUI."""
         if not host:
-            # Try pinging for a running suite
-            conf = ResourceLocator.default().get_conf()
-            node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
-            if node is not None:
-                hosts = self.suite_engine_proc.ping(
-                        suite_name,
-                        self.host_selector.expand(node.value.split())[0])
-                if hosts:
-                    host = hosts[0]
-                    if len(hosts) > 1:
-                        self.handle_event(SuiteRunningOnMultipleHostsEvent(
-                                suite_name, hosts))
-        return self.suite_engine_proc.launch_gcontrol(suite_name, host, args)
+            host = self._get_host(suite_name)
+        return self.suite_engine_proc.gcontrol(suite_name, host, args)
 
-    __call__ = launch
+    def shutdown(self, suite_name, host=None, *args):
+        """Shutdown the suite."""
+        if not host:
+            host = self._get_host(suite_name)
+        return self.suite_engine_proc.shutdown(suite_name, host, args)
+
+    def _get_host(self, suite_name):
+        """Return the suite host where possible."""
+        conf = ResourceLocator.default().get_conf()
+        node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
+        host = None
+        if node is not None:
+            hosts = self.suite_engine_proc.ping(
+                    suite_name,
+                    self.host_selector.expand(node.value.split())[0])
+            if hosts:
+                host = hosts[0]
+                if len(hosts) > 1:
+                    self.handle_event(SuiteRunningOnMultipleHostsEvent(
+                            suite_name, hosts))
+        return host
 
 
 def main():
@@ -88,16 +97,17 @@ def main():
     opt_parser.add_my_options("host")
     opts, args = opt_parser.parse_args()
     event_handler = Reporter(opts.verbosity - opts.quietness)
+    suite_control = SuiteControl(event_handler=event_handler)
+    method = getattr(suite_control, args.pop(0))
     if args:
         suite_name = args.pop()
     else:
         suite_name = os.path.basename(os.getcwd())
-    launcher = SuiteControlGUILauncher(event_handler=event_handler)
     if opts.debug_mode:
-        launcher(suite_name, opts.host, *args)
+        method(suite_name, opts.host, *args)
     else:
         try:
-            launcher(suite_name, opts.host, *args)
+            method(suite_name, opts.host, *args)
         except Exception as e:
             event_handler(e)
             sys.exit(1)
