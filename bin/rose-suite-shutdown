@@ -37,6 +37,8 @@
 # OPTIONS
 #     --host=HOST
 #         Specify a host.
+#     --non-interactive, --yes, -y
+#         Switch off interactive prompting (=answer yes to everything)
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v

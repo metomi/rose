@@ -29,19 +29,11 @@ from rose.suite_engine_proc import SuiteEngineProcessor
 import sys
 
 
-class SuiteRunningOnMultipleHostsEvent(Event):
-    """A warning raised if a suite is running on multiple hosts."""
-
-    TYPE = Event.TYPE_ERR
-
-    def __str__(self):
-        suite_name, hosts = self.args
-        return "%s is running on multiple hosts: %s" % (suite_name,
-                                                        ", ".join(hosts))
+YES = "y"
+PROMPT = "Really %s %s at %s? [" + YES + "/n] "
 
 
 class SuiteControl(object):
-
     """Launch suite engine's control commands from the correct suite host."""
 
     def __init__(self, event_handler=None, popen=None, suite_engine_proc=None,
@@ -63,51 +55,81 @@ class SuiteControl(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def gcontrol(self, suite_name, host=None, *args):
-        """Launch suite engine's control GUI."""
-        if not host:
-            host = self._get_host(suite_name)
-        return self.suite_engine_proc.gcontrol(suite_name, host, args)
+    def gcontrol(self, suite_name, host=None, callback=None, *args):
+        """Launch suite engine's control GUI.
 
-    def shutdown(self, suite_name, host=None, *args):
-        """Shutdown the suite."""
-        if not host:
-            host = self._get_host(suite_name)
-        return self.suite_engine_proc.shutdown(suite_name, host, args)
+        suite_name: name of the suite.
+        host: a host where the suite is running.
+        args: extra arguments for the suite engine's gcontrol command.
 
-    def _get_host(self, suite_name):
-        """Return the suite host where possible."""
-        conf = ResourceLocator.default().get_conf()
-        node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
-        host = None
-        if node is not None:
-            hosts = self.suite_engine_proc.ping(
-                    suite_name,
-                    self.host_selector.expand(node.value.split())[0])
-            if hosts:
-                host = hosts[0]
-                if len(hosts) > 1:
-                    self.handle_event(SuiteRunningOnMultipleHostsEvent(
-                            suite_name, hosts))
-        return host
+        N.B. "callback" is not used. It is included so that this method can
+        have the same interface as the "shutdown" method.
+
+        """
+        for host in self._get_hosts(suite_name, host):
+            self.suite_engine_proc.gcontrol(suite_name, host, args)
+
+    def shutdown(self, suite_name, host=None, callback=None, *args):
+        """Shutdown the suite.
+
+        suite_name: the name of the suite.
+        host: a host where the suite is running.
+        callback: If specified, must be a callable with the interface
+                  b = callback("shutdown", suite_name, host). This method will
+                  only issue the shutdown command to suite_name at host if b is
+                  True.
+        args: extra arguments for the suite engine's gcontrol command.
+
+        """
+        for host in self._get_hosts(suite_name, host):
+            if callback is None or callback("shutdown", suite_name, host):
+                self.suite_engine_proc.shutdown(suite_name, host, args)
+
+    def _get_hosts(self, suite_name, host):
+        if host:
+            hosts = [host]
+        else:
+            conf = ResourceLocator.default().get_conf()
+            node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
+            host = None
+            if node is not None:
+                hosts = self.suite_engine_proc.ping(
+                        suite_name,
+                        self.host_selector.expand(node.value.split())[0])
+            if not hosts:
+                hosts = [None]
+        return hosts
+
+
+def prompt(action, suite_name, host):
+    """Prompt user to confirm action for suite_name at host."""
+    if not host:
+        host = "localhost"
+    return raw_input(PROMPT % (action, suite_name, host)).strip() in [YES]
 
 
 def main():
+    """Implement "rose suite-gcontrol" and "rose suite-shutdown"."""
+    argv = sys.argv[1:]
+    method_name = argv.pop(0)
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("host")
-    opts, args = opt_parser.parse_args()
+    opt_parser.add_my_options("host", "non_interactive")
+    opts, args = opt_parser.parse_args(argv)
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_control = SuiteControl(event_handler=event_handler)
-    method = getattr(suite_control, args.pop(0))
+    method = getattr(suite_control, method_name)
+    callback = None
+    if not opts.non_interactive:
+        callback = prompt
     if args:
         suite_name = args.pop()
     else:
         suite_name = os.path.basename(os.getcwd())
     if opts.debug_mode:
-        method(suite_name, opts.host, *args)
+        method(suite_name, opts.host, callback, *args)
     else:
         try:
-            method(suite_name, opts.host, *args)
+            method(suite_name, opts.host, callback, *args)
         except Exception as e:
             event_handler(e)
             sys.exit(1)
