@@ -125,24 +125,8 @@
     <div class="slide">
       <h3 class="alwayshidden">Task Runtime</h3>
 
-<<<<<<< HEAD
-      <p>We need a <samp>wait_for_it</samp> app.</p>
-
-      <p>Create a directory in your suite:</p>
-      <pre class="shell">
-mkdir -p app/wait_for_it
-</pre>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">App File</h3>
-
-      <p>Create a file <samp>app/wait_for_it/rose-app.conf</samp> and paste in
-      the following contents:</p>
-=======
       <p>We need to add a rolling doubles task - add these lines to the end of
       your <samp>suite.rc</samp> file:</p>
->>>>>>> master
       <pre>
     [[roll_doubles]]
         command scripting = """
@@ -171,11 +155,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-<<<<<<< HEAD
-      <h2 id="results-no-retries">Results</h3>
-=======
       <h2 id="retry-delays">Results</h2>
->>>>>>> master
 
       <p>Unless you're lucky, the suite should fail at the
       <samp>roll_doubles</samp> task.</p>
@@ -227,35 +207,11 @@ rose suite-run
     </div>
 
     <div class="slide">
-<<<<<<< HEAD
       <h2 id="alter">Altering Behaviour</h3>
-=======
-      <h2 id="alter">Altering behaviour</h2>
->>>>>>> master
 
       <p>We can alter the behaviour of the task based on the number of retries,
       using <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
       <pre>
-<<<<<<< HEAD
-hurryup = echo 'hurry up and chuck it now!'
-</pre>
-
-      <p>This adds an alternative command to the app, that we know will work -
-      in real circumstances, you might want a special environment variable or
-      namelist option that, for example, speeds up or debugs the
-      application.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Command Key</h3>
-
-      <p>We can edit the <samp>command scripting</samp> to introduce different
-      behaviour based on <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
-      <pre>
-    [[wait_for_it]]
-        retry delays = 0.1, 0.1, 0.1, 0.1, 0.1
-=======
->>>>>>> master
         command scripting = """
 sleep 10
 if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
