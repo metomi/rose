@@ -64,6 +64,9 @@
 # OPTIONS
 #     --default
 #         Specify a default value.
+#     --env-var-process, -E
+#         Process environment variable substitution. (Only works when returning
+#         a string value.)
 #     --file=FILE, -f FILE
 #         Each of this specifies a configuration file. If none specified, read
 #         from $THIS/../etc/rose.conf and $HOME/.metomi/rose.conf (where $THIS

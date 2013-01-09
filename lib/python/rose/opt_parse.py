@@ -126,6 +126,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "downgrade",
                         "help": "Downgrade instead of upgrade."}],
+               "env_var_process_mode": [
+                       ["--env-var-process", "-E"],
+                       {"action": "store_true",
+                        "dest": "env_var_process_mode",
+                        "help": "Process environment variable syntax."}],
                "files": [
                        ["--file", "-f"],
                        {"action": "append",

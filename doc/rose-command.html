@@ -434,6 +434,11 @@
 
       <dd>Specify a default value.</dd>
 
+      <dt><kbd>--env-var-process, -E</kbd></dt>
+
+      <dd>Process environment variable substitution. (Only works when returning
+      a string value.)</dd>
+
       <dt><kbd>--file=FILE, -f FILE</kbd></dt>
 
       <dd>Each of this specifies a configuration file. If none specified, read
@@ -828,12 +833,57 @@
 
     <p><kbd>rose mpi-launch COMMAND [ARGUMENTS ...]</kbd></p>
 
+    <h3>DESCRIPTION</h3>
+
+    <p>Provide a portable way to launch an MPI command.</p>
+
     <h3>ARGUMENTS</h3>
 
     <dl>
       <dt><var>COMMAND</var></dt>
 
       <dd>Command to call. Subsequent arguments are passed to the command.</dd>
+    </dl>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--debug</kbd></dt>
+
+      <dd>Switch on xtrace, i.e. <code>set -x</code>.</dd>
+
+      <dt><kbd>--quiet, -q</kbd></dt>
+
+      <dd>Decrement verbosity.</dd>
+
+      <dt><kbd>--verbose; -v</kbd></dt>
+
+      <dd>Increment verbosity. Print command on <var>-v</var> mode. Run
+      <code>printenv</code>, <code>ldd</code> on a binary executable, and
+      <code>ulimit -a</code> on <var>-v -v</var> mode.</dd>
+    </dl>
+
+    <h3>CONFIGURATION</h3>
+
+    <p>The command reads its settings from the <var>[rose-host-select]</var>
+    section in <var>$ROSE_HOME/etc/rose.conf</var> and
+    <var>$HOME/.metomi/rose.conf</var>. All settings are optional. Valid
+    settings are:</p>
+
+    <dl>
+      <dt><kbd>launcher-list=LIST</kbd></dt>
+
+      <dd>Specify a list of launcher commands.</dd>
+
+      <dt><kbd>launcher-preopts.LAUNCHER=OPTIONS</kbd></dt>
+
+      <dd>Specify the default options of a <var>LAUNCHER</var> before the
+      COMMAND.</dd>
+
+      <dt><kbd>launcher-postopts.LAUNCHER=OPTIONS</kbd></dt>
+
+      <dd>Specify the default options of a <var>LAUNCHER</var> after the
+      COMMAND.</dd>
     </dl>
 
     <h3>ENVIRONMENT</h3>
@@ -851,11 +901,6 @@
       <dt><kbd>optional ROSE_LAUNCHER_LIST</kbd></dt>
 
       <dd>Specifies an alternative list of launchers.</dd>
-
-      <dt><kbd>optional ROSE_LAUNCHER_MPICH</kbd></dt>
-
-      <dd>Specifies the mpich launcher program to run the prog. Default is
-      <var>mpiexec</var>.</dd>
 
       <dt><kbd>optional ROSE_LAUNCHER_PREOPTS</kbd></dt>
 
@@ -877,10 +922,6 @@
 
       <dd>Specifies the number of processors to run on. Default is 1.</dd>
     </dl>
-
-    <h3>DESCRIPTION</h3>
-
-    <p>Provide a portable way to launch an MPI command.</p>
 
     <h3>DIAGNOSTICS</h3>
 
