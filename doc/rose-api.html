@@ -20,7 +20,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012
+      &copy; British Crown Copyright 2012-3
       <a href="http://www.metoffice.gov.uk">Met Office</a>.
       See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
@@ -758,9 +758,10 @@ def show_fixed(self, should_show)
 
     <p>This section explains how to add your own custom macros to transform and
     validate configurations. Upgrade macros are covered in a different section -
-    they are a special type of custom macro and are described in
-    <a href="rose-advanced-topics#upgrade">Advanced Topics</a>.
-    Macros should be written in Python. They can be
+    they are a special type of custom macro and (will be) described in
+    <a href="rose-rug-advanced-topics.html">Advanced Topics</a>.</p>
+    
+    <p>Macros should be written in Python. They can be
     run within <code>rose config-edit</code> or via <code>rose
     macro.</code></p>
 
@@ -784,352 +785,8 @@ def show_fixed(self, should_show)
 
     <h4 id="macro:code:examples">Examples</h4>
 
-    <p>These examples use the example suite from the <a href=
-    "rose-rug-brief-tour.html">brief tour</a> which you should have familiarised
-    yourself with.</p>
-
-    <p>Change directory to your example suite directory.</p>
-
-    <p>We are going to develop a macro for the app
-    <code>fred_hello_world</code>. Change directory to
-    <code>app/fred_hello_world</code>.</p>
-
-    <p>The metadata for the app lives under the <code>meta</code> sub
-    directory. Our new macro will live with the metadata.</p>
-
-    <p>For this example, we want to check the value of the option
-    <var>env=WORLD</var> in our fred_hello_world application. Specifically, for
-    this example, we want our macro to give us an error if the 'world' is too
-    far away from Earth.</p>
-
-    <p>Create the directories <code>meta/lib/python/macros/</code> by
-    running:</p>
-    <pre class="shell">
-mkdir -p meta/lib/python/macros
-</pre>
-
-    <p>Create an empty file called <code>__init__.py</code> in the
-    directory:</p>
-    <pre class="shell">
-touch meta/lib/python/macros/__init__.py
-</pre>
-
-    <p>Create a file called <code>planet.py</code> in the directory:</p>
-    <pre class="shell">
-touch meta/lib/python/widget/planet.py
-</pre>
-
-    <p>Open <code>planet.py</code> in a text editor and paste in the following
-    text:</p>
-    <pre>
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import re
-import subprocess
-
-import rose.macro
-
-
-class PlanetChecker(rose.macro.MacroBase):
-
-    """Checks option values that refer to planets."""
-
-    opts_to_check = [("env", "WORLD")]
-
-    def validate(self, config, meta_config=None):
-        """Return a list of errors, if any."""
-        problem_list = []
-        for section, option in self.opts_to_check:
-            node = config.get([section, option])
-            if node is None or node.is_ignored():
-                continue
-            # Check the option value (node.value) here
-        return problem_list
-</pre>
-
-    <p>We need to check the value of the option. In this case we'll generate a
-    list of allowed 'planet' choices.</p>
-
-    <p>Add the line</p>
-    <pre>
-        allowed_planets = self._get_allowed_planets()
-</pre>
-
-    <p>at the top of the <code>validate</code> method, so it looks like
-    this:</p>
-    <pre>
-    def validate(self, config, meta_config=None):
-        """Return a list of errors, if any."""
-        allowed_planets = self._get_allowed_planets()
-        problem_list = []
-</pre>
-
-    <p>Now add the method <code>_get_allowed_planets</code> to the class:</p>
-    <pre>
-    def _get_allowed_planets(self):
-        # Retrieve planets less than a certain distance away.
-        cmd_strings = ["wget", "-q", "-O", "-",
-                       "http://www.heavens-above.com/planetsummary.aspx"]
-        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
-        text = p.communicate()[0]
-        planets = re.findall("(\w+)&lt;/a&gt;",
-                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
-                                    r"\1", text))
-        distances = re.findall("([\d.]+)&lt;/td&gt;",
-                               re.sub('(?s)^.*(Range.*?Brightness).*$',
-                                      r"\1", text))
-        for planet, distance in zip(planets, distances):
-            if float(distance) &gt; 5.0:
-                planets.remove(planet)
-        planets += ["Earth"]  # Distance ~ 0
-        return planets
-</pre>
-
-    <p>This will give us a list of valid (nearby) solar system planets which
-    our configuration option should be in. If it isn't, we need to send a
-    message explaining the problem. Add:</p>
-    <pre>
-    error_text = "planet is too far away."
-</pre>
-
-    <p>at the top of the class, like this:</p>
-    <pre>
-class PlanetChecker(rose.macro.MacroBase):
-
-    """Checks option values that refer to planets."""
-
-    error_text = "planet is too far away."
-    opts_to_check = [("env", "WORLD")]
-
-    def validate(self, config, meta_config=None):
-    """Return a list of errors, if any."""
-        allowed_planets = self._get_allowed_planets()
-        problem_list = []
-</pre>
-
-    <p>Finally, we need to check if the configuration option is in the list, by
-    replacing</p>
-    <pre>
-            # Check the option value (node.value) here
-</pre>
-
-    <p>with</p>
-    <pre>
-            if node.value not in allowed_planets:
-                self.add_report(problem_list, section, option, node.value,
-                                self.error_text)
-</pre>
-
-    <p>which adds some information to the <code>problem_list</code> if the
-    option value is not a valid planet.</p>
-
-    <p>Your final macro should look like this:</p>
-    <pre>
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import re
-import subprocess
-
-import rose.macro
-
-
-class PlanetChecker(rose.macro.MacroBase):
-
-    """Checks option values that refer to planets."""
-
-    error_text = "planet is too far away."
-    opts_to_check = [("env", "WORLD")]
-
-    def validate(self, config, meta_config=None):
-        """Return a list of errors, if any."""
-        allowed_planets = self._get_allowed_planets()
-        problem_list = []
-        for section, option in self.opts_to_check:
-            node = config.get([section, option])
-            if node is None or node.is_ignored():
-                continue
-            if node.value not in allowed_planets:
-                self.add_report(problem_list, section, option, node.value,
-                                self.error_text)
-        return problem_list
-
-    def _get_allowed_planets(self):
-        # Retrieve planets less than a certain distance away.
-        cmd_strings = ["wget", "-q", "-O", "-",
-                       "http://www.heavens-above.com/planetsummary.aspx"]
-        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
-        text = p.communicate()[0]
-        planets = re.findall("(\w+)&lt;/a&gt;",
-                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
-                                    r"\1", text))
-        distances = re.findall("([\d.]+)&lt;/td&gt;",
-                               re.sub('(?s)^.*(Range.*?Brightness).*$',
-                                      r"\1", text))
-        for planet, distance in zip(planets, distances):
-            if float(distance) &gt; 5.0:
-                planets.remove(planet)
-        planets += ["Earth"]  # Distance ~ 0
-        return planets
-</pre>
-
-    <p>Your checker macro is now ready to use.</p>
-
-    <p>You can run it by running:</p>
-    <pre class="shell">
-rose edit
-</pre>
-
-    <p>in the application directory. Select the top menu Metadata, then the
-    item <var>fred_hello_world</var>, then the item
-    <var>planet.PlanetChecker.validate</var>.</p>
-
-    <p>It should either return an "OK" dialog, or give an error dialog using
-    the error text we wrote.</p>
-
-    <p>If there is an error, the variable should display an error icon on the
-    <var>env</var> page, which you can hover-over to get the error text. You
-    can remove the error by fixing the value and re-running your macro.</p>
-
-    <p>Try changing the value of <var>env=WORLD</var> to other solar system
-    planets and re-running the macro.</p>
-
-    <p>You can also run your macro from the command line in the application
-    directory by invoking <code>rose macro planet.PlanetChecker</code>.</p>
-
-    <p>We'll now make a macro that <em>changes</em> the configuration. Our
-    example will change the value of <var>env=WORLD</var> to something
-    else.</p>
-
-    <p>Open <code>planet.py</code> in a text editor and add the following
-    lines:</p>
-    <pre>
-class PlanetChanger(rose.macro.MacroBase):
-
-    """Switch between planets."""
-
-    change_text = '{0} to {1}'
-    opts_to_change = [("env", "WORLD")]
-    planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn",
-               "Uranus", "Neptune", "Eris", "Neptune", "Uranus", "Saturn",
-               "Jupiter", "Mars", "Earth", "Venus"]
-
-    def transform(self, config, meta_config=None):
-        """Transform configuration and return it with a list of changes."""
-        change_list = []
-        for section, option in self.opts_to_change:
-            node = config.get([section, option])
-            # Do something to the configuration.
-        return config, change_list
-</pre>
-
-    <p>We need to write some code to make some changes to the
-    configuration.</p>
-
-    <p>Replace the line</p>
-    <pre>
-            # Do something to the configuration.
-</pre>
-
-    <p>with</p>
-    <pre>
-            if node is None or node.is_ignored():
-                continue
-            if node.value not in self.planets:
-                old_planet = node.value
-                new_planet = self.planets[0]
-            else:
-                old_planet = node.value
-                index = self.planets.index(node.value)
-                if index == len(self.planets) - 1:
-                    new_index = 0
-                else:
-                    new_index = index + 1
-                new_planet = self.planets[new_index]
-            config.set([section, option], new_planet)
-</pre>
-
-    <p>This changes the option <var>env=WORLD</var> to the next planet on the
-    list. It will set it to the first planet on the list if it is something
-    else. It will skip it if it is missing or <var>ignored</var>.</p>
-
-    <p>We also need to add a change message to flag what we've changed.</p>
-
-    <p>Beneath</p>
-    <pre>
-            config.set([section, option], new_planet)
-</pre>
-
-    <p>add</p>
-    <pre>
-            message = self.change_text.format(old_planet, new_planet)
-            self.add_report(change_list, section, option, new_planet,
-                            message)
-</pre>
-
-    <p>This makes use of the template <code>self.change_text</code> at the top
-    of the class. The message will be used to provide more information to the
-    user about the change.</p>
-
-    <p>Your class should now look like this:</p>
-    <pre>
-class PlanetChanger(rose.macro.MacroBase):
-
-    """Switch between planets."""
-
-    change_text = '{0} to {1}'
-    opts_to_change = [("env", "WORLD")]
-    planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn",
-               "Uranus", "Neptune", "Eris", "Neptune", "Uranus", "Saturn",
-               "Jupiter", "Mars", "Earth", "Venus"]
-
-    def transform(self, config, meta_config=None):
-        """Transform configuration and return it with a list of changes."""
-        change_list = []
-        for section, option in self.opts_to_change:
-            node = config.get([section, option])
-            if node is None or node.is_ignored():
-                continue
-            if node.value not in self.planets:
-                old_planet = node.value
-                new_planet = self.planets[0]
-            else:
-                old_planet = node.value
-                index = self.planets.index(node.value)
-                if index == len(self.planets) - 1:
-                    new_index = 0
-                else:
-                    new_index = index + 1
-                new_planet = self.planets[new_index]
-            config.set([section, option], new_planet)
-            message = self.change_text.format(old_planet, new_planet)
-            self.add_report(change_list, section, option, new_planet,
-                            message)
-        return config, change_list
-</pre>
-
-    <p>Your transform macro is now ready to use.</p>
-
-    <p>You can run it by running:</p>
-    <pre class="shell">
-rose edit
-</pre>
-
-    <p>in the application directory. Select the top menu Metadata, then the
-    item <var>fred_hello_world</var>, then the item
-    <var>planet.PlanetChanger.transform</var>.</p>
-
-    <p>It should give a dialog explaining the changes it's made and asking for
-    permission to apply them. If you click <var>OK</var>, the changes will be
-    applied and the value of <var>env=WORLD</var> will be changed. You can
-    <var>Undo</var> and <var>Redo</var> macro changes.</p>
-
-    <p>Try running the macro once or twice more to see it change the
-    configuration.</p>
-
-    <p>You can also run your macro from the command line in the application
-    directory by invoking <code>rose macro planet.PlanetChanger</code>.</p>
+    <p>See the macro
+    <a href="rose-rug-advanced-tutorials-macro.html">Advanced Tutorial</a>.</p>
 
     <h4 id="macro:code:api">API Reference</h4>
 
@@ -1155,8 +812,8 @@ class SomeValidator(rose.macro.MacroBase):
     """This does some kind of check."""
 
     def validate(self, config, meta_config=None):
-        # Some check on config goes here, generates list_of_problems
-        return list_of_problems
+        # Some check on config appends to self.reports using self.add_report
+        return self.reports
 </pre>
 
     <p>The returned list should be a list of rose.macro.MacroReport objects
@@ -1169,32 +826,28 @@ class SomeValidator(rose.macro.MacroBase):
                    info=None, is_warning=False):
 </pre>
 
-    <p>This means that you should call it with your problem list first, then
-    the relevant section, then the relevant option, then the relevant value,
+    <p>This means that you should call it with the relevant section first, then the relevant option, then the relevant value,
     then the relevant error message, and optionally a warning flag that we'll
     discuss later. If the setting is a section, the option should be
     <code>None</code> and the value None. For example,</p>
     <pre>
     def validate(self, config, meta_config=None):
-        list_of_problems = []
         editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
         if editor_value != "sed":
-            self.add_report(list_of_problems,              # List to add to
-                            "env",                         # Section
+            self.add_report("env",                         # Section
                             "MY_FAVOURITE_STREAM_EDITOR",  # Option
                             editor_value,                  # Value
                             "Should be 'sed'!")            # Message
-        return list_of_problems
+        return self.reports
 </pre>
 
     <p>Validator macros have the option to give warnings, which do not count as
     formal errors in the Rose config editor GUI. These should be used when
     something <em>may</em> be wrong, such as warning when using an
-    advanced-developer-only option. They are invoked by passing a 6th argument
+    advanced-developer-only option. They are invoked by passing a 5th argument
     to <code>self.add_report</code>, <code>is_warning</code>, like so:</p>
     <pre>
-            self.add_report(list_of_problems,
-                            "env",
+            self.add_report("env",
                             "MY_FAVOURITE_STREAM_EDITOR",
                             editor_value,
                             "Could be 'sed'",
@@ -1210,8 +863,8 @@ class SomeTransformer(rose.macro.MacroBase):
     """This does some kind of change to the config."""
 
     def transform(self, config, meta_config=None):
-        # Some operation on config goes here, generates list_of_changes
-        return config, list_of_changes
+        # Some operation on config which calls self.add_report for each change.
+        return config, self.reports
 </pre>
 
     <p>The returned list should be a list of 4-tuples containing the section,
@@ -1223,16 +876,15 @@ class SomeTransformer(rose.macro.MacroBase):
     <pre>
     def transform(self, config, meta_config=None):
         """Add some more snow control."""
-        list_of_changes = []
         if config.get(["namelist:snowflakes"]) is None:
             config.set(["namelist:snowflakes"])
             self.add_report(list_of_changes,
                             "namelist:snowflakes", None, None,
                             "Updated snow handling in time for Christmas")
             config.set(["namelist:snowflakes", "l_unique"], ".true.")
-            self.add_report(list_of_changes, "namelist:snowflakes",
-                            "l_unique", ".true.", "So far, anyway.")
-        return config, list_of_changes
+            self.add_report("namelist:snowflakes", "l_unique", ".true.",
+                            "So far, anyway.")
+        return config, self.reports
 </pre>
 
     <h2 id="rosie-ws">Rosie Web</h2>

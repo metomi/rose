@@ -20,7 +20,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012
+      &copy; British Crown Copyright 2012-3
       <a href="http://www.metoffice.gov.uk">Met Office</a>.
       See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
@@ -213,10 +213,10 @@ key-4=value 4
     configuration in the user configuration overrides the site configuration
     and the default. Rose expects these files to be in the modified INI format
     described above. Rose utilities search for its site configuration at
-    <var>$ROSE_HOME/etc/rose.conf</var> where <var>$ROSE_HOME/bin/rose</var>
-    is the location of the <code>rose</code> command, and they search for the
-    user configuration at <var>$HOME/.metomi/rose.conf</var> where
-    <var>$HOME</var> is the home directory of the current user.</p>
+    <var>$ROSE_HOME/etc/rose.conf</var> where <var>$ROSE_HOME/bin/rose</var> is
+    the location of the <code>rose</code> command, and they search for the user
+    configuration at <var>$HOME/.metomi/rose.conf</var> where <var>$HOME</var>
+    is the home directory of the current user.</p>
 
     <p><em>Allowed settings in the site and user configuration files will be
     documented in a future version of this document. In the mean time, the
@@ -225,9 +225,9 @@ key-4=value 4
 
     <p>You can also override many internal constants of the <code>rose config
     edit</code> and <code>rosie go</code>. To change the keyboard shortcut of
-    the <samp>Find Next</samp> action in the config editor to <kbd>F3</kbd>, put
-    the following lines in your user config file, and the setting will apply the
-    next time you run <code>rose config-edit</code>:</p>
+    the <samp>Find Next</samp> action in the config editor to <kbd>F3</kbd>,
+    put the following lines in your user config file, and the setting will
+    apply the next time you run <code>rose config-edit</code>:</p>
     <pre>
 [rose-config-edit]
 accel-find-next=F3
@@ -577,8 +577,7 @@ accel-find-next=F3
 
       <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
 
-      <li>The value of the <var>ROSE_META_PATH</var> environment
-      variable.</li>
+      <li>The value of the <var>ROSE_META_PATH</var> environment variable.</li>
 
       <li>The <samp>meta-path</samp> setting in <a href=
       "rose-configuration.html#site">site/user</a> configurations.</li>
@@ -917,6 +916,17 @@ warn-if = True  # This option is deprecated
 
         <p>This would always evaluate True and give a warning if the setting is
         present.</p>
+
+        <p>Please note: when dividing a real-numbered setting by something,
+        make sure that the expression does not actually divide an integer by an
+        integer - for example, <samp>this / 2</samp> will evaluate as
+        <samp>0</samp> if <var>this</var> has a value of <samp>1</samp>, but
+        <samp>0.5</samp> if it has a value of <samp>1.0</samp>. This is a
+        result of Python's implicit typing.</p>
+
+        <p>You can get around this by making sure either the numerator or
+        denominator is a real number - e.g. by rewriting it as <samp>this /
+        2.0</samp> or <samp>1.0 * this / 2</samp>.</p>
       </dd>
     </dl>
 
@@ -1460,7 +1470,7 @@ meta = my-command/t123
     ignored state mismatches. The actual situations are considerably more
     varied, given section-ignoring and latent variables - the table holds the
     most important varieties.</p>
-    
+
     <p>The <samp>State</samp> contains the actual states. The <samp>Trigger
     State</samp> column contains the trigger-mechanism's expected states. The
     states can be:</p>
@@ -1555,8 +1565,7 @@ meta = my-command/t123
 
         <td>E</td>
 
-        <td class="caption">I<sub>U</sub> not given for above
-        reasons.</td>
+        <td class="caption">I<sub>U</sub> not given for above reasons.</td>
       </tr>
 
       <tr>
@@ -1584,9 +1593,9 @@ meta = my-command/t123
 
         <td>E</td>
 
-        <td>overlooking mainly in order to de-clutter the <kbd>No Metadata</kbd>
-        view.  <span class="user-ignored">I<sub>U</sub></span> not given for
-        above reasons.</td>
+        <td>overlooking mainly in order to de-clutter the <kbd>No
+        Metadata</kbd> view. <span class="user-ignored">I<sub>U</sub></span>
+        not given for above reasons.</td>
       </tr>
 
       <tr>
@@ -1600,8 +1609,8 @@ meta = my-command/t123
 
         <td>None</td>
 
-        <td>same basic state, won't mess with trigger
-        too much. macro will ask to fix this.</td>
+        <td>same basic state, won't mess with trigger too much. macro will ask
+        to fix this.</td>
       </tr>
 
       <tr class="odd">

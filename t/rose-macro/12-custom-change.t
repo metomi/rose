@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# (C) British Crown Copyright 2012 Met Office.
+# (C) British Crown Copyright 2012-3 Met Office.
 # 
 # This file is part of Rose, a framework for scientific suites.
 # 
@@ -35,7 +35,7 @@ init_macro envswitch.py <<__MACRO__
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
-# (C) British Crown Copyright 2012 Met Office.
+# (C) British Crown Copyright 2012-3 Met Office.
 # 
 # This file is part of Rose, a framework for scientific suites.
 # 
@@ -96,7 +96,7 @@ init_macro envswitch.py <<__MACRO__
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
-# (C) British Crown Copyright 2012 Met Office.
+# (C) British Crown Copyright 2012-3 Met Office.
 # 
 # This file is part of Rose, a framework for scientific suites.
 # 
