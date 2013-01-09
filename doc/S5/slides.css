@@ -6,3 +6,23 @@
 h2 {
     border-top: none;
 }
+
+h1 {
+    border-top: none;
+}
+
+
+body {
+		background:white;
+}
+
+#body-main {
+		border:none;
+		width:100%
+		background:white;
+		margin:0;
+		padding:0;
+}
+
+
+

@@ -53,6 +53,7 @@ var {
 
 h1 {
     color: #ffcb00;
+		/* color: #060048; */
 }
 
 .header-footer {
@@ -95,7 +96,7 @@ h1 {
  *
  **********************************************************************/
 h1 {
-    background: #060048;
+   background: #060048;
 }
 
 caption,
@@ -105,7 +106,8 @@ pre,
 samp,
 th,
 .image {
-    background: #eee;
+    background:none;
+		color:#46d;
 }
 
 .header-footer {
@@ -116,6 +118,12 @@ th,
 .sectionlink:hover {
     background: #ddd;
 }
+
+.shell {
+    background: #d6faf8;
+		color:#565088;
+}
+
 
 .shell-prompt {
     background: none;
@@ -148,16 +156,16 @@ kbd,
 pre,
 samp,
 .image {
-    border: thin solid #ddd;
+    /* border: thin solid #ddd; */
 }
 
 
 h2 {
-    border-top: medium ridge #060048;
+    border-top: medium solid #060048;
 }
 
 .shell {
-    border: thin outset black;
+    border: none;
 }
 
 .shell-prompt,
@@ -180,6 +188,7 @@ th {
  **********************************************************************/
 body {
     font-family: sans-serif;
+		background:#aaa;
 }
 
 code,
@@ -337,6 +346,10 @@ h2,
     margin: 0;
 }
 
+h1 {
+		margin:0px -30px 0px -30px;
+}
+
 img {
     margin: 0.25em;
 }
@@ -368,7 +381,7 @@ table {
  *
  **********************************************************************/
 h1 {
-    padding-top: 0;
+    padding-right: 30px;
 }
 h1,
 h2,
@@ -436,12 +449,19 @@ th {
 }
 
 .header-footer,
-#body-main {
+{
     position: absolute;
 }
 
 #body-main {
-    top: 3em;
+		width:800px;
+		background:white;
+		border:1px solid #060048;
+		margin:0 auto;
+		margin-top:20px;
+		margin-bottom:50px;
+		padding:30px;
+		padding-top:0px;
 }
 
 
@@ -456,6 +476,5 @@ th {
 @media screen {
     #body-header,
     #body-main {
-        width: 100%;
     }
 }
