@@ -387,7 +387,12 @@ class CylcProcessor(SuiteEngineProcessor):
             suite_dir_old = None
         if suite_dir_old is None:
             self.popen("cylc", "register", suite_name, suite_dir)
-        passphrase_dir = os.path.join(home, ".cylc", suite_name)
+        passphrase_dir_root = os.path.join(home, ".cylc")
+        for name in os.listdir(passphrase_dir_root):
+            p = os.path.join(passphrase_dir_root, name)
+            if os.path.islink(p) and not os.path.exists(p):
+                self.fs_util.delete(p)
+        passphrase_dir = os.path.join(passphrase_dir_root, suite_name)
         self.fs_util.symlink(suite_dir, passphrase_dir)
         self.popen("cylc", "validate", suite_name)
 
