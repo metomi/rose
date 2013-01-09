@@ -113,7 +113,7 @@ def main():
     argv = sys.argv[1:]
     method_name = argv.pop(0)
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("host", "non_interactive")
+    opt_parser.add_my_options("host", "name", "non_interactive")
     opts, args = opt_parser.parse_args(argv)
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_control = SuiteControl(event_handler=event_handler)
@@ -121,8 +121,8 @@ def main():
     callback = None
     if not opts.non_interactive:
         callback = prompt
-    if args:
-        suite_name = args.pop()
+    if opts.name:
+        suite_name = opts.name
     else:
         suite_name = os.path.basename(os.getcwd())
     if opts.debug_mode:

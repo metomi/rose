@@ -997,16 +997,15 @@
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose suite-gcontrol [OPTIONS] [SUITE]</kbd></p>
-
-    <p><kbd>rose suite-gcontrol [OPTIONS] -- EXTRA-ARGS SUITE</kbd></p>
+    <p><kbd>rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS
+    ...]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
     <p>Launch suite engine's suite control GUI for a suite.</p>
 
-    <p>If no argument is specified, the basename of <var>PWD</var> is assumed
-    to be the suite name.</p>
+    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the basename of
+    <var>$PWD</var> is assumed to be the suite name.</p>
 
     <p>This wrapper is to deal with the use case where a suite may be running
     on dedicated servers at a site. The wrapper will make an attempt to detect
@@ -1018,6 +1017,10 @@
       <dt><kbd>--host=HOST</kbd></dt>
 
       <dd>Specify a host.</dd>
+
+      <dt><kbd>--name=SUITE-NAME</kbd></dt>
+
+      <dd>Specify the suite name.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -1335,16 +1338,15 @@
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose suite-shutdown [OPTIONS] [SUITE]</kbd></p>
-
-    <p><kbd>rose suite-shutdown [OPTIONS] -- EXTRA-ARGS SUITE</kbd></p>
+    <p><kbd>rose suite-shutdown [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS
+    ...]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
     <p>Shutdown a running suite.</p>
 
-    <p>If no argument is specified, the basename of <var>PWD</var> is assumed
-    to be the suite name.</p>
+    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the basename of
+    <var>$PWD</var> is assumed to be the suite name.</p>
 
     <p>This wrapper is to deal with the use case where a suite may be running
     on dedicated servers at a site. The wrapper will make an attempt to detect
@@ -1356,6 +1358,10 @@
       <dt><kbd>--host=HOST</kbd></dt>
 
       <dd>Specify a host.</dd>
+
+      <dt><kbd>--name=SUITE-NAME</kbd></dt>
+
+      <dd>Specify the suite name.</dd>
 
       <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
 
