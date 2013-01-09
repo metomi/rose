@@ -151,7 +151,7 @@ export NPROC=${NPROC:-1}
 
 #-------------------------------------------------------------------------------
 # 0. ROSE_LAUNCHER_MPICH is deprecated. Alternative launchers should be
-# specified in build specific scripts using ROSE_LAUNCHER
+# specified in build specific run time scripts using ROSE_LAUNCHER
 #-------------------------------------------------------------------------------
 ROSE_LAUNCHER_LIST="${ROSE_LAUNCHER_MPICH:-} $ROSE_LAUNCHER_LIST"
 
