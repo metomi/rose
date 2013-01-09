@@ -4,7 +4,7 @@ Rose is a framework for managing and running scientific suites.
 
 ## Copyright
 
-British Crown Copyright 2012 Met Office.
+British Crown Copyright 2012-3 Met Office.
 
 ## Terms of Use
 
