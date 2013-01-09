@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose User Guide: Advanced Tutorials</title>
+  <title>Rose Advanced Tutorial: Suite Date/Time Manipulation</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -16,6 +16,8 @@
   id="operaFix" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
   <script type="text/javascript" src="jquery.min.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
@@ -44,41 +46,49 @@
       <p><a id="doc-home-link" href="." name="doc-home-link">Rose
       Documentation</a></p>
     </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
   </div>
 
-  <div id="body-main">
-    <h1>Rose User Guide: Advanced Tutorials</h1>
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Suite Date/Time Manipulation</h1>
+    </div>
 
-    <h2 id="intro">Introduction</h2>
+    <div class="handout" id="content"></div>
 
-    <p>These tutorials walk you through advanced features of Rose and cylc. You
-    should already have a good understanding of the material in the rest of the
-    user guide.</p>
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
 
-    <h2 id="metadata">Configuration Metadata Tutorials</h2>
-    
-    <ul>
-      <li><a href="rose-rug-advanced-tutorials-fail-if.html">fail-if, warn-if</a></li>
-    </ul>
+      <p>This part of the Rose user guide walks you through using templating
+      and <samp>rose-suite.conf</samp> variables in your <samp>suite.rc</samp>,
+      using <a href="jinja.pocoo.org">Jinja2</a>.</p>
 
-    <h2 id="suites">Suite Tutorials</h2>
+      <p>This allows you to collapse repeated configuration, and move commonly used
+      settings to a central place. It is particularly useful for suites with
+      many, very similar tasks.</p>
+    </div>
 
-    <ul>
-      <li><a href="rose-rug-advanced-tutorials-broadcast.html">cylc
-      broadcast</a>, for changing runtime settings during a suite's run</li>
+    <div class="slide">
+      <h2>Further Reading</h2>
 
-      <li><a href="rose-rug-advanced-tutorials-jinja2.html">jinja2
-      templating</a></li>
+      <p>For more information, see:</p>
 
-      <li><a href="rose-rug-advanced-tutorials-queues.html">queues</a>, for
-      restricting the number of certain tasks active at any one time</li>
+      <ul>
+        <li><a href="http://jinja.pocoo.org">Jinja2</a></li>
 
-      <li><a href="rose-rug-advanced-tutorials-retries.html">retries</a>, for
-      automatically re-running failing tasks</li>
-      
-      <li><a href="rose-rug-advanced-tutorials-suite-date-time.html">date/time
-      manipulation</a></li>
-    </ul>
+        <li>the <a href="http://cylc.github.com/cylc/single/cug-html.html">cylc
+        user guide</a>.</li>
+      </ul>
+    </div>
   </div>
 </body>
 </html>
