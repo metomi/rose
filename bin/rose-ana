@@ -29,6 +29,50 @@
 # OPTIONS
 #     --method-path=DIR, -p DIR
 #         Specify additional directories to locate extraction and comparison
-#         methods.
+#         classes.
+#
+# CONFIGURATION FILE CONTENTS
+#
+#     A human-readable name of the test should be placed in square brackets,
+#     followed by the following settings, one per line:
+#
+#     comparison
+#         The class name which will be called to compare the resulting data from
+#         the 'extract' command.
+#     extract
+#         Either the class name which should be called to extract data from the
+#         files to be compared, or a system command which will be called to
+#         extract or compare the files. In the latter case, the tokens 
+#         {resultfile} and {kgo1file} map to the values defined in the 
+#         configuration file. The token {file} will result in the command being
+#         called twice, once on {resultfile} and once on {kgo1file}. Some
+#         extraction classes such as 'OutputGrepper' require additional 
+#         information about how to extract the data. This should be placed
+#         after the class name, separated from it by a colon.
+#     kgo1file
+#         The path and name of the file containing the known good output.
+#         Environment variables and the wildcard character '*' are accepted.
+#     resultfile
+#         The path and name of the file containing the output to be compared.
+#         Environment variables and the wildcard character '*' are accepted.
+#     tolerance
+#         For inexact comparisons such as 'Within', the tolerance should be 
+#         specified using this variable. Values with a percentage sign are 
+#         treated as percentages, otherwise values are treated as a range
+#         either side of the known good output value. This value is optional;
+#         some comparisons such as 'Exact' do not require it.
+#     warnonfail
+#         If this is set to be 'yes' a failure of the test will result in a
+#         warning rather than a failure. This value is always optional.
+#
+# CONFIGURATION FILE EXAMPLE
+#
+#     [Compare initial norms]
+#     resultfile = $OUTPUT_DIR/fort6.pe0
+#     kgo1file = /path/to/kgo/fort6.pe0
+#     extract = OutputGrepper:um_initial_norms
+#     comparison = Within
+#     tolerance = 5%
+#
 #-------------------------------------------------------------------------------
 exec python -m rose.ana "$@"
