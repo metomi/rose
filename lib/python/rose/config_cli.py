@@ -20,6 +20,7 @@
 """Implements the "rose config" command."""
 
 from rose.config import ConfigDumper, ConfigLoader, ConfigNode
+from rose.env import env_var_process
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
@@ -53,8 +54,8 @@ def get_meta_path(root_node, rel_path=None, meta_key=False):
 def main():
     """Implement the "rose config" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("default", "files", "keys", "no_ignore", "meta", 
-                              "meta_key")
+    opt_parser.add_my_options("default", "env_var_process_mode", "files",
+                              "keys", "no_ignore", "meta", "meta_key")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -135,7 +136,10 @@ def main():
                     sys.exit(1)
                 print opts.default
             else:
-                print node.value
+                value = node.value
+                if opts.env_var_process_mode:
+                    value = env_var_process(value)
+                print value
 
 
 if __name__ == "__main__":
