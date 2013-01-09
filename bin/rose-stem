@@ -44,7 +44,7 @@
 #         This may be used to locate 'fcm make' config files. If not set, this
 #         defaults to the first --diffsource set on the command line, or 
 #         the first --source if --diffsource is not specified. This controls
-#         the variables URL_CONFDIR and URL_CONFREV, which are  the path and 
+#         the variables URL_CONFDIR and URL_CONFREV, which are the path and 
 #         revision of the source to take the config file from respectively.
 #     --diffsource=SOURCE, -d SOURCE
 #         Specify a source tree to add to the trunk as a branch. This sets the
