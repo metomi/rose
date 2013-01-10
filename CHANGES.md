@@ -32,6 +32,11 @@ Changes that have significant impact on user experience.
 
 Changes that are worth mentioning.
 
+\#329: rose suite-shutdown: new command.
+* rose suite-gcontrol: use `--name=SUITE-NAME` to specify a suite name instead of the last argument.
+
+\#325: rose config-edit: fix section ignore problem.
+
 \#313: rose config: added `--meta` and `--meta-key` options.
 
 \#299: rose task-run: the built-in `fcm_make(2)` task utilities can
@@ -40,6 +45,10 @@ now be configured using Rose application configurations.
 * Support no directory change via the `use-pwd` option.
 * Introduce `ROSE_TASK_MIRROR_TARGET`. Deprecate `MIRROR_TARGET`.
 * Remove support for `ROSE_TASK_PRE_SCRIPT` - ask users to move to suite's pre command scripting.
+
+\#297: rose mpi-launch: added standard verbosity options.
+* Hard coded support for the various MPI launchers are removed.
+* Default MPI launchers and their options are now configurable in the site/user configuration.
 
 \#298: rose suite-run: fix failure if `svn` not installed.
 Also support generating version files for suites in a `git` repository.
