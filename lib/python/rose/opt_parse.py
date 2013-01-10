@@ -231,7 +231,7 @@ class RoseOptionParser(OptionParser):
                         "help": "Operate on a config file's metadata."}],
                "meta_key": [
                        ["--meta-key"],
-                       {"metavar": "METAKEY",
+                       {"metavar": "KEY",
                         "help": "Specify a meta-key to search for."}],
                "meta_path": [
                        ["--meta-path", "-M"],

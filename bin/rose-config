@@ -52,8 +52,8 @@
 #     # the specified config FILE
 #     rose config --file=FILE --meta SECTION OPTION
 #
-#     # Print the value of a specified metadata FLAG
-#     rose config --meta-key=FLAG
+#     # Print the value of a specified metadata KEY
+#     rose config --meta-key=KEY
 #
 # DESCRIPTION
 #     Parse a set of rose configuration files.
@@ -80,9 +80,9 @@
 #     --meta
 #         If specified, operate on the metadata associated with the 
 #         configuration FILE.
-#     --meta-key
-#         If specified, prints the value of a specified metadata flag.
-#         Cannot be used in conjunction with --file.
+#     --meta-key=KEY
+#         If specified, prints the value of a specified metadata flag KEY.
+#         Cannot be used in conjunction with --file=FILE.
 #     --print-ignored, -i
 #         If specified, the program will print ignored !OPTION=VALUE where
 #         relevant.
