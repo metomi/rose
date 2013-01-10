@@ -42,7 +42,7 @@ import rose.gtk.run
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator, ResourceError
-from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_control import SuiteControl
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search
@@ -755,7 +755,7 @@ class MainWindow(gtk.Window):
     def handle_run_scheduler(self, *args):
         """Run the scheduler for this suite."""
         this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
-        return SuiteEngineProcessor.get_processor().launch_gcontrol(this_id)
+        return SuiteControl().gcontrol(this_id)
 
     def handle_search(self, widget=None, record=True, *args):
         """Get results that contain the values in the search widget."""

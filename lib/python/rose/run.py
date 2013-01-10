@@ -645,7 +645,7 @@ class SuiteRunner(Runner):
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
         if os.getenv("DISPLAY") and opts.gcontrol_mode:
-            self.suite_engine_proc.launch_gcontrol(suite_name, host)
+            self.suite_engine_proc.gcontrol(suite_name, host)
         return ret
 
     def _run_conf(

@@ -18,13 +18,13 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose suite-gcontrol
+#     rose suite-shutdown
 #
 # SYNOPSIS
-#     rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS ...]
+#     rose suite-shutdown [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS ...]
 #
 # DESCRIPTION
-#     Launch suite engine's suite control GUI for a suite.
+#     Shutdown a running suite.
 #
 #     If --name=SUITE-NAME is not specified, the basename of $PWD is assumed to
 #     be the suite name.
@@ -38,9 +38,11 @@
 #         Specify a host.
 #     --name=SUITE-NAME
 #         Specify the suite name.
+#     --non-interactive, --yes, -y
+#         Switch off interactive prompting (=answer yes to everything)
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_control gcontrol "$@"
+exec python -m rose.suite_control shutdown "$@"
