@@ -76,7 +76,7 @@
     </div>
 
     <div class="slide">
-      <h2>Purpose</h2>
+      <h2 id="purpose">Purpose</h2>
 
       <p>Retries can be useful for tasks that may occasionally fail due to
       external events, and are routinely fixable when they do - an example
@@ -142,7 +142,7 @@ fi
     </div>
 
     <div class="slide">
-      <h2 id="running-no-retries">Running it without retries</h2>
+      <h2 id="running-no-retries">Running It without Retries</h2>
 
       <p>Let's see what happens when we run the suite as it is.</p>
 
@@ -185,7 +185,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h2 id="running-retries">Running it with retries</h2>
+      <h2 id="running-retries">Running It with Retries</h2>
 
       <p>Stop the running suite and re-run the suite using:</p>
       <pre class="shell">
@@ -207,7 +207,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h2 id="alter">Altering behaviour</h2>
+      <h2 id="alter">Altering Behaviour</h3>
 
       <p>We can alter the behaviour of the task based on the number of retries,
       using <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
@@ -241,7 +241,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h2>Further Reading</h2>
+      <h2 id="further">Further Reading</h2>
 
       <p>For more information, see the <a href=
       "http://cylc.github.com/cylc/single/cug-html.html">cylc user
