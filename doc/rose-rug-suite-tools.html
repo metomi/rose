@@ -373,8 +373,7 @@ eval $(rose task-env)
         connect to the suite at the correct host.</p>
 
         <p>See <a href="rose-command.html#rose-suite-gcontrol">Rose Reference
-        Guide: CLI &gt; rose suite-gcontrol</a> for a full list of environment
-        variables provided by this command.</p>
+        Guide: CLI &gt; rose suite-gcontrol</a> for more information.</p>
       </dd>
 
       <dt>rose suite-scan</dt>
@@ -385,8 +384,21 @@ eval $(rose task-env)
         site/user configuration.</p>
 
         <p>See <a href="rose-command.html#rose-suite-scan">Rose Reference
-        Guide: CLI &gt; rose suite-scan</a> for a full list of environment
-        variables provided by this command.</p>
+        Guide: CLI &gt; rose suite-scan</a> for more information.</p>
+      </dd>
+
+      <dt>rose suite-shutdown</dt>
+
+      <dd>
+        <p>A convenient way to run <code>cylc shutdown</code>. In the
+        absence of arguments, the command assumes that base name of the current
+        directory is the name of the suite you want to run <code>cylc
+        shutdown</code> on. If your suite is running on a dedicated suite host
+        as specified by the Rose site/user configuration, it will automatically
+        connect to the suite at the correct host.</p>
+
+        <p>See <a href="rose-command.html#rose-suite-shutdown">Rose Reference
+        Guide: CLI &gt; rose suite-shutdown</a> for more information.</p>
       </dd>
 
       <dt>rose app-run</dt>

@@ -156,7 +156,7 @@ class CylcProcessor(SuiteEngineProcessor):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def launch_gcontrol(self, suite_name, host=None, args=None):
+    def gcontrol(self, suite_name, host=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
         log_dir = self.get_suite_dir(suite_name, "log")
         if not host:
@@ -367,9 +367,15 @@ class CylcProcessor(SuiteEngineProcessor):
                 sleep(0.1)
         return ret
 
-    def shutdown(self, suite):
+    def shutdown(self, suite_name, host=None, args=None):
         """Shut down the suite."""
-        self.popen("cylc", "shutdown", "--force", suite)
+        command = ["cylc", "shutdown", "--force"]
+        if host:
+            command += ["--host=%s" % host]
+        if args:
+            command += args
+        command += [suite_name]
+        self.popen(*command)
 
     def validate(self, suite_name):
         """(Re-)register and validate a suite."""
