@@ -435,14 +435,15 @@ class SuiteRunner(Runner):
 
         # Automatic Rose constants
         # ROSE_ORIG_HOST: originating host
-        # ROSE_VERSION: Rose version
+        # ROSE_VERSION: Rose version (not retained in run_mode=="reload")
         # Suite engine version 
         jinja2_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
-        rose_version = ResourceLocator.default().get_version()
-        # TODO: handle reload
+        my_rose_version = ResourceLocator.default().get_version()
         suite_engine_key = self.suite_engine_proc.SCHEME.upper() + "_VERSION"
-        suite_engine_version = self.suite_engine_proc.get_version()
-        # TODO: handle reload
+        if opts.run_mode == "reload":
+            suite_engine_version = config.get_value(["env", suite_engine_key])
+        else:
+            suite_engine_version = self.suite_engine_proc.get_version()
         auto_items = {"ROSE_ORIG_HOST": socket.gethostname(),
                       "ROSE_VERSION": ResourceLocator.default().get_version(),
                       suite_engine_key: suite_engine_version}
@@ -572,7 +573,7 @@ class SuiteRunner(Runner):
                     rose_bin = "%s/bin/rose" % (rose_home_node.value)
                     break
             # Build remote "rose suite-run" command
-            rose_sr = "ROSE_VERSION=%s %s" % (rose_version, rose_bin)
+            rose_sr = "ROSE_VERSION=%s %s" % (my_rose_version, rose_bin)
             rose_sr += " suite-run -v -v --name=%s" % suite_name
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
