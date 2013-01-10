@@ -140,7 +140,7 @@ def main(repos, rev):
     date = time.mktime(time.strptime(" ".join([d, t, "UTC"]), DATE_FMT))
 
     path_copies = {}
-    path_num = 0
+    path_num = -1
     copy_changes = svnlook("changed", "--copy-info", "-r", rev, repos)
     for i, change in enumerate(copy_changes.splitlines()):
         copy_match = REC_COPY_INFO.match(change)
@@ -150,6 +150,7 @@ def main(repos, rev):
             path_num += 1
     changes = svnlook("changed", "-r", rev, repos)
     for i, line in enumerate(changes.splitlines()):
+        is_new_copied_branch = False
         status, path = line.split(None, 1)
         if not check_path_is_sid(path):
             continue
@@ -157,12 +158,6 @@ def main(repos, rev):
         sid = "".join(names[0:LEN_ID])
         idx = db_name + "-" + sid
         branch = names[LEN_ID]
-        if i in path_copies and check_path_is_sid(path_copies[i]):
-            copy_names = path_copies[i].split("/")
-            copy_sid = "".join(copy_names[:LEN_ID])
-            if copy_sid != sid:
-                copies.setdefault((rev, idx, branch), copy_sid)
-        
         if branch:
             statuses.setdefault((rev, idx, branch), {0: " ", 1: " "})
         branch_path = "/".join(sid) + "/" + branch
@@ -173,7 +168,13 @@ def main(repos, rev):
                 del_branch = line.strip().rstrip("/")
                 statuses.setdefault((rev, idx, del_branch), {0: " ", 1: " "})
                 statuses[(rev, idx, del_branch)][0] = ST_DELETED
- 
+        if i in path_copies and check_path_is_sid(path_copies[i]):
+            copy_names = path_copies[i].split("/")
+            copy_sid = "".join(copy_names[:LEN_ID])
+            if copy_sid != sid:
+                copies.setdefault((rev, idx, branch), copy_sid)
+            elif branch_path + "/" == path:
+                is_new_copied_branch = True
         if (sid == "ROSIE" and branch == "trunk" and
             path == branch_path + "/" + KNOWN_KEYS_FILE):
             new_keys = parse_known_keys(repos, path, rev)
@@ -192,11 +193,12 @@ def main(repos, rev):
         if (len(path) > len(branch_path) and path != info_file_path and
             statuses[(rev, idx, branch)][0].isspace()):
             statuses[(rev, idx, branch)][0] = ST_MODIFIED
-        if status[0] == ST_DELETED or path != info_file_path:
+        if (status[0] == ST_DELETED or
+            path != info_file_path and not is_new_copied_branch):
             continue
         
         f = tempfile.TemporaryFile()
-        f.write(svnlook("cat", "-r", rev, repos, path))
+        f.write(svnlook("cat", "-r", rev, repos, info_file_path))
         f.seek(0)
         config = rose.config.load(f)
         f.close()
@@ -205,7 +207,8 @@ def main(repos, rev):
             old_config = rose.config.ConfigNode()
         else:
             f = tempfile.TemporaryFile()
-            f.write(svnlook("cat", "-r", str(int(rev) -1), repos, path))
+            f.write(svnlook("cat", "-r", str(int(rev) -1), repos,
+                            info_file_path))
             f.seek(0)
             old_config = rose.config.load(f)
             f.close()
