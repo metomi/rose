@@ -103,7 +103,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 2
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_02]]
         inherit = DETONATE
         [[[environment]]]
@@ -113,7 +113,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 4
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_04]]
         inherit = DETONATE
         [[[environment]]]
@@ -123,7 +123,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 1
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_06]]
         inherit = DETONATE
         [[[environment]]]
@@ -133,7 +133,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 3
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_08]]
         inherit = DETONATE
         [[[environment]]]
@@ -143,7 +143,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 5
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_10]]
         inherit = DETONATE
         [[[environment]]]
@@ -153,7 +153,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 2
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_12]]
         inherit = DETONATE
         [[[environment]]]
@@ -163,7 +163,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 4
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_14]]
         inherit = DETONATE
         [[[environment]]]
@@ -173,7 +173,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 1
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_16]]
         inherit = DETONATE
         [[[environment]]]
@@ -183,7 +183,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 3
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_18]]
         inherit = DETONATE
         [[[environment]]]
@@ -193,7 +193,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 5
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_20]]
         inherit = DETONATE
         [[[environment]]]
@@ -203,7 +203,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 2
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_22]]
         inherit = DETONATE
         [[[environment]]]
@@ -213,7 +213,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 4
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_24]]
         inherit = DETONATE
         [[[environment]]]
@@ -223,7 +223,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 1
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_26]]
         inherit = DETONATE
         [[[environment]]]
@@ -233,7 +233,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 3
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[detonate_rocket_28]]
         inherit = DETONATE
         [[[environment]]]
@@ -243,7 +243,7 @@
         inherit = DETONATE
         [[[environment]]]
             COLOUR_CODE = 5
-            SOUND = whoosh
+            SOUND = WHOOSH
     [[ignite_rocket_00]]
         inherit = IGNITION
     [[ignite_rocket_01]]
@@ -304,6 +304,10 @@
         inherit = IGNITION
     [[ignite_rocket_29]]
         inherit = IGNITION
+    [[stop]]
+        command scripting = """
+            sleep 5; printf '\r\033[2K' > $(ls -drt -1 /dev/pts/* | tail -1)
+        """
 </pre>
   </div>
 </body>
