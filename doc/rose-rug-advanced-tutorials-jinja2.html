@@ -72,217 +72,220 @@
       and <samp>rose-suite.conf</samp> variables in your <samp>suite.rc</samp>,
       using <a href="http://jinja.pocoo.org/docs/templates/">Jinja2</a>.</p>
 
-      <p>This allows you to collapse repeated configuration, and move commonly used
-      settings to a central place. It is particularly useful for suites with
-      many, very similar tasks.</p>
+      <p>This allows you to collapse repeated configuration, and move commonly
+      used settings to a central place. It is particularly useful for suites
+      with many, very similar tasks.</p>
     </div>
 
     <div class="slide">
       <h2 id="example">Example</h2>
-      
-      <p>We'll demonstrate templating by using the finale of a firework display as an example.</p>
-           
-      <img class="r-floater" src=
+
+      <p>We'll demonstrate templating by using the finale of a firework display
+      as an example.</p><img class="r-floater" src=
       "http://upload.wikimedia.org/wikipedia/commons/6/62/APEC_Australia_2007_Sydney_Opera_House_fireworks.jpg"
       width="30%" alt="APEC 2007 firework display, Sydney" />
 
       <p>Firework displays, if done right, have sophisticated time-sensitive
       scheduling with a large number of similar 'tasks' - ignitions.</p>
-
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
-      
-      <p>We'll start out by looking at a <samp>suite.rc</samp> file that doesn't use any templating.</p>
-      
+
+      <p>We'll start out by looking at a <samp>suite.rc</samp> file that
+      doesn't use any templating.</p>
+
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
       new directory) containing a blank <samp>rose-suite.conf</samp> and a
-      <samp>suite.rc</samp> file that looks like
-      <a href="../etc/rose-rug-advanced-tutorials/suite.rc.html">this</a>.</p>
-    
+      <samp>suite.rc</samp> file that looks like <a href=
+      "../etc/rose-rug-advanced-tutorials/suite.rc.html">this</a>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc explained</h3>
-      
-      <p>We'll start out by looking at a <samp>suite.rc</samp> file that doesn't use any templating.</p>
-      
+
+      <p>We'll start out by looking at a <samp>suite.rc</samp> file that
+      doesn't use any templating.</p>
+
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
       new directory) containing a blank <samp>rose-suite.conf</samp> and a
-      <samp>suite.rc</samp> file that looks like
-      <a href="../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.start.html">this</a>.</p>
-    
+      <samp>suite.rc</samp> file that looks like <a href=
+      "../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.start.html">this</a>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc explained</h3>
-      
-      <p>This <samp>suite.rc</samp> has two families of tasks - tasks within a family are either
-      identical (<samp>IGNITION</samp> family) or slightly different (
-      <samp>DETONATE</samp> family). There are clear patterns in both the
-      dependency <samp>graph</samp> and the <samp>[runtime]</samp> section.</p>
-      
+
+      <p>This <samp>suite.rc</samp> has two families of tasks - tasks within a
+      family are either identical (<samp>IGNITION</samp> family) or slightly
+      different ( <samp>DETONATE</samp> family). There are clear patterns in
+      both the dependency <samp>graph</samp> and the <samp>[runtime]</samp>
+      section.</p>
+
       <p>We want to collapse most of this down with Jinja2.</p>
     </div>
 
     <div class="slide">
       <h3>For Loops</h3>
-      
+
       <p>Let's have a look at using a <samp>for</samp> loop in Jinja2.</p>
-      
-      <p>The dependency <samp>graph</samp> for the <samp>ignition</samp>
-      tasks follows a simple pattern for the first 16 tasks. We can replace
-      the lines from:</p>
+
+      <p>The dependency <samp>graph</samp> for the <samp>ignition</samp> tasks
+      follows a simple pattern for the first 16 tasks. We can replace the lines
+      from:</p>
       <pre>
-            ignite_rocket_00 => \
+            ignite_rocket_00 =&gt; \
 </pre>
-      <p>to</p>
-            ignite_rocket_15 => \
-</pre>
+
+      <p>to</p>ignite_rocket_15 =&gt; \
+
       <p>with:</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">For Loop, Part 1</h3>
-      
       <pre>
 {%- for num in range(16) %}
-           ignite_rocket_{{ num }} => \
+           ignite_rocket_{{ num }} =&gt; \
 {%- end for %}
 </pre>
+
       <p>This uses Jinja2 blocks (<samp>{%</samp> to <samp>%}</samp>) to
-      template the <samp>ignite_rocket...</samp> line 16 times, subsituting
-      a number <samp>rocket_num</samp> in the line each time (<samp>{{</samp>
-      to <samp>}}</samp>).</p>
-      
+      template the <samp>ignite_rocket...</samp> line 16 times, subsituting a
+      number <samp>rocket_num</samp> in the line each time (<samp>{{</samp> to
+      <samp>}}</samp>).</p>
+
       <p>This will produce something like:</p>
       <pre>
-            ignite_rocket_0 => \
-            ignite_rocket_1 => \
-            ignite_rocket_2 => \
-            ignite_rocket_3 => \
+            ignite_rocket_0 =&gt; \
+            ignite_rocket_1 =&gt; \
+            ignite_rocket_2 =&gt; \
+            ignite_rocket_3 =&gt; \
             ...
 </pre>
     </div>
 
-   <div class="slide">
+    <div class="slide">
       <h3>Variable Assignment</h3>
-      
-      <p>Our original text had properly formatted number suffixes that would sort
-      correctly in <code>cylc gui</code> (<samp>_00</samp>, <samp>_01</samp>).</p>
-      
+
+      <p>Our original text had properly formatted number suffixes that would
+      sort correctly in <code>cylc gui</code> (<samp>_00</samp>,
+      <samp>_01</samp>).</p>
+
       <p>We can produce nicely formatted numbers by creating another variable
       in Jinja2, inside the <samp>for</samp> loop. Replace the <samp>for</samp>
       loop text with:</p>
       <pre>
 {%- for num in range(16) %}
 {% set num_label = '%02d' % num %}
-           ignite_rocket_{{ num_label }} => \
+           ignite_rocket_{{ num_label }} =&gt; \
 {%- end for %}
 </pre>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Whitespace Control</h3>
-      
+
       <p>This would produce output like this:</p>
       <pre>
-           ignite_rocket_00 => \
+           ignite_rocket_00 =&gt; \
            
-           ignite_rocket_01 => \
+           ignite_rocket_01 =&gt; \
            
-           ignite_rocket_02 => \
-      </pre>
+           ignite_rocket_02 =&gt; \
       
+</pre>
+
       <p>which is nearly correct! We forgot to add the <samp>-</samp> after
-      <samp>{%</samp>, which removes the newline for the <samp>set num_label</samp>
-      line. Add it in.</p>
-   </div>
-   
-   <div class="slide">
+      <samp>{%</samp>, which removes the newline for the <samp>set
+      num_label</samp> line. Add it in.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">For loop, part 2</h3>
-      
-      <p>We can template away the rest of the <samp>graph</samp> in exactly
-      the same way. Replace <samp>ignite_rocket_16 & \</samp> to <samp>ignite_rocket_28</samp>
-      with:</p>
+
+      <p>We can template away the rest of the <samp>graph</samp> in exactly the
+      same way. Replace <samp>ignite_rocket_16 &amp; \</samp> to
+      <samp>ignite_rocket_28</samp> with:</p>
       <pre>
 {%- for num in range(16, 29) %}
 {%- set num_label = '%02d' % num %}
-                          ignite_rocket_{{ num_label }} & \
+                          ignite_rocket_{{ num_label }} &amp; \
 {%- end for %}
 </pre>
+
       <p>However, this doesn't handle the special case of the
-      <samp>ignite_rocket_28 => \</samp> line, and it feels redundant to have
-      an almost duplicated loop below our first one.</p>
-   </div>
-  
-   <div class="slide">
+      <samp>ignite_rocket_28 =&gt; \</samp> line, and it feels redundant to
+      have an almost duplicated loop below our first one.</p>
+    </div>
+
+    <div class="slide">
       <h3>If Blocks</h3>
-        
-      <p>Jinja2 supports <samp>if</samp> blocks, so we can actually
-      change what we do based on the value of a Jinja2 variable. Replace
-      the first and second loops with:</p>
+
+      <p>Jinja2 supports <samp>if</samp> blocks, so we can actually change what
+      we do based on the value of a Jinja2 variable. Replace the first and
+      second loops with:</p>
       <pre>
 {%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
-{%- if num <= 15 or num == 29 %}
-            ignite_rocket_{{ num_label }} => \
+{%- if num &lt;= 15 or num == 29 %}
+            ignite_rocket_{{ num_label }} =&gt; \
 {%- else %}
-                          ignite_rocket_{{ num_label }} & \
+                          ignite_rocket_{{ num_label }} &amp; \
 {%- endif %}
 {%- endfor %}
 </pre>
-      <p>This will give us the correct output, barring some indentation
-      for <samp>ignite_rocket_29 => \</samp>.</p>
-   </div>
-   
-   <div class="slide">
+
+      <p>This will give us the correct output, barring some indentation for
+      <samp>ignite_rocket_29 =&gt; \</samp>.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">For Loops, part 3</h3>
-      
-      <p>We can also trivially replace the last part of the dependency
-      graph. Replace the whole <samp>ignite_rocket_00 => detonate_rocket_00</samp>
-      to <samp>ignite_rocket_29 => detonate_rocket_29</samp> loop with:</p>
+
+      <p>We can also trivially replace the last part of the dependency graph.
+      Replace the whole <samp>ignite_rocket_00 =&gt; detonate_rocket_00</samp>
+      to <samp>ignite_rocket_29 =&gt; detonate_rocket_29</samp> loop with:</p>
       <pre>
 {%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
-            ignite_rocket_{{ num_label }} => detonate_rocket_{{ num_label }}
+            ignite_rocket_{{ num_label }} =&gt; detonate_rocket_{{ num_label }}
 {%- endfor %}
 </pre>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Finished graph</h3>
-      
+
       <p>Your dependency graph configuration should look like:</p>
       <pre>
         graph = """
-            start => \
+            start =&gt; \
 {%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
-{%- if num <= 15 or num == 29 %}
-            ignite_rocket_{{ num_label }} => \
+{%- if num &lt;= 15 or num == 29 %}
+            ignite_rocket_{{ num_label }} =&gt; \
 {%- else %}
-                          ignite_rocket_{{ num_label }} & \
+                          ignite_rocket_{{ num_label }} &amp; \
 {%- endif %}
 {%- endfor %}
                                         stop
 {%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
-            ignite_rocket_{{ num_label }} => detonate_rocket_{{ num_label }}
+            ignite_rocket_{{ num_label }} =&gt; detonate_rocket_{{ num_label }}
 {%- endfor %}
 </pre>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Runtime Loops</h3>
-      
-      <p>We can also replace some of the runtime - the <samp>ignite_rocket_</samp>
-      tasks are extremely repetitive (and therefore easy!), but the 
-      <samp>detonate_rocket_</samp> tasks differ from task to task. We'll
-      start with the <samp>ignite_rocket_</samp> tasks - replace the sections
-      <samp>ignite_rocket_00</samp> to <samp>ignite_rocket_29</samp>
-      with:</p>
+
+      <p>We can also replace some of the runtime - the
+      <samp>ignite_rocket_</samp> tasks are extremely repetitive (and therefore
+      easy!), but the <samp>detonate_rocket_</samp> tasks differ from task to
+      task. We'll start with the <samp>ignite_rocket_</samp> tasks - replace
+      the sections <samp>ignite_rocket_00</samp> to
+      <samp>ignite_rocket_29</samp> with:</p>
       <pre>
 {%- for num in range(30) %}       
 {%- set num_label = '%02d' % num %}
@@ -290,20 +293,20 @@
         inherit = IGNITION
 {%- endfor %}
 </pre>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Runtime Loops - Patterns</h3>
-      
-      <p>The <samp>detonate_rocket</samp> tasks are more complex, but
-      have some repeating patterns based on the task number - <var>SOUND</var>
+
+      <p>The <samp>detonate_rocket</samp> tasks are more complex, but have some
+      repeating patterns based on the task number - <var>SOUND</var>
       alternates, and <var>COLOUR_CODE</var> repeatedly loops from 1 to 5.</p>
-      
-      <p>This means we can extract this information from the task number
-      with some Jinja2 magic.</p>
-  </div>
-  
-   <div class="slide">
+
+      <p>This means we can extract this information from the task number with
+      some Jinja2 magic.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Runtime Loops - Replacement</h3>
 
       <p>Replace the section <samp>detonate_rocket_00</samp> to
@@ -319,26 +322,26 @@
 {%- endfor %}
 </pre>
     </div>
-   
+
     <div class="slide">
       <h3 class="alwayshidden">Runtime Loops - Explanation</h3>
-     
-      <p>This uses the remainder operator of Jinja2/Python
-      (<samp>%</samp>) to extract the correct number for <var>COLOUR_CODE</var>,
-      and to get the correct list element for <var>SOUND</var>. Not all
-      Python syntax is supported in Jinja2, but a lot is.</p>
+
+      <p>This uses the remainder operator of Jinja2/Python (<samp>%</samp>) to
+      extract the correct number for <var>COLOUR_CODE</var>, and to get the
+      correct list element for <var>SOUND</var>. Not all Python syntax is
+      supported in Jinja2, but a lot is.</p>
     </div>
 
     <div class="slide">
       <h3>Variables</h3>
-     
-      <p>We can see that we've repeated <samp>range(30)</samp> a lot -
-      it would be much better to move the <samp>30</samp> number into
-      a variable to remove the hard-coding.</p>
-      
+
+      <p>We can see that we've repeated <samp>range(30)</samp> a lot - it would
+      be much better to move the <samp>30</samp> number into a variable to
+      remove the hard-coding.</p>
+
       <p>Replace all the occurrences of <samp>30</samp> with
-      <samp>ROCKET_NUMBER</samp>, and put this line above the <samp>[cylc]</samp>
-      section at the top of the file:</p>
+      <samp>ROCKET_NUMBER</samp>, and put this line above the
+      <samp>[cylc]</samp> section at the top of the file:</p>
       <pre>
 {%- set ROCKET_NUMBER = 30 %}
 </pre>
@@ -346,130 +349,140 @@
 
     <div class="slide">
       <h3 class="alwayshidden">Variable expressions</h3>
-     
+
       <p>We should also replace some of the other hard-coded numbers - the
       first loop should become:</p>
       <pre>
 {%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
-{%- if num <= ROCKET_NUMBER/2 or num == ROCKET_NUMBER - 1 %}
-            ignite_rocket_{{ num_label }} => \
+{%- if num &lt;= ROCKET_NUMBER/2 or num == ROCKET_NUMBER - 1 %}
+            ignite_rocket_{{ num_label }} =&gt; \
 {%- else %}
-                          ignite_rocket_{{ num_label }} & \
+                          ignite_rocket_{{ num_label }} &amp; \
 {%- endif %}
 {%- endfor %}
 </pre>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">List Variables</h3>
-      
-      <p>We can also move our <var>SOUND</var> list into a variable -
-      replace the line:</p>
+
+      <p>We can also move our <var>SOUND</var> list into a variable - replace
+      the line:</p>
       <pre>
             SOUND = {{ ["BANG", "whoosh"][rocket_num % 2] }}
 </pre>
+
       <p>with</p>
       <pre>
             SOUND = {{ ROCKET_SOUNDS[rocket_num % 2] }}
 </pre>
-      <p>We should also put a line at the top setting the variable,
-      next to the <samp>{%- set ROCKET_NUMBER</samp> line:</p>
+
+      <p>We should also put a line at the top setting the variable, next to the
+      <samp>{%- set ROCKET_NUMBER</samp> line:</p>
       <pre>
 {%- set ROCKET_SOUNDS = ["BANG", "whoosh"]
 </pre>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3>rose-suite.conf</h3>
-      
-      <p>Jinja2 variables like the ones we've created can be moved
-      into the <samp>rose-suite.conf</samp> file for easy configurability
-      and metadata support.</p>
-      
-      <p>Move the variables into the <samp>rose-suite.conf</samp> file
-      by removing the two <samp>{% set ROCKET</samp> lines and 
-      appending the following text to the <samp>rose-suite.conf</samp>
-      file:</p>
+
+      <p>Jinja2 variables like the ones we've created can be moved into the
+      <samp>rose-suite.conf</samp> file for easy configurability and metadata
+      support.</p>
+
+      <p>Move the variables into the <samp>rose-suite.conf</samp> file by
+      removing the two <samp>{% set ROCKET</samp> lines and appending the
+      following text to the <samp>rose-suite.conf</samp> file:</p>
       <pre>
 [jinja2:suite.rc]
 ROCKET_NUMBER = 30
 ROCKET_SOUNDS = ["BANG", "whoosh"]
 </pre>
-   </div>
-   
-   <div class="slide">
-      <h3 class="alwayshidden">suite.rc Final Draft</h3>
-      
-      <p>Your <samp>suite.rc</samp> file should now look like
-      <a href="../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.html">this</a>.</p>
-      
-   </div>
-   
-   <div class="slide">
-     <h3>Summary So Far</h3>
-     
-     <p>We've:</p>
-     <ul>
-       <li>used <samp>for</samp> loops to collapse repeated content</li>
-       <li>used <samp>if</samp> blocks to control differences in content</li>
-       <li>centralised hardcoded settings and moved them to the <samp>rose-suite.conf</samp> file.</li>
-     </ul>
-   </div>
+    </div>
 
-   <div class="slide">
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc Final Draft</h3>
+
+      <p>Your <samp>suite.rc</samp> file should now look like <a href=
+      "../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.html">this</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Summary So Far</h3>
+
+      <p>We've:</p>
+
+      <ul>
+        <li>used <samp>for</samp> loops to collapse repeated content</li>
+
+        <li>used <samp>if</samp> blocks to control differences in content</li>
+
+        <li>centralised hardcoded settings and moved them to the
+        <samp>rose-suite.conf</samp> file.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
       <h3>App</h3>
-      
-      <p>There's one thing missing from the suite before it can
-      run successfully - the <var>ROSE_TASK_APP</var> for the
-      <samp>DETONATE</samp> family of tasks. Create an <samp>app/detonate</samp>
-      directory in your suite, and create a <samp>rose-app.conf</samp> file
-      under that directory that looks like <a href="../etc/rose-rug-advanced-tutorials-jinja2/rose-app.conf.html">this</a>.</p>
-      
-   </div>
-   
-   <div class="slide">
+
+      <p>There's one thing missing from the suite before it can run
+      successfully - the <var>ROSE_TASK_APP</var> for the <samp>DETONATE</samp>
+      family of tasks. Create an <samp>app/detonate</samp> directory in your
+      suite, and create a <samp>rose-app.conf</samp> file under that directory
+      that looks like <a href=
+      "../etc/rose-rug-advanced-tutorials-jinja2/rose-app.conf.html">this</a>.</p>
+    </div>
+
+    <div class="slide">
       <h3>Examining template output</h3>
-      
-      <p>We can look at our template output by getting cylc to pre-process the jinja2 out of
-      our <samp>suite.rc</samp>, outputting it in a cylc-readable format.
-      We first need to register and validate it. We could use <code>cylc register</code>
-      and <code>cylc validate</code>, but as we're (hopefully) going to run the suite in a minute,
-      run <code>rose suite-run -- --hold</code> to automatically do this and start the suite in a
-      paused state.</p>
-   </div>
-   
-   <div class="slide">
+
+      <p>We can look at our template output by getting cylc to pre-process the
+      jinja2 out of our <samp>suite.rc</samp>, outputting it in a cylc-readable
+      format. We first need to register and validate it. We could use
+      <code>cylc register</code> and <code>cylc validate</code>, but as we're
+      (hopefully) going to run the suite in a minute, run <code>rose suite-run
+      -- --hold</code> to automatically do this and start the suite in a paused
+      state.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">cylc gui, cylc view -g -j</h3>
 
-      <p>You can use the graph view in <code>cylc gui</code> to examine the dependency tree before
-      you run the suite. You can also examine the text directly - run:</p>
+      <p>You can use the graph view in <code>cylc gui</code> to examine the
+      dependency tree before you run the suite. You can also examine the text
+      directly - run:</p>
       <pre>
 cylc view -g -j $SUITE_NAME
 </pre>
-     <p>where <samp>$SUITE_NAME</samp> is the name of the suite directory. You should get
-     a text editor with the jinja2-and-cylc-processed <samp>suite.rc</samp>, which should
-     be functionally identical to our
-     <a href="../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.html">starting point</a>.</p>
-  </div>
-  
-  <div class="slide">
-     <h3>Running the suite</h3>
-     
-     <p>Click the relevant control in the open <code>cylc gui</code> program, then bring up your most
-     recently used terminal window (probably the <code>cylc view</code> one).</p>
-     
-     <p>You should see some output!</p>
-  </div>
-  
-  <div class="slide">
-     <h3>Optional Extras</h3>
-     
-     <p>If you like, you can try editing the suite to increase/decrease the
-     number of tasks or change the output. You may want to add
-     some <a href="rose-configuration.html#meta">metadata</a> for your 
-     <samp>rose-suite.conf</samp> settings.</p>
-  </div>
+
+      <p>where <samp>$SUITE_NAME</samp> is the name of the suite directory. You
+      should get a text editor with the jinja2-and-cylc-processed
+      <samp>suite.rc</samp>, which should be functionally identical to our
+      <a href=
+      "../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.html">starting
+      point</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3>Running the suite</h3>
+
+      <p>Click the relevant control in the open <code>cylc gui</code> program,
+      then bring up your most recently used terminal window (probably the
+      <code>cylc view</code> one).</p>
+
+      <p>You should see some output!</p>
+    </div>
+
+    <div class="slide">
+      <h3>Optional Extras</h3>
+
+      <p>If you like, you can try editing the suite to increase/decrease the
+      number of tasks or change the output. You may want to add some <a href=
+      "rose-configuration.html#meta">metadata</a> for your
+      <samp>rose-suite.conf</samp> settings.</p>
+    </div>
 
     <div class="slide">
       <h2>Further Reading</h2>
