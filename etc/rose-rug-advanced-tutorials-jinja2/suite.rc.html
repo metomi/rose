@@ -45,7 +45,7 @@
         command scripting = "rose task-run"
         [[[environment]]]
             ROSE_TASK_APP = detonate
-    [[IGNITION]]
+    [[IGNITE]]
         command scripting = "sleep $((RANDOM % 2))"
 {%- for num in range(ROCKET_NUMBER) %}
 {%- set num_label = '%02d' % num %}
@@ -58,11 +58,12 @@
 {%- for num in range(ROCKET_NUMBER) %}       
 {%- set num_label = '%02d' % num %}
     [[ignite_rocket_{{ num_label }}]]
-        inherit = IGNITION
+        inherit = IGNITE
 {%- endfor %}
     [[stop]]
         command scripting = """
-            sleep 5; printf '\r\033[2K' > $(ls -drt -1 /dev/pts/* | tail -1)
+sleep 5 && printf '\r\033[2K THE END\r' > $(ls -drt -1 /dev/pts/* | tail -1)
+sleep 2 && printf '\033[2K' > $(ls -drt -1 /dev/pts/* | tail -1)
         """
 </pre>
   </div>

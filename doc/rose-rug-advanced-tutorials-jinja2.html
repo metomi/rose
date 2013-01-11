@@ -105,8 +105,8 @@
       <h3 class="alwayshidden">Example suite.rc explained</h3>
 
       <p>This <samp>suite.rc</samp> has two families of tasks - tasks within a
-      family are either identical (<samp>IGNITION</samp> family) or variations on
-      a theme (<samp>DETONATE</samp> family). There are clear patterns in
+      family are either identical (<samp>IGNITE</samp> family) or variations
+      on a theme (<samp>DETONATE</samp> family). There are clear patterns in
       both the dependency <samp>graph</samp> and the <samp>[runtime]</samp>
       section.</p>
 
@@ -115,13 +115,14 @@
 
     <div class="slide">
       <h3>Starting Out</h3>
-      
-      <p>The first thing to do is to mark the <samp>suite.rc</samp> as
-      a jinja2 file by adding this shebang line to the top of the file:</p>
+
+      <p>The first thing to do is to mark the <samp>suite.rc</samp> as a jinja2
+      file by adding this shebang line to the top of the file:</p>
       <pre>
 #!jinja2
 </pre>
     </div>
+
     <div class="slide">
       <h3>For Loops</h3>
 
@@ -151,9 +152,9 @@
 </pre>
 
       <p>This uses Jinja2 blocks (<samp>{%</samp> to <samp>%}</samp>) to
-      template the <samp>ignite_rocket...</samp> line 16 times, substituting (<samp>{{</samp> to
-      <samp>}}</samp>) a
-      number <samp>num</samp> in the line each time.</p>
+      template the <samp>ignite_rocket...</samp> line 16 times, substituting
+      (<samp>{{</samp> to <samp>}}</samp>) a number <samp>num</samp> in the
+      line each time.</p>
 
       <p>This will produce something like:</p>
       <pre>
@@ -198,7 +199,7 @@
 
       <p>which is nearly correct! We forgot to add the <samp>-</samp> after
       <samp>{%</samp>, which removes the newline for the <samp>set
-      num_label</samp> line. Add it in so that the line reads:
+      num_label</samp> line. Add it in so that the line reads:</p>
       <pre>
 {%- set num_label = '%02d' % num %}
 </pre>
@@ -287,14 +288,14 @@
       <p>We can also replace some of the runtime - the
       <samp>ignite_rocket</samp> tasks are extremely repetitive (and therefore
       easy!), but the <samp>detonate_rocket</samp> tasks differ from task to
-      task. We'll start with the <samp>ignite_rocket</samp> tasks - replace
-      the sections <samp>ignite_rocket_00</samp> to
-      <samp>ignite_rocket_29</samp> with:</p>
+      task. We'll start with the <samp>ignite_rocket</samp> tasks - replace the
+      sections <samp>ignite_rocket_00</samp> to <samp>ignite_rocket_29</samp>
+      with:</p>
       <pre>
 {%- for num in range(30) %}       
 {%- set num_label = '%02d' % num %}
     [[ignite_rocket_{{ num_label }}]]
-        inherit = IGNITION
+        inherit = IGNITE
 {%- endfor %}
 </pre>
     </div>
@@ -303,8 +304,9 @@
       <h3 class="alwayshidden">Runtime Loops - Patterns</h3>
 
       <p>The <samp>detonate_rocket</samp> tasks are more complex, but have some
-      repeating patterns based on the task number. <var>SOUND</var>
-      alternates, and <var>COLOUR_CODE</var> repeatedly loops from <samp>1</samp> to <samp>5</samp>.</p>
+      repeating patterns based on the task number. <var>SOUND</var> alternates,
+      and <var>COLOUR_CODE</var> repeatedly loops from <samp>1</samp> to
+      <samp>5</samp>.</p>
 
       <p>This means we can extract this information from the task number with
       some Jinja2 magic.</p>
@@ -445,11 +447,11 @@ ROCKET_SOUNDS = ["BANG", "WHOOSH"]
       <p>We can look at our template output by getting cylc to pre-process the
       jinja2 out of our <samp>suite.rc</samp>, outputting it in a cylc-readable
       format. We first need to register and validate it.</p>
-      
-      <p>We could use <code>cylc register</code> and <code>cylc validate</code>, but as we're
-      (hopefully) going to run the suite in a minute, run <code>rose suite-run
-      -- --hold</code> to automatically do this and start the suite in a paused
-      state.</p>
+
+      <p>We could use <code>cylc register</code> and <code>cylc
+      validate</code>, but as we're (hopefully) going to run the suite in a
+      minute, run <code>rose suite-run -- --hold</code> to automatically do
+      this and start the suite in a paused state.</p>
     </div>
 
     <div class="slide">
@@ -473,9 +475,9 @@ cylc view -g -j $SUITE_NAME
     <div class="slide">
       <h3>Running the Suite</h3>
 
-      <p>Launch the suite by clicking the relevant control in the open <code>cylc gui</code> program,
-      then bring up your most recently used terminal window (probably the
-      <code>cylc view</code> one).</p>
+      <p>Launch the suite by clicking the relevant control in the open
+      <code>cylc gui</code> program, then bring up your most recently used
+      terminal window (probably the <code>cylc view</code> one).</p>
 
       <p>You should see some output!</p>
     </div>

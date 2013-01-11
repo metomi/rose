@@ -92,7 +92,7 @@
         command scripting = "rose task-run"
         [[[environment]]]
             ROSE_TASK_APP = detonate
-    [[IGNITION]]
+    [[IGNITE]]
         command scripting = "sleep $((RANDOM % 2))"
     [[detonate_rocket_00]]
         inherit = DETONATE
@@ -245,68 +245,69 @@
             COLOUR_CODE = 5
             SOUND = WHOOSH
     [[ignite_rocket_00]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_01]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_02]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_03]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_04]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_05]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_06]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_07]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_08]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_09]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_10]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_11]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_12]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_13]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_14]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_15]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_16]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_17]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_18]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_19]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_20]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_21]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_22]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_23]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_24]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_25]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_26]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_27]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_28]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[ignite_rocket_29]]
-        inherit = IGNITION
+        inherit = IGNITE
     [[stop]]
         command scripting = """
-            sleep 5; printf '\r\033[2K' > $(ls -drt -1 /dev/pts/* | tail -1)
+sleep 5 && printf '\r\033[2K THE END\r' > $(ls -drt -1 /dev/pts/* | tail -1)
+sleep 2 && printf '\033[2K' > $(ls -drt -1 /dev/pts/* | tail -1)
         """
 </pre>
   </div>
