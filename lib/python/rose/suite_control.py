@@ -20,6 +20,7 @@
 """Launch suite engine's control commands from the correct suite host."""
 
 import os
+import rose.config
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
@@ -97,8 +98,24 @@ class SuiteControl(object):
                         suite_name,
                         self.host_selector.expand(node.value.split())[0])
             if not hosts:
-                hosts = [None]
+                # Try the "rose-suite.host" file in the suite log directory
+                log = self.suite_engine_proc.get_suite_dir(suite_name, "log")
+                try:
+                    host_file = os.path.join(log, "rose-suite-run.host")
+                    hosts = [open(host_file).read().strip()]
+                except IOError:
+                    pass
+            if not hosts:
+                hosts = ["localhost"]
         return hosts
+
+    def _get_suite_engine_version(self, suite_name):
+        log = self.suite_engine_proc.get_suite_dir(suite_name, "log")
+        conf_path = os.path.join(log, "rose-suite-run.conf")
+        if os.access(conf_path, os.F_OK | os.R_OK):
+            conf = rose.config.load(conf_path)
+            key = self.suite_engine_proc.SCHEME.upper() + "_VERSION"
+            return conf.get_value(["env", key])
 
 
 def prompt(action, suite_name, host):
