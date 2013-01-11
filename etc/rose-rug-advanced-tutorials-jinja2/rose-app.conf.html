@@ -13,7 +13,7 @@
     <pre>
 [command]
 default=TERM=$(ls -drt -1 /dev/pts/* | tail -1)
-       =printf "\r\033[2K %-$((RANDOM%40 + 20))s\033[1;3${COLOUR_CODE}m $SOUND \033[0m\r" " " > $TERM
+       =printf "\r\033[2K %-$((RANDOM%40 + 20))s\033[1;3${COLOUR_CODE}m $SOUND \033[0m\r" " " &gt; $TERM
 </pre>
   </div>
 </body>
