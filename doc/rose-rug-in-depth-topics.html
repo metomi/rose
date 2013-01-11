@@ -404,6 +404,15 @@ meta=rose-demo-upgrade/27.1
     </div>
 
     <div class="slide">
+      <h3 id="upgrade">Upgrading</h3>
+      
+      <p>You can upgrade app configurations to use newer versions of metadata
+      (corresponding to newer versions of the application code). This may
+      result in some changes to the configuration (e.g. new or renamed
+      variables).</p>
+    </div>
+
+    <div class="slide">
       <h2>Configuration Metadata - but fancier</h2>
 
       <p>The <a href="rose-rug-metadata-tutorial.html">Metadata Tutorial</a>
@@ -470,7 +479,9 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
       <h3>More Metadata Options</h3>
 
       <p>See <a href="rose-configuration.html#meta.conf">Metadata
-      Reference</a>.</p>
+      Reference</a> and the
+      <a href="rose-rug-advanced-tutorials.html#metadata">Advanced Metadata
+      Tutorials</a>.</p>
 
       <dl>
         <dt><code>compulsory</code></dt>
@@ -556,8 +567,9 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
         configurations</li>
       </ul>
 
-      <p>You can find out how to write macros in the <a href=
-      "rose-api.html#macro">API</a> documentation (includes a tutorial).</p>
+      <p>You can find out how to write macros in the
+      <a href="rose-rug-advanced-tutorials.html#metadata">Advanced Metadata
+      Tutorials</a>.</p>
     </div>
 
     <div class="slide">
@@ -565,8 +577,8 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
 
     <p>You can replace widgets in the config editor with your own. These live
     with metadata under <samp>lib/python/widget/</samp>. For more details, see
-    the <a href="rose-api.html#gtk">API</a> documentation (this also includes a
-    tutorial).</p>
+    the <a href="rose-api.html#gtk">API</a> documentation and the
+    <a href="rose-rug-advanced-tutorials-widget.html">Advanced Tutorial</a>.</p>
 
     <h3>Icons!</h3>
 
@@ -626,6 +638,36 @@ rose macro fib.FibonnaciChecker
 
       <p>Demo! If viewing offline, see the <a href=
       "rose-rug-rosie-go.html">Rosie Go Guide</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="suite-version-control">Suite Version Control</h2>
+      
+      <p>Rosie uses Subversion/FCM as the version control system.
+      Each suite is a separate FCM project with its own trunk and
+      branches. They use a simplified branch naming convention e.g.
+      <samp>a/a/0/0/1/trunk</samp>, <samp>a/a/0/0/1/my_branch</samp>.
+      
+      <p>You can work on a suite exactly as you would work
+      on source code managed under FCM.</p>
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Suite Version Control - Copying vs Branching</h2>
+      
+      <p>Rosie provides utilities for copying suites, which is useful
+      when basing a suite on a standard template or forking a project.</p>
+      
+      <p>However, when proposing or testing changes to a suite, it's
+      usually better to use a branch (<code>fcm branch-create</code>).</p>
+   </div>
+
+   <div class="slide">
+      <h3 class="alwayshidden">Suite Version Control - config edit</h3>
+      <p>The config editor does not interface with Subversion/FCM -
+      saving changes purely modifies your working copy, just like
+      a text editor. Changes should be committed from the command
+      line.</p>
     </div>
 
     <div class="slide">
