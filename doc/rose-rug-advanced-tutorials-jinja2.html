@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Advanced Tutorial: Suite Date/Time Manipulation</title>
+  <title>Rose Advanced Tutorial: suite.rc Templating</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -60,7 +60,7 @@
 
   <div id="body-main" class="presentation">
     <div class="slide">
-      <h1>Rose Advanced Tutorial: Suite Date/Time Manipulation</h1>
+      <h1>Rose Advanced Tutorial: suite.rc Templating</h1>
     </div>
 
     <div class="handout" id="content"></div>
@@ -102,7 +102,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Example suite.rc explained</h3>
+      <h3 class="alwayshidden">Example suite.rc Explained</h3>
 
       <p>This <samp>suite.rc</samp> has two families of tasks - tasks within a
       family are either identical (<samp>IGNITE</samp> family) or variations
@@ -124,7 +124,7 @@
     </div>
 
     <div class="slide">
-      <h3>For Loops</h3>
+      <h3 id="for">For Loops</h3>
 
       <p>Let's have a look at using a <samp>for</samp> loop in Jinja2.</p>
 
@@ -167,7 +167,7 @@
     </div>
 
     <div class="slide">
-      <h3>Variable Assignment</h3>
+      <h3 id="set">Variable Assignment</h3>
 
       <p>Our original text had properly formatted number suffixes that would
       sort correctly in <code>cylc gui</code> (<samp>_00</samp>,
@@ -224,7 +224,7 @@
     </div>
 
     <div class="slide">
-      <h3>If Blocks</h3>
+      <h3 id="if">If Blocks</h3>
 
       <p>Jinja2 supports <samp>if</samp> blocks, so we can actually change what
       we do based on the value of a Jinja2 variable. Replace the first and
@@ -240,8 +240,14 @@
 {%- endfor %}
 </pre>
 
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Caveats</h3>
+      
       <p>This will give us the correct output, barring some indentation for
       <samp>ignite_rocket_29 =&gt; \</samp>.</p>
+
     </div>
 
     <div class="slide">
@@ -261,7 +267,7 @@
     <div class="slide">
       <h3 class="alwayshidden">Finished graph</h3>
 
-      <p>Your dependency graph configuration should look like:</p>
+      <p>Your dependency graph configuration should now look like:</p>
       <pre>
         graph = """
             start =&gt; \
@@ -288,7 +294,9 @@
       <p>We can also replace some of the runtime - the
       <samp>ignite_rocket</samp> tasks are extremely repetitive (and therefore
       easy!), but the <samp>detonate_rocket</samp> tasks differ from task to
-      task. We'll start with the <samp>ignite_rocket</samp> tasks - replace the
+      task.</p>
+      
+      <p>We'll start with the <samp>ignite_rocket</samp> tasks - replace the
       sections <samp>ignite_rocket_00</samp> to <samp>ignite_rocket_29</samp>
       with:</p>
       <pre>
@@ -315,7 +323,7 @@
     <div class="slide">
       <h3 class="alwayshidden">Runtime Loops - Replacement</h3>
 
-      <p>Replace the section <samp>detonate_rocket_00</samp> to
+      <p>Replace the sections <samp>detonate_rocket_00</samp> to
       <samp>detonate_rocket_29</samp> with:</p>
       <pre>
 {%- for num in range(30) %}
@@ -339,7 +347,7 @@
     </div>
 
     <div class="slide">
-      <h3>Variables</h3>
+      <h3 id="variables">Variables</h3>
 
       <p>We can see that we've repeated <samp>range(30)</samp> a lot - it would
       be much better to move the <samp>30</samp> number into a variable to
@@ -354,7 +362,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Variable expressions</h3>
+      <h3 class="alwayshidden">Variable Expressions</h3>
 
       <p>We should also replace some of the other hard-coded numbers - the
       first loop should become:</p>
@@ -392,7 +400,7 @@
     </div>
 
     <div class="slide">
-      <h3>rose-suite.conf</h3>
+      <h3 id="rose-suite">rose-suite.conf</h3>
 
       <p>Jinja2 variables like the ones we've created can be moved into the
       <samp>rose-suite.conf</samp> file for easy configurability and metadata
@@ -416,7 +424,7 @@ ROCKET_SOUNDS = ["BANG", "WHOOSH"]
     </div>
 
     <div class="slide">
-      <h3>Summary So Far</h3>
+      <h3 id="summary">Summary So Far</h3>
 
       <p>We've:</p>
 
@@ -431,7 +439,7 @@ ROCKET_SOUNDS = ["BANG", "WHOOSH"]
     </div>
 
     <div class="slide">
-      <h3>Adding the app</h3>
+      <h3 id="app">Adding the app</h3>
 
       <p>There's one thing missing from the suite before it can run
       successfully - the <var>ROSE_TASK_APP</var> for the <samp>DETONATE</samp>
@@ -442,7 +450,7 @@ ROCKET_SOUNDS = ["BANG", "WHOOSH"]
     </div>
 
     <div class="slide">
-      <h3>Examining Template Output</h3>
+      <h3 id="cylc view">Examining Template Output</h3>
 
       <p>We can look at our template output by getting cylc to pre-process the
       jinja2 out of our <samp>suite.rc</samp>, outputting it in a cylc-readable
@@ -450,8 +458,12 @@ ROCKET_SOUNDS = ["BANG", "WHOOSH"]
 
       <p>We could use <code>cylc register</code> and <code>cylc
       validate</code>, but as we're (hopefully) going to run the suite in a
-      minute, run <code>rose suite-run -- --hold</code> to automatically do
-      this and start the suite in a paused state.</p>
+      minute, run:</p>
+      <pre class="shell">
+rose suite-run -- --hold
+</pre>
+
+      <p>to automatically do this and start the suite in a paused state.</p>
     </div>
 
     <div class="slide">
@@ -473,7 +485,7 @@ cylc view -g -j $SUITE_NAME
     </div>
 
     <div class="slide">
-      <h3>Running the Suite</h3>
+      <h3 id="run">Running the Suite</h3>
 
       <p>Launch the suite by clicking the relevant control in the open
       <code>cylc gui</code> program, then bring up your most recently used
@@ -483,7 +495,7 @@ cylc view -g -j $SUITE_NAME
     </div>
 
     <div class="slide">
-      <h3>Optional Extras</h3>
+      <h3 id="extra">Optional Extras</h3>
 
       <p>If you like, you can try editing the suite to increase/decrease the
       number of tasks or change the output. You may want to add some <a href=
@@ -492,7 +504,7 @@ cylc view -g -j $SUITE_NAME
     </div>
 
     <div class="slide">
-      <h2>Further Reading</h2>
+      <h2 id="further">Further Reading</h2>
 
       <p>For more information, see:</p>
 
