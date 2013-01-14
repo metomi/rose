@@ -130,12 +130,11 @@
 
       <p>The dependency <samp>graph</samp> for the <samp>ignition</samp> tasks
       follows a simple pattern for the first 16 tasks.</p>
-      
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">For Loop, Part 1</h3>
-      
+
       <p>We can replace the lines:</p>
       <pre>
             ignite_rocket_00 =&gt; \
@@ -152,7 +151,7 @@
 {%- endfor %}
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">For Loop, Part 1 - Explanation</h3>
 
@@ -225,8 +224,8 @@
 </pre>
 
       <p>However, this doesn't handle the special case of the
-      <samp>ignite_rocket_29</samp> line, and it feels redundant to
-      have an almost duplicated loop below our first one.</p>
+      <samp>ignite_rocket_29</samp> line, and it feels redundant to have an
+      almost duplicated loop below our first one.</p>
     </div>
 
     <div class="slide">
@@ -254,9 +253,9 @@
     <div class="slide">
       <h3 class="alwayshidden">For Loops, part 3</h3>
 
-      <p>We can also replace the last part of the dependency graph.
-      Replace the whole <samp>ignite_rocket_00 =&gt; detonate_rocket_00</samp>
-      to <samp>ignite_rocket_29 =&gt; detonate_rocket_29</samp> loop with:</p>
+      <p>We can also replace the last part of the dependency graph. Replace the
+      whole <samp>ignite_rocket_00 =&gt; detonate_rocket_00</samp> to
+      <samp>ignite_rocket_29 =&gt; detonate_rocket_29</samp> loop with:</p>
       <pre>
 {%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
@@ -286,7 +285,7 @@
 {%- set num_label = '%02d' % num %}
             ignite_rocket_{{ num_label }} =&gt; detonate_rocket_{{ num_label }}
 {%- endfor %}
-            DETONATE:finish-all => stop
+            DETONATE:finish-all =&gt; stop
         """
 </pre>
     </div>
@@ -294,9 +293,9 @@
     <div class="slide">
       <h3 class="alwayshidden">Runtime Loops</h3>
 
-      <p>We can also replace some of the <samp>[runtime]</samp> configuration
-      - the <samp>ignite_rocket</samp> tasks are extremely repetitive, but
-      the <samp>detonate_rocket</samp> tasks have some differences.</p>
+      <p>We can also replace some of the <samp>[runtime]</samp> configuration -
+      the <samp>ignite_rocket</samp> tasks are extremely repetitive, but the
+      <samp>detonate_rocket</samp> tasks have some differences.</p>
 
       <p>We'll start with the <samp>ignite_rocket</samp> tasks - replace the
       sections <samp>ignite_rocket_00</samp> to <samp>ignite_rocket_29</samp>
@@ -344,8 +343,8 @@
 
       <p>This uses the remainder operator of Jinja2/Python (<samp>%</samp>) to
       extract the correct number for <var>COLOUR_CODE</var>, and to get the
-      correct list element for <var>SOUND</var>. N.B. Jinja2 supports quite a lot
-      of Python syntax, but not all.</p>
+      correct list element for <var>SOUND</var>. N.B. Jinja2 supports quite a
+      lot of Python syntax, but not all.</p>
     </div>
 
     <div class="slide">
