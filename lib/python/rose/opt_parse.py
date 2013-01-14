@@ -420,6 +420,10 @@ class RoseOptionParser(OptionParser):
                        ["--to-web"],
                        {"action": "store_true", 
                         "help": "Convert ID to the web source URL"}],
+               "unbound": [
+                       ["--unbound", "--undef"],
+                       {"metavar": "STRING",
+                        "help": "Substitute unbound variables with STRING"}],
                "upper": [
                        ["--upper", "-u"],
                        {"action": "store_const",
