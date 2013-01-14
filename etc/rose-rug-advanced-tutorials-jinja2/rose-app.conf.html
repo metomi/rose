@@ -12,8 +12,11 @@
   <div id="body-main">
     <pre>
 [command]
-default=TERM=$(ls -drt -1 /dev/pts/* | tail -1)
-       =printf "\r\033[2K %-$((RANDOM%40 + 20))s\033[1;3${COLOUR_CODE}m $SOUND \033[0m\r" " " &gt; $TERM
+default=TERM=$(ls -drt -1 /dev/pts/* | tail -1); START=$((RANDOM%40 + 20))
+       =for i in {0..2}; do
+       =    printf "\r\033[2K %-"$((START-${#SOUND}/2))"s\033[1;3${COLOUR_CODE}m $SOUND \033[0m\r" " " &gt; $TERM
+       =    SOUND=$(echo $SOUND | sed "s/\([^ ]\)/\1 /g"); sleep 0.15
+       =done
 </pre>
   </div>
 </body>

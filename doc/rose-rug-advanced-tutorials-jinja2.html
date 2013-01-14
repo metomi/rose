@@ -129,34 +129,39 @@
       <p>Let's have a look at using a <samp>for</samp> loop in Jinja2.</p>
 
       <p>The dependency <samp>graph</samp> for the <samp>ignition</samp> tasks
-      follows a simple pattern for the first 16 tasks. We can replace the lines
-      from:</p>
+      follows a simple pattern for the first 16 tasks.</p>
+      
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">For Loop, Part 1</h3>
+      
+      <p>We can replace the lines:</p>
       <pre>
             ignite_rocket_00 =&gt; \
-</pre>
-
-      <p>to</p>
-      <pre>
+            ignite_rocket_01 =&gt; \
+            ignite_rocket_02 =&gt; \
+            ...
             ignite_rocket_15 =&gt; \
 </pre>
 
       <p>with:</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">For Loop, Part 1</h3>
       <pre>
 {%- for num in range(16) %}
            ignite_rocket_{{ num }} =&gt; \
 {%- endfor %}
 </pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">For Loop, Part 1 - Explanation</h3>
 
-      <p>This uses Jinja2 blocks (<samp>{%</samp> to <samp>%}</samp>) to
+      <p>We've used Jinja2 blocks (<samp>{%</samp> to <samp>%}</samp>) to
       template the <samp>ignite_rocket...</samp> line 16 times, substituting
       (<samp>{{</samp> to <samp>}}</samp>) a number <samp>num</samp> in the
       line each time.</p>
 
-      <p>This will produce something that is nearly correct:</p>
+      <p>When evaluated, it will produce something that is nearly correct:</p>
       <pre>
             ignite_rocket_0 =&gt; \
             ignite_rocket_1 =&gt; \
@@ -199,7 +204,8 @@
 
       <p>which is almost there! We forgot to add the <samp>-</samp> after
       <samp>{%</samp>, which removes the newline for the <samp>set
-      num_label</samp> line. Add it in so that the line reads:</p>
+      num_label</samp> line. Fix this by adding it in so that the line
+      reads:</p>
       <pre>
 {%- set num_label = '%02d' % num %}
 </pre>
@@ -241,10 +247,6 @@
 {%- endif %}
 {%- endfor %}
 </pre>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Caveats</h3>
 
       <p>This will give us the correct output.</p>
     </div>
@@ -252,7 +254,7 @@
     <div class="slide">
       <h3 class="alwayshidden">For Loops, part 3</h3>
 
-      <p>We can also trivially replace the last part of the dependency graph.
+      <p>We can also replace the last part of the dependency graph.
       Replace the whole <samp>ignite_rocket_00 =&gt; detonate_rocket_00</samp>
       to <samp>ignite_rocket_29 =&gt; detonate_rocket_29</samp> loop with:</p>
       <pre>
@@ -293,9 +295,8 @@
       <h3 class="alwayshidden">Runtime Loops</h3>
 
       <p>We can also replace some of the <samp>[runtime]</samp> configuration
-      - the <samp>ignite_rocket</samp> tasks are extremely repetitive (and
-      therefore easy!), but the <samp>detonate_rocket</samp> tasks differ from
-      task to task.</p>
+      - the <samp>ignite_rocket</samp> tasks are extremely repetitive, but
+      the <samp>detonate_rocket</samp> tasks have some differences.</p>
 
       <p>We'll start with the <samp>ignite_rocket</samp> tasks - replace the
       sections <samp>ignite_rocket_00</samp> to <samp>ignite_rocket_29</samp>
@@ -343,7 +344,7 @@
 
       <p>This uses the remainder operator of Jinja2/Python (<samp>%</samp>) to
       extract the correct number for <var>COLOUR_CODE</var>, and to get the
-      correct list element for <var>SOUND</var>. Jinja2 supports quite a lot
+      correct list element for <var>SOUND</var>. N.B. Jinja2 supports quite a lot
       of Python syntax, but not all.</p>
     </div>
 
@@ -477,7 +478,7 @@ rose suite-run -- --hold
 
       <p>You can use the graph view in <code>cylc gui</code> to examine the
       dependency tree before you run the suite. You can also examine the text
-      directly - run:</p>
+      directly. Run:</p>
       <pre class="shell">
 cylc view -g -j $SUITE_NAME
 </pre>
