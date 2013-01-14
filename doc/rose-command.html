@@ -83,6 +83,10 @@
 
       <dd>(=config-edit)</dd>
 
+      <dt><a href="#rose-env-cat">rose env-cat</a></dt>
+
+      <dd>Substitute environment variables in input files and print.</dd>
+
       <dt><a href="#rose-host-select">rose host-select</a></dt>
 
       <dd>Select a host from a set of groups or names by load or by
@@ -620,6 +624,40 @@
     <h2 id="rose-edit">rose edit</h2>
 
     <p>See <a href="#rose-config-edit">rose config-edit</a>.</p>
+
+    <h2 id="rose-env-cat">rose env-cat</h2>
+
+    <h3>NAME</h3>
+
+    <p><kbd>rose env-cat</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <p><kbd>rose env-cat [OPTIONS] [FILE ...]</kbd></p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Substitute environment variables in input files and print.</p>
+
+    <p>If no argument is specified, read from <var>STDIN</var>. One
+    <var>FILE</var> argument may be <kbd>-</kbd>, which means read from
+    <var>STDIN</var>.</p>
+
+    <p>The command will look for <kbd>$NAME</kbd> or <kbd>${NAME}</kbd> syntax
+    and substitute them with the value of the environment variable
+    <var>NAME</var>. A backslash in front of the syntax, e.g. <kbd>\$NAME</kbd>
+    or <kbd>\${NAME}</kbd> will escape the substitution.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--unbound=STRING</kbd>, <kbd>--undef=STRING</kbd></dt>
+
+      <dd>The command will normally fail on unbound (or undefined) variables.
+      If this option is specified, the command will substitute an unbound
+      variable with the value of <var>STRING</var>, (which can be an empty
+      string), instead of failing.</dd>
+    </dl>
 
     <h2 id="rose-host-select">rose host-select</h2>
 

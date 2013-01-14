@@ -29,7 +29,7 @@ import sys
 
 # Rose modules
 import rose.config
-import rose.env
+from rose.env import env_var_process
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
@@ -210,8 +210,7 @@ class Analyse(object):
         if hasattr(task, filevar):
             configvar = var + "fileconfig"
             setattr(task, configvar, getattr(task, filevar))
-            filenames = glob.glob(rose.env.env_var_process(getattr(task, 
-                        filevar)))
+            filenames = glob.glob(env_var_process(getattr(task, filevar)))
             if len(filenames) > 0:
                 setattr(task, filevar, filenames[0])
         return task

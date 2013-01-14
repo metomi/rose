@@ -37,7 +37,6 @@ import sys
 import time
 
 import rose.config
-import rose.env
 from rosie.suite_id import SuiteId, SuiteIdError
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
