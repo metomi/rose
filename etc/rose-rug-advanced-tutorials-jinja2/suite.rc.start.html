@@ -1,0 +1,314 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Advanced Tutorials: Jinja2 suite.rc</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <div id="body-main">
+    <pre>
+[cylc]
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+[scheduling]
+    [[dependencies]]
+        graph = """
+            start =&gt; \
+            ignite_rocket_00 =&gt; \
+            ignite_rocket_01 =&gt; \
+            ignite_rocket_02 =&gt; \
+            ignite_rocket_03 =&gt; \
+            ignite_rocket_04 =&gt; \
+            ignite_rocket_05 =&gt; \
+            ignite_rocket_06 =&gt; \
+            ignite_rocket_07 =&gt; \
+            ignite_rocket_08 =&gt; \
+            ignite_rocket_09 =&gt; \
+            ignite_rocket_10 =&gt; \
+            ignite_rocket_11 =&gt; \
+            ignite_rocket_12 =&gt; \
+            ignite_rocket_13 =&gt; \
+            ignite_rocket_14 =&gt; \
+            ignite_rocket_15 =&gt; \
+                          ignite_rocket_16 &amp; \
+                          ignite_rocket_17 &amp; \
+                          ignite_rocket_18 &amp; \
+                          ignite_rocket_19 &amp; \
+                          ignite_rocket_20 &amp; \
+                          ignite_rocket_21 &amp; \
+                          ignite_rocket_22 &amp; \
+                          ignite_rocket_23 &amp; \
+                          ignite_rocket_24 &amp; \
+                          ignite_rocket_25 &amp; \
+                          ignite_rocket_26 &amp; \
+                          ignite_rocket_27 &amp; \
+                          ignite_rocket_28 &amp; \
+                          ignite_rocket_29
+            ignite_rocket_00 =&gt; detonate_rocket_00
+            ignite_rocket_01 =&gt; detonate_rocket_01
+            ignite_rocket_02 =&gt; detonate_rocket_02
+            ignite_rocket_03 =&gt; detonate_rocket_03
+            ignite_rocket_04 =&gt; detonate_rocket_04
+            ignite_rocket_05 =&gt; detonate_rocket_05
+            ignite_rocket_06 =&gt; detonate_rocket_06
+            ignite_rocket_07 =&gt; detonate_rocket_07
+            ignite_rocket_08 =&gt; detonate_rocket_08
+            ignite_rocket_09 =&gt; detonate_rocket_09
+            ignite_rocket_10 =&gt; detonate_rocket_10
+            ignite_rocket_11 =&gt; detonate_rocket_11
+            ignite_rocket_12 =&gt; detonate_rocket_12
+            ignite_rocket_13 =&gt; detonate_rocket_13
+            ignite_rocket_14 =&gt; detonate_rocket_14
+            ignite_rocket_15 =&gt; detonate_rocket_15
+            ignite_rocket_16 =&gt; detonate_rocket_16
+            ignite_rocket_17 =&gt; detonate_rocket_17
+            ignite_rocket_18 =&gt; detonate_rocket_18
+            ignite_rocket_19 =&gt; detonate_rocket_19
+            ignite_rocket_20 =&gt; detonate_rocket_20
+            ignite_rocket_21 =&gt; detonate_rocket_21
+            ignite_rocket_22 =&gt; detonate_rocket_22
+            ignite_rocket_23 =&gt; detonate_rocket_23
+            ignite_rocket_24 =&gt; detonate_rocket_24
+            ignite_rocket_25 =&gt; detonate_rocket_25
+            ignite_rocket_26 =&gt; detonate_rocket_26
+            ignite_rocket_27 =&gt; detonate_rocket_27
+            ignite_rocket_28 =&gt; detonate_rocket_28
+            ignite_rocket_29 =&gt; detonate_rocket_29
+            DETONATE:finish-all =&gt; stop
+        """
+[runtime]
+    [[root]]
+        [[[remote]]]
+            host = $ROSE_ORIG_HOST
+        [[[event hooks]]]
+            failed handler = "rose suite-hook"
+            succeeded handler = "rose suite-hook"
+    [[DETONATE]]
+        command scripting = "rose task-run"
+        [[[environment]]]
+            ROSE_TASK_APP = detonate
+    [[IGNITE]]
+        command scripting = "sleep $((RANDOM % 2))"
+    [[detonate_rocket_00]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 1
+            SOUND = BANG
+    [[detonate_rocket_01]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 2
+            SOUND = WHOOSH
+    [[detonate_rocket_02]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 3
+            SOUND = BANG
+    [[detonate_rocket_03]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 4
+            SOUND = WHOOSH
+    [[detonate_rocket_04]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 5
+            SOUND = BANG
+    [[detonate_rocket_05]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 1
+            SOUND = WHOOSH
+    [[detonate_rocket_06]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 2
+            SOUND = BANG
+    [[detonate_rocket_07]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 3
+            SOUND = WHOOSH
+    [[detonate_rocket_08]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 4
+            SOUND = BANG
+    [[detonate_rocket_09]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 5
+            SOUND = WHOOSH
+    [[detonate_rocket_10]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 1
+            SOUND = BANG
+    [[detonate_rocket_11]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 2
+            SOUND = WHOOSH
+    [[detonate_rocket_12]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 3
+            SOUND = BANG
+    [[detonate_rocket_13]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 4
+            SOUND = WHOOSH
+    [[detonate_rocket_14]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 5
+            SOUND = BANG
+    [[detonate_rocket_15]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 1
+            SOUND = WHOOSH
+    [[detonate_rocket_16]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 2
+            SOUND = BANG
+    [[detonate_rocket_17]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 3
+            SOUND = WHOOSH
+    [[detonate_rocket_18]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 4
+            SOUND = BANG
+    [[detonate_rocket_19]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 5
+            SOUND = WHOOSH
+    [[detonate_rocket_20]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 1
+            SOUND = BANG
+    [[detonate_rocket_21]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 2
+            SOUND = WHOOSH
+    [[detonate_rocket_22]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 3
+            SOUND = BANG
+    [[detonate_rocket_23]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 4
+            SOUND = WHOOSH
+    [[detonate_rocket_24]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 5
+            SOUND = BANG
+    [[detonate_rocket_25]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 1
+            SOUND = WHOOSH
+    [[detonate_rocket_26]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 2
+            SOUND = BANG
+    [[detonate_rocket_27]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 3
+            SOUND = WHOOSH
+    [[detonate_rocket_28]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 4
+            SOUND = BANG
+    [[detonate_rocket_29]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = 5
+            SOUND = WHOOSH
+    [[ignite_rocket_00]]
+        inherit = IGNITE
+    [[ignite_rocket_01]]
+        inherit = IGNITE
+    [[ignite_rocket_02]]
+        inherit = IGNITE
+    [[ignite_rocket_03]]
+        inherit = IGNITE
+    [[ignite_rocket_04]]
+        inherit = IGNITE
+    [[ignite_rocket_05]]
+        inherit = IGNITE
+    [[ignite_rocket_06]]
+        inherit = IGNITE
+    [[ignite_rocket_07]]
+        inherit = IGNITE
+    [[ignite_rocket_08]]
+        inherit = IGNITE
+    [[ignite_rocket_09]]
+        inherit = IGNITE
+    [[ignite_rocket_10]]
+        inherit = IGNITE
+    [[ignite_rocket_11]]
+        inherit = IGNITE
+    [[ignite_rocket_12]]
+        inherit = IGNITE
+    [[ignite_rocket_13]]
+        inherit = IGNITE
+    [[ignite_rocket_14]]
+        inherit = IGNITE
+    [[ignite_rocket_15]]
+        inherit = IGNITE
+    [[ignite_rocket_16]]
+        inherit = IGNITE
+    [[ignite_rocket_17]]
+        inherit = IGNITE
+    [[ignite_rocket_18]]
+        inherit = IGNITE
+    [[ignite_rocket_19]]
+        inherit = IGNITE
+    [[ignite_rocket_20]]
+        inherit = IGNITE
+    [[ignite_rocket_21]]
+        inherit = IGNITE
+    [[ignite_rocket_22]]
+        inherit = IGNITE
+    [[ignite_rocket_23]]
+        inherit = IGNITE
+    [[ignite_rocket_24]]
+        inherit = IGNITE
+    [[ignite_rocket_25]]
+        inherit = IGNITE
+    [[ignite_rocket_26]]
+        inherit = IGNITE
+    [[ignite_rocket_27]]
+        inherit = IGNITE
+    [[ignite_rocket_28]]
+        inherit = IGNITE
+    [[ignite_rocket_29]]
+        inherit = IGNITE
+    [[stop]]
+        command scripting = """
+sleep 2 &amp;&amp; printf '\033[2K' &gt; $(ls -drt -1 /dev/pts/* | tail -1)
+        """
+</pre>
+  </div>
+</body>
+</html>
