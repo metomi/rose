@@ -95,8 +95,8 @@
       <p>We'll start out by looking at a <samp>suite.rc</samp> file that
       doesn't use any templating.</p>
 
-      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
-      new directory) containing a blank <samp>rose-suite.conf</samp> and a
+      <p>Create a <a href="rose-rug-brief-tour.html#cli">new suite</a> (or just
+      a new directory) containing a blank <samp>rose-suite.conf</samp> and a
       <samp>suite.rc</samp> file that looks like <a href=
       "../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.start.html">this</a>.</p>
     </div>
@@ -105,9 +105,9 @@
       <h3 class="alwayshidden">Example suite.rc Explained</h3>
 
       <p>This <samp>suite.rc</samp> has two families of tasks - tasks within a
-      family are either identical (<samp>IGNITE</samp> family) or variations
-      on a theme (<samp>DETONATE</samp> family). There are clear patterns in
-      both the dependency <samp>graph</samp> and the <samp>[runtime]</samp>
+      family are either identical (<samp>IGNITE</samp> family) or variations on
+      a theme (<samp>DETONATE</samp> family). There are clear patterns in both
+      the dependency <samp>graph</samp> and the <samp>[runtime]</samp>
       section.</p>
 
       <p>We want to collapse most of this down with Jinja2.</p>
@@ -156,7 +156,7 @@
       (<samp>{{</samp> to <samp>}}</samp>) a number <samp>num</samp> in the
       line each time.</p>
 
-      <p>This will produce something like:</p>
+      <p>This will produce something that is nearly correct:</p>
       <pre>
             ignite_rocket_0 =&gt; \
             ignite_rocket_1 =&gt; \
@@ -169,9 +169,9 @@
     <div class="slide">
       <h3 id="set">Variable Assignment</h3>
 
-      <p>Our original text had properly formatted number suffixes that would
-      sort correctly in <code>cylc gui</code> (<samp>_00</samp>,
-      <samp>_01</samp>).</p>
+      <p>This doesn't have properly formatted number suffixes like the original
+      text - the original formatting would sort correctly in <code>cylc
+      gui</code> (<samp>_00</samp>, <samp>_01</samp>) and other output.</p>
 
       <p>We can produce nicely formatted numbers by creating another variable
       in Jinja2, inside the <samp>for</samp> loop. Replace the <samp>for</samp>
@@ -239,15 +239,13 @@
 {%- endif %}
 {%- endfor %}
 </pre>
-
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Caveats</h3>
-      
+
       <p>This will give us the correct output, barring some indentation for
       <samp>ignite_rocket_29 =&gt; \</samp>.</p>
-
     </div>
 
     <div class="slide">
@@ -295,7 +293,7 @@
       <samp>ignite_rocket</samp> tasks are extremely repetitive (and therefore
       easy!), but the <samp>detonate_rocket</samp> tasks differ from task to
       task.</p>
-      
+
       <p>We'll start with the <samp>ignite_rocket</samp> tasks - replace the
       sections <samp>ignite_rocket_00</samp> to <samp>ignite_rocket_29</samp>
       with:</p>
@@ -342,8 +340,8 @@
 
       <p>This uses the remainder operator of Jinja2/Python (<samp>%</samp>) to
       extract the correct number for <var>COLOUR_CODE</var>, and to get the
-      correct list element for <var>SOUND</var>. Not all Python syntax is
-      supported in Jinja2, but a lot is.</p>
+      correct list element for <var>SOUND</var>. Jinja2 supports quite a lot
+      of Python syntax, but not all.</p>
     </div>
 
     <div class="slide">
@@ -392,7 +390,7 @@
             SOUND = {{ ROCKET_SOUNDS[num % 2] }}
 </pre>
 
-      <p>We should also put a line at the top setting the variable, next to the
+      <p>We should also put a line at the top setting the variable, after the
       <samp>{%- set ROCKET_NUMBER</samp> line:</p>
       <pre>
 {%- set ROCKET_SOUNDS = ["BANG", "WHOOSH"] %}
@@ -400,11 +398,21 @@
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">suite.rc Standalone Draft</h3>
+
+      <p>Your <samp>suite.rc</samp> file should now look like <a href=
+      "../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.standalone.html">this</a>.</p>
+
+      <p>This is a valid way of writing a <samp>suite.rc</samp> - but we could
+      centralise the input variables even more.</p>
+    </div>
+
+    <div class="slide">
       <h3 id="rose-suite">rose-suite.conf</h3>
 
-      <p>Jinja2 variables like the ones we've created can be moved into the
-      <samp>rose-suite.conf</samp> file for easy configurability and metadata
-      support.</p>
+      <p>Jinja2 input variables, like the ones we've created, can be moved into
+      the <samp>rose-suite.conf</samp> file for easy configurability and
+      metadata support.</p>
 
       <p>Move the variables into the <samp>rose-suite.conf</samp> file by
       removing the two <samp>{% set ROCKET</samp> lines and appending the
@@ -426,7 +434,7 @@ ROCKET_SOUNDS = ["BANG", "WHOOSH"]
     <div class="slide">
       <h3 id="summary">Summary So Far</h3>
 
-      <p>We've:</p>
+      <p>We have:</p>
 
       <ul>
         <li>used <samp>for</samp> loops to collapse repeated content</li>
@@ -450,7 +458,7 @@ ROCKET_SOUNDS = ["BANG", "WHOOSH"]
     </div>
 
     <div class="slide">
-      <h3 id="cylc view">Examining Template Output</h3>
+      <h3 id="cylc-view">Examining Template Output</h3>
 
       <p>We can look at our template output by getting cylc to pre-process the
       jinja2 out of our <samp>suite.rc</samp>, outputting it in a cylc-readable
@@ -476,18 +484,18 @@ rose suite-run -- --hold
 cylc view -g -j $SUITE_NAME
 </pre>
 
-      <p>where <samp>$SUITE_NAME</samp> is the name of the suite directory. You
-      should get a text editor with the jinja2-and-cylc-processed
-      <samp>suite.rc</samp>, which should be functionally identical to our
-      <a href=
+      <p>where <samp>$SUITE_NAME</samp> is the name of the suite directory.
+      Keep the terminal you've used open. You should get a text editor with the
+      jinja2-and-cylc-processed <samp>suite.rc</samp>, which should be
+      functionally identical to our <a href=
       "../etc/rose-rug-advanced-tutorials-jinja2/suite.rc.html">starting
-      point</a>.</p>
+      point</a> - continuation lines may be collapsed.</p>
     </div>
 
     <div class="slide">
       <h3 id="run">Running the Suite</h3>
 
-      <p>Launch the suite by clicking the relevant control in the open
+      <p>Start the suite running by clicking the relevant control in the open
       <code>cylc gui</code> program, then bring up your most recently used
       terminal window (probably the <code>cylc view</code> one).</p>
 
