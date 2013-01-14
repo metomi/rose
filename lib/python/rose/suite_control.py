@@ -67,8 +67,10 @@ class SuiteControl(object):
         have the same interface as the "shutdown" method.
 
         """
+        engine_version = self._get_engine_version(suite_name)
         for host in self._get_hosts(suite_name, host):
-            self.suite_engine_proc.gcontrol(suite_name, host, args)
+            self.suite_engine_proc.gcontrol(
+                    suite_name, host, engine_version, args)
 
     def shutdown(self, suite_name, host=None, callback=None, *args):
         """Shutdown the suite.
@@ -82,9 +84,11 @@ class SuiteControl(object):
         args: extra arguments for the suite engine's gcontrol command.
 
         """
+        engine_version = self._get_engine_version(suite_name)
         for host in self._get_hosts(suite_name, host):
             if callback is None or callback("shutdown", suite_name, host):
-                self.suite_engine_proc.shutdown(suite_name, host, args)
+                self.suite_engine_proc.shutdown(
+                        suite_name, host, engine_version, args)
 
     def _get_hosts(self, suite_name, host):
         if host:
@@ -109,12 +113,12 @@ class SuiteControl(object):
                 hosts = ["localhost"]
         return hosts
 
-    def _get_suite_engine_version(self, suite_name):
+    def _get_engine_version(self, suite_name):
         log = self.suite_engine_proc.get_suite_dir(suite_name, "log")
         conf_path = os.path.join(log, "rose-suite-run.conf")
         if os.access(conf_path, os.F_OK | os.R_OK):
             conf = rose.config.load(conf_path)
-            key = self.suite_engine_proc.SCHEME.upper() + "_VERSION"
+            key = self.suite_engine_proc.get_version_env_name()
             return conf.get_value(["env", key])
 
 

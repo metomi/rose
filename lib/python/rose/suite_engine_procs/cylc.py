@@ -162,28 +162,18 @@ class CylcProcessor(SuiteEngineProcessor):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def gcontrol(self, suite_name, host=None, args=None):
+    def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
-        log_dir = self.get_suite_dir(suite_name, "log")
         if not host:
-            # Try the "rose-suite.host" file in the suite log directory
-            try:
-                host_file = os.path.join(log_dir, "rose-suite-run.host")
-                host = open(host_file).read().strip()
-            except IOError:
-                host = "localhost"
-        conf_path = os.path.join(log_dir, "rose-suite-run.conf")
-        prefix = ""
-        if os.access(conf_path, os.F_OK | os.R_OK):
-            conf = rose.config.load(conf_path)
-            key = self.SCHEME.upper() + "_VERSION"
-            value = conf.get_value(["env", key])
-            if value:
-                prefix = "%s='%s' " % (key, value)
-        fmt = r"%snohup cylc gui --host=%s %s %s 1>>%s 2>&1 &"
-        log = os.path.join(log_dir, "cylc-gui.log")
+            host = "localhost"
+        environ = dict(os.environ)
+        if engine_version:
+            environ.update({self.get_version_env_name(): engine_version})
+        fmt = r"nohup cylc gui --host=%s %s %s 1>>%s 2>&1 &"
+        log = self.get_suite_dir(suite_name, "log", "cylc-gui.log")
         args_str = self.popen.list_to_shell_str(args)
-        self.popen(fmt % (prefix, host, suite_name, args_str, log), shell=True)
+        self.popen(fmt % (host, suite_name, args_str, log),
+                   env=environ, shell=True)
 
     def ping(self, suite_name, hosts=None):
         """Return a list of host names where suite_name is running."""
@@ -381,7 +371,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 sleep(0.1)
         return ret
 
-    def shutdown(self, suite_name, host=None, args=None):
+    def shutdown(self, suite_name, host=None, engine_version=None, args=None):
         """Shut down the suite."""
         command = ["cylc", "shutdown", "--force"]
         if host:
@@ -389,7 +379,10 @@ class CylcProcessor(SuiteEngineProcessor):
         if args:
             command += args
         command += [suite_name]
-        self.popen(*command)
+        environ = dict(os.environ)
+        if engine_version:
+            environ.update({self.get_version_env_name(): engine_version})
+        self.popen(*command, env=environ)
 
     def validate(self, suite_name):
         """(Re-)register and validate a suite."""

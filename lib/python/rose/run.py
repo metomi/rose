@@ -439,7 +439,7 @@ class SuiteRunner(Runner):
         # Suite engine version 
         jinja2_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
         my_rose_version = ResourceLocator.default().get_version()
-        suite_engine_key = self.suite_engine_proc.SCHEME.upper() + "_VERSION"
+        suite_engine_key = self.suite_engine_proc.get_version_env_name()
         if opts.run_mode == "reload":
             suite_engine_version = config.get_value(["env", suite_engine_key])
         else:
