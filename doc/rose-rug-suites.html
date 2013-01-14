@@ -527,7 +527,9 @@ COMPUTE_HOST = "voyager_1"
 
       <p>Suites also need some standard Rose <em>event hooks</em> to construct
       the Rose output viewer (more later) and report or shutdown on
-      failure:</p>
+      failure.</p>
+      
+      <p>The following should be in every Rose suite:</p>
       <pre>
 [cylc]
     [[event hooks]]
@@ -543,11 +545,10 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Hello World event hooks (continued)</h3>
 
-      <p>They could also do with some recommended Rose event hooks:</p>
+      <p>Suites should also have task event hooks, along these lines:</p>
       <pre>
 [runtime]
     [[root]]
-        command scripting = "rose task-run --verbose"
         [[[event hooks]]]
            succeeded handler = "rose suite-hook"
            failed handler = "rose suite-hook --shutdown"
@@ -557,10 +558,13 @@ COMPUTE_HOST = "voyager_1"
            submission timeout = 1440 # 24 hours
            execution timeout  =  180 # 3 hours
 </pre>
+      <p>The <samp>[runtime]</samp> and <samp>[cylc]</samp> event hooks
+      should be adjusted if necessary - for example, increasing the timeout lengths or
+      altering the hook options like <samp>--shutdown</samp>.</p>
     </div>
 
     <div class="slide">
-      <h3>Job Submission</h3>
+      <h3 id="submit">Job Submission</h3>
 
       <p>We may want to configure a job submission method, such as using
       <code>LoadLeveler</code> (spelling is theirs):</p>
@@ -589,6 +593,20 @@ COMPUTE_HOST = "voyager_1"
             resources        = ConsumableMemory(5000)
             wall_clock_limit = '1260,1200'
 </pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Job Submission Methods</h3>
+
+      <p>cylc supports the following job submission methods (potentially more later):</p>
+      
+      <ul class="incremental">
+        <li>at</li>
+        <li>background (default)</li>
+        <li>loadleveler</li>
+        <li>pbs</li>
+        <li>sge</li>
+      </ul>
     </div>
 
     <div class="slide">
@@ -863,7 +881,7 @@ COMPUTE_HOST = "voyager_1"
         <li>Rerunnable tasks, doing one thing and doing it well</li>
 
         <li>Using Rose standard environments, utilities, standard suite
-        templates</li>
+        templates, and the recommended event hooks.</li>
       </ul>
     </div>
 
@@ -893,40 +911,10 @@ COMPUTE_HOST = "voyager_1"
       </ul>
     </div>
 
-    <div class="handout">
+    <div class="handout"><!-- For the images -->
       <br />
       <br />
       <br />
-    </div>
-
-    <div class="slide">
-      <h2 id="suite.rc">Suite Contents</h2>
-
-      <p>A Rose suite should definitely contain the following lines:</p>
-      <pre>
-[cylc]
-    [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
-        timeout = 4320 # 3 days
-</pre>
-    </div>
-
-    <div class="slide">
-      <h2 class="alwayshidden">Standard suite contents continued</h2>
-
-      <p>It <em>should</em> also contain these (or similar):</p>
-      <pre>
-    [[root]]
-        command scripting = "rose task-run --verbose"
-        [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook --mail"
-           execution timeout handler = "rose suite-hook --mail"
-           submission timeout = 1440 # 24 hours
-           execution timeout  =  180 # 3 hours
-</pre>
     </div>
 
     <div class="slide">
