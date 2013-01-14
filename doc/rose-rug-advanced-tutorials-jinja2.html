@@ -197,7 +197,7 @@
            ...
 </pre>
 
-      <p>which is nearly correct! We forgot to add the <samp>-</samp> after
+      <p>which is almost there! We forgot to add the <samp>-</samp> after
       <samp>{%</samp>, which removes the newline for the <samp>set
       num_label</samp> line. Add it in so that the line reads:</p>
       <pre>
@@ -219,7 +219,7 @@
 </pre>
 
       <p>However, this doesn't handle the special case of the
-      <samp>ignite_rocket_29 =&gt; \</samp> line, and it feels redundant to
+      <samp>ignite_rocket_29</samp> line, and it feels redundant to
       have an almost duplicated loop below our first one.</p>
     </div>
 
@@ -228,12 +228,14 @@
 
       <p>Jinja2 supports <samp>if</samp> blocks, so we can actually change what
       we do based on the value of a Jinja2 variable. Replace the first and
-      second loops and the <samp>ignite_rocket_29 =&gt; \</samp> line with:</p>
+      second loops and the <samp>ignite_rocket_29</samp> line with:</p>
       <pre>
 {%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
-{%- if num &lt;= 15 or num == 29 %}
+{%- if num &lt;= 15 %}
             ignite_rocket_{{ num_label }} =&gt; \
+{%- elif num == 29 %}
+                          ignite_rocket_{{ num_label }}
 {%- else %}
                           ignite_rocket_{{ num_label }} &amp; \
 {%- endif %}
@@ -244,8 +246,7 @@
     <div class="slide">
       <h3 class="alwayshidden">Caveats</h3>
 
-      <p>This will give us the correct output, barring some indentation for
-      <samp>ignite_rocket_29 =&gt; \</samp>.</p>
+      <p>This will give us the correct output.</p>
     </div>
 
     <div class="slide">
@@ -271,8 +272,10 @@
             start =&gt; \
 {%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
-{%- if num &lt;= 15 or num == 29 %}
+{%- if num &lt;= 15 %}
             ignite_rocket_{{ num_label }} =&gt; \
+{%- elif num == 29 %}
+                          ignite_rocket_{{ num_label }}
 {%- else %}
                           ignite_rocket_{{ num_label }} &amp; \
 {%- endif %}
@@ -367,8 +370,10 @@
       <pre>
 {%- for num in range(ROCKET_NUMBER) %}
 {%- set num_label = '%02d' % num %}
-{%- if num &lt;= ROCKET_NUMBER/2 or num == ROCKET_NUMBER - 1 %}
+{%- if num &lt;= ROCKET_NUMBER/2 %}
             ignite_rocket_{{ num_label }} =&gt; \
+{%- elif num == ROCKET_NUMBER - 1 %}
+                          ignite_rocket_{{ num_label }}
 {%- else %}
                           ignite_rocket_{{ num_label }} &amp; \
 {%- endif %}

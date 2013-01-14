@@ -24,17 +24,19 @@
             start =&gt; \
 {%- for num in range(ROCKET_NUMBER) %}
 {%- set num_label = '%02d' % num %}
-{%- if num &lt;= ROCKET_NUMBER/2 or num == ROCKET_NUMBER - 1 %}
+{%- if num &lt;= ROCKET_NUMBER/2 %}
             ignite_rocket_{{ num_label }} =&gt; \
+{%- elif num == ROCKET_NUMBER - 1 %}
+                          ignite_rocket_{{ num_label }}
 {%- else %}
                           ignite_rocket_{{ num_label }} &amp; \
 {%- endif %}
 {%- endfor %}
-                                        stop
 {%- for num in range(ROCKET_NUMBER) %}
 {%- set num_label = '%02d' % num %}
             ignite_rocket_{{ num_label }} =&gt; detonate_rocket_{{ num_label }}
 {%- endfor %}
+            DETONATE =&gt; stop
         """
 [runtime]
     [[root]]
@@ -64,7 +66,7 @@
 {%- endfor %}
     [[stop]]
         command scripting = """
-sleep 5 &amp;&amp; printf '\r\033[2K THE END\r' &gt; $(ls -drt -1 /dev/pts/* | tail -1)
+sleep 2 &amp;&amp; printf '\r\033[2K THE END\r' &gt; $(ls -drt -1 /dev/pts/* | tail -1)
 sleep 2 &amp;&amp; printf '\033[2K' &gt; $(ls -drt -1 /dev/pts/* | tail -1)
         """
 </pre>
