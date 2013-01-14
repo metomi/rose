@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Advanced Tutorials: Jinja2 suite.rc</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <div id="body-main">
+    <pre>
+#!jinja2
+{%- set ROCKET_NUMBER = 30 %}
+{%- set ROCKET_SOUNDS = ["BANG", "WHOOSH"] %}
+[cylc]
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+[scheduling]
+    [[dependencies]]
+        graph = """
+            start =&gt; \
+{%- for num in range(ROCKET_NUMBER) %}
+{%- set num_label = '%02d' % num %}
+{%- if num &lt;= ROCKET_NUMBER / 2 %}
+            ignite_rocket_{{ num_label }} =&gt; \
+{%- elif num == ROCKET_NUMBER - 1 %}
+                          ignite_rocket_{{ num_label }}
+{%- else %}
+                          ignite_rocket_{{ num_label }} &amp; \
+{%- endif %}
+{%- endfor %}
+{%- for num in range(ROCKET_NUMBER) %}
+{%- set num_label = '%02d' % num %}
+            ignite_rocket_{{ num_label }} =&gt; detonate_rocket_{{ num_label }}
+{%- endfor %}
+            DETONATE:finish-all =&gt; stop
+        """
+[runtime]
+    [[root]]
+        [[[remote]]]
+            host = $ROSE_ORIG_HOST
+        [[[event hooks]]]
+            failed handler = "rose suite-hook"
+            succeeded handler = "rose suite-hook"
+    [[DETONATE]]
+        command scripting = "rose task-run"
+        [[[environment]]]
+            ROSE_TASK_APP = detonate
+    [[IGNITE]]
+        command scripting = "sleep $((RANDOM % 2))"
+{%- for num in range(ROCKET_NUMBER) %}
+{%- set num_label = '%02d' % num %}
+    [[detonate_rocket_{{ num_label }}]]
+        inherit = DETONATE
+        [[[environment]]]
+            COLOUR_CODE = {{ num % 5 + 1 }}
+            SOUND = {{ ROCKET_SOUNDS[num % 2] }}
+{%- endfor %}
+{%- for num in range(ROCKET_NUMBER) %}       
+{%- set num_label = '%02d' % num %}
+    [[ignite_rocket_{{ num_label }}]]
+        inherit = IGNITE
+{%- endfor %}
+    [[stop]]
+        command scripting = """
+sleep 2 &amp;&amp; printf '\033[2K' &gt; $(ls -drt -1 /dev/pts/* | tail -1)
+        """
+</pre>
+  </div>
+</body>
+</html>
