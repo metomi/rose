@@ -18,13 +18,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-import re
-
-import rose.env
 import rose.macro
 import rose.macros.rule
-
-import value
 
 
 class TriggerMacro(rose.macro.MacroBase):
