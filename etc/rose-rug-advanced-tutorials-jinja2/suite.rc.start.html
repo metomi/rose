@@ -79,7 +79,7 @@
             ignite_rocket_27 =&gt; detonate_rocket_27
             ignite_rocket_28 =&gt; detonate_rocket_28
             ignite_rocket_29 =&gt; detonate_rocket_29
-            DETONATE =&gt; stop
+            DETONATE:finish-all =&gt; stop
         """
 [runtime]
     [[root]]
@@ -306,7 +306,6 @@
         inherit = IGNITE
     [[stop]]
         command scripting = """
-sleep 2 &amp;&amp; printf '\r\033[2K THE END\r' &gt; $(ls -drt -1 /dev/pts/* | tail -1)
 sleep 2 &amp;&amp; printf '\033[2K' &gt; $(ls -drt -1 /dev/pts/* | tail -1)
         """
 </pre>
