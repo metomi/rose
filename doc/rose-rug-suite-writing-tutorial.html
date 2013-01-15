@@ -176,7 +176,7 @@
       </ul>
 
       <p>We then get a working copy of the new suite in the
-      <samp>$HOME/roses</samp> directory.</p>
+      <samp>$HOME/roses/</samp> directory.</p>
     </div>
 
     <div class="slide">
@@ -200,7 +200,7 @@
       <p>We'll need to store the source code with our suite.</p>
 
       <p>Change directory to the suite and make a directory
-      <samp>src</samp>:</p>
+      <samp>src/</samp>:</p>
       <pre class="shell">
 cd ~/roses/$SUITE_ID
 </pre>
@@ -235,13 +235,13 @@ dead_reckoning.f90
       <p>Let's make an application configuration for our fortran program. We
       can call it whatever we like - let's choose <samp>navigate</samp></p>
 
-      <p>Make a directory <samp>app</samp> in the root directory of the
+      <p>Make a directory <samp>app/</samp> in the root directory of the
       suite:</p>
       <pre class="shell">
 mkdir app
 </pre>
 
-      <p>Now make a directory inside <samp>app</samp> called
+      <p>Now make a directory inside <samp>app/</samp> called
       <samp>navigate</samp>:</p>
       <pre class="shell">
 mkdir app/navigate
@@ -277,7 +277,7 @@ mkdir app/navigate
       <h3 class="alwayshidden">Add an App Configuration Contents</h3>
 
       <p>Create a file called <samp>rose-app.conf</samp> in the
-      <samp>app/navigate</samp> directory:</p>
+      <samp>app/navigate/</samp> directory:</p>
       <pre class="shell">
 touch app/navigate/rose-app.conf
 </pre>
@@ -320,8 +320,8 @@ rose config-dump
 
       <p>We need to add an <samp>fcm_make</samp> application.</p>
 
-      <p>Create a directory <samp>fcm_make_navigate</samp> in the
-      <samp>app</samp> directory:</p>
+      <p>Create a directory <samp>fcm_make_navigate/</samp> in the
+      <samp>app/</samp> directory:</p>
       <pre class="shell">
 mkdir app/fcm_make_navigate
 </pre>
@@ -339,8 +339,8 @@ touch app/fcm_make_navigate/rose-app.conf
       <p>Unlike <samp>navigate</samp>, we don't need anything in the
       <samp>rose-app.conf</samp>.</p>
 
-      <p>We do need a build configuration, so create a <samp>file</samp>
-      directory under <samp>app/fcm_make_navigate</samp>:</p>
+      <p>We do need a build configuration, so create a <samp>file/</samp>
+      directory under <samp>app/fcm_make_navigate/</samp>:</p>
       <pre class="shell">
 mkdir app/fcm_make_navigate/file
 </pre>
@@ -413,7 +413,7 @@ dead_reckoning.f90
         <samp>app/navigate/</samp>.</li>
 
         <li>the configuration for the build of the source code,
-        <samp>app/fcm_make_navigate</samp>.</li>
+        <samp>app/fcm_make_navigate/</samp>.</li>
       </ul>
     </div>
 
@@ -554,7 +554,7 @@ touch suite.rc
       <samp>position</samp> file that <var>POS_FPATH</var> refers to, with
       latitude and longitude, for <samp>navigate</samp> to run.</p>
 
-      <p>We need to put this in the suite <samp>[runtime]</samp> directory
+      <p>We need to put this in the suite <samp>[runtime]</samp> configuration
       under a <samp>navigate</samp> sub section.</p>
     </div>
 
