@@ -57,6 +57,7 @@
 
     <div class="header-footer" id="footer"></div>
   </div>
+
   <div id="body-main" class="presentation">
     <div class="slide">
       <h1>Rose User Guide: In Depth Topics</h1>
@@ -320,7 +321,7 @@ should-show-ignored = True
         <li><kbd>rose suite-run -n alternate_suite_name</kbd>: run with a
         different suite name, in a different output directory.</li>
 
-        <li><kbd>rose suite-run -C /path/to/suite</kbd>: run a suite in a
+        <li><kbd>rose suite-run -C /path/to/suite/</kbd>: run a suite in a
         different directory than <samp>$PWD</samp>.</li>
 
         <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>: run with a
@@ -400,7 +401,16 @@ meta=rose-demo-upgrade/27.1
 
       <p>You can check out a branch of a project, change its metadata, and test
       it by pointing <samp>meta-path</samp> at it (e.g. by running <code>rose
-      config-edit --meta-path=$HOME/branch/rose-meta</code>).</p>
+      config-edit --meta-path=$HOME/branch/rose-meta/</code>).</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="upgrade">Upgrading</h3>
+
+      <p>You can upgrade app configurations to use newer versions of metadata
+      (corresponding to newer versions of the application code). This may
+      result in some changes to the configuration (e.g. new or renamed
+      variables).</p>
     </div>
 
     <div class="slide">
@@ -469,8 +479,9 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
     <div class="slide">
       <h3>More Metadata Options</h3>
 
-      <p>See <a href="rose-configuration.html#meta.conf">Metadata
-      Reference</a>.</p>
+      <p>See <a href="rose-configuration.html#meta.conf">Metadata Reference</a>
+      and the <a href="rose-rug-advanced-tutorials.html#metadata">Advanced
+      Metadata Tutorials</a>.</p>
 
       <dl>
         <dt><code>compulsory</code></dt>
@@ -534,7 +545,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       <h3>Macros</h3>
 
       <p>Macros are written in Python and live with metadata under
-      <samp>lib/python/macros</samp>. There are three categories:</p>
+      <samp>lib/python/macros/</samp>. There are three categories:</p>
 
       <ul class="incremental">
         <li><code>Validator</code> macros - <em>checking</em> macros that can
@@ -557,7 +568,8 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       </ul>
 
       <p>You can find out how to write macros in the <a href=
-      "rose-api.html#macro">API</a> documentation (includes a tutorial).</p>
+      "rose-rug-advanced-tutorials.html#metadata">Advanced Metadata
+      Tutorials</a>.</p>
     </div>
 
     <div class="slide">
@@ -565,8 +577,8 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
 
     <p>You can replace widgets in the config editor with your own. These live
     with metadata under <samp>lib/python/widget/</samp>. For more details, see
-    the <a href="rose-api.html#gtk">API</a> documentation (this also includes a
-    tutorial).</p>
+    the <a href="rose-api.html#gtk">API</a> documentation and the <a href=
+    "rose-rug-advanced-tutorials-widget.html">Advanced Tutorial</a>.</p>
 
     <h3>Icons!</h3>
 
@@ -629,6 +641,37 @@ rose macro fib.FibonnaciChecker
     </div>
 
     <div class="slide">
+      <h2 id="suite-version-control">Suite Version Control</h2>
+
+      <p>Rosie uses Subversion/FCM as the version control system. Each suite is
+      a separate FCM project with its own trunk and branches. A simplified
+      branch naming convention is used, e.g. <samp>a/a/0/0/1/trunk</samp>,
+      <samp>a/a/0/0/1/my_branch</samp>.</p>
+
+      <p>You can work on a suite exactly as you would work on source code
+      managed under FCM.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Version Control - Copying vs
+      Branching</h3>
+
+      <p>Rosie provides utilities for copying suites, which is useful when
+      basing a suite on a standard template or forking a project.</p>
+
+      <p>However, when proposing or testing changes to a suite, it's usually
+      better to use a branch (<code>fcm branch-create</code>).</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Version Control - config edit</h3>
+
+      <p>The config editor does not interface with Subversion/FCM - saving
+      changes purely modifies your working copy, just like a text editor.
+      Changes should be committed from the command line.</p>
+    </div>
+
+    <div class="slide">
       <h2 id="rosie-lookup">rosie lookup</h2>
 
       <p><code>rosie lookup</code> queries the Rosie database (through a web
@@ -649,7 +692,7 @@ rosie lookup -Q owner eq bob and title contains test
       <h2 id="rosie-ls">rosie ls</h2>
 
       <p><code>rosie ls</code> lists the suites currently checked out in a
-      user's <code>roses</code> directory.</p>
+      user's <code>roses/</code> directory.</p>
     </div>
 
     <div class="slide">
