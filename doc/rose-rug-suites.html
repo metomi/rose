@@ -604,8 +604,8 @@ COMPUTE_HOST = "voyager_1"
         <li>at</li>
         <li>background (default)</li>
         <li>loadleveler</li>
-        <li>pbs</li>
-        <li>sge</li>
+        <li>pbs (Portable Batch System)</li>
+        <li>sge (<del>Sun</del> Oracle Grid Engine)</li>
       </ul>
     </div>
 
@@ -767,6 +767,16 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">cylc capabilities (continued 2)</h3>
+
+      <ul class="incremental">
+        <li>broadcasting runtime changes to a particular task or cycle within a running suite (cylc broadcast)</li>
+
+        <li>reload the <samp>suite.rc</samp> settings for a running suite</li>
+      </ul>
+    </div>
+
+    <div class="slide">
       <h3>Environment</h3>
 
       <p>There are some useful environment variables that you can use in your
@@ -778,7 +788,8 @@ COMPUTE_HOST = "voyager_1"
 
         <li><var>ROSE_TASK_NAME</var>, name of the suite task.</li>
 
-        <li><var>ROSE_DATA</var>, data directory of the suite.</li>
+        <li><var>ROSE_TASK_CYCLE_TIME</var>, cycle time of the suite task.</li>
+        
       </ul>
     </div>
 
@@ -786,11 +797,12 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Environment continued</h3>
 
       <ul class="incremental">
+        <li><var>ROSE_DATA</var>, data directory of the suite.</li>
+
         <li><var>ROSE_DATAC</var>, data directory for tasks in this cycle
         time.</li>
-
-        <li><var>ROSE_ETC</var>, etc directory of the running suite (if it
-        exists).</li>
+        
+        <li><var>ROSE_ORIG_HOST</var>, host that invoked 'rose suite-run'.</li>
       </ul>
     </div>
 
@@ -800,8 +812,10 @@ COMPUTE_HOST = "voyager_1"
       <p>For more, see <a href="rose-command.html#rose-task-env">rose
       task-env</a> and the <a href=
       "http://cylc.github.com/cylc/single/cug-html.html">cylc
-      documentation</a>. Note: usually, only cylc environment variables are
-      used in your suite.rc file.</p>
+      documentation</a>. Note: to reference Rose environment variables in
+      your <samp>suite.rc</samp> file, you'll need to use <code>rose task-env</code>
+      in the <samp>environment scripting</samp> runtime setting (tutorial <a href=
+      "rose-rug-advanced-tutorials-suite-date-time.html">here</a>).
     </div>
 
     <div class="slide">
@@ -824,12 +838,11 @@ COMPUTE_HOST = "voyager_1"
       <ul class="incremental">
         <li>Usually symbolic links to data directories.</li>
 
-        <li><samp>share</samp> usually contains builds and task output
-        files.</li>
+        <li><samp>share</samp> is intended for any files that need to be shared
+        between tasks.</li>
 
         <li><samp>work</samp> contains task <q>working</q> directories, e.g.
-        containing Rose application namelists and
-        <samp>rose-app-run.conf</samp></li>
+        containing Rose application namelists and other temporary files</li>
       </ul>
     </div>
 
@@ -846,6 +859,9 @@ COMPUTE_HOST = "voyager_1"
 
         <li>The <samp>job/</samp> subdirectory contains task scripts and their
         output and error.</li>
+        
+        <li>The <samp>rose-suite.version</samp> file, which records any version
+        control information about the suite, including any local modifications.</li>
       </ul>
     </div>
 
@@ -970,19 +986,30 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Suite Utilities (continued)</h3>
+
+      <ul class="incremental">
+        <li><kbd>rose date</kbd> - manipulate date/time strings</li>
+
+        <li><kbd>rose mpi-launch</kbd> - a portable way to launch an MPI
+        command</li>
+
+        <li><kbd>rose host-select</kbd> - select from available remote
+        hosts based on things like load and disk space</li>
+      </ul>
+    </div>
+
+    <div class="slide">
       <h2 id="disk">Tidying Up</h2>
 
       <p>You can delete a <samp>~/roses/SUITE_NAME</samp> directory in the
       normal way (<samp>rm -rf</samp>), or run <samp>rosie delete --local-only
       SUITE_NAME</samp>.</p>
 
-      <p><samp>share</samp> and <samp>work</samp> subdirectories/symbolic links
-      in your <samp>~/cylc-run/SUITE_NAME</samp> directory can hold a
-      substantial amount of suite resources.</p>
-
       <p>You can get rid of your suite output in
-      <samp>~/cylc-run/SUITE_NAME</samp> by running <samp>cylc unregister
-      SUITE_NAME</samp>.</p>
+      <samp>~/cylc-run/SUITE_NAME</samp> in the normal way. Note that the
+      <samp>share</samp> and <samp>work</samp> subdirectories may be symbolic links
+      to other locations which should also be tidied up.</p>
     </div>
 
     <div class="slide">
@@ -990,12 +1017,12 @@ COMPUTE_HOST = "voyager_1"
 
       <p>Next Steps:</p>
 
-      <ul class="incremental">
+      <ul>
         <li>Go through the <a href="rose-rug-suite-writing-tutorial.html">Suite
         Writing Tutorial</a>.</li>
 
         <li>Have a look at some of the <a href=
-        "rose-rug-advanced-tutorials.html">Advanced Tutorials</a>.</li>
+        "rose-rug-advanced-tutorials.html#suites">Advanced Suite Tutorials</a>.</li>
       </ul>
     </div>
   </div>
