@@ -119,10 +119,12 @@ rosie create
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Create a Suite: location</h3>A new suite will
-      have been created in the version control system, with a local copy
-      created (i.e. checked out) at <samp>$HOME/roses/$ID</samp> where
-      <var>$ID</var> is a unique ID for the new suite.
+      <h3 class="alwayshidden">Create a Suite: location</h3>
+      
+      <p>A new suite will have been created in the version control system,
+      with a local copy created (i.e. checked out) at
+      <samp>$HOME/roses/$ID/</samp> where <var>$ID</var> is a unique ID for the
+      new suite.</p>
     </div>
 
     <div class="slide">
@@ -199,7 +201,7 @@ rose rug-brief-tour
             In this example suite, the directory contains sets of application
             configurations for running the <em>hello world</em> program in
             different ways. Some of these are not used in the suite at the
-            moment. <kbd>app/fcm_make</kbd> is a special Rose application that
+            moment. <kbd>app/fcm_make/</kbd> is a special Rose application that
             invokes <code>fcm make</code> using the configuration in
             <kbd>app/fcm_make/file/fcm-make.cfg</kbd>.</li>
           </ul>
@@ -249,7 +251,7 @@ cd $HOME/roses/$ID # replace $ID with your suite ID
 rose suite-run
 </pre>
 
-      <p>This will install your suite under <var>$HOME/cylc-run/$ID</var>,
+      <p>This will install your suite under <var>$HOME/cylc-run/$ID/</var>,
       start your suite with <code>cylc</code> and fire up <code>cylc gui
       $ID</code>.</p>
     </div>
@@ -275,7 +277,7 @@ rose suite-run
       <h3>View the Output</h3>
 
       <p>The output of your suite can be found at
-      <var>$HOME/cylc-run/$ID</var>.</p>
+      <var>$HOME/cylc-run/$ID/</var>.</p>
 
       <p>The sub-directory <samp>log/</samp> contains the log files produced by
       the suite. In particular, the <samp>log/job/</samp> directory contains

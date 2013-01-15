@@ -321,7 +321,7 @@ should-show-ignored = True
         <li><kbd>rose suite-run -n alternate_suite_name</kbd>: run with a
         different suite name, in a different output directory.</li>
 
-        <li><kbd>rose suite-run -C /path/to/suite</kbd>: run a suite in a
+        <li><kbd>rose suite-run -C /path/to/suite/</kbd>: run a suite in a
         different directory than <samp>$PWD</samp>.</li>
 
         <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>: run with a
@@ -401,7 +401,7 @@ meta=rose-demo-upgrade/27.1
 
       <p>You can check out a branch of a project, change its metadata, and test
       it by pointing <samp>meta-path</samp> at it (e.g. by running <code>rose
-      config-edit --meta-path=$HOME/branch/rose-meta</code>).</p>
+      config-edit --meta-path=$HOME/branch/rose-meta/</code>).</p>
     </div>
 
     <div class="slide">
@@ -545,7 +545,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       <h3>Macros</h3>
 
       <p>Macros are written in Python and live with metadata under
-      <samp>lib/python/macros</samp>. There are three categories:</p>
+      <samp>lib/python/macros/</samp>. There are three categories:</p>
 
       <ul class="incremental">
         <li><code>Validator</code> macros - <em>checking</em> macros that can
@@ -692,7 +692,7 @@ rosie lookup -Q owner eq bob and title contains test
       <h2 id="rosie-ls">rosie ls</h2>
 
       <p><code>rosie ls</code> lists the suites currently checked out in a
-      user's <code>roses</code> directory.</p>
+      user's <code>roses/</code> directory.</p>
     </div>
 
     <div class="slide">
