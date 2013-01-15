@@ -69,8 +69,8 @@ import rose.gtk.util
 import rose.macro
 import rose.opt_parse
 import rose.resource
+from rose.suite_control import SuiteControl
 import rose.macros
-
 
 RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
 
@@ -92,7 +92,8 @@ class MainController(object):
 
     def __init__(self, config_directory=None, config_objs=None,
                  pluggable=False,
-                 loader_update=rose.config_editor.false_function):
+                 loader_update=rose.config_editor.false_function,
+                 sched_icon_path=None):
         if config_objs is None:
             config_objs = {}
         self.pluggable = pluggable
@@ -108,6 +109,7 @@ class MainController(object):
              rose.META_PROP_TYPE:
              rose.macros.value.ValueChecker}
         self.metadata_off = False
+        self.sched_icon_path = sched_icon_path
 
         # Load the top configuration directory
         self.data = rose.config_editor.loader.ConfigDataManager(
@@ -222,7 +224,9 @@ class MainController(object):
                    (rose.config_editor.TOOLBAR_VALIDATE,
                     'gtk.STOCK_DIALOG_QUESTION'),
                    (rose.config_editor.TOOLBAR_TRANSFORM,
-                    'gtk.STOCK_CONVERT')],
+                    'gtk.STOCK_CONVERT'),
+                   (rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+                    self.get_sched_toolitem)],
                 sep_on_name=[rose.config_editor.TOOLBAR_SAVE,
                              rose.config_editor.TOOLBAR_BROWSE,
                              rose.config_editor.TOOLBAR_REDO,
@@ -241,6 +245,7 @@ class MainController(object):
                self.handle.check_all_extra)
         assign(rose.config_editor.TOOLBAR_TRANSFORM,
                self.handle.transform_default)
+        assign(rose.config_editor.TOOLBAR_SUITE_GCONTROL, self.handle_run_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
                                rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
@@ -260,6 +265,11 @@ class MainController(object):
         run_button.set_sensitive(
               any([c.is_top_level for c in self.data.config.values()]))
         self.toolbar.insert(run_button, -1)
+        
+        self.toolbar.set_widget_sensitive(
+              rose.config_editor.TOOLBAR_SUITE_GCONTROL, 
+              any([c.is_top_level for c in self.data.config.values()]))
+        #self.toolbar.insert(gcontrol_button, -1)        
 
     def generate_menubar(self):
         """Link in the menu functionality and accelerators."""
@@ -1249,6 +1259,11 @@ class MainController(object):
 
 #------------------ Primary menu functions -----------------------------------
 
+    def handle_run_scheduler(self, *args):
+        """Run the scheduler for this suite."""
+        this_id = self.data.top_level_name
+        return SuiteControl().gcontrol(this_id)
+
     def load_from_file(self, somewidget=None):
         """Open a standard dialogue and load a config file, if selected."""
         dirname = self.mainwindow.launch_open_dirname_dialog()
@@ -1417,6 +1432,25 @@ class MainController(object):
             if address.endswith(suffix):
                 return self.menu_widgets[address]
         return None
+
+    def _get_sched_image(self, size=gtk.ICON_SIZE_MENU):
+        if self.sched_icon_path is None:
+            image = gtk.image_new_from_stock(gtk.STOCK_MISSING_IMAGE, size)
+        else:
+            w, h = gtk.icon_size_lookup(size)
+            pix = gtk.gdk.pixbuf_new_from_file(self.sched_icon_path)
+            pix = pix.scale_simple(w, h, gtk.gdk.INTERP_BILINEAR)
+            image = gtk.image_new_from_pixbuf(pix)
+        return image
+        
+    def get_sched_toolitem(self):
+        """Return a button for the suite scheduler."""
+        image = self._get_sched_image(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        button = gtk.Button()
+        button.set_relief(gtk.RELIEF_NONE)
+        button.set_image(image)
+        button.show()
+        return button        
 
     def alter_bar_sensitivity(self):
         """Update bar functionality like Undo and Redo."""
@@ -1940,6 +1974,14 @@ def spawn_window(config_directory_path=None):
          RESOURCER.locate('etc/rose-config-edit/.gtkrc-2.0'))
     rose.gtk.util.setup_stock_icons()
     logo = RESOURCER.locate("etc/images/rose-splash-logo.png")
+    if rose.config_editor.ICON_PATH_SCHEDULER is None:
+        gcontrol_icon = None
+    else:
+        try:
+            gcontrol_icon = RESOURCER.locate(
+                                    rose.config_editor.ICON_PATH_SCHEDULER)
+        except rose.resource.ResourceError:
+            gcontrol_icon = None    
     number_of_events = (get_number_of_configs(config_directory_path) *
                         rose.config_editor.LOAD_NUMBER_OF_EVENTS + 1)
     if config_directory_path is None:
@@ -1947,7 +1989,9 @@ def spawn_window(config_directory_path=None):
     else:
         title = config_directory_path.split("/")[-1]
     splash_screen = rose.gtk.util.SplashScreen(logo, title, number_of_events)
-    MainController(config_directory_path, loader_update=splash_screen.update)
+    MainController(config_directory_path, 
+                   loader_update=splash_screen.update,
+                   sched_icon_path=gcontrol_icon )
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",

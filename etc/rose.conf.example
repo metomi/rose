@@ -43,6 +43,8 @@
 # Configuration specific to "rose config-edit".
 # See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
 #
+## Path to a picture containing the suite engine icon.
+#  icon-path-scheduler = /path/to/suite-engine/icon.png
 ## Hyperlink to the user guide.
 #  help-url = http://host/rose/doc/
 ## Hyperlink to the Rose project page.

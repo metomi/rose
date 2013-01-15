@@ -886,6 +886,11 @@ class Handler(object):
             self.mainwindow.launch_macro_changes_dialog(
                             config_name, macro_type, problem_list,
                             mode="validate", search_func=search)
+
+    def handle_run_scheduler(self, *args):
+        """Run the scheduler for this suite."""
+        this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
+        return SuiteControl().gcontrol(this_id)
     
     def help(self, *args):
         # Handle a GUI help request.
