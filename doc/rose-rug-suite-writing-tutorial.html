@@ -711,19 +711,54 @@ rose suite-log-view
     </div>
 
     <div class="slide">
+      <h2 id="commit">Committing Your Work</h2>
+      
+      <p>You can version control your work - change directory to the
+      root of your suite working copy, and add your files using:</p>
+      <pre class="shell">
+fcm add -c
+</pre>
+      <p>You can then commit by running:</p>
+      <pre class="shell">
+fcm commit
+</pre>
+      <p>This will commit to the trunk of your suite.</p>
+    </div>
+    
+    <div class="slide">
       <h2 id="multi-cycle">More Cycling</h2>
 
       <p>Our suite has a single cycling period of 3 hours, but we could have
       other time definitions in the same suite. Let's add a task that runs at
       12 each day - <samp>take_sun_sight</samp>. This will correct our
       latitude.</p>
+      
+      <p>We have a working suite trunk already, so we should probably make our changes
+      in a branch.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="branch">Working with a Branch</h3>
+      
+      <p>You can create a branch by running:</p>
+      <pre class="shell">
+fcm branch-create sun_sight
+</pre>
+      <p>This will create a branch that you can see by invoking:</p>
+      <pre class="shell">
+fcm branch-list
+</pre>
+      <p>You can then switch to the branch - run:</p>
+      <pre class="shell">
+fcm switch sun_sight
+</pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Adding Alternate Dependency</h3>
 
-      <p>Add these lines below <samp>[[dependencies]]</samp> in your
-      <samp>suite.rc</samp> file:</p>
+      <p>We can now make changes with impunity. Add these lines below
+      <samp>[[dependencies]]</samp> in your <samp>suite.rc</samp> file:</p>
       <pre>
         [[[ 12 ]]]
             graph = """
@@ -731,12 +766,12 @@ rose suite-log-view
             """
 </pre>
 
-      <p>This will run after the <samp>navigate</samp> task from the
-      <samp>*12</samp> cycle time finishes.</p>
+      <p>This will run after the <samp>navigate</samp> task from that
+      cycle time finishes.</p>
     </div>
 
     <div class="slide">
-      <h3 id="scripts">Scripts</h3>
+      <h3 id="scripts">Adding a Script</h3>
 
       <p>It's not necessary to put all scripting in an app or in the
       <samp>command scripting</samp> in the <samp>suite.rc</samp> - you can put
@@ -745,7 +780,7 @@ rose suite-log-view
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">bin/</h3>
+      <h3 class="alwayshidden">Adding a Script (continued)</h3>
 
       <p>Change directory to the root of your suite, and create a
       <samp>bin/</samp> directory:</p>
@@ -762,7 +797,7 @@ touch bin/sun_sight
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">bin/sun_sight</h3>
+      <h3 class="alwayshidden">Editing a Script</h3>
 
       <p>Paste this text into the <samp>sun_sight</samp> file:</p>
       <pre>
@@ -784,7 +819,7 @@ if __name__ == "__main__":
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Executable</h3>
+      <h3 class="alwayshidden">Referencing Scripts</h3>
 
       <p>Save the file. Make it executable by running:</p>
       <pre class="shell">
@@ -796,7 +831,7 @@ chmod +x bin/sun_sight
       file:</p>
       <pre>
     [[take_sun_sight]]
-        command scripting = "sun_sight $$CYLC_SUITE_SHARE_PATH/position"
+        command scripting = "sun_sight $CYLC_SUITE_SHARE_PATH/position"
 </pre>
     </div>
 
@@ -808,21 +843,69 @@ chmod +x bin/sun_sight
 rose suite-run
 </pre>
 
-      <p>You should see that our extra task runs at <samp>2013060112</samp> and
+      <p>Our extra task should run at <samp>2013060112</samp> and
       <samp>2013060212</samp>.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Irregular times</h3>
+      <h3 class="alwayshidden">Branch Committing</h3>
+      
+      <p>Change directory to the root of your suite working copy,
+      and then add your new file and directory to version control by using:</p>
+      <pre class="shell">
+fcm add -c
+</pre>
+      <p>You can then commit by running:</p>
+      <pre class="shell">
+fcm commit
+</pre>
+      <p>This will commit to the <samp>sun_sight</samp> branch of your suite.</p>
+    </div>
+ 
+    <div class="slide">
+      <h3 class="alwayshidden">Branch Merging</h3>
+      
+      <p>If you're happy with your suite changes (run <samp>fcm branch-diff -g</samp>
+      to evaluate them), run:</p>
+      <pre class="shell">
+fcm switch trunk
+</pre>
+      <p>You can then merge in the branch changes by running:</p>
+      <pre class="shell">
+fcm merge sun_sight
+</pre>
+      <p>Commit the changes to the trunk and finish the guide by using:</p>
+      <pre class="shell">
+fcm commit
+</pre>
+    </div>
 
-      <p>We could easily have a more complicated example, where the intervals
-      between tasks are <a href=
-      "http://en.wikipedia.org/wiki/Watch_system#Traditional_system">irregular</a>
+    <div class="slide">
+      <h3>Irregular Cycling</h3>
+
+      <p>We could also have <a href=
+      "http://en.wikipedia.org/wiki/Watch_system#Traditional_system">irregular</a> intervals between tasks
       - for example, under <samp>[[dependencies]]</samp>:</p>
       <pre>
       [[[0, 4, 8, 12, 16, 18, 20]]]
           graph = """change_of_watch"""
 </pre>
+      <p>N.B. We'd also need an appropriate <samp>[runtime]</samp> entry if we
+      were adding this.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="summary-branch">Summary</h2>
+
+      <p>In this part we've:</p>
+
+      <ul class="incremental">
+        <li>added a task with a different cycling period</li>
+
+        <li>added a script in <samp>bin/</samp></li>
+        
+        <li>developed changes in a suite branch and merged back to the trunk</li>
+      </ul>
     </div>
 
     <div class="slide">
