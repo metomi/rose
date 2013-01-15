@@ -3,9 +3,6 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="generator" content=
-  "HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" />
-
   <title>Rose User Guide: Suite Writing Tutorial</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -747,7 +744,7 @@ fcm commit
 
       <p>You can create a branch by running:</p>
       <pre class="shell">
-fcm branch-create sun_sight
+fcm branch-create sun_sight_dev
 </pre>
 
       <p>This will create a branch that you can see by invoking:</p>
@@ -757,7 +754,7 @@ fcm branch-list
 
       <p>You can then switch to the branch - run:</p>
       <pre class="shell">
-fcm switch sun_sight
+fcm switch sun_sight_dev
 </pre>
     </div>
 
@@ -868,7 +865,7 @@ fcm add -c
 fcm commit
 </pre>
 
-      <p>This will commit to the <samp>sun_sight</samp> branch of your
+      <p>This will commit to the <samp>sun_sight_dev</samp> branch of your
       suite.</p>
     </div>
 
@@ -883,7 +880,7 @@ fcm switch trunk
 
       <p>You can then merge in the branch changes by running:</p>
       <pre class="shell">
-fcm merge sun_sight
+fcm merge sun_sight_dev
 </pre>
 
       <p>Commit the changes to the trunk and finish the guide by using:</p>
