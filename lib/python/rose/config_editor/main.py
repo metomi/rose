@@ -32,7 +32,9 @@ import re
 import shutil
 import sre_constants
 import sys
+import urllib
 import warnings
+import webbrowser
 
 # Ignore add menu related warnings for now, but remove this later.
 warnings.filterwarnings('ignore',
@@ -70,7 +72,9 @@ import rose.macro
 import rose.opt_parse
 import rose.resource
 from rose.suite_control import SuiteControl
+from rose.suite_engine_proc import SuiteEngineProcessor
 import rose.macros
+
 
 RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
 
@@ -225,6 +229,8 @@ class MainController(object):
                     'gtk.STOCK_DIALOG_QUESTION'),
                    (rose.config_editor.TOOLBAR_TRANSFORM,
                     'gtk.STOCK_CONVERT'),
+                   (rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+                    'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_SUITE_GCONTROL,
                     self.get_sched_toolitem)],
                 sep_on_name=[rose.config_editor.TOOLBAR_SAVE,
@@ -245,6 +251,7 @@ class MainController(object):
                self.handle.check_all_extra)
         assign(rose.config_editor.TOOLBAR_TRANSFORM,
                self.handle.transform_default)
+        assign(rose.config_editor.TOOLBAR_VIEW_OUTPUT, self.handle_view_output)
         assign(rose.config_editor.TOOLBAR_SUITE_GCONTROL, self.handle_run_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
                                rose.config_editor.TOOLBAR_FIND)['widget']
@@ -269,7 +276,10 @@ class MainController(object):
         self.toolbar.set_widget_sensitive(
               rose.config_editor.TOOLBAR_SUITE_GCONTROL, 
               any([c.is_top_level for c in self.data.config.values()]))
-        #self.toolbar.insert(gcontrol_button, -1)        
+
+        self.toolbar.set_widget_sensitive(
+              rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+              any([c.is_top_level for c in self.data.config.values()]))
 
     def generate_menubar(self):
         """Link in the menu functionality and accelerators."""
@@ -1263,6 +1273,24 @@ class MainController(object):
         """Run the scheduler for this suite."""
         this_id = self.data.top_level_name
         return SuiteControl().gcontrol(this_id)
+
+    def handle_view_output(self, *args, **kwargs):
+        """View a suite's output, if any."""
+        suite_engine_proc = SuiteEngineProcessor.get_processor()
+        output_url = suite_engine_proc.get_suite_log_url(
+                                       self.data.top_level_name)
+        if output_url is None:
+            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
+                                     rose.config_editor.ERROR_NO_OUTPUT.format(
+                                      self.data.top_level_name))
+        else:
+            try:
+                urllib.urlopen(output_url)
+            except (AttributeError, IOError) as e:
+                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
+                                         str(e))
+            else:
+                webbrowser.open(output_url, new=True, autoraise=True)
 
     def load_from_file(self, somewidget=None):
         """Open a standard dialogue and load a config file, if selected."""
