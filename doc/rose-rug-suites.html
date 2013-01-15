@@ -528,7 +528,7 @@ COMPUTE_HOST = "voyager_1"
       <p>Suites also need some standard Rose <em>event hooks</em> to construct
       the Rose output viewer (more later) and report or shutdown on
       failure.</p>
-      
+
       <p>The following should be in every Rose suite:</p>
       <pre>
 [cylc]
@@ -558,8 +558,9 @@ COMPUTE_HOST = "voyager_1"
            submission timeout = 1440 # 24 hours
            execution timeout  =  180 # 3 hours
 </pre>
-      <p>The <samp>[runtime]</samp> and <samp>[cylc]</samp> event hooks
-      should be adjusted if necessary - for example, increasing the timeout lengths or
+
+      <p>The <samp>[runtime]</samp> and <samp>[cylc]</samp> event hooks should
+      be adjusted if necessary - for example, increasing the timeout lengths or
       altering the hook options like <samp>--shutdown</samp>.</p>
     </div>
 
@@ -598,14 +599,20 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Job Submission Methods</h3>
 
-      <p>cylc supports the following job submission methods (potentially more later):</p>
-      
+      <p>cylc supports the following job submission methods (potentially more
+      later):</p>
+
       <ul class="incremental">
         <li>at</li>
+
         <li>background (default)</li>
+
         <li>loadleveler</li>
+
         <li>pbs (Portable Batch System)</li>
-        <li>sge (<del>Sun</del> Oracle Grid Engine)</li>
+
+        <li>sge (<del>Sun</del> Oracle Grid Engine)
+        </li>
       </ul>
     </div>
 
@@ -732,7 +739,7 @@ COMPUTE_HOST = "voyager_1"
 
         <li>clock-triggered tasks - tasks triggered at certain wallclock
         times</li>
-        
+
         <li>runahead limit - prevent too many cycles being active at any one
         time</li>
       </ul>
@@ -770,7 +777,8 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">cylc capabilities (continued 2)</h3>
 
       <ul class="incremental">
-        <li>broadcasting runtime changes to a particular task or cycle within a running suite (cylc broadcast)</li>
+        <li>broadcasting runtime changes to a particular task or cycle within a
+        running suite (cylc broadcast)</li>
 
         <li>reload the <samp>suite.rc</samp> settings for a running suite</li>
       </ul>
@@ -789,7 +797,6 @@ COMPUTE_HOST = "voyager_1"
         <li><var>ROSE_TASK_NAME</var>, name of the suite task.</li>
 
         <li><var>ROSE_TASK_CYCLE_TIME</var>, cycle time of the suite task.</li>
-        
       </ul>
     </div>
 
@@ -801,7 +808,7 @@ COMPUTE_HOST = "voyager_1"
 
         <li><var>ROSE_DATAC</var>, data directory for tasks in this cycle
         time.</li>
-        
+
         <li><var>ROSE_ORIG_HOST</var>, host that invoked 'rose suite-run'.</li>
       </ul>
     </div>
@@ -812,10 +819,10 @@ COMPUTE_HOST = "voyager_1"
       <p>For more, see <a href="rose-command.html#rose-task-env">rose
       task-env</a> and the <a href=
       "http://cylc.github.com/cylc/single/cug-html.html">cylc
-      documentation</a>. Note: to reference Rose environment variables in
-      your <samp>suite.rc</samp> file, you'll need to use <code>rose task-env</code>
-      in the <samp>environment scripting</samp> runtime setting (tutorial <a href=
-      "rose-rug-advanced-tutorials-suite-date-time.html">here</a>).
+      documentation</a>. Note: to reference Rose environment variables in your
+      <samp>suite.rc</samp> file, you'll need to use <code>rose task-env</code>
+      in the <samp>environment scripting</samp> runtime setting (tutorial
+      <a href="rose-rug-advanced-tutorials-suite-date-time.html">here</a>).</p>
     </div>
 
     <div class="slide">
@@ -859,9 +866,10 @@ COMPUTE_HOST = "voyager_1"
 
         <li>The <samp>job/</samp> subdirectory contains task scripts and their
         output and error.</li>
-        
+
         <li>The <samp>rose-suite.version</samp> file, which records any version
-        control information about the suite, including any local modifications.</li>
+        control information about the suite, including any local
+        modifications.</li>
       </ul>
     </div>
 
@@ -927,7 +935,8 @@ COMPUTE_HOST = "voyager_1"
       </ul>
     </div>
 
-    <div class="handout"><!-- For the images -->
+    <div class="handout">
+      <!-- For the images -->
       <br />
       <br />
       <br />
@@ -994,8 +1003,8 @@ COMPUTE_HOST = "voyager_1"
         <li><kbd>rose mpi-launch</kbd> - a portable way to launch an MPI
         command</li>
 
-        <li><kbd>rose host-select</kbd> - select from available remote
-        hosts based on things like load and disk space</li>
+        <li><kbd>rose host-select</kbd> - select from available remote hosts
+        based on things like load and disk space</li>
       </ul>
     </div>
 
@@ -1008,8 +1017,8 @@ COMPUTE_HOST = "voyager_1"
 
       <p>You can get rid of your suite output in
       <samp>~/cylc-run/SUITE_NAME</samp> in the normal way. Note that the
-      <samp>share</samp> and <samp>work</samp> subdirectories may be symbolic links
-      to other locations which should also be tidied up.</p>
+      <samp>share</samp> and <samp>work</samp> subdirectories may be symbolic
+      links to other locations which should also be tidied up.</p>
     </div>
 
     <div class="slide">
@@ -1022,7 +1031,8 @@ COMPUTE_HOST = "voyager_1"
         Writing Tutorial</a>.</li>
 
         <li>Have a look at some of the <a href=
-        "rose-rug-advanced-tutorials.html#suites">Advanced Suite Tutorials</a>.</li>
+        "rose-rug-advanced-tutorials.html#suites">Advanced Suite
+        Tutorials</a>.</li>
       </ul>
     </div>
   </div>
