@@ -17,4 +17,5 @@
  * along with Rose. If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
+/* N.B. The following line is also used by a shell script. Do not add spaces. */
 ROSE_VERSION="2012-11+";
