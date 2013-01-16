@@ -91,13 +91,13 @@
       <h2 id="example">Example</h2>
 
       <p>This example uses the Rose example suite from the <a href=
-      "rose-rug-brief-tour.html">brief tour</a> and assumes that you are familiar
-      with it and have it to hand. Otherwise, go back to the brief tour and
-      follow the instructions to check it out or recreate it.</p>
+      "rose-rug-brief-tour.html">brief tour</a> and assumes that you are
+      familiar with it and have it to hand. Otherwise, go back to the brief
+      tour and follow the instructions to check it out or recreate it.</p>
 
       <p>We are going to develop metadata for the app
       <code>my_hello_mars</code>. Change directory to the suite directory, then
-      change directory to <code>app/my_hello_mars</code>.</p>
+      change directory to <code>app/my_hello_mars/</code>.</p>
     </div>
 
     <div class="slide">
@@ -152,7 +152,7 @@ rose edit
     <div class="slide">
       <h3 class="alwayshidden">Example: metadata directory</h3>
 
-      <p>Create the sub directory <code>meta</code> in your application
+      <p>Create the sub directory <code>meta/</code> in your application
       directory:</p>
       <pre class="shell">
 mkdir meta
@@ -228,6 +228,7 @@ range = 0:
 title = Max target number
 type = integer
 </pre>
+
       <p>This means that any integer less than zero will be flagged as a
       problem.</p>
     </div>
@@ -240,8 +241,8 @@ type = integer
 
       <p>Now try decreasing the value of <var>MAX_TARGETS</var> below 0. An
       error will be flagged next to the variable and on the page list in the
-      left hand panel. If you change it to an integer value of 0 or greater, the
-      error will go away.</p>
+      left hand panel. If you change it to an integer value of 0 or greater,
+      the error will go away.</p>
     </div>
 
     <div class="slide">
@@ -354,9 +355,9 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
       <p>Reload the metadata. Now when you change the value of <var>WORLD</var>
       to <samp>Saturn</samp>, or any other planet, <var>LANG_JUPITER</var> will
       be <em>ignored</em> and hidden by default in the config editor (you can
-      show it by selecting <kbd>View -&gt; View All Ignored Variables</kbd>). If
-      you change it back to <samp>Jupiter</samp>, it will be <em>enabled</em>
-      and re-appear.</p>
+      show it by selecting <kbd>View -&gt; View All Ignored Variables</kbd>).
+      If you change it back to <samp>Jupiter</samp>, it will be
+      <em>enabled</em> and re-appear.</p>
     </div>
 
     <div class="slide">
@@ -411,8 +412,8 @@ help = This variable controls which language to use when saying hello
       <h3 class="alwayshidden">Example: view changes</h3>
 
       <p>If you reload the metadata you can now click on the title of
-      <var>LANG_JUPITER</var> or use the menu button to launch a help dialog.
-      </p>
+      <var>LANG_JUPITER</var> or use the menu button to launch a help
+      dialog.</p>
     </div>
 
     <div class="slide">
@@ -497,8 +498,12 @@ url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
 
       <p>We've finished! However, there are other things you can do with
       configuration metadata. Make sure you have a good idea of when to use
-      these by consulting the <a href="rose-configuration.html#meta">Rose
-      Reference Guide &gt; Configuration Metadata</a>.</p>
+      these by consulting the <a href=
+      "rose-configuration.html#meta">Configuration Metadata Reference</a>.</p>
+
+      <p>You could also look at the <a href=
+      "rose-rug-advanced-tutorials.html#metadata">Advanced Metadata
+      Tutorials</a>.</p>
     </div>
   </div>
 </body>
