@@ -714,9 +714,9 @@ rose suite-log-view
       <h2 id="multi-cycle">More Cycling</h2>
 
       <p>Our suite has a single cycling period of 3 hours, but we could have
-      other time definitions in the same suite. Let's add a task that runs at
-      12 each day - <samp>take_sun_sight</samp>. This will correct our
-      latitude.</p>
+      other time definitions in the same suite. Let's add a task called
+      <samp>take_sun_sight</samp> that runs at 12 each day. This will correct
+      our latitude.</p>
     </div>
 
     <div class="slide">
@@ -738,7 +738,7 @@ rose suite-log-view
     <div class="slide">
       <h3 id="scripts">Adding a Script</h3>
 
-      <p>It's not necessary to put all scripting in an app or in the
+      <p>It isn't necessary to put all scripting in an app or in the
       <samp>command scripting</samp> in the <samp>suite.rc</samp> - you can put
       scripts in the <samp>bin/</samp> directory of a suite, and they will be
       added to cylc's path.</p>
@@ -764,7 +764,7 @@ touch bin/sun_sight
     <div class="slide">
       <h3 class="alwayshidden">Editing a Script</h3>
 
-      <p>Paste this text into the <samp>sun_sight</samp> file:</p>
+      <p>Paste the following text into the <samp>sun_sight</samp> file:</p>
       <pre>
 #!/usr/bin/env python
 
@@ -791,9 +791,9 @@ if __name__ == "__main__":
 chmod +x bin/sun_sight
 </pre>
 
-      <p>We need to reference it explicitly in the <samp>suite.rc</samp> for
-      our <samp>take_sun_sight</samp> task - append these lines to the
-      file:</p>
+      <p>We need to reference this script explicitly in the
+      <samp>suite.rc</samp> for our <samp>take_sun_sight</samp> task - append
+      these lines to the file:</p>
       <pre>
     [[take_sun_sight]]
         command scripting = "sun_sight $CYLC_SUITE_SHARE_PATH/position"
@@ -803,7 +803,7 @@ chmod +x bin/sun_sight
     <div class="slide">
       <h3 id="multi-cycle-results">Results</h3>
 
-      <p>Run the suite by invoking <code>rose suite-run</code>:</p>
+      <p>Run the suite by invoking:</p>
       <pre class="shell">
 rose suite-run
 </pre>
@@ -815,7 +815,7 @@ rose suite-run
     <div class="slide">
       <h3 id="summary-multi-cycle">Summary</h3>
 
-      <p>In this part we've:</p>
+      <p>In this part we have:</p>
 
       <ul class="incremental">
         <li>added a task with a different cycling period</li>
