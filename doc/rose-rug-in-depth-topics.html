@@ -349,19 +349,14 @@ should-show-ignored = True
       <h2 id="metadata">Configuration Metadata</h2>
 
       <p>Metadata for rose-suite.conf (and rose-app.conf settings) can be
-      <a href="rose-configuration.html#meta">referenced</a> by:</p>
-
-      <ul class="incremental">
-        <li>
-          <p>the <samp>meta</samp> flag in an app config, e.g.:</p>
-          <pre>
+      <a href="rose-configuration.html#meta">referenced</a> by the
+      <samp>meta</samp> flag in an app config, e.g.:</p>
+      <pre>
 meta=rose-demo-upgrade/27.1
 </pre>
 
-          <p>which references centrally-stored metadata, looked up using the
-          <samp>meta-path</samp> user/site config setting.</p>
-        </li>
-      </ul>
+       <p>This references centrally-stored metadata, looked up using the
+       <samp>meta-path</samp> user/site config setting.</p>
     </div>
 
     <div class="slide">
@@ -698,7 +693,7 @@ rosie lookup -Q owner eq bob and title contains test
     <div class="slide">
       <h2 id="future">Future of Rose</h2>
 
-      <ul class="incremental">
+      <ul>
         <li>More work for us</li>
 
         <li>More work for you</li>
