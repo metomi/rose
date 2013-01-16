@@ -85,7 +85,7 @@
 
       <p>This example supposes:</p><img class="r-floater" src=
       "http://images1.wikia.nocookie.net/__cb20080808224861/patrickobrian/images/0/0e/Master_commander_hms_surpri.jpg"
-      width="30%" alt="'HMS Surprise' replica tall ship" />
+      width="30%" alt="'HMS Surprise' tall ship" />
 
       <ul class="incremental">
         <li>We're on a sailing ship, making a passage</li>
@@ -311,6 +311,7 @@ l_verbose = .true.
       <pre class="shell">
 rose config-dump
 </pre>
+
       <p>This prettifies the format by handling whitespace and sorting in a
       consistent way.</p>
     </div>
@@ -710,7 +711,121 @@ rose suite-log-view
     </div>
 
     <div class="slide">
-      <h2 id="next-steps">Next steps</h2>
+      <h2 id="multi-cycle">More Cycling</h2>
+
+      <p>Our suite has a single cycling period of 3 hours, but we could have
+      other time definitions in the same suite. Let's add a task called
+      <samp>take_sun_sight</samp> that runs at 12 each day. This will correct
+      our latitude.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Adding Alternate Dependency</h3>
+
+      <p>Add these lines below <samp>[[dependencies]]</samp> in your
+      <samp>suite.rc</samp> file:</p>
+      <pre>
+        [[[ 12 ]]]
+            graph = """
+                navigate =&gt; take_sun_sight
+            """
+</pre>
+
+      <p>This will run after the <samp>navigate</samp> task from that cycle
+      time finishes.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="scripts">Adding a Script</h3>
+
+      <p>It isn't necessary to put all scripting in an app or in the
+      <samp>command scripting</samp> in the <samp>suite.rc</samp> - you can put
+      scripts in the <samp>bin/</samp> directory of a suite, and they will be
+      added to cylc's path.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Adding a Script (continued)</h3>
+
+      <p>Change directory to the root of your suite, and create a
+      <samp>bin/</samp> directory:</p>
+      <pre class="shell">
+mkdir bin
+</pre>
+
+      <p>Create an empty file in the <samp>bin/</samp> directory:</p>
+      <pre class="shell">
+touch bin/sun_sight
+</pre>
+
+      <p>Open this file with a text editor.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Editing a Script</h3>
+
+      <p>Paste the following text into the <samp>sun_sight</samp> file:</p>
+      <pre>
+#!/usr/bin/env python
+
+import random
+import sys
+
+
+if __name__ == "__main__":
+    random.seed()
+    with open(sys.argv[1], "r") as f:
+        (lat, long) = f.read().split()
+    lat = float(lat) + random.uniform(-0.05, 0.05)
+    print "Yarr! Our corrected position be {0}, {1}".format(lat, long)
+    with open(sys.argv[1], "w") as f:
+        f.write("{0} {1}\n".format(lat, long))
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Referencing Scripts</h3>
+
+      <p>Save the file. Make it executable by running:</p>
+      <pre class="shell">
+chmod +x bin/sun_sight
+</pre>
+
+      <p>We need to reference this script explicitly in the
+      <samp>suite.rc</samp> for our <samp>take_sun_sight</samp> task - append
+      these lines to the file:</p>
+      <pre>
+    [[take_sun_sight]]
+        command scripting = "sun_sight $CYLC_SUITE_SHARE_PATH/position"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 id="multi-cycle-results">Results</h3>
+
+      <p>Run the suite by invoking:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+
+      <p>Our extra task should run at <samp>2013060112</samp> and
+      <samp>2013060212</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="summary-multi-cycle">Summary</h3>
+
+      <p>In this part we have:</p>
+
+      <ul class="incremental">
+        <li>added a task with a different cycling period</li>
+
+        <li>added a script in <samp>bin/</samp></li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="next-steps">Next Steps</h2>
 
       <p>You may want to experiment with adding metadata to your
       <samp>navigate</samp> app, following the approach in the <a href=
