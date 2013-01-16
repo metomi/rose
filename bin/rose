@@ -79,11 +79,6 @@ function help_util() {
 }
 
 function print_version() {
-    local ROSE_VERSION=
-    if ! ROSE_VERSION=$(cd $ROSE_HOME && git describe 2>/dev/null); then
-        ROSE_VERSION=$(sed '/ROSE_VERSION/!d; s/^.*="\(.*\)";$/\1/' \
-            $ROSE_HOME/doc/rose-version.js)
-    fi
     echo "Rose $ROSE_VERSION ($(readlink -f $ROSE_HOME))"
 }
 

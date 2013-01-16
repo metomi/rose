@@ -32,6 +32,12 @@ Changes that have significant impact on user experience.
 
 Changes that are worth mentioning.
 
+\#349: rose env-cat: new command to substitute environment variables in input files and print result.
+
+\#342: rosa svn-post-commit: fix branch creation DB update.
+
+\#340: rose suite-run: tidy old symbolic links in `$HOME/.cylc/`.
+
 \#329: rose suite-shutdown: new command.
 * rose suite-gcontrol: use `--name=SUITE-NAME` to specify a suite name instead of the last argument.
 

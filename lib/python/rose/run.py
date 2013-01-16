@@ -77,11 +77,10 @@ class ConfigurationNotFoundError(Exception):
 
 class NewModeError(Exception):
 
-    """An exception raised for --new when cwd is the config directory."""
+    """An exception raised for --new mode is not supported."""
 
     def __str__(self):
-        s = "%s: is the configuration directory, --new mode not supported."
-        return s % self.args[0]
+        return "%s=%s, --new mode not supported." % self.args
 
 
 class SuiteHostSelectEvent(Event):
@@ -435,10 +434,22 @@ class SuiteRunner(Runner):
             opts.conf_dir = None
 
         # Automatic Rose constants
-        for k, v in {"ROSE_ORIG_HOST": socket.gethostname()}.items():
+        # ROSE_ORIG_HOST: originating host
+        # ROSE_VERSION: Rose version (not retained in run_mode=="reload")
+        # Suite engine version 
+        jinja2_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
+        my_rose_version = ResourceLocator.default().get_version()
+        suite_engine_key = self.suite_engine_proc.get_version_env_name()
+        if opts.run_mode == "reload":
+            suite_engine_version = config.get_value(["env", suite_engine_key])
+        else:
+            suite_engine_version = self.suite_engine_proc.get_version()
+        auto_items = {"ROSE_ORIG_HOST": socket.gethostname(),
+                      "ROSE_VERSION": ResourceLocator.default().get_version(),
+                      suite_engine_key: suite_engine_version}
+        for k, v in auto_items.items():
             config.set(["env", k], v)
-            config.set(["jinja2:" + self.suite_engine_proc.SUITE_CONF, k],
-                       '"' + v + '"')
+            config.set([jinja2_section, k], '"' + v + '"')
 
         suite_name = opts.name
         if not opts.name:
@@ -472,12 +483,13 @@ class SuiteRunner(Runner):
         suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
 
         suite_conf_dir = os.getcwd()
-        if os.getcwd() == suite_dir:
-            if opts.new_mode:
-                raise NewModeError(os.getcwd())
-        else:
-            if opts.new_mode:
-                self.fs_util.delete(suite_dir)
+        if opts.new_mode:
+            if os.getcwd() == suite_dir:
+                raise NewModeError("PWD", os.getcwd())
+            elif opts.run_mode in ["reload", "restart"]:
+                raise NewModeError("--run", opts.run_mode)
+            self.fs_util.delete(suite_dir)
+        if os.getcwd() != suite_dir:
             self.fs_util.makedirs(suite_dir)
             cmd = self._get_cmd_rsync(suite_dir)
             self.popen(*cmd)
@@ -561,8 +573,8 @@ class SuiteRunner(Runner):
                     rose_bin = "%s/bin/rose" % (rose_home_node.value)
                     break
             # Build remote "rose suite-run" command
-            rose_sr = rose_bin + " suite-run -v -v"
-            rose_sr += " --name=" + suite_name
+            rose_sr = "ROSE_VERSION=%s %s" % (my_rose_version, rose_bin)
+            rose_sr += " suite-run -v -v --name=%s" % suite_name
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:
