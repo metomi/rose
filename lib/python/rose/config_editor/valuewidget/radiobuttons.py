@@ -54,6 +54,8 @@ class RadioButtonsValueWidget(gtk.HBox):
             if item == self.value:
                 radio_button.set_active(True)
             radio_button.connect('toggled', self.setter)
+            radio_button.connect('button-press-event', self.setter)
+            radio_button.connect('activate', self.setter)
             self.pack_start(radio_button, False, False, 10)
             radio_button.show()
             radio_button.connect('focus-in-event',
@@ -62,7 +64,7 @@ class RadioButtonsValueWidget(gtk.HBox):
         if len(var_values) == 1 and self.value == var_values[0]:
             radio_button.set_sensitive(False)
 
-    def setter(self, widget):
+    def setter(self, widget, event=None):
         if widget.get_active():
             self.value = widget.get_label()
             self.set_value(self.value)
