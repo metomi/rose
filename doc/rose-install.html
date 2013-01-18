@@ -378,10 +378,10 @@ $ROSE_HOME/sbin/rosa db-create
 setsid sbin/rosa ws 0/dev/null 2&gt;&amp;1 &amp;
 </pre>
 
-    <p>Alternatively you can run the Rosie web service run under Apache
-    mod_wsgi. To do this you will need to set up an Apache module configuration
-    file (typically in <samp>/etc/httpd/conf.d/rosie-wsgi.conf</samp>)
-    containing the following (with the paths set appropriately):</p>
+    <p>Alternatively you can run the Rosie web service under Apache mod_wsgi. To
+    do this you will need to set up an Apache module configuration file
+    (typically in <samp>/etc/httpd/conf.d/rosie-wsgi.conf</samp>) containing the
+    following (with the paths set appropriately):</p>
     <pre>
 SetEnv ROSE_HOME /path/to/rose
 SetEnv ROSE_NS rosa
