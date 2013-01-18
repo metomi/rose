@@ -373,13 +373,25 @@ $ROSE_HOME/sbin/rosa db-create
     <p>Make sure that the account that runs the repository hooks has read/write
     access to the database and database directory.</p>
 
-    <p>Start the web service by running:</p>
+    <p>You can start the built in web service by running:</p>
     <pre>
 setsid sbin/rosa ws 0/dev/null 2&gt;&amp;1 &amp;
 </pre>
 
-    <p><em>TODO: Provide instruction for running Rosie web service run under
-    Apache mod_wsgi.</em></p>
+    <p>Alternatively you can run the Rosie web service run under Apache
+    mod_wsgi. To do this you will need to set up an Apache module configuration
+    file (typically in <samp>/etc/httpd/conf.d/rosie-wsgi.conf</samp>)
+    containing the following (with the paths set appropriately):</p>
+    <pre>
+SetEnv ROSE_HOME /path/to/rose
+SetEnv ROSE_NS rosa
+SetEnv ROSE_UTIL ws
+
+WSGIPythonPath /path/to/rose/lib/python
+WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
+</pre>
+
+    <p>Use the Apache log at <samp>/var/log/httpd/</samp> to debug problems.</p>
 
     <p>Hopefully, you should now have a working Rosie service. You can test it
     by running:</p>
