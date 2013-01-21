@@ -29,7 +29,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
+      &copy; British Crown Copyright 2012
       <a href="http://www.metoffice.gov.uk">Met Office</a>.
       See <a href="rose-terms-of-use.html">Terms of Use</a>.
       <br />
@@ -249,6 +249,18 @@ mkdir app/navigate
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">App Explanation</h3>
+
+      <p>This new directory is the container for our app configuration. It
+      could hold a Rose configuration file, other files within an optional
+      <samp>file/</samp> subdirectory, scripts in a <samp>bin/</samp>
+      directory, and more.</p>
+
+      <p>In our example we'll only need to add a Rose configuration file,
+      <samp>rose-app.conf</samp>, inside it.</p>
+    </div>
+
+    <div class="slide">
       <h3>Add an App Configuration</h3>
 
       <p>We need to cover the following inputs:</p>
@@ -271,6 +283,9 @@ mkdir app/navigate
 
       <p>We've decided we'll setup the environment and the
       <samp>position</samp> file in the suite, so ignore them for now.</p>
+
+      <p>We'll now create our Rose configuration file for the
+      <samp>navigate</samp> app.</p>
     </div>
 
     <div class="slide">
@@ -299,8 +314,18 @@ l_verbose = .true.
     <div class="slide">
       <h3 class="alwayshidden">Add an App Configuration Explained</h3>
 
+      <p>As with most app configs, this describes how to run a Unix command -
+      in this case, a <samp>dead_reckoning.exe</samp> executable.</p>
+
       <p>When the app is run, this will create our <samp>report.nl</samp> file
-      with the namelist inside, and invoke <samp>dead_reckoning.exe</samp>.</p>
+      with this inside:</p>
+      <pre>
+&amp;report_nl
+l_verbose=.true.,
+/
+</pre>
+
+      <p>It will then invoke <samp>dead_reckoning.exe</samp>.</p>
     </div>
 
     <div class="slide">
@@ -319,7 +344,18 @@ rose config-dump
     <div class="slide">
       <h3 id="build">Add a Build Application</h3>
 
-      <p>We need to add an <samp>fcm_make</samp> application.</p>
+      <p>We need to add an <samp>fcm_make</samp> application, in order to
+      compile <samp>src/dead_reckoning.f90</samp> into an executable that our
+      <samp>navigate</samp> app can call.</p>
+
+      <p>Rose does some under-the-hood magic by default for apps whose name
+      begins with <samp>fcm_make</samp>. This means that we don't need to
+      instruct Rose how to invoke <code>fcm make</code> explicitly, so our app
+      config will be minimal.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Add a Build Application - directory</h3>
 
       <p>Create a directory <samp>fcm_make_navigate/</samp> in the
       <samp>app/</samp> directory:</p>
@@ -337,11 +373,13 @@ touch app/fcm_make_navigate/rose-app.conf
     <div class="slide">
       <h3>Add a Build Configuration</h3>
 
-      <p>Unlike <samp>navigate</samp>, we don't need anything in the
-      <samp>rose-app.conf</samp>.</p>
+      <p>Unlike <samp>navigate</samp>, we don't need to put anything in the
+      <samp>rose-app.conf</samp> configuration - Rose already knows how to run
+      <code>fcm</code>.</p>
 
-      <p>We do need a build configuration, so create a <samp>file/</samp>
-      directory under <samp>app/fcm_make_navigate/</samp>:</p>
+      <p>However, we do need a configuration for <code>fcm</code> to read, so
+      create a <samp>file/</samp> directory under
+      <samp>app/fcm_make_navigate/</samp>:</p>
       <pre class="shell">
 mkdir app/fcm_make_navigate/file
 </pre>
@@ -410,11 +448,11 @@ dead_reckoning.f90
       <ul class="incremental">
         <li>the source code, in <samp>src/dead_reckoning.f90</samp>.</li>
 
-        <li>the configuration for the source code,
-        <samp>app/navigate/</samp>.</li>
-
         <li>the configuration for the build of the source code,
         <samp>app/fcm_make_navigate/</samp>.</li>
+
+        <li>the configuration for running the compiled source code,
+        <samp>app/navigate/</samp>.</li>
       </ul>
     </div>
 
@@ -829,7 +867,7 @@ rose suite-run
 
       <p>You may want to experiment with adding metadata to your
       <samp>navigate</samp> app, following the approach in the <a href=
-      "rose-conf-meta-dev.html">Metadata Development Guide</a>.</p>
+      "rose-rug-metadata-tutorial.html">Metadata Development Guide</a>.</p>
     </div>
 
     <div class="slide">

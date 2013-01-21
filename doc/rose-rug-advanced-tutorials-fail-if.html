@@ -127,8 +127,9 @@ fail-if=namelist:coffee=daily_min &lt;= this &lt;= namelist:coffee=daily_max
 
       <p>We'll use the example of a rocket launch.</p>
 
-      <p>Create a new, blank directory containing a <samp>rose-app.conf</samp>
-      file that looks like this:</p>
+      <p>Create a new, blank directory somewhere - for example, in your
+      homespace - containing a <samp>rose-app.conf</samp> file that looks like
+      this:</p>
     </div>
 
     <div class="slide">
@@ -218,9 +219,11 @@ fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEE
       <h3 class="alwayshidden">config edit</h3>
 
       <p>Save the metadata file and then reload the config editor metadata. You
-      can ask Rose to evaluate the fail-if condition by either pressing the
-      toolbar button ("Check fail-if ...") or clicking the menu <kbd>Metadata
-      -&gt; Check fail-if, warn-if</kbd>.</p>
+      now need to ask Rose to evaluate the fail-if condition, as it's an
+      on-demand process.</p>
+
+      <p>Either press the toolbar button ("Check fail-if ...") or click the
+      menu <kbd>Metadata -&gt; Check fail-if, warn-if</kbd>.</p>
 
       <p>Hopefully, this should not flag any errors, as these are the Apollo
       mission parameters!</p>

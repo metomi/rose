@@ -29,7 +29,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
+      &copy; British Crown Copyright 2012
       <a href="http://www.metoffice.gov.uk">Met Office</a>.
       See <a href="rose-terms-of-use.html">Terms of Use</a>.
       <br />
@@ -346,29 +346,105 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
+      <h2 id="rosie-go">rosie go</h2>
+
+      <p><code>rosie go</code> is the suite manager GUI. It acts as a hub for
+      all your suite work.</p>
+
+      <p>Demo! If viewing offline, see the <a href=
+      "rose-rug-rosie-go.html">Rosie Go Guide</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="suite-version-control">Suite Version Control</h2>
+
+      <p>Rosie uses Subversion/FCM as the version control system. Each suite is
+      a separate FCM project with its own trunk and branches. A simplified
+      branch naming convention is used, e.g. <samp>a/a/0/0/1/trunk</samp>,
+      <samp>a/a/0/0/1/my_branch</samp>.</p>
+
+      <p>You can work on a suite exactly as you would work on source code
+      managed under FCM.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Version Control - Copying vs
+      Branching</h3>
+
+      <p>Rosie provides utilities for copying suites, which is useful when
+      basing a suite on a standard template or forking a project.</p>
+
+      <p>However, when proposing or testing changes to a suite, it's usually
+      better to use a branch (<code>fcm branch-create</code>).</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Version Control - config edit</h3>
+
+      <p>The config editor does not interface with Subversion/FCM - saving
+      changes purely modifies your working copy, just like a text editor.
+      Changes should be committed from the command line.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="rosie-lookup">rosie lookup</h2>
+
+      <p><code>rosie lookup</code> queries the Rosie database (through a web
+      API) to find suites. For example, running:</p>
+      <pre class="shell">
+rosie lookup bob test
+</pre>
+
+      <p>would basically return all suites that had "bob" and "test" in their
+      <samp>rose-suite.info</samp> files. You can also run more targeted
+      queries such as:</p>
+      <pre class="shell">
+rosie lookup -Q owner eq bob and title contains test
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="rosie-ls">rosie ls</h2>
+
+      <p><code>rosie ls</code> lists the suites currently checked out in a
+      user's <code>roses/</code> directory.</p>
+    </div>
+
+    <div class="slide">
       <h2 id="metadata">Configuration Metadata</h2>
 
+      <p>Metadata describes other Rose configuration settings -
+      <samp>help</samp>, <samp>range</samp>, <samp>pattern</samp>, and so
+      on.</p>
+
+      <p>We should have already seen some metadata in the <a href=
+      "rose-rug-metadata-tutorial.html">Metadata Tutorial</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="metadata-central">Referencing Metadata</h3>
+
       <p>Metadata for <samp>rose-suite.conf</samp> (and
-      <samp>rose-app.conf</samp>)settings can be
-      <a href="rose-configuration.html#meta">referenced</a> by the
-      <samp>meta</samp> flag in an app config, e.g.:</p>
+      <samp>rose-app.conf</samp>)settings can be <a href=
+      "rose-configuration.html#meta">referenced</a> by the <samp>meta</samp>
+      flag in an app config, e.g.:</p>
       <pre>
 meta=rose-demo-upgrade/27.1
 </pre>
 
-       <p>This references centrally-stored metadata, looked up using the
-       <samp>meta-path</samp> user/site config setting.</p>
+      <p>This usually references centrally-stored metadata, looked up using the
+      <samp>meta-path</samp> user/site config setting. The example above, for a
+      <samp>meta-path</samp> of <samp>/project/rose-meta/</samp>, would be
+      stored at <samp>/project/rose-meta/rose-demo-upgrade/27.1/</samp>.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Configuration Metadata locations</h3>
+      <h3 id="metadata-decentral">Decentralised Locations</h3>
 
-      <p>You can store metadata in alternate locations, and reference it
-      using:</p>
+      <p>You can store metadata in other locations, and reference it by
+      overriding where the <samp>meta</samp> flag points to, using:</p>
 
       <ul class="incremental">
-        <li>A <samp>meta/</samp> directory in a suite or an application.</li>
-
         <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
 
         <li>The <var>ROSE_META_PATH</var> environment variable.</li>
@@ -376,37 +452,19 @@ meta=rose-demo-upgrade/27.1
         <li>The <samp>meta-path</samp> setting in <a href=
         "rose-configuration.html#site">site/user</a> configurations.</li>
       </ul>
-    </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Configuration Metadata explanation</h3>
-
-      <p>Metadata from (usually) subdirectories in the <samp>rose-meta</samp>
-      directory in a a project's source tree is stored at a central Rose
-      location - this location is pointed to by the site configuration
-      <samp>meta-path</samp> option (e.g.
-      <samp>/project/rose-metadata</samp>)</p>
-
-      <p>The app config <samp>meta</samp> option configures which
-      subdirectories in a location to choose (e.g.
-      <samp>/project/rose-metadata/rose-demo-upgrade/27.1</samp>).</p>
+      <p>Alternatively, you can store metadata in a <samp>meta/</samp>
+      subdirectory in a suite or an application, which will override the
+      others.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Configuration Metadata branches</h3>
 
-      <p>You can check out a branch of a project, change its metadata, and test
-      it by pointing <samp>meta-path</samp> at it (e.g. by running <code>rose
-      config-edit --meta-path=$HOME/branch/rose-meta/</code>).</p>
-    </div>
-
-    <div class="slide">
-      <h3 id="upgrade">Upgrading</h3>
-
-      <p>You can upgrade app configurations to use newer versions of metadata
-      (corresponding to newer versions of the application code). This may
-      result in some changes to the configuration (e.g. new or renamed
-      variables).</p>
+      <p>If you wanted to develop metadata on a branch, using a working copy
+      somewhere, you could test it by pointing <samp>meta-path</samp> at it
+      (e.g. by running <code>rose config-edit
+      --meta-path=$HOME/branch/rose-meta/</code>).</p>
     </div>
 
     <div class="slide">
@@ -431,18 +489,32 @@ meta=rose-demo-upgrade/27.1
 
       <p>There is a logical expression syntax for several metadata options.
       Here are some examples:</p>
-      <pre>
+
+      <ul>
+        <li>
+          <code>range</code>:
+          <pre>
 [namelist:run_snow=min_temp_water_supercool]
 range = this &gt; -48.3
-</pre><br />
-      <pre>
-[namelist:run_snow=slush_fraction]
-trigger = namelist:run_snow=max_num_slushballs: this &gt; 0.5
-</pre><br />
-      <pre>
-[namelist:run_snow=ice_fraction]
-warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
 </pre>
+        </li>
+
+        <li>
+          <code>trigger</code>:
+          <pre>
+[namelist:run_snow=slush_fraction]
+trigger = namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
+</pre>
+        </li>
+
+        <li>
+          <code>warn-if</code>:
+          <pre>
+[namelist:run_snow=ice_fraction]
+warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
+</pre>
+        </li>
+      </ul>
     </div>
 
     <div class="slide">
@@ -453,6 +525,8 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
       <ul class="incremental">
         <li>It's vaguely Pythonic (actually <a href=
         "http://jinja.pocoo.org/docs/templates/#tests">Jinja2</a>)</li>
+
+        <li>Please forget the Jinja2 part</li>
 
         <li>You can refer to variables by id (e.g.
         <samp>namelist:run_snow=max_ok_ice_fraction</samp>) and using
@@ -469,7 +543,7 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
       <samp>namelist:run_snow=monthly_snowfall(12)</samp>).</p>
 
       <p>There are <code>any</code> and <code>all</code> functions (e.g.
-      <samp>any(namelist:run_snow=monthly_snowfall) &gt; 10</samp>).</p>
+      <samp>any(namelist:run_snow=monthly_snowfall &gt; 10)</samp>).</p>
     </div>
 
     <div class="slide">
@@ -584,6 +658,15 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     metadata directory.</p><img alt="Rose Icon" src="rose-icon.png" /></div>
 
     <div class="slide">
+      <h3 id="upgrade">Upgrading</h3>
+
+      <p>You can upgrade app configurations to use newer versions of metadata
+      (corresponding to newer versions of the application code). This may
+      result in some changes to the configuration (e.g. new or renamed
+      variables).</p>
+    </div>
+
+    <div class="slide">
       <h2 id="config-edit">rose config-edit</h2>
 
       <p>The config editor is the suite/application editor GUI.</p>
@@ -625,71 +708,6 @@ rose macro fib.FibonnaciChecker
     env=INVALID_SEQUENCE=1, 1, 2, 3, 5, 8, 14
         not the Fibonacci sequence
 </pre>
-    </div>
-
-    <div class="slide">
-      <h2 id="rosie-go">rosie go</h2>
-
-      <p><code>rosie go</code> is the suite manager GUI. It acts as a hub for
-      all your suite work.</p>
-
-      <p>Demo! If viewing offline, see the <a href=
-      "rose-rug-rosie-go.html">Rosie Go Guide</a>.</p>
-    </div>
-
-    <div class="slide">
-      <h2 id="suite-version-control">Suite Version Control</h2>
-
-      <p>Rosie uses Subversion/FCM as the version control system. Each suite is
-      a separate FCM project with its own trunk and branches. A simplified
-      branch naming convention is used, e.g. <samp>a/a/0/0/1/trunk</samp>,
-      <samp>a/a/0/0/1/my_branch</samp>.</p>
-
-      <p>You can work on a suite exactly as you would work on source code
-      managed under FCM.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Suite Version Control - Copying vs
-      Branching</h3>
-
-      <p>Rosie provides utilities for copying suites, which is useful when
-      basing a suite on a standard template or forking a project.</p>
-
-      <p>However, when proposing or testing changes to a suite, it's usually
-      better to use a branch (<code>fcm branch-create</code>).</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Suite Version Control - config edit</h3>
-
-      <p>The config editor does not interface with Subversion/FCM - saving
-      changes purely modifies your working copy, just like a text editor.
-      Changes should be committed from the command line.</p>
-    </div>
-
-    <div class="slide">
-      <h2 id="rosie-lookup">rosie lookup</h2>
-
-      <p><code>rosie lookup</code> queries the Rosie database (through a web
-      API) to find suites. For example, running:</p>
-      <pre class="shell">
-rosie lookup bob test
-</pre>
-
-      <p>would basically return all suites that had "bob" and "test" in their
-      <samp>rose-suite.info</samp> files. You can also run more targeted
-      queries such as:</p>
-      <pre class="shell">
-rosie lookup -Q owner eq bob and title contains test
-</pre>
-    </div>
-
-    <div class="slide">
-      <h2 id="rosie-ls">rosie ls</h2>
-
-      <p><code>rosie ls</code> lists the suites currently checked out in a
-      user's <code>roses/</code> directory.</p>
     </div>
 
     <div class="slide">
