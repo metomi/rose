@@ -88,9 +88,6 @@
 ## DIR is the root location of a suite's "work" directory (default=$HOME)
 #  root-dir-work=hpc*=$WORKING
 #               =*=$DATADIR
-## Maxium number of times to ping a suite to see if it is running (default=3)
-#  num-ping-try-max=3
-[rose-suite-run]
 
 # Configuration related to "rose task-run".
 #

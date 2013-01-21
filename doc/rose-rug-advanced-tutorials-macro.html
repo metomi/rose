@@ -29,7 +29,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012
+      &copy; British Crown Copyright 2012-3
       <a href="http://www.metoffice.gov.uk">Met Office</a>.
       See <a href="rose-terms-of-use.html">Terms of Use</a>.
       <br />
@@ -77,6 +77,17 @@
     </div>
 
     <div class="slide">
+      <h2 id="warning">Warning</h2>
+
+      <p>Macros should only be written if there is a <em>genuine need</em>
+      that is not covered by other metadata - make sure you are familiar with
+      metadata capabilities before you write your own (real-life) macros.</p>
+      
+      <p>For example, <samp>fail-if</samp> and <samp>warn-if</samp> metadata
+      options can perform complex inter-setting validation.</p>
+    </div>
+
+    <div class="slide">
       <h2 id="purpose">Purpose</h2>
 
       <p>Macros are used in Rose to report problems with a configuration, and
@@ -104,10 +115,10 @@
       <h3 class="alwayshidden">Location</h3>
 
       <p>We are going to develop a macro for the app
-      <code>fred_hello_world</code>. Change directory to
-      <code>app/fred_hello_world</code>.</p>
+      <code>fred_hello_world/</code>. Change directory to
+      <code>app/fred_hello_world/</code>.</p>
 
-      <p>The metadata for the app lives under the <code>meta</code> sub
+      <p>The metadata for the app lives under the <code>meta/</code> sub
       directory. Our new macro will live with the metadata.</p>
     </div>
 
