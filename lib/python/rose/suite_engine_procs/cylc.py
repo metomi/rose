@@ -25,6 +25,7 @@ import pwd
 import re
 import rose.config
 from rose.popen import RosePopenError
+from rose.reporter import Event
 from rose.suite_engine_proc \
         import SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
@@ -331,9 +332,8 @@ class CylcProcessor(SuiteEngineProcessor):
             run_mode = "run"
         # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
         # that the log will be redirected back via "ssh" to the localhost.
-        bash_cmd = r"nohup cylc %s %s %s 1>>%s 2>&1 &" % (
-                run_mode, suite_name, self.popen.list_to_shell_str(args),
-                "cylc-run.log")
+        bash_cmd = r"cylc %s %s %s" % (
+                run_mode, suite_name, self.popen.list_to_shell_str(args))
         if host:
             bash_cmd_prefix = "set -eu\ncd\n"
             log_dir = self.get_suite_dir_rel(suite_name, "log")
@@ -345,9 +345,13 @@ class CylcProcessor(SuiteEngineProcessor):
                     bash_cmd_prefix += "%s=%s\n" % (key, v)
                     bash_cmd_prefix += "export %s\n" % (key)
             ssh_cmd = self.popen.get_cmd("ssh", host, "bash", "--login")
-            self.popen(*ssh_cmd, stdin=(bash_cmd_prefix + bash_cmd))
+            out, err = self.popen(*ssh_cmd, stdin=(bash_cmd_prefix + bash_cmd))
         else:
-            self.popen(bash_cmd, shell=True)
+            out, err = self.popen(bash_cmd, shell=True)
+        if err:
+            self.handle_event(err, type=Event.TYPE_ERR)
+        if out:
+            self.handle_event(out)
 
     def scan(self, hosts=None):
         """Return a list of SuiteScanResult for suites running in hosts.
@@ -382,7 +386,11 @@ class CylcProcessor(SuiteEngineProcessor):
         environ = dict(os.environ)
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
-        self.popen(*command, env=environ)
+        out, err = self.popen(*command, env=environ)
+        if err:
+            self.handle_event(err, type=Event.TYPE_ERR)
+        if out:
+            self.handle_event(out)
 
     def validate(self, suite_name):
         """(Re-)register and validate a suite."""
