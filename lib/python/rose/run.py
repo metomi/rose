@@ -42,7 +42,7 @@ import shutil
 import sys
 import tarfile
 from tempfile import TemporaryFile
-from time import time, sleep
+from time import sleep, strftime, time
 from uuid import uuid4
 
 
@@ -485,11 +485,18 @@ class SuiteRunner(Runner):
             self._run_init_dir_log(opts, suite_name, config)
         self.fs_util.makedirs("log/suite")
 
+        # Rose configuration and version logs
+        self.fs_util.makedirs("log/rose-conf")
+        run_mode = opts.run_mode
+        if run_mode not in ["reload", "restart", "run"]:
+            run_mode = "run"
+        prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), run_mode)
+
         # Dump the actual configuration as rose-suite-run.conf
-        rose.config.dump(config, "log/rose-suite-run.conf")
+        rose.config.dump(config, "log/" + prefix + ".conf")
 
         # Install version information file
-        f = open("log/rose-suite.version", "wb")
+        f = open("log/" + prefix + ".version", "wb")
         for vcs, cmds in [("svn", ["info", "status", "diff"]),
                           ("git", ["describe", "status", "diff"])]:
             if not self.popen.which(vcs):
@@ -509,6 +516,9 @@ class SuiteRunner(Runner):
             finally:
                 os.chdir(cwd)
         f.close()
+
+        for ext in [".conf", ".version"]:
+            self.fs_util.symlink(prefix + ext, "log/rose-suite-run" + ext)
 
         # Move temporary log to permanent log
         if hasattr(self.event_handler, "contexts"):
