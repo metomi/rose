@@ -99,18 +99,6 @@ class SuiteLogArchiveEvent(Event):
         return "%s <= %s" % self.args
 
 
-class SuitePingTryMaxEvent(Event):
-
-    """An event raised when the suite ping did not succeed after the maximum
-    number of attempts.
-    """
-
-    TYPE = Event.TYPE_ERR
-
-    def __str__(self):
-        return "Suite ping did not succeed after %d attempts" % self.args[0]
-
-
 class Dummy(object):
 
     """Convert a dict into an object."""
@@ -376,11 +364,8 @@ class SuiteRunner(Runner):
 
     """Invoke a Rose suite."""
 
-    SLEEP_PING = 1.0
     SLEEP_PIPE = 0.05
     NAME = "suite"
-    NUM_LOG_MAX = 5
-    NUM_PING_TRY_MAX = 3
     OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
                "gcontrol_mode", "host", "install_only_mode",
                "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
@@ -639,19 +624,6 @@ class SuiteRunner(Runner):
             self.suite_engine_proc.run(
                     suite_name, host, environ, opts.run_mode, args)
             open("rose-suite-run.host", "w").write(host + "\n")
-
-            # Check that the suite is running
-            keys = ["rose-suite-run", "num-ping-try-max"]
-            num_ping_try_max = conf.get_value(keys, self.NUM_PING_TRY_MAX)
-            num_ping_try_max = int(num_ping_try_max)
-            for num_ping_try in range(1, num_ping_try_max + 1):
-                if self.suite_engine_proc.ping(suite_name, [host]):
-                    break
-                elif num_ping_try < num_ping_try_max:
-                    sleep(self.SLEEP_PING)
-                else:
-                    event = SuitePingTryMaxEvent(num_ping_try_max)
-                    self.event_handler(event)
             self.suite_log_view_gen(suite_name)
 
         # Launch the monitoring tool
