@@ -545,6 +545,7 @@ COMPUTE_HOST = "voyager_1"
         [[[event hooks]]]
            succeeded handler = "rose suite-hook"
            failed handler = "rose suite-hook --shutdown"
+           retry handler = "rose suite-hook --mail"
            submission failed handler = "rose suite-hook --shutdown"
            submission timeout handler = "rose suite-hook --mail"
            execution timeout handler = "rose suite-hook --mail"
@@ -711,7 +712,6 @@ COMPUTE_HOST = "voyager_1"
       <p>If task B is not needed when task A succeeds, it can be <samp>suicide
       triggered</samp>:</p>
       <pre>
-
 [scheduling]
     [[dependencies]]
         graph = "A =&gt; !B"
@@ -825,9 +825,9 @@ COMPUTE_HOST = "voyager_1"
       <samp>~/cylc-run/</samp>, which is updated when you run the suite.</p>
 
       <p>It is a mirror of your suite directory structure and content, but with
-      some added cylc directories and symbolic links (e.g. <samp>share/</samp>).
-      These hold things like installed files, current task statuses, and task
-      output.</p>
+      some added cylc directories and symbolic links (e.g.
+      <samp>share/</samp>). These hold things like installed files, current
+      task statuses, and task output.</p>
     </div>
 
     <div class="slide">
@@ -838,8 +838,8 @@ COMPUTE_HOST = "voyager_1"
       <ul class="incremental">
         <li>Usually symbolic links to data directories.</li>
 
-        <li><samp>share/</samp> is intended for any files that need to be shared
-        between tasks.</li>
+        <li><samp>share/</samp> is intended for any files that need to be
+        shared between tasks.</li>
 
         <li><samp>work/</samp> contains task <q>working</q> directories, e.g.
         containing Rose application namelists and other temporary files</li>
