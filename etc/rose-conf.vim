@@ -1,15 +1,5 @@
 " Syntax highlighter for Rose configuration files.
 "_____________________________________________________________________
-" = Instructions =
-"
-" Make a $HOME/.vim/syntax/ directory and bung this file in there.
-
-" Put the following in $HOME/.vimrc for file type recognition:
-
-"augroup filetype
-"  au! BufRead,BufnewFile rose-*.conf,rose-*.info set filetype=rose-conf
-"augroup END
-"_____________________________________________________________________
 " = Licence =
 "
 " This file is part of Rose, a framework for scientific suites.
@@ -26,6 +16,16 @@
 " 
 " You should have received a copy of the GNU General Public License
 " along with Rose. If not, see <http://www.gnu.org/licenses/>.
+"_____________________________________________________________________
+" = Instructions =
+"
+" Make a $HOME/.vim/syntax/ directory and bung this file in there.
+
+" Put the following in $HOME/.vimrc for file type recognition:
+
+"augroup filetype
+"  au! BufRead,BufnewFile rose-*.conf,rose-*.info set filetype=rose-conf
+"augroup END
 "_____________________________________________________________________
 
 if exists("b:current_syntax")

@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- = Instructions =
- 
- Create this directory if it doesn't already exist:
- ~/.local/share/gtksourceview-2.0/language-specs/
-
- Place this file in that directory (or symlink it)
- 
- In the case of gedit, a total reload is required to apply it.
-
+ _____________________________________________________________________
  = Licence =
 
  This file is part of Rose, a framework for scientific suites.
@@ -25,6 +17,16 @@
  
  You should have received a copy of the GNU General Public License
  along with Rose. If not, see <http://www.gnu.org/licenses/>.
+ _____________________________________________________________________
+ = Instructions =
+ 
+ Create this directory if it doesn't already exist:
+ ~/.local/share/gtksourceview-2.0/language-specs/
+
+ Place this file in that directory (or symlink it)
+ 
+ In the case of gedit, a total reload is required to apply it.
+ _____________________________________________________________________
 -->
 <language id="rose-conf" _name="Rose Config File" version="2.0" _section="Others">
   <metadata>
