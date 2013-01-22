@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -104,7 +109,7 @@
       between values, after some initial pre-processing.</p>
 
       <p>You can reference setting values by using their ids - for example:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 fail-if=namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume
 </pre>
     </div>
@@ -114,7 +119,7 @@ fail-if=namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume
 
       <p>You can also use <samp>this</samp> as a shorthand for the current
       (metadata section) id - e.g.:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [namelist:coffee=daily_amount]
 fail-if=namelist:coffee=daily_min &lt;= this &lt;= namelist:coffee=daily_max
 </pre>
@@ -134,7 +139,7 @@ fail-if=namelist:coffee=daily_min &lt;= this &lt;= namelist:coffee=daily_max
 
     <div class="slide">
       <h3 class="alwayshidden">rose-app.conf</h3>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [command]
 default=launch.exe
 
@@ -203,7 +208,7 @@ specific_impulse_s=311.0
 
       <p>Add the following lines to the metadata section
       <samp>[namelist:rocket=total_weight_kg]</samp>:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))
 </pre>
 
@@ -247,7 +252,7 @@ fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEE
       <h3 class="alwayshidden">config edit, fail-if errors</h3>
 
       <p>Change the fail-if line to:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))  # Fuel mass ratio or specific impulse too low to achieve orbit.
 </pre>
 
@@ -282,7 +287,7 @@ fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEE
       <p>Open the metadata file <samp>meta/rose-meta.conf</samp> in a text
       editor, and add this line to the
       <samp>[namelist:rocket=battery_levels]</samp> section:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 warn-if=namelist:rocket=battery_levels(1) &lt; 75 or namelist:rocket=battery_levels(2) &lt; 75
 </pre>
 
@@ -299,7 +304,7 @@ warn-if=namelist:rocket=battery_levels(1) &lt; 75 or namelist:rocket=battery_lev
 
       <p>We already know the shorthand syntax <samp>this</samp>, so rephrase
       the metadata to:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 warn-if=this(1) &lt; 75 or this(2) &lt; 75
 </pre>
     </div>
@@ -321,7 +326,7 @@ warn-if=this(1) &lt; 75 or this(2) &lt; 75
       <h3 class="alwayshidden">any example</h3>
 
       <p>We can change the <samp>warn-if</samp> setting to:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 warn-if=any(this &lt; 75)
 </pre>
 
@@ -336,7 +341,7 @@ warn-if=any(this &lt; 75)
       be chained using the Python operator <samp>or</samp>, or you can separate
       them to give clearer error/warning messages. Using our
       <var>battery_levels</var> example again, change the setting to:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 warn-if=any(this &lt; 75);
         all(this &gt; 95)
 </pre>
@@ -350,7 +355,7 @@ warn-if=any(this &lt; 75);
       <h3 class="alwayshidden">Multiple expressions and messages</h3>
 
       <p>You can add separate helper messages for each expression:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 warn-if=any(this &lt; 75);  # Battery level low
         all(this &gt; 95)   # Don't over-charge!
 </pre>

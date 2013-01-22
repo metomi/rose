@@ -6,11 +6,39 @@
   <title>Rose User Guide - Advanced Tutorials: fail-if, warn-if rose-meta.conf</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="../../../doc/rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="../../../doc/rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="../../../doc/rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href="../../../doc/google-code-prettify/prettify.css" />
+  <script type="text/javascript" src="../../../doc/jquery.min.js">
+</script>
+  <script type="text/javascript" src="../../../doc/google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="../../../doc/prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="../../../doc/rose-doc.js">
+</script>
+  <script type="text/javascript" src="../../../doc/rose-version.js">
+</script>
 </head>
 
 <body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="../../../doc/rose-icon.png" alt="Rose" />
+
+    <p><a href="../../../doc/">Rose Documentation</a></p>
+  </div>
   <div id="body-main">
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 [env=ORBITAL_SPEED_MS]
 description=Minimum speed necessary to achieve orbit (m/s)
 help=Delta-v (Increase in speed) necessary to go into a close orbit.

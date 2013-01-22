@@ -36,6 +36,10 @@ doc/jquery.min.js:
 doc/S5/*:
 * Slightly modified version of S5, in the public domain.
   See meyerweb.com/eric/tools/s5/.
+  
+doc/google-code-prettify/*:
+* Unmodified external software library, licensed under the Apache License 2.0.
+  See http://code.google.com/p/google-code-prettify/.
 
 doc/rose-icon.png,
 etc/images/rose-icon.png,
