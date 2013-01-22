@@ -170,7 +170,7 @@ class CylcProcessor(SuiteEngineProcessor):
         environ = dict(os.environ)
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
-        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1"
+        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1 &"
         args_str = self.popen.list_to_shell_str(args)
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
