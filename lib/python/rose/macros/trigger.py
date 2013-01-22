@@ -36,7 +36,6 @@ class TriggerMacro(rose.macro.MacroBase):
                             'is not {2} ({1})')
     IGNORED_STATUS_VALUES = ('from parent value: {0} with {1} '
                              'is not in the allowed values: {2}')
-    PARENT_VALUE_MISSING = 'a missing (!) value'
     PARENT_VALUE = 'value {0}'
 
     def _setup_triggers(self, meta_config):
@@ -157,7 +156,7 @@ class TriggerMacro(rose.macro.MacroBase):
             # Check the children of this id
             id_val_map = self._get_family_dict(this_id, config, meta_config)
             for child_id, vals in id_val_map.items():
-                if has_ignored_parent:
+                if has_ignored_parent or value is None:
                     help_text = self.IGNORED_STATUS_PARENT.format(this_id)
                     self.ignored_dict.setdefault(child_id, {})
                     self.ignored_dict[child_id].update({this_id: help_text})
@@ -182,10 +181,7 @@ class TriggerMacro(rose.macro.MacroBase):
                         id_stack.insert(1, (child_id, False))
                     elif not self._check_values_ok(value, this_id, vals):
                         # Enabled parent, with the wrong values.
-                        if value is None:
-                            repr_value = self.PARENT_VALUE_MISSING
-                        else:
-                            repr_value = self.PARENT_VALUE.format(value)
+                        repr_value = self.PARENT_VALUE.format(value)
                         if len(vals) == 1:
                             help_text = self.IGNORED_STATUS_VALUE.format(
                                              this_id, repr_value,
