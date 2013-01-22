@@ -172,4 +172,9 @@ $(function() {
     if (NODE) {
         NODE.text("Rose " + ROSE_VERSION);
     }
+
+    // Google Code Prettify
+    if (typeof prettyPrint != 'undefined') {
+        prettyPrint();
+    }
 });
