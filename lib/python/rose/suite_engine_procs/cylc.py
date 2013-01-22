@@ -67,7 +67,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     REC_TASK_LOG_FILE_TAIL = re.compile("(\d+\.\d+)(?:\.(.*))?")
 
-    LOG_TASK_TIMESTAMP_THRESHOLD = 2.0
+    LOG_TASK_TIMESTAMP_THRESHOLD = 5.0
 
     def get_task_log_dir_rel(self, suite):
         """Return the relative path to the log directory for suite tasks."""
