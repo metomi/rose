@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -247,7 +252,7 @@
       <samp>hello_world</samp>, by making an <samp>app/hello_world/</samp>
       directory and creating a <samp>rose-app.conf</samp> file in there with
       this content:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [command]
 default = echo 'Hello World'
 </pre>
@@ -455,7 +460,7 @@ default = echo 'Hello World'
 
       <p>We can then store the value of <var>COMPUTE_HOST</var> in a central
       location, the <samp>rose-suite.conf</samp> file:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [jinja2:suite.rc]
 COMPUTE_HOST = "voyager_1"
 </pre>

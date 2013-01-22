@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -132,7 +137,7 @@
         Format</a>.</li>
 
         <li>modified INI format:
-          <pre>
+          <pre class="prettyprint lang-rose_conf">
 [command]
 default = hello.exe
 
@@ -159,7 +164,7 @@ default = hello.exe
       <h3>rose-suite.info</h3>
 
       <p>Discovery information about the suite:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 access-list=bob helen mary 
 issue-list=abc:#2231 my-project:#4076
 owner=fred
@@ -174,7 +179,7 @@ title=Run XYZ for A, with improved B
       <p>Holds <a href="rose-configuration.html#suite">suite-specific</a>
       settings (more in a <a href="rose-rug-suites.html">later part</a> of the
       documentation):</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [jinja2:suite.rc]
 COMPUTE_HOST = mayanstonecircle
 END_TIME = 20121221
@@ -193,7 +198,7 @@ source = /project/hello/mayanpwr0.1/debug.glyph
       <p>This configures a specific <a href=
       "rose-configuration.html#app">application</a> in the suite, which is
       usually a scientific model:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 # Holds bash commands to run (e.g. 'rsync X/ Y/', 'run.exe')
 [command]
 # The usual command:
@@ -209,7 +214,7 @@ MAX_TARGETS = 5
 
     <div class="slide">
       <h3 class="alwayshidden">rose-app.conf continued</h3>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
   
 # A file that we want to be constructed.
 [file:local_orography]
@@ -235,7 +240,7 @@ care_about_shape = .false.
 
       <p>This provides <a href="rose-configuration#meta">metadata</a> for a
       configuration, and is used to drive the config editor GUI.</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow]
 help = This section holds options for configuring the snow
      = retrieval dynamics.
@@ -248,7 +253,7 @@ values = 'too dry', 'too icy', 'good'
 
     <div class="slide">
       <h3 class="alwayshidden">rose-meta.conf continued</h3>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
 description = This specifies the maximum acceptable mass
  fraction of slush.
@@ -271,11 +276,11 @@ type = logical
       configuration file, that controls how Rose tools behave.</p>
 
       <p>An example site configuration snippet, and a user one:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [rose-suite-run]
 hosts = localhost
 </pre><br />
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
 should-show-ignored = True
 </pre>
@@ -427,7 +432,7 @@ rosie lookup -Q owner eq bob and title contains test
       <samp>rose-app.conf</samp>)settings can be <a href=
       "rose-configuration.html#meta">referenced</a> by the <samp>meta</samp>
       flag in an app config, e.g.:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 meta=rose-demo-upgrade/27.1
 </pre>
 
@@ -492,7 +497,7 @@ meta=rose-demo-upgrade/27.1
       <ul>
         <li>
           <code>range</code>:
-          <pre>
+          <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=min_temp_water_supercool]
 range = this &gt; -48.3
 </pre>
@@ -500,7 +505,7 @@ range = this &gt; -48.3
 
         <li>
           <code>trigger</code>:
-          <pre>
+          <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
 trigger = namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
 </pre>
@@ -508,7 +513,7 @@ trigger = namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
 
         <li>
           <code>warn-if</code>:
-          <pre>
+          <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=ice_fraction]
 warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
 </pre>
@@ -592,7 +597,7 @@ warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
           <code>fail-if</code> will cause an error if the expression evaluates
           true. <code>warn-if</code> is the same, but will flag up a warning
           instead of an error. For example:
-          <pre>
+          <pre class="prettyprint lang-rose_conf">
 fail-if = any(namelist:test=ctrl_array % this == 0)
 </pre>
         </dd>
