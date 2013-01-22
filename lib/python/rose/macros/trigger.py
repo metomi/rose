@@ -148,10 +148,10 @@ class TriggerMacro(rose.macro.MacroBase):
                 continue
             if not has_ignored_parent:
                 section, option = self._get_section_option_from_id(this_id)
+                node = config.get([section, option])
                 if option is None:
-                    value = True
+                    value = None if node is None else True
                 else:
-                    node = config.get([section, option])
                     value = None if node is None else node.value
             # Check the children of this id
             id_val_map = self._get_family_dict(this_id, config, meta_config)
