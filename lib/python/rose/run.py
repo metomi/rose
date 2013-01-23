@@ -191,11 +191,10 @@ class Runner(object):
             opt_conf_keys += shlex.split(opt_conf_keys_env)
         if opts.opt_conf_keys:
             opt_conf_keys += opts.opt_conf_keys
-        if opt_conf_keys:
-            for key in opt_conf_keys:
-                source_base = "rose-" + self.CONF_NAME + "-" + key + ".conf"
-                source = os.path.join(conf_dir, "opt", source_base)
-                rose.config.load(source, config)
+        for key in opt_conf_keys:
+            source_base = "rose-" + self.CONF_NAME + "-" + key + ".conf"
+            source = os.path.join(conf_dir, "opt", source_base)
+            rose.config.load(source, config)
 
         # Optional defines
         # N.B. In theory, we should write the values in "opts.defines" to
