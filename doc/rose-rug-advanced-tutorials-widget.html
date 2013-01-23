@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -76,6 +81,13 @@
     </div>
 
     <div class="slide">
+      <h2 id="warning">Warning</h2>
+
+      <p>If you find yourself needing to write a custom widget, please contact
+      the Rose team for guidance.</p>
+    </div>
+
+    <div class="slide">
       <h2 id="example">Example</h2>
 
       <p>This example uses the example suite from the <a href=
@@ -84,14 +96,14 @@
       been deleted.</p>
 
       <p>We are going to develop a value widget for the app
-      <code>fred_hello_world</code>. Change directory to
-      <code>app/fred_hello_world</code>.</p>
+      <code>fred_hello_world/</code>. Change directory to
+      <code>app/fred_hello_world/</code>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Metadata Directory</h3>
 
-      <p>The metadata for the app lives under the <code>meta</code> sub
+      <p>The metadata for the app lives under the <code>meta/</code> sub
       directory. Our new widget will live with the metadata.</p>
 
       <p>Create the directories <code>meta/lib/python/widget/</code> by
@@ -134,12 +146,12 @@ touch meta/lib/python/widget/username.py
       <h3 class="alwayshidden">Importing a Library</h3>
 
       <p>Add the line:</p>
-      <pre>
+      <pre class="prettyprint">
 import pwd
 </pre>
 
       <p>at the top of the file, so it looks like this:</p>
-      <pre>
+      <pre class="prettyprint">
 import pwd
 
 import gobject
@@ -168,7 +180,7 @@ import gtk
 
       <p>Add the following method to the class (append to the bottom of the
       file):</p>
-      <pre>
+      <pre class="prettyprint">
     def _set_completion(self):
         # Return a predictive text model.
         completion = gtk.EntryCompletion()
@@ -187,19 +199,19 @@ import gtk
 
       <p>We need to make sure this method gets called at the right time, so we
       add the line:</p>
-      <pre>
+      <pre class="prettyprint">
         gobject.idle_add(self._set_completion)
 </pre>
 
       <p>in the <code>__init__</code> method as follows:</p>
-      <pre>
+      <pre class="prettyprint">
         self.entry.show()
         self.pack_start(self.entry, expand=True, fill=True,
                         padding=0)
 </pre>
 
       <p>becomes</p>
-      <pre>
+      <pre class="prettyprint">
         self.entry.show()
         gobject.idle_add(self._set_completion)
         self.pack_start(self.entry, expand=True, fill=True,
@@ -238,7 +250,7 @@ import gtk
 
       <p>Open the file <code>meta/rose-meta.conf</code> in a text editor and
       add the lines:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=HELLO_GREETER]
 widget[rose-config-edit] = username.UsernameValueWidget
 </pre>
@@ -253,7 +265,7 @@ widget[rose-config-edit] = username.UsernameValueWidget
 
       <p>Try opening up the config editor in the application directory (where
       the rose-app.conf is) by typing:</p>
-      <pre>
+      <pre class="shell">
 rose edit
 </pre>
 

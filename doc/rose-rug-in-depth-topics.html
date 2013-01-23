@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -57,6 +62,7 @@
 
     <div class="header-footer" id="footer"></div>
   </div>
+
   <div id="body-main" class="presentation">
     <div class="slide">
       <h1>Rose User Guide: In Depth Topics</h1>
@@ -131,7 +137,7 @@
         Format</a>.</li>
 
         <li>modified INI format:
-          <pre>
+          <pre class="prettyprint lang-rose_conf">
 [command]
 default = hello.exe
 
@@ -158,7 +164,7 @@ default = hello.exe
       <h3>rose-suite.info</h3>
 
       <p>Discovery information about the suite:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 access-list=bob helen mary 
 issue-list=abc:#2231 my-project:#4076
 owner=fred
@@ -173,7 +179,7 @@ title=Run XYZ for A, with improved B
       <p>Holds <a href="rose-configuration.html#suite">suite-specific</a>
       settings (more in a <a href="rose-rug-suites.html">later part</a> of the
       documentation):</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [jinja2:suite.rc]
 COMPUTE_HOST = mayanstonecircle
 END_TIME = 20121221
@@ -192,7 +198,7 @@ source = /project/hello/mayanpwr0.1/debug.glyph
       <p>This configures a specific <a href=
       "rose-configuration.html#app">application</a> in the suite, which is
       usually a scientific model:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 # Holds bash commands to run (e.g. 'rsync X/ Y/', 'run.exe')
 [command]
 # The usual command:
@@ -208,7 +214,7 @@ MAX_TARGETS = 5
 
     <div class="slide">
       <h3 class="alwayshidden">rose-app.conf continued</h3>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
   
 # A file that we want to be constructed.
 [file:local_orography]
@@ -234,7 +240,7 @@ care_about_shape = .false.
 
       <p>This provides <a href="rose-configuration#meta">metadata</a> for a
       configuration, and is used to drive the config editor GUI.</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow]
 help = This section holds options for configuring the snow
      = retrieval dynamics.
@@ -247,7 +253,7 @@ values = 'too dry', 'too icy', 'good'
 
     <div class="slide">
       <h3 class="alwayshidden">rose-meta.conf continued</h3>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
 description = This specifies the maximum acceptable mass
  fraction of slush.
@@ -270,12 +276,11 @@ type = logical
       configuration file, that controls how Rose tools behave.</p>
 
       <p>An example site configuration snippet, and a user one:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [rose-suite-run]
 hosts = localhost
-num-ping-try-max = 10
 </pre><br />
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
 should-show-ignored = True
 </pre>
@@ -320,7 +325,7 @@ should-show-ignored = True
         <li><kbd>rose suite-run -n alternate_suite_name</kbd>: run with a
         different suite name, in a different output directory.</li>
 
-        <li><kbd>rose suite-run -C /path/to/suite</kbd>: run a suite in a
+        <li><kbd>rose suite-run -C /path/to/suite/</kbd>: run a suite in a
         different directory than <samp>$PWD</samp>.</li>
 
         <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>: run with a
@@ -345,33 +350,105 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
-      <h2 id="metadata">Configuration Metadata</h2>
+      <h2 id="rosie-go">rosie go</h2>
 
-      <p>Metadata for rose-suite.conf (and rose-app.conf settings) can be
-      <a href="rose-configuration.html#meta">referenced</a> by:</p>
+      <p><code>rosie go</code> is the suite manager GUI. It acts as a hub for
+      all your suite work.</p>
 
-      <ul class="incremental">
-        <li>
-          <p>the <samp>meta</samp> flag in an app config, e.g.:</p>
-          <pre>
-meta=rose-demo-upgrade/27.1
-</pre>
-
-          <p>which references centrally-stored metadata, looked up using the
-          <samp>meta-path</samp> user/site config setting.</p>
-        </li>
-      </ul>
+      <p>Demo! If viewing offline, see the <a href=
+      "rose-rug-rosie-go.html">Rosie Go Guide</a>.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Configuration Metadata locations</h3>
+      <h2 id="suite-version-control">Suite Version Control</h2>
 
-      <p>You can store metadata in alternate locations, and reference it
-      using:</p>
+      <p>Rosie uses Subversion/FCM as the version control system. Each suite is
+      a separate FCM project with its own trunk and branches. A simplified
+      branch naming convention is used, e.g. <samp>a/a/0/0/1/trunk</samp>,
+      <samp>a/a/0/0/1/my_branch</samp>.</p>
+
+      <p>You can work on a suite exactly as you would work on source code
+      managed under FCM.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Version Control - Copying vs
+      Branching</h3>
+
+      <p>Rosie provides utilities for copying suites, which is useful when
+      basing a suite on a standard template or forking a project.</p>
+
+      <p>However, when proposing or testing changes to a suite, it's usually
+      better to use a branch (<code>fcm branch-create</code>).</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Version Control - config edit</h3>
+
+      <p>The config editor does not interface with Subversion/FCM - saving
+      changes purely modifies your working copy, just like a text editor.
+      Changes should be committed from the command line.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="rosie-lookup">rosie lookup</h2>
+
+      <p><code>rosie lookup</code> queries the Rosie database (through a web
+      API) to find suites. For example, running:</p>
+      <pre class="shell">
+rosie lookup bob test
+</pre>
+
+      <p>would basically return all suites that had "bob" and "test" in their
+      <samp>rose-suite.info</samp> files. You can also run more targeted
+      queries such as:</p>
+      <pre class="shell">
+rosie lookup -Q owner eq bob and title contains test
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="rosie-ls">rosie ls</h2>
+
+      <p><code>rosie ls</code> lists the suites currently checked out in a
+      user's <code>roses/</code> directory.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="metadata">Configuration Metadata</h2>
+
+      <p>Metadata describes other Rose configuration settings -
+      <samp>help</samp>, <samp>range</samp>, <samp>pattern</samp>, and so
+      on.</p>
+
+      <p>We should have already seen some metadata in the <a href=
+      "rose-rug-metadata-tutorial.html">Metadata Tutorial</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="metadata-central">Referencing Metadata</h3>
+
+      <p>Metadata for <samp>rose-suite.conf</samp> (and
+      <samp>rose-app.conf</samp>)settings can be <a href=
+      "rose-configuration.html#meta">referenced</a> by the <samp>meta</samp>
+      flag in an app config, e.g.:</p>
+      <pre class="prettyprint lang-rose_conf">
+meta=rose-demo-upgrade/27.1
+</pre>
+
+      <p>This usually references centrally-stored metadata, looked up using the
+      <samp>meta-path</samp> user/site config setting. The example above, for a
+      <samp>meta-path</samp> of <samp>/project/rose-meta/</samp>, would be
+      stored at <samp>/project/rose-meta/rose-demo-upgrade/27.1/</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="metadata-decentral">Decentralised Locations</h3>
+
+      <p>You can store metadata in other locations, and reference it by
+      overriding where the <samp>meta</samp> flag points to, using:</p>
 
       <ul class="incremental">
-        <li>A <samp>meta/</samp> directory in a suite or an application.</li>
-
         <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
 
         <li>The <var>ROSE_META_PATH</var> environment variable.</li>
@@ -379,28 +456,19 @@ meta=rose-demo-upgrade/27.1
         <li>The <samp>meta-path</samp> setting in <a href=
         "rose-configuration.html#site">site/user</a> configurations.</li>
       </ul>
-    </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Configuration Metadata explanation</h3>
-
-      <p>Metadata from (usually) subdirectories in the <samp>rose-meta</samp>
-      directory in a a project's source tree is stored at a central Rose
-      location - this location is pointed to by the site configuration
-      <samp>meta-path</samp> option (e.g.
-      <samp>/project/rose-metadata</samp>)</p>
-
-      <p>The app config <samp>meta</samp> option configures which
-      subdirectories in a location to choose (e.g.
-      <samp>/project/rose-metadata/rose-demo-upgrade/27.1</samp>).</p>
+      <p>Alternatively, you can store metadata in a <samp>meta/</samp>
+      subdirectory in a suite or an application, which will override the
+      others.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Configuration Metadata branches</h3>
 
-      <p>You can check out a branch of a project, change its metadata, and test
-      it by pointing <samp>meta-path</samp> at it (e.g. by running <code>rose
-      config-edit --meta-path=$HOME/branch/rose-meta</code>).</p>
+      <p>If you wanted to develop metadata on a branch, using a working copy
+      somewhere, you could test it by pointing <samp>meta-path</samp> at it
+      (e.g. by running <code>rose config-edit
+      --meta-path=$HOME/branch/rose-meta/</code>).</p>
     </div>
 
     <div class="slide">
@@ -425,18 +493,32 @@ meta=rose-demo-upgrade/27.1
 
       <p>There is a logical expression syntax for several metadata options.
       Here are some examples:</p>
-      <pre>
+
+      <ul>
+        <li>
+          <code>range</code>:
+          <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=min_temp_water_supercool]
 range = this &gt; -48.3
-</pre><br />
-      <pre>
-[namelist:run_snow=slush_fraction]
-trigger = namelist:run_snow=max_num_slushballs: this &gt; 0.5
-</pre><br />
-      <pre>
-[namelist:run_snow=ice_fraction]
-warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
 </pre>
+        </li>
+
+        <li>
+          <code>trigger</code>:
+          <pre class="prettyprint lang-rose_conf">
+[namelist:run_snow=slush_fraction]
+trigger = namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
+</pre>
+        </li>
+
+        <li>
+          <code>warn-if</code>:
+          <pre class="prettyprint lang-rose_conf">
+[namelist:run_snow=ice_fraction]
+warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
+</pre>
+        </li>
+      </ul>
     </div>
 
     <div class="slide">
@@ -446,7 +528,9 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
 
       <ul class="incremental">
         <li>It's vaguely Pythonic (actually <a href=
-        "http://jinja.pocoo.org/docs/templates/#tests">jinja2</a>)</li>
+        "http://jinja.pocoo.org/docs/templates/#tests">Jinja2</a>)</li>
+
+        <li>Please forget the Jinja2 part</li>
 
         <li>You can refer to variables by id (e.g.
         <samp>namelist:run_snow=max_ok_ice_fraction</samp>) and using
@@ -463,14 +547,15 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
       <samp>namelist:run_snow=monthly_snowfall(12)</samp>).</p>
 
       <p>There are <code>any</code> and <code>all</code> functions (e.g.
-      <samp>any(namelist:run_snow=monthly_snowfall) &gt; 10</samp>).</p>
+      <samp>any(namelist:run_snow=monthly_snowfall &gt; 10)</samp>).</p>
     </div>
 
     <div class="slide">
       <h3>More Metadata Options</h3>
 
-      <p>See <a href="rose-configuration.html#meta.conf">Metadata
-      Reference</a>.</p>
+      <p>See <a href="rose-configuration.html#meta.conf">Metadata Reference</a>
+      and the <a href="rose-rug-advanced-tutorials.html#metadata">Advanced
+      Metadata Tutorials</a>.</p>
 
       <dl>
         <dt><code>compulsory</code></dt>
@@ -512,7 +597,7 @@ warn-if = this &gt; namelist:run_snow=max_ok_ice_fraction
           <code>fail-if</code> will cause an error if the expression evaluates
           true. <code>warn-if</code> is the same, but will flag up a warning
           instead of an error. For example:
-          <pre>
+          <pre class="prettyprint lang-rose_conf">
 fail-if = any(namelist:test=ctrl_array % this == 0)
 </pre>
         </dd>
@@ -534,7 +619,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       <h3>Macros</h3>
 
       <p>Macros are written in Python and live with metadata under
-      <samp>lib/python/macros</samp>. There are three categories:</p>
+      <samp>lib/python/macros/</samp>. There are three categories:</p>
 
       <ul class="incremental">
         <li><code>Validator</code> macros - <em>checking</em> macros that can
@@ -557,7 +642,9 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       </ul>
 
       <p>You can find out how to write macros in the <a href=
-      "rose-api.html#macro">API</a> documentation (includes a tutorial).</p>
+      "rose-rug-advanced-tutorials.html#metadata">Advanced Metadata
+      Tutorials</a> and the <a href="rose-api.html#macro">API</a>
+      documentation.</p>
     </div>
 
     <div class="slide">
@@ -565,14 +652,23 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
 
     <p>You can replace widgets in the config editor with your own. These live
     with metadata under <samp>lib/python/widget/</samp>. For more details, see
-    the <a href="rose-api.html#gtk">API</a> documentation (this also includes a
-    tutorial).</p>
+    the <a href="rose-api.html#gtk">API</a> documentation and the <a href=
+    "rose-rug-advanced-tutorials-widget.html">Advanced Tutorial</a>.</p>
 
     <h3>Icons!</h3>
 
     <p>You can set an icon in the metadata that is used in the config editor to
     distinguish configurations: put a file <samp>etc/icon.png</samp> in the
     metadata directory.</p><img alt="Rose Icon" src="rose-icon.png" /></div>
+
+    <div class="slide">
+      <h3 id="upgrade">Upgrading</h3>
+
+      <p>You can upgrade app configurations to use newer versions of metadata
+      (corresponding to newer versions of the application code). This may
+      result in some changes to the configuration (e.g. new or renamed
+      variables).</p>
+    </div>
 
     <div class="slide">
       <h2 id="config-edit">rose config-edit</h2>
@@ -619,43 +715,9 @@ rose macro fib.FibonnaciChecker
     </div>
 
     <div class="slide">
-      <h2 id="rosie-go">rosie go</h2>
-
-      <p><code>rosie go</code> is the suite manager GUI. It acts as a hub for
-      all your suite work.</p>
-
-      <p>Demo! If viewing offline, see the <a href=
-      "rose-rug-rosie-go.html">Rosie Go Guide</a>.</p>
-    </div>
-
-    <div class="slide">
-      <h2 id="rosie-lookup">rosie lookup</h2>
-
-      <p><code>rosie lookup</code> queries the Rosie database (through a web
-      API) to find suites. For example, running:</p>
-      <pre class="shell">
-rosie lookup bob test
-</pre>
-
-      <p>would basically return all suites that had "bob" and "test" in their
-      <samp>rose-suite.info</samp> files. You can also run more targeted
-      queries such as:</p>
-      <pre class="shell">
-rosie lookup -Q owner eq bob and title contains test
-</pre>
-    </div>
-
-    <div class="slide">
-      <h2 id="rosie-ls">rosie ls</h2>
-
-      <p><code>rosie ls</code> lists the suites currently checked out in a
-      user's <code>roses</code> directory.</p>
-    </div>
-
-    <div class="slide">
       <h2 id="future">Future of Rose</h2>
 
-      <ul class="incremental">
+      <ul>
         <li>More work for us</li>
 
         <li>More work for you</li>

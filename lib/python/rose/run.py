@@ -42,7 +42,7 @@ import shutil
 import sys
 import tarfile
 from tempfile import TemporaryFile
-from time import time, sleep
+from time import sleep, strftime, time
 from uuid import uuid4
 
 
@@ -77,11 +77,10 @@ class ConfigurationNotFoundError(Exception):
 
 class NewModeError(Exception):
 
-    """An exception raised for --new when cwd is the config directory."""
+    """An exception raised for --new mode is not supported."""
 
     def __str__(self):
-        s = "%s: is the configuration directory, --new mode not supported."
-        return s % self.args[0]
+        return "%s=%s, --new mode not supported." % self.args
 
 
 class SuiteHostSelectEvent(Event):
@@ -98,18 +97,6 @@ class SuiteLogArchiveEvent(Event):
 
     def __str__(self):
         return "%s <= %s" % self.args
-
-
-class SuitePingTryMaxEvent(Event):
-
-    """An event raised when the suite ping did not succeed after the maximum
-    number of attempts.
-    """
-
-    TYPE = Event.TYPE_ERR
-
-    def __str__(self):
-        return "Suite ping did not succeed after %d attempts" % self.args[0]
 
 
 class Dummy(object):
@@ -377,11 +364,8 @@ class SuiteRunner(Runner):
 
     """Invoke a Rose suite."""
 
-    SLEEP_PING = 1.0
     SLEEP_PIPE = 0.05
     NAME = "suite"
-    NUM_LOG_MAX = 5
-    NUM_PING_TRY_MAX = 3
     OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
                "gcontrol_mode", "host", "install_only_mode",
                "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
@@ -435,10 +419,22 @@ class SuiteRunner(Runner):
             opts.conf_dir = None
 
         # Automatic Rose constants
-        for k, v in {"ROSE_ORIG_HOST": socket.gethostname()}.items():
+        # ROSE_ORIG_HOST: originating host
+        # ROSE_VERSION: Rose version (not retained in run_mode=="reload")
+        # Suite engine version 
+        jinja2_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
+        my_rose_version = ResourceLocator.default().get_version()
+        suite_engine_key = self.suite_engine_proc.get_version_env_name()
+        if opts.run_mode == "reload":
+            suite_engine_version = config.get_value(["env", suite_engine_key])
+        else:
+            suite_engine_version = self.suite_engine_proc.get_version()
+        auto_items = {"ROSE_ORIG_HOST": socket.gethostname(),
+                      "ROSE_VERSION": ResourceLocator.default().get_version(),
+                      suite_engine_key: suite_engine_version}
+        for k, v in auto_items.items():
             config.set(["env", k], v)
-            config.set(["jinja2:" + self.suite_engine_proc.SUITE_CONF, k],
-                       '"' + v + '"')
+            config.set([jinja2_section, k], '"' + v + '"')
 
         suite_name = opts.name
         if not opts.name:
@@ -472,12 +468,13 @@ class SuiteRunner(Runner):
         suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
 
         suite_conf_dir = os.getcwd()
-        if os.getcwd() == suite_dir:
-            if opts.new_mode:
-                raise NewModeError(os.getcwd())
-        else:
-            if opts.new_mode:
-                self.fs_util.delete(suite_dir)
+        if opts.new_mode:
+            if os.getcwd() == suite_dir:
+                raise NewModeError("PWD", os.getcwd())
+            elif opts.run_mode in ["reload", "restart"]:
+                raise NewModeError("--run", opts.run_mode)
+            self.fs_util.delete(suite_dir)
+        if os.getcwd() != suite_dir:
             self.fs_util.makedirs(suite_dir)
             cmd = self._get_cmd_rsync(suite_dir)
             self.popen(*cmd)
@@ -488,11 +485,18 @@ class SuiteRunner(Runner):
             self._run_init_dir_log(opts, suite_name, config)
         self.fs_util.makedirs("log/suite")
 
+        # Rose configuration and version logs
+        self.fs_util.makedirs("log/rose-conf")
+        run_mode = opts.run_mode
+        if run_mode not in ["reload", "restart", "run"]:
+            run_mode = "run"
+        prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), run_mode)
+
         # Dump the actual configuration as rose-suite-run.conf
-        rose.config.dump(config, "log/rose-suite-run.conf")
+        rose.config.dump(config, "log/" + prefix + ".conf")
 
         # Install version information file
-        f = open("log/rose-suite.version", "wb")
+        f = open("log/" + prefix + ".version", "wb")
         for vcs, cmds in [("svn", ["info", "status", "diff"]),
                           ("git", ["describe", "status", "diff"])]:
             if not self.popen.which(vcs):
@@ -512,6 +516,9 @@ class SuiteRunner(Runner):
             finally:
                 os.chdir(cwd)
         f.close()
+
+        for ext in [".conf", ".version"]:
+            self.fs_util.symlink(prefix + ext, "log/rose-suite-run" + ext)
 
         # Move temporary log to permanent log
         if hasattr(self.event_handler, "contexts"):
@@ -561,8 +568,8 @@ class SuiteRunner(Runner):
                     rose_bin = "%s/bin/rose" % (rose_home_node.value)
                     break
             # Build remote "rose suite-run" command
-            rose_sr = rose_bin + " suite-run -v -v"
-            rose_sr += " --name=" + suite_name
+            rose_sr = "ROSE_VERSION=%s %s" % (my_rose_version, rose_bin)
+            rose_sr += " suite-run -v -v --name=%s" % suite_name
             for key in ["new", "debug", "install-only"]:
                 attr = key.replace("-", "_") + "_mode"
                 if getattr(opts, attr, None) is not None:
@@ -627,19 +634,6 @@ class SuiteRunner(Runner):
             self.suite_engine_proc.run(
                     suite_name, host, environ, opts.run_mode, args)
             open("rose-suite-run.host", "w").write(host + "\n")
-
-            # Check that the suite is running
-            keys = ["rose-suite-run", "num-ping-try-max"]
-            num_ping_try_max = conf.get_value(keys, self.NUM_PING_TRY_MAX)
-            num_ping_try_max = int(num_ping_try_max)
-            for num_ping_try in range(1, num_ping_try_max + 1):
-                if self.suite_engine_proc.ping(suite_name, [host]):
-                    break
-                elif num_ping_try < num_ping_try_max:
-                    sleep(self.SLEEP_PING)
-                else:
-                    event = SuitePingTryMaxEvent(num_ping_try_max)
-                    self.event_handler(event)
             self.suite_log_view_gen(suite_name)
 
         # Launch the monitoring tool

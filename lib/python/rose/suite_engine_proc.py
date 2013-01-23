@@ -364,12 +364,20 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
+    def get_version(self):
+        """Return the version string of the suite engine."""
+        raise NotImplementedError()
+
+    def get_version_env_name(self):
+        """Return the name of the suite engine version environment variable."""
+        return self.SCHEME.upper() + "_VERSION"
+
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def gcontrol(self, suite_name, host=None, args=None):
+    def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
         raise NotImplementedError()
 
@@ -423,7 +431,7 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def shutdown(self, suite_name, host=None, args=None):
+    def shutdown(self, suite_name, host=None, engine_version=None, args=None):
         """Shut down the suite."""
         raise NotImplementedError()
 

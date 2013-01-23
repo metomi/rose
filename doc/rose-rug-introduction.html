@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -41,15 +46,18 @@
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
+
     <div id="currentSlide">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
+
     <div id="controls">
-        <!-- DO NOT EDIT -->
+      <!-- DO NOT EDIT -->
     </div>
 
     <div class="header-footer" id="footer"></div>
@@ -81,12 +89,8 @@
       <p>What's the point of the guide?</p>
 
       <ul class="incremental">
-        <li>Interactive/guided learning
-
-          <ul>
-            <li>the basis for training courses or independent work</li>
-          </ul>
-        </li>
+        <li>Interactive/guided learning - the basis for training courses or
+        independent work</li>
 
         <li>Worked Examples</li>
 
@@ -261,7 +265,7 @@
       <h3 class="alwayshidden">What is a Rose suite? contents - continued</h3>
 
       <ul class="incremental">
-        <li>an <code>app</code> directory, containing Rose applications</li>
+        <li>an <code>app/</code> directory, containing Rose applications</li>
 
         <li>other, optional directories containing scripts and resources for
         the suite.</li>
@@ -314,10 +318,15 @@
     <div class="slide">
     <h3 class="alwayshidden">What is cylc? host diagram</h3>
 
-    <p class="caption">How cylc runs a suite.</p>
-    <img src="cylc-suite-graphic.png" alt="cylc suite" width="65%" 
-    height="65%" /></div>
-    
+    <p class="caption">How cylc runs a suite.</p><img src=
+    "cylc-suite-graphic.png" alt="cylc suite" width="65%" height="65%" /></div>
+
+    <div class="slide">
+      <h2 id="demo">Running a simple suite</h2>
+
+      <p>(Demo) - if this isn't part of a course, skip to the next section</p>
+    </div>
+
     <div class="slide">
       <h2>What is a Rose application configuration?</h2>
 
@@ -368,7 +377,7 @@
         to run, the environment, and configuring some of the input files like
         namelists.</li>
 
-        <li>an optional <code>file</code> directory, for storing other input
+        <li>an optional <code>file/</code> directory, for storing other input
         files.</li>
       </ul>
     </div>
@@ -377,15 +386,15 @@
       <h3 class="alwayshidden">What is a Rose app config? contents
       (complex)</h3>
 
-      <p>It may also contain other sub-directories, which we'll cover later
-      (<code>bin</code>, <code>meta</code> and <code>opt</code>).</p>
+      <p>It may also contain other sub-directories such as <code>bin/</code>,
+      <code>meta/</code> and <code>opt/</code>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">What is a Rose app config? example</h3>
 
       <p>Here's an example of a <code>rose-app.conf</code> file:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [command]
 default=hello.exe
 
@@ -445,7 +454,7 @@ l_exclamation_mark=.true.,
       <h3 class="alwayshidden">What is a Rose app config? metadata
       location</h3>
 
-      <p>Metadata sometimes lives in the <code>meta</code> directory of an app
+      <p>Metadata sometimes lives in the <code>meta/</code> directory of an app
       config, but more often in a shared central location.</p>
 
       <p>You'll be looking at metadata in the <a href=
@@ -511,12 +520,12 @@ l_exclamation_mark=.true.,
       <code>rose-suite.info</code> file that describes the suite.</p>
 
       <p>These usually look a bit like this:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 access-list=bob helen mary 
-issue-list=#2231 #4076
+issue-list=nasa:#2231 boeing:#4076
 owner=fred
-project=um
-title=Run XYZ for A, with improved B
+project=apollo
+title=SV-1 experiment
 </pre>
 
       <p>These properties are stored in a database that is queried using Rosie
@@ -526,31 +535,28 @@ title=Run XYZ for A, with improved B
     <div class="slide">
     <h3 class="alwayshidden">How are Suites Stored and Managed? GUI</h3>
 
-    <p class="caption">This is the <code>rosie go</code> GUI.</p>
+    <p class="caption">This is the <code>rosie go</code> GUI for managing your
+    Rose suites (e.g. finding, copying, checking out suites). Not an FCM
+    GUI!</p>
 
     <p class="caption">1) Menu 2) Address bar 3) Search 4) Search History 5)
     Advanced Search 6) Search Results 7) Statusbar</p><img src=
     "rosie-go-layout.png" alt="rosie go" width="60%" /></div>
 
     <div class="slide">
-      <h2 id="run-suite">Running a simple suite</h2>
-
-      <p>(Demo) - if this isn't part of a course, skip to the next section</p>
-    </div>
-
-    <div class="slide">
       <h2 id="independent-learning">Independent Learning</h2>
 
       <p>Next Steps:</p>
 
-      <ul class="incremental">
+      <ul>
         <li>Take the <a href="rose-rug-brief-tour.html">Brief Tour</a></li>
 
         <li>Go through the <a href="rose-rug-metadata-tutorial.html">Metadata
         Tutorial</a></li>
 
-        <li>If super-keen: learn how to write custom macros and widgets in the
-        <a href="rose-api.html">API</a> guide.</li>
+        <li>If super-keen: have a look at the <a href=
+        "rose-rug-advanced-tutorials.html#metadata">Advanced Metadata
+        Tutorials</a>.</li>
       </ul>
     </div>
   </div>
