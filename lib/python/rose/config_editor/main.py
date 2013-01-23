@@ -1275,11 +1275,6 @@ class MainController(object):
 
 #------------------ Primary menu functions -----------------------------------
 
-    def handle_run_scheduler(self, *args):
-        """Run the scheduler for this suite."""
-        this_id = self.data.top_level_name
-        return SuiteControl().gcontrol(this_id)
-
     def load_from_file(self, somewidget=None):
         """Open a standard dialogue and load a config file, if selected."""
         dirname = self.mainwindow.launch_open_dirname_dialog()
