@@ -19,7 +19,10 @@
 "_____________________________________________________________________
 " = Instructions =
 "
-" Make a $HOME/.vim/syntax/ directory and bung this file in there.
+" Make a $HOME/.vim/syntax/ directory.
+" Put this file in there.
+" Alternatively, put a symlink there, pointing to this file in your
+" local Rose installation.
 
 " Put the following in $HOME/.vimrc for file type recognition:
 
