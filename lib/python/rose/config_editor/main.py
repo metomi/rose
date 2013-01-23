@@ -251,9 +251,10 @@ class MainController(object):
                self.handle.check_all_extra)
         assign(rose.config_editor.TOOLBAR_TRANSFORM,
                self.handle.transform_default)
-        assign(rose.config_editor.TOOLBAR_VIEW_OUTPUT, self.handle_view_output)
+        assign(rose.config_editor.TOOLBAR_VIEW_OUTPUT, 
+               self.handle.launch_output_viewer )
         assign(rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-               self.handle_run_scheduler)
+               self.handle.launch_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
                                rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
@@ -344,9 +345,9 @@ class MainController(object):
                      ('/TopMenuBar/Tools/Terminal',
                       lambda m: self.handle.launch_terminal()),
                      ('/TopMenuBar/Tools/View Output',
-                      lambda m: self.handle_view_output()),
+                      lambda m: self.handle.launch_output_viewer()),
                      ('/TopMenuBar/Tools/Open Suite GControl',
-                      lambda m: self.handle_run_scheduler()),
+                      lambda m: self.handle.launch_scheduler()),
                      ('/TopMenuBar/Page/Revert',
                       lambda m: self.revert_to_saved_data()),
                      ('/TopMenuBar/Page/Page Info',
@@ -1278,24 +1279,6 @@ class MainController(object):
         """Run the scheduler for this suite."""
         this_id = self.data.top_level_name
         return SuiteControl().gcontrol(this_id)
-
-    def handle_view_output(self, *args, **kwargs):
-        """View a suite's output, if any."""
-        suite_engine_proc = SuiteEngineProcessor.get_processor()
-        output_url = suite_engine_proc.get_suite_log_url(
-                                       self.data.top_level_name)
-        if output_url is None:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
-                                     rose.config_editor.ERROR_NO_OUTPUT.format(
-                                      self.data.top_level_name))
-        else:
-            try:
-                urllib.urlopen(output_url)
-            except (AttributeError, IOError) as e:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         str(e))
-            else:
-                webbrowser.open(output_url, new=True, autoraise=True)
 
     def load_from_file(self, somewidget=None):
         """Open a standard dialogue and load a config file, if selected."""
