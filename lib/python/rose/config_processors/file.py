@@ -104,7 +104,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # Ensure that everything is overwritable
         # Ensure that container directories exist
         for key, node in sorted(nodes.items()):
-            name = key[len(self.PREFIX):]
+            try:
+                name = env_var_process(key[len(self.PREFIX):])
+            except UnboundEnvironmentVariableError as e:
+                raise ConfigProcessError([key], key, e)
             if os.path.exists(name) and kwargs.get("no_overwrite_mode"):
                 e = FileOverwriteError(name)
                 raise ConfigProcessError([key], None, e)
@@ -114,7 +117,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         sources = {}
         targets = {}
         for key, node in sorted(nodes.items()):
-            name = key[len(self.PREFIX):]
+            # N.B. no need to catch UnboundEnvironmentVariableError here
+            #      because any exception should been caught earlier.
+            name = env_var_process(key[len(self.PREFIX):])
             targets[name] = Loc(name)
             targets[name].action_key = Loc.A_INSTALL
             targets[name].mode = node.get_value(["mode"])
