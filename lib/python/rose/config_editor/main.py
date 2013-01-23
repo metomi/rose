@@ -69,8 +69,6 @@ import rose.gtk.util
 import rose.macro
 import rose.opt_parse
 import rose.resource
-from rose.suite_control import SuiteControl
-from rose.suite_engine_proc import SuiteEngineProcessor
 import rose.macros
 
 
