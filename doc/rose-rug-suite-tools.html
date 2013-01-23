@@ -108,8 +108,15 @@ rose UTIL [OPTS] [ARG ...]
     Optional configuration files are stored in the <var>opt/</var> directory of
     a suite configuration. Each file has a name that looks like
     <var>opt/rose-suite-KEY.conf</var>. One or more optional configurations can
-    be selected using the <code>--opt-conf-key=KEY</code> or <code>-O
-    KEY</code> option of the <code>rose suite-run</code> command.</p>
+    be selected using:</p>
+    
+    <ol>
+      <li>The <var>ROSE_SUITE_OPT_CONF_KEYS</var> environment variable, which
+      should contain a list of space delimited keys.</li>
+
+      <li>The <code>--opt-conf-key=KEY</code> or <code>-O KEY</code> option of
+      the <code>rose suite-run</code> command.</p>
+    </ol>
 
     <p>For each specified optional configuration, the content of its file is
     appended to the main configuration file before the whole configuration is
@@ -189,8 +196,15 @@ rose task-run -D '[env]!BAZ='
     in handy. Optional configuration files are stored in the <var>opt/</var>
     directory of an application configuration. Each file has a name that looks
     like <var>opt/rose-app-KEY.conf</var>. One or more optional configurations
-    can be selected using the <code>--opt-conf-key=KEY</code> or <code>-O
-    KEY</code> option of the <code>rose task-run</code> command.</p>
+    can be selected using:</p>
+    
+    <ol>
+      <li>The <var>ROSE_APP_OPT_CONF_KEYS</var> environment variable, which
+      should contain a list of space delimited keys.</li>
+  
+      <li>The <code>--opt-conf-key=KEY</code> or <code>-O KEY</code> option of
+      the <code>rose task-run</code> command.</li>
+    </ol>
 
     <p>For each specified optional configuration, the content of its file is
     appended to the main configuration file before the whole configuration is
