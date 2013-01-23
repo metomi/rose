@@ -32,9 +32,7 @@ import re
 import shutil
 import sre_constants
 import sys
-import urllib
 import warnings
-import webbrowser
 
 # Ignore add menu related warnings for now, but remove this later.
 warnings.filterwarnings('ignore',
@@ -1461,7 +1459,7 @@ class MainController(object):
         button.set_relief(gtk.RELIEF_NONE)
         button.set_image(image)
         button.show()
-        return button        
+        return button
 
     def alter_bar_sensitivity(self):
         """Update bar functionality like Undo and Redo."""
