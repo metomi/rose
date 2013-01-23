@@ -252,7 +252,8 @@ class MainController(object):
         assign(rose.config_editor.TOOLBAR_TRANSFORM,
                self.handle.transform_default)
         assign(rose.config_editor.TOOLBAR_VIEW_OUTPUT, self.handle_view_output)
-        assign(rose.config_editor.TOOLBAR_SUITE_GCONTROL, self.handle_run_scheduler)
+        assign(rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+               self.handle_run_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
                                rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
@@ -342,6 +343,10 @@ class MainController(object):
                       lambda m: self.handle.launch_browser()),
                      ('/TopMenuBar/Tools/Terminal',
                       lambda m: self.handle.launch_terminal()),
+                     ('/TopMenuBar/Tools/View Output',
+                      lambda m: self.handle_view_output()),
+                     ('/TopMenuBar/Tools/Open Suite GControl',
+                      lambda m: self.handle_run_scheduler()),
                      ('/TopMenuBar/Page/Revert',
                       lambda m: self.revert_to_saved_data()),
                      ('/TopMenuBar/Page/Page Info',

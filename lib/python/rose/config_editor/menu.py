@@ -93,6 +93,8 @@ class MenuBar(object):
         <separator name="sep_run_action"/>
         <menuitem action="Browser"/>
         <menuitem action="Terminal"/>
+        <menuitem action="View Output"/>
+        <menuitem action="Open Suite GControl"/>
       </menu>
       <menu action="Page">
         <menuitem action="Add variable"/>
@@ -176,6 +178,10 @@ class MenuBar(object):
                       ('Terminal', gtk.STOCK_EXECUTE,
                        rose.config_editor.TOP_MENU_TOOLS_TERMINAL,
                        rose.config_editor.ACCEL_TERMINAL),
+                      ('View Output', gtk.STOCK_DIRECTORY,
+                       rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
+                      ('Open Suite GControl', None,
+                       rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
                       ('Help', None,
                        rose.config_editor.TOP_MENU_HELP),
                       ('GUI Help', gtk.STOCK_HELP,
