@@ -41,6 +41,8 @@ import rose.gtk.util
 import rose.macro
 import rose.macros
 from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_control import SuiteControl
+
 
 class MenuBar(object):
 
