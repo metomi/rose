@@ -461,11 +461,6 @@ accel-find-next=F3
     keys can be:</p>
 
     <dl>
-      <dt><code>app</code>
-
-      <dd>Root level setting. Specify the name of a builtin application, instead
-      of running a command specified in the <code>[command]</code> section.</dd>
-
       <dt><code>file-install-root</code>
 
       <dd>Root level setting. Specify the root directory to install file
@@ -477,6 +472,11 @@ accel-find-next=F3
       application. This is ignored by the application runner, but may be used by
       other Rose utilities, such as the config editor GUI. It can be used to
       specify the application type.</dd>
+
+      <dt><code>mode</code>
+
+      <dd>Root level setting. Specify the name of a builtin application, instead
+      of running a command specified in the <code>[command]</code> section.</dd>
 
       <dt><code>[command]</code></dt>
 
@@ -1278,6 +1278,20 @@ schemes=hpc*:*=rsync
       host using <code>rsync</code> via <code>ssh</code>. A URI should have the
       form <var>[USER@]HOST:PATH</var>.</dd>
     </dl>
+
+    <p>The application launcher will use the following logic to determine the
+    root directory to install file targets with a relative path:</p>
+
+    <ol>
+      <li>If the setting <var>file-install-root=PATH</var> is specified (at the
+      root level) in the application configuration file, its value will be
+      used.</li>
+
+      <li>If the environment variable <var>ROSE_FILE_INSTALL_ROOT</var> is
+      specified, its value will be used.</li>
+
+      <li>Otherwise, the working directory of the task will be used.</li>
+    </ol>
 
     <h2 id="appendix-metadata-location">Appendix: Metadata Location</h2>
 

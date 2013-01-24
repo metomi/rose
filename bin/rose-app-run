@@ -26,7 +26,7 @@
 # DESCRIPTION
 #     Run an application according to its configuration.
 #
-#     May run a builtin application (if the "app" setting in the configuration
+#     May run a builtin application (if the "mode" setting in the configuration
 #     specifies the name of a builtin application) or a command.
 #
 #     Determine the command to run in this order:
