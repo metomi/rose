@@ -231,6 +231,9 @@
 
     <p>Run an application according to its configuration.</p>
 
+    <p>May run a builtin application (if the <var>app</var> setting in the
+    configuration specifies the name of a builtin application) or a command.</p>
+
     <p>Determine the command to run in this order:</p>
 
     <ol>
@@ -1625,15 +1628,6 @@ environment scripting = "eval $(rose task-env)"
     <kbd>--app-key=KEY</kbd> option or the <var>ROSE_TASK_APP</var> environment
     variable.</p>
 
-    <p>If <kbd>--no-auto-util</kbd> and <kbd>--util-key=KEY</kbd> are not
-    specified, the task name will be passed to each built-in task utility to
-    see if it is compatible with the utility. If so, it will run the task using
-    the task utility instead of as a Rose application.</p>
-
-    <p>More documentation on built-in task utilities can be found at
-    <a href="rose-rug-suite-tools.html#rose-task-run.util">Rose User Guide:
-    Suite Tools &gt; Task Utility Selection</a>.</p>
-
     <h3>OPTIONS</h3>
 
     <p>All options of <kbd>rose app-run</kbd> and <kbd>rose task-env</kbd>
@@ -1646,11 +1640,6 @@ environment scripting = "eval $(rose task-env)"
 
       <dd>Specify a named application configuration.</dd>
 
-      <dt><kbd>--no-auto-util</kbd></dt>
-
-      <dd>Do not automatically select a task utility based on the task
-      name.</dd>
-
       <dt><kbd>--path=PATTERN, -P PATTERN</kbd></dt>
 
       <dd>Each of this specify a glob pattern for paths to prepend to the
@@ -1658,10 +1647,6 @@ environment scripting = "eval $(rose task-env)"
       relative to <var>$ROSE_SUITE_DIR</var>. An empty value resets the default
       and any previous <kbd>--path=PATTERN</kbd> settings.
       (default=<kbd>share/fcm[_-]make*/*/bin</kbd>)</dd>
-
-      <dt><kbd>--util-key=KEY</kbd></dt>
-
-      <dd>Specify a named task utility.</dd>
     </dl>
 
     <h3>ENVIRONMENT</h3>
@@ -1676,10 +1661,6 @@ environment scripting = "eval $(rose task-env)"
       <dt><var>ROSE_TASK_APP</var></dt>
 
       <dd>Specify a named application configuration.</dd>
-
-      <dt><var>ROSE_TASK_UTIL</var></dt>
-
-      <dd>Specify a named task utility.</dd>
     </dl>
 
     <p>All environment variables documented in <kbd>rose task-env</kbd> are

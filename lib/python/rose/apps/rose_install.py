@@ -17,18 +17,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Task utility: install files in a given location of a suite."""
+"""Builtin application: install files in a given location of a suite."""
 
-from rose.run import TaskUtilBase
+from rose.run import BuiltinApp
 
-class RoseInstallTaskUtil(TaskUtilBase):
+class RoseInstallApp(BuiltinApp):
+    """
+    Builtin application: install files in a given location of a suite.
+    
+    Does nothing. Everything already done by application runner.
 
-    """Install files in a given location."""
+    """
 
     SCHEME = "rose_install"
 
-    def can_handle(self, key):
-        return key.startswith(self.SCHEME)
-
-    def run_impl_main(self, config, opts, args, uuid, work_files):
+    def run(self, config, opts, args, uuid, work_files):
         pass

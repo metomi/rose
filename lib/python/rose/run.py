@@ -83,6 +83,13 @@ class NewModeError(Exception):
         return "%s=%s, --new mode not supported." % self.args
 
 
+class TaskAppNotFoundError(Exception):
+    """Error: a task has no an associated application configuration."""
+
+    def __str__(self):
+        return "%s (key=%s): task has no associated application." % self.args
+
+
 class SuiteHostSelectEvent(Event):
 
     """An event raised to report the host for running a suite."""
@@ -106,6 +113,40 @@ class Dummy(object):
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+
+class BuiltinApp(object):
+
+    """An abstract bas class for a builtin application.
+    
+    Instance of sub-classes are expected to be managed by
+    rose.scheme_handler.SchemeHandlersManager.
+
+    """
+
+    SCHEME = None
+
+    def __init__(self, *args, **kwargs):
+        manager = kwargs.pop("manager")
+        self.manager = manager
+
+    def can_handle(self, key):
+        return key.startswith(self.SCHEME)
+
+    def get_app_key(self, name):
+        """Return the application key for a given (task) name."""
+        return None
+
+    def run(self, config, opts, args, uuid, work_files):
+        """
+        Run the logic of a builtin application.
+
+        config -- root node of the application configuration file.
+        See Runner.run and Runner.run_impl for definitions for opts, args,
+        uuid, work_files.
+
+        """
+        raise NotImplementedError()
 
 
 class Runner(object):
@@ -274,12 +315,23 @@ class AppRunner(Runner):
     OPTIONS = ["command_key", "conf_dir", "defines", "install_only_mode",
                "new_mode", "no_overwrite_mode", "opt_conf_keys"]
 
+    def __init__(self, *args, **kwargs):
+        Runner.__init__(self, *args, **kwargs)
+        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        self.builtins_manager = SchemeHandlersManager(
+                [p], "rose.apps", ["run"], None, *args, **kwargs)
+
     def run_impl(self, opts, args, uuid, work_files):
         """The actual logic for a run."""
 
         config = self.config_load(opts)
         self.run_impl_prep(config, opts, args, uuid, work_files)
-        return self.run_impl_main(config, opts, args, uuid, work_files)
+        app_name = config.get_value(["app"])
+        if app_name in [None, "command"]:
+            return self.run_impl_main(config, opts, args, uuid, work_files)
+        else:
+            builtin_app = self.builtins_manager.get_handler(app_name)
+            return builtin_app.run(config, opts, args, uuid, work_files)
 
     def run_impl_prep(self, config, opts, args, uuid, work_files):
         """Prepare to run the application."""
@@ -806,15 +858,18 @@ class TaskRunner(Runner):
 
     NAME = "task"
     OPTIONS = AppRunner.OPTIONS + [
-            "app_key", "auto_util_mode", "cycle", "cycle_offsets",
-            "path_globs", "prefix_delim", "suffix_delim", "util_key"]
+            "app_key", "cycle", "cycle_offsets", "path_globs", "prefix_delim",
+            "suffix_delim"]
     PATH_GLOBS = ["share/fcm[_-]make*/*/bin", "work/fcm[_-]make*/*/bin"]
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
-        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
-        self.task_utils_manager = SchemeHandlersManager(
-                [p], "rose.task_utils", ["run"], None, *args, **kwargs)
+        self.app_runner = Runner.get_runner_class("app")(
+                event_handler=self.event_handler,
+                popen=self.popen,
+                config_pm=self.config_pm,
+                fs_util=self.fs_util,
+                suite_engine_proc=self.suite_engine_proc)
 
     def run_impl(self, opts, args, uuid, work_files):
         t = self.suite_engine_proc.get_task_props(
@@ -864,63 +919,28 @@ class TaskRunner(Runner):
             if os.getenv(name) != value:
                 env_export(name, value, self.event_handler)
 
-        # Determine whether to run a task util or an app
-        util_key = os.getenv("ROSE_TASK_UTIL")
-        if opts.util_key:
-            util_key = opts.util_key
-        util = None
-        if util_key:
-            util = self.task_utils_manager.get_handler(util_key)
-        if opts.auto_util_mode and util is None:
-            util = self.task_utils_manager.guess_handler(t.task_name)
-
         # Determine what app config to use
         if not opts.conf_dir:
-            app_key = t.task_name
-            if opts.app_key:
-                app_key = opts.app_key
-            elif os.getenv("ROSE_TASK_APP"):
-                app_key = os.getenv("ROSE_TASK_APP")
-            elif util and hasattr(util, "get_app_key"):
-                app_key = util.get_app_key(t.task_name)
-            opts.conf_dir = os.path.join(t.suite_dir, "app", app_key)
+            for app_key in [opts.app_key, os.getenv("ROSE_TASK_APP")]:
+                if app_key is not None:
+                    conf_dir = os.path.join(t.suite_dir, "app", app_key)
+                    if not os.path.isdir(conf_dir):
+                        raise TaskAppNotFoundError(t.task_name, app_key)
+                    break
+            else:
+                app_key = t.task_name
+                conf_dir = os.path.join(t.suite_dir, "app", t.task_name)
+                if not os.path.isdir(conf_dir):
+                    builtins_manager = self.app_runner.builtins_manager
+                    h = builtins_manager.guess_handler(t.task_name)
+                    if h is not None and h.get_app_key(t.task_name):
+                        app_key = h.get_app_key(t.task_name)
+                        conf_dir = os.path.join(t.suite_dir, "app", app_key)
+                    if not os.path.isdir(conf_dir):
+                        raise TaskAppNotFoundError(t.task_name, app_key)
+            opts.conf_dir = conf_dir
 
-        # Run the task util or the app
-        if util is None:
-            return self._run_app(opts, args)
-        else:
-            return util(opts, args)
-
-    def _run_app(self, opts, args):
-        if not hasattr(self, "app_runner"):
-            runner_class = Runner.get_runner_class("app")
-            self.app_runner = runner_class(
-                    event_handler=self.event_handler,
-                    popen=self.popen,
-                    config_pm=self.config_pm,
-                    fs_util=self.fs_util,
-                    suite_engine_proc=self.suite_engine_proc)
         return self.app_runner(opts, args)
-
-
-class TaskUtilBase(AppRunner):
-
-    """Base class for a task util."""
-
-    CONF_NAME = AppRunner.NAME
-    NAME = None
-    SCHEME = None
-
-    def __init__(self, *args, **kwargs):
-        manager = kwargs.pop("manager")
-        AppRunner.__init__(self, *args, **kwargs)
-        self.manager = manager
-
-    def can_handle(self, key):
-        return key.startswith(self.SCHEME)
-
-    def run_impl_main(self, config, opts, args, uuid, work_files):
-        raise NotImplementedError()
 
 
 def main():

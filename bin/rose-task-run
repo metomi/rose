@@ -30,29 +30,17 @@
 #     that has the same name as the task. This can be overridden by the
 #     --app-key=KEY option or the ROSE_TASK_APP environment variable.
 #
-#     If --no-auto-util and --util-key=KEY is not specified, the task name will
-#     be passed to each built-in task utility to see if it is compatible with
-#     the utility. If so, it will run the task using the task utility instead
-#     of as a Rose application.
-#
-#     More documentation on built-in task utilities can be found at Rose User
-#     Guide: Suite Tools > Task Utility Selection.
-#
 # OPTIONS
 #     All options of "rose app-run" and "rose task-env" are supported.
 #     Additional options are:
 #     --app-key=KEY
 #         Specify a named application configuration.
-#     --no-auto-util
-#         Do not automatically select a task utility based on the task name.
 #     --path=PATTERN, -P PATTERN
 #         Each of this specify a glob pattern for paths to prepend to the PATH
 #         environment variable. If a relative path is given, it is relative to
 #         $ROSE_SUITE_DIR. An empty value resets the default and any previous
 #         --path=PATTERN settings.
 #         (default="share/fcm[_-]make*/*/bin")
-#     --util-key=KEY
-#         Specify a named task utility.
 #
 # ENVIRONMENT VARIABLES
 #     All environment variables of "rose app-run" and "rose task-env" are
@@ -62,8 +50,6 @@
 #
 #     ROSE_TASK_APP
 #         Specify a named application configuration.
-#     ROSE_TASK_UTIL
-#         Specify a named task utility.
 #
 #     All environment variables documented in "rose task-env" are passed to the
 #     application "rose task-run" runs.
