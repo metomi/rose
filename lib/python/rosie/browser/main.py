@@ -39,6 +39,7 @@ import rose.config_editor.main
 import rose.env
 import rose.external
 import rose.gtk.run
+import rose.gtk.splash
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator, ResourceError
@@ -1240,9 +1241,17 @@ if __name__ == "__main__":
 
     title = rosie.browser.PROGRAM_NAME
     number_of_events = 6
-    splash_screen = rose.gtk.util.SplashScreen(logo, title, number_of_events)
-    
-    MainWindow(opts, args, splash_screen.update)
+    splash_screen = rose.gtk.splash.SplashScreenProcess(logo, title,
+                                                        number_of_events)
+    try:
+        MainWindow(opts, args, splash_screen.update)
+    except BaseException as e:
+        splash_screen.stop()
+        gtk.gdk.threads_leave()
+        for thread in threading.enumerate():
+            if hasattr(thread, "stop"):
+                thread.stop()
+        raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",

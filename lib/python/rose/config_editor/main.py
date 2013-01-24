@@ -65,6 +65,7 @@ import rose.config_editor.stack
 import rose.config_editor.util
 import rose.config_editor.variable
 import rose.config_editor.window
+import rose.gtk.splash
 import rose.gtk.util
 import rose.macro
 import rose.opt_parse
@@ -108,6 +109,7 @@ class MainController(object):
              rose.META_PROP_TYPE:
              rose.macros.value.ValueChecker}
         self.metadata_off = False
+        self.loader_update = loader_update
 
         # Load the top configuration directory
         self.data = rose.config_editor.loader.ConfigDataManager(
@@ -118,9 +120,8 @@ class MainController(object):
                                 loader_update)
         self.trigger = self.data.trigger
 
-        loader_update(rose.config_editor.LOAD_STATUSES,
-                      self.data.top_level_name)
-
+        self.loader_update(rose.config_editor.LOAD_STATUSES,
+                           self.data.top_level_name)
         self.mainwindow = rose.config_editor.window.MainWindow()
 
         self.section_ops = rose.config_editor.stack.SectionOperations(
@@ -197,8 +198,10 @@ class MainController(object):
                                                  self.handle_page_change)
             self.mainwindow.window.connect_after('focus-in-event',
                                                  self.handle_page_change)
-        self.update_all()
-        loader_update(rose.config_editor.LOAD_DONE, self.data.top_level_name)
+        self.load_errors = 0
+        self.update_all(is_loading=True)
+        self.loader_update(rose.config_editor.LOAD_DONE,
+                           self.data.top_level_name)
         self.perform_startup_check()
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
@@ -798,7 +801,7 @@ class MainController(object):
             self.hyper_panel.load_tree(None, self.data.namespace_tree)
             self.update_all()
 
-    def refresh_ids(self, config_name, setting_ids):
+    def refresh_ids(self, config_name, setting_ids, is_loading=False):
         """Refresh and redraw settings if needed."""
         self._generate_pagelist()
         nses_to_do = []
@@ -823,9 +826,9 @@ class MainController(object):
             if ns not in nses_to_do:
                 nses_to_do.append(ns)
         for ns in nses_to_do:
-            self.update_namespace(ns)
+            self.update_namespace(ns, is_loading=is_loading)
 
-    def update_all(self, just_this_config=None):
+    def update_all(self, just_this_config=None, is_loading=False):
         """Loop over all namespaces and update."""
         unique_namespaces = self.data.get_all_namespaces(just_this_config)
         if just_this_config is None:
@@ -835,13 +838,16 @@ class MainController(object):
         for config_name in configs:
             self.update_config(config_name)
         self._generate_pagelist()
+       
         for ns in unique_namespaces:
             if ns in [p.namespace for p in self.pagelist]:
                 index = [p.namespace for p in self.pagelist].index(ns)
                 page = self.pagelist[index]
                 self.sync_page_var_lists(page)
             self.update_ignored_statuses(ns)
-        self.perform_error_check()  # Perform a global error check.
+            
+        self.perform_error_check(is_loading=is_loading)  # Global error check.
+        
         for ns in unique_namespaces:
             if ns in [p.namespace for p in self.pagelist]:
                 index = [p.namespace for p in self.pagelist].index(ns)
@@ -855,7 +861,8 @@ class MainController(object):
             self.update_metadata_id(config_name)
         self.update_ns_sub_data()
 
-    def update_namespace(self, namespace, are_errors_done=False):
+    def update_namespace(self, namespace, are_errors_done=False,
+                         is_loading=False):
         """Update driver function. Updates the page if open."""
         self._generate_pagelist()
         if namespace in [p.namespace for p in self.pagelist]:
@@ -866,10 +873,11 @@ class MainController(object):
             self.update_config(namespace)
             self.update_sections(namespace)
             self.update_ignored_statuses(namespace)
-            if not are_errors_done:
+            if not are_errors_done and not is_loading:
                 self.perform_error_check(namespace)
             self.update_tree_status(namespace)
-            self.alter_bar_sensitivity()
+            if not is_loading:
+                self.alter_bar_sensitivity()
             self.update_stack_viewer_if_open()
             if namespace in self.data.config.keys():
                 self.update_metadata_id(namespace)
@@ -1722,13 +1730,14 @@ class MainController(object):
                             config_name, 'format.FormatChecker.validate',
                             macro_config, problem_list)
                    
-    def perform_error_check(self, namespace=None):
+    def perform_error_check(self, namespace=None, is_loading=False):
         """Loop through system macros and sum errors."""
         for macro_name in self.macros:
             # We may need to speed up trigger for large configs.
-            self.perform_macro_validation(macro_name, namespace)
+            self.perform_macro_validation(macro_name, namespace, is_loading)
 
-    def perform_macro_validation(self, macro_type, namespace=None):
+    def perform_macro_validation(self, macro_type, namespace=None,
+                                 is_loading=False):
         """Calculate errors for a given internal macro."""
         configs = self.data.config.keys()
         if namespace is not None:
@@ -1746,10 +1755,10 @@ class MainController(object):
             checker = self.macros[macro_type]()
             bad_list = checker.validate(config, meta)
             self.apply_macro_validation(config_name, macro_type, bad_list,
-                                        namespace)
+                                        namespace, is_loading)
 
     def apply_macro_validation(self, config_name, macro_type, bad_list=None,
-                               namespace=None):
+                               namespace=None, is_loading=False):
         """Display error icons if a variable is in the wrong state."""
         if bad_list is None:
             bad_list = []
@@ -1789,7 +1798,8 @@ class MainController(object):
                 id_warn_dict.update({var.metadata['id']: this_warning})
         if not bad_list:
             self.refresh_ids(config_name,
-                             id_error_dict.keys() + id_warn_dict.keys())
+                             id_error_dict.keys() + id_warn_dict.keys(),
+                             is_loading)
             return
         for bad_report in bad_list:
             section = bad_report.section
@@ -1829,6 +1839,12 @@ class MainController(object):
                 map_ = id_warn_dict
             else:
                 map_ = id_error_dict
+                if is_loading:
+                    self.load_errors += 1
+                    update_text = rose.config_editor.LOAD_ERRORS.format(
+                                                          self.load_errors)
+                    self.loader_update(update_text, self.data.top_level_name,
+                                       no_progress=True)
             if setting_id in map_:
                 # No need for further update, already had warning/error.
                 map_.pop(setting_id)
@@ -1836,7 +1852,8 @@ class MainController(object):
                 # New warning or error.
                 map_.update({setting_id: info})
         self.refresh_ids(config_name,
-                         id_error_dict.keys() + id_warn_dict.keys())
+                         id_error_dict.keys() + id_warn_dict.keys(),
+                         is_loading)
 
     def apply_macro_transform(self, config_name, macro_type, changed_ids):
         """Refresh pages with changes."""
@@ -1946,8 +1963,14 @@ def spawn_window(config_directory_path=None):
         title = rose.config_editor.UNTITLED_NAME
     else:
         title = config_directory_path.split("/")[-1]
-    splash_screen = rose.gtk.util.SplashScreen(logo, title, number_of_events)
-    MainController(config_directory_path, loader_update=splash_screen.update)
+    splash_screen = rose.gtk.splash.SplashScreenProcess(logo, title,
+                                                        number_of_events)
+    try:
+        MainController(config_directory_path,
+                       loader_update=splash_screen.update)
+    except BaseException as e:
+        splash_screen.stop()
+        raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
