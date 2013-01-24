@@ -1988,7 +1988,8 @@ def spawn_window(config_directory_path=None):
             gcontrol_icon = RESOURCER.locate(
                                     rose.config_editor.ICON_PATH_SCHEDULER)
         except rose.resource.ResourceError:
-            gcontrol_icon = None    
+            gcontrol_icon = None
+    rose.gtk.util.setup_scheduler_icon(gcontrol_icon)
     number_of_events = (get_number_of_configs(config_directory_path) *
                         rose.config_editor.LOAD_NUMBER_OF_EVENTS + 1)
     if config_directory_path is None:

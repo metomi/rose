@@ -185,7 +185,7 @@ class MenuBar(object):
                        rose.config_editor.ACCEL_TERMINAL),
                       ('View Output', gtk.STOCK_DIRECTORY,
                        rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
-                      ('Open Suite GControl', None,
+                      ('Open Suite GControl', "rose-gtk-scheduler",
                        rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
                       ('Help', None,
                        rose.config_editor.TOP_MENU_HELP),
