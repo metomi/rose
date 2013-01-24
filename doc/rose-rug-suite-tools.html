@@ -143,8 +143,8 @@ rose task-run -D '[env]!BAZ='
 
     <p>The command uses the suite engine environment to set up some standard
     <var>ROSE_*</var> environment variables, site/user specific <var>PATH</var>
-    and similar variables, etc. for the task before launching an application or
-    a task utility.</p>
+    and similar variables, etc. for the task before launching an
+    application.</p>
 
     <p>See <a href="rose-command.html#rose-task-run">Rose Reference Guide: CLI
     &gt; rose task-run</a> for a full command reference.</p>
@@ -227,65 +227,55 @@ rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
 rose task-run -D '[env]!BAZ='
 </pre>
 
-    <h3 id="rose-task-run.util">Task Utility Selection</h3>
+    <h3 id="rose-task-run.builtin-app">Builtin Applications</h3>
 
-    <p>Apart from running applications normally, the command also has a set of
-    built-in utilities to call. You can use the <code>--util-key=KEY</code>
-    option or the <var>ROSE_TASK_UTIL</var> environment variable to specify a
-    task utility to run instead of an application.</p>
+    <p>Apart from running command normally, the <code>rose task-run</code>
+    command (or the <code>rose app-run</code> command) also has a set of
+    built-in applications to call. To use a builtin application, add the
+    <kbd>app=KEY</kbd> setting in the application configuration, where
+    <var>KEY</var> is the name of a builtin application. (See below.)</p>
 
-    <p>If neither <code>--no-auto-util</code> or <code>--util-key=KEY</code> is
-    specified, the task name will be passed to each built-in task utility for a
-    pattern match. If there is a match, it will run the task using the task
-    utility instead of as a Rose application.</p>
-
-    <p>A task utility would normally behave very much like running a Rose
-    application. (Consider the normal application runner as the default task
-    utility.) The key differences are normally that:</p>
+    <p>A builtin application would normally behave very much like running an
+    external command. The key differences are normally that:</p>
 
     <ol>
-      <li>A task utility may use a different working directory to a Rose
+      <li>A builtin application may use a different working directory to a Rose
       application.</li>
 
-      <li>A task utility will run some pre-defined commands or logics instead
-      of a command defined in the application configuration.</li>
+      <li>A builtin application will run some pre-defined commands or logics
+      instead of a command defined in the application configuration.</li>
     </ol>
 
-    <h3 id="rose-task-run.util.fcm_make">Task Utility: fcm_make</h3>
+    <h3 id="rose-task-run.builtin-app.fcm_make">Builtin Application:
+    fcm_make</h3>
 
-    <p>A pair of built-in task utilities are provided for running <code>fcm
-    make</code>.</p>
+    <p>The <code>fcm_make</code> built-in applications is provided for running
+    <code>fcm make</code>.</p>
 
-    <p>The <code>fcm_make</code> utility will be invoked automatically if a
-    task has a name that starts with <var>fcm_make*</var>. (However, if the
-    task name starts with <var>fcm_make2*</var> it will invoke the
-    <code>fcm_make2</code> utility instead, see next paragraph).</p>
+    <p>N.B. If a task has a name that starts with <var>fcm_make2*</var> and it
+    does not have its own application configuration, <code>rose task-run</code>
+    will attempt to associate it with the corresponding <var>fcm_make*</var>
+    application configuration.</p>
 
-    <p>The <code>fcm_make2</code> utility will be invoked automatically if a
-    task has a name that starts with <var>fcm_make2*</var>. If there is a Rose
-    application configuration for its corresponding <var>fcm_make*</var> task,
-    it will use its settings by default.</p>
-
-    <p>The <code>fcm_make</code> task utility expects a file
+    <p>The <code>fcm_make</code> application expects a file
     <var>file/fcm-make.cfg</var> in its application configuration. It runs
     <code>fcm make</code> using this configuration file.</p>
 
-    <p>The <code>fcm make</code> task utility will also look for a matching
+    <p>The <code>fcm make</code> application will also look for a matching
     <code>fcm_make2*</code> task in the suite which would normally be a
     continuation of the <code>fcm make</code> command as a separate
     <var>USER@HOST</var>. If so, will export an environment variable
     <var>ROSE_TASK_MIRROR_TARGET</var> to the <code>fcm make</code> command to
     substitute the mirror target.</p>
 
-    <p>You can configure these task utilities with environment variables or
+    <p>You can configure these applications with environment variables or
     settings in <var>rose-app.conf</var>. (Settings in <var>rose-app.conf</var>
     override their equivalent environment variables.)</p>
 
-    <p><kbd>use-pwd=true</kbd>: By default, the <code>fcm_make</code> and
-    <code>fcm_make2</code> task utilities change the working directory to
-    <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var>. This option will stop
-    this, and the working directory is the normal working directory of the
-    task.</p>
+    <p><kbd>use-pwd=true</kbd>: By default, the application changes the working
+    directory to <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var>. This option
+    will stop this, and the working directory is the normal working directory of
+    the task.</p>
 
     <p><kbd>opt.jobs=N</kbd> or the environment variable
     <var>ROSE_TASK_N_JOBS</var>: This can be used to control the number of
@@ -295,19 +285,15 @@ rose task-run -D '[env]!BAZ='
     This can be used to pass extra options to the <code>fcm make</code>
     command.</p>
 
-    <h3 id="rose-task-run.util.rose_install">Task Utility: rose_install</h3>
+    <h3 id="rose-task-run.builtin-app.rose_install">Builtin Application:
+    rose_install</h3>
 
-    <p>This built-in utility behaves almost the same as the application
-    launcher. It will export the environment and install files, but will not
-    launch a command.</p>
+    <p>This built-in application will export the environment and install files,
+    but will not launch a command.</p>
 
-    <p>In automatic task utility selection mode, this utility will be invoked
-    automatically if a task has a name that starts with
-    <code>rose_install*</code>.</p>
-
-    <p>By default, as for the application launcher, this task utility will use
-    the following logic to determine the root directory to install file targets
-    with a relative path:</p>
+    <p>By default, as for the application launcher, this builtin application
+    will use the following logic to determine the root directory to install file
+    targets with a relative path:</p>
 
     <ol>
       <li>If the setting <var>file-install-root=PATH</var> is specified (at the

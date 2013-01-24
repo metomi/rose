@@ -17,40 +17,54 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Task utility: run "fcm make"."""
+"""Builtin application: run "fcm make"."""
 
 from rose.env import env_export
-from rose.run import TaskUtilBase
+from rose.run import BuiltinApp
 import os
 import shlex
 import sys
 
-class FCMMakeTaskUtil(TaskUtilBase):
+class FCMMakeApp(BuiltinApp):
 
     """Run "fcm make"."""
 
-    CONFIG_IS_OPTIONAL = True
     SCHEME = "fcm_make"
     SCHEME2 = SCHEME + "2"
 
-    def can_handle(self, key):
-        return key.startswith(self.SCHEME) and not key.startswith(self.SCHEME2)
+    def get_app_key(self, name):
+        """Return the fcm_make* application key if name is fcm_make2*."""
+        if task_name.startswith(self.SCHEME2):
+            return self.SCHEME + task_name.replace(self.SCHEME2, "")
+        return task_name
 
-    def run_impl_main(self, config, opts, args, uuid, work_files):
-        t = self.suite_engine_proc.get_task_props()
+    def run(self, config, opts, args, uuid, work_files):
+        """
+        Run "fcm make".
+
+        This application will only work under "rose task-run".
+
+        """
+        t = self.manager.suite_engine_proc.get_task_props()
+
+        if t.task_name.startswith(self.SCHEME2):
+            return self._run2(config, opts, args, uuid, work_files, t)
+
         task2_name = self.SCHEME2 + t.task_name.replace(self.SCHEME, "")
 
         use_pwd = config.get_value(["use-pwd"]) in ["True", "true"]
-        auth = self.suite_engine_proc.get_task_auth(t.suite_name, task2_name)
+        auth = self.manager.suite_engine_proc.get_task_auth(
+                t.suite_name, task2_name)
         if auth is not None:
             target = "@".join(auth) + ":"
             if use_pwd:
                 target += os.path.join(t.suite_dir_rel, "work", t.task_id)
             else:
                 target += os.path.join(t.suite_dir_rel, "share", t.task_name)
-            env_export("ROSE_TASK_MIRROR_TARGET", target, self.event_handler)
+            env_export("ROSE_TASK_MIRROR_TARGET", target,
+                       self.manager.event_handler)
             # N.B. MIRROR_TARGET deprecated
-            env_export("MIRROR_TARGET", target, self.event_handler)
+            env_export("MIRROR_TARGET", target, self.manager.event_handler)
 
         cmd = ["fcm", "make"]
         for c in [os.path.abspath("fcm-make.cfg"),
@@ -66,4 +80,20 @@ class FCMMakeTaskUtil(TaskUtilBase):
         cmd_opts = config.get_value(["opts"], os.getenv("ROSE_TASK_OPTIONS"))
         cmd += shlex.split(cmd_opts)
         cmd += args
-        self.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
+        return self.manager.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
+
+    def _run2(self, config, opts, args, uuid, work_files, t):
+        cmd = ["fcm", "make"]
+        if config.get_value(["use-pwd"]) in ["True", "true"]:
+            task1_id = self.SCHEME1 + t.task_id.replace(self.SCHEME, "")
+            cmd += ["-C", os.path.join(t.suite_dir, "work", task1_id)]
+        else:
+            task1_name = self.SCHEME1 + t.task_name.replace(self.SCHEME, "")
+            cmd += ["-C", os.path.join(t.suite_dir, "share", task1_name)]
+        cmd_opt_jobs = config.get_value(["opt.jobs"],
+                                        os.getenv("ROSE_TASK_N_JOBS", "4"))
+        cmd += ["-j", cmd_opt_jobs]
+        cmd_opts = config.get_value(["opts"], os.getenv("ROSE_TASK_OPTIONS"))
+        cmd += shlex.split(cmd_opts)
+        cmd += args
+        return self.manager.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
