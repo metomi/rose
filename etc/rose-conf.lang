@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ _____________________________________________________________________
+ = Licence =
+
+ This file is part of Rose, a framework for scientific suites.
+ 
+ Rose is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ Rose is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with Rose. If not, see <http://www.gnu.org/licenses/>.
+ _____________________________________________________________________
+ = Instructions =
+ 
+ Create this directory if it doesn't already exist:
+ ~/.local/share/gtksourceview-2.0/language-specs/
+
+ Place this file in that directory (or symlink it)
+ 
+ In the case of gedit, a total reload is required to apply it.
+ _____________________________________________________________________
+-->
+<language id="rose-conf" _name="Rose Config File" version="2.0" _section="Others">
+  <metadata>
+    <property name="globs">rose-*.conf;rose-*.info</property>
+  </metadata>
+
+  <styles>
+    <style id="comment" _name="Preceding Comment" map-to="def:comment"/>
+    <style id="ignored-option" _name="Ignored Option" map-to="def:preprocessor"/>
+    <style id="ignored-section" _name="Ignored Section" map-to="def:preprocessor"/>
+    <style id="rhs-value" _name="RHS Value" map-to="def:string"/>
+    <style id="keyword" _name="Keyword" map-to="def:keyword"/>
+    <style id="option" _name="Option" map-to="def:type"/>
+    <style id="setting-id" _name="Setting ID" map-to="def:identifier"/>
+  </styles>
+
+  <definitions>
+    <context id="line-comment" style-ref="comment">
+      <match>^#.*$</match>
+    </context>
+    <context id="group" style-ref="def:keyword">
+      <start>^\[[^!]</start>
+      <end>\] *$</end>
+    </context>
+    <context id="equals" style-ref="def:special-char">
+      <match>=</match>
+    </context>
+    <context id="rhs-value" style-ref="rhs-value">
+      <match>(?&lt;==).+$</match>
+    </context>
+    <context id="rhs-value-cont" style-ref="rhs-value">
+      <match>^ +[\w-].*$</match>
+    </context>
+    <context id="ignored-option" style-ref="ignored-option" end-at-line-end="false">
+      <start>^!!?.*$</start>
+      <end>^(?=[[\w-#!])</end>
+    </context>
+    <context id="ignored-section" style-ref="ignored-section" end-at-line-end="false">
+      <start>^\[!!?[^!].*\]$</start>
+      <end>^(?=\[)</end>
+      <include>
+        <context ref="line-comment"/>
+      </include>
+    </context>
+    <context id="rose-conf">
+      <include>
+        <context ref="line-comment"/>
+        <context ref="ignored-section"/>
+        <context ref="group"/>
+        <context ref="ignored-option"/>
+        <context ref="rhs-value-cont"/>
+        <context ref="rhs-value"/>
+        <context ref="equals"/>
+      </include>
+    </context>
+  </definitions>
+</language>
+

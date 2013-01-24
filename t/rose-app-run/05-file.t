@@ -44,7 +44,7 @@ Hello and good bye.
 __CONTENT__
 OUT=$(cd config/file && cat hello1 hello2 hello3/text)
 #-------------------------------------------------------------------------------
-tests 47
+tests 50
 #-------------------------------------------------------------------------------
 # Normal mode with free format files.
 TEST_KEY=$TEST_KEY_BASE
@@ -196,6 +196,22 @@ run_pass "$TEST_KEY.db" test -f ".rose-config_processors-file.db"
 run_pass "$TEST_KEY.hello1" test -f "$TEST_DIR/test-root/hello1"
 run_pass "$TEST_KEY.hello2" test -f "$TEST_DIR/test-root/hello2"
 run_pass "$TEST_KEY.hello3" test -f "$TEST_DIR/test-root/hello3/text"
+teardown
+#-------------------------------------------------------------------------------
+# Normal mode with environment variable substituion syntax in target name.
+TEST_KEY=$TEST_KEY_BASE-target-env-syntax
+setup
+HELLO=hello \
+HELLO_NUM=4 \
+    run_pass "$TEST_KEY" rose app-run --config=../config -q \
+        --command-key=test-sources \
+        '--define=[file:${HELLO}$HELLO_NUM/text]source=/etc/passwd /etc/profile'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+$OUT
+$(</etc/passwd)
+$(</etc/profile)
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 exit
