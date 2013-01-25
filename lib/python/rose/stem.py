@@ -222,16 +222,8 @@ class StemRunner(object):
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
-
-        basedir = ''        
-        if self.opts.diffsource:
-            basedir = self.opts.diffsource[0]
-        elif self.opts.source:
-            basedir = self.opts.source[0]
+        dummy, basedir = self._ascertain_project(os.getcwd())
         name = os.path.basename(basedir)
-        if not name:
-            name = 'rose-stem-test'
-        name = re.sub(r'@', r'_', name)    
         return name
 
     def _this_suite(self):
