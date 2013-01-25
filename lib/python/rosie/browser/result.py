@@ -142,13 +142,13 @@ class DisplayBox(gtk.VBox):
         return idx, branch, revision
 
     def _get_treeview_path_owner(self, path):
-        """Get the status of a suite"""
+        """Get the owner of a suite"""
         model = self.treeview.get_model()
         i = self.get_column_index_by_name("owner")
         if i is None:
             return False
         return model.get_value(model.get_iter(path), i)
-        
+
     def _get_treeview_path_status(self, path):
         """Get the status of a suite"""
         model = self.treeview.get_model()
