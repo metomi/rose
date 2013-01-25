@@ -291,7 +291,7 @@ class ConfigDataManager(object):
         """Return two copies of the rose.config.ConfigNode at config_path."""
         try:
             config = rose.config.load(config_path)
-        except rose.config.SyntaxError as e:
+        except rose.config.ConfigSyntaxError as e:
             text = rose.config_editor.ERROR_LOAD_SYNTAX.format(
                                                     config_path, e)
             title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR

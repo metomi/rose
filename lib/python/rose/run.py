@@ -59,8 +59,7 @@ class NotRunningError(Exception):
         return "%s: is not running" % (self.args)
 
 
-class ConfigurationNotFoundError(Exception):
-
+class ConfigNotFoundError(Exception):
     """An exception raised when a config can't be found at or below cwd."""
 
     def __str__(self):
@@ -68,12 +67,29 @@ class ConfigurationNotFoundError(Exception):
                 self.args[0])
 
 
-class NewModeError(Exception):
+class ConfigValueError(Exception):
+    """An exception raised when a config value is incorrect."""
 
+    def __str__(self):
+        keys, value = self.args
+        key = keys.pop()
+        if keys:
+            key = "[" + "][".join(keys) + "]" + key
+        return "%s=%s: configuration value error" % (key, value)
+
+
+class NewModeError(Exception):
     """An exception raised for --new mode is not supported."""
 
     def __str__(self):
         return "%s=%s, --new mode not supported." % self.args
+
+
+class PollTimeoutError(Exception):
+    """An exception raised when time is out for polling."""
+
+    def __str__(self):
+        return "Polling condition(s) not satisfied."
 
 
 class TaskAppNotFoundError(Exception):
@@ -84,7 +100,6 @@ class TaskAppNotFoundError(Exception):
 
 
 class CommandNotDefinedEvent(Event):
-
     """An event raised when a command is not defined for an app."""
 
     TYPE = Event.TYPE_ERR
@@ -94,7 +109,6 @@ class CommandNotDefinedEvent(Event):
 
 
 class SuiteHostSelectEvent(Event):
-
     """An event raised to report the host for running a suite."""
 
     def __str__(self):
@@ -102,7 +116,6 @@ class SuiteHostSelectEvent(Event):
 
 
 class SuiteLogArchiveEvent(Event):
-
     """An event raised to report the archiving of a suite log directory."""
 
     def __str__(self):
@@ -110,7 +123,6 @@ class SuiteLogArchiveEvent(Event):
 
 
 class Dummy(object):
-
     """Convert a dict into an object."""
 
     def __init__(self, **kwargs):
@@ -340,18 +352,106 @@ class AppRunner(Runner):
     def run_impl(self, opts, args, uuid, work_files):
         """The actual logic for a run."""
 
+        # Preparation.
         config = self.config_load(opts)
-        self.run_impl_prep(config, opts, args, uuid, work_files)
+        self._prep(config, opts, args, uuid, work_files)
+        self._poll(config, opts, args, uuid, work_files)
+
+        # Run the application or the command.
         app_mode = config.get_value(["mode"])
         if app_mode is None:
             app_mode = opts.app_mode
         if app_mode in [None, "command"]:
-            return self.run_impl_command(config, opts, args, uuid, work_files)
+            return self._command(config, opts, args, uuid, work_files)
         else:
             builtin_app = self.builtins_manager.get_handler(app_mode)
             return builtin_app.run(self, config, opts, args, uuid, work_files)
 
-    def run_impl_prep(self, config, opts, args, uuid, work_files):
+    def _poll(self, config, opts, args, uuid, work_files):
+        """Poll for prerequisites of applications."""
+        # Poll configuration
+        poll_test = config.get_value(["poll", "test"])
+        poll_all_files_value = config.get_value(["poll", "all-files"])
+        poll_all_files = []
+        if poll_all_files_value:
+            poll_all_files = shlex.split(poll_all_files_value)
+        poll_any_files_value = config.get_value(["poll", "any-files"])
+        poll_any_files = []
+        if poll_any_files_value:
+            poll_any_files = shlex.split(poll_any_files_value)
+        poll_file_test = None
+        if poll_all_files or poll_any_files:
+            poll_file_test = config.get_value(["poll", "file-test"])
+            if poll_file_test and "{}" not in poll_file_test:
+                raise ConfigValueError(["poll", "file-test"], poll_file_test)
+        if poll_test or poll_all_files or poll_any_files:
+            # Parse something like this: delays=10,4*30s,2.5m,2*1h
+            # No unit or s: seconds
+            # m: minutes
+            # h: hours
+            # N*: repeat the value N times
+            poll_delays_value = config.get_value(["poll", "delays"]).strip()
+            units = {"h": 3600, "m": 60, "s": 1}
+            if poll_delays_value:
+                for item in poll_delays_value.split(","):
+                    value = item.strip()
+                    repeat = 1
+                    if "*" in value:
+                        repeat, value = value.split("*", 1)
+                    if value[-1].lower() in units.keys():
+                        try:
+                            value = float(value[:-1]) * units[value[-1]]
+                        except ValueError as e:
+                            raise ConfigValueError(["poll", "delays"],
+                                                   poll_delays_value)
+                    for i in range(repeat):
+                        poll_delays.append(value)
+            else:
+                poll_delays = [0] # poll once without a delay
+
+        # Poll
+        while poll_delays and (poll_test or poll_any_files or poll_all_files):
+            poll_delay = poll_delays.pop(0)
+            if poll_delay:
+                sleep(poll_delay)
+            if poll_test:
+                rc, out, err = self.popen.run(poll_test, shell=True,
+                                              stdout=sys.stdout,
+                                              stderr=sys.stderr)
+                # TODO: report result
+                if rc == 0:
+                    poll_test = None
+            any_files = list(poll_any_files)
+            for file in any_files:
+                if self._poll_file(file, poll_file_test):
+                    # TODO: report poll any files succeeded
+                    poll_any_files = []
+                    break
+            all_files = list(poll_all_files)
+            for file in all_files:
+                if self._poll_file(file, poll_file_test):
+                    poll_all_files.remove(file)
+            if all_files and not poll_all_files:
+                pass # TODO: report poll all files succeeded
+        if poll_test or poll_any_files or poll_all_files:
+            # FIXME: report: time
+            #                poll_test, poll_any_files, poll_all_files
+            raise PollTimeoutError()
+
+    def _poll_file(self, file, poll_file_test):
+        ok = False
+        if poll_file_test:
+            test = poll_file_test.replace(
+                    "{}", self.popen.list_to_shell_str([file]))
+            rc, out, err = self.popen.run(test, shell=True,
+                                          stdout=sys.stdout, stderr=sys.stderr)
+            ok = rc == 0
+        else:
+            ok = os.path.exists(file)
+        # TODO: report result
+        return ok
+
+    def _prep(self, config, opts, args, uuid, work_files):
         """Prepare to run the application."""
 
         if opts.new_mode:
@@ -406,7 +506,7 @@ class AppRunner(Runner):
         self.config_pm(config, "file",
                        no_overwrite_mode=opts.no_overwrite_mode)
 
-    def run_impl_command(self, config, opts, args, uuid, work_files):
+    def _command(self, config, opts, args, uuid, work_files):
         """Run the command."""
 
         command = self.popen.list_to_shell_str(args)
@@ -484,7 +584,7 @@ class SuiteRunner(Runner):
             except (OSError, IOError) as e:
                 opts.conf_dir = self.fs_util.dirname(opts.conf_dir)
                 if opts.conf_dir == self.fs_util.dirname(opts.conf_dir):
-                    raise ConfigurationNotFoundError(os.getcwd())
+                    raise ConfigNotFoundError(os.getcwd())
         if opts.conf_dir != os.getcwd():
             self.fs_util.chdir(opts.conf_dir)
             opts.conf_dir = None
