@@ -349,7 +349,7 @@ class AppRunner(Runner):
             return self.run_impl_command(config, opts, args, uuid, work_files)
         else:
             builtin_app = self.builtins_manager.get_handler(app_mode)
-            return builtin_app.run(config, opts, args, uuid, work_files)
+            return builtin_app.run(self, config, opts, args, uuid, work_files)
 
     def run_impl_prep(self, config, opts, args, uuid, work_files):
         """Prepare to run the application."""

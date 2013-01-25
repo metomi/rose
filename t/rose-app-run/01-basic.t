@@ -27,22 +27,20 @@ tests 18
 # Normal mode, no command.
 TEST_KEY=$TEST_KEY_BASE-no-command
 setup
-run_fail "$TEST_KEY" rose app-run --config=../config -q
+run_pass "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[FAIL] command not defined
-__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 # Verbose mode, no command.
 TEST_KEY=$TEST_KEY_BASE-no-command-v1
 setup
-run_fail "$TEST_KEY" rose app-run -C ../config
+run_pass "$TEST_KEY" rose app-run -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[FAIL] command not defined
+[WARN] command not defined
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
