@@ -41,6 +41,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "KEY",
                         "help": "Specify a named application configuration."}],
+               "app_mode": [
+                       ["--app-mode"],
+                       {"action": "store",
+                        "metavar": "MODE",
+                        "help": "Run a command or a builtin application"}],
                "auto_type": [
                        ["--auto-type"],
                        {"action": "store_true",

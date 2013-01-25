@@ -189,6 +189,19 @@ rose task-run -D '[env]!BAZ='
     application configuration, if most of their differences can be defined at
     the command line.</p>
 
+    <h3 id="rose-task-run.env">Environment Variables Export</h3>
+
+    <p>The application runner exports each environment variables in the
+    <var>[env]</var> section in the application configuration file in no
+    particular oder, before doing anything else. The file installation sections
+    and the application command can reference the environment variables
+    exported in the <var>env</var> section.</p>
+
+    <h3 id="rose-task-run.file">File Installation</h3>
+
+    <p>See <a href="rose-configuration.html#appendix-file-creation-mode">Rose
+    Reference Guide: Configuration &gt; Appendix: File Creation Mode</a>.</p>
+
     <h3 id="rose-task-run.opt">Optional Configuration Selection</h3>
 
     <p>If an application configuration is shared by a set of tasks, each
@@ -232,7 +245,7 @@ rose task-run -D '[env]!BAZ='
     <p>Apart from running command normally, the <code>rose task-run</code>
     command (or the <code>rose app-run</code> command) also has a set of
     built-in applications to call. To use a builtin application, add the
-    <kbd>app=KEY</kbd> setting in the application configuration, where
+    <kbd>mode=KEY</kbd> setting in the application configuration, where
     <var>KEY</var> is the name of a builtin application. (See below.)</p>
 
     <p>A builtin application would normally behave very much like running an
@@ -251,6 +264,9 @@ rose task-run -D '[env]!BAZ='
 
     <p>The <code>fcm_make</code> built-in applications is provided for running
     <code>fcm make</code>.</p>
+
+    <p>N.B. If a task has a name that starts with <var>fcm_make*</var>,
+    <code>rose task-run</code> will run this builtin application.</p>
 
     <p>N.B. If a task has a name that starts with <var>fcm_make2*</var> and it
     does not have its own application configuration, <code>rose task-run</code>
@@ -284,27 +300,6 @@ rose task-run -D '[env]!BAZ='
     <p><kbd>opts</kbd> or the environment variable <var>ROSE_TASK_OPTIONS</var>:
     This can be used to pass extra options to the <code>fcm make</code>
     command.</p>
-
-    <h3 id="rose-task-run.builtin-app.rose_install">Builtin Application:
-    rose_install</h3>
-
-    <p>This built-in application will export the environment and install files,
-    but will not launch a command.</p>
-
-    <p>By default, as for the application launcher, this builtin application
-    will use the following logic to determine the root directory to install file
-    targets with a relative path:</p>
-
-    <ol>
-      <li>If the setting <var>file-install-root=PATH</var> is specified (at the
-      root level) in the application configuration file, its value will be
-      used.</li>
-
-      <li>If the environment variable <var>ROSE_FILE_INSTALL_ROOT</var> is
-      specified, its value will be used.</li>
-
-      <li>Otherwise, the working directory of the task will be used.</li>
-    </ol>
 
     <h2 id="rose-task-env">rose task-env</h2>
 

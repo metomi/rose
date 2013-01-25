@@ -59,14 +59,6 @@ class NotRunningError(Exception):
         return "%s: is not running" % (self.args)
 
 
-class CommandNotDefinedError(Exception):
-
-    """An exception raised when a command is not defined for an app."""
-
-    def __str__(self):
-        return "command not defined"
-
-
 class ConfigurationNotFoundError(Exception):
 
     """An exception raised when a config can't be found at or below cwd."""
@@ -89,6 +81,16 @@ class TaskAppNotFoundError(Exception):
 
     def __str__(self):
         return "%s (key=%s): task has no associated application." % self.args
+
+
+class CommandNotDefinedEvent(Event):
+
+    """An event raised when a command is not defined for an app."""
+
+    TYPE = Event.TYPE_ERR
+
+    def __str__(self):
+        return "command not defined"
 
 
 class SuiteHostSelectEvent(Event):
@@ -319,8 +321,15 @@ class AppRunner(Runner):
     """Invoke a Rose application."""
 
     NAME = "app"
-    OPTIONS = ["command_key", "conf_dir", "defines", "install_only_mode",
-               "new_mode", "no_overwrite_mode", "opt_conf_keys"]
+    OPTIONS = ["app_mode", "command_key", "conf_dir", "defines",
+               "install_only_mode", "new_mode", "no_overwrite_mode",
+               "opt_conf_keys"]
+
+    def __init__(self, *args, **kwargs):
+        Runner.__init__(self, *args, **kwargs)
+        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        self.builtins_manager = SchemeHandlersManager(
+                [p], "rose.apps", ["run"], None, *args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
@@ -333,11 +342,13 @@ class AppRunner(Runner):
 
         config = self.config_load(opts)
         self.run_impl_prep(config, opts, args, uuid, work_files)
-        app_name = config.get_value(["app"])
-        if app_name in [None, "command"]:
-            return self.run_impl_main(config, opts, args, uuid, work_files)
+        app_mode = config.get_value(["mode"])
+        if app_mode is None:
+            app_mode = opts.app_mode
+        if app_mode in [None, "command"]:
+            return self.run_impl_command(config, opts, args, uuid, work_files)
         else:
-            builtin_app = self.builtins_manager.get_handler(app_name)
+            builtin_app = self.builtins_manager.get_handler(app_mode)
             return builtin_app.run(config, opts, args, uuid, work_files)
 
     def run_impl_prep(self, config, opts, args, uuid, work_files):
@@ -395,8 +406,8 @@ class AppRunner(Runner):
         self.config_pm(config, "file",
                        no_overwrite_mode=opts.no_overwrite_mode)
 
-    def run_impl_main(self, config, opts, args, uuid, work_files):
-        """Run the command. May be overridden by sub-classes."""
+    def run_impl_command(self, config, opts, args, uuid, work_files):
+        """Run the command."""
 
         command = self.popen.list_to_shell_str(args)
         if not command:
@@ -408,7 +419,8 @@ class AppRunner(Runner):
                 if node is not None:
                     break
             else:
-                raise CommandNotDefinedError()
+                self.handle_event(CommandNotDefinedEvent())
+                return
             command = node.value
         if os.access("STDIN", os.F_OK | os.R_OK):
             command += " <STDIN"
@@ -926,6 +938,14 @@ class TaskRunner(Runner):
             if os.getenv(name) != value:
                 env_export(name, value, self.event_handler)
 
+        # Name association with builtin applications
+        builtin_app = None
+        if opts.app_mode is None:
+            builtin_apps_manager = self.app_runner.builtins_manager
+            builtin_app = builtin_apps_manager.guess_handler(t.task_name)
+            if builtin_app is not None:
+                opts.app_mode = builtin_app.SCHEME
+
         # Determine what app config to use
         if not opts.conf_dir:
             for app_key in [opts.app_key, os.getenv("ROSE_TASK_APP")]:
@@ -937,14 +957,15 @@ class TaskRunner(Runner):
             else:
                 app_key = t.task_name
                 conf_dir = os.path.join(t.suite_dir, "app", t.task_name)
+                if (not os.path.isdir(conf_dir) and
+                    builtin_app is not None and
+                    builtin_app.get_app_key(t.task_name)):
+                    # A builtin application may select a different app_key
+                    # based on the task name.
+                    app_key = builtin_app.get_app_key(t.task_name)
+                    conf_dir = os.path.join(t.suite_dir, "app", app_key)
                 if not os.path.isdir(conf_dir):
-                    builtins_manager = self.app_runner.builtins_manager
-                    h = builtins_manager.guess_handler(t.task_name)
-                    if h is not None and h.get_app_key(t.task_name):
-                        app_key = h.get_app_key(t.task_name)
-                        conf_dir = os.path.join(t.suite_dir, "app", app_key)
-                    if not os.path.isdir(conf_dir):
-                        raise TaskAppNotFoundError(t.task_name, app_key)
+                    raise TaskAppNotFoundError(t.task_name, app_key)
             opts.conf_dir = conf_dir
 
         return self.app_runner(opts, args)
