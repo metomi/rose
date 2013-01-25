@@ -32,7 +32,34 @@ Changes that have significant impact on user experience.
 
 Changes that are worth mentioning.
 
+\#393: rosie go, rosie ls: recover from checked out deleted suites.
+
+\#388: rose suite-run, rose app-run:
+--opt-conf-key=KEY can now be specified via the `ROSE_SUITE_OPT_CONF_KEYS` and `ROSE_APP_OPT_CONF_KEYS`
+environment variables
+
+\#386: rose suite-run, rose app-run:
+file install target names can now contain environment variable substitution syntax.
+
+\#378: rose config-edit: fix trigger for null-value missing parent.
+
+\#377: HTML documents: add syntax highlighting.
+
+\#375: Rose configuration: add syntax highlight files for `gedit` and `vim`.
+
+\#370: rose suite-run, rose suite-gcontrol: send `cylc gui` output to `/dev/null`.
+
+\#368: rose suite-run: wait for `cylc run` to complete.
+
 \#365: rosie go and rosie ls: fixed a crash bug when a user has a checked out copy of a deleted suite.  
+
+\#363: installation guide: more instruction on running `rosie.ws` under `mod_wsgi`.
+
+\#362: installation guide: more instruction on the roles of different hosts.
+
+\#361: rose config-edit: a single value setting can now be fixed on mismatch with metadata.
+
+\#350: rose suite-run: export Rose and suite engine versions to suite.
 
 \#349: rose env-cat: new command to substitute environment variables in input files and print result.
 
