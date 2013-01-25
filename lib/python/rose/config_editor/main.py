@@ -92,8 +92,7 @@ class MainController(object):
 
     def __init__(self, config_directory=None, config_objs=None,
                  pluggable=False,
-                 loader_update=rose.config_editor.false_function,
-                 sched_icon_path=None):
+                 loader_update=rose.config_editor.false_function):
         if config_objs is None:
             config_objs = {}
         self.pluggable = pluggable
@@ -109,8 +108,6 @@ class MainController(object):
              rose.META_PROP_TYPE:
              rose.macros.value.ValueChecker}
         self.metadata_off = False
-        self.sched_icon_path = sched_icon_path
-
         # Load the top configuration directory
         self.data = rose.config_editor.loader.ConfigDataManager(
                                 self.util,
@@ -228,7 +225,7 @@ class MainController(object):
                    (rose.config_editor.TOOLBAR_VIEW_OUTPUT,
                     'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-                    self.get_sched_toolitem)],
+                    'rose-gtk-scheduler')],
                 sep_on_name=[rose.config_editor.TOOLBAR_SAVE,
                              rose.config_editor.TOOLBAR_BROWSE,
                              rose.config_editor.TOOLBAR_REDO,
@@ -1440,25 +1437,6 @@ class MainController(object):
                 return self.menu_widgets[address]
         return None
 
-    def _get_sched_image(self, size=gtk.ICON_SIZE_MENU):
-        if self.sched_icon_path is None:
-            image = gtk.image_new_from_stock(gtk.STOCK_MISSING_IMAGE, size)
-        else:
-            w, h = gtk.icon_size_lookup(size)
-            pix = gtk.gdk.pixbuf_new_from_file(self.sched_icon_path)
-            pix = pix.scale_simple(w, h, gtk.gdk.INTERP_BILINEAR)
-            image = gtk.image_new_from_pixbuf(pix)
-        return image
-        
-    def get_sched_toolitem(self):
-        """Return a button for the suite scheduler."""
-        image = self._get_sched_image(gtk.ICON_SIZE_SMALL_TOOLBAR)
-        button = gtk.Button()
-        button.set_relief(gtk.RELIEF_NONE)
-        button.set_image(image)
-        button.show()
-        return button
-
     def alter_bar_sensitivity(self):
         """Update bar functionality like Undo and Redo."""
         if not hasattr(self, 'toolbar'):
@@ -1998,8 +1976,7 @@ def spawn_window(config_directory_path=None):
         title = config_directory_path.split("/")[-1]
     splash_screen = rose.gtk.util.SplashScreen(logo, title, number_of_events)
     MainController(config_directory_path, 
-                   loader_update=splash_screen.update,
-                   sched_icon_path=gcontrol_icon )
+                   loader_update=splash_screen.update)
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
