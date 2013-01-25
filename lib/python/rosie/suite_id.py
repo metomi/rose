@@ -344,8 +344,11 @@ class SuiteId(object):
                 status_lines = self.svn("st", "-u", path).splitlines()
             except RosePopenError:
                 raise SuiteIdLocationError(path)
-            latest_rev = int(status_lines.pop().split()[-1])
-            self.out_of_date = (latest_rev > int(self.revision))
+            if status_lines:
+                latest_rev = int(status_lines.pop().split()[-1])
+                self.out_of_date = (latest_rev > int(self.revision))
+            else:
+                self.out_of_date = False
             self.modified = any([l[:7].strip() for l in status_lines])
 
     def incr(self):
