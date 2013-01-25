@@ -913,7 +913,7 @@ class Handler(object):
 
     def launch_browser(self):
         rose.external.launch_fs_browser(self.data.top_level_directory)
-        
+
     def launch_scheduler(self, *args):
         """Run the scheduler for a suite open in config edit."""
         this_id = self.data.top_level_name
