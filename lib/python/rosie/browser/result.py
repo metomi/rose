@@ -140,7 +140,7 @@ class DisplayBox(gtk.VBox):
         branch = self.treestore.get_value(this_iter, branch_col_index)
         revision = int(self.treestore.get_value(this_iter, rev_col_index))
         return idx, branch, revision
-        
+
     def _get_treeview_path_owner(self, path):
         """Get the status of a suite"""
         model = self.treeview.get_model()
