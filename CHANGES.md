@@ -32,6 +32,8 @@ Changes that have significant impact on user experience.
 
 Changes that are worth mentioning.
 
+\#365: rosie go and rosie ls: fixed a crash bug when a user has a checked out copy of a deleted suite.  
+
 \#349: rose env-cat: new command to substitute environment variables in input files and print result.
 
 \#342: rosa svn-post-commit: fix branch creation DB update.
