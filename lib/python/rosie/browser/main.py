@@ -1058,6 +1058,8 @@ class MainWindow(gtk.Window):
         delete_working_item.set_sensitive(status == rosie.ws_client.STATUS_OK)
         delete_item = uimanager.get_widget("/Popup/Delete")
         delete_item.connect("activate", self.handle_delete)
+        owner = self.display_box._get_treeview_path_owner(path)
+        delete_item.set_sensitive(owner == os.getlogin())
         source_item = uimanager.get_widget("/Popup/View Web")
         source_item.connect("activate", self.handle_view_web)
         output_item = uimanager.get_widget("/Popup/View Output")
