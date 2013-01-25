@@ -272,11 +272,22 @@ class MainWindow(gtk.Window):
         branch_index = result_columns.index("branch")
         rev_index = result_columns.index("revision")
         self.display_box._result_info = {}
+        address = "/TopMenuBar/View/View _{0}_".format("branch")
+        branch_widget = self.menubar.uimanager.get_widget(address)
+        displayed_branch = False
+        
         for result_map in result_maps:
             results.append([])
             idx = result_map["idx"]
             branch = result_map["branch"]
             revision = result_map["revision"]
+            
+            if not displayed_branch:
+                if branch_widget is not None:
+                    if branch != "trunk":
+                        branch_widget.set_active(True)
+                        displayed_branch = True
+
             if is_local:
                 local_status = result_map.pop("local")
             else:
