@@ -45,7 +45,7 @@ cat >config/opt/rose-app-$OPT_3.conf <<'__CONFIG__'
 [!env]
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 24
+tests 27
 #-------------------------------------------------------------------------------
 # Control run.
 TEST_KEY=$TEST_KEY_BASE-control
@@ -121,6 +121,20 @@ TEST_KEY=$TEST_KEY_BASE-opt-3-1-2
 setup
 run_fail "$TEST_KEY" rose app-run --config=../config \
     --opt-conf-key=$OPT_3 --opt-conf-key=$OPT_1 --opt-conf-key=$OPT_2 -q
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+foolish fool
+baz
+__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+[FAIL] printenv FOO BAR BAZ # rc=1
+__CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Add option 3, 1 and 2, with environment variable.
+TEST_KEY=$TEST_KEY_BASE-env-opt-3-1-2
+setup
+ROSE_APP_OPT_CONF_KEYS="$OPT_3 $OPT_1 $OPT_2" \
+    run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 foolish fool
 baz

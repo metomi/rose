@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -29,7 +34,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012
+      &copy; British Crown Copyright 2012-3
       <a href="http://www.metoffice.gov.uk">Met Office</a>.
       See <a href="rose-terms-of-use.html">Terms of Use</a>.
       <br />
@@ -74,6 +79,17 @@
 
       <p>This covers the development of checking (<strong>validator</strong>)
       and changing (<strong>transformer</strong>) macros.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="warning">Warning</h2>
+
+      <p>Macros should only be written if there is a <em>genuine need</em>
+      that is not covered by other metadata - make sure you are familiar with
+      metadata capabilities before you write your own (real-life) macros.</p>
+      
+      <p>For example, <samp>fail-if</samp> and <samp>warn-if</samp> metadata
+      options can perform complex inter-setting validation.</p>
     </div>
 
     <div class="slide">
@@ -157,13 +173,13 @@ touch meta/lib/python/macros/planet.py
       <h3 class="alwayshidden">File Editing</h3>
 
       <p>Call a method to get the choices by adding the line</p>
-      <pre>
+      <pre class="prettyprint">
         allowed_planets = self._get_allowed_planets()
 </pre>
 
       <p>at the top of the <code>validate</code> method, so it looks like
       this:</p>
-      <pre>
+      <pre class="prettyprint">
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
         allowed_planets = self._get_allowed_planets()
@@ -174,7 +190,7 @@ touch meta/lib/python/macros/planet.py
       <h3 class="alwayshidden">Adding a method</h3>
 
       <p>Now add the method <code>_get_allowed_planets</code> to the class:</p>
-      <pre>
+      <pre class="prettyprint">
     def _get_allowed_planets(self):
         # Retrieve planets less than a certain distance away.
         cmd_strings = ["wget", "-q", "-O", "-",
@@ -201,7 +217,7 @@ touch meta/lib/python/macros/planet.py
       <p>This will give us a list of valid (nearby) solar system planets which
       our configuration option should be in. If it isn't, we need to send a
       message explaining the problem. Add:</p>
-      <pre>
+      <pre class="prettyprint">
     error_text = "planet is too far away."
 </pre>
 
@@ -210,7 +226,7 @@ touch meta/lib/python/macros/planet.py
 
     <div class="slide">
       <h3 class="alwayshidden">Error text example</h3>
-      <pre>
+      <pre class="prettyprint">
 class PlanetChecker(rose.macro.MacroBase):
 
     """Checks option values that refer to planets."""
@@ -229,12 +245,12 @@ class PlanetChecker(rose.macro.MacroBase):
 
       <p>Finally, we need to check if the configuration option is in the list,
       by replacing</p>
-      <pre>
+      <pre class="prettyprint">
             # Check the option value (node.value) here
 </pre>
 
       <p>with</p>
-      <pre>
+      <pre class="prettyprint">
             if node.value not in allowed_planets:
                 self.add_report(section, option, node.value, self.error_text)
 </pre>
@@ -316,7 +332,7 @@ rose macro planet.PlanetChecker
       configuration.</p>
 
       <p>Replace the line</p>
-      <pre>
+      <pre class="prettyprint">
             # Do something to the configuration.
 </pre>
 
@@ -325,7 +341,7 @@ rose macro planet.PlanetChecker
 
     <div class="slide">
       <h3 class="alwayshidden">Editing - text</h3>
-      <pre>
+      <pre class="prettyprint">
             if node is None or node.is_ignored():
                 continue
             if node.value not in self.planets:
@@ -357,12 +373,12 @@ rose macro planet.PlanetChecker
       <h3 class="alwayshidden">Change report</h3>
 
       <p>Beneath</p>
-      <pre>
+      <pre class="prettyprint">
             config.set([section, option], new_planet)
 </pre>
 
       <p>add</p>
-      <pre>
+      <pre class="prettyprint">
             message = self.change_text.format(old_planet, new_planet)
             self.add_report(section, option, new_planet, message)
 </pre>

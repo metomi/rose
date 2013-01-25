@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -29,7 +34,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012
+      &copy; British Crown Copyright 2012-3
       <a href="http://www.metoffice.gov.uk">Met Office</a>.
       See <a href="rose-terms-of-use.html">Terms of Use</a>.
       <br />
@@ -93,8 +98,8 @@
 
       <p>In this example, we'll be ordering pizza.</p>
 
-      <p>Create a new directory, containing a <samp>rose-app.conf</samp> file
-      that looks like <a href=
+      <p>Create a new directory somewhere - e.g. in your homespace - containing
+      a <samp>rose-app.conf</samp> file that looks like <a href=
       "../etc/rose-rug-advanced-tutorials-trigger/rose-app.conf.html">this</a>.</p>
     </div>
 
@@ -120,7 +125,7 @@
       <p>Let's add some <samp>trigger</samp> information.</p>
 
       <p>Under <samp>[namelist:pizza_order=pizza_type]</samp>, add:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken'
 </pre>
@@ -138,7 +143,7 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
       <p>We should also make sure we don't order over our budget, especially by
       splashing out on truffles. Add the following to
       <samp>[env=BUDGET]</samp>:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=truffle: this &gt; 25;
         namelist:side_order: this &gt;= 10
 </pre>
@@ -245,7 +250,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
 
       <p>Open the metadata file in a text editor, and add the following to the
       <samp>[namelist:pizza_order=no_mushrooms]</samp> metadata section:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=truffle: .false.
 </pre>
 
@@ -279,7 +284,7 @@ trigger=namelist:pizza_order=truffle: .false.
 
       <p>We can see this by replacing the <var>env=BUDGET</var> trigger
       with:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=truffle: this &gt; 25;
         namelist:side_order: this &gt;= 10;
         namelist:pizza_order=pizza_type: this &gt;= 5
@@ -320,7 +325,7 @@ trigger=namelist:pizza_order=truffle: this &gt; 25;
 
       <p>Add a new variable in the metadata by adding these lines to the
       metadata file:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [namelist:pizza_order=dip_type]
 values='Garlic','Sour Cream','Salsa','Brown Sauce','Mustard'
 </pre>
@@ -331,7 +336,7 @@ values='Garlic','Sour Cream','Salsa','Brown Sauce','Mustard'
 
       <p>We should add a trigger expression as well - replace the
       <samp>[namelist:pizza_order=pizza_type]</samp> trigger with:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
         namelist:pizza_order=dip_type

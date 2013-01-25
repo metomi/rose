@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -105,7 +110,7 @@
 
       <p>Open the Rose application file (<code>rose-app.conf</code>) in this
       directory. It should look like this:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [command]
 default = hello.exe
 
@@ -113,7 +118,6 @@ default = hello.exe
 MAX_TARGETS = 5
 LANG_JUPITER = Europan
 WORLD = Mars
-
 </pre>
     </div>
 
@@ -174,7 +178,7 @@ touch meta/rose-meta.conf
       <p>Let's provide some type information about <var>MAX_TARGETS</var>. The
       id for this variable is <var>env=MAX_TARGETS</var>, so add a section into
       the file:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
 </pre>
     </div>
@@ -183,7 +187,7 @@ touch meta/rose-meta.conf
       <h3 class="alwayshidden">Example: metadata type</h3>
 
       <p>We can specify that it's an integer by giving it a type:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
 type = integer
 </pre>
@@ -193,7 +197,7 @@ type = integer
       <h3 class="alwayshidden">Example: metadata title</h3>
 
       <p>We could also improve the way it's displayed by giving it a title:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
 title = Max target number
 type = integer
@@ -222,7 +226,7 @@ type = integer
       but we haven't ruled out choices of integer that would crash our code,
       such as negative integers. We need to restrict the number using a range.
       To do this add a range as follows:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
 range = 0:
 title = Max target number
@@ -250,12 +254,12 @@ type = integer
 
       <p>Let's now make the <var>WORLD</var> setting less ambiguous. Create a
       section in the metadata</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
 </pre>
 
       <p>Add a title and description:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
 description = Choose your target world to say hello to.
 title = World
@@ -275,7 +279,7 @@ title = World
       <p>We'll decide to be harsh about grammar and insist that the first
       letter of <var>WORLD</var> must be capitalised. To do this, we can use a
       very simple regular expression by adding a pattern:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
 description = Choose your target world to say hello to.
 pattern = ^[A-Z]
@@ -294,7 +298,8 @@ title = World
       describing the error. There should be some error icons in the page list
       as well.</p>
 
-      <p>You can change the value back to fix it.</p>
+      <p>You can change the value back to fix it (try using <kbd>Undo</kbd>
+      or <kbd>Ctrl-Z</kbd> in the config editor).</p>
     </div>
 
     <div class="slide">
@@ -303,7 +308,7 @@ title = World
       <p>Alternatively, we could just give a list of valid world names - this
       means we won't need a regular expression or any other type information.
       Let's remove the pattern and add a list of values:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
 description = Choose your target world to say hello to.
 title = World
@@ -327,9 +332,9 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 
       <p>Looking at the other variable in the configuration, it doesn't appear
       as if we really need a Jupiter language <var>LANG_JUPITER</var> set when
-      <var>WORLD</var> is not <samp>Jupiter</samp>. Let's add a trigger to
-      automatically handle this:</p>
-      <pre>
+      <var>WORLD</var> is not <samp>Jupiter</samp>. Let's add a
+      <samp>trigger</samp> to automatically handle this:</p>
+      <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
 description = Choose your target world to say hello to.
 title = World
@@ -397,7 +402,7 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 
       <p>Let's add some proper help for <var>LANG_JUPITER</var> - Jovian
       linguistics are notoriously difficult. Add:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=LANG_JUPITER]
 help = This variable controls which language to use when saying hello
      = to Jupiter.
@@ -421,7 +426,7 @@ help = This variable controls which language to use when saying hello
 
       <p>Let's improve the look of the <code>page</code> by adding metadata for
       the section:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env]
 description = Hello Environment
 help = These environment variables provide overrides for the hello.f90 program.
@@ -445,7 +450,7 @@ title = Environment
       <p>We can also swap variables in and out of pages, regardless of whether
       they belong in the <code>env</code> application section or not. Let's
       move <var>LANG_JUPITER</var>. Add a namespace (<var>ns</var>):</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=LANG_JUPITER]
 help = This variable controls which language to use when saying hello
      = to Jupiter.
@@ -472,7 +477,7 @@ ns = languages
       <p>Sometimes just having help or descriptions isn't enough, or there's a
       more relevant resource page on the Web - in this case you can add a url
       help:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [env=LANG_JUPITER]
 help = This variable controls which language to use when saying hello
      = to Jupiter.

@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -85,7 +90,7 @@
 
       <p>This example supposes:</p><img class="r-floater" src=
       "http://images1.wikia.nocookie.net/__cb20080808224861/patrickobrian/images/0/0e/Master_commander_hms_surpri.jpg"
-      width="30%" alt="'HMS Surprise' replica tall ship" />
+      width="30%" alt="'HMS Surprise' tall ship" />
 
       <ul class="incremental">
         <li>We're on a sailing ship, making a passage</li>
@@ -249,6 +254,18 @@ mkdir app/navigate
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">App Explanation</h3>
+
+      <p>This new directory is the container for our app configuration. It
+      could hold a Rose configuration file, other files within an optional
+      <samp>file/</samp> subdirectory, scripts in a <samp>bin/</samp>
+      directory, and more.</p>
+
+      <p>In our example we'll only need to add a Rose configuration file,
+      <samp>rose-app.conf</samp>, inside it.</p>
+    </div>
+
+    <div class="slide">
       <h3>Add an App Configuration</h3>
 
       <p>We need to cover the following inputs:</p>
@@ -271,6 +288,9 @@ mkdir app/navigate
 
       <p>We've decided we'll setup the environment and the
       <samp>position</samp> file in the suite, so ignore them for now.</p>
+
+      <p>We'll now create our Rose configuration file for the
+      <samp>navigate</samp> app.</p>
     </div>
 
     <div class="slide">
@@ -284,7 +304,7 @@ touch app/navigate/rose-app.conf
 
       <p>Now open it in a text editor and paste in the following
       configuration:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [command]
 default = dead_reckoning.exe
 
@@ -299,8 +319,18 @@ l_verbose = .true.
     <div class="slide">
       <h3 class="alwayshidden">Add an App Configuration Explained</h3>
 
+      <p>As with most app configs, this describes how to run a Unix command -
+      in this case, a <samp>dead_reckoning.exe</samp> executable.</p>
+
       <p>When the app is run, this will create our <samp>report.nl</samp> file
-      with the namelist inside, and invoke <samp>dead_reckoning.exe</samp>.</p>
+      with this inside:</p>
+      <pre>
+&amp;report_nl
+l_verbose=.true.,
+/
+</pre>
+
+      <p>It will then invoke <samp>dead_reckoning.exe</samp>.</p>
     </div>
 
     <div class="slide">
@@ -311,6 +341,7 @@ l_verbose = .true.
       <pre class="shell">
 rose config-dump
 </pre>
+
       <p>This prettifies the format by handling whitespace and sorting in a
       consistent way.</p>
     </div>
@@ -318,7 +349,18 @@ rose config-dump
     <div class="slide">
       <h3 id="build">Add a Build Application</h3>
 
-      <p>We need to add an <samp>fcm_make</samp> application.</p>
+      <p>We need to add an <samp>fcm_make</samp> application, in order to
+      compile <samp>src/dead_reckoning.f90</samp> into an executable that our
+      <samp>navigate</samp> app can call.</p>
+
+      <p>Rose does some under-the-hood magic by default for apps whose name
+      begins with <samp>fcm_make</samp>. This means that we don't need to
+      instruct Rose how to invoke <code>fcm make</code> explicitly, so our app
+      config will be minimal.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Add a Build Application - directory</h3>
 
       <p>Create a directory <samp>fcm_make_navigate/</samp> in the
       <samp>app/</samp> directory:</p>
@@ -336,11 +378,13 @@ touch app/fcm_make_navigate/rose-app.conf
     <div class="slide">
       <h3>Add a Build Configuration</h3>
 
-      <p>Unlike <samp>navigate</samp>, we don't need anything in the
-      <samp>rose-app.conf</samp>.</p>
+      <p>Unlike <samp>navigate</samp>, we don't need to put anything in the
+      <samp>rose-app.conf</samp> configuration - Rose already knows how to run
+      <code>fcm</code>.</p>
 
-      <p>We do need a build configuration, so create a <samp>file/</samp>
-      directory under <samp>app/fcm_make_navigate/</samp>:</p>
+      <p>However, we do need a configuration for <code>fcm</code> to read, so
+      create a <samp>file/</samp> directory under
+      <samp>app/fcm_make_navigate/</samp>:</p>
       <pre class="shell">
 mkdir app/fcm_make_navigate/file
 </pre>
@@ -409,11 +453,11 @@ dead_reckoning.f90
       <ul class="incremental">
         <li>the source code, in <samp>src/dead_reckoning.f90</samp>.</li>
 
-        <li>the configuration for the source code,
-        <samp>app/navigate/</samp>.</li>
-
         <li>the configuration for the build of the source code,
         <samp>app/fcm_make_navigate/</samp>.</li>
+
+        <li>the configuration for running the compiled source code,
+        <samp>app/navigate/</samp>.</li>
       </ul>
     </div>
 
@@ -710,11 +754,125 @@ rose suite-log-view
     </div>
 
     <div class="slide">
-      <h2 id="next-steps">Next steps</h2>
+      <h2 id="multi-cycle">More Cycling</h2>
+
+      <p>Our suite has a single cycling period of 3 hours, but we could have
+      other time definitions in the same suite. Let's add a task called
+      <samp>take_sun_sight</samp> that runs at 12 each day. This will correct
+      our latitude.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Adding Alternate Dependency</h3>
+
+      <p>Add these lines below <samp>[[dependencies]]</samp> in your
+      <samp>suite.rc</samp> file:</p>
+      <pre>
+        [[[ 12 ]]]
+            graph = """
+                navigate =&gt; take_sun_sight
+            """
+</pre>
+
+      <p>This will run after the <samp>navigate</samp> task from that cycle
+      time finishes.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="scripts">Adding a Script</h3>
+
+      <p>It isn't necessary to put all scripting in an app or in the
+      <samp>command scripting</samp> in the <samp>suite.rc</samp> - you can put
+      scripts in the <samp>bin/</samp> directory of a suite, and they will be
+      added to cylc's path.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Adding a Script (continued)</h3>
+
+      <p>Change directory to the root of your suite, and create a
+      <samp>bin/</samp> directory:</p>
+      <pre class="shell">
+mkdir bin
+</pre>
+
+      <p>Create an empty file in the <samp>bin/</samp> directory:</p>
+      <pre class="shell">
+touch bin/sun_sight
+</pre>
+
+      <p>Open this file with a text editor.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Editing a Script</h3>
+
+      <p>Paste the following text into the <samp>sun_sight</samp> file:</p>
+      <pre class="prettyprint">
+#!/usr/bin/env python
+
+import random
+import sys
+
+
+if __name__ == "__main__":
+    random.seed()
+    with open(sys.argv[1], "r") as f:
+        (lat, long) = f.read().split()
+    lat = float(lat) + random.uniform(-0.05, 0.05)
+    print "Yarr! Our corrected position be {0}, {1}".format(lat, long)
+    with open(sys.argv[1], "w") as f:
+        f.write("{0} {1}\n".format(lat, long))
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Referencing Scripts</h3>
+
+      <p>Save the file. Make it executable by running:</p>
+      <pre class="shell">
+chmod +x bin/sun_sight
+</pre>
+
+      <p>We need to reference this script explicitly in the
+      <samp>suite.rc</samp> for our <samp>take_sun_sight</samp> task - append
+      these lines to the file:</p>
+      <pre>
+    [[take_sun_sight]]
+        command scripting = "sun_sight $CYLC_SUITE_SHARE_PATH/position"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 id="multi-cycle-results">Results</h3>
+
+      <p>Run the suite by invoking:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+
+      <p>Our extra task should run at <samp>2013060112</samp> and
+      <samp>2013060212</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="summary-multi-cycle">Summary</h3>
+
+      <p>In this part we have:</p>
+
+      <ul class="incremental">
+        <li>added a task with a different cycling period</li>
+
+        <li>added a script in <samp>bin/</samp></li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="next-steps">Next Steps</h2>
 
       <p>You may want to experiment with adding metadata to your
       <samp>navigate</samp> app, following the approach in the <a href=
-      "rose-conf-meta-dev.html">Metadata Development Guide</a>.</p>
+      "rose-rug-metadata-tutorial.html">Metadata Development Guide</a>.</p>
     </div>
 
     <div class="slide">
