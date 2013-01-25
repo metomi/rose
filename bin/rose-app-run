@@ -39,6 +39,8 @@
 #     4. Invoke the command specified in [command]default.
 #
 # OPTION
+#     --app-mode=MODE
+#         Run a builtin application identified by MODE.
 #     --config=DIR; -C DIR
 #         Specify the configuration directory of the application. (default=$PWD)
 #     --command-key=KEY; -c KEY
