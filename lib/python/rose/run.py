@@ -38,6 +38,7 @@ from rose.scheme_handler import SchemeHandlersManager
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
 import socket
+import shlex
 import shutil
 import sys
 import tarfile
@@ -224,11 +225,17 @@ class Runner(object):
             rose.config.load(source, config)
 
         # Optional configuration files
+        opt_conf_keys = []
+        opt_conf_keys_env_name = "ROSE_" + self.NAME.upper() + "_OPT_CONF_KEYS"
+        opt_conf_keys_env = os.getenv(opt_conf_keys_env_name)
+        if opt_conf_keys_env:
+            opt_conf_keys += shlex.split(opt_conf_keys_env)
         if opts.opt_conf_keys:
-            for key in opts.opt_conf_keys:
-                source_base = "rose-" + self.CONF_NAME + "-" + key + ".conf"
-                source = os.path.join(conf_dir, "opt", source_base)
-                rose.config.load(source, config)
+            opt_conf_keys += opts.opt_conf_keys
+        for key in opt_conf_keys:
+            source_base = "rose-" + self.CONF_NAME + "-" + key + ".conf"
+            source = os.path.join(conf_dir, "opt", source_base)
+            rose.config.load(source, config)
 
         # Optional defines
         # N.B. In theory, we should write the values in "opts.defines" to

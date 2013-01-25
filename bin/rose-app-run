@@ -62,6 +62,9 @@
 #         Increment verbosity.
 #
 # ENVIRONMENT VARIABLES
+#     optional ROSE_APP_OPT_CONF_KEYS
+#         Each KEY in this space delimited list switches on an optional
+#         configuration.
 #     optional ROSE_FILE_INSTALL_ROOT
 #         If specified, change to the specified directory to install files.
 #-------------------------------------------------------------------------------
