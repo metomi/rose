@@ -32,6 +32,8 @@ Changes that have significant impact on user experience.
 
 Changes that are worth mentioning.
 
+\#398: rosie go: disable the suite delete functionality if current user does not own the suite.
+
 \#393: rosie go, rosie ls: recover from checked out deleted suites.
 
 \#388: rose suite-run, rose app-run:
