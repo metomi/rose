@@ -71,11 +71,12 @@ class RoseAnaTaskUtil(TaskUtilBase):
                 method_paths.append(item)
         
         # Initialise the analysis engine
-        engine = Analyse(config, opts, method_paths, reporter=self.event_handler, popen=self.popen)
+        engine = Analyse(config, opts, method_paths, 
+                         reporter=self.event_handler, popen=self.popen)
         
         # Run the analysis
         num_failed, tasks = engine.analyse()
-        if num_failed is not 0:
+        if num_failed != 0:
             raise TestsFailedException(num_failed)
 
 class DataLengthError(Exception):
@@ -115,10 +116,10 @@ class TestsFailedException(Exception):
     """Exception raised if any rose-ana comparisons fail."""
     
     def __init__(self, num_failed):
-        self.num_failed = num_failed
+        self.rc = num_failed
     
     def __repr__(self):
-        return "%s tests did not pass" % (self.num_failed)
+        return "%s tests did not pass" % (self.rc)
 
     __str__ = __repr__
 

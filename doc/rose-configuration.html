@@ -1475,13 +1475,14 @@ meta = my-command/t123
       <li>comparison - The class name which will be called to compare the 
       resulting data from the extract command.</li>
       
-      <li>extract - Either the class name which should be called to extract data from the
-      files to be compared, or a system command which will be called to
-      extract or compare the files. In the latter case, the tokens 
-      {resultfile} and {kgo1file} map to the values defined in the 
-      configuration file. The token {file} will result in the command being
-      called twice, once on {resultfile} and once on {kgo1file}. Some
-      extraction classes such as 'OutputGrepper' require additional 
+      <li>extract - Either the class name which should be called to extract 
+      data from the files to be compared, or a system command which will be 
+      called to extract or compare the files. In the latter case, the tokens 
+      <var>{resultfile}</var> and <var>{kgo1file}</var> map to the values 
+      defined in the configuration file. The token <var>{file}</var> will 
+      result in the command being called twice, once on <var>{resultfile}</var> 
+      and once on  <var>{kgo1file}</var>. Some extraction classes such as 
+      <kbd>OutputGrepper</kbd> require additional 
       information about how to extract the data. This should be placed
       after the class name, separated from it by a colon.</li>
       
@@ -1505,7 +1506,7 @@ meta = my-command/t123
     </ul>
 
     <p>For example:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 [Compare initial norms]
 resultfile = $OUTPUT_DIR/fort6.pe0
 kgo1file = /path/to/kgo/fort6.pe0
