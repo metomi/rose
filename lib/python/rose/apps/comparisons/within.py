@@ -20,7 +20,7 @@
 """Compare one list of numbers is within a tolerance of a second."""
 
 import re
-from rose.ana import DataLengthError
+from rose.apps.rose_ana import DataLengthError
 
 OUTPUT_STRING = "%s %s%% %s %s: File %s c.f. %s"
 PASS = "<="

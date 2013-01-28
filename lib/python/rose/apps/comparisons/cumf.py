@@ -19,7 +19,7 @@
 #-----------------------------------------------------------------------------
 """Compare two UM output files using cumf."""
 
-from rose.ana import DataLengthError
+from rose.apps.rose_ana import DataLengthError
 import re
 
 DIFF_INDEX = { "#" : 10, 

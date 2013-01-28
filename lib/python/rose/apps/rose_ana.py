@@ -48,7 +48,7 @@ USRCOMPARISON_DIRNAME = "comparisons"
 USRCOMPARISON_EXT = ".py"
 
 
-class RoseAnaTaskUtil(BuiltinApp):
+class RoseAnaApp(BuiltinApp):
 
     """Run rosa ana as an application."""
 
@@ -319,7 +319,7 @@ class Analyse(object):
             sys.path.insert(0, os.path.abspath(directory))
             try:
                 modules.append(__import__(comparison_name))
-            except Exception as e:
+            except ImportError as e:
                 self.reporter(e)
             sys.path.pop(0)
         modules.sort()
