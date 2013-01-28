@@ -49,11 +49,13 @@
 #     --diffsource=SOURCE, -d SOURCE
 #         Specify a source tree to add to the trunk as a branch. This sets the
 #         variable URL_<project>_DIFF. Multiple branches can be added by
-#         successive uses of this option.
+#         successive uses of this option. The first source tree must be a 
+#         working copy.
 #     --source=SOURCE, -s SOURCE
 #         Specify a source tree to run as the trunk. This sets the variable
 #         URL_<project>. Trunks for different projects can be set by using
-#         multiple --source arguments.
+#         multiple --source arguments. The first source tree must be a 
+#         working copy.
 #     --task=TASK, -t TASK
 #         Specify a task name or group to run. This sets the variable RUN_NAMES
 #         which is a Python list of jobs (or groups of jobs) to run.
