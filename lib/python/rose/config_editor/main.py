@@ -108,7 +108,6 @@ class MainController(object):
              rose.META_PROP_TYPE:
              rose.macros.value.ValueChecker}
         self.metadata_off = False
-
         # Load the top configuration directory
         self.data = rose.config_editor.loader.ConfigDataManager(
                                 self.util,
@@ -222,7 +221,11 @@ class MainController(object):
                    (rose.config_editor.TOOLBAR_VALIDATE,
                     'gtk.STOCK_DIALOG_QUESTION'),
                    (rose.config_editor.TOOLBAR_TRANSFORM,
-                    'gtk.STOCK_CONVERT')],
+                    'gtk.STOCK_CONVERT'),
+                   (rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+                    'gtk.STOCK_DIRECTORY'),
+                   (rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+                    'rose-gtk-scheduler')],
                 sep_on_name=[rose.config_editor.TOOLBAR_SAVE,
                              rose.config_editor.TOOLBAR_BROWSE,
                              rose.config_editor.TOOLBAR_REDO,
@@ -241,6 +244,10 @@ class MainController(object):
                self.handle.check_all_extra)
         assign(rose.config_editor.TOOLBAR_TRANSFORM,
                self.handle.transform_default)
+        assign(rose.config_editor.TOOLBAR_VIEW_OUTPUT, 
+               self.handle.launch_output_viewer )
+        assign(rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+               self.handle.launch_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
                                rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
@@ -260,6 +267,14 @@ class MainController(object):
         run_button.set_sensitive(
               any([c.is_top_level for c in self.data.config.values()]))
         self.toolbar.insert(run_button, -1)
+        
+        self.toolbar.set_widget_sensitive(
+              rose.config_editor.TOOLBAR_SUITE_GCONTROL, 
+              any([c.is_top_level for c in self.data.config.values()]))
+
+        self.toolbar.set_widget_sensitive(
+              rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+              any([c.is_top_level for c in self.data.config.values()]))
 
     def generate_menubar(self):
         """Link in the menu functionality and accelerators."""
@@ -322,6 +337,10 @@ class MainController(object):
                       lambda m: self.handle.launch_browser()),
                      ('/TopMenuBar/Tools/Terminal',
                       lambda m: self.handle.launch_terminal()),
+                     ('/TopMenuBar/Tools/View Output',
+                      lambda m: self.handle.launch_output_viewer()),
+                     ('/TopMenuBar/Tools/Open Suite GControl',
+                      lambda m: self.handle.launch_scheduler()),
                      ('/TopMenuBar/Page/Revert',
                       lambda m: self.revert_to_saved_data()),
                      ('/TopMenuBar/Page/Page Info',
@@ -1940,6 +1959,15 @@ def spawn_window(config_directory_path=None):
          RESOURCER.locate('etc/rose-config-edit/.gtkrc-2.0'))
     rose.gtk.util.setup_stock_icons()
     logo = RESOURCER.locate("etc/images/rose-splash-logo.png")
+    if rose.config_editor.ICON_PATH_SCHEDULER is None:
+        gcontrol_icon = None
+    else:
+        try:
+            gcontrol_icon = RESOURCER.locate(
+                                    rose.config_editor.ICON_PATH_SCHEDULER)
+        except rose.resource.ResourceError:
+            gcontrol_icon = None
+    rose.gtk.util.setup_scheduler_icon(gcontrol_icon)
     number_of_events = (get_number_of_configs(config_directory_path) *
                         rose.config_editor.LOAD_NUMBER_OF_EVENTS + 1)
     if config_directory_path is None:
@@ -1947,7 +1975,8 @@ def spawn_window(config_directory_path=None):
     else:
         title = config_directory_path.split("/")[-1]
     splash_screen = rose.gtk.util.SplashScreen(logo, title, number_of_events)
-    MainController(config_directory_path, loader_update=splash_screen.update)
+    MainController(config_directory_path, 
+                   loader_update=splash_screen.update)
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
