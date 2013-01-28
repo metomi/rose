@@ -35,6 +35,11 @@
 #     Additional options are:
 #     --app-key=KEY
 #         Specify a named application configuration.
+#     --app-mode=MODE
+#         Run a builtin application identified by MODE. Disable automatic task
+#         name association with a builtin application. The default MODE is
+#         "command" if this option is not specified and the task name cannot be
+#         automatically associated with a builtin application.
 #     --path=PATTERN, -P PATTERN
 #         Each of this specify a glob pattern for paths to prepend to the PATH
 #         environment variable. If a relative path is given, it is relative to

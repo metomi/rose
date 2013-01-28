@@ -40,7 +40,8 @@
 #
 # OPTION
 #     --app-mode=MODE
-#         Run a builtin application identified by MODE.
+#         Run a builtin application identified by MODE. The default MODE is
+#         "command".
 #     --config=DIR; -C DIR
 #         Specify the configuration directory of the application. (default=$PWD)
 #     --command-key=KEY; -c KEY

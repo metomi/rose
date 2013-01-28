@@ -233,7 +233,8 @@
     <dl>
       <dt><kbd>--app-mode=MODE</kbd></dt>
 
-      <dd>Run a builtin application identified by MODE.</dd>
+      <dd>Run a builtin application identified by MODE. The default
+      <var>MODE</var> is <kbd>command</kbd>.</dd>
 
       <dt><kbd>--config=DIR; -C DIR</kbd></dt>
 
@@ -1631,6 +1632,13 @@ environment scripting = "eval $(rose task-env)"
       <dt><kbd>--app-key=KEY</kbd></dt>
 
       <dd>Specify a named application configuration.</dd>
+
+      <dt><kbd>--app-mode=MODE</kbd></dt>
+
+      <dd>Run a builtin application identified by MODE. Disable automatic task
+      name association with a builtin application. The default <var>MODE</var>
+      is <kbd>command</kbd> if this option is not specified and the task name
+      cannot be automatically associated with a builtin application.</dd>
 
       <dt><kbd>--path=PATTERN, -P PATTERN</kbd></dt>
 
