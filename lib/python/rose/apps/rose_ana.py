@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Task Utility: "rose ana", a comparison engine for Rose."""
+"""Builtin application: "rose ana", a comparison engine for Rose."""
 
 
 # Standard Python modules
@@ -34,7 +34,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
-from rose.run import TaskUtilBase
+from rose.run import BuiltinApp
 
 WARN = -1
 PASS = 0
@@ -48,32 +48,30 @@ USRCOMPARISON_DIRNAME = "comparisons"
 USRCOMPARISON_EXT = ".py"
 
 
-class RoseAnaTaskUtil(TaskUtilBase):
+class RoseAnaTaskUtil(BuiltinApp):
 
-    """Run rosa ana as a task utility"""
-    
+    """Run rosa ana as an application."""
+
     SCHEME = "rose_ana"
-    
-    def can_handle(self, key):
-        return key.startswith(self.SCHEME)
-    
-    def run_impl_main(self, config, opts, args, uuid, work_files):
+
+    def run(self, app_runner, config, opts, args, uuid, work_files):
         """Implement the "rose ana" command"""
 
         # Get config file option for user-specified method paths
-        method_paths = [ os.path.join(os.path.dirname(__file__),
-                         USRCOMPARISON_DIRNAME) ]
+        method_paths = [os.path.join(os.path.dirname(__file__),
+                        USRCOMPARISON_DIRNAME)]
         conf = ResourceLocator.default().get_conf()
-        
+
         my_conf = conf.get_value(["rose-ana", "method-path"])
         if my_conf:
             for item in my_conf.split():
                 method_paths.append(item)
-        
+
         # Initialise the analysis engine
-        engine = Analyse(config, opts, method_paths, 
-                         reporter=self.event_handler, popen=self.popen)
-        
+        engine = Analyse(config, opts, method_paths,
+                         reporter=app_runner.event_handler,
+                         popen=app_runner.popen)
+
         # Run the analysis
         num_failed, tasks = engine.analyse()
         if num_failed != 0:
@@ -91,33 +89,33 @@ class DataLengthError(Exception):
     def __repr__(self):
         return "Mismatch in data lengths in %s (%s and %s)" % (
             self.taskname, self.resultlen, self.kgolen)
-               
+
     __str__ = __repr__
 
 
 class TaskCompletionEvent(Event):
 
     """Event for completing a comparison from AnalysisTask."""
- 
+
     def __init__(self, task):
         self.message = task.message
         self.userstatus = task.userstatus
         self.level = Event.DEFAULT
         self.type = Event.TYPE_OUT
-        
+
     def __repr__(self):
         return " %s" % (self.message)
-        
+
     __str__ = __repr__
 
 
 class TestsFailedException(Exception):
 
     """Exception raised if any rose-ana comparisons fail."""
-    
+
     def __init__(self, num_failed):
         self.rc = num_failed
-    
+
     def __repr__(self):
         return "%s tests did not pass" % (self.rc)
 
@@ -149,22 +147,22 @@ class Analyse(object):
     def analyse(self):
         """Perform comparisons given a list of tasks."""
         rc = 0
-        for task in self.tasks:  
+        for task in self.tasks:
 
             if self.check_extract(task):
             # Internal AnalysisEngine extract+comparison test
-                
+
                 # Extract data from results and from kgoX
                 task = self.do_extract(task, "result")
                 for i in range(1, task.numkgofiles + 1):
                     var = "kgo" + str(i)
                     task = self.do_extract(task, var)
-                
+
                 task = self.do_comparison(task)
             else:
             # External program(s) doing test
-                
-                # Command to run    
+
+                # Command to run
                 command = task.extract
 
                 result = re.search(r"\$file", command)
@@ -191,8 +189,9 @@ class Analyse(object):
 
                 # Run the comparison
                 task = self.do_comparison(task)
-            
-            self.reporter(TaskCompletionEvent(task), prefix="[%s]" % (task.userstatus))
+
+            self.reporter(TaskCompletionEvent(task),
+                          prefix="[%s]" % (task.userstatus))
             if task.numericstatus != PASS:
                 rc += 1
         return rc, self.tasks
@@ -213,7 +212,7 @@ class Analyse(object):
                     if module.__name__ == module_name:
                         comparison_inst = getattr(module, class_name)()
                         comparison_meth = getattr(comparison_inst, "run")(task)
-        return task    
+        return task
 
     def do_extract(self, task, var):
         """Extract the specified data."""
@@ -244,7 +243,7 @@ class Analyse(object):
             value = getattr(task, key)
             expansions[key] = value
         inputstring = inputstring.format(**expansions)
-        return inputstring  
+        return inputstring
 
     def _find_file(self, var, task):
         """Finds a file given a variable name containing the filename.
@@ -287,10 +286,11 @@ class Analyse(object):
                                     newtask.extract)
             newtask.comparison = self.config.get_value([task, "comparison"])
             newtask.tolerance = self.config.get_value([task, "tolerance"])
-            newtask.warnonfail = self.config.get_value([task, "warnonfail"]) \
-                in [ "yes", "true"]
+            newtask.warnonfail = (
+                    self.config.get_value([task, "warnonfail"]) in 
+                    ["yes", "true"])
 
-            # Allow for multiple KGO, e.g. kgo1file, kgo2file, for 
+            # Allow for multiple KGO, e.g. kgo1file, kgo2file, for
             # statistical comparisons of results
             for i in range(1, MAX_KGO_FILES):
                 kgovar = "kgo" + str(i)
@@ -303,7 +303,7 @@ class Analyse(object):
                 else:
                     break
             tasks.append(newtask)
-        self.tasks = tasks        
+        self.tasks = tasks
         return tasks
 
     def load_user_comparison_modules(self, files):
@@ -331,12 +331,12 @@ class Analyse(object):
             contents = inspect.getmembers(module, inspect.isclass)
             for obj_name, obj in contents:
                 att_name = "run"
-                if (hasattr(obj, att_name) and 
+                if (hasattr(obj, att_name) and
                     callable(getattr(obj, att_name))):
                     doc_string = obj.__doc__
                     user_methods.append((comparison_name, obj_name, att_name,
                                         doc_string))
-        self.user_methods = user_methods      
+        self.user_methods = user_methods
         return user_methods
 
     def write_config(self, filename, tasks):
@@ -355,8 +355,8 @@ class Analyse(object):
             if task.extract:
                 config.set([sectionname, "extract"], task.extract)
             if task.subextract:
-                config.set([sectionname, "extract"], task.extract + ":" + 
-                            task.subextract)            
+                config.set([sectionname, "extract"], task.extract + ":" +
+                            task.subextract)
             if task.comparison:
                 config.set([sectionname, "comparison"], task.comparison)
             if task.tolerance:
@@ -369,7 +369,7 @@ class Analyse(object):
 class AnalysisTask(object):
 
     """Class to completely describe an analysis task.
-    
+
     Attributes:
         name                    # Short description of test for the user
         resultfile              # File generated by suite
@@ -378,11 +378,11 @@ class AnalysisTask(object):
         extract                 # Extract method
         subextract              # Extract sub-type (if any)
         tolerance               # Tolerance (optional in file)
-        warnonfail              # True if failure is just a warning 
-        numkgofiles             # Number of KGO files 
+        warnonfail              # True if failure is just a warning
+        numkgofiles             # Number of KGO files
         resultdata              # Data from result file
         kgo1data                # Data from KGO file
-        ok                      # True if test didn"t fail 
+        ok                      # True if test didn"t fail
         message                 # User message
         userstatus              # User status
         numericstatus           # Numeric status
@@ -390,7 +390,7 @@ class AnalysisTask(object):
 
     def __init__(self):
 
-# Variables defined in config file  
+# Variables defined in config file
         self.name = None
         self.resultfile = None
         self.kgofile = None
@@ -399,9 +399,9 @@ class AnalysisTask(object):
         self.tolerance = None
         self.warnonfail = False
         self.numkgofiles = 0
-                                    
 
-# Variables to save settings before environment variable expansion (for 
+
+# Variables to save settings before environment variable expansion (for
 # writing back to config file, rerunning, etc)
         self.resultfileconfig = self.resultfile
         self.kgofileconfig = self.kgofile
@@ -412,13 +412,13 @@ class AnalysisTask(object):
 
 # Variables set by comparison methods
         self.ok = False
-                                    
+
         self.message = None
         self.userstatus = "UNTESTED"
         self.numericstatus = WARN
 
-# Methods for setting pass/fail/warn; all take an object of one of the 
-# success/ failure/warning classes as an argument, which all have a sensible 
+# Methods for setting pass/fail/warn; all take an object of one of the
+# success/ failure/warning classes as an argument, which all have a sensible
 # user message as the string representation of them.
     def set_failure(self, message):
         """Sets the status of the task to "FAIL"."""
@@ -444,7 +444,7 @@ class AnalysisTask(object):
 
         self.ok = True
         self.message = message
-        self.userstatus = "WARN"    
+        self.userstatus = "WARN"
         self.numericstatus = WARN
 
     def __repr__(self):

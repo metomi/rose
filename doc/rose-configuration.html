@@ -1489,44 +1489,45 @@ meta = my-command/t123
     discard).</p>
 
     <h2 id="appendix-rose-ana-config">Appendix: rose-ana configuration format</h2>
-    
-    <p>The task utility <code>rose-ana</code> reads information about which 
-    comparisons to perform from the <code>rose-app.conf</code> file for that
-    task. The first element is a human-readable name in square brackets, 
+
+    <p>The <code>rose-ana</code> builtin application reads information about
+    which comparisons to perform from the <code>rose-app.conf</code> file for
+    that task. The first element is a human-readable name in square brackets,
     followed by the following settings, one per line:</p>
-    
+
     <ul>
-      <li>comparison - The class name which will be called to compare the 
+      <li>comparison - The class name which will be called to compare the
       resulting data from the extract command.</li>
-      
-      <li>extract - Either the class name which should be called to extract 
-      data from the files to be compared, or a system command which will be 
-      called to extract or compare the files. In the latter case, the tokens 
-      <var>{resultfile}</var> and <var>{kgo1file}</var> map to the values 
-      defined in the configuration file. The token <var>{file}</var> will 
-      result in the command being called twice, once on <var>{resultfile}</var> 
-      and once on  <var>{kgo1file}</var>. Some extraction classes such as 
-      <kbd>OutputGrepper</kbd> require additional 
+
+      <li>extract - Either the class name which should be called to extract
+      data from the files to be compared, or a system command which will be
+      called to extract or compare the files. In the latter case, the tokens
+      <var>{resultfile}</var> and <var>{kgo1file}</var> map to the values
+      defined in the configuration file. The token <var>{file}</var> will
+      result in the command being called twice, once on <var>{resultfile}</var>
+      and once on  <var>{kgo1file}</var>. Some extraction classes such as
+      <kbd>OutputGrepper</kbd> require additional
       information about how to extract the data. This should be placed
       after the class name, separated from it by a colon.</li>
-      
-      <li>kgo1file - The path and name of the file containing the known good 
-      output. Environment variables and the wildcard character '*' are 
-      accepted.</li>
-      
-      <li>resultfile - The path and name of the file containing the output to 
-      be compared Environment variables and the wildcard character '*' are 
-      accepted.</li>
-      
-      <li>tolerance - For inexact comparisons such as 'Within', the tolerance 
-      should be specified using this variable. Values with a percentage sign 
-      are treated as percentages, otherwise values are treated as a range
-      either side of the known good output value. This value is optional;
-      some comparisons such as 'Exact' do not require it.</li>
 
-      <li>warnonfail - If this is set to be 'yes' a failure of the test will 
-      result in a warning rather than a failure. This value is always optional.
-      </li>
+      <li>kgo1file - The path and name of the file containing the known good
+      output. Environment variables and the wildcard character <var>*</var> are
+      accepted.</li>
+
+      <li>resultfile - The path and name of the file containing the output to be
+      compared Environment variables and the wildcard character <kbd>*</kbd> are
+      accepted.</li>
+
+      <li>tolerance - For inexact comparisons such as <kbd>Within</kbd>, the
+      tolerance should be specified using this variable. Values with a
+      percentage sign are treated as percentages, otherwise values are treated
+      as a range either side of the known good output value. This value is
+      optional; some comparisons such as <kbd>Exact</kbd> do not require
+      it.</li>
+
+      <li>warnonfail - If this is set to be <kbd>yes</kbd> a failure of the test
+      will result in a warning rather than a failure. This value is always
+      optional.</li>
     </ul>
 
     <p>For example:</p>
