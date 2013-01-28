@@ -144,6 +144,7 @@ LABEL_EDIT = "edit"
 # Loading strings
 LOAD_CONFIG = "reading    "
 LOAD_DONE = "loading GUI"
+LOAD_ERRORS = "errors: {0}"
 LOAD_METADATA = "configuring"
 LOAD_NUMBER_OF_EVENTS = 2
 LOAD_STATUSES = "checking   "
