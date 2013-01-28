@@ -26,7 +26,8 @@ from glob import glob
 import os
 import re
 import rose.config
-from rose.env import env_export, env_var_process
+from rose.env \
+        import env_export, env_var_process, UnboundEnvironmentVariableError
 from rose.config_processor import ConfigProcessorsManager
 from rose.fs_util import FileSystemUtil
 from rose.host_select import HostSelector
@@ -43,7 +44,7 @@ import shutil
 import sys
 import tarfile
 from tempfile import TemporaryFile
-from time import sleep, strftime, time
+from time import localtime, sleep, strftime, time
 from uuid import uuid4
 
 
@@ -70,12 +71,14 @@ class ConfigNotFoundError(Exception):
 class ConfigValueError(Exception):
     """An exception raised when a config value is incorrect."""
 
+    SYNTAX = "syntax"
+
     def __str__(self):
-        keys, value = self.args
+        keys, value, e = self.args
         key = keys.pop()
         if keys:
             key = "[" + "][".join(keys) + "]" + key
-        return "%s=%s: configuration value error" % (key, value)
+        return "%s=%s: configuration value error: %s" % (key, value, str(e))
 
 
 class NewModeError(Exception):
@@ -89,7 +92,9 @@ class PollTimeoutError(Exception):
     """An exception raised when time is out for polling."""
 
     def __str__(self):
-        return "Polling condition(s) not satisfied."
+        t, dt = self.args
+        return "[POLL FAIL] %s timeout after %d seconds" % (
+                strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), dt)
 
 
 class TaskAppNotFoundError(Exception):
@@ -106,6 +111,20 @@ class CommandNotDefinedEvent(Event):
 
     def __str__(self):
         return "command not defined"
+
+
+class PollEvent(Event):
+    """An event raised when polling for an application prerequisite."""
+
+    LEVEL = Event.V
+
+    def __str__(self):
+        t, test, ok = self.args
+        ok_str = "ATTEMPT"
+        if ok:
+            ok_str = "OK"
+        return "[POLL %s] %s %s" % (
+                ok_str, strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), test)
 
 
 class SuiteHostSelectEvent(Event):
@@ -374,16 +393,28 @@ class AppRunner(Runner):
         poll_all_files_value = config.get_value(["poll", "all-files"])
         poll_all_files = []
         if poll_all_files_value:
-            poll_all_files = shlex.split(poll_all_files_value)
+            try:
+                poll_all_files = shlex.split(
+                        env_var_process(poll_all_files_value))
+            except UnboundEnvironmentVariableError as e:
+                raise ConfigValueError(["poll", "all-files"],
+                                       poll_all_files_value, e)
         poll_any_files_value = config.get_value(["poll", "any-files"])
         poll_any_files = []
         if poll_any_files_value:
-            poll_any_files = shlex.split(poll_any_files_value)
+            try:
+                poll_any_files = shlex.split(
+                        env_var_process(poll_any_files_value))
+            except UnboundEnvironmentVariableError as e:
+                raise ConfigValueError(["poll", "any-files"],
+                                       poll_any_files_value, e)
         poll_file_test = None
         if poll_all_files or poll_any_files:
             poll_file_test = config.get_value(["poll", "file-test"])
             if poll_file_test and "{}" not in poll_file_test:
-                raise ConfigValueError(["poll", "file-test"], poll_file_test)
+                raise ConfigValueError(["poll", "file-test"], poll_file_test,
+                                       ConfigValueError.SYNTAX)
+        poll_delays = []
         if poll_test or poll_all_files or poll_any_files:
             # Parse something like this: delays=10,4*30s,2.5m,2*1h
             # No unit or s: seconds
@@ -398,18 +429,31 @@ class AppRunner(Runner):
                     repeat = 1
                     if "*" in value:
                         repeat, value = value.split("*", 1)
-                    if value[-1].lower() in units.keys():
                         try:
-                            value = float(value[:-1]) * units[value[-1]]
+                            repeat = int(repeat)
                         except ValueError as e:
                             raise ConfigValueError(["poll", "delays"],
-                                                   poll_delays_value)
+                                                   poll_delays_value,
+                                                   ConfigValueError.SYNTAX)
+                    unit = None
+                    if value[-1].lower() in units.keys():
+                        unit = units[value[-1]]
+                        value = value[:-1]
+                    try:
+                        value = float(value)
+                    except ValueError as e:
+                        raise ConfigValueError(["poll", "delays"],
+                                               poll_delays_value,
+                                               ConfigValueError.SYNTAX)
+                    if unit:
+                        value *= unit
                     for i in range(repeat):
                         poll_delays.append(value)
             else:
                 poll_delays = [0] # poll once without a delay
 
         # Poll
+        t_init = time()
         while poll_delays and (poll_test or poll_any_files or poll_all_files):
             poll_delay = poll_delays.pop(0)
             if poll_delay:
@@ -418,13 +462,13 @@ class AppRunner(Runner):
                 rc, out, err = self.popen.run(poll_test, shell=True,
                                               stdout=sys.stdout,
                                               stderr=sys.stderr)
-                # TODO: report result
+                self.handle_event(PollEvent(time(), poll_test, rc == 0))
                 if rc == 0:
                     poll_test = None
             any_files = list(poll_any_files)
             for file in any_files:
                 if self._poll_file(file, poll_file_test):
-                    # TODO: report poll any files succeeded
+                    self.handle_event(PollEvent(time(), "any-files", True))
                     poll_any_files = []
                     break
             all_files = list(poll_all_files)
@@ -432,11 +476,10 @@ class AppRunner(Runner):
                 if self._poll_file(file, poll_file_test):
                     poll_all_files.remove(file)
             if all_files and not poll_all_files:
-                pass # TODO: report poll all files succeeded
+                self.handle_event(PollEvent(time(), "all-files", True))
         if poll_test or poll_any_files or poll_all_files:
-            # FIXME: report: time
-            #                poll_test, poll_any_files, poll_all_files
-            raise PollTimeoutError()
+            now = time()
+            raise PollTimeoutError(now, now - t_init)
 
     def _poll_file(self, file, poll_file_test):
         ok = False
@@ -448,7 +491,7 @@ class AppRunner(Runner):
             ok = rc == 0
         else:
             ok = os.path.exists(file)
-        # TODO: report result
+        self.handle_event(PollEvent(time(), "file:" + file, ok))
         return ok
 
     def _prep(self, config, opts, args, uuid, work_files):
