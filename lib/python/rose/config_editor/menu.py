@@ -26,6 +26,8 @@ import re
 import shlex
 import subprocess
 import sys
+import urllib
+import webbrowser
 
 import pygtk
 pygtk.require('2.0')
@@ -35,8 +37,11 @@ import rose.config
 import rose.config_editor.util
 import rose.external
 import rose.gtk.run
+import rose.gtk.util
 import rose.macro
 import rose.macros
+from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_control import SuiteControl
 
 
 class MenuBar(object):
@@ -93,6 +98,8 @@ class MenuBar(object):
         <separator name="sep_run_action"/>
         <menuitem action="Browser"/>
         <menuitem action="Terminal"/>
+        <menuitem action="View Output"/>
+        <menuitem action="Open Suite GControl"/>
       </menu>
       <menu action="Page">
         <menuitem action="Add variable"/>
@@ -176,6 +183,10 @@ class MenuBar(object):
                       ('Terminal', gtk.STOCK_EXECUTE,
                        rose.config_editor.TOP_MENU_TOOLS_TERMINAL,
                        rose.config_editor.ACCEL_TERMINAL),
+                      ('View Output', gtk.STOCK_DIRECTORY,
+                       rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
+                      ('Open Suite GControl', "rose-gtk-scheduler",
+                       rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
                       ('Help', None,
                        rose.config_editor.TOP_MENU_HELP),
                       ('GUI Help', gtk.STOCK_HELP,
@@ -886,6 +897,11 @@ class Handler(object):
             self.mainwindow.launch_macro_changes_dialog(
                             config_name, macro_type, problem_list,
                             mode="validate", search_func=search)
+
+    def handle_run_scheduler(self, *args):
+        """Run the scheduler for this suite."""
+        this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
+        return SuiteControl().gcontrol(this_id)
     
     def help(self, *args):
         # Handle a GUI help request.
@@ -898,9 +914,32 @@ class Handler(object):
     def launch_browser(self):
         rose.external.launch_fs_browser(self.data.top_level_directory)
 
+    def launch_scheduler(self, *args):
+        """Run the scheduler for a suite open in config edit."""
+        this_id = self.data.top_level_name
+        return SuiteControl().gcontrol(this_id)
+        
     def launch_terminal(self):
         # Handle a launch terminal request.
         rose.external.launch_terminal()
+
+    def launch_output_viewer(self):
+        """View a suite's output, if any."""
+        suite_engine_proc = SuiteEngineProcessor.get_processor()
+        output_url = suite_engine_proc.get_suite_log_url(
+                                       self.data.top_level_name)
+        if output_url is None:
+            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
+                                     rose.config_editor.ERROR_NO_OUTPUT.format(
+                                     self.data.top_level_name))
+        else:
+            try:
+                urllib.urlopen(output_url)
+            except (AttributeError, IOError) as e:
+                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
+                                         str(e))
+            else:
+                webbrowser.open(output_url, new=True, autoraise=True)    
 
     def get_run_suite_args(self, *args):
         """Ask the user for custom arguments to suite run."""
