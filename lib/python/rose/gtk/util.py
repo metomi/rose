@@ -1332,6 +1332,19 @@ def _handle_exception(exc_class, exc_inst, tback, hook, keep_alive):
         except RuntimeError:
             pass
 
+def setup_scheduler_icon(ipath=None):
+    """Setup a 'stock' icon for the scheduler"""
+    new_icon_factory = gtk.IconFactory()
+    locator = rose.resource.ResourceLocator(paths=sys.path)
+    iname = "rose-gtk-scheduler"
+    if ipath is None:
+        new_icon_factory.add(iname, gtk.icon_factory_lookup_default(
+                                        gtk.STOCK_MISSING_IMAGE))
+    else:
+        path = locator.locate(ipath)
+        pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+        new_icon_factory.add(iname, gtk.IconSet(pixbuf))
+    new_icon_factory.add_default()
 
 def setup_stock_icons():
     """Setup any additional 'stock' icons."""

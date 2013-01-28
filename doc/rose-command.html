@@ -49,10 +49,6 @@
     <p><kbd>rose</kbd> provides the following utilities:</p>
 
     <dl>
-      <dt><a href="#rose-ana">rose ana</a></dt>
-
-      <dd>Run the given test config files through the analysis engine.</dd>
-
       <dt><a href="#rose-app-run">rose app-run</a></dt>
 
       <dd>Run an application according to its configuration.</dd>
@@ -199,24 +195,6 @@
       <dd>List the local suites.</dd>
     </dl>
 
-    <h2 id="rose-ana">rose ana</h2>
-
-    <h3>NAME</h3>
-
-    <p><kbd>rose ana</kbd></p>
-
-    <h3>SYNOPSIS</h3>
-
-    <p><kbd>rose ana FILENAMES</kbd></p>
-
-    <h3>DESCRIPTION</h3>
-
-    <p>Run the given test config files through the analysis engine.</p>
-
-    <h3>OPTIONS</h3>
-
-    <p>None so far</p>
-
     <h2 id="rose-app-run">rose app-run</h2>
 
     <h3>NAME</h3>
@@ -299,6 +277,11 @@
     <h3>ENVIRONMENT</h3>
 
     <dl>
+      <dt><kbd>optional ROSE_APP_OPT_CONF_KEYS</kbd></dt>
+
+      <dd>Each KEY in this space delimited list switches on an optional
+      configuration.</dd>
+
       <dt><kbd>optional ROSE_FILE_INSTALL_ROOT</kbd></dt>
 
       <dd>If specified, change to the specified directory to install files.</dd>
@@ -1358,6 +1341,11 @@
 
       <dd>The name of the host where the <kbd>rose suite-run</kbd> command was
       invoked.</dd>
+
+      <dt><kbd>optional ROSE_SUITE_OPT_CONF_KEYS</kbd></dt>
+
+      <dd>Each KEY in this space delimited list switches on an optional
+      configuration.</dd>
     </dl>
 
     <h3>JINJA2</h3>

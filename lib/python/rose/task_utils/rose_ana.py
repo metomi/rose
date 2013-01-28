@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Implementation of "rose ana", a comparison engine for Rose."""
+"""Task Utility: "rose ana", a comparison engine for Rose."""
 
 
 # Standard Python modules
@@ -34,6 +34,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
+from rose.run import TaskUtilBase
 
 WARN = -1
 PASS = 0
@@ -46,6 +47,37 @@ OPTIONS = ["method_path"]
 USRCOMPARISON_DIRNAME = "comparisons"
 USRCOMPARISON_EXT = ".py"
 
+
+class RoseAnaTaskUtil(TaskUtilBase):
+
+    """Run rosa ana as a task utility"""
+    
+    SCHEME = "rose_ana"
+    
+    def can_handle(self, key):
+        return key.startswith(self.SCHEME)
+    
+    def run_impl_main(self, config, opts, args, uuid, work_files):
+        """Implement the "rose ana" command"""
+
+        # Get config file option for user-specified method paths
+        method_paths = [ os.path.join(os.path.dirname(__file__),
+                         USRCOMPARISON_DIRNAME) ]
+        conf = ResourceLocator.default().get_conf()
+        
+        my_conf = conf.get_value(["rose-ana", "method-path"])
+        if my_conf:
+            for item in my_conf.split():
+                method_paths.append(item)
+        
+        # Initialise the analysis engine
+        engine = Analyse(config, opts, method_paths, 
+                         reporter=self.event_handler, popen=self.popen)
+        
+        # Run the analysis
+        num_failed, tasks = engine.analyse()
+        if num_failed != 0:
+            raise TestsFailedException(num_failed)
 
 class DataLengthError(Exception):
 
@@ -74,8 +106,21 @@ class TaskCompletionEvent(Event):
         self.type = Event.TYPE_OUT
         
     def __repr__(self):
-        return "[%s] %s" % (self.userstatus, self.message)
+        return " %s" % (self.message)
         
+    __str__ = __repr__
+
+
+class TestsFailedException(Exception):
+
+    """Exception raised if any rose-ana comparisons fail."""
+    
+    def __init__(self, num_failed):
+        self.rc = num_failed
+    
+    def __repr__(self):
+        return "%s tests did not pass" % (self.rc)
+
     __str__ = __repr__
 
 
@@ -83,19 +128,20 @@ class Analyse(object):
 
     """A comparison engine for Rose."""
 
-    def __init__(self, opts, reporter=None, popen=None):
+    def __init__(self, config, opts, method_paths, reporter=None, popen=None):
         if reporter is None:
             self.reporter = Reporter(opts.verbosity - opts.quietness)
         else:
             self.reporter = reporter
         if popen is None:
-            self.popen = RosePopener(event_handler = self.reporter)
+            self.popen = RosePopener(event_handler=self.reporter)
         else:
             self.popen = popen
         self.opts = opts
-        
+        self.config = config
+        self.load_tasks()
         modules = []
-        for path in self.opts.method_path:
+        for path in method_paths:
             for filename in glob.glob(path + "/*.py"):
                 modules.append(filename)
         self.load_user_comparison_modules(modules)
@@ -104,28 +150,29 @@ class Analyse(object):
         """Perform comparisons given a list of tasks."""
         rc = 0
         for task in self.tasks:  
+
             if self.check_extract(task):
             # Internal AnalysisEngine extract+comparison test
-
+                
                 # Extract data from results and from kgoX
                 task = self.do_extract(task, "result")
                 for i in range(1, task.numkgofiles + 1):
                     var = "kgo" + str(i)
                     task = self.do_extract(task, var)
-
+                
                 task = self.do_comparison(task)
             else:
             # External program(s) doing test
-
+                
                 # Command to run    
-                command         = task.extract
+                command = task.extract
 
                 result = re.search(r"\$file", command)
                 # If the command contains $file, it is run separately for both
                 # the KGO and the result files
                 if result:
                     # Replace $file token with resultfile or kgofile
-                    resultcommand = self._expand_tokens(command, task, 
+                    resultcommand = self._expand_tokens(command, task,
                                                         "result")
                     kgocommand = self._expand_tokens(command, task, "kgo1")
 
@@ -144,8 +191,8 @@ class Analyse(object):
 
                 # Run the comparison
                 task = self.do_comparison(task)
-                
-            self.reporter(TaskCompletionEvent(task))
+            
+            self.reporter(TaskCompletionEvent(task), prefix="[%s]" % (task.userstatus))
             if task.numericstatus != PASS:
                 rc += 1
         return rc, self.tasks
@@ -182,7 +229,7 @@ class Analyse(object):
     def _run_command(self, command):
         """Run an external command using rose.popen."""
         output, stderr = self.popen.run_ok(command, shell=True)
-        output = "".join(output).splitlines()      
+        output = "".join(output).splitlines()
         return output
 
     def _expand_tokens(self, inputstring, task, var=None):
@@ -215,7 +262,7 @@ class Analyse(object):
                 setattr(task, filevar, filenames[0])
         return task
 
-    def load_tasks(self, files):
+    def load_tasks(self):
         """Loads AnalysisTasks from files.
 
         Given a list of files, return AnalysisTasks generated from those files.
@@ -224,38 +271,38 @@ class Analyse(object):
         """
 
         tasks = []
-        for filename in files:
-            config = rose.config.load(filename)
-            for task in config.value.keys():
-                newtask = AnalysisTask()
-                newtask.name = task
-                newtask.resultfile = config.get_value([task, "resultfile"])
-                newtask = self._find_file("result", newtask)
-                newtask.extract = config.get_value([task, "extract"])
-                result = re.search(r":", newtask.extract)
-                if result:
-                    newtask.subextract = re.sub(r".*:\s*", r"", 
-                                        newtask.extract)
-                    newtask.extract = re.sub(r"\s*:.*", r"", 
-                                        newtask.extract)
-                newtask.comparison = config.get_value([task, "comparison"])
-                newtask.tolerance = config.get_value([task, "tolerance"])
-                newtask.warnonfail = config.get_value([task, "warnonfail"]) \
-                    in [ "yes", "true"]
+        for task in self.config.value.keys():
+            if task is "env":
+                continue
+            newtask = AnalysisTask()
+            newtask.name = task
+            newtask.resultfile = self.config.get_value([task, "resultfile"])
+            newtask = self._find_file("result", newtask)
+            newtask.extract = self.config.get_value([task, "extract"])
+            result = re.search(r":", newtask.extract)
+            if result:
+                newtask.subextract = re.sub(r".*:\s*", r"",
+                                    newtask.extract)
+                newtask.extract = re.sub(r"\s*:.*", r"",
+                                    newtask.extract)
+            newtask.comparison = self.config.get_value([task, "comparison"])
+            newtask.tolerance = self.config.get_value([task, "tolerance"])
+            newtask.warnonfail = self.config.get_value([task, "warnonfail"]) \
+                in [ "yes", "true"]
 
-                # Allow for multiple KGO, e.g. kgo1file, kgo2file, for 
-                # statistical comparisons of results
-                for i in range(1, MAX_KGO_FILES):
-                    kgovar = "kgo" + str(i)
-                    kgofilevar = kgovar + "file"
-                    if config.get([task, kgofilevar]):
-                        tempvar = config.get([task, kgofilevar])[:]
-                        setattr(newtask, kgofilevar, tempvar)
-                        newtask.numkgofiles += 1
-                        newtask = self._find_file(kgovar, newtask)
-                    else:
-                        break
-                tasks.append(newtask)
+            # Allow for multiple KGO, e.g. kgo1file, kgo2file, for 
+            # statistical comparisons of results
+            for i in range(1, MAX_KGO_FILES):
+                kgovar = "kgo" + str(i)
+                kgofilevar = kgovar + "file"
+                if self.config.get([task, kgofilevar]):
+                    tempvar = self.config.get([task, kgofilevar])[:]
+                    setattr(newtask, kgofilevar, tempvar)
+                    newtask.numkgofiles += 1
+                    newtask = self._find_file(kgovar, newtask)
+                else:
+                    break
+            tasks.append(newtask)
         self.tasks = tasks        
         return tasks
 
@@ -285,9 +332,9 @@ class Analyse(object):
             for obj_name, obj in contents:
                 att_name = "run"
                 if (hasattr(obj, att_name) and 
-                    callable(getattr(obj,att_name))):
+                    callable(getattr(obj, att_name))):
                     doc_string = obj.__doc__
-                    user_methods.append((comparison_name, obj_name, att_name, 
+                    user_methods.append((comparison_name, obj_name, att_name,
                                         doc_string))
         self.user_methods = user_methods      
         return user_methods
@@ -302,18 +349,18 @@ class Analyse(object):
                 config.set([sectionname, "resultfile"], task.resultfileconfig)
             for i in range(1, task.numkgofiles + 1):
                 origvar = "kgo" + str(i) + "fileconfig"
-                valvar  = "kgo" + str(i) + "file"
+                valvar = "kgo" + str(i) + "file"
                 if hasattr(task, origvar):
-                    config.set([sectionname, valvar], getattr(task, origvar) )
+                    config.set([sectionname, valvar], getattr(task, origvar))
             if task.extract:
                 config.set([sectionname, "extract"], task.extract)
             if task.subextract:
-                config.set([sectionname, "extract"], task.extract + ":" +
+                config.set([sectionname, "extract"], task.extract + ":" + 
                             task.subextract)            
             if task.comparison:
                 config.set([sectionname, "comparison"], task.comparison)
             if task.tolerance:
-                config.set([sectionname,"tolerance"], task.tolerance)
+                config.set([sectionname, "tolerance"], task.tolerance)
             if task.warnonfail:
                 config.set([sectionname, "warnonfail"], "true")
         rose.config.dump(config, filename)
@@ -415,51 +462,3 @@ def data_from_regexp(regexp, filename):
             numbers.append(result.group(1))
     return numbers
 
-
-def main():
-    """Implement the "rose ana" command"""
-
-    # Get config file option for user-specified method paths
-    method_paths = [ os.path.join(os.path.dirname(__file__), 
-                     USRCOMPARISON_DIRNAME) ]
-    conf = ResourceLocator.default().get_conf()
-    my_conf = conf.get_value(["rose-ana", "method-path"])
-    if my_conf:
-        for item in my_conf.split():
-            method_paths.append(item)
-
-    # Process options
-    opt_parser = RoseOptionParser()
-    option_keys = OPTIONS
-    opt_parser.add_my_options(*option_keys)
-    opts, args = opt_parser.parse_args()
-    if opts.method_path:
-        opts.method_path += method_paths
-    else:
-        opts.method_path = method_paths
-
-    # Get filenames of .test files from command line
-    # Maybe replace with proper options?
-    files = args
-
-    # Initialise the analysis engine
-    engine = Analyse(opts)
-
-    # Load analysis tasks from files
-    engine.load_tasks(files)
-    
-    # Run the analysis
-    rc = 0
-    if opts.debug_mode:
-        rc, tasks = engine.analyse()
-    else:
-        try:
-            rc, tasks = engine.analyse()
-        except Exception as e:
-            engine.reporter(e)
-            sys.exit(1)
-            
-    sys.exit(rc)
-
-if __name__ == "__main__":
-    main()

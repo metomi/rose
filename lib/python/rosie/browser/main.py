@@ -81,11 +81,14 @@ class MainWindow(gtk.Window):
         self.config = locator.get_conf()
         icon_path = locator.locate(rosie.browser.ICON_PATH_WINDOW)
         self.set_icon_from_file(icon_path)
-        try:
-            self.sched_icon_path = locator.locate(
-                                           rosie.browser.ICON_PATH_SCHEDULER)
-        except ResourceError:
+        if rosie.browser.ICON_PATH_SCHEDULER is None:
             self.sched_icon_path = None
+        else:
+            try:
+                self.sched_icon_path = locator.locate(
+                                               rosie.browser.ICON_PATH_SCHEDULER)
+            except ResourceError:
+                self.sched_icon_path = None
         self.query_rows = None
         self.adv_controls_on = rosie.browser.SHOULD_SHOW_ADVANCED_CONTROLS
         splash_updater(rosie.browser.SPLASH_LOADING.format(
@@ -273,11 +276,22 @@ class MainWindow(gtk.Window):
         branch_index = result_columns.index("branch")
         rev_index = result_columns.index("revision")
         self.display_box._result_info = {}
+        address = "/TopMenuBar/View/View _{0}_".format("branch")
+        branch_widget = self.menubar.uimanager.get_widget(address)
+        displayed_branch = False
+        
         for result_map in result_maps:
             results.append([])
             idx = result_map["idx"]
             branch = result_map["branch"]
             revision = result_map["revision"]
+            
+            if not displayed_branch:
+                if branch_widget is not None:
+                    if branch != "trunk":
+                        branch_widget.set_active(True)
+                        displayed_branch = True
+
             if is_local:
                 local_status = result_map.pop("local")
             else:
@@ -1048,6 +1062,8 @@ class MainWindow(gtk.Window):
         delete_working_item.set_sensitive(status == rosie.ws_client.STATUS_OK)
         delete_item = uimanager.get_widget("/Popup/Delete")
         delete_item.connect("activate", self.handle_delete)
+        owner = self.display_box._get_treeview_path_owner(path)
+        delete_item.set_sensitive(owner == os.getlogin())
         source_item = uimanager.get_widget("/Popup/View Web")
         source_item.connect("activate", self.handle_view_web)
         output_item = uimanager.get_widget("/Popup/View Output")
