@@ -92,9 +92,12 @@ class PollTimeoutError(Exception):
     """An exception raised when time is out for polling."""
 
     def __str__(self):
-        t, dt = self.args
-        return "[POLL FAIL] %s timeout after %d seconds" % (
-                strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), dt)
+        t, dt, items = self.args
+        items_str = ""
+        for item in items:
+            items_str += "\n* " + item
+        return "%s poll timeout after %d seconds:%s" % (
+                strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), dt, items_str)
 
 
 class TaskAppNotFoundError(Exception):
@@ -477,9 +480,17 @@ class AppRunner(Runner):
                     poll_all_files.remove(file)
             if all_files and not poll_all_files:
                 self.handle_event(PollEvent(time(), "all-files", True))
-        if poll_test or poll_any_files or poll_all_files:
+        failed_items = []
+        if poll_test:
+            failed_items.append("test")
+        if poll_any_files:
+            failed_items.append("any-files")
+        if poll_all_files:
+            failed_items.append("all-files:" +
+                                self.popen.list_to_shell_str(poll_all_files))
+        if failed_items:
             now = time()
-            raise PollTimeoutError(now, now - t_init)
+            raise PollTimeoutError(now, now - t_init, failed_items)
 
     def _poll_file(self, file, poll_file_test):
         ok = False

@@ -30,15 +30,18 @@ any-files=file3 file4
 test=test -e file5
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 9
+tests 12
 #-------------------------------------------------------------------------------
 # Timeout test 1.
 TEST_KEY=$TEST_KEY_BASE-timeout-1
 setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" \
-    '[FAIL] [POLL FAIL].*timeout after.*seconds' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err.0" \
+    '[FAIL] .*poll timeout after.*seconds' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err.1" '* test' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err.2" '* any-files' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err.3" '* all-files:file1 file2' "$TEST_KEY.err"
 teardown
 #-------------------------------------------------------------------------------
 # OK test 1.
