@@ -185,7 +185,7 @@ class Runner(object):
 
         # Optional configuration files
         opt_conf_keys = []
-        opt_conf_keys_env_name = "ROSE_" + self.NAME.upper() + "_OPT_CONF_KEYS"
+        opt_conf_keys_env_name = "ROSE_" + self.CONF_NAME.upper() + "_OPT_CONF_KEYS"
         opt_conf_keys_env = os.getenv(opt_conf_keys_env_name)
         if opt_conf_keys_env:
             opt_conf_keys += shlex.split(opt_conf_keys_env)
