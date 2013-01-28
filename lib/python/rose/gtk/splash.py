@@ -109,6 +109,7 @@ class SplashScreenUpdaterThread(threading.Thread):
         return False
 
 if __name__ == "__main__":
+    sys.path.append(os.getenv('ROSE_HOME'))
     splash_screen = rose.gtk.util.SplashScreen(*sys.argv[1:])
     stop_event = threading.Event()
     update_thread = SplashScreenUpdaterThread(splash_screen, stop_event, sys.stdin)
