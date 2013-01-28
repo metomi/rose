@@ -513,20 +513,22 @@ class MainController(object):
         # Related pages
         see_also = ''
         for section_name in [s for s in sections if s.startswith('namelist')]:
-            last_part = section_name.split(':')[-1]
-            search_name = section_name
-            while re.search('\([\d:, ]+\)$', search_name):
-                search_name = re.sub('\([\d:, ]+\)$', '', search_name)
+            no_num_name = rose.macro.REC_ID_STRIP_DUPL.sub("", section_name)
+            no_mod_name = rose.macro.REC_ID_STRIP.sub("", section_name)
+            ok_names = [section_name, no_num_name + "(:)",
+                        no_mod_name + "(:)"]
+            if no_mod_name != no_num_name:
+                # There's a modifier in the section name.
+                ok_names.append(no_num_name)
             for section, variables in config_data.vars.now.items():
                 if not section.startswith(rose.SUB_CONFIG_FILE_DIR):
                     continue
                 for variable in variables:
                     if variable.name != rose.FILE_VAR_SOURCE:
                         continue
-                    if (variable.value in [search_name, last_part] or
-                        search_name in variable.value):
+                    var_values = rose.variable.array_split(variable.value)
+                    if set(ok_names) & set(var_values):
                         var_id = variable.metadata['id']
-                        sect = self.util.get_section_option_from_id(var_id)[0]
                         see_also += ", " + var_id
         see_also = see_also.replace(", ", "", 1)
         # Icon
