@@ -34,6 +34,8 @@ Changes that are worth mentioning.
 
 \#398: rosie go: disable the suite delete functionality if current user does not own the suite.
 
+\#396: rose ana: command replaced by a task utility `rose_ana`.
+
 \#393: rosie go, rosie ls: recover from checked out deleted suites.
 
 \#388: rose suite-run, rose app-run:
