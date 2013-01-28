@@ -124,6 +124,7 @@ class CustomButton(gtk.Button):
     def set_tip_text(self, new_text):
         self.set_tooltip_text(new_text)
 
+
 class CustomExpandButton(gtk.Button):
 
     """Custom button for expanding/hiding something"""
@@ -212,6 +213,7 @@ class CustomExpandButton(gtk.Button):
             self.expander_function(set_visibility=not self.minimised)                                
         self.set_stock_id(self.stock_id)
 
+
 class CustomMenuButton(gtk.MenuToolButton):
 
     """Custom wrapper for the gtk Menu Tool Button."""
@@ -246,6 +248,7 @@ class CustomMenuButton(gtk.MenuToolButton):
         button_menu.show()
         self.set_menu(button_menu)
         
+
 class ToolBar(gtk.Toolbar):
 
     """An easier-to-use gtk.Toolbar."""
@@ -499,11 +502,16 @@ class SplashScreen(gtk.Window):
     PADDING = 10
     SUB_PADDING = 5
     FONT_DESC = "8"
+    PULSE_FRACTION = 0.05
+    TIME_WAIT_FINISH = 500  # Milliseconds.
+    TIME_IDLE_BEFORE_PULSE = 3000  # Milliseconds.
+    TIME_INTERVAL_PULSE = 50  # Milliseconds.
 
     def __init__(self, logo_path, title, total_number_of_events):
         super(SplashScreen, self).__init__()
         self.set_title(title)
         self.set_decorated(False)
+        self.stopped = False
         try:
             locator = rose.resource.ResourceLocator(paths=sys.path)
             icon_path = locator.locate('etc/images/rose-icon-trim.png')
@@ -523,10 +531,14 @@ class SplashScreen(gtk.Window):
         image_hbox.show()
         image_hbox.pack_start(image, expand=False, fill=True)
         main_vbox.pack_start(image_hbox, expand=False, fill=True)
+        self._is_progress_bar_pulsing = False
+        self._progress_fraction = 0.0
         self.progress_bar = gtk.ProgressBar()
+        self.progress_bar.set_pulse_step(self.PULSE_FRACTION)
         self.progress_bar.show()
         self.progress_bar.modify_font(pango.FontDescription(self.FONT_DESC))
         self.progress_bar.set_ellipsize(pango.ELLIPSIZE_END)
+        self._progress_message = None
         self.event_count = 0.0
         self.total_number_of_events = float(total_number_of_events)
         progress_hbox = gtk.HBox(spacing=self.SUB_PADDING)
@@ -541,7 +553,7 @@ class SplashScreen(gtk.Window):
         while gtk.events_pending():
             gtk.main_iteration()
 
-    def update(self, event, data_name):
+    def update(self, event, data_name, no_progress=False):
         """Show text corresponding to an event."""
         text = data_name + " - " + event
         if self.total_number_of_events == 0:
@@ -549,17 +561,46 @@ class SplashScreen(gtk.Window):
         else:
             fraction = min([1.0, self.event_count /
                                  self.total_number_of_events])
-        self.progress_bar.set_fraction(fraction)
+        self._stop_pulse()
+        if not no_progress:
+            gobject.idle_add(self.progress_bar.set_fraction, fraction)
+            self._progress_fraction = fraction
+            self.event_count += 1.0
         self.progress_bar.set_text(text)
-        self.event_count += 1.0
+        self._progress_message = text
+        gobject.timeout_add(self.TIME_IDLE_BEFORE_PULSE,
+                            self._start_pulse, fraction, text)
         while gtk.events_pending():
             gtk.main_iteration()
-        if fraction == 1.0:
-            self.finish()
+        if fraction == 1.0 and not no_progress:
+            gobject.timeout_add(self.TIME_WAIT_FINISH,
+                                lambda: self.finish())
+
+    def _start_pulse(self, idle_fraction, idle_message):
+        """Start the progress bar pulsing (moving side-to-side)."""
+        if (self._progress_message != idle_message or
+            self._progress_fraction != idle_fraction):
+            return False
+        self._is_progress_bar_pulsing = True
+        gobject.timeout_add(self.TIME_INTERVAL_PULSE,
+                            self._pulse)
+        return False
+
+    def _stop_pulse(self):
+        self._is_progress_bar_pulsing = False
+    
+    def _pulse(self):
+        if self._is_progress_bar_pulsing:
+            self.progress_bar.pulse()
+        while gtk.events_pending():
+            gtk.main_iteration()
+        return self._is_progress_bar_pulsing
 
     def finish(self):
         """Delete the splash screen."""
-        gobject.idle_add(lambda: self.destroy())
+        self.stopped = True
+        gobject.idle_add(self.destroy)
+        return False
 
 
 class DialogProcess(object):
