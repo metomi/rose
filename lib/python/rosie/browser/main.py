@@ -80,11 +80,14 @@ class MainWindow(gtk.Window):
         self.config = locator.get_conf()
         icon_path = locator.locate(rosie.browser.ICON_PATH_WINDOW)
         self.set_icon_from_file(icon_path)
-        try:
-            self.sched_icon_path = locator.locate(
-                                           rosie.browser.ICON_PATH_SCHEDULER)
-        except ResourceError:
+        if rosie.browser.ICON_PATH_SCHEDULER is None:
             self.sched_icon_path = None
+        else:
+            try:
+                self.sched_icon_path = locator.locate(
+                                               rosie.browser.ICON_PATH_SCHEDULER)
+            except ResourceError:
+                self.sched_icon_path = None
         self.query_rows = None
         self.adv_controls_on = rosie.browser.SHOULD_SHOW_ADVANCED_CONTROLS
         splash_updater(rosie.browser.SPLASH_LOADING.format(
