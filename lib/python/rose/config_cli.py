@@ -19,7 +19,8 @@
 #-----------------------------------------------------------------------------
 """Implements the "rose config" command."""
 
-from rose.config import ConfigDumper, ConfigLoader, ConfigNode
+from rose.config \
+        import ConfigDumper, ConfigLoader, ConfigNode, ConfigSyntaxError
 from rose.env import env_var_process
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter, Event
@@ -100,7 +101,7 @@ def main():
             else:
                 root_node = ResourceLocator.default().get_conf()
             
-    except SyntaxError as e:
+    except ConfigSyntaxError as e:
         sys.exit(repr(e))
     if opts.quietness:
         if root_node.get(args, opts.no_ignore) is None:

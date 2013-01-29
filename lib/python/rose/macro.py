@@ -325,7 +325,7 @@ def load_meta_config(config, directory=None, error_handler=None):
         else:
             try:
                 meta_config = rose.config.load(meta_path, meta_config)
-            except rose.config.SyntaxError as e:
+            except rose.config.ConfigSyntaxError as e:
                 error_handler(text=str(e))
     return meta_config
 
