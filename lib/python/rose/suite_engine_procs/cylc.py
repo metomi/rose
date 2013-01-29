@@ -68,6 +68,7 @@ class CylcProcessor(SuiteEngineProcessor):
     REC_TASK_LOG_FILE_TAIL = re.compile("(\d+\.\d+)(?:\.(.*))?")
 
     LOG_TASK_TIMESTAMP_THRESHOLD = 5.0
+    PYRO_TIMEOUT = 5
 
     def get_task_log_dir_rel(self, suite):
         """Return the relative path to the log directory for suite tasks."""
@@ -359,7 +360,8 @@ class CylcProcessor(SuiteEngineProcessor):
             hosts = ["localhost"]
         host_proc_dict = {}
         for host in sorted(hosts):
-            proc = self.popen.run_bg("cylc", "scan", "--host=" + host)
+            timeout = "--pyro-timeout={0}".format(self.PYRO_TIMEOUT)
+            proc = self.popen.run_bg("cylc", "scan", "--host=" + host, timeout)
             host_proc_dict[host] = proc
         ret = []
         while host_proc_dict:
