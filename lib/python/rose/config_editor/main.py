@@ -2007,6 +2007,7 @@ def spawn_window(config_directory_path=None):
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
                                                  True, "main")
+    splash_screen.stop()
     gtk.main()
 
 
@@ -2025,10 +2026,9 @@ def get_number_of_configs(config_directory_path=None):
     """Return the number of configurations that will be loaded."""
     number_to_load = 0
     if config_directory_path is not None:
-        number_to_load = 1
-        info_file = os.path.join(config_directory_path, rose.INFO_CONFIG_NAME)
-        if os.path.exists(info_file):
-            number_to_load += 1
+        for listing in set(os.listdir(config_directory_path)):
+            if listing in rose.CONFIG_NAMES:
+                number_to_load += 1
         app_dir = os.path.join(config_directory_path, rose.SUB_CONFIGS_DIR)
         if os.path.exists(app_dir):
             for entry in os.listdir(app_dir):

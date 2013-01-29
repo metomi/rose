@@ -64,8 +64,7 @@ class SplashScreenProcess(object):
         self.process.stdin.write(json_text + "\n")
 
     def stop(self):
-        """Kill the process and exit."""
-        self.process.terminate()
+        self.process.communicate(input=json.dumps("stop") + "\n")
   
 
 class SplashScreenUpdaterThread(threading.Thread):
@@ -93,13 +92,19 @@ class SplashScreenUpdaterThread(threading.Thread):
                 update_input = json.loads(stdin_line.strip())
             except ValueError as e:
                 continue
+            if update_input == "stop":
+                self._stop()
+                continue
             gobject.idle_add(self._update_splash_screen, update_input)
+
+    def _stop(self):
+        self.stop_event.set()
+        gtk.main_quit()
 
     def _check_splash_screen_alive(self):
         """Check whether the splash screen is finished."""
-        if self.splash_screen.stopped:
-            self.stop_event.set()
-            gtk.main_quit()
+        if self.splash_screen.stopped or self.stop_event.is_set():
+            self._stop()
             return False
         return True
 

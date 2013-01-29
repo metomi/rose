@@ -1272,6 +1272,7 @@ if __name__ == "__main__":
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
                                                  True, "main")
+    splash_screen.stop()
     gtk.gdk.threads_init()
     gtk.gdk.threads_enter()
     try:
