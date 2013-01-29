@@ -158,6 +158,8 @@ class ConfigDataManager(object):
         self.tree_update = tree_trig_update
         self.signal_load_event = signal_load_event
         self.config = {}  # Stores configuration name: object
+        self._builtin_value_macro = rose.macros.value.ValueChecker()  # value
+        self.builtin_macros = {}  # Stores other Rose built-in macro instances
         self.trigger = {}  # Stores trigger macro instances per configuration
         self.trigger_id_trees = {}  # Stores trigger dependencies
         self.trigger_id_value_lookup = {}  # Stores old values of trigger vars
@@ -265,6 +267,7 @@ class ConfigDataManager(object):
         self.config[name] = ConfigData(config, s_config, config_directory,
                                        meta_config, meta_id, meta_files,
                                        macros, is_top_level, is_discovery)
+        self.load_builtin_macros(name)
         self.load_file_metadata(name)
         self.filter_meta_config(name)
         
@@ -304,6 +307,14 @@ class ConfigDataManager(object):
         rose.macro.standard_format_config(config)
         rose.macro.standard_format_config(master_config)
         return config, master_config
+
+    def load_builtin_macros(self, config_name):
+        """Load Rose builtin macros."""
+        self.builtin_macros[config_name] = {
+                     rose.META_PROP_COMPULSORY:
+                     rose.macros.compulsory.CompulsoryChecker(),
+                     rose.META_PROP_TYPE:
+                     self._builtin_value_macro}
 
     def load_sections_from_config(self, config_name, save=False):
         """Return maps of section objects from the configuration."""

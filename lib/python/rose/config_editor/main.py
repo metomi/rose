@@ -103,11 +103,6 @@ class MainController(object):
         self.redo_stack = [] # Nothing to redo yet
         self.find_hist = {'regex': '', 'ids': []}
         self.util = rose.config_editor.util.Lookup()
-        self.macros = {
-             rose.META_PROP_COMPULSORY:
-             rose.macros.compulsory.CompulsoryChecker,
-             rose.META_PROP_TYPE:
-             rose.macros.value.ValueChecker}
         self.metadata_off = False
 
         self.loader_update = loader_update
@@ -1520,6 +1515,7 @@ class MainController(object):
                 meta_files = self.data.load_meta_files(config, directory)
                 macros = rose.macro.load_meta_macro_modules(meta_files)
             config_data.meta = meta_config
+            self.data.load_builtin_macros(config_name)
             self.data.load_file_metadata(config_name)
             self.data.filter_meta_config(config_name)
             # Load section and variable data into the object.
@@ -1753,7 +1749,7 @@ class MainController(object):
                    
     def perform_error_check(self, namespace=None, is_loading=False):
         """Loop through system macros and sum errors."""
-        for macro_name in self.macros:
+        for macro_name in [rose.META_PROP_COMPULSORY, rose.META_PROP_TYPE]:
             # We may need to speed up trigger for large configs.
             self.perform_macro_validation(macro_name, namespace, is_loading)
 
@@ -1773,7 +1769,7 @@ class MainController(object):
                 config = self.data.dump_to_internal_config(config_name,
                                                            namespace)
             meta = self.data.config[config_name].meta
-            checker = self.macros[macro_type]()
+            checker = self.data.builtin_macros[config_name][macro_type]
             bad_list = checker.validate(config, meta)
             self.apply_macro_validation(config_name, macro_type, bad_list,
                                         namespace, is_loading)
