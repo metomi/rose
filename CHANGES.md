@@ -32,11 +32,17 @@ Changes that have significant impact on user experience.
 
 Changes that are worth mentioning.
 
+\#402: rose config-edit: fix orphan section warning.
+
 \#398: rosie go: disable the suite delete functionality if current user does not own the suite.
 
 \#396: rose ana: command replaced by the `rose_ana` builtin application.
 
 \#393: rosie go, rosie ls: recover from checked out deleted suites.
+
+\#392: rose config-edit, rosie go: improve splash screen.
+
+\#390: rose config-edit: buttons to suite engine's gcontrol and log view.
 
 \#388: rose suite-run, rose app-run:
 --opt-conf-key=KEY can now be specified via the `ROSE_SUITE_OPT_CONF_KEYS` and `ROSE_APP_OPT_CONF_KEYS`
