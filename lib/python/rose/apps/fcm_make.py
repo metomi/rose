@@ -29,7 +29,7 @@ class FCMMakeApp(BuiltinApp):
 
     """Run "fcm make"."""
 
-    OPT_JOBS = 4
+    OPT_JOBS = "4"
     SCHEME = "fcm_make"
     SCHEME2 = SCHEME + "2"
 
