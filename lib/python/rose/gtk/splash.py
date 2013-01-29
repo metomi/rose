@@ -65,12 +65,6 @@ class SplashScreenProcess(object):
 
     def stop(self):
         self.process.communicate(input=json.dumps("stop") + "\n")
-
-    def terminate(self):
-        """Kill the process and exit."""
-        self.process.stdin.write("stop\n")
-        self.process.terminate()
-        return False
   
 
 class SplashScreenUpdaterThread(threading.Thread):
