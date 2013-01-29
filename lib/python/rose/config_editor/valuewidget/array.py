@@ -977,7 +977,7 @@ class ArrayElementSetter(object):
 
 def get_next_delimiter(array_text, next_element):
     v = array_text.index(next_element)
-    if v == 0:  # Null or whitespace element.
+    if v == 0 and len(array_text) > 1:  # Null or whitespace element.
         while array_text[v].isspace():
             v += 1
         if array_text[v] == ",":
