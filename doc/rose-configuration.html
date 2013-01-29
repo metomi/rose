@@ -461,12 +461,22 @@ accel-find-next=F3
     keys can be:</p>
 
     <dl>
+      <dt><code>file-install-root</code>
+
+      <dd>Root level setting. Specify the root directory to install file
+      targets that are specified using with a relative path.</dd>
+
       <dt><code>meta</code></dt>
 
-      <dd>Top level key that specifies the configuration metadata for the
-      application. This is ignored by the application runner, but may be used
-      by other Rose utilities, such as the config editor GUI. It can be used to
+      <dd>Root level setting. Specify the configuration metadata for the
+      application. This is ignored by the application runner, but may be used by
+      other Rose utilities, such as the config editor GUI. It can be used to
       specify the application type.</dd>
+
+      <dt><code>mode</code>
+
+      <dd>Root level setting. Specify the name of a builtin application, instead
+      of running a command specified in the <code>[command]</code> section.</dd>
 
       <dt><code>[command]</code></dt>
 
@@ -546,6 +556,61 @@ accel-find-next=F3
           their basic group <code>[namelist:NAME]</code> as well as from their
           specific category <code>[namelist:NAME{CATEGORY}]</code>.</li>
         </ul>
+      </dd>
+
+      <dt><code>[poll]</code></dt>
+
+      <dd>
+        Specify prerequisites to poll for before running the actual application.
+        3 types of tests can be performed:
+
+        <p><var>all-files</var>: A list of space delimited list of file paths.
+        This test passes only if all file paths in the list exist.</p>
+
+        <p><var>any-files</var>: A list of space delimited list of file paths.
+        This test passes if any file path in the list exists.</p>
+
+        <p><var>test</var>: A shell command. This test passes if the command
+        returns a 0 (zero) return code.</p>
+
+        <p>Normally, the <var>all-files</var> and <var>any-files</var> tests
+        both test for the existence of file paths. If this is not enough, e.g.
+        you want to test for the existence of a string in each file, you can
+        specify a <var>file-test</var> to do a <code>grep</code>. E.g.:</p>
+
+        <pre class="prettyprint lang-rose_conf">
+all-files=file1 file2
+file-test=test -e {} &amp;&amp; grep -q 'hello' {}
+</pre>
+
+        <p>At runtime, any <code>{}</code> pattern in the above would be
+        replaced with the name of the file. The above make sure that both
+        <samp>file1</samp> and <samp>file2</samp> exist and that they both
+        contain the string <samp>hello</samp>.</p>
+
+        <p>The above tests will only be performed once when the application
+        runner starts. If a list of <var>delays</var> are added, the tests will
+        be performed a number of times with delays between them. If the
+        prerequisites are still not met after the number of delays, the
+        application runner will fail with a time out. The list is a
+        comma-separated list. The syntax looks like <var>[R*]T[U]</var>, where
+        <var>U</var> is a unit (<kbd>s</kbd> for seconds (default), <kbd>m</kbd>
+        for minutes and <kbd>h</kbd> for hours), <var>T</var> is the number of
+        units. E.g.:</p>
+
+        <pre class="prettyprint lang-rose_conf">
+# Default
+delays=0
+
+# Poll 1 minute after the runner begins, repeat every minute 10 times
+delays=10*1m
+
+# Poll when runner begins,
+# repeat every 10 seconds 6 times,
+# repeat every minute 60 times,
+# repeat once after 1 hour
+delays=0,6*10s,60*1m,1h
+</pre>
       </dd>
     </dl>
 
@@ -1269,6 +1334,20 @@ schemes=hpc*:*=rsync
       form <var>[USER@]HOST:PATH</var>.</dd>
     </dl>
 
+    <p>The application launcher will use the following logic to determine the
+    root directory to install file targets with a relative path:</p>
+
+    <ol>
+      <li>If the setting <var>file-install-root=PATH</var> is specified (at the
+      root level) in the application configuration file, its value will be
+      used.</li>
+
+      <li>If the environment variable <var>ROSE_FILE_INSTALL_ROOT</var> is
+      specified, its value will be used.</li>
+
+      <li>Otherwise, the working directory of the task will be used.</li>
+    </ol>
+
     <h2 id="appendix-metadata-location">Appendix: Metadata Location</h2>
 
     <p>Centralised Rose metadata is referred to with either the <var>meta</var>
@@ -1465,44 +1544,45 @@ meta = my-command/t123
     discard).</p>
 
     <h2 id="appendix-rose-ana-config">Appendix: rose-ana configuration format</h2>
-    
-    <p>The task utility <code>rose-ana</code> reads information about which 
-    comparisons to perform from the <code>rose-app.conf</code> file for that
-    task. The first element is a human-readable name in square brackets, 
+
+    <p>The <code>rose-ana</code> builtin application reads information about
+    which comparisons to perform from the <code>rose-app.conf</code> file for
+    that task. The first element is a human-readable name in square brackets,
     followed by the following settings, one per line:</p>
-    
+
     <ul>
-      <li>comparison - The class name which will be called to compare the 
+      <li>comparison - The class name which will be called to compare the
       resulting data from the extract command.</li>
-      
-      <li>extract - Either the class name which should be called to extract 
-      data from the files to be compared, or a system command which will be 
-      called to extract or compare the files. In the latter case, the tokens 
-      <var>{resultfile}</var> and <var>{kgo1file}</var> map to the values 
-      defined in the configuration file. The token <var>{file}</var> will 
-      result in the command being called twice, once on <var>{resultfile}</var> 
-      and once on  <var>{kgo1file}</var>. Some extraction classes such as 
-      <kbd>OutputGrepper</kbd> require additional 
+
+      <li>extract - Either the class name which should be called to extract
+      data from the files to be compared, or a system command which will be
+      called to extract or compare the files. In the latter case, the tokens
+      <var>{resultfile}</var> and <var>{kgo1file}</var> map to the values
+      defined in the configuration file. The token <var>{file}</var> will
+      result in the command being called twice, once on <var>{resultfile}</var>
+      and once on  <var>{kgo1file}</var>. Some extraction classes such as
+      <kbd>OutputGrepper</kbd> require additional
       information about how to extract the data. This should be placed
       after the class name, separated from it by a colon.</li>
-      
-      <li>kgo1file - The path and name of the file containing the known good 
-      output. Environment variables and the wildcard character '*' are 
-      accepted.</li>
-      
-      <li>resultfile - The path and name of the file containing the output to 
-      be compared Environment variables and the wildcard character '*' are 
-      accepted.</li>
-      
-      <li>tolerance - For inexact comparisons such as 'Within', the tolerance 
-      should be specified using this variable. Values with a percentage sign 
-      are treated as percentages, otherwise values are treated as a range
-      either side of the known good output value. This value is optional;
-      some comparisons such as 'Exact' do not require it.</li>
 
-      <li>warnonfail - If this is set to be 'yes' a failure of the test will 
-      result in a warning rather than a failure. This value is always optional.
-      </li>
+      <li>kgo1file - The path and name of the file containing the known good
+      output. Environment variables and the wildcard character <var>*</var> are
+      accepted.</li>
+
+      <li>resultfile - The path and name of the file containing the output to be
+      compared Environment variables and the wildcard character <kbd>*</kbd> are
+      accepted.</li>
+
+      <li>tolerance - For inexact comparisons such as <kbd>Within</kbd>, the
+      tolerance should be specified using this variable. Values with a
+      percentage sign are treated as percentages, otherwise values are treated
+      as a range either side of the known good output value. This value is
+      optional; some comparisons such as <kbd>Exact</kbd> do not require
+      it.</li>
+
+      <li>warnonfail - If this is set to be <kbd>yes</kbd> a failure of the test
+      will result in a warning rather than a failure. This value is always
+      optional.</li>
     </ul>
 
     <p>For example:</p>

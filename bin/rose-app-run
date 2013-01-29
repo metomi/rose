@@ -26,6 +26,9 @@
 # DESCRIPTION
 #     Run an application according to its configuration.
 #
+#     May run a builtin application (if the "mode" setting in the configuration
+#     specifies the name of a builtin application) or a command.
+#
 #     Determine the command to run in this order:
 #     1. If COMMAND is specified, invoke the command.
 #     2. If the --command-key=KEY option is defined, invoke the command
@@ -36,6 +39,9 @@
 #     4. Invoke the command specified in [command]default.
 #
 # OPTION
+#     --app-mode=MODE
+#         Run a builtin application identified by MODE. The default MODE is
+#         "command".
 #     --config=DIR; -C DIR
 #         Specify the configuration directory of the application. (default=$PWD)
 #     --command-key=KEY; -c KEY

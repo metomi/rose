@@ -24,7 +24,7 @@ Synopsis:
     import rose.config
     try:
         config = rose.config.load(file)
-    except rose.config.SyntaxError:
+    except rose.config.ConfigSyntaxError:
         # ... do something to handle exception
     value = config.get([section, option])
     # ...
@@ -445,7 +445,7 @@ class ConfigLoader(object):
             # Match the start of an option setting
             match = self.re_option.match(line)
             if not match:
-                raise SyntaxError(file_name, line_num, line)
+                raise ConfigSyntaxError(file_name, line_num, line)
             option, value, state = match.group("option", "value", "state")
             if type == TYPE_OPTION:
                 keys.pop()
@@ -464,7 +464,7 @@ class ConfigLoader(object):
         return line.strip()[1:]
 
 
-class SyntaxError(Exception):
+class ConfigSyntaxError(Exception):
 
     """Exception raised for syntax error loading a configuration file."""
 

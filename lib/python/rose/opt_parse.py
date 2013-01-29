@@ -41,19 +41,17 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "KEY",
                         "help": "Specify a named application configuration."}],
+               "app_mode": [
+                       ["--app-mode"],
+                       {"action": "store",
+                        "metavar": "MODE",
+                        "help": "Run a command or a builtin application"}],
                "auto_type": [
                        ["--auto-type"],
                        {"action": "store_true",
                         "default": False,
                         "dest": "type",
                         "help": "Automatically guess types of settings."}],
-               "auto_util_mode": [
-                       ["--no-auto-util"],
-                       {"action": "store_false",
-                        "default": True,
-                        "dest": "auto_util_mode",
-                        "help": ("Do not automatically select " +
-                                 "a task utility based on the task name.")}],
                "case_mode": [
                        ["--case"],
                        {"action": "store",
@@ -431,11 +429,6 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Use search url"}],                        
-               "util_key": [
-                       ["--util-key"],
-                       {"action": "store",
-                        "metavar": "KEY",
-                        "help": "Specify a named task utility."}],
                "validate_all": [
                        ["--validate", "-V"],
                        {"action": "store_true",
