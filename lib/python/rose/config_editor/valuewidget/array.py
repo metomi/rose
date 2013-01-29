@@ -300,7 +300,8 @@ class EntryArrayValueWidget(gtk.HBox):
             focus.grab_focus()
             focus.set_position(position)
             focus.select_region(position, position)
-        self.grab_focus = lambda : self.hook.get_focus(self.entries[-1])
+        self.grab_focus = lambda : self.hook.get_focus(
+                                                 self._get_widget_for_focus())
         self.check_resize()
 
     def reshape_table(self):
@@ -372,6 +373,11 @@ class EntryArrayValueWidget(gtk.HBox):
             entry.set_width_chars(self.chars_width)
             entry.set_max_length(self.chars_width)
         self.reshape_table()
+
+    def _get_widget_for_focus(self):
+        if self.entries:
+            return self.entries[-1]
+        return self.entry_table
 
     def _handle_focus_off_entry(self, widget, event):
         if widget == self.last_selected_src:
@@ -971,7 +977,7 @@ class ArrayElementSetter(object):
 
 def get_next_delimiter(array_text, next_element):
     v = array_text.index(next_element)
-    if v == 0:  # Null or whitespace element.
+    if v == 0 and len(array_text) > 1:  # Null or whitespace element.
         while array_text[v].isspace():
             v += 1
         if array_text[v] == ",":
