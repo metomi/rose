@@ -355,8 +355,8 @@ class Analyse(object):
             if task.extract:
                 config.set([sectionname, "extract"], task.extract)
             if task.subextract:
-                config.set([sectionname, "extract"], task.extract + ":" +
-                            task.subextract)
+                config.set([sectionname, "extract"],
+                           task.extract + ":" + task.subextract)
             if task.comparison:
                 config.set([sectionname, "comparison"], task.comparison)
             if task.tolerance:

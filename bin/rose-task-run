@@ -37,9 +37,10 @@
 #         Specify a named application configuration.
 #     --app-mode=MODE
 #         Run a builtin application identified by MODE. Disable automatic task
-#         name association with a builtin application. The default MODE is
-#         "command" if this option is not specified and the task name cannot be
-#         automatically associated with a builtin application.
+#         name association with a builtin application. If this option is not
+#         specified, it will attempt use the task name to look for a builtin
+#         application. If the task name does not match a builtin application,
+#         the default MODE is to run the command.
 #     --path=PATTERN, -P PATTERN
 #         Each of this specify a glob pattern for paths to prepend to the PATH
 #         environment variable. If a relative path is given, it is relative to

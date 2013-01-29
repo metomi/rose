@@ -1636,9 +1636,10 @@ environment scripting = "eval $(rose task-env)"
       <dt><kbd>--app-mode=MODE</kbd></dt>
 
       <dd>Run a builtin application identified by MODE. Disable automatic task
-      name association with a builtin application. The default <var>MODE</var>
-      is <kbd>command</kbd> if this option is not specified and the task name
-      cannot be automatically associated with a builtin application.</dd>
+      name association with a builtin application. If this option is not
+      specified, it will attempt use the task name to look for a builtin
+      application. If the task name does not match a builtin application, the
+      default <var>MODE</var> is to run the <kbd>command</kbd>.</dd>
 
       <dt><kbd>--path=PATTERN, -P PATTERN</kbd></dt>
 

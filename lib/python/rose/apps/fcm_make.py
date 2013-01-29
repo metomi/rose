@@ -29,6 +29,7 @@ class FCMMakeApp(BuiltinApp):
 
     """Run "fcm make"."""
 
+    OPT_JOBS = 4
     SCHEME = "fcm_make"
     SCHEME2 = SCHEME + "2"
 
@@ -39,8 +40,7 @@ class FCMMakeApp(BuiltinApp):
         return name
 
     def run(self, app_runner, config, opts, args, uuid, work_files):
-        """
-        Run "fcm make".
+        """Run "fcm make".
 
         This application will only work under "rose task-run".
 
@@ -75,8 +75,8 @@ class FCMMakeApp(BuiltinApp):
                 break
         if not use_pwd:
             cmd += ["-C", os.path.join(t.suite_dir, "share", t.task_name)]
-        cmd_opt_jobs = config.get_value(["opt.jobs"],
-                                        os.getenv("ROSE_TASK_N_JOBS", "4"))
+        cmd_opt_jobs = config.get_value(
+                ["opt.jobs"], os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))
         cmd += ["-j", cmd_opt_jobs]
         cmd_opts = config.get_value(["opts"], os.getenv("ROSE_TASK_OPTIONS"))
         cmd += shlex.split(cmd_opts)
@@ -91,8 +91,8 @@ class FCMMakeApp(BuiltinApp):
         else:
             task1_name = self.SCHEME + t.task_name.replace(self.SCHEME2, "")
             cmd += ["-C", os.path.join(t.suite_dir, "share", task1_name)]
-        cmd_opt_jobs = config.get_value(["opt.jobs"],
-                                        os.getenv("ROSE_TASK_N_JOBS", "4"))
+        cmd_opt_jobs = config.get_value(
+                ["opt.jobs"], os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))
         cmd += ["-j", cmd_opt_jobs]
         cmd_opts = config.get_value(["opts"], os.getenv("ROSE_TASK_OPTIONS"))
         cmd += shlex.split(cmd_opts)

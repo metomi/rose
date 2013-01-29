@@ -24,7 +24,7 @@ init <<'__CONFIG__'
 [command]
 default=true
 [poll]
-delays=2*0.0001h,0.005m,3*0.1s
+delays=2*0.0001h,0.005m,3*0.1s,1*0.5
 all-files=file1 file2
 any-files=file3 file4
 test=test -e file5
@@ -38,7 +38,7 @@ setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err.0" \
-    '[FAIL] .*poll timeout after.*seconds' "$TEST_KEY.err"
+    '\[FAIL\] ....-..-..T..:..:.. poll timeout after .s' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.1" '* test' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.2" '* any-files' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.3" '* all-files:file1 file2' "$TEST_KEY.err"

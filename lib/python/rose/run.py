@@ -49,18 +49,23 @@ from uuid import uuid4
 
 
 class AlreadyRunningError(Exception):
+
     """An exception raised when a suite is already running."""
+
     def __str__(self):
         return "%s: is already running on %s" % self.args
 
 
 class NotRunningError(Exception):
+
     """An exception raised when a suite is not running."""
+
     def __str__(self):
         return "%s: is not running" % (self.args)
 
 
 class ConfigNotFoundError(Exception):
+
     """An exception raised when a config can't be found at or below cwd."""
 
     def __str__(self):
@@ -69,6 +74,7 @@ class ConfigNotFoundError(Exception):
 
 
 class ConfigValueError(Exception):
+
     """An exception raised when a config value is incorrect."""
 
     SYNTAX = "syntax"
@@ -82,6 +88,7 @@ class ConfigValueError(Exception):
 
 
 class NewModeError(Exception):
+
     """An exception raised for --new mode is not supported."""
 
     def __str__(self):
@@ -89,6 +96,7 @@ class NewModeError(Exception):
 
 
 class PollTimeoutError(Exception):
+
     """An exception raised when time is out for polling."""
 
     def __str__(self):
@@ -96,18 +104,20 @@ class PollTimeoutError(Exception):
         items_str = ""
         for item in items:
             items_str += "\n* " + item
-        return "%s poll timeout after %d seconds:%s" % (
+        return "%s poll timeout after %ds:%s" % (
                 strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), dt, items_str)
 
 
 class TaskAppNotFoundError(Exception):
-    """Error: a task has no an associated application configuration."""
+
+    """Error: a task has no associated application configuration."""
 
     def __str__(self):
         return "%s (key=%s): task has no associated application." % self.args
 
 
 class CommandNotDefinedEvent(Event):
+
     """An event raised when a command is not defined for an app."""
 
     TYPE = Event.TYPE_ERR
@@ -117,6 +127,7 @@ class CommandNotDefinedEvent(Event):
 
 
 class PollEvent(Event):
+
     """An event raised when polling for an application prerequisite."""
 
     LEVEL = Event.V
@@ -131,6 +142,7 @@ class PollEvent(Event):
 
 
 class SuiteHostSelectEvent(Event):
+
     """An event raised to report the host for running a suite."""
 
     def __str__(self):
@@ -138,6 +150,7 @@ class SuiteHostSelectEvent(Event):
 
 
 class SuiteLogArchiveEvent(Event):
+
     """An event raised to report the archiving of a suite log directory."""
 
     def __str__(self):
@@ -145,6 +158,7 @@ class SuiteLogArchiveEvent(Event):
 
 
 class Dummy(object):
+
     """Convert a dict into an object."""
 
     def __init__(self, **kwargs):
@@ -154,7 +168,7 @@ class Dummy(object):
 
 class BuiltinApp(object):
 
-    """An abstract bas class for a builtin application.
+    """An abstract base class for a builtin application.
     
     Instance of sub-classes are expected to be managed by
     rose.scheme_handler.SchemeHandlersManager.
@@ -175,8 +189,7 @@ class BuiltinApp(object):
         return None
 
     def run(self, config, opts, args, uuid, work_files):
-        """
-        Run the logic of a builtin application.
+        """Run the logic of a builtin application.
 
         config -- root node of the application configuration file.
         See Runner.run and Runner.run_impl for definitions for opts, args,
@@ -358,12 +371,6 @@ class AppRunner(Runner):
     OPTIONS = ["app_mode", "command_key", "conf_dir", "defines",
                "install_only_mode", "new_mode", "no_overwrite_mode",
                "opt_conf_keys"]
-
-    def __init__(self, *args, **kwargs):
-        Runner.__init__(self, *args, **kwargs)
-        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
-        self.builtins_manager = SchemeHandlersManager(
-                [p], "rose.apps", ["run"], None, *args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
