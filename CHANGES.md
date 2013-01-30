@@ -1,5 +1,8 @@
 # Rose Changes
 
+Go to https://github.com/metomi/rose/issues/milestones?state=closed
+for a full listing of issues for each release.
+
 ## Rose 2013-01 (To be released 2013-01)
 
 ### Highlight Changes
@@ -11,7 +14,7 @@ Changes that have significant impact on user experience.
 * Chapters: Introduction, In Depth Topics, Suites
 * Tutorials: Metadata, Suite Writing, Advanced (x9).
 
-\#165, #243: rose suite-run: run modes and new log directory mechanism:
+\#165, #242. #243: rose suite-run: run modes and new log directory mechanism:
 * Log directories no longer rotated.
 * Introduce a run mode: `--run=reload|restart|run`.
   In reload and restart modes, the existing log directory is used.
@@ -139,9 +142,6 @@ to reduce the chance of opening a terminal based editor in a GUI environment.
 \#248: rose-suite-log-view: Log file view:
 * Added link to toggle between HTML and text.
 * Added link to view raw text.
-
-\#242: rose suite-run: New --restart option to launch `cylc restart` instead of
-`cylc run`.
 
 \#241: rosie create: Allow alternate prefix for special metadata suite.
 
