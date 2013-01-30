@@ -1,17 +1,15 @@
 # Rose Changes
 
-## Rose 2012-11+ (To be released 2013-Q1)
+## Rose 2013-01 (To be released 2013-01)
 
 ### Highlight Changes
 
 Changes that have significant impact on user experience.
 
-\#244: Tutorial: Added S5 slide show enabled documentation chapters.
+\#244: Rose User Guide: Added S5 slide show enabled documentation chapters.
 * Improved brief tour of the system.
-* Metadata tutorial.
-* Suite writing tutorial.
-* In depth topics.
-* Advanced tutorials.
+* Chapters: Introduction, In Depth Topics, Suites
+* Tutorials: Metadata, Suite Writing, Advanced (x9).
 
 \#165, #243: rose suite-run: run modes and new log directory mechanism:
 * Log directories no longer rotated.
@@ -28,11 +26,23 @@ Changes that have significant impact on user experience.
 * If `--log-keep=DAYS` is specified, `log.DATETIME` directories with modified
   time older than the specified number of `DAYS` are removed.
 
+\#404: `rose task-run`'s *task utilities* are rebranded as `rose app-run`'s
+*built-in applications*. This makes it logical to introduce a mode setting in
+the `rose-app.conf` to specify a built-in application
+(as opposed to running a command).
+* `rose app-run`: `--app-mode=MODE` option is introduced to overwrite the `mode`
+  setting. This would mainly be used internally by `rose task-run`.
+  Users would normally use the `mode` setting to do this in the `rose-app.conf`.
+* `rose task-run`: Removed both the `--no-auto-util` and `--util-key=KEY` options.
+  The `--app-mode=MODE` option supersedes the functionalities of both of these
+  options. `--no-auto-util` is achieved by doing `--app-mode=command`.
+* The `rose_install` task utility is pointless, so it is removed.
+* New prerequisite polling functionality: The main command (or built-in
+  application) will not start until all the prerequisites are met.
+
 ### Other Changes
 
 Changes that are worth mentioning.
-
-\#402: rose config-edit: fix orphan section warning.
 
 \#398: rosie go: disable the suite delete functionality if current user does not own the suite.
 
@@ -60,8 +70,6 @@ file install target names can now contain environment variable substitution synt
 \#370: rose suite-run, rose suite-gcontrol: send `cylc gui` output to `/dev/null`.
 
 \#368: rose suite-run: wait for `cylc run` to complete.
-
-\#365: rosie go and rosie ls: fixed a crash bug when a user has a checked out copy of a deleted suite.  
 
 \#363: installation guide: more instruction on running `rosie.ws` under `mod_wsgi`.
 
