@@ -79,6 +79,8 @@
 #         Do not archive (tar-gzip) old log directories.
 #     --no-overwrite
 #         Do not overwrite existing files.
+#     --no-strict
+#         Do not validate (suite engine configuration) in strict mode.
 #     --opt-conf-key=KEY, -O KEY
 #         Each of this switches on an optional configuration identified by KEY.
 #     --quiet, -q

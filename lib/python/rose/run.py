@@ -602,7 +602,7 @@ class SuiteRunner(Runner):
                "gcontrol_mode", "host", "install_only_mode",
                "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
                "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
-               "restart_mode", "run_mode"]
+               "restart_mode", "run_mode", "strict_mode"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
@@ -778,7 +778,7 @@ class SuiteRunner(Runner):
         self.config_pm(config, "jinja2")
 
         # Register the suite
-        self.suite_engine_proc.validate(suite_name)
+        self.suite_engine_proc.validate(suite_name, opts.strict_mode)
 
         # Install suite files to each remote [user@]host
         for name in ["", "log/", "share/", "work/"]:
@@ -823,21 +823,23 @@ class SuiteRunner(Runner):
                     rose_sr += "," + key + "=" + v
             command += ["'" + rose_sr + "'"]
             pipe = self.popen.run_bg(*command)
-            queue.append([pipe, command, "ssh"])
+            queue.append([pipe, command, "ssh", auth])
 
         while queue:
             sleep(self.SLEEP_PIPE)
-            pipe, command, mode = queue.pop(0)
+            pipe, command, mode, auth = queue.pop(0)
             if pipe.poll() is None:
-                queue.append([pipe, command, mode]) # put it back at the end
+                queue.append([pipe, command, mode, auth]) # put it back
                 continue
             rc = pipe.wait()
             out, err = pipe.communicate()
             if rc:
                 raise RosePopenError(command, rc, out, err)
-            self.handle_event(out, level=Event.VV)
             if mode == "rsync":
+                self.handle_event(out, level=Event.VV)
                 continue
+            else:
+                self.handle_event(out, level=Event.VV, prefix="[%s] " % auth)
             for line in out.split("\n"):
                 if "/" + uuid == line.strip():
                     break
@@ -847,7 +849,7 @@ class SuiteRunner(Runner):
                     filters["excludes"].append(name + uuid)
                 target = auth + ":" + suite_dir_rel
                 cmd = self._get_cmd_rsync(target, **filters)
-                queue.append([self.popen.run_bg(*cmd), cmd, "rsync"])
+                queue.append([self.popen.run_bg(*cmd), cmd, "rsync", auth])
 
         # Start the suite
         self.fs_util.chdir("log")
