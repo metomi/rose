@@ -6,12 +6,10 @@
 
 Changes that have significant impact on user experience.
 
-\#244: Tutorial: Added S5 slide show enabled documentation chapters.
+\#244: Rose User Guide: Added S5 slide show enabled documentation chapters.
 * Improved brief tour of the system.
-* Metadata tutorial.
-* Suite writing tutorial.
-* In depth topics.
-* Advanced tutorials.
+* Chapters: Introduction, In Depth Topics, Suites
+* Tutorials: Metadata, Suite Writing, Advanced (x9).
 
 \#165, #243: rose suite-run: run modes and new log directory mechanism:
 * Log directories no longer rotated.
@@ -31,8 +29,6 @@ Changes that have significant impact on user experience.
 ### Other Changes
 
 Changes that are worth mentioning.
-
-\#402: rose config-edit: fix orphan section warning.
 
 \#398: rosie go: disable the suite delete functionality if current user does not own the suite.
 
@@ -60,8 +56,6 @@ file install target names can now contain environment variable substitution synt
 \#370: rose suite-run, rose suite-gcontrol: send `cylc gui` output to `/dev/null`.
 
 \#368: rose suite-run: wait for `cylc run` to complete.
-
-\#365: rosie go and rosie ls: fixed a crash bug when a user has a checked out copy of a deleted suite.  
 
 \#363: installation guide: more instruction on running `rosie.ws` under `mod_wsgi`.
 
