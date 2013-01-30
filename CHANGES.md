@@ -1,6 +1,6 @@
 # Rose Changes
 
-## Rose 2012-01 (To be released 2013-01)
+## Rose 2013-01 (To be released 2013-01)
 
 ### Highlight Changes
 
