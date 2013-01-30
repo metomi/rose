@@ -41,6 +41,8 @@ class CylcProcessor(SuiteEngineProcessor):
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     SUITE_LOG = "suite/log"
+    TASK_ID_DELIM = "%"
+    TASK_LOG_DELIM = "."
 
     REC_LOG_ENTRIES = {
          "submit": re.compile(
@@ -241,7 +243,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     signal = search_result.group("signal")
                 event_time = mktime(strptime(time_stamp, "%Y/%m/%d %H:%M:%S"))
                 if task_id not in data:
-                    name, cycle_time = task_id.split("%", 1)
+                    name, cycle_time = task_id.split(self.TASK_ID_DELIM)
                     data[task_id] = {"name": name,
                                      "cycle_time": cycle_time,
                                      "submits": []}
@@ -262,13 +264,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 break
         # Locate task log files
         for task_id, task_datum in data.items():
+            name = task_datum["name"]
+            cycle_time = task_datum["cycle_time"]
             for i, submit in enumerate(task_datum["submits"]):
-                root = "job/%s.%d" % (task_id, i)
-                for name in glob(root + "*"):
-                    key = name[len(root) + 1:]
+                root = "job/" + self.TASK_LOG_DELIM.join([name, cycle_time,
+                                                          str(i + 1)])
+                for path in glob(root + "*"):
+                    key = path[len(root) + 1:]
                     if not key:
                         key = "script"
-                    submit["files"][key] = {"n_bytes": os.stat(name).st_size)
+                    submit["files"][key] = {"n_bytes": os.stat(path).st_size}
         return data
 
     def process_suite_hook_args(self, *args, **kwargs):
