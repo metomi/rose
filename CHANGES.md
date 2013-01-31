@@ -3,7 +3,9 @@
 Go to https://github.com/metomi/rose/issues/milestones?state=closed
 for a full listing of issues for each release.
 
-## Rose 2013-01 (To be released 2013-01)
+## Rose 2013-01 (Released 2013-01-31)
+
+This is the 2nd release of Rose. We hope you find it useful.
 
 ### Highlight Changes
 
@@ -104,6 +106,6 @@ to reduce the chance of opening a terminal based editor in a GUI environment.
 
 \#231: rose date: New command.
 
-## Rose 2012-11 (2012-11-30)
+## Rose 2012-11 (Released 2012-11-30)
 
 This is the 1st release of Rose. Enjoy!
