@@ -4,7 +4,7 @@
 @import url(../rose-doc.css);  /* stuff for Rose */
 
 h2 {
-    border-top: none;
+    border-bottom: none;
 }
 
 h1 {
@@ -13,16 +13,13 @@ h1 {
 
 
 body {
-		background:white;
+    background:white;
 }
 
 #body-main {
-		border:none;
-		width:100%
-		background:white;
-		margin:0;
-		padding:0;
+    border:none;
+    width:100%
+    background:white;
+    margin:0;
+    padding:0;
 }
-
-
-

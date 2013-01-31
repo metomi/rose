@@ -22,7 +22,7 @@
  * CSS for Rose documents.
  *
  **********************************************************************/
- 
+
 /**********************************************************************
  * FOREGROUND COLOUR
  *
@@ -53,7 +53,6 @@ var {
 
 h1 {
     color: #ffcb00;
-		/* color: #060048; */
 }
 
 .header-footer {
@@ -96,7 +95,7 @@ h1 {
  *
  **********************************************************************/
 h1 {
-   background: #060048;
+    background: #060048;
 }
 
 caption,
@@ -106,8 +105,7 @@ pre,
 samp,
 th,
 .image {
-    background:none;
-		color:#46d;
+    background: #f8f8f8;
 }
 
 .header-footer {
@@ -120,8 +118,8 @@ th,
 }
 
 .shell {
-    background: #d6faf8;
-		color:#565088;
+   /* background: #d6faf8; */
+   color:#464078;
 }
 
 
@@ -159,9 +157,12 @@ samp,
     /* border: thin solid #ddd; */
 }
 
+pre {
+    border: thin solid #ddd;
+}
 
 h2 {
-    border-top: medium solid #060048;
+    border-bottom: thin solid #ddd;
 }
 
 .shell {
@@ -188,7 +189,7 @@ th {
  **********************************************************************/
 body {
     font-family: sans-serif;
-		background:#aaa;
+    background:#ddd;
 }
 
 code,
@@ -199,15 +200,15 @@ var {
 }
 
 h1 {
-    font-size: 200%;
-}
-
-h2 {
     font-size: 175%;
 }
 
-h3 {
+h2 {
     font-size: 150%;
+}
+
+h3 {
+    font-size: 100%;
 }
 
 h4,
@@ -284,9 +285,12 @@ a:hover {
  * TEXT ALIGNMENT
  *
  **********************************************************************/
-address,
-h1 {
+address {
     text-align: right;
+}
+
+h1 {
+    text-align: center;
 }
 
 .collapse-expand {
@@ -347,7 +351,7 @@ h2,
 }
 
 h1 {
-		margin:0px -30px 0px -30px;
+    margin:0px -30px 0px -30px;
 }
 
 img {
@@ -380,9 +384,6 @@ table {
  * PADDING
  *
  **********************************************************************/
-h1 {
-    padding-right: 30px;
-}
 h1,
 h2,
 h3,
@@ -414,6 +415,10 @@ var {
 }
 
 .header-footer p {
+    padding-top: 0.5em;
+}
+
+#content {
     padding-top: 0.5em;
 }
 
@@ -454,14 +459,14 @@ th {
 }
 
 #body-main {
-		width:800px;
-		background:white;
-		border:1px solid #060048;
-		margin:0 auto;
-		margin-top:20px;
-		margin-bottom:50px;
-		padding:30px;
-		padding-top:0px;
+    width:800px;
+    background:white;
+    border:1px solid #060048;
+    margin:0 auto;
+    margin-top:20px;
+    margin-bottom:50px;
+    padding:30px;
+    padding-top:0px;
 }
 
 
@@ -476,5 +481,31 @@ th {
 @media screen {
     #body-header,
     #body-main {
+    }
+}
+
+
+/**********************************************************************
+ * CROSS-PLATFORM SUPPORT
+ *
+ **********************************************************************/
+
+@media screen handheld, screen and (max-device-width:850px) {
+    #body-main {
+        border:none;
+        margin: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding: 0;
+        top: 3em;
+        position: relative;
+        width: 100%;
+    }
+
+    h1 {
+        border-top: none;
+        margin: 0;
+        padding: 0;
+        padding-top: 0;
     }
 }
