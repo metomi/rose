@@ -126,11 +126,11 @@ th,
 }
 
 body {
-    background:#ededed;
+    background: #eee;
 }
 
 #body-main {
-    background:white;
+    background: white;
 }
 
 /**********************************************************************
@@ -172,7 +172,7 @@ th {
 }
 
 #body-main {
-    border: thin solid #bbb;
+    border: thin ridge #ccc;
 }
 
 /**********************************************************************
@@ -485,7 +485,7 @@ th {
  *
  **********************************************************************/
 
-@media handheld, only screen and (max-device-width:850px) { */
+@media handheld, only screen and (max-device-width:850px) {
     #body-main {
         border:none;
         margin: 0;
