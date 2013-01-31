@@ -685,11 +685,12 @@ class SuiteRunner(Runner):
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
+        suite_running_hosts = self.suite_engine_proc.ping(suite_name, hosts)
         if opts.run_mode == "reload":
-            if not self.suite_engine_proc.ping(suite_name, hosts):
+            if not suite_running_hosts:
                 raise NotRunningError(suite_name)
         else:
-            if self.suite_engine_proc.ping(suite_name, hosts):
+            if suite_running_hosts:
                 if opts.force_mode:
                     opts.install_only_mode = True
                 else:
@@ -852,8 +853,12 @@ class SuiteRunner(Runner):
         # Start the suite
         self.fs_util.chdir("log")
         ret = 0
-        host = hosts[0]
-        if not opts.install_only_mode:
+        if opts.install_only_mode:
+            host = None
+            if suite_running_hosts:
+                host = suite_running_hosts[0]
+        else:
+            host = hosts[0]
             # FIXME: should sync files to suite host?
             if opts.host:
                 hosts = [host]
@@ -870,7 +875,7 @@ class SuiteRunner(Runner):
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
-        if os.getenv("DISPLAY") and opts.gcontrol_mode:
+        if os.getenv("DISPLAY") and host and opts.gcontrol_mode:
             self.suite_engine_proc.gcontrol(suite_name, host)
         return ret
 
