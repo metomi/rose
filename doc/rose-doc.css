@@ -95,7 +95,7 @@ h1 {
  *
  **********************************************************************/
 h1 {
-    background: #060048;
+    background-color: #060048;
 }
 
 caption,
@@ -117,12 +117,6 @@ th,
     background: #ddd;
 }
 
-.shell {
-   /* background: #d6faf8; */
-   color:#464078;
-}
-
-
 .shell-prompt {
     background: none;
 }
@@ -131,6 +125,13 @@ th,
     background: #fafafa;
 }
 
+body {
+    background:#ededed;
+}
+
+#body-main {
+    background:white;
+}
 
 /**********************************************************************
  * OPACITY
@@ -149,24 +150,12 @@ th,
  * BORDER
  *
  **********************************************************************/
-dl,
-kbd,
-pre,
-samp,
-.image {
-    /* border: thin solid #ddd; */
-}
-
 pre {
     border: thin solid #ddd;
 }
 
 h2 {
     border-bottom: thin solid #ddd;
-}
-
-.shell {
-    border: none;
 }
 
 .shell-prompt,
@@ -182,6 +171,9 @@ th {
     border-collapse: collapse;
 }
 
+#body-main {
+    border: thin solid #bbb;
+}
 
 /**********************************************************************
  * FONT
@@ -189,7 +181,6 @@ th {
  **********************************************************************/
 body {
     font-family: sans-serif;
-    background:#ddd;
 }
 
 code,
@@ -335,7 +326,6 @@ pre,
     -moz-border-radius: 0;
 }
 
-
 /**********************************************************************
  * MARGIN
  *
@@ -379,24 +369,33 @@ table {
     margin-top: 2em;
 }
 
-
+#body-main {
+    margin:0 auto;
+    margin-top:20px;
+    margin-bottom:50px;
+}
 /**********************************************************************
  * PADDING
  *
  **********************************************************************/
+h1 {
+    padding-left: 0.1em;
+}
+
 h1,
 h2,
 h3,
 h4,
 h5 {
-    padding-bottom: 0.2em;
+    padding-bottom: 0.1em;
 }
 
+h1,
 h2,
 h3,
 h4,
 h5 {
-    padding-top: 0.2em;
+    padding-top: 0.1em;
 }
 
 dl,
@@ -428,7 +427,10 @@ th {
     padding: 0.1em;
 }
 
-
+#body-main {
+    padding:30px;
+    padding-top:0px;
+}
 /**********************************************************************
  * POSITION AND FLOAT
  *
@@ -458,17 +460,6 @@ th {
     position: absolute;
 }
 
-#body-main {
-    width:800px;
-    background:white;
-    border:1px solid #060048;
-    margin:0 auto;
-    margin-top:20px;
-    margin-bottom:50px;
-    padding:30px;
-    padding-top:0px;
-}
-
 
 /**********************************************************************
  * HEIGHT AND WIDTH
@@ -476,6 +467,10 @@ th {
  **********************************************************************/
 .header-footer {
     height: 2.9em;
+}
+
+#body-main {
+    width:800px;
 }
 
 @media screen {
@@ -490,22 +485,27 @@ th {
  *
  **********************************************************************/
 
-@media screen handheld, screen and (max-device-width:850px) {
+@media handheld, only screen and (max-device-width:850px) { */
     #body-main {
         border:none;
         margin: 0;
         margin-top: 0;
         margin-bottom: 0;
-        padding: 0;
-        top: 3em;
+        padding: 0 0 0 0;
+        padding-top: 0;
+        top: 0.1em;
         position: relative;
         width: 100%;
     }
 
+    body {
+        background: white;
+    }
+
     h1 {
         border-top: none;
-        margin: 0;
-        padding: 0;
+        margin: 0 0 0 0;
+        padding: 0 0 0 0;
         padding-top: 0;
     }
 }
