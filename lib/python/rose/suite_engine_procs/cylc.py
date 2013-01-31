@@ -360,7 +360,7 @@ class CylcProcessor(SuiteEngineProcessor):
             hosts = ["localhost"]
         host_proc_dict = {}
         for host in sorted(hosts):
-            timeout = "--pyro-timeout={0}".format(self.PYRO_TIMEOUT)
+            timeout = "--pyro-timeout=%s" % self.PYRO_TIMEOUT
             proc = self.popen.run_bg("cylc", "scan", "--host=" + host, timeout)
             host_proc_dict[host] = proc
         ret = []
