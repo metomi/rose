@@ -37,6 +37,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
+    PYRO_TIMEOUT = 5
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
@@ -243,7 +244,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     signal = search_result.group("signal")
                 event_time = mktime(strptime(time_stamp, "%Y/%m/%d %H:%M:%S"))
                 if task_id not in data:
-                    name, cycle_time = task_id.split(self.TASK_ID_DELIM)
+                    name, cycle_time = task_id.split(self.TASK_ID_DELIM, 1)
                     data[task_id] = {"name": name,
                                      "cycle_time": cycle_time,
                                      "submits": []}
@@ -342,7 +343,8 @@ class CylcProcessor(SuiteEngineProcessor):
             hosts = ["localhost"]
         host_proc_dict = {}
         for host in sorted(hosts):
-            proc = self.popen.run_bg("cylc", "scan", "--host=" + host)
+            timeout = "--pyro-timeout=%s" % self.PYRO_TIMEOUT
+            proc = self.popen.run_bg("cylc", "scan", "--host=" + host, timeout)
             host_proc_dict[host] = proc
         ret = []
         while host_proc_dict:
