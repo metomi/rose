@@ -853,8 +853,12 @@ class SuiteRunner(Runner):
         # Start the suite
         self.fs_util.chdir("log")
         ret = 0
-        host = hosts[0]
-        if not opts.install_only_mode:
+        if opts.install_only_mode:
+            host = None
+            if suite_running_hosts:
+                host = suite_running_hosts[0]
+        else:
+            host = hosts[0]
             # FIXME: should sync files to suite host?
             if opts.host:
                 hosts = [host]
@@ -866,13 +870,12 @@ class SuiteRunner(Runner):
             # FIXME: values in environ were expanded in the localhost
             self.suite_engine_proc.run(
                     suite_name, host, environ, opts.run_mode, args)
-            suite_running_hosts = [host]
             open("rose-suite-run.host", "w").write(host + "\n")
             self.suite_log_view_gen(suite_name)
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
-        if os.getenv("DISPLAY") and suite_running_hosts and opts.gcontrol_mode:
+        if os.getenv("DISPLAY") and host and opts.gcontrol_mode:
             self.suite_engine_proc.gcontrol(suite_name, host)
         return ret
 
