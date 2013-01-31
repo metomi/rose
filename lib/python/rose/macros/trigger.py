@@ -18,13 +18,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-import re
-
-import rose.env
 import rose.macro
 import rose.macros.rule
-
-import value
 
 
 class TriggerMacro(rose.macro.MacroBase):
@@ -36,12 +31,11 @@ class TriggerMacro(rose.macro.MacroBase):
     ERROR_DUPL_TRIG = "Badly defined trigger - {0} is 'duplicate'"
     ERROR_MISSING_METADATA = 'No metadata entry found'
     WARNING_STATE_CHANGED = '{0} -> {1}'
-    IGNORED_STATUS_PARENT = 'from ignored parent: {0}'
+    IGNORED_STATUS_PARENT = 'from state of parent: {0}'
     IGNORED_STATUS_VALUE = ('from parent value: {0} '
                             'is not {2} ({1})')
     IGNORED_STATUS_VALUES = ('from parent value: {0} with {1} '
                              'is not in the allowed values: {2}')
-    PARENT_VALUE_MISSING = 'a missing (!) value'
     PARENT_VALUE = 'value {0}'
 
     def _setup_triggers(self, meta_config):
@@ -121,11 +115,14 @@ class TriggerMacro(rose.macro.MacroBase):
             start_ids = alt_ids
         id_stack = []
         for start_id in start_ids:
-            if start_id in self.enabled_dict and start_id not in self.ignored_dict:
+            if (start_id in self.enabled_dict and
+                start_id not in self.ignored_dict):
                 has_ignored_parent = False
             if not sum([start_id in v for v in
                         self.trigger_family_lookup.values()]):
                 has_ignored_parent = False
+            node = config.get(self._get_section_option_from_id(start_id))
+            has_ignored_parent = has_ignored_parent or (node is None)
             id_stack.append((start_id, has_ignored_parent))
         update_id_list = []
         while id_stack:
@@ -151,15 +148,15 @@ class TriggerMacro(rose.macro.MacroBase):
                 continue
             if not has_ignored_parent:
                 section, option = self._get_section_option_from_id(this_id)
+                node = config.get([section, option])
                 if option is None:
-                    value = True
+                    value = None if node is None else True
                 else:
-                    node = config.get([section, option])
                     value = None if node is None else node.value
             # Check the children of this id
             id_val_map = self._get_family_dict(this_id, config, meta_config)
             for child_id, vals in id_val_map.items():
-                if has_ignored_parent:
+                if has_ignored_parent or value is None:
                     help_text = self.IGNORED_STATUS_PARENT.format(this_id)
                     self.ignored_dict.setdefault(child_id, {})
                     self.ignored_dict[child_id].update({this_id: help_text})
@@ -172,7 +169,7 @@ class TriggerMacro(rose.macro.MacroBase):
                     id_stack.insert(1, (child_id, True))
                 else:  # Enabled parent
                     if vals == [None]:
-                        # Enabled parent, don't care about what value it is.
+                        # Enabled parent with a value, don't care what it is.
                         self.enabled_dict.setdefault(child_id, [])
                         if this_id not in self.enabled_dict[child_id]:
                             self.enabled_dict[child_id].append(this_id)
@@ -184,10 +181,7 @@ class TriggerMacro(rose.macro.MacroBase):
                         id_stack.insert(1, (child_id, False))
                     elif not self._check_values_ok(value, this_id, vals):
                         # Enabled parent, with the wrong values.
-                        if value is None:
-                            repr_value = self.PARENT_VALUE_MISSING
-                        else:
-                            repr_value = self.PARENT_VALUE.format(value)
+                        repr_value = self.PARENT_VALUE.format(value)
                         if len(vals) == 1:
                             help_text = self.IGNORED_STATUS_VALUE.format(
                                              this_id, repr_value,

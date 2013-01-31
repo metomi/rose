@@ -19,15 +19,16 @@
 #-----------------------------------------------------------------------------
 """Compare two UM output files using cumf."""
 
-from rose.ana import DataLengthError
+from rose.apps.rose_ana import DataLengthError
 import re
 
 DIFF_INDEX = { "#" : 10, 
                "X" : 1, 
-               "0" : 0.1, 
+               "O" : 0.1, 
                "o" : 0.01,
                ":" : 0,
                "." : -1, }
+MISSING_DATA = "~"
 OUTPUT_STRING = "Files %s: %s c.f. %s %s"
 PASS = "compare"
 FAIL = "differ"
@@ -161,6 +162,23 @@ class CumfDiffNotFoundFailure(object):
     __str__ = __repr__
 
 
+class DiffNotUnderstoodException(Exception):
+
+    """Exception for unexpected characters in the cumf diff map"""
+    
+    
+    def __init__(self, task, character):
+        self.character = character
+        self.file1 = task.resultfile
+        self.file2 = task.kgo1file
+
+    def __repr__(self):
+        return "Invalid character '%s' in cumf diff between %s and %s"%( 
+               self.character, self.file1, self.file2)
+
+    __str__ = __repr__
+
+
 def analyse_cumf_diff(task):
     """Find percentage difference for each field from cumf diff."""
     task.errors = {}
@@ -189,6 +207,10 @@ def analyse_cumf_diff(task):
             diffmap = get_diff_map(field)
             max_error = DIFF_INDEX["."]
             for character in diffmap:
+                if character == MISSING_DATA:
+                    continue
+                if not character in DIFF_INDEX:
+                    raise DiffNotUnderstoodException(task, character)
                 if DIFF_INDEX[character] > max_error:
                     max_error = DIFF_INDEX[character]
             if name in task.errors:

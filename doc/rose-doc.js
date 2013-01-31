@@ -1,5 +1,5 @@
 /******************************************************************************
- * (C) British crown copyright 2012 Met Office.
+ * (C) British crown copyright 2012-3 Met Office.
  * 
  * This file is part of Rose, a framework for scientific suites.
  * 
@@ -171,5 +171,10 @@ $(function() {
     NODE = $("#rose-version");
     if (NODE) {
         NODE.text("Rose " + ROSE_VERSION);
+    }
+
+    // Google Code Prettify
+    if (typeof prettyPrint != 'undefined') {
+        prettyPrint();
     }
 });

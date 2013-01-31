@@ -277,13 +277,13 @@ class ConfigDataManager(object):
         s_var, s_l_var = self.load_vars_from_config(name)
         self.config[name].vars = VarData(var, l_var, s_var, s_l_var)
         
+        self.signal_load_event(rose.config_editor.LOAD_METADATA,
+                               name.lstrip("/"))
         # Process namespaces and ignored statuses.
         self.load_variable_namespaces(name)
         self.load_variable_namespaces(name, from_saved=True)
         self.load_ignored_data(name)
         self.load_metadata_for_namespaces(name)
-        self.signal_load_event(rose.config_editor.LOAD_METADATA,
-                               name.lstrip("/"))
         if reload_tree_on:
             self.reload_namespace_tree()
 
@@ -291,7 +291,7 @@ class ConfigDataManager(object):
         """Return two copies of the rose.config.ConfigNode at config_path."""
         try:
             config = rose.config.load(config_path)
-        except rose.config.SyntaxError as e:
+        except rose.config.ConfigSyntaxError as e:
             text = rose.config_editor.ERROR_LOAD_SYNTAX.format(
                                                     config_path, e)
             title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR

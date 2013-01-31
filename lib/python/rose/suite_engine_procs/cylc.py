@@ -23,7 +23,9 @@ import ast
 import os
 import pwd
 import re
+import rose.config
 from rose.popen import RosePopenError
+from rose.reporter import Event
 from rose.suite_engine_proc \
         import SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
@@ -65,7 +67,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     REC_TASK_LOG_FILE_TAIL = re.compile("(\d+\.\d+)(?:\.(.*))?")
 
-    LOG_TASK_TIMESTAMP_THRESHOLD = 2.0
+    LOG_TASK_TIMESTAMP_THRESHOLD = 5.0
 
     def get_task_log_dir_rel(self, suite):
         """Return the relative path to the log directory for suite tasks."""
@@ -151,25 +153,27 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
+    def get_version(self):
+        """Return Cylc's version."""
+        out, err = self.popen("cylc", "--version")
+        return out.strip()
+
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def launch_gcontrol(self, suite_name, host=None, args=None):
+    def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
-        log_dir = self.get_suite_dir(suite_name, "log")
         if not host:
-            # Try the "rose-suite.host" file in the suite log directory
-            try:
-                host_file = os.path.join(log_dir, "rose-suite-run.host")
-                host = open(host_file).read().strip()
-            except IOError:
-                host = "localhost"
-        fmt = r"nohup cylc gui --host=%s %s %s 1>>%s 2>&1 &"
-        log = os.path.join(log_dir, "cylc-gui.log")
+            host = "localhost"
+        environ = dict(os.environ)
+        if engine_version:
+            environ.update({self.get_version_env_name(): engine_version})
+        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1 &"
         args_str = self.popen.list_to_shell_str(args)
-        self.popen(fmt % (host, suite_name, args_str, log), shell=True)
+        self.popen(fmt % (host, suite_name, args_str, os.devnull),
+                   env=environ, shell=True)
 
     def ping(self, suite_name, hosts=None):
         """Return a list of host names where suite_name is running."""
@@ -327,9 +331,8 @@ class CylcProcessor(SuiteEngineProcessor):
             run_mode = "run"
         # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
         # that the log will be redirected back via "ssh" to the localhost.
-        bash_cmd = r"nohup cylc %s %s %s 1>>%s 2>&1 &" % (
-                run_mode, suite_name, self.popen.list_to_shell_str(args),
-                "cylc-run.log")
+        bash_cmd = r"cylc %s %s %s" % (
+                run_mode, suite_name, self.popen.list_to_shell_str(args))
         if host:
             bash_cmd_prefix = "set -eu\ncd\n"
             log_dir = self.get_suite_dir_rel(suite_name, "log")
@@ -341,9 +344,13 @@ class CylcProcessor(SuiteEngineProcessor):
                     bash_cmd_prefix += "%s=%s\n" % (key, v)
                     bash_cmd_prefix += "export %s\n" % (key)
             ssh_cmd = self.popen.get_cmd("ssh", host, "bash", "--login")
-            self.popen(*ssh_cmd, stdin=(bash_cmd_prefix + bash_cmd))
+            out, err = self.popen(*ssh_cmd, stdin=(bash_cmd_prefix + bash_cmd))
         else:
-            self.popen(bash_cmd, shell=True)
+            out, err = self.popen(bash_cmd, shell=True)
+        if err:
+            self.handle_event(err, type=Event.TYPE_ERR)
+        if out:
+            self.handle_event(out)
 
     def scan(self, hosts=None):
         """Return a list of SuiteScanResult for suites running in hosts.
@@ -367,9 +374,22 @@ class CylcProcessor(SuiteEngineProcessor):
                 sleep(0.1)
         return ret
 
-    def shutdown(self, suite):
+    def shutdown(self, suite_name, host=None, engine_version=None, args=None):
         """Shut down the suite."""
-        self.popen("cylc", "shutdown", "--force", suite)
+        command = ["cylc", "shutdown", "--force"]
+        if host:
+            command += ["--host=%s" % host]
+        if args:
+            command += args
+        command += [suite_name]
+        environ = dict(os.environ)
+        if engine_version:
+            environ.update({self.get_version_env_name(): engine_version})
+        out, err = self.popen(*command, env=environ)
+        if err:
+            self.handle_event(err, type=Event.TYPE_ERR)
+        if out:
+            self.handle_event(out)
 
     def validate(self, suite_name):
         """(Re-)register and validate a suite."""
@@ -387,7 +407,12 @@ class CylcProcessor(SuiteEngineProcessor):
             suite_dir_old = None
         if suite_dir_old is None:
             self.popen("cylc", "register", suite_name, suite_dir)
-        passphrase_dir = os.path.join(home, ".cylc", suite_name)
+        passphrase_dir_root = os.path.join(home, ".cylc")
+        for name in os.listdir(passphrase_dir_root):
+            p = os.path.join(passphrase_dir_root, name)
+            if os.path.islink(p) and not os.path.exists(p):
+                self.fs_util.delete(p)
+        passphrase_dir = os.path.join(passphrase_dir_root, suite_name)
         self.fs_util.symlink(suite_dir, passphrase_dir)
         self.popen("cylc", "validate", suite_name)
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 # 
@@ -16,13 +17,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Example Apache module configuration file for serving Rosie via mod_wsgi
-# Typically, this file should be installed in /etc/httpd/conf.d/rosie-wsgi.conf
+# NAME
+#     rose suite-shutdown
+#
+# SYNOPSIS
+#     rose suite-shutdown [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS ...]
+#
+# DESCRIPTION
+#     Shutdown a running suite.
+#
+#     If --name=SUITE-NAME is not specified, the basename of $PWD is assumed to
+#     be the suite name.
+#
+#     This wrapper is to deal with the use case where a suite may be running on
+#     dedicated servers at a site. The wrapper will make an attempt to detect
+#     where the suite is running or last run.
+#
+# OPTIONS
+#     --host=HOST
+#         Specify a host.
+#     --name=SUITE-NAME
+#         Specify the suite name.
+#     --non-interactive, --yes, -y
+#         Switch off interactive prompting (=answer yes to everything)
+#     --quiet, -q
+#         Decrement verbosity.
+#     --verbose, -v
+#         Increment verbosity.
 #-------------------------------------------------------------------------------
-
-SetEnv ROSE_HOME /path/to/rose
-SetEnv ROSE_NS rosa
-SetEnv ROSE_UTIL ws
-
-WSGIPythonPath /path/to/rose/lib/python
-WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
+exec python -m rose.suite_control shutdown "$@"

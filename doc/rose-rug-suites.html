@@ -14,11 +14,16 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -200,13 +205,6 @@
     "multi-cycle dependencies" /></div>
 
     <div class="slide">
-    <h3 class="alwayshidden">cylc task pool</h3>
-
-    <p>How cylc sees task dependencies:</p><img src=
-    "http://cylc.github.com/cylc/single/images/task-pool.png" width="40%" alt=
-    "cylc task pool" /></div>
-
-    <div class="slide">
     <h3 class="alwayshidden">A cycle isn't a prison</h3>
 
     <p>A cycle isn't a prison - if tasks can run ahead of their cycle time,
@@ -251,10 +249,10 @@
       as above.</p>
 
       <p>If we wanted to invoke a Rose application, we'd make an app called
-      <samp>hello_world</samp>, by making an <samp>app/hello_world</samp>
+      <samp>hello_world</samp>, by making an <samp>app/hello_world/</samp>
       directory and creating a <samp>rose-app.conf</samp> file in there with
       this content:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [command]
 default = echo 'Hello World'
 </pre>
@@ -310,8 +308,8 @@ default = echo 'Hello World'
       <h3 class="alwayshidden">Families example</h3>
 
       <p>Here is a <samp>suite.rc</samp> <samp>[runtime]</samp> section snippet
-      for a suite with two similar applications, <samp>hello_eris</samp> and
-      <samp>hello_pluto</samp></p>
+      for a suite with two similar applications, <samp>hello_eris/</samp> and
+      <samp>hello_pluto/</samp></p>
       <pre>
 [runtime]
     [[root]]
@@ -350,11 +348,11 @@ default = echo 'Hello World'
       <h3>Shared Applications</h3>
 
       <p>In the last example, if we don't really need two Rose applications,
-      (<samp>app/hello_eris</samp> and <samp>app/hello_pluto</samp>) we can
+      (<samp>app/hello_eris/</samp> and <samp>app/hello_pluto/</samp>) we can
       create two tasks that share a single application, with some override
       settings - in this example, a <var>WORLD</var> environment variable.</p>
 
-      <p>We reference our single application, <samp>app/hello_world</samp> by
+      <p>We reference our single application, <samp>app/hello_world/</samp> by
       using <var>ROSE_TASK_APP</var>. <code>rose task-run</code> will read this
       environment variable value and use it to run the Rose app. We will put
       the override setting (<var>WORLD</var>) in the <samp>suite.rc</samp>
@@ -462,7 +460,7 @@ default = echo 'Hello World'
 
       <p>We can then store the value of <var>COMPUTE_HOST</var> in a central
       location, the <samp>rose-suite.conf</samp> file:</p>
-      <pre>
+      <pre class="prettyprint lang-rose_conf">
 [jinja2:suite.rc]
 COMPUTE_HOST = "voyager_1"
 </pre>
@@ -527,7 +525,9 @@ COMPUTE_HOST = "voyager_1"
 
       <p>Suites also need some standard Rose <em>event hooks</em> to construct
       the Rose output viewer (more later) and report or shutdown on
-      failure:</p>
+      failure.</p>
+
+      <p>The following should be in every Rose suite:</p>
       <pre>
 [cylc]
     [[event hooks]]
@@ -543,24 +543,28 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Hello World event hooks (continued)</h3>
 
-      <p>They could also do with some recommended Rose event hooks:</p>
+      <p>Suites should also have task event hooks, along these lines:</p>
       <pre>
 [runtime]
     [[root]]
-        command scripting = "rose task-run --verbose"
         [[[event hooks]]]
            succeeded handler = "rose suite-hook"
            failed handler = "rose suite-hook --shutdown"
+           retry handler = "rose suite-hook --mail"
            submission failed handler = "rose suite-hook --shutdown"
            submission timeout handler = "rose suite-hook --mail"
            execution timeout handler = "rose suite-hook --mail"
            submission timeout = 1440 # 24 hours
            execution timeout  =  180 # 3 hours
 </pre>
+
+      <p>The <samp>[runtime]</samp> and <samp>[cylc]</samp> event hooks should
+      be adjusted if necessary - for example, increasing the timeout lengths or
+      altering the hook options like <samp>--shutdown</samp>.</p>
     </div>
 
     <div class="slide">
-      <h3>Job Submission</h3>
+      <h3 id="submit">Job Submission</h3>
 
       <p>We may want to configure a job submission method, such as using
       <code>LoadLeveler</code> (spelling is theirs):</p>
@@ -589,6 +593,26 @@ COMPUTE_HOST = "voyager_1"
             resources        = ConsumableMemory(5000)
             wall_clock_limit = '1260,1200'
 </pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Job Submission Methods</h3>
+
+      <p>cylc supports the following job submission methods (potentially more
+      later):</p>
+
+      <ul class="incremental">
+        <li>at</li>
+
+        <li>background (default)</li>
+
+        <li>loadleveler</li>
+
+        <li>pbs (Portable Batch System)</li>
+
+        <li>sge (<del>Sun</del> Oracle Grid Engine)
+        </li>
+      </ul>
     </div>
 
     <div class="slide">
@@ -693,7 +717,6 @@ COMPUTE_HOST = "voyager_1"
       <p>If task B is not needed when task A succeeds, it can be <samp>suicide
       triggered</samp>:</p>
       <pre>
-
 [scheduling]
     [[dependencies]]
         graph = "A =&gt; !B"
@@ -714,6 +737,9 @@ COMPUTE_HOST = "voyager_1"
 
         <li>clock-triggered tasks - tasks triggered at certain wallclock
         times</li>
+
+        <li>runahead limit - prevent too many cycles being active at any one
+        time</li>
       </ul>
     </div>
 
@@ -746,6 +772,17 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">cylc capabilities (continued 2)</h3>
+
+      <ul class="incremental">
+        <li>broadcasting runtime changes to a particular task or cycle within a
+        running suite (cylc broadcast)</li>
+
+        <li>reload the <samp>suite.rc</samp> settings for a running suite</li>
+      </ul>
+    </div>
+
+    <div class="slide">
       <h3>Environment</h3>
 
       <p>There are some useful environment variables that you can use in your
@@ -757,7 +794,7 @@ COMPUTE_HOST = "voyager_1"
 
         <li><var>ROSE_TASK_NAME</var>, name of the suite task.</li>
 
-        <li><var>ROSE_DATA</var>, data directory of the suite.</li>
+        <li><var>ROSE_TASK_CYCLE_TIME</var>, cycle time of the suite task.</li>
       </ul>
     </div>
 
@@ -765,11 +802,12 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Environment continued</h3>
 
       <ul class="incremental">
+        <li><var>ROSE_DATA</var>, data directory of the suite.</li>
+
         <li><var>ROSE_DATAC</var>, data directory for tasks in this cycle
         time.</li>
 
-        <li><var>ROSE_ETC</var>, etc directory of the running suite (if it
-        exists).</li>
+        <li><var>ROSE_ORIG_HOST</var>, host that invoked 'rose suite-run'.</li>
       </ul>
     </div>
 
@@ -779,8 +817,10 @@ COMPUTE_HOST = "voyager_1"
       <p>For more, see <a href="rose-command.html#rose-task-env">rose
       task-env</a> and the <a href=
       "http://cylc.github.com/cylc/single/cug-html.html">cylc
-      documentation</a>. Note: usually, only cylc environment variables are
-      used in your suite.rc file.</p>
+      documentation</a>. Note: to reference Rose environment variables in your
+      <samp>suite.rc</samp> file, you'll need to use <code>rose task-env</code>
+      in the <samp>environment scripting</samp> runtime setting (tutorial
+      <a href="rose-rug-advanced-tutorials-suite-date-time.html">here</a>).</p>
     </div>
 
     <div class="slide">
@@ -790,32 +830,31 @@ COMPUTE_HOST = "voyager_1"
       <samp>~/cylc-run/</samp>, which is updated when you run the suite.</p>
 
       <p>It is a mirror of your suite directory structure and content, but with
-      some added cylc directories and symbolic links (e.g. <samp>share</samp>).
-      These hold things like installed files, current task statuses, and task
-      output.</p>
+      some added cylc directories and symbolic links (e.g.
+      <samp>share/</samp>). These hold things like installed files, current
+      task statuses, and task output.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">cylc-run directories: work/share</h3>
 
-      <p><samp>work</samp>, <samp>share</samp> sub-directories:</p>
+      <p><samp>work/</samp>, <samp>share/</samp> sub-directories:</p>
 
       <ul class="incremental">
         <li>Usually symbolic links to data directories.</li>
 
-        <li><samp>share</samp> usually contains builds and task output
-        files.</li>
+        <li><samp>share/</samp> is intended for any files that need to be
+        shared between tasks.</li>
 
-        <li><samp>work</samp> contains task <q>working</q> directories, e.g.
-        containing Rose application namelists and
-        <samp>rose-app-run.conf</samp></li>
+        <li><samp>work/</samp> contains task <q>working</q> directories, e.g.
+        containing Rose application namelists and other temporary files</li>
       </ul>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">cylc-run directories: log/</h3>
 
-      <p><samp>log</samp>, <samp>log.*</samp> sub-directories:</p>
+      <p><samp>log/</samp>, <samp>log.*/</samp> sub-directories:</p>
 
       <ul class="incremental">
         <li>Used to store output, including error messages.</li>
@@ -825,6 +864,10 @@ COMPUTE_HOST = "voyager_1"
 
         <li>The <samp>job/</samp> subdirectory contains task scripts and their
         output and error.</li>
+
+        <li>The <samp>rose-suite.version</samp> file, which records any version
+        control information about the suite, including any local
+        modifications.</li>
       </ul>
     </div>
 
@@ -860,7 +903,7 @@ COMPUTE_HOST = "voyager_1"
         <li>Rerunnable tasks, doing one thing and doing it well</li>
 
         <li>Using Rose standard environments, utilities, standard suite
-        templates</li>
+        templates, and the recommended event hooks.</li>
       </ul>
     </div>
 
@@ -891,39 +934,10 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="handout">
+      <!-- For the images -->
       <br />
       <br />
       <br />
-    </div>
-
-    <div class="slide">
-      <h2 id="suite.rc">Suite Contents</h2>
-
-      <p>A Rose suite should definitely contain the following lines:</p>
-      <pre>
-[cylc]
-    [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
-        timeout = 4320 # 3 days
-</pre>
-    </div>
-
-    <div class="slide">
-      <h2 class="alwayshidden">Standard suite contents continued</h2>
-
-      <p>It <em>should</em> also contain these (or similar):</p>
-      <pre>
-    [[root]]
-        command scripting = "rose task-run --verbose"
-        [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook --mail"
-           execution timeout handler = "rose suite-hook --mail"
-           submission timeout = 1440 # 24 hours
-           execution timeout  =  180 # 3 hours
-</pre>
     </div>
 
     <div class="slide">
@@ -969,7 +983,7 @@ COMPUTE_HOST = "voyager_1"
       <ul class="incremental">
         <li><kbd>fcm make</kbd> - invoked using a Rose application beginning
         with <samp>fcm_make</samp>, with an <samp>fcm-make.cfg</samp> under the
-        <samp>file</samp> directory.</li>
+        <samp>file/</samp> directory.</li>
 
         <li><kbd>rose ana</kbd> - a Rose analysis engine, for comparing
         output</li>
@@ -979,19 +993,30 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Suite Utilities (continued)</h3>
+
+      <ul class="incremental">
+        <li><kbd>rose date</kbd> - manipulate date/time strings</li>
+
+        <li><kbd>rose mpi-launch</kbd> - a portable way to launch an MPI
+        command</li>
+
+        <li><kbd>rose host-select</kbd> - select from available remote hosts
+        based on things like load and disk space</li>
+      </ul>
+    </div>
+
+    <div class="slide">
       <h2 id="disk">Tidying Up</h2>
 
-      <p>You can delete a <samp>~/roses/SUITE_NAME</samp> directory in the
+      <p>You can delete a <samp>~/roses/SUITE_NAME/</samp> directory in the
       normal way (<samp>rm -rf</samp>), or run <samp>rosie delete --local-only
       SUITE_NAME</samp>.</p>
 
-      <p><samp>share</samp> and <samp>work</samp> subdirectories/symbolic links
-      in your <samp>~/cylc-run/SUITE_NAME</samp> directory can hold a
-      substantial amount of suite resources.</p>
-
       <p>You can get rid of your suite output in
-      <samp>~/cylc-run/SUITE_NAME</samp> by running <samp>cylc unregister
-      SUITE_NAME</samp>.</p>
+      <samp>~/cylc-run/SUITE_NAME/</samp> in the normal way. Note that the
+      <samp>share/</samp> and <samp>work/</samp> subdirectories may be symbolic
+      links to other locations which should also be tidied up.</p>
     </div>
 
     <div class="slide">
@@ -999,12 +1024,13 @@ COMPUTE_HOST = "voyager_1"
 
       <p>Next Steps:</p>
 
-      <ul class="incremental">
+      <ul>
         <li>Go through the <a href="rose-rug-suite-writing-tutorial.html">Suite
         Writing Tutorial</a>.</li>
 
         <li>Have a look at some of the <a href=
-        "rose-rug-advanced-tutorials.html">Advanced Tutorials</a>.</li>
+        "rose-rug-advanced-tutorials.html#suites">Advanced Suite
+        Tutorials</a>.</li>
       </ul>
     </div>
   </div>

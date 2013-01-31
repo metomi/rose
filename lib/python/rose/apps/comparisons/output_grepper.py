@@ -19,7 +19,7 @@
 #-----------------------------------------------------------------------------
 """Return a list of values matching a regular expression."""
 
-from rose.ana import DataLengthError, data_from_regexp
+from rose.apps.rose_ana import DataLengthError, data_from_regexp
 
 REGEXPS = {
   'um_wallclock' : r"Total Elapsed CPU Time:\s*(\S+)",

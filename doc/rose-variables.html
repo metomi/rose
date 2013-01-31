@@ -50,6 +50,21 @@
       <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a></li>
     </ul>
 
+    <h2 id="ROSE_APP_OPT_CONF_KEYS"><var>ROSE_APP_OPT_CONF_KEYS</var></h2>
+
+    <h3>Description</h3>
+
+    <p>Each KEY in this space delimited list switches on an optional
+    configuration in an application.</p>
+
+    <h3>Used By</h3>
+
+    <ul>
+      <li><a href="rose-command.html#rose-app-run">rose app-run</a></li>
+
+      <li><a href="rose-command.html#rose-app-run">rose task-run</a></li>
+    </ul>
+
     <h2 id="ROSE_DATA"><var>ROSE_DATA</var></h2>
 
     <h3>Description</h3>
@@ -150,7 +165,8 @@
 
     <h3>Description</h3>
 
-    <p>Specifies the path to the rose bin directory.</p>
+    <p>Specifies the path to the <var>bin/</var> or <var>sbin/</var> directory
+    of the current Rose utility.</p>
 
     <h3>Used and Provided By</h3>
 
@@ -188,19 +204,6 @@
     <h3>Description</h3>
 
     <p>Specifies an alternative list of launchers.</p>
-
-    <h3>Used By</h3>
-
-    <ul>
-      <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a></li>
-    </ul>
-
-    <h2 id="ROSE_LAUNCHER_MPICH"><var>ROSE_LAUNCHER_MPICH</var></h2>
-
-    <h3>Description</h3>
-
-    <p>Specifies the mpich launcher program to run the prog. Default is
-    <var>mpiexec</var>.</p>
 
     <h3>Used By</h3>
 
@@ -314,6 +317,21 @@
       <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
     </ul>
 
+    <h2 id="ROSE_SUITE_OPT_CONF_KEYS"><var>ROSE_SUITE_OPT_CONF_KEYS</var></h2>
+
+    <h3>Description</h3>
+
+    <p>Each KEY in this space delimited list switches on an optional
+    configuration when installing a suite.</p>
+
+    <h3>Used By</h3>
+
+    <ul>
+      <li><a href="rose-command.html#rose-app-run">rose app-run</a></li>
+
+      <li><a href="rose-command.html#rose-app-run">rose task-run</a></li>
+    </ul>
+
     <h2 id="ROSE_TASK_APP"><var>ROSE_TASK_APP</var></h2>
 
     <h3>Description</h3>
@@ -354,15 +372,18 @@
 
     <h3>Description</h3>
 
+    <p>(Deprecated) Use the <var>opt.jobs</var> setting in the application
+    configuration instead.</p>
+
     <p>The number of jobs to run in parallel in <kbd>fcm make</kbd>.
     (default=4)</p>
 
     <h3>Used By</h3>
 
     <ul>
-      <li>fcm_make built-in task utility</li>
+      <li>fcm_make built-in application</li>
 
-      <li>fcm_make2 built-in task utility</li>
+      <li>fcm_make2 built-in application</li>
     </ul>
 
     <h2 id="ROSE_TASK_OPTIONS"><var>ROSE_TASK_MIRROR_TARGET</var></h2>
@@ -375,7 +396,7 @@
     <h3>Provided By</h3>
 
     <ul>
-      <li>fcm_make built-in task utility</li>
+      <li>fcm_make built-in application</li>
     </ul>
 
     <h2 id="ROSE_TASK_NAME"><var>ROSE_TASK_NAME</var></h2>
@@ -400,15 +421,18 @@
 
     <h3>Description</h3>
 
+    <p>(Deprecated) Use the <var>opts</var> setting in the application
+    configuration instead.</p>
+
     <p>Additional options and arguments for <kbd>fcm make</kbd> or <kbd>rose
     app-run</kbd>.</p>
 
     <h3>Used By</h3>
 
     <ul>
-      <li>fcm_make built-in task utility</li>
+      <li>fcm_make built-in application</li>
 
-      <li>fcm_make2 built-in task utility</li>
+      <li>fcm_make2 built-in application</li>
     </ul>
 
     <h2 id="ROSE_TASK_PREFIX"><var>ROSE_TASK_PREFIX</var></h2>
@@ -435,24 +459,24 @@
       <li><a href="rose-command.html#rose-task-env">rose task-env</a></li>
     </ul>
 
-    <h2 id="ROSE_TASK_UTIL"><var>ROSE_TASK_UTIL</var></h2>
-
-    <h3>Description</h3>
-
-    <p>Specify a named task utility.</p>
-
-    <h3>Used By</h3>
-
-    <ul>
-      <li><a href="rose-command.html#rose-task-run">rose task-run</a></li>
-    </ul>
-
     <h2 id="ROSE_UTIL"><var>ROSE_UTIL</var></h2>
 
     <h3>Description</h3>
 
     <p>Used to identify which <kbd>rose</kbd> or <kbd>rosie</kbd> utility is
     being run.</p>
+
+    <h3>Used and Provided By</h3>
+
+    <ul>
+      <li>rose</li>
+    </ul>
+
+    <h2 id="ROSE_VERSION"><var>ROSE_VERSION</var></h2>
+
+    <h3>Description</h3>
+
+    <p>The current version of Rose.</p>
 
     <h3>Used and Provided By</h3>
 

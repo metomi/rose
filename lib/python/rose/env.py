@@ -130,13 +130,11 @@ def env_var_process(s, unbound=None):
             tail = ""
     return ret
 
+
 environment_variable_process = env_var_process
+
 
 def contains_env_var(s):
     """Check if a string contains an environment variable."""
     match = _RE.match(s)
     return (match and len(match.groupdict()["escape"]) % 2 == 0)
-
-
-if __name__ == "__main__":
-    print(map(environment_variable_process, sys.argv[1:]))

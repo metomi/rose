@@ -75,7 +75,7 @@ class ResourceLocator(object):
         return self.get_conf().get_value(["rose-doc"], default=default)
 
     def get_synopsis(self):
-        """Return the 1st line of SYNOPSIS in ROSE_HOME_BIN/ROSE_UTIL."""
+        """Return line 1 of SYNOPSIS in $ROSE_HOME_BIN/$ROSE_NS-$ROSE_UTIL."""
         try:
             home_bin = os.getenv("ROSE_HOME_BIN")
             path = os.path.join(home_bin, self.get_util_name("-"))
@@ -117,6 +117,17 @@ class ResourceLocator(object):
             return ns + separator + util
         except KeyError:
             return os.path.basename(sys.argv[0])
+
+    def get_version(self):
+        """Return ROSE_VERSION."""
+        version = os.getenv("ROSE_VERSION")
+        if version is None:
+            for line in open(get_util_home("doc", "rose-version.js")):
+                if line.startswith("ROSE_VERSION="):
+                    value = line.replace("ROSE_VERSION=", "")
+                    version = value.strip(string.whitespace + "\";")
+                    break
+        return version
 
     def locate(self, key):
         """Return the location of the resource key."""

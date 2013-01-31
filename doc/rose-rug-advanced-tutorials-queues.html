@@ -71,12 +71,12 @@
       <p>This part of the Rose user guide walks you through using cylc
       queues.</p>
 
-      <p>These can limit the number of certain tasks that are submitted
-      or run at any given time.</p>
+      <p>These can limit the number of certain tasks that are submitted or run
+      at any given time.</p>
     </div>
 
     <div class="slide">
-      <h2>Purpose</h2>
+      <h2 id="purpose">Purpose</h2>
 
       <p>Queues are used to put a limit on the number of tasks that will be
       active at any one time, even if their dependencies are satisfied.</p>
@@ -91,12 +91,13 @@
       restaurant.</p>
 
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
-      new directory) containing a blank <samp>rose-suite.conf</samp> and a
-      <samp>suite.rc</samp> file with the following contents:</p>
+      new directory somewhere - e.g. in your homespace) containing a blank
+      <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file with the
+      following contents:</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Example scheduling</h3>
+      <h3 class="alwayshidden">Example Scheduling</h3>
       <pre>
 [scheduling]
     [[dependencies]]
@@ -134,7 +135,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Overwhelming!</h3>
+      <h3 class="alwayshidden">Running It</h3>
 
       <p>Run the suite by changing directory to your new suite directory and
       invoking:</p>
@@ -143,12 +144,10 @@ rose suite-run
 </pre>
 
       <p>When <code>cylc gui</code> starts up, you will see that all the
-      <samp>steak</samp>, <samp>pasta</samp>, and <samp>pizza</samp> tasks
-      are run at once, swiftly followed by all the
-      <samp>ice_cream</samp>, <samp>cheesecake</samp>,
-      <samp>sticky_toffee</samp> tasks as the customers order from the dessert
-      menu.</p>
-    
+      <samp>steak</samp>, <samp>pasta</samp>, and <samp>pizza</samp> tasks are
+      run at once, swiftly followed by all the <samp>ice_cream</samp>,
+      <samp>cheesecake</samp>, <samp>sticky_toffee</samp> tasks as the
+      customers order from the dessert menu.</p>
     </div>
 
     <div class="slide">
@@ -178,7 +177,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Running it</h3>
+      <h3 class="alwayshidden">Running It with queues</h3>
 
       <p>Make sure you are in the root directory of your suite.</p>
 
@@ -192,14 +191,14 @@ rose suite-run
       <h3 class="alwayshidden">Results</h3>
 
       <p>When <code>cylc gui</code> starts up, you can see that there are now
-      never more than 3 active <samp>MAINS</samp> tasks running and never more than 2
-      active <samp>DESSERT</samp> tasks running.</p>
+      never more than 3 active <samp>MAINS</samp> tasks running and never more
+      than 2 active <samp>DESSERT</samp> tasks running.</p>
 
       <p>The customers will obviously have to wait!</p>
     </div>
 
     <div class="slide">
-      <h2>Further Reading</h2>
+      <h2 id="further">Further Reading</h2>
 
       <p>For more information, see the <a href=
       "http://cylc.github.com/cylc/single/cug-html.html">cylc user

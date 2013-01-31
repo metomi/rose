@@ -1,19 +1,22 @@
 # Rose Changes
 
-## Rose 2012-11+ (To be released 2013-Q1)
+Go to https://github.com/metomi/rose/issues/milestones?state=closed
+for a full listing of issues for each release.
+
+## Rose 2013-01 (Released 2013-01-31)
+
+This is the 2nd release of Rose. We hope you find it useful.
 
 ### Highlight Changes
 
 Changes that have significant impact on user experience.
 
-\#244: Tutorial: Added S5 slide show enabled documentation chapters.
+\#244, etc: Rose User Guide: Added S5 slide show enabled documentation chapters.
 * Improved brief tour of the system.
-* Metadata tutorial.
-* Suite writing tutorial.
-* In depth topics.
-* Advanced tutorials.
+* Chapters: Introduction, In Depth Topics, Suites
+* Tutorials: Metadata, Suite Writing, Advanced (x9).
 
-\#165, #243: rose suite-run: run modes and new log directory mechanism:
+\#165, #242, #243: rose suite-run: run modes and new log directory mechanism:
 * Log directories no longer rotated.
 * Introduce a run mode: `--run=reload|restart|run`.
   In reload and restart modes, the existing log directory is used.
@@ -28,9 +31,50 @@ Changes that have significant impact on user experience.
 * If `--log-keep=DAYS` is specified, `log.DATETIME` directories with modified
   time older than the specified number of `DAYS` are removed.
 
+\#404: `rose task-run`'s *task utilities* are rebranded as `rose app-run`'s
+*built-in applications*. This makes it logical to introduce a mode setting in
+the `rose-app.conf` to specify a built-in application
+(as opposed to running a command).
+* `rose app-run`: `--app-mode=MODE` option is introduced to overwrite the `mode`
+  setting. This would mainly be used internally by `rose task-run`.
+  Users would normally use the `mode` setting to do this in the `rose-app.conf`.
+* `rose task-run`: Removed both the `--no-auto-util` and `--util-key=KEY` options.
+  The `--app-mode=MODE` option supersedes the functionalities of both of these
+  options. `--no-auto-util` is achieved by doing `--app-mode=command`.
+* The `rose_install` task utility is pointless, so it is removed.
+* New prerequisite polling functionality: The main command (or built-in
+  application) will not start until all the prerequisites are met.
+
 ### Other Changes
 
-Changes that are worth mentioning.
+There have been lots of minor bug fixes and enhancements for rose config-edit,
+and lots of minor documentation improvements.
+
+Changes that are worth mentioning:
+
+\#396: rose ana: command replaced by the `rose_ana` builtin application.
+
+\#390: rose config-edit: buttons to suite engine's gcontrol and log view.
+
+\#388: rose suite-run, rose app-run:
+--opt-conf-key=KEY can now be specified via the `ROSE_SUITE_OPT_CONF_KEYS` and `ROSE_APP_OPT_CONF_KEYS`
+environment variables
+
+\#386: rose suite-run, rose app-run:
+file install target names can now contain environment variable substitution syntax.
+
+\#375: Rose configuration: add syntax highlight files for `gedit` and `vim`.
+
+\#368: rose suite-run: wait for `cylc run` to complete.
+
+\#350: rose suite-run: export Rose and suite engine versions to suite.
+
+\#349: rose env-cat: new command to substitute environment variables in input files and print result.
+
+\#340: rose suite-run: tidy old symbolic links in `$HOME/.cylc/`.
+
+\#329: rose suite-shutdown: new command.
+* rose suite-gcontrol: use `--name=SUITE-NAME` to specify a suite name instead of the last argument.
 
 \#313: rose config: added `--meta` and `--meta-key` options.
 
@@ -41,68 +85,27 @@ now be configured using Rose application configurations.
 * Introduce `ROSE_TASK_MIRROR_TARGET`. Deprecate `MIRROR_TARGET`.
 * Remove support for `ROSE_TASK_PRE_SCRIPT` - ask users to move to suite's pre command scripting.
 
-\#298: rose suite-run: fix failure if `svn` not installed.
-Also support generating version files for suites in a `git` repository.
-
-\#285: rose suite-run: simplify `ssh` commands with `bash --login`.
-
 \#284: rose config-dump: new command to re-dump Rose configuration files in
 in a directory into a common format.
-
-\#283: rose config-edit: `fail-if` errors should disappear when the settings
-are fixed.
 
 \#282: rose suite-log-view: Index view:
 * Allow display of suite information.
 * Added column for cycle time.
 * Added data generation date-time.
 
-\#281: rosie delete: fix traceback.
-
 \#273: geditor setting: no longer use the environment variables EDITOR/VISUAL
 to reduce the chance of opening a terminal based editor in a GUI environment.
 
-\#271: rose metadata-gen: Removes some extraneous `duplicate` metadata.
-
 \#261, #263: rose config-edit: file `content` no longer supported.
-
-\#257: rosie app-upgrade: fix various bugs.
-
-\#253: rose config-edit: fix modifier latent variables.
-
-\#252: rosie lookup: fix non-terminal display problem.
-
-\#249: rose config-edit: Fix duplicate errors.
 
 \#248: rose-suite-log-view: Log file view:
 * Added link to toggle between HTML and text.
 * Added link to view raw text.
 
-\#242: rose suite-run: New --restart option to launch `cylc restart` instead of
-`cylc run`.
-
-\#241: rosie create: Allow alternate prefix for special metadata suite.
-
-\#239: rose config-edit, rose-macro: Added auto fixer functionality.
-
 \#238: rose suite-log-view: New --full option to re-sync logs of remote tasks.
-
-\#237: rosie go: Fixed start up error.
-
-\#236: rosie create: Fixed copy bug.
-
-\#235: Improved demo suite.
-
-\#233: rose config-edit: Better *ignored* errors and latent variable triggering.
-
-\#232: Installation Guide: Improved wording.
 
 \#231: rose date: New command.
 
-\#228: Reference Guide: Configuration: Remove deprecated syntax.
-
-\#227: rose: Improved CLI help and version display.
-
-## Rose 2012-11 (2012-11-30)
+## Rose 2012-11 (Released 2012-11-30)
 
 This is the 1st release of Rose. Enjoy!

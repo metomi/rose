@@ -41,19 +41,17 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "metavar": "KEY",
                         "help": "Specify a named application configuration."}],
+               "app_mode": [
+                       ["--app-mode"],
+                       {"action": "store",
+                        "metavar": "MODE",
+                        "help": "Run a command or a builtin application"}],
                "auto_type": [
                        ["--auto-type"],
                        {"action": "store_true",
                         "default": False,
                         "dest": "type",
                         "help": "Automatically guess types of settings."}],
-               "auto_util_mode": [
-                       ["--no-auto-util"],
-                       {"action": "store_false",
-                        "default": True,
-                        "dest": "auto_util_mode",
-                        "help": ("Do not automatically select " +
-                                 "a task utility based on the task name.")}],
                "case_mode": [
                        ["--case"],
                        {"action": "store",
@@ -126,6 +124,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "downgrade",
                         "help": "Downgrade instead of upgrade."}],
+               "env_var_process_mode": [
+                       ["--env-var-process", "-E"],
+                       {"action": "store_true",
+                        "dest": "env_var_process_mode",
+                        "help": "Process environment variable syntax."}],
                "files": [
                        ["--file", "-f"],
                        {"action": "append",
@@ -226,17 +229,13 @@ class RoseOptionParser(OptionParser):
                         "help": "Operate on a config file's metadata."}],
                "meta_key": [
                        ["--meta-key"],
-                       {"metavar": "METAKEY",
+                       {"metavar": "KEY",
                         "help": "Specify a meta-key to search for."}],
                "meta_path": [
                        ["--meta-path", "-M"],
                        {"action": "append",
                         "metavar": "PATH",
                         "help": "Prepend items to the metadata search path."}],
-               "method_path": [
-                       ["--method-path", "-p"],
-                       {"action": "append",
-                        "help": "Preprend items to the method search path."}],
                "meta_suite": [
                        ["--meta-suite"],
                        {"action": "store_true",
@@ -415,6 +414,10 @@ class RoseOptionParser(OptionParser):
                        ["--to-web"],
                        {"action": "store_true", 
                         "help": "Convert ID to the web source URL"}],
+               "unbound": [
+                       ["--unbound", "--undef"],
+                       {"metavar": "STRING",
+                        "help": "Substitute unbound variables with STRING"}],
                "upper": [
                        ["--upper", "-u"],
                        {"action": "store_const",
@@ -426,11 +429,6 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Use search url"}],                        
-               "util_key": [
-                       ["--util-key"],
-                       {"action": "store",
-                        "metavar": "KEY",
-                        "help": "Specify a named task utility."}],
                "validate_all": [
                        ["--validate", "-V"],
                        {"action": "store_true",

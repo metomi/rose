@@ -9,7 +9,12 @@
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -169,7 +174,7 @@
     </ol>
 
     <p>E.g.</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 # This is line 1 of the comment for this file.
 # This is line 2 of the comment for this file.
 
@@ -228,7 +233,7 @@ key-4=value 4
     the <samp>Find Next</samp> action in the config editor to <kbd>F3</kbd>,
     put the following lines in your user config file, and the setting will
     apply the next time you run <code>rose config-edit</code>:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
 accel-find-next=F3
 </pre>
@@ -456,12 +461,22 @@ accel-find-next=F3
     keys can be:</p>
 
     <dl>
+      <dt><code>file-install-root</code>
+
+      <dd>Root level setting. Specify the root directory to install file
+      targets that are specified using with a relative path.</dd>
+
       <dt><code>meta</code></dt>
 
-      <dd>Top level key that specifies the configuration metadata for the
-      application. This is ignored by the application runner, but may be used
-      by other Rose utilities, such as the config editor GUI. It can be used to
+      <dd>Root level setting. Specify the configuration metadata for the
+      application. This is ignored by the application runner, but may be used by
+      other Rose utilities, such as the config editor GUI. It can be used to
       specify the application type.</dd>
+
+      <dt><code>mode</code>
+
+      <dd>Root level setting. Specify the name of a builtin application, instead
+      of running a command specified in the <code>[command]</code> section.</dd>
 
       <dt><code>[command]</code></dt>
 
@@ -541,6 +556,61 @@ accel-find-next=F3
           their basic group <code>[namelist:NAME]</code> as well as from their
           specific category <code>[namelist:NAME{CATEGORY}]</code>.</li>
         </ul>
+      </dd>
+
+      <dt><code>[poll]</code></dt>
+
+      <dd>
+        Specify prerequisites to poll for before running the actual application.
+        3 types of tests can be performed:
+
+        <p><var>all-files</var>: A list of space delimited list of file paths.
+        This test passes only if all file paths in the list exist.</p>
+
+        <p><var>any-files</var>: A list of space delimited list of file paths.
+        This test passes if any file path in the list exists.</p>
+
+        <p><var>test</var>: A shell command. This test passes if the command
+        returns a 0 (zero) return code.</p>
+
+        <p>Normally, the <var>all-files</var> and <var>any-files</var> tests
+        both test for the existence of file paths. If this is not enough, e.g.
+        you want to test for the existence of a string in each file, you can
+        specify a <var>file-test</var> to do a <code>grep</code>. E.g.:</p>
+
+        <pre class="prettyprint lang-rose_conf">
+all-files=file1 file2
+file-test=test -e {} &amp;&amp; grep -q 'hello' {}
+</pre>
+
+        <p>At runtime, any <code>{}</code> pattern in the above would be
+        replaced with the name of the file. The above make sure that both
+        <samp>file1</samp> and <samp>file2</samp> exist and that they both
+        contain the string <samp>hello</samp>.</p>
+
+        <p>The above tests will only be performed once when the application
+        runner starts. If a list of <var>delays</var> are added, the tests will
+        be performed a number of times with delays between them. If the
+        prerequisites are still not met after the number of delays, the
+        application runner will fail with a time out. The list is a
+        comma-separated list. The syntax looks like <var>[R*]T[U]</var>, where
+        <var>U</var> is a unit (<kbd>s</kbd> for seconds (default), <kbd>m</kbd>
+        for minutes and <kbd>h</kbd> for hours), <var>T</var> is the number of
+        units. E.g.:</p>
+
+        <pre class="prettyprint lang-rose_conf">
+# Default
+delays=0
+
+# Poll 1 minute after the runner begins, repeat every minute 10 times
+delays=10*1m
+
+# Poll when runner begins,
+# repeat every 10 seconds 6 times,
+# repeat every minute 60 times,
+# repeat once after 1 hour
+delays=0,6*10s,60*1m,1h
+</pre>
       </dd>
     </dl>
 
@@ -662,7 +732,7 @@ accel-find-next=F3
         used.</p>
 
         <p>For example, the following metadata:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 [env=apple]
 
 [env=banana]
@@ -853,7 +923,7 @@ sort-key = do-not-like-00
         The logical expression uses a Python-like syntax. It can reference the
         value of the current setting with the <var>this</var> variable and the
         value of other settings with their IDs. E.g.:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 [namelist:test=my_test_var]
 fail-if = this &lt; namelist:test=control_lt_var
 </pre>
@@ -861,7 +931,7 @@ fail-if = this &lt; namelist:test=control_lt_var
         <p>means that an error will be flagged if the numeric value of
         <var>my_test_var</var> is less than the numeric value of
         <var>control_lt_var</var>.</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 fail-if = this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this)
 </pre>
 
@@ -869,19 +939,19 @@ fail-if = this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - thi
 
         <p>To check array elements, the ID should be expressed with a bracketed
         index, as in the configuration:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 fail-if = this(2) != "'0A'" and this(4) == "'0A'"
 </pre>
 
         <p>Array elements can also be checked using <code>any</code> and
         <code>all</code>. E.g.:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 fail-if = any(namelist:test=ctrl_array &lt; this)
 fail-if = all(this == 0)
 </pre>
 
         <p>Expressions can be chained together and brackets used:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 fail-if = this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'))
 </pre>
 
@@ -889,20 +959,20 @@ fail-if = this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or namelist:t
         the separator. This is essentially similar to chaining them together
         with <code>or</code>, but the system can process each expression one by
         one to target the error message.</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 fail-if = this &gt; 0; this % 2 == 1; this * 3 &gt; 100
 </pre>
 
         <p>You can add a message to the error or warning message to make it
         clearer by adding a hash followed by the comment at the end of a
         configuration metadata line:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 fail-if = any(namelist:test=ctrl_array % this == 0) # Needs to be common divisor for ctrl_array
 </pre>
 
         <p>When using multiple failure conditions, different messages can be
         added if they are placed on individual lines:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 fail-if = this &gt; 0; # Needs to be less than or equal to 0
           this % 2 == 1; # Needs to be odd
           this * 3 &gt; 100; # Needs to be more than 100/3.
@@ -910,7 +980,7 @@ fail-if = this &gt; 0; # Needs to be less than or equal to 0
 
         <p>A slightly different usage of this functionality can do things like
         warn of deprecated content:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 warn-if = True  # This option is deprecated
 </pre>
 
@@ -981,7 +1051,7 @@ warn-if = True  # This option is deprecated
         be triggered only if the current setting is enabled. The syntax for
         giving values is the same as the setting "values" defined above. The
         trigger syntax looks like:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 [namelist:trig_nl=trigger_variable]
 trigger = namelist:dep_nl=A;
           namelist:dep_nl=B;
@@ -1040,7 +1110,7 @@ trigger = namelist:dep_nl=A;
         <p>Where multiple triggers act on a setting, the setting is triggered
         only if all triggers are active (i.e. an <em>AND</em> relationship).
         For example, for the two triggers here:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 [env=IS_WATER]
 trigger = env=IS_ICE: true
 
@@ -1054,7 +1124,7 @@ trigger = env=IS_ICE: true
 
         <p>The trigger syntax also supports a logical expression in the same
         format as range or fail-if metadata:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 [env=SNOWFLAKE_SIDES]
 trigger = env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
           env=SILLY_SNOWFLAKE_GEOMETRY: this &lt; 2
@@ -1094,14 +1164,14 @@ trigger = env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
         <p>The widget may take space-delimited arguments which would be
         specified after the widget name. E.g. to set up a hypothetical table
         with named columns X, Y, VCT, and Level, we may do:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 widget[rose-config-edit] = table X Y VCT Level
 </pre>
 
         <p>You may override to a Rose built-in widget by specifying a full
         <code>rose</code> class path in Python - for example, to always show
         radiobuttons for an option with <code>values</code> set:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 widget[rose-config-edit] = rose.config_editor.valuewidget.radiobuttons
 </pre>
       </dd>
@@ -1116,7 +1186,7 @@ widget[rose-config-edit] = rose.config_editor.valuewidget.radiobuttons
 
       <dd>
         <p>A web URL containing help for the setting. For example:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 url = http://www-nwp/~frve/VER/view/dev/doc/GTDP5.html
 </pre>
 
@@ -1131,7 +1201,7 @@ url = http://www-nwp/~frve/VER/view/dev/doc/GTDP5.html
         this in a popup dialog for a variable. Embedding variable ids in the
         help string will allow links to the variables to be created within the
         popup dialog box, e.g.</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
  do something linear.
 </pre>
@@ -1218,13 +1288,13 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
     <code>schemes</code> setting can be used to help the system to do the right
     thing. The general syntax of the value of the <code>schemes</code> setting
     looks like:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 schemes=PATTERN-1=SCHEME-1
        =PATTERN-2=SCHEME-2
 </pre>
 
     <p>E.g.:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 schemes=hpc*:*=rsync
        =http://host/svn-repos/*=svn
 </pre>
@@ -1264,6 +1334,20 @@ schemes=hpc*:*=rsync
       form <var>[USER@]HOST:PATH</var>.</dd>
     </dl>
 
+    <p>The application launcher will use the following logic to determine the
+    root directory to install file targets with a relative path:</p>
+
+    <ol>
+      <li>If the setting <var>file-install-root=PATH</var> is specified (at the
+      root level) in the application configuration file, its value will be
+      used.</li>
+
+      <li>If the environment variable <var>ROSE_FILE_INSTALL_ROOT</var> is
+      specified, its value will be used.</li>
+
+      <li>Otherwise, the working directory of the task will be used.</li>
+    </ol>
+
     <h2 id="appendix-metadata-location">Appendix: Metadata Location</h2>
 
     <p>Centralised Rose metadata is referred to with either the <var>meta</var>
@@ -1287,7 +1371,7 @@ schemes=hpc*:*=rsync
 
     <p>Underneath each directory in the search path should be a hierarchy like
     the following:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 ${APP}/HEAD/
 ${APP}/${VERSION}/
 ${APP}/versions.py # i.e. the upgrade macros
@@ -1307,7 +1391,7 @@ ${APP}/versions.py # i.e. the upgrade macros
 
     <p>For example, for a system <code>COFFEE</code>, with the following
     directory structure:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 COFFEE/doc/
 ...
 COFFEE/rose-meta/
@@ -1317,7 +1401,7 @@ COFFEE/rose-meta/coffee-mocha/
 </pre>
 
     <p>and the system <code>CHOCOLATE</code>:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 CHOCOLATE/doc/
 ...
 CHOCOLATE/rose-meta/
@@ -1326,13 +1410,13 @@ CHOCOLATE/rose-meta/choc-milk/
 </pre>
 
     <p>and a site configuration with:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 meta-path = /path/to/rose-meta
 </pre>
 
     <p>We would expect the following directories in
     <samp>/path/to/rose-meta</samp>:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 /path/to/rose-meta/coffee-cappuccino/
 /path/to/rose-meta/coffee-latte/
 /path/to/rose-meta/coffee-mocha/
@@ -1384,7 +1468,7 @@ meta-path = /path/to/rose-meta
 
     <p>Application configurations can reference the configuration metadata as
     follows:</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 #!cfg
 # Refer to the HEAD version
 # (typically you wouldn't do this since no upgrade process is possible)
@@ -1458,6 +1542,58 @@ meta = my-command/t123
     versions of the upgrade macros it is safest to not commit any resulting
     changes (or to use a branch of the suite which you are happy to
     discard).</p>
+
+    <h2 id="appendix-rose-ana-config">Appendix: rose-ana configuration format</h2>
+
+    <p>The <code>rose-ana</code> builtin application reads information about
+    which comparisons to perform from the <code>rose-app.conf</code> file for
+    that task. The first element is a human-readable name in square brackets,
+    followed by the following settings, one per line:</p>
+
+    <ul>
+      <li>comparison - The class name which will be called to compare the
+      resulting data from the extract command.</li>
+
+      <li>extract - Either the class name which should be called to extract
+      data from the files to be compared, or a system command which will be
+      called to extract or compare the files. In the latter case, the tokens
+      <var>{resultfile}</var> and <var>{kgo1file}</var> map to the values
+      defined in the configuration file. The token <var>{file}</var> will
+      result in the command being called twice, once on <var>{resultfile}</var>
+      and once on  <var>{kgo1file}</var>. Some extraction classes such as
+      <kbd>OutputGrepper</kbd> require additional
+      information about how to extract the data. This should be placed
+      after the class name, separated from it by a colon.</li>
+
+      <li>kgo1file - The path and name of the file containing the known good
+      output. Environment variables and the wildcard character <var>*</var> are
+      accepted.</li>
+
+      <li>resultfile - The path and name of the file containing the output to be
+      compared Environment variables and the wildcard character <kbd>*</kbd> are
+      accepted.</li>
+
+      <li>tolerance - For inexact comparisons such as <kbd>Within</kbd>, the
+      tolerance should be specified using this variable. Values with a
+      percentage sign are treated as percentages, otherwise values are treated
+      as a range either side of the known good output value. This value is
+      optional; some comparisons such as <kbd>Exact</kbd> do not require
+      it.</li>
+
+      <li>warnonfail - If this is set to be <kbd>yes</kbd> a failure of the test
+      will result in a warning rather than a failure. This value is always
+      optional.</li>
+    </ul>
+
+    <p>For example:</p>
+    <pre class="prettyprint lang-rose_conf">
+[Compare initial norms]
+resultfile = $OUTPUT_DIR/fort6.pe0
+kgo1file = /path/to/kgo/fort6.pe0
+extract = OutputGrepper:um_initial_norms
+comparison = Within
+tolerance = 5%
+</pre>
 
     <h2 id="appendix-ignored-config-edit">Appendix: Config Editor Ignored
     Mechanics</h2>

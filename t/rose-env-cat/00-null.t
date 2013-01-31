@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 # 
@@ -17,18 +17,26 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# NAME
-#     rose ana
-#
-# SYNOPSIS
-#     rose ana [--method-path=/path/to/comparisons] FILENAMES
-#
-# DESCRIPTION
-#     Run the given test config files through the comparison engine.
-#
-# OPTIONS
-#     --method-path=DIR, -p DIR
-#         Specify additional directories to locate extraction and comparison
-#         methods.
+# Test "rose env-cat" with no file.
 #-------------------------------------------------------------------------------
-exec python -m rose.ana "$@"
+. $(dirname $0)/test_header
+#-------------------------------------------------------------------------------
+tests 6
+#-------------------------------------------------------------------------------
+# Pipe from /dev/null
+TEST_KEY=$TEST_KEY_BASE
+setup
+run_pass "$TEST_KEY" rose env-cat </dev/null
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Arg 1 is /dev/null
+TEST_KEY=$TEST_KEY_BASE-arg
+setup
+run_pass "$TEST_KEY" rose env-cat /dev/null
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+exit

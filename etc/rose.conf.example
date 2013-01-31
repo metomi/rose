@@ -43,6 +43,8 @@
 # Configuration specific to "rose config-edit".
 # See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
 #
+## Path to a picture containing the suite engine icon.
+#  icon-path-scheduler = /path/to/suite-engine/icon.png
 ## Hyperlink to the user guide.
 #  help-url = http://host/rose/doc/
 ## Hyperlink to the Rose project page.
@@ -61,6 +63,19 @@
 #  home-public-html = http://host/~$USER public_html
 [rose-suite-log-view]
 
+# Configuration related to "rose mpi-launch".
+#
+## Specify a list of default launchers
+#  launcher-list=poe mpiexec mpirun mpprun
+#
+## Specify the default options of a launcher before/after the command.
+#  launcher-preopts.LAUNCHER=OPTIONS
+#  launcher-postopts.LAUNCHER=OPTIONS
+## E.g.:
+#  launcher-preopts.mpiexec=-n $NPROC
+#  launcher-preopts.mpirun=-v -np $NPROC
+[rose-mpi-launch]
+
 # Configuration related to "rose suite-run".
 #
 ## Hosts in [rose-host-select] section that can be used to run a suite.
@@ -75,9 +90,6 @@
 ## DIR is the root location of a suite's "work" directory (default=$HOME)
 #  root-dir-work=hpc*=$WORKING
 #               =*=$DATADIR
-## Maxium number of times to ping a suite to see if it is running (default=3)
-#  num-ping-try-max=3
-[rose-suite-run]
 
 # Configuration related to "rose task-run".
 #

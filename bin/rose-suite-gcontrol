@@ -21,14 +21,13 @@
 #     rose suite-gcontrol
 #
 # SYNOPSIS
-#     rose suite-gcontrol [OPTIONS] [SUITE]
-#     rose suite-gcontrol [OPTIONS] -- GCONTROL-ARGS SUITE
+#     rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS ...]
 #
 # DESCRIPTION
 #     Launch suite engine's suite control GUI for a suite.
 #
-#     If no argument is specified, the basename of $PWD is assumed to be the
-#     suite name.
+#     If --name=SUITE-NAME is not specified, the basename of $PWD is assumed to
+#     be the suite name.
 #
 #     This wrapper is to deal with the use case where a suite may be running on
 #     dedicated servers at a site. The wrapper will make an attempt to detect
@@ -37,9 +36,11 @@
 # OPTIONS
 #     --host=HOST
 #         Specify a host.
+#     --name=SUITE-NAME
+#         Specify the suite name.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_gcontrol "$@"
+exec python -m rose.suite_control gcontrol "$@"

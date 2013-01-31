@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 # 
 # This file is part of Rose, a framework for scientific suites.
@@ -16,19 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
-"""Task utility: install files in a given location of a suite."""
-
-from rose.run import TaskUtilBase
-
-class RoseInstallTaskUtil(TaskUtilBase):
-
-    """Install files in a given location."""
-
-    SCHEME = "rose_install"
-
-    def can_handle(self, key):
-        return key.startswith(self.SCHEME)
-
-    def run_impl_main(self, config, opts, args, uuid, work_files):
-        pass
+#-------------------------------------------------------------------------------
+# Alias of "rose suite-shutdown".
+#-------------------------------------------------------------------------------
+exec $(dirname $0)/rose-suite-shutdown "$@"

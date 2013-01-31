@@ -120,6 +120,11 @@ C = 2
 A = 2
 B = .false.
 C = 2
+
+[namelist:trig_absent]
+no_value_triggered = .false.
+one_value_triggered = .false.
+two_values_triggered = .false.
 __CONFIG__
 #-------------------------------------------------------------------------------
 tests 4
@@ -374,10 +379,28 @@ trigger = namelist:trig_dupl=C: .true.
 [namelist:trig_dupl=C]
 type = integer
 description = This should be triggered on/off depending on B
+
+[namelist:trig_absent=no_value]
+type = integer
+trigger = namelist:trig_absent=no_value_triggered
+
+[namelist:trig_absent=no_value_triggered]
+
+[namelist:trig_absent=one_value]
+type = integer
+trigger = namelist:trig_absent=one_value_triggered: 1
+
+[namelist:trig_absent=one_value_triggered]
+
+[namelist:trig_absent=two_values]
+type = integer
+trigger = namelist:trig_absent=two_values_triggered: 1, 2
+
+[namelist:trig_absent=two_values_triggered]
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultTransforms
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[T] rose.macros.DefaultTransforms: changes: 18
+[T] rose.macros.DefaultTransforms: changes: 21
     namelist:ignored_error_namelist=en_trig_e_err_comp_var=2
         enabled      -> trig-ignored
     namelist:ignored_error_namelist=en_trig_e_err_opt_var=2
@@ -398,6 +421,12 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
         user-ignored -> enabled     
     namelist:ignored_namelist=ign_user_sw_var=6
         user-ignored -> enabled     
+    namelist:trig_absent=no_value_triggered=.false.
+        enabled      -> trig-ignored
+    namelist:trig_absent=one_value_triggered=.false.
+        enabled      -> trig-ignored
+    namelist:trig_absent=two_values_triggered=.false.
+        enabled      -> trig-ignored
     namelist:trig_dupl(1)=A=2
         enabled      -> trig-ignored
     namelist:trig_dupl(1)=C=2
@@ -458,6 +487,11 @@ ign_user_sw_var=6
 !!E=2
 !!F=2
 switch=.false.
+
+[namelist:trig_absent]
+!!no_value_triggered=.false.
+!!one_value_triggered=.false.
+!!two_values_triggered=.false.
 
 [namelist:trig_dupl(1)]
 !!A=2

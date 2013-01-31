@@ -34,6 +34,18 @@ OPTIONS = ['confsource', 'diffsource', 'source', 'task', ]
 SUITE_RC_PREFIX = '[jinja2:suite.rc]'
 
 
+class ConfigVariableSetEvent(Event):
+
+   """Event to report a particular variable has been set."""
+   
+   LEVEL = Event.V
+   
+   def __repr__(self):
+       return "Variable %s set to %s"%(self.args[0], self.args[1])
+
+   __str__ = __repr__
+
+
 class ConfigSourceTreeSetEvent(Event):
 
    """Event to report a source tree for config files."""
@@ -86,7 +98,12 @@ class RoseSuiteConfNotFoundException(Exception):
         self.location = location
 
     def __repr__(self):
-        return "\nCannot find a suite to run in %s"%(self.location)
+        if os.path.isdir(self.location):
+            return "\nCannot find a suite to run in directory %s"%(
+                    self.location)
+        else:
+            return "\nSuite directory %s is not a valid directory"%(
+                    self.location)
 
     __str__ = __repr__
 
@@ -95,7 +112,7 @@ class SourceTreeAddedAsBranchEvent(Event):
 
    """Event to report a source tree has been added as a branch."""
    
-   LEVEL = Event.V
+   LEVEL = Event.DEFAULT
    
    def __repr__(self):
        return "Source tree %s added as branch"%(self.args[0])
@@ -107,7 +124,7 @@ class SourceTreeAddedAsTrunkEvent(Event):
 
    """Event to report a source tree has been added as a trunk."""
    
-   LEVEL = Event.V
+   LEVEL = Event.DEFAULT
    
    def __repr__(self):
        return "Source tree %s added as trunk"%(self.args[0])
@@ -119,7 +136,7 @@ class SuiteSelectionEvent(Event):
 
    """Event to report a source tree for config files."""
    
-   LEVEL = Event.V
+   LEVEL = Event.DEFAULT
    
    def __repr__(self):
        return "Will run suite from %s"%(self.args[0])
@@ -153,6 +170,7 @@ class StemRunner(object):
             self.opts.defines.append(SUITE_RC_PREFIX + var + '=' + val )
         else: 
             self.opts.defines= [ SUITE_RC_PREFIX + var + '=' + val ]
+        self.reporter(ConfigVariableSetEvent(var, val))
         return
 
     def _ascertain_project(self, item):
@@ -204,15 +222,8 @@ class StemRunner(object):
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
-
-        basedir = ''        
-        if self.opts.diffsource:
-            basedir = self.opts.diffsource[0]
-        elif self.opts.source:
-            basedir = self.opts.source[0]
+        dummy, basedir = self._ascertain_project(os.getcwd())
         name = os.path.basename(basedir)
-        if not name:
-            name = 'rose-stem-test'
         return name
 
     def _this_suite(self):
@@ -224,7 +235,9 @@ class StemRunner(object):
             basedir = self.opts.diffsource[0]
         elif self.opts.source:
             basedir = self.opts.source[0]
-
+        else:
+            dummy, basedir = self._ascertain_project(os.getcwd())
+            
         suitedir = os.path.join(basedir, DEFAULT_TEST_DIR)
         suitefile = os.path.join(suitedir, rose.TOP_CONFIG_NAME)
 
@@ -275,7 +288,12 @@ class StemRunner(object):
             confsource = self.opts.source[0]
 
         if confsource:
-            confsource = re.sub(r'@.*', r'', confsource)
+            conf = confsource.split('@')
+            confrev = ''
+            confsource = conf[0]
+            if len(conf) > 1:
+                confrev = '@' + conf[1]
+            self._add_define_option('URL_CONFREV', '"' + confrev + '"')
             self._add_define_option('URL_CONFDIR', '"' + confsource + '"')
         
         # Generate the variable containing tasks to run

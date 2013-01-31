@@ -73,7 +73,7 @@ html>body .external {border-bottom: none;}
 
 .incremental, .incremental *, .incremental *:after {color: #DDE; visibility: hidden;}
 img.incremental {visibility: hidden;}
-.slide .current {color: #B02;}
+/* .slide .current {color: #B02;}  Colours the current bullet point */ 
 
 h2 {border-top: none;}
 /* diagnostics

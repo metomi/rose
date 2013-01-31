@@ -75,7 +75,7 @@
     </div>
 
     <div class="slide">
-      <h2>Purpose</h2>
+      <h2 id="purpose">Purpose</h2>
 
       <p><code>cylc broadcast</code> can be used to change any
       <samp>[runtime]</samp> setting during a suite's run.</p>
@@ -90,11 +90,12 @@
     </div>
 
     <div class="slide">
-      <h2 id="example">Example - task-based</h2>
+      <h2 id="example-task">Task-based Example</h2>
 
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
-      new directory) containing a blank <samp>rose-suite.conf</samp> and a
-      <samp>suite.rc</samp> file that looks like this:</p>
+      new directory somewhere - e.g. in your homespace) containing a blank
+      <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
+      like this:</p>
       <pre>
 [scheduling]
     initial cycle time = 2013010100
@@ -154,7 +155,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Running it</h3>
+      <h3 class="alwayshidden">Running It</h3>
 
       <p>The <samp>startup</samp> task will change the
       <samp>[[[environment]]]</samp> setting <samp>COLOUR</samp> of
@@ -171,7 +172,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h2 id="results">Results</h2>
+      <h2 id="results-task">Results</h2>
 
       <p>Once the suite has run, you can see the results of the <code>cylc
       broadcast</code> by looking at <samp>print_colour</samp>'s standard out
@@ -182,12 +183,12 @@ rose suite-log-view
 
       <p>The output (<samp>out</samp>) of the <samp>print_colour</samp> tasks
       should have some green text, except for the <samp>2013010200</samp> cycle
-      time where it should be blue and <samp>2013010400</samp> where it should be
-      red.</p>
+      time where it should be blue and <samp>2013010400</samp> where it should
+      be red.</p>
     </div>
 
     <div class="slide">
-      <h2 id="cli">Example - CLI</h2>
+      <h2 id="example-cli">CLI-based Example</h2>
 
       <p>You can also run <code>cylc broadcast</code> from the command
       line.</p>
@@ -204,7 +205,7 @@ rose suite-log-view
     </div>
 
     <div class="slide">
-      <h2>Example - cycle time extension</h2>
+      <h3 class="alwayshidden">Cycle Time Extension</h3>
 
       <p>We should make the suite run a bit longer by increasing <samp>final
       cycle time</samp>:</p>
@@ -243,7 +244,7 @@ cylc broadcast --host=HOSTNAME -n print_colour -s [environment]COLOUR=purple $SU
     </div>
 
     <div class="slide">
-      <h2>Results</h2>
+      <h2 id="results-cli">Results</h2>
 
       <p>You can see the results of your command line changes by looking at the
       output viewer. Run:</p>
@@ -256,7 +257,7 @@ rose suite-log-view
     </div>
 
     <div class="slide">
-      <h2>Further reading</h2>
+      <h2 id="further">Further Reading</h2>
 
       <p>For more information, run:</p>
       <pre class="shell">
