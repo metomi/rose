@@ -1,0 +1,381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Upgrade Macro Development</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3
+      <a href="http://www.metoffice.gov.uk">Met Office</a>.
+      See <a href="rose-terms-of-use.html">Terms of Use</a>.
+      <br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.
+      <br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Upgrade Macro Development</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through writing
+      macros to upgrade application configurations to newer metadata versions.</p>
+
+      <p>Upgrade macros are intended to keep application configurations
+      in sync with changes to application inputs e.g. from new code releases.</p>
+      
+      <p>You should already be familiar with using
+      <a href="rose-command.html#rose-app-upgrade">rose app-upgrade</a> (see the
+      <a href="rose-rug-advanced-tutorials-upgrade-usage.html">Upgrade Usage</a>
+      tutorial) and the concepts in the
+      <a href="rose-configuration.html#appendix-upgrade">reference</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="example">Example</h2>
+
+      <p>In this example, we'll be upgrading a boat on a desert island.</p>
+
+      <p>Create a new directory called <samp>make_boat_app</samp> somewhere -
+      e.g. in your homespace - containing
+      a <samp>rose-app.conf</samp> file with the following content:</p>
+      <pre class="prettyprint lang-rose_conf">
+meta=make-boat/0.1
+
+[namelist:materials]
+paddles=1
+large_trees=1
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example App Explanation</h3>
+
+      <p>This creates an app config that configures our simple boat (a raft). It references a meta-flag
+      (for which metadata is unlikely to already exist), made up of a category
+      (<samp>make-boat</samp>) at a particular version (<samp>0.1</samp>). The meta flag is
+      used by Rose to locate a configuration metadata directory.</p>
+      
+      <p>It's important to note that the version in the meta flag doesn't have to be numeric -
+      it could be <samp>vn0.1</samp> or <samp>alpha</samp> or <samp>Roomy-Raft</samp>.</p>
+      
+      <p>We need to create some metadata to make this work.</p>
+      
+   </div>
+   
+   <div class="slide">
+     <h2 id="example-metadata">Example Metadata</h2>
+      
+      <p>Create a <samp>rose-meta/make-boat/</samp> directory somewhere, for
+      example in your homespace (<samp>mkdir -p ~/rose-meta/make-boat</samp>).</p>
+      
+      <p>This is the category (also called command) directory for the metadata, which will hold
+      sub-directories for actual configuration metadata versions (each containing a <samp>rose-meta.conf</samp> file, etc).</p>
+      
+      <p>Usually, this would be centrally stored, under version
+      control with the source code somewhere.</p>
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Creating Example Metadata Versions</h3>
+
+      <p>We know we need some metadata for the <samp>0.1</samp> version, so
+      create a <samp>0.1/</samp> subdirectory under <samp>rose-meta/make-boat/</samp>.</p>
+      
+      <p>We'll need a <samp>rose-meta.conf</samp> file there too, so create an
+      empty one - e.g. if the directories are in your homespace, run:</p>
+      <pre class="shell">
+touch ~/rose-meta/make-boat/0.1/rose-meta.conf
+</pre>
+
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Creating the First Metadata Version</h3>
+
+      <p>We can safely say that our two namelist inputs are essential for the
+      construction and testing of the boat, so we can paste the following into
+      the newly created <samp>rose-meta.conf</samp> file:</p>
+      <pre class="prettyprint lang-rose_conf">
+[namelist:materials=paddles]
+compulsory=true
+range=1:
+type=integer
+
+[namelist:materials=large_trees]
+compulsory=true
+values=1
+</pre>
+
+      <p>So far, we have a normal application configuration which references
+      some metadata, somewhere, for a category at a certain version.</p>
+      
+      <p>Let's make another version to upgrade to.</p>
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Creating the Next Metadata Version</h3>
+      
+      <p>We can now make an <a href="http://en.wikipedia.org/wiki/Outrigger_canoe">outrigger</a>
+      for our canoe, to make it more stable. Some of the inputs in our application configuration
+      will need to change.</p>
+      
+      <p>After upgrading, our application configuration would probably need to look a bit like this (don't change it yet!):</p>
+      <pre class="prettyprint lang-rose_conf">
+meta=make-boat/0.2
+
+[namelist:materials]
+paddles=1
+small_trees=1
+large_trees=1
+</pre>
+      <p>It looks like we've added an input, <samp>small_trees</samp>.</p>
+      
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Metadata for the Next Metadata Version</h3>
+            
+      <p>Let's create the new metadata version first, to document the change.</p>
+      
+      <p>Create a new subdirectory, <samp>rose-meta/make-boat/0.2/</samp>,
+      containing a <samp>rose-meta.conf</samp> file that looks like this:</p>
+      <pre class="prettyprint lang-rose_conf">
+[namelist:materials=paddles]
+compulsory=true
+range=1:
+type=integer
+
+[namelist:materials=small_trees]
+compulsory=true
+values=1,2
+
+[namelist:materials=large_trees]
+compulsory=true
+values=1
+</pre>
+      <p>We now want to automate the process of updating our app config from
+      <samp>make-boat/0.1</samp> to the new <samp>make-boat/0.2</samp>
+      version.</p>
+   </div>
+   
+   <div class="slide">
+      <h2 id="versions.py">versions.py</h3>
+
+      <p>Upgrade macros are invoked through a Python module,
+      <samp>versions.py</samp>, that doesn't live with any particular version
+      metadata - it should be present at the root of the category directory.</p>
+      
+      Create a new file <samp>rose-meta/make-boat/versions.py</samp>. You can check that
+      everything is OK so far by changing directory to the <samp>rose-meta/make-boat/</samp> directory
+      and running <code>ls -R</code> - it should look something like:</p>
+      <pre>
+.:
+0.1  0.2  versions.py
+
+./0.1:
+rose-meta.conf
+
+./0.2:
+rose-meta.conf
+</pre>
+   </div>
+   
+   <div class="slide">
+      <h3>Upgrade Macros Explained</h3>
+      
+      <p>Upgrade macros are Python objects with a <samp>BEFORE_TAG</samp>
+      (e.g. <samp>"0.1"</samp>) and an <samp>AFTER_TAG</samp> (e.g. <samp>"0.2"</samp>).</p>
+      
+      <p>When a user requests an upgrade for their configuration (e.g. by running <code>rose app-upgrade</code>),
+      the <samp>versions.py</samp> file will be searched for a macro whose <samp>BEFORE_TAG</samp> matches
+      the version (the <samp>0.1</samp> in <samp>meta=make-boat/0.1</samp>). When that particular upgrade macro is run,
+      the version in the app configuration will be changed from <samp>BEFORE_TAG</samp> to <samp>AFTER_TAG</samp> (e.g. <samp>meta=make-boat/0.1</samp> to <samp>meta=make-boat/0.2</samp>), as well as making other changes to the configuration if needed, like adding/removing the right variables.</p>
+
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Chaining Macros</h3>
+      
+      <p>If the user wanted to upgrade across multiple versions - e.g. <samp>0.1</samp> to <samp>0.4</samp> -
+      there would need to be a chain of objects whose <samp>BEFORE_TAG</samp> was equal to the last <samp>AFTER_TAG</samp>,
+      ending in an <samp>AFTER_TAG</samp> of <samp>0.4</samp>.</p>
+      
+      <p>We'll cover multiple version upgrading later in the tutorial.</p>
+   </div>
+   
+   <div class="slide">
+      <h3>Upgrade Macro Skeleton</h3>
+
+      Upgrade macros are bits of Python code that essentially look like this:</p>
+      
+      <pre class="prettyprint">
+class Upgrade272to273(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 27.2 to 27.3."""
+
+    BEFORE_TAG = "27.2"
+    AFTER_TAG = "27.3"
+
+    def upgrade(self, config, meta_config=None):
+        """Upgrade the application configuration (config)."""
+        # Some code doing something to config goes here.
+        return config, self.reports
+</pre>
+      <p>They are sub-classes of a particular class,
+      <samp>rose.upgrade.MacroUpgrade</samp>, which means that some of
+      the Python functionality is done 'under the hood' to make things easier.</p>
+      
+      <p>You shouldn't need to know very much Python to get most things done.</p>
+   </div>
+   
+   <div class="slide">
+      <h3>Example Upgrade Macro</h3>
+      
+      <p>Paste the following into your <samp>versions.py</samp> file:</p>
+      <pre class="prettyprint">
+import rose.upgrade
+
+
+class MyFirstUpgradeMacro(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 0.1 (Crafty Canoe) to 0.2 (Outrageous Outrigger)."""
+
+    BEFORE_TAG = "0.1"
+    AFTER_TAG = "0.2"
+
+    def upgrade(self, config, meta_config=None):
+        """Upgrade the boat!"""
+        # Some code doing something to config goes here.
+        return config, self.reports
+</pre>
+      <p>This is already a functional upgrade macro - although it won't do
+      anything. Note that the name of the class (<samp>MyFirstUpgradeMacro</samp>)
+      doesn't need to be related to the versions - the only identifiers that
+      matter are the <samp>BEFORE_TAG</samp> and the <samp>AFTER_TAG</samp>.</p>
+      
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Upgrade Macro API</h3>
+      
+      <p>We need to get the macro to add the new <samp>0.2</samp> option,
+      <samp>namelist:materials=small_trees</samp>.
+      
+      <p>We can use the <a href="rose-api.html#upgrade">nice API</a> provided
+      to express this in Python code - replace the <samp># Some code doing something...</samp>
+      line with:</p>
+      <pre class="prettyprint">
+        self.add_setting(config, ["namelist:materials", "small_trees"], "1")
+</pre>
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Upgrade Macro Explanation</h3>
+      
+      <p>This changes the app configuration (<samp>config</samp>) in the way we want, and (behind the scenes)
+      adds some things to the <samp>self.reports</samp> list mentioned in the
+      <samp>return config, self.reports</samp> line. Note that because we were
+      adding <samp>tree_trunks</samp>, we needed a value to add it with -
+      what it is will often be a matter of judgement.</p>
+
+   </div>
+   
+   <div class="slide">
+      <h3>Running rose app-upgrade</h3>
+
+      <p>Our upgrade macro will now work - change directory to the application directory
+      and run:</p>
+      <pre class="shell">
+rose app-upgrade --meta-path=path/to/rose-meta
+</pre>
+      <p>where <samp>--meta-path</samp> equals the <samp>rose-meta/</samp> directory you
+      created. This option won't usually be needed by users, if the metadata is
+      centrally stored.</p>
+      
+      <p>This should display some information about the current and available versions -
+      see the help by running:</p>
+      <pre class="shell">
+rose help app-upgrade
+</pre>
+
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Upgrading with rose app-upgrade</h3>
+      
+      <p>Let's upgrade to <samp>0.2</samp>. Run:</p>
+      <pre class="shell">
+rose app-upgrade --meta-path=path/to/rose-meta 0.2
+</pre>
+      <p>This should provide you with a summary of changes, and prompt you
+      to accept them. If you accept them, the app config file should change
+      accordingly.</p>
+
+   </div>
+
+    <div class="slide">
+      <h2 id="further">Further Reading</h2>
+
+      <p>For more information, see the <a href=
+      "rose-configuration.html#meta.conf.behaviour">Configuration Metadata
+      Reference</a>.</p>
+    </div>
+  </div>
+</body>
+</html>

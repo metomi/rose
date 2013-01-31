@@ -214,6 +214,7 @@ def add_site_meta_paths():
         for path in path.split(os.pathsep):
             path = os.path.expanduser(os.path.expandvars(path))
             sys.path.insert(0, os.path.abspath(path))
+    sys.path.append(os.path.join(os.getenv("ROSE_HOME"), "etc/rose-meta"))
 
 
 def add_env_meta_paths():
@@ -266,7 +267,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         opt_node = config.get([rose.CONFIG_SECT_TOP,
                                rose.CONFIG_OPT_PROJECT], no_ignore=True)
     if opt_node is None or not opt_node.value:
-        meta_keys = ["etc/metadata/all"]
+        meta_keys = ["rose-all"]
     else:
         key = opt_node.value
         if "/" not in key:

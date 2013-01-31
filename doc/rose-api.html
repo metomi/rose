@@ -499,9 +499,8 @@ def show_fixed(self, should_show)
     trigger changing and type checking.</p>
 
     <p>This section explains how to add your own custom macros to transform and
-    validate configurations. Upgrade macros are covered in a different section -
-    they are a special type of custom macro and (will be) described in
-    <a href="rose-rug-advanced-topics.html">Advanced Topics</a>.</p>
+    validate configurations. See <a href="#upgrade">Upgrade Macro API</a> for
+    upgrade macros.</p>
     
     <p>Macros should be written in Python. They can be
     run within <code>rose config-edit</code> or via <code>rose
@@ -628,6 +627,11 @@ class SomeTransformer(rose.macro.MacroBase):
                             "So far, anyway.")
         return config, self.reports
 </pre>
+
+    <h2 id="upgrade">Rose Upgrade Macros</h2>
+
+    <p>Rose upgrade macros are used to upgrade application configurations
+    between metadata versions.</p>
 
     <h2 id="rosie-ws">Rosie Web</h2>
 

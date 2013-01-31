@@ -98,7 +98,7 @@ class MacroUpgrade(rose.macro.MacroBase):
                 file_map.pop(key)
         return file_map
 
-    def add_setting(self, config, keys, value=None,
+    def add_setting(self, config, keys, value=None, forced=False,
                     state=None, comments=None, info=None):
         """Add a setting to the configuration."""
         section, option = self._get_section_option_from_keys(keys)
@@ -113,12 +113,39 @@ class MacroUpgrade(rose.macro.MacroBase):
         if option is not None and config.get([section]) is None:
             self.add_setting(config, section)
         if config.get([section, option]) is not None:
+            if forced:
+                return self.change_setting(config, keys, value, state,
+                                           comments, info)
             return False
         if value is not None and not isinstance(value, basestring):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(id_, value))
         config.set([section, option], value=value, state=state,
                    comments=comments)
+        self.add_report(section, option, value, info)
+
+    def change_setting_value(self, config, keys, value, forced=False,
+                             comment=None, info=None):
+        """Change a setting (option) value in the configuration."""
+        section, option = self._get_section_option_from_keys(keys)
+        id_ = self._get_id_from_section_option(section, option)
+        node = config.get([section, option])
+        if node is None:
+            if forced:
+                return self.add_setting(config, keys, value, state,
+                                        comments, info)
+            return False
+        if node.value == value:
+            return False
+        if option is None:
+            text = "Not valid for value change: {0}".format(id_)
+            raise TypeError(text)
+        if info is None:
+            info = self.INFO_CHANGED_VAR.format(value)
+        if (value is not None and not isinstance(value, basestring):
+            text = "New value {0} for {1} is not a string"
+            raise ValueError(text.format(id_, value))
+        config.set([section, option], value=value, comments=comments)
         self.add_report(section, option, value, info)
 
     def get_value(self, config, keys, no_ignore=False):
