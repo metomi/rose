@@ -73,8 +73,8 @@
 #     --new, -N
 #         (Re-)create working directories.
 #     --no-gcontrol
-#         Do not run "cylc gui". Default is to run "cylc gui" if the
-#         DISPLAY environment variable is defined.
+#         Do not run "cylc gui". Default is to run "cylc gui" if the suite is
+#         running and the DISPLAY environment variable is defined.
 #     --no-log-archive
 #         Do not archive (tar-gzip) old log directories.
 #     --no-overwrite
