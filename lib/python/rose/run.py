@@ -685,11 +685,12 @@ class SuiteRunner(Runner):
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
+        suite_running_hosts = self.suite_engine_proc.ping(suite_name, hosts)
         if opts.run_mode == "reload":
-            if not self.suite_engine_proc.ping(suite_name, hosts):
+            if not suite_running_hosts:
                 raise NotRunningError(suite_name)
         else:
-            if self.suite_engine_proc.ping(suite_name, hosts):
+            if suite_running_hosts:
                 if opts.force_mode:
                     opts.install_only_mode = True
                 else:
@@ -865,12 +866,13 @@ class SuiteRunner(Runner):
             # FIXME: values in environ were expanded in the localhost
             self.suite_engine_proc.run(
                     suite_name, host, environ, opts.run_mode, args)
+            suite_running_hosts = [host]
             open("rose-suite-run.host", "w").write(host + "\n")
             self.suite_log_view_gen(suite_name)
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
-        if os.getenv("DISPLAY") and opts.gcontrol_mode:
+        if os.getenv("DISPLAY") and suite_running_hosts and opts.gcontrol_mode:
             self.suite_engine_proc.gcontrol(suite_name, host)
         return ret
 
