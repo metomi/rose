@@ -330,10 +330,14 @@ class CylcProcessor(SuiteEngineProcessor):
         # Invoke "cylc run" or "cylc restart"
         if run_mode not in ["reload", "restart", "run"]:
             run_mode = "run"
+        opt_force = ""
+        if run_mode == "reload":
+            opt_force = " --force"
         # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
         # that the log will be redirected back via "ssh" to the localhost.
-        bash_cmd = r"cylc %s %s %s" % (
-                run_mode, suite_name, self.popen.list_to_shell_str(args))
+        bash_cmd = r"cylc %s%s %s %s" % (
+                run_mode, opt_force, suite_name,
+                self.popen.list_to_shell_str(args))
         if host:
             bash_cmd_prefix = "set -eu\ncd\n"
             log_dir = self.get_suite_dir_rel(suite_name, "log")
