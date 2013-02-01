@@ -793,7 +793,7 @@ class SuiteRunner(Runner):
 
         # Install items to user@host
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
-        queue = [] # [[pipe, command, "ssh"|"rsync"], ...]
+        queue = [] # [[pipe, command, "ssh"|"rsync", auth], ...]
         for user, host in sorted(auths):
             auth = user + "@" + host
             command = self.popen.get_cmd("ssh", auth, "bash", "--login", "-c")

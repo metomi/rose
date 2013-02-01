@@ -203,12 +203,8 @@ class RosePopener(object):
 
         """
         stdin = kwargs.get("stdin")
-        stderr_level = None
-        if "stderr_level" in kwargs:
-            stderr_level = kwargs.pop("stderr_level")
-        stdout_level = None
-        if "stdout_level" in kwargs:
-            stdout_level = kwargs.pop("stdout_level")
+        stderr_level = kwargs.pop("stderr_level", None)
+        stdout_level = kwargs.pop("stdout_level", None)
         rc, stdout, stderr = self.run(*args, **kwargs)
         if stdout:
             self.handle_event(stdout, level=stdout_level)
