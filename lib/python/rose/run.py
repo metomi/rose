@@ -650,6 +650,10 @@ class SuiteRunner(Runner):
             self.fs_util.chdir(opts.conf_dir)
             opts.conf_dir = None
 
+        suite_name = opts.name
+        if not opts.name:
+            suite_name = os.path.basename(os.getcwd())
+
         # Automatic Rose constants
         # ROSE_ORIG_HOST: originating host
         # ROSE_VERSION: Rose version (not retained in run_mode=="reload")
@@ -658,7 +662,11 @@ class SuiteRunner(Runner):
         my_rose_version = ResourceLocator.default().get_version()
         suite_engine_key = self.suite_engine_proc.get_version_env_name()
         if opts.run_mode == "reload":
-            suite_engine_version = config.get_value(["env", suite_engine_key])
+            prev_config_path = self.suite_engine_proc.get_suite_dir(
+                    suite_name, "log", "rose-suite-run.conf")
+            prev_config = rose.config.load(prev_config_path)
+            suite_engine_version = prev_config.get_value(
+                    ["env", suite_engine_key])
         else:
             suite_engine_version = self.suite_engine_proc.get_version()
         auto_items = {"ROSE_ORIG_HOST": socket.gethostname(),
@@ -668,10 +676,6 @@ class SuiteRunner(Runner):
             if v is not None:
                 config.set(["env", k], v)
                 config.set([jinja2_section, k], '"' + v + '"')
-
-        suite_name = opts.name
-        if not opts.name:
-            suite_name = os.path.basename(os.getcwd())
 
         # See if suite is running or not
         hosts = []
@@ -947,8 +951,14 @@ class SuiteRunner(Runner):
                         logs.remove(log)
                 else:
                     for root, dirs, files in os.walk(log):
-                        if any([os.stat(os.path.join(root, f)).st_mtime >= t
-                                for f in files]):
+                        keep = False
+                        for file in files:
+                            path = os.path.join(root, file)
+                            if (os.path.exists(path) and
+                                os.stat(path).st_mtime >= t):
+                                keep = True
+                                break
+                        if keep:
                             break
                     else:
                         self.fs_util.delete(log)
