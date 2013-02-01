@@ -391,13 +391,9 @@ class CylcProcessor(SuiteEngineProcessor):
         environ = dict(os.environ)
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
-        out, err = self.popen(*command, env=environ)
-        if err:
-            self.handle_event(err, type=Event.TYPE_ERR)
-        if out:
-            self.handle_event(out)
+        self.popen.run_simple(*command, env=environ)
 
-    def validate(self, suite_name):
+    def validate(self, suite_name, strict_mode=False):
         """(Re-)register and validate a suite."""
         suite_dir_rel = self.get_suite_dir_rel(suite_name)
         home = os.path.expanduser("~")
@@ -407,12 +403,13 @@ class CylcProcessor(SuiteEngineProcessor):
         if out:
             suite_dir_old = out.strip()
         suite_passphrase = os.path.join(suite_dir, "passphrase")
-        self.popen("cylc", "refresh", "--unregister")
+        self.popen.run_simple("cylc", "refresh", "--unregister",
+                              stdout_level=Event.VV)
         if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
-            self.popen("cylc", "unregister", suite_name)
+            self.popen.run_simple("cylc", "unregister", suite_name)
             suite_dir_old = None
         if suite_dir_old is None:
-            self.popen("cylc", "register", suite_name, suite_dir)
+            self.popen.run_simple("cylc", "register", suite_name, suite_dir)
         passphrase_dir_root = os.path.join(home, ".cylc")
         for name in os.listdir(passphrase_dir_root):
             p = os.path.join(passphrase_dir_root, name)
@@ -420,7 +417,11 @@ class CylcProcessor(SuiteEngineProcessor):
                 self.fs_util.delete(p)
         passphrase_dir = os.path.join(passphrase_dir_root, suite_name)
         self.fs_util.symlink(suite_dir, passphrase_dir)
-        self.popen("cylc", "validate", suite_name)
+        command = ["cylc", "validate", "-v"]
+        if strict_mode:
+            command.append("--strict")
+        command.append(suite_name)
+        self.popen.run_simple(*command, stdout_level=Event.V)
 
     def _parse_user_host(self, user, host, my_user=None, my_host=None):
         if my_user is None:
