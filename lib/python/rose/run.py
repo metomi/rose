@@ -665,8 +665,9 @@ class SuiteRunner(Runner):
                       "ROSE_VERSION": ResourceLocator.default().get_version(),
                       suite_engine_key: suite_engine_version}
         for k, v in auto_items.items():
-            config.set(["env", k], v)
-            config.set([jinja2_section, k], '"' + v + '"')
+            if v is not None:
+                config.set(["env", k], v)
+                config.set([jinja2_section, k], '"' + v + '"')
 
         suite_name = opts.name
         if not opts.name:
