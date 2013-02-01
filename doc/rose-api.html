@@ -545,7 +545,7 @@ def show_fixed(self, should_show)
     information about the configuration items.</p>
 
     <p>A validator macro should look like:</p>
-    <pre>
+    <pre class="prettyprint">
 import rose.macro
 
 class SomeValidator(rose.macro.MacroBase):
@@ -571,7 +571,7 @@ class SomeValidator(rose.macro.MacroBase):
     then the relevant error message, and optionally a warning flag that we'll
     discuss later. If the setting is a section, the option should be
     <code>None</code> and the value None. For example,</p>
-    <pre>
+    <pre class="prettyprint">
     def validate(self, config, meta_config=None):
         editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
         if editor_value != "sed":
@@ -587,7 +587,7 @@ class SomeValidator(rose.macro.MacroBase):
     something <em>may</em> be wrong, such as warning when using an
     advanced-developer-only option. They are invoked by passing a 5th argument
     to <code>self.add_report</code>, <code>is_warning</code>, like so:</p>
-    <pre>
+    <pre class="prettyprint">
             self.add_report("env",
                             "MY_FAVOURITE_STREAM_EDITOR",
                             editor_value,
@@ -596,7 +596,7 @@ class SomeValidator(rose.macro.MacroBase):
 </pre>
 
     <p>A transformer macro should look like:</p>
-    <pre>
+    <pre class="prettyprint">
 import rose.macro
 
 class SomeTransformer(rose.macro.MacroBase):
@@ -614,7 +614,7 @@ class SomeTransformer(rose.macro.MacroBase):
     option should be <code>None</code> and the value None. If an option was
     removed, the value should be the old value - otherwise it should be the new
     one (added/changed). For example,</p>
-    <pre>
+    <pre class="prettyprint">
     def transform(self, config, meta_config=None):
         """Add some more snow control."""
         if config.get(["namelist:snowflakes"]) is None:
@@ -631,7 +631,124 @@ class SomeTransformer(rose.macro.MacroBase):
     <h2 id="upgrade">Rose Upgrade Macros</h2>
 
     <p>Rose upgrade macros are used to upgrade application configurations
-    between metadata versions.</p>
+    between metadata versions. They are classes, very similar to the
+    Transform macros above, but with a few differences:</p>
+    <ul>
+      <li>an <var>upgrade</var> method instead of a <var>transform</var> method</li>
+      <li>a more helpful API</li>
+      <li><samp>BEFORE_TAG</samp> and <samp>AFTER_TAG</samp> attributes - the
+      version of metadata they apply to (<samp>BEFORE_TAG</samp>) and the version
+      they upgrade to (<samp>AFTER_TAG</samp>).</li>
+    </ul>
+    
+    <p>An example upgrade macro might look like this:</p>
+    <pre class="prettyprint">
+class Upgrade272to273(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 27.2 to 27.3."""
+
+    BEFORE_TAG = "27.2"
+    AFTER_TAG = "27.3"
+
+    def upgrade(self, config, meta_config=None):
+        self.add_setting(config, ["env", "NEW_VARIABLE"], "0")
+        self.remove_setting(config, ["namelist:old_things", "OLD_VARIABLE"])
+        return config, self.reports
+</pre>
+
+    <p>The class name is unimportant - the <samp>BEFORE_TAG</samp> and
+    <samp>AFTER_TAG</samp> identify the macro.</p>
+    
+    <p>Metadata versions are usually structured in a <samp>rose-meta/CATEGORY/VERSION/</samp>
+    hierarchy - where <samp>CATEGORY</samp> denotes the type or family of application (sometimes
+    it is the command used), and <samp>VERSION</samp> is the particular version e.g. <samp>27.2</samp>
+    or <samp>HEAD</samp>.</p>
+    
+    <p>Upgrade macros live under the <samp>CATEGORY</samp> directory in a <samp>versions.py</samp> file -
+    <samp>rose-meta/CATEGORY/versions.py</samp>.</p>
+    
+    <p>They can also have a <code>downgrade</code> method (identical in format to <code>upgrade</code>)
+    which performs the upgrade in the opposite direction.</p>
+
+    <p>The API for upgrade macros, in addition to the functionality documented for
+    transform macros, is the following:</p>
+
+    <dl>
+      <dt><code>act_from_files(config, downgrade=False)</code></dt>
+
+      <dd>
+        <p>A method that takes the app configuration (<samp>config</samp>, a
+        <code>rose.config.ConfigNode</code> instance) and an optional
+        boolean <samp>downgrade</samp> keyword argument. This initiates a
+        search for <samp>etc/VERSION/rose-macro-add.conf</samp> and 
+        <samp>etc/VERSION/rose-macro-remove.conf</samp>, which should be
+        Rose app config-like patch files, containing settings to be added
+        (<samp>rose-macro-add.conf</samp>) and settings to be removed (<samp>rose-macro-remove.conf</samp>)
+        for the particular VERSION (equal to the <samp>BEFORE_TAG</samp> of the
+        macro). If downgrading, the settings in <samp>rose-macro-remove.conf</samp>
+        will be added, and the ones in <samp>rose-macro-add.conf</samp> removed.</p>
+        a number as an argument, which is the current
+        cursor position relative to the characters in the variable value:</p>
+        <pre>
+def act_from_files(self, config, downgrade=False):
+        """Parse a change configuration into actions."""
+    self.entry.set_position(focus_index)
+</pre>
+
+        <p>For example, a <code>focus_index</code> of <samp>0</samp> means that
+        your widget should set the cursor position to the beginning of the
+        value. A <code>focus_index</code> of <samp>4</samp> for a variable
+        value of <samp>Operational</samp> means that the cursor should be
+        placed between the <samp>r</samp> and the <samp>a</samp>.</p>
+
+        <p>This has no real meaning or importance for widgets that don't
+        display editable text. If you do not supply this method, the config
+        editor will attempt to do the right thing anyway.</p>
+      </dd>
+
+      <dt><code>get_focus_index() -&gt; focus_index</code></dt>
+
+      <dd>
+        <p>A method that takes no arguments and returns a number which is the
+        current cursor position relative to the characters in the variable
+        value:</p>
+        <pre>
+def get_focus_index(self):
+    """Return the cursor position."""
+    return self.entry.get_position()
+</pre>
+
+        <p>This has no real meaning or importance for widgets that don't
+        display editable text. If you do not supply this method, the config
+        editor will guess the cursor position anyway, based on the last change
+        to the variable value.</p>
+      </dd>
+
+      <dt><code>handle_type_error(is_in_error) -&gt; None</code></dt>
+
+      <dd>
+        <p>The default behaviour when a variable error is added or removed is
+        to re-instantiate the widget (refresh and redraw it). This can be
+        overridden by defining this method in your value widget class. It takes
+        a boolean <code>is_in_error</code> which is <samp>True</samp> if there
+        is a value (type) error and <samp>False</samp> otherwise:</p>
+        <pre>
+def handle_type_error(self, is_in_error):
+    """Change behaviour based on whether the variable is_in_error."""
+    icon_id = gtk.STOCK_DIALOG_ERROR if is_in_error else None
+    self.entry.set_icon_from_stock(0, gtk.STOCK_DIALOG_ERROR)       
+</pre>
+
+        <p>For example, this is used in a built-in widget for the quoted string
+        types <code>string</code> and <code>character</code>. The quotes around
+        the text are normally hidden, but the <code>handle_type_error</code>
+        shows them if there is an error. The method also keeps the keyboard
+        focus, which is the main purpose.</p>
+
+        <p>You may not have much need for this method, as the default error
+        flagging and cursor focus handling is normally sufficient.</p>
+      </dd>
+    </dl>
 
     <h2 id="rosie-ws">Rosie Web</h2>
 

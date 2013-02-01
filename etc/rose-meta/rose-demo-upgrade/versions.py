@@ -3,72 +3,90 @@
 #-----------------------------------------------------------------------------
 # (C) Crown copyright Met Office. All rights reserved.
 #-----------------------------------------------------------------------------
+"""Module containing example macros for using rose app-upgrade.
+
+Quotes are the copyright of the quotee.
+
+"""
 
 import rose.upgrade
 
 
-class Upgrade272to273(rose.upgrade.MacroUpgrade):
+class UpgradeGarden01(rose.upgrade.MacroUpgrade):
 
-    """Upgrade from 27.2 to 27.3."""
+    """'We want... a shrubbery!'"""
 
-    BEFORE_TAG = "27.2"
-    AFTER_TAG = "27.3"
+    BEFORE_TAG = "garden0.1"
+    AFTER_TAG = "garden0.2"
 
     def downgrade(self, config, meta_config=None):
-        self.remove_setting(config, ["env", "C"])
-        self.remove_setting(config, ["env", "D"])
-        self.add_setting(config, ["env", "A"], "0")
-        self.add_setting(config, ["env", "B"], "1")
+        self.remove_setting(config, ["namelist:features", "shrubberies"])
         return config, self.reports
 
     def upgrade(self, config, meta_config=None):
-        self.add_setting(config, ["env", "C"], "0")
-        self.add_setting(config, ["env", "D"], "1")
-        self.remove_setting(config, ["env", "A"])
-        self.remove_setting(config, ["env", "B"])
+        self.add_setting(config, ["namelist:features", "shrubberies"], "1")
         return config, self.reports
 
 
-class Upgrade273to281(rose.upgrade.MacroUpgrade):
+class UpgradeGarden02(rose.upgrade.MacroUpgrade):
 
-    """Upgrade from 27.3 to 28.1."""
+    """'...there is one small problem...'"""
 
-    BEFORE_TAG = "27.3"
-    AFTER_TAG = "28.1"
+    BEFORE_TAG = "garden0.2"
+    AFTER_TAG = "garden0.3"
 
     def downgrade(self, config, meta_config=None):
-        self.add_setting(config, ["namelist:test_nl", "X"], "0")
+        self.remove_setting(config, ["namelist:features", "shrubbery_laurels"])
         return config, self.reports
 
     def upgrade(self, config, meta_config=None):
-        self.remove_setting(config, ["namelist:test_nl", "X"],
-                            info="Remove for #2020")
+        self.add_setting(config, ["namelist:features", "shrubbery_laurels"],
+                         "'particularly nice'")
+        shrub_num = self.get_setting_value(
+                 config, ["namelist:features", "shrubberies"])
+        if shrub_num in ["0", "1"]:
+            self.add_report("namelist:features", "shrubberies", shrub_num,
+                            info="More than one shrubbery is desirable",
+                            is_warning=True)
         return config, self.reports
 
 
-class Upgrade281to291(rose.upgrade.MacroUpgrade):
+class UpgradeGarden03(rose.upgrade.MacroUpgrade):
 
-    """Upgrade from 28.1 to 29.1."""
+    """'You must find... another shrubbery!'"""
 
-    BEFORE_TAG = "28.1"
-    AFTER_TAG = "29.1"
+    BEFORE_TAG = "garden0.3"
+    AFTER_TAG = "garden0.4"
 
     def downgrade(self, config, meta_config=None):
-        self.add_setting(config, ["namelist:test_nl", "C"], "0")
+        if self._get_shrub_num(config) == 2:
+            self.change_setting_value(
+                 config, ["namelist:features", "shrubberies"], "1")
         return config, self.reports
 
     def upgrade(self, config, meta_config=None):
-        self.remove_setting(config, ["namelist:test_nl", "C"],
-                            info="Remove for #1668")
+        if self._get_shrub_num(config) == 1:
+            self.change_setting_value(
+                 config, ["namelist:features", "shrubberies"], "2",
+                 info="Fetched another shrubbery")
         return config, self.reports
 
+    def _get_shrub_num(self, config):
+        shrub_num = self.get_setting_value(
+                 config, ["namelist:features", "shrubberies"])
+        try:
+            shrub_num = float(shrub_num)
+        except (TypeError, ValueError):
+            return None
+        return shrub_num
 
-class Upgrade291to292(rose.upgrade.MacroUpgrade):
 
-    """Upgrade from 29.1 to 29.2."""
+class UpgradeGarden04(rose.upgrade.MacroUpgrade):
 
-    BEFORE_TAG = "29.1"
-    AFTER_TAG = "29.2"
+    """'...the two-level effect with a little path running down the middle'"""
+
+    BEFORE_TAG = "garden0.4"
+    AFTER_TAG = "garden0.5"
 
     def downgrade(self, config, meta_config=None):
         self.act_from_files(config, downgrade=True)
@@ -77,3 +95,21 @@ class Upgrade291to292(rose.upgrade.MacroUpgrade):
     def upgrade(self, config, meta_config=None):
         self.act_from_files(config, downgrade=False)
         return config, self.reports
+
+
+class UpgradeGarden05(rose.upgrade.MacroUpgrade):
+
+    """'cut down the mightiest tree in the forest... with... a herring!'"""
+    
+    BEFORE_TAG = "garden0.5"
+    AFTER_TAG = "garden0.9"
+    
+    def downgrade(self, config, meta_config=None):
+        self.remove_setting(config, ["env", "AXE"])
+        self.remove_setting(config, ["namelist:trees"])
+        return config, self.reports
+
+    def upgrade(self, config, meta_config=None):
+        self.add_setting(config, ["namelist:trees", "mighty_tree"], "1")
+        self.add_setting(config, ["env", "AXE"], "herring")
+        return config, self.reports   

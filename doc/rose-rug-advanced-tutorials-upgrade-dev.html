@@ -98,21 +98,22 @@
 meta=make-boat/0.1
 
 [namelist:materials]
-paddles=1
-large_trees=1
+hollow_tree_trunks=1
+paddling_twigs=1
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Example App Explanation</h3>
 
-      <p>This creates an app config that configures our simple boat (a raft). It references a meta-flag
+      <p>This creates an app config that configures our simple boat (a dugout canoe).
+      It references a meta-flag
       (for which metadata is unlikely to already exist), made up of a category
       (<samp>make-boat</samp>) at a particular version (<samp>0.1</samp>). The meta flag is
       used by Rose to locate a configuration metadata directory.</p>
       
       <p>It's important to note that the version in the meta flag doesn't have to be numeric -
-      it could be <samp>vn0.1</samp> or <samp>alpha</samp> or <samp>Roomy-Raft</samp>.</p>
+      it could be <samp>vn0.1</samp> or <samp>alpha</samp> or <samp>Crafty-Canoe</samp>.</p>
       
       <p>We need to create some metadata to make this work.</p>
       
@@ -152,14 +153,14 @@ touch ~/rose-meta/make-boat/0.1/rose-meta.conf
       construction and testing of the boat, so we can paste the following into
       the newly created <samp>rose-meta.conf</samp> file:</p>
       <pre class="prettyprint lang-rose_conf">
-[namelist:materials=paddles]
+[namelist:materials=hollow_tree_trunks]
+compulsory=true
+values=1
+
+[namelist:materials=paddling_twigs]
 compulsory=true
 range=1:
 type=integer
-
-[namelist:materials=large_trees]
-compulsory=true
-values=1
 </pre>
 
       <p>So far, we have a normal application configuration which references
@@ -171,7 +172,7 @@ values=1
    <div class="slide">
       <h3 class="alwayshidden">Creating the Next Metadata Version</h3>
       
-      <p>We can now make an <a href="http://en.wikipedia.org/wiki/Outrigger_canoe">outrigger</a>
+      <p>We can now add <a href="http://en.wikipedia.org/wiki/Outrigger_canoe">outriggers</a>
       for our canoe, to make it more stable. Some of the inputs in our application configuration
       will need to change.</p>
       
@@ -180,11 +181,14 @@ values=1
 meta=make-boat/0.2
 
 [namelist:materials]
-paddles=1
-small_trees=1
-large_trees=1
+misc_branches=4
+hollow_tree_trunks=1
+outrigger_tree_trunks=2
+paddling_branches=1
 </pre>
-      <p>It looks like we've added an input, <samp>small_trees</samp>.</p>
+      <p>It looks like we've added the inputs  <samp>misc_branches</samp>, <samp>outrigger_tree_trunks</samp>
+      and <samp>paddling_branches</samp>. <samp>paddling_twigs</samp> is now redundant, so we
+      can remove it from the configuration when we upgrade.</p>
       
    </div>
    
@@ -196,18 +200,22 @@ large_trees=1
       <p>Create a new subdirectory, <samp>rose-meta/make-boat/0.2/</samp>,
       containing a <samp>rose-meta.conf</samp> file that looks like this:</p>
       <pre class="prettyprint lang-rose_conf">
-[namelist:materials=paddles]
+[namelist:materials=hollow_tree_trunks]
+compulsory=true
+values=1
+
+[namelist:materials=misc_branches]
+compulsory=true
+range=4:
+
+[namelist:materials=paddling_branches]
 compulsory=true
 range=1:
 type=integer
 
-[namelist:materials=small_trees]
+[namelist:materials=outrigger_tree_trunks]
 compulsory=true
-values=1,2
-
-[namelist:materials=large_trees]
-compulsory=true
-values=1
+values=2
 </pre>
       <p>We now want to automate the process of updating our app config from
       <samp>make-boat/0.1</samp> to the new <samp>make-boat/0.2</samp>
@@ -294,7 +302,7 @@ import rose.upgrade
 
 class MyFirstUpgradeMacro(rose.upgrade.MacroUpgrade):
 
-    """Upgrade from 0.1 (Crafty Canoe) to 0.2 (Outrageous Outrigger)."""
+    """Upgrade from 0.1 (Canonical Canoe) to 0.2 (Outrageous Outrigger)."""
 
     BEFORE_TAG = "0.1"
     AFTER_TAG = "0.2"
@@ -314,14 +322,24 @@ class MyFirstUpgradeMacro(rose.upgrade.MacroUpgrade):
    <div class="slide">
       <h3 class="alwayshidden">Upgrade Macro API</h3>
       
-      <p>We need to get the macro to add the new <samp>0.2</samp> option,
-      <samp>namelist:materials=small_trees</samp>.
-      
+      <p>We need to get the macro to do the following:</p>
+      <ul>
+        <li>add the option <samp>namelist:materials=misc_branches</samp></li>
+        <li>add the option <samp>namelist:materials=outrigger_tree_trunks</samp></li>
+        <li>add the option <samp>namelist:materials=paddling_branches</samp></li>
+        <li>remove the option <samp>namelist:materials=paddling_twigs</samp></li>
+      </ul>
+
       <p>We can use the <a href="rose-api.html#upgrade">nice API</a> provided
       to express this in Python code - replace the <samp># Some code doing something...</samp>
       line with:</p>
       <pre class="prettyprint">
-        self.add_setting(config, ["namelist:materials", "small_trees"], "1")
+        self.add_setting(config, ["namelist:materials", "misc_branches"], "4")
+        self.add_setting(
+                 config, ["namelist:materials", "outrigger_tree_trunks", "2")
+        self.add_setting(
+                 config, ["namelist:materials", "paddling_branches"], "1")
+        self.remove_setting(config, ["namelist:materials", "paddling_twigs"])
 </pre>
    </div>
    
@@ -330,14 +348,28 @@ class MyFirstUpgradeMacro(rose.upgrade.MacroUpgrade):
       
       <p>This changes the app configuration (<samp>config</samp>) in the way we want, and (behind the scenes)
       adds some things to the <samp>self.reports</samp> list mentioned in the
-      <samp>return config, self.reports</samp> line. Note that because we were
-      adding <samp>tree_trunks</samp>, we needed a value to add it with -
-      what it is will often be a matter of judgement.</p>
+      <samp>return config, self.reports</samp> line. Note that when we add options like <var>small_trees</var>,
+      we need values to add them with - what they are will often be a matter of judgement.</p>
+      
+      <p>However, even if they appear to be numeric inputs, values should always be entered as strings (<kbd>"1"</kbd> rather than <kbd>1</kbd>).</p>
 
    </div>
    
    <div class="slide">
-      <h3>Running rose app-upgrade</h3>
+      <h3>Customising the Output</h3>
+      
+      <p>The methods <code>self.add_setting</code> and <code>self.remove_setting</code> will
+      provide a default message to the user about the change (e.g. <samp>"Added X with value Y"</samp>),
+      but you can customise them to add your own by passing an <var>info</var> 'keyword argument' like this:</p>
+      <pre class="prettyprint">
+        self.add_setting(
+                 config, ["namelist:materials", "outrigger_tree_trunks"], "2",
+                 info="This makes it into a trimaran!")
+</pre>
+      <p>If you want to, try adding your own messages.</p>
+   </div>
+   <div class="slide">
+      <h3 id="rose-app-upgrade">Running rose app-upgrade</h3>
 
       <p>Our upgrade macro will now work - change directory to the application directory
       and run:</p>
@@ -363,18 +395,261 @@ rose help app-upgrade
       <pre class="shell">
 rose app-upgrade --meta-path=path/to/rose-meta 0.2
 </pre>
-      <p>This should provide you with a summary of changes, and prompt you
-      to accept them. If you accept them, the app config file should change
-      accordingly.</p>
+      <p>This should provide you with a summary of changes (including any
+      custom messages you may have added) and prompt you
+      to accept them. Accept them and have a look at the app config file -
+      it should have been changed accordingly.</p>
 
    </div>
+
+   <div class="slide">
+      <h3 id="patch">Using patch configurations</h3>
+      
+      <p>For relatively straightforward changes like the one above, we can
+      configure a macro to apply patches to the configuration without having
+      to write setting-specific Python code.</p>
+      
+      <p>We'll add a rudder option for our <samp>0.3</samp> version, with a 
+      <var>namelist:materials=l_rudder_branch</var>.</p>
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">Next Version Metadata</h3>
+       
+       <p>Create a <kbd>0.3</kbd> directory in the same way that you created
+       the <kbd>0.1</kbd> and <kbd>0.2</kbd> metadata directories, with a
+       <samp>rose-meta.conf</samp> file that looks like this:</p>
+       <pre class="prettyprint lang-rose_conf">
+[namelist:materials=hollow_tree_trunks]
+compulsory=true
+values=1
+
+[namelist:materials=l_rudder_branch]
+compulsory=true
+type=logical
+
+[namelist:materials=misc_branches]
+compulsory=true
+type=integer
+range=4:
+
+[namelist:materials=outrigger_tree_trunks]
+compulsory=true
+values=2
+
+[namelist:materials=paddling_branches]
+compulsory=true
+range=1:
+type=integer
+</pre>
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Writing a Patch Macro</h3>
+      
+      <p>We need to write another macro in <samp>versions.py</samp> - append the following code:</p>
+      
+      <pre class="prettyprint">
+class MySecondUpgradeMacro(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 0.2 (Outrageous Outrigger) to 0.3 (Amazing Ama)."""
+
+    BEFORE_TAG = "0.2"
+    AFTER_TAG = "0.3"
+
+    def upgrade(self, config, meta_config=None):
+        self.act_from_files(config)
+        return config, self.reports
+</pre>
+     <p>The <samp>self.act_from_files</samp> line tells the macro to look for
+     patch configuration files - two files called <kbd>rose-macro-add.conf</kbd>
+     and <kbd>rose-macro-remove.conf</kbd> in a particular directory for this
+     <samp>BEFORE_TAG</samp> - in our case, <kbd>make-boat/rose-meta/etc/0.2/</kbd>.</p>
+     
+  </div>
+  
+  <div class="slide">
+     <h3 class="alwayshidden">Patch Macro Explanation</h3>
+     
+     <p>Whatever is found in <kbd>rose-macro-add.conf</kbd> will be added to
+     the configuration, and whatever is found in <kbd>rose-macro-remove.conf</kbd>
+     will be removed. If the files don't exist, nothing will happen.</p>
+     
+     <p>Let's configure what we want to happen. Create a directory <kbd>etc/0.2/</kbd>
+     under <kbd>make-boat/</kbd>, containing a <samp>rose-macro-add.conf</samp> file
+     that looks like this:</p>
+     <pre>
+[namelist:materials]
+l_rudder_branch=.true.
+</pre>
+
+      <p>Note that if a <samp>rose-macro-add.conf</samp> setting is already
+      defined, the value will not be overwritten. In our case, we don't need a
+      <samp>rose-macro-remove.conf</samp> file.</p>
+  </div>
+  
+  <div class="slide">
+     <h3 class="alwayshidden">Running rose app-upgrade</h3>
+     
+     <p>Go ahead and upgrade the app configuration to <kbd>0.3</kbd>, as you
+     did before (<kbd>rose app-upgrade --meta-path==path/to/rose-meta 0.3</kbd>).</p>
+     
+     <p>The <samp>rose-app.conf</samp> should now contain the new option.</p>
+  </div>
+  
+  <div class="slide">
+     <h3 id="complex">More Complex Upgrade Macros</h3>
+
+     <p>The <a href="rose-api.html#upgrade">Upgrade Macro API</a> gives us
+     quite a bit of power without having to write too much Python.</p>
+     
+     <p>For our <samp>1.0</samp> release,
+     we want to add sailing gear - we need the number of <var>misc_branches</var>
+     to be at least <kbd>6</kbd>, and add a <var>sail_canvas_sq_m</var> option.
+
+     <p>We may want to issue a warning for a deprecated option (<var>paddle_branches</var>)
+     so that the user can decide whether to remove it.</p>
+  </div>
+  
+  <div class="slide">
+     <h3 class="alwayshidden">Metadata for the New Version</h3>
+     
+     <p>Create a <kbd>rose-meta/make-boat/1.0</kbd> directory, with
+     the following content in a <kbd>rose-meta.conf</kbd> file:</p>
+     <pre class="prettyprint lang-rose_conf">
+[namelist:materials=hollow_tree_trunks]
+compulsory=true
+values=1
+
+[namelist:materials=l_rudder_branch]
+compulsory=true
+type=logical
+
+[namelist:materials=misc_branches]
+compulsory=true
+range=6:
+type=integer
+
+[namelist:materials=outrigger_tree_trunks]
+compulsory=true
+values=1
+
+[namelist:materials=paddling_branches]
+range=0:
+type=integer
+warn-if=True # Deprecated - real sailors don't use engines
+
+[namelist:materials=sail_canvas_sq_m]
+range=4:
+type=real
+</pre>
+      <p>We need to write a macro that reflects these changes.</p>
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">More Complex Upgrade Macro Example</h3>
+       
+       <p>We need to start with appending the following code to <samp>versions.py</samp>:</p>
+       <pre class="prettyprint">
+class MyMoreComplexUpgradeMacro(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 0.3 (Amazing Ama) to 1.0 (Tremendous Trimaran)."""
+
+    BEFORE_TAG = "0.3"
+    AFTER_TAG = "1.0"
+
+    def upgrade(self, config, meta_config=None):
+        # Some code doing something to config goes here.
+        return config, self.reports
+</pre>
+      <p>We already know how to add an option, so replace <samp># Some code going here...</samp> with
+      <kbd>self.add_setting(config, ["namelist:materials", "sail_canvas_sq_m"], "5")</kbd>
+
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">If Block</h3>
+       
+       <p>To perform the check/change in the number of <var>misc_branches</var>,
+       we can insert the following lines after the one we just added:</p>
+       <pre class="prettyprint">
+       branch_num = self.get_setting_value(
+              config, ["namelist:materials", "misc_branches"])
+       if branch_num.isdigit() and float(branch_num) &lt; 6:
+           self.set_setting_value(
+                    config, ["namelist:materials", "misc_branches"], "6")
+</pre>
+       <p>This extracts the value of <var>misc_branches</var> (as a string!) and
+       if the value represents a positive integer that is less than 6, changes it to
+       <samp>"6"</samp>. It's good practice to guard against the possibility that a user
+       might have set the value to a non-integer representation like <samp>'many'</samp> -
+       if we don't do this, the macro may crash out when running things like <code>float</code>.</p></p>
+    </div>
+
+    <div class="slide">
+       <h3 class="alwayshidden">Adding a Warning</h3>
+       
+       <p>In a similar way, to flag a warning, we can insert:</p>
+       <pre class="prettyprint">
+       paddles = self.get_setting_value(
+                      config, ["namelist:materials", "paddle_branches"])
+       if paddles is not None:
+           self.add_report("namelist:materials", "paddle_branches",
+                           paddles, info="Deprecated - probably not needed.",
+                           is_warning=True)
+</pre>
+       <p>This calls <samp>self.add_report</samp>, a method that notifies the user
+       of actions and issues by appending things to the <samp>self.reports</samp>
+       list which appears on the <samp>return ...</samp>line.</p>
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">Running the Complex Macro</h3>
+       
+       <p>Run <kbd>rose app-upgrade --meta-path=/path/to/rose-macro 1.0</kbd> to
+       see the effect of your changes. You should see a warning message for
+       <var>namelist:materials=paddle_branches</var> as well.</p>
+
+    </div>
+    
+    <div class="slide">
+       <h3>Upgrading Many Versions at Once</h3>
+       
+       <p>We've kept in step with the metadata by upgrading incrementally, but
+       typically users will need to upgrade across multiple versions. When this
+       happens, the relevant macros will be applied in turn, and their changes
+       and issues aggregated.</p>
+       
+       <p>Turn back the clock by reverting your application configuration to
+       look like it was at <samp>0.1</samp>:</p>
+       <pre class="prettyprint lang-rose_conf">
+meta=make-boat/0.1
+
+[namelist:materials]
+hollow_tree_trunks=1
+paddling_twigs=1
+</pre>
+
+    <div class="slide">
+       <h3 class="alwayshidden">rose app-upgrade Across Versions</h3>
+       
+       <p>Run <kbd>rose app-upgrade --meta-path=/path/to/rose-macro</kbd> in
+       the application directory. You should see the available versions to
+       upgrade to - let's choose <samp>1.0</samp>. Run:</p>
+       <pre class="prettyprint lang-rose_conf">
+rose app-upgrade --meta-path=/path/to/rose-macro 1.0
+</pre>
+       <p>This should aggregate all the changes that our macros make - if
+       you accept the changes, it will upgrade all the way to the <samp>1.0</samp>
+       version we had before.</p>
+    </div>
 
     <div class="slide">
       <h2 id="further">Further Reading</h2>
 
       <p>For more information, see the <a href=
-      "rose-configuration.html#meta.conf.behaviour">Configuration Metadata
-      Reference</a>.</p>
+      "rose-api.html#upgrade">Upgrade Macro API Reference</a> and
+      the general <a href="rose-api.html#macro">Macro API Reference</a>.</p>
     </div>
   </div>
 </body>

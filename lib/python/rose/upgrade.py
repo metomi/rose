@@ -50,6 +50,7 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     INFO_ADDED_SECT = "Added"
     INFO_ADDED_VAR = "Added with value '{0}'"
+    INFO_CHANGED_VAR = "Changed value from {0} to {1}"
     INFO_ENABLE = "User-Ignored -> Enabled"
     INFO_IGNORE = "Enabled -> User-ignored"
     INFO_REMOVED = "Removed"
@@ -69,15 +70,19 @@ class MacroUpgrade(rose.macro.MacroBase):
         for keys, node in add_config.walk():
             section = keys[0]
             option = None
+            value = None
             if len(keys) > 1:
                 option = keys[1]
-            self.add_setting(config, [section, option],
+                value = node.value
+            self.add_setting(config, [section, option], value=value,
                              state=node.state, comments=node.comments)
         for keys, node in rem_config.walk():
             section = keys[0]
             option = None
             if len(keys) > 1:
                 option = keys[1]
+            elif node.value is not None:
+                continue
             self.remove_setting(config, [section, option])
 
     def _get_config_resources(self):
@@ -111,7 +116,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             else:
                 info = self.INFO_ADDED_VAR.format(value)
         if option is not None and config.get([section]) is None:
-            self.add_setting(config, section)
+            self.add_setting(config, [section])
         if config.get([section, option]) is not None:
             if forced:
                 return self.change_setting(config, keys, value, state,
@@ -125,7 +130,7 @@ class MacroUpgrade(rose.macro.MacroBase):
         self.add_report(section, option, value, info)
 
     def change_setting_value(self, config, keys, value, forced=False,
-                             comment=None, info=None):
+                             comments=None, info=None):
         """Change a setting (option) value in the configuration."""
         section, option = self._get_section_option_from_keys(keys)
         id_ = self._get_id_from_section_option(section, option)
@@ -141,14 +146,14 @@ class MacroUpgrade(rose.macro.MacroBase):
             text = "Not valid for value change: {0}".format(id_)
             raise TypeError(text)
         if info is None:
-            info = self.INFO_CHANGED_VAR.format(value)
-        if (value is not None and not isinstance(value, basestring):
+            info = self.INFO_CHANGED_VAR.format(node.value, value)
+        if value is not None and not isinstance(value, basestring):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(id_, value))
         config.set([section, option], value=value, comments=comments)
         self.add_report(section, option, value, info)
 
-    def get_value(self, config, keys, no_ignore=False):
+    def get_setting_value(self, config, keys, no_ignore=False):
         """Return the value of a setting."""
         section, option = self._get_section_option_from_keys(keys)
         if config.get([section, option], no_ignore=no_ignore) is None:
@@ -377,13 +382,6 @@ class MacroUpgradeManager(object):
             else:
                 # No more macros found.
                 break
-
-
-def run_upgrade_macros(app_config, meta_config, config_name, args,
-                       opt_conf_dir, opt_downgrade, opt_non_interactive, 
-                       opt_output_dir, opt_quietness):
-    """CLI function to run upgrade/downgrade macros."""
-
 
 
 def main():
