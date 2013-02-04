@@ -1100,6 +1100,8 @@ class TaskRunner(Runner):
             path_globs.extend(opts.path_globs)
         for path_glob in path_globs:
             if path_glob:
+                if path_glob.startswith("~"):
+                    path_glob = os.path.expanduser(path_glob)
                 if not os.path.isabs(path_glob):
                     path_glob = os.path.join(t.suite_dir, path_glob)
                 for path in glob(path_glob):
