@@ -383,6 +383,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "dest": "source",
                         "help": "Add a trunk."}],
+               "strict_mode": [
+                       ["--no-strict"],
+                       {"action": "store_false",
+                        "dest": "strict_mode",
+                        "default": True,
+                        "help": "Do not validate in strict mode."}],
                "suffix_delim": [
                        ["--suffix-delim"],
                        {"metavar": "DELIMITER",
