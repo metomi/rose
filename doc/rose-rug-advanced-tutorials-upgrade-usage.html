@@ -14,7 +14,8 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
-  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
@@ -34,14 +35,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.
-      <br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address>
 
@@ -76,8 +75,8 @@
       <p>This part of the Rose user guide walks you through upgrading
       application configurations to newer metadata versions.</p>
 
-      <p>This is intended to automatically keep application configurations
-      in sync with changes to application inputs e.g. from new code releases.</p>
+      <p>This is intended to automatically keep application configurations in
+      sync with changes to application inputs e.g. from new code releases.</p>
     </div>
 
     <div class="slide">
@@ -85,15 +84,17 @@
 
       <p>Newer metadata versions can be created each time the inputs to the
       parent code are changed, or just between major releases.</p>
-      
-      <p>This may mean, for example, that a new compulsory option is added or an old one is removed.</p>
 
-      <p>Upgrade macros may be written to automatically apply these changes.</p>
+      <p>This may mean, for example, that a new compulsory option is added or
+      an old one is removed.</p>
+
+      <p>Upgrade macros may be written to automatically apply these
+      changes.</p>
     </div>
 
     <div class="slide">
       <h2 id="example">Example</h2>
-      
+
       <p>Create a new directory somewhere - e.g. in your homespace - containing
       a <samp>rose-app.conf</samp> file that looks like this:</p>
       <pre class="prettyprint lang-rose_conf">
@@ -105,109 +106,112 @@ FOREST=true
 [namelist:features]
 rose_bushes=2
 </pre>
-
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example Explanation</h3>
 
-      <p>The <samp>meta=...</samp> line references a category (<samp>rose-demo-upgrade</samp>)
-      at a particular version (<samp>garden0.1</samp>). It's the version that we
-      want to change.</p>
+      <p>The <samp>meta=...</samp> line references a category
+      (<samp>rose-demo-upgrade</samp>) at a particular version
+      (<samp>garden0.1</samp>). It's the version that we want to change.</p>
     </div>
-    
+
     <div class="slide">
       <h3 id="rose-app-upgrade">rose app-upgrade</h3>
-      
-      <p>Change directory to your new application directory. You can see the available
-      upgrade versions for your new app config by running:</p>
+
+      <p>Change directory to your new application directory. You can see the
+      available upgrade versions for your new app config by running:</p>
       <pre class="shell">
 rose app-upgrade
 </pre>
+
       <p>This gives you a list of versions to upgrade to - see the help for
       more information (run <kbd>rose help app-upgrade</kbd>).</p>
+    </div>
 
-   </div>
-   
-   <div class="slide">
+    <div class="slide">
       <h3 class="alwayshidden">Upgrading with rose app-upgrade</h3>
 
       <p>You can upgrade directly to the latest (<samp>garden0.9</samp>) or to
-      intermediate versions - let's choose <samp>garden0.2</samp> to start with. Run:</p>
+      intermediate versions - let's choose <samp>garden0.2</samp> to start
+      with. Run:</p>
       <pre class="shell">
 rose app-upgrade garden0.2
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 id="changes">Upgrade Changes</h3>
-      
-      <p>This will give you a list of changes that the upgrade will apply
-      to your configuration. Accept it, and your application configuration will
-      be upgraded, with a new option (<var>shrubberies</var>) and a new
-      <samp>meta=...</samp> version of the metadata to point to. Have a look
-      at the changed <samp>rose-app.conf</samp> if you like.</p>
-      
+
+      <p>This will give you a list of changes that the upgrade will apply to
+      your configuration. Accept it, and your application configuration will be
+      upgraded, with a new option (<var>shrubberies</var>) and a new
+      <samp>meta=...</samp> version of the metadata to point to. Have a look at
+      the changed <samp>rose-app.conf</samp> if you like.</p>
+
       <p>Try repeating this by upgrading to <samp>garden0.3</samp> in the same
       way. This time, you'll get a warning - warnings are used to point out
       problems such as deprecated options when you upgrade.</p>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Many-Version Upgrades</h3>
 
       <p>We can upgrade over many versions at once - for example, directly to
       <samp>garden0.9</samp> - and the changes between each version will be
       aggregated into a single list of changes.</p>
-      
+
       <p>Try running:</p>
       <pre class="shell">
 rose app-upgrade garden0.9
 </pre>
-      
+
       <p>If you accept the changes, your app config will be upgraded through
       all the intermediary versions to the new one. Have a look at the
       <samp>rose-app.conf</samp> file.</p>
+    </div>
 
-   </div>
-   
-   <div class="slide">
+    <div class="slide">
       <h3 class="alwayshidden">Checking the Version</h3>
 
-      <p>If you run <kbd>rose app-upgrade</kbd> with no arguments, you can
-      see that you're at the latest version.</p>
-   </div>
+      <p>If you run <kbd>rose app-upgrade</kbd> with no arguments, you can see
+      that you're at the latest version.</p>
+    </div>
 
-   <div class="slide">
+    <div class="slide">
       <h3 id="downgrading">Downgrading</h3>
-      
-      <p>Some versions may support downgrading - the reverse operation
-      to upgrading. You can see if this is supported by running:</p>
+
+      <p>Some versions may support downgrading - the reverse operation to
+      upgrading. You can see if this is supported by running:</p>
       <pre class="shell">
 rose app-upgrade --downgrade
 </pre>
-   </div>
-   
-   <div class="slide">
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Downgrading to a Version</h3>
 
       <p>You can then use it to downgrade by running:</p>
       <pre class="shell">
 rose app-upgrade --downgrade VERSION
 </pre>
-      <p>where <kbd>VERSION</kbd> is a lower supported version. This time,
-      some settings may be removed.</p>
-      
+
+      <p>where <kbd>VERSION</kbd> is a lower supported version. This time, some
+      settings may be removed.</p>
     </div>
+
     <div class="slide">
       <h2 id="further">Further Reading</h2>
 
       <p>For more information, see:</p>
+
       <ul>
         <li>the <a href=
-      "rose-configuration.html#meta.conf.behaviour">Configuration Metadata
-      Reference</a>.</li>
-        <li>the <a href="rose-rug-advanced-tutorials-upgrade-dev.html">Upgrade Macro Development Advanced Tutorial</a>.</li>
+        "rose-configuration.html#meta.conf.behaviour">Configuration Metadata
+        Reference</a>.</li>
+
+        <li>the <a href="rose-rug-advanced-tutorials-upgrade-dev.html">Upgrade
+        Macro Development Advanced Tutorial</a>.</li>
       </ul>
     </div>
   </div>
