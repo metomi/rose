@@ -553,8 +553,7 @@ warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
       <h3>More Metadata Options</h3>
 
       <p>See <a href="rose-configuration.html#meta.conf">Metadata Reference</a>
-      and the <a href="rose-rug-advanced-tutorials.html#metadata">Advanced
-      Metadata Tutorials</a>.</p>
+      and the <a href="rose.html">Advanced Metadata Tutorials</a>.</p>
 
       <dl>
         <dt><code>compulsory</code></dt>
@@ -641,9 +640,8 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
       </ul>
 
       <p>You can find out how to write macros in the <a href=
-      "rose-rug-advanced-tutorials.html#metadata">Advanced Metadata
-      Tutorials</a> and the <a href="rose-api.html#macro">API</a>
-      documentation.</p>
+      "rose.html">Advanced Metadata Tutorials</a> and the <a href=
+      "rose-api.html#macro">API</a> documentation.</p>
     </div>
 
     <div class="slide">
@@ -713,6 +711,27 @@ rose macro fib.FibonnaciChecker
 </pre>
     </div>
 
+    <div class="slide">
+      <h2 id="rose-app-upgrade">Upgrading</h2>
+      
+      <p>You can upgrade app configs from one metadata version to another,
+      if upgrade macros are defined - this is a special form of <code>rose macro</code>.</p>
+      
+      <p>For example, you might run:</p>
+      <pre class="shell">
+rose app-upgrade vn2.0
+</pre>
+      <p>which might give:</p>
+      <pre>
+[U] Upgradevn1.4-vn2.0: changes: 2
+    namelist:shoes=self_tying_shoelaces=2
+        Added with value '2'
+    =meta=shoe-control/vn2.0
+        Upgraded from vn1.4 to vn2.0
+Accept y/n (default n)?
+</pre>
+    </div>
+      
     <div class="slide">
       <h2 id="rose-stem">rose stem</h2>
 
