@@ -105,13 +105,19 @@ FOREST=true
 [namelist:features]
 rose_bushes=2
 </pre>
+
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Example Explanation</h3>
+
       <p>The <samp>meta=...</samp> line references a category (<samp>rose-demo-upgrade</samp>)
       at a particular version (<samp>garden0.1</samp>). It's the version that we
       want to change.</p>
     </div>
     
     <div class="slide">
-      <h3 id="rose-app-upgrade">Running rose app-upgrade</h3>
+      <h3 id="rose-app-upgrade">rose app-upgrade</h3>
       
       <p>Change directory to your new application directory. You can see the available
       upgrade versions for your new app config by running:</p>
@@ -120,6 +126,11 @@ rose app-upgrade
 </pre>
       <p>This gives you a list of versions to upgrade to - see the help for
       more information (run <kbd>rose help app-upgrade</kbd>).</p>
+
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Upgrading with rose app-upgrade</h3>
 
       <p>You can upgrade directly to the latest (<samp>garden0.9</samp>) or to
       intermediate versions - let's choose <samp>garden0.2</samp> to start with. Run:</p>
@@ -134,7 +145,8 @@ rose app-upgrade garden0.2
       <p>This will give you a list of changes that the upgrade will apply
       to your configuration. Accept it, and your application configuration will
       be upgraded, with a new option (<var>shrubberies</var>) and a new
-      <samp>meta=...</samp> version of the metadata to point to.</p>
+      <samp>meta=...</samp> version of the metadata to point to. Have a look
+      at the changed <samp>rose-app.conf</samp> if you like.</p>
       
       <p>Try repeating this by upgrading to <samp>garden0.3</samp> in the same
       way. This time, you'll get a warning - warnings are used to point out
@@ -156,11 +168,37 @@ rose app-upgrade garden0.9
       <p>If you accept the changes, your app config will be upgraded through
       all the intermediary versions to the new one. Have a look at the
       <samp>rose-app.conf</samp> file.</p>
-      
+
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Checking the Version</h3>
+
       <p>If you run <kbd>rose app-upgrade</kbd> with no arguments, you can
       see that you're at the latest version.</p>
    </div>
 
+   <div class="slide">
+      <h3 id="downgrading">Downgrading</h3>
+      
+      <p>Some versions may support downgrading - the reverse operation
+      to upgrading. You can see if this is supported by running:</p>
+      <pre class="shell">
+rose app-upgrade --downgrade
+</pre>
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Downgrading to a Version</h3>
+
+      <p>You can then use it to downgrade by running:</p>
+      <pre class="shell">
+rose app-upgrade --downgrade VERSION
+</pre>
+      <p>where <kbd>VERSION</kbd> is a lower supported version. This time,
+      some settings may be removed.</p>
+      
+    </div>
     <div class="slide">
       <h2 id="further">Further Reading</h2>
 

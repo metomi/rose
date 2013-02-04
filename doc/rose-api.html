@@ -642,11 +642,15 @@ class SomeTransformer(rose.macro.MacroBase):
       <li>an <var>upgrade</var> method instead of a <var>transform</var>
       method</li>
 
-      <li>a more helpful API</li>
+      <li>an optional <var>downgrade</var> method, identical in API to the
+      <var>upgrade</var> method, but intended for performing the reverse
+      operation</li>
+
+      <li>a more helpful API via <code>rose.upgrade.MacroUpgrade</code> methods</li>
 
       <li><samp>BEFORE_TAG</samp> and <samp>AFTER_TAG</samp> attributes - the
       version of metadata they apply to (<samp>BEFORE_TAG</samp>) and the
-      version they upgrade to (<samp>AFTER_TAG</samp>).</li>
+      version they upgrade to (<samp>AFTER_TAG</samp>)</li>
     </ul>
 
     <p>An example upgrade macro might look like this:</p>
@@ -676,10 +680,6 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
     <p>Upgrade macros live under the <samp>CATEGORY</samp> directory in a
     <samp>versions.py</samp> file -
     <samp>rose-meta/CATEGORY/versions.py</samp>.</p>
-
-    <p>They can also have a <code>downgrade</code> method (identical in format
-    to <code>upgrade</code>) which performs the upgrade in the opposite
-    direction.</p>
 
     <p>Upgrade macros are subclasses of <code>rose.upgrade.MacroUpgrade</code>.
     They have all the functionality of the transform macros documented above.
@@ -902,9 +902,7 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
         <dl>
           <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
 
-          <dd>
-            <p>As in <code>add_setting</code> above.</p>
-          </dd>
+          <dd>As in <code>add_setting</code> above.</dd>
         </dl>
 
         <p>Example usage:</p>

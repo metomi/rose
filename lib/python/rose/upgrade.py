@@ -49,7 +49,7 @@ class MacroUpgrade(rose.macro.MacroBase):
     """Class derived from MacroBase to aid upgrade functionality."""
 
     INFO_ADDED_SECT = "Added"
-    INFO_ADDED_VAR = "Added with value '{0}'"
+    INFO_ADDED_VAR = "Added with value {0}"
     INFO_CHANGED_VAR = "Changed value from {0} to {1}"
     INFO_ENABLE = "User-Ignored -> Enabled"
     INFO_IGNORE = "Enabled -> User-ignored"
@@ -114,7 +114,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             if option is None:
                 info = self.INFO_ADDED_SECT
             else:
-                info = self.INFO_ADDED_VAR.format(value)
+                info = self.INFO_ADDED_VAR.format(repr(value))
         if option is not None and config.get([section]) is None:
             self.add_setting(config, [section])
         if config.get([section, option]) is not None:
@@ -124,7 +124,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             return False
         if value is not None and not isinstance(value, basestring):
             text = "New value {0} for {1} is not a string"
-            raise ValueError(text.format(id_, value))
+            raise ValueError(text.format(repr(value), id_))
         config.set([section, option], value=value, state=state,
                    comments=comments)
         self.add_report(section, option, value, info)
@@ -146,10 +146,10 @@ class MacroUpgrade(rose.macro.MacroBase):
             text = "Not valid for value change: {0}".format(id_)
             raise TypeError(text)
         if info is None:
-            info = self.INFO_CHANGED_VAR.format(node.value, value)
+            info = self.INFO_CHANGED_VAR.format(repr(node.value), repr(value))
         if value is not None and not isinstance(value, basestring):
             text = "New value {0} for {1} is not a string"
-            raise ValueError(text.format(id_, value))
+            raise ValueError(text.format(repr(value), id_))
         config.set([section, option], value=value, comments=comments)
         self.add_report(section, option, value, info)
 
