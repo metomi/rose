@@ -129,8 +129,8 @@ paddling_twigs=1
       which will hold sub-directories for actual configuration metadata
       versions (each containing a <samp>rose-meta.conf</samp> file, etc).</p>
 
-      <p>Usually, this would be centrally stored, under version control with
-      the source code somewhere.</p>
+      <p>N.B. Configuration metadata would normally be managed by whoever
+      manages Rose installation at your site.</p>
     </div>
 
     <div class="slide">
@@ -236,17 +236,15 @@ values=2
       <h3 class="alwayshidden">Summary</h3>
 
       <p>You can check that everything is OK so far by changing directory to
-      the <samp>rose-meta/make-boat/</samp> directory and running <code>ls
-      -R</code> - it should look something like:</p>
+      the <samp>rose-meta/make-boat/</samp> directory and running
+      <code>find</code> - it should look something like:</p>
       <pre>
-.:
-0.1  0.2  versions.py
-
-./0.1:
-rose-meta.conf
-
-./0.2:
-rose-meta.conf
+.
+./0.1
+./0.1/rose-meta.conf
+./0.2
+./0.2/rose-meta.conf
+./versions.py
 </pre>
 
       <p>We now want to automate the process of updating our app config from

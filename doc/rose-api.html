@@ -506,8 +506,14 @@ def show_fixed(self, should_show)
     validate configurations. See <a href="#upgrade">Upgrade Macro API</a> for
     upgrade macros.</p>
 
-    <p>Macros should be written in Python. They can be run within <code>rose
-    config-edit</code> or via <code>rose macro.</code></p>
+    <p>Macros use a Python API, and should be written in Python, unless you are
+    doing something very fancy. In the absence of a Python house style, it's
+    usual to follow the standard Python style guidance (<a href=
+    "http://www.python.org/dev/peps/pep-0008/">PEP8</a>, <a href=
+    "http://www.python.org/dev/peps/pep-0257/">PEP257</a>).</p>
+
+    <p>They can be run within <code>rose config-edit</code> or via <code>rose
+    macro.</code></p>
 
     <p>You should avoid writing checker macros if the checking can be expressed
     via metadata.</p>
@@ -646,7 +652,8 @@ class SomeTransformer(rose.macro.MacroBase):
       <var>upgrade</var> method, but intended for performing the reverse
       operation</li>
 
-      <li>a more helpful API via <code>rose.upgrade.MacroUpgrade</code> methods</li>
+      <li>a more helpful API via <code>rose.upgrade.MacroUpgrade</code>
+      methods</li>
 
       <li><samp>BEFORE_TAG</samp> and <samp>AFTER_TAG</samp> attributes - the
       version of metadata they apply to (<samp>BEFORE_TAG</samp>) and the
