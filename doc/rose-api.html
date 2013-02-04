@@ -147,20 +147,24 @@ set_value("20")
 
       <dt><code>hook</code></dt>
 
-      <dd><p>An instance of a class
-      <code>rose.config_editor.valuewidget.ValueWidgetHook</code> containing
-      callback functions that you should connect some of your widgets to.</p></dd>
+      <dd>
+        <p>An instance of a class
+        <code>rose.config_editor.valuewidget.ValueWidgetHook</code> containing
+        callback functions that you should connect some of your widgets to.</p>
+      </dd>
 
       <dt><code>arg_str</code></dt>
 
       <dd>
-        <p>is an optional argument that stores any text given after the widget in
-        the metadata:</p>
+        <p>is an optional argument that stores any text given after the widget
+        in the metadata:</p>
         <pre>
 widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
-</pre><p>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3 ..."</code>.
-This could help configure your widget - for example, for a table based widget,
-you might give the column names</p>:
+</pre>
+
+        <p>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
+        ..."</code>. This could help configure your widget - for example, for a
+        table based widget, you might give the column names</p>:
         <pre>
 widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
 </pre>This means that you can write a generic widget and then configure it for
@@ -757,7 +761,7 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
           <dt><samp>comments</samp> (optional)</dt>
 
           <dd>A list of comment strings (lines) for the new setting or
-          <code>None</code>.</code></dd>
+          <code>None</code>.</dd>
 
           <dt><samp>info</samp> (optional)</dt>
 
@@ -789,8 +793,7 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
           <dt><samp>config</samp>, <samp>keys</samp>, <samp>comments</samp>,
           <samp>info</samp></dt>
 
-          <dd>As in <code>add_setting</code> above.
-          </dd>
+          <dd>As in <code>add_setting</code> above.</dd>
 
           <dt><samp>value</samp></dt>
 
@@ -830,10 +833,9 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
           <dt><samp>no_ignore</samp> (optional)</dt>
 
           <dd><code>False</code> means return the setting value if the setting
-            is ignored. <code>True</code> means return <code>None</code> if the
-            setting is ignored. If the setting is missing, <code>None</code> is
-            returned.
-          </dd>
+          is ignored. <code>True</code> means return <code>None</code> if the
+          setting is ignored. If the setting is missing, <code>None</code> is
+          returned.</dd>
         </dl>
 
         <p>Example usage:</p>
@@ -858,8 +860,7 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
         <dl>
           <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
 
-          <dd>As in <code>add_setting</code> above.
-          </dd>
+          <dd>As in <code>add_setting</code> above.</dd>
         </dl>
 
         <p>Example usage:</p>
@@ -880,9 +881,7 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
         <dl>
           <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
 
-          <dd>
-            As in <code>add_setting</code> above.
-          </dd>
+          <dd>As in <code>add_setting</code> above.</dd>
         </dl>
 
         <p>Example usage:</p>
@@ -896,9 +895,9 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
       <dt><code>def ignore_setting(self, config, keys, info=None):</code></dt>
 
       <dd>
-        <p>Inverse of <code>enable_setting</code>, a method to make sure a setting
-        defined by <samp>keys</samp> in <samp>config</samp> is user-ignored.
-        The arguments are:</p>
+        <p>Inverse of <code>enable_setting</code>, a method to make sure a
+        setting defined by <samp>keys</samp> in <samp>config</samp> is
+        user-ignored. The arguments are:</p>
 
         <dl>
           <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
@@ -907,12 +906,13 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
             <p>As in <code>add_setting</code> above.</p>
           </dd>
         </dl>
-        
+
         <p>Example usage:</p>
         <pre class="prettyprint">
     def upgrade(self, config, meta_config=None):
         self.ignore_setting(config, ["namelist:breakfast_nl", "milk_bottle_date"])
-        return config, self.reports        
+        return config, self.reports
+</pre>
       </dd>
     </dl>
 
