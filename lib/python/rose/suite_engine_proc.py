@@ -437,7 +437,7 @@ class SuiteEngineProcessor(object):
         """Shut down the suite."""
         raise NotImplementedError()
 
-    def validate(self, suite_name):
+    def validate(self, suite_name, strict_mode=False):
         """Validate a suite."""
         raise NotImplementedError()
 
