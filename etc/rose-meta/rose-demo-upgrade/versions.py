@@ -5,7 +5,7 @@
 #-----------------------------------------------------------------------------
 """Module containing example macros for using rose app-upgrade.
 
-Quotes are the copyright of the quotee.
+Quotes are copyright Python (Monty) Pictures Ltd, Freeway Cam (UK) Ltd.
 
 """
 

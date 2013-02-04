@@ -670,85 +670,192 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
     <p>They can also have a <code>downgrade</code> method (identical in format to <code>upgrade</code>)
     which performs the upgrade in the opposite direction.</p>
 
-    <p>The API for upgrade macros, in addition to the functionality documented for
-    transform macros, is the following:</p>
+    <p>Upgrade macros are subclasses of <code>rose.upgrade.MacroUpgrade</code>. They have
+    all the functionality of the transform macros documented above. <code>rose.upgrade.MacroUpgrade</code>
+    also has some additional convenience methods defined for you to call. All methods return <code>None</code> unless otherwise
+    specified.</p>
 
     <dl>
-      <dt><code>act_from_files(config, downgrade=False)</code></dt>
+      <dt><code>def act_from_files(self, config, downgrade=False)</code></dt>
 
       <dd>
         <p>A method that takes the app configuration (<samp>config</samp>, a
         <code>rose.config.ConfigNode</code> instance) and an optional
         boolean <samp>downgrade</samp> keyword argument. This initiates a
         search for <samp>etc/VERSION/rose-macro-add.conf</samp> and 
-        <samp>etc/VERSION/rose-macro-remove.conf</samp>, which should be
+        <samp>etc/VERSION/rose-macro-remove.conf</samp>, where VERSION is
+        equal to the <samp>BEFORE_TAG</samp> of the macro. These files should be
         Rose app config-like patch files, containing settings to be added
-        (<samp>rose-macro-add.conf</samp>) and settings to be removed (<samp>rose-macro-remove.conf</samp>)
-        for the particular VERSION (equal to the <samp>BEFORE_TAG</samp> of the
-        macro). If downgrading, the settings in <samp>rose-macro-remove.conf</samp>
+        (<samp>rose-macro-add.conf</samp>) and settings to be removed (<samp>rose-macro-remove.conf</samp>). If downgrading (<samp>downgrade</samp> set to <samp>False</samp>), the settings in <samp>rose-macro-remove.conf</samp>
         will be added, and the ones in <samp>rose-macro-add.conf</samp> removed.</p>
-        a number as an argument, which is the current
-        cursor position relative to the characters in the variable value:</p>
         <pre>
-def act_from_files(self, config, downgrade=False):
-        """Parse a change configuration into actions."""
-    self.entry.set_position(focus_index)
+    def upgrade(self, config, meta_config=None):
+        self.act_from_files(config)
+        return config, self.reports
 </pre>
-
-        <p>For example, a <code>focus_index</code> of <samp>0</samp> means that
-        your widget should set the cursor position to the beginning of the
-        value. A <code>focus_index</code> of <samp>4</samp> for a variable
-        value of <samp>Operational</samp> means that the cursor should be
-        placed between the <samp>r</samp> and the <samp>a</samp>.</p>
-
-        <p>This has no real meaning or importance for widgets that don't
-        display editable text. If you do not supply this method, the config
-        editor will attempt to do the right thing anyway.</p>
+        <p>Note that you can use other methods (below) as well as this in the same <samp>upgrade</samp>.</p>
+        
+        <p>If settings are defined in either file, and changes can be made,
+        the <code>self.reports</code> will be updated automatically.</p> 
       </dd>
 
-      <dt><code>get_focus_index() -&gt; focus_index</code></dt>
+      <dt><code>def add_setting(self, config, keys, value=None, forced=False, state=None, comments=None, info=None):</code></dt>
 
       <dd>
-        <p>A method that takes no arguments and returns a number which is the
-        current cursor position relative to the characters in the variable
-        value:</p>
-        <pre>
-def get_focus_index(self):
-    """Return the cursor position."""
-    return self.entry.get_position()
-</pre>
-
-        <p>This has no real meaning or importance for widgets that don't
-        display editable text. If you do not supply this method, the config
-        editor will guess the cursor position anyway, based on the last change
-        to the variable value.</p>
+        <p>A method that attempts to add the setting defined by the list <samp>keys</samp> (<samp>[section]</samp> or <samp>[section, option]<?samp> strings) with the value <samp>value</samp> to the app config <samp>config</samp>. The arguments mostly follow <code>rose.config.ConfigNode</code> attributes, and are as follows:</p>
+        <dl>
+          <dt><samp>config</samp></dt>
+          
+          <dd>The application configuration object (<code>rose.config.ConfigNode</code> instance)</dd>
+          
+          <dt><samp>keys</samp></dt>
+          
+          <dd>A list of strings denoting config settings - <code>[section_name]</code> for a section,
+          <code>[section_name, option_name]</code> for an option. For example, it might be <code>["namelist:foo", "bar"]</code>.
+          </dd>
+          
+          <dt><samp>value</samp> (optional)</dt>
+          
+          <dd>A string or <code>None</code> denoting the new setting value. <code>None</code> should be used for sections only.
+          Options must have a string <code>value</code> defined.</dd>
+          
+          <dt><samp>forced</samp> (optional)</dt>
+          
+          <dd>If the setting already exists, override the value to the new <code>value</code>.</dd>
+          
+          <dt><samp>state</samp> (optional)</dt>
+          
+          <dd>Set the state of the new setting (<code>rose.config.ConfigNode</code> states) - <code>None</code> implies the default, which is <code>rose.config.ConfigNode.STATE_NORMAL. Other states are <code>rose.config.ConfigNode.STATE_SYST_IGNORED</code> and <code>rose.config.ConfigNode.STATE_USER_IGNORED.</dd>
+          
+          <dt><samp>comments</samp> (optional)</dt>
+          
+          <dd>A list of comment strings (lines) for the new setting or <code>None</code>.</dd>
+          
+          <dt><samp>info</samp> (optional)</dt>
+          
+          <dd>A short string containing no new lines, describing the addition of the setting.</dd>
+        </dl>
       </dd>
+      
+      <p>Example usage:</p>
+      <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.add_setting(config, ["namelist:breakfast_nl", "bacon"], "2",
+                         comments=["Mmmm. Bacon."], info="Add for food:#810")
+        return config, self.reports
+      </pre>
 
-      <dt><code>handle_type_error(is_in_error) -&gt; None</code></dt>
-
-      <dd>
-        <p>The default behaviour when a variable error is added or removed is
-        to re-instantiate the widget (refresh and redraw it). This can be
-        overridden by defining this method in your value widget class. It takes
-        a boolean <code>is_in_error</code> which is <samp>True</samp> if there
-        is a value (type) error and <samp>False</samp> otherwise:</p>
-        <pre>
-def handle_type_error(self, is_in_error):
-    """Change behaviour based on whether the variable is_in_error."""
-    icon_id = gtk.STOCK_DIALOG_ERROR if is_in_error else None
-    self.entry.set_icon_from_stock(0, gtk.STOCK_DIALOG_ERROR)       
+    </dd>
+    
+    <dt><code> def change_setting_value(self, config, keys, value, forced=False, comments=None, info=None):</code></dt>
+      
+    <dd>
+      <p>A method that attempts to change an existing setting value defined by <samp>keys</samp> to a new one (<samp>value</samp>)
+      in the app config <samp>config</samp>. The arguments are:</p>
+      
+      <dl>
+        <dt><samp>config</samp>, <samp>keys</samp>, <samp>comments</samp>, <samp>info</samp></dt>
+        
+        <dd><p>As in <code>add_setting</code> above.</p>
+        
+        <dt><samp>value</samp></dt>
+        
+        <dd>Required argument, must be a string for option values, and can be <code>None</code> for section values.</dd>
+        
+        <dt><samp>forced</samp> (optional)</dt>
+        
+        <dd>Add the setting if it does not exist.</dd>
+      </dl>
+    
+      <p>Example usage:</p>
+      <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.change_setting_value(config, ["namelist:breakfast_nl", "coffee"], "'more'",
+                                  info="Add for food:#820")
+        return config, self.reports
+    </dd>
+    
+    <dt><code>def get_setting_value(self, config, keys, no_ignore=False): (-&gt; value)</code></dt>
+    
+    <dd><p>A method that returns a setting value or <code>None</code>, functionally similar to
+        <code>rose.config.ConfigNode.get</code>. The arguments are:</p>
+        
+        <dl>
+        
+          <dt><samp>config</samp>, <samp>keys</samp></dt>
+          
+          <dd><p>As in <code>add_setting</code> above.</p></dd>
+          
+          <dt><samp>no_ignore</samp> (optional)</dt>
+          
+          <dd><p><code>False</code> means return the setting value if the setting is ignored. <code>True</code>
+          means return <code>None</code> if the setting is ignored. If the setting is missing, <code>None</code>
+          is returned.</p></dd>
+          
+        </dl>
+        <p>Example usage:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        if self.get_setting_value(
+                    config, ["namelist:breakfast_nl", "coffee"]) == "'empty'":
+            self.add_setting(config, ["namelist:breakfast_nl", "tea"],
+                             "'extra_strong'")
+        return config, self.reports    
+    </dd>
+    
+    <dt><code>def remove_setting(self, config, keys, info=None):</code></dt>
+    
+    <dd><p>A method that removes a setting defined by <samp>keys</samp> in <samp>config</samp>
+    with an optional <samp>info</samp> message. The arguments are:</p>
+    
+      <dl>
+        <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
+        
+        <dd><p>As in <code>add_setting</code> above.</p></dd>
+      </dl>
+    
+    <p>Example usage:</p>
+    <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.remove_setting(config, ["namelist:breakfast_nl", "cheeseburger"],
+                            info="Cheeseburgers are for lunch")
 </pre>
+    </dd>
+    
+    <dt><code>def enable_setting(self, config, keys, info=None):</code></dt>
+    
+    <dd>A method to make sure a setting defined by <samp>keys</samp> in <samp>config</samp>
+    is not user-ignored. The arguments are:</p>
+    
+      <dl>
+        <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
+        
+        <dd><p>As in <code>add_setting</code> above.</p></dd>
+      </dl>
+      
+    <p>Example usage:</p>
+    <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.enable_setting(config, ["namelist:breakfast_nl", "egg_monitoring"])
+</pre>
+    </dd>
+    
+    <dt><code>def ignore_setting(self, config, keys, info=None):</code></dt>
+    
+    <dd>Inverse of <code>enable_setting</code>, a method to make sure a setting
+    defined by <samp>keys</samp> in <samp>config</samp>
+    is user-ignored. The arguments are:</p>
+    
+      <dl>
+        <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
+        
+        <dd><p>As in <code>add_setting</code> above.</p></dd>
+      </dl>
+    </dd>
 
-        <p>For example, this is used in a built-in widget for the quoted string
-        types <code>string</code> and <code>character</code>. The quotes around
-        the text are normally hidden, but the <code>handle_type_error</code>
-        shows them if there is an error. The method also keeps the keyboard
-        focus, which is the main purpose.</p>
-
-        <p>You may not have much need for this method, as the default error
-        flagging and cursor focus handling is normally sufficient.</p>
-      </dd>
-    </dl>
+    <p>There is an upgrade macro <a href="rose-rug-advanced-tutorials-upgrade-dev.html">development tutorial</a>
+    and more examples in the upgrade file for the upgrade <a href="rose-rug-advanced-tutorials-upgrade-usage.html">usage
+    tutorial</a> (<samp>versions.py</samp>) <a href="../etc/rose-meta/rose-demo-upgrade/versions.py">here</a>.</p>
 
     <h2 id="rosie-ws">Rosie Web</h2>
 
