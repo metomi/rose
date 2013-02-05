@@ -121,18 +121,17 @@ paddling_twigs=1
     <div class="slide">
       <h2 id="example-metadata">Example Metadata</h2>
 
-      <p>We need a <samp>rose-meta/</samp> directory somewhere, to store
-      our metadata - for the purposes of this tutorial it's easiest to
-      put in in your homespace, but the location does not matter.</p>
+      <p>We need a <samp>rose-meta/</samp> directory somewhere, to store our
+      metadata - for the purposes of this tutorial it's easiest to put in in
+      your homespace, but the location does not matter.</p>
 
       <p>Create a <samp>rose-meta/make-boat/</samp> directory in your
       homespace:</p>
       <pre class="shell">
 mkdir -p ~/rose-meta/make-boat/
 </pre>
-
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example Metadata Explanation</h3>
 
@@ -225,7 +224,8 @@ paddling_branches=1
       <h3 class="alwayshidden">Metadata Snippet</h3>
 
       <p>Create a new subdirectory, <samp>0.2/</samp> under
-      <samp>make-boat/</samp>, containing a <samp>rose-meta.conf</samp> file that looks like this:</p>
+      <samp>make-boat/</samp>, containing a <samp>rose-meta.conf</samp> file
+      that looks like this:</p>
       <pre class="prettyprint lang-rose_conf">
 [namelist:materials=hollow_tree_trunks]
 compulsory=true
@@ -250,8 +250,8 @@ values=2
       <h3 class="alwayshidden">Summary</h3>
 
       <p>You can check that everything is OK so far by changing directory to
-      the <samp>make-boat/</samp> directory and running
-      <code>find</code> - it should look something like:</p>
+      the <samp>make-boat/</samp> directory and running <code>find</code> - it
+      should look something like:</p>
       <pre>
 .
 ./0.1
@@ -275,9 +275,8 @@ values=2
       directory.</p>
 
       <p>Create a new file <samp>versions.py</samp> under
-      <samp>make-boat/</samp>
-      (<samp>~/rose-meta/make-boat/versions.py</samp>). We'll add a macro to
-      it in a little bit.</p>
+      <samp>make-boat/</samp> (<samp>~/rose-meta/make-boat/versions.py</samp>).
+      We'll add a macro to it in a little bit.</p>
     </div>
 
     <div class="slide">
@@ -322,10 +321,9 @@ values=2
 
     <div class="slide">
       <h3 id="skeleton">Upgrade Macro Skeleton</h3>
-      
-      <p>Upgrade macros are bits of
-      Python code that essentially look like this:</p>
 
+      <p>Upgrade macros are bits of Python code that essentially look like
+      this:</p>
       <pre class="prettyprint">
 class Upgrade272to273(rose.upgrade.MacroUpgrade):
 
@@ -463,8 +461,8 @@ rose app-upgrade --meta-path=~/rose-meta/
       <p><samp>--meta-path</samp> equals the path to the
       <samp>rose-meta/</samp> directory you created - as this path isn't
       configured in the site/user configuration, we need to set it manually.
-      This won't normally be the case for users, if the metadata is
-      centrally managed.</p>
+      This won't normally be the case for users, if the metadata is centrally
+      managed.</p>
 
       <p>This should display some information about the current and available
       versions - see the help by running <code>rose help
@@ -685,8 +683,8 @@ class MyMoreComplexUpgradeMacro(rose.upgrade.MacroUpgrade):
     <div class="slide">
       <h3 class="alwayshidden">Running the Complex Macro</h3>
 
-      <p>Run <kbd>rose app-upgrade --meta-path=~/rose-meta/ 1.0</kbd> to
-      see the effect of your changes. You should see a warning message for
+      <p>Run <kbd>rose app-upgrade --meta-path=~/rose-meta/ 1.0</kbd> to see
+      the effect of your changes. You should see a warning message for
       <var>namelist:materials=paddling_branches</var> as well.</p>
     </div>
 
@@ -711,9 +709,9 @@ paddling_twigs=1
       <div class="slide">
         <h3 class="alwayshidden">rose app-upgrade Across Versions</h3>
 
-        <p>Run <kbd>rose app-upgrade --meta-path=~/rose-meta/</kbd> in
-        the application directory. You should see the available versions to
-        upgrade to - let's choose <samp>1.0</samp>. Run:</p>
+        <p>Run <kbd>rose app-upgrade --meta-path=~/rose-meta/</kbd> in the
+        application directory. You should see the available versions to upgrade
+        to - let's choose <samp>1.0</samp>. Run:</p>
         <pre class="prettyprint lang-rose_conf">
 rose app-upgrade --meta-path=~/rose-meta/ 1.0
 </pre>
