@@ -20,6 +20,7 @@
 """Logic specific to the Cylc suite engine."""
 
 import ast
+from glob import glob
 import os
 import pwd
 import re
@@ -36,10 +37,13 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
+    PYRO_TIMEOUT = 5
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     SUITE_LOG = "suite/log"
+    TASK_ID_DELIM = "%"
+    TASK_LOG_DELIM = "."
 
     REC_LOG_ENTRIES = {
          "submit": re.compile(
@@ -64,10 +68,6 @@ class CylcProcessor(SuiteEngineProcessor):
                  CRITICAL\s-\s                  # The type of the message
                  \[(?P<task_id>\S+)\]           # The task id as a named group
                  \s-.+?signal\s(?P<signal>\S+)$ # The message""", re.X)}
-
-    REC_TASK_LOG_FILE_TAIL = re.compile("(\d+\.\d+)(?:\.(.*))?")
-
-    LOG_TASK_TIMESTAMP_THRESHOLD = 5.0
 
     def get_task_log_dir_rel(self, suite):
         """Return the relative path to the log directory for suite tasks."""
@@ -244,7 +244,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     signal = search_result.group("signal")
                 event_time = mktime(strptime(time_stamp, "%Y/%m/%d %H:%M:%S"))
                 if task_id not in data:
-                    name, cycle_time = task_id.split("%", 1)
+                    name, cycle_time = task_id.split(self.TASK_ID_DELIM, 1)
                     data[task_id] = {"name": name,
                                      "cycle_time": cycle_time,
                                      "submits": []}
@@ -252,8 +252,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 if not submits or submits[-1]["events"][event]:
                     submits.append({"events": {},
                                     "status": None,
-                                    "files": {},
-                                    "files_time_stamp": None})
+                                    "files": {}})
                     for name in ["submit", "init", "exit"]:
                         submits[-1]["events"][name] = None
                 task_data = submits[-1]
@@ -266,31 +265,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 break
         # Locate task log files
         for task_id, task_datum in data.items():
-            submits = task_datum["submits"]
-            if not os.path.isdir("job"):
-                return
-            for name in os.listdir("job"):
-                if not name.startswith(task_id + "-"):
-                    continue
-                tail = name.replace(task_id + "-", "", 1)
-                match = self.REC_TASK_LOG_FILE_TAIL.match(tail)
-                if not match:
-                    continue
-                time_stamp, key = match.groups()
-                if not key:
-                    key = "script"
-                n_bytes = int(os.stat(os.path.join("job", name)).st_size)
-                for submit in submits:
-                    if submit["files_time_stamp"] == time_stamp:
-                        submit["files"][key] = {"n_bytes": n_bytes}
-                        break
-                    # The 1st element in submits with a submit time
-                    # within THRESHOLD seconds of the file name's time stamp.
-                    dt = abs(submit["events"]["submit"] - float(time_stamp))
-                    if dt <= self.LOG_TASK_TIMESTAMP_THRESHOLD:
-                        submit["files"][key] = {"n_bytes": n_bytes}
-                        submit["files_time_stamp"] = time_stamp
-                        break
+            name = task_datum["name"]
+            cycle_time = task_datum["cycle_time"]
+            for i, submit in enumerate(task_datum["submits"]):
+                root = "job/" + self.TASK_LOG_DELIM.join([name, cycle_time,
+                                                          str(i + 1)])
+                for path in glob(root + "*"):
+                    key = path[len(root) + 1:]
+                    if not key:
+                        key = "script"
+                    submit["files"][key] = {"n_bytes": os.stat(path).st_size}
         return data
 
     def process_suite_hook_args(self, *args, **kwargs):
@@ -329,10 +313,14 @@ class CylcProcessor(SuiteEngineProcessor):
         # Invoke "cylc run" or "cylc restart"
         if run_mode not in ["reload", "restart", "run"]:
             run_mode = "run"
+        opt_force = ""
+        if run_mode == "reload":
+            opt_force = " --force"
         # N.B. We cannot do "cylc run --host=HOST". STDOUT redirection means
         # that the log will be redirected back via "ssh" to the localhost.
-        bash_cmd = r"cylc %s %s %s" % (
-                run_mode, suite_name, self.popen.list_to_shell_str(args))
+        bash_cmd = r"cylc %s%s %s %s" % (
+                run_mode, opt_force, suite_name,
+                self.popen.list_to_shell_str(args))
         if host:
             bash_cmd_prefix = "set -eu\ncd\n"
             log_dir = self.get_suite_dir_rel(suite_name, "log")
@@ -359,7 +347,8 @@ class CylcProcessor(SuiteEngineProcessor):
             hosts = ["localhost"]
         host_proc_dict = {}
         for host in sorted(hosts):
-            proc = self.popen.run_bg("cylc", "scan", "--host=" + host)
+            timeout = "--pyro-timeout=%s" % self.PYRO_TIMEOUT
+            proc = self.popen.run_bg("cylc", "scan", "--host=" + host, timeout)
             host_proc_dict[host] = proc
         ret = []
         while host_proc_dict:
@@ -385,13 +374,9 @@ class CylcProcessor(SuiteEngineProcessor):
         environ = dict(os.environ)
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
-        out, err = self.popen(*command, env=environ)
-        if err:
-            self.handle_event(err, type=Event.TYPE_ERR)
-        if out:
-            self.handle_event(out)
+        self.popen.run_simple(*command, env=environ)
 
-    def validate(self, suite_name):
+    def validate(self, suite_name, strict_mode=False):
         """(Re-)register and validate a suite."""
         suite_dir_rel = self.get_suite_dir_rel(suite_name)
         home = os.path.expanduser("~")
@@ -401,12 +386,13 @@ class CylcProcessor(SuiteEngineProcessor):
         if out:
             suite_dir_old = out.strip()
         suite_passphrase = os.path.join(suite_dir, "passphrase")
-        self.popen("cylc", "refresh", "--unregister")
+        self.popen.run_simple("cylc", "refresh", "--unregister",
+                              stdout_level=Event.VV)
         if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
-            self.popen("cylc", "unregister", suite_name)
+            self.popen.run_simple("cylc", "unregister", suite_name)
             suite_dir_old = None
         if suite_dir_old is None:
-            self.popen("cylc", "register", suite_name, suite_dir)
+            self.popen.run_simple("cylc", "register", suite_name, suite_dir)
         passphrase_dir_root = os.path.join(home, ".cylc")
         for name in os.listdir(passphrase_dir_root):
             p = os.path.join(passphrase_dir_root, name)
@@ -414,7 +400,11 @@ class CylcProcessor(SuiteEngineProcessor):
                 self.fs_util.delete(p)
         passphrase_dir = os.path.join(passphrase_dir_root, suite_name)
         self.fs_util.symlink(suite_dir, passphrase_dir)
-        self.popen("cylc", "validate", suite_name)
+        command = ["cylc", "validate", "-v"]
+        if strict_mode:
+            command.append("--strict")
+        command.append(suite_name)
+        self.popen.run_simple(*command, stdout_level=Event.V)
 
     def _parse_user_host(self, user, host, my_user=None, my_host=None):
         if my_user is None:

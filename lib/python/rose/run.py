@@ -602,7 +602,7 @@ class SuiteRunner(Runner):
                "gcontrol_mode", "host", "install_only_mode",
                "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
                "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
-               "restart_mode", "run_mode"]
+               "restart_mode", "run_mode", "strict_mode"]
 
     REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
 
@@ -650,6 +650,10 @@ class SuiteRunner(Runner):
             self.fs_util.chdir(opts.conf_dir)
             opts.conf_dir = None
 
+        suite_name = opts.name
+        if not opts.name:
+            suite_name = os.path.basename(os.getcwd())
+
         # Automatic Rose constants
         # ROSE_ORIG_HOST: originating host
         # ROSE_VERSION: Rose version (not retained in run_mode=="reload")
@@ -658,7 +662,11 @@ class SuiteRunner(Runner):
         my_rose_version = ResourceLocator.default().get_version()
         suite_engine_key = self.suite_engine_proc.get_version_env_name()
         if opts.run_mode == "reload":
-            suite_engine_version = config.get_value(["env", suite_engine_key])
+            prev_config_path = self.suite_engine_proc.get_suite_dir(
+                    suite_name, "log", "rose-suite-run.conf")
+            prev_config = rose.config.load(prev_config_path)
+            suite_engine_version = prev_config.get_value(
+                    ["env", suite_engine_key])
         else:
             suite_engine_version = self.suite_engine_proc.get_version()
         auto_items = {"ROSE_ORIG_HOST": socket.gethostname(),
@@ -667,10 +675,6 @@ class SuiteRunner(Runner):
         for k, v in auto_items.items():
             config.set(["env", k], v)
             config.set([jinja2_section, k], '"' + v + '"')
-
-        suite_name = opts.name
-        if not opts.name:
-            suite_name = os.path.basename(os.getcwd())
 
         # See if suite is running or not
         hosts = []
@@ -685,11 +689,12 @@ class SuiteRunner(Runner):
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
+        suite_running_hosts = self.suite_engine_proc.ping(suite_name, hosts)
         if opts.run_mode == "reload":
-            if not self.suite_engine_proc.ping(suite_name, hosts):
+            if not suite_running_hosts:
                 raise NotRunningError(suite_name)
         else:
-            if self.suite_engine_proc.ping(suite_name, hosts):
+            if suite_running_hosts:
                 if opts.force_mode:
                     opts.install_only_mode = True
                 else:
@@ -778,7 +783,7 @@ class SuiteRunner(Runner):
         self.config_pm(config, "jinja2")
 
         # Register the suite
-        self.suite_engine_proc.validate(suite_name)
+        self.suite_engine_proc.validate(suite_name, opts.strict_mode)
 
         # Install suite files to each remote [user@]host
         for name in ["", "log/", "share/", "work/"]:
@@ -788,7 +793,7 @@ class SuiteRunner(Runner):
 
         # Install items to user@host
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
-        queue = [] # [[pipe, command, "ssh"|"rsync"], ...]
+        queue = [] # [[pipe, command, "ssh"|"rsync", auth], ...]
         for user, host in sorted(auths):
             auth = user + "@" + host
             command = self.popen.get_cmd("ssh", auth, "bash", "--login", "-c")
@@ -823,21 +828,23 @@ class SuiteRunner(Runner):
                     rose_sr += "," + key + "=" + v
             command += ["'" + rose_sr + "'"]
             pipe = self.popen.run_bg(*command)
-            queue.append([pipe, command, "ssh"])
+            queue.append([pipe, command, "ssh", auth])
 
         while queue:
             sleep(self.SLEEP_PIPE)
-            pipe, command, mode = queue.pop(0)
+            pipe, command, mode, auth = queue.pop(0)
             if pipe.poll() is None:
-                queue.append([pipe, command, mode]) # put it back at the end
+                queue.append([pipe, command, mode, auth]) # put it back
                 continue
             rc = pipe.wait()
             out, err = pipe.communicate()
             if rc:
                 raise RosePopenError(command, rc, out, err)
-            self.handle_event(out, level=Event.VV)
             if mode == "rsync":
+                self.handle_event(out, level=Event.VV)
                 continue
+            else:
+                self.handle_event(out, level=Event.VV, prefix="[%s] " % auth)
             for line in out.split("\n"):
                 if "/" + uuid == line.strip():
                     break
@@ -847,13 +854,17 @@ class SuiteRunner(Runner):
                     filters["excludes"].append(name + uuid)
                 target = auth + ":" + suite_dir_rel
                 cmd = self._get_cmd_rsync(target, **filters)
-                queue.append([self.popen.run_bg(*cmd), cmd, "rsync"])
+                queue.append([self.popen.run_bg(*cmd), cmd, "rsync", auth])
 
         # Start the suite
         self.fs_util.chdir("log")
         ret = 0
-        host = hosts[0]
-        if not opts.install_only_mode:
+        if opts.install_only_mode:
+            host = None
+            if suite_running_hosts:
+                host = suite_running_hosts[0]
+        else:
+            host = hosts[0]
             # FIXME: should sync files to suite host?
             if opts.host:
                 hosts = [host]
@@ -870,7 +881,7 @@ class SuiteRunner(Runner):
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
-        if os.getenv("DISPLAY") and opts.gcontrol_mode:
+        if os.getenv("DISPLAY") and host and opts.gcontrol_mode:
             self.suite_engine_proc.gcontrol(suite_name, host)
         return ret
 
@@ -941,8 +952,14 @@ class SuiteRunner(Runner):
                         logs.remove(log)
                 else:
                     for root, dirs, files in os.walk(log):
-                        if any([os.stat(os.path.join(root, f)).st_mtime >= t
-                                for f in files]):
+                        keep = False
+                        for file in files:
+                            path = os.path.join(root, file)
+                            if (os.path.exists(path) and
+                                os.stat(path).st_mtime >= t):
+                                keep = True
+                                break
+                        if keep:
                             break
                     else:
                         self.fs_util.delete(log)
@@ -1061,20 +1078,22 @@ class TaskRunner(Runner):
         # Prepend PATH-like variable, site/user configuration
         conf = ResourceLocator.default().get_conf()
         my_conf = conf.get(["rose-task-run"], no_ignore=True)
-        for key, node in sorted(my_conf.value.items()):
-            if node.is_ignored() or not key.startswith("path-prepend"):
-                continue
-            env_key = "PATH"
-            if key != "path-prepend":
-                env_key = key[len("path-prepend."):]
-            values = []
-            for v in node.value.split():
-                if os.path.exists(v):
-                    values.append(v)
-            if os.getenv(env_key):
-                values.append(os.getenv(env_key))
-            if values:
-                env_export(env_key, os.pathsep.join(values), self.event_handler)
+        if my_conf is not None:
+            for key, node in sorted(my_conf.value.items()):
+                if node.is_ignored() or not key.startswith("path-prepend"):
+                    continue
+                env_key = "PATH"
+                if key != "path-prepend":
+                    env_key = key[len("path-prepend."):]
+                values = []
+                for v in node.value.split():
+                    if os.path.exists(v):
+                        values.append(v)
+                if os.getenv(env_key):
+                    values.append(os.getenv(env_key))
+                if values:
+                    env_export(env_key, os.pathsep.join(values),
+                               self.event_handler)
 
         # Prepend PATH with paths determined by default or specified globs
         paths = []
@@ -1083,6 +1102,8 @@ class TaskRunner(Runner):
             path_globs.extend(opts.path_globs)
         for path_glob in path_globs:
             if path_glob:
+                if path_glob.startswith("~"):
+                    path_glob = os.path.expanduser(path_glob)
                 if not os.path.isabs(path_glob):
                     path_glob = os.path.join(t.suite_dir, path_glob)
                 for path in glob(path_glob):

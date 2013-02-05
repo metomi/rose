@@ -114,8 +114,8 @@ class SuiteControl(object):
         return hosts
 
     def _get_engine_version(self, suite_name):
-        log = self.suite_engine_proc.get_suite_dir(suite_name, "log")
-        conf_path = os.path.join(log, "rose-suite-run.conf")
+        conf_path = self.suite_engine_proc.get_suite_dir(
+                suite_name, "log", "rose-suite-run.conf")
         if os.access(conf_path, os.F_OK | os.R_OK):
             conf = rose.config.load(conf_path)
             key = self.suite_engine_proc.get_version_env_name()

@@ -22,7 +22,7 @@
  * CSS for Rose documents.
  *
  **********************************************************************/
- 
+
 /**********************************************************************
  * FOREGROUND COLOUR
  *
@@ -105,7 +105,7 @@ pre,
 samp,
 th,
 .image {
-    background: #eee;
+    background: #f8f8f8;
 }
 
 .header-footer {
@@ -125,6 +125,13 @@ th,
     background: #fafafa;
 }
 
+body {
+    background: #eee;
+}
+
+#body-main {
+    background: white;
+}
 
 /**********************************************************************
  * OPACITY
@@ -143,21 +150,12 @@ th,
  * BORDER
  *
  **********************************************************************/
-dl,
-kbd,
-pre,
-samp,
-.image {
+pre {
     border: thin solid #ddd;
 }
 
-
 h2 {
-    border-top: medium ridge #060048;
-}
-
-.shell {
-    border: thin outset black;
+    border-bottom: thin solid #ddd;
 }
 
 .shell-prompt,
@@ -173,6 +171,9 @@ th {
     border-collapse: collapse;
 }
 
+#body-main {
+    border: thin ridge #ccc;
+}
 
 /**********************************************************************
  * FONT
@@ -190,15 +191,15 @@ var {
 }
 
 h1 {
-    font-size: 200%;
-}
-
-h2 {
     font-size: 175%;
 }
 
-h3 {
+h2 {
     font-size: 150%;
+}
+
+h3 {
+    font-size: 100%;
 }
 
 h4,
@@ -275,9 +276,12 @@ a:hover {
  * TEXT ALIGNMENT
  *
  **********************************************************************/
-address,
-h1 {
+address {
     text-align: right;
+}
+
+h1 {
+    text-align: center;
 }
 
 .collapse-expand {
@@ -322,7 +326,6 @@ pre,
     -moz-border-radius: 0;
 }
 
-
 /**********************************************************************
  * MARGIN
  *
@@ -335,6 +338,10 @@ h2,
 .header-footer img,
 .header-footer p {
     margin: 0;
+}
+
+h1 {
+    margin:0px -30px 0px -30px;
 }
 
 img {
@@ -362,14 +369,15 @@ table {
     margin-top: 2em;
 }
 
-
+#body-main {
+    margin:0 auto;
+    margin-top:20px;
+    margin-bottom:50px;
+}
 /**********************************************************************
  * PADDING
  *
  **********************************************************************/
-h1 {
-    padding-top: 0;
-}
 h1,
 h2,
 h3,
@@ -378,6 +386,7 @@ h5 {
     padding-bottom: 0.2em;
 }
 
+h1,
 h2,
 h3,
 h4,
@@ -404,13 +413,20 @@ var {
     padding-top: 0.5em;
 }
 
+#content {
+    padding-top: 0.5em;
+}
+
 caption,
 td,
 th {
     padding: 0.1em;
 }
 
-
+#body-main {
+    padding:30px;
+    padding-top:0px;
+}
 /**********************************************************************
  * POSITION AND FLOAT
  *
@@ -436,12 +452,8 @@ th {
 }
 
 .header-footer,
-#body-main {
+{
     position: absolute;
-}
-
-#body-main {
-    top: 3em;
 }
 
 
@@ -453,9 +465,39 @@ th {
     height: 2.9em;
 }
 
+#body-main {
+    width:800px;
+}
+
 @media screen {
     #body-header,
     #body-main {
+    }
+}
+
+
+/**********************************************************************
+ * CROSS-PLATFORM SUPPORT
+ *
+ **********************************************************************/
+
+@media handheld, only screen and (max-device-width:850px) {
+    #body-main {
+        border:none;
+        margin: 0;
+        padding: 0;
+        top: 0.1em;
+        position: relative;
         width: 100%;
+    }
+
+    body {
+        background: white;
+    }
+
+    h1 {
+        border-top: none;
+        margin: 0;
+        padding: 0;
     }
 }

@@ -206,6 +206,8 @@ class SuiteEngineProcessor(object):
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
     SCHEME_HANDLER_MANAGER = None
     SCHEME_DEFAULT = "cylc" # TODO: site configuration?
+    TASK_ID_DELIM = None # Delimiter of task ID
+    TASK_LOG_DELIM = None # Delimiter of task ID in log files
 
     @classmethod
     def get_processor(
@@ -435,7 +437,7 @@ class SuiteEngineProcessor(object):
         """Shut down the suite."""
         raise NotImplementedError()
 
-    def validate(self, suite_name):
+    def validate(self, suite_name, strict_mode=False):
         """Validate a suite."""
         raise NotImplementedError()
 

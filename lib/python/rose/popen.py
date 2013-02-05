@@ -193,6 +193,26 @@ class RosePopener(object):
             raise RosePopenError(args, rc, stdout, stderr, kwargs.get("stdin"))
         return stdout, stderr
 
+    def run_simple(self, *args, **kwargs):
+        """Similar to RosePopener.run_ok, but event handle stdout and stderr.
+
+        kwargs["stderr_level"] -- set event level of stderr
+        kwargs["stdout_level"] -- set event level of stdout
+
+        Return None.
+
+        """
+        stdin = kwargs.get("stdin")
+        stderr_level = kwargs.pop("stderr_level", None)
+        stdout_level = kwargs.pop("stdout_level", None)
+        rc, stdout, stderr = self.run(*args, **kwargs)
+        if stdout:
+            self.handle_event(stdout, level=stdout_level)
+        if rc:
+            raise RosePopenError(args, rc, stdout, stderr, kwargs.get("stdin"))
+        if stderr:
+            self.handle_event(stderr, level=stderr_level)
+
     def which(self, name):
         """Search an executable file name in PATH, and return its full path.
 
