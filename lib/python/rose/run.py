@@ -1078,20 +1078,22 @@ class TaskRunner(Runner):
         # Prepend PATH-like variable, site/user configuration
         conf = ResourceLocator.default().get_conf()
         my_conf = conf.get(["rose-task-run"], no_ignore=True)
-        for key, node in sorted(my_conf.value.items()):
-            if node.is_ignored() or not key.startswith("path-prepend"):
-                continue
-            env_key = "PATH"
-            if key != "path-prepend":
-                env_key = key[len("path-prepend."):]
-            values = []
-            for v in node.value.split():
-                if os.path.exists(v):
-                    values.append(v)
-            if os.getenv(env_key):
-                values.append(os.getenv(env_key))
-            if values:
-                env_export(env_key, os.pathsep.join(values), self.event_handler)
+        if my_conf is not None:
+            for key, node in sorted(my_conf.value.items()):
+                if node.is_ignored() or not key.startswith("path-prepend"):
+                    continue
+                env_key = "PATH"
+                if key != "path-prepend":
+                    env_key = key[len("path-prepend."):]
+                values = []
+                for v in node.value.split():
+                    if os.path.exists(v):
+                        values.append(v)
+                if os.getenv(env_key):
+                    values.append(os.getenv(env_key))
+                if values:
+                    env_export(env_key, os.pathsep.join(values),
+                               self.event_handler)
 
         # Prepend PATH with paths determined by default or specified globs
         paths = []
@@ -1100,6 +1102,8 @@ class TaskRunner(Runner):
             path_globs.extend(opts.path_globs)
         for path_glob in path_globs:
             if path_glob:
+                if path_glob.startswith("~"):
+                    path_glob = os.path.expanduser(path_glob)
                 if not os.path.isabs(path_glob):
                     path_glob = os.path.join(t.suite_dir, path_glob)
                 for path in glob(path_glob):

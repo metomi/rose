@@ -60,7 +60,7 @@ REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([\d:, ]+\))?$')
 PROBLEM_ENTRY = "    {0}={1}={2}\n        {3}\n"
 PROMPT_ACCEPT_CHANGES = "Accept y/n (default n)? "
 PROMPT_OK = "y"
-TRANSFORM_CHANGE = "    {0}={1}={2}\n        {3}"
+SETTING_ID = "    {0}={1}={2}\n        {3}"
 TRANSFORM_METHOD = "transform"
 VALIDATE_METHOD = "validate"
 VERBOSE_LIST = "{0} - ({1}) - {2}"
@@ -214,6 +214,7 @@ def add_site_meta_paths():
         for path in path.split(os.pathsep):
             path = os.path.expanduser(os.path.expandvars(path))
             sys.path.insert(0, os.path.abspath(path))
+    sys.path.append(os.path.join(os.getenv("ROSE_HOME"), "etc/rose-meta"))
 
 
 def add_env_meta_paths():
@@ -266,7 +267,7 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         opt_node = config.get([rose.CONFIG_SECT_TOP,
                                rose.CONFIG_OPT_PROJECT], no_ignore=True)
     if opt_node is None or not opt_node.value:
-        meta_keys = ["etc/metadata/all"]
+        meta_keys = ["rose-all"]
     else:
         key = opt_node.value
         if "/" not in key:
@@ -624,16 +625,27 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
 
 def _handle_transform(app_config, new_config, change_list, macro_id,
                       opt_conf_dir, opt_output_dir, opt_non_interactive):
+    changes = []
+    warnings = []
     user_allowed_changes = False
-    if change_list:
-        header = MACRO_OUTPUT_TRANSFORM_CHANGES
-        sys.stdout.write(header.format(macro_id, len(change_list)))
-        for rep in change_list:  # MacroReport instances
-            out = TRANSFORM_CHANGE.format(
+    for rep in change_list:  # MacroReport instance
+        if rep.is_warning:
+            warnings.append(rep)
+        else:
+            changes.append(rep)
+    for reps, header, out in [(changes, MACRO_OUTPUT_TRANSFORM_CHANGES,
+                               SETTING_ID),
+                              (warnings, MACRO_OUTPUT_WARNING_ISSUES,
+                               SETTING_ID)]:
+        if not reps:
+            continue
+        sys.stdout.write(header.format(macro_id, len(reps)))
+        for rep in reps:  # MacroReport instances
+            this_out = out.format(
                         rep.section, rep.option, rep.value, rep.info)
-            sys.stdout.write(out + "\n")
-        if not opt_non_interactive:
-            user_allowed_changes = _get_user_accept()
+            sys.stdout.write(this_out + "\n")
+    if not opt_non_interactive and changes:
+        user_allowed_changes = _get_user_accept()
     else:
         user_allowed_changes = False
     if user_allowed_changes or opt_non_interactive:

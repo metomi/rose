@@ -20,6 +20,7 @@
 """Logic specific to the Cylc suite engine."""
 
 import ast
+from glob import glob
 import os
 import pwd
 import re
@@ -36,10 +37,13 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
+    PYRO_TIMEOUT = 5
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     SUITE_LOG = "suite/log"
+    TASK_ID_DELIM = "%"
+    TASK_LOG_DELIM = "."
 
     REC_LOG_ENTRIES = {
          "submit": re.compile(
@@ -64,11 +68,6 @@ class CylcProcessor(SuiteEngineProcessor):
                  CRITICAL\s-\s                  # The type of the message
                  \[(?P<task_id>\S+)\]           # The task id as a named group
                  \s-.+?signal\s(?P<signal>\S+)$ # The message""", re.X)}
-
-    REC_TASK_LOG_FILE_TAIL = re.compile("(\d+\.\d+)(?:\.(.*))?")
-
-    LOG_TASK_TIMESTAMP_THRESHOLD = 5.0
-    PYRO_TIMEOUT = 5
 
     def get_task_log_dir_rel(self, suite):
         """Return the relative path to the log directory for suite tasks."""
@@ -245,7 +244,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     signal = search_result.group("signal")
                 event_time = mktime(strptime(time_stamp, "%Y/%m/%d %H:%M:%S"))
                 if task_id not in data:
-                    name, cycle_time = task_id.split("%", 1)
+                    name, cycle_time = task_id.split(self.TASK_ID_DELIM, 1)
                     data[task_id] = {"name": name,
                                      "cycle_time": cycle_time,
                                      "submits": []}
@@ -253,8 +252,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 if not submits or submits[-1]["events"][event]:
                     submits.append({"events": {},
                                     "status": None,
-                                    "files": {},
-                                    "files_time_stamp": None})
+                                    "files": {}})
                     for name in ["submit", "init", "exit"]:
                         submits[-1]["events"][name] = None
                 task_data = submits[-1]
@@ -267,31 +265,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 break
         # Locate task log files
         for task_id, task_datum in data.items():
-            submits = task_datum["submits"]
-            if not os.path.isdir("job"):
-                return
-            for name in os.listdir("job"):
-                if not name.startswith(task_id + "-"):
-                    continue
-                tail = name.replace(task_id + "-", "", 1)
-                match = self.REC_TASK_LOG_FILE_TAIL.match(tail)
-                if not match:
-                    continue
-                time_stamp, key = match.groups()
-                if not key:
-                    key = "script"
-                n_bytes = int(os.stat(os.path.join("job", name)).st_size)
-                for submit in submits:
-                    if submit["files_time_stamp"] == time_stamp:
-                        submit["files"][key] = {"n_bytes": n_bytes}
-                        break
-                    # The 1st element in submits with a submit time
-                    # within THRESHOLD seconds of the file name's time stamp.
-                    dt = abs(submit["events"]["submit"] - float(time_stamp))
-                    if dt <= self.LOG_TASK_TIMESTAMP_THRESHOLD:
-                        submit["files"][key] = {"n_bytes": n_bytes}
-                        submit["files_time_stamp"] = time_stamp
-                        break
+            name = task_datum["name"]
+            cycle_time = task_datum["cycle_time"]
+            for i, submit in enumerate(task_datum["submits"]):
+                root = "job/" + self.TASK_LOG_DELIM.join([name, cycle_time,
+                                                          str(i + 1)])
+                for path in glob(root + "*"):
+                    key = path[len(root) + 1:]
+                    if not key:
+                        key = "script"
+                    submit["files"][key] = {"n_bytes": os.stat(path).st_size}
         return data
 
     def process_suite_hook_args(self, *args, **kwargs):
