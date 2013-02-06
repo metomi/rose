@@ -20,13 +20,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
@@ -86,7 +85,8 @@
 
     <h4 id="gtk:config-edit:values:example">Example</h4>
 
-    <p>See the <a href="rose-rug-advanced-tutorials-widget.html">Advanced Tutorial</a>.</p>
+    <p>See the <a href="rose-rug-advanced-tutorials-widget.html">Advanced
+    Tutorial</a>.</p>
 
     <h4 id="gtk:config-edit:values:api">API Reference</h4>
 
@@ -147,20 +147,24 @@ set_value("20")
 
       <dt><code>hook</code></dt>
 
-      <dd>An instance of a class
-      <code>rose.config_editor.valuewidget.ValueWidgetHook</code> containing
-      callback functions that you should connect some of your widgets to.</dd>
+      <dd>
+        <p>An instance of a class
+        <code>rose.config_editor.valuewidget.ValueWidgetHook</code> containing
+        callback functions that you should connect some of your widgets to.</p>
+      </dd>
 
       <dt><code>arg_str</code></dt>
 
       <dd>
-        is an optional argument that stores any text given after the widget in
-        the metadata:
+        <p>is an optional argument that stores any text given after the widget
+        in the metadata:</p>
         <pre>
 widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
-</pre>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
-..."</code>. This could help configure your widget - for example, for a table
-based widget, you might give the column names:
+</pre>
+
+        <p>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
+        ..."</code>. This could help configure your widget - for example, for a
+        table based widget, you might give the column names</p>:
         <pre>
 widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
 </pre>This means that you can write a generic widget and then configure it for
@@ -400,21 +404,21 @@ def handle_type_error(self, is_in_error):
 
           <dt><code>'flag:optional'</code></dt>
 
-          <dd>True means indicate if a variable is <code>optional</code>,
-          and False means do not show an indicator.</dd>
+          <dd>True means indicate if a variable is <code>optional</code>, and
+          False means do not show an indicator.</dd>
 
           <dt><code>'flag:no-meta'</code></dt>
 
-          <dd>True means indicate if a variable has any metadata content,
-          and False means do not show an indicator.</dd>
+          <dd>True means indicate if a variable has any metadata content, and
+          False means do not show an indicator.</dd>
         </dl>
 
         <p>If you wish to implement actions based on changes in these
         properties (e.g. displaying and hiding fixed variables depending on the
         'fixed' setting), the custom page widget should expose a method named
-        'show_mode_change' followed by the key. However, 'ignored' is handled separately
-        (more below). These methods should take a single boolean that indicates
-        the display status. For example:</p>
+        'show_mode_change' followed by the key. However, 'ignored' is handled
+        separately (more below). These methods should take a single boolean
+        that indicates the display status. For example:</p>
         <pre>
 def show_fixed(self, should_show)
 </pre>
@@ -490,7 +494,7 @@ def show_fixed(self, should_show)
 
       <li>Changers (transformers) - change a configuration e.g. adding/removing
       options.</li>
-      
+
       <li>Upgraders - these are special transformer macros for upgrading and
       downgrading configurations.</li>
     </ul>
@@ -499,12 +503,16 @@ def show_fixed(self, should_show)
     trigger changing and type checking.</p>
 
     <p>This section explains how to add your own custom macros to transform and
-    validate configurations. Upgrade macros are covered in a different section -
-    they are a special type of custom macro and (will be) described in
-    <a href="rose-rug-advanced-topics.html">Advanced Topics</a>.</p>
-    
-    <p>Macros should be written in Python. They can be
-    run within <code>rose config-edit</code> or via <code>rose
+    validate configurations. See <a href="#upgrade">Upgrade Macro API</a> for
+    upgrade macros.</p>
+
+    <p>Macros use a Python API, and should be written in Python, unless you are
+    doing something very fancy. In the absence of a Python house style, it's
+    usual to follow the standard Python style guidance (<a href=
+    "http://www.python.org/dev/peps/pep-0008/">PEP8</a>, <a href=
+    "http://www.python.org/dev/peps/pep-0257/">PEP257</a>).</p>
+
+    <p>They can be run within <code>rose config-edit</code> or via <code>rose
     macro.</code></p>
 
     <p>You should avoid writing checker macros if the checking can be expressed
@@ -527,8 +535,8 @@ def show_fixed(self, should_show)
 
     <h4 id="macro:code:examples">Examples</h4>
 
-    <p>See the macro
-    <a href="rose-rug-advanced-tutorials-macro.html">Advanced Tutorial</a>.</p>
+    <p>See the macro <a href="rose-rug-advanced-tutorials-macro.html">Advanced
+    Tutorial</a>.</p>
 
     <h4 id="macro:code:api">API Reference</h4>
 
@@ -546,7 +554,7 @@ def show_fixed(self, should_show)
     information about the configuration items.</p>
 
     <p>A validator macro should look like:</p>
-    <pre>
+    <pre class="prettyprint">
 import rose.macro
 
 class SomeValidator(rose.macro.MacroBase):
@@ -568,11 +576,12 @@ class SomeValidator(rose.macro.MacroBase):
                    info=None, is_warning=False):
 </pre>
 
-    <p>This means that you should call it with the relevant section first, then the relevant option, then the relevant value,
-    then the relevant error message, and optionally a warning flag that we'll
-    discuss later. If the setting is a section, the option should be
-    <code>None</code> and the value None. For example,</p>
-    <pre>
+    <p>This means that you should call it with the relevant section first, then
+    the relevant option, then the relevant value, then the relevant error
+    message, and optionally a warning flag that we'll discuss later. If the
+    setting is a section, the option should be <code>None</code> and the value
+    None. For example,</p>
+    <pre class="prettyprint">
     def validate(self, config, meta_config=None):
         editor_value = config.get(["env", "MY_FAVOURITE_STREAM_EDITOR"]).value
         if editor_value != "sed":
@@ -588,7 +597,7 @@ class SomeValidator(rose.macro.MacroBase):
     something <em>may</em> be wrong, such as warning when using an
     advanced-developer-only option. They are invoked by passing a 5th argument
     to <code>self.add_report</code>, <code>is_warning</code>, like so:</p>
-    <pre>
+    <pre class="prettyprint">
             self.add_report("env",
                             "MY_FAVOURITE_STREAM_EDITOR",
                             editor_value,
@@ -597,7 +606,7 @@ class SomeValidator(rose.macro.MacroBase):
 </pre>
 
     <p>A transformer macro should look like:</p>
-    <pre>
+    <pre class="prettyprint">
 import rose.macro
 
 class SomeTransformer(rose.macro.MacroBase):
@@ -615,7 +624,7 @@ class SomeTransformer(rose.macro.MacroBase):
     option should be <code>None</code> and the value None. If an option was
     removed, the value should be the old value - otherwise it should be the new
     one (added/changed). For example,</p>
-    <pre>
+    <pre class="prettyprint">
     def transform(self, config, meta_config=None):
         """Add some more snow control."""
         if config.get(["namelist:snowflakes"]) is None:
@@ -628,6 +637,296 @@ class SomeTransformer(rose.macro.MacroBase):
                             "So far, anyway.")
         return config, self.reports
 </pre>
+
+    <h2 id="upgrade">Rose Upgrade Macros</h2>
+
+    <p>Rose upgrade macros are used to upgrade application configurations
+    between metadata versions. They are classes, very similar to the Transform
+    macros above, but with a few differences:</p>
+
+    <ul>
+      <li>an <var>upgrade</var> method instead of a <var>transform</var>
+      method</li>
+
+      <li>an optional <var>downgrade</var> method, identical in API to the
+      <var>upgrade</var> method, but intended for performing the reverse
+      operation</li>
+
+      <li>a more helpful API via <code>rose.upgrade.MacroUpgrade</code>
+      methods</li>
+
+      <li><samp>BEFORE_TAG</samp> and <samp>AFTER_TAG</samp> attributes - the
+      version of metadata they apply to (<samp>BEFORE_TAG</samp>) and the
+      version they upgrade to (<samp>AFTER_TAG</samp>)</li>
+    </ul>
+
+    <p>An example upgrade macro might look like this:</p>
+    <pre class="prettyprint">
+class Upgrade272to273(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 27.2 to 27.3."""
+
+    BEFORE_TAG = "27.2"
+    AFTER_TAG = "27.3"
+
+    def upgrade(self, config, meta_config=None):
+        self.add_setting(config, ["env", "NEW_VARIABLE"], "0")
+        self.remove_setting(config, ["namelist:old_things", "OLD_VARIABLE"])
+        return config, self.reports
+</pre>
+
+    <p>The class name is unimportant - the <samp>BEFORE_TAG</samp> and
+    <samp>AFTER_TAG</samp> identify the macro.</p>
+
+    <p>Metadata versions are usually structured in a
+    <samp>rose-meta/CATEGORY/VERSION/</samp> hierarchy - where
+    <samp>CATEGORY</samp> denotes the type or family of application (sometimes
+    it is the command used), and <samp>VERSION</samp> is the particular version
+    e.g. <samp>27.2</samp> or <samp>HEAD</samp>.</p>
+
+    <p>Upgrade macros live under the <samp>CATEGORY</samp> directory in a
+    <samp>versions.py</samp> file -
+    <samp>rose-meta/CATEGORY/versions.py</samp>.</p>
+
+    <p>Upgrade macros are subclasses of <code>rose.upgrade.MacroUpgrade</code>.
+    They have all the functionality of the transform macros documented above.
+    <code>rose.upgrade.MacroUpgrade</code> also has some additional convenience
+    methods defined for you to call. All methods return <code>None</code>
+    unless otherwise specified.</p>
+
+    <dl>
+      <dt><code>def act_from_files(self, config, downgrade=False)</code></dt>
+
+      <dd>
+        <p>A method that takes the app configuration (<samp>config</samp>, a
+        <code>rose.config.ConfigNode</code> instance) and an optional boolean
+        <samp>downgrade</samp> keyword argument. This initiates a search for
+        <samp>etc/VERSION/rose-macro-add.conf</samp> and
+        <samp>etc/VERSION/rose-macro-remove.conf</samp>, where VERSION is equal
+        to the <samp>BEFORE_TAG</samp> of the macro. These files should be Rose
+        app config-like patch files, containing settings to be added
+        (<samp>rose-macro-add.conf</samp>) and settings to be removed
+        (<samp>rose-macro-remove.conf</samp>). If downgrading
+        (<samp>downgrade</samp> set to <samp>False</samp>), the settings in
+        <samp>rose-macro-remove.conf</samp> will be added, and the ones in
+        <samp>rose-macro-add.conf</samp> removed.</p>
+        <pre>
+    def upgrade(self, config, meta_config=None):
+        self.act_from_files(config)
+        return config, self.reports
+</pre>
+
+        <p>Note that you can use other methods (below) as well as this in the
+        same <samp>upgrade</samp>.</p>
+
+        <p>If settings are defined in either file, and changes can be made, the
+        <code>self.reports</code> will be updated automatically.</p>
+      </dd>
+
+      <dt><code>def add_setting(self, config, keys, value=None, forced=False,
+      state=None, comments=None, info=None):</code></dt>
+
+      <dd>
+        <p>A method that attempts to add the setting defined by the list
+        <samp>keys</samp> (<samp>[section]</samp> or <samp>[section,
+        option]</samp> strings) with the value <samp>value</samp> to the app
+        config <samp>config</samp>. The arguments mostly follow
+        <code>rose.config.ConfigNode</code> attributes, and are as follows:</p>
+
+        <dl>
+          <dt><samp>config</samp></dt>
+
+          <dd>The application configuration object
+          (<code>rose.config.ConfigNode</code> instance)</dd>
+
+          <dt><samp>keys</samp></dt>
+
+          <dd>A list of strings denoting config settings -
+          <code>[section_name]</code> for a section, <code>[section_name,
+          option_name]</code> for an option. For example, it might be
+          <code>["namelist:foo", "bar"]</code>.</dd>
+
+          <dt><samp>value</samp> (optional)</dt>
+
+          <dd>A string or <code>None</code> denoting the new setting value.
+          <code>None</code> should be used for sections only. Options must have
+          a string <code>value</code> defined.</dd>
+
+          <dt><samp>forced</samp> (optional)</dt>
+
+          <dd>If the setting already exists, override the value to the new
+          <code>value</code>.</dd>
+
+          <dt><samp>state</samp> (optional)</dt>
+
+          <dd>Set the state of the new setting
+          (<code>rose.config.ConfigNode</code> states) - <code>None</code>
+          implies the default, which is
+          <code>rose.config.ConfigNode.STATE_NORMAL</code>. You may also use
+          <code>rose.config.ConfigNode.STATE_USER_IGNORED.</code></dd>
+
+          <dt><samp>comments</samp> (optional)</dt>
+
+          <dd>A list of comment strings (lines) for the new setting or
+          <code>None</code>.</dd>
+
+          <dt><samp>info</samp> (optional)</dt>
+
+          <dd>A short string containing no new lines, describing the addition
+          of the setting.</dd>
+        </dl>
+      </dd>
+
+      <dd>
+        <p>Example usage:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.add_setting(config, ["namelist:breakfast_nl", "bacon"], "2",
+                         comments=["Mmmm. Bacon."], info="Add for food:#810")
+        return config, self.reports
+      
+</pre>
+      </dd>
+
+      <dt><code>def change_setting_value(self, config, keys, value,
+      forced=False, comments=None, info=None):</code></dt>
+
+      <dd>
+        <p>A method that attempts to change an existing setting value defined
+        by <samp>keys</samp> to a new one (<samp>value</samp>) in the app
+        config <samp>config</samp>. The arguments are:</p>
+
+        <dl>
+          <dt><samp>config</samp>, <samp>keys</samp>, <samp>comments</samp>,
+          <samp>info</samp></dt>
+
+          <dd>As in <code>add_setting</code> above.</dd>
+
+          <dt><samp>value</samp></dt>
+
+          <dd>Required argument, must be a string for option values, and can be
+          <code>None</code> for section values.</dd>
+
+          <dt><samp>forced</samp> (optional)</dt>
+
+          <dd>Add the setting if it does not exist.</dd>
+        </dl>
+
+        <p>Example usage:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.change_setting_value(config, ["namelist:breakfast_nl", "coffee"], "'more'",
+                                  info="Add for food:#820")
+        return config, self.reports
+    
+</pre>
+      </dd>
+
+      <dt><code>def get_setting_value(self, config, keys, no_ignore=False):
+      (-&gt; value)</code></dt>
+
+      <dd>
+        <p>A method that returns a setting value or <code>None</code>,
+        functionally similar to <code>rose.config.ConfigNode.get</code>. The
+        arguments are:</p>
+
+        <dl>
+          <dt><samp>config</samp>, <samp>keys</samp></dt>
+
+          <dd>
+            <p>As in <code>add_setting</code> above.</p>
+          </dd>
+
+          <dt><samp>no_ignore</samp> (optional)</dt>
+
+          <dd><code>False</code> means return the setting value if the setting
+          is ignored. <code>True</code> means return <code>None</code> if the
+          setting is ignored. If the setting is missing, <code>None</code> is
+          returned.</dd>
+        </dl>
+
+        <p>Example usage:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        if self.get_setting_value(
+                    config, ["namelist:breakfast_nl", "coffee"]) == "'empty'":
+            self.add_setting(config, ["namelist:breakfast_nl", "tea"],
+                             "'extra_strong'")
+        return config, self.reports    
+    
+</pre>
+      </dd>
+
+      <dt><code>def remove_setting(self, config, keys, info=None):</code></dt>
+
+      <dd>
+        <p>A method that removes a setting defined by <samp>keys</samp> in
+        <samp>config</samp> with an optional <samp>info</samp> message. The
+        arguments are:</p>
+
+        <dl>
+          <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
+
+          <dd>As in <code>add_setting</code> above.</dd>
+        </dl>
+
+        <p>Example usage:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.remove_setting(config, ["namelist:breakfast_nl", "cheeseburger"],
+                            info="Cheeseburgers are for lunch")
+        return config, self.reports
+</pre>
+      </dd>
+
+      <dt><code>def enable_setting(self, config, keys, info=None):</code></dt>
+
+      <dd>
+        <p>A method to make sure a setting defined by <samp>keys</samp> in
+        <samp>config</samp> is not user-ignored. The arguments are:</p>
+
+        <dl>
+          <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
+
+          <dd>As in <code>add_setting</code> above.</dd>
+        </dl>
+
+        <p>Example usage:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.enable_setting(config, ["namelist:breakfast_nl", "egg_monitoring"])
+        return config, self.reports
+</pre>
+      </dd>
+
+      <dt><code>def ignore_setting(self, config, keys, info=None):</code></dt>
+
+      <dd>
+        <p>Inverse of <code>enable_setting</code>, a method to make sure a
+        setting defined by <samp>keys</samp> in <samp>config</samp> is
+        user-ignored. The arguments are:</p>
+
+        <dl>
+          <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
+
+          <dd>As in <code>add_setting</code> above.</dd>
+        </dl>
+
+        <p>Example usage:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.ignore_setting(config, ["namelist:breakfast_nl", "milk_bottle_date"])
+        return config, self.reports
+</pre>
+      </dd>
+    </dl>
+
+    <p>There is an upgrade macro <a href=
+    "rose-rug-advanced-tutorials-upgrade-dev.html">development tutorial</a> and
+    more examples in the upgrade file for the upgrade <a href=
+    "rose-rug-advanced-tutorials-upgrade-usage.html">usage tutorial</a>
+    (<samp>versions.py</samp>) <a href=
+    "../etc/rose-meta/rose-demo-upgrade/versions.py">here</a>.</p>
 
     <h2 id="rosie-ws">Rosie Web</h2>
 
@@ -660,9 +959,8 @@ http://host/PREFIX_NAME/get_known_keys?format=json
 
       <dd>
         returns the main property names stored for suites (e.g. idx, branch,
-        owner) plus any additional names specified in the site config and
-        takes the format argument. For example, entering a URL in a
-        web browser:
+        owner) plus any additional names specified in the site config and takes
+        the format argument. For example, entering a URL in a web browser:
         <pre>
 http://host/PREFIX_NAME/get_known_keys?format=json
 </pre>
@@ -677,8 +975,8 @@ http://host/PREFIX_NAME/get_known_keys?format=json
 
       <dd>
         returns all unique optional or user-defined property names given in
-        suite discovery information and takes the
-        format argument. For example, entering this URL in Firefox:
+        suite discovery information and takes the format argument. For example,
+        entering this URL in Firefox:
         <pre>
 http://host/PREFIX_NAME/get_optional_keys?format=json
 </pre>
@@ -913,6 +1211,7 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       programs.</dd>
 
       <dt><code>rose.ana</code></dt>
+
       <dd>callable, invokes an analysis engine for testing suites/apps.</dd>
 
       <dt><code>rose.config</code></dt>
@@ -1015,8 +1314,8 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dt><code>rose.suite_control</code></dt>
 
-      <dd>Invoke control commands (currently gcontrol and shutdown) of a running
-      suite.</dd>
+      <dd>Invoke control commands (currently gcontrol and shutdown) of a
+      running suite.</dd>
 
       <dt><code>rose.suite_hook</code></dt>
 

@@ -220,8 +220,8 @@ var {
     font-style: normal;
 }
 
-.caption {
-    font-size: 50%;
+pre {
+    font-size: small;
 }
 
 #controls,
