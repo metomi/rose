@@ -35,6 +35,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
+from rose.run_source_vc import write_source_vc_info 
 from rose.scheme_handler import SchemeHandlersManager
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
@@ -733,26 +734,8 @@ class SuiteRunner(Runner):
         rose.config.dump(config, "log/" + prefix + ".conf")
 
         # Install version information file
-        f = open("log/" + prefix + ".version", "wb")
-        for vcs, cmds in [("svn", ["info", "status", "diff"]),
-                          ("git", ["describe", "status", "diff"])]:
-            if not self.popen.which(vcs):
-                continue
-            cwd = os.getcwd()
-            os.chdir(suite_conf_dir)
-            try:
-                for cmd in cmds:
-                    rc, out, err = self.popen.run(vcs, cmd)
-                    if out:
-                        f.write("#" * 80 + "\n")
-                        f.write(("# %s %s\n" % (vcs, cmd)).upper())
-                        f.write("#" * 80 + "\n")
-                        f.write(out)
-                    if rc: # If cmd fails once, chances are, it will fail again
-                        break
-            finally:
-                os.chdir(cwd)
-        f.close()
+        write_source_vc_info(
+                suite_conf_dir, "log/" + prefix + ".version", self.popen)
 
         for ext in [".conf", ".version"]:
             self.fs_util.symlink(prefix + ext, "log/rose-suite-run" + ext)
