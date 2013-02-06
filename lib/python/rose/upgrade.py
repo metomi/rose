@@ -50,9 +50,9 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     INFO_ADDED_SECT = "Added"
     INFO_ADDED_VAR = "Added with value {0}"
-    INFO_CHANGED_VAR = "Changed value from {0} to {1}"
-    INFO_ENABLE = "User-Ignored -> Enabled"
-    INFO_IGNORE = "Enabled -> User-ignored"
+    INFO_CHANGED_VAR = "Value: {0} -> {1}"
+    INFO_ENABLE = "user-ignored -> enabled"
+    INFO_IGNORE = "enabled -> user-ignored"
     INFO_REMOVED = "Removed"
     UPGRADE_RESOURCE_DIR = MACRO_UPGRADE_RESOURCE_DIR
 
@@ -81,7 +81,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             option = None
             if len(keys) > 1:
                 option = keys[1]
-            elif node.value is not None:
+            elif node.value:
                 continue
             self.remove_setting(config, [section, option])
 
@@ -189,24 +189,24 @@ class MacroUpgrade(rose.macro.MacroBase):
         """Set the ignored state of a setting, if it exists."""
         section, option = self._get_section_option_from_keys(keys)
         id_ = self._get_id_from_section_option(section, option)
+        node = config.get([section, option])
+        if node is None:
+            return False
         if option is None:
             value = None
         else:
-            value = config.get([section, option]).value
-        if config.get([section, option]) is None:
-            return False
-        state = config.get([section, option]).state
+            value = node.value
         if should_be_user_ignored:
-            info_text = self.IGNORE
+            info_text = self.INFO_IGNORE
             new_state = rose.config.ConfigNode.STATE_USER_IGNORED
         else:
-            info_text = self.ENABLE
+            info_text = self.INFO_ENABLE
             new_state = rose.config.ConfigNode.STATE_NORMAL
-        if state == new_state:
+        if node.state == new_state:
             return False
         if info is None:
             info = info_text
-        config.set([section, option], state=new_state)
+        node.state = new_state
         self.add_report(section, option, value, info)
 
     def _remove_setting(self, config, keys, info=None):
