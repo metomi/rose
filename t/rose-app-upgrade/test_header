@@ -46,7 +46,7 @@ function init_resource_file() {
 }
 
 function setup() {
-    mkdir $TEST_DIR/run
+    mkdir -p $TEST_DIR/run
     cd $TEST_DIR/run
 }
 
@@ -54,4 +54,5 @@ function teardown() {
     cd $TEST_DIR
     rm -rf $TEST_DIR/run
     rm -rf $TEST_DIR/config
+    rm -rf $TEST_DIR/rose-meta
 }

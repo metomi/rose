@@ -23,12 +23,12 @@
 init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
-tests 24
+tests 36
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE-base
 setup
-run_fail "$TEST_KEY" rose app-upgrade
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 $PWD: not an application directory.
@@ -38,7 +38,7 @@ teardown
 # Normal mode, -C.
 TEST_KEY=$TEST_KEY_BASE-C
 setup
-run_fail "$TEST_KEY" rose app-upgrade -C ../config
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 ../config: not an application directory.
@@ -48,7 +48,7 @@ teardown
 # Unknown option.
 TEST_KEY=$TEST_KEY_BASE-unknown-option
 setup
-run_fail "$TEST_KEY" rose app-upgrade --unknown-option
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive --unknown-option -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 Usage: rose app-upgrade [OPTIONS] [VERSION]
@@ -61,7 +61,7 @@ teardown
 init </dev/null
 TEST_KEY=$TEST_KEY_BASE-no-metadata
 setup
-run_fail "$TEST_KEY" rose app-upgrade -C ../config
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 Error: could not find meta flag
@@ -72,10 +72,10 @@ teardown
 init << '__CONFIG__'
 meta=unknown-flag
 __CONFIG__
-init_meta </dev/null
+init_meta different_flag
 TEST_KEY=$TEST_KEY_BASE-unknown-flag-i
 setup
-run_fail "$TEST_KEY" rose app-upgrade -C ../config
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 Error: could not find meta flag
@@ -86,10 +86,10 @@ teardown
 init << '__CONFIG__'
 meta=unknown-flag/10.0
 __CONFIG__
-init_meta </dev/null
+init_meta different_flag
 TEST_KEY=$TEST_KEY_BASE-unknown-flag-ii
 setup
-run_fail "$TEST_KEY" rose app-upgrade -C ../config
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 Error: could not find meta flag
@@ -100,10 +100,10 @@ teardown
 init << '__CONFIG__'
 meta=
 __CONFIG__
-init_meta </dev/null
+init_meta different_flag
 TEST_KEY=$TEST_KEY_BASE-malformed-flag-i
 setup
-run_fail "$TEST_KEY" rose app-upgrade -C ../config
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 Error: could not find meta flag
@@ -116,14 +116,150 @@ meta=flag/
  /45/
  flag'456
 __CONFIG__
-init_meta </dev/null
+init_meta different_flag
 TEST_KEY=$TEST_KEY_BASE-malformed-flag-ii
 setup
-run_fail "$TEST_KEY" rose app-upgrade -C ../config
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 Error: could not find meta flag
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
+# Check upgrading to a bad version (i).
+TEST_KEY=$TEST_KEY_BASE-upgrade-bad-version-i
+init <<'__CONFIG__'
+meta=test-app-upgrade/0.1
+
+[env]
+A=4
+__CONFIG__
+setup
+init_meta test-app-upgrade
+init_macro test-app-upgrade <<'__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#-----------------------------------------------------------------------------
+# (C) Crown copyright Met Office. All rights reserved.
+#-----------------------------------------------------------------------------
+
+import rose.upgrade
+
+
+class Upgrade02to03(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 0.2 to 0.3."""
+
+    BEFORE_TAG = "0.2"
+    AFTER_TAG = "0.3"
+
+    def upgrade(self, config, meta_config=None):
+        return config, self.reports
+__MACRO__
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.2 
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+0.2: invalid version.
+__ERROR__
+teardown
+#-------------------------------------------------------------------------------
+# Check upgrading to a bad version.
+TEST_KEY=$TEST_KEY_BASE-upgrade-bad-version-ii
+init <<'__CONFIG__'
+meta=test-app-upgrade/0.1
+
+[env]
+A=4
+__CONFIG__
+setup
+init_meta test-app-upgrade
+init_macro test-app-upgrade << '__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#-----------------------------------------------------------------------------
+# (C) Crown copyright Met Office. All rights reserved.
+#-----------------------------------------------------------------------------
+
+import rose.upgrade
+
+
+class Upgrade02to03(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 0.2 to 0.3."""
+
+    BEFORE_TAG = "0.2"
+    AFTER_TAG = "0.3"
+
+    def upgrade(self, config, meta_config=None):
+        return config, self.reports
+__MACRO__
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.3
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+0.3: invalid version.
+__ERROR__
+teardown
+#-------------------------------------------------------------------------------
+# Check upgrading to a bad version (iii).
+TEST_KEY=$TEST_KEY_BASE-upgrade-bad-version-iii
+init <<'__CONFIG__'
+meta=test-app-upgrade/0.3
+
+[env]
+A=4
+__CONFIG__
+setup
+init_meta test-app-upgrade
+init_macro test-app-upgrade <<'__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#-----------------------------------------------------------------------------
+# (C) Crown copyright Met Office. All rights reserved.
+#-----------------------------------------------------------------------------
+
+import rose.upgrade
+
+
+class Upgrade02to03(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 0.2 to 0.3."""
+
+    BEFORE_TAG = "0.2"
+    AFTER_TAG = "0.3"
+
+    def upgrade(self, config, meta_config=None):
+        return config, self.reports
+__MACRO__
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.4
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+0.4: invalid version.
+__ERROR__
+teardown
+#-------------------------------------------------------------------------------
+# Check upgrading to a bad version (iv).
+TEST_KEY=$TEST_KEY_BASE-upgrade-bad-version-iv
+init <<'__CONFIG__'
+meta=test-app-upgrade/0.3
+
+[env]
+A=4
+__CONFIG__
+setup
+init_meta test-app-upgrade
+init_macro test-app-upgrade <<'__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#-----------------------------------------------------------------------------
+# (C) Crown copyright Met Office. All rights reserved.
+#-----------------------------------------------------------------------------
+
+import rose.upgrade
+__MACRO__
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.1
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+0.1: invalid version.
+__ERROR__
+teardown
 exit
