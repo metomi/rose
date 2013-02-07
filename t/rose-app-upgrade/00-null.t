@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose macro" in the absence of a rose configuration.
+# Test "rose app-upgrade" in the absence of proper macros
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 init </dev/null
