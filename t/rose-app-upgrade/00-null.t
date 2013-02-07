@@ -154,7 +154,8 @@ class Upgrade02to03(rose.upgrade.MacroUpgrade):
     def upgrade(self, config, meta_config=None):
         return config, self.reports
 __MACRO__
-run_fail "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.2 
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config 0.2 
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 0.2: invalid version.
@@ -189,7 +190,8 @@ class Upgrade02to03(rose.upgrade.MacroUpgrade):
     def upgrade(self, config, meta_config=None):
         return config, self.reports
 __MACRO__
-run_fail "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.3
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config 0.3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 0.3: invalid version.
@@ -224,7 +226,8 @@ class Upgrade02to03(rose.upgrade.MacroUpgrade):
     def upgrade(self, config, meta_config=None):
         return config, self.reports
 __MACRO__
-run_fail "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.4
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config 0.4
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 0.4: invalid version.
@@ -248,7 +251,8 @@ init_macro test-app-upgrade <<'__MACRO__'
 
 import rose.upgrade
 __MACRO__
-run_fail "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.1
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 0.1: invalid version.

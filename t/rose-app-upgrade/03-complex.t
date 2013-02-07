@@ -249,7 +249,8 @@ __MACRO__
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-upgrade
 # Check a complex upgrade
-run_pass "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config fig
+run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgradeapple-fig: changes: 33
     namelist:add_sect=new_opt=.true.
@@ -677,7 +678,8 @@ __MACRO__
 TEST_KEY=$TEST_KEY_BASE-upgrade-info
 # Check a complex upgrade with info messages.
 # meta-test: no 'bad' allowed, must match above number of 'good'.
-run_pass "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config fig
+run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgradeapple-fig: changes: 33
     namelist:add_sect=new_opt=.true.

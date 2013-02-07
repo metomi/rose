@@ -105,7 +105,8 @@ __MACRO__
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-upgrade-add-start-version
 # Check correct start version
-run_pass "$TEST_KEY" rose app-upgrade --meta-path=../rose-meta/ -C ../config
+run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 = 0.1
   0.2
@@ -119,7 +120,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-upgrade-add
 # Check adding
-run_pass "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config 0.2
+run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config 0.2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.1-0.2: changes: 2
     env=Z=1
@@ -139,7 +141,8 @@ __CONFIG__
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-upgrade-add-end-version
 # Check correct end version
-run_pass "$TEST_KEY" rose app-upgrade --non-interactive --meta-path=../rose-meta/ -C ../config
+run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 = 0.2
   0.3
@@ -159,7 +162,8 @@ meta=test-app-upgrade/0.2
 A=4
 Z=1
 __CONFIG__
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 0.3
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.2-0.3: changes: 2
     env=A=4
@@ -179,7 +183,8 @@ __CONFIG__
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-upgrade-ignore-end-version
 # Check correct end version
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 = 0.3
   0.4
@@ -198,7 +203,8 @@ meta=test-app-upgrade/0.3
 !A=4
 Z=1
 __CONFIG__
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 0.4
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.4
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.3-0.4: changes: 2
     env=A=4
@@ -236,7 +242,8 @@ meta=test-app-upgrade/0.4
 A=4
 Z=1
 __CONFIG__
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 0.5
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.5
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.4-0.5: changes: 2
     env=A=None
@@ -255,7 +262,8 @@ __CONFIG__
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-upgrade-remove-end-version
 # Check correct end version
-run_pass "$TEST_KEY" rose app-upgrade --meta-path=../rose-meta/ -C ../config/
+run_pass "$TEST_KEY" rose app-upgrade \
+ --meta-path=../rose-meta/ -C ../config/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 = 0.5
 * 1.0
@@ -271,7 +279,8 @@ meta=test-app-upgrade/0.5
 [env]
 Z=1
 __CONFIG__
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 1.0
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 1.0
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.5-1.0: changes: 2
     env=Z=5
@@ -290,7 +299,8 @@ __CONFIG__
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-upgrade-change-end-version
 # Check correct end version
-run_pass "$TEST_KEY" rose app-upgrade --meta-path=../rose-meta/ -C ../config/
+run_pass "$TEST_KEY" rose app-upgrade \
+ --meta-path=../rose-meta/ -C ../config/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 = 1.0
 __OUTPUT__
@@ -305,7 +315,8 @@ meta=test-app-upgrade/0.1
 [env]
 A=4
 __CONFIG__
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 1.0
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 1.0
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.1-1.0: changes: 6
     env=Z=1
@@ -381,7 +392,8 @@ class Upgrade04to05(rose.upgrade.MacroUpgrade):
         return config, self.reports
 __MACRO__
 
-run_fail "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 0.5
+run_fail "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.5
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 0.5: invalid version.
@@ -444,7 +456,8 @@ class Upgrade04to05(rose.upgrade.MacroUpgrade):
         return config, self.reports
 __MACRO__
 
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 0.3
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.1-0.3: changes: 3
     env=Z=1
@@ -521,7 +534,8 @@ class Upgrade04to05(rose.upgrade.MacroUpgrade):
         return config, self.reports
 __MACRO__
 
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 0.5
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.5
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.4-0.5: changes: 2
     env=A=None
@@ -592,7 +606,8 @@ A=5
 foo=bar
 __CONFIG__
 
-run_pass "$TEST_KEY" rose app-upgrade -y --meta-path=../rose-meta/ -C ../config/ 0.2
+run_pass "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.1-0.2: changes: 8
     env=B=5
