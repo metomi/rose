@@ -127,9 +127,6 @@ init_meta test-app-upgrade
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
-# (C) Crown copyright Met Office. All rights reserved.
-#-----------------------------------------------------------------------------
 
 
 import rose.upgrade
@@ -514,9 +511,6 @@ init_meta test-app-upgrade
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------
-# (C) Crown copyright Met Office. All rights reserved.
-#-----------------------------------------------------------------------------
 
 
 import rose.upgrade
