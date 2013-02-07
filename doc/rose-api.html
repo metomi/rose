@@ -899,17 +899,25 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
 </pre>
       </dd>
 
-      <dt><code>def ignore_setting(self, config, keys, info=None):</code></dt>
+      <dt><code>def ignore_setting(self, config, keys, info=None, state=rose.config.ConfigNode.STATE_USER_IGNORED):</code></dt>
 
       <dd>
         <p>Inverse of <code>enable_setting</code>, a method to make sure a
         setting defined by <samp>keys</samp> in <samp>config</samp> is
-        user-ignored. The arguments are:</p>
+        ignored (default state is user-ignored). The arguments are:</p>
 
         <dl>
           <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
 
           <dd>As in <code>add_setting</code> above.</dd>
+          
+          <dt><samp>state</samp></dt>
+          
+          <dd>One of <code>rose.config.ConfigNode.STATE_USER_IGNORED</code>
+          (default), <code>rose.config.ConfigNode.STATE_SYST_IGNORED</code>
+          (trigger-ignored). When using it, you can just use 
+          <code>config.STATE...</code> rather than the full
+          <code>rose.config.ConfigNode.STATE...</code>.
         </dl>
 
         <p>Example usage:</p>

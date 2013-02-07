@@ -1,0 +1,58 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-3 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# Provides init, setup and teardown functions for rose macro tests.
+#-------------------------------------------------------------------------------
+. $(dirname $0)/../lib/bash/test_header
+TEST_KEY_BASE=$(basename $0 .t)
+
+function init() {
+    mkdir -p $TEST_DIR/config
+    cat >$TEST_DIR/config/rose-app.conf
+}
+
+function init_meta() {
+    category=$1
+    mkdir -p $TEST_DIR/rose-meta/$category/
+}
+
+function init_macro() {
+    category=$1
+    cat >$TEST_DIR/rose-meta/$category/versions.py
+}
+
+function init_resource_file() {
+    category=$1
+    version=$2
+    filename=$3
+    mkdir -p $TEST_DIR/rose-meta/$category/etc/$version/
+    cat >$TEST_DIR/rose-meta/$category/etc/$version/$filename
+}
+
+function setup() {
+    mkdir -p $TEST_DIR/run
+    cd $TEST_DIR/run
+}
+
+function teardown() {
+    cd $TEST_DIR
+    rm -rf $TEST_DIR/run
+    rm -rf $TEST_DIR/config
+    rm -rf $TEST_DIR/rose-meta
+}
