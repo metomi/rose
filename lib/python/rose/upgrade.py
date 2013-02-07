@@ -43,6 +43,10 @@ NAME_UPGRADE = "Upgrade{0}-{1}"
 DOWNGRADE_METHOD = "downgrade"
 UPGRADE_METHOD = "upgrade"
 
+IGNORE_MAP = {rose.config.ConfigNode.STATE_NORMAL: "enabled",
+              rose.config.ConfigNode.STATE_USER_IGNORED: "user-ignored",
+              rose.config.ConfigNode.STATE_SYST_IGNORED: "trig-ignored"}
+
 
 class MacroUpgrade(rose.macro.MacroBase):
 
@@ -50,9 +54,8 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     INFO_ADDED_SECT = "Added"
     INFO_ADDED_VAR = "Added with value {0}"
-    INFO_CHANGED_VAR = "Changed value from {0} to {1}"
-    INFO_ENABLE = "User-Ignored -> Enabled"
-    INFO_IGNORE = "Enabled -> User-ignored"
+    INFO_CHANGED_VAR = "Value: {0} -> {1}"
+    INFO_STATE = "{0} -> {1}"
     INFO_REMOVED = "Removed"
     UPGRADE_RESOURCE_DIR = MACRO_UPGRADE_RESOURCE_DIR
 
@@ -81,7 +84,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             option = None
             if len(keys) > 1:
                 option = keys[1]
-            elif node.value is not None:
+            elif node.value:
                 continue
             self.remove_setting(config, [section, option])
 
@@ -150,7 +153,9 @@ class MacroUpgrade(rose.macro.MacroBase):
         if value is not None and not isinstance(value, basestring):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(repr(value), id_))
-        config.set([section, option], value=value, comments=comments)
+        node.value = value
+        if comments is not None:
+            node.comments = comments
         self.add_report(section, option, value, info)
 
     def get_setting_value(self, config, keys, no_ignore=False):
@@ -174,39 +179,34 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     def enable_setting(self, config, keys, info=None):
         """Enable a setting in the configuration."""
-        section, option = self._get_section_option_from_keys(keys)
-        return self._ignore_setting(config, [section, option],
-                                    should_be_user_ignored=False, info=info)
+        return self._ignore_setting(config, list(keys),
+                                    info=info, 
+                                    state=rose.config.ConfigNode.STATE_NORMAL)
 
-    def ignore_setting(self, config, keys, info=None):
+    def ignore_setting(self, config, keys, info=None,
+                       state=rose.config.ConfigNode.STATE_USER_IGNORED):
         """User-ignore a setting in the configuration."""
-        section, option = self._get_section_option_from_keys(keys)
-        return self._ignore_setting(config, [section, option],
-                                    should_be_user_ignored=True, info=info)
+        return self._ignore_setting(config, list(keys),
+                                    info=info, state=state)
 
-    def _ignore_setting(self, config, keys, should_be_user_ignored=False,
-                        info=None):
+    def _ignore_setting(self, config, keys, info=None, state=None):
         """Set the ignored state of a setting, if it exists."""
         section, option = self._get_section_option_from_keys(keys)
         id_ = self._get_id_from_section_option(section, option)
+        node = config.get([section, option])
+        if node is None or state is None:
+            return False
         if option is None:
             value = None
         else:
-            value = config.get([section, option]).value
-        if config.get([section, option]) is None:
-            return False
-        state = config.get([section, option]).state
-        if should_be_user_ignored:
-            info_text = self.IGNORE
-            new_state = rose.config.ConfigNode.STATE_USER_IGNORED
-        else:
-            info_text = self.ENABLE
-            new_state = rose.config.ConfigNode.STATE_NORMAL
-        if state == new_state:
+            value = node.value
+        info_text = self.INFO_STATE.format(IGNORE_MAP[node.state],
+                                           IGNORE_MAP[state])
+        if node.state == state:
             return False
         if info is None:
             info = info_text
-        config.set([section, option], state=new_state)
+        node.state = state
         self.add_report(section, option, value, info)
 
     def _remove_setting(self, config, keys, info=None):
@@ -320,7 +320,8 @@ class MacroUpgradeManager(object):
                 func = macro.downgrade
             else:
                 func = macro.upgrade
-            config, i_changes = func(config, meta_config)
+            upgrade_macro_result = func(config, meta_config)
+            config, i_changes = upgrade_macro_result
             self.reports += i_changes
         opt_node = config.get([rose.CONFIG_SECT_TOP,
                                rose.CONFIG_OPT_META_TYPE], no_ignore=True)
