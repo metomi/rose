@@ -41,10 +41,9 @@ class ValueChecker(rose.macro.MacroBase):
 
     """
 
-    bad_value_meta_map = {}
-    good_value_meta_list = []
-    pattern_comp_map = {}
-    range_func_map = {}
+    META_PROPS = [rose.META_PROP_LENGTH, rose.META_PROP_PATTERN,
+                  rose.META_PROP_RANGE, rose.META_PROP_TYPE,
+                  rose.META_PROP_VALUES]
     WARNING_BAD_PATTERN = "Value {0} doesn't contain the pattern: {1}"
     WARNING_BAD_RANGE = "Value {0} isn't in the range criteria: {1}"
     WARNING_INVALID_LENGTH = 'Derived type has an invalid length: {0}'
@@ -52,10 +51,17 @@ class ValueChecker(rose.macro.MacroBase):
     WARNING_WRONG_VALUE_FIXED = 'Value {0} should be {1}'
     WARNING_WRONG_LENGTH = 'Array longer than max length: {0} instead of {1}'
 
+    def __init__(self, *args, **kwargs):
+        self.bad_value_meta_map = {}
+        self.good_value_meta_map = {}
+        self.pattern_comp_map = {}
+        self.range_func_map = {}
+        super(ValueChecker, self).__init__(*args, **kwargs)
+
     def validate(self, config, meta_config=None):
         """Return a list of errors if found, None otherwise."""
         self.reports = []
-        meta_config = self._load_meta_config(config, meta_config)
+        meta_config = self._load_meta_config(config, meta_config)       
         for node_keys, node in config.walk():
             if isinstance(node.value, dict):
                 continue
@@ -72,8 +78,11 @@ class ValueChecker(rose.macro.MacroBase):
                                                              meta_config)
             saved_metadata = copy.deepcopy(metadata)
             saved_metadata.pop('id')
+            for meta_key in saved_metadata.keys():
+                if meta_key not in self.META_PROPS:
+                    saved_metadata.pop(meta_key)
             goodness_id = (value, tuple(sorted(saved_metadata.items())))
-            if goodness_id in self.good_value_meta_list:
+            if goodness_id in self.good_value_meta_map:
                 continue
             if goodness_id in self.bad_value_meta_map:
                 self.add_report(sect, key, value,
@@ -169,7 +178,6 @@ class ValueChecker(rose.macro.MacroBase):
                                 break
                         except KeyError:
                             pass 
-                    
             if rose.META_PROP_PATTERN in metadata:
                 pattern = metadata[rose.META_PROP_PATTERN]
                 if pattern not in self.pattern_comp_map:
@@ -183,47 +191,19 @@ class ValueChecker(rose.macro.MacroBase):
                     continue
             if rose.META_PROP_RANGE in metadata:
                 range_pat = metadata[rose.META_PROP_RANGE]
-                check_ok = True
-                if "this" in range_pat:
-                    tiny_config = rose.config.ConfigNode()
-                    for val in val_list:
-                        if skip_nulls and not val:
-                            continue
-                        tiny_config.set([sect, key], val)
-                        evaluator = rose.macros.rule.RuleEvaluator()
-                        try:
-                            check_ok = evaluator.evaluate_rule(
-                                                 range_pat, var_id, tiny_config)
-                        except rose.macros.rule.RuleValueError:
-                            pass
-                        if not check_ok:
-                            text = self.WARNING_BAD_RANGE.format(
-                                                    val, range_pat)
-                            break
-                else:
-                    if range_pat not in self.range_func_map:
-                        func = rose.variable.parse_range_expression(range_pat)
-                        self.range_func_map.update({range_pat: func})
-                    for val in val_list:
-                        if skip_nulls and not val:
-                            continue
-                        if not self.meta_check(val, "real", sect, key):
-                            break
-                        val_num = float(val)
-                        if not self.range_func_map[range_pat](val_num):
-                            check_ok = False
-                            text = self.WARNING_BAD_RANGE.format(
-                                                val, range_pat)
-                            break
-                if not check_ok:
+                text = self.check_range(range_pat, var_id, sect, key,
+                                        val_list, type_list,
+                                        skip_nulls=skip_nulls)
+                if text:
                     self.bad_value_meta_map[goodness_id] = text
                     self.add_report(sect, key, value, text)
-            if self.reports:
-                if (sect != self.reports[-1].section and
-                    key != self.reports[-1].option):
-                    # Then this value correctly matches the metadata.
-                    if goodness_id not in self.good_value_meta_list:
-                        self.good_value_meta_list.append(goodness_id)
+                    continue
+            if (not self.reports or
+                not (sect == self.reports[-1].section and
+                     key == self.reports[-1].option)):
+                # Then this value correctly matches the metadata.
+                if goodness_id not in self.good_value_meta_map:
+                    self.good_value_meta_map[goodness_id] = None
         return self.reports
 
     def meta_check(self, value, meta_type, sect, key):
@@ -240,6 +220,45 @@ class ValueChecker(rose.macro.MacroBase):
     def check_quoted(self, value):
         """Interface to check a "double quoted" type string."""
         return self.meta_check(value, "quoted", "", "")
+
+    def check_range(self, range_pat, var_id, sect, key, val_list, type_list,
+                    skip_nulls=False):
+        """Check against a range pattern."""
+        is_range_complex = "this" in range_pat
+        if is_range_complex:
+            tiny_config = rose.config.ConfigNode()
+        elif range_pat not in self.range_func_map:
+            check_func = rose.variable.parse_range_expression(range_pat)
+            self.range_func_map.update({range_pat: check_func})
+        else:
+            check_func = self.range_func_map[range_pat]
+        check_ok = True
+        for i, val in enumerate(val_list):
+            if skip_nulls and not val:
+                continue
+            if len(type_list) > 1:
+                val_type = type_list[i % len(type_list)]
+                if val_type not in ["integer", "real"]:
+                    continue
+            if not self.meta_check(val, "real", sect, key):
+                check_ok = False
+                break
+            if is_range_complex:
+                tiny_config.set([sect, key], val)
+                evaluator = rose.macros.rule.RuleEvaluator()
+                try:
+                    check_ok = evaluator.evaluate_rule(
+                                            range_pat, var_id, tiny_config)
+                except rose.macros.rule.RuleValueError:
+                    pass
+            else:
+                val_num = float(val)
+                if not check_func(val_num):
+                    check_ok = False
+                    break
+        if check_ok:
+            return ""
+        return self.WARNING_BAD_RANGE.format(val, range_pat)
 
 
 class TypeFixer(rose.macro.MacroBase):

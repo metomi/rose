@@ -172,34 +172,36 @@ class SuiteLogViewGenerator(object):
         finally:
             os.rmdir(lock)
 
-    def update_task_log(self, suite_name, task_names=None):
+    def update_task_log(self, suite_name, task_ids=None):
         """Update the log(s) of tasks in suite_name.
 
-        If "task_names" is None, update the logs for all tasks.
+        If "task_ids" is None, update the logs for all tasks.
 
         """
-        return self._chdir(self._update_task_log, suite_name, task_names)
+        return self._chdir(self._update_task_log, suite_name, task_ids)
 
-    def _update_task_log(self, suite_name, task_names=None):
-        users_and_hosts_and_tasks = []
-        if task_names:
-            for task_name in task_names:
-                task_name_0 = task_name.split("%", 1)[0]
+    def _update_task_log(self, suite_name, task_ids=None):
+        users_and_hosts_and_tags = []
+        if task_ids:
+            for task_id in task_ids:
+                name, cycle = task_id.split(
+                        self.suite_engine_proc.TASK_ID_DELIM)
                 user_and_host = self.suite_engine_proc.get_task_auth(
-                        suite_name, task_name_0)
+                        suite_name, name)
                 if user_and_host is None:
                     continue
                 user, host = user_and_host
-                users_and_hosts_and_tasks.append((user, host, task_name))
+                tag = self.suite_engine_proc.TASK_LOG_DELIM.join([name, cycle])
+                users_and_hosts_and_tags.append((user, host, tag))
         else:
             users_and_hosts = self.suite_engine_proc.get_tasks_auths(suite_name)
             for user, host in users_and_hosts:
-                users_and_hosts_and_tasks.append((user, host, ""))
+                users_and_hosts_and_tags.append((user, host, ""))
 
         log_dir_rel = self.suite_engine_proc.get_task_log_dir_rel(suite_name)
         log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
-        for user, host, task in users_and_hosts_and_tasks:
-            r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, task)
+        for user, host, tag in users_and_hosts_and_tags:
+            r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, tag)
             cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
             try:
                 out, err = self.popen(*cmd)
