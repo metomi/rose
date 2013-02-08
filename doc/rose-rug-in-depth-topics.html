@@ -14,6 +14,7 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
@@ -23,6 +24,8 @@
   <script type="text/javascript" src="google-code-prettify/prettify.js">
 </script>
   <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -292,7 +295,7 @@ should-show-ignored = True
 
       <p>This is the cylc configuration file - we'll discuss it properly in a
       <a href="rose-rug-suites.html">later part</a> of the documentation.</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 #!jinja2
 [scheduling]
     [[dependencies]]
