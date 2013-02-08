@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide: Quiz</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose User Guide: Quiz</h1>
+
+    <div id="content"></div>
+
+    <h2 id="intro">Introduction</h2>
+
+    <p>This is a test to see how much Rose/cylc knowledge you've absorbed.</p>
+    
+    <p>You should be familiar with all the content in the Rose User Guide.</p>
+       
+    <h2>Multiple choice</h2>
+    
+    <ol>
+      <li>Rose is:
+        <ul>
+          <li>A) A framework for growing roses outside scientific institutions</li>
+          <li>B) A framework for getting legal advice</li>
+          <li>C) A framework for managing and running suites of scientific applications</li>
+          <li>D) A framework for developing web applications</li>
+        </ul>
+      </li>
+      
+      <li>cylc is:
+        <ul>
+          <li>A) a washing machine program</li>
+          <li>B) a workload scheduler</li>
+          <li>C) a framework for configuring Rose applications</li>
+          <li>D) a suite engine</li>
+        </ul>
+      </li>
+      
+      <li>A user configuration for Rose is stored in:
+        <ul>
+          <li>A) ~/.metomi/rose.conf</li>
+          <li>B) ~/.rose/rose-user.conf</li>
+          <li>C) ~/.rose.rc</li>
+          <li>D) ~/.met-um/rose.rc</li>
+        </ul>
+      </li>
+      
+      <li>You can create a new suite with:
+        <ul>
+          <li>A) <code>rose suite-create</code></li>
+          <li>B) <code>rosie create</code></li>
+          <li>C) <code>fcm create</code></li>
+          <li>D) <code>rosie suite-create</code></li>
+        </ul>
+      </li>
+      
+      <li>The sub-directory of a suite that holds Rose application configurations is called:
+        <ul>
+          <li>A) <samp>rose-apps/</samp></li>
+          <li>B) <samp>app/</samp></li>
+          <li>C) <samp>apps/</samp></li>
+          <li>D) <samp>etc/</samp></li>
+        </ul>
+      </li>
+      
+      <li><samp>rose-suite.conf</samp> files are for:
+        <ul>
+          <li>A) reading in by cylc</li>
+          <li>B) storing application input data</li>
+          <li>C) identifying the suite with metadata</li>
+          <li>D) jinja2 templating and installing files</li>
+        </ul>
+      </li>
+      
+      <li>You can switch branches in a suite working copy by using the command:
+        <ul>
+          <li>A) <code>fcm switch</code></li>
+          <li>B) <code>rosie switch</code></li>
+          <li>C) <code>rose suite-switch</code></li>
+          <li>D) <code>rosie checkout</code></li>
+        </ul>
+      </li>
+      
+      <li>Output for Rose suites is usually under:</li>
+        <ul>
+          <li>A) <samp>$HOME/cylc-run/</samp></li>
+          <li>B) <samp>$TMPDIR/suite-run/</samp></li>
+          <li>C) <samp>$DATADIR/suite-run/</samp></li>
+          <li>D) <samp>$HOME/rose-suite-run/</samp></li>
+        </ul>
+      </li>
+      
+      <li>Running the <code>rosie go</code> command:</li>
+        <ul>
+          <li>A) starts a suite running using cylc run</li>
+          <li>B) launches the output viewer</li>
+          <li>C) sshes to a cylc server</li>
+          <li>D) launches a discovery GUI</li>
+        </ul>
+      </li>
+      
+      <li><code>rose edit</code> cannot:</li>
+        <ul>
+          <li>A) commit changes to version control</li>
+          <li>B) generate panels without metadata</li>
+          <li>C) automatically fix trigger state errors</li>
+          <li>D) load a single application by itself</li>
+        </ul>
+      </li>
+      
+      <li><p>I have the following metadata for one of my inputs:</p>
+      <pre class="prettyprint lang-rose_conf">
+[namelist:foo=bar]
+fail-if = this > 0 and (all(namelist:foo=baz == 0))
+</pre>
+
+      <p>Which application configuration settings would cause the <samp>fail-if</samp>
+      checking to throw an error?</p>
+        <ul>
+          <li>A)
+          <pre class="prettyprint lang-rose_conf">
+[namelist:foo]
+bar = 1
+baz = 0, 0
+</pre>
+          </li>
+          <li>B)
+          <pre class="prettyprint lang-rose_conf">
+[namelist:foo]
+bar = 1
+</pre>
+          </li>
+          <li>C)
+          <pre class="prettyprint lang-rose_conf">
+[namelist:foo]
+bar = 0
+baz = 1, 0
+</pre>
+          </li>
+          <li>D)
+          <pre class="prettyprint lang-rose_conf">
+[namelist:foo]
+bar = 0
+baz = 1, 1
+</pre>
+          </li>
+        </ul>
+      </li>
+      
+      <li><p>I have a flawed metadata file:</p>
+        <pre class="prettyprint lang-rose_conf">
+[namelist:foo=bar]
+description=Bar, part of the legendary made up variable family of foo, bar,
+           =baz, qux, quux, corge, grault, garply, waldo, wibble, wobble,
+           =wubble, fred, and flob.
+           =
+           =See http://en.wikipedia.org/wiki/Metasyntactic_variable .
+help=Bar, for controlling foo things.
+pattern=^.?$
+trigger=namelist:spam=eggs: this &lt; 0
+type=integer
+values=-1, 2, 10
+warn-if=True
+</pre>
+       <p>Which of the following metadata options are correctly used, given the other options?</p>
+       <ul>
+         <li>A) <samp>type</samp> and <samp>pattern</samp></li>
+         <li>B) <samp>warn-if</samp></li>
+         <li>C) <samp>description</samp></li>
+         <li>D) <samp>description</samp> and <samp>trigger</samp></li>
+       </ul>
+     </li>
+    </ul>
+     
+    <h2 id="gtk">Rose GTK library</h2>
+  </div>
+</body>
+</html>
