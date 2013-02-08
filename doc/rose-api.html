@@ -9,7 +9,15 @@
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -98,7 +106,7 @@
 
     <p>Assign a <var>widget[rose-config-edit]</var> attribute to the relevant
     variable in the metadata configuration, e.g.</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
 [namelist:VerifConNL/ScalarAreaCodes]
 widget[rose-config-edit]=module_name.AreaCodeChooser
 </pre>
@@ -109,7 +117,7 @@ widget[rose-config-edit]=module_name.AreaCodeChooser
     demand.</p>
 
     <p>This class should have a constructor of the form</p>
-    <pre>
+    <pre class="prettyprint">
 class AreaCodeChooser(gtk.HBox):
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None)
@@ -128,7 +136,7 @@ class AreaCodeChooser(gtk.HBox):
       <dd>
         <p>a map or dictionary of configuration metadata properties for this
         value, such as</p>
-        <pre>
+        <pre class="prettyprint">
 {'type': 'integer', 'help': 'This is used to count something'}
 </pre>
 
@@ -140,7 +148,7 @@ class AreaCodeChooser(gtk.HBox):
       <dd>
         <p>a function that should be called with a new string value of this
         widget, e.g.</p>
-        <pre>
+        <pre class="prettyprint">
 set_value("20")
 </pre>
       </dd>
@@ -158,14 +166,14 @@ set_value("20")
       <dd>
         <p>is an optional argument that stores any text given after the widget
         in the metadata:</p>
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
 </pre>
 
         <p>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
         ..."</code>. This could help configure your widget - for example, for a
         table based widget, you might give the column names</p>:
-        <pre>
+        <pre class="prettyprint lang-rose_conf">
 widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
 </pre>This means that you can write a generic widget and then configure it for
 different cases.
@@ -181,12 +189,12 @@ different cases.
       <dd>
         <p>which you should connect your top-level widget (<samp>self</samp>)
         to as follows:</p>
-        <pre>
+        <pre class="prettyprint">
     self.grab_focus = lambda: hook.get_focus(my_favourite_focus_widget)
 </pre>
 
         <p>or define a method in your class</p>
-        <pre>
+        <pre class="prettyprint">
 def grab_focus(self):
     """Override the focus method, so we can scroll to a particular widget."""
     return hook.get_focus(my_favourite_focus_widget)
@@ -203,13 +211,13 @@ def grab_focus(self):
 
       <dd>
         <p>accessed by</p>
-        <pre>
+        <pre class="prettyprint">
     hook.trigger_scroll(my_favourite_focus_widget)
 </pre>
 
         <p>This should be connected to the <code>focus-in-event</code> GTK
         signal of your top-level widget (<samp>self</samp>):</p>
-        <pre>
+        <pre class="prettyprint">
         self.entry.connect('focus-in-event',
                            hook.trigger_scroll)
         
@@ -229,7 +237,7 @@ def grab_focus(self):
       <dd>
         <p>A method that takes a number as an argument, which is the current
         cursor position relative to the characters in the variable value:</p>
-        <pre>
+        <pre class="prettyprint">
 def set_focus_index(self, focus_index):
     """Set the cursor position to focus_index."""
     self.entry.set_position(focus_index)
@@ -252,7 +260,7 @@ def set_focus_index(self, focus_index):
         <p>A method that takes no arguments and returns a number which is the
         current cursor position relative to the characters in the variable
         value:</p>
-        <pre>
+        <pre class="prettyprint">
 def get_focus_index(self):
     """Return the cursor position."""
     return self.entry.get_position()
@@ -272,7 +280,7 @@ def get_focus_index(self):
         overridden by defining this method in your value widget class. It takes
         a boolean <code>is_in_error</code> which is <samp>True</samp> if there
         is a value (type) error and <samp>False</samp> otherwise:</p>
-        <pre>
+        <pre class="prettyprint">
 def handle_type_error(self, is_in_error):
     """Change behaviour based on whether the variable is_in_error."""
     icon_id = gtk.STOCK_DIALOG_ERROR if is_in_error else None
@@ -320,13 +328,13 @@ def handle_type_error(self, is_in_error):
 
     <p>Assign a <code>widget</code> option to the relevant namespace in the
     metadata configuration, e.g.</p>
-    <pre>
+    <pre class="prettyprint lang-rose_conf">
     [ns:namelist/STASHNUM]
     widget[rose-config-edit]=module_name.MyGreatBigTable
 </pre>
 
     <p>The widget class should have a constructor of the form</p>
-    <pre>
+    <pre class="prettyprint">
     class MyGreatBigTable(gtk.Table):
 
         def __init__(self, real_variable_list, missing_variable_list,
@@ -365,7 +373,7 @@ def handle_type_error(self, is_in_error):
 
       <dd>
         a dictionary that looks like this:
-        <pre>
+        <pre class="prettyprint">
     show_modes_dict = {'latent': False, 'fixed': False, 'ignored': True,
                        'user-ignored': False, 'title': False,
                        'flag:optional': False, 'flag:no-meta': False}
@@ -419,7 +427,7 @@ def handle_type_error(self, is_in_error):
         'show_mode_change' followed by the key. However, 'ignored' is handled
         separately (more below). These methods should take a single boolean
         that indicates the display status. For example:</p>
-        <pre>
+        <pre class="prettyprint">
 def show_fixed(self, should_show)
 </pre>
 
@@ -571,7 +579,7 @@ class SomeValidator(rose.macro.MacroBase):
     that is in error. These are initialised behind the scenes by calling the
     inherited method <code>rose.macro.MacroBase.add_report</code> via
     <code>self.add_report</code>. This has the form:</p>
-    <pre>
+    <pre class="prettyprint">
     def add_report(self, report_list, section=None, option=None, value=None,
                    info=None, is_warning=False):
 </pre>
@@ -710,7 +718,7 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
         (<samp>downgrade</samp> set to <samp>False</samp>), the settings in
         <samp>rose-macro-remove.conf</samp> will be added, and the ones in
         <samp>rose-macro-add.conf</samp> removed.</p>
-        <pre>
+        <pre class="prettyprint">
     def upgrade(self, config, meta_config=None):
         self.act_from_files(config)
         return config, self.reports
@@ -784,7 +792,6 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
         self.add_setting(config, ["namelist:breakfast_nl", "bacon"], "2",
                          comments=["Mmmm. Bacon."], info="Add for food:#810")
         return config, self.reports
-      
 </pre>
       </dd>
 
@@ -818,7 +825,6 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
         self.change_setting_value(config, ["namelist:breakfast_nl", "coffee"], "'more'",
                                   info="Add for food:#820")
         return config, self.reports
-    
 </pre>
       </dd>
 
@@ -853,7 +859,6 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
             self.add_setting(config, ["namelist:breakfast_nl", "tea"],
                              "'extra_strong'")
         return config, self.reports    
-    
 </pre>
       </dd>
 
@@ -976,7 +981,7 @@ http://host/PREFIX_NAME/get_known_keys?format=json
 </pre>
 
         <p>may give</p>
-        <pre>
+        <pre class="prettyprint">
 ["access-list", "idx", "issue-list", "branch", "owner", "project", "revision", "status",  "title"]  
 </pre>
       </dd>
@@ -992,7 +997,7 @@ http://host/PREFIX_NAME/get_optional_keys?format=json
 </pre>
 
         <p>may give</p>
-        <pre>
+        <pre class="prettyprint">
 ["access-list", "description", "endgame_status", "operational_flag", "tag-list"]
 </pre>
       </dd>
@@ -1009,7 +1014,7 @@ http://host/PREFIX_NAME/get_query_operators?format=json
 </pre>
 
         <p>may give</p>
-        <pre>
+        <pre class="prettyprint">
 ["eq", "ge", "gt", "le", "lt", "ne", "contains", "endswith", "ilike", "like", "match", "startswith"]
 </pre>
       </dd>
@@ -1026,7 +1031,7 @@ http://host/PREFIX_NAME/info?idx=mo1-aa000&amp;branch=trunk&amp;revision=1&amp;f
 </pre>
 
         <p>may give</p>
-        <pre>
+        <pre class="prettyprint">
 {"access-list": ["fred", "alice"], "author": "bob", "branch": "trunk", "date": 1340700481,
  "experiment": "HADGEM6", "from_idx": null, "idx": "mo1-aa000", "project": "HADGEM5#123",
  "revision": 1, "status": "M ", "title": "HADGEM5 replacement"}
@@ -1081,7 +1086,7 @@ http://host/PREFIX_NAME/query?q=and+idx+endswith+78&amp;q=or+owner+eq+bob&amp;fo
 </pre>
 
         <p>may give</p>
-        <pre>
+        <pre class="prettyprint">
 [{"idx": "mo1-aa078", "branch": "trunk", "revision": 200, "owner": "fred",
   "project": "fred's project.", "title": "fred's awesome suite",
   "status": "M ", "access-list": ["fred", "jack"], "description": "awesome"},
@@ -1105,7 +1110,7 @@ http://host/mo1/json/query?q=and+idx+endswith+78&amp;all_revs&amp;format=json
 </pre>
 
         <p>may give</p>
-        <pre>
+        <pre class="prettyprint">
 [{"idx": "mo1-aa078", "branch": "trunk", "revision": 120, "owner": "fred",
   "project": "fred's project.", "title": "fred's new suite",
   "status": "A "}
@@ -1148,7 +1153,7 @@ http://host/PREFIX_NAME/search?var+bob+nowcast&amp;format=json
 </pre>
 
         <p>may give</p>
-        <pre>
+        <pre class="prettyprint">
 [{"idx": "mo1-aa090", "branch": "trunk", "revision": 330, "owner": "bob",
   "project": "um", "title": "A copy of um.alpra.", "status": "M ",
   "description": "Bob's UM suite"},
@@ -1174,7 +1179,7 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 </pre>
 
         <p>may give</p>
-        <pre>
+        <pre class="prettyprint">
 [{"idx": "mo1-aa001", "branch": "trunk", "revision": 120, "owner": "bob",
   "project": "useless", "title": "Bob's useless suite.", "status": "A "},
  {"idx": "mo1-aa001", "branch": "trunk", "revision": 122, "owner": "bob",
