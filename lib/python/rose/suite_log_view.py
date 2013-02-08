@@ -21,7 +21,7 @@
 import json
 import os
 from rose.config import ConfigLoader
-from rose.fs_util import FileSystemUtil
+from rose.fs_util import FileSystemUtil, FileSystemEvent
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
@@ -40,31 +40,6 @@ class LockEvent(Event):
         return str(self.args[0]) + ": lock exists, abort"
 
 
-# TODO: should this be moved to rose.fs_util?
-class FileInstallEvent(Event):
-    """An event raised when files are installed."""
-
-    LEVEL = Event.V
-
-    def __init__(self, target, source):
-        self.target = target
-        self.source = source
-        Event.__init__(self, target, source)
-
-    def __str__(self):
-        return "install: %s <= %s" % (self.target, self.source)
-
-
-# TODO: should this be moved to rose.fs_util?
-class FileUpdateEvent(Event):
-    """An event raised when the content of a file is updated."""
-
-    LEVEL = Event.V
-
-    def __str__(self):
-        return str(self.args[0]) + ": updated"
-
-
 # TODO: should this be moved to rose.external?
 class WebBrowserEvent(Event):
     """An event raised when a web browser is launched."""
@@ -77,6 +52,8 @@ class WebBrowserEvent(Event):
 
 class SuiteLogViewGenerator(object):
     """Generate the log view for a suite."""
+
+    NS = "rose-suite-log-view"
 
     def __init__(self, event_handler=None, fs_util=None, popen=None,
                  suite_engine_proc=None):
@@ -103,9 +80,16 @@ class SuiteLogViewGenerator(object):
         cwd = os.getcwd()
         if suite_log_dir is not None:
             self.fs_util.chdir(suite_log_dir)
+        lock = os.path.join(os.getcwd(), "." + self.NS + ".lock")
+        try:
+            os.mkdir(lock)
+        except OSError:
+            self.handle_event(LockEvent(lock))
+            return
         try:
             return method(suite_name, *args, **kwargs)
         finally:
+            os.rmdir(lock)
             try:
                 self.fs_util.chdir(cwd)
             except OSError:
@@ -118,59 +102,52 @@ class SuiteLogViewGenerator(object):
     __call__ = generate
 
     def _generate(self, suite_name):
-        if not os.path.exists(self.suite_engine_proc.SUITE_LOG):
-            return
-        ns = "rose-suite-log-view"
-        lock = os.path.join(os.getcwd(), "." + ns + ".lock")
-        try:
-            os.mkdir(lock)
-        except OSError:
-            self.handle_event(LockEvent(lock))
-            return
-        try:
-            # Copy presentation files into the log directory
-            html_lib_source = os.path.join(os.getenv("ROSE_HOME"), "lib",
-                                           "html")
-            html_lib_dest = "html-lib"
-            if not os.path.isdir(html_lib_dest):
-                external_html_lib_source = os.path.join(html_lib_source,
-                                                        "external")
-                shutil.copytree(external_html_lib_source, html_lib_dest,
-                                ignore=shutil.ignore_patterns(".svn"))
-                ev = FileInstallEvent(html_lib_dest, external_html_lib_source)
-                self.handle_event(ev)
-            this_html_lib_source = os.path.join(html_lib_source, ns)
-            for name in os.listdir(this_html_lib_source):
-                if not name.startswith(".") and not os.path.isfile(name):
-                    source = os.path.join(this_html_lib_source, name)
-                    shutil.copy2(source, ".")
-                    self.handle_event(FileInstallEvent(name, source))
-            # Parse the suite log
+        # Copy presentation files into the log directory
+        html_lib_source = os.path.join(os.getenv("ROSE_HOME"), "lib", "html")
+        html_lib_dest = "html-lib"
+        if not os.path.isdir(html_lib_dest):
+            external_html_lib_source = os.path.join(html_lib_source,
+                                                    "external")
+            shutil.copytree(external_html_lib_source, html_lib_dest)
+            self.handle_event(FileSystemEvent(FileSystemEvent.INSTALL,
+                                              html_lib_dest,
+                                              external_html_lib_source))
+        this_html_lib_source = os.path.join(html_lib_source, self.NS)
+        for name in os.listdir(this_html_lib_source):
+            if not name.startswith(".") and not os.path.isfile(name):
+                source = os.path.join(this_html_lib_source, name)
+                shutil.copy2(source, ".")
+                self.handle_event(FileSystemEvent(FileSystemEvent.INSTALL,
+                                                  name, source))
+                os.utime(name, None)
+        # (Re-)Create JOB.json
+        suite_info = {}
+        suite_info_file_name = self.suite_engine_proc.get_suite_dir(
+                suite_name, "rose-suite.info")
+        if os.access(suite_info_file_name, os.F_OK | os.R_OK):
+            info_conf = ConfigLoader()(suite_info_file_name)
+            for key, node in info_conf.value.items():
+                if not node.state:
+                    suite_info[key] = node.value
+        data = {"suite": suite_name,
+                "suite_info": suite_info,
+                "tasks": {},
+                "updated_at": time()}
+        if os.path.exists(self.suite_engine_proc.SUITE_LOG):
             suite_log_file = self.suite_engine_proc.SUITE_LOG
             suite_log_file_size_prev = None
             suite_log_file_size = os.stat(suite_log_file).st_size
             while suite_log_file_size != suite_log_file_size_prev:
-                suite_info = {}
-                suite_info_file_name = self.suite_engine_proc.get_suite_dir(
-                        suite_name, "rose-suite.info")
-                if os.access(suite_info_file_name, os.F_OK | os.R_OK):
-                    info_conf = ConfigLoader()(suite_info_file_name)
-                    for key, node in info_conf.value.items():
-                        if not node.state:
-                            suite_info[key] = node.value
                 tasks = self.suite_engine_proc.process_suite_log()
-                data = {"suite": suite_name,
-                        "suite_info": suite_info,
-                        "tasks": tasks,
-                        "updated_at": time()}
-                f = open("JOB.json", "w")
-                json.dump(data, f, indent=0)
-                f.close()
-                self.handle_event(FileUpdateEvent("JOB.json"))
+                data["tasks"] = self.suite_engine_proc.process_suite_log()
+                data["updated_at"] = time()
                 suite_log_file_size_prev = suite_log_file_size
                 suite_log_file_size = os.stat(suite_log_file).st_size
-        finally:
-            os.rmdir(lock)
+        f = open("JOB.json", "w")
+        json.dump(data, f, indent=0)
+        f.close()
+        self.handle_event(FileSystemEvent("update", "JOB.json"))
+        return
 
     def update_task_log(self, suite_name, task_ids=None):
         """Update the log(s) of tasks in suite_name.
