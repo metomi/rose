@@ -125,11 +125,38 @@
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Startup</h3>
+      
+      <p>We need a special <q>cold start</q> task (<samp>startup</samp>). This sets
+      our initial gate number - put this in the runtime section of the
+      <samp>suite.rc</samp> file:</p>
+      <pre class="prettyprint lang-cylc">
+    [[startup]]
+        environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
+        command scripting = """
+            GATE="A"$((RANDOM%3))
+            echo "GATE=$GATE" &gt; $ROSE_DATACT12H/flight_gate
+            cylc task message "Starting gate: $GATE"
+            sleep 5
+         """
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Startup Explanation</h3>
+      
+      <p>This <samp>flight_gate</samp> file will be sourceable by tasks that
+      need the <var>GATE</var> number.</p>
+
+    </div>
+
+    <div class="slide">
       <h3>Boarding</h3>
 
-      <p>The gate for boarding the flight is the same as the last flight's
-      arrival gate (the aircraft doesn't move). We'd like to tell passengers
-      which gate to board at in the <samp>boarding</samp> task.</p>
+      <p>We'd like to tell passengers which gate to board at in the
+      <samp>boarding</samp> task. The gate was output to a file by
+      <samp>startup</samp>, for the first cycle, and by
+      <samp>assign_gate</samp> thereafter.</p>
 
       <p>This means that this task has to read the <samp>flight_gates</samp>
       file from the last cycle's data directory.</p>
@@ -204,19 +231,6 @@
       <p>We've used the <samp>--print-format</samp> option to <code>rose
       date</code> to change the format of the date and time into something
       simple.</p>
-
-      <p>The suite won't run correctly until we setup our cold start task
-      properly - add the following to your runtime section:</p>
-      <pre class="prettyprint lang-cylc">
-    [[startup]]
-        environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
-        command scripting = """
-            GATE="A"$((RANDOM%3))
-            echo "flight gate: $GATE" &gt; $ROSE_DATACT12H/flight_gate
-            cylc task message "Starting gate: $GATE"
-            sleep 5
-         """
-</pre>
     </div>
 
     <div class="slide">
