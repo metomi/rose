@@ -167,37 +167,6 @@
         and installing files</em></p>
 
       </li>
-      <li>Output for Rose suites is usually under:
-      
-        <ul>
-          <li>A) <samp>$HOME/cylc-run/</samp></li>
-
-          <li>B) <samp>$TMPDIR/suite-run/</samp></li>
-
-          <li>C) <samp>$DATADIR/suite-run/</samp></li>
-
-          <li>D) <samp>$HOME/rose-suite-run/</samp></li>
-        </ul>
-
-        <p class="answers"><em>Answer: <strong>A)</strong>
-        <samp>$HOME/cylc-run/</samp></em></p>
-      </li>
-
-      <li>Running the <code>rosie go</code> command:
-      
-        <ul>
-          <li>A) starts a suite running using cylc run</li>
-
-          <li>B) launches the output viewer</li>
-
-          <li>C) sshes to a cylc server</li>
-
-          <li>D) launches a discovery GUI</li>
-        </ul>
-
-        <p class="answers"><em>Answer: <strong>D)</strong> launches a discovery
-        GUI</em></p>
-      </li>
 
       <li><code>rose edit</code> cannot:
         <ul>
@@ -208,6 +177,67 @@
         </ul>
         
         <p class="answers"><em>Answer: <strong>A)</strong> commit changes to version control</em></p>     
+      </li>
+
+      <li>
+        <p>Which metadata option best matches the following description?</p>
+        <pre>
+Used to order and group pages and variables in the config editor
+</pre>
+
+        <ul>
+          <li>A) <samp>duplicate</samp></li>
+
+          <li>B) <samp>range</samp></li>
+
+          <li>C) <samp>sort-key</samp></li>
+
+          <li>D) <samp>title</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>C)</strong>
+        <samp>sort-key</samp></em></p>
+      </li>
+
+      <li>
+        <p>Which metadata option best matches the following description?</p>
+        <pre>
+Specify a regular expression that the value of the setting must match.
+</pre>
+
+        <ul>
+          <li>A) <samp>values</samp></li>
+
+          <li>B) <samp>fail-if</samp></li>
+
+          <li>C) <samp>range</samp></li>
+
+          <li>D) <samp>pattern</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>D)</strong>
+        <samp>pattern</samp></em></p>
+      </li>
+
+      <li>
+        <p>Which metadata option best matches the following description?</p>
+        <pre>
+If not present, the setting is assumed to be a scalar. A positive integer defines a fixed length array.
+A colon : defines a dynamic length array.
+</pre>
+
+        <ul>
+          <li>A) <samp>type</samp></li>
+
+          <li>B) <samp>length</samp></li>
+
+          <li>C) <samp>range</samp></li>
+
+          <li>D) <samp>values</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>B)</strong>
+        <samp>length</samp></em></p>
       </li>
 
       <li>
@@ -310,6 +340,73 @@ warn-if=True
         <samp>namelist:spam=eggs</samp> is not defined in the metadata</em></p>
       </li>
 
+      <li>Rose macros are used to:
+
+        <ul>
+          <li>A) Run applications</li>
+
+          <li>B) Record and play actions in the config editor</li>
+
+          <li>C) Check and apply changes to Rose configurations</li>
+
+          <li>D) Remove the need for metadata configuration</li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>C)</strong> Check and apply
+        changes to Rose configurations</em></p>
+      </li>
+
+      <li>Output for Rose suites is usually under:
+      
+        <ul>
+          <li>A) <samp>$HOME/cylc-run/</samp></li>
+
+          <li>B) <samp>$TMPDIR/suite-run/</samp></li>
+
+          <li>C) <samp>$DATADIR/suite-run/</samp></li>
+
+          <li>D) <samp>$HOME/rose-suite-run/</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>A)</strong>
+        <samp>$HOME/cylc-run/</samp></em></p>
+      </li>
+
+      <li>The <samp>share/</samp> subdirectory in a suite's
+      output directory is for:
+
+        <ul>
+          <li>A) any files that need to be shared between tasks</li>
+
+          <li>B) task working directories, e.g. containing Rose application
+          namelists and other temporary files</li>
+
+          <li>C) task scripts and their output and error</li>
+
+          <li>D) the rose-suite.version file, which records any version control
+          information about the suite, including any local modifications</li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>A)</strong> any files that need
+        to be shared between tasks</em></p>
+      </li>
+
+      <li>Running the <code>rosie go</code> command:
+      
+        <ul>
+          <li>A) starts a suite running using cylc run</li>
+
+          <li>B) launches the output viewer</li>
+
+          <li>C) sshes to a cylc server</li>
+
+          <li>D) launches a discovery GUI</li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>D)</strong> launches a discovery
+        GUI</em></p>
+      </li>
+
       <li>
         <p>We're searching for suites using <code>rosie</code>. We want every
         suite with <samp>Case Study</samp> in the title and where either the
@@ -330,67 +427,6 @@ warn-if=True
         </ul>
 
         <p class="answers"><em>Answer: <strong>D)</strong></em></p>
-      </li>
-
-      <li>
-        <p>Which metadata option best matches the following description?</p>
-        <pre>
-Used to order and group pages and variables in the config editor
-</pre>
-
-        <ul>
-          <li>A) <samp>duplicate</samp></li>
-
-          <li>B) <samp>range</samp></li>
-
-          <li>C) <samp>sort-key</samp></li>
-
-          <li>D) <samp>title</samp></li>
-        </ul>
-
-        <p class="answers"><em>Answer: <strong>C)</strong>
-        <samp>sort-key</samp></em></p>
-      </li>
-
-      <li>
-        <p>Which metadata option best matches the following description?</p>
-        <pre>
-Specify a regular expression that the value of the setting must match.
-</pre>
-
-        <ul>
-          <li>A) <samp>values</samp></li>
-
-          <li>B) <samp>fail-if</samp></li>
-
-          <li>C) <samp>range</samp></li>
-
-          <li>D) <samp>pattern</samp></li>
-        </ul>
-
-        <p class="answers"><em>Answer: <strong>D)</strong>
-        <samp>pattern</samp></em></p>
-      </li>
-
-      <li>
-        <p>Which metadata option best matches the following description?</p>
-        <pre>
-If not present, the setting is assumed to be a scalar. A positive integer defines a fixed length array.
-A colon : defines a dynamic length array.
-</pre>
-
-        <ul>
-          <li>A) <samp>type</samp></li>
-
-          <li>B) <samp>length</samp></li>
-
-          <li>C) <samp>range</samp></li>
-
-          <li>D) <samp>values</samp></li>
-        </ul>
-
-        <p class="answers"><em>Answer: <strong>B)</strong>
-        <samp>length</samp></em></p>
       </li>
 
       <li>
@@ -475,22 +511,6 @@ A colon : defines a dynamic length array.
         !B</samp></em></p>
       </li>
 
-      <li>Rose macros are used to:
-
-        <ul>
-          <li>A) Run applications</li>
-
-          <li>B) Record and play actions in the config editor</li>
-
-          <li>C) Check and apply changes to Rose configurations</li>
-
-          <li>D) Remove the need for metadata configuration</li>
-        </ul>
-
-        <p class="answers"><em>Answer: <strong>C)</strong> Check and apply
-        changes to Rose configurations</em></p>
-      </li>
-
       <li>Which of the following Rose commands invokes an in-built <q>analysis
       engine</q>?
 
@@ -507,25 +527,6 @@ A colon : defines a dynamic length array.
         <p class="answers"><em>Answer: <strong>C)</strong> <code>rose
         ana</code></em></p>
 
-      </li>
-
-      <li>The <samp>share/</samp> subdirectory in a suite's
-      <samp>cylc-run/</samp> directory is for:
-
-        <ul>
-          <li>A) any files that need to be shared between tasks</li>
-
-          <li>B) task working directories, e.g. containing Rose application
-          namelists and other temporary files</li>
-
-          <li>C) task scripts and their output and error</li>
-
-          <li>D) the rose-suite.version file, which records any version control
-          information about the suite, including any local modifications</li>
-        </ul>
-
-        <p class="answers"><em>Answer: <strong>A)</strong> any files that need
-        to be shared between tasks</em></p>
       </li>
     </ol>
     
