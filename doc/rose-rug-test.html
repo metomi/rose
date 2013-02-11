@@ -29,7 +29,7 @@
         $(this).hide();
     });
     $("#toggleanswers").click(function() {
-        $("html, body").animate({scrollTop: 0}, 500);
+        $("html").scrollTop(0);
         $(".answers").each(function(i, answer) {
             $(this).show(1000);
         });
@@ -166,6 +166,9 @@
         <p class="answers"><em>Answer: <strong>D)</strong> jinja2 templating
         and installing files</em></p>
 
+      </li>
+      <li>Output for Rose suites is usually under:
+      
         <ul>
           <li>A) <samp>$HOME/cylc-run/</samp></li>
 
@@ -180,8 +183,8 @@
         <samp>$HOME/cylc-run/</samp></em></p>
       </li>
 
-      <li>Output for Rose suites is usually under:
-
+      <li>Running the <code>rosie go</code> command:
+      
         <ul>
           <li>A) starts a suite running using cylc run</li>
 
@@ -196,23 +199,16 @@
         GUI</em></p>
       </li>
 
-      <li>Running the <code>rosie go</code> command:
-
+      <li><code>rose edit</code> cannot:
         <ul>
           <li>A) commit changes to version control</li>
-
           <li>B) generate panels without metadata</li>
-
           <li>C) automatically fix trigger state errors</li>
-
           <li>D) load a single application by itself</li>
         </ul>
-
-        <p class="answers"><em>Answer: <strong>A)</strong> commit changes to
-        version control</em></p>
+        
+        <p class="answers"><em>Answer: <strong>A)</strong> commit changes to version control</em></p>     
       </li>
-
-      <li><code>rose edit</code> cannot:</li>
 
       <li>
         <p>I have the following metadata for one of my inputs:</p>
@@ -259,7 +255,8 @@ baz = 1, 1
 
         <p class="answers"><em>Answer: <strong>A)</strong> - it throws an error
         if the expression evaluates true - i.e. <var>bar</var> &gt; 0
-        <em>AND</em> all elements in <var>baz</var> are 0</em></p>
+        <em>AND</em> all elements in <var>baz</var> are 0</em>. Missing options,
+        as in <strong>B</strong>, cause the check to be skipped.</p>
       </li>
 
       <li>
@@ -397,8 +394,8 @@ A colon : defines a dynamic length array.
       </li>
 
       <li>
-        <p><samp>Task A runs if B succeeds and C fails. Which is the correct
-        <samp>suite.rc</samp> graph configuration entry?</samp></p>
+        <p>Task A runs if B succeeds and C fails. Which is the correct
+        <samp>suite.rc</samp> graph configuration entry?</p>
 
         <ul>
           <li>A)
@@ -437,7 +434,9 @@ A colon : defines a dynamic length array.
 
         <p class="answers"><em>Answer: <strong>C)</strong> <samp>B &amp; C:fail
         =&gt; A</samp></em></p>
+      </li>
 
+      <li>Which of the following is a valid cylc suicide trigger?
         <ul>
           <li>A)
             <pre class="prettyprint lang-cylc">
@@ -475,8 +474,6 @@ A colon : defines a dynamic length array.
         <p class="answers"><em>Answer: <strong>C)</strong> <samp>A =&gt;
         !B</samp></em></p>
       </li>
-
-      <li>Which of the following is a valid cylc suicide trigger?</li>
 
       <li>Rose macros are used to:
 
