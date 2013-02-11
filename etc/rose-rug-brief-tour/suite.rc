@@ -49,3 +49,7 @@
         """
     [[fcm_make]]
         pre-command scripting = "sleep 10"  # Slow down fcm make so we can see it run
+    # Tasks need defining in runtime sections, even when identical to root.
+    [[my_hello_world]]
+    [[fred_hello_world]]
+    [[my_hello_mars]]

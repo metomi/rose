@@ -199,9 +199,9 @@ rose suite-log-view
       <p>You can also run <code>cylc broadcast</code> from the command
       line.</p>
 
-      <p>Remove the <samp>startup</samp> task runtime. Get rid of:</p>
+      <p>Remove the <samp>startup</samp> task command scripting. Get rid
+      of:</p>
       <pre class="prettyprint lang-cylc">
-    [[startup]]
         command scripting = """
             cylc broadcast -t 2013010200 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
             cylc broadcast -t 2013010400 -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
