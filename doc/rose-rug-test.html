@@ -8,7 +8,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
-  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <link rel="stylesheet" type="text/css" href="rose-doc.css" />
   <script type="text/javascript" src="jquery.min.js">
 </script>
@@ -23,18 +24,18 @@
   <script type="text/javascript" src="rose-version.js">
 </script>
   <script type="text/javascript">
-$(document).ready(function() {
+  $(document).ready(function() {
     $(".answers").each(function(i, answer) {
         $(this).hide();
     });
     $("#toggleanswers").click(function() {
+        $("html, body").animate({scrollTop: 0}, 500);
         $(".answers").each(function(i, answer) {
-            $(this).show();
+            $(this).show(1000);
         });
     });
-});
+  });
 </script>
-              
 </head>
 
 <body>
@@ -60,142 +61,195 @@ $(document).ready(function() {
     <h2 id="intro">Introduction</h2>
 
     <p>This is a test to see how much Rose/cylc knowledge you've absorbed.</p>
-    
+
     <p>You should be familiar with all the content in the Rose User Guide.</p>
-       
+
     <h2 id="multi">Multiple choice</h2>
-    
+
     <ol>
       <li>Rose is:
+
         <ul>
-          <li>A) A framework for growing roses outside scientific institutions</li>
+          <li>A) A framework for growing roses outside scientific
+          institutions</li>
+
           <li>B) A framework for getting legal advice</li>
-          <li>C) A framework for managing and running suites of scientific applications</li>
+
+          <li>C) A framework for managing and running suites of scientific
+          applications</li>
+
           <li>D) A framework for developing web applications</li>
         </ul>
-        
-        <p class="answers"><em>Answer: <strong>C)</strong> A framework for managing and running suites of scientific applications</em></p>
+
+        <p class="answers"><em>Answer: <strong>C)</strong> A framework for
+        managing and running suites of scientific applications</em></p>
       </li>
-      
+
       <li>cylc is:
+
         <ul>
           <li>A) a washing machine program</li>
+
           <li>B) a workload scheduler</li>
+
           <li>C) a framework for configuring Rose applications</li>
+
           <li>D) a suite engine</li>
         </ul>
-        
-        <p class="answers"><em>Answer: <strong>D)</strong> a suite engine</em></p>
+
+        <p class="answers"><em>Answer: <strong>D)</strong> a suite
+        engine</em></p>
       </li>
-      
+
       <li>A user configuration for Rose is stored in:
+
         <ul>
           <li>A) <samp>~/.metomi/rose.conf</samp></li>
+
           <li>B) <samp>~/.rose/rose-user.conf</samp></li>
+
           <li>C) <samp>~/.rose.rc</samp></li>
+
           <li>D) <samp>~/.met-um/rose.rc</samp></li>
         </ul>
-        
-        <p class="answers"><em>Answer: <strong>A)</strong> <samp>~/.metomi/rose.conf</samp></em></p>
+
+        <p class="answers"><em>Answer: <strong>A)</strong>
+        <samp>~/.metomi/rose.conf</samp></em></p>
       </li>
-      
+
       <li>You can create a new suite with:
+
         <ul>
           <li>A) <code>rose suite-create</code></li>
+
           <li>B) <code>rosie create</code></li>
+
           <li>C) <code>fcm create</code></li>
+
           <li>D) <code>rosie suite-create</code></li>
         </ul>
-        
-        <p class="answers"><em>Answer: <strong>B)</strong> <code>rosie create</code></em></p>
+
+        <p class="answers"><em>Answer: <strong>B)</strong> <code>rosie
+        create</code></em></p>
       </li>
-      
-      <li>The sub-directory of a suite that holds Rose application configurations is called:
+
+      <li>The sub-directory of a suite that holds Rose application
+      configurations is called:
+
         <ul>
           <li>A) <samp>rose-apps/</samp></li>
+
           <li>B) <samp>app/</samp></li>
+
           <li>C) <samp>apps/</samp></li>
+
           <li>D) <samp>etc/</samp></li>
         </ul>
-        
-        <p class="answers"><em>Answer: <strong>B)</strong> <samp>app/</samp></em></p>
+
+        <p class="answers"><em>Answer: <strong>B)</strong>
+        <samp>app/</samp></em></p>
       </li>
-      
-      <li><samp>rose-suite.conf</samp> files are for:
+
+      <li>
+        <samp>rose-suite.conf</samp> files are for:
+
         <ul>
           <li>A) reading in by cylc</li>
+
           <li>B) storing application input data</li>
+
           <li>C) identifying the suite with metadata</li>
+
           <li>D) jinja2 templating and installing files</li>
         </ul>
 
-        <p class="answers"><em>Answer: <strong>D)</strong> jinja2 templating and installing files</em></p>
-      </li>
-     
-      <li>Output for Rose suites is usually under:</li>
+        <p class="answers"><em>Answer: <strong>D)</strong> jinja2 templating
+        and installing files</em></p>
+
         <ul>
           <li>A) <samp>$HOME/cylc-run/</samp></li>
+
           <li>B) <samp>$TMPDIR/suite-run/</samp></li>
+
           <li>C) <samp>$DATADIR/suite-run/</samp></li>
+
           <li>D) <samp>$HOME/rose-suite-run/</samp></li>
         </ul>
 
-        <p class="answers"><em>Answer: <strong>A)</strong> <samp>$HOME/cylc-run/</samp></em></p>
+        <p class="answers"><em>Answer: <strong>A)</strong>
+        <samp>$HOME/cylc-run/</samp></em></p>
       </li>
-      
-      <li>Running the <code>rosie go</code> command:</li>
+
+      <li>Output for Rose suites is usually under:
+
         <ul>
           <li>A) starts a suite running using cylc run</li>
+
           <li>B) launches the output viewer</li>
+
           <li>C) sshes to a cylc server</li>
+
           <li>D) launches a discovery GUI</li>
         </ul>
 
-        <p class="answers"><em>Answer: <strong>D)</strong> launches a discovery GUI</em></p>
+        <p class="answers"><em>Answer: <strong>D)</strong> launches a discovery
+        GUI</em></p>
       </li>
-      
-      <li><code>rose edit</code> cannot:</li>
+
+      <li>Running the <code>rosie go</code> command:
+
         <ul>
           <li>A) commit changes to version control</li>
+
           <li>B) generate panels without metadata</li>
+
           <li>C) automatically fix trigger state errors</li>
+
           <li>D) load a single application by itself</li>
         </ul>
-        
-        <p class="answers"><em>Answer: <strong>A)</strong> commit changes to version control</em></p>     
+
+        <p class="answers"><em>Answer: <strong>A)</strong> commit changes to
+        version control</em></p>
       </li>
-      
-      <li><p>I have the following metadata for one of my inputs:</p>
-      <pre class="prettyprint lang-rose_conf">
+
+      <li><code>rose edit</code> cannot:</li>
+
+      <li>
+        <p>I have the following metadata for one of my inputs:</p>
+        <pre class="prettyprint lang-rose_conf">
 [namelist:foo=bar]
-fail-if = this > 0 and (all(namelist:foo=baz == 0))
+fail-if = this &gt; 0 and (all(namelist:foo=baz == 0))
 </pre>
 
-      <p>Which application configuration settings would cause the <samp>fail-if</samp>
-      checking to throw an error?</p>
+        <p>Which application configuration settings would cause the
+        <samp>fail-if</samp> checking to throw an error?</p>
+
         <ul>
           <li>A)
-          <pre class="prettyprint lang-rose_conf">
+            <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
 bar = 1
 baz = 0, 0
 </pre>
           </li>
+
           <li>B)
-          <pre class="prettyprint lang-rose_conf">
+            <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
 bar = 1
 </pre>
           </li>
+
           <li>C)
-          <pre class="prettyprint lang-rose_conf">
+            <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
 bar = 0
 baz = 1, 0
 </pre>
           </li>
+
           <li>D)
-          <pre class="prettyprint lang-rose_conf">
+            <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
 bar = 0
 baz = 1, 1
@@ -203,11 +257,13 @@ baz = 1, 1
           </li>
         </ul>
 
-        <p class="answers"><em>Answer: <strong>A)</strong> - it throws an error if the expression
-        evaluates true - i.e. <var>bar</var> > 0 <em>AND</em> all elements in <var>baz</var> are 0</em></p>
+        <p class="answers"><em>Answer: <strong>A)</strong> - it throws an error
+        if the expression evaluates true - i.e. <var>bar</var> &gt; 0
+        <em>AND</em> all elements in <var>baz</var> are 0</em></p>
       </li>
-      
-      <li><p>I have a flawed metadata file, that looks like this:</p>
+
+      <li>
+        <p>I have a flawed metadata file, that looks like this:</p>
         <pre class="prettyprint lang-rose_conf">
 [namelist:foo=bar]
 description=Bar, for controlling foo things.
@@ -221,209 +277,264 @@ type=integer
 values=-1, 2, 10
 warn-if=True
 </pre>
-      
-       <p>Which metadata option is redundant?</p>
-       <ul>
-         <li>A) <samp>description</samp></li>
-         <li>B) <samp>help</samp></li>
-         <li>C) <samp>type</samp></li>
-         <li>D) <samp>warn-if</samp></li>
-       </ul>
 
-        <p class="answers"><em>Answer: <strong>C)</strong> type - the <samp>values</samp> option
-        supersedes other value definition options such as <samp>type</samp>,
-        <samp>range</samp>, and <samp>pattern</samp></em></p>
-     </li>
-     
-     <li>
-       <p>Which metadata option will cause an error?</p>
-       <ul>
-         <li>A) <samp>description</samp></li>
-         <li>B) <samp>help</samp></li>
-         <li>C) <samp>trigger</samp></li>
-         <li>D) <samp>type</samp></li>
-       </ul>
-       
-        <p class="answers"><em>Answer: <strong>C)</strong> trigger - the option <samp>namelist:spam=eggs</samp>
-        is not defined in the metadata</em></p>
-     </li>
-     
-     <li>
-       <p>We're searching for suites using <code>rosie</code>. We want every suite
-       with <samp>Case Study</samp> in the title and where either the owner or the
-       commit author was <samp>bob</samp>, across revisions. What is the correct
-       command to run?</p>
-       
-       <ul>
-         <li>A) <code>rosie ls --title='Case Study' --username=bob --all</code></li>
-         <li>B) <code>rosie lookup --allrevs 'Case Study' bob</code></li>
-         <li>C) <code>rosie ls --all -Q 'Case Study' in title and 'bob' from \[author, owner\]</code></li>
-         <li>D) <code>rosie lookup --allrevs -Q title contains 'Case Study' and \( owner eq bob or author eq bob \)</code></li>
-       </ul>
+        <p>Which metadata option is redundant?</p>
 
-        <p class="answers"><em>Answer: <strong>D)</strong></em></p>     
-     </li>
-     
-     <li>
-       <p>Which metadata option best matches the following description?</p>
-       <pre>
+        <ul>
+          <li>A) <samp>description</samp></li>
+
+          <li>B) <samp>help</samp></li>
+
+          <li>C) <samp>type</samp></li>
+
+          <li>D) <samp>warn-if</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>C)</strong> type - the
+        <samp>values</samp> option supersedes other value definition options
+        such as <samp>type</samp>, <samp>range</samp>, and
+        <samp>pattern</samp></em></p>
+      </li>
+
+      <li>
+        <p>Which metadata option will cause an error?</p>
+
+        <ul>
+          <li>A) <samp>description</samp></li>
+
+          <li>B) <samp>help</samp></li>
+
+          <li>C) <samp>trigger</samp></li>
+
+          <li>D) <samp>type</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>C)</strong> trigger - the option
+        <samp>namelist:spam=eggs</samp> is not defined in the metadata</em></p>
+      </li>
+
+      <li>
+        <p>We're searching for suites using <code>rosie</code>. We want every
+        suite with <samp>Case Study</samp> in the title and where either the
+        owner or the commit author was <samp>bob</samp>, across revisions. What
+        is the correct command to run?</p>
+
+        <ul>
+          <li>A) <code>rosie ls --title='Case Study' --username=bob
+          --all</code></li>
+
+          <li>B) <code>rosie lookup --allrevs 'Case Study' bob</code></li>
+
+          <li>C) <code>rosie ls --all -Q 'Case Study' in title and 'bob' from
+          \[author, owner\]</code></li>
+
+          <li>D) <code>rosie lookup --allrevs -Q title contains 'Case Study'
+          and \( owner eq bob or author eq bob \)</code></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>D)</strong></em></p>
+      </li>
+
+      <li>
+        <p>Which metadata option best matches the following description?</p>
+        <pre>
 Used to order and group pages and variables in the config editor
 </pre>
-       <ul>
-         <li>A) <samp>duplicate</samp></li>
-         <li>B) <samp>range</samp></li>
-         <li>C) <samp>sort-key</samp></li>
-         <li>D) <samp>title</samp></li>
-       </ul>
 
-        <p class="answers"><em>Answer: <strong>C)</strong> <samp>sort-key</samp></em></p>
-     </li>
-     
-     <li>
-       <p>Which metadata option best matches the following description?</p>
-       <pre>
+        <ul>
+          <li>A) <samp>duplicate</samp></li>
+
+          <li>B) <samp>range</samp></li>
+
+          <li>C) <samp>sort-key</samp></li>
+
+          <li>D) <samp>title</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>C)</strong>
+        <samp>sort-key</samp></em></p>
+      </li>
+
+      <li>
+        <p>Which metadata option best matches the following description?</p>
+        <pre>
 Specify a regular expression that the value of the setting must match.
 </pre>
-       <ul>
-         <li>A) <samp>values</samp></li>
-         <li>B) <samp>fail-if</samp></li>
-         <li>C) <samp>range</samp></li>
-         <li>D) <samp>pattern</samp></li>
-       </ul>
-       
-       <p class="answers"><em>Answer: <strong>D)</strong> <samp>pattern</samp></em></p>
-     </li>
-     
-     <li>
-       <p>Which metadata option best matches the following description?</p>
-       <pre>
+
+        <ul>
+          <li>A) <samp>values</samp></li>
+
+          <li>B) <samp>fail-if</samp></li>
+
+          <li>C) <samp>range</samp></li>
+
+          <li>D) <samp>pattern</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>D)</strong>
+        <samp>pattern</samp></em></p>
+      </li>
+
+      <li>
+        <p>Which metadata option best matches the following description?</p>
+        <pre>
 If not present, the setting is assumed to be a scalar. A positive integer defines a fixed length array.
 A colon : defines a dynamic length array.
 </pre>
-       <ul>
-         <li>A) <samp>type</samp></li>
-         <li>B) <samp>length</samp></li>
-         <li>C) <samp>range</samp></li>
-         <li>D) <samp>values</samp></li>
-       </ul>
-       
-       <p class="answers"><em>Answer: <strong>B)</strong> <samp>length</stamp></em></p>
-     </li>
-     
-     <li>
-       <p>Task A runs if B succeeds and C fails. Which is the correct <samp>suite.rc</samp> graph
-       configuration entry?</p>
-       
-       <ul>
-         <li>A)
-         <pre class="prettyprint lang-cylc">
+
+        <ul>
+          <li>A) <samp>type</samp></li>
+
+          <li>B) <samp>length</samp></li>
+
+          <li>C) <samp>range</samp></li>
+
+          <li>D) <samp>values</samp></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>B)</strong>
+        <samp>length</samp></em></p>
+      </li>
+
+      <li>
+        <p><samp>Task A runs if B succeeds and C fails. Which is the correct
+        <samp>suite.rc</samp> graph configuration entry?</samp></p>
+
+        <ul>
+          <li>A)
+            <pre class="prettyprint lang-cylc">
         graph = """
-            A =&gt; B & C:fail
+            A =&gt; B &amp; C:fail
         """
 </pre>
-         </li>
-         <li>B) 
-         <pre class="prettyprint lang-cylc">
+          </li>
+
+          <li>B)
+            <pre class="prettyprint lang-cylc">
         graph = """
             B =&gt; C =&gt; A
         """
 </pre>
-         </li>
-         <li>C)
-         <pre class="prettyprint lang-cylc">
+          </li>
+
+          <li>C)
+            <pre class="prettyprint lang-cylc">
         graph = """
-            B & C:fail =&gt; A
+            B &amp; C:fail =&gt; A
         """
 </pre>
-         </li>
-         <li>D)
-         <pre class="prettyprint lang-cylc">
+          </li>
+
+          <li>D)
+            <pre class="prettyprint lang-cylc">
         graph = """
             B =&gt; A
             C:fail =&gt; A
         """
 </pre>
-         </li>
-       </ul>
-       
-       <p class="answers"><em>Answer: <strong>C)</strong> <samp>B & C:fail =&gt; A</samp></em></p>
+          </li>
+        </ul>
 
-     </li>
-     
-     <li>Which of the following is a valid cylc suicide trigger?</li>
-     
-     <ul>
-       <li>A)
-       <pre class="prettyprint lang-cylc">
+        <p class="answers"><em>Answer: <strong>C)</strong> <samp>B &amp; C:fail
+        =&gt; A</samp></em></p>
+
+        <ul>
+          <li>A)
+            <pre class="prettyprint lang-cylc">
       graph = """
           A:kill =&gt; B
       """
 </pre>
-       </li>
-       <li>B)
-       <pre class="prettyprint lang-cylc">
+          </li>
+
+          <li>B)
+            <pre class="prettyprint lang-cylc">
       graph = """
           A murders B
       """
 </pre>
-       </li>
-       <li>C)
-       <pre class="prettyprint lang-cylc">
+          </li>
+
+          <li>C)
+            <pre class="prettyprint lang-cylc">
       graph = """
           A =&gt; !B
       """
 </pre>
-       </li>
-       <li>D)
-       <pre class="prettyprint lang-cylc">
+          </li>
+
+          <li>D)
+            <pre class="prettyprint lang-cylc">
       graph = """
           A:fail =&gt; B
       """
 </pre>
-       </li>
-     </ul>
-    <p class="answers"><em>Answer: <strong>C)</strong> <samp>A =&gt; !B</samp></em></p>
-     </li>
-     
-     <li>Rose macros are used to:
-     
-       <ul>
-         <li>A) Run applications</li>
-         <li>B) Record and play actions in the config editor</li>
-         <li>C) Check and apply changes to Rose configurations</li>
-         <li>D) Remove the need for metadata configuration</li>
-       </ul>
+          </li>
+        </ul>
 
-       <p class="answers"><em>Answer: <strong>C)</strong> Check and apply changes to Rose configurations</em></p>
-     </li>
-     
-     <li>Which of the following Rose commands invokes an in-built <q>analysis engine</q>?
-       <ul>
-         <li>A) <code>rose mpi-launch</code></li>
-         <li>B) <code>rose macro</code></li>
-         <li>C) <code>rose ana</code></li>
-         <li>D) <code>rose suite-hook</code></li>
-       </ul>
-       
-       <p class="answers"><em>Answer: <strong>C)</strong> <code>rose ana</code></em></p>
-     </li>
-     
-     <li>The <samp>share/</samp> subdirectory in a suite's <samp>cylc-run/</samp> directory
-     is for:
-       <ul>
-         <li>A) any files that need to be shared between tasks</li>
-         <li>B) task working directories, e.g. containing Rose application namelists and other temporary files</li>
-         <li>C) task scripts and their output and error</li>
-         <li>D) the rose-suite.version file, which records any version control information about the suite, including any local modifications</li>
-       </ul>
+        <p class="answers"><em>Answer: <strong>C)</strong> <samp>A =&gt;
+        !B</samp></em></p>
+      </li>
 
-       <p class="answers"><em>Answer: <strong>A)</strong> any files that need to be shared between tasks</em></p>
-     </li>
-    </ul>
+      <li>Which of the following is a valid cylc suicide trigger?</li>
+
+      <li>Rose macros are used to:
+
+        <ul>
+          <li>A) Run applications</li>
+
+          <li>B) Record and play actions in the config editor</li>
+
+          <li>C) Check and apply changes to Rose configurations</li>
+
+          <li>D) Remove the need for metadata configuration</li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>C)</strong> Check and apply
+        changes to Rose configurations</em></p>
+      </li>
+
+      <li>Which of the following Rose commands invokes an in-built <q>analysis
+      engine</q>?
+
+        <ul>
+          <li>A) <code>rose mpi-launch</code></li>
+
+          <li>B) <code>rose macro</code></li>
+
+          <li>C) <code>rose ana</code></li>
+
+          <li>D) <code>rose suite-hook</code></li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>C)</strong> <code>rose
+        ana</code></em></p>
+
+      </li>
+
+      <li>The <samp>share/</samp> subdirectory in a suite's
+      <samp>cylc-run/</samp> directory is for:
+
+        <ul>
+          <li>A) any files that need to be shared between tasks</li>
+
+          <li>B) task working directories, e.g. containing Rose application
+          namelists and other temporary files</li>
+
+          <li>C) task scripts and their output and error</li>
+
+          <li>D) the rose-suite.version file, which records any version control
+          information about the suite, including any local modifications</li>
+        </ul>
+
+        <p class="answers"><em>Answer: <strong>A)</strong> any files that need
+        to be shared between tasks</em></p>
+      </li>
+    </ol>
     
-    <h2 id="answer">Answers</h2>
-    
-    <button id="toggleanswers">Click here to see the answers.</button>
+   <h2 id="answer">Answers</h2>
+   
+   <p>Click <button id="toggleanswers">here</button> to see the answers.</p>
   </div>
 </body>
 </html>
