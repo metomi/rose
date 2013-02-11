@@ -14,7 +14,8 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
-  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
@@ -25,6 +26,8 @@
 </script>
   <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
   <script type="text/javascript" src="rose-version.js">
@@ -34,14 +37,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.
-      <br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address>
 
@@ -130,8 +131,8 @@
       <h3>Disclaimer</h3>
 
       <p>The best reference for cylc is the <a href=
-      "http://cylc.github.com/cylc/html/single/cug-html.html">cylc User Guide</a> -
-      some of the following images are taken from there.</p>
+      "http://cylc.github.com/cylc/html/single/cug-html.html">cylc User
+      Guide</a> - some of the following images are taken from there.</p>
     </div>
 
     <div class="slide">
@@ -149,8 +150,8 @@
       "http://www.niwa.co.nz/">NIWA</a>. It runs their <a href=
       "http://ecoconnect.niwa.co.nz/">EcoConnect</a> operational
       suite.</p><img src=
-      "http://cylc.github.com/cylc/graphics/png/scaled/niwa-colour-small.png" alt=
-      "NIWA logo" />
+      "http://cylc.github.com/cylc/graphics/png/scaled/niwa-colour-small.png"
+      alt="NIWA logo" />
 
       <p>cylc was developed to provide a fast, automated way of scheduling
       tasks so that a suite could <em>catch up</em> after outages.</p>
@@ -194,8 +195,8 @@
     <h3 class="alwayshidden">single cycle</h3>
 
     <p>Task dependencies - single cycle</p><img src=
-    "http://cylc.github.com/cylc/graphics/png/scaled/dep-one-cycle.png"
-    width="40%" alt="single cycle dependencies" /></div>
+    "http://cylc.github.com/cylc/graphics/png/scaled/dep-one-cycle.png" width=
+    "40%" alt="single cycle dependencies" /></div>
 
     <div class="slide">
     <h3 class="alwayshidden">scheduling cycling tasks</h3>
@@ -210,8 +211,8 @@
     <p>A cycle isn't a prison - if tasks can run ahead of their cycle time,
     they should. The image shows how a traditional cycle-fixed scheduler
     operates (bottom) vs cylc (top).</p><img src=
-    "http://cylc.github.com/cylc/graphics/png/scaled/timeline-two.png"
-    width="50%" alt="optimal task scheduling" /></div>
+    "http://cylc.github.com/cylc/graphics/png/scaled/timeline-two.png" width=
+    "50%" alt="optimal task scheduling" /></div>
 
     <div class="slide">
       <h3>The suite.rc file</h3>
@@ -230,7 +231,7 @@
 
     <div class="slide">
       <h3>Hello World cylc suite</h3>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = """hello_world"""
@@ -263,7 +264,7 @@ default = echo 'Hello World'
 
       <p>We would then have to change the <samp>[runtime]</samp> section
       to:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
     [[hello_world]]
         command scripting = "rose task-run"
@@ -281,7 +282,7 @@ default = echo 'Hello World'
       <p><code>rose task-run</code> is reasonably generic, so we can put it as
       the suite default (<samp>[[root]]</samp>)<samp>command scripting</samp>
       by writing:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         command scripting = "rose task-run"
@@ -310,7 +311,7 @@ default = echo 'Hello World'
       <p>Here is a <samp>suite.rc</samp> <samp>[runtime]</samp> section snippet
       for a suite with two similar applications, <samp>hello_eris/</samp> and
       <samp>hello_pluto/</samp></p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         command scripting = "rose task-run"
@@ -328,7 +329,7 @@ default = echo 'Hello World'
       <h3 class="alwayshidden">Families and overrides</h3>
 
       <p>Overriding family settings can be done under a task section:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         command scripting = "rose task-run"
@@ -361,7 +362,7 @@ default = echo 'Hello World'
 
     <div class="slide">
       <h3 class="alwayshidden">Shared Applications example</h3>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         command scripting = "rose task-run"
@@ -389,7 +390,7 @@ default = echo 'Hello World'
       <p>Let's say <samp>hello_pluto</samp> must run and succeed before
       <samp>hello_eris</samp>. We can put this in our
       <samp>suite.rc</samp>:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "hello_pluto =&gt; hello_eris"
@@ -400,7 +401,7 @@ default = echo 'Hello World'
       <h3>Cycling Dependencies</h3>
 
       <p>We can make this run as a cycling suite, repeating every 12 hours:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     initial cycle time = 2013010500  # 00:00, 5/1/2013
     final cycle time = 2013010600    # 00:00, 6/1/2013
@@ -419,7 +420,7 @@ default = echo 'Hello World'
 
       <p>We could set <samp>hello_eris</samp> to run on a given host by setting
       <samp>[[remote]]</samp> section settings:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[hello_eris]]
         inherit = FAM_HELLO
         [[[environment]]]
@@ -438,7 +439,7 @@ default = echo 'Hello World'
       reduce duplication and provide some simple logic.</p>
 
       <p>We could then write:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[hello_eris]]
         inherit = FAM_HELLO
         [[[environment]]]
@@ -486,7 +487,7 @@ COMPUTE_HOST = "voyager_1"
       <p>Jinja2 can be used to collapse duplicated portions of configuration -
       for example, in an ensemble context. You can use <code>if</code> and
       <code>for</code> blocks, amongst other things:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 {%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
     [[hello_{{ WORLD }}]
         inherit = FAM_HELLO
@@ -500,7 +501,7 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Jinja2 blocks result</h3>
 
       <p>This gets expanded at runtime:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[hello_eris]
         inherit = FAM_HELLO
         [[[environment]]]
@@ -527,8 +528,8 @@ COMPUTE_HOST = "voyager_1"
       the Rose output viewer (more later) and report or shutdown on
       failure.</p>
 
-      <p>The following should be in every Rose suite:</p>
-      <pre>
+      <p><strong>The following should be in every Rose suite:</strong></p>
+      <pre class="prettyprint lang-cylc">
 [cylc]
     [[event hooks]]
         timeout handler = "rose suite-hook --mail --shutdown"
@@ -544,7 +545,7 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Hello World event hooks (continued)</h3>
 
       <p>Suites should also have task event hooks, along these lines:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         [[[event hooks]]]
@@ -568,7 +569,7 @@ COMPUTE_HOST = "voyager_1"
 
       <p>We may want to configure a job submission method, such as using
       <code>LoadLeveler</code> (spelling is theirs):</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[hello_eris]]
 ...
         [[[job submission]]]
@@ -581,7 +582,7 @@ COMPUTE_HOST = "voyager_1"
 
       <p>The job submission method may need configuration via
       <code>directives</code>:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[hello_eris]]
 ...
         [[[job submission]]]
@@ -621,7 +622,7 @@ COMPUTE_HOST = "voyager_1"
       <p>Let's look at the syntax for configuring task dependencies.</p>
 
       <p>To run a single task, A:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "A"
@@ -632,14 +633,14 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Dependency syntax A =&gt; B</h3>
 
       <p>If task B depends on task A's output to run:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "A =&gt; B"
 </pre>
 
       <p>If task C depends on both task A <em>and</em> task B:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "A &amp; B =&gt; C"
@@ -650,14 +651,14 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Dependency syntax A | B</h3>
 
       <p>If task C depends on <em>either</em> task A <em>or</em> task B:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "A | B =&gt; C"
 </pre>
 
       <p>If <em>both</em> task B <em>and</em> task C depend on task A:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "A =&gt; B &amp; C"
@@ -668,14 +669,14 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Dependency syntax B &amp; C</h3>
 
       <p>If task B only runs when task A <em>fails</em>:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "A:fail =&gt; B"
 </pre>
 
       <p>If task B runs after task A <em>starts</em>:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "A:start =&gt; B"
@@ -687,7 +688,7 @@ COMPUTE_HOST = "voyager_1"
 
       <p>In a cycling suite, with cycles every 6 hours, if task A depends on a
       previous cycle's task A finishing:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         [[[0, 6, 12, 18]]]
@@ -695,7 +696,7 @@ COMPUTE_HOST = "voyager_1"
 </pre>
 
       <p>If task B depends on the previous cycle's task A failing:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         [[[0, 6, 12, 18]]]
@@ -708,7 +709,7 @@ COMPUTE_HOST = "voyager_1"
 
       <p>If task D depends on either task A and task B finishing, together with
       task C:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "( A | B ) &amp; C =&gt; D"
@@ -716,7 +717,7 @@ COMPUTE_HOST = "voyager_1"
 
       <p>If task B is not needed when task A succeeds, it can be <samp>suicide
       triggered</samp>:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "A =&gt; !B"
@@ -727,8 +728,8 @@ COMPUTE_HOST = "voyager_1"
       <h3>Dependency Reference</h3>
 
       <p>Full details of dependency configuration are in the <a href=
-      "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user guide</a>,
-      including:</p>
+      "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user
+      guide</a>, including:</p>
 
       <ul class="incremental">
         <li>family triggers - triggers based on groups</li>
@@ -875,8 +876,8 @@ COMPUTE_HOST = "voyager_1"
       <h2 id="design">Suite Design</h2>
 
       <p>See <a href=
-      "http://cylc.github.com/cylc/html/single/cug-html.html#x1-16600014">cylc suite
-      design principles</a>.</p>
+      "http://cylc.github.com/cylc/html/single/cug-html.html#x1-16600014">cylc
+      suite design principles</a>.</p>
     </div>
 
     <div class="slide">
@@ -1028,8 +1029,8 @@ COMPUTE_HOST = "voyager_1"
         <li>Go through the <a href="rose-rug-suite-writing-tutorial.html">Suite
         Writing Tutorial</a>.</li>
 
-        <li>Have a look at some of the <a href=
-        "rose.html">Advanced Suite Tutorials</a>.</li>
+        <li>Have a look at some of the <a href="rose.html">Advanced Suite
+        Tutorials</a>.</li>
       </ul>
     </div>
   </div>
