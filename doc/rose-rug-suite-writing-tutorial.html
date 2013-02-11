@@ -617,8 +617,23 @@ touch suite.rc
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">suite.rc Empty Task Runtime</h3>
+
+      <p>We need a blank runtime section for <samp>fcm_make_navigate</samp> -
+      it doesn't need any extra configuration, beyond root.</p>
+      
+      <p>Add this at the end of the <samp>suite.rc</samp>
+      file:</p>
+      <pre class="prettyprint lang-cylc">
+    [[fcm_make_navigate]]
+</pre>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">suite.rc Runtime Environment</h3>
 
+      <p>We'll now add some runtime configuration for <samp>navigate</samp>.</p>
+      
       <p>Add these lines to the end of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[navigate]]
@@ -631,7 +646,7 @@ touch suite.rc
     <div class="slide">
       <h3 class="alwayshidden">suite.rc Runtime Results</h3>
 
-      <p>We've set the environment for the app <samp>navigate</samp>.
+      <p>This sets the environment for the app <samp>navigate</samp>.
       <var>POS_FPATH</var> is using an environment variable that cylc provides,
       <var>CYLC_SUITE_SHARE_PATH</var> to define the file path to the lat/long
       position file.</p>
@@ -679,7 +694,7 @@ touch suite.rc
     <div class="slide">
       <h3 class="alwayshidden">suite.rc Special Task Runtime</h3>
 
-      <p>Add these lines at the end of the <samp>suite.rc</samp>
+      <p>Finally, add these lines at the end of the <samp>suite.rc</samp>
       file:</p>
       <pre class="prettyprint lang-cylc">
     [[write_start_position]]
@@ -692,19 +707,6 @@ touch suite.rc
       file (pointed to via <samp>$POS_FPATH</samp>). Our start coordinates are
       <samp>50.0</samp> north, <samp>3.0</samp> west. You can change these to
       another location if you like.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">suite.rc Empty Task Runtime</h3>
-
-      <p>Finally, we need a blank runtime section for <samp>fcm_make_navigate</samp>,
-      or our suite validation will fail when we run <code>rose suite-run</code>.</p>
-      
-      <p>Add this at the end of the <samp>suite.rc</samp>
-      file:</p>
-      <pre>
-    [[fcm_make_navigate]]
-</pre>
     </div>
 
     <div class="slide">
