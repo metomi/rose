@@ -14,7 +14,8 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
-  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
@@ -25,6 +26,8 @@
 </script>
   <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
   <script type="text/javascript" src="rose-version.js">
@@ -34,14 +37,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.
-      <br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address>
 
@@ -117,7 +118,7 @@
       <h3 class="alwayshidden">dead_reckoning.f90</h3>
 
       <p>Our Fortran program is <a href=
-      "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>,
+      "etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>,
       which (pretends to) calculate the new position of our ship.</p>
 
       <p>Have a look at this file.</p>
@@ -214,7 +215,7 @@ mkdir src
 </pre>
 
       <p>Copy the source code from <a href=
-      "../etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>
+      "etc/rose-rug-suite-writing-tutorial/src/dead_reckoning.f90.html">dead_reckoning.f90</a>
       into a file called <samp>src/dead_reckoning.f90</samp>.</p>
     </div>
 
@@ -490,7 +491,7 @@ touch suite.rc
 
     <div class="slide">
       <h3 class="alwayshidden">suite.rc Contents</h3>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 #!jinja2
 [cylc]
     [[event hooks]]
@@ -540,7 +541,7 @@ touch suite.rc
       <h3 class="alwayshidden">suite.rc Content</h3>
 
       <p>Replace <samp>[scheduling]</samp> with the following lines:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     initial cycle time = 2013060100
     final cycle time   = 2013060300
@@ -619,7 +620,7 @@ touch suite.rc
       <h3 class="alwayshidden">suite.rc Runtime Environment</h3>
 
       <p>Add these lines to the end of the <samp>suite.rc</samp> file:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[navigate]]
         [[[environment]]]
             POS_FPATH = $CYLC_SUITE_SHARE_PATH/position
@@ -651,7 +652,7 @@ touch suite.rc
       <p>We'll add a task called <samp>write_start_position</samp>. Add it as a
       cold start task by replacing the <samp>cold-start =
       fcm_make_navigate</samp> line with:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
         cold-start = fcm_make_navigate, write_start_position
 </pre>
     </div>
@@ -660,12 +661,12 @@ touch suite.rc
       <h3 class="alwayshidden">suite.rc Special Task Dependency</h3>
 
       <p>Replace the</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
                fcm_make_navigate | navigate[T-3] =&gt; navigate
 </pre>
 
       <p>line with:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
                 write_start_position &amp; \
                 fcm_make_navigate | navigate[T-3] =&gt; navigate
 </pre>
@@ -680,7 +681,7 @@ touch suite.rc
 
       <p>Add these lines at the end of the <samp>suite.rc</samp>
       file:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[write_start_position]]
         command scripting = """
             echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position
@@ -710,7 +711,7 @@ touch suite.rc
       <h3>Checking the suite.rc</h3>
 
       <p>Your suite.rc should now look like <a href=
-      "../etc/rose-rug-suite-writing-tutorial/suite.rc.html">this</a>.</p>
+      "etc/rose-rug-suite-writing-tutorial/suite.rc.html">this</a>.</p>
     </div>
 
     <div class="slide">
@@ -793,7 +794,7 @@ rose suite-log-view
 
       <p>Add these lines below <samp>[[dependencies]]</samp> in your
       <samp>suite.rc</samp> file:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
         [[[ 12 ]]]
             graph = """
                 navigate =&gt; take_sun_sight
@@ -863,7 +864,7 @@ chmod +x bin/sun_sight
       <p>We need to reference this script explicitly in the
       <samp>suite.rc</samp> for our <samp>take_sun_sight</samp> task - append
       these lines to the file:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[take_sun_sight]]
         command scripting = "sun_sight $CYLC_SUITE_SHARE_PATH/position"
 </pre>
