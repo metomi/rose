@@ -603,6 +603,19 @@ touch suite.rc
     </div>
 
     <div class="slide">
+      <h3 id="empty-runtime">Runtime definitions</h3>
+      
+      <p>It's important to note that without runtime for each task,
+      our suite will fail validation in <code>rose suite-run</code>. This is
+      because <code>rose suite-run</code> uses strict cylc validation to make
+      sure the dependency tasks are actually the tasks you intended to run.</p>
+     
+      <p>You can switch this behaviour off by using the <samp>--no-strict</samp>
+      option. In this example, we'll just put in runtime sections for each task.</p>
+
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">suite.rc Runtime Environment</h3>
 
       <p>Add these lines to the end of the <samp>suite.rc</samp> file:</p>
@@ -665,7 +678,7 @@ touch suite.rc
     <div class="slide">
       <h3 class="alwayshidden">suite.rc Special Task Runtime</h3>
 
-      <p>Finally, add these lines at the end of the <samp>suite.rc</samp>
+      <p>Add these lines at the end of the <samp>suite.rc</samp>
       file:</p>
       <pre>
     [[write_start_position]]
@@ -678,6 +691,19 @@ touch suite.rc
       file (pointed to via <samp>$POS_FPATH</samp>). Our start coordinates are
       <samp>50.0</samp> north, <samp>3.0</samp> west. You can change these to
       another location if you like.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc Empty Task Runtime</h3>
+
+      <p>Finally, we need a blank runtime section for <samp>fcm_make_navigate</samp>,
+      or our suite validation will fail when we run <code>rose suite-run</code>.</p>
+      
+      <p>Add this at the end of the <samp>suite.rc</samp>
+      file:</p>
+      <pre>
+    [[fcm_make_navigate]]
+</pre>
     </div>
 
     <div class="slide">
