@@ -251,7 +251,7 @@ $(function() {
                 }
                 cell.append(task_id);
 
-                task_id_out = task_id.replace("%", ".");
+                var task_id_out = task_name + "." + cycle_time;
                 /* Column 2-3: name, cycle */
                 cell = $("<td/>").appendTo(row).text(task_name);
                 cell = $("<td/>").appendTo(row).text(cycle_time);
