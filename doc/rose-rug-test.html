@@ -24,18 +24,18 @@
   <script type="text/javascript" src="rose-version.js">
 </script>
   <script type="text/javascript">
-  $(document).ready(function() {
-    $(".answers").each(function(i, answer) {
+$(function() {
+    $(".answers").each(function() {
         $(this).hide();
     });
     $("#toggleanswers").click(function() {
         $("html").scrollTop(0);
-        $(".answers").each(function(i, answer) {
+        $(".answers").each(function() {
             $(this).show(1000);
         });
     });
-  });
-</script>
+});
+  </script>
 </head>
 
 <body>
@@ -165,18 +165,23 @@
 
         <p class="answers"><em>Answer: <strong>D)</strong> jinja2 templating
         and installing files</em></p>
-
       </li>
 
-      <li><code>rose edit</code> cannot:
+      <li>
+        <code>rose edit</code> cannot:
+
         <ul>
           <li>A) commit changes to version control</li>
+
           <li>B) generate panels without metadata</li>
+
           <li>C) automatically fix trigger state errors</li>
+
           <li>D) load a single application by itself</li>
         </ul>
-        
-        <p class="answers"><em>Answer: <strong>A)</strong> commit changes to version control</em></p>     
+
+        <p class="answers"><em>Answer: <strong>A)</strong> commit changes to
+        version control</em></p>
       </li>
 
       <li>
@@ -285,8 +290,8 @@ baz = 1, 1
 
         <p class="answers"><em>Answer: <strong>A)</strong> - it throws an error
         if the expression evaluates true - i.e. <var>bar</var> &gt; 0
-        <em>AND</em> all elements in <var>baz</var> are 0</em>. Missing options,
-        as in <strong>B</strong>, cause the check to be skipped.</p>
+        <em>AND</em> all elements in <var>baz</var> are 0</em>. Missing
+        options, as in <strong>B</strong>, cause the check to be skipped.</p>
       </li>
 
       <li>
@@ -357,7 +362,7 @@ warn-if=True
       </li>
 
       <li>Output for Rose suites is usually under:
-      
+
         <ul>
           <li>A) <samp>$HOME/cylc-run/</samp></li>
 
@@ -372,8 +377,8 @@ warn-if=True
         <samp>$HOME/cylc-run/</samp></em></p>
       </li>
 
-      <li>The <samp>share/</samp> subdirectory in a suite's
-      output directory is for:
+      <li>The <samp>share/</samp> subdirectory in a suite's output directory is
+      for:
 
         <ul>
           <li>A) any files that need to be shared between tasks</li>
@@ -392,7 +397,7 @@ warn-if=True
       </li>
 
       <li>Running the <code>rosie go</code> command:
-      
+
         <ul>
           <li>A) starts a suite running using cylc run</li>
 
@@ -473,6 +478,7 @@ warn-if=True
       </li>
 
       <li>Which of the following is a valid cylc suicide trigger?
+
         <ul>
           <li>A)
             <pre class="prettyprint lang-cylc">
@@ -526,13 +532,12 @@ warn-if=True
 
         <p class="answers"><em>Answer: <strong>C)</strong> <code>rose
         ana</code></em></p>
-
       </li>
     </ol>
-    
-   <h2 id="answer">Answers</h2>
-   
-   <p>Click <button id="toggleanswers">here</button> to see the answers.</p>
+
+    <h2 id="answer">Answers</h2>
+
+    <p>Click <button id="toggleanswers">here</button> to see the answers.</p>
   </div>
 </body>
 </html>
