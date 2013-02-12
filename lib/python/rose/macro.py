@@ -305,7 +305,7 @@ def load_meta_config(config, directory=None, error_handler=None):
     if error_handler is None:
         error_handler = _report_error
     meta_config = rose.config.ConfigNode()
-    meta_list = ['etc/metadata/all/' + rose.META_CONFIG_NAME]
+    meta_list = ['rose-all/' + rose.META_CONFIG_NAME]
     config_meta_path, warning = load_meta_path(config, directory)
     if warning is not None:
         error_handler(text=warning)
@@ -322,7 +322,7 @@ def load_meta_config(config, directory=None, error_handler=None):
             meta_path = locator.locate(meta_key)
         except rose.resource.ResourceError as e:
             if not ignore_meta_error:
-                error_handler(text=ERROR_LOAD_META_PATH.format(meta_path))
+                error_handler(text=ERROR_LOAD_META_PATH.format(meta_key))
         else:
             try:
                 meta_config = rose.config.load(meta_path, meta_config)
