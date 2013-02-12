@@ -100,10 +100,10 @@ class ConfigPage(gtk.VBox):
         self.scrolled_vbox.pack_start(self.main_container,
                                       expand=False, fill=True)
         self.scrolled_main_window.show()
+        self.main_vpaned = gtk.VPaned()
         self.info_panel = gtk.VBox(homogeneous=False)
         self.info_panel.show()
-        self.generate_page_info_widget()
-        self.pack_start(self.info_panel, expand=False, fill=False)
+        self.update_info()
         second_panel = None
         if self.namespace == self.config_name and self.directory is not None:
             self.generate_filesystem_panel()
@@ -111,17 +111,17 @@ class ConfigPage(gtk.VBox):
         elif self.sub_data is not None:
             self.generate_sub_data_panel()
             second_panel = self.sub_data_panel
-        if second_panel is None:
-            self.pack_start(self.scrolled_main_window, expand=True, fill=True)
-        else:
-            self.paned = gtk.VPaned()
-            self.paned.pack1(self.scrolled_main_window, resize=True,
-                             shrink=True)
-            self.paned.pack2(second_panel, resize=True, shrink=True)
-            if not self.panel_data:
-                self.paned.set_position(rose.config_editor.FILE_PANEL_EXPAND)
-            self.paned.show()
-            self.pack_start(self.paned, expand=True, fill=True)
+        self.vpaned = gtk.VPaned()
+        self.vpaned.pack1(self.scrolled_main_window, resize=True,
+                         shrink=True)
+        if second_panel is not None:
+            self.vpaned.pack2(second_panel, resize=False, shrink=True)
+        if not self.panel_data:
+            self.vpaned.set_position(rose.config_editor.FILE_PANEL_EXPAND)
+        self.vpaned.show()
+        self.main_vpaned.pack2(self.vpaned)
+        self.main_vpaned.show()
+        self.pack_start(self.main_vpaned, expand=True, fill=True)
         self.show()
         self.scroll_vadj = self.scrolled_main_window.get_vadjustment()
         self.scrolled_main_window.connect(
@@ -244,13 +244,6 @@ class ConfigPage(gtk.VBox):
     def reshuffle_for_detached(self, add_button, revert_button, parent):
         """Reshuffle widgets for detached view."""
         focus_child = getattr(self, 'focus_child')
-        if hasattr(self, "paned"):
-            self.remove(self.paned)
-        else:
-            self.remove(self.scrolled_main_window)
-        self.remove(self.info_panel)
-        if hasattr(self, 'tool_hbox'):
-            self.remove(self.tool_hbox)
         button_hbox = gtk.HBox(homogeneous=False, spacing=0)
         self.tool_hbox = gtk.HBox(homogeneous=False, spacing=0)
         sep = gtk.VSeparator()
@@ -295,11 +288,7 @@ class ConfigPage(gtk.VBox):
         self.tool_hbox.pack_start(label_box, expand=True, fill=True, padding=10)
         self.tool_hbox.show()
         self.pack_start(self.tool_hbox, expand=False, fill=False)
-        self.pack_start(self.info_panel, expand=False, fill=True)
-        if hasattr(self, "paned"):
-            self.pack_start(self.paned, expand=True, fill=True)
-        else:
-            self.pack_start(self.scrolled_main_window, expand=True, fill=True)
+        self.reorder_child(self.tool_hbox, 0)
         if isinstance(parent, gtk.Window):
             if parent.get_child() is not None:
                 parent.remove(parent.get_child())
@@ -330,13 +319,21 @@ class ConfigPage(gtk.VBox):
     def update_info(self):
         """Driver routine to update non-variable information."""
         self.generate_page_info_widget()
+        is_content = (self.info_panel.get_children() and
+                      self.info_panel.get_children()[0].get_children())
+        if self.info_panel in self.main_vpaned.get_children():
+            if not is_content:
+                self.main_vpaned.remove(self.info_panel)
+        elif is_content:
+            self.main_vpaned.pack1(self.info_panel)
 
     def generate_page_info_widget(self):
-        """Generates a widget giving information about sections."""
+        """Generate a widget giving information about sections."""
         info_container = gtk.VBox(homogeneous=False)
         info_container.show()
         button_list = []
         label_list = []
+        # No content warning, if applicable.
         if self.section is None and self.sub_data is None:
             info = rose.config_editor.PAGE_WARNING_NO_CONTENT
             tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
@@ -350,6 +347,7 @@ class ConfigPage(gtk.VBox):
             button_list.append(error_button)
             label_list.append(error_label)
         if self.section is not None and self.section.ignored_reason:
+            # This adds an ignored warning.
             info = rose.config_editor.PAGE_WARNING_IGNORED_SECTION.format(
                         self.section.name)
             tip = rose.config_editor.PAGE_WARNING_IGNORED_SECTION_TIP
@@ -364,6 +362,7 @@ class ConfigPage(gtk.VBox):
             label_list.append(error_label)
         elif (self.see_also == '' or
               rose.FILE_VAR_SOURCE not in self.see_also):
+            # This adds an 'orphaned' warning, only if the section is enabled.
             if (self.section is not None and 
                 self.section.name.startswith('namelist:')):
                 error_button = rose.gtk.util.CustomButton(
@@ -375,6 +374,7 @@ class ConfigPage(gtk.VBox):
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)
+        # This adds error notification for sections.
         for sect_data in self.sections:
             for err, info in sect_data.error.items():
                 error_button = rose.gtk.util.CustomButton(
@@ -395,15 +395,37 @@ class ConfigPage(gtk.VBox):
                                 padding=rose.config_editor.SPACING_SUB_PAGE)
             var_hbox.show()
             info_container.pack_start(var_hbox, expand=False, fill=True)
-        if button_list:
-            sep = gtk.HSeparator()
-            sep.show()
-            info_container.pack_end(
-                                sep, expand=True, fill=True,
+        # Add page help.
+        if self.help is not None:
+            help_expander = gtk.Expander(rose.config_editor.LABEL_PAGE_HELP)
+            help_label = rose.gtk.util.get_hyperlink_label(
+                                  self.help, search_func=self.search_for_id)
+            help_label_window = gtk.ScrolledWindow()
+            help_label_window.set_policy(gtk.POLICY_AUTOMATIC,
+                                         gtk.POLICY_AUTOMATIC)
+            help_label_hbox = gtk.HBox()
+            help_label_hbox.pack_start(help_label, expand=False, fill=False)
+            help_label_hbox.show()
+            help_label_window.add_with_viewport(help_label_hbox)
+            help_label_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
+            help_label_window.show()
+            help_expander.add(help_label_window)
+            width, height = help_label_window.size_request()
+            height = min([rose.config_editor.SIZE_WINDOW[1]/3, 
+                          help_label.size_request()[1]])
+            help_label_window.set_size_request(width, height)
+            help_expander.show()
+            help_hbox = gtk.HBox()
+            help_hbox.pack_start(help_expander, expand=True, fill=True,
+                                 padding=rose.config_editor.SPACING_SUB_PAGE)
+            help_hbox.set_tooltip_text(self.description)
+            help_hbox.show()
+            info_container.pack_start(
+                                help_hbox, expand=True, fill=True,
                                 padding=rose.config_editor.SPACING_SUB_PAGE)
         for child in self.info_panel.get_children():
             self.info_panel.remove(child)
-        self.info_panel.pack_start(info_container, expand=False, fill=True)
+        self.info_panel.pack_start(info_container, expand=True, fill=True)
 
     def generate_filesystem_panel(self):
         """Generate a widget to view the file hierarchy."""
@@ -412,11 +434,11 @@ class ConfigPage(gtk.VBox):
 
     def generate_sub_data_panel(self):
         """Generate a panel giving a summary of other page data."""
-        s_func = lambda i: self.variable_ops.search_for_var(self.namespace, i)
         self.sub_data_panel = rose.config_editor.panel.SummaryDataPanel(
                                           self.sub_data["sections"],
                                           self.sub_data["variables"],
-                                          s_func, self.is_duplicate)
+                                          self.search_for_id,
+                                          self.is_duplicate)
 
     def update_sub_data(self):
         """Update the sub (summary) data panel."""
@@ -918,6 +940,10 @@ class ConfigPage(gtk.VBox):
         if x_name == '' or y_name == '':
             return (x_name == '') - (y_name == '')
         return rose.config.sort_settings(x, y)
+
+    def search_for_id(self, id_):
+        """Launch a search for variable or section id."""
+        return self.variable_ops.search_for_var(self.namespace, id_)
 
     def trigger_update_status(self):
         """Connect this at a higher level to allow changed data signals."""
