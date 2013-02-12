@@ -258,15 +258,15 @@ class MainController(object):
         self.toolbar.set_widget_function(rose.config_editor.TOOLBAR_REVERT,
                                          self.revert_to_saved_data)
         custom_text = rose.config_editor.TOOLBAR_SUITE_RUN_MENU
-        run_button = rose.gtk.util.CustomMenuButton(
+        self._toolbar_run_button = rose.gtk.util.CustomMenuButton(
                           stock_id=gtk.STOCK_MEDIA_PLAY,
                           menu_items=[(custom_text, gtk.STOCK_MEDIA_PLAY)],
                           menu_funcs=[self.handle.get_run_suite_args],
                           tip_text=rose.config_editor.TOOLBAR_SUITE_RUN)
-        run_button.connect("clicked", self.handle.run_suite)
-        run_button.set_sensitive(
+        self._toolbar_run_button.connect("clicked", self.handle.run_suite)
+        self._toolbar_run_button.set_sensitive(
               any([c.is_top_level for c in self.data.config.values()]))
-        self.toolbar.insert(run_button, -1)
+        self.toolbar.insert(self._toolbar_run_button, -1)
         
         self.toolbar.set_widget_sensitive(
               rose.config_editor.TOOLBAR_SUITE_GCONTROL, 
@@ -1486,16 +1486,23 @@ class MainController(object):
             for v in config_data.vars.get_all(no_latent=True, save=True):
                 las_vars.append(v.to_hashable())
             if set(now_vars) ^ set(las_vars):
-                self.toolbar.set_widget_sensitive('Save', True)
-                self._get_menu_widget('/Save').set_sensitive(True)
+                self._alter_change_widget_sensitivity(is_changed=True)
                 break
             if self._namespace_data_is_modified(config_name):
-                self.toolbar.set_widget_sensitive('Save', True)
-                self._get_menu_widget('/Save').set_sensitive(True)
+                self._alter_change_widget_sensitivity(is_changed=True)
                 break
         else:
-            self.toolbar.set_widget_sensitive('Save', False)
-            self._get_menu_widget('/Save').set_sensitive(False)
+            self._alter_change_widget_sensitivity(is_changed=False)
+
+    def _alter_change_widget_sensitivity(self, is_changed=False):
+        # Alter sensitivity of 'unsaved changes' related widgets.
+        self.toolbar.set_widget_sensitive('Save', is_changed)
+        self._get_menu_widget('/Save').set_sensitive(is_changed)
+        self._toolbar_run_button.set_sensitive(not is_changed)
+        self._get_menu_widget('/Run Suite custom').set_sensitive(
+                                                       not is_changed)
+        self._get_menu_widget('/Run Suite default').set_sensitive(
+                                                        not is_changed)
 
     def _refresh_metadata_if_on(self):
         if not self.metadata_off:
