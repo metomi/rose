@@ -125,6 +125,8 @@ if __name__ == "__main__":
     update_thread.start()
     try:
         gtk.main()
+    except KeyboardInterrupt:
+        pass
     finally:
         stop_event.set()
         update_thread.join()
