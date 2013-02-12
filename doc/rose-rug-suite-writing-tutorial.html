@@ -604,8 +604,36 @@ touch suite.rc
     </div>
 
     <div class="slide">
+      <h3 id="empty-runtime">Runtime definitions</h3>
+      
+      <p>It's important to note that without runtime for each task,
+      our suite will fail validation in <code>rose suite-run</code>. This is
+      because <code>rose suite-run</code> uses strict cylc validation to make
+      sure the dependency tasks are actually the tasks you intended to run.</p>
+     
+      <p>You can switch this behaviour off by using the <samp>--no-strict</samp>
+      option. In this example, we'll just put in runtime sections for each task.</p>
+
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc Empty Task Runtime</h3>
+
+      <p>We need a blank runtime section for <samp>fcm_make_navigate</samp> -
+      it doesn't need any extra configuration, beyond root.</p>
+      
+      <p>Add this at the end of the <samp>suite.rc</samp>
+      file:</p>
+      <pre class="prettyprint lang-cylc">
+    [[fcm_make_navigate]]
+</pre>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">suite.rc Runtime Environment</h3>
 
+      <p>We'll now add some runtime configuration for <samp>navigate</samp>.</p>
+      
       <p>Add these lines to the end of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[navigate]]
@@ -618,7 +646,7 @@ touch suite.rc
     <div class="slide">
       <h3 class="alwayshidden">suite.rc Runtime Results</h3>
 
-      <p>We've set the environment for the app <samp>navigate</samp>.
+      <p>This sets the environment for the app <samp>navigate</samp>.
       <var>POS_FPATH</var> is using an environment variable that cylc provides,
       <var>CYLC_SUITE_SHARE_PATH</var> to define the file path to the lat/long
       position file.</p>
