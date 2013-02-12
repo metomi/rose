@@ -83,6 +83,7 @@ class MenuBar(object):
         <menuitem action="Flag optional"/>
       </menu>
       <menu action="Metadata">
+      <menuitem action="Reload metadata"/>
       <menuitem action="Switch off metadata"/>
       <separator name="sep_checking"/>
       <menuitem action="Extra checks"/>
@@ -162,6 +163,9 @@ class MenuBar(object):
                        rose.config_editor.TOP_MENU_PAGE_WEB_HELP),
                       ('Metadata', None,
                        rose.config_editor.TOP_MENU_METADATA),
+                      ('Reload metadata', gtk.STOCK_REFRESH,
+                       rose.config_editor.TOP_MENU_METADATA_REFRESH,
+                       rose.config_editor.ACCEL_METADATA_REFRESH),
                       ('All V', gtk.STOCK_DIALOG_QUESTION,
                        rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
                       ('Autofix', gtk.STOCK_CONVERT,

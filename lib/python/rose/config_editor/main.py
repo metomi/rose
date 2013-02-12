@@ -327,6 +327,8 @@ class MainController(object):
                       lambda m: self.handle.transform_default()),
                      ('/TopMenuBar/Metadata/Extra checks',
                       lambda m: self.handle.check_fail_rules()),
+                     ('/TopMenuBar/Metadata/Reload metadata',
+                      lambda m: self._refresh_metadata_if_on()),
                      ('/TopMenuBar/Metadata/Switch off metadata',
                       lambda m: self.refresh_metadata(m.get_active())),
                      ('/TopMenuBar/Tools/Run Suite/Run Suite default',
@@ -412,6 +414,8 @@ class MainController(object):
                         lambda: self.save_to_file(),
             rose.config_editor.ACCEL_QUIT:
                         lambda: self.handle.destroy(),
+            rose.config_editor.ACCEL_METADATA_REFRESH:
+                        lambda: self._refresh_metadata_if_on(),
             rose.config_editor.ACCEL_SUITE_RUN:
                         lambda: self.handle.run_suite(),
             rose.config_editor.ACCEL_BROWSER:
@@ -1493,9 +1497,15 @@ class MainController(object):
             self.toolbar.set_widget_sensitive('Save', False)
             self._get_menu_widget('/Save').set_sensitive(False)
 
+    def _refresh_metadata_if_on(self):
+        if not self.metadata_off:
+            self.refresh_metadata()
+
     def refresh_metadata(self, metadata_off=False, just_this_config=None):
         """Switch metadata on/off and reloads namespaces."""
         self.metadata_off = metadata_off
+        self._get_menu_widget('/Reload metadata').set_sensitive(
+                                                  not self.metadata_off)
         if just_this_config is None:
             configs = self.data.config.keys()
         else:
