@@ -14,11 +14,19 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -29,14 +37,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.
-      <br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address>
 
@@ -98,7 +104,7 @@
 
     <div class="slide">
       <h3 class="alwayshidden">Example Scheduling</h3>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = """
@@ -121,8 +127,9 @@
       <h3 class="alwayshidden">Runtime</h3>
 
       <p>We'll add some information in the <samp>[runtime]</samp> section:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
+    [[open_restaurant]]
     [[MAINS]]
     [[DESSERT]]
     [[steak1,steak2,pasta1,pasta2,pasta3,pizza1,pizza2,pizza3,pizza4]]
@@ -164,7 +171,7 @@ rose suite-run
       <h3 class="alwayshidden">Add queues</h3>
 
       <p>Replace the <samp>[scheduling]</samp> line with:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     [[queues]]
         [[[mains_chef_queue]]]

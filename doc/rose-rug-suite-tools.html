@@ -20,21 +20,20 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.
-      <br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address>
 
     <div class="rose-link">
-    <img id="rose-icon" src="rose-icon.png" alt="Rose" />
-    <p><a id="doc-home-link" href="." name="doc-home-link">Rose
-         Documentation</a></p>
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
     </div>
   </div>
 
@@ -91,8 +90,8 @@ rose UTIL [OPTS] [ARG ...]
     <h2 id="rose-suite-run">rose suite-run</h2>
 
     <p>Some aspects of the <code>rose suite-run</code> command has already been
-    discussed in <a href="rose-rug-brief-tour.html">A Brief Tour</a>. Here, we are
-    going to discuss some other features of the command.</p>
+    discussed in <a href="rose-rug-brief-tour.html">A Brief Tour</a>. Here, we
+    are going to discuss some other features of the command.</p>
 
     <p>See <a href="rose-command.html#rose-suite-run">Rose Reference Guide: CLI
     &gt; rose suite-run</a> for a full command reference.</p>
@@ -115,7 +114,7 @@ rose UTIL [OPTS] [ARG ...]
       should contain a list of space delimited keys.</li>
 
       <li>The <code>--opt-conf-key=KEY</code> or <code>-O KEY</code> option of
-      the <code>rose suite-run</code> command.</p>
+      the <code>rose suite-run</code> command.</li>
     </ol>
 
     <p>For each specified optional configuration, the content of its file is
@@ -205,11 +204,11 @@ rose task-run -D '[env]!BAZ='
     <h3 id="rose-task-run.opt">Optional Configuration Selection</h3>
 
     <p>If an application configuration is shared by a set of tasks, each
-    requiring a set of coordinated changes, the optional configurations may come
-    in handy. Optional configuration files are stored in the <var>opt/</var>
-    directory of an application configuration. Each file has a name that looks
-    like <var>opt/rose-app-KEY.conf</var>. One or more optional configurations
-    can be selected using:</p>
+    requiring a set of coordinated changes, the optional configurations may
+    come in handy. Optional configuration files are stored in the
+    <var>opt/</var> directory of an application configuration. Each file has a
+    name that looks like <var>opt/rose-app-KEY.conf</var>. One or more optional
+    configurations can be selected using:</p>
 
     <ol>
       <li>The <var>ROSE_APP_OPT_CONF_KEYS</var> environment variable, which
@@ -290,28 +289,30 @@ rose task-run -D '[env]!BAZ='
 
     <p><kbd>use-pwd=true</kbd>: By default, the application changes the working
     directory to <var>$ROSE_SUITE_DIR/share/$ROSE_TASK_NAME</var>. This option
-    will stop this, and the working directory is the normal working directory of
-    the task.</p>
+    will stop this, and the working directory is the normal working directory
+    of the task.</p>
 
     <p><kbd>opt.jobs=N</kbd> or the environment variable
     <var>ROSE_TASK_N_JOBS</var>: This can be used to control the number of
     processes <code>fcm make</code> would use in parallel. (default=4)</p>
 
-    <p><kbd>opts</kbd> or the environment variable <var>ROSE_TASK_OPTIONS</var>:
-    This can be used to pass extra options to the <code>fcm make</code>
-    command.</p>
+    <p><kbd>opts</kbd> or the environment variable
+    <var>ROSE_TASK_OPTIONS</var>: This can be used to pass extra options to the
+    <code>fcm make</code> command.</p>
 
     <h3 id="rose-task-run.util.rose_ana">Task Utility: rose_ana</h3>
-    <p>This built-in task utility runs <code>rose-ana</code>, the Rose comparison
-    engine. This compares files against each other using a configurable method and
-    reports whether the files differ or not.</p>
+
+    <p>This built-in task utility runs <code>rose-ana</code>, the Rose
+    comparison engine. This compares files against each other using a
+    configurable method and reports whether the files differ or not.</p>
 
     <p>In automatic task utility selection mode, this utility will be invoked
-    automatically if a task has a name that starts with <code>rose_ana*</code>.</p>
+    automatically if a task has a name that starts with
+    <code>rose_ana*</code>.</p>
 
     <p>The utility will search the <code>comparisons</code> subdirectory of the
-    Rose installation for built-in comparisons, and further directories to search
-    can be specified in the <code>rose.conf</code> file using the
+    Rose installation for built-in comparisons, and further directories to
+    search can be specified in the <code>rose.conf</code> file using the
     <var>method-path</var> variable in the <var>[rose-ana]</var> section.</p>
 
     <h2 id="rose-task-env">rose task-env</h2>
@@ -373,12 +374,12 @@ eval $(rose task-env)
       <dt>rose suite-gcontrol</dt>
 
       <dd>
-        <p>A convenient way to launch <code>cylc gui</code>. In the
-        absence of arguments, the command assumes that base name of the current
-        directory is the name of the suite you want to launch <code>cylc
-        gui</code> on. If your suite is running on a dedicated suite host
-        as specified by the Rose site/user configuration, it will automatically
-        connect to the suite at the correct host.</p>
+        <p>A convenient way to launch <code>cylc gui</code>. In the absence of
+        arguments, the command assumes that base name of the current directory
+        is the name of the suite you want to launch <code>cylc gui</code> on.
+        If your suite is running on a dedicated suite host as specified by the
+        Rose site/user configuration, it will automatically connect to the
+        suite at the correct host.</p>
 
         <p>See <a href="rose-command.html#rose-suite-gcontrol">Rose Reference
         Guide: CLI &gt; rose suite-gcontrol</a> for more information.</p>
@@ -398,8 +399,8 @@ eval $(rose task-env)
       <dt>rose suite-shutdown</dt>
 
       <dd>
-        <p>A convenient way to run <code>cylc shutdown</code>. In the
-        absence of arguments, the command assumes that base name of the current
+        <p>A convenient way to run <code>cylc shutdown</code>. In the absence
+        of arguments, the command assumes that base name of the current
         directory is the name of the suite you want to run <code>cylc
         shutdown</code> on. If your suite is running on a dedicated suite host
         as specified by the Rose site/user configuration, it will automatically

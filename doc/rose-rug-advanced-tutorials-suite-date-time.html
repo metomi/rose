@@ -14,11 +14,19 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -29,14 +37,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.
-      <br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address>
 
@@ -90,7 +96,7 @@
       new directory somewhere - e.g. in your homespace) containing a blank
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like <a href=
-      "../etc/rose-rug-advanced-tutorials-suite-date-time/suite.rc.html">this</a>.</p>
+      "etc/rose-rug-advanced-tutorials-suite-date-time/suite.rc.html">this</a>.</p>
     </div>
 
     <div class="slide">
@@ -119,11 +125,37 @@
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Startup</h3>
+
+      <p>We need a special <q>cold start</q> task (<samp>startup</samp>). This
+      sets our initial gate number - put this in the runtime section of the
+      <samp>suite.rc</samp> file:</p>
+      <pre class="prettyprint lang-cylc">
+    [[startup]]
+        environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
+        command scripting = """
+            GATE="A"$((RANDOM%3))
+            echo "GATE=$GATE" &gt; $ROSE_DATACT12H/flight_gate
+            cylc task message "Starting gate: $GATE"
+            sleep 5
+         """
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Startup Explanation</h3>
+
+      <p>This <samp>flight_gate</samp> file will be sourceable by tasks that
+      need the <var>GATE</var> number.</p>
+    </div>
+
+    <div class="slide">
       <h3>Boarding</h3>
 
-      <p>The gate for boarding the flight is the same as the last flight's
-      arrival gate (the aircraft doesn't move). We'd like to tell passengers
-      which gate to board at in the <samp>boarding</samp> task.</p>
+      <p>We'd like to tell passengers which gate to board at in the
+      <samp>boarding</samp> task. The gate was output to a file by
+      <samp>startup</samp>, for the first cycle, and by
+      <samp>assign_gate</samp> thereafter.</p>
 
       <p>This means that this task has to read the <samp>flight_gates</samp>
       file from the last cycle's data directory.</p>
@@ -138,7 +170,7 @@
       <p>We need to use the same <samp>environment scripting</samp> option, but
       with a <samp>--cycle-offset=12H</samp> option - add this to your runtime
       section:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[boarding]]
         environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
 </pre>
@@ -152,7 +184,7 @@
 
       <p>We can now refer to this in boarding's <samp>command scripting</samp>
       - add:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
         command scripting = """
             . $ROSE_DATACT12H/flight_gate
             cylc task message "Now boarding at Gate $GATE"
@@ -180,7 +212,7 @@
 
       <p>Replace the boarding <samp>command scripting</samp> triple-quoted
       block with:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
         command scripting = """
             . $ROSE_DATACT12H/flight_gate
             FLIGHT_TIME=$(rose date --print-format="%H:%M" $CYLC_TASK_CYCLE_TIME)
@@ -198,19 +230,6 @@
       <p>We've used the <samp>--print-format</samp> option to <code>rose
       date</code> to change the format of the date and time into something
       simple.</p>
-
-      <p>The suite won't run correctly until we setup our cold start task
-      properly - add the following to your runtime section:</p>
-      <pre>
-    [[startup]]
-        environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
-        command scripting = """
-            GATE="A"$((RANDOM%3))
-            echo "flight gate: $GATE" &gt; $ROSE_DATACT12H/flight_gate
-            cylc task message "Starting gate: $GATE"
-            sleep 5
-         """
-</pre>
     </div>
 
     <div class="slide">
@@ -235,7 +254,7 @@
 
     <div class="slide">
       <h3 class="alwayshidden">Example</h3>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     [[departure]]
         command scripting = """
             NOW=$(rose date --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
@@ -262,8 +281,9 @@
 
         <li><a href="rose-command.html#rose-date">rose date</a></li>
 
-        <li>the <a href="http://cylc.github.com/cylc/html/single/cug-html.html">cylc
-        user guide</a>.</li>
+        <li>the <a href=
+        "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user
+        guide</a>.</li>
       </ul>
     </div>
   </div>

@@ -251,6 +251,7 @@ $(function() {
                 }
                 cell.append(task_id);
 
+                var task_id_out = task_name + "." + cycle_time;
                 /* Column 2-3: name, cycle */
                 cell = $("<td/>").appendTo(row).text(task_name);
                 cell = $("<td/>").appendTo(row).text(cycle_time);
@@ -308,12 +309,11 @@ $(function() {
                 }
 
                 /* Column 11, 12, 13: stdout file, stderr file, job script */
-                var FTS = submit_data["files_time_stamp"];
                 var task_files = submit_data["files"];
                 $.each(["out", "err", "script"], function(i, name) {
                     cell = $("<td/>").appendTo(row);
                     if (task_files[name] != null) {
-                        var file = "job/" + task_id + "-" + FTS;
+                        var file = "job/" + task_id_out + "." + (submit_num + 1);
                         if (name != "script") {
                             file += "." + name;
                         }
@@ -378,7 +378,7 @@ $(function() {
                     if (name in indexed_files_data_map) {
                         var d = indexed_files_data_map[name];
                         var select = $("<select/>").appendTo(cell);
-                        var root = "job/" + task_id + "-" + FTS + ".";
+                        var root = "job/" + task_id_out + "." +  (submit_num + 1) + ".";
                         var option = $("<option/>");
                         option.attr("selected", "selected");
                         option.attr("value", "");
@@ -411,7 +411,7 @@ $(function() {
                             cell.append(span);
                         }
                         else {
-                            var file = "job/" + task_id + "-" + FTS + "." + name;
+                            var file = "job/" + task_id_out + "." + (submit_num + 1) + "." + name;
                             var anchor = $("<a/>");
                             anchor.attr("title", n_bytes.toString() + " byte(s)");
                             if (name.match(/\.html$/)) {

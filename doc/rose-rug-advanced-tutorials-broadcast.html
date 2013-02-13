@@ -14,11 +14,19 @@
   "screen" id="outlineStyle" />
   <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
   id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <script src="S5/slides.js" type="text/javascript">
 </script>
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -29,14 +37,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.
-      <br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address>
 
@@ -96,7 +102,7 @@
       new directory somewhere - e.g. in your homespace) containing a blank
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [scheduling]
     initial cycle time = 2013010100
     final cycle time = 2013010500
@@ -123,7 +129,7 @@
       <h3 class="alwayshidden">Runtime</h3>
 
       <p>It will need some runtime - add:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         [[[event hooks]]]
@@ -143,7 +149,7 @@
 
       <p>We need to set up the <samp>startup</samp> task now - replace
       <samp>[runtime]</samp> with:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
 [runtime]
     [[startup]]
         command scripting = """
@@ -193,9 +199,9 @@ rose suite-log-view
       <p>You can also run <code>cylc broadcast</code> from the command
       line.</p>
 
-      <p>Remove the <samp>startup</samp> task runtime. Get rid of:</p>
-      <pre>
-    [[startup]]
+      <p>Remove the <samp>startup</samp> task command scripting. Get rid
+      of:</p>
+      <pre class="prettyprint lang-cylc">
         command scripting = """
             cylc broadcast -t 2013010200 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
             cylc broadcast -t 2013010400 -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
@@ -209,7 +215,7 @@ rose suite-log-view
 
       <p>We should make the suite run a bit longer by increasing <samp>final
       cycle time</samp>:</p>
-      <pre>
+      <pre class="prettyprint lang-cylc">
     final cycle time = 2013012500
 </pre>
     </div>

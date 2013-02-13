@@ -80,7 +80,7 @@ class SplashScreenUpdaterThread(threading.Thread):
     def run(self):
         """Loop over time and wait for stdin lines."""
         gobject.timeout_add(1000, self._check_splash_screen_alive)
-        while not stop_event.is_set():
+        while not self.stop_event.is_set():
             time.sleep(0.005)
             if self.stop_event.is_set():
                 return False
@@ -99,7 +99,11 @@ class SplashScreenUpdaterThread(threading.Thread):
 
     def _stop(self):
         self.stop_event.set()
-        gtk.main_quit()
+        try:
+            gtk.main_quit()
+        except RuntimeError:
+            # This can result from gtk having already quit.
+            pass
 
     def _check_splash_screen_alive(self):
         """Check whether the splash screen is finished."""
@@ -121,6 +125,8 @@ if __name__ == "__main__":
     update_thread.start()
     try:
         gtk.main()
+    except KeyboardInterrupt:
+        pass
     finally:
         stop_event.set()
         update_thread.join()
