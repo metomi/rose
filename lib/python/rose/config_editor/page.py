@@ -319,12 +319,12 @@ class ConfigPage(gtk.VBox):
     def update_info(self):
         """Driver routine to update non-variable information."""
         self.generate_page_info_widget()
-        is_content = (self.info_panel.get_children() and
-                      self.info_panel.get_children()[0].get_children())
+        has_content = (self.info_panel.get_children() and
+                       self.info_panel.get_children()[0].get_children())
         if self.info_panel in self.main_vpaned.get_children():
-            if not is_content:
+            if not has_content:
                 self.main_vpaned.remove(self.info_panel)
-        elif is_content:
+        elif has_content:
             self.main_vpaned.pack1(self.info_panel)
 
     def generate_page_info_widget(self):
@@ -411,7 +411,7 @@ class ConfigPage(gtk.VBox):
             help_label_window.show()
             help_expander.add(help_label_window)
             width, height = help_label_window.size_request()
-            height = min([rose.config_editor.SIZE_WINDOW[1]/3, 
+            height = min([rose.config_editor.SIZE_WINDOW[1] / 3, 
                           help_label.size_request()[1]])
             help_label_window.set_size_request(width, height)
             help_expander.show()
