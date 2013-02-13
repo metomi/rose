@@ -96,7 +96,7 @@ class SuiteControl(object):
         else:
             conf = ResourceLocator.default().get_conf()
             node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
-            host = None
+            hosts = None
             if node is not None:
                 hosts = self.suite_engine_proc.ping(
                         suite_name,
