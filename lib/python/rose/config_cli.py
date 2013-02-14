@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -30,11 +30,15 @@ import os
 import sys
 
 
-class NoMetadata(Event):
+class MetadataNotFoundEvent(Event):
+
+    """Warn when there is no metadata."""
+
     LEVEL = Event.WARN
     TYPE = Event.TYPE_ERR
+
     def __str__(self):
-        return self.args[0]
+        return "%s: metadata not found" % str(self.args[0])
 
 
 def get_meta_path(root_node, rel_path=None, meta_key=False):
@@ -56,7 +60,7 @@ def main():
     """Implement the "rose config" command."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("default", "env_var_process_mode", "files",
-                              "keys", "no_ignore", "meta", "meta_key")
+                              "keys", "meta", "meta_key", "no_ignore", "no_opts")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -65,44 +69,54 @@ def main():
 
     if opts.meta_key:
         opts.meta = True
-    
+
     if opts.files and opts.meta_key:
-        sys.exit("Cannot specify both a file and meta key.")
-        
-    try:
-        if opts.files:
-            root_node = ConfigNode()
-            for fname in opts.files:
-                if fname == "-":
-                    ConfigLoader()(sys.stdin, root_node)
-                    sys.stdin.close()
-                else:
-                    if opts.meta:
-                        rel_path = os.sep.join(fname.split(os.sep)[:-1])
-                        fpath = get_meta_path(root_node, rel_path)
-                        if fpath is None:
-                            msg = "No metadata found for %s.\n" % str(fname)
-                            report(NoMetadata(msg))
-                        else:
-                            ConfigLoader()(fpath, root_node)
-                    else:
-                        ConfigLoader()(fname, root_node)
-        else:
-            if opts.meta:
-                root_node = ConfigNode()
-                if opts.meta_key:
-                    root_node.set(["meta"], opts.meta_key)
-                fpath = get_meta_path(root_node, meta_key=opts.meta_key)  
-                root_node.unset(["meta"])
-                if fpath is None:
-                    sys.exit("No metadata found.")
-                else:
-                    ConfigLoader()(fpath, root_node)
+        report(Exception("Cannot specify both a file and meta key."))
+        sys.exit(1)
+
+    sources = []
+    if opts.files:
+        root_node = ConfigNode()
+        for fname in opts.files:
+            if fname == "-":
+                sources.append(sys.stdin)
             else:
-                root_node = ResourceLocator.default().get_conf()
-            
-    except ConfigSyntaxError as e:
-        sys.exit(repr(e))
+                if opts.meta:
+                    rel_path = os.sep.join(fname.split(os.sep)[:-1])
+                    fpath = get_meta_path(root_node, rel_path)
+                    if fpath is None:
+                        report(MetadataNotFoundEvent(fname))
+                    else:
+                        sources.append(fpath)
+                else:
+                    sources.append(fname)
+    elif opts.meta:
+        root_node = ConfigNode()
+        if opts.meta_key:
+            root_node.set(["meta"], opts.meta_key)
+        fpath = get_meta_path(root_node, meta_key=opts.meta_key)
+        root_node.unset(["meta"])
+        if fpath is None:
+            report(Exception("Metadata not found"))
+            sys.exit(1)
+        else:
+            sources.append(fpath)
+    else:
+        root_node = ResourceLocator.default().get_conf()
+
+    config_loader = ConfigLoader()
+    for source in sources:
+        try:
+            if opts.meta or opts.no_opts:
+                config_loader.load(source, root_node)
+            else:
+                config_loader.load_with_opts(source, root_node)
+        except ConfigSyntaxError as e:
+            report(e)
+            sys.exit(1)
+        if source is sys.stdin:
+            source.close()
+
     if opts.quietness:
         if root_node.get(args, opts.no_ignore) is None:
             sys.exit(1)

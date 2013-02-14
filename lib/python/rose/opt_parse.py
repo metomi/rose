@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ from rose.resource import ResourceLocator
 class RoseOptionParser(OptionParser):
 
     """Option parser base class for Rose command utilities.
-    
+
     Warning: do not use a list or dict as a default.
 
     """
@@ -255,7 +255,7 @@ class RoseOptionParser(OptionParser):
                        ["--next"],
                        {"action": "store_true",
                         "help": "Print the next available ID in the " +
-                                "repository"}],
+                                "repository."}],
                "non_interactive": [
                        ["--non-interactive", "--yes", "-y"],
                        {"action": "store_true",
@@ -265,7 +265,12 @@ class RoseOptionParser(OptionParser):
                        ["--print-ignored", "-i"],
                        {"action": "store_false",
                         "dest": "no_ignore",
-                        "help": "print ignored settings where relevant"}],
+                        "help": "Print ignored settings where relevant."}],
+               "no_opts": [
+                       ["--no-opts"],
+                       {"action": "store_true",
+                        "dest": "no_opts",
+                        "help": "Do not load optional configurations."}],
                "no_overwrite_mode": [
                        ["--no-overwrite"],
                        {"action": "store_true",
@@ -322,7 +327,7 @@ class RoseOptionParser(OptionParser):
                        ["--query", "-Q"],
                        {"action": "store_true",
                         "default": False,
-                        "help": "Run a suite query."}],                  
+                        "help": "Run a suite query."}],
                "quietness": [
                        ["--quiet", "-q"],
                        {"action": "count",
@@ -410,15 +415,15 @@ class RoseOptionParser(OptionParser):
                         "help": "Convert ID to to the local copy path"}],
                "to_origin": [
                        ["--to-origin"],
-                       {"action": "store_true", 
+                       {"action": "store_true",
                         "help": "Convert ID to the origin URL"}],
                "to_output": [
                        ["--to-output"],
-                       {"action": "store_true", 
+                       {"action": "store_true",
                         "help": "Get the ID output directory"}],
                "to_web": [
                        ["--to-web"],
-                       {"action": "store_true", 
+                       {"action": "store_true",
                         "help": "Convert ID to the web source URL"}],
                "unbound": [
                        ["--unbound", "--undef"],
@@ -434,7 +439,7 @@ class RoseOptionParser(OptionParser):
                        ["--url", "-U"],
                        {"action": "store_true",
                         "default": False,
-                        "help": "Use search url"}],                        
+                        "help": "Use search url"}],
                "validate_all": [
                        ["--validate", "-V"],
                        {"action": "store_true",
