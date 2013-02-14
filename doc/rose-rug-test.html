@@ -14,6 +14,14 @@
   <link rel="stylesheet" type="text/css" href=
   "google-code-prettify/prettify.css" />
   <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+   <style type="text/css">
+.ok {
+    color:green;
+}
+.bad {
+    color:red;
+}
+</style>
   <script type="text/javascript" src="jquery.min.js">
 </script>
   <script type="text/javascript" src="jquery.min.js">
@@ -30,12 +38,14 @@
 //<![CDATA[
   $(function() {
     $(".answers").hide();
-    $(".answer-statuses").hide();
     $("#toggleanswers").click(function() {
         $("html").scrollTop(0);
         $(".answers").show(1000);
     });
     $("#submitbutton").click(function() {
+        $(".answerstatus").remove();
+        $(".results").hide();
+        $(".resultinfo").remove();
         var names = [];
         var user_answers = new Array();
         var correct_answers = new Array();
@@ -58,8 +68,6 @@
                 user_answers[input_name].push(answer.val());
             }
             correct_answer = $("#" + input_name + " .answers").attr("class").replace("answers ", "");
-            correct_input = $("input[name='" + input_name + "'][type='radio'][value='" + correct_answer + "']");
-            alert(correct_input.length + correct_input.attr("name"));
             correct_answers[input_name].push(correct_answer);
         });
         /* Missing answer checking */
@@ -68,29 +76,44 @@
             return false;
         }
         /* Correct answer checking */
+        var good_answers = 0;
+        var bad_answers = 0;
         $.each(names, function(i, input_name) {
             user_answers[input_name].sort();
             correct_answers[input_name].sort();
             if (user_answers[input_name].join("") ==
                 correct_answers[input_name].join("")) {
-                $("#" + input_name).append("<p class='result'><strong style='color:green'>Correct<\/strong><\/p>").show();
+                $("#" + input_name + " .answers").html("<span class='answerstatus'><strong class='ok'>Correct</strong></span>");
+                good_answers += 1;
             }
             else {
-                $("#" + input_name).append("<p class='result'><strong style='color:red'>Wrong<\/strong><\/p>").show();
+                $("#" + input_name + " .answers").prepend("<span class='answerstatus'><strong class='bad'>Answer:</strong> </span>");
+                bad_answers += 1;
             }
-        }); 
-        $(".answers").show(500);
-        $(".answer-statuses").show(500);
+        });
+        $("#results").append("<h2 id='results' class='resultinfo'>Results</h3>" +
+                             "<p class='resultinfo'>You got " + good_answers +
+                             " answers correct, and " + bad_answers + " wrong.</p>");
+        $("html, body").animate({
+            scrollTop: $("#results").offset().top,
+        }, {
+            "duration": 500,
+            "complete": function() {
+                 $(".answers").show(500);
+            },
+        });
+        $("#submitbutton").remove();
+        $("#answer").remove();
         return false;
     });
     $(".questions").each(function() {
         var question_id = $(this).attr("id");
         $(this).children("input").each(function() {
             $(this).attr("name", question_id);
-            $(this).attr("id", question_id + this.attr("value"));
+            $(this).attr("id", question_id + $(this).attr("value"));
         });
         $(this).children("label").each(function() {
-            $(this).attr("for", question_id + this.attr("for"));
+            $(this).attr("for", question_id + $(this).attr("for"));
         });
     });
   });
@@ -124,6 +147,8 @@
 
     <p>You should be familiar with all the content in the Rose User Guide.</p>
 
+    <div id="results"></div>
+
     <h2 id="questions">Questions</h2>
 
     <form id="qform">
@@ -131,6 +156,7 @@
         <li>Rose is:
 
           <div id="rose-is" class="questions">
+          
             <input type="radio" value="A" /><label for="A">a framework for
             growing roses outside scientific institutions</label><br />
             <input type="radio" value="B" /><label for="B">a framework for
@@ -140,8 +166,8 @@
             applications</label><br />
             <input type="radio" value="D" /><label for="D">a framework for
             developing web applications</label><br />
-
-            <p class="answers C"><em>Answer: A framework for managing and
+                
+            <p class="answers C"><em>a framework for managing and
             running suites of scientific applications</em></p>
           </div>
         </li>
@@ -149,6 +175,7 @@
         <li>cylc is:
 
           <div id="cylc-is" class="questions">
+          
             <input type="radio" value="A" /><label for="A">a washing machine
             program</label><br />
             <input type="radio" value="B" /><label for="B">a workload
@@ -157,8 +184,9 @@
             configuring Rose applications</label><br />
             <input type="radio" value="D" /><label for="D">a suite
             engine</label><br />
-
-            <p class="answers D"><em>Answer: a suite engine</em></p>
+            
+            <p class="answers D"><em>a suite engine</em></p>
+          
           </div>
         </li>
 
@@ -174,7 +202,7 @@
             <input type="radio" value="D" /><label for=
             "D"><samp>~/.met-um/rose.rc</samp></label><br />
 
-            <p class="answers A"><em>Answer:
+            <p class="answers A"><em>
             <samp>~/.metomi/rose.conf</samp></em></p>
           </div>
         </li>
@@ -191,7 +219,7 @@
             <input type="radio" value="D" /><label for="D"><code>rosie
             suite-create</code></label><br />
 
-            <p class="answers B"><em>Answer: <code>rosie create</code></em></p>
+            <p class="answers B"><em><code>rosie create</code></em></p>
           </div>
         </li>
 
@@ -208,7 +236,7 @@
             <input type="radio" value="D" /><label for=
             "D"><samp>etc/</samp></label><br />
 
-            <p class="answers B"><em>Answer: <samp>app/</samp></em></p>
+            <p class="answers B"><em><samp>app/</samp></em></p>
           </div>
         </li>
 
@@ -225,7 +253,7 @@
             <input type="radio" value="D" /><label for="D">jinja2 templating
             and installing files</label><br />
 
-            <p class="answers D"><em>Answer: jinja2 templating and installing
+            <p class="answers D"><em>jinja2 templating and installing
             files</em></p>
           </div>
         </li>
@@ -243,7 +271,7 @@
             <input type="radio" value="D" /><label for="D">load a single
             application by itself</label><br />
 
-            <p class="answers A"><em>Answer: commit changes to version
+            <p class="answers A"><em>commit changes to version
             control</em></p>
           </div>
         </li>
@@ -264,7 +292,7 @@ Used to order and group pages and variables in the config editor
             <input type="radio" value="D" /><label for=
             "D"><samp>title</samp></label><br />
 
-            <p class="answers C"><em>Answer: <samp>sort-key</samp></em></p>
+            <p class="answers C"><em><samp>sort-key</samp></em></p>
           </div>
         </li>
 
@@ -284,7 +312,7 @@ Specify a regular expression that the value of the setting must match.
             <input type="radio" value="D" /><label for=
             "D"><samp>pattern</samp></label><br />
 
-            <p class="answers D"><em>Answer: <samp>pattern</samp></em></p>
+            <p class="answers D"><em><samp>pattern</samp></em></p>
           </div>
         </li>
 
@@ -305,7 +333,7 @@ A colon : defines a dynamic length array.
             <input type="radio" value="D" /><label for=
             "D"><samp>values</samp></label><br />
 
-            <p class="answers B"><em>Answer: <samp>length</samp></em></p>
+            <p class="answers B"><em><samp>length</samp></em></p>
           </div>
         </li>
 
@@ -348,7 +376,7 @@ baz = 1, 1
 </label>
 </pre><br />
 
-            <p class="answers A"><em>Answer: <samp>bar = 1</samp>, <samp>baz =
+            <p class="answers A"><em><samp>bar = 1</samp>, <samp>baz =
             0, 0</samp> - it throws an error if the expression evaluates true -
             i.e. <var>bar</var> &gt; 0 AND all elements in <var>baz</var> are
             0</em>. Missing options, as in <strong>B</strong>, cause the check
@@ -384,7 +412,7 @@ warn-if=True
             <input type="radio" value="D" /><label for=
             "D"><samp>warn-if</samp></label><br />
 
-            <p class="answers C"><em>Answer: <samp>type</samp> - the
+            <p class="answers C"><em><samp>type</samp> - the
             <samp>values</samp> option supersedes other value definition
             options such as <samp>type</samp>, <samp>range</samp>, and
             <samp>pattern</samp></em></p>
@@ -404,7 +432,7 @@ warn-if=True
             <input type="radio" value="D" /><label for=
             "D"><samp>type</samp></label><br />
 
-            <p class="answers C"><em>Answer: <samp>trigger</samp> - the option
+            <p class="answers C"><em><samp>trigger</samp> - the option
             <samp>namelist:spam=eggs</samp> is not defined in the
             metadata</em></p>
           </div>
@@ -422,24 +450,24 @@ warn-if=True
             <input type="radio" value="D" /><label for="D">Remove the need for
             metadata configuration</label><br />
 
-            <p class="answers C"><em>Answer: Check and apply changes to Rose
+            <p class="answers C"><em>Check and apply changes to Rose
             configurations</em></p>
           </div>
         </li>
 
         <li>Output for Rose suites is usually under:
 
-          <div id="output" class="questions">
-            <input type="radio" value="A" /><label for="A"><label for=
+          <div id="output-for-suites" class="questions">
+            <input type="radio" value="A" /><label for=
             "A"><samp>$HOME/cylc-run/</samp></label><br />
             <input type="radio" value="B" /><label for=
             "B"><samp>$TMPDIR/suite-run/</samp></label><br />
             <input type="radio" value="C" /><label for=
             "C"><samp>$DATADIR/suite-run/</samp></label><br />
             <input type="radio" value="D" /><label for=
-            "D"><samp>$HOME/rose-suite-run/</samp></label><br /></label>
+            "D"><samp>$HOME/rose-suite-run/</samp></label><br />
 
-            <p class="answers A"><em>Answer:
+            <p class="answers A"><em>
             <samp>$HOME/cylc-run/</samp></em></p>
           </div>
         </li>
@@ -447,7 +475,7 @@ warn-if=True
         <li>The <samp>share/</samp> subdirectory in a suite's output directory
         is for:
 
-          <div id="share" class="questions">
+          <div id="share-subdir" class="questions">
             <input type="radio" value="A" /><label for="A">any files that need
             to be shared between tasks</label><br />
             <input type="radio" value="B" /><label for="B">task working
@@ -460,7 +488,7 @@ warn-if=True
             information about the suite, including any local
             modifications</label><br />
 
-            <p class="answers A"><em>Answer: any files that need to be shared
+            <p class="answers A"><em>any files that need to be shared
             between tasks</em></p>
           </div>
         </li>
@@ -477,7 +505,7 @@ warn-if=True
             <input type="radio" value="D" /><label for="D">launches a discovery
             GUI</label><br />
 
-            <p class="answers D"><em>Answer: launches a discovery GUI</em></p>
+            <p class="answers D"><em>launches a discovery GUI</em></p>
           </div>
         </li>
 
@@ -499,7 +527,7 @@ warn-if=True
             --allrevs -Q title contains 'Case Study' and \( owner eq bob or
             author eq bob \)</code></label><br />
 
-            <p class="answers D"><em>Answer: <code>rosie lookup --allrevs -Q
+            <p class="answers D"><em><code>rosie lookup --allrevs -Q
             ...</code></em></p>
           </div>
         </li>
@@ -539,7 +567,7 @@ warn-if=True
 </label>
 </pre><br />
 
-            <p class="answers C"><em>Answer: <samp>B &amp; C:fail =&gt;
+            <p class="answers C"><em><samp>B &amp; C:fail =&gt;
             A</samp></em></p>
           </div>
         </li>
@@ -576,7 +604,7 @@ warn-if=True
 </label>
 </pre><br />
 
-            <p class="answers C"><em>Answer: <samp>A =&gt; !B</samp></em></p>
+            <p class="answers C"><em><samp>A =&gt; !B</samp></em></p>
           </div>
         </li>
 
@@ -593,7 +621,7 @@ warn-if=True
             <input type="radio" value="D" /><label for="D"><code>rose
             suite-hook</code></label><br />
 
-            <p class="answers C"><em>Answer: <code>rose ana</code></em></p>
+            <p class="answers C"><em><code>rose ana</code></em></p>
           </div>
         </li>
       </ol>
