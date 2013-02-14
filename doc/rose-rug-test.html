@@ -56,7 +56,6 @@ $(function() {
             correct_answer = $("#" + input_name + " .answers").attr("class").replace("answers ", "");
             correct_input = $("input[name='" + input_name + "'][type='radio'][value='" + correct_answer + "']");
             alert(correct_input.length + correct_input.attr("name"));
-            correct_input.html("<p>&#10004;</p>");
             correct_answers[input_name].push(correct_answer);
         });
         /* Missing answer checking */
@@ -122,17 +121,18 @@ $(function() {
 
     <h2 id="questions">Questions</h2>
 
+    <form id="qform">
+
     <ol>
-      <form id="qform">
       <li>Rose is:
         <div id="rose-is" class="questions">
-        <input type="radio" value="A">a framework for growing roses outside scientific institutions</label><br/>
-        <input type="radio" value="B">a framework for getting legal advice</label><br/>
+        <input type="radio" value="A"/><label for="A">a framework for growing roses outside scientific institutions</label><br/>
+        <input type="radio" value="B"/><label for="B">a framework for getting legal advice</label><br/>
 
-          <input type="radio" value="C">a framework for managing and running suites of scientific
+          <input type="radio" value="C"/><label for="C">a framework for managing and running suites of scientific
           applications</label><br/>
 
-          <input type="radio" value="D">a framework for developing web applications</label><br/>
+          <input type="radio" value="D"/><label for="D">a framework for developing web applications</label><br/>
 
           <p class="answers C"><em>Answer: A framework for
           managing and running suites of scientific applications</em></p>
@@ -142,13 +142,13 @@ $(function() {
       <li>cylc is:
 
         <div id="cylc-is" class="questions">
-          <input type="radio" value="A">a washing machine program</label><br/>
+          <input type="radio" value="A"/><label for="A">a washing machine program</label><br/>
 
-          <input type="radio" value="B">a workload scheduler</label><br/>
+          <input type="radio" value="B"/><label for="B">a workload scheduler</label><br/>
 
-          <input type="radio" value="C">a framework for configuring Rose applications</label><br/>
+          <input type="radio" value="C"/><label for="C">a framework for configuring Rose applications</label><br/>
 
-          <input type="radio" value="D">a suite engine</label><br/>
+          <input type="radio" value="D"/><label for="D">a suite engine</label><br/>
 
           <p class="answers D"><em>Answer: a suite engine</em></p>
         </div>
@@ -157,13 +157,13 @@ $(function() {
       <li>A user configuration for Rose is stored in:
 
         <div id="a-user" class="questions">
-          <input type="radio" value="A"><samp>~/.metomi/rose.conf</samp></label><br/>
+          <input type="radio" value="A"/><label for="A"><samp>~/.metomi/rose.conf</samp></label><br/>
 
-          <input type="radio" value="B"><samp>~/.rose/rose-user.conf</samp></label><br/>
+          <input type="radio" value="B"/><label for="B"><samp>~/.rose/rose-user.conf</samp></label><br/>
 
-          <input type="radio" value="C"><samp>~/.rose.rc</samp></label><br/>
+          <input type="radio" value="C"/><label for="C"><samp>~/.rose.rc</samp></label><br/>
 
-          <input type="radio" value="D"><samp>~/.met-um/rose.rc</samp></label><br/>
+          <input type="radio" value="D"/><label for="D"><samp>~/.met-um/rose.rc</samp></label><br/>
         
           <p class="answers A"><em>Answer: <samp>~/.metomi/rose.conf</samp></em></p>
         </div>
@@ -172,13 +172,13 @@ $(function() {
       <li>You can create a new suite with:
 
         <div id="you-can" class="questions">
-          <input type="radio" value="A"><code>rose suite-create</code></label><br/>
+          <input type="radio" value="A"/><label for="A"><code>rose suite-create</code></label><br/>
 
-          <input type="radio" value="B"><code>rosie create</code></label><br/>
+          <input type="radio" value="B"/><label for="B"><code>rosie create</code></label><br/>
 
-          <input type="radio" value="C"><code>fcm create</code></label><br/>
+          <input type="radio" value="C"/><label for="C"><code>fcm create</code></label><br/>
 
-          <input type="radio" value="D"><code>rosie suite-create</code></label><br/>
+          <input type="radio" value="D"/><label for="D"><code>rosie suite-create</code></label><br/>
 
           <p class="answers B"><em>Answer: <code>rosie create</code></em></p>
         </div>
@@ -188,13 +188,13 @@ $(function() {
       configurations is called:
 
         <div id="sub-dir" class="questions">
-          <input type="radio" value="A"><samp>rose-apps/</samp></label><br/>
+          <input type="radio" value="A"/><label for="A"><samp>rose-apps/</samp></label><br/>
 
-          <input type="radio" value="B"><samp>app/</samp></label><br/>
+          <input type="radio" value="B"/><label for="B"><samp>app/</samp></label><br/>
 
-          <input type="radio" value="C"><samp>apps/</samp></label><br/>
+          <input type="radio" value="C"/><label for="C"><samp>apps/</samp></label><br/>
 
-          <input type="radio" value="D"><samp>etc/</samp></label><br/>
+          <input type="radio" value="D"/><label for="D"><samp>etc/</samp></label><br/>
 
         <p class="answers B"><em>Answer: <samp>app/</samp></em></p>
         </div>
@@ -204,13 +204,13 @@ $(function() {
         <samp>rose-suite.conf</samp> files are for:
 
         <div id="rose-suite-conf" class="questions">
-          <input type="radio" value="A">reading in by cylc</label><br/>
+          <input type="radio" value="A"/><label for="A">reading in by cylc</label><br/>
 
-          <input type="radio" value="B">storing application input data</label><br/>
+          <input type="radio" value="B"/><label for="B">storing application input data</label><br/>
 
-          <input type="radio" value="C">identifying the suite with metadata</label><br/>
+          <input type="radio" value="C"/><label for="C">identifying the suite with metadata</label><br/>
 
-          <input type="radio" value="D">jinja2 templating and installing files</label><br/>
+          <input type="radio" value="D"/><label for="D">jinja2 templating and installing files</label><br/>
 
         <p class="answers D"><em>Answer: jinja2 templating
         and installing files</em></p>
@@ -221,13 +221,13 @@ $(function() {
         <code>rose edit</code> cannot:
 
         <div id="rose-edit" class="questions">
-          <input type="radio" value="A">commit changes to version control</label><br/>
+          <input type="radio" value="A"/><label for="A">commit changes to version control</label><br/>
 
-          <input type="radio" value="B">generate panels without metadata</label><br/>
+          <input type="radio" value="B"/><label for="B">generate panels without metadata</label><br/>
 
-          <input type="radio" value="C">automatically fix trigger state errors</label><br/>
+          <input type="radio" value="C"/><label for="C">automatically fix trigger state errors</label><br/>
 
-          <input type="radio" value="D">load a single application by itself</label><br/>
+          <input type="radio" value="D"/><label for="D">load a single application by itself</label><br/>
 
         <p class="answers A"><em>Answer: commit changes to
         version control</em></p>
@@ -241,13 +241,13 @@ Used to order and group pages and variables in the config editor
 </pre>
 
         <div id="meta-used-to-order" class="questions">
-          <input type="radio" value="A"><samp>duplicate</samp></label><br/>
+          <input type="radio" value="A"/><label for="A"><samp>duplicate</samp></label><br/>
 
-          <input type="radio" value="B"><samp>range</samp></label><br/>
+          <input type="radio" value="B"/><label for="B"><samp>range</samp></label><br/>
 
-          <input type="radio" value="C"><samp>sort-key</samp></label><br/>
+          <input type="radio" value="C"/><label for="C"><samp>sort-key</samp></label><br/>
 
-          <input type="radio" value="D"><samp>title</samp></label><br/>
+          <input type="radio" value="D"/><label for="D"><samp>title</samp></label><br/>
 
         <p class="answers C"><em>Answer: <samp>sort-key</samp></em></p>
         </div>
@@ -577,9 +577,10 @@ warn-if=True
         <p class="answers C"><em>Answer: <code>rose ana</code></em></p>
         </div>
       </li>
-      </form>
     </ol>
 
+    </form>
+      
     <h2 id="answer">Answers</h2>
 
     <button id="submitbutton">Check Answers</button>
