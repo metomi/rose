@@ -53,7 +53,7 @@ $(function() {
             else {
                 user_answers[input_name].push(answer.val());
             }
-            correct_answer = $("#" + input_name + " .answers").attr("name");
+            correct_answer = $("#" + input_name + " .answers").attr("class").replace("answers ", "");
             correct_input = $("input[name='" + input_name + "'][type='radio'][value='" + correct_answer + "']");
             alert(correct_input.length + correct_input.attr("name"));
             correct_input.html("<p>&#10004;</p>");
@@ -84,6 +84,10 @@ $(function() {
         var question_id = $(this).attr("id");
         $(this).children("input").each(function() {
             $(this).attr("name", question_id);
+            $(this).attr("id", question_id + this.attr("value"));
+        });
+        $(this).children("label").each(function() {
+            $(this).attr("for", question_id + this.attr("for"));
         });
     });
 });
@@ -122,15 +126,15 @@ $(function() {
       <form id="qform">
       <li>Rose is:
         <div id="rose-is" class="questions">
-        <input type="radio" value="A">a framework for growing roses outside scientific institutions</input><br/>
-        <input type="radio" value="B">a framework for getting legal advice</input><br/>
+        <input type="radio" value="A">a framework for growing roses outside scientific institutions</label><br/>
+        <input type="radio" value="B">a framework for getting legal advice</label><br/>
 
           <input type="radio" value="C">a framework for managing and running suites of scientific
-          applications</input><br/>
+          applications</label><br/>
 
-          <input type="radio" value="D">a framework for developing web applications</input><br/>
+          <input type="radio" value="D">a framework for developing web applications</label><br/>
 
-          <p name="C" class="answers"><em>Answer: A framework for
+          <p class="answers C"><em>Answer: A framework for
           managing and running suites of scientific applications</em></p>
         </div>
       </li>
@@ -138,45 +142,45 @@ $(function() {
       <li>cylc is:
 
         <div id="cylc-is" class="questions">
-          <input type="radio" value="A">a washing machine program</input><br/>
+          <input type="radio" value="A">a washing machine program</label><br/>
 
-          <input type="radio" value="B">a workload scheduler</input><br/>
+          <input type="radio" value="B">a workload scheduler</label><br/>
 
-          <input type="radio" value="C">a framework for configuring Rose applications</input><br/>
+          <input type="radio" value="C">a framework for configuring Rose applications</label><br/>
 
-          <input type="radio" value="D">a suite engine</input><br/>
+          <input type="radio" value="D">a suite engine</label><br/>
 
-          <p name="D" class="answers"><em>Answer: a suite engine</em></p>
+          <p class="answers D"><em>Answer: a suite engine</em></p>
         </div>
       </li>
 
       <li>A user configuration for Rose is stored in:
 
         <div id="a-user" class="questions">
-          <input type="radio" value="A"><samp>~/.metomi/rose.conf</samp></input><br/>
+          <input type="radio" value="A"><samp>~/.metomi/rose.conf</samp></label><br/>
 
-          <input type="radio" value="B"><samp>~/.rose/rose-user.conf</samp></input><br/>
+          <input type="radio" value="B"><samp>~/.rose/rose-user.conf</samp></label><br/>
 
-          <input type="radio" value="C"><samp>~/.rose.rc</samp></input><br/>
+          <input type="radio" value="C"><samp>~/.rose.rc</samp></label><br/>
 
-          <input type="radio" value="D"><samp>~/.met-um/rose.rc</samp></input><br/>
+          <input type="radio" value="D"><samp>~/.met-um/rose.rc</samp></label><br/>
         
-          <p name="A" class="answers"><em>Answer: <samp>~/.metomi/rose.conf</samp></em></p>
+          <p class="answers A"><em>Answer: <samp>~/.metomi/rose.conf</samp></em></p>
         </div>
       </li>
 
       <li>You can create a new suite with:
 
         <div id="you-can" class="questions">
-          <input type="radio" value="A"><code>rose suite-create</code></input><br/>
+          <input type="radio" value="A"><code>rose suite-create</code></label><br/>
 
-          <input type="radio" value="B"><code>rosie create</code></input><br/>
+          <input type="radio" value="B"><code>rosie create</code></label><br/>
 
-          <input type="radio" value="C"><code>fcm create</code></input><br/>
+          <input type="radio" value="C"><code>fcm create</code></label><br/>
 
-          <input type="radio" value="D"><code>rosie suite-create</code></input><br/>
+          <input type="radio" value="D"><code>rosie suite-create</code></label><br/>
 
-          <p name="B" class="answers"><em>Answer: <code>rosie create</code></em></p>
+          <p class="answers B"><em>Answer: <code>rosie create</code></em></p>
         </div>
       </li>
 
@@ -184,15 +188,15 @@ $(function() {
       configurations is called:
 
         <div id="sub-dir" class="questions">
-          <input type="radio" value="A"><samp>rose-apps/</samp></input><br/>
+          <input type="radio" value="A"><samp>rose-apps/</samp></label><br/>
 
-          <input type="radio" value="B"><samp>app/</samp></input><br/>
+          <input type="radio" value="B"><samp>app/</samp></label><br/>
 
-          <input type="radio" value="C"><samp>apps/</samp></input><br/>
+          <input type="radio" value="C"><samp>apps/</samp></label><br/>
 
-          <input type="radio" value="D"><samp>etc/</samp></input><br/>
+          <input type="radio" value="D"><samp>etc/</samp></label><br/>
 
-        <p name="B" class="answers"><em>Answer: <samp>app/</samp></em></p>
+        <p class="answers B"><em>Answer: <samp>app/</samp></em></p>
         </div>
       </li>
 
@@ -200,15 +204,15 @@ $(function() {
         <samp>rose-suite.conf</samp> files are for:
 
         <div id="rose-suite-conf" class="questions">
-          <input type="radio" value="A">reading in by cylc</input><br/>
+          <input type="radio" value="A">reading in by cylc</label><br/>
 
-          <input type="radio" value="B">storing application input data</input><br/>
+          <input type="radio" value="B">storing application input data</label><br/>
 
-          <input type="radio" value="C">identifying the suite with metadata</input><br/>
+          <input type="radio" value="C">identifying the suite with metadata</label><br/>
 
-          <input type="radio" value="D">jinja2 templating and installing files</input><br/>
+          <input type="radio" value="D">jinja2 templating and installing files</label><br/>
 
-        <p name="D" class="answers"><em>Answer: jinja2 templating
+        <p class="answers D"><em>Answer: jinja2 templating
         and installing files</em></p>
         </div>
       </li>
@@ -217,15 +221,15 @@ $(function() {
         <code>rose edit</code> cannot:
 
         <div id="rose-edit" class="questions">
-          <input type="radio" value="A">commit changes to version control</input><br/>
+          <input type="radio" value="A">commit changes to version control</label><br/>
 
-          <input type="radio" value="B">generate panels without metadata</input><br/>
+          <input type="radio" value="B">generate panels without metadata</label><br/>
 
-          <input type="radio" value="C">automatically fix trigger state errors</input><br/>
+          <input type="radio" value="C">automatically fix trigger state errors</label><br/>
 
-          <input type="radio" value="D">load a single application by itself</input><br/>
+          <input type="radio" value="D">load a single application by itself</label><br/>
 
-        <p name="A" class="answers"><em>Answer: commit changes to
+        <p class="answers A"><em>Answer: commit changes to
         version control</em></p>
         </div>
       </li>
@@ -237,15 +241,15 @@ Used to order and group pages and variables in the config editor
 </pre>
 
         <div id="meta-used-to-order" class="questions">
-          <input type="radio" value="A"><samp>duplicate</samp></input><br/>
+          <input type="radio" value="A"><samp>duplicate</samp></label><br/>
 
-          <input type="radio" value="B"><samp>range</samp></input><br/>
+          <input type="radio" value="B"><samp>range</samp></label><br/>
 
-          <input type="radio" value="C"><samp>sort-key</samp></input><br/>
+          <input type="radio" value="C"><samp>sort-key</samp></label><br/>
 
-          <input type="radio" value="D"><samp>title</samp></input><br/>
+          <input type="radio" value="D"><samp>title</samp></label><br/>
 
-        <p name="C" class="answers"><em>Answer: <samp>sort-key</samp></em></p>
+        <p class="answers C"><em>Answer: <samp>sort-key</samp></em></p>
         </div>
       </li>
 
@@ -256,15 +260,15 @@ Specify a regular expression that the value of the setting must match.
 </pre>
 
         <div id="meta-regex" class="questions">
-          <input type="radio" name="A"><samp>values</samp></input><br/>
+          <input type="radio" value="A"/><label for="A"><samp>values</samp></label><br/>
 
-          <input type="radio" name="B"><samp>fail-if</samp></input><br/>
+          <input type="radio" value="B"/><label for="B"><samp>fail-if</samp></label><br/>
 
-          <input type="radio" name="C"><samp>range</samp></input><br/>
+          <input type="radio" value="C"/><label for="C"><samp>range</samp></label><br/>
 
-          <input type="radio" name="D"><samp>pattern</samp></input><br/>
+          <input type="radio" value="D"/><label for="D"><samp>pattern</samp></label><br/>
         
-        <p name="D" class="answers"><em>Answer: <samp>pattern</samp></em></p>
+        <p class="answers D"><em>Answer: <samp>pattern</samp></em></p>
         </div>
       </li>
 
@@ -276,16 +280,16 @@ A colon : defines a dynamic length array.
 </pre>
 
         <div id="meta-length" class="questions">
-          <input type="radio" name="A"><samp>type</samp></input><br/>
+          <input type="radio" value="A"/><label for="A"><samp>type</samp></label><br/>
 
-          <input type="radio" name="B"><samp>length</samp></input><br/>
+          <input type="radio" value="B"/><label for="B"><samp>length</samp></label><br/>
 
-          <input type="radio" name="C"><samp>range</samp></input><br/>
+          <input type="radio" value="C"/><label for="C"><samp>range</samp></label><br/>
 
-          <input type="radio" name="D"><samp>values</samp></input><br/>
+          <input type="radio" value="D"/><label for="D"><samp>values</samp></label><br/>
         
 
-        <p name="B" class="answers"><em>Answer: <samp>length</samp></em></p>
+        <p class="answers B"><em>Answer: <samp>length</samp></em></p>
         </div>
       </li>
 
@@ -300,36 +304,36 @@ fail-if = this &gt; 0 and (all(namelist:foo=baz == 0))
         <samp>fail-if</samp> checking to throw an error?</p>
 
         <div id="fail-if" class="questions">
-          <input type="radio" name="A">
+          <input type="radio" value="A"/><label for="A">
             <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
 bar = 1
 baz = 0, 0
-</pre></input><br/>
+</pre></label><br/>
 
-          <input type="radio" name="B">
+          <input type="radio" value="B"/><label for="B">
             <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
 bar = 1
 </pre>
-          </input><br/>
+          </label><br/>
 
-          <input type="radio" name="C">
+          <input type="radio" value="C"/><label for="C">
             <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
 bar = 0
 baz = 1, 0
-</pre></input><br/>
+</pre></label><br/>
 
-          <input type="radio" name="D">
+          <input type="radio" value="D"/><label for="D">
             <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
 bar = 0
 baz = 1, 1
-</pre></input><br/>
+</pre></label><br/>
         
 
-        <p name="A" class="answers"><em>Answer: <samp>bar = 1</samp>, <samp>baz = 0, 0</samp> - it throws an error
+        <p class="answers A"><em>Answer: <samp>bar = 1</samp>, <samp>baz = 0, 0</samp> - it throws an error
         if the expression evaluates true - i.e. <var>bar</var> &gt; 0
         AND all elements in <var>baz</var> are 0</em>. Missing
         options, as in <strong>B</strong>, cause the check to be skipped.</em></p>
@@ -354,16 +358,16 @@ warn-if=True
         <p>Which metadata option is redundant?</p>
 
         <div id="meta-redundant" class="questions">
-          <input type="radio" name="A"><samp>description</samp></input><br/>
+          <input type="radio" value="A"/><label for="A"><samp>description</samp></label><br/>
 
-          <input type="radio" name="B"><samp>help</samp></input><br/>
+          <input type="radio" value="B"/><label for="B"><samp>help</samp></label><br/>
 
-          <input type="radio" name="C"><samp>type</samp></input><br/>
+          <input type="radio" value="C"/><label for="C"><samp>type</samp></label><br/>
 
-          <input type="radio" name="D"><samp>warn-if</samp></input><br/>
+          <input type="radio" value="D"/><label for="D"><samp>warn-if</samp></label><br/>
         
 
-        <p name="C" class="answers"><em>Answer: <samp>type</samp> - the
+        <p class="answers C"><em>Answer: <samp>type</samp> - the
         <samp>values</samp> option supersedes other value definition options
         such as <samp>type</samp>, <samp>range</samp>, and
         <samp>pattern</samp></em></p>
@@ -374,16 +378,16 @@ warn-if=True
         <p>Which metadata option will cause an error?</p>
 
         <div id="meta-error" class="questions">
-          <input type="radio" name="A"><samp>description</samp></input><br/>
+          <input type="radio" value="A"/><label for="A"><samp>description</samp></label><br/>
 
-          <input type="radio" name="B"><samp>help</samp></input><br/>
+          <input type="radio" value="B"/><label for="B"><samp>help</samp></label><br/>
 
-          <input type="radio" name="C"><samp>trigger</samp></input><br/>
+          <input type="radio" value="C"/><label for="C"><samp>trigger</samp></label><br/>
 
-          <input type="radio" name="D"><samp>type</samp></input><br/>
+          <input type="radio" value="D"/><label for="D"><samp>type</samp></label><br/>
         
 
-        <p name="C" class="answers"><em>Answer: <samp>trigger</samp> - the option
+        <p class="answers C"><em>Answer: <samp>trigger</samp> - the option
         <samp>namelist:spam=eggs</samp> is not defined in the metadata</em></p>
         </div>
       </li>
@@ -391,32 +395,32 @@ warn-if=True
       <li>Rose macros are used to:
 
         <div id="macro" class="questions">
-          <input type="radio" name="A">Run applications</input><br/>
+          <input type="radio" value="A"/><label for="A">Run applications</label><br/>
 
-          <input type="radio" name="B">Record and play actions in the config editor</input><br/>
+          <input type="radio" value="B"/><label for="B">Record and play actions in the config editor</label><br/>
 
-          <input type="radio" name="C">Check and apply changes to Rose configurations</input><br/>
+          <input type="radio" value="C"/><label for="C">Check and apply changes to Rose configurations</label><br/>
 
-          <input type="radio" name="D">Remove the need for metadata configuration</input><br/>
+          <input type="radio" value="D"/><label for="D">Remove the need for metadata configuration</label><br/>
         
 
-        <p name="C" class="answers"><em>Answer: Check and apply
+        <p class="answers C"><em>Answer: Check and apply
         changes to Rose configurations</em></p>
       </li>
 
       <li>Output for Rose suites is usually under:
 
         <div id="output" class="questions">
-          <input type="radio" name="A"><samp>$HOME/cylc-run/</samp></input><br/>
+          <input type="radio" value="A"/><label for="A"><label for="A"><samp>$HOME/cylc-run/</samp></label><br/>
 
-          <input type="radio" name="B"><samp>$TMPDIR/suite-run/</samp></input><br/>
+          <input type="radio" value="B"/><label for="B"><samp>$TMPDIR/suite-run/</samp></label><br/>
 
-          <input type="radio" name="C"><samp>$DATADIR/suite-run/</samp></input><br/>
+          <input type="radio" value="C"/><label for="C"><samp>$DATADIR/suite-run/</samp></label><br/>
 
-          <input type="radio" name="D"><samp>$HOME/rose-suite-run/</samp></input><br/>
+          <input type="radio" value="D"/><label for="D"><samp>$HOME/rose-suite-run/</samp></label><br/>
         
 
-        <p name="A" class="answers"><em>Answer: <samp>$HOME/cylc-run/</samp></em></p>
+        <p class="answers A"><em>Answer: <samp>$HOME/cylc-run/</samp></em></p>
         </div>
       </li>
 
@@ -424,18 +428,18 @@ warn-if=True
       for:
 
         <div id="share" class="questions">
-          <input type="radio" name="A">any files that need to be shared between tasks</input><br/>
+          <input type="radio" value="A"/><label for="A">any files that need to be shared between tasks</label><br/>
 
-          <input type="radio" name="B">task working directories, e.g. containing Rose application
-          namelists and other temporary files</input><br/>
+          <input type="radio" value="B"/><label for="B">task working directories, e.g. containing Rose application
+          namelists and other temporary files</label><br/>
 
-          <input type="radio" name="C">task scripts and their output and error</input><br/>
+          <input type="radio" value="C"/><label for="C">task scripts and their output and error</label><br/>
 
-          <input type="radio" name="D">the rose-suite.version file, which records any version control
-          information about the suite, including any local modifications</input><br/>
+          <input type="radio" value="D"/><label for="D">the rose-suite.version file, which records any version control
+          information about the suite, including any local modifications</label><br/>
         
 
-        <p name="A" class="answers"><em>Answer: any files that need
+        <p class="answers A"><em>Answer: any files that need
         to be shared between tasks</em></p>
         </div>
       </li>
@@ -443,16 +447,16 @@ warn-if=True
       <li>Running the <code>rosie go</code> command:
 
         <div id="rosie-go" class="questions">
-          <input type="radio" name="A">starts a suite running using cylc run</input><br/>
+          <input type="radio" value="A"/><label for="A">starts a suite running using cylc run</label><br/>
 
-          <input type="radio" name="B">launches the output viewer</input><br/>
+          <input type="radio" value="B"/><label for="B">launches the output viewer</label><br/>
 
-          <input type="radio" name="C">sshes to a cylc server</input><br/>
+          <input type="radio" value="C"/><label for="C">sshes to a cylc server</label><br/>
 
-          <input type="radio" name="D">launches a discovery GUI</input><br/>
+          <input type="radio" value="D"/><label for="D">launches a discovery GUI</label><br/>
         
 
-        <p name="D" class="answers"><em>Answer: launches a discovery
+        <p class="answers D"><em>Answer: launches a discovery
         GUI</em></p>
         </div>
       </li>
@@ -464,19 +468,19 @@ warn-if=True
         is the correct command to run?</p>
 
         <div id="rosie-lookup" class="questions">
-          <input type="radio" name="A"><code>rosie ls --title='Case Study' --username=bob
-          --all</code></input><br/>
+          <input type="radio" value="A"/><label for="A"><code>rosie ls --title='Case Study' --username=bob
+          --all</code></label><br/>
 
-          <input type="radio" name="B"><code>rosie lookup --allrevs 'Case Study' bob</code></input><br/>
+          <input type="radio" value="B"/><label for="B"><code>rosie lookup --allrevs 'Case Study' bob</code></label><br/>
 
-          <input type="radio" name="C"><code>rosie ls --all -Q 'Case Study' in title and 'bob' from
-          \[author, owner\]</code></input><br/>
+          <input type="radio" value="C"/><label for="C"><code>rosie ls --all -Q 'Case Study' in title and 'bob' from
+          \[author, owner\]</code></label><br/>
 
-          <input type="radio" name="D"><code>rosie lookup --allrevs -Q title contains 'Case Study'
-          and \( owner eq bob or author eq bob \)</code></input><br/>
+          <input type="radio" value="D"/><label for="D"><code>rosie lookup --allrevs -Q title contains 'Case Study'
+          and \( owner eq bob or author eq bob \)</code></label><br/>
         
 
-        <p name="D" class="answers"><em>Answer: <code>rosie lookup --allrevs -Q ...</code></em></p>
+        <p class="answers D"><em>Answer: <code>rosie lookup --allrevs -Q ...</code></em></p>
         </div>
       </li>
 
@@ -485,37 +489,37 @@ warn-if=True
         <samp>suite.rc</samp> graph configuration entry?</p>
 
         <div id="graph-A-run-C-fail" class="questions">
-          <input type="radio" name="A">
+          <input type="radio" value="A"/><label for="A">
             <pre class="prettyprint lang-cylc">
         graph = """
             A =&gt; B &amp; C:fail
         """
-</pre></input><br/>
+</pre></label><br/>
 
-          <input type="radio" name="B">
+          <input type="radio" value="B"/><label for="B">
             <pre class="prettyprint lang-cylc">
         graph = """
             B =&gt; C =&gt; A
         """
-</pre></input><br/>
+</pre></label><br/>
 
-          <input type="radio" name="C">
+          <input type="radio" value="C"/><label for="C">
             <pre class="prettyprint lang-cylc">
         graph = """
             B &amp; C:fail =&gt; A
         """
-</pre></input><br/>
+</pre></label><br/>
 
-          <input type="radio" name="D">
+          <input type="radio" value="D"/><label for="D">
             <pre class="prettyprint lang-cylc">
         graph = """
             B =&gt; A
             C:fail =&gt; A
         """
-</pre></input><br/>
+</pre></label><br/>
         
 
-        <p name="C" class="answers"><em>Answer: <samp>B &amp; C:fail
+        <p class="answers C"><em>Answer: <samp>B &amp; C:fail
         =&gt; A</samp></em></p>
         </div>
       </li>
@@ -523,36 +527,36 @@ warn-if=True
       <li>Which of the following is a valid cylc suicide trigger?
 
         <div id="suicide-trigger" class="questions">
-          <input type="radio" name="A">
+          <input type="radio" value="A"/><label for="A">
             <pre class="prettyprint lang-cylc">
       graph = """
           A:kill =&gt; B
       """
-</pre></input><br/>
+</pre></label><br/>
 
-          <input type="radio" name="B">
+          <input type="radio" value="B"/><label for="B">
             <pre class="prettyprint lang-cylc">
       graph = """
           A murders B
       """
-</pre></input><br/>
+</pre></label><br/>
 
-          <input type="radio" name="C">
+          <input type="radio" value="C"/><label for="C">
             <pre class="prettyprint lang-cylc">
       graph = """
           A =&gt; !B
       """
-</pre></input><br/>
+</pre></label><br/>
 
-          <input type="radio" name="D">
+          <input type="radio" value="D"/><label for="D">
             <pre class="prettyprint lang-cylc">
       graph = """
           A:fail =&gt; B
       """
-</pre></input><br/>
+</pre></label><br/>
         
 
-        <p name="C" class="answers"><em>Answer: <samp>A =&gt;
+        <p class="answers C"><em>Answer: <samp>A =&gt;
         !B</samp></em></p>
         </div>
       </li>
@@ -561,16 +565,16 @@ warn-if=True
       engine</q>?
 
         <div id="rose-ana" class="questions">
-          <input type="radio" name="A"><code>rose mpi-launch</code></input><br/>
+          <input type="radio" value="A"/><label for="A"><code>rose mpi-launch</code></label><br/>
 
-          <input type="radio" name="B"><code>rose macro</code></input></input><br/>
+          <input type="radio" value="B"/><label for="B"><code>rose macro</code></label></label><br/>
 
-          <input type="radio" name="C"><code>rose ana</code></input></input><br/>
+          <input type="radio" value="C"/><label for="C"><code>rose ana</code></label></label><br/>
 
-          <input type="radio" name="D"><code>rose suite-hook</code></input></input><br/>
+          <input type="radio" value="D"/><label for="D"><code>rose suite-hook</code></label></label><br/>
         
 
-        <p name="C" class="answers"><em>Answer: <code>rose ana</code></em></p>
+        <p class="answers C"><em>Answer: <code>rose ana</code></em></p>
         </div>
       </li>
       </form>
