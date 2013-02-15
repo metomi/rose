@@ -488,15 +488,14 @@ class ConfigLoader(object):
         return line.strip()[1:]
 
     def _get_file_and_name(self, f):
-        file_name = f
-        if isinstance(file_name, str):
-            file_name = os.path.abspath(file_name)
-            f = open(file_name, "r")
-        else:
+        if hasattr(f, "readline"):
             try:
                 file_name = f.name
             except AttributeError:
                 file_name = self.UNKNOWN_NAME
+        else:
+            file_name = os.path.abspath(f)
+            f = open(file_name, "r")
         return (f, file_name)
 
 
