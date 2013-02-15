@@ -171,6 +171,11 @@ th {
     border-collapse: collapse;
 }
 
+.noborder,
+.questiontable {
+    border: none;
+}
+
 #body-main {
     border: thin ridge #ccc;
 }
@@ -367,6 +372,10 @@ caption {
 
 table {
     margin-top: 2em;
+}
+
+.questiontable {
+    margin: 0.25em;
 }
 
 #body-main {

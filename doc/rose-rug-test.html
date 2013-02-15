@@ -30,6 +30,8 @@
 </script>
   <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
   <script type="text/javascript" src="rose-version.js">
@@ -38,6 +40,10 @@
 //<![CDATA[
   $(function() {
     $(".answers").hide();
+    function show_answers() {
+        $(".answers").show(500);
+        $(".resultinfo").show(500);
+    }
     $("#toggleanswers").click(function() {
         $("html").scrollTop(0);
         $(".answers").show(1000);
@@ -83,7 +89,7 @@
             correct_answers[input_name].sort();
             if (user_answers[input_name].join("") ==
                 correct_answers[input_name].join("")) {
-                $("#" + input_name + " .answers").html("<span class='answerstatus'><strong class='ok'>Correct</strong></span>");
+                $("#" + input_name + " .answers").prepend("<span class='answerstatus'><strong class='ok'>Correct:</strong> </span>");
                 good_answers += 1;
             }
             else {
@@ -91,16 +97,15 @@
                 bad_answers += 1;
             }
         });
-        $("#results").append("<h2 id='results' class='resultinfo'>Results</h3>" +
+        $("#results").append("<h2 id='results' class='resultinfo'>Results</h2>" +
                              "<p class='resultinfo'>You got " + good_answers +
                              " answers correct, and " + bad_answers + " wrong.</p>");
+        $(".resultinfo").hide()
         $("html, body").animate({
             scrollTop: $("#results").offset().top,
         }, {
             "duration": 500,
-            "complete": function() {
-                 $(".answers").show(500);
-            },
+            "complete": show_answers
         });
         $("#submitbutton").remove();
         $("#answer").remove();
@@ -108,11 +113,11 @@
     });
     $(".questions").each(function() {
         var question_id = $(this).attr("id");
-        $(this).children("input").each(function() {
+        $(this).find("input").each(function() {
             $(this).attr("name", question_id);
             $(this).attr("id", question_id + $(this).attr("value"));
         });
-        $(this).children("label").each(function() {
+        $(this).find("label").each(function() {
             $(this).attr("for", question_id + $(this).attr("for"));
         });
     });
@@ -153,7 +158,7 @@
 
     <form id="qform">
       <ol>
-        <li>Rose is:
+        <li><p>Rose is:</p>
 
           <div id="rose-is" class="questions">
           
@@ -172,7 +177,7 @@
           </div>
         </li>
 
-        <li>cylc is:
+        <li><p>cylc is:</p>
 
           <div id="cylc-is" class="questions">
           
@@ -190,7 +195,7 @@
           </div>
         </li>
 
-        <li>A user configuration for Rose is stored in:
+        <li><p>A user configuration for Rose is stored in:</p>
 
           <div id="a-user" class="questions">
             <input type="radio" value="A" /><label for=
@@ -207,7 +212,7 @@
           </div>
         </li>
 
-        <li>You can create a new suite with:
+        <li><p>You can create a new suite with:</p>
 
           <div id="you-can" class="questions">
             <input type="radio" value="A" /><label for="A"><code>rose
@@ -223,8 +228,8 @@
           </div>
         </li>
 
-        <li>The sub-directory of a suite that holds Rose application
-        configurations is called:
+        <li><p>The sub-directory of a suite that holds Rose application
+        configurations is called:</p>
 
           <div id="sub-dir" class="questions">
             <input type="radio" value="A" /><label for=
@@ -240,8 +245,7 @@
           </div>
         </li>
 
-        <li>
-          <samp>rose-suite.conf</samp> files are for:
+        <li><p><samp>rose-suite.conf</samp> files are for:</p>
 
           <div id="rose-suite-conf" class="questions">
             <input type="radio" value="A" /><label for="A">reading in by
@@ -258,8 +262,7 @@
           </div>
         </li>
 
-        <li>
-          <code>rose edit</code> cannot:
+        <li><p><code>rose edit</code> cannot:</p>
 
           <div id="rose-edit" class="questions">
             <input type="radio" value="A" /><label for="A">commit changes to
@@ -276,8 +279,126 @@
           </div>
         </li>
 
-        <li>
-          <p>Which metadata option best matches the following description?</p>
+        <li><p>We need an app config in Rose that will produce a file
+        <samp>output.nl</samp> containing the following text:</p>
+        <pre>
+&spaghetti
+l_meat_ok=.true.,
+number_of_meatballs=3,
+/
+
+&salad
+cherry_tomatoes=4
+rocket=30,
+/
+</pre>
+        <p>Which <samp>rose-app.conf</samp> file will produce the correct output
+        at runtime?</p>
+        
+          <div id="app-config" class="questions">
+            <table class="questiontable">
+            <tr>
+            <td class="noborder">
+            <input type="radio" value="A" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-rose_conf">
+[file[nl]:output.nl]
+namelists=spaghetti, salad
+
+[nl:spaghetti]
+l_meat_ok=.true.
+number_of_meatballs=3
+
+[nl:salad]
+cherry_tomatoes=4
+rocket=30
+</pre>
+            </td>
+            <tr>
+            <td class="noborder">
+            <input type="radio" value="B" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-rose_conf">
+[output.nl]
+content=spaghetti, salad
+
+[spaghetti]
+l_meat_ok=.true.
+number_of_meatballs=3
+
+[salad]
+cherry_tomatoes=4
+rocket=30
+</pre></td></tr><tr><td class="noborder">
+            <input type="radio" value="C" /></td>
+            <td class="noborder">
+            <pre class="prettyprint lang-rose_conf">
+[file:output.nl]
+source=namelist:spaghetti, namelist:salad
+
+[namelist:spaghetti]
+l_meat_ok=.true.
+number_of_meatballs=3
+
+[namelist:salad]
+cherry_tomatoes=4
+!goats_cheese=2
+rocket=30
+</pre></td></tr><tr><td class="noborder">
+            <input type="radio" value="D" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-rose_conf">
+[namelist:spaghetti]
+__files__ = output.nl
+l_meat_ok=.true.
+number_of_meatballs=3
+
+[namelist:salad]
+__files__ = output.nl
+cherry_tomatoes=4
+rocket=30
+</pre></td></tr></table><p class="answers C"><em><samp>[file:output.nl]....</samp></em> -
+            note that <samp>goats_cheese</samp> is <samp>user-ignored</samp>
+            and won't be output at runtime.</p>
+        </div>
+        </li>
+        
+        <li><p>What is the command to recursively prettyprint Rose configurations?</p>
+
+          <div id="config-dump" class="questions">
+            <input type="radio" value="A" /><label for=
+            "A"><code>rose config-dump</code></label><br />
+            <input type="radio" value="B" /><label for=
+            "B"><code>rose macro -PR</code></label><br />
+            <input type="radio" value="C" /><label for=
+            "C"><code>rose config</code></label><br />
+            <input type="radio" value="D" /><label for=
+            "D"><code>rose format</code></label><br />
+
+            <p class="answers A"><em><code>rose config-dump</code></em></p>
+          </div>
+        </li>
+
+        <li><p>In a Rose metadata configuration file, what does setting
+        <samp>compulsory=true</samp> for an app configuration setting imply?</p>
+          <div id="meta-used-to-order" class="questions">
+            <input type="radio" value="A" /><label for=
+            "A">it is always required at runtime</label><br />
+            <input type="radio" value="B" /><label for=
+            "B">it should always be in the app configuration, ignored or not</label><br />
+            <input type="radio" value="C" /><label for=
+            "C">it should never be trigger-ignored</label><br />
+            <input type="radio" value="D" /><label for=
+            "D">it must have non-null content</label><br />
+
+            <p class="answers B"><em>it should always be in the app configuration, ignored or not</em></p>
+          </div>
+        </li>
+
+        <li><p>Which metadata option best matches the following description?</p>
           <pre>
 Used to order and group pages and variables in the config editor
 </pre>
@@ -296,8 +417,7 @@ Used to order and group pages and variables in the config editor
           </div>
         </li>
 
-        <li>
-          <p>Which metadata option best matches the following description?</p>
+        <li><p>Which metadata option best matches the following description?</p>
           <pre>
 Specify a regular expression that the value of the setting must match.
 </pre>
@@ -316,8 +436,7 @@ Specify a regular expression that the value of the setting must match.
           </div>
         </li>
 
-        <li>
-          <p>Which metadata option best matches the following description?</p>
+        <li><p>Which metadata option best matches the following description?</p>
           <pre>
 If not present, the setting is assumed to be a scalar. A positive integer defines a fixed length array.
 A colon : defines a dynamic length array.
@@ -348,44 +467,108 @@ fail-if = this &gt; 0 and (all(namelist:foo=baz == 0))
           <samp>fail-if</samp> checking to throw an error?</p>
 
           <div id="fail-if" class="questions">
+            <table class="questiontable">
+            <tr>
+            <td class="noborder">
             <input type="radio" value="A" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-rose_conf">
-<label for="A">[namelist:foo]
+[namelist:foo]
 bar = 1
 baz = 0, 0
-</label>
-</pre><br />
+</pre>
+            </td>
+            <tr>
+            <td class="noborder">
             <input type="radio" value="B" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-rose_conf">
-<label for="B">[namelist:foo]
+[namelist:foo]
 bar = 1
-</label>
-</pre><br />
-            <input type="radio" value="C" />
+</pre></td></tr><tr><td class="noborder">
+            <input type="radio" value="C" /></td>
+            <td class="noborder">
             <pre class="prettyprint lang-rose_conf">
-<label for="C">[namelist:foo]
+[namelist:foo]
 bar = 0
 baz = 1, 0
-</label>
-</pre><br />
+</pre></td></tr><tr><td class="noborder">
             <input type="radio" value="D" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-rose_conf">
-<label for="D">[namelist:foo]
+[namelist:foo]
 bar = 0
 baz = 1, 1
-</label>
-</pre><br />
+</pre></td></tr></table>
 
             <p class="answers A"><em><samp>bar = 1</samp>, <samp>baz =
-            0, 0</samp> - it throws an error if the expression evaluates true -
+            0, 0</samp></em> - it throws an error if the expression evaluates true -
             i.e. <var>bar</var> &gt; 0 AND all elements in <var>baz</var> are
-            0</em>. Missing options, as in <strong>B</strong>, cause the check
+            0. Missing options, as in <strong>B</strong>, cause the check
             to be skipped.</p>
           </div>
         </li>
 
         <li>
-          <p>I have a flawed metadata file, that looks like this:</p>
+          <p>I have the following metadata for an app configuration:</p>
+          <pre class="prettyprint lang-rose_conf">
+[env=A]
+trigger=env=Z: 20, 30
+
+[env=Z]
+</pre>
+          <p>In which app configuration is <samp>env=Z</samp> in
+          the correct state?</p>
+
+          <div id="fail-if" class="questions">
+            <table class="questiontable">
+            <tr>
+            <td class="noborder">
+            <input type="radio" value="A" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-rose_conf">
+[env]
+Z=0
+</pre>
+            </td>
+            <tr>
+            <td class="noborder">
+            <input type="radio" value="B" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-rose_conf">
+[env]
+A=20
+!!Z=0
+</pre></td></tr><tr><td class="noborder">
+            <input type="radio" value="C" /></td>
+            <td class="noborder">
+            <pre class="prettyprint lang-rose_conf">
+[env]
+A=30
+Z=0
+</pre></td></tr><tr><td class="noborder">
+            <input type="radio" value="D" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-rose_conf">
+[env]
+A=40
+Z=0
+</pre></td></tr></table>
+
+            <p class="answers C"><em><samp>A=30...</samp></em> - <samp>Z</samp> will only be enabled
+            if A is present, enabled, and either <samp>20</samp>
+            or <samp>30</samp>.</p>
+            </p>
+          </div>
+        </li>
+
+        <li><p>I have a flawed metadata file, that looks like this:</p>
           <pre class="prettyprint lang-rose_conf">
 [namelist:foo=bar]
 description=Bar, for controlling foo things.
@@ -412,15 +595,14 @@ warn-if=True
             <input type="radio" value="D" /><label for=
             "D"><samp>warn-if</samp></label><br />
 
-            <p class="answers C"><em><samp>type</samp> - the
+            <p class="answers C"><em><samp>type</samp></em> - the
             <samp>values</samp> option supersedes other value definition
             options such as <samp>type</samp>, <samp>range</samp>, and
-            <samp>pattern</samp></em></p>
+            <samp>pattern</samp></p>
           </div>
         </li>
 
-        <li>
-          <p>Which metadata option will cause an error?</p>
+        <li><p>Which metadata option will cause an error?</p>
 
           <div id="meta-error" class="questions">
             <input type="radio" value="A" /><label for=
@@ -432,13 +614,13 @@ warn-if=True
             <input type="radio" value="D" /><label for=
             "D"><samp>type</samp></label><br />
 
-            <p class="answers C"><em><samp>trigger</samp> - the option
+            <p class="answers C"><em><samp>trigger</samp></em> - the option
             <samp>namelist:spam=eggs</samp> is not defined in the
-            metadata</em></p>
+            metadata</p>
           </div>
         </li>
 
-        <li>Rose macros are used to:
+        <li><p>Rose macros are used to:</p>
 
           <div id="macro" class="questions">
             <input type="radio" value="A" /><label for="A">Run
@@ -455,7 +637,7 @@ warn-if=True
           </div>
         </li>
 
-        <li>Output for Rose suites is usually under:
+        <li><p>Output for Rose suites is usually under:</p>
 
           <div id="output-for-suites" class="questions">
             <input type="radio" value="A" /><label for=
@@ -472,28 +654,26 @@ warn-if=True
           </div>
         </li>
 
-        <li>The <samp>share/</samp> subdirectory in a suite's output directory
-        is for:
+        <li><p>The <samp>share/</samp> subdirectory in a suite's output directory
+        is for:</p>
 
           <div id="share-subdir" class="questions">
             <input type="radio" value="A" /><label for="A">any files that need
             to be shared between tasks</label><br />
             <input type="radio" value="B" /><label for="B">task working
-            directories, e.g. containing Rose application namelists and other
-            temporary files</label><br />
+            directories, e.g. containing Rose application namelists</label><br />
             <input type="radio" value="C" /><label for="C">task scripts and
             their output and error</label><br />
             <input type="radio" value="D" /><label for="D">the
             rose-suite.version file, which records any version control
-            information about the suite, including any local
-            modifications</label><br />
+            information about the suite</label>
 
             <p class="answers A"><em>any files that need to be shared
             between tasks</em></p>
           </div>
         </li>
 
-        <li>Running the <code>rosie go</code> command:
+        <li><p>Running the <code>rosie go</code> command:</p>
 
           <div id="rosie-go" class="questions">
             <input type="radio" value="A" /><label for="A">starts a suite
@@ -503,14 +683,13 @@ warn-if=True
             <input type="radio" value="C" /><label for="C">sshes to a cylc
             server</label><br />
             <input type="radio" value="D" /><label for="D">launches a discovery
-            GUI</label><br />
+            GUI</label>
 
             <p class="answers D"><em>launches a discovery GUI</em></p>
           </div>
         </li>
 
-        <li>
-          <p>We're searching for suites using <code>rosie</code>. We want every
+        <li><p>We're searching for suites using <code>rosie</code>. We want every
           suite with <samp>Case Study</samp> in the title and where either the
           owner or the commit author was <samp>bob</samp>, across revisions.
           What is the correct command to run?</p>
@@ -525,103 +704,226 @@ warn-if=True
             owner\]</code></label><br />
             <input type="radio" value="D" /><label for="D"><code>rosie lookup
             --allrevs -Q title contains 'Case Study' and \( owner eq bob or
-            author eq bob \)</code></label><br />
+            author eq bob \)</code></label>
 
             <p class="answers D"><em><code>rosie lookup --allrevs -Q
             ...</code></em></p>
           </div>
         </li>
 
-        <li>
-          <p>Task A runs if B succeeds and C fails. Which is the correct
+        <li><p>Which of the following is considered bad practice for suite design?</p>
+        
+          <div id="bad-practice" class="questions">
+            <input type="radio" value="A" /><label for="A">Single, well-commented suite.rc file</label><br />
+            <input type="radio" value="B" /><label for="B">Condensing repeated settings or blocks with Jinja-2</label><br />
+            <input type="radio" value="C" /><label for="C">Magical, black box tasks with suite-level functionality</label><br />
+            <input type="radio" value="D" /><label for="D">Using families where appropriate</label>
+
+            <p class="answers C"><em>Magical, black box tasks with suite-level functionality</em></p>
+          </div>
+        </li>
+
+        <li><p>I have a <samp>suite.rc</samp> file with the following <samp>scheduling</samp> section:</p>
+          <pre class="prettyprint lang-cylc">
+[scheduling]
+    initial cycle time = 2014010500
+    final cycle time = 2014010700
+    [[dependencies]]
+        [[[0, 12]]]
+            graph = """
+                a => b
+            """
+        [[[6]]]
+            graph = """
+                b
+            """
+</pre><p>How many times will the task <samp>b</samp> run?</p>
+          <div id="scheduling-times" class="questions">
+            <input type="radio" value="A" /><label for="A">2</label><br />
+            <input type="radio" value="B" /><label for="B">3</label><br />
+            <input type="radio" value="C" /><label for="C">6</label><br />
+            <input type="radio" value="D" /><label for="D">7</label>
+
+            <p class="answers D"><em>7</em>: at <samp>2014010500</samp>, <samp>2014010506</samp>, <samp>2014010512</samp>, <samp>2014010600</samp>, <samp>2014010606</samp>, <samp>2014010612</samp>, <samp>2014010700</samp></p>
+          </div>
+        </li>
+
+        <li><p>Task A runs if and only if B succeeds and C fails. Which is the correct
           <samp>suite.rc</samp> graph configuration entry?</p>
 
           <div id="graph-A-run-C-fail" class="questions">
+            <table class="questiontable">
+            <tr>
+            <td class="noborder">
             <input type="radio" value="A" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-cylc">
-<label for="A">        graph = """
-            A =&gt; B &amp; C:fail
-        """
-</label>
-</pre><br />
+graph = """
+    A =&gt; B &amp; C:fail
+"""
+</pre></td></tr><tr><td class="noborder">
             <input type="radio" value="B" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-cylc">
-<label for="B">        graph = """
-            B =&gt; C =&gt; A
-        """
-</label>
-</pre><br />
+graph = """
+    B =&gt; C =&gt; A
+"""
+</pre></td></tr><tr><td class="noborder">
             <input type="radio" value="C" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-cylc">
-<label for="C">        graph = """
-            B &amp; C:fail =&gt; A
-        """
-</label>
-</pre><br />
+graph = """
+    B &amp; C:fail =&gt; A
+"""
+</pre></td></tr><tr><td class="noborder">
             <input type="radio" value="D" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-cylc">
-<label for="D">        graph = """
-            B =&gt; A
-            C:fail =&gt; A
-        """
-</label>
-</pre><br />
+graph = """
+    B =&gt; A
+    C:fail =&gt; A
+"""
+</pre></td></tr></table>
 
             <p class="answers C"><em><samp>B &amp; C:fail =&gt;
             A</samp></em></p>
           </div>
         </li>
 
-        <li>Which of the following is a valid cylc suicide trigger?
+        <li><p>Which of the following is a valid cylc suicide trigger?</p>
 
           <div id="suicide-trigger" class="questions">
+            <table class="questiontable">
+            <tr>
+            <td class="noborder">
             <input type="radio" value="A" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-cylc">
-<label for="A">      graph = """
-          A:kill =&gt; B
-      """
-</label>
-</pre><br />
+graph = """
+    A:kill =&gt; B
+"""
+</pre></td></tr><tr><td class="noborder">
             <input type="radio" value="B" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-cylc">
-<label for="B">      graph = """
-          A murders B
-      """
-</label>
-</pre><br />
+graph = """
+    A murders B
+"""
+</pre></td></tr><tr><td class="noborder">
             <input type="radio" value="C" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-cylc">
-<label for="C">      graph = """
-          A =&gt; !B
-      """
-</label>
-</pre><br />
+graph = """
+    A =&gt; !B
+"""
+</pre></td></tr><tr><td class="noborder">
             <input type="radio" value="D" />
+            </td>
+            <td class="noborder">
             <pre class="prettyprint lang-cylc">
-<label for="D">      graph = """
-          A:fail =&gt; B
-      """
-</label>
-</pre><br />
+graph = """
+    A:fail =&gt; B
+"""
+</pre></td></tr></table>
 
             <p class="answers C"><em><samp>A =&gt; !B</samp></em></p>
           </div>
         </li>
 
-        <li>Which of the following Rose commands invokes an in-built
-        <q>analysis engine</q>?
+        <li><p>What should the vast majority of Rose suites have in
+        their <samp>suite.rc</samp> files?</p>
 
-          <div id="rose-ana" class="questions">
-            <input type="radio" value="A" /><label for="A"><code>rose
-            mpi-launch</code></label><br />
-            <input type="radio" value="B" /><label for="B"><code>rose
-            macro</code></label><br />
-            <input type="radio" value="C" /><label for="C"><code>rose
-            ana</code></label><br />
-            <input type="radio" value="D" /><label for="D"><code>rose
-            suite-hook</code></label><br />
+          <div id="suicide-trigger" class="questions">
+            <table class="questiontable">
+            <tr>
+            <td class="noborder">
+            <input type="radio" value="A" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-cylc">
+[scheduling]
+    initial cycle time = 2013060100
+    final cycle time   = 2013060300
+</pre></td></tr><tr><td class="noborder">
+            <input type="radio" value="B" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-cylc">
+[runtime]
+    [[root]]
+        command scripting = "rose app-run --verbose"
+</pre></td></tr><tr><td class="noborder">
+            <input type="radio" value="C" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-cylc">
+[cylc]
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+</pre></td></tr><tr><td class="noborder">
+            <input type="radio" value="D" />
+            </td>
+            <td class="noborder">
+            <pre class="prettyprint lang-cylc">
+[visualization]
+    [[node attributes]]
+        fcm_make = "style=filled", "color=LemonChiffon", "shape=rectangle"
+</pre></td></tr></table>
 
-            <p class="answers C"><em><code>rose ana</code></em></p>
+            <p class="answers C"><em><samp>[cylc]</samp> <samp>[[event hooks]]</samp>...</em> - this makes
+            sure your suite does not become a long-lived zombie. The <samp>command scripting</samp> answer
+            would be reasonably standard if it was <code>rose task-run</code>, not <code>rose app-run</code></p>
+          </div>
+        </li>
+
+        <li><p>What does the environment variable <var>ROSE_ORIG_HOST</var>
+        identify?</p>
+
+          <div id="config-dump" class="questions">
+            <input type="radio" value="A" /><label for=
+            "A">the host where the cylc daemon is running</label><br />
+            <input type="radio" value="B" /><label for=
+            "B">the first computer</label><br />
+            <input type="radio" value="C" /><label for=
+            "C">the host that invoked <code>rose suite-run</code></label><br />
+            <input type="radio" value="D" /><label for=
+            "D">the host that an app is running on</label><br />
+
+            <p class="answers C"><em>the host that invoked <code>rose suite-run</code></em></p>
+          </div>
+        </li>
+
+        <li><p>Which of the following are Rose built-in apps?</p>
+
+          <div id="rose-built-in-apps" class="questions">
+            <input type="radio" value="A" /><label for="A"><code>Angry Flowers</code>, <code>Suite Ninja</code></label><br/>
+            <input type="radio" value="B" /><label for="B"><code>rose_macro</code>, <code>fcm_build</code></label><br />
+            <input type="radio" value="C" /><label for="C"><code>rose_ana</code>, <code>fcm_make</code></label><br />
+            <input type="radio" value="D" /><label for="D"><code>fcm_export</code>, <code>rose_stem</code></label>
+            
+            <p class="answers C"><em><code>rose_ana</code> and <code>fcm_make</code></em> are
+            built in apps that you can reference in a <samp>suite.rc</samp>.</p>
+          </div>
+        </li>
+
+        <li><p>How can you run a suite to completion to check dependencies, without actually running tasks and apps?</p>
+
+          <div id="rose-built-in-apps" class="questions">
+            <input type="radio" value="A" /><label for="A"><code>rose suite-run -- --hold</code></label><br />
+            <input type="radio" value="B" /><label for="B"><code>rose_suite-run --install-only</code></label><br />
+            <input type="radio" value="C" /><label for="C"><code>rose suite-run -- --mode=simulation</code></label><br />
+            <input type="radio" value="D" /><label for="D"><code>rose suite-run --inconsequential</code></label>
+
+            <p class="answers C"><em><code>rose suite-run -- --mode=simulation</code></em> - options following <samp>--</samp>
+            are passed directly to <code>cylc run</code>.</p>
           </div>
         </li>
       </ol>
