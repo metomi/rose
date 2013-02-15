@@ -47,15 +47,9 @@ class SvnCaller(RosePopener):
     """Call "svn" commands."""
 
     def __call__(self, *args):
-        lang = os.getenv("LANG")
-        os.environ["LANG"] = "C"
-        try:
-            out, err = self.run_ok("svn", *args)
-        finally:
-            if lang is None:
-                os.environ.pop("LANG")
-            else:
-                os.environ["LANG"] = lang
+        environ = dict(os.environ)
+        environ["LANG"] = "C"
+        out, err = self.run_ok("svn", env=environ, *args)
         return out
 
 
