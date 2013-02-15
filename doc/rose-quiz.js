@@ -21,14 +21,14 @@ $(function() {
     /* Function for displaying answer/result info.*/
     function show_answers() {
         $(".answers").show(500);
-        $(".resultinfo").show(500);
+        $(".result-info").show(500);
     }
     
     /* Validate and present results on button click.*/
     $("#submitbutton").click(function() {
-        $(".answerstatus").remove();
+        $(".answer-status").remove();
         $(".results").hide();
-        $(".resultinfo").remove();
+        $(".result-info").remove();
         var names = [];
         var user_answers = new Array();
         var correct_answers = new Array();
@@ -43,14 +43,15 @@ $(function() {
             }
         });
         $.each(names, function(i, input_name) {
-            answer = $("input[name='" + input_name + "']:checked")
+            var answer = $("input[name='" + input_name + "']:checked")
             if (answer.length == 0) {
                 missing_fields.push(i + 1);
             }
             else {
                 user_answers[input_name].push(answer.val());
             }
-            correct_answer = $("#" + input_name + " .answers").attr("class").replace("answers ", "");
+            var correct_answer = $("#" + input_name + " .answers").attr("class");
+            correct_answer = correct_answer.replace("answers ", "");
             correct_answers[input_name].push(correct_answer);
         });
         /* Missing answer checking */
@@ -66,18 +67,36 @@ $(function() {
             correct_answers[input_name].sort();
             if (user_answers[input_name].join("") ==
                 correct_answers[input_name].join("")) {
-                $("#" + input_name + " .answers").prepend("<span class='answerstatus'><strong class='succeed'>Correct:</strong> </span>");
+                $("#" + input_name + " .answers").prepend(
+                    $("<span/>",
+                      {"class": "answer-status succeed"}
+                     ).text("Correct: ")
+                );
                 good_answers += 1;
             }
             else {
-                $("#" + input_name + " .answers").prepend("<span class='answerstatus'><strong class='fail'>Answer:</strong> </span>");
+                $("#" + input_name + " .answers").prepend(
+                    $("<span/>",
+                      {"class": "answer-status fail"}
+                     ).text("Answer: ")
+                );
                 bad_answers += 1;
             }
         });
-        $("#results").append("<h2 id='results' class='resultinfo'>Results<\/h2>" +
-                             "<p class='resultinfo'>You got " + good_answers +
-                             " answers correct, and " + bad_answers + " wrong.<\/p>");
-        $(".resultinfo").hide()
+        var res_text = (
+            "Right: " + good_answers +
+            ", Wrong: " + bad_answers + "."
+        );
+        $("#results").append(
+            $("<h2/>",
+              {"id": "results",
+               "class": "result-info"}
+             ).text("Results")
+        );
+        $("#results").append(
+            $("<p/>", {"class": "result-info"}).text(res_text)
+        );
+        $(".result-info").hide();
         $("html, body").animate({
             scrollTop: $("#results").offset().top,
         }, {

@@ -328,9 +328,8 @@ rocket=30
 
         <li>
           <p>Which metadata option best matches the following description?</p>
-          <pre>
-Used to order and group pages and variables in the config editor
-</pre>
+
+          <blockquote>Used to order and group pages and variables in the config editor</blockquote>
 
           <div id="meta-used-to-order" class="questions">
             <input type="radio" value="A" /><label for=
@@ -348,9 +347,8 @@ Used to order and group pages and variables in the config editor
 
         <li>
           <p>Which metadata option best matches the following description?</p>
-          <pre>
-Specify a regular expression that the value of the setting must match.
-</pre>
+          
+          <blockquote>Specify a regular expression that the value of the setting must match.</blockquote>
 
           <div id="meta-regex" class="questions">
             <input type="radio" value="A" /><label for=
@@ -368,9 +366,8 @@ Specify a regular expression that the value of the setting must match.
 
         <li>
           <p>Which metadata option best matches the following description?</p>
-          <pre>
-If not present, the setting is assumed to be a scalar. A positive integer defines a fixed length array.
-A colon : defines a dynamic length array.
+          <blockquote>If not present, the setting is assumed to be a scalar. A positive integer defines a fixed length array.
+A colon : defines a dynamic length array.</blockquote>
 </pre>
 
           <div id="meta-length" class="questions">
@@ -450,8 +447,7 @@ baz = 1, 1
             <p class="answers A"><em><samp>bar = 1</samp>, <samp>baz = 0,
             0</samp></em> - it throws an error if the expression evaluates true
             - i.e. <var>bar</var> &gt; 0 AND all elements in <var>baz</var> are
-            0. Missing options, as in <strong>B</strong>, cause the check to be
-            skipped.</p>
+            0. Missing options, as in the second answer, cause the check to be skipped.</p>
           </div>
         </li>
 
@@ -539,7 +535,7 @@ values=-1, 2, 10
 warn-if=True
 </pre>
 
-          <p>Which metadata option is redundant?</p>
+          <p>Which metadata option is definitely not needed?</p>
 
           <div id="meta-redundant" class="questions">
             <input type="radio" value="A" /><label for=
@@ -603,7 +599,7 @@ warn-if=True
             <input type="radio" value="B" /><label for=
             "B"><samp>$TMPDIR/suite-run/</samp></label><br />
             <input type="radio" value="C" /><label for=
-            "C"><samp>$DATADIR/suite-run/</samp></label><br />
+            "C"><samp>$PWD/suite-run/</samp></label><br />
             <input type="radio" value="D" /><label for=
             "D"><samp>$HOME/rose-suite-run/</samp></label><br />
 
@@ -640,7 +636,7 @@ warn-if=True
             running using cylc run</label><br />
             <input type="radio" value="B" /><label for="B">launches the output
             viewer</label><br />
-            <input type="radio" value="C" /><label for="C">sshes to a cylc
+            <input type="radio" value="C" /><label for="C">logs into a cylc
             server</label><br />
             <input type="radio" value="D" /><label for="D">launches a discovery
             GUI</label>
@@ -656,18 +652,52 @@ warn-if=True
           What is the correct command to run?</p>
 
           <div id="rosie-lookup" class="questions">
-            <input type="radio" value="A" /><label for="A"><code>rosie ls
-            --title='Case Study' --username=bob --all</code></label><br />
-            <input type="radio" value="B" /><label for="B"><code>rosie lookup
-            --allrevs 'Case Study' bob</code></label><br />
-            <input type="radio" value="C" /><label for="C"><code>rosie ls --all
-            -Q 'Case Study' in title and 'bob' from \[author,
-            owner\]</code></label><br />
-            <input type="radio" value="D" /><label for="D"><code>rosie lookup
-            --allrevs -Q title contains 'Case Study' and \( owner eq bob or
-            author eq bob \)</code></label>
 
-            <p class="answers D"><em><code>rosie lookup --allrevs -Q
+            <table summary="Answer Choices" class="questiontable">
+              <tr>
+                <td class="noborder"><input type="radio" value="A" /></td>
+
+                <td class="noborder">
+                  <pre>
+rosie ls --title='Case Study' --username=bob --all
+</pre>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="noborder"><input type="radio" value="B" /></td>
+
+                <td class="noborder">
+                  <pre>
+rosie lookup --allrevs 'Case Study' bob
+</pre>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="noborder"><input type="radio" value="C" /></td>
+
+                <td class="noborder">
+                  <pre>
+rosie ls --all -Q 'Case Study' in title and \
+ 'bob' from \[author, owner\]
+</pre>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="noborder"><input type="radio" value="D" /></td>
+
+                <td class="noborder">
+                  <pre>
+rosie lookup --all-revs -Q title contains 'Case Study' and \
+ \( owner eq bob or author eq bob \)
+</pre>
+                </td>
+              </tr>
+            </table>
+
+            <p class="answers D"><em><code>rosie lookup --all-revs -Q
             ...</code></em></p>
           </div>
         </li>
@@ -914,7 +944,7 @@ graph = """
           <div id="rose-orig-host" class="questions">
             <input type="radio" value="A" /><label for="A">the host where the
             cylc daemon is running</label><br />
-            <input type="radio" value="B" /><label for="B">the first
+            <input type="radio" value="B" /><label for="B">the very first
             computer</label><br />
             <input type="radio" value="C" /><label for="C">the host that
             invoked <code>rose suite-run</code></label><br />
@@ -960,14 +990,16 @@ graph = """
             --inconsequential</code></label>
 
             <p class="answers C"><em><code>rose suite-run --
-            --mode=simulation</code></em> - options following <samp>--</samp>
+            --mode=simulation</code></em> - options following <code>--</code>
             are passed directly to <code>cylc run</code>.</p>
           </div>
         </li>
       </ol>
     </form>
 
-    <h2 id="answer">Answers</h2><button id="submitbutton">Check
+    <h2 id="answer">Answers</h2>
+    
+    <br/><button id="submitbutton">Check
     Answers</button>
   </div>
 </body>

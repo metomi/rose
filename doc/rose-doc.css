@@ -192,6 +192,12 @@ body {
     font-family: sans-serif;
 }
 
+blockquote {
+    font-family: serif;
+    font-size: 90%;
+    font-style: italic;
+}   
+
 code,
 kbd,
 samp,
@@ -242,6 +248,7 @@ h4,
 h5,
 dt,
 .shell-prompt,
+.answer-status,
 .header-footer p {
     font-weight: bold;
 }
