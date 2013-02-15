@@ -103,7 +103,7 @@ $(function() {
             "duration": 500,
             "complete": show_answers
         });
-        $("#submitbutton").remove();
+        $("#submitcontainer").remove();
         $("#answer").remove();
         return false;
     });

@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -39,7 +39,7 @@
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
       "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
-    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose"/>
 
     <p><a href=".">Rose Documentation</a></p>
   </div>
@@ -329,7 +329,11 @@ rocket=30
         <li>
           <p>Which metadata option best matches the following description?</p>
 
-          <blockquote>Used to order and group pages and variables in the config editor</blockquote>
+          <blockquote>
+            <div>
+              Used to order and group pages and variables in the config editor
+            </div>
+          </blockquote>
 
           <div id="meta-used-to-order" class="questions">
             <input type="radio" value="A" /><label for=
@@ -347,8 +351,13 @@ rocket=30
 
         <li>
           <p>Which metadata option best matches the following description?</p>
-          
-          <blockquote>Specify a regular expression that the value of the setting must match.</blockquote>
+
+          <blockquote>
+            <div>
+              Specify a regular expression that the value of the setting must
+              match.
+            </div>
+          </blockquote>
 
           <div id="meta-regex" class="questions">
             <input type="radio" value="A" /><label for=
@@ -366,9 +375,14 @@ rocket=30
 
         <li>
           <p>Which metadata option best matches the following description?</p>
-          <blockquote>If not present, the setting is assumed to be a scalar. A positive integer defines a fixed length array.
-A colon : defines a dynamic length array.</blockquote>
-</pre>
+
+          <blockquote>
+            <div>
+              If not present, the setting is assumed to be a scalar. A positive
+              integer defines a fixed length array. A colon : defines a dynamic
+              length array.
+            </div>
+          </blockquote>
 
           <div id="meta-length" class="questions">
             <input type="radio" value="A" /><label for=
@@ -447,7 +461,8 @@ baz = 1, 1
             <p class="answers A"><em><samp>bar = 1</samp>, <samp>baz = 0,
             0</samp></em> - it throws an error if the expression evaluates true
             - i.e. <var>bar</var> &gt; 0 AND all elements in <var>baz</var> are
-            0. Missing options, as in the second answer, cause the check to be skipped.</p>
+            0. Missing options, as in the second answer, cause the check to be
+            skipped.</p>
           </div>
         </li>
 
@@ -652,7 +667,6 @@ warn-if=True
           What is the correct command to run?</p>
 
           <div id="rosie-lookup" class="questions">
-
             <table summary="Answer Choices" class="questiontable">
               <tr>
                 <td class="noborder"><input type="radio" value="A" /></td>
@@ -998,9 +1012,9 @@ graph = """
     </form>
 
     <h2 id="answer">Answers</h2>
-    
-    <br/><button id="submitbutton">Check
-    Answers</button>
+
+    <p id="submit-container"><button id="submitbutton">Check
+    Answers</button></p>
   </div>
 </body>
 </html>
