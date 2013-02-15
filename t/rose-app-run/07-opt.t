@@ -45,7 +45,7 @@ cat >config/opt/rose-app-$OPT_3.conf <<'__CONFIG__'
 [!env]
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 27
+tests 30
 #-------------------------------------------------------------------------------
 # Control run.
 TEST_KEY=$TEST_KEY_BASE-control
@@ -156,6 +156,25 @@ barman
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# In-place optional configuration, add option 3, 1 and 2.
+TEST_KEY=$TEST_KEY_BASE-opt-3-1-2-opts
+setup
+cp -r ../config ../config2
+{
+    echo '[]'
+    echo "opts=$OPT_3 $OPT_1 $OPT_2"
+} >>../config2/rose-app.conf
+run_fail "$TEST_KEY" rose app-run --config=../config2 -q
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+foolish fool
+baz
+__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+[FAIL] printenv FOO BAR BAZ # rc=1
+__CONTENT__
+rm -r ../config2
 teardown
 #-------------------------------------------------------------------------------
 exit
