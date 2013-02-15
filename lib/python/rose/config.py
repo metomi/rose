@@ -400,7 +400,7 @@ class ConfigLoader(object):
         """
         node = self.load(source, node)
         opt_conf_keys_node = node.unset(["opts"])
-        if opt_conf_keys_node is None or not opt_conf_keys_node.is_ignored():
+        if opt_conf_keys_node is None or opt_conf_keys_node.is_ignored():
             opt_conf_keys = []
         else:
             opt_conf_keys = shlex.split(opt_conf_keys_node.value)
