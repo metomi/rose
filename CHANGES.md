@@ -19,6 +19,10 @@ Use the `--no-strict` option if this is not desirable.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#454: Optional configuration files are now supported by all types of Rose
+configurations. The `opts=KEY ...` setting in the main configuration file of a
+Rose configuration can now be used to select a list of optional configurations.
+
 \#443: rose config-edit: user can now reload metadata with a single menu command.
 
 \#418: rose suite-hook: support latest naming convention of Cylc task job log.
