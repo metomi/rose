@@ -85,6 +85,10 @@ h1 {
     color: red;
 }
 
+.succeed {
+    color:green;
+}
+
 .warn {
     color: #ffc200;
 }
