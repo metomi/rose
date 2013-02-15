@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -22,7 +22,7 @@ Convenient functions for searching resource files.
 """
 
 import os
-import rose.config
+from rose.config import ConfigLoader, ConfigNode
 import string
 import sys
 
@@ -63,10 +63,11 @@ class ResourceLocator(object):
             site_file = os.path.join(self.get_util_home(), "etc", "rose.conf")
             user_file = os.path.join(
                     os.path.expanduser("~"), ".metomi", "rose.conf")
-            self.conf = rose.config.ConfigNode()
+            self.conf = ConfigNode()
+            config_loader = ConfigLoader()
             for file in [site_file, user_file]:
                 if os.path.isfile(file) and os.access(file, os.R_OK):
-                    rose.config.load(file, self.conf)
+                    config_loader.load_with_opts(file, self.conf)
         return self.conf
 
     def get_doc_url(self):

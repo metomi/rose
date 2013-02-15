@@ -24,6 +24,7 @@ import inspect
 import os
 import sys
 
+import rose.config
 import rose.macro
 
 

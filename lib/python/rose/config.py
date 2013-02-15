@@ -57,6 +57,7 @@ What about the standard library ConfigParser? Well, it is problematic:
 import os.path
 import re
 from rose.env import env_var_escape
+import shlex
 import sys
 
 
@@ -348,6 +349,9 @@ class ConfigLoader(object):
     """Loader of an INI format configuration into a Config object."""
 
     RE_SECTION = re.compile(r"^\s*\[(?P<state>!?!?)(?P<section>[^\]]*)\]\s*$")
+    TYPE_SECTION = "TYPE_SECTION"
+    TYPE_OPTION = "TYPE_OPTION"
+    UNKNOWN_NAME = "<???>"
 
     def __init__(self, char_assign=CHAR_ASSIGN, char_comment=CHAR_COMMENT):
         """Initialise the configuration utility.
@@ -368,6 +372,38 @@ class ConfigLoader(object):
             + char_assign
             + r"\s*(?P<value>.*)$")
 
+    def load_with_opts(self, source, node=None, more_keys=None):
+        """Read a source configuration file with optional configurations.
+
+        Arguments:
+        source -- a string for a file path.
+        node --- a ConfigNode object if specified, otherwise created.
+        more_keys -- a list of additional optional configuration names. If
+                     source is "rose-${TYPE}.conf", the file of each name
+                     should be "opt/rose-${TYPE}-${NAME}.conf".
+
+        Return node.
+        
+        """
+        node = self.load(source, node)
+        opt_conf_keys_node = node.unset(["opts"])
+        if opt_conf_keys_node is None or opt_conf_keys_node.is_ignored():
+            opt_conf_keys = []
+        else:
+            opt_conf_keys = shlex.split(opt_conf_keys_node.value)
+        if more_keys:
+            opt_conf_keys += more_keys
+        if not opt_conf_keys:
+            return node
+        source_dir = os.path.dirname(source)
+        source_root, source_ext = os.path.splitext(os.path.basename(source))
+        for key in opt_conf_keys:
+            opt_conf_file_name_base = source_root + "-" + key + source_ext
+            opt_conf_file_name = os.path.join(
+                    source_dir, "opt", opt_conf_file_name_base)
+            self.load(opt_conf_file_name, node)
+        return node
+
     def load(self, source, node=None):
         """Read a source configuration file.
 
@@ -375,23 +411,13 @@ class ConfigLoader(object):
         source -- an open file handle or a string for a file path.
         node --- a ConfigNode object if specified, otherwise created.
 
-        Return the node.
+        Return node.
         
         """
-        f = source
-        file_name = source
-        if isinstance(source, str):
-            f = open(source, "r")
-        else:
-            try:
-                file_name = f.name
-            except AttributeError:
-                file_name = "<???>"
         if node is None:
             node = ConfigNode()
+        f, file_name = self._get_file_and_name(source)
         keys = []
-        TYPE_SECTION = "TYPE_SECTION"
-        TYPE_OPTION = "TYPE_OPTION"
         type = None
         comments = None
         line_num = 0
@@ -412,7 +438,7 @@ class ConfigLoader(object):
                     comments.append(self._comment_strip(line))
                 continue
             # Handle option continuation.
-            if type == TYPE_OPTION and line[0].isspace():
+            if type == self.TYPE_OPTION and line[0].isspace():
                 value = node.get(keys[:]).value
                 value_cont = line.strip()
                 if value_cont.startswith(self.char_assign):
@@ -423,13 +449,13 @@ class ConfigLoader(object):
             match = self.RE_SECTION.match(line)
             if match:
                 section, state = match.group("section", "state")
-                if type == TYPE_OPTION:
+                if type == self.TYPE_OPTION:
                     keys.pop()
                 if keys:
                     keys.pop()
                 if section:
                     keys.append(section)
-                    type = TYPE_SECTION
+                    type = self.TYPE_SECTION
                 else:
                     keys = []
                     type = None
@@ -447,15 +473,13 @@ class ConfigLoader(object):
             if not match:
                 raise ConfigSyntaxError(file_name, line_num, line)
             option, value, state = match.group("option", "value", "state")
-            if type == TYPE_OPTION:
+            if type == self.TYPE_OPTION:
                 keys.pop()
             keys.append(option)
-            type = TYPE_OPTION
+            type = self.TYPE_OPTION
             value = value.strip()
             node.set(keys[:], value.strip(), state, comments)
             comments = []
-        if f is not source:
-            f.close()
         return node
 
     __call__ = load
@@ -463,27 +487,33 @@ class ConfigLoader(object):
     def _comment_strip(self, line):
         return line.strip()[1:]
 
+    def _get_file_and_name(self, f):
+        if hasattr(f, "readline"):
+            try:
+                file_name = f.name
+            except AttributeError:
+                file_name = self.UNKNOWN_NAME
+        else:
+            file_name = os.path.abspath(f)
+            f = open(file_name, "r")
+        return (f, file_name)
+
 
 class ConfigSyntaxError(Exception):
 
     """Exception raised for syntax error loading a configuration file."""
 
     def __init__(self, file_name, line_number, line, e=None):
+        Exception.__init__(self, file_name, line_number, line, e)
+
+    def __str__(self):
+        file_name, line_number, line, e = self.args
         e_string = ""
         if e:
             e_string = "%s:" % (e)
         else:
             e_string = "[SYNTAX ERROR]"
-        self.message = (
-            "%s %s:%d:\n%s"
-            % (e_string, file_name, line_number, line)
-        )
-        Exception.__init__(self, self.message)
-
-    def __repr__(self):
-        return self.message
-
-    __str__ = __repr__
+        return "%s %s:%d:\n%s" % (e_string, file_name, line_number, line)
 
 
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,
