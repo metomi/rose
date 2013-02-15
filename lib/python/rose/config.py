@@ -344,19 +344,6 @@ class ConfigDumper(object):
         return "#%s\n" % (comment)
 
 
-class ConfigCyclicError(Exception):
-
-    """Error raised when the loader detects a cyclic dependency."""
-
-    def __str__(self):
-        ret = "Cyclic dependency:\n"
-        for i, arg in enumerate(self.args):
-            if i:
-                ret += "   " * (i - 1) + " `- " + arg + "\n"
-            else:
-                ret += " " + arg + "\n"
-        return ret
-
 class ConfigLoader(object):
 
     """Loader of an INI format configuration into a Config object."""

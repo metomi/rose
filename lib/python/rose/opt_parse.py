@@ -265,6 +265,7 @@ class RoseOptionParser(OptionParser):
                        ["--print-ignored", "-i"],
                        {"action": "store_false",
                         "dest": "no_ignore",
+                        "default": True,
                         "help": "Print ignored settings where relevant."}],
                "no_opts": [
                        ["--no-opts"],

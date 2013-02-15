@@ -145,16 +145,15 @@ def main():
                 i_equal = len(state + key) + 1
                 for line in lines[1:]:
                     print " " * i_equal + line
+        elif node is None:
+            if opts.default is None:
+                sys.exit(1)
+            print opts.default
         else:
-            if node is None:
-                if opts.default is None:
-                    sys.exit(1)
-                print opts.default
-            else:
-                value = node.value
-                if opts.env_var_process_mode:
-                    value = env_var_process(value)
-                print value
+            value = node.value
+            if opts.env_var_process_mode:
+                value = env_var_process(value)
+            print value
 
 
 if __name__ == "__main__":
