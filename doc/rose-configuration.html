@@ -96,6 +96,10 @@
     <p>We have added the following conventions into our INI format:</p>
 
     <ol>
+      <li>The file name is normally called <samp>rose*.conf</samp>, e.g.
+      <samp>rose.conf</samp>, <samp>rose-app.conf</samp>,
+      <samp>rose-meta.conf</samp>, etc.</li>
+
       <li>Only a hash <kbd>#</kbd> in the beginning of a line starts a comment.
       Empty lines and lines with only white spaces are ignored. There is no
       support for trailing comments. Comments are normally ignored when a
@@ -210,6 +214,23 @@ key-4=value 4
     to represent a <code>KEY=VALUE</code> pair in a <code>[SECTION]</code> of
     an INI format file.</p>
 
+    <h2 id="opts">Optional Configuration</h2>
+
+    <p>In a Rose configuration directory, we can add an <samp>opt/</samp>
+    sub-directory for optional configuration files. Optional configuration
+    files contain additional configuration, which can be selected at run time to
+    override the configuration in the main <var>rose-${TYPE}.conf</var> file.
+    The name of each optional configuration should follow the syntax
+    <var>rose-${TYPE}-${KEY}.conf</var>, where <var>${KEY}</var> is a short
+    name to describe the override functionality of the optional configuration
+    file.</p>
+
+    <p>A root level <var>opts=KEY ...</var> setting in the main configuration
+    will tell the run time program to load the relevant optional configurations
+    in the <samp>opt/</samp> sub-directory at run time. Individual Rose
+    utilities may also read optional configuration keys from environment
+    variables and/or command line options.</p>
+
     <h2 id="site">Site and User Configuration</h2>
 
     <p>Aspects of some Rose utilities can be configured per installation via
@@ -272,6 +293,11 @@ accel-find-next=F3
 
       <li>A <samp>meta/</samp> directory containing the suite's configuration
       metadata.</li>
+
+      <li><samp>opt/</samp> directory. For detail, see <a href="#opts">Optional
+      Configuration</a> and <a href=
+      "rose-rug-suite-tools#rose-suite-run.opt">Rose User Guide: Suite Tools &gt;
+      rose-suite-run &gt; Optional Configuration Selection</a>.</li>
 
       <li>Other items, as long as they do not clash with the scheduler's
       working directories. E.g. for a cylc suite, <samp>log*/</samp>,
@@ -432,13 +458,10 @@ accel-find-next=F3
       <li><samp>meta/</samp> directory for the metadata of the
       application.</li>
 
-      <li><samp>opt/</samp> directory for optional configuration files. An
-      optional configuration file contains additional configuration, which can
-      be selected at run time to override the configuration in
-      <samp>rose-app.conf</samp>. The name of each optional configuration
-      should follow the syntax <code>rose-app-NAME.conf</code>, where
-      <var>NAME</var> is a short name to describe the override functionality of
-      the optional configuration file.</li>
+      <li><samp>opt/</samp> directory. For detail, see <a href="#opts">Optional
+      Configuration</a> and <a href=
+      "rose-rug-suite-tools#rose-task-run.opt">Rose User Guide: Suite Tools &gt;
+      rose task-run &gt; Optional Configuration Selection</a>.</li>
     </ul>
 
     <p>E.g. The application configuration directory may look like:</p>
@@ -622,6 +645,9 @@ delays=0,6*10s,60*1m,1h
     <ul>
       <li><samp>rose-meta.conf</samp>, the main configuration file. See
       <a href="#meta.conf"></a> for detail.</li>
+
+      <li><samp>opt/</samp> directory. For detail, see <a href="#opts">Optional
+      Configuration</a>.</li>
 
       <li>other files, e.g.:
 

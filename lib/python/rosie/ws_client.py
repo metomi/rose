@@ -370,9 +370,9 @@ def get_local_status(suites, prefix, idx, branch, revision):
             status = STATUS_SW
             if suite_id.branch == branch:
                 status = STATUS_DO
-                if int(suite_id.revision) < int(revision):
+                if suite_id.out_of_date:
                     status = STATUS_UP
-                if int(suite_id.revision) == int(revision):
+                elif int(suite_id.revision) == int(revision):
                     status = STATUS_OK
                     if suite_id.modified:
                         status = STATUS_MO

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ from fnmatch import fnmatchcase
 from glob import glob
 import os
 import re
-import rose.config
+from rose.config import ConfigDumper, ConfigLoader
 from rose.env \
         import env_export, env_var_process, UnboundEnvironmentVariableError
 from rose.config_processor import ConfigProcessorsManager
@@ -170,7 +170,7 @@ class Dummy(object):
 class BuiltinApp(object):
 
     """An abstract base class for a builtin application.
-    
+
     Instance of sub-classes are expected to be managed by
     rose.scheme_handler.SchemeHandlersManager.
 
@@ -204,7 +204,6 @@ class Runner(object):
 
     """Invoke a Rose application or a Rose suite."""
 
-    CONFIG_IS_OPTIONAL = False
     CONF_NAME = None
     NAME = None
     OPTIONS = []
@@ -255,7 +254,7 @@ class Runner(object):
 
     def config_load(self, opts):
         """Combine main config file with optional ones and defined ones.
-        
+
         Return a ConfigNode.
 
         """
@@ -264,15 +263,7 @@ class Runner(object):
         conf_dir = opts.conf_dir
         if conf_dir is None:
             conf_dir = os.getcwd()
-        config = rose.config.ConfigNode()
         source = os.path.join(conf_dir, "rose-" + self.CONF_NAME + ".conf")
-        if self.CONFIG_IS_OPTIONAL:
-            try:
-                rose.config.load(source, config)
-            except IOError as e:
-                pass
-        else:
-            rose.config.load(source, config)
 
         # Optional configuration files
         opt_conf_keys = []
@@ -282,14 +273,13 @@ class Runner(object):
             opt_conf_keys += shlex.split(opt_conf_keys_env)
         if opts.opt_conf_keys:
             opt_conf_keys += opts.opt_conf_keys
-        for key in opt_conf_keys:
-            source_base = "rose-" + self.CONF_NAME + "-" + key + ".conf"
-            source = os.path.join(conf_dir, "opt", source_base)
-            rose.config.load(source, config)
+
+        config_loader = ConfigLoader()
+        node = config_loader.load_with_opts(source, more_keys=opt_conf_keys)
 
         # Optional defines
         # N.B. In theory, we should write the values in "opts.defines" to
-        # "config" directly. However, the values in "opts.defines" may contain
+        # "node" directly. However, the values in "opts.defines" may contain
         # "ignore" flags. Rather than replicating the logic for parsing ignore
         # flags in here, it is actually easier to write the values in
         # "opts.defines" to a file and pass it to the loader to parse it.
@@ -305,8 +295,8 @@ class Runner(object):
                 if key is not None:
                     source.write("%s=%s\n" % (key, value))
             source.seek(0)
-            rose.config.load(source, config)
-        return config
+            config_loader.load(source, node)
+        return node
 
     def run(self, opts, args):
 
@@ -524,7 +514,7 @@ class AppRunner(Runner):
                 self.fs_util.delete(p)
 
         # Dump the actual configuration as rose-app-run.conf
-        rose.config.dump(config, "rose-app-run.conf")
+        ConfigDumper()(config, "rose-app-run.conf")
 
         # Environment variables: PATH
         conf_dir = opts.conf_dir
@@ -538,7 +528,7 @@ class AppRunner(Runner):
             config.set(["env", "PATH"], os.getenv("PATH"))
 
         # Free format files not defined in the configuration file
-        conf_file_dir = os.path.join(conf_dir, rose.SUB_CONFIG_FILE_DIR)
+        conf_file_dir = os.path.join(conf_dir, "file")
         file_section_prefix = self.config_pm.get_handler("file").PREFIX
         if os.path.isdir(conf_file_dir):
             dirs = []
@@ -658,14 +648,14 @@ class SuiteRunner(Runner):
         # Automatic Rose constants
         # ROSE_ORIG_HOST: originating host
         # ROSE_VERSION: Rose version (not retained in run_mode=="reload")
-        # Suite engine version 
+        # Suite engine version
         jinja2_section = "jinja2:" + self.suite_engine_proc.SUITE_CONF
         my_rose_version = ResourceLocator.default().get_version()
         suite_engine_key = self.suite_engine_proc.get_version_env_name()
         if opts.run_mode == "reload":
             prev_config_path = self.suite_engine_proc.get_suite_dir(
                     suite_name, "log", "rose-suite-run.conf")
-            prev_config = rose.config.load(prev_config_path)
+            prev_config = ConfigLoader()(prev_config_path)
             suite_engine_version = prev_config.get_value(
                     ["env", suite_engine_key])
         else:
@@ -731,7 +721,7 @@ class SuiteRunner(Runner):
         prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), run_mode)
 
         # Dump the actual configuration as rose-suite-run.conf
-        rose.config.dump(config, "log/" + prefix + ".conf")
+        ConfigDumper()(config, "log/" + prefix + ".conf")
 
         # Install version information file
         write_source_vc_info(
@@ -923,7 +913,7 @@ class SuiteRunner(Runner):
                 log_link = os.readlink(log)
                 if log_link in logs:
                     logs.remove(log_link)
-            
+
         # Housekeep old logs, if necessary
         log_keep = getattr(opts, "log_keep", None)
         if log_keep:

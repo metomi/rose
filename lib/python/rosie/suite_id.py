@@ -47,7 +47,9 @@ class SvnCaller(RosePopener):
     """Call "svn" commands."""
 
     def __call__(self, *args):
-        out, err = self.run_ok("svn", *args)
+        environ = dict(os.environ)
+        environ["LANG"] = "C"
+        out, err = self.run_ok("svn", env=environ, *args)
         return out
 
 
@@ -341,15 +343,18 @@ class SuiteId(object):
     def _set_statuses(self, path):
         if os.path.exists(path):
             try:
-                status_lines = self.svn("st", "-u", path).splitlines()
+                out = self.svn("st", "-u", path)
             except RosePopenError:
                 raise SuiteIdLocationError(path)
-            if status_lines:
-                latest_rev = int(status_lines.pop().split()[-1])
-                self.out_of_date = (latest_rev > int(self.revision))
-            else:
-                self.out_of_date = False
-            self.modified = any([l[:7].strip() for l in status_lines])
+            for line in out.splitlines():
+                if line.startswith("Status against revision:"):
+                    continue
+                if line[8] == "*":
+                    self.out_of_date = True
+                if line[:7].strip():
+                    self.modified = True
+                if self.out_of_date and self.modified:
+                    break
 
     def incr(self):
         """Return an SuiteId object that represents the ID after this ID."""
