@@ -85,6 +85,10 @@ h1 {
     color: red;
 }
 
+.succeed {
+    color:green;
+}
+
 .warn {
     color: #ffc200;
 }
@@ -171,6 +175,11 @@ th {
     border-collapse: collapse;
 }
 
+.noborder,
+.questiontable {
+    border: none;
+}
+
 #body-main {
     border: thin ridge #ccc;
 }
@@ -182,6 +191,12 @@ th {
 body {
     font-family: sans-serif;
 }
+
+blockquote {
+    font-family: serif;
+    font-size: 90%;
+    font-style: italic;
+}   
 
 code,
 kbd,
@@ -233,6 +248,7 @@ h4,
 h5,
 dt,
 .shell-prompt,
+.answer-status,
 .header-footer p {
     font-weight: bold;
 }
@@ -367,6 +383,10 @@ caption {
 
 table {
     margin-top: 2em;
+}
+
+.questiontable {
+    margin: 0.25em;
 }
 
 #body-main {
