@@ -144,10 +144,11 @@ class ConfigPage(gtk.VBox):
         label_event_box = gtk.EventBox()
         label_event_box.add(label)
         label_event_box.show()
-        label_event_box.connect("enter-notify-event",
-                                self._handle_enter_label)
-        label_event_box.connect("leave-notify-event",
-                                self._handle_leave_label)
+        if self.help:
+            label_event_box.connect("enter-notify-event",
+                                    self._handle_enter_label)
+            label_event_box.connect("leave-notify-event",
+                                    self._handle_leave_label)
         label_box = gtk.HBox(homogeneous=False)
         if self.icon_path is not None:
             self.label_icon = gtk.Image()
@@ -179,7 +180,7 @@ class ConfigPage(gtk.VBox):
             event_box.connect("enter-notify-event", self._set_tab_tooltip)
         return event_box
 
-    def _handle_enter_label(self, label_event_box):
+    def _handle_enter_label(self, label_event_box, event=None):
         label = label_event_box.get_child()
         att_list = label.get_attributes()
         if att_list is None:
@@ -189,13 +190,16 @@ class ConfigPage(gtk.VBox):
                                             end_index=-1))
         label.set_attributes(att_list)
 
-    def _handle_leave_label(self, label_event_box):
+    def _handle_leave_label(self, label_event_box, event=None):
         label = label_event_box.get_child()
         att_list = label.get_attributes()
         if att_list is None:
             att_list = pango.AttrList()
         att_list = att_list.filter(lambda a:
                                    a.type != pango.ATTR_UNDERLINE)
+        if att_list is None:
+            # This is messy but necessary.
+            att_list = pango.AttrList()
         label.set_attributes(att_list)
 
     def _set_tab_tooltip(self, event_box, event):
