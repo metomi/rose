@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
@@ -48,7 +48,7 @@
 #     # Combine the configurations in FILE1 and FILE2, and dump the result.
 #     rose config --file=FILE1 --file=FILE2
 #
-#     # Print the value of OPTION in SECTION of the metadata associated with 
+#     # Print the value of OPTION in SECTION of the metadata associated with
 #     # the specified config FILE
 #     rose config --file=FILE --meta SECTION OPTION
 #
@@ -78,11 +78,13 @@
 #         If specified, only print the SECTION keys in the configuration file or
 #         the OPTION keys in a SECTION.
 #     --meta
-#         If specified, operate on the metadata associated with the 
+#         If specified, operate on the metadata associated with the
 #         configuration FILE.
 #     --meta-key=KEY
 #         If specified, prints the value of a specified metadata flag KEY.
 #         Cannot be used in conjunction with --file=FILE.
+#     --no-opts
+#         Do not load optional configurations.
 #     --print-ignored, -i
 #         If specified, the program will print ignored !OPTION=VALUE where
 #         relevant.

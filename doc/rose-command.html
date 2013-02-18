@@ -403,14 +403,14 @@
 
       <dd>Combine the configurations in <var>FILE1</var> and <var>FILE2</var>,
       and dump the result.</dd>
-      
+
       <dt><kbd>rose config --file=FILE --meta SECTION OPTION</kbd></dt>
-      
-      <dd>Print the value of <var>OPTION</var> in <var>SECTION</var> of the 
+
+      <dd>Print the value of <var>OPTION</var> in <var>SECTION</var> of the
       metadata associated with the specified config <var>FILE</var>.</dd>
-      
+
       <dt><kbd>rose config --meta-key=KEY</kbd></dt>
-      
+
       <dd>Print the value of a specified metadata <var>KEY</var>.</dd>
     </dl>
 
@@ -453,15 +453,19 @@
       <var>SECTION</var>.</dd>
 
       <dt><kbd>--meta</kbd></dt>
-      
-      <dd>If specified, operate on the metadata associated with the 
+
+      <dd>If specified, operate on the metadata associated with the
       configuration <var>FILE</var>.</dd>
 
-     <dt><kbd>--meta-key=KEY</kbd></dt>
+      <dt><kbd>--meta-key=KEY</kbd></dt>
 
-     <dd>If specified, prints the value of a specified metadata flag
-     <var>KEY</var>. Cannot be used in conjunction with
-     <kbd>--file=FILE</kbd>.</dd>
+      <dd>If specified, prints the value of a specified metadata flag
+      <var>KEY</var>. Cannot be used in conjunction with
+      <kbd>--file=FILE</kbd>.</dd>
+
+      <dt><kbd>--no-opts</kbd></dt>
+
+      <dd>Do not load optional configurations.</dd>
 
       <dt><kbd>--print-ignored, -i</kbd></dt>
 
@@ -494,9 +498,9 @@
     <h3>DESCRIPTION</h3>
 
     <p>Re-dump Rose configuration files in the common format.</p>
- 
+
     <p>Load and dump <var>rose-*.conf</var> files in place.</p>
- 
+
     <p>By default, it recursively loads and dumps all <var>rose-*.conf</var>
     files in the current working directory.Parse a set of rose configuration
     files.</p>
@@ -1538,7 +1542,7 @@
       the data directory of 1 day before the current cycle time.</dd>
 
       <dt><var>ROSE_ETC</var></dt>
-      
+
       <dd>The path to the etc directory of the running suite.</dd>
 
       <dt><var>ROSE_TASK_PREFIX</var></dt>
@@ -1591,16 +1595,16 @@
 
     <h3>NOTE ON CYCLE TIME</h3>
 
-    <p>Cycle time is expected to be in the <var>YYYYmmdd[HH[MM]]</var> format 
-    at the moment. It would be desirable to move to an ISO 8601 compliant 
-    format, e.g. <var>&lt;date&gt;[T&lt;time&gt;]</var> where 
-    <var>&lt;date&gt;</var> is <var>YYYYmmdd</var> and <var>&lt;time&gt;</var> 
+    <p>Cycle time is expected to be in the <var>YYYYmmdd[HH[MM]]</var> format
+    at the moment. It would be desirable to move to an ISO 8601 compliant
+    format, e.g. <var>&lt;date&gt;[T&lt;time&gt;]</var> where
+    <var>&lt;date&gt;</var> is <var>YYYYmmdd</var> and <var>&lt;time&gt;</var>
     is <var>HH[MM]</var>.</p>
 
     <h3>USAGE IN SUITES</h3>
 
-    <p><kbd>rose task-env</kbd> can be used to make environment variables 
-    available to a suite by defining its suite.rc <var>environment 
+    <p><kbd>rose task-env</kbd> can be used to make environment variables
+    available to a suite by defining its suite.rc <var>environment
     scripting</var> option as:</p>
     <pre>
 environment scripting = "eval $(rose task-env)"

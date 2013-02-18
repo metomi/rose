@@ -40,7 +40,7 @@ syn sync fromstart
 syn match roselinecomment '^#.*$'
 syn region roseignoredsection start='^\[!!\?[^!].*\]' end='^\ze\[' contains=roselinecomment
 syn match rosesection '^\[[^!].*\]$'
-syn region roseignoredoption start='^!!\?[^!].*$' end='^\ze\S'
+syn region roseignoredoption start='^!!\?\(\w\|-\).*$' end='^\ze\S'
 syn match roserhsvaluecont '^\s\s*\w.*$'
 syn match roserhsvalue '^[^=]*=\zs.*$'
 

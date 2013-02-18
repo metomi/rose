@@ -3,6 +3,30 @@
 Go to https://github.com/metomi/rose/issues/milestones?state=closed
 for a full listing of issues for each release.
 
+## Next Release (End of 2013-Q1)
+
+This will be the 3rd release of Rose.
+
+### Highlight Changes
+
+Changes that have significant impact on user experience.
+
+\#422: rose suite-run: will now call `cylc validate --strict` by default.
+Use the `--no-strict` option if this is not desirable.
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+\#454: Optional configuration files are now supported by all types of Rose
+configurations. The `opts=KEY ...` setting in the main configuration file of a
+Rose configuration can now be used to select a list of optional configurations.
+
+\#443: rose config-edit: user can now reload metadata with a single menu command.
+
+\#418: rose suite-hook: support latest naming convention of Cylc task job log.
+
 ## Rose 2013-01 (Released 2013-01-31)
 
 This is the 2nd release of Rose. We hope you find it useful.
