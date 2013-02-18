@@ -141,6 +141,13 @@ class ConfigPage(gtk.VBox):
             label = gtk.Label(self.label)
             self.is_detached = False
         label.show()
+        label_event_box = gtk.EventBox()
+        label_event_box.add(label)
+        label_event_box.show()
+        label_event_box.connect("enter-notify-event",
+                                self._handle_enter_label)
+        label_event_box.connect("leave-notify-event",
+                                self._handle_leave_label)
         label_box = gtk.HBox(homogeneous=False)
         if self.icon_path is not None:
             self.label_icon = gtk.Image()
@@ -158,7 +165,7 @@ class ConfigPage(gtk.VBox):
         setattr(style, "inner-border", [0, 0, 0, 0] )
         close_button.modify_style(style)
         
-        label_box.pack_start(label, expand=False, fill=False,
+        label_box.pack_start(label_event_box, expand=False, fill=False,
                              padding=rose.config_editor.SPACING_SUB_PAGE)
         if not is_detached:
             label_box.pack_end(close_button, expand=False, fill=False)
@@ -166,11 +173,30 @@ class ConfigPage(gtk.VBox):
         event_box = gtk.EventBox()
         event_box.add(label_box)
         close_button.connect('released', lambda b: self.close_self())
-        event_box.connect('button_press_event', self.launch_tab_menu)
+        event_box.connect('button_press_event', self._handle_click_tab)
         event_box.show()
         if self.info is not None:
             event_box.connect("enter-notify-event", self._set_tab_tooltip)
         return event_box
+
+    def _handle_enter_label(self, label_event_box):
+        label = label_event_box.get_child()
+        att_list = label.get_attributes()
+        if att_list is None:
+            att_list = pango.AttrList()
+        att_list.insert(pango.AttrUnderline(pango.UNDERLINE_SINGLE,
+                                            start_index=0,
+                                            end_index=-1))
+        label.set_attributes(att_list)
+
+    def _handle_leave_label(self, label_event_box):
+        label = label_event_box.get_child()
+        att_list = label.get_attributes()
+        if att_list is None:
+            att_list = pango.AttrList()
+        att_list = att_list.filter(lambda a:
+                                   a.type != pango.ATTR_UNDERLINE)
+        label.set_attributes(att_list)
 
     def _set_tab_tooltip(self, event_box, event):
         tip_text = ""
@@ -182,10 +208,13 @@ class ConfigPage(gtk.VBox):
                 tip_text += "\n" + comment_format(comment_line)
         event_box.set_tooltip_text(tip_text)
 
-    def launch_tab_menu(self, event_widget=None, event=None, somewidget=None):
+    def _handle_click_tab(self, event_widget, event):
+        if event.button == 3:
+            return self.launch_tab_menu()
+        return self.launch_help()
+
+    def launch_tab_menu(self):
         """Open a popup menu for the tab, if right clicked."""
-        if event.button != 3:
-            return False
         ui_config_string_start = """<ui> <popup name='Popup'>"""
         ui_config_string_end = """</popup> </ui>"""
         if not self.is_detached:
