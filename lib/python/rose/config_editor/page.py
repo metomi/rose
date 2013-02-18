@@ -214,10 +214,10 @@ class ConfigPage(gtk.VBox):
 
     def _handle_click_tab(self, event_widget, event):
         if event.button == 3:
-            return self.launch_tab_menu()
+            return self.launch_tab_menu(event)
         return self.launch_help()
 
-    def launch_tab_menu(self):
+    def launch_tab_menu(self, event):
         """Open a popup menu for the tab, if right clicked."""
         ui_config_string_start = """<ui> <popup name='Popup'>"""
         ui_config_string_end = """</popup> </ui>"""
