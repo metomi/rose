@@ -452,7 +452,6 @@ class ConfigPage(gtk.VBox):
             help_hbox = gtk.HBox()
             help_hbox.pack_start(help_label_window, expand=True, fill=True,
                                  padding=rose.config_editor.SPACING_SUB_PAGE)
-            help_hbox.set_tooltip_text(self.info)
             help_hbox.show()
             info_container.pack_start(
                                 help_hbox, expand=True, fill=True,
