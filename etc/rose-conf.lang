@@ -61,7 +61,7 @@
       <match>^ +[\w-].*$</match>
     </context>
     <context id="ignored-option" style-ref="ignored-option" end-at-line-end="false">
-      <start>^!!?.*$</start>
+      <start>^!!?\S.*$</start>
       <end>^(?=[[\w-#!])</end>
     </context>
     <context id="ignored-section" style-ref="ignored-section" end-at-line-end="false">
