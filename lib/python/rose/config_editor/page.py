@@ -66,14 +66,15 @@ class ConfigPage(gtk.VBox):
         self.launch_edit = launch_edit_func
         namespaces = self.namespace.strip('/').split('/')
         namespaces.reverse()
+        self.info = ""
         if self.description is None:
-            self.description = " - ".join(namespaces[:-1])
+            self.info = " - ".join(namespaces[:-1])
         else:
             if self.description != '':
-                self.description += '\n'
-            self.description += " - ".join(namespaces[:-1])
+                self.info = self.description + '\n'
+            self.info += " - ".join(namespaces[:-1])
         if self.see_also != '':
-            self.description += '\n => ' + self.see_also
+            self.info += '\n => ' + self.see_also
         self.panel_data = config_data
         self.ghost_data = ghost_data
         self.variable_ops = variable_ops
@@ -167,14 +168,14 @@ class ConfigPage(gtk.VBox):
         close_button.connect('released', lambda b: self.close_self())
         event_box.connect('button_press_event', self.launch_tab_menu)
         event_box.show()
-        if self.description is not None:
+        if self.info is not None:
             event_box.connect("enter-notify-event", self._set_tab_tooltip)
         return event_box
 
     def _set_tab_tooltip(self, event_box, event):
         tip_text = ""
-        if self.description is not None:
-            tip_text += self.description
+        if self.info is not None:
+            tip_text += self.info
         if self.section is not None:
             comment_format = rose.config_editor.VAR_COMMENT_TIP.format
             for comment_line in self.section.comments:
@@ -396,29 +397,29 @@ class ConfigPage(gtk.VBox):
             var_hbox.show()
             info_container.pack_start(var_hbox, expand=False, fill=True)
         # Add page help.
-        if self.help is not None:
-            help_expander = gtk.Expander(rose.config_editor.LABEL_PAGE_HELP)
+        if self.description:
             help_label = rose.gtk.util.get_hyperlink_label(
-                                  self.help, search_func=self.search_for_id)
+                                  self.description, search_func=self.search_for_id)
             help_label_window = gtk.ScrolledWindow()
             help_label_window.set_policy(gtk.POLICY_AUTOMATIC,
                                          gtk.POLICY_AUTOMATIC)
             help_label_hbox = gtk.HBox()
             help_label_hbox.pack_start(help_label, expand=False, fill=False)
             help_label_hbox.show()
-            help_label_window.add_with_viewport(help_label_hbox)
+            help_label_vbox = gtk.VBox()
+            help_label_vbox.pack_start(help_label_hbox, expand=False, fill=False)
+            help_label_vbox.show()
+            help_label_window.add_with_viewport(help_label_vbox)
             help_label_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
             help_label_window.show()
-            help_expander.add(help_label_window)
             width, height = help_label_window.size_request()
             height = min([rose.config_editor.SIZE_WINDOW[1] / 3, 
                           help_label.size_request()[1]])
             help_label_window.set_size_request(width, height)
-            help_expander.show()
             help_hbox = gtk.HBox()
-            help_hbox.pack_start(help_expander, expand=True, fill=True,
+            help_hbox.pack_start(help_label_window, expand=True, fill=True,
                                  padding=rose.config_editor.SPACING_SUB_PAGE)
-            help_hbox.set_tooltip_text(self.description)
+            help_hbox.set_tooltip_text(self.info)
             help_hbox.show()
             info_container.pack_start(
                                 help_hbox, expand=True, fill=True,
