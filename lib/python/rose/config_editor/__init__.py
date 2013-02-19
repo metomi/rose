@@ -142,6 +142,7 @@ VAR_MENU_REMOVE = '_Remove'
 VAR_MENU_URL = '_Web Help'
 # Button strings
 LABEL_EDIT = "edit"
+LABEL_PAGE_HELP = "Page help"
 
 # Loading strings
 LOAD_CONFIG = "reading    "

@@ -976,27 +976,7 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     # Apply the text
     message_vbox = gtk.VBox()
     message_vbox.show()
-    label = gtk.Label()
-    label.show()
-    try:
-        pango.parse_markup(text)
-    except glib.GError:
-        label.set_text(text)
-    else:
-        try:
-            label.connect("activate-link",
-                          lambda l, u: handle_link(u, search_func))
-        except TypeError:  # No such signal before PyGTK 2.18
-            label.connect("button-release-event",
-                          lambda l, e: extract_link(l, search_func))
-            text = REC_DIALOG_HYPERLINK_ID_OR_URL.sub(
-                                        DIALOG_MARKUP_URL_UNDERLINE, text)
-            label.set_markup(text)
-        else:
-            text = REC_DIALOG_HYPERLINK_ID_OR_URL.sub(
-                                        DIALOG_MARKUP_URL_HTML, text)
-            label.set_markup(text)
-    
+    label = get_hyperlink_label(text, search_func)   
     message_vbox.pack_start(label, expand=True, fill=True,
                             padding=DIALOG_PADDING)
     scrolled_window = gtk.ScrolledWindow()
@@ -1036,6 +1016,31 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     dialog.show()
     label.set_selectable(True)
     button.grab_focus()
+
+
+def get_hyperlink_label(text, search_func=lambda i: False):
+    """Return a label with clickable hyperlinks."""
+    label = gtk.Label()
+    label.show()
+    try:
+        pango.parse_markup(text)
+    except glib.GError:
+        label.set_text(text)
+    else:
+        try:
+            label.connect("activate-link",
+                          lambda l, u: handle_link(u, search_func))
+        except TypeError:  # No such signal before PyGTK 2.18
+            label.connect("button-release-event",
+                          lambda l, e: extract_link(l, search_func))
+            text = REC_DIALOG_HYPERLINK_ID_OR_URL.sub(
+                                        DIALOG_MARKUP_URL_UNDERLINE, text)
+            label.set_markup(text)
+        else:
+            text = REC_DIALOG_HYPERLINK_ID_OR_URL.sub(
+                                        DIALOG_MARKUP_URL_HTML, text)
+            label.set_markup(text)
+    return label
 
 
 def run_scrolled_dialog(text, title=None):
