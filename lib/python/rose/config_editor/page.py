@@ -215,7 +215,8 @@ class ConfigPage(gtk.VBox):
     def _handle_click_tab(self, event_widget, event):
         if event.button == 3:
             return self.launch_tab_menu(event)
-        return self.launch_help()
+        if self.help and self.main_vpaned.flags() & gtk.MAPPED:
+            return self.launch_help()
 
     def launch_tab_menu(self, event):
         """Open a popup menu for the tab, if right clicked."""
