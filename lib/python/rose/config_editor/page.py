@@ -144,7 +144,7 @@ class ConfigPage(gtk.VBox):
         label_event_box = gtk.EventBox()
         label_event_box.add(label)
         label_event_box.show()
-        if self.help:
+        if self.help or self.url:
             label_event_box.connect("enter-notify-event",
                                     self._handle_enter_label)
             label_event_box.connect("leave-notify-event",
@@ -215,8 +215,11 @@ class ConfigPage(gtk.VBox):
     def _handle_click_tab(self, event_widget, event):
         if event.button == 3:
             return self.launch_tab_menu(event)
-        if self.help and self.main_vpaned.flags() & gtk.MAPPED:
-            return self.launch_help()
+        if self.main_vpaned.flags() & gtk.MAPPED:
+            if self.help:
+                return self.launch_help()
+            if self.url:
+                return self.launch_url()
 
     def launch_tab_menu(self, event):
         """Open a popup menu for the tab, if right clicked."""
