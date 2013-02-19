@@ -44,8 +44,8 @@ class ValueChecker(rose.macro.MacroBase):
     META_PROPS = [rose.META_PROP_LENGTH, rose.META_PROP_PATTERN,
                   rose.META_PROP_RANGE, rose.META_PROP_TYPE,
                   rose.META_PROP_VALUES]
-    WARNING_BAD_PATTERN = "Value {0} doesn't contain the pattern: {1}"
-    WARNING_BAD_RANGE = "Value {0} isn't in the range criteria: {1}"
+    WARNING_BAD_PATTERN = "Value {0} does not contain the pattern: {1}"
+    WARNING_BAD_RANGE = "Value {0} is not in the range criteria: {1}"
     WARNING_INVALID_LENGTH = 'Derived type has an invalid length: {0}'
     WARNING_WRONG_VALUES = 'Value {0} not in allowed values {1}'
     WARNING_WRONG_VALUE_FIXED = 'Value {0} should be {1}'
