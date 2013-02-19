@@ -128,7 +128,7 @@
     </div>
 
     <div class="slide">
-      <h3>Disclaimer</h3>
+      <h3 id="intro-disclaimer">Disclaimer</h3>
 
       <p>The best reference for cylc is the <a href=
       "http://cylc.github.com/cylc/html/single/cug-html.html">cylc User
@@ -163,7 +163,7 @@
     alt="ECOX" width="80%" /></div>
 
     <div class="slide">
-      <h3>Background - current</h3>
+      <h3>Background - Current</h3>
 
       <p>cylc is now a collaborative effort, involving the Met Office.</p>
 
@@ -176,7 +176,7 @@
     </div>
 
     <div class="slide">
-      <h3>The cylc scheduling algorithm</h3>
+      <h2 id="algorithm">Scheduling Algorithm</h2>
 
       <p>Scheduling - making sure tasks run in the correct order, at the
       correct time - is the core purpose of cylc. The <a href=
@@ -192,21 +192,21 @@
     </div>
 
     <div class="slide">
-    <h3 class="alwayshidden">single cycle</h3>
+    <h3 class="alwayshidden">Single Cycle</h3>
 
     <p>Task dependencies - single cycle</p><img src=
     "http://cylc.github.com/cylc/graphics/png/scaled/dep-one-cycle.png" width=
     "40%" alt="single cycle dependencies" /></div>
 
     <div class="slide">
-    <h3 class="alwayshidden">scheduling cycling tasks</h3>
+    <h3 class="alwayshidden">Scheduling Cycling Tasks</h3>
 
     <p>Most meteorological suites repeat over time (cycling):</p><img src=
     "http://cylc.github.com/cylc/graphics/png/scaled/dep-multi-cycle.png"
     width="40%" alt="multi-cycle dependencies" /></div>
 
     <div class="slide">
-    <h3 class="alwayshidden">A cycle isn't a prison</h3>
+    <h3 class="alwayshidden">A Cycle isn't A Prison</h3>
 
     <p>A cycle isn't a prison - if tasks can run ahead of their cycle time,
     they should. The image shows how a traditional cycle-fixed scheduler
@@ -215,7 +215,7 @@
     "50%" alt="optimal task scheduling" /></div>
 
     <div class="slide">
-      <h3>The suite.rc file</h3>
+      <h2 id="suite-rc">The suite.rc File</h2>
 
       <p>cylc has a single file to configure the suite, the
       <samp>suite.rc</samp> file. It configures:</p>
@@ -230,7 +230,7 @@
     </div>
 
     <div class="slide">
-      <h3>Hello World cylc suite</h3>
+      <h2 id="hello-world">Hello World cylc Suite</h2>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
@@ -244,7 +244,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Hello World Rose suite</h3>
+      <h3 class="alwayshidden">Hello World Rose Suite</h3>
 
       <p>Tasks are generic - they can be Rose applications, or generic commands
       as above.</p>
@@ -260,7 +260,7 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Hello World rose task-run example</h3>
+      <h3 class="alwayshidden">Hello World rose task-run Example</h3>
 
       <p>We would then have to change the <samp>[runtime]</samp> section
       to:</p>
@@ -277,7 +277,7 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Hello World rose task-run</h3>
+      <h3 id="hello-world-task-run">Hello World rose task-run</h3>
 
       <p><code>rose task-run</code> is reasonably generic, so we can put it as
       the suite default (<samp>[[root]]</samp>)<samp>command scripting</samp>
@@ -294,7 +294,7 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3>Families</h3>
+      <h3 id="hello-world-families">Families</h3>
 
       <p>Families define shared configuration.</p>
 
@@ -306,7 +306,7 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Families example</h3>
+      <h3 class="alwayshidden">Families Example</h3>
 
       <p>Here is a <samp>suite.rc</samp> <samp>[runtime]</samp> section snippet
       for a suite with two similar applications, <samp>hello_eris/</samp> and
@@ -326,7 +326,7 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Families and overrides</h3>
+      <h3 class="alwayshidden">Families and Overrides</h3>
 
       <p>Overriding family settings can be done under a task section:</p>
       <pre class="prettyprint lang-cylc">
@@ -346,22 +346,22 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3>Shared Applications</h3>
+      <h3 id="hello-world-shared-applications">Shared Applications</h3>
 
       <p>In the last example, if we don't really need two Rose applications,
       (<samp>app/hello_eris/</samp> and <samp>app/hello_pluto/</samp>) we can
       create two tasks that share a single application, with some override
       settings - in this example, a <var>WORLD</var> environment variable.</p>
 
-      <p>We reference our single application, <samp>app/hello_world/</samp> by
-      using <var>ROSE_TASK_APP</var>. <code>rose task-run</code> will read this
-      environment variable value and use it to run the Rose app. We will put
-      the override setting (<var>WORLD</var>) in the <samp>suite.rc</samp>
+      <p>We can reference our single application, <samp>app/hello_world/</samp>
+      by using <var>ROSE_TASK_APP</var>. <code>rose task-run</code> will read
+      this environment variable value and use it to run the Rose app. We will
+      put the override setting (<var>WORLD</var>) in the <samp>suite.rc</samp>
       file.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Shared Applications example</h3>
+      <h3 class="alwayshidden">Shared Applications Example</h3>
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
@@ -382,7 +382,7 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3>Dependencies</h3>
+      <h3 id="hello-world-dependencies">Dependencies</h3>
 
       <p>We haven't looked at the <samp>[scheduling]</samp> part of the
       suite.rc yet.</p>
@@ -412,7 +412,7 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3>Remote hosts</h3>
+      <h3 id="hello-world-remote-hosts">Remote Hosts</h3>
 
       <p>So far, both example tasks run on the localhost - it is usually better
       to farm off tasks to a remote host like a compute server or a
@@ -431,7 +431,7 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3>Jinja2</h3>
+      <h3 id="hello-world-jinja2">Jinja2</h3>
 
       <p>If we had a lot of tasks using this setting, it might become quite
       duplicated across the <samp>suite.rc</samp> file. cylc supports the use
@@ -450,14 +450,14 @@ default = echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Jinja2 shebang</h3>
+      <h3 class="alwayshidden">Jinja2 Shebang</h3>
 
       <p>This would also need a <samp>#!jinja2</samp> shebang to the top of the
       suite.rc file.</p>
     </div>
 
     <div class="slide">
-      <h3>rose-suite.conf</h3>
+      <h3 id="hello-world-rose-suite-conf">rose-suite.conf</h3>
 
       <p>We can then store the value of <var>COMPUTE_HOST</var> in a central
       location, the <samp>rose-suite.conf</samp> file:</p>
@@ -471,7 +471,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">rose-suite.conf advantages</h3>
+      <h3 class="alwayshidden">rose-suite.conf Advantages</h3>
 
       <p>It's useful to keep commonly-changed variables in the
       <samp>rose-suite.conf</samp> file, so users don't have to modify the
@@ -482,14 +482,14 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Jinja2 blocks</h3>
+      <h3 class="alwayshidden">Jinja2 Blocks</h3>
 
       <p>Jinja2 can be used to collapse duplicated portions of configuration -
       for example, in an ensemble context. You can use <code>if</code> and
       <code>for</code> blocks, amongst other things:</p>
       <pre class="prettyprint lang-cylc">
 {%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
-    [[hello_{{ WORLD }}]
+    [[hello_{{ WORLD }}]]
         inherit = FAM_HELLO
         [[[environment]]]
             WORLD = {{ WORLD }}
@@ -498,23 +498,23 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Jinja2 blocks result</h3>
+      <h3 class="alwayshidden">Jinja2 Blocks Result</h3>
 
       <p>This gets expanded at runtime:</p>
       <pre class="prettyprint lang-cylc">
-    [[hello_eris]
+    [[hello_eris]]
         inherit = FAM_HELLO
         [[[environment]]]
             WORLD = eris
-    [[hello_pluto]
+    [[hello_pluto]]
         inherit = FAM_HELLO
         [[[environment]]]
             WORLD = pluto
-    [[hello_makemake]
+    [[hello_makemake]]
         inherit = FAM_HELLO
         [[[environment]]]
             WORLD = makemake
-    [[hello_haumea]
+    [[hello_haumea]]
         inherit = FAM_HELLO
         [[[environment]]]
             WORLD = haumea
@@ -522,7 +522,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3>Event hooks</h3>
+      <h2 id="event-hooks">Event Hooks</h2>
 
       <p>Suites also need some standard Rose <em>event hooks</em> to construct
       the Rose output viewer (more later) and report or shutdown on
@@ -536,13 +536,18 @@ COMPUTE_HOST = "voyager_1"
         timeout = 4320 # 3 days
 </pre>
 
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Event Hooks Explained</h3>
+
       <p>Here, when a suite times out, the user will receive an email
       (<kbd>--mail</kbd>) and the suite will shutdown
       (<kbd>--shutdown</kbd>).</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Hello World event hooks (continued)</h3>
+      <h3 class="alwayshidden">Hello World Event Hooks (Continued)</h3>
 
       <p>Suites should also have task event hooks, along these lines:</p>
       <pre class="prettyprint lang-cylc">
@@ -565,7 +570,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 id="submit">Job Submission</h3>
+      <h2 id="submit">Job Submission</h2>
 
       <p>We may want to configure a job submission method, such as using
       <code>LoadLeveler</code> (spelling is theirs):</p>
@@ -617,7 +622,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3>Dependency syntax</h3>
+      <h2 id="dep-syntax">Dependency Syntax</h2>
 
       <p>Let's look at the syntax for configuring task dependencies.</p>
 
@@ -630,7 +635,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Dependency syntax A =&gt; B</h3>
+      <h3 class="alwayshidden">Dependency Syntax A =&gt; B</h3>
 
       <p>If task B depends on task A's output to run:</p>
       <pre class="prettyprint lang-cylc">
@@ -648,7 +653,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Dependency syntax A | B</h3>
+      <h3 class="alwayshidden">Dependency Syntax A | B</h3>
 
       <p>If task C depends on <em>either</em> task A <em>or</em> task B:</p>
       <pre class="prettyprint lang-cylc">
@@ -666,7 +671,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Dependency syntax B &amp; C</h3>
+      <h3 class="alwayshidden">Dependency Syntax B &amp; C</h3>
 
       <p>If task B only runs when task A <em>fails</em>:</p>
       <pre class="prettyprint lang-cylc">
@@ -684,7 +689,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Dependency syntax A[T-6]</h3>
+      <h3 class="alwayshidden">Dependency Syntax A[T-6]</h3>
 
       <p>In a cycling suite, with cycles every 6 hours, if task A depends on a
       previous cycle's task A finishing:</p>
@@ -705,7 +710,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Dependency syntax ( A | B ) &amp; C</h3>
+      <h3 class="alwayshidden">Dependency Syntax ( A | B ) &amp; C</h3>
 
       <p>If task D depends on either task A and task B finishing, together with
       task C:</p>
@@ -725,7 +730,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3>Dependency Reference</h3>
+      <h3 id="dep-syntax-reference">Dependency Reference</h3>
 
       <p>Full details of dependency configuration are in the <a href=
       "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user
@@ -745,7 +750,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3>cylc capabilities</h3>
+      <h2 id="cylc-cap">cylc Capabilities</h2>
 
       <p>cylc has some nice capabilities:</p>
 
@@ -760,7 +765,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">cylc capabilities (continued)</h3>
+      <h3 class="alwayshidden">cylc Capabilities (Continued)</h3>
 
       <ul class="incremental">
         <li>automatically resubmitting failed tasks, optionally with different
@@ -773,7 +778,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">cylc capabilities (continued 2)</h3>
+      <h3 class="alwayshidden">cylc Capabilities (Continued 2)</h3>
 
       <ul class="incremental">
         <li>broadcasting runtime changes to a particular task or cycle within a
@@ -784,7 +789,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3>Environment</h3>
+      <h2 id="env">Environment</h2>
 
       <p>There are some useful environment variables that you can use in your
       <samp>suite.rc</samp> file and Rose applications:</p>
@@ -800,7 +805,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Environment continued</h3>
+      <h3 class="alwayshidden">Environment Continued</h3>
 
       <ul class="incremental">
         <li><var>ROSE_DATA</var>, data directory of the suite.</li>
@@ -813,7 +818,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Environment reference</h3>
+      <h3 class="alwayshidden">Environment Reference</h3>
 
       <p>For more, see <a href="rose-command.html#rose-task-env">rose
       task-env</a> and the <a href=
@@ -825,7 +830,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h2 id="cylc-run">cylc-run directories</h2>
+      <h2 id="cylc-run">cylc-run Directories</h2>
 
       <p>cylc keeps a runtime directory for each suite in
       <samp>~/cylc-run/</samp>, which is updated when you run the suite.</p>
@@ -979,7 +984,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h2 id="utils">Suite Utilities</h2>
+      <h2 id="utils">Rose Built-in Apps/Utilities</h2>
 
       <ul class="incremental">
         <li><kbd>fcm make</kbd> - invoked using a Rose application beginning
@@ -989,7 +994,7 @@ COMPUTE_HOST = "voyager_1"
         <li><kbd>rose ana</kbd> - a Rose analysis engine, for comparing
         output</li>
 
-        <li>Rose install/housekeeping</li>
+        <li>Housekeeping</li>
       </ul>
     </div>
 

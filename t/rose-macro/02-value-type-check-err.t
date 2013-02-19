@@ -124,13 +124,13 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 4
     namelist:values_nl1=my_char='Character string ending in unescaped''
-        Value "'Character string ending in unescaped''" isn't in a valid single quoted format
+        Not in a valid single quoted format: "'Character string ending in unescaped''"
     namelist:values_nl1=my_char_array_any="h"
-        Value '"h"' isn't in a valid single quoted format
+        Not in a valid single quoted format: '"h"'
     namelist:values_nl1=my_char_complex_esc=''Character string that's "very escaped'''
-        Value '\'\'Character string that\'s "very escaped\'\'\'' isn't in a valid single quoted format
+        Not in a valid single quoted format: '\'\'Character string that\'s "very escaped\'\'\''
     namelist:values_nl1=my_char_esc='Character string that\'s escaped in a string way'
-        Value "'Character string that\\'s escaped in a string way'" isn't in a valid single quoted format
+        Not in a valid single quoted format: "'Character string that\\'s escaped in a string way'"
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -230,17 +230,17 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_quoted="\\" Bad quoted quoted"
-        Value '"\\\\" Bad quoted quoted"' isn't in a valid double quoted format
+        Not in a valid double quoted format: '"\\\\" Bad quoted quoted"'
     namelist:values_nl1=my_quoted_array_fixed="a, "b\"", "\"c", "d"
-        Value '"a, "b\\"", "\\"c", "d"' isn't in a valid double quoted format
+        Not in a valid double quoted format: '"a, "b\\"", "\\"c", "d"'
     namelist:values_nl1=my_quoted_ends_quote=Bad quoted"
-        Value 'Bad quoted"' isn't in a valid double quoted format
+        Not in a valid double quoted format: 'Bad quoted"'
     namelist:values_nl1=my_quoted_no_quotes=something
-        Value 'something' isn't in a valid double quoted format
+        Not in a valid double quoted format: 'something'
     namelist:values_nl1=my_quoted_starts_quote="bad quoted
-        Value '"bad quoted' isn't in a valid double quoted format
+        Not in a valid double quoted format: '"bad quoted'
     namelist:values_nl1=my_quoted_wrong_kind_quotes='"double quoted"'
-        Value '\'"double quoted"\'' isn't in a valid double quoted format
+        Not in a valid double quoted format: '\'"double quoted"\''
 __CONTENT__
 teardown
 
@@ -305,7 +305,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
     namelist:values_nl1=my_derived_type_raw_log_char_real=45.0p2
         Not a real number: '45.0p2'
     namelist:values_nl1=my_derived_type_raw_log_char_real_array='I\'m a bad character quoted'
-        Value "'I\\'m a bad character quoted'" isn't in a valid single quoted format
+        Not in a valid single quoted format: "'I\\'m a bad character quoted'"
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -372,7 +372,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
     namelist:values_nl1=my_boolean_array_null_comp=
         Not true/false: ''
     namelist:values_nl1=my_char_array_null_comp=
-        Value '' isn't in a valid single quoted format
+        Not in a valid single quoted format: ''
     namelist:values_nl1=my_derived_type_real_int_null_comp_array=
         Not an integer: ''
     namelist:values_nl1=my_int_array_null_comp=
