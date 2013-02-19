@@ -23,6 +23,8 @@ The following are worth mentioning:
 configurations. The `opts=KEY ...` setting in the main configuration file of a
 Rose configuration can now be used to select a list of optional configurations.
 
+\#451: rose config-edit: the description of a page is now displayed at its header.
+
 \#443: rose config-edit: user can now reload metadata with a single menu command.
 
 \#418: rose suite-hook: support latest naming convention of Cylc task job log.
