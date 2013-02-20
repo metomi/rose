@@ -95,19 +95,19 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [V] rose.macros.DefaultValidators: issues: 7
     namelist:values_nl1=my_array=1,2,4,6
-        Value 1,2,4,6 doesn't contain the pattern: ^(\d*)$
+        Value 1,2,4,6 does not contain the pattern: ^(\d*)$
     namelist:values_nl1=my_char='something'
-        Value 'something' doesn't contain the pattern: ^'.*"$
+        Value 'something' does not contain the pattern: ^'.*"$
     namelist:values_nl1=my_date=07/06/12 14:28:13
-        Value 07/06/12 14:28:13 doesn't contain the pattern: ^\d\d/\d\d/41\s\d\d:\d\d:\d\d$
+        Value 07/06/12 14:28:13 does not contain the pattern: ^\d\d/\d\d/41\s\d\d:\d\d:\d\d$
     namelist:values_nl1=my_int=56
-        Value 56 doesn't contain the pattern: ^\d+e\d+$
+        Value 56 does not contain the pattern: ^\d+e\d+$
     namelist:values_nl1=my_nocase=CamelCase
-        Value CamelCase doesn't contain the pattern: ^camelcase$
+        Value CamelCase does not contain the pattern: ^camelcase$
     namelist:values_nl1=my_raw=This is some kind of sentence.
-        Value This is some kind of sentence. doesn't contain the pattern: ^Because\s[\w\s,]+\.$
+        Value This is some kind of sentence. does not contain the pattern: ^Because\s[\w\s,]+\.$
     namelist:values_nl1=my_raw_ends=This ends with orange
-        Value This ends with orange doesn't contain the pattern: green$
+        Value This ends with orange does not contain the pattern: green$
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------

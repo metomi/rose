@@ -55,13 +55,13 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 4
     namelist:values_nl1=my_int=5
-        Value 5 isn't in the range criteria: 3
+        Value 5 is not in the range criteria: 3
     namelist:values_nl1=my_int_neg=-2
-        Value -2 isn't in the range criteria: -1
+        Value -2 is not in the range criteria: -1
     namelist:values_nl1=my_real=678.3
-        Value 678.3 isn't in the range criteria: 7.3
+        Value 678.3 is not in the range criteria: 7.3
     namelist:values_nl1=my_real_neg=-345.1
-        Value -345.1 isn't in the range criteria: -3.1
+        Value -345.1 is not in the range criteria: -3.1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -92,17 +92,17 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
-        Value 5 isn't in the range criteria: 3, 4, 6
+        Value 5 is not in the range criteria: 3, 4, 6
     namelist:values_nl1=my_int_neg=-2
-        Value -2 isn't in the range criteria: -1, -3
+        Value -2 is not in the range criteria: -1, -3
     namelist:values_nl1=my_real=678.3
-        Value 678.3 isn't in the range criteria: 4.0e2, 67.3
+        Value 678.3 is not in the range criteria: 4.0e2, 67.3
     namelist:values_nl1=my_real_neg=-345.1
-        Value -345.1 isn't in the range criteria: 456, -34.1
+        Value -345.1 is not in the range criteria: 456, -34.1
     namelist:values_nl1=my_real_sci_notation_neg=-3.546e-2
-        Value -3.546e-2 isn't in the range criteria: -3.6e-2, -100
+        Value -3.546e-2 is not in the range criteria: -3.6e-2, -100
     namelist:values_nl1=my_real_sci_notation_pos=56.0e+67
-        Value 56.0e+67 isn't in the range criteria: -2.3, 5.0e+6, 56, 5, 1, -2
+        Value 56.0e+67 is not in the range criteria: -2.3, 5.0e+6, 56, 5, 1, -2
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -133,17 +133,17 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
-        Value 5 isn't in the range criteria: 1:3, 7:10
+        Value 5 is not in the range criteria: 1:3, 7:10
     namelist:values_nl1=my_int_neg=-2
-        Value -2 isn't in the range criteria: -1:5
+        Value -2 is not in the range criteria: -1:5
     namelist:values_nl1=my_real=678.3
-        Value 678.3 isn't in the range criteria: 680:680.3
+        Value 678.3 is not in the range criteria: 680:680.3
     namelist:values_nl1=my_real_neg=-345.1
-        Value -345.1 isn't in the range criteria: -34:
+        Value -345.1 is not in the range criteria: -34:
     namelist:values_nl1=my_real_sci_notation_neg=-3.546e-2
-        Value -3.546e-2 isn't in the range criteria: -100:-1
+        Value -3.546e-2 is not in the range criteria: -100:-1
     namelist:values_nl1=my_real_sci_notation_pos=56.0e+67
-        Value 56.0e+67 isn't in the range criteria: 1e70:1.1e70
+        Value 56.0e+67 is not in the range criteria: 1e70:1.1e70
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -174,17 +174,17 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
-        Value 5 isn't in the range criteria: : 4
+        Value 5 is not in the range criteria: : 4
     namelist:values_nl1=my_int_neg=-2
-        Value -2 isn't in the range criteria: -0:
+        Value -2 is not in the range criteria: -0:
     namelist:values_nl1=my_real=678.3
-        Value 678.3 isn't in the range criteria: -65: 68.3
+        Value 678.3 is not in the range criteria: -65: 68.3
     namelist:values_nl1=my_real_neg=-345.1
-        Value -345.1 isn't in the range criteria: -36 :
+        Value -345.1 is not in the range criteria: -36 :
     namelist:values_nl1=my_real_sci_notation_neg=-3.546e-2
-        Value -3.546e-2 isn't in the range criteria: -100: -50
+        Value -3.546e-2 is not in the range criteria: -100: -50
     namelist:values_nl1=my_real_sci_notation_pos=56.0e+67
-        Value 56.0e+67 isn't in the range criteria: :1e60
+        Value 56.0e+67 is not in the range criteria: :1e60
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -215,17 +215,17 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
-        Value 5 isn't in the range criteria: 4, 3:4, 7:, 8
+        Value 5 is not in the range criteria: 4, 3:4, 7:, 8
     namelist:values_nl1=my_int_neg=-2
-        Value -2 isn't in the range criteria: 0, -6:-8, 2:
+        Value -2 is not in the range criteria: 0, -6:-8, 2:
     namelist:values_nl1=my_real=678.3
-        Value 678.3 isn't in the range criteria: :100, 34, 56:67
+        Value 678.3 is not in the range criteria: :100, 34, 56:67
     namelist:values_nl1=my_real_neg=-345.1
-        Value -345.1 isn't in the range criteria: -36:, 345
+        Value -345.1 is not in the range criteria: -36:, 345
     namelist:values_nl1=my_real_sci_notation_neg=-3.546e-2
-        Value -3.546e-2 isn't in the range criteria: -2:-1, -45, 12
+        Value -3.546e-2 is not in the range criteria: -2:-1, -45, 12
     namelist:values_nl1=my_real_sci_notation_pos=56.0e+67
-        Value 56.0e+67 isn't in the range criteria: 1:-1, 2, 546, :-1
+        Value 56.0e+67 is not in the range criteria: 1:-1, 2, 546, :-1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -256,17 +256,17 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators: issues: 6
     namelist:values_nl1=my_int=5
-        Value 5 isn't in the range criteria: this % 2 == 0
+        Value 5 is not in the range criteria: this % 2 == 0
     namelist:values_nl1=my_int_neg=-2
-        Value -2 isn't in the range criteria: this >= 0
+        Value -2 is not in the range criteria: this >= 0
     namelist:values_nl1=my_real=678.3
-        Value 678.3 isn't in the range criteria: 700 < this <= 600
+        Value 678.3 is not in the range criteria: 700 < this <= 600
     namelist:values_nl1=my_real_neg=-345.1
-        Value -345.1 isn't in the range criteria: this < -1000 or this > 10
+        Value -345.1 is not in the range criteria: this < -1000 or this > 10
     namelist:values_nl1=my_real_sci_notation_neg=-3.546e-2
-        Value -3.546e-2 isn't in the range criteria: this / 4560457 > 0
+        Value -3.546e-2 is not in the range criteria: this / 4560457 > 0
     namelist:values_nl1=my_real_sci_notation_pos=56.0e+67
-        Value 56.0e+67 isn't in the range criteria: 0 < this / 100 < 6
+        Value 56.0e+67 is not in the range criteria: 0 < this / 100 < 6
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------

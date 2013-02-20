@@ -152,7 +152,7 @@ default = hello.exe
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Format continued</h3>
+      <h3 class="alwayshidden">Format Continued</h3>
 
       <p><samp>!</samp> or <samp>!!</samp> in front of a section
       (<samp>[!env]</samp>, <samp>[!!env]</samp>) or option
@@ -162,7 +162,7 @@ default = hello.exe
     </div>
 
     <div class="slide">
-      <h3>rose-suite.info</h3>
+      <h3 id="rose-suite-info">rose-suite.info</h3>
 
       <p>Discovery information about the suite:</p>
       <pre class="prettyprint lang-rose_conf">
@@ -175,7 +175,7 @@ title=Run XYZ for A, with improved B
     </div>
 
     <div class="slide">
-      <h3>rose-suite.conf</h3>
+      <h3 id="rose-suite-conf">rose-suite.conf</h3>
 
       <p>Holds <a href="rose-configuration.html#suite">suite-specific</a>
       settings (more in a <a href="rose-rug-suites.html">later part</a> of the
@@ -194,7 +194,7 @@ source = /project/hello/mayanpwr0.1/debug.glyph
     </div>
 
     <div class="slide">
-      <h3>rose-app.conf</h3>
+      <h3 id="rose-app-conf">rose-app.conf</h3>
 
       <p>This configures a specific <a href=
       "rose-configuration.html#app">application</a> in the suite, which is
@@ -214,7 +214,7 @@ MAX_TARGETS = 5
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">rose-app.conf continued</h3>
+      <h3 class="alwayshidden">rose-app.conf Continued</h3>
       <pre class="prettyprint lang-rose_conf">
   
 # A file that we want to be constructed.
@@ -237,7 +237,7 @@ care_about_shape = .false.
     </div>
 
     <div class="slide">
-      <h3>rose-meta.conf</h3>
+      <h3 id="rose-meta-conf">rose-meta.conf</h3>
 
       <p>This provides <a href="rose-configuration#meta">metadata</a> for a
       configuration, and is used to drive the config editor GUI.</p>
@@ -253,7 +253,7 @@ values = 'too dry', 'too icy', 'good'
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">rose-meta.conf continued</h3>
+      <h3 class="alwayshidden">rose-meta.conf Continued</h3>
       <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
 description = This specifies the maximum acceptable mass
@@ -271,7 +271,7 @@ type = logical
     </div>
 
     <div class="slide">
-      <h3>rose.conf</h3>
+      <h3 id="rose-conf">rose.conf</h3>
 
       <p>This is the <a href="rose-configuration.html#site">site/user</a>
       configuration file, that controls how Rose tools behave.</p>
@@ -288,7 +288,7 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
-      <h3>cylc suite.rc</h3>
+      <h3 id="suite-rc">cylc suite.rc</h3>
 
       <p><em>(Different format)</em></p>
 
@@ -310,7 +310,7 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
-      <h3>Running Suites</h3>
+      <h2 id="run-suite">Running Suites</h2>
 
       <p>Once you have a suite, you can run it on the command line by invoking
       <kbd>rose suite-run</kbd> in the top-level suite directory. You can see
@@ -473,7 +473,7 @@ meta=rose-demo-upgrade/27.1
     </div>
 
     <div class="slide">
-      <h2>Configuration Metadata - but fancier</h2>
+      <h2 id="metadata-fancy">Configuration Metadata, Advanced</h2>
 
       <p>The <a href="rose-rug-metadata-tutorial.html">Metadata Tutorial</a>
       covered fundamental metadata usage - there is quite a lot more!</p>
@@ -490,7 +490,7 @@ meta=rose-demo-upgrade/27.1
     </div>
 
     <div class="slide">
-      <h3 id="logicsyntax">Logical expression syntax</h3>
+      <h3 id="metadata-fancy-logicsyntax">Logical Expression Syntax</h3>
 
       <p>There is a logical expression syntax for several metadata options.
       Here are some examples:</p>
@@ -523,7 +523,7 @@ warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
     </div>
 
     <div class="slide">
-      <h4 class="alwayshidden">Configuration Metadata - logic syntax</h4>
+      <h4 class="alwayshidden">Configuration Metadata - Logic Syntax</h4>
 
       <p>More about the syntax:</p>
 
@@ -540,8 +540,8 @@ warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
     </div>
 
     <div class="slide">
-      <h4 class="alwayshidden">Configuration Metadata - logic syntax
-      arrays</h4>
+      <h4 class="alwayshidden">Configuration Metadata - Logic Syntax
+      Arrays</h4>
 
       <p>The syntax also has array element support via bracketed indices (e.g.
       <samp>this(2)</samp> or
@@ -552,7 +552,7 @@ warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
     </div>
 
     <div class="slide">
-      <h3>More Metadata Options</h3>
+      <h3 id="metadata-fancy-options">More Metadata Options</h3>
 
       <p>See <a href="rose-configuration.html#meta.conf">Metadata Reference</a>
       and the <a href="rose.html#advanced">Advanced Metadata Tutorials</a>.</p>
@@ -616,7 +616,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     </div>
 
     <div class="slide">
-      <h3>Macros</h3>
+      <h3 id="metadata-fancy-macros">Macros</h3>
 
       <p>Macros are written in Python and live with metadata under
       <samp>lib/python/macros/</samp>. There are three categories:</p>
@@ -647,7 +647,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     </div>
 
     <div class="slide">
-    <h3>Widgets</h3>
+    <h3 id="metadata-fancy-widgets">Widgets</h3>
 
     <p>You can replace widgets in the config editor with your own. These live
     with metadata under <samp>lib/python/widget/</samp>. For more details, see
@@ -659,15 +659,6 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     <p>You can set an icon in the metadata that is used in the config editor to
     distinguish configurations: put a file <samp>etc/icon.png</samp> in the
     metadata directory.</p><img alt="Rose Icon" src="rose-icon.png" /></div>
-
-    <div class="slide">
-      <h3 id="upgrade">Upgrading</h3>
-
-      <p>You can upgrade app configurations to use newer versions of metadata
-      (corresponding to newer versions of the application code). This may
-      result in some changes to the configuration (e.g. new or renamed
-      variables).</p>
-    </div>
 
     <div class="slide">
       <h2 id="config-edit">rose config-edit</h2>
@@ -687,7 +678,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">rose macro examples</h3>
+      <h3 class="alwayshidden">rose macro Examples</h3>
 
       <p>Running <code>rose macro --validate</code> in an application directory
       will check against all built-in and custom <em>validator</em> macros.</p>
@@ -697,7 +688,7 @@ fail-if = any(namelist:test=ctrl_array % this == 0)
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">rose macro examples (continued)</h3>
+      <h3 class="alwayshidden">rose macro Examples (Continued)</h3>
 
       <p>Running <code>rose macro MY_MACRO</code> will run a macro called
       <code>MY_MACRO</code>. In an example app in the rose distribution:</p>
@@ -714,11 +705,25 @@ rose macro fib.FibonnaciChecker
     </div>
 
     <div class="slide">
-      <h2 id="rose-app-upgrade">Upgrading</h2>
+      <h2 id="upgrade">Upgrading</h2>
 
-      <p>You can upgrade app configs from one metadata version to another, if
-      upgrade macros are defined - this is a special form of <code>rose
-      macro</code>.</p>
+      <p>You can upgrade app configurations to use newer versions of metadata
+      (corresponding to newer versions of the application code). This may
+      result in some changes to the configuration (e.g. new or renamed
+      variables).</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose app-upgrade</h3>
+
+      <p>Upgrade macros are the mechanism for making these changes - they are
+      a special form of macro. You can upgrade a configuration that has
+      upgrade macros defined by running <code>rose app-upgrade</code>.</p>
+
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">rose app-upgrade Example</h3>
 
       <p>For example, you might run:</p>
       <pre class="shell">

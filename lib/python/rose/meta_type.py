@@ -67,7 +67,7 @@ class BooleanMetaType(MetaType):
 class CharacterMetaType(MetaType):
 
     KEY = "character"
-    WARNING = "Value {0} isn't in a valid single quoted format"
+    WARNING = "Not in a valid single quoted format: {0}"
     
     def is_valid(self, value):
         if not REC_CHARACTER.match(value):
@@ -137,7 +137,7 @@ class RealMetaType(MetaType):
 class QuotedMetaType(MetaType):
 
     KEY = "quoted"
-    WARNING = "Value {0} isn't in a valid double quoted format"
+    WARNING = "Not in a valid double quoted format: {0}"
     
     def is_valid(self, value):
         quote_segs = value.split('"')
