@@ -436,12 +436,13 @@ class MainController(object):
                    lambda n: "/" + n in self.data.config.keys())
         self.hyper_panel.ask_has_content = (
                    lambda n: self.data.is_ns_content("/" + n))
-        self.hyper_panel.send_clone_request = self.handle.clone_request
+        self.hyper_panel.send_clone_request = self.handle.copy_request
         self.hyper_panel.send_delete_request = self.handle.delete_request
         self.hyper_panel.send_edit_request = self.handle.edit_request
         self.hyper_panel.send_fix_request = self.handle.fix_request
         self.hyper_panel.send_ignore_request = self.handle.ignore_request
         self.hyper_panel.send_info_request = self.handle.info_request
+        self.hyper_panel.send_rename_request = self.handle.rename_request
         self.hyper_panel.send_search_request = self.perform_find_by_ns_id
 
 #------------------ Page manipulation functions ------------------------------

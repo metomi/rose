@@ -385,7 +385,7 @@ class Handler(object):
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section)
         
-    def clone_request(self, namespace):
+    def copy_request(self, namespace, new_section=None):
         """Copy a section and variables."""
         namespace = "/" + namespace.lstrip("/")
         sections = self.data.get_sections_from_namespace(namespace)
@@ -403,10 +403,11 @@ class Handler(object):
                     clone_vars.append(variable.copy())
             if v_sect not in existing_sections:
                 existing_sections.append(v_sect)
-        i = 2
-        while section_base + "(" + str(i) + ")" in existing_sections:
-            i += 1
-        new_section = section_base + "(" + str(i) + ")"
+        if new_section is None:
+            i = 2
+            while section_base + "(" + str(i) + ")" in existing_sections:
+                i += 1
+            new_section = section_base + "(" + str(i) + ")"
         self.sect_ops.add_section(config_name, new_section)
         new_namespace = self.data.get_default_namespace_for_section(
                                   new_section, config_name)
@@ -581,6 +582,12 @@ class Handler(object):
             if sect_data is not None:
                 rose.config_editor.util.launch_node_info_dialog(
                             sect_data, "", search_function)
+
+    def rename_request(self, config_name, section, new_section,
+                       no_update=False):
+        """Implement a rename (delete + add)."""
+        new_section_data = config_data.sections.now[section]
+
 
     def search_request(self, base_ns, setting_id):
         """Handle a search for an id (hyperlink)."""

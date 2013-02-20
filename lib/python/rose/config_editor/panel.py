@@ -150,7 +150,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         if top_rows > rose.config_editor.TREE_PANEL_MAX_EXPANDED:
             return False
         if top_rows == 1:
-            return self.tree.expand_all()
+            return self.expand_recursive(no_duplicates=True)
         r_iter = self.tree.get_model().get_iter_first()
         while r_iter is not None:
             path = self.tree.get_model().get_path(r_iter)
@@ -409,7 +409,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                         if event.button != 3:
                             return False
                         else:
-                            return treeview.expand_row(path, open_all=True)
+                            return self.expand_recursive(start_path=path,
+                                                         no_duplicates=True)
                     if event.button == 3:
                         self.popup_menu(path, event)
                     else:
@@ -612,6 +613,31 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         menu.popup(None, None, None, event.button, event.time)
         return False
 
+    def expand_recursive(self, start_path=None, no_duplicates=False):
+        """Expand the tree starting at start_path."""
+        treemodel = self.tree.get_model()
+        if start_path is None:
+            start_iter = treemodel.get_iter_first()
+            start_path = treemodel.get_path(start_iter)
+        if not no_duplicates:
+            return self.tree.expand_row(start_path, open_all=True)
+        stack = [treemodel.get_iter(start_path)]
+        while stack:
+            iter_ = stack.pop(0)
+            if iter_ is None:
+                continue
+            path = treemodel.get_path(iter_)
+            child_iter = treemodel.iter_children(iter_)
+            child_dups = []
+            while child_iter is not None:
+                title = treemodel.get_value(child_iter, 2)
+                child_dups.append(title.strip().isdigit())
+                child_iter = treemodel.iter_next(child_iter)
+            if not all(child_dups):
+                self.tree.expand_row(path, open_all=False)
+                stack.append(treemodel.iter_children(iter_))
+            stack.append(treemodel.iter_next(iter_))
+
     def collapse_reset(self):
         """Return the tree view to the basic startup state."""
         self.tree.collapse_all()
@@ -796,7 +822,7 @@ class SummaryDataPanel(gtk.ScrolledWindow):
         self._view.set_rules_hint(True)
         self._view.show()
         self._view.connect("row-activated",
-                                    self._handle_activation)
+                           self._handle_activation)
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.update_tree_model()
         self.add(self._view)
