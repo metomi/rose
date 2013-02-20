@@ -143,6 +143,8 @@ to reduce the chance of opening a terminal based editor in a GUI environment.
 
 \#231: rose date: New command.
 
+--------------------------------------------------------------------------------
+
 ## Rose 2012-11 (Released 2012-11-30)
 
 This is the 1st release of Rose. Enjoy!
