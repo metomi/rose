@@ -506,6 +506,10 @@ class ConfigDataManager(object):
                 basic_dupl_map.setdefault(mod_section, [])
                 basic_dupl_map[mod_section].append(section)
 
+    def add_section_to_config(self, section, config_name):
+        """Add a blank section to the configuration."""
+        self.config[config_name].config.set([section])
+
     def dump_to_internal_config(self, config_name, only_this_ns=None):
         """Return a rose.config.ConfigNode object from variable info."""
         config = rose.config.ConfigNode()
@@ -841,10 +845,13 @@ class ConfigDataManager(object):
                     if meta_config.get([new_id, meta_prop]) is None:
                         meta_config.set([new_id, meta_prop], prop_val)
 
-    def load_variable_namespaces(self, config_name, from_saved=False):
+    def load_variable_namespaces(self, config_name, just_this_section=None,
+                                 from_saved=False):
         """Load namespaces for variables, using defaults if not specified."""
         config_vars = self.config[config_name].vars
         for section, variables in config_vars.foreach(from_saved):
+            if just_this_section is not None and section != just_this_section:
+                continue
             for variable in variables:
                 self.load_ns_for_variable(variable, config_name)
         

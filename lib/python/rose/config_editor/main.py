@@ -431,7 +431,7 @@ class MainController(object):
         self.hyper_panel.send_create_request = self.handle.create_request
         self.hyper_panel.send_launch_request = self.handle_launch_request
         self.hyper_panel.send_add_dialog_request = self.handle.add_dialog
-        self.hyper_panel.ask_can_clone = self.handle.ask_can_clone
+        self.hyper_panel.ask_can_clone = self.handle.is_ns_duplicate
         self.hyper_panel.ask_is_top = (
                    lambda n: "/" + n in self.data.config.keys())
         self.hyper_panel.ask_has_content = (
@@ -580,6 +580,7 @@ class MainController(object):
         return page
 
     def get_orphan_page(self, namespace):
+        """Return a page widget for embedding somewhere else."""
         page = self.make_page(namespace)
         orphan_container = self.handle.get_orphan_container(page)
         self.orphan_pages.append(page)
@@ -1915,10 +1916,15 @@ class MainController(object):
         if not stack:
             return False
         self._generate_pagelist()
-        do_list = [stack[-1]]  # Undo all list items at once
-        # do_list should only contain items for a single page
-        focused = False
-        new_page = None
+        do_list = [stack[-1]]
+        # We should do grouped items together.
+        for stack_item in reversed(stack[:-1]):
+            if (stack_item.group is None or
+                stack_item.group != do_list[0].group):
+                break
+            do_list.append(stack_item)
+        is_group = len(do_list) > 1
+        stack_info = {}
         for stack_item in do_list:
             node = stack_item.node
             node_id = node.metadata.get('id')
@@ -1942,7 +1948,7 @@ class MainController(object):
                 else:
                     namespace = self.data.get_default_namespace_for_section(
                                                       node_id, config_name)
-            if self.data.is_ns_in_tree(namespace):
+            if not is_group and self.data.is_ns_in_tree(namespace):
                 page = self.view_page(namespace, node_id)
             redo_items = [x for x in self.redo_stack]
             if stack_item.undo_args:
@@ -1966,11 +1972,12 @@ class MainController(object):
                 self.redo_stack.append(just_done_item)
             if not self.data.is_ns_in_tree(namespace):
                 self.data.reload_namespace_tree()
-            if self.data.is_ns_in_tree(namespace):
+            page = None
+            if is_group:
+                stack_info.setdefault(namespace, [])
+                stack_info[namespace].append([stack_item.page_label, node_id])
+            elif self.data.is_ns_in_tree(namespace):
                 page = self.view_page(namespace, node_id)
-            else:
-                page = None
-            if page is not None:
                 self.sync_page_var_lists(page)
                 page.sort_data()
                 page.refresh(node_id)
@@ -1979,6 +1986,24 @@ class MainController(object):
                 page.set_main_focus(node_id)
                 self.set_current_page_indicator(page.namespace)
                 if namespace != stack_item.page_label:
+                    # Make sure the right status update is made.
+                    self.update_status(page)
+                self.alter_bar_sensitivity()
+                self.update_stack_viewer_if_open()
+        if is_group:
+            for namespace, label_id_tuples in stack_info.items():
+                node_id = None
+                if label_id_tuples:
+                    node_id = label_id_tuples[-1][1]
+                page = self.view_page(namespace, node_id)
+                self.sync_page_var_lists(page)
+                page.sort_data()
+                page.refresh()
+                page.update_ignored()
+                page.update_info()
+                page.set_main_focus(node_id)
+                self.set_current_page_indicator(page.namespace)
+                if any([l[0] != namespace for l in label_id_tuples]):
                     # Make sure the right status update is made.
                     self.update_status(page)
             self.alter_bar_sensitivity()

@@ -26,6 +26,7 @@ import re
 import shlex
 import subprocess
 import sys
+import time
 import urllib
 import webbrowser
 
@@ -345,9 +346,9 @@ class Handler(object):
     def about_dialog(self, args):
         self.mainwindow.launch_about_dialog()
 
-    def ask_can_clone(self, namespace):
+    def is_ns_duplicate(self, base_ns):
         """Lookup whether a page can be cloned, via the metadata."""
-        namespace = "/" + namespace
+        namespace = "/" + base_ns.lstrip("/")
         sections = self.data.get_sections_from_namespace(namespace)
         if len(sections) != 1:
             return False
@@ -385,9 +386,9 @@ class Handler(object):
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section)
         
-    def copy_request(self, namespace, new_section=None):
+    def copy_request(self, base_ns, new_section=None, no_update=False):
         """Copy a section and variables."""
-        namespace = "/" + namespace.lstrip("/")
+        namespace = "/" + base_ns.lstrip("/")
         sections = self.data.get_sections_from_namespace(namespace)
         if len(sections) != 1:
             return False
@@ -408,12 +409,10 @@ class Handler(object):
             while section_base + "(" + str(i) + ")" in existing_sections:
                 i += 1
             new_section = section_base + "(" + str(i) + ")"
-        self.sect_ops.add_section(config_name, new_section)
+        self.sect_ops.add_section(config_name, new_section,
+                                  no_update=no_update)
         new_namespace = self.data.get_default_namespace_for_section(
                                   new_section, config_name)
-        page = self.view_page_func(new_namespace)
-        sorter = rose.config.sort_settings
-        clone_vars.sort(lambda v, w: sorter(v.name, w.name))
         for var in clone_vars:
             var_id = self.util.get_id_from_section_option(
                                            new_section, var.name)
@@ -421,7 +420,15 @@ class Handler(object):
                                                             config_name)
             var.process_metadata(metadata)
             var.metadata['full_ns'] = new_namespace
-            page.add_row(var)  # It may be better to just use the stack ops.
+        sorter = rose.config.sort_settings
+        clone_vars.sort(lambda v, w: sorter(v.name, w.name))
+        if no_update:
+            for var in clone_vars:
+                self.var_ops.add_var(var, no_update=no_update)
+        else:    
+            page = self.view_page_func(new_namespace)
+            for var in clone_vars:
+                page.add_row(var)
         return False
 
     def create_request(self):
@@ -441,7 +448,7 @@ class Handler(object):
         config_name = "/" + self.data.top_level_name + "/" + name
         self._add_config(config_name, meta)
 
-    def delete_request(self, namespace_list):
+    def delete_request(self, namespace_list, no_update=False):
         """Handle a delete namespace request (more complicated than add)."""
         namespace_list.sort(rose.config.sort_settings)
         namespace_list.reverse()
@@ -464,6 +471,7 @@ class Handler(object):
         element_sort = rose.config.sort_settings
         variable_sorter = lambda v, w: element_sort(v.metadata['id'],
                                                     w.metadata['id']) 
+        duplicate_nses = []
         for ns in list(namespace_list):
             if ns in ns_done:
                 continue
@@ -489,7 +497,14 @@ class Handler(object):
                      section in real_sections)):
                     self.sect_ops.remove_section(config_name, section,
                                                  no_update=True)
-        self.data.reload_namespace_tree()  # Update everything as well.
+            ns_meta = self.data.namespace_meta_lookup[ns]
+            if (ns_meta.get(rose.META_PROP_DUPLICATE) ==
+                rose.META_PROP_VALUE_TRUE):
+                duplicate_nses.append(ns)
+        if duplicate_nses and not no_update:
+            self.reorder_duplicate_namespaces(duplicate_nses)
+        if not no_update:
+            self.data.reload_namespace_tree()  # Update everything as well.
 
     def ignore_request(self, base_ns, is_ignored):
         """Handle an ignore or enable section request."""
@@ -583,11 +598,18 @@ class Handler(object):
                 rose.config_editor.util.launch_node_info_dialog(
                             sect_data, "", search_function)
 
-    def rename_request(self, config_name, section, new_section,
-                       no_update=False):
+    def rename_request(self, base_ns, new_section, no_update=True):
         """Implement a rename (delete + add)."""
-        new_section_data = config_data.sections.now[section]
-
+        namespace = "/" + base_ns.lstrip("/")
+        sections = self.data.get_sections_from_namespace(namespace)
+        if len(sections) != 1:
+            return False
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_RENAME + "-" + str(time.time())
+        self.copy_request(namespace, new_section, no_update=no_update)
+        self.delete_request([namespace], no_update=no_update)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
 
     def search_request(self, base_ns, setting_id):
         """Handle a search for an id (hyperlink)."""
@@ -596,8 +618,51 @@ class Handler(object):
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
         self.var_ops.search_for_var(config_name, setting_id)
 
+    def reorder_duplicate_namespaces(self, namespaces=None):
+        """Make sure duplicate sections have the correct indices."""
+        if namespaces is None:
+            namespaces = []
+            for ns_key, meta_dict in self.data.namespace_meta_lookup.items():
+                if (meta_dict.get(rose.META_PROP_DUPLICATE) ==
+                    rose.META_PROP_VALUE_TRUE):
+                    namespaces.append(ns_key)
+        reorder_ns_bases = {}
+        for ns in namespaces:
+            config_name, subsp = self.util.split_full_ns(self.data, ns)
+            reorder_ns_bases.setdefault(config_name, [])
+            for sect in self.data.get_sections_from_namespace(ns):
+                base_sect = rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
+                if base_sect not in reorder_ns_bases[config_name]:
+                    reorder_ns_bases[config_name].append(base_sect)
+        sorter = rose.config.sort_settings
+        id_formatter = rose.macro.ID_ELEMENT_FORMAT.format
+        for config_name, base_sections in reorder_ns_bases.items():
+            sections_done = []
+            dupl_sect_dict = {}
+            for sect in self.data.config[config_name].sections.now:
+                base_sect = rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
+                if base_sect not in base_sections or base_sect == sect:
+                    continue
+                element_search = rose.macro.REC_ID_ELEMENT.search(sect)
+                if element_search is None:
+                    continue
+                element = element_search.groups()[0]
+                dupl_sect_dict.setdefault(base_sect, {})
+                dupl_sect_dict[base_sect].update({sect: element})
+            for base_sect, sect_element_dict in dupl_sect_dict.items():
+                sections = sect_element_dict.keys()
+                sections.sort(sorter)
+                for i, sect in enumerate(sections):
+                    element = sect_element_dict[sect]
+                    if int(element) != i + 1:
+                        new_sect_name = id_formatter(base_sect, i + 1)
+                        ns = self.data.get_default_namespace_for_section(
+                                           sect, config_name)
+                        self.rename_request(ns, new_sect_name, no_update=True)
+        self.data.reload_namespace_tree()
+
     def get_orphan_container(self, page):
-        # Return a container with the page object inside.
+        """Return a container with the page object inside."""
         box = gtk.VBox()
         box.pack_start(page, expand=True, fill=True)
         box.show()

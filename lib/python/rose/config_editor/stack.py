@@ -35,11 +35,13 @@ class StackItem(object):
     """A dictionary containing stack information."""
 
     def __init__(self, page_label, action_text, node,
-                       undo_function, undo_args=None):
+                       undo_function, undo_args=None,
+                       group=None):
         self.page_label = page_label
         self.action = action_text
         self.node = node
         self.name = self.node.name
+        self.group = group
         if hasattr(self.node, "value"):
             self.value = self.node.value
             self.old_value = self.node.old_value
@@ -83,8 +85,6 @@ class SectionOperations(object):
     def add_section(self, config_name, section, no_update=False):
         """Add a section to this configuration."""
         config_data = self.__data.config[config_name]
-        config = self.__data.dump_to_internal_config(config_name)
-        config_data.config = config
         new_section_data = None
         was_latent = False
         if section in config_data.sections.latent:
@@ -95,12 +95,13 @@ class SectionOperations(object):
                                                               config_name)
             new_section_data = rose.section.Section(section, [], metadata)
         config_data.sections.now.update({section: new_section_data})
-        config_data.config = self.__data.dump_to_internal_config(config_name)
+        self.__data.add_section_to_config(section, config_name)
         self.__data.load_file_metadata(config_name)
         self.__data.load_vars_from_config(config_name,
                                           just_this_section=section,
                                           update=True)
-        self.__data.load_variable_namespaces(config_name)
+        self.__data.load_variable_namespaces(config_name,
+                                             just_this_section=section)
         metadata = self.__data.get_metadata_for_config_id(section,
                                                           config_name)
         new_section_data.metadata = metadata
@@ -118,8 +119,8 @@ class SectionOperations(object):
         self.__undo_stack.append(stack_item)
         while self.__redo_stack:
             self.__redo_stack.pop()
-        self.view_page_func(ns)
         if not no_update:
+            self.view_page_func(ns)
             self.trigger_update(ns)
 
     def ignore_section(self, config_name, section, is_ignored,

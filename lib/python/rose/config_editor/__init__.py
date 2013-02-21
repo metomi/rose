@@ -265,6 +265,8 @@ SPACING_PAGE = 10
 SPACING_SUB_PAGE = 5
 
 # Stack action names and presentation
+STACK_GROUP_RENAME = "Rename"
+
 STACK_ACTION_ADDED = 'Added'
 STACK_ACTION_CHANGED = 'Changed'
 STACK_ACTION_CHANGED_COMMENTS = 'Changed #'

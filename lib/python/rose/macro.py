@@ -57,6 +57,8 @@ MACRO_OUTPUT_WARNING_ISSUES = "{0}: warnings: {1}\n"
 REC_MODIFIER = re.compile(r"\{.+\}")
 REC_ID_STRIP_DUPL = re.compile(r"\([\d:, ]+\)")
 REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([\d:, ]+\))?$')
+REC_ID_ELEMENT = re.compile(r"\((\d+)\)")
+ID_ELEMENT_FORMAT = "{0}({1})"
 PROBLEM_ENTRY = "    {0}={1}={2}\n        {3}\n"
 PROMPT_ACCEPT_CHANGES = "Accept y/n (default n)? "
 PROMPT_OK = "y"
