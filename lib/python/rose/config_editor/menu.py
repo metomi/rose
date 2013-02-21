@@ -598,7 +598,7 @@ class Handler(object):
                 rose.config_editor.util.launch_node_info_dialog(
                             sect_data, "", search_function)
 
-    def rename_request(self, base_ns, new_section, no_update=True):
+    def rename_request(self, base_ns, new_section, no_update=False):
         """Implement a rename (delete + add)."""
         namespace = "/" + base_ns.lstrip("/")
         sections = self.data.get_sections_from_namespace(namespace)
