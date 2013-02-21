@@ -472,6 +472,8 @@ class Handler(object):
         variable_sorter = lambda v, w: element_sort(v.metadata['id'],
                                                     w.metadata['id']) 
         duplicate_nses = []
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
         for ns in list(namespace_list):
             if ns in ns_done:
                 continue
@@ -503,6 +505,8 @@ class Handler(object):
                 duplicate_nses.append(ns)
         if duplicate_nses and not no_update:
             self.reorder_duplicate_namespaces(duplicate_nses)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
         if not no_update:
             self.data.reload_namespace_tree()  # Update everything as well.
 
@@ -636,6 +640,8 @@ class Handler(object):
                     reorder_ns_bases[config_name].append(base_sect)
         sorter = rose.config.sort_settings
         id_formatter = rose.macro.ID_ELEMENT_FORMAT.format
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_REORDER + "-" + str(time.time())
         for config_name, base_sections in reorder_ns_bases.items():
             sections_done = []
             dupl_sect_dict = {}
@@ -659,6 +665,8 @@ class Handler(object):
                         ns = self.data.get_default_namespace_for_section(
                                            sect, config_name)
                         self.rename_request(ns, new_sect_name, no_update=True)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
         self.data.reload_namespace_tree()
 
     def get_orphan_container(self, page):
