@@ -274,6 +274,8 @@ class CylcProcessor(SuiteEngineProcessor):
                     key = path[len(root) + 1:]
                     if not key:
                         key = "script"
+                    elif key == "status":
+                        continue
                     submit["files"][key] = {"n_bytes": os.stat(path).st_size}
         return data
 
