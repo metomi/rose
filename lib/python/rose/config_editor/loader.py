@@ -523,7 +523,7 @@ class ConfigDataManager(object):
             allowed_sections = sect_map.keys()
         else:
             allowed_sections = self.get_sections_from_namespace(only_this_ns)
-        for section, sect_data in sect_map.items():
+        for section in sect_map:
             if (only_this_ns is not None and
                 section not in allowed_sections):
                 continue
@@ -816,8 +816,10 @@ class ConfigDataManager(object):
             # Remaining possibilities are not a problem:
             # Doc table: E -> E, E -> not trigger
 
-    def load_file_metadata(self, config_name):
+    def load_file_metadata(self, config_name, section_name=None):
         """Deal with file section variables."""
+        if section_name is not None and not section_name.startswith("file:"):
+            return False
         config = self.config[config_name].config
         meta_config = self.config[config_name].meta
         file_sections = []

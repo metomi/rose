@@ -150,6 +150,7 @@ def launch_error_dialog(exception=None, text=""):
     rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
                              text, rose.config_editor.DIALOG_TITLE_ERROR)
 
+
 def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
     """Return a wrapped string - 'textwrap' is not flexible enough for this."""
     lines = [""]

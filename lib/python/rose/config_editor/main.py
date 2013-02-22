@@ -25,13 +25,16 @@ Classes:
 
 """
 
+import cProfile
 import copy
 import itertools
 import os
+import pstats
 import re
 import shutil
 import sre_constants
 import sys
+import tempfile
 import warnings
 
 # Ignore add menu related warnings for now, but remove this later.
@@ -1924,7 +1927,7 @@ class MainController(object):
                 break
             do_list.append(stack_item)
         is_group = len(do_list) > 1
-        stack_info = {}
+        stack_info = []
         for stack_item in do_list:
             node = stack_item.node
             node_id = node.metadata.get('id')
@@ -1961,8 +1964,7 @@ class MainController(object):
             else:
                 stack_item.undo_func()
             del self.redo_stack[:]
-            for redo_item in redo_items:
-                self.redo_stack.append(redo_item)
+            self.redo_stack.extend(redo_items)
             just_done_item = self.undo_stack[-1]
             del self.undo_stack[-1]
             del stack[-1]
@@ -1974,8 +1976,7 @@ class MainController(object):
                 self.data.reload_namespace_tree()
             page = None
             if is_group:
-                stack_info.setdefault(namespace, [])
-                stack_info[namespace].append([stack_item.page_label, node_id])
+                stack_info.append([namespace, stack_item.page_label, node_id])
             elif self.data.is_ns_in_tree(namespace):
                 page = self.view_page(namespace, node_id)
                 self.sync_page_var_lists(page)
@@ -1991,23 +1992,7 @@ class MainController(object):
                 self.alter_bar_sensitivity()
                 self.update_stack_viewer_if_open()
         if is_group:
-            for namespace, label_id_tuples in stack_info.items():
-                node_id = None
-                if label_id_tuples:
-                    node_id = label_id_tuples[-1][1]
-                page = self.view_page(namespace, node_id)
-                self.sync_page_var_lists(page)
-                page.sort_data()
-                page.refresh()
-                page.update_ignored()
-                page.update_info()
-                page.set_main_focus(node_id)
-                self.set_current_page_indicator(page.namespace)
-                if any([l[0] != namespace for l in label_id_tuples]):
-                    # Make sure the right status update is made.
-                    self.update_status(page)
-            self.alter_bar_sensitivity()
-            self.update_stack_viewer_if_open()
+            self.data.reload_namespace_tree()
         return True
 
 # ----------------------- System functions -----------------------------------
@@ -2116,4 +2101,11 @@ if __name__ == '__main__':
     if opts.new_mode:
         cwd = None
     rose.gtk.util.set_exception_hook(keep_alive=True)
-    spawn_window(cwd)
+    if opts.debug_mode:
+        f = tempfile.NamedTemporaryFile()
+        cProfile.runctx("spawn_window(cwd)", globals(), locals(), f.name)
+        p = pstats.Stats(f.name)
+        p.strip_dirs().sort_stats('time').print_stats(40)
+        f.close()
+    else:
+        spawn_window(cwd)

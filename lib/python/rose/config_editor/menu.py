@@ -398,12 +398,10 @@ class Handler(object):
         section_base = re.sub('(.*)\(\d+\)$', r"\1", section)
         existing_sections = []
         clone_vars = []
-        for v_sect, variables in config_data.vars.now.items():
-            if v_sect == section:
-                for variable in variables:
-                    clone_vars.append(variable.copy())
-            if v_sect not in existing_sections:
-                existing_sections.append(v_sect)
+        existing_sections = config_data.vars.now.keys()
+        existing_sections.extend(config_data.sections.now.keys())
+        for variable in config_data.vars.now.get(section, []):
+            clone_vars.append(variable.copy())
         if new_section is None:
             i = 2
             while section_base + "(" + str(i) + ")" in existing_sections:

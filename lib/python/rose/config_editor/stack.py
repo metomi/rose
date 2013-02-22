@@ -21,6 +21,7 @@
 import copy
 import os
 import re
+import time
 
 import pygtk
 pygtk.require('2.0')
@@ -96,7 +97,7 @@ class SectionOperations(object):
             new_section_data = rose.section.Section(section, [], metadata)
         config_data.sections.now.update({section: new_section_data})
         self.__data.add_section_to_config(section, config_name)
-        self.__data.load_file_metadata(config_name)
+        self.__data.load_file_metadata(config_name, section)
         self.__data.load_vars_from_config(config_name,
                                           just_this_section=section,
                                           update=True)
@@ -115,10 +116,9 @@ class SectionOperations(object):
                           rose.config_editor.STACK_ACTION_ADDED,
                           copy_section_data,
                           self.remove_section,
-                          (config_name, section))
+                          (config_name, section, no_update))
         self.__undo_stack.append(stack_item)
-        while self.__redo_stack:
-            self.__redo_stack.pop()
+        del self.__redo_stack[:]
         if not no_update:
             self.view_page_func(ns)
             self.trigger_update(ns)
@@ -185,8 +185,7 @@ class SectionOperations(object):
                           self.ignore_section,
                           (config_name, section, not is_ignored, True))
         self.__undo_stack.append(stack_item)
-        while self.__redo_stack:
-            self.__redo_stack.pop()
+        del self.__redo_stack[:]
         nses_to_do = []
         for var in (config_data.vars.now.get(section, []) +
                     config_data.vars.latent.get(section, [])):
@@ -226,12 +225,11 @@ class SectionOperations(object):
                           rose.config_editor.STACK_ACTION_REMOVED,
                           old_section_data.copy(),
                           self.add_section,
-                          (config_name, section))
+                          (config_name, section, no_update))
         for ns in ns_list:
             self.kill_page_func(ns)
         self.__undo_stack.append(stack_item)
-        while self.__redo_stack:
-            self.__redo_stack.pop()
+        del self.__redo_stack[:]
         if not no_update:
             self.__data.reload_namespace_tree()  # This will update everything.
 
@@ -251,8 +249,7 @@ class SectionOperations(object):
                              self.set_section_comments,
                              (config_name, section, last_comments))
         self.__undo_stack.append(stack_item)
-        while self.__redo_stack:
-            self.__redo_stack.pop()
+        del self.__redo_stack[:]
         self.trigger_update(ns)
         self.trigger_comments_update(ns)
 
@@ -314,9 +311,8 @@ class VariableOperations(object):
                                         rose.config_editor.STACK_ACTION_ADDED,
                                         copy_var,
                                         self.remove_var,
-                                        [copy_var]))
-            for item in [i for i in self.__redo_stack]:
-                self.__redo_stack.remove(item)
+                                        [copy_var, no_update]))
+            del self.__redo_stack[:]
         if not no_update:
             self.trigger_update(variable.metadata['full_ns'])
 
@@ -348,9 +344,8 @@ class VariableOperations(object):
                                     rose.config_editor.STACK_ACTION_REMOVED,
                                     copy_var,
                                     self.add_var,
-                                    [copy_var]))
-        for item in [i for i in self.__redo_stack]:
-            self.__redo_stack.remove(item)
+                                    [copy_var, no_update]))
+        del self.__redo_stack[:]
         if not no_update:
             self.trigger_update(variable.metadata['full_ns'])
 
@@ -436,8 +431,7 @@ class VariableOperations(object):
                                            copy_var,
                                            self.set_var_ignored,
                                            [copy_var, old_reason, True]))
-        for item in [i for i in self.__redo_stack]:
-            self.__redo_stack.remove(item)
+        del self.__redo_stack[:]
         self.trigger_ignored_update(variable)
         self.trigger_update(variable.metadata['full_ns'])
 
@@ -456,8 +450,7 @@ class VariableOperations(object):
                                     copy_var,
                                     self.set_var_value,
                                     [copy_var, copy_var.old_value]))
-        for item in [i for i in self.__redo_stack]:
-            self.__redo_stack.remove(item)
+        del self.__redo_stack[:]
         self.trigger_update(variable.metadata['full_ns'])
 
     def set_var_comments(self, variable, comments):
@@ -473,8 +466,7 @@ class VariableOperations(object):
                             copy_variable,
                             self.set_var_comments,
                             [copy_variable, old_comments]))
-        for item in [i for i in self.__redo_stack]:
-            self.__redo_stack.remove(item)
+        del self.__redo_stack[:]
         self.trigger_update(variable.metadata['full_ns'])
 
     def get_var_original_comments(self, variable):
