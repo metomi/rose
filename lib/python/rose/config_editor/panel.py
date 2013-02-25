@@ -807,25 +807,41 @@ class FileSystemPanel(gtk.ScrolledWindow):
             this_menu.popup(None, None, None, event.button, event.time)
 
 
-class SummaryDataPanel(gtk.ScrolledWindow):
+class SummaryDataPanel(gtk.VBox):
 
     """A class to show rose sub-sections and variables in a gtk.TreeView."""
 
-    def __init__(self, sections, variables, search_function, is_duplicate):
+    def __init__(self, sections, variables, sect_ops, var_ops, search_function,
+                 is_duplicate):
         super(SummaryDataPanel, self).__init__()
         self.sections = sections
         self.variables = variables
+        self.sect_ops = sect_ops
+        self.var_ops = var_ops
         self.search_function = search_function
         self.is_duplicate = is_duplicate
+        self.util = rose.config_editor.util.Lookup()
+        self._filter = gtk.Entry()
+        self._filter.set_width_chars(
+                     rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
+        self._filter.connect("changed", self._refilter)
+        self._filter.show()
+        filter_hbox = gtk.HBox()
+        filter_hbox.pack_end(self._filter, expand=False, fill=False)
+        filter_hbox.show()
+        self.pack_start(filter_hbox, expand=False, fill=False)
         self._view = rose.gtk.util.TooltipTreeView(
                                    get_tooltip_func=self._get_tree_tip)
         self._view.set_rules_hint(True)
         self._view.show()
         self._view.connect("row-activated",
                            self._handle_activation)
-        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self._window = gtk.ScrolledWindow()
+        self._window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.update_tree_model()
-        self.add(self._view)
+        self._window.add(self._view)
+        self._window.show()
+        self.pack_start(self._window, expand=True, fill=True)
         self.show()
 
     def update_tree_model(self, sections=None, variables=None):
@@ -851,6 +867,11 @@ class SummaryDataPanel(gtk.ScrolledWindow):
 
     def _get_tree_cell(self, col, cell, model, row_iter):
         col_index = self._view.get_columns().index(col)
+        section = model.get_value(row_iter, 0)
+        if col_index == 0:
+            option = None
+        else:
+            option = self._column_names[col_index]
         value = model.get_value(row_iter, col_index)
         max_len = rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
         if (value is not None and len(value) > max_len
@@ -859,54 +880,111 @@ class SummaryDataPanel(gtk.ScrolledWindow):
             cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         if col_index == 0 and self.is_duplicate:
             value = value.split("(")[-1].rstrip(")")
-        cell.set_property("markup", value)
+        markup_value = self._get_markup(section, option, value)
+        cell.set_property("markup", markup_value)
+
+    def _get_markup(self, section, option, value):
+        markups = []
+        if value is None:
+            return None
+        if option is None:
+            node_data = self.sections.get(section)
+        else:
+            id_ = self.util.get_id_from_section_option(section, option)
+            node_data = self.var_id_map.get(id_)
+        if node_data is None:
+            return None
+        if rose.variable.IGNORED_BY_SYSTEM in node_data.ignored_reason:
+            markups.append(
+                    rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP)
+        elif rose.variable.IGNORED_BY_USER in node_data.ignored_reason:
+            markups.append(
+                    rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP)
+        if rose.variable.IGNORED_BY_SECTION in node_data.ignored_reason:
+            markups.append(
+                    rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP)
+        if option is not None and self.var_ops.is_var_modified(node_data):
+            markups.append(
+                    rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP)
+        if node_data.error:
+            markups.append(
+                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP)
+        for markup in markups:
+            value = markup.format(value)
+        return value
 
     def _get_tree_tip(self, view, row_iter, col_index, tip):
-        cell_id = view.get_model().get_value(row_iter, 0)
+        section = view.get_model().get_value(row_iter, 0)
         if col_index == 0:
-            tip.set_text(cell_id)
+            option = None
+            id_data = self.sections[section]
+            tip_text = section
         else:
-            col_title = view.get_columns()[col_index].get_title()
-            cell_id += rose.CONFIG_DELIMITER + col_title
-            cell_data = view.get_model().get_value(row_iter, col_index)
-            if cell_data is None:
-                tip.set_text(cell_id)
-            else:
-                tip.set_text(cell_id + "\n" + cell_data)
+            option = self._column_names[col_index]
+            id_ = self.util.get_id_from_section_option(section, option)#
+            id_data = self.var_id_map[id_]
+            value = str(view.get_model().get_value(row_iter, col_index))
+            tip_text = rose.CONFIG_DELIMITER.join([section, option, value])
+        tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
+        if tip_text:
+            tip_text += "\n"
+        for key, value in id_data.error.items():
+            tip_text += (
+                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
+                                                                key, value))
+        for key in id_data.ignored_reason:
+            tip_text += key + "\n"
+        if option is not None:
+            change_text = self.var_ops.get_var_changes(id_data)
+            tip_text += change_text + "\n"
+        tip.set_text(tip_text.rstrip())
         return True
-
+        
     def _get_tree_model_and_col_names(self):
         # Construct a data model of other page data.
-        sub_sect_names = [s.name for s in self.sections]
+        sub_sect_names = self.sections.keys()
         sub_var_names = []
-        var_id_map = {}
-        for variable in self.variables:
-            var_id_map[variable.metadata["id"]] = variable
-            if variable.name not in sub_var_names:
-                sub_var_names.append(variable.name)
+        self.var_id_map = {}
+        for section, variables in self.variables.items():
+            for variable in variables:
+                self.var_id_map[variable.metadata["id"]] = variable
+                if variable.name not in sub_var_names:
+                    sub_var_names.append(variable.name)
         sub_sect_names.sort(rose.config.sort_settings)
         sub_var_names.sort(rose.config.sort_settings)
         col_types = [str] + [str] * len(sub_var_names)
         store = gtk.TreeStore(*col_types)
-        i_format = rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_MARKUP.format
-        safe_str = rose.gtk.util.safe_str
         for section in sub_sect_names:
             row_data = [section]
             for opt in sub_var_names:
-                var = var_id_map.get(section + rose.CONFIG_DELIMITER + opt)
+                id_ = self.util.get_id_from_section_option(section, opt)
+                var = self.var_id_map.get(id_)
                 if var is None:
                     row_data.append(None)
                 else:
-                    if var.ignored_reason:
-                        row_data.append(i_format(safe_str(var.value)))
-                    else:
-                        row_data.append(var.value)
+                    row_data.append(rose.gtk.util.safe_str(var.value))
             store.append(None, row_data)
         if self.is_duplicate:
             store.set_sort_func(0, self._sort_model_dupl)
-        column_names = [rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE]
-        column_names += sub_var_names
-        return store, column_names
+        self._column_names = [
+                     rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE]
+        self._column_names += sub_var_names
+        filter_model = store.filter_new()
+        filter_model.set_visible_func(self._filter_visible)
+        return filter_model, self._column_names
+
+    def _refilter(self, widget=None):
+        self._view.get_model().refilter()
+
+    def _filter_visible(self, model, iter_):
+        filt_text = self._filter.get_text()
+        if not filt_text:
+            return True
+        for i in range(model.get_n_columns()):
+            col_text = model.get_value(iter_, i)
+            if isinstance(col_text, basestring) and filt_text in col_text:
+                return True
+        return False
 
     def _sort_model_dupl(self, model, iter1, iter2):
         val1 = model.get_value(iter1, 0)
@@ -920,8 +998,9 @@ class SummaryDataPanel(gtk.ScrolledWindow):
         row_iter = model.get_iter(path)
         col_index = view.get_columns().index(column)
         cell_data = model.get_value(row_iter, col_index)
-        search_id = model.get_value(row_iter, 0)
-        if cell_data != search_id and cell_data is not None:
-            option = column.get_title().replace("__", "_")
-            search_id += rose.CONFIG_DELIMITER + option
-        self.search_function(search_id)
+        section = model.get_value(row_iter, 0)
+        option = None
+        if col_index != 0 and cell_data is not None:
+            option = self._column_names[col_index]
+        id_ = self.util.get_id_from_section_option(section, option)
+        self.search_function(id_)

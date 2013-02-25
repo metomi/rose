@@ -497,7 +497,9 @@ class MainController(object):
         duplicate = ns_metadata.get(rose.META_PROP_DUPLICATE)
         help = ns_metadata.get(rose.META_PROP_HELP)
         url = ns_metadata.get(rose.META_PROP_URL)
-        custom_widget = ns_metadata.get(rose.META_PROP_WIDGET)
+        custom_widget = ns_metadata.get(rose.config_editor.META_PROP_WIDGET)
+        custom_sub_widget = ns_metadata.get(
+                               rose.config_editor.META_PROP_WIDGET_SUB_NS)
         if custom_widget is not None:
             module, cls = re.match('([.\w]*)\.(\w+)$', custom_widget).groups()
             custom_widget = None
@@ -548,13 +550,23 @@ class MainController(object):
                          'help': help,
                          'url': url,
                          'widget': custom_widget,
+                         'widget_sub_ns': custom_sub_widget
                          'see_also': see_also,
                          'config_name': config_name,
                          'show_modes': self.page_show_modes,
                          'icon': icon_path}
         if len(sections) == 1:
             page_metadata.update({'id': sections.pop()})
-        variable_ops = rose.config_editor.stack.VariableOperations(
+        sect_ops = rose.config_editor.stack.SectionOperations(
+                                   self.data, self.util,
+                                   self.undo_stack, self.redo_stack,
+                                   self.check_cannot_enable_setting,
+                                   self.update_namespace,
+                                   self.update_ns_info,
+                                   self.update_ns_comments,
+                                   view_page_func=self.view_page,
+                                   kill_page_func=self.kill_page)
+        var_ops = rose.config_editor.stack.VariableOperations(
                                    self.data, self.util, 
                                    self.undo_stack, self.redo_stack,
                                    self.check_cannot_enable_setting,
@@ -569,7 +581,8 @@ class MainController(object):
                                   page_metadata,
                                   data,
                                   latent_data,
-                                  variable_ops,
+                                  sect_ops,
+                                  var_ops,
                                   section_data_objects,
                                   self.data.get_format_sections,
                                   directory,
@@ -578,7 +591,7 @@ class MainController(object):
                                   launch_edit_func=launch_edit)
         #FIXME: These three should go.
         page.trigger_tab_detach = lambda b: self._handle_detach_request(page)
-        variable_ops.trigger_ignored_update = lambda v: page.update_ignored()
+        var_ops.trigger_ignored_update = lambda v: page.update_ignored()
         page.trigger_update_status = lambda: self.update_status(page)
         return page
 
@@ -931,7 +944,8 @@ class MainController(object):
         for page in self.pagelist:
             if (page.sub_data is None or
                 (namespace is not None and
-                 not namespace.startswith(page.namespace))):
+                 not namespace.startswith(page.namespace) and
+                 namespace != page.namespace)):
                 continue
             page.sub_data = self.data.get_sub_data_for_namespace(
                                                    page.namespace)

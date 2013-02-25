@@ -473,6 +473,7 @@ def get_metadata_for_config_id(setting_id, meta_config):
     """Return a dict of metadata properties and values for a setting id."""
     metadata = {}
     search_id = REC_ID_STRIP_DUPL.sub("", setting_id)
+    is_element = REC_ID_ELEMENT.search(setting_id)
     no_modifier_id = REC_MODIFIER.sub("", search_id)
     if no_modifier_id != search_id:
         # There is a modifier e.g. namelist:foo{bar}.
@@ -492,7 +493,7 @@ def get_metadata_for_config_id(setting_id, meta_config):
     if node is not None:
         metadata.update(dict([(o, n.value) for o, n
                                in node.value.items()]))
-    if search_id != setting_id and rose.META_PROP_TITLE in metadata:
+    if is_element and rose.META_PROP_TITLE in metadata:
         # Individual items of an array should not steal its title
         metadata.pop(rose.META_PROP_TITLE)
     metadata.update({'id': setting_id})

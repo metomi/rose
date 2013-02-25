@@ -380,7 +380,13 @@ TITLE_FILE_PANEL = "Other files"
 
 # Summary (sub) data panel names
 
-SUMMARY_DATA_PANEL_IGNORED_MARKUP = "<b>{0}</b>"
+SUMMARY_DATA_PANEL_ERROR_TIP = "Error ({0}): {1}\n"
+SUMMARY_DATA_PANEL_ERROR_MARKUP = "{0} <span color='red'>X</span>"
+SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP = "<b>^</b> {0}"
+SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP = "<b>!!</b> {0}"
+SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP = "<b>!</b> {0}"
+SUMMARY_DATA_PANEL_MODIFIED_MARKUP = "<span color='blue'>{0}</span>"
+SUMMARY_DATA_PANEL_FILTER_MAX_CHAR = 8
 SUMMARY_DATA_PANEL_MAX_LEN = 15
 SUMMARY_DATA_PANEL_SECTION_TITLE = "Section"
 FILE_CONTENT_PANEL_FORMAT_LABEL = "Hide available sections"
@@ -438,6 +444,7 @@ FLAG_TYPE_NO_META = "No metadata flag"
 # Relevant metadata properties
 
 META_PROP_WIDGET = "widget[rose-config-edit]"
+META_PROP_WIDGET_SUB_NS = "widget[rose-config-edit:sub-ns]"
 
 # Miscellaneous
 COPYRIGHT = '(C) British Crown Copyright 2012-3 Met Office.'

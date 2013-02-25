@@ -1095,17 +1095,18 @@ class ConfigDataManager(object):
 
     def get_sub_data_for_namespace(self, ns, from_saved=False):
         """Return any sections/variables below this namespace."""
-        sub_data = {"sections": [], "variables": []}
+        sub_data = {"sections": {}, "variables": {}}
         config_name = self.util.split_full_ns(self, ns)[0]
         config_data = self.config[config_name]
         for sect, sect_data in config_data.sections.now.items():
             sect_ns = self.get_default_namespace_for_section(sect, config_name)
             if sect_ns.startswith(ns):
-                sub_data['sections'].append(sect_data)
+                sub_data['sections'].update({sect: sect_data})
         for sect, variables in config_data.vars.now.items():
             for variable in variables:
                 if variable.metadata['full_ns'].startswith(ns):
-                    sub_data['variables'].append(variable)
+                    sub_data['variables'].setdefault(sect, [])
+                    sub_data['variables'][sect].append(variable)
         return sub_data
 
     def get_ns_comments(self, ns):

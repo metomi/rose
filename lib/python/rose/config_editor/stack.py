@@ -253,6 +253,12 @@ class SectionOperations(object):
         self.trigger_update(ns)
         self.trigger_comments_update(ns)
 
+    def get_ns_metadata_files(self, namespace):
+        """Retrieve filenames within the metadata for this namespace."""
+        config_name = self.__util.split_full_ns(
+                             self.__data, namespace)[0]
+        return self.__data.config[config_name].meta_files
+
 
 class VariableOperations(object):
 
@@ -572,10 +578,10 @@ class VariableOperations(object):
                              self.__data, config_name_or_namespace)[0]
         self.search_id_func(config_name, setting_id)
 
-    def get_var_metadata_files(self, variable):
-        """Retrieve filenames within the metadata for this variable."""
+    def get_ns_metadata_files(self, namespace):
+        """Retrieve filenames within the metadata for this namespace."""
         config_name = self.__util.split_full_ns(
-                             self.__data, variable.metadata['full_ns'])[0]
+                             self.__data, namespace)[0]
         return self.__data.config[config_name].meta_files
 
 
