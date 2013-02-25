@@ -550,7 +550,7 @@ class MainController(object):
                          'help': help,
                          'url': url,
                          'widget': custom_widget,
-                         'widget_sub_ns': custom_sub_widget
+                         'widget_sub_ns': custom_sub_widget,
                          'see_also': see_also,
                          'config_name': config_name,
                          'show_modes': self.page_show_modes,

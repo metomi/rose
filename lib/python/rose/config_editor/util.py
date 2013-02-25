@@ -25,6 +25,7 @@ one to import custom plugins.
 
 """
 
+import inspect
 import re
 
 import pygtk
@@ -110,7 +111,7 @@ def import_object(import_string, from_files, error_handler):
     if module_name.startswith("rose."):
         is_builtin = True
     class_name = import_string.split(".")[-1]
-    module_fpath = *import_string.split(".")[:-1] + ".py"
+    module_fpath = "/".join(import_string.rsplit(".")[:-1]) + ".py"
     module_files = [f for f in from_files if f.endswith(module_fpath)]
     if not module_files and not is_builtin:
         return None

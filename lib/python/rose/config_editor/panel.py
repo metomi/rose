@@ -807,15 +807,25 @@ class FileSystemPanel(gtk.ScrolledWindow):
             this_menu.popup(None, None, None, event.button, event.time)
 
 
-class SummaryDataPanel(gtk.VBox):
+class BaseSummaryDataPanel(gtk.VBox):
 
-    """A class to show rose sub-sections and variables in a gtk.TreeView."""
+    """A base class for summarising data across many namespaces.
+    
+    Subclasses should provide the following methods:
+    def add_cell_renderer_for_value(self, column)
+    def get_tree_model_and_col_names(self)
+    def get_tree_tip(self, treeview, row_iter, col_index, tip(self)
+
+    These are described below in their placeholder methods.
+
+    """
 
     def __init__(self, sections, variables, sect_ops, var_ops, search_function,
                  is_duplicate):
-        super(SummaryDataPanel, self).__init__()
+        super(BaseSummaryDataPanel, self).__init__()
         self.sections = sections
         self.variables = variables
+        self._last_column_names = []
         self.sect_ops = sect_ops
         self.var_ops = var_ops
         self.search_function = search_function
@@ -831,7 +841,7 @@ class SummaryDataPanel(gtk.VBox):
         filter_hbox.show()
         self.pack_start(filter_hbox, expand=False, fill=False)
         self._view = rose.gtk.util.TooltipTreeView(
-                                   get_tooltip_func=self._get_tree_tip)
+                                   get_tooltip_func=self.get_tree_tip)
         self._view.set_rules_hint(True)
         self._view.show()
         self._view.connect("row-activated",
@@ -844,49 +854,75 @@ class SummaryDataPanel(gtk.VBox):
         self.pack_start(self._window, expand=True, fill=True)
         self.show()
 
+    def add_cell_renderer_for_value(self, column):
+        """Add a cell renderer to represent the model value.
+
+        column is the gtk.TreeColumn to pack the cell in.
+
+        You may want to use column.set_cell_data_func.
+
+        """
+        raise NotImplementedError()
+
+    def get_tree_model_and_col_names(self):
+        """Return a tuple of treemodel, columns, and a refresh switch.
+        
+        treemodel should be a gtk.TreeModel-derived data store
+        columns should be a list of column names
+        refresh should be a boolean denoting whether to redraw the
+        whole view - e.g. if the columns have changed.
+        
+        """
+        raise NotImplementedError()
+
+    def get_tree_tip(self, treeview, row_iter, col_index, tip):
+        """Add the hover-over text for a cell to 'tip'.
+        
+        treeview is the gtk.TreeView object
+        row_iter is the gtk.TreeIter for the row
+        col_index is the index of the gtk.TreeColumn in
+        e.g. treeview.get_columns()
+        tip is the gtk.Tooltip object that the text needs to be set in.
+        
+        """
+        raise NotImplementedError()
+
     def update_tree_model(self, sections=None, variables=None):
         """Update the summary of page data."""
         if sections is not None:
             self.sections = sections
         if variables is not None:
             self.variables = variables
-        for column in list(self._view.get_columns()):
-            self._view.remove_column(column)
-        model, cols = self._get_tree_model_and_col_names()
+        model, cols, should_redraw = self.get_tree_model_and_col_names()
+        if should_redraw:
+            for column in list(self._view.get_columns()):
+                self._view.remove_column(column)
         self._view.set_model(model)
-        for i, col_name in enumerate(cols):
+        if should_redraw:
+            self.add_new_columns(self._view, cols)
+
+    def add_new_columns(self, treeview, column_names):      
+        for i, column_name in enumerate(column_names):
             col = gtk.TreeViewColumn()
-            col.set_title(col_name.replace("_", "__"))
-            cell = gtk.CellRendererText()
-            col.pack_start(cell, expand=True)
-            if i < len(cols) - 1:
+            col.set_title(column_name.replace("_", "__"))
+            cell_for_status = gtk.CellRendererText()
+            col.pack_start(cell_for_status, expand=True)
+            col.set_cell_data_func(cell_for_status,
+                                   self._get_tree_cell_status)
+            self.add_cell_renderer_for_value(col)
+            if i < len(column_names) - 1:
                 col.set_resizable(True)
             col.set_sort_column_id(i)
-            col.set_cell_data_func(cell, self._get_tree_cell)
-            self._view.append_column(col)
+            treeview.append_column(col)
 
-    def _get_tree_cell(self, col, cell, model, row_iter):
+    def _get_tree_cell_status(self, col, cell, model, row_iter):
         col_index = self._view.get_columns().index(col)
         section = model.get_value(row_iter, 0)
         if col_index == 0:
             option = None
         else:
-            option = self._column_names[col_index]
-        value = model.get_value(row_iter, col_index)
-        max_len = rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
-        if (value is not None and len(value) > max_len
-            and col_index != 0):
-            cell.set_property("width-chars", max_len)
-            cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        if col_index == 0 and self.is_duplicate:
-            value = value.split("(")[-1].rstrip(")")
-        markup_value = self._get_markup(section, option, value)
-        cell.set_property("markup", markup_value)
-
-    def _get_markup(self, section, option, value):
-        markups = []
-        if value is None:
-            return None
+            option = self.column_names[col_index]
+        status = ""
         if option is None:
             node_data = self.sections.get(section)
         else:
@@ -895,52 +931,67 @@ class SummaryDataPanel(gtk.VBox):
         if node_data is None:
             return None
         if rose.variable.IGNORED_BY_SYSTEM in node_data.ignored_reason:
-            markups.append(
-                    rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP)
+            status += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP
         elif rose.variable.IGNORED_BY_USER in node_data.ignored_reason:
-            markups.append(
-                    rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP)
+            status += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP
         if rose.variable.IGNORED_BY_SECTION in node_data.ignored_reason:
-            markups.append(
-                    rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP)
+            status += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP
         if option is not None and self.var_ops.is_var_modified(node_data):
-            markups.append(
-                    rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP)
+            status += rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
         if node_data.error:
-            markups.append(
-                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP)
-        for markup in markups:
-            value = markup.format(value)
+            status += rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP
+        cell.set_property("markup", status)
+
+    def _get_value_from_iter_column(self, row_iter, column):
+        col_index = self._view.get_columns().index(column)
+        value = treemodel.get_value(row_iter, col_index)
+        max_len = rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
+        if (value is not None and len(value) > max_len
+            and col_index != 0):
+            cell.set_property("width-chars", max_len)
+            cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        if col_index == 0 and self.is_duplicate:
+            value = value.split("(")[-1].rstrip(")")
         return value
 
-    def _get_tree_tip(self, view, row_iter, col_index, tip):
-        section = view.get_model().get_value(row_iter, 0)
-        if col_index == 0:
-            option = None
-            id_data = self.sections[section]
-            tip_text = section
-        else:
-            option = self._column_names[col_index]
-            id_ = self.util.get_id_from_section_option(section, option)#
-            id_data = self.var_id_map[id_]
-            value = str(view.get_model().get_value(row_iter, col_index))
-            tip_text = rose.CONFIG_DELIMITER.join([section, option, value])
-        tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
-        if tip_text:
-            tip_text += "\n"
-        for key, value in id_data.error.items():
-            tip_text += (
-                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
-                                                                key, value))
-        for key in id_data.ignored_reason:
-            tip_text += key + "\n"
-        if option is not None:
-            change_text = self.var_ops.get_var_changes(id_data)
-            tip_text += change_text + "\n"
-        tip.set_text(tip_text.rstrip())
-        return True
-        
-    def _get_tree_model_and_col_names(self):
+    def _refilter(self, widget=None):
+        self._view.get_model().refilter()
+
+    def _filter_visible(self, model, iter_):
+        filt_text = self._filter.get_text()
+        if not filt_text:
+            return True
+        for i in range(model.get_n_columns()):
+            col_text = model.get_value(iter_, i)
+            if isinstance(col_text, basestring) and filt_text in col_text:
+                return True
+        return False
+
+    def _sort_model_dupl(self, model, iter1, iter2):
+        val1 = model.get_value(iter1, 0)
+        val2 = model.get_value(iter2, 0)
+        return rose.config.sort_settings(val1, val2)
+         
+    def _handle_activation(self, view, path, column):
+        if path is None:
+            return False
+        model = view.get_model()
+        row_iter = model.get_iter(path)
+        col_index = view.get_columns().index(column)
+        cell_data = model.get_value(row_iter, col_index)
+        section = model.get_value(row_iter, 0)
+        option = None
+        if col_index != 0 and cell_data is not None:
+            option = self.column_names[col_index]
+        id_ = self.util.get_id_from_section_option(section, option)
+        self.search_function(id_)
+
+
+class StandardSummaryDataPanel(BaseSummaryDataPanel):
+
+    """Class that provides a standard interface to summary data."""
+
+    def get_tree_model_and_col_names(self):
         # Construct a data model of other page data.
         sub_sect_names = self.sections.keys()
         sub_var_names = []
@@ -966,41 +1017,48 @@ class SummaryDataPanel(gtk.VBox):
             store.append(None, row_data)
         if self.is_duplicate:
             store.set_sort_func(0, self._sort_model_dupl)
-        self._column_names = [
+        self.column_names = [
                      rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE]
-        self._column_names += sub_var_names
+        self.column_names += sub_var_names
         filter_model = store.filter_new()
         filter_model.set_visible_func(self._filter_visible)
-        return filter_model, self._column_names
+        should_redraw = self.column_names != self._last_column_names
+        self._last_column_names = self.column_names
+        return filter_model, self.column_names, should_redraw
 
-    def _refilter(self, widget=None):
-        self._view.get_model().refilter()
+    def add_cell_renderer_for_value(self, col):
+        cell_for_value = gtk.CellRendererText()
+        col.pack_start(cell_for_value, expand=True)
+        col.set_cell_data_func(cell_for_value,
+                               self._get_tree_cell_value)
 
-    def _filter_visible(self, model, iter_):
-        filt_text = self._filter.get_text()
-        if not filt_text:
-            return True
-        for i in range(model.get_n_columns()):
-            col_text = model.get_value(iter_, i)
-            if isinstance(col_text, basestring) and filt_text in col_text:
-                return True
-        return False
+    def _get_tree_cell_value(self, column, cell, treemodel, iter_):
+        value = self._get_value_from_iter_column(iter_, column)
+        cell.set_property("markup", value)
 
-    def _sort_model_dupl(self, model, iter1, iter2):
-        val1 = model.get_value(iter1, 0)
-        val2 = model.get_value(iter2, 0)
-        return rose.config.sort_settings(val1, val2)
-            
-    def _handle_activation(self, view, path, column):
-        if path is None:
-            return False
-        model = view.get_model()
-        row_iter = model.get_iter(path)
-        col_index = view.get_columns().index(column)
-        cell_data = model.get_value(row_iter, col_index)
-        section = model.get_value(row_iter, 0)
-        option = None
-        if col_index != 0 and cell_data is not None:
-            option = self._column_names[col_index]
-        id_ = self.util.get_id_from_section_option(section, option)
-        self.search_function(id_)
+    def get_tree_tip(self, view, row_iter, col_index, tip):
+        section = view.get_model().get_value(row_iter, 0)
+        if col_index == 0:
+            option = None
+            id_data = self.sections[section]
+            tip_text = section
+        else:
+            option = self.column_names[col_index]
+            id_ = self.util.get_id_from_section_option(section, option)#
+            id_data = self.var_id_map[id_]
+            value = str(view.get_model().get_value(row_iter, col_index))
+            tip_text = rose.CONFIG_DELIMITER.join([section, option, value])
+        tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
+        if tip_text:
+            tip_text += "\n"
+        for key, value in id_data.error.items():
+            tip_text += (
+                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
+                                                                key, value))
+        for key in id_data.ignored_reason:
+            tip_text += key + "\n"
+        if option is not None:
+            change_text = self.var_ops.get_var_changes(id_data)
+            tip_text += change_text + "\n"
+        tip.set_text(tip_text.rstrip())
+        return True

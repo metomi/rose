@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import sys
 import time
 import webbrowser
 
@@ -491,15 +492,12 @@ class ConfigPage(gtk.VBox):
                                                        self.custom_sub_widget)
                 self.handle_bad_custom_sub_widget(text)
             try:
-                self.main_container = custom_widget(self.panel_data,
-                                                    self.ghost_data,
-                                                    self.var_ops,
-                                                    self.show_modes)
+                self.sub_data_panel = custom_widget(*args)
             except Exception as e:
                 self.handle_bad_custom_sub_widget(str(e))
         else:
-            self.sub_data_panel = rose.config_editor.panel.SummaryDataPanel(
-                                                           *args)
+            self.sub_data_panel = (
+                     rose.config_editor.panel.StandardSummaryDataPanel(*args))
 
     def handle_bad_custom_sub_widget(self, error_info):
         text = rose.config_editor.ERROR_IMPORT_WIDGET.format(error_info)
