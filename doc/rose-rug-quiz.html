@@ -560,7 +560,11 @@ warn-if=True
             <p class="answers C"><em><samp>type</samp></em> - the
             <samp>values</samp> option supersedes other value definition
             options such as <samp>type</samp>, <samp>range</samp>, and
-            <samp>pattern</samp></p>
+            <samp>pattern</samp>. <samp>warn-if=True</samp> is a valid
+            way of warning a user when the setting is included in their
+            configuration - for example, if it is deprecated. It would
+            usually include a comment - e.g.
+            <samp>warn-if=True  #Deprecated.</samp>.</p>
           </div>
         </li>
 
@@ -812,8 +816,7 @@ graph = """
                 <td class="noborder">
                   <pre class="prettyprint lang-cylc">
 graph = """
-    B =&gt; A
-    C:fail =&gt; A
+    B and not C =&gt; A
 """
 </pre>
                 </td>
