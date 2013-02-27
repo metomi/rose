@@ -81,13 +81,13 @@ table,
 td,
 th {
     border: 1px solid #d0d0d0;
+    white-space: nowrap;
 }
 td {
     border-bottom: 0;
     border-top: 0;
     padding: 0.3em;
     font-size: small;
-    white-space: nowrap;
 }
 th {
     font-size: small;
@@ -242,7 +242,7 @@ $(function() {
             $.each(submits, function(submit_num, submit_data) {
                 var row = $("<tr/>").appendTo($("tbody", node));
                 var cell;
-                /* Column 1: task%cycle (submit-n) */
+                /* Column 1: task.cycle (submit-n) */
                 cell = $("<td/>").appendTo(row).addClass("firstColumn")
                 if (submits.length > 1) {
                     var span = $("<span/>").appendTo(cell);
@@ -320,7 +320,7 @@ $(function() {
                         var content = "empty";
                         var n_bytes = task_files[name]["n_bytes"];
                         if (n_bytes > 0) {
-                            var file_uri = URL_PREFIX + encodeURIComponent(file);
+                            var file_uri = URL_PREFIX + file;
                             content = $("<a/>", {"href": file_uri}).append("view");
                             content.attr("title", n_bytes.toString() + " byte(s)");
                         }
@@ -375,10 +375,11 @@ $(function() {
                             delete(indexed_files_data_map[name]);
                         }
                     }
+                    var n = (submit_num + 1).toString();
+                    var root = "job/" + task_id_out + "." + n + ".";
                     if (name in indexed_files_data_map) {
                         var d = indexed_files_data_map[name];
                         var select = $("<select/>").appendTo(cell);
-                        var root = "job/" + task_id_out + "." +  (submit_num + 1) + ".";
                         var option = $("<option/>");
                         option.attr("selected", "selected");
                         option.attr("value", "");
@@ -394,10 +395,10 @@ $(function() {
                             option.click(function() {
                                 var file = root + $(this).text();
                                 if (file.match(/\.html(?:\.\d+)?$/)) {
-                                    location = (file).replace(/%/, "%25");
+                                    location = file;
                                 }
                                 else {
-                                    var file_uri = encodeURIComponent(file);
+                                    var file_uri = file;
                                     location = URL_PREFIX + file_uri;
                                 }
                             });
@@ -411,15 +412,16 @@ $(function() {
                             cell.append(span);
                         }
                         else {
-                            var file = "job/" + task_id_out + "." + (submit_num + 1) + "." + name;
+                            var n = submit_num + 1;
+                            var file = root + name;
                             var anchor = $("<a/>");
                             anchor.attr("title", n_bytes.toString() + " byte(s)");
                             if (name.match(/\.html$/)) {
-                                anchor.attr("href", file.replace(/%/, "%25"));
+                                anchor.attr("href", file);
                                 anchor.text(name);
                             }
                             else {
-                                var file_uri = encodeURIComponent(file);
+                                var file_uri = file;
                                 anchor.attr("href", URL_PREFIX + file_uri);
                                 anchor.text(name);
                             }
@@ -488,7 +490,7 @@ $(function() {
 <table id="task_list" summary="Task List">
   <thead>
     <tr>
-      <th class="firstColumn">Task Name%Cycle</th>
+      <th class="firstColumn">Job</th>
       <th>Name</th>
       <th>Cycle</th>
       <th>Submit-N</th>
