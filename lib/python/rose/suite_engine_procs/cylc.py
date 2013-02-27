@@ -42,7 +42,7 @@ class CylcProcessor(SuiteEngineProcessor):
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     SUITE_LOG = "suite/log"
-    TASK_ID_DELIM = "%"
+    TASK_ID_DELIM = "."
     TASK_LOG_DELIM = "."
 
     REC_LOG_ENTRIES = {
