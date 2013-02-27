@@ -26,7 +26,9 @@ one to import custom plugins.
 """
 
 import inspect
+import os
 import re
+import sys
 
 import pygtk
 pygtk.require("2.0")

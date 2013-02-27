@@ -500,9 +500,6 @@ class MainController(object):
         custom_widget = ns_metadata.get(rose.config_editor.META_PROP_WIDGET)
         custom_sub_widget = ns_metadata.get(
                                rose.config_editor.META_PROP_WIDGET_SUB_NS)
-        if custom_widget is not None:
-            module, cls = re.match('([.\w]*)\.(\w+)$', custom_widget).groups()
-            custom_widget = None
         label = ns_metadata.get(rose.META_PROP_TITLE)
         if label is None:
             label = subspace.split('/')[-1]

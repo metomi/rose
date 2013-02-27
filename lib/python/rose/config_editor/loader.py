@@ -1102,12 +1102,20 @@ class ConfigDataManager(object):
             sect_ns = self.get_default_namespace_for_section(sect, config_name)
             if sect_ns.startswith(ns):
                 sub_data['sections'].update({sect: sect_data})
+        sub_data["get_var_id_values_func"] = (
+                lambda: self.get_sub_data_var_id_values(config_name))
         for sect, variables in config_data.vars.now.items():
             for variable in variables:
                 if variable.metadata['full_ns'].startswith(ns):
                     sub_data['variables'].setdefault(sect, [])
                     sub_data['variables'][sect].append(variable)
         return sub_data
+
+    def get_sub_data_var_id_values(self, config_name):
+        """Return all real variable values for sub data."""
+        config_data = self.config[config_name]
+        for variable in config_data.vars.get_all():
+            yield variable.metadata["id"], variable.value
 
     def get_ns_comments(self, ns):
         """Return any section comments for this namespace."""

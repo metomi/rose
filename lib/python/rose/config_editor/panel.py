@@ -821,8 +821,8 @@ class BaseSummaryDataPanel(gtk.VBox):
     """
 
     def __init__(self, sections, variables, sect_ops, var_ops,
-                 search_function, get_config_sections_function,
-                 is_duplicate):
+                 search_function, get_var_id_values_function,
+                 is_duplicate, arg_str=None):
         super(BaseSummaryDataPanel, self).__init__()
         self.sections = sections
         self.variables = variables
@@ -831,7 +831,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.sect_ops = sect_ops
         self.var_ops = var_ops
         self.search_function = search_function
-        self.get_config_sections_function = get_config_sections_function
+        self.get_var_id_values_function = get_var_id_values_function
         self.is_duplicate = is_duplicate
         self.group_index = None
         self.util = rose.config_editor.util.Lookup()
@@ -843,6 +843,8 @@ class BaseSummaryDataPanel(gtk.VBox):
         self._view.show()
         self._view.connect("row-activated",
                            self._handle_activation)
+        self._view.connect("button-press-event",
+                           self._handle_button_press_event)
         self._window = gtk.ScrolledWindow()
         self._window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.update_tree_model()
@@ -993,7 +995,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             col = gtk.TreeViewColumn()
             col.set_title(column_name.replace("_", "__"))
             cell_for_status = gtk.CellRendererText()
-            col.pack_start(cell_for_status, expand=True)
+            col.pack_start(cell_for_status, expand=False)
             col.set_cell_data_func(cell_for_status,
                                    self.get_tree_cell_status)
             self.add_cell_renderer_for_value(col)
@@ -1109,6 +1111,9 @@ class BaseSummaryDataPanel(gtk.VBox):
                 last_entry = row[0]
         return data_rows, column_names, rows_are_descendants
 
+    def _handle_button_press_event(self, widget, event):
+        pass
+
 
 class StandardSummaryDataPanel(BaseSummaryDataPanel):
 
@@ -1189,6 +1194,8 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
             return False
         if col_index == sect_index:
             option = None
+            if section not in self.sections:
+                return False
             id_data = self.sections[section]
             tip_text = section
         else:

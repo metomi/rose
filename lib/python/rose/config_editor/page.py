@@ -20,6 +20,7 @@
 
 import sys
 import time
+import traceback
 import webbrowser
 
 import pygtk
@@ -479,13 +480,18 @@ class ConfigPage(gtk.VBox):
                 self.sect_ops,
                 self.var_ops,
                 self.search_for_id,
-                self.trigger_ask_for_config_keys,
+                self.sub_data["get_var_id_values_func"],
                 self.is_duplicate)
         if self.custom_sub_widget is not None and not override_custom:
+            widget_name_args = self.custom_sub_widget.split(None, 1)
+            if len(widget_name_args) > 1:
+                widget_path, widget_args = widget_name_args
+            else:
+                widget_path, widget_args = widget_name_args[0], None
             metadata_files = self.sect_ops.get_ns_metadata_files(
                                                self.namespace)
             custom_widget = rose.config_editor.util.import_object(
-                                        self.custom_sub_widget,
+                                        widget_path,
                                         metadata_files,
                                         self.handle_bad_custom_sub_widget)
             if custom_widget is None:
@@ -493,7 +499,7 @@ class ConfigPage(gtk.VBox):
                                                        self.custom_sub_widget)
                 self.handle_bad_custom_sub_widget(text)
             try:
-                self.sub_data_panel = custom_widget(*args)
+                self.sub_data_panel = custom_widget(*args, arg_str=widget_args)
             except Exception as e:
                 self.handle_bad_custom_sub_widget(str(e))
         else:
@@ -501,7 +507,7 @@ class ConfigPage(gtk.VBox):
                      rose.config_editor.panel.StandardSummaryDataPanel(*args))
 
     def handle_bad_custom_sub_widget(self, error_info):
-        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(error_info)
+        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(traceback.format_exc())
         sys.stderr.write(text + "\n")
         self.generate_sub_data_panel(override_custom=True)
 
@@ -624,23 +630,29 @@ class ConfigPage(gtk.VBox):
     def generate_main_container(self, override_custom=False):
         """Choose a container to interface with variables in panel_data."""
         if self.custom_widget is not None and not override_custom:
+            widget_name_args = self.custom_sub_widget.split(None, 1)
+            if len(widget_name_args) > 1:
+                widget_path, widget_args = widget_name_args
+            else:
+                widget_path, widget_args = widget_name_args[0], None
             metadata_files = self.sect_ops.get_ns_metadata_files(
                                                self.namespace)
             custom_widget = rose.config_editor.util.import_object(
-                                        self.custom_widget,
+                                        widget_path,
                                         metadata_files,
                                         self.handle_bad_custom_main_widget)
             if custom_widget is None:
                 text = rose.config_editor.ERROR_IMPORT_CLASS.format(
-                                                       self.custom_widget)
+                                                       widget_path)
                 self.handle_bad_custom_main_widget(text)
             try:
                 self.main_container = self.custom_widget(self.panel_data,
                                                          self.ghost_data,
                                                          self.var_ops,
-                                                         self.show_modes)
+                                                         self.show_modes,
+                                                         arg_str=widget_args)
             except Exception as e:
-                self.handle_bad_custom_main_widget(str(e))
+                self.handle_bad_custom_main_widget(e)
             else:
                 return
         std_table = rose.config_editor.pagewidget.standard.PageTable
@@ -666,7 +678,7 @@ class ConfigPage(gtk.VBox):
 
     def handle_bad_custom_main_widget(self, error_info):
         """Handle a bad custom page widget import."""
-        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(error_info)
+        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(traceback.format_exc())
         sys.stderr.write(text + "\n")
         self.generate_main_container(override_custom=True)
 
