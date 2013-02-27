@@ -479,6 +479,7 @@ class ConfigPage(gtk.VBox):
                 self.sect_ops,
                 self.var_ops,
                 self.search_for_id,
+                self.trigger_ask_for_config_keys,
                 self.is_duplicate)
         if self.custom_sub_widget is not None and not override_custom:
             metadata_files = self.sect_ops.get_ns_metadata_files(
