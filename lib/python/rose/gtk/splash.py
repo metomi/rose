@@ -22,7 +22,7 @@
 
 import json
 import os
-import subprocess
+from subprocess import Popen, PIPE
 import sys
 import tempfile
 import threading
@@ -48,11 +48,9 @@ class SplashScreenProcess(object):
     """
 
     def __init__(self, *args):
-        self.stdin = subprocess.PIPE
         args = [str(a) for a in args]
-        file_name = __file__.rsplit(".", 1)[0] + ".py"
-        self.process = subprocess.Popen([file_name] + list(args),
-                                        stdin=self.stdin)
+        self.args = args
+        self.start()
 
     def update(self, *args, **kwargs):
         """Communicate via stdin to SplashScreenManager.
@@ -60,11 +58,26 @@ class SplashScreenProcess(object):
         args and kwargs are the update method args, kwargs.
 
         """
+        if self.process is None:
+            self.start()
         json_text = json.dumps({"args": args, "kwargs": kwargs})
-        self.process.stdin.write(json_text + "\n")
+        while True:
+            try:
+                self.process.stdin.write(json_text + "\n")
+            except IOError as e:
+                self.start()
+            else:
+                break
+
+    __call__ = update
+
+    def start(self):
+        file_name = __file__.rsplit(".", 1)[0] + ".py"
+        self.process = Popen([file_name] + list(self.args), stdin=PIPE)
 
     def stop(self):
         self.process.communicate(input=json.dumps("stop") + "\n")
+        self.process = None
   
 
 class SplashScreenUpdaterThread(threading.Thread):
