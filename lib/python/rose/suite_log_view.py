@@ -133,16 +133,16 @@ class SuiteLogViewGenerator(object):
                 "suite_info": suite_info,
                 "tasks": {},
                 "updated_at": time()}
-        if os.path.exists(self.suite_engine_proc.SUITE_LOG):
-            suite_log_file = self.suite_engine_proc.SUITE_LOG
-            suite_log_file_size_prev = None
-            suite_log_file_size = os.stat(suite_log_file).st_size
-            while suite_log_file_size != suite_log_file_size_prev:
-                tasks = self.suite_engine_proc.process_suite_log()
-                data["tasks"] = self.suite_engine_proc.process_suite_log()
+        suite_db_file = self.suite_engine_proc.get_suite_db_file(suite_name)
+        if os.path.exists(suite_db_file):
+            suite_db_file_size_prev = None
+            suite_db_file_size = os.stat(suite_db_file).st_size
+            while suite_db_file_size != suite_db_file_size_prev:
+                data["tasks"] = self.suite_engine_proc.get_suite_events(
+                        suite_name)
                 data["updated_at"] = time()
-                suite_log_file_size_prev = suite_log_file_size
-                suite_log_file_size = os.stat(suite_log_file).st_size
+                suite_db_file_size_prev = suite_db_file_size
+                suite_db_file_size = os.stat(suite_db_file).st_size
         f = open("JOB.json", "w")
         json.dump(data, f, indent=0)
         f.close()
