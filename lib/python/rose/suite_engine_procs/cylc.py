@@ -134,6 +134,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 for name in ["submit", "init", "exit"]:
                     submits[-1]["events"][name] = None
             submits[submit_num - 1]["events"][event] = event_time
+            submits[submit_num - 1]["status"] = status
+            submits[submit_num - 1]["signal"] = signal
 
         # Locate task log files
         for task_id, task_datum in data.items():
@@ -151,38 +153,24 @@ class CylcProcessor(SuiteEngineProcessor):
                     submit["files"][key] = {"n_bytes": os.stat(path).st_size}
         return data
 
-    def get_task_log_dir_rel(self, suite):
-        """Return the relative path to the log directory for suite tasks."""
-        return self.get_suite_dir_rel(suite, "log", "job")
-
-    def get_task_props_from_env(self):
-        """Get attributes of a suite task from environment variables.
-
-        Return a TaskProps object containing the attributes of a suite task.
-
-        """
-
-        suite_name = os.environ["CYLC_SUITE_REG_NAME"]
-        suite_dir_rel = self.get_suite_dir_rel(suite_name)
-        suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
-        task_id = os.environ["CYLC_TASK_ID"]
-        task_name = os.environ["CYLC_TASK_NAME"]
-        task_cycle_time = os.environ["CYLC_TASK_CYCLE_TIME"]
-        if task_cycle_time == "1":
-            task_cycle_time = None
-        task_log_root = os.environ["CYLC_TASK_LOG_ROOT"]
-        task_is_cold_start = "false"
-        if os.environ["CYLC_TASK_IS_COLDSTART"] == "True":
-            task_is_cold_start = "true"
-
-        return TaskProps(suite_name=suite_name,
-                         suite_dir_rel=suite_dir_rel,
-                         suite_dir=suite_dir,
-                         task_id=task_id,
-                         task_name=task_name,
-                         task_cycle_time=task_cycle_time,
-                         task_log_root=task_log_root,
-                         task_is_cold_start=task_is_cold_start)
+    def get_suite_jobs_auths(self, suite_name, task_id=None):
+        """Return remote [(user, host), ...] for submitted jobs (of a task)."""
+        my_user = pwd.getpwuid(os.getuid())[0]
+        my_host = socket.gethostname()
+        conn = sqlite3.connect(self.get_suite_db_file(suite_name))
+        c = conn.cursor()
+        auths = []
+        stmt = "SELECT DISTINCT host FROM task_events"
+        stmt_args = tuple()
+        if task_id:
+            stmt += " WHERE name==? AND cycle==? AND event=='submitted'"
+            stmt_args = tuple(task_id.split(self.TASK_ID_DELIM))
+        for row in c.execute(stmt, stmt_args):
+            u, h = row[0].split("@")
+            user, host, my_user, my_host = self._parse_user_host(u, h)
+            if (my_user, my_host) != (user, host):
+                auths.append((user, host))
+        return auths
 
     def get_task_auth(self, suite_name, task_name):
         """
@@ -226,6 +214,39 @@ class CylcProcessor(SuiteEngineProcessor):
             if (user, host) != (my_user, my_host) and (user, host) not in auths:
                 auths.append((user, host))
         return auths
+
+    def get_task_log_dir_rel(self, suite):
+        """Return the relative path to the log directory for suite tasks."""
+        return self.get_suite_dir_rel(suite, "log", "job")
+
+    def get_task_props_from_env(self):
+        """Get attributes of a suite task from environment variables.
+
+        Return a TaskProps object containing the attributes of a suite task.
+
+        """
+
+        suite_name = os.environ["CYLC_SUITE_REG_NAME"]
+        suite_dir_rel = self.get_suite_dir_rel(suite_name)
+        suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
+        task_id = os.environ["CYLC_TASK_ID"]
+        task_name = os.environ["CYLC_TASK_NAME"]
+        task_cycle_time = os.environ["CYLC_TASK_CYCLE_TIME"]
+        if task_cycle_time == "1":
+            task_cycle_time = None
+        task_log_root = os.environ["CYLC_TASK_LOG_ROOT"]
+        task_is_cold_start = "false"
+        if os.environ["CYLC_TASK_IS_COLDSTART"] == "True":
+            task_is_cold_start = "true"
+
+        return TaskProps(suite_name=suite_name,
+                         suite_dir_rel=suite_dir_rel,
+                         suite_dir=suite_dir,
+                         task_id=task_id,
+                         task_name=task_name,
+                         task_cycle_time=task_cycle_time,
+                         task_log_root=task_log_root,
+                         task_is_cold_start=task_is_cold_start)
 
     def get_version(self):
         """Return Cylc's version."""
@@ -356,6 +377,33 @@ class CylcProcessor(SuiteEngineProcessor):
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
         self.popen.run_simple(*command, env=environ)
+
+    def update_job_log(self, suite_name, task_ids=None):
+        """Update the log(s) of task jobs in suite_name.
+
+        If "task_ids" is None, update the logs for all task jobs.
+
+        """
+        id_user_host_set = set()
+        if task_ids:
+            for task_id in task_ids:
+                auths = self.get_suite_jobs_auths(suite_name, task_id)
+                for user, host in auths:
+                    id_user_host_set.add((task_id, user, host))
+        else:
+            users_and_hosts = self.get_suite_jobs_auths(suite_name)
+            for user, host in users_and_hosts:
+                id_user_host_set.add(("", user, host))
+
+        log_dir_rel = self.get_task_log_dir_rel(suite_name)
+        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+        for task_id, user, host in id_user_host_set:
+            r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, task_id)
+            cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
+            try:
+                out, err = self.popen(*cmd)
+            except RosePopenError as e:
+                self.handle_event(e, level=Reporter.WARN)
 
     def validate(self, suite_name, strict_mode=False):
         """(Re-)register and validate a suite."""

@@ -437,6 +437,14 @@ class SuiteEngineProcessor(object):
         """Shut down the suite."""
         raise NotImplementedError()
 
+    def update_job_log(self, suite_name, task_ids=None):
+        """Update the log(s) of task jobs in suite_name.
+
+        If "task_ids" is None, update the logs for all task jobs.
+
+        """
+        raise NotImplementedError()
+
     def validate(self, suite_name, strict_mode=False):
         """Validate a suite."""
         raise NotImplementedError()
