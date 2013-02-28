@@ -385,9 +385,18 @@ class Handler(object):
                                     config_names, choices_help, help_str)
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section)
+
+    def add_section_with_options(self, config_name, new_section_name):
+        """Add a section and any compulsory options."""
+        self.sect_ops.add_section(config_name, new_section_name)
+        config_data = self.data.config[config_name]
+        for variable in config_data.vars.latent.get(new_section_name, []):
+            if (variable.metadata[rose.META_PROP_COMPULSORY] ==
+                rose.META_PROP_VALUE_TRUE):
+                self.var_ops.add_variable(variable)
         
     def copy_request(self, base_ns, new_section=None, no_update=False):
-        """Copy a section and variables."""
+        """Handle a copy request for a section and its options."""
         namespace = "/" + base_ns.lstrip("/")
         sections = self.data.get_sections_from_namespace(namespace)
         if len(sections) != 1:
@@ -395,6 +404,10 @@ class Handler(object):
         section = sections.pop()
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
+        return self.copy_section(config_name, section)
+
+    def copy_section(self, config_name, section):
+        """Copy a section and its options."""
         section_base = re.sub('(.*)\(\d+\)$', r"\1", section)
         existing_sections = []
         clone_vars = []
@@ -501,8 +514,6 @@ class Handler(object):
             if (ns_meta.get(rose.META_PROP_DUPLICATE) ==
                 rose.META_PROP_VALUE_TRUE):
                 duplicate_nses.append(ns)
-        if duplicate_nses and not no_update:
-            self.reorder_duplicate_namespaces(duplicate_nses)
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
         if not no_update:
@@ -600,6 +611,19 @@ class Handler(object):
                 rose.config_editor.util.launch_node_info_dialog(
                             sect_data, "", search_function)
 
+    def remove_section(self, config_name, section, no_update=False):
+        """Implement a remove of a section and its options."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
+        config_data = self.data.config[config_name]
+        variables = config_data.vars.now.get(section, [])
+        for variable in variables:
+            self.var_ops.remove_var(variable, no_update=True)
+        self.sect_opts.remove_section(config_name, section,
+                                      no_update=no_update)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+
     def rename_request(self, base_ns, new_section, no_update=False):
         """Implement a rename (delete + add)."""
         namespace = "/" + base_ns.lstrip("/")
@@ -667,6 +691,19 @@ class Handler(object):
             stack_item.group = group
         self.data.reload_namespace_tree()
 
+    def get_sub_ops_for_namespace(self, namespace):
+        """Return data functions for summary (sub) data panels."""
+        if not namespace.startswith("/"):
+            namespace = "/" + namespace
+        config_name, subsp = self.util.split_full_ns(self.data, namespace)
+        return rose.config_editor.stack.SubDataOperations(
+                config_name,
+                add_section_func=self.add_section_with_options,
+                clone_section_func=self.copy_section,
+                remove_section_func=self.remove_section,
+                get_var_id_values_func=(
+                        self.data.get_sub_data_var_id_value_map))
+
     def get_orphan_container(self, page):
         """Return a container with the page object inside."""
         box = gtk.VBox()
@@ -675,12 +712,12 @@ class Handler(object):
         return box
 
     def view_stack(self, args):
-        # Handle a View Stack request.
+        """Handle a View Stack request."""
         self.mainwindow.launch_view_stack(self.undo_stack, self.redo_stack,
                                           self.perform_undo)
 
     def destroy(self, *args):
-        # Handle a destroy main program request.
+        """Handle a destroy main program request."""
         for name in self.data.config:
             config_data = self.data.config[name]
             variables = config_data.vars.get_all(no_latent=True)

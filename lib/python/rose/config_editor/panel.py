@@ -821,7 +821,7 @@ class BaseSummaryDataPanel(gtk.VBox):
     """
 
     def __init__(self, sections, variables, sect_ops, var_ops,
-                 search_function, get_var_id_values_function,
+                 search_function, sub_ops,
                  is_duplicate, arg_str=None):
         super(BaseSummaryDataPanel, self).__init__()
         self.sections = sections
@@ -831,7 +831,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.sect_ops = sect_ops
         self.var_ops = var_ops
         self.search_function = search_function
-        self.get_var_id_values_function = get_var_id_values_function
+        self.sub_ops = sub_ops
         self.is_duplicate = is_duplicate
         self.group_index = None
         self.util = rose.config_editor.util.Lookup()
@@ -841,8 +841,6 @@ class BaseSummaryDataPanel(gtk.VBox):
                                    get_tooltip_func=self.get_tree_tip)
         self._view.set_rules_hint(True)
         self._view.show()
-        self._view.connect("row-activated",
-                           self._handle_activation)
         self._view.connect("button-press-event",
                            self._handle_button_press_event)
         self._window = gtk.ScrolledWindow()
@@ -894,6 +892,14 @@ class BaseSummaryDataPanel(gtk.VBox):
         
         """
         raise NotImplementedError()
+
+    def _get_custom_menu_items(self, path, column, event):
+        """Override this method to add to the right click menu.
+
+        This should return a list of gtk.MenuItem subclass instances.
+
+        """
+        return []
 
     def _get_control_widget_box(self):
         filter_label = gtk.Label(
@@ -1022,7 +1028,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         return status
 
     def _refilter(self, widget=None):
-        self._view.get_model().refilter()
+        self._view.get_model().get_model().refilter()
 
     def _filter_visible(self, model, iter_):
         filt_text = self._filter_widget.get_text()
@@ -1060,6 +1066,79 @@ class BaseSummaryDataPanel(gtk.VBox):
             option = self.column_names[col_index]
         id_ = self.util.get_id_from_section_option(section, option)
         self.search_function(id_)
+
+    def _handle_button_press_event(self, treeview, event):
+        pathinfo = treeview.get_path_at_pos(int(event.x),
+                                            int(event.y))
+        if pathinfo is not None:
+            path, col, cell_x, cell_y = pathinfo
+            if event.button != 3:
+                self._handle_activation(treeview, path, col)
+            else:
+                self._popup_tree_menu(path, col, event)
+
+    def _popup_tree_menu(self, path, col, event):
+        """Launch a menu for this main treeview row."""
+        menu = gtk.Menu()
+        menu.show()
+        model = self._view.get_model()
+        row_iter = model.get_iter(path)
+        sect_index = 0
+        if self.group_index is not None and self.group_index != 0:
+            sect_index = 1
+        this_section = model.get_value(row_iter, sect_index)
+        menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_JUMP_TO)
+        label = rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
+                                           this_section.replace("_", "__"))
+        menuitem.set_label(label)
+        menuitem._section = this_section
+        menuitem.connect("activate",
+                         lambda i: self.search_function(i._section))
+        menuitem.show()
+        menu.append(menuitem)
+        sep = gtk.SeparatorMenuItem()
+        sep.show()
+        menu.append(sep)
+        extra_menuitems = self._get_custom_menu_items(path, col, event)
+        if extra_menuitems:
+            for extra_menuitem in extra_menuitems:
+                menu.append(extra_menuitem)
+            sep = gtk.SeparatorMenuItem()
+            sep.show()
+            menu.append(sep)
+        if self.is_duplicate:
+            add_text = rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD
+            copy_text = rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY
+            rem_text = rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE
+            dupl_entries = [(add_text, gtk.STOCK_ADD, self.add_section),
+                            (copy_text, gtk.STOCK_COPY, self.copy_section),
+                            (rem_text, gtk.STOCK_REMOVE, self.remove_section)]
+            for label, stock_id, connect_func in dupl_entries:
+                menuitem = gtk.ImageMenuItem(stock_id=stock_id)
+                menuitem.set_label(label)
+                menuitem._section = this_section
+                menuitem.show()
+                menuitem.connect("activate",
+                                 lambda i: connect_func(i._section))
+                menu.append(menuitem)
+        menu.popup(None, None, None, event.button, event.time)
+        return False
+
+    def add_section(self, section=None):
+        if not self.sections:
+            return False
+        section_base = self.sections[0].rsplit("(", 1)[0]
+        i = 1
+        while section_base + "(" + str(i) + ")" in self.sections:
+            i += 1
+            new_section = section_base + "(" + str(i) + ")"
+        self.sub_ops.add_section(new_section)
+
+    def copy_section(self, section):
+        self.sub_ops.clone_section(section)
+
+    def remove_section(self, section):
+        self.sub_ops.remove_section(section)
 
     def _append_row_data(self, model, path, iter_, data_rows):
         data_rows.append(model.get(iter_))
@@ -1110,9 +1189,6 @@ class BaseSummaryDataPanel(gtk.VBox):
                 rows_are_descendants.append(False)
                 last_entry = row[0]
         return data_rows, column_names, rows_are_descendants
-
-    def _handle_button_press_event(self, widget, event):
-        pass
 
 
 class StandardSummaryDataPanel(BaseSummaryDataPanel):

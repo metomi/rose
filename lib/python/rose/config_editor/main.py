@@ -537,8 +537,10 @@ class MainController(object):
         icon_path = self.data.get_icon_path_for_config(config_name)
         is_default = self.get_ns_is_default(namespace_name)
         sub_data = None
+        sub_ops = None
         if has_sub_data:
             sub_data = self.data.get_sub_data_for_namespace(namespace_name)
+            sub_ops = self.handle.get_sub_ops_for_namespace(namespace_name)
         page_metadata = {'namespace': namespace_name,
                          'ns_is_default': is_default,
                          'label': label,
@@ -584,6 +586,7 @@ class MainController(object):
                                   self.data.get_format_sections,
                                   directory,
                                   sub_data=sub_data,
+                                  sub_ops=sub_ops,
                                   launch_info_func=launch_info,
                                   launch_edit_func=launch_edit)
         #FIXME: These three should go.

@@ -43,7 +43,8 @@ class ConfigPage(gtk.VBox):
 
     def __init__(self, page_metadata, config_data, ghost_data, sect_ops,
                  var_ops, sections, get_formats_func, directory=None,
-                 sub_data=None, launch_info_func=None, launch_edit_func=None):
+                 sub_data=None, sub_ops=None, launch_info_func=None,
+                 launch_edit_func=None):
         super(ConfigPage, self).__init__(homogeneous=False)
         self.namespace = page_metadata.get('namespace')
         self.ns_is_default = page_metadata.get('ns_is_default')
@@ -65,6 +66,7 @@ class ConfigPage(gtk.VBox):
         self.icon_path = page_metadata.get('icon')
         self.directory = directory
         self.sub_data = sub_data
+        self.sub_ops = sub_ops
         self.launch_info = launch_info_func
         self.launch_edit = launch_edit_func
         namespaces = self.namespace.strip('/').split('/')
@@ -480,7 +482,7 @@ class ConfigPage(gtk.VBox):
                 self.sect_ops,
                 self.var_ops,
                 self.search_for_id,
-                self.sub_data["get_var_id_values_func"],
+                self.sub_ops,
                 self.is_duplicate)
         if self.custom_sub_widget is not None and not override_custom:
             widget_name_args = self.custom_sub_widget.split(None, 1)

@@ -585,6 +585,45 @@ class VariableOperations(object):
         return self.__data.config[config_name].meta_files
 
 
+class SubDataOperations(object):
+
+    """Class to hold a selected set of functions."""
+
+    def __init__(self, config_name,
+                 add_section_func=None, clone_section_func=None,
+                 remove_section_func=None, get_var_id_values_func=None):
+        self.config_name = config_name
+        self._add_section_func = add_section_func
+        self._clone_section_func = clone_section_func
+        self._remove_section_func = remove_section_func
+        self._get_var_id_values_func = get_var_id_values_func
+
+    def add_section(self, new_section_name):
+        """Add a new section, complete with any compulsory variables."""
+        if self._add_section_func is None:
+            raise NotImplementedError()
+        return self._add_section_func(self.config_name, new_section_name)
+
+    def clone_section(self, clone_section_name):
+        """Copy a (duplicate) section and all its options."""
+        if self._clone_section_func is None:
+            raise NotImplementedError()
+        return self._clone_section_func(self.config_name, clone_section_name)
+
+    def remove_section(self, remove_section_name):
+        """Remove a section and all its options."""
+        if self._remove_section_func is None:
+            raise NotImplementedError()
+        return self._remove_section_func(self.config_name,
+                                         remove_section_name)
+
+    def get_var_id_values(self):
+        """Return a map of all var id values."""
+        if self._get_var_id_values_func is None:
+            raise NotImplementedError()
+        return self._get_var_id_values_func(self.config_name)
+
+
 class StackViewer(gtk.Window):
 
     """Window to dynamically display the internal stack."""
