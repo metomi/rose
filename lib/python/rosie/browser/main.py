@@ -169,29 +169,31 @@ class MainWindow(gtk.Window):
         self.refresh_url = address_url
 
         # if the url string doesn't begin with a valid prefix       
-        if not (address_url.find("http://") == 0 or 
-                address_url.find("search?s=") == 0 or 
-                address_url.find("query?q=") == 0):
+        if not (address_url.startswith("http://") or 
+                address_url.startswith("search?s=") or 
+                address_url.startswith("query?q=")):
             self.nav_bar.simple_search_entry.set_text(address_url)
             self.handle_search(None)
         else:
             items = {}
-
-            if not address_url.endswith("&format=json"):
-                address_url += "&format=json"
             
             #set the all revisions to the setting specified *by the url*
             self.history_menuitem.set_active("all_revs=" in address_url)
             
             # convert partial addresses to full ones for purposes of searching
-            if (address_url.find("search?s=") == 0 or 
-                address_url.find("query?q=") == 0):
+            if (address_url.startswith("search?s=") or 
+                address_url.startswith("query?q=")):
                 address_url = (self.search_manager.ws_client.get_query_prefix()
                               + address_url)
             try:
                 items.update({"url": address_url})
-                results = self.search_manager.address_lookup(**items)
-                if record == True:
+                results, url = self.search_manager.address_lookup(**items)
+                if url != address_url:
+                    record = True
+                    address_url = url
+                    self.refresh_url = url
+                if record:
+                    self.nav_bar.address_box.child.set_text(address_url)
                     if (self.nav_bar.address_box
                         .get_model().iter_n_children(None) > 0):
                         if address_url != str(
@@ -212,7 +214,7 @@ class MainWindow(gtk.Window):
                                                 "url", 
                                                 repr(address_url),
                                                 self.search_history)
-                    if recorded == True:
+                    if recorded:
                         self.handle_record_search_ui("url", 
                                                      address_url,
                                                      self.search_history)
@@ -712,8 +714,6 @@ class MainWindow(gtk.Window):
                 items.update({"all_revs": ""})
             try:
                 results, url = self.search_manager.ws_query(filters, **items)
-                if url.endswith("&format=json"):
-                    url = url.replace("&format=json", "")
                 
                 self.nav_bar.address_box.child.set_text(url)
                 self.refresh_url = url   
@@ -789,8 +789,6 @@ class MainWindow(gtk.Window):
             items.update({"all_revs": ""})
         try:
             results, url = self.search_manager.ws_search(search_text, **items)
-            if url.endswith("&format=json"):
-                url = url.replace("&format=json", "")
             self.nav_bar.address_box.child.set_text(url)
             self.refresh_url = url
             if record == True:

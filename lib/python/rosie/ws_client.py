@@ -85,12 +85,11 @@ class RosieWSClient(object):
 
     def _get(self, method, **kwargs):
         """Send a JSON object to the web server and retrieve results."""
-        if method != "address":
-            url = self.root + self.prefix + "/" + method
-            kwargs["format"] = "json"
+        if method == "address":
+            url = kwargs.pop("url").replace("&format=json", "")
         else:
-            url = kwargs['url']
-            del kwargs['url']
+            url = self.root + self.prefix + "/" + method
+        kwargs["format"] = "json"
         try:
             response = requests.get(url, params=kwargs)
         except requests.exceptions.ConnectionError as e:
@@ -103,18 +102,16 @@ class RosieWSClient(object):
         except:
             raise QueryError("%s: %s: %s" % (url, kwargs, response.status_code))
         try:
-            if method in ["query", "search"]:
-                return simplejson.loads(response.text), response.url
-            else:
-                return simplejson.loads(response.text)
+            response_url = response.url.replace("&format=json", "")
+            return simplejson.loads(response.text), response_url
         except ValueError:
             raise QueryError("%s: %s" % (method, kwargs))
 
     def get_known_keys(self):
-        return self._get("get_known_keys")
+        return self._get("get_known_keys")[0]
 
     def get_optional_keys(self):
-        return self._get("get_optional_keys")
+        return self._get("get_optional_keys")[0]
 
     def get_prefix(self):
         return self.prefix
@@ -123,16 +120,10 @@ class RosieWSClient(object):
         return self.root
 
     def get_query_operators(self):
-        return self._get("get_query_operators")
+        return self._get("get_query_operators")[0]
 
     def get_query_prefix(self):
         return self.get_root() + self.get_prefix() + "/"
-
-    def info(self, idx, branch, revision=None):
-        if revision is None:
-            return self._get("info", idx=idx, branch=branch)
-        else:
-            return self._get("info", idx=idx, branch=branch, revision=revision)
 
     def query(self, q, **kwargs):
         return self._get("query", q=q, **kwargs)
@@ -230,16 +221,12 @@ def lookup(argv):
     if opts.url:
         ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
         addr = args[0]
-        if not addr.endswith("&format=json"):
-            addr += "&format=json"
 
         if opts.debug_mode:
-            results = ws_client.address_search(None,url=addr)
-            url = addr
+            results, url = ws_client.address_search(None,url=addr)
         else:
             try:
-                results = ws_client.address_search(None,url=addr)
-                url = addr
+                results, url = ws_client.address_search(None,url=addr)
             except QueryError as e:
                 sys.exit(ERR_INVALID_URL.format(args[0]))
     elif opts.query:
@@ -407,7 +394,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     popen = RosePopener(event_handler=report)
 
     try:
-        terminal_cols = int(popen('stty size', shell=True)[0].split()[1])
+        terminal_cols = int(popen("stty size", shell=True)[0].split()[1])
     except:
         terminal_cols = None
 
@@ -493,7 +480,7 @@ def main():
     sys.exit(f(argv[1:]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
