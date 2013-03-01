@@ -58,7 +58,7 @@ class CompulsoryChecker(rose.macro.MacroBase):
         if self.stored_compulsory_ids is None:
             self.stored_compulsory_ids = []
             for setting_id, sect_node in meta_config.value.items():
-                if sect_node.is_ignored():
+                if sect_node.is_ignored() or isinstance(sect_node.value, str):
                     continue
                 for prop_opt, opt_node in sect_node.value.items():
                     if (prop_opt == rose.META_PROP_COMPULSORY and
