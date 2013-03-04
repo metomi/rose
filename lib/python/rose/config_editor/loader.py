@@ -615,25 +615,33 @@ class ConfigDataManager(object):
         return meta_filepaths
 
     def filter_meta_config(self, config_name):
+        """Filter out invalid metadata e.g. app metadata for suite configs."""
         # TODO: Remove after different default metadata for different configs
         config_data = self.config[config_name]
         meta_config = config_data.meta
-        filter_list = []
-        no_filter_list = []
-        delim = rose.CONFIG_DELIMITER
-        if config_data.is_top_level or config_data.is_discovery:
-            filter_list.append(rose.CONFIG_SECT_CMD)
-        if config_data.is_discovery:
-            filter_list.append(delim + rose.CONFIG_OPT_META_TYPE)
+        if config_data.is_top_level:
+            good_id_prefixes = rose.TOP_CONFIG_DEFAULT_META_IDS
+            bad_id_prefixes = (rose.INFO_CONFIG_DEFAULT_META_IDS +
+                               rose.SUB_CONFIG_DEFAULT_META_IDS)
+        elif config_data.is_discovery:
+            good_id_prefixes = rose.INFO_CONFIG_DEFAULT_META_IDS
+            bad_id_prefixes = (rose.SUB_CONFIG_DEFAULT_META_IDS +
+                               rose.TOP_CONFIG_DEFAULT_META_IDS)
         else:
-            filter_list.append("")
-            no_filter_list.append(delim + rose.CONFIG_OPT_META_TYPE)
+            good_id_prefixes = rose.SUB_CONFIG_DEFAULT_META_IDS
+            bad_id_prefixes = (rose.INFO_CONFIG_DEFAULT_META_IDS +
+                               rose.TOP_CONFIG_DEFAULT_META_IDS)
+        for key in good_id_prefixes:
+            if key in bad_id_prefixes:
+                bad_id_prefixes.remove(key)
+            for bad_key in list(bad_id_prefixes):
+                if bad_key.startswith(key):
+                    bad_id_prefixes.remove(bad_key)
         for key in meta_config.value.keys():
-            if (key in filter_list or
-                any([key.startswith(a + delim) for a in filter_list]) and
-                key not in no_filter_list and
-                not any([key.startswith(a + delim) for a in no_filter_list])):
-                meta_config.value.pop(key)
+            for bad_key in bad_id_prefixes:
+                if key.startswith(bad_key):
+                    meta_config.value.pop(key)
+                    break
 
     def load_ignored_data(self, config_name):
         """Deal with ignored variables and sections.
