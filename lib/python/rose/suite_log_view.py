@@ -46,6 +46,10 @@ class WebBrowserEvent(Event):
 
     LEVEL = Event.V
 
+    def __init__(self, *args):
+        Event.__init__(self, *args)
+        self.browser, self.url = args
+
     def __str__(self):
         return "%s %s" % self.args
 
@@ -68,6 +72,14 @@ class SuiteLogViewGenerator(object):
             suite_engine_proc = SuiteEngineProcessor.get_processor(
                     event_handler=event_handler)
         self.suite_engine_proc = suite_engine_proc
+
+    def get_suite_log_url(self, suite_name):
+        """Return the log view URL of the suite.
+
+        Return None if the URL does not exist.
+
+        """
+        return self.suite_engine_proc.get_suite_log_url(suite_name)
 
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
@@ -185,6 +197,22 @@ class SuiteLogViewGenerator(object):
             except RosePopenError as e:
                 self.handle_event(e, level=Reporter.WARN)
 
+    def view_suite_log_url(self, suite_name):
+        """Launch web browser to view suite log.
+
+        Return URL of suite log on success, None otherwise.
+
+        """
+        if not os.getenv("DISPLAY"):
+            return
+        url = self.suite_engine_proc.get_suite_log_url(suite_name)
+        if not url:
+            return
+        w = webbrowser.get()
+        w.open(url, new=True, autoraise=True)
+        self.handle_event(WebBrowserEvent(w.name, url))
+        return url
+
 
 def main():
     opt_parser = RoseOptionParser()
@@ -213,11 +241,7 @@ def suite_log_view(opts, args, report=None):
     elif args:
         gen.update_task_log(suite_name, tasks=args)
     gen(suite_name)
-    if os.getenv("DISPLAY") and opts.web_browser_mode:
-        w = webbrowser.get()
-        url = gen.suite_engine_proc.get_suite_log_url(suite_name)
-        gen.handle_event(WebBrowserEvent(w.name, url))
-        w.open_new_tab(url)
+    return gen.view_suite_log_url(suite_name)
 
 
 if __name__ == "__main__":

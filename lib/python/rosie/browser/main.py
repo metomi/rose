@@ -44,6 +44,7 @@ import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 from rose.resource import ResourceLocator, ResourceError
 from rose.suite_control import SuiteControl
+from rose.suite_log_view import SuiteLogViewGenerator, WebBrowserEvent
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search
@@ -117,6 +118,8 @@ class MainWindow(gtk.Window):
         self.initial_filter(opts, args)
         self.nav_bar.simple_search_entry.grab_focus()
         splash_updater(rosie.browser.SPLASH_READY, rosie.browser.PROGRAM_NAME)
+        self.suite_log_view_generator = SuiteLogViewGenerator(
+                event_handler=self.handle_view_output_event)
         self.show()
 
     def setup_window(self):
@@ -887,21 +890,18 @@ class MainWindow(gtk.Window):
 
     def handle_view_output(self, *args, **kwargs):
         """View a suite's output, if any."""
-        test = kwargs.get("test", False)
         path = kwargs.get("path", None)
         id_ = SuiteId(id_text=self.get_selected_suite_id(path))
-        output_url = id_.to_output()
-        if test:
-            return (output_url is not None)
-        try:
-            urllib.urlopen(output_url)
-        except (AttributeError, IOError) as e:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR, str(e))
+        if kwargs.get("test", False):
+            url = self.suite_log_view_generator.get_suite_log_url(str(id_))
+            return (url is not None)
         else:
-            webbrowser.open(output_url, new=True, autoraise=True)
-            self.statusbar.set_status_text(rosie.browser.STATUS_OPENING_LOG, 
-                                           instant=True)
+            self.suite_log_view_generator.view_suite_log_url(str(id_))
 
+    def handle_view_output_event(self, event):
+        if isinstance(event, WebBrowserEvent):
+            s = rosie.browser.STATUS_OPENING_LOG.format(event.url)
+            self.statusbar.set_status_text(s, instant=True)
 
     def handle_view_web(self, *args):
         """View a suite's web source URL."""
