@@ -360,7 +360,7 @@ class ConfigDataManager(object):
             sect_map.update({"": rose.section.Section("", [], meta_data)})
             real_sect_ids.append("")
         for setting_id, sect_node in meta_config.value.items():
-            if sect_node.is_ignored():
+            if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
             if section in real_sect_ids:
@@ -449,7 +449,7 @@ class ConfigDataManager(object):
         id_node_stack = meta_config.value.items()
         while id_node_stack:
             setting_id, sect_node = id_node_stack.pop(0)
-            if sect_node.is_ignored():
+            if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
             if section in basic_dupl_map:
