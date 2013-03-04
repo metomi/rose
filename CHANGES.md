@@ -5,6 +5,26 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (End of 2013-Q1)
+
+This will be the 4th release of Rose.
+
+### Highlight Changes
+
+Changes that have significant impact on user experience.
+
+None yet.
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+\#475: rose suite-hook, rose suite-log-view: support latest naming convention
+of Cylc task ID. (Cylc 5.1.0)
+
+--------------------------------------------------------------------------------
+
 ## 2013-02 (2013-02-20)
 
 This is the 3rd release of Rose.
