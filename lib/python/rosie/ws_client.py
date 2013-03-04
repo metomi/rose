@@ -223,10 +223,10 @@ def lookup(argv):
         addr = args[0]
 
         if opts.debug_mode:
-            results, url = ws_client.address_search(None,url=addr)
+            results, url = ws_client.address_search(None, url=addr)
         else:
             try:
-                results, url = ws_client.address_search(None,url=addr)
+                results, url = ws_client.address_search(None, url=addr)
             except QueryError as e:
                 sys.exit(ERR_INVALID_URL.format(args[0]))
     elif opts.query:
@@ -374,7 +374,7 @@ def align(res, keys):
     for k in keys:
         if k != "date":
             try:
-                max_len = max([len(res[i].get(k,"%" + k))
+                max_len = max([len(res[i].get(k, "%" + k))
                                for i in range(len(res))])
                 for r in res:
                     r[k] = r.get(k, "%" + k) + " " * (max_len -
