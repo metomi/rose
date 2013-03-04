@@ -40,8 +40,8 @@ import rose.gtk.run
 import rose.gtk.util
 import rose.macro
 import rose.macros
-from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_control import SuiteControl
+from rose.suite_log_view import SuiteLogViewGenerator
 
 
 class MenuBar(object):
@@ -929,21 +929,14 @@ class Handler(object):
 
     def launch_output_viewer(self):
         """View a suite's output, if any."""
-        suite_engine_proc = SuiteEngineProcessor.get_processor()
-        output_url = suite_engine_proc.get_suite_log_url(
-                                       self.data.top_level_name)
-        if output_url is None:
+        g = SuiteLogViewGenerator()
+        url = g.get_suite_log_url(self.data.top_level_name)
+        if url is None:
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
                                      rose.config_editor.ERROR_NO_OUTPUT.format(
                                      self.data.top_level_name))
         else:
-            try:
-                urllib.urlopen(output_url)
-            except (AttributeError, IOError) as e:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         str(e))
-            else:
-                webbrowser.open(output_url, new=True, autoraise=True)    
+            g.view_suite_log_url(self.data.top_level_name)
 
     def get_run_suite_args(self, *args):
         """Ask the user for custom arguments to suite run."""

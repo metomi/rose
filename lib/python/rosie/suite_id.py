@@ -36,7 +36,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
-from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_log_view import SuiteLogViewGenerator
 import string
 import sys
 import xml.parsers.expat
@@ -196,18 +196,6 @@ class SuiteId(object):
             return cls(id_text=cls.FORMAT_IDX % (prefix, cls.SID_0))
         else:
             return cls(id_text=cls.SID_0)
-
-    @classmethod
-    def get_output_root(cls):
-        """Return the root output directory for suites."""
-        config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", "output-root"], no_ignore=True)
-        if node:
-            path = node.value
-        else:
-            suite_engine_proc = SuiteEngineProcessor.get_processor()
-            path = os.path.join("~", suite_engine_proc.RUN_DIR_REL_ROOT)
-        return rose.env.env_var_process(os.path.expanduser(path))
 
     @classmethod
     def get_prefix_default(cls):
@@ -412,8 +400,7 @@ class SuiteId(object):
 
     def to_output(self):
         """Return the output directory for this suite."""
-        suite_engine_proc = SuiteEngineProcessor.get_processor()
-        return suite_engine_proc.get_suite_log_url(str(self))
+        return SuiteLogViewGenerator().get_suite_log_url(str(self))
 
 
 def main():
