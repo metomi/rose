@@ -126,7 +126,7 @@
       <p>Under <samp>[namelist:pizza_order=pizza_type]</samp>, add:</p>
       <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
-        namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken'
+        namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
 </pre>
 
       <p>This states which values of <var>pizza_type</var> are relevant for
@@ -144,7 +144,7 @@ trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
       <samp>[env=BUDGET]</samp>:</p>
       <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=truffle: this &gt; 25;
-        namelist:side_order: this &gt;= 10
+        namelist:side_order: this &gt;= 10;
 </pre>
 
       <p>What we've done here is used a small subset of the Rose configuration
@@ -286,7 +286,7 @@ trigger=namelist:pizza_order=truffle: .false.
       <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=truffle: this &gt; 25;
         namelist:side_order: this &gt;= 10;
-        namelist:pizza_order=pizza_type: this &gt;= 5
+        namelist:pizza_order=pizza_type: this &gt;= 5;
 </pre>
 
       <p>When <var>env=BUDGET</var> is less than 5,
@@ -338,7 +338,7 @@ values='Garlic','Sour Cream','Salsa','Brown Sauce','Mustard'
       <pre class="prettyprint lang-rose_conf">
 trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
         namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
-        namelist:pizza_order=dip_type
+        namelist:pizza_order=dip_type;
 </pre>
 
       <p>This means that <var>namelist:pizza_order=dip_type</var> is dependent

@@ -191,7 +191,7 @@ type = logical
 [namelist:triggering_dict=D_trig_E_1_2_F_2_3]
 type = integer
 trigger = namelist:triggering_dict=E: 1, 2;
-          namelist:triggering_dict=F: 2, 3
+          namelist:triggering_dict=F: 2, 3;
 
 [namelist:triggering_dict=E]
 type = logical
@@ -201,8 +201,7 @@ type = logical
 
 [namelist:triggering_cascade=A_trig_B_4_V_3]
 type = integer
-trigger = namelist:triggering_cascade=B_trig_C_1: 4;
-          namelist:triggering_cascade=V_trig_W: 3;
+trigger = namelist:triggering_cascade=B_trig_C_1: 4; namelist:triggering_cascade=V_trig_W: 3;
 
 [namelist:triggering_cascade=B_trig_C_1]
 type = integer
@@ -215,7 +214,7 @@ trigger = namelist:triggering_cascade=D_trig_F_3;
 
 [namelist:triggering_cascade=D_trig_F_3]
 type = integer
-trigger = namelist:triggering_cascade=F: 3
+trigger = namelist:triggering_cascade=F: 3;
 
 [namelist:triggering_cascade=E_trig_G_4]
 type = integer
