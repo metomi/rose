@@ -951,14 +951,14 @@ sort-key = do-not-like-00
         value of other settings with their IDs. E.g.:</p>
         <pre class="prettyprint lang-rose_conf">
 [namelist:test=my_test_var]
-fail-if = this &lt; namelist:test=control_lt_var
+fail-if = this &lt; namelist:test=control_lt_var;
 </pre>
 
         <p>means that an error will be flagged if the numeric value of
         <var>my_test_var</var> is less than the numeric value of
         <var>control_lt_var</var>.</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this)
+fail-if = this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this);
 </pre>
 
         <p>shows a more complex operation, again with numeric values.</p>
@@ -966,34 +966,36 @@ fail-if = this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - thi
         <p>To check array elements, the ID should be expressed with a bracketed
         index, as in the configuration:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this(2) != "'0A'" and this(4) == "'0A'"
+fail-if = this(2) != "'0A'" and this(4) == "'0A'";
 </pre>
 
         <p>Array elements can also be checked using <code>any</code> and
         <code>all</code>. E.g.:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = any(namelist:test=ctrl_array &lt; this)
-fail-if = all(this == 0)
+fail-if = any(namelist:test=ctrl_array &lt; this);
+fail-if = all(this == 0);
 </pre>
 
         <p>Expressions can be chained together and brackets used:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'))
+fail-if = this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'));
 </pre>
 
         <p>Multiple failure conditions can be added, by using a semicolon as
-        the separator. This is essentially similar to chaining them together
-        with <code>or</code>, but the system can process each expression one by
-        one to target the error message.</p>
+        the separator - the semicolon is optional for a single statement or
+        the last in a block, but is recommended. Multiple failure conditions are essentially
+        similar to chaining them together with <code>or</code>, but the system
+        can process each expression one by one to target the error
+        message.</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this &gt; 0; this % 2 == 1; this * 3 &gt; 100
+fail-if = this &gt; 0; this % 2 == 1; this * 3 &gt; 100;
 </pre>
 
         <p>You can add a message to the error or warning message to make it
         clearer by adding a hash followed by the comment at the end of a
         configuration metadata line:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = any(namelist:test=ctrl_array % this == 0) # Needs to be common divisor for ctrl_array
+fail-if = any(namelist:test=ctrl_array % this == 0); # Needs to be common divisor for ctrl_array
 </pre>
 
         <p>When using multiple failure conditions, different messages can be
@@ -1007,7 +1009,7 @@ fail-if = this &gt; 0; # Needs to be less than or equal to 0
         <p>A slightly different usage of this functionality can do things like
         warn of deprecated content:</p>
         <pre class="prettyprint lang-rose_conf">
-warn-if = True  # This option is deprecated
+warn-if = True;  # This option is deprecated
 </pre>
 
         <p>This would always evaluate True and give a warning if the setting is
@@ -1074,16 +1076,22 @@ warn-if = True  # This option is deprecated
 
         <p>The trigger expression is a list of settings triggered by (different
         values of) this setting. If the values are not given, the setting will
-        be triggered only if the current setting is enabled. The syntax for
-        giving values is the same as the setting "values" defined above. The
-        trigger syntax looks like:</p>
+        be triggered only if the current setting is enabled.</p>
+        
+        <p>The syntax contains id-values pairs, where the values part is optional.
+        Each pair must be separated by a semi-colon. Within each pair, any values
+        must be separated from the id by a colon and a space (<samp>: </samp>).
+        Values must be formatted in the same way as the setting "values"
+        defined above (i.e. comma separated).</p>
+       
+        <p>The trigger syntax looks like:</p>
         <pre class="prettyprint lang-rose_conf">
 [namelist:trig_nl=trigger_variable]
 trigger = namelist:dep_nl=A;
           namelist:dep_nl=B;
           namelist:value_nl=X: 10;
           env=Y: 20, 30, 40;
-          namelist:value_nl=Z: 20
+          namelist:value_nl=Z: 20;
 </pre>
 
         <p>In this example:</p>
@@ -1125,23 +1133,21 @@ trigger = namelist:dep_nl=A;
           </li>
         </ul>
 
-        <p>Settings mentioned in a in trigger expressions will have their
+        <p>Settings mentioned in trigger expressions will have their
         default state set to ignored unless explicitly triggered. The config
         editor will issue warnings if variables or sections are in the
         incorrect state when it loads a configuration. Triggering thereafter
-        will work as normal. Map expressions are not supported for derived type
-        or array type settings, because of the difficulty of expressing their
-        values.</p>
+        will work as normal.</p>
 
         <p>Where multiple triggers act on a setting, the setting is triggered
         only if all triggers are active (i.e. an <em>AND</em> relationship).
         For example, for the two triggers here:</p>
         <pre class="prettyprint lang-rose_conf">
 [env=IS_WATER]
-trigger = env=IS_ICE: true
+trigger = env=IS_ICE: true;
 
 [env=IS_COLD]
-trigger = env=IS_ICE: true
+trigger = env=IS_ICE: true;
 </pre>
 
         <p>the setting <var>env=IS_ICE</var> is only enabled if both
@@ -1153,7 +1159,7 @@ trigger = env=IS_ICE: true
         <pre class="prettyprint lang-rose_conf">
 [env=SNOWFLAKE_SIDES]
 trigger = env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
-          env=SILLY_SNOWFLAKE_GEOMETRY: this &lt; 2
+          env=SILLY_SNOWFLAKE_GEOMETRY: this &lt; 2;
 </pre>
 
         <p>In this example, the setting

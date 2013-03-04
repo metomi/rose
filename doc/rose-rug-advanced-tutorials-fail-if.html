@@ -109,7 +109,7 @@
 
       <p>You can reference setting values by using their ids - for example:</p>
       <pre class="prettyprint lang-rose_conf">
-fail-if=namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume
+fail-if=namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume;
 </pre>
     </div>
 
@@ -120,10 +120,17 @@ fail-if=namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume
       (metadata section) id - e.g.:</p>
       <pre class="prettyprint lang-rose_conf">
 [namelist:coffee=daily_amount]
-fail-if=namelist:coffee=daily_min &lt;= this &lt;= namelist:coffee=daily_max
+fail-if=namelist:coffee=daily_min &lt;= this &lt;= namelist:coffee=daily_max;
 </pre>
 
       <p>There is also some array shorthand, which we'll demonstrate later.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Syntax - Delimiters</h3>
+
+      <p>Note that the <samp>;</samp> at the end is optional when we only have
+      one expression (it's a delimiter), but it's better style to keep it.</p>
     </div>
 
     <div class="slide">
@@ -208,7 +215,7 @@ specific_impulse_s=311.0
       <p>Add the following lines to the metadata section
       <samp>[namelist:rocket=total_weight_kg]</samp>:</p>
       <pre class="prettyprint lang-rose_conf">
-fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))
+fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s));
 </pre>
 
       <p>This states the relationship between these settings (a rearrangement
@@ -252,7 +259,7 @@ fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEE
 
       <p>Change the fail-if line to:</p>
       <pre class="prettyprint lang-rose_conf">
-fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s))  # Fuel mass ratio or specific impulse too low to achieve orbit.
+fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEED_MS / (9.8 * namelist:rocket=specific_impulse_s));  # Fuel mass ratio or specific impulse too low to achieve orbit.
 </pre>
 
       <p>If you reload the metadata and run the check again, the error messages
@@ -287,7 +294,7 @@ fail-if=this &lt; namelist:rocket=fuelless_weight_kg * 2.7183**(env=ORBITAL_SPEE
       editor, and add this line to the
       <samp>[namelist:rocket=battery_levels]</samp> section:</p>
       <pre class="prettyprint lang-rose_conf">
-warn-if=namelist:rocket=battery_levels(1) &lt; 75 or namelist:rocket=battery_levels(2) &lt; 75
+warn-if=namelist:rocket=battery_levels(1) &lt; 75 or namelist:rocket=battery_levels(2) &lt; 75;
 </pre>
 
       <p>This uses a special syntax for referencing the individual array
@@ -304,7 +311,7 @@ warn-if=namelist:rocket=battery_levels(1) &lt; 75 or namelist:rocket=battery_lev
       <p>We already know the shorthand syntax <samp>this</samp>, so rephrase
       the metadata to:</p>
       <pre class="prettyprint lang-rose_conf">
-warn-if=this(1) &lt; 75 or this(2) &lt; 75
+warn-if=this(1) &lt; 75 or this(2) &lt; 75;
 </pre>
     </div>
 
@@ -326,7 +333,7 @@ warn-if=this(1) &lt; 75 or this(2) &lt; 75
 
       <p>We can change the <samp>warn-if</samp> setting to:</p>
       <pre class="prettyprint lang-rose_conf">
-warn-if=any(this &lt; 75)
+warn-if=any(this &lt; 75);
 </pre>
 
       <p>which will flag a warning if any <var>battery_levels</var> array
@@ -342,7 +349,7 @@ warn-if=any(this &lt; 75)
       <var>battery_levels</var> example again, change the setting to:</p>
       <pre class="prettyprint lang-rose_conf">
 warn-if=any(this &lt; 75);
-        all(this &gt; 95)
+        all(this &gt; 95);
 </pre>
 
       <p>This gives a warning if any elements are less than 75, and a separate
@@ -355,8 +362,8 @@ warn-if=any(this &lt; 75);
 
       <p>You can add separate helper messages for each expression:</p>
       <pre class="prettyprint lang-rose_conf">
-warn-if=any(this &lt; 75);  # Battery level low
-        all(this &gt; 95)   # Don't over-charge!
+warn-if=any(this &lt; 75);   # Battery level low
+        all(this &gt; 95);   # Don't over-charge!
 </pre>
 
       <p>Try adding the above lines to the metadata, saving, and playing about
