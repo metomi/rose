@@ -50,8 +50,7 @@ INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=issue-list",
 SUB_CONFIG_DEFAULT_META_IDS = ["=file-install-root", "=meta", "=mode",
                                "=opts", "command", "file:", "poll"]
 TOP_CONFIG_DEFAULT_META_IDS = ["file:", "jinja2:suite.rc", "=meta",
-                               "=num-log-max", "=opts",
-                               "=root-dir-share", "=root-dir-work"]
+                               "=opts", "=root-dir-share", "=root-dir-work"]
 # Metadata specification names
 META_PROP_COMPULSORY = 'compulsory'
 META_PROP_DESCRIPTION = 'description'
