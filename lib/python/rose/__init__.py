@@ -44,7 +44,14 @@ CONFIG_SECT_TOP = ""
 CONFIG_OPT_META_PATH = "meta-path"
 CONFIG_OPT_META_TYPE = "meta"
 CONFIG_OPT_PROJECT = "project"
-
+INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=issue-list",
+                                "=owner", "=project", "=sub-project",
+                                "=title"]
+SUB_CONFIG_DEFAULT_META_IDS = ["=file-install-root", "=meta", "=mode",
+                               "command", "file:", "poll"]
+TOP_CONFIG_DEFAULT_META_IDS = ["file:", "jinja2:suite.rc", "=meta",
+                               "=num-log-max", "=opts",
+                               "=root-dir-share", "=root-dir-work"]
 # Metadata specification names
 META_PROP_COMPULSORY = 'compulsory'
 META_PROP_DESCRIPTION = 'description'
