@@ -390,10 +390,10 @@ class Handler(object):
         """Add a section and any compulsory options."""
         self.sect_ops.add_section(config_name, new_section_name)
         config_data = self.data.config[config_name]
-        for variable in config_data.vars.latent.get(new_section_name, []):
-            if (variable.metadata[rose.META_PROP_COMPULSORY] ==
+        for var in list(config_data.vars.latent.get(new_section_name, [])):
+            if (var.metadata[rose.META_PROP_COMPULSORY] ==
                 rose.META_PROP_VALUE_TRUE):
-                self.var_ops.add_variable(variable)
+                self.var_ops.add_var(var)
         
     def copy_request(self, base_ns, new_section=None, no_update=False):
         """Handle a copy request for a section and its options."""
@@ -619,10 +619,12 @@ class Handler(object):
         variables = config_data.vars.now.get(section, [])
         for variable in variables:
             self.var_ops.remove_var(variable, no_update=True)
-        self.sect_opts.remove_section(config_name, section,
-                                      no_update=no_update)
+        self.sect_ops.remove_section(config_name, section,
+                                     no_update=no_update)
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
+        if not no_update:
+            self.data.reload_namespace_tree()
 
     def rename_request(self, base_ns, new_section, no_update=False):
         """Implement a rename (delete + add)."""

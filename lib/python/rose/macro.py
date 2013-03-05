@@ -25,10 +25,12 @@ It also stores macro base classes and macro library functions.
 """
 
 import copy
+import imp
 import inspect
 import os
 import re
 import sys
+import traceback
 
 import rose.config
 import rose.formats.namelist
@@ -47,7 +49,9 @@ ERROR_LOAD_META_PATH = "Could not find metadata for {0}\n"
 ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACROS = "Please specify a macro name.\n"
-MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"), "macros")
+ERROR_RETURN_VALUE = "{0}: incorrect return value"
+MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"),
+                             rose.META_DIR_MACRO)
 MACRO_EXT = ".py"
 MACRO_OUTPUT_HELP = "    # {0}"
 MACRO_OUTPUT_ID = "[{0}] {2}"
@@ -334,7 +338,7 @@ def load_meta_config(config, directory=None, error_handler=None):
     return meta_config
 
 
-def load_meta_macro_modules(meta_files):
+def load_meta_macro_modules(meta_files, module_prefix=None):
     """Import metadata macros and return them in an array."""
     modules = []
     for meta_file in meta_files:
@@ -343,13 +347,15 @@ def load_meta_macro_modules(meta_files):
             not meta_file.endswith(MACRO_EXT)):
             continue
         macro_name = os.path.basename(meta_file).rpartition(MACRO_EXT)[0]
-        sys.path.append(os.path.abspath(meta_dir))
+        if module_prefix is None:
+            as_name = macro_name
+        else:
+            as_name = module_prefix + macro_name
         try:
-            modules.append(__import__(macro_name))
+            modules.append(imp.load_source(as_name, meta_file))
         except Exception as e:
-            info = ERROR_LOAD_MACRO.format(meta_file, e)
+            info = ERROR_LOAD_MACRO.format(meta_file, traceback.format_exc())
             sys.stderr.write(info + "\n")
-        sys.path.pop()
     modules.sort()
     return modules
 
@@ -413,6 +419,8 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                     macro_meth = getattr(macro_inst, method)
                     break
             problem_list = macro_meth(app_config, meta_config)
+            if not isinstance(problem_list, list):
+                raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
             if problem_list:
                 macro_problem_dict.update({macro_name: problem_list})
     return macro_problem_dict
@@ -550,7 +558,8 @@ def run_macros(app_config, meta_config, config_name, macro_names,
         if this_macro_name in macro_names:
             macros_by_type.setdefault(method, [])
             macros_by_type[method].append(this_macro_name)
-            macros_not_found.remove(this_macro_name)
+            if this_macro_name in macros_not_found:
+                macros_not_found.remove(this_macro_name)
     for macro_name in macros_not_found:
         sys.stderr.write(ERROR_MACRO_NOT_FOUND.format(macro_name))
         RC = 1
@@ -616,10 +625,20 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
     for transformer_macro in macros:
         user_allowed_changes = False
         macro_config = copy.deepcopy(app_config)
-        new_config, change_list = transform_config(macro_config,
-                                                   meta_config,
-                                                   transformer_macro,
-                                                   modules, macro_tuples)
+        return_value = transform_config(macro_config,
+                                        meta_config,
+                                        transformer_macro,
+                                        modules, macro_tuples)
+        err_bad_return_value = ERROR_RETURN_VALUE.format(
+                                     transformer_macro)
+        if (not isinstance(return_value, tuple) or
+            len(return_value) != 2):
+            print "Bad tuple"
+            raise ValueError(err_bad_return_value)
+        new_config, change_list = return_value
+        if (not isinstance(new_config, rose.config.ConfigNode) or
+            not isinstance(change_list, list)):
+            raise ValueError(err_bad_return_value)
         method_id = TRANSFORM_METHOD.upper()[0]
         macro_id = MACRO_OUTPUT_ID.format(method_id, config_name,
                                           transformer_macro)

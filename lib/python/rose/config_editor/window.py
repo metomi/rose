@@ -47,7 +47,8 @@ class MainWindow(object):
              page_change_func=rose.config_editor.false_function,
              save_func=rose.config_editor.false_function):
         self.window = gtk.Window()
-        self.window.set_title(name + ' - ' + rose.config_editor.LAUNCH_COMMAND)
+        self.window.set_title(name + ' - ' +
+                              rose.config_editor.LAUNCH_COMMAND)
         self.util = rose.config_editor.util.Lookup()
         locator = rose.resource.ResourceLocator(paths=sys.path)
         icon_path = locator.locate('etc/images/rose-icon-trim.png')

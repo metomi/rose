@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import re
 import sys
 import time
 import traceback
@@ -492,16 +493,25 @@ class ConfigPage(gtk.VBox):
                 widget_path, widget_args = widget_name_args[0], None
             metadata_files = self.sect_ops.get_ns_metadata_files(
                                                self.namespace)
+            widget_dir = rose.META_DIR_WIDGET
+            metadata_files.sort(lambda x, y: (widget_dir in y) -
+                                             (widget_dir in x))
+            prefix = re.sub("[^\w]", "_", self.config_name.strip("/"))
+            prefix += "/" + rose.META_DIR_WIDGET + "/"            
             custom_widget = rose.config_editor.util.import_object(
                                         widget_path,
                                         metadata_files,
-                                        self.handle_bad_custom_sub_widget)
+                                        self.handle_bad_custom_sub_widget,
+                                        module_prefix=prefix)
             if custom_widget is None:
                 text = rose.config_editor.ERROR_IMPORT_CLASS.format(
                                                        self.custom_sub_widget)
                 self.handle_bad_custom_sub_widget(text)
+                return False
             try:
-                self.sub_data_panel = custom_widget(*args, arg_str=widget_args)
+                print "ARGS:", widget_args
+                self.sub_data_panel = custom_widget(*args,
+                                                    arg_str=widget_args)
             except Exception as e:
                 self.handle_bad_custom_sub_widget(str(e))
         else:

@@ -259,8 +259,10 @@ class ConfigDataManager(object):
                     sys.exit(2)
             config, s_config = self.load_config_file(config_path)
         meta_config = self.load_meta_config(config, config_directory)
-        meta_files = self.load_meta_files(config, config_directory)
-        macros = rose.macro.load_meta_macro_modules(meta_files)
+        meta_files = self.load_meta_files(config, config_directory)  
+        macro_module_prefix = re.sub("[^\w]", "_", name.strip("/")) + "/"
+        macros = rose.macro.load_meta_macro_modules(
+                      meta_files, module_prefix=macro_module_prefix)
         meta_id = self.get_config_meta_flag(config)
         
         # Initialise configuration data object.
@@ -458,6 +460,7 @@ class ConfigDataManager(object):
                     dupl_id = self.util.get_id_from_section_option(
                                                dupl_section, option)
                     id_node_stack.insert(0, (dupl_id, sect_node))
+                continue
             if just_this_section is not None and section != just_this_section:
                 continue
             ignored_reason = {}

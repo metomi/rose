@@ -835,8 +835,8 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.is_duplicate = is_duplicate
         self.group_index = None
         self.util = rose.config_editor.util.Lookup()
-        control_widget_hbox = self._get_control_widget_box()
-        self.pack_start(control_widget_hbox, expand=False, fill=False)
+        self.control_widget_hbox = self._get_control_widget_box()
+        self.pack_start(self.control_widget_hbox, expand=False, fill=False)
         self._view = rose.gtk.util.TooltipTreeView(
                                    get_tooltip_func=self.get_tree_tip)
         self._view.set_rules_hint(True)
@@ -1107,27 +1107,35 @@ class BaseSummaryDataPanel(gtk.VBox):
             sep.show()
             menu.append(sep)
         if self.is_duplicate:
-            add_text = rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD
-            copy_text = rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY
-            rem_text = rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE
-            dupl_entries = [(add_text, gtk.STOCK_ADD, self.add_section),
-                            (copy_text, gtk.STOCK_COPY, self.copy_section),
-                            (rem_text, gtk.STOCK_REMOVE, self.remove_section)]
-            for label, stock_id, connect_func in dupl_entries:
-                menuitem = gtk.ImageMenuItem(stock_id=stock_id)
-                menuitem.set_label(label)
-                menuitem._section = this_section
-                menuitem.show()
-                menuitem.connect("activate",
-                                 lambda i: connect_func(i._section))
-                menu.append(menuitem)
+            add_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
+            add_menuitem.set_label(
+                         rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
+            add_menuitem.connect("activate",
+                                 lambda i: self.add_section(this_section))
+            add_menuitem.show()
+            copy_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_COPY)
+            copy_menuitem.set_label(
+                          rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
+            copy_menuitem.connect("activate",
+                                  lambda i: self.copy_section(this_section))
+            copy_menuitem.show()
+            rem_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
+            rem_menuitem.set_label(
+                         rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+            rem_menuitem.connect("activate",
+                                 lambda i: self.remove_section(this_section))
+            rem_menuitem.show()
+            menu.append(add_menuitem)
+            menu.append(copy_menuitem)
+            menu.append(rem_menuitem)
         menu.popup(None, None, None, event.button, event.time)
         return False
 
     def add_section(self, section=None):
+        print "Add new section"
         if not self.sections:
             return False
-        section_base = self.sections[0].rsplit("(", 1)[0]
+        section_base = self.sections.keys()[0].rsplit("(", 1)[0]
         i = 1
         while section_base + "(" + str(i) + ")" in self.sections:
             i += 1

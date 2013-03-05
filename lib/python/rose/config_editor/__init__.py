@@ -179,6 +179,7 @@ ERROR_IMPORT_CLASS = 'Could not retrieve class {0}'
 ERROR_IMPORT_WIDGET = 'Could not import widget: {0}'
 ERROR_IMPORT_WIDGET_TITLE = 'Error importing widget.'
 ERROR_LOAD_SYNTAX = 'Could not load path: {0}\n\nSyntax error:\n{0}\n{1}'
+ERROR_LOCATE_OBJECT = "Could not locate {0}"
 ERROR_MIN_PYGTK_VERSION = 'Requires PyGTK version {0}, found {1}.'
 ERROR_MIN_PYGTK_VERSION_TITLE = 'Need later PyGTK version to run'
 ERROR_NO_OUTPUT = 'No output found for {0}'

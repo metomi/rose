@@ -600,6 +600,7 @@ class SubDataOperations(object):
 
     def add_section(self, new_section_name):
         """Add a new section, complete with any compulsory variables."""
+        print "Add new section", new_section_name
         if self._add_section_func is None:
             raise NotImplementedError()
         return self._add_section_func(self.config_name, new_section_name)
@@ -612,6 +613,7 @@ class SubDataOperations(object):
 
     def remove_section(self, remove_section_name):
         """Remove a section and all its options."""
+        print "Remove section"
         if self._remove_section_func is None:
             raise NotImplementedError()
         return self._remove_section_func(self.config_name,
