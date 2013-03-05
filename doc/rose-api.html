@@ -1019,27 +1019,6 @@ http://host/PREFIX_NAME/get_query_operators?format=json
 </pre>
       </dd>
 
-      <dt><code>info</code></dt>
-
-      <dd>
-        returns an associative array of suite property key-value pairs, and
-        takes three suite arguments: idx, branch, revision to identify a suite
-        and the format argument. For example, entering this URL in a web
-        browser:
-        <pre>
-http://host/PREFIX_NAME/info?idx=mo1-aa000&amp;branch=trunk&amp;revision=1&amp;format=json
-</pre>
-
-        <p>may give</p>
-        <pre class="prettyprint">
-{"access-list": ["fred", "alice"], "author": "bob", "branch": "trunk", "date": 1340700481,
- "experiment": "HADGEM6", "from_idx": null, "idx": "mo1-aa000", "project": "HADGEM5#123",
- "revision": 1, "status": "M ", "title": "HADGEM5 replacement"}
-</pre>
-
-        <p>revision is an optional argument.</p>
-      </dd>
-
       <dt><code>query</code></dt>
 
       <dd>

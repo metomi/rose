@@ -102,12 +102,6 @@ class PrefixRoot(object):
         return self._render(all_revs, data, s=s)
 
     @cherrypy.expose
-    def info(self, idx, branch, revision=None, format=None):
-        """Return the information of a version of a suite."""
-        if format == "json":
-            return simplejson.dumps(self.dao.info(idx, branch, revision))
-
-    @cherrypy.expose
     def get_known_keys(self, format=None):
         """Return the names of the common fields."""
         if format == "json":
