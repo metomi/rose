@@ -30,6 +30,7 @@ from rose.reporter import Event
 from rose.suite_engine_proc \
         import SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
+import sqlite3
 from time import mktime, sleep, strptime
 
 
@@ -41,66 +42,138 @@ class CylcProcessor(SuiteEngineProcessor):
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
-    SUITE_LOG = "suite/log"
     TASK_ID_DELIM = "."
     TASK_LOG_DELIM = "."
 
-    REC_LOG_ENTRIES = {
-         "submit": re.compile(
-             r"""^(?P<time_stamp>\S+\s\S+)\s    # The date and time
-                 INFO\s-\s                      # The type of the message
-                 \[(?P<task_id>\S+)\]           # The task id
-                 \s-job\ssubmitted$             # The message""", re.X),
-         "init": re.compile(
-             r"""^(?P<time_stamp>\S+\s\S+)\s    # The date and time
-                 INFO\s-\s                      # The type of the message
-                 \[(?P<task_id>\S+)\]           # The task id as a named group
-                 \s-(?P=task_id)\s              # The task id appears again
-                 started$                       # The message""", re.X),
-         "pass": re.compile(
-             r"""^(?P<time_stamp>\S+\s\S+)\s    # The date and time
-                 INFO\s-\s                      # The type of the message
-                 \[(?P<task_id>\S+)\]           # The task id as a named group
-                 \s-(?P=task_id)\s              # The task id appears again
-                 succeeded$                     # The message""", re.X),
-         "fail": re.compile(
-             r"""^(?P<time_stamp>\S+\s\S+)\s    # The date and time
-                 CRITICAL\s-\s                  # The type of the message
-                 \[(?P<task_id>\S+)\]           # The task id as a named group
-                 \s-.+?signal\s(?P<signal>\S+)$ # The message""", re.X)}
+    def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
+        """Launch control GUI for a suite_name running at a host."""
+        if not host:
+            host = "localhost"
+        environ = dict(os.environ)
+        if engine_version:
+            environ.update({self.get_version_env_name(): engine_version})
+        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1 &"
+        args_str = self.popen.list_to_shell_str(args)
+        self.popen(fmt % (host, suite_name, args_str, os.devnull),
+                   env=environ, shell=True)
 
-    def get_task_log_dir_rel(self, suite):
-        """Return the relative path to the log directory for suite tasks."""
-        return self.get_suite_dir_rel(suite, "log", "job")
+    def get_suite_db_file(self, suite_name):
+        """Return the path to the suite runtime database file."""
+        return self.get_suite_dir(suite_name, "cylc-suite.db")
 
-    def get_task_props_from_env(self):
-        """Get attributes of a suite task from environment variables.
+    def get_suite_dir_rel(self, suite_name, *args):
+        """Return the relative path to the suite running directory.
 
-        Return a TaskProps object containing the attributes of a suite task.
+        Extra args, if specified, are added to the end of the path.
 
         """
+        return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
-        suite_name = os.environ["CYLC_SUITE_REG_NAME"]
-        suite_dir_rel = self.get_suite_dir_rel(suite_name)
-        suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
-        task_id = os.environ["CYLC_TASK_ID"]
-        task_name = os.environ["CYLC_TASK_NAME"]
-        task_cycle_time = os.environ["CYLC_TASK_CYCLE_TIME"]
-        if task_cycle_time == "1":
-            task_cycle_time = None
-        task_log_root = os.environ["CYLC_TASK_LOG_ROOT"]
-        task_is_cold_start = "false"
-        if os.environ["CYLC_TASK_IS_COLDSTART"] == "True":
-            task_is_cold_start = "true"
+    def get_suite_events(self, suite_name):
+        """Parse the cylc suite running database for task events.
 
-        return TaskProps(suite_name=suite_name,
-                         suite_dir_rel=suite_dir_rel,
-                         suite_dir=suite_dir,
-                         task_id=task_id,
-                         task_name=task_name,
-                         task_cycle_time=task_cycle_time,
-                         task_log_root=task_log_root,
-                         task_is_cold_start=task_is_cold_start)
+        Return a data structure that looks like:
+        {   <task_id>: {
+                "name": <name>,
+                "cycle_time": <cycle time string>,
+                "submits": [
+                    {   "events": {
+                            "submit": <seconds-since-epoch>,
+                            "init": <seconds-since-epoch>,
+                            "exit": <seconds-since-epoch>,
+                        },
+                        "files": {
+                            "script": {"n_bytes": <n_bytes>},
+                            "out": {"n_bytes": <n_bytes>},
+                            "err": {"n_bytes": <n_bytes>},
+                            # ... more files
+                        },
+                        "signal": <signal-name-if-job-killed-by-signal>,
+                        "status": <"pass"|"fail">,
+                    },
+                    # ... more re-submits of the task
+                ]
+            }
+            # ... more task IDs
+        }
+        """
+        data = {}
+
+        # Read task events from suite runtime database
+        conn = sqlite3.connect(self.get_suite_db_file(suite_name))
+        c = conn.cursor()
+        EVENTS = {"submitted": "submit",
+                  "started": "init",
+                  "succeeded": "pass",
+                  "failed": "fail",
+                  "signaled": "fail"}
+        for row in c.execute(
+                "SELECT time,name,cycle,submit_num,event,message"
+                " FROM task_events"
+                " ORDER BY time"):
+            time, name, cycle_time, submit_num, key, message = row
+            event = EVENTS.get(key, None)
+            if event is None:
+                continue
+            event_time = mktime(strptime(time, "%Y-%m-%dT%H:%M:%S"))
+            task_id = name + self.TASK_ID_DELIM + cycle_time
+            if task_id not in data:
+                data[task_id] = {"name": name,
+                                 "cycle_time": cycle_time,
+                                 "submits": []}
+            submits = data[task_id]["submits"]
+            submit_num = int(submit_num)
+            while submit_num > len(submits):
+                submits.append({"events": {},
+                                "status": None,
+                                "signal": None,
+                                "files": {}})
+                for name in ["submit", "init", "exit"]:
+                    submits[-1]["events"][name] = None
+            submit = submits[submit_num - 1]
+            submit["events"][event] = event_time
+            status = None
+            if event in ["pass", "fail"]:
+                status = event
+                event = "exit"
+                submit["status"] = status
+                if key == "signaled":
+                    submit["signal"] = message.rsplit(None, 1)[-1]
+
+        # Locate task log files
+        for task_id, task_datum in data.items():
+            name = task_datum["name"]
+            cycle_time = task_datum["cycle_time"]
+            for i, submit in enumerate(task_datum["submits"]):
+                root = "job/" + self.TASK_LOG_DELIM.join([name, cycle_time,
+                                                          str(i + 1)])
+                for path in glob(root + "*"):
+                    key = path[len(root) + 1:]
+                    if not key:
+                        key = "script"
+                    elif key == "status":
+                        continue
+                    submit["files"][key] = {"n_bytes": os.stat(path).st_size}
+        return data
+
+    def get_suite_jobs_auths(self, suite_name, task_id=None):
+        """Return remote [(user, host), ...] for submitted jobs (of a task)."""
+        my_user = pwd.getpwuid(os.getuid())[0]
+        my_host = socket.gethostname()
+        conn = sqlite3.connect(self.get_suite_db_file(suite_name))
+        c = conn.cursor()
+        auths = []
+        stmt = "SELECT DISTINCT host FROM task_events"
+        stmt_args = tuple()
+        if task_id:
+            stmt += " WHERE name==? AND cycle==? AND event=='submitted'"
+            stmt_args = tuple(task_id.split(self.TASK_ID_DELIM))
+        for row in c.execute(stmt, stmt_args):
+            u, h = row[0].split("@")
+            user, host, my_user, my_host = self._parse_user_host(u, h)
+            if (my_user, my_host) != (user, host):
+                auths.append((user, host))
+        return auths
 
     def get_task_auth(self, suite_name, task_name):
         """
@@ -145,13 +218,38 @@ class CylcProcessor(SuiteEngineProcessor):
                 auths.append((user, host))
         return auths
 
-    def get_suite_dir_rel(self, suite_name, *args):
-        """Return the relative path to the suite running directory.
+    def get_task_log_dir_rel(self, suite):
+        """Return the relative path to the log directory for suite tasks."""
+        return self.get_suite_dir_rel(suite, "log", "job")
 
-        Extra args, if specified, are added to the end of the path.
+    def get_task_props_from_env(self):
+        """Get attributes of a suite task from environment variables.
+
+        Return a TaskProps object containing the attributes of a suite task.
 
         """
-        return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
+
+        suite_name = os.environ["CYLC_SUITE_REG_NAME"]
+        suite_dir_rel = self.get_suite_dir_rel(suite_name)
+        suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
+        task_id = os.environ["CYLC_TASK_ID"]
+        task_name = os.environ["CYLC_TASK_NAME"]
+        task_cycle_time = os.environ["CYLC_TASK_CYCLE_TIME"]
+        if task_cycle_time == "1":
+            task_cycle_time = None
+        task_log_root = os.environ["CYLC_TASK_LOG_ROOT"]
+        task_is_cold_start = "false"
+        if os.environ["CYLC_TASK_IS_COLDSTART"] == "True":
+            task_is_cold_start = "true"
+
+        return TaskProps(suite_name=suite_name,
+                         suite_dir_rel=suite_dir_rel,
+                         suite_dir=suite_dir,
+                         task_id=task_id,
+                         task_name=task_name,
+                         task_cycle_time=task_cycle_time,
+                         task_log_root=task_log_root,
+                         task_is_cold_start=task_is_cold_start)
 
     def get_version(self):
         """Return Cylc's version."""
@@ -162,18 +260,6 @@ class CylcProcessor(SuiteEngineProcessor):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
-
-    def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
-        """Launch control GUI for a suite_name running at a host."""
-        if not host:
-            host = "localhost"
-        environ = dict(os.environ)
-        if engine_version:
-            environ.update({self.get_version_env_name(): engine_version})
-        fmt = r"nohup cylc gui --host=%s %s %s 1>%s 2>&1 &"
-        args_str = self.popen.list_to_shell_str(args)
-        self.popen(fmt % (host, suite_name, args_str, os.devnull),
-                   env=environ, shell=True)
 
     def ping(self, suite_name, hosts=None):
         """Return a list of host names where suite_name is running."""
@@ -195,89 +281,6 @@ class CylcProcessor(SuiteEngineProcessor):
             if host_proc_dict:
                 sleep(0.1)
         return ping_ok_hosts
-
-    def process_suite_log(self):
-        """Parse the cylc suite log in $PWD for task events.
-
-        Locate task log files from the cylc suite log directory.
-        Return a data structure that looks like:
-        {   <task_id>: {
-                "name": <name>,
-                "cycle_time": <cycle time string>,
-                "submits": [
-                    {   "events": {
-                            "submit": <seconds-since-epoch>,
-                            "init": <seconds-since-epoch>,
-                            "queue": <delta-between-submit-and-init>,
-                            "exit": <seconds-since-epoch>,
-                            "elapsed": <delta-between-init-and-exit>,
-                        },
-                        "files": {
-                            "script": {"n_bytes": <n_bytes>},
-                            "out": {"n_bytes": <n_bytes>},
-                            "err": {"n_bytes": <n_bytes>},
-                            # ... more files
-                        },
-                        "files_time_stamp": <seconds-since-epoch>,
-                        "status": <"pass"|"fail">,
-                    },
-                    # ... more re-submits of the task
-                ]
-            }
-            # ... more task IDs
-        }
-        """
-        data = {}
-        # Parse the suite log file
-        for line in open(self.SUITE_LOG, "r"):
-            for key, rec in self.REC_LOG_ENTRIES.items():
-                search_result = rec.search(line)
-                if not search_result:
-                    continue
-                event = key
-                if key in ["pass", "fail"]:
-                    event = "exit"
-                time_stamp = search_result.group("time_stamp")
-                task_id = search_result.group("task_id")
-                signal = None
-                if search_result.groupdict().has_key("signal"):
-                    signal = search_result.group("signal")
-                event_time = mktime(strptime(time_stamp, "%Y/%m/%d %H:%M:%S"))
-                if task_id not in data:
-                    name, cycle_time = task_id.split(self.TASK_ID_DELIM, 1)
-                    data[task_id] = {"name": name,
-                                     "cycle_time": cycle_time,
-                                     "submits": []}
-                submits = data[task_id]["submits"]
-                if not submits or submits[-1]["events"][event]:
-                    submits.append({"events": {},
-                                    "status": None,
-                                    "files": {}})
-                    for name in ["submit", "init", "exit"]:
-                        submits[-1]["events"][name] = None
-                task_data = submits[-1]
-                task_events = task_data["events"]
-                task_events[event] = event_time
-                if event == "exit":
-                    task_data["status"] = key
-                    if signal:
-                        task_data["signal"] = signal
-                break
-        # Locate task log files
-        for task_id, task_datum in data.items():
-            name = task_datum["name"]
-            cycle_time = task_datum["cycle_time"]
-            for i, submit in enumerate(task_datum["submits"]):
-                root = "job/" + self.TASK_LOG_DELIM.join([name, cycle_time,
-                                                          str(i + 1)])
-                for path in glob(root + "*"):
-                    key = path[len(root) + 1:]
-                    if not key:
-                        key = "script"
-                    elif key == "status":
-                        continue
-                    submit["files"][key] = {"n_bytes": os.stat(path).st_size}
-        return data
 
     def process_suite_hook_args(self, *args, **kwargs):
         """Rearrange args for TaskHook.run."""
@@ -377,6 +380,33 @@ class CylcProcessor(SuiteEngineProcessor):
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
         self.popen.run_simple(*command, env=environ)
+
+    def update_job_log(self, suite_name, task_ids=None):
+        """Update the log(s) of task jobs in suite_name.
+
+        If "task_ids" is None, update the logs for all task jobs.
+
+        """
+        id_user_host_set = set()
+        if task_ids:
+            for task_id in task_ids:
+                auths = self.get_suite_jobs_auths(suite_name, task_id)
+                for user, host in auths:
+                    id_user_host_set.add((task_id, user, host))
+        else:
+            users_and_hosts = self.get_suite_jobs_auths(suite_name)
+            for user, host in users_and_hosts:
+                id_user_host_set.add(("", user, host))
+
+        log_dir_rel = self.get_task_log_dir_rel(suite_name)
+        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+        for task_id, user, host in id_user_host_set:
+            r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, task_id)
+            cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
+            try:
+                out, err = self.popen(*cmd)
+            except RosePopenError as e:
+                self.handle_event(e, level=Reporter.WARN)
 
     def validate(self, suite_name, strict_mode=False):
         """(Re-)register and validate a suite."""
