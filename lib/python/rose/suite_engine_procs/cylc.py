@@ -105,19 +105,16 @@ class CylcProcessor(SuiteEngineProcessor):
         EVENTS = {"submitted": "submit",
                   "started": "init",
                   "succeeded": "pass",
-                  "failed": "fail"}
+                  "failed": "fail",
+                  "signaled": "fail"}
         for row in c.execute(
-                "SELECT time,name,cycle,submit_num,event FROM task_events"
+                "SELECT time,name,cycle,submit_num,event,message"
+                " FROM task_events"
                 " ORDER BY time"):
-            time, name, cycle_time, submit_num, key = row
+            time, name, cycle_time, submit_num, key, message = row
             event = EVENTS.get(key, None)
             if event is None:
                 continue
-            status = None
-            signal = None # TODO
-            if event in ["pass", "fail"]:
-                status = event
-                event = "exit"
             event_time = mktime(strptime(time, "%Y-%m-%dT%H:%M:%S"))
             task_id = name + self.TASK_ID_DELIM + cycle_time
             if task_id not in data:
@@ -128,14 +125,20 @@ class CylcProcessor(SuiteEngineProcessor):
             submit_num = int(submit_num)
             while submit_num > len(submits):
                 submits.append({"events": {},
-                                "status": status,
-                                "signal": signal,
+                                "status": None,
+                                "signal": None,
                                 "files": {}})
                 for name in ["submit", "init", "exit"]:
                     submits[-1]["events"][name] = None
-            submits[submit_num - 1]["events"][event] = event_time
-            submits[submit_num - 1]["status"] = status
-            submits[submit_num - 1]["signal"] = signal
+            submit = submits[submit_num - 1]
+            submit["events"][event] = event_time
+            status = None
+            if event in ["pass", "fail"]:
+                status = event
+                event = "exit"
+                submit["status"] = status
+                if key == "signaled":
+                    submit["signal"] = message.rsplit(None, 1)[-1]
 
         # Locate task log files
         for task_id, task_datum in data.items():
