@@ -202,7 +202,6 @@ class SuiteEngineProcessor(object):
 
     CYCLE_INTERVAL = 6
     RUN_DIR_REL_ROOT = None
-    SUITE_LOG = None
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
     SCHEME_HANDLER_MANAGER = None
     SCHEME_DEFAULT = "cylc" # TODO: site configuration?
@@ -232,6 +231,93 @@ class SuiteEngineProcessor(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
+
+    def get_suite_db_file(self, suite_name):
+        """Return the path to the suite runtime database file."""
+        raise NotImplementedError()
+
+    def get_suite_dir(self, suite_name, *args):
+        """Return the path to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        """
+        return os.path.join(os.path.expanduser("~"),
+                            self.get_suite_dir_rel(suite_name, *args))
+
+    def get_suite_dir_rel(self, suite_name, *args):
+        """Return the relative path to the suite running directory.
+
+        Extra args, if specified, are added to the end of the path.
+
+        """
+        raise NotImplementedError()
+
+    def get_suite_events(self, suite_name):
+        """Get suite events.
+        Return a data structure that looks like:
+        {   <task_id>: {
+                "name": <name>,
+                "cycle_time": <cycle time string>,
+                "submits": [
+                    {   "events": {
+                            "submit": <seconds-since-epoch>,
+                            "init": <seconds-since-epoch>,
+                            "exit": <seconds-since-epoch>,
+                        },
+                        "files": {
+                            "script": {"n_bytes": <n_bytes>},
+                            "out": {"n_bytes": <n_bytes>},
+                            "err": {"n_bytes": <n_bytes>},
+                            # ... more files
+                        },
+                        "signal": <signal-name-if-job-killed-by-signal>,
+                        "status": <"pass"|"fail">,
+                    },
+                    # ... more re-submits of the task
+                ]
+            }
+            # ... more task IDs
+        }
+        """
+        raise NotImplementedError()
+
+    def get_suite_log_url(self, suite_name):
+        """Return the URL to the suite log directory.
+
+        Use the "home-public-html" setting in the site/user configuration to
+        determine the URL.
+        If no such setting is defined, return the suite running directory as a
+        "file://" URL.
+
+        """
+        log_index = self.get_suite_dir(suite_name, "log", "index.html")
+        if not os.path.exists(log_index):
+            return None
+        conf = ResourceLocator.default().get_conf()
+        value = conf.get_value(["rose-suite-log-view", "home-public-html"])
+        if value is None:
+            return "file://" + log_index
+        values = env_var_process(value).split(None, 1)
+        if len(values) == 1:
+            url_prefix = values[0]
+            public_html = ""
+        else:
+            url_prefix, public_html = values
+        home = os.path.expanduser("~")
+        dir_rel = self.get_suite_dir_rel(suite_name, "log")
+        if os.path.exists(os.path.join(home, public_html, dir_rel)):
+            return url_prefix + "/" + dir_rel
+        else:
+            return "file://" + log_index
+
+    def get_task_auth(self, suite_name, task_name):
+        """Return (user, host) for a remote task in a suite."""
+        raise NotImplementedError()
+
+    def get_tasks_auths(self, suite_name):
+        """Return a list of (user, host) for remote tasks in a suite."""
+        raise NotImplementedError()
 
     def get_task_log_dir_rel(self, suite):
         """Return the relative path to the log directory for suite tasks."""
@@ -312,60 +398,6 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_task_auth(self, suite_name, task_name):
-        """Return (user, host) for a remote task in a suite."""
-        raise NotImplementedError()
-
-    def get_tasks_auths(self, suite_name):
-        """Return a list of (user, host) for remote tasks in a suite."""
-        raise NotImplementedError()
-
-    def get_suite_dir(self, suite_name, *args):
-        """Return the path to the suite running directory.
-
-        Extra args, if specified, are added to the end of the path.
-
-        """
-        return os.path.join(os.path.expanduser("~"),
-                            self.get_suite_dir_rel(suite_name, *args))
-
-    def get_suite_log_url(self, suite_name):
-        """Return the URL to the suite log directory.
-
-        Use the "home-public-html" setting in the site/user configuration to
-        determine the URL.
-        If no such setting is defined, return the suite running directory as a
-        "file://" URL.
-
-        """
-        log_index = self.get_suite_dir(suite_name, "log", "index.html")
-        if not os.path.exists(log_index):
-            return None
-        conf = ResourceLocator.default().get_conf()
-        value = conf.get_value(["rose-suite-log-view", "home-public-html"])
-        if value is None:
-            return "file://" + log_index
-        values = env_var_process(value).split(None, 1)
-        if len(values) == 1:
-            url_prefix = values[0]
-            public_html = ""
-        else:
-            url_prefix, public_html = values
-        home = os.path.expanduser("~")
-        dir_rel = self.get_suite_dir_rel(suite_name, "log")
-        if os.path.exists(os.path.join(home, public_html, dir_rel)):
-            return url_prefix + "/" + dir_rel
-        else:
-            return "file://" + log_index
-
-    def get_suite_dir_rel(self, suite_name, *args):
-        """Return the relative path to the suite running directory.
-
-        Extra args, if specified, are added to the end of the path.
-
-        """
-        raise NotImplementedError()
-
     def get_version(self):
         """Return the version string of the suite engine."""
         raise NotImplementedError()
@@ -387,38 +419,6 @@ class SuiteEngineProcessor(object):
         """Return a list of host names where suite_name is running."""
         raise NotImplementedError()
 
-    def process_suite_log(self):
-        """Parse the cylc suite log in $PWD for task events.
-        Locate task log files from the cylc suite log directory.
-        Return a data structure that looks like:
-        {   <task_id>: {
-                "name": <name>,
-                "cycle_time": <cycle time string>,
-                "submits": [
-                    {   "events": {
-                            "submit": <seconds-since-epoch>,
-                            "init": <seconds-since-epoch>,
-                            "queue": <delta-between-submit-and-init>,
-                            "exit": <seconds-since-epoch>,
-                            "elapsed": <delta-between-init-and-exit>,
-                        },
-                        "files": {
-                            "script": {"n_bytes": <n_bytes>},
-                            "out": {"n_bytes": <n_bytes>},
-                            "err": {"n_bytes": <n_bytes>},
-                            # ... more files
-                        },
-                        "files_time_stamp": <seconds-since-epoch>,
-                        "status": <"pass"|"fail">,
-                    },
-                    # ... more re-submits of the task
-                ]
-            }
-            # ... more task IDs
-        }
-        """
-        raise NotImplementedError()
-
     def process_task_hook_args(self, *args, **kwargs):
         """Rearrange args for TaskHook.run. Return the rearranged list."""
         raise NotImplementedError()
@@ -435,6 +435,14 @@ class SuiteEngineProcessor(object):
 
     def shutdown(self, suite_name, host=None, engine_version=None, args=None):
         """Shut down the suite."""
+        raise NotImplementedError()
+
+    def update_job_log(self, suite_name, task_ids=None):
+        """Update the log(s) of task jobs in suite_name.
+
+        If "task_ids" is None, update the logs for all task jobs.
+
+        """
         raise NotImplementedError()
 
     def validate(self, suite_name, strict_mode=False):
