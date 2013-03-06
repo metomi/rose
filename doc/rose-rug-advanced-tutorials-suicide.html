@@ -136,8 +136,10 @@
     [[root]]
         [[[event hooks]]]
             succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook"
     [[bake_cake]]
-        command scripting = """ sleep 10; if (($RANDOM % 2)); then echo 'Success'; true;
+        command scripting = """ sleep 10; if (($RANDOM % 2)); 
+                                then echo 'Success'; true;
                                 else echo 'Burned the cake!'; false; fi
                             """
     [[buy_cake]]
@@ -154,7 +156,7 @@
       
       <p>The suite should now run. If <samp>bake_cake</samp> fails, 
       <samp>buy_cake</samp> is triggered which triggers <samp>eat_cake</samp>.
-      Otherwise, <samp>bake_cake</samp> triggers <samp>eat_cake</samp></p>
+      Otherwise, <samp>bake_cake</samp> triggers <samp>eat_cake</samp>.</p>
 
       <p>Notice that at once  <samp>eat_cake</samp> has completed the suite 
       does not shut down. This is because either <samp>bake_cake</samp> is in 
@@ -169,7 +171,7 @@
       <p>Since <samp>buy_cake</samp> has corrected for the failure of 
       <samp>bake_cake</samp> we don't need the suite to keep 
       running - we would like the suite to be able to shutdown once the final 
-      cycle has completed</p>
+      cycle has completed.</p>
       
       <p>We can make use of a suicide trigger to remove the failed 
       <samp>bake_cake</samp> task</p> 
@@ -227,6 +229,11 @@
       the suite is required to correct the problem (the task has been removed 
       from the suite).</p> 
       
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Note on suicide triggers (2)</h2> 
+          
       <p>Depending on your needs, possible places to put the suicide trigger 
       are:</p>
       <ul>
