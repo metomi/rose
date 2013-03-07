@@ -594,12 +594,13 @@ class SubDataOperations(object):
     def __init__(self, config_name,
                  add_section_func, clone_section_func,
                  ignore_section_func, remove_section_func,
-                 get_var_id_values_func):
+                 remove_sections_func, get_var_id_values_func):
         self.config_name = config_name
         self._add_section_func = add_section_func
         self._clone_section_func = clone_section_func
         self._ignore_section_func = ignore_section_func
         self._remove_section_func = remove_section_func
+        self._remove_sections_func = remove_sections_func
         self._get_var_id_values_func = get_var_id_values_func
 
     def add_section(self, new_section_name, opt_map=None, no_page_launch=False):
@@ -623,6 +624,11 @@ class SubDataOperations(object):
         """Remove a section and all its options."""
         return self._remove_section_func(self.config_name,
                                          remove_section_name)
+
+    def remove_sections(self, remove_sections_list):
+        """Remove a list of sections and all their options."""
+        return self._remove_sections_func(self.config_name,
+                                          remove_sections_list)
 
     def get_var_id_values(self):
         """Return a map of all var id values."""

@@ -653,6 +653,17 @@ class Handler(object):
         if not no_update:
             self.data.reload_namespace_tree()
 
+    def remove_sections(self, config_name, sections, no_update=False):
+        """Implement a mass removal of sections."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
+        for section in sections:
+            self.remove_section(config_name, section, no_update=True)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+        if not no_update:
+            self.data.reload_namespace_tree()
+
     def rename_request(self, base_ns, new_section, no_update=False):
         """Implement a rename (delete + add)."""
         namespace = "/" + base_ns.lstrip("/")
@@ -731,6 +742,7 @@ class Handler(object):
                 self.copy_section,
                 self.sect_ops.ignore_section,
                 self.remove_section,
+                self.remove_sections,
                 get_var_id_values_func=(
                         self.data.get_sub_data_var_id_value_map))
 

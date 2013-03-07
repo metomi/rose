@@ -966,12 +966,13 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def update_tree_model(self, sections=None, variables=None):
         """Update the summary of page data."""
+        print "update tree model"
         if sections is not None:
             self.sections = sections
         if variables is not None:
             self.variables = variables
         old_cols = set(self.column_names)
-        vadj = self._window.get_vadjustment()
+        vadj_value = self._window.get_vadjustment().get_value()
         model, cols, should_redraw = self.get_tree_model_and_col_names()
         if should_redraw:
             for column in list(self._view.get_columns()):
@@ -997,7 +998,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                     group_model.append(None, [""])
                 self._group_widget.set_model(group_model)
                 self._group_widget.set_active(start_index)
-        self._window.set_vadjustment(vadj)
+        self._window.get_vadjustment().set_value(vadj_value)
 
     def add_new_columns(self, treeview, column_names):      
         for i, column_name in enumerate(column_names):
@@ -1079,6 +1080,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                 self._handle_activation(treeview, path, col)
             else:
                 self._popup_tree_menu(path, col, event)
+        return False
 
     def _popup_tree_menu(self, path, col, event):
         """Launch a menu for this main treeview row."""
