@@ -19,6 +19,8 @@
 #-----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
+import Queue
+
 import multiprocessing
 import os
 import re
