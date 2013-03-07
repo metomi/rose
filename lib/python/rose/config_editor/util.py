@@ -108,6 +108,8 @@ def import_object(import_string, from_files, error_handler,
     from_files is a list of available Python file paths to search in
     error_handler is a function that accepts an Exception instance
     and does something appropriate with it.
+    module_prefix is an optional string to prepend to the module
+    as an alias - this avoids any clashing between same-name modules.
 
     """
     is_builtin = False
@@ -133,10 +135,12 @@ def import_object(import_string, from_files, error_handler,
             error_handler(e)
     else:
         for filename in module_files:
+            sys.path.insert(0, os.path.dirname(filename))
             try:
                 module = imp.load_source(as_name, filename)
             except Exception as e:
                 error_handler(e)
+            sys.path.pop(0)
     if module is None:
         error_handler(
               rose.config_editor.ERROR_LOCATE_OBJECT.format(module_name))

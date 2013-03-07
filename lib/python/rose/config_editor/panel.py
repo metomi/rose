@@ -812,7 +812,7 @@ class BaseSummaryDataPanel(gtk.VBox):
     """A base class for summarising data across many namespaces.
     
     Subclasses should provide the following methods:
-    def add_cell_renderer_for_value(self, column)
+    def add_cell_renderer_for_value(self, column, column_title)
     def get_tree_model_and_col_names(self)
     def get_tree_tip(self, treeview, row_iter, col_index, tip(self)
 
@@ -851,10 +851,11 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.pack_start(self._window, expand=True, fill=True)
         self.show()
 
-    def add_cell_renderer_for_value(self, column):
+    def add_cell_renderer_for_value(self, column, column_title):
         """Add a cell renderer to represent the model value.
 
         column is the gtk.TreeColumn to pack the cell in.
+        column_title is the title of column.
 
         You may want to use column.set_cell_data_func.
 
@@ -970,6 +971,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         if variables is not None:
             self.variables = variables
         old_cols = set(self.column_names)
+        vadj = self._window.get_vadjustment()
         model, cols, should_redraw = self.get_tree_model_and_col_names()
         if should_redraw:
             for column in list(self._view.get_columns()):
@@ -995,6 +997,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                     group_model.append(None, [""])
                 self._group_widget.set_model(group_model)
                 self._group_widget.set_active(start_index)
+        self._window.set_vadjustment(vadj)
 
     def add_new_columns(self, treeview, column_names):      
         for i, column_name in enumerate(column_names):
@@ -1004,7 +1007,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             col.pack_start(cell_for_status, expand=False)
             col.set_cell_data_func(cell_for_status,
                                    self.get_tree_cell_status)
-            self.add_cell_renderer_for_value(col)
+            self.add_cell_renderer_for_value(col, column_name)
             if i < len(column_names) - 1:
                 col.set_resizable(True)
             col.set_sort_column_id(i)
@@ -1040,7 +1043,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                 return True
         child_iter = model.iter_children(iter_)
         while child_iter is not None:
-            if self._filter_widget_visible(model, child_iter):
+            if self._filter_visible(model, child_iter):
                 return True
             child_iter = model.iter_next(child_iter)
         return False
@@ -1113,43 +1116,101 @@ class BaseSummaryDataPanel(gtk.VBox):
             add_menuitem.connect("activate",
                                  lambda i: self.add_section(this_section))
             add_menuitem.show()
+            menu.append(add_menuitem)
             copy_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_COPY)
             copy_menuitem.set_label(
                           rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
             copy_menuitem.connect("activate",
                                   lambda i: self.copy_section(this_section))
             copy_menuitem.show()
+            menu.append(copy_menuitem)
+            if (rose.variable.IGNORED_BY_USER in
+                self.sections[this_section].ignored_reason):
+                enab_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
+                enab_menuitem.set_label(
+                              rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                enab_menuitem.connect(
+                              "activate",
+                              lambda i: self.sub_ops.ignore_section(
+                                                           this_section, False))
+                enab_menuitem.show()
+                menu.append(enab_menuitem)
+            else:
+                ign_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
+                ign_menuitem.set_label(
+                             rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                ign_menuitem.connect(
+                             "activate",
+                             lambda i: self.sub_ops.ignore_section(
+                                                           this_section, True))
+                ign_menuitem.show()
+                menu.append(ign_menuitem)
             rem_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
             rem_menuitem.set_label(
                          rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
             rem_menuitem.connect("activate",
                                  lambda i: self.remove_section(this_section))
             rem_menuitem.show()
-            menu.append(add_menuitem)
-            menu.append(copy_menuitem)
             menu.append(rem_menuitem)
         menu.popup(None, None, None, event.button, event.time)
         return False
 
-    def add_section(self, section=None):
-        print "Add new section"
-        if not self.sections:
-            return False
-        section_base = self.sections.keys()[0].rsplit("(", 1)[0]
-        i = 1
-        while section_base + "(" + str(i) + ")" in self.sections:
-            i += 1
-            new_section = section_base + "(" + str(i) + ")"
-        self.sub_ops.add_section(new_section)
+    def add_section(self, section=None, opt_map=None, no_page_launch=False):
+        """Add a new section.
+
+        section is the optional name for the new section - otherwise
+        one will be calculated, if the sub data sections are duplicates
+        opt_map is a dictionary of option names and values to add with
+        the section
+        no_page_launch controls whether the addition launches a
+        separate page.
+
+        """
+        if section is None:
+            if not self.sections or not self.is_duplicate:
+                return False
+            section_base = self.sections.keys()[0].rsplit("(", 1)[0]
+            i = 1
+            while section_base + "(" + str(i) + ")" in self.sections:
+                i += 1
+                section = section_base + "(" + str(i) + ")"
+        self.sub_ops.add_section(section, opt_map=opt_map,
+                                 no_page_launch=no_page_launch)
+        self.scroll_to_section(section)
 
     def copy_section(self, section):
-        self.sub_ops.clone_section(section)
+        """Copy a section and its content into a new section name."""
+        new_section = self.sub_ops.clone_section(section)
+        self.scroll_to_section(new_section)
 
     def remove_section(self, section):
+        """Remove a section."""
         self.sub_ops.remove_section(section)
 
-    def _append_row_data(self, model, path, iter_, data_rows):
-        data_rows.append(model.get(iter_))
+    def scroll_to_section(self, section):
+        """Find a particular section in the treeview and scroll to it."""
+        iter_ = self.get_section_iter(section)
+        path = self._view.get_model().get_path(iter_)
+        self._view.scroll_to_cell(path)
+
+    def get_section_iter(self, section):
+        """Get the gtk.TreeIter of this section."""
+        iters = []
+        sect_index = 0
+        if self.group_index is not None and self.group_index != sect_index:
+            sect_index = 1
+        self._view.get_model().foreach(self._check_value_iter,
+                                       [sect_index, section, iters])
+        if iters:
+            return iters[0]
+        return None
+
+    def _check_value_iter(self, model, path, iter_, data):
+        value_index, value, iters = data
+        if model.get_value(iter_, value_index) == value:
+            iters.append(iter_)
+            return True
+        return False
 
     def _sort_row_data(self, row1, row2, sort_index, descending=False):
         fac = (-1 if descending else 1)
@@ -1203,7 +1264,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
 
     """Class that provides a standard interface to summary data."""
 
-    def add_cell_renderer_for_value(self, col):
+    def add_cell_renderer_for_value(self, col, col_title):
         cell_for_value = gtk.CellRendererText()
         col.pack_start(cell_for_value, expand=True)
         col.set_cell_data_func(cell_for_value,

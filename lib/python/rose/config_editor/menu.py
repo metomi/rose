@@ -340,6 +340,7 @@ class Handler(object):
         self._add_config = add_config_func
         self.kill_page_func = kill_page_func
         self.update_func = update_func
+        self.update_ns_func = update_ns_func
         self.view_page_func = view_page_func
         self.find_ns_id_func = find_ns_id_func
 
@@ -386,14 +387,39 @@ class Handler(object):
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section)
 
-    def add_section_with_options(self, config_name, new_section_name):
-        """Add a section and any compulsory options."""
-        self.sect_ops.add_section(config_name, new_section_name)
+    def add_section_with_options(self, config_name, new_section_name, opt_map=None,
+                                 no_page_launch=False):
+        """Add a section and any compulsory options.
+        
+        Any option-value pairs in the opt_map dict will also be added.
+        
+        """
+        self.sect_ops.add_section(config_name, new_section_name,
+                                  no_page_launch=no_page_launch)
+        namespace = self.data.get_default_namespace_for_section(
+                                          new_section_name, config_name)
         config_data = self.data.config[config_name]
+        if opt_map is None:
+            opt_map = {}
         for var in list(config_data.vars.latent.get(new_section_name, [])):
-            if (var.metadata[rose.META_PROP_COMPULSORY] ==
-                rose.META_PROP_VALUE_TRUE):
-                self.var_ops.add_var(var)
+            if var.name in opt_map:
+                var.value = opt_map.pop(var.name)
+            if (var.name in opt_map or
+                (var.metadata[rose.META_PROP_COMPULSORY] ==
+                 rose.META_PROP_VALUE_TRUE)):
+                self.var_ops.add_var(var, no_update=True)
+        for opt_name, value in opt_map:
+            var_id = self.util.get_id_from_section_option(
+                                           new_section_name, opt_name)
+            metadata = self.data.get_metadata_for_config_id(var_id, config_name)
+            metadata['full_ns'] = namespace
+            ignored_reason = {}  # This may not be safe.
+            var = rose.variable.Variable(opt_name, value,
+                                         metadata, ignored_reason,
+                                         error={})
+            self.var_ops.add_var(var, no_update=True)
+        self.update_ns_func(namespace)
+        return new_section_name
         
     def copy_request(self, base_ns, new_section=None, no_update=False):
         """Handle a copy request for a section and its options."""
@@ -408,6 +434,7 @@ class Handler(object):
 
     def copy_section(self, config_name, section):
         """Copy a section and its options."""
+        config_data = self.data.config[config_name]
         section_base = re.sub('(.*)\(\d+\)$', r"\1", section)
         existing_sections = []
         clone_vars = []
@@ -700,9 +727,10 @@ class Handler(object):
         config_name, subsp = self.util.split_full_ns(self.data, namespace)
         return rose.config_editor.stack.SubDataOperations(
                 config_name,
-                add_section_func=self.add_section_with_options,
-                clone_section_func=self.copy_section,
-                remove_section_func=self.remove_section,
+                self.add_section_with_options,
+                self.copy_section,
+                self.sect_ops.ignore_section,
+                self.remove_section,
                 get_var_id_values_func=(
                         self.data.get_sub_data_var_id_value_map))
 

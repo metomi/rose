@@ -972,13 +972,17 @@ class ConfigDataManager(object):
                                       err_string, setting_id, config_name))
         self.trigger[config_name].trigger_family_lookup.clear()
 
-    def reload_namespace_tree(self, view_missing=False):
+    def reload_namespace_tree(self, just_this_config_name=None,
+                              view_missing=False):
         """Make the tree of namespaces and load to the tree panel."""
         self.namespace_tree = {}
-        configs = self.config.keys()
-        configs.sort(rose.config.sort_settings)
-        configs.sort(lambda x, y: cmp(self.config[y].is_top_level,
-                                      self.config[x].is_top_level))
+        if just_this_config_name is None:
+            configs = self.config.keys()
+            configs.sort(rose.config.sort_settings)
+            configs.sort(lambda x, y: cmp(self.config[y].is_top_level,
+                                          self.config[x].is_top_level))
+        else:
+            configs = [just_this_config_name]
         for config_name in configs:
             config_data = self.config[config_name]
             top_spaces = config_name.lstrip('/').split('/')

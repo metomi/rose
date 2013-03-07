@@ -83,7 +83,8 @@ class SectionOperations(object):
         self.view_page_func = view_page_func
         self.kill_page_func = kill_page_func
 
-    def add_section(self, config_name, section, no_update=False):
+    def add_section(self, config_name, section, no_update=False,
+                    no_page_launch=False):
         """Add a section to this configuration."""
         config_data = self.__data.config[config_name]
         new_section_data = None
@@ -119,8 +120,9 @@ class SectionOperations(object):
                           (config_name, section, no_update))
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
-        if not no_update:
+        if not no_page_launch and not no_update:
             self.view_page_func(ns)
+        if not no_update:
             self.trigger_update(ns)
 
     def ignore_section(self, config_name, section, is_ignored,
@@ -590,39 +592,40 @@ class SubDataOperations(object):
     """Class to hold a selected set of functions."""
 
     def __init__(self, config_name,
-                 add_section_func=None, clone_section_func=None,
-                 remove_section_func=None, get_var_id_values_func=None):
+                 add_section_func, clone_section_func,
+                 ignore_section_func, remove_section_func,
+                 get_var_id_values_func):
         self.config_name = config_name
         self._add_section_func = add_section_func
         self._clone_section_func = clone_section_func
+        self._ignore_section_func = ignore_section_func
         self._remove_section_func = remove_section_func
         self._get_var_id_values_func = get_var_id_values_func
 
-    def add_section(self, new_section_name):
+    def add_section(self, new_section_name, opt_map=None, no_page_launch=False):
         """Add a new section, complete with any compulsory variables."""
-        print "Add new section", new_section_name
-        if self._add_section_func is None:
-            raise NotImplementedError()
-        return self._add_section_func(self.config_name, new_section_name)
+        return self._add_section_func(self.config_name, new_section_name,
+                                      opt_map=opt_map,
+                                      no_page_launch=no_page_launch)
 
     def clone_section(self, clone_section_name):
         """Copy a (duplicate) section and all its options."""
-        if self._clone_section_func is None:
-            raise NotImplementedError()
         return self._clone_section_func(self.config_name, clone_section_name)
+
+    def ignore_section(self, ignore_section_name, is_ignored):
+        """User-ignore or enable a section."""
+        return self._ignore_section_func(
+                            self.config_name,
+                            ignore_section_name,
+                            is_ignored)
 
     def remove_section(self, remove_section_name):
         """Remove a section and all its options."""
-        print "Remove section"
-        if self._remove_section_func is None:
-            raise NotImplementedError()
         return self._remove_section_func(self.config_name,
                                          remove_section_name)
 
     def get_var_id_values(self):
         """Return a map of all var id values."""
-        if self._get_var_id_values_func is None:
-            raise NotImplementedError()
         return self._get_var_id_values_func(self.config_name)
 
 

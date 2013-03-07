@@ -509,7 +509,6 @@ class ConfigPage(gtk.VBox):
                 self.handle_bad_custom_sub_widget(text)
                 return False
             try:
-                print "ARGS:", widget_args
                 self.sub_data_panel = custom_widget(*args,
                                                     arg_str=widget_args)
             except Exception as e:
@@ -525,6 +524,7 @@ class ConfigPage(gtk.VBox):
 
     def update_sub_data(self):
         """Update the sub (summary) data panel."""
+        print "update page sub"
         if self.sub_data is not None:
             self.sub_data_panel.update_tree_model(self.sub_data["sections"],
                                                   self.sub_data["variables"])

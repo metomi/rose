@@ -937,7 +937,9 @@ class MainController(object):
         self.update_stack_viewer_if_open()
         if page.namespace in self.data.config.keys():
             self.update_metadata_id(page.namespace)
+        print "update status"
         self.update_ns_sub_data(page.namespace)
+        print "finish update status"
 
     def update_ns_sub_data(self, namespace=None):
         """Update any relevant summary data on another page."""
@@ -1852,9 +1854,11 @@ class MainController(object):
                 this_warning = var.warning.pop(macro_type)
                 id_warn_dict.update({var.metadata['id']: this_warning})
         if not bad_list:
+            print "Refresh"
             self.refresh_ids(config_name,
                              id_error_dict.keys() + id_warn_dict.keys(),
                              is_loading)
+            print "finish refresh"
             return
         for bad_report in bad_list:
             section = bad_report.section
