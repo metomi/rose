@@ -138,9 +138,12 @@
             succeeded handler = "rose suite-hook"
             failed handler = "rose suite-hook"
     [[bake_cake]]
-        command scripting = """ sleep 10; if (($RANDOM % 2)); 
-                                then echo 'Success'; true;
-                                else echo 'Burned the cake!'; false; fi
+        command scripting = """ sleep 10; 
+                                if (($RANDOM % 2)); then 
+                                    echo 'Success'; true;
+                                else 
+                                    echo 'Burned the cake!'; false;
+                                fi
                             """
     [[buy_cake]]
         command scripting = "sleep 10; echo 'Off to the shops!'"
