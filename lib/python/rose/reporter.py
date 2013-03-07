@@ -19,6 +19,8 @@
 #-----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
+import Queue
+
 import multiprocessing
 import os
 import re
@@ -246,15 +248,26 @@ class ReporterContextQueue(ReporterContext):
             queue = multiprocessing.Queue()
         self.queue = queue
         self.closed = False
+        self._messages_pending = []
 
     def close(self):
+        self._send_pending_messages()
         self.closed = True
 
     def is_closed(self):
         return self.closed
 
     def write(self, message):
-        self.queue.put(message, block=True, timeout=0.1)
+        self._messages_pending.append(message)
+        self._send_pending_messages()
+
+    def _send_pending_messages(self):
+        for message in list(self._messages_pending):
+            try:
+                self.queue.put(self._messages_pending[0], block=False)
+            except Queue.Full:
+                break
+            self._messages_pending.pop(0)
 
 
 class Event(object):
