@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Advanced Tutorial: suicide triggers</title>
+  <title>Rose Advanced Tutorial: alternate commands</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -137,7 +137,7 @@ default = sleep 10; echo 'fresh bread'
         <li>a <samp>gather_ingredients</samp> task</li>
         <li>a <samp>breadmaker</samp> task that runs the 
         <samp>breadmaker</samp> app</li>
-      <ul>
+      </ul>
 
     </div>
 
@@ -156,7 +156,7 @@ default = sleep 10; echo 'fresh bread'
     </div>
 
     <div class="slide">
-      <h2 id="adding commands">Adding alternate commands</h2>
+      <h2 id="adding-commands">Adding alternate commands</h2>
 
       <p>Open the <samp>rose-app.conf</samp> file and edit to look like this:
       </p>
@@ -182,34 +182,15 @@ timed_bread = sleep 15; echo 'fresh bread when you want it'
 
     <div class="slide">
       <h3 class="alwayshidden">Adding alternate commands (3)</h3>
-      <p></p>
-
-</pre>      
-    </div>    
-
-    
-    <div class="slide">
-      <h2 id="notes">Note on suicide triggers</h2> 
-    
-      <p>While it is possible to have a task suicide triggering itself this is 
-      not recommended and may lead to difficulties if manual interaction with 
-      the suite is required to correct the problem (the task has been removed 
-      from the suite).</p> 
       
-    </div>
-    
-    <div class="slide">
-      <h3 class="alwayshidden">Note on suicide triggers (2)</h2> 
-          
-      <p>Depending on your needs, possible places to put the suicide trigger 
-      are:</p>
-      <ul>
-        <li>triggering off the success of a recovery task</li>
-        <li>triggering off the final task in a cycle</li>
-        <li>triggering off a cleanup task in the suite</li>
-      </ul>    
-    </div>
-    
+      <p>Save your changes and run the suite. If you inspect the output from 
+      the breadmaker task you should see the line "dough for later".</p>
+      
+      <p>Edit the command scripting for the <samp>breadmaker</samp> task to
+      change to command key to <samp>'timed_bread'</samp>. Run the suite and 
+      confirm the timed_bread command has been run.</p>
+
+    </div>    
   </div>
 </body>
 </html>
