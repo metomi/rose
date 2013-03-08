@@ -188,19 +188,16 @@ class StemRunner(object):
         rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
         if rc != 0:
             raise ProjectNotFoundException(item, stderr)
-        result = re.search(r'url:\s*svn://(.*)', output)
+        result = re.search(r'url:\s*(svn://.*)', output)
         
         # Split the URL into forward-slash separated items to generate a 
         # unique name for this project
         if result:
             urlstring = result.group(1)
-            pieces = urlstring.split('/')
-            pieces[1] = re.sub(r'_svn', r'', pieces[1])
-            item = urlstring
-            if len(pieces) < 2 or pieces[1] == pieces[2]:
-                project = pieces[1]
-            else:
-                project = pieces[1] + '_' + pieces[2]
+            rc, kpoutput, stderr = self.popen.run('fcm', 'kp', urlstring)
+            kpresult = re.search(r'location{primary}\[(.*)\]\s*=', kpoutput)
+            if kpresult:
+                project = kpresult.group(1)
         if not project:
             raise ProjectNotFoundException(item)
 
@@ -340,6 +337,7 @@ def main():
         except Exception as e:
             stem.reporter(e)
             sys.exit(1)
+
 
     # Get the suiterunner object and execute
     runner = rose.run.SuiteRunner(event_handler=stem.reporter, 
