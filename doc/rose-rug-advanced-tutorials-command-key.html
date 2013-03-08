@@ -76,19 +76,18 @@
 
       <p>This tutorial walks you through using command keys.</p>
 
-      <p>Command keys allow you to specify and run different commands for 
-      an app.</p>
+      <p>Command keys allow you to specify and run different commands for an
+      app.</p>
     </div>
 
     <div class="slide">
       <h2 id="purpose">Purpose</h2>
 
-      <p>Command keys can be used to specify different ways of running a 
+      <p>Command keys can be used to specify different ways of running a
       particular app.</p>
-      
-      <p>They work just like the default command for an app but have to be 
-      explicitly called by the command scripting of a task.</p>
 
+      <p>They work just like the default command for an app but have to be
+      explicitly called by the command scripting of a task.</p>
     </div>
 
     <div class="slide">
@@ -116,51 +115,52 @@
 
     <div class="slide">
       <h3 class="alwayshidden">Example (2)</h3>
-      
+
       <p>In your suite directory create an <samp>app</samp> directory.</p>
+
       <p>In the <samp>app</samp> directory create a new directory called
       <samp>breadmaker</samp>.</p>
-      <p>In the <samp>breadmaker</samp> directory create a 
+
+      <p>In the <samp>breadmaker</samp> directory create a
       <samp>rose-app.conf</samp> file that looks like this:</p>
       <pre class="prettyprint lang-cylc">
 [command]
 default = sleep 10; echo 'fresh bread'
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Description</h3>
 
       <p>This sets up a simple suite that contains the following:</p>
+
       <ul>
         <li>a <samp>breadmaker</samp> app</li>
+
         <li>a <samp>gather_ingredients</samp> task</li>
-        <li>a <samp>breadmaker</samp> task that runs the 
+
+        <li>a <samp>breadmaker</samp> task that runs the
         <samp>breadmaker</samp> app</li>
       </ul>
-
     </div>
-
 
     <div class="slide">
       <h3 class="alwayshidden">Run the suite</h3>
 
-      <p>Save your changes and run the suite using <samp>rose suite-run</samp>.
-      </p>
-      
-      <p>Once it has finished use <samp>rose suite-log-view</samp> to view the 
-      suite log. In the page that appears, click the "out" link for the 
+      <p>Save your changes and run the suite using <samp>rose
+      suite-run</samp>.</p>
+
+      <p>Once it has finished use <samp>rose suite-log-view</samp> to view the
+      suite log. In the page that appears, click the "out" link for the
       breadmaker task. In the page you are taken to you should see a line
       saying "fresh bread".</p>
-
     </div>
 
     <div class="slide">
       <h2 id="adding-commands">Adding alternate commands</h2>
 
-      <p>Open the <samp>rose-app.conf</samp> file and edit to look like this:
-      </p>
-      
+      <p>Open the <samp>rose-app.conf</samp> file and edit to look like
+      this:</p>
       <pre class="prettyprint lang-cylc">
 [command]
 default = sleep 10; echo 'fresh bread'
@@ -171,41 +171,43 @@ timed_bread = sleep 15; echo 'fresh bread when you want it'
 
     <div class="slide">
       <h3 class="alwayshidden">Adding alternate commands (2)</h3>
-      <p>Save your changes and open up your <samp>suite.rc</samp> file. Alter 
-      the <samp>[[breadmaker]]</samp> task to look like this:</p>
 
+      <p>Save your changes and open up your <samp>suite.rc</samp> file. Alter
+      the <samp>[[breadmaker]]</samp> task to look like this:</p>
       <pre class="prettyprint lang-cylc">
     [[breadmaker]]
         command scripting = "rose task-run --command-key='dough'"
-</pre>      
+</pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Adding alternate commands (3)</h3>
-      
-      <p>Save your changes and run the suite. If you inspect the output from 
-      the breadmaker task you should see the line "dough for later".</p>
-      
-      <p>Edit the command scripting for the <samp>[[breadmaker]]</samp> task to
-      change the command key to <samp>'timed_bread'</samp>. Run the suite and 
-      confirm the timed_bread command has been run.</p>
 
+      <p>Save your changes and run the suite. If you inspect the output from
+      the breadmaker task you should see the line "dough for later".</p>
+
+      <p>Edit the command scripting for the <samp>[[breadmaker]]</samp> task to
+      change the command key to <samp>'timed_bread'</samp>. Run the suite and
+      confirm the timed_bread command has been run.</p>
     </div>
-    
+
     <div class="slide">
       <h2 id="summary">Summary</h2>
-      
-      <p>You have successfully made use of command keys to run alternate 
+
+      <p>You have successfully made use of command keys to run alternate
       commands in an app.</p>
-      
+
       <p>Possible uses of command keys might be:</p>
+
       <ul>
         <li>running an app in different modes of verbosity</li>
+
         <li>running an app in different configurations</li>
+
         <li>specifying different options to an app</li>
+
         <li>during suite development to aid in debugging an app</li>
       </ul>
-    
     </div>
   </div>
 </body>
