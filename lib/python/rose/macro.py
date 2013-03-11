@@ -59,9 +59,9 @@ MACRO_OUTPUT_TRANSFORM_CHANGES = "{0}: changes: {1}\n"
 MACRO_OUTPUT_VALIDATE_ISSUES = "{0}: issues: {1}\n"
 MACRO_OUTPUT_WARNING_ISSUES = "{0}: warnings: {1}\n"
 REC_MODIFIER = re.compile(r"\{.+\}")
-REC_ID_STRIP_DUPL = re.compile(r"\([\d:, ]+\)")
-REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([\d:, ]+\))?$')
-REC_ID_ELEMENT = re.compile(r"\((\d+)\)$")
+REC_ID_STRIP_DUPL = re.compile(r"\([\d:, \w]+\)")
+REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([\d:, \w]+\))?$')
+REC_ID_ELEMENT = re.compile(r"\(([\d:, \w]+)\)$")
 ID_ELEMENT_FORMAT = "{0}({1})"
 PROBLEM_ENTRY = "    {0}={1}={2}\n        {3}\n"
 PROMPT_ACCEPT_CHANGES = "Accept y/n (default n)? "

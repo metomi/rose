@@ -47,7 +47,7 @@ import rose.variable
 
 REC_NS_SECTION = re.compile(r"^(" + rose.META_PROP_NS + rose.CONFIG_DELIMITER +
                             r")(.*)$")
-REC_ELEMENT_SECTION = re.compile(r"^(.*)\((\d*)\)$")
+REC_ELEMENT_SECTION = re.compile(r"^(.*)\((.+)\)$")
 
 
 class VarData(object):

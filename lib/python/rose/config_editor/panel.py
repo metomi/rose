@@ -70,7 +70,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                                           self._set_title_markup, 2)
         self.data_store = gtk.TreeStore(gtk.gdk.Pixbuf, gtk.gdk.Pixbuf,
                                         str, str, int, int, int, int,
-                                        str, str, str, str, str, str)
+                                        str, str, str, str, str, str, str)
         # Data: name, title, error and change numbers,
         #       main tip, description, help, url, comment, change
         resource_loc = rose.resource.ResourceLocator(paths=sys.path)
@@ -172,6 +172,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             help = meta.get(rose.META_PROP_HELP, '')
             url = meta.get(rose.META_PROP_URL, '')
             title = meta[rose.META_PROP_TITLE]
+            duplicate = meta.get(rose.META_PROP_DUPLICATE, '')
             new_row = self.data_store.append(row, [self.null_icon,
                                                    self.null_icon,
                                                    title,
@@ -182,7 +183,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                                                    help,
                                                    url,
                                                    comment,
-                                                   change])
+                                                   change,
+                                                   duplicate])
             if type(value) is dict:
                 newer_initials = value.items()
                 newer_initials.sort(self.sort_tree_items)
@@ -630,8 +632,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             child_iter = treemodel.iter_children(iter_)
             child_dups = []
             while child_iter is not None:
-                title = treemodel.get_value(child_iter, 2)
-                child_dups.append(title.strip().isdigit())
+                dupl = treemodel.get_value(child_iter, 14)
+                child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)
             if not all(child_dups):
                 self.tree.expand_row(path, open_all=False)
@@ -966,7 +968,6 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def update_tree_model(self, sections=None, variables=None):
         """Update the summary of page data."""
-        print "update tree model"
         if sections is not None:
             self.sections = sections
         if variables is not None:
@@ -1173,7 +1174,8 @@ class BaseSummaryDataPanel(gtk.VBox):
                 return False
             section_base = self.sections.keys()[0].rsplit("(", 1)[0]
             i = 1
-            while section_base + "(" + str(i) + ")" in self.sections:
+            section = section_base + "(" + str(i) + ")"
+            while section in self.sections:
                 i += 1
                 section = section_base + "(" + str(i) + ")"
         self.sub_ops.add_section(section, opt_map=opt_map,
