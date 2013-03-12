@@ -30,47 +30,34 @@
 #     in the rose-suite.conf file.
 #
 # EXAMPLES
-#     rose stem --diffsource=$PWD
-#     rose stem --source=fcm:source_tr@head --task=myjob
-#     rose stem --source=fcm:source_tr@head --source=fcm:othersrc_tr@head 
-#     rose stem --diffsource=. --confsource=fcm:source_tr@head --task=all
-#     rose stem --source=$PWD -C ~/roses/mot-aa121 --task=myjob --task=yourjob
+#     rose stem --task=developer
+#     rose stem --source=/path/to/source --task=myjob
 #
 # OPTIONS
 #     All options of "rose suite-run" are supported. Additional options are:
 #
-#     --confsource=DIR, -c DIR
-#         Specify an alterate top-level source tree directory. 
-#         This may be used to locate 'fcm make' config files. If not set, this
-#         defaults to the first --diffsource set on the command line, or 
-#         the first --source if --diffsource is not specified. This controls
-#         the variables URL_CONFDIR and URL_CONFREV, which are the path and 
-#         revision of the source to take the config file from respectively.
-#     --diffsource=SOURCE, -d SOURCE
-#         Specify a source tree to add to the trunk as a branch. This sets the
-#         variable URL_<project>_DIFF. Multiple branches can be added by
-#         successive uses of this option. The first source tree must be a 
-#         working copy.
 #     --source=SOURCE, -s SOURCE
-#         Specify a source tree to run as the trunk. This sets the variable
-#         URL_<project>. Trunks for different projects can be set by using
-#         multiple --source arguments. The first source tree must be a 
-#         working copy.
+#         Specify a source tree to include in a rose-stem suite. The source 
+#         tree must be a working copy as the location of the suite and fcm-make config files
+#         are taken from it. Defaults to '.' if not specified.
 #     --task=TASK, -t TASK
-#         Specify a task name or group to run. This sets the variable RUN_NAMES
-#         which is a Python list of jobs (or groups of jobs) to run.
+#         Specify a task name or group to run. 
 #
-# PROJECT NAME RULES
+# JINJA2 VARIABLES
 #
-#     The project name is derived from the output of the 'fcm loc-layout' 
-#     command. The target is taken from the output, and the first two elements 
-#     after the machine name are taken as the project with the following rules:
-#         * If the first element ends in _svn, this is stripped off
-#         * If the two elements are identical, ignore the second element
-#         * If only one element is present, use only that.
-#         * Project names are always converted to uppercase.
-#     Running with increased verbosity (-v) will report the variables which are
-#     being set by rose stem.
+#     Note that <project> refers to the FCM keyword name of the repository in
+#     upper case. 
+#
+#     RUN_NAMES
+#         A list of jobs and job groups to run in the rose-stem suite.
+#     SOURCE_<project>
+#         The complete list of source trees for a given project.
+#     SOURCE_<project>_BASE
+#         The base of the project specified on the command line. This is
+#         intended to specify the location of 'fcm-make' config files.
+#     SOURCE_<project>_REV
+#         The revision of the project specified on the command line. This
+#         is intended to specify the revision of 'fcm-make' config files.
 #
 #-------------------------------------------------------------------------------
 exec python -m rose.stem "$@"

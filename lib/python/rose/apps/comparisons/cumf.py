@@ -230,6 +230,9 @@ def get_diff_map(field):
         result = re.search(r"1234567890", line)
         if result:
             inmap = 1
+        result = re.search(r"^\s*\d+\s$", line)
+        if result:
+            inmap = 1
         result = re.search(r"->", line)
         if result and inmap == 1:
             mapline = re.sub(r".*->", r"", line)
