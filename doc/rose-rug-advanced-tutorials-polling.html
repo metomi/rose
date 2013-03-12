@@ -3,6 +3,9 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+  <meta name="generator" content=
+  "HTML Tidy for Linux (vers 14 June 2007), see www.w3.org" />
+
   <title>Rose Advanced Tutorial: polling</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -37,7 +40,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3 <a href=
+      © British Crown Copyright 2012-3 <a href=
       "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
       "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
@@ -76,21 +79,20 @@
 
       <p>This tutorial walks you through using polling.</p>
 
-      <p>Polling allows you to check for some condition to be met prior to 
+      <p>Polling allows you to check for some condition to be met prior to
       running the main command in an app.</p>
     </div>
 
     <div class="slide">
       <h2 id="purpose">Purpose</h2>
 
-      <p>Polling can be used to have a task wait until a particular condition 
-      is met, without the need for additional entries in the dependencies 
+      <p>Polling can be used to have a task wait until a particular condition
+      is met, without the need for additional entries in the dependencies
       graph.</p>
-      
-      <p>Polling commands work much like a normal command except they are
-      run to check some condition has been met prior to running the main 
-      command in an app.</p>
 
+      <p>Polling commands work much like a normal command except they are run
+      to check some condition has been met prior to running the main command in
+      an app.</p>
     </div>
 
     <div class="slide">
@@ -103,30 +105,33 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = """compose_letter => send_letter
-                   bob => read_letter"""
+        graph = """compose_letter =&gt; send_letter
+                   bob =&gt; read_letter"""
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Description</h3>
 
-      <p>This sets up a simple suite which consists of the following:
-      </p>
+      <p>This sets up a simple suite which consists of the following:</p>
+
       <ul>
         <li>a <samp>compose_letter</samp> task</li>
-        <li>a <samp>send_letter</samp> task which is run once the letter 
-        is composed</li>  
-        <li>a <samp>bob</samp> task which we will be using to poll with.</li> 
-        <li>a <samp>read_letter</samp> task which will run once the polling 
-        task is complete.</li>
+
+        <li>a <samp>send_letter</samp> task which is run once the letter is
+        composed</li>
+
+        <li>a <samp>bob</samp> task which we will be using to poll with</li>
+
+        <li>a <samp>read_letter</samp> task which will run once the polling
+        task is complete</li>
       </ul>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Runtime</h3>
 
-      <p>It will need some runtime. Add the following to your 
+      <p>It will need some runtime. Add the following to your
       <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
 [runtime]
@@ -140,8 +145,14 @@
     [[send_letter]]
         environment scripting = "eval `rose task-env`"
         command scripting = """sleep 5;
-                               echo 'Hello Bob, how are you?' > $ROSE_DATA/letter.txt;
+                               echo 'Hello Bob' &gt; $ROSE_DATA/letter.txt;
                                sleep 10"""
+</pre>
+    </div>
+    <div class="slide">
+      <h3 class="alwayshidden">Runtime (2)</h3>
+
+      <pre class="prettyprint lang-cylc">    
     [[bob]]
         environment scripting = "eval `rose task-env`"
         command scripting = "rose task-run"
@@ -154,21 +165,20 @@
 
     <div class="slide">
       <h2 id="example-trigger">Adding polling</h2>
+
       <p>In the suite directory create an <samp>app</samp> directory.</p>
-      
-      <p>In the <samp>app</samp> directory create a directory called 
+
+      <p>In the <samp>app</samp> directory create a directory called
       <samp>bob</samp>.</p>
-      
-      <p>In the newly created <samp>bob</samp> directory, create a 
-      <samp>rose-app.conf</samp> file.
 
-    </div>    
+      <p>In the newly created <samp>bob</samp> directory, create a
+      <samp>rose-app.conf</samp> file.</p>
+    </div>
 
-    <div class ="slide">
+    <div class="slide">
       <h3 class="alwayshidden">Adding polling (2)</h3>
-      
+
       <p>Edit the <samp>rose-app.conf</samp> file to look like this:</p>
-    
       <pre class="prettyprint lang-cylc">
 [poll]
 delays=10*5s
@@ -179,61 +189,53 @@ default=echo 'Ooh, a letter!'
 </pre>
     </div>
 
-    <div class ="slide">
+    <div class="slide">
       <h3 class="alwayshidden">Adding polling (3)</h3>
-      
+
       <p>We now have an app that does the following:</p>
-      
+
       <ul>
-        <li>has a polling <samp>test</samp> that checks for the existence of a 
-        file.</li>
-        <li>polls up to 10 times with 5 second delays between each 
-        attempt.</li>
+        <li>has a polling <samp>test</samp> that checks for the existence of a
+        file</li>
+
+        <li>polls up to 10 times with 5 second delays between each
+        attempt</li>
+
         <li>prints a message once the polling test succeeds</li>
       </ul>
-    
-      <p>N.B. the ordering of the <samp>[poll]</samp> and 
-      <samp>[command]</samp> sections is not important. In practice, it may be 
+
+      <p>N.B. the ordering of the <samp>[poll]</samp> and
+      <samp>[command]</samp> sections is not important. In practice, it may be
       preferable to have the <samp>[command]</samp> section at the top as that
       should contain the main command(s) being run by the app.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Run the suite</h3>
-      
-      <p>Save your changes and run the suite using <samp>rose suite-run</samp>
-      </p>
-      
+
+      <p>Save your changes and run the suite using <samp>rose
+      suite-run</samp></p>
+
       <p>The suite should now run.</p>
 
-      <p>Notice that <samp>bob</samp> finishes and triggers 
-      <samp>read_letter</samp> before <samp>send_letter</samp> has completed. 
-      This is because the polling condition has been met, allowing the main 
+      <p>Notice that <samp>bob</samp> finishes and triggers
+      <samp>read_letter</samp> before <samp>send_letter</samp> has completed.
+      This is because the polling condition has been met, allowing the main
       command in <samp>bob</samp> to be run.</p>
     </div>
 
     <div class="slide">
-      <h2 id="notes">Note on suicide triggers</h2> 
-    
-      <p>While it is possible to have a task suicide triggering itself this is 
-      not recommended and may lead to difficulties if manual interaction with 
-      the suite is required to correct the problem (the task has been removed 
-      from the suite).</p> 
+      <h2 id="notes">Possible uses for polling</h2>
 
-    </div>
-    
-    <div class="slide">
-      <h3 class="alwayshidden">Note on suicide triggers (2)</h3> 
-          
-      <p>Depending on your needs, possible places to put the suicide trigger 
-      are:</p>
+      <p>Depending on your needs, possible uses for polling might include:</p>
+
       <ul>
-        <li>triggering off the success of a recovery task</li>
-        <li>triggering off the final task in a cycle</li>
-        <li>triggering off a cleanup task in the suite</li>
-      </ul>    
+        <li>checking for required output from a long running task rather than
+        waiting for the task to complete</li>
+
+        <li>monitoring output from another suite</li>
+      </ul>
     </div>
-    
   </div>
 </body>
 </html>
