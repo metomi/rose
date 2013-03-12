@@ -26,7 +26,7 @@ import pwd
 import re
 import rose.config
 from rose.popen import RosePopenError
-from rose.reporter import Event
+from rose.reporter import Event, Reporter
 from rose.suite_engine_proc \
         import SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
