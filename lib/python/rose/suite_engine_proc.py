@@ -334,17 +334,23 @@ class SuiteEngineProcessor(object):
             return t
 
         t = self.get_task_props_from_env()
+        
         if kwargs["cycle"] is not None:
-            if t.task_cycle_time:
-                try:
-                    cycle_offset = CycleOffset(kwargs["cycle"])
-                except CycleOffsetError as e:
-                    t.task_cycle_time = kwargs["cycle"]
-                else:
-                    t.task_cycle_time = self._get_offset_cycle_time(
-                            t.task_cycle_time, cycle_offset)
-            else:
+        
+            if (not CycleOffset.REC_TEXT.match(kwargs["cycle"]).group("unit") 
+                and len(kwargs["cycle"]) == 10):
                 t.task_cycle_time = kwargs["cycle"]
+            else:
+                if t.task_cycle_time:
+                    try:
+                        cycle_offset = CycleOffset(kwargs["cycle"])
+                    except CycleOffsetError as e:
+                        t.task_cycle_time = kwargs["cycle"]
+                    else:
+                        t.task_cycle_time = self._get_offset_cycle_time(
+                                t.task_cycle_time, cycle_offset)
+                else:
+                    t.task_cycle_time = kwargs["cycle"]
 
         # Etc directory
         if os.path.exists(os.path.join(t.suite_dir, "etc")):
