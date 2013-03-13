@@ -46,6 +46,10 @@ class WebBrowserEvent(Event):
 
     LEVEL = Event.V
 
+    def __init__(self, *args):
+        Event.__init__(self, *args)
+        self.browser, self.url = args
+
     def __str__(self):
         return "%s %s" % self.args
 
@@ -68,6 +72,14 @@ class SuiteLogViewGenerator(object):
             suite_engine_proc = SuiteEngineProcessor.get_processor(
                     event_handler=event_handler)
         self.suite_engine_proc = suite_engine_proc
+
+    def get_suite_log_url(self, suite_name):
+        """Return the log view URL of the suite.
+
+        Return None if the URL does not exist.
+
+        """
+        return self.suite_engine_proc.get_suite_log_url(suite_name)
 
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
@@ -133,57 +145,48 @@ class SuiteLogViewGenerator(object):
                 "suite_info": suite_info,
                 "tasks": {},
                 "updated_at": time()}
-        if os.path.exists(self.suite_engine_proc.SUITE_LOG):
-            suite_log_file = self.suite_engine_proc.SUITE_LOG
-            suite_log_file_size_prev = None
-            suite_log_file_size = os.stat(suite_log_file).st_size
-            while suite_log_file_size != suite_log_file_size_prev:
-                tasks = self.suite_engine_proc.process_suite_log()
-                data["tasks"] = self.suite_engine_proc.process_suite_log()
+        suite_db_file = self.suite_engine_proc.get_suite_db_file(suite_name)
+        if os.path.exists(suite_db_file):
+            suite_db_file_size_prev = None
+            suite_db_file_size = os.stat(suite_db_file).st_size
+            while suite_db_file_size != suite_db_file_size_prev:
+                data["tasks"] = self.suite_engine_proc.get_suite_events(
+                        suite_name)
                 data["updated_at"] = time()
-                suite_log_file_size_prev = suite_log_file_size
-                suite_log_file_size = os.stat(suite_log_file).st_size
+                suite_db_file_size_prev = suite_db_file_size
+                suite_db_file_size = os.stat(suite_db_file).st_size
         f = open("JOB.json", "w")
         json.dump(data, f, indent=0)
         f.close()
         self.handle_event(FileSystemEvent("update", "JOB.json"))
         return
 
-    def update_task_log(self, suite_name, task_ids=None):
+    def update_job_log(self, suite_name, task_ids=None):
         """Update the log(s) of tasks in suite_name.
 
         If "task_ids" is None, update the logs for all tasks.
 
         """
-        return self._chdir(self._update_task_log, suite_name, task_ids)
+        return self._chdir(self._update_job_log, suite_name, task_ids)
 
-    def _update_task_log(self, suite_name, task_ids=None):
-        users_and_hosts_and_tags = []
-        if task_ids:
-            for task_id in task_ids:
-                name, cycle = task_id.split(
-                        self.suite_engine_proc.TASK_ID_DELIM)
-                user_and_host = self.suite_engine_proc.get_task_auth(
-                        suite_name, name)
-                if user_and_host is None:
-                    continue
-                user, host = user_and_host
-                tag = self.suite_engine_proc.TASK_LOG_DELIM.join([name, cycle])
-                users_and_hosts_and_tags.append((user, host, tag))
-        else:
-            users_and_hosts = self.suite_engine_proc.get_tasks_auths(suite_name)
-            for user, host in users_and_hosts:
-                users_and_hosts_and_tags.append((user, host, ""))
+    def _update_job_log(self, suite_name, task_ids=None):
+        return self.suite_engine_proc.update_job_log(suite_name, task_ids)
 
-        log_dir_rel = self.suite_engine_proc.get_task_log_dir_rel(suite_name)
-        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
-        for user, host, tag in users_and_hosts_and_tags:
-            r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, tag)
-            cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
-            try:
-                out, err = self.popen(*cmd)
-            except RosePopenError as e:
-                self.handle_event(e, level=Reporter.WARN)
+    def view_suite_log_url(self, suite_name):
+        """Launch web browser to view suite log.
+
+        Return URL of suite log on success, None otherwise.
+
+        """
+        if not os.getenv("DISPLAY"):
+            return
+        url = self.suite_engine_proc.get_suite_log_url(suite_name)
+        if not url:
+            return
+        w = webbrowser.get()
+        w.open(url, new=True, autoraise=True)
+        self.handle_event(WebBrowserEvent(w.name, url))
+        return url
 
 
 def main():
@@ -209,15 +212,11 @@ def suite_log_view(opts, args, report=None):
     else:
         suite_name = os.path.basename(os.getcwd())
     if opts.full_mode:
-        gen.update_task_log(suite_name)
+        gen.update_job_log(suite_name)
     elif args:
-        gen.update_task_log(suite_name, tasks=args)
+        gen.update_job_log(suite_name, tasks=args)
     gen(suite_name)
-    if os.getenv("DISPLAY") and opts.web_browser_mode:
-        w = webbrowser.get()
-        url = gen.suite_engine_proc.get_suite_log_url(suite_name)
-        gen.handle_event(WebBrowserEvent(w.name, url))
-        w.open_new_tab(url)
+    return gen.view_suite_log_url(suite_name)
 
 
 if __name__ == "__main__":

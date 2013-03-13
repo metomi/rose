@@ -56,21 +56,21 @@ RESULT_MENU_UNGROUP = "Ungroup"
 RESULT_MENU_VIEW_OUTPUT_SUITE = "View Output"
 RESULT_MENU_VIEW_SOURCE_SUITE = "View Web"
 
-TOGGLE_ACTION_VIEW_ALL_REVISIONS = 'Toggle view all revisions'
-TOGGLE_ACTION_VIEW_SEARCH_HISTORY = 'Show search history'
+TOGGLE_ACTION_VIEW_ALL_REVISIONS = "Toggle view all revisions"
+TOGGLE_ACTION_VIEW_SEARCH_HISTORY = "Show search history"
 
-TOP_MENU_ABOUT = '_About'
-TOP_MENU_CLEAR_HISTORY = 'Clear history'
-TOP_MENU_EDIT = '_Edit'
+TOP_MENU_ABOUT = "_About"
+TOP_MENU_CLEAR_HISTORY = "Clear history"
+TOP_MENU_EDIT = "_Edit"
 TOP_MENU_FILE = "_File"
-TOP_MENU_GUI_HELP = '_GUI Help'
-TOP_MENU_HELP = '_Help'
-TOP_MENU_HISTORY = 'Hi_story'
-TOP_MENU_NEW_SUITE = '_New Suite...'
-TOP_MENU_PREFERENCES = '_Preferences'
-TOP_MENU_QUIT = '_Quit'
-TOP_MENU_SOURCE = '_Data source'
-TOP_MENU_VIEW = '_View'
+TOP_MENU_GUI_HELP = "_GUI Help"
+TOP_MENU_HELP = "_Help"
+TOP_MENU_HISTORY = "Hi_story"
+TOP_MENU_NEW_SUITE = "_New Suite..."
+TOP_MENU_PREFERENCES = "_Preferences"
+TOP_MENU_QUIT = "_Quit"
+TOP_MENU_SOURCE = "_Data source"
+TOP_MENU_VIEW = "_View"
 
 # Button strings
 
@@ -104,7 +104,7 @@ STATUS_GOT = "{0} records found at {1}"
 STATUS_LOCAL_GOT = "{0} local suites found at {1}" 
 STATUS_NO_LOCAL_SUITES = "No local suites could be found {0}"
 STATUS_OPENING_HELP = "Opened help in browser"
-STATUS_OPENING_LOG = "Opened suite output in browser"
+STATUS_OPENING_LOG = "Opened web browser on {0}"
 STATUS_OPENING_WEB = "Opened suite web view"
 STATUS_SOURCE_CHANGED = "Data source changed to {0}"
 STATUS_UPDATE = "updating view..."
@@ -192,16 +192,16 @@ TITLE_HISTORY_NAVIGATION_ERROR = "History navigation error"
 TITLE_INVALID_QUERY = "Error"
 
 # Miscellaneous
-COPYRIGHT = '(C) British Crown Copyright 2012-3 Met Office.'
+COPYRIGHT = "(C) British Crown Copyright 2012-3 Met Office."
 DEFAULT_QUERY = "list_my_suites"
 DELIM_KEYVAL = ": "
 HELP_FILE = "rose-rug-rosie-go.html"
 HISTORY_LOCATION = "~/.metomi/rosie-browse.history"
-ICON_PATH_WINDOW = 'etc/images/rosie-icon-trim.png'
+ICON_PATH_WINDOW = "etc/images/rosie-icon-trim.png"
 ICON_PATH_SCHEDULER = None
-LOGO_PATH = 'etc/images/rose-logo.png'
+LOGO_PATH = "etc/images/rose-logo.png"
 PROGRAM_NAME = "rosie go"
-PROJECT_URL = None
+PROJECT_URL = "http://github.com/metomi/rose/"
 SHOULD_SHOW_ADVANCED_CONTROLS = False
 SIZE_ADDRESS = 10
 SIZE_HISTORY = 100

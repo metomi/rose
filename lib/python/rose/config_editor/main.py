@@ -2045,7 +2045,7 @@ def spawn_window(config_directory_path=None):
                                                         number_of_events)
     try:
         MainController(config_directory_path,
-                       loader_update=splash_screen.update)
+                       loader_update=splash_screen)
     except BaseException as e:
         splash_screen.stop()
         raise e

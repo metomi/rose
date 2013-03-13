@@ -45,16 +45,16 @@ ACCEL_TERMINAL = "<Ctrl>T"
 ACCEL_HELP_GUI = "F1"
 
 # Menu or panel strings
-ADD_MENU_BLANK = 'Add blank variable'
-ADD_MENU_BLANK_MULTIPLE = 'Add blank variable...'
-ADD_MENU_META = 'Add latent variable'
+ADD_MENU_BLANK = "Add blank variable"
+ADD_MENU_BLANK_MULTIPLE = "Add blank variable..."
+ADD_MENU_META = "Add latent variable"
 ICON_PATH_SCHEDULER = None
-TAB_MENU_CLOSE = 'Close'
-TAB_MENU_HELP = 'Help'
-TAB_MENU_EDIT = 'Edit comments'
+TAB_MENU_CLOSE = "Close"
+TAB_MENU_HELP = "Help"
+TAB_MENU_EDIT = "Edit comments"
 TAB_MENU_INFO = "Info"
-TAB_MENU_OPEN_NEW = 'Open in a new window'
-TAB_MENU_WEB_HELP = 'Web Help'
+TAB_MENU_OPEN_NEW = "Open in a new window"
+TAB_MENU_WEB_HELP = "Web Help"
 TOP_MENU_FILE = "_File"
 TOP_MENU_FILE_NEW = "_New"
 TOP_MENU_FILE_OPEN = "_Open..."
@@ -116,30 +116,30 @@ TOOLBAR_SUITE_GCONTROL = "Launch Suite Control GUI"
 TOOLBAR_SUITE_RUN = "Run suite"
 TOOLBAR_SUITE_RUN_MENU = "Run suite ..."
 TOOLBAR_VIEW_OUTPUT = "View Output"
-TREE_PANEL_TITLE = 'Index'
-TREE_PANEL_ADD_SECTION = '_Add new section...'
-TREE_PANEL_AUTOFIX_CONFIG = '_Auto-fix configuration'
-TREE_PANEL_CLONE_SECTION = '_Clone this section'
-TREE_PANEL_EDIT_SECTION = 'Edit section comments...'
-TREE_PANEL_ENABLE_SECTION = '_Enable a section...'
-TREE_PANEL_IGNORE_SECTION = '_Ignore a section...'
-TREE_PANEL_INFO_SECTION = 'I_nfo'
-TREE_PANEL_HELP_SECTION = '_Help'
+TREE_PANEL_TITLE = "Index"
+TREE_PANEL_ADD_SECTION = "_Add new section..."
+TREE_PANEL_AUTOFIX_CONFIG = "_Auto-fix configuration"
+TREE_PANEL_CLONE_SECTION = "_Clone this section"
+TREE_PANEL_EDIT_SECTION = "Edit section comments..."
+TREE_PANEL_ENABLE_SECTION = "_Enable a section..."
+TREE_PANEL_IGNORE_SECTION = "_Ignore a section..."
+TREE_PANEL_INFO_SECTION = "I_nfo"
+TREE_PANEL_HELP_SECTION = "_Help"
 TREE_PANEL_NEW_CONFIG = "_Create new configuration..."
-TREE_PANEL_REMOVE = '_Remove'
-TREE_PANEL_URL_SECTION = '_Web Help'
+TREE_PANEL_REMOVE = "_Remove"
+TREE_PANEL_URL_SECTION = "_Web Help"
 TREE_PANEL_KBD_TIMEOUT = 600
 MACRO_MENU_ALL_VALIDATORS = "All Validators"
 MACRO_MENU_ALL_VALIDATORS_TIP = "Run all available validator macros."
-VAR_MENU_ADD = '_Add to configuration'
+VAR_MENU_ADD = "_Add to configuration"
 VAR_MENU_EDIT_COMMENTS = "Edit _comments"
 VAR_MENU_FIX_IGNORE = "Auto-Fix Error"
-VAR_MENU_ENABLE = '_Enable'
-VAR_MENU_HELP = '_Help'
-VAR_MENU_IGNORE = '_User-Ignore'
-VAR_MENU_INFO = 'I_nfo'
-VAR_MENU_REMOVE = '_Remove'
-VAR_MENU_URL = '_Web Help'
+VAR_MENU_ENABLE = "_Enable"
+VAR_MENU_HELP = "_Help"
+VAR_MENU_IGNORE = "_User-Ignore"
+VAR_MENU_INFO = "I_nfo"
+VAR_MENU_REMOVE = "_Remove"
+VAR_MENU_URL = "_Web Help"
 # Button strings
 LABEL_EDIT = "edit"
 LABEL_PAGE_HELP = "Page help"
@@ -163,41 +163,41 @@ CHOICE_TITLE_INCLUDED = "Included"
 # Error and warning strings
 ERROR_ADD_FILE = "Could not add file {0}: {1}"
 ERROR_BAD_NAME = "{0}: invalid name"
-ERROR_BAD_TRIGGER = ('{0}\nfor <b>{1}</b>\n'
-                     'from the configuration <b>{2}</b>. '
-                     '\nDisabling triggers for this configuration.')
-ERROR_BAD_MACRO_RETURN = 'Bad return value {0}'
+ERROR_BAD_TRIGGER = ("{0}\nfor <b>{1}</b>\n"
+                     "from the configuration <b>{2}</b>. "
+                     "\nDisabling triggers for this configuration.")
+ERROR_BAD_MACRO_RETURN = "Bad return value {0}"
 ERROR_CONFIG_CREATE = ("Error creating application config at {0}:" +
                        "\n  {1}, {2}")
 ERROR_CONFIG_CREATE_TITLE = "Error in creating configuration"
 ERROR_CONFIG_DELETE = ("Error deleting application config at {0}:" +
                        "\n  {1}, {2}")
 ERROR_CONFIG_DELETE_TITLE = "Error in deleting configuration"
-ERROR_ID_NOT_FOUND = 'Could not find resource: {0}'
-ERROR_FILE_DELETE_FAILED = 'Delete failed. {0}'
-ERROR_IMPORT_CLASS = 'Could not retrieve class {0}'
-ERROR_IMPORT_WIDGET = 'Could not import widget: {0}'
-ERROR_IMPORT_WIDGET_TITLE = 'Error importing widget.'
-ERROR_LOAD_SYNTAX = 'Could not load path: {0}\n\nSyntax error:\n{0}\n{1}'
+ERROR_ID_NOT_FOUND = "Could not find resource: {0}"
+ERROR_FILE_DELETE_FAILED = "Delete failed. {0}"
+ERROR_IMPORT_CLASS = "Could not retrieve class {0}"
+ERROR_IMPORT_WIDGET = "Could not import widget: {0}"
+ERROR_IMPORT_WIDGET_TITLE = "Error importing widget."
+ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
-ERROR_MIN_PYGTK_VERSION = 'Requires PyGTK version {0}, found {1}.'
-ERROR_MIN_PYGTK_VERSION_TITLE = 'Need later PyGTK version to run'
-ERROR_NO_OUTPUT = 'No output found for {0}'
-ERROR_NOT_FOUND = 'Could not find path: {0}'
-ERROR_NOT_REGEX = 'Could not compile expression: {0}\nError info: {1}'
-ERROR_ORPHAN_SECTION = 'Orphaned section: will not be output in a file.'
-ERROR_ORPHAN_SECTION_TIP = 'Error: orphaned section!'
+ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
+ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
+ERROR_NO_OUTPUT = "No output found for {0}"
+ERROR_NOT_FOUND = "Could not find path: {0}"
+ERROR_NOT_REGEX = "Could not compile expression: {0}\nError info: {1}"
+ERROR_ORPHAN_SECTION = "Orphaned section: will not be output in a file."
+ERROR_ORPHAN_SECTION_TIP = "Error: orphaned section!"
 ERROR_REMOVE_FILE = "Could not remove file {0}: {1}"
-ERROR_RUN_MACRO_TITLE = 'Error in running {0}'
+ERROR_RUN_MACRO_TITLE = "Error in running {0}"
 ERROR_SUITE_RUN_INVALID = "Could not run suite - no suite config loaded."
-ERROR_SAVE_PATH_FAIL = 'Could not save to path!\n {0}'
-IGNORED_STATUS_CONFIG = 'from configuration.'
-IGNORED_STATUS_DEFAULT = 'from default.'
-IGNORED_STATUS_MANUAL = 'from manual intervention.'
-IGNORED_STATUS_MACRO = 'from macro.'
-PAGE_WARNING = 'Error ({0}): {1}'
-PAGE_WARNING_IGNORED_SECTION = 'Section {0} is ignored.'
-PAGE_WARNING_IGNORED_SECTION_TIP = 'Ignored section'
+ERROR_SAVE_PATH_FAIL = "Could not save to path!\n {0}"
+IGNORED_STATUS_CONFIG = "from configuration."
+IGNORED_STATUS_DEFAULT = "from default."
+IGNORED_STATUS_MANUAL = "from manual intervention."
+IGNORED_STATUS_MACRO = "from macro."
+PAGE_WARNING = "Error ({0}): {1}"
+PAGE_WARNING_IGNORED_SECTION = "Section {0} is ignored."
+PAGE_WARNING_IGNORED_SECTION_TIP = "Ignored section"
 PAGE_WARNING_NO_CONTENT = "This page has no associated data."
 PAGE_WARNING_NO_CONTENT_TIP = ("No associated configuration or summary data " +
                                "for this page.")
@@ -210,41 +210,41 @@ WARNING_FILE_DELETE = ("Not a configuration file entry!\n" +
                        "This file must be manually removed" +
                        " in the filesystem:\n {0}.")
 WARNING_FILE_DELETE_TITLE = "Can't remove filesystem file"
-WARNING_CANNOT_ENABLE = 'Warning - cannot override a trigger setting: {0}'
+WARNING_CANNOT_ENABLE = "Warning - cannot override a trigger setting: {0}"
 WARNING_CANNOT_ENABLE_TITLE = "Warning - can't enable"
-WARNING_CANNOT_IGNORE = 'Warning - cannot override a trigger setting: {0}'
+WARNING_CANNOT_IGNORE = "Warning - cannot override a trigger setting: {0}"
 WARNING_CANNOT_IGNORE_TITLE = "Warning - can't ignore"
-WARNING_CANNOT_USER_IGNORE = 'Warning - cannot override this setting: {0}'
-WARNING_NOT_ENABLED = 'Should be enabled from '
-WARNING_NOT_FOUND = 'No results'
+WARNING_CANNOT_USER_IGNORE = "Warning - cannot override this setting: {0}"
+WARNING_NOT_ENABLED = "Should be enabled from "
+WARNING_NOT_FOUND = "No results"
 WARNING_NOT_FOUND_TITLE = "Couldn't find it"
-WARNING_NOT_IGNORED = 'Should be ignored '
-WARNING_NOT_TRIGGER = 'Not part of the trigger mechanism'
-WARNING_USER_NOT_TRIGGER_IGNORED = 'User-ignored, but should be trigger-ignored'
-WARNING_NOT_USER_IGNORABLE = 'User-ignored, but is compulsory'
-WARNING_TYPE_ENABLED = 'enabled'
-WARNING_TYPE_TRIGGER_IGNORED = 'trigger-ignored'
-WARNING_TYPE_USER_IGNORED = 'user-ignored'
-WARNING_TYPE_NOT_TRIGGER = 'trigger'
+WARNING_NOT_IGNORED = "Should be ignored "
+WARNING_NOT_TRIGGER = "Not part of the trigger mechanism"
+WARNING_USER_NOT_TRIGGER_IGNORED = "User-ignored, but should be trigger-ignored"
+WARNING_NOT_USER_IGNORABLE = "User-ignored, but is compulsory"
+WARNING_TYPE_ENABLED = "enabled"
+WARNING_TYPE_TRIGGER_IGNORED = "trigger-ignored"
+WARNING_TYPE_USER_IGNORED = "user-ignored"
+WARNING_TYPE_NOT_TRIGGER = "trigger"
 WARNING_TYPES_IGNORE = [WARNING_TYPE_ENABLED, WARNING_TYPE_TRIGGER_IGNORED,
                         WARNING_TYPE_USER_IGNORED, WARNING_TYPE_NOT_TRIGGER]
 
-# Special metadata 'type' values
-FILE_TYPE_FORMATS = 'formats'
-FILE_TYPE_INTERNAL = 'file_int'
-FILE_TYPE_NORMAL = 'file'
-FILE_TYPE_TOP = 'suite'
+# Special metadata "type" values
+FILE_TYPE_FORMATS = "formats"
+FILE_TYPE_INTERNAL = "file_int"
+FILE_TYPE_NORMAL = "file"
+FILE_TYPE_TOP = "suite"
 
-META_PROP_INTERNAL = '_internal'
+META_PROP_INTERNAL = "_internal"
 
 # Setting visibility modes
-SHOW_MODE_FIXED = 'fixed'
-SHOW_MODE_FLAG_OPTIONAL = 'flag:optional'
-SHOW_MODE_FLAG_NO_META = 'flag:no-meta'
-SHOW_MODE_IGNORED = 'ignored'
-SHOW_MODE_USER_IGNORED = 'user-ignored'
-SHOW_MODE_LATENT = 'latent'
-SHOW_MODE_NO_TITLE = 'title'
+SHOW_MODE_FIXED = "fixed"
+SHOW_MODE_FLAG_OPTIONAL = "flag:optional"
+SHOW_MODE_FLAG_NO_META = "flag:no-meta"
+SHOW_MODE_IGNORED = "ignored"
+SHOW_MODE_USER_IGNORED = "user-ignored"
+SHOW_MODE_LATENT = "latent"
+SHOW_MODE_NO_TITLE = "title"
 
 SHOULD_SHOW_FLAG_OPTIONAL = False
 SHOULD_SHOW_FLAG_NO_META = False
@@ -272,44 +272,44 @@ STACK_GROUP_DELETE = "Delete"
 STACK_GROUP_RENAME = "Rename"
 STACK_GROUP_REORDER = "Reorder"
 
-STACK_ACTION_ADDED = 'Added'
-STACK_ACTION_CHANGED = 'Changed'
-STACK_ACTION_CHANGED_COMMENTS = 'Changed #'
-STACK_ACTION_ENABLED = 'Enabled'
-STACK_ACTION_IGNORED = 'Ignored'
-STACK_ACTION_REMOVED = 'Removed'
+STACK_ACTION_ADDED = "Added"
+STACK_ACTION_CHANGED = "Changed"
+STACK_ACTION_CHANGED_COMMENTS = "Changed #"
+STACK_ACTION_ENABLED = "Enabled"
+STACK_ACTION_IGNORED = "Ignored"
+STACK_ACTION_REMOVED = "Removed"
 
-COLOUR_STACK_ADDED = 'green'
-COLOUR_STACK_CHANGED = 'blue'
-COLOUR_STACK_CHANGED_COMMENTS = 'dark blue'
-COLOUR_STACK_ENABLED = 'light green'
-COLOUR_STACK_IGNORED = 'grey'
-COLOUR_STACK_REMOVED = 'red'
+COLOUR_STACK_ADDED = "green"
+COLOUR_STACK_CHANGED = "blue"
+COLOUR_STACK_CHANGED_COMMENTS = "dark blue"
+COLOUR_STACK_ENABLED = "light green"
+COLOUR_STACK_IGNORED = "grey"
+COLOUR_STACK_REMOVED = "red"
 
-COLOUR_MACRO_CHANGED = 'blue'
-COLOUR_MACRO_ERROR = 'red'
-COLOUR_MACRO_WARNING = 'orange'
+COLOUR_MACRO_CHANGED = "blue"
+COLOUR_MACRO_ERROR = "red"
+COLOUR_MACRO_WARNING = "orange"
 
-STACK_COL_NS = 'Namespace'
-STACK_COL_ACT = 'Action'
-STACK_COL_NAME = 'Name'
-STACK_COL_VALUE = 'Value'
-STACK_COL_OLD_VALUE = 'Old Value'
+STACK_COL_NS = "Namespace"
+STACK_COL_ACT = "Action"
+STACK_COL_NAME = "Name"
+STACK_COL_VALUE = "Value"
+STACK_COL_OLD_VALUE = "Old Value"
 
 COLOUR_VALUEWIDGET_BASE_SELECTED = "GhostWhite"
-COLOUR_VARIABLE_CHANGED = 'blue'
-COLOUR_VARIABLE_TEXT_ERROR = 'dark red'
-COLOUR_VARIABLE_TEXT_IRRELEVANT = 'light grey'
-COLOUR_VARIABLE_TEXT_VAL_ENV = 'purple4'
+COLOUR_VARIABLE_CHANGED = "blue"
+COLOUR_VARIABLE_TEXT_ERROR = "dark red"
+COLOUR_VARIABLE_TEXT_IRRELEVANT = "light grey"
+COLOUR_VARIABLE_TEXT_VAL_ENV = "purple4"
 
 # Dialog text
-DIALOG_BODY_ADD_CONFIG = 'Choose configuration to add to'
-DIALOG_BODY_ADD_SECTION = 'Specify new configuration section name'
-DIALOG_BODY_IGNORE_ENABLE_CONFIG = 'Choose configuration'
-DIALOG_BODY_IGNORE_SECTION = 'Choose the section to ignore'
-DIALOG_BODY_ENABLE_SECTION = 'Choose the section to enable'
-DIALOG_BODY_FILE_ADD = 'The file {0} will be added at your next save.'
-DIALOG_BODY_FILE_REMOVE = 'The file {0} will be deleted at your next save.'
+DIALOG_BODY_ADD_CONFIG = "Choose configuration to add to"
+DIALOG_BODY_ADD_SECTION = "Specify new configuration section name"
+DIALOG_BODY_IGNORE_ENABLE_CONFIG = "Choose configuration"
+DIALOG_BODY_IGNORE_SECTION = "Choose the section to ignore"
+DIALOG_BODY_ENABLE_SECTION = "Choose the section to enable"
+DIALOG_BODY_FILE_ADD = "The file {0} will be added at your next save."
+DIALOG_BODY_FILE_REMOVE = "The file {0} will be deleted at your next save."
 DIALOG_BODY_MACRO_CHANGES = "<b>{0} {1}</b>\n    {2}\n"
 DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH = 150  # Must > raw CHANGES text above
 DIALOG_BODY_MACRO_CHANGES_NUM_HEIGHT = 3  # > Number, needs more height.
@@ -350,7 +350,7 @@ DIALOG_TITLE_ERROR = "Error"
 DIALOG_TITLE_IGNORE = "Ignore section"
 DIALOG_TITLE_INFO = "Information"
 DIALOG_TITLE_OPEN = "Open configuration"
-DIALOG_TITLE_MACRO_CHANGES = 'Accept changes made by {0}?'
+DIALOG_TITLE_MACRO_CHANGES = "Accept changes made by {0}?"
 DIALOG_TITLE_META_LOAD_ERROR = "Error loading metadata."
 DIALOG_TITLE_NL_CASE_WARNING = "Mixed-case warning"
 DIALOG_TITLE_PREFERENCES = "Configure preferences"
@@ -366,7 +366,7 @@ DIALOG_NODE_INFO_METADATA = ("<span foreground='blue'>" +
                                  "Metadata</span>\n")
 DIALOG_NODE_INFO_MAX_LEN = 80
 DIALOG_NODE_INFO_SUB_ATTRIBUTE = "<i>{0}:</i>"
-STACK_VIEW_TITLE = 'Undo and Redo Stack Viewer'
+STACK_VIEW_TITLE = "Undo and Redo Stack Viewer"
 
 # Page names
 
@@ -407,48 +407,48 @@ FILE_CONTENT_PANEL_TITLE = "Available sections"
 
 # Tooltip (hover-over) text
 
-TREE_PANEL_TIP_ADDED_CONFIG = 'Added configuration since the last save'
-TREE_PANEL_TIP_ADDED_VARS = 'Added variable(s) since the last save'
-TREE_PANEL_TIP_CHANGED_CONFIG = 'Modified since the last save'
-TREE_PANEL_TIP_CHANGED_SECTIONS = 'Modified section data since the last save'
-TREE_PANEL_TIP_CHANGED_VARS = 'Modified variable data since the last save'
-TREE_PANEL_TIP_DIFF_SECTIONS = 'Added/removed sections since the last save'
-TREE_PANEL_TIP_REMOVED_VARS = 'Removed variable(s) since the last save'
+TREE_PANEL_TIP_ADDED_CONFIG = "Added configuration since the last save"
+TREE_PANEL_TIP_ADDED_VARS = "Added variable(s) since the last save"
+TREE_PANEL_TIP_CHANGED_CONFIG = "Modified since the last save"
+TREE_PANEL_TIP_CHANGED_SECTIONS = "Modified section data since the last save"
+TREE_PANEL_TIP_CHANGED_VARS = "Modified variable data since the last save"
+TREE_PANEL_TIP_DIFF_SECTIONS = "Added/removed sections since the last save"
+TREE_PANEL_TIP_REMOVED_VARS = "Removed variable(s) since the last save"
 
-KEY_TIP_ADDED = 'Added since the last save.'
-KEY_TIP_CHANGED = 'Modified since the last save, old value {0}'
-KEY_TIP_CHANGED_COMMENTS = 'Modified comments since the last save.'
-KEY_TIP_ENABLED = 'Enabled since the last save.'
+KEY_TIP_ADDED = "Added since the last save."
+KEY_TIP_CHANGED = "Modified since the last save, old value {0}"
+KEY_TIP_CHANGED_COMMENTS = "Modified comments since the last save."
+KEY_TIP_ENABLED = "Enabled since the last save."
 KEY_TIP_SECTION_IGNORED = "Section ignored since the last save."
-KEY_TIP_TRIGGER_IGNORED = 'Trigger ignored since the last save.'
-KEY_TIP_MISSING = 'Removed since the last save.'
-KEY_TIP_USER_IGNORED = 'User ignored since the last save.'
+KEY_TIP_TRIGGER_IGNORED = "Trigger ignored since the last save."
+KEY_TIP_MISSING = "Removed since the last save."
+KEY_TIP_USER_IGNORED = "User ignored since the last save."
 TIP_CONFIG_CHOOSE_META = "Enter a metadata identifier for the new config"
 TIP_CONFIG_CHOOSE_NAME = "Enter a directory name for the new config."
 TIP_CONFIG_CHOOSE_NAME_ERROR = "Invalid directory name for the new config."
-TIP_ADD_TO_PAGE = 'Add to page...'
-TIP_REVERT_PAGE = 'Revert page to last save'
-TIP_SUITE_RUN_ARG = 'Enter extra suite run arguments'
+TIP_ADD_TO_PAGE = "Add to page..."
+TIP_REVERT_PAGE = "Revert page to last save"
+TIP_SUITE_RUN_ARG = "Enter extra suite run arguments"
 TIP_VALUE_ADD_URI = "Add a URI - for example a file path, or a web url"
-TREE_PANEL_ERROR = ' (1 error)'
-TREE_PANEL_ERRORS = ' ({0} errors)'
-TREE_PANEL_MODIFIED = ' (modified)'
-TERMINAL_TIP_CLOSE = 'Close terminal'
+TREE_PANEL_ERROR = " (1 error)"
+TREE_PANEL_ERRORS = " ({0} errors)"
+TREE_PANEL_MODIFIED = " (modified)"
+TERMINAL_TIP_CLOSE = "Close terminal"
 VAR_COMMENT_TIP = "# {0}"
-VAR_FLAG_TIP_FIXED = 'Fixed variable (only one allowed value)'
+VAR_FLAG_TIP_FIXED = "Fixed variable (only one allowed value)"
 VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
-VAR_MENU_TIP_ERROR = 'Error '
-VAR_MENU_TIP_LATENT = 'This variable could be added to the configuration.'
-VAR_MENU_TIP_WARNING = 'Warning '
+VAR_MENU_TIP_ERROR = "Error "
+VAR_MENU_TIP_LATENT = "This variable could be added to the configuration."
+VAR_MENU_TIP_WARNING = "Warning "
 VAR_MENU_TIP_FIX_IGNORE = "Auto-fix the variable's ignored state error"
-VAR_WIDGET_ENV_INFO = 'Set to environment variable'
+VAR_WIDGET_ENV_INFO = "Set to environment variable"
 
 # Flags for variable widgets
 
 FLAG_TYPE_DEFAULT = "Default flag"
 FLAG_TYPE_ERROR = "Error flag"
-FLAG_TYPE_FIXED = 'Fixed flag'
+FLAG_TYPE_FIXED = "Fixed flag"
 FLAG_TYPE_OPTIONAL = "Optional flag"
 FLAG_TYPE_NO_META = "No metadata flag"
 
@@ -458,17 +458,17 @@ META_PROP_WIDGET = "widget[rose-config-edit]"
 META_PROP_WIDGET_SUB_NS = "widget[rose-config-edit:sub-ns]"
 
 # Miscellaneous
-COPYRIGHT = '(C) British Crown Copyright 2012-3 Met Office.'
-HELP_FILE = 'rose-config-edit.html'
-LAUNCH_COMMAND = 'rose config-edit'
-LAUNCH_COMMAND_CONFIG = 'rose config-edit -C'
-LAUNCH_SUITE_RUN = 'rose suite-run'
-LAUNCH_SUITE_RUN_HELP = 'rose help suite-run'
+COPYRIGHT = "(C) British Crown Copyright 2012-3 Met Office."
+HELP_FILE = "rose-rug-config-edit.html"
+LAUNCH_COMMAND = "rose config-edit"
+LAUNCH_COMMAND_CONFIG = "rose config-edit -C"
+LAUNCH_SUITE_RUN = "rose suite-run"
+LAUNCH_SUITE_RUN_HELP = "rose help suite-run"
 MIN_PYGTK_VERSION = (2, 12, 0)
-PROGRAM_NAME = 'rose edit'
-PROJECT_URL = None
-UNTITLED_NAME = 'Untitled'
-VAR_ID_IN_CONFIG = 'Variable id {0} from the configuration {1}'
+PROGRAM_NAME = "rose edit"
+PROJECT_URL = "http://github.com/metomi/rose/"
+UNTITLED_NAME = "Untitled"
+VAR_ID_IN_CONFIG = "Variable id {0} from the configuration {1}"
 
 
 def false_function(*args):

@@ -273,28 +273,6 @@ class DAO(object):
         """Return the query operators."""
         return self.QUERY_OPERATORS
 
-    def info(self, idx, branch, revision=None):
-        """Return the information of a version of a suite."""
-        self._connect()
-        if revision is None:
-            from_obj, cols = self._get_join_and_columns()
-        else:
-            from_obj, cols = self._get_hist_join_and_columns()
-        idx_column = _col_by_key(from_obj, "idx")
-        branch_column = _col_by_key(from_obj, "branch")
-        if revision is not None:
-            rev_column = _col_by_key(from_obj, "revision")
-        where = (idx_column == idx) & (branch_column == branch)
-        if revision is not None:
-            where &= (rev_column == int(revision)) 
-        
-        statement = from_obj.select(whereclause=where)
-        rows = self._execute(statement)
-        results = self._rows_to_maps(rows, list(from_obj.c))
-        if not results:
-            return {}
-        return results[0]
-
     def query(self, filters, all_revs=False):
         """Return the results of a series of filters on both tables.
 
