@@ -177,8 +177,7 @@ class StemRunner(object):
             raise ProjectNotFoundException(item, stderr)
         result = re.search(r'url:\s*(svn://.*)', output)
         
-        # Split the URL into forward-slash separated items to generate a 
-        # unique name for this project
+        # Generate a unique name for this project based on fcm kp
         if result:
             urlstring = result.group(1)
             rc, kpoutput, stderr = self.popen.run('fcm', 'kp', urlstring)
@@ -187,6 +186,14 @@ class StemRunner(object):
                 project = kpresult.group(1)
         if not project:
             raise ProjectNotFoundException(item)
+
+        result = re.search(r'peg_rev:\s*(.*)', output)
+        if '@' in item and result:
+            revision = '@' + result.group(1)
+            base = re.sub(r'@.*', r'', item)
+        else:
+            revision = ''
+            base = item
 
         # If we're in a subdirectory of the source tree, find it and
         # remove it leaving the top-level location
@@ -199,14 +206,14 @@ class StemRunner(object):
             if result2:
                 subtree = result2.group(1)
                 item = re.sub(subtree, r'', target)
-                
+
         # Remove trailing forwards-slash    
         item = re.sub(r'/$',r'',item)    
-        return project, item                    
+        return project, item, base, revision                    
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
-        dummy, basedir = self._ascertain_project(os.getcwd())
+        dummy, basedir, dummy2, dummy3 = self._ascertain_project(os.getcwd())
         name = os.path.basename(basedir)
         return name
 
@@ -218,7 +225,7 @@ class StemRunner(object):
         if self.opts.source:
             basedir = self.opts.source[0]
         else:
-            dummy, basedir = self._ascertain_project(os.getcwd())
+            dummy, basedir, dum2, dum3 = self._ascertain_project(os.getcwd())
             
         suitedir = os.path.join(basedir, DEFAULT_TEST_DIR)
         suitefile = os.path.join(suitedir, rose.TOP_CONFIG_NAME)
@@ -236,7 +243,7 @@ class StemRunner(object):
             self.opts.source = ['.']
 
         for i, url in enumerate(self.opts.source):
-            project, url = self._ascertain_project(url)
+            project, url, base, rev = self._ascertain_project(url)
             self.opts.source[i] = url
             if project in repos:
                 repos[project].append(url)
@@ -250,16 +257,11 @@ class StemRunner(object):
 
         # Add configs source variables for first
         confsource = self.opts.source[0]
-        confproject, url = self._ascertain_project(confsource)
-        conf = confsource.split('@')
-        confrev = ''
-        confsource = conf[0]
-        if len(conf) > 1:
-            confrev = '@' + conf[1]
+        confproject, url, base, rev = self._ascertain_project(confsource)
         self._add_define_option('SOURCE_' + confproject.upper() + '_REV', '"' 
-                                + confrev + '"')
+                                + rev + '"')
         self._add_define_option('SOURCE_' + confproject.upper() + '_BASE', '"'
-                                + confsource + '"')
+                                + base + '"')
 
         # Generate the variable containing tasks to run
         if self.opts.task:
