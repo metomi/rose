@@ -308,11 +308,11 @@ default = echo 'Hello World'
     <div class="slide">
       <h3 class="alwayshidden">Families (2)</h3>
 
-      <p>Families can also be used to help write the dependencies - e.g.
-      to set up a task so that it runs when all the tasks in a family
-      succeed (more later). They can also be used in
-      <a href="rose-rug-advanced-tutorials-queues.html">queues</a> (see
-      the tutorial).</p>
+      <p>Families can also be used to help write the dependencies - e.g. to set
+      up a task so that it runs when all the tasks in a family succeed (more
+      later). They can also be used in <a href=
+      "rose-rug-advanced-tutorials-queues.html">queues</a> (see the
+      tutorial).</p>
     </div>
 
     <div class="slide">
@@ -533,10 +533,10 @@ COMPUTE_HOST = "voyager_1"
 
     <div class="slide">
       <h3 id="multiple-inheritance">Multiple Family Inheritance</h3>
-      
+
       <p>cylc supports multiple inheritance, so tasks can combine useful
-      configuration from more than one separate family. If you set up
-      families like this:</p>
+      configuration from more than one separate family. If you set up families
+      like this:</p>
       <pre class="prettyprint lang-cylc">
     [[FAM_HELLO]]
         [[[environment]]]
@@ -553,7 +553,7 @@ COMPUTE_HOST = "voyager_1"
 
     <div class="slide">
       <h3 class="alwayshidden">Multiple Family Inheritance (2)</h3>
-      
+
       <p>You can inherit them like this:</p>
       <pre class="prettyprint lang-cylc">
     [[hello_eris]]
@@ -581,9 +581,8 @@ COMPUTE_HOST = "voyager_1"
         timeout handler = "rose suite-hook --mail --shutdown"
         timeout = 4320 # 3 days
 </pre>
-
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Event Hooks Explained</h3>
 
@@ -702,15 +701,16 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Dependency Syntax a | b</h3>
 
-      <p>If task <var>c</var> depends on <em>either</em> task <var>a</var> <em>or</em> task
-      <var>b</var>:</p>
+      <p>If task <var>c</var> depends on <em>either</em> task <var>a</var>
+      <em>or</em> task <var>b</var>:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "a | b =&gt; c"
 </pre>
 
-      <p>If <em>both</em> task <var>b</var> <em>and</em> task <var>c</var> depend on task <var>a</var>:</p>
+      <p>If <em>both</em> task <var>b</var> <em>and</em> task <var>c</var>
+      depend on task <var>a</var>:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
@@ -721,7 +721,8 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Dependency Syntax b &amp; c</h3>
 
-      <p>If task <var>b</var> only runs when task <var>a</var> <em>fails</em>:</p>
+      <p>If task <var>b</var> only runs when task <var>a</var>
+      <em>fails</em>:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
@@ -739,8 +740,8 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Dependency Syntax a[T-6]</h3>
 
-      <p>In a cycling suite, with cycles every 6 hours, if task <var>a</var> depends on a
-      previous cycle's task <var>a</var> finishing:</p>
+      <p>In a cycling suite, with cycles every 6 hours, if task <var>a</var>
+      depends on a previous cycle's task <var>a</var> finishing:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
@@ -748,7 +749,8 @@ COMPUTE_HOST = "voyager_1"
             graph = "a[T-6] =&gt; a"
 </pre>
 
-      <p>If task <var>b</var> depends on the previous cycle's task <var>a</var> failing:</p>
+      <p>If task <var>b</var> depends on the previous cycle's task <var>a</var>
+      failing:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
@@ -760,29 +762,29 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Dependency Syntax ( a | b ) &amp; c</h3>
 
-      <p>If task <var>d</var> depends on either task <var>a</var> and task <var>b</var> finishing, together with
-      task <var>c</var>:</p>
+      <p>If task <var>d</var> depends on either task <var>a</var> and task
+      <var>b</var> finishing, together with task <var>c</var>:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "( a | b ) &amp; c =&gt; d"
 </pre>
-
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Dependency Syntax a =&gt; !b</h3>
 
-      <p>If task <var>b</var> is not needed when task <var>a</var> succeeds, it can be <em>suicide
-      triggered</em>:</p>
+      <p>If task <var>b</var> is not needed when task <var>a</var> succeeds, it
+      can be <em>suicide triggered</em>:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "a =&gt; !b"
 </pre>
 
-      <p>Typically, <var>b</var> would be a failure recovery task that should never run
-      if <var>a</var> succeeds. It should be run after <var>a</var> fails:</p>
+      <p>Typically, <var>b</var> would be a failure recovery task that should
+      never run if <var>a</var> succeeds. It should be run after <var>a</var>
+      fails:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
@@ -796,16 +798,16 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h3 class="alwayshidden">Dependency Syntax FAM_A:succeed-any =&gt; b</h3>
 
-      <p>If task <var>b</var> should run when any task in the <var>FAM_A</var> family
-      succeeds:</p>
+      <p>If task <var>b</var> should run when any task in the <var>FAM_A</var>
+      family succeeds:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
         graph = "FAM_A:succeed-any =&gt; B"
 </pre>
 
-      <p>If task <var>b</var> should run when all tasks in the <var>FAM_A</var> family
-      have finished (whether succeeded or failed):</p>
+      <p>If task <var>b</var> should run when all tasks in the <var>FAM_A</var>
+      family have finished (whether succeeded or failed):</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
