@@ -815,8 +815,13 @@ class BaseSummaryDataPanel(gtk.VBox):
     
     Subclasses should provide the following methods:
     def add_cell_renderer_for_value(self, column, column_title)
-    def get_tree_model_and_col_names(self)
-    def get_tree_tip(self, treeview, row_iter, col_index, tip(self)
+    def get_model_data(self)
+    def get_section_column_index(self)
+    def get_tree_cell_status(self, column, cell, model, row_iter):
+    def get_tree_tip(self, treeview, row_iter, col_index, tip):
+
+    Subclasses may provide the following methods:
+    def _get_custom_menu_items(self, path, column, event):
 
     These are described below in their placeholder methods.
 
