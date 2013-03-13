@@ -48,8 +48,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     """
 
-    def __init__(self, namespace_tree):
+    def __init__(self, namespace_tree, get_metadata_func=None):
         super(HyperLinkTreePanel, self).__init__()
+        if get_metadata_func is not None:
+            self.get_metadata_and_comments = get_metadata_func
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         self.panel_top = gtk.TreeViewColumn()
@@ -623,7 +625,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             while child_iter is not None:
                 child_name = self.get_name(treemodel.get_path(child_iter))
                 metadata, comment = self.get_metadata_and_comments(child_name)
-                dupl = metadata.get(rose.META_PROP_DESCRIPTION)
+                dupl = metadata.get(rose.META_PROP_DUPLICATE)
                 child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)
             if not all(child_dups):

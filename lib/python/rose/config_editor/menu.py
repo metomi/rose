@@ -394,6 +394,8 @@ class Handler(object):
         Any option-value pairs in the opt_map dict will also be added.
         
         """
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_ADD + "-" + str(time.time())
         self.sect_ops.add_section(config_name, new_section_name,
                                   no_page_launch=no_page_launch)
         namespace = self.data.get_default_namespace_for_section(
@@ -419,6 +421,8 @@ class Handler(object):
                                          error={})
             self.var_ops.add_var(var, no_update=True)
         self.update_ns_func(namespace)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
         return new_section_name
         
     def copy_request(self, base_ns, new_section=None, no_update=False):

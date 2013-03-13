@@ -266,6 +266,7 @@ SPACING_PAGE = 10
 SPACING_SUB_PAGE = 5
 
 # Stack action names and presentation
+STACK_GROUP_ADD = "Add"
 STACK_GROUP_DELETE = "Delete"
 STACK_GROUP_RENAME = "Rename"
 STACK_GROUP_REORDER = "Reorder"

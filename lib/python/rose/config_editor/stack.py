@@ -78,7 +78,6 @@ class SectionOperations(object):
         self.check_cannot_enable_setting = check_cannot_enable_func
         self.trigger_update = update_ns_func
         self.trigger_info_update = update_info_func
-        self.trigger_comments_update = update_comments_func
         self.search_id_func = search_id_func
         self.view_page_func = view_page_func
         self.kill_page_func = kill_page_func
@@ -253,7 +252,6 @@ class SectionOperations(object):
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
         self.trigger_update(ns)
-        self.trigger_comments_update(ns)
 
     def get_ns_metadata_files(self, namespace):
         """Retrieve filenames within the metadata for this namespace."""

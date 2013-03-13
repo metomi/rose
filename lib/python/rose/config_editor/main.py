@@ -129,7 +129,6 @@ class MainController(object):
                                    self.check_cannot_enable_setting,
                                    self.update_namespace,
                                    self.update_ns_info,
-                                   self.update_ns_comments,
                                    view_page_func=self.view_page,
                                    kill_page_func=self.kill_page)
 
@@ -430,9 +429,8 @@ class MainController(object):
     def generate_hyper_panel(self):
         """"Create tree panel and link functions."""
         self.hyper_panel = rose.config_editor.panel.HyperLinkTreePanel(
-                                              self.data.namespace_tree)
-        self.hyper_panel.get_metadata_and_comments = (
-                             self.handle.get_metadata_and_comments)
+                                       self.data.namespace_tree,
+                                       self.handle.get_metadata_and_comments)
         self.hyper_panel.send_create_request = self.handle.create_request
         self.hyper_panel.send_launch_request = self.handle_launch_request
         self.hyper_panel.send_add_dialog_request = self.handle.add_dialog
@@ -565,7 +563,6 @@ class MainController(object):
                                    self.check_cannot_enable_setting,
                                    self.update_namespace,
                                    self.update_ns_info,
-                                   self.update_ns_comments,
                                    view_page_func=self.view_page,
                                    kill_page_func=self.kill_page)
         var_ops = rose.config_editor.stack.VariableOperations(
@@ -993,13 +990,6 @@ class MainController(object):
                 action(var)
         for var in refresh_vars:
             page.refresh(var.metadata['id'])
-
-    def update_ns_comments(self, namespace):
-        """Update section comments for this namespace."""
-        if hasattr(self, "hyper_panel"):
-            comment = self.data.get_ns_comment_string(namespace)
-            self.hyper_panel.update_comment(namespace.lstrip("/").split("/"),
-                                            comment)
 
     def update_config(self, namespace):
         """Update the config object for the macros. To be removed."""
@@ -1956,6 +1946,7 @@ class MainController(object):
                 stack_item.group != do_list[0].group):
                 break
             do_list.append(stack_item)
+        group = do_list[0].group
         is_group = len(do_list) > 1
         stack_info = []
         for stack_item in do_list:
@@ -1996,6 +1987,7 @@ class MainController(object):
             del self.redo_stack[:]
             self.redo_stack.extend(redo_items)
             just_done_item = self.undo_stack[-1]
+            just_done_item.group = group
             del self.undo_stack[-1]
             del stack[-1]
             if redo_mode_on:
