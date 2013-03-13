@@ -248,7 +248,7 @@ class StemRunner(object):
             self.reporter(SourceTreeAddedAsBranchEvent(url))
         for project, branches in repos.iteritems():
             var = 'SOURCE_' + project.upper()
-            branchstring = " ".join(branches)
+            branchstring = RosePopener.list_to_shell_str(branches)
             self._add_define_option(var, '"' + branchstring + '"')
 
         # Add configs source variables for first

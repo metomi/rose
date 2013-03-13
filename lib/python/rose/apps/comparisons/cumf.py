@@ -225,16 +225,11 @@ def get_diff_map(field):
     """Return a list of diff map characters for a field."""
     lines = field.split("\n")
     diffmap = []
-    inmap = 0
+    inmap = False
     for line in lines:
-        result = re.search(r"1234567890", line)
-        if result:
-            inmap = 1
-        result = re.search(r"^\s*\d+\s$", line)
-        if result:
-            inmap = 1
-        result = re.search(r"->", line)
-        if result and inmap == 1:
+        if "1234567890" in line or re.search(r"^\s*\d+\s*$", line):
+            inmap = True
+        if r"->" in line and inmap:
             mapline = re.sub(r".*->", r"", line)
             diffmap += list(mapline)
     return diffmap

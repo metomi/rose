@@ -38,7 +38,8 @@
 #
 #     --source=SOURCE, -s SOURCE
 #         Specify a source tree to include in a rose-stem suite. The source 
-#         tree must be a working copy as the location of the suite and fcm-make config files
+#         tree must be a working copy as the location of the suite and fcm-make
+#         config files
 #         are taken from it. Defaults to '.' if not specified.
 #     --task=TASK, -t TASK
 #         Specify a task name or group to run. 
