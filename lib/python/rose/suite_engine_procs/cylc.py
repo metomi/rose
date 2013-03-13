@@ -135,7 +135,7 @@ class CylcProcessor(SuiteEngineProcessor):
             status = None
             if event in ["pass", "fail"]:
                 status = event
-                event = "exit"
+                submit["events"]["exit"] = event_time
                 submit["status"] = status
                 if key == "signaled":
                     submit["signal"] = message.rsplit(None, 1)[-1]
