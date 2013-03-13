@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""A handler of file system locations."""
+"""A handler of Subversion locations."""
 
 import os
 from tempfile import mkdtemp
@@ -25,7 +25,7 @@ from urlparse import urlparse
 import xml.parsers.expat
 
 class SvnLocHandler(object):
-    """Handler of file system locations."""
+    """Handler of Subversion locations."""
 
     FCM = "fcm"
     SVN = "svn"
