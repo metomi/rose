@@ -97,6 +97,14 @@ class CylcProcessor(SuiteEngineProcessor):
             # ... more task IDs
         }
         """
+        for i in range(3): # 3 retries
+            try:
+                return self._get_suite_events(suite_name)
+            except sqlite3.OperationalError:
+                sleep(1.0)
+        return {}
+
+    def _get_suite_events(self, suite_name):
         data = {}
 
         # Read task events from suite runtime database
