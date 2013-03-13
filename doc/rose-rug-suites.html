@@ -540,14 +540,13 @@ COMPUTE_HOST = "voyager_1"
       <pre class="prettyprint lang-cylc">
     [[FAM_HELLO]]
         [[[environment]]]
-            IS_WORLD_A_PLANET = false  # Shared env variable
             ROSE_TASK_APP = hello_world
-    [[FAM_CUBEWANO]]
+    [[FAM_GAS_GIANT]]
         [[[environment]]]
-            NEPTUNE_RESONANCE = false
-    [[FAM_PLUTINO]]
+            ATMOSPHERE_ONLY = true
+    [[FAM_ROCKY]]
         [[[environment]]]
-            NEPTUNE_RESONANCE = true
+            ATMOSPHERE_ONLY = false
 </pre>
     </div>
 
@@ -556,15 +555,15 @@ COMPUTE_HOST = "voyager_1"
 
       <p>You can inherit them like this:</p>
       <pre class="prettyprint lang-cylc">
-    [[hello_eris]]
-        inherit = FAM_HELLO, FAM_CUBEWANO
+    [[hello_neptune]]
+        inherit = FAM_HELLO, FAM_GAS_GIANT
         [[[environment]]]
-            WORLD = Eris
+            WORLD = Neptune
 </pre>
 
       <p>The order in which they are combined is essentially last to first -
       e.g. <samp>FAM_HELLO</samp> will override any shared setting in
-      <samp>FAM_CUBEWANO</samp>.</p>
+      <samp>FAM_GAS_GIANT</samp>.</p>
     </div>
 
     <div class="slide">
