@@ -337,8 +337,10 @@ class SuiteEngineProcessor(object):
         
         if kwargs["cycle"] is not None:
         
+            #If no unit is specified for the cycle and the length is at least 
+            #10 it is assumed to be in YYYYmmddHH format (length 10)
             if (not CycleOffset.REC_TEXT.match(kwargs["cycle"]).group("unit") 
-                and len(kwargs["cycle"]) == 10):
+                and len(kwargs["cycle"]) >= 10):
                 t.task_cycle_time = kwargs["cycle"]
             else:
                 if t.task_cycle_time:
