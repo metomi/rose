@@ -407,7 +407,7 @@ class Handler(object):
             if var.name in opt_map:
                 var.value = opt_map.pop(var.name)
             if (var.name in opt_map or
-                (var.metadata[rose.META_PROP_COMPULSORY] ==
+                (var.metadata.get(rose.META_PROP_COMPULSORY) ==
                  rose.META_PROP_VALUE_TRUE)):
                 self.var_ops.add_var(var, no_update=True)
         for opt_name, value in opt_map:
@@ -420,7 +420,7 @@ class Handler(object):
                                          metadata, ignored_reason,
                                          error={})
             self.var_ops.add_var(var, no_update=True)
-        self.update_ns_func(namespace)
+        self.data.reload_namespace_tree(namespace)
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
         return new_section_name
@@ -439,6 +439,8 @@ class Handler(object):
     def copy_section(self, config_name, section, new_section=None,
                      no_update=False):
         """Copy a section and its options."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_COPY + "-" + str(time.time())
         config_data = self.data.config[config_name]
         section_base = re.sub('(.*)\(\w+\)$', r"\1", section)
         existing_sections = []
@@ -473,6 +475,8 @@ class Handler(object):
             page = self.view_page_func(new_namespace)
             for var in clone_vars:
                 page.add_row(var)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
         return new_section
 
     def create_request(self):

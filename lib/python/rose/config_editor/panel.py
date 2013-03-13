@@ -1131,7 +1131,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             add_menuitem.set_label(
                          rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
             add_menuitem.connect("activate",
-                                 lambda i: self.add_section(this_section))
+                                 lambda i: self.add_section())
             add_menuitem.show()
             menu.append(add_menuitem)
             copy_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_COPY)
