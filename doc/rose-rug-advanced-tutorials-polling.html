@@ -87,7 +87,7 @@
       <p>Polling can be used to have a task wait until a particular condition
       is met, without the need for additional entries in the dependencies
       graph. For example, you might want to run a polling command to check for
-      the existence of a particular file before running the main command which 
+      the existence of a particular file before running the main command which
       requires said file.</p>
     </div>
 
@@ -145,10 +145,11 @@
                                sleep 10"""
 </pre>
     </div>
+
     <div class="slide">
       <h3 class="alwayshidden">Runtime (2)</h3>
-
-      <pre class="prettyprint lang-cylc">    
+      <pre class="prettyprint lang-cylc">
+    
     [[bob]]
         command scripting = "rose task-run"
     [[read_letter]]
@@ -193,8 +194,7 @@ default=echo 'Ooh, a letter!'
         <li>has a polling <samp>test</samp> that checks for the existence of a
         file</li>
 
-        <li>polls up to 10 times with 5 second delays between each
-        attempt</li>
+        <li>polls up to 10 times with 5 second delays between each attempt</li>
 
         <li>prints a message once the polling test succeeds</li>
       </ul>
@@ -221,19 +221,17 @@ default=echo 'Ooh, a letter!'
 
     <div class="slide">
       <h2 id="improvements">Improving the polling</h2>
-      
-      <p>At present we have specified our own routine for testing for the 
-      existence of a particular file using the <samp>test</samp> option. 
+
+      <p>At present we have specified our own routine for testing for the
+      existence of a particular file using the <samp>test</samp> option.
       However, rose provides a simpler method for doing this.</p>
-    
     </div>
-    
+
     <div class="slide">
-      <h3 class="alwayshidden">Improving the polling (2)</h2>
-      
-      <p>Edit the <samp>rose-app.conf</samp></p> in your <samp>bob</samp> app
-      to look like the following:</p>
-      
+      <h3 class="alwayshidden">Improving the polling (2)</h3>
+
+      <p>Edit the <samp>rose-app.conf</samp>in your <samp>bob</samp> app to
+      look like the following:</p>
       <pre class="prettyprint lang-cylc">
 [poll]
 delays=10*5s
@@ -242,41 +240,41 @@ all-files=$ROSE_DATA/letter.txt
 [command]
 default=echo 'Ooh, a letter!'
 </pre>
-      
-      <p>Polling is now making use of the <samp>all-files</samp> option, which 
-      allows you to specify a list of files to check the existence of. Save 
-      your changes and run the suite to confirm it still works.</p>
 
+      <p>Polling is now making use of the <samp>all-files</samp> option, which
+      allows you to specify a list of files to check the existence of. Save
+      your changes and run the suite to confirm it still works.</p>
     </div>
-    
+
     <div class="slide">
       <h2 id="options">Available polling types</h2>
-      
-      <p><samp>test</samp> and <samp>all-files</samp> are just two of the 
+
+      <p><samp>test</samp> and <samp>all-files</samp> are just two of the
       available polling options:</p>
-      
+
       <ul>
-        <li><samp>all-files</samp> - a list of space delimited list of files 
+        <li><samp>all-files</samp> - a list of space delimited list of files
         which only passes if all file paths in the list exist.</li>
-        <li><samp>any-files</samp> - a list of space delimited list of files 
+
+        <li><samp>any-files</samp> - a list of space delimited list of files
         which passes if any file path in the list exists.</li>
       </ul>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Available polling types (2)</h3>
-      
+
       <ul>
-        <li><samp>file-test</samp> - allows you perform tests on a file if 
-        checking its existence is not enough e.g. perform a 
+        <li><samp>file-test</samp> - allows you perform tests on a file if
+        checking its existence is not enough e.g. perform a
         <samp>grep</samp>.</li>
-        <li><samp>test</samp> - a shell command which passes if the command 
+
+        <li><samp>test</samp> - a shell command which passes if the command
         returns a 0 (zero) return code.</li>
       </ul>
-      
-      <p>For more details see the application configuration file section of: 
+
+      <p>For more details see the application configuration file section of:
       <a href="rose-configuration.html#app">Configuration</a>.</p>
-    
     </div>
 
     <div class="slide">
@@ -289,7 +287,7 @@ default=echo 'Ooh, a letter!'
         waiting for the task to complete</li>
 
         <li>monitoring output from another suite</li>
-        
+
         <li>checking if a file has required content before using it</li>
       </ul>
     </div>
