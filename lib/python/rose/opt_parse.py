@@ -77,11 +77,6 @@ class RoseOptionParser(OptionParser):
                         "dest": "conf_dir",
                         "metavar": "DIR",
                         "help": "Use configuration in DIR instead of $PWD."}],
-               "confsource": [
-                       ["--confsource", "-c"],
-                       {"action": "store",
-                        "dest": "confsource",
-                        "help": "Specify root configuration directory."}],
                "cycle": [
                        ["--cycle", "-t"],
                        {"action": "store",
@@ -114,11 +109,6 @@ class RoseOptionParser(OptionParser):
                         "dest": "defines_suite",
                         "metavar": "KEY=VALUE",
                         "help": "Set suite variable KEY to VALUE."}],
-               "diffsource": [
-                       ["--diffsource", "-d"],
-                       {"action": "append",
-                        "dest": "diffsource",
-                        "help": "Add a branch."}],
                "downgrade": [
                        ["--downgrade", "-d"],
                        {"action": "store_true",
@@ -388,7 +378,7 @@ class RoseOptionParser(OptionParser):
                        ["--source", "-s"],
                        {"action": "append",
                         "dest": "source",
-                        "help": "Add a trunk."}],
+                        "help": "Add a source tree."}],
                "strict_mode": [
                        ["--no-strict"],
                        {"action": "store_false",
