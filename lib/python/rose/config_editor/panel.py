@@ -70,9 +70,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                                           self._set_title_markup, 2)
         self.data_store = gtk.TreeStore(gtk.gdk.Pixbuf, gtk.gdk.Pixbuf,
                                         str, str, int, int, int, int,
-                                        str, str, str, str, str, str, str)
-        # Data: name, title, error and change numbers,
-        #       main tip, description, help, url, comment, change
+                                        str, str)
+        # Data: error_icon, change_icon,
+        #       name, title, error and change numbers,
+        #       main tip, change text
         resource_loc = rose.resource.ResourceLocator(paths=sys.path)
         image_path = resource_loc.locate('etc/images/rose-config-edit')
         self.null_icon = gtk.gdk.pixbuf_new_from_file(image_path +
@@ -167,24 +168,15 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         stack = [[row] + list(i) for i in initials]
         while stack:
             row, key, value_meta_tuple = stack[0]
-            value, meta, comment, change = value_meta_tuple
-            description = meta.get(rose.META_PROP_DESCRIPTION, '')
-            help = meta.get(rose.META_PROP_HELP, '')
-            url = meta.get(rose.META_PROP_URL, '')
+            value, meta, change = value_meta_tuple
             title = meta[rose.META_PROP_TITLE]
-            duplicate = meta.get(rose.META_PROP_DUPLICATE, '')
             new_row = self.data_store.append(row, [self.null_icon,
                                                    self.null_icon,
                                                    title,
                                                    key,
                                                    0, 0, 0, 0,
                                                    '',
-                                                   description,
-                                                   help,
-                                                   url,
-                                                   comment,
-                                                   change,
-                                                   duplicate])
+                                                   change])
             if type(value) is dict:
                 newer_initials = value.items()
                 newer_initials.sort(self.sort_tree_items)
@@ -299,10 +291,11 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             name = tree_model.get_value(path_iter, 3)
             num_errors = tree_model.get_value(path_iter, 4)
             mods = tree_model.get_value(path_iter, 6)
-            description = tree_model.get_value(path_iter, 9)
-            comment = tree_model.get_value(path_iter, 12)
-            change = tree_model.get_value(path_iter, 13)
-            if description != '':
+            proper_name = self.get_name(path)
+            metadata, comment = self.get_metadata_and_comments(proper_name)
+            description = metadata.get(rose.META_PROP_DESCRIPTION, "")
+            change = tree_model.get_value(path_iter, 9)
+            if description:
                 text = description
             else:
                 text = name
@@ -314,7 +307,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                 else:
                     text += rose.config_editor.TREE_PANEL_ERRORS.format(
                                                           num_errors)
-            if description != '':
+            if description:
                 text += "\n(" + name + ")"
             if comment:
                 text += "\n" + comment
@@ -324,11 +317,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     def update_change(self, row_names, new_change):
         """Update 'changed' text."""
-        self._set_row_names_value(row_names, 13, new_change)
-
-    def update_comment(self, row_names, new_comment):
-        """Update 'comment' text."""
-        self._set_row_names_value(row_names, 12, new_comment)
+        self._set_row_names_value(row_names, 9, new_change)
 
     def _set_row_names_value(self, row_names, index, value):
         path = self.get_path_from_names(row_names)
@@ -632,7 +621,9 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             child_iter = treemodel.iter_children(iter_)
             child_dups = []
             while child_iter is not None:
-                dupl = treemodel.get_value(child_iter, 14)
+                child_name = self.get_name(treemodel.get_path(child_iter))
+                metadata, comment = self.get_metadata_and_comments(child_name)
+                dupl = metadata.get(rose.META_PROP_DESCRIPTION)
                 child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)
             if not all(child_dups):
@@ -648,18 +639,20 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         return False
 
     def get_help(self, path):
-        h_iter = self.tree.get_model().get_iter(path)
-        help = self.tree.get_model().get_value(h_iter, 10)
-        if help == '':
+        metadata, comments = self.get_metadata_and_comments(
+                                               self.get_name(path))
+        help = metadata.get(rose.META_PROP_HELP, "")
+        if not help:
             return None
         return help
 
     def get_url(self, path):
-        u_iter = self.tree.get_model().get_iter(path)
-        help = self.tree.get_model().get_value(u_iter, 11)
-        if help == '':
+        metadata, comments = self.get_metadata_and_comments(
+                                               self.get_name(path))
+        url = metadata.get(rose.META_PROP_URL, "")
+        if not url:
             return None
-        return help
+        return url
 
     def ask_can_clone(self, name):
         """Connect this at a higher level for section clone menu options."""
@@ -672,6 +665,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
     def ask_has_content(self, name):
         """Connect this at a higher level to test for any data here."""
         pass
+
+    def get_metadata_and_comments(self, name):
+        """Connect this at a higher level for metadata and comments."""
+        return {}, ""
 
     def send_add_dialog_request(self, name):
         """Connect this at a higher level for section add requests."""
@@ -702,6 +699,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     def send_info_request(self, name):
         """Connect this at a higher level for section info."""
+        pass
 
     def send_launch_request(self, path, as_new=False):
         """Connect this at a higher level for page creation requests."""
@@ -843,7 +841,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                                    get_tooltip_func=self.get_tree_tip)
         self._view.set_rules_hint(True)
         self._view.show()
-        self._view.connect("button-press-event",
+        self._view.connect("button-release-event",
                            self._handle_button_press_event)
         self._window = gtk.ScrolledWindow()
         self._window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -869,6 +867,14 @@ class BaseSummaryDataPanel(gtk.VBox):
         
         The returned list should contain lists of items for each row.
         The column names should be a list of strings for column titles.
+
+        """
+        raise NotImplementedError()
+
+    def get_section_column_index(self):
+        """Return the section name column index from the gtk.TreeView.
+        
+        This may change based on the grouping (self.group_index).
 
         """
         raise NotImplementedError()
@@ -957,11 +963,11 @@ class BaseSummaryDataPanel(gtk.VBox):
                 parent_data = [row_data[0]] + [None] * len(row_data[1:])
                 parent_iter = store.append(None, parent_data) 
                 store.append(parent_iter, row_data)
-        if self.is_duplicate:
-            store.set_sort_func(0, self._sort_model_dupl)
         filter_model = store.filter_new()
         filter_model.set_visible_func(self._filter_visible)
         sort_model = gtk.TreeModelSort(filter_model)
+        for i in range(len(self.column_names)):
+            sort_model.set_sort_func(i, self._sort_model_dupl, i)
         should_redraw = self.column_names != self._last_column_names
         self._last_column_names = self.column_names
         return sort_model, self.column_names, should_redraw
@@ -973,7 +979,9 @@ class BaseSummaryDataPanel(gtk.VBox):
         if variables is not None:
             self.variables = variables
         old_cols = set(self.column_names)
-        vadj_value = self._window.get_vadjustment().get_value()
+        expanded_rows = []
+        self._view.map_expanded_rows(lambda r, d: expanded_rows.append(d))
+        start_path, start_column = self._view.get_cursor()
         model, cols, should_redraw = self.get_tree_model_and_col_names()
         if should_redraw:
             for column in list(self._view.get_columns()):
@@ -999,7 +1007,8 @@ class BaseSummaryDataPanel(gtk.VBox):
                     group_model.append(None, [""])
                 self._group_widget.set_model(group_model)
                 self._group_widget.set_active(start_index)
-        self._window.get_vadjustment().set_value(vadj_value)
+        for this_row in expanded_rows:
+            self._view.expand_to_path(this_row)
 
     def add_new_columns(self, treeview, column_names):      
         for i, column_name in enumerate(column_names):
@@ -1050,10 +1059,17 @@ class BaseSummaryDataPanel(gtk.VBox):
             child_iter = model.iter_next(child_iter)
         return False
 
-    def _sort_model_dupl(self, model, iter1, iter2):
-        val1 = model.get_value(iter1, 0)
-        val2 = model.get_value(iter2, 0)
-        return rose.config.sort_settings(val1, val2)
+    def _sort_model_dupl(self, model, iter1, iter2, col_index):
+        val1 = model.get_value(iter1, col_index)
+        val2 = model.get_value(iter2, col_index)
+        if (isinstance(val1, basestring) and isinstance(val2, basestring) and
+            val1.isdigit() and val2.isdigit()):
+            rval = cmp(float(val1), float(val2))
+        else:
+            rval = rose.config.sort_settings(val1, val2)
+        if rval == 0:
+            return cmp(model.get_path(iter1), model.get_path(iter2))
+        return rval
          
     def _handle_activation(self, view, path, column):
         if path is None:
@@ -1062,9 +1078,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         row_iter = model.get_iter(path)
         col_index = view.get_columns().index(column)       
         cell_data = model.get_value(row_iter, col_index)
-        sect_index = 0
-        if self.group_index is not None and self.group_index != sect_index:
-            sect_index = 1
+        sect_index = self.get_section_column_index()
         section = model.get_value(row_iter, sect_index)
         option = None
         if col_index != sect_index and cell_data is not None:
@@ -1077,10 +1091,10 @@ class BaseSummaryDataPanel(gtk.VBox):
                                             int(event.y))
         if pathinfo is not None:
             path, col, cell_x, cell_y = pathinfo
-            if event.button != 3:
-                self._handle_activation(treeview, path, col)
-            else:
+            if event.button == 3:
                 self._popup_tree_menu(path, col, event)
+            elif event.button == 2:
+                self._handle_activation(treeview, path, col)               
         return False
 
     def _popup_tree_menu(self, path, col, event):
@@ -1089,9 +1103,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         menu.show()
         model = self._view.get_model()
         row_iter = model.get_iter(path)
-        sect_index = 0
-        if self.group_index is not None and self.group_index != 0:
-            sect_index = 1
+        sect_index = self.get_section_column_index()
         this_section = model.get_value(row_iter, sect_index)
         menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_JUMP_TO)
         label = rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
@@ -1194,15 +1206,14 @@ class BaseSummaryDataPanel(gtk.VBox):
     def scroll_to_section(self, section):
         """Find a particular section in the treeview and scroll to it."""
         iter_ = self.get_section_iter(section)
-        path = self._view.get_model().get_path(iter_)
-        self._view.scroll_to_cell(path)
+        if iter_ is not None:
+            path = self._view.get_model().get_path(iter_)
+            self._view.scroll_to_cell(path)
 
     def get_section_iter(self, section):
         """Get the gtk.TreeIter of this section."""
         iters = []
-        sect_index = 0
-        if self.group_index is not None and self.group_index != sect_index:
-            sect_index = 1
+        sect_index = self.get_section_column_index()
         self._view.get_model().foreach(self._check_value_iter,
                                        [sect_index, section, iters])
         if iters:
@@ -1276,8 +1287,9 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
 
     def get_tree_cell_status(self, col, cell, model, row_iter):
         col_index = self._view.get_columns().index(col)
-        section = model.get_value(row_iter, 0)
-        if col_index == 0:
+        sect_index = self.get_section_column_index()
+        section = model.get_value(row_iter, sect_index)
+        if col_index == sect_index:
             node_data = self.sections.get(section)
         else:
             option = self.column_names[col_index]
@@ -1322,10 +1334,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
             and col_index != 0):
             cell.set_property("width-chars", max_len)
             cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        sect_index = 0
-        if (self.group_index is not None and
-            self.group_index != sect_index):
-            sect_index = 1
+        sect_index = self.get_section_column_index()
         if (value is not None and col_index == sect_index and
             self.is_duplicate):
             value = value.split("(")[-1].rstrip(")")
@@ -1334,10 +1343,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         cell.set_property("markup", value)
 
     def get_tree_tip(self, view, row_iter, col_index, tip):
-        sect_index = 0
-        if (self.group_index is not None and
-            self.group_index != sect_index):
-            sect_index = 1
+        sect_index = self.get_section_column_index()
         section = view.get_model().get_value(row_iter, sect_index)
         if section is None:
             return False
@@ -1369,3 +1375,9 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
             tip_text += change_text + "\n"
         tip.set_text(tip_text.rstrip())
         return True
+
+    def get_section_column_index(self):
+        sect_index = 0
+        if self.group_index is not None and self.group_index != 0:
+            sect_index = 1
+        return sect_index

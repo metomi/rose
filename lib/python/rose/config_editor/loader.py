@@ -165,6 +165,7 @@ class ConfigDataManager(object):
         self.trigger_id_value_lookup = {}  # Stores old values of trigger vars
         self.namespace_tree = {}  # Stores the namespace hierarchy
         self.namespace_meta_lookup = {}  # Stores titles etc of namespaces
+        self._config_section_namespace_lookup = {}  # Store section namespaces
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
@@ -523,7 +524,7 @@ class ConfigDataManager(object):
         enabled_state = rose.config.ConfigNode.STATE_NORMAL
         sections_to_be_dumped = []
         if only_this_ns is None:
-            allowed_sections = sect_map.keys()
+            allowed_sections = set(sect_map.keys() + var_map.keys())
         else:
             allowed_sections = self.get_sections_from_namespace(only_this_ns)
         for section in sect_map:
@@ -534,13 +535,10 @@ class ConfigDataManager(object):
         for section in allowed_sections:
             variables = var_map.get(section, [])
             for variable in variables:
-                var_id = variable.metadata.get('id')
                 if only_this_ns is not None:
                     if variable.metadata['full_ns'] != only_this_ns:
                         continue
-                section, option = self.util.get_section_option_from_id(var_id)
-                if section not in sections_to_be_dumped:
-                    sections_to_be_dumped.append(section)
+                option = variable.name
                 value = variable.value
                 var_state = enabled_state
                 if variable.ignored_reason:
@@ -593,6 +591,14 @@ class ConfigDataManager(object):
         # The logic here will be improved once suite integration is worked on.
         node = config.get([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_PROJECT])
         return node is not None
+
+    def clear_meta_lookups(self, config_name):
+        for ns in self.namespace_meta_lookup.keys():
+            if (ns.startswith(config_name) and
+                self.util.split_full_ns(self, ns)[0] == config_name):
+                self.namespace_meta_lookup.pop(ns)
+        if config_name in self._config_section_namespace_lookup:
+            self._config_section_namespace_lookup.pop(config_name)
 
     def load_meta_config(self, config=None, directory=None):
         """Load the main metadata, and any specified in 'config'."""
@@ -972,9 +978,15 @@ class ConfigDataManager(object):
                                       err_string, setting_id, config_name))
         self.trigger[config_name].trigger_family_lookup.clear()
 
-    def reload_namespace_tree(self, just_this_config_name=None,
+    def reload_namespace_tree(self, just_this_namespace=None,
+                              just_this_config_name=None,
                               view_missing=False):
         """Make the tree of namespaces and load to the tree panel."""
+        if (just_this_namespace is not None and
+            just_this_config_name is None):
+            config_name = self.util.split_full_ns(self,
+                                                  just_this_namespace)[0]
+            just_this_config_name = config_name
         self.namespace_tree = {}
         if just_this_config_name is None:
             configs = self.config.keys()
@@ -985,7 +997,10 @@ class ConfigDataManager(object):
             configs = [just_this_config_name]
         for config_name in configs:
             config_data = self.config[config_name]
-            top_spaces = config_name.lstrip('/').split('/')
+            if just_this_namespace:
+                top_spaces = just_this_namespace.lstrip('/').split('/')[:-1]
+            else:
+                top_spaces = config_name.lstrip('/').split('/')
             self.update_namespace_tree(top_spaces, self.namespace_tree,
                                        prev_spaces=[])
             self.load_metadata_for_namespaces(config_name)
@@ -1012,7 +1027,7 @@ class ConfigDataManager(object):
                 self.update_namespace_tree(spaces,
                                            self.namespace_tree,
                                            prev_spaces=[])
-        self.tree_update()
+        self.tree_update(just_this_namespace=just_this_namespace)
 
     def update_namespace_tree(self, spaces, subtree, prev_spaces):
         """Recursively load the namespace tree for a single path (spaces).
@@ -1023,11 +1038,10 @@ class ConfigDataManager(object):
         """
         if spaces:
             this_ns = "/" + "/".join(prev_spaces + [spaces[0]])
-            comment = self.get_ns_comment_string(this_ns)
             change = ""
             meta = self.namespace_meta_lookup.get(this_ns, {})
             meta.setdefault('title', spaces[0])
-            subtree.setdefault(spaces[0], [{}, meta, comment, change])
+            subtree.setdefault(spaces[0], [{}, meta, change])
             prev_spaces += [spaces[0]]
             self.update_namespace_tree(spaces[1:], subtree[spaces[0]][0],
                                        prev_spaces)
@@ -1126,26 +1140,18 @@ class ConfigDataManager(object):
             var_id_val_map.update({variable.metadata["id"]: variable.value})
         return var_id_val_map
 
-    def get_ns_comments(self, ns):
-        """Return any section comments for this namespace."""
+    def get_ns_comment_string(self, ns):
+        """Return a comment string for this namespace."""
+        comment = ""
         comments = []
         config_name = self.util.split_full_ns(self, ns)[0]
         config_data = self.config[config_name]
         sections = self.get_sections_from_namespace(ns)
         sections.sort(rose.config.sort_settings)
         for section in sections:
-            s_ns = self.get_default_namespace_for_section(section,
-                                                          config_name)
-            if s_ns == ns:
-                sect_data = config_data.sections.now.get(section)
-                if sect_data is not None:
-                    comments.extend(sect_data.comments)
-        return comments
-
-    def get_ns_comment_string(self, ns):
-        """Return a comment string for this namespace."""
-        comment = ""
-        comments = self.get_ns_comments(ns)
+            sect_data = config_data.sections.now.get(section)
+            if sect_data is not None and sect_data.comments:
+                comments.extend(sect_data.comments)
         if comments:
             comment = "#" + "\n#".join(comments)
         return comment
@@ -1222,28 +1228,35 @@ class ConfigDataManager(object):
 
     def get_default_namespace_for_section(self, section, config_name):
         """Return the default namespace for the section."""
-        config_data = self.config[config_name]
-        meta_config = config_data.meta
-        node = meta_config.get([section, rose.META_PROP_NS], no_ignore=True)
-        if node is not None:
-            subspace = node.value
-        else:
-            match = REC_ELEMENT_SECTION.match(section)
-            if match:
-                node = meta_config.get([match.groups()[0], rose.META_PROP_NS])
-                if node is None or node.is_ignored():
-                    subspace = section.replace('(', '/')
-                    subspace = subspace.replace(')', '').replace(':', '/')
-                else:
-                    subspace = node.value + '/' + str(match.groups()[1])
-            elif section.startswith(rose.SUB_CONFIG_FILE_DIR + ":"):
-                subspace = section.replace('/', ':')
-                subspace = subspace.replace(':', '/', 1)
+        if config_name not in self._config_section_namespace_lookup:
+            self._config_section_namespace_lookup.setdefault(config_name, {})
+        section_ns = self._config_section_namespace_lookup[config_name].get(
+                                                                  section)
+        if section_ns is None:
+            config_data = self.config[config_name]
+            meta_config = config_data.meta
+            node = meta_config.get([section, rose.META_PROP_NS], no_ignore=True)
+            if node is not None:
+                subspace = node.value
             else:
-                subspace = section.replace(':', '/')
-        section_ns = config_name + '/' + subspace
-        if not subspace:
-            section_ns = config_name
+                match = REC_ELEMENT_SECTION.match(section)
+                if match:
+                    node = meta_config.get([match.groups()[0], rose.META_PROP_NS])
+                    if node is None or node.is_ignored():
+                        subspace = section.replace('(', '/')
+                        subspace = subspace.replace(')', '').replace(':', '/')
+                    else:
+                        subspace = node.value + '/' + str(match.groups()[1])
+                elif section.startswith(rose.SUB_CONFIG_FILE_DIR + ":"):
+                    subspace = section.replace('/', ':')
+                    subspace = subspace.replace(':', '/', 1)
+                else:
+                    subspace = section.replace(':', '/')
+            section_ns = config_name + '/' + subspace
+            if not subspace:
+                section_ns = config_name
+            self._config_section_namespace_lookup[config_name].update(
+                                           {section: section_ns})
         return section_ns
 
     def get_format_sections(self, config_name):

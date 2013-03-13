@@ -110,7 +110,7 @@ class SectionOperations(object):
         ns = self.__data.get_default_namespace_for_section(section, 
                                                            config_name)
         if not no_update:
-            self.__data.reload_namespace_tree()  # This will update everything.
+            self.__data.reload_namespace_tree(ns)
         copy_section_data = new_section_data.copy()
         stack_item = rose.config_editor.stack.StackItem(
                           ns,
@@ -233,7 +233,7 @@ class SectionOperations(object):
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
         if not no_update:
-            self.__data.reload_namespace_tree()  # This will update everything.
+            self.__data.reload_namespace_tree(namespace)
 
     def set_section_comments(self, config_name, section, comments):
         """Change the comments field for the section object."""

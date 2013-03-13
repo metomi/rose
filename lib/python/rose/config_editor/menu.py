@@ -430,12 +430,13 @@ class Handler(object):
         section = sections.pop()
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
-        return self.copy_section(config_name, section)
+        return self.copy_section(config_name, section, no_update=no_update)
 
-    def copy_section(self, config_name, section):
+    def copy_section(self, config_name, section, new_section=None,
+                     no_update=False):
         """Copy a section and its options."""
         config_data = self.data.config[config_name]
-        section_base = re.sub('(.*)\(\d+\)$', r"\1", section)
+        section_base = re.sub('(.*)\(\w+\)$', r"\1", section)
         existing_sections = []
         clone_vars = []
         existing_sections = config_data.vars.now.keys()
@@ -443,10 +444,11 @@ class Handler(object):
         for variable in config_data.vars.now.get(section, []):
             clone_vars.append(variable.copy())
         if new_section is None:
-            i = 2
-            while section_base + "(" + str(i) + ")" in existing_sections:
-                i += 1
+            i = 1
             new_section = section_base + "(" + str(i) + ")"
+            while new_section in existing_sections:
+                i += 1
+                new_section = section_base + "(" + str(i) + ")"
         self.sect_ops.add_section(config_name, new_section,
                                   no_update=no_update)
         new_namespace = self.data.get_default_namespace_for_section(
@@ -467,7 +469,7 @@ class Handler(object):
             page = self.view_page_func(new_namespace)
             for var in clone_vars:
                 page.add_row(var)
-        return False
+        return new_section
 
     def create_request(self):
         """Handle a create configuration request."""
@@ -544,7 +546,8 @@ class Handler(object):
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
         if not no_update:
-            self.data.reload_namespace_tree()  # Update everything as well.
+            for namespace in namespace_list:
+                self.data.reload_namespace_tree(namespace)  # Update everything as well.
 
     def ignore_request(self, base_ns, is_ignored):
         """Handle an ignore or enable section request."""
@@ -623,6 +626,17 @@ class Handler(object):
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
         self.transform_default(just_this_config_name=config_name)
 
+    def get_metadata_and_comments(self, base_ns):
+        """Return metadata dict and comments list."""
+        metadata = {}
+        comments = ""
+        if base_ns is None:
+            return metadata, comments
+        base_ns = "/" + base_ns.lstrip("/")
+        metadata = self.data.namespace_meta_lookup.get(base_ns, {})
+        comments = self.data.get_ns_comment_string(base_ns)
+        return metadata, comments
+
     def info_request(self, base_ns):
         """Handle a request for namespace info."""
         if base_ns is None:
@@ -650,19 +664,23 @@ class Handler(object):
                                      no_update=no_update)
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
-        if not no_update:
-            self.data.reload_namespace_tree()
 
     def remove_sections(self, config_name, sections, no_update=False):
         """Implement a mass removal of sections."""
         start_stack_index = len(self.undo_stack)
         group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
+        nses = []
         for section in sections:
+            ns = self.data.get_default_namespace_for_section(
+                                           section, config_name)
+            if ns not in nses:
+                nses.append(ns)
             self.remove_section(config_name, section, no_update=True)
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
         if not no_update:
-            self.data.reload_namespace_tree()
+            for ns in nses:
+                self.data.reload_namespace_tree(ns)
 
     def rename_request(self, base_ns, new_section, no_update=False):
         """Implement a rename (delete + add)."""

@@ -431,6 +431,8 @@ class MainController(object):
         """"Create tree panel and link functions."""
         self.hyper_panel = rose.config_editor.panel.HyperLinkTreePanel(
                                               self.data.namespace_tree)
+        self.hyper_panel.get_metadata_and_comments = (
+                             self.handle.get_metadata_and_comments)
         self.hyper_panel.send_create_request = self.handle.create_request
         self.hyper_panel.send_launch_request = self.handle_launch_request
         self.hyper_panel.send_add_dialog_request = self.handle.add_dialog
@@ -500,13 +502,14 @@ class MainController(object):
         custom_widget = ns_metadata.get(rose.config_editor.META_PROP_WIDGET)
         custom_sub_widget = ns_metadata.get(
                                rose.config_editor.META_PROP_WIDGET_SUB_NS)
+        has_sub_data = self.data.is_ns_sub_data(namespace_name)
         label = ns_metadata.get(rose.META_PROP_TITLE)
         if label is None:
             label = subspace.split('/')[-1]
-        if label.isdigit() and duplicate == rose.META_PROP_VALUE_TRUE:
+        if duplicate == rose.META_PROP_VALUE_TRUE and not has_sub_data:
+            # For example, namelist/foo/1 should be shown as foo(1).
             label = "(".join(subspace.split('/')[-2:]) + ")"
         sections = [s for s in ns_metadata.get('sections', [])]
-        has_sub_data = self.data.is_ns_sub_data(namespace_name)
         section_data_objects = []
         for section in sections:
             sect_data = config_data.sections.now.get(section)
@@ -836,10 +839,19 @@ class MainController(object):
                         return rose.config_editor.TREE_PANEL_TIP_CHANGED_SECTIONS
         return ""
 
-    def tree_trigger_update(self):
+    def tree_trigger_update(self, just_this_namespace=None):
         if hasattr(self, 'hyper_panel'):
             self.hyper_panel.load_tree(None, self.data.namespace_tree)
-            self.update_all()
+            if just_this_namespace is None:
+                self.update_all()
+            else:
+                config_name = self.util.split_full_ns(self.data,
+                                                      just_this_namespace)[0]
+                self.update_config(config_name)
+                spaces = just_this_namespace.lstrip("/").split("/")
+                for i in range(len(spaces), 0, -1):
+                    update_ns = "/" + "/".join(spaces[:i])
+                    self.update_namespace(update_ns, no_config_update=True)
 
     def refresh_ids(self, config_name, setting_ids, is_loading=False):
         """Refresh and redraw settings if needed."""
@@ -902,15 +914,17 @@ class MainController(object):
         self.update_ns_sub_data()
 
     def update_namespace(self, namespace, are_errors_done=False,
-                         is_loading=False):
+                         is_loading=False, no_config_update=False):
         """Update driver function. Updates the page if open."""
         self._generate_pagelist()
         if namespace in [p.namespace for p in self.pagelist]:
             index = [p.namespace for p in self.pagelist].index(namespace)
             page = self.pagelist[index]
-            self.update_status(page, are_errors_done)
+            self.update_status(page, are_errors_done=are_errors_done,
+                               no_config_update=no_config_update)
         else:
-            self.update_config(namespace)
+            if not no_config_update:
+                self.update_config(namespace)
             self.update_sections(namespace)
             self.update_ignored_statuses(namespace)
             if not are_errors_done and not is_loading:
@@ -923,11 +937,13 @@ class MainController(object):
                 self.update_metadata_id(namespace)
             self.update_ns_sub_data(namespace)
 
-    def update_status(self, page, are_errors_done=False):
+    def update_status(self, page, are_errors_done=False,
+                      no_config_update=False):
         """Update ignored statuses and update the tree statuses."""
         self._generate_pagelist()
         self.sync_page_var_lists(page)
-        self.update_config(page.namespace)
+        if not no_config_update:
+            self.update_config(page.namespace)
         self.update_sections(page.namespace)
         self.update_ignored_statuses(page.namespace)
         if not are_errors_done:
@@ -937,9 +953,7 @@ class MainController(object):
         self.update_stack_viewer_if_open()
         if page.namespace in self.data.config.keys():
             self.update_metadata_id(page.namespace)
-        print "update status"
         self.update_ns_sub_data(page.namespace)
-        print "finish update status"
 
     def update_ns_sub_data(self, namespace=None):
         """Update any relevant summary data on another page."""
@@ -1352,7 +1366,7 @@ class MainController(object):
             # Un-prettify.
             config = self.data.dump_to_internal_config(config_name)
             # Update the last save data.
-            config_data.saved_config = new_saved_config
+            config_data.save_config = new_saved_config
             config_vars.save.clear()
             config_vars.latent_save.clear()
             for section, variables in config_vars.now.items():
@@ -1500,6 +1514,9 @@ class MainController(object):
                                           found_error)
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
+            if self._namespace_data_is_modified(config_name):
+                self._alter_change_widget_sensitivity(is_changed=True)
+                break
             now_vars = []
             for v in config_data.vars.get_all(no_latent=True):
                 now_vars.append(v.to_hashable())
@@ -1507,9 +1524,6 @@ class MainController(object):
             for v in config_data.vars.get_all(no_latent=True, save=True):
                 las_vars.append(v.to_hashable())
             if set(now_vars) ^ set(las_vars):
-                self._alter_change_widget_sensitivity(is_changed=True)
-                break
-            if self._namespace_data_is_modified(config_name):
                 self._alter_change_widget_sensitivity(is_changed=True)
                 break
         else:
@@ -1538,8 +1552,8 @@ class MainController(object):
             configs = self.data.config.keys()
         else:
             configs = [just_this_config]
-        self.data.namespace_meta_lookup = {}
         for config_name in configs:
+            self.data.clear_meta_lookups(config_name)
             config = self.data.dump_to_internal_config(config_name)
             config_data = self.data.config[config_name]
             config_data.config = config
@@ -1854,11 +1868,9 @@ class MainController(object):
                 this_warning = var.warning.pop(macro_type)
                 id_warn_dict.update({var.metadata['id']: this_warning})
         if not bad_list:
-            print "Refresh"
             self.refresh_ids(config_name,
                              id_error_dict.keys() + id_warn_dict.keys(),
                              is_loading)
-            print "finish refresh"
             return
         for bad_report in bad_list:
             section = bad_report.section
@@ -2123,7 +2135,7 @@ if __name__ == '__main__':
         f = tempfile.NamedTemporaryFile()
         cProfile.runctx("spawn_window(cwd)", globals(), locals(), f.name)
         p = pstats.Stats(f.name)
-        p.strip_dirs().sort_stats('time').print_stats(40)
+        p.strip_dirs().sort_stats('cumulative').print_stats(40)
         f.close()
     else:
         spawn_window(cwd)
