@@ -803,7 +803,7 @@ COMPUTE_HOST = "voyager_1"
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "FAM_A:succeed-any =&gt; B"
+        graph = "FAM_A:succeed-any =&gt; b"
 </pre>
 
       <p>If task <var>b</var> should run when all tasks in the <var>FAM_A</var>
@@ -811,7 +811,7 @@ COMPUTE_HOST = "voyager_1"
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "FAM_A:finish-all =&gt; B"
+        graph = "FAM_A:finish-all =&gt; b"
 </pre>
     </div>
 
