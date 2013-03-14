@@ -198,7 +198,12 @@ class CylcProcessor(SuiteEngineProcessor):
                     suite_name)
         except RosePopenError:
             return
-        u, h = out.strip().replace("*", " ").split(None, 1)
+        u, h = None
+        items = out.strip().split(None, 1)
+        if items:
+            u = items.pop(0).replace("*", " ")
+        if items:
+            h = items.pop(0).replace("*", " ")
         user, host, my_user, my_host = self._parse_user_host(u, h)
         if (my_user, my_host) == (user, host):
             return
@@ -215,7 +220,13 @@ class CylcProcessor(SuiteEngineProcessor):
                               "-i", "[remote]host",
                               suite_name)
         for line in out.splitlines():
-            task, user, host = line.replace("*", " ").split(None, 2)
+            items = line.split(None, 2)
+            task = items.pop(0).replace("*", " ")
+            user, host = (my_user, my_host)
+            if items:
+                user = items.pop(0).replace("*", " ")
+            if items:
+                host = items.pop(0).replace("*", " ")
             if not actual_hosts.has_key(host):
                 result = self._parse_user_host(user, host, my_user, my_host)
                 user, actual_hosts[host] = result[0:2]
