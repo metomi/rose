@@ -758,14 +758,14 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Dependency Syntax ( a | b ) &amp; c</h3>
+      <h3 class="alwayshidden">Dependency Syntax a &amp; ( b | c )</h3>
 
-      <p>If task <var>d</var> depends on either task <var>a</var> and task
-      <var>b</var> finishing, together with task <var>c</var>:</p>
+      <p>If task <var>d</var> depends on task <var>a</var> and either task
+      <var>b</var> or task <var>c</var> succeeding:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "( a | b ) &amp; c =&gt; d"
+        graph = "a &amp; ( b | c ) =&gt; d"
 </pre>
     </div>
 
