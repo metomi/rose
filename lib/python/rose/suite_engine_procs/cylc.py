@@ -199,7 +199,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     suite_name)
         except RosePopenError:
             return
-        u, h = None
+        u, h = (None, None)
         items = out.strip().split(None, 1)
         if items:
             u = items.pop(0).replace("*", " ")
