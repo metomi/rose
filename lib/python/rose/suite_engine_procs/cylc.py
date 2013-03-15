@@ -177,10 +177,11 @@ class CylcProcessor(SuiteEngineProcessor):
             stmt += " WHERE name==? AND cycle==? AND event=='submitted'"
             stmt_args = tuple(task_id.split(self.TASK_ID_DELIM))
         for row in c.execute(stmt, stmt_args):
-            u, h = row[0].split("@")
-            user, host, my_user, my_host = self._parse_user_host(u, h)
-            if (my_user, my_host) != (user, host):
-                auths.append((user, host))
+            if row and "@" in row[0]:
+                u, h = row[0].split("@")
+                user, host, my_user, my_host = self._parse_user_host(u, h)
+                if (my_user, my_host) != (user, host):
+                    auths.append((user, host))
         return auths
 
     def get_task_auth(self, suite_name, task_name):
@@ -198,7 +199,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     suite_name)
         except RosePopenError:
             return
-        u, h = None
+        u, h = (None, None)
         items = out.strip().split(None, 1)
         if items:
             u = items.pop(0).replace("*", " ")
