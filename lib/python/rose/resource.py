@@ -55,7 +55,10 @@ class ResourceLocator(object):
             h = self.get_util_home()
             n = self.get_util_name("-")
             self.paths = [os.path.join(h, "etc", n), os.path.join(h, "etc")]
-        self.conf = None
+        if os.getenv("ROSE_CONF_IGNORE") in ["true"]:
+            self.conf = ConfigNode()
+        else:
+            self.conf = None
 
     def get_conf(self):
         """Return the site/user configuration root node."""
