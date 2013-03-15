@@ -221,12 +221,17 @@ def get_value_from_metadata(meta_data):
         var_value = meta_data[rose.META_PROP_VALUES].replace(' ', '')
         var_value = var_value.replace(',', ' ').split()[0]
     elif rose.META_PROP_TYPE in meta_data:
-        if meta_data[rose.META_PROP_TYPE] == 'logical':
+        var_type = meta_data[rose.META_PROP_TYPE]
+        if var_type == 'logical':
             var_value = rose.TYPE_LOGICAL_VALUE_FALSE
-        elif meta_data[rose.META_PROP_TYPE] == 'boolean':
+        elif var_type == 'boolean':
             var_value = rose.TYPE_BOOLEAN_VALUE_FALSE
-        elif meta_data[rose.META_PROP_TYPE] in ['integer', 'real']:
+        elif var_type in ['integer', 'real']:
             var_value = '0'
+        elif var_type == 'character':
+            var_value = "''"
+        elif var_type == 'quoted':
+            var_value = '""'
     return var_value
 
 
