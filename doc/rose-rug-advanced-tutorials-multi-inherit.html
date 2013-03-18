@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Suite Multiple Inheritance</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Suite Multiple Inheritance</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through using
+      more than one cylc family for configuring a task (multiple
+      inheritance).</p>
+
+      <p>This helps when tasks naturally belong to more than one
+      category - e.g. an application type category and a job submission
+      type category.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="example">Example</h2>
+
+      <p>Our example suite will control a drag race.</p><img class="r-floater" src=
+      "http://upload.wikimedia.org/wikipedia/commons/0/0b/Pro_Street_Camaro_at_launch.JPG"
+      width="70%" alt="Drag race starting in Saskatoon, Saskatchewan" />
+
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Setup</h3>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory somewhere - e.g. in your homespace) containing a blank
+      <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
+      like <a href=
+      "etc/rose-rug-advanced-tutorials-multi-inherit/suite.rc.html">this</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Explanation</h3>
+
+      <p>A realistic scenario for multiple inheritance might be when you have one
+      set of families handling job submission (e.g. parallel vs serial) and one set
+      driving the particular setup of the code run by the task (e.g. for different systems).</p>
+
+      <p>In our <samp>suite.rc</samp> file, there is a set of families for the
+      engine (<samp>ENGINE_PETROL</samp>, <samp>ENGINE_ELECTRIC</samp>), and one
+      for the actual chassis and body (<samp>CAR</samp>, <samp>TRUCK</samp>).</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Explanation (2)</h3>
+
+      <p>We need to use configuration from both sets to build a racer.</p>
+
+      <p>We can see from the <samp>graph</samp> specification in <samp>dependencies</samp>
+      that we have a task called <samp>blue_car</samp> and a task called <samp>red_car</samp>
+      that need defining.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Red Car</h3>
+
+      <p>Let's start off with the <samp>red_car</samp>. To inherit from a
+      single family <samp>CAR</samp>, we would put this under the <samp>[runtime]</samp> section:</p>
+      <pre class="prettyprint lang-cylc">
+    [[red_car]]
+        inherit = CAR
+</pre>
+      <p>Since <samp>CAR</samp> inherits from <samp>VEHICLE</samp>, and every task/family inherits from <samp>root</samp>,
+      the order configuration is applied and overwritten in is:</p>
+      <pre>
+settings in root
+extended/overwritten by settings in VEHICLE
+extended/overwritten by CAR
+extended/overwritten by red_car
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Red Car</h3>
+
+      <p>If we add an additional family to inherit from, by writing:</p>
+      <pre class="prettyprint lang-cylc">
+    [[red_car]]
+        inherit = CAR, ENGINE_ELECTRIC
+</pre>
+      <p>the order becomes:</p>
+      <pre>
+settings in root
+extended/overwritten by settings in ENGINE_ELECTRIC
+extended/overwritten by settings in VEHICLE
+extended/overwritten by CAR
+extended/overwritten by red_car
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Startup Explanation</h3>
+
+      <p>The </p>
+    </div>
+
+    <div class="slide">
+      <h3>Boarding</h3>
+
+      <p>We'd like to tell passengers which gate to board at in the
+      <samp>boarding</samp> task. The gate was output to a file by
+      <samp>startup</samp>, for the first cycle, and by
+      <samp>assign_gate</samp> thereafter.</p>
+
+      <p>This means that this task has to read the <samp>flight_gates</samp>
+      file from the last cycle's data directory.</p>
+    </div>
+
+    <div class="slide">
+      <h3>rose task-env --cycle-offset</h3>
+
+      <p>Rose will give us the environment variable for the last cycle's data
+      directory, if we ask for it.</p>
+
+      <p>We need to use the same <samp>environment scripting</samp> option, but
+      with a <samp>--cycle-offset=T12H</samp> option - add this to your runtime
+      section:</p>
+      <pre class="prettyprint lang-cylc">
+    [[boarding]]
+        environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">ROSE_DATAC???</h3>
+
+      <p>This exports an extra environment variable called
+      <samp>$ROSE_DATACT12H</samp>.</p>
+
+      <p>We can now refer to this in boarding's <samp>command scripting</samp>
+      - add:</p>
+      <pre class="prettyprint lang-cylc">
+        command scripting = """
+            . $ROSE_DATACT12H/flight_gate
+            cylc task message "Now boarding at Gate $GATE"
+            sleep 5
+        """
+</pre>
+
+      <p>This will report the correct gate.</p>
+    </div>
+
+    <div class="slide">
+      <h3>rose date</h3>
+
+      <p>We can also process the cylc environment variable
+      <samp>$CYLC_TASK_CYCLE_TIME</samp> in our tasks, using the date
+      manipulation utility <a href="rose-command.html#rose-date">rose
+      date</a>.</p>
+
+      <p>This takes date strings and transmutes them into different formats
+      and/or with offsets in time.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Using rose date</h3>
+
+      <p>Replace the boarding <samp>command scripting</samp> triple-quoted
+      block with:</p>
+      <pre class="prettyprint lang-cylc">
+        command scripting = """
+            . $ROSE_DATACT12H/flight_gate
+            FLIGHT_TIME=$(rose date --print-format="%H:%M" $CYLC_TASK_CYCLE_TIME)
+            cylc task message "Flight $FLIGHT_TIME now boarding at Gate $GATE"
+            sleep 5
+            cylc task message "Last call for Flight $FLIGHT_TIME at Gate $GATE"
+            sleep 5
+        """
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Using rose date: explanation</h3>
+
+      <p>We've used the <samp>--print-format</samp> option to <code>rose
+      date</code> to change the format of the date and time into something
+      simple.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="running-no-retries">Running the suite</h3>
+
+      <p>Try running the suite. It should run correctly over the cycle times,
+      and if you have the correct <code>cylc gui</code> view open, you'll see
+      the cylc task messages appear.</p>
+    </div>
+
+    <div class="slide">
+      <h3>rose date --offset</h3>
+
+      <p><code>rose date</code> can be used to add or remove increments of
+      time, as well as change the output format.</p>
+
+      <p>If you add the following lines to your runtime section, you can see
+      how you can use different offset units (days, hours) and quite
+      complicated <a href=
+      "http://docs.python.org/library/time.html#time.strftime">formats</a>:</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example</h3>
+      <pre class="prettyprint lang-cylc">
+    [[departure]]
+        command scripting = """
+            NOW=$(rose date --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
+            ETA=$(rose date --offset=-1d --offset=2h --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
+            echo "Welcome to the aircraft. The current time and date is $NOW."
+            echo "Since we're crossing the International Date Line, our ETA is $ETA."
+        """
+</pre>
+
+      <p>Try running the suite again and looking at the departure output using
+      <code>rose suite-log-view</code>.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="further">Further Reading</h2>
+
+      <p>For more information, see:</p>
+
+      <ul>
+        <li><a href="rose-variables.html#ROSE_DATAC">ROSE_DATAC</a></li>
+
+        <li><a href=
+        "rose-variables.html#ROSE_DATAC_TIME">ROSE_DATAC???</a></li>
+
+        <li><a href="rose-command.html#rose-date">rose date</a></li>
+
+        <li>the <a href=
+        "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user
+        guide</a>.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
