@@ -43,22 +43,21 @@
   <div id="body-main">
     <h2>suite.rc</h2>
     <pre class="prettyprint">
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <title>Output</title>
-  <meta name="author" content="Rose Team, Met Office, UK" />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-</head>
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head&gt;
+  &lt;title&gt;Output&lt;/title&gt;
+  &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;
+&lt;/head&gt;
 
-<script type="text/javascript" src="../../jquery.min.js"></script>
-<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-<script type="text/javascript">
+&lt;script type="text/javascript" src="../../jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://www.google.com/jsapi"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
   google.load('visualization', '1', {packages: ['corechart']});
-</script>
-<script type="text/javascript">
+&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
 function startDrawing() {
     var data = new google.visualization.DataTable();
     var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
@@ -100,7 +99,7 @@ function startDrawing() {
                           width: 500, height: 400,
                           colors: colours_present,
                           vAxis: {title: "Distance", minValue: 0.0, maxValue: 450.0},
-                          hAxis: {title: "Time", minValue: 0.0, maxValue: 1500.0},
+                          hAxis: {title: "Time", minValue: 0.0, maxValue: 15.0},
             });
             i += 1;
             if (i + 1 == times.length) {
@@ -110,12 +109,12 @@ function startDrawing() {
     });
 }
 google.setOnLoadCallback(startDrawing);
-</script>
-</head>
-  <body>
-    <div id="chart_div"></div>
-  </body>
-</html>
+&lt;/script&gt;
+&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="chart_div"&gt;&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
 </pre>
   </div>
 </body>
