@@ -68,7 +68,7 @@ class RoseAnaApp(BuiltinApp):
                 method_paths.append(item)
 
         # Initialise the analysis engine
-        engine = Analyse(config, opts, method_paths,
+        engine = Analyse(config, opts, args, method_paths,
                          reporter=app_runner.event_handler,
                          popen=app_runner.popen)
 
@@ -125,8 +125,11 @@ class TestsFailedException(Exception):
 class Analyse(object):
 
     """A comparison engine for Rose."""
+    
+    SCHEME = "test"
 
-    def __init__(self, config, opts, method_paths, reporter=None, popen=None):
+    def __init__(self, config, opts, args, method_paths, reporter=None,
+                 popen=None):
         if reporter is None:
             self.reporter = Reporter(opts.verbosity - opts.quietness)
         else:
@@ -136,6 +139,7 @@ class Analyse(object):
         else:
             self.popen = popen
         self.opts = opts
+        self.args = args
         self.config = config
         self.load_tasks()
         modules = []
@@ -270,24 +274,43 @@ class Analyse(object):
         """
 
         tasks = []
-        for task in self.config.value.keys():
-            if task is "env":
+        for key, node in self.config.value.items():
+            if not key.startswith(self.SCHEME + ":"):
                 continue
-            newtask = AnalysisTask()
-            newtask.name = task
-            newtask.resultfile = self.config.get_value([task, "resultfile"])
-            newtask = self._find_file("result", newtask)
-            newtask.extract = self.config.get_value([task, "extract"])
-            result = re.search(r":", newtask.extract)
+            if node.is_ignored():
+                continue
+            task = AnalysisTask()
+            task.name = key[len(self.SCHEME + ":"):]
+            for name in ["resultfile", "kgo1file"]:
+                value = node.get_value([name])
+                if value:
+                    task.items.append(value)
+            value = node.get_value(["items"])
+            if value:
+                if "{}" in value:
+                    for arg in self.args:
+                        task.items.append(value.replace("{}", arg))
+# TBD need to prepend the correct working directory.
+                else:
+                    task.items.append(value)
+
+#
+# TBD More to be done from here down.
+#
+
+
+            task = self._find_file("result", task)
+            task.extract = node.get_value(["extract"])
+            result = re.search(r":", task.extract)
             if result:
-                newtask.subextract = re.sub(r".*:\s*", r"",
-                                    newtask.extract)
-                newtask.extract = re.sub(r"\s*:.*", r"",
-                                    newtask.extract)
-            newtask.comparison = self.config.get_value([task, "comparison"])
-            newtask.tolerance = self.config.get_value([task, "tolerance"])
-            newtask.warnonfail = (
-                    self.config.get_value([task, "warnonfail"]) in 
+                task.subextract = re.sub(r".*:\s*", r"",
+                                    task.extract)
+                task.extract = re.sub(r"\s*:.*", r"",
+                                    task.extract)
+            task.comparison = node.get_value(["comparison"])
+            task.tolerance = node.get_value(["tolerance"])
+            task.warnonfail = (
+                    node.get_value(["warnonfail"]) in 
                     ["yes", "true"])
 
             # Allow for multiple KGO, e.g. kgo1file, kgo2file, for
@@ -295,14 +318,14 @@ class Analyse(object):
             for i in range(1, MAX_KGO_FILES):
                 kgovar = "kgo" + str(i)
                 kgofilevar = kgovar + "file"
-                if self.config.get([task, kgofilevar]):
-                    tempvar = self.config.get([task, kgofilevar])[:]
-                    setattr(newtask, kgofilevar, tempvar)
-                    newtask.numkgofiles += 1
-                    newtask = self._find_file(kgovar, newtask)
+                if node.get([kgofilevar]):
+                    tempvar = node.get([kgofilevar])[:]
+                    setattr(task, kgofilevar, tempvar)
+                    task.numkgofiles += 1
+                    task = self._find_file(kgovar, task)
                 else:
                     break
-            tasks.append(newtask)
+            tasks.append(task)
         self.tasks = tasks
         return tasks
 
@@ -392,6 +415,7 @@ class AnalysisTask(object):
 
 # Variables defined in config file
         self.name = None
+        self.items = []
         self.resultfile = None
         self.kgofile = None
         self.comparison = None

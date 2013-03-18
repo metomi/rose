@@ -24,13 +24,19 @@ from rose.apps.rose_ana import DataLengthError, data_from_regexp
 REGEXPS = {
   'um_wallclock' : r"Total Elapsed CPU Time:\s*(\S+)",
   'um_initial_norms' : r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
-  'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)", }
+  'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)",
+  'var_penalty' : r" J= \s*(\S+)\s*gradJ=",
+  'var_gradient' : r" gradJ= \s*(\S+)",
+  'var_converged' : r" [Cc]onverge from\s*(\S+)\s*to\s*(\S+)",
+  'var_tests_pass' : r"PASS(.*)",
+  'var_tests_fail' : r"FAIL(.*)", }
 
 class OutputGrepper(object):
     def run(self, task, variable):
         """Return a list of values matching a regular expression."""
         filevar  = variable + "file"
         filename = getattr(task, filevar)
+        print 'filename is:', filename
         numbers = data_from_regexp(REGEXPS[task.subextract], filename)
         datavar  = variable + "data"
         setattr(task, datavar, numbers)
