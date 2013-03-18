@@ -281,24 +281,17 @@ class Analyse(object):
                 continue
             task = AnalysisTask()
             task.name = key[len(self.SCHEME + ":"):]
-            for name in ["resultfile", "kgo1file"]:
+            for name in ["kgo1file", "resultfile"]:
                 value = node.get_value([name])
                 if value:
                     task.items.append(value)
             value = node.get_value(["items"])
-            if value:
-                if "{}" in value:
+            for name in value.split():
+                if "{}" in name:
                     for arg in self.args:
-                        task.items.append(value.replace("{}", arg))
-# TBD need to prepend the correct working directory.
+                        task.items.append(name.replace("{}", arg))
                 else:
-                    task.items.append(value)
-
-#
-# TBD More to be done from here down.
-#
-
-
+                    task.items.append(name)
             task = self._find_file("result", task)
             task.extract = node.get_value(["extract"])
             result = re.search(r":", task.extract)
@@ -313,18 +306,15 @@ class Analyse(object):
                     node.get_value(["warnonfail"]) in 
                     ["yes", "true"])
 
-            # Allow for multiple KGO, e.g. kgo1file, kgo2file, for
-            # statistical comparisons of results
-            for i in range(1, MAX_KGO_FILES):
-                kgovar = "kgo" + str(i)
-                kgofilevar = kgovar + "file"
-                if node.get([kgofilevar]):
-                    tempvar = node.get([kgofilevar])[:]
-                    setattr(task, kgofilevar, tempvar)
-                    task.numkgofiles += 1
-                    task = self._find_file(kgovar, task)
-                else:
-                    break
+            # Use resultfile and kgo1file until rest of rose ana infrastructure
+            # has been updated to use task.items. Note: kgo2file and higher no
+            # longer supported.
+            setattr(task, "kgo1file", task.items[0])
+            task.resultfile = task.items[1]
+            task = self._find_file("kgo1", task)
+            task = self._find_file("result", task)
+            task.numkgofiles += 1
+
             tasks.append(task)
         self.tasks = tasks
         return tasks
