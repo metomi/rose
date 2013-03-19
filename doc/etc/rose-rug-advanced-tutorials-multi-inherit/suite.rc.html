@@ -52,8 +52,8 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            three =&gt; two =&gt; one
-            one =&gt; go =&gt; red_car &amp; blue_car
+            get_ready =&gt; COMPETITORS
+            COMPETITORS:finish-all => output
         """
 [runtime]
     [[root]]
@@ -64,30 +64,34 @@
         [[[remote]]]
             # Run on the computer that invoked 'rose suite-run'
             host = {{ ROSE_ORIG_HOST }}
-    [[go]]
-        command scripting = "firefox $CYLC_SUITE_SHARE_PATH/race.html"
-    [[RACE_VEHICLE]]
-        command scripting = "race_the_car"           
-    [[TRUCK]]
-        inherit = RACE_VEHICLE
+    [[output]]
+        command scripting = """
+            cp $CYLC_SUITE_DEF_PATH/lib/output.html $CYLC_SUITE_SHARE_PATH/output.html
+            xdg-open $CYLC_SUITE_SHARE_PATH/output.html
+            """
+    [[COMPETITOR_VEHICLE]]
+        pre-command scripting = "printenv | sort | grep ^COMP"
+        command scripting = "race_the_car"
+    [[BODY_TRUCK]]
+        inherit = COMPETITOR_VEHICLE
         [[[enviroment]]]
-            MASS_KG = 2000
-            WHEEL_DIAMETER_M = 0.7
-    [[CAR]]
-        inherit = RACE_VEHICLE
+            COMP_MASS_KG = 2000
+            COMP_WHEEL_DIAMETER_M = 0.7
+    [[BODY_CAR]]
+        inherit = COMPETITOR_VEHICLE
         [[[environment]]]
-            MASS_KG = 1000
-            WHEEL_DIAMETER_M = 0.5
+            COMP_MASS_KG = 1000
+            COMP_WHEEL_DIAMETER_M = 0.5
     [[ENGINE_PETROL]]
         [[[environment]]]
-            GEAR_RATIOS = 3.18 2.26 1.68 1.29 1.06
-            POWER_FRAC_VS_1000_RPM = 0.18 0.3 0.6 0.88 1.0 0.6
-            MAX_POWER_KW = 135
+            COMP_GEAR_RATIOS = 3.18 2.26 1.68 1.29 1.06
+            COMP_POWER_FRAC_VS_1000_RPM = 0.18 0.3 0.6 0.88 1.0 0.6
+            COMP_MAX_POWER_KW = 135
     [[ENGINE_ELECTRIC]]
         [[[environment]]]
-            GEAR_RATIOS = 2.0
-            POWER_FRAC_VS_1000_RPM = 0.63 0.65 0.66 0.69 0.71 0.73 0.76 0.78 0.81 0.84 0.88 0.92 0.96 1.0 0.8 0.5
-            MAX_POWER_KW = 126
+            COMP_GEAR_RATIOS = 2.0
+            COMP_POWER_FRAC_VS_1000_RPM = 0.63 0.65 0.66 0.69 0.71 0.73 0.76 0.78 0.81 0.84 0.88 0.92 0.96 1.0 0.8 0.5
+            COMP_MAX_POWER_KW = 126
 </pre>
   </div>
 </body>

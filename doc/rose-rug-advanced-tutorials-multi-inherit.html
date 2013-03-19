@@ -75,7 +75,7 @@
       <h2 id="intro">Introduction</h2>
 
       <p>This part of the Rose user guide walks you through using
-      more than one cylc family for configuring a task (multiple
+      more than one cylc family for configuring a task's runtime (multiple
       inheritance).</p>
 
       <p>This helps when tasks naturally belong to more than one
@@ -90,11 +90,6 @@
       "http://upload.wikimedia.org/wikipedia/commons/0/0b/Pro_Street_Camaro_at_launch.JPG"
       width="70%" alt="Drag race starting in Saskatoon, Saskatchewan" />
 
-    </div>
-    
-    <div class="slide">
-      <h3 class="alwayshidden">Setup</h3>
-
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
       new directory somewhere - e.g. in your homespace) containing a blank
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
@@ -103,7 +98,34 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Explanation</h3>
+      <h3 class="alwayshidden">Setup (2)</h3>
+      
+      <p>Create a subdirectory in your suite directory called <samp>lib/</samp>
+      and create a file inside this subdirectory called <samp>output.html</samp>
+      with <a href="etc/rose-rug-advanced-tutorials-multi-inherit/output.html">this content</a>.
+      This is a web page that summarises the suite output.</p>
+      
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Setup (3)</h3>
+      
+      <p>We'll also need an executable script that looks like
+      <a href="etc/rose-rug-advanced-tutorials-multi-inherit/race-the-car.html">this</a> -
+      create a <samp>bin/</samp> subdirectory in your suite directory, and paste the script
+      into a file called <samp>race_the_car</samp>. The <samp>bin/</samp> directory is added
+      to the path by <code>cylc</code>, which means you can just specify the name of this script
+      in <samp>command_scripting</samp> (e.g. <samp>command scripting = "race_the_car"</samp>).</p>
+      
+      <p>We need to make the file executable as well - you'll need to run:</p>
+      <pre class="shell">
+chmod +x bin/race_the_car
+</pre>
+      <p>where your current working directory is the suite directory.</p>     
+    </div>
+
+    <div class="slide">
+      <h3 id="explanation">Explanation</h3>
 
       <p>A realistic scenario for multiple inheritance might be when you have one
       set of families handling job submission (e.g. parallel vs serial) and one set
@@ -111,7 +133,7 @@
 
       <p>In our <samp>suite.rc</samp> file, there is a set of families for the
       engine (<samp>ENGINE_PETROL</samp>, <samp>ENGINE_ELECTRIC</samp>), and one
-      for the actual chassis and body (<samp>CAR</samp>, <samp>TRUCK</samp>).</p>
+      for the actual chassis and body (<samp>BODY_CAR</samp>, <samp>BODY_TRUCK</samp>).</p>
     </div>
 
     <div class="slide">
@@ -120,188 +142,314 @@
       <p>We need to use configuration from both sets to build a racer.</p>
 
       <p>We can see from the <samp>graph</samp> specification in <samp>dependencies</samp>
-      that we have a task called <samp>blue_car</samp> and a task called <samp>red_car</samp>
-      that need defining.</p>
+      that we have a family called <samp>COMPETITOR_VEHICLE</samp> whose tasks will be
+      run.</p>
+      
+      <p><samp>BODY_CAR</samp> and <samp>BODY_TRUCK</samp> themselves inherit from
+      <samp>COMPETITOR_VEHICLE</samp>, so any tasks belonging to these families will also
+      belong to <samp>COMPETITOR_VEHICLE</samp> and will be run.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Red Car</h3>
 
-      <p>Let's start off with the <samp>red_car</samp>. To inherit from a
-      single family <samp>CAR</samp>, we would put this under the <samp>[runtime]</samp> section:</p>
+      <p>Let's start off with creating a configuration for a task called <samp>red_car</samp>.</p>
+      
+      <p>We'll inherit from a single family <samp>BODY_CAR</samp> - put this under the
+      <samp>[runtime]</samp> section:</p>
       <pre class="prettyprint lang-cylc">
     [[red_car]]
-        inherit = CAR
+        inherit = BODY_CAR
 </pre>
-      <p>Since <samp>CAR</samp> inherits from <samp>VEHICLE</samp>, and every task/family inherits from <samp>root</samp>,
+      <p>Since <samp>BODY_CAR</samp> inherits from <samp>COMPETITOR_VEHICLE</samp>, and every task/family
+      inherits from <samp>root</samp>,
       the order configuration is applied and overwritten in is:</p>
       <pre>
 settings in root
-extended/overwritten by settings in VEHICLE
-extended/overwritten by CAR
-extended/overwritten by red_car
+extended/overwritten by settings in COMPETITOR_VEHICLE
+extended/overwritten by settings in BODY_CAR
+extended/overwritten by settings in red_car
 </pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Diagram</h3>
+      
+      <p>In a diagram form, the inheritance looks like:</p>
+      
+      <pre>
+      root
+        |
+  COMPETITOR_VEHICLE
+        |
+     BODY_CAR
+        |
+     red_car
+</pre>
+
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Red Car</h3>
 
-      <p>If we add an additional family to inherit from, by writing:</p>
+      <p>This means that any settings in, for example, <samp>root</samp>, can be
+      overwritten by settings from the others. This is the standard way that single
+      inheritance of families works.</p>
+      
+      <p>However, we need to include some configuration from an entirely separate
+      family, so that we have an engine!</p>
+      
+      <p>Add another family for the engine by writing:</p>
       <pre class="prettyprint lang-cylc">
     [[red_car]]
-        inherit = CAR, ENGINE_ELECTRIC
+        inherit = BODY_CAR, ENGINE_ELECTRIC
 </pre>
-      <p>the order becomes:</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Multiple Inheritance Precedence</h3>
+
+      <p>In a diagram form, this inheritance looks like:</p>
+
+     <pre>
+       root 
+      /   \__________
+     /               \
+COMPETITOR_VEHICLE  ENGINE_ELECTRIC
+     /          _____/
+  BODY_CAR     /
+      \       /
+        red_car
+</pre>
+
+      <p>The order of inheritance becomes:</p>
       <pre>
 settings in root
 extended/overwritten by settings in ENGINE_ELECTRIC
-extended/overwritten by settings in VEHICLE
-extended/overwritten by CAR
+extended/overwritten by settings in COMPETITOR_VEHICLE
+extended/overwritten by BODY_CAR
 extended/overwritten by red_car
 </pre>
+
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Multiple Inheritance Precedence (2)</h3>
+
+      <p>We can see that settings in <samp>ENGINE_ELECTRIC</samp> could
+      be overwritten by the other families and the task itself - in other
+      words, the inheritance list in <samp>inherit = BODY_CAR, ENGINE_ELECTRIC</samp>
+      is basically last-to-first (<samp>ENGINE_ELECTRIC</samp> then the
+      <samp>BODY_CAR</samp>-related families (<samp>COMPETITOR_VEHICLE</samp> and <samp>BODY_CAR</samp>)).</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Startup Explanation</h3>
+      <h3 class="alwayshidden">Red Car</h3>
 
-      <p>The </p>
-    </div>
-
-    <div class="slide">
-      <h3>Boarding</h3>
-
-      <p>We'd like to tell passengers which gate to board at in the
-      <samp>boarding</samp> task. The gate was output to a file by
-      <samp>startup</samp>, for the first cycle, and by
-      <samp>assign_gate</samp> thereafter.</p>
-
-      <p>This means that this task has to read the <samp>flight_gates</samp>
-      file from the last cycle's data directory.</p>
-    </div>
-
-    <div class="slide">
-      <h3>rose task-env --cycle-offset</h3>
-
-      <p>Rose will give us the environment variable for the last cycle's data
-      directory, if we ask for it.</p>
-
-      <p>We need to use the same <samp>environment scripting</samp> option, but
-      with a <samp>--cycle-offset=T12H</samp> option - add this to your runtime
-      section:</p>
+      <p>We also need a classifying colour - change the runtime to:</p>
       <pre class="prettyprint lang-cylc">
-    [[boarding]]
-        environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
+    [[red_car]]
+        inherit = CAR, ENGINE_ELECTRIC
+        [[[environment]]]
+            COMP_COLOUR = red
+</pre>
+      <p>When <code>cylc</code> evaluates all this, it will be equivalent to:</p>
+      <pre class="prettyprint lang-cylc">
+    [[red_car]]
+        # From COMPETITOR_VEHICLE:
+        command scripting = "race_the_car"
+
+        [[[environment]]]
+            # From ENGINE ELECTRIC:
+            COMP_GEAR_RATIOS = 2.0
+            COMP_POWER_FRAC_VS_1000_RPM = 0.63 0.65 0.66 0.69 0.71 0.73 0.76 0.78 0.81 0.84 0.88 0.92 0.96 1.0 0.8 0.5
+            COMP_MAX_POWER_KW = 126
+
+            # From BODY_CAR:
+            COMP_MASS_KG = 1000
+            COMP_WHEEL_DIAMETER_M = 0.5
+
+            # From red_car itself:
+            COMP_COLOUR = red
 </pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">ROSE_DATAC???</h3>
+      <h3 class="alwayshidden">Overriding</h3>
 
-      <p>This exports an extra environment variable called
-      <samp>$ROSE_DATACT12H</samp>.</p>
-
-      <p>We can now refer to this in boarding's <samp>command scripting</samp>
-      - add:</p>
+      <p>We should add another <samp>COMPETITOR_VEHICLE</samp> task - add this to your runtime:</p>
       <pre class="prettyprint lang-cylc">
-        command scripting = """
-            . $ROSE_DATACT12H/flight_gate
-            cylc task message "Now boarding at Gate $GATE"
-            sleep 5
-        """
+    [[blue_truck]]
+        inherit = BODY_TRUCK, ENGINE_PETROL
+        [[[environment]]]
+            COMP_COLOUR = blue
+</pre>
+      <p>This task inherits from different families, but gives a similar kind of
+      configuration to <samp>red_car</samp>.</p>
+   </div>
+   
+   <div class="slide">
+     <h3 class="alwayshidden">Running the Suite</h3>
+     
+     <p>Go ahead and run the suite. The two vehicles will race over a quarter mile,
+     and you should see the results in both the cylc GUI and in the web page
+     that pops up. The environment variables we set up will be printed in the
+     standard output of both tasks in the Rose output viewer.</p>
+     
+     <p>This is a successful implementation of multiple inheritance! The next thing
+     to do is to make it slightly more tricky.</p>
+     
+  </div>
+  
+   <div class="slide">
+     <h3 class="alwayshidden">Diamond Inheritance</h3>
+     
+     <p>Let's suppose the race organisers decide on a maximum engine power for competitors
+     to adhere to. At the moment, <samp>COMP_MAX_POWER_KW</samp> is different in the
+     two types of engine we've specified.</p>
+     
+     <p>As this will be common to all competitors, it makes sense to move the setting
+     to the <samp>COMPETITOR_VEHICLE</samp> class.</p>
+     
+   </div>
+   
+   <div class="slide">
+     <h3 class="alwayshidden">Implementing Diamond Inheritance</h3>
+     
+     <p>Remove all the lines in the <samp>suite.rc</samp> file for
+     <samp>COMP_MAX_POWER_KW</samp>, and change the <samp>COMPETITOR_VEHICLE</samp>
+     runtime to:</p>
+     <pre class="prettyprint lang-cylc">
+    [[COMPETITOR_VEHICLE]]
+        command scripting = "race_the_car"
+        [[[environment]]]
+            COMP_MAX_POWER_KW = 130
 </pre>
 
-      <p>This will report the correct gate.</p>
-    </div>
-
-    <div class="slide">
-      <h3>rose date</h3>
-
-      <p>We can also process the cylc environment variable
-      <samp>$CYLC_TASK_CYCLE_TIME</samp> in our tasks, using the date
-      manipulation utility <a href="rose-command.html#rose-date">rose
-      date</a>.</p>
-
-      <p>This takes date strings and transmutes them into different formats
-      and/or with offsets in time.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Using rose date</h3>
-
-      <p>Replace the boarding <samp>command scripting</samp> triple-quoted
-      block with:</p>
+      <p>We'll also change the ENGINE families so that they include this setting
+      through inheritance - add <samp>inherit</samp> lines to both ENGINE families:</p>
+      
+   </div>
+   
+   <div class="slide">
+      <h3 class="alwayshidden">Implementing Diamond Inheritance (2)</h3>
+      
       <pre class="prettyprint lang-cylc">
-        command scripting = """
-            . $ROSE_DATACT12H/flight_gate
-            FLIGHT_TIME=$(rose date --print-format="%H:%M" $CYLC_TASK_CYCLE_TIME)
-            cylc task message "Flight $FLIGHT_TIME now boarding at Gate $GATE"
-            sleep 5
-            cylc task message "Last call for Flight $FLIGHT_TIME at Gate $GATE"
-            sleep 5
-        """
+    [[ENGINE_PETROL]]
+        inherit = COMPETITOR_VEHICLE
+</pre>
+     <p>and</p>
+      <pre class="prettyprint lang-cylc">
+    [[ENGINE_ELECTRIC]]
+        inherit = COMPETITOR_VEHICLE
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Implementing Diamond Inheritance (3)</h3>
+      
+      <p>Our <samp>red_car</samp> task has <samp>inherit = BODY_CAR, ENGINE_ELECTRIC</samp>.
+      The inheritance order for the <samp>red_car</samp> task used to be:</p>
+      <pre>
+settings in root
+extended/overwritten by settings in ENGINE_ELECTRIC
+extended/overwritten by settings in COMPETITOR_VEHICLE
+extended/overwritten by BODY_CAR
+extended/overwritten by red_car 
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Implementing Diamond Inheritance (4)</h3>
+      <p>However, since the ENGINE families now inherit from COMPETITOR_VEHICLE, they
+      should be evaluated after it - they should be able to override that family. This means that
+      the order is now:</p>
+      <pre>
+settings in root
+extended/overwritten by settings in COMPETITOR_VEHICLE
+extended/overwritten by settings in ENGINE_ELECTRIC
+extended/overwritten by BODY_CAR
+extended/overwritten by red_car 
+</pre>
+      <p>which is subtly different. This is a case of <a href="http://mypythonnotes.wordpress.com/2008/11/01/python-multiple-inheritance-and-the-diamond-problem/">diamond inheritance</a>, where the diagram goes:</p>
+      <pre>
+        root
+          |
+  COMPETITOR_VEHICLE
+     /         \
+  BODY_CAR   ENGINE_ELECTRIC
+      \       /
+        red_car
 </pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Using rose date: explanation</h3>
-
-      <p>We've used the <samp>--print-format</samp> option to <code>rose
-      date</code> to change the format of the date and time into something
-      simple.</p>
-    </div>
-
-    <div class="slide">
-      <h3 id="running-no-retries">Running the suite</h3>
-
-      <p>Try running the suite. It should run correctly over the cycle times,
-      and if you have the correct <code>cylc gui</code> view open, you'll see
-      the cylc task messages appear.</p>
-    </div>
-
-    <div class="slide">
-      <h3>rose date --offset</h3>
-
-      <p><code>rose date</code> can be used to add or remove increments of
-      time, as well as change the output format.</p>
-
-      <p>If you add the following lines to your runtime section, you can see
-      how you can use different offset units (days, hours) and quite
-      complicated <a href=
-      "http://docs.python.org/library/time.html#time.strftime">formats</a>:</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Example</h3>
+      <h3 id="diamond-override">Overriding Diamond Inheritance</h3>
+      
+      <p>Although this is more complex, it's still easy to override settings.</p>
+      
+      <p>Let's suppose there's some cheating going on, and the standard
+      <samp>ENGINE_PETROL</samp> family actually has a bit more power.
+      Change the <samp>ENGINE_PETROL</samp> family to override the
+      <samp>COMP_MAX_POWER_KW</samp> setting:</p>
       <pre class="prettyprint lang-cylc">
-    [[departure]]
-        command scripting = """
-            NOW=$(rose date --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
-            ETA=$(rose date --offset=-1d --offset=2h --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
-            echo "Welcome to the aircraft. The current time and date is $NOW."
-            echo "Since we're crossing the International Date Line, our ETA is $ETA."
-        """
+    [[ENGINE_PETROL]]
+        inherit = COMPETITOR_VEHICLE    
+        [[[environment]]]
+            COMP_GEAR_RATIOS = 3.18 2.26 1.68 1.29 1.06
+            COMP_POWER_FRAC_VS_1000_RPM = 0.18 0.3 0.6 0.88 1.0 0.6
+            COMP_MAX_POWER_KW = 150  # Cheating!
 </pre>
+    </div>
+    
+    <div class="slide">
+       <h3 class="alwayshidden">Overriding Diamond Inheritance (2)</h3>
+       
+       <p>Meanwhile, our <samp>red_car</samp> task has invested in some
+       oversize wheels - change the <samp>red_car</samp> runtime to read:</p>
+     <pre class="prettyprint lang-cylc">
+    [[red_car]]
+        inherit = BODY_CAR, ENGINE_ELECTRIC
+        [[[environment]]]
+            COMP_COLOUR = red
+            COMP_WHEEL_DIAMETER_M = 1.0
+</pre>
+    </div>
+    
+    <div class="slide">
+       <h3 id="re-run">Re-Running the suite</h3>
+       
+       <p>Run the suite again, and have a look at the output files - the
+       overrides or overwriting of settings should have happened. <samp>COMP_WHEEL_DIAMETER_M</samp> should now be <samp>1.0</samp> for
+       the <samp>red_car</samp> task, and the <samp>COMP_MAX_POWER_KW</samp>
+       should be <samp>150</samp> in the <samp>blue_truck</samp> task.</p>
 
-      <p>Try running the suite again and looking at the departure output using
-      <code>rose suite-log-view</code>.</p>
     </div>
 
+    <div class="slide">
+       <h2 id="notes">Notes</h2>
+       
+       <p>You can inherit from any number of families, not just two - for example,
+       you could invent a scenario where you might write:</p>
+      <pre class="prettyprint lang-cylc">
+    [[red_car]]
+        inherit = BODY_CAR, ENGINE_ELECTRIC, DRIVER_PROFESSIONAL, SPOILER_OUTSIZE
+</pre>
+       <p>Have a go at overriding various settings in the tasks and families, and
+       seeing at which points this becomes effective.</p>
+    </div>
+    
     <div class="slide">
       <h2 id="further">Further Reading</h2>
 
       <p>For more information, see:</p>
 
       <ul>
-        <li><a href="rose-variables.html#ROSE_DATAC">ROSE_DATAC</a></li>
-
-        <li><a href=
-        "rose-variables.html#ROSE_DATAC_TIME">ROSE_DATAC???</a></li>
-
-        <li><a href="rose-command.html#rose-date">rose date</a></li>
+        <li>the <a href="http://www.python.org/download/releases/2.3/mro">algorithm</a> on which cylc's
+        multiple inheritance is based</a></li>
 
         <li>the <a href=
-        "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user
-        guide</a>.</li>
+        "http://cylc.github.com/cylc/html/single/cug-html.html#x1-880008.4">cylc user guide</a></li>
       </ul>
     </div>
   </div>

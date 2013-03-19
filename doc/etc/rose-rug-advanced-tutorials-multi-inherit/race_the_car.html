@@ -56,18 +56,18 @@ DISTANCE_METRES = 1609.344 / 4  # Quarter-mile
 
 if __name__ == "__main__":
     dist = 0.0
-    time = 0.0
+    elapsed_time = 0.0
     dt = 0.05
     velocity = 0.0
     gear = 1
-    vehicle_type = os.getenv("COLOUR")
-    gear_ratios = [float(r) for r in os.getenv("GEAR_RATIOS").split()]
-    mass = float(os.getenv("MASS_KG"))
-    wheel_diameter = float(os.getenv("WHEEL_DIAMETER_M"))
-    max_kw = float(os.getenv("MAX_POWER_KW"))
-    power_frac_vs_1000_rpms = os.getenv("POWER_FRAC_VS_1000_RPM").split()
+    vehicle_type = os.getenv("RACE_COLOUR")
+    gear_ratios = [float(r) for r in os.getenv("RACE_GEAR_RATIOS").split()]
+    mass = float(os.getenv("RACE_MASS_KG"))
+    wheel_diameter = float(os.getenv("RACE_WHEEL_DIAMETER_M"))
+    max_kw = float(os.getenv("RACE_MAX_POWER_KW"))
+    power_frac_vs_1000_rpms = os.getenv("RACE_POWER_FRAC_VS_1000_RPM").split()
     kw_vs_1000_rpms = [float(k) * max_kw for k in power_frac_vs_1000_rpms]
-    output_dir = os.getenv("OUTPUT_DIR")
+    output_dir = os.getenv("RACE_OUTPUT_DIR")
     output_data = {}
     f = open(os.path.join(output_dir, vehicle_type + ".json"), "w")
     while dist < DISTANCE_METRES:
@@ -89,8 +89,9 @@ if __name__ == "__main__":
             power *= 1000.0
         velocity = math.sqrt((2.0 * power * dt / mass) + velocity ** 2)
         dist += velocity * dt  # Not elegant or correct, but will work.
-        time += dt
-        output_data.update({time: dist})
+        elapsed_time += dt
+        time.sleep(dt)
+        output_data.update({elapsed_time: dist})
     f.write(simplejson.dumps(output_data))
     f.close()
 </pre>
