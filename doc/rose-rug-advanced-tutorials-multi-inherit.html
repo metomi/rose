@@ -151,7 +151,7 @@ chmod +x bin/race_the_car
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Red Car</h3>
+      <h3 id="single">Single Inheritance</h3>
 
       <p>Let's start off with creating a configuration for a task called <samp>red_car</samp>.</p>
       
@@ -190,16 +190,16 @@ extended/overwritten by settings in red_car
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Red Car</h3>
+      <h3 id="multi">Multiple Inheritance</h3>
 
       <p>This means that any settings in, for example, <samp>root</samp>, can be
       overwritten by settings from the others. This is the standard way that single
       inheritance of families works.</p>
       
-      <p>However, we need to include some configuration from an entirely separate
-      family, so that we have an engine!</p>
+      <p>We now need an engine - this means that we need to include some
+      configuration from an entirely separate family.</p>
       
-      <p>Add another family for the engine by writing:</p>
+      <p>Add another family to inherit from by writing:</p>
       <pre class="prettyprint lang-cylc">
     [[red_car]]
         inherit = BODY_CAR, ENGINE_ELECTRIC
@@ -207,9 +207,9 @@ extended/overwritten by settings in red_car
     </div>
     
     <div class="slide">
-      <h3 class="alwayshidden">Multiple Inheritance Precedence</h3>
+      <h3 id="precedence">Multiple Inheritance Precedence</h3>
 
-      <p>In a diagram form, this inheritance looks like:</p>
+      <p>In a diagram form, the inheritance now looks like:</p>
 
      <pre>
        root 
@@ -244,16 +244,16 @@ extended/overwritten by red_car
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Red Car</h3>
+      <h3 class="alwayshidden">Task Configuration</h3>
 
-      <p>We also need a classifying colour - change the runtime to:</p>
+      <p>We also need some racing colours, which should be task-specific - change the runtime to:</p>
       <pre class="prettyprint lang-cylc">
     [[red_car]]
         inherit = CAR, ENGINE_ELECTRIC
         [[[environment]]]
             COMP_COLOUR = red
 </pre>
-      <p>When <code>cylc</code> evaluates all this, it will be equivalent to:</p>
+      <p>When <code>cylc</code> evaluates this runtime now, it will be equivalent to:</p>
       <pre class="prettyprint lang-cylc">
     [[red_car]]
         # From COMPETITOR_VEHICLE:
@@ -275,9 +275,18 @@ extended/overwritten by red_car
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Task Configuration Overrides</h3>
+
+      <p>Note that because configuration in the task is applied last,
+      you can override any family configuration at the task level - whether
+      single inheritance or multiple.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Overriding</h3>
 
-      <p>We should add another <samp>COMPETITOR_VEHICLE</samp> task - add this to your runtime:</p>
+      <p>A race isn't a race without more than one competitor - add another <samp>COMPETITOR_VEHICLE</samp> task
+      in the runtime:</p>
       <pre class="prettyprint lang-cylc">
     [[blue_truck]]
         inherit = BODY_TRUCK, ENGINE_PETROL
@@ -289,7 +298,7 @@ extended/overwritten by red_car
    </div>
    
    <div class="slide">
-     <h3 class="alwayshidden">Running the Suite</h3>
+     <h3 id="run">Running the Suite</h3>
      
      <p>Go ahead and run the suite. The two vehicles will race over a quarter mile,
      and you should see the results in both the cylc GUI and in the web page
@@ -302,7 +311,7 @@ extended/overwritten by red_car
   </div>
   
    <div class="slide">
-     <h3 class="alwayshidden">Diamond Inheritance</h3>
+     <h3 id="more-complex-inheritance">More Complex Inheritance</h3>
      
      <p>Let's suppose the race organisers decide on a maximum engine power for competitors
      to adhere to. At the moment, <samp>COMP_MAX_POWER_KW</samp> is different in the
@@ -348,8 +357,9 @@ extended/overwritten by red_car
     <div class="slide">
       <h3 class="alwayshidden">Implementing Diamond Inheritance (3)</h3>
       
-      <p>Our <samp>red_car</samp> task has <samp>inherit = BODY_CAR, ENGINE_ELECTRIC</samp>.
-      The inheritance order for the <samp>red_car</samp> task used to be:</p>
+      <p>Our <samp>red_car</samp> task has <samp>inherit = BODY_CAR, ENGINE_ELECTRIC</samp>.</p>
+      
+      <p>The inheritance order for the <samp>red_car</samp> task used to be:</p>
       <pre>
 settings in root
 extended/overwritten by settings in ENGINE_ELECTRIC
@@ -362,8 +372,10 @@ extended/overwritten by red_car
     <div class="slide">
       <h3 class="alwayshidden">Implementing Diamond Inheritance (4)</h3>
       <p>However, since the ENGINE families now inherit from COMPETITOR_VEHICLE, they
-      should be evaluated after it - they should be able to override that family. This means that
-      the order is now:</p>
+      should be evaluated after it - they should be able to override that family.
+      The algorithm will recognise this and change the order accordingly.</p>
+      
+      <p>This means that the order will now be:</p>
       <pre>
 settings in root
 extended/overwritten by settings in COMPETITOR_VEHICLE
@@ -384,7 +396,7 @@ extended/overwritten by red_car
     </div>
 
     <div class="slide">
-      <h3 id="diamond-override">Overriding Diamond Inheritance</h3>
+      <h3 id="diamond-override">Overriding Multiple Inheritance</h3>
       
       <p>Although this is more complex, it's still easy to override settings.</p>
       
@@ -427,16 +439,26 @@ extended/overwritten by red_car
     </div>
 
     <div class="slide">
+       <h2 id="more-work">Further work</h3>
+       
+       <p>If you like, have a go at overriding various settings
+       in the tasks and families, and
+       seeing at which points this becomes effective.</p>
+
+    </div>
+    <div class="slide">
        <h2 id="notes">Notes</h2>
        
        <p>You can inherit from any number of families, not just two - for example,
        you could invent a scenario where you might write:</p>
       <pre class="prettyprint lang-cylc">
     [[red_car]]
-        inherit = BODY_CAR, ENGINE_ELECTRIC, DRIVER_PROFESSIONAL, SPOILER_OUTSIZE
+        inherit = BODY_CAR, ENGINE_ELECTRIC, SPOILER_OUTSIZE
 </pre>
-       <p>Have a go at overriding various settings in the tasks and families, and
-       seeing at which points this becomes effective.</p>
+       <p>The inheritance order will still be evaluated last-to-first, so both
+       <samp>BODY_CAR</samp> and <samp>ENGINE_ELECTRIC</samp> (and any families
+       they inherit from) can override <samp>SPOILER_OUTSIZE</samp>. The <samp>red_car</samp>
+       task itself can override any inheritance.</p>
     </div>
     
     <div class="slide">
