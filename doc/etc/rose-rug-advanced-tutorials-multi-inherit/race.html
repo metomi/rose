@@ -3,7 +3,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose User Guide - Advanced Tutorials: Multiple Inheritance race</title>
+  <title>Rose User Guide - Advanced Tutorials: Multiple Inheritance
+  race</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="../../rose-icon.png" type="image/png" />
@@ -70,12 +71,12 @@ if __name__ == "__main__":
     output_dir = os.getenv("COMP_OUTPUT_DIR")
     output_data = {}
     f = open(os.path.join(output_dir, vehicle_type + ".json"), "w")
-    while dist < DISTANCE_METRES:
+    while dist &lt; DISTANCE_METRES:
         curr_rpm = ((velocity / (math.pi * wheel_diameter)) *
                     gear_ratios[gear - 1]) * 60.0 * DIFF_GEAR_RATIO
         curr_rpm_1000 = curr_rpm / 1000.0
         rpm_index = int(curr_rpm_1000)
-        if rpm_index > len(kw_vs_1000_rpms) - 2:
+        if rpm_index &gt; len(kw_vs_1000_rpms) - 2:
             if gear == len(gear_ratios):
                 power = kw_vs_1000_rpms[-1] * 1000.0
             else:
