@@ -64,17 +64,24 @@
         [[[remote]]]
             # Run on the computer that invoked 'rose suite-run'
             host = {{ ROSE_ORIG_HOST }}
+    [[get_ready]]
     [[output]]
         command scripting = """
-            cp $CYLC_SUITE_DEF_PATH/lib/output.html $CYLC_SUITE_SHARE_PATH/output.html
-            xdg-open $CYLC_SUITE_SHARE_PATH/output.html
+            cp $CYLC_SUITE_DEF_PATH/lib/output.html $CYLC_SUITE_SHARE_PATH/
+            cp $CYLC_SUITE_DEF_PATH/lib/jquery.min.js $CYLC_SUITE_SHARE_PATH/
+            echo 'See the output &lt;a href="file:///'$CYLC_SUITE_SHARE_PATH'/output.html"&gt;here&lt;/a&gt;'
+            DISPLAY=:0.0 firefox $CYLC_SUITE_SHARE_PATH/output.html
             """
+    # All competitors should inherit (directly or indirectly) from COMPETITOR_VEHICLE.
     [[COMPETITOR_VEHICLE]]
         pre-command scripting = "printenv | sort | grep ^COMP"
-        command scripting = "race_the_car"
+        command scripting = "race"
+        [[[environment]]]
+            COMP_OUTPUT_DIR = $CYLC_SUITE_SHARE_PATH
+    # Families defining vehicle externals (body, wheels..)
     [[BODY_TRUCK]]
         inherit = COMPETITOR_VEHICLE
-        [[[enviroment]]]
+        [[[environment]]]
             COMP_MASS_KG = 2000
             COMP_WHEEL_DIAMETER_M = 0.7
     [[BODY_CAR]]
@@ -82,6 +89,8 @@
         [[[environment]]]
             COMP_MASS_KG = 1000
             COMP_WHEEL_DIAMETER_M = 0.5
+
+    # Families defining vehicle powertrains (engine, gearbox...)
     [[ENGINE_PETROL]]
         [[[environment]]]
             COMP_GEAR_RATIOS = 3.18 2.26 1.68 1.29 1.06

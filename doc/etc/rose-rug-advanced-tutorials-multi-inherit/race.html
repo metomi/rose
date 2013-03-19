@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose User Guide - Advanced Tutorials: Multiple Inheritance suite.rc</title>
+  <title>Rose User Guide - Advanced Tutorials: Multiple Inheritance race</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="icon" href="../../rose-icon.png" type="image/png" />
@@ -41,7 +41,7 @@
   </div>
 
   <div id="body-main">
-    <h2>suite.rc</h2>
+    <h2>race</h2>
     <pre class="prettyprint">
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -60,14 +60,14 @@ if __name__ == "__main__":
     dt = 0.05
     velocity = 0.0
     gear = 1
-    vehicle_type = os.getenv("RACE_COLOUR")
-    gear_ratios = [float(r) for r in os.getenv("RACE_GEAR_RATIOS").split()]
-    mass = float(os.getenv("RACE_MASS_KG"))
-    wheel_diameter = float(os.getenv("RACE_WHEEL_DIAMETER_M"))
-    max_kw = float(os.getenv("RACE_MAX_POWER_KW"))
-    power_frac_vs_1000_rpms = os.getenv("RACE_POWER_FRAC_VS_1000_RPM").split()
+    vehicle_type = os.getenv("COMP_COLOUR")
+    gear_ratios = [float(r) for r in os.getenv("COMP_GEAR_RATIOS").split()]
+    mass = float(os.getenv("COMP_MASS_KG"))
+    wheel_diameter = float(os.getenv("COMP_WHEEL_DIAMETER_M"))
+    max_kw = float(os.getenv("COMP_MAX_POWER_KW"))
+    power_frac_vs_1000_rpms = os.getenv("COMP_POWER_FRAC_VS_1000_RPM").split()
     kw_vs_1000_rpms = [float(k) * max_kw for k in power_frac_vs_1000_rpms]
-    output_dir = os.getenv("RACE_OUTPUT_DIR")
+    output_dir = os.getenv("COMP_OUTPUT_DIR")
     output_data = {}
     f = open(os.path.join(output_dir, vehicle_type + ".json"), "w")
     while dist < DISTANCE_METRES:
@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 power = kw_vs_1000_rpms[-1] * 1000.0
             else:
                 gear += 1
-                power = 0
+                power = 0.0
         else:
             fraction = (curr_rpm_1000 - rpm_index)
             power = kw_vs_1000_rpms[rpm_index]

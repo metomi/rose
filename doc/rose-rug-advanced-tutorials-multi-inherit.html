@@ -105,21 +105,24 @@
       with <a href="etc/rose-rug-advanced-tutorials-multi-inherit/output.html">this content</a>.
       This is a web page that summarises the suite output.</p>
       
+      <p>We also need to copy the library <a href="jquery.min.js">jquery.min.js</a> into the
+      same directory.</p>
+      
     </div>
     
     <div class="slide">
       <h3 class="alwayshidden">Setup (3)</h3>
       
       <p>We'll also need an executable script that looks like
-      <a href="etc/rose-rug-advanced-tutorials-multi-inherit/race-the-car.html">this</a> -
+      <a href="etc/rose-rug-advanced-tutorials-multi-inherit/race.html">this</a> -
       create a <samp>bin/</samp> subdirectory in your suite directory, and paste the script
-      into a file called <samp>race_the_car</samp>. The <samp>bin/</samp> directory is added
+      into a file called <samp>race</samp>. The <samp>bin/</samp> directory is added
       to the path by <code>cylc</code>, which means you can just specify the name of this script
-      in <samp>command_scripting</samp> (e.g. <samp>command scripting = "race_the_car"</samp>).</p>
+      in <samp>command_scripting</samp> (e.g. <samp>command scripting = "race"</samp>).</p>
       
       <p>We need to make the file executable as well - you'll need to run:</p>
       <pre class="shell">
-chmod +x bin/race_the_car
+chmod +x bin/race
 </pre>
       <p>where your current working directory is the suite directory.</p>     
     </div>
@@ -249,7 +252,7 @@ extended/overwritten by red_car
       <p>We also need some racing colours, which should be task-specific - change the runtime to:</p>
       <pre class="prettyprint lang-cylc">
     [[red_car]]
-        inherit = CAR, ENGINE_ELECTRIC
+        inherit = BODY_CAR, ENGINE_ELECTRIC
         [[[environment]]]
             COMP_COLOUR = red
 </pre>
@@ -283,7 +286,7 @@ extended/overwritten by red_car
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Overriding</h3>
+      <h3 id="another">Another Contender</h3>
 
       <p>A race isn't a race without more than one competitor - add another <samp>COMPETITOR_VEHICLE</samp> task
       in the runtime:</p>
@@ -300,10 +303,12 @@ extended/overwritten by red_car
    <div class="slide">
      <h3 id="run">Running the Suite</h3>
      
-     <p>Go ahead and run the suite. The two vehicles will race over a quarter mile,
+     <p>Go ahead and run the suite with <code>rose suite-run</code>. The two vehicles will race over a quarter mile,
      and you should see the results in both the cylc GUI and in the web page
      that pops up. The environment variables we set up will be printed in the
-     standard output of both tasks in the Rose output viewer.</p>
+     standard output of both tasks in the Rose output viewer. If a web page didn't
+     pop up, you can access it through the Rose output viewer by navigating to the standard out of
+     the <samp>output</samp> task and following the link.</p>
      
      <p>This is a successful implementation of multiple inheritance! The next thing
      to do is to make it slightly more tricky.</p>
