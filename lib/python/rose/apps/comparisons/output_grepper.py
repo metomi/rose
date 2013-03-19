@@ -36,7 +36,6 @@ class OutputGrepper(object):
         """Return a list of values matching a regular expression."""
         filevar  = variable + "file"
         filename = getattr(task, filevar)
-        print 'filename is:', filename
         numbers = data_from_regexp(REGEXPS[task.subextract], filename)
         datavar  = variable + "data"
         setattr(task, datavar, numbers)

@@ -125,8 +125,6 @@ class TestsFailedException(Exception):
 class Analyse(object):
 
     """A comparison engine for Rose."""
-    
-    SCHEME = "test"
 
     def __init__(self, config, opts, args, method_paths, reporter=None,
                  popen=None):
@@ -274,48 +272,48 @@ class Analyse(object):
         """
 
         tasks = []
-        for key, node in self.config.value.items():
-            if not key.startswith(self.SCHEME + ":"):
+        for task in self.config.value.keys():
+            if task is "env":
                 continue
-            if node.is_ignored():
-                continue
-            task = AnalysisTask()
-            task.name = key[len(self.SCHEME + ":"):]
-            for name in ["kgo1file", "resultfile"]:
-                value = node.get_value([name])
-                if value:
-                    task.items.append(value)
-            value = node.get_value(["items"])
-            for name in value.split():
-                if "{}" in name:
-                    for arg in self.args:
-                        task.items.append(name.replace("{}", arg))
-                else:
-                    task.items.append(name)
-            task = self._find_file("result", task)
-            task.extract = node.get_value(["extract"])
-            result = re.search(r":", task.extract)
+            newtask = AnalysisTask()
+            newtask.name = task
+            value = self.config.get_value([task, "resultfile"])
+            if "{}" in value:
+                for arg in self.args:
+                    newtask.resultfile = value.replace("{}", arg)
+            else:
+                newtask.resultfile = value
+            newtask = self._find_file("result", newtask)
+            newtask.extract = self.config.get_value([task, "extract"])
+            result = re.search(r":", newtask.extract)
             if result:
-                task.subextract = re.sub(r".*:\s*", r"",
-                                    task.extract)
-                task.extract = re.sub(r"\s*:.*", r"",
-                                    task.extract)
-            task.comparison = node.get_value(["comparison"])
-            task.tolerance = node.get_value(["tolerance"])
-            task.warnonfail = (
-                    node.get_value(["warnonfail"]) in 
+                newtask.subextract = re.sub(r".*:\s*", r"",
+                                    newtask.extract)
+                newtask.extract = re.sub(r"\s*:.*", r"",
+                                    newtask.extract)
+            newtask.comparison = self.config.get_value([task, "comparison"])
+            newtask.tolerance = self.config.get_value([task, "tolerance"])
+            newtask.warnonfail = (
+                    self.config.get_value([task, "warnonfail"]) in 
                     ["yes", "true"])
 
-            # Use resultfile and kgo1file until rest of rose ana infrastructure
-            # has been updated to use task.items. Note: kgo2file and higher no
-            # longer supported.
-            setattr(task, "kgo1file", task.items[0])
-            task.resultfile = task.items[1]
-            task = self._find_file("kgo1", task)
-            task = self._find_file("result", task)
-            task.numkgofiles += 1
-
-            tasks.append(task)
+            # Allow for multiple KGO, e.g. kgo1file, kgo2file, for
+            # statistical comparisons of results
+            for i in range(1, MAX_KGO_FILES):
+                kgovar = "kgo" + str(i)
+                kgofilevar = kgovar + "file"
+                if self.config.get([task, kgofilevar]):
+                    value = self.config.get([task, kgofilevar])[:]
+                    if "{}" in value:
+                        for arg in self.args:
+                            setattr(newtask, kgofilevar, value.replace("{}", arg))
+                    else:
+                        setattr(newtask, kgofilevar, value)
+                    newtask.numkgofiles += 1
+                    newtask = self._find_file(kgovar, newtask)
+                else:
+                    break
+            tasks.append(newtask)
         self.tasks = tasks
         return tasks
 
@@ -405,7 +403,6 @@ class AnalysisTask(object):
 
 # Variables defined in config file
         self.name = None
-        self.items = []
         self.resultfile = None
         self.kgofile = None
         self.comparison = None
