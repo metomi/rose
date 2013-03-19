@@ -111,6 +111,7 @@ class CylcProcessor(SuiteEngineProcessor):
         conn = sqlite3.connect(self.get_suite_db_file(suite_name))
         c = conn.cursor()
         EVENTS = {"submitted": "submit",
+                  "submit failed": "submit-fail",
                   "started": "init",
                   "succeeded": "pass",
                   "failed": "fail",
@@ -147,6 +148,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 submit["status"] = status
                 if key == "signaled":
                     submit["signal"] = message.rsplit(None, 1)[-1]
+            elif event in ["submit-fail"]:
+                status = event
 
         # Locate task log files
         for task_id, task_datum in data.items():
