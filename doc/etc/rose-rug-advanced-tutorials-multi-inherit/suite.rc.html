@@ -52,8 +52,8 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            get_ready =&gt; COMPETITORS
-            COMPETITORS:finish-all =&gt; output
+            get_ready =&gt; COMPETITOR_VEHICLE
+            COMPETITOR_VEHICLE:finish-all =&gt; output
         """
 [runtime]
     [[root]]
@@ -94,7 +94,7 @@
     [[ENGINE_PETROL]]
         [[[environment]]]
             COMP_GEAR_RATIOS = 3.18 2.26 1.68 1.29 1.06
-            COMP_POWER_FRAC_VS_1000_RPM = 0.18 0.3 0.6 0.88 1.0 0.6
+            COMP_POWER_FRAC_VS_1000_RPM = 0.18 0.3 0.6 0.88 1.0 0.8
             COMP_MAX_POWER_KW = 135
     [[ENGINE_ELECTRIC]]
         [[[environment]]]

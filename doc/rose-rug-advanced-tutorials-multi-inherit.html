@@ -343,9 +343,11 @@ extended/overwritten by red_car
       <samp>COMPETITOR_VEHICLE</samp> runtime to:</p>
       <pre class="prettyprint lang-cylc">
     [[COMPETITOR_VEHICLE]]
-        command scripting = "race_the_car"
+        pre-command scripting = "printenv | sort | grep ^COMP"
+        command scripting = "race"
         [[[environment]]]
             COMP_MAX_POWER_KW = 130
+            COMP_OUTPUT_DIR = $CYLC_SUITE_SHARE_PATH
 </pre>
 
       <p>We'll also change the ENGINE families so that they include this
@@ -431,7 +433,7 @@ extended/overwritten by red_car
         [[[environment]]]
             COMP_GEAR_RATIOS = 3.18 2.26 1.68 1.29 1.06
             COMP_POWER_FRAC_VS_1000_RPM = 0.18 0.3 0.6 0.88 1.0 0.6
-            COMP_MAX_POWER_KW = 150  # Cheating!
+            COMP_MAX_POWER_KW = 200  # Cheating!
 </pre>
     </div>
 
@@ -445,7 +447,7 @@ extended/overwritten by red_car
         inherit = BODY_CAR, ENGINE_ELECTRIC
         [[[environment]]]
             COMP_COLOUR = red
-            COMP_WHEEL_DIAMETER_M = 1.0
+            COMP_WHEEL_DIAMETER_M = 1.0  # Override the standard BODY_CAR setting
 </pre>
     </div>
 
@@ -456,7 +458,7 @@ extended/overwritten by red_car
       overrides or overwriting of settings should have happened.
       <samp>COMP_WHEEL_DIAMETER_M</samp> should now be <samp>1.0</samp> for the
       <samp>red_car</samp> task, and the <samp>COMP_MAX_POWER_KW</samp> should
-      be <samp>150</samp> in the <samp>blue_truck</samp> task.</p>
+      be <samp>200</samp> in the <samp>blue_truck</samp> task.</p>
     </div>
 
     <div class="slide">
