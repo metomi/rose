@@ -165,7 +165,7 @@ TOPPING=no topping
       <p>Change the <samp>suite.rc</samp> <samp>command scripting</samp> for
       <samp>order_icecream</samp> so that it reads:</p>
       <pre class="prettyprint lang-cylc">
-        command scripting = "rose task-run --define=[env]FLAVOUR=chocolate --define=[env]TOPPING=fudge"
+        command scripting = "rose task-run --define='[env]FLAVOUR=chocolate' --define='[env]TOPPING=fudge'"
 </pre>
 
       <p>This will override the <samp>FLAVOUR</samp> and <samp>TOPPING</samp>
@@ -268,7 +268,7 @@ opts=chocofudge
     </div>
 
     <div class="slide">
-      <h3 id="include">Default Optional Configurations - Test</h3>
+      <h3 id="opts">Default Optional Configurations - Test</h3>
 
       <p>If you run the suite, it should have the same standard output for
       <samp>order_icecream</samp> as before.</p>
@@ -284,7 +284,9 @@ opts=chocofudge
       <p>All Rose configurations can have optional configurations, not just
       application configurations. Suites can have optional configurations that
       override <samp>rose-suite.conf</samp> settings, controlled through
-      similar options for <code>rose suite-run</code>.</p>
+      <code>rose suite-run</code>. This takes the same
+      <samp>--opt-conf-key</samp> option as <code>rose app-run</code> and/or
+      the environment variable <samp>$ROSE_SUITE_OPT_CONF_KEYS</samp>.</p>
 
       <p>Metadata configurations can also have optional configurations,
       typically included via the <samp>opts</samp> top-level setting.</p>
