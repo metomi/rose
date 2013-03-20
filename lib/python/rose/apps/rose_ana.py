@@ -279,8 +279,7 @@ class Analyse(object):
             newtask.name = task
             value = self.config.get_value([task, "resultfile"])
             if "{}" in value:
-                for arg in self.args:
-                    newtask.resultfile = value.replace("{}", arg)
+                newtask.resultfile = value.replace("{}", self.args[0])
             else:
                 newtask.resultfile = value
             newtask = self._find_file("result", newtask)
@@ -305,8 +304,7 @@ class Analyse(object):
                 if self.config.get([task, kgofilevar]):
                     value = self.config.get([task, kgofilevar])[:]
                     if "{}" in value:
-                        for arg in self.args:
-                            setattr(newtask, kgofilevar, value.replace("{}", arg))
+                        setattr(newtask, kgofilevar, value.replace("{}", self.args[0]))
                     else:
                         setattr(newtask, kgofilevar, value)
                     newtask.numkgofiles += 1
