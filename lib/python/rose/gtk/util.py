@@ -739,11 +739,11 @@ class DialogProcess(object):
         while self.p.is_alive():
             self.progress_bar.pulse()
             if self.event_queue is not None:
-                try:
-                    new_text = self.event_queue.get(False)
-                except Queue.Empty:
-                    pass
-                else:
+                while True:
+                    try:
+                        new_text = self.event_queue.get(False)
+                    except Queue.Empty:
+                        break
                     end = self.text_buffer.get_end_iter()
                     tag = gtk
                     self.text_buffer.insert_with_tags(end, new_text,

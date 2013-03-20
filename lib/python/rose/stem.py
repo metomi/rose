@@ -30,7 +30,7 @@ from rose.reporter import Reporter, Event
 import rose.run
 
 DEFAULT_TEST_DIR = 'rose-stem'
-OPTIONS = ['confsource', 'diffsource', 'source', 'task', ]
+OPTIONS = ['source', 'task', ]
 SUITE_RC_PREFIX = '[jinja2:suite.rc]'
 
 
@@ -56,19 +56,6 @@ class ConfigSourceTreeSetEvent(Event):
        return "Using config files from source %s"%(self.args[0])
 
    __str__ = __repr__
-
-
-class MultiplesTrunksSpecifiedException(Exception):
-
-    """Exception class when two trunks specified for the same project."""
-
-    def __init__(self, project):
-        self.project = project
-
-    def __repr__(self):
-        return "Attempted to add multiple trunks for project %s"%(self.project)
-
-    __str__ = __repr__
 
 
 class ProjectNotFoundException(Exception):
@@ -188,21 +175,25 @@ class StemRunner(object):
         rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
         if rc != 0:
             raise ProjectNotFoundException(item, stderr)
-        result = re.search(r'url:\s*svn://(.*)', output)
+        result = re.search(r'url:\s*(svn://.*)', output)
         
-        # Split the URL into forward-slash separated items to generate a 
-        # unique name for this project
+        # Generate a unique name for this project based on fcm kp
         if result:
             urlstring = result.group(1)
-            pieces = urlstring.split('/')
-            pieces[1] = re.sub(r'_svn', r'', pieces[1])
-            item = urlstring
-            if len(pieces) < 2 or pieces[1] == pieces[2]:
-                project = pieces[1]
-            else:
-                project = pieces[1] + '_' + pieces[2]
+            rc, kpoutput, stderr = self.popen.run('fcm', 'kp', urlstring)
+            kpresult = re.search(r'location{primary}\[(.*)\]\s*=', kpoutput)
+            if kpresult:
+                project = kpresult.group(1)
         if not project:
             raise ProjectNotFoundException(item)
+
+        result = re.search(r'peg_rev:\s*(.*)', output)
+        if '@' in item and result:
+            revision = '@' + result.group(1)
+            base = re.sub(r'@.*', r'', item)
+        else:
+            revision = ''
+            base = item
 
         # If we're in a subdirectory of the source tree, find it and
         # remove it leaving the top-level location
@@ -215,14 +206,14 @@ class StemRunner(object):
             if result2:
                 subtree = result2.group(1)
                 item = re.sub(subtree, r'', target)
-                
+
         # Remove trailing forwards-slash    
         item = re.sub(r'/$',r'',item)    
-        return project, item                    
+        return project, item, base, revision                    
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
-        dummy, basedir = self._ascertain_project(os.getcwd())
+        dummy, basedir, dummy2, dummy3 = self._ascertain_project(os.getcwd())
         name = os.path.basename(basedir)
         return name
 
@@ -231,12 +222,10 @@ class StemRunner(object):
 
         # Get base of first source
         basedir = ''        
-        if self.opts.diffsource:
-            basedir = self.opts.diffsource[0]
-        elif self.opts.source:
+        if self.opts.source:
             basedir = self.opts.source[0]
         else:
-            dummy, basedir = self._ascertain_project(os.getcwd())
+            dummy, basedir, dum2, dum3 = self._ascertain_project(os.getcwd())
             
         suitedir = os.path.join(basedir, DEFAULT_TEST_DIR)
         suitefile = os.path.join(suitedir, rose.TOP_CONFIG_NAME)
@@ -248,54 +237,32 @@ class StemRunner(object):
     def process(self):
         """Process STEM options into 'rose suite-run' options."""
 
-        # Generate options for trunk source trees
-        done_source = []    # List to ensure projects aren't added twice
-        if self.opts.source:
-            for i, url in enumerate(self.opts.source):
-                project, url = self._ascertain_project(url)
-                self.opts.source[i] = url
-                if done_source.count(project):
-                    raise MultiplesTrunksSpecifiedException(project)
-                done_source.append(project)
-                var = 'URL_' + project.upper()
-                self._add_define_option(var, '"'+url+'"')
-                self.reporter(SourceTreeAddedAsTrunkEvent(url))
-
-        # Generate options for branch source trees
+        # Generate options for source trees
         repos = {}
-        if self.opts.diffsource:
-            for i, url in enumerate(self.opts.diffsource):
-                project, url = self._ascertain_project(url)
-                self.opts.diffsource[i] = url
-                if project in repos:
-                    repos[project].append(url)
-                else:
-                    repos[project] = [ url ]
-                self.reporter(SourceTreeAddedAsBranchEvent(url))
-            for project, branches in repos.iteritems():
-                var = 'URL_' + project.upper() + '_DIFF'
-                branchstring = " ".join(branches)
-                self._add_define_option(var, '"' + branchstring + '"')
+        if not self.opts.source:
+            self.opts.source = ['.']
 
-        # Add configs source variable name - default to first specified
-        # diffsource or source if none explicitly specified
-        confsource = None
-        if self.opts.confsource:
-            confsource = self.opts.confsource
-        elif self.opts.diffsource:
-            confsource = self.opts.diffsource[0]
-        elif self.opts.source:
-            confsource = self.opts.source[0]
+        for i, url in enumerate(self.opts.source):
+            project, url, base, rev = self._ascertain_project(url)
+            self.opts.source[i] = url
+            if project in repos:
+                repos[project].append(url)
+            else:
+                repos[project] = [ url ]
+            self.reporter(SourceTreeAddedAsBranchEvent(url))
+        for project, branches in repos.iteritems():
+            var = 'SOURCE_' + project.upper()
+            branchstring = RosePopener.list_to_shell_str(branches)
+            self._add_define_option(var, '"' + branchstring + '"')
 
-        if confsource:
-            conf = confsource.split('@')
-            confrev = ''
-            confsource = conf[0]
-            if len(conf) > 1:
-                confrev = '@' + conf[1]
-            self._add_define_option('URL_CONFREV', '"' + confrev + '"')
-            self._add_define_option('URL_CONFDIR', '"' + confsource + '"')
-        
+        # Add configs source variables for first
+        confsource = self.opts.source[0]
+        confproject, url, base, rev = self._ascertain_project(confsource)
+        self._add_define_option('SOURCE_' + confproject.upper() + '_REV', '"' 
+                                + rev + '"')
+        self._add_define_option('SOURCE_' + confproject.upper() + '_BASE', '"'
+                                + base + '"')
+
         # Generate the variable containing tasks to run
         if self.opts.task:
             if not self.opts.defines:
@@ -340,6 +307,7 @@ def main():
         except Exception as e:
             stem.reporter(e)
             sys.exit(1)
+
 
     # Get the suiterunner object and execute
     runner = rose.run.SuiteRunner(event_handler=stem.reporter, 

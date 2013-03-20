@@ -850,12 +850,15 @@ class SuiteRunner(Runner):
             self.suite_engine_proc.run(
                     suite_name, host, environ, opts.run_mode, args)
             open("rose-suite-run.host", "w").write(host + "\n")
-            self.suite_log_view_gen(suite_name)
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
         if os.getenv("DISPLAY") and host and opts.gcontrol_mode:
             self.suite_engine_proc.gcontrol(suite_name, host)
+
+        # Create the suite log view
+        self.suite_log_view_gen(suite_name)
+
         return ret
 
     def _run_conf(

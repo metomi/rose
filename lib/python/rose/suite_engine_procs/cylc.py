@@ -26,7 +26,7 @@ import pwd
 import re
 import rose.config
 from rose.popen import RosePopenError
-from rose.reporter import Event
+from rose.reporter import Event, Reporter
 from rose.suite_engine_proc \
         import SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
@@ -97,6 +97,14 @@ class CylcProcessor(SuiteEngineProcessor):
             # ... more task IDs
         }
         """
+        for i in range(3): # 3 retries
+            try:
+                return self._get_suite_events(suite_name)
+            except sqlite3.OperationalError:
+                sleep(1.0)
+        return {}
+
+    def _get_suite_events(self, suite_name):
         data = {}
 
         # Read task events from suite runtime database
@@ -135,7 +143,7 @@ class CylcProcessor(SuiteEngineProcessor):
             status = None
             if event in ["pass", "fail"]:
                 status = event
-                event = "exit"
+                submit["events"]["exit"] = event_time
                 submit["status"] = status
                 if key == "signaled":
                     submit["signal"] = message.rsplit(None, 1)[-1]
@@ -169,10 +177,11 @@ class CylcProcessor(SuiteEngineProcessor):
             stmt += " WHERE name==? AND cycle==? AND event=='submitted'"
             stmt_args = tuple(task_id.split(self.TASK_ID_DELIM))
         for row in c.execute(stmt, stmt_args):
-            u, h = row[0].split("@")
-            user, host, my_user, my_host = self._parse_user_host(u, h)
-            if (my_user, my_host) != (user, host):
-                auths.append((user, host))
+            if row and "@" in row[0]:
+                u, h = row[0].split("@")
+                user, host, my_user, my_host = self._parse_user_host(u, h)
+                if (my_user, my_host) != (user, host):
+                    auths.append((user, host))
         return auths
 
     def get_task_auth(self, suite_name, task_name):
@@ -190,7 +199,12 @@ class CylcProcessor(SuiteEngineProcessor):
                     suite_name)
         except RosePopenError:
             return
-        u, h = out.strip().replace("*", " ").split(None, 1)
+        u, h = (None, None)
+        items = out.strip().split(None, 1)
+        if items:
+            u = items.pop(0).replace("*", " ")
+        if items:
+            h = items.pop(0).replace("*", " ")
         user, host, my_user, my_host = self._parse_user_host(u, h)
         if (my_user, my_host) == (user, host):
             return
@@ -207,7 +221,13 @@ class CylcProcessor(SuiteEngineProcessor):
                               "-i", "[remote]host",
                               suite_name)
         for line in out.splitlines():
-            task, user, host = line.replace("*", " ").split(None, 2)
+            items = line.split(None, 2)
+            task = items.pop(0).replace("*", " ")
+            user, host = (my_user, my_host)
+            if items:
+                user = items.pop(0).replace("*", " ")
+            if items:
+                host = items.pop(0).replace("*", " ")
             if not actual_hosts.has_key(host):
                 result = self._parse_user_host(user, host, my_user, my_host)
                 user, actual_hosts[host] = result[0:2]
