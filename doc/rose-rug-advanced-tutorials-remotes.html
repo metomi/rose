@@ -101,56 +101,239 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = """
-
-            """
+        graph = "initialise => short & medium & long"
+[runtime]
+    [[root]]
+        command scripting = "rose task-run"
+        [[[environment]]]
+            ROSE_TASK_APP="calc_pi"
+        [[[event hooks]]]
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook"
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Example (2)</h3>
+      
+      <pre class="prettyprint lang-cylc">
+    [[initialise]]
+        command scripting = "echo 'initialising...'; sleep 10"
+    [[short]]
+        [[[environment]]]
+            NUM="50"
+    [[medium]]
+        [[[environment]]]
+            NUM="500"
+    [[long]]
+        [[[environment]]]
+            NUM="5000"
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Description</h3>
-
-      <p>Suite description</p>
-
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Runtime</h3>
-
-      <p>It will need some runtime. Add the following to your 
-      <samp>suite.rc</samp> file:</p>
+      
+      <p>In the suite directory create an <samp>app</samp> directory</p>
+      
+      <p>In the <samp>app</samp> directory create a <samp>calc_pi</samp> 
+      directory</p>
+      
+      <p>In the <samp>calc_pi</samp> directory create a 
+      <samp>rose-app.conf</samp> file and paste in the following lines:</p>
+      
       <pre class="prettyprint lang-cylc">
-[runtime]
-    [[root]]
+[command]
+default = echo "scale=$NUM; 4*a(1)" | bc -l -q
 </pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Run the suite</h3>
-      <p>Save your changes and run the suite using <samp>rose suite-run</samp>
-      </p>
+      <h2 id="description">Description</h3>
+
+      <p>You have now created a suite that:</p>
       
-      <p>The suite should now run.</p>
+      <ul>
+        <li>contains a <samp>calc_pi</samp> task that calculates pi to some 
+        number of decimal places as specified by <samp>$NUM</samp>.</li>
+        <li>has an initialisation task</li>
+        <li>has short, medium and long tasks that use the <samp>calc_pi</samp>
+        app to calculate pi to increasing numbers of decimal places</li>
+      </ul>
+
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Run the suite</h3>
+      
+      <p>Save your changes and run the suite using 
+      <samp>rose suite-run</samp>. Notice the different lengths of time it 
+      takes for each of the tasks to run.</p>
+      
+      <p>View the suite output using <samp>rose suite-log-view</samp> and 
+      inspect the output of the <samp>short</samp>, <samp>medium</samp> and 
+      <samp>long</samp> tasks. You should see pi printed to different numbers 
+      of decimal places.</p>
+      
+      <p>Also, note the <em>task host</em> listed at the top of the output of 
+      each task, which should be the same as the <em>suite host</em>, also 
+      listed at the top.</p> 
+      
     </div>
 
     <div class="slide">
       <h2 id="example-trigger">Adding remote hosts</h2>
       
-      <p>What and why</p>
+      <p>As you will have noticed from examining the output, your tasks have 
+      run been run on the machine hosting the suite. This may be undesireable,
+      particularly when a suite host is used by multiple users. Additionally, 
+      we might want to run various tasks on particular machines or run more 
+      computationally intensive tasks on higher power servers.</p>
+      
+      <p>We can address this by adding <samp>[[[remote]]]</samp> sections to 
+      the tasks in the <samp>suite.rc</samp>.</p>
 
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Adding remote hosts (2)</h3>
-        
-      <p>Some more</p>
+      
+      <p>Open your <samp>suite.rc</samp> file and add the following to the 
+      <samp>[[root]]</samp> task:</p>
+      
+      <pre class="prettyprint lang-cylc">
+        [[[remote]]]
+            host = "my-desktop"
+</pre>      
+      
+      <p>where <em>"my-desktop"</em> is the name of your desktop machine in 
+      quotes. This will result in all tasks running on your desktop machine.
+      </p>
+    
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Adding remote hosts (3)</h3>
+      
+      <p>Save your changes and run your suite. Once it has completed, check 
+      the output from the tasks. Your should see your desktop being used as the 
+      task host</p> 
+    
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Adding remote hosts (4)</h3>
+      
+      <p>As our suites may be run by other people, or we may run them ourselves
+      on different desktops we can have rose automatically insert the name of 
+      the desktop being used to launch the suite (i.e. the one on which 
+      <samp>rose suite-run</samp> is run.</p>
+
+      <p>To do this, change the <samp>[[[remote]]]</samp> section of 
+      <samp>[[root]]</samp> in the <samp>suite.rc</samp> file to look like 
+      this:</p>
+      
+      <pre class="prettyprint lang-cylc">
+        [[[remote]]]
+            host = {{ ROSE_ORIG_HOST }}
+</pre>
+
+      <p>Save your changes, run your suite and examine the output to check this
+      is working as expected.</p>
+    
+    </div>
+
+    <div class="slide">
+      <h2 id="rose-host-select">Automating host selection</h2>
+      
+      <p>Rose also offers an in-built function for automatic host selection in 
+      the form of the <samp>rose host-select</samp> command. This will return 
+      a hostname from a set of pre-defined hosts in the <samp>rose.conf</samp>
+      file.</p>
+      
+    </div>  
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Automating host selection (2)</h3>
+      
+      <p>To list the hostnames available through <samp>rose host-select</samp> 
+      type <samp>rose config rose host-select</samp> into the command line.</p>
+      
+      <p>Depending on your rose configuration you should see something along 
+      the lines of:</p>
+      <pre class="prettyprint lang-cylc">
+default=linux-servers
+group{linux-servers}=server01 server02 server03
+group{hpc}=node01 node02 node03
+</pre>
+
+    <p>The <samp>default=</samp> entry identifies which group to return a 
+    hostname from if <samp>rose host-select</samp> is invoked without any 
+    arguments. Each <samp>group{groupname}</samp> entry lists the hosts from 
+    which one is returned when <samp>rose host-select groupname</samp> is 
+    run.</p>
+    
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Automating host selection (3)</h3>
+      
+      <p>In your terminal experiment with <samp>rose host-select</samp> and 
+      the names of the groups listed earlier in your terminal to see what 
+      hostnames are returned.</p>
 
     </div>
 
     <div class="slide">
-      <h2 id="notes">Note on remote hosts</h2> 
+      <h3 class="alwayshidden">Automating host selection (4)</h3>
+      
+      <p>We will now implement the use of <samp>rose host-select</samp> in our 
+      suite by adding <samp>[[[remote]]]</samp> sections to the medium and long
+      tasks in our <samp>suite.rc</samp> file as follows, replacing 
+      <em>groupname</em> with an appropriate group you discovered 
+      previously:</p>
+      
+      <pre class="prettyprint lang-cylc">
+    [[medium]]
+        [[[remote]]]
+            host = "`rose host-select`"
+        [[[environment]]]
+            NUM="500"
+    [[long]]
+        [[[remote]]]
+            host = "`rose host-select groupname`"
+        [[[environment]]]
+            NUM="5000"
+</pre>
+    </div>
     
-      <p>Notes</p>
+    <div class="slide">
+      <h3 class="alwayshidden">Automating host selection (5)</h3>
+      
+      <p>Save your changes, run the suite and view the output. You should see
+      the following in the task outputs:</p>
+      
+      <ul>
+        <li>The short task's host should be the machine you ran 
+        <samp>rose suite-run</samp> on.</li>
+        <li>The medium task's host should be one of the hosts from the default 
+        group.</li>
+        <li>The long task's host should be one of the hosts from the specified
+        group.</li>
+      </ul>
+
+    <div class="slide">
+      <h2 id="summary">Summary</h2> 
+    
+        <li>Use the <samp>[[[remote]]]</samp> section to specify a host so 
+        your task doesn't run on the suite host</li>
+        <li>Use <samp>host = {{ ROSE_ORIG_HOST }}</samp> in the 
+        <samp>[[[remote]]]</samp> section of a task to have it run on the 
+        machine on which <samp>rose suite-run</samp> was invoked</li>
+        <li>Make use of <samp>rose host-select</samp> to automatically select 
+        a host from an appropriate group rather than hard-coding host names 
+        where possible</li>
+      </ul>
       
     </div>
     
