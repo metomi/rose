@@ -693,7 +693,8 @@ class ConfigPage(gtk.VBox):
 
     def handle_bad_custom_main_widget(self, error_info):
         """Handle a bad custom page widget import."""
-        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(traceback.format_exc())
+        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(
+                                               traceback.format_exc())
         sys.stderr.write(text + "\n")
         self.generate_main_container(override_custom=True)
 
