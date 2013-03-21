@@ -55,13 +55,6 @@ from rosie.suite_id import SuiteId
 import rosie.vc
 import rosie.ws_client
 
-STATUS_TIP = {rosie.ws_client.STATUS_DO: rosie.browser.LOCAL_STATUS_DOWNDATE,
-              rosie.ws_client.STATUS_NO: rosie.browser.LOCAL_STATUS_NO,
-              rosie.ws_client.STATUS_OK: rosie.browser.LOCAL_STATUS_OK,
-              rosie.ws_client.STATUS_MO: rosie.browser.LOCAL_STATUS_MODIFIED,
-              rosie.ws_client.STATUS_SW: rosie.browser.LOCAL_STATUS_SWITCH,
-              rosie.ws_client.STATUS_UP: rosie.browser.LOCAL_STATUS_UPDATE}
-
 
 class MainWindow(gtk.Window):
 
