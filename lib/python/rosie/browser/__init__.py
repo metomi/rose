@@ -111,6 +111,7 @@ STATUS_UPDATE = "updating view..."
 
 # Suite status tips
 
+LOCAL_STATUS_CORRUPT = "Local copy (corrupted)"
 LOCAL_STATUS_DOWNDATE = "Local copy at newer revision"
 LOCAL_STATUS_MODIFIED = "Local copy (modified)"
 LOCAL_STATUS_NO = "No local copy"
