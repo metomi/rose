@@ -692,7 +692,25 @@ __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultTransforms
 cp $TEST_KEY.out /var/tmp/bfitz/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[T] rose.macros.DefaultTransforms: changes: 21
+[T] rose.macros.DefaultTransforms: changes: 38
+    namelist:already_triggered_ignored_namelist=ab_trig_var1=2
+        enabled      -> trig-ignored
+    namelist:already_triggered_ignored_namelist=ab_trig_var2=2
+        enabled      -> trig-ignored
+    namelist:already_triggered_ignored_namelist=ab_trig_var3=2
+        enabled      -> trig-ignored
+    namelist:already_triggered_ignored_namelist=ab_trig_var4=2
+        enabled      -> trig-ignored
+    namelist:already_triggered_ignored_namelist=trig_var_err1=2
+        enabled      -> trig-ignored
+    namelist:already_triggered_ignored_namelist=trig_var_err2=2
+        enabled      -> trig-ignored
+    namelist:already_triggered_ignored_namelist=trig_var_err3=2
+        enabled      -> trig-ignored
+    namelist:already_triggered_ignored_namelist=trig_var_err4=2
+        enabled      -> trig-ignored
+    namelist:already_triggered_ignored_namelist=user_sw_var=5
+        user-ignored -> enabled     
     namelist:ignored_error_namelist=en_trig_e_err_comp_var=2
         enabled      -> trig-ignored
     namelist:ignored_error_namelist=en_trig_e_err_opt_var=2
@@ -729,6 +747,22 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
         enabled      -> trig-ignored
     namelist:triggered_ignored_namelist=None=None
         enabled      -> trig-ignored
+    namelist:triggered_ignored_namelist=ab_trig_var1=2
+        enabled      -> trig-ignored
+    namelist:triggered_ignored_namelist=ab_trig_var2=2
+        enabled      -> trig-ignored
+    namelist:triggered_ignored_namelist=ab_trig_var3=2
+        enabled      -> trig-ignored
+    namelist:triggered_ignored_namelist=ab_trig_var4=2
+        enabled      -> trig-ignored
+    namelist:triggered_ignored_namelist=trig_var_err1=2
+        enabled      -> trig-ignored
+    namelist:triggered_ignored_namelist=trig_var_err2=2
+        enabled      -> trig-ignored
+    namelist:triggered_ignored_namelist=trig_var_err3=2
+        enabled      -> trig-ignored
+    namelist:triggered_ignored_namelist=trig_var_err4=2
+        enabled      -> trig-ignored
     namelist:triggered_ignored_namelist=user_sw_var=5
         user-ignored -> enabled     
     namelist:triggered_namelist=trig_var=2
@@ -746,6 +780,7 @@ default=main_command
 IS_COLD=false
 IS_WET=true
 TRIGGERED_IF_TRIGGERED_NAMELIST=0
+USE_ALREADY_TRIGGERED_IGNORED_NAMELIST=false
 !!USE_ICE=true
 USE_TRIGGERED_IGNORED_NAMELIST=false
 USE_TRIGGERED_NAMELIST=true
@@ -753,6 +788,41 @@ USE_TRIG_DUPL_NAMELIST_A=false
 
 [file:file1]
 source=namelist:nl1
+
+[!!namelist:already_triggered_ignored_namelist]
+!!ab_trig_var1=2
+!!ab_trig_var2=2
+!!ab_trig_var3=2
+!!ab_trig_var4=2
+!!ab_trig_var_err1=2
+!!ab_trig_var_err2=2
+!!ab_trig_var_err3=2
+!!ab_trig_var_err4=2
+abnormal_err_variable1=abnormal
+abnormal_err_variable2=abnormal
+abnormal_err_variable3=abnormal
+abnormal_err_variable4=abnormal
+abnormal_variable1=abnormal
+abnormal_variable2=abnormal
+abnormal_variable3=abnormal
+abnormal_variable4=abnormal
+normal_err_variable1=normal
+normal_err_variable2=normal
+normal_err_variable3=normal
+normal_err_variable4=normal
+normal_variable1=normal
+normal_variable2=normal
+normal_variable3=normal
+normal_variable4=normal
+!!trig_var1=2
+!!trig_var2=2
+!!trig_var3=2
+!!trig_var4=2
+!!trig_var_err1=2
+!!trig_var_err2=2
+!!trig_var_err3=2
+!!trig_var_err4=2
+user_sw_var=5
 
 [namelist:ignored_error_namelist]
 en_normal_var=normal
@@ -806,30 +876,38 @@ C=2
 trig_X_if_not_2=2
 
 [!!namelist:triggered_ignored_namelist]
-normal_variable1=normal
-normal_variable2=normal
-normal_variable3=normal
-normal_variable4=normal
-abnormal_variable1=abnormal
-abnormal_variable2=abnormal
-abnormal_variable3=abnormal
-abnormal_variable4=abnormal
-trig_var1=2
-trig_var2=2
-trig_var3=2
-trig_var4=2
-!!trig_var_err1=2
-!!trig_var_err2=2
-!!trig_var_err3=2
-!!trig_var_err4=2
 !!ab_trig_var1=2
 !!ab_trig_var2=2
 !!ab_trig_var3=2
 !!ab_trig_var4=2
-ab_trig_var_err1=2
-ab_trig_var_err2=2
-ab_trig_var_err3=2
-ab_trig_var_err4=2
+!!ab_trig_var_err1=2
+!!ab_trig_var_err2=2
+!!ab_trig_var_err3=2
+!!ab_trig_var_err4=2
+abnormal_err_variable1=abnormal
+abnormal_err_variable2=abnormal
+abnormal_err_variable3=abnormal
+abnormal_err_variable4=abnormal
+abnormal_variable1=abnormal
+abnormal_variable2=abnormal
+abnormal_variable3=abnormal
+abnormal_variable4=abnormal
+normal_err_variable1=normal
+normal_err_variable2=normal
+normal_err_variable3=normal
+normal_err_variable4=normal
+normal_variable1=normal
+normal_variable2=normal
+normal_variable3=normal
+normal_variable4=normal
+!!trig_var1=2
+!!trig_var2=2
+!!trig_var3=2
+!!trig_var4=2
+!!trig_var_err1=2
+!!trig_var_err2=2
+!!trig_var_err3=2
+!!trig_var_err4=2
 user_sw_var=5
 
 [namelist:triggered_namelist]
