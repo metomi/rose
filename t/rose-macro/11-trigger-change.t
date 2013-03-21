@@ -28,6 +28,7 @@ alternate = alternate_command
 [env]
 USE_TRIGGERED_NAMELIST = true
 USE_TRIGGERED_IGNORED_NAMELIST = false
+USE_ALREADY_TRIGGERED_IGNORED_NAMELIST = false
 TRIGGERED_IF_TRIGGERED_NAMELIST = 0
 USE_TRIG_DUPL_NAMELIST_A = false
 IS_COLD = false
@@ -97,6 +98,41 @@ trigger_env_variable = normal
 !!trig_var = 2
 !user_sw_var = 6
 
+[!!namelist:already_triggered_ignored_namelist]
+normal_variable1 = normal
+normal_variable2 = normal
+normal_variable3 = normal
+normal_variable4 = normal
+normal_err_variable1 = normal
+normal_err_variable2 = normal
+normal_err_variable3 = normal
+normal_err_variable4 = normal
+abnormal_variable1 = abnormal
+abnormal_variable2 = abnormal
+abnormal_variable3 = abnormal
+abnormal_variable4 = abnormal
+abnormal_err_variable1 = abnormal
+abnormal_err_variable2 = abnormal
+abnormal_err_variable3 = abnormal
+abnormal_err_variable4 = abnormal
+!!trig_var1 = 2
+!!trig_var2 = 2
+!!trig_var3 = 2
+!!trig_var4 = 2
+trig_var_err1 = 2
+trig_var_err2 = 2
+trig_var_err3 = 2
+trig_var_err4 = 2
+ab_trig_var1 = 2
+ab_trig_var2 = 2
+ab_trig_var3 = 2
+ab_trig_var4 = 2
+!!ab_trig_var_err1 = 2
+!!ab_trig_var_err2 = 2
+!!ab_trig_var_err3 = 2
+!!ab_trig_var_err4 = 2
+!user_sw_var = 5
+
 [namelist:triggered_ignored_namelist]
 normal_variable1 = normal
 normal_variable2 = normal
@@ -118,10 +154,18 @@ abnormal_err_variable4 = abnormal
 !!trig_var2 = 2
 !!trig_var3 = 2
 !!trig_var4 = 2
+trig_var_err1 = 2
+trig_var_err2 = 2
+trig_var_err3 = 2
+trig_var_err4 = 2
 ab_trig_var1 = 2
 ab_trig_var2 = 2
 ab_trig_var3 = 2
 ab_trig_var4 = 2
+!!ab_trig_var_err1 = 2
+!!ab_trig_var_err2 = 2
+!!ab_trig_var_err3 = 2
+!!ab_trig_var_err4 = 2
 !user_sw_var = 5
 
 [namelist:trigger_logical_expression]
@@ -166,6 +210,10 @@ type = integer
 [env=USE_TRIGGERED_IGNORED_NAMELIST]
 type = boolean
 trigger = namelist:triggered_ignored_namelist: true
+
+[env=USE_ALREADY_TRIGGERED_IGNORED_NAMELIST]
+type = boolean
+trigger = namelist:already_triggered_ignored_namelist: true
 
 [env=USE_TRIG_DUPL_NAMELIST_A]
 type = boolean
@@ -362,35 +410,67 @@ type = integer
 
 [namelist:triggered_ignored_namelist=normal_variable1]
 values = normal, abnormal
-trigger = namelist:triggered_ignored_namelist=trig_var1: abnormal
+trigger = namelist:triggered_ignored_namelist=trig_var1: normal
 
 [namelist:triggered_ignored_namelist=normal_variable2]
 values = normal, abnormal
-trigger = namelist:triggered_ignored_namelist=trig_var2: abnormal
+trigger = namelist:triggered_ignored_namelist=trig_var2: normal
 
 [namelist:triggered_ignored_namelist=normal_variable3]
 values = normal, abnormal
-trigger = namelist:triggered_ignored_namelist=trig_var3: abnormal
+trigger = namelist:triggered_ignored_namelist=trig_var3: normal
 
 [namelist:triggered_ignored_namelist=normal_variable4]
 values = normal, abnormal
-trigger = namelist:triggered_ignored_namelist=trig_var4: abnormal
+trigger = namelist:triggered_ignored_namelist=trig_var4: normal
+
+[namelist:triggered_ignored_namelist=normal_variable_err1]
+values = normal, abnormal
+trigger = namelist:triggered_ignored_namelist=trig_var_err1: normal
+
+[namelist:triggered_ignored_namelist=normal_variable_err2]
+values = normal, abnormal
+trigger = namelist:triggered_ignored_namelist=trig_var_err2: normal
+
+[namelist:triggered_ignored_namelist=normal_variable_err3]
+values = normal, abnormal
+trigger = namelist:triggered_ignored_namelist=trig_var_err3: normal
+
+[namelist:triggered_ignored_namelist=normal_variable_err4]
+values = normal, abnormal
+trigger = namelist:triggered_ignored_namelist=trig_var_err4: normal
 
 [namelist:triggered_ignored_namelist=abnormal_variable1]
 values = normal, abnormal
-trigger = namelist:triggered_ignored_namelist=ab_trig_var1: abnormal
+trigger = namelist:triggered_ignored_namelist=ab_trig_var1: normal
 
 [namelist:triggered_ignored_namelist=abnormal_variable2]
 values = normal, abnormal
-trigger = namelist:triggered_ignored_namelist=ab_trig_var2: abnormal
+trigger = namelist:triggered_ignored_namelist=ab_trig_var2: normal
 
 [namelist:triggered_ignored_namelist=abnormal_variable3]
 values = normal, abnormal
-trigger = namelist:triggered_ignored_namelist=ab_trig_var3: abnormal
+trigger = namelist:triggered_ignored_namelist=ab_trig_var3: normal
 
 [namelist:triggered_ignored_namelist=abnormal_variable4]
 values = normal, abnormal
-trigger = namelist:triggered_ignored_namelist=ab_trig_var4: abnormal
+trigger = namelist:triggered_ignored_namelist=ab_trig_var4: normal
+
+[namelist:triggered_ignored_namelist=abnormal_variable_err1]
+values = normal, abnormal
+trigger = namelist:triggered_ignored_namelist=ab_trig_var_err1: normal
+
+[namelist:triggered_ignored_namelist=abnormal_variable_err2]
+values = normal, abnormal
+trigger = namelist:triggered_ignored_namelist=ab_trig_var_err2: normal
+
+[namelist:triggered_ignored_namelist=abnormal_variable_err3]
+values = normal, abnormal
+trigger = namelist:triggered_ignored_namelist=ab_trig_var_err3: normal
+
+[namelist:triggered_ignored_namelist=abnormal_variable_err4]
+values = normal, abnormal
+trigger = namelist:triggered_ignored_namelist=ab_trig_var_err4: normal
 
 [namelist:triggered_ignored_namelist=trig_var1]
 type = integer
@@ -402,6 +482,18 @@ type = integer
 type = integer
 
 [namelist:triggered_ignored_namelist=trig_var4]
+type = integer
+
+[namelist:triggered_ignored_namelist=trig_var_err1]
+type = integer
+
+[namelist:triggered_ignored_namelist=trig_var_err2]
+type = integer
+
+[namelist:triggered_ignored_namelist=trig_var_err3]
+type = integer
+
+[namelist:triggered_ignored_namelist=trig_var_err4]
 type = integer
 
 [namelist:triggered_ignored_namelist=ab_trig_var1]
@@ -416,7 +508,136 @@ type = integer
 [namelist:triggered_ignored_namelist=ab_trig_var4]
 type = integer
 
+[namelist:triggered_ignored_namelist=ab_trig_var_err1]
+type = integer
+
+[namelist:triggered_ignored_namelist=ab_trig_var_err2]
+type = integer
+
+[namelist:triggered_ignored_namelist=ab_trig_var_err3]
+type = integer
+
+[namelist:triggered_ignored_namelist=ab_trig_var_err4]
+type = integer
+
 [namelist:triggered_ignored_namelist=user_sw_var]
+type = integer
+
+[namelist:already_triggered_ignored_namelist]
+
+[namelist:already_triggered_ignored_namelist=normal_variable1]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=trig_var1: normal
+
+[namelist:already_triggered_ignored_namelist=normal_variable2]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=trig_var2: normal
+
+[namelist:already_triggered_ignored_namelist=normal_variable3]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=trig_var3: normal
+
+[namelist:already_triggered_ignored_namelist=normal_variable4]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=trig_var4: normal
+
+[namelist:already_triggered_ignored_namelist=normal_variable_err1]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=trig_var_err1: normal
+
+[namelist:already_triggered_ignored_namelist=normal_variable_err2]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=trig_var_err2: normal
+
+[namelist:already_triggered_ignored_namelist=normal_variable_err3]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=trig_var_err3: normal
+
+[namelist:already_triggered_ignored_namelist=normal_variable_err4]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=trig_var_err4: normal
+
+[namelist:already_triggered_ignored_namelist=abnormal_variable1]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=ab_trig_var1: normal
+
+[namelist:already_triggered_ignored_namelist=abnormal_variable2]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=ab_trig_var2: normal
+
+[namelist:already_triggered_ignored_namelist=abnormal_variable3]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=ab_trig_var3: normal
+
+[namelist:already_triggered_ignored_namelist=abnormal_variable4]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=ab_trig_var4: normal
+
+[namelist:already_triggered_ignored_namelist=abnormal_variable_err1]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=ab_trig_var_err1: normal
+
+[namelist:already_triggered_ignored_namelist=abnormal_variable_err2]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=ab_trig_var_err2: normal
+
+[namelist:already_triggered_ignored_namelist=abnormal_variable_err3]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=ab_trig_var_err3: normal
+
+[namelist:already_triggered_ignored_namelist=abnormal_variable_err4]
+values = normal, abnormal
+trigger = namelist:already_triggered_ignored_namelist=ab_trig_var_err4: normal
+
+[namelist:already_triggered_ignored_namelist=trig_var1]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=trig_var2]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=trig_var3]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=trig_var4]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=trig_var_err1]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=trig_var_err2]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=trig_var_err3]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=trig_var_err4]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=ab_trig_var1]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=ab_trig_var2]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=ab_trig_var3]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=ab_trig_var4]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=ab_trig_var_err1]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=ab_trig_var_err2]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=ab_trig_var_err3]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=ab_trig_var_err4]
+type = integer
+
+[namelist:already_triggered_ignored_namelist=user_sw_var]
 type = integer
 
 [namelist:trigger_logical_expression]
@@ -469,6 +690,7 @@ trigger = namelist:trig_absent=two_values_triggered: 1, 2
 [namelist:trig_absent=two_values_triggered]
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultTransforms
+cp $TEST_KEY.out /var/tmp/bfitz/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [T] rose.macros.DefaultTransforms: changes: 21
     namelist:ignored_error_namelist=en_trig_e_err_comp_var=2
@@ -514,6 +736,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
     namelist:triggered_namelist=user_sw_var=6
         user-ignored -> enabled     
 __CONTENT__
+cp ../config/rose-app.conf /var/tmp/bfitz/$TEST_KEY.app.conf
 file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONTENT__'
 [command]
 alternate=alternate_command
@@ -591,14 +814,22 @@ abnormal_variable1=abnormal
 abnormal_variable2=abnormal
 abnormal_variable3=abnormal
 abnormal_variable4=abnormal
-!!trig_var1=2
-!!trig_var2=2
-!!trig_var3=2
-!!trig_var4=2
-ab_trig_var1=2
-ab_trig_var2=2
-ab_trig_var3=2
-ab_trig_var4=2
+trig_var1=2
+trig_var2=2
+trig_var3=2
+trig_var4=2
+!!trig_var_err1=2
+!!trig_var_err2=2
+!!trig_var_err3=2
+!!trig_var_err4=2
+!!ab_trig_var1=2
+!!ab_trig_var2=2
+!!ab_trig_var3=2
+!!ab_trig_var4=2
+ab_trig_var_err1=2
+ab_trig_var_err2=2
+ab_trig_var_err3=2
+ab_trig_var_err4=2
 user_sw_var=5
 
 [namelist:triggered_namelist]
