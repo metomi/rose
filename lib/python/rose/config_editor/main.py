@@ -396,7 +396,7 @@ class MainController(object):
         if not any([c.is_top_level for c in self.data.config.values()]):
             self.menubar.uimanager.get_widget(
                          "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
-        self.alter_bar_sensitivity()
+        self.update_bar_sensitivity()
         self.top_menu = self.menubar.uimanager.get_widget('/TopMenuBar')
         # Load the keyboard accelerators.
         accel = {
@@ -675,14 +675,14 @@ class MainController(object):
     def handle_page_change(self, *args):
         """Handle a page change and select the correct tree row."""
         current_page = self._get_current_page()
-        self.alter_page_menubar_toolbar_sensitivity(current_page)
+        self.update_page_menubar_toolbar_sensitivity(current_page)
         if current_page is None:
             self.hyper_panel.select_row(None)
             return False
         self.set_current_page_indicator(current_page.namespace)
         return False
 
-    def alter_page_menubar_toolbar_sensitivity(self, current_page):
+    def update_page_menubar_toolbar_sensitivity(self, current_page):
         if not hasattr(self, 'toolbar') or not hasattr(self, 'menubar'):
             return False
         page_icons = ['Add to page...', 'Revert page to saved']
@@ -837,6 +837,12 @@ class MainController(object):
         return ""
 
     def tree_trigger_update(self, just_this_namespace=None):
+        """Reload the tree panel, and perform an update.
+
+        If just_this_namespace is not None, perform a selective update
+        to save time.
+
+        """
         if hasattr(self, 'hyper_panel'):
             self.hyper_panel.load_tree(None, self.data.namespace_tree)
             if just_this_namespace is None:
@@ -848,7 +854,7 @@ class MainController(object):
                 spaces = just_this_namespace.lstrip("/").split("/")
                 for i in range(len(spaces), 0, -1):
                     update_ns = "/" + "/".join(spaces[:i])
-                    self.update_namespace(update_ns, no_config_update=True)
+                    self.update_namespace(update_ns, skip_config_update=True)
 
     def refresh_ids(self, config_name, setting_ids, is_loading=False):
         """Refresh and redraw settings if needed."""
@@ -904,23 +910,23 @@ class MainController(object):
                 self.update_tree_status(page)  # Faster.
             else:
                 self.update_tree_status(ns)
-        self.alter_bar_sensitivity()
+        self.update_bar_sensitivity()
         self.update_stack_viewer_if_open()
         for config_name in configs:
             self.update_metadata_id(config_name)
         self.update_ns_sub_data()
 
     def update_namespace(self, namespace, are_errors_done=False,
-                         is_loading=False, no_config_update=False):
+                         is_loading=False, skip_config_update=False):
         """Update driver function. Updates the page if open."""
         self._generate_pagelist()
         if namespace in [p.namespace for p in self.pagelist]:
             index = [p.namespace for p in self.pagelist].index(namespace)
             page = self.pagelist[index]
             self.update_status(page, are_errors_done=are_errors_done,
-                               no_config_update=no_config_update)
+                               skip_config_update=skip_config_update)
         else:
-            if not no_config_update:
+            if not skip_config_update:
                 self.update_config(namespace)
             self.update_sections(namespace)
             self.update_ignored_statuses(namespace)
@@ -928,25 +934,25 @@ class MainController(object):
                 self.perform_error_check(namespace)
             self.update_tree_status(namespace)
             if not is_loading:
-                self.alter_bar_sensitivity()
+                self.update_bar_sensitivity()
             self.update_stack_viewer_if_open()
             if namespace in self.data.config.keys():
                 self.update_metadata_id(namespace)
             self.update_ns_sub_data(namespace)
 
     def update_status(self, page, are_errors_done=False,
-                      no_config_update=False):
+                      skip_config_update=False):
         """Update ignored statuses and update the tree statuses."""
         self._generate_pagelist()
         self.sync_page_var_lists(page)
-        if not no_config_update:
+        if not skip_config_update:
             self.update_config(page.namespace)
         self.update_sections(page.namespace)
         self.update_ignored_statuses(page.namespace)
         if not are_errors_done:
             self.perform_error_check(page.namespace)
         self.update_tree_status(page)
-        self.alter_bar_sensitivity()
+        self.update_bar_sensitivity()
         self.update_stack_viewer_if_open()
         if page.namespace in self.data.config.keys():
             self.update_metadata_id(page.namespace)
@@ -1473,7 +1479,7 @@ class MainController(object):
                 return self.menu_widgets[address]
         return None
 
-    def alter_bar_sensitivity(self):
+    def update_bar_sensitivity(self):
         """Update bar functionality like Undo and Redo."""
         if not hasattr(self, 'toolbar'):
             return False
@@ -1505,7 +1511,7 @@ class MainController(object):
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
             if self._namespace_data_is_modified(config_name):
-                self._alter_change_widget_sensitivity(is_changed=True)
+                self._update_change_widget_sensitivity(is_changed=True)
                 break
             now_vars = []
             for v in config_data.vars.get_all(no_latent=True):
@@ -1514,12 +1520,12 @@ class MainController(object):
             for v in config_data.vars.get_all(no_latent=True, save=True):
                 las_vars.append(v.to_hashable())
             if set(now_vars) ^ set(las_vars):
-                self._alter_change_widget_sensitivity(is_changed=True)
+                self._update_change_widget_sensitivity(is_changed=True)
                 break
         else:
-            self._alter_change_widget_sensitivity(is_changed=False)
+            self._update_change_widget_sensitivity(is_changed=False)
 
-    def _alter_change_widget_sensitivity(self, is_changed=False):
+    def _update_change_widget_sensitivity(self, is_changed=False):
         # Alter sensitivity of 'unsaved changes' related widgets.
         self.toolbar.set_widget_sensitive('Save', is_changed)
         self._get_menu_widget('/Save').set_sensitive(is_changed)
@@ -1940,7 +1946,7 @@ class MainController(object):
             return False
         self._generate_pagelist()
         do_list = [stack[-1]]
-        # We should do grouped items together.
+        # We should undo/redo all same-grouped items together.
         for stack_item in reversed(stack[:-1]):
             if (stack_item.group is None or
                 stack_item.group != do_list[0].group):
@@ -2011,7 +2017,7 @@ class MainController(object):
                 if namespace != stack_item.page_label:
                     # Make sure the right status update is made.
                     self.update_status(page)
-                self.alter_bar_sensitivity()
+                self.update_bar_sensitivity()
                 self.update_stack_viewer_if_open()
         if is_group:
             self.data.reload_namespace_tree()

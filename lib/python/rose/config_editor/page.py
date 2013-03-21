@@ -29,6 +29,7 @@ pygtk.require('2.0')
 import gtk
 import pango
 
+import rose.config_editor.panelwidget
 import rose.config_editor.pagewidget
 import rose.config_editor.stack
 import rose.config_editor.util
@@ -473,8 +474,9 @@ class ConfigPage(gtk.VBox):
 
     def generate_filesystem_panel(self):
         """Generate a widget to view the file hierarchy."""
-        self.filesystem_panel = rose.config_editor.panel.FileSystemPanel(
-                                                         self.directory)
+        self.filesystem_panel = (
+                rose.config_editor.panelwidget.filesystem.FileSystemPanel(
+                                                              self.directory))
 
     def generate_sub_data_panel(self, override_custom=False):
         """Generate a panel giving a summary of other page data."""
@@ -514,11 +516,13 @@ class ConfigPage(gtk.VBox):
             except Exception as e:
                 self.handle_bad_custom_sub_widget(str(e))
         else:
+            standard_panel_module = rose.config_editor.panelwidget.standard
             self.sub_data_panel = (
-                     rose.config_editor.panel.StandardSummaryDataPanel(*args))
+                     standard_panel_module.StandardSummaryDataPanel(*args))
 
     def handle_bad_custom_sub_widget(self, error_info):
-        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(traceback.format_exc())
+        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(
+                                               traceback.format_exc())
         sys.stderr.write(text + "\n")
         self.generate_sub_data_panel(override_custom=True)
 

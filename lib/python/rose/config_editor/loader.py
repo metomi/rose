@@ -260,7 +260,7 @@ class ConfigDataManager(object):
                     sys.exit(2)
             config, s_config = self.load_config_file(config_path)
         meta_config = self.load_meta_config(config, config_directory)
-        meta_files = self.load_meta_files(config, config_directory)  
+        meta_files = self.load_meta_files(config, config_directory)
         macro_module_prefix = re.sub("[^\w]", "_", name.strip("/")) + "/"
         macros = rose.macro.load_meta_macro_modules(
                       meta_files, module_prefix=macro_module_prefix)
@@ -1141,7 +1141,7 @@ class ConfigDataManager(object):
         return sub_data
 
     def get_sub_data_var_id_value_map(self, config_name):
-        """Return all real variable values for sub data."""
+        """Return all real (=existing) variable values for sub data."""
         config_data = self.config[config_name]
         var_id_val_map = {}
         for variable in config_data.vars.get_all():
