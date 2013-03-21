@@ -20,23 +20,28 @@
 """Return a list of values matching a regular expression."""
 
 from rose.apps.rose_ana import DataLengthError, data_from_regexp
+import sys
 
 REGEXPS = {
   'um_wallclock' : r"Total Elapsed CPU Time:\s*(\S+)",
   'um_initial_norms' : r"initial\s*Absolute\s*Norm\s*:\s*(\S+)",
-  'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)",
-  'var_penalty' : r" J= \s*(\S+)\s*gradJ=",
-  'var_gradient' : r" gradJ= \s*(\S+)",
-  'var_converged' : r" [Cc]onverge from\s*(\S+)\s*to\s*(\S+)",
-  'var_tests_pass' : r"PASS(.*)",
-  'var_tests_fail' : r"FAIL(.*)", }
+  'um_final_norms' : r"Final\s*Absolute\s*Norm\s*:\s*(\S+)", }
 
 class OutputGrepper(object):
     def run(self, task, variable):
         """Return a list of values matching a regular expression."""
         filevar  = variable + "file"
         filename = getattr(task, filevar)
-        numbers = data_from_regexp(REGEXPS[task.subextract], filename)
+        if task.subextract in REGEXPS:
+            regexp = REGEXPS[task.subextract]
+        else:
+            regexp = task.subextract
+        # TBD if verbose - print this once
+        sys.stdout.write("Regular expression for extraction of data: '")
+        sys.stdout.write(regexp)
+        sys.stdout.write("'")
+        print
+        numbers = data_from_regexp(regexp, filename)
         datavar  = variable + "data"
         setattr(task, datavar, numbers)
         return task
