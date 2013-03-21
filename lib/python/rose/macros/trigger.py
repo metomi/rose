@@ -121,7 +121,10 @@ class TriggerMacro(rose.macro.MacroBase):
             if not sum([start_id in v for v in
                         self.trigger_family_lookup.values()]):
                 has_ignored_parent = False
-            node = config.get(self._get_section_option_from_id(start_id))
+            section, option = self._get_section_option_from_id(start_id)
+            node = config.get([section, option])
+            if section in self.ignored_dict and option is not None:
+                has_ignored_parent = True
             has_ignored_parent = has_ignored_parent or (node is None)
             id_stack.append((start_id, has_ignored_parent))
         update_id_list = []

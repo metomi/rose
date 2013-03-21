@@ -360,7 +360,7 @@ class VariableOperations(object):
         old_reason = variable.ignored_reason.copy()
         if rose.variable.IGNORED_BY_SECTION in old_reason:
             # Preserve section-ignored status.
-            new_reason.setdefault(
+            new_reason_dict.setdefault(
                             rose.variable.IGNORED_BY_SECTION,
                             old_reason[rose.variable.IGNORED_BY_SECTION])
         if rose.variable.IGNORED_BY_SYSTEM in ignored_reasons:
