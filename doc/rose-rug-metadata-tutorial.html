@@ -114,12 +114,12 @@
       directory. It should look like this:</p>
       <pre class="prettyprint lang-rose_conf">
 [command]
-default = hello.exe
+default=hello.exe
 
 [env]
-MAX_TARGETS = 5
-LANG_JUPITER = Europan
-WORLD = Mars
+MAX_TARGETS=5
+LANG_JUPITER=Europan
+WORLD=Mars
 </pre>
     </div>
 
@@ -159,7 +159,7 @@ rose edit
       <h3 class="alwayshidden">Example: metadata directory</h3>
 
       <p>Create the sub directory <code>meta/</code> in your application
-      directory:</p>
+      directory (inside <samp>app/my_hello_mars/</samp>):</p>
       <pre class="shell">
 mkdir meta
 </pre>
@@ -191,7 +191,7 @@ touch meta/rose-meta.conf
       <p>We can specify that it's an integer by giving it a type:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
-type = integer
+type=integer
 </pre>
     </div>
 
@@ -201,8 +201,8 @@ type = integer
       <p>We could also improve the way it's displayed by giving it a title:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
-title = Max target number
-type = integer
+title=Max target number
+type=integer
 </pre>
     </div>
 
@@ -230,9 +230,9 @@ type = integer
       To do this add a range as follows:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
-range = 0:
-title = Max target number
-type = integer
+range=0:
+title=Max target number
+type=integer
 </pre>
 
       <p>This means that any integer less than zero will be flagged as a
@@ -263,8 +263,8 @@ type = integer
       <p>Add a title and description:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
-description = Choose your target world to say hello to.
-title = World
+description=Choose your target world to say hello to.
+title=World
 </pre>
     </div>
 
@@ -283,9 +283,9 @@ title = World
       very simple regular expression by adding a pattern:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
-description = Choose your target world to say hello to.
-pattern = ^[A-Z]
-title = World
+description=Choose your target world to say hello to.
+pattern=^[A-Z]
+title=World
 </pre>
     </div>
 
@@ -312,9 +312,9 @@ title = World
       Let's remove the pattern and add a list of values:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
-description = Choose your target world to say hello to.
-title = World
-values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+description=Choose your target world to say hello to.
+title=World
+values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 </pre>
 
       <p>(You may add or remove <samp>Pluto</samp> in line with your personal
@@ -338,10 +338,10 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
       <samp>trigger</samp> to automatically handle this:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
-description = Choose your target world to say hello to.
-title = World
-trigger = env=LANG_JUPITER: Jupiter
-values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+description=Choose your target world to say hello to.
+title=World
+trigger=env=LANG_JUPITER: Jupiter
+values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 
 [env=LANG_JUPITER]
 </pre>
@@ -406,12 +406,12 @@ values = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
       linguistics are notoriously difficult. Add:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=LANG_JUPITER]
-help = This variable controls which language to use when saying hello
-     = to Jupiter.
-     =
-     = The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
-     =
-     = The Great Red Spot people are not worth it.
+help=This variable controls which language to use when saying hello
+    =to Jupiter.
+    =
+    =The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
+    =
+    =The Great Red Spot people are not worth it.
 </pre>
     </div>
 
@@ -430,11 +430,11 @@ help = This variable controls which language to use when saying hello
       the section:</p>
       <pre class="prettyprint lang-rose_conf">
 [env]
-description = Hello Environment
-help = These environment variables provide overrides for the hello.f90 program.
-     =
-     = Use these to say hello to other planets.
-title = Environment
+description=Hello Environment
+help=These environment variables provide overrides for the hello.f90 program.
+    =
+    =Use these to say hello to other planets.
+title=Environment
 </pre>
     </div>
 
@@ -444,6 +444,8 @@ title = Environment
       <p>Reload the metadata and you should then have a modifed page name,
       hover-over text (description) when the mouse is over the page name, and a
       menu option for help for this section (right click on the page name).</p>
+
+      <p>You should also see the description text at the top of the page.</p>
     </div>
 
     <div class="slide">
@@ -454,13 +456,13 @@ title = Environment
       move <var>LANG_JUPITER</var>. Add a namespace (<var>ns</var>):</p>
       <pre class="prettyprint lang-rose_conf">
 [env=LANG_JUPITER]
-help = This variable controls which language to use when saying hello
-     = to Jupiter.
-     =
-     = The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
-     =
-     = The Great Red Spot people are not worth it.
-ns = languages
+help=This variable controls which language to use when saying hello
+    =to Jupiter.
+    =
+    =The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
+    =
+    =The Great Red Spot people are not worth it.
+ns=languages
 </pre>
     </div>
 
@@ -481,14 +483,14 @@ ns = languages
       help:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=LANG_JUPITER]
-help = This variable controls which language to use when saying hello
-     = to Jupiter.
-     =
-     = The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
-     =
-     = The Great Red Spot people are not worth it.
-ns = languages
-url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
+help=This variable controls which language to use when saying hello
+    =to Jupiter.
+    =
+    =The Galilean moons of Jupiter are Io, Europa, Ganymede and Callisto.
+    =
+    =The Great Red Spot people are not worth it.
+ns=languages
+url=http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
 </pre>
     </div>
 
@@ -498,6 +500,41 @@ url = http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
       <p>This can be accessed via the variable button menu (<var>Web
       Help</var>) in the config editor on reload, or via clicking on the
       variable name when there's no help.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example: embedded help url</h3>
+
+      <p>You can also do this in another way. Variable ids or
+      "http://"-prefixed URLs in the help will be clickable - this will either
+      navigate to the variable or launch a web page.</p>
+
+      <p>Add some help for the <var>env=WORLD</var> option:</p>
+      <pre class="prettyprint lang-rose_conf">
+[env=WORLD]
+description=Choose your target world to say hello to.
+help=Select a target world.
+    =
+    =This should be one of the formally recognised Solar System planets.
+    =It would be nice to be able to say hello to some of these:
+    =http://phl.upr.edu/library/notes/astellarsystemmapforexoplanets
+    =but we're not there yet.
+    =
+    =This variable gets passed to command=default.
+title=World
+trigger=env=LANG_JUPITER: Jupiter
+values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example: embedded help url</h3>
+
+      <p>The web URL and the variable id should be clickable when you reload
+      the metadata and launch the help.</p>
+
+      <p>You could also make use of the same functionality in the description
+      text for sections or namespaces - the text at the top of the page.</p>
     </div>
 
     <div class="slide">

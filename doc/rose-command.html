@@ -112,8 +112,7 @@
 
       <dt><a href="#rose-stem">rose stem</a></dt>
 
-      <dd>Run a suitable suite with a specified set of source tree(s).
-      Default</dd>
+      <dd>Run a suitable suite with the specified source tree and tasks(s).</dd>
 
       <dt><a href="#rose-sgc">rose sgc</a></dt>
 
@@ -1049,32 +1048,50 @@
 
     <h3>EXAMPLES</h3>
     <pre>
-    rose stem --diffsource=$PWD
-    rose stem --source=fcm:source_tr@head --task=myjob
-    rose stem --source=$PWD -C ~/roses/mot-aa121 --task=myjob --task=yourjob
+    rose stem --task=developer
+    rose stem --source=/path/to/source --task=myjob
 </pre>
 
     <h3>OPTIONS</h3>All options of <a href="#rose-suite-run">rose suite-run</a>
     are supported. Additional options are:
 
     <dl>
-      <dt><kbd>--confsource=DIR, -c DIR</kbd></dt>
-
-      <dd>Specify an alterate top-level source tree directory. This may be used
-      to locate <kbd>fcm make</kbd> config files.</dd>
-
-      <dt><kbd>--diffsource=SOURCE, -d SOURCE</kbd></dt>
-
-      <dd>Specify a source tree to add to the trunk as a branch.</dd>
-
       <dt><kbd>--source=SOURCE, -s SOURCE</kbd></dt>
 
-      <dd>Specify a source tree to run as the trunk.</dd>
+      <dd>Specify a source tree to include in a rose-stem suite. The source 
+      tree must be a working copy as the location of the suite and 
+      <kbd>fcm-make</kbd> config files are taken from it. Defaults to '.' 
+      if not specified.</dd>
 
       <dt><kbd>--task=TASK, -t TASK</kbd></dt>
 
       <dd>Specify a task name or group to run.</dd>
     </dl>
+
+    <h3>JINJA2 VARIABLES</h3>Note that <kbd>project</kbd> refers to the FCM 
+    keyword name of the repository in upper case.
+
+    <dl>
+      <dt><kbd>RUN_NAMES</kbd></dt>
+
+      <dd>A list of jobs and job groups to run in the rose-stem suite.</dd>
+
+      <dt><kbd>SOURCE_project</kbd></dt>
+
+      <dd>The complete list of source trees for a given project.</dd>
+
+      <dt><kbd>SOURCE_project_BASE</kbd></dt>
+
+      <dd>The base of the project specified on the command line. This is
+      intended to specify the location of <kbd>fcm-make</kbd> config files.</dd>
+
+      <dt><kbd>SOURCE_project_REV</kbd></dt>
+
+      <dd>The revision of the project specified on the command line. This is
+      intended to specify the location of <kbd>fcm-make</kbd> config files.</dd>
+
+    </dl>
+
 
     <h2 id="rose-sgc">rose sgc</h2>
 

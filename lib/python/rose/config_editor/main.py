@@ -1334,7 +1334,7 @@ class MainController(object):
             config_names = [only_config_name]
         for config_name in config_names:
             config = self.data.dump_to_internal_config(config_name)
-            new_saved_config = self.data.dump_to_internal_config(config_name)
+            new_save_config = self.data.dump_to_internal_config(config_name)
             config_data = self.data.config[config_name]
             directory = config_data.directory
             config_vars = config_data.vars
@@ -1362,7 +1362,7 @@ class MainController(object):
             # Un-prettify.
             config = self.data.dump_to_internal_config(config_name)
             # Update the last save data.
-            config_data.save_config = new_saved_config
+            config_data.save_config = new_save_config
             config_vars.save.clear()
             config_vars.latent_save.clear()
             for section, variables in config_vars.now.items():

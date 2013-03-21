@@ -39,7 +39,7 @@ class KeyWidget(gtk.HBox):
              rose.config_editor.FLAG_TYPE_ERROR:
                   gtk.STOCK_DIALOG_WARNING,
              rose.config_editor.FLAG_TYPE_FIXED:
-                  gtk.STOCK_MEDIA_PAUSE,
+                  gtk.STOCK_DIALOG_AUTHENTICATION,
              rose.config_editor.FLAG_TYPE_OPTIONAL:
                   gtk.STOCK_ABOUT,
              rose.config_editor.FLAG_TYPE_NO_META:
