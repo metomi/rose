@@ -9,7 +9,8 @@
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <link rel="stylesheet" type="text/css" href="rose-doc.css" />
-  <link rel="stylesheet" type="text/css" href="google-code-prettify/prettify.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <script type="text/javascript" src="jquery.min.js">
 </script>
   <script type="text/javascript" src="google-code-prettify/prettify.js">
@@ -25,13 +26,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
@@ -218,9 +218,9 @@ key-4=value 4
 
     <p>In a Rose configuration directory, we can add an <samp>opt/</samp>
     sub-directory for optional configuration files. Optional configuration
-    files contain additional configuration, which can be selected at run time to
-    override the configuration in the main <var>rose-${TYPE}.conf</var> file.
-    The name of each optional configuration should follow the syntax
+    files contain additional configuration, which can be selected at run time
+    to override the configuration in the main <var>rose-${TYPE}.conf</var>
+    file. The name of each optional configuration should follow the syntax
     <var>rose-${TYPE}-${KEY}.conf</var>, where <var>${KEY}</var> is a short
     name to describe the override functionality of the optional configuration
     file.</p>
@@ -296,8 +296,8 @@ accel-find-next=F3
 
       <li><samp>opt/</samp> directory. For detail, see <a href="#opts">Optional
       Configuration</a> and <a href=
-      "rose-rug-suite-tools#rose-suite-run.opt">Rose User Guide: Suite Tools &gt;
-      rose-suite-run &gt; Optional Configuration Selection</a>.</li>
+      "rose-rug-suite-tools#rose-suite-run.opt">Rose User Guide: Suite Tools
+      &gt; rose-suite-run &gt; Optional Configuration Selection</a>.</li>
 
       <li>Other items, as long as they do not clash with the scheduler's
       working directories. E.g. for a cylc suite, <samp>log*/</samp>,
@@ -452,8 +452,8 @@ accel-find-next=F3
 
       <li><samp>opt/</samp> directory. For detail, see <a href="#opts">Optional
       Configuration</a> and <a href=
-      "rose-rug-suite-tools#rose-task-run.opt">Rose User Guide: Suite Tools &gt;
-      rose task-run &gt; Optional Configuration Selection</a>.</li>
+      "rose-rug-suite-tools#rose-task-run.opt">Rose User Guide: Suite Tools
+      &gt; rose task-run &gt; Optional Configuration Selection</a>.</li>
     </ul>
 
     <p>E.g. The application configuration directory may look like:</p>
@@ -484,14 +484,15 @@ accel-find-next=F3
       <dt><code>meta</code></dt>
 
       <dd>Root level setting. Specify the configuration metadata for the
-      application. This is ignored by the application runner, but may be used by
-      other Rose utilities, such as the config editor GUI. It can be used to
+      application. This is ignored by the application runner, but may be used
+      by other Rose utilities, such as the config editor GUI. It can be used to
       specify the application type.</dd>
 
       <dt><code>mode</code></dt>
 
-      <dd>Root level setting. Specify the name of a builtin application, instead
-      of running a command specified in the <code>[command]</code> section.</dd>
+      <dd>Root level setting. Specify the name of a builtin application,
+      instead of running a command specified in the <code>[command]</code>
+      section.</dd>
 
       <dt><code>[command]</code></dt>
 
@@ -576,8 +577,8 @@ accel-find-next=F3
       <dt><code>[poll]</code></dt>
 
       <dd>
-        Specify prerequisites to poll for before running the actual application.
-        3 types of tests can be performed:
+        Specify prerequisites to poll for before running the actual
+        application. 3 types of tests can be performed:
 
         <p><var>all-files</var>: A list of space delimited list of file paths.
         This test passes only if all file paths in the list exist.</p>
@@ -592,7 +593,6 @@ accel-find-next=F3
         both test for the existence of file paths. If this is not enough, e.g.
         you want to test for the existence of a string in each file, you can
         specify a <var>file-test</var> to do a <code>grep</code>. E.g.:</p>
-
         <pre class="prettyprint lang-rose_conf">
 all-files=file1 file2
 file-test=test -e {} &amp;&amp; grep -q 'hello' {}
@@ -609,10 +609,9 @@ file-test=test -e {} &amp;&amp; grep -q 'hello' {}
         prerequisites are still not met after the number of delays, the
         application runner will fail with a time out. The list is a
         comma-separated list. The syntax looks like <var>[R*]T[U]</var>, where
-        <var>U</var> is a unit (<kbd>s</kbd> for seconds (default), <kbd>m</kbd>
-        for minutes and <kbd>h</kbd> for hours), <var>T</var> is the number of
-        units. E.g.:</p>
-
+        <var>U</var> is a unit (<kbd>s</kbd> for seconds (default),
+        <kbd>m</kbd> for minutes and <kbd>h</kbd> for hours), <var>T</var> is
+        the number of units. E.g.:</p>
         <pre class="prettyprint lang-rose_conf">
 # Default
 delays=0
@@ -756,13 +755,13 @@ delays=0,6*10s,60*1m,1h
 [env=banana]
 
 [env=cherry]
-sort-key = favourites-01
+sort-key=favourites-01
 
 [env=melon]
-sort-key = do-not-like-01
+sort-key=do-not-like-01
 
 [env=prune]
-sort-key = do-not-like-00
+sort-key=do-not-like-00
 </pre>
 
         <p>would produce a sorting order of <samp>env=prune</samp>,
@@ -943,14 +942,14 @@ sort-key = do-not-like-00
         value of other settings with their IDs. E.g.:</p>
         <pre class="prettyprint lang-rose_conf">
 [namelist:test=my_test_var]
-fail-if = this &lt; namelist:test=control_lt_var;
+fail-if=this &lt; namelist:test=control_lt_var;
 </pre>
 
         <p>means that an error will be flagged if the numeric value of
         <var>my_test_var</var> is less than the numeric value of
         <var>control_lt_var</var>.</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this);
+fail-if=this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - this);
 </pre>
 
         <p>shows a more complex operation, again with numeric values.</p>
@@ -958,50 +957,50 @@ fail-if = this != 1 + namelist:test=ctrl_var_1 * (namelist:test=ctrl_var_2 - thi
         <p>To check array elements, the ID should be expressed with a bracketed
         index, as in the configuration:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this(2) != "'0A'" and this(4) == "'0A'";
+fail-if=this(2) != "'0A'" and this(4) == "'0A'";
 </pre>
 
         <p>Array elements can also be checked using <code>any</code> and
         <code>all</code>. E.g.:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = any(namelist:test=ctrl_array &lt; this);
-fail-if = all(this == 0);
+fail-if=any(namelist:test=ctrl_array &lt; this);
+fail-if=all(this == 0);
 </pre>
 
         <p>Expressions can be chained together and brackets used:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'));
+fail-if=this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'));
 </pre>
 
         <p>Multiple failure conditions can be added, by using a semicolon as
-        the separator - the semicolon is optional for a single statement or
-        the last in a block, but is recommended. Multiple failure conditions are essentially
-        similar to chaining them together with <code>or</code>, but the system
-        can process each expression one by one to target the error
+        the separator - the semicolon is optional for a single statement or the
+        last in a block, but is recommended. Multiple failure conditions are
+        essentially similar to chaining them together with <code>or</code>, but
+        the system can process each expression one by one to target the error
         message.</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this &gt; 0; this % 2 == 1; this * 3 &gt; 100;
+fail-if=this &gt; 0; this % 2 == 1; this * 3 &gt; 100;
 </pre>
 
         <p>You can add a message to the error or warning message to make it
         clearer by adding a hash followed by the comment at the end of a
         configuration metadata line:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = any(namelist:test=ctrl_array % this == 0); # Needs to be common divisor for ctrl_array
+fail-if=any(namelist:test=ctrl_array % this == 0); # Needs to be common divisor for ctrl_array
 </pre>
 
         <p>When using multiple failure conditions, different messages can be
         added if they are placed on individual lines:</p>
         <pre class="prettyprint lang-rose_conf">
-fail-if = this &gt; 0; # Needs to be less than or equal to 0
-          this % 2 == 1; # Needs to be odd
-          this * 3 &gt; 100; # Needs to be more than 100/3.
+fail-if=this &gt; 0; # Needs to be less than or equal to 0
+        this % 2 == 1; # Needs to be odd
+        this * 3 &gt; 100; # Needs to be more than 100/3.
 </pre>
 
         <p>A slightly different usage of this functionality can do things like
         warn of deprecated content:</p>
         <pre class="prettyprint lang-rose_conf">
-warn-if = True;  # This option is deprecated
+warn-if=True;  # This option is deprecated
 </pre>
 
         <p>This would always evaluate True and give a warning if the setting is
@@ -1069,21 +1068,21 @@ warn-if = True;  # This option is deprecated
         <p>The trigger expression is a list of settings triggered by (different
         values of) this setting. If the values are not given, the setting will
         be triggered only if the current setting is enabled.</p>
-        
-        <p>The syntax contains id-values pairs, where the values part is optional.
-        Each pair must be separated by a semi-colon. Within each pair, any values
-        must be separated from the id by a colon and a space (<samp>: </samp>).
-        Values must be formatted in the same way as the setting "values"
-        defined above (i.e. comma separated).</p>
-       
+
+        <p>The syntax contains id-values pairs, where the values part is
+        optional. Each pair must be separated by a semi-colon. Within each
+        pair, any values must be separated from the id by a colon and a space
+        (<samp>:</samp> ). Values must be formatted in the same way as the
+        setting "values" defined above (i.e. comma separated).</p>
+
         <p>The trigger syntax looks like:</p>
         <pre class="prettyprint lang-rose_conf">
 [namelist:trig_nl=trigger_variable]
-trigger = namelist:dep_nl=A;
-          namelist:dep_nl=B;
-          namelist:value_nl=X: 10;
-          env=Y: 20, 30, 40;
-          namelist:value_nl=Z: 20;
+trigger=namelist:dep_nl=A;
+        namelist:dep_nl=B;
+        namelist:value_nl=X: 10;
+        env=Y: 20, 30, 40;
+        namelist:value_nl=Z: 20;
 </pre>
 
         <p>In this example:</p>
@@ -1125,21 +1124,21 @@ trigger = namelist:dep_nl=A;
           </li>
         </ul>
 
-        <p>Settings mentioned in trigger expressions will have their
-        default state set to ignored unless explicitly triggered. The config
-        editor will issue warnings if variables or sections are in the
-        incorrect state when it loads a configuration. Triggering thereafter
-        will work as normal.</p>
+        <p>Settings mentioned in trigger expressions will have their default
+        state set to ignored unless explicitly triggered. The config editor
+        will issue warnings if variables or sections are in the incorrect state
+        when it loads a configuration. Triggering thereafter will work as
+        normal.</p>
 
         <p>Where multiple triggers act on a setting, the setting is triggered
         only if all triggers are active (i.e. an <em>AND</em> relationship).
         For example, for the two triggers here:</p>
         <pre class="prettyprint lang-rose_conf">
 [env=IS_WATER]
-trigger = env=IS_ICE: true;
+trigger=env=IS_ICE: true;
 
 [env=IS_COLD]
-trigger = env=IS_ICE: true;
+trigger=env=IS_ICE: true;
 </pre>
 
         <p>the setting <var>env=IS_ICE</var> is only enabled if both
@@ -1150,8 +1149,8 @@ trigger = env=IS_ICE: true;
         format as range or fail-if metadata:</p>
         <pre class="prettyprint lang-rose_conf">
 [env=SNOWFLAKE_SIDES]
-trigger = env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
-          env=SILLY_SNOWFLAKE_GEOMETRY: this &lt; 2;
+trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
+        env=SILLY_SNOWFLAKE_GEOMETRY: this &lt; 2;
 </pre>
 
         <p>In this example, the setting
@@ -1189,14 +1188,14 @@ trigger = env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
         specified after the widget name. E.g. to set up a hypothetical table
         with named columns X, Y, VCT, and Level, we may do:</p>
         <pre class="prettyprint lang-rose_conf">
-widget[rose-config-edit] = table X Y VCT Level
+widget[rose-config-edit]=table X Y VCT Level
 </pre>
 
         <p>You may override to a Rose built-in widget by specifying a full
         <code>rose</code> class path in Python - for example, to always show
         radiobuttons for an option with <code>values</code> set:</p>
         <pre class="prettyprint lang-rose_conf">
-widget[rose-config-edit] = rose.config_editor.valuewidget.radiobuttons
+widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons
 </pre>
       </dd>
     </dl>
@@ -1211,7 +1210,7 @@ widget[rose-config-edit] = rose.config_editor.valuewidget.radiobuttons
       <dd>
         <p>A web URL containing help for the setting. For example:</p>
         <pre class="prettyprint lang-rose_conf">
-url = http://www-nwp/~frve/VER/view/dev/doc/GTDP5.html
+url=http://www-nwp/~frve/VER/view/dev/doc/GTDP5.html
 </pre>
 
         <p>For example, the config editor will trigger a web browser to display
@@ -1226,9 +1225,12 @@ url = http://www-nwp/~frve/VER/view/dev/doc/GTDP5.html
         help string will allow links to the variables to be created within the
         popup dialog box, e.g.</p>
         <pre class="prettyprint lang-rose_conf">
-help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
+help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
  do something linear.
 </pre>
+
+        <p>Web URLs beginning with <samp>http://</samp> will also be presented
+        as links in the config editor.</p>
       </dd>
 
       <dt>description</dt>
@@ -1236,6 +1238,10 @@ help = Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
       <dd>
         <p>(Medium) description for the setting. For example, the configuration
         editor will use this as part of the hover over text.</p>
+
+        <p>The config editor will also use descriptions set for sections or
+        namespaces as page header text (appears at the top of a panel or page),
+        with clickable id and URL links as in help.</p>
       </dd>
 
       <dt>title</dt>
@@ -1435,7 +1441,7 @@ CHOCOLATE/rose-meta/choc-milk/
 
     <p>and a site configuration with:</p>
     <pre class="prettyprint lang-rose_conf">
-meta-path = /path/to/rose-meta
+meta-path=/path/to/rose-meta
 </pre>
 
     <p>We would expect the following directories in
@@ -1496,11 +1502,11 @@ meta-path = /path/to/rose-meta
 #!cfg
 # Refer to the HEAD version
 # (typically you wouldn't do this since no upgrade process is possible)
-meta = my-command
+meta=my-command
 
 # Refer to a named or tagged version
-meta = my-command/8.3
-meta = my-command/t123
+meta=my-command/8.3
+meta=my-command/t123
 </pre>
 
     <p>If a version is defined then the Rose utilities will first look for the
@@ -1567,7 +1573,8 @@ meta = my-command/t123
     changes (or to use a branch of the suite which you are happy to
     discard).</p>
 
-    <h2 id="appendix-rose-ana-config">Appendix: rose-ana configuration format</h2>
+    <h2 id="appendix-rose-ana-config">Appendix: rose-ana configuration
+    format</h2>
 
     <p>The <code>rose-ana</code> builtin application reads information about
     which comparisons to perform from the <code>rose-app.conf</code> file for
@@ -1584,18 +1591,18 @@ meta = my-command/t123
       <var>{resultfile}</var> and <var>{kgo1file}</var> map to the values
       defined in the configuration file. The token <var>{file}</var> will
       result in the command being called twice, once on <var>{resultfile}</var>
-      and once on  <var>{kgo1file}</var>. Some extraction classes such as
-      <kbd>OutputGrepper</kbd> require additional
-      information about how to extract the data. This should be placed
-      after the class name, separated from it by a colon.</li>
+      and once on <var>{kgo1file}</var>. Some extraction classes such as
+      <kbd>OutputGrepper</kbd> require additional information about how to
+      extract the data. This should be placed after the class name, separated
+      from it by a colon.</li>
 
       <li>kgo1file - The path and name of the file containing the known good
       output. Environment variables and the wildcard character <var>*</var> are
       accepted.</li>
 
-      <li>resultfile - The path and name of the file containing the output to be
-      compared Environment variables and the wildcard character <kbd>*</kbd> are
-      accepted.</li>
+      <li>resultfile - The path and name of the file containing the output to
+      be compared Environment variables and the wildcard character <kbd>*</kbd>
+      are accepted.</li>
 
       <li>tolerance - For inexact comparisons such as <kbd>Within</kbd>, the
       tolerance should be specified using this variable. Values with a
@@ -1604,19 +1611,19 @@ meta = my-command/t123
       optional; some comparisons such as <kbd>Exact</kbd> do not require
       it.</li>
 
-      <li>warnonfail - If this is set to be <kbd>yes</kbd> a failure of the test
-      will result in a warning rather than a failure. This value is always
+      <li>warnonfail - If this is set to be <kbd>yes</kbd> a failure of the
+      test will result in a warning rather than a failure. This value is always
       optional.</li>
     </ul>
 
     <p>For example:</p>
     <pre class="prettyprint lang-rose_conf">
 [Compare initial norms]
-resultfile = $OUTPUT_DIR/fort6.pe0
-kgo1file = /path/to/kgo/fort6.pe0
-extract = OutputGrepper:um_initial_norms
-comparison = Within
-tolerance = 5%
+resultfile=$OUTPUT_DIR/fort6.pe0
+kgo1file=/path/to/kgo/fort6.pe0
+extract=OutputGrepper:um_initial_norms
+comparison=Within
+tolerance=5%
 </pre>
 
     <h2 id="appendix-ignored-config-edit">Appendix: Config Editor Ignored
