@@ -690,7 +690,6 @@ trigger = namelist:trig_absent=two_values_triggered: 1, 2
 [namelist:trig_absent=two_values_triggered]
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultTransforms
-cp $TEST_KEY.out /var/tmp/bfitz/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [T] rose.macros.DefaultTransforms: changes: 38
     namelist:already_triggered_ignored_namelist=ab_trig_var1=2
@@ -770,7 +769,6 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
     namelist:triggered_namelist=user_sw_var=6
         user-ignored -> enabled     
 __CONTENT__
-cp ../config/rose-app.conf /var/tmp/bfitz/$TEST_KEY.app.conf
 file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONTENT__'
 [command]
 alternate=alternate_command
