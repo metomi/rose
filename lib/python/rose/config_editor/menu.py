@@ -410,7 +410,7 @@ class Handler(object):
                 (var.metadata.get(rose.META_PROP_COMPULSORY) ==
                  rose.META_PROP_VALUE_TRUE)):
                 self.var_ops.add_var(var, no_update=True)
-        for opt_name, value in opt_map:
+        for opt_name, value in opt_map.items():
             var_id = self.util.get_id_from_section_option(
                                            new_section_name, opt_name)
             metadata = self.data.get_metadata_for_config_id(var_id, config_name)
