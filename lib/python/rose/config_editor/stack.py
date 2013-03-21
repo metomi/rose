@@ -82,7 +82,7 @@ class SectionOperations(object):
         self.view_page_func = view_page_func
         self.kill_page_func = kill_page_func
 
-    def add_section(self, config_name, section, no_update=False,
+    def add_section(self, config_name, section, skip_update=False,
                     no_page_launch=False):
         """Add a section to this configuration."""
         config_data = self.__data.config[config_name]
@@ -108,7 +108,7 @@ class SectionOperations(object):
         new_section_data.metadata = metadata
         ns = self.__data.get_default_namespace_for_section(section, 
                                                            config_name)
-        if not no_update:
+        if not skip_update:
             self.__data.reload_namespace_tree(ns)
         copy_section_data = new_section_data.copy()
         stack_item = rose.config_editor.stack.StackItem(
@@ -116,12 +116,12 @@ class SectionOperations(object):
                           rose.config_editor.STACK_ACTION_ADDED,
                           copy_section_data,
                           self.remove_section,
-                          (config_name, section, no_update))
+                          (config_name, section, skip_update))
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
-        if not no_page_launch and not no_update:
+        if not no_page_launch and not skip_update:
             self.view_page_func(ns)
-        if not no_update:
+        if not skip_update:
             self.trigger_update(ns)
 
     def ignore_section(self, config_name, section, is_ignored,
@@ -205,7 +205,7 @@ class SectionOperations(object):
             self.trigger_update(ns)
             self.trigger_info_update(ns)
 
-    def remove_section(self, config_name, section, no_update=False):
+    def remove_section(self, config_name, section, skip_update=False):
         """Remove a section from this configuration."""
         config_data = self.__data.config[config_name]
         old_section_data = config_data.sections.now.pop(section)
@@ -226,12 +226,12 @@ class SectionOperations(object):
                           rose.config_editor.STACK_ACTION_REMOVED,
                           old_section_data.copy(),
                           self.add_section,
-                          (config_name, section, no_update))
+                          (config_name, section, skip_update))
         for ns in ns_list:
             self.kill_page_func(ns)
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
-        if not no_update:
+        if not skip_update:
             self.__data.reload_namespace_tree(namespace)
 
     def set_section_comments(self, config_name, section, comments):
@@ -286,7 +286,7 @@ class VariableOperations(object):
         var_id = possible_copy_variable.metadata['id']
         return self.__data.get_ns_variable(var_id, config_name)
 
-    def add_var(self, variable, no_update=False):
+    def add_var(self, variable, skip_update=False):
         """Add a variable to the internal list."""
         existing_variable = self._get_proper_variable(variable)
         namespace = variable.metadata.get('full_ns')
@@ -317,12 +317,12 @@ class VariableOperations(object):
                                         rose.config_editor.STACK_ACTION_ADDED,
                                         copy_var,
                                         self.remove_var,
-                                        [copy_var, no_update]))
+                                        [copy_var, skip_update]))
             del self.__redo_stack[:]
-        if not no_update:
+        if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
 
-    def remove_var(self, variable, no_update=False):
+    def remove_var(self, variable, skip_update=False):
         """Remove the variable entry from the internal lists."""
         variable = self._get_proper_variable(variable)
         namespace = variable.metadata.get('full_ns')
@@ -350,9 +350,9 @@ class VariableOperations(object):
                                     rose.config_editor.STACK_ACTION_REMOVED,
                                     copy_var,
                                     self.add_var,
-                                    [copy_var, no_update]))
+                                    [copy_var, skip_update]))
         del self.__redo_stack[:]
-        if not no_update:
+        if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
 
     def fix_var_ignored(self, variable):
