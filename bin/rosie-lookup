@@ -43,6 +43,8 @@
 #     "<" means that the suite is checked out but at an older revision.
 #     ">" means that the suite is checked out but at a newer revision.
 #     "S" means that the suite is checked out but on a different branch.
+#     "M" means that the suite is checked out and modified.
+#     "X" means that the suite is checked out but is corrupted.
 #
 # OPTIONS
 #

@@ -55,10 +55,11 @@ FORMAT_QUIET = "%suite"
 REC_COL_IN_FORMAT = re.compile("(?:^|[^%])%([\w-]+)")
 REC_ID = re.compile("\A(?:(\w+)-)?(\w+)(?:/([^\@/]+))?(?:@([^\@/]+))?\Z")
 
+STATUS_CR = "X"
 STATUS_DO = ">"
-STATUS_NO = " "
 STATUS_OK = "="
 STATUS_MO = "M"
+STATUS_NO = " "
 STATUS_SW = "S"
 STATUS_UP = "<"
 
@@ -288,11 +289,11 @@ def get_local_suites(prefix=None):
     for path in os.listdir(local_copy_root):
         location = os.path.join(local_copy_root, path)
         try:
-            id = SuiteId(location=location)
+            id_ = SuiteId(location=location)
         except SuiteIdError as e:
             continue
-        if prefix is None or id.prefix == prefix:
-            local_copies.append(id)
+        if prefix is None or id_.prefix == prefix:
+            local_copies.append(id_)
     return local_copies
 
 
@@ -313,7 +314,6 @@ def get_local_suite_details(prefix=None, id_list=None):
     for id_ in id_list:
 
         if id_.prefix == prefix:
-
             local_copy_root = id_.get_local_copy_root()
             info_file_path = os.path.join(local_copy_root, str(id_),
                                           rose.INFO_CONFIG_NAME)
@@ -330,7 +330,9 @@ def get_local_suite_details(prefix=None, id_list=None):
             id_info_map[u"owner"] = id_config[u"owner"].value
             id_info_map[u"project"] = id_config[u"project"].value
 
-            if id_.modified:
+            if id_.corrupt:
+                id_info_map[u"local"] = STATUS_CR
+            elif id_.modified:
                 id_info_map[u"local"] = STATUS_MO
             else:
                 id_info_map[u"local"] = STATUS_OK
@@ -355,7 +357,9 @@ def get_local_status(suites, prefix, idx, branch, revision):
             continue
         if suite_id.idx == idx:
             status = STATUS_SW
-            if suite_id.branch == branch:
+            if suite_id.corrupt:
+                status = STATUS_CR
+            elif suite_id.branch == branch:
                 status = STATUS_DO
                 if suite_id.out_of_date:
                     status = STATUS_UP

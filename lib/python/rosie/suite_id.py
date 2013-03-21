@@ -256,6 +256,7 @@ class SuiteId(object):
         self.revision = None
         self.modified = False
         self.out_of_date = False
+        self.corrupt = False
         if id_text:
             self._from_id_text(id_text)
         elif location:
@@ -333,16 +334,19 @@ class SuiteId(object):
             try:
                 out = self.svn("st", "-u", path)
             except RosePopenError:
-                raise SuiteIdLocationError(path)
-            for line in out.splitlines():
-                if line.startswith("Status against revision:"):
-                    continue
-                if line[8] == "*":
-                    self.out_of_date = True
-                if line[:7].strip():
-                    self.modified = True
-                if self.out_of_date and self.modified:
-                    break
+                # Corrupt working copy.
+                self.corrupt = True
+                self.modified = True
+            else:
+                for line in out.splitlines():
+                    if line.startswith("Status against revision:"):
+                        continue
+                    if line[8] == "*":
+                        self.out_of_date = True
+                    if line[:7].strip():
+                        self.modified = True
+                    if self.out_of_date and self.modified:
+                        break
 
     def incr(self):
         """Return an SuiteId object that represents the ID after this ID."""

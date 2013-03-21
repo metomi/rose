@@ -388,7 +388,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 sleep(0.1)
         return ret
 
-    def shutdown(self, suite_name, host=None, engine_version=None, args=None):
+    def shutdown(self, suite_name, host=None, engine_version=None, args=None,
+                 stderr=None, stdout=None):
         """Shut down the suite."""
         command = ["cylc", "shutdown", "--force"]
         if host:
@@ -399,7 +400,8 @@ class CylcProcessor(SuiteEngineProcessor):
         environ = dict(os.environ)
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
-        self.popen.run_simple(*command, env=environ)
+        self.popen.run_simple(
+                *command, env=environ, stderr=stderr, stdout=stdout)
 
     def update_job_log(self, suite_name, task_ids=None):
         """Update the log(s) of task jobs in suite_name.
