@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
-  <title>Rose Advanced Tutorial: remotes</title>
+  <title>Rose Advanced Tutorial: remote hosts</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -183,7 +183,7 @@ default = echo "scale=$NUM; 4*a(1)" | bc -l -q
       <h2 id="example-trigger">Adding remote hosts</h2>
 
       <p>As you will have noticed from examining the output, your tasks have
-      run been run on the machine hosting the suite. This may be undesireable,
+      been run on the machine hosting the suite. This may be undesireable,
       particularly when a suite host is used by multiple users. Additionally,
       we might want to run various tasks on particular machines or run more
       computationally intensive tasks on higher power servers.</p>
@@ -204,7 +204,8 @@ default = echo "scale=$NUM; 4*a(1)" | bc -l -q
 
       <p>where <em>"my-desktop"</em> is the name of your desktop machine in
       quotes. This will result in all tasks running on your desktop
-      machine.</p>
+      machine. If you don't know the name of your desktop, type 
+      <samp>hostname</samp> into your terminal.</p>
     </div>
 
     <div class="slide">
