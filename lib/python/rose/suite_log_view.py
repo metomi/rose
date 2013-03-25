@@ -216,8 +216,10 @@ def suite_log_view(opts, args, report=None):
     elif args:
         gen.update_job_log(suite_name, tasks=args)
     gen(suite_name)
-    return gen.view_suite_log_url(suite_name)
-
+    if opts.web_browser_mode:
+        return gen.view_suite_log_url(suite_name)
+    else:
+        return
 
 if __name__ == "__main__":
     main()
