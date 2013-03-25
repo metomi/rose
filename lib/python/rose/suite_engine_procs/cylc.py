@@ -110,8 +110,8 @@ class CylcProcessor(SuiteEngineProcessor):
         # Read task events from suite runtime database
         conn = sqlite3.connect(self.get_suite_db_file(suite_name))
         c = conn.cursor()
-        EVENTS = {"submitted": "submit",
-                  "submit failed": "submit-fail",
+        EVENTS = {"submission succeeded": "submit",
+                  "submission failed": "submit-fail",
                   "started": "init",
                   "succeeded": "pass",
                   "failed": "fail",
@@ -142,14 +142,22 @@ class CylcProcessor(SuiteEngineProcessor):
             submit = submits[submit_num - 1]
             submit["events"][event] = event_time
             status = None
-            if event in ["pass", "fail"]:
+            if event in ["init"]:
+                if submit["events"]["submit"] is None:
+                    submit["events"]["submit"] = event_time
+            elif event in ["pass", "fail"]:
                 status = event
                 submit["events"]["exit"] = event_time
                 submit["status"] = status
                 if key == "signaled":
                     submit["signal"] = message.rsplit(None, 1)[-1]
+                if submit["events"]["submit"] is None:
+                    submit["events"]["submit"] = event_time
+                if submit["events"]["init"] is None:
+                    submit["events"]["init"] = event_time
             elif event in ["submit-fail"]:
-                status = event
+                submit["events"]["submit"] = event_time
+                submit["status"] = event
 
         # Locate task log files
         for task_id, task_datum in data.items():
