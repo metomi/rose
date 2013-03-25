@@ -32,11 +32,7 @@ class Exact(object):
         if len(task.resultdata) != len(task.kgo1data):
             raise DataLengthError(task)
         location = 0
-        # TBD if verbose
-        print "resultdata", "kgo1data"
         for val1, val2 in zip(task.resultdata, task.kgo1data):
-            # TBD if verbose
-            print val1, val2
             location += 1
             if val1 != val2:
                 task.set_failure(ExactComparisonFailure(task, val1, val2, 
@@ -81,6 +77,8 @@ class ExactComparisonSuccess(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        if hasattr(task, "subextract"):
+            self.extract = self.extract + ":" + task.subextract
 
     def __repr__(self):
         return OUTPUT_STRING % ( self.extract, "all", 0,

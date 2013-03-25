@@ -286,10 +286,8 @@ class Analyse(object):
             newtask.extract = self.config.get_value([task, "extract"])
             result = re.search(r":", newtask.extract)
             if result:
-                newtask.subextract = re.sub(r".*:\s*'?", r"",
+                newtask.subextract = re.sub(r".*:\s*", r"",
                                     newtask.extract)
-                newtask.subextract = re.sub(r"'.*", r"",
-                                    newtask.subextract)
                 newtask.extract = re.sub(r"\s*:.*", r"",
                                     newtask.extract)
             newtask.comparison = self.config.get_value([task, "comparison"])
