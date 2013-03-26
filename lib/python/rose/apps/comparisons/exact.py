@@ -77,6 +77,8 @@ class ExactComparisonSuccess(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        if hasattr(task, "subextract"):
+            self.extract = self.extract + ":" + task.subextract
 
     def __repr__(self):
         return OUTPUT_STRING % ( self.extract, "all", 0,

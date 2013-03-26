@@ -20,6 +20,7 @@
 """Return a list of values matching a regular expression."""
 
 from rose.apps.rose_ana import DataLengthError, data_from_regexp
+import re
 
 REGEXPS = {
   'um_wallclock' : r"Total Elapsed CPU Time:\s*(\S+)",
@@ -31,7 +32,13 @@ class OutputGrepper(object):
         """Return a list of values matching a regular expression."""
         filevar  = variable + "file"
         filename = getattr(task, filevar)
-        numbers = data_from_regexp(REGEXPS[task.subextract], filename)
+        if task.subextract in REGEXPS:
+            regexp = REGEXPS[task.subextract]
+        else:
+            if (task.subextract.startswith("'") and
+                task.subextract.endswith("'")):
+                regexp = task.subextract[1:-1]
+        numbers = data_from_regexp(regexp, filename)
         datavar  = variable + "data"
         setattr(task, datavar, numbers)
         return task

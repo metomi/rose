@@ -68,7 +68,7 @@ class RoseAnaApp(BuiltinApp):
                 method_paths.append(item)
 
         # Initialise the analysis engine
-        engine = Analyse(config, opts, method_paths,
+        engine = Analyse(config, opts, args, method_paths,
                          reporter=app_runner.event_handler,
                          popen=app_runner.popen)
 
@@ -126,7 +126,8 @@ class Analyse(object):
 
     """A comparison engine for Rose."""
 
-    def __init__(self, config, opts, method_paths, reporter=None, popen=None):
+    def __init__(self, config, opts, args, method_paths, reporter=None,
+                 popen=None):
         if reporter is None:
             self.reporter = Reporter(opts.verbosity - opts.quietness)
         else:
@@ -136,6 +137,7 @@ class Analyse(object):
         else:
             self.popen = popen
         self.opts = opts
+        self.args = args
         self.config = config
         self.load_tasks()
         modules = []
@@ -275,7 +277,11 @@ class Analyse(object):
                 continue
             newtask = AnalysisTask()
             newtask.name = task
-            newtask.resultfile = self.config.get_value([task, "resultfile"])
+            value = self.config.get_value([task, "resultfile"])
+            if "{}" in value:
+                newtask.resultfile = value.replace("{}", self.args[0])
+            else:
+                newtask.resultfile = value
             newtask = self._find_file("result", newtask)
             newtask.extract = self.config.get_value([task, "extract"])
             result = re.search(r":", newtask.extract)
@@ -296,8 +302,11 @@ class Analyse(object):
                 kgovar = "kgo" + str(i)
                 kgofilevar = kgovar + "file"
                 if self.config.get([task, kgofilevar]):
-                    tempvar = self.config.get([task, kgofilevar])[:]
-                    setattr(newtask, kgofilevar, tempvar)
+                    value = self.config.get([task, kgofilevar])[:]
+                    if "{}" in value:
+                        setattr(newtask, kgofilevar, value.replace("{}", self.args[0]))
+                    else:
+                        setattr(newtask, kgofilevar, value)
                     newtask.numkgofiles += 1
                     newtask = self._find_file(kgovar, newtask)
                 else:
