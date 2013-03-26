@@ -132,6 +132,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                  "submits": []}
             submits = data[task_id]["submits"]
             submit_num = int(submit_num)
+            if not submit_num:
+                continue
             while submit_num > len(submits):
                 submits.append({"events": {},
                                 "status": None,
