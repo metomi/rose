@@ -177,7 +177,7 @@ class SuiteLogViewGenerator(object):
         If "task_ids" is None, update the logs for all tasks.
 
         """
-        return self._chdir(self._update_job_log, suite_name, task_ids=task_ids)
+        return self._chdir(self._update_job_log, suite_name, task_ids)
 
     def _update_job_log(self, suite_name, task_ids=None):
         return self.suite_engine_proc.update_job_log(suite_name, task_ids)
