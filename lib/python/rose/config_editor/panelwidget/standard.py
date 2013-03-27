@@ -519,6 +519,9 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         col_index = self._view.get_columns().index(col)
         sect_index = self.get_section_column_index()
         section = model.get_value(row_iter, sect_index)
+        if section is None:
+            cell.set_property("markup", None)
+            return False
         if col_index == sect_index:
             node_data = self.sections.get(section)
         else:
