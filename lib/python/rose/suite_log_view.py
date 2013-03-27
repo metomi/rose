@@ -104,7 +104,8 @@ class SuiteLogViewGenerator(object):
                 break
             except OSError:
                 attempts += 1
-                sleep(1)
+                if attempts < self.MAX_ATTEMPTS:
+                    sleep(1)
         if attempts == self.MAX_ATTEMPTS:
             self.handle_event(LockEvent(lock))
             return
