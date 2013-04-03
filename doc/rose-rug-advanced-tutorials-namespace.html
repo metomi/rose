@@ -107,39 +107,30 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = " "
+        graph = "visit_mine => MINERS"
 [runtime]
-    [[send_invites]]
-        command scripting = "sleep 5; echo 'posted the invites'"
-    [[CLOSE_FAMILY]]
-        command scripting = "sleep 5; echo 'see you there'"
-    [[FRIENDS]]
-        command scripting = """sleep 5; 
-                                if (($RANDOM % 2)); then 
-                                    echo 'see you there'; true;
-                                else 
-                                    echo 'sorry, can't make it'; false;
-                                fi
-                            """
-    [[mother_of_bride]]
-        inherit = CLOSE_FAMILY
-    
+    [[root]]
+        [[[event hooks]]]
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook"
+    [[visit_mine]]
+        command scripting = "sleep 5; echo 'off to work we go'"
 </pre>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Example (2)</h3>
-
-      <p>In the suite directory create an <samp>app</samp> directory</p>
-
-      <p>In the <samp>app</samp> directory create a <samp>calc_pi</samp>
-      directory</p>
-
-      <p>In the <samp>calc_pi</samp> directory create a
-      <samp>rose-app.conf</samp> file and paste in the following lines:</p>
       <pre class="prettyprint lang-cylc">
-[command]
-default = echo "scale=$NUM; 4*a(1)" | bc -l -q
+    [[MINERS]]
+        command scripting = """sleep 5; 
+                                if (($RANDOM % 2)); then 
+                                    echo 'Diamonds!'; true;
+                                else 
+                                    echo 'Nothing...'; false;
+                                fi
+                            """
+    [[doc, grumpy, sleepy, happy, bashful, sneezy, dopey]]
+        inherit = MINERS
 </pre>
     </div>
 
@@ -149,13 +140,13 @@ default = echo "scale=$NUM; 4*a(1)" | bc -l -q
       <p>You have now created a suite that:</p>
 
       <ul>
-        <li>contains a <samp>calc_pi</samp> task that calculates pi to some
-        number of decimal places as specified by <samp>$NUM</samp>.</li>
+        <li>contains a <samp>visit_mine</samp> task that sleeps for 5 seconds
+        then outputs a message.</li>
 
-        <li>has an initialisation task</li>
+        <li>contains a <samp>MINERS</samp> namespace (family) with a command in 
+        it that randomly succeeds or fails.</li>
 
-        <li>has short, medium and long tasks that use the <samp>calc_pi</samp>
-        app to calculate pi to increasing numbers of decimal places</li>
+        <li>contains 7 tasks that inherit from miners.</li>
       </ul>
     </div>
 
@@ -163,17 +154,12 @@ default = echo "scale=$NUM; 4*a(1)" | bc -l -q
       <h3 class="alwayshidden">Run the suite</h3>
 
       <p>Save your changes and run the suite using <samp>rose suite-run</samp>.
-      Notice the different lengths of time it takes for each of the tasks to
-      run.</p>
+      The cylc gui should launch and you should see the <samp>visit_mine</samp>
+      task run, then trigger the members of the <samp>MINERS</samp> family. 
+      Note that some of the <samp>MINERS</samp> tasks may fail so you should 
+      stop your suite using the stop button in the cylc gui in order to allow 
+      it to shutdown.</p>
 
-      <p>View the suite output using <samp>rose suite-log-view</samp> and
-      inspect the output of the <samp>short</samp>, <samp>medium</samp> and
-      <samp>long</samp> tasks. You should see pi printed to different numbers
-      of decimal places.</p>
-
-      <p>Also, note the <em>task host</em> listed at the top of the output of
-      each task, which should be the same as the <em>suite host</em>, also
-      listed at the top.</p>
     </div>
 
     <div class="slide">
