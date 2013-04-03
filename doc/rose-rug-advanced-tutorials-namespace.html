@@ -3,7 +3,6 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-
   <title>Rose Advanced Tutorial: namespace triggers</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -77,23 +76,22 @@
 
       <p>This tutorial walks you through using namespace triggers.</p>
 
-      <p>Namespace triggers allow you to build dependencies based on sets of 
-      tasks sharing the same namespace, sometimes referred to as "families".
-      </p>
-      
+      <p>Namespace triggers allow you to build dependencies based on sets of
+      tasks sharing the same namespace, sometimes referred to as
+      "families".</p>
     </div>
 
     <div class="slide">
       <h2 id="purpose">Purpose</h2>
 
-      <p>Namespace triggers are used to specify a condition to be met by a set 
-      of tasks in a particular namespace that will trigger the next entry in 
+      <p>Namespace triggers are used to specify a condition to be met by a set
+      of tasks in a particular namespace that will trigger the next entry in
       the dependencies graph.</p>
 
       <p>Like regular task based triggers, namespace triggers can depend on the
-      success or failure of tasks. However, because a namespace can contain 
-      multiple tasks, you need to specify whether you are concerned with 
-      <em>all</em> or <em>any</em> of the tasks in that namespace reaching the 
+      success or failure of tasks. However, because a namespace can contain
+      multiple tasks, you need to specify whether you are concerned with
+      <em>all</em> or <em>any</em> of the tasks in that namespace reaching the
       desired state.</p>
     </div>
 
@@ -107,7 +105,7 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "visit_mine => MINERS"
+        graph = "visit_mine =&gt; MINERS"
 [runtime]
     [[root]]
         [[[event hooks]]]
@@ -143,10 +141,10 @@
         <li>contains a <samp>visit_mine</samp> task that sleeps for 5 seconds
         then outputs a message.</li>
 
-        <li>contains a <samp>MINERS</samp> namespace (family) with a command in 
+        <li>contains a <samp>MINERS</samp> namespace (family) with a command in
         it that randomly succeeds or fails.</li>
 
-        <li>contains 7 tasks that inherit from miners.</li>
+        <li>contains 7 tasks that inherit from <samp>MINERS</samp>.</li>
       </ul>
     </div>
 
@@ -155,193 +153,160 @@
 
       <p>Save your changes and run the suite using <samp>rose suite-run</samp>.
       The cylc gui should launch and you should see the <samp>visit_mine</samp>
-      task run, then trigger the members of the <samp>MINERS</samp> family. 
-      Note that some of the <samp>MINERS</samp> tasks may fail so you should 
-      stop your suite using the stop button in the cylc gui in order to allow 
+      task run, then trigger the members of the <samp>MINERS</samp> family.
+      Note that some of the <samp>MINERS</samp> tasks may fail so you should
+      stop your suite using the stop button in the cylc gui in order to allow
       it to shutdown.</p>
-
     </div>
 
     <div class="slide">
-      <h2 id="example-trigger">Adding remote hosts</h2>
+      <h2 id="example-trigger">Namespace triggering: success</h2>
 
-      <p>As you will have noticed from examining the output, your tasks have
-      been run on the machine hosting the suite. This may be undesireable,
-      particularly when a suite host is used by multiple users. Additionally,
-      we might want to run various tasks on particular machines or run more
-      computationally intensive tasks on higher power servers.</p>
+      <p>As you will have noticed by watching the suite run, some of the tasks
+      in the <samp>MINERS</samp> namespace succeed and some fail.</p>
 
-      <p>We can address this by adding <samp>[[[remote]]]</samp> sections to
-      the tasks in the <samp>suite.rc</samp>.</p>
+      <p>We would like to add a task to sell any diamonds we find, but wait for
+      all the miners to report back first so we only make the one trip.</p>
+
+      <p>We can address this by using <em>namespace triggers</em>.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Adding remote hosts (2)</h3>
+      <h3 class="alwayshidden">Namespace triggering: success (2)</h3>
 
-      <p>Open your <samp>suite.rc</samp> file and add the following to the
-      <samp>[[root]]</samp> task:</p>
+      <p>Open your <samp>suite.rc</samp> file and change the
+      <samp>[[dependencies]]</samp> to look like this:</p>
       <pre class="prettyprint lang-cylc">
-        [[[remote]]]
-            host = "my-desktop"
+    [[dependencies]]
+        graph = """visit_mine =&gt; MINERS
+                   MINERS:finish-all &amp; MINERS:succeed-any =&gt; sell_diamonds"""
 </pre>
 
-      <p>where <em>"my-desktop"</em> is the name of your desktop machine in
-      quotes. This will result in all tasks running on your desktop
-      machine. If you don't know the name of your desktop, type 
-      <samp>hostname</samp> into your terminal.</p>
+      <p>Then, add the following task to the <samp>[runtime]</samp>
+      section:</p>
+      <pre class="prettyprint lang-cylc">
+    [[sell_diamonds]]
+        command scripting = "sleep 5"
+</pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Adding remote hosts (3)</h3>
+      <h3 class="alwayshidden">Namespace triggering: success (3)</h3>
 
-      <p>Save your changes and run your suite. Once it has completed, check the
-      output from the tasks. Your should see your desktop being used as the
-      task host</p>
+      <p>These changes add a <samp>sell_diamonds</samp> task to the suite which
+      is run once <em>all</em> the <samp>MINERS</samp> tasks have finished and
+      if <em>any</em> of them have succeeded.</p>
+
+      <p>Save your changes and run your suite. You should see the new
+      <samp>sell_diamonds</samp> task being run once all the miners have
+      finished and at least one of them has succeeded. As before, stop your
+      suite using the stop button in the cylc gui</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Adding remote hosts (4)</h3>
+      <h2 id="rose-host-select">Namespace triggering: failure</h2>
 
-      <p>As our suites may be run by other people, or we may run them ourselves
-      on different desktops we can have rose automatically insert the name of
-      the desktop being used to launch the suite (i.e. the one on which
-      <samp>rose suite-run</samp> is run.</p>
+      <p>cylc also allows us to trigger off failure of tasks in a particular
+      namespace.</p>
 
-      <p>To do this, change the <samp>[[[remote]]]</samp> section of
-      <samp>[[root]]</samp> in the <samp>suite.rc</samp> file to look like
+      <p>We would like to add another task to close down unproductive
+      mineshafts once all the miners have reported back and had time to discuss
+      their findings.</p>
+
+      <p>To do this we will make use of namespace triggers in a similar manner
+      to before.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Namespace triggering: failure (2)</h3>
+
+      <p>Open your <samp>suite.rc</samp> file and change the
+      <samp>[[dependencies]]</samp> to look like this:</p>
+      <pre class="prettyprint lang-cylc">
+    [[dependencies]]
+        graph = """visit_mine =&gt; MINERS
+                   MINERS:finish-all &amp; MINERS:succeed-any =&gt; sell_diamonds
+                   MINERS:finish-all &amp; MINERS:fail-any =&gt; close_shafts
+                   close_shafts =&gt; !MINERS
+                   """
+</pre>
+
+      <p>and alter the <samp>[[sell_diamonds]]</samp> section to look like
       this:</p>
       <pre class="prettyprint lang-cylc">
-        [[[remote]]]
-            host = {{ ROSE_ORIG_HOST }}
-</pre>
-
-      <p>Save your changes, run your suite and examine the output to check this
-      is working as expected.</p>
-    </div>
-
-    <div class="slide">
-      <h2 id="rose-host-select">Automating host selection</h2>
-
-      <p>Rose also offers an in-built function for automatic host selection in
-      the form of the <samp>rose host-select</samp> command. This will return a
-      hostname from a set of pre-defined hosts in the <samp>rose.conf</samp>
-      file.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Automating host selection (2)</h3>
-
-      <p>To list the hostnames available through <samp>rose host-select</samp>
-      type <samp>rose config rose host-select</samp> into the command line.</p>
-
-      <p>Depending on your rose configuration you should see something along
-      the lines of:</p>
-      <pre class="prettyprint lang-cylc">
-default=linux-servers
-group{linux-servers}=server01 server02 server03
-group{hpc}=node01 node02 node03
-</pre>
-
-      <p>The <samp>default=</samp> entry identifies which group to return a
-      hostname from if <samp>rose host-select</samp> is invoked without any
-      arguments. Each <samp>group{groupname}</samp> entry lists the hosts from
-      which one is returned when <samp>rose host-select groupname</samp> is
-      run.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Automating host selection (3)</h3>
-
-      <p>In your terminal, experiment with <samp>rose host-select</samp> and 
-      the names of the groups listed earlier to see what hostnames are 
-      returned e.g. if you discovered a group called "linux-servers" see what
-      is returned when you run <samp>rose host-select linux-servers</samp>.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Automating host selection (4)</h3>
-
-      <p>We will now implement the use of <samp>rose host-select</samp> in our
-      suite by adding <samp>[[[remote]]]</samp> sections to the medium and long
-      tasks in our <samp>suite.rc</samp> file as follows, replacing
-      <em>groupname</em> with an appropriate group you discovered
-      previously:</p>
-      <pre class="prettyprint lang-cylc">
-    [[medium]]
-        [[[remote]]]
-            host = "`rose host-select`"
-        [[[environment]]]
-            NUM="500"
-    [[long]]
-        [[[remote]]]
-            host = "`rose host-select groupname`"
-        [[[environment]]]
-            NUM="5000"
+    [[close_shafts, sell_diamonds]]
+        command scripting = "sleep 5"
 </pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Automating host selection (5)</h3>
+      <h3 class="alwayshidden">Namespace triggering: failure (3)</h3>
 
-      <p>Save your changes, run the suite and view the output. You should see
-      the following in the task outputs:</p>
+      <p>These changes add a <samp>close_shafts</samp> task which is run once
+      all the <samp>MINERS</samp> tasks have finished and any of them have
+      failed. On completion it applies a suicide trigger to the
+      <samp>MINERS</samp> namespace in order to allow the suite to
+      shutdown.</p>
+
+      <p>Save your changes and run your suite. You should see the new
+      <samp>close_shafts</samp> run should any of the <samp>MINERS</samp> tasks
+      be in the failed state once they have all finished.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="reference">Different triggers</h2>
+
+      <p>Other types of triggers beyond those covered in the example are also 
+      available.</p>
+
+      <p>The following types of "all" type triggers are available:</p>
 
       <ul>
-        <li>The short task's host should be the machine you ran <samp>rose
-        suite-run</samp> on.</li>
+        <li><samp>FAM:start-all</samp> - all the tasks in FAM have started</li>
 
-        <li>The medium task's host should be one of the hosts from the default
-        group.</li>
+        <li><samp>FAM:succeed-all</samp> - all the tasks in FAM have
+        succeeded</li>
 
-        <li>The long task's host should be one of the hosts from the specified
-        group.</li>
+        <li><samp>FAM:fail-all</samp> - all the tasks in FAM have failed</li>
+
+        <li><samp>FAM:finish-all</samp> - all the tasks in FAM have
+        finished</li>
       </ul>
+    </div>
 
-      <div class="slide">
-        <h2 id="reference">Different triggers</h2>
-        
-        <p>The following types of "all" type triggers are available:</p>
-        
-        <ul>
-            <li><samp>FAM:start-all</samp> - all the tasks in FAM have started</li> 
-            <li><samp>FAM:succeed-all</samp> - all the tasks in FAM have succeeded</li> 
-            <li><samp>FAM:fail-all</samp> - all the tasks in FAM have failed</li>
-            <li><samp>FAM:finish-all</samp> - all the tasks in FAM have finished</li>
-        </ul>
-        
-      </div>
-      
-      <div class="slide">
-        <h3 class="alwayshidden">Different triggers (2)</h3>
-        
-        <p>The following types of "any" type triggers are available:</p>
-        
-        <ul>
-            <li><samp>FAM:start-any</samp> - at least one task in FAM has started</li>
-            <li><samp>FAM:succeed-any</samp> - at least one task in FAM has succeeded</li>
-            <li><samp>FAM:fail-any</samp> - at least one task in FAM has failed</li>
-            <li><samp>FAM:finish-any</samp> - at least one task in FAM has finished</li>
-         </ul> 
-      
-      </div>
+    <div class="slide">
+      <h3 class="alwayshidden">Different triggers (2)</h3>
 
+      <p>The following types of "any" type triggers are available:</p>
 
-      <div class="slide">
-        <h2 id="summary">Summary</h2>
+      <ul>
+        <li><samp>FAM:start-any</samp> - at least one task in FAM has
+        started</li>
 
-        <ul>
-          <li>Use the <samp>[[[remote]]]</samp> section to specify a host so
-          your task doesn't run on the suite host.</li>
+        <li><samp>FAM:succeed-any</samp> - at least one task in FAM has
+        succeeded</li>
 
-          <li>Use <samp>host = {{ ROSE_ORIG_HOST }}</samp> in the
-          <samp>[[[remote]]]</samp> section of a task to have it run on the
-          machine on which <samp>rose suite-run</samp> was invoked.</li>
+        <li><samp>FAM:fail-any</samp> - at least one task in FAM has
+        failed</li>
 
-          <li>Make use of <samp>rose host-select</samp> to automatically select
-          a host from an appropriate group rather than hard-coding host names
-          where possible.</li>
-        </ul>
-      </div>
+        <li><samp>FAM:finish-any</samp> - at least one task in FAM has
+        finished</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="summary">Summary</h2>
+
+      <ul>
+        <li>Namespace triggers allow you to create dependencies on particular
+        namespaces.</li>
+
+        <li>Like task triggers, namespace triggers can be based on success, 
+        failure, starting and finishing of tasks in a namespace.</li>
+
+        <li>Namespace triggers can trigger off either <em>all</em> or 
+        <em>any</em> of the tasks in a namespace.</li>
+      </ul>
     </div>
   </div>
 </body>
