@@ -104,7 +104,8 @@ def import_object(import_string, from_files, error_handler,
     """Import a Python callable.
 
     import_string is the '.' delimited path to the callable,
-    as in normal Python - e.g. rose.config_editor.page.PageWidget
+    as in normal Python - e.g.
+    rose.config_editor.pagewidget.standard.PageWidget
     from_files is a list of available Python file paths to search in
     error_handler is a function that accepts an Exception instance
     and does something appropriate with it.
