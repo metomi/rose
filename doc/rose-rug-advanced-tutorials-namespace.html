@@ -109,11 +109,26 @@
     [[dependencies]]
         graph = " "
 [runtime]
+    [[send_invites]]
+        command scripting = "sleep 5; echo 'posted the invites'"
+    [[CLOSE_FAMILY]]
+        command scripting = "sleep 5; echo 'see you there'"
+    [[FRIENDS]]
+        command scripting = """sleep 5; 
+                                if (($RANDOM % 2)); then 
+                                    echo 'see you there'; true;
+                                else 
+                                    echo 'sorry, can't make it'; false;
+                                fi
+                            """
+    [[mother_of_bride]]
+        inherit = CLOSE_FAMILY
+    
 </pre>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Description</h3>
+      <h3 class="alwayshidden">Example (2)</h3>
 
       <p>In the suite directory create an <samp>app</samp> directory</p>
 
