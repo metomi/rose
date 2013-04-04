@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Rose Advanced Tutorial: namespace triggers</title>
+  <title>Rose Advanced Tutorial: family triggers</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="defaultView" content="outline" />
@@ -66,7 +66,7 @@
 
   <div id="body-main" class="presentation">
     <div class="slide">
-      <h1>Rose Advanced Tutorial: namespace triggers</h1>
+      <h1>Rose Advanced Tutorial: family triggers</h1>
     </div>
 
     <div class="handout" id="content"></div>
@@ -74,9 +74,9 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This tutorial walks you through using namespace triggers.</p>
+      <p>This tutorial walks you through using family triggers.</p>
 
-      <p>Namespace triggers allow you to build dependencies based on sets of
+      <p>Family triggers allow you to build dependencies based on sets of
       tasks sharing the same namespace, sometimes referred to as
       "families".</p>
     </div>
@@ -84,14 +84,14 @@
     <div class="slide">
       <h2 id="purpose">Purpose</h2>
 
-      <p>Namespace triggers are used to specify a condition to be met by a set
-      of tasks in a particular namespace that will trigger the next entry in
+      <p>Family triggers are used to specify a condition to be met by a set
+      of tasks in a particular family that will trigger the next entry in
       the dependencies graph.</p>
 
-      <p>Like regular task based triggers, namespace triggers can depend on the
-      success or failure of tasks. However, because a namespace can contain
+      <p>Like regular task based triggers, family triggers can depend on the
+      success or failure of tasks. However, because a family can contain
       multiple tasks, you need to specify whether you are concerned with
-      <em>all</em> or <em>any</em> of the tasks in that namespace reaching the
+      <em>all</em> or <em>any</em> of the tasks in that family reaching the
       desired state.</p>
     </div>
 
@@ -141,7 +141,7 @@
         <li>contains a <samp>visit_mine</samp> task that sleeps for 5 seconds
         then outputs a message.</li>
 
-        <li>contains a <samp>MINERS</samp> namespace (family) with a command in
+        <li>contains a <samp>MINERS</samp> family with a command in
         it that randomly succeeds or fails.</li>
 
         <li>contains 7 tasks that inherit from <samp>MINERS</samp>.</li>
@@ -160,19 +160,19 @@
     </div>
 
     <div class="slide">
-      <h2 id="example-trigger">Namespace triggering: success</h2>
+      <h2 id="example-trigger">Family triggering: success</h2>
 
       <p>As you will have noticed by watching the suite run, some of the tasks
-      in the <samp>MINERS</samp> namespace succeed and some fail.</p>
+      in the <samp>MINERS</samp> family succeed and some fail.</p>
 
       <p>We would like to add a task to sell any diamonds we find, but wait for
       all the miners to report back first so we only make the one trip.</p>
 
-      <p>We can address this by using <em>namespace triggers</em>.</p>
+      <p>We can address this by using <em>family triggers</em>.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Namespace triggering: success (2)</h3>
+      <h3 class="alwayshidden">Family triggering: success (2)</h3>
 
       <p>Open your <samp>suite.rc</samp> file and change the
       <samp>[[dependencies]]</samp> to look like this:</p>
@@ -191,7 +191,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Namespace triggering: success (3)</h3>
+      <h3 class="alwayshidden">Family triggering: success (3)</h3>
 
       <p>These changes add a <samp>sell_diamonds</samp> task to the suite which
       is run once <em>all</em> the <samp>MINERS</samp> tasks have finished and
@@ -204,21 +204,21 @@
     </div>
 
     <div class="slide">
-      <h2 id="rose-host-select">Namespace triggering: failure</h2>
+      <h2 id="rose-host-select">Family triggering: failure</h2>
 
       <p>cylc also allows us to trigger off failure of tasks in a particular
-      namespace.</p>
+      family.</p>
 
       <p>We would like to add another task to close down unproductive
       mineshafts once all the miners have reported back and had time to discuss
       their findings.</p>
 
-      <p>To do this we will make use of namespace triggers in a similar manner
+      <p>To do this we will make use of family triggers in a similar manner
       to before.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Namespace triggering: failure (2)</h3>
+      <h3 class="alwayshidden">Family triggering: failure (2)</h3>
 
       <p>Open your <samp>suite.rc</samp> file and change the
       <samp>[[dependencies]]</samp> to look like this:</p>
@@ -240,12 +240,12 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Namespace triggering: failure (3)</h3>
+      <h3 class="alwayshidden">Family triggering: failure (3)</h3>
 
       <p>These changes add a <samp>close_shafts</samp> task which is run once
       all the <samp>MINERS</samp> tasks have finished and any of them have
       failed. On completion it applies a suicide trigger to the
-      <samp>MINERS</samp> namespace in order to allow the suite to
+      <samp>MINERS</samp> family in order to allow the suite to
       shutdown.</p>
 
       <p>Save your changes and run your suite. You should see the new
@@ -298,14 +298,14 @@
       <h2 id="summary">Summary</h2>
 
       <ul>
-        <li>Namespace triggers allow you to create dependencies on particular
-        namespaces.</li>
+        <li>Family triggers allow you to create dependencies on particular
+        families.</li>
 
-        <li>Like task triggers, namespace triggers can be based on success, 
-        failure, starting and finishing of tasks in a namespace.</li>
+        <li>Like task triggers, family triggers can be based on success, 
+        failure, starting and finishing of tasks in a family.</li>
 
-        <li>Namespace triggers can trigger off either <em>all</em> or 
-        <em>any</em> of the tasks in a namespace.</li>
+        <li>Family triggers can trigger off either <em>all</em> or 
+        <em>any</em> of the tasks in a family.</li>
       </ul>
     </div>
   </div>
