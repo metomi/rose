@@ -56,15 +56,17 @@ class SuiteControl(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def gcontrol(self, suite_name, host=None, callback=None, *args):
+    def gcontrol(self, suite_name, host=None, confirm=None, stderr=None,
+                 stdout=None, *args):
         """Launch suite engine's control GUI.
 
         suite_name: name of the suite.
         host: a host where the suite is running.
         args: extra arguments for the suite engine's gcontrol command.
 
-        N.B. "callback" is not used. It is included so that this method can
-        have the same interface as the "shutdown" method.
+        N.B. "confirm", "stderr" and "stdout" are not used. They are included
+        so that this method can have the same interface as the "shutdown"
+        method.
 
         """
         engine_version = self._get_engine_version(suite_name)
@@ -72,23 +74,26 @@ class SuiteControl(object):
             self.suite_engine_proc.gcontrol(
                     suite_name, host, engine_version, args)
 
-    def shutdown(self, suite_name, host=None, callback=None, *args):
+    def shutdown(self, suite_name, host=None, confirm=None, stderr=None,
+                 stdout=None, *args):
         """Shutdown the suite.
 
         suite_name: the name of the suite.
         host: a host where the suite is running.
-        callback: If specified, must be a callable with the interface
-                  b = callback("shutdown", suite_name, host). This method will
+        confirm: If specified, must be a callable with the interface
+                  b = confirm("shutdown", suite_name, host). This method will
                   only issue the shutdown command to suite_name at host if b is
                   True.
+        stderr: A file handle for stderr, if relevant for suite engine.
+        stdout: A file handle for stdout, if relevant for suite engine.
         args: extra arguments for the suite engine's gcontrol command.
 
         """
         engine_version = self._get_engine_version(suite_name)
         for host in self._get_hosts(suite_name, host):
-            if callback is None or callback("shutdown", suite_name, host):
+            if confirm is None or confirm("shutdown", suite_name, host):
                 self.suite_engine_proc.shutdown(
-                        suite_name, host, engine_version, args)
+                        suite_name, host, engine_version, args, stderr, stdout)
 
     def _get_hosts(self, suite_name, host):
         if host:
@@ -139,18 +144,19 @@ def main():
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_control = SuiteControl(event_handler=event_handler)
     method = getattr(suite_control, method_name)
-    callback = None
+    confirm = None
     if not opts.non_interactive:
-        callback = prompt
+        confirm = prompt
     if opts.name:
         suite_name = opts.name
     else:
         suite_name = os.path.basename(os.getcwd())
     if opts.debug_mode:
-        method(suite_name, opts.host, callback, *args)
+        method(suite_name, opts.host, confirm, sys.stderr, sys.stdout, *args)
     else:
         try:
-            method(suite_name, opts.host, callback, *args)
+            method(suite_name, opts.host, confirm, sys.stderr, sys.stdout,
+                   *args)
         except Exception as e:
             event_handler(e)
             sys.exit(1)

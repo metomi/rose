@@ -29,14 +29,16 @@ from rose.opt_parse import RoseOptionParser
 import rosie.browser
 import rosie.ws_client
 
-STATUS_ICON = {rosie.ws_client.STATUS_DO: gtk.STOCK_MEDIA_FORWARD,
+STATUS_ICON = {rosie.ws_client.STATUS_CR: gtk.STOCK_DIALOG_ERROR,
+               rosie.ws_client.STATUS_DO: gtk.STOCK_MEDIA_FORWARD,
                rosie.ws_client.STATUS_NO: None,
                rosie.ws_client.STATUS_OK: gtk.STOCK_HOME,
                rosie.ws_client.STATUS_MO: gtk.STOCK_EDIT,
                rosie.ws_client.STATUS_SW: gtk.STOCK_CONVERT,
                rosie.ws_client.STATUS_UP: gtk.STOCK_MEDIA_REWIND}
 
-STATUS_TIP = {rosie.ws_client.STATUS_DO: rosie.browser.LOCAL_STATUS_DOWNDATE,
+STATUS_TIP = {rosie.ws_client.STATUS_CR: rosie.browser.LOCAL_STATUS_CORRUPT,
+              rosie.ws_client.STATUS_DO: rosie.browser.LOCAL_STATUS_DOWNDATE,
               rosie.ws_client.STATUS_NO: rosie.browser.LOCAL_STATUS_NO,
               rosie.ws_client.STATUS_OK: rosie.browser.LOCAL_STATUS_OK,
               rosie.ws_client.STATUS_MO: rosie.browser.LOCAL_STATUS_MODIFIED,

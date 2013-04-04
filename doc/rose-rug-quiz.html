@@ -269,12 +269,12 @@ rocket=30
                 <td class="noborder">
                   <pre class="prettyprint lang-rose_conf">
 [namelist:spaghetti]
-__files__ = output.nl
+__files__=output.nl
 l_meat_ok=.true.
 number_of_meatballs=3
 
 [namelist:salad]
-__files__ = output.nl
+__files__=output.nl
 cherry_tomatoes=4
 rocket=30
 </pre>
@@ -397,7 +397,7 @@ rocket=30
           <p>I have the following metadata for one of my inputs:</p>
           <pre class="prettyprint lang-rose_conf">
 [namelist:foo=bar]
-fail-if = this &gt; 0 and (all(namelist:foo=baz == 0))
+fail-if=this &gt; 0 and (all(namelist:foo=baz == 0))
 </pre>
 
           <p>Which application configuration settings would cause the
@@ -411,8 +411,8 @@ fail-if = this &gt; 0 and (all(namelist:foo=baz == 0))
                 <td class="noborder">
                   <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
-bar = 1
-baz = 0, 0
+bar=1
+baz=0, 0
 </pre>
                 </td>
               </tr>
@@ -423,7 +423,7 @@ baz = 0, 0
                 <td class="noborder">
                   <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
-bar = 1
+bar=1
 </pre>
                 </td>
               </tr>
@@ -434,8 +434,8 @@ bar = 1
                 <td class="noborder">
                   <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
-bar = 0
-baz = 1, 0
+bar=0
+baz=1, 0
 </pre>
                 </td>
               </tr>
@@ -446,14 +446,14 @@ baz = 1, 0
                 <td class="noborder">
                   <pre class="prettyprint lang-rose_conf">
 [namelist:foo]
-bar = 0
-baz = 1, 1
+bar=0
+baz=1, 1
 </pre>
                 </td>
               </tr>
             </table>
 
-            <p class="answers A"><em><samp>bar = 1</samp>, <samp>baz = 0,
+            <p class="answers A"><em><samp>bar=1</samp>, <samp>baz=0,
             0</samp></em> - it throws an error if the expression evaluates true
             - i.e. <var>bar</var> &gt; 0 AND all elements in <var>baz</var> are
             0. Missing options, as in the second answer, cause the check to be

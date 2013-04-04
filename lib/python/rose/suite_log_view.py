@@ -28,7 +28,7 @@ from rose.reporter import Event, Reporter
 from rose.suite_engine_proc import SuiteEngineProcessor
 import shutil
 import sys
-from time import time
+from time import time, sleep
 import webbrowser
 
 class LockEvent(Event):
@@ -58,6 +58,7 @@ class SuiteLogViewGenerator(object):
     """Generate the log view for a suite."""
 
     NS = "rose-suite-log-view"
+    MAX_ATTEMPTS = 5
 
     def __init__(self, event_handler=None, fs_util=None, popen=None,
                  suite_engine_proc=None):
@@ -92,10 +93,20 @@ class SuiteLogViewGenerator(object):
         cwd = os.getcwd()
         if suite_log_dir is not None:
             self.fs_util.chdir(suite_log_dir)
+        
         lock = os.path.join(os.getcwd(), "." + self.NS + ".lock")
-        try:
-            os.mkdir(lock)
-        except OSError:
+        
+        attempts = 0
+        
+        while attempts < self.MAX_ATTEMPTS:
+            try:
+                os.mkdir(lock)
+                break
+            except OSError:
+                attempts += 1
+                if attempts < self.MAX_ATTEMPTS:
+                    sleep(1)
+        if attempts == self.MAX_ATTEMPTS:
             self.handle_event(LockEvent(lock))
             return
         try:
@@ -216,8 +227,10 @@ def suite_log_view(opts, args, report=None):
     elif args:
         gen.update_job_log(suite_name, tasks=args)
     gen(suite_name)
-    return gen.view_suite_log_url(suite_name)
-
+    if opts.web_browser_mode:
+        return gen.view_suite_log_url(suite_name)
+    else:
+        return
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Optional Configurations</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Optional Configurations</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through using optional
+      configurations for application configurations and metadata
+      configurations.</p>
+
+      <p>Optional configurations allow you to specify additional configuration
+      in other files, which you can include automatically or at runtime via
+      commands like <code>rose app-run</code>/<code>rose task-run</code>
+      (application configurations) or <code>rose suite-run</code> (for suite
+      configurations).</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="example">Example</h2>
+
+      <p>Our example suite will configure our selection of
+      icecream.</p><img class="r-floater" src=
+      "http://upload.wikimedia.org/wikipedia/commons/3/37/Helados.jpg" width=
+      "30%" alt="Icecreams (wikipedia)" />
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory somewhere - e.g. in your homespace) containing a blank
+      <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
+      like this:</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">suite.rc</h3>
+      <pre class="prettyprint lang-cylc">
+[scheduling]
+    [[dependencies]]
+        graph = "order_icecream =&gt; eat_icecream"
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            succeeded handler = "rose suite-hook"
+    [[order_icecream]]
+        command scripting = "rose task-run"
+    [[eat_icecream]]
+        command scripting = "echo 'Yummy'"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">App</h3>
+
+      <p>We'll also need an app for <samp>order_icecream</samp> - create an
+      <samp>app/order_icecream/</samp> subdirectory within your suite.</p>
+
+      <p>Add a <samp>rose-app.conf</samp> file within this directory - use this
+      content:</p>
+      <pre class="prettyprint lang-rose_conf">
+[command]
+default=echo "I'd like to order a $FLAVOUR icecream $CONE_TYPE with $TOPPING"
+
+[env]
+CONE_TYPE=cone
+FLAVOUR=vanilla
+TOPPING=no topping
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Runtime Overrides</h3>
+
+      <p>Your suite is now runnable with <code>rose suite-run</code>. Try
+      running it and looking at the output - it should be pretty
+      predictable!</p>
+
+      <p>We can override settings within apps by passing particular options or
+      to the <code>rose task-run</code> <samp>command scripting</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Command Line</h3>
+
+      <p>The best way to find out how to use <code>rose task-run</code> is to
+      look at the help by running <code>rose help task-run</code> - notice that
+      the help indicates that options for <code>rose app-run</code> are
+      supported. This is because <code>rose task-run</code> is effectively a
+      wrapper for <code>rose app-run</code>.</p>
+
+      <p>Have a look at the help for <code>rose app-run</code>, by running
+      <code>rose help app-run</code>. You can see that we can use
+      <samp>--define</samp> to override things in the app at runtime.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Suite Command Line</h3>
+
+      <p>Change the <samp>suite.rc</samp> <samp>command scripting</samp> for
+      <samp>order_icecream</samp> so that it reads:</p>
+      <pre class="prettyprint lang-cylc">
+        command scripting = "rose task-run --define='[env]FLAVOUR=chocolate' --define='[env]TOPPING=fudge'"
+</pre>
+
+      <p>This will override the <samp>FLAVOUR</samp> and <samp>TOPPING</samp>
+      options in the <samp>env</samp> section of our app. If you run the suite
+      again, you should see that the output of the task has changed.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Optional Configuration</h3>
+
+      <p>If we had any more options to override, it might get a little unwieldy
+      - it would be nicer to create an optional configuration containing these
+      settings that we could apply on-demand, especially if they were used
+      regularly.</p>
+
+      <p>Create a subdirectory <samp>opt/</samp> within the app itself
+      (<samp>app/order_icecream/opt/</samp>). This is where Rose will look for
+      optional configurations. Individual optional configuration files (there
+      can be more than one in the same directory) are named
+      <samp>rose-app-NAME.conf</samp> where <samp>NAME</samp> is some kind of
+      useful id.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="opt-conf-key">New Optional Configurations</h3>
+
+      <p>Create an optional configuration file called
+      <samp>rose-app-chocofudge.conf</samp> in your new <samp>opt/</samp>
+      subdirectory, with the following content:</p>
+      <pre class="prettyprint lang-rose_conf">
+[env]
+FLAVOUR=chocolate
+TOPPING=fudge
+</pre>
+
+      <p>We can now reference this through an option to <code>rose
+      task-run</code> - alter the <samp>command scripting</samp> of the
+      <samp>order_icecream</samp> task (in the <samp>suite.rc</samp> file) to
+      read:</p>
+      <pre class="prettyprint lang-cylc">
+        command scripting = "rose task-run --opt-conf-key=chocofudge"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Explanation</h3>
+
+      <p>This will now override the <samp>order_icecream</samp> app's
+      <samp>rose-app.conf</samp> file with the contents of the
+      <samp>rose-app-chocofudge.conf</samp> file at runtime.</p>
+
+      <p>We can add as many <samp>--opt-conf-key</samp> options to <samp>rose
+      task-run</samp> as we like - not just the one.</p>
+
+      <p>Try running the suite - it should apply the optional configuration
+      correctly.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="env">$ROSE_APP_OPT_CONF_KEYS</h3>
+
+      <p>We could also specify the optional configurations to use by passing in
+      an environment variable <code>$ROSE_APP_OPT_CONF_KEYS</code>, a space
+      delimited list of optional configuration names to use.</p>
+
+      <p>Try using it by replacing the <samp>order_icecream</samp> task
+      configuration with:</p>
+      <pre class="prettyprint lang-cylc">
+    [[order_icecream]]
+        command scripting = "rose task-run"
+        [[[environment]]]
+            ROSE_APP_OPT_CONF_KEYS = chocofudge
+</pre>
+
+      <p>If you re-run the suite, this should do the same job as the
+      <samp>--opt-conf-key</samp> method we tried before.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="include">Default Optional Configurations</h3>
+
+      <p>Optional configurations can be switched on by default by specifying
+      their names via a top-level <var>opts</var> setting in the configuration
+      file.</p>
+
+      <p>Put the following line at the top of the <samp>order_icecream</samp>
+      <samp>rose-app.conf</samp> file:</p>
+      <pre class="prettyprint lang-rose_conf">
+opts=chocofudge
+</pre>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Default Optional Configurations (2)</h3>
+     
+      <p>We now don't need to specify it at all for <code>rose task-run</code>
+      - get rid of the environment variable in the <samp>suite.rc</samp> file,
+      so that the <samp>order_icecream</samp> task runtime configuration looks
+      like this:</p>
+      <pre class="prettyprint lang-cylc">
+    [[order_icecream]]
+        command scripting = "rose task-run"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 id="opts">Default Optional Configurations - Test</h3>
+
+      <p>If you run the suite, it should have the same standard output for
+      <samp>order_icecream</samp> as before.</p>
+
+      <p>Typically, because the <var>opts</var> setting is 'always-on', it's
+      best to use the optional configurations to add settings rather than
+      override them.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="other">Other Optional Configurations</h2>
+
+      <p>All Rose configurations can have optional configurations, not just
+      application configurations. Suites can have optional configurations that
+      override <samp>rose-suite.conf</samp> settings, controlled through
+      <code>rose suite-run</code>. This takes the same
+      <samp>--opt-conf-key</samp> option as <code>rose app-run</code> and/or
+      the environment variable <samp>$ROSE_SUITE_OPT_CONF_KEYS</samp>.</p>
+
+      <p>Metadata configurations can also have optional configurations,
+      typically included via the <samp>opts</samp> top-level setting.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="further">Further Reading</h2>
+
+      <p>For more information, see:</p>
+
+      <ul>
+        <li><a href=
+        "http://metomi.github.com/rose/doc/rose-configuration.html#opts">Rose
+        Configuration Reference</a></li>
+
+        <li><a href="rose-command.html#rose-app-run">rose app-run</a></li>
+
+        <li><a href="rose-command.html#rose-suite-run">rose suite-run</a></li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
