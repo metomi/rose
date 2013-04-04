@@ -168,7 +168,11 @@
       <p>We would like to add a task to sell any diamonds we find, but wait for
       all the miners to report back first so we only make the one trip.</p>
 
-      <p>We can address this by using <em>family triggers</em>.</p>
+      <p>We can address this by using <em>family triggers</em>. In particular,
+      we are going to use the <samp>finish-all</samp> trigger to check for all
+      members of the <samp>MINERS</samp> family finishing, and the 
+      <samp>succeed-any</samp> trigger to check for any of the tasks in the 
+      <samp>MINERS</samp> family succeeding.</p>
     </div>
 
     <div class="slide">
@@ -244,8 +248,9 @@
 
       <p>These changes add a <samp>close_shafts</samp> task which is run once
       all the <samp>MINERS</samp> tasks have finished and any of them have
-      failed. On completion it applies a suicide trigger to the
-      <samp>MINERS</samp> family in order to allow the suite to
+      failed. On completion it applies a 
+      <a href="rose-rug-advanced-tutorials-suicide.html">suicide trigger</a> to 
+      the <samp>MINERS</samp> family in order to allow the suite to 
       shutdown.</p>
 
       <p>Save your changes and run your suite. You should see the new
