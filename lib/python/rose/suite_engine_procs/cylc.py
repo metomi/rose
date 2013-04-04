@@ -112,9 +112,9 @@ class CylcProcessor(SuiteEngineProcessor):
         c = conn.cursor()
         EVENTS = {"submission succeeded": "submit",
                   "submission failed": "submit-fail",
-                  "started": "init",
-                  "succeeded": "pass",
-                  "failed": "fail",
+                  "execution started": "init",
+                  "execution succeeded": "pass",
+                  "execution failed": "fail",
                   "signaled": "fail"}
         for row in c.execute(
                 "SELECT time,name,cycle,submit_num,event,message"
