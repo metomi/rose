@@ -20,6 +20,7 @@
 
 import ast
 import functools
+import gobject
 import os
 import re
 import shlex
@@ -94,7 +95,22 @@ class MainWindow(gtk.Window):
         self.last_search_historical = False
         self.repeat_last_request = lambda: None
         splash_updater(rosie.browser.SPLASH_LOADING.format(
-                                     rosie.browser.SPLASH_SETUP_WINDOW),
+                       def search_new_suite(self, new_id):
+        search = "query?q=and+idx+eq+" + str(new_id)
+        
+        if self.attempts < 5:
+            try:
+                results, url = self.search_manager.ws_search(search_text, **items)
+            except:
+                results = []
+            if len(results) == 0:
+                print results
+                self.attempts += 1
+            else:
+                print "I think I should refresh..."
+                return False       
+        else:
+            return False                  rosie.browser.SPLASH_SETUP_WINDOW),
                        rosie.browser.PROGRAM_NAME)
         self.setup_window()
         self.local_updater = rosie.browser.status.LocalStatusUpdater(
@@ -244,6 +260,16 @@ class MainWindow(gtk.Window):
                                      type(e).__name__ + ": " + str(e))
             return None
         self.handle_checkout(id_=new_id)
+        
+        #poll for new entry in db
+        search = "query?q=and+idx+eq+" + str(new_id)
+        print search #debug
+        items = {}
+        results = []
+        self.attempts = 0
+
+        gobject.timeout_add(5000, self.search_new_suite, new_id)
+
         self.repeat_last_request()
 
     def display_local_suites(self, a_widget=None):
@@ -1106,6 +1132,22 @@ class MainWindow(gtk.Window):
         if args is None:
             return False
         self._run_suite(args)
+
+    def search_new_suite(self, new_id):
+        """Search for the existence of a newly created suite in the db"""
+        search = "query?q=and+idx+eq+" + str(new_id)
+        if self.attempts < 10:   #this can be repeated up to 10 times
+            try:
+                results, url = self.search_manager.ws_search(search_text,
+                                                             **items)
+            except:
+                results = []
+            if len(results) == 0:
+                self.attempts += 1
+            else:
+                return False       
+        else:
+            return False
 
     def set_config(self, editor, config):
         """Assign the updated config."""
