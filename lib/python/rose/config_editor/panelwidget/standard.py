@@ -37,8 +37,8 @@ class BaseSummaryDataPanel(gtk.VBox):
     def add_cell_renderer_for_value(self, column, column_title)
     def get_model_data(self)
     def get_section_column_index(self)
-    def get_tree_cell_status(self, column, cell, model, row_iter):
-    def get_tree_tip(self, treeview, row_iter, col_index, tip):
+    def set_tree_cell_status(self, column, cell, model, row_iter):
+    def set_tree_tip(self, treeview, row_iter, col_index, tip):
 
     Subclasses may provide the following methods:
     def _get_custom_menu_items(self, path, column, event):
@@ -54,7 +54,6 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.sections = sections
         self.variables = variables
         self._last_column_names = []
-        self._sort_columns_stored = []
         self.column_names = []
         self.sect_ops = sect_ops
         self.var_ops = var_ops
@@ -66,8 +65,11 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.control_widget_hbox = self._get_control_widget_box()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
         self._view = rose.gtk.util.TooltipTreeView(
-                                   get_tooltip_func=self.get_tree_tip)
+                                   get_tooltip_func=self.set_tree_tip)
         self._view.set_rules_hint(True)
+        self.sort_util = rose.gtk.util.TreeModelSortUtil(
+                              lambda: self._view.get_model(),
+                              multi_sort_num=2)
         self._view.show()
         self._view.connect("button-release-event",
                            self._handle_button_press_event)
@@ -107,7 +109,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         """
         raise NotImplementedError()
 
-    def get_tree_cell_status(self, column, cell, model, row_iter):
+    def set_tree_cell_status(self, column, cell, model, row_iter):
         """Add status markup to the cell - e.g. error notification.
         
         column is the gtk.TreeColumn where the cell is
@@ -118,7 +120,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         """
         raise NotImplementedError()
     
-    def get_tree_tip(self, treeview, row_iter, col_index, tip):
+    def set_tree_tip(self, treeview, row_iter, col_index, tip):
         """Add the hover-over text for a cell to 'tip'.
         
         treeview is the gtk.TreeView object
@@ -195,9 +197,9 @@ class BaseSummaryDataPanel(gtk.VBox):
         filter_model.set_visible_func(self._filter_visible)
         sort_model = gtk.TreeModelSort(filter_model)
         for i in range(len(self.column_names)):
-            sort_model.set_sort_func(i, self._sort_model_dupl, i)
-            sort_model.connect("sort-column-changed",
-                               self._handle_sort_change)
+            sort_model.set_sort_func(i, self.sort_util.sort_column, i)
+        sort_model.connect("sort-column-changed",
+                           self.sort_util.handle_sort_column_change)
         should_redraw = self.column_names != self._last_column_names
         self._last_column_names = self.column_names
         return sort_model, self.column_names, should_redraw
@@ -214,7 +216,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         start_path, start_column = self._view.get_cursor()
         model, cols, should_redraw = self.get_tree_model_and_col_names()
         if should_redraw:
-            self._sort_columns_stored = []
+            self.sort_util.clear_sort_columns()
             for column in list(self._view.get_columns()):
                 self._view.remove_column(column)
         self._view.set_model(model)
@@ -249,7 +251,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             cell_for_status = gtk.CellRendererText()
             col.pack_start(cell_for_status, expand=False)
             col.set_cell_data_func(cell_for_status,
-                                   self.get_tree_cell_status)
+                                   self.set_tree_cell_status)
             self.add_cell_renderer_for_value(col, column_name)
             if i < len(column_names) - 1:
                 col.set_resizable(True)
@@ -290,56 +292,6 @@ class BaseSummaryDataPanel(gtk.VBox):
                 return True
             child_iter = model.iter_next(child_iter)
         return False
-
-    def _handle_sort_change(self, model):
-        # Store previous sorting information for multi-column sorts.
-        id_, order = model.get_sort_column_id()
-        if id_ is None and order is None:
-            return False
-        if (self._sort_columns_stored and
-            self._sort_columns_stored[0][0] == id_):
-            self._sort_columns_stored.pop(0)
-        self._sort_columns_stored.insert(0, (id_, order))
-        if len(self._sort_columns_stored) > 2:
-            self._sort_columns_stored.pop()
-
-    def _sort_cmp_model_values(self, value1, value2):
-        # Perform a useful form of 'cmp'.
-        if value1 is None or value2 is None:
-            return cmp(value1, value2)
-        if (isinstance(value1, basestring) and
-            isinstance(value2, basestring) and
-            value1.isdigit() and value2.isdigit()):
-            return cmp(float(value1), float(value2))
-        return rose.config.sort_settings(value1, value2)
-
-    def _sort_model_dupl(self, model, iter1, iter2, col_index):
-        # Multi-column sorting.
-        val1 = model.get_value(iter1, col_index)
-        val2 = model.get_value(iter2, col_index)
-        rval = self._sort_cmp_model_values(val1, val2)
-        # If rval is 1 or -1, no need for a multi-column sort.
-        if rval == 0:
-            this_order = self._view.get_model().get_sort_column_id()[1]
-            cmp_factor = 1
-            if this_order == gtk.SORT_DESCENDING:
-                # We need to de-invert the sort order for multi sorting.
-                cmp_factor = -1
-        i = 0
-        while rval == 0 and i < len(self._sort_columns_stored):
-            next_id, next_order = self._sort_columns_stored[i]
-            if next_id == col_index:
-                i += 1
-                continue
-            next_cmp_factor = cmp_factor * 1
-            if next_order == gtk.SORT_DESCENDING:
-                # Set the correct order for multi sorting.
-                next_cmp_factor = cmp_factor * -1
-            val1 = model.get_value(iter1, next_id)
-            val2 = model.get_value(iter2, next_id)
-            rval = next_cmp_factor * self._sort_cmp_model_values(val1, val2)
-            i += 1
-        return rval
          
     def _handle_activation(self, view, path, column):
         if path is None:
@@ -501,11 +453,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         fac = (-1 if descending else 1)
         x = row1[sort_index]
         y = row2[sort_index]
-        if isinstance(x, basestring) and isinstance(y, basestring):
-            if x.isdigit() and y.isdigit():
-                return fac * cmp(int(x), int(y))
-            return fac * rose.config.sort_settings(x, y)        
-        return fac * cmp(x, y)
+        return fac * self.sort_util.cmp_(x, y)
 
     def _handle_group_change(self, combobox):
         model = combobox.get_model()
@@ -556,7 +504,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         col.set_cell_data_func(cell_for_value,
                                self._set_tree_cell_value)
 
-    def get_tree_cell_status(self, col, cell, model, row_iter):
+    def set_tree_cell_status(self, col, cell, model, row_iter):
         """Set the status text for a cell in this column."""
         col_index = self._view.get_columns().index(col)
         sect_index = self.get_section_column_index()
@@ -617,7 +565,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
             cell.set_property("visible", False)
         cell.set_property("markup", value)
 
-    def get_tree_tip(self, view, row_iter, col_index, tip):
+    def set_tree_tip(self, view, row_iter, col_index, tip):
         """Set the hover-over (Tooltip) text for the TreeView."""
         sect_index = self.get_section_column_index()
         section = view.get_model().get_value(row_iter, sect_index)

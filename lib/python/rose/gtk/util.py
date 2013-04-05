@@ -811,6 +811,96 @@ def _process(cmd_args, stdout=sys.stdout, stderr=sys.stderr):
     return p.poll()
 
 
+class TreeModelSortUtil(object):
+
+    """This class contains useful sorting methods for TreeModelSort.
+    
+    Arguments:
+    sort_model_getter_func - a function accepting no arguments that
+    returns the TreeModelSort. This is necessary if a combination
+    of TreeModelFilter and TreeModelSort is used.
+    
+    Keyword Arguments:
+    multi_sort_num - the maximum number of columns to sort by. For
+    example, setting this to 2 means that a single secondary sort
+    may be applied based on the previous sort column.
+
+    You must connect to both handle_sort_column_change and sort_column
+    for multi-column sorting. Example code:
+    
+    sort_model = gtk.TreeModelSort(filter_model)
+    sort_util = TreeModelSortUtil(
+                         lambda: sort_model,
+                         multi_sort_num=2)
+    for i in range(len(columns)):
+        sort_model.set_sort_func(i, sort_util.sort_column, i)
+    sort_model.connect("sort-column-changed",
+                       sort_util.handle_sort_column_change)
+
+    """
+
+    def __init__(self, sort_model_getter_func, multi_sort_num=1):
+        self._get_sort_model = sort_model_getter_func
+        self.multi_sort_num = multi_sort_num
+        self._sort_columns_stored = []
+
+    def clear_sort_columns(self):
+        """Clear any multi-sort information."""
+        self._sort_columns_stored = []
+
+    def cmp_(self, value1, value2):
+        """Perform a useful form of 'cmp'"""
+        if (isinstance(value1, basestring) and
+            isinstance(value2, basestring)):
+            if value1.isdigit() and value2.isdigit():
+                return cmp(float(value1), float(value2))
+            return rose.config.sort_settings(value1, value2)
+        return cmp(value1, value2)
+
+    def handle_sort_column_change(self, model):
+        """Store previous sorting information for multi-column sorts."""
+        id_, order = model.get_sort_column_id()
+        if id_ is None and order is None:
+            return False
+        if (self._sort_columns_stored and
+            self._sort_columns_stored[0][0] == id_):
+            self._sort_columns_stored.pop(0)
+        self._sort_columns_stored.insert(0, (id_, order))
+        if len(self._sort_columns_stored) > 2:
+            self._sort_columns_stored.pop()
+
+    def sort_column(self, model, iter1, iter2, col_index):
+        """Multi-column sort."""
+        val1 = model.get_value(iter1, col_index)
+        val2 = model.get_value(iter2, col_index)
+        rval = self.cmp_(val1, val2)
+        # If rval is 1 or -1, no need for a multi-column sort.
+        if rval == 0:
+            if isinstance(model, gtk.TreeModelSort):
+                this_order = model.get_sort_column_id()[1]
+            else:
+                this_order = self._get_sort_model().get_sort_column_id()[1]
+            cmp_factor = 1
+            if this_order == gtk.SORT_DESCENDING:
+                # We need to de-invert the sort order for multi sorting.
+                cmp_factor = -1
+        i = 0
+        while rval == 0 and i < len(self._sort_columns_stored):
+            next_id, next_order = self._sort_columns_stored[i]
+            if next_id == col_index:
+                i += 1
+                continue
+            next_cmp_factor = cmp_factor * 1
+            if next_order == gtk.SORT_DESCENDING:
+                # Set the correct order for multi sorting.
+                next_cmp_factor = cmp_factor * -1
+            val1 = model.get_value(iter1, next_id)
+            val2 = model.get_value(iter2, next_id)
+            rval = next_cmp_factor * self.cmp_(val1, val2)
+            i += 1
+        return rval 
+
+
 run_gtk_main = gtk.main
 quit_gtk_main = gtk.main_quit
 

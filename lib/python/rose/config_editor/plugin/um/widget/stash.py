@@ -153,6 +153,7 @@ class BaseStashSummaryDataPanelv1(
                     break
 
     def add_cell_renderer_for_value(self, col, col_title):
+        """Add a cell renderer type based on the column."""
         self._update_available_profiles()
         if col_title in self.OPTION_NL_MAP:
             cell_for_value = gtk.CellRendererCombo()
@@ -191,6 +192,7 @@ class BaseStashSummaryDataPanelv1(
                                    self._set_tree_cell_value)
 
     def _add_new_diagnostic_launcher(self):
+        # Create a button for launching the Add new STASH dialog.
         add_button = rose.gtk.util.CustomButton(
                                    label=self.ADD_NEW_STASH_LABEL,
                                    stock_id=gtk.STOCK_ADD,
@@ -216,6 +218,7 @@ class BaseStashSummaryDataPanelv1(
 
     def _handle_cell_combo_change(self, combo_cell, path_string, combo_iter,
                                   col_title):
+        # Handle a gtk.CellRendererCombo (variable) value change.
         new_value = combo_cell.get_property("model").get_value(combo_iter, 0)
         row_iter = self._view.get_model().get_iter(path_string)
         sect_index = self.get_section_column_index()
@@ -228,6 +231,7 @@ class BaseStashSummaryDataPanelv1(
 
     def _handle_cell_text_change(self, text_cell, path_string, new_text,
                                  col_title):
+        # Handle a gtk.CellRendererText (variable) value change.
         row_iter = self._view.get_model().get_iter(path_string)
         sect_index = self.get_section_column_index()
         section = self._view.get_model().get_value(row_iter, sect_index)
@@ -238,6 +242,7 @@ class BaseStashSummaryDataPanelv1(
         return False
 
     def _handle_cell_toggle_change(self, combo_cell, path_string):
+        # Handle a gtk.CellRendererToggle value change.
         was_active = combo_cell.get_property("active")
         row_iter = self._view.get_model().get_iter(path_string)
         sect_index = self.get_section_column_index()
@@ -249,7 +254,8 @@ class BaseStashSummaryDataPanelv1(
         self.sub_ops.ignore_section(section, not is_active)
         return False
   
-    def get_tree_cell_status(self, col, cell, model, row_iter):
+    def set_tree_cell_status(self, col, cell, model, row_iter):
+        # Set the status-related markup for a cell.
         col_index = self._view.get_columns().index(col)
         sect_index = self.get_section_column_index()
         section = model.get_value(row_iter, sect_index)
@@ -386,7 +392,8 @@ class BaseStashSummaryDataPanelv1(
             cell.set_property("visible", False)
         cell.set_property("markup", rose.gtk.util.safe_str(value))
 
-    def get_tree_tip(self, view, row_iter, col_index, tip):
+    def set_tree_tip(self, view, row_iter, col_index, tip):
+        """Set the TreeView Tooltip."""
         sect_index = self.get_section_column_index()
         section = view.get_model().get_value(row_iter, sect_index)
         if section is None:
@@ -429,6 +436,7 @@ class BaseStashSummaryDataPanelv1(
         return True
 
     def _update_available_profiles(self):
+        # Retrieve which profiles (namelists like domain) are available.
         self._available_profile_map = {}
         self._profile_location_map = {}
         ok_var_names = self.OPTION_NL_MAP.keys()
@@ -447,6 +455,7 @@ class BaseStashSummaryDataPanelv1(
             profile_names.sort()
 
     def _get_custom_menu_items(self, path, col, event):
+        # Add some custom menu items to the TreeView rightclick menu.
         menuitems = []
         model = self._view.get_model()
         col_index = self._view.get_columns().index(col)
@@ -489,6 +498,7 @@ class BaseStashSummaryDataPanelv1(
         return menuitems
 
     def _handle_activation(self, view, path, column):
+        # React to row activation in the TreeView.
         if path is None:
             return False
         model = view.get_model()
@@ -511,15 +521,18 @@ class BaseStashSummaryDataPanelv1(
         self.search_function(id_)
 
     def get_section_column_index(self):
+        """Return the column index for the section (Rose section)."""
         return self.column_names.index(self.SECTION_INDEX_TITLE)
 
     def add_new_stash_request(self, section, item):
+        """Add a new streq namelist."""
         new_opt_map = {self.STREQ_NL_SECT_OPT: section,
                        self.STREQ_NL_ITEM_OPT: item}
         new_section = self.add_section(None, opt_map=new_opt_map,
                                        no_page_launch=True)
 
     def _launch_new_diagnostic_window(self, widget=None):
+        # Launch the new STASH request dialog.
         window = gtk.Window()
         window.set_title(self.ADD_NEW_STASH_WINDOW_TITLE)
         add_module = rose.config_editor.plugin.um.widget.stash_add
@@ -533,6 +546,7 @@ class BaseStashSummaryDataPanelv1(
         window.show()
 
     def _launch_package_menu(self, widget, event):
+        # Create a menu below the widget for package actions.
         menu = gtk.Menu()
         packages = {}
         for section, vars_ in self.variables.items():
@@ -603,6 +617,7 @@ class BaseStashSummaryDataPanelv1(
                    event.time, widget)
 
     def _position_menu(self, menu, widget):
+        # Place the menu carefully below the button.
         x, y = widget.get_window().get_origin()
         allocated_rectangle = widget.get_allocation()
         x += allocated_rectangle.x
@@ -610,6 +625,7 @@ class BaseStashSummaryDataPanelv1(
         return x, y, False
 
     def _add_package(self, package):
+        # Handle package addition - new requests and/or profiles.
         sections_for_adding = []
         for sect_type, values in self._package_lookup[package].items():
             if sect_type == "namelist:streq":
@@ -629,6 +645,7 @@ class BaseStashSummaryDataPanelv1(
                 self.sub_ops.add_section(section, opt_map=opt_name_values)
 
     def _remove_packages(self, just_this_package=None):
+        # Remove requests and/or profiles for packages.
         self._update_available_profiles()
         sections_for_removing = []
         profile_streqs = {}
@@ -660,6 +677,7 @@ class BaseStashSummaryDataPanelv1(
         self.sub_ops.remove_sections(sections_for_removing)
   
     def _enable_packages(self, just_this_package=None, disable=False):
+        # Enable or user-ignore requests matching these packages.
         sections_for_changing = []
         for section, vars_ in self.variables.items():
             for var in vars_:

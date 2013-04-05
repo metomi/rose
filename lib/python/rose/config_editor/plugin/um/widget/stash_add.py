@@ -46,8 +46,10 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self.control_widget_hbox = self._get_control_widget_box()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
         self._view = rose.gtk.util.TooltipTreeView(
-                                   get_tooltip_func=self.get_tree_tip)
+                                   get_tooltip_func=self.set_tree_tip)
         self._view.set_rules_hint(True)
+        self.sort_util = rose.gtk.util.TreeModelSortUtil(
+                              lambda: self._view.get_model(), 2)
         self._view.show()
         self._view.connect("button-press-event",
                            self._handle_button_press_event)
@@ -86,12 +88,12 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         data_rows = []
         columns = ["Section", "Item", "Description"]
         sections = self.stash_lookup.keys()
-        sections.sort(self.numeric_sorter)
+        sections.sort(self.sort_util.cmp_)
         for section in sections:
             if section == "-1":
                 continue
             items = self.stash_lookup[section].keys()
-            items.sort(self.numeric_sorter)
+            items.sort(self.sort_util.cmp_)
             for item in items:
                 data = self.stash_lookup[section][item]
                 this_row = [section, item, data[self.STASH_PARSE_DESC_OPT]]
@@ -102,13 +104,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                             columns.append(prop)
                 data_rows.append(this_row)
         return data_rows, columns
-    
-    def numeric_sorter(self, item1, item2):
-        if item1.strip().isdigit() and item2.strip().isdigit():
-            return cmp(int(item1), int(item2))
-        return cmp(item1, item2)
 
-    def get_tree_tip(self, treeview, row_iter, col_index, tip):
+    def set_tree_tip(self, treeview, row_iter, col_index, tip):
         """Add the hover-over text for a cell to 'tip'.
         
         treeview is the gtk.TreeView object
@@ -182,7 +179,9 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         filter_model.set_visible_func(self._filter_visible)
         sort_model = gtk.TreeModelSort(filter_model)
         for i in range(len(self.column_names)):
-            sort_model.set_sort_func(i, self._sort_model_dupl, i)
+            sort_model.set_sort_func(i, self.sort_util.sort_column, i)
+        sort_model.connect("sort-column-changed",
+                           self.sort_util.handle_sort_column_change)
         return sort_model
 
     def generate_tree_view(self, is_startup=False):
@@ -206,18 +205,6 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             self._group_widget.set_model(group_model)
             self._group_widget.set_active(self.group_index + 1)
             self._group_widget.connect("changed", self._handle_group_change)
-
-    def _sort_model_dupl(self, model, iter1, iter2, col_index):
-        val1 = model.get_value(iter1, col_index)
-        val2 = model.get_value(iter2, col_index)
-        if (isinstance(val1, basestring) and isinstance(val2, basestring) and
-            val1.isdigit() and val2.isdigit()):
-            rval = cmp(float(val1), float(val2))
-        else:
-            rval = rose.config.sort_settings(val1, val2)
-        if rval == 0:
-            return cmp(model.get_path(iter1), model.get_path(iter2))
-        return rval
 
     def update_tree_model(self):
         self._view.set_model(self.get_tree_model())
@@ -301,11 +288,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         fac = (-1 if descending else 1)
         x = row1[sort_index]
         y = row2[sort_index]
-        if isinstance(x, basestring) and isinstance(y, basestring):
-            if x.isdigit() and y.isdigit():
-                return fac * cmp(int(x), int(y))
-            return fac * rose.config.sort_settings(x, y)        
-        return fac * cmp(x, y)
+        return fac * self.sort_util.cmp_(x, y)
 
     def _handle_group_change(self, combobox):
         model = combobox.get_model()
