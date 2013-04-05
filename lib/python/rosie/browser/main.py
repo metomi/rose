@@ -95,7 +95,7 @@ class MainWindow(gtk.Window):
         self.last_search_historical = False
         self.repeat_last_request = lambda: None
         splash_updater(rosie.browser.SPLASH_LOADING.format(
-                  rosie.browser.SPLASH_SETUP_WINDOW),
+                                     rosie.browser.SPLASH_SETUP_WINDOW),
                        rosie.browser.PROGRAM_NAME)
         self.setup_window()
         self.local_updater = rosie.browser.status.LocalStatusUpdater(
