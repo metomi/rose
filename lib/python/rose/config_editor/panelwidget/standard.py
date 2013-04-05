@@ -54,6 +54,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.sections = sections
         self.variables = variables
         self._last_column_names = []
+        self._sort_columns_stored = []
         self.column_names = []
         self.sect_ops = sect_ops
         self.var_ops = var_ops
@@ -195,6 +196,8 @@ class BaseSummaryDataPanel(gtk.VBox):
         sort_model = gtk.TreeModelSort(filter_model)
         for i in range(len(self.column_names)):
             sort_model.set_sort_func(i, self._sort_model_dupl, i)
+            sort_model.connect("sort-column-changed",
+                               self._handle_sort_change)
         should_redraw = self.column_names != self._last_column_names
         self._last_column_names = self.column_names
         return sort_model, self.column_names, should_redraw
@@ -211,6 +214,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         start_path, start_column = self._view.get_cursor()
         model, cols, should_redraw = self.get_tree_model_and_col_names()
         if should_redraw:
+            self._sort_columns_stored = []
             for column in list(self._view.get_columns()):
                 self._view.remove_column(column)
         self._view.set_model(model)
@@ -287,16 +291,54 @@ class BaseSummaryDataPanel(gtk.VBox):
             child_iter = model.iter_next(child_iter)
         return False
 
+    def _handle_sort_change(self, model):
+        # Store previous sorting information for multi-column sorts.
+        id_, order = model.get_sort_column_id()
+        if id_ is None and order is None:
+            return False
+        if (self._sort_columns_stored and
+            self._sort_columns_stored[0][0] == id_):
+            self._sort_columns_stored.pop(0)
+        self._sort_columns_stored.insert(0, (id_, order))
+        if len(self._sort_columns_stored) > 2:
+            self._sort_columns_stored.pop()
+
+    def _sort_cmp_model_values(self, value1, value2):
+        # Perform a useful form of 'cmp'.
+        if value1 is None or value2 is None:
+            return cmp(value1, value2)
+        if (isinstance(value1, basestring) and
+            isinstance(value2, basestring) and
+            value1.isdigit() and value2.isdigit()):
+            return cmp(float(value1), float(value2))
+        return rose.config.sort_settings(value1, value2)
+
     def _sort_model_dupl(self, model, iter1, iter2, col_index):
+        # Multi-column sorting.
         val1 = model.get_value(iter1, col_index)
         val2 = model.get_value(iter2, col_index)
-        if (isinstance(val1, basestring) and isinstance(val2, basestring) and
-            val1.isdigit() and val2.isdigit()):
-            rval = cmp(float(val1), float(val2))
-        else:
-            rval = rose.config.sort_settings(val1, val2)
+        rval = self._sort_cmp_model_values(val1, val2)
+        # If rval is 1 or -1, no need for a multi-column sort.
         if rval == 0:
-            return cmp(model.get_path(iter1), model.get_path(iter2))
+            this_order = self._view.get_model().get_sort_column_id()[1]
+            cmp_factor = 1
+            if this_order == gtk.SORT_DESCENDING:
+                # We need to de-invert the sort order for multi sorting.
+                cmp_factor = -1
+        i = 0
+        while rval == 0 and i < len(self._sort_columns_stored):
+            next_id, next_order = self._sort_columns_stored[i]
+            if next_id == col_index:
+                i += 1
+                continue
+            next_cmp_factor = cmp_factor * 1
+            if next_order == gtk.SORT_DESCENDING:
+                # Set the correct order for multi sorting.
+                next_cmp_factor = cmp_factor * -1
+            val1 = model.get_value(iter1, next_id)
+            val2 = model.get_value(iter2, next_id)
+            rval = next_cmp_factor * self._sort_cmp_model_values(val1, val2)
+            i += 1
         return rval
          
     def _handle_activation(self, view, path, column):
