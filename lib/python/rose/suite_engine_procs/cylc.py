@@ -184,10 +184,11 @@ class CylcProcessor(SuiteEngineProcessor):
         conn = sqlite3.connect(self.get_suite_db_file(suite_name))
         c = conn.cursor()
         auths = []
-        stmt = "SELECT DISTINCT host FROM task_events"
+        stmt = "SELECT DISTINCT misc FROM task_events"
         stmt_args = tuple()
         if task_id:
-            stmt += " WHERE name==? AND cycle==? AND event=='submitted'"
+            stmt += (" WHERE name==? AND cycle==?"
+                     " AND event=='submission succeeded'")
             stmt_args = tuple(task_id.split(self.TASK_ID_DELIM))
         for row in c.execute(stmt, stmt_args):
             if row and "@" in row[0]:
