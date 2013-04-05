@@ -95,22 +95,7 @@ class MainWindow(gtk.Window):
         self.last_search_historical = False
         self.repeat_last_request = lambda: None
         splash_updater(rosie.browser.SPLASH_LOADING.format(
-                       def search_new_suite(self, new_id):
-        search = "query?q=and+idx+eq+" + str(new_id)
-        
-        if self.attempts < 5:
-            try:
-                results, url = self.search_manager.ws_search(search_text, **items)
-            except:
-                results = []
-            if len(results) == 0:
-                print results
-                self.attempts += 1
-            else:
-                print "I think I should refresh..."
-                return False       
-        else:
-            return False                  rosie.browser.SPLASH_SETUP_WINDOW),
+                  rosie.browser.SPLASH_SETUP_WINDOW),
                        rosie.browser.PROGRAM_NAME)
         self.setup_window()
         self.local_updater = rosie.browser.status.LocalStatusUpdater(
