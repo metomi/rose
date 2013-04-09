@@ -94,6 +94,45 @@ class BaseStashSummaryDataPanelv1(
         super(BaseStashSummaryDataPanelv1, self).__init__(*args, **kwargs)
         self._add_new_diagnostic_launcher()
 
+    def add_cell_renderer_for_value(self, col, col_title):
+        """Add a cell renderer type based on the column."""
+        self._update_available_profiles()
+        if col_title in self.OPTION_NL_MAP:
+            cell_for_value = gtk.CellRendererCombo()
+            listmodel = gtk.ListStore(str)
+            values = sorted(self._available_profile_map[col_title])
+            for possible_value in values:
+                listmodel.append([possible_value])
+            cell_for_value.set_property("has-entry", False)
+            cell_for_value.set_property("editable", True)
+            cell_for_value.set_property("model", listmodel)
+            cell_for_value.set_property("text-column", 0)
+            cell_for_value.connect("changed",
+                                   self._handle_cell_combo_change,
+                                   col_title)
+            col.pack_start(cell_for_value, expand=True)
+            col.set_cell_data_func(cell_for_value,
+                                   self._set_tree_cell_value_combo)
+        elif col_title == self.INCLUDED_TITLE:
+            cell_for_value = gtk.CellRendererToggle()
+            col.pack_start(cell_for_value, expand=False)
+            cell_for_value.set_property("activatable", True)
+            cell_for_value.connect("toggled",
+                                   self._handle_cell_toggle_change)
+            col.set_cell_data_func(cell_for_value,
+                                   self._set_tree_cell_value_toggle)
+        else:
+            cell_for_value = gtk.CellRendererText()
+            col.pack_start(cell_for_value, expand=True)
+            if (col_title not in [self.SECTION_INDEX_TITLE,
+                                  self.DESCRIPTION_TITLE]):
+                cell_for_value.set_property("editable", True)
+                cell_for_value.connect("edited",
+                                       self._handle_cell_text_change,
+                                       col_title)
+            col.set_cell_data_func(cell_for_value,
+                                   self._set_tree_cell_value)
+
     def get_stashmaster_lookup_dict(self):
         """Return a nested dictionary with STASHmaster info.
 
@@ -151,126 +190,6 @@ class BaseStashSummaryDataPanelv1(
                         self._package_profile_lookup.setdefault(prof, {})
                         self._package_profile_lookup[prof][name] = sect
                     break
-
-    def add_cell_renderer_for_value(self, col, col_title):
-        """Add a cell renderer type based on the column."""
-        self._update_available_profiles()
-        if col_title in self.OPTION_NL_MAP:
-            cell_for_value = gtk.CellRendererCombo()
-            listmodel = gtk.ListStore(str)
-            values = sorted(self._available_profile_map[col_title])
-            for possible_value in values:
-                listmodel.append([possible_value])
-            cell_for_value.set_property("has-entry", False)
-            cell_for_value.set_property("editable", True)
-            cell_for_value.set_property("model", listmodel)
-            cell_for_value.set_property("text-column", 0)
-            cell_for_value.connect("changed",
-                                   self._handle_cell_combo_change,
-                                   col_title)
-            col.pack_start(cell_for_value, expand=True)
-            col.set_cell_data_func(cell_for_value,
-                                   self._set_tree_cell_value_combo)
-        elif col_title == self.INCLUDED_TITLE:
-            cell_for_value = gtk.CellRendererToggle()
-            col.pack_start(cell_for_value, expand=False)
-            cell_for_value.set_property("activatable", True)
-            cell_for_value.connect("toggled",
-                                   self._handle_cell_toggle_change)
-            col.set_cell_data_func(cell_for_value,
-                                   self._set_tree_cell_value_toggle)
-        else:
-            cell_for_value = gtk.CellRendererText()
-            col.pack_start(cell_for_value, expand=True)
-            if (col_title not in [self.SECTION_INDEX_TITLE,
-                                  self.DESCRIPTION_TITLE]):
-                cell_for_value.set_property("editable", True)
-                cell_for_value.connect("edited",
-                                       self._handle_cell_text_change,
-                                       col_title)
-            col.set_cell_data_func(cell_for_value,
-                                   self._set_tree_cell_value)
-
-    def _add_new_diagnostic_launcher(self):
-        # Create a button for launching the Add new STASH dialog.
-        add_button = rose.gtk.util.CustomButton(
-                                   label=self.ADD_NEW_STASH_LABEL,
-                                   stock_id=gtk.STOCK_ADD,
-                                   tip_text=self.ADD_NEW_STASH_TIP)
-        package_button = rose.gtk.util.CustomButton(
-                                       label=self.PACKAGE_MANAGER_LABEL,
-                                       tip_text=self.PACKAGE_MANAGER_TIP)
-        arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
-        arrow.show()
-        package_button.hbox.pack_start(arrow, expand=False, fill=False)
-        eb = gtk.EventBox()
-        eb.show()
-        self.control_widget_hbox.pack_start(eb, expand=True, fill=True)
-        self.control_widget_hbox.pack_start(add_button, expand=False, fill=False)
-        self.control_widget_hbox.pack_start(package_button, expand=False,
-                                            fill=False)
-        eb = gtk.EventBox()
-        eb.show()
-        self.control_widget_hbox.pack_start(eb, expand=True, fill=True)
-        add_button.connect("clicked", self._launch_new_diagnostic_window)
-        package_button.connect("button-press-event",
-                               self._launch_package_menu)
-
-    def _handle_cell_combo_change(self, combo_cell, path_string, combo_iter,
-                                  col_title):
-        # Handle a gtk.CellRendererCombo (variable) value change.
-        new_value = combo_cell.get_property("model").get_value(combo_iter, 0)
-        row_iter = self._view.get_model().get_iter(path_string)
-        sect_index = self.get_section_column_index()
-        section = self._view.get_model().get_value(row_iter, sect_index)
-        option = col_title
-        id_ = self.util.get_id_from_section_option(section, option)
-        var = self.var_id_map[id_]
-        self.var_ops.set_var_value(var, new_value)
-        return False
-
-    def _handle_cell_text_change(self, text_cell, path_string, new_text,
-                                 col_title):
-        # Handle a gtk.CellRendererText (variable) value change.
-        row_iter = self._view.get_model().get_iter(path_string)
-        sect_index = self.get_section_column_index()
-        section = self._view.get_model().get_value(row_iter, sect_index)
-        option = col_title
-        id_ = self.util.get_id_from_section_option(section, option)
-        var = self.var_id_map[id_]
-        self.var_ops.set_var_value(var, new_text)
-        return False
-
-    def _handle_cell_toggle_change(self, combo_cell, path_string):
-        # Handle a gtk.CellRendererToggle value change.
-        was_active = combo_cell.get_property("active")
-        row_iter = self._view.get_model().get_iter(path_string)
-        sect_index = self.get_section_column_index()
-        section = self._view.get_model().get_value(row_iter, sect_index)
-        if section is None:
-            return False
-        is_active = not was_active
-        combo_cell.set_property("active", is_active)
-        self.sub_ops.ignore_section(section, not is_active)
-        return False
-  
-    def set_tree_cell_status(self, col, cell, model, row_iter):
-        # Set the status-related markup for a cell.
-        col_index = self._view.get_columns().index(col)
-        sect_index = self.get_section_column_index()
-        section = model.get_value(row_iter, sect_index)
-        if section is None:
-            return cell.set_property("markup", None)
-        if col_index == sect_index:
-            node_data = self.sections.get(section)
-        else:
-            option = self.column_names[col_index]
-            if option is None:
-                return cell.set_property("markup", None)
-            id_ = self.util.get_id_from_section_option(section, option)
-            node_data = self.var_id_map.get(id_)
-        cell.set_property("markup",
-                          self._get_status_from_data(node_data))
 
     def get_model_data(self):
         """Construct a data model of other page data."""
@@ -343,6 +262,130 @@ class BaseStashSummaryDataPanelv1(
         column_names = [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]
         column_names += sub_var_names + [self.SECTION_INDEX_TITLE]
         return data_rows, column_names
+ 
+    def set_tree_cell_status(self, col, cell, model, row_iter):
+        # Set the status-related markup for a cell.
+        col_index = self._view.get_columns().index(col)
+        sect_index = self.get_section_column_index()
+        section = model.get_value(row_iter, sect_index)
+        if section is None:
+            return cell.set_property("markup", None)
+        if col_index == sect_index:
+            node_data = self.sections.get(section)
+        else:
+            option = self.column_names[col_index]
+            if option is None:
+                return cell.set_property("markup", None)
+            id_ = self.util.get_id_from_section_option(section, option)
+            node_data = self.var_id_map.get(id_)
+        cell.set_property("markup",
+                          self._get_status_from_data(node_data))
+
+    def set_tree_tip(self, view, row_iter, col_index, tip):
+        """Set the TreeView Tooltip."""
+        sect_index = self.get_section_column_index()
+        section = view.get_model().get_value(row_iter, sect_index)
+        if section is None:
+            return False
+        if col_index == sect_index:
+            option = None
+            if section not in self.sections:
+                return False
+            id_data = self.sections[section]
+            tip_text = section
+        else:
+            option = self.column_names[col_index]
+            id_ = self.util.get_id_from_section_option(section, option)
+            if (id_ not in self.var_id_map and
+                option in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]):
+                tip.set_text(
+                        str(view.get_model().get_value(row_iter, col_index)))
+                return True
+            id_data = self.var_id_map[id_]
+            value = str(view.get_model().get_value(row_iter, col_index))
+            tip_text = rose.CONFIG_DELIMITER.join([section, option, value]) + "\n"
+            if option in self.OPTION_NL_MAP:
+                prof_id = self._profile_location_map[option].get(value)
+                if prof_id is not None:
+                    prof_sect = self.util.get_section_option_from_id(prof_id)[0]
+                    tip_text += "See " + prof_sect
+        tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
+        if tip_text:
+            tip_text += "\n"
+        for key, value in id_data.error.items():
+            tip_text += (
+                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
+                                                                key, value))
+        for key in id_data.ignored_reason:
+            tip_text += key + "\n"
+        if option is not None:
+            change_text = self.var_ops.get_var_changes(id_data)
+            tip_text += change_text + "\n"
+        tip.set_text(tip_text.rstrip())
+        return True
+
+    def _add_new_diagnostic_launcher(self):
+        # Create a button for launching the Add new STASH dialog.
+        add_button = rose.gtk.util.CustomButton(
+                                   label=self.ADD_NEW_STASH_LABEL,
+                                   stock_id=gtk.STOCK_ADD,
+                                   tip_text=self.ADD_NEW_STASH_TIP)
+        package_button = rose.gtk.util.CustomButton(
+                                       label=self.PACKAGE_MANAGER_LABEL,
+                                       tip_text=self.PACKAGE_MANAGER_TIP)
+        arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
+        arrow.show()
+        package_button.hbox.pack_start(arrow, expand=False, fill=False)
+        eb = gtk.EventBox()
+        eb.show()
+        self.control_widget_hbox.pack_start(eb, expand=True, fill=True)
+        self.control_widget_hbox.pack_start(add_button, expand=False, fill=False)
+        self.control_widget_hbox.pack_start(package_button, expand=False,
+                                            fill=False)
+        eb = gtk.EventBox()
+        eb.show()
+        self.control_widget_hbox.pack_start(eb, expand=True, fill=True)
+        add_button.connect("clicked", self._launch_new_diagnostic_window)
+        package_button.connect("button-press-event",
+                               self._launch_package_menu)
+
+    def _handle_cell_combo_change(self, combo_cell, path_string, combo_iter,
+                                  col_title):
+        # Handle a gtk.CellRendererCombo (variable) value change.
+        new_value = combo_cell.get_property("model").get_value(combo_iter, 0)
+        row_iter = self._view.get_model().get_iter(path_string)
+        sect_index = self.get_section_column_index()
+        section = self._view.get_model().get_value(row_iter, sect_index)
+        option = col_title
+        id_ = self.util.get_id_from_section_option(section, option)
+        var = self.var_id_map[id_]
+        self.var_ops.set_var_value(var, new_value)
+        return False
+
+    def _handle_cell_text_change(self, text_cell, path_string, new_text,
+                                 col_title):
+        # Handle a gtk.CellRendererText (variable) value change.
+        row_iter = self._view.get_model().get_iter(path_string)
+        sect_index = self.get_section_column_index()
+        section = self._view.get_model().get_value(row_iter, sect_index)
+        option = col_title
+        id_ = self.util.get_id_from_section_option(section, option)
+        var = self.var_id_map[id_]
+        self.var_ops.set_var_value(var, new_text)
+        return False
+
+    def _handle_cell_toggle_change(self, combo_cell, path_string):
+        # Handle a gtk.CellRendererToggle value change.
+        was_active = combo_cell.get_property("active")
+        row_iter = self._view.get_model().get_iter(path_string)
+        sect_index = self.get_section_column_index()
+        section = self._view.get_model().get_value(row_iter, sect_index)
+        if section is None:
+            return False
+        is_active = not was_active
+        combo_cell.set_property("active", is_active)
+        self.sub_ops.ignore_section(section, not is_active)
+        return False
 
     def _set_tree_cell_value_combo(self, column, cell, treemodel, iter_):
         cell.set_property("visible", True)
@@ -391,49 +434,6 @@ class BaseStashSummaryDataPanelv1(
         if col_index == 0 and treemodel.iter_parent(iter_) is not None:
             cell.set_property("visible", False)
         cell.set_property("markup", rose.gtk.util.safe_str(value))
-
-    def set_tree_tip(self, view, row_iter, col_index, tip):
-        """Set the TreeView Tooltip."""
-        sect_index = self.get_section_column_index()
-        section = view.get_model().get_value(row_iter, sect_index)
-        if section is None:
-            return False
-        if col_index == sect_index:
-            option = None
-            if section not in self.sections:
-                return False
-            id_data = self.sections[section]
-            tip_text = section
-        else:
-            option = self.column_names[col_index]
-            id_ = self.util.get_id_from_section_option(section, option)
-            if (id_ not in self.var_id_map and
-                option in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]):
-                tip.set_text(
-                        str(view.get_model().get_value(row_iter, col_index)))
-                return True
-            id_data = self.var_id_map[id_]
-            value = str(view.get_model().get_value(row_iter, col_index))
-            tip_text = rose.CONFIG_DELIMITER.join([section, option, value]) + "\n"
-            if option in self.OPTION_NL_MAP:
-                prof_id = self._profile_location_map[option].get(value)
-                if prof_id is not None:
-                    prof_sect = self.util.get_section_option_from_id(prof_id)[0]
-                    tip_text += "See " + prof_sect
-        tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
-        if tip_text:
-            tip_text += "\n"
-        for key, value in id_data.error.items():
-            tip_text += (
-                    rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
-                                                                key, value))
-        for key in id_data.ignored_reason:
-            tip_text += key + "\n"
-        if option is not None:
-            change_text = self.var_ops.get_var_changes(id_data)
-            tip_text += change_text + "\n"
-        tip.set_text(tip_text.rstrip())
-        return True
 
     def _update_available_profiles(self):
         # Retrieve which profiles (namelists like domain) are available.

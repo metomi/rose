@@ -819,6 +819,7 @@ class MainController(object):
                     if save_var is None:
                         return rose.config_editor.TREE_PANEL_TIP_ADDED_VARS
                     if save_var.to_hashable() != var.to_hashable():
+                        # Variable has changed in some form.
                         return rose.config_editor.TREE_PANEL_TIP_CHANGED_VARS
                     save_var_map.pop(var_id)
         if save_var_map:
@@ -2004,7 +2005,7 @@ class MainController(object):
                 self.data.reload_namespace_tree()
             page = None
             if is_group:
-                stack_info.append([namespace, stack_item.page_label, node_id])
+                stack_info.extend([namespace, stack_item.page_label])
             elif self.data.is_ns_in_tree(namespace):
                 page = self.view_page(namespace, node_id)
                 self.sync_page_var_lists(page)
@@ -2019,8 +2020,8 @@ class MainController(object):
                     self.update_status(page)
                 self.update_bar_sensitivity()
                 self.update_stack_viewer_if_open()
-        if is_group:
-            self.data.reload_namespace_tree()
+        for namespace in set(stack_info):
+            self.data.reload_namespace_tree(namespace)
         return True
 
 # ----------------------- System functions -----------------------------------

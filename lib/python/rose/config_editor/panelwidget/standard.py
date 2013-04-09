@@ -34,9 +34,9 @@ class BaseSummaryDataPanel(gtk.VBox):
     """A base class for summarising data across many namespaces.
     
     Subclasses should provide the following methods:
-    def add_cell_renderer_for_value(self, column, column_title)
-    def get_model_data(self)
-    def get_section_column_index(self)
+    def add_cell_renderer_for_value(self, column, column_title):
+    def get_model_data(self):
+    def get_section_column_index(self):
     def set_tree_cell_status(self, column, cell, model, row_iter):
     def set_tree_tip(self, treeview, row_iter, col_index, tip):
 
@@ -64,6 +64,8 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.util = rose.config_editor.util.Lookup()
         self.control_widget_hbox = self._get_control_widget_box()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
+        self._prev_store = None
+        self._prev_sort_model = None
         self._view = rose.gtk.util.TooltipTreeView(
                                    get_tooltip_func=self.set_tree_tip)
         self._view.set_rules_hint(True)
@@ -75,7 +77,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                            self._handle_button_press_event)
         self._window = gtk.ScrolledWindow()
         self._window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.update_tree_model()
+        self.update()
         self._window.add(self._view)
         self._window.show()
         self.pack_start(self._window, expand=True, fill=True)
@@ -166,7 +168,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         filter_hbox.show()
         return filter_hbox
 
-    def get_tree_model_and_col_names(self):
+    def update_tree_model(self):
         """Construct a data model of other page data."""
         sub_sect_names = self.sections.keys()
         sub_var_names = []
@@ -178,14 +180,28 @@ class BaseSummaryDataPanel(gtk.VBox):
         data_rows, column_names, rows_are_descendants = self._apply_grouping(
                                           data_rows, column_names, self.group_index)
         self.column_names = column_names
+        should_redraw = self.column_names != self._last_column_names
         if data_rows:
             col_types = [str] * len(data_rows[0])
         else:
             col_types = []
-        store = gtk.TreeStore(*col_types)
+        need_new_store = (should_redraw or
+                          any(rows_are_descendants))
+        if need_new_store:
+            # We need to construct a new TreeModel.
+            if self._prev_sort_model is not None:
+                prev_sort_id = self._prev_sort_model.get_sort_column_id()
+            store = gtk.TreeStore(*col_types)
+            self._prev_store = store
+        else:
+            store = self._prev_store
         parent_iter_ = None
         for i, row_data in enumerate(data_rows):
-            if rows_are_descendants is None:
+            insert_iter = store.iter_nth_child(None, i)
+            if insert_iter is not None:
+                for j, value in enumerate(row_data):
+                    store.set_value(insert_iter, j, value)
+            elif not rows_are_descendants:
                 store.append(None, row_data)
             elif rows_are_descendants[i]:
                 store.append(parent_iter, row_data)
@@ -193,18 +209,30 @@ class BaseSummaryDataPanel(gtk.VBox):
                 parent_data = [row_data[0]] + [None] * len(row_data[1:])
                 parent_iter = store.append(None, parent_data) 
                 store.append(parent_iter, row_data)
-        filter_model = store.filter_new()
-        filter_model.set_visible_func(self._filter_visible)
-        sort_model = gtk.TreeModelSort(filter_model)
-        for i in range(len(self.column_names)):
-            sort_model.set_sort_func(i, self.sort_util.sort_column, i)
-        sort_model.connect("sort-column-changed",
-                           self.sort_util.handle_sort_column_change)
-        should_redraw = self.column_names != self._last_column_names
+        for extra_index in range(i, len(store.iter_n_children(None))):
+            remove_iter = store.iter_nth_child(None, extra_index)
+            store.remove(remove_iter)
+        if need_new_store:
+            filter_model = store.filter_new()
+            filter_model.set_visible_func(self._filter_visible)
+            sort_model = gtk.TreeModelSort(filter_model)
+            for i in range(len(self.column_names)):
+                sort_model.set_sort_func(i, self.sort_util.sort_column, i)
+            if (self._prev_sort_model is not None and
+                prev_sort_id[0] is not None):
+                sort_model.set_sort_column_id(*prev_sort_id)
+            self._prev_sort_model = sort_model
+            sort_model.connect("sort-column-changed",
+                               self.sort_util.handle_sort_column_change)
+            if should_redraw:
+                self.sort_util.clear_sort_columns()
+                for column in list(self._view.get_columns()):
+                    self._view.remove_column(column)
+            self._view.set_model(sort_model)
         self._last_column_names = self.column_names
-        return sort_model, self.column_names, should_redraw
+        return should_redraw
 
-    def update_tree_model(self, sections=None, variables=None):
+    def update(self, sections=None, variables=None):
         """Update the summary of page data."""
         if sections is not None:
             self.sections = sections
@@ -214,15 +242,10 @@ class BaseSummaryDataPanel(gtk.VBox):
         expanded_rows = []
         self._view.map_expanded_rows(lambda r, d: expanded_rows.append(d))
         start_path, start_column = self._view.get_cursor()
-        model, cols, should_redraw = self.get_tree_model_and_col_names()
+        should_redraw = self.update_tree_model()
         if should_redraw:
-            self.sort_util.clear_sort_columns()
-            for column in list(self._view.get_columns()):
-                self._view.remove_column(column)
-        self._view.set_model(model)
-        if should_redraw:
-            self.add_new_columns(self._view, cols)
-            if old_cols != set(cols):
+            self.add_new_columns(self._view, self.column_names)
+            if old_cols != set(self.column_names):
                 iter_ = self._group_widget.get_active_iter()
                 if self.group_index is not None:
                    current_model = self._group_widget.get_model()
@@ -232,7 +255,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                 group_model = gtk.TreeStore(str)
                 group_model.append(None, [""])
                 start_index = 0
-                for i, name in enumerate(cols):
+                for i, name in enumerate(self.column_names):
                     if self.group_index is not None and name == current_group:
                         start_index = i
                     group_model.append(None, [name])
@@ -469,12 +492,12 @@ class BaseSummaryDataPanel(gtk.VBox):
         if group_index == self.group_index:
             return False
         self.group_index = group_index
-        self.update_tree_model()
+        self.update()
         return False
 
     def _apply_grouping(self, data_rows, column_names, group_index=None,
                         descending=False):
-        rows_are_descendants = None
+        rows_are_descendants = []
         if group_index is None:
             return data_rows, column_names, rows_are_descendants
         k = group_index

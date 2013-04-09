@@ -666,7 +666,7 @@ class Handler(object):
         group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
         config_data = self.data.config[config_name]
         variables = config_data.vars.now.get(section, [])
-        for variable in variables:
+        for variable in list(variables):
             self.var_ops.remove_var(variable, skip_update=True)
         self.sect_ops.remove_section(config_name, section,
                                      skip_update=skip_update)

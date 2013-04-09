@@ -529,8 +529,8 @@ class ConfigPage(gtk.VBox):
     def update_sub_data(self):
         """Update the sub (summary) data panel."""
         if self.sub_data is not None:
-            self.sub_data_panel.update_tree_model(self.sub_data["sections"],
-                                                  self.sub_data["variables"])
+            self.sub_data_panel.update(self.sub_data["sections"],
+                                       self.sub_data["variables"])
 
     def launch_add_menu(self, button, my_time):
         """Pop up a contextual add variable menu."""
