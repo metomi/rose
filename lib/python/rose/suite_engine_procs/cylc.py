@@ -319,6 +319,7 @@ class CylcProcessor(SuiteEngineProcessor):
     def process_suite_hook_args(self, *args, **kwargs):
         """Rearrange args for TaskHook.run."""
         task = None
+        args = list(args)
         hook_event = args.pop(0)
         suite = args.pop(0)
         if len(args) > 1:
