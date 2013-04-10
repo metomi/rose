@@ -140,10 +140,10 @@
         <li>modified INI format:
           <pre class="prettyprint lang-rose_conf">
 [command]
-default = hello.exe
+default=hello.exe
 
 [env]
-!!MAX_TARGETS = 5
+!!MAX_TARGETS=5
 
 [!namelist:hello]
 </pre>
@@ -182,14 +182,14 @@ title=Run XYZ for A, with improved B
       documentation):</p>
       <pre class="prettyprint lang-rose_conf">
 [jinja2:suite.rc]
-COMPUTE_HOST = mayanstonecircle
-END_TIME = 20121221
+COMPUTE_HOST=mayanstonecircle
+END_TIME=20121221
 
 [file:app/goodbye_world]
-source = fcm:hello_tr/standard_apps/goodbye_world@25678
+source=fcm:hello_tr/standard_apps/goodbye_world@25678
 
 [file:etc/debug.glyph]
-source = /project/hello/mayanpwr0.1/debug.glyph
+source=/project/hello/mayanpwr0.1/debug.glyph
 </pre>
     </div>
 
@@ -203,13 +203,13 @@ source = /project/hello/mayanpwr0.1/debug.glyph
 # Holds bash commands to run (e.g. 'rsync X/ Y/', 'run.exe')
 [command]
 # The usual command:
-default = throw_snowball.exe
+default=throw_snowball.exe
 # A different command, run using the option --command-key=recon:
-recon = reconfigure_snowball.exe
+recon=reconfigure_snowball.exe
 
 # Environment variables set before the command is run
 [env]
-MAX_TARGETS = 5
+MAX_TARGETS=5
 </pre>
     </div>
 
@@ -220,19 +220,19 @@ MAX_TARGETS = 5
 # A file that we want to be constructed.
 [file:local_orography]
 # The file to create a symlink to.
-source = /project/snowball/ctldata/orog_devon
+source=/project/snowball/ctldata/orog_devon
 # mode can also be auto (usually =copy), or mkdir for dirs.
-mode = symlink
+mode=symlink
 
 # Another file - this time built from our namelist.
 [file:snow_nl]
-source = namelist:run_snow
+source=namelist:run_snow
 
 # Our namelist
 [namelist:run_snow]
-snow_consistency = 'good'
-slush_fraction = 0.1
-care_about_shape = .false.
+snow_consistency='good'
+slush_fraction=0.1
+care_about_shape=.false.
 </pre>
     </div>
 
@@ -243,12 +243,12 @@ care_about_shape = .false.
       configuration, and is used to drive the config editor GUI.</p>
       <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow]
-help = This section holds options for configuring the snow
-     = retrieval dynamics.
+help=This section holds options for configuring the snow
+    =retrieval dynamics.
 
 [namelist:run_snow=snow_consistency]
-title = Snow Consistency
-values = 'too dry', 'too icy', 'good'
+title=Snow Consistency
+values='too dry', 'too icy', 'good'
 </pre>
     </div>
 
@@ -256,17 +256,17 @@ values = 'too dry', 'too icy', 'good'
       <h3 class="alwayshidden">rose-meta.conf Continued</h3>
       <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
-description = This specifies the maximum acceptable mass
+description=This specifies the maximum acceptable mass
  fraction of slush.
-title = Slush Fraction
+title=Slush Fraction
 
 [namelist:run_snow=care_about_shape]
-help = If .true., we'll attempt to make the snowball
-     = like this:
-     = http://mrhonner.files.wordpress.com/2011/01/snowball-1.jpg
-     =
-     = Otherwise, it'll just be a heap.
-type = logical
+help=If .true., we'll attempt to make the snowball
+    =like this:
+    =http://mrhonner.files.wordpress.com/2011/01/snowball-1.jpg
+    =
+    =Otherwise, it'll just be a heap.
+type=logical
 </pre>
     </div>
 
@@ -279,11 +279,11 @@ type = logical
       <p>An example site configuration snippet, and a user one:</p>
       <pre class="prettyprint lang-rose_conf">
 [rose-suite-run]
-hosts = localhost
+hosts=localhost
 </pre><br />
       <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
-should-show-ignored = True
+should-show-ignored=True
 </pre>
     </div>
 
@@ -500,7 +500,7 @@ meta=rose-demo-upgrade/27.1
           <code>range</code>:
           <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=min_temp_water_supercool]
-range = this &gt; -48.3
+range=this &gt; -48.3
 </pre>
         </li>
 
@@ -508,7 +508,7 @@ range = this &gt; -48.3
           <code>trigger</code>:
           <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
-trigger = namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
+trigger=namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
 </pre>
         </li>
 
@@ -516,7 +516,7 @@ trigger = namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
           <code>warn-if</code>:
           <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=ice_fraction]
-warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
+warn-if=this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
 </pre>
         </li>
       </ul>
@@ -598,7 +598,7 @@ warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
           true. <code>warn-if</code> is the same, but will flag up a warning
           instead of an error. For example:
           <pre class="prettyprint lang-rose_conf">
-fail-if = any(namelist:test=ctrl_array % this == 0)
+fail-if=any(namelist:test=ctrl_array % this == 0)
 </pre>
         </dd>
       </dl>
