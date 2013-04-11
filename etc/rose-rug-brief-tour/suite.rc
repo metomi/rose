@@ -1,6 +1,7 @@
 #!jinja2
 [cylc]
     # Begin Rose required event hook block
+    UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = "rose suite-hook --mail --shutdown"
         timeout = 4320 # 3 days

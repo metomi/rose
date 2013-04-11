@@ -99,7 +99,17 @@
       new directory somewhere - e.g. in your homespace) containing a blank
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc</h3>
+
       <pre class="prettyprint lang-cylc">
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
         graph = "initialise =&gt; short &amp; medium &amp; long"
@@ -115,7 +125,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Example (2)</h3>
+      <h3 class="alwayshidden">Example suite.rc (2)</h3>
       <pre class="prettyprint lang-cylc">
     [[initialise]]
         command scripting = "echo 'initialising...'; sleep 10"
@@ -132,7 +142,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Example (3)</h3>
+      <h3 class="alwayshidden">Example App</h3>
 
       <p>In the suite directory create an <samp>app</samp> directory</p>
 
