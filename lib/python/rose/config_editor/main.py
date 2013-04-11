@@ -96,6 +96,9 @@ class MainController(object):
                  loader_update=rose.config_editor.false_function):
         if config_objs is None:
             config_objs = {}
+        if pluggable:
+            rose.macro.add_site_meta_paths()
+            rose.macro.add_env_meta_paths()
         self.pluggable = pluggable
         self.tab_windows = []  # No child windows yet
         self.orphan_pages = []
@@ -740,6 +743,12 @@ class MainController(object):
             n = self.notebook.get_current_page()
             return self.notebook.get_nth_page(n)
         return None
+
+    def _get_current_page_and_id(self):
+        page = self._get_current_page()
+        if page is None:
+            return None, None
+        return page, page.get_main_focus()
 
     def _set_page_show_modes(self, key, is_key_allowed):
         self.page_show_modes[key] = is_key_allowed
@@ -1511,7 +1520,8 @@ class MainController(object):
     def refresh_metadata(self, metadata_off=False, just_this_config=None):
         """Switch metadata on/off and reloads namespaces."""
         self.metadata_off = metadata_off
-        self._get_menu_widget('/Reload metadata').set_sensitive(
+        if hasattr(self, 'menubar'):
+           self._get_menu_widget('/Reload metadata').set_sensitive(
                                                   not self.metadata_off)
         if just_this_config is None:
             configs = self.data.config.keys()
@@ -1568,7 +1578,7 @@ class MainController(object):
                     self.update_tree_status(ns, icon_type='changed')
                     namespaces_updated.append(ns)
         self._generate_pagelist()
-        current_page = self._get_current_page()
+        current_page, current_id = self._get_current_page_and_id()
         current_namespace = None
         if current_page is not None:
             current_namespace = current_page.namespace
@@ -1614,7 +1624,7 @@ class MainController(object):
             self._generate_pagelist()
             if config_name in configs:
                 if current_namespace in [p.namespace for p in self.pagelist]:
-                    self.view_page(current_namespace)
+                    self.view_page(current_namespace, current_id)
 
 #------------------ Data-intensive menu functions / utilities ----------------
 
