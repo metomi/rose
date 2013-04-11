@@ -246,8 +246,8 @@
     <div class="slide">
       <h3 class="alwayshidden">Hello World Rose Suite</h3>
 
-      <p>Tasks are generic - they can be Rose applications, or generic commands
-      as above.</p>
+      <p>Tasks are generic - they can be Rose applications, or commands or
+      executables as above.</p>
 
       <p>If we wanted to invoke a Rose application, we'd make an app called
       <samp>hello_world</samp>, by making an <samp>app/hello_world/</samp>
@@ -350,7 +350,7 @@ default=echo 'Hello World'
     [[hello_pluto]]
         inherit = FAM_HELLO
         [[[environment]]]
-            IS_WORLD_A_PLANET = true  # Not really.
+            IS_WORLD_A_PLANET = true  # Override.
 </pre>
     </div>
 
@@ -449,6 +449,12 @@ default=echo 'Hello World'
 
       <p>We could then write:</p>
       <pre class="prettyprint lang-cylc">
+    [[hello_pluto]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Eris
+        [[[remote]]]
+            host = {{ COMPUTE_HOST }}
     [[hello_eris]]
         inherit = FAM_HELLO
         [[[environment]]]
@@ -575,6 +581,7 @@ COMPUTE_HOST = "voyager_1"
       <p><strong>The following should be in every Rose suite:</strong></p>
       <pre class="prettyprint lang-cylc">
 [cylc]
+    UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = "rose suite-hook --mail --shutdown"
         timeout = 4320 # 3 days
@@ -897,7 +904,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Environment Continued</h3>
+      <h3 class="alwayshidden">Environment (2)</h3>
 
       <ul class="incremental">
         <li><var>ROSE_DATA</var>, data directory of the suite.</li>
@@ -906,6 +913,16 @@ COMPUTE_HOST = "voyager_1"
         time.</li>
 
         <li><var>ROSE_ORIG_HOST</var>, host that invoked 'rose suite-run'.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Environment (3)</h3>
+
+      <ul class="incremental">
+        <li><var>ROSE_TASK_LOG_ROOT</var>, log directory for the task that
+        will get retrieved by the hook scripts - files here will be displayed
+        in the output viewer.</li>
       </ul>
     </div>
 
