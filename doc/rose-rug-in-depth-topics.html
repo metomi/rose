@@ -105,7 +105,7 @@
     "rose suite hierarchy" /></div>
 
     <div class="slide">
-      <h3>Suite Files</h3>
+      <h2 id="formats">Rose Configuration Files</h2>
 
       <p>There are (only) 5 different types of Rose configuration files:</p>
 
@@ -310,11 +310,60 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
+      <h3 id="rose-config">rose config</h3>
+
+      <p>There is a convenient command line utility for accessing Rose
+      configuration information: <a href="rose-command.html#rose-config">rose
+      config</a>.</p>
+
+      <p>You can view your current site and user configuration by running:</p>
+      <pre class="shell">
+rose config
+</pre>
+
+      <p>or to drill down to e.g. the <samp>rose-suite-run</samp>
+      <samp>hosts</samp> value:</p>
+      <pre class="shell">
+rose config rose-suite-run hosts
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose config --file</h3>
+
+      <p>rose config also works for the other Rose formats. For example:</p>
+      <pre class="shell">
+rose config --file=/path/to/rose-app.conf env
+</pre>
+
+      <p>will print the option-value pairs in the <samp>env</samp> section in
+      the <samp>rose-app.conf</samp> file. To print a specific option value,
+      you might run something like:</p>
+      <pre class="shell">
+rose config --file=/path/to/rose-app.conf env SPAM_NUMBER
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose config --meta</h3>
+
+      <p>You can also retrieve metadata values for a Rose configuration setting
+      - for example, running this in an app directory:</p>
+      <pre class="shell">
+rose config --meta env=SPAM_NUMBER help
+</pre>
+
+      <p>returns the help (if any) for the <var>SPAM_NUMBER</var> option in the
+      <samp>env</samp> section.</p>
+    </div>
+
+    <div class="slide">
       <h2 id="run-suite">Running Suites</h2>
 
-      <p>Once you have a suite, you can run it on the command line by invoking
-      <kbd>rose suite-run</kbd> in the top-level suite directory. You can see
-      the available options by typing <kbd>rose help suite-run</kbd>.</p>
+      <p>Once you have a suite with some of these files set up, you can run it
+      on the command line by invoking <kbd>rose suite-run</kbd> in the
+      top-level suite directory. You can see the available options by typing
+      <kbd>rose help suite-run</kbd>.</p>
     </div>
 
     <div class="slide">
@@ -716,12 +765,11 @@ rose macro fib.FibonnaciChecker
     <div class="slide">
       <h3 class="alwayshidden">rose app-upgrade</h3>
 
-      <p>Upgrade macros are the mechanism for making these changes - they are
-      a special form of macro. You can upgrade a configuration that has
-      upgrade macros defined by running <code>rose app-upgrade</code>.</p>
-
+      <p>Upgrade macros are the mechanism for making these changes - they are a
+      special form of macro. You can upgrade a configuration that has upgrade
+      macros defined by running <code>rose app-upgrade</code>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">rose app-upgrade Example</h3>
 
@@ -745,9 +793,9 @@ Accept y/n (default n)?
       <h2 id="rose-stem">rose stem</h2>
 
       <p><code>rose stem</code> is a testing system for use with Rose. It
-      provides a user-friendly way of defining source trees and tasks on the 
-      command line which are then passed by <code>rose stem</code> to the 
-      suite as Jinja2 variables.</p>
+      provides a user-friendly way of defining source trees and tasks on the
+      command line which are then passed by <code>rose stem</code> to the suite
+      as Jinja2 variables.</p>
     </div>
 
     <div class="slide">
