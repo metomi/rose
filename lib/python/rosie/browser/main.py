@@ -248,13 +248,10 @@ class MainWindow(gtk.Window):
         
         #poll for new entry in db
         search = "query?q=and+idx+eq+" + str(new_id)
-        print search #debug
-        items = {}
-        results = []
         self.attempts = 0
-
-        gobject.timeout_add(5000, self.search_new_suite, new_id)
-
+        gobject.timeout_add(rosie.browser.CHECKOUT_PAUSE, 
+                            self.search_new_suite, new_id)
+                            
         self.repeat_last_request()
 
     def display_local_suites(self, a_widget=None):
@@ -1121,11 +1118,12 @@ class MainWindow(gtk.Window):
     def search_new_suite(self, new_id):
         """Search for the existence of a newly created suite in the db"""
         search = "query?q=and+idx+eq+" + str(new_id)
-        if self.attempts < 10:   #this can be repeated up to 10 times
+        #try the search up to 10 times
+        if self.attempts < 10:
             try:
                 results, url = self.search_manager.ws_search(search_text,
                                                              **items)
-            except:
+            except Exception:
                 results = []
             if len(results) == 0:
                 self.attempts += 1
