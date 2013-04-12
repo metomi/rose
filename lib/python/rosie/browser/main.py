@@ -249,10 +249,9 @@ class MainWindow(gtk.Window):
         #poll for new entry in db
         search = "query?q=and+idx+eq+" + str(new_id)
         self.attempts = 0
+        self.not_found = True
         gobject.timeout_add(rosie.browser.CHECKOUT_PAUSE, 
                             self.search_new_suite, new_id)
-                            
-        self.repeat_last_request()
 
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
@@ -709,6 +708,7 @@ class MainWindow(gtk.Window):
         """Retrieve filters from widgets and apply."""
         self.local_updater.update_now()
         filters, proceed = self.advanced_search_widget.get_query()
+        print "filters:", filters
         if proceed:   
             self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                            instant=True)
@@ -1117,17 +1117,23 @@ class MainWindow(gtk.Window):
 
     def search_new_suite(self, new_id):
         """Search for the existence of a newly created suite in the db"""
-        search = "query?q=and+idx+eq+" + str(new_id)
+        filters = ["and idx eq " + str(new_id)]
         #try the search up to 10 times
         if self.attempts < 10:
             try:
-                results, url = self.search_manager.ws_search(search_text,
-                                                             **items)
-            except Exception:
+                items = {}
+                results, url = self.search_manager.ws_query(filters, **items)
+                print "results: ", results
+            except Exception as e:
+                print str(e)
                 results = []
             if len(results) == 0:
+                print "failing to find..."
                 self.attempts += 1
+                return True
             else:
+                print "found..."
+                self.handle_refresh()
                 return False       
         else:
             return False
