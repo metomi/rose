@@ -147,7 +147,7 @@ class SuiteHostSelectEvent(Event):
     """An event raised to report the host for running a suite."""
 
     def __str__(self):
-        return "%s: will run on %s" % self.args
+        return "%s: will %s on %s" % self.args
 
 
 class SuiteLogArchiveEvent(Event):
@@ -684,6 +684,7 @@ class SuiteRunner(Runner):
         if opts.run_mode == "reload":
             if not suite_running_hosts:
                 raise NotRunningError(suite_name)
+            hosts = suite_running_hosts
         else:
             if suite_running_hosts:
                 if opts.force_mode:
@@ -845,7 +846,7 @@ class SuiteRunner(Runner):
                 host = hosts[0]
             else:
                 host = self.host_selector(hosts)[0][0]
-            self.handle_event(SuiteHostSelectEvent(suite_name, host))
+            self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
             # FIXME: values in environ were expanded in the localhost
             self.suite_engine_proc.run(
                     suite_name, host, environ, opts.run_mode, args)
