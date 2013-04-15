@@ -193,7 +193,6 @@ TITLE_HISTORY_NAVIGATION_ERROR = "History navigation error"
 TITLE_INVALID_QUERY = "Error"
 
 # Miscellaneous
-CHECKOUT_PAUSE = 5000
 COPYRIGHT = "(C) British Crown Copyright 2012-3 Met Office."
 DEFAULT_QUERY = "list_my_suites"
 DELIM_KEYVAL = ": "
