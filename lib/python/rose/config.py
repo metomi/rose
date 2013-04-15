@@ -64,7 +64,7 @@ import sys
 CHAR_ASSIGN = "="
 CHAR_COMMENT = "#"
 
-REC_SETTING_ELEMENT = re.compile(r"^(.+?)(?:$|\(([^)]+)\)$)")
+REC_SETTING_ELEMENT = re.compile(r"^(.+?)\(([^)]+)\)$")
 
 
 class ConfigNode(object):
