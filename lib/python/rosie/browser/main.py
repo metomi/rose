@@ -244,14 +244,18 @@ class MainWindow(gtk.Window):
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
                                      type(e).__name__ + ": " + str(e))
             return None
-        self.handle_checkout(id_=new_id)
-        
+
         #poll for new entry in db
         search = "query?q=and+idx+eq+" + str(new_id)
         self.attempts = 0
         self.not_found = True
-        gobject.timeout_add(rosie.browser.CHECKOUT_PAUSE, 
-                            self.search_new_suite, new_id)
+        
+        while self.search_new_suite(new_id):
+            timer.sleep(1)
+        
+        self.repeat_last_request()
+        
+        self.handle_checkout(id_=new_id)
 
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
@@ -1123,17 +1127,13 @@ class MainWindow(gtk.Window):
             try:
                 items = {}
                 results, url = self.search_manager.ws_query(filters, **items)
-                print "results: ", results
             except Exception as e:
                 print str(e)
                 results = []
             if len(results) == 0:
-                print "failing to find..."
                 self.attempts += 1
                 return True
             else:
-                print "found..."
-                self.handle_refresh()
                 return False       
         else:
             return False
