@@ -139,10 +139,10 @@
 ## The default prefix
 #  prefix-default = name1
 ## URL of the repository of an ID prefix
-## e.g. svn://host/PREFIX_ID_svn
+## e.g. svn://host/PREFIX_ID
 #  prefix-location.PREFIX = URL
 ## Source browser URL of the repository of an ID prefix
-## e.g. http://source_browse_host/projects/PREFIX_ID
+## e.g. http://host/projects/PREFIX_ID
 #  prefix-web.PREFIX = URL
 [rosie-id]
 
