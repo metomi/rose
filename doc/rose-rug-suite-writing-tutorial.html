@@ -307,13 +307,13 @@ touch app/navigate/rose-app.conf
       configuration:</p>
       <pre class="prettyprint lang-rose_conf">
 [command]
-default = dead_reckoning.exe
+default=dead_reckoning.exe
 
 [file:report.nl]
-source = namelist:report_nl
+source=namelist:report_nl
 
 [namelist:report_nl]
-l_verbose = .true.
+l_verbose=.true.
 </pre>
     </div>
 
@@ -494,6 +494,7 @@ touch suite.rc
       <pre class="prettyprint lang-cylc">
 #!jinja2
 [cylc]
+    UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = "rose suite-hook --mail --shutdown"
         timeout = 4320 # 3 days

@@ -46,6 +46,7 @@
     <pre class="prettyprint lang-cylc">
 #!jinja2
 [cylc]
+    UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = "rose suite-hook --mail --shutdown"
         timeout = 4320 # 3 days

@@ -99,7 +99,17 @@
       new directory somewhere - e.g. in your homespace) containing a blank
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc</h3>
+
       <pre class="prettyprint lang-cylc">
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
         graph = """
