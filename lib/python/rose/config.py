@@ -64,7 +64,7 @@ import sys
 CHAR_ASSIGN = "="
 CHAR_COMMENT = "#"
 
-REC_SETTING_ELEMENT = re.compile(r"^(.*?)\(?(\d+)\)?$")
+REC_SETTING_ELEMENT = re.compile(r"^(.+?)(?:$|\(([^)]+)\)$)")
 
 
 class ConfigNode(object):
@@ -535,5 +535,10 @@ def sort_settings(setting_1, setting_2):
         text_1, num_1 = match_1.groups()
         text_2, num_2 = match_2.groups()
         if text_1 == text_2:
-            return cmp(int(num_1), int(num_2))
+            if num_1.isdigit():
+                if num_2.isdigit():
+                    return cmp(int(num_1), int(num_2))
+                return -1
+            elif num_2.isdigit():
+                return 1
     return cmp(setting_1, setting_2)
