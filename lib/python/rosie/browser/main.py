@@ -251,7 +251,7 @@ class MainWindow(gtk.Window):
         self.not_found = True
         
         while self.search_new_suite(new_id):
-            timer.sleep(1)
+            timer.sleep(0.1)
         
         self.repeat_last_request()
         
@@ -712,7 +712,6 @@ class MainWindow(gtk.Window):
         """Retrieve filters from widgets and apply."""
         self.local_updater.update_now()
         filters, proceed = self.advanced_search_widget.get_query()
-        print "filters:", filters
         if proceed:   
             self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                            instant=True)
@@ -1122,13 +1121,13 @@ class MainWindow(gtk.Window):
     def search_new_suite(self, new_id):
         """Search for the existence of a newly created suite in the db"""
         filters = ["and idx eq " + str(new_id)]
-        #try the search up to 10 times
-        if self.attempts < 10:
+        #try the search up to 100 times
+        if self.attempts < 100:
             try:
                 items = {}
                 results, url = self.search_manager.ws_query(filters, **items)
             except Exception as e:
-                print str(e)
+                sys.stderr.write(str(e))
                 results = []
             if len(results) == 0:
                 self.attempts += 1
