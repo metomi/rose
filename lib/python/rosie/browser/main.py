@@ -246,9 +246,7 @@ class MainWindow(gtk.Window):
             return None
 
         # Poll for new entry in db.
-        search = "query?q=and+idx+eq+" + str(new_id)
         self.attempts = 0
-        self.not_found = True
         
         while self.search_new_suite(new_id):
             time.sleep(0.1)
