@@ -867,8 +867,11 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">cylc Capabilities (Continued)</h3>
 
       <ul class="incremental">
-        <li>automatically resubmitting failed tasks, optionally with different
-        environments or commands (retries)</li>
+        <li>automatically resubmitting tasks that have failed, optionally with 
+        different environments or commands (retries)</li>
+
+        <li>automatically resubmitting tasks when <em>submission</em> fails 
+        (submission retries)</li>
 
         <li>giving manual control over the status of tasks</li>
 
@@ -996,7 +999,7 @@ COMPUTE_HOST = "voyager_1"
 
     <div class="slide">
       <h3>Good Practice</h3><img class="r-floater" src=
-      "http://upload.wikimedia.org/wikipedia/en/0/0b/Ben_Kenobi.jpg" alt=
+      "http://upload.wikimedia.org/wikipedia/en/thumb/3/32/Ben_Kenobi.png/200px-Ben_Kenobi.png" alt=
       "Ben Kenobi" /><br />
 
       <ul class="incremental">
@@ -1071,7 +1074,7 @@ COMPUTE_HOST = "voyager_1"
 
         <li>Easy stop/start interface</li>
 
-        <li>Get task output,error,state</li>
+        <li>Get task output, error, state</li>
 
         <li>Manual trigger/reset of tasks</li>
       </ul>
