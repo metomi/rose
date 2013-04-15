@@ -109,6 +109,14 @@ class CycleOffset(object):
         return timedelta(**{timedelta_unit: multiplier * amount})
 
 
+class StillRunningError(Exception):
+
+    """An exception raised when trying to clean a running suite."""
+
+    def __str__(self):
+        return "%s: cannot clean, still running on %s" % self.args
+
+
 class CycleOffsetError(ValueError):
     """Unrecognised cycle time offset format."""
 
@@ -231,6 +239,10 @@ class SuiteEngineProcessor(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
+
+    def clean(self, suite_name, host=None):
+        """Remove items created by the previous run of a suite."""
+        raise NotImplementedError()
 
     def get_suite_db_file(self, suite_name):
         """Return the path to the suite runtime database file."""

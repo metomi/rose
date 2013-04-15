@@ -880,10 +880,10 @@ class SuiteRunner(Runner):
                 (ResourceLocator.default().get_conf(), ["rose-suite-run"])]:
             if conf is None:
                 continue
-            node = conf.get(keys + [key], no_ignore=True)
-            if node is None:
+            node_value = conf.get_value(keys + [key])
+            if node_value is None:
                 continue
-            for line in node.value.split("\n"):
+            for line in node_value.strip().splitlines():
                 pattern, value = line.strip().split("=", 1)
                 if pattern.startswith("jinja2:"):
                     section, key = pattern.rsplit(":", 1)
