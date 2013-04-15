@@ -245,13 +245,13 @@ class MainWindow(gtk.Window):
                                      type(e).__name__ + ": " + str(e))
             return None
 
-        #poll for new entry in db
+        # Poll for new entry in db.
         search = "query?q=and+idx+eq+" + str(new_id)
         self.attempts = 0
         self.not_found = True
         
         while self.search_new_suite(new_id):
-            timer.sleep(0.1)
+            time.sleep(0.1)
         
         self.repeat_last_request()
         
@@ -1121,7 +1121,7 @@ class MainWindow(gtk.Window):
     def search_new_suite(self, new_id):
         """Search for the existence of a newly created suite in the db"""
         filters = ["and idx eq " + str(new_id)]
-        #try the search up to 100 times
+        # Try the search up to 100 times.
         if self.attempts < 100:
             try:
                 items = {}
