@@ -406,6 +406,31 @@ rosie create
 rosie lookup 001
 </pre>
 
+    <h3 id="rosie-special-suite">ROSIE special suite</h3>
+    
+    <p>You can define a special suite in each Rosie repository that provides
+    some additional repository-specific data and metadata. The suite ID will
+    end with <samp>ROSIE</samp> - e.g. <samp>mo1-ROSIE</samp>.</p>
+
+    <p>This can be created by running <code>rosie create --meta-suite</code>.</p>
+
+    <h4 id="rosie-special-suite-known-keys">Creating a Known Keys File</h4>
+    
+    <p>You can extend the list of search keys used in the Rosie discovery
+    interfaces (such as <code>rosie go</code>). Create a text file at the root
+    of a <samp>ROSIE</samp> suite working copy called <samp>rosie-keys</samp>.</p>
+    
+    <p>Add a space-delimited list of search keys into the file - for example:</p>
+    <pre>
+sub-project experiment model
+</pre>
+
+    <p>Run <code>fcm add -c</code> and <code>fcm commit</code>. After the
+    commit, these will be added to the list of Rosie interface search keys.</p>
+
+    <p>You can continue to modify the list by changing the file contents and
+    committing.</p>
+
     <h2 id="meta">Storing Configuration Metadata</h2>
 
     <p>Some <a href="rose-configuration.html#meta">configuration metadata</a>
