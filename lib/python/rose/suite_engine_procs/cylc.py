@@ -59,12 +59,18 @@ class CylcProcessor(SuiteEngineProcessor):
         if not os.path.isdir(self.get_suite_dir_rel(suite_name)):
             return
         hosts = ["localhost"]
+        host_file_path = self.get_suite_dir_rel(
+                suite_name, "log", "rose-suite-run.host")
+        if os.access(host_file_path, os.F_OK | os.R_OK):
+            for line in open(host_file_path):
+                hosts.append(line.strip())
         conf = ResourceLocator.default().get_conf()
         hosts_str = conf.get_value(["rose-suite-run", "hosts"])
         if hosts_str:
-            hosts += shlex.split(hosts_str)
-        if self.ping(suite_name, hosts):
-            raise StillRunningError(suite_name, hosts[0])
+            hosts += self.host_selector.expand(shlex.split(hosts_str))[0]
+        running_hosts = self.ping(suite_name, hosts)
+        if running_hosts:
+            raise StillRunningError(suite_name, running_hosts[0])
         job_auths = []
         if os.access(self.get_suite_db_file(suite_name), os.F_OK | os.R_OK):
             try:

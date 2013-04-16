@@ -243,7 +243,8 @@ class Runner(object):
         self.host_selector = host_selector
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
-                    event_handler=event_handler, popen=popen, fs_util=fs_util)
+                    event_handler=event_handler, popen=popen, fs_util=fs_util,
+                    host_selector=host_selector)
         self.suite_engine_proc = suite_engine_proc
 
     def handle_event(self, *args, **kwargs):
