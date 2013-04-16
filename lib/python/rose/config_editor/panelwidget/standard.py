@@ -209,7 +209,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                 parent_data = [row_data[0]] + [None] * len(row_data[1:])
                 parent_iter = store.append(None, parent_data) 
                 store.append(parent_iter, row_data)
-        for extra_index in range(i, len(store.iter_n_children(None))):
+        for extra_index in range(i, store.iter_n_children(None)):
             remove_iter = store.iter_nth_child(None, extra_index)
             store.remove(remove_iter)
         if need_new_store:

@@ -67,12 +67,12 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                                      column=1)
         self.panel_top.set_cell_data_func(self.cell_title,
                                           self._set_title_markup, 2)
+        # The columns in self.data_store correspond to: error_icon,
+        # change_icon, name, title, error and change totals (4),
+        # main tip text, and change text.
         self.data_store = gtk.TreeStore(gtk.gdk.Pixbuf, gtk.gdk.Pixbuf,
                                         str, str, int, int, int, int,
                                         str, str)
-        # Data: error_icon, change_icon,
-        #       name, title, error and change numbers,
-        #       main tip, change text
         resource_loc = rose.resource.ResourceLocator(paths=sys.path)
         image_path = resource_loc.locate('etc/images/rose-config-edit')
         self.null_icon = gtk.gdk.pixbuf_new_from_file(image_path +

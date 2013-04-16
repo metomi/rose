@@ -837,22 +837,22 @@ class MainController(object):
                         return rose.config_editor.TREE_PANEL_TIP_CHANGED_SECTIONS
         return ""
 
-    def tree_trigger_update(self, just_this_namespace=None):
+    def tree_trigger_update(self, only_this_namespace=None):
         """Reload the tree panel, and perform an update.
 
-        If just_this_namespace is not None, perform a selective update
+        If "only_this_namespace" is not None, perform a selective update
         to save time.
 
         """
         if hasattr(self, 'hyper_panel'):
             self.hyper_panel.load_tree(None, self.data.namespace_tree)
-            if just_this_namespace is None:
+            if only_this_namespace is None:
                 self.update_all()
             else:
                 config_name = self.util.split_full_ns(self.data,
-                                                      just_this_namespace)[0]
+                                                      only_this_namespace)[0]
                 self.update_config(config_name)
-                spaces = just_this_namespace.lstrip("/").split("/")
+                spaces = only_this_namespace.lstrip("/").split("/")
                 for i in range(len(spaces), 0, -1):
                     update_ns = "/" + "/".join(spaces[:i])
                     self.update_namespace(update_ns, skip_config_update=True)
@@ -884,13 +884,13 @@ class MainController(object):
         for ns in nses_to_do:
             self.update_namespace(ns, is_loading=is_loading)
 
-    def update_all(self, just_this_config=None, is_loading=False):
+    def update_all(self, only_this_config=None, is_loading=False):
         """Loop over all namespaces and update."""
-        unique_namespaces = self.data.get_all_namespaces(just_this_config)
-        if just_this_config is None:
+        unique_namespaces = self.data.get_all_namespaces(only_this_config)
+        if only_this_config is None:
             configs = self.data.config.keys()
         else:
-            configs = [just_this_config]
+            configs = [only_this_config]
         for config_name in configs:
             self.update_config(config_name)
         self._generate_pagelist()
@@ -1272,7 +1272,7 @@ class MainController(object):
         if config_data.meta_id != new_meta_id:
             config_data.meta_id = new_meta_id
             if not self.metadata_off:
-                self.refresh_metadata(just_this_config=config_name)
+                self.refresh_metadata(only_this_config=config_name)
         
         
 #------------------ Page viewer function -------------------------------------
@@ -1540,15 +1540,15 @@ class MainController(object):
         if not self.metadata_off:
             self.refresh_metadata()
 
-    def refresh_metadata(self, metadata_off=False, just_this_config=None):
+    def refresh_metadata(self, metadata_off=False, only_this_config=None):
         """Switch metadata on/off and reloads namespaces."""
         self.metadata_off = metadata_off
         self._get_menu_widget('/Reload metadata').set_sensitive(
                                                   not self.metadata_off)
-        if just_this_config is None:
+        if only_this_config is None:
             configs = self.data.config.keys()
         else:
-            configs = [just_this_config]
+            configs = [only_this_config]
         for config_name in configs:
             self.data.clear_meta_lookups(config_name)
             config = self.data.dump_to_internal_config(config_name)

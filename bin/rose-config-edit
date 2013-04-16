@@ -40,6 +40,6 @@
 #        Prepend PATH to the search path for metadata (look here first).
 #        This option can be used repeatedly to load multiple paths.
 #     --new
-#        Load without a configuration.
+#        Launch, ignoring any configuration.
 #-------------------------------------------------------------------------------
 exec python -m rose.config_editor.main "$@"

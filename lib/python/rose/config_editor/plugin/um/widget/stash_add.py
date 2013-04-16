@@ -34,13 +34,24 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
 
     STASH_PARSE_DESC_OPT = "name"
 
-    def __init__(self, stash_lookup, sections, variables,
+    def __init__(self, stash_lookup,
                  add_stash_request_func):
+        """Create a widget displaying STASHmaster information.
+
+        stash_lookup is a nested dictionary that uses STASH section
+        numbers and item numbers as a key chain to get the information
+        about a specific record - e.g. stash_lookup[1][0]["name"] may
+        return the 'name' (text description) for stash section 1, item
+        0.
+        
+        add_stash_request_func is a hook function that should take a
+        STASH section number argument and a STASH item number argument,
+        and add this request as a new namelist in a configuration.
+
+        """
         super(AddStashDiagnosticsPanelv1, self).__init__(self)
         self.set_property("homogeneous", False)
         self.stash_lookup = stash_lookup
-        self.sections = sections
-        self.variables = variables
         self.add_stash_request = add_stash_request_func
         self.group_index = 0
         self.control_widget_hbox = self._get_control_widget_box()
@@ -68,20 +79,27 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         column.set_cell_data_func(cell_for_value,
                                   self._set_tree_cell_value)
 
-    def _set_tree_cell_value(self, column, cell, treemodel, iter_):
-        cell.set_property("visible", True)
-        col_index = self._view.get_columns().index(column)
-        value = self._view.get_model().get_value(iter_, col_index)
-        max_len = 30
-        if (value is not None and len(value) > max_len
-            and col_index != 0):
-            cell.set_property("width-chars", max_len)
-            cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        if col_index == 0 and treemodel.iter_parent(iter_) is not None:
-            cell.set_property("visible", False)
-        if value is not None:
-            value = rose.gtk.util.safe_str(value)
-        cell.set_property("markup", value)
+    def generate_tree_view(self, is_startup=False):
+        """Create the summary of page data."""
+        for column in self._view.get_columns():
+            self._view.remove_column(column)
+        self.update_tree_model()
+        for i, column_name in enumerate(self.column_names):
+            col = gtk.TreeViewColumn()
+            col.set_title(column_name.replace("_", "__"))
+            self.add_cell_renderer_for_value(col)
+            if i < len(self.column_names) - 1:
+                col.set_resizable(True)
+            col.set_sort_column_id(i)
+            self._view.append_column(col)
+        if is_startup:
+            group_model = gtk.TreeStore(str)
+            group_model.append(None, [""])
+            for i, name in enumerate(self.column_names):
+                group_model.append(None, [name])
+            self._group_widget.set_model(group_model)
+            self._group_widget.set_active(self.group_index + 1)
+            self._group_widget.connect("changed", self._handle_group_change)
 
     def get_model_data_and_columns(self):
         """Return a list of data tuples and columns"""
@@ -104,55 +122,6 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                             columns.append(prop)
                 data_rows.append(this_row)
         return data_rows, columns
-
-    def set_tree_tip(self, treeview, row_iter, col_index, tip):
-        """Add the hover-over text for a cell to 'tip'.
-        
-        treeview is the gtk.TreeView object
-        row_iter is the gtk.TreeIter for the row
-        col_index is the index of the gtk.TreeColumn in
-        e.g. treeview.get_columns()
-        tip is the gtk.Tooltip object that the text needs to be set in.
-        
-        """
-        model = treeview.get_model()
-        name = self.column_names[col_index]
-        value = model.get_value(row_iter, col_index)
-        if value is None:
-            return False
-        text = name + ": " + str(value) + "\n\n"
-        for column_name in ["Section", "Item", "Description"]:
-            index = self.column_names.index(column_name)
-            value = model.get_value(row_iter, index)
-            text += column_name + ": " + str(value) + "\n"
-        text = text.strip()
-        tip.set_text(text)
-        return True
-
-    def _get_control_widget_box(self):
-        filter_label = gtk.Label(
-                      rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
-        filter_label.show()
-        self._filter_widget = gtk.Entry()
-        self._filter_widget.set_width_chars(
-                     rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
-        self._filter_widget.connect("changed", self._refilter)
-        self._filter_widget.show()
-        group_label = gtk.Label(
-                     rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
-        group_label.show()
-        self._group_widget = gtk.ComboBox()
-        cell = gtk.CellRendererText()
-        self._group_widget.pack_start(cell, expand=True)
-        self._group_widget.add_attribute(cell, 'text', 0)
-        self._group_widget.show()
-        filter_hbox = gtk.HBox()
-        filter_hbox.pack_start(group_label, expand=False, fill=False)
-        filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
-        filter_hbox.pack_end(self._filter_widget, expand=False, fill=False)
-        filter_hbox.pack_end(filter_label, expand=False, fill=False)
-        filter_hbox.show()
-        return filter_hbox
 
     def get_tree_model(self):
         """Construct a data model of other page data."""
@@ -184,39 +153,65 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                            self.sort_util.handle_sort_column_change)
         return sort_model
 
-    def generate_tree_view(self, is_startup=False):
-        """Create the summary of page data."""
-        for column in self._view.get_columns():
-            self._view.remove_column(column)
-        self.update_tree_model()
-        for i, column_name in enumerate(self.column_names):
-            col = gtk.TreeViewColumn()
-            col.set_title(column_name.replace("_", "__"))
-            self.add_cell_renderer_for_value(col)
-            if i < len(self.column_names) - 1:
-                col.set_resizable(True)
-            col.set_sort_column_id(i)
-            self._view.append_column(col)
-        if is_startup:
-            group_model = gtk.TreeStore(str)
-            group_model.append(None, [""])
-            for i, name in enumerate(self.column_names):
-                group_model.append(None, [name])
-            self._group_widget.set_model(group_model)
-            self._group_widget.set_active(self.group_index + 1)
-            self._group_widget.connect("changed", self._handle_group_change)
+    def set_tree_tip(self, treeview, row_iter, col_index, tip):
+        """Add the hover-over text for a cell to 'tip'.
+        
+        treeview is the gtk.TreeView object
+        row_iter is the gtk.TreeIter for the row
+        col_index is the index of the gtk.TreeColumn in
+        e.g. treeview.get_columns()
+        tip is the gtk.Tooltip object that the text needs to be set in.
+        
+        """
+        model = treeview.get_model()
+        name = self.column_names[col_index]
+        value = model.get_value(row_iter, col_index)
+        if value is None:
+            return False
+        text = name + ": " + str(value) + "\n\n"
+        for column_name in ["Section", "Item", "Description"]:
+            index = self.column_names.index(column_name)
+            value = model.get_value(row_iter, index)
+            text += column_name + ": " + str(value) + "\n"
+        text = text.strip()
+        tip.set_text(text)
+        return True
 
     def update_tree_model(self):
+        """Refresh."""
         self._view.set_model(self.get_tree_model())
 
-    def _get_status_from_data(self, node_data):
-        status = ""
-        return status
+    def _append_row_data(self, model, path, iter_, data_rows):
+        # Append new row data.
+        data_rows.append(model.get(iter_))
 
-    def _refilter(self, widget=None):
+    def _apply_grouping(self, data_rows, column_names, group_index=None,
+                        descending=False):
+        # Calculate nesting (grouping) for the data.
+        rows_are_descendants = None
+        if group_index is None:
+            return data_rows, column_names, rows_are_descendants
+        k = group_index
+        data_rows = [r[k:k + 1] + r[0:k] + r[k + 1:] for r in data_rows]
+        column_names.insert(0, column_names.pop(k))
+        data_rows.sort(lambda x, y:
+                       self._sort_row_data(x, y, 0, descending))
+        last_entry = None
+        rows_are_descendants = []
+        for i, row in enumerate(data_rows):
+            if i > 0 and last_entry == row[0]:
+                rows_are_descendants.append(True)
+            else:
+                rows_are_descendants.append(False)
+                last_entry = row[0]
+        return data_rows, column_names, rows_are_descendants  
+
+    def _filter_refresh(self, widget=None):
+        # Hook function that reacts to a change in filter status.
         self._view.get_model().get_model().refilter()
 
     def _filter_visible(self, model, iter_):
+        # This returns whether a row should be visible.
         filt_text = self._filter_widget.get_text()
         if not filt_text:
             return True
@@ -230,8 +225,35 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                 return True
             child_iter = model.iter_next(child_iter)
         return False
+
+    def _get_control_widget_box(self):
+        # Build the control widgets for the dialog.
+        filter_label = gtk.Label(
+                      rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
+        filter_label.show()
+        self._filter_widget = gtk.Entry()
+        self._filter_widget.set_width_chars(
+                     rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
+        self._filter_widget.connect("changed", self._filter_refresh)
+        self._filter_widget.show()
+        group_label = gtk.Label(
+                     rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
+        group_label.show()
+        self._group_widget = gtk.ComboBox()
+        cell = gtk.CellRendererText()
+        self._group_widget.pack_start(cell, expand=True)
+        self._group_widget.add_attribute(cell, 'text', 0)
+        self._group_widget.show()
+        filter_hbox = gtk.HBox()
+        filter_hbox.pack_start(group_label, expand=False, fill=False)
+        filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
+        filter_hbox.pack_end(self._filter_widget, expand=False, fill=False)
+        filter_hbox.pack_end(filter_label, expand=False, fill=False)
+        filter_hbox.show()
+        return filter_hbox
          
     def _handle_activation(self, view, path, column):
+        # React to an activation of a row in the dialog.
         model = view.get_model()
         row_iter = model.get_iter(path)
         col_index = view.get_columns().index(column)       
@@ -252,6 +274,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         return self.add_stash_request(section, item)
 
     def _handle_button_press_event(self, treeview, event):
+        # React to a button press (mouse click).
         pathinfo = treeview.get_path_at_pos(int(event.x),
                                             int(event.y))
         if pathinfo is not None:
@@ -261,6 +284,24 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                     self._handle_activation(treeview, path, col)
             else:
                 self._popup_tree_menu(path, col, event)
+
+    def _handle_group_change(self, combobox):
+        # Handle grouping (nesting) status changes.
+        model = combobox.get_model()
+        col_name = model.get_value(combobox.get_active_iter(), 0)
+        if col_name:
+            group_index = self.column_names.index(col_name)
+            # Any existing grouping changes the order of self.column_names.
+            if (self.group_index is not None and
+                group_index <= self.group_index):
+                group_index -= 1
+        else:
+            group_index = None
+        if group_index == self.group_index:
+            return False
+        self.group_index = group_index
+        self.generate_tree_view()
+        return False  
 
     def _popup_tree_menu(self, path, col, event):
         """Launch a menu for this main treeview row."""
@@ -281,48 +322,25 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         menu.popup(None, None, None, event.button, event.time)
         return False
 
-    def _append_row_data(self, model, path, iter_, data_rows):
-        data_rows.append(model.get(iter_))
+    def _set_tree_cell_value(self, column, cell, treemodel, iter_):
+        # Extract an appropriate value for this cell from the model.
+        cell.set_property("visible", True)
+        col_index = self._view.get_columns().index(column)
+        value = self._view.get_model().get_value(iter_, col_index)
+        max_len = 30
+        if (value is not None and len(value) > max_len
+            and col_index != 0):
+            cell.set_property("width-chars", max_len)
+            cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        if col_index == 0 and treemodel.iter_parent(iter_) is not None:
+            cell.set_property("visible", False)
+        if value is not None:
+            value = rose.gtk.util.safe_str(value)
+        cell.set_property("markup", value)
 
     def _sort_row_data(self, row1, row2, sort_index, descending=False):
+        # Handle column sorting.
         fac = (-1 if descending else 1)
         x = row1[sort_index]
         y = row2[sort_index]
         return fac * self.sort_util.cmp_(x, y)
-
-    def _handle_group_change(self, combobox):
-        model = combobox.get_model()
-        col_name = model.get_value(combobox.get_active_iter(), 0)
-        if col_name:
-            group_index = self.column_names.index(col_name)
-            # Any existing grouping changes the order of self.column_names.
-            if (self.group_index is not None and
-                group_index <= self.group_index):
-                group_index -= 1
-        else:
-            group_index = None
-        if group_index == self.group_index:
-            return False
-        self.group_index = group_index
-        self.generate_tree_view()
-        return False
-
-    def _apply_grouping(self, data_rows, column_names, group_index=None,
-                        descending=False):
-        rows_are_descendants = None
-        if group_index is None:
-            return data_rows, column_names, rows_are_descendants
-        k = group_index
-        data_rows = [r[k:k + 1] + r[0:k] + r[k + 1:] for r in data_rows]
-        column_names.insert(0, column_names.pop(k))
-        data_rows.sort(lambda x, y:
-                       self._sort_row_data(x, y, 0, descending))
-        last_entry = None
-        rows_are_descendants = []
-        for i, row in enumerate(data_rows):
-            if i > 0 and last_entry == row[0]:
-                rows_are_descendants.append(True)
-            else:
-                rows_are_descendants.append(False)
-                last_entry = row[0]
-        return data_rows, column_names, rows_are_descendants    

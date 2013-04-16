@@ -99,10 +99,10 @@ class SectionOperations(object):
         self.__data.add_section_to_config(section, config_name)
         self.__data.load_file_metadata(config_name, section)
         self.__data.load_vars_from_config(config_name,
-                                          just_this_section=section,
+                                          only_this_section=section,
                                           update=True)
         self.__data.load_variable_namespaces(config_name,
-                                             just_this_section=section)
+                                             only_this_section=section)
         metadata = self.__data.get_metadata_for_config_id(section,
                                                           config_name)
         new_section_data.metadata = metadata
@@ -196,7 +196,7 @@ class SectionOperations(object):
             if is_ignored:
                 var.ignored_reason.update(
                             {rose.variable.IGNORED_BY_SECTION:
-                                rose.config_editor.IGNORED_STATUS_MANUAL})
+                             rose.config_editor.IGNORED_STATUS_MANUAL})
             elif rose.variable.IGNORED_BY_SECTION in var.ignored_reason:
                 var.ignored_reason.pop(rose.variable.IGNORED_BY_SECTION)
             else:
@@ -592,7 +592,8 @@ class SubDataOperations(object):
     def __init__(self, config_name,
                  add_section_func, clone_section_func,
                  ignore_section_func, remove_section_func,
-                 remove_sections_func, get_var_id_values_func):
+                 remove_sections_func,
+                 get_var_id_values_func):
         self.config_name = config_name
         self._add_section_func = add_section_func
         self._clone_section_func = clone_section_func

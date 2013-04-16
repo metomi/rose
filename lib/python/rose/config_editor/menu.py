@@ -632,7 +632,7 @@ class Handler(object):
             return False
         base_ns = "/" + base_ns.lstrip("/")
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
-        self.transform_default(just_this_config_name=config_name)
+        self.transform_default(only_this_config_name=config_name)
 
     def get_metadata_and_comments(self, base_ns):
         """Return metadata dict and comments list."""
@@ -1150,11 +1150,11 @@ class Handler(object):
         rose.gtk.run.run_suite(*args)
         return False
 
-    def transform_default(self, just_this_config_name=None):
+    def transform_default(self, only_this_config_name=None):
         """Run the Rose built-in transformer macros."""
-        if (just_this_config_name is not None and
-            just_this_config_name in self.data.config.keys()):
-            config_keys = [just_this_config_name]
+        if (only_this_config_name is not None and
+            only_this_config_name in self.data.config.keys()):
+            config_keys = [only_this_config_name]
             text = rose.config_editor.DIALOG_LABEL_AUTOFIX
         else:
             config_keys = sorted(self.data.config.keys())
