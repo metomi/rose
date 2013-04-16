@@ -20,13 +20,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
@@ -165,8 +164,8 @@
       <dd>
         <p><dfn>used by:</dfn> Rosie, as the normal wrapper on top of
         Subversion; <code>rose suite-run</code> recognises FCM location
-        keywords in file configurations; <code>rose app-run</code> has
-        built-in applications for running <code>fcm make</code>.</p>
+        keywords in file configurations; <code>rose app-run</code> has built-in
+        applications for running <code>fcm make</code>.</p>
 
         <p><dfn>tested with version:</dfn> HEAD.</p>
 
@@ -378,10 +377,10 @@ $ROSE_HOME/sbin/rosa db-create
 setsid sbin/rosa ws 0/dev/null 2&gt;&amp;1 &amp;
 </pre>
 
-    <p>Alternatively you can run the Rosie web service under Apache mod_wsgi. To
-    do this you will need to set up an Apache module configuration file
-    (typically in <samp>/etc/httpd/conf.d/rosie-wsgi.conf</samp>) containing the
-    following (with the paths set appropriately):</p>
+    <p>Alternatively you can run the Rosie web service under Apache mod_wsgi.
+    To do this you will need to set up an Apache module configuration file
+    (typically in <samp>/etc/httpd/conf.d/rosie-wsgi.conf</samp>) containing
+    the following (with the paths set appropriately):</p>
     <pre>
 SetEnv ROSE_HOME /path/to/rose
 SetEnv ROSE_NS rosa
@@ -391,7 +390,8 @@ WSGIPythonPath /path/to/rose/lib/python
 WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
 </pre>
 
-    <p>Use the Apache log at <samp>/var/log/httpd/</samp> to debug problems.</p>
+    <p>Use the Apache log at <samp>/var/log/httpd/</samp> to debug
+    problems.</p>
 
     <p>Hopefully, you should now have a working Rosie service. You can test it
     by running:</p>
@@ -407,20 +407,23 @@ rosie lookup 001
 </pre>
 
     <h3 id="rosie-special-suite">ROSIE special suite</h3>
-    
+
     <p>You can define a special suite in each Rosie repository that provides
     some additional repository-specific data and metadata. The suite ID will
     end with <samp>ROSIE</samp> - e.g. <samp>mo1-ROSIE</samp>.</p>
 
-    <p>This can be created by running <code>rosie create --meta-suite</code>.</p>
+    <p>This can be created by running <code>rosie create
+    --meta-suite</code>.</p>
 
     <h4 id="rosie-special-suite-known-keys">Creating a Known Keys File</h4>
-    
+
     <p>You can extend the list of search keys used in the Rosie discovery
     interfaces (such as <code>rosie go</code>). Create a text file at the root
-    of a <samp>ROSIE</samp> suite working copy called <samp>rosie-keys</samp>.</p>
-    
-    <p>Add a space-delimited list of search keys into the file - for example:</p>
+    of a <samp>ROSIE</samp> suite working copy called
+    <samp>rosie-keys</samp>.</p>
+
+    <p>Add a space-delimited list of search keys into the file - for
+    example:</p>
     <pre>
 sub-project experiment model
 </pre>
