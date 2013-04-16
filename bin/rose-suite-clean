@@ -21,15 +21,15 @@
 #     rose suite-clean
 #
 # SYNOPSIS
-#     rose suite-clean [SUITE-NAME [...]]
+#     rose suite-clean [OPTIONS] [SUITE-NAME [...]]
 #
 # DESCRIPTION
 #     Remove items created by the previous suite runs.
 #
 #     If no argument is specified, use the base-name of $PWD as suite name.
 #
-#     Correctly remove share and work directories and suite runtime directories
-#     on remote job hosts.
+#     Correctly remove share/ and work/ directories and suite runtime
+#     directories on remote job hosts.
 #
 # OPTIONS
 #     --non-interactive, --yes, -y
