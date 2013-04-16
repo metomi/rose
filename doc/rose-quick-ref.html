@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Reference Guide: CLI</title>
+  <meta id="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+    <p><a href=".">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose Reference Guide: Quick Reference</h1>
+
+    <h2 id="rose-cmds">Rose Commands</h2>
+
+    <dl>
+      <dt>rose help</dt>
+
+      <dd>Show the rose help.</dd>
+
+      <dt>rose suite-run</dt>
+
+      <dd>Run the suite in <var>$PWD</var>.</dd>
+
+      <dt>rose suite-run -- --mode=simulation</dt>
+
+      <dd>Run the suite in <var>$PWD</var> in simulation mode, executing all
+      tasks/apps as 'sleep 10'. Useful for checking dependencies.</dd>
+
+      <dt>rose suite-run -C /path/to/suite/</dt>
+
+      <dd>Run a suite in a different directory than <var>$PWD</var>.</dd>
+
+      <dt>rose suite-run -v -v --debug</dt>
+
+      <dd>Run in debug mode.</dd>
+
+      <dt>rose suite-gcontrol</dt>
+
+      <dd>Launch the cylc gui for the suite in <var>$PWD</var>. Short version:
+      <samp>rose sgc</samp>.</dd>
+
+      <dt>rose suite-log-view</dt>
+
+      <dd>Launch the rose suite log viewer.</dd>
+
+      <dt>rose suite-scan</dt>
+
+      <dd>Scan for running suites.</dd>
+
+      <dt>rose suite-shutdown</dt>
+      
+      <dd>Shutdown a running suite in <var>$PWD</var>.</dd>
+
+      <dt>rose edit</dt>
+
+      <dd>Launch <samp>rose config-edit</samp> for the suite in
+      <var>$PWD</var>.</dd>
+      
+      <dt>rose macro -V</dt>
+      
+      <dd>Error check the config in <var>$PWD</var>.</dd>
+      
+      <dt>rose host-select</dt>
+      
+      <dd>Select and print a host from a set of groups or names.</dd>
+      
+    </dl>
+
+    <h2 id="rosie-cmds">Rosie Commands</h2>
+
+    <dl>
+      <dt>rosie go</dt>
+
+      <dd>Checkout local copies of suites.</dd>
+
+      <dt>rosie ls</dt>
+
+      <dd>List the suites checked out to your <var>roses</var> directory.</dd>
+
+      <dt>rosie lookup SEARCH</dt>
+
+      <dd>Run a search for suites containing <var>SEARCH</var> in their
+      <samp>suite.info</samp>.</dd>
+
+      <dt>rosie checkout SUITE</dt>
+
+      <dd>Checkout a copy of suite <var>SUITE</var>.</dd>
+    </dl>
+  </div>
+</body>
+</html>
