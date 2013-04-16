@@ -3,6 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+
   <title>Rose User Guide: Suite Writing Tutorial</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -307,13 +308,13 @@ touch app/navigate/rose-app.conf
       configuration:</p>
       <pre class="prettyprint lang-rose_conf">
 [command]
-default = dead_reckoning.exe
+default=dead_reckoning.exe
 
 [file:report.nl]
-source = namelist:report_nl
+source=namelist:report_nl
 
 [namelist:report_nl]
-l_verbose = .true.
+l_verbose=.true.
 </pre>
     </div>
 
@@ -494,6 +495,7 @@ touch suite.rc
       <pre class="prettyprint lang-cylc">
 #!jinja2
 [cylc]
+    UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = "rose suite-hook --mail --shutdown"
         timeout = 4320 # 3 days
@@ -605,15 +607,15 @@ touch suite.rc
 
     <div class="slide">
       <h3 id="empty-runtime">Runtime definitions</h3>
-      
-      <p>It's important to note that without runtime for each task,
-      our suite will fail validation in <code>rose suite-run</code>. This is
-      because <code>rose suite-run</code> uses strict cylc validation to make
-      sure the dependency tasks are actually the tasks you intended to run.</p>
-     
-      <p>You can switch this behaviour off by using the <samp>--no-strict</samp>
-      option. In this example, we'll just put in runtime sections for each task.</p>
 
+      <p>It's important to note that without runtime for each task, our suite
+      will fail validation in <code>rose suite-run</code>. This is because
+      <code>rose suite-run</code> uses strict cylc validation to make sure the
+      dependency tasks are actually the tasks you intended to run.</p>
+
+      <p>You can switch this behaviour off by using the
+      <samp>--no-strict</samp> option. In this example, we'll just put in
+      runtime sections for each task.</p>
     </div>
 
     <div class="slide">
@@ -621,9 +623,8 @@ touch suite.rc
 
       <p>We need a blank runtime section for <samp>fcm_make_navigate</samp> -
       it doesn't need any extra configuration, beyond root.</p>
-      
-      <p>Add this at the end of the <samp>suite.rc</samp>
-      file:</p>
+
+      <p>Add this at the end of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[fcm_make_navigate]]
 </pre>
@@ -632,8 +633,9 @@ touch suite.rc
     <div class="slide">
       <h3 class="alwayshidden">suite.rc Runtime Environment</h3>
 
-      <p>We'll now add some runtime configuration for <samp>navigate</samp>.</p>
-      
+      <p>We'll now add some runtime configuration for
+      <samp>navigate</samp>.</p>
+
       <p>Add these lines to the end of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[navigate]]
@@ -809,11 +811,11 @@ rose suite-log-view
 
     <div class="slide">
       <h3 class="alwayshidden">Extra Override Dependency</h3>
-      
+
       <p>In order to make the <samp>navigate</samp> task wait for our new
       <samp>take_sun_sight</samp> task, we'll need to add some extra
-      configuration for the <samp>15</samp> hour cycle - add the following lines
-      in the same way as you did for <samp>[[[ 12 ]]]</samp>:
+      configuration for the <samp>15</samp> hour cycle - add the following
+      lines in the same way as you did for <samp>[[[ 12 ]]]</samp>:</p>
       <pre class="prettyprint lang-cylc">
         [[[ 15 ]]]
             graph = """
@@ -821,21 +823,19 @@ rose suite-log-view
             """
 </pre>
     </div>
-    
-    <div class="slide">
-       <h3 class="alwayshidden">Extra Override Dependency Explanation</h3>
-       
-       <p>The caveat with the lines we added above is that it will refuse to
-       start at an initial cycle time at 15 hours - this is because
-       <samp>navigate</samp>
-       now requires the <samp>take_sun_sight[T-3]</samp> task
-       (added in an AND relationship to the existing dependencies in
-       <samp>[[[ 0, 3, 6 ... ]]]</samp>).</p>
-       
-       <p>A good exercise for later would be to have a go at improving it so
-       that it will actually work when the <samp>initial cycle time</samp>
-       ends with <samp>15</samp>.</p>
 
+    <div class="slide">
+      <h3 class="alwayshidden">Extra Override Dependency Explanation</h3>
+
+      <p>The caveat with the lines we added above is that it will refuse to
+      start at an initial cycle time at 15 hours - this is because
+      <samp>navigate</samp> now requires the <samp>take_sun_sight[T-3]</samp>
+      task (added in an AND relationship to the existing dependencies in
+      <samp>[[[ 0, 3, 6 ... ]]]</samp>).</p>
+
+      <p>A good exercise for later would be to have a go at improving it so
+      that it will actually work when the <samp>initial cycle time</samp> ends
+      with <samp>15</samp>.</p>
     </div>
 
     <div class="slide">

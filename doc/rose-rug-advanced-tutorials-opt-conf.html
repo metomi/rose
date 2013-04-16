@@ -102,6 +102,11 @@
     <div class="slide">
       <h3 class="alwayshidden">suite.rc</h3>
       <pre class="prettyprint lang-cylc">
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
         graph = "order_icecream =&gt; eat_icecream"
@@ -303,9 +308,8 @@ opts=chocofudge
       <p>For more information, see:</p>
 
       <ul>
-        <li><a href=
-        "http://metomi.github.com/rose/doc/rose-configuration.html#opts">Rose
-        Configuration Reference</a></li>
+        <li><a href="rose-configuration.html#opts">Rose Configuration
+        Reference</a></li>
 
         <li><a href="rose-command.html#rose-app-run">rose app-run</a></li>
 

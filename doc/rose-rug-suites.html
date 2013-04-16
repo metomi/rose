@@ -246,8 +246,8 @@
     <div class="slide">
       <h3 class="alwayshidden">Hello World Rose Suite</h3>
 
-      <p>Tasks are generic - they can be Rose applications, or generic commands
-      as above.</p>
+      <p>Tasks are generic - they can be Rose applications, or commands or
+      executables as above.</p>
 
       <p>If we wanted to invoke a Rose application, we'd make an app called
       <samp>hello_world</samp>, by making an <samp>app/hello_world/</samp>
@@ -350,7 +350,7 @@ default=echo 'Hello World'
     [[hello_pluto]]
         inherit = FAM_HELLO
         [[[environment]]]
-            IS_WORLD_A_PLANET = true  # Not really.
+            IS_WORLD_A_PLANET = true  # Override.
 </pre>
     </div>
 
@@ -449,6 +449,12 @@ default=echo 'Hello World'
 
       <p>We could then write:</p>
       <pre class="prettyprint lang-cylc">
+    [[hello_pluto]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = Eris
+        [[[remote]]]
+            host = {{ COMPUTE_HOST }}
     [[hello_eris]]
         inherit = FAM_HELLO
         [[[environment]]]
@@ -575,6 +581,7 @@ COMPUTE_HOST = "voyager_1"
       <p><strong>The following should be in every Rose suite:</strong></p>
       <pre class="prettyprint lang-cylc">
 [cylc]
+    UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = "rose suite-hook --mail --shutdown"
         timeout = 4320 # 3 days
@@ -712,7 +719,7 @@ COMPUTE_HOST = "voyager_1"
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "A =&gt; B &amp; C"
+        graph = "a =&gt; b &amp; c"
 </pre>
     </div>
 
@@ -860,8 +867,11 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">cylc Capabilities (Continued)</h3>
 
       <ul class="incremental">
-        <li>automatically resubmitting failed tasks, optionally with different
-        environments or commands (retries)</li>
+        <li>automatically resubmitting tasks that have failed, optionally with 
+        different environments or commands (retries)</li>
+
+        <li>automatically resubmitting tasks when <em>submission</em> fails 
+        (submission retries)</li>
 
         <li>giving manual control over the status of tasks</li>
 
@@ -897,7 +907,7 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Environment Continued</h3>
+      <h3 class="alwayshidden">Environment (2)</h3>
 
       <ul class="incremental">
         <li><var>ROSE_DATA</var>, data directory of the suite.</li>
@@ -906,6 +916,16 @@ COMPUTE_HOST = "voyager_1"
         time.</li>
 
         <li><var>ROSE_ORIG_HOST</var>, host that invoked 'rose suite-run'.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Environment (3)</h3>
+
+      <ul class="incremental">
+        <li><var>ROSE_TASK_LOG_ROOT</var>, log directory for the task that
+        will get retrieved by the hook scripts - files here will be displayed
+        in the output viewer.</li>
       </ul>
     </div>
 
@@ -979,7 +999,7 @@ COMPUTE_HOST = "voyager_1"
 
     <div class="slide">
       <h3>Good Practice</h3><img class="r-floater" src=
-      "http://upload.wikimedia.org/wikipedia/en/0/0b/Ben_Kenobi.jpg" alt=
+      "http://upload.wikimedia.org/wikipedia/en/thumb/3/32/Ben_Kenobi.png/200px-Ben_Kenobi.png" alt=
       "Ben Kenobi" /><br />
 
       <ul class="incremental">
@@ -1054,7 +1074,7 @@ COMPUTE_HOST = "voyager_1"
 
         <li>Easy stop/start interface</li>
 
-        <li>Get task output,error,state</li>
+        <li>Get task output, error, state</li>
 
         <li>Manual trigger/reset of tasks</li>
       </ul>
@@ -1107,14 +1127,16 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h2 id="disk">Tidying Up</h2>
 
-      <p>You can delete a <samp>~/roses/SUITE_NAME/</samp> directory in the
-      normal way (<samp>rm -rf</samp>), or run <samp>rosie delete --local-only
-      SUITE_NAME</samp>.</p>
+      <p>You can delete a <var>~/roses/SUITE_NAME/</var> directory in the
+      normal way (<code>rm -rf</code>), or run <code>rosie delete --local-only
+      SUITE_NAME</code>.</p>
 
-      <p>You can get rid of your suite output in
-      <samp>~/cylc-run/SUITE_NAME/</samp> in the normal way. Note that the
-      <samp>share/</samp> and <samp>work/</samp> subdirectories may be symbolic
-      links to other locations which should also be tidied up.</p>
+      <p>You can delete your suite output in <var>~/cylc-run/SUITE_NAME/</var>
+      in the normal way, or run <code>rose suite-clean SUITE_NAME</code>. The
+      latter removes the actual locations of <var>share/</var> and
+      <var>work/</var> (which may be symbolic links), as well as the
+      <var>~/cylc-run/SUITE_NAME/</var> directory structure in each job host of
+      the latest run.</p>
     </div>
 
     <div class="slide">
