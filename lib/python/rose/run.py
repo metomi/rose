@@ -243,7 +243,8 @@ class Runner(object):
         self.host_selector = host_selector
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
-                    event_handler=event_handler, popen=popen, fs_util=fs_util)
+                    event_handler=event_handler, popen=popen, fs_util=fs_util,
+                    host_selector=host_selector)
         self.suite_engine_proc = suite_engine_proc
 
     def handle_event(self, *args, **kwargs):
@@ -880,10 +881,10 @@ class SuiteRunner(Runner):
                 (ResourceLocator.default().get_conf(), ["rose-suite-run"])]:
             if conf is None:
                 continue
-            node = conf.get(keys + [key], no_ignore=True)
-            if node is None:
+            node_value = conf.get_value(keys + [key])
+            if node_value is None:
                 continue
-            for line in node.value.split("\n"):
+            for line in node_value.strip().splitlines():
                 pattern, value = line.strip().split("=", 1)
                 if pattern.startswith("jinja2:"):
                     section, key = pattern.rsplit(":", 1)
