@@ -113,11 +113,11 @@
 ## method-path=/path/1 /path2
 [rose-ana]
 
-# Configuration related to the databse of the Rosie web service server
+# Configuration related to the database of the Rosie web service server
 #
-## The database location of a given repository prefix
+## The database location of a given repository prefix, from within the server
 #  db.PREFIX = URL
-## The path to the repository of a given prefix
+## The path to the repository of a given prefix, from within the server
 #  repos.PREFIX = URL
 [rosie-db]
 
@@ -139,8 +139,10 @@
 ## The default prefix
 #  prefix-default = name1
 ## URL of the repository of an ID prefix
+## e.g. svn://host/PREFIX_ID
 #  prefix-location.PREFIX = URL
 ## Source browser URL of the repository of an ID prefix
+## e.g. http://host/projects/PREFIX_ID
 #  prefix-web.PREFIX = URL
 [rosie-id]
 
