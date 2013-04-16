@@ -379,7 +379,8 @@ rose config --meta env=SPAM_NUMBER help
         different directory than <samp>$PWD</samp>.</li>
 
         <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>: run with a
-        different <samp>[jinja2:suite.rc]</samp> option setting.</li>
+        different template option setting in the <samp>suite.rc</samp>
+        file.</li>
       </ul>
     </div>
 
@@ -548,8 +549,8 @@ meta=rose-demo-upgrade/27.1
         <li>
           <code>range</code>:
           <pre class="prettyprint lang-rose_conf">
-[namelist:run_snow=min_temp_water_supercool]
-range=this &gt; -48.3
+[namelist:run_em=number_magnetic_poles]
+range=this % 2 == 0 and this &gt;= 2
 </pre>
         </li>
 
@@ -557,7 +558,7 @@ range=this &gt; -48.3
           <code>trigger</code>:
           <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
-trigger=namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
+trigger=namelist:run_snow=num_slushballs: this &gt; 0.5
 </pre>
         </li>
 
@@ -574,18 +575,21 @@ warn-if=this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
     <div class="slide">
       <h4 class="alwayshidden">Configuration Metadata - Logic Syntax</h4>
 
-      <p>More about the syntax:</p>
+      <p>The syntax is a subset of Python with some extra metadata
+      functionality - you can use standard Python operators e.g.:</p>
+      <pre>
+(foo * bar + baz) / wibble &gt;= wobble - flob ** qux
+</pre>
 
-      <ul class="incremental">
-        <li>It's vaguely Pythonic (actually <a href=
-        "http://jinja.pocoo.org/docs/templates/#tests">Jinja2</a>)</li>
+      <p>or</p>
+      <pre>
+"spam" in foo and not bar or (baz and 5 &lt; wibble &lt;= wobble)
+</pre>
 
-        <li>Please forget the Jinja2 part</li>
-
-        <li>You can refer to variables by id (e.g.
-        <samp>namelist:run_snow=max_ok_ice_fraction</samp>) and using
-        <samp>this</samp>.</li>
-      </ul>
+      <p>Where you would normally use a variable name, use an id to refer to
+      the value of a setting (e.g.
+      <samp>namelist:run_snow=max_ok_ice_fraction</samp>) or use
+      <samp>this</samp> as a shorthand for the id of this setting.</p>
     </div>
 
     <div class="slide">
