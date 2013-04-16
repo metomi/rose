@@ -137,7 +137,7 @@ class PageFormatTree(gtk.VBox):
         """Generate the internal content tables."""
         self._ok_content_sections = set([None])
         if self.formats_ok is None:
-            content_sections = self._get_included_sources()
+            content_sections = self._get_available_sections()
             num_format_sections = 0
             for section in content_sections:
                 for format in self.formats:
@@ -147,7 +147,7 @@ class PageFormatTree(gtk.VBox):
                 if num_format_sections > 0:
                     break
             self.formats_ok = (num_format_sections > 0)
-        
+
         formats_check_button = gtk.CheckButton(
                 rose.config_editor.FILE_CONTENT_PANEL_FORMAT_LABEL)
         formats_check_button.set_active(not self.formats_ok)

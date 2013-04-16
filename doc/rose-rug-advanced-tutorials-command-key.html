@@ -97,7 +97,17 @@
       new directory somewhere - e.g. in your homespace) containing a blank
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc</h3>
+
       <pre class="prettyprint lang-cylc">
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
         graph = "gather_ingredients =&gt; breadmaker"
@@ -125,7 +135,7 @@
       <samp>rose-app.conf</samp> file that looks like this:</p>
       <pre class="prettyprint lang-cylc">
 [command]
-default = sleep 10; echo 'fresh bread'
+default=sleep 10; echo 'fresh bread'
 </pre>
     </div>
 
@@ -163,9 +173,9 @@ default = sleep 10; echo 'fresh bread'
       this:</p>
       <pre class="prettyprint lang-cylc">
 [command]
-default = sleep 10; echo 'fresh bread'
-make_dough = sleep 8; echo 'dough for later'
-timed_bread = sleep 15; echo 'fresh bread when you want it'
+default=sleep 10; echo 'fresh bread'
+make_dough=sleep 8; echo 'dough for later'
+timed_bread=sleep 15; echo 'fresh bread when you want it'
 </pre>
     </div>
 
@@ -176,7 +186,7 @@ timed_bread = sleep 15; echo 'fresh bread when you want it'
       the <samp>[[breadmaker]]</samp> task to look like this:</p>
       <pre class="prettyprint lang-cylc">
     [[breadmaker]]
-        command scripting = "rose task-run --command-key='dough'"
+        command scripting="rose task-run --command-key='dough'"
 </pre>
     </div>
 
