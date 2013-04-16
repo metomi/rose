@@ -101,23 +101,23 @@
 
       <p>A Rose suite hierarchy can look a bit like this:</p>
       <pre class="prettyprint">
-rose-suite.conf    # Rose suite configuration file
-suite.rc           # Cylc suite configuration file
-app/               # Apps directory
-    hello_world/   # hello_world app configuration
-        rose-app.conf  # App configuration file
-        meta/      # Metadata configuration for app
-            rose-meta.conf  # Metadata configuration file
-        opt/       # Optional configuration files dir
-            rose-app-informal.conf  # Optional configuration
-    recon/         # recon app configuration
-        rose-app.conf  # App configuration file
-        file/      # Non-Rose files dir for app
-            INITHELLOENV  # Non-Rose file for the app
-bin/               # Suite scripts and executables directory
-    hello.sh       # A script used by the suite
-meta/              # Metadata for the Rose suite configuration
-    rose-meta.conf  # Metadata configuration file
+rose-suite.conf         # Rose suite configuration file
+suite.rc                # Cylc suite configuration file
+app/                    # App configurations:
+  hello_world/          #   hello_world app:
+    rose-app.conf       #     App configuration file
+    meta/               #     Metadata configuration for app:
+      rose-meta.conf    #       Metadata configuration file
+    opt/                #     Optional configuration files:
+      rose-app-hi.conf  #       Optional configuration file
+  recon/                #   recon app:
+    rose-app.conf       #     App configuration file
+    file/               #     Non-Rose-format files:
+      INITHELLOENV      #       Non-Rose-format file
+bin/                    # Suite scripts and executables:
+  hello.sh              #   A script
+meta/                   # Metadata for the Rose suite configuration:
+  rose-meta.conf        #   Metadata configuration file
 </pre>
     </div>
 
