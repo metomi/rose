@@ -1127,14 +1127,16 @@ COMPUTE_HOST = "voyager_1"
     <div class="slide">
       <h2 id="disk">Tidying Up</h2>
 
-      <p>You can delete a <samp>~/roses/SUITE_NAME/</samp> directory in the
-      normal way (<samp>rm -rf</samp>), or run <samp>rosie delete --local-only
-      SUITE_NAME</samp>.</p>
+      <p>You can delete a <var>~/roses/SUITE_NAME/</var> directory in the
+      normal way (<code>rm -rf</code>), or run <code>rosie delete --local-only
+      SUITE_NAME</code>.</p>
 
-      <p>You can get rid of your suite output in
-      <samp>~/cylc-run/SUITE_NAME/</samp> in the normal way. Note that the
-      <samp>share/</samp> and <samp>work/</samp> subdirectories may be symbolic
-      links to other locations which should also be tidied up.</p>
+      <p>You can delete your suite output in <var>~/cylc-run/SUITE_NAME/</var>
+      in the normal way, or run <code>rose suite-clean SUITE_NAME</code>. The
+      latter removes the actual locations of <var>share/</var> and
+      <var>work/</var> (which may be symbolic links), as well as the
+      <var>~/cylc-run/SUITE_NAME/</var> directory structure in each job host of
+      the latest run.</p>
     </div>
 
     <div class="slide">

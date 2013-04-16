@@ -24,6 +24,7 @@ import os
 import re
 from rose.env import env_var_process
 from rose.fs_util import FileSystemUtil
+from rose.host_select import HostSelector
 from rose.popen import RosePopener
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
@@ -107,6 +108,14 @@ class CycleOffset(object):
         if self.sign == self.SIGN_DEFAULT: # negative
             amount = -amount
         return timedelta(**{timedelta_unit: multiplier * amount})
+
+
+class StillRunningError(Exception):
+
+    """An exception raised when trying to clean a running suite."""
+
+    def __str__(self):
+        return "%s: cannot clean, still running on %s" % self.args
 
 
 class CycleOffsetError(ValueError):
@@ -209,8 +218,8 @@ class SuiteEngineProcessor(object):
     TASK_LOG_DELIM = None # Delimiter of task ID in log files
 
     @classmethod
-    def get_processor(
-            cls, key=None, event_handler=None, popen=None, fs_util=None):
+    def get_processor(cls, key=None, event_handler=None, popen=None,
+                      fs_util=None, host_selector=None):
         """Return a processor for the suite engine named by "key"."""
 
         if cls.SCHEME_HANDLER_MANAGER is None:
@@ -218,12 +227,13 @@ class SuiteEngineProcessor(object):
             cls.SCHEME_HANDLER_MANAGER = SchemeHandlersManager(
                     [p], ns="rose.suite_engine_procs", attrs=["SCHEME"],
                     can_handle=None, event_handler=event_handler, popen=popen,
-                    fs_util=fs_util)
+                    fs_util=fs_util, host_selector=host_selector)
         if key is None:
             key = cls.SCHEME_DEFAULT
         return cls.SCHEME_HANDLER_MANAGER.get_handler(key)
 
-    def __init__(self, event_handler=None, popen=None, fs_util=None, **kwargs):
+    def __init__(self, event_handler=None, popen=None, fs_util=None,
+                 host_selector=None, **kwargs):
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -231,6 +241,13 @@ class SuiteEngineProcessor(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
+        if host_selector is None:
+            host_selector = HostSelector(event_handler, popen)
+        self.host_selector = host_selector
+
+    def clean(self, suite_name, host=None):
+        """Remove items created by the previous run of a suite."""
+        raise NotImplementedError()
 
     def get_suite_db_file(self, suite_name):
         """Return the path to the suite runtime database file."""
