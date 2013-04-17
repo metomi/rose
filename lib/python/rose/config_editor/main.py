@@ -1399,7 +1399,8 @@ class MainController(object):
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
                                      text, title)
             return False
-        self.data.load_config(os.path.dirname(new_path), reload_tree_on=True)
+        self.data.load_config(os.path.dirname(new_path), reload_tree_on=True,
+                              skip_load_event=True)
         stack_item = rose.config_editor.stack.StackItem(
                           config_name,
                           rose.config_editor.STACK_ACTION_ADDED,
