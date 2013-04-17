@@ -97,12 +97,29 @@
     </div>
 
     <div class="slide">
-    <h3 class="alwayshidden">Suite Hierarchy</h3>
+      <h3 class="alwayshidden">Suite Hierarchy</h3>
 
-    <div class="handout">
-      <p>A suite hierarchy can look a bit like this:</p>
-    </div><img height="50%" width="60%" src="rose-suite-hierarchy.png" alt=
-    "rose suite hierarchy" /></div>
+      <p>A Rose suite hierarchy can look a bit like this:</p>
+      <pre class="prettyprint">
+rose-suite.conf         # Rose suite configuration file
+suite.rc                # Cylc suite configuration file
+app/                    # App configurations:
+  hello_world/          #   hello_world app:
+    rose-app.conf       #     App configuration file
+    meta/               #     Metadata configuration for app:
+      rose-meta.conf    #       Metadata configuration file
+    opt/                #     Optional configuration files:
+      rose-app-hi.conf  #       Optional configuration file
+  recon/                #   recon app:
+    rose-app.conf       #     App configuration file
+    file/               #     Non-Rose-format files:
+      INITHELLOENV      #       Non-Rose-format file
+bin/                    # Suite scripts and executables:
+  hello.sh              #   A script
+meta/                   # Metadata for the Rose suite configuration:
+  rose-meta.conf        #   Metadata configuration file
+</pre>
+    </div>
 
     <div class="slide">
       <h2 id="formats">Rose Configuration Files</h2>
