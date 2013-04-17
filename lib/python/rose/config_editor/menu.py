@@ -387,8 +387,7 @@ class Handler(object):
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section)
 
-    def add_section_with_options(self, config_name, new_section_name, opt_map=None,
-                                 no_page_launch=False):
+    def add_section_with_options(self, config_name, new_section_name, opt_map=None):
         """Add a section and any compulsory options.
         
         Any option-value pairs in the opt_map dict will also be added.
@@ -396,8 +395,7 @@ class Handler(object):
         """
         start_stack_index = len(self.undo_stack)
         group = rose.config_editor.STACK_GROUP_ADD + "-" + str(time.time())
-        self.sect_ops.add_section(config_name, new_section_name,
-                                  no_page_launch=no_page_launch)
+        self.sect_ops.add_section(config_name, new_section_name)
         namespace = self.data.get_default_namespace_for_section(
                                           new_section_name, config_name)
         config_data = self.data.config[config_name]

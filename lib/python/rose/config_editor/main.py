@@ -866,7 +866,8 @@ class MainController(object):
                     update_ns = "/" + "/".join(spaces[:i])
                     self.update_namespace(update_ns, skip_config_update=True)
 
-    def refresh_ids(self, config_name, setting_ids, is_loading=False):
+    def refresh_ids(self, config_name, setting_ids, is_loading=False,
+                    are_errors_done=False):
         """Refresh and redraw settings if needed."""
         self._generate_pagelist()
         nses_to_do = []
@@ -888,7 +889,7 @@ class MainController(object):
                     index = [p.namespace for p in self.pagelist].index(ns)
                     page = self.pagelist[index]
                     page.refresh(changed_id)
-            if ns not in nses_to_do:
+            if ns not in nses_to_do and not are_errors_done:
                 nses_to_do.append(ns)
         for ns in nses_to_do:
             self.update_namespace(ns, is_loading=is_loading)
@@ -1878,7 +1879,7 @@ class MainController(object):
         if not bad_list:
             self.refresh_ids(config_name,
                              id_error_dict.keys() + id_warn_dict.keys(),
-                             is_loading)
+                             is_loading, are_errors_done=True)
             return
         for bad_report in bad_list:
             section = bad_report.section
@@ -1932,7 +1933,7 @@ class MainController(object):
                 map_.update({setting_id: info})
         self.refresh_ids(config_name,
                          id_error_dict.keys() + id_warn_dict.keys(),
-                         is_loading)
+                         is_loading, are_errors_done=True)
 
     def apply_macro_transform(self, config_name, macro_type, changed_ids):
         """Refresh pages with changes."""

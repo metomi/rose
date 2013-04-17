@@ -415,15 +415,13 @@ class BaseSummaryDataPanel(gtk.VBox):
         menu.popup(None, None, None, event.button, event.time)
         return False
 
-    def add_section(self, section=None, opt_map=None, no_page_launch=False):
+    def add_section(self, section=None, opt_map=None):
         """Add a new section.
 
         section is the optional name for the new section - otherwise
         one will be calculated, if the sub data sections are duplicates
         opt_map is a dictionary of option names and values to add with
         the section
-        no_page_launch controls whether the addition launches a
-        separate page.
 
         """
         if section is None:
@@ -435,8 +433,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             while section in self.sections:
                 i += 1
                 section = section_base + "(" + str(i) + ")"
-        self.sub_ops.add_section(section, opt_map=opt_map,
-                                 no_page_launch=no_page_launch)
+        self.sub_ops.add_section(section, opt_map=opt_map)
         self.scroll_to_section(section)
 
     def copy_section(self, section):

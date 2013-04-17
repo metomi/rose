@@ -335,8 +335,7 @@ class BaseStashSummaryDataPanelv1(
         """Add a new streq namelist."""
         new_opt_map = {self.STREQ_NL_SECT_OPT: section,
                        self.STREQ_NL_ITEM_OPT: item}
-        new_section = self.add_section(None, opt_map=new_opt_map,
-                                       no_page_launch=True)
+        new_section = self.add_section(None, opt_map=new_opt_map)
 
     def generate_package_lookup(self):
         """Store a dictionary of package requests and domains."""
