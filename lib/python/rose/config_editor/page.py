@@ -121,11 +121,15 @@ class ConfigPage(gtk.VBox):
             self.generate_sub_data_panel()
             second_panel = self.sub_data_panel
         self.vpaned = gtk.VPaned()
-        self.vpaned.pack1(self.scrolled_main_window, resize=True,
-                         shrink=True)
-        if second_panel is not None:
-            self.vpaned.pack2(second_panel, resize=False, shrink=True)
-        if not self.panel_data:
+        if self.panel_data:
+            self.vpaned.pack1(self.scrolled_main_window, resize=True,
+                              shrink=True)
+            if second_panel is not None:
+                self.vpaned.pack2(second_panel, resize=False, shrink=True)
+        elif second_panel is not None:
+            self.vpaned.pack1(self.scrolled_main_window, resize=False,
+                              shrink=True)
+            self.vpaned.pack2(second_panel, resize=True, shrink=True)
             self.vpaned.set_position(rose.config_editor.FILE_PANEL_EXPAND)
         self.vpaned.show()
         self.main_vpaned.pack2(self.vpaned)

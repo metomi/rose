@@ -946,13 +946,15 @@ class ConfigDataManager(object):
         for ns in ns_sections:
             self.namespace_meta_lookup.setdefault(ns, {})
             self.namespace_meta_lookup[ns]['sections'] = ns_sections[ns]
-            if len(ns_sections[ns]) == 1:
-                ns_section = ns_sections[ns][0]
+            for ns_section in ns_sections[ns]:
+                # Loop over metadata from contributing sections.
+                # Note: rogue-variable section metadata can be overridden.
                 metadata = self.get_metadata_for_config_id(ns_section,
                                                            config_name)
                 for key, value in metadata.items():
                     if (ns_section not in default_ns_sections.get(ns, []) and
-                        key == rose.META_PROP_TITLE):
+                        key in [rose.META_PROP_TITLE,
+                                rose.META_PROP_DESCRIPTION]):
                         # ns created from variables, not a section - no title.
                         continue
                     self.namespace_meta_lookup[ns].setdefault(key, value)

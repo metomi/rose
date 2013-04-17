@@ -488,8 +488,9 @@ def get_metadata_for_config_id(setting_id, meta_config):
         node = meta_config.get([no_modifier_id], no_ignore=True)
         # Get metadata for namelist:foo
         if node is not None:
-            metadata.update(dict([(o, n.value) for o, n
-                                    in node.value.items()]))
+            for opt, opt_node in node.value.items():
+                if not opt_node.is_ignored():
+                    metadata.update({opt: opt_node.value})
             if rose.META_PROP_TITLE in metadata:
                 metadata.pop(rose.META_PROP_TITLE)
             if (setting_id != search_id and
@@ -499,8 +500,9 @@ def get_metadata_for_config_id(setting_id, meta_config):
     node = meta_config.get([search_id], no_ignore=True)
     # If modifier, get metadata for namelist:foo{bar}
     if node is not None:
-        metadata.update(dict([(o, n.value) for o, n
-                               in node.value.items()]))
+        for opt, opt_node in node.value.items():
+            if not opt_node.is_ignored():
+                metadata.update({opt: opt_node.value})
     if is_element and rose.META_PROP_TITLE in metadata:
         # Individual items of an array should not steal its title
         metadata.pop(rose.META_PROP_TITLE)
