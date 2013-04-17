@@ -442,65 +442,19 @@ default=echo 'Hello World'
     <div class="slide">
       <h3 id="hello-world-jinja2">Jinja2</h3>
 
-      <p>If we had a lot of tasks using this setting, it might become quite
-      duplicated across the <samp>suite.rc</samp> file. cylc supports the use
-      of a templating language, <a href="http://jinja.pocoo.org">Jinja2</a>, to
-      reduce duplication and provide some simple logic.</p>
+      <p>cylc uses a templating language called Jinja2 that you can use to
+      collapse duplicated portions of configuration or insert settings.</p>
 
-      <p>We could then write:</p>
-      <pre class="prettyprint lang-cylc">
-    [[hello_pluto]]
-        inherit = FAM_HELLO
-        [[[environment]]]
-            WORLD = Eris
-        [[[remote]]]
-            host = {{ COMPUTE_HOST }}
-    [[hello_eris]]
-        inherit = FAM_HELLO
-        [[[environment]]]
-            WORLD = Eris
-        [[[remote]]]
-            host = {{ COMPUTE_HOST }}
-</pre>
+      <p>This means that you can embed special instruction code in the
+      <samp>suite.rc</samp> file to generate or insert text that will be
+      expanded at runtime.</p>
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Jinja2 Shebang</h3>
+      <h3 class="alwayshidden">Jinja2 Loop</h3>
 
-      <p>This would also need a <samp>#!jinja2</samp> shebang to the top of the
-      suite.rc file.</p>
-    </div>
-
-    <div class="slide">
-      <h3 id="hello-world-rose-suite-conf">rose-suite.conf</h3>
-
-      <p>We can then store the value of <var>COMPUTE_HOST</var> in a central
-      location, the <samp>rose-suite.conf</samp> file:</p>
-      <pre class="prettyprint lang-rose_conf">
-[jinja2:suite.rc]
-COMPUTE_HOST = "voyager_1"
-</pre>
-
-      <p>Rose will pass in this variable to cylc at runtime, which will fill in
-      the Jinja2 template.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">rose-suite.conf Advantages</h3>
-
-      <p>It's useful to keep commonly-changed variables in the
-      <samp>rose-suite.conf</samp> file, so users don't have to modify the
-      <samp>suite.rc</samp> itself.</p>
-
-      <p>You can also add proper metadata for them such as help, so they have a
-      nice interface in the config editor.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Jinja2 Blocks</h3>
-
-      <p>Jinja2 can be used to collapse duplicated portions of configuration -
-      for example, in an ensemble context. You can use <code>if</code> and
+      <p>This can be especially useful when you have a lot of repetition - for
+      example, in an ensemble context. You can use <code>if</code> and
       <code>for</code> blocks, amongst other things:</p>
       <pre class="prettyprint lang-cylc">
 {%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
@@ -513,9 +467,10 @@ COMPUTE_HOST = "voyager_1"
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Jinja2 Blocks Result</h3>
+      <h3 class="alwayshidden">Jinja2 Result</h3>
 
-      <p>This gets expanded at runtime:</p>
+      <p>This gets processed at runtime, so the file as read in by cylc looks
+      like:</p>
       <pre class="prettyprint lang-cylc">
     [[hello_eris]]
         inherit = FAM_HELLO
@@ -533,6 +488,78 @@ COMPUTE_HOST = "voyager_1"
         inherit = FAM_HELLO
         [[[environment]]]
             WORLD = haumea
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Jinja2 rose-suite.conf</h3>
+
+      <p>You can use Jinja2 to centralise commonly-used settings. Rose supports
+      storing these in the <samp>rose-suite.conf</samp> file - e.g.</p>
+      <pre class="prettyprint lang-rose_conf">
+[jinja2:suite.rc]
+HELLO_WORLDS = ["eris", "pluto", "makemake", "haumea"]
+</pre>
+
+      <p>Rose passes variables in this section into the Jinja2 template at
+      runtime. This means that we can have a <samp>suite.rc</samp> snippet that
+      looks like this:</p>
+      <pre class="prettyprint lang-cylc">
+{%- for WORLD in HELLO_WORLDS %}
+    [[hello_{{ WORLD }}]]
+        inherit = FAM_HELLO
+        [[[environment]]]
+            WORLD = {{ WORLD }}
+{%- endfor %}
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Jinja2 rose-suite.conf Advantages</h3>
+
+      <p>It's useful to keep commonly-changed variables in the
+      <samp>rose-suite.conf</samp> file, so users don't have to modify the
+      <samp>suite.rc</samp> itself.</p>
+
+      <p>You can also add proper metadata for them such as help, so they have a
+      nice interface in the config editor.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Jinja2 rose-suite.conf Setting Example</h3>
+
+      <p>For example, if we had a <samp>suite.rc</samp> setting that looked
+      like this:</p>
+      <pre class="prettyprint lang-cylc">
+        [[[environment]]]
+            INCLUDE_MOONS = {{ HELLO_TO_MOONS }}
+</pre>
+
+      <p>We could have a <samp>rose-suite.conf</samp> file that looked like
+      this:</p>
+      <pre class="prettyprint lang-rose_conf">
+[jinja2:suite.rc]
+HELLO_TO_MOONS=false
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Jinja2 rose-suite.conf Metadata Example</h3>
+
+      <p>We could then write some nice metadata (similar to app metadata) for
+      the <samp>rose-suite.conf</samp> file, such as:</p>
+      <pre class="prettyprint lang-rose_conf">
+[jinja2:suite.rc=HELLO_TO_MOONS]
+help=Decide whether to say hello to the moons of the world
+    =(if any).
+    =
+    =If true, include moons like
+    =http://en.wikipedia.org/wiki/Dysnomia_%28moon%29
+    =If false, ignore them.
+    =
+    =Moons of moons are not supported.
+title=Include Moons when saying hello?
+type=boolean
 </pre>
     </div>
 
@@ -805,7 +832,6 @@ COMPUTE_HOST = "voyager_1"
 
       <p>See the <a href="rose-rug-advanced-tutorials-suicide.html">suicide
       triggering tutorial</a> for more details.</p>
-
     </div>
 
     <div class="slide">
@@ -867,10 +893,10 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">cylc Capabilities (Continued)</h3>
 
       <ul class="incremental">
-        <li>automatically resubmitting tasks that have failed, optionally with 
+        <li>automatically resubmitting tasks that have failed, optionally with
         different environments or commands (retries)</li>
 
-        <li>automatically resubmitting tasks when <em>submission</em> fails 
+        <li>automatically resubmitting tasks when <em>submission</em> fails
         (submission retries)</li>
 
         <li>giving manual control over the status of tasks</li>
@@ -923,9 +949,9 @@ COMPUTE_HOST = "voyager_1"
       <h3 class="alwayshidden">Environment (3)</h3>
 
       <ul class="incremental">
-        <li><var>ROSE_TASK_LOG_ROOT</var>, log directory for the task that
-        will get retrieved by the hook scripts - files here will be displayed
-        in the output viewer.</li>
+        <li><var>ROSE_TASK_LOG_ROOT</var>, log directory for the task that will
+        get retrieved by the hook scripts - files here will be displayed in the
+        output viewer.</li>
       </ul>
     </div>
 
@@ -999,8 +1025,8 @@ COMPUTE_HOST = "voyager_1"
 
     <div class="slide">
       <h3>Good Practice</h3><img class="r-floater" src=
-      "http://upload.wikimedia.org/wikipedia/en/thumb/3/32/Ben_Kenobi.png/200px-Ben_Kenobi.png" alt=
-      "Ben Kenobi" /><br />
+      "http://upload.wikimedia.org/wikipedia/en/thumb/3/32/Ben_Kenobi.png/200px-Ben_Kenobi.png"
+      alt="Ben Kenobi" /><br />
 
       <ul class="incremental">
         <li>Having read the cylc and Rose documentation <em>before writing the
