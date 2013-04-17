@@ -215,15 +215,17 @@ class ConfigDataManager(object):
 
     def load_config(self, config_directory=None,
                     config_name=None, config=None,
-                    reload_tree_on=False, is_discovery=False):
+                    reload_tree_on=False, is_discovery=False,
+                    skip_load_event=False):
         """Load the configuration and meta-data. Load namespaces."""
         is_top_level = False
         if config_directory is None:
             name = "/" + config_name.lstrip("/")
             config = config
             s_config = copy.deepcopy(config)
-            self.signal_load_event(rose.config_editor.LOAD_CONFIG,
-                                   name.lstrip("/"))
+            if not skip_load_event:
+                self.signal_load_event(rose.config_editor.LOAD_CONFIG,
+                                       name.lstrip("/"))
         else:
             config_directory = config_directory.rstrip("/")
             if config_directory != self.top_level_directory:
@@ -241,8 +243,9 @@ class ConfigDataManager(object):
                 # A suite configuration
                 self.load_info_config(config_directory)
                 name = "/" + self.top_level_name + "-conf"
-            self.signal_load_event(rose.config_editor.LOAD_CONFIG,
-                                   name.lstrip("/"))
+            if not skip_load_event:
+                self.signal_load_event(rose.config_editor.LOAD_CONFIG,
+                                       name.lstrip("/"))
             config_path = os.path.join(config_directory, rose.SUB_CONFIG_NAME)
             if not os.path.isfile(config_path):
                 if (os.path.abspath(config_directory) ==
@@ -280,8 +283,9 @@ class ConfigDataManager(object):
         s_var, s_l_var = self.load_vars_from_config(name)
         self.config[name].vars = VarData(var, l_var, s_var, s_l_var)
         
-        self.signal_load_event(rose.config_editor.LOAD_METADATA,
-                               name.lstrip("/"))
+        if not skip_load_event:
+            self.signal_load_event(rose.config_editor.LOAD_METADATA,
+                                   name.lstrip("/"))
         # Process namespaces and ignored statuses.
         self.load_variable_namespaces(name)
         self.load_variable_namespaces(name, from_saved=True)
