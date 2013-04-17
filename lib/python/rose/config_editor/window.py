@@ -136,9 +136,9 @@ class MainWindow(object):
         section_box.show()
         config_name_box.connect('changed',
                                 lambda c: self._reload_choices(
-                                           liststore,
-                                           names[c.get_active()]),
-                                           add_choices)
+                                            liststore,
+                                            names[c.get_active()],
+                                            add_choices))
         section_box.connect('activate',
                             lambda s: add_dialog.response(gtk.RESPONSE_OK))
         vbox = gtk.VBox(spacing=10)
