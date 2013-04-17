@@ -992,12 +992,20 @@ class ConfigDataManager(object):
                               only_this_config_name=None,
                               view_missing=False):
         """Make the tree of namespaces and load to the tree panel."""
+        # Clear the old namespace tree information (selectively if necessary).
         if (only_this_namespace is not None and
             only_this_config_name is None):
             config_name = self.util.split_full_ns(self,
                                                   only_this_namespace)[0]
             only_this_config_name = config_name
-        self.namespace_tree = {}
+            clear_namespace = only_this_namespace.rsplit("/", 1)[0]
+            self.clear_namespace_tree(clear_namespace)
+        elif only_this_config_name is not None:
+            self.clear_namespace_tree(only_this_config_name)
+        else:
+            self.clear_namespace_tree()
+
+        # Reload the information into the tree.
         if only_this_config_name is None:
             configs = self.config.keys()
             configs.sort(rose.config.sort_settings)
@@ -1037,7 +1045,21 @@ class ConfigDataManager(object):
                 self.update_namespace_tree(spaces,
                                            self.namespace_tree,
                                            prev_spaces=[])
+        # Perform an update.
         self.tree_update(only_this_namespace=only_this_namespace)
+
+    def clear_namespace_tree(self, namespace=None):
+        """Clear the namespace tree, or a subtree from namespace."""
+        if namespace is None:
+            spaces = []
+        else:
+            spaces = namespace.lstrip('/').split('/')
+        tree = self.namespace_tree
+        for space in spaces:
+            if space not in tree:
+                break
+            tree = tree[space][0]
+        tree.clear()
 
     def update_namespace_tree(self, spaces, subtree, prev_spaces):
         """Recursively load the namespace tree for a single path (spaces).

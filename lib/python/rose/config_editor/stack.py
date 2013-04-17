@@ -204,6 +204,7 @@ class SectionOperations(object):
         for ns in nses_to_do:
             self.trigger_update(ns)
             self.trigger_info_update(ns)
+            self.trigger_update(config_name)
 
     def remove_section(self, config_name, section, skip_update=False):
         """Remove a section from this configuration."""
@@ -232,7 +233,7 @@ class SectionOperations(object):
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
         if not skip_update:
-            self.__data.reload_namespace_tree(namespace)
+            self.__data.reload_namespace_tree(only_this_namespace=namespace)
 
     def set_section_comments(self, config_name, section, comments):
         """Change the comments field for the section object."""
