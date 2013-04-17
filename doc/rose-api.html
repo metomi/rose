@@ -167,14 +167,14 @@ set_value("20")
         <p>is a keyword argument that stores extra text given to the
         <samp>widget</samp> option in the metadata, if any:</p>
         <pre class="prettyprint lang-rose_conf">
-widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
+widget[rose-config-edit]=modulename.ClassName arg1 arg2 arg3 ...
 </pre>
 
         <p>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
         ..."</code>. This could help configure your widget - for example, for a
         table based widget, you might give the column names</p>:
         <pre class="prettyprint lang-rose_conf">
-widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
+widget[rose-config-edit]=table.TableValueWidget NAME ID WEIGHTING
 </pre>This means that you can write a generic widget and then configure it for
 different cases.
       </dd>

@@ -851,6 +851,18 @@ class ConfigPage(gtk.VBox):
             i += 1
         return widget_list
 
+    def get_main_focus(self):
+        """Retrieve the focus variable widget id."""
+        widget_list = self.get_main_variable_widgets()
+        focus_child = getattr(self.main_container, "focus_child")
+        for widget in widget_list:
+            if focus_child == widget:
+                if hasattr(widget.get_parent(), 'variable'):
+                    return widget.get_parent().variable.metadata['id']
+                elif hasattr(widget, 'variable'):
+                    return widget.variable.metadata['id']
+        return None
+
     def set_main_focus(self, var_id):
         """Set the main focus on the key-matched variable widget."""
         widget_list = self.get_main_variable_widgets()

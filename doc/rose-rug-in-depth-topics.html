@@ -97,15 +97,32 @@
     </div>
 
     <div class="slide">
-    <h3 class="alwayshidden">Suite Hierarchy</h3>
+      <h3 class="alwayshidden">Suite Hierarchy</h3>
 
-    <div class="handout">
-      <p>A suite hierarchy can look a bit like this:</p>
-    </div><img height="50%" width="60%" src="rose-suite-hierarchy.png" alt=
-    "rose suite hierarchy" /></div>
+      <p>A Rose suite hierarchy can look a bit like this:</p>
+      <pre class="prettyprint">
+rose-suite.conf         # Rose suite configuration file
+suite.rc                # Cylc suite configuration file
+app/                    # App configurations:
+  hello_world/          #   hello_world app:
+    rose-app.conf       #     App configuration file
+    meta/               #     Metadata configuration for app:
+      rose-meta.conf    #       Metadata configuration file
+    opt/                #     Optional configuration files:
+      rose-app-hi.conf  #       Optional configuration file
+  recon/                #   recon app:
+    rose-app.conf       #     App configuration file
+    file/               #     Non-Rose-format files:
+      INITHELLOENV      #       Non-Rose-format file
+bin/                    # Suite scripts and executables:
+  hello.sh              #   A script
+meta/                   # Metadata for the Rose suite configuration:
+  rose-meta.conf        #   Metadata configuration file
+</pre>
+    </div>
 
     <div class="slide">
-      <h3>Suite Files</h3>
+      <h2 id="formats">Rose Configuration Files</h2>
 
       <p>There are (only) 5 different types of Rose configuration files:</p>
 
@@ -140,10 +157,10 @@
         <li>modified INI format:
           <pre class="prettyprint lang-rose_conf">
 [command]
-default = hello.exe
+default=hello.exe
 
 [env]
-!!MAX_TARGETS = 5
+!!MAX_TARGETS=5
 
 [!namelist:hello]
 </pre>
@@ -169,7 +186,7 @@ default = hello.exe
 access-list=bob helen mary 
 issue-list=abc:#2231 my-project:#4076
 owner=fred
-project=um
+project=refresh-um-2013
 title=Run XYZ for A, with improved B
 </pre>
     </div>
@@ -182,14 +199,14 @@ title=Run XYZ for A, with improved B
       documentation):</p>
       <pre class="prettyprint lang-rose_conf">
 [jinja2:suite.rc]
-COMPUTE_HOST = mayanstonecircle
-END_TIME = 20121221
+COMPUTE_HOST=mayanstonecircle
+END_TIME=20121221
 
 [file:app/goodbye_world]
-source = fcm:hello_tr/standard_apps/goodbye_world@25678
+source=fcm:hello_tr/standard_apps/goodbye_world@25678
 
 [file:etc/debug.glyph]
-source = /project/hello/mayanpwr0.1/debug.glyph
+source=/project/hello/mayanpwr0.1/debug.glyph
 </pre>
     </div>
 
@@ -203,13 +220,13 @@ source = /project/hello/mayanpwr0.1/debug.glyph
 # Holds bash commands to run (e.g. 'rsync X/ Y/', 'run.exe')
 [command]
 # The usual command:
-default = throw_snowball.exe
+default=throw_snowball.exe
 # A different command, run using the option --command-key=recon:
-recon = reconfigure_snowball.exe
+recon=reconfigure_snowball.exe
 
 # Environment variables set before the command is run
 [env]
-MAX_TARGETS = 5
+MAX_TARGETS=5
 </pre>
     </div>
 
@@ -220,19 +237,19 @@ MAX_TARGETS = 5
 # A file that we want to be constructed.
 [file:local_orography]
 # The file to create a symlink to.
-source = /project/snowball/ctldata/orog_devon
+source=/project/snowball/ctldata/orog_devon
 # mode can also be auto (usually =copy), or mkdir for dirs.
-mode = symlink
+mode=symlink
 
 # Another file - this time built from our namelist.
 [file:snow_nl]
-source = namelist:run_snow
+source=namelist:run_snow
 
 # Our namelist
 [namelist:run_snow]
-snow_consistency = 'good'
-slush_fraction = 0.1
-care_about_shape = .false.
+snow_consistency='good'
+slush_fraction=0.1
+care_about_shape=.false.
 </pre>
     </div>
 
@@ -243,12 +260,12 @@ care_about_shape = .false.
       configuration, and is used to drive the config editor GUI.</p>
       <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow]
-help = This section holds options for configuring the snow
-     = retrieval dynamics.
+help=This section holds options for configuring the snow
+    =retrieval dynamics.
 
 [namelist:run_snow=snow_consistency]
-title = Snow Consistency
-values = 'too dry', 'too icy', 'good'
+title=Snow Consistency
+values='too dry', 'too icy', 'good'
 </pre>
     </div>
 
@@ -256,17 +273,17 @@ values = 'too dry', 'too icy', 'good'
       <h3 class="alwayshidden">rose-meta.conf Continued</h3>
       <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
-description = This specifies the maximum acceptable mass
+description=This specifies the maximum acceptable mass
  fraction of slush.
-title = Slush Fraction
+title=Slush Fraction
 
 [namelist:run_snow=care_about_shape]
-help = If .true., we'll attempt to make the snowball
-     = like this:
-     = http://mrhonner.files.wordpress.com/2011/01/snowball-1.jpg
-     =
-     = Otherwise, it'll just be a heap.
-type = logical
+help=If .true., we'll attempt to make the snowball
+    =like this:
+    =http://mrhonner.files.wordpress.com/2011/01/snowball-1.jpg
+    =
+    =Otherwise, it'll just be a heap.
+type=logical
 </pre>
     </div>
 
@@ -279,11 +296,11 @@ type = logical
       <p>An example site configuration snippet, and a user one:</p>
       <pre class="prettyprint lang-rose_conf">
 [rose-suite-run]
-hosts = localhost
+hosts=localhost
 </pre><br />
       <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
-should-show-ignored = True
+should-show-ignored=True
 </pre>
     </div>
 
@@ -310,11 +327,60 @@ should-show-ignored = True
     </div>
 
     <div class="slide">
+      <h3 id="rose-config">rose config</h3>
+
+      <p>There is a convenient command line utility for accessing Rose
+      configuration information: <a href="rose-command.html#rose-config">rose
+      config</a>.</p>
+
+      <p>You can view your current site and user configuration by running:</p>
+      <pre class="shell">
+rose config
+</pre>
+
+      <p>or to drill down to e.g. the <samp>rose-suite-run</samp>
+      <samp>hosts</samp> value:</p>
+      <pre class="shell">
+rose config rose-suite-run hosts
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose config --file</h3>
+
+      <p>rose config also works for the other Rose formats. For example:</p>
+      <pre class="shell">
+rose config --file=/path/to/rose-app.conf env
+</pre>
+
+      <p>will print the option-value pairs in the <samp>env</samp> section in
+      the <samp>rose-app.conf</samp> file. To print a specific option value,
+      you might run something like:</p>
+      <pre class="shell">
+rose config --file=/path/to/rose-app.conf env SPAM_NUMBER
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose config --meta</h3>
+
+      <p>You can also retrieve metadata values for a Rose configuration setting
+      - for example, running this in an app directory:</p>
+      <pre class="shell">
+rose config --meta env=SPAM_NUMBER help
+</pre>
+
+      <p>returns the help (if any) for the <var>SPAM_NUMBER</var> option in the
+      <samp>env</samp> section.</p>
+    </div>
+
+    <div class="slide">
       <h2 id="run-suite">Running Suites</h2>
 
-      <p>Once you have a suite, you can run it on the command line by invoking
-      <kbd>rose suite-run</kbd> in the top-level suite directory. You can see
-      the available options by typing <kbd>rose help suite-run</kbd>.</p>
+      <p>Once you have a suite with some of these files set up, you can run it
+      on the command line by invoking <kbd>rose suite-run</kbd> in the
+      top-level suite directory. You can see the available options by typing
+      <kbd>rose help suite-run</kbd>.</p>
     </div>
 
     <div class="slide">
@@ -330,7 +396,8 @@ should-show-ignored = True
         different directory than <samp>$PWD</samp>.</li>
 
         <li><kbd>rose suite-run -S COMPUTE_HOST=marys_iphone</kbd>: run with a
-        different <samp>[jinja2:suite.rc]</samp> option setting.</li>
+        different template option setting in the <samp>suite.rc</samp>
+        file.</li>
       </ul>
     </div>
 
@@ -339,16 +406,36 @@ should-show-ignored = True
 
       <ul class="incremental">
         <li><kbd>rose suite-run --install-only</kbd>: construct all
-        rose-suite.conf files, but do not run</li>
+        rose-suite.conf files, but do not run.</li>
 
         <li><kbd>rose suite-run -- --mode=simulation</kbd>: (<kbd>cylc
         run</kbd>option) execute all tasks/apps as 'sleep 10'.</li>
 
-        <li><kbd>rose suite-run -- --hold</kbd>: hold suite on startup</li>
+        <li><kbd>rose suite-run -- --hold</kbd>: hold suite on startup.</li>
 
-        <li><kbd>rose suite-run -v -v --debug</kbd>: debug/get more info</li>
+        <li><kbd>rose suite-run -v -v --debug</kbd>: debug/get more info.</li>
       </ul>
     </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Other Useful Commands</h3>
+      
+      <p>Some useful commands to know about once you have got your suite 
+      running:</p>
+      
+      <ul class="incremental">
+        <li><kbd>rose suite-scan</kbd>: list your running suites.</li>
+        
+        <li><kbd>rose suite-gcontrol</kbd>: launch the cylc gui for the suite 
+        in <var>$PWD</var>.</li>
+
+        <li><kbd>rose suite-shutdown</kbd>: shutdown the suite in 
+        <var>$PWD</var> at the next opportunity.</li>
+      </ul>
+      
+      <p class="incremental">See the <a href="rose-command.html">CLI 
+      documentation</a> for details of further options.</p>
+    </div>  
 
     <div class="slide">
       <h2 id="rosie-go">rosie go</h2>
@@ -499,8 +586,8 @@ meta=rose-demo-upgrade/27.1
         <li>
           <code>range</code>:
           <pre class="prettyprint lang-rose_conf">
-[namelist:run_snow=min_temp_water_supercool]
-range = this &gt; -48.3
+[namelist:run_em=number_magnetic_poles]
+range=this % 2 == 0 and this &gt;= 2
 </pre>
         </li>
 
@@ -508,7 +595,7 @@ range = this &gt; -48.3
           <code>trigger</code>:
           <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=slush_fraction]
-trigger = namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
+trigger=namelist:run_snow=num_slushballs: this &gt; 0.5
 </pre>
         </li>
 
@@ -516,7 +603,7 @@ trigger = namelist:run_snow=max_num_slushballs: 0.5 &lt; this &lt; 0.7
           <code>warn-if</code>:
           <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow=ice_fraction]
-warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
+warn-if=this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
 </pre>
         </li>
       </ul>
@@ -525,18 +612,21 @@ warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
     <div class="slide">
       <h4 class="alwayshidden">Configuration Metadata - Logic Syntax</h4>
 
-      <p>More about the syntax:</p>
+      <p>The syntax is a subset of Python with some extra metadata
+      functionality - you can use standard Python operators e.g.:</p>
+      <pre>
+(foo * bar + baz) / wibble &gt;= wobble - flob ** qux
+</pre>
 
-      <ul class="incremental">
-        <li>It's vaguely Pythonic (actually <a href=
-        "http://jinja.pocoo.org/docs/templates/#tests">Jinja2</a>)</li>
+      <p>or</p>
+      <pre>
+"spam" in foo and not bar or (baz and 5 &lt; wibble &lt;= wobble)
+</pre>
 
-        <li>Please forget the Jinja2 part</li>
-
-        <li>You can refer to variables by id (e.g.
-        <samp>namelist:run_snow=max_ok_ice_fraction</samp>) and using
-        <samp>this</samp>.</li>
-      </ul>
+      <p>Where you would normally use a variable name, use an id to refer to
+      the value of a setting (e.g.
+      <samp>namelist:run_snow=max_ok_ice_fraction</samp>) or use
+      <samp>this</samp> as a shorthand for the id of this setting.</p>
     </div>
 
     <div class="slide">
@@ -598,7 +688,7 @@ warn-if = this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
           true. <code>warn-if</code> is the same, but will flag up a warning
           instead of an error. For example:
           <pre class="prettyprint lang-rose_conf">
-fail-if = any(namelist:test=ctrl_array % this == 0)
+fail-if=any(namelist:test=ctrl_array % this == 0)
 </pre>
         </dd>
       </dl>
@@ -716,12 +806,11 @@ rose macro fib.FibonnaciChecker
     <div class="slide">
       <h3 class="alwayshidden">rose app-upgrade</h3>
 
-      <p>Upgrade macros are the mechanism for making these changes - they are
-      a special form of macro. You can upgrade a configuration that has
-      upgrade macros defined by running <code>rose app-upgrade</code>.</p>
-
+      <p>Upgrade macros are the mechanism for making these changes - they are a
+      special form of macro. You can upgrade a configuration that has upgrade
+      macros defined by running <code>rose app-upgrade</code>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">rose app-upgrade Example</h3>
 
@@ -745,9 +834,9 @@ Accept y/n (default n)?
       <h2 id="rose-stem">rose stem</h2>
 
       <p><code>rose stem</code> is a testing system for use with Rose. It
-      provides a user-friendly way of defining source trees and tasks on the 
-      command line which are then passed by <code>rose stem</code> to the 
-      suite as Jinja2 variables.</p>
+      provides a user-friendly way of defining source trees and tasks on the
+      command line which are then passed by <code>rose stem</code> to the suite
+      as Jinja2 variables.</p>
     </div>
 
     <div class="slide">

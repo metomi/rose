@@ -76,7 +76,7 @@ class FileSystemUtil(object):
             ret = os.unlink(path)
             self.handle_event(FileSystemEvent(FileSystemEvent.DELETE, path))
         elif os.path.isdir(path):
-            ret = shutil.rmtree(path)
+            ret = shutil.rmtree(path, ignore_errors=True)
             event = FileSystemEvent(FileSystemEvent.DELETE, path + "/")
             self.handle_event(event)
 

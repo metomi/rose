@@ -374,8 +374,8 @@ accel-find-next=F3
       <dt><code>owner</code></dt>
 
       <dd>Specify the user ID of the owner of the suite. The owner has full
-      commit access to the suite. Only the owner can delete the suite or pass
-      the suite's ownership to someone else.</dd>
+      commit access to the suite. Only the owner can delete the suite, pass
+      the suite's ownership to someone else or change the access-list.</dd>
 
       <dt><code>project</code></dt>
 
@@ -390,7 +390,8 @@ accel-find-next=F3
       <dd>Specify a list of users with commit access to trunk of the suite. A
       <kbd>*</kbd> in the list means that anyone can commit to the trunk of the
       suite. Setting this blank or omitting the setting means that nobody apart
-      from the owner can commit to the trunk.</dd>
+      from the owner can commit to the trunk. Only the suite owner can change 
+      the access list.</dd>
 
       <dt><code>description</code></dt>
 
@@ -1593,16 +1594,18 @@ meta=my-command/t123
       result in the command being called twice, once on <var>{resultfile}</var>
       and once on <var>{kgo1file}</var>. Some extraction classes such as
       <kbd>OutputGrepper</kbd> require additional information about how to
-      extract the data. This should be placed after the class name, separated
-      from it by a colon.</li>
+      extract the data, such as a pattern to match. This should be placed after
+      the class name, separated from it by a colon.</li>
 
       <li>kgo1file - The path and name of the file containing the known good
       output. Environment variables and the wildcard character <var>*</var> are
-      accepted.</li>
+      accepted. <var>{}</var> is expanded with arguments passed to the
+      application.</li>
 
       <li>resultfile - The path and name of the file containing the output to
-      be compared Environment variables and the wildcard character <kbd>*</kbd>
-      are accepted.</li>
+      be compared. Environment variables and the wildcard character
+      <kbd>*</kbd> are accepted. <var>{}</var> is expanded with arguments
+      passed to the application.</li>
 
       <li>tolerance - For inexact comparisons such as <kbd>Within</kbd>, the
       tolerance should be specified using this variable. Values with a
@@ -1624,6 +1627,13 @@ kgo1file=/path/to/kgo/fort6.pe0
 extract=OutputGrepper:um_initial_norms
 comparison=Within
 tolerance=5%
+</pre>
+    <pre class="prettyprint lang-rose_conf">
+[Compare Gradiant]
+comparison=Exact
+extract=OutputGrepper:' gradJ= \s*(\S+)'
+kgo1file=$SUITE_CONTROL_DIR/log/job/{}.1.1.out
+resultfile=$ROSE_SUITE_DIR/log/job/{}.1.1.out
 </pre>
 
     <h2 id="appendix-ignored-config-edit">Appendix: Config Editor Ignored

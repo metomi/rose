@@ -20,15 +20,19 @@
 """Logic specific to the Cylc suite engine."""
 
 import ast
+from fnmatch import fnmatchcase
 from glob import glob
 import os
 import pwd
 import re
 import rose.config
+from rose.env import env_var_process
 from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
-from rose.suite_engine_proc \
-        import SuiteEngineProcessor, SuiteScanResult, TaskProps
+from rose.resource import ResourceLocator
+from rose.suite_engine_proc import \
+        StillRunningError, SuiteEngineProcessor, SuiteScanResult, TaskProps
+import shlex
 import socket
 import sqlite3
 from time import mktime, sleep, strptime
@@ -44,6 +48,64 @@ class CylcProcessor(SuiteEngineProcessor):
     SUITE_CONF = "suite.rc"
     TASK_ID_DELIM = "."
     TASK_LOG_DELIM = "."
+
+    def clean(self, suite_name):
+        """Remove items created by the previous run of a suite.
+
+        Change to user's $HOME for safety.
+
+        """
+        os.chdir(os.path.expanduser('~'))
+        if not os.path.isdir(self.get_suite_dir_rel(suite_name)):
+            return
+        hosts = ["localhost"]
+        host_file_path = self.get_suite_dir_rel(
+                suite_name, "log", "rose-suite-run.host")
+        if os.access(host_file_path, os.F_OK | os.R_OK):
+            for line in open(host_file_path):
+                hosts.append(line.strip())
+        conf = ResourceLocator.default().get_conf()
+        hosts_str = conf.get_value(["rose-suite-run", "hosts"])
+        if hosts_str:
+            hosts += self.host_selector.expand(shlex.split(hosts_str))[0]
+        running_hosts = self.ping(suite_name, hosts)
+        if running_hosts:
+            raise StillRunningError(suite_name, running_hosts[0])
+        job_auths = []
+        if os.access(self.get_suite_db_file(suite_name), os.F_OK | os.R_OK):
+            try:
+                job_auths = self.get_suite_jobs_auths(suite_name)
+            except sqlite3.OperationalError as e:
+                pass
+        for job_user, job_host in job_auths + [(None, "localhost")]:
+            dirs = [] 
+            for key in ["share", "work"]:
+                item_root = None
+                node_value = conf.get_value(["rose-suite-run", "root-dir-" + key])
+                for line in node_value.strip().splitlines():
+                    pattern, value = line.strip().split("=", 1)
+                    if fnmatchcase(job_host, pattern):
+                        item_root = value.strip()
+                        break
+                if item_root is not None:
+                    dir_rel = self.get_suite_dir_rel(suite_name, key)
+                    item_path_source = os.path.join(item_root, dir_rel)
+                    dirs.append(item_path_source)
+            dirs.append(self.get_suite_dir_rel(suite_name))
+            if (job_user, job_host) == (None, "localhost"):
+                for d in dirs:
+                    d = os.path.realpath(env_var_process(d))
+                    if os.path.exists(d):
+                        self.fs_util.delete(d)
+            else:
+                if job_user:
+                    auth = job_user + "@"
+                if job_host:
+                    auth += job_host
+                else:
+                    auth += "localhost"
+                command = self.popen.get_cmd("ssh", auth, "rm", "-rf") + dirs
+                self.popen(*command)
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
@@ -110,10 +172,11 @@ class CylcProcessor(SuiteEngineProcessor):
         # Read task events from suite runtime database
         conn = sqlite3.connect(self.get_suite_db_file(suite_name))
         c = conn.cursor()
-        EVENTS = {"submitted": "submit",
-                  "started": "init",
-                  "succeeded": "pass",
-                  "failed": "fail",
+        EVENTS = {"submission succeeded": "submit",
+                  "submission failed": "submit-fail",
+                  "execution started": "init",
+                  "execution succeeded": "pass",
+                  "execution failed": "fail",
                   "signaled": "fail"}
         for row in c.execute(
                 "SELECT time,name,cycle,submit_num,event,message"
@@ -131,6 +194,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                  "submits": []}
             submits = data[task_id]["submits"]
             submit_num = int(submit_num)
+            if not submit_num:
+                continue
             while submit_num > len(submits):
                 submits.append({"events": {},
                                 "status": None,
@@ -141,12 +206,22 @@ class CylcProcessor(SuiteEngineProcessor):
             submit = submits[submit_num - 1]
             submit["events"][event] = event_time
             status = None
-            if event in ["pass", "fail"]:
+            if event in ["init"]:
+                if submit["events"]["submit"] is None:
+                    submit["events"]["submit"] = event_time
+            elif event in ["pass", "fail"]:
                 status = event
                 submit["events"]["exit"] = event_time
                 submit["status"] = status
                 if key == "signaled":
                     submit["signal"] = message.rsplit(None, 1)[-1]
+                if submit["events"]["submit"] is None:
+                    submit["events"]["submit"] = event_time
+                if submit["events"]["init"] is None:
+                    submit["events"]["init"] = event_time
+            elif event in ["submit-fail"]:
+                submit["events"]["submit"] = event_time
+                submit["status"] = event
 
         # Locate task log files
         for task_id, task_datum in data.items():
@@ -171,10 +246,11 @@ class CylcProcessor(SuiteEngineProcessor):
         conn = sqlite3.connect(self.get_suite_db_file(suite_name))
         c = conn.cursor()
         auths = []
-        stmt = "SELECT DISTINCT host FROM task_events"
+        stmt = "SELECT DISTINCT misc FROM task_events"
         stmt_args = tuple()
         if task_id:
-            stmt += " WHERE name==? AND cycle==? AND event=='submitted'"
+            stmt += (" WHERE name==? AND cycle==?"
+                     " AND event=='submission succeeded'")
             stmt_args = tuple(task_id.split(self.TASK_ID_DELIM))
         for row in c.execute(stmt, stmt_args):
             if row and "@" in row[0]:

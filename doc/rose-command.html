@@ -122,6 +122,10 @@
 
       <dd>(=suite-log-view)</dd>
 
+      <dt><a href="#rose-suite-clean">rose suite-clean</a></dt>
+
+      <dd>Remove items created by the previous suite runs.</dd>
+
       <dt><a href="#rose-suite-gcontrol">rose suite-gcontrol</a></dt>
 
       <dd>Launch suite engine's suite control GUI for a suite.</dd>
@@ -747,19 +751,19 @@
     settings are:</p>
 
     <dl>
-      <dt><kbd>default = GROUP/HOST ...</kbd></dt>
+      <dt><kbd>default=GROUP/HOST ...</kbd></dt>
 
       <dd>The default arguments to use for this command.</dd>
 
-      <dt><kbd>group{NAME} = GROUP/HOST ...</kbd></dt>
+      <dt><kbd>group{NAME}=GROUP/HOST ...</kbd></dt>
 
       <dd>Declare a named group of hosts.</dd>
 
-      <dt><kbd>method{NAME} = METHOD[:METHOD-ARG]</kbd></dt>
+      <dt><kbd>method{NAME}=METHOD[:METHOD-ARG]</kbd></dt>
 
       <dd>Declare the default ranking method for a group of hosts.</dd>
 
-      <dt><kbd>thresholds{NAME} = [METHOD[:METHOD-ARG]:]VALUE</kbd></dt>
+      <dt><kbd>thresholds{NAME}=[METHOD[:METHOD-ARG]:]VALUE</kbd></dt>
 
       <dd>Declare the default threshold(s) for a group of hosts.</dd>
     </dl>
@@ -1100,6 +1104,47 @@
     <h2 id="rose-slv">rose slv</h2>
 
     <p>See <a href="#rose-suite-log-view">rose suite-log-view</a>.</p>
+
+    <h2 id="rose-suite-clean">rose suite-clean</h2>
+
+    <h3>NAME</h3>
+
+    <p><kbd>rose suite-clean</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <p><kbd>rose suite-clean [OPTIONS] [SUITE-NAME [...]]</kbd></p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Remove items created by the previous suite runs.</p>
+
+    <p>If no argument is specified, use the base-name of <var>$PWD</var> as
+    the suite name.</p>
+
+    <p>Correctly remove the <var>share/</var> and <var>work/</var> directories
+    and suite runtime directories on remote job hosts.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
+
+      <dd>Switch off interactive prompting (=answer yes to everything).</dd>
+
+      <dt><kbd>--quiet, -q</kbd></dt>
+
+      <dd>Decrement verbosity.</dd>
+
+      <dt><kbd>--verbose, -v</kbd></dt>
+
+      <dd>Increment verbosity.</dd>
+    </dl>
+
+    <h3>DIAGNOSTICS</h3>
+
+    <p>Return the difference between the number of arguments and number of
+    successfully cleaned suites, i.e. <samp>0</samp> if all successful.</p>
 
     <h2 id="rose-suite-gcontrol">rose suite-gcontrol</h2>
 

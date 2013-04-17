@@ -20,6 +20,7 @@
 
 import ast
 import functools
+import gobject
 import os
 import re
 import shlex
@@ -243,8 +244,16 @@ class MainWindow(gtk.Window):
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
                                      type(e).__name__ + ": " + str(e))
             return None
-        self.handle_checkout(id_=new_id)
+
+        # Poll for new entry in db.
+        self.attempts = 0
+        
+        while self.search_new_suite(new_id):
+            time.sleep(0.1)
+        
         self.repeat_last_request()
+        
+        self.handle_checkout(id_=new_id)
 
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
@@ -1106,6 +1115,25 @@ class MainWindow(gtk.Window):
         if args is None:
             return False
         self._run_suite(args)
+
+    def search_new_suite(self, new_id):
+        """Search for the existence of a newly created suite in the db"""
+        filters = ["and idx eq " + str(new_id)]
+        # Try the search up to 100 times.
+        if self.attempts < 100:
+            try:
+                items = {}
+                results, url = self.search_manager.ws_query(filters, **items)
+            except Exception as e:
+                sys.stderr.write(str(e))
+                results = []
+            if len(results) == 0:
+                self.attempts += 1
+                return True
+            else:
+                return False       
+        else:
+            return False
 
     def set_config(self, editor, config):
         """Assign the updated config."""

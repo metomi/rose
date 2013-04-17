@@ -147,7 +147,7 @@ class SuiteHostSelectEvent(Event):
     """An event raised to report the host for running a suite."""
 
     def __str__(self):
-        return "%s: will run on %s" % self.args
+        return "%s: will %s on %s" % self.args
 
 
 class SuiteLogArchiveEvent(Event):
@@ -243,7 +243,8 @@ class Runner(object):
         self.host_selector = host_selector
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
-                    event_handler=event_handler, popen=popen, fs_util=fs_util)
+                    event_handler=event_handler, popen=popen, fs_util=fs_util,
+                    host_selector=host_selector)
         self.suite_engine_proc = suite_engine_proc
 
     def handle_event(self, *args, **kwargs):
@@ -684,6 +685,7 @@ class SuiteRunner(Runner):
         if opts.run_mode == "reload":
             if not suite_running_hosts:
                 raise NotRunningError(suite_name)
+            hosts = suite_running_hosts
         else:
             if suite_running_hosts:
                 if opts.force_mode:
@@ -845,7 +847,7 @@ class SuiteRunner(Runner):
                 host = hosts[0]
             else:
                 host = self.host_selector(hosts)[0][0]
-            self.handle_event(SuiteHostSelectEvent(suite_name, host))
+            self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
             # FIXME: values in environ were expanded in the localhost
             self.suite_engine_proc.run(
                     suite_name, host, environ, opts.run_mode, args)
@@ -879,10 +881,10 @@ class SuiteRunner(Runner):
                 (ResourceLocator.default().get_conf(), ["rose-suite-run"])]:
             if conf is None:
                 continue
-            node = conf.get(keys + [key], no_ignore=True)
-            if node is None:
+            node_value = conf.get_value(keys + [key])
+            if node_value is None:
                 continue
-            for line in node.value.split("\n"):
+            for line in node_value.strip().splitlines():
                 pattern, value = line.strip().split("=", 1)
                 if pattern.startswith("jinja2:"):
                     section, key = pattern.rsplit(":", 1)

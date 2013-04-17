@@ -493,7 +493,7 @@ class Handler(object):
         name, meta = self.mainwindow.launch_new_config_dialog(root)
         if name is None:
             return False
-        config_name = "/" + self.data.top_level_name + "/" + name
+        config_name = "/" + name
         self._add_config(config_name, meta)
 
     def delete_request(self, namespace_list, skip_update=False):
