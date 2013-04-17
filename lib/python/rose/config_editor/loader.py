@@ -436,9 +436,10 @@ class ConfigDataManager(object):
             if update:
                 id_list = [v.metadata['id'] for v in var_map[section]]
                 if var_id in id_list:
-                    for var in var_map[section]:
+                    for i, var in enumerate(var_map[section]):
                         if var.metadata['id'] == var_id:
                             var_map[section].pop(i)
+                            break
             var_map[section].append(rose.variable.Variable(
                                                   option,
                                                   node.value,
