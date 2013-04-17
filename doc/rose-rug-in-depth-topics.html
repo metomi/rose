@@ -389,16 +389,36 @@ rose config --meta env=SPAM_NUMBER help
 
       <ul class="incremental">
         <li><kbd>rose suite-run --install-only</kbd>: construct all
-        rose-suite.conf files, but do not run</li>
+        rose-suite.conf files, but do not run.</li>
 
         <li><kbd>rose suite-run -- --mode=simulation</kbd>: (<kbd>cylc
         run</kbd>option) execute all tasks/apps as 'sleep 10'.</li>
 
-        <li><kbd>rose suite-run -- --hold</kbd>: hold suite on startup</li>
+        <li><kbd>rose suite-run -- --hold</kbd>: hold suite on startup.</li>
 
-        <li><kbd>rose suite-run -v -v --debug</kbd>: debug/get more info</li>
+        <li><kbd>rose suite-run -v -v --debug</kbd>: debug/get more info.</li>
       </ul>
     </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Other Useful Commands</h3>
+      
+      <p>Some useful commands to know about once you have got your suite 
+      running:</p>
+      
+      <ul class="incremental">
+        <li><kbd>rose suite-scan</kbd>: list your running suites.</li>
+        
+        <li><kbd>rose suite-gcontrol</kbd>: launch the cylc gui for the suite 
+        in <var>$PWD</var>.</li>
+
+        <li><kbd>rose suite-shutdown</kbd>: shutdown the suite in 
+        <var>$PWD</var> at the next opportunity.</li>
+      </ul>
+      
+      <p class="incremental">See the <a href="rose-command.html">CLI 
+      documentation</a> for details of further options.</p>
+    </div>  
 
     <div class="slide">
       <h2 id="rosie-go">rosie go</h2>
