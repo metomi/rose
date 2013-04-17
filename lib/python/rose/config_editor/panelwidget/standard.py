@@ -567,7 +567,11 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
                 else:
                     row_data.append(rose.gtk.util.safe_str(var.value))
             data_rows.append(row_data)
-        column_names = [rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE]
+        if self.is_duplicate:
+            sect_name = rose.config_editor.SUMMARY_DATA_PANEL_INDEX_TITLE
+        else:
+            sect_name = rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE
+        column_names = [sect_name]
         column_names += sub_var_names
         return data_rows, column_names
 
