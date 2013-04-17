@@ -82,7 +82,8 @@ class SectionOperations(object):
         self.view_page_func = view_page_func
         self.kill_page_func = kill_page_func
 
-    def add_section(self, config_name, section, skip_update=False):
+    def add_section(self, config_name, section, skip_update=False,
+                    page_launch=False):
         """Add a section to this configuration."""
         config_data = self.__data.config[config_name]
         new_section_data = None
@@ -118,6 +119,8 @@ class SectionOperations(object):
                           (config_name, section, skip_update))
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
+        if page_launch and not skip_update:
+            self.view_page_func(ns)
         if not skip_update:
             self.trigger_update(ns)
 

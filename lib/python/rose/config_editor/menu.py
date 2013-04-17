@@ -385,7 +385,7 @@ class Handler(object):
         config_name, section = self.mainwindow.launch_add_dialog(
                                     config_names, choices_help, help_str)
         if config_name in self.data.config and section is not None:
-            self.sect_ops.add_section(config_name, section)
+            self.sect_ops.add_section(config_name, section, page_launch=True)
 
     def add_section_with_options(self, config_name, new_section_name, opt_map=None):
         """Add a section and any compulsory options.
