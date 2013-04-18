@@ -53,6 +53,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         super(BaseSummaryDataPanel, self).__init__()
         self.sections = sections
         self.variables = variables
+        self._section_data_list = None
         self._last_column_names = []
         self.column_names = []
         self.sect_ops = sect_ops
@@ -232,6 +233,11 @@ class BaseSummaryDataPanel(gtk.VBox):
         self._last_column_names = self.column_names
         return should_redraw
 
+    def set_focus_node_id(self, node_id):
+        """Set the focus on a particular node id, if possible."""
+        section, option = self.util.get_section_option_from_id(node_id)
+        self.scroll_to_section(section)
+
     def update(self, sections=None, variables=None):
         """Update the summary of page data."""
         if sections is not None:
@@ -263,6 +269,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                     group_model.append(None, [""])
                 self._group_widget.set_model(group_model)
                 self._group_widget.set_active(start_index)
+        model = self._view.get_model()
         for this_row in expanded_rows:
             self._view.expand_to_path(this_row)
 
@@ -296,6 +303,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             text += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP
         if isinstance(node_data, rose.section.Section):
             # Modified status
+            section = node_data.metadata["id"]
             if self.sect_ops.is_section_modified(node_data):
                 text += mod_markup
             else:
@@ -471,6 +479,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         if iter_ is not None:
             path = self._view.get_model().get_path(iter_)
             self._view.scroll_to_cell(path)
+            self._view.set_cursor(path)
 
     def get_section_iter(self, section):
         """Get the gtk.TreeIter of this section."""
@@ -559,7 +568,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
             id_ = self.util.get_id_from_section_option(section, option)
             node_data = self.var_id_map.get(id_)
         cell.set_property("markup",
-                          self._get_status_from_data(node_data))
+                          self.get_status_from_data(node_data))
 
     def get_model_data(self):
         """Construct a data model of other page data."""

@@ -176,7 +176,7 @@ class SectionOperations(object):
                 if error in my_errors:
                     sect_data.error.pop(error)
             action = rose.config_editor.STACK_ACTION_ENABLED
-        ns = sect_data["full_ns"]
+        ns = sect_data.metadata["full_ns"]
         copy_sect_data = sect_data.copy()
         stack_item = rose.config_editor.stack.StackItem(
                           ns,
@@ -240,7 +240,7 @@ class SectionOperations(object):
         old_sect_data = sect_data.copy()
         last_comments = old_sect_data.comments
         sect_data.comments = comments
-        ns = sect_data["full_ns"]
+        ns = sect_data.metadata["full_ns"]
         stack_item = rose.config_editor.stack.StackItem(
                              ns,
                              rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
@@ -251,15 +251,14 @@ class SectionOperations(object):
         del self.__redo_stack[:]
         self.trigger_update(ns)
 
-    def is_section_modified(self, config_name, section):
+    def is_section_modified(self, section_object):
         """Check against the last saved section object reference."""
-        section = section_object.metadata['id']
-        print section_object.metadata
-        namespace = section_object.metadata['full_ns']
+        section = section_object.metadata["id"]
+        namespace = section_object.metadata["full_ns"]
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         config_data = self.__data.config[config_name]
-        this_section = config_data.now.get(section)
-        save_section = config_data.save.get(section)
+        this_section = config_data.sections.now.get(section)
+        save_section = config_data.sections.save.get(section)
         if this_section is None:
             # Ghost variable, check absence from saved list.
             if save_section is not None:
@@ -269,6 +268,32 @@ class SectionOperations(object):
             if save_section is None:
                 return True
             return this_section.to_hashable() != this_section.to_hashable()
+
+    def get_section_changes(self, section_object):
+        """Return text describing changes since the last save."""
+        section = section_object.metadata["id"]
+        namespace = section_object.metadata["full_ns"]
+        config_name = self.__util.split_full_ns(self.__data, namespace)[0]
+        config_data = self.__data.config[config_name]
+        this_section = config_data.sections.now.get(section)
+        save_section = config_data.sections.save.get(section)
+        if this_section is None:
+            if save_section is not None:
+                return rose.config_editor.KEY_TIP_ADDED
+            # Ignore both-missing scenarios (no actual diff in output).
+            return ""
+        if save_section is None:
+            return rose.config_editor.KEY_TIP_MISSING
+        if this_section.to_hashable() == save_section.to_hashable():
+            return ""
+        if this_section.comments != save_section.comments:
+            return rose.config_editor.KEY_TIP_CHANGED_COMMENTS
+        # The difference must now be in the ignored state.
+        if rose.variable.IGNORED_BY_SYSTEM in this_section.ignored_reason:
+            return rose.config_editor.KEY_TIP_TRIGGER_IGNORED
+        if rose.variable.IGNORED_BY_USER in this_section.ignored_reason:
+            return rose.config_editor.KEY_TIP_USER_IGNORED
+        return rose.config_editor.KEY_TIP_ENABLED       
 
     def get_ns_metadata_files(self, namespace):
         """Retrieve filenames within the metadata for this namespace."""

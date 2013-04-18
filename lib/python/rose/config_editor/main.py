@@ -808,10 +808,10 @@ class MainController(object):
             if config_name not in self.data.saved_config_names:
                 return rose.config_editor.TREE_PANEL_TIP_ADDED_CONFIG
             section_hashes = []
-            for sect, sect_data in config_sections.now.items():
+            for sect, sect_data in sorted(config_sections.now.items()):
                 section_hashes.append(sect_data.to_hashable())
             old_section_hashes = []
-            for sect, sect_data in config_sections.save.items():
+            for sect, sect_data in sorted(config_sections.save.items()):
                 old_section_hashes.append(sect_data.to_hashable())
             if set(section_hashes) ^ set(old_section_hashes):
                 return rose.config_editor.TREE_PANEL_TIP_CHANGED_CONFIG
@@ -1274,6 +1274,18 @@ class MainController(object):
         if isinstance(self.mainwindow.log_window,
                       rose.config_editor.stack.StackViewer):
             self.mainwindow.log_window.update()
+
+    def focus_sub_page_if_open(self, namespace, node_id):
+        """Focus the sub (summary) page for a namespace and id."""
+        if "/" not in namespace:
+            return False
+        summary_namespace = namespace.rsplit("/", 1)[0]
+        self._generate_pagelist()
+        page_namespaces = [p.namespace for p in self.pagelist]
+        if summary_namespace not in page_namespaces:
+            return False
+        page = self.pagelist[page_namespaces.index(summary_namespace)]
+        page.set_sub_focus(node_id)
 
     def update_metadata_id(self, config_name):
         """Update the metadata if the id has changed."""
@@ -1968,6 +1980,7 @@ class MainController(object):
         group = do_list[0].group
         is_group = len(do_list) > 1
         stack_info = []
+        namespace_id_map = {}
         for stack_item in do_list:
             node = stack_item.node
             node_id = node.metadata.get('id')
@@ -2018,7 +2031,13 @@ class MainController(object):
                 self.data.reload_namespace_tree()
             page = None
             if is_group:
+                # Store namespaces and ids for later updating.
                 stack_info.extend([namespace, stack_item.page_label])
+                namespace_id_map.setdefault(namespace, [])
+                namespace_id_map[namespace].append(node_id)
+                if namespace != stack_item.page_label:
+                    namespace_id_map.setdefault(stack_item.page_label, [])
+                    namespace_id_map[stack_item.page_label].append(node_id)
             elif self.data.is_ns_in_tree(namespace):
                 if not node_is_section:
                     # Section operations should not require pages.
@@ -2035,8 +2054,13 @@ class MainController(object):
                         self.update_status(page)
                 self.update_bar_sensitivity()
                 self.update_stack_viewer_if_open()
+            if not is_group:
+                self.focus_sub_page_if_open(namespace, node_id)
         for namespace in set(stack_info):
             self.data.reload_namespace_tree(namespace)
+            # Use the last node_id for a sub page focus (if any).
+            focus_id = namespace_id_map[namespace][-1]
+            self.focus_sub_page_if_open(namespace, focus_id)
         return True
 
 # ----------------------- System functions -----------------------------------

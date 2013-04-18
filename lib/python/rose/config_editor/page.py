@@ -882,6 +882,11 @@ class ConfigPage(gtk.VBox):
                 return True
         return False
 
+    def set_sub_focus(self, node_id):
+        if (self.sub_data is not None and
+            hasattr(self.sub_data_panel, "set_focus_node_id")):
+            self.sub_data_panel.set_focus_node_id(node_id)
+
     def react_to_show_modes(self, mode_key, is_mode_on):
         self.show_modes[mode_key] = is_mode_on
         if hasattr(self.main_container, 'show_mode_change'):

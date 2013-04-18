@@ -156,6 +156,7 @@ class BaseStashSummaryDataPanelv1(
         sub_var_names = []
         self.var_id_map = {}
         section_sect_item = {}
+        # Apply the correct default sorting (section, item)
         for section, variables in self.variables.items():
             for variable in variables:
                 self.var_id_map[variable.metadata["id"]] = variable
@@ -176,9 +177,9 @@ class BaseStashSummaryDataPanelv1(
                         value = int(variable.value)
                     except (TypeError, ValueError):
                         value = variable.value
-                    if len(section_sect_item[section]) < 2:
+                    while len(section_sect_item[section]) < 2:
                         section_sect_item[section].append(None)
-                    section_sect_item[section].append(value)
+                    section_sect_item[section][1] = value
         sub_sect_names.sort(lambda x, y: cmp(section_sect_item.get(x),
                                              section_sect_item.get(y)))
         sub_var_names.sort(rose.config.sort_settings)
@@ -188,6 +189,7 @@ class BaseStashSummaryDataPanelv1(
                                         (x == self.STREQ_NL_ITEM_OPT))
         sub_var_names.sort(lambda x, y: (y == self.STREQ_NL_SECT_OPT) -
                                         (x == self.STREQ_NL_SECT_OPT))
+        # Load the data.
         data_rows = []
         for section in sub_sect_names:
             row_data = []
@@ -218,6 +220,7 @@ class BaseStashSummaryDataPanelv1(
                     row_data.append(rose.gtk.util.safe_str(var.value))
             row_data.append(section)
             data_rows.append(row_data)
+        # Set the column names and their ordering.
         column_names = [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]
         column_names += sub_var_names + [self.SECTION_INDEX_TITLE]
         return data_rows, column_names
@@ -251,19 +254,25 @@ class BaseStashSummaryDataPanelv1(
         section = view.get_model().get_value(row_iter, sect_index)
         if section is None:
             return False
-        if col_index == sect_index:
+        col_name = self.column_names[col_index]
+        if (col_index == sect_index or
+            col_name in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]):
             option = None
             if section not in self.sections:
                 return False
             id_data = self.sections[section]
-            tip_text = section
+            if col_index == sect_index:
+                tip_text = section
+            elif col_name in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]:
+                tip_text = str(view.get_model().get_value(row_iter,
+                                                          col_index))
+                tip_text += "\n" + section
         else:
             option = self.column_names[col_index]
             id_ = self.util.get_id_from_section_option(section, option)
-            if (id_ not in self.var_id_map and
-                option in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]):
-                tip.set_text(
-                        str(view.get_model().get_value(row_iter, col_index)))
+            if (id_ not in self.var_id_map):
+                tip.set_text(str(
+                        view.get_model().get_value(row_iter, col_index)))
                 return True
             id_data = self.var_id_map[id_]
             value = str(view.get_model().get_value(row_iter, col_index))
@@ -282,9 +291,12 @@ class BaseStashSummaryDataPanelv1(
                     rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
                                                                 key, value))
         for key in id_data.ignored_reason:
-            tip_text += key + "\n"
-        if option is not None:
+            tip_text += "({0})\n".format(key)
+        if option is None:
+            change_text = self.sect_ops.get_section_changes(id_data)
+        else:
             change_text = self.var_ops.get_var_changes(id_data)
+        if change_text:
             tip_text += change_text + "\n"
         tip.set_text(tip_text.rstrip())
         return True

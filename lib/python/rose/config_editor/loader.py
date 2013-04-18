@@ -898,7 +898,7 @@ class ConfigDataManager(object):
         node_id = node.metadata.get('id')
         section, option = self.util.get_section_option_from_id(node_id)
         subspace = node.metadata.get(rose.META_PROP_NS)
-        if subspace is None:
+        if subspace is None or option is None:
             new_namespace = self.get_default_namespace_for_section(
                                              section, config_name)
         else:
@@ -938,15 +938,15 @@ class ConfigDataManager(object):
             if sect not in ns_sections[ns]:
                 ns_sections[ns].append(sect)
         default_ns_sections = {}
-        for section in config_data.sections.get_all():
+        for section_data in config_data.sections.get_all():
             # Use the default section namespace.
-            ns = section.metadata["full_ns"]
+            ns = section_data.metadata["full_ns"]
             ns_sections.setdefault(ns, [])
-            if section.name not in ns_sections[ns]:
-                ns_sections[ns].append(section.name)
+            if section_data.name not in ns_sections[ns]:
+                ns_sections[ns].append(section_data.name)
             default_ns_sections.setdefault(ns, [])
-            if section.name not in default_ns_sections[ns]:
-                default_ns_sections[ns].append(section.name)
+            if section_data.name not in default_ns_sections[ns]:
+                default_ns_sections[ns].append(section_data.name)
         for ns in ns_sections:
             self.namespace_meta_lookup.setdefault(ns, {})
             self.namespace_meta_lookup[ns]['sections'] = ns_sections[ns]
@@ -1162,7 +1162,7 @@ class ConfigDataManager(object):
         config_name = self.util.split_full_ns(self, ns)[0]
         config_data = self.config[config_name]
         for sect, sect_data in config_data.sections.now.items():
-            sect_ns = sect_data["full_ns"]
+            sect_ns = sect_data.metadata["full_ns"]
             if sect_ns.startswith(ns):
                 sub_data['sections'].update({sect: sect_data})
         sub_data["get_var_id_values_func"] = (
@@ -1235,7 +1235,7 @@ class ConfigDataManager(object):
             for var in self.config[config_name].vars.get_all(no_latent=True):
                 all_namespaces.append(var.metadata["full_ns"])
             for sect_data in self.config[config_name].sections.now.values():
-                all_namespaces.append(sect_data["full_ns"])
+                all_namespaces.append(sect_data.metadata["full_ns"])
         unique_namespaces = []
         for ns in all_namespaces:
             if ns not in unique_namespaces:
