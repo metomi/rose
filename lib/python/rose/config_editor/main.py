@@ -808,10 +808,10 @@ class MainController(object):
             if config_name not in self.data.saved_config_names:
                 return rose.config_editor.TREE_PANEL_TIP_ADDED_CONFIG
             section_hashes = []
-            for sect, sect_data in sorted(config_sections.now.items()):
+            for sect, sect_data in config_sections.now.items():
                 section_hashes.append(sect_data.to_hashable())
             old_section_hashes = []
-            for sect, sect_data in sorted(config_sections.save.items()):
+            for sect, sect_data in config_sections.save.items():
                 old_section_hashes.append(sect_data.to_hashable())
             if set(section_hashes) ^ set(old_section_hashes):
                 return rose.config_editor.TREE_PANEL_TIP_CHANGED_CONFIG
