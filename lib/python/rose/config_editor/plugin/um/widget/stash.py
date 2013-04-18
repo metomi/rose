@@ -233,8 +233,9 @@ class BaseStashSummaryDataPanelv1(
         section = model.get_value(row_iter, sect_index)
         if section is None:
             return cell.set_property("markup", None)
-        if col_index == sect_index:
-            node_data = self.sections.get(section)
+        if (col_index == sect_index or
+            self.column_names[col_index] == self.DESCRIPTION_TITLE):
+            node_data = self.sections.get(section)          
         else:
             option = self.column_names[col_index]
             if option is None:
@@ -242,7 +243,7 @@ class BaseStashSummaryDataPanelv1(
             id_ = self.util.get_id_from_section_option(section, option)
             node_data = self.var_id_map.get(id_)
         cell.set_property("markup",
-                          self._get_status_from_data(node_data))
+                          self.get_status_from_data(node_data))
 
     def set_tree_tip(self, view, row_iter, col_index, tip):
         """(Override) Set the TreeView Tooltip."""

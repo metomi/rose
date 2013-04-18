@@ -1037,7 +1037,7 @@ class Handler(object):
                 metadata = self.data.get_metadata_for_config_id(
                                          var_id, config_name)
                 variable = rose.variable.Variable(opt, value, metadata)
-                self.data.load_ns_for_variable(variable, config_name)
+                self.data.load_ns_for_node(variable, config_name)
                 self.var_ops.add_var(variable)
                 var = self.data.get_variable_by_id(var_id, config_name)
                 continue

@@ -281,22 +281,42 @@ class BaseSummaryDataPanel(gtk.VBox):
             col.set_sort_column_id(i)
             treeview.append_column(col)
 
-    def _get_status_from_data(self, node_data):
-        status = ""
+    def get_status_from_data(self, node_data):
+        """Return markup corresponding to changes since the last save."""
+        text = ""
+        mod_markup = rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
+        err_markup = rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP
         if node_data is None:
             return None
         if rose.variable.IGNORED_BY_SYSTEM in node_data.ignored_reason:
-            status += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP
+            text += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP
         elif rose.variable.IGNORED_BY_USER in node_data.ignored_reason:
-            status += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP
+            text += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP
         if rose.variable.IGNORED_BY_SECTION in node_data.ignored_reason:
-            status += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP
-        if (isinstance(node_data, rose.variable.Variable) and
-            self.var_ops.is_var_modified(node_data)):
-            status += rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
-        if node_data.error:
-            status += rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP
-        return status
+            text += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP
+        if isinstance(node_data, rose.section.Section):
+            # Modified status
+            if self.sect_ops.is_section_modified(node_data):
+                text += mod_markup
+            else:
+                for var in self.variables.get(section, []):
+                    if self.var_ops.is_var_modified(var):
+                        text += mod_markup
+                        break
+            # Error status
+            if node_data.error:
+                text += err_markup
+            else:
+                for var in self.variables.get(section, []):
+                    if var.error:
+                        text += err_markup
+                        break
+        elif isinstance(node_data, rose.variable.Variable):
+            if self.var_ops.is_var_modified(node_data):
+                text += mod_markup
+            if node_data.error:
+                text += err_markup
+        return text
 
     def _refilter(self, widget=None):
         self._view.get_model().get_model().refilter()

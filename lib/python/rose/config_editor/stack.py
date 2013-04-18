@@ -97,17 +97,17 @@ class SectionOperations(object):
             new_section_data = rose.section.Section(section, [], metadata)
         config_data.sections.now.update({section: new_section_data})
         self.__data.add_section_to_config(section, config_name)
+        self.__data.load_ns_for_node(new_section_data, config_name)
         self.__data.load_file_metadata(config_name, section)
         self.__data.load_vars_from_config(config_name,
                                           only_this_section=section,
                                           update=True)
-        self.__data.load_variable_namespaces(config_name,
-                                             only_this_section=section)
+        self.__data.load_node_namespaces(config_name,
+                                         only_this_section=section)
         metadata = self.__data.get_metadata_for_config_id(section,
                                                           config_name)
-        new_section_data.metadata = metadata
-        ns = self.__data.get_default_namespace_for_section(section, 
-                                                           config_name)
+        new_section_data.process_metadata(metadata)
+        ns = new_section_data.metadata["full_ns"]
         if not skip_update:
             self.__data.reload_namespace_tree(ns)
         copy_section_data = new_section_data.copy()
@@ -176,8 +176,7 @@ class SectionOperations(object):
                 if error in my_errors:
                     sect_data.error.pop(error)
             action = rose.config_editor.STACK_ACTION_ENABLED
-        ns = self.__data.get_default_namespace_for_section(section,
-                                                           config_name)
+        ns = sect_data["full_ns"]
         copy_sect_data = sect_data.copy()
         stack_item = rose.config_editor.stack.StackItem(
                           ns,
@@ -214,8 +213,7 @@ class SectionOperations(object):
                              {section: old_section_data})
         if section in config_data.vars.now:
             config_data.vars.now.pop(section)
-        namespace = self.__data.get_default_namespace_for_section(
-                                                      section, config_name)
+        namespace = old_section_data.metadata["full_ns"]
         ns_list = [namespace]
         for ns, values in self.__data.namespace_meta_lookup.items():
             sections = values.get('sections')
@@ -242,8 +240,7 @@ class SectionOperations(object):
         old_sect_data = sect_data.copy()
         last_comments = old_sect_data.comments
         sect_data.comments = comments
-        ns = self.__data.get_default_namespace_for_section(
-                                                   section, config_name)
+        ns = sect_data["full_ns"]
         stack_item = rose.config_editor.stack.StackItem(
                              ns,
                              rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
@@ -253,6 +250,25 @@ class SectionOperations(object):
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
         self.trigger_update(ns)
+
+    def is_section_modified(self, config_name, section):
+        """Check against the last saved section object reference."""
+        section = section_object.metadata['id']
+        print section_object.metadata
+        namespace = section_object.metadata['full_ns']
+        config_name = self.__util.split_full_ns(self.__data, namespace)[0]
+        config_data = self.__data.config[config_name]
+        this_section = config_data.now.get(section)
+        save_section = config_data.save.get(section)
+        if this_section is None:
+            # Ghost variable, check absence from saved list.
+            if save_section is not None:
+                return True
+        else:
+            # Real variable, check value and presence in saved list.
+            if save_section is None:
+                return True
+            return this_section.to_hashable() != this_section.to_hashable()
 
     def get_ns_metadata_files(self, namespace):
         """Retrieve filenames within the metadata for this namespace."""

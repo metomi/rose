@@ -727,11 +727,11 @@ class MainController(object):
             return
         namespace = page.namespace
         config_name = self.util.split_full_ns(self.data, namespace)[0]
-        self.data.load_variable_namespaces(config_name, from_saved=True)
+        self.data.load_node_namespaces(config_name, from_saved=True)
         config_data, ghost_data = self.data.get_data_for_namespace(
                                             namespace, from_saved=True)
         page.reload_from_data(config_data, ghost_data)
-        self.data.load_variable_namespaces(config_name)
+        self.data.load_node_namespaces(config_name)
         self.update_status(page)
 
     def _generate_pagelist(self):
@@ -1594,8 +1594,8 @@ class MainController(object):
                         var, l_var, s_var, s_l_var)
             config_data.meta_files = meta_files
             config_data.macros = macros
-            self.data.load_variable_namespaces(config_name)
-            self.data.load_variable_namespaces(config_name, from_saved=True)
+            self.data.load_node_namespaces(config_name)
+            self.data.load_node_namespaces(config_name, from_saved=True)
             self.data.load_ignored_data(config_name)
             self.data.load_metadata_for_namespaces(config_name)
         self.data.reload_namespace_tree()
@@ -1975,8 +1975,11 @@ class MainController(object):
             if node_id is None:
                 # Not a variable or section
                 namespace = stack_item.page_label
+                node_is_section = False
             else:
                 # A variable or section
+                sect, opt = self.util.get_section_option_from_id(node_id)
+                node_is_section = (opt is None)
                 namespace = node.metadata.get('full_ns')
                 if namespace is None:
                     namespace = stack_item.page_label
@@ -1985,13 +1988,11 @@ class MainController(object):
                 node.process_metadata(
                      self.data.get_metadata_for_config_id(node_id,
                                                           config_name))
-                if isinstance(node, rose.variable.Variable):
-                    self.data.load_ns_for_variable(node, config_name)
-                    namespace = node.metadata.get('full_ns')
-                else:
-                    namespace = self.data.get_default_namespace_for_section(
-                                                      node_id, config_name)
-            if not is_group and self.data.is_ns_in_tree(namespace):
+                self.data.load_ns_for_node(node, config_name)
+                namespace = node.metadata.get('full_ns')
+            if (not is_group and
+                self.data.is_ns_in_tree(namespace) and
+                not node_is_section):
                 page = self.view_page(namespace, node_id)
             redo_items = [x for x in self.redo_stack]
             if stack_item.undo_args:
@@ -2019,17 +2020,19 @@ class MainController(object):
             if is_group:
                 stack_info.extend([namespace, stack_item.page_label])
             elif self.data.is_ns_in_tree(namespace):
-                page = self.view_page(namespace, node_id)
-                self.sync_page_var_lists(page)
-                page.sort_data()
-                page.refresh(node_id)
-                page.update_ignored()
-                page.update_info()
-                page.set_main_focus(node_id)
-                self.set_current_page_indicator(page.namespace)
-                if namespace != stack_item.page_label:
-                    # Make sure the right status update is made.
-                    self.update_status(page)
+                if not node_is_section:
+                    # Section operations should not require pages.
+                    page = self.view_page(namespace, node_id)
+                    self.sync_page_var_lists(page)
+                    page.sort_data()
+                    page.refresh(node_id)
+                    page.update_ignored()
+                    page.update_info()
+                    page.set_main_focus(node_id)
+                    self.set_current_page_indicator(page.namespace)
+                    if namespace != stack_item.page_label:
+                        # Make sure the right status update is made.
+                        self.update_status(page)
                 self.update_bar_sensitivity()
                 self.update_stack_viewer_if_open()
         for namespace in set(stack_info):
