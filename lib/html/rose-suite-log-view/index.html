@@ -190,6 +190,9 @@ $(function() {
 
     /* Convert a time delta in seconds to a M:SS string. */
     function timedelta2string(s) {
+        if (s < 0) {
+            return "0:00";
+        }
         var minute = Math.floor(s / 60).toString();
         var second = Math.round(s % 60).toString();
         if (second.length == 1) {
