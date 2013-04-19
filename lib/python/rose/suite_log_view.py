@@ -57,6 +57,7 @@ class WebBrowserEvent(Event):
 class SuiteLogViewGenerator(object):
     """Generate the log view for a suite."""
 
+    VIEW_DATA_FILE_NAME = "rose-suite-log.json"
     NS = "rose-suite-log-view"
     MAX_ATTEMPTS = 5
 
@@ -143,7 +144,7 @@ class SuiteLogViewGenerator(object):
                 self.handle_event(FileSystemEvent(FileSystemEvent.INSTALL,
                                                   name, source))
                 os.utime(name, None)
-        # (Re-)Create JOB.json
+        # (Re-)Create view data file
         suite_info = {}
         suite_info_file_name = self.suite_engine_proc.get_suite_dir(
                 suite_name, "rose-suite.info")
@@ -154,22 +155,24 @@ class SuiteLogViewGenerator(object):
                     suite_info[key] = node.value
         data = {"suite": suite_name,
                 "suite_info": suite_info,
-                "tasks": {},
+                "cycles": {},
                 "updated_at": time()}
         suite_db_file = self.suite_engine_proc.get_suite_db_file(suite_name)
         if os.path.exists(suite_db_file):
-            suite_db_file_size_prev = None
-            suite_db_file_size = os.stat(suite_db_file).st_size
-            while suite_db_file_size != suite_db_file_size_prev:
-                data["tasks"] = self.suite_engine_proc.get_suite_events(
+            prev_mtime = None
+            if os.access(self.VIEW_DATA_FILE_NAME, os.F_OK | os.R_OK):
+                prev_mtime = os.stat(self.VIEW_DATA_FILE_NAME).st_mtime
+            this_mtime = os.stat(suite_db_file).st_mtime
+            while prev_mtime is None or prev_mtime < this_mtime:
+                data["cycles"] = self.suite_engine_proc.get_suite_events(
                         suite_name)
                 data["updated_at"] = time()
-                suite_db_file_size_prev = suite_db_file_size
-                suite_db_file_size = os.stat(suite_db_file).st_size
-        f = open("JOB.json", "w")
+                prev_mtime = this_mtime
+                this_mtime = os.stat(suite_db_file).st_mtime
+        f = open(self.VIEW_DATA_FILE_NAME, "w")
         json.dump(data, f, indent=0)
         f.close()
-        self.handle_event(FileSystemEvent("update", "JOB.json"))
+        self.handle_event(FileSystemEvent("update", self.VIEW_DATA_FILE_NAME))
         return
 
     def update_job_log(self, suite_name, task_ids=None):

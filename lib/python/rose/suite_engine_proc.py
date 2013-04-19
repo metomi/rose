@@ -273,10 +273,8 @@ class SuiteEngineProcessor(object):
     def get_suite_events(self, suite_name):
         """Get suite events.
         Return a data structure that looks like:
-        {   <task_id>: {
-                "name": <name>,
-                "cycle_time": <cycle time string>,
-                "submits": [
+        {   <cycle time string>: {
+                <task name>: [
                     {   "events": {
                             "submit": <seconds-since-epoch>,
                             "init": <seconds-since-epoch>,
@@ -292,9 +290,10 @@ class SuiteEngineProcessor(object):
                         "status": <"pass"|"fail">,
                     },
                     # ... more re-submits of the task
-                ]
+                ],
+                # ... more task names
             }
-            # ... more task IDs
+            # ... more cycle times
         }
         """
         raise NotImplementedError()

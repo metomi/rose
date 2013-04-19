@@ -135,10 +135,8 @@ class CylcProcessor(SuiteEngineProcessor):
         """Parse the cylc suite running database for task events.
 
         Return a data structure that looks like:
-        {   <task_id>: {
-                "name": <name>,
-                "cycle_time": <cycle time string>,
-                "submits": [
+        {   <cycle time string>: {
+                <task name>: [
                     {   "events": {
                             "submit": <seconds-since-epoch>,
                             "init": <seconds-since-epoch>,
@@ -154,9 +152,10 @@ class CylcProcessor(SuiteEngineProcessor):
                         "status": <"pass"|"fail">,
                     },
                     # ... more re-submits of the task
-                ]
+                ],
+                # ... more task names
             }
-            # ... more task IDs
+            # ... more cycle times
         }
         """
         for i in range(3): # 3 retries
@@ -188,11 +187,11 @@ class CylcProcessor(SuiteEngineProcessor):
                 continue
             event_time = mktime(strptime(time, "%Y-%m-%dT%H:%M:%S"))
             task_id = name + self.TASK_ID_DELIM + cycle_time
-            if task_id not in data:
-                data[task_id] = {"name": name,
-                                 "cycle_time": cycle_time,
-                                 "submits": []}
-            submits = data[task_id]["submits"]
+            if cycle_time not in data:
+                data[cycle_time] = {}
+            if name not in data[cycle_time]:
+                data[cycle_time][name] = []
+            submits = data[cycle_time][name]
             submit_num = int(submit_num)
             if not submit_num:
                 continue
@@ -224,19 +223,19 @@ class CylcProcessor(SuiteEngineProcessor):
                 submit["status"] = event
 
         # Locate task log files
-        for task_id, task_datum in data.items():
-            name = task_datum["name"]
-            cycle_time = task_datum["cycle_time"]
-            for i, submit in enumerate(task_datum["submits"]):
-                root = "job/" + self.TASK_LOG_DELIM.join([name, cycle_time,
-                                                          str(i + 1)])
-                for path in glob(root + "*"):
-                    key = path[len(root) + 1:]
-                    if not key:
-                        key = "script"
-                    elif key == "status":
-                        continue
-                    submit["files"][key] = {"n_bytes": os.stat(path).st_size}
+        for cycle_time, datum in data.items():
+            for name, submits in datum.items():
+                for i, submit in enumerate(submits):
+                    delim = self.TASK_LOG_DELIM
+                    root = "job/" + delim.join([name, cycle_time, str(i + 1)])
+                    for path in glob(root + "*"):
+                        key = path[len(root) + 1:]
+                        if not key:
+                            key = "script"
+                        elif key == "status":
+                            continue
+                        size = os.stat(path).st_size
+                        submit["files"][key] = {"n_bytes": size}
         return data
 
     def get_suite_jobs_auths(self, suite_name, task_id=None):
