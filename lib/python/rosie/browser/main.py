@@ -246,9 +246,9 @@ class MainWindow(gtk.Window):
             return None
 
         # Poll for new entry in db.
-        self.attempts = 0
-        
-        while self.search_new_suite(new_id):
+        attempts = 0
+        while not self.search_suite(new_id) and attempts < 100:
+            attempts += 1
             time.sleep(0.1)
         
         self.repeat_last_request()
@@ -618,11 +618,18 @@ class MainWindow(gtk.Window):
         """"Handles deletion of a suite."""
         to_delete = self.get_selected_suite_id()
         if self.suite_director.delete(to_delete, *args):
+            # Poll for suite entry in db.
+            attempts = 0
+            del_suite = to_delete.split('/')[0]
+            while self.search_suite(del_suite) and attempts < 100:
+                attempts += 1
+                time.sleep(0.1)
+            
             self.local_updater.update_now()
             self.repeat_last_request()
             
     def handle_delete_local(self, *args):
-        """"Handles deletion of a suite."""
+        """"Handles deletion of a local copy of a suite."""
         to_delete = self.get_selected_suite_id()
         if self.suite_director.delete_local(to_delete, *args):
             self.local_updater.update_now()
@@ -1116,24 +1123,19 @@ class MainWindow(gtk.Window):
             return False
         self._run_suite(args)
 
-    def search_new_suite(self, new_id):
-        """Search for the existence of a newly created suite in the db"""
+    def search_suite(self, new_id):
+        """Search for the existence of a specific suite in the db"""
         filters = ["and idx eq " + str(new_id)]
-        # Try the search up to 100 times.
-        if self.attempts < 100:
-            try:
-                items = {}
-                results, url = self.search_manager.ws_query(filters, **items)
-            except Exception as e:
-                sys.stderr.write(str(e))
-                results = []
-            if len(results) == 0:
-                self.attempts += 1
-                return True
-            else:
-                return False       
-        else:
+        try:
+            items = {}
+            results, url = self.search_manager.ws_query(filters, **items)
+        except Exception as e:
+            sys.stderr.write(str(e))
+            results = []
+        if len(results) == 0:
             return False
+        else:
+            return True       
 
     def set_config(self, editor, config):
         """Assign the updated config."""
