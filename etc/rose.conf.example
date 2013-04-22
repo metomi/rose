@@ -138,7 +138,7 @@
 #  local-copy-root = $HOME/roses
 ## The default prefix
 #  prefix-default = name1
-## URL of the repository of an ID prefix
+## URL of the repository of an ID prefix, no trailing slash
 ## e.g. svn://host/PREFIX_ID
 #  prefix-location.PREFIX = URL
 ## Source browser URL of the repository of an ID prefix
@@ -156,6 +156,6 @@
 
 # Configuration related to Rosie client commands
 #
-## Root URL of the Rosie web server
+## Root URL of the Rosie web server, trailing slash
 #  ws-root-default = http://host:port/
 [rosie-ws-client]
