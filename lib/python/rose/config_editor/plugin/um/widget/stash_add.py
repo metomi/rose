@@ -33,9 +33,13 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
     """Display a grouped set of stash requests to add."""
 
     STASH_PARSE_DESC_OPT = "name"
+    STASH_PARSE_ITEM_OPT = "item"
+    STASH_PARSE_SECT_OPT = "sectn"
 
-    def __init__(self, stash_lookup,
-                 add_stash_request_func):
+    def __init__(self, stash_lookup, request_lookup,
+                 changed_request_lookup, add_stash_request_func,
+                 navigate_to_stash_request_func,
+                 refresh_stash_requests_func):
         """Create a widget displaying STASHmaster information.
 
         stash_lookup is a nested dictionary that uses STASH section
@@ -43,16 +47,38 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         about a specific record - e.g. stash_lookup[1][0]["name"] may
         return the 'name' (text description) for stash section 1, item
         0.
-        
+
+        request_lookup is a nested dictionary in the same form as stash
+        lookup (section numbers, item numbers), but then contains
+        a dictionary of relevant streq namelists vs option-value pairs
+        as a sub-level - e.g. request_lookup[1][0].keys() gives all the
+        relevant streq indices for stash section 1, item 0.
+        request_lookup[1][0]["0abcd123"]["dom_name"] may give the
+        domain profile name for the relevant namelist:streq(0abcd123).
+
+        changed_request_lookup is a dictionary of changed streq
+        namelists (keys) and their change description text (values).
+
         add_stash_request_func is a hook function that should take a
         STASH section number argument and a STASH item number argument,
         and add this request as a new namelist in a configuration.
 
+        navigate_to_stash_request_func is a hook function that should
+        take a streq namelist section id and search for it. It should
+        display it if found.
+
+        refresh_stash_requests_func is a hook function that should call
+        the update_request_info method with updated streq namelist
+        info.
         """
         super(AddStashDiagnosticsPanelv1, self).__init__(self)
         self.set_property("homogeneous", False)
         self.stash_lookup = stash_lookup
-        self.add_stash_request = add_stash_request_func
+        self.request_lookup = request_lookup
+        self.changed_request_lookup = changed_request_lookup
+        self._add_stash_request = add_stash_request_func
+        self.navigate_to_stash_request = navigate_to_stash_request_func
+        self.refresh_stash_requests = refresh_stash_requests_func
         self.group_index = 0
         self.control_widget_hbox = self._get_control_widget_box()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
@@ -79,11 +105,16 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         column.set_cell_data_func(cell_for_value,
                                   self._set_tree_cell_value)
 
+    def add_stash_request(self, section, item):
+        """Handle an add stash request call."""
+        self._add_stash_request(section, item)
+        self.refresh_stash_requests()
+
     def generate_tree_view(self, is_startup=False):
         """Create the summary of page data."""
         for column in self._view.get_columns():
             self._view.remove_column(column)
-        self.update_tree_model()
+        self._view.set_model(self.get_tree_model())
         for i, column_name in enumerate(self.column_names):
             col = gtk.TreeViewColumn()
             col.set_title(column_name.replace("_", "__"))
@@ -100,13 +131,17 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             self._group_widget.set_model(group_model)
             self._group_widget.set_active(self.group_index + 1)
             self._group_widget.connect("changed", self._handle_group_change)
+        self.update_request_info()
 
     def get_model_data_and_columns(self):
         """Return a list of data tuples and columns"""
         data_rows = []
-        columns = ["Section", "Item", "Description"]
+        columns = ["Section", "Item", "Description", "?", "#"]
         sections = self.stash_lookup.keys()
         sections.sort(self.sort_util.cmp_)
+        mod_markup = rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
+        props_excess = [self.STASH_PARSE_DESC_OPT, self.STASH_PARSE_ITEM_OPT,
+                        self.STASH_PARSE_SECT_OPT]
         for section in sections:
             if section == "-1":
                 continue
@@ -115,8 +150,9 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             for item in items:
                 data = self.stash_lookup[section][item]
                 this_row = [section, item, data[self.STASH_PARSE_DESC_OPT]]
+                this_row += ["", ""]
                 for prop in sorted(data.keys()):
-                    if prop != self.STASH_PARSE_DESC_OPT:
+                    if prop not in props_excess:
                         this_row.append(data[prop])
                         if prop not in columns:
                             columns.append(prop)
@@ -133,18 +169,18 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             col_types = [str] * len(data_rows[0])
         else:
             col_types = []
-        store = gtk.TreeStore(*col_types)
+        self._store = gtk.TreeStore(*col_types)
         parent_iter_ = None
         for i, row_data in enumerate(data_rows):
             if rows_are_descendants is None:
-                store.append(None, row_data)
+                self._store.append(None, row_data)
             elif rows_are_descendants[i]:
-                store.append(parent_iter, row_data)
+                self._store.append(parent_iter, row_data)
             else:
                 parent_data = [row_data[0]] + [None] * len(row_data[1:])
-                parent_iter = store.append(None, parent_data) 
-                store.append(parent_iter, row_data)
-        filter_model = store.filter_new()
+                parent_iter = self._store.append(None, parent_data) 
+                self._store.append(parent_iter, row_data)
+        filter_model = self._store.filter_new()
         filter_model.set_visible_func(self._filter_visible)
         sort_model = gtk.TreeModelSort(filter_model)
         for i in range(len(self.column_names)):
@@ -164,22 +200,106 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         
         """
         model = treeview.get_model()
+        stash_section_index = self.column_names.index("Section")
+        stash_item_index = self.column_names.index("Item")
+        stash_desc_index = self.column_names.index("Description")
+        stash_request_num_index = self.column_names.index("#")
+        stash_section = model.get_value(row_iter, stash_section_index)
+        stash_item = model.get_value(row_iter, stash_item_index)
+        stash_desc = model.get_value(row_iter, stash_desc_index)
+        stash_request_num = model.get_value(row_iter, stash_request_num_index)
+        if not stash_request_num or stash_request_num == "0":
+            stash_request_num = "None"
         name = self.column_names[col_index]
         value = model.get_value(row_iter, col_index)
         if value is None:
             return False
+        if name == "?":
+            name = "Requests Status"
+            if value == rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP:
+                value = "changed"
+            else:
+                value = "no changes"
+        elif name == "#":
+            name = "Requests"
+            if stash_request_num != "None":
+                sect_streqs = self.request_lookup.get(stash_section, {})
+                streqs = sect_streqs.get(stash_item, {}).keys()
+                streqs.sort(rose.config.sort_settings)
+                if streqs:
+                    value = "\n    " + "\n    ".join(streqs)
+                else:
+                    value = stash_request_num + " total"
         text = name + ": " + str(value) + "\n\n"
-        for column_name in ["Section", "Item", "Description"]:
-            index = self.column_names.index(column_name)
-            value = model.get_value(row_iter, index)
-            text += column_name + ": " + str(value) + "\n"
+        text += "Section: " + str(stash_section) + "\n"
+        text += "Item: " + str(stash_item) + "\n"
+        text += "Description: " + str(stash_desc) + "\n"
+        if stash_request_num != "None":
+            text += str(stash_request_num) + " request(s)"
         text = text.strip()
         tip.set_text(text)
         return True
 
-    def update_tree_model(self):
-        """Refresh."""
-        self._view.set_model(self.get_tree_model())
+    def update_request_info(self, request_lookup=None,
+                            changed_request_lookup=None):
+        """Refresh streq namelist information."""
+        if request_lookup is not None:
+            self.request_lookup = request_lookup
+        if changed_request_lookup is not None:
+            self.changed_request_lookup = changed_request_lookup
+        sect_col_index = self.column_names.index("Section")
+        item_col_index = self.column_names.index("Item")
+        streq_info_index = self.column_names.index("?")
+        num_streqs_index = self.column_names.index("#")
+        parent_iter_stack = []
+        # For speed, pass in the relevant indices here.
+        user_data = (sect_col_index, item_col_index,
+                     streq_info_index, num_streqs_index)
+        self._store.foreach(self._update_row_request_info, user_data)
+        # Loop over any parent rows and sum numbers and info.
+        parent_iter = self._store.iter_children(None)
+        while parent_iter is not None:
+            num_streq_children = 0
+            streq_info_children = ""
+            child_iter = self._store.iter_children(parent_iter)
+            if child_iter is None:
+                parent_iter = self._store.iter_next(parent_iter)
+                continue
+            while child_iter is not None:
+                num = self._store.get_value(child_iter, num_streqs_index)
+                info = self._store.get_value(child_iter, streq_info_index)
+                if isinstance(num, basestring) and num.isdigit():
+                    num_streq_children += int(num)
+                if info and not streq_info_children:
+                    streq_info_children = info
+                child_iter = self._store.iter_next(child_iter)
+            self._store.set_value(parent_iter, num_streqs_index,
+                                  str(num_streq_children))
+            self._store.set_value(parent_iter, streq_info_index,
+                                  streq_info_children)
+            parent_iter = self._store.iter_next(parent_iter)
+            
+            
+                    
+    def _update_row_request_info(self, model, path, iter_, user_data):
+        # Update the streq namelist information for a model row.
+        (sect_col_index, item_col_index,
+         streq_info_index, num_streqs_index) = user_data
+        section = model.get_value(iter_, sect_col_index)
+        item = model.get_value(iter_, item_col_index)
+        if section is None or item is None:
+            model.set_value(iter_, num_streqs_index, None)
+            model.set_value(iter_, streq_info_index, None)
+            return
+        streqs = self.request_lookup.get(section, {}).get(item, {})
+        model.set_value(iter_, num_streqs_index, str(len(streqs)))
+        streq_info = ""
+        mod_markup = rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
+        for streq_section in streqs:
+            if streq_section in self.changed_request_lookup:
+                streq_info = mod_markup + streq_info
+                break
+        model.set_value(iter_, streq_info_index, streq_info)
 
     def _append_row_data(self, model, path, iter_, data_rows):
         # Append new row data.
@@ -244,20 +364,33 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._group_widget.pack_start(cell, expand=True)
         self._group_widget.add_attribute(cell, 'text', 0)
         self._group_widget.show()
+        self._refresh_button = rose.gtk.util.CustomButton(
+                                    label="Refresh",
+                                    stock_id=gtk.STOCK_REFRESH,
+                                    tip_text="Refresh namelist:streq statuses")
+        self._refresh_button.connect("activate",
+                                     lambda b: self.refresh_stash_requests())
+        self._refresh_button.connect("clicked",
+                                     lambda b: self.refresh_stash_requests())
+         
+        eb1 = gtk.EventBox()
+        eb1.show()
+        eb2 = gtk.EventBox()
+        eb2.show()
         filter_hbox = gtk.HBox()
         filter_hbox.pack_start(group_label, expand=False, fill=False)
         filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
+        filter_hbox.pack_start(eb1, expand=True, fill=True)
+        filter_hbox.pack_start(self._refresh_button, expand=False, fill=False)
+        filter_hbox.pack_start(eb2, expand=True, fill=True)
         filter_hbox.pack_end(self._filter_widget, expand=False, fill=False)
         filter_hbox.pack_end(filter_label, expand=False, fill=False)
         filter_hbox.show()
         return filter_hbox
-         
-    def _handle_activation(self, view, path, column):
-        # React to an activation of a row in the dialog.
-        model = view.get_model()
-        row_iter = model.get_iter(path)
-        col_index = view.get_columns().index(column)       
-        cell_data = model.get_value(row_iter, col_index)
+
+    def _get_section_item_col_indices(self):
+        # Return the column indices of the STASH section and item.
+        model = self._view.get_model()
         sect_index = 0
         if self.group_index is not None and self.group_index != sect_index:
             sect_index = 1
@@ -269,8 +402,21 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                 item_index = 0
             else:
                 item_index = 2
-        section = model.get_value(row_iter, sect_index)
-        item = model.get_value(row_iter, item_index)
+        return sect_index, item_index
+
+    def _get_section_item_from_iter(self, iter_):
+        # Return the STASH section and item numbers for this row.
+        sect_index, item_index = self._get_section_item_col_indices()
+        model = self._view.get_model()
+        section = model.get_value(iter_, sect_index)
+        item = model.get_value(iter_, item_index)
+        return section, item
+
+    def _handle_activation(self, view, path, column):
+        # React to an activation of a row in the dialog.
+        model = view.get_model()
+        row_iter = model.get_iter(path)
+        section, item = self._get_section_item_from_iter(row_iter)
         return self.add_stash_request(section, item)
 
     def _handle_button_press_event(self, treeview, event):
@@ -309,16 +455,32 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         menu.show()
         model = self._view.get_model()
         row_iter = model.get_iter(path)
-        sect_index = 0
-        if self.group_index is not None and self.group_index != 0:
-            sect_index = 1
-        this_section = model.get_value(row_iter, sect_index)
+        section, item = self._get_section_item_from_iter(row_iter)
         add_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
-        add_menuitem.set_label(
-                     rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
+        add_menuitem.set_label("Add STASH request")
         add_menuitem.connect("activate",
-                             lambda i: self.add_section(this_section))
+                             lambda i: self.add_stash_request(section, item))
         add_menuitem.show()
+        menu.append(add_menuitem)
+        streqs = self.request_lookup.get(section, {}).get(item, {}).keys()
+        if streqs:
+            view_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_FIND)
+            view_menuitem.set_label(label="View...")
+            view_menuitem.show()
+            view_menu = gtk.Menu()
+            view_menu.show()
+            view_menuitem.set_submenu(view_menu)
+            streqs.sort(rose.config.sort_settings)
+            for streq in streqs:
+                view_streq_menuitem = gtk.MenuItem(label=streq)
+                view_streq_menuitem._section = streq
+                view_streq_menuitem.connect(
+                           "button-release-event",
+                           lambda m, e: self.navigate_to_stash_request(
+                                                      m._section))
+                view_streq_menuitem.show()
+                view_menu.append(view_streq_menuitem)
+            menu.append(view_menuitem)
         menu.popup(None, None, None, event.button, event.time)
         return False
 
@@ -326,6 +488,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         # Extract an appropriate value for this cell from the model.
         cell.set_property("visible", True)
         col_index = self._view.get_columns().index(column)
+        col_title = self.column_names[col_index]
         value = self._view.get_model().get_value(iter_, col_index)
         max_len = 30
         if (value is not None and len(value) > max_len
@@ -334,7 +497,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         if col_index == 0 and treemodel.iter_parent(iter_) is not None:
             cell.set_property("visible", False)
-        if value is not None:
+        if value is not None and col_title != "?":
             value = rose.gtk.util.safe_str(value)
         cell.set_property("markup", value)
 

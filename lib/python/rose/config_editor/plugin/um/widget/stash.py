@@ -93,6 +93,7 @@ class BaseStashSummaryDataPanelv1(
         self.load_stash()
         super(BaseStashSummaryDataPanelv1, self).__init__(*args, **kwargs)
         self._add_new_diagnostic_launcher()
+        self._diag_panel = None
 
     def get_stashmaster_lookup_dict(self):
         """Return a nested dictionary with STASHmaster info.
@@ -478,17 +479,66 @@ class BaseStashSummaryDataPanelv1(
         self.sub_ops.ignore_section(section, not is_active)
         return False
 
+    def _get_request_lookup(self):
+        # Return a lookup dictionary of streq info.
+        request_lookup = {}
+        for section in self.sections:
+            stash_sect_id = self.util.get_id_from_section_option(
+                                             section, self.STREQ_NL_SECT_OPT)
+            stash_item_id = self.util.get_id_from_section_option(
+                                             section, self.STREQ_NL_ITEM_OPT)
+            sect_var = self.var_id_map.get(stash_sect_id)
+            item_var = self.var_id_map.get(stash_item_id)
+            if sect_var is None or item_var is None:
+                continue
+            st_sect = sect_var.value
+            st_item = item_var.value
+            request_lookup.setdefault(st_sect, {})
+            request_lookup[st_sect].setdefault(st_item, {})
+            request_lookup[st_sect][st_item][section] = {}
+            for variable in self.variables.get(section, []):
+                request_lookup[st_sect][st_item][section][variable.name] = variable.value
+        return request_lookup
+
+    def _get_request_changes(self):
+        # Return a list of request indices with changes.
+        changed_requests = {}
+        for section, sect_data in self.sections.items():
+            changes = self.sect_ops.get_section_changes(sect_data)
+            if changes:           
+                changed_requests.update({section: changes})
+        return changed_requests
+
+    def _handle_close_diagnostic_window(self, widget=None):
+        # Handle a close of the diagnostic window.
+        self._diag_panel = None
+
     def _launch_new_diagnostic_window(self, widget=None):
         # Launch the "new STASH request" dialog.
         window = gtk.Window()
         window.set_title(self.ADD_NEW_STASH_WINDOW_TITLE)
         add_module = rose.config_editor.plugin.um.widget.stash_add
+        request_lookup = self._get_request_lookup()
+        request_changes = self._get_request_changes()
         self._diag_panel = add_module.AddStashDiagnosticsPanelv1(
                                               self._stash_lookup,
-                                              self.add_new_stash_request)
+                                              request_lookup,
+                                              request_changes,
+                                              self.add_new_stash_request,
+                                              self.scroll_to_section,
+                                              self._refresh_diagnostic_window)
         window.add(self._diag_panel)
         window.set_default_size(900, 800)
+        window.connect("destroy", self._handle_close_diagnostic_window)
         window.show()
+
+    def _refresh_diagnostic_window(self):
+        # Refresh information in the "new STASH request" dialog.
+        if self._diag_panel is not None:
+            request_lookup = self._get_request_lookup()
+            request_changes = self._get_request_changes()
+            self._diag_panel.update_request_info(request_lookup,
+                                                 request_changes)
 
     def _set_tree_cell_value_combo(self, column, cell, treemodel, iter_):
         # Extract a value for a combo box cell renderer.
