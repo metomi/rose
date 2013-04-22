@@ -72,19 +72,23 @@ class MenuBar(object):
         <menuitem action="Preferences"/>
       </menu>
       <menu action="View">
-        <menuitem action="View fixed"/>
-        <menuitem action="View ignored"/>
-        <menuitem action="View user-ignored"/>
-        <menuitem action="View latent"/>
-        <separator name="sep_view_options"/>
-        <menuitem action="View without titles"/>
-        <separator name="sep_tweak_views"/>
-        <menuitem action="Flag no-metadata"/>
-        <menuitem action="Flag optional"/>
+        <menuitem action="View fixed vars"/>
+        <menuitem action="View ignored vars"/>
+        <menuitem action="View user-ignored vars"/>
+        <menuitem action="View latent vars"/>
+        <separator name="sep_view_vars"/>
+        <menuitem action="View ignored pages"/>
+        <menuitem action="View user-ignored pages"/>
+        <menuitem action="View latent pages"/>
+        <separator name="sep_view_flags"/>
+        <menuitem action="Flag no-metadata vars"/>
+        <menuitem action="Flag optional vars"/>
       </menu>
       <menu action="Metadata">
       <menuitem action="Reload metadata"/>
       <menuitem action="Switch off metadata"/>
+      <separator name="sep_view_generic"/>
+      <menuitem action="View without titles"/>
       <separator name="sep_checking"/>
       <menuitem action="Extra checks"/>
       <separator name="sep macro"/>
@@ -200,20 +204,26 @@ class MenuBar(object):
                        rose.config_editor.TOP_MENU_HELP_ABOUT)]
 
     toggle_action_details = [
-                      ('View latent', None,
-                       rose.config_editor.TOP_MENU_VIEW_LATENT),
-                      ('View fixed', None,
-                       rose.config_editor.TOP_MENU_VIEW_FIXED),
-                      ('View ignored', None,
-                       rose.config_editor.TOP_MENU_VIEW_IGNORED),
-                      ('View user-ignored', None,
-                       rose.config_editor.TOP_MENU_VIEW_USER_IGNORED),
+                      ('View latent vars', None,
+                       rose.config_editor.TOP_MENU_VIEW_LATENT_VARS),
+                      ('View fixed vars', None,
+                       rose.config_editor.TOP_MENU_VIEW_FIXED_VARS),
+                      ('View ignored vars', None,
+                       rose.config_editor.TOP_MENU_VIEW_IGNORED_VARS),
+                      ('View user-ignored vars', None,
+                       rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_VARS),
                       ('View without titles', None,
                        rose.config_editor.TOP_MENU_VIEW_WITHOUT_TITLES),
-                      ('Flag optional', None,
-                       rose.config_editor.TOP_MENU_VIEW_FLAG_OPTIONAL),
-                      ('Flag no-metadata', None,
-                       rose.config_editor.TOP_MENU_VIEW_FLAG_NO_METADATA),
+                      ('View ignored pages', None,
+                       rose.config_editor.TOP_MENU_VIEW_IGNORED_PAGES),
+                      ('View user-ignored pages', None,
+                       rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_PAGES),
+                      ('View latent pages', None,
+                       rose.config_editor.TOP_MENU_VIEW_LATENT_PAGES),
+                      ('Flag optional vars', None,
+                       rose.config_editor.TOP_MENU_VIEW_FLAG_OPTIONAL_VARS),
+                      ('Flag no-metadata vars', None,
+                       rose.config_editor.TOP_MENU_VIEW_FLAG_NO_METADATA_VARS),
                       ('Switch off metadata', None,
                        rose.config_editor.TOP_MENU_METADATA_SWITCH_OFF)]
 

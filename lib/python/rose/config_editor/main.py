@@ -110,13 +110,42 @@ class MainController(object):
 
         self.loader_update = loader_update
 
+        # Set page variable 'verbosity' defaults.
+        self.page_var_show_modes = {
+             rose.config_editor.SHOW_MODE_FIXED:
+             rose.config_editor.SHOULD_SHOW_FIXED_VARS,
+             rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
+             rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS,
+             rose.config_editor.SHOW_MODE_FLAG_NO_META:
+             rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS,
+             rose.config_editor.SHOW_MODE_IGNORED:
+             rose.config_editor.SHOULD_SHOW_IGNORED_VARS,
+             rose.config_editor.SHOW_MODE_USER_IGNORED:
+             rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
+             rose.config_editor.SHOW_MODE_LATENT:
+             rose.config_editor.SHOULD_SHOW_LATENT_VARS,
+             rose.config_editor.SHOW_MODE_NO_TITLE:
+             rose.config_editor.SHOULD_SHOW_NO_TITLE}
+
+        # Set page tree 'verbosity' defaults.
+        self.page_ns_show_modes = {
+             rose.config_editor.SHOW_MODE_IGNORED:
+             rose.config_editor.SHOULD_SHOW_IGNORED_PAGES,
+             rose.config_editor.SHOW_MODE_USER_IGNORED:
+             rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES,
+             rose.config_editor.SHOW_MODE_LATENT:
+             rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
+             rose.config_editor.SHOW_MODE_NO_TITLE:
+             rose.config_editor.SHOULD_SHOW_NO_TITLE}
+
         # Load the top configuration directory
         self.data = rose.config_editor.loader.ConfigDataManager(
                                 self.util,
                                 config_directory,
                                 config_objs,
                                 self.tree_trigger_update,
-                                loader_update)
+                                loader_update,
+                                self.page_ns_show_modes)
         self.trigger = self.data.trigger
 
         self.loader_update(rose.config_editor.LOAD_STATUSES,
@@ -162,23 +191,6 @@ class MainController(object):
             self.generate_hyper_panel()
             # Create notebook (tabbed container) and connect signals.
             self.notebook = rose.gtk.util.Notebook()
-
-        # Set page 'verbosity' defaults.
-        self.page_show_modes = {
-             rose.config_editor.SHOW_MODE_FIXED:
-             rose.config_editor.SHOULD_SHOW_FIXED,
-             rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
-             rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL,
-             rose.config_editor.SHOW_MODE_FLAG_NO_META:
-             rose.config_editor.SHOULD_SHOW_FLAG_NO_META,
-             rose.config_editor.SHOW_MODE_IGNORED:
-             rose.config_editor.SHOULD_SHOW_IGNORED,
-             rose.config_editor.SHOW_MODE_USER_IGNORED:
-             rose.config_editor.SHOULD_SHOW_USER_IGNORED,
-             rose.config_editor.SHOW_MODE_LATENT:
-             rose.config_editor.SHOULD_SHOW_LATENT,
-             rose.config_editor.SHOW_MODE_NO_TITLE:
-             rose.config_editor.SHOULD_SHOW_NO_TITLE}
 
         # Create the main panel with the menu, toolbar, tree panel, notebook.
         if not self.pluggable:
@@ -295,34 +307,46 @@ class MainController(object):
                       lambda m: self.perform_find(self.find_hist['regex'])),
                      ('/TopMenuBar/Edit/Preferences', self.handle.prefs),
                      ('/TopMenuBar/Edit/Stack', self.handle.view_stack),
-                     ('/TopMenuBar/View/View fixed',
-                      lambda m: self._set_page_show_modes(
+                     ('/TopMenuBar/View/View fixed vars',
+                      lambda m: self._set_page_var_show_modes(
                                      rose.config_editor.SHOW_MODE_FIXED,
                                      m.get_active())),
-                     ('/TopMenuBar/View/View ignored',
-                      lambda m: self._set_page_show_modes(
+                     ('/TopMenuBar/View/View ignored vars',
+                      lambda m: self._set_page_var_show_modes(
                                   rose.config_editor.SHOW_MODE_IGNORED,
                                   m.get_active())),
-                     ('/TopMenuBar/View/View user-ignored',
-                      lambda m: self._set_page_show_modes(
+                     ('/TopMenuBar/View/View user-ignored vars',
+                      lambda m: self._set_page_var_show_modes(
                                    rose.config_editor.SHOW_MODE_USER_IGNORED,
                                    m.get_active())),
-                     ('/TopMenuBar/View/View latent',
-                      lambda m: self._set_page_show_modes(
+                     ('/TopMenuBar/View/View latent vars',
+                      lambda m: self._set_page_var_show_modes(
                                      rose.config_editor.SHOW_MODE_LATENT,
                                      m.get_active())),
-                     ('/TopMenuBar/View/View without titles',
+                     ('/TopMenuBar/View/View ignored pages',
+                      lambda m: self._set_page_ns_show_modes(
+                                     rose.config_editor.SHOW_MODE_FIXED,
+                                     m.get_active())),
+                     ('/TopMenuBar/View/View user-ignored pages',
+                      lambda m: self._set_page_ns_show_modes(
+                                     rose.config_editor.SHOW_MODE_FIXED,
+                                     m.get_active())),
+                     ('/TopMenuBar/View/View latent pages',
+                      lambda m: self._set_page_ns_show_modes(
+                                  rose.config_editor.SHOW_MODE_IGNORED,
+                                  m.get_active())),
+                     ('/TopMenuBar/View/Flag no-metadata vars',
+                      lambda m: self._set_page_var_show_modes(
+                                   rose.config_editor.SHOW_MODE_FLAG_NO_META,
+                                   m.get_active())),
+                     ('/TopMenuBar/View/Flag optional vars',
+                      lambda m: self._set_page_var_show_modes(
+                                  rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
+                                  m.get_active())),
+                     ('/TopMenuBar/Metadata/View without titles',
                       lambda m: self._set_page_show_modes(
                                      rose.config_editor.SHOW_MODE_NO_TITLE,
                                      m.get_active())),
-                     ('/TopMenuBar/View/Flag no-metadata',
-                      lambda m: self._set_page_show_modes(
-                                   rose.config_editor.SHOW_MODE_FLAG_NO_META,
-                                   m.get_active())),
-                     ('/TopMenuBar/View/Flag optional',
-                      lambda m: self._set_page_show_modes(
-                                  rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
-                                  m.get_active())),
                      ('/TopMenuBar/Metadata/All V',
                       lambda m: self.handle.run_custom_macro(
                                      method_name=rose.macro.VALIDATE_METHOD)),
@@ -549,7 +573,7 @@ class MainController(object):
                          'widget': custom_widget,
                          'see_also': see_also,
                          'config_name': config_name,
-                         'show_modes': self.page_show_modes,
+                         'show_modes': self.page_var_show_modes,
                          'icon': icon_path}
         if len(sections) == 1:
             page_metadata.update({'id': sections.pop()})
@@ -751,7 +775,17 @@ class MainController(object):
         return page, page.get_main_focus()
 
     def _set_page_show_modes(self, key, is_key_allowed):
-        self.page_show_modes[key] = is_key_allowed
+        """Set generic variable/namespace view options."""
+        self._set_page_var_show_modes(key, is_key_allowed)
+        self._set_page_ns_show_modes(key, is_key_allowed)
+
+    def _set_page_ns_show_modes(self, key, is_key_allowed):
+        """Set namespace view options."""
+        self.page_ns_show_modes[key] = is_key_allowed
+        self.data.reload_namespace_tree()  # Knows about page_ns_show_modes.
+
+    def _set_page_var_show_modes(self, key, is_key_allowed):
+        self.page_var_show_modes[key] = is_key_allowed
         self._generate_pagelist()
         for page in self.pagelist:
             page.react_to_show_modes(key, is_key_allowed)
@@ -1714,7 +1748,7 @@ class MainController(object):
         for config_name in config_keys:
             config_data = self.data.config[config_name]
             search_vars = config_data.vars.get_all(
-                                 no_latent=not self.page_show_modes["latent"])
+                           no_latent=not self.page_var_show_modes["latent"])
             found_ns_vars = {}
             for variable in search_vars:
                 var_id = variable.metadata.get('id')
@@ -1736,10 +1770,10 @@ class MainController(object):
                 for variable in variables:
                     var_id = variable.metadata['id']
                     if (config_name, var_id) not in self.find_hist['ids']:
-                        if (not self.page_show_modes['fixed'] and
+                        if (not self.page_var_show_modes['fixed'] and
                             len(variable.metadata.get('values', [])) == 1):
                             continue
-                        if (not self.page_show_modes['ignored'] and
+                        if (not self.page_var_show_modes['ignored'] and
                             variable.ignored_reason):
                             continue
                         self.find_hist['ids'].append((config_name, var_id))

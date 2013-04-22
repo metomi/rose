@@ -152,11 +152,12 @@ class ConfigDataManager(object):
     """Loads the information from the various configurations."""
 
     def __init__(self, util, top_level_directory, config_obj_dict,
-                 tree_trig_update, signal_load_event):
+                 tree_trig_update, signal_load_event, page_ns_show_modes):
         """Load the root configuration and all its sub-configurations."""
         self.util = util
         self.tree_update = tree_trig_update
         self.signal_load_event = signal_load_event
+        self.page_ns_show_modes = page_ns_show_modes
         self.config = {}  # Stores configuration name: object
         self._builtin_value_macro = rose.macros.value.ValueChecker()  # value
         self.builtin_macros = {}  # Stores other Rose built-in macro instances
@@ -968,7 +969,7 @@ class ConfigDataManager(object):
                                       err_string, setting_id, config_name))
         self.trigger[config_name].trigger_family_lookup.clear()
 
-    def reload_namespace_tree(self, view_missing=False):
+    def reload_namespace_tree(self):
         """Make the tree of namespaces and load to the tree panel."""
         self.namespace_tree = {}
         configs = self.config.keys()
@@ -995,7 +996,7 @@ class ConfigDataManager(object):
                                            prev_spaces=[])
             # Now load tree from variables
             self.load_variable_namespaces(config_name)
-            for var in config_data.vars.get_all(no_latent=not view_missing):
+            for var in config_data.vars.get_all():
                 ns = var.metadata['full_ns']
                 self.namespace_meta_lookup.setdefault(ns, {})
                 self.namespace_meta_lookup[ns].setdefault(
