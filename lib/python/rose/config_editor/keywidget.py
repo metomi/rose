@@ -90,8 +90,7 @@ class KeyWidget(gtk.HBox):
         self.grab_focus = lambda : self.entry.grab_focus()
         self.set_sensitive(True)
         self.set_sensitive = self.entry.set_sensitive 
-        event_box.connect('button-press-event',
-                          lambda b, w: self.launch_help())
+        event_box.connect('button-press-event', self.handle_launch_help)
         self.update_comment_display()
         self.entry.show()
         for key, value in self.show_modes.items():
@@ -102,6 +101,11 @@ class KeyWidget(gtk.HBox):
                           rose.config_editor.VAR_FLAG_TIP_FIXED)
         event_box.show()
         self.show()
+
+    def handle_launch_help(self, widget, event):
+        """Handle launching help."""
+        if event.type == gtk.gdk.BUTTON_PRESS and event.button == 1:
+            self.launch_help()
         
     def set_ignored(self):
         """Update the ignored display."""
