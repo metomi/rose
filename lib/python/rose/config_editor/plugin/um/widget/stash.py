@@ -345,11 +345,16 @@ class BaseStashSummaryDataPanelv1(
             menuitems.append(profiles_root_menuitem)
         return menuitems
 
-    def add_new_stash_request(self, section, item):
+    def add_new_stash_request(self, section, item, launch_dialog=False):
         """Add a new streq namelist."""
         new_opt_map = {self.STREQ_NL_SECT_OPT: section,
                        self.STREQ_NL_ITEM_OPT: item}
         new_section = self.add_section(None, opt_map=new_opt_map)
+        if launch_dialog:
+            rose.gtk.util.run_dialog(
+                              rose.gtk.util.DIALOG_TYPE_INFO,
+                              "Added request as {0}".format(new_section),
+                              "New Request")
 
     def generate_package_lookup(self):
         """Store a dictionary of package requests and domains."""
@@ -520,11 +525,13 @@ class BaseStashSummaryDataPanelv1(
         add_module = rose.config_editor.plugin.um.widget.stash_add
         request_lookup = self._get_request_lookup()
         request_changes = self._get_request_changes()
+        add_new_func = lambda s, i: (
+                self.add_new_stash_request(s, i, launch_dialog=True))
         self._diag_panel = add_module.AddStashDiagnosticsPanelv1(
                                               self._stash_lookup,
                                               request_lookup,
                                               request_changes,
-                                              self.add_new_stash_request,
+                                              add_new_func,
                                               self.scroll_to_section,
                                               self._refresh_diagnostic_window)
         window.add(self._diag_panel)

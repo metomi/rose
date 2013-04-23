@@ -972,10 +972,9 @@ class MainController(object):
     def update_ns_sub_data(self, namespace=None):
         """Update any relevant summary data on another page."""
         for page in self.pagelist:
-            if (page.sub_data is None or
-                (namespace is not None and
+            if (namespace is not None and
                  not namespace.startswith(page.namespace) and
-                 namespace != page.namespace)):
+                 namespace != page.namespace):
                 continue
             page.sub_data = self.data.get_sub_data_for_namespace(
                                                    page.namespace)

@@ -463,6 +463,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                 section = section_base + "(" + str(i) + ")"
         self.sub_ops.add_section(section, opt_map=opt_map)
         self.scroll_to_section(section)
+        return section
 
     def copy_section(self, section):
         """Copy a section and its content into a new section name."""

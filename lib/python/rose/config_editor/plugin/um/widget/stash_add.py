@@ -90,12 +90,15 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._view.show()
         self._view.connect("button-press-event",
                            self._handle_button_press_event)
+        self._view.connect("cursor-changed",
+                           lambda v: self._update_control_widget_sensitivity())
         self._window = gtk.ScrolledWindow()
         self._window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.generate_tree_view(is_startup=True)
         self._window.add(self._view)
         self._window.show()
         self.pack_start(self._window, expand=True, fill=True)
+        self._update_control_widget_sensitivity()
         self.show()
 
     def add_cell_renderer_for_value(self, column):
@@ -364,6 +367,14 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._group_widget.pack_start(cell, expand=True)
         self._group_widget.add_attribute(cell, 'text', 0)
         self._group_widget.show()
+        self._add_button = rose.gtk.util.CustomButton(
+                                label="Add",
+                                stock_id=gtk.STOCK_ADD,
+                                tip_text="Add a new request for this entry")
+        self._add_button.connect("activate",
+                                 lambda b: self._handle_add_current_row())
+        self._add_button.connect("clicked",
+                                 lambda b: self._handle_add_current_row())
         self._refresh_button = rose.gtk.util.CustomButton(
                                     label="Refresh",
                                     stock_id=gtk.STOCK_REFRESH,
@@ -381,12 +392,21 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         filter_hbox.pack_start(group_label, expand=False, fill=False)
         filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
         filter_hbox.pack_start(eb1, expand=True, fill=True)
+        filter_hbox.pack_start(self._add_button, expand=False, fill=False)
         filter_hbox.pack_start(self._refresh_button, expand=False, fill=False)
         filter_hbox.pack_start(eb2, expand=True, fill=True)
         filter_hbox.pack_end(self._filter_widget, expand=False, fill=False)
         filter_hbox.pack_end(filter_label, expand=False, fill=False)
         filter_hbox.show()
         return filter_hbox
+
+    def _get_current_section_item(self):
+        # Return the current highlighted section (or None) and item (or None).
+        current_path, current_column = self._view.get_cursor()
+        if current_path is None:
+            return (None, None)
+        current_iter = self._view.get_model().get_iter(current_path)
+        return self._get_section_item_from_iter(current_iter)
 
     def _get_section_item_col_indices(self):
         # Return the column indices of the STASH section and item.
@@ -412,11 +432,17 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         item = model.get_value(iter_, item_index)
         return section, item
 
+    def _handle_add_current_row(self):
+        section, item = self._get_current_section_item()
+        return self.add_stash_request(section, item)
+
     def _handle_activation(self, view, path, column):
         # React to an activation of a row in the dialog.
         model = view.get_model()
         row_iter = model.get_iter(path)
         section, item = self._get_section_item_from_iter(row_iter)
+        if section is None or item is None:
+            return False
         return self.add_stash_request(section, item)
 
     def _handle_button_press_event(self, treeview, event):
@@ -456,10 +482,12 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         model = self._view.get_model()
         row_iter = model.get_iter(path)
         section, item = self._get_section_item_from_iter(row_iter)
+        if section is None or item is None:
+            return False
         add_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
         add_menuitem.set_label("Add STASH request")
         add_menuitem.connect("activate",
-                             lambda i: self.add_stash_request(section, item))
+                                lambda i: self.add_stash_request(section, item))
         add_menuitem.show()
         menu.append(add_menuitem)
         streqs = self.request_lookup.get(section, {}).get(item, {}).keys()
@@ -507,3 +535,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         x = row1[sort_index]
         y = row2[sort_index]
         return fac * self.sort_util.cmp_(x, y)
+
+    def _update_control_widget_sensitivity(self):
+        section, item = self._get_current_section_item()
+        self._add_button.set_sensitive(section is not None and
+                                       item is not None)

@@ -1164,14 +1164,16 @@ class ConfigDataManager(object):
         for sect, sect_data in config_data.sections.now.items():
             sect_ns = sect_data.metadata["full_ns"]
             if sect_ns.startswith(ns):
-                sub_data['sections'].update({sect: sect_data})
+                sub_data["sections"].update({sect: sect_data})
         sub_data["get_var_id_values_func"] = (
                 lambda: self.get_sub_data_var_id_values(config_name))
         for sect, variables in config_data.vars.now.items():
             for variable in variables:
-                if variable.metadata['full_ns'].startswith(ns):
-                    sub_data['variables'].setdefault(sect, [])
-                    sub_data['variables'][sect].append(variable)
+                if variable.metadata["full_ns"].startswith(ns):
+                    sub_data["variables"].setdefault(sect, [])
+                    sub_data["variables"][sect].append(variable)
+        if not sub_data["sections"] and not sub_data["variables"]:
+            return None
         return sub_data
 
     def get_sub_data_var_id_value_map(self, config_name):
