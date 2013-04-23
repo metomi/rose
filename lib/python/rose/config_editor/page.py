@@ -538,7 +538,8 @@ class ConfigPage(gtk.VBox):
                 self.sub_data_panel.destroy()
                 self.sub_data_panel = None
         else:
-            if self.sub_data_panel is not None:
+            if (hasattr(self, "sub_data_panel") and
+                self.sub_data_panel is not None):
                 self.sub_data_panel.update(self.sub_data["sections"],
                                            self.sub_data["variables"])
 
@@ -1005,6 +1006,9 @@ class ConfigPage(gtk.VBox):
                 if old_variable.value != variable.value:
                     self.variable_ops.set_var_value(old_variable, 
                                                     variable.value)
+                if old_variable.comments != variable.comments:
+                    self.variable_ops.set_var_comments(old_variable,
+                                                       variable.comments)
                 old_ign_set = set(old_variable.ignored_reason.keys())
                 new_ign_set = set(variable.ignored_reason.keys())
                 if old_ign_set != new_ign_set:
