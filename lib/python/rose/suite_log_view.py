@@ -164,16 +164,20 @@ class SuiteLogViewGenerator(object):
             this_mtime = os.stat(suite_db_file).st_mtime
             while prev_mtime is None or prev_mtime < this_mtime:
                 cycles = self.suite_engine_proc.get_suite_events(suite_name)
-                for cycle in cycles:
+                for cycle, tasks in cycles.items():
                     if cycle not in main_data["cycles"]:
                         main_data["cycles"].append(cycle)
                     f = open(self.NS + "-" + cycle + ".json", "wb")
-                    json.dump(cycle, f, indent=0)
+                    json.dump({"cycle_time": cycle, "tasks": tasks},
+                              f, indent=0)
                     f.close()
                 main_data["updated_at"] = time()
                 prev_mtime = this_mtime
                 this_mtime = os.stat(suite_db_file).st_mtime
         main_data["cycles"].sort()
+        main_data["cycles"].reverse()
+        self.fs_util.symlink(self.NS + "-" + main_data["cycles"][0] + ".json",
+                             self.NS + "-latest.json")
         f = open(self.NS + ".json", "wb")
         json.dump(main_data, f, indent=0)
         f.close()

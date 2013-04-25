@@ -188,6 +188,14 @@ $(function() {
         alert("Could not load data.");
     }
 
+    function get_opt(key, default_value) {
+        var match = RegExp("[?&]" + key + "=([^&#]*)").exec(location.search);
+        if (match) {
+            return match[1];
+        }
+        return default_value;
+    };
+
     /* Convert a time delta in seconds to a M:SS string. */
     function timedelta2string(s) {
         if (s < 0) {
@@ -211,14 +219,8 @@ $(function() {
         return {"date": dd, "time": dt, "string": dd + " " + dt};
     }
 
-    /* Load the data into the HTML. */
-    function load(data) {
-        load_misc(data);
-        load_tasks(data);
-    }
-
-    /* Load the misc data into the HTML. */
-    function load_misc(data) {
+    /* Load suite data into the HTML. */
+    function load_suite_data(data) {
         var title_var = data["suite"];
         document.title = title_var;
         $("h1:first").text(title_var).attr("title", data["suite"]);
@@ -239,213 +241,213 @@ $(function() {
     }
 
     /* Load the data of the tasks into the HTML. */
-    function load_tasks(data) {
+    function load_cycle_tasks_data(data) {
+        var cycle_time = data["cycle_time"];
+        $("#cycle_time").text(cycle_time);
         var URL_PREFIX = "source.html?suite=" + data["suite"] + "\&path=";
         var node = $("#task_list");
         var task_keys = [];
-        for (var cycle_time in data["cycles"]) {
-            for (var task_name in data["cycles"][cycle_time]) {
-                var submits = data["cycles"][cycle_time][task_name];
-                $.each(submits, function(submit_num, submit_data) {
-                    var row = $("<tr/>").appendTo($("tbody", node));
-                    var cell;
-                    /* Column 1: task.cycle (submit-n) */
-                    cell = $("<td/>").appendTo(row).addClass("firstColumn")
-                    if (submits.length > 1) {
-                        var span = $("<span/>").appendTo(cell);
-                        span.addClass("submit-num");
-                        span.text("(" + (submit_num + 1).toString() + ")");
+        for (var task_name in data["tasks"]) {
+            var submits = data["tasks"][task_name];
+            $.each(submits, function(submit_num, submit_data) {
+                var row = $("<tr/>").appendTo($("tbody", node));
+                var cell;
+                /* Column 1: task.cycle (submit-n) */
+                cell = $("<td/>").appendTo(row).addClass("firstColumn")
+                if (submits.length > 1) {
+                    var span = $("<span/>").appendTo(cell);
+                    span.addClass("submit-num");
+                    span.text("(" + (submit_num + 1).toString() + ")");
+                }
+                var task_id_out = task_name + "." + cycle_time;
+                cell.append(task_id_out);
+
+                /* Column 2-3: name, cycle */
+                cell = $("<td/>").appendTo(row).text(cycle_time);
+                cell = $("<td/>").appendTo(row).text(task_name);
+
+                /* Column 4: submit-n */
+                cell = $("<td/>").appendTo(row);
+                cell.append((submit_num + 1).toString());
+
+                /* Column 5: status */
+                cell = $("<td/>").appendTo(row);
+                if (submit_data["status"] != null) {
+                    var value = submit_data["status"];
+                    var signal = submit_data["signal"];
+                    if (signal && signal != "ERR") {
+                        value += " (" + signal + ")";
                     }
-                    var task_id_out = task_name + "." + cycle_time;
-                    cell.append(task_id_out);
+                    cell.append(value);
+                    cell.addClass(submit_data["status"]);
+                }
 
-                    /* Column 2-3: name, cycle */
-                    cell = $("<td/>").appendTo(row).text(cycle_time);
-                    cell = $("<td/>").appendTo(row).text(task_name);
+                /* Column 6: submit time */
+                var task_events = submit_data["events"];
+                var date_submit = datetime2obj(task_events["submit"]);
+                cell = $("<td/>").appendTo(row);
+                cell.append(date_submit["string"]);
 
-                    /* Column 4: submit-n */
+                /* Column 7: queue time delta */
+                cell = $("<td/>").appendTo(row);
+                if (task_events["init"] != null) {
+                    var delta = task_events["init"] - task_events["submit"];
+                    cell.append(timedelta2string(delta));
+                }
+
+                /* Column 8, 9: init time, exit time */
+                $.each(["init", "exit"], function(i, key) {
                     cell = $("<td/>").appendTo(row);
-                    cell.append((submit_num + 1).toString());
-
-                    /* Column 5: status */
-                    cell = $("<td/>").appendTo(row);
-                    if (submit_data["status"] != null) {
-                        var value = submit_data["status"];
-                        var signal = submit_data["signal"];
-                        if (signal && signal != "ERR") {
-                            value += " (" + signal + ")";
-                        }
-                        cell.append(value);
-                        cell.addClass(submit_data["status"]);
-                    }
-
-                    /* Column 6: submit time */
-                    var task_events = submit_data["events"];
-                    var date_submit = datetime2obj(task_events["submit"]);
-                    cell = $("<td/>").appendTo(row);
-                    cell.append(date_submit["string"]);
-
-                    /* Column 7: queue time delta */
-                    cell = $("<td/>").appendTo(row);
-                    if (task_events["init"] != null) {
-                        var delta = task_events["init"] - task_events["submit"];
-                        cell.append(timedelta2string(delta));
-                    }
-
-                    /* Column 8, 9: init time, exit time */
-                    $.each(["init", "exit"], function(i, key) {
-                        cell = $("<td/>").appendTo(row);
-                        if (task_events[key] != null) {
-                            var str = task_events[key];
-                            var obj = datetime2obj(task_events[key]);
-                            /* Remove timestamp date if same as submit date */
-                            if (obj["date"] == date_submit["date"]) {
-                                str = obj["time"];
-                            }
-                            else {
-                                str = obj["string"];
-                            }
-                            cell.append(str);
-                        }
-                    });
-
-                    /* Column 10: run time delta */
-                    cell = $("<td/>").appendTo(row);
-                    if (    task_events["init"] != null
-                        &&  task_events["exit"] != null
-                    ) {
-                        var delta = task_events["exit"] - task_events["init"];
-                        cell.append(timedelta2string(delta));
-                    }
-
-                    /* Column 11, 12, 13: stdout file, stderr file, job script */
-                    var task_files = submit_data["files"];
-                    $.each(["out", "err", "script"], function(i, name) {
-                        cell = $("<td/>").appendTo(row);
-                        if (task_files[name] != null) {
-                            var file = "job/" + task_id_out + "."
-                                     + (submit_num + 1);
-                            if (name != "script") {
-                                file += "." + name;
-                            }
-                            var content = "empty";
-                            var n_bytes = task_files[name]["n_bytes"];
-                            if (n_bytes > 0) {
-                                var file_uri = URL_PREFIX + file;
-                                content = $("<a/>", {"href": file_uri})
-                                content.append("view");
-                                var n_bytes_str = n_bytes.toString();
-                                content.attr("title", n_bytes_str + " byte(s)");
-                            }
-                            cell.append(content);
-                        }
-                    });
-
-                    /* Column 14: other files */
-                    cell = $("<td/>").appendTo(row);
-                    var files = [];
-                    var indexed_files_data_map = {};
-                    for (var name in task_files) {
-                        if (name in {"out": null, "err": null, "script": null}) {
-                            continue;
-                        }
-                        var match = name.match(/^(.*)\.(\d+)(\.html)?$/);
-                        if (match) {
-                            var head = match[1];
-                            if (head == null) {
-                                head = "";
-                            }
-                            var idx = match[2];
-                            var tail = match[3];
-                            if (tail == null) {
-                                tail = "";
-                            }
-                            var name = head + ".*" + tail;
-                            if (!(name in indexed_files_data_map)) {
-                                indexed_files_data_map[name] = {
-                                    "head": head,
-                                    "tail": tail,
-                                    "list": [],
-                                    "name": name};
-                                files.push(name);
-                            }
-                            idx = Number(idx);
-                            indexed_files_data_map[name]["list"].push(idx);
+                    if (task_events[key] != null) {
+                        var str = task_events[key];
+                        var obj = datetime2obj(task_events[key]);
+                        /* Remove timestamp date if same as submit date */
+                        if (obj["date"] == date_submit["date"]) {
+                            str = obj["time"];
                         }
                         else {
+                            str = obj["string"];
+                        }
+                        cell.append(str);
+                    }
+                });
+
+                /* Column 10: run time delta */
+                cell = $("<td/>").appendTo(row);
+                if (    task_events["init"] != null
+                    &&  task_events["exit"] != null
+                ) {
+                    var delta = task_events["exit"] - task_events["init"];
+                    cell.append(timedelta2string(delta));
+                }
+
+                /* Column 11, 12, 13: stdout file, stderr file, job script */
+                var task_files = submit_data["files"];
+                $.each(["out", "err", "script"], function(i, name) {
+                    cell = $("<td/>").appendTo(row);
+                    if (task_files[name] != null) {
+                        var file = "job/" + task_id_out + "."
+                                 + (submit_num + 1);
+                        if (name != "script") {
+                            file += "." + name;
+                        }
+                        var content = "empty";
+                        var n_bytes = task_files[name]["n_bytes"];
+                        if (n_bytes > 0) {
+                            var file_uri = URL_PREFIX + file;
+                            content = $("<a/>", {"href": file_uri})
+                            content.append("view");
+                            var n_bytes_str = n_bytes.toString();
+                            content.attr("title", n_bytes_str + " byte(s)");
+                        }
+                        cell.append(content);
+                    }
+                });
+
+                /* Column 14: other files */
+                cell = $("<td/>").appendTo(row);
+                var files = [];
+                var indexed_files_data_map = {};
+                for (var name in task_files) {
+                    if (name in {"out": null, "err": null, "script": null}) {
+                        continue;
+                    }
+                    var match = name.match(/^(.*)\.(\d+)(\.html)?$/);
+                    if (match) {
+                        var head = match[1];
+                        if (head == null) {
+                            head = "";
+                        }
+                        var idx = match[2];
+                        var tail = match[3];
+                        if (tail == null) {
+                            tail = "";
+                        }
+                        var name = head + ".*" + tail;
+                        if (!(name in indexed_files_data_map)) {
+                            indexed_files_data_map[name] = {
+                                "head": head,
+                                "tail": tail,
+                                "list": [],
+                                "name": name};
                             files.push(name);
                         }
+                        idx = Number(idx);
+                        indexed_files_data_map[name]["list"].push(idx);
                     }
-                    files.sort();
-                    for (var i = 0; i < files.length; i++) {
-                        if (i > 0) {
-                            cell.append(" | ");
-                        }
-                        var name = files[i];
-                        if (name in indexed_files_data_map) {
-                            if (indexed_files_data_map[name]["list"].length == 1) {
-                                var d = indexed_files_data_map[name];
-                                name = d["head"] + "." + d["list"][0] + d["tail"];
-                                delete(indexed_files_data_map[name]);
-                            }
-                        }
-                        var n = (submit_num + 1).toString();
-                        var root = "job/" + task_id_out + "." + n + ".";
-                        if (name in indexed_files_data_map) {
+                    else {
+                        files.push(name);
+                    }
+                }
+                files.sort();
+                for (var i = 0; i < files.length; i++) {
+                    if (i > 0) {
+                        cell.append(" | ");
+                    }
+                    var name = files[i];
+                    if (name in indexed_files_data_map) {
+                        if (indexed_files_data_map[name]["list"].length == 1) {
                             var d = indexed_files_data_map[name];
-                            var select = $("<select/>").appendTo(cell);
-                            var option = $("<option/>");
-                            option.attr("selected", "selected");
-                            option.attr("value", "");
-                            option.text(name);
-                            option.appendTo(select);
-                            var list = d["list"];
-                            list.sort(function(a, b) {return a - b});
-                            for (var idx = 0; idx < list.length; idx++) {
-                                var option = $("<option/>").appendTo(select);
-                                var name_idx = list[idx].toString();
-                                var name = d["head"] + "." + name_idx + d["tail"];
-                                option.text(name);
-                                option.click(function() {
-                                    var file = root + $(this).text();
-                                    if (file.match(/\.html(?:\.\d+)?$/)) {
-                                        location = file;
-                                    }
-                                    else {
-                                        var file_uri = file;
-                                        location = URL_PREFIX + file_uri;
-                                    }
-                                });
-                            }
+                            name = d["head"] + "." + d["list"][0] + d["tail"];
+                            delete(indexed_files_data_map[name]);
                         }
-                        else {
-                            var n_bytes = task_files[name]["n_bytes"];
-                            if (n_bytes == 0) {
-                                var span = $("<span/>", {"title": "0 bytes"});
-                                span.text(name);
-                                cell.append(span);
-                            }
-                            else {
-                                var n = submit_num + 1;
-                                var file = root + name;
-                                var anchor = $("<a/>");
-                                var n_bytes_str = n_bytes.toString();
-                                anchor.attr("title", n_bytes_str + " byte(s)");
-                                if (name.match(/\.html$/)) {
-                                    anchor.attr("href", file);
-                                    anchor.text(name);
+                    }
+                    var n = (submit_num + 1).toString();
+                    var root = "job/" + task_id_out + "." + n + ".";
+                    if (name in indexed_files_data_map) {
+                        var d = indexed_files_data_map[name];
+                        var select = $("<select/>").appendTo(cell);
+                        var option = $("<option/>");
+                        option.attr("selected", "selected");
+                        option.attr("value", "");
+                        option.text(name);
+                        option.appendTo(select);
+                        var list = d["list"];
+                        list.sort(function(a, b) {return a - b});
+                        for (var idx = 0; idx < list.length; idx++) {
+                            var option = $("<option/>").appendTo(select);
+                            var name_idx = list[idx].toString();
+                            var name = d["head"] + "." + name_idx + d["tail"];
+                            option.text(name);
+                            option.click(function() {
+                                var file = root + $(this).text();
+                                if (file.match(/\.html(?:\.\d+)?$/)) {
+                                    location = file;
                                 }
                                 else {
                                     var file_uri = file;
-                                    anchor.attr("href", URL_PREFIX + file_uri);
-                                    anchor.text(name);
+                                    location = URL_PREFIX + file_uri;
                                 }
-                                cell.append(anchor);
-                            }
+                            });
                         }
                     }
-                });
-            }
+                    else {
+                        var n_bytes = task_files[name]["n_bytes"];
+                        if (n_bytes == 0) {
+                            var span = $("<span/>", {"title": "0 bytes"});
+                            span.text(name);
+                            cell.append(span);
+                        }
+                        else {
+                            var n = submit_num + 1;
+                            var file = root + name;
+                            var anchor = $("<a/>");
+                            var n_bytes_str = n_bytes.toString();
+                            anchor.attr("title", n_bytes_str + " byte(s)");
+                            if (name.match(/\.html$/)) {
+                                anchor.attr("href", file);
+                                anchor.text(name);
+                            }
+                            else {
+                                var file_uri = file;
+                                anchor.attr("href", URL_PREFIX + file_uri);
+                                anchor.text(name);
+                            }
+                            cell.append(anchor);
+                        }
+                    }
+                }
+            });
         }
         node.dataTable({
             /* See columns of the task_list table */
@@ -477,8 +479,16 @@ $(function() {
     $.ajax({
         url: "rose-suite-log-view.json",
         dataType: "json",
-        success: load,
-        error: err
+        success: load_suite_data,
+        error: err /* TODO: Need better handler */
+    });
+
+    var cycle_time = get_opt("cycle_time", "latest");
+    $.ajax({
+        url: "rose-suite-log-view-" + cycle_time + ".json",
+        dataType: "json",
+        success: load_cycle_tasks_data,
+        error: err /* TODO: Need better handler */
     });
 } );
 </script>
@@ -507,6 +517,12 @@ $(function() {
     <a id="suite_info_toggle" href="#">suite info</a>
     <div id="suite_info"></div>
   </div>
+</div>
+<div>
+<form action="." method="get">
+<label for="cycle_time">Display Tasks at Cycle Time:</label>
+<input id="cycle_time" type="text" value="latest" />
+</form>
 </div>
 <table id="task_list" summary="Task List">
   <thead>
