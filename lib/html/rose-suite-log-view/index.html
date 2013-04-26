@@ -53,6 +53,7 @@
 }
 #body-main {
     background: #eee;
+    font-size: small;
     left: 0;
     margin: 0;
     padding: 0;
@@ -61,10 +62,10 @@
     right: 0;
     top: 2.5em;
 }
-#body-main-top {
+#body-main-top, #cycle_times_filter {
     background: white;
     border: thin solid #aaa;
-    font-size: xx-small;
+    font-size: small;
     padding: 0.2em;
 }
 #body-main-top address {
@@ -184,16 +185,19 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 
 /* The ready function */
 $(function() {
-    function err(data) {
-        alert("Could not load data.");
+    /* Report error loading a URL. */
+    function err(url) {
+        alert(url + ": could not load data.");
     }
 
-    function get_opt(key, default_value) {
-        var match = RegExp("[?&]" + key + "=([^&#]*)").exec(location.search);
+    /* Get values of query parameter from URL matching key. */
+    function get_opts(key, default_values) {
+        var re_str = "[?&]" + key + "=([^&#]*)";
+        var match = location.search.match(RegExp(re_str, "g"));
         if (match) {
-            return match[1];
+            return $.map(match, function(m) {return RegExp(re_str).exec(m)[1]});
         }
-        return default_value;
+        return default_values;
     };
 
     /* Convert a time delta in seconds to a M:SS string. */
@@ -219,8 +223,8 @@ $(function() {
         return {"date": dd, "time": dt, "string": dd + " " + dt};
     }
 
-    /* Load suite data into the HTML. */
-    function load_suite_data(data) {
+    /* Populate page with general suite data. */
+    function populate_suite_data(data) {
         var title_var = data["suite"];
         document.title = title_var;
         $("h1:first").text(title_var).attr("title", data["suite"]);
@@ -238,12 +242,22 @@ $(function() {
         $("#suite_info_toggle").click(function() {
             $("#suite_info").toggle();
         });
+        $.each(data["cycle_times"], function(i, cycle_time) {
+            $("#cycle_time select").append($("<option/>").text(cycle_time));
+        });
+        $("#cycle_time_toggle").click(function() {
+            $("#cycle_time").toggle();
+        });
+        $("#cycle_time_toggle").click();
+        $("#t_cycle_times").text(data["cycle_times"].length);
+        populate_tasks_table();
     }
 
-    /* Load the data of the tasks into the HTML. */
-    function load_cycle_tasks_data(data) {
+    /* Populate task table with data from a cycle. */
+    function populate_cycle_tasks_data(data) {
         var cycle_time = data["cycle_time"];
-        $("#cycle_time").text(cycle_time);
+        var option_node = $("#cycle_time option:contains(" + cycle_time + ")");
+        option_node.attr("selected", "selected");
         var URL_PREFIX = "source.html?suite=" + data["suite"] + "\&path=";
         var node = $("#task_list");
         var task_keys = [];
@@ -449,46 +463,68 @@ $(function() {
                 }
             });
         }
-        node.dataTable({
-            /* See columns of the task_list table */
-            "aaSorting": [[5, "asc"]],
-            "aoColumn": [
-                null,
-                {"bVisible": false},
-                {"bVisible": false},
-                {"bVisible": false, "sType": "numeric"},
-                null,
-                null,
-                {"sType": "delta-time-m-s"},
-                {"bVisible": false},
-                {"bVisible": false},
-                {"sType": "delta-time-m-s"},
-                null,
-                null,
-                {"bVisible": false},
-                null
-            ],
-            "bPaginate": false,
-            "bStateSave": true,
-            "oColVis": {"activate": "mouseover", "aiExclude": [0]},
-            "oLanguage": {"sSearch": "Filter results:"},
-            "sDom": '<"#task_list_colvis"C>frltip'
-        });
     }
 
-    $.ajax({
-        url: "rose-suite-log-view.json",
-        dataType: "json",
-        success: load_suite_data,
-        error: err /* TODO: Need better handler */
-    });
+    /* Populates the task table. */
+    function populate_tasks_table(cycle_times) {
+        if (cycle_times == null) {
+            var default_value = $("#cycle_time option:first").text();
+            cycle_times = get_opts("cycle_time", [default_value]);
+            $("#n_cycle_times").text(cycle_times.length);
+        }
+        if (cycle_times.length) {
+            var cycle_time = cycle_times.shift();
+            var url = "rose-suite-log-view-" + cycle_time + ".json";
+            $.ajax({
+                url: url,
+                dataType: "json",
+                success: [
+                    populate_cycle_tasks_data,
+                    function() {populate_tasks_table(cycle_times);}
+                ],
+                error: [
+                    function() {err(url);},
+                    function() {populate_tasks_table(cycle_times);}
+                ]
+            });
+        }
+        else {
+            /* Table populated. Initialise Data Table. */
+            var node = $("#task_list");
+            node.dataTable({
+                /* See columns of the task_list table */
+                "aaSorting": [[5, "asc"]],
+                "aoColumn": [
+                    null,
+                    {"bVisible": false},
+                    {"bVisible": false},
+                    {"bVisible": false, "sType": "numeric"},
+                    null,
+                    null,
+                    {"sType": "delta-time-m-s"},
+                    {"bVisible": false},
+                    {"bVisible": false},
+                    {"sType": "delta-time-m-s"},
+                    null,
+                    null,
+                    {"bVisible": false},
+                    null
+                ],
+                "bPaginate": false,
+                "bStateSave": true,
+                "oColVis": {"activate": "mouseover", "aiExclude": [0]},
+                "oLanguage": {"sSearch": "Filter results:"},
+                "sDom": '<"#task_list_colvis"C>frltip'
+            });
+        }
+    }
 
-    var cycle_time = get_opt("cycle_time", "latest");
+    var url_main = "rose-suite-log-view.json";
     $.ajax({
-        url: "rose-suite-log-view-" + cycle_time + ".json",
+        url: url_main,
         dataType: "json",
-        success: load_cycle_tasks_data,
-        error: err /* TODO: Need better handler */
+        success: populate_suite_data,
+        error: [function() {err(url_main);}]
     });
 } );
 </script>
@@ -518,10 +554,14 @@ $(function() {
     <div id="suite_info"></div>
   </div>
 </div>
-<div>
-<form action="." method="get">
-<label for="cycle_time">Display Tasks at Cycle Time:</label>
-<input id="cycle_time" type="text" value="latest" />
+<div id="cycle_times_filter">
+<a id="cycle_time_toggle" href="#">cycle times filter</a>
+(<span id="n_cycle_times">?</span> of <span id="t_cycle_times">?</span> selected)
+<form id="cycle_time" action="." method="get">
+<select name="cycle_time" multiple="multiple" size="10"
+title="filter cycle times">
+</select>
+<input type="submit" value="ok" />
 </form>
 </div>
 <table id="task_list" summary="Task List">

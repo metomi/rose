@@ -154,7 +154,7 @@ class SuiteLogViewGenerator(object):
                     suite_info[key] = node.value
         main_data = {"suite": suite_name,
                      "suite_info": suite_info,
-                     "cycles": [],
+                     "cycle_times": [],
                      "updated_at": time()}
         suite_db_file = self.suite_engine_proc.get_suite_db_file(suite_name)
         if os.path.exists(suite_db_file):
@@ -164,20 +164,21 @@ class SuiteLogViewGenerator(object):
             this_mtime = os.stat(suite_db_file).st_mtime
             while prev_mtime is None or prev_mtime < this_mtime:
                 cycles = self.suite_engine_proc.get_suite_events(suite_name)
-                for cycle, tasks in cycles.items():
-                    if cycle not in main_data["cycles"]:
-                        main_data["cycles"].append(cycle)
-                    f = open(self.NS + "-" + cycle + ".json", "wb")
-                    json.dump({"cycle_time": cycle, "tasks": tasks},
+                for cycle_time, tasks in cycles.items():
+                    if cycle_time not in main_data["cycle_times"]:
+                        main_data["cycle_times"].append(cycle_time)
+                    f = open(self.NS + "-" + cycle_time + ".json", "wb")
+                    json.dump({"cycle_time": cycle_time, "tasks": tasks},
                               f, indent=0)
                     f.close()
                 main_data["updated_at"] = time()
                 prev_mtime = this_mtime
                 this_mtime = os.stat(suite_db_file).st_mtime
-        main_data["cycles"].sort()
-        main_data["cycles"].reverse()
-        self.fs_util.symlink(self.NS + "-" + main_data["cycles"][0] + ".json",
-                             self.NS + "-latest.json")
+        main_data["cycle_times"].sort()
+        main_data["cycle_times"].reverse()
+        self.fs_util.symlink(
+                self.NS + "-" + main_data["cycle_times"][0] + ".json",
+                self.NS + "-latest.json")
         f = open(self.NS + ".json", "wb")
         json.dump(main_data, f, indent=0)
         f.close()
