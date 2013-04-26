@@ -448,9 +448,13 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         dict_rows.reverse()
 
     keylist = []
+    dummy_row = {}
     for key in all_keys:
         if "%" + key in opts.format:
             keylist.append(key)
+            dummy_row[key] = key
+
+    dict_rows.insert(0, dummy_row)  # Insert a dummy results row for printing.
 
     dict_rows = align(dict_rows, keylist)
 
