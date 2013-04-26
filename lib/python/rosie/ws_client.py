@@ -175,7 +175,7 @@ class SuiteInfo(Event):
 def local_suites(argv):
     """CLI command to list all the locally checked out suites"""
     opt_parser = RoseOptionParser().add_my_options(
-            "format", "prefix", "reverse", "sort", "ws_root")
+            "format", "no_head", "prefix", "reverse", "sort", "ws_root",)
     opts, args = opt_parser.parse_args(argv)
 
     ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
@@ -208,8 +208,8 @@ def local_suites(argv):
 def lookup(argv):
     """CLI command to run the various search types"""
     opt_parser = RoseOptionParser().add_my_options(
-            "all_revs", "format", "prefix", "query", "reverse", "search",
-            "sort", "url", "ws_root")
+            "all_revs", "format", "no_head", "prefix", "query", "reverse", 
+            "search", "sort", "url", "ws_root")
     opts, args = opt_parser.parse_args(argv)
     if not args:
         sys.exit(opt_parser.print_usage())
@@ -448,13 +448,15 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         dict_rows.reverse()
 
     keylist = []
-    dummy_row = {}
     for key in all_keys:
         if "%" + key in opts.format:
             keylist.append(key)
-            dummy_row[key] = key
 
-    dict_rows.insert(0, dummy_row)  # Insert a dummy results row for printing.
+    if not opts.no_head:
+        dummy_row = {}
+        for key in all_keys:
+            dummy_row[key] = key
+        dict_rows.insert(0, dummy_row)
 
     dict_rows = align(dict_rows, keylist)
 

@@ -49,6 +49,9 @@
 #         For example: rose suite-list --format="%idx from %owner"
 #         might give: abc01 from daisy
 #
+#     --no-head
+#         Do not print column headers.
+#
 #     --quiet; -q
 #         Shorthand for --format="%idx".
 #
