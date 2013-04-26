@@ -131,6 +131,9 @@ class ConfigPage(gtk.VBox):
                               shrink=True)
             self.vpaned.pack2(second_panel, resize=True, shrink=True)
             self.vpaned.set_position(rose.config_editor.FILE_PANEL_EXPAND)
+        else:
+            self.vpaned.pack1(self.scrolled_main_window, resize=True,
+                              shrink=True)
         self.vpaned.show()
         self.main_vpaned.pack2(self.vpaned)
         self.main_vpaned.show()
