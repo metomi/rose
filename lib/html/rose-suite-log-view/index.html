@@ -493,13 +493,14 @@ $(function() {
             var cycle_time = cycle_times.shift();
             var url = "rose-suite-log-view-" + cycle_time + ".json";
             $.ajax({
-                url: url,
-                dataType: "json",
-                success: [
+                "url": url,
+                "cache": false,
+                "dataType": "json",
+                "success": [
                     populate_cycle_tasks_data,
                     function() {populate_tasks_table(cycle_times);}
                 ],
-                error: [
+                "error": [
                     function() {err(url);},
                     function() {populate_tasks_table(cycle_times);}
                 ]
@@ -538,10 +539,11 @@ $(function() {
 
     var url_main = "rose-suite-log-view.json";
     $.ajax({
-        url: url_main,
-        dataType: "json",
-        success: populate_suite_data,
-        error: [function() {err(url_main);}]
+        "url": url_main,
+        "cache": false,
+        "dataType": "json",
+        "success": populate_suite_data,
+        "error": [function() {err(url_main);}]
     });
 } );
 </script>
