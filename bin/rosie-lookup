@@ -57,7 +57,7 @@
 #         For example: rosie lookup daisy --format="%idx from %owner"
 #         might give: abc01 from daisy
 #
-#     --no-head
+#     --no-headers; -H
 #         Do not print column headers.
 #
 #     --prefix=PREFIX

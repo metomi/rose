@@ -241,10 +241,10 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "new_mode",
                         "help": "Fresh start."}],
-               "no_head": [
-                       ["--no-head"],
+               "no_headers": [
+                       ["--no-headers", "-H"],
                        {"action": "store_true",
-                        "dest": "no_head",
+                        "dest": "no_headers",
                         "help": "Suppress headers."}],
                "next": [
                        ["--next"],
