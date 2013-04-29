@@ -912,11 +912,13 @@ class ConfigPage(gtk.VBox):
                 old_variable = self.panel_data[old_id_list.index(var_id)]
                 old_variable.metadata = variable.metadata
                 if old_variable.value != variable.value:
+                    # Reset the value.
                     self.variable_ops.set_var_value(old_variable, 
                                                     variable.value)
                 old_ign_set = set(old_variable.ignored_reason.keys())
                 new_ign_set = set(variable.ignored_reason.keys())
                 if old_ign_set != new_ign_set:
+                    # Reset the ignored state.
                     self.variable_ops.set_var_ignored(
                                       old_variable,
                                       variable.ignored_reason.copy(),
@@ -925,6 +927,8 @@ class ConfigPage(gtk.VBox):
                     # The types are the same, but pass on the info.
                     old_variable.ignored_reason = (
                                          variable.ignored_reason.copy())
+                old_variable.error = variable.error.copy()
+                old_variable.warning = variable.warning.copy()
             else:
                 self.variable_ops.add_var(variable)
         for variable in new_ghost_data:
@@ -940,12 +944,12 @@ class ConfigPage(gtk.VBox):
                 old_variable.ignored_reason = variable.ignored_reason.copy()
                 if old_variable.value != variable.value:
                     old_variable.value = variable.value
+                old_variable.error = variable.error.copy()
+                old_variable.warning = variable.warning.copy()
             else:
                 self.ghost_data.append(variable)
         self.refresh()
         self.trigger_update_status()
-       # if self.sort_data is not None:
-       #    self.update_sort_data()
         return False
 
     def sort_data(self, column_index=0, ascending=True, ghost=False):
