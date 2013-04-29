@@ -480,6 +480,12 @@ def standard_format_config(config):
 def get_metadata_for_config_id(setting_id, meta_config):
     """Return a dict of metadata properties and values for a setting id."""
     metadata = {}
+    if rose.CONFIG_DELIMITER in setting_id:
+        section, option = setting_id.split(rose.CONFIG_DELIMITER, 1)
+        search_option = REC_ID_STRIP_DUPL.sub("", option)
+    else:
+        section = setting_id
+        option = None
     search_id = REC_ID_STRIP_DUPL.sub("", setting_id)
     is_element = REC_ID_ELEMENT.search(setting_id)
     no_modifier_id = REC_MODIFIER.sub("", search_id)
@@ -491,8 +497,10 @@ def get_metadata_for_config_id(setting_id, meta_config):
             for opt, opt_node in node.value.items():
                 if not opt_node.is_ignored():
                     metadata.update({opt: opt_node.value})
-            if rose.META_PROP_TITLE in metadata:
-                metadata.pop(rose.META_PROP_TITLE)
+            if option is None and rose.META_PROP_TITLE in metadata:
+                # Handle section modifier titles
+                modifier = search_id.replace(no_modifier_id, "")
+                metadata[rose.META_PROP_TITLE] += " " + modifier
             if (setting_id != search_id and
                 rose.META_PROP_DUPLICATE in metadata):
                 # foo{bar}(1) cannot inherit duplicate from foo.
@@ -503,9 +511,20 @@ def get_metadata_for_config_id(setting_id, meta_config):
         for opt, opt_node in node.value.items():
             if not opt_node.is_ignored():
                 metadata.update({opt: opt_node.value})
-    if is_element and rose.META_PROP_TITLE in metadata:
-        # Individual items of an array should not steal its title
-        metadata.pop(rose.META_PROP_TITLE)
+    if rose.META_PROP_TITLE in metadata:
+        # Handle duplicate (indexed) settings sharing a title
+        if option is None:
+            if search_id != setting_id:
+                # Handle duplicate sections titles
+                metadata.pop(rose.META_PROP_TITLE)
+        elif search_option != option:
+            # Handle duplicate options titles
+            index = option.replace(search_option, "")
+            metadata[rose.META_PROP_TITLE] += " " + index
+    if (rose.META_PROP_LENGTH in metadata and
+        option is not None and search_option != option):
+        # Option is an element in an array.
+        metadata.pop(rose.META_PROP_LENGTH)
     metadata.update({'id': setting_id})
     return metadata
 
