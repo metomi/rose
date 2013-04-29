@@ -104,8 +104,8 @@ class CylcProcessor(SuiteEngineProcessor):
                     if os.path.exists(d):
                         self.fs_util.delete(d)
             else:
-                command = self.popen.get_cmd("ssh", job_auth, "rm", "-rf") +
-                          dirs
+                command = self.popen.get_cmd("ssh", job_auth, "rm", "-rf")
+                command += dirs
                 self.popen(*command)
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
@@ -186,11 +186,11 @@ class CylcProcessor(SuiteEngineProcessor):
                 "SELECT time,name,cycle,submit_num,event,message"
                 " FROM task_events"
                 " ORDER BY time"):
-            time, name, cycle_time, submit_num, key, message = row
+            ev_time, name, cycle_time, submit_num, key, message = row
             event = EVENTS.get(key, None)
             if event is None:
                 continue
-            event_time = mktime(strptime(time, "%Y-%m-%dT%H:%M:%S"))
+            event_time = mktime(strptime(ev_time, "%Y-%m-%dT%H:%M:%S"))
             task_id = name + self.TASK_ID_DELIM + cycle_time
             if cycle_time not in data:
                 data[cycle_time] = {"cycle_time": cycle_time,
@@ -232,7 +232,26 @@ class CylcProcessor(SuiteEngineProcessor):
         # Locate job log files
         archive_threshold = time() - 259200 # 3 days ago, FIXME
         for cycle_time, datum in data.items():
-            can_archive = True
+            archive_file_name = "job-" + cycle_time + ".tar.gz"
+            if os.access(archive_file_name, os.F_OK | os.R_OK):
+                datum["is_archived"] = True
+                tar = tarfile.open(archive_file_name, "r:gz")
+                for tarinfo in tar:
+                    size = tarinfo.size
+                    name = tarinfo.name[len("job/"):]
+                    names = name.split(self.TASK_LOG_DELIM, 3)
+                    if len(names) == 3:
+                        key = "script"
+                        task_name, c, submit_num = names
+                    elif len(names) == 4:
+                        task_name, c, submit_num, key = names
+                        if key == "status":
+                            continue
+                    submit = datum["tasks"][task_name][int(submit_num) - 1]
+                    submit["files"][key] = {"n_bytes": size}
+                tar.close()
+                continue
+            dont_archive = False
             for name, submits in datum["tasks"].items():
                 for i, submit in enumerate(submits):
                     delim = self.TASK_LOG_DELIM
@@ -247,39 +266,41 @@ class CylcProcessor(SuiteEngineProcessor):
                         size = stat.st_size
                         submit["files"][key] = {"n_bytes": size}
                         if stat.st_mtime > archive_threshold:
-                            can_archive = False
-            if can_archive:
-                # Pull from each remote host all job log files of this
-                # cycle time.
-                auths = self.get_suite_jobs_auths(suite_name, cycle_time)
-                log_dir_rel = self.get_task_log_dir_rel(suite_name)
-                log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
-                glob_pat = self.TASK_LOG_DELIM.join("*", cycle_time, "*")
-                for auth in auths:
-                    r_glob = "%s:%s/%s" % (auth, log_dir_rel, glob_pat)
-                    cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
-                    try:
-                        out, err = self.popen(*cmd)
-                    except RosePopenError as e:
-                        self.handle_event(e, level=Reporter.WARN)
-                # Create the job log archive for this cycle time.
-                tar = tarfile.open("job-" + cycle_time + ".tar.gz", "w:gz")
-                names = glob("job/" + glob_pat)
-                for name in names:
-                    tar.add(name)
-                tar.close()
-                # Remove local job log files of this cycle time.
-                for name in names:
-                    self.fs_util.delete(name)
-                # Remove remote job log files of this cycle time.
-                for auth in auths:
-                    r_glob = "%s/%s" % (log_dir_rel, glob_pat)
-                    cmd = self.popen.get_cmd("ssh", auth, "rm", "-f", r_glob)
-                    try:
-                        out, err = self.popen(*cmd)
-                    except RosePopenError as e:
-                        self.handle_event(e, level=Reporter.WARN)
-                datum["is_archived"] = True
+                            dont_archive = True
+            if dont_archive:
+                datum["is_archived"] = False
+                continue
+            # Pull from each remote host all job log files of this
+            # cycle time.
+            auths = self.get_suite_jobs_auths(suite_name, cycle_time)
+            log_dir_rel = self.get_task_log_dir_rel(suite_name)
+            log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+            glob_pat = self.TASK_LOG_DELIM.join(["*", cycle_time, "*"])
+            for auth in auths:
+                r_glob = "%s:%s/%s" % (auth, log_dir_rel, glob_pat)
+                cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
+                try:
+                    out, err = self.popen(*cmd)
+                except RosePopenError as e:
+                    self.handle_event(e, level=Reporter.WARN)
+            # Create the job log archive for this cycle time.
+            tar = tarfile.open(archive_file_name, "w:gz")
+            names = glob("job/" + glob_pat)
+            for name in names:
+                tar.add(name)
+            tar.close()
+            # Remove local job log files of this cycle time.
+            for name in names:
+                self.fs_util.delete(name)
+            # Remove remote job log files of this cycle time.
+            for auth in auths:
+                r_glob = "%s/%s" % (log_dir_rel, glob_pat)
+                cmd = self.popen.get_cmd("ssh", auth, "rm", "-f", r_glob)
+                try:
+                    out, err = self.popen(*cmd)
+                except RosePopenError as e:
+                    self.handle_event(e, level=Reporter.WARN)
+            datum["is_archived"] = True
         return data
 
     def get_suite_jobs_auths(self, suite_name, cycle_time=None,
