@@ -212,8 +212,8 @@ type=integer
       <p>Now if we save the file and open the application in the config editor
       again, we see that the value of <var>MAX_TARGETS</var> now appears in a
       special numeric widget, and that the title has replaced the name. You can
-      see the difference easily by refreshing the metadata (menu
-      <kbd>Metadata -&gt; Refresh Metadata</kbd>).</p>
+      see the difference easily by refreshing the metadata (menu <kbd>Metadata
+      -&gt; Refresh Metadata</kbd>).</p>
 
       <p>Setting the type does more than change the widget - it also instructs
       Rose to check that the input is valid for that type. If the value of
@@ -479,7 +479,7 @@ ns=languages
       <h3 class="alwayshidden">Example: metadata url</h3>
 
       <p>Sometimes just having help or descriptions isn't enough, or there's a
-      more relevant resource page on the Web - in this case you can add 
+      more relevant resource page on the Web - in this case you can add
       <var>Web Help</var> using a url:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=LANG_JUPITER]
@@ -497,9 +497,13 @@ url=http://solarsystem.nasa.gov/planets/profile.cfm?Object=Jupiter
     <div class="slide">
       <h3 class="alwayshidden">Example: view changes</h3>
 
-      <p>This can be accessed via the variable button menu (<var>Web
-      Help</var>) in the config editor on reload, or via clicking on the
-      variable name when there's no help.</p>
+      <p>Navigate to the page containing <samp>LANG_JUPITER</samp>. After a
+      reload of the metadata, click the menu button next to the
+      <samp>LANG_JUPITER</samp> name to launch a menu - this will now contain a
+      <var>Web Help</var> item.</p>
+
+      <p>If there isn't any help defined for a variable, clicking the name will
+      launch the web help url instead.</p>
     </div>
 
     <div class="slide">
