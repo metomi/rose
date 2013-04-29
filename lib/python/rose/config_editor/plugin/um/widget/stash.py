@@ -82,6 +82,7 @@ class BaseStashSummaryDataPanelv1(
     STREQ_NL_BASE = "namelist:streq"
     STREQ_NL_SECT_OPT = "isec"
     STREQ_NL_ITEM_OPT = "item"
+    STREQ_NL_PACKAGE_OPT = "package"
     OPTION_NL_MAP = {"dom_name": "namelist:domain",
                      "tim_name": "namelist:time",
                      "use_name": "namelist:use"}
@@ -156,7 +157,7 @@ class BaseStashSummaryDataPanelv1(
         sub_sect_names = self.sections.keys()
         sub_var_names = []
         self.var_id_map = {}
-        section_sect_item = {}
+        section_sort_keys = {}
         # Apply the correct default sorting (section, item)
         for section, variables in self.variables.items():
             for variable in variables:
@@ -164,28 +165,37 @@ class BaseStashSummaryDataPanelv1(
                 if variable.name not in sub_var_names:
                     sub_var_names.append(variable.name)
                 if variable.name == self.STREQ_NL_SECT_OPT:
-                    section_sect_item.setdefault(section, [])
+                    section_sort_keys.setdefault(section, [])
                     try:
                         value = int(variable.value)
                     except (TypeError, ValueError):
                         value = variable.value
-                    if len(section_sect_item[section]) < 1:
-                        section_sect_item[section].append(None)
-                    section_sect_item[section][0] = value
+                    if len(section_sort_keys[section]) < 1:
+                        section_sort_keys[section].append(None)
+                    section_sort_keys[section][0] = value
                 if variable.name == self.STREQ_NL_ITEM_OPT:
-                    section_sect_item.setdefault(section, [])
+                    section_sort_keys.setdefault(section, [])
                     try:
                         value = int(variable.value)
                     except (TypeError, ValueError):
                         value = variable.value
-                    while len(section_sect_item[section]) < 2:
-                        section_sect_item[section].append(None)
-                    section_sect_item[section][1] = value
-        sub_sect_names.sort(lambda x, y: cmp(section_sect_item.get(x),
-                                             section_sect_item.get(y)))
+                    while len(section_sort_keys[section]) < 2:
+                        section_sort_keys[section].append(None)
+                    section_sort_keys[section][1] = value
+                if variable.name == self.STREQ_NL_PACKAGE_OPT:
+                    section_sort_keys.setdefault(section, [])
+                    while len(section_sort_keys[section]) < 3:
+                        section_sort_keys[section].append(None)
+                    section_sort_keys[section][2] = variable.value
+        for section, sort_list in section_sort_keys.items():
+            while len(sort_list) < 4:
+                sort_list.append(None)
+            sort_list[3] = section
+        sub_sect_names.sort(lambda x, y: cmp(section_sort_keys.get(x),
+                                             section_sort_keys.get(y)))
         sub_var_names.sort(rose.config.sort_settings)
-        sub_var_names.sort(lambda x, y: (y != "package") -
-                                        (x != "package"))
+        sub_var_names.sort(lambda x, y: (y != self.STREQ_NL_PACKAGE_OPT) -
+                                        (x != self.STREQ_NL_PACKAGE_OPT))
         sub_var_names.sort(lambda x, y: (y == self.STREQ_NL_ITEM_OPT) -
                                         (x == self.STREQ_NL_ITEM_OPT))
         sub_var_names.sort(lambda x, y: (y == self.STREQ_NL_SECT_OPT) -
@@ -366,7 +376,8 @@ class BaseStashSummaryDataPanelv1(
                 continue
             base_sect = sect.rsplit("(", 1)[0]
             if base_sect == self.STREQ_NL_BASE:
-                package_node = node.get(["package"], no_ignore=True)
+                package_node = node.get([self.STREQ_NL_PACKAGE_OPT],
+                                        no_ignore=True)
                 if package_node is not None:
                     package = package_node.value
                     self._package_lookup.setdefault(package, {})
@@ -644,7 +655,7 @@ class BaseStashSummaryDataPanelv1(
         packages = {}
         for section, vars_ in self.variables.items():
             for var in vars_:
-                if var.name == "package":
+                if var.name == self.STREQ_NL_PACKAGE_OPT:
                     is_ignored = (rose.variable.IGNORED_BY_USER in
                                   self.sections[section].ignored_reason)
                     packages.setdefault(var.value, [])
@@ -724,7 +735,7 @@ class BaseStashSummaryDataPanelv1(
         profile_streqs = {}
         for section, vars_ in self.variables.items():
             for var in vars_:
-                if var.name == "package":
+                if var.name == self.STREQ_NL_PACKAGE_OPT:
                     if (only_this_package is None or
                         var.value == only_this_package):
                         sect, opt = self.util.get_section_option_from_id(
@@ -754,7 +765,7 @@ class BaseStashSummaryDataPanelv1(
         sections_for_changing = []
         for section, vars_ in self.variables.items():
             for var in vars_:
-                if var.name == "package":
+                if var.name == self.STREQ_NL_PACKAGE_OPT:
                     if (only_this_package is None or
                         var.value == only_this_package):
                         sect, opt = self.util.get_section_option_from_id(
