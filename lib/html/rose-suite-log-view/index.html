@@ -256,6 +256,10 @@ $(function() {
     /* Populate task table with data from a cycle. */
     function populate_cycle_tasks_data(data) {
         var cycle_time = data["cycle_time"];
+        var cycle_time_archive = null;
+        if (data["is_archived"]) {
+            cycle_time_archive = "job-" + cycle_time + ".tar.gz";
+        }
         var option_node = $("#cycle_time option:contains(" + cycle_time + ")");
         option_node.attr("selected", "selected");
         var URL_PREFIX = "source.html?suite=" + data["suite"] + "\&path=";
@@ -348,9 +352,15 @@ $(function() {
                         var content = "empty";
                         var n_bytes = task_files[name]["n_bytes"];
                         if (n_bytes > 0) {
-                            var file_uri = URL_PREFIX + file;
-                            content = $("<a/>", {"href": file_uri})
-                            content.append("view");
+                            if (cycle_time_archive) {
+                                content = $("<a/>", {"href": cycle_time_archive});
+                                content.append("archived");
+                            }
+                            else {
+                                var file_uri = URL_PREFIX + file;
+                                content = $("<a/>", {"href": file_uri});
+                                content.append("view");
+                            }
                             var n_bytes_str = n_bytes.toString();
                             content.attr("title", n_bytes_str + " byte(s)");
                         }
@@ -425,7 +435,10 @@ $(function() {
                             option.text(name);
                             option.click(function() {
                                 var file = root + $(this).text();
-                                if (file.match(/\.html(?:\.\d+)?$/)) {
+                                if (cycle_time_archive) {
+                                    location = cycle_time_archive;
+                                }
+                                else if (file.match(/\.html(?:\.\d+)?$/)) {
                                     location = file;
                                 }
                                 else {
@@ -448,7 +461,11 @@ $(function() {
                             var anchor = $("<a/>");
                             var n_bytes_str = n_bytes.toString();
                             anchor.attr("title", n_bytes_str + " byte(s)");
-                            if (name.match(/\.html$/)) {
+                            if (cycle_time_archive) {
+                                anchor.attr("href", cycle_time_archive);
+                                anchor.text(name);
+                            }
+                            else if (name.match(/\.html$/)) {
                                 anchor.attr("href", file);
                                 anchor.text(name);
                             }

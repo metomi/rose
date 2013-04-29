@@ -35,7 +35,8 @@ from rose.suite_engine_proc import \
 import shlex
 import socket
 import sqlite3
-from time import mktime, sleep, strptime
+import tarfile
+from time import mktime, sleep, strptime, time
 
 
 class CylcProcessor(SuiteEngineProcessor):
@@ -77,11 +78,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 job_auths = self.get_suite_jobs_auths(suite_name)
             except sqlite3.OperationalError as e:
                 pass
-        for job_user, job_host in job_auths + [(None, "localhost")]:
+        for job_auth in job_auths + ["localhost"]:
+            if "@" in job_auth:
+                job_host = job_auth.split("@", 1)[1]
+            else:
+                job_host = job_auth
             dirs = [] 
             for key in ["share", "work"]:
                 item_root = None
-                node_value = conf.get_value(["rose-suite-run", "root-dir-" + key])
+                node_value = conf.get_value(
+                        ["rose-suite-run", "root-dir-" + key])
                 for line in node_value.strip().splitlines():
                     pattern, value = line.strip().split("=", 1)
                     if fnmatchcase(job_host, pattern):
@@ -92,19 +98,14 @@ class CylcProcessor(SuiteEngineProcessor):
                     item_path_source = os.path.join(item_root, dir_rel)
                     dirs.append(item_path_source)
             dirs.append(self.get_suite_dir_rel(suite_name))
-            if (job_user, job_host) == (None, "localhost"):
+            if job_auth == "localhost":
                 for d in dirs:
                     d = os.path.realpath(env_var_process(d))
                     if os.path.exists(d):
                         self.fs_util.delete(d)
             else:
-                if job_user:
-                    auth = job_user + "@"
-                if job_host:
-                    auth += job_host
-                else:
-                    auth += "localhost"
-                command = self.popen.get_cmd("ssh", auth, "rm", "-rf") + dirs
+                command = self.popen.get_cmd("ssh", job_auth, "rm", "-rf") +
+                          dirs
                 self.popen(*command)
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
@@ -136,24 +137,28 @@ class CylcProcessor(SuiteEngineProcessor):
 
         Return a data structure that looks like:
         {   <cycle time string>: {
-                <task name>: [
-                    {   "events": {
-                            "submit": <seconds-since-epoch>,
-                            "init": <seconds-since-epoch>,
-                            "exit": <seconds-since-epoch>,
+                "cycle_time": <cycle time>,
+                "is_archived": True, # if job logs of this cycle are archived
+                "tasks": {
+                    <task name>: [
+                        {   "events": {
+                                "submit": <seconds-since-epoch>,
+                                "init": <seconds-since-epoch>,
+                                "exit": <seconds-since-epoch>,
+                            },
+                            "files": {
+                                "script": {"n_bytes": <n_bytes>},
+                                "out": {"n_bytes": <n_bytes>},
+                                "err": {"n_bytes": <n_bytes>},
+                                # ... more files
+                            },
+                            "signal": <signal-name-if-job-killed-by-signal>,
+                            "status": <"pass"|"fail">,
                         },
-                        "files": {
-                            "script": {"n_bytes": <n_bytes>},
-                            "out": {"n_bytes": <n_bytes>},
-                            "err": {"n_bytes": <n_bytes>},
-                            # ... more files
-                        },
-                        "signal": <signal-name-if-job-killed-by-signal>,
-                        "status": <"pass"|"fail">,
-                    },
-                    # ... more re-submits of the task
-                ],
-                # ... more task names
+                        # ... more re-submits of the task
+                    ],
+                    # ... more task names
+                }
             }
             # ... more cycle times
         }
@@ -188,10 +193,12 @@ class CylcProcessor(SuiteEngineProcessor):
             event_time = mktime(strptime(time, "%Y-%m-%dT%H:%M:%S"))
             task_id = name + self.TASK_ID_DELIM + cycle_time
             if cycle_time not in data:
-                data[cycle_time] = {}
-            if name not in data[cycle_time]:
-                data[cycle_time][name] = []
-            submits = data[cycle_time][name]
+                data[cycle_time] = {"cycle_time": cycle_time,
+                                    "is_archived": False,
+                                    "tasks": {}}
+            if name not in data[cycle_time]["tasks"]:
+                data[cycle_time]["tasks"][name] = []
+            submits = data[cycle_time]["tasks"][name]
             submit_num = int(submit_num)
             if not submit_num:
                 continue
@@ -222,9 +229,11 @@ class CylcProcessor(SuiteEngineProcessor):
                 submit["events"]["submit"] = event_time
                 submit["status"] = event
 
-        # Locate task log files
+        # Locate job log files
+        archive_threshold = time() - 259200 # 3 days ago, FIXME
         for cycle_time, datum in data.items():
-            for name, submits in datum.items():
+            can_archive = True
+            for name, submits in datum["tasks"].items():
                 for i, submit in enumerate(submits):
                     delim = self.TASK_LOG_DELIM
                     root = "job/" + delim.join([name, cycle_time, str(i + 1)])
@@ -234,34 +243,72 @@ class CylcProcessor(SuiteEngineProcessor):
                             key = "script"
                         elif key == "status":
                             continue
-                        size = os.stat(path).st_size
+                        stat = os.stat(path)
+                        size = stat.st_size
                         submit["files"][key] = {"n_bytes": size}
+                        if stat.st_mtime > archive_threshold:
+                            can_archive = False
+            if can_archive:
+                # Pull from each remote host all job log files of this
+                # cycle time.
+                auths = self.get_suite_jobs_auths(suite_name, cycle_time)
+                log_dir_rel = self.get_task_log_dir_rel(suite_name)
+                log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+                glob_pat = self.TASK_LOG_DELIM.join("*", cycle_time, "*")
+                for auth in auths:
+                    r_glob = "%s:%s/%s" % (auth, log_dir_rel, glob_pat)
+                    cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
+                    try:
+                        out, err = self.popen(*cmd)
+                    except RosePopenError as e:
+                        self.handle_event(e, level=Reporter.WARN)
+                # Create the job log archive for this cycle time.
+                tar = tarfile.open("job-" + cycle_time + ".tar.gz", "w:gz")
+                names = glob("job/" + glob_pat)
+                for name in names:
+                    tar.add(name)
+                tar.close()
+                # Remove local job log files of this cycle time.
+                for name in names:
+                    self.fs_util.delete(name)
+                # Remove remote job log files of this cycle time.
+                for auth in auths:
+                    r_glob = "%s/%s" % (log_dir_rel, glob_pat)
+                    cmd = self.popen.get_cmd("ssh", auth, "rm", "-f", r_glob)
+                    try:
+                        out, err = self.popen(*cmd)
+                    except RosePopenError as e:
+                        self.handle_event(e, level=Reporter.WARN)
+                datum["is_archived"] = True
         return data
 
-    def get_suite_jobs_auths(self, suite_name, task_id=None):
+    def get_suite_jobs_auths(self, suite_name, cycle_time=None,
+                             task_name=None):
         """Return remote [(user, host), ...] for submitted jobs (of a task)."""
         my_user = pwd.getpwuid(os.getuid())[0]
         my_host = socket.gethostname()
         conn = sqlite3.connect(self.get_suite_db_file(suite_name))
         c = conn.cursor()
         auths = []
-        stmt = "SELECT DISTINCT misc FROM task_events"
+        stmt = "SELECT DISTINCT misc FROM task_events WHERE "
         stmt_args = tuple()
-        if task_id:
-            stmt += (" WHERE name==? AND cycle==?"
-                     " AND event=='submission succeeded'")
-            stmt_args = tuple(task_id.split(self.TASK_ID_DELIM))
+        if cycle_time:
+            stmt += "cycle==? AND "
+            stmt_args = stmt_args + (cycle_time,)
+        if task_name:
+            stmt += "name==? AND "
+            stmt_args = stmt_args + (task_name,)
+        stmt += "event=='submission succeeded'"
         for row in c.execute(stmt, stmt_args):
             if row and "@" in row[0]:
-                u, h = row[0].split("@")
-                user, host, my_user, my_host = self._parse_user_host(u, h)
-                if (my_user, my_host) != (user, host):
-                    auths.append((user, host))
+                auth, my_user, my_host = self._parse_user_host(row[0])
+                if auth:
+                    auths.append(auth)
         return auths
 
     def get_task_auth(self, suite_name, task_name):
         """
-        Return (user, host) for a remote task in a suite.
+        Return [user@]host for a remote task in a suite.
 
         Or None if task does not run remotely.
 
@@ -280,13 +327,11 @@ class CylcProcessor(SuiteEngineProcessor):
             u = items.pop(0).replace("*", " ")
         if items:
             h = items.pop(0).replace("*", " ")
-        user, host, my_user, my_host = self._parse_user_host(u, h)
-        if (my_user, my_host) == (user, host):
-            return
-        return (user, host)
+        auth, my_user, my_host = self._parse_user_host(u + "@" + h)
+        return auth
 
     def get_tasks_auths(self, suite_name):
-        """Return a list of unique user@host for remote tasks in a suite."""
+        """Return a list of unique [user@]host for remote tasks in a suite."""
         my_user = pwd.getpwuid(os.getuid())[0]
         my_host = socket.gethostname()
         actual_hosts = {}
@@ -298,19 +343,21 @@ class CylcProcessor(SuiteEngineProcessor):
         for line in out.splitlines():
             items = line.split(None, 2)
             task = items.pop(0).replace("*", " ")
-            user, host = (my_user, my_host)
             if items:
-                user = items.pop(0).replace("*", " ")
+                u = items.pop(0).replace("*", " ")
             if items:
-                host = items.pop(0).replace("*", " ")
-            if not actual_hosts.has_key(host):
-                result = self._parse_user_host(user, host, my_user, my_host)
-                user, actual_hosts[host] = result[0:2]
-            if user in [None, "None"]:
-                user = my_user
-            host = actual_hosts[host]
-            if (user, host) != (my_user, my_host) and (user, host) not in auths:
-                auths.append((user, host))
+                h = items.pop(0).replace("*", " ")
+            if actual_hosts.has_key(h):
+                h = actual_hosts[h]
+                auth = self._parse_user_host(u + "@" + h, my_user, my_host)[0]
+            else:
+                auth = self._parse_user_host(u + "@" + h, my_user, my_host)[0]
+                if auth and "@" in auth:
+                    actual_hosts[h] = auth.split("@", 1)[1]
+                else:
+                    actual_hosts[h] = auth
+            if auth and auth not in auths:
+                auths.append(auth)
         return auths
 
     def get_task_log_dir_rel(self, suite):
@@ -484,21 +531,24 @@ class CylcProcessor(SuiteEngineProcessor):
         If "task_ids" is None, update the logs for all task jobs.
 
         """
-        id_user_host_set = set()
+        id_auth_set = set()
         if task_ids:
             for task_id in task_ids:
-                auths = self.get_suite_jobs_auths(suite_name, task_id)
-                for user, host in auths:
-                    id_user_host_set.add((task_id, user, host))
+                task_name, cycle_time = task_id.split(self.TASK_ID_DELIM)
+                auths = self.get_suite_jobs_auths(suite_name, cycle_time,
+                                                  task_name)
+                for auth in auths:
+                    id_auth_set.add((task_id, auth))
         else:
-            users_and_hosts = self.get_suite_jobs_auths(suite_name)
-            for user, host in users_and_hosts:
-                id_user_host_set.add(("", user, host))
+            auths = self.get_suite_jobs_auths(suite_name)
+            for auth in auths:
+                id_auth_set.add(("", auth))
 
         log_dir_rel = self.get_task_log_dir_rel(suite_name)
         log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
-        for task_id, user, host in id_user_host_set:
-            r_log_dir = "%s@%s:%s/%s*" % (user, host, log_dir_rel, task_id)
+        for task_id, auth in id_auth_set:
+            r_log_dir = ""
+            r_log_dir += "%s:%s/%s*" % (auth, log_dir_rel, task_id)
             cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
             try:
                 out, err = self.popen(*cmd)
@@ -535,16 +585,28 @@ class CylcProcessor(SuiteEngineProcessor):
         command.append(suite_name)
         self.popen.run_simple(*command, stdout_level=Event.V)
 
-    def _parse_user_host(self, user, host, my_user=None, my_host=None):
+    def _parse_user_host(self, auth, my_user=None, my_host=None):
         if my_user is None:
-            my_user = pwd.getpwuid(os.getuid())[0]
+            my_user = pwd.getpwuid(os.getuid()).pw_name
         if my_host is None:
             my_host = socket.gethostname()
-        if user in [None, "None"]:
-            user = my_user
-        if host in [None, "None", "localhost"]:
-            host = my_host
-        elif "`" in host or "$" in host:
+        user = None
+        host = auth
+        if "@" in auth:
+            user, host = auth.split("@", 1)
+        if user in ["None", my_user]:
+            user = None
+        if "`" in host or "$" in host:
             command = ["bash", "-ec", "H=" + host + "; echo $H"]
             host = self.popen(*command)[0].strip()
-        return (user, host, my_user, my_host)
+        if host in ["None", "localhost", my_host]:
+            host = None
+        if user and host:
+            auth = user + "@" + host
+        elif user:
+            auth = user + "@" + my_host
+        elif host:
+            auth = host
+        else:
+            auth = None
+        return (auth, my_user, my_host)
