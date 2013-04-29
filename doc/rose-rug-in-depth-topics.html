@@ -261,7 +261,7 @@ care_about_shape=.false.
       <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow]
 help=This section holds options for configuring the snow
-    =retrieval dynamics.
+    =retrieval and snowball morphology.
 
 [namelist:run_snow=snow_consistency]
 title=Snow Consistency
@@ -275,14 +275,16 @@ values='too dry', 'too icy', 'good'
 [namelist:run_snow=slush_fraction]
 description=This specifies the maximum acceptable mass
  fraction of slush.
-title=Slush Fraction
+title=Slush Max Acceptable Fraction
 
 [namelist:run_snow=care_about_shape]
 help=If .true., we'll attempt to make the snowball
     =like this:
+    =
     =http://mrhonner.files.wordpress.com/2011/01/snowball-1.jpg
     =
-    =Otherwise, it'll just be a heap.
+    =If .false., it may be a bit messy - this depends
+    =on namelist:run_snow=snow_consistency.
 type=logical
 </pre>
     </div>
