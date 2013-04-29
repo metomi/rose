@@ -927,15 +927,8 @@ class ConfigPage(gtk.VBox):
                     # The types are the same, but pass on the info.
                     old_variable.ignored_reason = (
                                          variable.ignored_reason.copy())
-                old_err_set = set(old_variable.error.keys())
-                new_err_set = set(variable.error.keys())
-                if old_err_set != new_err_set:
-                    # Reset errors (most will be recalculated anyway...).
-                    for unwanted_err in old_err_set - new_err_set:
-                        old_variable.error.pop(unwanted_err)
-                    for new_err in new_err_set:
-                        info = variable.ignored_reason[new_err]
-                        old_variable.error.update({new_err: info})
+                old_variable.error = variable.error.copy()
+                old_variable.warning = variable.warning.copy()
             else:
                 self.variable_ops.add_var(variable)
         for variable in new_ghost_data:
@@ -952,6 +945,7 @@ class ConfigPage(gtk.VBox):
                 if old_variable.value != variable.value:
                     old_variable.value = variable.value
                 old_variable.error = variable.error.copy()
+                old_variable.warning = variable.warning.copy()
             else:
                 self.ghost_data.append(variable)
         self.refresh()
