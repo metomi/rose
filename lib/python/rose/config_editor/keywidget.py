@@ -104,7 +104,7 @@ class KeyWidget(gtk.HBox):
 
     def handle_launch_help(self, widget, event):
         """Handle launching help."""
-        if event.type == gtk.gdk.BUTTON_PRESS and event.button == 1:
+        if event.type == gtk.gdk.BUTTON_PRESS and event.button != 3:
             self.launch_help()
         
     def set_ignored(self):
