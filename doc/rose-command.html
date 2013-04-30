@@ -1217,6 +1217,12 @@
 
       <dd>Switch on debug mode.</dd>
 
+      <dt><kbd>--log-archive-threshold=DAYS</kbd></dt>
+
+      <dd>Specify the number of days of inactivity in the jobs of a given cycle
+      time before archiving its job logs. Set to <kbd>0.0</kbd> to switch off
+      job log archiving (default=<kbd>3.0</kbd>)</dd>
+
       <dt><kbd>--mail-cc=LIST</kbd></dt>
 
       <dd>Only useful if the <kbd>--mail</kbd> option is specified.
@@ -1264,6 +1270,17 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--full, -f</kbd></dt>
+
+      <dd>Re-sync all remote task logs, regardless of the <var>TASK</var>
+      arguments.</dd>
+
+      <dt><kbd>--log-archive-threshold=DAYS</kbd></dt>
+
+      <dd>Specify the number of days of inactivity in the jobs of a given cycle
+      time before archiving its job logs. Set to <kbd>0.0</kbd> to switch off
+      job log archiving (default=<kbd>3.0</kbd>)</dd>
+
       <dt><kbd>--no-web-browse</kbd></dt>
 
       <dd>Do not open a web browser to display the log view.</dd>

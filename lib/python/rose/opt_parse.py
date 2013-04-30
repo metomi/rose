@@ -183,6 +183,11 @@ class RoseOptionParser(OptionParser):
                         "default": True,
                         "dest": "log_archive_mode",
                         "help": "Do not archive old logs."}],
+               "log_archive_threshold": [
+                       ["--log-archive-threshold"],
+                       {"action": "store",
+                        "metavar": "DAYS",
+                        "help": "N-days before archiving cycle job logs."}],
                "log_keep": [
                        ["--log-keep"],
                        {"action": "store",

@@ -35,6 +35,10 @@
 # OPTIONS
 #     --debug
 #         Switch on debug mode.
+#     --log-archive-threshold=DAYS
+#         Specify the number of days of inactivity in the jobs of a given cycle
+#         time before archiving its job logs. Set to 0 to switch off job log
+#         archiving (default=3.0)
 #     --mail-cc=LIST
 #         Only useful if the --mail option is specified. Specify a
 #         comma separated list of additional addresses to email.

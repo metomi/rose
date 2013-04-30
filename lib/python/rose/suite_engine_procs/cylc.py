@@ -43,6 +43,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
+    LOG_ARCHIVE_THRESHOLD = 3.0 # days
     PYRO_TIMEOUT = 5
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
@@ -132,7 +133,7 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
-    def get_suite_events(self, suite_name):
+    def get_suite_events(self, suite_name, log_archive_threshold=None):
         """Parse the cylc suite running database for task events.
 
         Return a data structure that looks like:
@@ -170,7 +171,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 sleep(1.0)
         return {}
 
-    def _get_suite_events(self, suite_name):
+    def _get_suite_events(self, suite_name, log_archive_threshold=None):
         data = {}
 
         # Read task events from suite runtime database
@@ -229,10 +230,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 submit["events"]["submit"] = event_time
                 submit["status"] = event
 
-        # Locate job log files
-        archive_threshold = time() - 259200 # 3 days ago, FIXME
+        # Job log files
+        if log_archive_threshold is None:
+            log_archive_threshold = self.LOG_ARCHIVE_THRESHOLD
+        if log_archive_threshold:
+            archive_threshold = time() - float(log_archive_threshold) * 86400.0
+        else:
+            archive_threshold = 0
         for cycle_time, datum in data.items():
             archive_file_name = "job-" + cycle_time + ".tar.gz"
+            # Job logs of this cycle already archived
             if os.access(archive_file_name, os.F_OK | os.R_OK):
                 datum["is_archived"] = True
                 tar = tarfile.open(archive_file_name, "r:gz")
@@ -251,6 +258,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     submit["files"][key] = {"n_bytes": size}
                 tar.close()
                 continue
+            # Check stats of job logs of this cycle
             dont_archive = False
             for name, submits in datum["tasks"].items():
                 for i, submit in enumerate(submits):
@@ -265,7 +273,7 @@ class CylcProcessor(SuiteEngineProcessor):
                         stat = os.stat(path)
                         size = stat.st_size
                         submit["files"][key] = {"n_bytes": size}
-                        if stat.st_mtime > archive_threshold:
+                        if stat.st_mtime >= archive_threshold:
                             dont_archive = True
             if dont_archive:
                 datum["is_archived"] = False

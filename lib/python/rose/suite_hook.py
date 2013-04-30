@@ -54,7 +54,8 @@ class RoseSuiteHook(object):
             return self.event_handler(*args, **kwargs)
 
     def run(self, suite, task, hook_event, hook_message=None,
-            should_mail=False, mail_cc_list=None, should_shutdown=False):
+            should_mail=False, mail_cc_list=None, should_shutdown=False,
+            log_archive_threshold=None):
         """
         Invoke the hook for a suite task.
 
@@ -70,7 +71,7 @@ class RoseSuiteHook(object):
             self.suite_log_view_generator.update_job_log(suite, [task])
 
         # Generate suite log view
-        self.suite_log_view_generator(suite)
+        self.suite_log_view_generator(suite, log_archive_threshold)
 
         # Send email notification if required
         if should_mail:
@@ -103,7 +104,8 @@ class RoseSuiteHook(object):
 
 def main():
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("mail_cc", "mail", "shutdown")
+    opt_parser.add_my_options("log_archive_threshold", "mail_cc", "mail",
+                              "shutdown")
     opts, args = opt_parser.parse_args()
     for key in ["mail_cc"]:
         values = []
@@ -122,7 +124,8 @@ def main():
     hook(*args,
          should_mail=opts.mail,
          mail_cc_list=opts.mail_cc,
-         should_shutdown=opts.shutdown)
+         should_shutdown=opts.shutdown,
+         log_archive_threshold=opts.log_archive_threshold)
 
 
 if __name__ == "__main__":

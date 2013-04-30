@@ -119,13 +119,15 @@ class SuiteLogViewGenerator(object):
             except OSError:
                 pass
 
-    def generate(self, suite_name, full_mode=False):
+    def generate(self, suite_name, full_mode=False,
+                 log_archive_threshold=None):
         """Generate the log view for a suite."""
         return self._chdir(self._generate, suite_name, full_mode)
 
     __call__ = generate
 
-    def _generate(self, suite_name, full_mode=False):
+    def _generate(self, suite_name, full_mode=False,
+                  log_archive_threshold=None):
         # Copy presentation files into the log directory
         html_lib_source = os.path.join(os.getenv("ROSE_HOME"), "lib", "html")
         html_lib_dest = "html-lib"
@@ -169,7 +171,8 @@ class SuiteLogViewGenerator(object):
                 prev_mtime = os.stat(self.NS + ".json").st_mtime
             this_mtime = os.stat(suite_db_file).st_mtime
             while prev_mtime is None or prev_mtime < this_mtime:
-                cycles = self.suite_engine_proc.get_suite_events(suite_name)
+                cycles = self.suite_engine_proc.get_suite_events(
+                        suite_name, log_archive_threshold)
                 for cycle_time, data in cycles.items():
                     if cycle_time not in main_data["cycle_times"]:
                         main_data["cycle_times"].append(cycle_time)
@@ -225,7 +228,8 @@ class SuiteLogViewGenerator(object):
 
 def main():
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("full_mode", "web_browser_mode")
+    opt_parser.add_my_options("full_mode", "log_archive_threshold",
+                              "web_browser_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -247,7 +251,7 @@ def suite_log_view(opts, args, report=None):
         suite_name = os.path.basename(os.getcwd())
     if not opts.full_mode and args:
         gen.update_job_log(suite_name, tasks=args)
-    gen(suite_name, opts.full_mode)
+    gen(suite_name, opts.full_mode, opts.log_archive_threshold)
     if opts.web_browser_mode:
         return gen.view_suite_log_url(suite_name)
     else:

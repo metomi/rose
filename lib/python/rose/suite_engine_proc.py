@@ -270,7 +270,7 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_suite_events(self, suite_name):
+    def get_suite_events(self, suite_name, log_archive_threshold=None):
         """Get suite events.
         Return a data structure that looks like:
         {   <cycle time string>: {
