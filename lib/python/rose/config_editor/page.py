@@ -431,13 +431,18 @@ class ConfigPage(gtk.VBox):
                 label_list.append(error_label)
         if self.custom_macros.items():
             macro_button = rose.gtk.util.CustomButton(
-                            stock_id=gtk.STOCK_EXECUTE,
-                            tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE)
+                            label=rose.config_editor.LABEL_PAGE_MACRO_RUN,
+                            tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
+                            as_tool=True)
             arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
             arrow.show()
             macro_button.hbox.pack_start(arrow, expand=False, fill=False)
             macro_button.connect("button-press-event",
                                  self._macro_menu_launch)
+            macro_label = gtk.Label()
+            macro_label.show()
+            button_list.append(macro_button)
+            label_list.append(macro_label)
         for button, label in zip(button_list, label_list):
             var_hbox = gtk.HBox(homogeneous=False)
             var_hbox.pack_start(button, expand=False, fill=False)
@@ -1009,65 +1014,31 @@ class ConfigPage(gtk.VBox):
     def _macro_menu_launch(self, widget, event):
         # Create a menu below the widget for macro actions.
         menu = gtk.Menu()
-        for macro_name, description in sorted(self.custom_macros.items()):
-            
-            macro_menuitem = gtk.MenuItem(macro_name)
-            package_menuitem.show()
-            package_menu = gtk.Menu()
-            enable_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
-            enable_menuitem.set_label(label="Enable all")
-            enable_menuitem._connect_args = (package, True)
-            enable_menuitem.connect(
-                   "button-release-event",
-                   lambda m, e: self._packages_enable(*m._connect_args))
-            enable_menuitem.show()
-            enable_menuitem.set_sensitive(any(ignored_list))
-            package_menu.append(enable_menuitem)
-            ignore_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
-            ignore_menuitem.set_label(label="Ignore all")
-            ignore_menuitem._connect_args = (package, False)
-            ignore_menuitem.connect(
-                   "button-release-event",
-                   lambda m, e: self._packages_enable(*m._connect_args))
-            ignore_menuitem.set_sensitive(any([not i for i in ignored_list]))
-            ignore_menuitem.show()
-            package_menu.append(ignore_menuitem)
-            remove_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
-            remove_menuitem.set_label(label="Remove all")
-            remove_menuitem._connect_args = (package,)
-            remove_menuitem.connect(
-                   "button-release-event",
-                   lambda m, e: self._packages_remove(*m._connect_args))
-            remove_menuitem.show()
-            package_menu.append(remove_menuitem)
-            package_menuitem.set_submenu(package_menu)
-            menu.append(package_menuitem)
-        menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
-        menuitem.set_label(label="Import")
-        import_menu = gtk.Menu()
-        new_packages = set(self._package_lookup.keys()) - set(packages.keys())
-        for new_package in sorted(new_packages):
-            new_pack_menuitem = gtk.MenuItem(label=new_package)
-            new_pack_menuitem._connect_args = (new_package,)
-            new_pack_menuitem.connect(
-                     "button-release-event",
-                     lambda m, e: self._package_add(*m._connect_args))
-            new_pack_menuitem.show()
-            import_menu.append(new_pack_menuitem)
-        if not new_packages:
-            menuitem.set_sensitive(False)
-        menuitem.set_submenu(import_menu)
-        menuitem.show()
-        menu.append(menuitem)
-        menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
-        menuitem.set_label(label="Disable all packages")
-        menuitem.connect("activate",
-                         lambda i: self._packages_enable(disable=True))
-        menuitem.show()
-        menu.append(menuitem)
-        menu.popup(None, None, self._package_menu_position, event.button,
+        for macro_name, info in sorted(self.custom_macros.items()):
+            method, description = info
+            if method == rose.macro.TRANSFORM_METHOD:
+                stock_id = gtk.STOCK_CONVERT
+            else:
+                stock_id = gtk.STOCK_DIALOG_QUESTION
+            macro_menuitem = gtk.ImageMenuItem(stock_id=stock_id)
+            macro_menuitem.set_label(macro_name)
+            macro_menuitem.set_tooltip_text(description)
+            macro_menuitem.show()
+            macro_menuitem._macro = macro_name
+            macro_menuitem.connect(
+                  "button-release-event",
+                  lambda m, e: self.launch_macro(m._macro))
+            menu.append(macro_menuitem)
+        menu.popup(None, None, self._macro_menu_position, event.button,
                    event.time, widget)
 
+    def _macro_menu_position(self, menu, widget):
+        # Place the menu carefully below the button.
+        x, y = widget.get_window().get_origin()
+        allocated_rectangle = widget.get_allocation()
+        x += allocated_rectangle.x
+        y += allocated_rectangle.y + allocated_rectangle.height
+        return x, y, False
 
     def launch_macro(self, macro_name_string):
         """Launch a macro, if possible."""
@@ -1079,8 +1050,10 @@ class ConfigPage(gtk.VBox):
                 class_name, method_name = class_name.split(".", 1)
         else:
             module_name = macro_name_string
-        rval = self._launch_macro_func(self.config_name, module_name,
-                                       class_name, method_name)
+        rval = self._launch_macro_func(config_name=self.config_name,
+                                       module_name=module_name,
+                                       class_name=class_name,
+                                       method_name=method_name)
 
     def search_for_id(self, id_):
         """Launch a search for variable or section id."""

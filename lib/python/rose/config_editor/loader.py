@@ -1134,9 +1134,9 @@ class ConfigDataManager(object):
             this_macro_method_name = ".".join([this_macro_name, method_name])
             this_info = (method_name, docstring)
             if this_macro_name in ns_macros:
-                ns_macro_info.update({this_macro_name: docstring})
+                ns_macro_info.update({this_macro_name: this_info})
             elif this_macro_method_name in ns_macros:
-                ns_macro_info.update({this_macro_method_name: docstring})
+                ns_macro_info.update({this_macro_method_name: this_info})
         return ns_macro_info
 
     def get_sub_data_for_namespace(self, ns, from_saved=False):
