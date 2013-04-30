@@ -539,6 +539,7 @@ class MainController(object):
         sub_data = None
         if has_sub_data:
             sub_data = self.data.get_sub_data_for_namespace(namespace_name)
+        macro_info = self.data.get_macro_info_for_namespace(namespace_name)
         page_metadata = {'namespace': namespace_name,
                          'ns_is_default': is_default,
                          'label': label,
@@ -546,6 +547,7 @@ class MainController(object):
                          'duplicate': duplicate,
                          'help': help,
                          'url': url,
+                         'macro': macro_info,
                          'widget': custom_widget,
                          'see_also': see_also,
                          'config_name': config_name,
@@ -574,7 +576,8 @@ class MainController(object):
                                   directory,
                                   sub_data=sub_data,
                                   launch_info_func=launch_info,
-                                  launch_edit_func=launch_edit)
+                                  launch_edit_func=launch_edit,
+                                  launch_macro_func=self.handle.run_custom_macro)
         #FIXME: These three should go.
         page.trigger_tab_detach = lambda b: self._handle_detach_request(page)
         variable_ops.trigger_ignored_update = lambda v: page.update_ignored()

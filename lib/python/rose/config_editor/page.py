@@ -41,7 +41,8 @@ class ConfigPage(gtk.VBox):
 
     def __init__(self, page_metadata, config_data, ghost_data,
                  variable_ops, sections, get_formats_func, directory=None,
-                 sub_data=None, launch_info_func=None, launch_edit_func=None):
+                 sub_data=None, launch_info_func=None, launch_edit_func=None,
+                 launch_macro_func=None):
         super(ConfigPage, self).__init__(homogeneous=False)
         self.namespace = page_metadata.get('namespace')
         self.ns_is_default = page_metadata.get('ns_is_default')
@@ -51,6 +52,7 @@ class ConfigPage(gtk.VBox):
         self.help = page_metadata.get('help')
         self.url = page_metadata.get('url')
         self.see_also = page_metadata.get('see_also')
+        self.custom_macros = page_metadata.get('macro')
         self.custom_widget = page_metadata.get('widget')
         self.show_modes = page_metadata.get('show_modes')
         self.is_duplicate = (page_metadata.get('duplicate') ==
@@ -64,6 +66,7 @@ class ConfigPage(gtk.VBox):
         self.sub_data = sub_data
         self.launch_info = launch_info_func
         self.launch_edit = launch_edit_func
+        self._launch_macro_func = launch_macro_func
         namespaces = self.namespace.strip('/').split('/')
         namespaces.reverse()
         self.info = ""
@@ -426,6 +429,15 @@ class ConfigPage(gtk.VBox):
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)
+        if self.custom_macros.items():
+            macro_button = rose.gtk.util.CustomButton(
+                            stock_id=gtk.STOCK_EXECUTE,
+                            tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE)
+            arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
+            arrow.show()
+            macro_button.hbox.pack_start(arrow, expand=False, fill=False)
+            macro_button.connect("button-press-event",
+                                 self._macro_menu_launch)
         for button, label in zip(button_list, label_list):
             var_hbox = gtk.HBox(homogeneous=False)
             var_hbox.pack_start(button, expand=False, fill=False)
@@ -993,6 +1005,82 @@ class ConfigPage(gtk.VBox):
         if x_name == '' or y_name == '':
             return (x_name == '') - (y_name == '')
         return rose.config.sort_settings(x, y)
+
+    def _macro_menu_launch(self, widget, event):
+        # Create a menu below the widget for macro actions.
+        menu = gtk.Menu()
+        for macro_name, description in sorted(self.custom_macros.items()):
+            
+            macro_menuitem = gtk.MenuItem(macro_name)
+            package_menuitem.show()
+            package_menu = gtk.Menu()
+            enable_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
+            enable_menuitem.set_label(label="Enable all")
+            enable_menuitem._connect_args = (package, True)
+            enable_menuitem.connect(
+                   "button-release-event",
+                   lambda m, e: self._packages_enable(*m._connect_args))
+            enable_menuitem.show()
+            enable_menuitem.set_sensitive(any(ignored_list))
+            package_menu.append(enable_menuitem)
+            ignore_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
+            ignore_menuitem.set_label(label="Ignore all")
+            ignore_menuitem._connect_args = (package, False)
+            ignore_menuitem.connect(
+                   "button-release-event",
+                   lambda m, e: self._packages_enable(*m._connect_args))
+            ignore_menuitem.set_sensitive(any([not i for i in ignored_list]))
+            ignore_menuitem.show()
+            package_menu.append(ignore_menuitem)
+            remove_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_REMOVE)
+            remove_menuitem.set_label(label="Remove all")
+            remove_menuitem._connect_args = (package,)
+            remove_menuitem.connect(
+                   "button-release-event",
+                   lambda m, e: self._packages_remove(*m._connect_args))
+            remove_menuitem.show()
+            package_menu.append(remove_menuitem)
+            package_menuitem.set_submenu(package_menu)
+            menu.append(package_menuitem)
+        menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
+        menuitem.set_label(label="Import")
+        import_menu = gtk.Menu()
+        new_packages = set(self._package_lookup.keys()) - set(packages.keys())
+        for new_package in sorted(new_packages):
+            new_pack_menuitem = gtk.MenuItem(label=new_package)
+            new_pack_menuitem._connect_args = (new_package,)
+            new_pack_menuitem.connect(
+                     "button-release-event",
+                     lambda m, e: self._package_add(*m._connect_args))
+            new_pack_menuitem.show()
+            import_menu.append(new_pack_menuitem)
+        if not new_packages:
+            menuitem.set_sensitive(False)
+        menuitem.set_submenu(import_menu)
+        menuitem.show()
+        menu.append(menuitem)
+        menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
+        menuitem.set_label(label="Disable all packages")
+        menuitem.connect("activate",
+                         lambda i: self._packages_enable(disable=True))
+        menuitem.show()
+        menu.append(menuitem)
+        menu.popup(None, None, self._package_menu_position, event.button,
+                   event.time, widget)
+
+
+    def launch_macro(self, macro_name_string):
+        """Launch a macro, if possible."""
+        class_name = None
+        method_name = None
+        if "." in macro_name_string:
+            module_name, class_name = macro_name_string.split(".", 1)
+            if "." in class_name:
+                class_name, method_name = class_name.split(".", 1)
+        else:
+            module_name = macro_name_string
+        rval = self._launch_macro_func(self.config_name, module_name,
+                                       class_name, method_name)
 
     def search_for_id(self, id_):
         """Launch a search for variable or section id."""
