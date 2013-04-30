@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Rose Configuration Files" section="Configuration" extensions="rose-*.conf; rose-*.info" mimetype="" version="1.0" kateversion="2.0" author="Rose Team, derived in part from ini.xml by Jan Janssen" license="LGPL">
+<language name="Rose Configuration Files" section="Configuration" extensions="rose-*.conf;rose-*.info" mimetype="" version="1.0" kateversion="2.0" author="Rose Team, derived in part from ini.xml by Jan Janssen" license="LGPL">
 
 <!-- For use with Kate. Copy or symlink this file to ~/.kde/share/apps/katepart/syntax/rose-conf.xml to use it. -->
 
