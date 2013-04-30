@@ -187,11 +187,12 @@ class SuiteLogViewGenerator(object):
                 key = name[len(self.NS) + 1 : -len(".json")]
                 if key != "latest":
                     main_data["cycle_times"].append(key)
-        self.fs_util.symlink(
-                self.NS + "-" + main_data["cycle_times"][0] + ".json",
-                self.NS + "-latest.json")
-        main_data["cycle_times"].sort()
-        main_data["cycle_times"].reverse()
+        if main_data["cycle_times"]:
+            main_data["cycle_times"].sort()
+            main_data["cycle_times"].reverse()
+            self.fs_util.symlink(
+                    self.NS + "-" + main_data["cycle_times"][0] + ".json",
+                    self.NS + "-latest.json")
         f = open(self.NS + ".json", "wb")
         json.dump(main_data, f, indent=0)
         f.close()
