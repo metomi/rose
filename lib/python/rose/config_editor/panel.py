@@ -19,8 +19,6 @@
 #-----------------------------------------------------------------------------
 
 import os
-import shlex
-import subprocess
 import sys
 import webbrowser
 
@@ -33,7 +31,6 @@ import pango
 import rose.config
 import rose.config_editor
 import rose.config_editor.util
-import rose.external
 import rose.gtk.util
 import rose.resource
 
@@ -48,8 +45,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     """
 
-    def __init__(self, namespace_tree):
+    def __init__(self, namespace_tree, get_metadata_func=None):
         super(HyperLinkTreePanel, self).__init__()
+        if get_metadata_func is not None:
+            self.get_metadata_and_comments = get_metadata_func
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         self.panel_top = gtk.TreeViewColumn()
@@ -68,11 +67,12 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                                      column=1)
         self.panel_top.set_cell_data_func(self.cell_title,
                                           self._set_title_markup, 2)
+        # The columns in self.data_store correspond to: error_icon,
+        # change_icon, name, title, error and change totals (4),
+        # main tip text, and change text.
         self.data_store = gtk.TreeStore(gtk.gdk.Pixbuf, gtk.gdk.Pixbuf,
                                         str, str, int, int, int, int,
-                                        str, str, str, str, str, str)
-        # Data: name, title, error and change numbers,
-        #       main tip, description, help, url, comment, change
+                                        str, str)
         resource_loc = rose.resource.ResourceLocator(paths=sys.path)
         image_path = resource_loc.locate('etc/images/rose-config-edit')
         self.null_icon = gtk.gdk.pixbuf_new_from_file(image_path +
@@ -150,7 +150,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         if top_rows > rose.config_editor.TREE_PANEL_MAX_EXPANDED:
             return False
         if top_rows == 1:
-            return self.tree.expand_all()
+            return self.expand_recursive(no_duplicates=True)
         r_iter = self.tree.get_model().get_iter_first()
         while r_iter is not None:
             path = self.tree.get_model().get_path(r_iter)
@@ -167,10 +167,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         stack = [[row] + list(i) for i in initials]
         while stack:
             row, key, value_meta_tuple = stack[0]
-            value, meta, comment, change = value_meta_tuple
-            description = meta.get(rose.META_PROP_DESCRIPTION, '')
-            help = meta.get(rose.META_PROP_HELP, '')
-            url = meta.get(rose.META_PROP_URL, '')
+            value, meta, change = value_meta_tuple
             title = meta[rose.META_PROP_TITLE]
             new_row = self.data_store.append(row, [self.null_icon,
                                                    self.null_icon,
@@ -178,10 +175,6 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                                                    key,
                                                    0, 0, 0, 0,
                                                    '',
-                                                   description,
-                                                   help,
-                                                   url,
-                                                   comment,
                                                    change])
             if type(value) is dict:
                 newer_initials = value.items()
@@ -297,10 +290,11 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             name = tree_model.get_value(path_iter, 3)
             num_errors = tree_model.get_value(path_iter, 4)
             mods = tree_model.get_value(path_iter, 6)
-            description = tree_model.get_value(path_iter, 9)
-            comment = tree_model.get_value(path_iter, 12)
-            change = tree_model.get_value(path_iter, 13)
-            if description != '':
+            proper_name = self.get_name(path)
+            metadata, comment = self.get_metadata_and_comments(proper_name)
+            description = metadata.get(rose.META_PROP_DESCRIPTION, "")
+            change = tree_model.get_value(path_iter, 9)
+            if description:
                 text = description
             else:
                 text = name
@@ -312,7 +306,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                 else:
                     text += rose.config_editor.TREE_PANEL_ERRORS.format(
                                                           num_errors)
-            if description != '':
+            if description:
                 text += "\n(" + name + ")"
             if comment:
                 text += "\n" + comment
@@ -322,11 +316,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     def update_change(self, row_names, new_change):
         """Update 'changed' text."""
-        self._set_row_names_value(row_names, 13, new_change)
-
-    def update_comment(self, row_names, new_comment):
-        """Update 'comment' text."""
-        self._set_row_names_value(row_names, 12, new_comment)
+        self._set_row_names_value(row_names, 9, new_change)
 
     def _set_row_names_value(self, row_names, index, value):
         path = self.get_path_from_names(row_names)
@@ -409,7 +399,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                         if event.button != 3:
                             return False
                         else:
-                            return treeview.expand_row(path, open_all=True)
+                            return self.expand_recursive(start_path=path,
+                                                         no_duplicates=True)
                     if event.button == 3:
                         self.popup_menu(path, event)
                     else:
@@ -612,6 +603,33 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         menu.popup(None, None, None, event.button, event.time)
         return False
 
+    def expand_recursive(self, start_path=None, no_duplicates=False):
+        """Expand the tree starting at start_path."""
+        treemodel = self.tree.get_model()
+        if start_path is None:
+            start_iter = treemodel.get_iter_first()
+            start_path = treemodel.get_path(start_iter)
+        if not no_duplicates:
+            return self.tree.expand_row(start_path, open_all=True)
+        stack = [treemodel.get_iter(start_path)]
+        while stack:
+            iter_ = stack.pop(0)
+            if iter_ is None:
+                continue
+            path = treemodel.get_path(iter_)
+            child_iter = treemodel.iter_children(iter_)
+            child_dups = []
+            while child_iter is not None:
+                child_name = self.get_name(treemodel.get_path(child_iter))
+                metadata, comment = self.get_metadata_and_comments(child_name)
+                dupl = metadata.get(rose.META_PROP_DUPLICATE)
+                child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
+                child_iter = treemodel.iter_next(child_iter)
+            if not all(child_dups):
+                self.tree.expand_row(path, open_all=False)
+                stack.append(treemodel.iter_children(iter_))
+            stack.append(treemodel.iter_next(iter_))
+
     def collapse_reset(self):
         """Return the tree view to the basic startup state."""
         self.tree.collapse_all()
@@ -620,18 +638,20 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         return False
 
     def get_help(self, path):
-        h_iter = self.tree.get_model().get_iter(path)
-        help = self.tree.get_model().get_value(h_iter, 10)
-        if help == '':
+        metadata, comments = self.get_metadata_and_comments(
+                                               self.get_name(path))
+        help = metadata.get(rose.META_PROP_HELP, "")
+        if not help:
             return None
         return help
 
     def get_url(self, path):
-        u_iter = self.tree.get_model().get_iter(path)
-        help = self.tree.get_model().get_value(u_iter, 11)
-        if help == '':
+        metadata, comments = self.get_metadata_and_comments(
+                                               self.get_name(path))
+        url = metadata.get(rose.META_PROP_URL, "")
+        if not url:
             return None
-        return help
+        return url
 
     def ask_can_clone(self, name):
         """Connect this at a higher level for section clone menu options."""
@@ -644,6 +664,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
     def ask_has_content(self, name):
         """Connect this at a higher level to test for any data here."""
         pass
+
+    def get_metadata_and_comments(self, name):
+        """Connect this at a higher level for metadata and comments."""
+        return {}, ""
 
     def send_add_dialog_request(self, name):
         """Connect this at a higher level for section add requests."""
@@ -674,6 +698,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     def send_info_request(self, name):
         """Connect this at a higher level for section info."""
+        pass
 
     def send_launch_request(self, path, as_new=False):
         """Connect this at a higher level for page creation requests."""
@@ -682,220 +707,3 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
     def send_search_request(self, name, variable_id):
         """Connect this at a higher level for hyperlink connection."""
         pass
-
-
-class FileSystemPanel(gtk.ScrolledWindow):
-
-    """A class to show underlying files and directories in a gtk.TreeView."""
-
-    def __init__(self, directory):
-        super(FileSystemPanel, self).__init__()
-        self.directory = directory
-        view = gtk.TreeView()
-        store = gtk.TreeStore(str, str)
-        dirpath_iters = {self.directory: None}
-        for dirpath, dirnames, filenames in os.walk(self.directory):
-            if dirpath not in dirpath_iters:
-                known_path = os.path.dirname(dirpath)
-                new_iter = store.append(dirpath_iters[known_path],
-                                        [os.path.basename(dirpath),
-                                         os.path.abspath(dirpath)])
-                dirpath_iters.update({dirpath: new_iter})
-            this_iter = dirpath_iters[dirpath]
-            filenames.sort()
-            for name in filenames:
-                if name in rose.CONFIG_NAMES:
-                    continue
-                filepath = os.path.join(dirpath, name)
-                store.append(this_iter, [name, os.path.abspath(filepath)])
-            for dirname in list(dirnames):
-                if (dirname.startswith(".") or
-                    dirname in [rose.SUB_CONFIGS_DIR, rose.CONFIG_META_DIR]):
-                    dirnames.remove(dirname)
-            dirnames.sort()
-        view.set_model(store)
-        col = gtk.TreeViewColumn()
-        col.set_title(rose.config_editor.TITLE_FILE_PANEL)
-        cell = gtk.CellRendererText()
-        col.pack_start(cell, expand=True)
-        col.set_cell_data_func(cell,
-                               self._set_path_markup, store)
-        view.append_column(col)
-        view.expand_all()
-        view.show()
-        view.connect("row-activated", self._handle_activation)
-        view.connect("button-press-event", self._handle_click)
-        self.add(view)
-        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.show()
-
-    def _set_path_markup(self, column, cell, model, r_iter, treestore):
-        title = model.get_value(r_iter, 0)
-        title = rose.gtk.util.safe_str(title)
-        cell.set_property("markup", title)
-
-    def _handle_activation(self, view=None, path=None, col=None):
-        target_func = rose.external.launch_fs_browser
-        if path is None:
-            target = self.directory
-        else:
-            model = view.get_model()
-            row_iter = model.get_iter(path)
-            fs_path = model.get_value(row_iter, 1)
-            target = fs_path
-            if not model.iter_has_child(row_iter):
-                target_func = rose.external.launch_geditor
-        try:
-            target_func(target)
-        except Exception as e:
-            title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     str(e), title)
-
-    def _handle_click(self, view, event):
-        pathinfo = view.get_path_at_pos(int(event.x), int(event.y))
-        if (event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS and
-            pathinfo is None):
-            self._handle_activation()
-        if event.button == 3:
-            ui_string = """<ui><popup name='Popup'>
-                           <menuitem action='Open'/>
-                           </popup> </ui>"""
-            actions = [('Open', gtk.STOCK_OPEN,
-                         rose.config_editor.FILE_PANEL_MENU_OPEN)]
-            uimanager = gtk.UIManager()
-            actiongroup = gtk.ActionGroup('Popup')
-            actiongroup.add_actions(actions)
-            uimanager.insert_action_group(actiongroup, pos=0)
-            uimanager.add_ui_from_string(ui_string)
-            if pathinfo is None:
-                path = None
-                col = None
-            else:
-                path, col = pathinfo[:2]
-            open_item = uimanager.get_widget('/Popup/Open')
-            open_item.connect(
-                      "activate",
-                      lambda m: self._handle_activation(view, path, col))
-            this_menu = uimanager.get_widget('/Popup')
-            this_menu.popup(None, None, None, event.button, event.time)
-
-
-class SummaryDataPanel(gtk.ScrolledWindow):
-
-    """A class to show rose sub-sections and variables in a gtk.TreeView."""
-
-    def __init__(self, sections, variables, search_function, is_duplicate):
-        super(SummaryDataPanel, self).__init__()
-        self.sections = sections
-        self.variables = variables
-        self.search_function = search_function
-        self.is_duplicate = is_duplicate
-        self._view = rose.gtk.util.TooltipTreeView(
-                                   get_tooltip_func=self._get_tree_tip)
-        self._view.set_rules_hint(True)
-        self._view.show()
-        self._view.connect("row-activated",
-                                    self._handle_activation)
-        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.update_tree_model()
-        self.add(self._view)
-        self.show()
-
-    def update_tree_model(self, sections=None, variables=None):
-        """Update the summary of page data."""
-        if sections is not None:
-            self.sections = sections
-        if variables is not None:
-            self.variables = variables
-        for column in list(self._view.get_columns()):
-            self._view.remove_column(column)
-        model, cols = self._get_tree_model_and_col_names()
-        self._view.set_model(model)
-        for i, col_name in enumerate(cols):
-            col = gtk.TreeViewColumn()
-            col.set_title(col_name.replace("_", "__"))
-            cell = gtk.CellRendererText()
-            col.pack_start(cell, expand=True)
-            if i < len(cols) - 1:
-                col.set_resizable(True)
-            col.set_sort_column_id(i)
-            col.set_cell_data_func(cell, self._get_tree_cell)
-            self._view.append_column(col)
-
-    def _get_tree_cell(self, col, cell, model, row_iter):
-        col_index = self._view.get_columns().index(col)
-        value = model.get_value(row_iter, col_index)
-        max_len = rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
-        if (value is not None and len(value) > max_len
-            and col_index != 0):
-            cell.set_property("width-chars", max_len)
-            cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        if col_index == 0 and self.is_duplicate:
-            value = value.split("(")[-1].rstrip(")")
-        cell.set_property("markup", value)
-
-    def _get_tree_tip(self, view, row_iter, col_index, tip):
-        cell_id = view.get_model().get_value(row_iter, 0)
-        if col_index == 0:
-            tip.set_text(cell_id)
-        else:
-            col_title = view.get_columns()[col_index].get_title()
-            cell_id += rose.CONFIG_DELIMITER + col_title
-            cell_data = view.get_model().get_value(row_iter, col_index)
-            if cell_data is None:
-                tip.set_text(cell_id)
-            else:
-                tip.set_text(cell_id + "\n" + cell_data)
-        return True
-
-    def _get_tree_model_and_col_names(self):
-        # Construct a data model of other page data.
-        sub_sect_names = [s.name for s in self.sections]
-        sub_var_names = []
-        var_id_map = {}
-        for variable in self.variables:
-            var_id_map[variable.metadata["id"]] = variable
-            if variable.name not in sub_var_names:
-                sub_var_names.append(variable.name)
-        sub_sect_names.sort(rose.config.sort_settings)
-        sub_var_names.sort(rose.config.sort_settings)
-        col_types = [str] + [str] * len(sub_var_names)
-        store = gtk.TreeStore(*col_types)
-        i_format = rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_MARKUP.format
-        safe_str = rose.gtk.util.safe_str
-        for section in sub_sect_names:
-            row_data = [section]
-            for opt in sub_var_names:
-                var = var_id_map.get(section + rose.CONFIG_DELIMITER + opt)
-                if var is None:
-                    row_data.append(None)
-                else:
-                    if var.ignored_reason:
-                        row_data.append(i_format(safe_str(var.value)))
-                    else:
-                        row_data.append(var.value)
-            store.append(None, row_data)
-        if self.is_duplicate:
-            store.set_sort_func(0, self._sort_model_dupl)
-        column_names = [rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE]
-        column_names += sub_var_names
-        return store, column_names
-
-    def _sort_model_dupl(self, model, iter1, iter2):
-        val1 = model.get_value(iter1, 0)
-        val2 = model.get_value(iter2, 0)
-        return rose.config.sort_settings(val1, val2)
-            
-    def _handle_activation(self, view, path, column):
-        if path is None:
-            return False
-        model = view.get_model()
-        row_iter = model.get_iter(path)
-        col_index = view.get_columns().index(column)
-        cell_data = model.get_value(row_iter, col_index)
-        search_id = model.get_value(row_iter, 0)
-        if cell_data != search_id and cell_data is not None:
-            option = column.get_title().replace("__", "_")
-            search_id += rose.CONFIG_DELIMITER + option
-        self.search_function(search_id)

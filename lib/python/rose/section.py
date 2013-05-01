@@ -65,7 +65,7 @@ class Section(object):
 
     def to_hashable(self):
         """Return a hashable summary of the current state."""
-        return (self.name, tuple(sorted(self.options)),
+        return (self.name,
                 tuple(sorted(self.ignored_reason.keys())),
                 tuple(self.comments))
 
