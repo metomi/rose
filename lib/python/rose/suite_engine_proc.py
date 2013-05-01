@@ -210,6 +210,7 @@ class SuiteEngineProcessor(object):
     """An abstract suite engine processor."""
 
     CYCLE_INTERVAL = 6
+    LOG_ARCHIVE_THRESHOLD = 3.0 # days
     RUN_DIR_REL_ROOT = None
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
     SCHEME_HANDLER_MANAGER = None
