@@ -35,6 +35,7 @@ import rose.gtk.util
 import rose.config_editor.keywidget
 import rose.config_editor.menuwidget
 import rose.config_editor.valuewidget
+import rose.config_editor.util
 
 
 class VariableWidget(object):
@@ -129,50 +130,27 @@ class VariableWidget(object):
                 widget_path, widget_args = info
             else:
                 widget_path, widget_args = info[0], None
-            files = self.var_ops.get_var_metadata_files(variable)
+            files = self.var_ops.get_ns_metadata_files(metadata["full_ns"])
             lib = os.path.join("lib", "python", "widget")
-            is_builtin = False
-            module_name = ".".join(widget_path.split(".")[:-1])
-            if module_name.startswith("rose."):
-                is_builtin = True
-            class_name = widget_path.split(".")[-1]
             widget_fpath = os.path.join(lib, *widget_path.split(".")[:-1])
-            widget_fpath += ".py"
-            module_files = [f for f in files if f.endswith(widget_fpath)]
-            if not module_files and not is_builtin:
-                self.handle_bad_valuewidget(w_val, variable, set_value)
-            else:
-                if not is_builtin:
-                    module_dir = os.path.dirname(module_files.pop())
-                    sys.path.insert(0, module_dir)
-                try:
-                    module = __import__(module_name, globals(), locals(),
-                                        [], 0)
-                except Exception as e:
-                    self.handle_bad_valuewidget(str(e), variable, set_value)
-                else:
-                    for submodule in module_name.split(".")[1:]:
-                        module = getattr(module, submodule)
-                    contents = inspect.getmembers(module)
-                    for obj_name, obj in contents:
-                        if obj_name == class_name and inspect.isclass(obj):
-                            try:
-                                self.valuewidget = obj(variable.value,
-                                                       metadata,
-                                                       set_value,
-                                                       hook_object,
-                                                       widget_args)
-                            except Exception as e:
-                                self.handle_bad_valuewidget(str(e), variable,
-                                                            set_value)
-                            else:
-                                break
-                    else:
-                        text = rose.config_editor.ERROR_IMPORT_CLASS.format(
-                                                               class_name)
-                        self.handle_bad_valuewidget(text, variable, set_value)
-                if not is_builtin:
-                    sys.path.pop(0)
+            error_handler = lambda e: self.handle_bad_valuewidget(
+                                           str(e), variable, set_value)
+            widget = rose.config_editor.util.import_object(widget_path,
+                                                           files,
+                                                           error_handler)
+            if widget is None:
+                text = rose.config_editor.ERROR_IMPORT_CLASS.format(
+                                                               w_val)
+                self.handle_bad_valuewidget(text, variable, set_value)
+            try:
+                self.valuewidget = widget(variable.value,
+                                          metadata,
+                                          set_value,
+                                          hook_object,
+                                          widget_args)
+            except Exception as e:
+                self.handle_bad_valuewidget(str(e), variable,
+                                            set_value)
         else:
             widget_maker = rose.config_editor.valuewidget.chooser(
                                 variable.value, variable.metadata,
