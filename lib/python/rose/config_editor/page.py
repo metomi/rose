@@ -523,9 +523,9 @@ class ConfigPage(gtk.VBox):
             except Exception as e:
                 self.handle_bad_custom_sub_widget(str(e))
         else:
-            standard_panel_module = rose.config_editor.panelwidget.standard
+            panel_module = rose.config_editor.panelwidget.summary_data
             self.sub_data_panel = (
-                     standard_panel_module.StandardSummaryDataPanel(*args))
+                     panel_module.StandardSummaryDataPanel(*args))
 
     def handle_bad_custom_sub_widget(self, error_info):
         text = rose.config_editor.ERROR_IMPORT_WIDGET.format(
@@ -684,9 +684,9 @@ class ConfigPage(gtk.VBox):
                 self.handle_bad_custom_main_widget(e)
             else:
                 return
-        std_table = rose.config_editor.pagewidget.standard.PageTable
+        std_table = rose.config_editor.pagewidget.table.PageTable
         file_chooser = rose.config_editor.pagewidget.chooser.PageFormatTree
-        disc_table = rose.config_editor.pagewidget.standard.PageLatentTable
+        disc_table = rose.config_editor.pagewidget.table.PageLatentTable
         if "/file/" in self.namespace:  # Don't like this!
             self.main_container = file_chooser(
                                        self.panel_data,

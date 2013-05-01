@@ -29,7 +29,7 @@ pygtk.require("2.0")
 import gtk
 
 import rose.config
-import rose.config_editor.panelwidget.standard
+import rose.config_editor.panelwidget.summary_data
 import rose.gtk.util
 import rose.config_editor.plugin.um.widget.stash_add
 
