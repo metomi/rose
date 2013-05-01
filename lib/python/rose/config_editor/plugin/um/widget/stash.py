@@ -35,7 +35,7 @@ import rose.config_editor.plugin.um.widget.stash_add
 
 
 class BaseStashSummaryDataPanelv1(
-          rose.config_editor.panelwidget.standard.BaseSummaryDataPanel):
+          rose.config_editor.panelwidget.summary_data.BaseSummaryDataPanel):
 
     """This is a base class for displaying and editing STASH requests.
     
