@@ -180,6 +180,7 @@ ERROR_IMPORT_CLASS = "Could not retrieve class {0}"
 ERROR_IMPORT_WIDGET = "Could not import widget: {0}"
 ERROR_IMPORT_WIDGET_TITLE = "Error importing widget."
 ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
+ERROR_LOCATE_OBJECT = "Could not locate {0}"
 ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
 ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
 ERROR_NO_OUTPUT = "No output found for {0}"
@@ -266,6 +267,12 @@ SPACING_PAGE = 10
 SPACING_SUB_PAGE = 5
 
 # Stack action names and presentation
+STACK_GROUP_ADD = "Add"
+STACK_GROUP_COPY = "Copy"
+STACK_GROUP_DELETE = "Delete"
+STACK_GROUP_RENAME = "Rename"
+STACK_GROUP_REORDER = "Reorder"
+
 STACK_ACTION_ADDED = "Added"
 STACK_ACTION_CHANGED = "Changed"
 STACK_ACTION_CHANGED_COMMENTS = "Changed #"
@@ -377,9 +384,24 @@ TITLE_FILE_PANEL = "Other files"
 
 # Summary (sub) data panel names
 
-SUMMARY_DATA_PANEL_IGNORED_MARKUP = "<b>{0}</b>"
+SUMMARY_DATA_PANEL_ERROR_TIP = "Error ({0}): {1}\n"
+SUMMARY_DATA_PANEL_ERROR_MARKUP = "<span color='red'>X</span>"
+SUMMARY_DATA_PANEL_FILTER_LABEL = "Filter:"
+SUMMARY_DATA_PANEL_FILTER_MAX_CHAR = 8
+SUMMARY_DATA_PANEL_GROUP_LABEL = "Group:"
+SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP = "<b>^</b>"
+SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP = "<b>!!</b>"
+SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP = "<b>!</b>"
+SUMMARY_DATA_PANEL_MODIFIED_MARKUP = "<span color='blue'>*</span>"
 SUMMARY_DATA_PANEL_MAX_LEN = 15
+SUMMARY_DATA_PANEL_MENU_ADD = "Add new section"
+SUMMARY_DATA_PANEL_MENU_COPY = "Clone this section"
+SUMMARY_DATA_PANEL_MENU_ENABLE = "Enable this section"
+SUMMARY_DATA_PANEL_MENU_GO_TO = "View {0}"
+SUMMARY_DATA_PANEL_MENU_IGNORE = "Ignore this section"
+SUMMARY_DATA_PANEL_MENU_REMOVE = "Remove this section"
 SUMMARY_DATA_PANEL_SECTION_TITLE = "Section"
+SUMMARY_DATA_PANEL_INDEX_TITLE = "Index"
 FILE_CONTENT_PANEL_FORMAT_LABEL = "Hide available sections"
 FILE_CONTENT_PANEL_OPT_TIP = "Items available for file source"
 FILE_CONTENT_PANEL_TIP = "Items included in file source"
@@ -436,6 +458,7 @@ FLAG_TYPE_NO_META = "No metadata flag"
 # Relevant metadata properties
 
 META_PROP_WIDGET = "widget[rose-config-edit]"
+META_PROP_WIDGET_SUB_NS = "widget[rose-config-edit:sub-ns]"
 
 # Miscellaneous
 COPYRIGHT = "(C) British Crown Copyright 2012-3 Met Office."

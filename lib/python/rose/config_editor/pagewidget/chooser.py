@@ -44,7 +44,7 @@ class PageFormatTree(gtk.VBox):
     EMPTY_LABEL = 'empty'
 
     def __init__(self, panel_data, ghost_data, var_ops, show_modes,
-                 format_keys_func):
+                 format_keys_func, arg_str=None):
         super(PageFormatTree, self).__init__(spacing=self.SPACING)
         self.panel_data = panel_data
         self.ghost_data = ghost_data
