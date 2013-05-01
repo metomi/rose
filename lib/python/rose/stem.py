@@ -241,10 +241,12 @@ class StemRunner(object):
         repos = {}
         if not self.opts.source:
             self.opts.source = ['.']
+        self.opts.project = list()
 
         for i, url in enumerate(self.opts.source):
             project, url, base, rev = self._ascertain_project(url)
             self.opts.source[i] = url
+            self.opts.project.append(project)
             if project in repos:
                 repos[project].append(url)
             else:
