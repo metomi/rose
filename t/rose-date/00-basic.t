@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 14
+tests 17
 #-------------------------------------------------------------------------------
 # Ensure it can parse its own output.
 TEST_KEY=$TEST_KEY_BASE
@@ -56,6 +56,15 @@ TEST_KEY=$TEST_KEY_BASE-format-iso
 run_pass "$TEST_KEY" rose date --print-format="%Y%m%dT%H%M%S" "2012122515"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 20121225T150000
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Test -c option.
+TEST_KEY=$TEST_KEY_BASE-c
+ROSE_TASK_CYCLE_TIME=2012122500 \
+    run_pass "$TEST_KEY" rose date -c
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2012122500
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
