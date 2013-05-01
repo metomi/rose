@@ -515,7 +515,8 @@ class BaseStashSummaryDataPanelv1(
             request_lookup[st_sect].setdefault(st_item, {})
             request_lookup[st_sect][st_item][section] = {}
             for variable in self.variables.get(section, []):
-                request_lookup[st_sect][st_item][section][variable.name] = variable.value
+                request_lookup[st_sect][st_item][section].update(
+                                           {variable.name: variable.value})
         return request_lookup
 
     def _get_request_changes(self):

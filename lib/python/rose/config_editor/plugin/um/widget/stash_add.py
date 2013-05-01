@@ -488,7 +488,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         add_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
         add_menuitem.set_label("Add STASH request")
         add_menuitem.connect("activate",
-                                lambda i: self.add_stash_request(section, item))
+                             lambda i: self.add_stash_request(section, item))
         add_menuitem.show()
         menu.append(add_menuitem)
         streqs = self.request_lookup.get(section, {}).get(item, {}).keys()
