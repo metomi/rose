@@ -80,7 +80,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self.navigate_to_stash_request = navigate_to_stash_request_func
         self.refresh_stash_requests = refresh_stash_requests_func
         self.group_index = 0
-        self.control_widget_hbox = self._get_control_widget_box()
+        self.control_widget_hbox = self._get_control_widget_hbox()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
         self._view = rose.gtk.util.TooltipTreeView(
                                    get_tooltip_func=self.set_tree_tip)
@@ -350,7 +350,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             child_iter = model.iter_next(child_iter)
         return False
 
-    def _get_control_widget_box(self):
+    def _get_control_widget_hbox(self):
         # Build the control widgets for the dialog.
         filter_label = gtk.Label(
                       rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
@@ -385,19 +385,14 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._refresh_button.connect("clicked",
                                      lambda b: self.refresh_stash_requests())
          
-        eb1 = gtk.EventBox()
-        eb1.show()
-        eb2 = gtk.EventBox()
-        eb2.show()
         filter_hbox = gtk.HBox()
         filter_hbox.pack_start(group_label, expand=False, fill=False)
         filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
-        filter_hbox.pack_start(eb1, expand=True, fill=True)
-        filter_hbox.pack_start(self._add_button, expand=False, fill=False)
-        filter_hbox.pack_start(self._refresh_button, expand=False, fill=False)
-        filter_hbox.pack_start(eb2, expand=True, fill=True)
-        filter_hbox.pack_end(self._filter_widget, expand=False, fill=False)
-        filter_hbox.pack_end(filter_label, expand=False, fill=False)
+        filter_hbox.pack_start(filter_label, expand=False, fill=False,
+                               padding=10)
+        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False)
+        filter_hbox.pack_end(self._refresh_button, expand=False, fill=False)
+        filter_hbox.pack_end(self._add_button, expand=False, fill=False)
         filter_hbox.show()
         return filter_hbox
 

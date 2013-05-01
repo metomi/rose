@@ -63,7 +63,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         self.is_duplicate = is_duplicate
         self.group_index = None
         self.util = rose.config_editor.util.Lookup()
-        self.control_widget_hbox = self._get_control_widget_box()
+        self.control_widget_hbox = self._get_control_widget_hbox()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
         self._prev_store = None
         self._prev_sort_model = None
@@ -143,7 +143,7 @@ class BaseSummaryDataPanel(gtk.VBox):
         """
         return []
 
-    def _get_control_widget_box(self):
+    def _get_control_widget_hbox(self):
         filter_label = gtk.Label(
                       rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
         filter_label.show()
@@ -164,8 +164,9 @@ class BaseSummaryDataPanel(gtk.VBox):
         filter_hbox = gtk.HBox()
         filter_hbox.pack_start(group_label, expand=False, fill=False)
         filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
-        filter_hbox.pack_end(self._filter_widget, expand=False, fill=False)
-        filter_hbox.pack_end(filter_label, expand=False, fill=False)
+        filter_hbox.pack_start(filter_label, expand=False, fill=False,
+                               padding=rose.config_editor.SPACING_SUB_PAGE)
+        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False)
         filter_hbox.show()
         return filter_hbox
 

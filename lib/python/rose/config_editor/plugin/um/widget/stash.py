@@ -421,16 +421,10 @@ class BaseStashSummaryDataPanelv1(
         arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
         arrow.show()
         package_button.hbox.pack_start(arrow, expand=False, fill=False)
-        eb = gtk.EventBox()
-        eb.show()
-        self.control_widget_hbox.pack_start(eb, expand=True, fill=True)
-        self.control_widget_hbox.pack_start(self._add_button,
-                                            expand=False, fill=False)
-        self.control_widget_hbox.pack_start(package_button, expand=False,
-                                            fill=False)
-        eb = gtk.EventBox()
-        eb.show()
-        self.control_widget_hbox.pack_start(eb, expand=True, fill=True)
+        self.control_widget_hbox.pack_end(package_button, expand=False,
+                                          fill=False)
+        self.control_widget_hbox.pack_end(self._add_button,
+                                          expand=False, fill=False)
         self._add_button.connect("clicked",
                                  self._launch_new_diagnostic_window)
         package_button.connect("button-press-event",
