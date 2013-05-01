@@ -1825,10 +1825,11 @@ class MainController(object):
         """Loop through system macros and sum errors."""
         for macro_name in [rose.META_PROP_COMPULSORY, rose.META_PROP_TYPE]:
             # We may need to speed up trigger for large configs.
-            self.perform_macro_validation(macro_name, namespace, is_loading)
+            self.perform_macro_validation(macro_name, namespace, is_loading,
+                                          is_macro_dynamic=True)
 
     def perform_macro_validation(self, macro_type, namespace=None,
-                                 is_loading=False):
+                                 is_loading=False, is_macro_dynamic=False):
         """Calculate errors for a given internal macro."""
         configs = self.data.config.keys()
         if namespace is not None:
@@ -1846,10 +1847,12 @@ class MainController(object):
             checker = self.data.builtin_macros[config_name][macro_type]
             bad_list = checker.validate(config, meta)
             self.apply_macro_validation(config_name, macro_type, bad_list,
-                                        namespace, is_loading)
+                                        namespace, is_loading=is_loading,
+                                        is_macro_dynamic=is_macro_dynamic)
 
     def apply_macro_validation(self, config_name, macro_type, bad_list=None,
-                               namespace=None, is_loading=False):
+                               namespace=None, is_loading=False,
+                               is_macro_dynamic=False):
         """Display error icons if a variable is in the wrong state."""
         if bad_list is None:
             bad_list = []
@@ -1890,7 +1893,7 @@ class MainController(object):
         if not bad_list:
             self.refresh_ids(config_name,
                              id_error_dict.keys() + id_warn_dict.keys(),
-                             is_loading, are_errors_done=True)
+                             is_loading, are_errors_done=is_macro_dynamic)
             return
         for bad_report in bad_list:
             section = bad_report.section
@@ -1944,7 +1947,8 @@ class MainController(object):
                 map_.update({setting_id: info})
         self.refresh_ids(config_name,
                          id_error_dict.keys() + id_warn_dict.keys(),
-                         is_loading, are_errors_done=True)
+                         is_loading,
+                         are_errors_done=is_macro_dynamic)
 
     def apply_macro_transform(self, config_name, macro_type, changed_ids):
         """Refresh pages with changes."""

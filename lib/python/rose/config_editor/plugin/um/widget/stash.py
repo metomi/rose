@@ -411,7 +411,7 @@ class BaseStashSummaryDataPanelv1(
 
     def _add_new_diagnostic_launcher(self):
         # Create a button for launching the "Add new STASH" dialog.
-        add_button = rose.gtk.util.CustomButton(
+        self._add_button = rose.gtk.util.CustomButton(
                                    label=self.ADD_NEW_STASH_LABEL,
                                    stock_id=gtk.STOCK_ADD,
                                    tip_text=self.ADD_NEW_STASH_TIP)
@@ -424,13 +424,15 @@ class BaseStashSummaryDataPanelv1(
         eb = gtk.EventBox()
         eb.show()
         self.control_widget_hbox.pack_start(eb, expand=True, fill=True)
-        self.control_widget_hbox.pack_start(add_button, expand=False, fill=False)
+        self.control_widget_hbox.pack_start(self._add_button,
+                                            expand=False, fill=False)
         self.control_widget_hbox.pack_start(package_button, expand=False,
                                             fill=False)
         eb = gtk.EventBox()
         eb.show()
         self.control_widget_hbox.pack_start(eb, expand=True, fill=True)
-        add_button.connect("clicked", self._launch_new_diagnostic_window)
+        self._add_button.connect("clicked",
+                                 self._launch_new_diagnostic_window)
         package_button.connect("button-press-event",
                                self._package_menu_launch)
 
@@ -528,6 +530,7 @@ class BaseStashSummaryDataPanelv1(
     def _handle_close_diagnostic_window(self, widget=None):
         # Handle a close of the diagnostic window.
         self._diag_panel = None
+        self._add_button.set_sensitive(True)
 
     def _launch_new_diagnostic_window(self, widget=None):
         # Launch the "new STASH request" dialog.
@@ -549,6 +552,7 @@ class BaseStashSummaryDataPanelv1(
         window.set_default_size(900, 800)
         window.connect("destroy", self._handle_close_diagnostic_window)
         window.show()
+        self._add_button.set_sensitive(False)
 
     def _refresh_diagnostic_window(self):
         # Refresh information in the "new STASH request" dialog.

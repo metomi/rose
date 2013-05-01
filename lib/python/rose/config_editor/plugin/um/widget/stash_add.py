@@ -130,7 +130,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             group_model = gtk.TreeStore(str)
             group_model.append(None, [""])
             for i, name in enumerate(self.column_names):
-                group_model.append(None, [name])
+                if name not in ["?", "#"]:
+                    group_model.append(None, [name])
             self._group_widget.set_model(group_model)
             self._group_widget.set_active(self.group_index + 1)
             self._group_widget.connect("changed", self._handle_group_change)
