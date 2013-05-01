@@ -43,11 +43,13 @@ REC_OFFSET = re.compile(
         r"""\A(?P<sign>[\+\-])?(?P<num>\d+)(?P<unit>[wdhms])\Z""", re.I)
 
 
-def date_shift(offsets=None, parse_format=None, print_format=None, *args):
+def date_shift(offsets=None, parse_format=None, print_format=None,
+               task_cycle_time_mode=None, *args):
     """Return a date string with an offset.
 
-    If args specified, use args[0] as the date-time string. Otherwise, use
-    current time.
+    If args specified, use args[0] as the date-time string. If args not
+    specified and if task_cycle_time_mode is True, use ROSE_TASK_CYCLE_TIME
+    environment variable if it is defined. Otherwise, use current time.
 
     If offsets is specified, it should be a list of offsets that have the
     format "[+/-]nU" where "n" is an integer, and U is a unit matching a key in
@@ -65,6 +67,8 @@ def date_shift(offsets=None, parse_format=None, print_format=None, *args):
     parse_formats = FORMATS
     if parse_format:
         parse_formats = [parse_format]
+    if not args and task_cycle_time_mode and os.getenv("ROSE_TASK_CYCLE_TIME"):
+        args = [os.getenv("ROSE_TASK_CYCLE_TIME")]
     if not args or args[0] == "now":
         d, parse_format = (datetime.now(), parse_formats[0])
     else:
@@ -99,9 +103,11 @@ def date_shift(offsets=None, parse_format=None, print_format=None, *args):
 def main():
     """Implement "rose date"."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("offsets", "parse_format", "print_format")
+    opt_parser.add_my_options("offsets", "parse_format", "print_format",
+                              "task_cycle_time_mode")
     opts, args = opt_parser.parse_args()
-    print date_shift(opts.offsets, opts.parse_format, opts.print_format, *args)
+    print date_shift(opts.offsets, opts.parse_format, opts.print_format,
+                     opts.task_cycle_time_mode, *args)
 
 
 if __name__ == "__main__":

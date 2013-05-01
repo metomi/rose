@@ -432,14 +432,15 @@ class CylcProcessor(SuiteEngineProcessor):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def ping(self, suite_name, hosts=None):
+    def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
         if not hosts:
             hosts = ["localhost"]
         host_proc_dict = {}
         for host in sorted(hosts):
             proc = self.popen.run_bg(
-                    "cylc", "ping", "--host=" + host, suite_name)
+                    "cylc", "ping", "--host=" + host, suite_name, 
+                    "--pyro-timeout=" + str(timeout))
             host_proc_dict[host] = proc
         ping_ok_hosts = []
         while host_proc_dict:

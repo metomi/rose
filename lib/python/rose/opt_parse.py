@@ -404,6 +404,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "dest": "task",
                         "help": "Switch a task on/off."}],
+               "task_cycle_time_mode": [
+                       ["--use-task-cycle-time", "-c"],
+                       {"action": "store_true",
+                        "dest": "task_cycle_time_mode",
+                        "help": "Use ROSE_TASK_CYCLE_TIME."}],
                "thresholds": [
                        ["--threshold"],
                        {"action": "append",
