@@ -186,8 +186,9 @@ class RoseOptionParser(OptionParser):
                "log_archive_threshold": [
                        ["--log-archive-threshold"],
                        {"action": "store",
-                        "metavar": "DAYS",
-                        "help": "N-days before archiving cycle job logs."}],
+                        "metavar": "CYCLE-TIME",
+                        "help": "Specify the cycle at and before which job" +
+                                "logs can be archived."}],
                "log_keep": [
                        ["--log-keep"],
                        {"action": "store",

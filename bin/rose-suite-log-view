@@ -39,10 +39,9 @@
 # OPTIONS
 #     --full, -f
 #         Re-sync all remote task logs, regardless of the TASK arguments.
-#     --log-archive-threshold=DAYS
-#         Specify the number of days of inactivity in the jobs of a given cycle
-#         time before archiving its job logs. Set to 0 to switch off job log
-#         archiving (default=3.0)
+#     --log-archive-threshold=CYCLE-TIME
+#         Switch on job log archiving by specifying a cycle time threshold. All
+#         job logs at this cycle time or older will be archived.
 #     --no-web-browse
 #         Do not open a web browser to display the log view.
 #-------------------------------------------------------------------------------

@@ -171,10 +171,6 @@ class SuiteLogViewGenerator(object):
                                            os.F_OK | os.R_OK):
                 prev_mtime = os.stat(self.NS + ".json").st_mtime
             this_mtime = os.stat(suite_db_file).st_mtime
-            if log_archive_threshold is None:
-                conf = ResourceLocator.default().get_conf()
-                log_archive_threshold = conf.get_value(
-                        [self.NS, "log-archive-threshold"])
             while prev_mtime is None or prev_mtime < this_mtime:
                 cycles = self.suite_engine_proc.get_suite_events(
                         suite_name, log_archive_threshold)

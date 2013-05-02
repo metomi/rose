@@ -36,7 +36,7 @@ import shlex
 import socket
 import sqlite3
 import tarfile
-from time import mktime, sleep, strptime, time
+from time import mktime, sleep, strptime
 
 
 class CylcProcessor(SuiteEngineProcessor):
@@ -170,7 +170,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 sleep(1.0)
         return {}
 
-    def _get_suite_events(self, suite_name, log_archive_threshold=None):
+    def _get_suite_events(self, suite_name, log_archive_threshold=""):
         data = {}
 
         # Read task events from suite runtime database
@@ -230,12 +230,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 submit["status"] = event
 
         # Job log files
-        if log_archive_threshold is None:
-            log_archive_threshold = self.LOG_ARCHIVE_THRESHOLD
-        if log_archive_threshold:
-            archive_threshold = time() - float(log_archive_threshold) * 86400.0
-        else:
-            archive_threshold = 0
         for cycle_time, datum in data.items():
             archive_file_name = "job-" + cycle_time + ".tar.gz"
             # Job logs of this cycle already archived
@@ -258,7 +252,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 tar.close()
                 continue
             # Check stats of job logs of this cycle
-            dont_archive = False
             for name, submits in datum["tasks"].items():
                 for i, submit in enumerate(submits):
                     delim = self.TASK_LOG_DELIM
@@ -269,12 +262,9 @@ class CylcProcessor(SuiteEngineProcessor):
                             key = "script"
                         elif key == "status":
                             continue
-                        stat = os.stat(path)
-                        size = stat.st_size
-                        submit["files"][key] = {"n_bytes": size}
-                        if stat.st_mtime >= archive_threshold:
-                            dont_archive = True
-            if dont_archive:
+                        n_bytes = os.stat(path).st_size
+                        submit["files"][key] = {"n_bytes": n_bytes}
+            if cycle_time > log_archive_threshold: # str cmp
                 datum["is_archived"] = False
                 continue
             # Pull from each remote host all job log files of this
