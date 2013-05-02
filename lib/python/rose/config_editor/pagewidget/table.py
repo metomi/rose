@@ -42,7 +42,8 @@ class PageTable(gtk.Table):
     MAX_COLS = 3
     BORDER_WIDTH = rose.config_editor.SPACING_SUB_PAGE
 
-    def __init__(self, panel_data, ghost_data, var_ops, show_modes):
+    def __init__(self, panel_data, ghost_data, var_ops, show_modes,
+                 arg_str=None):
         super(PageTable, self).__init__(rows=self.MAX_ROWS,
                                         columns=self.MAX_COLS,
                                         homogeneous=False)
@@ -292,7 +293,8 @@ class PageLatentTable(gtk.Table):
     MAX_ROWS = 2000
     MAX_COLS = 3
 
-    def __init__(self, panel_data, ghost_data, var_ops, show_modes):
+    def __init__(self, panel_data, ghost_data, var_ops, show_modes,
+                 arg_str=None):
         super(PageLatentTable, self).__init__(rows=self.MAX_ROWS,
                                      columns=self.MAX_COLS,
                                      homogeneous=False)

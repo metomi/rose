@@ -2,19 +2,16 @@
 
 # Preparation
 
-Checkout new working copy
+Remove all .pyc files.
 
 # Menu and toolbars
 
-File-> New
-Toolbar New
 File-> Open wrong-path dialog-close dialog-cancel correct-path-enter correct-path_OK repeat_with_new_window
 Toolbar Open wrong-path dialog-close dialog-cancel correct-path-enter correct-path_OK repeat_with_new_window
 File-> Save no_changes do_some_changes change_ignored
 Toolbar Save no_changes do_some_changes change_ignored
 Check changed icons work after a save
 File-> Quit no-changes unsaved-changes
-Toolbar Quit no-changes unsaved-changes
 Window Close no-changes unsaved-changes
 open_page, change a variable, remove it, change another variable, add a variable, change it
 open another page, repeat first changes and ignore a variable under No Metadata
