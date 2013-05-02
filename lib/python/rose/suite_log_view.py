@@ -123,7 +123,8 @@ class SuiteLogViewGenerator(object):
     def generate(self, suite_name, full_mode=False,
                  log_archive_threshold=None):
         """Generate the log view for a suite."""
-        return self._chdir(self._generate, suite_name, full_mode)
+        return self._chdir(self._generate, suite_name, full_mode,
+                           log_archive_threshold)
 
     __call__ = generate
 

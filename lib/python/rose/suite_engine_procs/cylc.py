@@ -27,6 +27,7 @@ import pwd
 import re
 import rose.config
 from rose.env import env_var_process
+from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
@@ -165,7 +166,8 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         for i in range(3): # 3 retries
             try:
-                return self._get_suite_events(suite_name)
+                return self._get_suite_events(suite_name,
+                                              log_archive_threshold)
             except sqlite3.OperationalError:
                 sleep(1.0)
         return {}
@@ -275,7 +277,7 @@ class CylcProcessor(SuiteEngineProcessor):
             glob_pat = self.TASK_LOG_DELIM.join(["*", cycle_time, "*"])
             for auth in auths:
                 r_glob = "%s:%s/%s" % (auth, log_dir_rel, glob_pat)
-                cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
+                cmd = self.popen.get_cmd("rsync", r_glob, log_dir)
                 try:
                     out, err = self.popen(*cmd)
                 except RosePopenError as e:
@@ -286,6 +288,8 @@ class CylcProcessor(SuiteEngineProcessor):
             for name in names:
                 tar.add(name)
             tar.close()
+            self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
+                                              archive_file_name))
             # Remove local job log files of this cycle time.
             for name in names:
                 self.fs_util.delete(name)
