@@ -60,8 +60,10 @@ import gtk  # Only used to run the main gtk loop.
 
 import rose.config
 import rose.config_editor
+import rose.config_editor.action
 import rose.config_editor.loader
 import rose.config_editor.menu
+import rose.config_editor.nav_panel_menu
 import rose.config_editor.page
 import rose.config_editor.panel
 import rose.config_editor.stack
@@ -171,10 +173,9 @@ class MainController(object):
                                    self.update_namespace,
                                    search_id_func=self.perform_find_by_id)
 
-        # Add in the general 'menu' event handler.
-        # Eventually it might be a good idea to package up the undo stuff.
-        self.handle = rose.config_editor.menu.Handler(
-                             self.data, self.util, self.mainwindow,
+
+        self.action = rose.config_editor.action.Actions(
+                             self.data, self.util,
                              self.undo_stack, self.redo_stack,
                              self.perform_undo,
                              self.apply_macro_transform,
@@ -185,6 +186,26 @@ class MainController(object):
                              self.variable_ops,
                              self.kill_page, self.update_status,
                              self.update_namespace, self.view_page,
+                             self.perform_find_by_ns_id)
+
+        # Add in the navigation panel menu handler.
+        self.nav_handle = rose.config_editor.nav_panel_menu.NavPanelHandler(
+                             self.data, self.util, self.mainwindow,
+                             self.undo_stack, self.redo_stack,
+                             self._add_config,
+                             self.section_ops,
+                             self.variable_ops,
+                             self.kill_page)
+
+        # Add in the main menu bar and tool bar handler.
+        self.main_handle = rose.config_editor.menu.Handler(
+                             self.data, self.util, self.mainwindow,
+                             self.undo_stack, self.redo_stack,
+                             self.perform_undo,
+                             self.apply_macro_transform,
+                             self.apply_macro_validation,
+                             self.section_ops,
+                             self.variable_ops,
                              self.perform_find_by_ns_id)
 
         if not self.pluggable:
@@ -204,9 +225,9 @@ class MainController(object):
                                  notebook=self.notebook,
                                  page_change_func=self.handle_page_change,
                                  save_func=self.save_to_file,)
-            self.mainwindow.window.connect('destroy', self.handle.destroy)
+            self.mainwindow.window.connect('destroy', self.main_handle.destroy)
             self.mainwindow.window.connect('delete-event',
-                                           self.handle.destroy)
+                                           self.main_handle.destroy)
             self.mainwindow.window.connect_after('grab_focus',
                                                  self.handle_page_change)
             self.mainwindow.window.connect_after('focus-in-event',
@@ -252,19 +273,20 @@ class MainController(object):
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
-        assign(rose.config_editor.TOOLBAR_BROWSE, self.handle.launch_browser)
+        assign(rose.config_editor.TOOLBAR_BROWSE,
+               self.main_handle.launch_browser)
         assign(rose.config_editor.TOOLBAR_UNDO, self.perform_undo)
         assign(rose.config_editor.TOOLBAR_REDO, self.perform_undo, [True])
         assign(rose.config_editor.TOOLBAR_REVERT, self.revert_to_saved_data)
         assign(rose.config_editor.TOOLBAR_FIND_NEXT, self._launch_find)
         assign(rose.config_editor.TOOLBAR_VALIDATE,
-               self.handle.check_all_extra)
+               self.main_handle.check_all_extra)
         assign(rose.config_editor.TOOLBAR_TRANSFORM,
-               self.handle.transform_default)
+               self.main_handle.transform_default)
         assign(rose.config_editor.TOOLBAR_VIEW_OUTPUT, 
-               self.handle.launch_output_viewer )
+               self.main_handle.launch_output_viewer )
         assign(rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-               self.handle.launch_scheduler)
+               self.main_handle.launch_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
                                rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
@@ -278,9 +300,9 @@ class MainController(object):
         self._toolbar_run_button = rose.gtk.util.CustomMenuButton(
                           stock_id=gtk.STOCK_MEDIA_PLAY,
                           menu_items=[(custom_text, gtk.STOCK_MEDIA_PLAY)],
-                          menu_funcs=[self.handle.get_run_suite_args],
+                          menu_funcs=[self.main_handle.get_run_suite_args],
                           tip_text=rose.config_editor.TOOLBAR_SUITE_RUN)
-        self._toolbar_run_button.connect("clicked", self.handle.run_suite)
+        self._toolbar_run_button.connect("clicked", self.main_handle.run_suite)
         self._toolbar_run_button.set_sensitive(
               any([c.is_top_level for c in self.data.config.values()]))
         self.toolbar.insert(self._toolbar_run_button, -1)
@@ -299,7 +321,7 @@ class MainController(object):
         self.menu_widgets = {}
         menu_list = [('/TopMenuBar/File/Open...', self.load_from_file),
                      ('/TopMenuBar/File/Save', lambda m: self.save_to_file()),
-                     ('/TopMenuBar/File/Quit', self.handle.destroy),
+                     ('/TopMenuBar/File/Quit', self.main_handle.destroy),
                      ('/TopMenuBar/Edit/Undo', 
                       lambda m: self.perform_undo()),
                      ('/TopMenuBar/Edit/Redo', 
@@ -307,8 +329,8 @@ class MainController(object):
                      ('/TopMenuBar/Edit/Find', self._launch_find),
                      ('/TopMenuBar/Edit/Find Next',
                       lambda m: self.perform_find(self.find_hist['regex'])),
-                     ('/TopMenuBar/Edit/Preferences', self.handle.prefs),
-                     ('/TopMenuBar/Edit/Stack', self.handle.view_stack),
+                     ('/TopMenuBar/Edit/Preferences', self.main_handle.prefs),
+                     ('/TopMenuBar/Edit/Stack', self.main_handle.view_stack),
                      ('/TopMenuBar/View/View fixed vars',
                       lambda m: self._set_page_var_show_modes(
                                      rose.config_editor.SHOW_MODE_FIXED,
@@ -350,39 +372,39 @@ class MainController(object):
                                      rose.config_editor.SHOW_MODE_NO_TITLE,
                                      m.get_active())),
                      ('/TopMenuBar/Metadata/All V',
-                      lambda m: self.handle.run_custom_macro(
+                      lambda m: self.main_handle.run_custom_macro(
                                      method_name=rose.macro.VALIDATE_METHOD)),
                      ('/TopMenuBar/Metadata/Autofix',
-                      lambda m: self.handle.transform_default()),
+                      lambda m: self.main_handle.transform_default()),
                      ('/TopMenuBar/Metadata/Extra checks',
-                      lambda m: self.handle.check_fail_rules()),
+                      lambda m: self.main_handle.check_fail_rules()),
                      ('/TopMenuBar/Metadata/Reload metadata',
                       lambda m: self._refresh_metadata_if_on()),
                      ('/TopMenuBar/Metadata/Switch off metadata',
                       lambda m: self.refresh_metadata(m.get_active())),
                      ('/TopMenuBar/Tools/Run Suite/Run Suite default',
-                      self.handle.run_suite),
+                      self.main_handle.run_suite),
                      ('/TopMenuBar/Tools/Run Suite/Run Suite custom',
-                      self.handle.get_run_suite_args),
+                      self.main_handle.get_run_suite_args),
                      ('/TopMenuBar/Tools/Browser',
-                      lambda m: self.handle.launch_browser()),
+                      lambda m: self.main_handle.launch_browser()),
                      ('/TopMenuBar/Tools/Terminal',
-                      lambda m: self.handle.launch_terminal()),
+                      lambda m: self.main_handle.launch_terminal()),
                      ('/TopMenuBar/Tools/View Output',
-                      lambda m: self.handle.launch_output_viewer()),
+                      lambda m: self.main_handle.launch_output_viewer()),
                      ('/TopMenuBar/Tools/Open Suite GControl',
-                      lambda m: self.handle.launch_scheduler()),
+                      lambda m: self.main_handle.launch_scheduler()),
                      ('/TopMenuBar/Page/Revert',
                       lambda m: self.revert_to_saved_data()),
                      ('/TopMenuBar/Page/Page Info',
-                      lambda m: self.handle.info_request(
+                      lambda m: self.nav_panel_handle.info_request(
                                      self._get_current_page().namespace)),
                      ('/TopMenuBar/Page/Page Help',
                       lambda m: self._get_current_page().launch_help()),
                      ('/TopMenuBar/Page/Page Web Help',
                       lambda m: self._get_current_page().launch_url()),
-                     ('/TopMenuBar/Help/GUI Help', self.handle.help),
-                     ('/TopMenuBar/Help/About', self.handle.about_dialog)]
+                     ('/TopMenuBar/Help/GUI Help', self.main_handle.help),
+                     ('/TopMenuBar/Help/About', self.main_handle.about_dialog)]
         is_toggled = dict([('/TopMenuBar/View/View fixed vars',
                             rose.config_editor.SHOULD_SHOW_FIXED_VARS),
                            ('/TopMenuBar/View/View ignored vars',
@@ -416,16 +438,16 @@ class MainController(object):
         add_menuitem = self.menubar.uimanager.get_widget(
                                               "/TopMenuBar/Page/Add variable")
         page_menu.connect("activate",
-                          lambda m: self.handle.load_page_menu(
+                          lambda m: self.main_handle.load_page_menu(
                                                 self.menubar,
                                                 add_menuitem,
                                                 self._get_current_page()))
         page_menu.get_submenu().connect(
                           "deactivate",
-                          lambda m: self.handle.clear_page_menu(
+                          lambda m: self.main_handle.clear_page_menu(
                                                       self.menubar,
                                                       add_menuitem))
-        self.handle.load_macro_menu(self.menubar)
+        self.main_handle.load_macro_menu(self.menubar)
         if not any([c.is_top_level for c in self.data.config.values()]):
             self.menubar.uimanager.get_widget(
                          "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
@@ -442,46 +464,29 @@ class MainController(object):
             rose.config_editor.ACCEL_FIND_NEXT:
                         lambda: self.perform_find(self.find_hist['regex']),
             rose.config_editor.ACCEL_HELP_GUI:
-                        lambda: self.handle.help(),
+                        lambda: self.main_handle.help(),
             rose.config_editor.ACCEL_OPEN:
                         lambda: self.load_from_file(),
             rose.config_editor.ACCEL_SAVE:
                         lambda: self.save_to_file(),
             rose.config_editor.ACCEL_QUIT:
-                        lambda: self.handle.destroy(),
+                        lambda: self.main_handle.destroy(),
             rose.config_editor.ACCEL_METADATA_REFRESH:
                         lambda: self._refresh_metadata_if_on(),
             rose.config_editor.ACCEL_SUITE_RUN:
-                        lambda: self.handle.run_suite(),
+                        lambda: self.main_handle.run_suite(),
             rose.config_editor.ACCEL_BROWSER:
-                        lambda: self.handle.launch_browser(),
+                        lambda: self.main_handle.launch_browser(),
             rose.config_editor.ACCEL_TERMINAL:
-                        lambda: self.handle.launch_terminal()}
+                        lambda: self.main_handle.launch_terminal()}
         self.menubar.set_accelerators(accel)
 
     def generate_hyper_panel(self):
         """"Create tree panel and link functions."""
         self.hyper_panel = rose.config_editor.panel.HyperLinkTreePanel(
                                        self.data.namespace_tree,
-                                       self.handle.get_metadata_and_comments)
-        self.hyper_panel.send_create_request = self.handle.create_request
-        self.hyper_panel.send_launch_request = self.handle_launch_request
-        self.hyper_panel.send_add_dialog_request = self.handle.add_dialog
-        self.hyper_panel.ask_can_clone = self.handle.is_ns_duplicate
-        self.hyper_panel.ask_can_show = self.handle.get_can_show_page
-        self.hyper_panel.ask_ignored_status = self.handle.get_ns_ignored
-        self.hyper_panel.ask_is_top = (
-                   lambda n: "/" + n in self.data.config.keys())
-        self.hyper_panel.ask_has_content = (
-                   lambda n: self.data.is_ns_content("/" + n))
-        self.hyper_panel.send_clone_request = self.handle.copy_request
-        self.hyper_panel.send_delete_request = self.handle.delete_request
-        self.hyper_panel.send_edit_request = self.handle.edit_request
-        self.hyper_panel.send_fix_request = self.handle.fix_request
-        self.hyper_panel.send_ignore_request = self.handle.ignore_request
-        self.hyper_panel.send_info_request = self.handle.info_request
-        self.hyper_panel.send_rename_request = self.handle.rename_request
-        self.hyper_panel.send_search_request = self.perform_find_by_ns_id
+                                       self.nav_panel_handle.popup_panel_menu,
+                                       self.nav_panel_handle.get_can_show_page)
 
 #------------------ Page manipulation functions ------------------------------
 
@@ -576,7 +581,7 @@ class MainController(object):
         sub_ops = None
         if has_sub_data:
             sub_data = self.data.get_sub_data_for_namespace(namespace_name)
-            sub_ops = self.handle.get_sub_ops_for_namespace(namespace_name)
+            sub_ops = self.action.get_sub_ops_for_namespace(namespace_name)
         page_metadata = {'namespace': namespace_name,
                          'ns_is_default': is_default,
                          'label': label,

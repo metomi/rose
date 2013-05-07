@@ -45,9 +45,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     """
 
-    def __init__(self, namespace_tree, popup_menu_func):
+    def __init__(self, namespace_tree, popup_menu_func, ask_can_show_func):
         super(HyperLinkTreePanel, self).__init__()
         self._popup_menu_func = popup_menu_func
+        self._ask_can_show_func = ask_can_show_func
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         self.panel_top = gtk.TreeViewColumn()
@@ -483,7 +484,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         latent_status = model.get_value(iter_, 8)
         ignored_status = model.get_value(iter_, 9)
         child_iter = model.iter_children(iter_)
-        is_visible = self.ask_can_show(latent_status, ignored_status)
+        is_visible = self._ask_can_show_func(latent_status, ignored_status)
         print "get should show", model.get_value(iter_, 3), repr(latent_status), repr(ignored_status), "?", is_visible
         if child_iter is None:
             # We only cache rows with no children to avoid parent updates.
