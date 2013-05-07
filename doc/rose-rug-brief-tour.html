@@ -122,9 +122,10 @@ rosie create
 </pre>
 
       <p>This command will prompt you to edit the suite discovery information
-      file. Edit the <em>project</em> (e.g. <samp>rug</samp>) and the
-      <em>title</em> settings (e.g. <samp>Brief tour</samp>). Save the file and
-      exit the editor.</p>
+      file. Put some meaningful values in for the <em>project</em> (e.g.
+      <samp>project=rose-user-guide</samp>) and the <em>title</em> settings
+      (e.g. <samp>title=Brief tour</samp>). Save the file and exit the
+      editor.</p>
     </div>
 
     <div class="slide">
@@ -142,8 +143,11 @@ rosie create
       running the following commands:</p>
       <pre class="shell">
 cd $HOME/roses/$ID # replace $ID with your suite ID
-rose rug-brief-tour
+rose rug-brief-tour # Rose command to set up the tour suite
 </pre>
+
+      <p>The <samp>rose rug-brief-tour</samp> command should create some
+      content for this guide within the current working directory.</p>
     </div>
 
     <div class="slide">

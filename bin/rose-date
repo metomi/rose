@@ -45,6 +45,8 @@
 #     --print-format=FORMAT
 #         Specify a format for printing the result. Default to the same format
 #         as the parse format.
+#     --use-task-cycle-time, -c
+#         Shorthand for `rose date $ROSE_TASK_CYCLE_TIME`.
 #     --utc, -u
 #         Parse/print date time in UTC instead of local time zone.
 #         (Does not work at the moment.)

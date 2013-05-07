@@ -47,7 +47,8 @@ class MainWindow(object):
              page_change_func=rose.config_editor.false_function,
              save_func=rose.config_editor.false_function):
         self.window = gtk.Window()
-        self.window.set_title(name + ' - ' + rose.config_editor.LAUNCH_COMMAND)
+        self.window.set_title(name + ' - ' +
+                              rose.config_editor.LAUNCH_COMMAND)
         self.util = rose.config_editor.util.Lookup()
         locator = rose.resource.ResourceLocator(paths=sys.path)
         icon_path = locator.locate('etc/images/rose-icon-trim.png')
@@ -136,9 +137,9 @@ class MainWindow(object):
         section_box.show()
         config_name_box.connect('changed',
                                 lambda c: self._reload_choices(
-                                           liststore,
-                                           names[c.get_active()]),
-                                           add_choices)
+                                            liststore,
+                                            names[c.get_active()],
+                                            add_choices))
         section_box.connect('activate',
                             lambda s: add_dialog.response(gtk.RESPONSE_OK))
         vbox = gtk.VBox(spacing=10)
@@ -305,11 +306,11 @@ class MainWindow(object):
         label = rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_NAME
         ok_tip_text = rose.config_editor.TIP_CONFIG_CHOOSE_NAME
         err_tip_text = rose.config_editor.TIP_CONFIG_CHOOSE_NAME_ERROR
-        dialog, container, name_entry = rose.gtk.util._get_naming_dialog(
-                                                           label,
-                                                           checker_function,
-                                                           ok_tip_text,
-                                                           err_tip_text)
+        dialog, container, name_entry = rose.gtk.util.get_naming_dialog(
+                                                          label,
+                                                          checker_function,
+                                                          ok_tip_text,
+                                                          err_tip_text)
         dialog.set_title(rose.config_editor.DIALOG_TITLE_CONFIG_CREATE)
         meta_hbox = gtk.HBox()
         meta_label = gtk.Label(

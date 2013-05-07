@@ -261,7 +261,7 @@ care_about_shape=.false.
       <pre class="prettyprint lang-rose_conf">
 [namelist:run_snow]
 help=This section holds options for configuring the snow
-    =retrieval dynamics.
+    =retrieval and snowball morphology.
 
 [namelist:run_snow=snow_consistency]
 title=Snow Consistency
@@ -275,14 +275,16 @@ values='too dry', 'too icy', 'good'
 [namelist:run_snow=slush_fraction]
 description=This specifies the maximum acceptable mass
  fraction of slush.
-title=Slush Fraction
+title=Slush Max Acceptable Fraction
 
 [namelist:run_snow=care_about_shape]
 help=If .true., we'll attempt to make the snowball
     =like this:
+    =
     =http://mrhonner.files.wordpress.com/2011/01/snowball-1.jpg
     =
-    =Otherwise, it'll just be a heap.
+    =If .false., it may be a bit messy - this depends
+    =on namelist:run_snow=snow_consistency.
 type=logical
 </pre>
     </div>
@@ -431,10 +433,18 @@ rose config --meta env=SPAM_NUMBER help
 
         <li><kbd>rose suite-shutdown</kbd>: shutdown the suite in 
         <var>$PWD</var> at the next opportunity.</li>
+        
+        <li><kbd>rose suite-clean</kbd>: remove items from previous runs for 
+        the suite in <var>$PWD</var> including <var>share/</var>, 
+        <var>work/</var> and runtime directories on remote job hosts.</li>
       </ul>
+    </div>
       
-      <p class="incremental">See the <a href="rose-command.html">CLI 
-      documentation</a> for details of further options.</p>
+    <div class="slide">
+      <h3 class="alwayshidden">Other Useful Commands (2)</h3>
+        
+      <p>See the <a href="rose-command.html">CLI documentation</a> for details 
+      of further options.</p>
     </div>  
 
     <div class="slide">

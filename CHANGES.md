@@ -20,8 +20,26 @@ None yet.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#605: rose configuration files: added syntax highlight for Kate.
+
+\#604: rose date -c: new option, short for `rose date $ROSE_TASK_CYCLE_TIME`.
+
+\#595: rosie lookup, rosie ls: now output with column headings.
+
+\#571: user guide: added a quick reference guide.
+
+\#567: rose suite-clean: new command to remove items created by suite runs.
+
+\#559: rose config-edit: added custom interface to display STASH configuration.
+
+\#534: rose_ana built-in application: now support arguments.
+
 \#475: rose suite-hook, rose suite-log-view: support latest naming convention
 of Cylc task ID. (Cylc 5.1.0)
+
+\#467: rose sgc: alias of `rose suite-gcontrol`.
+
+User guide: added many new tutorials.
 
 --------------------------------------------------------------------------------
 

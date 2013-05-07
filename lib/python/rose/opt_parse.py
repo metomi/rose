@@ -241,6 +241,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "new_mode",
                         "help": "Fresh start."}],
+               "no_headers": [
+                       ["--no-headers", "-H"],
+                       {"action": "store_true",
+                        "dest": "no_headers",
+                        "help": "Suppress headers."}],
                "next": [
                        ["--next"],
                        {"action": "store_true",
@@ -394,6 +399,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "dest": "task",
                         "help": "Switch a task on/off."}],
+               "task_cycle_time_mode": [
+                       ["--use-task-cycle-time", "-c"],
+                       {"action": "store_true",
+                        "dest": "task_cycle_time_mode",
+                        "help": "Use ROSE_TASK_CYCLE_TIME."}],
                "thresholds": [
                        ["--threshold"],
                        {"action": "append",

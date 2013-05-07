@@ -164,8 +164,8 @@ set_value("20")
       <dt><code>arg_str</code></dt>
 
       <dd>
-        <p>is an optional argument that stores any text given after the widget
-        in the metadata:</p>
+        <p>is a keyword argument that stores extra text given to the
+        <samp>widget</samp> option in the metadata, if any:</p>
         <pre class="prettyprint lang-rose_conf">
 widget[rose-config-edit]=modulename.ClassName arg1 arg2 arg3 ...
 </pre>
@@ -321,9 +321,6 @@ def handle_type_error(self, is_in_error):
 
     <h4 id="gtk:config-edit:pages:api">API Reference</h4>
 
-    <p>The API for custom page widgets is fully functional, but importing them
-    using the meta-data is not yet implemented.</p>
-
     <p>The procedure for generating a custom page widget is as follows:</p>
 
     <p>Assign a <code>widget</code> option to the relevant namespace in the
@@ -338,7 +335,8 @@ def handle_type_error(self, is_in_error):
     class MyGreatBigTable(gtk.Table):
 
         def __init__(self, real_variable_list, missing_variable_list,
-                     variable_functions_class_inst, show_modes_dict)
+                     variable_functions_class_inst, show_modes_dict,
+                     arg_str=None):
 </pre>
 
     <p>The class can inherit from any <code>gtk.Container</code>-derived
@@ -419,6 +417,7 @@ def handle_type_error(self, is_in_error):
 
           <dd>True means indicate if a variable has any metadata content, and
           False means do not show an indicator.</dd>
+        
         </dl>
 
         <p>If you wish to implement actions based on changes in these
@@ -435,6 +434,25 @@ def show_fixed(self, should_show)
         variables should be shown. If False, they should be hidden by your
         custom container.</p>
       </dd>
+
+      <dt><code>arg_str</code></dt>
+
+      <dd>
+        <p>is a keyword argument that stores extra text given to the
+        <samp>widget</samp> option in the metadata, if any:</p>
+        <pre class="prettyprint lang-rose_conf">
+widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
+</pre>
+
+        <p>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
+        ..."</code>. This could help configure your widget - for example, for a
+        table based widget, you might give the column names</p>:
+        <pre class="prettyprint lang-rose_conf">
+widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
+</pre>This means that you can write a generic widget and then configure it for
+different cases.
+      </dd>
+
     </dl>
 
     <p>Refreshing the whole page in order to display a small change to a

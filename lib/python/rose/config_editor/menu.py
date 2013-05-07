@@ -26,6 +26,7 @@ import re
 import shlex
 import subprocess
 import sys
+import time
 import urllib
 import webbrowser
 
@@ -349,15 +350,16 @@ class Handler(object):
         self._add_config = add_config_func
         self.kill_page_func = kill_page_func
         self.update_func = update_func
+        self.update_ns_func = update_ns_func
         self.view_page_func = view_page_func
         self.find_ns_id_func = find_ns_id_func
 
     def about_dialog(self, args):
         self.mainwindow.launch_about_dialog()
 
-    def ask_can_clone(self, namespace):
+    def is_ns_duplicate(self, base_ns):
         """Lookup whether a page can be cloned, via the metadata."""
-        namespace = "/" + namespace
+        namespace = "/" + base_ns.lstrip("/")
         sections = self.data.get_sections_from_namespace(namespace)
         if len(sections) != 1:
             return False
@@ -393,36 +395,78 @@ class Handler(object):
         config_name, section = self.mainwindow.launch_add_dialog(
                                     config_names, choices_help, help_str)
         if config_name in self.data.config and section is not None:
-            self.sect_ops.add_section(config_name, section)
+            self.sect_ops.add_section(config_name, section, page_launch=True)
+
+    def add_section_with_options(self, config_name, new_section_name, opt_map=None):
+        """Add a section and any compulsory options.
         
-    def clone_request(self, namespace):
-        """Copy a section and variables."""
-        namespace = "/" + namespace.lstrip("/")
+        Any option-value pairs in the opt_map dict will also be added.
+        
+        """
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_ADD + "-" + str(time.time())
+        self.sect_ops.add_section(config_name, new_section_name)
+        namespace = self.data.get_default_namespace_for_section(
+                                          new_section_name, config_name)
+        config_data = self.data.config[config_name]
+        if opt_map is None:
+            opt_map = {}
+        for var in list(config_data.vars.latent.get(new_section_name, [])):
+            if var.name in opt_map:
+                var.value = opt_map.pop(var.name)
+            if (var.name in opt_map or
+                (var.metadata.get(rose.META_PROP_COMPULSORY) ==
+                 rose.META_PROP_VALUE_TRUE)):
+                self.var_ops.add_var(var, skip_update=True)
+        for opt_name, value in opt_map.items():
+            var_id = self.util.get_id_from_section_option(
+                                           new_section_name, opt_name)
+            metadata = self.data.get_metadata_for_config_id(var_id, config_name)
+            metadata['full_ns'] = namespace
+            ignored_reason = {}  # This may not be safe.
+            var = rose.variable.Variable(opt_name, value,
+                                         metadata, ignored_reason,
+                                         error={})
+            self.var_ops.add_var(var, skip_update=True)
+        self.data.reload_namespace_tree(namespace)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+        return new_section_name
+        
+    def copy_request(self, base_ns, new_section=None, skip_update=False):
+        """Handle a copy request for a section and its options."""
+        namespace = "/" + base_ns.lstrip("/")
         sections = self.data.get_sections_from_namespace(namespace)
         if len(sections) != 1:
             return False
         section = sections.pop()
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
-        section_base = re.sub('(.*)\(\d+\)$', r"\1", section)
+        return self.copy_section(config_name, section, skip_update=skip_update)
+
+    def copy_section(self, config_name, section, new_section=None,
+                     skip_update=False):
+        """Copy a section and its options."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_COPY + "-" + str(time.time())
+        config_data = self.data.config[config_name]
+        section_base = re.sub('(.*)\(\w+\)$', r"\1", section)
         existing_sections = []
         clone_vars = []
-        for v_sect, variables in config_data.vars.now.items():
-            if v_sect == section:
-                for variable in variables:
-                    clone_vars.append(variable.copy())
-            if v_sect not in existing_sections:
-                existing_sections.append(v_sect)
-        i = 2
-        while section_base + "(" + str(i) + ")" in existing_sections:
-            i += 1
-        new_section = section_base + "(" + str(i) + ")"
-        self.sect_ops.add_section(config_name, new_section)
+        existing_sections = config_data.vars.now.keys()
+        existing_sections.extend(config_data.sections.now.keys())
+        for variable in config_data.vars.now.get(section, []):
+            clone_vars.append(variable.copy())
+        if new_section is None:
+            i = 1
+            new_section = section_base + "(" + str(i) + ")"
+            while new_section in existing_sections:
+                i += 1
+                new_section = section_base + "(" + str(i) + ")"
+        self.sect_ops.add_section(config_name, new_section,
+                                  skip_update=skip_update)
         new_namespace = self.data.get_default_namespace_for_section(
                                   new_section, config_name)
-        page = self.view_page_func(new_namespace)
-        sorter = rose.config.sort_settings
-        clone_vars.sort(lambda v, w: sorter(v.name, w.name))
         for var in clone_vars:
             var_id = self.util.get_id_from_section_option(
                                            new_section, var.name)
@@ -430,8 +474,18 @@ class Handler(object):
                                                             config_name)
             var.process_metadata(metadata)
             var.metadata['full_ns'] = new_namespace
-            page.add_row(var)  # It may be better to just use the stack ops.
-        return False
+        sorter = rose.config.sort_settings
+        clone_vars.sort(lambda v, w: sorter(v.name, w.name))
+        if skip_update:
+            for var in clone_vars:
+                self.var_ops.add_var(var, skip_update=skip_update)
+        else:    
+            page = self.view_page_func(new_namespace)
+            for var in clone_vars:
+                page.add_row(var)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+        return new_section
 
     def create_request(self):
         """Handle a create configuration request."""
@@ -447,10 +501,10 @@ class Handler(object):
         name, meta = self.mainwindow.launch_new_config_dialog(root)
         if name is None:
             return False
-        config_name = "/" + self.data.top_level_name + "/" + name
+        config_name = "/" + name
         self._add_config(config_name, meta)
 
-    def delete_request(self, namespace_list):
+    def delete_request(self, namespace_list, skip_update=False):
         """Handle a delete namespace request (more complicated than add)."""
         namespace_list.sort(rose.config.sort_settings)
         namespace_list.reverse()
@@ -473,6 +527,9 @@ class Handler(object):
         element_sort = rose.config.sort_settings
         variable_sorter = lambda v, w: element_sort(v.metadata['id'],
                                                     w.metadata['id']) 
+        duplicate_nses = []
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
         for ns in list(namespace_list):
             if ns in ns_done:
                 continue
@@ -485,7 +542,7 @@ class Handler(object):
             var_list.sort(variable_sorter)
             var_list.reverse()
             for variable in var_list:
-                self.var_ops.remove_var(variable, no_update=True)
+                self.var_ops.remove_var(variable, skip_update=True)
                 var_id = variable.metadata['id']
                 sect, opt = self.util.get_section_option_from_id(var_id)
                 ns_var_sections.setdefault(ns, {})
@@ -497,8 +554,16 @@ class Handler(object):
                     (section in ns_var_sections.get(ns, []) or
                      section in real_sections)):
                     self.sect_ops.remove_section(config_name, section,
-                                                 no_update=True)
-        self.data.reload_namespace_tree()  # Update everything as well.
+                                                 skip_update=True)
+            ns_meta = self.data.namespace_meta_lookup[ns]
+            if (ns_meta.get(rose.META_PROP_DUPLICATE) ==
+                rose.META_PROP_VALUE_TRUE):
+                duplicate_nses.append(ns)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+        if not skip_update:
+            for namespace in namespace_list:
+                self.data.reload_namespace_tree(namespace)  # Update everything as well.
 
     def ignore_request(self, base_ns, is_ignored):
         """Handle an ignore or enable section request."""
@@ -575,7 +640,18 @@ class Handler(object):
             return False
         base_ns = "/" + base_ns.lstrip("/")
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
-        self.transform_default(just_this_config_name=config_name)
+        self.transform_default(only_this_config_name=config_name)
+
+    def get_metadata_and_comments(self, base_ns):
+        """Return metadata dict and comments list."""
+        metadata = {}
+        comments = ""
+        if base_ns is None:
+            return metadata, comments
+        base_ns = "/" + base_ns.lstrip("/")
+        metadata = self.data.namespace_meta_lookup.get(base_ns, {})
+        comments = self.data.get_ns_comment_string(base_ns)
+        return metadata, comments
 
     def info_request(self, base_ns):
         """Handle a request for namespace info."""
@@ -592,6 +668,49 @@ class Handler(object):
                 rose.config_editor.util.launch_node_info_dialog(
                             sect_data, "", search_function)
 
+    def remove_section(self, config_name, section, skip_update=False):
+        """Implement a remove of a section and its options."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
+        config_data = self.data.config[config_name]
+        variables = config_data.vars.now.get(section, [])
+        for variable in list(variables):
+            self.var_ops.remove_var(variable, skip_update=True)
+        self.sect_ops.remove_section(config_name, section,
+                                     skip_update=skip_update)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+
+    def remove_sections(self, config_name, sections, skip_update=False):
+        """Implement a mass removal of sections."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
+        nses = []
+        for section in sections:
+            ns = self.data.get_default_namespace_for_section(
+                                           section, config_name)
+            if ns not in nses:
+                nses.append(ns)
+            self.remove_section(config_name, section, skip_update=True)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+        if not skip_update:
+            for ns in nses:
+                self.data.reload_namespace_tree(ns)
+
+    def rename_request(self, base_ns, new_section, skip_update=False):
+        """Implement a rename (delete + add)."""
+        namespace = "/" + base_ns.lstrip("/")
+        sections = self.data.get_sections_from_namespace(namespace)
+        if len(sections) != 1:
+            return False
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_RENAME + "-" + str(time.time())
+        self.copy_request(namespace, new_section, skip_update=skip_update)
+        self.delete_request([namespace], skip_update=skip_update)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+
     def search_request(self, base_ns, setting_id):
         """Handle a search for an id (hyperlink)."""
         if not base_ns.startswith("/"):
@@ -599,20 +718,82 @@ class Handler(object):
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
         self.var_ops.search_for_var(config_name, setting_id)
 
+    def reorder_duplicate_namespaces(self, namespaces=None):
+        """Make sure duplicate sections have the correct indices."""
+        if namespaces is None:
+            namespaces = []
+            for ns_key, meta_dict in self.data.namespace_meta_lookup.items():
+                if (meta_dict.get(rose.META_PROP_DUPLICATE) ==
+                    rose.META_PROP_VALUE_TRUE):
+                    namespaces.append(ns_key)
+        reorder_ns_bases = {}
+        for ns in namespaces:
+            config_name, subsp = self.util.split_full_ns(self.data, ns)
+            reorder_ns_bases.setdefault(config_name, [])
+            for sect in self.data.get_sections_from_namespace(ns):
+                base_sect = rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
+                if base_sect not in reorder_ns_bases[config_name]:
+                    reorder_ns_bases[config_name].append(base_sect)
+        sorter = rose.config.sort_settings
+        id_formatter = rose.macro.ID_ELEMENT_FORMAT.format
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_REORDER + "-" + str(time.time())
+        for config_name, base_sections in reorder_ns_bases.items():
+            sections_done = []
+            dupl_sect_dict = {}
+            for sect in self.data.config[config_name].sections.now:
+                base_sect = rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
+                if base_sect not in base_sections or base_sect == sect:
+                    continue
+                element_search = rose.macro.REC_ID_ELEMENT.search(sect)
+                if element_search is None:
+                    continue
+                element = element_search.groups()[0]
+                dupl_sect_dict.setdefault(base_sect, {})
+                dupl_sect_dict[base_sect].update({sect: element})
+            for base_sect, sect_element_dict in dupl_sect_dict.items():
+                sections = sect_element_dict.keys()
+                sections.sort(sorter)
+                for i, sect in enumerate(sections):
+                    element = sect_element_dict[sect]
+                    if int(element) != i + 1:
+                        new_sect_name = id_formatter(base_sect, i + 1)
+                        ns = self.data.get_default_namespace_for_section(
+                                           sect, config_name)
+                        self.rename_request(ns, new_sect_name, skip_update=True)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+        self.data.reload_namespace_tree()
+
+    def get_sub_ops_for_namespace(self, namespace):
+        """Return data functions for summary (sub) data panels."""
+        if not namespace.startswith("/"):
+            namespace = "/" + namespace
+        config_name, subsp = self.util.split_full_ns(self.data, namespace)
+        return rose.config_editor.stack.SubDataOperations(
+                config_name,
+                self.add_section_with_options,
+                self.copy_section,
+                self.sect_ops.ignore_section,
+                self.remove_section,
+                self.remove_sections,
+                get_var_id_values_func=(
+                        self.data.get_sub_data_var_id_value_map))
+
     def get_orphan_container(self, page):
-        # Return a container with the page object inside.
+        """Return a container with the page object inside."""
         box = gtk.VBox()
         box.pack_start(page, expand=True, fill=True)
         box.show()
         return box
 
     def view_stack(self, args):
-        # Handle a View Stack request.
+        """Handle a View Stack request."""
         self.mainwindow.launch_view_stack(self.undo_stack, self.redo_stack,
                                           self.perform_undo)
 
     def destroy(self, *args):
-        # Handle a destroy main program request.
+        """Handle a destroy main program request."""
         for name in self.data.config:
             config_data = self.data.config[name]
             variables = config_data.vars.get_all(no_latent=True)
@@ -866,7 +1047,7 @@ class Handler(object):
                 metadata = self.data.get_metadata_for_config_id(
                                          var_id, config_name)
                 variable = rose.variable.Variable(opt, value, metadata)
-                self.data.load_ns_for_variable(variable, config_name)
+                self.data.load_ns_for_node(variable, config_name)
                 self.var_ops.add_var(variable)
                 var = self.data.get_variable_by_id(var_id, config_name)
                 continue
@@ -977,11 +1158,11 @@ class Handler(object):
         rose.gtk.run.run_suite(*args)
         return False
 
-    def transform_default(self, just_this_config_name=None):
+    def transform_default(self, only_this_config_name=None):
         """Run the Rose built-in transformer macros."""
-        if (just_this_config_name is not None and
-            just_this_config_name in self.data.config.keys()):
-            config_keys = [just_this_config_name]
+        if (only_this_config_name is not None and
+            only_this_config_name in self.data.config.keys()):
+            config_keys = [only_this_config_name]
             text = rose.config_editor.DIALOG_LABEL_AUTOFIX
         else:
             config_keys = sorted(self.data.config.keys())
