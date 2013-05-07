@@ -31,7 +31,12 @@ class RoseOptionParser(OptionParser):
 
     """
 
-    OPTIONS = {"all_revs": [
+    OPTIONS = {"all": [
+                       ["--all"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Open gcontrol for all running suites."}],
+               "all_revs": [
                        ["--all-revs"],
                        {"action": "store_true",
                         "default": False,
