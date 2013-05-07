@@ -56,7 +56,7 @@ class ConfigPage(gtk.VBox):
         self.help = page_metadata.get('help')
         self.url = page_metadata.get('url')
         self.see_also = page_metadata.get('see_also')
-        self.custom_macros = page_metadata.get('macro')
+        self.custom_macros = page_metadata.get('macro', {})
         self.custom_widget = page_metadata.get('widget')
         self.custom_sub_widget = page_metadata.get('widget_sub_ns')
         self.show_modes = page_metadata.get('show_modes')
@@ -445,12 +445,12 @@ class ConfigPage(gtk.VBox):
                 label_list.append(error_label)
         if self.custom_macros.items():
             macro_button = rose.gtk.util.CustomButton(
-                            label=rose.config_editor.LABEL_PAGE_MACRO_RUN,
+                            stock_id=gtk.STOCK_EXECUTE,
                             tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
-                            as_tool=True)
+                            as_tool=True, icon_at_start=True)
             arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
             arrow.show()
-            macro_button.hbox.pack_start(arrow, expand=False, fill=False)
+            macro_button.hbox.pack_end(arrow, expand=False, fill=False)
             macro_button.connect("button-press-event",
                                  self._macro_menu_launch)
             macro_label = gtk.Label()
@@ -1118,7 +1118,9 @@ class ConfigPage(gtk.VBox):
             else:
                 stock_id = gtk.STOCK_DIALOG_QUESTION
             macro_menuitem = gtk.ImageMenuItem(stock_id=stock_id)
-            macro_menuitem.set_label(macro_name)
+            text = rose.config_editor.LABEL_PAGE_MACRO_MENU_ITEM.format(
+                                                                 macro_name)
+            macro_menuitem.set_label(text)
             macro_menuitem.set_tooltip_text(description)
             macro_menuitem.show()
             macro_menuitem._macro = macro_name
