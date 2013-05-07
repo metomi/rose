@@ -536,7 +536,8 @@ class ConfigPage(gtk.VBox):
     def update_sub_data(self):
         """Update the sub (summary) data panel."""
         if self.sub_data is None:
-            if self.sub_data_panel is not None:
+            if (hasattr(self, "sub_data_panel") and
+                self.sub_data_panel is not None):
                 self.vpaned.remove(self.sub_data_panel)
                 self.sub_data_panel.destroy()
                 self.sub_data_panel = None

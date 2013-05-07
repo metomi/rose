@@ -127,6 +127,19 @@ class SectData(object):
             all_sections += latent.values()
         return all_sections
 
+    def get_sect(self, section, save=False, no_latent=False):
+        """Return the section data specified by section."""
+        if save:
+            nodes = [self.save, self.latent_save]
+        else:
+            nodes = [self.now, self.latent]
+        if no_latent:
+            nodes.pop()
+        for node in nodes:
+            if section in node:
+                return node[section]
+        return None
+
 
 class ConfigData(object):
 
@@ -1001,8 +1014,7 @@ class ConfigDataManager(object):
         self.trigger[config_name].trigger_family_lookup.clear()
 
     def reload_namespace_tree(self, only_this_namespace=None,
-                              only_this_config_name=None,
-                              view_missing=False):
+                              only_this_config_name=None):
         """Make the tree of namespaces and load to the tree panel."""
         # Clear the old namespace tree information (selectively if necessary).
         if (only_this_namespace is not None and
@@ -1016,7 +1028,8 @@ class ConfigDataManager(object):
             self.clear_namespace_tree(only_this_config_name)
         else:
             self.clear_namespace_tree()
-
+        view_missing = self.page_ns_show_modes[
+                                 rose.config_editor.SHOW_MODE_LATENT]
         # Reload the information into the tree.
         if only_this_config_name is None:
             configs = self.config.keys()
@@ -1037,7 +1050,10 @@ class ConfigDataManager(object):
             meta_config = config_data.meta
             # Load tree from sections (usually vast majority of tree nodes)
             self.load_node_namespaces(config_name)
-            for section_id, section_data in config_data.sections.now.items():
+            for section_data in config_data.sections.get_all(
+                                            no_latent=not view_missing):
+                if section_data.metadata["id"] not in config_data.sections.now:
+                    print "LATENT", section_data.metadata["id"], section_data.metadata["full_ns"]
                 ns = section_data.metadata["full_ns"]
                 self.namespace_meta_lookup.setdefault(ns, {})
                 self.namespace_meta_lookup[ns].setdefault(
@@ -1047,7 +1063,6 @@ class ConfigDataManager(object):
                                            self.namespace_tree,
                                            prev_spaces=[])
             # Now load tree from variables
-            self.load_variable_namespaces(config_name)
             for var in config_data.vars.get_all(no_latent=not view_missing):
                 ns = var.metadata['full_ns']
                 self.namespace_meta_lookup.setdefault(ns, {})
@@ -1085,7 +1100,12 @@ class ConfigDataManager(object):
             change = ""
             meta = self.namespace_meta_lookup.get(this_ns, {})
             meta.setdefault('title', spaces[0])
-            subtree.setdefault(spaces[0], [{}, meta, change])
+            latent_status = not self.is_ns_content(this_ns)
+            ignored_status = self.get_ns_ignored_status(this_ns)
+            print "Set", this_ns, repr(latent_status), repr(ignored_status)
+            statuses = {rose.config_editor.SHOW_MODE_LATENT: latent_status,
+                        rose.config_editor.SHOW_MODE_IGNORED: ignored_status}
+            subtree.setdefault(spaces[0], [{}, meta, statuses, change])
             prev_spaces += [spaces[0]]
             self.update_namespace_tree(spaces[1:], subtree[spaces[0]][0],
                                        prev_spaces)
@@ -1322,3 +1342,45 @@ class ConfigDataManager(object):
                 icon_path = filename
                 break
         return icon_path
+
+    def get_ns_ignored_status(self, namespace):
+        """Return the ignored status for a namespace's data."""
+        config_name = self.util.split_full_ns(self, namespace)[0]
+        config_data = self.config[config_name]
+        sections = self.get_sections_from_namespace(namespace)
+        status = rose.config.ConfigNode.STATE_NORMAL
+        object_statuses = {}
+        for section in sections:
+            sect_data = config_data.sections.get_sect(section)
+            if sect_data.metadata["full_ns"] == namespace:
+                if not sect_data.ignored_reason:
+                    return status
+        real_data, latent_data = self.get_data_for_namespace(namespace)
+        for var in real_data + latent_data:
+            if not var.ignored_reason:
+                return status
+            for key in var.ignored_reason:
+                if key == rose.variable.IGNORED_BY_SECTION:
+                    # Section ignored statuses need interpreting.
+                    var_id = var.metadata["id"]
+                    section, option = self.util.get_section_option_from_id(
+                                                                   var_id)
+                    sect_data = config_data.sections.get_sect(section)
+                    for key in sect_data.ignored_reason:
+                        object_statuses.setdefault(key, 0)
+                        object_statuses[key] += 1
+                else:
+                    object_statuses.setdefault(key, 0)
+                    object_statuses[key] += 1
+        if not object_statuses:
+            # No data, so no ignored state.
+            return status
+        # Now return the most 'popular' ignored status.
+        status_counts = object_statuses.items()
+        status_counts.sort(lambda x, y: cmp(x[1], y[1]))
+        status = status_counts[0][0]
+        if status == rose.variable.IGNORED_BY_USER:
+            return rose.config.ConfigNode.STATE_USER_IGNORED
+        if status == rose.variable.IGNORED_BY_SYSTEM:
+            return rose.config.ConfigNode.STATE_SYST_IGNORED
+        return rose.config.ConfigNode.STATE_NORMAL

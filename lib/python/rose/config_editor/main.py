@@ -327,15 +327,15 @@ class MainController(object):
                                      m.get_active())),
                      ('/TopMenuBar/View/View ignored pages',
                       lambda m: self._set_page_ns_show_modes(
-                                     rose.config_editor.SHOW_MODE_FIXED,
+                                     rose.config_editor.SHOW_MODE_IGNORED,
                                      m.get_active())),
                      ('/TopMenuBar/View/View user-ignored pages',
                       lambda m: self._set_page_ns_show_modes(
-                                     rose.config_editor.SHOW_MODE_FIXED,
-                                     m.get_active())),
+                                   rose.config_editor.SHOW_MODE_USER_IGNORED,
+                                   m.get_active())),
                      ('/TopMenuBar/View/View latent pages',
                       lambda m: self._set_page_ns_show_modes(
-                                  rose.config_editor.SHOW_MODE_IGNORED,
+                                  rose.config_editor.SHOW_MODE_LATENT,
                                   m.get_active())),
                      ('/TopMenuBar/View/Flag no-metadata vars',
                       lambda m: self._set_page_var_show_modes(
@@ -383,20 +383,26 @@ class MainController(object):
                       lambda m: self._get_current_page().launch_url()),
                      ('/TopMenuBar/Help/GUI Help', self.handle.help),
                      ('/TopMenuBar/Help/About', self.handle.about_dialog)]
-        is_toggled = dict([('/TopMenuBar/View/View fixed',
-                            rose.config_editor.SHOULD_SHOW_FIXED),
-                           ('/TopMenuBar/View/View ignored',
-                            rose.config_editor.SHOULD_SHOW_IGNORED),
-                           ('/TopMenuBar/View/View user-ignored',
-                            rose.config_editor.SHOULD_SHOW_USER_IGNORED),
-                           ('/TopMenuBar/View/View latent',
-                            rose.config_editor.SHOULD_SHOW_LATENT),
+        is_toggled = dict([('/TopMenuBar/View/View fixed vars',
+                            rose.config_editor.SHOULD_SHOW_FIXED_VARS),
+                           ('/TopMenuBar/View/View ignored vars',
+                            rose.config_editor.SHOULD_SHOW_IGNORED_VARS),
+                           ('/TopMenuBar/View/View user-ignored vars',
+                            rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS),
+                           ('/TopMenuBar/View/View latent vars',
+                            rose.config_editor.SHOULD_SHOW_LATENT_VARS),
                            ('/TopMenuBar/View/View without titles',
                             rose.config_editor.SHOULD_SHOW_NO_TITLE),
-                           ('/TopMenuBar/View/Flag optional',
-                            rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL),
-                           ('/TopMenuBar/View/Flag no-metadata',
-                            rose.config_editor.SHOULD_SHOW_FLAG_NO_META)])
+                           ('/TopMenuBar/View/View ignored pages',
+                            rose.config_editor.SHOULD_SHOW_IGNORED_PAGES),
+                           ('/TopMenuBar/View/View user-ignored pages',
+                            rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES),
+                           ('/TopMenuBar/View/View latent pages',
+                            rose.config_editor.SHOULD_SHOW_LATENT_PAGES),
+                           ('/TopMenuBar/View/Flag optional vars',
+                            rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS),
+                           ('/TopMenuBar/View/Flag no-metadata vars',
+                            rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS)])
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
@@ -462,6 +468,8 @@ class MainController(object):
         self.hyper_panel.send_launch_request = self.handle_launch_request
         self.hyper_panel.send_add_dialog_request = self.handle.add_dialog
         self.hyper_panel.ask_can_clone = self.handle.is_ns_duplicate
+        self.hyper_panel.ask_can_show = self.handle.get_can_show_page
+        self.hyper_panel.ask_ignored_status = self.handle.get_ns_ignored
         self.hyper_panel.ask_is_top = (
                    lambda n: "/" + n in self.data.config.keys())
         self.hyper_panel.ask_has_content = (
@@ -800,7 +808,7 @@ class MainController(object):
     def _set_page_ns_show_modes(self, key, is_key_allowed):
         """Set namespace view options."""
         self.page_ns_show_modes[key] = is_key_allowed
-        self.data.reload_namespace_tree()  # Knows about page_ns_show_modes.
+        self.data.reload_namespace_tree()  # This knows page_ns_show_modes.
 
     def _set_page_var_show_modes(self, key, is_key_allowed):
         self.page_var_show_modes[key] = is_key_allowed
