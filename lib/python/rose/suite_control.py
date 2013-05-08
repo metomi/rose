@@ -146,24 +146,24 @@ def main():
     suite_control = SuiteControl(event_handler=event_handler)
     method = getattr(suite_control, method_name)
     confirm = None
-    suite_name = []
+    suite_names = []
     if not opts.non_interactive:
         confirm = prompt
     if opts.all:
         suite_scan = SuiteScan(event_handler=event_handler)
         res = suite_scan.scan()
         for r in res:
-            suite_name.append(str(r).split(' ')[0])
+            suite_names.append(str(r).split(' ')[0])
     else:
         if opts.name:
-            suite_name.append(opts.name)
+            suite_names.append(opts.name)
         else:
-            suite_name.append(os.path.basename(os.getcwd()))
+            suite_names.append(os.path.basename(os.getcwd()))
     if opts.debug_mode:
-        for sname in suite_name:
+        for sname in suite_names:
             method(sname, opts.host, confirm, sys.stderr, sys.stdout, *args)
     else:
-        for sname in suite_name:
+        for sname in suite_names:
             try:
                 method(sname, opts.host, confirm, sys.stderr, sys.stdout,
                        *args)
