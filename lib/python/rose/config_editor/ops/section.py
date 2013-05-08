@@ -18,45 +18,12 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-import copy
-import os
-import re
-import time
 
 import pygtk
 pygtk.require('2.0')
 import gtk
 
 import rose.gtk.util
-import rose.resource
-
-
-class StackItem(object):
-
-    """A dictionary containing stack information."""
-
-    def __init__(self, page_label, action_text, node,
-                       undo_function, undo_args=None,
-                       group=None):
-        self.page_label = page_label
-        self.action = action_text
-        self.node = node
-        self.name = self.node.name
-        self.group = group
-        if hasattr(self.node, "value"):
-            self.value = self.node.value
-            self.old_value = self.node.old_value
-        else:
-            self.value = ""
-            self.old_value = ""
-        self.undo_func = undo_function
-        if undo_args is None:
-            undo_args = []
-        self.undo_args = undo_args
-
-    def __repr__(self):
-        return (self.action[0].lower() + self.action[1:] + ' ' + self.name +
-                ", ".join([str(u) for u in self.undo_args]))
 
 
 class SectionOperations(object):

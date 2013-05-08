@@ -19,16 +19,6 @@
 #-----------------------------------------------------------------------------
 
 import copy
-import os
-import re
-import time
-
-import pygtk
-pygtk.require('2.0')
-import gtk
-
-import rose.gtk.util
-import rose.resource
 
 
 class VariableOperations(object):
