@@ -176,6 +176,29 @@ class ConfigDataHelper(object):
             return [ns_section]
         return []
 
+    def get_ns_is_default(self, namespace):
+        """Sets if this namespace is the default for a section. Slow!"""
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
+        config_data = self.data.config[config_name]
+        meta_config = config_data.meta
+        allowed_sections = self.get_sections_from_namespace(namespace)
+        empty = True
+        for section in allowed_sections:
+            for variable in config_data.vars.now.get(section, []):
+                if variable.metadata['full_ns'] == namespace:
+                    empty = False
+                    if rose.META_PROP_NS not in variable.metadata:
+                        return True
+            for variable in config_data.vars.latent.get(section, []):
+                if variable.metadata['full_ns'] == namespace:
+                    empty = False
+                    if rose.META_PROP_NS not in variable.metadata:
+                        return True
+        if empty:
+            # An added, non-metadata section with no variables.
+            return True
+        return False
+
     def get_all_namespaces(self, only_this_config=None):
         """Return all unique namespaces."""
         all_namespaces = []
