@@ -221,7 +221,7 @@ class ConfigDataManager(object):
                         not config_dir.startswith('.')):
                         self.load_config(conf_path)
             self.load_config(top_level_directory)
-            self.reload_namespace_tree()
+            self.reload_ns_tree_func()
 
     def load_info_config(self, config_directory):
         """Load any information (discovery) config."""
@@ -313,7 +313,7 @@ class ConfigDataManager(object):
         self.load_ignored_data(name)
         self.load_metadata_for_namespaces(name)
         if reload_tree_on:
-            self.reload_namespace_tree()
+            self.reload_ns_tree_func()
 
     def load_config_file(self, config_path):
         """Return two copies of the rose.config.ConfigNode at config_path."""

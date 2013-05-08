@@ -822,7 +822,7 @@ class MainController(object):
     def _set_page_ns_show_modes(self, key, is_key_allowed):
         """Set namespace view options."""
         self.page_ns_show_modes[key] = is_key_allowed
-        self.data.reload_namespace_tree()  # This knows page_ns_show_modes.
+        self.reload_namespace_tree()  # This knows page_ns_show_modes.
 
     def _set_page_var_show_modes(self, key, is_key_allowed):
         self.page_var_show_modes[key] = is_key_allowed
@@ -1559,7 +1559,7 @@ class MainController(object):
                                          text, title)
                 return False
         self.data.config.pop(config_name)
-        self.data.reload_namespace_tree()
+        self.reload_namespace_tree()
         stack_item = rose.config_editor.stack.StackItem(
                           config_name,
                           rose.config_editor.STACK_ACTION_REMOVED,
@@ -1683,7 +1683,7 @@ class MainController(object):
             self.data.load_node_namespaces(config_name, from_saved=True)
             self.data.load_ignored_data(config_name)
             self.data.load_metadata_for_namespaces(config_name)
-        self.data.reload_namespace_tree()
+        self.reload_namespace_tree()
         if self.pluggable:
             self.update_all()
         if hasattr(self, 'menubar'):
@@ -2108,7 +2108,7 @@ class MainController(object):
             else:
                 self.redo_stack.append(just_done_item)
             if not self.data.helper.is_ns_in_tree(namespace):
-                self.data.reload_namespace_tree()
+                self.reload_namespace_tree()
             page = None
             if is_group:
                 # Store namespaces and ids for later updating.
@@ -2137,7 +2137,7 @@ class MainController(object):
             if not is_group:
                 self.focus_sub_page_if_open(namespace, node_id)
         for namespace in set(stack_info):
-            self.data.reload_namespace_tree(namespace)
+            self.reload_namespace_tree(namespace)
             # Use the last node_id for a sub page focus (if any).
             focus_id = namespace_id_map[namespace][-1]
             self.focus_sub_page_if_open(namespace, focus_id)

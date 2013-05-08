@@ -92,8 +92,8 @@ class SectionOperations(object):
             new_section_data = config_data.sections.latent.pop(section)
             was_latent = True
         else:
-            metadata = self.__data.get_metadata_for_config_id(section,
-                                                              config_name)
+            metadata = self.__data.helper.get_metadata_for_config_id(
+                                              section, config_name)
             new_section_data = rose.section.Section(section, [], metadata)
         config_data.sections.now.update({section: new_section_data})
         self.__data.add_section_to_config(section, config_name)
@@ -104,8 +104,8 @@ class SectionOperations(object):
                                           update=True)
         self.__data.load_node_namespaces(config_name,
                                          only_this_section=section)
-        metadata = self.__data.get_metadata_for_config_id(section,
-                                                          config_name)
+        metadata = self.__data.helper.get_metadata_for_config_id(section,
+                                                                 config_name)
         new_section_data.process_metadata(metadata)
         ns = new_section_data.metadata["full_ns"]
         if not skip_update:
@@ -326,7 +326,7 @@ class VariableOperations(object):
         namespace = possible_copy_variable.metadata.get('full_ns')
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         var_id = possible_copy_variable.metadata['id']
-        return self.__data.get_ns_variable(var_id, config_name)
+        return self.__data.helper.get_ns_variable(var_id, config_name)
 
     def add_var(self, variable, skip_update=False):
         """Add a variable to the internal list."""
@@ -337,7 +337,8 @@ class VariableOperations(object):
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         config_data = self.__data.config[config_name]
         old_metadata = copy.deepcopy(variable.metadata)
-        metadata = self.__data.get_metadata_for_config_id(var_id, config_name)
+        metadata = self.__data.helper.get_metadata_for_config_id(var_id,
+                                                                 config_name)
         variable.process_metadata(metadata)
         variable.metadata.update(old_metadata)
         variables = config_data.vars.now.get(sect, [])
@@ -522,8 +523,8 @@ class VariableOperations(object):
         var_id = variable.metadata['id']
         namespace = variable.metadata['full_ns']
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
-        save_var = self.__data.get_variable_by_id(var_id, config_name,
-                                                  save=True)
+        save_var = self.__data.helper.get_variable_by_id(var_id, config_name,
+                                                         save=True)
         if save_var is None:
             return None
         return save_var.comments
@@ -533,8 +534,8 @@ class VariableOperations(object):
         var_id = variable.metadata['id']
         namespace = variable.metadata['full_ns']
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
-        save_var = self.__data.get_variable_by_id(var_id, config_name,
-                                                  save=True)
+        save_var = self.__data.helper.get_variable_by_id(var_id, config_name,
+                                                         save=True)
         if save_var is None:
             return None
         return save_var.ignored_reason
@@ -544,8 +545,8 @@ class VariableOperations(object):
         var_id = variable.metadata['id']
         namespace = variable.metadata['full_ns']
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
-        save_variable = self.__data.get_variable_by_id(var_id, config_name,
-                                                       save=True)
+        save_variable = self.__data.helper.get_variable_by_id(
+                                    var_id, config_name, save=True)
         if save_variable is None:
             return None
         return save_variable.value
@@ -555,9 +556,11 @@ class VariableOperations(object):
         var_id = variable.metadata['id']
         namespace = variable.metadata['full_ns']
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
-        this_variable = self.__data.get_variable_by_id(var_id, config_name)
-        save_variable = self.__data.get_variable_by_id(var_id, config_name,
-                                                       save=True)
+        this_variable = self.__data.helper.get_variable_by_id(var_id,
+                                                              config_name)
+        save_variable = self.__data.helper.get_variable_by_id(var_id,
+                                                              config_name,
+                                                              save=True)
         if this_variable is None:
             # Ghost variable, check absence from saved list.
             if save_variable is not None:
@@ -573,8 +576,9 @@ class VariableOperations(object):
         var_id = variable.metadata['id']
         namespace = variable.metadata['full_ns']
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
-        save_variable = self.__data.get_variable_by_id(var_id, config_name,
-                                                       save=True)
+        save_variable = self.__data.helper.get_variable_by_id(var_id,
+                                                              config_name,
+                                                              save=True)
         return save_variable is None
 
     def is_var_ghost(self, variable):
@@ -582,7 +586,8 @@ class VariableOperations(object):
         var_id = variable.metadata['id']
         namespace = variable.metadata['full_ns']
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
-        this_variable = self.__data.get_variable_by_id(var_id, config_name)
+        this_variable = self.__data.helper.get_variable_by_id(var_id,
+                                                              config_name)
         return (this_variable is None)
 
     def get_var_changes(self, variable):
