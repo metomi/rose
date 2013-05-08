@@ -153,7 +153,7 @@ def main():
         suite_scan = SuiteScan(event_handler=event_handler)
         res = suite_scan.scan()
         for r in res:
-            suite_names.append(str(r).split(' ')[0])
+            suite_names.append(str(r).split()[0])
     else:
         if opts.name:
             suite_names.append(opts.name)
