@@ -27,6 +27,7 @@ from rose.popen import RosePopener
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_scan import SuiteScan
 import sys
 
 
@@ -139,27 +140,36 @@ def main():
     argv = sys.argv[1:]
     method_name = argv.pop(0)
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("host", "name", "non_interactive")
+    opt_parser.add_my_options("all", "host", "name", "non_interactive")
     opts, args = opt_parser.parse_args(argv)
     event_handler = Reporter(opts.verbosity - opts.quietness)
     suite_control = SuiteControl(event_handler=event_handler)
     method = getattr(suite_control, method_name)
     confirm = None
+    suite_names = []
     if not opts.non_interactive:
         confirm = prompt
-    if opts.name:
-        suite_name = opts.name
+    if opts.all:
+        suite_scan = SuiteScan(event_handler=event_handler)
+        res = suite_scan.scan()
+        for r in res:
+            suite_names.append(str(r).split()[0])
     else:
-        suite_name = os.path.basename(os.getcwd())
+        if opts.name:
+            suite_names.append(opts.name)
+        else:
+            suite_names.append(os.path.basename(os.getcwd()))
     if opts.debug_mode:
-        method(suite_name, opts.host, confirm, sys.stderr, sys.stdout, *args)
+        for sname in suite_names:
+            method(sname, opts.host, confirm, sys.stderr, sys.stdout, *args)
     else:
-        try:
-            method(suite_name, opts.host, confirm, sys.stderr, sys.stdout,
-                   *args)
-        except Exception as e:
-            event_handler(e)
-            sys.exit(1)
+        for sname in suite_names:
+            try:
+                method(sname, opts.host, confirm, sys.stderr, sys.stdout,
+                       *args)
+            except Exception as e:
+                event_handler(e)
+                sys.exit(1)
         
 
 if __name__ == "__main__":
