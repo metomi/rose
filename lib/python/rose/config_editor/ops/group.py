@@ -45,7 +45,7 @@ from rose.suite_control import SuiteControl
 from rose.suite_log_view import SuiteLogViewGenerator
 
 
-class Actions(object):
+class GroupOperations(object):
 
     """Class to perform actions on groups of sections and/or options."""
 

@@ -182,7 +182,7 @@ class MainController(object):
                                    self.update_namespace,
                                    search_id_func=self.perform_find_by_id)
 
-        self.action = rose.config_editor.action.Actions(
+        self.action = rose.config_editor.action.GroupOperations(
                              self.data, self.util,
                              self.undo_stack, self.redo_stack,
                              self.section_ops,
