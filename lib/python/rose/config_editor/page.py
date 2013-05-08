@@ -445,12 +445,11 @@ class ConfigPage(gtk.VBox):
                 label_list.append(error_label)
         if self.custom_macros.items():
             macro_button = rose.gtk.util.CustomButton(
+                            label=rose.config_editor.LABEL_PAGE_MACRO_BUTTON,
                             stock_id=gtk.STOCK_EXECUTE,
                             tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
-                            as_tool=True, icon_at_start=True)
-            arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
-            arrow.show()
-            macro_button.hbox.pack_end(arrow, expand=False, fill=False)
+                            as_tool=True, icon_at_start=True,
+                            has_menu=True)
             macro_button.connect("button-press-event",
                                  self._macro_menu_launch)
             macro_label = gtk.Label()
@@ -1118,9 +1117,7 @@ class ConfigPage(gtk.VBox):
             else:
                 stock_id = gtk.STOCK_DIALOG_QUESTION
             macro_menuitem = gtk.ImageMenuItem(stock_id=stock_id)
-            text = rose.config_editor.LABEL_PAGE_MACRO_MENU_ITEM.format(
-                                                                 macro_name)
-            macro_menuitem.set_label(text)
+            macro_menuitem.set_label(macro_name)
             macro_menuitem.set_tooltip_text(description)
             macro_menuitem.show()
             macro_menuitem._macro = macro_name
@@ -1128,16 +1125,8 @@ class ConfigPage(gtk.VBox):
                   "button-release-event",
                   lambda m, e: self.launch_macro(m._macro))
             menu.append(macro_menuitem)
-        menu.popup(None, None, self._macro_menu_position, event.button,
+        menu.popup(None, None, widget.position_menu, event.button,
                    event.time, widget)
-
-    def _macro_menu_position(self, menu, widget):
-        # Place the menu carefully below the button.
-        x, y = widget.get_window().get_origin()
-        allocated_rectangle = widget.get_allocation()
-        x += allocated_rectangle.x
-        y += allocated_rectangle.y + allocated_rectangle.height
-        return x, y, False
 
     def launch_macro(self, macro_name_string):
         """Launch a macro, if possible."""

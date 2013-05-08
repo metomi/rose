@@ -143,7 +143,7 @@ VAR_MENU_URL = "_Web Help"
 # Button strings
 LABEL_EDIT = "edit"
 LABEL_PAGE_HELP = "Page help"
-LABEL_PAGE_MACRO_MENU_ITEM = "Run {0}"
+LABEL_PAGE_MACRO_BUTTON = "Macros"
 
 # Loading strings
 LOAD_CONFIG = "reading    "
