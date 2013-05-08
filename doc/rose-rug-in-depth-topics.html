@@ -708,6 +708,10 @@ fail-if=any(namelist:test=ctrl_array % this == 0)
       <h3 class="alwayshidden">More Metadata Options - widget</h3>
 
       <dl>
+        <dt><code>macro</code></dt>
+
+        <dd>Used to associate a setting with a set of custom macros.</dd>
+      
         <dt><code>widget</code></dt>
 
         <dd>Used to set a custom or different built-in widget for the setting
@@ -799,7 +803,7 @@ rose macro fib.FibonnaciChecker
       <p>produces:</p>
       <pre>
 [V] fib.FibonacciChecker: issues: 1
-    env=INVALID_SEQUENCE=1, 1, 2, 3, 5, 8, 14
+    env=INVALID_SEQUENCE=0, 1, 1, 2, 3, 5, 8, 14
         not the Fibonacci sequence
 </pre>
     </div>
