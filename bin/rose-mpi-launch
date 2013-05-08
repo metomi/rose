@@ -22,7 +22,7 @@
 #     rose-mpi-launch
 #
 # SYNOPSIS
-#     rose mpi-launch [OPTIONS] [--] COMMAND [ARGUMENTS ...]
+#     rose mpi-launch [OPTIONS] [--] [COMMAND [ARGUMENTS ...]]
 #
 # DESCRIPTION
 #     Provide a portable way to launch an MPI command.
@@ -41,7 +41,7 @@
 #         on a binary executable, and "ulimit -a" on "-v -v" mode.
 #
 # CONFIGURATION
-#     The command reads from the <var>[rose-mpi-launch]</var> section in
+#     The command reads from the [rose-mpi-launch] section in
 #     "$ROSE_HOME/etc/rose.conf" and "$HOME/.metomi/rose.conf". All settings
 #     are optional. Valid settings are:
 #
