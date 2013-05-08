@@ -307,8 +307,6 @@ class CylcProcessor(SuiteEngineProcessor):
     def get_suite_jobs_auths(self, suite_name, cycle_time=None,
                              task_name=None):
         """Return remote [(user, host), ...] for submitted jobs (of a task)."""
-        my_user = pwd.getpwuid(os.getuid())[0]
-        my_host = socket.gethostname()
         conn = sqlite3.connect(self.get_suite_db_file(suite_name))
         c = conn.cursor()
         auths = []
@@ -323,7 +321,7 @@ class CylcProcessor(SuiteEngineProcessor):
         stmt += "event=='submission succeeded'"
         for row in c.execute(stmt, stmt_args):
             if row and "@" in row[0]:
-                auth, my_user, my_host = self._parse_user_host(row[0])
+                auth = self._parse_user_host(auth=row[0])
                 if auth:
                     auths.append(auth)
         return auths
@@ -349,13 +347,10 @@ class CylcProcessor(SuiteEngineProcessor):
             u = items.pop(0).replace("*", " ")
         if items:
             h = items.pop(0).replace("*", " ")
-        auth, my_user, my_host = self._parse_user_host(u + "@" + h)
-        return auth
+        return self._parse_user_host(user=u, host=h)
 
     def get_tasks_auths(self, suite_name):
         """Return a list of unique [user@]host for remote tasks in a suite."""
-        my_user = pwd.getpwuid(os.getuid())[0]
-        my_host = socket.gethostname()
         actual_hosts = {}
         auths = []
         out, err = self.popen("cylc", "get-config", "-ao",
@@ -365,15 +360,16 @@ class CylcProcessor(SuiteEngineProcessor):
         for line in out.splitlines():
             items = line.split(None, 2)
             task = items.pop(0).replace("*", " ")
+            u, h = (None, None)
             if items:
                 u = items.pop(0).replace("*", " ")
             if items:
                 h = items.pop(0).replace("*", " ")
             if actual_hosts.has_key(h):
-                h = actual_hosts[h]
-                auth = self._parse_user_host(u + "@" + h, my_user, my_host)[0]
+                h = str(actual_hosts[h])
+                auth = self._parse_user_host(user=u, host=h)
             else:
-                auth = self._parse_user_host(u + "@" + h, my_user, my_host)[0]
+                auth = self._parse_user_host(user=u, host=h)
                 if auth and "@" in auth:
                     actual_hosts[h] = auth.split("@", 1)[1]
                 else:
@@ -608,28 +604,29 @@ class CylcProcessor(SuiteEngineProcessor):
         command.append(suite_name)
         self.popen.run_simple(*command, stdout_level=Event.V)
 
-    def _parse_user_host(self, auth, my_user=None, my_host=None):
-        if my_user is None:
-            my_user = pwd.getpwuid(os.getuid()).pw_name
-        if my_host is None:
-            my_host = socket.gethostname()
-        user = None
-        host = auth
-        if "@" in auth:
-            user, host = auth.split("@", 1)
-        if user in ["None", my_user]:
+    def _parse_user_host(self, auth=None, user=None, host=None):
+        if getattr(self, "user", None) is None:
+            self.user = pwd.getpwuid(os.getuid()).pw_name
+        if getattr(self, "host", None) is None:
+            self.host = socket.gethostname()
+        if auth is not None:
             user = None
-        if "`" in host or "$" in host:
+            host = auth
+            if "@" in auth:
+                user, host = auth.split("@", 1)
+        if user in ["None", self.user]:
+            user = None
+        if host and ("`" in host or "$" in host):
             command = ["bash", "-ec", "H=" + host + "; echo $H"]
             host = self.popen(*command)[0].strip()
-        if host in ["None", "localhost", my_host]:
+        if host in ["None", "localhost", self.host]:
             host = None
         if user and host:
             auth = user + "@" + host
         elif user:
-            auth = user + "@" + my_host
+            auth = user + "@" + self.host
         elif host:
             auth = host
         else:
             auth = None
-        return (auth, my_user, my_host)
+        return auth
