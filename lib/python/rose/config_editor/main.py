@@ -61,7 +61,7 @@ import gtk  # Only used to run the main gtk loop.
 import rose.config
 import rose.config_editor
 import rose.config_editor.action
-import rose.config_editor.loader
+import rose.config_editor.data
 import rose.config_editor.menu
 import rose.config_editor.nav_panel_menu
 import rose.config_editor.page
@@ -144,7 +144,7 @@ class MainController(object):
              rose.config_editor.SHOULD_SHOW_NO_TITLE}
 
         # Load the top configuration directory
-        self.data = rose.config_editor.loader.ConfigDataManager(
+        self.data = rose.config_editor.data.ConfigDataManager(
                                 self.util,
                                 config_directory,
                                 config_objs,
@@ -1660,12 +1660,12 @@ class MainController(object):
             sects, l_sects = self.data.load_sections_from_config(config_name)
             s_sects, s_l_sects = self.data.load_sections_from_config(
                                                 config_name, save=True)
-            config_data.sections = rose.config_editor.loader.SectData(
+            config_data.sections = rose.config_editor.data.SectData(
                         sects, l_sects, s_sects, s_l_sects)
             var, l_var = self.data.load_vars_from_config(config_name)
             s_var, s_l_var = self.data.load_vars_from_config(
                                                  config_name, save=True)
-            config_data.vars = rose.config_editor.loader.VarData(
+            config_data.vars = rose.config_editor.data.VarData(
                         var, l_var, s_var, s_l_var)
             config_data.meta_files = meta_files
             config_data.macros = macros
