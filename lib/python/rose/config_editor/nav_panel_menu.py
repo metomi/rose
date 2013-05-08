@@ -51,10 +51,8 @@ class NavPanelHandler(object):
     """Handles the navigation panel menu."""
 
     def __init__(self, data, util, mainwindow, undo_stack, redo_stack,
-                 add_config_func,
-                 section_ops_inst,
-                 variable_ops_inst,
-                 kill_page_func):
+                 add_config_func, section_ops_inst, variable_ops_inst,
+                 kill_page_func, reload_ns_tree_func):
         self.util = util
         self.data = data
         self.mainwindow = mainwindow
@@ -64,6 +62,7 @@ class NavPanelHandler(object):
         self.var_ops = variable_ops_inst
         self._add_config = add_config_func
         self.kill_page_func = kill_page_func
+        self.reload_ns_tree_func = reload_ns_tree_func
 
     def add_dialog(self, base_ns):
         """Handle an add section dialog and request."""
@@ -178,7 +177,7 @@ class NavPanelHandler(object):
             stack_item.group = group
         if not skip_update:
             for namespace in namespace_list:
-                self.data.reload_namespace_tree(namespace)  # Update everything as well.
+                self.reload_ns_tree_func(namespace)  # Update everything as well.
 
     def ignore_request(self, base_ns, is_ignored):
         """Handle an ignore or enable section request."""

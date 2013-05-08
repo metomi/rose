@@ -165,14 +165,15 @@ class ConfigDataManager(object):
 
     """Loads the information from the various configurations."""
 
-    def __init__(self, util, top_level_directory, config_obj_dict,
-                 signal_load_event, page_ns_show_modes):
+    def __init__(self, util, signal_load_event, page_ns_show_modes,
+                 reload_ns_tree_func):
         """Load the root configuration and all its sub-configurations."""
         self.util = util
         self.helper = rose.config_editor.data_helper.ConfigDataHelper(
                                   self, util)
         self.signal_load_event = signal_load_event
         self.page_ns_show_modes = page_ns_show_modes
+        self.reload_ns_tree_func = reload_ns_tree_func
         self.config = {}  # Stores configuration name: object
         self._builtin_value_macro = rose.macros.value.ValueChecker()  # value
         self.builtin_macros = {}  # Stores other Rose built-in macro instances
@@ -182,6 +183,8 @@ class ConfigDataManager(object):
         self.namespace_meta_lookup = {}  # Stores titles etc of namespaces
         self._config_section_namespace_lookup = {}  # Store section namespaces
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
+
+    def load(self, top_level_directory, config_obj_dict):
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
                 if filename in [rose.TOP_CONFIG_NAME, rose.SUB_CONFIG_NAME]:

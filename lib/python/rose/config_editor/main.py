@@ -147,10 +147,9 @@ class MainController(object):
         # Load the top configuration directory
         self.data = rose.config_editor.data.ConfigDataManager(
                                 self.util,
-                                config_directory,
-                                config_objs,
                                 loader_update,
-                                self.page_ns_show_modes)
+                                self.page_ns_show_modes,
+                                self.reload_namespace_tree)
 
         self.nav_controller = (
                   rose.config_editor.nav_controller.NavPanelController(
@@ -160,6 +159,8 @@ class MainController(object):
                                 self.tree_trigger_update))
         
         self.trigger = self.data.trigger
+
+        self.data.load(config_directory, config_objs)
 
         self.loader_update(rose.config_editor.LOAD_STATUSES,
                            self.data.top_level_name)
@@ -181,13 +182,13 @@ class MainController(object):
                                    self.update_namespace,
                                    search_id_func=self.perform_find_by_id)
 
-
         self.action = rose.config_editor.action.Actions(
                              self.data, self.util,
                              self.undo_stack, self.redo_stack,
                              self.section_ops,
                              self.variable_ops,
-                             self.view_page)
+                             self.view_page,
+                             self.reload_namespace_tree)
 
         # Add in the navigation panel menu handler.
         self.nav_handle = rose.config_editor.nav_panel_menu.NavPanelHandler(
@@ -196,7 +197,8 @@ class MainController(object):
                              self._add_config,
                              self.section_ops,
                              self.variable_ops,
-                             self.kill_page)
+                             self.kill_page,
+                             self.reload_namespace_tree)
 
         # Add in the main menu bar and tool bar handler.
         self.main_handle = rose.config_editor.menu.MainMenuHandler(
@@ -920,6 +922,13 @@ class MainController(object):
                 for i in range(len(spaces), 0, -1):
                     update_ns = "/" + "/".join(spaces[:i])
                     self.update_namespace(update_ns, skip_config_update=True)
+
+    def reload_namespace_tree(self, only_this_namespace=None,
+                              only_this_config_name=None):
+        """Redraw the navigation namespace tree."""
+        self.nav_controller.reload_namespace_tree(
+                            only_this_namespace=only_this_namespace,
+                            only_this_config_name=only_this_config_name)
 
     def refresh_ids(self, config_name, setting_ids, is_loading=False,
                     are_errors_done=False):

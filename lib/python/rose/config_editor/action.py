@@ -52,7 +52,7 @@ class Actions(object):
     def __init__(self, data, util, undo_stack, redo_stack,
                  section_ops_inst,
                  variable_ops_inst,
-                 view_page_func):
+                 view_page_func, reload_ns_tree_func):
         self.data = data
         self.util = util
         self.undo_stack = undo_stack
@@ -60,6 +60,7 @@ class Actions(object):
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self.view_page_func = view_page_func
+        self.reload_ns_tree_func = reload_ns_tree_func
 
     def add_section_with_options(self, config_name, new_section_name, opt_map=None):
         """Add a section and any compulsory options.
@@ -92,7 +93,7 @@ class Actions(object):
                                          metadata, ignored_reason,
                                          error={})
             self.var_ops.add_var(var, skip_update=True)
-        self.data.reload_namespace_tree(namespace)
+        self.reload_ns_tree_func(namespace)
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
         return new_section_name
@@ -168,7 +169,7 @@ class Actions(object):
             stack_item.group = group
         if not skip_update:
             for ns in nses:
-                self.data.reload_namespace_tree(ns)
+                self.reload_ns_tree_func(ns)
 
     def get_sub_ops_for_namespace(self, namespace):
         """Return data functions for summary (sub) data panels."""
