@@ -731,11 +731,12 @@ class SuiteRunner(Runner):
 
         # If run through rose-stem, install version information files for
         # each source tree if they're a working copy
-        if hasattr(opts, 'source'):
-            for url, project in zip(opts.source, opts.project):
+        if hasattr(opts, 'source') and hasattr(opts, 'project'):
+            for i, url in enumerate(opts.source):
                 if os.path.isdir(url):
                     write_source_vc_info(
-                        url, "log/" + project + ".version", self.popen)
+                        url, "log/" + opts.project[i] + "-" + str(i) + 
+                        ".version", self.popen)
 
         for ext in [".conf", ".version"]:
             self.fs_util.symlink(prefix + ext, "log/rose-suite-run" + ext)
