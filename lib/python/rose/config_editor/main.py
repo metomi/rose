@@ -63,9 +63,10 @@ import rose.config_editor
 import rose.config_editor.action
 import rose.config_editor.data
 import rose.config_editor.menu
+import rose.config_editor.nav_controller
+import rose.config_editor.nav_panel
 import rose.config_editor.nav_panel_menu
 import rose.config_editor.page
-import rose.config_editor.panel
 import rose.config_editor.stack
 import rose.config_editor.util
 import rose.config_editor.variable
@@ -483,7 +484,7 @@ class MainController(object):
 
     def generate_nav_panel(self):
         """"Create tree panel and link functions."""
-        self.nav_panel = rose.config_editor.panel.PageNavigationPanel(
+        self.nav_panel = rose.config_editor.nav_panel.PageNavigationPanel(
                               self.data.namespace_tree,
                               self.handle_launch_request,
                               self.nav_handle.get_ns_metadata_and_comments,
