@@ -136,14 +136,13 @@ while (($# > 0)); do
 done
 
 # ------------------------------------------------------------------------------
-if (($# < 1)); then
-    rose_usage 1
+COMMAND=
+if (($# > 0)); then
+    if ! COMMAND=$(type -P $1); then
+        err "$1: COMMAND not found"
+    fi
+    shift 1
 fi
-
-if ! COMMAND=$(type -P $1); then
-    err "$1: COMMAND not found"
-fi
-shift 1
 
 ROSE_LAUNCHER_LIST=${ROSE_LAUNCHER_LIST:-$( \
     rose config --default= $ROSE_NS launcher-list)}
@@ -192,7 +191,7 @@ else
     ROSE_LAUNCHER_POSTOPTS=
 fi
 
-if ((ROSE_VERBOSITY >= 3)); then
+if ((ROSE_VERBOSITY >= 3)) && [[ -n ${COMMAND:-} ]]; then
     info 3 printenv
     printenv | sort
     run ldd $COMMAND || true 2>/dev/null
