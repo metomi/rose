@@ -432,13 +432,13 @@ class MainMenuHandler(object):
         config_keys.sort()
         tuple_sorter = lambda x, y: cmp(x[0], y[0])
         for config_name in config_keys:
-            config_image = self.data.get_icon_path_for_config(config_name)
+            image = self.data.helper.get_icon_path_for_config(config_name)
             macros = self.data.config[config_name].macros
             macro_tuples = rose.macro.get_macro_class_methods(macros)
             macro_tuples.sort(tuple_sorter)
             for macro_mod, macro_cls, macro_func, help in macro_tuples:
                 menubar.add_macro(config_name, macro_mod, macro_cls,
-                                  macro_func, help, config_image,
+                                  macro_func, help, image,
                                   self.run_custom_macro)
 
     def run_custom_macro(self, config_name=None, module_name=None,
@@ -605,19 +605,19 @@ class MainMenuHandler(object):
             warning = item.info
             var_id = self.util.get_id_from_section_option(sect, opt)
             changed_ids.append(var_id)
-            var = self.data.get_variable_by_id(var_id, config_name)
+            var = self.data.helper.get_variable_by_id(var_id, config_name)
             macro_node = macro_config.get([sect, opt])
             if macro_node is None:
                 self.var_ops.remove_var(var)
                 continue
             if var is None:
                 value = macro_node.value
-                metadata = self.data.get_metadata_for_config_id(
-                                         var_id, config_name)
+                metadata = self.data.helper.get_metadata_for_config_id(
+                                            var_id, config_name)
                 variable = rose.variable.Variable(opt, value, metadata)
                 self.data.load_ns_for_node(variable, config_name)
                 self.var_ops.add_var(variable)
-                var = self.data.get_variable_by_id(var_id, config_name)
+                var = self.data.helper.get_variable_by_id(var_id, config_name)
                 continue
             if var.value != macro_node.value:
                 self.var_ops.set_var_value(var, macro_node.value)

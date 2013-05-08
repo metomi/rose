@@ -35,7 +35,7 @@ import rose.gtk.util
 import rose.resource
 
 
-class HyperLinkTreePanel(gtk.ScrolledWindow):
+class PageNavigationPanel(gtk.ScrolledWindow):
 
     """Generate the page launcher panel.
 
@@ -45,8 +45,12 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     """
 
-    def __init__(self, namespace_tree, popup_menu_func, ask_can_show_func):
-        super(HyperLinkTreePanel, self).__init__()
+    def __init__(self, namespace_tree, launch_ns_func,
+                 get_metadata_comments_func,
+                 popup_menu_func, ask_can_show_func):
+        super(PageNavigationPanel, self).__init__()
+        self._launch_ns_func = launch_ns_func
+        self._get_metadata_comments_func = get_metadata_comments_func
         self._popup_menu_func = popup_menu_func
         self._ask_can_show_func = ask_can_show_func
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -134,8 +138,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         current_path = self.tree.get_cursor()[0]
         if (current_path == timeout_path and
             self._last_tree_activation_path != timeout_path):
-            self.send_launch_request(self.get_name(timeout_path),
-                                     as_new=False)
+            self._launch_ns_func(self.get_name(timeout_path),
+                                 as_new=False)
         return False
         
     def load_tree(self, row, namespace_subtree):
@@ -280,7 +284,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             num_errors = self.data_store.get_value(path_iter, 4)
             mods = self.data_store.get_value(path_iter, 6)
             proper_name = self.get_name(path, unfiltered=True)
-            metadata, comment = self.get_metadata_and_comments(proper_name)
+            metadata, comment = self._get_metadata_comments_func(proper_name)
             description = metadata.get(rose.META_PROP_DESCRIPTION, "")
             change = self.data_store.get_value(path_iter, 11)
             if description:
@@ -386,15 +390,13 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                     return False
                 if event.button == 1:  # Left click event, replace old tab
                     self._last_tree_activation_path = path
-                    self.send_launch_request(self.get_name(path),
-                                             as_new=False)
+                    self._launch_ns_func(self.get_name(path), as_new=False)
                 elif event.button == 2:  # Middle click event, make new tab
                     self._last_tree_activation_path = path
-                    self.send_launch_request(self.get_name(path),
-                                             as_new=True)
+                    self._launch_ns_func(self.get_name(path), as_new=True)
             else:
                 path = event
-                self.send_launch_request(self.get_name(path), as_new=False)
+                self._launch_ns_func(self.get_name(path), as_new=False)
         return False
 
     def get_name(self, path=None, unfiltered=False):
@@ -441,7 +443,7 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         else:
             add_name = "/" + self.get_name(path)
         namespace = self.get_name(path)
-        return self._popup_menu_func(namespace)
+        return self._popup_menu_func(namespace, event)
 
     def collapse_reset(self):
         """Return the tree view to the basic startup state."""
@@ -468,7 +470,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             child_dups = []
             while child_iter is not None:
                 child_name = self.get_name(treemodel.get_path(child_iter))
-                metadata, comment = self.get_metadata_and_comments(child_name)
+                metadata, comment = self._get_metadata_comments_func(
+                                                                child_name)
                 dupl = metadata.get(rose.META_PROP_DUPLICATE)
                 child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)

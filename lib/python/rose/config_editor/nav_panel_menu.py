@@ -299,19 +299,19 @@ class NavPanelHandler(object):
         config_name, subsp = self.util.split_full_ns(self.data, namespace)
         self.var_ops.search_for_var(config_name, setting_id)
 
-    def popup_panel_menu(self, base_ns):
+    def popup_panel_menu(self, base_ns, event):
         """Popup a page menu on the navigation panel."""
         if base_ns is None:
             namespace = None
         else:
             namespace = "/" + base_ns.lstrip("/")
         ui_config_string = """<ui> <popup name='Popup'>
-                              <menuitem action="New"/>
-                              <separator name="newconfigsep"/>
-                              <menuitem action="Add"/>"""
+                              <menuitem action="Add..."/>"""
         actions = [('New', gtk.STOCK_NEW,
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),
-                   ('Add', gtk.STOCK_ADD,
+                   ('Add...', gtk.STOCK_ADD,
+                    rose.config_editor.TREE_PANEL_ADD_GENERIC),
+                   ('Add section', gtk.STOCK_ADD,
                     rose.config_editor.TREE_PANEL_ADD_SECTION),
                    ('Autofix', gtk.STOCK_CONVERT,
                     rose.config_editor.TREE_PANEL_AUTOFIX_CONFIG),
@@ -319,9 +319,13 @@ class NavPanelHandler(object):
                     rose.config_editor.TREE_PANEL_CLONE_SECTION),
                    ('Edit', gtk.STOCK_EDIT,
                     rose.config_editor.TREE_PANEL_EDIT_SECTION),
-                   ('Enable', gtk.STOCK_YES,
+                   ('Enable...', gtk.STOCK_YES,
+                    rose.config_editor.TREE_PANEL_ENABLE_GENERIC),
+                   ('Enable section', gtk.STOCK_YES,
                     rose.config_editor.TREE_PANEL_ENABLE_SECTION),
-                   ('Ignore', gtk.STOCK_NO,
+                   ('Ignore...', gtk.STOCK_NO,
+                    rose.config_editor.TREE_PANEL_IGNORE_GENERIC),
+                   ('Ignore section', gtk.STOCK_NO,
                     rose.config_editor.TREE_PANEL_IGNORE_SECTION),
                    ('Info', gtk.STOCK_INFO,
                     rose.config_editor.TREE_PANEL_INFO_SECTION),
@@ -329,15 +333,21 @@ class NavPanelHandler(object):
                     rose.config_editor.TREE_PANEL_HELP_SECTION),
                    ('URL', gtk.STOCK_HOME,
                     rose.config_editor.TREE_PANEL_URL_SECTION),
-                   ('Remove', gtk.STOCK_DELETE,
-                    rose.config_editor.TREE_PANEL_REMOVE_SECTION),
+                   ('Remove...', gtk.STOCK_DELETE,
+                    rose.config_editor.TREE_PANEL_REMOVE_GENERIC),
+                   ('Remove section', gtk.STOCK_DELETE,
+                    rose.config_editor.TREE_PANEL_REMOVE_SECTION)]
         url = None
         help = None
+        is_empty = (not self.data.config)
         if namespace is not None:
             cloneable = self.is_ns_duplicate(namespace)
             is_top = (namespace in self.data.config.keys())
             is_fixable = bool(self.get_ns_errors(namespace))
             has_content = self.data.is_ns_content(namespace)
+            ignored_sections = self.data.get_ignored_sections(config_name)
+            enabled_sections = self.data.get_enabled_sections(config_name)
+            
             metadata, comments = self.get_ns_metadata_and_comments(namespace)
             if is_fixable:
                 ui_config_string = ui_config_string.replace(
@@ -365,22 +375,25 @@ class NavPanelHandler(object):
                     ui_config_string += '<menuitem action="Help"/>'
             if not is_empty:
                 ui_config_string += """<separator name="removesep"/>"""
-                ui_config_string += """<menuitem action="Remove section"/>"""
+                ui_config_string += """<menuitem action="Remove"/>"""
         else:
             ui_config_string += '<separator name="ignoresep"/>'
             ui_config_string += '<menuitem action="Enable"/>'
             ui_config_string += '<menuitem action="Ignore"/>'
+        if namespace is None or (is_top or is_empty):
+            ui_config_string += """<separator name="newconfigsep"/>
+                                   <menuitem action="New"/>"""
         ui_config_string += """</popup> </ui>"""
         uimanager = gtk.UIManager()
         actiongroup = gtk.ActionGroup('Popup')
         actiongroup.add_actions(actions)
         uimanager.insert_action_group(actiongroup, pos=0)
         uimanager.add_ui_from_string(ui_config_string)
-        is_empty = (not self.data.config)
-        new_item = uimanager.get_widget('/Popup/New')
-        new_item.connect("activate",
-                         lambda b: self.create_request())
-        new_item.set_sensitive(not is_empty)
+        if namespace is None or (is_top or is_empty):
+            new_item = uimanager.get_widget('/Popup/New')
+            new_item.connect("activate",
+                             lambda b: self.create_request())
+            new_item.set_sensitive(not is_empty)
         add_item = uimanager.get_widget('/Popup/Add')
         add_item.connect("activate",
                          lambda b: self.add_dialog(namespace))

@@ -148,9 +148,16 @@ class MainController(object):
                                 self.util,
                                 config_directory,
                                 config_objs,
-                                self.tree_trigger_update,
                                 loader_update,
                                 self.page_ns_show_modes)
+
+        self.nav_controller = (
+                  rose.config_editor.nav_controller.NavPanelController(
+                                self.data,
+                                self.util,
+                                self.data_helper,
+                                self.tree_trigger_update))
+        
         self.trigger = self.data.trigger
 
         self.loader_update(rose.config_editor.LOAD_STATUSES,
@@ -177,16 +184,9 @@ class MainController(object):
         self.action = rose.config_editor.action.Actions(
                              self.data, self.util,
                              self.undo_stack, self.redo_stack,
-                             self.perform_undo,
-                             self.apply_macro_transform,
-                             self.apply_macro_validation,
-                             self._add_config,
-                             self.check_cannot_enable_setting,
                              self.section_ops,
                              self.variable_ops,
-                             self.kill_page, self.update_status,
-                             self.update_namespace, self.view_page,
-                             self.perform_find_by_ns_id)
+                             self.view_page)
 
         # Add in the navigation panel menu handler.
         self.nav_handle = rose.config_editor.nav_panel_menu.NavPanelHandler(
@@ -198,7 +198,7 @@ class MainController(object):
                              self.kill_page)
 
         # Add in the main menu bar and tool bar handler.
-        self.main_handle = rose.config_editor.menu.Handler(
+        self.main_handle = rose.config_editor.menu.MainMenuHandler(
                              self.data, self.util, self.mainwindow,
                              self.undo_stack, self.redo_stack,
                              self.perform_undo,
@@ -211,7 +211,7 @@ class MainController(object):
         if not self.pluggable:
             self.generate_toolbar()
             self.generate_menubar()
-            self.generate_hyper_panel()
+            self.generate_nav_panel()
             # Create notebook (tabbed container) and connect signals.
             self.notebook = rose.gtk.util.Notebook()
 
@@ -221,7 +221,7 @@ class MainController(object):
                                  menu=self.top_menu,
                                  accelerators=self.menubar.accelerators,
                                  toolbar=self.toolbar,
-                                 hyper_panel=self.hyper_panel,
+                                 nav_panel=self.nav_panel,
                                  notebook=self.notebook,
                                  page_change_func=self.handle_page_change,
                                  save_func=self.save_to_file,)
@@ -397,7 +397,7 @@ class MainController(object):
                      ('/TopMenuBar/Page/Revert',
                       lambda m: self.revert_to_saved_data()),
                      ('/TopMenuBar/Page/Page Info',
-                      lambda m: self.nav_panel_handle.info_request(
+                      lambda m: self.nav_handle.info_request(
                                      self._get_current_page().namespace)),
                      ('/TopMenuBar/Page/Page Help',
                       lambda m: self._get_current_page().launch_help()),
@@ -481,12 +481,14 @@ class MainController(object):
                         lambda: self.main_handle.launch_terminal()}
         self.menubar.set_accelerators(accel)
 
-    def generate_hyper_panel(self):
+    def generate_nav_panel(self):
         """"Create tree panel and link functions."""
-        self.hyper_panel = rose.config_editor.panel.HyperLinkTreePanel(
-                                       self.data.namespace_tree,
-                                       self.nav_panel_handle.popup_panel_menu,
-                                       self.nav_panel_handle.get_can_show_page)
+        self.nav_panel = rose.config_editor.panel.PageNavigationPanel(
+                              self.data.namespace_tree,
+                              self.handle_launch_request,
+                              self.nav_handle.get_ns_metadata_and_comments,
+                              self.nav_handle.popup_panel_menu,
+                              self.nav_handle.get_can_show_page)
 
 #------------------ Page manipulation functions ------------------------------
 
@@ -528,8 +530,8 @@ class MainController(object):
         """Look up page data and attributes and call a page constructor."""
         config_name, subspace = self.util.split_full_ns(self.data,
                                                         namespace_name)
-        data, latent_data = self.data.get_data_for_namespace(
-                                                   namespace_name)
+        data, latent_data = self.data.helper.get_data_for_namespace(
+                                                      namespace_name)
         config_data = self.data.config[config_name]
         meta_config = config_data.meta
         ns_metadata = self.data.namespace_meta_lookup.get(namespace_name, {})
@@ -540,7 +542,7 @@ class MainController(object):
         custom_widget = ns_metadata.get(rose.config_editor.META_PROP_WIDGET)
         custom_sub_widget = ns_metadata.get(
                                rose.config_editor.META_PROP_WIDGET_SUB_NS)
-        has_sub_data = self.data.is_ns_sub_data(namespace_name)
+        has_sub_data = self.data.helper.is_ns_sub_data(namespace_name)
         label = ns_metadata.get(rose.META_PROP_TITLE)
         if label is None:
             label = subspace.split('/')[-1]
@@ -575,12 +577,13 @@ class MainController(object):
                         see_also += ", " + var_id
         see_also = see_also.replace(", ", "", 1)
         # Icon
-        icon_path = self.data.get_icon_path_for_config(config_name)
+        icon_path = self.data.helper.get_icon_path_for_config(config_name)
         is_default = self.get_ns_is_default(namespace_name)
         sub_data = None
         sub_ops = None
         if has_sub_data:
-            sub_data = self.data.get_sub_data_for_namespace(namespace_name)
+            sub_data = self.data.helper.get_sub_data_for_namespace(
+                                                         namespace_name)
             sub_ops = self.action.get_sub_ops_for_namespace(namespace_name)
         page_metadata = {'namespace': namespace_name,
                          'ns_is_default': is_default,
@@ -614,8 +617,10 @@ class MainController(object):
         directory = None
         if namespace_name == config_name:
             directory = config_data.directory
-        launch_info = lambda: self.handle.info_request(namespace_name)
-        launch_edit = lambda: self.handle.edit_request(namespace_name)
+        launch_info = lambda: self.nav_handle.info_request(
+                                                   namespace_name)
+        launch_edit = lambda: self.nav_handle.edit_request(
+                                                   namespace_name)
         page = rose.config_editor.page.ConfigPage(
                                   page_metadata,
                                   data,
@@ -623,7 +628,7 @@ class MainController(object):
                                   sect_ops,
                                   var_ops,
                                   section_data_objects,
-                                  self.data.get_format_sections,
+                                  self.data.helper.get_format_sections,
                                   directory,
                                   sub_data=sub_data,
                                   sub_ops=sub_ops,
@@ -638,7 +643,7 @@ class MainController(object):
     def get_orphan_page(self, namespace):
         """Return a page widget for embedding somewhere else."""
         page = self.make_page(namespace)
-        orphan_container = self.handle.get_orphan_container(page)
+        orphan_container = self.main_handle.get_orphan_container(page)
         self.orphan_pages.append(page)
         return orphan_container
 
@@ -647,7 +652,8 @@ class MainController(object):
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
         meta_config = config_data.meta
-        allowed_sections = self.data.get_sections_from_namespace(namespace)
+        allowed_sections = self.data.helper.get_sections_from_namespace(
+                                                         namespace)
         empty = True
         for section in allowed_sections:
             for variable in config_data.vars.now.get(section, []):
@@ -717,7 +723,7 @@ class MainController(object):
         current_page = self._get_current_page()
         self.update_page_menubar_toolbar_sensitivity(current_page)
         if current_page is None:
-            self.hyper_panel.select_row(None)
+            self.nav_panel.select_row(None)
             return False
         self.set_current_page_indicator(current_page.namespace)
         return False
@@ -747,8 +753,8 @@ class MainController(object):
                                          rose.META_PROP_URL in metadata)
 
     def set_current_page_indicator(self, namespace):
-        if hasattr(self, 'hyper_panel'):
-            self.hyper_panel.select_row(namespace.lstrip('/').split('/'))
+        if hasattr(self, 'nav_panel'):
+            self.nav_panel.select_row(namespace.lstrip('/').split('/'))
 
     def add_page_variable(self, widget, event):
         """Launch an add menu based on page content."""
@@ -765,7 +771,7 @@ class MainController(object):
         namespace = page.namespace
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         self.data.load_node_namespaces(config_name, from_saved=True)
-        config_data, ghost_data = self.data.get_data_for_namespace(
+        config_data, ghost_data = self.data.helper.get_data_for_namespace(
                                             namespace, from_saved=True)
         page.reload_from_data(config_data, ghost_data)
         self.data.load_node_namespaces(config_name)
@@ -862,7 +868,8 @@ class MainController(object):
                 old_section_hashes.append(sect_data.to_hashable())
             if set(section_hashes) ^ set(old_section_hashes):
                 return rose.config_editor.TREE_PANEL_TIP_CHANGED_CONFIG
-        allowed_sections = self.data.get_sections_from_namespace(namespace)
+        allowed_sections = self.data.helper.get_sections_from_namespace(
+                                                              namespace)
         save_var_map = {}
         for section in allowed_sections:
             for var in config_data.vars.save.get(section, []):
@@ -882,7 +889,7 @@ class MainController(object):
             # Some variables are now absent.
             return rose.config_editor.TREE_PANEL_TIP_REMOVED_VARS
         if self.get_ns_is_default(namespace):
-            sections = self.data.get_sections_from_namespace(namespace)
+            sections = self.data.helper.get_sections_from_namespace(namespace)
             for section in sections:
                 sect_data = config_sections.now.get(section)
                 save_sect_data = config_sections.save.get(section)
@@ -900,8 +907,8 @@ class MainController(object):
         to save time.
 
         """
-        if hasattr(self, 'hyper_panel'):
-            self.hyper_panel.load_tree(None, self.data.namespace_tree)
+        if hasattr(self, 'nav_panel'):
+            self.nav_panel.load_tree(None, self.data.namespace_tree)
             if only_this_namespace is None:
                 self.update_all()
             else:
@@ -921,14 +928,15 @@ class MainController(object):
         for changed_id in setting_ids:
             sect, opt = self.util.get_section_option_from_id(changed_id)
             if opt is None:
-                ns = self.data.get_default_namespace_for_section(sect,
-                                                                 config_name)
+                ns = self.data.helper.get_default_namespace_for_section(
+                                          sect, config_name)
                 if ns in [p.namespace for p in self.pagelist]:
                     index = [p.namespace for p in self.pagelist].index(ns)
                     page = self.pagelist[index]
                     page.refresh()
             else:
-                var = self.data.get_ns_variable(changed_id, config_name)
+                var = self.data.helper.get_ns_variable(changed_id,
+                                                       config_name)
                 if var is None:
                     continue
                 ns = var.metadata['full_ns']
@@ -943,7 +951,8 @@ class MainController(object):
 
     def update_all(self, only_this_config=None, is_loading=False):
         """Loop over all namespaces and update."""
-        unique_namespaces = self.data.get_all_namespaces(only_this_config)
+        unique_namespaces = self.data.helper.get_all_namespaces(
+                                                     only_this_config)
         if only_this_config is None:
             configs = self.data.config.keys()
         else:
@@ -1023,8 +1032,8 @@ class MainController(object):
                  not namespace.startswith(page.namespace) and
                  namespace != page.namespace):
                 continue
-            page.sub_data = self.data.get_sub_data_for_namespace(
-                                                   page.namespace)
+            page.sub_data = self.data.helper.get_sub_data_for_namespace(
+                                                     page.namespace)
             page.update_sub_data()
 
     def update_ns_info(self, namespace):
@@ -1037,7 +1046,7 @@ class MainController(object):
     def sync_page_var_lists(self, page):
         """Make sure the list of page variables has the right members."""
         config_name = self.util.split_full_ns(self.data, page.namespace)[0]
-        real, miss = self.data.get_data_for_namespace(page.namespace)
+        real, miss = self.data.helper.get_data_for_namespace(page.namespace)
         page_real, page_miss = page.panel_data, page.ghost_data
         refresh_vars = []
         action_vsets = [(page_real.remove, set(page_real) - set(real)),
@@ -1064,7 +1073,8 @@ class MainController(object):
         """Update the list of sections that are empty."""
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
-        for section in self.data.get_sections_from_namespace(namespace):
+        ns_sections = self.data.helper.get_sections_from_namespace(namespace)
+        for section in ns_sections:
             sect_data = config_data.sections.now.get(section)
             if sect_data is None:
                 continue
@@ -1086,11 +1096,13 @@ class MainController(object):
         self.data.trigger_id_value_lookup.setdefault(config_name, {})
         trig_id_val_dict = self.data.trigger_id_value_lookup[config_name]
         trigger = self.trigger[config_name]
-        allowed_sections = self.data.get_sections_from_namespace(namespace)
+        allowed_sections = self.data.helper.get_sections_from_namespace(
+                                                              namespace)
         updated_ids = []
 
         this_ns_triggers = []
-        ns_vars, ns_l_vars = self.data.get_data_for_namespace(namespace)
+        ns_vars, ns_l_vars = self.data.helper.get_data_for_namespace(
+                                                           namespace)
         for var in ns_vars + ns_l_vars:
             var_id = var.metadata['id']
             if not trigger.check_is_id_trigger(var_id, config_data.meta):
@@ -1120,8 +1132,8 @@ class MainController(object):
             sect, opt = self.util.get_section_option_from_id(setting_id)
             if opt is None:
                 sect_vars = config_data.vars.now.get(sect, [])
-                ns = self.data.get_default_namespace_for_section(sect,
-                                                                 config_name)
+                ns = self.data.helper.get_default_namespace_for_section(
+                                          sect, config_name)
                 if ns not in update_section_nses:
                     update_section_nses.append(ns)
             else:
@@ -1280,13 +1292,14 @@ class MainController(object):
 
     def update_tree_status(self, page_or_ns, icon_bool=None, icon_type=None):
         """Update the tree statuses."""
-        if not hasattr(self, 'hyper_panel'):
+        if not hasattr(self, 'nav_panel'):
             return
         if isinstance(page_or_ns, basestring):
             namespace = page_or_ns
             config_name = self.util.split_full_ns(self.data, namespace)[0]
             errors = []
-            ns_vars, ns_l_vars = self.data.get_data_for_namespace(namespace)
+            ns_vars, ns_l_vars = self.data.helper.get_data_for_namespace(
+                                                               namespace)
             for var in ns_vars + ns_l_vars:
                 errors += var.error.items()
         else:
@@ -1295,7 +1308,8 @@ class MainController(object):
             errors = page_or_ns.validate_errors()
         # Add section errors.
         config_data = self.data.config[config_name]
-        for section in self.data.get_sections_from_namespace(namespace):
+        ns_sections = self.data.helper.get_sections_from_namespace(namespace)
+        for section in ns_sections:
             if section in config_data.sections.now:
                 errors += config_data.sections.now[section].error.items()
         # Set icons.
@@ -1303,15 +1317,15 @@ class MainController(object):
         if icon_bool is None:
             if icon_type == 'changed' or icon_type is None:
                 change = self._namespace_data_is_modified(namespace)
-                self.hyper_panel.update_change(name_tree, change)
-                self.hyper_panel.set_row_icon(name_tree, bool(change),
-                                              ind_type='changed')
+                self.nav_panel.update_change(name_tree, change)
+                self.nav_panel.set_row_icon(name_tree, bool(change),
+                                            ind_type='changed')
             if icon_type == 'error' or icon_type is None:
-                self.hyper_panel.set_row_icon(name_tree, len(errors),
-                                              ind_type='error')
+                self.nav_panel.set_row_icon(name_tree, len(errors),
+                                            ind_type='error')
         else:
-            self.hyper_panel.set_row_icon(name_tree, icon_bool,
-                                          ind_type=icon_type)
+            self.nav_panel.set_row_icon(name_tree, icon_bool,
+                                        ind_type=icon_type)
 
     def update_stack_viewer_if_open(self):
         """Update the information in the stack viewer, if open."""
@@ -1336,7 +1350,8 @@ class MainController(object):
     def update_metadata_id(self, config_name):
         """Update the metadata if the id has changed."""
         config_data = self.data.config[config_name]
-        new_meta_id = self.data.get_config_meta_flag(config_data.config)
+        new_meta_id = self.data.helper.get_config_meta_flag(
+                                                  config_data.config)
         if config_data.meta_id != new_meta_id:
             config_data.meta_id = new_meta_id
             if not self.metadata_off:
@@ -1506,8 +1521,9 @@ class MainController(object):
 
     def _remove_config(self, config_name, meta=None):
         """Remove a configuration, optionally caching a meta id."""
-        dirpath = self.data.config[config_name].directory
-        nses = self.data.get_all_namespaces(config_name)
+        config_data = self.data.config[config_name]
+        dirpath = config_data.directory
+        nses = self.data.helper.get_all_namespaces(config_name)
         nses.remove(config_name)
         self._generate_pagelist()
         for page in self.pagelist:
@@ -1520,7 +1536,8 @@ class MainController(object):
                                 for w in self.tab_windows]
                     page_window = self.tab_windows[tab_nses.index(name)]
                     page.window.destroy()
-        self.handle.delete_request(nses)
+        self.action.remove_sections(config_name,
+                                    config_data.sections.now.keys())
         if dirpath is not None:
             try:
                 shutil.rmtree(dirpath)
@@ -1660,7 +1677,7 @@ class MainController(object):
         if self.pluggable:
             self.update_all()
         if hasattr(self, 'menubar'):
-            self.handle.load_macro_menu(self.menubar)
+            self.main_handle.load_macro_menu(self.menubar)
         namespaces_updated = []
         for config_name in configs:
             config_data = self.data.config[config_name]
@@ -1681,7 +1698,8 @@ class MainController(object):
             config_name = self.util.split_full_ns(self.data, namespace)[0]
             if config_name not in configs:
                 continue
-            data, missing_data = self.data.get_data_for_namespace(namespace)
+            data, missing_data = self.data.helper.get_data_for_namespace(
+                                                               namespace)
             if len(data + missing_data) > 0:
                 new_page = self.make_page(namespace)
                 if new_page is None:
@@ -1766,14 +1784,15 @@ class MainController(object):
         config_data = self.data.config[config_name]
         section, option = self.util.get_section_option_from_id(setting_id)
         if option is None:
-            page_id = self.data.get_default_namespace_for_section(section,
-                                                                  config_name)
+            page_id = self.data.helper.get_default_namespace_for_section(
+                                                   section, config_name)
             self.view_page(page_id)
         else:
-            var = self.data.get_variable_by_id(setting_id, config_name)
+            var = self.data.helper.get_variable_by_id(setting_id, config_name)
             if var is None:
-                var = self.data.get_variable_by_id(setting_id, config_name,
-                                                   latent=True)
+                var = self.data.helper.get_variable_by_id(setting_id,
+                                                          config_name,
+                                                          latent=True)
             if var is not None:
                 page_id = var.metadata["full_ns"]
                 self.view_page(page_id, setting_id)
@@ -1839,10 +1858,10 @@ class MainController(object):
         if self.find_hist['ids']:
             config_name, var_id = self.find_hist['ids'][0]
             config_data = self.data.config[config_name]
-            var = self.data.get_variable_by_id(var_id, config_name)
+            var = self.data.helper.get_variable_by_id(var_id, config_name)
             if var is None:
-                var = self.data.get_variable_by_id(var_id, config_name,
-                                                   latent=True)
+                var = self.data.helper.get_variable_by_id(var_id, config_name,
+                                                          latent=True)
             if var is not None:
                 self.find_hist['ids'] = [self.find_hist['ids'][0]]
                 return var.metadata['full_ns'], var_id
@@ -1857,16 +1876,16 @@ class MainController(object):
             dupl_checker = rose.macros.duplicate.DuplicateChecker()
             problem_list = dupl_checker.validate(macro_config, meta_config)
             if problem_list:
-                self.handle.handle_macro_validation(
-                            config_name,
-                            'duplicate.DuplicateChecker.validate',
-                            macro_config, problem_list, no_display=True)
+                self.main_handle.handle_macro_validation(
+                          config_name,
+                          'duplicate.DuplicateChecker.validate',
+                          macro_config, problem_list, no_display=True)
             format_checker = rose.macros.format.FormatChecker()
             problem_list = format_checker.validate(macro_config, meta_config)
             if problem_list:
-                self.handle.handle_macro_validation(
-                            config_name, 'format.FormatChecker.validate',
-                            macro_config, problem_list)
+                self.main_handle.handle_macro_validation(
+                          config_name, 'format.FormatChecker.validate',
+                          macro_config, problem_list)
                    
     def perform_error_check(self, namespace=None, is_loading=False):
         """Loop through system macros and sum errors."""
@@ -1915,7 +1934,8 @@ class MainController(object):
                            config_sections.latent.keys())
             ok_variables = variables
         else:
-            ok_sections = self.data.get_sections_from_namespace(namespace)
+            ok_sections = self.data.helper.get_sections_from_namespace(
+                                                             namespace)
             ok_variables = [v for v in variables
                             if v.metadata.get('full_ns') == namespace]
         for section in ok_sections:
@@ -1949,7 +1969,7 @@ class MainController(object):
             if key is None:
                 setting_id = section
                 if (namespace is not None and section not in
-                    self.data.get_sections_from_namespace(namespace)):
+                    self.data.helper.get_sections_from_namespace(namespace)):
                     continue
                 sect_data = config_sections.now.get(section)
                 if sect_data is None:
@@ -1961,12 +1981,12 @@ class MainController(object):
             else:
                 setting_id = self.util.get_id_from_section_option(
                                                     section, key)
-                var = self.data.get_variable_by_id(setting_id,
-                                                    config_name)
+                var = self.data.helper.get_variable_by_id(setting_id,
+                                                          config_name)
                 if var is None:
-                    var = self.data.get_variable_by_id(setting_id,
-                                                        config_name,
-                                                        latent=True)
+                    var = self.data.helper.get_variable_by_id(setting_id,
+                                                              config_name,
+                                                              latent=True)
                 if var is None:
                     continue
                 if (namespace is not None and
@@ -2049,12 +2069,12 @@ class MainController(object):
                 config_name = self.util.split_full_ns(
                                         self.data, namespace)[0]
                 node.process_metadata(
-                     self.data.get_metadata_for_config_id(node_id,
-                                                          config_name))
+                     self.data.helper.get_metadata_for_config_id(node_id,
+                                                                 config_name))
                 self.data.load_ns_for_node(node, config_name)
                 namespace = node.metadata.get('full_ns')
             if (not is_group and
-                self.data.is_ns_in_tree(namespace) and
+                self.data.helper.is_ns_in_tree(namespace) and
                 not node_is_section):
                 page = self.view_page(namespace, node_id)
             redo_items = [x for x in self.redo_stack]
@@ -2077,7 +2097,7 @@ class MainController(object):
                 self.undo_stack.append(just_done_item)
             else:
                 self.redo_stack.append(just_done_item)
-            if not self.data.is_ns_in_tree(namespace):
+            if not self.data.helper.is_ns_in_tree(namespace):
                 self.data.reload_namespace_tree()
             page = None
             if is_group:
@@ -2088,7 +2108,7 @@ class MainController(object):
                 if namespace != stack_item.page_label:
                     namespace_id_map.setdefault(stack_item.page_label, [])
                     namespace_id_map[stack_item.page_label].append(node_id)
-            elif self.data.is_ns_in_tree(namespace):
+            elif self.data.helper.is_ns_in_tree(namespace):
                 if not node_is_section:
                     # Section operations should not require pages.
                     page = self.view_page(namespace, node_id)

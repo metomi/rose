@@ -43,7 +43,7 @@ class MainWindow(object):
     """Generate the main window and dialog handling for this example."""
 
     def load(self, name='Untitled', menu=None, accelerators=None, toolbar=None,
-             hyper_panel=None, notebook=None,
+             nav_panel=None, notebook=None,
              page_change_func=rose.config_editor.false_function,
              save_func=rose.config_editor.false_function):
         self.window = gtk.Window()
@@ -69,25 +69,25 @@ class MainWindow(object):
         if toolbar is not None:
             toolbar.show()
             self.top_vbox.pack_start(toolbar, expand=False)
-        # Load the hyper_panel and notebook
+        # Load the nav_panel and notebook
         for signal in ['switch-page', 'focus-tab', 'select-page',
                        'change-current-page']:
             notebook.connect_after(signal, page_change_func)
-        self.generate_main_hbox(hyper_panel, notebook)
+        self.generate_main_hbox(nav_panel, notebook)
         self.top_vbox.pack_start(self.main_hbox, expand=True)
         self.top_vbox.show()
         self.window.show()
-        hyper_panel.tree.columns_autosize()
-        hyper_panel.grab_focus()
+        nav_panel.tree.columns_autosize()
+        nav_panel.grab_focus()
 
-    def generate_main_hbox(self, hyper_panel, notebook):
+    def generate_main_hbox(self, nav_panel, notebook):
         """Create the main container of the GUI window.
 
         This contains the tree panel and notebook.
 
         """
         self.main_hbox = gtk.HPaned()
-        self.main_hbox.pack1(hyper_panel, resize=False, shrink=False)
+        self.main_hbox.pack1(nav_panel, resize=False, shrink=False)
         self.main_hbox.show()
         self.main_hbox.pack2(notebook, resize=True, shrink=True)
         self.main_hbox.show()
