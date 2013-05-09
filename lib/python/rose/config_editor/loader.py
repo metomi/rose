@@ -264,7 +264,7 @@ class ConfigDataManager(object):
             config, s_config = self.load_config_file(config_path)
         meta_config = self.load_meta_config(config, config_directory)
         meta_files = self.load_meta_files(config, config_directory)
-        macro_module_prefix = re.sub("[^\w]", "_", name.strip("/")) + "/"
+        macro_module_prefix = self.get_macro_module_prefix(name)
         macros = rose.macro.load_meta_macro_modules(
                       meta_files, module_prefix=macro_module_prefix)
         meta_id = self.get_config_meta_flag(config)
@@ -923,12 +923,18 @@ class ConfigDataManager(object):
                 else:
                     namespace = config_name
                 self.namespace_meta_lookup.setdefault(namespace, {})
+                ns_metadata = self.namespace_meta_lookup[namespace]
                 for option, opt_node in sect_node.value.items():
                     if opt_node.is_ignored():
                         continue
                     value = meta_config[section][option].value
-                    self.namespace_meta_lookup[namespace].update(
-                                                            {option: value})
+                    if option == rose.META_PROP_MACRO:
+                        if option in ns_metadata:
+                            ns_metadata[option] += ", " + value
+                        else:
+                            ns_metadata[option] = value
+                    else:
+                        ns_metadata.update({option: value})
         ns_sections = {}  # Namespace-sections key value pairs.
         for variable in config_data.vars.get_all():
             ns = variable.metadata['full_ns']
@@ -937,6 +943,14 @@ class ConfigDataManager(object):
             ns_sections.setdefault(ns, [])
             if sect not in ns_sections[ns]:
                 ns_sections[ns].append(sect)
+            if rose.META_PROP_MACRO in variable.metadata:
+                macro_info = variable.metadata[rose.META_PROP_MACRO]
+                self.namespace_meta_lookup.setdefault(ns, {})
+                ns_metadata = self.namespace_meta_lookup[ns]
+                if rose.META_PROP_MACRO in ns_metadata:
+                    ns_metadata[rose.META_PROP_MACRO] += ", " + macro_info
+                else:
+                    ns_metadata[rose.META_PROP_MACRO] = macro_info
         default_ns_sections = {}
         for section_data in config_data.sections.get_all():
             # Use the default section namespace.
@@ -949,7 +963,9 @@ class ConfigDataManager(object):
                 default_ns_sections[ns].append(section_data.name)
         for ns in ns_sections:
             self.namespace_meta_lookup.setdefault(ns, {})
-            self.namespace_meta_lookup[ns]['sections'] = ns_sections[ns]
+            ns_metadata = self.namespace_meta_lookup[ns]
+            ns_metadata['sections'] = ns_sections[ns]
+            ns_metadata['sections'] = ns_sections[ns]
             for ns_section in ns_sections[ns]:
                 # Loop over metadata from contributing sections.
                 # Note: rogue-variable section metadata can be overridden.
@@ -961,7 +977,13 @@ class ConfigDataManager(object):
                                 rose.META_PROP_DESCRIPTION]):
                         # ns created from variables, not a section - no title.
                         continue
-                    self.namespace_meta_lookup[ns].setdefault(key, value)
+                    if key == rose.META_PROP_MACRO:
+                        if key in ns_metadata:
+                            ns_metadata[rose.META_PROP_MACRO] += ", " + macro_info
+                        else:
+                            ns_metadata[rose.META_PROP_MACRO] = macro_info
+                    else:
+                        ns_metadata.setdefault(key, value)
         file_ns_bit = "/" + rose.SUB_CONFIG_FILE_DIR + "/"
         for ns, prop_map in self.namespace_meta_lookup.items():
             if file_ns_bit in ns:
@@ -1156,6 +1178,32 @@ class ConfigDataManager(object):
         ns_latents = [v for v in latents if v.metadata.get('full_ns') == ns]
         return ns_vars, ns_latents
 
+    def get_macro_info_for_namespace(self, ns):
+        """Return some information for custom macros for this namespace."""
+        config_name = self.util.split_full_ns(self, ns)[0]
+        config_data = self.config[config_name]
+        ns_macros_text = self.namespace_meta_lookup.get(ns, {}).get(
+                                             rose.META_PROP_MACRO, "")
+        if not ns_macros_text:
+            return {}
+        ns_macros = rose.variable.array_split(ns_macros_text)
+        module_prefix = self.get_macro_module_prefix(config_name)
+        for i, ns_macro in enumerate(ns_macros):
+            ns_macros[i] = module_prefix + ns_macro
+        ns_macro_info = {}
+        macro_tuples = rose.macro.get_macro_class_methods(config_data.macros)
+        for module_name, class_name, method_name, docstring in macro_tuples:
+            this_macro_name = ".".join([module_name, class_name])
+            this_macro_method_name = ".".join([this_macro_name, method_name])
+            this_info = (method_name, docstring)
+            if this_macro_name in ns_macros:
+                key = this_macro_name.replace(module_prefix, "", 1)
+                ns_macro_info.update({key: this_info})
+            elif this_macro_method_name in ns_macros:
+                key = this_macro_method_name.replace(module_prefix, "", 1)
+                ns_macro_info.update({key: this_info})
+        return ns_macro_info
+
     def get_sub_data_for_namespace(self, ns, from_saved=False):
         """Return any sections/variables below this namespace."""
         sub_data = {"sections": {}, "variables": {}}
@@ -1320,3 +1368,7 @@ class ConfigDataManager(object):
                 icon_path = filename
                 break
         return icon_path
+
+    def get_macro_module_prefix(self, config_name):
+        # Return a valid module-like name for macros.
+        return re.sub("[^\w]", "_", config_name.strip("/")) + "/"

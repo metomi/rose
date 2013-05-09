@@ -417,10 +417,8 @@ class BaseStashSummaryDataPanelv1(
                                    tip_text=self.ADD_NEW_STASH_TIP)
         package_button = rose.gtk.util.CustomButton(
                                        label=self.PACKAGE_MANAGER_LABEL,
-                                       tip_text=self.PACKAGE_MANAGER_TIP)
-        arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
-        arrow.show()
-        package_button.hbox.pack_start(arrow, expand=False, fill=False)
+                                       tip_text=self.PACKAGE_MANAGER_TIP,
+                                       has_menu=True)
         self.control_widget_hbox.pack_end(package_button, expand=False,
                                           fill=False)
         self.control_widget_hbox.pack_end(self._add_button,
@@ -716,16 +714,8 @@ class BaseStashSummaryDataPanelv1(
                          lambda i: self._packages_enable(disable=True))
         menuitem.show()
         menu.append(menuitem)
-        menu.popup(None, None, self._package_menu_position, event.button,
+        menu.popup(None, None, widget.position_menu, event.button,
                    event.time, widget)
-
-    def _package_menu_position(self, menu, widget):
-        # Place the menu carefully below the button.
-        x, y = widget.get_window().get_origin()
-        allocated_rectangle = widget.get_allocation()
-        x += allocated_rectangle.x
-        y += allocated_rectangle.y + allocated_rectangle.height
-        return x, y, False
 
     def _packages_remove(self, only_this_package=None):
         # Remove requests and no-longer-needed profiles for packages.
