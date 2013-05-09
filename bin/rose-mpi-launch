@@ -22,16 +22,24 @@
 #     rose-mpi-launch
 #
 # SYNOPSIS
-#     rose mpi-launch [OPTIONS] [--] [COMMAND [ARGUMENTS ...]]
+#     1. rose mpi-launch -f FILE [OPTIONS] [--] [ARGS ...]
+#     2. rose mpi-launch [OPTIONS] [--] COMMAND [ARGS ...]
 #
 # DESCRIPTION
 #     Provide a portable way to launch an MPI command.
 #
-# ARGUMENTS
-#     COMMAND
-#         Command to call. Subsequent arguments are passed to the command.
+#     1. If a command file is specified with the --command-file=FILE
+#        (or -f FILE) option, then it will attempt to submit FILE to the MPI
+#        launcher command.
+#     2. Otherwise, it will attempt to submit COMMAND with the MPI launcher
+#        command.
+#
+#     In both cases, the remaining ARGS will be added to the command line of
+#     the launcher program.
 #
 # OPTIONS
+#     --command-file=FILE, -f FILE
+#         Specify a command file for the MPI launcher.
 #     --debug
 #         Switch on xtrace, i.e. "set -x".
 #     --quiet, -q
@@ -42,56 +50,75 @@
 #
 # CONFIGURATION
 #     The command reads from the [rose-mpi-launch] section in
-#     "$ROSE_HOME/etc/rose.conf" and "$HOME/.metomi/rose.conf". All settings
-#     are optional. Valid settings are:
+#     "$ROSE_HOME/etc/rose.conf" and "$HOME/.metomi/rose.conf".
+#     Valid settings are:
 #
 #     launcher-list=LIST
-#         Specify a list of launcher commands.
-#     launcher-preopts.LAUNCHER=OPTIONS
-#         Specify the default options of a LAUNCHER before the COMMAND.
-#     launcher-postopts.LAUNCHER=OPTIONS
-#         Specify the default options of a LAUNCHER after the COMMAND.
+#         Specify a list of launcher commands. E.g.:
+#             launcher-list=poe mpiexec
+#     launcher-fileopts.LAUNCHER=OPTION-TEMPLATE
+#         Specify the options to a LAUNCHER for launching with a command file.
+#         The template string should contain "$ROSE_COMMAND_FILE" (or
+#         "${ROSE_COMMAND_FILE}"), which will be expanded to the path to the
+#         command file. E.g.:
+#             launcher-fileopts.mpiexec=-f $ROSE_COMMAND_FILE
+#             launcher-fileopts.poe=-cmdfile $ROSE_COMMAND_FILE
+#     launcher-preopts.LAUNCHER=OPTION-TEMPLATE
+#     launcher-postopts.LAUNCHER=OPTION-TEMPLATE
+#         Specify the options to a LAUNCHER for launching with a command.
+#         "preopts" are options placed after the launcher command but before
+#         COMMAND. "postopts" are options placed after COMMAND but before the
+#         remaining arguments. E.g.:
+#             launcher-preopts.mpiexec=-n $PROC
 #
 # ENVIRONMENT VARIABLES
 #     optional ROSE_LAUNCHER
-#         Specify the launcher program to run the prog.
-#
+#         Specify the launcher program.
 #     optional ROSE_LAUNCH_INNER
-#         Specify an inner wrapper to be run by launcher, can be set to ""
-#         to call the executable directly. Default is "$0 --inner".
-#
+#         Only relevant when launching with a command. Specify an inner wrapper
+#         to be run by launcher, can be set to a null string to call the
+#         executable directly. Default is "$0 --inner".
 #     optional ROSE_LAUNCHER_LIST
-#         Specify an alternative list of launchers. Override launcher-list
-#         setting in configuration.
-#
+#         Override "launcher-list" setting in configuration.
+#     optional ROSE_LAUNCHER_FILEOPTS
+#         Override "launcher-fileopts.LAUNCHER" setting for the selected
+#         LAUNCHER.
 #     optional ROSE_LAUNCHER_PREOPTS
-#         Specify the options to the launcher program to be inserted before
-#         the program name.
-#
+#         Override "launcher-preopts.LAUNCHER" setting for the selected
+#         LAUNCHER.
 #     optional ROSE_LAUNCHER_POSTOPTS
-#         Specify the options to the launcher program to be inserted after
-#         the program name.
-#       
+#         Override "launcher-postopts.LAUNCHER" setting for the selected
+#         LAUNCHER.
 #     optional ROSE_LAUNCHER_ULIMIT_OPTS
-#         Specify the arguments to ulimit. Setting this variable to "-a -s
-#         unlimited -d unlimited -a" results in "ulimit -a; ulimit -s unlimited;
-#         ulimit -d unlimited; ulimit -a"
-#
+#         Only relevant if $ROSE_LAUNCH_INNER is used. Specify the arguments to
+#         ulimit. Setting this variable to "-a -s unlimited -d unlimited -a"
+#         results in "ulimit -a; ulimit -s unlimited; ulimit -d unlimited;
+#         ulimit -a"
 #     optional NPROC
 #         Specify the number of processors to run on. Default is 1.
 #
 # DIAGNOSTICS
-#     Return 0 on success, 1 or exit code of COMMAND on failure.
+#     Return 0 on success, 1 or exit code of the launcher program on failure.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
 rose_init rose_log
 
 # ------------------------------------------------------------------------------
+ROSE_COMMAND=
+ROSE_COMMAND_FILE=
 while (($# > 0)); do
     case $1 in
+    --command-file=*)
+        ROSE_COMMAND_FILE=${1#*=}
+        shift 1
+        :;;
     --debug)
         shift 1
         set -x
+        :;;
+    -f) shift 1
+        ROSE_COMMAND_FILE=$1
+        shift 1
         :;;
     --inner)
         shift 1
@@ -136,9 +163,11 @@ while (($# > 0)); do
 done
 
 # ------------------------------------------------------------------------------
-COMMAND=
-if (($# > 0)); then
-    if ! COMMAND=$(type -P $1); then
+if [[ -z $ROSE_COMMAND_FILE ]]; then
+    if (($# < 1)); then
+        rose_usage 1
+    fi
+    if ! ROSE_COMMAND=$(type -P $1); then
         err "$1: COMMAND not found"
     fi
     shift 1
@@ -176,41 +205,52 @@ if [[ -n $ROSE_LAUNCHER ]]; then
         err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
     fi
     ROSE_LAUNCHER=$ROSE_LAUNCHER_PATH
-    if ! printenv ROSE_LAUNCH_INNER >/dev/null; then
-         ROSE_LAUNCH_INNER="${0}$(optv) --inner"
-    fi
-    # Options
     ROSE_LAUNCHER_BASE=$(basename $ROSE_LAUNCHER)
-    ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-$( \
-        rose config -E --default= $ROSE_NS launcher-preopts.$ROSE_LAUNCHER_BASE)}
-    ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:-$( \
-        rose config -E --default= $ROSE_NS launcher-postopts.$ROSE_LAUNCHER_BASE)}
-else
-    ROSE_LAUNCH_INNER=
-    ROSE_LAUNCHER_PREOPTS=
-    ROSE_LAUNCHER_POSTOPTS=
-fi
-
-if ((ROSE_VERBOSITY >= 3)) && [[ -n ${COMMAND:-} ]]; then
-    info 3 printenv
-    printenv | sort
-    run ldd $COMMAND || true 2>/dev/null
 fi
 
 #-------------------------------------------------------------------------------
 # 3. Launch the program.
 #-------------------------------------------------------------------------------
-info 2 exec \
-$ROSE_LAUNCHER \
-$ROSE_LAUNCHER_PREOPTS \
-$ROSE_LAUNCH_INNER \
-$COMMAND \
-$ROSE_LAUNCHER_POSTOPTS \
-"$@"
-exec \
-$ROSE_LAUNCHER \
-$ROSE_LAUNCHER_PREOPTS \
-$ROSE_LAUNCH_INNER \
-$COMMAND \
-$ROSE_LAUNCHER_POSTOPTS \
-"$@"
+if [[ -n $ROSE_COMMAND_FILE ]]; then
+    if [[ -z $ROSE_LAUNCHER_BASE ]]; then
+        err "ROSE_LAUNCHER not defined, command file not supported."
+    fi
+    ROSE_LAUNCHER_FILEOPTS=${ROSE_LAUNCHER_FILEOPTS:-$( \
+        rose config --default= $ROSE_NS launcher-fileopts.$ROSE_LAUNCHER_BASE)}
+    eval "info 2 exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $@"
+    eval "exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $@"
+else
+    if [[ -n $ROSE_LAUNCHER_BASE ]]; then
+        if ! printenv ROSE_LAUNCH_INNER 1>/dev/null; then
+             ROSE_LAUNCH_INNER="${0}$(optv) --inner"
+        fi
+        # Options
+        ROSE_LAUNCHER_PREOPTS=${ROSE_LAUNCHER_PREOPTS:-$(rose config -E \
+            --default= $ROSE_NS launcher-preopts.$ROSE_LAUNCHER_BASE)}
+        ROSE_LAUNCHER_POSTOPTS=${ROSE_LAUNCHER_POSTOPTS:-$(rose config -E \
+            --default= $ROSE_NS launcher-postopts.$ROSE_LAUNCHER_BASE)}
+    else
+        ROSE_LAUNCH_INNER=
+        ROSE_LAUNCHER_PREOPTS=
+        ROSE_LAUNCHER_POSTOPTS=
+    fi
+    if ((ROSE_VERBOSITY >= 3)); then
+        info 3 printenv
+        printenv | sort
+        run ldd $ROSE_COMMAND || true 2>/dev/null
+    fi
+    info 2 exec \
+        $ROSE_LAUNCHER \
+        $ROSE_LAUNCHER_PREOPTS \
+        $ROSE_LAUNCH_INNER \
+        "$ROSE_COMMAND" \
+        $ROSE_LAUNCHER_POSTOPTS \
+        "$@"
+    exec \
+        $ROSE_LAUNCHER \
+        $ROSE_LAUNCHER_PREOPTS \
+        $ROSE_LAUNCH_INNER \
+        "$ROSE_COMMAND" \
+        $ROSE_LAUNCHER_POSTOPTS \
+        "$@"
+fi

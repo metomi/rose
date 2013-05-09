@@ -9,7 +9,13 @@
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -884,23 +890,35 @@
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose mpi-launch [COMMAND [ARGUMENTS ...]]</kbd></p>
+    <ol>
+      <li><kbd>rose mpi-launch -f FILE [OPTIONS] [--] [ARGS ...]</kbd></li>
+
+      <li><kbd>rose mpi-launch [OPTIONS] [--] COMMAND [ARGS ...]</kbd></li>
+    </ol>
 
     <h3>DESCRIPTION</h3>
 
     <p>Provide a portable way to launch an MPI command.</p>
 
-    <h3>ARGUMENTS</h3>
+    <ol>
+      <li>If a command file is specified with the <kbd>--command-file=FILE</kbd>
+      (or <kbd>-f FILE</kbd>) option, then it will attempt to submit
+      <var>FILE</var> to the MPI launcher command.</li>
 
-    <dl>
-      <dt><var>COMMAND</var></dt>
+      <li>Otherwise, it will attempt to submit <var>COMMAND</var> with the MPI
+      launcher command.</li>
+    </ol>
 
-      <dd>Command to call. Subsequent arguments are passed to the command.</dd>
-    </dl>
+    <p>In both cases, the remaining ARGS will be added to the command line of
+    the launcher program.</p>
 
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--command-file=FILE</kbd>, <kbd>-f FILE</kbd></dt>
+      
+      <dd>Specify a command file for the MPI launcher.</dd>
+
       <dt><kbd>--debug</kbd></dt>
 
       <dd>Switch on xtrace, i.e. <code>set -x</code>.</dd>
@@ -920,23 +938,43 @@
 
     <p>The command reads its settings from the <var>[rose-host-select]</var>
     section in <var>$ROSE_HOME/etc/rose.conf</var> and
-    <var>$HOME/.metomi/rose.conf</var>. All settings are optional. Valid
-    settings are:</p>
+    <var>$HOME/.metomi/rose.conf</var>. Valid settings are:</p>
 
     <dl>
       <dt><kbd>launcher-list=LIST</kbd></dt>
 
-      <dd>Specify a list of launcher commands.</dd>
+      <dd>Specify a list of launcher commands. E.g.:
 
-      <dt><kbd>launcher-preopts.LAUNCHER=OPTIONS</kbd></dt>
+        <pre class="prettyprint lang-rose_conf">
+launcher-list=poe mpiexec
+</pre>
+      </dd>
 
-      <dd>Specify the default options of a <var>LAUNCHER</var> before the
-      COMMAND.</dd>
+      <dt><kbd>launcher-fileopts.LAUNCHER=OPTION-TEMPLATE</kbd></dt>
 
-      <dt><kbd>launcher-postopts.LAUNCHER=OPTIONS</kbd></dt>
+      <dd>Specify the options to a <var>LAUNCHER</var> for launching with a
+      command file.  The template string should contain
+      <var>$ROSE_COMMAND_FILE</var> (or <var>${ROSE_COMMAND_FILE}</var>), which
+      will be expanded to the path to the command file. E.g.:
 
-      <dd>Specify the default options of a <var>LAUNCHER</var> after the
-      COMMAND.</dd>
+        <pre class="prettyprint lang-rose_conf">
+launcher-fileopts.mpiexec=-f $ROSE_COMMAND_FILE
+launcher-fileopts.poe=-cmdfile $ROSE_COMMAND_FILE
+</pre>
+      </dd>
+
+      <dt><kbd>launcher-preopts.LAUNCHER=OPTIONS</kbd><br/>
+      <kbd>launcher-postopts.LAUNCHER=OPTIONS</kbd></dt>
+
+      <dd>Specify the options to a <var>LAUNCHER</var> for launching with a
+      command.  <var>preopts</var> are options placed after the launcher command
+      but before <var>COMMAND</var>. <var>postopts</var> are options placed
+      after <var>COMMAND</var> but before the remaining arguments. E.g.:
+
+        <pre class="prettyprint lang-rose_conf">
+launcher-preopts.mpiexec=-n $NPROC
+</pre>
+      </dd>
     </dl>
 
     <h3>ENVIRONMENT</h3>
@@ -944,41 +982,49 @@
     <dl>
       <dt><kbd>optional ROSE_LAUNCHER</kbd></dt>
 
-      <dd>Specifies the launcher program to run the prog.</dd>
+      <dd>Specify the launcher program.</dd>
 
       <dt><kbd>optional ROSE_LAUNCH_INNER</kbd></dt>
 
-      <dd>Specifies an inner wrapper to be run by launcher, can be set to "" to
-      call the executable directly. Default is <kbd>$0 --inner</kbd>.</dd>
+      <dd>Only relevant when launching with a command. Specify an inner wrapper
+      to be run by launcher, can be set to a null string to call the executable
+      directly. Default is <kbd>$0 --inner</kbd>.</dd>
 
       <dt><kbd>optional ROSE_LAUNCHER_LIST</kbd></dt>
 
-      <dd>Specifies an alternative list of launchers.</dd>
+      <dd>Override <var>launcher-list</var> setting in configuration.</dd>
+
+      <dt><kbd>optional ROSE_LAUNCHER_FILEOPTS</kbd></dt>
+
+      <dd>Override <var>launcher-fileopts.LAUNCHER</var> setting for the
+      selected <var>LAUNCHER</var>.</dd>
 
       <dt><kbd>optional ROSE_LAUNCHER_PREOPTS</kbd></dt>
 
-      <dd>Specifies the options to the launcher program to be inserted before
-      the program name.</dd>
+      <dd>Override <var>launcher-preopts.LAUNCHER</var> setting for the
+      selected <var>LAUNCHER</var>.</dd>
 
       <dt><kbd>optional ROSE_LAUNCHER_POSTOPTS</kbd></dt>
 
-      <dd>Specifies the options to the launcher program to be inserted after
-      the program name.</dd>
+      <dd>Override <var>launcher-postopts.LAUNCHER</var> setting for the
+      selected <var>LAUNCHER</var>.</dd>
 
       <dt><kbd>optional ROSE_LAUNCHER_ULIMIT_OPTS</kbd></dt>
 
-      <dd>Specifies the arguments to ulimit. Setting this variable to <kbd>-a
-      -s unlimited -d unlimited -a</kbd> results in <kbd>ulimit -a; ulimit -s
+      <dd>Only relevant if <var>$ROSE_LAUNCH_INNER</var> is used. Specify the
+      arguments to <kbd>ulimit</kbd>. Setting this variable to <kbd>-a -s
+      unlimited -d unlimited -a</kbd> results in <kbd>ulimit -a; ulimit -s
       unlimited; ulimit -d unlimited; ulimit -a</kbd></dd>
 
       <dt><kbd>optional NPROC</kbd></dt>
 
-      <dd>Specifies the number of processors to run on. Default is 1.</dd>
+      <dd>Specify the number of processors to run on. Default is
+      <kbd>1</kbd>.</dd>
     </dl>
 
     <h3>DIAGNOSTICS</h3>
 
-    <p>Return 0 on success, 1 or exit code of <var>COMMAND</var> on
+    <p>Return 0 on success, 1 or exit code of the launcher program on
     failure.</p>
 
     <h2 id="rose-namelist-dump">rose namelist-dump</h2>
@@ -1175,7 +1221,7 @@
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbr>--all</kbd></dt>
+      <dt><kbd>--all</kbd></dt>
       
       <dd>Open a suite control GUI for each running suite.</dd>
       

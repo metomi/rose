@@ -81,15 +81,26 @@
 
 # Configuration related to "rose mpi-launch".
 #
-## Specify a list of default launchers
-#  launcher-list=poe mpiexec mpirun
-#
-## Specify the default options of a launcher before/after the command.
-#  launcher-preopts.LAUNCHER=OPTIONS
-#  launcher-postopts.LAUNCHER=OPTIONS
+## Specify a list of launcher commands.
+#  launcher-list=LAUNCHER ...
+## E.g.:
+#  launcher-list=poe mpiexec
+## Specify the options to a LAUNCHER for launching with a command file.
+## The template string should contain "$ROSE_COMMAND_FILE" (or
+## "${ROSE_COMMAND_FILE}"), which will be expanded to the path to the
+## command file.
+#  launcher-fileopts.LAUNCHER=OPTION-TEMPLATE
+## E.g.:
+#  launcher-fileopts.poe=-f $ROSE_COMMAND_FILE
+#  launcher-fileopts.mpiexec=-cmdfile $ROSE_COMMAND_FILE
+## Specify the options to a LAUNCHER for launching with a command.
+## "preopts" are options placed after the launcher command but before
+## COMMAND. "postopts" are options placed after COMMAND but before the
+## remaining arguments.
+#  launcher-preopts.LAUNCHER=OPTIONS-TEMPLATE
+#  launcher-postopts.LAUNCHER=OPTIONS-TEMPLATE
 ## E.g.:
 #  launcher-preopts.mpiexec=-n $NPROC
-#  launcher-preopts.mpirun=-v -np $NPROC
 [rose-mpi-launch]
 
 # Configuration related to "rose suite-run".
