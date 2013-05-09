@@ -143,6 +143,7 @@ VAR_MENU_URL = "_Web Help"
 # Button strings
 LABEL_EDIT = "edit"
 LABEL_PAGE_HELP = "Page help"
+LABEL_PAGE_MACRO_BUTTON = "Macros"
 
 # Loading strings
 LOAD_CONFIG = "reading    "
@@ -428,6 +429,7 @@ TIP_CONFIG_CHOOSE_META = "Enter a metadata identifier for the new config"
 TIP_CONFIG_CHOOSE_NAME = "Enter a directory name for the new config."
 TIP_CONFIG_CHOOSE_NAME_ERROR = "Invalid directory name for the new config."
 TIP_ADD_TO_PAGE = "Add to page..."
+TIP_MACRO_RUN_PAGE = "Choose a macro to run for this page"
 TIP_REVERT_PAGE = "Revert page to last save"
 TIP_SUITE_RUN_ARG = "Enter extra suite run arguments"
 TIP_VALUE_ADD_URI = "Add a URI - for example a file path, or a web url"

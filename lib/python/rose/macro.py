@@ -576,11 +576,17 @@ def run_macros(app_config, meta_config, config_name, macro_names,
     macros_not_found = [m for m in macro_names]
     for module_name, class_name, method, help in macro_tuples:
         this_macro_name = ".".join([module_name, class_name])
+        this_macro_method_name = ".".join([this_macro_name, method])
         if this_macro_name in macro_names:
             macros_by_type.setdefault(method, [])
             macros_by_type[method].append(this_macro_name)
             if this_macro_name in macros_not_found:
                 macros_not_found.remove(this_macro_name)
+        elif this_macro_method_name in macro_names:
+            macros_by_type.setdefault(method, [])
+            macros_by_type[method].append(this_macro_name)
+            if this_macro_method_name in macros_not_found:
+                macros_not_found.remove(this_macro_method_name)
     for macro_name in macros_not_found:
         sys.stderr.write(ERROR_MACRO_NOT_FOUND.format(macro_name))
         RC = 1

@@ -871,31 +871,45 @@ class Handler(object):
             configs = self.data.config.keys()
         else:
             configs = [config_name]
+        if method_name is None:
+            method_names = [rose.macro.VALIDATE_METHOD,
+                            rose.macro.TRANSFORM_METHOD]
+        else:
+            method_names = [method_name]
+        if module_name is not None and config_name is not None:
+            config_mod_prefix = self.data.get_macro_module_prefix(config_name)
+            if not module_name.startswith(config_mod_prefix):
+                module_name = config_mod_prefix + module_name
         for config_name in configs:
             config_data = self.data.config[config_name]
             for module in config_data.macros:
                 if module_name is not None and module.__name__ != module_name:
                     continue
                 for obj_name, obj in inspect.getmembers(module):
-                    if (not hasattr(obj, method_name) or
-                        obj_name.startswith("_") or
-                        not issubclass(obj, rose.macro.MacroBase)):
-                        continue
-                    if class_name is not None and obj_name != class_name:
-                        continue
-                    try:
-                        macro_inst = obj()
-                    except Exception as e:
-                        rose.gtk.util.run_dialog(
-                             rose.gtk.util.DIALOG_TYPE_ERROR,
-                             str(e),
-                             rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                                macro_fullname))
-                        continue
-                    if hasattr(macro_inst, method_name):
-                        macro_data.append((config_name, macro_inst,
-                                           module.__name__, obj_name,
-                                           method_name))
+                    for method_name in method_names:
+                        if (not hasattr(obj, method_name) or
+                            obj_name.startswith("_") or
+                            not issubclass(obj, rose.macro.MacroBase)):
+                            continue
+                        if class_name is not None and obj_name != class_name:
+                            continue
+                        macro_fullname = ".".join([module.__name__,
+                                                   obj_name,
+                                                   method_name])
+                        err_text = (
+                              rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                                                           macro_fullname))
+                        try:
+                            macro_inst = obj()
+                        except Exception as e:
+                            rose.gtk.util.run_dialog(
+                                 rose.gtk.util.DIALOG_TYPE_ERROR,
+                                 str(e), err_text)
+                            continue
+                        if hasattr(macro_inst, method_name):
+                            macro_data.append((config_name, macro_inst,
+                                               module.__name__, obj_name,
+                                               method_name))
         if not macro_data:
             return None
         sorter = rose.config.sort_settings
@@ -915,7 +929,7 @@ class Handler(object):
                               rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
                                                                  macro_fullname))
                 continue
-            if method_name == 'transform':
+            if methname == rose.macro.TRANSFORM_METHOD:
                 if (not isinstance(return_value, tuple) or
                     len(return_value) != 2 or
                     not isinstance(return_value[0], rose.config.ConfigNode) or
@@ -929,7 +943,7 @@ class Handler(object):
                 self.handle_macro_transforms(config_name, macro_fullname,
                                              macro_config, change_list)
                 continue
-            elif method_name == 'validate':
+            elif methname == rose.macro.VALIDATE_METHOD:
                 if not isinstance(return_value, list):
                     self._handle_bad_macro_return(macro_fullname, return_value)
                     continue
