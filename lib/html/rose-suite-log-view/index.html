@@ -245,6 +245,9 @@ $(function() {
         $.each(data["cycle_times"], function(i, cycle_time) {
             $("#cycle_time select").append($("<option/>").text(cycle_time));
         });
+        $("#cycle_times_select_all").click(function() {
+            $("#cycle_time select option").attr("selected", "selected");
+        });
         $("#cycle_time_toggle").click(function() {
             $("#cycle_time").toggle();
         });
@@ -580,7 +583,9 @@ $(function() {
 <select name="cycle_time" multiple="multiple" size="10"
 title="filter cycle times">
 </select>
-<input type="submit" value="ok" />
+<input type="button" id="cycle_times_select_all" name="cycle_times_select_all"
+value="Select All" />
+<input type="submit" value="OK" />
 </form>
 </div>
 <table id="task_list" summary="Task List">
