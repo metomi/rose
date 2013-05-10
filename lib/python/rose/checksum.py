@@ -44,8 +44,7 @@ def get_checksum(name):
 
     path_and_checksum_list = []
     if os.path.isfile(name):
-        m = md5()
-        m.update(open(name).read())
+        m = _load(name)
         path_and_checksum_list.append(("", m.hexdigest()))
     else: # if os.path.isdir(path):
         path_and_checksum_list = []
@@ -53,8 +52,20 @@ def get_checksum(name):
             path = dirpath[len(name) + 1:]
             path_and_checksum_list.append((path, None))
             for filename in filenames:
-                m = md5()
-                m.update(open(os.path.join(dirpath, filename)).read())
+                m = _load(os.path.join(dirpath, filename))
                 filepath = os.path.join(path, filename)
                 path_and_checksum_list.append((filepath, m.hexdigest()))
     return path_and_checksum_list
+
+def _load(source):
+    """Load content of source into an md5 object, and return it."""
+    m = md5()
+    s = open(source)
+    f_bsize = os.statvfs(source).f_bsize
+    while True:
+        bytes = s.read(f_bsize)
+        if not bytes:
+            break
+        m.update(bytes)
+    s.close()
+    return m

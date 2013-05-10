@@ -1314,10 +1314,6 @@ help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
 
       <dd>Target is an empty file.</dd>
 
-      <dt><code>mode=mkdir,source=</code></dt>
-
-      <dd>Target is an empty directory.</dd>
-
       <dt><code>mode=auto,source=SOURCE</code></dt>
 
       <dd>Target is a copy of <var>SOURCE</var>.</dd>
@@ -1327,6 +1323,10 @@ help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
       <dd>Target is created by concatenating the contents of
       <var>SOURCE-LIST</var>. The sources should either be all files or all
       directories.</dd>
+
+      <dt><code>mode=mkdir</code></dt>
+
+      <dd>Target is a directory.</dd>
 
       <dt><code>mode=symlink,source=SOURCE</code></dt>
 
