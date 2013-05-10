@@ -8,6 +8,7 @@ for a full listing of issues for each release.
 ## Next Release (End of 2013-Q1)
 
 This will be the 4th release of Rose.
+This release will be compatible with cylc 5.2.0.
 
 ### Highlight Changes
 
@@ -19,6 +20,11 @@ None yet.
 
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
+
+\#621: rose stem: will now log version control information for each source.
+
+\#617: rose suite-gcontrol: added `--all` option to launch the control
+GUI for all your running suites.
 
 \#605: rose configuration files: added syntax highlight for Kate.
 
