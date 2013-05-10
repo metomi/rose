@@ -18,6 +18,12 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import re
+
+import rose.config_editor
+
+REC_ELEMENT_SECTION = re.compile(r"^(.*)\((.+)\)$")
+
 
 class ConfigDataHelper(object):
 
@@ -40,16 +46,6 @@ class ConfigDataHelper(object):
         node = config.get([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_PROJECT])
         return node is not None
 
-    def is_ns_in_tree(self, ns):
-        spaces = ns.lstrip('/').split('/')
-        subtree = self.data.namespace_tree
-        while spaces:
-            if spaces[0] not in subtree:
-                return False
-            subtree = subtree[spaces[0]][0]
-            spaces.pop(0)
-        return True
-
     def is_ns_sub_data(self, ns):
         """Return whether a namespace is mentioned in summary data."""
         ns_meta = self.data.namespace_meta_lookup.get(ns, {})
@@ -64,8 +60,8 @@ class ConfigDataHelper(object):
 
     def is_ns_content(self, ns):
         """Return whether a namespace has any existing content."""
-        config_name = self.util.split_full_ns(self, ns)[0]
-        for section in self.data.get_sections_from_namespace(ns):
+        config_name = self.util.split_full_ns(self.data, ns)[0]
+        for section in self.get_sections_from_namespace(ns):
             if section in self.data.config[config_name].sections.now:
                 return True
         return self.is_ns_sub_data(ns)
@@ -90,7 +86,7 @@ class ConfigDataHelper(object):
 
     def get_data_for_namespace(self, ns, from_saved=False):
         """Return a list of vars and a list of latent vars for this ns."""
-        config_name = self.util.split_full_ns(self, ns)[0]
+        config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
         allowed_sections = self.get_sections_from_namespace(ns)
         variables = []
@@ -111,7 +107,7 @@ class ConfigDataHelper(object):
     def get_sub_data_for_namespace(self, ns, from_saved=False):
         """Return any sections/variables below this namespace."""
         sub_data = {"sections": {}, "variables": {}}
-        config_name = self.util.split_full_ns(self, ns)[0]
+        config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
         for sect, sect_data in config_data.sections.now.items():
             sect_ns = sect_data.metadata["full_ns"]
@@ -140,7 +136,7 @@ class ConfigDataHelper(object):
         """Return a comment string for this namespace."""
         comment = ""
         comments = []
-        config_name = self.util.split_full_ns(self, ns)[0]
+        config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
         sections = self.get_sections_from_namespace(ns)
         sections.sort(rose.config.sort_settings)
@@ -154,7 +150,7 @@ class ConfigDataHelper(object):
 
     def get_ns_variable(self, var_id, ns):
         """Return a variable with this id in the config specified by ns."""
-        config_name = self.util.split_full_ns(self, ns)[0]
+        config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
         sect, opt = self.util.get_section_option_from_id(var_id)
         var = config_data.vars.get_var(sect, opt)
@@ -169,7 +165,7 @@ class ConfigDataHelper(object):
         sections = ns_metadata.get('sections', [])
         if sections:
             return [s for s in sections]
-        base, subsp = self.util.split_full_ns(self, namespace)
+        base, subsp = self.util.split_full_ns(self.data, namespace)
         ns_section = subsp.replace('/', ':')
         if (ns_section in self.data.config[base].sections.now or
             ns_section in self.data.config[base].sections.latent):
@@ -248,8 +244,9 @@ class ConfigDataHelper(object):
         if config_name not in self.data._config_section_namespace_lookup:
             self.data._config_section_namespace_lookup.setdefault(
                                                 config_name, {})
-        section_ns = self._config_section_namespace_lookup[config_name].get(
-                                                                  section)
+        section_ns = (
+                self.data._config_section_namespace_lookup[config_name].get(
+                                                                  section))
         if section_ns is None:
             config_data = self.data.config[config_name]
             meta_config = config_data.meta
@@ -274,8 +271,8 @@ class ConfigDataHelper(object):
             section_ns = config_name + '/' + subspace
             if not subspace:
                 section_ns = config_name
-            self._config_section_namespace_lookup[config_name].update(
-                                           {section: section_ns})
+            self.data._config_section_namespace_lookup[config_name].update(
+                                                {section: section_ns})
         return section_ns
 
     def get_format_sections(self, config_name):
@@ -299,7 +296,7 @@ class ConfigDataHelper(object):
 
     def get_ns_ignored_status(self, namespace):
         """Return the ignored status for a namespace's data."""
-        config_name = self.util.split_full_ns(self, namespace)[0]
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
         sections = self.get_sections_from_namespace(namespace)
         status = rose.config.ConfigNode.STATE_NORMAL

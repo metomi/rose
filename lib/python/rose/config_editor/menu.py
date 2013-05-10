@@ -18,31 +18,23 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-import copy
 import inspect
-import itertools
-import os
-import re
 import shlex
 import subprocess
-import sys
-import time
-import urllib
-import webbrowser
 
 import pygtk
 pygtk.require('2.0')
 import gtk
 
 import rose.config
-import rose.config_editor.util
+import rose.config_editor
 import rose.external
 import rose.gtk.run
 import rose.gtk.util
 import rose.macro
 import rose.macros
-from rose.suite_control import SuiteControl
-from rose.suite_log_view import SuiteLogViewGenerator
+import rose.suite_control
+import rose.suite_log_view
 
 
 class MenuBar(object):
@@ -664,7 +656,7 @@ class MainMenuHandler(object):
     def handle_run_scheduler(self, *args):
         """Run the scheduler for this suite."""
         this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
-        return SuiteControl().gcontrol(this_id)
+        return rose.suite_control.SuiteControl().gcontrol(this_id)
     
     def help(self, *args):
         # Handle a GUI help request.
@@ -680,7 +672,7 @@ class MainMenuHandler(object):
     def launch_scheduler(self, *args):
         """Run the scheduler for a suite open in config edit."""
         this_id = self.data.top_level_name
-        return SuiteControl().gcontrol(this_id)
+        return rose.suite_control.SuiteControl().gcontrol(this_id)
         
     def launch_terminal(self):
         # Handle a launch terminal request.
@@ -688,7 +680,7 @@ class MainMenuHandler(object):
 
     def launch_output_viewer(self):
         """View a suite's output, if any."""
-        g = SuiteLogViewGenerator()
+        g = rose.suite_log_view.SuiteLogViewGenerator()
         url = g.get_suite_log_url(self.data.top_level_name)
         if url is None:
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,

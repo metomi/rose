@@ -20,6 +20,9 @@
 
 import copy
 
+import rose.config_editor
+import rose.config_editor.stack
+
 
 class VariableOperations(object):
 
@@ -74,12 +77,13 @@ class VariableOperations(object):
         else:
             config_data.vars.now.setdefault(sect, [])
             config_data.vars.now[sect].append(variable)
-            self.__undo_stack.append(StackItem(
-                                        variable.metadata['full_ns'],
-                                        rose.config_editor.STACK_ACTION_ADDED,
-                                        copy_var,
-                                        self.remove_var,
-                                        [copy_var, skip_update]))
+            self.__undo_stack.append(
+                   rose.config_editor.stack.StackItem(
+                                      variable.metadata['full_ns'],
+                                      rose.config_editor.STACK_ACTION_ADDED,
+                                      copy_var,
+                                      self.remove_var,
+                                      [copy_var, skip_update]))
             del self.__redo_stack[:]
         if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
@@ -107,12 +111,13 @@ class VariableOperations(object):
                 config_data.vars.latent.setdefault(sect, [])
                 config_data.vars.latent[sect].append(variable)
         copy_var = variable.copy()
-        self.__undo_stack.append(StackItem(
-                                    variable.metadata['full_ns'],
-                                    rose.config_editor.STACK_ACTION_REMOVED,
-                                    copy_var,
-                                    self.add_var,
-                                    [copy_var, skip_update]))
+        self.__undo_stack.append(
+                    rose.config_editor.stack.StackItem(
+                                variable.metadata['full_ns'],
+                                rose.config_editor.STACK_ACTION_REMOVED,
+                                copy_var,
+                                self.add_var,
+                                [copy_var, skip_update]))
         del self.__redo_stack[:]
         if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
@@ -194,11 +199,13 @@ class VariableOperations(object):
                     if err_type in variable.error:
                         variable.error.pop(err_type)
         copy_var = variable.copy()
-        self.__undo_stack.append(StackItem(variable.metadata['full_ns'],
-                                           action_text,
-                                           copy_var,
-                                           self.set_var_ignored,
-                                           [copy_var, old_reason, True]))
+        self.__undo_stack.append(
+                    rose.config_editor.stack.StackItem(
+                                       variable.metadata['full_ns'],
+                                       action_text,
+                                       copy_var,
+                                       self.set_var_ignored,
+                                       [copy_var, old_reason, True]))
         del self.__redo_stack[:]
         self.trigger_ignored_update(variable)
         self.trigger_update(variable.metadata['full_ns'])
@@ -212,7 +219,7 @@ class VariableOperations(object):
         variable.old_value = variable.value
         variable.value = new_value
         copy_var = variable.copy()
-        self.__undo_stack.append(StackItem(
+        self.__undo_stack.append(rose.config_editor.stack.StackItem(
                                     variable.metadata['full_ns'],
                                     rose.config_editor.STACK_ACTION_CHANGED,
                                     copy_var,
@@ -228,7 +235,7 @@ class VariableOperations(object):
         old_comments = copy_variable.comments
         variable.comments = comments
         self.__undo_stack.append(
-                    StackItem(
+                    rose.config_editor.stack.StackItem(
                             variable.metadata['full_ns'],
                             rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
                             copy_variable,

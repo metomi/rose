@@ -23,6 +23,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
+import rose.config_editor.stack
 import rose.gtk.util
 
 

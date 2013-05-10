@@ -1,15 +1,47 @@
+# -*- coding: utf-8 -*-
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-3 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
 
 
-class NamespaceTreeManager(object):
+import rose.config_editor
+
+
+class NavTreeManager(object):
 
     """This controls the navigation namespace tree structure."""
     
-    def __init__(self, data, util, data_helper, tree_trigger_update):
+    def __init__(self, data, util, tree_trigger_update):
         self.data = data
         self.util = util
-        self.data_helper = data_helper
         self.tree_trigger_update = tree_trigger_update
         self.namespace_tree = {}  # Stores the namespace hierarchy
+
+    def is_ns_in_tree(self, ns):
+        """Determine if the namespace is in the tree or not."""
+        spaces = ns.lstrip('/').split('/')
+        subtree = self.data.namespace_tree
+        while spaces:
+            if spaces[0] not in subtree:
+                return False
+            subtree = subtree[spaces[0]][0]
+            spaces.pop(0)
+        return True
 
     def reload_namespace_tree(self, only_this_namespace=None,
                               only_this_config_name=None):
@@ -50,8 +82,6 @@ class NamespaceTreeManager(object):
             self.data.load_node_namespaces(config_name)
             for section_data in config_data.sections.get_all(
                                             no_latent=not view_missing):
-                if section_data.metadata["id"] not in config_data.sections.now:
-                    print "LATENT", section_data.metadata["id"], section_data.metadata["full_ns"]
                 ns = section_data.metadata["full_ns"]
                 self.data.namespace_meta_lookup.setdefault(ns, {})
                 self.data.namespace_meta_lookup[ns].setdefault(
@@ -98,9 +128,8 @@ class NamespaceTreeManager(object):
             change = ""
             meta = self.data.namespace_meta_lookup.get(this_ns, {})
             meta.setdefault('title', spaces[0])
-            latent_status = not self.data_helper.is_ns_content(this_ns)
-            ignored_status = self.data_helper.get_ns_ignored_status(this_ns)
-            print "Set", this_ns, repr(latent_status), repr(ignored_status)
+            latent_status = not self.data.helper.is_ns_content(this_ns)
+            ignored_status = self.data.helper.get_ns_ignored_status(this_ns)
             statuses = {rose.config_editor.SHOW_MODE_LATENT: latent_status,
                         rose.config_editor.SHOW_MODE_IGNORED: ignored_status}
             subtree.setdefault(spaces[0], [{}, meta, statuses, change])

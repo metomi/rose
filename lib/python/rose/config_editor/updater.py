@@ -1,23 +1,48 @@
+# -*- coding: utf-8 -*-
+#-----------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-3 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-----------------------------------------------------------------------------
+
+import rose.config_editor
 
 
 class Updater(object):
 
     """This handles the updating of various statuses and displays."""
 
-    def __init__(self, data, util, main_handle,
+    def __init__(self, data, util, mainwindow, main_handle,
                  generate_pagelist_func, loader_update_func,
                  update_bar_sensitivity_func,
-                 refresh_metadata_func)
+                 refresh_metadata_func,
+                 is_pluggable=False):
         self.data = data
         self.util = util
+        self.mainwindow = mainwindow
         self.main_handle = main_handle
         self.generate_pagelist_func = generate_pagelist_func
         self.pagelist = []  # This is the current list of pages open.
+        self.load_errors = 0
         self.loader_update_func = loader_update_func
         self.update_bar_sensitivity_func = update_bar_sensitivity_func
         self.refresh_metadata_func = refresh_metadata_func
+        self.is_pluggable = is_pluggable
 
-    def _namespace_data_is_modified(self, namespace):
+    def namespace_data_is_modified(self, namespace):
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         if config_name is None:
             return ""
@@ -90,7 +115,7 @@ class Updater(object):
     def refresh_ids(self, config_name, setting_ids, is_loading=False,
                     are_errors_done=False):
         """Refresh and redraw settings if needed."""
-        self._generate_pagelist_func()
+        self.generate_pagelist_func()
         nses_to_do = []
         for changed_id in setting_ids:
             sect, opt = self.util.get_section_option_from_id(changed_id)
@@ -126,7 +151,7 @@ class Updater(object):
             configs = [only_this_config]
         for config_name in configs:
             self.update_config(config_name)
-        self._generate_pagelist_func()
+        self.generate_pagelist_func()
        
         for ns in unique_namespaces:
             if ns in [p.namespace for p in self.pagelist]:
@@ -153,7 +178,7 @@ class Updater(object):
     def update_namespace(self, namespace, are_errors_done=False,
                          is_loading=False, skip_config_update=False):
         """Update driver function. Updates the page if open."""
-        self._generate_pagelist_func()
+        self.generate_pagelist_func()
         if namespace in [p.namespace for p in self.pagelist]:
             index = [p.namespace for p in self.pagelist].index(namespace)
             page = self.pagelist[index]
@@ -177,7 +202,7 @@ class Updater(object):
     def update_status(self, page, are_errors_done=False,
                       skip_config_update=False):
         """Update ignored statuses and update the tree statuses."""
-        self._generate_pagelist_func()
+        self.generate_pagelist_func()
         self.sync_page_var_lists(page)
         if not skip_config_update:
             self.update_config(page.namespace)
@@ -262,7 +287,7 @@ class Updater(object):
         # Check for triggering variables that have changed values
         self.data.trigger_id_value_lookup.setdefault(config_name, {})
         trig_id_val_dict = self.data.trigger_id_value_lookup[config_name]
-        trigger = self.trigger[config_name]
+        trigger = self.data.trigger[config_name]
         allowed_sections = self.data.helper.get_sections_from_namespace(
                                                               namespace)
         updated_ids = []
@@ -335,7 +360,7 @@ class Updater(object):
     def update_ignoreds(self, config_name, var_id):
         """Update the variable ignored flags ('reasons')."""
         config_data = self.data.config[config_name]
-        trigger = self.trigger[config_name]
+        trigger = self.data.trigger[config_name]
         
         config = config_data.config
         meta_config = config_data.meta
@@ -483,7 +508,7 @@ class Updater(object):
         name_tree = namespace.lstrip('/').split('/')
         if icon_bool is None:
             if icon_type == 'changed' or icon_type is None:
-                change = self._namespace_data_is_modified(namespace)
+                change = self.namespace_data_is_modified(namespace)
                 self.nav_panel.update_change(name_tree, change)
                 self.nav_panel.set_row_icon(name_tree, bool(change),
                                             ind_type='changed')
@@ -496,7 +521,7 @@ class Updater(object):
 
     def update_stack_viewer_if_open(self):
         """Update the information in the stack viewer, if open."""
-        if self.pluggable:
+        if self.is_pluggable:
             return False
         if isinstance(self.mainwindow.log_window,
                       rose.config_editor.stack.StackViewer):
@@ -507,7 +532,7 @@ class Updater(object):
         if "/" not in namespace:
             return False
         summary_namespace = namespace.rsplit("/", 1)[0]
-        self._generate_pagelist_func()
+        self.generate_pagelist_func()
         page_namespaces = [p.namespace for p in self.pagelist]
         if summary_namespace not in page_namespaces:
             return False

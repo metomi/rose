@@ -18,16 +18,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-import copy
-import inspect
-import itertools
 import os
-import re
-import shlex
-import subprocess
-import sys
 import time
-import urllib
 import webbrowser
 
 import pygtk
@@ -36,13 +28,7 @@ import gtk
 
 import rose.config
 import rose.config_editor.util
-import rose.external
-import rose.gtk.run
 import rose.gtk.util
-import rose.macro
-import rose.macros
-from rose.suite_control import SuiteControl
-from rose.suite_log_view import SuiteLogViewGenerator
 
 
 
@@ -263,7 +249,7 @@ class NavPanelHandler(object):
         if namespace is None:
             return metadata, comments
         metadata = self.data.namespace_meta_lookup.get(namespace, {})
-        comments = self.data.get_ns_comment_string(namespace)
+        comments = self.data.helper.get_ns_comment_string(namespace)
         return metadata, comments
 
     def info_request(self, namespace):
@@ -272,7 +258,7 @@ class NavPanelHandler(object):
             return False
         config_name, subsp = self.util.split_full_ns(self.data, namespace)
         config_data = self.data.config[config_name]
-        sections = self.data.get_sections_from_namespace(namespace)
+        sections = self.data.helper.get_sections_from_namespace(namespace)
         search_function = lambda i: self.search_request(namespace, i)
         for section in sections:
             sect_data = config_data.sections.now.get(section)
@@ -283,7 +269,7 @@ class NavPanelHandler(object):
     def rename_request(self, base_ns, new_section, skip_update=False):
         """Implement a rename (delete + add)."""
         namespace = "/" + base_ns.lstrip("/")
-        sections = self.data.get_sections_from_namespace(namespace)
+        sections = self.data.helper.get_sections_from_namespace(namespace)
         if len(sections) != 1:
             return False
         start_stack_index = len(self.undo_stack)
@@ -344,8 +330,10 @@ class NavPanelHandler(object):
             is_top = (namespace in self.data.config.keys())
             is_fixable = bool(self.get_ns_errors(namespace))
             has_content = self.data.is_ns_content(namespace)
-            ignored_sections = self.data.get_ignored_sections(config_name)
-            enabled_sections = self.data.get_enabled_sections(config_name)
+            ignored_sections = self.data.helper.get_ignored_sections(
+                                                    config_name)
+            enabled_sections = self.data.helper.get_enabled_sections(
+                                                    config_name)
             
             metadata, comments = self.get_ns_metadata_and_comments(namespace)
             if is_fixable:
@@ -447,7 +435,7 @@ class NavPanelHandler(object):
 
     def is_ns_duplicate(self, namespace):
         """Lookup whether a page can be cloned, via the metadata."""
-        sections = self.data.get_sections_from_namespace(namespace)
+        sections = self.data.helper.get_sections_from_namespace(namespace)
         if len(sections) != 1:
             return False
         section = sections.pop()
@@ -462,11 +450,12 @@ class NavPanelHandler(object):
         """Count the number of errors in a namespace."""
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
-        sections = self.data.get_sections_from_namespace(namespace)
+        sections = self.data.helper.get_sections_from_namespace(namespace)
         errors = 0
         for section in sections:
             errors += len(config_data.sections.get_sect(section).error)
-        real_data, latent_data = self.data.get_data_for_namespace(namespace)
+        real_data, latent_data = self.data.helper.get_data_for_namespace(
+                                                               namespace)
         errors += sum([len(v.error) for v in real_data + latent_data])
         return errors
 

@@ -60,14 +60,17 @@ import gtk  # Only used to run the main gtk loop.
 
 import rose.config
 import rose.config_editor
-import rose.config_editor.action
 import rose.config_editor.data
 import rose.config_editor.menu
 import rose.config_editor.nav_controller
 import rose.config_editor.nav_panel
 import rose.config_editor.nav_panel_menu
+import rose.config_editor.ops.group
+import rose.config_editor.ops.section
+import rose.config_editor.ops.variable
 import rose.config_editor.page
 import rose.config_editor.stack
+import rose.config_editor.updater
 import rose.config_editor.util
 import rose.config_editor.variable
 import rose.config_editor.window
@@ -105,7 +108,7 @@ class MainController(object):
         if pluggable:
             rose.macro.add_site_meta_paths()
             rose.macro.add_env_meta_paths()
-        self.pluggable = pluggable
+        self.is_pluggable = pluggable
         self.tab_windows = []  # No child windows yet
         self.orphan_pages = []
         self.undo_stack = [] # Nothing to undo yet
@@ -152,37 +155,31 @@ class MainController(object):
                                 self.reload_namespace_tree)
 
         self.nav_controller = (
-                  rose.config_editor.nav_controller.NavPanelController(
+                  rose.config_editor.nav_controller.NavTreeManager(
                                 self.data,
                                 self.util,
-                                self.data_helper,
                                 self.tree_trigger_update))
-        
-        self.trigger = self.data.trigger
 
-        self.data.load(config_directory, config_objs)
-
-        self.loader_update(rose.config_editor.LOAD_STATUSES,
-                           self.data.top_level_name)
         self.mainwindow = rose.config_editor.window.MainWindow()
 
-        self.section_ops = rose.config_editor.stack.SectionOperations(
+        self.section_ops = rose.config_editor.ops.section.SectionOperations(
                                    self.data, self.util,
                                    self.undo_stack, self.redo_stack,
                                    self.check_cannot_enable_setting,
-                                   self.update_namespace,
-                                   self.update_ns_info,
+                                   lambda n: self.updater.update_namespace(n),
+                                   lambda n: self.updater.update_ns_info(n),
                                    view_page_func=self.view_page,
                                    kill_page_func=self.kill_page)
 
-        self.variable_ops = rose.config_editor.stack.VariableOperations(
+        self.variable_ops = (
+                      rose.config_editor.ops.variable.VariableOperations(
                                    self.data, self.util, 
                                    self.undo_stack, self.redo_stack,
                                    self.check_cannot_enable_setting,
-                                   self.update_namespace,
-                                   search_id_func=self.perform_find_by_id)
+                                   lambda n: self.updater.update_namespace(n),
+                                   search_id_func=self.perform_find_by_id))
 
-        self.action = rose.config_editor.action.GroupOperations(
+        self.group_ops = rose.config_editor.ops.group.GroupOperations(
                              self.data, self.util,
                              self.undo_stack, self.redo_stack,
                              self.section_ops,
@@ -212,12 +209,19 @@ class MainController(object):
                              self.perform_find_by_ns_id)
 
         self.updater = rose.config_editor.updater.Updater(
-                             self.data, self.util, self.main_handle,
+                             self.data, self.util, self.mainwindow,
+                             self.main_handle,
                              self._generate_pagelist, self.loader_update,
                              self.update_bar_sensitivity,
-                             self._refresh_metadata_if_on)
+                             self._refresh_metadata_if_on,
+                             self.is_pluggable)
 
-        if not self.pluggable:
+        self.data.load(config_directory, config_objs)
+
+        self.loader_update(rose.config_editor.LOAD_STATUSES,
+                           self.data.top_level_name)
+
+        if not self.is_pluggable:
             self.generate_toolbar()
             self.generate_menubar()
             self.generate_nav_panel()
@@ -225,7 +229,7 @@ class MainController(object):
             self.notebook = rose.gtk.util.Notebook()
 
         # Create the main panel with the menu, toolbar, tree panel, notebook.
-        if not self.pluggable:
+        if not self.is_pluggable:
             self.mainwindow.load(name=self.data.top_level_name,
                                  menu=self.top_menu,
                                  accelerators=self.menubar.accelerators,
@@ -245,7 +249,7 @@ class MainController(object):
         self.updater.update_all(is_loading=True)
         self.loader_update(rose.config_editor.LOAD_DONE,
                            self.data.top_level_name)
-        self.perform_startup_check()
+        self.updater.perform_startup_check()
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
@@ -493,7 +497,7 @@ class MainController(object):
     def generate_nav_panel(self):
         """"Create tree panel and link functions."""
         self.nav_panel = rose.config_editor.nav_panel.PageNavigationPanel(
-                              self.data.namespace_tree,
+                              self.nav_controller.namespace_tree,
                               self.handle_launch_request,
                               self.nav_handle.get_ns_metadata_and_comments,
                               self.nav_handle.popup_panel_menu,
@@ -593,7 +597,7 @@ class MainController(object):
         if has_sub_data:
             sub_data = self.data.helper.get_sub_data_for_namespace(
                                                          namespace_name)
-            sub_ops = self.action.get_sub_ops_for_namespace(namespace_name)
+            sub_ops = self.group_ops.get_sub_ops_for_namespace(namespace_name)
         page_metadata = {'namespace': namespace_name,
                          'ns_is_default': is_default,
                          'label': label,
@@ -609,7 +613,7 @@ class MainController(object):
                          'icon': icon_path}
         if len(sections) == 1:
             page_metadata.update({'id': sections.pop()})
-        sect_ops = rose.config_editor.stack.SectionOperations(
+        sect_ops = rose.config_editor.ops.section.SectionOperations(
                                    self.data, self.util,
                                    self.undo_stack, self.redo_stack,
                                    self.check_cannot_enable_setting,
@@ -617,7 +621,7 @@ class MainController(object):
                                    self.updater.update_ns_info,
                                    view_page_func=self.view_page,
                                    kill_page_func=self.kill_page)
-        var_ops = rose.config_editor.stack.VariableOperations(
+        var_ops = rose.config_editor.ops.variable.VariableOperations(
                                    self.data, self.util, 
                                    self.undo_stack, self.redo_stack,
                                    self.check_cannot_enable_setting,
@@ -835,13 +839,14 @@ class MainController(object):
 
 #------------------ Update functions -----------------------------------------
 
-    def reload_namespace_tree(self, only_this_namespace=None,
-                              only_this_config_name=None):
+    def reload_namespace_tree(self, *args, **kwargs):
         """Redraw the navigation namespace tree."""
-        self.nav_controller.reload_namespace_tree(
-                            only_this_namespace=only_this_namespace,
-                            only_this_config_name=only_this_config_name)
-        
+        self.nav_controller.reload_namespace_tree(*args, **kwargs)
+
+    def tree_trigger_update(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.tree_trigger_update(*args, **kwargs)
+
 #------------------ Page viewer function -------------------------------------
 
     def view_page(self, page_id, var_id=None):
@@ -883,7 +888,7 @@ class MainController(object):
         dirname = self.mainwindow.launch_open_dirname_dialog()
         if dirname is None or not os.path.isdir(dirname):
             return False
-        if (self.data.top_level_directory is None and not self.pluggable):
+        if (self.data.top_level_directory is None and not self.is_pluggable):
             config_objs = {}
             self.data.load_top_config(dirname)
             self.data.saved_config_names = set(self.data.config.keys())
@@ -1027,8 +1032,8 @@ class MainController(object):
                                 for w in self.tab_windows]
                     page_window = self.tab_windows[tab_nses.index(name)]
                     page.window.destroy()
-        self.action.remove_sections(config_name,
-                                    config_data.sections.now.keys())
+        self.group_ops.remove_sections(config_name,
+                                       config_data.sections.now.keys())
         if dirpath is not None:
             try:
                 shutil.rmtree(dirpath)
@@ -1088,7 +1093,7 @@ class MainController(object):
                                           found_error)
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
-            if self._namespace_data_is_modified(config_name):
+            if self.updater.namespace_data_is_modified(config_name):
                 self._update_change_widget_sensitivity(is_changed=True)
                 break
             now_vars = []
@@ -1165,7 +1170,7 @@ class MainController(object):
             self.data.load_ignored_data(config_name)
             self.data.load_metadata_for_namespaces(config_name)
         self.reload_namespace_tree()
-        if self.pluggable:
+        if self.is_pluggable:
             self.updater.update_all()
         if hasattr(self, 'menubar'):
             self.main_handle.load_macro_menu(self.menubar)
@@ -1359,7 +1364,7 @@ class MainController(object):
         return None, None
 
     def check_cannot_enable_setting(self, config_name, setting_id):
-        return setting_id in self.trigger[config_name].get_all_ids()
+        return setting_id in self.data.trigger[config_name].get_all_ids()
 
     def perform_undo(self, redo_mode_on=False):
         """Change focus to the correct page and call an undo or redo.
@@ -1411,7 +1416,7 @@ class MainController(object):
                 self.data.load_ns_for_node(node, config_name)
                 namespace = node.metadata.get('full_ns')
             if (not is_group and
-                self.data.helper.is_ns_in_tree(namespace) and
+                self.nav_controller.is_ns_in_tree(namespace) and
                 not node_is_section):
                 page = self.view_page(namespace, node_id)
             redo_items = [x for x in self.redo_stack]
@@ -1434,7 +1439,7 @@ class MainController(object):
                 self.undo_stack.append(just_done_item)
             else:
                 self.redo_stack.append(just_done_item)
-            if not self.data.helper.is_ns_in_tree(namespace):
+            if not self.nav_controller.is_ns_in_tree(namespace):
                 self.reload_namespace_tree()
             page = None
             if is_group:
@@ -1445,7 +1450,7 @@ class MainController(object):
                 if namespace != stack_item.page_label:
                     namespace_id_map.setdefault(stack_item.page_label, [])
                     namespace_id_map[stack_item.page_label].append(node_id)
-            elif self.data.helper.is_ns_in_tree(namespace):
+            elif self.nav_controller.is_ns_in_tree(namespace):
                 if not node_is_section:
                     # Section operations should not require pages.
                     page = self.view_page(namespace, node_id)
@@ -1496,12 +1501,12 @@ def spawn_window(config_directory_path=None):
         title = config_directory_path.split("/")[-1]
     splash_screen = rose.gtk.splash.SplashScreenProcess(logo, title,
                                                         number_of_events)
-    try:
-        MainController(config_directory_path,
+ #   try:
+    MainController(config_directory_path,
                        loader_update=splash_screen)
-    except BaseException as e:
-        splash_screen.stop()
-        raise e
+  #  except BaseException as e:
+  #      splash_screen.stop()
+  #      raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
