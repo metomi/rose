@@ -44,7 +44,7 @@ Hello and good bye.
 __CONTENT__
 OUT=$(cd config/file && cat hello1 hello2 hello3/text)
 #-------------------------------------------------------------------------------
-tests 50
+tests 59
 #-------------------------------------------------------------------------------
 # Normal mode with free format files.
 TEST_KEY=$TEST_KEY_BASE
@@ -124,6 +124,33 @@ run_pass "$TEST_KEY" rose app-run --config=../config -q \
     --define='[file:hello4/directory]mode=mkdir'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# As above, but directory already exists with a file.
+TEST_KEY=$TEST_KEY_BASE-directory-exists
+setup
+mkdir -p hello4/directory
+touch hello4/directory/file
+run_pass "$TEST_KEY" rose app-run --config=../config -q \
+    --command-key=test-directory \
+    --define='[file:hello4/directory]mode=mkdir'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_test "$TEST_KEY.hello4/directory/file" hello4/directory/file
+teardown
+#-------------------------------------------------------------------------------
+# Normal mode, copying in an executable file.
+TEST_KEY=$TEST_KEY_BASE-file-mod-bits
+setup
+TRUE_PATH=$(which true)
+run_pass "$TEST_KEY" rose app-run --config=../config -q \
+    --define="[file:bin/my-true]source=$TRUE_PATH"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.my-true" 'bin/my-true' "$TRUE_PATH"
+ACT_STAT=$(stat -c %a 'bin/my-true')
+EXP_STAT=$(stat -c %a "$TRUE_PATH")
+run_pass "$TEST_KEY.mod" test "$ACT_STAT" = "$EXP_STAT"
 teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files and an existing file, with --no-overwrite.
