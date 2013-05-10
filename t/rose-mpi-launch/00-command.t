@@ -28,8 +28,9 @@ TEST_KEY=$TEST_KEY_BASE-null
 run_fail "$TEST_KEY" rose mpi-launch
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-usage: 1. rose mpi-launch -f FILE [OPTIONS] [--] [ARGS ...]
-usage: 2. rose mpi-launch [OPTIONS] [--] COMMAND [ARGS ...]
+usage: 1. rose mpi-launch
+usage: 2. rose mpi-launch -f FILE
+usage: 3. rose mpi-launch COMMAND [ARGS ...]
 __ERR__
 #-------------------------------------------------------------------------------
 # Basic.
