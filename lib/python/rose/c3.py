@@ -50,14 +50,14 @@ def mro(target_name, get_base_names, *args, **kwargs):
     base_names_of = {} # {name: base_names_list, ...}
     dependents_of = {}
     stack = [target_name] # list of names not yet in results
-    while results.get(target_name) is None:
+    while target_name not in results:
         name = stack.pop()
-        if results.get(name) is not None:
+        if name in results:
             continue
         base_names_of[name] = get_base_names(name, *args, **kwargs)
         if base_names_of[name]:
             # "name" has parents
-            if all([results.get(n) is not None for n in base_names_of[name]]):
+            if all([n in results for n in base_names_of[name]]):
                 # All parents resolved. Time to merge them.
                 results[name] = [name]
                 # Walk the mro of each parent, breadth 1st.
@@ -94,7 +94,7 @@ def mro(target_name, get_base_names, *args, **kwargs):
                 stack.append(name)
                 dependents = dependents_of.get(name, []) + [name]
                 for base_name in base_names_of[name]:
-                    if results.get(base_name) is None:
+                    if base_name not in results:
                         if base_name in dependents:
                             raise MROError(target_name)
                         dependents_of[base_name] = dependents
@@ -105,7 +105,7 @@ def mro(target_name, get_base_names, *args, **kwargs):
     return results[target_name]
 
 
-if __name__ == "__main__":
+class _Test(object):
 
     """Self tests. Print results in TAP format.
 
@@ -113,89 +113,95 @@ if __name__ == "__main__":
 
     """
 
-    base_names_of = {}
+    def __init__(self):
+        self.base_names_of = {}
+        self.test_num = 0
+        self.test_plan = "1..9"
 
-    def get_base_names(name):
-        global base_names_of
-        return base_names_of[name]
+    def get_base_names(self, name):
+        return self.base_names_of[name]
 
-    n = 0
-    def ok(key, cond):
-        global n
-        n += 1
+    def ok(self, key, cond):
+        self.test_num += 1
         if cond:
-            print "ok %d - %s" % (n, key)
+            print "ok %d - %s" % (self.test_num, key)
         else:
-            print "not ok %d - %s" % (n, key)
+            print "not ok %d - %s" % (self.test_num, key)
 
-    def test(key, actual, expect):
-        ok(key, actual == expect)
+    def test(self, key, actual, expect):
+        self.ok(key, actual == expect)
 
-    print "1..9"
+    def run(self):
+        print self.test_plan
 
-    # Test good cases
-    base_names_of["O"] = []
-    test("zero", mro("O", get_base_names), ["O"])
+        # Test good cases
+        self.base_names_of["O"] = []
+        self.test("zero", mro("O", self.get_base_names), ["O"])
 
-    base_names_of["A1"] = ["O"]
-    base_names_of["A2"] = ["A1"]
-    base_names_of["A3"] = ["A2"]
-    test("single", mro("A3", get_base_names), ["A3", "A2", "A1", "O"])
+        self.base_names_of["A1"] = ["O"]
+        self.base_names_of["A2"] = ["A1"]
+        self.base_names_of["A3"] = ["A2"]
+        self.test("single", mro("A3", self.get_base_names),
+                  ["A3", "A2", "A1", "O"])
 
-    base_names_of["B1"] = ["O"]
-    base_names_of["C1"] = ["O"]
-    base_names_of["X"] = ["C1", "A1"]
-    base_names_of["Y"] = ["C1", "B1"]
-    base_names_of["Z"] = ["Y", "X"]
-    test("diamond-1",
-       mro("Z", get_base_names),
-       ["Z", "Y", "X", "C1", "B1", "A1", "O"])
+        self.base_names_of["B1"] = ["O"]
+        self.base_names_of["C1"] = ["O"]
+        self.base_names_of["X"] = ["C1", "A1"]
+        self.base_names_of["Y"] = ["C1", "B1"]
+        self.base_names_of["Z"] = ["Y", "X"]
+        self.test("diamond-1",
+           mro("Z", self.get_base_names),
+           ["Z", "Y", "X", "C1", "B1", "A1", "O"])
 
-    base_names_of["P"] = ["C1", "A1"]
-    base_names_of["Q"] = ["B1", "C1"]
-    base_names_of["R"] = ["Q", "P"]
-    test("diamond-2",
-       mro("R", get_base_names),
-       ["R", "Q", "B1", "P", "C1", "A1", "O"])
+        self.base_names_of["P"] = ["C1", "A1"]
+        self.base_names_of["Q"] = ["B1", "C1"]
+        self.base_names_of["R"] = ["Q", "P"]
+        self.test("diamond-2",
+           mro("R", self.get_base_names),
+           ["R", "Q", "B1", "P", "C1", "A1", "O"])
 
-    base_names_of["P"] = ["A1", "A2"]
-    test("triangle", mro("P", get_base_names), ["P", "A2", "A1", "O"])
+        self.base_names_of["P"] = ["A1", "A2"]
+        self.test("triangle", mro("P", self.get_base_names),
+                  ["P", "A2", "A1", "O"])
 
-    base_names_of["D1"] = ["O"]
-    base_names_of["E1"] = ["O"]
-    base_names_of["K"] = ["D1", "A1"]
-    base_names_of["L"] = ["D1", "B1", "E1"]
-    base_names_of["M"] = ["A1", "B1", "C1"]
-    base_names_of["N"] = ["M", "L", "K"]
-    test("complex",
-       mro("N", get_base_names),
-       ["N", "M", "L", "K", "D1", "A1", "B1", "C1", "E1", "O"])
+        self.base_names_of["D1"] = ["O"]
+        self.base_names_of["E1"] = ["O"]
+        self.base_names_of["K"] = ["D1", "A1"]
+        self.base_names_of["L"] = ["D1", "B1", "E1"]
+        self.base_names_of["M"] = ["A1", "B1", "C1"]
+        self.base_names_of["N"] = ["M", "L", "K"]
+        self.test("complex", mro("N", self.get_base_names),
+                  ["N", "M", "L", "K", "D1", "A1", "B1", "C1", "E1", "O"])
 
-    # Test bad cases
-    base_names_of["CYCLIC"] = ["CYCLIC"]
-    try:
-        mro("CYCLIC", get_base_names)
-    except MROError as e:
-        test("cyclic", str(e), str(MROError("CYCLIC")))
-    else:
-        ok("cyclic", False)
+        # Test bad cases
+        self.base_names_of["CYCLIC"] = ["CYCLIC"]
+        try:
+            mro("CYCLIC", self.get_base_names)
+        except MROError as e:
+            self.test("cyclic", str(e), str(MROError("CYCLIC")))
+        else:
+            self.ok("cyclic", False)
 
-    base_names_of["CYCLIC1"] = ["CYCLIC3"]
-    base_names_of["CYCLIC2"] = ["CYCLIC1"]
-    base_names_of["CYCLIC3"] = ["CYCLIC2"]
-    try:
-        mro("CYCLIC3", get_base_names)
-    except MROError as e:
-        test("cyclic3", str(e), str(MROError("CYCLIC3")))
-    else:
-        ok("cyclic3", False)
+        self.base_names_of["CYCLIC1"] = ["CYCLIC3"]
+        self.base_names_of["CYCLIC2"] = ["CYCLIC1"]
+        self.base_names_of["CYCLIC3"] = ["CYCLIC2"]
+        try:
+            mro("CYCLIC3", self.get_base_names)
+        except MROError as e:
+            self.test("cyclic3", str(e), str(MROError("CYCLIC3")))
+        else:
+            self.ok("cyclic3", False)
 
-    base_names_of["A1B1"] = ["A1", "B1"]
-    base_names_of["B1A1"] = ["B1", "A1"]
-    base_names_of["BAD"] = ["A1B1", "B1A1"]
-    try:
-        mro("BAD", get_base_names)
-    except MROError as e:
-        test("bad", str(e), str(MROError("BAD")))
-    else:
-        ok("bad", False)
+        self.base_names_of["A1B1"] = ["A1", "B1"]
+        self.base_names_of["B1A1"] = ["B1", "A1"]
+        self.base_names_of["BAD"] = ["A1B1", "B1A1"]
+        try:
+            mro("BAD", self.get_base_names)
+        except MROError as e:
+            self.test("bad", str(e), str(MROError("BAD")))
+        else:
+            self.ok("bad", False)
+
+
+if __name__ == "__main__":
+    _Test().run()
