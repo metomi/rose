@@ -5,10 +5,10 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (End of 2013-Q1)
+## Next Release (2013-05-??)
 
 This will be the 4th release of Rose.
-This release will be compatible with cylc 5.2.0.
+This release is known to work with cylc 5.2.0.
 
 ### Highlight Changes
 
@@ -29,6 +29,14 @@ GUI for all your running suites.
 \#605: rose configuration files: added syntax highlight for Kate.
 
 \#604: rose date -c: new option, short for `rose date $ROSE_TASK_CYCLE_TIME`.
+
+\#603: rose suite-log-view: new `--log-archive-threshold=CYCLE-TIME` option.
+The option switches on job log archiving by specifying a cycle time threshold.
+All job logs at this cycle time or older will be archived.
+
+The HTML view has been modified to load the data of the jobs of selected
+cycle times only. The default view is the latest cycle, but this can be modified
+via a multiple selection box and/or via URL query.
 
 \#595: rosie lookup, rosie ls: now output with column headings.
 

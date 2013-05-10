@@ -778,8 +778,10 @@ class SuiteRunner(Runner):
         # Install items to user@host
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
         queue = [] # [[pipe, command, "ssh"|"rsync", auth], ...]
-        for user, host in sorted(auths):
-            auth = user + "@" + host
+        for auth in sorted(auths):
+            host = auth
+            if "@" in auth:
+                host = auth.split("@", 1)[1]
             command = self.popen.get_cmd("ssh", auth, "bash", "--login", "-c")
             rose_bin = "rose"
             for h in [host, "*"]:
