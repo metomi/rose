@@ -71,8 +71,8 @@ class GroupOperations(object):
         start_stack_index = len(self.undo_stack)
         group = rose.config_editor.STACK_GROUP_ADD + "-" + str(time.time())
         self.sect_ops.add_section(config_name, new_section_name)
-        namespace = self.data.get_default_namespace_for_section(
-                                          new_section_name, config_name)
+        namespace = self.data.helper.get_default_namespace_for_section(
+                                         new_section_name, config_name)
         config_data = self.data.config[config_name]
         if opt_map is None:
             opt_map = {}
@@ -86,7 +86,8 @@ class GroupOperations(object):
         for opt_name, value in opt_map.items():
             var_id = self.util.get_id_from_section_option(
                                            new_section_name, opt_name)
-            metadata = self.data.get_metadata_for_config_id(var_id, config_name)
+            metadata = self.data.helper.get_metadata_for_config_id(
+                                            var_id, config_name)
             metadata['full_ns'] = namespace
             ignored_reason = {}  # This may not be safe.
             var = rose.variable.Variable(opt_name, value,
@@ -119,13 +120,13 @@ class GroupOperations(object):
                 new_section = section_base + "(" + str(i) + ")"
         self.sect_ops.add_section(config_name, new_section,
                                   skip_update=skip_update)
-        new_namespace = self.data.get_default_namespace_for_section(
+        new_namespace = self.data.helper.get_default_namespace_for_section(
                                   new_section, config_name)
         for var in clone_vars:
             var_id = self.util.get_id_from_section_option(
                                            new_section, var.name)
-            metadata = self.data.get_metadata_for_config_id(var_id,
-                                                            config_name)
+            metadata = self.data.helper.get_metadata_for_config_id(
+                                 var_id, config_name)
             var.process_metadata(metadata)
             var.metadata['full_ns'] = new_namespace
         sorter = rose.config.sort_settings
@@ -160,8 +161,8 @@ class GroupOperations(object):
         group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
         nses = []
         for section in sections:
-            ns = self.data.get_default_namespace_for_section(
-                                           section, config_name)
+            ns = self.data.helper.get_default_namespace_for_section(
+                                              section, config_name)
             if ns not in nses:
                 nses.append(ns)
             self.remove_section(config_name, section, skip_update=True)
@@ -184,4 +185,4 @@ class GroupOperations(object):
                 self.remove_section,
                 self.remove_sections,
                 get_var_id_values_func=(
-                        self.data.get_sub_data_var_id_value_map))
+                        self.data.helper.get_sub_data_var_id_value_map))

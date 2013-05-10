@@ -57,7 +57,8 @@ class NavPanelHandler(object):
             if config_name == base_ns:
                 help_str = ''
             else:
-                sections = self.data.get_sections_from_namespace(base_ns)
+                sections = self.data.helper.get_sections_from_namespace(
+                                                              base_ns)
                 if sections == []:
                     help_str = subsp.replace('/', ':')
                 else:
@@ -68,7 +69,7 @@ class NavPanelHandler(object):
         else:
             help_str = None
             config_name = None
-        choices_help = self.data.get_missing_sections(config_name)
+        choices_help = self.data.helper.get_missing_sections(config_name)
         config_names = [n for n in self.data.config]
         config_names.sort(lambda x, y: (y == config_name) -(x == config_name))
         config_name, section = self.mainwindow.launch_add_dialog(
@@ -79,7 +80,7 @@ class NavPanelHandler(object):
     def copy_request(self, base_ns, new_section=None, skip_update=False):
         """Handle a copy request for a section and its options."""
         namespace = "/" + base_ns.lstrip("/")
-        sections = self.data.get_sections_from_namespace(namespace)
+        sections = self.data.helper.get_sections_from_namespace(namespace)
         if len(sections) != 1:
             return False
         section = sections.pop()
@@ -137,7 +138,8 @@ class NavPanelHandler(object):
             config_data = self.data.config[config_name]
             real_sections = config_data.sections.now.keys()
             ns_done.append(ns)
-            real_data, ghost_data = self.data.get_data_for_namespace(ns)
+            real_data, ghost_data = self.data.helper.get_data_for_namespace(
+                                                                  ns)
             var_list = list(real_data)
             var_list.sort(variable_sorter)
             var_list.reverse()
@@ -148,7 +150,7 @@ class NavPanelHandler(object):
                 ns_var_sections.setdefault(ns, {})
                 ns_var_sections[ns].update({sect: True})
             config_name = self.util.split_full_ns(self.data, ns)[0]
-            for section in self.data.get_sections_from_namespace(ns):
+            for section in self.data.helper.get_sections_from_namespace(ns):
                 # Interlinked (in metadata) empty sections may cause problems.
                 if (section not in config_data.vars.now and
                     (section in ns_var_sections.get(ns, []) or
@@ -171,7 +173,8 @@ class NavPanelHandler(object):
         if base_ns is not None and '/' in base_ns:
             config_name, subsp = self.util.split_full_ns(self.data, base_ns)
             prefer_name_sections = {
-                  config_name: self.data.get_sections_from_namespace(base_ns)}
+                  config_name: self.data.helper.get_sections_from_namespace(
+                                                                  base_ns)}
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
@@ -213,7 +216,7 @@ class NavPanelHandler(object):
         base_ns = "/" + base_ns.lstrip("/")
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
         config_data = self.data.config[config_name]
-        sections = self.data.get_sections_from_namespace(base_ns)
+        sections = self.data.helper.get_sections_from_namespace(base_ns)
         for section in list(sections):
             if section not in config_data.sections.now:
                 sections.remove(section)
@@ -329,7 +332,7 @@ class NavPanelHandler(object):
             cloneable = self.is_ns_duplicate(namespace)
             is_top = (namespace in self.data.config.keys())
             is_fixable = bool(self.get_ns_errors(namespace))
-            has_content = self.data.is_ns_content(namespace)
+            has_content = self.data.helper.is_ns_content(namespace)
             ignored_sections = self.data.helper.get_ignored_sections(
                                                     config_name)
             enabled_sections = self.data.helper.get_enabled_sections(

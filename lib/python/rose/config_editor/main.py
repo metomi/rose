@@ -228,6 +228,8 @@ class MainController(object):
             # Create notebook (tabbed container) and connect signals.
             self.notebook = rose.gtk.util.Notebook()
 
+        self.updater.nav_panel = getattr(self, "nav_panel", None)
+
         # Create the main panel with the menu, toolbar, tree panel, notebook.
         if not self.is_pluggable:
             self.mainwindow.load(name=self.data.top_level_name,
@@ -1454,7 +1456,7 @@ class MainController(object):
                 if not node_is_section:
                     # Section operations should not require pages.
                     page = self.view_page(namespace, node_id)
-                    self.sync_page_var_lists(page)
+                    self.updater.sync_page_var_lists(page)
                     page.sort_data()
                     page.refresh(node_id)
                     page.update_ignored()
@@ -1467,12 +1469,12 @@ class MainController(object):
                 self.update_bar_sensitivity()
                 self.updater.update_stack_viewer_if_open()
             if not is_group:
-                self.focus_sub_page_if_open(namespace, node_id)
+                self.updater.focus_sub_page_if_open(namespace, node_id)
         for namespace in set(stack_info):
             self.reload_namespace_tree(namespace)
             # Use the last node_id for a sub page focus (if any).
             focus_id = namespace_id_map[namespace][-1]
-            self.focus_sub_page_if_open(namespace, focus_id)
+            self.updater.focus_sub_page_if_open(namespace, focus_id)
         return True
 
 # ----------------------- System functions -----------------------------------

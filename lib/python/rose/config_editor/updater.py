@@ -41,6 +41,7 @@ class Updater(object):
         self.update_bar_sensitivity_func = update_bar_sensitivity_func
         self.refresh_metadata_func = refresh_metadata_func
         self.is_pluggable = is_pluggable
+        self.nav_panel = None  # This may be set later.
 
     def namespace_data_is_modified(self, namespace):
         config_name = self.util.split_full_ns(self.data, namespace)[0]
@@ -99,7 +100,7 @@ class Updater(object):
         to save time.
 
         """
-        if hasattr(self, 'nav_panel'):
+        if self.nav_panel is not None:
             self.nav_panel.load_tree(None, self.data.namespace_tree)
             if only_this_namespace is None:
                 self.update_all()
@@ -484,7 +485,7 @@ class Updater(object):
 
     def update_tree_status(self, page_or_ns, icon_bool=None, icon_type=None):
         """Update the tree statuses."""
-        if not hasattr(self, 'nav_panel'):
+        if self.nav_panel is None:
             return
         if isinstance(page_or_ns, basestring):
             namespace = page_or_ns

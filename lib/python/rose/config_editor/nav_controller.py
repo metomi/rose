@@ -35,7 +35,7 @@ class NavTreeManager(object):
     def is_ns_in_tree(self, ns):
         """Determine if the namespace is in the tree or not."""
         spaces = ns.lstrip('/').split('/')
-        subtree = self.data.namespace_tree
+        subtree = self.namespace_tree
         while spaces:
             if spaces[0] not in subtree:
                 return False
