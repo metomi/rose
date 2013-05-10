@@ -33,12 +33,14 @@ class MROError(Exception):
        return "%s: cannot resolve MRO" % self.args[0]
 
 
-def mro(target_name, get_base_names):
+def mro(target_name, get_base_names, *args, **kwargs):
     """Resolve MRO for an item.
 
     target_name -- The name of the target item.
     get_base_names -- A callable to return the base names of an item. It should
-                      have the interface: [base1, ...] = get_base_names(name)
+                      have the interface:
+                      [base1, ...] = get_base_names(name, *args, **kwargs)
+    *args and **kwargs -- Optional arguments for get_base_names.
 
     Return a list e.g. [target_name, name, ...] with the correct method
     resolution order.
@@ -52,7 +54,7 @@ def mro(target_name, get_base_names):
         name = stack.pop()
         if results.get(name) is not None:
             continue
-        base_names_of[name] = get_base_names(name)
+        base_names_of[name] = get_base_names(name, *args, **kwargs)
         if base_names_of[name]:
             # "name" has parents
             if all([results.get(n) is not None for n in base_names_of[name]]):

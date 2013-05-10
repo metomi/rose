@@ -72,23 +72,9 @@ class ConfigTreeLoader(object):
                 conf_file_name, more_keys=opt_keys,
                 ignore_missing_more_keys=True)
 
-        def get_base_names(my_conf_dir, conf_name=conf_name, opt_keys=opt_keys,
-                           nodes=nodes):
-            values = shlex.split(nodes[my_conf_dir].get_value(["import"], ""))
-            i_conf_dirs = []
-            for value in values:
-                i_conf_dir = self._search(
-                        value, [os.path.dirname(my_conf_dir)] + conf_dir_paths)
-                i_conf_file_name = os.path.join(i_conf_dir, conf_name)
-                if nodes.get(i_conf_dir) is None:
-                    nodes[i_conf_dir] = self.node_loader.load_with_opts(
-                            i_conf_file_name, more_keys=opt_keys,
-                            ignore_missing_more_keys=True)
-                i_conf_dirs.append(i_conf_dir)
-            return i_conf_dirs
-
         config_tree = ConfigTree()
-        config_tree.conf_dirs = mro(conf_dir, get_base_names)
+        config_tree.conf_dirs = mro(conf_dir, self._get_base_names, conf_name,
+                                    conf_dir_paths, opt_keys, nodes)
 
         config_tree.node = ConfigNode()
         for t_conf_dir in config_tree.conf_dirs:
@@ -110,6 +96,21 @@ class ConfigTreeLoader(object):
         return config_tree
 
     __call__ = load
+
+    def _get_base_names(self, my_conf_dir, conf_name, conf_dir_paths, opt_keys,
+                        nodes):
+        values = shlex.split(nodes[my_conf_dir].get_value(["import"], ""))
+        i_conf_dirs = []
+        for value in values:
+            i_conf_dir = self._search(
+                    value, [os.path.dirname(my_conf_dir)] + conf_dir_paths)
+            i_conf_file_name = os.path.join(i_conf_dir, conf_name)
+            if nodes.get(i_conf_dir) is None:
+                nodes[i_conf_dir] = self.node_loader.load_with_opts(
+                        i_conf_file_name, more_keys=opt_keys,
+                        ignore_missing_more_keys=True)
+            i_conf_dirs.append(i_conf_dir)
+        return i_conf_dirs
 
     def _search(self, conf_dir, conf_dir_paths):
         if os.path.isabs(conf_dir):
