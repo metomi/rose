@@ -8,6 +8,7 @@ for a full listing of issues for each release.
 ## Next Release (End of 2013-Q1)
 
 This will be the 4th release of Rose.
+This release will be compatible with cylc 5.2.0.
 
 ### Highlight Changes
 
