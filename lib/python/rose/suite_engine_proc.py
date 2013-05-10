@@ -270,31 +270,34 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_suite_events(self, suite_name):
+    def get_suite_events(self, suite_name, log_archive_threshold=None):
         """Get suite events.
         Return a data structure that looks like:
-        {   <task_id>: {
-                "name": <name>,
-                "cycle_time": <cycle time string>,
-                "submits": [
-                    {   "events": {
-                            "submit": <seconds-since-epoch>,
-                            "init": <seconds-since-epoch>,
-                            "exit": <seconds-since-epoch>,
+        {   <cycle time string>: {
+                "cycle_time": <cycle time>,
+                "is_archived": True, # if job logs of this cycle are archived
+                "tasks": {
+                    <task name>: [
+                        {   "events": {
+                                "submit": <seconds-since-epoch>,
+                                "init": <seconds-since-epoch>,
+                                "exit": <seconds-since-epoch>,
+                            },
+                            "files": {
+                                "script": {"n_bytes": <n_bytes>},
+                                "out": {"n_bytes": <n_bytes>},
+                                "err": {"n_bytes": <n_bytes>},
+                                # ... more files
+                            },
+                            "signal": <signal-name-if-job-killed-by-signal>,
+                            "status": <"pass"|"fail">,
                         },
-                        "files": {
-                            "script": {"n_bytes": <n_bytes>},
-                            "out": {"n_bytes": <n_bytes>},
-                            "err": {"n_bytes": <n_bytes>},
-                            # ... more files
-                        },
-                        "signal": <signal-name-if-job-killed-by-signal>,
-                        "status": <"pass"|"fail">,
-                    },
-                    # ... more re-submits of the task
-                ]
+                        # ... more re-submits of the task
+                    ],
+                    # ... more task names
+                }
             }
-            # ... more task IDs
+            # ... more cycle times
         }
         """
         raise NotImplementedError()
@@ -329,11 +332,11 @@ class SuiteEngineProcessor(object):
             return "file://" + log_index
 
     def get_task_auth(self, suite_name, task_name):
-        """Return (user, host) for a remote task in a suite."""
+        """Return [user@]host for a remote task in a suite."""
         raise NotImplementedError()
 
     def get_tasks_auths(self, suite_name):
-        """Return a list of (user, host) for remote tasks in a suite."""
+        """Return a list of [user@]host for remote tasks in a suite."""
         raise NotImplementedError()
 
     def get_task_log_dir_rel(self, suite):
