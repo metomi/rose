@@ -26,7 +26,8 @@ class Updater(object):
     """This handles the updating of various statuses and displays."""
 
     def __init__(self, data, util, mainwindow, main_handle,
-                 generate_pagelist_func, loader_update_func,
+                 nav_controller, generate_pagelist_func,
+                 loader_update_func,
                  update_bar_sensitivity_func,
                  refresh_metadata_func,
                  is_pluggable=False):
@@ -34,6 +35,7 @@ class Updater(object):
         self.util = util
         self.mainwindow = mainwindow
         self.main_handle = main_handle
+        self.nav_controller = nav_controller
         self.generate_pagelist_func = generate_pagelist_func
         self.pagelist = []  # This is the current list of pages open.
         self.load_errors = 0
@@ -101,7 +103,8 @@ class Updater(object):
 
         """
         if self.nav_panel is not None:
-            self.nav_panel.load_tree(None, self.data.namespace_tree)
+            self.nav_panel.load_tree(None,
+                                     self.nav_controller.namespace_tree)
             if only_this_namespace is None:
                 self.update_all()
             else:

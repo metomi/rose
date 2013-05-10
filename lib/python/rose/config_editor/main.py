@@ -210,7 +210,7 @@ class MainController(object):
 
         self.updater = rose.config_editor.updater.Updater(
                              self.data, self.util, self.mainwindow,
-                             self.main_handle,
+                             self.main_handle, self.nav_controller,
                              self._generate_pagelist, self.loader_update,
                              self.update_bar_sensitivity,
                              self._refresh_metadata_if_on,
