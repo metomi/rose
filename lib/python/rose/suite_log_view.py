@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+from glob import glob
 import json
 import os
 from rose.config import ConfigLoader
@@ -25,6 +26,7 @@ from rose.fs_util import FileSystemUtil, FileSystemEvent
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
+from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import shutil
 import sys
@@ -118,16 +120,32 @@ class SuiteLogViewGenerator(object):
             except OSError:
                 pass
 
-    def generate(self, suite_name):
-        """Generate the log view for a suite."""
-        return self._chdir(self._generate, suite_name)
+    def generate(self, suite_name, full_mode=False,
+                 log_archive_threshold=None):
+        """Generate the log view for a suite.
+
+        suite_name -- The name of the suite.
+        full_mode -- A boolean to indicate whether a full update is required.
+        log_archive_threshold -- Switch on job log archiving by specifying a
+                                 cycle time threshold. All job logs at this
+                                 cycle time or older will be archived. Implies
+                                 full_mode.
+
+        """
+        return self._chdir(self._generate, suite_name, full_mode,
+                           log_archive_threshold)
 
     __call__ = generate
 
-    def _generate(self, suite_name):
+    def _generate(self, suite_name, full_mode=False,
+                  log_archive_threshold=None):
         # Copy presentation files into the log directory
         html_lib_source = os.path.join(os.getenv("ROSE_HOME"), "lib", "html")
         html_lib_dest = "html-lib"
+        if log_archive_threshold:
+            full_mode = True
+        if full_mode:
+            self.fs_util.delete(html_lib_dest)
         if not os.path.isdir(html_lib_dest):
             external_html_lib_source = os.path.join(html_lib_source,
                                                     "external")
@@ -137,13 +155,15 @@ class SuiteLogViewGenerator(object):
                                               external_html_lib_source))
         this_html_lib_source = os.path.join(html_lib_source, self.NS)
         for name in os.listdir(this_html_lib_source):
-            if not name.startswith(".") and not os.path.isfile(name):
+            if name.startswith("."):
+                continue
+            if full_mode or not os.path.isfile(name):
                 source = os.path.join(this_html_lib_source, name)
                 shutil.copy2(source, ".")
                 self.handle_event(FileSystemEvent(FileSystemEvent.INSTALL,
                                                   name, source))
                 os.utime(name, None)
-        # (Re-)Create JOB.json
+        # (Re-)Create view data file
         suite_info = {}
         suite_info_file_name = self.suite_engine_proc.get_suite_dir(
                 suite_name, "rose-suite.info")
@@ -152,24 +172,44 @@ class SuiteLogViewGenerator(object):
             for key, node in info_conf.value.items():
                 if not node.state:
                     suite_info[key] = node.value
-        data = {"suite": suite_name,
-                "suite_info": suite_info,
-                "tasks": {},
-                "updated_at": time()}
+        main_data = {"suite": suite_name,
+                     "suite_info": suite_info,
+                     "cycle_times": [],
+                     "updated_at": time()}
         suite_db_file = self.suite_engine_proc.get_suite_db_file(suite_name)
         if os.path.exists(suite_db_file):
-            suite_db_file_size_prev = None
-            suite_db_file_size = os.stat(suite_db_file).st_size
-            while suite_db_file_size != suite_db_file_size_prev:
-                data["tasks"] = self.suite_engine_proc.get_suite_events(
-                        suite_name)
-                data["updated_at"] = time()
-                suite_db_file_size_prev = suite_db_file_size
-                suite_db_file_size = os.stat(suite_db_file).st_size
-        f = open("JOB.json", "w")
-        json.dump(data, f, indent=0)
+            prev_mtime = None
+            if not full_mode and os.access(self.NS + ".json",
+                                           os.F_OK | os.R_OK):
+                prev_mtime = os.stat(self.NS + ".json").st_mtime
+            this_mtime = os.stat(suite_db_file).st_mtime
+            while prev_mtime is None or prev_mtime < this_mtime:
+                cycles = self.suite_engine_proc.get_suite_events(
+                        suite_name, log_archive_threshold)
+                for cycle_time, data in cycles.items():
+                    if cycle_time not in main_data["cycle_times"]:
+                        main_data["cycle_times"].append(cycle_time)
+                    f = open(self.NS + "-" + cycle_time + ".json", "wb")
+                    json.dump(data, f, indent=0)
+                    f.close()
+                main_data["updated_at"] = time()
+                prev_mtime = this_mtime
+                this_mtime = os.stat(suite_db_file).st_mtime
+        if not main_data["cycle_times"]:
+            for name in glob(self.NS + "-*.json"):
+                key = name[len(self.NS) + 1 : -len(".json")]
+                if key != "latest":
+                    main_data["cycle_times"].append(key)
+        if main_data["cycle_times"]:
+            main_data["cycle_times"].sort()
+            main_data["cycle_times"].reverse()
+            self.fs_util.symlink(
+                    self.NS + "-" + main_data["cycle_times"][0] + ".json",
+                    self.NS + "-latest.json")
+        f = open(self.NS + ".json", "wb")
+        json.dump(main_data, f, indent=0)
         f.close()
-        self.handle_event(FileSystemEvent("update", "JOB.json"))
+        self.handle_event(FileSystemEvent("update", self.NS + ".json"))
         return
 
     def update_job_log(self, suite_name, task_ids=None):
@@ -202,7 +242,8 @@ class SuiteLogViewGenerator(object):
 
 def main():
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("full_mode", "web_browser_mode")
+    opt_parser.add_my_options("full_mode", "log_archive_threshold",
+                              "web_browser_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -222,11 +263,9 @@ def suite_log_view(opts, args, report=None):
         suite_name = args.pop(0)
     else:
         suite_name = os.path.basename(os.getcwd())
-    if opts.full_mode:
-        gen.update_job_log(suite_name)
-    elif args:
+    if not opts.full_mode and args:
         gen.update_job_log(suite_name, tasks=args)
-    gen(suite_name)
+    gen(suite_name, opts.full_mode, opts.log_archive_threshold)
     if opts.web_browser_mode:
         return gen.view_suite_log_url(suite_name)
     else:

@@ -57,7 +57,7 @@ class FCMMakeApp(BuiltinApp):
         auth = app_runner.suite_engine_proc.get_task_auth(
                 t.suite_name, task2_name)
         if auth is not None:
-            target = "@".join(auth) + ":"
+            target = auth + ":"
             if use_pwd:
                 target += os.path.join(t.suite_dir_rel, "work", t.task_id)
             else:

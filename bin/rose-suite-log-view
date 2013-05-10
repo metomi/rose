@@ -37,9 +37,12 @@
 #     display the log view unless --no-web-browse is specified.
 #
 # OPTIONS
-#     --no-web-browse
-#         Do not open a web browser to display the log view.
 #     --full, -f
 #         Re-sync all remote task logs, regardless of the TASK arguments.
+#     --log-archive-threshold=CYCLE-TIME
+#         Switch on job log archiving by specifying a cycle time threshold. All
+#         job logs at this cycle time or older will be archived. Implies --full.
+#     --no-web-browse
+#         Do not open a web browser to display the log view.
 #-------------------------------------------------------------------------------
 exec python -m rose.suite_log_view "$@"
