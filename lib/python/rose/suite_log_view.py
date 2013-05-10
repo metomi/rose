@@ -122,7 +122,16 @@ class SuiteLogViewGenerator(object):
 
     def generate(self, suite_name, full_mode=False,
                  log_archive_threshold=None):
-        """Generate the log view for a suite."""
+        """Generate the log view for a suite.
+
+        suite_name -- The name of the suite.
+        full_mode -- A boolean to indicate whether a full update is required.
+        log_archive_threshold -- Switch on job log archiving by specifying a
+                                 cycle time threshold. All job logs at this
+                                 cycle time or older will be archived. Implies
+                                 full_mode.
+
+        """
         return self._chdir(self._generate, suite_name, full_mode,
                            log_archive_threshold)
 
@@ -133,6 +142,8 @@ class SuiteLogViewGenerator(object):
         # Copy presentation files into the log directory
         html_lib_source = os.path.join(os.getenv("ROSE_HOME"), "lib", "html")
         html_lib_dest = "html-lib"
+        if log_archive_threshold:
+            full_mode = True
         if full_mode:
             self.fs_util.delete(html_lib_dest)
         if not os.path.isdir(html_lib_dest):

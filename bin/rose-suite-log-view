@@ -41,7 +41,7 @@
 #         Re-sync all remote task logs, regardless of the TASK arguments.
 #     --log-archive-threshold=CYCLE-TIME
 #         Switch on job log archiving by specifying a cycle time threshold. All
-#         job logs at this cycle time or older will be archived.
+#         job logs at this cycle time or older will be archived. Implies --full.
 #     --no-web-browse
 #         Do not open a web browser to display the log view.
 #-------------------------------------------------------------------------------
