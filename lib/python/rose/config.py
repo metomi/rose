@@ -54,6 +54,7 @@ What about the standard library ConfigParser? Well, it is problematic:
 
 """
 
+import errno
 import os.path
 import re
 from rose.env import env_var_escape
@@ -372,7 +373,8 @@ class ConfigLoader(object):
             + char_assign
             + r"\s*(?P<value>.*)$")
 
-    def load_with_opts(self, source, node=None, more_keys=None):
+    def load_with_opts(self, source, node=None, more_keys=None,
+                       ignore_missing_more_keys=False):
         """Read a source configuration file with optional configurations.
 
         Arguments:
@@ -381,6 +383,8 @@ class ConfigLoader(object):
         more_keys -- a list of additional optional configuration names. If
                      source is "rose-${TYPE}.conf", the file of each name
                      should be "opt/rose-${TYPE}-${NAME}.conf".
+        ignore_missing_more_keys -- a flag to indicate whether non-existent
+                                    more_keys should be ignored or not.
 
         Return node.
         
@@ -401,7 +405,13 @@ class ConfigLoader(object):
             opt_conf_file_name_base = source_root + "-" + key + source_ext
             opt_conf_file_name = os.path.join(
                     source_dir, "opt", opt_conf_file_name_base)
-            self.load(opt_conf_file_name, node)
+            if os.access(opt_conf_file_name, os.F_OK | os.R_OK):
+                self.load(opt_conf_file_name, node)
+            elif ignore_missing_more_keys and key in more_keys:
+                continue
+            else:
+                raise OSError(errno.ENOENT, os.strerror(errno.ENOENT),
+                              opt_conf_file_name)
         return node
 
     def load(self, source, node=None):
