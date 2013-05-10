@@ -20,6 +20,11 @@ None yet.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#621: rose stem: will now log version control information for each source.
+
+\#617: rose suite-gcontrol: added `--all` option to launch the control
+GUI for all your running suites.
+
 \#605: rose configuration files: added syntax highlight for Kate.
 
 \#604: rose date -c: new option, short for `rose date $ROSE_TASK_CYCLE_TIME`.
