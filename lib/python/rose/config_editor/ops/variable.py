@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 
 import copy
+import time
 
 import rose.config_editor
 import rose.config_editor.stack
@@ -77,8 +78,14 @@ class VariableOperations(object):
             # At the moment, assume this should just be skipped.
             pass
         else:
+            group = None
             if sect not in config_data.sections.now:
+                start_stack_index = len(self.__undo_stack)
+                group = (rose.config_editor.STACK_GROUP_ADD + "-" +
+                         str(time.time()))
                 self.__add_section_func(config_name, sect)
+                for item in self.__undo_stack[start_stack_index:]:
+                    item.group = group
             config_data.vars.now.setdefault(sect, [])
             config_data.vars.now[sect].append(variable)
             self.__undo_stack.append(
@@ -87,7 +94,8 @@ class VariableOperations(object):
                                       rose.config_editor.STACK_ACTION_ADDED,
                                       copy_var,
                                       self.remove_var,
-                                      [copy_var, skip_update]))
+                                      [copy_var, skip_update],
+                                      group=group))
             del self.__redo_stack[:]
         if not skip_update:
             self.trigger_update(variable.metadata['full_ns'])
