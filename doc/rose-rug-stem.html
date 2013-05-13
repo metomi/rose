@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide: rose-stem</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose User Guide: rose-stem</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide explains how to use the 
+      <samp>rose-stem</samp> testing system, and the motivation behind it.
+      </p>
+
+      <p><samp>rose-stem</samp> requires the use of 
+      <a href="https://github.com/metomi/fcm">FCM</a> as it requires some of
+      the version control information.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="motivation">Motivation</h2>
+
+      <p>Why do we test code?</p>
+
+    </div>
+    <div class="slide">
+      <h3 class="alwayshidden">Motivation II</h3>
+      
+      <p>Most people would answer something along the lines of &quot;so we know
+      it works&quot;.</p>
+
+      <p>However, this is really asking two related but separate questions.</p>
+      
+      <p>
+      <ul>
+      <li> Does the code do what I meant it to do? </li>
+      <li> Does the code do anything I didn't mean it to do? </li>
+      </ul>
+      </p>
+    </div>
+      
+    <div class="slide">
+      <h3 class="alwayshidden">Motivation III</h3>
+      <p> Answering the first question may involve writing a bespoke test and
+      checking the results. The second question can at least partially be 
+      answered by using an automated testing system which runs predefined
+      tasks and presents the answers. <samp>rose-stem</samp> is a system
+      for doing this.</p>
+      
+      <p><i>N.B. When writing tests for new code, they should be added to the 
+      testing system so that future developers can be confident that they
+      haven't broken the new functionality.</i></p>
+    </div>
+
+
+    <div class="slide">
+      <h2>Introduction</h2>
+
+      <p>There are two components in rose-stem:</p>
+      
+      <p><ul>
+      <li><samp>rose-stem</samp> - the command line tool which executes an 
+      appropriate suite.</li>
+      <li><samp>rose-ana</samp> - a Rose task app which can compare the result
+      of a task against a control.</li></ul></p>
+
+    <p>We will describe each in turn. It
+    is intended that a test suite lives alongside the code in the same
+    version-controlled project, which should encourage developers to update the
+    test suite when they update the code. This means that the test suite will
+    always be a valid test of the code it is accompanying.</p>
+
+    </div>
+
+    <div class="slide">
+      <h2 id="rose-stem">Running a suite with <samp>rose-stem</samp></h2>
+      
+      <p>The <code>rose stem</code> command is essentially a wrapper to
+      <code>rose suite-run</code>, which accepts some additional arguments
+      and converts them to Jinja2 variables which the suite can interpret.</p>
+      
+      <p>These arguments are: <ul>
+      <li><code>--source</code> - specifies a source tree to include in a 
+      suite.</li>
+      <li><code>--group</code> - specifies a group of tasks to run.</li>
+      </ul>
+      <p>A <i>group</i> is a set of Rose tasks which together test a certain
+      configuration of a program.</p>
+    </div>
+
+   <div class="slide">
+     <h2>The <code>--source</code> argument</h2>
+     
+     <p>The source argument provides a set of Jinja2 variables which can then
+     be included in any compilation tasks in a suite. You can specify
+     multiple <code>--source</code> arguments on the command line. For example:
+     </p>
+     <pre>
+rose stem --source=/path/to/workingcopy --source=fcm:other_project_tr@head
+</pre>     
+     <p>Each source 
+     tree is associated with a project (via an <samp>fcm</samp> command) when
+     <code>rose stem</code> is run on the command line. This project name 
+     is then used in the construction of the Jinja2 variable names.
+     </p>
+     
+     
+  </div>
+
+  <div class="slide">
+      <h3 class="alwayshidden">Source II</h3>
+
+     <p>Each project has a Jinja2 variable <code>SOURCE_FOO</code> where FOO
+     is the project name. This contains a space-separated list of all 
+     source trees belonging to that project, which can then be given to an
+     appropriate build task in the suite so it builds those source trees.<p>
+
+      <p>The first source specified must be a working copy which contains the 
+      <samp>rose-stem</samp> suite. The suite is expected to be in a 
+      subdirectory named <code>rose-stem</code> off the top of the working copy.
+      This source is used to generate two additional variables:</p>
+      <p><ul>
+      <li><code>SOURCE_FOO_BASE</code> - the base directory of the project</li>
+      <li><code>SOURCE_FOO_REV</code> - the revision of the project (if any)
+      </li>
+      </ul></p>
+      
+      <p>These settings <b>override</b> the variables in the 
+      <code>rose-suite.conf</code> file.</p>
+      
+  </div>
+
+<div class="slide">
+  <h3 class="alwayshidden">Source III</h3>
+        <p>These should allow the use of configuration files which control the
+      build process inside the working copy, e.g. you can refer to:
+      <pre>
+      {{SOURCE_FOO_BASE}}/fcm-make/configs/machine.cfg{{SOURCE_FOO_REV}}</pre>
+      </p>
+
+<p>If you omit the source argument, <samp>rose-stem</samp> defaults to assuming
+</p>
+<pre>
+rose stem --source=.
+</pre>
+<p>viz. that the current directory is part of the working copy which should be
+added as a source tree.</p>
+</div>
+    <div class="slide">
+      <h2>The <code>--group</code> argument</h2>
+
+      <p>The group argument is used to provide a Pythonic list of groups
+      in the variable <samp>RUN_NAMES</samp> which can then be looped
+      over in a suite to switch sets of tasks on and off. </p>
+      
+      <p>Each <code>--group</code> argument adds another group to the list.
+      For example:</p>
+      
+      <pre>
+rose stem --group=mygroup --group=myothergroup
+</pre>
+<p>runs two groups named <i>mygroup</i> and <i>myothergroup</i> with the current
+working copy. The suite will then interpret these into a set of tasks which
+build with the given source tree(s), run the program, and compare the output.
+</p>
+    </div>
+
+  <div class="slide">
+    <h2 id="rose-ana">Comparing output with <samp>rose-ana</samp></h2>
+
+    <p>Any task beginning with <i>rose_ana_</i> will be interpreted by Rose as
+    a <samp>rose-ana</samp> task, and run through the <samp>rose-ana</samp>
+    task app.</p>
+    
+    <p>A <samp>rose-ana</samp> <code>rose-app.conf</code> file contains a series
+    of blocks which each contain the names of two files to compare, a method of
+    extracting the data from the file, and a method to compare the data. Each 
+    block is given a human-readable description of the test.</p>
+  </div>
+  
+  <div class="slide">
+    <h3 class="alwayshidden">rose-ana II</h3>
+    <p>For example:</p>
+    <p><pre>
+  [Compare data from myfile]
+  comparison=Exact
+  extract=OutputGrepper:'data value:(\d+)'
+  kgo1file=/data/kgo/myfile
+  resultfile=../run.1/myfile
+    </pre></p>
+    
+    <p>This tells <samp>rose-ana</samp> to take the contents of the file
+    <code>../run.1/myfile</code> (which is relative to the <samp>rose-ana</samp>
+    task's <code>work</code> directory) and the contents of 
+    <code>/data/kgo/myfile</code> and run the built-in OutputGrepper method
+    on each file. This particular method runs an arbitrary regular expression on the file,
+    producing a list of items which match the first group. In this case, the
+    regular expression is <code>data value:(\d+)</code>. The comparison method
+    is exact, so anything other than an exact match will cause a failure.
+    </p>
+  </div>
+
+  <div class="slide">
+    <h3 class="alwayshidden">rose-ana III</h3>
+    <p>It is possible to add additional comparison and extraction methods to
+    <samp>rose-ana</samp> by setting the <code>method-path</code> variable in
+    the <code>rose-ana</code> section of the <code>rose.conf</code> file.</p>
+    
+  <p>A list of available methods can be found by listing the contents of the
+  <code>lib/python/rose/apps/comparisons</code> subdirectory inside your 
+  <samp>Rose</samp> installation. The default installation includes:
+  <ul><li><samp>OutputGrepper</samp> - an extraction method for running regular 
+  expressions on files</li>
+  <li><samp>Exact</samp> - a comparison method for comparing two lists are 
+  identical</li>
+  <li><samp>Within</samp> - a comparison method for comparing that the contents
+  of one list are within a certain percentagge or range of the other. This uses
+  an additional <code>tolerance</code> value in the <code>rose-app.conf</code> 
+  file</li></ul></p>
+
+  </div>
+
+  <div class="slide">
+  <h2 id="summary">Summary</h2>
+  
+  <p>From within a working copy, running <samp>rose-stem</samp> is simple. Just run
+<pre class="shell">
+rose stem --group=groupname
+</pre>
+replacing the groupname with the desired task. <samp>rose-stem</samp> should 
+then automatically pick up the working copy and run the requested tests on it.
+</p>
+
+<p>For further information about writing your own <samp>rose-stem</samp>
+test suite, please see the <a href="rose-rug-advanced-tutorials-rose-stem.html">
+advanced tutorial</a> on the subject.</p>
+</div>
+</body>
+</html>

@@ -30,7 +30,7 @@ from rose.reporter import Reporter, Event
 import rose.run
 
 DEFAULT_TEST_DIR = 'rose-stem'
-OPTIONS = ['source', 'task', ]
+OPTIONS = ['group', 'source', 'task', ]
 SUITE_RC_PREFIX = '[jinja2:suite.rc]'
 
 
@@ -264,11 +264,11 @@ class StemRunner(object):
                                 + base + '"')
 
         # Generate the variable containing tasks to run
-        if self.opts.task:
+        if self.opts.group:
             if not self.opts.defines:
                 self.opts.defines = []
             self.opts.defines.append(SUITE_RC_PREFIX + 'RUN_NAMES=' + 
-                                     str(self.opts.task))
+                                     str(self.opts.group))
 
         # Change into the suite directory
         if self.opts.conf_dir:

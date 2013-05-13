@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide - Rose-stem Tutorial spaceship_command.f90</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="../../../rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="../../../rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="../../../rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "../../../google-code-prettify/prettify.css" />
+  <script type="text/javascript" src="../../../jquery.min.js">
+</script>
+  <script type="text/javascript" src=
+  "../../../google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="../../../prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="../../../rose-doc.js">
+</script>
+  <script type="text/javascript" src="../../../rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address><img id="rose-icon" src="../../../rose-icon.png" alt="Rose" />
+
+    <p><a href="../../../">Rose Documentation</a></p>
+  </div>
+
+  <div id="body-main">
+    <h2>spaceship_command.f90</h2>
+    <pre>
+PROGRAM spaceship_command
+
+IMPLICIT NONE
+
+INTEGER, PARAMETER :: tmax = 10 ! Number of timesteps
+
+REAL :: position(3) = 0.0
+REAL :: velocity(3) = 0.0 
+REAL :: acceleration(3) = 0.0
+REAL :: thrust(3, tmax) = 0.0
+REAL :: mass = 1.0
+
+! Timestep
+REAL, PARAMETER :: dt = 1.0 
+
+INTEGER :: i, j
+
+NAMELIST /spaceship/ position, mass
+NAMELIST /command/ thrust
+
+OPEN(UNIT=1, FILE='spaceship.NL', ACTION='read', STATUS='old')
+READ(1, NML=spaceship)
+CLOSE(UNIT=1)
+
+OPEN(UNIT=2, FILE='command.NL', ACTION='read', STATUS='old')
+READ(2, NML=command)
+CLOSE(UNIT=2)
+
+OPEN(UNIT=3, FILE='output.txt')
+WRITE(3, *) 'Time: t=0.0'
+WRITE(3, *) 'Position: ',position(1),',',position(2),',',position(3)
+WRITE(3, *) 'Velocity: ',velocity(1),',',velocity(2),',',velocity(3)
+WRITE(3, '(/)')
+
+DO i = 1, tmax
+  acceleration = thrust(:, i) / mass
+  velocity = velocity + acceleration * dt
+  position = position + velocity * dt
+  WRITE(3, *) 'Time: t=',dt * i
+  WRITE(3, *) 'Acceleration:',acceleration(1),',',acceleration(2),',',acceleration(3)
+  WRITE(3, *) 'Position: ',position(1),',',position(2),',',position(3)
+  WRITE(3, *) 'Velocity: ',velocity(1),',',velocity(2),',',velocity(3)
+  WRITE(3, '(/)')
+END DO
+
+CLOSE(UNIT=3)
+
+END PROGRAM spaceship_command
+</pre>
+  </div>
+</body>
+</html>
