@@ -121,6 +121,10 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
 
+    def get_cycle_log_archive_name(self, cycle_time):
+        """Return the jobs log archive file name of a given cycle time."""
+        return "job-" + cycle_time + ".tar.gz"
+
     def get_suite_db_file(self, suite_name):
         """Return the path to the suite runtime database file."""
         return self.get_suite_dir(suite_name, "cylc-suite.db")
@@ -233,7 +237,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
         # Job log files
         for cycle_time, datum in data.items():
-            archive_file_name = "job-" + cycle_time + ".tar.gz"
+            archive_file_name = self.get_cycle_log_archive_name(cycle_time)
             # Job logs of this cycle already archived
             if os.access(archive_file_name, os.F_OK | os.R_OK):
                 datum["is_archived"] = True
