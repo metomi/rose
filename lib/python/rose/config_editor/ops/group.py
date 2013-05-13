@@ -62,7 +62,8 @@ class GroupOperations(object):
         self.view_page_func = view_page_func
         self.reload_ns_tree_func = reload_ns_tree_func
 
-    def add_section_with_options(self, config_name, new_section_name, opt_map=None):
+    def add_section_with_options(self, config_name, new_section_name,
+                                 opt_map=None):
         """Add a section and any compulsory options.
         
         Any option-value pairs in the opt_map dict will also be added.
@@ -177,12 +178,60 @@ class GroupOperations(object):
         if not namespace.startswith("/"):
             namespace = "/" + namespace
         config_name, subsp = self.util.split_full_ns(self.data, namespace)
-        return rose.config_editor.stack.SubDataOperations(
-                config_name,
-                self.add_section_with_options,
-                self.copy_section,
-                self.sect_ops.ignore_section,
-                self.remove_section,
-                self.remove_sections,
-                get_var_id_values_func=(
-                        self.data.helper.get_sub_data_var_id_value_map))
+        return SubDataOperations(
+                    config_name,
+                    self.add_section_with_options,
+                    self.copy_section,
+                    self.sect_ops.ignore_section,
+                    self.remove_section,
+                    self.remove_sections,
+                    get_var_id_values_func=(
+                            self.data.helper.get_sub_data_var_id_value_map))
+
+
+class SubDataOperations(object):
+
+    """Class to hold a selected set of functions."""
+
+    def __init__(self, config_name,
+                 add_section_func, clone_section_func,
+                 ignore_section_func, remove_section_func,
+                 remove_sections_func,
+                 get_var_id_values_func):
+        self.config_name = config_name
+        self._add_section_func = add_section_func
+        self._clone_section_func = clone_section_func
+        self._ignore_section_func = ignore_section_func
+        self._remove_section_func = remove_section_func
+        self._remove_sections_func = remove_sections_func
+        self._get_var_id_values_func = get_var_id_values_func
+
+    def add_section(self, new_section_name, opt_map=None):
+        """Add a new section, complete with any compulsory variables."""
+        return self._add_section_func(self.config_name, new_section_name,
+                                      opt_map=opt_map)
+
+    def clone_section(self, clone_section_name):
+        """Copy a (duplicate) section and all its options."""
+        return self._clone_section_func(self.config_name, clone_section_name)
+
+    def ignore_section(self, ignore_section_name, is_ignored):
+        """User-ignore or enable a section."""
+        return self._ignore_section_func(
+                            self.config_name,
+                            ignore_section_name,
+                            is_ignored)
+
+    def remove_section(self, remove_section_name):
+        """Remove a section and all its options."""
+        return self._remove_section_func(self.config_name,
+                                         remove_section_name)
+
+    def remove_sections(self, remove_sections_list):
+        """Remove a list of sections and all their options."""
+        return self._remove_sections_func(self.config_name,
+                                          remove_sections_list)
+
+    def get_var_id_values(self):
+        """Return a map of all var id values."""
+        return self._get_var_id_values_func(self.config_name)

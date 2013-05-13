@@ -294,6 +294,32 @@ class ConfigDataHelper(object):
                 break
         return icon_path
 
+    def get_ignored_sections(self, namespace, get_enabled=False):
+        """Return the user-ignored sections for this namespace.
+
+        If namespace is a config_name, return all config ignored
+        sections.
+
+        Return enabled sections instead if get_enabled is True.
+
+        """
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
+        config_data = self.data.config[config_name]
+        if namespace == config_name:
+            sections = config_data.sections.now.keys()
+        else:
+            sections = self.get_sections_from_namespace(namespace)
+        return_sections = []
+        for section in sections:
+            sect_data = config_data.sections.get_sect(section)
+            if get_enabled:
+                if not sect_data.ignored_reason:
+                    return_sections.append(section)
+            elif (rose.variable.IGNORED_BY_USER in
+                  sect_data.ignored_reason):
+                return_sections.append(section)
+        return return_sections
+
     def get_ns_ignored_status(self, namespace):
         """Return the ignored status for a namespace's data."""
         config_name = self.util.split_full_ns(self.data, namespace)[0]

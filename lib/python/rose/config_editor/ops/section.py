@@ -36,6 +36,7 @@ class SectionOperations(object):
                  update_ns_func=rose.config_editor.false_function,
                  update_info_func=rose.config_editor.false_function,
                  update_comments_func=rose.config_editor.false_function,
+                 update_tree_func=rose.config_editor.false_function,
                  search_id_func=rose.config_editor.false_function,
                  view_page_func=rose.config_editor.false_function,
                  kill_page_func=rose.config_editor.false_function):
@@ -46,6 +47,7 @@ class SectionOperations(object):
         self.check_cannot_enable_setting = check_cannot_enable_func
         self.trigger_update = update_ns_func
         self.trigger_info_update = update_info_func
+        self.trigger_reload_tree = update_tree_func
         self.search_id_func = search_id_func
         self.view_page_func = view_page_func
         self.kill_page_func = kill_page_func
@@ -77,7 +79,7 @@ class SectionOperations(object):
         new_section_data.process_metadata(metadata)
         ns = new_section_data.metadata["full_ns"]
         if not skip_update:
-            self.__data.reload_namespace_tree(ns)
+            self.trigger_reload_tree(ns)
         copy_section_data = new_section_data.copy()
         stack_item = rose.config_editor.stack.StackItem(
                           ns,
@@ -199,7 +201,7 @@ class SectionOperations(object):
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
         if not skip_update:
-            self.__data.reload_namespace_tree(only_this_namespace=namespace)
+            self.trigger_reload_tree(only_this_namespace=namespace)
 
     def set_section_comments(self, config_name, section, comments):
         """Change the comments field for the section object."""

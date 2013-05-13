@@ -257,7 +257,7 @@ class NavPanelHandler(object):
 
     def info_request(self, namespace):
         """Handle a request for namespace info."""
-        if base_ns is None:
+        if namespace is None:
             return False
         config_name, subsp = self.util.split_full_ns(self.data, namespace)
         config_data = self.data.config[config_name]
@@ -294,10 +294,10 @@ class NavPanelHandler(object):
         else:
             namespace = "/" + base_ns.lstrip("/")
         ui_config_string = """<ui> <popup name='Popup'>
-                              <menuitem action="Add..."/>"""
+                              <menuitem action="Add"/>"""
         actions = [('New', gtk.STOCK_NEW,
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),
-                   ('Add...', gtk.STOCK_ADD,
+                   ('Add', gtk.STOCK_ADD,
                     rose.config_editor.TREE_PANEL_ADD_GENERIC),
                    ('Add section', gtk.STOCK_ADD,
                     rose.config_editor.TREE_PANEL_ADD_SECTION),
@@ -307,11 +307,11 @@ class NavPanelHandler(object):
                     rose.config_editor.TREE_PANEL_CLONE_SECTION),
                    ('Edit', gtk.STOCK_EDIT,
                     rose.config_editor.TREE_PANEL_EDIT_SECTION),
-                   ('Enable...', gtk.STOCK_YES,
+                   ('Enable', gtk.STOCK_YES,
                     rose.config_editor.TREE_PANEL_ENABLE_GENERIC),
                    ('Enable section', gtk.STOCK_YES,
                     rose.config_editor.TREE_PANEL_ENABLE_SECTION),
-                   ('Ignore...', gtk.STOCK_NO,
+                   ('Ignore', gtk.STOCK_NO,
                     rose.config_editor.TREE_PANEL_IGNORE_GENERIC),
                    ('Ignore section', gtk.STOCK_NO,
                     rose.config_editor.TREE_PANEL_IGNORE_SECTION),
@@ -321,7 +321,7 @@ class NavPanelHandler(object):
                     rose.config_editor.TREE_PANEL_HELP_SECTION),
                    ('URL', gtk.STOCK_HOME,
                     rose.config_editor.TREE_PANEL_URL_SECTION),
-                   ('Remove...', gtk.STOCK_DELETE,
+                   ('Remove', gtk.STOCK_DELETE,
                     rose.config_editor.TREE_PANEL_REMOVE_GENERIC),
                    ('Remove section', gtk.STOCK_DELETE,
                     rose.config_editor.TREE_PANEL_REMOVE_SECTION)]
@@ -334,9 +334,9 @@ class NavPanelHandler(object):
             is_fixable = bool(self.get_ns_errors(namespace))
             has_content = self.data.helper.is_ns_content(namespace)
             ignored_sections = self.data.helper.get_ignored_sections(
-                                                    config_name)
-            enabled_sections = self.data.helper.get_enabled_sections(
-                                                    config_name)
+                                                namespace)
+            enabled_sections = self.data.helper.get_ignored_sections(
+                                                namespace, get_enabled=True)
             
             metadata, comments = self.get_ns_metadata_and_comments(namespace)
             if is_fixable:
@@ -465,6 +465,7 @@ class NavPanelHandler(object):
     def get_ns_ignored(self, base_ns):
         """Lookup the ignored status of a namespace's data."""
         namespace = "/" + base_ns.lstrip("/")
+        return self.data.helper.get_ns_ignored_status(namespace)
 
     def get_can_show_page(self, latent_status, ignored_status):
         """Lookup whether to display a page based on the data status."""

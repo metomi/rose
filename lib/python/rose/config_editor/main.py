@@ -163,18 +163,20 @@ class MainController(object):
         self.mainwindow = rose.config_editor.window.MainWindow()
 
         self.section_ops = rose.config_editor.ops.section.SectionOperations(
-                                   self.data, self.util,
-                                   self.undo_stack, self.redo_stack,
-                                   self.check_cannot_enable_setting,
-                                   lambda n: self.updater.update_namespace(n),
-                                   lambda n: self.updater.update_ns_info(n),
-                                   view_page_func=self.view_page,
-                                   kill_page_func=self.kill_page)
+                                self.data, self.util,
+                                self.undo_stack, self.redo_stack,
+                                self.check_cannot_enable_setting,
+                                lambda n: self.updater.update_namespace(n),
+                                lambda n: self.updater.update_ns_info(n),
+                                update_tree_func=self.reload_namespace_tree,
+                                view_page_func=self.view_page,
+                                kill_page_func=self.kill_page)
 
         self.variable_ops = (
                       rose.config_editor.ops.variable.VariableOperations(
                                    self.data, self.util, 
                                    self.undo_stack, self.redo_stack,
+                                   self.section_ops.add_section,
                                    self.check_cannot_enable_setting,
                                    lambda n: self.updater.update_namespace(n),
                                    search_id_func=self.perform_find_by_id))
@@ -211,7 +213,7 @@ class MainController(object):
         self.updater = rose.config_editor.updater.Updater(
                              self.data, self.util, self.mainwindow,
                              self.main_handle, self.nav_controller,
-                             self._generate_pagelist, self.loader_update,
+                             self._get_pagelist, self.loader_update,
                              self.update_bar_sensitivity,
                              self._refresh_metadata_if_on,
                              self.is_pluggable)
@@ -626,6 +628,7 @@ class MainController(object):
         var_ops = rose.config_editor.ops.variable.VariableOperations(
                                    self.data, self.util, 
                                    self.undo_stack, self.redo_stack,
+                                   sect_ops.add_section,
                                    self.check_cannot_enable_setting,
                                    self.updater.update_namespace,
                                    search_id_func=self.perform_find_by_id)
@@ -768,7 +771,7 @@ class MainController(object):
         self.data.load_node_namespaces(config_name)
         self.updater.update_status(page)
 
-    def _generate_pagelist(self):
+    def _get_pagelist(self):
         """Load an attribute self.pagelist with a list of open pages."""
         self.pagelist = []
         if hasattr(self, 'notebook'):
@@ -780,9 +783,10 @@ class MainController(object):
                 if hasattr(window.get_child(), 'panel_data'):
                     self.pagelist.append(window.get_child())
         self.pagelist.extend(self.orphan_pages)
+        return self.pagelist
 
     def _get_current_page(self):
-        self._generate_pagelist()
+        self._get_pagelist()
         if not self.pagelist:
             return None
         for window in self.tab_windows:
@@ -814,7 +818,7 @@ class MainController(object):
 
     def _set_page_var_show_modes(self, key, is_key_allowed):
         self.page_var_show_modes[key] = is_key_allowed
-        self._generate_pagelist()
+        self._get_pagelist()
         for page in self.pagelist:
             page.react_to_show_modes(key, is_key_allowed)
         if (hasattr(self, "menubar") and 
@@ -825,7 +829,7 @@ class MainController(object):
 
     def kill_page(self, namespace):
         """Destroy a page if it has the same namespace as the argument."""
-        self._generate_pagelist()
+        self._get_pagelist()
         for page in self.pagelist:
             if page.namespace == namespace:
                 if page.namespace in self.notebook.get_page_ids():
@@ -861,7 +865,7 @@ class MainController(object):
             current_page.set_main_focus(var_id)
             self.handle_page_change()  # Just to make sure.
             return current_page
-        self._generate_pagelist()
+        self._get_pagelist()
         if (page_id not in [p.namespace for p in self.pagelist]):
             self.handle_launch_request(page_id, as_new=True)
             n = self.notebook.get_current_page()
@@ -956,7 +960,7 @@ class MainController(object):
                 config_sections.latent_save.update({section: data.copy()})
         self.data.saved_config_names = set(self.data.config.keys())
         # Update open pages.
-        self._generate_pagelist()
+        self._get_pagelist()
         for page in self.pagelist:
             page.refresh_widget_status()
         # Update everything else.
@@ -1023,7 +1027,7 @@ class MainController(object):
         dirpath = config_data.directory
         nses = self.data.helper.get_all_namespaces(config_name)
         nses.remove(config_name)
-        self._generate_pagelist()
+        self._get_pagelist()
         for page in self.pagelist:
             name = self.util.split_full_ns(self.data, page.namespace)[0]
             if name == config_name:
@@ -1184,7 +1188,7 @@ class MainController(object):
                 if ns not in namespaces_updated:
                     self.updater.update_tree_status(ns, icon_type='changed')
                     namespaces_updated.append(ns)
-        self._generate_pagelist()
+        self._get_pagelist()
         current_page, current_id = self._get_current_page_and_id()
         current_namespace = None
         if current_page is not None:
@@ -1229,7 +1233,7 @@ class MainController(object):
         if current_namespace is not None:
             config_name = self.util.split_full_ns(self.data,
                                                   current_namespace)[0]
-            self._generate_pagelist()
+            self._get_pagelist()
             if config_name in configs:
                 if current_namespace in [p.namespace for p in self.pagelist]:
                     self.view_page(current_namespace, current_id)
@@ -1383,7 +1387,7 @@ class MainController(object):
             stack = self.undo_stack
         if not stack:
             return False
-        self._generate_pagelist()
+        self._get_pagelist()
         do_list = [stack[-1]]
         # We should undo/redo all same-grouped items together.
         for stack_item in reversed(stack[:-1]):

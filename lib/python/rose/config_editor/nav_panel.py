@@ -488,7 +488,6 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         ignored_status = model.get_value(iter_, 9)
         child_iter = model.iter_children(iter_)
         is_visible = self._ask_can_show_func(latent_status, ignored_status)
-        print "get should show", model.get_value(iter_, 3), repr(latent_status), repr(ignored_status), "?", is_visible
         if child_iter is None:
             # We only cache rows with no children to avoid parent updates.
             self.visible_iter_map.update({iter_: is_visible})

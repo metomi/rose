@@ -26,7 +26,7 @@ class Updater(object):
     """This handles the updating of various statuses and displays."""
 
     def __init__(self, data, util, mainwindow, main_handle,
-                 nav_controller, generate_pagelist_func,
+                 nav_controller, get_pagelist_func,
                  loader_update_func,
                  update_bar_sensitivity_func,
                  refresh_metadata_func,
@@ -36,7 +36,7 @@ class Updater(object):
         self.mainwindow = mainwindow
         self.main_handle = main_handle
         self.nav_controller = nav_controller
-        self.generate_pagelist_func = generate_pagelist_func
+        self.get_pagelist_func = get_pagelist_func
         self.pagelist = []  # This is the current list of pages open.
         self.load_errors = 0
         self.loader_update_func = loader_update_func
@@ -119,7 +119,7 @@ class Updater(object):
     def refresh_ids(self, config_name, setting_ids, is_loading=False,
                     are_errors_done=False):
         """Refresh and redraw settings if needed."""
-        self.generate_pagelist_func()
+        self.pagelist = self.get_pagelist_func()
         nses_to_do = []
         for changed_id in setting_ids:
             sect, opt = self.util.get_section_option_from_id(changed_id)
@@ -155,7 +155,7 @@ class Updater(object):
             configs = [only_this_config]
         for config_name in configs:
             self.update_config(config_name)
-        self.generate_pagelist_func()
+        self.pagelist = self.get_pagelist_func()
        
         for ns in unique_namespaces:
             if ns in [p.namespace for p in self.pagelist]:
@@ -182,7 +182,7 @@ class Updater(object):
     def update_namespace(self, namespace, are_errors_done=False,
                          is_loading=False, skip_config_update=False):
         """Update driver function. Updates the page if open."""
-        self.generate_pagelist_func()
+        self.pagelist = self.get_pagelist_func()
         if namespace in [p.namespace for p in self.pagelist]:
             index = [p.namespace for p in self.pagelist].index(namespace)
             page = self.pagelist[index]
@@ -206,7 +206,7 @@ class Updater(object):
     def update_status(self, page, are_errors_done=False,
                       skip_config_update=False):
         """Update ignored statuses and update the tree statuses."""
-        self.generate_pagelist_func()
+        self.pagelist = self.get_pagelist_func()
         self.sync_page_var_lists(page)
         if not skip_config_update:
             self.update_config(page.namespace)
@@ -242,7 +242,8 @@ class Updater(object):
     def sync_page_var_lists(self, page):
         """Make sure the list of page variables has the right members."""
         config_name = self.util.split_full_ns(self.data, page.namespace)[0]
-        real, miss = self.data.helper.get_data_for_namespace(page.namespace)
+        real, miss = self.data.helper.get_data_for_namespace(
+                                                   page.namespace)
         page_real, page_miss = page.panel_data, page.ghost_data
         refresh_vars = []
         action_vsets = [(page_real.remove, set(page_real) - set(real)),
@@ -536,7 +537,7 @@ class Updater(object):
         if "/" not in namespace:
             return False
         summary_namespace = namespace.rsplit("/", 1)[0]
-        self.generate_pagelist_func()
+        self.pagelist = self.get_pagelist_func()
         page_namespaces = [p.namespace for p in self.pagelist]
         if summary_namespace not in page_namespaces:
             return False
