@@ -387,7 +387,9 @@ class ConfigPage(gtk.VBox):
         button_list = []
         label_list = []
         # No content warning, if applicable.
-        if self.section is None and self.sub_data is None:
+        if (self.section is None and
+            not self.ghost_data and
+            self.sub_data is None):
             info = rose.config_editor.PAGE_WARNING_NO_CONTENT
             tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
             error_button = rose.gtk.util.CustomButton(
@@ -423,7 +425,9 @@ class ConfigPage(gtk.VBox):
                       as_tool=True,
                       tip_text=rose.config_editor.ERROR_ORPHAN_SECTION_TIP)
                 error_label = gtk.Label()
-                error_label.set_text(rose.config_editor.ERROR_ORPHAN_SECTION)
+                info = rose.config_editor.ERROR_ORPHAN_SECTION.format(
+                                                       self.section.name)
+                error_label.set_text(info)
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)

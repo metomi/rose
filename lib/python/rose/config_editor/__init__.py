@@ -192,7 +192,7 @@ ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
 ERROR_NO_OUTPUT = "No output found for {0}"
 ERROR_NOT_FOUND = "Could not find path: {0}"
 ERROR_NOT_REGEX = "Could not compile expression: {0}\nError info: {1}"
-ERROR_ORPHAN_SECTION = "Orphaned section: will not be output in a file."
+ERROR_ORPHAN_SECTION = "Orphaned section: {0} will not be output at runtime."
 ERROR_ORPHAN_SECTION_TIP = "Error: orphaned section!"
 ERROR_REMOVE_FILE = "Could not remove file {0}: {1}"
 ERROR_RUN_MACRO_TITLE = "Error in running {0}"
@@ -203,9 +203,9 @@ IGNORED_STATUS_DEFAULT = "from default."
 IGNORED_STATUS_MANUAL = "from manual intervention."
 IGNORED_STATUS_MACRO = "from macro."
 PAGE_WARNING = "Error ({0}): {1}"
-PAGE_WARNING_IGNORED_SECTION = "Section {0} is ignored."
+PAGE_WARNING_IGNORED_SECTION = "Ignored section: {0}"
 PAGE_WARNING_IGNORED_SECTION_TIP = "Ignored section"
-PAGE_WARNING_NO_CONTENT = "This page has no associated data."
+PAGE_WARNING_NO_CONTENT = "No data associated with this page."
 PAGE_WARNING_NO_CONTENT_TIP = ("No associated configuration or summary data " +
                                "for this page.")
 WARNING_APP_CONFIG_CREATE = "Cannot create another configuration here."
@@ -379,9 +379,13 @@ STACK_VIEW_TITLE = "Undo and Redo Stack Viewer"
 
 # Page names
 
+TITLE_PAGE_IGNORED_MARKUP = "<b>{0}</b> {1}"
 TITLE_PAGE_INFO = "suite info"
-TITLE_PAGE_LATENT = "<i>{0}</i>"
-TITLE_PAGE_MARKUP = "<b>{0}</b>"
+TITLE_PAGE_LATENT_COLOUR = "grey"
+TITLE_PAGE_LATENT_MARKUP = ("<span foreground='" +
+                            TITLE_PAGE_LATENT_COLOUR +
+                            "'><i>{0}</i>" + "</span>")
+TITLE_PAGE_ROOT_MARKUP = "<b>{0}</b>"
 TITLE_PAGE_SUITE = "suite conf"
 TREE_PANEL_MAX_EXPANDED = 5
 

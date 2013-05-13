@@ -198,7 +198,14 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         title = model.get_value(r_iter, index)
         title = rose.gtk.util.safe_str(title)
         if len(model.get_path(r_iter)) == 1:
-            title = rose.config_editor.TITLE_PAGE_MARKUP.format(title)
+            title = rose.config_editor.TITLE_PAGE_ROOT_MARKUP.format(title)
+        latent_status = model.get_value(r_iter, 8)
+        ignored_status = model.get_value(r_iter, 9)
+        if latent_status:
+            title = rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(title)
+        if ignored_status:
+            title = rose.config_editor.TITLE_PAGE_IGNORED_MARKUP.format(
+                                                  ignored_status, title)
         cell.set_property("markup", title)
 
     def sort_tree_items(self, row_item_1, row_item_2):
@@ -482,16 +489,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def _get_should_show(self, model, iter_):
         # Determine whether to show a row.
-        if iter_ in self.visible_iter_map:
-            return self.visible_iter_map[iter_]
         latent_status = model.get_value(iter_, 8)
         ignored_status = model.get_value(iter_, 9)
         child_iter = model.iter_children(iter_)
         is_visible = self._ask_can_show_func(latent_status, ignored_status)
-        if child_iter is None:
-            # We only cache rows with no children to avoid parent updates.
-            self.visible_iter_map.update({iter_: is_visible})
-            return self.visible_iter_map[iter_]
         if is_visible:
             return True
         while child_iter is not None:

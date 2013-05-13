@@ -21,7 +21,7 @@
 This module contains the core processing of the config editor.
 
 Classes:
-    MainController - driver for loading, and handles updates.
+    MainController - driver for loading and central coordination.
 
 """
 
@@ -618,20 +618,21 @@ class MainController(object):
         if len(sections) == 1:
             page_metadata.update({'id': sections.pop()})
         sect_ops = rose.config_editor.ops.section.SectionOperations(
-                                   self.data, self.util,
-                                   self.undo_stack, self.redo_stack,
-                                   self.check_cannot_enable_setting,
-                                   self.updater.update_namespace,
-                                   self.updater.update_ns_info,
-                                   view_page_func=self.view_page,
-                                   kill_page_func=self.kill_page)
+                                self.data, self.util,
+                                self.undo_stack, self.redo_stack,
+                                self.check_cannot_enable_setting,
+                                self.updater.update_namespace,
+                                self.updater.update_ns_info,
+                                update_tree_func=self.reload_namespace_tree,
+                                view_page_func=self.view_page,
+                                kill_page_func=self.kill_page)
         var_ops = rose.config_editor.ops.variable.VariableOperations(
-                                   self.data, self.util, 
-                                   self.undo_stack, self.redo_stack,
-                                   sect_ops.add_section,
-                                   self.check_cannot_enable_setting,
-                                   self.updater.update_namespace,
-                                   search_id_func=self.perform_find_by_id)
+                                self.data, self.util, 
+                                self.undo_stack, self.redo_stack,
+                                sect_ops.add_section,
+                                self.check_cannot_enable_setting,
+                                self.updater.update_namespace,
+                                search_id_func=self.perform_find_by_id)
         directory = None
         if namespace_name == config_name:
             directory = config_data.directory
@@ -824,7 +825,7 @@ class MainController(object):
         if (hasattr(self, "menubar") and 
             key == rose.config_editor.SHOW_MODE_IGNORED):
             user_ign_item = self.menubar.uimanager.get_widget(
-                                         "/TopMenuBar/View/View user-ignored")
+                                 "/TopMenuBar/View/View user-ignored vars")
             user_ign_item.set_sensitive(not is_key_allowed)
 
     def kill_page(self, namespace):

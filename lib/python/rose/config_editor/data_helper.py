@@ -332,6 +332,9 @@ class ConfigDataHelper(object):
             if sect_data.metadata["full_ns"] == namespace:
                 if not sect_data.ignored_reason:
                     return status
+                for key in sect_data.ignored_reason:
+                    object_statuses.setdefault(key, 0)
+                    object_statuses[key] += 1
         real_data, latent_data = self.get_data_for_namespace(namespace)
         for var in real_data + latent_data:
             if not var.ignored_reason:
@@ -349,7 +352,7 @@ class ConfigDataHelper(object):
                 else:
                     object_statuses.setdefault(key, 0)
                     object_statuses[key] += 1
-        if not object_statuses:
+        if not (object_statuses or sections):
             # No data, so no ignored state.
             return status
         # Now return the most 'popular' ignored status.
@@ -361,3 +364,17 @@ class ConfigDataHelper(object):
         if status == rose.variable.IGNORED_BY_SYSTEM:
             return rose.config.ConfigNode.STATE_SYST_IGNORED
         return rose.config.ConfigNode.STATE_NORMAL
+
+    def get_ns_latent_status(self, namespace):
+        """Return whether a page only contains missing content."""
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
+        config_data = self.data.config[config_name]
+        sections = self.get_sections_from_namespace(namespace)
+        for section in sections:
+            if section in config_data.sections.now:
+                # It has a current section associated.
+                return False
+        if self.is_ns_sub_data(namespace) or not sections:
+            # It has sub-data or has nothing at all.
+            return False
+        return True

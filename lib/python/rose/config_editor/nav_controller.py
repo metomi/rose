@@ -128,7 +128,7 @@ class NavTreeManager(object):
             change = ""
             meta = self.data.namespace_meta_lookup.get(this_ns, {})
             meta.setdefault('title', spaces[0])
-            latent_status = not self.data.helper.is_ns_content(this_ns)
+            latent_status = self.data.helper.get_ns_latent_status(this_ns)
             ignored_status = self.data.helper.get_ns_ignored_status(this_ns)
             statuses = {rose.config_editor.SHOW_MODE_LATENT: latent_status,
                         rose.config_editor.SHOW_MODE_IGNORED: ignored_status}
