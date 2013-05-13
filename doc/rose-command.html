@@ -1175,6 +1175,10 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbr>--all</kbd></dt>
+      
+      <dd>Open a suite control GUI for each running suite.</dd>
+      
       <dt><kbd>--host=HOST</kbd></dt>
 
       <dd>Specify a host.</dd>
@@ -1272,6 +1276,17 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--full, -f</kbd></dt>
+
+      <dd>Re-sync all remote task logs, regardless of the <var>TASK</var>
+      arguments.</dd>
+
+      <dt><kbd>--log-archive-threshold=CYCLE-TIME</kbd></dt>
+
+      <dd>Switch on job log archiving by specifying a cycle time threshold. All
+      job logs at this cycle time or older will be archived. Implies
+      <kbd>--full</kbd>.</dd>
+
       <dt><kbd>--no-web-browse</kbd></dt>
 
       <dd>Do not open a web browser to display the log view.</dd>

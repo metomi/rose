@@ -907,7 +907,7 @@ class MainWindow(gtk.Window):
         else:
             self.suite_log_view_generator.view_suite_log_url(str(id_))
 
-    def handle_view_output_event(self, event):
+    def handle_view_output_event(self, event, *args, **kwargs):
         if isinstance(event, WebBrowserEvent):
             s = rosie.browser.STATUS_OPENING_LOG.format(event.url)
             self.statusbar.set_status_text(s, instant=True)

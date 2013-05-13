@@ -729,6 +729,15 @@ class SuiteRunner(Runner):
         write_source_vc_info(
                 suite_conf_dir, "log/" + prefix + ".version", self.popen)
 
+        # If run through rose-stem, install version information files for
+        # each source tree if they're a working copy
+        if hasattr(opts, 'source') and hasattr(opts, 'project'):
+            for i, url in enumerate(opts.source):
+                if os.path.isdir(url):
+                    write_source_vc_info(
+                        url, "log/" + opts.project[i] + "-" + str(i) + 
+                        ".version", self.popen)
+
         for ext in [".conf", ".version"]:
             self.fs_util.symlink(prefix + ext, "log/rose-suite-run" + ext)
 
@@ -769,8 +778,10 @@ class SuiteRunner(Runner):
         # Install items to user@host
         auths = self.suite_engine_proc.get_tasks_auths(suite_name)
         queue = [] # [[pipe, command, "ssh"|"rsync", auth], ...]
-        for user, host in sorted(auths):
-            auth = user + "@" + host
+        for auth in sorted(auths):
+            host = auth
+            if "@" in auth:
+                host = auth.split("@", 1)[1]
             command = self.popen.get_cmd("ssh", auth, "bash", "--login", "-c")
             rose_bin = "rose"
             for h in [host, "*"]:

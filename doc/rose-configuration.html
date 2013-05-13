@@ -374,8 +374,8 @@ accel-find-next=F3
       <dt><code>owner</code></dt>
 
       <dd>Specify the user ID of the owner of the suite. The owner has full
-      commit access to the suite. Only the owner can delete the suite, pass
-      the suite's ownership to someone else or change the access-list.</dd>
+      commit access to the suite. Only the owner can delete the suite, pass the
+      suite's ownership to someone else or change the access-list.</dd>
 
       <dt><code>project</code></dt>
 
@@ -390,7 +390,7 @@ accel-find-next=F3
       <dd>Specify a list of users with commit access to trunk of the suite. A
       <kbd>*</kbd> in the list means that anyone can commit to the trunk of the
       suite. Setting this blank or omitting the setting means that nobody apart
-      from the owner can commit to the trunk. Only the suite owner can change 
+      from the owner can commit to the trunk. Only the suite owner can change
       the access list.</dd>
 
       <dt><code>description</code></dt>
@@ -1176,6 +1176,27 @@ trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
         sections that are found with multiple copies or an index.</p>
       </dd>
 
+      <dt>macro</dt>
+
+      <dd>
+        <p>Associate a setting with a comma-delimited set of custom macros (but
+        not upgrade macros).</p>
+
+        <p>E.g. for a macro class called <samp>FibonacciChecker</samp> in the
+        metadata under <samp>lib/python/macros/fib.py</samp>, we may have:</p>
+        <pre class="prettyprint lang-rose_conf">
+macro=fib.FibonacciChecker
+</pre>
+
+        <p>This may be used in the config editor to visually associate the
+        setting with these macros. If a macro class has both a
+        <code>transform</code> and a <code>validate</code> method, you can
+        specify which you need by appending the method to the name e.g.:</p>
+        <pre class="prettyprint lang-rose_conf">
+macro=fib.Fibonacci.validate
+</pre>
+      </dd>
+
       <dt>widget[gui-application]</dt>
 
       <dd>
@@ -1293,10 +1314,6 @@ help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
 
       <dd>Target is an empty file.</dd>
 
-      <dt><code>mode=mkdir,source=</code></dt>
-
-      <dd>Target is an empty directory.</dd>
-
       <dt><code>mode=auto,source=SOURCE</code></dt>
 
       <dd>Target is a copy of <var>SOURCE</var>.</dd>
@@ -1306,6 +1323,10 @@ help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
       <dd>Target is created by concatenating the contents of
       <var>SOURCE-LIST</var>. The sources should either be all files or all
       directories.</dd>
+
+      <dt><code>mode=mkdir</code></dt>
+
+      <dd>Target is a directory.</dd>
 
       <dt><code>mode=symlink,source=SOURCE</code></dt>
 

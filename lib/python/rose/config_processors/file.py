@@ -187,6 +187,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 target.is_out_of_date = (
                         not os.path.islink(target.name) or
                         target.real_name != os.readlink(target.name))
+            elif target.mode == "mkdir":
+                target.is_out_of_date = not os.path.isdir(target.name)
             else:
                 if os.path.exists(target.name):
                     for path, checksum in get_checksum(target.name):
@@ -310,6 +312,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
         """
         f = None
+        mod_bits = None
         is_first = True
         # Install target
         for source in target.dep_locs:
@@ -320,10 +323,21 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                                    source.loc_type)
             if target.loc_type == target.TYPE_BLOB:
                 if f is None:
-                    if os.path.isdir(target.name):
+                    if not os.path.isfile(target.name):
                         self.manager.fs_util.delete(target.name)
                     f = open(target.name, "wb")
-                f.write(open(source.cache).read())
+                f_bsize = os.statvfs(source.cache).f_bsize
+                s = open(source.cache)
+                while True:
+                    bytes = s.read(f_bsize)
+                    if not bytes:
+                        break
+                    f.write(bytes)
+                s.close()
+                if mod_bits is None:
+                    mod_bits = os.stat(source.cache).st_mode
+                else:
+                    mod_bits |= os.stat(source.cache).st_mode
             else: # target.loc_type == target.TYPE_TREE
                 args = []
                 if is_first:
@@ -335,6 +349,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             is_first = False
         if f is not None:
             f.close()
+        if mod_bits:
+            os.chmod(target.name, mod_bits)
 
         # TODO: auto decompression of tar, gzip, etc?
 

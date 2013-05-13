@@ -75,7 +75,7 @@ class CustomButton(gtk.Button):
 
     def __init__(self, label=None, stock_id=None,
                  size=gtk.ICON_SIZE_SMALL_TOOLBAR, tip_text=None,
-                 as_tool=False, icon_at_start=False):
+                 as_tool=False, icon_at_start=False, has_menu=False):
         self.hbox = gtk.HBox()
         self.size = size
         self.as_tool = as_tool
@@ -100,6 +100,11 @@ class CustomButton(gtk.Button):
                 self.hbox.pack_start(self.icon, expand=False, fill=False)
             else:
                 self.hbox.pack_end(self.icon, expand=False, fill=False)
+        if has_menu:
+            arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE)
+            arrow.show()
+            self.hbox.pack_end(arrow, expand=False, fill=False)
+            self.hbox.reorder_child(arrow, 0)
         self.hbox.show()
         super(CustomButton, self).__init__()
         if self.as_tool:
@@ -111,6 +116,7 @@ class CustomButton(gtk.Button):
             self.set_tooltip_text(tip_text)
 
     def set_stock_id(self, stock_id):
+        """Set an icon based on the stock id."""
         if hasattr(self, "icon"):
             self.hbox.remove(self.icon)
         self.icon.set_from_stock(stock_id, self.size)
@@ -122,7 +128,16 @@ class CustomButton(gtk.Button):
         return False
 
     def set_tip_text(self, new_text):
+        """Set new tooltip text."""
         self.set_tooltip_text(new_text)
+
+    def position_menu(self, menu, widget):
+        """Place a drop-down menu carefully below the button."""
+        x, y = widget.get_window().get_origin()
+        allocated_rectangle = widget.get_allocation()
+        x += allocated_rectangle.x
+        y += allocated_rectangle.y + allocated_rectangle.height
+        return x, y, False
 
 
 class CustomExpandButton(gtk.Button):

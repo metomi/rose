@@ -46,7 +46,7 @@ class ConfigPage(gtk.VBox):
     def __init__(self, page_metadata, config_data, ghost_data, section_ops,
                  variable_ops, sections, get_formats_func, directory=None,
                  sub_data=None, sub_ops=None, launch_info_func=None,
-                 launch_edit_func=None):
+                 launch_edit_func=None, launch_macro_func=None):
         super(ConfigPage, self).__init__(homogeneous=False)
         self.namespace = page_metadata.get('namespace')
         self.ns_is_default = page_metadata.get('ns_is_default')
@@ -56,6 +56,7 @@ class ConfigPage(gtk.VBox):
         self.help = page_metadata.get('help')
         self.url = page_metadata.get('url')
         self.see_also = page_metadata.get('see_also')
+        self.custom_macros = page_metadata.get('macro', {})
         self.custom_widget = page_metadata.get('widget')
         self.custom_sub_widget = page_metadata.get('widget_sub_ns')
         self.show_modes = page_metadata.get('show_modes')
@@ -71,6 +72,7 @@ class ConfigPage(gtk.VBox):
         self.sub_ops = sub_ops
         self.launch_info = launch_info_func
         self.launch_edit = launch_edit_func
+        self._launch_macro_func = launch_macro_func
         namespaces = self.namespace.strip('/').split('/')
         namespaces.reverse()
         self.info = ""
@@ -1045,6 +1047,42 @@ class ConfigPage(gtk.VBox):
             return (x_name == '') - (y_name == '')
         return rose.config.sort_settings(x, y)
 
+    def _macro_menu_launch(self, widget, event):
+        # Create a menu below the widget for macro actions.
+        menu = gtk.Menu()
+        for macro_name, info in sorted(self.custom_macros.items()):
+            method, description = info
+            if method == rose.macro.TRANSFORM_METHOD:
+                stock_id = gtk.STOCK_CONVERT
+            else:
+                stock_id = gtk.STOCK_DIALOG_QUESTION
+            macro_menuitem = gtk.ImageMenuItem(stock_id=stock_id)
+            macro_menuitem.set_label(macro_name)
+            macro_menuitem.set_tooltip_text(description)
+            macro_menuitem.show()
+            macro_menuitem._macro = macro_name
+            macro_menuitem.connect(
+                  "button-release-event",
+                  lambda m, e: self.launch_macro(m._macro))
+            menu.append(macro_menuitem)
+        menu.popup(None, None, widget.position_menu, event.button,
+                   event.time, widget)
+
+    def launch_macro(self, macro_name_string):
+        """Launch a macro, if possible."""
+        class_name = None
+        method_name = None
+        if "." in macro_name_string:
+            module_name, class_name = macro_name_string.split(".", 1)
+            if "." in class_name:
+                class_name, method_name = class_name.split(".", 1)
+        else:
+            module_name = macro_name_string
+        rval = self._launch_macro_func(config_name=self.config_name,
+                                       module_name=module_name,
+                                       class_name=class_name,
+                                       method_name=method_name)
+
     def search_for_id(self, id_):
         """Launch a search for variable or section id."""
         return self.variable_ops.search_for_var(self.namespace, id_)
@@ -1115,4 +1153,17 @@ class ConfigPage(gtk.VBox):
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)
+        if self.custom_macros.items():
+            macro_button = rose.gtk.util.CustomButton(
+                            label=rose.config_editor.LABEL_PAGE_MACRO_BUTTON,
+                            stock_id=gtk.STOCK_EXECUTE,
+                            tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
+                            as_tool=True, icon_at_start=True,
+                            has_menu=True)
+            macro_button.connect("button-press-event",
+                                 self._macro_menu_launch)
+            macro_label = gtk.Label()
+            macro_label.show()
+            button_list.append(macro_button)
+            label_list.append(macro_label)
         return button_list, label_list

@@ -602,6 +602,7 @@ class MainController(object):
             sub_data = self.data.helper.get_sub_data_for_namespace(
                                                          namespace_name)
             sub_ops = self.group_ops.get_sub_ops_for_namespace(namespace_name)
+        macro_info = self.data.helper.get_macro_info_for_namespace(namespace_name)
         page_metadata = {'namespace': namespace_name,
                          'ns_is_default': is_default,
                          'label': label,
@@ -609,6 +610,7 @@ class MainController(object):
                          'duplicate': duplicate,
                          'help': help,
                          'url': url,
+                         'macro': macro_info,
                          'widget': custom_widget,
                          'widget_sub_ns': custom_sub_widget,
                          'see_also': see_also,
@@ -652,7 +654,8 @@ class MainController(object):
                                   sub_data=sub_data,
                                   sub_ops=sub_ops,
                                   launch_info_func=launch_info,
-                                  launch_edit_func=launch_edit)
+                                  launch_edit_func=launch_edit,
+                                  launch_macro_func=self.handle.run_custom_macro)
         #FIXME: These three should go.
         page.trigger_tab_detach = lambda b: self._handle_detach_request(page)
         var_ops.trigger_ignored_update = lambda v: page.update_ignored()

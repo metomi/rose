@@ -5,24 +5,38 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (End of 2013-Q1)
+## Next Release (2013-05-??)
 
 This will be the 4th release of Rose.
+This release is known to work with cylc 5.2.0.
 
 ### Highlight Changes
 
 Changes that have significant impact on user experience.
 
-None yet.
+\#559: rose config-edit: added custom interface to display STASH configuration.
 
 ### Other Changes
 
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#621: rose stem: will now log version control information for each source.
+
+\#617: rose suite-gcontrol: added `--all` option to launch the control
+GUI for all your running suites.
+
 \#605: rose configuration files: added syntax highlight for Kate.
 
 \#604: rose date -c: new option, short for `rose date $ROSE_TASK_CYCLE_TIME`.
+
+\#603: rose suite-log-view: new `--log-archive-threshold=CYCLE-TIME` option.
+The option switches on job log archiving by specifying a cycle time threshold.
+All job logs at this cycle time or older will be archived.
+
+The HTML view has been modified to load the data of the jobs of selected
+cycle times only. The default view is the latest cycle, but this can be modified
+via a multiple selection box and/or via URL query.
 
 \#595: rosie lookup, rosie ls: now output with column headings.
 
@@ -30,7 +44,7 @@ The following are worth mentioning:
 
 \#567: rose suite-clean: new command to remove items created by suite runs.
 
-\#559: rose config-edit: added custom interface to display STASH configuration.
+\#546: rose metadata: new macro option.
 
 \#534: rose_ana built-in application: now support arguments.
 

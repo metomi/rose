@@ -491,7 +491,8 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             if not all(child_dups):
                 self.tree.expand_row(path, open_all=False)
                 stack.append(treemodel.iter_children(iter_))
-            stack.append(treemodel.iter_next(iter_))
+            if path != start_path:
+                stack.append(treemodel.iter_next(iter_))
 
     def _get_should_show(self, model, iter_):
         # Determine whether to show a row.

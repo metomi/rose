@@ -34,6 +34,8 @@
 #     where the suite is running or last run.
 #
 # OPTIONS
+#     --all
+#         Open a suite control GUI for each running suite.
 #     --host=HOST
 #         Specify a host.
 #     --name=SUITE-NAME
