@@ -447,7 +447,7 @@ class MainMenuHandler(object):
         else:
             method_names = [method_name]
         if module_name is not None and config_name is not None:
-            config_mod_prefix = self.data.get_macro_module_prefix(config_name)
+            config_mod_prefix = self.data.helper.get_macro_module_prefix(config_name)
             if not module_name.startswith(config_mod_prefix):
                 module_name = config_mod_prefix + module_name
         for config_name in configs:

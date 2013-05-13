@@ -655,7 +655,7 @@ class MainController(object):
                                   sub_ops=sub_ops,
                                   launch_info_func=launch_info,
                                   launch_edit_func=launch_edit,
-                                  launch_macro_func=self.handle.run_custom_macro)
+                                  launch_macro_func=self.main_handle.run_custom_macro)
         #FIXME: These three should go.
         page.trigger_tab_detach = lambda b: self._handle_detach_request(page)
         var_ops.trigger_ignored_update = lambda v: page.update_ignored()
