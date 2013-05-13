@@ -1508,12 +1508,12 @@ def spawn_window(config_directory_path=None):
         title = config_directory_path.split("/")[-1]
     splash_screen = rose.gtk.splash.SplashScreenProcess(logo, title,
                                                         number_of_events)
- #   try:
-    MainController(config_directory_path,
+    try:
+        MainController(config_directory_path,
                        loader_update=splash_screen)
-  #  except BaseException as e:
-  #      splash_screen.stop()
-  #      raise e
+    except BaseException as e:
+        splash_screen.stop()
+        raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
