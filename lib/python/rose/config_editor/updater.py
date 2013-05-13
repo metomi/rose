@@ -217,6 +217,7 @@ class Updater(object):
         self.update_tree_status(page)
         self.update_bar_sensitivity_func()
         self.update_stack_viewer_if_open()
+        page.update_info()
         if page.namespace in self.data.config.keys():
             self.update_metadata_id(page.namespace)
         self.update_ns_sub_data(page.namespace)
