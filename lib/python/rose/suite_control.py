@@ -159,7 +159,7 @@ def prompt(action, suite_name, host):
     if not host:
         host = "localhost"
     return raw_input(PROMPT % (action, suite_name, host)).strip() in [YES]
-        
+
 def main():
     """Implement "rose suite-gcontrol" and "rose suite-shutdown"."""
     argv = sys.argv[1:]
