@@ -140,7 +140,6 @@ def get_suite_name(event_handler=None):
     """Find the top level of a suite directory structure"""
     fs_util = FileSystemUtil(event_handler)
     suite_name = None
-    init_dir = os.getcwd()
     conf_dir = os.getcwd()
     while True:
         conf = os.path.join(conf_dir,'rose-suite.conf')
@@ -151,7 +150,7 @@ def get_suite_name(event_handler=None):
             if not fs_util.dirname(conf_dir) == '/':
                 conf_dir = fs_util.dirname(conf_dir)
             else:
-                raise SuiteNotFoundError(init_dir)
+                raise SuiteNotFoundError(os.getcwd())
     return suite_name
 
 def prompt(action, suite_name, host):
