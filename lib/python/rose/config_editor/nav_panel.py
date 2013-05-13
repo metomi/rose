@@ -318,6 +318,11 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         """Update 'changed' text."""
         self._set_row_names_value(row_names, 11, new_change)
 
+    def update_statuses(self, row_names, latent_status, ignored_status):
+        """Update latent and ignored statuses."""
+        self._set_row_names_value(row_names, 8, latent_status)
+        self._set_row_names_value(row_names, 9, ignored_status)
+
     def _set_row_names_value(self, row_names, index, value):
         path = self.get_path_from_names(row_names, unfiltered=True)
         if path is not None:

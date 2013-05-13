@@ -324,6 +324,8 @@ DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH = 150  # Must > raw CHANGES text above
 DIALOG_BODY_MACRO_CHANGES_NUM_HEIGHT = 3  # > Number, needs more height.
 DIALOG_BODY_NL_CASE_CHANGE = ("Mixed-case names cause trouble in namelists." +
                               "\nSuggested: {0}")
+DIALOG_BODY_REMOVE_CONFIG = "Choose configuration"
+DIALOG_BODY_REMOVE_SECTION = "Choose the section to remove"
 DIALOG_HELP_TITLE = "Help for {0}"
 DIALOG_LABEL_AUTOFIX = "Run built-in transform (fixer) macros?"
 DIALOG_LABEL_AUTOFIX_ALL = "Run built-in transform (fixer) macros for all configurations?"
@@ -363,6 +365,7 @@ DIALOG_TITLE_MACRO_CHANGES = "Accept changes made by {0}?"
 DIALOG_TITLE_META_LOAD_ERROR = "Error loading metadata."
 DIALOG_TITLE_NL_CASE_WARNING = "Mixed-case warning"
 DIALOG_TITLE_PREFERENCES = "Configure preferences"
+DIALOG_TITLE_REMOVE = "Remove section"
 DIALOG_TITLE_SAVE_CHANGES = "Save changes?"
 DIALOG_TITLE_WARNING = "Warning"
 DIALOG_VARIABLE_ERROR_TITLE = "{0} error for {1}"

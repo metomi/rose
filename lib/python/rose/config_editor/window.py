@@ -207,22 +207,30 @@ class MainWindow(object):
             dialog_title = rose.config_editor.DIALOG_TITLE_IGNORE
         else:
             dialog_title = rose.config_editor.DIALOG_TITLE_ENABLE
-        add_dialog = gtk.Dialog(title=dialog_title,
+        config_title = rose.config_editor.DIALOG_BODY_IGNORE_ENABLE_CONFIG
+        if is_ignored:
+            section_title = rose.config_editor.DIALOG_BODY_IGNORE_SECTION
+        else:
+            section_title = rose.config_editor.DIALOG_BODY_ENABLE_SECTION
+        return self._launch_config_section_chooser_dialog(
+                                 name_section_dict, prefs,
+                                 dialog_title, config_title,
+                                 section_title)
+
+    def _launch_config_section_chooser_dialog(self, name_section_dict, prefs,
+                                              dialog_title, config_title,
+                                              section_title):
+        chooser_dialog = gtk.Dialog(
+                                title=dialog_title,
                                 parent=self.window,
                                 buttons=(gtk.STOCK_CANCEL,
                                          gtk.RESPONSE_REJECT,
                                          gtk.STOCK_OK,
                                          gtk.RESPONSE_ACCEPT))
-        config_label = gtk.Label(
-                         rose.config_editor.DIALOG_BODY_IGNORE_ENABLE_CONFIG)
+        config_label = gtk.Label(config_title)
         config_label.show()
-        if is_ignored:
-            label = gtk.Label(
-                         rose.config_editor.DIALOG_BODY_IGNORE_SECTION)
-        else:
-            label = gtk.Label(
-                         rose.config_editor.DIALOG_BODY_ENABLE_SECTION)
-        label.show()
+        section_label = gtk.Label(section_title)
+        section_label.show()
         config_name_box = gtk.combo_box_new_text()
         name_keys = name_section_dict.keys()
         name_keys.sort()
@@ -251,17 +259,17 @@ class MainWindow(object):
         vbox = gtk.VBox(spacing=rose.config_editor.SPACING_PAGE)
         vbox.pack_start(config_label, expand=False, fill=False)
         vbox.pack_start(config_name_box, expand=False, fill=False)
-        vbox.pack_start(label, expand=False, fill=False)
+        vbox.pack_start(section_label, expand=False, fill=False)
         vbox.pack_start(section_box, expand=False, fill=False)
         vbox.show()
         hbox = gtk.HBox()
         hbox.pack_start(vbox, expand=True, fill=True,
                         padding=rose.config_editor.SPACING_PAGE)
         hbox.show()
-        add_dialog.vbox.pack_start(hbox,
-                                   padding=rose.config_editor.SPACING_PAGE)
+        chooser_dialog.vbox.pack_start(
+                hbox, padding=rose.config_editor.SPACING_PAGE)
         section_box.grab_focus()
-        response = add_dialog.run()
+        response = chooser_dialog.run()
         if response in [gtk.RESPONSE_OK, gtk.RESPONSE_YES,
                         gtk.RESPONSE_ACCEPT]:
             config_name_entered = name_keys[config_name_box.get_active()]
@@ -270,9 +278,9 @@ class MainWindow(object):
                     index = widget.get_active()
                     sections = name_section_dict[config_name_entered]
                     section_name = sections[index]
-                    add_dialog.destroy()
+                    chooser_dialog.destroy()
                     return config_name_entered, section_name
-        add_dialog.destroy()
+        chooser_dialog.destroy()
         return None, None
 
     def _reload_section_choices(self, vbox, sections, prefs):
@@ -372,6 +380,22 @@ class MainWindow(object):
         title = rose.config_editor.DIALOG_TITLE_PREFERENCES
         rose.gtk.util.run_dialog(gtk.MESSAGE_INFO, text, title)
         return False
+
+    def launch_remove_dialog(self, name_section_dict, prefs):
+        """Launch a dialog asking for a section name to remove.
+        
+        name_section_dict is a dictionary containing config names
+        as keys, and lists of available sections as values.
+        prefs is in the same format, but indicates preferred values.
+        
+        """
+        dialog_title = rose.config_editor.DIALOG_TITLE_REMOVE
+        config_title = rose.config_editor.DIALOG_BODY_REMOVE_CONFIG
+        section_title = rose.config_editor.DIALOG_BODY_REMOVE_SECTION
+        return self._launch_config_section_chooser_dialog(
+                                 name_section_dict, prefs,
+                                 dialog_title, config_title,
+                                 section_title)
 
     def launch_view_stack(self, undo_stack, redo_stack, undo_func):
         """Load a view of the stack."""

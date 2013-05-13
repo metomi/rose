@@ -326,15 +326,16 @@ class ConfigDataHelper(object):
         config_data = self.data.config[config_name]
         sections = self.get_sections_from_namespace(namespace)
         status = rose.config.ConfigNode.STATE_NORMAL
-        object_statuses = {}
+        default_section_statuses = {}
+        variable_statuses = {}
         for section in sections:
             sect_data = config_data.sections.get_sect(section)
             if sect_data.metadata["full_ns"] == namespace:
                 if not sect_data.ignored_reason:
                     return status
                 for key in sect_data.ignored_reason:
-                    object_statuses.setdefault(key, 0)
-                    object_statuses[key] += 1
+                    default_section_statuses.setdefault(key, 0)
+                    default_section_statuses[key] += 1
         real_data, latent_data = self.get_data_for_namespace(namespace)
         for var in real_data + latent_data:
             if not var.ignored_reason:
@@ -347,15 +348,20 @@ class ConfigDataHelper(object):
                                                                    var_id)
                     sect_data = config_data.sections.get_sect(section)
                     for key in sect_data.ignored_reason:
-                        object_statuses.setdefault(key, 0)
-                        object_statuses[key] += 1
+                        variable_statuses.setdefault(key, 0)
+                        variable_statuses[key] += 1
                 else:
-                    object_statuses.setdefault(key, 0)
-                    object_statuses[key] += 1
-        if not (object_statuses or sections):
+                    variable_statuses.setdefault(key, 0)
+                    variable_statuses[key] += 1
+        if not (variable_statuses or sections):
             # No data, so no ignored state.
             return status
         # Now return the most 'popular' ignored status.
+        # Choose section statuses if any are default for this namespace.
+        if default_section_statuses:
+            object_statuses = default_section_statuses
+        else:
+            object_statuses = variable_statuses
         status_counts = object_statuses.items()
         status_counts.sort(lambda x, y: cmp(x[1], y[1]))
         status = status_counts[0][0]

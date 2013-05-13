@@ -105,68 +105,6 @@ class NavPanelHandler(object):
         config_name = "/" + name
         self._add_config(config_name, meta)
 
-    def delete_request(self, namespace_list, skip_update=False):
-        """Handle a delete namespace request (more complicated than add)."""
-        namespace_list.sort(rose.config.sort_settings)
-        namespace_list.reverse()
-        for ns in [n for n in namespace_list]:
-            if not ns.startswith('/'):
-                ns = '/' + ns
-            config_name = self.util.split_full_ns(self.data, ns)[0]
-            if config_name == ns:
-                short_config_name = config_name.split('/')[-1]
-                text = rose.config_editor.WARNING_CONFIG_DELETE.format(
-                                                         short_config_name)
-                title = rose.config_editor.WARNING_CONFIG_DELETE_TITLE
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR, 
-                                         text, title)
-                return False
-        ns_done = []
-        for namespace in namespace_list:
-            self.kill_page_func(namespace)
-        ns_var_sections = {}
-        element_sort = rose.config.sort_settings
-        variable_sorter = lambda v, w: element_sort(v.metadata['id'],
-                                                    w.metadata['id']) 
-        duplicate_nses = []
-        start_stack_index = len(self.undo_stack)
-        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
-        for ns in list(namespace_list):
-            if ns in ns_done:
-                continue
-            config_name = self.util.split_full_ns(self.data, ns)[0]
-            config_data = self.data.config[config_name]
-            real_sections = config_data.sections.now.keys()
-            ns_done.append(ns)
-            real_data, ghost_data = self.data.helper.get_data_for_namespace(
-                                                                  ns)
-            var_list = list(real_data)
-            var_list.sort(variable_sorter)
-            var_list.reverse()
-            for variable in var_list:
-                self.var_ops.remove_var(variable, skip_update=True)
-                var_id = variable.metadata['id']
-                sect, opt = self.util.get_section_option_from_id(var_id)
-                ns_var_sections.setdefault(ns, {})
-                ns_var_sections[ns].update({sect: True})
-            config_name = self.util.split_full_ns(self.data, ns)[0]
-            for section in self.data.helper.get_sections_from_namespace(ns):
-                # Interlinked (in metadata) empty sections may cause problems.
-                if (section not in config_data.vars.now and
-                    (section in ns_var_sections.get(ns, []) or
-                     section in real_sections)):
-                    self.sect_ops.remove_section(config_name, section,
-                                                 skip_update=True)
-            ns_meta = self.data.namespace_meta_lookup[ns]
-            if (ns_meta.get(rose.META_PROP_DUPLICATE) ==
-                rose.META_PROP_VALUE_TRUE):
-                duplicate_nses.append(ns)
-        for stack_item in self.undo_stack[start_stack_index:]:
-            stack_item.group = group
-        if not skip_update:
-            for namespace in namespace_list:
-                self.reload_ns_tree_func(namespace)  # Update everything as well.
-
     def ignore_request(self, base_ns, is_ignored):
         """Handle an ignore or enable section request."""
         config_names = self.data.config.keys()
@@ -270,18 +208,47 @@ class NavPanelHandler(object):
                 rose.config_editor.util.launch_node_info_dialog(
                             sect_data, "", search_function)
 
-    def rename_request(self, base_ns, new_section, skip_update=False):
-        """Implement a rename (delete + add)."""
-        namespace = "/" + base_ns.lstrip("/")
-        sections = self.data.helper.get_sections_from_namespace(namespace)
-        if len(sections) != 1:
-            return False
-        start_stack_index = len(self.undo_stack)
-        group = rose.config_editor.STACK_GROUP_RENAME + "-" + str(time.time())
-        self.copy_request(namespace, new_section, skip_update=skip_update)
-        self.delete_request([namespace], skip_update=skip_update)
-        for stack_item in self.undo_stack[start_stack_index:]:
-            stack_item.group = group
+    def remove_request(self, base_ns):
+        """Handle a delete section request."""
+        config_names = self.data.config.keys()
+        if base_ns is not None and '/' in base_ns:
+            config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+            prefer_name_sections = {
+                  config_name: self.data.helper.get_sections_from_namespace(
+                                                                  base_ns)}
+        else:
+            prefer_name_sections = {}
+        config_sect_dict = {}
+        sorter = rose.config.sort_settings
+        for config_name in config_names:
+            config_data = self.data.config[config_name]
+            config_sect_dict[config_name] = config_data.sections.now.keys()
+            config_sect_dict[config_name].sort(
+                             rose.config.sort_settings)
+            if config_name in prefer_name_sections:
+                prefer_name_sections[config_name].sort(
+                            rose.config.sort_settings)
+        config_name, section = self.mainwindow.launch_remove_dialog(
+                                               config_sect_dict,
+                                               prefer_name_sections)
+        if config_name in self.data.config and section is not None:
+            start_stack_index = len(self.undo_stack)
+            group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(
+                                                                 time.time())
+            config_data = self.data.config[config_name]
+            sect_data = config_data.sections.now[section]
+            ns = sect_data.metadata["full_ns"]
+            variable_sorter = lambda v, w: rose.config.sort_settings(
+                                                        v.metadata['id'],
+                                                        w.metadata['id']) 
+            variables = list(config_data.vars.now.get(section, []))
+            variables.sort(variable_sorter)
+            variables.reverse()
+            for variable in variables:
+                self.var_ops.remove_var(variable)
+            self.sect_ops.remove_section(config_name, section)
+            for stack_item in self.undo_stack[start_stack_index:]:
+                stack_item.group = group
 
     def search_request(self, namespace, setting_id):
         """Handle a search for an id (hyperlink)."""
@@ -341,11 +308,8 @@ class NavPanelHandler(object):
             
             metadata, comments = self.get_ns_metadata_and_comments(namespace)
             if is_fixable:
-                ui_config_string = ui_config_string.replace(
-                          """<separator name="newconfigsep"/>""",
-                          """<separator name="newconfigsep"/>
-                             <menuitem action="Autofix"/>
-                             <separator name="sepauto"/>""", 1)
+                ui_config_string += """<menuitem action="Autofix"/>
+                                       <separator name="sepauto"/>"""
             if cloneable:
                 ui_config_string += '<separator name="clonesep"/>'
                 ui_config_string += '<menuitem action="Clone"/>'
@@ -413,7 +377,7 @@ class NavPanelHandler(object):
                                     lambda b: self.info_request(namespace))
             if help is not None:
                 help_item = uimanager.get_widget('/Popup/Help')
-                help_title = name.split('/')[1:]
+                help_title = namespace.split('/')[1:]
                 help_title = rose.config_editor.DIALOG_HELP_TITLE.format(
                                                                   help_title)
                 search_function = lambda i: self.search_request(namespace, i)
@@ -433,6 +397,9 @@ class NavPanelHandler(object):
                 autofix_item.connect("activate",
                                      lambda b: self.fix_request(namespace))
             remove_section_item = uimanager.get_widget('/Popup/Remove')
+            remove_section_item.connect(
+                           "activate",
+                           lambda b: self.remove_request(namespace))
         menu = uimanager.get_widget('/Popup')
         menu.popup(None, None, None, event.button, event.time)
         return False

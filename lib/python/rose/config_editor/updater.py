@@ -95,6 +95,14 @@ class Updater(object):
                         return rose.config_editor.TREE_PANEL_TIP_CHANGED_SECTIONS
         return ""
 
+    def update_ns_tree_states(self, namespace):
+        """Refresh the tree panel states for a single row (namespace)."""
+        latent_status = self.data.helper.get_ns_latent_status(namespace)
+        ignored_status = self.data.helper.get_ns_ignored_status(namespace)
+        ns_names = namespace.lstrip("/").split("/")
+        self.nav_panel.update_statuses(ns_names, latent_status,
+                                       ignored_status)
+
     def tree_trigger_update(self, only_this_namespace=None):
         """Reload the tree panel, and perform an update.
 
@@ -163,6 +171,7 @@ class Updater(object):
                 page = self.pagelist[index]
                 self.sync_page_var_lists(page)
             self.update_ignored_statuses(ns)
+            self.update_ns_tree_states(ns)
             
         self.perform_error_check(is_loading=is_loading)  # Global error check.
         
@@ -199,6 +208,7 @@ class Updater(object):
             if not is_loading:
                 self.update_bar_sensitivity_func()
             self.update_stack_viewer_if_open()
+            self.update_ns_tree_states(namespace)
             if namespace in self.data.config.keys():
                 self.update_metadata_id(namespace)
             self.update_ns_sub_data(namespace)
@@ -218,6 +228,7 @@ class Updater(object):
         self.update_bar_sensitivity_func()
         self.update_stack_viewer_if_open()
         page.update_info()
+        self.update_ns_tree_states(page.namespace)
         if page.namespace in self.data.config.keys():
             self.update_metadata_id(page.namespace)
         self.update_ns_sub_data(page.namespace)
@@ -354,6 +365,10 @@ class Updater(object):
                 page.update_ignored()  # Redraw affected widgets.
             if page.namespace in update_section_nses:
                 page.update_info()
+        for ns in update_nses:
+            if ns != namespace:
+                # We don't need another update of namespace.
+                self.update_ns_tree_states(ns)
         for var_id in trig_id_val_dict.keys() + updated_ids:
             var = var_id_map.get(var_id)
             if var is None:
