@@ -247,6 +247,7 @@ class NavPanelHandler(object):
 
     def get_ns_metadata_and_comments(self, namespace):
         """Return metadata dict and comments list."""
+        namespace = "/" + namespace.lstrip("/")
         metadata = {}
         comments = ""
         if namespace is None:

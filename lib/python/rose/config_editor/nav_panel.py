@@ -328,7 +328,8 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         """Highlight one particular row, but only this one."""
         if row_names is None:
             return
-        path = self.get_path_from_names(row_names)
+        path = self.get_path_from_names(row_names, unfiltered=True)
+        path = self.filter_model.convert_child_path_to_path(path)
         if path is not None:
             i = 1
             while self.tree.row_expanded(path[:i]) and i <= len(path):

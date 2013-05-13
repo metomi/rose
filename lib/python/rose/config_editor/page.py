@@ -846,6 +846,7 @@ class ConfigPage(gtk.VBox):
 
     def set_sub_focus(self, node_id):
         if (self.sub_data is not None and
+            hasattr(self, "sub_data_panel") and
             hasattr(self.sub_data_panel, "set_focus_node_id")):
             self.sub_data_panel.set_focus_node_id(node_id)
 
