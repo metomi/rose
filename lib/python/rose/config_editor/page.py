@@ -90,7 +90,7 @@ class ConfigPage(gtk.VBox):
                                                        self.config_name)
         self.sort_data()
         self.sort_data(ghost=True)
-        self._last_info_labels = []
+        self._last_info_labels = None
         self.generate_main_container()
         self.get_page()
         self.update_ignored()
@@ -372,11 +372,11 @@ class ConfigPage(gtk.VBox):
 
     def update_info(self):
         """Driver routine to update non-variable information."""
-        button_list, label_list = self.get_page_info()
+        button_list, label_list = self._get_page_info_widgets()
         if [l.get_text() for l in label_list] == self._last_info_labels:
             # No change - do not redraw.
             return False
-        self.generate_page_info_widget(button_list, label_list)
+        self.generate_page_info(button_list, label_list)
         has_content = (self.info_panel.get_children() and
                        self.info_panel.get_children()[0].get_children())
         if self.info_panel in self.main_vpaned.get_children():
@@ -385,12 +385,12 @@ class ConfigPage(gtk.VBox):
         elif has_content:
             self.main_vpaned.pack1(self.info_panel)
         
-    def generate_page_info_widgets(self, button_list=None, label_list=None):
+    def generate_page_info(self, button_list=None, label_list=None):
         """Generate a widget giving information about sections."""
         info_container = gtk.VBox(homogeneous=False)
         info_container.show()
         if button_list is None or label_list is None:
-            button_list, label_list = self.get_page_info()
+            button_list, label_list = self._get_page_info_widgets()
         self._last_info_labels = [l.get_text() for l in label_list]
         for button, label in zip(button_list, label_list):
             var_hbox = gtk.HBox(homogeneous=False)
@@ -705,7 +705,7 @@ class ConfigPage(gtk.VBox):
     def refresh(self, only_this_var_id=None):
         """Reload the page or selectively refresh widgets for one variable."""
         if only_this_var_id is None:
-            self.generate_page_info_widget()
+            self.generate_page_info()
             return self.sort_main(remake_forced=True)
         variable = None
         for variable in self.panel_data + self.ghost_data:
