@@ -628,7 +628,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             if not all(child_dups):
                 self.tree.expand_row(path, open_all=False)
                 stack.append(treemodel.iter_children(iter_))
-            stack.append(treemodel.iter_next(iter_))
+            if path != start_path:
+                stack.append(treemodel.iter_next(iter_))
 
     def collapse_reset(self):
         """Return the tree view to the basic startup state."""
