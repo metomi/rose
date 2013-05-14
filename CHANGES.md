@@ -14,6 +14,9 @@ This release is known to work with cylc 5.2.0.
 
 Changes that have significant impact on user experience.
 
+\#577: rose suite-log-view: now uses `--name=SUITE-NAME` instead of an argument
+to specify a suite.
+
 \#559: rose config-edit: added custom interface to display STASH configuration.
 
 ### Other Changes
