@@ -247,7 +247,7 @@ class SuiteId(object):
             raise SuiteIdPrefixError(prefix)
         return node.value.rstrip("/")
 
-    def __init__(self, id_text=None, location=None):
+    def __init__(self, id_text=None, location=None, skip_status=False):
         """Initialise either from an id_text or from a location."""
         self.prefix = None  # Repos id e.g. repo1
         self.sid = None     # Short/Sub/Suffix id e.g. aa000
@@ -259,7 +259,7 @@ class SuiteId(object):
         if id_text:
             self._from_id_text(id_text)
         elif location:
-            self._from_location(location)
+            self._from_location(location, skip_status=skip_status)
 
     def __str__(self):
         return self.idx
@@ -288,7 +288,7 @@ class SuiteId(object):
                 raise SuiteIdPrefixError(id_text)
         self.idx = self.FORMAT_IDX % (self.prefix, self.sid)
 
-    def _from_location(self, location):
+    def _from_location(self, location, skip_status=False):
         """Return the ID of a location (origin URL or local copy path).
         """
         # FIXME: not sure why a closure for "state" does not work here?
@@ -326,7 +326,8 @@ class SuiteId(object):
             self.branch = names[self.SID_LEN]
         if info_entry.has_key("commit:revision"):
             self.revision = info_entry["commit:revision"]
-        self._set_statuses(location)
+        if not skip_status:
+            self._set_statuses(location)
 
     def _set_statuses(self, path):
         if os.path.exists(path):

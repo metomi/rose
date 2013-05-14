@@ -257,14 +257,15 @@ class MainWindow(gtk.Window):
 
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
-        self.local_updater.update_now()
         self.nav_bar.address_box.child.set_text("")
         self.refresh_url = ""
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
         res, id_list = rosie.ws_client.get_local_suite_details( 
-                                self.search_manager.get_datasource())
+                                self.search_manager.get_datasource(),
+                                skip_status=True)
+        self.local_updater.update_now()
         self.display_maps_result(res, is_local=True)
         self.repeat_last_request = self.display_local_suites
         self.statusbar.set_progressbar_pulsing(False)

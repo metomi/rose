@@ -279,7 +279,7 @@ def query_split(args):
     return q
 
 
-def get_local_suites(prefix=None):
+def get_local_suites(prefix=None, skip_status=False):
     """Returns a dict of prefixes and id tuples for locally-present suites."""
     local_copies = []
     local_copy_root = SuiteId.get_local_copy_root()
@@ -288,7 +288,7 @@ def get_local_suites(prefix=None):
     for path in os.listdir(local_copy_root):
         location = os.path.join(local_copy_root, path)
         try:
-            id_ = SuiteId(location=location)
+            id_ = SuiteId(location=location, skip_status=skip_status)
         except SuiteIdError as e:
             continue
         if prefix is None or id_.prefix == prefix:
@@ -296,7 +296,7 @@ def get_local_suites(prefix=None):
     return local_copies
 
 
-def get_local_suite_details(prefix=None, id_list=None):
+def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
     """returns details of the local suites as if they had been obtained using
        a search or query.
        """
@@ -304,7 +304,7 @@ def get_local_suite_details(prefix=None, id_list=None):
         return
 
     if id_list == None:
-        id_list = get_local_suites()
+        id_list = get_local_suites(skip_status=skip_status)
 
     if not id_list:
         return []
