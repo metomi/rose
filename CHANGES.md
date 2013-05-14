@@ -33,13 +33,14 @@ GUI for all your running suites.
 
 \#604: rose date -c: new option, short for `rose date $ROSE_TASK_CYCLE_TIME`.
 
-\#603: rose suite-log-view: new `--log-archive-threshold=CYCLE-TIME` option.
+\#603, #641: rose suite-log-view: new `--log-archive-threshold=CYCLE-TIME` option.
 The option switches on job log archiving by specifying a cycle time threshold.
 All job logs at this cycle time or older will be archived.
 
 The HTML view has been modified to load the data of the jobs of selected
-cycle times only. The default view is the latest cycle, but this can be modified
-via a multiple selection box and/or via URL query.
+cycle times only. The default view will ignore cycles with job logs that have
+been archived, but this can be modified via a multiple selection box and/or via
+URL query.
 
 \#595: rosie lookup, rosie ls: now output with column headings.
 
