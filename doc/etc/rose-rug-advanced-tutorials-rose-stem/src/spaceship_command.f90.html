@@ -71,19 +71,19 @@ READ(2, NML=command)
 CLOSE(UNIT=2)
 
 OPEN(UNIT=3, FILE='output.txt')
-WRITE(3, *) 'Time: t=0.0'
-WRITE(3, *) 'Position: ',position(1),',',position(2),',',position(3)
-WRITE(3, *) 'Velocity: ',velocity(1),',',velocity(2),',',velocity(3)
+WRITE(3, '(A)') 'Time: t=0.0'
+WRITE(3, '(A,3(F7.3,A))') 'Position: ',position(1),',',position(2),',',position(3)
+WRITE(3, '(A,3(F7.3,A))') 'Velocity: ',velocity(1),',',velocity(2),',',velocity(3)
 WRITE(3, '(/)')
 
 DO i = 1, tmax
   acceleration = thrust(:, i) / mass
   velocity = velocity + acceleration * dt
   position = position + velocity * dt
-  WRITE(3, *) 'Time: t=',dt * i
-  WRITE(3, *) 'Acceleration:',acceleration(1),',',acceleration(2),',',acceleration(3)
-  WRITE(3, *) 'Position: ',position(1),',',position(2),',',position(3)
-  WRITE(3, *) 'Velocity: ',velocity(1),',',velocity(2),',',velocity(3)
+  WRITE(3, '(A, F7.3)') 'Time: t=',dt * i
+  WRITE(3, '(A,3(F7.3,A))') 'Acceleration:',acceleration(1),',',acceleration(2),',',acceleration(3)
+  WRITE(3, '(A,3(F7.3,A))') 'Position: ',position(1),',',position(2),',',position(3)
+  WRITE(3, '(A,3(F7.3,A))') 'Velocity: ',velocity(1),',',velocity(2),',',velocity(3)
   WRITE(3, '(/)')
 END DO
 
