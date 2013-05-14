@@ -34,6 +34,9 @@
 #     where the suite is running or last run.
 #
 # OPTIONS
+#     --all
+#         Shutdown all running suites. You will be prompted to confirm shutting
+#         down each affected suite.
 #     --host=HOST
 #         Specify a host.
 #     --name=SUITE-NAME

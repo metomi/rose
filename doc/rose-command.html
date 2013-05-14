@@ -1175,7 +1175,7 @@
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbr>--all</kbd></dt>
+      <dt><kbd>--all</kbd></dt>
       
       <dd>Open a suite control GUI for each running suite.</dd>
       
@@ -1259,15 +1259,15 @@
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose suite-log-view [OPTIONS] [SUITE]</kbd></p>
+    <p><kbd>rose suite-log-view [OPTIONS] [TASK ...]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
-    <p>Generate and browse the log view of <var>SUITE</var>.</p>
+    <p>Generate and browse the log view of a suite.</p>
 
     <p>Analyse the suite log to generate a JSON file for feeding into an HTML
-    based viewer. <var>SUITE</var> should be a valid suite name. If not
-    defined, use <var>basename $PWD</var>.</p>
+    based viewer. If <kbd>--name=SUITE-NAME</kbd> is not specified, the 
+    basename of <var>$PWD</var> is assumed to be the suite name.</p>
 
     <p>If the <var>DISPLAY</var> environment variable is defined. Launch the
     web browser to display the log view unless <kbd>--no-web-browse</kbd> is
@@ -1286,6 +1286,10 @@
       <dd>Switch on job log archiving by specifying a cycle time threshold. All
       job logs at this cycle time or older will be archived. Implies
       <kbd>--full</kbd>.</dd>
+
+      <dt><kbd>--name=SUITE-NAME</kbd></dt>
+      
+      <dd>Specify the suite name.</dd>
 
       <dt><kbd>--no-web-browse</kbd></dt>
 
@@ -1540,6 +1544,11 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--all</kbd></dt>
+      
+      <dd>Shutdown all running suites. You will be prompted to confirm shutting
+      down each affected suite.</dd>
+      
       <dt><kbd>--host=HOST</kbd></dt>
 
       <dd>Specify a host.</dd>

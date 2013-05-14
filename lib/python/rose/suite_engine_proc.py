@@ -249,6 +249,10 @@ class SuiteEngineProcessor(object):
         """Remove items created by the previous run of a suite."""
         raise NotImplementedError()
 
+    def get_cycle_log_archive_name(self, cycle):
+        """Return the jobs log archive file name of a given cycle time."""
+        raise NotImplementedError()
+
     def get_suite_db_file(self, suite_name):
         """Return the path to the suite runtime database file."""
         raise NotImplementedError()

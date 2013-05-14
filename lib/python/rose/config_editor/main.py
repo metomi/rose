@@ -853,9 +853,444 @@ class MainController(object):
         """Redraw the navigation namespace tree."""
         self.nav_controller.reload_namespace_tree(*args, **kwargs)
 
+<<<<<<< HEAD
     def tree_trigger_update(self, *args, **kwargs):
         """Placeholder for updater function of the same name."""
         self.updater.tree_trigger_update(*args, **kwargs)
+=======
+        """
+        if hasattr(self, 'hyper_panel'):
+            self.hyper_panel.load_tree(None, self.data.namespace_tree)
+            if only_this_namespace is None:
+                self.update_all()
+            else:
+                self.update_all(skip_checking=True)
+                spaces = only_this_namespace.lstrip("/").split("/")
+                for i in range(len(spaces), 0, -1):
+                    update_ns = "/" + "/".join(spaces[:i])
+                    self.update_namespace(update_ns, skip_config_update=True)
+
+    def refresh_ids(self, config_name, setting_ids, is_loading=False,
+                    are_errors_done=False):
+        """Refresh and redraw settings if needed."""
+        self._generate_pagelist()
+        nses_to_do = []
+        for changed_id in setting_ids:
+            sect, opt = self.util.get_section_option_from_id(changed_id)
+            if opt is None:
+                ns = self.data.get_default_namespace_for_section(sect,
+                                                                 config_name)
+                if ns in [p.namespace for p in self.pagelist]:
+                    index = [p.namespace for p in self.pagelist].index(ns)
+                    page = self.pagelist[index]
+                    page.refresh()
+            else:
+                var = self.data.get_ns_variable(changed_id, config_name)
+                if var is None:
+                    continue
+                ns = var.metadata['full_ns']
+                if ns in [p.namespace for p in self.pagelist]:
+                    index = [p.namespace for p in self.pagelist].index(ns)
+                    page = self.pagelist[index]
+                    page.refresh(changed_id)
+            if ns not in nses_to_do and not are_errors_done:
+                nses_to_do.append(ns)
+        for ns in nses_to_do:
+            self.update_namespace(ns, is_loading=is_loading)
+
+    def update_all(self, only_this_config=None, is_loading=False,
+                   skip_checking=False):
+        """Loop over all namespaces and update."""
+        unique_namespaces = self.data.get_all_namespaces(only_this_config)
+        if only_this_config is None:
+            configs = self.data.config.keys()
+        else:
+            configs = [only_this_config]
+        for config_name in configs:
+            self.update_config(config_name)
+        self._generate_pagelist()
+
+        if not skip_checking:
+            for ns in unique_namespaces:
+                if ns in [p.namespace for p in self.pagelist]:
+                    index = [p.namespace for p in self.pagelist].index(ns)
+                    page = self.pagelist[index]
+                    self.sync_page_var_lists(page)
+                self.update_ignored_statuses(ns)  
+            self.perform_error_check(is_loading=is_loading)
+        
+        for ns in unique_namespaces:
+            if ns in [p.namespace for p in self.pagelist]:
+                index = [p.namespace for p in self.pagelist].index(ns)
+                page = self.pagelist[index]
+                self.update_tree_status(page)  # Faster.
+            else:
+                self.update_tree_status(ns)
+        self.update_bar_sensitivity()
+        self.update_stack_viewer_if_open()
+        for config_name in configs:
+            self.update_metadata_id(config_name)
+        self.update_ns_sub_data()
+
+    def update_namespace(self, namespace, are_errors_done=False,
+                         is_loading=False, skip_config_update=False):
+        """Update driver function. Updates the page if open."""
+        self._generate_pagelist()
+        if namespace in [p.namespace for p in self.pagelist]:
+            index = [p.namespace for p in self.pagelist].index(namespace)
+            page = self.pagelist[index]
+            self.update_status(page, are_errors_done=are_errors_done,
+                               skip_config_update=skip_config_update)
+        else:
+            if not skip_config_update:
+                self.update_config(namespace)
+            self.update_sections(namespace)
+            self.update_ignored_statuses(namespace)
+            if not are_errors_done and not is_loading:
+                self.perform_error_check(namespace)
+            self.update_tree_status(namespace)
+            if not is_loading:
+                self.update_bar_sensitivity()
+            self.update_stack_viewer_if_open()
+            if namespace in self.data.config.keys():
+                self.update_metadata_id(namespace)
+            self.update_ns_sub_data(namespace)
+
+    def update_status(self, page, are_errors_done=False,
+                      skip_config_update=False):
+        """Update ignored statuses and update the tree statuses."""
+        self._generate_pagelist()
+        self.sync_page_var_lists(page)
+        if not skip_config_update:
+            self.update_config(page.namespace)
+        self.update_sections(page.namespace)
+        self.update_ignored_statuses(page.namespace)
+        if not are_errors_done:
+            self.perform_error_check(page.namespace)
+        self.update_tree_status(page)
+        self.update_bar_sensitivity()
+        self.update_stack_viewer_if_open()
+        if page.namespace in self.data.config.keys():
+            self.update_metadata_id(page.namespace)
+        self.update_ns_sub_data(page.namespace)
+
+    def update_ns_sub_data(self, namespace=None):
+        """Update any relevant summary data on another page."""
+        for page in self.pagelist:
+            if (namespace is not None and
+                 not namespace.startswith(page.namespace) and
+                 namespace != page.namespace):
+                continue
+            page.sub_data = self.data.get_sub_data_for_namespace(
+                                                   page.namespace)
+            page.update_sub_data()
+
+    def update_ns_info(self, namespace):
+        if namespace in [p.namespace for p in self.pagelist]:
+            index = [p.namespace for p in self.pagelist].index(namespace)
+            page = self.pagelist[index]
+            page.update_ignored()
+            page.update_info()
+
+    def sync_page_var_lists(self, page):
+        """Make sure the list of page variables has the right members."""
+        config_name = self.util.split_full_ns(self.data, page.namespace)[0]
+        real, miss = self.data.get_data_for_namespace(page.namespace)
+        page_real, page_miss = page.panel_data, page.ghost_data
+        refresh_vars = []
+        action_vsets = [(page_real.remove, set(page_real) - set(real)),
+                        (page_real.append, set(real) - set(page_real)),
+                        (page_miss.remove, set(page_miss) - set(miss)),
+                        (page_miss.append, set(miss) - set(page_miss))]
+        
+        for action, v_set in action_vsets:
+            for var in v_set:
+                if var not in refresh_vars:
+                    refresh_vars.append(var)
+            for var in v_set:
+                action(var)
+        for var in refresh_vars:
+            page.refresh(var.metadata['id'])
+
+    def update_config(self, namespace):
+        """Update the config object for the macros. To be removed."""
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
+        config = self.data.dump_to_internal_config(config_name)
+        self.data.config[config_name].config = config
+
+    def update_sections(self, namespace):
+        """Update the list of sections that are empty."""
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
+        config_data = self.data.config[config_name]
+        for section in self.data.get_sections_from_namespace(namespace):
+            sect_data = config_data.sections.now.get(section)
+            if sect_data is None:
+                continue
+            variables = config_data.vars.now.get(section, [])
+            sect_data.options = []
+            if not variables:
+                if section in config_data.vars.now:
+                    config_data.vars.now.pop(section)
+            for variable in variables:
+                var_id = variable.metadata['id']
+                option = self.util.get_section_option_from_id(var_id)[1]
+                sect_data.options.append(option)
+            
+    def update_ignored_statuses(self, namespace):
+        """Refresh the list of ignored variables and update relevant pages."""
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
+        config_data = self.data.config[config_name]
+        # Check for triggering variables that have changed values
+        self.data.trigger_id_value_lookup.setdefault(config_name, {})
+        trig_id_val_dict = self.data.trigger_id_value_lookup[config_name]
+        trigger = self.trigger[config_name]
+        allowed_sections = self.data.get_sections_from_namespace(namespace)
+        updated_ids = []
+
+        this_ns_triggers = []
+        ns_vars, ns_l_vars = self.data.get_data_for_namespace(namespace)
+        for var in ns_vars + ns_l_vars:
+            var_id = var.metadata['id']
+            if not trigger.check_is_id_trigger(var_id, config_data.meta):
+                continue
+            if var in ns_l_vars:
+                new_val = None
+            else:
+                new_val = var.value
+            old_val = trig_id_val_dict.get(var_id)
+            if old_val != new_val:  # new_val or old_val can be None
+                this_ns_triggers.append(var_id)
+                updated_ids += self.update_ignoreds(config_name,
+                                                    var_id)
+
+        if not this_ns_triggers:
+            # No reason to update anything.
+            return False
+
+        var_id_map = {}
+        for var in config_data.vars.get_all(no_latent=True):
+            var_id = var.metadata['id']
+            var_id_map.update({var_id: var})
+
+        update_nses = []
+        update_section_nses = []
+        for setting_id in updated_ids:
+            sect, opt = self.util.get_section_option_from_id(setting_id)
+            if opt is None:
+                sect_vars = config_data.vars.now.get(sect, [])
+                ns = self.data.get_default_namespace_for_section(sect,
+                                                                 config_name)
+                if ns not in update_section_nses:
+                    update_section_nses.append(ns)
+            else:
+                sect_vars = list(config_data.vars.now.get(sect, []))
+                sect_vars += list(config_data.vars.latent.get(sect, []))
+                for var in list(sect_vars):
+                    if var.metadata['id'] != setting_id:
+                        sect_vars.remove(var)
+            for var in sect_vars:
+                var_ns = var.metadata['full_ns']
+                var_id = var.metadata['id']
+                vsect = self.util.get_section_option_from_id(var_id)[0]
+                if var_ns not in update_nses:
+                    update_nses.append(var_ns)
+                if (vsect in updated_ids and
+                    var_ns not in update_section_nses):
+                    update_section_nses.append(var_ns)
+        for page in self.pagelist:
+            if page.namespace in update_nses:
+                page.update_ignored()  # Redraw affected widgets.
+            if page.namespace in update_section_nses:
+                page.update_info()
+        for var_id in trig_id_val_dict.keys() + updated_ids:
+            var = var_id_map.get(var_id)
+            if var is None:
+                if var_id in trig_id_val_dict:
+                    trig_id_val_dict.pop(var_id)
+            else:
+                trig_id_val_dict.update(
+                                    {var_id: var.value})
+
+    def update_ignoreds(self, config_name, var_id):
+        """Update the variable ignored flags ('reasons')."""
+        config_data = self.data.config[config_name]
+        trigger = self.trigger[config_name]
+        
+        config = config_data.config
+        meta_config = config_data.meta
+        config_sections = config_data.sections
+        update_ids = trigger.update(var_id, config, meta_config)
+        update_vars = []
+        update_sections = []
+        for setting_id in update_ids:
+            section, option = self.util.get_section_option_from_id(setting_id)
+            if option is None:
+                update_sections.append(section)
+            else:
+                for var in config_data.vars.now.get(section, []):
+                    if var.metadata['id'] == setting_id:
+                        update_vars.append(var)
+                        break
+                else:
+                    for var in config_data.vars.latent.get(section, []):
+                        if var.metadata['id'] == setting_id:
+                            update_vars.append(var)
+                            break
+        triggered_ns_list = []
+        this_id = var_id
+        nses = []
+        for namespace, metadata in self.data.namespace_meta_lookup.items():
+            this_name = self.util.split_full_ns(self.data, namespace)
+            if this_name != config_name:
+                continue
+            for section in update_sections:
+                if section in metadata['sections']:
+                    triggered_ns_list.append(namespace)
+
+        # Update the sections.
+        enabled_sections = [s for s in update_sections
+                            if s in trigger.enabled_dict and
+                            s not in trigger.ignored_dict]
+        for section in update_sections:
+            # Clear pre-existing errors.
+            sect_vars = (config_data.vars.now.get(section, []) +
+                         config_data.vars.latent.get(section, []))
+            sect_data = config_sections.now.get(section)
+            if sect_data is None:
+                sect_data = config_sections.latent[section]
+            for attribute in rose.config_editor.WARNING_TYPES_IGNORE:
+                if attribute in sect_data.error:
+                    sect_data.error.pop(attribute)
+            reason = sect_data.ignored_reason
+            if section in enabled_sections:
+                # Trigger-enabled sections
+                if (rose.variable.IGNORED_BY_USER in reason):
+                    # User-ignored but trigger-enabled
+                    if (meta.get([section, rose.META_PROP_COMPULSORY]).value
+                        == rose.META_PROP_VALUE_TRUE):
+                        # Doc table: I_u -> E -> compulsory
+                        sect_data.error.update(
+                              {rose.config_editor.WARNING_TYPE_USER_IGNORED:
+                               rose.config_editor.WARNING_NOT_USER_IGNORABLE})
+                elif (rose.variable.IGNORED_BY_SYSTEM in reason):
+                    # Normal trigger-enabled sections
+                    reason.pop(rose.variable.IGNORED_BY_SYSTEM)
+                    for var in sect_vars:
+                        ns = var.metadata['full_ns']
+                        if ns not in triggered_ns_list:
+                            triggered_ns_list.append(ns)
+                        var.ignored_reason.pop(
+                                    rose.variable.IGNORED_BY_SECTION)
+            elif section in trigger.ignored_dict:
+                # Trigger-ignored sections
+                parents = trigger.ignored_dict.get(section, {})
+                if parents:
+                    help_text = "; ".join(parents.values())
+                else:
+                    help_text = rose.config_editor.IGNORED_STATUS_DEFAULT
+                reason.update({rose.variable.IGNORED_BY_SYSTEM: help_text})
+                for var in sect_vars:
+                    ns = var.metadata['full_ns']
+                    if ns not in triggered_ns_list:
+                        triggered_ns_list.append(ns)
+                    var.ignored_reason.update(
+                                {rose.variable.IGNORED_BY_SECTION: help_text})
+        # Update the variables.
+        for var in update_vars:
+            var_id = var.metadata.get('id')
+            ns = var.metadata.get('full_ns')
+            if ns not in triggered_ns_list:
+                triggered_ns_list.append(ns)
+            if var_id == this_id:
+                continue
+            for attribute in rose.config_editor.WARNING_TYPES_IGNORE:
+                if attribute in var.error:
+                    var.error.pop(attribute)
+            if (var_id in trigger.enabled_dict and
+                var_id not in trigger.ignored_dict):
+                # Trigger-enabled variables
+                if (rose.variable.IGNORED_BY_USER in
+                    var.ignored_reason):
+                    # User-ignored but trigger-enabled
+                    # Doc table: I_u -> E
+                    if (var.metadata.get(rose.META_PROP_COMPULSORY) ==
+                        rose.META_PROP_VALUE_TRUE):
+                        # Doc table: I_u -> E -> compulsory
+                        var.error.update(
+                              {rose.config_editor.WARNING_TYPE_USER_IGNORED:
+                               rose.config_editor.WARNING_NOT_USER_IGNORABLE})
+                elif (rose.variable.IGNORED_BY_SYSTEM in
+                      var.ignored_reason):
+                    # Normal trigger-enabled variables
+                    var.ignored_reason.pop(rose.variable.IGNORED_BY_SYSTEM)
+            elif var_id in trigger.ignored_dict:
+                # Trigger-ignored variables
+                parents = trigger.ignored_dict.get(var_id, {})
+                if parents:
+                    help_text = "; ".join(parents.values())
+                else:
+                    help_text = rose.config_editor.IGNORED_STATUS_DEFAULT
+                var.ignored_reason.update(
+                            {rose.variable.IGNORED_BY_SYSTEM: help_text})
+        for namespace in triggered_ns_list:
+            self.update_tree_status(namespace)
+        return update_ids
+
+    def update_tree_status(self, page_or_ns, icon_bool=None, icon_type=None):
+        """Update the tree statuses."""
+        if not hasattr(self, 'hyper_panel'):
+            return
+        if isinstance(page_or_ns, basestring):
+            namespace = page_or_ns
+            config_name = self.util.split_full_ns(self.data, namespace)[0]
+            errors = []
+            ns_vars, ns_l_vars = self.data.get_data_for_namespace(namespace)
+            for var in ns_vars + ns_l_vars:
+                errors += var.error.items()
+        else:
+            namespace = page_or_ns.namespace
+            config_name = self.util.split_full_ns(self.data, namespace)[0]
+            errors = page_or_ns.validate_errors()
+        # Add section errors.
+        config_data = self.data.config[config_name]
+        for section in self.data.get_sections_from_namespace(namespace):
+            if section in config_data.sections.now:
+                errors += config_data.sections.now[section].error.items()
+        # Set icons.
+        name_tree = namespace.lstrip('/').split('/')
+        if icon_bool is None:
+            if icon_type == 'changed' or icon_type is None:
+                change = self._namespace_data_is_modified(namespace)
+                self.hyper_panel.update_change(name_tree, change)
+                self.hyper_panel.set_row_icon(name_tree, bool(change),
+                                              ind_type='changed')
+            if icon_type == 'error' or icon_type is None:
+                self.hyper_panel.set_row_icon(name_tree, len(errors),
+                                              ind_type='error')
+        else:
+            self.hyper_panel.set_row_icon(name_tree, icon_bool,
+                                          ind_type=icon_type)
+
+    def update_stack_viewer_if_open(self):
+        """Update the information in the stack viewer, if open."""
+        if self.pluggable:
+            return False
+        if isinstance(self.mainwindow.log_window,
+                      rose.config_editor.stack.StackViewer):
+            self.mainwindow.log_window.update()
+
+    def focus_sub_page_if_open(self, namespace, node_id):
+        """Focus the sub (summary) page for a namespace and id."""
+        if "/" not in namespace:
+            return False
+        summary_namespace = namespace.rsplit("/", 1)[0]
+        self._generate_pagelist()
+        page_namespaces = [p.namespace for p in self.pagelist]
+        if summary_namespace not in page_namespaces:
+            return False
+        page = self.pagelist[page_namespaces.index(summary_namespace)]
+        page.set_sub_focus(node_id)
+>>>>>>> master
 
 #------------------ Page viewer function -------------------------------------
 
