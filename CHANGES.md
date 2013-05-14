@@ -14,7 +14,7 @@ This release is known to work with cylc 5.2.0.
 
 Changes that have significant impact on user experience.
 
-None yet.
+\#559: rose config-edit: added custom interface to display STASH configuration.
 
 ### Other Changes
 
@@ -44,7 +44,7 @@ via a multiple selection box and/or via URL query.
 
 \#567: rose suite-clean: new command to remove items created by suite runs.
 
-\#559: rose config-edit: added custom interface to display STASH configuration.
+\#546: rose metadata: new macro option.
 
 \#534: rose_ana built-in application: now support arguments.
 
