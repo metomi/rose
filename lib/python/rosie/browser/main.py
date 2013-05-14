@@ -263,8 +263,8 @@ class MainWindow(gtk.Window):
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
-        res, suites = rosie.ws_client.get_local_suite_details( 
-                               self.search_manager.get_datasource())
+        res, id_list = rosie.ws_client.get_local_suite_details( 
+                                self.search_manager.get_datasource())
         self.display_maps_result(res, is_local=True)
         self.repeat_last_request = self.display_local_suites
         self.statusbar.set_progressbar_pulsing(False)

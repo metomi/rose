@@ -180,9 +180,8 @@ def local_suites(argv):
 
     ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
     if opts.prefix is not None:
-
         results, id_list = get_local_suite_details(opts.prefix)
-        return _display_maps(opts, ws_client, results)
+        return _display_maps(opts, ws_client, results, local_suites=id_list)
     else:
         id_list = get_local_suites()
         if len(id_list) > 0:
@@ -198,7 +197,7 @@ def local_suites(argv):
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
 
-                results, pref_id_list = get_local_suite_details(p, id_list)
+                results, other_id_list = get_local_suite_details(p, id_list)
                 opts.prefix = p
                 _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
@@ -338,7 +337,7 @@ def get_local_suite_details(prefix=None, id_list=None):
                 new_results.update({missing_id: result_map})
         for key in sorted(new_results):
             result_maps.append(new_results[key])
-    return result_maps, prefix_id_list
+    return result_maps, id_list
 
 
 def get_local_status(suites, prefix, idx, branch, revision):
