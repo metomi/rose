@@ -21,7 +21,7 @@
 #     rose suite-gcontrol
 #
 # SYNOPSIS
-#     rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [[--] CYLC-RUN-ARGS]
+#     rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [[--] CYLC-GUI-ARGS]
 #
 # DESCRIPTION
 #     Launch suite engine's suite control GUI for a suite.
