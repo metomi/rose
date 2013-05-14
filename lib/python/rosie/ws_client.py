@@ -181,7 +181,7 @@ def local_suites(argv):
     ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
     if opts.prefix is not None:
 
-        results = get_local_suite_details(opts.prefix)
+        results, id_list = get_local_suite_details(opts.prefix)
         return _display_maps(opts, ws_client, results)
     else:
         id_list = get_local_suites()
@@ -198,7 +198,7 @@ def local_suites(argv):
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
 
-                results = get_local_suite_details(p, id_list)
+                results, pref_id_list = get_local_suite_details(p, id_list)
                 opts.prefix = p
                 _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
@@ -311,42 +311,28 @@ def get_local_suite_details(prefix=None, id_list=None):
         return []
 
     result_maps = []
+    q = []
+    prefix_id_list = []
     for id_ in id_list:
-
         if id_.prefix == prefix:
-            local_copy_root = id_.get_local_copy_root()
-            info_file_path = os.path.join(local_copy_root, str(id_),
-                                          rose.INFO_CONFIG_NAME)
-            try:
-                id_config = rose.config.load(info_file_path)
-            except Exception:
-                continue
-
-            id_info_map = {u"idx": id_.idx,
-                           u"branch": id_.branch,
-                           u"revision": int(id_.revision)}
-
-            id_info_map[u"title"] = id_config[u"title"].value
-            id_info_map[u"owner"] = id_config[u"owner"].value
-            id_info_map[u"project"] = id_config[u"project"].value
-
-            if id_.corrupt:
-                id_info_map[u"local"] = STATUS_CR
-            elif id_.modified:
-                id_info_map[u"local"] = STATUS_MO
-            else:
-                id_info_map[u"local"] = STATUS_OK
-            id_info_map[u"status"] = None
-            id_info_map[u"from_idx"] = None
-
-            for key, node in id_config.value.items():
-                if node.is_ignored():
-                    continue
-                id_info_map.update({key: node.value})
-
-            result_maps.append(id_info_map)
-
-    return result_maps
+            prefix_id_list.append(id_)
+            q.extend(["or ( idx eq " + id_.idx,
+                      "and branch eq " + id_.branch + " )"])
+    ws_client = RosieWSClient(prefix=prefix)
+    result_maps, url = ws_client.query(q)
+    result_idx_branches = [(r[u"idx"], r[u"branch"]) for r in result_maps]
+    for id_ in prefix_id_list:
+        if (id_.idx, id_.branch) not in result_idx_branches:
+            # A branch may have been deleted - we need all_revs True.
+            # We only want to use all_revs on demand as it's slower.
+            idx_result_maps, url = ws_client.query(["and idx eq " + id_.idx,
+                                                    "and branch eq " + id_.branch],
+                                                   all_revs=True)
+            idx_result_maps.sort(lambda r1, r2: cmp(r2[u"revision"],
+                                                    r1[u"revision"]))
+            if idx_result_maps:
+                result_maps.append(idx_result_maps[0])
+    return result_maps, prefix_id_list
 
 
 def get_local_status(suites, prefix, idx, branch, revision):
@@ -361,7 +347,7 @@ def get_local_status(suites, prefix, idx, branch, revision):
                 status = STATUS_CR
             elif suite_id.branch == branch:
                 status = STATUS_DO
-                if suite_id.out_of_date:
+                if int(suite_id.revision) < int(revision):
                     status = STATUS_UP
                 elif int(suite_id.revision) == int(revision):
                     status = STATUS_OK
