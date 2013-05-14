@@ -147,10 +147,10 @@ def get_suite_name(event_handler=None):
             suite_name = os.path.basename(conf_dir)
             break
         else:
-            if not fs_util.dirname(conf_dir) == '/':
-                conf_dir = fs_util.dirname(conf_dir)
-            else:
+            up_dir = fs_util.dirname(conf_dir)
+            if up_dir == conf_dir:
                 raise SuiteNotFoundError(os.getcwd())
+            conf_dir = up_dir        
     return suite_name
 
 def prompt(action, suite_name, host):
