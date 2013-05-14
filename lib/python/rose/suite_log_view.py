@@ -28,6 +28,7 @@ from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_control import get_suite_name, SuiteNotFoundError
 import shutil
 import sys
 from time import time, sleep
@@ -271,6 +272,11 @@ def suite_log_view(opts, args, report=None):
         suite_name = args.pop(0)
     else:
         suite_name = os.path.basename(os.getcwd())
+        try:
+            suite_name = get_suite_name(report)
+        except SuiteNotFoundError as e:
+            report(e)
+            sys.exit(1)
     if not opts.full_mode and args:
         gen.update_job_log(suite_name, tasks=args)
     gen(suite_name, opts.full_mode, opts.log_archive_threshold)
