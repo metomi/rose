@@ -21,17 +21,18 @@
 #     rose suite-gcontrol
 #
 # SYNOPSIS
-#     rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS ...]
+#     rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [[--] CYLC-RUN-ARGS]
 #
 # DESCRIPTION
 #     Launch suite engine's suite control GUI for a suite.
 #
 #     If --name=SUITE-NAME is not specified, the basename of $PWD is assumed to
-#     be the suite name.
+#     be the suite name. Arguments (and options after --) are passed to 
+#     "cylc gui".
 #
 #     This wrapper is to deal with the use case where a suite may be running on
 #     dedicated servers at a site. The wrapper will make an attempt to detect
-#     where the suite is running or last run.
+#     where the suite is running or last run. 
 #
 # OPTIONS
 #     --all
