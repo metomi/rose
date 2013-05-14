@@ -321,17 +321,23 @@ def get_local_suite_details(prefix=None, id_list=None):
     ws_client = RosieWSClient(prefix=prefix)
     result_maps, url = ws_client.query(q)
     result_idx_branches = [(r[u"idx"], r[u"branch"]) for r in result_maps]
+    q = []
     for id_ in prefix_id_list:
         if (id_.idx, id_.branch) not in result_idx_branches:
             # A branch may have been deleted - we need all_revs True.
-            # We only want to use all_revs on demand as it's slower.
-            idx_result_maps, url = ws_client.query(["and idx eq " + id_.idx,
-                                                    "and branch eq " + id_.branch],
-                                                   all_revs=True)
-            idx_result_maps.sort(lambda r1, r2: cmp(r2[u"revision"],
-                                                    r1[u"revision"]))
-            if idx_result_maps:
-                result_maps.append(idx_result_maps[0])
+            # We only want to use all_revs on demand as it's slow.
+            q.extend(["or ( idx eq " + id_.idx,
+                      "and branch eq " + id_.branch + " )"])
+    if q:
+        missing_result_maps, url = ws_client.query(q, all_revs=True)
+        new_results = {}
+        for result_map in missing_result_maps:
+            missing_id = (result_map[u"idx"], result_map[u"branch"])
+            if (missing_id not in new_results or
+                result_map[u"revision"] > new_results[missing_id][u"revision"]):
+                new_results.update({missing_id: result_map})
+        for key in sorted(new_results):
+            result_maps.append(new_results[key])
     return result_maps, prefix_id_list
 
 
