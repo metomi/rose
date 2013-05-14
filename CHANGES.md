@@ -21,6 +21,9 @@ Changes that have significant impact on user experience.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#620: rose suite-shutdown: added `--all` option to shutdown all of your
+running rose suites.
+
 \#621: rose stem: will now log version control information for each source.
 
 \#617: rose suite-gcontrol: added `--all` option to launch the control
