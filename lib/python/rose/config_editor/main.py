@@ -861,9 +861,7 @@ class MainController(object):
             if only_this_namespace is None:
                 self.update_all()
             else:
-                config_name = self.util.split_full_ns(self.data,
-                                                      only_this_namespace)[0]
-                self.update_config(config_name)
+                self.update_all(skip_checking=True)
                 spaces = only_this_namespace.lstrip("/").split("/")
                 for i in range(len(spaces), 0, -1):
                     update_ns = "/" + "/".join(spaces[:i])
@@ -897,7 +895,8 @@ class MainController(object):
         for ns in nses_to_do:
             self.update_namespace(ns, is_loading=is_loading)
 
-    def update_all(self, only_this_config=None, is_loading=False):
+    def update_all(self, only_this_config=None, is_loading=False,
+                   skip_checking=False):
         """Loop over all namespaces and update."""
         unique_namespaces = self.data.get_all_namespaces(only_this_config)
         if only_this_config is None:
@@ -907,15 +906,15 @@ class MainController(object):
         for config_name in configs:
             self.update_config(config_name)
         self._generate_pagelist()
-       
-        for ns in unique_namespaces:
-            if ns in [p.namespace for p in self.pagelist]:
-                index = [p.namespace for p in self.pagelist].index(ns)
-                page = self.pagelist[index]
-                self.sync_page_var_lists(page)
-            self.update_ignored_statuses(ns)
-            
-        self.perform_error_check(is_loading=is_loading)  # Global error check.
+
+        if not skip_checking:
+            for ns in unique_namespaces:
+                if ns in [p.namespace for p in self.pagelist]:
+                    index = [p.namespace for p in self.pagelist].index(ns)
+                    page = self.pagelist[index]
+                    self.sync_page_var_lists(page)
+                self.update_ignored_statuses(ns)  
+            self.perform_error_check(is_loading=is_loading)
         
         for ns in unique_namespaces:
             if ns in [p.namespace for p in self.pagelist]:
