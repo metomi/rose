@@ -1158,15 +1158,16 @@
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [-- EXTRA-ARGS
-    ...]</kbd></p>
+    <p><kbd>rose suite-gcontrol [OPTIONS] [--name=SUITE-NAME] [[--] 
+    CYLC-GUI-ARGS]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
     <p>Launch suite engine's suite control GUI for a suite.</p>
 
     <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the basename of
-    <var>$PWD</var> is assumed to be the suite name.</p>
+    <var>$PWD</var> is assumed to be the suite name.  Arguments (and options) 
+    after <kbd>--</kbd> are passed to <kbd>cylc gui</kbd>.</p>
 
     <p>This wrapper is to deal with the use case where a suite may be running
     on dedicated servers at a site. The wrapper will make an attempt to detect
