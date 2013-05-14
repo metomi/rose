@@ -62,7 +62,7 @@
 {# groups contains group_option-trigger_list key-value pairs. -#}
 {# If a group option is set, each group or task in the trigger list will be set. -#}
 {%- set groups = {
-    "all"       : ["command_spaceship",  "fire_lasers",  ],
+    "all"       : ["command_spaceship",  "fire_lasers"]
     }
 %}
 
@@ -115,7 +115,7 @@ export ROSE_VERSION={{ROSE_VERSION}}
 
     [[fcm_make_spaceship]]
       [[[environment]]]
-        SOURCE_FOO = {{SOURCE_FOO}}
+        SOURCE_SPACESHIP = {{SOURCE_SPACESHIP}}
     
     [[spaceship]]
     
