@@ -154,6 +154,25 @@ tr.even td.sorting_1 {
     float: right;
     font-weight: bold;
 }
+#cycle_time {
+    height: 14.5em;
+    position: relative;
+}
+#cycle_time div {
+    left: 10.5em;
+    position: absolute;
+    top: 0.2em;
+}
+#cycle_time select {
+    left: 0;
+    height: 14em;
+    position: absolute;
+    top: 0.2em;
+    width: 10em;
+}
+#cycle_time input[type=button], #cycle_time input[type=submit] {
+    width: 9em;
+}
 </style>
 <script type="text/javascript" src="html-lib/jquery/jquery.min.js">
 </script>
@@ -242,8 +261,15 @@ $(function() {
         $("#suite_info_toggle").click(function() {
             $("#suite_info").toggle();
         });
-        $.each(data["cycle_times"], function(i, cycle_time) {
-            $("#cycle_time select").append($("<option/>").text(cycle_time));
+        $.each(data["cycle_times_archived"], function(i, cycle_time) {
+            $("#cycle_times_archived").append($("<option/>").text(cycle_time));
+        });
+        $.each(data["cycle_times_current"], function(i, cycle_time) {
+            $("#cycle_times_current").append($("<option/>").text(cycle_time));
+        });
+        $("#cycle_times_select_current").click(function() {
+            $("#cycle_times_current option").attr("selected", "selected");
+            $("#cycle_times_archived option").removeAttr("selected");
         });
         $("#cycle_times_select_all").click(function() {
             $("#cycle_time select option").attr("selected", "selected");
@@ -252,7 +278,14 @@ $(function() {
             $("#cycle_time").toggle();
         });
         $("#cycle_time_toggle").click();
-        $("#t_cycle_times").text(data["cycle_times"].length);
+        var t_cycle_times = 0;
+        if (data["cycle_times_archived"]) {
+            t_cycle_times += data["cycle_times_archived"].length;
+        }
+        if (data["cycle_times_current"]) {
+            t_cycle_times += data["cycle_times_current"].length;
+        }
+        $("#t_cycle_times").text(t_cycle_times);
         populate_tasks_table();
     }
 
@@ -488,8 +521,11 @@ $(function() {
     /* Populates the task table. */
     function populate_tasks_table(cycle_times) {
         if (cycle_times == null) {
-            var default_value = $("#cycle_time option:first").text();
-            cycle_times = get_opts("cycle_time", [default_value]);
+            var default_values = [];
+            $("#cycle_times_current option").each(function() {
+                default_values.push($(this).text());
+            });
+            cycle_times = get_opts("cycle_time", default_values);
             $("#n_cycle_times").text(cycle_times.length);
         }
         if (cycle_times.length) {
@@ -577,16 +613,27 @@ $(function() {
   </div>
 </div>
 <div id="cycle_times_filter">
-<a id="cycle_time_toggle" href="#">cycle times filter</a>
-(<span id="n_cycle_times">?</span> of <span id="t_cycle_times">?</span> selected)
-<form id="cycle_time" action="#" method="get">
-<select name="cycle_time" multiple="multiple" size="10"
-title="filter cycle times">
-</select>
-<input type="button" id="cycle_times_select_all" name="cycle_times_select_all"
-value="Select All" />
-<input type="submit" value="OK" />
-</form>
+  <a id="cycle_time_toggle" href="#">cycle times filter</a>
+  (<span id="n_cycle_times">?</span> of <span id="t_cycle_times">?</span>
+  selected)
+  <form id="cycle_time" action="#" method="get">
+    <select name="cycle_time" multiple="multiple"
+    title="filter cycle times">
+      <optgroup id="cycle_times_current" label="current">
+      </optgroup>
+      <optgroup id="cycle_times_archived" label="archived">
+      </optgroup>
+    </select>
+    <div>
+    <input type="button" id="cycle_times_select_current"
+    name="cycle_times_select_current" value="Select Current" />
+    <br/>
+    <input type="button" id="cycle_times_select_all"
+    name="cycle_times_select_all" value="Select All" />
+    <br/>
+    <input type="submit" value="OK" />
+    </div>
+  </form>
 </div>
 <table id="task_list" summary="Task List">
   <thead>
