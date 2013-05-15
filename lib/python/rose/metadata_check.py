@@ -47,8 +47,9 @@ VALUE_JOIN = " and "
 def get_allowed_metadata_properties():
     """Return a list of allowed properties such as type or values."""
     properties = []
-    for key, value in dir(rose).items():
-        if key.startswith("META_PROP_"):
+    for key in dir(rose):
+        if (key.startswith("META_PROP_") and
+            not key.startswith("META_PROP_VALUE_")):
             properties.append(key)
     return properties
 
@@ -185,7 +186,7 @@ def metadata_check(meta_config, meta_dir=None,
             # 'values' supercedes other type-like props, so don't use them.
             unnecessary_props = []
             for type_like_prop in [rose.META_PROP_PATTERN,
-                                   rose.META_PROP_RANGE
+                                   rose.META_PROP_RANGE,
                                    rose.META_PROP_TYPE]:
                 if node.get([type_like_prop], no_ignore=True) is not None:
                     info = UNNECESSARY_VALUES_PROP
@@ -216,11 +217,11 @@ def metadata_check(meta_config, meta_dir=None,
                 reports.append(rose.macro.MacroReport(section, option,
                                                       value, info))
     # Check triggering.
-    trigger_macro = rose.macros.TriggerMacro()
+    trigger_macro = rose.macros.trigger.TriggerMacro()
     # The .validate method will be replaced in a forthcoming enhancement.
     reports.extend(trigger_macro.validate(rose.config.ConfigNode(),
                                           meta_config=meta_config))
-    sorter = rose.config.sort_settings()
+    sorter = rose.config.sort_settings
     reports.sort(lambda x, y: sorter(x.option, y.option))
     reports.sort(lambda x, y: sorter(x.section, y.section))
     return reports
@@ -246,9 +247,14 @@ def main():
                              meta_dir=opts.conf_dir,
                              only_these_sections=args,
                              only_these_properties=opts.property)
-    sys.stderr.write(rose.macro.get_reports_as_text(
+    text = rose.macro.get_reports_as_text(
                                     reports,
                                     "Metadata Checker")
+    if reports:
+        sys.exit(text)
+    else:
+        sys.stdout.write(text)
+
 
 if __name__ == "__main__":
     main()
