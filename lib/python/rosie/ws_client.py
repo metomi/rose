@@ -180,9 +180,8 @@ def local_suites(argv):
 
     ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
     if opts.prefix is not None:
-
-        results = get_local_suite_details(opts.prefix)
-        return _display_maps(opts, ws_client, results)
+        results, id_list = get_local_suite_details(opts.prefix)
+        return _display_maps(opts, ws_client, results, local_suites=id_list)
     else:
         id_list = get_local_suites()
         if len(id_list) > 0:
@@ -198,7 +197,7 @@ def local_suites(argv):
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
 
-                results = get_local_suite_details(p, id_list)
+                results, other_id_list = get_local_suite_details(p, id_list)
                 opts.prefix = p
                 _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
@@ -280,7 +279,7 @@ def query_split(args):
     return q
 
 
-def get_local_suites(prefix=None):
+def get_local_suites(prefix=None, skip_status=False):
     """Returns a dict of prefixes and id tuples for locally-present suites."""
     local_copies = []
     local_copy_root = SuiteId.get_local_copy_root()
@@ -289,7 +288,7 @@ def get_local_suites(prefix=None):
     for path in os.listdir(local_copy_root):
         location = os.path.join(local_copy_root, path)
         try:
-            id_ = SuiteId(location=location)
+            id_ = SuiteId(location=location, skip_status=skip_status)
         except SuiteIdError as e:
             continue
         if prefix is None or id_.prefix == prefix:
@@ -297,7 +296,7 @@ def get_local_suites(prefix=None):
     return local_copies
 
 
-def get_local_suite_details(prefix=None, id_list=None):
+def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
     """returns details of the local suites as if they had been obtained using
        a search or query.
        """
@@ -305,48 +304,40 @@ def get_local_suite_details(prefix=None, id_list=None):
         return
 
     if id_list == None:
-        id_list = get_local_suites()
+        id_list = get_local_suites(skip_status=skip_status)
 
     if not id_list:
         return []
 
     result_maps = []
+    q = []
+    prefix_id_list = []
     for id_ in id_list:
-
         if id_.prefix == prefix:
-            local_copy_root = id_.get_local_copy_root()
-            info_file_path = os.path.join(local_copy_root, str(id_),
-                                          rose.INFO_CONFIG_NAME)
-            try:
-                id_config = rose.config.load(info_file_path)
-            except Exception:
-                continue
-
-            id_info_map = {u"idx": id_.idx,
-                           u"branch": id_.branch,
-                           u"revision": int(id_.revision)}
-
-            id_info_map[u"title"] = id_config[u"title"].value
-            id_info_map[u"owner"] = id_config[u"owner"].value
-            id_info_map[u"project"] = id_config[u"project"].value
-
-            if id_.corrupt:
-                id_info_map[u"local"] = STATUS_CR
-            elif id_.modified:
-                id_info_map[u"local"] = STATUS_MO
-            else:
-                id_info_map[u"local"] = STATUS_OK
-            id_info_map[u"status"] = None
-            id_info_map[u"from_idx"] = None
-
-            for key, node in id_config.value.items():
-                if node.is_ignored():
-                    continue
-                id_info_map.update({key: node.value})
-
-            result_maps.append(id_info_map)
-
-    return result_maps
+            prefix_id_list.append(id_)
+            q.extend(["or ( idx eq " + id_.idx,
+                      "and branch eq " + id_.branch + " )"])
+    ws_client = RosieWSClient(prefix=prefix)
+    result_maps, url = ws_client.query(q)
+    result_idx_branches = [(r[u"idx"], r[u"branch"]) for r in result_maps]
+    q = []
+    for id_ in prefix_id_list:
+        if (id_.idx, id_.branch) not in result_idx_branches:
+            # A branch may have been deleted - we need all_revs True.
+            # We only want to use all_revs on demand as it's slow.
+            q.extend(["or ( idx eq " + id_.idx,
+                      "and branch eq " + id_.branch + " )"])
+    if q:
+        missing_result_maps, url = ws_client.query(q, all_revs=True)
+        new_results = {}
+        for result_map in missing_result_maps:
+            missing_id = (result_map[u"idx"], result_map[u"branch"])
+            if (missing_id not in new_results or
+                result_map[u"revision"] > new_results[missing_id][u"revision"]):
+                new_results.update({missing_id: result_map})
+        for key in sorted(new_results):
+            result_maps.append(new_results[key])
+    return result_maps, id_list
 
 
 def get_local_status(suites, prefix, idx, branch, revision):
@@ -361,7 +352,7 @@ def get_local_status(suites, prefix, idx, branch, revision):
                 status = STATUS_CR
             elif suite_id.branch == branch:
                 status = STATUS_DO
-                if suite_id.out_of_date:
+                if int(suite_id.revision) < int(revision):
                     status = STATUS_UP
                 elif int(suite_id.revision) == int(revision):
                     status = STATUS_OK

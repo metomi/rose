@@ -5,14 +5,16 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2013-05-??)
+## 2013-05 (2013-05-15)
 
-This will be the 4th release of Rose.
-This release is known to work with cylc 5.2.0.
+This release of Rose works with cylc 5.2.0.
 
 ### Highlight Changes
 
 Changes that have significant impact on user experience.
+
+\#577: rose suite-log-view: now uses `--name=SUITE-NAME` instead of an argument
+to specify a suite.
 
 \#559: rose config-edit: added custom interface to display STASH configuration.
 

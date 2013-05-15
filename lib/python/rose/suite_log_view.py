@@ -252,7 +252,7 @@ class SuiteLogViewGenerator(object):
 def main():
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("full_mode", "log_archive_threshold",
-                              "web_browser_mode")
+                              "name", "web_browser_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -268,8 +268,8 @@ def main():
 
 def suite_log_view(opts, args, report=None):
     gen = SuiteLogViewGenerator(event_handler=report)
-    if args:
-        suite_name = args.pop(0)
+    if opts.name:
+        suite_name = opts.name
     else:
         suite_name = os.path.basename(os.getcwd())
         try:
@@ -278,7 +278,7 @@ def suite_log_view(opts, args, report=None):
             report(e)
             sys.exit(1)
     if not opts.full_mode and args:
-        gen.update_job_log(suite_name, tasks=args)
+        gen.update_job_log(suite_name, task_ids=args)
     gen(suite_name, opts.full_mode, opts.log_archive_threshold)
     if opts.web_browser_mode:
         return gen.view_suite_log_url(suite_name)

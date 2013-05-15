@@ -242,7 +242,8 @@ class MainWindow(gtk.Window):
                                          self.search_manager.ws_client.prefix)
         except Exception as e:
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     type(e).__name__ + ": " + str(e))
+                                     type(e).__name__ + ": " + str(e),
+                                     title=rosie.browser.TITLE_ERROR)
             return None
 
         # Poll for new entry in db.
@@ -257,14 +258,16 @@ class MainWindow(gtk.Window):
 
     def display_local_suites(self, a_widget=None):
         """Get and display the locally stored suites."""
+        self.local_updater.update_now()
         self.nav_bar.address_box.child.set_text("")
         self.refresh_url = ""
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
-        res = rosie.ws_client.get_local_suite_details( 
-                              self.search_manager.get_datasource() )
-        self.display_maps_result(res, True)
+        res, id_list = rosie.ws_client.get_local_suite_details( 
+                                self.search_manager.get_datasource(),
+                                skip_status=True)
+        self.display_maps_result(res, is_local=True)
         self.repeat_last_request = self.display_local_suites
         self.statusbar.set_progressbar_pulsing(False)
 
@@ -299,10 +302,7 @@ class MainWindow(gtk.Window):
                         branch_widget.set_active(True)
                         displayed_branch = True
 
-            if is_local:
-                local_status = result_map.pop("local")
-            else:
-                local_status = rosie.ws_client.get_local_status(
+            local_status = rosie.ws_client.get_local_status(
                                     self.local_updater.local_suites,
                                     self.search_manager.get_datasource(),
                                     idx, branch, revision)
