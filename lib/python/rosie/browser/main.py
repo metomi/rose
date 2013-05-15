@@ -242,7 +242,8 @@ class MainWindow(gtk.Window):
                                          self.search_manager.ws_client.prefix)
         except Exception as e:
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     type(e).__name__ + ": " + str(e))
+                                     type(e).__name__ + ": " + str(e),
+                                     title=rosie.browser.TITLE_ERROR)
             return None
 
         # Poll for new entry in db.

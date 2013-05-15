@@ -288,11 +288,15 @@ class RosieVCClient(object):
         from_origin_base = "%s/%s" % (from_id.to_origin(), from_id.branch)
         from_origin = "%s@%s" % (from_origin_base, from_id.revision)
         copy_command_list = ["copy", "-q"]
+        from_item_list = []
         for from_item in self.popen("svn", "ls", from_origin)[0].split():
             if from_item not in ["rose-suite.conf", "rose-suite.info"]:
                 item = "%s/%s@%s" % (from_origin_base, from_item, from_id.revision)
                 copy_command_list.append(item)
+                from_item_list.append(item)
         copy_command_list.append(".")
+        if not from_item_list:
+            return new_id
         log = "%s: copy items from %s" % (str(new_id),
                                           from_id.to_string_with_version())
         temp_local_copy = os.path.join(self._get_work_dir(), "work")
