@@ -240,14 +240,10 @@ class MainWindow(gtk.Window):
         try:
             new_id = self.suite_director.vc_client.create(config, from_id,
                                          self.search_manager.ws_client.prefix)
-        except rosie.vc.SuiteCopyNullError as e:
-            new_id = e.new_id
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
-                                     str(e),
-                                     title=rosie.browser.TITLE_SUITE_COPY_ERROR)
         except Exception as e:
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     type(e).__name__ + ": " + str(e))
+                                     type(e).__name__ + ": " + str(e),
+                                     title=rosie.browser.TITLE_ERROR)
             return None
 
         # Poll for new entry in db.

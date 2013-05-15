@@ -79,19 +79,6 @@ class LocalCopyStatusError(Exception):
         return "%s: %s: local copy has uncommitted changes:\n%s" % data
 
 
-class SuiteCopyNullError(Exception):
-
-    """Raised when attempting to copy a no-contents suite."""
-
-    def __init__(self, new_id, from_id):
-        self.new_id = new_id
-        self.from_id = from_id
-        super(SuiteCopyNullError, self).__init__()
-
-    def __str__(self):
-        return "No items to copy from %s" % self.from_id
-
-
 class SuiteInfoFieldError(Exception):
     """Raised when the rose-suite.info doesn't contain a required field."""
     def __str__(self):
@@ -308,6 +295,8 @@ class RosieVCClient(object):
                 copy_command_list.append(item)
                 from_item_list.append(item)
         copy_command_list.append(".")
+        if not from_item_list:
+            return new_id
         log = "%s: copy items from %s" % (str(new_id),
                                           from_id.to_string_with_version())
         temp_local_copy = os.path.join(self._get_work_dir(), "work")
@@ -315,14 +304,7 @@ class RosieVCClient(object):
             self.popen("svn", "checkout", new_origin, temp_local_copy)
             cwd = os.getcwd()
             os.chdir(temp_local_copy)
-            if from_item_list:
-                self.popen("svn", *copy_command_list)
-            else:
-                try:
-                    self.popen("svn", *copy_command_list)
-                except RosePopenError as e:
-                    raise SuiteCopyNullError(
-                            new_id, from_id.to_string_with_version())
+            self.popen("svn", *copy_command_list)
             from_conf = "%s/%s@%s" % (from_origin_base,
                                       "rose-suite.conf",
                                       from_id.revision)
