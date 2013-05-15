@@ -21,17 +21,17 @@
 #     rose suite-log-view
 #
 # SYNOPSIS
-#     rose suite-log-view [OPTIONS] [SUITE [TASK ...]]
+#     rose suite-log-view [OPTIONS] [TASK ...]
 #
 # DESCRIPTION
-#     Generate and browse the log view of SUITE.
+#     Generate and browse the log view of a suite.
 #
 #     If one or more TASK is specified, re-sync their logs if they are
 #     submitted remotely.
 #
 #     Analyse the suite log to generate a JSON file for feeding into an HTML
-#     based viewer. SUITE should be a valid suite name. If not defined, use
-#     `basename $PWD`.
+#     based viewer. If --name=SUITE-NAME is not specified, the basename of $PWD
+#     is assumed to be the suite name.
 #
 #     If the DISPLAY environment variable is defined. Launch the web browser to
 #     display the log view unless --no-web-browse is specified.
@@ -42,6 +42,8 @@
 #     --log-archive-threshold=CYCLE-TIME
 #         Switch on job log archiving by specifying a cycle time threshold. All
 #         job logs at this cycle time or older will be archived. Implies --full.
+#     --name=SUITE-NAME
+#         Specify the suite name.
 #     --no-web-browse
 #         Do not open a web browser to display the log view.
 #-------------------------------------------------------------------------------
