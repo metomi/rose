@@ -79,6 +79,19 @@ class LocalCopyStatusError(Exception):
         return "%s: %s: local copy has uncommitted changes:\n%s" % data
 
 
+class SuiteCopyNullError(Exception):
+
+    """Raised when attempting to copy a no-contents suite."""
+
+    def __init__(self, new_id, from_id):
+        self.new_id = new_id
+        self.from_id = from_id
+        super(SuiteCopyNullError, self).__init__()
+
+    def __str__(self):
+        return "No items to copy from %s" % self.from_id
+
+
 class SuiteInfoFieldError(Exception):
     """Raised when the rose-suite.info doesn't contain a required field."""
     def __str__(self):
@@ -288,10 +301,12 @@ class RosieVCClient(object):
         from_origin_base = "%s/%s" % (from_id.to_origin(), from_id.branch)
         from_origin = "%s@%s" % (from_origin_base, from_id.revision)
         copy_command_list = ["copy", "-q"]
+        from_item_list = []
         for from_item in self.popen("svn", "ls", from_origin)[0].split():
             if from_item not in ["rose-suite.conf", "rose-suite.info"]:
                 item = "%s/%s@%s" % (from_origin_base, from_item, from_id.revision)
                 copy_command_list.append(item)
+                from_item_list.append(item)
         copy_command_list.append(".")
         log = "%s: copy items from %s" % (str(new_id),
                                           from_id.to_string_with_version())
@@ -300,7 +315,14 @@ class RosieVCClient(object):
             self.popen("svn", "checkout", new_origin, temp_local_copy)
             cwd = os.getcwd()
             os.chdir(temp_local_copy)
-            self.popen("svn", *copy_command_list)
+            if from_item_list:
+                self.popen("svn", *copy_command_list)
+            else:
+                try:
+                    self.popen("svn", *copy_command_list)
+                except RosePopenError as e:
+                    raise SuiteCopyNullError(
+                            new_id, from_id.to_string_with_version())
             from_conf = "%s/%s@%s" % (from_origin_base,
                                       "rose-suite.conf",
                                       from_id.revision)
