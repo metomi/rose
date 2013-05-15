@@ -54,7 +54,7 @@ MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"),
                              rose.META_DIR_MACRO)
 MACRO_EXT = ".py"
 MACRO_OUTPUT_HELP = "    # {0}"
-MACRO_OUTPUT_ID = "[{0}] {2}"
+MACRO_OUTPUT_ID = "[{0}] {1}"
 MACRO_OUTPUT_TRANSFORM_CHANGES = "{0}: changes: {1}\n"
 MACRO_OUTPUT_VALIDATE_ISSUES = "{0}: issues: {1}\n"
 MACRO_OUTPUT_WARNING_ISSUES = "{0}: warnings: {1}\n"
@@ -561,8 +561,7 @@ def run_macros(app_config, meta_config, config_name, macro_names,
     if not macro_names:
         for module_name, class_name, method, help in macro_tuples:
             macro_name = ".".join([module_name, class_name])
-            macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], config_name,
-                                              macro_name)
+            macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], macro_name)
             if opt_quietness:
                 print macro_id
             else:
@@ -610,8 +609,7 @@ def run_macros(app_config, meta_config, config_name, macro_names,
                     problem_list.sort(lambda x, y: sort(x.option, y.option))
                     problem_list.sort(lambda x, y: sort(x.section, y.section))
                     method_id = VALIDATE_METHOD.upper()[0]
-                    macro_id = MACRO_OUTPUT_ID.format(method_id, config_name,
-                                                      macro_name)
+                    macro_id = MACRO_OUTPUT_ID.format(method_id, macro_name)
                     sys.stderr.write(get_reports_as_text(problem_list,
                                                          macro_id,
                                                          is_from_transform=False))
@@ -679,8 +677,7 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
             not isinstance(change_list, list)):
             raise ValueError(err_bad_return_value)
         method_id = TRANSFORM_METHOD.upper()[0]
-        macro_id = MACRO_OUTPUT_ID.format(method_id, config_name,
-                                          transformer_macro)
+        macro_id = MACRO_OUTPUT_ID.format(method_id, transformer_macro)
         _handle_transform(app_config, new_config, change_list, macro_id,
                           opt_conf_dir, opt_output_dir, opt_non_interactive)
 

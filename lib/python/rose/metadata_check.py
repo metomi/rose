@@ -20,6 +20,7 @@
 """Module to provide checking facilities for Rose configuration metadata."""
 
 import os
+import re
 import sys
 
 import rose.config
@@ -28,11 +29,12 @@ import rose.macro
 import rose.macros.value
 from rose.opt_parse import RoseOptionParser
 
-
+ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
 INVALID_ALLOWED_VALUE = "Invalid value - should be {0}"
 INVALID_RANGE = "Could not process range: {0}"
 INVALID_RANGE_RULE_IDS = "Other ids not allowed - error: {0}"
 INVALID_RANGE_RULE = "Invalid rule syntax: {0}"
+INVALID_RULE = "Invalid rule syntax: {0}"
 INVALID_LENGTH = "Invalid length - should be : or positive integer"
 INVALID_PATTERN = "Invalid regex: {0}"
 INVALID_VALUES = "Could not process values: {0}"
@@ -40,7 +42,7 @@ INVALID_VALUES_LENGTH = "Invalid values length"
 INVALID_WIDGET_MODULE = "Invalid widget module"
 UNNECESSARY_VALUES_PROP = "Property not needed - 'values' property overrides"
 UNKNOWN_TYPE = "Unknown type: {0}"
-UNKNOWN_PROP = "Unknown property."
+UNKNOWN_PROP = "Unknown property: {0}"
 VALUE_JOIN = " and "
 
 
@@ -50,7 +52,7 @@ def get_allowed_metadata_properties():
     for key in dir(rose):
         if (key.startswith("META_PROP_") and
             not key.startswith("META_PROP_VALUE_")):
-            properties.append(key)
+            properties.append(getattr(rose, key))
     return properties
 
 
@@ -66,6 +68,21 @@ def _check_duplicate(value):
                       rose.META_PROP_VALUE_FALSE]
     if value not in allowed_values:
         return INVALID_ALLOWED_VALUE.format("/".join(allowed_values))
+
+
+def _check_fail_if(value, var_id, meta_config):
+    test_config = rose.config.ConfigNode()
+    for 
+    test_id = "env=A"
+    test_config.set(["env", "A"], "0")
+    evaluator =  rose.macros.rule.RuleEvaluator()
+    try:
+        check_ok = evaluator.evaluate_rule(
+                                        value, var_id, test_config)
+    except RuleValueError as e:
+        pass
+    except Exception as e:
+        return INVALID_RULE.format(e)
 
 
 def _check_length(value):
@@ -110,14 +127,14 @@ def _check_range(value):
         evaluator =  rose.macros.rule.RuleEvaluator()
         try:
             check_ok = evaluator.evaluate_rule(
-                                          range_pat, var_id, tiny_config)
+                                          value, test_id, test_config)
         except RuleValueError as e:
             return INVALID_RANGE_RULE_IDS.format(e)
         except Exception as e:
             return INVALID_RANGE_RULE.format(e)
     else:
         try:
-            check_func = rose.variable.parse_range_expression(range_pat)
+            check_func = rose.variable.parse_range_expression(value)
         except Exception as e:
             return INVALID_RANGE.format(type(e).__name__ + ": " + str(e))
 
@@ -143,6 +160,10 @@ def _check_values(value):
         return INVALID_VALUES.format(type(e).__name__ + ": " + str(e))
     if not val_list:
         return INVALID_VALUES_LENGTH.format(value)
+
+
+def _check_warn_if(value):
+    return _check_fail_if(value)
 
 
 def _check_widget(value, module_files=None, meta_dir=None):
@@ -200,8 +221,9 @@ def metadata_check(meta_config, meta_dir=None,
                 opt_node.is_ignored()):
                 continue
             value = opt_node.value
-            if option not in allowed_properties:
-                info = UNKNOWN_PROP
+            if (option not in allowed_properties and
+                not option.startswith(rose.META_PROP_WIDGET)):
+                info = UNKNOWN_PROP.format(option)
                 reports.append(rose.macro.MacroReport(section, option,
                                                       value, info))
             if option.startswith(rose.META_PROP_WIDGET):
@@ -210,8 +232,13 @@ def metadata_check(meta_config, meta_dir=None,
             elif option == rose.META_PROP_MACRO:
                 check_func = lambda v: _check_macro(
                                  v, module_files)
+            elif option in [rose.META_PROP_FAIL_IF,
+                            rose.META_PROP_WARN_IF]:
+                check_func = lambda v: _check_fail_if(
+                                 v, section, meta_config)
             else:
-                check_func = locals().get("_check_" + option, lambda v: None)
+                func_name = "_check_" + option.replace("-", "_")
+                check_func = globals().get(func_name, lambda v: None)
             info = check_func(value)
             if info:
                 reports.append(rose.macro.MacroReport(section, option,
@@ -241,15 +268,24 @@ def main():
     opts.conf_dir = os.path.abspath(opts.conf_dir)
     meta_conf_file_path = os.path.join(opts.conf_dir, rose.META_CONFIG_NAME)
     if not os.path.isfile(meta_conf_file_path):
-        sys.exit(opt_parser.get_usage())
+        sys.exit(ERROR_LOAD_META_CONFIG_DIR.format(opts.conf_dir))
     meta_config = rose.config.load(meta_conf_file_path)
+    sections = None
+    if args:
+        sections = args
+    properties = None
+    if opts.property:
+        properties = opts.property
     reports = metadata_check(meta_config,
                              meta_dir=opts.conf_dir,
-                             only_these_sections=args,
-                             only_these_properties=opts.property)
+                             only_these_sections=sections,
+                             only_these_properties=properties)
+    macro_id = rose.macro.MACRO_OUTPUT_ID.format(
+                                rose.macro.VALIDATE_METHOD.upper()[0],
+                                "MetadataChecker")
     text = rose.macro.get_reports_as_text(
                                     reports,
-                                    "Metadata Checker")
+                                    macro_id)
     if reports:
         sys.exit(text)
     else:

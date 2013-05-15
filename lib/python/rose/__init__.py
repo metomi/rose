@@ -57,6 +57,7 @@ META_DIR_WIDGET = "widget"
 META_PROP_COMPULSORY = "compulsory"
 META_PROP_DESCRIPTION = "description"
 META_PROP_DUPLICATE = "duplicate"
+META_PROP_FAIL_IF = "fail-if"
 META_PROP_HELP = "help"
 META_PROP_LENGTH = "length"
 META_PROP_MACRO = 'macro'
@@ -69,6 +70,7 @@ META_PROP_TRIGGER = "trigger"
 META_PROP_TYPE = "type"
 META_PROP_URL = "url"
 META_PROP_VALUES = "values"
+META_PROP_WARN_IF = "warn-if"
 META_PROP_WIDGET = "widget"
 
 # Value used to denote "on" for a metadata setting.
