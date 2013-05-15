@@ -73,10 +73,11 @@ META_PROP_WIDGET = "widget"
 
 # Value used to denote "on" for a metadata setting.
 META_PROP_VALUE_TRUE = "true"
+META_PROP_VALUE_FALSE = "false"  # Not actually used.
 
 # Allowed type settings (that actually do something)
 TYPE_VALUES = ["boolean", "character", "integer",
-               "logical", "raw", "real", "string"]
+               "logical", "quoted", "raw", "real"]
  
 # Preferred Fortran logical and environment boolean syntax
 TYPE_BOOLEAN_VALUE_FALSE = "false"
