@@ -190,6 +190,7 @@ TITLE_NEW_SUITE_WIZARD = "Edit new suite information"
 TITLE_ERROR_DISCOVERY = "Errors found"
 TITLE_HISTORY_IO_ERROR = "History read/write error"
 TITLE_HISTORY_NAVIGATION_ERROR = "History navigation error"
+TITLE_ERROR = "Error"
 TITLE_INVALID_QUERY = "Error"
 
 # Miscellaneous
