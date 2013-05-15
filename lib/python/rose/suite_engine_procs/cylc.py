@@ -536,12 +536,11 @@ class CylcProcessor(SuiteEngineProcessor):
     def shutdown(self, suite_name, host=None, engine_version=None, args=None,
                  stderr=None, stdout=None):
         """Shut down the suite."""
-        command = ["cylc", "shutdown", "--force"]
+        command = ["cylc", "shutdown", suite_name, "--force"]
         if host:
             command += ["--host=%s" % host]
         if args:
             command += args
-        command += [suite_name]
         environ = dict(os.environ)
         if engine_version:
             environ.update({self.get_version_env_name(): engine_version})
