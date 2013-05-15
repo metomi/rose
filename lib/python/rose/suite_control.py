@@ -136,6 +136,13 @@ class SuiteNotFoundError(Exception):
         return ("%s - no suite found for this path." % self.args[0])
 
 
+class GControlArgsError(Exception):
+    
+    """An exception raised if args are passed to rose sgc."""
+    def __str__(self):
+        return ("No arguments expected - %s supplied" % self.args[0])
+
+
 def get_suite_name(event_handler=None):
     """Find the top level of a suite directory structure"""
     fs_util = FileSystemUtil(event_handler)
@@ -167,6 +174,11 @@ def main():
     opt_parser.add_my_options("all", "host", "name", "non_interactive")
     opts, args = opt_parser.parse_args(argv)
     event_handler = Reporter(opts.verbosity - opts.quietness)
+    
+    if method_name == "gcontrol" and len(args) > 0:
+        event_handler(GControlArgsError(len(args)))
+        sys.exit(1)
+        
     suite_control = SuiteControl(event_handler=event_handler)
     method = getattr(suite_control, method_name)
     confirm = None
