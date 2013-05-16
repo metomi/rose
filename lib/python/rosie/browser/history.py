@@ -220,7 +220,7 @@ class HistoryIO():
         if archive != False:
             f = open(self.hist_path, 'w')
             for i, h in enumerate(archive):
-                if i < self.timescale:                              
+                if i < self.timescale and h.h_type is not "home":                              
                     f.write(str(h) + '\n')
                 else:
                     break
