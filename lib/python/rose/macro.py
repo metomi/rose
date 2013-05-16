@@ -522,13 +522,10 @@ def get_metadata_for_config_id(setting_id, meta_config):
             index = option.replace(search_option, "")
             metadata[rose.META_PROP_TITLE] += " " + index
     if (rose.META_PROP_LENGTH in metadata and
-        option is not None and search_option != option):
-        if REC_ID_SINGLE_ELEMENT.search(option):
-            # Option is a single element in an array.
-            metadata.pop(rose.META_PROP_LENGTH)
-        else:
-            # Option may be a slice of the array, or similar.
-            metadata[rose.META_PROP_LENGTH] = ":"
+        option is not None and search_option != option and
+        REC_ID_SINGLE_ELEMENT.search(option)):
+        # Option is a single element in an array, not a slice.
+        metadata.pop(rose.META_PROP_LENGTH)
     metadata.update({'id': setting_id})
     return metadata
 
