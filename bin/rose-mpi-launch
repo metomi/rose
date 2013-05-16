@@ -22,8 +22,8 @@
 #     rose-mpi-launch
 #
 # SYNOPSIS
-#     1. rose mpi-launch
-#     2. rose mpi-launch -f FILE
+#     1. rose mpi-launch -f FILE
+#     2. rose mpi-launch
 #     3. rose mpi-launch COMMAND [ARGS ...]
 #
 # DESCRIPTION
