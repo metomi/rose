@@ -24,14 +24,18 @@ import re
 import sys
 
 import rose.config
+import rose.config_editor.util
 import rose.formats.namelist
 import rose.macro
 import rose.macros
 
-from rose.opt_parse import RoseOptionParser
+import rose.opt_parse
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
 INVALID_ALLOWED_VALUE = "Invalid value - should be {0}"
+INVALID_MACRO = "Not found: {0}"
+INVALID_MACRO_IMPORT = "Could not import {0}: {1}"
+INVALID_MACRO_METHOD = "Invalid method: {0}"
 INVALID_RANGE = "Could not process range: {0}"
 INVALID_RANGE_RULE_IDS = "Inter-variable comparison not allowed in range."
 INVALID_RANGE_RULE = "Invalid rule syntax: {0}"
@@ -40,7 +44,8 @@ INVALID_LENGTH = "Invalid length - should be : or positive integer"
 INVALID_PATTERN = "Invalid regex: {0}"
 INVALID_VALUES = "Could not process values: {0}"
 INVALID_VALUES_LENGTH = "Invalid values length"
-INVALID_WIDGET_MODULE = "Invalid widget module"
+INVALID_WIDGET = "Not found: {0}"
+INVALID_WIDGET_IMPORT = "Could not import {0}: {1}"
 UNNECESSARY_VALUES_PROP = "Property not needed - 'values' property overrides"
 UNKNOWN_TYPE = "Unknown type: {0}"
 UNKNOWN_PROP = "Unknown property: {0}"
@@ -91,13 +96,25 @@ def _check_macro(value, module_files=None, meta_dir=None):
         return INVALID_MACRO_SYNTAX.format(e)
     bad_macros = []
     for macro in macros:
+        macro_name = macro
+        method = None
+        if (macro.endswith("." + rose.macro.VALIDATE_METHOD) or
+            macro.endswith("." + rose.macro.TRANSFORM_METHOD)):
+            macro_name, method = macro.rsplit(".", 1)
         try:
-            macro = rose.config_editor.util.import_object(value, module_files,
-                                                          _import_err_handler)
+            macro_obj = rose.config_editor.util.import_object(
+                                                       macro_name,
+                                                       module_files,
+                                                       _import_err_handler)
         except Exception as e:
             return INVALID_MACRO_IMPORT.format(
                                  macro,
                                  type(e).__name__ + ": " + str(e))
+        if macro_obj is None:
+            return INVALID_MACRO.format(macro)
+        elif method is not None:
+            if not hasattr(macro_obj, method):
+                return INVALID_MACRO_METHOD.format(macro)
 
 
 def _check_pattern(value):
@@ -163,11 +180,14 @@ def _check_widget(value, module_files=None, meta_dir=None):
         module_files = _get_module_files(meta_dir)
     if not module_files:
         return
+    widget_name = value.split()[0]
     try:
-        widget = rose.config_editor.util.import_object(value, module_files,
+        widget = rose.config_editor.util.import_object(widget_name, module_files,
                                                        _import_err_handler)
     except Exception as e:
         return INVALID_WIDGET_IMPORT.format(type(e).__name__ + ": " + str(e))
+    if widget is None:
+        return INVALID_WIDGET.format(value)
 
 
 def _get_module_files(meta_dir=None):
@@ -178,7 +198,9 @@ def _get_module_files(meta_dir=None):
             for dirpath, dirnames, filenames in os.walk(lib_dir):
                 for filename in filenames:
                     if filename.endswith(".py"):
-                        module_files.append(filename)
+                        abs_filename = os.path.abspath(
+                                          os.path.join(dirpath, filename))
+                        module_files.append(abs_filename)
     return module_files
     
 
@@ -189,7 +211,10 @@ def metadata_check(meta_config, meta_dir=None,
     allowed_properties = get_allowed_metadata_properties()
     reports = []
     module_files = _get_module_files(meta_dir)
-    for section, node in meta_config.value.items():
+    sections = meta_config.value.keys()
+    sections.sort(rose.config.sort_settings)
+    for section in sections:
+        node = meta_config.value[section]
         if node.is_ignored() or not isinstance(node.value, dict):
             continue
         if (only_these_sections is not None and
@@ -207,7 +232,10 @@ def metadata_check(meta_config, meta_dir=None,
                     reports.append(rose.macro.MacroReport(
                                               section, type_like_prop,
                                               value, info))
-        for option, opt_node in node.value.items():
+        options = node.value.keys()
+        options.sort(rose.config.sort_settings)
+        for option in options:
+            opt_node = node.value[option]
             if ((only_these_properties is not None and
                  option not in only_these_properties) or
                 opt_node.is_ignored()):
@@ -234,19 +262,41 @@ def metadata_check(meta_config, meta_dir=None,
     # Check triggering.
     trigger_macro = rose.macros.trigger.TriggerMacro()
     # The .validate method will be replaced in a forthcoming enhancement.
-    reports.extend(trigger_macro.validate(rose.config.ConfigNode(),
-                                          meta_config=meta_config))
+    trig_reports = trigger_macro.validate(rose.config.ConfigNode(),
+                                          meta_config=meta_config)
+    for report in trig_reports:
+        if report.option is None:
+            new_rep_section = report.section
+        else:
+            new_rep_section = (report.section + rose.CONFIG_DELIMITER +
+                               report.option)
+        rep_id_node = meta_config.get([new_rep_section], no_ignore=True)
+        if rep_id_node is None:
+            new_rep_option = None
+            new_rep_value = None
+        else:
+            new_rep_option = rose.META_PROP_TRIGGER
+            rep_trig_node = meta_config.get([new_rep_section, new_rep_option],
+                                            no_ignore=True)
+            if rep_trig_node is None:
+                new_rep_value = None
+            else:
+                new_rep_value = rep_trig_node.value
+        reports.append(rose.macro.MacroReport(new_rep_section, new_rep_option,
+                                              new_rep_value, report.info))
     sorter = rose.config.sort_settings
     reports.sort(rose.macro.report_sort)
     return reports
 
 
 def _import_err_handler(exception):
-    raise exception
+    if isinstance(exception, Exception):
+        raise exception
+    raise Exception(exception)
 
 
 def main():
-    opt_parser = RoseOptionParser()
+    opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "property")
     opts, args = opt_parser.parse_args()
 

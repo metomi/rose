@@ -101,7 +101,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] MetadataChecker: issues: 4
+[V] rose.metadata_check.MetadataChecker: issues: 4
     namelist:compulsory_nl1=my_var1=compulsory=.true.
         Invalid value - should be true/false
     namelist:compulsory_nl6=my_var6=compulsory=duplicate

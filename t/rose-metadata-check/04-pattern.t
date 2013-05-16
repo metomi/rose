@@ -77,7 +77,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] MetadataChecker: issues: 5
+[V] rose.metadata_check.MetadataChecker: issues: 5
     namelist:values_nl1=my_array=pattern=(?} oo){1,-9}(\d*,{\s*)*\d*$
         Invalid regex: error: unexpected end of pattern
     namelist:values_nl1=my_char=pattern=+'.*'$

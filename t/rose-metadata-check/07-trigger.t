@@ -23,36 +23,36 @@
 #-------------------------------------------------------------------------------
 tests 6
 #-------------------------------------------------------------------------------
-# Check values syntax checking.
+# Check trigger syntax checking.
 TEST_KEY=$TEST_KEY_BASE-ok
 setup
 init <<__META_CONFIG__
 [namelist:near_cyclic_namelist=switch]
-type = logical
-trigger = namelist:near_cyclic_namelist=a: .true.
+type=logical
+trigger=namelist:near_cyclic_namelist=a: this == .true.
 
 [namelist:near_cyclic_namelist=a]
-trigger = namelist:near_cyclic_namelist=b;
-          namelist:near_cyclic_namelist=c;
-          namelist:near_cyclic_namelist=d
+trigger=namelist:near_cyclic_namelist=b;
+        namelist:near_cyclic_namelist=c;
+        namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=b]
-trigger = namelist:near_cyclic_namelist=c;
-          namelist:near_cyclic_namelist=d
+trigger=namelist:near_cyclic_namelist=c;
+        namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=c]
-trigger = namelist:near_cyclic_namelist=d
+trigger=namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=d]
-trigger = namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
+trigger=namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
 
 [namelist:near_cyclic_namelist=e]
-trigger = namelist:near_cyclic_namelist=f
+trigger=namelist:near_cyclic_namelist=f
 
 [namelist:near_cyclic_namelist=f]
 
 [namelist:dupl_nl]
-duplicate = true
+duplicate=true
 __META_CONFIG__
 run_pass "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
@@ -60,41 +60,41 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 # Check trigger checking - missing trigger in metadata.
-TEST_KEY=$TEST_KEY_BASE-err-cyclic
+TEST_KEY=$TEST_KEY_BASE-err-missing
 setup
 init_meta <<__META_CONFIG__
 [namelist:near_cyclic_namelist=switch]
-type = logical
-trigger = namelist:near_cyclic_namelist=a: .true.
+type=logical
+trigger=namelist:near_cyclic_namelist=a: .true.
 
 [namelist:near_cyclic_namelist=a]
-trigger = namelist:near_cyclic_namelist=b;
-          namelist:near_cyclic_namelist=c;
-          namelist:near_cyclic_namelist=d
+trigger=namelist:near_cyclic_namelist=b;
+        namelist:near_cyclic_namelist=c;
+        namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=b]
-trigger = namelist:near_cyclic_namelist=c;
+trigger=namelist:near_cyclic_namelist=c;
           namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=c]
-trigger = namelist:near_cyclic_namelist=d
+trigger=namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=d]
-trigger = namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
+trigger=namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
 
 [namelist:near_cyclic_namelist=e]
-trigger = namelist:near_cyclic_namelist=f
+trigger=namelist:near_cyclic_namelist=f
 
 [namelist:dupl_nl]
-duplicate = true
+duplicate=true
 __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[V] MetadataChecker: issues: 1
-    namelist:near_cyclic_namelist=f=2
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+[V] rose.metadata_check.MetadataChecker: issues: 1
+    namelist:near_cyclic_namelist=f=None
         No metadata entry found
-__CONTENT__
+__ERROR__
 teardown
 #-------------------------------------------------------------------------------
 # Check trigger checking - cyclic dependency.
@@ -102,39 +102,39 @@ TEST_KEY=$TEST_KEY_BASE-err-cyclic
 setup
 init_meta <<__META_CONFIG__
 [namelist:near_cyclic_namelist=switch]
-type = logical
-trigger = namelist:near_cyclic_namelist=a: .true.
+type=logical
+trigger=namelist:near_cyclic_namelist=a: .true.
 
 [namelist:near_cyclic_namelist=a]
-trigger = namelist:near_cyclic_namelist=b;
-          namelist:near_cyclic_namelist=c;
-          namelist:near_cyclic_namelist=d
+trigger=namelist:near_cyclic_namelist=b;
+        namelist:near_cyclic_namelist=c;
+        namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=b]
-trigger = namelist:near_cyclic_namelist=c;
-          namelist:near_cyclic_namelist=d
+trigger=namelist:near_cyclic_namelist=c;
+        namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=c]
-trigger = namelist:near_cyclic_namelist=d
+trigger=namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=d]
-trigger = namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
+trigger=namelist:near_cyclic_namelist=e; namelist:near_cyclic_namelist=f
 
 [namelist:near_cyclic_namelist=e]
-trigger = namelist:near_cyclic_namelist=f; namelist:near_cyclic_namelist=switch
+trigger=namelist:near_cyclic_namelist=f; namelist:near_cyclic_namelist=switch
 
 [namelist:near_cyclic_namelist=f]
 
 [namelist:dupl_nl]
-duplicate = true
+duplicate=true
 __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[V] MetadataChecker: issues: 1
-    namelist:near_cyclic_namelist=switch=.false.
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+[V] rose.metadata_check.MetadataChecker: issues: 1
+    namelist:near_cyclic_namelist=switch=trigger=namelist:near_cyclic_namelist=a: .true.
         Cyclic dependency detected: namelist:near_cyclic_namelist=a to namelist:near_cyclic_namelist=switch
-__CONTENT__
+__ERROR__
 teardown
 #-------------------------------------------------------------------------------
 # Check trigger checking - duplicate namelist external triggers.
@@ -142,18 +142,72 @@ TEST_KEY=$TEST_KEY_BASE-err-dupl-external
 setup
 init_meta <<__META_CONFIG__
 [namelist:dupl_nl]
-duplicate = true
+duplicate=true
 
 [namelist:dupl_nl=a]
-trigger = namelist:subject_nl=atrig: .true.
+trigger=namelist:subject_nl=atrig: .true.
 __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-[V] MetadataChecker: issues: 1
-    namelist:dupl_nl=a=None
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+[V] rose.metadata_check.MetadataChecker: issues: 1
+    namelist:dupl_nl=a=trigger=namelist:subject_nl=atrig: .true.
         Badly defined trigger - namelist:dupl_nl is 'duplicate'
-__CONTENT__
+__ERROR__
+teardown
+#-------------------------------------------------------------------------------
+# Check trigger syntax checking.
+TEST_KEY=$TEST_KEY_BASE-err-syntax-1
+setup
+init <<__META_CONFIG__
+[namelist:near_cyclic_namelist=a]
+trigger=namelist:near_cyclic_namelist=b something;
+        namelist:near_cyclic_namelist=c;
+        namelist:near_cyclic_namelist=d
+
+[namelist:near_cyclic_namelist=b]
+trigger=namelist:near_cyclic_namelist=c
+        namelist:near_cyclic_namelist=d
+
+[namelist:near_cyclic_namelist=c]
+trigger=namelist:near_cyclic_namelist=d
+
+[namelist:near_cyclic_namelist=d]
+__META_CONFIG__
+run_pass "$TEST_KEY" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+[V] rose.metadata_check.MetadataChecker: issues: 1
+    namelist:dupl_nl=a=trigger=namelist:subject_nl=atrig: .true.
+        Badly defined trigger - namelist:dupl_nl is 'duplicate'
+__ERROR__
+teardown
+#-------------------------------------------------------------------------------
+# Check trigger syntax checking.
+TEST_KEY=$TEST_KEY_BASE-err-syntax-2
+setup
+init <<__META_CONFIG__
+[namelist:near_cyclic_namelist=a]
+trigger=namelist:near_cyclic_namelist=b;
+        namelist:near_cyclic_namelist=c;
+        namelist:near_cyclic_namelist=d
+
+[namelist:near_cyclic_namelist=b]
+trigger=namelist:near_cyclic_namelist=c
+        namelist:near_cyclic_namelist=d
+
+[namelist:near_cyclic_namelist=c]
+trigger=;namelist:near_cyclic_namelist=d
+
+[namelist:near_cyclic_namelist=d]
+__META_CONFIG__
+run_pass "$TEST_KEY" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+[V] rose.metadata_check.MetadataChecker: issues: 1
+    =trigger=None
+        No metadata entry found
+__ERROR__
 teardown
 #-------------------------------------------------------------------------------
 exit

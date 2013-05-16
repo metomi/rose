@@ -203,7 +203,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] MetadataChecker: issues: 9
+[V] rose.metadata_check.MetadataChecker: issues: 9
     namelist:values_nl1=my_boolean_array_any=type=booleans
         Unknown type: booleans
     namelist:values_nl1=my_boolean_false=type=booleans

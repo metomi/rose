@@ -102,7 +102,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] MetadataChecker: issues: 9
+[V] rose.metadata_check.MetadataChecker: issues: 9
     namelist:values_nl1=my_int=range=5foo
         Invalid syntax: 5foo
     namelist:values_nl1=my_int_dot=range=this != .

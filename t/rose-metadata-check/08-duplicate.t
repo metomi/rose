@@ -23,50 +23,61 @@
 #-------------------------------------------------------------------------------
 tests 6
 #-------------------------------------------------------------------------------
-# Check values syntax checking.
+# Check duplicate syntax checking.
 TEST_KEY=$TEST_KEY_BASE-ok
 setup
 init <<__META_CONFIG__
-[namelist:values_nl1=my_fixed_array]
-length=:
-values=red, blue
-
-[namelist:values_nl1=my_char]
-values = 'orange'
-
-[namelist:values_nl1=my_num]
-values=56
-
-[namelist:values_nl1=my_raw]
-values = something"(")\,
-
-[namelist:values_nl2]
+[namelist:nl2]
 duplicate = true
 
-[namelist:values_nl2=my_num]
-values = 5
+[namelist:nl3]
+duplicate = true
 
-[namelist:values_nl2{mod1}=my_num]
-values = 4
+[namelist:nl3{modifier}]
+duplicate = true
+
+[namelist:nl4]
+duplicate = true
+
+[namelist:nl4{modifier}]
+duplicate = true
 __META_CONFIG__
 run_pass "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
-# Check values syntax checking (fail).
+# Check duplicate syntax checking (fail).
 TEST_KEY=$TEST_KEY_BASE-bad
 setup
 init <<__META_CONFIG__
-[namelist:values_nl1=my_fixed_var]
-values=
+[namelist:duplicate_nl1=my_var1]
+duplicate=.true.
+
+[namelist:duplicate_nl2]
+duplicate=false
+
+[namelist:duplicate_nl6=my_var6]
+duplicate=duplicate
+
+[namelist:duplicate_nl6=my_var7]
+duplicate=1
+
+[namelist:duplicate_nl7=my_var8]
+duplicate=?
 __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] rose.metadata_check.MetadataChecker: issues: 1
-    namelist:values_nl1=my_fixed_var=values=
-        Invalid values length
+[V] rose.metadata_check.MetadataChecker: issues: 4
+    namelist:duplicate_nl1=my_var1=duplicate=.true.
+        Invalid value - should be true/false
+    namelist:duplicate_nl6=my_var6=duplicate=duplicate
+        Invalid value - should be true/false
+    namelist:duplicate_nl6=my_var7=duplicate=1
+        Invalid value - should be true/false
+    namelist:duplicate_nl7=my_var8=duplicate=?
+        Invalid value - should be true/false
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------
