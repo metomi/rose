@@ -196,6 +196,8 @@ def _get_module_files(meta_dir=None):
         lib_dir = os.path.join(meta_dir, "lib", "python")
         if os.path.isdir(lib_dir):
             for dirpath, dirnames, filenames in os.walk(lib_dir):
+                if '/.' in dirpath:
+                    continue
                 for filename in filenames:
                     if filename.endswith(".py"):
                         abs_filename = os.path.abspath(

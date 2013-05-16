@@ -78,8 +78,10 @@ META_PROP_VALUE_TRUE = "true"
 META_PROP_VALUE_FALSE = "false"  # Not actually used.
 
 # Allowed type settings (that actually do something)
+# "meta" and "file" are for internal use.
 TYPE_VALUES = ["boolean", "character", "integer",
-               "logical", "quoted", "raw", "real"]
+               "logical", "quoted", "raw", "real",
+               "meta", "file"]
  
 # Preferred Fortran logical and environment boolean syntax
 TYPE_BOOLEAN_VALUE_FALSE = "false"

@@ -980,6 +980,10 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     """Run a simple dialog with an 'OK' button and some text."""
     parent_window = get_dialog_parent()
     dialog = gtk.Dialog(parent=parent_window)
+    if parent_window is None:
+        locator = rose.resource.ResourceLocator(paths=sys.path)
+        icon_path = locator.locate('etc/images/rose-icon-trim.png')
+        dialog.set_icon_from_file(icon_path)
     if cancel:
         cancel_button = dialog.add_button(gtk.STOCK_CANCEL,
                                           gtk.RESPONSE_CANCEL)
@@ -1050,9 +1054,14 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     dialog.set_default_size(*new_size)
     ok_button.grab_focus()
-    response = dialog.run()
-    dialog.destroy()
-    return (response == gtk.RESPONSE_OK)
+    if modal or cancel:
+        dialog.show()
+        response = dialog.run()
+        dialog.destroy()
+        return (response == gtk.RESPONSE_OK)
+    else:
+        ok_button.connect("clicked", lambda b: dialog.destroy())
+        dialog.show()
 
 
 def run_hyperlink_dialog(stock_id=None, text="", title=None,
