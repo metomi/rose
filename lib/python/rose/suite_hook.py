@@ -65,12 +65,11 @@ class RoseSuiteHook(object):
         4. If "should_shutdown", shut down the suite.
 
         """
-        # Retrieve log
+        # Retrieve log and generate code view
+        tasks = []
         if task:
-            self.suite_log_view_generator.update_job_log(suite, [task])
-
-        # Generate suite log view
-        self.suite_log_view_generator(suite)
+            tasks = [task]
+        self.suite_log_view_generator(suite, tasks)
 
         # Send email notification if required
         if should_mail:
