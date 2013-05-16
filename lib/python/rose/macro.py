@@ -59,9 +59,10 @@ MACRO_OUTPUT_TRANSFORM_CHANGES = "{0}: changes: {1}\n"
 MACRO_OUTPUT_VALIDATE_ISSUES = "{0}: issues: {1}\n"
 MACRO_OUTPUT_WARNING_ISSUES = "{0}: warnings: {1}\n"
 REC_MODIFIER = re.compile(r"\{.+\}")
-REC_ID_STRIP_DUPL = re.compile(r"\([\d:, \w]+\)")
-REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([\d:, \w]+\))?$')
-REC_ID_ELEMENT = re.compile(r"\(([\d:, \w]+)\)$")
+REC_ID_STRIP_DUPL = re.compile(r"\([:, \w]+\)")
+REC_ID_STRIP = re.compile('(?:\{.+\})?(?:\([:, \w]+\))?$')
+REC_ID_ELEMENT = re.compile(r"\(([:, \w]+)\)$")
+REC_ID_SINGLE_ELEMENT = re.compile(r"\((\d+)\)$")
 ID_ELEMENT_FORMAT = "{0}({1})"
 PROBLEM_ENTRY = "    {0}={1}={2}\n        {3}\n"
 PROMPT_ACCEPT_CHANGES = "Accept y/n (default n)? "
@@ -487,7 +488,6 @@ def get_metadata_for_config_id(setting_id, meta_config):
         section = setting_id
         option = None
     search_id = REC_ID_STRIP_DUPL.sub("", setting_id)
-    is_element = REC_ID_ELEMENT.search(setting_id)
     no_modifier_id = REC_MODIFIER.sub("", search_id)
     if no_modifier_id != search_id:
         # There is a modifier e.g. namelist:foo{bar}.
@@ -522,8 +522,9 @@ def get_metadata_for_config_id(setting_id, meta_config):
             index = option.replace(search_option, "")
             metadata[rose.META_PROP_TITLE] += " " + index
     if (rose.META_PROP_LENGTH in metadata and
-        option is not None and search_option != option):
-        # Option is an element in an array.
+        option is not None and search_option != option and
+        REC_ID_SINGLE_ELEMENT.search(option)):
+        # Option is a single element in an array, not a slice.
         metadata.pop(rose.META_PROP_LENGTH)
     metadata.update({'id': setting_id})
     return metadata
