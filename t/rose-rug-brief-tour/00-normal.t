@@ -44,6 +44,7 @@ done
 if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
 else
+    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
