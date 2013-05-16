@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 6
+tests 18
 #-------------------------------------------------------------------------------
 # Check trigger syntax checking.
 TEST_KEY=$TEST_KEY_BASE-ok
@@ -29,7 +29,7 @@ setup
 init <<__META_CONFIG__
 [namelist:near_cyclic_namelist=switch]
 type=logical
-trigger=namelist:near_cyclic_namelist=a: this == .true.
+trigger=namelist:near_cyclic_namelist=a: this == ".true."
 
 [namelist:near_cyclic_namelist=a]
 trigger=namelist:near_cyclic_namelist=b;
@@ -62,7 +62,7 @@ teardown
 # Check trigger checking - missing trigger in metadata.
 TEST_KEY=$TEST_KEY_BASE-err-missing
 setup
-init_meta <<__META_CONFIG__
+init <<'__META_CONFIG__'
 [namelist:near_cyclic_namelist=switch]
 type=logical
 trigger=namelist:near_cyclic_namelist=a: .true.
@@ -92,7 +92,7 @@ run_fail "$TEST_KEY" rose metadata-check --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [V] rose.metadata_check.MetadataChecker: issues: 1
-    namelist:near_cyclic_namelist=f=None
+    namelist:near_cyclic_namelist=f=None=None
         No metadata entry found
 __ERROR__
 teardown
@@ -100,7 +100,7 @@ teardown
 # Check trigger checking - cyclic dependency.
 TEST_KEY=$TEST_KEY_BASE-err-cyclic
 setup
-init_meta <<__META_CONFIG__
+init <<'__META_CONFIG__'
 [namelist:near_cyclic_namelist=switch]
 type=logical
 trigger=namelist:near_cyclic_namelist=a: .true.
@@ -140,7 +140,7 @@ teardown
 # Check trigger checking - duplicate namelist external triggers.
 TEST_KEY=$TEST_KEY_BASE-err-dupl-external
 setup
-init_meta <<__META_CONFIG__
+init <<'__META_CONFIG__'
 [namelist:dupl_nl]
 duplicate=true
 
@@ -174,12 +174,12 @@ trigger=namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=d]
 __META_CONFIG__
-run_pass "$TEST_KEY" rose metadata-check -C ../config
+run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [V] rose.metadata_check.MetadataChecker: issues: 1
-    namelist:dupl_nl=a=trigger=namelist:subject_nl=atrig: .true.
-        Badly defined trigger - namelist:dupl_nl is 'duplicate'
+    namelist:near_cyclic_namelist=b something=None=None
+        No metadata entry found
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ trigger=;namelist:near_cyclic_namelist=d
 
 [namelist:near_cyclic_namelist=d]
 __META_CONFIG__
-run_pass "$TEST_KEY" rose metadata-check -C ../config
+run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [V] rose.metadata_check.MetadataChecker: issues: 1

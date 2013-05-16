@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 6
+tests 18
 #-------------------------------------------------------------------------------
 # Check macro reference checking.
 TEST_KEY=$TEST_KEY_BASE-import-simple-ok
@@ -151,7 +151,7 @@ macro=LogicalTransformer.validate, envswitch.LogicalTransformer.validate
 [namelist:macro_nl=my_macro_var5]
 macro=envswitch.LogicalTruthChecker.transform
 __META_CONFIG__
-run_pass "$TEST_KEY" rose metadata-check -C ../config
+run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [V] rose.metadata_check.MetadataChecker: issues: 5
@@ -175,8 +175,7 @@ init <<__META_CONFIG__
 [namelist:macro_nl=my_macro_var1]
 macro=envswitch.LogicalTransformer
 __META_CONFIG__
-init_macro << '__MACRO__'
-__MACRO__
+init_macro envswitch.py << '__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
@@ -238,7 +237,7 @@ class LogicalTruthChecker(rose.macro.MacroBase):
             self.add_report("env", "TRANSFORM_SWITCH", value, info)
         return self.reports
 __MACRO__
-run_pass "$TEST_KEY" rose metadata-check -C ../config
+run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [V] rose.metadata_check.MetadataChecker: issues: 1

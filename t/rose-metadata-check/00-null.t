@@ -23,7 +23,7 @@
 init </dev/null
 rm config/rose-meta.conf
 #-------------------------------------------------------------------------------
-tests 15
+tests 12
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE-base
@@ -40,8 +40,9 @@ TEST_KEY=$TEST_KEY_BASE-C
 setup
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-../config: not a configuration metadata directory.
+CONFIG_DIR=$(dirname $PWD)/config
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
+$CONFIG_DIR: not a configuration metadata directory.
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------

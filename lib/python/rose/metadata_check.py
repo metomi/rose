@@ -185,7 +185,7 @@ def _check_widget(value, module_files=None, meta_dir=None):
         widget = rose.config_editor.util.import_object(widget_name, module_files,
                                                        _import_err_handler)
     except Exception as e:
-        return INVALID_WIDGET_IMPORT.format(type(e).__name__ + ": " + str(e))
+        return INVALID_WIDGET_IMPORT.format(widget_name, type(e).__name__ + ": " + str(e))
     if widget is None:
         return INVALID_WIDGET.format(value)
 
