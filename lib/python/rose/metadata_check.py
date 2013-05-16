@@ -33,7 +33,7 @@ from rose.opt_parse import RoseOptionParser
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
 INVALID_ALLOWED_VALUE = "Invalid value - should be {0}"
 INVALID_RANGE = "Could not process range: {0}"
-INVALID_RANGE_RULE_IDS = "Other ids not allowed - error: {0}"
+INVALID_RANGE_RULE_IDS = "Inter-variable comparison not allowed in range."
 INVALID_RANGE_RULE = "Invalid rule syntax: {0}"
 INVALID_RULE = "Invalid rule syntax: {0}"
 INVALID_LENGTH = "Invalid length - should be : or positive integer"
@@ -86,7 +86,7 @@ def _check_macro(value, module_files=None, meta_dir=None):
     if not module_files:
         return
     try:
-        macros = rose.variable.array_split(value)
+        macros = rose.variable.array_split(value, only_this_delim=",")
     except Exception as e:
         return INVALID_MACRO_SYNTAX.format(e)
     bad_macros = []
@@ -118,13 +118,15 @@ def _check_range(value):
         try:
             check_ok = evaluator.evaluate_rule(
                                           value, test_id, test_config)
-        except RuleValueError as e:
+        except rose.macros.rule.RuleValueError as e:
             return INVALID_RANGE_RULE_IDS.format(e)
         except Exception as e:
             return INVALID_RANGE_RULE.format(e)
     else:
         try:
             check_func = rose.variable.parse_range_expression(value)
+        except rose.variable.RangeSyntaxError as e:
+            return str(e)
         except Exception as e:
             return INVALID_RANGE.format(type(e).__name__ + ": " + str(e))
 
@@ -145,7 +147,7 @@ def _check_type(value):
 
 def _check_values(value):
     try:
-        val_list = rose.variable.array_split(value)
+        val_list = rose.variable.array_split(value, only_this_delim=",")
     except Exception as e:
         return INVALID_VALUES.format(type(e).__name__ + ": " + str(e))
     if not val_list:
@@ -235,8 +237,7 @@ def metadata_check(meta_config, meta_dir=None,
     reports.extend(trigger_macro.validate(rose.config.ConfigNode(),
                                           meta_config=meta_config))
     sorter = rose.config.sort_settings
-    reports.sort(lambda x, y: sorter(x.option, y.option))
-    reports.sort(lambda x, y: sorter(x.section, y.section))
+    reports.sort(rose.macro.report_sort)
     return reports
 
 
@@ -268,7 +269,7 @@ def main():
                              only_these_properties=properties)
     macro_id = rose.macro.MACRO_OUTPUT_ID.format(
                                 rose.macro.VALIDATE_METHOD.upper()[0],
-                                "MetadataChecker")
+                                "rose.metadata_check.MetadataChecker")
     text = rose.macro.get_reports_as_text(
                                     reports,
                                     macro_id)

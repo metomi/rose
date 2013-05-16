@@ -606,13 +606,13 @@ def run_macros(app_config, meta_config, config_name, macro_names,
                     problem_list = config_problem_dict[macro_name]
                     sort = rose.config.sort_settings
                     
-                    problem_list.sort(lambda x, y: sort(x.option, y.option))
-                    problem_list.sort(lambda x, y: sort(x.section, y.section))
+                    problem_list.sort(report_sort)
                     method_id = VALIDATE_METHOD.upper()[0]
                     macro_id = MACRO_OUTPUT_ID.format(method_id, macro_name)
-                    sys.stderr.write(get_reports_as_text(problem_list,
-                                                         macro_id,
-                                                         is_from_transform=False))
+                    sys.stderr.write(get_reports_as_text(
+                                                 problem_list,
+                                                 macro_id,
+                                                 is_from_transform=False))
 
     # Run any transform macros.
     if TRANSFORM_METHOD in macros_by_type:
@@ -623,6 +623,18 @@ def run_macros(app_config, meta_config, config_name, macro_names,
                               opt_conf_dir=opt_conf_dir,
                               opt_output_dir=opt_output_dir)
     sys.exit(RC)
+
+
+def report_sort(report1, report2):
+    sect1 = report1.section
+    sect2 = report2.section
+    if sect1 == sect2:
+        opt1 = report1.option
+        opt2 = report2.option
+        if opt1 is None or opt2 is None:
+            return cmp(opt1, opt2)
+        return rose.config.sort_settings(opt1, opt2)
+    return rose.config.sort_settings(sect1, sect2)
 
 
 def get_reports_as_text(reports, macro_id, is_from_transform=False):

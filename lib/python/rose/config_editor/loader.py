@@ -1186,7 +1186,8 @@ class ConfigDataManager(object):
                                              rose.META_PROP_MACRO, "")
         if not ns_macros_text:
             return {}
-        ns_macros = rose.variable.array_split(ns_macros_text)
+        ns_macros = rose.variable.array_split(ns_macros_text,
+                                              only_this_delim=",")
         module_prefix = self.get_macro_module_prefix(config_name)
         for i, ns_macro in enumerate(ns_macros):
             ns_macros[i] = module_prefix + ns_macro

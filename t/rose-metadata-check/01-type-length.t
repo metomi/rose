@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose macro" in built-in value checking mode.
+# Test "rose metadata-gen".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 tests 6
 #-------------------------------------------------------------------------------
 # Check type-length checking.
-TEST_KEY=$TEST_KEY_BASE-type-length-ok
+TEST_KEY=$TEST_KEY_BASE-ok
 setup
 init <<__META_CONFIG__
 [namelist:values_nl1=my_boolean_false]
@@ -126,7 +126,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 # Check type-length checking (fail).
-TEST_KEY=$TEST_KEY_BASE-type-length-bad
+TEST_KEY=$TEST_KEY_BASE-bad
 setup
 init <<__META_CONFIG__
 [namelist:values_nl1=my_boolean_false]

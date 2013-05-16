@@ -94,7 +94,8 @@ class Variable(object):
         if ('values' in self.metadata and
             not isinstance(self.metadata['values'], list)):
             # Replace this kind of thing with a proper metadata handler later.
-            val_list = rose.variable.array_split(self.metadata['values'])
+            val_list = rose.variable.array_split(self.metadata['values'],
+                                                 only_this_delim=",")
             self.metadata['values'] = val_list
         return self.metadata
 
@@ -276,6 +277,14 @@ class CombinedRangeSubFunction(object):
                  ", ".join([repr(r) for r in self.range_insts]) + ">")
 
 
+class RangeSyntaxError(Exception):
+
+    """Raised when the metadata range option is passed invalid syntax."""
+
+    def __str__(self):
+        return "Invalid syntax: {0}".format(self.args[0])
+
+
 def parse_range_expression(expr):
     """Parse numeric limits on a variable value into a checker function.
 
@@ -293,7 +302,7 @@ def parse_range_expression(expr):
 
 
 def parse_trigger_expression(expr):
-    """Parse a string containing a Python-syntax dictionary or list."""
+    """Parse a trigger expression."""
     expr = expr.replace('\n', '')
     trigger_data = {}
     current_key = None
@@ -328,7 +337,7 @@ def parse_type_expression(expr):
     'integer, real' => ['integer', 'real']
     
     """
-    types = array_split(expr.strip())
+    types = array_split(expr.strip(), only_this_delim=",")
     if len(types) == 1:
         types = types[0]
     return types
@@ -340,6 +349,8 @@ def _scan_range_string(string):
             yield item, '=='
         elif REC_RANGE_RANGE.match(item):
             yield REC_RANGE_RANGE.match(item).groups(), '<='
+        elif item != ",":
+            raise RangeSyntaxError(item)
 
 
 def _scan_trigger_string(string):
