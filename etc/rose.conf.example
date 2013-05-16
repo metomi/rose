@@ -95,6 +95,8 @@
 #
 ## Hosts in [rose-host-select] section that can be used to run a suite.
 #  hosts=localhost
+## Hosts in [rose-host-select] section that can be scanned by rose utilities.
+#  scan=localhost
 ## HOST-PATTERNS=DIR list, line delimited.
 ## HOST-PATTERNS are glob patterns for matching host names.
 ## DIR is the root location of a suite's "share" directory (default=$HOME)

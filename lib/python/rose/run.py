@@ -673,15 +673,24 @@ class SuiteRunner(Runner):
         if opts.host:
             hosts.append(opts.host)
         conf = ResourceLocator.default().get_conf()
-        node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
+        
+        # Get the scan group of hosts
+        node = conf.get(["rose-suite-run", "scan"], no_ignore=True)
         if node is None:
             known_hosts = ["localhost"]
         else:
             known_hosts = self.host_selector.expand(node.value.split())[0]
+            
+        # Get the group of hosts which can be run on
+        node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
+        if node is not None:
+            known_hosts += self.host_selector.expand(node.value.split())[0]       
+        
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
         suite_running_hosts = self.suite_engine_proc.ping(suite_name, hosts)
+        print suite_running_hosts
         if opts.run_mode == "reload":
             if not suite_running_hosts:
                 raise NotRunningError(suite_name)
@@ -691,7 +700,8 @@ class SuiteRunner(Runner):
                 if opts.force_mode:
                     opts.install_only_mode = True
                 else:
-                    raise AlreadyRunningError(suite_name, hosts[0])
+                    raise AlreadyRunningError(suite_name, 
+                                              suite_running_hosts[0])
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
@@ -850,10 +860,24 @@ class SuiteRunner(Runner):
             if suite_running_hosts:
                 host = suite_running_hosts[0]
         else:
-            host = hosts[0]
+            host = hosts[0] # needed?????????????????????????????
             # FIXME: should sync files to suite host?
             if opts.host:
                 hosts = [host]
+            
+            #use the list of hosts on which you can run
+            if opts.run_mode != "reload" and not opts.host:
+                hosts = []
+                node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
+                if node is None:
+                    known_hosts = ["localhost"]
+                else:
+                    known_hosts = self.host_selector.expand(
+                                                     node.value.split())[0]
+                for known_host in known_hosts:
+                    if known_host not in hosts:
+                        hosts.append(known_host)    
+                
             if hosts == ["localhost"]:
                 host = hosts[0]
             else:
