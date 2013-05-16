@@ -17,7 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
+"""This module deals with variable actions.
 
+The methods of VariableOperations are the only ways that variable data
+objects should be interacted with (adding, removing, changing value,
+etc). There are also some utility methods.
+
+"""
 import copy
 import time
 

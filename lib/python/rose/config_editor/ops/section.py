@@ -17,7 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
+"""This module deals with section-specific actions.
 
+The methods of SectionOperations are the only ways that section data
+objects should be interacted with. There are also some utility methods.
+
+"""
 
 import pygtk
 pygtk.require('2.0')
