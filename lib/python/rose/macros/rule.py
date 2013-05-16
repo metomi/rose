@@ -121,7 +121,7 @@ class RuleEvaluator(rose.macro.MacroBase):
     INTERNAL_ID_SCI_NUM = "_scinum{0}"
     REC_ARRAY = {"all": re.compile(r"(\W)all\( *(\S+) *(\S+) *(.*?) *\)(\W)"),
                  "any": re.compile(r"(\W)any\( *(\S+) *(\S+) *(.*?) *\)(\W)")}
-    REC_CONFIG_ID = re.compile(r"(?:\W)([\w:](?:\{.*?\})?+=\w+(?:\(\d+\))?)(?:\W)")
+    REC_CONFIG_ID = re.compile(r"(?:\W)([\w:]+(?:\{.*?\})?=\w+(?:\(\d+\))?)(?:\W)")
     REC_SCI_NUM = re.compile(r"""(?:\W|^)
                                  ([-+]?[\d.]+
                                   [edED][-+]?\d+)

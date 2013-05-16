@@ -26,7 +26,8 @@ import sys
 import rose.config
 import rose.formats.namelist
 import rose.macro
-import rose.macros.value
+import rose.macros
+
 from rose.opt_parse import RoseOptionParser
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
@@ -70,19 +71,8 @@ def _check_duplicate(value):
         return INVALID_ALLOWED_VALUE.format("/".join(allowed_values))
 
 
-def _check_fail_if(value, var_id, meta_config):
-    test_config = rose.config.ConfigNode()
-    for 
-    test_id = "env=A"
-    test_config.set(["env", "A"], "0")
-    evaluator =  rose.macros.rule.RuleEvaluator()
-    try:
-        check_ok = evaluator.evaluate_rule(
-                                        value, var_id, test_config)
-    except RuleValueError as e:
-        pass
-    except Exception as e:
-        return INVALID_RULE.format(e)
+def _check_fail_if(value):
+    pass
 
 
 def _check_length(value):
@@ -188,7 +178,7 @@ def _get_module_files(meta_dir=None):
                     if filename.endswith(".py"):
                         module_files.append(filename)
     return module_files
-
+    
 
 def metadata_check(meta_config, meta_dir=None,
                    only_these_sections=None,
@@ -232,10 +222,6 @@ def metadata_check(meta_config, meta_dir=None,
             elif option == rose.META_PROP_MACRO:
                 check_func = lambda v: _check_macro(
                                  v, module_files)
-            elif option in [rose.META_PROP_FAIL_IF,
-                            rose.META_PROP_WARN_IF]:
-                check_func = lambda v: _check_fail_if(
-                                 v, section, meta_config)
             else:
                 func_name = "_check_" + option.replace("-", "_")
                 check_func = globals().get(func_name, lambda v: None)
@@ -287,9 +273,8 @@ def main():
                                     reports,
                                     macro_id)
     if reports:
-        sys.exit(text)
-    else:
-        sys.stdout.write(text)
+        sys.stderr.write(text)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
