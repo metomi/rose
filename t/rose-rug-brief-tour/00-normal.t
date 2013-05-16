@@ -38,14 +38,15 @@ run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
 TIMEOUT=$(($(date +%s) + 36000)) # wait 10 minutes
 OK=false
-while (($(date +%s) < TIMEOUT)); do
+while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
-    if grep -q '^Main thread DONE$' $HOME/cylc-run/$NAME/log/suite/out; then
-        OK=true
-        break
-    fi
 done
-run_pass "$TEST_KEY" $OK
+if [[ -e $HOME/.cylc/ports/$NAME ]]; then
+    fail "$TEST_KEY"
+else
+    OK=true
+    pass "$TEST_KEY"
+fi
 #-------------------------------------------------------------------------------
 # See if all tasks are OK
 TEST_KEY=$TEST_KEY_BASE-tasks
