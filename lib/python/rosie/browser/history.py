@@ -133,7 +133,15 @@ class HistoryManager():
     def get_archive(self):
         """Return the archive of history items."""
         return self.archive
-      
+    
+    def get_clean_session_log(self):
+        """Return the non-home entries from the session log"""
+        session = []
+        for record in self.session_log:
+            if record.h_type != "home":
+                session.append(record)        
+        return session
+    
     def record_search(self, search_type, description, hist_search):
         """Record a history item."""
         record = HistoryItem(search_type, description, hist_search)
@@ -150,10 +158,10 @@ class HistoryManager():
         
     def store_history(self):
         """Save the combined session history and archive."""
-        complete_hist = self.session_log + self.archive
+        complete_hist = self.get_clean_session_log() + self.archive
+        complete_hist = self.clean_log(complete_hist)
         hist_out = [complete_hist[i] for i in range(min(self.timescale, 
                                                     len(complete_hist)))]
-        hist_out = self.clean_log(hist_out)
         self.hist_io.write_history(hist_out)
        
 
@@ -220,7 +228,7 @@ class HistoryIO():
         if archive != False:
             f = open(self.hist_path, 'w')
             for i, h in enumerate(archive):
-                if i < self.timescale:                              
+                if i < self.timescale and h.h_type != "home":
                     f.write(str(h) + '\n')
                 else:
                     break
