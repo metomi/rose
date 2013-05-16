@@ -29,12 +29,13 @@
 # DESCRIPTION
 #     Provide a portable way to launch an MPI command.
 #
-#     1. If $PWD/rose-mpi-launch.rc exists, it is assumed to be a command file.
-#        The command file will be submitted to the MPI launcher command.
-#     2. Alternatively, a command file can be specified with the
-#        --command-file=FILE (or -f FILE) option.
-#     3. In this form, it will attempt to submit COMMAND with the MPI launcher
-#        command.
+#     1. If --command-file=FILE (or -f FILE) is specified, FILE is assumed to
+#        be the command file to be submitted to the MPI launcher command.
+#     2. Alternatively, if $PWD/rose-mpi-launch.rc exists and
+#        --command-file=FILE (or -f FILE) is not specified, it is assumed to be
+#        the command file to be submitted to the MPI launcher command.
+#     3. In the final form, it will attempt to submit COMMAND with the MPI
+#        launcher command.
 #
 #     In all cases, the remaining arguments will be appended to the command
 #     line of the launcher program.

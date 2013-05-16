@@ -891,9 +891,9 @@
     <h3>SYNOPSIS</h3>
 
     <ol>
-      <li><kbd>rose mpi-launch</kbd></li>
-
       <li><kbd>rose mpi-launch -f FILE</kbd></li>
+
+      <li><kbd>rose mpi-launch</kbd></li>
 
       <li><kbd>rose mpi-launch COMMAND [ARGS ...]</kbd></li>
     </ol>
@@ -903,15 +903,17 @@
     <p>Provide a portable way to launch an MPI command.</p>
 
     <ol>
-      <li>If <var>$PWD/rose-mpi-launch.rc</var> exists, it is assumed to be a
-      command file. The command file will be submitted to the MPI launcher
+      <li>If <kbd>--command-file=FILE</kbd> (or <kbd>-f FILE</kbd>) is
+      specified, <var>FILE</var> is assumed to be the command file to be
+      submitted to the MPI launcher command.</li>
+
+      <li>Alternatively, if <var>$PWD/rose-mpi-launch.rc</var> exists and
+      <kbd>--command-file=FILE</kbd> (or <kbd>-f FILE</kbd>) is not specified,
+      it is assumed to be the command file to be submitted to the MPI launcher
       command.</li>
 
-      <li>Alternatively, a command file can be specified with the
-      <kbd>--command-file=FILE</kbd> (or <kbd>-f FILE</kbd>) option.</li>
-
-      <li>In this form, it will attempt to submit <var>COMMAND</var> with the MPI
-      launcher command.</li>
+      <li>In the final form, it will attempt to submit <var>COMMAND</var> with
+      the MPI launcher command.</li>
     </ol>
 
     <p>In all cases, the remaining arguments will be added to the command line of
