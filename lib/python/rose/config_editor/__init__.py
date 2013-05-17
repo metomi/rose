@@ -183,8 +183,8 @@ ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
 ERROR_METADATA_CHECKER_TITLE = "Flawed metadata warning"
 ERROR_METADATA_CHECKER_TEXT = ( 
-                       "{0} error(s) found in metadata at {1}.\n" +
-                       "Some functionality will be switched off.\n\n" +
+                       "{0} problem(s) found in metadata at {1}.\n" +
+                       "Some functionality has been switched off.\n\n" +
                        "Run rose metadata-check for more info.")
 ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
 ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"

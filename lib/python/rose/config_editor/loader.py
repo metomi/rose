@@ -669,13 +669,18 @@ class ConfigDataManager(object):
         reports = rose.metadata_check.metadata_check(meta_config,
                                                      directory)
         if reports and meta_dir_path not in self._bad_meta_dir_paths:
+            # There are problems with some metadata.
             title = rose.config_editor.ERROR_METADATA_CHECKER_TITLE.format(
                                                       meta_dir_path)
             text = rose.config_editor.ERROR_METADATA_CHECKER_TEXT.format(
                                             len(reports), meta_dir_path)
             self._bad_meta_dir_paths.append(meta_dir_path)
+            reports_text = rose.macro.get_reports_as_text(
+                                      reports,
+                                      "rose.metadata_check.MetadataChecker")
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text, title, modal=False)
+                                     text, title, modal=False,
+                                     extra_text=reports_text)
         for report in reports:
             meta_config.unset([report.section, report.option])
 
