@@ -859,7 +859,7 @@ class SuiteRunner(Runner):
             if suite_running_hosts:
                 host = suite_running_hosts[0]
         else:
-            host = hosts[0] # needed?????????????????????????????
+            host = hosts[0]
             # FIXME: should sync files to suite host?
             if opts.host:
                 hosts = [host]
