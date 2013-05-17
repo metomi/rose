@@ -674,17 +674,11 @@ class SuiteRunner(Runner):
             hosts.append(opts.host)
         conf = ResourceLocator.default().get_conf()
         
-        # Get the scan group of hosts
-        node = conf.get(["rose-suite-run", "scan-hosts"], no_ignore=True)
-        if node is None:
-            known_hosts = ["localhost"]
-        else:
-            known_hosts = self.host_selector.expand(node.value.split())[0]
-            
-        # Get the group of hosts which can be run on
-        node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
-        if node is not None:
-            known_hosts += self.host_selector.expand(node.value.split())[0]       
+        known_hosts = self.host_selector.expand(
+              conf.get_value(["rose-suite-run", "hosts"], "").split() +
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
+        known_hosts += ["localhost"]
+        known_hosts = list(set(known_hosts))
         
         for known_host in known_hosts:
             if known_host not in hosts:
