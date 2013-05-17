@@ -690,7 +690,6 @@ class SuiteRunner(Runner):
             if known_host not in hosts:
                 hosts.append(known_host)
         suite_running_hosts = self.suite_engine_proc.ping(suite_name, hosts)
-        print suite_running_hosts
         if opts.run_mode == "reload":
             if not suite_running_hosts:
                 raise NotRunningError(suite_name)
