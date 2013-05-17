@@ -70,9 +70,10 @@ class CylcProcessor(SuiteEngineProcessor):
                 conn = sqlite3.connect(self.get_suite_db_file(suite_name))
                 c = conn.cursor()
                 rows = c.execute("SELECT DISTINCT cycle FROM task_events")
-                break
             except sqlite3.OperationalError:
                 sleep(1.0)
+            else:
+                break
         for row in rows:
             cycle_time = row[0]
             archive_file_name = self.get_cycle_log_archive_name(cycle_time)
@@ -239,8 +240,10 @@ class CylcProcessor(SuiteEngineProcessor):
         where = ""
         where_args = []
         for task_id in task_ids:
+            cycle = None
             if self.TASK_ID_DELIM in task_id:
-                where_args += task_id.split(self.TASK_ID_DELIM, 1)
+                name, cycle = task_id.split(self.TASK_ID_DELIM, 1)
+                where_args += [name, cycle]
             else:
                 where_args.append(task_id)
             if where:
@@ -257,11 +260,14 @@ class CylcProcessor(SuiteEngineProcessor):
                 conn = sqlite3.connect(self.get_suite_db_file(suite_name))
                 c = conn.cursor()
                 rows = c.execute(
-                        "SELECT time,name,cycle,submit_num,event,message"
-                        " FROM task_events"
-                        " ORDER BY time" + where, where_args)
-            except sqlite3.OperationalError:
+                        "SELECT time,name,cycle,submit_num,event,message" +
+                        " FROM task_events" +
+                        where +
+                        " ORDER BY time", where_args)
+            except sqlite3.OperationalError as e:
                 sleep(1.0)
+            else:
+                break
 
         data = {}
         for row in rows:

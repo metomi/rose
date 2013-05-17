@@ -90,7 +90,7 @@ class SuiteLogViewGenerator(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def generate(self, suite_name, task_ids, full_mode=False,
+    def generate(self, suite_name, task_ids=None, full_mode=False,
                  log_archive_threshold=None):
         """Generate the log view for a suite.
 
@@ -112,7 +112,6 @@ class SuiteLogViewGenerator(object):
         lock = os.path.join(os.getcwd(), self.LOCK)
         try:
             os.mkdir(lock)
-            break
         except OSError:
             self.handle_event(LockEvent(lock))
             return
@@ -121,9 +120,13 @@ class SuiteLogViewGenerator(object):
                 for task_id in task_ids:
                     self.fs_util.touch(os.path.join(lock, task_id))
         try:
-            return self._generate(suite_name, full_mode=False,
-                                  log_archive_threshold=None)
+            if full_mode or log_archive_threshold:
+                self._generate(suite_name, full_mode, log_archive_threshold)
+            while os.listdir(lock):
+                self._generate(suite_name, full_mode, log_archive_threshold)
         finally:
+            for name in os.listdir(lock):
+                os.unlink(os.path.join(lock, name))
             os.rmdir(lock)
             try:
                 self.fs_util.chdir(cwd)
@@ -185,20 +188,22 @@ class SuiteLogViewGenerator(object):
                 if not task_ids and glob(self.NS + "-*.json"):
                     break
                 for name in task_ids:
-                    self.fs_util.delete(name)
+                    self.fs_util.delete(os.path.join(self.LOCK, name))
                 self.suite_engine_proc.update_job_log(suite_name, task_ids)
                 data = self.suite_engine_proc.get_suite_events(suite_name,
                                                                task_ids)
                 if not data:
                     break
-                for cycle_time, new_datum in data:
+                for cycle_time, new_datum in data.items():
                     cycle_time_f_name = self.NS + "-" + cycle_time + ".json"
                     if os.access(cycle_time_f_name, os.F_OK | os.R_OK):
-                        datum = json.load(open(cycle_time_file_name))
+                        datum = json.load(open(cycle_time_f_name))
                         datum["tasks"].update(new_datum["tasks"])
                     else:
                         datum = new_datum
                     json.dump(datum, open(cycle_time_f_name, "wb"), indent=0)
+                    self.handle_event(
+                            FileSystemEvent("update", cycle_time_f_name))
         if log_archive_threshold:
             self.suite_engine_proc.archive_job_logs(suite_name,
                                                     log_archive_threshold)

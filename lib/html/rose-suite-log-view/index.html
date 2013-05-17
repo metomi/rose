@@ -293,7 +293,9 @@ $(function() {
     function populate_cycle_tasks_data(data) {
         var cycle_time = data["cycle_time"];
         var cycle_time_archive = null;
-        if (data["is_archived"]) {
+        var opts_archived
+            = $("#cycle_times_archived option:contains(" + cycle_time + ")");
+        if (opts_archived.size() > 0) {
             cycle_time_archive = "job-" + cycle_time + ".tar.gz";
         }
         var option_node = $("#cycle_time option:contains(" + cycle_time + ")");
