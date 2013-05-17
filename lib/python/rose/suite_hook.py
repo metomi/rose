@@ -110,7 +110,7 @@ def main():
             for value in getattr(opts, key):
                 values.extend(value.split(","))
         setattr(opts, key, values)
-    report = Reporter(opts.verbosity - opts.quietness)
+    report = Reporter(opts.verbosity - opts.quietness - 1) # Reduced default
     popen = RosePopener(event_handler=report)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=report, popen=popen)

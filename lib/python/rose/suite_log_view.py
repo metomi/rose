@@ -38,6 +38,7 @@ class LockEvent(Event):
     """An warning raised when the generator aborts due to a lock file."""
 
     TYPE = Event.TYPE_ERR
+    LEVEL = Event.V
 
     def __str__(self):
         return str(self.args[0]) + ": lock exists, abort"
