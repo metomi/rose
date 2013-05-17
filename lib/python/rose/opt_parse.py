@@ -156,6 +156,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "gcontrol_mode",
                         "default": True,
                         "help": "Do not run suite control GUI."}],
+               "group": [
+                       ["--group", "-g"],
+                       {"action": "append",
+                        "dest": "group",
+                        "help": "Switch a group of tasks on."}],
                "host": [
                        ["--host"],
                        {"metavar": "HOST",
@@ -408,8 +413,8 @@ class RoseOptionParser(OptionParser):
                "task": [
                        ["--task", "-t"],
                        {"action": "append",
-                        "dest": "task",
-                        "help": "Switch a task on/off."}],
+                        "dest": "group",
+                        "help": "Switch a group of tasks on."}],
                "task_cycle_time_mode": [
                        ["--use-task-cycle-time", "-c"],
                        {"action": "store_true",
