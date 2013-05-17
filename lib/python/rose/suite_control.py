@@ -102,12 +102,18 @@ class SuiteControl(object):
             hosts = [host]
         else:
             conf = ResourceLocator.default().get_conf()
-            node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
             hosts = None
-            if node is not None:
+            
+            known_hosts = self.host_selector.expand(
+              conf.get_value(["rose-suite-run", "hosts"], "").split() +
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
+            known_hosts = list(set(known_hosts))
+            
+            if known_hosts:
                 hosts = self.suite_engine_proc.ping(
                         suite_name,
-                        self.host_selector.expand(node.value.split())[0])
+                        known_hosts)
+
             if not hosts:
                 # Try the "rose-suite.host" file in the suite log directory
                 log = self.suite_engine_proc.get_suite_dir(suite_name, "log")

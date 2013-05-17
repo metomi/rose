@@ -60,6 +60,10 @@ class ExactComparisonFailure(object):
             self.val1 = val1
             self.val2 = val2
             self.percentage = "XX"
+        except ZeroDivisionError:
+            self.val1 = val1
+            self.val2 = val2
+            self.percentage = "XX"
         self.location = location
 
     def __repr__(self):
