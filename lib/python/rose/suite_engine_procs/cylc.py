@@ -60,16 +60,25 @@ class CylcProcessor(SuiteEngineProcessor):
         os.chdir(os.path.expanduser('~'))
         if not os.path.isdir(self.get_suite_dir_rel(suite_name)):
             return
-        hosts = ["localhost"]
+        hostnames = ["localhost"]
         host_file_path = self.get_suite_dir_rel(
                 suite_name, "log", "rose-suite-run.host")
         if os.access(host_file_path, os.F_OK | os.R_OK):
             for line in open(host_file_path):
-                hosts.append(line.strip())
+                hostnames.append(line.strip())
         conf = ResourceLocator.default().get_conf()
-        hosts_str = conf.get_value(["rose-suite-run", "hosts"])
-        if hosts_str:
-            hosts += self.host_selector.expand(shlex.split(hosts_str))[0]
+        
+        hostnames = self.host_selector.expand(
+              conf.get_value(["rose-suite-run", "hosts"], "").split() +
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
+        hostnames = list(set(hostnames))
+        hosts_str = conf.get_value(["rose-suite-run", "scan-hosts"])
+        
+        hosts = []
+        for h in hostnames:
+            if h not in hosts:
+                hosts.append(h)
+            
         running_hosts = self.ping(suite_name, hosts)
         if running_hosts:
             raise StillRunningError(suite_name, running_hosts[0])
