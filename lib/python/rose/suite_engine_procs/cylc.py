@@ -67,7 +67,7 @@ class CylcProcessor(SuiteEngineProcessor):
             for line in open(host_file_path):
                 hostnames.append(line.strip())
         conf = ResourceLocator.default().get_conf()
-        hosts_str = conf.get_value(["rose-suite-run", "scan"])
+        hosts_str = conf.get_value(["rose-suite-run", "scan-hosts"])
         if hosts_str:
             hostnames += self.host_selector.expand(shlex.split(hosts_str))[0]
         hosts_str = conf.get_value(["rose-suite-run", "hosts"])
