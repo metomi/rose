@@ -94,8 +94,9 @@
       in.</p>
 
       <p>Usually you would add a <samp>rose stem</samp> suite to an existing
-      repository with the keyword already set up to test the accompanying source
-      code . For the purposes of this tutorial we will create a new one.</p>
+      repository with the keyword already set up to test the accompanying
+      source code . For the purposes of this tutorial we will create a new
+      one.</p>
 
       <p>Type the follow to create a temporary repository (you can safely
       delete it after finishing this tutorial).</p>
@@ -158,8 +159,8 @@ fcm checkout fcm:spaceship_tr .
       <code>rose-suite.conf</code> and <code>suite.rc</code> files. We will
       fill these in later.</p>
 
-      <p>Next, create an <code>app</code> sub-directory inside your 
-      <code>rose-stem</code> directory, and inside there create a directory 
+      <p>Next, create an <code>app</code> sub-directory inside your
+      <code>rose-stem</code> directory, and inside there create a directory
       named <code>spaceship</code>.</p>
     </div>
 
@@ -169,7 +170,9 @@ fcm checkout fcm:spaceship_tr .
       <p>Open the file:</p>
       <pre>
 app/spaceship/rose-app.conf
-</pre><p>in a text editor, and paste in the following configuration:</p>
+</pre>
+
+      <p>in a text editor, and paste in the following configuration:</p>
     </div>
 
     <div class="slide">
@@ -322,9 +325,9 @@ resultfile=../spaceship.1/output.txt
         contents</a>. Replace the <code>/home/user/spaceship</code> path in the
         <code>kgo1file</code> variable with the path to this file.</p>
 
-        <p>The <em>known good output</em> should be the result of a control run.
-        <samp>rose ana</samp> will compare the answers from this file (obtained
-        using the extract and comparison methods in the
+        <p>The <em>known good output</em> should be the result of a control
+        run. <samp>rose ana</samp> will compare the answers from this file
+        (obtained using the extract and comparison methods in the
         <code>rose-app.conf</code> file) with the results from the user's code
         change.</p>
       </div>
@@ -350,17 +353,16 @@ rose stem --group=command_spaceship
 
         <p>anywhere in your working copy (the <code>--source</code> argument
         defaults to <code>.</code> so it should automatically pick up your
-        working copy as the source). If your site uses a Cylc server, and 
-        your home directory is not shared with the Cylc server, you will need 
-        to add the option</p>
+        working copy as the source). If your site uses a Cylc server, and your
+        home directory is not shared with the Cylc server, you will need to add
+        the option</p>
         <pre>
 --host=localhost
 </pre>
 
-        <p><em>We use <code>--group</code> in preference to
-        <code>--task</code> in this suite (both are synonymous) as we specify a
-        group of tasks set up in the Jinja2 variable
-        <code>name_graphs</code>.</em></p>
+        <p><em>We use <code>--group</code> in preference to <code>--task</code>
+        in this suite (both are synonymous) as we specify a group of tasks set
+        up in the Jinja2 variable <code>name_graphs</code>.</em></p>
       </div>
 
       <div class="slide">
