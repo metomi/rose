@@ -38,7 +38,7 @@ class NavPanelHandler(object):
 
     def __init__(self, data, util, mainwindow, undo_stack, redo_stack,
                  add_config_func, section_ops_inst, variable_ops_inst,
-                 kill_page_func, reload_ns_tree_func):
+                 kill_page_func, reload_ns_tree_func, transform_default_func):
         self.util = util
         self.data = data
         self.mainwindow = mainwindow
@@ -49,6 +49,7 @@ class NavPanelHandler(object):
         self._add_config = add_config_func
         self.kill_page_func = kill_page_func
         self.reload_ns_tree_func = reload_ns_tree_func
+        self._transform_default_func = transform_default_func
 
     def add_dialog(self, base_ns):
         """Handle an add section dialog and request."""
@@ -181,7 +182,7 @@ class NavPanelHandler(object):
             return False
         base_ns = "/" + base_ns.lstrip("/")
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
-        self.transform_default(only_this_config_name=config_name)
+        self._transform_default_func(only_this_config_name=config_name)
 
     def get_ns_metadata_and_comments(self, namespace):
         """Return metadata dict and comments list."""
@@ -261,8 +262,7 @@ class NavPanelHandler(object):
             namespace = None
         else:
             namespace = "/" + base_ns.lstrip("/")
-        ui_config_string = """<ui> <popup name='Popup'>
-                              <menuitem action="Add"/>"""
+        ui_config_string = """<ui> <popup name='Popup'>"""
         actions = [('New', gtk.STOCK_NEW,
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),
                    ('Add', gtk.STOCK_ADD,
@@ -297,6 +297,7 @@ class NavPanelHandler(object):
         help = None
         is_empty = (not self.data.config)
         if namespace is not None:
+            config_name = self.util.split_full_ns(self.data, namespace)[0]
             cloneable = self.is_ns_duplicate(namespace)
             is_top = (namespace in self.data.config.keys())
             is_fixable = bool(self.get_ns_errors(namespace))
@@ -305,11 +306,21 @@ class NavPanelHandler(object):
                                                 namespace)
             enabled_sections = self.data.helper.get_ignored_sections(
                                                 namespace, get_enabled=True)
-            
+            is_latent = self.data.helper.get_ns_latent_status(namespace)
+            latent_sections = self.data.helper.get_latent_sections(
+                                                   namespace)
             metadata, comments = self.get_ns_metadata_and_comments(namespace)
-            if is_fixable:
-                ui_config_string += """<menuitem action="Autofix"/>
-                                       <separator name="sepauto"/>"""
+            if is_latent:
+                for i, section in enumerate(latent_sections):
+                    action_name = "Add {0}".format(i)
+                    ui_config_string += '<menuitem action="{0}"/>'.format(
+                                                                   action_name)
+                    actions.append(
+                            (action_name, gtk.STOCK_ADD,
+                             rose.config_editor.TREE_PANEL_ADD_SECTION.format(
+                                                               section)))
+                ui_config_string += '<separator name="addlatentsep"/>'
+            ui_config_string += '<menuitem action="Add"/>'
             if cloneable:
                 ui_config_string += '<separator name="clonesep"/>'
                 ui_config_string += '<menuitem action="Clone"/>'
@@ -331,7 +342,11 @@ class NavPanelHandler(object):
             if not is_empty:
                 ui_config_string += """<separator name="removesep"/>"""
                 ui_config_string += """<menuitem action="Remove"/>"""
+            if is_fixable:
+                ui_config_string += """<separator name="sepauto"/>
+                                       <menuitem action="Autofix"/>"""
         else:
+            ui_config_string += '<menuitem action="Add"/>'
             ui_config_string += '<separator name="ignoresep"/>'
             ui_config_string += '<menuitem action="Enable"/>'
             ui_config_string += '<menuitem action="Ignore"/>'
@@ -364,6 +379,14 @@ class NavPanelHandler(object):
                     lambda b: self.ignore_request(namespace, True))
         ignore_item.set_sensitive(not is_empty)
         if namespace is not None:
+            if is_latent:
+                for i, section in enumerate(latent_sections):
+                    action_name = "Add {0}".format(i)
+                    add_item = uimanager.get_widget("/Popup/" + action_name)
+                    add_item._section = section
+                    add_item.connect("activate",
+                                     lambda b: self.sect_ops.add_section(
+                                                    config_name, b._section))
             if cloneable:
                 clone_item = uimanager.get_widget('/Popup/Clone')
                 clone_item.connect("activate",

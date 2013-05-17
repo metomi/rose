@@ -20,7 +20,9 @@
 
 import re
 
+import rose.config
 import rose.config_editor
+
 
 REC_ELEMENT_SECTION = re.compile(r"^(.*)\((.+)\)$")
 
@@ -348,6 +350,22 @@ class ConfigDataHelper(object):
             elif (rose.variable.IGNORED_BY_USER in
                   sect_data.ignored_reason):
                 return_sections.append(section)
+        return_sections.sort(rose.config.sort_settings)
+        return return_sections
+
+    def get_latent_sections(self, namespace):
+        """Return the latent sections for this namespace."""
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
+        config_data = self.data.config[config_name]
+        if namespace == config_name:
+            sections = config_data.sections.now.keys()
+        else:
+            sections = self.get_sections_from_namespace(namespace)
+        return_sections = []
+        for section in sections:
+            if section not in config_data.sections.now:
+                return_sections.append(section)
+        return_sections.sort(rose.config.sort_settings)
         return return_sections
 
     def get_ns_ignored_status(self, namespace):

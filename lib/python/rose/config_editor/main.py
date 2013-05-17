@@ -189,16 +189,6 @@ class MainController(object):
                              self.view_page,
                              self.reload_namespace_tree)
 
-        # Add in the navigation panel menu handler.
-        self.nav_handle = rose.config_editor.nav_panel_menu.NavPanelHandler(
-                             self.data, self.util, self.mainwindow,
-                             self.undo_stack, self.redo_stack,
-                             self._add_config,
-                             self.section_ops,
-                             self.variable_ops,
-                             self.kill_page,
-                             self.reload_namespace_tree)
-
         # Add in the main menu bar and tool bar handler.
         self.main_handle = rose.config_editor.menu.MainMenuHandler(
                              self.data, self.util, self.mainwindow,
@@ -209,6 +199,17 @@ class MainController(object):
                              self.section_ops,
                              self.variable_ops,
                              self.perform_find_by_ns_id)
+
+        # Add in the navigation panel menu handler.
+        self.nav_handle = rose.config_editor.nav_panel_menu.NavPanelHandler(
+                             self.data, self.util, self.mainwindow,
+                             self.undo_stack, self.redo_stack,
+                             self._add_config,
+                             self.section_ops,
+                             self.variable_ops,
+                             self.kill_page,
+                             self.reload_namespace_tree,
+                             self.main_handle.transform_default)
 
         self.updater = rose.config_editor.updater.Updater(
                              self.data, self.util, self.mainwindow,
