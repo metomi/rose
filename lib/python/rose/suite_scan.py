@@ -54,11 +54,13 @@ class SuiteScan(object):
         """Scan for running suites (in args)."""
         if not args:
             conf = ResourceLocator.default().get_conf()
-            node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
-            if node is None:
-                args = ["localhost"]
-            else:
-                args = self.host_selector.expand(node.value.split())[0]
+            hosts = self.host_selector.expand(
+               conf.get_value(["rose-suite-run", "hosts"], "").split() +
+               conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
+        if not hosts:
+            args = ["localhost"]
+        else:
+            args = list(set(hosts + ["localhost"]))
         return self.suite_engine_proc.scan(args)
 
     __call__ = scan
