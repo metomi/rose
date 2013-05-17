@@ -30,19 +30,24 @@
 #     in the rose-suite.conf file.
 #
 # EXAMPLES
-#     rose stem --task=developer
-#     rose stem --source=/path/to/source --task=myjob
+#     rose stem --group=developer
+#     rose stem --source=/path/to/source --source=/other/source --group=mygroup
 #
 # OPTIONS
 #     All options of "rose suite-run" are supported. Additional options are:
 #
 #     --source=SOURCE, -s SOURCE
-#         Specify a source tree to include in a rose-stem suite. The source 
-#         tree must be a working copy as the location of the suite and fcm-make
-#         config files
-#         are taken from it. Defaults to '.' if not specified.
-#     --task=TASK, -t TASK
-#         Specify a task name or group to run. 
+#         Specify a source tree to include in a rose-stem suite. The first 
+#         source tree must be a working copy as the location of the suite and 
+#         fcm-make config files are taken from it. Further source trees can be
+#         added with additional --source arguments.
+#         Defaults to '.' if not specified.
+#     --group=GROUP, -g GROUP
+#         Specify a group name to run. Additional groups can be specified
+#         with further --group arguments. The suite will then convert the groups
+#         into a series of tasks to run..
+#    --task=GROUP, -t GROUP
+#         Synonym for --group.
 #
 # JINJA2 VARIABLES
 #
@@ -50,7 +55,7 @@
 #     upper case. 
 #
 #     RUN_NAMES
-#         A list of jobs and job groups to run in the rose-stem suite.
+#         A list of groups to run in the rose-stem suite.
 #     SOURCE_<project>
 #         The complete list of source trees for a given project.
 #     SOURCE_<project>_BASE

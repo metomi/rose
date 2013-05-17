@@ -1,0 +1,401 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Testing with rose stem</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Testing with rose stem</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This advanced tutorial will walk you through creating a simple example
+      of the <samp>rose stem</samp> testing system. Our tutorial will involve
+      you commanding a spaceship flying through space.<img class="r-floater"
+      src=
+      "http://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Cassini_Saturn_Orbit_Insertion.jpg/320px-Cassini_Saturn_Orbit_Insertion.jpg"
+      width="30%" alt=
+      "Artist's Impression of Cassini entering Saturn orbit" /></p>
+
+      <p>You should already be familiar with the <a href=
+      "rose-rug-stem.html">rose stem</a> part of the documentation.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="tutorial_start">Getting started</h2>
+
+      <p>We will start the <samp>rose stem</samp> tutorial by setting up an FCM
+      repository called <code>SPACESHIP</code> to store the code and test suite
+      in.</p>
+
+      <p>Usually you would add a <samp>rose stem</samp> suite to an existing
+      repository with the keyword already set up to test the accompanying
+      source code . For the purposes of this tutorial we will create a new
+      one.</p>
+
+      <p>Type the follow to create a temporary repository (you can safely
+      delete it after finishing this tutorial).</p>
+      <pre class="shell">
+svnadmin create ~/spaceship_repos
+(cd $(mktemp -d); mkdir -p trunk/src; svn import -m "" . file://$HOME/spaceship_repos)
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Getting Started II</h3>
+
+      <p>We then need to link the project name <code>SPACESHIP</code> with this
+      project. Edit the file:</p>
+      <pre>
+$HOME/.metomi/fcm/keyword.cfg
+</pre>
+
+      <p>and add the line</p>
+      <pre>
+location{primary}[spaceship] = file:///home/user/spaceship_repos
+</pre>
+
+      <p>making sure the path on the right-hand side matches the location you
+      specified in the <code>svnadmin</code> command.</p>
+
+      <p>Now you can checkout a working copy of your repository by typing:</p>
+      <pre class="shell">
+mkdir ~/spaceship_working_copy
+cd ~/spaceship_working_copy
+fcm checkout fcm:spaceship_tr .
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2>spaceship_command.f90</h2>
+
+      <p>Our Fortran program is <a href=
+      "etc/rose-rug-advanced-tutorials-rose-stem/src/spaceship_command.f90.html">
+      spaceship_command.f90</a>, which reads in an initial position and
+      spaceship mass from one namelist, and a series of commands to apply
+      thrust in three-dimensional space. It then uses Newtonian mechanics to
+      calculate a final position.</p>
+
+      <p>Create a file called <code>src/spaceship_command.f90</code> with
+      <a href=
+      "etc/rose-rug-advanced-tutorials-rose-stem/src/spaceship_command.f90.html">
+      this content</a>. Have a look at it and see what it does.</p>
+    </div>
+
+    <div class="slide">
+      <h2>Creating the test suite</h2>
+
+      <p>We now need to create the test suite. In the top-level directory of
+      your working copy, create a directory named <code>rose-stem</code>, along
+      side the <code>src</code> directory which you've just put the Fortran
+      program in.</p>
+
+      <p>Inside your <code>rose-stem</code> directory create empty
+      <code>rose-suite.conf</code> and <code>suite.rc</code> files. We will
+      fill these in later.</p>
+
+      <p>Next, create an <code>app</code> sub-directory inside your
+      <code>rose-stem</code> directory, and inside there create a directory
+      named <code>spaceship</code>.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="spaceship_app">The spaceship app</h2>
+
+      <p>Open the file:</p>
+      <pre>
+app/spaceship/rose-app.conf
+</pre>
+
+      <p>in a text editor, and paste in the following configuration:</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">The spaceship app II</h3>
+      <pre class="prettyprint lang-rose_conf">
+[command]
+default=spaceship_command.exe
+
+[file:spaceship.NL]
+source=namelist:spaceship
+
+[file:command.NL]
+source=namelist:command
+
+[namelist:spaceship]
+mass=2.0
+position=0.0,0.0,0.0
+
+[namelist:command]
+thrust(1,:) =  1.0,  0.0, 0.0, 1.0,  0.0, -1.0, -1.0, 0.0, 0.0,  0.0
+thrust(2,:) =  0.0, -2.0, 0.0, 1.0,  1.0,  0.5, -1.0, 1.5, 0.0, -1.0
+thrust(3,:) =  0.0,  1.0, 0.0, 1.0, -1.0,  1.0, -1.5, 0.0, 0.0, -0.5
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="fcm_make_app">The <code>fcm-make</code> app</h2>
+
+      <p>We now need to provide the instructions for <samp>fcm make</samp> to
+      build the Fortran executable. Create an
+      <code>app/fcm_make_spaceship</code> directory with an empty
+      <code>rose-app.conf</code> file. Then create a directory named
+      <code>file</code> with the file <code>fcm-make.cfg</code> inside. Put the
+      following contents in that file:</p>
+      <pre>
+steps = build
+build.source = $SOURCE_SPACESHIP/src
+build.target{task} = link
+</pre>
+
+      <p>The <code>$SOURCE_SPACESHIP</code> environment variable will be set
+      using the Jinja2 variable of the same name which is provided by
+      <samp>rose stem</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="suiterc">The <code>suite.rc</code> file</h2>
+
+      <p>We're now in a position to create the <code>suite.rc</code> file for
+      the test suite. Copy and paste the contents of <a href=
+      "etc/rose-rug-advanced-tutorials-rose-stem/src/suite.rc.html">suite.rc</a>
+      into your <code>suite.rc</code> file.</p>
+
+      <p>We will now take a few moments to examine this file and see how it
+      works.</p>
+
+      <div class="slide">
+        <h3 class="alwayshidden">suite.rc II</h3>
+
+        <p>The <code>suite.rc</code> file starts off with the timeout event
+        hooks, which you should already be familiar with. The next part is a
+        Jinja2 block which links the group names the user can specific with the
+        dependency graph for that group. In this case, the group
+        <samp>command_spaceship</samp> gives you the dependency graph:</p>
+        <pre>
+fcm_make_spaceship =&gt; spaceship =&gt; rose_ana_position
+</pre>
+
+        <p>This variable <code>name_graphs</code> is used later to work out the
+        scheduling graph at runtime. The Jinja2 variable <code>groups</code> is
+        next. This enables you to set shortcuts to a list of groups, in this
+        case specifying <samp>all</samp> on the command line will run the tasks
+        associated with both <code>command_spaceship</code> and
+        <code>fire_lasers</code>.</p>
+      </div>
+
+      <div class="slide">
+        <h3 class="alwayshidden">suite.rc III</h3>
+
+        <p>The scheduling section contains the Jinja2 code to use the
+        information we have already set to generate the dependency graph based
+        on what the user requested on the command line.</p>
+
+        <p>The runtime section should be familiar. Note, however, that the
+        <samp>fcm_make_spaceship</samp> task sets the environment variable
+        <code>SOURCE_SPACESHIP</code> from the Jinja2 variable of the same
+        name. This is how the variables passed with <code>--source</code> on
+        the command line are passed to <samp>fcm-make</samp>, which then uses
+        these environment variables in its own configuration files.</p>
+      </div>
+
+      <div class="slide">
+        <h2>The <code>rose-suite.conf</code> file</h2>
+
+        <p>You should now initialise the <code>rose-suite.conf</code> with the
+        default values of <code>RUN_NAMES</code> and
+        <code>SOURCE_SPACESHIP</code>:</p>
+        <pre>
+[jinja2:suite.rc]
+RUN_NAMES=[]
+SOURCE_SPACESHIP='fcm:spaceship_tr@head'
+</pre>
+
+        <p>Both of these variables will be overriden by the user when they
+        execute <code>rose stem</code> on the command line.</p>
+      </div>
+
+      <div class="slide">
+        <h2 id="roseana">The <code>rose_ana_position</code> app</h2>
+
+        <p>The final component is a <samp>rose ana</samp> app to test the
+        position of our spaceship matches the correct output.</p>
+
+        <p>Create an app named <code>rose_ana_position</code> and paste the
+        contents of the following slide into the <code>rose-app.conf</code>
+        file:</p>
+      </div>
+
+      <div class="slide">
+        <h2 class="alwayshidden">rose ana config</h2>
+        <pre class="prettyprint lang-rose_conf">
+[Check X position at each timestep]
+comparison=Exact
+extract=OutputGrepper:'^\s*Position:\s*(.*?)\s*,'
+kgo1file=/home/user/spaceship/kgo.txt
+resultfile=../spaceship.1/output.txt
+
+[Check Y position at each timestep]
+comparison=Exact
+extract=OutputGrepper:'^\s*Position:.*?,\s*(.*?)\s*,'
+kgo1file=/home/user/spaceship/kgo.txt
+resultfile=../spaceship.1/output.txt
+
+[Check Z position at each timestep]
+comparison=Exact
+extract=OutputGrepper:'^\s*Position:.*,\s*(.*)\s*$'
+kgo1file=/home/user/spaceship/kgo.txt
+resultfile=../spaceship.1/output.txt
+</pre>
+
+        <p>This will check that the positions reported by the program match
+        those within the known good output file.</p>
+      </div>
+
+      <div class="slide">
+        <h2 id="kgo">Known Good Output</h2>
+
+        <p>Now create a file named <code>kgo.txt</code> with <a href=
+        "etc/rose-rug-advanced-tutorials-rose-stem/src/kgo.txt.html">these
+        contents</a>. Replace the <code>/home/user/spaceship</code> path in the
+        <code>kgo1file</code> variable with the path to this file.</p>
+
+        <p>The <em>known good output</em> should be the result of a control
+        run. <samp>rose ana</samp> will compare the answers from this file
+        (obtained using the extract and comparison methods in the
+        <code>rose-app.conf</code> file) with the results from the user's code
+        change.</p>
+      </div>
+
+      <div class="slide">
+        <h2>Adding the suite to version control</h2>
+
+        <p>Before running the suite we need to make sure that all the files and
+        directories we have created are known to the version control
+        system.</p>
+
+        <p>Add all the new files you've created using <code>fcm add
+        -c</code>.</p>
+      </div>
+
+      <div class="slide">
+        <h2 id="running">Running the test suite</h2>
+
+        <p>We should now be able to run the test suite. Simply type</p>
+        <pre class="shell">
+rose stem --group=command_spaceship
+</pre>
+
+        <p>anywhere in your working copy (the <code>--source</code> argument
+        defaults to <code>.</code> so it should automatically pick up your
+        working copy as the source). If your site uses a Cylc server, and your
+        home directory is not shared with the Cylc server, you will need to add
+        the option</p>
+        <pre>
+--host=localhost
+</pre>
+
+        <p><em>We use <code>--group</code> in preference to <code>--task</code>
+        in this suite (both are synonymous) as we specify a group of tasks set
+        up in the Jinja2 variable <code>name_graphs</code>.</em></p>
+      </div>
+
+      <div class="slide">
+        <h2>A failing test</h2>
+
+        <p>Now edit the file</p>
+        <pre>
+rose-stem/app/spaceship/rose-app.conf
+</pre>
+
+        <p>and change one of the thrusts, then rerun <samp>rose stem</samp>.
+        You will find the <samp>rose ana</samp> task fails, as the results have
+        changed.</p>
+
+        <p>Try modifying the Fortran source code - for example, changing the
+        direction in which thrust is applied (by changing the acceleration to
+        be subtracted from the velocity rather than added). Again, rerun
+        <samp>rose stem</samp>, and see the failure.</p>
+
+        <p>In this way, you can monitor whether the behaviour of code is
+        changed by any of the code alterations you have made.</p>
+      </div>
+
+      <div class="slide">
+        <h2 id="furtherideas">Further Exercises</h2>
+
+        <p>If you wish, you can try extending the suite to include the
+        <em>fire_lasers</em> group of tasks which was in the list of groups in
+        the <code>suite.rc</code> file. Using the same technique as we've just
+        demonstrated for piloting the spaceship, you should be able to aim and
+        fire the ship's weapons.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
