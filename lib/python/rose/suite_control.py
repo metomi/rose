@@ -109,6 +109,12 @@ class SuiteControl(object):
                         suite_name,
                         self.host_selector.expand(node.value.split())[0])
             if not hosts:
+                node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
+                if node is not None:
+                    hosts = self.suite_engine_proc.ping(
+                            suite_name,
+                            self.host_selector.expand(node.value.split())[0])
+            if not hosts:
                 # Try the "rose-suite.host" file in the suite log directory
                 log = self.suite_engine_proc.get_suite_dir(suite_name, "log")
                 try:
