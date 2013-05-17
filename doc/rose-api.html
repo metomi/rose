@@ -360,12 +360,12 @@ def handle_type_error(self, is_in_error):
 
       <dt><code>variable_functions_class_inst</code></dt>
 
-      <dd>an instance of the class rose.config_editor.stack.VariableOperations.
-      This contains methods to operate on the variables. These will update the
-      undo stack and take care of any errors. These methods are the only ways
-      that you should write to the variable states or values. For
-      documentation, see the module
-      lib/python/rose/config_editor/stack.py.</dd>
+      <dd>an instance of the class
+      rose.config_editor.ops.variable.VariableOperations.This contains methods
+      to operate on the variables. These will update the undo stack and take
+      care of any errors. These methods are the only ways that you should write
+      to the variable states or values. For documentation, see the module
+      lib/python/rose/config_editor/ops/variable.py.</dd>
 
       <dt><code>show_modes_dict</code></dt>
 
@@ -417,7 +417,6 @@ def handle_type_error(self, is_in_error):
 
           <dd>True means indicate if a variable has any metadata content, and
           False means do not show an indicator.</dd>
-        
         </dl>
 
         <p>If you wish to implement actions based on changes in these
@@ -452,7 +451,6 @@ widget[rose-config-edit] = table.TableValueWidget NAME ID WEIGHTING
 </pre>This means that you can write a generic widget and then configure it for
 different cases.
       </dd>
-
     </dl>
 
     <p>Refreshing the whole page in order to display a small change to a
@@ -497,9 +495,8 @@ different cases.
     that the user sees. Pages are treated as temporary, superficial views of
     variable data, and changes are always assumed to be made directly to the
     main copy of the configuration in memory (this is automatic when the
-    [source:/rose//trunk/lib/python/rose/config_editor/stack.py
-    rose.config_editor.stack.VariableOperations] methods are used, as they
-    should be). Closing the page shouldn't change, or lose, any data! The
+    rose.config_editor.ops.variable.VariableOperations methods are used, as
+    they should be). Closing the page shouldn't change, or lose, any data! The
     custom class should return a gtk object to be packed into the page
     framework, so it's best to subclass from an existing gtk Container type
     such as gtk.VBox (or gtk.Table, in the example above).</p>
@@ -922,23 +919,24 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
 </pre>
       </dd>
 
-      <dt><code>def ignore_setting(self, config, keys, info=None, state=rose.config.ConfigNode.STATE_USER_IGNORED):</code></dt>
+      <dt><code>def ignore_setting(self, config, keys, info=None,
+      state=rose.config.ConfigNode.STATE_USER_IGNORED):</code></dt>
 
       <dd>
         <p>Inverse of <code>enable_setting</code>, a method to make sure a
-        setting defined by <samp>keys</samp> in <samp>config</samp> is
-        ignored (default state is user-ignored). The arguments are:</p>
+        setting defined by <samp>keys</samp> in <samp>config</samp> is ignored
+        (default state is user-ignored). The arguments are:</p>
 
         <dl>
           <dt><samp>config</samp>, <samp>keys</samp>, <samp>info</samp></dt>
 
           <dd>As in <code>add_setting</code> above.</dd>
-          
+
           <dt><samp>state</samp></dt>
-          
+
           <dd>One of <code>rose.config.ConfigNode.STATE_USER_IGNORED</code>
           (default), <code>rose.config.ConfigNode.STATE_SYST_IGNORED</code>
-          (trigger-ignored). When using it, you can just use 
+          (trigger-ignored). When using it, you can just use
           <code>config.STATE...</code> rather than the full
           <code>rose.config.ConfigNode.STATE...</code>.</dd>
         </dl>
@@ -957,8 +955,8 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
     more examples in the upgrade file for the upgrade <a href=
     "rose-rug-advanced-tutorials-upgrade-usage.html">usage tutorial</a>
     (<samp>versions.py</samp>), at
-    <samp>$ROSE_HOME/etc/rose-meta/rose-demo-upgrade/versions.py</samp>,
-    where <samp>$ROSE_HOME</samp> is the path to your local Rose distribution,
+    <samp>$ROSE_HOME/etc/rose-meta/rose-demo-upgrade/versions.py</samp>, where
+    <samp>$ROSE_HOME</samp> is the path to your local Rose distribution,
     locatable by invoking <code>rose --version</code>.</p>
 
     <h2 id="rosie-ws">Rosie Web</h2>

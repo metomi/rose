@@ -92,6 +92,7 @@ class ConfigPage(gtk.VBox):
                                                        self.config_name)
         self.sort_data()
         self.sort_data(ghost=True)
+        self._last_info_labels = None
         self.generate_main_container()
         self.get_page()
         self.update_ignored()
@@ -373,7 +374,11 @@ class ConfigPage(gtk.VBox):
 
     def update_info(self):
         """Driver routine to update non-variable information."""
-        self.generate_page_info_widget()
+        button_list, label_list = self._get_page_info_widgets()
+        if [l.get_text() for l in label_list] == self._last_info_labels:
+            # No change - do not redraw.
+            return False
+        self.generate_page_info(button_list, label_list)
         has_content = (self.info_panel.get_children() and
                        self.info_panel.get_children()[0].get_children())
         if self.info_panel in self.main_vpaned.get_children():
@@ -381,81 +386,14 @@ class ConfigPage(gtk.VBox):
                 self.main_vpaned.remove(self.info_panel)
         elif has_content:
             self.main_vpaned.pack1(self.info_panel)
-
-    def generate_page_info_widget(self):
+        
+    def generate_page_info(self, button_list=None, label_list=None):
         """Generate a widget giving information about sections."""
         info_container = gtk.VBox(homogeneous=False)
         info_container.show()
-        button_list = []
-        label_list = []
-        # No content warning, if applicable.
-        if self.section is None and self.sub_data is None:
-            info = rose.config_editor.PAGE_WARNING_NO_CONTENT
-            tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
-            error_button = rose.gtk.util.CustomButton(
-                                stock_id=gtk.STOCK_DIALOG_WARNING,
-                                as_tool=True,
-                                tip_text=tip)
-            error_label = gtk.Label()
-            error_label.set_text(info)
-            error_label.show()
-            button_list.append(error_button)
-            label_list.append(error_label)
-        if self.section is not None and self.section.ignored_reason:
-            # This adds an ignored warning.
-            info = rose.config_editor.PAGE_WARNING_IGNORED_SECTION.format(
-                        self.section.name)
-            tip = rose.config_editor.PAGE_WARNING_IGNORED_SECTION_TIP
-            error_button = rose.gtk.util.CustomButton(
-                  stock_id=gtk.STOCK_NO,
-                  as_tool=True,
-                  tip_text=tip)
-            error_label = gtk.Label()
-            error_label.set_text(info)
-            error_label.show()
-            button_list.append(error_button)
-            label_list.append(error_label)
-        elif (self.see_also == '' or
-              rose.FILE_VAR_SOURCE not in self.see_also):
-            # This adds an 'orphaned' warning, only if the section is enabled.
-            if (self.section is not None and 
-                self.section.name.startswith('namelist:')):
-                error_button = rose.gtk.util.CustomButton(
-                      stock_id=gtk.STOCK_DIALOG_WARNING,
-                      as_tool=True,
-                      tip_text=rose.config_editor.ERROR_ORPHAN_SECTION_TIP)
-                error_label = gtk.Label()
-                error_label.set_text(rose.config_editor.ERROR_ORPHAN_SECTION)
-                error_label.show()
-                button_list.append(error_button)
-                label_list.append(error_label)
-        # This adds error notification for sections.
-        for sect_data in self.sections:
-            for err, info in sect_data.error.items():
-                error_button = rose.gtk.util.CustomButton(
-                      stock_id=gtk.STOCK_DIALOG_ERROR,
-                      as_tool=True,
-                      tip_text=info)
-                error_label = gtk.Label()
-                error_label.set_text(
-                            rose.config_editor.PAGE_WARNING.format(
-                                 err, sect_data.name))
-                error_label.show()
-                button_list.append(error_button)
-                label_list.append(error_label)
-        if self.custom_macros.items():
-            macro_button = rose.gtk.util.CustomButton(
-                            label=rose.config_editor.LABEL_PAGE_MACRO_BUTTON,
-                            stock_id=gtk.STOCK_EXECUTE,
-                            tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
-                            as_tool=True, icon_at_start=True,
-                            has_menu=True)
-            macro_button.connect("button-press-event",
-                                 self._macro_menu_launch)
-            macro_label = gtk.Label()
-            macro_label.show()
-            button_list.append(macro_button)
-            label_list.append(macro_label)
+        if button_list is None or label_list is None:
+            button_list, label_list = self._get_page_info_widgets()
+        self._last_info_labels = [l.get_text() for l in label_list]
         for button, label in zip(button_list, label_list):
             var_hbox = gtk.HBox(homogeneous=False)
             var_hbox.pack_start(button, expand=False, fill=False)
@@ -551,7 +489,8 @@ class ConfigPage(gtk.VBox):
     def update_sub_data(self):
         """Update the sub (summary) data panel."""
         if self.sub_data is None:
-            if self.sub_data_panel is not None:
+            if (hasattr(self, "sub_data_panel") and
+                self.sub_data_panel is not None):
                 self.vpaned.remove(self.sub_data_panel)
                 self.sub_data_panel.destroy()
                 self.sub_data_panel = None
@@ -768,7 +707,7 @@ class ConfigPage(gtk.VBox):
     def refresh(self, only_this_var_id=None):
         """Reload the page or selectively refresh widgets for one variable."""
         if only_this_var_id is None:
-            self.generate_page_info_widget()
+            self.generate_page_info()
             return self.sort_main(remake_forced=True)
         variable = None
         for variable in self.panel_data + self.ghost_data:
@@ -909,6 +848,7 @@ class ConfigPage(gtk.VBox):
 
     def set_sub_focus(self, node_id):
         if (self.sub_data is not None and
+            hasattr(self, "sub_data_panel") and
             hasattr(self.sub_data_panel, "set_focus_node_id")):
             self.sub_data_panel.set_focus_node_id(node_id)
 
@@ -1150,3 +1090,80 @@ class ConfigPage(gtk.VBox):
     def trigger_update_status(self):
         """Connect this at a higher level to allow changed data signals."""
         pass
+
+    def _get_page_info_widgets(self):
+        button_list = []
+        label_list = []
+        # No content warning, if applicable.
+        if (self.section is None and
+            not self.ghost_data and
+            self.sub_data is None):
+            info = rose.config_editor.PAGE_WARNING_NO_CONTENT
+            tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
+            error_button = rose.gtk.util.CustomButton(
+                                stock_id=gtk.STOCK_DIALOG_WARNING,
+                                as_tool=True,
+                                tip_text=tip)
+            error_label = gtk.Label()
+            error_label.set_text(info)
+            error_label.show()
+            button_list.append(error_button)
+            label_list.append(error_label)
+        if self.section is not None and self.section.ignored_reason:
+            # This adds an ignored warning.
+            info = rose.config_editor.PAGE_WARNING_IGNORED_SECTION.format(
+                        self.section.name)
+            tip = rose.config_editor.PAGE_WARNING_IGNORED_SECTION_TIP
+            error_button = rose.gtk.util.CustomButton(
+                  stock_id=gtk.STOCK_NO,
+                  as_tool=True,
+                  tip_text=tip)
+            error_label = gtk.Label()
+            error_label.set_text(info)
+            error_label.show()
+            button_list.append(error_button)
+            label_list.append(error_label)
+        elif (self.see_also == '' or
+              rose.FILE_VAR_SOURCE not in self.see_also):
+            # This adds an 'orphaned' warning, only if the section is enabled.
+            if (self.section is not None and 
+                self.section.name.startswith('namelist:')):
+                error_button = rose.gtk.util.CustomButton(
+                      stock_id=gtk.STOCK_DIALOG_WARNING,
+                      as_tool=True,
+                      tip_text=rose.config_editor.ERROR_ORPHAN_SECTION_TIP)
+                error_label = gtk.Label()
+                info = rose.config_editor.ERROR_ORPHAN_SECTION.format(
+                                                       self.section.name)
+                error_label.set_text(info)
+                error_label.show()
+                button_list.append(error_button)
+                label_list.append(error_label)
+        # This adds error notification for sections.
+        for sect_data in self.sections:
+            for err, info in sect_data.error.items():
+                error_button = rose.gtk.util.CustomButton(
+                      stock_id=gtk.STOCK_DIALOG_ERROR,
+                      as_tool=True,
+                      tip_text=info)
+                error_label = gtk.Label()
+                error_label.set_text(
+                            rose.config_editor.PAGE_WARNING.format(
+                                 err, sect_data.name))
+                error_label.show()
+                button_list.append(error_button)
+                label_list.append(error_label)
+        if self.custom_macros.items():
+            macro_button = rose.gtk.util.CustomButton(
+                            label=rose.config_editor.LABEL_PAGE_MACRO_BUTTON,
+                            stock_id=gtk.STOCK_EXECUTE,
+                            tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
+                            as_tool=True, icon_at_start=True,
+                            has_menu=True)
+            macro_button.connect("button-press-event",
+                                 self._macro_menu_launch)
+            macro_label = gtk.Label()
+            macro_label.show()
+            button_list.append(macro_button)
+            label_list.append(macro_label)
+        return button_list, label_list

@@ -69,13 +69,16 @@ TOP_MENU_EDIT_FIND = "_Find..."
 TOP_MENU_EDIT_FIND_NEXT = "_Find Next"
 TOP_MENU_EDIT_PREFERENCES = "_Preferences"
 TOP_MENU_VIEW = "_View"
-TOP_MENU_VIEW_LATENT = "View _Latent Variables"
-TOP_MENU_VIEW_FIXED = "View _Fixed Variables"
-TOP_MENU_VIEW_IGNORED = "View All _Ignored Variables"
-TOP_MENU_VIEW_USER_IGNORED = "View _User Ignored Variables"
+TOP_MENU_VIEW_LATENT_VARS = "View _Latent Variables"
+TOP_MENU_VIEW_FIXED_VARS = "View _Fixed Variables"
+TOP_MENU_VIEW_IGNORED_VARS = "View All _Ignored Variables"
+TOP_MENU_VIEW_USER_IGNORED_VARS = "View _User Ignored Variables"
+TOP_MENU_VIEW_LATENT_PAGES = "View Latent _Pages"
+TOP_MENU_VIEW_IGNORED_PAGES = "View All _Ignored Pages"
+TOP_MENU_VIEW_USER_IGNORED_PAGES = "View _User Ignored Pages"
 TOP_MENU_VIEW_WITHOUT_TITLES = "Hide _Titles"
-TOP_MENU_VIEW_FLAG_OPTIONAL = "Flag _Optional Variables"
-TOP_MENU_VIEW_FLAG_NO_METADATA = "Flag _No-metadata Variables"
+TOP_MENU_VIEW_FLAG_OPTIONAL_VARS = "Flag _Optional Variables"
+TOP_MENU_VIEW_FLAG_NO_METADATA_VARS = "Flag _No-metadata Variables"
 TOP_MENU_PAGE = "_Page"
 TOP_MENU_PAGE_ADD = "_Add"
 TOP_MENU_PAGE_REVERT = "_Revert to Saved"
@@ -117,16 +120,20 @@ TOOLBAR_SUITE_RUN = "Run suite"
 TOOLBAR_SUITE_RUN_MENU = "Run suite ..."
 TOOLBAR_VIEW_OUTPUT = "View Output"
 TREE_PANEL_TITLE = "Index"
-TREE_PANEL_ADD_SECTION = "_Add new section..."
+TREE_PANEL_ADD_GENERIC = "_Add a new section..."
+TREE_PANEL_ADD_SECTION = "_Add {0}"
 TREE_PANEL_AUTOFIX_CONFIG = "_Auto-fix configuration"
 TREE_PANEL_CLONE_SECTION = "_Clone this section"
 TREE_PANEL_EDIT_SECTION = "Edit section comments..."
-TREE_PANEL_ENABLE_SECTION = "_Enable a section..."
-TREE_PANEL_IGNORE_SECTION = "_Ignore a section..."
+TREE_PANEL_ENABLE_GENERIC = "_Enable a section..."
+TREE_PANEL_ENABLE_SECTION = "_Enable"
+TREE_PANEL_IGNORE_GENERIC = "_Ignore a section..."
+TREE_PANEL_IGNORE_SECTION = "_Ignore"
 TREE_PANEL_INFO_SECTION = "I_nfo"
 TREE_PANEL_HELP_SECTION = "_Help"
 TREE_PANEL_NEW_CONFIG = "_Create new configuration..."
-TREE_PANEL_REMOVE = "_Remove"
+TREE_PANEL_REMOVE_GENERIC = "Remove a section..."
+TREE_PANEL_REMOVE_SECTION = "_Remove"
 TREE_PANEL_URL_SECTION = "_Web Help"
 TREE_PANEL_KBD_TIMEOUT = 600
 MACRO_MENU_ALL_VALIDATORS = "All Validators"
@@ -186,7 +193,7 @@ ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
 ERROR_NO_OUTPUT = "No output found for {0}"
 ERROR_NOT_FOUND = "Could not find path: {0}"
 ERROR_NOT_REGEX = "Could not compile expression: {0}\nError info: {1}"
-ERROR_ORPHAN_SECTION = "Orphaned section: will not be output in a file."
+ERROR_ORPHAN_SECTION = "Orphaned section: {0} will not be output at runtime."
 ERROR_ORPHAN_SECTION_TIP = "Error: orphaned section!"
 ERROR_REMOVE_FILE = "Could not remove file {0}: {1}"
 ERROR_RUN_MACRO_TITLE = "Error in running {0}"
@@ -197,9 +204,9 @@ IGNORED_STATUS_DEFAULT = "from default."
 IGNORED_STATUS_MANUAL = "from manual intervention."
 IGNORED_STATUS_MACRO = "from macro."
 PAGE_WARNING = "Error ({0}): {1}"
-PAGE_WARNING_IGNORED_SECTION = "Section {0} is ignored."
+PAGE_WARNING_IGNORED_SECTION = "Ignored section: {0}"
 PAGE_WARNING_IGNORED_SECTION_TIP = "Ignored section"
-PAGE_WARNING_NO_CONTENT = "This page has no associated data."
+PAGE_WARNING_NO_CONTENT = "No data associated with this page."
 PAGE_WARNING_NO_CONTENT_TIP = ("No associated configuration or summary data " +
                                "for this page.")
 WARNING_APP_CONFIG_CREATE = "Cannot create another configuration here."
@@ -247,14 +254,16 @@ SHOW_MODE_USER_IGNORED = "user-ignored"
 SHOW_MODE_LATENT = "latent"
 SHOW_MODE_NO_TITLE = "title"
 
-SHOULD_SHOW_FLAG_OPTIONAL = False
-SHOULD_SHOW_FLAG_NO_META = False
-
+SHOULD_SHOW_FLAG_OPTIONAL_VARS = False
+SHOULD_SHOW_FLAG_NO_META_VARS = False
 SHOULD_SHOW_ALL_COMMENTS = False
-SHOULD_SHOW_FIXED = False
-SHOULD_SHOW_IGNORED = False
-SHOULD_SHOW_USER_IGNORED = True
-SHOULD_SHOW_LATENT = False
+SHOULD_SHOW_FIXED_VARS = False
+SHOULD_SHOW_IGNORED_PAGES = False
+SHOULD_SHOW_IGNORED_VARS = False
+SHOULD_SHOW_USER_IGNORED_PAGES = True
+SHOULD_SHOW_USER_IGNORED_VARS = True
+SHOULD_SHOW_LATENT_PAGES = False
+SHOULD_SHOW_LATENT_VARS = False
 SHOULD_SHOW_NO_TITLE = False
 
 # Window sizes
@@ -316,6 +325,8 @@ DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH = 150  # Must > raw CHANGES text above
 DIALOG_BODY_MACRO_CHANGES_NUM_HEIGHT = 3  # > Number, needs more height.
 DIALOG_BODY_NL_CASE_CHANGE = ("Mixed-case names cause trouble in namelists." +
                               "\nSuggested: {0}")
+DIALOG_BODY_REMOVE_CONFIG = "Choose configuration"
+DIALOG_BODY_REMOVE_SECTION = "Choose the section to remove"
 DIALOG_HELP_TITLE = "Help for {0}"
 DIALOG_LABEL_AUTOFIX = "Run built-in transform (fixer) macros?"
 DIALOG_LABEL_AUTOFIX_ALL = "Run built-in transform (fixer) macros for all configurations?"
@@ -355,6 +366,7 @@ DIALOG_TITLE_MACRO_CHANGES = "Accept changes made by {0}?"
 DIALOG_TITLE_META_LOAD_ERROR = "Error loading metadata."
 DIALOG_TITLE_NL_CASE_WARNING = "Mixed-case warning"
 DIALOG_TITLE_PREFERENCES = "Configure preferences"
+DIALOG_TITLE_REMOVE = "Remove section"
 DIALOG_TITLE_SAVE_CHANGES = "Save changes?"
 DIALOG_TITLE_WARNING = "Warning"
 DIALOG_VARIABLE_ERROR_TITLE = "{0} error for {1}"
@@ -371,8 +383,13 @@ STACK_VIEW_TITLE = "Undo and Redo Stack Viewer"
 
 # Page names
 
+TITLE_PAGE_IGNORED_MARKUP = "<b>{0}</b> {1}"
 TITLE_PAGE_INFO = "suite info"
-TITLE_PAGE_MARKUP = "<b>{0}</b>"
+TITLE_PAGE_LATENT_COLOUR = "grey"
+TITLE_PAGE_LATENT_MARKUP = ("<span foreground='" +
+                            TITLE_PAGE_LATENT_COLOUR +
+                            "'><i>{0}</i>" + "</span>")
+TITLE_PAGE_ROOT_MARKUP = "<b>{0}</b>"
 TITLE_PAGE_SUITE = "suite conf"
 TREE_PANEL_MAX_EXPANDED = 5
 
