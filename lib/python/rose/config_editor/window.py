@@ -183,8 +183,9 @@ class MainWindow(object):
         if response == gtk.RESPONSE_REJECT:
             gtk.main_quit()
         elif response == gtk.RESPONSE_ACCEPT:
-            self.save_func()
-            gtk.main_quit()
+            save_ok = self.save_func()
+            if save_ok:
+                gtk.main_quit()
         return False
 
     def launch_help_dialog(self, somewidget=None):
