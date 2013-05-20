@@ -538,17 +538,24 @@ def load(source, root=None):
     return ConfigLoader()(source, root)
 
 
+def sort_element(elem_1, elem_2):
+    """Sort pieces of text, numerically if possible."""
+    if elem_1.isdigit():
+        if elem_2.isdigit():
+            return cmp(int(elem_1), int(elem_2))
+        return -1
+    elif elem_2.isdigit():
+        return 1
+    return cmp(elem_1, elem_2)
+
+
 def sort_settings(setting_1, setting_2):
+    """Sort sections and options, by numeric element if possible."""
     match_1 = REC_SETTING_ELEMENT.match(setting_1)
     match_2 = REC_SETTING_ELEMENT.match(setting_2)
     if match_1 and match_2:
         text_1, num_1 = match_1.groups()
         text_2, num_2 = match_2.groups()
         if text_1 == text_2:
-            if num_1.isdigit():
-                if num_2.isdigit():
-                    return cmp(int(num_1), int(num_2))
-                return -1
-            elif num_2.isdigit():
-                return 1
+            return sort_element(num_1, num_2)
     return cmp(setting_1, setting_2)

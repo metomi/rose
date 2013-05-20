@@ -1085,39 +1085,13 @@ class MainController(object):
         self._get_menu_widget('/Redo').set_sensitive(len(self.redo_stack) > 0)
         self._get_menu_widget('/Find Next').set_sensitive(
                                             len(self.find_hist['ids']) > 0)
-        found_error = False
-        for config_name in self.data.config:
-            config_data = self.data.config[config_name]
-            for v in config_data.vars.get_all():
-                if v.error or v.warning:
-                    found_error = True
-                    break
-            else:
-                for s in config_data.sections.get_all():
-                    if s.error or s.warning:
-                        found_error = True
-                        break
-            if found_error:
-                break
-        self._get_menu_widget('/Autofix').set_sensitive(found_error)
+        if not hasattr(self, "nav_panel"):
+            return False
+        changes, errors = self.nav_panel.get_change_error_totals()
+        self._get_menu_widget('/Autofix').set_sensitive(bool(errors))
         self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_TRANSFORM,
-                                          found_error)
-        for config_name in self.data.config:
-            config_data = self.data.config[config_name]
-            if self.updater.namespace_data_is_modified(config_name):
-                self._update_change_widget_sensitivity(is_changed=True)
-                break
-            now_vars = []
-            for v in config_data.vars.get_all(no_latent=True):
-                now_vars.append(v.to_hashable())
-            las_vars = []
-            for v in config_data.vars.get_all(no_latent=True, save=True):
-                las_vars.append(v.to_hashable())
-            if set(now_vars) ^ set(las_vars):
-                self._update_change_widget_sensitivity(is_changed=True)
-                break
-        else:
-            self._update_change_widget_sensitivity(is_changed=False)
+                                          bool(errors))
+        self._update_change_widget_sensitivity(is_changed=bool(changes))
 
     def _update_change_widget_sensitivity(self, is_changed=False):
         # Alter sensitivity of 'unsaved changes' related widgets.
@@ -1512,12 +1486,12 @@ def spawn_window(config_directory_path=None):
         title = config_directory_path.split("/")[-1]
     splash_screen = rose.gtk.splash.SplashScreenProcess(logo, title,
                                                         number_of_events)
-    try:
-        MainController(config_directory_path,
-                       loader_update=splash_screen)
-    except BaseException as e:
-        splash_screen.stop()
-        raise e
+    #try:
+    MainController(config_directory_path,
+                   loader_update=splash_screen)
+   # except BaseException as e:
+   #     splash_screen.stop()
+   #     raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
@@ -1596,7 +1570,7 @@ if __name__ == '__main__':
         f = tempfile.NamedTemporaryFile()
         cProfile.runctx("spawn_window(cwd)", globals(), locals(), f.name)
         p = pstats.Stats(f.name)
-        p.strip_dirs().sort_stats('cumulative').print_stats(40)
+        p.strip_dirs().sort_stats('time').print_stats(200)
         f.close()
     else:
         spawn_window(cwd)
