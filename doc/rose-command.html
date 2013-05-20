@@ -1698,6 +1698,16 @@
       task-env</kbd> to export <var>ROSE_DATACT3H</var> and
       <var>ROSE_DATACT6H</var>.</dd>
 
+      <dt><kbd>--path=[NAME=]PATTERN, -P [NAME=]PATTERN</kbd></dt>
+
+      <dd>Each of this specify a glob pattern for paths to prepend to an
+      environment variable called <var>NAME</var> (or <var>PATH</var> if
+      <var>NAME</var> is not specified). If a relative path is given, it is
+      relative to <var>$ROSE_SUITE_DIR</var>. An empty value resets the default
+      and any previous <kbd>--path=PATTERN</kbd> settings.
+      (default=<kbd>share/fcm[_-]make*/*/bin</kbd>,
+      <kbd>work/fcm[_-]make*/*/bin</kbd>)</dd>
+
       <dt><kbd>--prefix-delim=DELIMITER</kbd></dt>
 
       <dd>Specify the delimiter used to determine the task name prefix.
@@ -1748,6 +1758,11 @@ environment scripting = "eval $(rose task-env)"
 
     <p>Provide an environment to run a suite task.</p>
 
+    <p>Provides environment variables documented in <a href=
+    "#rose-task-env">rose task-env</a>. It is worth noting that if the
+    environment variables are already provided by <a href="#rose-task-env">rose
+    task-env</a>, this command will not override them.</p>
+
     <p>Normally, the suite task will select a Rose application configuration
     that has the same name as the task. This can be overridden by the
     <kbd>--app-key=KEY</kbd> option or the <var>ROSE_TASK_APP</var> environment
@@ -1772,14 +1787,6 @@ environment scripting = "eval $(rose task-env)"
       specified, it will attempt use the task name to look for a builtin
       application. If the task name does not match a builtin application, the
       default <var>MODE</var> is to run the <kbd>command</kbd>.</dd>
-
-      <dt><kbd>--path=PATTERN, -P PATTERN</kbd></dt>
-
-      <dd>Each of this specify a glob pattern for paths to prepend to the
-      <var>PATH</var> environment variable. If a relative path is given, it is
-      relative to <var>$ROSE_SUITE_DIR</var>. An empty value resets the default
-      and any previous <kbd>--path=PATTERN</kbd> settings.
-      (default=<kbd>share/fcm[_-]make*/*/bin</kbd>)</dd>
     </dl>
 
     <h3>ENVIRONMENT</h3>
