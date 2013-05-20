@@ -106,7 +106,8 @@ class SuiteControl(object):
             
             known_hosts = self.host_selector.expand(
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
+              ["localhost"])[0]
             known_hosts = list(set(known_hosts))
             
             if known_hosts:
