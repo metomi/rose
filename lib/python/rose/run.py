@@ -1084,9 +1084,12 @@ class TaskRunner(Runner):
                 is_changed = True
 
         if is_changed:
+            path_globs = opts.path_globs
+            if path_globs is None:
+                path_globs = []
             for k, prepend_paths in get_prepend_paths(self.event_handler,
                                                       t.suite_dir,
-                                                      *opts.path_globs):
+                                                      *path_globs).items():
                 paths = os.getenv(k, "").split(os.pathsep)
                 if prepend_paths != paths[0:len(prepend_paths)]:
                     v = os.pathsep.join(prepend_paths + paths)

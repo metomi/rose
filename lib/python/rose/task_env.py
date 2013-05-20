@@ -24,6 +24,7 @@ import os
 from rose.env import env_export, EnvExportEvent
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter
+from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import sys
 import traceback
@@ -89,7 +90,7 @@ def get_prepend_paths(event_handler=None, path_root=None, **args):
     for name, path_globs in path_globs_of.items():
         if name not in more_prepend_paths_of:
             more_prepend_paths_of[name] = []
-        for path_glob in path_globs
+        for path_glob in path_globs:
             if path_glob:
                 if path_glob.startswith("~"):
                     path_glob = os.path.expanduser(path_glob)
@@ -99,7 +100,7 @@ def get_prepend_paths(event_handler=None, path_root=None, **args):
                     more_prepend_paths_of[name].append(path)
             else:
                 more_prepend_paths_of[name] = [] # empty value resets
-    for name, more_prepend_paths in more_prepend_paths.items():
+    for name, more_prepend_paths in more_prepend_paths_of.items():
         if name in prepend_paths_of:
             prepend_paths_of[name].extend(more_prepend_paths)
         elif more_prepend_paths:
@@ -119,14 +120,17 @@ def main():
             event_handler=report)
     kwargs = {}
     for k, v in vars(opts).items():
-    kwargs[k] = v
+        kwargs[k] = v
     try:
         task_props = suite_engine_proc.get_task_props(*args, **kwargs)
         for k, v in task_props:
             report(str(EnvExportEvent(k, v)) + "\n", level=0)
+        path_globs = opts.path_globs
+        if path_globs is None:
+            path_globs = []
         for k, prepend_paths in get_prepend_paths(report,
                                                   task_props.suite_dir,
-                                                  *opts.path_globs):
+                                                  *path_globs).items():
             paths = os.getenv(k, "").split(os.pathsep)
             v = os.pathsep.join(prepend_paths + paths)
             report(str(EnvExportEvent(k, v)) + "\n", level=0)
