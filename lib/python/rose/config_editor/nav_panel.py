@@ -35,7 +35,7 @@ import rose.gtk.util
 import rose.resource
 
 
-class HyperLinkTreePanel(gtk.ScrolledWindow):
+class PageNavigationPanel(gtk.ScrolledWindow):
 
     """Generate the page launcher panel.
 
@@ -45,10 +45,14 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     """
 
-    def __init__(self, namespace_tree, get_metadata_func=None):
-        super(HyperLinkTreePanel, self).__init__()
-        if get_metadata_func is not None:
-            self.get_metadata_and_comments = get_metadata_func
+    def __init__(self, namespace_tree, launch_ns_func,
+                 get_metadata_comments_func,
+                 popup_menu_func, ask_can_show_func):
+        super(PageNavigationPanel, self).__init__()
+        self._launch_ns_func = launch_ns_func
+        self._get_metadata_comments_func = get_metadata_comments_func
+        self._popup_menu_func = popup_menu_func
+        self._ask_can_show_func = ask_can_show_func
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         self.panel_top = gtk.TreeViewColumn()
@@ -69,10 +73,10 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                                           self._set_title_markup, 2)
         # The columns in self.data_store correspond to: error_icon,
         # change_icon, name, title, error and change totals (4),
-        # main tip text, and change text.
+        # latent and ignored statuses, main tip text, and change text.
         self.data_store = gtk.TreeStore(gtk.gdk.Pixbuf, gtk.gdk.Pixbuf,
                                         str, str, int, int, int, int,
-                                        str, str)
+                                        bool, str, str, str)
         resource_loc = rose.resource.ResourceLocator(paths=sys.path)
         image_path = resource_loc.locate('etc/images/rose-config-edit')
         self.null_icon = gtk.gdk.pixbuf_new_from_file(image_path +
@@ -84,7 +88,9 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         self.tree = rose.gtk.util.TooltipTreeView(
                              get_tooltip_func=self.get_treeview_tooltip)
         self.tree.append_column(self.panel_top)
-        self.tree.set_model(self.data_store)
+        self.filter_model = self.data_store.filter_new()
+        self.filter_model.set_visible_func(self._get_should_show)
+        self.tree.set_model(self.filter_model)
         self.tree.show()
         self.add(self.tree)
         self.load_tree(None, namespace_tree)
@@ -103,10 +109,11 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         self.tree.connect('enter-notify-event',
                           lambda t, e: self.update_row_tooltips())
         self.name_iter_map = {}
+        self.visible_iter_map = {}
 
     def get_treeview_tooltip(self, view, row_iter, col_index, tip):
         """Handle creating a tooltip for the treeview."""
-        tip.set_text(view.get_model().get_value(row_iter, 8))
+        tip.set_text(self.filter_model.get_value(row_iter, 10))
         return True
 
     def add_cursor_extra(self, widget, event):
@@ -131,13 +138,12 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         current_path = self.tree.get_cursor()[0]
         if (current_path == timeout_path and
             self._last_tree_activation_path != timeout_path):
-            self.send_launch_request(self.get_name(timeout_path),
-                                     as_new=False)
+            self._launch_ns_func(self.get_name(timeout_path),
+                                 as_new=False)
         return False
         
     def load_tree(self, row, namespace_subtree):
         expanded_rows = []
-        self.name_iter_map = {}
         self.tree.map_expanded_rows(lambda r, d: expanded_rows.append(d))
         self.recursively_load_tree(row, namespace_subtree)
         self.set_expansion()
@@ -146,20 +152,21 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
 
     def set_expansion(self):
         """Set the default expanded rows."""
-        top_rows = self.tree.get_model().iter_n_children(None)
+        top_rows = self.filter_model.iter_n_children(None)
         if top_rows > rose.config_editor.TREE_PANEL_MAX_EXPANDED:
             return False
         if top_rows == 1:
             return self.expand_recursive(no_duplicates=True)
-        r_iter = self.tree.get_model().get_iter_first()
+        r_iter = self.filter_model.get_iter_first()
         while r_iter is not None:
-            path = self.tree.get_model().get_path(r_iter)
+            path = self.filter_model.get_path(r_iter)
             self.tree.expand_to_path(path)
-            r_iter = self.tree.get_model().iter_next(r_iter)
+            r_iter = self.filter_model.iter_next(r_iter)
 
     def recursively_load_tree(self, row, namespace_subtree):
         """Update the tree store recursively using namespace_subtree."""
         self.name_iter_map = {}
+        self.visible_iter_map = {}
         if row is None:
             self.data_store.clear()
         initials = namespace_subtree.items()
@@ -167,13 +174,17 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         stack = [[row] + list(i) for i in initials]
         while stack:
             row, key, value_meta_tuple = stack[0]
-            value, meta, change = value_meta_tuple
+            value, meta, statuses, change = value_meta_tuple
             title = meta[rose.META_PROP_TITLE]
+            latent_status = statuses[rose.config_editor.SHOW_MODE_LATENT]
+            ignored_status = statuses[rose.config_editor.SHOW_MODE_IGNORED]
             new_row = self.data_store.append(row, [self.null_icon,
                                                    self.null_icon,
                                                    title,
                                                    key,
                                                    0, 0, 0, 0,
+                                                   latent_status,
+                                                   ignored_status,
                                                    '',
                                                    change])
             if type(value) is dict:
@@ -187,7 +198,14 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         title = model.get_value(r_iter, index)
         title = rose.gtk.util.safe_str(title)
         if len(model.get_path(r_iter)) == 1:
-            title = rose.config_editor.TITLE_PAGE_MARKUP.format(title)
+            title = rose.config_editor.TITLE_PAGE_ROOT_MARKUP.format(title)
+        latent_status = model.get_value(r_iter, 8)
+        ignored_status = model.get_value(r_iter, 9)
+        if latent_status:
+            title = rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(title)
+        if ignored_status:
+            title = rose.config_editor.TITLE_PAGE_IGNORED_MARKUP.format(
+                                                  ignored_status, title)
         cell.set_property("markup", title)
 
     def sort_tree_items(self, row_item_1, row_item_2):
@@ -198,25 +216,6 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         sort_key_1 = sort_key_1 + '~' + row_item_1[0]
         sort_key_2 = sort_key_2 + '~' + row_item_2[0]
         return main_sort_func(sort_key_1, sort_key_2)
-
-    def get_rows(self, path=None):
-        """Return all row paths under path in the tree model."""
-        tree_model = self.tree.get_model()
-        if path is None:
-            my_iter = tree_model.get_iter_first()
-        else:
-            my_iter = tree_model.get_iter(path)
-        rows = []
-        while my_iter is not None:
-            rows.append(tree_model.get_path(my_iter))
-            next_iter = tree_model.iter_children(my_iter)
-            if next_iter is None:
-                next_iter = tree_model.iter_next(my_iter)
-                if next_iter is None:
-                    next_iter = tree_model.iter_parent(my_iter)
-                    next_iter = tree_model.iter_next(next_iter)
-            my_iter = next_iter
-        return rows
 
     def set_row_icon(self, names, ind_count=0, ind_type='changed'):
         """Set the icons for row status on or off. Check parent icons.
@@ -236,64 +235,65 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                              'total_col': 5}}
         int_col = ind_map[ind_type]['int_col']
         total_col = ind_map[ind_type]['total_col']
-        row_path = self.get_path_from_names(names)
-        tree_model = self.tree.get_model()
+        row_path = self.get_path_from_names(names, unfiltered=True)
         if row_path is None:
             return False
-        row_iter = tree_model.get_iter(row_path)
-        old_total = tree_model.get_value(row_iter, total_col)
-        old_int = tree_model.get_value(row_iter, int_col)
+        row_iter = self.data_store.get_iter(row_path)
+        old_total = self.data_store.get_value(row_iter, total_col)
+        old_int = self.data_store.get_value(row_iter, int_col)
         diff_int_count = ind_count - old_int
         new_total = old_total + diff_int_count
-        tree_model.set_value(row_iter, int_col, ind_count)
-        tree_model.set_value(row_iter, total_col, new_total)
+        self.data_store.set_value(row_iter, int_col, ind_count)
+        self.data_store.set_value(row_iter, total_col, new_total)
         if new_total > 0:
-            tree_model.set_value(row_iter, ind_map[ind_type]['icon_col'],
-                                 ind_map[ind_type]['icon'])
+            self.data_store.set_value(row_iter, ind_map[ind_type]['icon_col'],
+                                      ind_map[ind_type]['icon'])
         else:
-            tree_model.set_value(row_iter, ind_map[ind_type]['icon_col'],
-                                 self.null_icon)
+            self.data_store.set_value(row_iter, ind_map[ind_type]['icon_col'],
+                                      self.null_icon)
 
         # Now pass information up the tree
         for parent in [row_path[:i] for i in range(len(row_path) - 1, 0, -1)]:
-            parent_iter = tree_model.get_iter(parent)
-            old_parent_total = tree_model.get_value(parent_iter, total_col)
+            parent_iter = self.data_store.get_iter(parent)
+            old_parent_total = self.data_store.get_value(parent_iter,
+                                                         total_col)
             new_parent_total = old_parent_total + diff_int_count
-            tree_model.set_value(parent_iter, total_col, new_parent_total)
+            self.data_store.set_value(parent_iter,
+                                      total_col,
+                                      new_parent_total)
             if new_parent_total > 0:
-                tree_model.set_value(parent_iter,
-                                     ind_map[ind_type]['icon_col'],
-                                     ind_map[ind_type]['icon'])
+                self.data_store.set_value(parent_iter,
+                                          ind_map[ind_type]['icon_col'],
+                                          ind_map[ind_type]['icon'])
             else:
-                tree_model.set_value(parent_iter,
-                                     ind_map[ind_type]['icon_col'],
-                                     self.null_icon)
+                self.data_store.set_value(parent_iter,
+                                          ind_map[ind_type]['icon_col'],
+                                          self.null_icon)
 
     def update_row_tooltips(self):
         """Synchronise the icon information with the hover-over text."""
-        tree_model = self.tree.get_model()
-        my_iter = tree_model.get_iter_first()
+        my_iter = self.data_store.get_iter_first()
         if my_iter is None:
             return
         paths = []
         iter_stack = [my_iter]
         while iter_stack:
             my_iter = iter_stack.pop(0)
-            paths.append(tree_model.get_path(my_iter))
-            next_iter = tree_model.iter_next(my_iter)
+            paths.append(self.data_store.get_path(my_iter))
+            next_iter = self.data_store.iter_next(my_iter)
             if next_iter is not None:
                 iter_stack.append(next_iter)
-            if tree_model.iter_has_child(my_iter):
-                iter_stack.append(tree_model.iter_children(my_iter))
+            if self.data_store.iter_has_child(my_iter):
+                iter_stack.append(self.data_store.iter_children(my_iter))
         for path in paths:
-            path_iter = tree_model.get_iter(path)
-            name = tree_model.get_value(path_iter, 3)
-            num_errors = tree_model.get_value(path_iter, 4)
-            mods = tree_model.get_value(path_iter, 6)
-            proper_name = self.get_name(path)
-            metadata, comment = self.get_metadata_and_comments(proper_name)
+            path_iter = self.data_store.get_iter(path)
+            name = self.data_store.get_value(path_iter, 3)
+            num_errors = self.data_store.get_value(path_iter, 4)
+            mods = self.data_store.get_value(path_iter, 6)
+            proper_name = self.get_name(path, unfiltered=True)
+            metadata, comment = self._get_metadata_comments_func(proper_name)
             description = metadata.get(rose.META_PROP_DESCRIPTION, "")
-            change = tree_model.get_value(path_iter, 9)
+            change = self.data_store.get_value(path_iter, 11)
             if description:
                 text = description
             else:
@@ -312,24 +312,29 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                 text += "\n" + comment
             if change:
                 text += "\n" + change
-            tree_model.set_value(path_iter, 8, text)
+            self.data_store.set_value(path_iter, 10, text)
 
     def update_change(self, row_names, new_change):
         """Update 'changed' text."""
-        self._set_row_names_value(row_names, 9, new_change)
+        self._set_row_names_value(row_names, 11, new_change)
+
+    def update_statuses(self, row_names, latent_status, ignored_status):
+        """Update latent and ignored statuses."""
+        self._set_row_names_value(row_names, 8, latent_status)
+        self._set_row_names_value(row_names, 9, ignored_status)
 
     def _set_row_names_value(self, row_names, index, value):
-        path = self.get_path_from_names(row_names)
+        path = self.get_path_from_names(row_names, unfiltered=True)
         if path is not None:
-            model = self.tree.get_model()
-            row_iter = model.get_iter(path)
-            model.set_value(row_iter, index, value)
+            row_iter = self.data_store.get_iter(path)
+            self.data_store.set_value(row_iter, index, value)
 
     def select_row(self, row_names):
         """Highlight one particular row, but only this one."""
         if row_names is None:
             return
-        path = self.get_path_from_names(row_names)
+        path = self.get_path_from_names(row_names, unfiltered=True)
+        path = self.filter_model.convert_child_path_to_path(path)
         if path is not None:
             i = 1
             while self.tree.row_expanded(path[:i]) and i <= len(path):
@@ -338,44 +343,30 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
         if path is None:
             self.tree.set_cursor((0,))
 
-    def get_path_from_name(self, row_name):
-        """Return a row path corresponding to the row name, or None."""
-        tree_model = self.tree.get_model()
-        my_iter = tree_model.get_iter_first()
-        this_name = tree_model.get_value(my_iter, 3)
-        while my_iter is not None and this_name != row_name:
-            my_iter = tree_model.iter_next(my_iter)
-            if my_iter is not None:
-                this_name = tree_model.get_value(my_iter, 3)
-            else:
-                my_iter = tree_model.iter_children(my_iter)
-                my_iter = tree_model.iter_children(my_iter)
-                if my_iter is not None:
-                    this_name = tree_model.get_value(my_iter, 3)
-        if my_iter is not None:
-            path = tree_model.get_path(my_iter)
-            return path
-        return None
-
-    def get_path_from_names(self, row_names):
+    def get_path_from_names(self, row_names, unfiltered=False):
         """Return a row path corresponding to the list of branch names."""
-        tree_model = self.tree.get_model()
+        if unfiltered:
+            tree_model = self.data_store
+        else:
+            tree_model = self.filter_model
+        self.name_iter_map.setdefault(unfiltered, {})
+        name_iter_map = self.name_iter_map[unfiltered]
         key = tuple(row_names)
-        if key in self.name_iter_map:
-            return tree_model.get_path(self.name_iter_map[key])
+        if key in name_iter_map:
+            return tree_model.get_path(name_iter_map[key])
         my_iter = tree_model.get_iter_first()
         these_names = []
         good_paths = [row_names[:i] for i in range(len(row_names) + 1)]
         for names in reversed(good_paths):
             subkey = tuple(names)
-            if subkey in self.name_iter_map:
-                my_iter = self.name_iter_map[subkey]
+            if subkey in name_iter_map:
+                my_iter = name_iter_map[subkey]
                 these_names = names[:-1]
                 break
         while my_iter is not None:
             branch_name = tree_model.get_value(my_iter, 3)
             my_names = these_names + [branch_name]
-            self.name_iter_map.update({tuple(my_names): my_iter})
+            name_iter_map.update({tuple(my_names): my_iter})
             if my_names in good_paths:
                 if my_names == row_names:
                     return tree_model.get_path(my_iter)
@@ -412,18 +403,16 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
                     return False
                 if event.button == 1:  # Left click event, replace old tab
                     self._last_tree_activation_path = path
-                    self.send_launch_request(self.get_name(path),
-                                             as_new=False)
+                    self._launch_ns_func(self.get_name(path), as_new=False)
                 elif event.button == 2:  # Middle click event, make new tab
                     self._last_tree_activation_path = path
-                    self.send_launch_request(self.get_name(path),
-                                             as_new=True)
+                    self._launch_ns_func(self.get_name(path), as_new=True)
             else:
                 path = event
-                self.send_launch_request(self.get_name(path), as_new=False)
+                self._launch_ns_func(self.get_name(path), as_new=False)
         return False
 
-    def get_name(self, path=None):
+    def get_name(self, path=None, unfiltered=False):
         """Return the row name (text) corresponding to the treeview path."""
         if path is None:
             tree_selection = self.tree.get_selection()
@@ -431,6 +420,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             path = tree_model.get_path(tree_iter)
         else:
             tree_model = self.tree.get_model()
+            if unfiltered:
+                tree_model = tree_model.get_model()
             tree_iter = tree_model.get_iter(path)
         row_name = str(tree_model.get_value(tree_iter, 3))
         full_name = row_name
@@ -461,146 +452,16 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
     def popup_menu(self, path, event):
         """Launch a popup menu for add/clone/remove."""
         if path is None or len(path) <= 1:
-            add_name = None
+            path_name = None
         else:
-            add_name = "/" + self.get_name(path)
-        tree_model = self.tree.get_model()
-        tree_iter = None
-        if path is not None:
-            tree_iter = tree_model.get_iter(path)
-        ui_config_string = """<ui> <popup name='Popup'>
-                              <menuitem action="New"/>
-                              <separator name="newconfigsep"/>
-                              <menuitem action="Add"/>"""
-        actions = [('New', gtk.STOCK_NEW,
-                    rose.config_editor.TREE_PANEL_NEW_CONFIG),
-                   ('Add', gtk.STOCK_ADD,
-                    rose.config_editor.TREE_PANEL_ADD_SECTION),
-                   ('Autofix', gtk.STOCK_CONVERT,
-                    rose.config_editor.TREE_PANEL_AUTOFIX_CONFIG),
-                   ('Clone', gtk.STOCK_COPY,
-                    rose.config_editor.TREE_PANEL_CLONE_SECTION),
-                   ('Edit', gtk.STOCK_EDIT,
-                    rose.config_editor.TREE_PANEL_EDIT_SECTION),
-                   ('Enable', gtk.STOCK_YES,
-                    rose.config_editor.TREE_PANEL_ENABLE_SECTION),
-                   ('Ignore', gtk.STOCK_NO,
-                    rose.config_editor.TREE_PANEL_IGNORE_SECTION),
-                   ('Info', gtk.STOCK_INFO,
-                    rose.config_editor.TREE_PANEL_INFO_SECTION),
-                   ('Help', gtk.STOCK_HELP,
-                    rose.config_editor.TREE_PANEL_HELP_SECTION),
-                   ('URL', gtk.STOCK_HOME,
-                    rose.config_editor.TREE_PANEL_URL_SECTION),
-                   ('Remove', gtk.STOCK_DELETE,
-                    rose.config_editor.TREE_PANEL_REMOVE)]
-        if path is not None:
-            name = self.get_name(path)
-            cloneable = self.ask_can_clone(name)
-            is_top = self.ask_is_top(name)
-            is_fixable = (is_top and tree_iter is not None and
-                          tree_model.get_value(tree_iter, 5) > 0)
-            has_content = self.ask_has_content(name)
-            if is_fixable:
-                ui_config_string = ui_config_string.replace(
-                          """<separator name="newconfigsep"/>""",
-                          """<separator name="newconfigsep"/>
-                             <menuitem action="Autofix"/>
-                             <separator name="sepauto"/>""", 1)
-            if cloneable:
-                ui_config_string += '<separator name="clonesep"/>'
-                ui_config_string += '<menuitem action="Clone"/>'
-            ui_config_string += '<separator name="ignoresep"/>'
-            ui_config_string += '<menuitem action="Enable"/>'
-            ui_config_string += '<menuitem action="Ignore"/>'
-            ui_config_string += '<separator name="infosep"/>'
-            if has_content:
-                ui_config_string += '<menuitem action="Info"/>'
-                ui_config_string += '<menuitem action="Edit"/>'
-            url = self.get_url(path)
-            help = self.get_help(path)
-            if url is not None or help is not None:
-                ui_config_string += '<separator name="helpsep"/>'
-                if url is not None:
-                    ui_config_string += '<menuitem action="URL"/>'
-                if help is not None:
-                    ui_config_string += '<menuitem action="Help"/>'
-            if not is_top:
-                ui_config_string += """<separator name="sep1"/>
-                                       <menuitem action="Remove"/>"""
-        else:
-            ui_config_string += '<separator name="ignoresep"/>'
-            ui_config_string += '<menuitem action="Enable"/>'
-            ui_config_string += '<menuitem action="Ignore"/>'
-        ui_config_string += """</popup> </ui>"""
-        uimanager = gtk.UIManager()
-        actiongroup = gtk.ActionGroup('Popup')
-        actiongroup.add_actions(actions)
-        uimanager.insert_action_group(actiongroup, pos=0)
-        uimanager.add_ui_from_string(ui_config_string)
-        is_empty = (self.tree.get_model().get_iter_first() is None)
-        new_item = uimanager.get_widget('/Popup/New')
-        new_item.connect("activate",
-                         lambda b: self.send_create_request())
-        new_item.set_sensitive(not is_empty)
-        add_item = uimanager.get_widget('/Popup/Add')
-        add_item.connect("activate",
-                         lambda b: self.send_add_dialog_request(add_name))
-        add_item.set_sensitive(not is_empty)
-        enable_item = uimanager.get_widget('/Popup/Enable')
-        enable_item.connect(
-                    "activate",
-                    lambda b: self.send_ignore_request(add_name, False))
-        enable_item.set_sensitive(not is_empty)
-        ignore_item = uimanager.get_widget('/Popup/Ignore')
-        ignore_item.connect(
-                    "activate",
-                    lambda b: self.send_ignore_request(add_name, True))
-        ignore_item.set_sensitive(not is_empty)
-        if path is not None:
-            if cloneable:
-                clone_item = uimanager.get_widget('/Popup/Clone')
-                clone_item.connect("activate",
-                                   lambda b: self.send_clone_request(name))
-            if has_content:
-                edit_item = uimanager.get_widget('/Popup/Edit')
-                edit_item.connect("activate",
-                                    lambda b: self.send_edit_request(name))
-                info_item = uimanager.get_widget('/Popup/Info')
-                info_item.connect("activate",
-                                    lambda b: self.send_info_request(name))
-            if self.get_help(path) is not None:
-                help_item = uimanager.get_widget('/Popup/Help')
-                help_title = name.split('/')[1:]
-                help_title = rose.config_editor.DIALOG_HELP_TITLE.format(
-                                                                  help_title)
-                ns = "/" + name
-                search_function = lambda i: self.send_search_request(ns, i)
-                help_item.connect(
-                          "activate",
-                          lambda b: rose.gtk.util.run_hyperlink_dialog(
-                                         gtk.STOCK_DIALOG_INFO,
-                                         self.get_help(path),
-                                         help_title,
-                                         search_function))
-            if self.get_url(path) is not None:
-                url_item = uimanager.get_widget('/Popup/URL')
-                url_item.connect(
-                            "activate",
-                            lambda b: webbrowser.open(self.get_url(path)))
-            if is_fixable:
-                autofix_item = uimanager.get_widget('/Popup/Autofix')
-                autofix_item.connect("activate",
-                                     lambda b: self.send_fix_request(name))
-            if not is_top:
-                del_names = self.get_subtree_names(path) + [name]
-                del_names = ['/' + d for d in del_names]
-                remove_item = uimanager.get_widget('/Popup/Remove')
-                remove_item.connect("activate",
-                                    lambda b: self.send_delete_request(
-                                                               del_names))
-        menu = uimanager.get_widget('/Popup')
-        menu.popup(None, None, None, event.button, event.time)
+            path_name = "/" + self.get_name(path)
+        return self._popup_menu_func(path_name, event)
+
+    def collapse_reset(self):
+        """Return the tree view to the basic startup state."""
+        self.tree.collapse_all()
+        self.set_expansion()
+        self.tree.grab_focus()
         return False
 
     def expand_recursive(self, start_path=None, no_duplicates=False):
@@ -621,7 +482,8 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             child_dups = []
             while child_iter is not None:
                 child_name = self.get_name(treemodel.get_path(child_iter))
-                metadata, comment = self.get_metadata_and_comments(child_name)
+                metadata, comment = self._get_metadata_comments_func(
+                                                                child_name)
                 dupl = metadata.get(rose.META_PROP_DUPLICATE)
                 child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)
@@ -631,80 +493,16 @@ class HyperLinkTreePanel(gtk.ScrolledWindow):
             if path != start_path:
                 stack.append(treemodel.iter_next(iter_))
 
-    def collapse_reset(self):
-        """Return the tree view to the basic startup state."""
-        self.tree.collapse_all()
-        self.set_expansion()
-        self.tree.grab_focus()
+    def _get_should_show(self, model, iter_):
+        # Determine whether to show a row.
+        latent_status = model.get_value(iter_, 8)
+        ignored_status = model.get_value(iter_, 9)
+        child_iter = model.iter_children(iter_)
+        is_visible = self._ask_can_show_func(latent_status, ignored_status)
+        if is_visible:
+            return True
+        while child_iter is not None:
+            if self._get_should_show(model, child_iter):
+                return True
+            child_iter = model.iter_next(child_iter)
         return False
-
-    def get_help(self, path):
-        metadata, comments = self.get_metadata_and_comments(
-                                               self.get_name(path))
-        help = metadata.get(rose.META_PROP_HELP, "")
-        if not help:
-            return None
-        return help
-
-    def get_url(self, path):
-        metadata, comments = self.get_metadata_and_comments(
-                                               self.get_name(path))
-        url = metadata.get(rose.META_PROP_URL, "")
-        if not url:
-            return None
-        return url
-
-    def ask_can_clone(self, name):
-        """Connect this at a higher level for section clone menu options."""
-        pass
-
-    def ask_is_top(self, name):
-        """Connect this at a higher level to test parenthood."""
-        pass
-
-    def ask_has_content(self, name):
-        """Connect this at a higher level to test for any data here."""
-        pass
-
-    def get_metadata_and_comments(self, name):
-        """Connect this at a higher level for metadata and comments."""
-        return {}, ""
-
-    def send_add_dialog_request(self, name):
-        """Connect this at a higher level for section add requests."""
-        pass
-
-    def send_clone_request(self, name):
-        """Connect this at a higher level for section clone requests."""
-        pass
-
-    def send_create_request(self):
-        """Connect this at a higher level for config creation requests."""
-        pass
-
-    def send_delete_request(self, name):
-        """Connect this at a higher level for namespace delete requests."""
-        pass
-
-    def send_edit_request(self, name):
-        """Connect this at a higher level for comment edit requests."""
-        pass
-
-    def send_fix_request(self, name):
-        """Connect this at a higher level for auto-fix requests."""
-
-    def send_ignore_request(self, name, is_ignored):
-        """Connect this at a higher level for section ignore/enable."""
-        pass
-
-    def send_info_request(self, name):
-        """Connect this at a higher level for section info."""
-        pass
-
-    def send_launch_request(self, path, as_new=False):
-        """Connect this at a higher level for page creation requests."""
-        pass
-
-    def send_search_request(self, name, variable_id):
-        """Connect this at a higher level for hyperlink connection."""
-        pass

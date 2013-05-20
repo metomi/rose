@@ -22,7 +22,10 @@
 from datetime import datetime, timedelta
 import os
 import re
+from rose.env import UnboundEnvironmentVariableError
 from rose.opt_parse import RoseOptionParser
+from rose.reporter import Reporter
+import sys
 
 
 FORMATS = ["%a %b %d %H:%M:%S %Y",    # ctime
@@ -67,8 +70,11 @@ def date_shift(offsets=None, parse_format=None, print_format=None,
     parse_formats = FORMATS
     if parse_format:
         parse_formats = [parse_format]
-    if not args and task_cycle_time_mode and os.getenv("ROSE_TASK_CYCLE_TIME"):
-        args = [os.getenv("ROSE_TASK_CYCLE_TIME")]
+    if not args and task_cycle_time_mode:
+        arg = os.getenv("ROSE_TASK_CYCLE_TIME")
+        if arg is None:
+            raise UnboundEnvironmentVariableError("ROSE_TASK_CYCLE_TIME")
+        args = [arg]
     if not args or args[0] == "now":
         d, parse_format = (datetime.now(), parse_formats[0])
     else:
@@ -106,8 +112,17 @@ def main():
     opt_parser.add_my_options("offsets", "parse_format", "print_format",
                               "task_cycle_time_mode")
     opts, args = opt_parser.parse_args()
-    print date_shift(opts.offsets, opts.parse_format, opts.print_format,
-                     opts.task_cycle_time_mode, *args)
+    report = Reporter(opts.verbosity - opts.quietness)
+    try:
+        print date_shift(opts.offsets, opts.parse_format, opts.print_format,
+                         opts.task_cycle_time_mode, *args)
+    except Exception as e:
+        if opts.debug_mode:
+            import traceback
+            traceback.print_exc(e)
+        else:
+            report(e)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

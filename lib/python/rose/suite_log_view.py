@@ -28,6 +28,7 @@ from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_control import get_suite_name, SuiteNotFoundError
 import shutil
 import sys
 from time import time, sleep
@@ -174,7 +175,8 @@ class SuiteLogViewGenerator(object):
                     suite_info[key] = node.value
         main_data = {"suite": suite_name,
                      "suite_info": suite_info,
-                     "cycle_times": [],
+                     "cycle_times_current": [],
+                     "cycle_times_archived": [],
                      "updated_at": time()}
         suite_db_file = self.suite_engine_proc.get_suite_db_file(suite_name)
         if os.path.exists(suite_db_file):
@@ -186,26 +188,33 @@ class SuiteLogViewGenerator(object):
             while prev_mtime is None or prev_mtime < this_mtime:
                 cycles = self.suite_engine_proc.get_suite_events(
                         suite_name, log_archive_threshold)
-                for cycle_time, data in cycles.items():
-                    if cycle_time not in main_data["cycle_times"]:
-                        main_data["cycle_times"].append(cycle_time)
-                    f = open(self.NS + "-" + cycle_time + ".json", "wb")
+                for c, data in cycles.items():
+                    if data["is_archived"]:
+                        if c not in main_data["cycle_times_archived"]:
+                            main_data["cycle_times_archived"].append(c)
+                    else:
+                        if c not in main_data["cycle_times_current"]:
+                            main_data["cycle_times_current"].append(c)
+                    f = open(self.NS + "-" + c + ".json", "wb")
                     json.dump(data, f, indent=0)
                     f.close()
                 main_data["updated_at"] = time()
                 prev_mtime = this_mtime
                 this_mtime = os.stat(suite_db_file).st_mtime
-        if not main_data["cycle_times"]:
+        if (not main_data["cycle_times_current"] and
+            not main_data["cycle_times_archived"]):
             for name in glob(self.NS + "-*.json"):
-                key = name[len(self.NS) + 1 : -len(".json")]
-                if key != "latest":
-                    main_data["cycle_times"].append(key)
-        if main_data["cycle_times"]:
-            main_data["cycle_times"].sort()
-            main_data["cycle_times"].reverse()
-            self.fs_util.symlink(
-                    self.NS + "-" + main_data["cycle_times"][0] + ".json",
-                    self.NS + "-latest.json")
+                cycle = name[len(self.NS) + 1 : -len(".json")]
+                if os.path.exists(
+                        self.suite_engine_proc.get_cycle_log_archive_name(
+                                cycle)):
+                    main_data["cycle_times_archived"].append(cycle)
+                else:
+                    main_data["cycle_times_current"].append(cycle)
+        for key in ["cycle_times_current", "cycle_times_archived"]:
+            if main_data[key]:
+                main_data[key].sort()
+                main_data[key].reverse()
         f = open(self.NS + ".json", "wb")
         json.dump(main_data, f, indent=0)
         f.close()
@@ -243,7 +252,7 @@ class SuiteLogViewGenerator(object):
 def main():
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("full_mode", "log_archive_threshold",
-                              "web_browser_mode")
+                              "name", "web_browser_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -259,12 +268,17 @@ def main():
 
 def suite_log_view(opts, args, report=None):
     gen = SuiteLogViewGenerator(event_handler=report)
-    if args:
-        suite_name = args.pop(0)
+    if opts.name:
+        suite_name = opts.name
     else:
         suite_name = os.path.basename(os.getcwd())
+        try:
+            suite_name = get_suite_name(report)
+        except SuiteNotFoundError as e:
+            report(e)
+            sys.exit(1)
     if not opts.full_mode and args:
-        gen.update_job_log(suite_name, tasks=args)
+        gen.update_job_log(suite_name, task_ids=args)
     gen(suite_name, opts.full_mode, opts.log_archive_threshold)
     if opts.web_browser_mode:
         return gen.view_suite_log_url(suite_name)

@@ -21,6 +21,7 @@
 
 import os
 import rose.config
+from rose.fs_util import FileSystemUtil
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
@@ -101,12 +102,18 @@ class SuiteControl(object):
             hosts = [host]
         else:
             conf = ResourceLocator.default().get_conf()
-            node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
             hosts = None
-            if node is not None:
+            
+            known_hosts = self.host_selector.expand(
+              conf.get_value(["rose-suite-run", "hosts"], "").split() +
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
+            known_hosts = list(set(known_hosts))
+            
+            if known_hosts:
                 hosts = self.suite_engine_proc.ping(
                         suite_name,
-                        self.host_selector.expand(node.value.split())[0])
+                        known_hosts)
+
             if not hosts:
                 # Try the "rose-suite.host" file in the suite log directory
                 log = self.suite_engine_proc.get_suite_dir(suite_name, "log")
@@ -128,12 +135,35 @@ class SuiteControl(object):
             return conf.get_value(["env", key])
 
 
+class SuiteNotFoundError(Exception):
+
+    """An exception raised when a suite can't be found at or below cwd."""
+    def __str__(self):
+        return ("%s - no suite found for this path." % self.args[0])
+
+
+def get_suite_name(event_handler=None):
+    """Find the top level of a suite directory structure"""
+    fs_util = FileSystemUtil(event_handler)
+    suite_name = None
+    conf_dir = os.getcwd()
+    while True:
+        conf = os.path.join(conf_dir,'rose-suite.conf')
+        if os.path.exists(conf):
+            suite_name = os.path.basename(conf_dir)
+            break
+        else:
+            up_dir = fs_util.dirname(conf_dir)
+            if up_dir == conf_dir:
+                raise SuiteNotFoundError(os.getcwd())
+            conf_dir = up_dir        
+    return suite_name
+
 def prompt(action, suite_name, host):
     """Prompt user to confirm action for suite_name at host."""
     if not host:
         host = "localhost"
     return raw_input(PROMPT % (action, suite_name, host)).strip() in [YES]
-
 
 def main():
     """Implement "rose suite-gcontrol" and "rose suite-shutdown"."""
@@ -158,7 +188,13 @@ def main():
         if opts.name:
             suite_names.append(opts.name)
         else:
-            suite_names.append(os.path.basename(os.getcwd()))
+            try:
+                suite_name = get_suite_name(event_handler)
+                suite_names.append(suite_name)
+            except SuiteNotFoundError as e:
+                event_handler(e)
+                sys.exit(1)
+
     if opts.debug_mode:
         for sname in suite_names:
             method(sname, opts.host, confirm, sys.stderr, sys.stdout, *args)
@@ -170,7 +206,7 @@ def main():
             except Exception as e:
                 event_handler(e)
                 sys.exit(1)
-        
+
 
 if __name__ == "__main__":
     main()

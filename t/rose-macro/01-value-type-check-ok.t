@@ -67,6 +67,9 @@ my_derived_type_raw_log_char_real = raw ^%75\\, .true., 'a simple character stri
 my_derived_type_raw_log_char_real_array = xlkdf",", .true., 'I''m a character string', 3.0e-3,
                                           asp'\,', .false., 'I also like to quote ''stuff''', -42
 my_derived_type_real_int_null_array = 2.0,,4.0,,2.3e+2, 1
+my_real_array_element(5)=5.0
+my_real_array_slice(5:8)=5.0,6.0,7.0,8.0
+my_real_array_slice_2d(5:90,1)=5.0,6.0,3.0
 __CONFIG__
 #-------------------------------------------------------------------------------
 tests 27
@@ -291,6 +294,18 @@ length=8
 length=:
 
 [namelist:values_nl1=my_array_any_one]
+length=:
+
+[namelist:values_nl1=my_real_array_element]
+type=real
+length=6
+
+[namelist:values_nl1=my_real_array_slice]
+type=real
+length=8
+
+[namelist:values_nl1=my_real_array_slice_2d]
+type=real
 length=:
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro -V --config=../config

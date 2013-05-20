@@ -242,7 +242,8 @@ class MainWindow(gtk.Window):
                                          self.search_manager.ws_client.prefix)
         except Exception as e:
             rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     type(e).__name__ + ": " + str(e))
+                                     type(e).__name__ + ": " + str(e),
+                                     title=rosie.browser.TITLE_ERROR)
             return None
 
         # Poll for new entry in db.
@@ -255,7 +256,7 @@ class MainWindow(gtk.Window):
         
         self.handle_checkout(id_=new_id)
 
-    def display_local_suites(self, a_widget=None):
+    def display_local_suites(self, a_widget=None, navigate=True):
         """Get and display the locally stored suites."""
         self.local_updater.update_now()
         self.nav_bar.address_box.child.set_text("")
@@ -269,6 +270,10 @@ class MainWindow(gtk.Window):
         self.display_maps_result(res, is_local=True)
         self.repeat_last_request = self.display_local_suites
         self.statusbar.set_progressbar_pulsing(False)
+        if navigate:
+            recorded = self.hist.record_search("home", repr("home"), False)
+            if recorded:
+                self.handle_record_search_ui("home", repr("home"), False)
 
     def display_maps_result(self, result_maps, is_local=False):
         """Process the results of calling function(*function_args)."""
@@ -752,7 +757,9 @@ class MainWindow(gtk.Window):
 
     def handle_record_search_ui(self, s_type, msg, all_revs):
         """Handles ui updating on recording a search/query/url lookup"""
-        self.history_pane.treestore_hist.prepend(None, [s_type, msg, all_revs]) 
+        if s_type is not "home":
+            self.history_pane.treestore_hist.prepend(None, 
+                                                     [s_type, msg, all_revs]) 
         
         if self.hist.get_n_searches() > 1:
             self.nav_bar.previous_search_button.set_sensitive(True)
@@ -848,7 +855,12 @@ class MainWindow(gtk.Window):
                 self.nav_bar.simple_search_entry.set_text("")
                 self.clear_filters()
                 self.nav_bar.address_box.child.set_text(search.details)
-                self.address_bar_lookup(None, False)                
+                self.address_bar_lookup(None, False)
+            elif search.h_type == "home":
+                self.clear_filters()
+                self.nav_bar.simple_search_entry.set_text("")
+                self.nav_bar.address_box.child.set_text("")    
+                self.display_local_suites(navigate=False) #need to do something with this...
             else:
                 if next:
                     msg = rosie.browser.ERROR_UNRECOGNISED_NEXT_SEARCH

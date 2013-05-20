@@ -1056,8 +1056,8 @@
 
     <h3>EXAMPLES</h3>
     <pre>
-    rose stem --task=developer
-    rose stem --source=/path/to/source --task=myjob
+    rose stem --group=developer
+    rose stem --source=/path/to/source --source=/other/source --group=mygroup
 </pre>
 
     <h3>OPTIONS</h3>All options of <a href="#rose-suite-run">rose suite-run</a>
@@ -1066,14 +1066,23 @@
     <dl>
       <dt><kbd>--source=SOURCE, -s SOURCE</kbd></dt>
 
-      <dd>Specify a source tree to include in a rose-stem suite. The source 
-      tree must be a working copy as the location of the suite and 
-      <kbd>fcm-make</kbd> config files are taken from it. Defaults to '.' 
+      <dd>Specify a source tree to include in a rose-stem suite. The first 
+      source tree must be a working copy as the location of the suite and 
+      <kbd>fcm-make</kbd> config files are taken from it. Further source trees 
+      can be added with additional --source arguments. Defaults to '.' 
       if not specified.</dd>
 
-      <dt><kbd>--task=TASK, -t TASK</kbd></dt>
+      <dt><kbd>--group=GROUP, -g GROUP</kbd></dt>
+      
+      <dd>Specify a group name to run. Additional groups can be specified
+      with further --group arguments. The suite will then convert the groups
+      into a series of tasks to run.</dd>
 
-      <dd>Specify a task name or group to run.</dd>
+      <dt><kbd>--task=GROUP, -t GROUP</kbd></dt>
+
+      <dd>Synonym for --group.</dd>
+
+
     </dl>
 
     <h3>JINJA2 VARIABLES</h3>Note that <kbd>project</kbd> refers to the FCM 
@@ -1082,7 +1091,7 @@
     <dl>
       <dt><kbd>RUN_NAMES</kbd></dt>
 
-      <dd>A list of jobs and job groups to run in the rose-stem suite.</dd>
+      <dd>A list of groups to run in the rose-stem suite.</dd>
 
       <dt><kbd>SOURCE_project</kbd></dt>
 
@@ -1175,7 +1184,7 @@
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbr>--all</kbd></dt>
+      <dt><kbd>--all</kbd></dt>
       
       <dd>Open a suite control GUI for each running suite.</dd>
       
@@ -1259,15 +1268,15 @@
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose suite-log-view [OPTIONS] [SUITE]</kbd></p>
+    <p><kbd>rose suite-log-view [OPTIONS] [TASK ...]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
-    <p>Generate and browse the log view of <var>SUITE</var>.</p>
+    <p>Generate and browse the log view of a suite.</p>
 
     <p>Analyse the suite log to generate a JSON file for feeding into an HTML
-    based viewer. <var>SUITE</var> should be a valid suite name. If not
-    defined, use <var>basename $PWD</var>.</p>
+    based viewer. If <kbd>--name=SUITE-NAME</kbd> is not specified, the 
+    basename of <var>$PWD</var> is assumed to be the suite name.</p>
 
     <p>If the <var>DISPLAY</var> environment variable is defined. Launch the
     web browser to display the log view unless <kbd>--no-web-browse</kbd> is
@@ -1286,6 +1295,10 @@
       <dd>Switch on job log archiving by specifying a cycle time threshold. All
       job logs at this cycle time or older will be archived. Implies
       <kbd>--full</kbd>.</dd>
+
+      <dt><kbd>--name=SUITE-NAME</kbd></dt>
+      
+      <dd>Specify the suite name.</dd>
 
       <dt><kbd>--no-web-browse</kbd></dt>
 
@@ -1540,6 +1553,11 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--all</kbd></dt>
+      
+      <dd>Shutdown all running suites. You will be prompted to confirm shutting
+      down each affected suite.</dd>
+      
       <dt><kbd>--host=HOST</kbd></dt>
 
       <dd>Specify a host.</dd>
