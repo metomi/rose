@@ -66,7 +66,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [V] rose.metadata_check.MetadataChecker: issues: 1
     namelist:values_nl1=my_fixed_var=values=
-        Invalid values length
+        Invalid syntax: 
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------

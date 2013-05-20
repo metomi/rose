@@ -209,15 +209,15 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
     namelist:values_nl1=my_boolean_false=type=booleans
         Unknown type: booleans
     namelist:values_nl1=my_char_array_any=length=-1
-        Invalid length - should be : or positive integer
+        Invalid syntax: -1
     namelist:values_nl1=my_char_array_fixed=length=four
-        Invalid length - should be : or positive integer
+        Invalid syntax: four
     namelist:values_nl1=my_derived_type_raw_log_char_real=type=raw, logical, what?, character, real
         Unknown type: what?
     namelist:values_nl1=my_derived_type_str_int_raw_bool=type=quoted, integer, string, raw, boolean
         Unknown type: string
     namelist:values_nl1=my_int_array_any=length=::
-        Invalid length - should be : or positive integer
+        Invalid syntax: ::
     namelist:values_nl1=my_int_sci_notation=type=integer (that means whole numbers)
         Unknown type: integer (that means whole numbers)
     namelist:values_nl1=my_quoted_complex_esc=type=string

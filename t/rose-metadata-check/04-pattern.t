@@ -79,15 +79,15 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [V] rose.metadata_check.MetadataChecker: issues: 5
     namelist:values_nl1=my_array=pattern=(?} oo){1,-9}(\d*,{\s*)*\d*$
-        Invalid regex: error: unexpected end of pattern
+        Invalid syntax: error: unexpected end of pattern
     namelist:values_nl1=my_char=pattern=+'.*'$
-        Invalid regex: error: nothing to repeat
+        Invalid syntax: error: nothing to repeat
     namelist:values_nl1=my_int=pattern=^\d+(?& \e)
-        Invalid regex: error: unexpected end of pattern
+        Invalid syntax: error: unexpected end of pattern
     namelist:values_nl1=my_nocase=pattern=(?i see a silhouette)^camelcase$
-        Invalid regex: error: unknown extension
+        Invalid syntax: error: unknown extension
     namelist:values_nl1=my_raw=pattern=^[A->>Z\][\w\s,]+\.$
-        Invalid regex: error: bad character range
+        Invalid syntax: error: bad character range
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------

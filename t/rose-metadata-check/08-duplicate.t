@@ -71,13 +71,13 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [V] rose.metadata_check.MetadataChecker: issues: 4
     namelist:duplicate_nl1=my_var1=duplicate=.true.
-        Invalid value - should be true/false
+        Invalid syntax: .true.
     namelist:duplicate_nl6=my_var6=duplicate=duplicate
-        Invalid value - should be true/false
+        Invalid syntax: duplicate
     namelist:duplicate_nl6=my_var7=duplicate=1
-        Invalid value - should be true/false
+        Invalid syntax: 1
     namelist:duplicate_nl7=my_var8=duplicate=?
-        Invalid value - should be true/false
+        Invalid syntax: ?
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------

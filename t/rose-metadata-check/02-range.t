@@ -106,15 +106,15 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
     namelist:values_nl1=my_int=range=5foo
         Invalid syntax: 5foo
     namelist:values_nl1=my_int_dot=range=this != .
-        Invalid rule syntax: unexpected '.'
+        Invalid syntax: unexpected '.'
     namelist:values_nl1=my_int_neg=range=-2:x
         Invalid syntax: -2:x
     namelist:values_nl1=my_int_neg_div_0=range=this/0 = 2
-        Invalid rule syntax: expected token 'end of statement block', got '='
+        Invalid syntax: expected token 'end of statement block', got '='
     namelist:values_nl1=my_real=range=678.3, y, 56.0
         Invalid syntax: y
     namelist:values_nl1=my_real_million=range=2 * this < 1 million dollars
-        Invalid rule syntax: expected token 'end of statement block', got 'million'
+        Invalid syntax: expected token 'end of statement block', got 'million'
     namelist:values_nl1=my_real_neg=range=namelist:foo=bar * this < 0
         Inter-variable comparison not allowed in range.
     namelist:values_nl1=my_real_sci_notation_neg=range=-3.546e-2-100

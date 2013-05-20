@@ -104,7 +104,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
     namelist:macro_nl=my_macro_var4=macro=LogicalTransformer.validate, envswitch.LogicalTransformer.validate
         Not found: LogicalTransformer.validate
     namelist:macro_nl=my_macro_var5=macro=envswitch.LogicalTruthChecker.transform
-        Invalid method: envswitch.LogicalTruthChecker.transform
+        Not found: transform
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------

@@ -103,13 +103,13 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [V] rose.metadata_check.MetadataChecker: issues: 4
     namelist:compulsory_nl1=my_var1=compulsory=.true.
-        Invalid value - should be true/false
+        Invalid syntax: .true.
     namelist:compulsory_nl6=my_var6=compulsory=duplicate
-        Invalid value - should be true/false
+        Invalid syntax: duplicate
     namelist:compulsory_nl6=my_var7=compulsory=1
-        Invalid value - should be true/false
+        Invalid syntax: 1
     namelist:compulsory_nl7=my_var8=compulsory=?
-        Invalid value - should be true/false
+        Invalid syntax: ?
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------

@@ -627,6 +627,7 @@ def run_macros(app_config, meta_config, config_name, macro_names,
 
 
 def report_sort(report1, report2):
+    """Sort MacroReport objects by section and option."""
     sect1 = report1.section
     sect2 = report2.section
     if sect1 == sect2:
@@ -722,6 +723,7 @@ def _get_user_accept():
 
 
 def dump_config(app_config, opt_conf_dir, opt_output_dir=None):
+    """Dump the config in a standard form."""
     pretty_format_config(app_config)
     if opt_output_dir is None:
         directory = opt_conf_dir

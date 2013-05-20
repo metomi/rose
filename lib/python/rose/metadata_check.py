@@ -32,21 +32,11 @@ import rose.macros
 import rose.opt_parse
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
-INVALID_ALLOWED_VALUE = "Invalid value - should be {0}"
-INVALID_MACRO = "Not found: {0}"
-INVALID_MACRO_IMPORT = "Could not import {0}: {1}"
-INVALID_MACRO_METHOD = "Invalid method: {0}"
-INVALID_RANGE = "Could not process range: {0}"
+INVALID_IMPORT = "Could not import {0}: {1}"
+INVALID_OBJECT = "Not found: {0}"
 INVALID_RANGE_RULE_IDS = "Inter-variable comparison not allowed in range."
-INVALID_RANGE_RULE = "Invalid rule syntax: {0}"
-INVALID_RULE = "Invalid rule syntax: {0}"
-INVALID_LENGTH = "Invalid length - should be : or positive integer"
-INVALID_PATTERN = "Invalid regex: {0}"
-INVALID_VALUES = "Could not process values: {0}"
-INVALID_VALUES_LENGTH = "Invalid values length"
-INVALID_WIDGET = "Not found: {0}"
-INVALID_WIDGET_IMPORT = "Could not import {0}: {1}"
-UNNECESSARY_VALUES_PROP = "Property not needed - 'values' property overrides"
+INVALID_SYNTAX = "Invalid syntax: {0}"
+UNNECESSARY_VALUES_PROP = "Unnecessary property - 'values' overrides"
 UNKNOWN_TYPE = "Unknown type: {0}"
 UNKNOWN_PROP = "Unknown property: {0}"
 VALUE_JOIN = " and "
@@ -66,14 +56,14 @@ def _check_compulsory(value):
     allowed_values = [rose.META_PROP_VALUE_TRUE,
                       rose.META_PROP_VALUE_FALSE]
     if value not in allowed_values:
-        return INVALID_ALLOWED_VALUE.format("/".join(allowed_values))
+        return INVALID_SYNTAX.format(value)
 
 
 def _check_duplicate(value):
     allowed_values = [rose.META_PROP_VALUE_TRUE,
                       rose.META_PROP_VALUE_FALSE]
     if value not in allowed_values:
-        return INVALID_ALLOWED_VALUE.format("/".join(allowed_values))
+        return INVALID_SYNTAX.format(value)
 
 
 def _check_fail_if(value):
@@ -82,7 +72,7 @@ def _check_fail_if(value):
 
 def _check_length(value):
     if not value.isdigit() and value != ":":
-        return INVALID_LENGTH.format(value)
+        return INVALID_SYNTAX.format(value)
 
 
 def _check_macro(value, module_files=None, meta_dir=None):
@@ -93,7 +83,7 @@ def _check_macro(value, module_files=None, meta_dir=None):
     try:
         macros = rose.variable.array_split(value, only_this_delim=",")
     except Exception as e:
-        return INVALID_MACRO_SYNTAX.format(e)
+        return INVALID_SYNTAX.format(e)
     bad_macros = []
     for macro in macros:
         macro_name = macro
@@ -107,14 +97,14 @@ def _check_macro(value, module_files=None, meta_dir=None):
                                                        module_files,
                                                        _import_err_handler)
         except Exception as e:
-            return INVALID_MACRO_IMPORT.format(
-                                 macro,
-                                 type(e).__name__ + ": " + str(e))
+            return INVALID_IMPORT.format(
+                                  macro,
+                                  type(e).__name__ + ": " + str(e))
         if macro_obj is None:
-            return INVALID_MACRO.format(macro)
+            return INVALID_OBJECT.format(macro)
         elif method is not None:
             if not hasattr(macro_obj, method):
-                return INVALID_MACRO_METHOD.format(macro)
+                return INVALID_OBJECT.format(method)
 
 
 def _check_pattern(value):
@@ -122,7 +112,7 @@ def _check_pattern(value):
         re.compile(value, re.VERBOSE)
     except Exception as e:
         err_text = type(e).__name__ + ": " + str(e)
-        return INVALID_PATTERN.format(err_text)
+        return INVALID_SYNTAX.format(err_text)
 
 
 def _check_range(value):
@@ -138,14 +128,14 @@ def _check_range(value):
         except rose.macros.rule.RuleValueError as e:
             return INVALID_RANGE_RULE_IDS.format(e)
         except Exception as e:
-            return INVALID_RANGE_RULE.format(e)
+            return INVALID_SYNTAX.format(e)
     else:
         try:
             check_func = rose.variable.parse_range_expression(value)
         except rose.variable.RangeSyntaxError as e:
             return str(e)
         except Exception as e:
-            return INVALID_RANGE.format(type(e).__name__ + ": " + str(e))
+            return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
 
 
 def _check_type(value):
@@ -166,9 +156,9 @@ def _check_values(value):
     try:
         val_list = rose.variable.array_split(value, only_this_delim=",")
     except Exception as e:
-        return INVALID_VALUES.format(type(e).__name__ + ": " + str(e))
+        return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
     if not val_list:
-        return INVALID_VALUES_LENGTH.format(value)
+        return INVALID_SYNTAX.format(value)
 
 
 def _check_warn_if(value):
@@ -182,12 +172,14 @@ def _check_widget(value, module_files=None, meta_dir=None):
         return
     widget_name = value.split()[0]
     try:
-        widget = rose.config_editor.util.import_object(widget_name, module_files,
+        widget = rose.config_editor.util.import_object(widget_name,
+                                                       module_files,
                                                        _import_err_handler)
     except Exception as e:
-        return INVALID_WIDGET_IMPORT.format(widget_name, type(e).__name__ + ": " + str(e))
+        return INVALID_IMPORT.format(widget_name,
+                                            type(e).__name__ + ": " + str(e))
     if widget is None:
-        return INVALID_WIDGET.format(value)
+        return INVALID_OBJECT.format(value)
 
 
 def _get_module_files(meta_dir=None):
