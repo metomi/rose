@@ -444,7 +444,6 @@ class ConfigDataManager(object):
                               save=False, update=False):
         """Return maps of variables from the configuration"""
         config_data = self.config[config_name]
-        opt_conf_diff_format = rose.config_editor.VAR_FLAG_TIP_OPT_CONF_STATE
         if save:
             config = config_data.save_config
             section_map = config_data.sections.save
@@ -477,22 +476,7 @@ class ConfigDataManager(object):
                 self._load_dupl_sect_map(basic_dupl_map, keylist[0])
                 continue
             section, option = keylist
-            cfg_flags = {}
-            opt_flags = {}
-            for opt_name in sorted(config_data.opt_configs):
-                opt_config = config_data.opt_configs[opt_name]
-                opt_node = opt_config.get([section, option])
-                if opt_node is not None:
-                    opt_sect_node = opt_config.get([section])
-                    text = opt_conf_diff_format.format(opt_sect_node.state,
-                                                       section,
-                                                       opt_node.state,
-                                                       option,
-                                                       opt_node.value)
-                    opt_flags.update({opt_name: text})
-            if opt_flags:
-                cfg_flags.update(
-                         {rose.config_editor.FLAG_TYPE_OPT_CONF: opt_flags})
+            flags = self.load_option_flags(config_name, section, option)
             ignored_reason = {}
             if section_map[section].ignored_reason:
                 ignored_reason.update({
@@ -527,7 +511,7 @@ class ConfigDataManager(object):
                                                   meta_data,
                                                   ignored_reason,
                                                   error={},
-                                                  flags=cfg_flags,
+                                                  flags=flags,
                                                   comments=cfg_comments))
         id_node_stack = meta_config.value.items()
         while id_node_stack:
@@ -545,6 +529,7 @@ class ConfigDataManager(object):
             if (only_this_section is not None and
                 section != only_this_section):
                 continue
+            flags = self.load_option_flags(config_name, section, option)
             ignored_reason = {}
             sect_data = section_map.get(section)
             if sect_data is None:
@@ -578,7 +563,8 @@ class ConfigDataManager(object):
                                                value,
                                                meta_data,
                                                ignored_reason,
-                                               error={}))
+                                               error={},
+                                               flags=flags))
         return var_map, latent_var_map
 
     def _load_dupl_sect_map(self, basic_dupl_map, section):
@@ -590,6 +576,34 @@ class ConfigDataManager(object):
             if mod_section != basic_section and mod_section != section:
                 basic_dupl_map.setdefault(mod_section, [])
                 basic_dupl_map[mod_section].append(section)
+
+    def load_option_flags(self, config_name, section, option):
+        """Load flags for an option."""
+        config_data = self.config[config_name]
+        flags = {}
+        opt_conf_flags = self._load_opt_conf_flags(config_name,
+                                                   section, option)
+        if opt_conf_flags:
+            flags.update({rose.config_editor.FLAG_TYPE_OPT_CONF:
+                          opt_conf_flags})
+        return flags
+
+    def _load_opt_conf_flags(self, config_name, section, option):
+        opt_config_map = self.config[config_name].opt_configs
+        opt_conf_diff_format = rose.config_editor.VAR_FLAG_TIP_OPT_CONF_STATE
+        opt_flags = {}
+        for opt_name in sorted(opt_config_map):
+            opt_config = opt_config_map[opt_name]
+            opt_node = opt_config.get([section, option])
+            if opt_node is not None:
+                opt_sect_node = opt_config.get([section])
+                text = opt_conf_diff_format.format(opt_sect_node.state,
+                                                    section,
+                                                    opt_node.state,
+                                                    option,
+                                                    opt_node.value)
+                opt_flags.update({opt_name: text})
+        return opt_flags
 
     def add_section_to_config(self, section, config_name):
         """Add a blank section to the configuration."""

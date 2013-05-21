@@ -68,6 +68,8 @@ class VariableOperations(object):
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         config_data = self.__data.config[config_name]
         old_metadata = copy.deepcopy(variable.metadata)
+        flags = self.__data.load_option_flags(config_name, sect, opt)
+        variable.flags.update(flags)
         metadata = self.__data.helper.get_metadata_for_config_id(var_id,
                                                                  config_name)
         variable.process_metadata(metadata)
