@@ -36,7 +36,8 @@
 #        specified more than once.
 # ARGUMENTS
 #     ID
-#        One or more sections to check in the metadata e.g. env=FOO or
-#        namelist:bar. If specified, only this section will be checked.
+#        One or more sections (configuration IDs) to check in the
+#        metadata e.g.env=FOO or namelist:bar. If specified, only
+#        this section will be checked.
 #-------------------------------------------------------------------------------
 exec python -m rose.metadata_check "$@"

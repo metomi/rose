@@ -831,6 +831,46 @@
       run the specified macro names.</dd>
     </dl>
 
+    <h2 id="rose-metadata-check">rose metadata-check</h2>
+
+    <h3>NAME</h3>
+
+    <p><kbd>rose metadata-check</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <p><kbd>rose metadata-check [OPTIONS] [ID ...]</kbd></p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Check metadata validity.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+
+      <dt><kbd>--config=DIR, -C DIR</kbd></dt>
+
+      <dd>The directory containing the configuration metadata i.e.
+      containing the rose-meta.conf file, amongst other things.
+      If not specified, the current directory will be used.</dd>
+
+      <dt><kbd>--property=PROPERTY, -p PROPERTY</kbd></dt>
+
+      <dd>Only check a certain property e.g. trigger. This can be specified
+      more than once.</dd>
+    </dl>
+
+    <h3>ARGUMENTS</h3>
+
+    <dl>
+      <dt><kbd>ID ...</kbd></dt>
+
+      <dd>One or more sections (configuration IDs) to check in the metadata,
+      e.g. env=FOO or namelist:bar=spam. If specified, only these sections
+      will be checked.</dd>
+    </dl>
+
     <h2 id="rose-metadata-gen">rose metadata-gen</h2>
 
     <h3>NAME</h3>
