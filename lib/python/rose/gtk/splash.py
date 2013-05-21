@@ -64,8 +64,7 @@ class SplashScreenProcess(object):
             self.start()
         if kwargs.get("no_progress"):
             return self._update_buffered(*args, **kwargs)
-        if self._flush_buffer()
-            time.sleep(0.005)
+        self._flush_buffer()
         json_text = json.dumps({"args": args, "kwargs": kwargs})
         self._communicate(json_text)
 
@@ -79,11 +78,9 @@ class SplashScreenProcess(object):
                 break
 
     def _flush_buffer(self):
-        num_buffered = len(self._buffer)
-        for buffer_text in self._buffer:
-            self._communicate(buffer_text)
-        del self._buffer[:]
-        return num_buffered
+        if self._buffer:
+            self._communicate(self._buffer[-1])
+            del self._buffer[:]
 
     def _update_buffered(self, *args, **kwargs):
         t1 = time.time()

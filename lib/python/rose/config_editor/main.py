@@ -250,11 +250,13 @@ class MainController(object):
                                                  self.handle_page_change)
             self.mainwindow.window.connect_after('focus-in-event',
                                                  self.handle_page_change)
-        self.load_errors = 0
         self.updater.update_all(is_loading=True)
-        self.loader_update(rose.config_editor.LOAD_DONE,
+        self.loader_update(rose.config_editor.LOAD_ERRORS.format(
+                                                   self.updater.load_errors),
                            self.data.top_level_name)
         self.updater.perform_startup_check()
+        self.loader_update(rose.config_editor.LOAD_DONE,
+                           self.data.top_level_name)
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
@@ -1479,7 +1481,7 @@ def spawn_window(config_directory_path=None):
             gcontrol_icon = None
     rose.gtk.util.setup_scheduler_icon(gcontrol_icon)
     number_of_events = (get_number_of_configs(config_directory_path) *
-                        rose.config_editor.LOAD_NUMBER_OF_EVENTS + 1)
+                        rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
     if config_directory_path is None:
         title = rose.config_editor.UNTITLED_NAME
     else:
@@ -1570,7 +1572,7 @@ if __name__ == '__main__':
         f = tempfile.NamedTemporaryFile()
         cProfile.runctx("spawn_window(cwd)", globals(), locals(), f.name)
         p = pstats.Stats(f.name)
-        p.strip_dirs().sort_stats('time').print_stats(200)
+        p.strip_dirs().sort_stats('cumulative').print_stats(200)
         f.close()
     else:
         spawn_window(cwd)
