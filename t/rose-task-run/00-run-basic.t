@@ -20,7 +20,7 @@
 # Test "rose task-run" and "rose task-env", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-#export ROSE_CONF_IGNORE=true
+export ROSE_CONF_IGNORE=true
 
 #-------------------------------------------------------------------------------
 tests 43
