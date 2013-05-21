@@ -32,7 +32,7 @@ import traceback
 PATH_GLOBS = {"PATH": ["share/fcm[_-]make*/*/bin", "work/fcm[_-]make*/*/bin"]}
 
 
-def get_prepend_paths(event_handler=None, path_root=None, **args):
+def get_prepend_paths(event_handler=None, path_root=None, *args):
     """Return map of PATH-like env-var names to path lists to prepend to them.
 
     event_handler -- an instance of rose.reporter.Reporter or an object with a
@@ -131,8 +131,11 @@ def main():
         for k, prepend_paths in get_prepend_paths(report,
                                                   task_props.suite_dir,
                                                   *path_globs).items():
-            paths = os.getenv(k, "").split(os.pathsep)
-            v = os.pathsep.join(prepend_paths + paths)
+            orig_paths = []
+            orig_v = os.getenv(k, "")
+            if orig_v:
+                orig_paths = orig_v.split(os.pathsep)
+            v = os.pathsep.join(prepend_paths + orig_paths)
             report(str(EnvExportEvent(k, v)) + "\n", level=0)
     except Exception as e:
         report(e)

@@ -1090,10 +1090,12 @@ class TaskRunner(Runner):
             for k, prepend_paths in get_prepend_paths(self.event_handler,
                                                       t.suite_dir,
                                                       *path_globs).items():
-                paths = os.getenv(k, "").split(os.pathsep)
-                if prepend_paths != paths[0:len(prepend_paths)]:
-                    v = os.pathsep.join(prepend_paths + paths)
-                    env_export(k, v, self.event_handler)
+                orig_paths = []
+                orig_v = os.getenv(k, "")
+                if orig_v:
+                    orig_paths = orig_v.split(os.pathsep)
+                v = os.pathsep.join(prepend_paths + orig_paths)
+                env_export(k, v, self.event_handler)
 
         # Name association with builtin applications
         builtin_app = None
