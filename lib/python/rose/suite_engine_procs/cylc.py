@@ -44,12 +44,74 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
+    EVENTS = {"submission succeeded": "submit",
+              "submission failed": "submit-fail",
+              "execution started": "init",
+              "execution succeeded": "pass",
+              "execution failed": "fail",
+              "signaled": "fail"}
+    N_DB_CONNECT_RETRIES = 3
     PYRO_TIMEOUT = 5
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     TASK_ID_DELIM = "."
     TASK_LOG_DELIM = "."
+
+    def archive_job_logs(self, suite_name, log_archive_threshold):
+        """Archive cycle job logs older than a threshold.
+
+        Assume current working directory is suite's log directory.
+        
+        """
+        rows = []
+        for i in range(self.N_DB_CONNECT_RETRIES):
+            try:
+                conn = sqlite3.connect(self.get_suite_db_file(suite_name))
+                c = conn.cursor()
+                rows = c.execute("SELECT DISTINCT cycle FROM task_events")
+            except sqlite3.OperationalError:
+                sleep(1.0)
+            else:
+                break
+        for row in rows:
+            cycle_time = row[0]
+            archive_file_name = self.get_cycle_log_archive_name(cycle_time)
+            if (os.path.exists(archive_file_name) or
+                cycle_time > log_archive_threshold): # str cmp
+                continue
+            # Pull from each remote host all job log files of this
+            # cycle time.
+            auths = self.get_suite_jobs_auths(suite_name, cycle_time)
+            log_dir_rel = self.get_task_log_dir_rel(suite_name)
+            log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+            glob_pat = self.TASK_LOG_DELIM.join(["*", cycle_time, "*"])
+            for auth in auths:
+                r_glob = "%s:%s/%s" % (auth, log_dir_rel, glob_pat)
+                cmd = self.popen.get_cmd("rsync", r_glob, log_dir)
+                try:
+                    out, err = self.popen(*cmd)
+                except RosePopenError as e:
+                    self.handle_event(e, level=Reporter.WARN)
+            # Create the job log archive for this cycle time.
+            tar = tarfile.open(archive_file_name, "w:gz")
+            names = glob("job/" + glob_pat)
+            for name in names:
+                tar.add(name)
+            tar.close()
+            self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
+                                              archive_file_name))
+            # Remove local job log files of this cycle time.
+            for name in names:
+                self.fs_util.delete(name)
+            # Remove remote job log files of this cycle time.
+            for auth in auths:
+                r_glob = "%s/%s" % (log_dir_rel, glob_pat)
+                cmd = self.popen.get_cmd("ssh", auth, "rm", "-f", r_glob)
+                try:
+                    out, err = self.popen(*cmd)
+                except RosePopenError as e:
+                    self.handle_event(e, level=Reporter.WARN)
 
     def clean(self, suite_name):
         """Remove items created by the previous run of a suite.
@@ -147,13 +209,18 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
-    def get_suite_events(self, suite_name, log_archive_threshold=None):
+    def get_suite_events(self, suite_name, task_ids):
         """Parse the cylc suite running database for task events.
 
-        Return a data structure that looks like:
+        suite_name -- The name of the suite.
+        task_ids -- A list of relevant task IDs. If empty or None, all tasks
+                    are relevant.
+
+        Assume current working directory is suite's log directory.
+
+        Return a  data structure that looks like:
         {   <cycle time string>: {
                 "cycle_time": <cycle time>,
-                "is_archived": True, # if job logs of this cycle are archived
                 "tasks": {
                     <task name>: [
                         {   "events": {
@@ -172,46 +239,56 @@ class CylcProcessor(SuiteEngineProcessor):
                         },
                         # ... more re-submits of the task
                     ],
-                    # ... more task names
+                    # ... more relevant task names
                 }
             }
-            # ... more cycle times
+            # ... more relevant cycle times
         }
         """
-        for i in range(3): # 3 retries
-            try:
-                return self._get_suite_events(suite_name,
-                                              log_archive_threshold)
-            except sqlite3.OperationalError:
-                sleep(1.0)
-        return {}
-
-    def _get_suite_events(self, suite_name, log_archive_threshold=""):
-        data = {}
 
         # Read task events from suite runtime database
-        conn = sqlite3.connect(self.get_suite_db_file(suite_name))
-        c = conn.cursor()
-        EVENTS = {"submission succeeded": "submit",
-                  "submission failed": "submit-fail",
-                  "execution started": "init",
-                  "execution succeeded": "pass",
-                  "execution failed": "fail",
-                  "signaled": "fail"}
-        for row in c.execute(
-                "SELECT time,name,cycle,submit_num,event,message"
-                " FROM task_events"
-                " ORDER BY time"):
+        where = ""
+        where_args = []
+        for task_id in task_ids:
+            cycle = None
+            if self.TASK_ID_DELIM in task_id:
+                name, cycle = task_id.split(self.TASK_ID_DELIM, 1)
+                where_args += [name, cycle]
+            else:
+                where_args.append(task_id)
+            if where:
+                where += " OR"
+            where += " (name=?"
+            if cycle is not None:
+                where += " AND cycle=?"
+            where += ")"
+        if where:
+            where = " WHERE" + where
+        rows = []
+        for i in range(self.N_DB_CONNECT_RETRIES):
+            try:
+                conn = sqlite3.connect(self.get_suite_db_file(suite_name))
+                c = conn.cursor()
+                rows = c.execute(
+                        "SELECT time,name,cycle,submit_num,event,message" +
+                        " FROM task_events" +
+                        where +
+                        " ORDER BY time", where_args)
+            except sqlite3.OperationalError as e:
+                sleep(1.0)
+            else:
+                break
+
+        data = {}
+        for row in rows:
             ev_time, name, cycle_time, submit_num, key, message = row
-            event = EVENTS.get(key, None)
+            event = self.EVENTS.get(key, None)
             if event is None:
                 continue
             event_time = mktime(strptime(ev_time, "%Y-%m-%dT%H:%M:%S"))
             task_id = name + self.TASK_ID_DELIM + cycle_time
             if cycle_time not in data:
-                data[cycle_time] = {"cycle_time": cycle_time,
-                                    "is_archived": False,
-                                    "tasks": {}}
+                data[cycle_time] = {"cycle_time": cycle_time, "tasks": {}}
             if name not in data[cycle_time]["tasks"]:
                 data[cycle_time]["tasks"][name] = []
             submits = data[cycle_time]["tasks"][name]
@@ -263,8 +340,9 @@ class CylcProcessor(SuiteEngineProcessor):
                         task_name, c, submit_num, key = names
                         if key == "status":
                             continue
-                    submit = datum["tasks"][task_name][int(submit_num) - 1]
-                    submit["files"][key] = {"n_bytes": size}
+                    if task_name in datum["tasks"]:
+                        submit = datum["tasks"][task_name][int(submit_num) - 1]
+                        submit["files"][key] = {"n_bytes": size}
                 tar.close()
                 continue
             # Check stats of job logs of this cycle
@@ -280,42 +358,6 @@ class CylcProcessor(SuiteEngineProcessor):
                             continue
                         n_bytes = os.stat(path).st_size
                         submit["files"][key] = {"n_bytes": n_bytes}
-            if cycle_time > log_archive_threshold: # str cmp
-                datum["is_archived"] = False
-                continue
-            # Pull from each remote host all job log files of this
-            # cycle time.
-            auths = self.get_suite_jobs_auths(suite_name, cycle_time)
-            log_dir_rel = self.get_task_log_dir_rel(suite_name)
-            log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
-            glob_pat = self.TASK_LOG_DELIM.join(["*", cycle_time, "*"])
-            for auth in auths:
-                r_glob = "%s:%s/%s" % (auth, log_dir_rel, glob_pat)
-                cmd = self.popen.get_cmd("rsync", r_glob, log_dir)
-                try:
-                    out, err = self.popen(*cmd)
-                except RosePopenError as e:
-                    self.handle_event(e, level=Reporter.WARN)
-            # Create the job log archive for this cycle time.
-            tar = tarfile.open(archive_file_name, "w:gz")
-            names = glob("job/" + glob_pat)
-            for name in names:
-                tar.add(name)
-            tar.close()
-            self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
-                                              archive_file_name))
-            # Remove local job log files of this cycle time.
-            for name in names:
-                self.fs_util.delete(name)
-            # Remove remote job log files of this cycle time.
-            for auth in auths:
-                r_glob = "%s/%s" % (log_dir_rel, glob_pat)
-                cmd = self.popen.get_cmd("ssh", auth, "rm", "-f", r_glob)
-                try:
-                    out, err = self.popen(*cmd)
-                except RosePopenError as e:
-                    self.handle_event(e, level=Reporter.WARN)
-            datum["is_archived"] = True
         return data
 
     def get_suite_jobs_auths(self, suite_name, cycle_time=None,
@@ -567,6 +609,9 @@ class CylcProcessor(SuiteEngineProcessor):
         if task_ids:
             for task_id in task_ids:
                 task_name, cycle_time = task_id.split(self.TASK_ID_DELIM)
+                archive_file_name = self.get_cycle_log_archive_name(cycle_time)
+                if os.path.exists(archive_file_name):
+                    continue
                 auths = self.get_suite_jobs_auths(suite_name, cycle_time,
                                                   task_name)
                 for auth in auths:
