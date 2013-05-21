@@ -76,6 +76,7 @@ class MenuBar(object):
         <separator name="sep_view_flags"/>
         <menuitem action="Flag no-metadata vars"/>
         <menuitem action="Flag optional vars"/>
+        <menuitem action="Flag opt config vars"/>
       </menu>
       <menu action="Metadata">
       <menuitem action="Reload metadata"/>
@@ -213,6 +214,8 @@ class MenuBar(object):
                        rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_PAGES),
                       ('View latent pages', None,
                        rose.config_editor.TOP_MENU_VIEW_LATENT_PAGES),
+                      ('Flag opt config vars', None,
+                       rose.config_editor.TOP_MENU_VIEW_FLAG_OPT_CONF_VARS),
                       ('Flag optional vars', None,
                        rose.config_editor.TOP_MENU_VIEW_FLAG_OPTIONAL_VARS),
                       ('Flag no-metadata vars', None,

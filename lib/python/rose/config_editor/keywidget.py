@@ -40,6 +40,8 @@ class KeyWidget(gtk.HBox):
                   gtk.STOCK_DIALOG_WARNING,
              rose.config_editor.FLAG_TYPE_FIXED:
                   gtk.STOCK_DIALOG_AUTHENTICATION,
+             rose.config_editor.FLAG_TYPE_OPT_CONF:
+                  gtk.STOCK_INDEX,
              rose.config_editor.FLAG_TYPE_OPTIONAL:
                   gtk.STOCK_ABOUT,
              rose.config_editor.FLAG_TYPE_NO_META:
@@ -164,6 +166,23 @@ class KeyWidget(gtk.HBox):
                 return self.add_flag(rose.config_editor.FLAG_TYPE_NO_META,
                                      rose.config_editor.VAR_FLAG_TIP_NO_META)
             return self.remove_flag(rose.config_editor.FLAG_TYPE_NO_META)
+        if show_mode == rose.config_editor.SHOW_MODE_FLAG_OPT_CONF:
+            if (should_show_mode and rose.config_editor.FLAG_TYPE_OPT_CONF in
+                self.my_variable.flags):
+                opts_info = self.my_variable.flags[
+                               rose.config_editor.FLAG_TYPE_OPT_CONF]
+                info_text = ""
+                info_format = rose.config_editor.VAR_FLAG_TIP_OPT_CONF_INFO
+                for opt, diff in sorted(opts_info.items()):
+                    info_text += info_format.format(opt, diff)
+                info_text = info_text.rstrip()
+                if info_text:
+                    text = rose.config_editor.VAR_FLAG_TIP_OPT_CONF.format(
+                                info_text)
+                    return self.add_flag(
+                                    rose.config_editor.FLAG_TYPE_OPT_CONF,
+                                    text)
+            return self.remove_flag(rose.config_editor.FLAG_TYPE_OPT_CONF)
 
     def _set_show_title(self, should_show_title):
         """Set the display of a variable title instead of the name."""

@@ -77,6 +77,7 @@ TOP_MENU_VIEW_LATENT_PAGES = "View Latent _Pages"
 TOP_MENU_VIEW_IGNORED_PAGES = "View All _Ignored Pages"
 TOP_MENU_VIEW_USER_IGNORED_PAGES = "View _User Ignored Pages"
 TOP_MENU_VIEW_WITHOUT_TITLES = "Hide _Titles"
+TOP_MENU_VIEW_FLAG_OPT_CONF_VARS = "Flag Opt _Config Variables"
 TOP_MENU_VIEW_FLAG_OPTIONAL_VARS = "Flag _Optional Variables"
 TOP_MENU_VIEW_FLAG_NO_METADATA_VARS = "Flag _No-metadata Variables"
 TOP_MENU_PAGE = "_Page"
@@ -186,6 +187,9 @@ ERROR_FILE_DELETE_FAILED = "Delete failed. {0}"
 ERROR_IMPORT_CLASS = "Could not retrieve class {0}"
 ERROR_IMPORT_WIDGET = "Could not import widget: {0}"
 ERROR_IMPORT_WIDGET_TITLE = "Error importing widget."
+ERROR_LOAD_OPT_CONFS = "Could not load optional configurations:\n{0}"
+ERROR_LOAD_OPT_CONF_FORMAT = "{0}\n    {1}: {2}\n"
+ERROR_LOAD_OPT_CONFS_TITLE = "Error loading opt configs"
 ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
 ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
@@ -247,15 +251,17 @@ META_PROP_INTERNAL = "_internal"
 
 # Setting visibility modes
 SHOW_MODE_FIXED = "fixed"
-SHOW_MODE_FLAG_OPTIONAL = "flag:optional"
 SHOW_MODE_FLAG_NO_META = "flag:no-meta"
+SHOW_MODE_FLAG_OPT_CONF = "flag:optional-conf"
+SHOW_MODE_FLAG_OPTIONAL = "flag:optional"
 SHOW_MODE_IGNORED = "ignored"
 SHOW_MODE_USER_IGNORED = "user-ignored"
 SHOW_MODE_LATENT = "latent"
 SHOW_MODE_NO_TITLE = "title"
 
-SHOULD_SHOW_FLAG_OPTIONAL_VARS = False
 SHOULD_SHOW_FLAG_NO_META_VARS = False
+SHOULD_SHOW_FLAG_OPT_CONF_VARS = True
+SHOULD_SHOW_FLAG_OPTIONAL_VARS = False
 SHOULD_SHOW_ALL_COMMENTS = False
 SHOULD_SHOW_FIXED_VARS = False
 SHOULD_SHOW_IGNORED_PAGES = False
@@ -456,8 +462,11 @@ TREE_PANEL_MODIFIED = " (modified)"
 TERMINAL_TIP_CLOSE = "Close terminal"
 VAR_COMMENT_TIP = "# {0}"
 VAR_FLAG_TIP_FIXED = "Fixed variable (only one allowed value)"
-VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
+VAR_FLAG_TIP_OPT_CONF = "Optional conf overrides:\n{0}"
+VAR_FLAG_TIP_OPT_CONF_INFO = "    {0}: {1}\n"
+VAR_FLAG_TIP_OPT_CONF_STATE = "{0}{1}={2}{3}={4}"
+VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_MENU_TIP_ERROR = "Error "
 VAR_MENU_TIP_LATENT = "This variable could be added to the configuration."
 VAR_MENU_TIP_WARNING = "Warning "
@@ -469,8 +478,9 @@ VAR_WIDGET_ENV_INFO = "Set to environment variable"
 FLAG_TYPE_DEFAULT = "Default flag"
 FLAG_TYPE_ERROR = "Error flag"
 FLAG_TYPE_FIXED = "Fixed flag"
-FLAG_TYPE_OPTIONAL = "Optional flag"
 FLAG_TYPE_NO_META = "No metadata flag"
+FLAG_TYPE_OPT_CONF = "Opt conf override flag"
+FLAG_TYPE_OPTIONAL = "Optional flag"
 
 # Relevant metadata properties
 
