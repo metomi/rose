@@ -38,8 +38,16 @@ class RadioButtonsValueWidget(gtk.HBox):
         self.hook = hook
 
         var_values = metadata[rose.META_PROP_VALUES]
+        
+        if metadata["value-titles"]:
+            vbox = gtk.VBox()
+            self.pack_start(vbox)
+            vbox.show()
+        
         for k, item in enumerate(var_values):
             button_label = str(item)
+            if metadata["value-titles"][k]:
+                button_label = metadata["value-titles"][k]
             if k == 0:
                 radio_button = gtk.RadioButton(group=None,
                                                label=button_label,
@@ -50,22 +58,29 @@ class RadioButtonsValueWidget(gtk.HBox):
                                                label=button_label,
                                                use_underline=False)
                 radio_button.real_value = item
+            if metadata["value-titles"][k]:
+                radio_button.set_tooltip_text("(value="+item+")")
             radio_button.set_active(False)
             if item == self.value:
                 radio_button.set_active(True)
             radio_button.connect('toggled', self.setter)
             radio_button.connect('button-press-event', self.setter)
             radio_button.connect('activate', self.setter)
-            self.pack_start(radio_button, False, False, 10)
+            
+            if metadata["value-titles"]:
+                vbox.pack_start(radio_button, False, False, 2)
+            else:
+                self.pack_start(radio_button, False, False, 10)
             radio_button.show()
             radio_button.connect('focus-in-event',
                                  self.hook.trigger_scroll)
+                
         self.grab_focus = lambda : self.hook.get_focus(radio_button)
         if len(var_values) == 1 and self.value == var_values[0]:
             radio_button.set_sensitive(False)
 
     def setter(self, widget, event=None):
         if widget.get_active():
-            self.value = widget.get_label()
+            self.value = widget.real_value
             self.set_value(self.value)
         return False
