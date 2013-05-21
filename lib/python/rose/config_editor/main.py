@@ -35,6 +35,7 @@ import shutil
 import sre_constants
 import sys
 import tempfile
+import traceback
 import warnings
 
 # Ignore add menu related warnings for now, but remove this later.
@@ -257,6 +258,7 @@ class MainController(object):
         self.updater.perform_startup_check()
         self.loader_update(rose.config_editor.LOAD_DONE,
                            self.data.top_level_name)
+        raise ImportError("contraband")
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
@@ -1488,12 +1490,14 @@ def spawn_window(config_directory_path=None):
         title = config_directory_path.split("/")[-1]
     splash_screen = rose.gtk.splash.SplashScreenProcess(logo, title,
                                                         number_of_events)
-    #try:
-    MainController(config_directory_path,
-                   loader_update=splash_screen)
-   # except BaseException as e:
-   #     splash_screen.stop()
-   #     raise e
+    try:
+        MainController(config_directory_path,
+                       loader_update=splash_screen)
+    except BaseException as e:
+        splash_screen.stop()
+        # Write out origin information.
+        traceback.print_tb(sys.exc_info()[2], 2)
+        raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
