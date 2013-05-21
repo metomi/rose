@@ -59,7 +59,7 @@ class ComboBoxValueWidget(gtk.HBox):
             else:
                 liststore.append([entry])
         comboboxentry.set_model(liststore)
-        if self.value not in self.metadata[rose.META_PROP_VALUES]:
+        if self.value not in var_values:
             pass #comboboxentry.set_active(0)
         else:
             index = self.metadata['values'].index(self.value)
