@@ -50,8 +50,14 @@ class ComboBoxValueWidget(gtk.HBox):
         comboboxentry.pack_start(cell)
         comboboxentry.set_wrap_width(self.MAX_COLS)
         comboboxentry.add_attribute(cell, 'text', 0)
-        for entry in self.metadata[rose.META_PROP_VALUES]:
-            liststore.append([entry])
+        
+        var_values = self.metadata[rose.META_PROP_VALUES]
+        var_titles = self.metadata.get(rose.META_PROP_VALUE_TITLES)
+        for k, entry in enumerate(var_values):
+            if var_titles is not None and var_titles[k]:
+                liststore.append([var_titles[k] + " (" + entry + ")"])
+            else:
+                liststore.append([entry])
         comboboxentry.set_model(liststore)
         if self.value not in self.metadata[rose.META_PROP_VALUES]:
             pass #comboboxentry.set_active(0)

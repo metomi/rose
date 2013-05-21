@@ -38,16 +38,17 @@ class RadioButtonsValueWidget(gtk.HBox):
         self.hook = hook
 
         var_values = metadata[rose.META_PROP_VALUES]
+        var_titles = metadata.get(rose.META_PROP_VALUE_TITLES)
         
-        if metadata["value-titles"]:
+        if var_titles:
             vbox = gtk.VBox()
             self.pack_start(vbox)
             vbox.show()
         
         for k, item in enumerate(var_values):
             button_label = str(item)
-            if metadata["value-titles"][k]:
-                button_label = metadata["value-titles"][k]
+            if var_titles is not None and var_titles[k]:
+                button_label = var_titles[k]
             if k == 0:
                 radio_button = gtk.RadioButton(group=None,
                                                label=button_label,
@@ -58,8 +59,8 @@ class RadioButtonsValueWidget(gtk.HBox):
                                                label=button_label,
                                                use_underline=False)
                 radio_button.real_value = item
-            if metadata["value-titles"][k]:
-                radio_button.set_tooltip_text("(value="+item+")")
+            if var_titles is not None and var_titles[k]:
+                radio_button.set_tooltip_text("("+item+")")
             radio_button.set_active(False)
             if item == self.value:
                 radio_button.set_active(True)
@@ -67,7 +68,7 @@ class RadioButtonsValueWidget(gtk.HBox):
             radio_button.connect('button-press-event', self.setter)
             radio_button.connect('activate', self.setter)
             
-            if metadata["value-titles"]:
+            if var_titles:
                 vbox.pack_start(radio_button, False, False, 2)
             else:
                 self.pack_start(radio_button, False, False, 10)
