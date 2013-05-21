@@ -412,6 +412,8 @@ class ConfigDataHelper(object):
             object_statuses = variable_statuses
         status_counts = object_statuses.items()
         status_counts.sort(lambda x, y: cmp(x[1], y[1]))
+        if not status_counts:
+            return rose.config.ConfigNode.STATE_NORMAL
         status = status_counts[0][0]
         if status == rose.variable.IGNORED_BY_USER:
             return rose.config.ConfigNode.STATE_USER_IGNORED
