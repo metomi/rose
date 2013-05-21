@@ -132,7 +132,8 @@ class CylcProcessor(SuiteEngineProcessor):
         
         hostnames = self.host_selector.expand(
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
+              ["localhost"])[0]
         hostnames = list(set(hostnames))
         hosts_str = conf.get_value(["rose-suite-run", "scan-hosts"])
         

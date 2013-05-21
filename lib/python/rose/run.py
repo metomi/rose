@@ -676,8 +676,8 @@ class SuiteRunner(Runner):
         
         known_hosts = self.host_selector.expand(
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
-        known_hosts += ["localhost"]
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
+              ["localhost"])[0]
         known_hosts = list(set(known_hosts))
         
         for known_host in known_hosts:
@@ -861,12 +861,8 @@ class SuiteRunner(Runner):
             #use the list of hosts on which you can run
             if opts.run_mode != "reload" and not opts.host:
                 hosts = []
-                node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
-                if node is None:
-                    known_hosts = ["localhost"]
-                else:
-                    known_hosts = self.host_selector.expand(
-                                                     node.value.split())[0]
+                v = conf.get_value(["rose-suite-run", "hosts"], "localhost")
+                known_hosts = self.host_selector.expand(v.split())[0]
                 for known_host in known_hosts:
                     if known_host not in hosts:
                         hosts.append(known_host)    
