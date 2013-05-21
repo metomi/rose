@@ -258,7 +258,6 @@ class MainController(object):
         self.updater.perform_startup_check()
         self.loader_update(rose.config_editor.LOAD_DONE,
                            self.data.top_level_name)
-        raise ImportError("contraband")
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
@@ -1466,7 +1465,7 @@ class MainController(object):
 
 # ----------------------- System functions -----------------------------------
 
-def spawn_window(config_directory_path=None):
+def spawn_window(config_directory_path=None, debug_mode=False):
     """Create a window and load the configuration into it. Run gtk."""
     RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
     rose.gtk.util.rc_setup(
@@ -1495,8 +1494,9 @@ def spawn_window(config_directory_path=None):
                        loader_update=splash_screen)
     except BaseException as e:
         splash_screen.stop()
-        # Write out origin information.
-        traceback.print_tb(sys.exc_info()[2], 2)
+        if debug_mode and isinstance(e, Exception):
+            # Write out origin information - this is otherwise lost.
+            traceback.print_exc()
         raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
@@ -1547,7 +1547,7 @@ if __name__ == '__main__':
         sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
-    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode")
+    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode", "profile")
     opts, args = opt_parser.parse_args()
     if args:
         opt_parser.print_usage(sys.stderr)
@@ -1572,11 +1572,12 @@ if __name__ == '__main__':
     if opts.new_mode:
         cwd = None
     rose.gtk.util.set_exception_hook(keep_alive=True)
-    if opts.debug_mode:
+    if opts.profile:
         f = tempfile.NamedTemporaryFile()
-        cProfile.runctx("spawn_window(cwd)", globals(), locals(), f.name)
+        cProfile.runctx("spawn_window(cwd, debug_mode=opts.debug_mode)",
+                        globals(), locals(), f.name)
         p = pstats.Stats(f.name)
         p.strip_dirs().sort_stats('cumulative').print_stats(200)
         f.close()
     else:
-        spawn_window(cwd)
+        spawn_window(cwd, debug_mode=opts.debug_mode)

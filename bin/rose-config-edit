@@ -41,5 +41,7 @@
 #        This option can be used repeatedly to load multiple paths.
 #     --new
 #        Launch, ignoring any configuration.
+#     --profile
+#        Developer option: display profiling information.
 #-------------------------------------------------------------------------------
 exec python -m rose.config_editor.main "$@"

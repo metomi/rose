@@ -335,6 +335,11 @@ class RoseOptionParser(OptionParser):
                        ["--print-format"],
                        {"metavar": "FORMAT",
                         "help": ("Specify the format for printing.")}],
+               "profile": [
+                       ["--profile"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Switch on profiling."}],
                "query": [
                        ["--query", "-Q"],
                        {"action": "store_true",
