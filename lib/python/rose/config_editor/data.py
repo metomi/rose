@@ -359,7 +359,7 @@ class ConfigDataManager(object):
             err_text = ""
             err_format = rose.config_editor.ERROR_LOAD_OPT_CONFS_FORMAT
             for path in sorted(opt_exceptions):
-                err = opt_conf_exceptions[path]
+                err = opt_exceptions[path]
                 err_text += err_format.format(path, type(e).__name__, e)
             err_text = err_text.rstrip()
             text = rose.config_editor.ERROR_LOAD_OPT_CONFS.format(err_text)
