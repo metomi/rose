@@ -186,6 +186,8 @@ class KeyWidget(gtk.HBox):
 
     def _set_show_title(self, should_show_title):
         """Set the display of a variable title instead of the name."""
+        if not self.my_variable.name:
+            return False
         if should_show_title:
             if (rose.META_PROP_TITLE in self.meta and 
                 self.entry.get_text() != self.meta[rose.META_PROP_TITLE]):
@@ -224,17 +226,39 @@ class KeyWidget(gtk.HBox):
             return
         self.var_flags.append(flag_type)
         stock_id = self.FLAG_ICON_MAP[flag_type]
+        event_box = gtk.EventBox()
+        event_box._flag_type = flag_type
+        hbox = gtk.HBox()
         image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
-        image._flag_type = flag_type
         image.set_tooltip_text(tooltip_text)
         image.show()
-        self.pack_end(image, expand=False, fill=False,
+        hbox.pack_start(image, expand=False, fill=False)
+        hbox.show()
+        event_box.add(hbox)
+        event_box.show()
+        event_box.connect("button-press-event", self._toggle_flag_label)
+        self.pack_end(event_box, expand=False, fill=False,
                       padding=rose.config_editor.SPACING_SUB_PAGE)
+
+    def _toggle_flag_label(self, event_box, event, text=None):
+        """Toggle a label describing the flag."""
+        flag_type = event_box._flag_type
+        for widget in event_box.get_child().get_children():
+            if isinstance(widget, gtk.Image) and text is None:
+                text = widget.get_tooltip_text()
+            if isinstance(widget, gtk.Label):
+                return event_box.get_child().remove(widget)
+        label = gtk.Label()
+        markup = rose.gtk.util.safe_str(text)
+        markup = rose.config_editor.VAR_FLAG_MARKUP.format(markup)
+        label.set_markup(markup)
+        label.show()
+        event_box.get_child().pack_start(label, expand=False, fill=False)
 
     def remove_flag(self, flag_type):
         """Remove the flag from the widget."""
         for widget in self.get_children():
-            if (isinstance(widget, gtk.Image) and
+            if (isinstance(widget, gtk.EventBox) and
                 getattr(widget, "_flag_type", None) == flag_type):
                 self.remove(widget)
         if flag_type in self.var_flags:
