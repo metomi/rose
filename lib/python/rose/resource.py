@@ -63,12 +63,13 @@ class ResourceLocator(object):
     def get_conf(self):
         """Return the site/user configuration root node."""
         if self.conf is None:
-            site_file = os.path.join(self.get_util_home(), "etc", "rose.conf")
-            user_file = os.path.join(
-                    os.path.expanduser("~"), ".metomi", "rose.conf")
+            paths = [os.path.join(self.get_util_home(), "etc"),
+                     os.path.join(os.path.expanduser("~"), ".metomi")]
+            paths += os.getenv("ROSE_CONF_PATH", "").split(os.pathsep)
             self.conf = ConfigNode()
             config_loader = ConfigLoader()
-            for file in [site_file, user_file]:
+            for path in paths:
+                file = os.path.join(path, "rose.conf")
                 if os.path.isfile(file) and os.access(file, os.R_OK):
                     config_loader.load_with_opts(file, self.conf)
         return self.conf
