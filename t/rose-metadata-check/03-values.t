@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 6
+tests 12
 #-------------------------------------------------------------------------------
 # Check values syntax checking.
 TEST_KEY=$TEST_KEY_BASE-ok
@@ -67,6 +67,72 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [V] rose.metadata_check.MetadataChecker: issues: 1
     namelist:values_nl1=my_fixed_var=values=
         Invalid syntax: 
+__ERROR__
+teardown
+#-------------------------------------------------------------------------------
+# Check value-titles syntax checking.
+TEST_KEY=$TEST_KEY_BASE-titles-ok
+setup
+init <<__META_CONFIG__
+[namelist:values_nl1=my_fixed_array]
+length=:
+values=red, blue
+value-titles=Red Colour, Blue Colour
+
+[namelist:values_nl1=my_char]
+values = 'orange'
+value-titles=Orange
+
+[namelist:values_nl1=my_num]
+values=56
+value-titles=fifty-six
+
+[namelist:values_nl1=my_raw]
+values = something"(")\,
+value-titles=Piece of random stuff
+
+[namelist:values_nl2]
+duplicate = true
+
+[namelist:values_nl2=my_num]
+values = 5
+value-titles=Five
+
+[namelist:values_nl2{mod1}=my_num]
+values=4
+value-titles=Four
+__META_CONFIG__
+run_pass "$TEST_KEY" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Check value-titles syntax checking (fail).
+TEST_KEY=$TEST_KEY_BASE-titles-bad
+setup
+init <<__META_CONFIG__
+[namelist:values_nl1=my_fixed_array]
+length=:
+values=red, blue
+value-titles=Red Colour
+
+[namelist:values_nl1=my_char]
+values = 'orange'
+value-titles=Orange, and Purple, and Pink, and Green
+
+[namelist:values_nl1=my_num]
+value-titles=Something
+__META_CONFIG__
+run_fail "$TEST_KEY" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+[V] rose.metadata_check.MetadataChecker: issues: 3
+    namelist:values_nl1=my_char=value-titles=Orange, and Purple, and Pink, and Green
+        Incompatible with values
+    namelist:values_nl1=my_fixed_array=value-titles=Red Colour
+        Incompatible with values
+    namelist:values_nl1=my_num=value-titles=Something
+        Incompatible with values
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------
