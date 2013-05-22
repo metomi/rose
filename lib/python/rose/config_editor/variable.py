@@ -68,6 +68,7 @@ class VariableWidget(object):
         self.errors = variable.error.keys()
         self.menuwidget = self.get_menuwidget(variable)
         self.generate_labelwidget()
+        self.generate_contentwidget()
         self.yoptions = gtk.FILL
         self.force_signal_ids = []
         self.is_modified = False
@@ -98,17 +99,34 @@ class VariableWidget(object):
         """Creates the label widget, a composite of key and menu widgets."""
         self.labelwidget = gtk.VBox()
         self.labelwidget.show()
-        table = gtk.Table(rows=2)
-        table.show()
-        table.attach(self.menuwidget, 0, 1, 0, 1, xoptions=gtk.SHRINK,
-                     yoptions=gtk.SHRINK)
-        table.attach(self.keywidget, 1, 2, 0, 1, xoptions=gtk.SHRINK,
-                     yoptions=gtk.SHRINK)
         self.labelwidget.set_ignored = self.keywidget.set_ignored
-        self.labelwidget.pack_start(table, expand=False, fill=False)
+        menu_offset = self.menuwidget.size_request()[1] / 2
+        key_offset = self.keywidget.get_centre_height() / 2
+        menu_vbox = gtk.VBox()
+        menu_vbox.pack_start(self.menuwidget, expand=False, fill=False,
+                             padding=max([(key_offset - menu_offset), 0]))
+        menu_vbox.show()
+        key_vbox = gtk.VBox()
+        key_vbox.pack_start(self.keywidget, expand=False, fill=False,
+                            padding=max([(menu_offset - key_offset) / 2, 0]))
+        key_vbox.show()
+        label_content_hbox = gtk.HBox()
+        label_content_hbox.pack_start(menu_vbox, expand=False, fill=False)
+        label_content_hbox.pack_start(key_vbox, expand=False, fill=False)
+        label_content_hbox.show()
         event_box = gtk.EventBox()
         event_box.show()
+        self.labelwidget.pack_start(label_content_hbox, expand=True, fill=True)
         self.labelwidget.pack_start(event_box, expand=True, fill=True)
+
+    def generate_contentwidget(self):
+        """Create the content widget, a vbox-packed valuewidget."""
+        self.contentwidget = gtk.VBox()
+        self.contentwidget.show()
+        content_event_box = gtk.EventBox()
+        content_event_box.show()
+        self.contentwidget.pack_start(self.valuewidget, expand=False, fill=False)
+        self.contentwidget.pack_start(content_event_box, expand=True, fill=True)
 
     def _valuewidget_set_value(self, value):
         # This is called by a valuewidget to change the variable value.
@@ -216,8 +234,8 @@ class VariableWidget(object):
                              key_col, key_col + 1,
                              row_index, row_index + 1,
                              xoptions=gtk.FILL,
-                             yoptions=gtk.EXPAND|gtk.FILL)
-            container.attach(self.valuewidget,
+                             yoptions=gtk.SHRINK)
+            container.attach(self.contentwidget,
                              key_col + 1, key_col + 2,
                              row_index, row_index + 1,
                              xpadding=5,
@@ -229,7 +247,7 @@ class VariableWidget(object):
         elif isinstance(container, gtk.VBox):
             container.pack_start(self.labelwidget, expand=False, fill=True,
                                  padding=5)
-            container.pack_start(self.valuewidget, expand=True, fill=True,
+            container.pack_start(self.contentwidget, expand=True, fill=True,
                                  padding=10)
             self.valuewidget.trigger_scroll = (
                              lambda b, e: self.force_scroll(b, container))
@@ -283,7 +301,7 @@ class VariableWidget(object):
 
     def get_children(self):
         """Method that returns child widgets - as in some gtk Objects."""
-        return [self.labelwidget, self.valuewidget]
+        return [self.labelwidget, self.contentwidget]
 
     def hide(self):
         for widget in self.get_children():

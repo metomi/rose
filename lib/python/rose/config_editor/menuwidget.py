@@ -168,6 +168,10 @@ class MenuWidget(gtk.HBox):
         self._set_hover_over(variable)
         self.button.show()
 
+    def get_centre_height(self):
+        """Return the vertical displacement of the centre of this widget."""
+        return (self.size_request()[1] / 2)
+
     def refresh(self, variable=None):
         """Reload the contents."""
         if variable is not None:
