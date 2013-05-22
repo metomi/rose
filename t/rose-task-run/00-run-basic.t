@@ -17,24 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose rug-brief-tour", without site/user configurations.
+# Test "rose task-run" and "rose task-env", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 export ROSE_CONF_IGNORE=true
 
 #-------------------------------------------------------------------------------
-tests 5
+tests 43
 #-------------------------------------------------------------------------------
-# Run rose rug-brief-tour command
+# Run the suite.
 TEST_KEY=$TEST_KEY_BASE
-run_pass "$TEST_KEY" rose rug-brief-tour
-#-------------------------------------------------------------------------------
-# Run the suite
-TEST_KEY=$TEST_KEY_BASE-suite-run
-mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-suite.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol
+run_pass "$TEST_KEY" \
+    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
@@ -51,35 +47,44 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-# See if all tasks are OK
-TEST_KEY=$TEST_KEY_BASE-tasks
-run_pass "$TEST_KEY" sqlite3 "$HOME/cylc-run/$NAME/cylc-suite.db" \
-    'SELECT name,cycle,submit_num FROM task_events
-         WHERE event=="execution succeeded"
-         ORDER BY name,cycle,submit_num;'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-fcm_make|2013010100|1
-fred_hello_world|2013010100|1
-fred_hello_world|2013010106|1
-fred_hello_world|2013010112|1
-fred_hello_world|2013010118|1
-fred_hello_world|2013010200|1
-locate_fred|2013010100|1
-locate_fred|2013010106|1
-locate_fred|2013010112|1
-locate_fred|2013010118|1
-locate_fred|2013010200|1
-my_hello_mars|2013010100|1
-my_hello_mars|2013010112|1
-my_hello_mars|2013010200|1
-my_hello_world|2013010100|1
-my_hello_world|2013010106|1
-my_hello_world|2013010112|1
-my_hello_world|2013010118|1
-my_hello_world|2013010200|1
-__OUT__
+MY_PATH=
+for P in $(ls -d -r $SUITE_RUN_DIR/etc/my-path/*); do
+    if [[ -n $MY_PATH ]]; then
+        MY_PATH="$P:$MY_PATH"
+    else
+        MY_PATH=$P
+    fi
+done
+PREV_CYCLE=
+for CYCLE in 2013010100 2013010112 2013010200; do
+    TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
+    TASK=my_task_1
+    FILE=$HOME/cylc-run/$NAME/log/job/$TASK.$CYCLE.1.txt
+    file_test "$TEST_KEY" $FILE
+    file_grep "$TEST_KEY-ROSE_SUITE_DIR" "ROSE_SUITE_DIR=$SUITE_RUN_DIR" $FILE
+    file_grep "$TEST_KEY-ROSE_SUITE_DIR_REL" \
+        "ROSE_SUITE_DIR_REL=${SUITE_RUN_DIR#$HOME/}" $FILE
+    file_grep "$TEST_KEY-ROSE_SUITE_NAME" "ROSE_SUITE_NAME=$NAME" $FILE
+    file_grep "$TEST_KEY-ROSE_TASK_NAME" "ROSE_TASK_NAME=$TASK" $FILE
+    file_grep "$TEST_KEY-ROSE_TASK_CYCLE_TIME" \
+        "ROSE_TASK_CYCLE_TIME=$CYCLE" $FILE
+    file_grep "$TEST_KEY-ROSE_TASK_LOG_ROOT" \
+        "ROSE_TASK_LOG_ROOT=${FILE%.txt}" $FILE
+    file_grep "$TEST_KEY-ROSE_DATA" "ROSE_DATA=$SUITE_RUN_DIR/share/data" $FILE
+    file_grep "$TEST_KEY-ROSE_DATAC" \
+        "ROSE_DATAC=$SUITE_RUN_DIR/share/data/$CYCLE" $FILE
+    if [[ -n $PREV_CYCLE ]]; then
+        file_grep "$TEST_KEY-ROSE_DATACT12H" \
+            "ROSE_DATACT12H=$SUITE_RUN_DIR/share/data/$PREV_CYCLE" $FILE
+    fi
+    file_grep "$TEST_KEY-ROSE_ETC" "ROSE_ETC=$SUITE_RUN_DIR/etc" $FILE
+    file_grep "$TEST_KEY-ROSE_TASK_PREFIX" "ROSE_TASK_PREFIX=my" $FILE
+    file_grep "$TEST_KEY-ROSE_TASK_SUFFIX" "ROSE_TASK_SUFFIX=1" $FILE
+    file_grep "$TEST_KEY-MY_PATH" "MY_PATH=$MY_PATH" $FILE
+    PREV_CYCLE=$CYCLE
+done
 #-------------------------------------------------------------------------------
 if $OK; then
-    rm -r $SUITE_RUN_DIR
+    : # rm -r $SUITE_RUN_DIR
 fi
 exit 0

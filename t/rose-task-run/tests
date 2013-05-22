@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 # 
@@ -17,28 +17,4 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# NAME
-#     rose config-dump
-#
-# SYNOPSIS
-#     rose config-dump
-#     rose config-dump -C /path/to/conf/dir
-#     rose config-dump -f /path/to/file1 -f /path/to/file2
-#
-# DESCRIPTION
-#     Re-dump Rose configuration files in the common format.
-#
-#     Load and dump "rose-*.conf" files in place.
-#
-#     By default, it recursively loads and dumps all rose-*.conf files in the
-#     current working directory.
-#
-# OPTIONS
-#     --config=DIR, -C DIR
-#         Specify a configuration directory. (default=$PWD)
-#     --file=FILE, -f FILE
-#         Each of these specifies a configuration file.
-#     --quiet, -q
-#         Decrement verbosity. Do not report modified files.
-#-------------------------------------------------------------------------------
-exec python -m rose.config_dump "$@"
+prove -r $(dirname $0) "$@"

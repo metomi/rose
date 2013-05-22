@@ -26,6 +26,10 @@
 # DESCRIPTION
 #     Provide an environment to run a suite task.
 #
+#     Provides environment variables documented in "rose task-env". It is worth
+#     noting that if the environment variables are already provided by "rose
+#     task-env", this command will not override them.
+#
 #     Normally, the suite task will select a Rose application configuration
 #     that has the same name as the task. This can be overridden by the
 #     --app-key=KEY option or the ROSE_TASK_APP environment variable.
@@ -41,12 +45,6 @@
 #         specified, it will attempt use the task name to look for a builtin
 #         application. If the task name does not match a builtin application,
 #         the default MODE is to run the command.
-#     --path=PATTERN, -P PATTERN
-#         Each of this specify a glob pattern for paths to prepend to the PATH
-#         environment variable. If a relative path is given, it is relative to
-#         $ROSE_SUITE_DIR. An empty value resets the default and any previous
-#         --path=PATTERN settings.
-#         (default="share/fcm[_-]make*/*/bin")
 #
 # ENVIRONMENT VARIABLES
 #     All environment variables of "rose app-run" and "rose task-env" are
