@@ -31,7 +31,9 @@ run_pass "$TEST_KEY" rose rug-brief-tour
 #-------------------------------------------------------------------------------
 # Run the suite
 TEST_KEY=$TEST_KEY_BASE-suite-run
-NAME="rose-test-suite-$TEST_KEY_BASE"
+mkdir -p $HOME/cylc-run
+SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-suite.XXXXXX')
+NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
@@ -43,6 +45,7 @@ while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
 done
 if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
+    exit 1
 else
     OK=true
     pass "$TEST_KEY"
@@ -77,6 +80,6 @@ my_hello_world|2013010200|1
 __OUT__
 #-------------------------------------------------------------------------------
 if $OK; then
-    rm -r $HOME/cylc-run/$NAME
+    rm -r $SUITE_RUN_DIR
 fi
 exit 0

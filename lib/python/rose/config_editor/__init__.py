@@ -188,6 +188,11 @@ ERROR_IMPORT_WIDGET = "Could not import widget: {0}"
 ERROR_IMPORT_WIDGET_TITLE = "Error importing widget."
 ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
+ERROR_METADATA_CHECKER_TITLE = "Flawed metadata warning"
+ERROR_METADATA_CHECKER_TEXT = ( 
+                       "{0} problem(s) found in metadata at {1}.\n" +
+                       "Some functionality has been switched off.\n\n" +
+                       "Run rose metadata-check for more info.")
 ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
 ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
 ERROR_NO_OUTPUT = "No output found for {0}"
@@ -199,6 +204,8 @@ ERROR_REMOVE_FILE = "Could not remove file {0}: {1}"
 ERROR_RUN_MACRO_TITLE = "Error in running {0}"
 ERROR_SUITE_RUN_INVALID = "Could not run suite - no suite config loaded."
 ERROR_SAVE_PATH_FAIL = "Could not save to path!\n {0}"
+ERROR_SAVE_BLANK = "Cannot save configuration {0}.\nUnnamed variable in {1}"
+ERROR_SAVE_TITLE = "Error saving {0}"
 IGNORED_STATUS_CONFIG = "from configuration."
 IGNORED_STATUS_DEFAULT = "from default."
 IGNORED_STATUS_MANUAL = "from manual intervention."
