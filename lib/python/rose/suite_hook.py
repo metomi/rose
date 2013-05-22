@@ -65,12 +65,11 @@ class RoseSuiteHook(object):
         4. If "should_shutdown", shut down the suite.
 
         """
-        # Retrieve log
+        # Retrieve log and generate code view
+        tasks = []
         if task:
-            self.suite_log_view_generator.update_job_log(suite, [task])
-
-        # Generate suite log view
-        self.suite_log_view_generator(suite)
+            tasks = [task]
+        self.suite_log_view_generator(suite, tasks)
 
         # Send email notification if required
         if should_mail:
@@ -111,7 +110,7 @@ def main():
             for value in getattr(opts, key):
                 values.extend(value.split(","))
         setattr(opts, key, values)
-    report = Reporter(opts.verbosity - opts.quietness)
+    report = Reporter(opts.verbosity - opts.quietness - 1) # Reduced default
     popen = RosePopener(event_handler=report)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
             event_handler=report, popen=popen)

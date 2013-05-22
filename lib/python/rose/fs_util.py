@@ -35,6 +35,7 @@ class FileSystemEvent(Event):
     INSTALL = "install"
     RENAME = "rename"
     SYMLINK = "symlink"
+    TOUCH = "touch"
 
     def __init__(self, action, target, source=None):
         self.action = action
@@ -146,3 +147,9 @@ class FileSystemUtil(object):
             os.symlink(source, target)
             event = FileSystemEvent(FileSystemEvent.SYMLINK, source, target)
             self.handle_event(event)
+
+    def touch(self, path):
+        """Touch a file."""
+        open(path, "a").close()
+        os.utime(path, None)
+        self.handle_event(FileSystemEvent(FileSystemEvent.TOUCH, path))

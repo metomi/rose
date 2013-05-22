@@ -245,6 +245,10 @@ class SuiteEngineProcessor(object):
             host_selector = HostSelector(event_handler, popen)
         self.host_selector = host_selector
 
+    def archive_job_logs(self, suite_name, log_archive_threshold):
+        """Archive cycle job logs older than a threshold."""
+        raise NotImplementedError()
+
     def clean(self, suite_name, host=None):
         """Remove items created by the previous run of a suite."""
         raise NotImplementedError()
