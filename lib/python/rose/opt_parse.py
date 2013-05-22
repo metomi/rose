@@ -183,6 +183,10 @@ class RoseOptionParser(OptionParser):
                        ["--latest"],
                        {"action": "store_true",
                         "help": "Print the latest ID in the repository."}],
+               "load_on_demand": [
+                       ["--load-on-demand"],
+                       {"action": "store_true",
+                        "help": "Load app configs on demand."}],
                "local_only": [
                        ["--local-only"],
                        {"action": "store_true",

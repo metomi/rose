@@ -219,7 +219,7 @@ class MainController(object):
                              self._refresh_metadata_if_on,
                              self.is_pluggable)
 
-        self.data.load(config_directory, config_objs)
+        self.data.load(config_directory, config_objs) #this is the point at which data.config is populated...
 
         self.loader_update(rose.config_editor.LOAD_STATUSES,
                            self.data.top_level_name)
@@ -1567,7 +1567,8 @@ if __name__ == '__main__':
         sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
-    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode")
+    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode", 
+                              "load_on_demand")
     opts, args = opt_parser.parse_args()
     if args:
         opt_parser.print_usage(sys.stderr)
