@@ -69,6 +69,7 @@ META_PROP_TRIGGER = "trigger"
 META_PROP_TYPE = "type"
 META_PROP_URL = "url"
 META_PROP_VALUES = "values"
+META_PROP_VALUE_TITLES = "value-titles"
 META_PROP_WIDGET = "widget"
 
 # Value used to denote "on" for a metadata setting.
