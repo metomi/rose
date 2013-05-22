@@ -24,7 +24,7 @@
 #     rose metadata-check [OPTIONS] [ID ...]
 #
 # DESCRIPTION
-#     Check metadata validity.
+#     Validate configuration metadata.
 #
 # OPTIONS
 #     --config=DIR, -C DIR
