@@ -37,7 +37,7 @@
 #     --config=DIR, -C DIR
 #         Specify a configuration directory. (default=$PWD)
 #     --file=FILE, -f FILE
-#         Each of this specifies a configuration file.
+#         Each of these specifies a configuration file.
 #     --quiet, -q
 #         Decrement verbosity. Do not report modified files.
 #-------------------------------------------------------------------------------

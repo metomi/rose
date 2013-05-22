@@ -54,7 +54,7 @@ MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"),
                              rose.META_DIR_MACRO)
 MACRO_EXT = ".py"
 MACRO_OUTPUT_HELP = "    # {0}"
-MACRO_OUTPUT_ID = "[{0}] {2}"
+MACRO_OUTPUT_ID = "[{0}] {1}"
 MACRO_OUTPUT_TRANSFORM_CHANGES = "{0}: changes: {1}\n"
 MACRO_OUTPUT_VALIDATE_ISSUES = "{0}: issues: {1}\n"
 MACRO_OUTPUT_WARNING_ISSUES = "{0}: warnings: {1}\n"
@@ -562,8 +562,7 @@ def run_macros(app_config, meta_config, config_name, macro_names,
     if not macro_names:
         for module_name, class_name, method, help in macro_tuples:
             macro_name = ".".join([module_name, class_name])
-            macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], config_name,
-                                              macro_name)
+            macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], macro_name)
             if opt_quietness:
                 print macro_id
             else:
@@ -608,33 +607,13 @@ def run_macros(app_config, meta_config, config_name, macro_names,
                     problem_list = config_problem_dict[macro_name]
                     sort = rose.config.sort_settings
                     
-                    problem_list.sort(lambda x, y: cmp(x.option, y.option))
-                    problem_list.sort(lambda x, y: sort(x.section, y.section))
+                    problem_list.sort(report_sort)
                     method_id = VALIDATE_METHOD.upper()[0]
-                    macro_id = MACRO_OUTPUT_ID.format(method_id, config_name,
-                                                      macro_name)
-                    warnings = []
-                    problems = []
-                    for rep in problem_list:  # MacroReport instance
-                        if rep.is_warning:
-                            warnings.append(rep)
-                            continue
-                        problems.append(rep)
-                    header = MACRO_OUTPUT_VALIDATE_ISSUES
-                    header = header.format(macro_id, len(problems))
-                    sys.stderr.write(header)
-                    for rep in problems:
-                        out = PROBLEM_ENTRY.format(rep.section, rep.option,
-                                                   rep.value, rep.info)
-                        sys.stderr.write(out)
-                    if warnings:
-                        header = MACRO_OUTPUT_WARNING_ISSUES
-                        header = header.format(macro_id, len(warnings))
-                        sys.stderr.write(header)
-                    for rep in warnings:
-                        out = PROBLEM_ENTRY.format(rep.section, rep.option,
-                                                   rep.value, rep.info)
-                        sys.stderr.write(out)
+                    macro_id = MACRO_OUTPUT_ID.format(method_id, macro_name)
+                    sys.stderr.write(get_reports_as_text(
+                                                 problem_list,
+                                                 macro_id,
+                                                 is_from_transform=False))
 
     # Run any transform macros.
     if TRANSFORM_METHOD in macros_by_type:
@@ -645,6 +624,50 @@ def run_macros(app_config, meta_config, config_name, macro_names,
                               opt_conf_dir=opt_conf_dir,
                               opt_output_dir=opt_output_dir)
     sys.exit(RC)
+
+
+def report_sort(report1, report2):
+    """Sort MacroReport objects by section and option."""
+    sect1 = report1.section
+    sect2 = report2.section
+    if sect1 == sect2:
+        opt1 = report1.option
+        opt2 = report2.option
+        if opt1 is None or opt2 is None:
+            return cmp(opt1, opt2)
+        return rose.config.sort_settings(opt1, opt2)
+    return rose.config.sort_settings(sect1, sect2)
+
+
+def get_reports_as_text(reports, macro_id, is_from_transform=False):
+    """Translate reports into nicely formatted text."""
+    warnings = []
+    issues = []
+    text = ""
+    for rep in reports:  # MacroReport instance
+        if rep.is_warning:
+            warnings.append(rep)
+            continue
+        issues.append(rep)
+    if is_from_transform:
+        header = MACRO_OUTPUT_TRANSFORM_CHANGES
+    else:
+        header = MACRO_OUTPUT_VALIDATE_ISSUES
+    header = header.format(macro_id, len(issues))
+    text += header
+    for rep in issues:
+        out = PROBLEM_ENTRY.format(rep.section, rep.option,
+                                    rep.value, rep.info)
+        text += out
+    if warnings:
+        header = MACRO_OUTPUT_WARNING_ISSUES
+        header = header.format(macro_id, len(warnings))
+        text += header
+    for rep in warnings:
+        out = PROBLEM_ENTRY.format(rep.section, rep.option,
+                                    rep.value, rep.info)
+        text += out
+    return text
 
 
 def _run_transform_macros(macros, config_name, app_config, meta_config,
@@ -668,40 +691,25 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
             not isinstance(change_list, list)):
             raise ValueError(err_bad_return_value)
         method_id = TRANSFORM_METHOD.upper()[0]
-        macro_id = MACRO_OUTPUT_ID.format(method_id, config_name,
-                                          transformer_macro)
+        macro_id = MACRO_OUTPUT_ID.format(method_id, transformer_macro)
         _handle_transform(app_config, new_config, change_list, macro_id,
                           opt_conf_dir, opt_output_dir, opt_non_interactive)
 
 
 def _handle_transform(app_config, new_config, change_list, macro_id,
                       opt_conf_dir, opt_output_dir, opt_non_interactive):
-    changes = []
-    warnings = []
     user_allowed_changes = False
-    for rep in change_list:  # MacroReport instance
-        if rep.is_warning:
-            warnings.append(rep)
+    has_changes = any([not i.is_warning for i in change_list])
+    sys.stdout.write(get_reports_as_text(change_list, macro_id,
+                                         is_from_transform=True))
+    if has_changes:
+        if opt_non_interactive:
+            user_allowed_changes = True
         else:
-            changes.append(rep)
-    for reps, header, out in [(changes, MACRO_OUTPUT_TRANSFORM_CHANGES,
-                               SETTING_ID),
-                              (warnings, MACRO_OUTPUT_WARNING_ISSUES,
-                               SETTING_ID)]:
-        if not reps:
-            continue
-        sys.stdout.write(header.format(macro_id, len(reps)))
-        for rep in reps:  # MacroReport instances
-            this_out = out.format(
-                        rep.section, rep.option, rep.value, rep.info)
-            sys.stdout.write(this_out + "\n")
-    if not opt_non_interactive and changes:
-        user_allowed_changes = _get_user_accept()
-    else:
-        user_allowed_changes = False
-    if user_allowed_changes or opt_non_interactive:
-        app_config = new_config
-        dump_config(app_config, opt_conf_dir, opt_output_dir)
+            user_allowed_changes = _get_user_accept()
+        if user_allowed_changes:
+            app_config = new_config
+            dump_config(app_config, opt_conf_dir, opt_output_dir)
             
 
 def _get_user_accept():
@@ -715,6 +723,7 @@ def _get_user_accept():
 
 
 def dump_config(app_config, opt_conf_dir, opt_output_dir=None):
+    """Dump the config in a standard form."""
     pretty_format_config(app_config)
     if opt_output_dir is None:
         directory = opt_conf_dir

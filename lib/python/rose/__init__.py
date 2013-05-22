@@ -61,6 +61,7 @@ META_DIR_WIDGET = "widget"
 META_PROP_COMPULSORY = "compulsory"
 META_PROP_DESCRIPTION = "description"
 META_PROP_DUPLICATE = "duplicate"
+META_PROP_FAIL_IF = "fail-if"
 META_PROP_HELP = "help"
 META_PROP_LENGTH = "length"
 META_PROP_MACRO = 'macro'
@@ -73,14 +74,19 @@ META_PROP_TRIGGER = "trigger"
 META_PROP_TYPE = "type"
 META_PROP_URL = "url"
 META_PROP_VALUES = "values"
+META_PROP_VALUE_TITLES = "value-titles"
+META_PROP_WARN_IF = "warn-if"
 META_PROP_WIDGET = "widget"
 
 # Value used to denote "on" for a metadata setting.
 META_PROP_VALUE_TRUE = "true"
+META_PROP_VALUE_FALSE = "false"  # Not actually used.
 
 # Allowed type settings (that actually do something)
+# "meta" and "file" are for internal use.
 TYPE_VALUES = ["boolean", "character", "integer",
-               "logical", "raw", "real", "string"]
+               "logical", "quoted", "raw", "real",
+               "meta", "file"]
  
 # Preferred Fortran logical and environment boolean syntax
 TYPE_BOOLEAN_VALUE_FALSE = "false"
