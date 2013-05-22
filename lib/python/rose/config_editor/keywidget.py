@@ -29,7 +29,7 @@ import rose.config_editor
 import rose.variable
 
 
-class KeyWidget(gtk.HBox):
+class KeyWidget(gtk.VBox):
 
     """This class generates a label or entry box for a variable name."""
 
@@ -40,6 +40,8 @@ class KeyWidget(gtk.HBox):
                   gtk.STOCK_DIALOG_WARNING,
              rose.config_editor.FLAG_TYPE_FIXED:
                   gtk.STOCK_DIALOG_AUTHENTICATION,
+             rose.config_editor.FLAG_TYPE_OPT_CONF:
+                  gtk.STOCK_INDEX,
              rose.config_editor.FLAG_TYPE_OPTIONAL:
                   gtk.STOCK_ABOUT,
              rose.config_editor.FLAG_TYPE_NO_META:
@@ -54,6 +56,9 @@ class KeyWidget(gtk.HBox):
                  show_modes):
         super(KeyWidget, self).__init__(homogeneous=False, spacing=0)
         self.my_variable = variable
+        self.hbox = gtk.HBox()
+        self.hbox.show()
+        self.pack_start(self.hbox, expand=False, fill=False)
         self.var_ops = var_ops
         self.meta = variable.metadata
         self.launch_help = launch_help_func
@@ -63,7 +68,7 @@ class KeyWidget(gtk.HBox):
         self._last_var_comments = None
         self.ignored_label = gtk.Label()
         self.ignored_label.show()
-        self.pack_start(self.ignored_label, expand=False, fill=False)
+        self.hbox.pack_start(self.ignored_label, expand=False, fill=False)
         self.set_ignored()
         if self.my_variable.name != '':
             self.entry = gtk.Label()
@@ -83,10 +88,10 @@ class KeyWidget(gtk.HBox):
                           lambda b, w: self._handle_enter(b))
         event_box.connect('leave-notify-event',
                           lambda b, w: self._handle_leave(b))
-        self.pack_start(event_box, expand=True, fill=True,
-                        padding=0)
+        self.hbox.pack_start(event_box, expand=True, fill=True,
+                             padding=0)
         self.comments_box = gtk.HBox()
-        self.pack_start(self.comments_box, expand=False, fill=False)
+        self.hbox.pack_start(self.comments_box, expand=False, fill=False)
         self.grab_focus = lambda : self.entry.grab_focus()
         self.set_sensitive(True)
         self.set_sensitive = self.entry.set_sensitive 
@@ -101,6 +106,10 @@ class KeyWidget(gtk.HBox):
                           rose.config_editor.VAR_FLAG_TIP_FIXED)
         event_box.show()
         self.show()
+
+    def get_centre_height(self):
+        """Return the vertical displacement of the centre of this widget."""
+        return (self.entry.size_request()[1] / 2)
 
     def handle_launch_help(self, widget, event):
         """Handle launching help."""
@@ -164,9 +173,28 @@ class KeyWidget(gtk.HBox):
                 return self.add_flag(rose.config_editor.FLAG_TYPE_NO_META,
                                      rose.config_editor.VAR_FLAG_TIP_NO_META)
             return self.remove_flag(rose.config_editor.FLAG_TYPE_NO_META)
+        if show_mode == rose.config_editor.SHOW_MODE_FLAG_OPT_CONF:
+            if (should_show_mode and rose.config_editor.FLAG_TYPE_OPT_CONF in
+                self.my_variable.flags):
+                opts_info = self.my_variable.flags[
+                               rose.config_editor.FLAG_TYPE_OPT_CONF]
+                info_text = ""
+                info_format = rose.config_editor.VAR_FLAG_TIP_OPT_CONF_INFO
+                for opt, diff in sorted(opts_info.items()):
+                    info_text += info_format.format(opt, diff)
+                info_text = info_text.rstrip()
+                if info_text:
+                    text = rose.config_editor.VAR_FLAG_TIP_OPT_CONF.format(
+                                info_text)
+                    return self.add_flag(
+                                    rose.config_editor.FLAG_TYPE_OPT_CONF,
+                                    text)
+            return self.remove_flag(rose.config_editor.FLAG_TYPE_OPT_CONF)
 
     def _set_show_title(self, should_show_title):
         """Set the display of a variable title instead of the name."""
+        if not self.my_variable.name:
+            return False
         if should_show_title:
             if (rose.META_PROP_TITLE in self.meta and 
                 self.entry.get_text() != self.meta[rose.META_PROP_TITLE]):
@@ -205,17 +233,42 @@ class KeyWidget(gtk.HBox):
             return
         self.var_flags.append(flag_type)
         stock_id = self.FLAG_ICON_MAP[flag_type]
+        event_box = gtk.EventBox()
+        event_box._flag_type = flag_type
         image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
-        image._flag_type = flag_type
         image.set_tooltip_text(tooltip_text)
         image.show()
-        self.pack_end(image, expand=False, fill=False,
-                      padding=rose.config_editor.SPACING_SUB_PAGE)
+        event_box.add(image)
+        event_box.show()
+        event_box.connect("button-press-event", self._toggle_flag_label)
+        self.hbox.pack_end(event_box, expand=False, fill=False,
+                           padding=rose.config_editor.SPACING_SUB_PAGE)
+
+    def _toggle_flag_label(self, event_box, event, text=None):
+        """Toggle a label describing the flag."""
+        flag_type = event_box._flag_type
+        if text is None:
+            text = event_box.get_child().get_tooltip_text()
+        for widget in self.get_children():
+            if (hasattr(widget, "_flag_type") and
+                widget._flag_type == flag_type):
+                return self.remove(widget)
+        label = gtk.Label()
+        markup = rose.gtk.util.safe_str(text)
+        markup = rose.config_editor.VAR_FLAG_MARKUP.format(markup)
+        label.set_markup(markup)
+        label.show()
+        hbox = gtk.HBox()
+        hbox._flag_type = flag_type
+        hbox.pack_start(label, expand=False, fill=False,
+                        padding=rose.config_editor.SPACING_SUB_PAGE)
+        hbox.show()
+        self.pack_start(hbox, expand=False, fill=False)
 
     def remove_flag(self, flag_type):
         """Remove the flag from the widget."""
         for widget in self.get_children():
-            if (isinstance(widget, gtk.Image) and
+            if (isinstance(widget, gtk.EventBox) and
                 getattr(widget, "_flag_type", None) == flag_type):
                 self.remove(widget)
         if flag_type in self.var_flags:

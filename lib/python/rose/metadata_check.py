@@ -33,6 +33,7 @@ import rose.opt_parse
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
 INVALID_IMPORT = "Could not import {0}: {1}"
+INCOMPATIBLE = "Incompatible with {0}"
 INVALID_OBJECT = "Not found: {0}"
 INVALID_RANGE_RULE_IDS = "Inter-variable comparison not allowed in range."
 INVALID_SYNTAX = "Invalid syntax: {0}"
@@ -47,7 +48,7 @@ def get_allowed_metadata_properties():
     properties = []
     for key in dir(rose):
         if (key.startswith("META_PROP_") and
-            not key.startswith("META_PROP_VALUE_")):
+            key not in ["META_PROP_VALUE_TRUE", "META_PROP_VALUE_FALSE"]):
             properties.append(getattr(rose, key))
     return properties
 
@@ -136,6 +137,21 @@ def _check_range(value):
             return str(e)
         except Exception as e:
             return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
+
+
+def _check_value_titles(title_value, values_value):
+    try:
+        title_list = rose.variable.array_split(title_value,
+                                               only_this_delim=",")
+    except Exception as e:
+        return INVALID_SYNTAX.format(type(e).__name__ + ": " + str(e))
+    try:
+        value_list = rose.variable.array_split(values_value,
+                                               only_this_delim=",")
+    except Exception as e:
+        return INCOMPATIBLE.format(rose.META_PROP_VALUES)
+    if len(title_list) != len(value_list):
+        return INCOMPATIBLE.format(rose.META_PROP_VALUES)
 
 
 def _check_type(value):
@@ -246,6 +262,9 @@ def metadata_check(meta_config, meta_dir=None,
             elif option == rose.META_PROP_MACRO:
                 check_func = lambda v: _check_macro(
                                  v, module_files)
+            elif option == rose.META_PROP_VALUE_TITLES:
+                check_func = lambda v: _check_value_titles(
+                                 v, node.get_value([rose.META_PROP_VALUES]))
             else:
                 func_name = "_check_" + option.replace("-", "_")
                 check_func = globals().get(func_name, lambda v: None)

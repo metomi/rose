@@ -30,6 +30,7 @@ ConfigDataManager -- class to load and process objects in ConfigData
 import atexit
 import copy
 import itertools
+import glob
 import os
 import re
 import shutil
@@ -146,11 +147,13 @@ class ConfigData(object):
 
     """Stores information about a configuration."""
 
-    def __init__(self, config, s_config, directory, meta, meta_id, meta_files,
-                 macros, is_top, is_disc, var_data=None, sect_data=None):
+    def __init__(self, config, s_config, directory, opt_conf_lookup, meta,
+                 meta_id, meta_files, macros, is_top, is_disc,
+                 var_data=None, sect_data=None):
         self.config = config
         self.save_config = s_config
         self.directory = directory
+        self.opt_configs = opt_conf_lookup
         self.meta = meta
         self.meta_id = meta_id
         self.meta_files = meta_files
@@ -281,17 +284,18 @@ class ConfigDataManager(object):
                                              text, title)
                     sys.exit(2)
             config, s_config = self.load_config_file(config_path)
+        opt_conf_lookup = self.load_optional_configs(config_directory)
         meta_config = self.load_meta_config(config, config_directory)
         meta_files = self.load_meta_files(config, config_directory)
         macro_module_prefix = self.helper.get_macro_module_prefix(name)
         macros = rose.macro.load_meta_macro_modules(
                       meta_files, module_prefix=macro_module_prefix)
         meta_id = self.helper.get_config_meta_flag(config)
-        
         # Initialise configuration data object.
         self.config[name] = ConfigData(config, s_config, config_directory,
-                                       meta_config, meta_id, meta_files,
-                                       macros, is_top_level, is_discovery)
+                                       opt_conf_lookup, meta_config,
+                                       meta_id, meta_files, macros,
+                                       is_top_level, is_discovery)
         self.load_builtin_macros(name)
         self.load_file_metadata(name)
         self.filter_meta_config(name)
@@ -333,6 +337,38 @@ class ConfigDataManager(object):
         rose.macro.standard_format_config(config)
         rose.macro.standard_format_config(master_config)
         return config, master_config
+
+    def load_optional_configs(self, config_directory):
+        """Load any optional configurations."""
+        opt_conf_lookup = {}
+        if config_directory is None:
+            return opt_conf_lookup
+        opt_dir = os.path.join(config_directory, rose.config.OPT_CONFIG_DIR)
+        if not os.path.isdir(opt_dir):
+            return opt_conf_lookup
+        opt_exceptions = {}
+        opt_glob = os.path.join(opt_dir, rose.GLOB_OPT_CONFIG_FILE)
+        for path in glob.glob(opt_glob):
+            if os.access(path, os.F_OK | os.R_OK):
+                name = re.search(rose.RE_OPT_CONFIG_FILE, path).group(1)
+                try:
+                    opt_config = rose.config.load(path)
+                except Exception as e:
+                    opt_exceptions.update({path: e})
+                    continue
+                opt_conf_lookup.update({name: opt_config})
+        if opt_exceptions:
+            err_text = ""
+            err_format = rose.config_editor.ERROR_LOAD_OPT_CONFS_FORMAT
+            for path in sorted(opt_exceptions):
+                err = opt_exceptions[path]
+                err_text += err_format.format(path, type(e).__name__, e)
+            err_text = err_text.rstrip()
+            text = rose.config_editor.ERROR_LOAD_OPT_CONFS.format(err_text)
+            title = rose.config_editor.ERROR_LOAD_OPT_CONFS_TITLE
+            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
+                                     text, title=title, modal=False)
+        return opt_conf_lookup
 
     def load_builtin_macros(self, config_name):
         """Load Rose builtin macros."""
@@ -442,6 +478,7 @@ class ConfigDataManager(object):
                 self._load_dupl_sect_map(basic_dupl_map, keylist[0])
                 continue
             section, option = keylist
+            flags = self.load_option_flags(config_name, section, option)
             ignored_reason = {}
             if section_map[section].ignored_reason:
                 ignored_reason.update({
@@ -476,6 +513,7 @@ class ConfigDataManager(object):
                                                   meta_data,
                                                   ignored_reason,
                                                   error={},
+                                                  flags=flags,
                                                   comments=cfg_comments))
         id_node_stack = meta_config.value.items()
         while id_node_stack:
@@ -493,6 +531,7 @@ class ConfigDataManager(object):
             if (only_this_section is not None and
                 section != only_this_section):
                 continue
+            flags = self.load_option_flags(config_name, section, option)
             ignored_reason = {}
             sect_data = section_map.get(section)
             if sect_data is None:
@@ -526,7 +565,8 @@ class ConfigDataManager(object):
                                                value,
                                                meta_data,
                                                ignored_reason,
-                                               error={}))
+                                               error={},
+                                               flags=flags))
         return var_map, latent_var_map
 
     def _load_dupl_sect_map(self, basic_dupl_map, section):
@@ -538,6 +578,34 @@ class ConfigDataManager(object):
             if mod_section != basic_section and mod_section != section:
                 basic_dupl_map.setdefault(mod_section, [])
                 basic_dupl_map[mod_section].append(section)
+
+    def load_option_flags(self, config_name, section, option):
+        """Load flags for an option."""
+        config_data = self.config[config_name]
+        flags = {}
+        opt_conf_flags = self._load_opt_conf_flags(config_name,
+                                                   section, option)
+        if opt_conf_flags:
+            flags.update({rose.config_editor.FLAG_TYPE_OPT_CONF:
+                          opt_conf_flags})
+        return flags
+
+    def _load_opt_conf_flags(self, config_name, section, option):
+        opt_config_map = self.config[config_name].opt_configs
+        opt_conf_diff_format = rose.config_editor.VAR_FLAG_TIP_OPT_CONF_STATE
+        opt_flags = {}
+        for opt_name in sorted(opt_config_map):
+            opt_config = opt_config_map[opt_name]
+            opt_node = opt_config.get([section, option])
+            if opt_node is not None:
+                opt_sect_node = opt_config.get([section])
+                text = opt_conf_diff_format.format(opt_sect_node.state,
+                                                    section,
+                                                    opt_node.state,
+                                                    option,
+                                                    opt_node.value)
+                opt_flags[opt_name] = text
+        return opt_flags
 
     def add_section_to_config(self, section, config_name):
         """Add a blank section to the configuration."""
