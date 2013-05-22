@@ -540,10 +540,15 @@ class ConfigPage(gtk.VBox):
         ghost_list.sort(lambda v, w: sorter(v.metadata['id'],
                                             w.metadata['id']))
         for variable in ghost_list:
+            label_text = variable.name
+            if (not self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE] and
+                rose.META_PROP_TITLE in variable.metadata):
+                label_text = variable.metadata[rose.META_PROP_TITLE]
+            label_text = label_text.replace("_", "__")
             add_ui_start += ('<menuitem action="' +
                              variable.metadata['id'] + '"/>')
             actions.append((variable.metadata['id'], None,
-                            "_" + variable.name.replace('_', ' ')))
+                            "_" + label_text))
         add_ui = add_ui_start + add_ui_end
         uimanager = gtk.UIManager()
         actiongroup = gtk.ActionGroup('Popup')
@@ -562,7 +567,12 @@ class ConfigPage(gtk.VBox):
             named_item = uimanager.get_widget('/Popup/Add meta/'
                                               + variable.metadata['id'])
             named_item.var_id = variable.metadata['id']
-            named_item.set_tooltip_text(variable.metadata['id'])
+            tooltip_text = ""
+            description = variable.metadata.get(rose.META_PROP_DESCRIPTION)
+            if description:
+                tooltip_text += description + "\n"
+            tooltip_text += "(" + variable.metadata["id"] + ")"
+            named_item.set_tooltip_text(tooltip_text)
             named_item.connect("activate", _add_var_from_item)
         if 'Add blank' in add_ui or self.ghost_data:
             return uimanager.get_widget('/Popup')
@@ -685,7 +695,7 @@ class ConfigPage(gtk.VBox):
         """Select a widget to have the focus on page generation."""
         if self.custom_widget is not None:
             return
-        if self.show_modes['latent']:
+        if self.show_modes[rose.config_editor.SHOW_MODE_LATENT]:
             for widget in self.get_main_variable_widgets():
                 if hasattr(widget.get_parent(), 'variable'):
                     if widget.get_parent().variable.name == '':
