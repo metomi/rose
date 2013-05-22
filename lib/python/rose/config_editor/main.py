@@ -916,10 +916,31 @@ class MainController(object):
             config_names = self.data.config.keys()
         else:
             config_names = [only_config_name]
+        save_ok = True
         for config_name in config_names:
+            short_config_name = config_name.lstrip("/")
             config = self.data.dump_to_internal_config(config_name)
             new_save_config = self.data.dump_to_internal_config(config_name)
             config_data = self.data.config[config_name]
+            vars_ok = True
+            for var in config_data.vars.get_all(no_latent=True):
+                if not var.name:
+                    self.view_page(var.metadata["full_ns"],
+                                   var.metadata["id"])
+                    page_address = var.metadata["full_ns"].lstrip("/")
+                    rose.gtk.util.run_dialog(
+                             rose.gtk.util.DIALOG_TYPE_ERROR,
+                             rose.config_editor.ERROR_SAVE_BLANK.format(
+                                                short_config_name,
+                                                page_address),
+                             title=rose.config_editor.ERROR_SAVE_TITLE.format(
+                                                            short_config_name),
+                             modal=False)
+                    vars_ok = False
+                    break
+            if not vars_ok:
+                save_ok = False
+                continue
             directory = config_data.directory
             config_vars = config_data.vars
             config_sections = config_data.sections
@@ -939,10 +960,13 @@ class MainController(object):
                 rose.config.dump(config, save_path)
             except (OSError, IOError) as e:
                 rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_ERROR,
-                              rose.config_editor.ERROR_SAVE_PATH_FAIL.format(
-                                                                 str(e)))
-                return False
+                          rose.gtk.util.DIALOG_TYPE_ERROR,
+                          rose.config_editor.ERROR_SAVE_PATH_FAIL.format(e),
+                          title=rose.config_editor.ERROR_SAVE_TITLE.format(
+                                                         short_config_name),
+                          modal=False)
+                save_ok = False
+                continue
             # Un-prettify.
             config = self.data.dump_to_internal_config(config_name)
             # Update the last save data.
@@ -970,6 +994,7 @@ class MainController(object):
             page.refresh_widget_status()
         # Update everything else.
         self.updater.update_all()
+        return save_ok
 
     def output_config_objects(self, only_config_name=None):
         """Return a dict of config name - object pairs from this session."""
