@@ -567,6 +567,9 @@ class ConfigDataManager(object):
                     if variable.metadata['full_ns'] != only_this_ns:
                         continue
                 option = variable.name
+                if not variable.name:
+                    var_id = variable.metadata["id"]
+                    option = self.util.get_section_option_from_id(var_id)[1]
                 value = variable.value
                 var_state = enabled_state
                 if variable.ignored_reason:
