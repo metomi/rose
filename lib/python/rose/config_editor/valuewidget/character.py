@@ -85,7 +85,6 @@ class QuotedTextValueWidget(gtk.HBox):
         if var_text != self.value:
             self.value = var_text
             self.set_value(var_text)
-            self.in_error = not self.type_checker(self.value)
         return False
 
     def get_focus_index(self):
@@ -110,15 +109,19 @@ class QuotedTextValueWidget(gtk.HBox):
 
     def handle_type_error(self, has_error):
         """Handle a change in error related to the value."""
-        position = self.entry.get_position()
+        start_position = self.entry.get_position()
+        position = start_position
         text = self.entry.get_text()
-        self.in_error = has_error
-        if has_error:  # Normal state -> error state.
-            position += 1 + text[:position].count(self.quote_char)
-        else:  # Error state -> normal state.
+        was_in_error = self.in_error
+        self.in_error = not self.type_checker(self.value)
+        if has_error:
+            if self.in_error and not was_in_error:
+                position += 1 + text[:position].count(self.quote_char)
+        elif was_in_error and not self.in_error:
             position -= 1 + text[:position].count(self.esc_quote_chars)
-        self.set_entry_text()
-        self.entry.set_position(position)
+        if position != start_position:
+            self.set_entry_text()
+            self.entry.set_position(position)
 
 
 def text_for_character_widget(text):
