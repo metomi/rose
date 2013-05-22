@@ -68,7 +68,7 @@
 #         Process environment variable substitution. (Only works when returning
 #         a string value.)
 #     --file=FILE, -f FILE
-#         Each of this specifies a configuration file. If none specified, read
+#         Each of these specifies a configuration file. If none specified, read
 #         from $THIS/../etc/rose.conf and $HOME/.metomi/rose.conf (where $THIS
 #         is the location of this command).
 #     --has, --quiet, -q

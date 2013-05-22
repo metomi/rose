@@ -47,7 +47,7 @@
 #     --command-key=KEY; -c KEY
 #         Invoke the command specified in [command]KEY.
 #     --define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE
-#         Each of this overrides the [SECTION]KEY setting with a given VALUE.
+#         Each of these overrides the [SECTION]KEY setting with a given VALUE.
 #         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
 #         or even --define=[!SECTION].
 #     --install-only; -i
@@ -58,7 +58,7 @@
 #     --no-overwrite
 #         Do not overwrite existing files.
 #     --opt-conf-key=KEY, -O KEY
-#         Each of this switches on an optional configuration identified by KEY.
+#         Each of these switches on an optional configuration identified by KEY.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose; -v
