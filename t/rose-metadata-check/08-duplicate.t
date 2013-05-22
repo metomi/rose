@@ -17,45 +17,68 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose macro" in custom checking mode.
+# Test "rose metadata-check".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init <<'__CONFIG__'
-[env]
-BAD_URL=htpp://www.google.co.uk
-__CONFIG__
 #-------------------------------------------------------------------------------
 tests 6
 #-------------------------------------------------------------------------------
-# Check macro finding.
-TEST_KEY=$TEST_KEY_BASE-discovery
+# Check duplicate syntax checking.
+TEST_KEY=$TEST_KEY_BASE-ok
 setup
-init_meta </dev/null
-init_macro url.py < $(dirname $0)/lib/custom_macro_check.py
-run_pass "$TEST_KEY" rose macro --config=../config
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators
-    # Runs all the default checks, such as compulsory checking.
-[V] url.URLChecker
-    # Class to check if a URL is valid.
-[T] rose.macros.DefaultTransforms
-    # Runs all the default fixers, such as trigger fixing.
-__CONTENT__
+init <<__META_CONFIG__
+[namelist:nl2]
+duplicate = true
+
+[namelist:nl3]
+duplicate = true
+
+[namelist:nl3{modifier}]
+duplicate = true
+
+[namelist:nl4]
+duplicate = true
+
+[namelist:nl4{modifier}]
+duplicate = true
+__META_CONFIG__
+run_pass "$TEST_KEY" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
-# Check checking.
-TEST_KEY=$TEST_KEY_BASE-check
+# Check duplicate syntax checking (fail).
+TEST_KEY=$TEST_KEY_BASE-bad
 setup
-init_meta </dev/null
-init_macro url.py < $(dirname $0)/lib/custom_macro_check.py
-run_fail "$TEST_KEY" rose macro --config=../config url.URLChecker
+init <<__META_CONFIG__
+[namelist:duplicate_nl1=my_var1]
+duplicate=.true.
+
+[namelist:duplicate_nl2]
+duplicate=false
+
+[namelist:duplicate_nl6=my_var6]
+duplicate=duplicate
+
+[namelist:duplicate_nl6=my_var7]
+duplicate=1
+
+[namelist:duplicate_nl7=my_var8]
+duplicate=?
+__META_CONFIG__
+run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] url.URLChecker: issues: 1
-    env=BAD_URL=htpp://www.google.co.uk
-        htpp://www.google.co.uk: [Errno -2] Name or service not known
-__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+[V] rose.metadata_check.MetadataChecker: issues: 4
+    namelist:duplicate_nl1=my_var1=duplicate=.true.
+        Invalid syntax: .true.
+    namelist:duplicate_nl6=my_var6=duplicate=duplicate
+        Invalid syntax: duplicate
+    namelist:duplicate_nl6=my_var7=duplicate=1
+        Invalid syntax: 1
+    namelist:duplicate_nl7=my_var8=duplicate=?
+        Invalid syntax: ?
+__ERROR__
 teardown
 #-------------------------------------------------------------------------------
 exit

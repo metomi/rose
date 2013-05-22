@@ -126,11 +126,18 @@ WORLD=Mars
     <div class="slide">
       <h3 class="alwayshidden">Example: config editor</h3>
 
+      <p>We can compare this text with the display in the Rose config
+      editor.</p>
+
       <p>Open this application directory in the Rose config editor by
       typing:</p>
       <pre class="shell">
 rose edit
 </pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example: config editor (2)</h3>
 
       <p>Look at the page <code>env</code>. The three options
       <var>LANG_JUPITER</var>, <var>MAX_TARGETS</var>, <var>WORLD</var> appear
@@ -222,6 +229,14 @@ type=integer
     </div>
 
     <div class="slide">
+      <h3>Viewing the Info</h3>
+
+      <p>You can view the data and metadata for <var>MAX_TARGETS</var> by
+      clicking the small menu button next to the title and selecting
+      <kbd>Info</kbd>.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Example: metadata range</h3>
 
       <p>We've set the type of <var>MAX_TARGETS</var> to <samp>integer</samp>,
@@ -249,6 +264,47 @@ type=integer
       error will be flagged next to the variable and on the page list in the
       left hand panel. If you change it to an integer value of 0 or greater,
       the error will go away.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="rose-metadata-check">rose metadata-check</h3>
+
+      <p>You can check syntax errors in the metadata that you write using
+      Rose's built-in metadata checker. This is automatically run when the
+      config editor loads, but can also be run from the command line in a
+      metadata directory using <code>rose metadata-check</code>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example: invalid metadata</h3>
+
+      <p>Let's write some deliberately invalid metadata. Change the
+      <samp>env=MAX_TARGETS</samp> section to read:</p>
+      <pre class="prettyprint lang-rose-conf">
+[env=MAX_TARGETS]
+range=0:not sure
+title=Max target number
+type=integer
+</pre>
+
+      <p>If you reload the metadata, a dialog will appear warning you about a
+      problem that's been detected. You can get more information by clicking
+      the <kbd>Information</kbd> button in the dialog.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example: invalid metadata (2)</h3>
+
+      <p>If you look at the variable in the config editor, the invalid range
+      setting will have been switched off - if you open the
+      <var>MAX_TARGETS</var> <kbd>Info</kbd> dialog again (using the small menu
+      button next to the title on the <var>env</var> page) it won't appear as
+      part of the metadata.</p>
+
+      <p>Change the metadata back to a valid state by removing the <samp>not
+      sure</samp> text in the range entry.</p>
+
+      <p>Your range metadata should now work OK again.</p>
     </div>
 
     <div class="slide">

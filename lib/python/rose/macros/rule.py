@@ -29,7 +29,52 @@ import rose.macro
 import rose.variable
 
 
-REC_EXPR_IS_THIS_RULE = re.compile("(?:^.*[^\w]|^)this(?:$|[^\w].*([<>=]|in\s).*$)")
+REC_EXPR_IS_THIS_RULE = (
+             """(?:^.*[^\w:=]|^)   (?# Break or beginning)
+                 this              (?# 'this')
+                 (?:               (?# Followed by:)
+                   $               (?# the end)
+                  |                (?# or)
+                   \W              (?# break plus)
+                   .*              (?# anything)
+                   (               (?# Start operator)
+                     [%<>=-+/*]    (?# Arithmetic)
+                    |              (?# or)
+                     in\s          (?# String)
+                    |              (?# or)
+                     not\s         (?# Logical not)
+                    |              (?# or)
+                     and\s         (?# Logical and)
+                    |              (?# or)
+                     or\s          (?# Logical or)
+                   )               (?# End operator)
+                   .*              (?# anything)
+                   $               (?# the end)
+                 )""", re.X)
+
+
+REC_EXPR_IS_THIS_RULE = re.compile(
+             """(?:^.*[^\w:=]|^)   (?# Break or beginning)
+                 this              (?# 'this')
+                 (?:               (?# Followed by:)
+                   $               (?# the end)
+                  |                (?# or)
+                   \W              (?# break plus)
+                   .*              (?# anything)
+                   (               (?# Start operator)
+                     [+*%<>=-]    (?# Arithmetic)
+                    |              (?# or)
+                     in\s          (?# String)
+                    |              (?# or)
+                     not\s         (?# Logical not)
+                    |              (?# or)
+                     and\s         (?# Logical and)
+                    |              (?# or)
+                     or\s          (?# Logical or)
+                   )               (?# End operator)
+                   .*              (?# anything)
+                   $               (?# the end)
+                 )""", re.X)
 
 
 class RuleValueError(Exception):
@@ -121,13 +166,31 @@ class RuleEvaluator(rose.macro.MacroBase):
     INTERNAL_ID_SCI_NUM = "_scinum{0}"
     REC_ARRAY = {"all": re.compile(r"(\W)all\( *(\S+) *(\S+) *(.*?) *\)(\W)"),
                  "any": re.compile(r"(\W)any\( *(\S+) *(\S+) *(.*?) *\)(\W)")}
-    REC_CONFIG_ID = re.compile(r"(?:\W)([\w:]+=\w+(?:\(\d+\))?)(?:\W)")
-    REC_SCI_NUM = re.compile(r"""(?:\W|^)
-                                 ([-+]?[\d.]+
-                                  [edED][-+]?\d+)
-                                 (?:\W|$)""",
-                             re.I | re.X)
-    REC_THIS_ELEMENT_ID = re.compile(r"(?:\W)(this\(\d+\))(?:\W)")
+    REC_CONFIG_ID = re.compile(r"""
+                      (?:\W|^)        (?# Break or beginning)
+                      (               (?# Begin ID capture)
+                       [\w:]+         (?# 1st part of section, including :)
+                       (?:\{.*?\})?   (?# Optional modifier for the section)
+                       (?:\([^)]*\))? (?# Optional element for the section)
+                       =              (?# Section-option delimiter)
+                       [\w-]+         (?# Option name )
+                       (?:\(\d+\))?   (?# Optional element for the option )
+                      )               (?# End ID capture )
+                      (?:\W|$)        (?# Break or end)""", re.X)
+    REC_SCI_NUM = re.compile(r"""
+                     (?:\W|^)    (?# Break or beginning)
+                     (           (?# Begin number capture)
+                      [-+]?      (?# Optional sign)
+                      [\d.]+     (?# Optional sign. Digit and dot)
+                      [ed][-+]?  (?# Exponent, [edED] with ignored case)
+                      \d+        (?# Exponent number)
+                     )           (?# End number capture)
+                     (?:\W|$)    (?# Break or end)
+                                 """, re.I | re.X)
+    REC_THIS_ELEMENT_ID = re.compile(r"""
+                             (?:\W|^)        (?# Break or beginning)
+                             (this\(\d+\))   (?# 'this' element)
+                             (?:\W|$)        (?# Break or end)""", re.X)
     REC_VALUE = re.compile(r'("[^"]*")')
 
     def evaluate_rule(self, rule, setting_id, config):
