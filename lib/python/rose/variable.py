@@ -97,6 +97,13 @@ class Variable(object):
             val_list = rose.variable.array_split(self.metadata['values'],
                                                  only_this_delim=",")
             self.metadata['values'] = val_list
+            
+        if ('value-titles' in self.metadata and
+            not isinstance(self.metadata['value-titles'], list)):
+            # Replace this kind of thing with a proper metadata handler later.
+            val_list = rose.variable.array_split(self.metadata['value-titles'])
+            self.metadata['value-titles'] = val_list
+            
         return self.metadata
 
     def to_hashable(self):
