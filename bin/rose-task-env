@@ -81,7 +81,7 @@
 #         E.g. --cycle-offset=T3H --cycle-offset=T6H will tell "rose task-env"
 #         to export ROSE_DATACT3H and ROSE_DATACT6H.
 #     --path=[NAME=]PATTERN, -P [NAME=]PATTERN
-#         Each of this specify a glob pattern for paths to prepend to an
+#         Each of these specify a glob pattern for paths to prepend to an
 #         environment variable called NAME (or PATH is NAME is not specified).
 #         If a relative path is given, it is relative to $ROSE_SUITE_DIR. An
 #         empty value resets the default and any previous --path=PATTERN

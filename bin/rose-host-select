@@ -47,7 +47,7 @@
 #                 and host groups. The default is to use the "~" directory.
 #             "random"
 #     --threshold=[METHOD[:METHOD-ARG]:]VALUE
-#         Each of this option specifies a numeric value of a threshold of which
+#         Each of these option specifies a numeric value of a threshold of which
 #         the hosts must not exceed. Accepts the same METHOD and METHOD-ARG
 #         (and the same defaults) as the --rank-method=METHOD[:METHOD-ARG]
 #         option. (Obviously, the "random" method does not make sense in this
