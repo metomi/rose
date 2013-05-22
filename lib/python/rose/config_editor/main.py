@@ -925,11 +925,14 @@ class MainController(object):
             vars_ok = True
             for var in config_data.vars.get_all(no_latent=True):
                 if not var.name:
+                    self.view_page(var.metadata["full_ns"],
+                                   var.metadata["id"])
+                    page_address = var.metadata["full_ns"].lstrip("/")
                     rose.gtk.util.run_dialog(
                              rose.gtk.util.DIALOG_TYPE_ERROR,
                              rose.config_editor.ERROR_SAVE_BLANK.format(
                                                 short_config_name,
-                                                var.metadata["full_ns"]),
+                                                page_address),
                              title=rose.config_editor.ERROR_SAVE_TITLE.format(
                                                             short_config_name),
                              modal=False)
