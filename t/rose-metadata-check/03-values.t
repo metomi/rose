@@ -17,45 +17,57 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose macro" in custom checking mode.
+# Test "rose metadata-check".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init <<'__CONFIG__'
-[env]
-BAD_URL=htpp://www.google.co.uk
-__CONFIG__
 #-------------------------------------------------------------------------------
 tests 6
 #-------------------------------------------------------------------------------
-# Check macro finding.
-TEST_KEY=$TEST_KEY_BASE-discovery
+# Check values syntax checking.
+TEST_KEY=$TEST_KEY_BASE-ok
 setup
-init_meta </dev/null
-init_macro url.py < $(dirname $0)/lib/custom_macro_check.py
-run_pass "$TEST_KEY" rose macro --config=../config
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators
-    # Runs all the default checks, such as compulsory checking.
-[V] url.URLChecker
-    # Class to check if a URL is valid.
-[T] rose.macros.DefaultTransforms
-    # Runs all the default fixers, such as trigger fixing.
-__CONTENT__
+init <<__META_CONFIG__
+[namelist:values_nl1=my_fixed_array]
+length=:
+values=red, blue
+
+[namelist:values_nl1=my_char]
+values = 'orange'
+
+[namelist:values_nl1=my_num]
+values=56
+
+[namelist:values_nl1=my_raw]
+values = something"(")\,
+
+[namelist:values_nl2]
+duplicate = true
+
+[namelist:values_nl2=my_num]
+values = 5
+
+[namelist:values_nl2{mod1}=my_num]
+values = 4
+__META_CONFIG__
+run_pass "$TEST_KEY" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
-# Check checking.
-TEST_KEY=$TEST_KEY_BASE-check
+# Check values syntax checking (fail).
+TEST_KEY=$TEST_KEY_BASE-bad
 setup
-init_meta </dev/null
-init_macro url.py < $(dirname $0)/lib/custom_macro_check.py
-run_fail "$TEST_KEY" rose macro --config=../config url.URLChecker
+init <<__META_CONFIG__
+[namelist:values_nl1=my_fixed_var]
+values=
+__META_CONFIG__
+run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] url.URLChecker: issues: 1
-    env=BAD_URL=htpp://www.google.co.uk
-        htpp://www.google.co.uk: [Errno -2] Name or service not known
-__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+[V] rose.metadata_check.MetadataChecker: issues: 1
+    namelist:values_nl1=my_fixed_var=values=
+        Invalid syntax: 
+__ERROR__
 teardown
 #-------------------------------------------------------------------------------
 exit

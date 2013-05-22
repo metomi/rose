@@ -40,6 +40,7 @@ import rose.config
 import rose.config_editor.data_helper
 import rose.gtk.util
 import rose.macro
+import rose.metadata_check
 import rose.resource
 import rose.section
 import rose.macros.trigger
@@ -176,6 +177,7 @@ class ConfigDataManager(object):
         self.config = {}  # Stores configuration name: object
         self._builtin_value_macro = rose.macros.value.ValueChecker()  # value
         self.builtin_macros = {}  # Stores other Rose built-in macro instances
+        self._bad_meta_dir_paths = []  # Stores flawed metadata directories.
         self.trigger = {}  # Stores trigger macro instances per configuration
         self.trigger_id_trees = {}  # Stores trigger dependencies
         self.trigger_id_value_lookup = {}  # Stores old values of trigger vars
@@ -634,7 +636,7 @@ class ConfigDataManager(object):
         except OSError:
             return []
         for dirpath, dirnames, filenames in file_tuples:
-            if '/.svn' in dirpath:
+            if '/.' in dirpath:
                 continue
             for fname in filenames:
                 meta_filepaths.append(os.path.join(dirpath, fname))
@@ -644,7 +646,9 @@ class ConfigDataManager(object):
         """Filter out invalid metadata e.g. app metadata for suite configs."""
         # TODO: Remove after different default metadata for different configs
         config_data = self.config[config_name]
+        config = config_data.config
         meta_config = config_data.meta
+        directory = config_data.directory
         if config_data.is_top_level:
             good_id_prefixes = rose.TOP_CONFIG_DEFAULT_META_IDS
             bad_id_prefixes = (rose.INFO_CONFIG_DEFAULT_META_IDS +
@@ -668,6 +672,24 @@ class ConfigDataManager(object):
                 if key.startswith(bad_key):
                     meta_config.value.pop(key)
                     break
+        meta_dir_path = self.load_meta_path(config, directory)[0]
+        reports = rose.metadata_check.metadata_check(meta_config,
+                                                     directory)
+        if reports and meta_dir_path not in self._bad_meta_dir_paths:
+            # There are problems with some metadata.
+            title = rose.config_editor.ERROR_METADATA_CHECKER_TITLE.format(
+                                                      meta_dir_path)
+            text = rose.config_editor.ERROR_METADATA_CHECKER_TEXT.format(
+                                            len(reports), meta_dir_path)
+            self._bad_meta_dir_paths.append(meta_dir_path)
+            reports_text = rose.macro.get_reports_as_text(
+                                      reports,
+                                      "rose.metadata_check.MetadataChecker")
+            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
+                                     text, title, modal=False,
+                                     extra_text=reports_text)
+        for report in reports:
+            meta_config.unset([report.section, report.option])
 
     def load_ignored_data(self, config_name):
         """Deal with ignored variables and sections.
@@ -699,8 +721,7 @@ class ConfigDataManager(object):
         bad_list = self.trigger[config_name].validate(config_for_macro,
                                                       meta_config)
         if bad_list:
-            self.handle_bad_trigger_dependency(config_name,
-                                               bad_list[0])
+            self.trigger[config_name].trigger_family_lookup.clear()
             return
         trig_config, change_list = self.trigger[config_name].transform(
                                         config_for_macro, meta_config)
@@ -1016,14 +1037,3 @@ class ConfigDataManager(object):
                 self.namespace_meta_lookup[config_name].setdefault(
                                                   rose.META_PROP_SORT_KEY,
                                                   " 0")
-    
-    def handle_bad_trigger_dependency(self, config_name, err_report):
-        """Handle a bad 'trigger' dependency event."""
-        section = err_report.section
-        option = err_report.option
-        err_string = err_report.info
-        setting_id = self.util.get_id_from_section_option(section, option)
-        rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                 rose.config_editor.ERROR_BAD_TRIGGER.format(
-                                      err_string, setting_id, config_name))
-        self.trigger[config_name].trigger_family_lookup.clear()

@@ -17,45 +17,54 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose macro" in custom checking mode.
+# Test "rose metadata-check" in the absence of a rose configuration.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init <<'__CONFIG__'
-[env]
-BAD_URL=htpp://www.google.co.uk
-__CONFIG__
+init </dev/null
+rm config/rose-meta.conf
 #-------------------------------------------------------------------------------
-tests 6
+tests 12
 #-------------------------------------------------------------------------------
-# Check macro finding.
-TEST_KEY=$TEST_KEY_BASE-discovery
+# Normal mode.
+TEST_KEY=$TEST_KEY_BASE-base
 setup
-init_meta </dev/null
-init_macro url.py < $(dirname $0)/lib/custom_macro_check.py
-run_pass "$TEST_KEY" rose macro --config=../config
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators
-    # Runs all the default checks, such as compulsory checking.
-[V] url.URLChecker
-    # Class to check if a URL is valid.
-[T] rose.macros.DefaultTransforms
-    # Runs all the default fixers, such as trigger fixing.
+run_fail "$TEST_KEY" rose metadata-check
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
+$PWD: not a configuration metadata directory.
 __CONTENT__
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
-# Check checking.
-TEST_KEY=$TEST_KEY_BASE-check
+# Normal mode, -C.
+TEST_KEY=$TEST_KEY_BASE-C
 setup
-init_meta </dev/null
-init_macro url.py < $(dirname $0)/lib/custom_macro_check.py
-run_fail "$TEST_KEY" rose macro --config=../config url.URLChecker
+run_fail "$TEST_KEY" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+CONFIG_DIR=$(dirname $PWD)/config
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
+$CONFIG_DIR: not a configuration metadata directory.
+__CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Unknown option.
+TEST_KEY=$TEST_KEY_BASE-unknown-option
+setup
+run_fail "$TEST_KEY" rose metadata-check --unknown-option
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] url.URLChecker: issues: 1
-    env=BAD_URL=htpp://www.google.co.uk
-        htpp://www.google.co.uk: [Errno -2] Name or service not known
+Usage: rose metadata-check [OPTIONS] [ID ...]
+
+rose metadata-check: error: no such option: --unknown-option
 __CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Null metadata.
+init </dev/null
+TEST_KEY=$TEST_KEY_BASE-null-metadata
+setup
+run_pass "$TEST_KEY" rose metadata-check -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 exit

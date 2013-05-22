@@ -428,7 +428,7 @@ def main():
     method_id = UPGRADE_METHOD.upper()[0]
     if opts.downgrade:
         method_id = DOWNGRADE_METHOD.upper()[0]
-    macro_id = rose.macro.MACRO_OUTPUT_ID.format(method_id, config_name,
+    macro_id = rose.macro.MACRO_OUTPUT_ID.format(method_id,
                                                  upgrade_manager.get_name())
     rose.macro._handle_transform(app_config, new_config, change_list,
                                  macro_id, opts.conf_dir, opts.output_dir,
