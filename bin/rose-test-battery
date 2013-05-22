@@ -69,10 +69,13 @@ for UTIL in $UTIL_LIST_ARG; do
     fi 
 done
 #-------------------------------------------------------------------------------
-if ((N_PASS == N_DONE)); then
-    echo "[PASS] $N_PASS/$N_DONE"
-    exit 0
-else
-    echo "[FAIL] $N_PASS/$N_DONE"
+if ((N_PASS != N_DONE)); then
+    if [[ -t 1 ]]; then
+        echo -e "\e[1;31m[FAIL]\e[0m $N_PASS/$N_DONE" # red
+    else
+        echo "[FAIL] $N_PASS/$N_DONE"
+    fi
     exit 1
 fi
+echo "[PASS] $N_PASS/$N_DONE"
+exit 0
