@@ -464,7 +464,9 @@ VAR_COMMENT_TIP = "# {0}"
 VAR_FLAG_TIP_FIXED = "Fixed variable (only one allowed value)"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
 VAR_FLAG_TIP_OPT_CONF = "Optional conf overrides:\n{0}"
+# Numbers below mean: 0-opt config name, 1-id state/value.
 VAR_FLAG_TIP_OPT_CONF_INFO = "    {0}: {1}\n"
+# Numbers below mean: 0-sect state, 1-sect, 2-opt state, 3-opt, 4-opt value. 
 VAR_FLAG_TIP_OPT_CONF_STATE = "{0}{1}={2}{3}={4}"
 VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_MENU_TIP_ERROR = "Error "

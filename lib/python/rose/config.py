@@ -65,6 +65,7 @@ import sys
 CHAR_ASSIGN = "="
 CHAR_COMMENT = "#"
 
+OPT_CONFIG_DIR = "opt"
 REC_SETTING_ELEMENT = re.compile(r"^(.+?)\(([^)]+)\)$")
 
 
@@ -404,7 +405,7 @@ class ConfigLoader(object):
         for key in opt_conf_keys:
             opt_conf_file_name_base = source_root + "-" + key + source_ext
             opt_conf_file_name = os.path.join(
-                    source_dir, "opt", opt_conf_file_name_base)
+                    source_dir, OPT_CONFIG_DIR, opt_conf_file_name_base)
             if os.access(opt_conf_file_name, os.F_OK | os.R_OK):
                 self.load(opt_conf_file_name, node)
             elif ignore_missing_more_keys and key in more_keys:

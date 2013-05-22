@@ -30,6 +30,7 @@ ConfigDataManager -- class to load and process objects in ConfigData
 import atexit
 import copy
 import itertools
+import glob
 import os
 import re
 import shutil
@@ -340,15 +341,13 @@ class ConfigDataManager(object):
         opt_conf_lookup = {}
         if config_directory is None:
             return opt_conf_lookup
-        opt_dir = os.path.join(config_directory, rose.OPT_CONFIG_DIR)
+        opt_dir = os.path.join(config_directory, rose.config.OPT_CONFIG_DIR)
         if not os.path.isdir(opt_dir):
             return opt_conf_lookup
         opt_exceptions = {}
-        for filename in os.listdir(opt_dir):
-            path = os.path.join(opt_dir, filename)
-            result = re.match(rose.RE_OPT_CONFIG_FILE, filename)
-            if result and os.access(path, os.F_OK | os.R_OK):
-                name = result.group(1)
+        for path in glob.glob(os.path.join(opt_dir, re.GLOB_OPT_CONFIG_FILE)):
+            if os.access(path, os.F_OK | os.R_OK):
+                name = re.match(rose.RE_OPT_CONFIG_FILE, filename).group(1)
                 try:
                     opt_config = rose.config.load(path)
                 except Exception as e:
@@ -602,7 +601,7 @@ class ConfigDataManager(object):
                                                     opt_node.state,
                                                     option,
                                                     opt_node.value)
-                opt_flags.update({opt_name: text})
+                opt_flags[opt_name] = text
         return opt_flags
 
     def add_section_to_config(self, section, config_name):

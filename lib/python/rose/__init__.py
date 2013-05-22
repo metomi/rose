@@ -34,11 +34,13 @@ CONFIG_META_DIR = "meta"
 SUB_CONFIG_NAME = "rose-app.conf"
 SUB_CONFIGS_DIR = "app"
 SUB_CONFIG_FILE_DIR = "file"
-OPT_CONFIG_DIR = "opt"
 INFO_CONFIG_NAME = "rose-suite.info"
 TOP_CONFIG_NAME = "rose-suite.conf"
 META_DEFAULT_VN_DIR = "HEAD"
-RE_OPT_CONFIG_FILE = "^rose-app-(.+).conf$"
+
+GLOB_OPT_CONFIG_FILE = "rose-*-*.conf"
+RE_OPT_CONFIG_FILE = "^rose-.*-(.+).conf$"
+
 
 # Configuration specification names
 CONFIG_SECT_CMD = "command"
