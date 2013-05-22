@@ -234,7 +234,7 @@ class VariableWidget(object):
                              key_col, key_col + 1,
                              row_index, row_index + 1,
                              xoptions=gtk.FILL,
-                             yoptions=gtk.SHRINK)
+                             yoptions=gtk.FILL)
             container.attach(self.contentwidget,
                              key_col + 1, key_col + 2,
                              row_index, row_index + 1,
