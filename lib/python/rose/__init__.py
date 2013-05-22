@@ -39,7 +39,7 @@ TOP_CONFIG_NAME = "rose-suite.conf"
 META_DEFAULT_VN_DIR = "HEAD"
 
 GLOB_OPT_CONFIG_FILE = "rose-*-*.conf"
-RE_OPT_CONFIG_FILE = "^rose-.*-(.+).conf$"
+RE_OPT_CONFIG_FILE = "rose-.*-(.+).conf$"
 
 
 # Configuration specification names

@@ -345,9 +345,10 @@ class ConfigDataManager(object):
         if not os.path.isdir(opt_dir):
             return opt_conf_lookup
         opt_exceptions = {}
-        for path in glob.glob(os.path.join(opt_dir, re.GLOB_OPT_CONFIG_FILE)):
+        opt_glob = os.path.join(opt_dir, rose.GLOB_OPT_CONFIG_FILE)
+        for path in glob.glob(opt_glob):
             if os.access(path, os.F_OK | os.R_OK):
-                name = re.match(rose.RE_OPT_CONFIG_FILE, filename).group(1)
+                name = re.search(rose.RE_OPT_CONFIG_FILE, path).group(1)
                 try:
                     opt_config = rose.config.load(path)
                 except Exception as e:
