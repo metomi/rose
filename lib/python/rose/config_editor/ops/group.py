@@ -77,10 +77,12 @@ class GroupOperations(object):
             metadata = self.data.helper.get_metadata_for_config_id(
                                             var_id, config_name)
             metadata['full_ns'] = namespace
+            flags = self.data.load_option_flags(config_name, section, option)
             ignored_reason = {}  # This may not be safe.
             var = rose.variable.Variable(opt_name, value,
                                          metadata, ignored_reason,
-                                         error={})
+                                         error={},
+                                         flags=flags)
             self.var_ops.add_var(var, skip_update=True)
         self.reload_ns_tree_func(namespace)
         for stack_item in self.undo_stack[start_stack_index:]:
