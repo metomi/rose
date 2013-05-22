@@ -108,7 +108,7 @@ def import_object(import_string, from_files, error_handler,
     rose.config_editor.pagewidget.table.PageTable
     from_files is a list of available Python file paths to search in
     error_handler is a function that accepts an Exception instance
-    and does something appropriate with it.
+    or string and does something appropriate with it.
     module_prefix is an optional string to prepend to the module
     as an alias - this avoids any clashing between same-name modules.
 
@@ -123,6 +123,9 @@ def import_object(import_string, from_files, error_handler,
         as_name = module_prefix + module_name
     class_name = import_string.split(".")[-1]
     module_fpath = "/".join(import_string.rsplit(".")[:-1]) + ".py"
+    if module_fpath == ".py":
+        # Empty module.
+        return None
     module_files = [f for f in from_files if f.endswith(module_fpath)]
     if not module_files and not is_builtin:
         return None
