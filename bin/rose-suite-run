@@ -46,7 +46,7 @@
 #     --config=DIR, -C DIR
 #         Specify the configuration directory of the suite. (default=$PWD)
 #     --define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE
-#         Each of this overrides the [SECTION]KEY setting with a given VALUE.
+#         Each of these overrides the [SECTION]KEY setting with a given VALUE.
 #         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
 #         or even --define=[!SECTION]. See also --define-suite.
 #     --define-suite=KEY=VALUE, -S KEY=VALUE
@@ -82,7 +82,7 @@
 #     --no-strict
 #         Do not validate (suite engine configuration) in strict mode.
 #     --opt-conf-key=KEY, -O KEY
-#         Each of this switches on an optional configuration identified by KEY.
+#         Each of these switches on an optional configuration identified by KEY.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --reload

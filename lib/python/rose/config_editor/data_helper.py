@@ -114,7 +114,8 @@ class ConfigDataHelper(object):
                                              rose.META_PROP_MACRO, "")
         if not ns_macros_text:
             return {}
-        ns_macros = rose.variable.array_split(ns_macros_text)
+        ns_macros = rose.variable.array_split(ns_macros_text,
+                                              only_this_delim=",")
         module_prefix = self.get_macro_module_prefix(config_name)
         for i, ns_macro in enumerate(ns_macros):
             ns_macros[i] = module_prefix + ns_macro
@@ -412,6 +413,8 @@ class ConfigDataHelper(object):
             object_statuses = variable_statuses
         status_counts = object_statuses.items()
         status_counts.sort(lambda x, y: cmp(x[1], y[1]))
+        if not status_counts:
+            return rose.config.ConfigNode.STATE_NORMAL
         status = status_counts[0][0]
         if status == rose.variable.IGNORED_BY_USER:
             return rose.config.ConfigNode.STATE_USER_IGNORED

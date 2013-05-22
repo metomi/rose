@@ -20,13 +20,12 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3
-      <a href="http://www.metoffice.gov.uk">Met Office</a>.
-      See <a href="rose-terms-of-use.html">Terms of Use</a>.<br />
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
       "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
-      "license">Open Government Licence</a>.
-      <br />
+      "license">Open Government Licence</a>.<br />
       <span id="rose-version"></span>
     </address><img id="rose-icon" src="rose-icon.png" alt="Rose" />
 
@@ -112,7 +111,8 @@
 
       <dt><a href="#rose-stem">rose stem</a></dt>
 
-      <dd>Run a suitable suite with the specified source tree and tasks(s).</dd>
+      <dd>Run a suitable suite with the specified source tree and
+      tasks(s).</dd>
 
       <dt><a href="#rose-sgc">rose sgc</a></dt>
 
@@ -221,7 +221,8 @@
     <p>Run an application according to its configuration.</p>
 
     <p>May run a builtin application (if the <var>mode</var> setting in the
-    configuration specifies the name of a builtin application) or a command.</p>
+    configuration specifies the name of a builtin application) or a
+    command.</p>
 
     <p>Determine the command to run in this order:</p>
 
@@ -258,7 +259,7 @@
 
       <dt><kbd>--define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE</kbd></dt>
 
-      <dd>Each of this overrides the <var>[SECTION]KEY</var> setting with a
+      <dd>Each of these overrides the <var>[SECTION]KEY</var> setting with a
       given <var>VALUE</var>.</dd>
 
       <dd>Can be used to disable a setting using the syntax
@@ -281,7 +282,7 @@
 
       <dt><kbd>--opt-conf-key=KEY, -O KEY</kbd></dt>
 
-      <dd>Each of this switches on an optional configuration identified by
+      <dd>Each of these switches on an optional configuration identified by
       <var>KEY</var>.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
@@ -303,7 +304,8 @@
 
       <dt><kbd>optional ROSE_FILE_INSTALL_ROOT</kbd></dt>
 
-      <dd>If specified, change to the specified directory to install files.</dd>
+      <dd>If specified, change to the specified directory to install
+      files.</dd>
     </dl>
 
     <h2 id="rose-app-upgrade">rose app-upgrade</h2>
@@ -447,7 +449,7 @@
 
       <dt><kbd>--file=FILE, -f FILE</kbd></dt>
 
-      <dd>Each of this specifies a configuration file. If none specified, read
+      <dd>Each of these specifies a configuration file. If none specified, read
       from <var>$THIS/../etc/rose.conf</var> and
       <var>$HOME/.metomi/rose.conf</var> (where <var>$THIS</var> is the
       location of this command).</dd>
@@ -525,7 +527,7 @@
 
       <dt><kbd>--file=FILE, -f FILE</kbd></dt>
 
-      <dd>Each of this specifies a configuration file.</dd>
+      <dd>Each of these specifies a configuration file.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -570,7 +572,7 @@
 
       <dd>Prepend <var>PATH</var> to the search path for metadata (look here
       first). This option can be used repeatedly to load multiple paths.</dd>
-      
+
       <dt><kbd>--new</kbd></dt>
 
       <dd>Launch, ignoring any configuration.</dd>
@@ -597,25 +599,30 @@
       <dt><kbd>--offset=OFFSET</kbd>, <kbd>-s OFFSET</kbd></dt>
 
       <dd>Specify an offset to add to the current or the specified
-      <var>DATE-TIME</var>.  <var>OFFSET</var> must be in the form <var>nU</var>
+      <var>DATE-TIME</var>. <var>OFFSET</var> must be in the form <var>nU</var>
       where <var>U</var> is the unit (<kbd>w</kbd> for weeks, <kbd>d</kbd> for
       days, <kbd>h</kbd> for hours, <kbd>m</kbd> for minutes and <kbd>s</kbd>
-      for seconds) and <var>n</var> is an positive or negative integer. Multiple
-      offsets can be specified with multiple <kbd>--offset=OFFSET</kbd>
-      options.</dd>
+      for seconds) and <var>n</var> is an positive or negative integer.
+      Multiple offsets can be specified with multiple
+      <kbd>--offset=OFFSET</kbd> options.</dd>
 
       <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>--format=FORMAT</kbd></dt>
 
-      <dd>Specify a format for parsing <var>DATE-TIME</var>, which should be
-      compatible with the format documented in Python's <a href=
-      "http://docs.python.org/library/time.html#time.strftime">time.strftime</a>.
-      If not specified, the system will attempt to parse <var>DATE-TIME</var>
-      using the following formats:
+      <dd>
+        Specify a format for parsing <var>DATE-TIME</var>, which should be
+        compatible with the format documented in Python's <a href=
+        "http://docs.python.org/library/time.html#time.strftime">time.strftime</a>.
+        If not specified, the system will attempt to parse <var>DATE-TIME</var>
+        using the following formats:
+
         <ul>
           <li><dfn>ctime</dfn>: <samp>%a %b %d %H:%M:%S %Y</samp></li>
+
           <li><dfn>Unix date</dfn>: <samp>%a %b %d %H:%M:%S %Z %Y</samp></li>
+
           <li><dfn>ISO8601</dfn>: <samp>%Y-%m-%dT%H:%M:%S</samp>,
           <samp>%Y%m%dT%H%M%S</samp></li>
+
           <li><dfn>Cylc</dfn>: <samp>%Y%m%d%H</samp></li>
         </ul>
       </dd>
@@ -735,7 +742,7 @@
 
       <dt><kbd>--threshold=[METHOD[:METHOD-ARG]:]VALUE</kbd></dt>
 
-      <dd>Each of this option specifies a numeric value of a threshold of which
+      <dd>Each of these option specifies a numeric value of a threshold of which
       the hosts must not exceed. Accepts the same <var>METHOD</var> and
       <var>METHOD-ARG</var> (and the same defaults) as the
       <kbd>--rank-method=METHOD[:METHOD-ARG]</kbd> option. (Obviously, the
@@ -829,6 +836,45 @@
       <dd>A list of macro names to run. If no macro names are specified and
       <kbd>--validate</kbd> is not used, list all available macros. Otherwise,
       run the specified macro names.</dd>
+    </dl>
+
+    <h2 id="rose-metadata-check">rose metadata-check</h2>
+
+    <h3>NAME</h3>
+
+    <p><kbd>rose metadata-check</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <p><kbd>rose metadata-check [OPTIONS] [ID ...]</kbd></p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Validate configuration metadata.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--config=DIR, -C DIR</kbd></dt>
+
+      <dd>The directory containing the configuration metadata i.e. containing
+      the rose-meta.conf file, amongst other things. If not specified, the
+      current directory will be used.</dd>
+
+      <dt><kbd>--property=PROPERTY, -p PROPERTY</kbd></dt>
+
+      <dd>Only check a certain property e.g. trigger. This can be specified
+      more than once.</dd>
+    </dl>
+
+    <h3>ARGUMENTS</h3>
+
+    <dl>
+      <dt><kbd>ID ...</kbd></dt>
+
+      <dd>One or more sections (configuration IDs) to check in the metadata,
+      e.g. env=FOO or namelist:bar=spam. If specified, only these sections will
+      be checked.</dd>
     </dl>
 
     <h2 id="rose-metadata-gen">rose metadata-gen</h2>
@@ -1035,8 +1081,8 @@
 
     <h3>DESCRIPTION</h3>
 
-    <p>Populate the current directory for <a href="./rose-rug-brief-tour.html">Rose
-    User Guide: A Brief Tour</a>.</p>
+    <p>Populate the current directory for <a href=
+    "./rose-rug-brief-tour.html">Rose User Guide: A Brief Tour</a>.</p>
 
     <h2 id="rose-stem">rose stem</h2>
 
@@ -1066,26 +1112,24 @@
     <dl>
       <dt><kbd>--source=SOURCE, -s SOURCE</kbd></dt>
 
-      <dd>Specify a source tree to include in a rose-stem suite. The first 
-      source tree must be a working copy as the location of the suite and 
-      <kbd>fcm-make</kbd> config files are taken from it. Further source trees 
-      can be added with additional --source arguments. Defaults to '.' 
-      if not specified.</dd>
+      <dd>Specify a source tree to include in a rose-stem suite. The first
+      source tree must be a working copy as the location of the suite and
+      <kbd>fcm-make</kbd> config files are taken from it. Further source trees
+      can be added with additional --source arguments. Defaults to '.' if not
+      specified.</dd>
 
       <dt><kbd>--group=GROUP, -g GROUP</kbd></dt>
-      
-      <dd>Specify a group name to run. Additional groups can be specified
-      with further --group arguments. The suite will then convert the groups
-      into a series of tasks to run.</dd>
+
+      <dd>Specify a group name to run. Additional groups can be specified with
+      further --group arguments. The suite will then convert the groups into a
+      series of tasks to run.</dd>
 
       <dt><kbd>--task=GROUP, -t GROUP</kbd></dt>
 
       <dd>Synonym for --group.</dd>
-
-
     </dl>
 
-    <h3>JINJA2 VARIABLES</h3>Note that <kbd>project</kbd> refers to the FCM 
+    <h3>JINJA2 VARIABLES</h3>Note that <kbd>project</kbd> refers to the FCM
     keyword name of the repository in upper case.
 
     <dl>
@@ -1100,15 +1144,15 @@
       <dt><kbd>SOURCE_project_BASE</kbd></dt>
 
       <dd>The base of the project specified on the command line. This is
-      intended to specify the location of <kbd>fcm-make</kbd> config files.</dd>
+      intended to specify the location of <kbd>fcm-make</kbd> config
+      files.</dd>
 
       <dt><kbd>SOURCE_project_REV</kbd></dt>
 
       <dd>The revision of the project specified on the command line. This is
-      intended to specify the location of <kbd>fcm-make</kbd> config files.</dd>
-
+      intended to specify the location of <kbd>fcm-make</kbd> config
+      files.</dd>
     </dl>
-
 
     <h2 id="rose-sgc">rose sgc</h2>
 
@@ -1132,8 +1176,8 @@
 
     <p>Remove items created by the previous suite runs.</p>
 
-    <p>If no argument is specified, use the base-name of <var>$PWD</var> as
-    the suite name.</p>
+    <p>If no argument is specified, use the base-name of <var>$PWD</var> as the
+    suite name.</p>
 
     <p>Correctly remove the <var>share/</var> and <var>work/</var> directories
     and suite runtime directories on remote job hosts.</p>
@@ -1185,9 +1229,9 @@
 
     <dl>
       <dt><kbd>--all</kbd></dt>
-      
+
       <dd>Open a suite control GUI for each running suite.</dd>
-      
+
       <dt><kbd>--host=HOST</kbd></dt>
 
       <dd>Specify a host.</dd>
@@ -1240,8 +1284,8 @@
 
       <dt><kbd>--mail-cc=LIST</kbd></dt>
 
-      <dd>Only useful if the <kbd>--mail</kbd> option is specified.
-      Specify a comma separated list of additional addresses to email.</dd>
+      <dd>Only useful if the <kbd>--mail</kbd> option is specified. Specify a
+      comma separated list of additional addresses to email.</dd>
 
       <dt><kbd>--mail</kbd></dt>
 
@@ -1275,7 +1319,7 @@
     <p>Generate and browse the log view of a suite.</p>
 
     <p>Analyse the suite log to generate a JSON file for feeding into an HTML
-    based viewer. If <kbd>--name=SUITE-NAME</kbd> is not specified, the 
+    based viewer. If <kbd>--name=SUITE-NAME</kbd> is not specified, the
     basename of <var>$PWD</var> is assumed to be the suite name.</p>
 
     <p>If the <var>DISPLAY</var> environment variable is defined. Launch the
@@ -1297,7 +1341,7 @@
       <kbd>--full</kbd>.</dd>
 
       <dt><kbd>--name=SUITE-NAME</kbd></dt>
-      
+
       <dd>Specify the suite name.</dd>
 
       <dt><kbd>--no-web-browse</kbd></dt>
@@ -1363,15 +1407,15 @@
 
       <dt><kbd>--define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE</kbd></dt>
 
-      <dd>Each of this overrides the <var>[SECTION]KEY</var> setting with a
+      <dd>Each of these overrides the <var>[SECTION]KEY</var> setting with a
       given <var>VALUE</var>. Can be used to disable a setting using the syntax
-      <kbd>--define=[SECTION]!KEY</kbd> or even
-      <kbd>--define=[!SECTION]</kbd>. See also <kbd>--suite-define</kbd>.</dd>
+      <kbd>--define=[SECTION]!KEY</kbd> or even <kbd>--define=[!SECTION]</kbd>.
+      See also <kbd>--suite-define</kbd>.</dd>
 
       <dt><kbd>--define-suite=KEY=VALUE; -S KEY=VALUE</kbd></dt>
 
-      <dd>As <kbd>--define</kbd>, but with an implicit <var>[SECTION]</var>
-      for suite variables.</dd>
+      <dd>As <kbd>--define</kbd>, but with an implicit <var>[SECTION]</var> for
+      suite variables.</dd>
 
       <dt><kbd>--force, -f</kbd></dt>
 
@@ -1394,16 +1438,16 @@
 
       <dt><kbd>--log-keep=DAYS</kbd></dt>
 
-      <dd>Specify the number of days to keep log directories/archives.  Do not
+      <dd>Specify the number of days to keep log directories/archives. Do not
       housekeep if not specified. Named log directories (created by
       <kbd>--log-name=NAME</kbd> in previous runs) will not be housekept.</dd>
 
       <dt><kbd>--log-name=NAME</kbd></dt>
 
       <dd>Specify a name for the log directory of the current run. If
-      specified, it will create a symbolic link <var>log.NAME</var> to point
-      to the log directory of the current run. Named log directories will not
-      be automatically archived or housekept. Only works with
+      specified, it will create a symbolic link <var>log.NAME</var> to point to
+      the log directory of the current run. Named log directories will not be
+      automatically archived or housekept. Only works with
       <kbd>--run=run</kbd>.</dd>
 
       <dt><kbd>--new, -N</kbd></dt>
@@ -1412,9 +1456,9 @@
 
       <dt><kbd>--no-gcontrol</kbd></dt>
 
-      <dd>Do not run <kbd>cylc gui</kbd>. Default is to run <kbd>cylc
-      gui</kbd> if the suite is running and the <var>DISPLAY</var> environment
-      variable is defined.</dd>
+      <dd>Do not run <kbd>cylc gui</kbd>. Default is to run <kbd>cylc gui</kbd>
+      if the suite is running and the <var>DISPLAY</var> environment variable
+      is defined.</dd>
 
       <dt><kbd>--no-log-archive</kbd></dt>
 
@@ -1430,7 +1474,7 @@
 
       <dt><kbd>--opt-conf-key=KEY, -O KEY</kbd></dt>
 
-      <dd>Each of this switches on an optional configuration identified by
+      <dd>Each of these switches on an optional configuration identified by
       <var>KEY</var>.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
@@ -1452,9 +1496,8 @@
       <dt><kbd>--run=reload|restart|run</kbd></dt>
 
       <dd>Invoke <code>cylc reload</code>, <code>cylc restart</code> or
-      <code>cylc run</code> according to this option.
-      See Cylc User Guide for detail.
-      (default=<kbd>run</kbd>)</dd>
+      <code>cylc run</code> according to this option. See Cylc User Guide for
+      detail. (default=<kbd>run</kbd>)</dd>
 
       <dt><kbd>--verbose, -v</kbd></dt>
 
@@ -1554,10 +1597,10 @@
 
     <dl>
       <dt><kbd>--all</kbd></dt>
-      
+
       <dd>Shutdown all running suites. You will be prompted to confirm shutting
       down each affected suite.</dd>
-      
+
       <dt><kbd>--host=HOST</kbd></dt>
 
       <dd>Specify a host.</dd>
@@ -1698,6 +1741,16 @@
       task-env</kbd> to export <var>ROSE_DATACT3H</var> and
       <var>ROSE_DATACT6H</var>.</dd>
 
+      <dt><kbd>--path=[NAME=]PATTERN, -P [NAME=]PATTERN</kbd></dt>
+
+      <dd>Each of these specify a glob pattern for paths to prepend to an
+      environment variable called <var>NAME</var> (or <var>PATH</var> if
+      <var>NAME</var> is not specified). If a relative path is given, it is
+      relative to <var>$ROSE_SUITE_DIR</var>. An empty value resets the default
+      and any previous <kbd>--path=PATTERN</kbd> settings.
+      (default=<kbd>share/fcm[_-]make*/*/bin</kbd>,
+      <kbd>work/fcm[_-]make*/*/bin</kbd>)</dd>
+
       <dt><kbd>--prefix-delim=DELIMITER</kbd></dt>
 
       <dd>Specify the delimiter used to determine the task name prefix.
@@ -1748,6 +1801,11 @@ environment scripting = "eval $(rose task-env)"
 
     <p>Provide an environment to run a suite task.</p>
 
+    <p>Provides environment variables documented in <a href=
+    "#rose-task-env">rose task-env</a>. It is worth noting that if the
+    environment variables are already provided by <a href="#rose-task-env">rose
+    task-env</a>, this command will not override them.</p>
+
     <p>Normally, the suite task will select a Rose application configuration
     that has the same name as the task. This can be overridden by the
     <kbd>--app-key=KEY</kbd> option or the <var>ROSE_TASK_APP</var> environment
@@ -1755,8 +1813,8 @@ environment scripting = "eval $(rose task-env)"
 
     <h3>OPTIONS</h3>
 
-    <p>All options of <kbd>rose app-run</kbd> and <kbd>rose task-env</kbd>
-    are supported.</p>
+    <p>All options of <kbd>rose app-run</kbd> and <kbd>rose task-env</kbd> are
+    supported.</p>
 
     <p>Additional options are:</p>
 
@@ -1772,14 +1830,6 @@ environment scripting = "eval $(rose task-env)"
       specified, it will attempt use the task name to look for a builtin
       application. If the task name does not match a builtin application, the
       default <var>MODE</var> is to run the <kbd>command</kbd>.</dd>
-
-      <dt><kbd>--path=PATTERN, -P PATTERN</kbd></dt>
-
-      <dd>Each of this specify a glob pattern for paths to prepend to the
-      <var>PATH</var> environment variable. If a relative path is given, it is
-      relative to <var>$ROSE_SUITE_DIR</var>. An empty value resets the default
-      and any previous <kbd>--path=PATTERN</kbd> settings.
-      (default=<kbd>share/fcm[_-]make*/*/bin</kbd>)</dd>
     </dl>
 
     <h3>ENVIRONMENT</h3>
@@ -2200,7 +2250,7 @@ abc01 from daisy
 
       <dt><kbd>--no-headers; -H</kbd></dt>
 
-      <dd>Do not print column headers.</dd>      
+      <dd>Do not print column headers.</dd>
 
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
@@ -2290,7 +2340,7 @@ abc01 from daisy
 
       <dt><kbd>--no-headers; -H</kbd></dt>
 
-      <dd>Do not print column headers.</dd>      
+      <dd>Do not print column headers.</dd>
 
       <dt><kbd>--quiet; -q</kbd></dt>
 

@@ -335,6 +335,11 @@ class RoseOptionParser(OptionParser):
                        ["--print-format"],
                        {"metavar": "FORMAT",
                         "help": ("Specify the format for printing.")}],
+               "property": [
+                       ["--property", "-p"],
+                       {"action": "append",
+                        "metavar": "PROPERTY",
+                        "help": ("Specify a property.")}],
                "query": [
                        ["--query", "-Q"],
                        {"action": "store_true",

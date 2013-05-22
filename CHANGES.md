@@ -5,6 +5,37 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (End of 2013-Q2)
+
+### Highlight Changes
+
+Changes that have significant impact on user experience.
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+\#665: rose config-edit: fix ignore status logic.
+
+\#663: rose suite-hook and rose suite-log-view: more efficient logic.
+
+\#659, #664: rose suite-run site/user configuration: configure a list of
+scannable hosts. This is useful when a set of hosts are no longer intended to be
+used to run new suites but still have running suites on them.
+
+\#652: rosie go: can now navigate home view.
+
+\#650: rosie go: no longer crash when copying an empty suite.
+
+\#649: rose suite-shutdown: improve interface with `cylc shutdown`.
+
+\#647: rosie ls: now a query.
+
+\#634: rose config-edit: support latent ignored pages.
+
+--------------------------------------------------------------------------------
+
 ## 2013-05 (2013-05-15)
 
 This release of Rose works with cylc 5.2.0.

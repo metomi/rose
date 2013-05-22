@@ -39,6 +39,7 @@ from rose.run_source_vc import write_source_vc_info
 from rose.scheme_handler import SchemeHandlersManager
 from rose.suite_engine_proc import SuiteEngineProcessor
 from rose.suite_log_view import SuiteLogViewGenerator
+from rose.task_env import get_prepend_paths
 import socket
 import shlex
 import shutil
@@ -676,8 +677,8 @@ class SuiteRunner(Runner):
         
         known_hosts = self.host_selector.expand(
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
-        known_hosts += ["localhost"]
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
+              ["localhost"])[0]
         known_hosts = list(set(known_hosts))
         
         for known_host in known_hosts:
@@ -861,12 +862,8 @@ class SuiteRunner(Runner):
             #use the list of hosts on which you can run
             if opts.run_mode != "reload" and not opts.host:
                 hosts = []
-                node = conf.get(["rose-suite-run", "hosts"], no_ignore=True)
-                if node is None:
-                    known_hosts = ["localhost"]
-                else:
-                    known_hosts = self.host_selector.expand(
-                                                     node.value.split())[0]
+                v = conf.get_value(["rose-suite-run", "hosts"], "localhost")
+                known_hosts = self.host_selector.expand(v.split())[0]
                 for known_host in known_hosts:
                     if known_host not in hosts:
                         hosts.append(known_host)    
@@ -1063,7 +1060,6 @@ class TaskRunner(Runner):
     OPTIONS = AppRunner.OPTIONS + [
             "app_key", "cycle", "cycle_offsets", "path_globs", "prefix_delim",
             "suffix_delim"]
-    PATH_GLOBS = ["share/fcm[_-]make*/*/bin", "work/fcm[_-]make*/*/bin"]
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
@@ -1075,56 +1071,31 @@ class TaskRunner(Runner):
                 suite_engine_proc=self.suite_engine_proc)
 
     def run_impl(self, opts, args, uuid, work_files):
+        # "rose task-env"
         t = self.suite_engine_proc.get_task_props(
                 cycle=opts.cycle,
                 cycle_offsets=opts.cycle_offsets,
                 prefix_delim=opts.prefix_delim,
                 suffix_delim=opts.suffix_delim)
+        is_changed = False
+        for k, v in t:
+            if os.getenv(k) != v:
+                env_export(k, v, self.event_handler)
+                is_changed = True
 
-        # Prepend PATH-like variable, site/user configuration
-        conf = ResourceLocator.default().get_conf()
-        my_conf = conf.get(["rose-task-run"], no_ignore=True)
-        if my_conf is not None:
-            for key, node in sorted(my_conf.value.items()):
-                if node.is_ignored() or not key.startswith("path-prepend"):
-                    continue
-                env_key = "PATH"
-                if key != "path-prepend":
-                    env_key = key[len("path-prepend."):]
-                values = []
-                for v in node.value.split():
-                    if os.path.exists(v):
-                        values.append(v)
-                if os.getenv(env_key):
-                    values.append(os.getenv(env_key))
-                if values:
-                    env_export(env_key, os.pathsep.join(values),
-                               self.event_handler)
-
-        # Prepend PATH with paths determined by default or specified globs
-        paths = []
-        path_globs = list(self.PATH_GLOBS)
-        if opts.path_globs:
-            path_globs.extend(opts.path_globs)
-        for path_glob in path_globs:
-            if path_glob:
-                if path_glob.startswith("~"):
-                    path_glob = os.path.expanduser(path_glob)
-                if not os.path.isabs(path_glob):
-                    path_glob = os.path.join(t.suite_dir, path_glob)
-                for path in glob(path_glob):
-                    paths.append(path)
-            else:
-                paths = [] # empty value resets
-        if paths:
-            if os.getenv("PATH"):
-                paths.append(os.getenv("PATH"))
-            env_export("PATH", os.pathsep.join(paths), self.event_handler)
-
-        # Add ROSE_* environment variables
-        for name, value in t:
-            if os.getenv(name) != value:
-                env_export(name, value, self.event_handler)
+        if is_changed:
+            path_globs = opts.path_globs
+            if path_globs is None:
+                path_globs = []
+            for k, prepend_paths in get_prepend_paths(self.event_handler,
+                                                      t.suite_dir,
+                                                      *path_globs).items():
+                orig_paths = []
+                orig_v = os.getenv(k, "")
+                if orig_v:
+                    orig_paths = orig_v.split(os.pathsep)
+                v = os.pathsep.join(prepend_paths + orig_paths)
+                env_export(k, v, self.event_handler)
 
         # Name association with builtin applications
         builtin_app = None

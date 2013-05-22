@@ -30,6 +30,7 @@ import rose.meta_type
 
 REC_CHARACTER = re.compile(r"'(?:[^']|'')*'$")
 
+
 class ValueChecker(rose.macro.MacroBase):
 
     """Returns sections and options with wrong values according to metadata.
