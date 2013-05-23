@@ -84,9 +84,7 @@ class EntryArrayValueWidget(gtk.HBox):
         self.entry_table.show()
 
         self.entries = []
-        for value_item in value_array:
-            entry = self.get_entry(value_item)
-            self.entries.append(entry)
+        self.generate_entries(value_array)
         self.generate_buttons()
         self.populate_table()
         self.pack_start(self.add_del_button_box, expand=False, fill=False)
@@ -130,7 +128,8 @@ class EntryArrayValueWidget(gtk.HBox):
             v = self.value[j:].index(val)
             prefix = get_next_delimiter(self.value[len(text):],
                                         val)
-            if len(text + prefix + val) >= focus_index:
+            if (len(text + prefix + val) >= focus_index or
+                i == len(value_array) - 1):
                 if len(self.entries) > i:
                     self.entries[i].grab_focus()
                     val_offset = focus_index - len(text + prefix)
@@ -139,6 +138,21 @@ class EntryArrayValueWidget(gtk.HBox):
                     self.entries[i].set_position(val_offset)
                     return
             text += prefix + val
+
+    def generate_entries(self, value_array=None):
+        """Create the gtk.Entry objects for elements in the array."""
+        if value_array is None:
+            value_array = rose.variable.array_split(self.value)
+        entries = []
+        existing_entries_text = [e.get_text() for e in self.entries]
+        for value_item in value_array:
+            for entry in self.entries:
+                if entry.get_text() == value_item and entry not in entries:
+                    entries.append(entry)
+                    break
+            else:
+                entries.append(self.get_entry(value_item))
+        self.entries = entries
 
     def generate_buttons(self):
         """Create the left-right movement arrows and add button."""
@@ -249,25 +263,24 @@ class EntryArrayValueWidget(gtk.HBox):
         entry.show()
         return entry
 
-    def populate_table(self):
+    def populate_table(self, focus_widget=None):
         """Populate a table with the array elements, dynamically."""
-        focus, position = None, None
+        position = None
         table_widgets = self.entries + [self.button_box]
-        for child in self.entry_table.get_children():
-            if child.is_focus() and isinstance(child, gtk.Entry):
-                focus = child
-                position = focus.get_position()
-        if len(self.entry_table.get_children()) < len(table_widgets):
-            # Newly added widget, set focus to the end
-            if len(self.entries) > 0:
-                focus = self.entries[-1]
-                position = len(self.entries[-1].get_text())
+        table_children = self.entry_table.get_children()
+        if focus_widget is None:
+            for child in table_children:
+                if child.is_focus() and isinstance(child, gtk.Entry):
+                    focus_widget = child
+                    position = focus_widget.get_position()
+        else:
+            position = focus_widget.get_position()
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
-        if (focus is None and self.entry_table.is_focus()
+        if (focus_widget is None and self.entry_table.is_focus()
             and len(self.entries) > 0):
-            focus = self.entries[-1]
-            position = len(focus.get_text())
+            focus_widget = self.entries[-1]
+            position = len(focus_widget.get_text())
         num_fields = len(self.entries + [self.button_box])
         num_rows_now = 1 + (num_fields - 1) / self.num_allowed_columns
         self.entry_table.resize(num_rows_now, self.num_allowed_columns)
@@ -307,10 +320,10 @@ class EntryArrayValueWidget(gtk.HBox):
                                     row, row + 1,
                                     xoptions=gtk.FILL,
                                     yoptions=gtk.SHRINK)
-        if focus is not None:
-            focus.grab_focus()
-            focus.set_position(position)
-            focus.select_region(position, position)
+        if focus_widget is not None:
+            focus_widget.grab_focus()
+            focus_widget.set_position(position)
+            focus_widget.select_region(position, position)
         self.grab_focus = lambda : self.hook.get_focus(
                                                  self._get_widget_for_focus())
         self.check_resize()
@@ -333,10 +346,12 @@ class EntryArrayValueWidget(gtk.HBox):
         """Add a new entry (with null text) to the variable array."""
         entry = self.get_entry('')
         self.entries.append(entry)
-        self.populate_table()
+        self._adjust_entry_length()
+        self.populate_table(focus_widget=entry)
         if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
             rose.META_PROP_VALUE_TRUE):
             self.setter(entry)
+        self.reshape_table()
 
     def remove_entry(self):
         """Remove the last selected or the last entry."""
@@ -372,11 +387,25 @@ class EntryArrayValueWidget(gtk.HBox):
         elif self.is_quoted_array:
             for i, val in enumerate(val_array):
                 val_array[i] = character.text_from_quoted_widget(val)
+        entries_have_commas = any(["," in v for v in val_array])
         new_value = rose.variable.array_join(val_array)
         if new_value != self.value:
             self.last_value = new_value
             self.set_value(new_value)
             self.value = new_value
+            if (entries_have_commas and
+                not (self.is_char_array or self.is_quoted_array)):
+                new_val_array = rose.variable.array_split(new_value)
+                if len(new_val_array) != len(self.entries):
+                    self.generate_entries()
+                    focus_index = None
+                    for i, val in enumerate(val_array):
+                        if "," in val:
+                            val_post_comma = val[:val.index(",") + 1]
+                            focus_index = len(rose.variable.array_join(
+                                  new_val_array[:i] + [val_post_comma]))
+                    self.populate_table()
+                    self.set_focus_index(focus_index)
         return False
 
     def _adjust_entry_length(self):
