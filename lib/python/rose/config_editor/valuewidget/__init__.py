@@ -78,8 +78,6 @@ def chooser(value, metadata, error):
     elif type(m_type) is not list:
         if m_type in ['logical', 'boolean']:
            return array.LogicalArrayValueWidget
-        if rose.META_PROP_TYPE in error:
-            return text.RawValueWidget
         return array.EntryArrayValueWidget
     if m_type == 'integer':
         return intspin.IntSpinButtonValueWidget

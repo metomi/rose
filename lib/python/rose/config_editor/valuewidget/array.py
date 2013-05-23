@@ -58,10 +58,21 @@ class EntryArrayValueWidget(gtk.HBox):
         arr_type = self.metadata.get(rose.META_PROP_TYPE)
         self.is_char_array = (arr_type == "character")
         self.is_quoted_array = (arr_type == "quoted")
+        # Do not treat character or quoted arrays specially when incorrect.
+        if self.is_char_array:
+            checker = rose.macros.value.ValueChecker()
+            for val in value_array:
+                if not checker.check_character(val):
+                    self.is_char_array = False
+        if self.is_quoted_array:
+            checker = rose.macros.value.ValueChecker()
+            for val in value_array:
+                if not checker.check_quoted(val):
+                    self.is_quoted_array = False
         if self.is_char_array:
             for i, val in enumerate(value_array):
                 value_array[i] = character.text_for_character_widget(val)
-        elif self.is_quoted_array:
+        if self.is_quoted_array:
             for i, val in enumerate(value_array):
                 value_array[i] = character.text_for_quoted_widget(val)
         # Designate the number of allowed columns - 10 for 4 chars width
