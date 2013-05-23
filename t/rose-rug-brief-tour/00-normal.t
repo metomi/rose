@@ -32,7 +32,7 @@ run_pass "$TEST_KEY" rose rug-brief-tour
 # Run the suite
 TEST_KEY=$TEST_KEY_BASE-suite-run
 mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-suite.XXXXXX')
+SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol
 #-------------------------------------------------------------------------------
