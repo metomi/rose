@@ -351,7 +351,6 @@ class EntryArrayValueWidget(gtk.HBox):
         if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
             rose.META_PROP_VALUE_TRUE):
             self.setter(entry)
-        self.reshape_table()
 
     def remove_entry(self):
         """Remove the last selected or the last entry."""
