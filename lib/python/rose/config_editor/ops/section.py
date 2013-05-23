@@ -85,6 +85,8 @@ class SectionOperations(object):
         ns = new_section_data.metadata["full_ns"]
         if not skip_update:
             self.trigger_reload_tree(ns)
+        if rose.META_PROP_DUPLICATE in metadata:
+            self.__data.load_namespace_has_sub_data(config_name)
         copy_section_data = new_section_data.copy()
         stack_item = rose.config_editor.stack.StackItem(
                           ns,

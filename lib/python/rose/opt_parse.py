@@ -335,6 +335,12 @@ class RoseOptionParser(OptionParser):
                        ["--print-format"],
                        {"metavar": "FORMAT",
                         "help": ("Specify the format for printing.")}],
+               "profile_mode": [
+                       ["--profile"],
+                       {"action": "store_true",
+                        "default": False,
+                        "dest": "profile_mode",
+                        "help": "Switch on profiling."}],
                "property": [
                        ["--property", "-p"],
                        {"action": "append",
@@ -495,7 +501,8 @@ class RoseOptionParser(OptionParser):
         if not hasattr(kwargs, "usage"):
             kwargs["usage"] = resource_loc.get_synopsis()
         OptionParser.__init__(self, *args, **kwargs)
-        self.add_my_options("debug_mode", "quietness", "verbosity")
+        self.add_my_options("debug_mode", "profile_mode",
+                            "quietness", "verbosity")
 
     def add_my_options(self, *args):
         """Add named options to this parser. Each element in args must be a key
