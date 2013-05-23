@@ -11,11 +11,16 @@ for a full listing of issues for each release.
 
 Changes that have significant impact on user experience.
 
+\#661: rose metadata-check: new command to validate configuration metadata.
+
 \#666: rose task-env and rose task-run: the `--path=[NAME=]GLOB` option can
 now be used in either command. Note, however, if `rose task-env` is used before
 `rose task-run`, any options shared between the 2 commands, including
 `--path=[NAME=]GLOB` options will be ignored by the subsequent `rose task-run`
 command. This may change the behaviour of some existing suites.
+
+\#668: rose config-edit: support new configuration metadata `value-titles` to
+define a list of titles to associate with a corresponding `values` setting.
 
 ### Other Changes
 
@@ -33,14 +38,9 @@ characters when a non-quote related error occurs.
 can be modified in an optional configuration, the information will now be
 shown with the setting's label.
 
-\#668: rose config-edit: support new configuration metadata `value-titles` to
-define a list of titles to associate with a corresponding `values` setting.
-
 \#665: rose config-edit: fix ignore status logic.
 
 \#663: rose suite-hook and rose suite-log-view: more efficient logic.
-
-\#661: rose metadata-check: new command to validate configuration metadata.
 
 \#659, #664: rose suite-run site/user configuration: configure a list of
 scannable hosts. This is useful when a set of hosts are no longer intended to be
