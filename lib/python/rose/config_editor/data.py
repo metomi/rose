@@ -1064,7 +1064,6 @@ class ConfigDataManager(object):
             self.namespace_meta_lookup.setdefault(ns, {})
             ns_metadata = self.namespace_meta_lookup[ns]
             ns_metadata['sections'] = ns_sections[ns]
-            ns_metadata['sections'] = ns_sections[ns]
             for ns_section in ns_sections[ns]:
                 # Loop over metadata from contributing sections.
                 # Note: rogue-variable section metadata can be overridden.
@@ -1083,12 +1082,7 @@ class ConfigDataManager(object):
                             ns_metadata[rose.META_PROP_MACRO] = macro_info
                     else:
                         ns_metadata.setdefault(key, value)
-        file_ns_bit = "/" + rose.SUB_CONFIG_FILE_DIR + "/"
-        for ns, prop_map in self.namespace_meta_lookup.items():
-            if file_ns_bit in ns:
-                title = re.sub(".*" + file_ns_bit, "", ns)
-                prop_map.setdefault(rose.META_PROP_TITLE,
-                                    title.replace(":", "/"))
+        self.load_namespace_has_sub_data(config_name)
         for config_name in self.config.keys():
             icon_path = self.helper.get_icon_path_for_config(config_name)
             self.namespace_meta_lookup.setdefault(config_name, {})
@@ -1108,3 +1102,24 @@ class ConfigDataManager(object):
                 self.namespace_meta_lookup[config_name].setdefault(
                                                   rose.META_PROP_SORT_KEY,
                                                   " 0")
+    def load_namespace_has_sub_data(self, config_name=None):
+        """Load namespace sub-data status."""
+        file_ns = "/" + rose.SUB_CONFIG_FILE_DIR
+        file_ns_sub = file_ns + "/"
+        ns_hierarchy = {}
+        for ns in self.namespace_meta_lookup:
+            if config_name is None or ns.startswith(config_name):
+                parent_ns = ns.rsplit("/", 1)[0]
+                ns_hierarchy.setdefault(parent_ns, [])
+                ns_hierarchy[parent_ns].append(ns)
+        for ns, prop_map in self.namespace_meta_lookup.items():
+            if config_name is None or ns.startswith(config_name):
+                if file_ns_sub in ns:
+                    title = re.sub(".*" + file_ns_sub, "", ns)
+                    prop_map.setdefault(rose.META_PROP_TITLE,
+                                        title.replace(":", "/"))
+                elif ns.endswith(file_ns):
+                    prop_map.setdefault("has_sub_data", True)
+                elif (rose.META_PROP_DUPLICATE in prop_map and
+                    ns_hierarchy.get(ns, [])):
+                    prop_map.setdefault("has_sub_data", True)

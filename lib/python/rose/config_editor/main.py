@@ -35,6 +35,7 @@ import shutil
 import sre_constants
 import sys
 import tempfile
+import traceback
 import warnings
 
 # Ignore add menu related warnings for now, but remove this later.
@@ -252,11 +253,13 @@ class MainController(object):
                                                  self.handle_page_change)
             self.mainwindow.window.connect_after('focus-in-event',
                                                  self.handle_page_change)
-        self.load_errors = 0
         self.updater.update_all(is_loading=True)
-        self.loader_update(rose.config_editor.LOAD_DONE,
+        self.loader_update(rose.config_editor.LOAD_ERRORS.format(
+                                                   self.updater.load_errors),
                            self.data.top_level_name)
         self.updater.perform_startup_check()
+        self.loader_update(rose.config_editor.LOAD_DONE,
+                           self.data.top_level_name)
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
@@ -1119,39 +1122,13 @@ class MainController(object):
         self._get_menu_widget('/Redo').set_sensitive(len(self.redo_stack) > 0)
         self._get_menu_widget('/Find Next').set_sensitive(
                                             len(self.find_hist['ids']) > 0)
-        found_error = False
-        for config_name in self.data.config:
-            config_data = self.data.config[config_name]
-            for v in config_data.vars.get_all():
-                if v.error or v.warning:
-                    found_error = True
-                    break
-            else:
-                for s in config_data.sections.get_all():
-                    if s.error or s.warning:
-                        found_error = True
-                        break
-            if found_error:
-                break
-        self._get_menu_widget('/Autofix').set_sensitive(found_error)
+        if not hasattr(self, "nav_panel"):
+            return False
+        changes, errors = self.nav_panel.get_change_error_totals()
+        self._get_menu_widget('/Autofix').set_sensitive(bool(errors))
         self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_TRANSFORM,
-                                          found_error)
-        for config_name in self.data.config:
-            config_data = self.data.config[config_name]
-            if self.updater.namespace_data_is_modified(config_name):
-                self._update_change_widget_sensitivity(is_changed=True)
-                break
-            now_vars = []
-            for v in config_data.vars.get_all(no_latent=True):
-                now_vars.append(v.to_hashable())
-            las_vars = []
-            for v in config_data.vars.get_all(no_latent=True, save=True):
-                las_vars.append(v.to_hashable())
-            if set(now_vars) ^ set(las_vars):
-                self._update_change_widget_sensitivity(is_changed=True)
-                break
-        else:
-            self._update_change_widget_sensitivity(is_changed=False)
+                                          bool(errors))
+        self._update_change_widget_sensitivity(is_changed=bool(changes))
 
     def _update_change_widget_sensitivity(self, is_changed=False):
         # Alter sensitivity of 'unsaved changes' related widgets.
@@ -1522,7 +1499,7 @@ class MainController(object):
 
 # ----------------------- System functions -----------------------------------
 
-def spawn_window(config_directory_path=None):
+def spawn_window(config_directory_path=None, debug_mode=False):
     """Create a window and load the configuration into it. Run gtk."""
     RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
     rose.gtk.util.rc_setup(
@@ -1539,7 +1516,7 @@ def spawn_window(config_directory_path=None):
             gcontrol_icon = None
     rose.gtk.util.setup_scheduler_icon(gcontrol_icon)
     number_of_events = (get_number_of_configs(config_directory_path) *
-                        rose.config_editor.LOAD_NUMBER_OF_EVENTS + 1)
+                        rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
     if config_directory_path is None:
         title = rose.config_editor.UNTITLED_NAME
     else:
@@ -1551,6 +1528,9 @@ def spawn_window(config_directory_path=None):
                        loader_update=splash_screen)
     except BaseException as e:
         splash_screen.stop()
+        if debug_mode and isinstance(e, Exception):
+            # Write out origin information - this is otherwise lost.
+            traceback.print_exc()
         raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
@@ -1626,11 +1606,12 @@ if __name__ == '__main__':
     if opts.new_mode:
         cwd = None
     rose.gtk.util.set_exception_hook(keep_alive=True)
-    if opts.debug_mode:
+    if opts.profile_mode:
         f = tempfile.NamedTemporaryFile()
-        cProfile.runctx("spawn_window(cwd)", globals(), locals(), f.name)
+        cProfile.runctx("spawn_window(cwd, debug_mode=opts.debug_mode)",
+                        globals(), locals(), f.name)
         p = pstats.Stats(f.name)
-        p.strip_dirs().sort_stats('cumulative').print_stats(40)
+        p.strip_dirs().sort_stats('cumulative').print_stats(200)
         f.close()
     else:
-        spawn_window(cwd)
+        spawn_window(cwd, debug_mode=opts.debug_mode)

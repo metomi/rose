@@ -97,11 +97,12 @@ class Updater(object):
 
     def update_ns_tree_states(self, namespace):
         """Refresh the tree panel states for a single row (namespace)."""
-        latent_status = self.data.helper.get_ns_latent_status(namespace)
-        ignored_status = self.data.helper.get_ns_ignored_status(namespace)
-        ns_names = namespace.lstrip("/").split("/")
-        self.nav_panel.update_statuses(ns_names, latent_status,
-                                       ignored_status)
+        if self.nav_panel is not None:
+            latent_status = self.data.helper.get_ns_latent_status(namespace)
+            ignored_status = self.data.helper.get_ns_ignored_status(namespace)
+            ns_names = namespace.lstrip("/").split("/")
+            self.nav_panel.update_statuses(ns_names, latent_status,
+                                           ignored_status)
 
     def tree_trigger_update(self, only_this_namespace=None):
         """Reload the tree panel, and perform an update.
@@ -566,7 +567,7 @@ class Updater(object):
                                                   config_data.config)
         if config_data.meta_id != new_meta_id:
             config_data.meta_id = new_meta_id
-            self.refresh_metadata_func(only_this_config=config_name)
+            self.refresh_metadata_func(config_name=config_name)
 
     def perform_startup_check(self):
         """Fix any relevant type errors."""
