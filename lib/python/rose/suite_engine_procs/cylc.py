@@ -46,6 +46,9 @@ class CylcProcessor(SuiteEngineProcessor):
 
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "submit-fail",
+              "started": "init",
+              "succeeded": "pass",
+              "failed": "fail",
               "execution started": "init",
               "execution succeeded": "pass",
               "execution failed": "fail",
