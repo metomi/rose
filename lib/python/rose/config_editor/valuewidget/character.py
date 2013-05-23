@@ -85,7 +85,6 @@ class QuotedTextValueWidget(gtk.HBox):
         if var_text != self.value:
             self.value = var_text
             self.set_value(var_text)
-            self.in_error = not self.type_checker(self.value)
         return False
 
     def get_focus_index(self):
@@ -109,14 +108,25 @@ class QuotedTextValueWidget(gtk.HBox):
         self.entry.set_position(focus_index - 1)
 
     def handle_type_error(self, has_error):
-        """Handle a change in error related to the value."""
+        """Handle a change in error related to the value.
+
+        We need to distinguish between quote-related errors and errors
+        related to pattern matching or other attributes.
+
+        """
         position = self.entry.get_position()
         text = self.entry.get_text()
-        self.in_error = has_error
-        if has_error:  # Normal state -> error state.
+        was_in_error = self.in_error
+        self.in_error = not self.type_checker(self.value)
+        if self.in_error and not was_in_error:
+            # This is an incoming quote error.
             position += 1 + text[:position].count(self.quote_char)
-        else:  # Error state -> normal state.
+        elif was_in_error and not self.in_error:
+            # This is an outgoing quote error.
             position -= 1 + text[:position].count(self.esc_quote_chars)
+        else:
+            # The error isn't related to quotes, so don't do anything.
+            return False
         self.set_entry_text()
         self.entry.set_position(position)
 
