@@ -1572,7 +1572,7 @@ if __name__ == '__main__':
         sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
-    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode", "profile")
+    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode")
     opts, args = opt_parser.parse_args()
     if args:
         opt_parser.print_usage(sys.stderr)
@@ -1597,7 +1597,7 @@ if __name__ == '__main__':
     if opts.new_mode:
         cwd = None
     rose.gtk.util.set_exception_hook(keep_alive=True)
-    if opts.profile:
+    if opts.profile_mode:
         f = tempfile.NamedTemporaryFile()
         cProfile.runctx("spawn_window(cwd, debug_mode=opts.debug_mode)",
                         globals(), locals(), f.name)

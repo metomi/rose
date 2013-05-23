@@ -339,6 +339,7 @@ class RoseOptionParser(OptionParser):
                        ["--profile"],
                        {"action": "store_true",
                         "default": False,
+                        "dest": "profile_mode",
                         "help": "Switch on profiling."}],
                "property": [
                        ["--property", "-p"],
