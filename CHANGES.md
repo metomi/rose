@@ -22,6 +22,9 @@ command. This may change the behaviour of some existing suites.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#675: rose config-edit: The quoted widget no longer messes with the quote
+characters when a non-quote related error occurs.
+
 \#672: rose config-edit: titles and descriptions in the `Add` menu.
 
 \#671: rose suite-log-view: HTML view: fix delta time sort.
