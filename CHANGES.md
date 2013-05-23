@@ -11,14 +11,33 @@ for a full listing of issues for each release.
 
 Changes that have significant impact on user experience.
 
+\#666: rose task-env and rose task-run: the `--path=[NAME=]GLOB` option can
+now be used in either command. Note, however, if `rose task-env` is used before
+`rose task-run`, any options shared between the 2 commands, including
+`--path=[NAME=]GLOB` options will be ignored by the subsequent `rose task-run`
+command. This may change the behaviour of some existing suites.
+
 ### Other Changes
 
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#672: rose config-edit: titles and descriptions in the `Add` menu.
+
+\#671: rose suite-log-view: HTML view: fix delta time sort.
+
+\#670: rose config-edit: information on optional configuration. If a setting
+can be modified in an optional configuration, the information will now be
+shown with the setting's label.
+
+\#668: rose config-edit: support new configuration metadata `value-titles` to
+define a list of titles to associate with a corresponding `values` setting.
+
 \#665: rose config-edit: fix ignore status logic.
 
 \#663: rose suite-hook and rose suite-log-view: more efficient logic.
+
+\#661: rose metadata-check: new command to validate configuration metadata.
 
 \#659, #664: rose suite-run site/user configuration: configure a list of
 scannable hosts. This is useful when a set of hosts are no longer intended to be
@@ -33,6 +52,9 @@ used to run new suites but still have running suites on them.
 \#647: rosie ls: now a query.
 
 \#634: rose config-edit: support latent ignored pages.
+
+\#628: rose mpi-launch: new `--file=FILE` option or `$PWD/rose-mpi-launch.rc`
+to specify a command file to use with the MPI launcher.
 
 --------------------------------------------------------------------------------
 
