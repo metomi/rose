@@ -179,6 +179,8 @@ class ReporterContext(object):
 
     """
 
+    TTY_COLOUR_ERR = "\033[1;31m"
+
     def __init__(self,
                  type=None,
                  verbosity=Reporter.DEFAULT,
@@ -204,9 +206,9 @@ class ReporterContext(object):
                 else:
                     return ""
             elif level > Reporter.FAIL:
-                return Reporter.PREFIX_WARN
+                return self._tty_colour_err(Reporter.PREFIX_WARN)
             else:
-                return Reporter.PREFIX_FAIL
+                return self._tty_colour_err(Reporter.PREFIX_FAIL)
         if callable(self.prefix):
             return self.prefix(type, level)
         else:
@@ -219,6 +221,14 @@ class ReporterContext(object):
     def write(self, message):
         """Write the message to the context's handle."""
         return self.handle.write(message)
+
+    def _tty_colour_err(self, s):
+        try:
+            if self.handle.isatty():
+                return self.TTY_COLOUR_ERR + s + "\033[0m"
+        except:
+            pass
+        return s
 
 
 class ReporterContextQueue(ReporterContext):

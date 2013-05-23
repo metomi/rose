@@ -18,13 +18,13 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # NAME
-#     rose-test-suite
+#     rose-test-battery
 #
 # SYNOPSIS
-#     rose test-suite [-v] [UTIL ...]
+#     rose test-battery [-v] [UTIL ...]
 #
 # DESCRIPTION
-#     Run the Rose test suite.
+#     Run the Rose test battery.
 #
 #     If no argument is specified, run available tests for all utilities.
 #     Otherwise, run only the tests for the utilities in the argument list.
@@ -45,7 +45,8 @@ if [[ -n ${1:-} && $1 == '-v' ]]; then
 fi
 UTIL_LIST_ARG=${@:-$UTIL_LIST}
 #-------------------------------------------------------------------------------
-RC=0
+N_DONE=0
+N_PASS=0
 for UTIL in $UTIL_LIST_ARG; do
     TEST_DIR=
     if grep -q "^$UTIL$" <<<"$UTIL_LIST"; then
@@ -60,11 +61,21 @@ for UTIL in $UTIL_LIST_ARG; do
         echo -e "[TEST-INIT] "$(basename $TEST_DIR)
         TEST_RC=0
         $TEST_DIR/tests $VERBOSE || TEST_RC=$?
-        if ((TEST_RC != 0)); then
-            RC=1
+        if ((TEST_RC == 0)); then
+            ((++N_PASS))
         fi
+        ((++N_DONE))
         echo -e "[TEST-EXIT] "$(basename $TEST_DIR)" ($TEST_RC)"
     fi 
 done
 #-------------------------------------------------------------------------------
-exit $RC
+if ((N_PASS != N_DONE)); then
+    if [[ -t 1 ]]; then
+        echo -e "\e[1;31m[FAIL]\e[0m $N_PASS/$N_DONE" # red
+    else
+        echo "[FAIL] $N_PASS/$N_DONE"
+    fi
+    exit 1
+fi
+echo "[PASS] $N_PASS/$N_DONE"
+exit 0
