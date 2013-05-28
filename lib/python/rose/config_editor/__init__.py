@@ -158,9 +158,20 @@ EVENT_LOAD_CONFIG = "{0} - reading    "
 EVENT_LOAD_DONE = "{0} - loading GUI"
 EVENT_LOAD_ERRORS = "{0} - errors: {1}"
 EVENT_LOAD_METADATA = "{0} - configuring"
-EVENT_LOAD_NUMBER_OF_EVENTS = 2
 EVENT_LOAD_STATUSES = "{0} - checking   "
-EVENT_MACRO_VALIDATE = "{1}: {2} errors in {0}"
+LOAD_NUMBER_OF_EVENTS = 2
+
+# Other event strings
+EVENT_ERR_MARKUP = "<span color='red'>{0}</span>"
+EVENT_FOUND_ID = "Found {0}"
+EVENT_MACRO_CONFIGS = "{0} configurations"
+EVENT_MACRO_TRANSFORM = "{1}: {0}: {2} changes"
+EVENT_MACRO_TRANSFORM_ALL = "{0}: {1} changes"
+EVENT_MACRO_TRANSFORM_ALL_OK = "{0}: no changes"
+EVENT_MACRO_TRANSFORM_OK = "{1}: {0}: no changes"
+EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
+EVENT_MACRO_VALIDATE_ALL = "{0}: {1} errors"
+EVENT_MACRO_VALIDATE_ALL_OK = "{0}: all OK"
 EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
 
 # Widget strings

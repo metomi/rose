@@ -487,6 +487,8 @@ class MainMenuHandler(object):
         sorter = rose.config.sort_settings
         to_id = lambda s: self.util.get_id_from_section_option(s.section,
                                                                s.option)
+        config_macro_errors = []
+        config_macro_changes = []
         for config_name, macro_inst, modname, objname, methname in macro_data:
             macro_fullname = '.'.join([modname, objname, methname])
             macro_config = self.data.dump_to_internal_config(config_name)
@@ -512,19 +514,56 @@ class MainMenuHandler(object):
                 if not change_list:
                     continue
                 change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
-                self.handle_macro_transforms(config_name, macro_fullname,
-                                             macro_config, change_list)
+                num_changes = self.handle_macro_transforms(
+                                                config_name, macro_fullname,
+                                                macro_config, change_list)
+                config_macro_changes.append((config_name,
+                                             macro_fullname,
+                                             num_changes))
                 continue
             elif methname == rose.macro.VALIDATE_METHOD:
                 if not isinstance(return_value, list):
-                    self._handle_bad_macro_return(macro_fullname, return_value)
+                    self._handle_bad_macro_return(macro_fullname,
+                                                  return_value)
                     continue
                 if return_value:
                     return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+                config_macro_errors.append((config_name,
+                                            macro_fullname,
+                                            len(return_value)))
                 self.handle_macro_validation(config_name, macro_fullname,
                                              macro_config, return_value)
                 continue
+        if class_name is None:
+            # Construct a grouped report.
+            config_macro_errors.sort()
+            config_macro_changes.sort()
+            if rose.macro.VALIDATE_METHOD in method_names:
+                null_format = rose.config_editor.EVENT_MACRO_VALIDATE_ALL_OK
+                change_format = rose.config_editor.EVENT_MACRO_VALIDATE_ALL
+                num_issues = len(config_macro_errors)
+                issue_confs = sorted(set(e[0] for e in config_macro_errors))
+            else:
+                null_format = rose.config_editor.EVENT_MACRO_TRANSFORM_ALL_OK
+                change_format = rose.config_editor.EVENT_MACRO_TRANSFORM_ALL
+                num_issues = len(config_macro_changes)
+                issue_confs = sorted(set(e[0] for e in config_macro_changes))
+            if num_issues:
+                issue_conf_text = self._format_macro_config_names(issue_confs)
+                self.reporter.report(change_format.format(issue_conf_text,
+                                                          num_issues),
+                                     type_=self.reporter.TYPE_ERR)
+            else:
+                all_conf_text = self._format_macro_config_names(configs)
+                self.reporter.report(null_format.format(all_conf_text),
+                                     type_=self.reporter.TYPE_OUT)
         return False                          
+
+    def _format_macro_config_names(self, config_names):
+        if len(config_names) > 5:
+            return rose.config_editor.EVENT_CONFIGS.format(len(config_names))
+        config_names = [c.lstrip("/") for c in config_names]
+        return ", ".join(config_names)
 
     def _handle_bad_macro_return(self, macro_fullname, return_value):
         rose.gtk.util.run_dialog(
@@ -545,6 +584,7 @@ class MainMenuHandler(object):
         
         """
         if not change_list:
+            self._report_macro_transform(config_name, macro_name, 0)
             return
         macro_type = ".".join(macro_name.split(".")[:-1])
         var_changes = []
@@ -561,7 +601,8 @@ class MainMenuHandler(object):
                               config_name, macro_type, change_list,
                               search_func=search)
             if not proceed_ok:
-                return
+                self._report_macro_transform(config_name, macro_name, 0)
+                return 0
         changed_ids = []
         sections = self.data.config[config_name].sections
         for item in sect_changes:
@@ -657,7 +698,25 @@ class MainMenuHandler(object):
         for sect in sect_removes:
             self.sect_ops.remove_section(config_name, sect)
         self.apply_macro_transform(config_name, macro_type, changed_ids)
-                
+        self._report_macro_transform(config_name, macro_name, len(change_list))
+        return len(change_list)
+
+    def _report_macro_transform(self, config_name, macro_name, num_changes):
+        name = config_name.lstrip("/")
+        if macro_name.endswith(rose.macro.TRANSFORM_METHOD):
+            macro = macro_name.split('.')[-2]
+        else:
+            macro = macro_name.split('.')[-1]
+        if num_changes:
+            info_text = rose.config_editor.EVENT_MACRO_TRANSFORM.format(
+                                    name, macro, num_changes)
+            type_ = self.reporter.TYPE_ERR
+        else:
+            info_text = rose.config_editor.EVENT_MACRO_TRANSFORM_OK.format(
+                                    name, macro)
+            type_ = self.reporter.TYPE_OUT
+        self.reporter.report(info_text, type_=type_)
+
     def handle_macro_validation(self, config_name, macro_name,
                                 macro_config, problem_list, no_display=False):
         """Apply errors and give information to the user."""
@@ -665,18 +724,27 @@ class MainMenuHandler(object):
         self.apply_macro_validation(config_name, macro_type, problem_list)
         search = lambda i: self.find_ns_id_func(config_name, i)
         if not no_display:
-            if problem_list:
-                info_text = rose.config_editor.EVENT_MACRO_VALIDATE.format(
-                                 config_name, macro_type, problem_list)
-                type_ = self.reporter.TYPE_ERR
-            else:
-                info_text = rose.config_editor.EVENT_MACRO_VALIDATE_OK.format(
-                                 config_name, macro_type)
-                type_ = self.reporter.TYPE_OUT
-            self.reporter.report(info_text, type_=type_)
+            self._report_macro_validation(config_name, macro_name,
+                                          len(problem_list))
             self.mainwindow.launch_macro_changes_dialog(
                             config_name, macro_type, problem_list,
                             mode="validate", search_func=search)
+
+    def _report_macro_validation(self, config_name, macro_name, num_errors):
+        name = config_name.lstrip("/")
+        if macro_name.endswith(rose.macro.VALIDATE_METHOD):
+            macro = macro_name.split('.')[-2]
+        else:
+            macro = macro_name.split('.')[-1]
+        if num_errors:
+            info_text = rose.config_editor.EVENT_MACRO_VALIDATE.format(
+                                name, macro, num_errors)
+            type_ = self.reporter.TYPE_ERR
+        else:
+            info_text = rose.config_editor.EVENT_MACRO_VALIDATE_OK.format(
+                                name, macro)
+            type_ = self.reporter.TYPE_OUT
+        self.reporter.report(info_text, type_=type_)
 
     def handle_run_scheduler(self, *args):
         """Run the scheduler for this suite."""

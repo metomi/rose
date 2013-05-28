@@ -43,7 +43,7 @@ class MainWindow(object):
     """Generate the main window and dialog handling for this example."""
 
     def load(self, name='Untitled', menu=None, accelerators=None, toolbar=None,
-             nav_panel=None, notebook=None,
+             nav_panel=None, status_bar=None, notebook=None,
              page_change_func=rose.config_editor.false_function,
              save_func=rose.config_editor.false_function):
         self.window = gtk.Window()
@@ -75,6 +75,7 @@ class MainWindow(object):
             notebook.connect_after(signal, page_change_func)
         self.generate_main_hbox(nav_panel, notebook)
         self.top_vbox.pack_start(self.main_hbox, expand=True)
+        self.top_vbox.pack_start(status_bar, expand=False, fill=False)
         self.top_vbox.show()
         self.window.show()
         nav_panel.tree.columns_autosize()

@@ -50,7 +50,7 @@ class Reporter(rose.reporter.Reporter):
                 level = message.level
             message_kwargs = message.kwargs
         if type_ == self.EVENT_TYPE_LOAD:
-            return self._loader_update_func(message, **message_kwargs)
+            return self._loader_update_func(str(message), **message_kwargs)
         return self._status_bar_update_func(message, type_, level)
 
     def report_load_event(self, text, no_progress=False):
@@ -69,9 +69,6 @@ class StatusBar(gtk.VBox):
         super(StatusBar, self).__init__()
         self.verbosity = verbosity
         self.num_errors = 0
-        hsep = gtk.HSeparator()
-        hsep.show()
-        self.pack_start(hsep, expand=False, fill=False)
         hbox = gtk.HBox()
         hbox.show()
         self.pack_start(hbox, expand=False, fill=False)
@@ -80,8 +77,12 @@ class StatusBar(gtk.VBox):
         self._generate_message_widget()
         vsep_message = gtk.VSeparator()
         vsep_message.show()
+        vsep_eb = gtk.EventBox()
+        vsep_eb.show()
         hbox.pack_start(vsep_message, expand=False, fill=False)
-        hbox.pack_start(self._message_widget, expand=True, fill=True)
+        hbox.pack_start(vsep_eb, expand=True, fill=True)
+        hbox.pack_end(self._message_widget, expand=False, fill=False,
+                      padding=rose.config_editor.SPACING_SUB_PAGE)
         self.messages = []
         self.show()
 
@@ -111,13 +112,14 @@ class StatusBar(gtk.VBox):
         locator = rose.resource.ResourceLocator(paths=sys.path)
         icon_path = locator.locate(
                             'etc/images/rose-config-edit/error_icon.xpm')
-        image = gtk.gdk.image_new_from_file(icon_path)
+        image = gtk.image_new_from_file(icon_path)
         image.show()
         self._error_widget.pack_start(image, expand=False, fill=False)
         self._error_widget_label = gtk.Label()
         self._error_widget_label.show()
-        self._error_widget.pack_start(self.error_widget_label, expand=False,
-                                      fill=False)
+        self._error_widget.pack_start(self._error_widget_label, expand=False,
+                                      fill=False,
+                                      padding=rose.config_editor.SPACING_SUB_PAGE)
         self._update_error_widget()
 
     def _generate_message_widget(self):
@@ -125,15 +127,23 @@ class StatusBar(gtk.VBox):
         self._message_widget = gtk.HBox()
         self._message_widget.show()
         self._message_widget_error_image = gtk.image_new_from_stock(
-                                                     gtk.STOCK_ERROR,
+                                                     gtk.STOCK_DIALOG_ERROR,
                                                      gtk.ICON_SIZE_MENU)
-        self._message_widget.pack_start(self._message_widget_error_image,
-                                        expand=False, fill=False)
+        self._message_widget_info_image = gtk.image_new_from_stock(
+                                                    gtk.STOCK_DIALOG_INFO,
+                                                    gtk.ICON_SIZE_MENU)
         self._message_widget_label = gtk.Label()
         self._message_widget_label.show()
-        self._message_widget.pack_start(self.message_widget_label,
-                                        expand=False,
-                                        fill=False)
+        self._message_widget.pack_start(
+                      self._message_widget_error_image,
+                      expand=False, fill=False)
+        self._message_widget.pack_start(
+                      self._message_widget_info_image,
+                      expand=False, fill=False)
+        self._message_widget.pack_start(
+                      self._message_widget_label,
+                      expand=False, fill=False,
+                      padding=rose.config_editor.SPACING_SUB_PAGE)
 
     def _update_error_widget(self):
         # Update the error display widget.
@@ -143,7 +153,11 @@ class StatusBar(gtk.VBox):
     def _update_message_widget(self, message_text, type_):
         # Update the message display widget.
         if type_ == rose.reporter.Reporter.TYPE_ERR:
+            markup = rose.config_editor.EVENT_ERR_MARKUP.format(
+                                 rose.gtk.util.safe_str(message_text))
             self._message_widget_error_image.show()
+            self._message_widget_info_image.hide()
         else:
             self._message_widget_error_image.hide()
+            self._message_widget_info_image.show()
         self._message_widget_label.set_text(message_text)

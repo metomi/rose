@@ -314,7 +314,7 @@ class ConfigDataManager(object):
         if not skip_load_event:
             self.reporter.report_load_event(
                           rose.config_editor.EVENT_LOAD_METADATA.format(
-                                                        name.lstrip("/"))
+                                                        name.lstrip("/")))
         # Process namespaces and ignored statuses.
         self.load_node_namespaces(name)
         self.load_node_namespaces(name, from_saved=True)

@@ -54,7 +54,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self._popup_menu_func = popup_menu_func
         self._ask_can_show_func = ask_can_show_func
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        self.set_shadow_type(gtk.SHADOW_OUT)
         self.panel_top = gtk.TreeViewColumn()
         self.panel_top.set_title(rose.config_editor.TREE_PANEL_TITLE)
         self.cell_error_icon = gtk.CellRendererPixbuf()

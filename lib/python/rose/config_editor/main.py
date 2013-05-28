@@ -71,6 +71,7 @@ import rose.config_editor.ops.section
 import rose.config_editor.ops.variable
 import rose.config_editor.page
 import rose.config_editor.stack
+import rose.config_editor.status
 import rose.config_editor.updater
 import rose.config_editor.util
 import rose.config_editor.variable
@@ -117,8 +118,6 @@ class MainController(object):
         self.find_hist = {'regex': '', 'ids': []}
         self.util = rose.config_editor.util.Lookup()
         self.metadata_off = False
-
-        self.loader_update = loader_update
 
         # Set page variable 'verbosity' defaults.
         self.page_var_show_modes = {
@@ -232,8 +231,9 @@ class MainController(object):
 
         self.data.load(config_directory, config_objs)
 
-        self.loader_update(rose.config_editor.LOAD_STATUSES,
-                           self.data.top_level_name)
+        self.reporter.report_load_event(
+                      rose.config_editor.EVENT_LOAD_STATUSES.format(
+                                                    self.data.top_level_name))
 
         if not self.is_pluggable:
             self.generate_toolbar()
@@ -252,6 +252,7 @@ class MainController(object):
                                  accelerators=self.menubar.accelerators,
                                  toolbar=self.toolbar,
                                  nav_panel=self.nav_panel,
+                                 status_bar=self.status_bar,
                                  notebook=self.notebook,
                                  page_change_func=self.handle_page_change,
                                  save_func=self.save_to_file,)
@@ -263,12 +264,14 @@ class MainController(object):
             self.mainwindow.window.connect_after('focus-in-event',
                                                  self.handle_page_change)
         self.updater.update_all(is_loading=True)
-        self.loader_update(rose.config_editor.LOAD_ERRORS.format(
-                                                   self.updater.load_errors),
-                           self.data.top_level_name)
+        self.reporter.report_load_event(
+                      rose.config_editor.EVENT_LOAD_ERRORS.format(
+                                              self.data.top_level_name,
+                                              self.updater.load_errors))
         self.updater.perform_startup_check()
-        self.loader_update(rose.config_editor.LOAD_DONE,
-                           self.data.top_level_name)
+        self.reporter.report_load_event(
+                      rose.config_editor.EVENT_LOAD_DONE.format(
+                                               self.data.top_level_name))
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
@@ -647,7 +650,7 @@ class MainController(object):
         if len(sections) == 1:
             page_metadata.update({'id': sections.pop()})
         sect_ops = rose.config_editor.ops.section.SectionOperations(
-                                self.data, self.util,
+                                self.data, self.util, self.reporter,
                                 self.undo_stack, self.redo_stack,
                                 self.check_cannot_enable_setting,
                                 self.updater.update_namespace,
@@ -656,7 +659,7 @@ class MainController(object):
                                 view_page_func=self.view_page,
                                 kill_page_func=self.kill_page)
         var_ops = rose.config_editor.ops.variable.VariableOperations(
-                                self.data, self.util, 
+                                self.data, self.util, self.reporter,
                                 self.undo_stack, self.redo_stack,
                                 sect_ops.add_section,
                                 self.check_cannot_enable_setting,
@@ -1283,7 +1286,7 @@ class MainController(object):
         expression = self.find_entry.get_text()
         start_page = self._get_current_page()
         if expression is not None and expression != '':
-            page = self.perform_find(expression, start_page)
+            page, var_id = self.perform_find(expression, start_page)
             if page is None:
                 text = rose.config_editor.WARNING_NOT_FOUND
                 try:  # Needs PyGTK >= 2.16
@@ -1296,6 +1299,9 @@ class MainController(object):
                                   text,
                                   rose.config_editor.WARNING_NOT_FOUND_TITLE)
             else:
+                if var_id is not None:
+                    self.reporter.report(
+                         rose.config_editor.EVENT_FOUND_ID.format(var_id))
                 self._clear_find()
 
     def _clear_find(self, *args):
@@ -1310,7 +1316,7 @@ class MainController(object):
         if expression == '':
             return None
         page_id, var_id = self.get_found_page_and_id(expression, start_page)
-        return self.view_page(page_id, var_id)
+        return self.view_page(page_id, var_id), var_id
 
     def perform_find_by_ns_id(self, namespace, setting_id):
         """Drive find by id."""
