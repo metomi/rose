@@ -152,7 +152,7 @@ class MainController(object):
 
         self.reporter = rose.config_editor.status.Reporter(
                              loader_update,
-                             self.status_bar_update)
+                             self.update_status_text)
 
         # Load the top configuration directory
         self.data = rose.config_editor.data.ConfigDataManager(
@@ -528,6 +528,11 @@ class MainController(object):
                               self.nav_handle.get_ns_metadata_and_comments,
                               self.nav_handle.popup_panel_menu,
                               self.nav_handle.get_can_show_page)
+
+    def generate_status_bar(self):
+        """Create a status bar."""
+        self.status_bar = rose.config_editor.status.StatusBar(
+                          verbosity=rose.config_editor.STATUS_BAR_VERBOSITY)
 
 #------------------ Page manipulation functions ------------------------------
 
@@ -1134,10 +1139,16 @@ class MainController(object):
         if not hasattr(self, "nav_panel"):
             return False
         changes, errors = self.nav_panel.get_change_error_totals()
+        self.status_bar.set_num_errors(errors)
         self._get_menu_widget('/Autofix').set_sensitive(bool(errors))
         self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_TRANSFORM,
                                           bool(errors))
         self._update_change_widget_sensitivity(is_changed=bool(changes))
+
+    def update_status_text(self, *args, **kwargs):
+        """Update the message displayed in the status bar."""
+        if hasattr(self, "status_bar"):
+            self.status_bar.set_message(*args, **kwargs)
 
     def _update_change_widget_sensitivity(self, is_changed=False):
         # Alter sensitivity of 'unsaved changes' related widgets.

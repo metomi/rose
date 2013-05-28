@@ -248,8 +248,8 @@ class ConfigDataManager(object):
             s_config = copy.deepcopy(config)
             if not skip_load_event:
                 self.reporter.report_load_event(
-                                     rose.config_editor.LOAD_CONFIG.format(
-                                                        name.lstrip("/")))
+                              rose.config_editor.EVENT_LOAD_CONFIG.format(
+                                                       name.lstrip("/")))
         else:
             config_directory = config_directory.rstrip("/")
             if config_directory != self.top_level_directory:
@@ -269,8 +269,8 @@ class ConfigDataManager(object):
                 name = "/" + self.top_level_name + "-conf"
             if not skip_load_event:
                 self.reporter.report_load_event(
-                                     rose.config_editor.LOAD_CONFIG.format(
-                                                        name.lstrip("/")))
+                              rose.config_editor.EVENT_LOAD_CONFIG.format(
+                                                       name.lstrip("/")))
             config_path = os.path.join(config_directory, rose.SUB_CONFIG_NAME)
             if not os.path.isfile(config_path):
                 if (os.path.abspath(config_directory) ==
@@ -313,8 +313,8 @@ class ConfigDataManager(object):
         
         if not skip_load_event:
             self.reporter.report_load_event(
-                                 rose.config_editor.LOAD_METADATA.format(
-                                 name.lstrip("/"))
+                          rose.config_editor.EVENT_LOAD_METADATA.format(
+                                                        name.lstrip("/"))
         # Process namespaces and ignored statuses.
         self.load_node_namespaces(name)
         self.load_node_namespaces(name, from_saved=True)

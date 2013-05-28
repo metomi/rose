@@ -703,12 +703,12 @@ class Updater(object):
                 map_ = id_error_dict
                 if is_loading:
                     self.load_errors += 1
-                    update_text = rose.config_editor.LOAD_ERRORS.format(
-                                                          self.load_errors)
-                    self.reporter.report_load_event(
-                                              update_text,
-                                              self.data.top_level_name,
-                                              no_progress=True)
+                    update_text = rose.config_editor.EVENT_LOAD_ERRORS.format(
+                                                     self.data.top_level_name,
+                                                     self.load_errors)
+                    
+                    self.reporter.report_load_event(update_text,
+                                                    no_progress=True)
             if setting_id in map_:
                 # No need for further update, already had warning/error.
                 map_.pop(setting_id)

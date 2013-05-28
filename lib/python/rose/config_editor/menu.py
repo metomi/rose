@@ -665,6 +665,15 @@ class MainMenuHandler(object):
         self.apply_macro_validation(config_name, macro_type, problem_list)
         search = lambda i: self.find_ns_id_func(config_name, i)
         if not no_display:
+            if problem_list:
+                info_text = rose.config_editor.EVENT_MACRO_VALIDATE.format(
+                                 config_name, macro_type, problem_list)
+                type_ = self.reporter.TYPE_ERR
+            else:
+                info_text = rose.config_editor.EVENT_MACRO_VALIDATE_OK.format(
+                                 config_name, macro_type)
+                type_ = self.reporter.TYPE_OUT
+            self.reporter.report(info_text, type_=type_)
             self.mainwindow.launch_macro_changes_dialog(
                             config_name, macro_type, problem_list,
                             mode="validate", search_func=search)

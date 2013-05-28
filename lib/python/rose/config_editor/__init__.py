@@ -154,12 +154,14 @@ LABEL_PAGE_HELP = "Page help"
 LABEL_PAGE_MACRO_BUTTON = "Macros"
 
 # Loading strings
-LOAD_CONFIG = "reading    "
-LOAD_DONE = "loading GUI"
-LOAD_ERRORS = "errors: {0}"
-LOAD_METADATA = "configuring"
-LOAD_NUMBER_OF_EVENTS = 2
-LOAD_STATUSES = "checking   "
+EVENT_LOAD_CONFIG = "{0} - reading    "
+EVENT_LOAD_DONE = "{0} - loading GUI"
+EVENT_LOAD_ERRORS = "{0} - errors: {1}"
+EVENT_LOAD_METADATA = "{0} - configuring"
+EVENT_LOAD_NUMBER_OF_EVENTS = 2
+EVENT_LOAD_STATUSES = "{0} - checking   "
+EVENT_MACRO_VALIDATE = "{1}: {2} errors in {0}"
+EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
 
 # Widget strings
 
@@ -287,6 +289,10 @@ SIZE_PAGE_DETACH = (650, 600)
 SIZE_WINDOW = (900, 600)
 SPACING_PAGE = 10
 SPACING_SUB_PAGE = 5
+
+# Status bar configuration
+STATUS_BAR_MESSAGE_LIMIT = 100
+STATUS_BAR_VERBOSITY = 0  # Compare with rose.reporter.Reporter.
 
 # Stack action names and presentation
 STACK_GROUP_ADD = "Add"
