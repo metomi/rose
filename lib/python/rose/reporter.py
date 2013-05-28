@@ -77,16 +77,16 @@ class Reporter(object):
         self.event_handler = None
         self.raise_on_exc = raise_on_exc
 
-    def report(self, message, type=None, level=None, prefix=None, clip=None):
+    def report(self, message, type_=None, level=None, prefix=None, clip=None):
         """Report a message, if relevant for the reporter contexts.
 
         message:
             The message to report. An Event, an Exception, an object
             with a __str__ method, or a callable that returns an object
             with a __str__ method.
-        type:
-            The message type. The default is determined by message.
-            If it is an Event, the default is message.type. If it is an
+        type_:
+            The message type_. The default is determined by message.
+            If it is an Event, the default is message.type_. If it is an
             Exception, the default is TYPE_ERR. Otherwise, the default
             is TYPE_OUT.
         level:
@@ -105,20 +105,20 @@ class Reporter(object):
 
         """
         if self.event_handler is not None:
-            return self.event_handler(message, type, level, prefix, clip)
+            return self.event_handler(message, type_, level, prefix, clip)
 
         if isinstance(message, Event):
-            if type is None:
-                type = message.type
+            if type_ is None:
+                type_ = message.type_
             if level is None:
                 level = message.level
         elif isinstance(message, Exception):
-            if type is None:
-                type = self.TYPE_ERR
+            if type_ is None:
+                type_ = self.TYPE_ERR
             if level is None:
                 level = self.FAIL
-        if type is None:
-            type = self.TYPE_OUT
+        if type_ is None:
+            type_ = self.TYPE_OUT
         if level is None:
             level = self.DEFAULT
         msg = None
@@ -127,14 +127,14 @@ class Reporter(object):
             if context.is_closed():
                 self.contexts.pop(key) # remove contexts with closed file handles
                 continue
-            if context.type is not None and context.type != type:
+            if context.type_ is not None and context.type_ != type_:
                 continue
             if level > context.verbosity:
                 continue
             if prefix is None:
-                prefix = context.get_prefix(type, level)
+                prefix = context.get_prefix(type_, level)
             elif callable(prefix):
-                prefix = prefix(type, level)
+                prefix = prefix(type_, level)
             if msg is None:
                 if callable(message):
                     msg = str(message())
@@ -167,7 +167,7 @@ class ReporterContext(object):
     """A context for the reporter object.
 
     It has the following attributes:
-    type:
+    type_:
         The message type to report to this context.
         (Reporter.TYPE_ERR, Reporter.TYPE_ERR or None.)
     verbosity:
@@ -182,25 +182,25 @@ class ReporterContext(object):
     TTY_COLOUR_ERR = "\033[1;31m"
 
     def __init__(self,
-                 type=None,
+                 type_=None,
                  verbosity=Reporter.DEFAULT,
                  handle=None,
                  prefix=None):
-        if type == Reporter.TYPE_ERR:
+        if type_ == Reporter.TYPE_ERR:
             if handle is None:
                 handle = sys.stderr
-        elif type == Reporter.TYPE_OUT:
+        elif type_ == Reporter.TYPE_OUT:
             if handle is None:
                 handle = sys.stdout
-        self.type = type
+        self.type_ = type_
         self.handle = handle
         self.verbosity = verbosity
         self.prefix = prefix
 
-    def get_prefix(self, type, level):
-        """Return the prefix suitable for the message type and level."""
+    def get_prefix(self, type_, level):
+        """Return the prefix suitable for the message type_ and level."""
         if self.prefix is None:
-            if type == Reporter.TYPE_OUT:
+            if type_ == Reporter.TYPE_OUT:
                 if level:
                     return Reporter.PREFIX_INFO
                 else:
@@ -210,7 +210,7 @@ class ReporterContext(object):
             else:
                 return self._tty_colour_err(Reporter.PREFIX_FAIL)
         if callable(self.prefix):
-            return self.prefix(type, level)
+            return self.prefix(type_, level)
         else:
             return self.prefix
 
@@ -236,8 +236,8 @@ class ReporterContextQueue(ReporterContext):
     """A context for the reporter object.
 
     It has the following attributes:
-    type:
-        The message type to report to this context.
+    type_:
+        The message type_ to report to this context.
         (Reporter.TYPE_ERR, Reporter.TYPE_ERR or None.)
     verbosity:
         The verbosity of this context.
@@ -249,11 +249,11 @@ class ReporterContextQueue(ReporterContext):
     """
 
     def __init__(self,
-                 type=None,
+                 type_=None,
                  verbosity=Reporter.DEFAULT,
                  queue=None,
                  prefix=None):
-        ReporterContext.__init__(self, type, verbosity, None, prefix)
+        ReporterContext.__init__(self, type_, verbosity, None, prefix)
         if queue is None:
             queue = multiprocessing.Queue()
         self.queue = queue
@@ -297,8 +297,9 @@ class Event(object):
 
     def __init__(self, *args, **kwargs):
         self.args = args
-        self.level = kwargs.get("level", self.LEVEL)
-        self.type = kwargs.get("type", self.TYPE)
+        self.level = kwargs.pop("level", self.LEVEL)
+        self.type_ = kwargs.pop("type_", self.TYPE)
+        self.kwargs = kwargs
 
     def __str__(self):
         if len(self.args) == 1:

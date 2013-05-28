@@ -322,14 +322,13 @@ class MainMenuHandler(object):
 
     """Handles signals from the main menu and tool bar."""
 
-    def __init__(self, data, util, mainwindow, undo_stack, redo_stack,
-                 undo_func, apply_macro_transform_func,
-                 apply_macro_validation_func,
-                 section_ops_inst,
-                 variable_ops_inst,
-                 find_ns_id_func):
-        self.util = util
+    def __init__(self, data, util, reporter, mainwindow,
+                 undo_stack, redo_stack, undo_func,
+                 apply_macro_transform_func, apply_macro_validation_func,
+                 section_ops_inst, variable_ops_inst, find_ns_id_func):
         self.data = data
+        self.util = util
+        self.reporter = reporter
         self.mainwindow = mainwindow
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack

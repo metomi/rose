@@ -35,7 +35,7 @@ class VariableOperations(object):
 
     """A class to hold functions that act on variables and their storage."""
 
-    def __init__(self, data, util, undo_stack, redo_stack,
+    def __init__(self, data, util, reporter, undo_stack, redo_stack,
                  add_section_func,
                  check_cannot_enable_func=rose.config_editor.false_function, 
                  update_ns_func=rose.config_editor.false_function,
@@ -43,6 +43,7 @@ class VariableOperations(object):
                  search_id_func=rose.config_editor.false_function):
         self.__data = data
         self.__util = util
+        self.__reporter = reporter
         self.__undo_stack = undo_stack
         self.__redo_stack = redo_stack
         self.__add_section_func = add_section_func

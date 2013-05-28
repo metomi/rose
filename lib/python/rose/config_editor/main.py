@@ -150,10 +150,14 @@ class MainController(object):
              rose.config_editor.SHOW_MODE_NO_TITLE:
              rose.config_editor.SHOULD_SHOW_NO_TITLE}
 
+        self.reporter = rose.config_editor.status.Reporter(
+                             loader_update,
+                             self.status_bar_update)
+
         # Load the top configuration directory
         self.data = rose.config_editor.data.ConfigDataManager(
                                 self.util,
-                                loader_update,
+                                self.reporter,
                                 self.page_ns_show_modes,
                                 self.reload_namespace_tree)
 
@@ -161,12 +165,13 @@ class MainController(object):
                   rose.config_editor.nav_controller.NavTreeManager(
                                 self.data,
                                 self.util,
+                                self.reporter,
                                 self.tree_trigger_update))
 
         self.mainwindow = rose.config_editor.window.MainWindow()
 
         self.section_ops = rose.config_editor.ops.section.SectionOperations(
-                                self.data, self.util,
+                                self.data, self.util, self.reporter,
                                 self.undo_stack, self.redo_stack,
                                 self.check_cannot_enable_setting,
                                 lambda n: self.updater.update_namespace(n),
@@ -177,7 +182,7 @@ class MainController(object):
 
         self.variable_ops = (
                       rose.config_editor.ops.variable.VariableOperations(
-                                   self.data, self.util, 
+                                   self.data, self.util, self.reporter,
                                    self.undo_stack, self.redo_stack,
                                    self.section_ops.add_section,
                                    self.check_cannot_enable_setting,
@@ -185,7 +190,7 @@ class MainController(object):
                                    search_id_func=self.perform_find_by_id))
 
         self.group_ops = rose.config_editor.ops.group.GroupOperations(
-                             self.data, self.util,
+                             self.data, self.util, self.reporter,
                              self.undo_stack, self.redo_stack,
                              self.section_ops,
                              self.variable_ops,
@@ -194,7 +199,8 @@ class MainController(object):
 
         # Add in the main menu bar and tool bar handler.
         self.main_handle = rose.config_editor.menu.MainMenuHandler(
-                             self.data, self.util, self.mainwindow,
+                             self.data, self.util, self.reporter,
+                             self.mainwindow,
                              self.undo_stack, self.redo_stack,
                              self.perform_undo,
                              self.apply_macro_transform,
@@ -205,7 +211,8 @@ class MainController(object):
 
         # Add in the navigation panel menu handler.
         self.nav_handle = rose.config_editor.nav_panel_menu.NavPanelHandler(
-                             self.data, self.util, self.mainwindow,
+                             self.data, self.util, self.reporter,
+                             self.mainwindow,
                              self.undo_stack, self.redo_stack,
                              self._add_config,
                              self.section_ops,
@@ -215,10 +222,11 @@ class MainController(object):
                              self.main_handle.transform_default)
 
         self.updater = rose.config_editor.updater.Updater(
-                             self.data, self.util, self.mainwindow,
-                             self.main_handle, self.nav_controller,
-                             self._get_pagelist, self.loader_update,
-                             self.update_bar_sensitivity,
+                             self.data, self.util, self.reporter,
+                             self.mainwindow, self.main_handle,
+                             self.nav_controller,
+                             self._get_pagelist,
+                             self.update_bar_widgets,
                              self._refresh_metadata_if_on,
                              self.is_pluggable)
 
@@ -231,6 +239,7 @@ class MainController(object):
             self.generate_toolbar()
             self.generate_menubar()
             self.generate_nav_panel()
+            self.generate_status_bar()
             # Create notebook (tabbed container) and connect signals.
             self.notebook = rose.gtk.util.Notebook()
 
@@ -481,7 +490,7 @@ class MainController(object):
         if not any([c.is_top_level for c in self.data.config.values()]):
             self.menubar.uimanager.get_widget(
                          "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
-        self.update_bar_sensitivity()
+        self.update_bar_widgets()
         self.top_menu = self.menubar.uimanager.get_widget('/TopMenuBar')
         # Load the keyboard accelerators.
         accel = {
@@ -1110,7 +1119,7 @@ class MainController(object):
                 return self.menu_widgets[address]
         return None
 
-    def update_bar_sensitivity(self):
+    def update_bar_widgets(self):
         """Update bar functionality like Undo and Redo."""
         if not hasattr(self, 'toolbar'):
             return False
@@ -1486,7 +1495,7 @@ class MainController(object):
                     if namespace != stack_item.page_label:
                         # Make sure the right status update is made.
                         self.updater.update_status(page)
-                self.update_bar_sensitivity()
+                self.update_bar_widgets()
                 self.updater.update_stack_viewer_if_open()
             if not is_group:
                 self.updater.focus_sub_page_if_open(namespace, node_id)

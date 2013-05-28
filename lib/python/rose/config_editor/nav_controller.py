@@ -26,9 +26,10 @@ class NavTreeManager(object):
 
     """This controls the navigation namespace tree structure."""
     
-    def __init__(self, data, util, tree_trigger_update):
+    def __init__(self, data, util, reporter, tree_trigger_update):
         self.data = data
         self.util = util
+        self.reporter = reporter
         self.tree_trigger_update = tree_trigger_update
         self.namespace_tree = {}  # Stores the namespace hierarchy
 
