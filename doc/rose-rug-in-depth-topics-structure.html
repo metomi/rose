@@ -182,7 +182,8 @@ default=hello.exe
 access-list=bob helen mary 
 issue-list=abc:#2231 my-project:#4076
 owner=fred
-project=refresh-um-2013
+project=refresh-Q-2013
+sub-project=improve-B
 title=Run XYZ for A, with improved B
 </pre>
     </div>
@@ -195,14 +196,13 @@ title=Run XYZ for A, with improved B
       documentation):</p>
       <pre class="prettyprint lang-rose_conf">
 [jinja2:suite.rc]
-COMPUTE_HOST=mayanstonecircle
-END_TIME=20121221
+COMPUTE_HOST=blueberrypi
 
-[file:app/goodbye_world]
-source=fcm:hello_tr/standard_apps/goodbye_world@25678
+[file:app/extract_and_process_blueberries]
+source=fcm:berry_tr/standard_apps/extract/blueberries@25678
 
-[file:etc/debug.glyph]
-source=/project/hello/mayanpwr0.1/debug.glyph
+[file:etc/pastry.yum]
+source=/project/baking/pastry.yum
 </pre>
     </div>
 
@@ -294,7 +294,7 @@ type=logical
       <p>An example site configuration snippet, and a user one:</p>
       <pre class="prettyprint lang-rose_conf">
 [rose-suite-run]
-hosts=localhost
+hosts=my-cylc-server1 my-cylc-server2
 </pre><br />
       <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
@@ -376,9 +376,9 @@ rose config --meta env=SPAM_NUMBER help
       <h2 id="run-suite">Running Suites</h2>
 
       <p>Once you have a suite with some of these files set up, you can run it
-      on the command line by invoking <kbd>rose suite-run</kbd> in the
-      top-level suite directory. You can see the available options by typing
-      <kbd>rose help suite-run</kbd>.</p>
+      on the command line by invoking <kbd>rose suite-run</kbd> from within the
+      suite directories. You can see the available options by typing <kbd>rose
+      help suite-run</kbd>.</p>
     </div>
 
     <div class="slide">
@@ -409,7 +409,8 @@ rose config --meta env=SPAM_NUMBER help
         <li><kbd>rose suite-run -- --mode=simulation</kbd>: (<kbd>cylc
         run</kbd>option) execute all tasks/apps as 'sleep 10'.</li>
 
-        <li><kbd>rose suite-run -- --hold</kbd>: hold suite on startup.</li>
+        <li><kbd>rose suite-run -- --hold</kbd>: hold (pause) suite on
+        startup.</li>
 
         <li><kbd>rose suite-run -v -v --debug</kbd>: debug/get more info.</li>
       </ul>
@@ -417,31 +418,31 @@ rose config --meta env=SPAM_NUMBER help
 
     <div class="slide">
       <h3 class="alwayshidden">Other Useful Commands</h3>
-      
-      <p>Some useful commands to know about once you have got your suite 
+
+      <p>Some useful commands to know about once you have got your suite
       running:</p>
-      
+
       <ul class="incremental">
         <li><kbd>rose suite-scan</kbd>: list your running suites.</li>
-        
-        <li><kbd>rose suite-gcontrol</kbd>: launch the cylc gui for the suite 
+
+        <li><kbd>rose suite-gcontrol</kbd>: launch the cylc gui for the suite
         in <var>$PWD</var>.</li>
 
-        <li><kbd>rose suite-shutdown</kbd>: shutdown the suite in 
+        <li><kbd>rose suite-shutdown</kbd>: shutdown the suite in
         <var>$PWD</var> at the next opportunity.</li>
-        
-        <li><kbd>rose suite-clean</kbd>: remove items from previous runs for 
-        the suite in <var>$PWD</var> including <var>share/</var>, 
+
+        <li><kbd>rose suite-clean</kbd>: remove items from previous runs for
+        the suite in <var>$PWD</var> including <var>share/</var>,
         <var>work/</var> and runtime directories on remote job hosts.</li>
       </ul>
     </div>
-      
+
     <div class="slide">
       <h3 class="alwayshidden">Other Useful Commands (2)</h3>
-        
-      <p>See the <a href="rose-command.html">CLI documentation</a> for details 
+
+      <p>See the <a href="rose-command.html">CLI documentation</a> for details
       of further options.</p>
-    </div>  
+    </div>
 
     <div class="slide">
       <h2 id="suite-version-control">Suite Version Control</h2>
