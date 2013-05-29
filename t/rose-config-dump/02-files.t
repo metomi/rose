@@ -21,9 +21,9 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 16
+tests 21
 #-------------------------------------------------------------------------------
-# Specific files.
+# Specific file, current directory.
 TEST_KEY=$TEST_KEY_BASE-f
 setup
 cat >rose-foo.conf <<'__CONTENT__'
@@ -47,6 +47,34 @@ file_cmp "$TEST_KEY.bar" 'rose-bar.conf' <<'__CONTENT__'
 cat=meow
 duck=quack
 __CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Specific file, other directory.
+TEST_KEY=$TEST_KEY_BASE-mktemp-f
+setup
+cat >rose-foo.conf <<'__CONTENT__'
+foo=FOO
+bar=BAR
+__CONTENT__
+FILE=$(mktemp)
+cat >$FILE <<'__CONTENT__'
+duck=quack
+cat=meow
+__CONTENT__
+run_pass "$TEST_KEY" rose config-dump -f $FILE
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] M $FILE
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.foo" 'rose-foo.conf' <<'__CONTENT__'
+foo=FOO
+bar=BAR
+__CONTENT__
+file_cmp "$TEST_KEY.file" $FILE <<'__CONTENT__'
+cat=meow
+duck=quack
+__CONTENT__
+rm -f $FILE
 teardown
 #-------------------------------------------------------------------------------
 # Change directory.
@@ -77,7 +105,7 @@ C=silly
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
-# Change directory, specific files.
+# Change directory, specific file.
 TEST_KEY=$TEST_KEY_BASE-C-f
 setup
 cat >rose-foo.conf <<'__CONTENT__'
