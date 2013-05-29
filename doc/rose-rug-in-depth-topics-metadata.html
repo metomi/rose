@@ -1,0 +1,462 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide: In Depth Topics</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose User Guide: In Depth Topics - Metadata</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>What are we covering?</p>
+
+      <ul class="incremental">
+        <li>Configuration Metadata</li>
+
+        <li>rose config-edit</li>
+
+        <li>rose macro</li>
+        
+        <li>rose app-upgrade, rose stem</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2 id="metadata">Configuration Metadata</h2>
+
+      <p>Metadata describes other Rose configuration settings -
+      <samp>help</samp>, <samp>range</samp>, <samp>pattern</samp>, and so
+      on.</p>
+
+      <p>We should have already seen some metadata in the <a href=
+      "rose-rug-metadata-tutorial.html">Metadata Tutorial</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="metadata-central">Referencing Metadata</h3>
+
+      <p>Metadata for <samp>rose-suite.conf</samp> (and
+      <samp>rose-app.conf</samp>) settings can be <a href=
+      "rose-configuration.html#meta">referenced</a> by the <samp>meta</samp>
+      flag in an app config, e.g.:</p>
+      <pre class="prettyprint lang-rose_conf">
+meta=rose-demo-upgrade/27.1
+</pre>
+
+      <p>This usually references centrally-stored metadata, looked up using the
+      <samp>meta-path</samp> user/site config setting. The example above, for a
+      <samp>meta-path</samp> of <samp>/project/rose-meta/</samp>, would be
+      stored at <samp>/project/rose-meta/rose-demo-upgrade/27.1/</samp>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="metadata-decentral">Decentralised Locations</h3>
+
+      <p>You can store metadata in other locations, and reference it by
+      overriding where the <samp>meta</samp> flag points to, using:</p>
+
+      <ul class="incremental">
+        <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
+
+        <li>The <var>ROSE_META_PATH</var> environment variable.</li>
+
+        <li>The <samp>meta-path</samp> setting in <a href=
+        "rose-configuration.html#site">site/user</a> configurations.</li>
+      </ul>
+
+      <p>Alternatively, you can store metadata in a <samp>meta/</samp>
+      subdirectory in a suite or an application, which will override the
+      others.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Configuration Metadata branches</h3>
+
+      <p>If you wanted to develop metadata on a branch, using a working copy
+      somewhere, you could test it by pointing <samp>meta-path</samp> at it
+      (e.g. by running <code>rose config-edit
+      --meta-path=$HOME/branch/rose-meta/</code>).</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="metadata-fancy">Configuration Metadata, Advanced</h2>
+
+      <p>The <a href="rose-rug-metadata-tutorial.html">Metadata Tutorial</a>
+      covered fundamental metadata usage - there is quite a lot more!</p>
+
+      <ul class="incremental">
+        <li>Logical expression syntax</li>
+
+        <li>More metadata options</li>
+
+        <li>Macros</li>
+
+        <li>Widgets</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h3 id="metadata-fancy-logicsyntax">Logical Expression Syntax</h3>
+
+      <p>There is a logical expression syntax for several metadata options.
+      Here are some examples:</p>
+
+      <ul>
+        <li>
+          <code>range</code>:
+          <pre class="prettyprint lang-rose_conf">
+[namelist:run_em=number_magnetic_poles]
+range=this % 2 == 0 and this &gt;= 2
+</pre>
+        </li>
+
+        <li>
+          <code>trigger</code>:
+          <pre class="prettyprint lang-rose_conf">
+[namelist:run_snow=slush_fraction]
+trigger=namelist:run_snow=num_slushballs: this &gt; 0.5
+</pre>
+        </li>
+
+        <li>
+          <code>warn-if</code>:
+          <pre class="prettyprint lang-rose_conf">
+[namelist:run_snow=ice_fraction]
+warn-if=this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
+</pre>
+        </li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h4 class="alwayshidden">Configuration Metadata - Logic Syntax</h4>
+
+      <p>The syntax is a subset of Python with some extra metadata
+      functionality - you can use standard Python operators e.g.:</p>
+      <pre>
+(foo * bar + baz) / wibble &gt;= wobble - flob ** qux
+</pre>
+
+      <p>or</p>
+      <pre>
+"spam" in foo and not bar or (baz and 5 &lt; wibble &lt;= wobble)
+</pre>
+
+      <p>Where you would normally use a variable name, use an id to refer to
+      the value of a setting (e.g.
+      <samp>namelist:run_snow=max_ok_ice_fraction</samp>) or use
+      <samp>this</samp> as a shorthand for the id of this setting.</p>
+    </div>
+
+    <div class="slide">
+      <h4 class="alwayshidden">Configuration Metadata - Logic Syntax
+      Arrays</h4>
+
+      <p>The syntax also has array element support via bracketed indices (e.g.
+      <samp>this(2)</samp> or
+      <samp>namelist:run_snow=monthly_snowfall(12)</samp>).</p>
+
+      <p>There are <code>any</code> and <code>all</code> functions (e.g.
+      <samp>any(namelist:run_snow=monthly_snowfall &gt; 10)</samp>).</p>
+    </div>
+
+    <div class="slide">
+      <h3 id="metadata-fancy-options">More Metadata Options</h3>
+
+      <p>See <a href="rose-configuration.html#meta.conf">Metadata Reference</a>
+      and the <a href="rose.html#advanced">Advanced Metadata Tutorials</a>.</p>
+
+      <dl>
+        <dt><code>compulsory</code></dt>
+
+        <dd>The most controversial metadata option! Setting it to
+        <code>true</code> means that the setting should always be in the
+        configuration, ignored or not.</dd>
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">More Metadata Options - duplicate</h3>
+
+      <dl>
+        <dt><code>duplicate</code></dt>
+
+        <dd>Allow duplicated copies of the setting. This is used for sections
+        where there may be more than one with the same metadata - for example
+        multiple namelist groups of the same name.</dd>
+
+        <dt><code>sort-key</code></dt>
+
+        <dd>Used to order and group pages and variables in the config
+        editor.</dd>
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">More Metadata Options - value-titles</h3>
+
+      <dl>
+        <dt><code>value-titles</code></dt>
+
+        <dd>Allows you to set a title to display for each of the values in 
+        <code>values</code> rather than the actual value e.g. for
+        <samp>values=0, 1</samp> and <samp>value-titles=False, True</samp>
+        "False" is displayed instead of the value "0" and "True" is displayed 
+        instead of the value "1". The length of <code>value-titles</samp> 
+        should be the same as the length of <code>values</code>.</dd>
+
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">More Metadata Options - warn-if/fail-if</h3>
+
+      <dl>
+        <dt><code>warn-if</code>, <code>fail-if</code></dt>
+
+        <dd>
+          These use the full logical syntax we just looked at. Unlike
+          <code>range</code> and <code>trigger</code>, they can use other
+          variable ids. This makes them slow, so they are only run on request
+          (config editor validate button/menu, rose macro).
+          <code>fail-if</code> will cause an error if the expression evaluates
+          true. <code>warn-if</code> is the same, but will flag up a warning
+          instead of an error. For example:
+          <pre class="prettyprint lang-rose_conf">
+fail-if=any(namelist:test=ctrl_array % this == 0)
+</pre>
+        </dd>
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">More Metadata Options - widget</h3>
+
+      <dl>
+        <dt><code>macro</code></dt>
+
+        <dd>Used to associate a setting with a set of custom macros.</dd>
+      
+        <dt><code>widget</code></dt>
+
+        <dd>Used to set a custom or different built-in widget for the setting
+        (in the config editor).</dd>
+      </dl>
+    </div>
+
+    <div class="slide">
+      <h3 id="metadata-fancy-macros">Macros</h3>
+
+      <p>Macros are written in Python and live with metadata under
+      <samp>lib/python/macros/</samp>. There are three categories:</p>
+
+      <ul class="incremental">
+        <li><code>Validator</code> macros - <em>checking</em> macros that can
+        flag errors in your application configurations. Only used when metadata
+        is not enough.</li>
+
+        <li><code>Transformer</code> macros - <em>changing macros</em> that
+        alter your application configurations. These are useful when applying a
+        change that affects many settings - for example, a change in resolution
+        or domain.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h4 class="alwayshidden">Macros continued</h4>
+
+      <ul>
+        <li><code>Upgrade</code> macros - upgrade (or downgrade) application
+        configurations</li>
+      </ul>
+
+      <p>You can find out how to write macros in the <a href=
+      "rose.html#advanced">Advanced Metadata Tutorials</a> and the <a href=
+      "rose-api.html#macro">API</a> documentation.</p>
+    </div>
+
+    <div class="slide">
+    <h3 id="metadata-fancy-widgets">Widgets</h3>
+
+    <p>You can replace widgets in the config editor with your own. These live
+    with metadata under <samp>lib/python/widget/</samp>. For more details, see
+    the <a href="rose-api.html#gtk">API</a> documentation and the <a href=
+    "rose-rug-advanced-tutorials-widget.html">Advanced Tutorial</a>.</p>
+
+    <h3>Icons!</h3>
+
+    <p>You can set an icon in the metadata that is used in the config editor to
+    distinguish configurations: put a file <samp>etc/icon.png</samp> in the
+    metadata directory.</p><img alt="Rose Icon" src="rose-icon.png" /></div>
+
+    <div class="slide">
+      <h2 id="config-edit">rose config-edit</h2>
+
+      <p>The config editor is the suite/application editor GUI.</p>
+
+      <p>Demo! If this isn't part of a course, see the <a href=
+      "rose-rug-config-edit.html">Config Editor Guide</a>.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="macro">rose macro</h2>
+
+      <p>This is the CLI equivalent (together with a text editor) of the config
+      editor. It applies Rose built-in macros to applications, plus any custom
+      macros defined in the metadata.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose macro Examples</h3>
+
+      <p>Running <code>rose macro --validate</code> in an application directory
+      will check against all built-in and custom <em>validator</em> macros.</p>
+
+      <p>Running <code>rose macro --fix</code> will make Rose run the built-in
+      transformer macros to fix your application.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose macro Examples (Continued)</h3>
+
+      <p>Running <code>rose macro MY_MACRO</code> will run a macro called
+      <code>MY_MACRO</code>. In an example app in the rose distribution:</p>
+      <pre class="shell">
+rose macro fib.FibonnaciChecker
+</pre>
+
+      <p>produces:</p>
+      <pre>
+[V] fib.FibonacciChecker: issues: 1
+    env=INVALID_SEQUENCE=0, 1, 1, 2, 3, 5, 8, 14
+        not the Fibonacci sequence
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="upgrade">Upgrading</h2>
+
+      <p>You can upgrade app configurations to use newer versions of metadata
+      (corresponding to newer versions of the application code). This may
+      result in some changes to the configuration (e.g. new or renamed
+      variables).</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose app-upgrade</h3>
+
+      <p>Upgrade macros are the mechanism for making these changes - they are a
+      special form of macro. You can upgrade a configuration that has upgrade
+      macros defined by running <code>rose app-upgrade</code>.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">rose app-upgrade Example</h3>
+
+      <p>For example, you might run:</p>
+      <pre class="shell">
+rose app-upgrade vn2.0
+</pre>
+
+      <p>which might give:</p>
+      <pre>
+[U] Upgradevn1.4-vn2.0: changes: 2
+    namelist:shoes=self_tying_shoelaces=2
+        Added with value '2'
+    =meta=shoe-control/vn2.0
+        Upgraded from vn1.4 to vn2.0
+Accept y/n (default n)?
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="rose-stem">rose stem</h2>
+
+      <p><code>rose stem</code> is a testing system for use with Rose. It
+      provides a user-friendly way of defining source trees and tasks on the
+      command line which are then passed by <code>rose stem</code> to the suite
+      as Jinja2 variables. There is a <a href="rose-rug-stem.html">User Guide
+      </a> section and an <a href="rose-rug-advanced-tutorials-rose-stem.html">
+      Advanced Tutorial</a> for <code>rose-stem</code>.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="future">Future of Rose</h2>
+
+      <ul>
+        <li>More work for us</li>
+
+        <li>More work for you</li>
+
+        <li>More fun for all</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
