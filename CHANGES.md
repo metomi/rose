@@ -11,16 +11,17 @@ for a full listing of issues for each release.
 
 Changes that have significant impact on user experience.
 
-\#661: rose metadata-check: new command to validate configuration metadata.
-
-\#666: rose task-env and rose task-run: the `--path=[NAME=]GLOB` option can
-now be used in either command. Note, however, if `rose task-env` is used before
-`rose task-run`, any options shared between the 2 commands, including
-`--path=[NAME=]GLOB` options will be ignored by the subsequent `rose task-run`
-command. This may change the behaviour of some existing suites.
-
 \#668: rose config-edit: support new configuration metadata `value-titles` to
 define a list of titles to associate with a corresponding `values` setting.
+
+\#666, #690: rose task-env and rose task-run: the `--path=[NAME=]GLOB` option can
+now be used in either command. Note, however, if `rose task-env` is used before
+`rose task-run`, options shared between the 2 commands, (but not
+`--path=[NAME=]GLOB`) options will be ignored by the subsequent `rose task-run`
+command. This may some minor change in behaviour of some existing suites as
+`PATH` would be modified by `rose task-env`.
+
+\#661: rose metadata-check: new command to validate configuration metadata.
 
 ### Other Changes
 
