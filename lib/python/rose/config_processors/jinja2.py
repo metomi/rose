@@ -19,7 +19,8 @@
 #-----------------------------------------------------------------------------
 """Process a section in a rose.config.ConfigNode into a Jinja2 template."""
 
-from rose.config_processor import ConfigProcessorBase
+from rose.config_processor import ConfigProcessError, ConfigProcessorBase
+from rose.env import env_var_process, UnboundEnvironmentVariableError
 import os
 from tempfile import TemporaryFile
 
@@ -41,8 +42,13 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             f = TemporaryFile()
             f.write("#!" + self.SCHEME + "\n")
             for k, n in sorted(node.value.items()):
-                if not n.is_ignored():
-                    f.write("{%% set %s=%s %%}\n" % (k, n.value))
+                if n.is_ignored():
+                    continue
+                try:
+                    value = env_var_process(n.value)
+                except UnboundEnvironmentVariableError as e:
+                    raise ConfigProcessError([key, k], n.value, e)
+                f.write("{%% set %s=%s %%}\n" % (k, value))
             for line in open(target):
                 if line.rstrip().lower() != ("#!" + self.SCHEME):
                     f.write(line)
