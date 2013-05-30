@@ -235,13 +235,13 @@
       <p>Cylc uses a nested INI-based configuration format that looks like
       this:</p>
       <pre class="prettyprint lang-cylc">
-[scheduling]                     # Section
-    [[dependencies]]             # Sub-section
-        graph = """my_task"""    # Key = value
-[runtime]                        # Section
-    [[my_task]]                  # Sub-section (user-specified)
-        [[[environment]]]        # Sub-sub-section
-            FOO = bar            # Key = value (user-specified)
+[scheduling]                     # Scheduling section
+    [[dependencies]]             # Dependencies sub-section
+        graph = """my_task"""    # Graph Setting, option = value
+[runtime]                        # Runtime Section
+    [[my_task]]                  # User-specified task sub-section
+        [[[environment]]]        # Environment sub-sub-section
+            FOO = bar            # User-specified, option = value
 </pre>
     </div>
 
