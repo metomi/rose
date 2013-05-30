@@ -55,7 +55,7 @@ fi
 TEST_KEY=$TEST_KEY_BASE-tasks
 run_pass "$TEST_KEY" sqlite3 "$HOME/cylc-run/$NAME/cylc-suite.db" \
     'SELECT name,cycle,submit_num FROM task_events
-         WHERE event=="execution succeeded"
+         WHERE event=="succeeded"
          ORDER BY name,cycle,submit_num;'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 fcm_make|2013010100|1
