@@ -82,11 +82,12 @@
 #         to export ROSE_DATACT3H and ROSE_DATACT6H.
 #     --path=[NAME=]PATTERN, -P [NAME=]PATTERN
 #         Each of these specify a glob pattern for paths to prepend to an
-#         environment variable called NAME (or PATH is NAME is not specified).
+#         environment variable called NAME (or PATH if NAME is not specified).
 #         If a relative path is given, it is relative to $ROSE_SUITE_DIR. An
 #         empty value resets the default and any previous --path=PATTERN
 #         settings.
-#         (default="share/fcm[_-]make*/*/bin", "work/fcm[_-]make*/*/bin")
+#         (Default for PATH is "share/fcm[_-]make*/*/bin" and
+#         "work/fcm[_-]make*/*/bin")
 #     --prefix-delim=DELIMITER
 #         Specify the delimiter used to determine the task name prefix.
 #         (Default="_")
