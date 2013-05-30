@@ -230,6 +230,22 @@
     </div>
 
     <div class="slide">
+      <h3 id="suite-rc-format">Format</h3>
+
+      <p>Cylc uses a nested INI-based configuration format that looks like
+      this:</p>
+      <pre class="prettyprint lang-cylc">
+[scheduling]                     # Scheduling section
+    [[dependencies]]             # Dependencies sub-section
+        graph = """my_task"""    # Graph Setting, option = value
+[runtime]                        # Runtime Section
+    [[my_task]]                  # User-specified task sub-section
+        [[[environment]]]        # Environment sub-sub-section
+            FOO = bar            # User-specified, option = value
+</pre>
+    </div>
+
+    <div class="slide">
       <h2 id="hello-world">Hello World cylc Suite</h2>
       <pre class="prettyprint lang-cylc">
 [scheduling]
@@ -277,7 +293,7 @@ default=echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3 id="hello-world-task-run">Hello World rose task-run</h3>
+      <h2 id="task-run">Hello World rose task-run</h2>
 
       <p><code>rose task-run</code> is reasonably generic, so we can put it as
       the suite default (<samp>[[root]]</samp>)<samp>command scripting</samp>
@@ -294,7 +310,7 @@ default=echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3 id="hello-world-families">Families</h3>
+      <h2 id="families">Families</h2>
 
       <p>Families define shared configuration.</p>
 
@@ -324,13 +340,13 @@ default=echo 'Hello World'
 [runtime]
     [[root]]
         command scripting = "rose task-run"
-    [[FAM_HELLO]]
+    [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false # Shared env variable
     [[hello_eris]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
     [[hello_pluto]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
 </pre>
     </div>
 
@@ -342,20 +358,20 @@ default=echo 'Hello World'
 [runtime]
     [[root]]
         command scripting = "rose task-run"
-    [[FAM_HELLO]]
+    [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false  # Shared env variable
     [[hello_eris]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
     [[hello_pluto]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
             IS_WORLD_A_PLANET = true  # Override.
 </pre>
     </div>
 
     <div class="slide">
-      <h3 id="hello-world-shared-applications">Shared Applications</h3>
+      <h2 id="shared-applications">Shared Applications</h2>
 
       <p>In the last example, if we don't really need two Rose applications,
       (<samp>app/hello_eris/</samp> and <samp>app/hello_pluto/</samp>) we can
@@ -375,23 +391,23 @@ default=echo 'Hello World'
 [runtime]
     [[root]]
         command scripting = "rose task-run"
-    [[FAM_HELLO]]
+    [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false  # Shared env variable
             ROSE_TASK_APP = hello_world
     [[hello_eris]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
-            WORLD = Eris
+            WORLD = eris
     [[hello_pluto]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
-            WORLD = Pluto
+            WORLD = pluto
 </pre>
     </div>
 
     <div class="slide">
-      <h3 id="hello-world-dependencies">Dependencies</h3>
+      <h2 id="dependencies">Dependencies</h2>
 
       <p>We haven't looked at the <samp>[scheduling]</samp> part of the
       suite.rc yet.</p>
@@ -407,7 +423,7 @@ default=echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3>Cycling Dependencies</h3>
+      <h3 id="dependencies-cycling">Cycling Dependencies</h3>
 
       <p>We can make this run as a cycling suite, repeating every 12 hours:</p>
       <pre class="prettyprint lang-cylc">
@@ -421,7 +437,7 @@ default=echo 'Hello World'
     </div>
 
     <div class="slide">
-      <h3 id="hello-world-remote-hosts">Remote Hosts</h3>
+      <h2 id="remote-hosts">Remote Hosts</h2>
 
       <p>So far, both example tasks run on the localhost - it is usually better
       to farm off tasks to a remote host like a compute server or a
@@ -431,16 +447,16 @@ default=echo 'Hello World'
       <samp>[[remote]]</samp> section settings:</p>
       <pre class="prettyprint lang-cylc">
     [[hello_eris]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
-            WORLD = Eris
+            WORLD = eris
         [[[remote]]]
             host = voyager_1
 </pre>
     </div>
 
     <div class="slide">
-      <h3 id="hello-world-jinja2">Jinja2</h3>
+      <h2 id="jinja2">Jinja2</h2>
 
       <p>cylc uses a templating language called Jinja2 that you can use to
       collapse duplicated portions of configuration or insert settings.</p>
@@ -459,7 +475,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 {%- for WORLD in ["eris", "pluto", "makemake", "haumea"] %}
     [[hello_{{ WORLD }}]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = {{ WORLD }}
 {%- endfor %}
@@ -473,19 +489,19 @@ default=echo 'Hello World'
       like:</p>
       <pre class="prettyprint lang-cylc">
     [[hello_eris]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = eris
     [[hello_pluto]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = pluto
     [[hello_makemake]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = makemake
     [[hello_haumea]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = haumea
 </pre>
@@ -507,7 +523,7 @@ HELLO_WORLDS = ["eris", "pluto", "makemake", "haumea"]
       <pre class="prettyprint lang-cylc">
 {%- for WORLD in HELLO_WORLDS %}
     [[hello_{{ WORLD }}]]
-        inherit = FAM_HELLO
+        inherit = HELLO_FAMILY
         [[[environment]]]
             WORLD = {{ WORLD }}
 {%- endfor %}
@@ -564,19 +580,19 @@ type=boolean
     </div>
 
     <div class="slide">
-      <h3 id="multiple-inheritance">Multiple Family Inheritance</h3>
+      <h2 id="multiple-inheritance">Multiple Family Inheritance</h2>
 
       <p>cylc supports multiple inheritance, so tasks can combine useful
       configuration from more than one separate family. If you set up families
       like this:</p>
       <pre class="prettyprint lang-cylc">
-    [[FAM_HELLO]]
+    [[HELLO_FAMILY]]
         [[[environment]]]
             ROSE_TASK_APP = hello_world
-    [[FAM_GAS_GIANT]]
+    [[GAS_GIANT_FAMILY]]
         [[[environment]]]
             ATMOSPHERE_ONLY = true
-    [[FAM_ROCKY]]
+    [[ROCKY_FAMILY]]
         [[[environment]]]
             ATMOSPHERE_ONLY = false
 </pre>
@@ -588,14 +604,14 @@ type=boolean
       <p>You can inherit them like this:</p>
       <pre class="prettyprint lang-cylc">
     [[hello_neptune]]
-        inherit = FAM_HELLO, FAM_GAS_GIANT
+        inherit = HELLO_FAMILY, GAS_GIANT_FAMILY
         [[[environment]]]
-            WORLD = Neptune
+            WORLD = neptune
 </pre>
 
       <p>The order in which they are combined is essentially last to first -
-      e.g. <samp>FAM_HELLO</samp> will override any shared setting in
-      <samp>FAM_GAS_GIANT</samp>.</p>
+      e.g. <samp>HELLO_FAMILY</samp> will override any shared setting in
+      <samp>GAS_GIANT_FAMILY</samp>.</p>
     </div>
 
     <div class="slide">
@@ -695,6 +711,8 @@ type=boolean
 
         <li>sge (<del>Sun</del> Oracle Grid Engine)
         </li>
+
+        <li>SLURM (not the fictional soft drink)</li>
       </ul>
     </div>
 
@@ -773,7 +791,7 @@ type=boolean
       <h3 class="alwayshidden">Dependency Syntax a[T-6]</h3>
 
       <p>In a cycling suite, with cycles every 6 hours, if task <var>a</var>
-      depends on a previous cycle's task <var>a</var> finishing:</p>
+      depends on a previous cycle's task <var>a</var> succeeding:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
@@ -835,22 +853,24 @@ type=boolean
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Dependency Syntax FAM_A:succeed-any =&gt; b</h3>
+      <h3 class="alwayshidden">Dependency Syntax FAMILY_A:succeed-any =&gt;
+      b</h3>
 
-      <p>If task <var>b</var> should run when any task in the <var>FAM_A</var>
-      family succeeds:</p>
+      <p>If task <var>b</var> should run when any task in the
+      <var>FAMILY_A</var> family succeeds:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "FAM_A:succeed-any =&gt; b"
+        graph = "FAMILY_A:succeed-any =&gt; b"
 </pre>
 
-      <p>If task <var>b</var> should run when all tasks in the <var>FAM_A</var>
-      family have finished (whether succeeded or failed):</p>
+      <p>If task <var>b</var> should run when all tasks in the
+      <var>FAMILY_A</var> family have finished (whether succeeded or
+      failed):</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "FAM_A:finish-all =&gt; b"
+        graph = "FAMILY_A:finish-all =&gt; b"
 </pre>
     </div>
 
@@ -949,9 +969,11 @@ type=boolean
       <h3 class="alwayshidden">Environment (3)</h3>
 
       <ul class="incremental">
-        <li><var>ROSE_TASK_LOG_ROOT</var>, log directory for the task that will
-        get retrieved by the hook scripts - files here will be displayed in the
-        output viewer.</li>
+        <li><var>ROSE_TASK_LOG_ROOT</var>, the name of the task including the
+        cycle time - if you prefix a filename with
+        <samp>$ROSE_TASK_LOG_ROOT</samp> in the <samp>log/job/</samp>
+        directory, it will be associated with the task in the output
+        viewer.</li>
       </ul>
     </div>
 
@@ -1019,7 +1041,7 @@ type=boolean
       <h2 id="design">Suite Design</h2>
 
       <p>See <a href=
-      "http://cylc.github.com/cylc/html/single/cug-html.html#x1-16600014">cylc
+      "http://cylc.github.com/cylc/html/single/cug-html.html#x1-17000014">cylc
       suite design principles</a>.</p>
     </div>
 
