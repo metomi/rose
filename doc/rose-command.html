@@ -529,11 +529,14 @@
     <dl>
       <dt><kbd>--config=DIR; -C DIR</kbd></dt>
 
-      <dd>Specify a configuration directory. (default=<var>$PWD</var>)</dd>
+      <dd>Change directory to <var>DIR</var> before looking for configuration
+      files. (default=<var>$PWD</var>)</dd>
 
       <dt><kbd>--file=FILE, -f FILE</kbd></dt>
 
-      <dd>Each of these specifies a configuration file.</dd>
+      <dd>Each of these specifies a configuration file. If
+      <kbd>--config=DIR</kbd> is specified and <var>FILE</var> is a relative
+      path, <var>FILE</var> is assumed to be relative to <var>DIR</var>.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
