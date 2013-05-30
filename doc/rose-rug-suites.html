@@ -711,7 +711,7 @@ type=boolean
 
         <li>sge (<del>Sun</del> Oracle Grid Engine)
         </li>
-        
+
         <li>SLURM (not the fictional soft drink)</li>
       </ul>
     </div>
@@ -969,9 +969,11 @@ type=boolean
       <h3 class="alwayshidden">Environment (3)</h3>
 
       <ul class="incremental">
-        <li><var>ROSE_TASK_LOG_ROOT</var>, log directory for the task that will
-        get retrieved by the hook scripts - files here will be displayed in the
-        output viewer.</li>
+        <li><var>ROSE_TASK_LOG_ROOT</var>, the name of the task including the
+        cycle time - if you prefix a filename with
+        <samp>$ROSE_TASK_LOG_ROOT</samp> in the <samp>log/job/</samp>
+        directory, it will be associated with the task in the output
+        viewer.</li>
       </ul>
     </div>
 
