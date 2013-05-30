@@ -136,6 +136,10 @@ class MainController(object):
              rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
              rose.config_editor.SHOW_MODE_LATENT:
              rose.config_editor.SHOULD_SHOW_LATENT_VARS,
+             rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
+             rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION,
+             rose.config_editor.SHOW_MODE_NO_HELP:
+             rose.config_editor.SHOULD_SHOW_NO_HELP,
              rose.config_editor.SHOW_MODE_NO_TITLE:
              rose.config_editor.SHOULD_SHOW_NO_TITLE}
 
@@ -394,6 +398,14 @@ class MainController(object):
                       lambda m: self._set_page_var_show_modes(
                                   rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
                                   m.get_active())),
+                     ('/TopMenuBar/Metadata/View without descriptions',
+                      lambda m: self._set_page_show_modes(
+                                 rose.config_editor.SHOW_MODE_NO_DESCRIPTION,
+                                 m.get_active())),
+                     ('/TopMenuBar/Metadata/View without help',
+                      lambda m: self._set_page_show_modes(
+                                     rose.config_editor.SHOW_MODE_NO_HELP,
+                                     m.get_active())),
                      ('/TopMenuBar/Metadata/View without titles',
                       lambda m: self._set_page_show_modes(
                                      rose.config_editor.SHOW_MODE_NO_TITLE,

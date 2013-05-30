@@ -83,6 +83,8 @@ class MenuBar(object):
       <menuitem action="Switch off metadata"/>
       <separator name="sep_view_generic"/>
       <menuitem action="View without titles"/>
+      <menuitem action="View without descriptions"/>
+      <menuitem action="View without help"/>
       <separator name="sep_checking"/>
       <menuitem action="Extra checks"/>
       <separator name="sep macro"/>
@@ -206,6 +208,10 @@ class MenuBar(object):
                        rose.config_editor.TOP_MENU_VIEW_IGNORED_VARS),
                       ('View user-ignored vars', None,
                        rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_VARS),
+                      ('View without descriptions', None,
+                       rose.config_editor.TOP_MENU_VIEW_WITHOUT_DESCRIPTIONS),
+                      ('View without help', None,
+                       rose.config_editor.TOP_MENU_VIEW_WITHOUT_HELP),
                       ('View without titles', None,
                        rose.config_editor.TOP_MENU_VIEW_WITHOUT_TITLES),
                       ('View ignored pages', None,

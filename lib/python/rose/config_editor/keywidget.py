@@ -141,13 +141,21 @@ class KeyWidget(gtk.VBox):
             if comment_widgets:
                 comment_widgets[0].set_tooltip_text(tooltip_text)
             else:
-                edit_button = rose.gtk.util.CustomButton(
-                                                     label="#",
-                                                     as_tool=True,
-                                                     tip_text=tooltip_text)
-                edit_button.connect("clicked", self.launch_edit_comments)
-                self.comments_box.pack_start(edit_button, expand=False,
-                                             fill=False)
+                edit_eb = gtk.EventBox()
+                edit_eb.show()
+                edit_label = gtk.Label("#")
+                edit_label.show()
+                edit_eb.add(edit_label)
+                edit_eb.set_tooltip_text(tooltip_text)
+                edit_eb.connect("button-press-event",
+                                self._handle_comment_click)
+                edit_eb.connect("enter-notify-event",
+                                self._handle_comment_enter_leave, True)
+                edit_eb.connect("enter-notify-event",
+                                self._handle_comment_enter_leave, False)
+                self.comments_box.pack_start(
+                              edit_eb, expand=False, fill=False,
+                              padding=rose.config_editor.SPACING_SUB_PAGE)
             self.comments_box.show()
         else:
             self.comments_box.hide()
@@ -160,6 +168,8 @@ class KeyWidget(gtk.VBox):
         """Set the display of a mode on or off."""
         if show_mode == rose.config_editor.SHOW_MODE_NO_TITLE:
             return self._set_show_title(not should_show_mode)
+        if show_mode == rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
+            return self._set_show_description(not should_show_mode)
         if show_mode == rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
             if (should_show_mode and
                 self.meta.get(rose.META_PROP_COMPULSORY) !=
@@ -190,6 +200,18 @@ class KeyWidget(gtk.VBox):
                                     rose.config_editor.FLAG_TYPE_OPT_CONF,
                                     text)
             return self.remove_flag(rose.config_editor.FLAG_TYPE_OPT_CONF)
+
+    def _set_show_description(self, should_show_description):
+        """Set the display of a variable description below the title/name."""
+        search_func = lambda i: self.var_ops.search_for_var(
+                                                    self.meta["full_ns"], i)
+        desc_text = rose.gtk.util.safe_str(self.meta.get(rose.META_PROP_DESCRIPTION))
+        
+        label = gtk.Label(desc_text)
+        markup = rose.gtk.util.safe_str(self.meta.get)
+        markup = rose.config_editor.VAR_FLAG_MARKUP.format(markup)
+        label.set_markup(markup)
+        label.show()
 
     def _set_show_title(self, should_show_title):
         """Set the display of a variable title instead of the name."""
@@ -288,6 +310,14 @@ class KeyWidget(gtk.VBox):
         self.var_ops.set_var_comments(self.my_variable, text.splitlines())
         self.update_status()
 
+    def _handle_comment_enter_leave(self, widget, event, is_entering=False):
+        label = widget.get_child()
+        self._set_underline(label, underline=is_entering)
+
+    def _handle_comment_click(self, widget, event):
+        if event.button == 1:
+            self.launch_edit_comments()
+
     def _handle_enter(self, event_box):
         if rose.META_PROP_DESCRIPTION in self.meta:
             tooltip_text = self.meta[rose.META_PROP_DESCRIPTION]
@@ -327,26 +357,29 @@ class KeyWidget(gtk.VBox):
         if (rose.META_PROP_HELP in self.meta or
             rose.META_PROP_URL in self.meta):
             if isinstance(self.entry, gtk.Label):
-                att_list = self.entry.get_attributes()
-                if att_list is None:
-                    att_list = pango.AttrList()
-                att_list.insert(pango.AttrUnderline(pango.UNDERLINE_SINGLE,
-                                                    start_index=0,
-                                                    end_index=-1))
-                self.entry.set_attributes(att_list)
+                self._set_underline(self.entry, underline=True)
         return False
+
+    def _set_underline(self, label, underline=False):
+        # Set an underline in a label widget.
+        att_list = label.get_attributes()
+        if att_list is None:
+            att_list = pango.AttrList()
+        if underline:
+            att_list.insert(pango.AttrUnderline(pango.UNDERLINE_SINGLE,
+                                                start_index=0,
+                                                end_index=-1))
+        else:
+            att_list = att_list.filter(lambda a:
+                                       a.type != pango.ATTR_UNDERLINE)
+            if att_list is None:
+                att_list = pango.AttrList()
+        label.set_attributes(att_list)
 
     def _handle_leave(self, event_box):
         event_box.set_tooltip_text(None)
         if isinstance(self.entry, gtk.Label):
-            att_list = self.entry.get_attributes()
-            if att_list is None:
-                att_list = pango.AttrList()
-            att_list = att_list.filter(lambda a:
-                                        a.type != pango.ATTR_UNDERLINE)
-            if att_list is None:
-                att_list = pango.AttrList()
-            self.entry.set_attributes(att_list)
+            self._set_underline(self.entry, underline=False)       
         return False
 
     def _setter(self, widget, variable):
