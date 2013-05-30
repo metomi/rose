@@ -851,22 +851,24 @@ type=boolean
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Dependency Syntax FAM_A:succeed-any =&gt; b</h3>
+      <h3 class="alwayshidden">Dependency Syntax FAMILY_A:succeed-any =&gt;
+      b</h3>
 
-      <p>If task <var>b</var> should run when any task in the <var>FAM_A</var>
-      family succeeds:</p>
+      <p>If task <var>b</var> should run when any task in the
+      <var>FAMILY_A</var> family succeeds:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "FAM_A:succeed-any =&gt; b"
+        graph = "FAMILY_A:succeed-any =&gt; b"
 </pre>
 
-      <p>If task <var>b</var> should run when all tasks in the <var>FAM_A</var>
-      family have finished (whether succeeded or failed):</p>
+      <p>If task <var>b</var> should run when all tasks in the
+      <var>FAMILY_A</var> family have finished (whether succeeded or
+      failed):</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "FAM_A:finish-all =&gt; b"
+        graph = "FAMILY_A:finish-all =&gt; b"
 </pre>
     </div>
 
