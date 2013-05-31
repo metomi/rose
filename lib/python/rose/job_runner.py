@@ -244,9 +244,9 @@ class JobRunnerWorkerEventHandler(object):
     def __init__(self):
         self.events = []
 
-    def __call__(self, message, type_=None, level=None, prefix=None,
+    def __call__(self, message, kind=None, level=None, prefix=None,
                  clip=None):
-        self.events.append((message, type_, level, prefix, clip))
+        self.events.append((message, kind, level, prefix, clip))
 
 
 class JobRunnerNotCompletedError(Exception):

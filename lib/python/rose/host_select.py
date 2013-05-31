@@ -49,7 +49,7 @@ class DeadHostEvent(Event):
 
     """An error raised when a host is not contactable."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return self.args[0] + ": (ssh failed)"
@@ -59,7 +59,7 @@ class HostExceedThresholdEvent(Event):
 
     """An error raised when a host exceeds a threshold."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
     FMT = "%(host)s: %(score)s > threshold %(method)s:%(method_arg)s:%(value)s"
 
     def __str__(self):
@@ -96,7 +96,7 @@ class TimedOutHostEvent(Event):
 
     """An event raised when contact to a host is timed out."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return self.args[0] + ": (timed out)"

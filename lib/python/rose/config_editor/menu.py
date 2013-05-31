@@ -556,11 +556,11 @@ class MainMenuHandler(object):
                 issue_conf_text = self._format_macro_config_names(issue_confs)
                 self.reporter.report(change_format.format(issue_conf_text,
                                                           num_issues),
-                                     type_=self.reporter.TYPE_ERR)
+                                     kind=self.reporter.KIND_ERR)
             else:
                 all_conf_text = self._format_macro_config_names(configs)
                 self.reporter.report(null_format.format(all_conf_text),
-                                     type_=self.reporter.TYPE_OUT)
+                                     kind=self.reporter.KIND_OUT)
         return False                          
 
     def _format_macro_config_names(self, config_names):
@@ -571,7 +571,7 @@ class MainMenuHandler(object):
 
     def _handle_bad_macro_return(self, macro_fullname, return_value):
         rose.gtk.util.run_dialog(
-            rose.gtk.util.DIALOG_TYPE_ERROR,
+            rose.gtk.util.DIALOG_KIND_ERROR,
             rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
                                                 return_value),
             rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
@@ -711,14 +711,14 @@ class MainMenuHandler(object):
             macro = macro_name.split('.')[-2]
         else:
             macro = macro_name.split('.')[-1]
-        type_ = self.reporter.TYPE_OUT
+        kind = self.reporter.KIND_OUT
         if num_changes:
             info_text = rose.config_editor.EVENT_MACRO_TRANSFORM.format(
                                     name, macro, num_changes)
         else:
             info_text = rose.config_editor.EVENT_MACRO_TRANSFORM_OK.format(
                                     name, macro)
-        self.reporter.report(info_text, type_=type_)
+        self.reporter.report(info_text, kind=kind)
 
     def handle_macro_validation(self, config_name, macro_name,
                                 macro_config, problem_list, no_display=False):
@@ -742,12 +742,12 @@ class MainMenuHandler(object):
         if num_errors:
             info_text = rose.config_editor.EVENT_MACRO_VALIDATE.format(
                                 name, macro, num_errors)
-            type_ = self.reporter.TYPE_ERR
+            kind = self.reporter.KIND_ERR
         else:
             info_text = rose.config_editor.EVENT_MACRO_VALIDATE_OK.format(
                                 name, macro)
-            type_ = self.reporter.TYPE_OUT
-        self.reporter.report(info_text, type_=type_)
+            kind = self.reporter.KIND_OUT
+        self.reporter.report(info_text, kind=kind)
 
     def handle_run_scheduler(self, *args):
         """Run the scheduler for this suite."""

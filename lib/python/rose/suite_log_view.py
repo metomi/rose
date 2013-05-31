@@ -37,7 +37,7 @@ import webbrowser
 class LockEvent(Event):
     """An warning raised when the generator aborts due to a lock file."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
     LEVEL = Event.V
 
     def __str__(self):

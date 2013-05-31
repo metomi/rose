@@ -36,30 +36,30 @@ class StatusReporter(rose.reporter.Reporter):
 
     """Handle event notification."""
 
-    EVENT_TYPE_LOAD = "load"
+    EVENT_KIND_LOAD = "load"
 
     def __init__(self, loader_update_func, status_bar_update_func):
         self._loader_update_func = loader_update_func
         self._status_bar_update_func = status_bar_update_func
 
-    def event_handler(self, message, type_=None, level=None, prefix=None,
+    def event_handler(self, message, kind=None, level=None, prefix=None,
                       clip=None):
         """Handle a message or event."""
         message_kwargs = {}
         if isinstance(message, rose.reporter.Event):
-            if type_ is None:
-                type_ = message.type_
+            if kind is None:
+                kind = message.kind
             if level is None:
                 level = message.level
             message_kwargs = message.kwargs
-        if type_ == self.EVENT_TYPE_LOAD:
+        if kind == self.EVENT_KIND_LOAD:
             return self._loader_update_func(str(message), **message_kwargs)
-        return self._status_bar_update_func(message, type_, level)
+        return self._status_bar_update_func(message, kind, level)
 
     def report_load_event(self, text, no_progress=False):
         """Report a load-related event (to rose.gtk.util.SplashScreen)."""
         event = rose.reporter.Event(text,
-                                    type_=self.EVENT_TYPE_LOAD,
+                                    kind=self.EVENT_KIND_LOAD,
                                     no_progress=no_progress)
         self.report(event)
 
@@ -90,18 +90,18 @@ class StatusBar(gtk.VBox):
         self.messages = []
         self.show()
 
-    def set_message(self, message, type_=None, level=None):
+    def set_message(self, message, kind=None, level=None):
         if isinstance(message, rose.reporter.Event):
-            if type_ is None:
-                type_ = message.type_
+            if kind is None:
+                kind = message.kind
             if level is None:
                 level = message.level
         if level > self.verbosity:
             return
-        self.messages.append((type_, str(message), time.time()))
+        self.messages.append((kind, str(message), time.time()))
         if len(self.messages) > rose.config_editor.STATUS_BAR_MESSAGE_LIMIT:
             self.messages.pop(0)
-        self._update_message_widget(str(message), type_=type_)
+        self._update_message_widget(str(message), kind=kind)
         self._update_console()
 
     def set_num_errors(self, new_num_errors):
@@ -178,9 +178,9 @@ class StatusBar(gtk.VBox):
         self._error_widget_label.set_text(str(self.num_errors))
         self._error_widget.set_sensitive((self.num_errors > 0))
 
-    def _update_message_widget(self, message_text, type_):
+    def _update_message_widget(self, message_text, kind):
         # Update the message display widget.
-        if type_ == rose.reporter.Reporter.TYPE_ERR:
+        if kind == rose.reporter.Reporter.KIND_ERR:
             self._message_widget_error_image.show()
             self._message_widget_info_image.hide()
         else:
@@ -190,8 +190,8 @@ class StatusBar(gtk.VBox):
 
     def _handle_enter_message_widget(self, *args):
         tooltip_text = ""
-        for type_, message_text, message_time in self.messages[-5:]:
-            if type_ == rose.reporter.Reporter.TYPE_ERR:
+        for kind, message_text, message_time in self.messages[-5:]:
+            if kind == rose.reporter.Reporter.KIND_ERR:
                 prefix = rose.reporter.Reporter.PREFIX_FAIL
             else:
                 prefix = rose.reporter.Reporter.PREFIX_INFO
@@ -205,8 +205,8 @@ class StatusBar(gtk.VBox):
         err_category = rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_ERROR
         info_category = rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_INFO
         message_tuples = []
-        for type_, message, time_info in self.messages:
-            if type_ == rose.reporter.Reporter.TYPE_ERR:
+        for kind, message, time_info in self.messages:
+            if kind == rose.reporter.Reporter.KIND_ERR:
                 category = err_category
             else:
                 category = info_category

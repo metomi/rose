@@ -101,7 +101,7 @@ class TaskCompletionEvent(Event):
         self.message = task.message
         self.userstatus = task.userstatus
         self.level = Event.DEFAULT
-        self.type_ = Event.TYPE_OUT
+        self.kind = Event.KIND_OUT
 
     def __repr__(self):
         return " %s" % (self.message)
