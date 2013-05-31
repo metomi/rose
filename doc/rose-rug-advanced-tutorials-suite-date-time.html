@@ -106,7 +106,8 @@
       single aircraft, twice a day.</p>
 
       <p>You can see we already have runtime information for two tasks,
-      <samp>wait_return</samp> and <samp>assign_gate</samp>.</p>
+      <samp>wait_return</samp> and <samp>assign_gate</samp>. There are a few
+      empty tasks as well.</p>
     </div>
 
     <div class="slide">
@@ -128,8 +129,8 @@
       <h3 class="alwayshidden">Startup</h3>
 
       <p>We need a special <q>cold start</q> task (<samp>startup</samp>). This
-      sets our initial gate number - put this in the runtime section of the
-      <samp>suite.rc</samp> file:</p>
+      sets our initial gate number - add this to your <samp>[[startup]]</samp>
+      runtime section of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[startup]]
         environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
@@ -168,8 +169,8 @@
       directory, if we ask for it.</p>
 
       <p>We need to use the same <samp>environment scripting</samp> option, but
-      with a <samp>--cycle-offset=T12H</samp> option - add this to your runtime
-      section:</p>
+      with a <samp>--cycle-offset=T12H</samp> option - add this to your
+      <samp>[[boarding]]</samp> runtime section:</p>
       <pre class="prettyprint lang-cylc">
     [[boarding]]
         environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
@@ -246,9 +247,9 @@
       <p><code>rose date</code> can be used to add or remove increments of
       time, as well as change the output format.</p>
 
-      <p>If you add the following lines to your runtime section, you can see
-      how you can use different offset units (days, hours) and quite
-      complicated <a href=
+      <p>If you add the following lines to your <samp>[[departure]]</samp>
+      runtime section, you can see how you can use different offset units
+      (days, hours) and quite complicated <a href=
       "http://docs.python.org/library/time.html#time.strftime">formats</a>:</p>
     </div>
 

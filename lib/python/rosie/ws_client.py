@@ -291,13 +291,13 @@ def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
        a search or query.
        """
     if prefix == None:
-        return
+        return [], []
 
     if id_list == None:
         id_list = get_local_suites(skip_status=skip_status)
 
     if not id_list:
-        return []
+        return [], []
 
     result_maps = []
     q = []
