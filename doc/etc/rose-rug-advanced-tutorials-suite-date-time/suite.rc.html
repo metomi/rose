@@ -68,6 +68,7 @@
         [[[event hooks]]]
             failed handler = "rose suite-hook"
             succeeded handler = "rose suite-hook"
+    [[arrival]]
     [[assign_gate]]
         environment scripting = "eval $(rose task-env)"
         command scripting = """
@@ -76,6 +77,9 @@
              cylc task message "Cleared to land, go to Gate $GATE"
              sleep 5
         """
+    [[boarding]]
+    [[departure]]
+    [[startup]]
     [[wait_return]]
         command scripting = """
             sleep $((10 + RANDOM%3))
