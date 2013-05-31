@@ -36,12 +36,13 @@ class GroupOperations(object):
 
     """Class to perform actions on groups of sections and/or options."""
 
-    def __init__(self, data, util, undo_stack, redo_stack,
+    def __init__(self, data, util, reporter, undo_stack, redo_stack,
                  section_ops_inst,
                  variable_ops_inst,
                  view_page_func, reload_ns_tree_func):
         self.data = data
         self.util = util
+        self.reporter = reporter
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack
         self.sect_ops = section_ops_inst

@@ -80,6 +80,7 @@ TOP_MENU_VIEW_WITHOUT_TITLES = "Hide _Titles"
 TOP_MENU_VIEW_FLAG_OPT_CONF_VARS = "Flag Opt _Config Variables"
 TOP_MENU_VIEW_FLAG_OPTIONAL_VARS = "Flag _Optional Variables"
 TOP_MENU_VIEW_FLAG_NO_METADATA_VARS = "Flag _No-metadata Variables"
+TOP_MENU_VIEW_STATUS_BAR = "View _Status Bar"
 TOP_MENU_PAGE = "_Page"
 TOP_MENU_PAGE_ADD = "_Add"
 TOP_MENU_PAGE_REVERT = "_Revert to Saved"
@@ -154,12 +155,31 @@ LABEL_PAGE_HELP = "Page help"
 LABEL_PAGE_MACRO_BUTTON = "Macros"
 
 # Loading strings
-LOAD_CONFIG = "reading    "
-LOAD_DONE = "loading GUI"
-LOAD_ERRORS = "errors: {0}"
-LOAD_METADATA = "configuring"
+EVENT_LOAD_CONFIG = "{0} - reading    "
+EVENT_LOAD_DONE = "{0} - loading GUI"
+EVENT_LOAD_ERRORS = "{0} - errors: {1}"
+EVENT_LOAD_METADATA = "{0} - configuring"
+EVENT_LOAD_STATUSES = "{0} - checking   "
 LOAD_NUMBER_OF_EVENTS = 2
-LOAD_STATUSES = "checking   "
+
+# Other event strings
+EVENT_ERR_MARKUP = "<span color='red'>{0}</span>"
+EVENT_FOUND_ID = "Found {0}"
+EVENT_MACRO_CONFIGS = "{0} configurations"
+EVENT_MACRO_TRANSFORM = "{1}: {0}: {2} changes"
+EVENT_MACRO_TRANSFORM_ALL = "Transforms: {0}: {1} changes"
+EVENT_MACRO_TRANSFORM_ALL_OK = "Transforms: {0}: no changes"
+EVENT_MACRO_TRANSFORM_OK = "{1}: {0}: no changes"
+EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
+EVENT_MACRO_VALIDATE_ALL = "Validators: {0}: {1} errors"
+EVENT_MACRO_VALIDATE_ALL_OK = "Validators: {0}: all OK"
+EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
+EVENT_REDO = "{0}"
+EVENT_REVERT = "Reverted {0}"
+EVENT_TIME = "%H:%M:%S"
+EVENT_TIME_LONG = "%a %H:%M:%S"
+EVENT_UNDO = "{0}"
+EVENT_UNDO_ACTION_ID = "{0} {1}"
 
 # Widget strings
 
@@ -279,6 +299,8 @@ SHOULD_SHOW_LATENT_PAGES = False
 SHOULD_SHOW_LATENT_VARS = False
 SHOULD_SHOW_NO_TITLE = False
 
+SHOULD_SHOW_STATUS_BAR = True
+
 # Window sizes
 WIDTH_TREE_PANEL = 256
 SIZE_MACRO_DIALOG_MAX = (800, 600)
@@ -287,6 +309,13 @@ SIZE_PAGE_DETACH = (650, 600)
 SIZE_WINDOW = (900, 600)
 SPACING_PAGE = 10
 SPACING_SUB_PAGE = 5
+
+# Status bar configuration
+STATUS_BAR_CONSOLE_TIP = "View more messages (Console)"
+STATUS_BAR_CONSOLE_CATEGORY_ERROR = "Error"
+STATUS_BAR_CONSOLE_CATEGORY_INFO = "Info"
+STATUS_BAR_MESSAGE_LIMIT = 1000
+STATUS_BAR_VERBOSITY = 0  # Compare with rose.reporter.Reporter.
 
 # Stack action names and presentation
 STACK_GROUP_ADD = "Add"
