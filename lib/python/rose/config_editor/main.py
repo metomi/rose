@@ -149,7 +149,7 @@ class MainController(object):
              rose.config_editor.SHOW_MODE_NO_TITLE:
              rose.config_editor.SHOULD_SHOW_NO_TITLE}
 
-        self.reporter = rose.config_editor.status.Reporter(
+        self.reporter = rose.config_editor.status.StatusReporter(
                              loader_update,
                              self.update_status_text)
 

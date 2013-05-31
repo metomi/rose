@@ -32,7 +32,7 @@ import rose.gtk.console
 import rose.reporter
 
 
-class Reporter(rose.reporter.Reporter):
+class StatusReporter(rose.reporter.Reporter):
 
     """Handle event notification."""
 
