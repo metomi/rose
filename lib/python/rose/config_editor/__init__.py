@@ -166,13 +166,19 @@ EVENT_ERR_MARKUP = "<span color='red'>{0}</span>"
 EVENT_FOUND_ID = "Found {0}"
 EVENT_MACRO_CONFIGS = "{0} configurations"
 EVENT_MACRO_TRANSFORM = "{1}: {0}: {2} changes"
-EVENT_MACRO_TRANSFORM_ALL = "{0}: {1} changes"
-EVENT_MACRO_TRANSFORM_ALL_OK = "{0}: no changes"
+EVENT_MACRO_TRANSFORM_ALL = "Transforms: {0}: {1} changes"
+EVENT_MACRO_TRANSFORM_ALL_OK = "Transforms: {0}: no changes"
 EVENT_MACRO_TRANSFORM_OK = "{1}: {0}: no changes"
 EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
-EVENT_MACRO_VALIDATE_ALL = "{0}: {1} errors"
-EVENT_MACRO_VALIDATE_ALL_OK = "{0}: all OK"
+EVENT_MACRO_VALIDATE_ALL = "Validators: {0}: {1} errors"
+EVENT_MACRO_VALIDATE_ALL_OK = "Validators: {0}: all OK"
 EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
+EVENT_REDO = "{0}"
+EVENT_REVERT = "Reverted {0}"
+EVENT_TIME = "%H:%M:%S"
+EVENT_TIME_LONG = "%a %H:%M:%S"
+EVENT_UNDO = "{0}"
+EVENT_UNDO_ACTION_ID = "{0} {1}"
 
 # Widget strings
 
@@ -302,7 +308,10 @@ SPACING_PAGE = 10
 SPACING_SUB_PAGE = 5
 
 # Status bar configuration
-STATUS_BAR_MESSAGE_LIMIT = 100
+STATUS_BAR_CONSOLE_TIP = "View more messages (Console)"
+STATUS_BAR_CONSOLE_CATEGORY_ERROR = "Error"
+STATUS_BAR_CONSOLE_CATEGORY_INFO = "Info"
+STATUS_BAR_MESSAGE_LIMIT = 1000
 STATUS_BAR_VERBOSITY = 0  # Compare with rose.reporter.Reporter.
 
 # Stack action names and presentation
@@ -479,6 +488,7 @@ TIP_ADD_TO_PAGE = "Add to page..."
 TIP_MACRO_RUN_PAGE = "Choose a macro to run for this page"
 TIP_REVERT_PAGE = "Revert page to last save"
 TIP_SUITE_RUN_ARG = "Enter extra suite run arguments"
+TIP_STATUSBAR_MESSAGE_EXPAND = "Toggle console"
 TIP_VALUE_ADD_URI = "Add a URI - for example a file path, or a web url"
 TREE_PANEL_ERROR = " (1 error)"
 TREE_PANEL_ERRORS = " ({0} errors)"

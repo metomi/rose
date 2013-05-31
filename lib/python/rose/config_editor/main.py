@@ -804,6 +804,8 @@ class MainController(object):
         page.reload_from_data(config_data, ghost_data)
         self.data.load_node_namespaces(config_name)
         self.updater.update_status(page)
+        self.reporter.report(rose.config_editor.EVENT_REVERT.format(
+                                         namespace.lstrip("/")))
 
     def _get_pagelist(self):
         """Load an attribute self.pagelist with a list of open pages."""
@@ -1441,7 +1443,11 @@ class MainController(object):
         is_group = len(do_list) > 1
         stack_info = []
         namespace_id_map = {}
+        event_text = rose.config_editor.EVENT_UNDO
+        if redo_mode_on:
+            event_text = rose.config_editor.EVENT_REDO
         for stack_item in do_list:
+            action = stack_item.action
             node = stack_item.node
             node_id = node.metadata.get('id')
             # We need to handle namespace and metadata changes
@@ -1516,6 +1522,12 @@ class MainController(object):
                 self.updater.update_stack_viewer_if_open()
             if not is_group:
                 self.updater.focus_sub_page_if_open(namespace, node_id)
+                id_text = rose.config_editor.EVENT_UNDO_ACTION_ID.format(
+                                      action, node_id)
+                self.reporter.report(event_text.format(id_text))
+        if is_group:
+            group_name = do_list[0].group.split("-")[0]
+            self.reporter.report(event_text.format(group_name))
         for namespace in set(stack_info):
             self.reload_namespace_tree(namespace)
             # Use the last node_id for a sub page focus (if any).
