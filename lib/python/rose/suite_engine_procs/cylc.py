@@ -561,7 +561,7 @@ class CylcProcessor(SuiteEngineProcessor):
         else:
             out, err = self.popen(bash_cmd, shell=True)
         if err:
-            self.handle_event(err, type=Event.TYPE_ERR)
+            self.handle_event(err, kind=Event.KIND_ERR)
         if out:
             self.handle_event(out)
 

@@ -44,7 +44,7 @@ PROMPT_DELETE_ALL = "Delete {0}? y/n/a (default n, a=yes-to-all) "
 
 class DeleteWarning(Event):
     """Raised when a user is about to delete a repository copy of a suite."""
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
     DELETE_WARNING = ("This will delete both local and repository " +
                           "copies of your suite")    
     def __str__(self):
@@ -105,7 +105,7 @@ class FileDeleteEvent(Event):
 
     """
 
-    TYPE = Reporter.TYPE_ERR
+    KIND = Reporter.KIND_ERR
 
     def __str__(self):
         return "%s: deleted" % " ".join(self.args)
@@ -129,7 +129,7 @@ class LocalCopyCreateSkipEvent(Event):
 
     """
 
-    TYPE = Reporter.TYPE_ERR
+    KIND = Reporter.KIND_ERR
 
     def __str__(self):
         id = self.args[0]

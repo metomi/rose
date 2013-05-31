@@ -33,8 +33,8 @@ def run_suite(*args):
     # Set up reporter
     queue = multiprocessing.Queue()
     verbosity = Reporter.VV
-    out_ctx = ReporterContextQueue(Reporter.TYPE_OUT, verbosity, queue=queue)
-    err_ctx = ReporterContextQueue(Reporter.TYPE_ERR, verbosity, queue=queue)
+    out_ctx = ReporterContextQueue(Reporter.KIND_OUT, verbosity, queue=queue)
+    err_ctx = ReporterContextQueue(Reporter.KIND_ERR, verbosity, queue=queue)
     event_handler = Reporter(contexts={"stdout": out_ctx, "stderr": err_ctx},
                              raise_on_exc=True)
 

@@ -36,11 +36,13 @@ class NavPanelHandler(object):
 
     """Handles the navigation panel menu."""
 
-    def __init__(self, data, util, mainwindow, undo_stack, redo_stack,
-                 add_config_func, section_ops_inst, variable_ops_inst,
+    def __init__(self, data, util, reporter, mainwindow,
+                 undo_stack, redo_stack, add_config_func,
+                 section_ops_inst, variable_ops_inst,
                  kill_page_func, reload_ns_tree_func, transform_default_func):
-        self.util = util
         self.data = data
+        self.util = util
+        self.reporter = reporter
         self.mainwindow = mainwindow
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack

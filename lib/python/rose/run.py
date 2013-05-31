@@ -122,7 +122,7 @@ class CommandNotDefinedEvent(Event):
 
     """An event raised when a command is not defined for an app."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return "command not defined"

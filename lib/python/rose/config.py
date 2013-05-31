@@ -429,7 +429,7 @@ class ConfigLoader(object):
             node = ConfigNode()
         f, file_name = self._get_file_and_name(source)
         keys = []
-        type = None
+        type_ = None
         comments = None
         line_num = 0
         # Note: "for line in f:" hangs for sys.stdin
@@ -449,7 +449,7 @@ class ConfigLoader(object):
                     comments.append(self._comment_strip(line))
                 continue
             # Handle option continuation.
-            if type == self.TYPE_OPTION and line[0].isspace():
+            if type_ == self.TYPE_OPTION and line[0].isspace():
                 value = node.get(keys[:]).value
                 value_cont = line.strip()
                 if value_cont.startswith(self.char_assign):
@@ -460,16 +460,16 @@ class ConfigLoader(object):
             match = self.RE_SECTION.match(line)
             if match:
                 section, state = match.group("section", "state")
-                if type == self.TYPE_OPTION:
+                if type_ == self.TYPE_OPTION:
                     keys.pop()
                 if keys:
                     keys.pop()
                 if section:
                     keys.append(section)
-                    type = self.TYPE_SECTION
+                    type_ = self.TYPE_SECTION
                 else:
                     keys = []
-                    type = None
+                    type_ = None
                 section_node = node.get(keys[:])
                 if section_node is None:
                     node.set(keys[:], {}, state, comments)
@@ -484,10 +484,10 @@ class ConfigLoader(object):
             if not match:
                 raise ConfigSyntaxError(file_name, line_num, line)
             option, value, state = match.group("option", "value", "state")
-            if type == self.TYPE_OPTION:
+            if type_ == self.TYPE_OPTION:
                 keys.pop()
             keys.append(option)
-            type = self.TYPE_OPTION
+            type_ = self.TYPE_OPTION
             value = value.strip()
             node.set(keys[:], value.strip(), state, comments)
             comments = []
