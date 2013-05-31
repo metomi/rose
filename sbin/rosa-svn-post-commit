@@ -62,9 +62,6 @@ class DAO(object):
     T_META = "meta"
     
     def __init__(self, db_url):
-        name = os.path.basename(repos).replace("roses_", "").replace("_svn", "")
-        res_loc = ResourceLocator.default()
-        url = res_loc.get_conf().get_value(["rosie-db", "db." + name])
         engine = al.create_engine(db_url)
         self.connection = engine.connect()
         self.metadata = al.MetaData(engine)
@@ -129,13 +126,21 @@ def check_path_is_sid(path):
 
 
 def main(repos, rev):
-    db_name = os.path.basename(repos).replace("roses_", "").replace("_svn", "")
     conf = ResourceLocator.default().get_conf()
-    dao = DAO(conf.get_value(["rosie-db", "db." + db_name]))
+    rosie_db_node = conf.get(["rosie-db"], no_ignore=True)
+    for key, node in rosie_db_node.value.items():
+        if node.is_ignored() or not key.startswith("repos."):
+            continue
+        if os.path.realpath(repos) == os.path.realpath(node.value):
+            prefix = key[len("repos."):]
+            break
+    else:
+        return
+    dao = DAO(conf.get_value(["rosie-db", "db." + prefix]))
     statuses = {}
     copies = {}
     author = svnlook("author", "-r", rev, repos).strip()
-    os.environ["TZ"] = "" # ensure UTC
+    os.environ["TZ"] = "UTC"
     d, t, junk = svnlook("date", "-r", rev, repos).split(None, 2)
     date = time.mktime(time.strptime(" ".join([d, t, "UTC"]), DATE_FMT))
 
@@ -156,7 +161,7 @@ def main(repos, rev):
             continue
         names = path.split("/")
         sid = "".join(names[0:LEN_ID])
-        idx = db_name + "-" + sid
+        idx = prefix + "-" + sid
         branch = names[LEN_ID]
         if branch:
             statuses.setdefault((rev, idx, branch), {0: " ", 1: " "})
@@ -182,7 +187,8 @@ def main(repos, rev):
                 try:
                     dao.insert(dao.T_META, name="known_keys", value=new_keys)
                 except al.exc.IntegrityError:
-                    dao.update(dao.T_META, ("name",), name="known_keys", value=new_keys)
+                    dao.update(dao.T_META, ("name",), name="known_keys",
+                               value=new_keys)
 
         if path.rstrip("/") == branch_path:
             if status[0] == ST_DELETED:
@@ -263,7 +269,7 @@ def main(repos, rev):
         copy_idx = None
         copy_sid = copies.get(key)
         if copy_sid is not None:
-            copy_idx = db_name + "-" + copy_sid
+            copy_idx = prefix + "-" + copy_sid
         status = ""
         if value[0] == ST_ADDED:
             value[1] = " "

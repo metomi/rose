@@ -185,7 +185,7 @@
       services.</dt>
 
       <dd>
-        <p>Typically you'll only need a single host but you can have multiple
+        <p>Typically you will only need a single host but you can have multiple
         repositories on different hosts if you require this.</p>
 
         <p><dfn>Installation requirements:</dfn></p>
@@ -305,22 +305,23 @@
 
     <p>Rosie is the optional suite storage and discovery system.</p>
 
-    <p>Rosie stores suites using Subversion repositories, with a web interface
-    for suite discovery and lookup. You'll need to select a machine to host the
-    Subversion repositories. This machine will also host the web server and
-    databases.</p>
+    <p>Rosie stores suites using Subversion repositories, with databases behind
+    a web interface for suite discovery and lookup. You will need to select a
+    machine to host the Subversion repositories. This machine will also host the
+    web server and databases.</p>
 
     <p>Login to your host, create one or more Subversion FSFS repositories.</p>
 
     <p>If you want to use <a href=
     "http://www.metoffice.gov.uk/research/collaboration/fcm">FCM</a> for your
     version control, you should set a special property on the repository to
-    allow branching and merging with FCM in the Rosie convention. For a given
-    <samp>HOST</samp> (e.g. myhost001) and a given repository root name
-    <samp>NAME</samp> (e.g. roses_mo1), change into a new directory and enter
-    the following commands:</p>
+    allow branching and merging with FCM in the Rosie convention. For example,
+    if your repository is served from
+    <var>HOST_AND_PATH</var> (e.g. <samp>myhost001/svn-repos</samp>) with given
+    repository base name <var>NAME</var> (e.g. <samp>roses_mo1</samp>), change
+    into a new directory and enter the following commands:</p>
     <pre>
-svn co -q svn://${HOST}/${NAME}/
+svn co -q svn://${HOST_AND_PATH}/${NAME}/
 svn ps fcm:layout -F - ${NAME} &lt;&lt;'__FCM_LAYOUT__'
 depth-project = 5
 depth-branch = 1
@@ -361,9 +362,13 @@ exec $ROSE_HOME/sbin/rosa svn-post-commit "$@"
 
     <p>where <var>$ROSE_HOME</var> the root of your Rose installation.</p>
 
-    <p>Edit the <var>[rosie-*]</var> settings in <samp>etc/rose.conf</samp> to
-    point to your host machine and relevant paths such as the location for your
-    repository and database.</p>
+    <p>Make sure the hook scripts are executable.</p>
+
+    <p>The <code>rosa svn-post-commit</code> command in the post-commit hook is
+    used to populate a database with the suite discovery information as suites
+    are committed to the repository. Edit the <var>[rosie-db]</var> settings in
+    <samp>etc/rose.conf</samp> to point to your host machine and provide
+    relevant paths such as the location for your repository and database.</p>
 
     <p>Once you have done that, create the Rosie database by running:</p>
     <pre>
@@ -373,7 +378,10 @@ $ROSE_HOME/sbin/rosa db-create
     <p>Make sure that the account that runs the repository hooks has read/write
     access to the database and database directory.</p>
 
-    <p>You can start the built in web service by running:</p>
+    <p>You can test that everything is working using the built in web server.
+    Edit the <var>[rosie-ws]</var> settings in <samp>etc/rose.conf</samp> to
+    configure the web server's log directory and port number. Start the web
+    server by running:</p>
     <pre>
 setsid sbin/rosa ws 0/dev/null 2&gt;&amp;1 &amp;
 </pre>
@@ -394,17 +402,18 @@ WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
     <p>Use the Apache log at <samp>/var/log/httpd/</samp> to debug
     problems.</p>
 
-    <p>Hopefully, you should now have a working Rosie service. You can test it
-    by running:</p>
+    <p>Hopefully, you should now have a working Rosie service. Configure the
+    client settings by editing the <var>[rosie-id]</var> settings in
+    <samp>etc/rose.conf</samp>. When you are done, test it by running:</p>
     <pre>
 rosie create
 </pre>
 
     <p>which will create the first suite in your repository, with an ID ending
-    in <samp>aa001</samp> - e.g. <samp>mo1-aa001</samp>. Locate it by
+    in <samp>aa000</samp> - e.g. <samp>mo1-aa000</samp>. Locate it by
     running:</p>
     <pre>
-rosie lookup 001
+rosie lookup 000
 </pre>
 
     <h3 id="rosie-special-suite">ROSIE special suite</h3>

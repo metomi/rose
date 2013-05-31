@@ -974,9 +974,9 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
 
     <h3 id="rosie-ws:location">Location</h3>
 
-    <p>The root url to access the rosie web API can be found in your rose site
-    configuration file as the value of
-    <var>[rosie-ws-client]ws-root-default</var>. To access the API for a given
+    <p>The URLs to access the web API of a Rosie web service (with a given
+    prefix name) can be found in your rose site configuration file as the value
+    of <var>[rosie-id]prefix-ws.PREFIX_NAME</var>. To access the API for a given
     repository with prefix PREFIX_NAME, you must select a format (the only
     currently supported format is 'json') and use a url that looks like:</p>
     <pre>
