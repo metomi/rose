@@ -77,6 +77,8 @@ class MenuBar(object):
         <menuitem action="Flag no-metadata vars"/>
         <menuitem action="Flag optional vars"/>
         <menuitem action="Flag opt config vars"/>
+        <separator name="sep_view_widgets"/>
+        <menuitem action="View status bar"/>
       </menu>
       <menu action="Metadata">
       <menuitem action="Reload metadata"/>
@@ -220,6 +222,8 @@ class MenuBar(object):
                        rose.config_editor.TOP_MENU_VIEW_FLAG_OPTIONAL_VARS),
                       ('Flag no-metadata vars', None,
                        rose.config_editor.TOP_MENU_VIEW_FLAG_NO_METADATA_VARS),
+                      ('View status bar', None,
+                       rose.config_editor.TOP_MENU_VIEW_STATUS_BAR),
                       ('Switch off metadata', None,
                        rose.config_editor.TOP_MENU_METADATA_SWITCH_OFF)]
 

@@ -406,6 +406,8 @@ class MainController(object):
                       lambda m: self._set_page_var_show_modes(
                                   rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
                                   m.get_active())),
+                     ('/TopMenuBar/View/View status bar',
+                      lambda m: self._set_show_status_bar(m.get_active())),
                      ('/TopMenuBar/Metadata/View without titles',
                       lambda m: self._set_page_show_modes(
                                      rose.config_editor.SHOW_MODE_NO_TITLE,
@@ -466,7 +468,9 @@ class MainController(object):
                     ('/TopMenuBar/View/Flag optional vars',
                     rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS),
                     ('/TopMenuBar/View/Flag no-metadata vars',
-                    rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS)])
+                    rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS),
+                    ('/TopMenuBar/View/View status bar',
+                    rose.config_editor.SHOULD_SHOW_STATUS_BAR)])
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
@@ -536,6 +540,7 @@ class MainController(object):
         """Create a status bar."""
         self.status_bar = rose.config_editor.status.StatusBar(
                           verbosity=rose.config_editor.STATUS_BAR_VERBOSITY)
+        self._set_show_status_bar(rose.config_editor.SHOULD_SHOW_STATUS_BAR)
 
 #------------------ Page manipulation functions ------------------------------
 
@@ -841,6 +846,14 @@ class MainController(object):
         if page is None:
             return None, None
         return page, page.get_main_focus()
+
+    def _set_show_status_bar(self, should_show_status_bar):
+        """Set whether the status bar is shown or hidden."""
+        if hasattr(self, "status_bar") and self.status_bar is not None:
+            if should_show_status_bar:
+                self.status_bar.show()
+            else:
+                self.status_bar.hide()
 
     def _set_page_show_modes(self, key, is_key_allowed):
         """Set generic variable/namespace view options."""
