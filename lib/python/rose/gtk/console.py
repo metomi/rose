@@ -151,6 +151,8 @@ class ConsoleWindow(gtk.Window):
             iter_ = next_iter
         path = model.get_path(iter_)
         self._message_treeview.scroll_to_cell(path)
+        self._message_treeview.set_cursor(path)
+        self._message_treeview.grab_focus()
 
     def _set_category_cell(self, column, cell, model, r_iter, index):
         category = model.get_value(r_iter, index)
