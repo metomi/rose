@@ -1329,7 +1329,7 @@ class MainController(object):
     def perform_find(self, expression, start_page=None):
         """Drive the finding of the regex 'expression' within the data."""
         if expression == '':
-            return None
+            return None, None
         page_id, var_id = self.get_found_page_and_id(expression, start_page)
         return self.view_page(page_id, var_id), var_id
 
