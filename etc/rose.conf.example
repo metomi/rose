@@ -171,9 +171,13 @@
 # Configuration related to Rosie client commands
 #
 ## Root directory of local (working) copies of suites (default=$HOME/roses)
-#  local-copy-root=$HOME/roses
-## The default prefix
-#  prefix-default=name1
+#  local-copy-root=DIR
+## E.g.:
+#  local-copy-root=$HOME/my-work/roses
+## The default ID prefix (an identifier for a Rosie repository/service)
+#  prefix-default=PREFIX
+## E.g.:
+#  prefix-default=foo
 ## URL of the repository of an ID prefix, no trailing slash
 #  prefix-location.PREFIX=URL
 ## E.g.:
@@ -182,13 +186,13 @@
 #  prefix-web.PREFIX=URL
 ## E.g.:
 #  prefix-web.foo=http://host/projects/foo
-## Web service URL of of an ID prefix
+## Web service URL of an ID prefix
 #  prefix-ws.PREFIX=URL
 ## E.g.:
 #  prefix-ws.foo=http://host:port/rosie/foo
 [rosie-id]
 
-# Configuration related to Rosie web service server
+# Configuration related to the adhoc Rosie web service server
 #
 ## Adhoc Rosie web server log directory
 #  log-dir=DIR

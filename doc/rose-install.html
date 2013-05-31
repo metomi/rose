@@ -185,7 +185,7 @@
       services.</dt>
 
       <dd>
-        <p>Typically you'll only need a single host but you can have multiple
+        <p>Typically you will only need a single host but you can have multiple
         repositories on different hosts if you require this.</p>
 
         <p><dfn>Installation requirements:</dfn></p>
@@ -306,7 +306,7 @@
     <p>Rosie is the optional suite storage and discovery system.</p>
 
     <p>Rosie stores suites using Subversion repositories, with databases behind
-    a web interface for suite discovery and lookup. You'll need to select a
+    a web interface for suite discovery and lookup. You will need to select a
     machine to host the Subversion repositories. This machine will also host the
     web server and databases.</p>
 
@@ -367,8 +367,8 @@ exec $ROSE_HOME/sbin/rosa svn-post-commit "$@"
     <p>The <code>rosa svn-post-commit</code> command in the post-commit hook is
     used to populate a database with the suite discovery information as suites
     are committed to the repository. Edit the <var>[rosie-db]</var> settings in
-    <samp>etc/rose.conf</samp> to point to your host machine and relevant paths
-    such as the location for your repository and database.</p>
+    <samp>etc/rose.conf</samp> to point to your host machine and provide
+    relevant paths such as the location for your repository and database.</p>
 
     <p>Once you have done that, create the Rosie database by running:</p>
     <pre>
@@ -378,10 +378,10 @@ $ROSE_HOME/sbin/rosa db-create
     <p>Make sure that the account that runs the repository hooks has read/write
     access to the database and database directory.</p>
 
-    <p>You can test that everything is working by using the built in web
-    service. Edit the <var>[rosie-ws]</var> settings in
-    <samp>etc/rose.conf</samp> to configure the location of the log directory
-    and the port number to use. Start the built in web service by running:</p>
+    <p>You can test that everything is working using the built in web server.
+    Edit the <var>[rosie-ws]</var> settings in <samp>etc/rose.conf</samp> to
+    configure the web server's log directory and port number. Start the web
+    server by running:</p>
     <pre>
 setsid sbin/rosa ws 0/dev/null 2&gt;&amp;1 &amp;
 </pre>
