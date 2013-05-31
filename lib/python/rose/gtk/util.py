@@ -570,9 +570,9 @@ class SplashScreen(gtk.Window):
         while gtk.events_pending():
             gtk.main_iteration()
 
-    def update(self, event, data_name, no_progress=False):
+    def update(self, event, no_progress=False):
         """Show text corresponding to an event."""
-        text = data_name + " - " + event
+        text = str(event)
         if self.total_number_of_events == 0:
             fraction = 1.0
         else:

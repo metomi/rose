@@ -210,9 +210,9 @@ SIZE_HISTORY = 100
 SPLASH_CONFIG = "configuration"
 SPLASH_DIRECTOR = "suite director"
 SPLASH_HISTORY = "search history"
-SPLASH_INITIAL_QUERY = "running initial query"
-SPLASH_LOADING = "loading {0}"
-SPLASH_READY = "ready"
+SPLASH_INITIAL_QUERY = "{0} - running initial query"
+SPLASH_LOADING = "{0} - loading {1}"
+SPLASH_READY = "{0} - ready"
 SPLASH_SEARCH_MANAGER = "search manager"
 SPLASH_SETUP_WINDOW = "main window"
 

@@ -66,13 +66,13 @@ class MainWindow(gtk.Window):
         super(MainWindow, self).__init__()
         self.refresh_url = ""
         splash_updater(rosie.browser.SPLASH_LOADING.format(
-                                     rosie.browser.SPLASH_SEARCH_MANAGER),
-                       rosie.browser.PROGRAM_NAME)
+                                     rosie.browser.PROGRAM_NAME,
+                                     rosie.browser.SPLASH_SEARCH_MANAGER))
         self.search_manager = rosie.browser.search.SearchManager(opts.prefix)        
         locator = ResourceLocator(paths=sys.path)
         splash_updater(rosie.browser.SPLASH_LOADING.format(
-                                     rosie.browser.SPLASH_CONFIG), 
-                       rosie.browser.PROGRAM_NAME)
+                                     rosie.browser.PROGRAM_NAME,
+                                     rosie.browser.SPLASH_CONFIG))
         self.config = locator.get_conf()
         icon_path = locator.locate(rosie.browser.ICON_PATH_WINDOW)
         self.set_icon_from_file(icon_path)
@@ -87,31 +87,32 @@ class MainWindow(gtk.Window):
         self.query_rows = None
         self.adv_controls_on = rosie.browser.SHOULD_SHOW_ADVANCED_CONTROLS
         splash_updater(rosie.browser.SPLASH_LOADING.format(
-                                     rosie.browser.SPLASH_HISTORY),
-                       rosie.browser.PROGRAM_NAME)
+                                     rosie.browser.PROGRAM_NAME,
+                                     rosie.browser.SPLASH_HISTORY))
         self.search_history = False
         self.hist = rosie.browser.history.HistoryManager(
                     rosie.browser.HISTORY_LOCATION, rosie.browser.SIZE_HISTORY)
         self.last_search_historical = False
         self.repeat_last_request = lambda: None
         splash_updater(rosie.browser.SPLASH_LOADING.format(
-                                     rosie.browser.SPLASH_SETUP_WINDOW),
-                       rosie.browser.PROGRAM_NAME)
+                                     rosie.browser.PROGRAM_NAME,
+                                     rosie.browser.SPLASH_SETUP_WINDOW))
         self.setup_window()
         self.local_updater = rosie.browser.status.LocalStatusUpdater(
                                    self.handle_update_treemodel_local_status)
         splash_updater(rosie.browser.SPLASH_LOADING.format(
-                                     rosie.browser.SPLASH_DIRECTOR),
-                       rosie.browser.PROGRAM_NAME)
+                                     rosie.browser.PROGRAM_NAME,
+                                     rosie.browser.SPLASH_DIRECTOR))
         self.suite_director = rosie.browser.suite.SuiteDirector(
                                             event_handler=self.handle_vc_event)
         self.set_title(rosie.browser.TITLEBAR.format(
                                      self.search_manager.get_datasource()))    
-        splash_updater(rosie.browser.SPLASH_INITIAL_QUERY,
-                       rosie.browser.PROGRAM_NAME)    
+        splash_updater(rosie.browser.SPLASH_INITIAL_QUERY.format(
+                                            rosie.browser.PROGRAM_NAME))
         self.initial_filter(opts, args)
         self.nav_bar.simple_search_entry.grab_focus()
-        splash_updater(rosie.browser.SPLASH_READY, rosie.browser.PROGRAM_NAME)
+        splash_updater(rosie.browser.SPLASH_READY.format(
+                                            rosie.browser.PROGRAM_NAME))
         self.suite_log_view_generator = SuiteLogViewGenerator(
                 event_handler=self.handle_view_output_event)
         self.show()

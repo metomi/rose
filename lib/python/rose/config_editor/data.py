@@ -168,13 +168,13 @@ class ConfigDataManager(object):
 
     """Loads the information from the various configurations."""
 
-    def __init__(self, util, signal_load_event, page_ns_show_modes,
+    def __init__(self, util, reporter, page_ns_show_modes,
                  reload_ns_tree_func):
         """Load the root configuration and all its sub-configurations."""
         self.util = util
         self.helper = rose.config_editor.data_helper.ConfigDataHelper(
                                   self, util)
-        self.signal_load_event = signal_load_event
+        self.reporter = reporter
         self.page_ns_show_modes = page_ns_show_modes
         self.reload_ns_tree_func = reload_ns_tree_func
         self.config = {}  # Stores configuration name: object
@@ -247,8 +247,9 @@ class ConfigDataManager(object):
             config = config
             s_config = copy.deepcopy(config)
             if not skip_load_event:
-                self.signal_load_event(rose.config_editor.LOAD_CONFIG,
-                                       name.lstrip("/"))
+                self.reporter.report_load_event(
+                              rose.config_editor.EVENT_LOAD_CONFIG.format(
+                                                       name.lstrip("/")))
         else:
             config_directory = config_directory.rstrip("/")
             if config_directory != self.top_level_directory:
@@ -267,8 +268,9 @@ class ConfigDataManager(object):
                 self.load_info_config(config_directory)
                 name = "/" + self.top_level_name + "-conf"
             if not skip_load_event:
-                self.signal_load_event(rose.config_editor.LOAD_CONFIG,
-                                       name.lstrip("/"))
+                self.reporter.report_load_event(
+                              rose.config_editor.EVENT_LOAD_CONFIG.format(
+                                                       name.lstrip("/")))
             config_path = os.path.join(config_directory, rose.SUB_CONFIG_NAME)
             if not os.path.isfile(config_path):
                 if (os.path.abspath(config_directory) ==
@@ -310,8 +312,9 @@ class ConfigDataManager(object):
         self.config[name].vars = VarData(var, l_var, s_var, s_l_var)
         
         if not skip_load_event:
-            self.signal_load_event(rose.config_editor.LOAD_METADATA,
-                                   name.lstrip("/"))
+            self.reporter.report_load_event(
+                          rose.config_editor.EVENT_LOAD_METADATA.format(
+                                                        name.lstrip("/")))
         # Process namespaces and ignored statuses.
         self.load_node_namespaces(name)
         self.load_node_namespaces(name, from_saved=True)

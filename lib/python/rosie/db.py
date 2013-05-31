@@ -498,7 +498,7 @@ class RosieDatabaseCreateSkipEvent(Event):
 
     """Event raised when a Rosie database creation is skipped."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return "%s: DB already exists, skip." % (self.args[0])
@@ -518,7 +518,7 @@ class RosieDatabaseLoadSkipEvent(Event):
 
     """Event raised when a Rosie database load is skipped."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return "%s: DB not loaded." % (self.args[0])
