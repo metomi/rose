@@ -711,14 +711,13 @@ class MainMenuHandler(object):
             macro = macro_name.split('.')[-2]
         else:
             macro = macro_name.split('.')[-1]
+        type_ = self.reporter.TYPE_OUT
         if num_changes:
             info_text = rose.config_editor.EVENT_MACRO_TRANSFORM.format(
                                     name, macro, num_changes)
-            type_ = self.reporter.TYPE_ERR
         else:
             info_text = rose.config_editor.EVENT_MACRO_TRANSFORM_OK.format(
                                     name, macro)
-            type_ = self.reporter.TYPE_OUT
         self.reporter.report(info_text, type_=type_)
 
     def handle_macro_validation(self, config_name, macro_name,
