@@ -151,7 +151,7 @@ class KeyWidget(gtk.VBox):
                                 self._handle_comment_click)
                 edit_eb.connect("enter-notify-event",
                                 self._handle_comment_enter_leave, True)
-                edit_eb.connect("enter-notify-event",
+                edit_eb.connect("leave-notify-event",
                                 self._handle_comment_enter_leave, False)
                 self.comments_box.pack_start(
                               edit_eb, expand=False, fill=False,
@@ -169,9 +169,11 @@ class KeyWidget(gtk.VBox):
         if show_mode == rose.config_editor.SHOW_MODE_NO_TITLE:
             return self._set_show_title(not should_show_mode)
         if show_mode == rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
-            return self._set_show_description(not should_show_mode)
+            return self._set_show_meta_text_mode(rose.META_PROP_DESCRIPTION,
+                                                 not should_show_mode)
         if show_mode == rose.config_editor.SHOW_MODE_NO_HELP:
-            return self._set_show_help(not should_show_mode)
+            return self._set_show_meta_text_mode(rose.META_PROP_HELP,
+                                                 not should_show_mode)
         if show_mode == rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
             if (should_show_mode and
                 self.meta.get(rose.META_PROP_COMPULSORY) !=
@@ -203,46 +205,28 @@ class KeyWidget(gtk.VBox):
                                     text)
             return self.remove_flag(rose.config_editor.FLAG_TYPE_OPT_CONF)
 
-    def _set_show_description(self, should_show_description):
-        """Set the display of a variable description below the title/name."""
-        if should_show_description:
+    def _set_show_meta_text_mode(self, mode, should_show_mode):
+        """Set the display of description or help below the title/name."""
+        if should_show_mode:
             search_func = lambda i: self.var_ops.search_for_var(
-                                                        self.meta["full_ns"], i)
-            desc_text = self.meta.get(rose.META_PROP_DESCRIPTION)
-            if desc_text is None:
+                                                 self.meta["full_ns"], i)
+            mode_text = self.meta.get(mode)
+            if mode_text is None:
                 return
-            desc_text = rose.gtk.util.safe_str(desc_text)
-            desc_text = rose.config_editor.VAR_FLAG_MARKUP.format(desc_text)
-            label = rose.gtk.util.get_hyperlink_label(desc_text, search_func)
-            label._show_mode = rose.META_PROP_DESCRIPTION
+            mode_text = rose.gtk.util.safe_str(mode_text)
+            mode_text = rose.config_editor.VAR_FLAG_MARKUP.format(mode_text)
+            label = rose.gtk.util.get_hyperlink_label(mode_text, search_func)
             label.show()
-            self.pack_start(label, expand=False, fill=False)
+            hbox = gtk.HBox()
+            hbox.show()
+            hbox.pack_start(label, expand=False, fill=False)
+            hbox._show_mode = mode
+            self.pack_start(hbox, expand=False, fill=False)
         else:
             for widget in self.get_children():
-                if (isinstance(widget, gtk.Label) and
+                if (isinstance(widget, gtk.HBox) and
                     hasattr(widget, "_show_mode") and
-                    widget._show_mode == rose.META_PROP_DESCRIPTION):
-                    self.remove(widget)
-
-    def _set_show_help(self, should_show_help):
-        """Set the display of variable help below the title/name."""
-        if should_show_help:
-            search_func = lambda i: self.var_ops.search_for_var(
-                                                        self.meta["full_ns"], i)
-            help_text = self.meta.get(rose.META_PROP_HELP)
-            if help_text is None:
-                return
-            help_text = rose.gtk.util.safe_str(help_text)
-            help_text = rose.config_editor.VAR_FLAG_MARKUP.format(help_text)
-            label = rose.gtk.util.get_hyperlink_label(help_text, search_func)
-            label._show_mode = rose.META_PROP_HELP
-            label.show()
-            self.pack_end(label, expand=False, fill=False)
-        else:
-            for widget in self.get_children():
-                if (isinstance(widget, gtk.Label) and
-                    hasattr(widget, "_show_mode") and
-                    widget._show_mode == rose.META_PROP_HELP):
+                    widget._show_mode == mode):
                     self.remove(widget)
 
     def _set_show_title(self, should_show_title):
@@ -314,8 +298,7 @@ class KeyWidget(gtk.VBox):
         label.show()
         hbox = gtk.HBox()
         hbox._flag_type = flag_type
-        hbox.pack_start(label, expand=False, fill=False,
-                        padding=rose.config_editor.SPACING_SUB_PAGE)
+        hbox.pack_start(label, expand=False, fill=False)
         hbox.show()
         self.pack_start(hbox, expand=False, fill=False)
 
