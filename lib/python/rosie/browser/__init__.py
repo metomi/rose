@@ -210,9 +210,9 @@ SIZE_HISTORY = 100
 SPLASH_CONFIG = "configuration"
 SPLASH_DIRECTOR = "suite director"
 SPLASH_HISTORY = "search history"
-SPLASH_INITIAL_QUERY = "running initial query"
-SPLASH_LOADING = "loading {0}"
-SPLASH_READY = "ready"
+SPLASH_INITIAL_QUERY = "{0} - running initial query"
+SPLASH_LOADING = "{0} - loading {1}"
+SPLASH_READY = "{0} - ready"
 SPLASH_SEARCH_MANAGER = "search manager"
 SPLASH_SETUP_WINDOW = "main window"
 
@@ -220,17 +220,18 @@ SPLASH_SETUP_WINDOW = "main window"
 def load_override_config():
     """Load any overrides of the above settings."""
     conf = ResourceLocator.default().get_conf()
-    node = conf.get(["rosie-browse"], no_ignore=True)
-    if node is None:
-        return
-    for key, node in node.value.items():
-        if node.is_ignored():
+    for s in ["rosie-browse", "rosie-go"]:
+        node = conf.get([s], no_ignore=True)
+        if node is None:
             continue
-        try:
-            cast_value = ast.literal_eval(node.value)
-        except Exception:
-            cast_value = node.value
-        globals()[key.replace("-", "_").upper()] = cast_value
+        for key, node in node.value.items():
+            if node.is_ignored():
+                continue
+            try:
+                cast_value = ast.literal_eval(node.value)
+            except Exception:
+                cast_value = node.value
+            globals()[key.replace("-", "_").upper()] = cast_value
 
 
 load_override_config()

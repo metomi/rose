@@ -65,7 +65,8 @@ class ResourceLocator(object):
         if self.conf is None:
             paths = [os.path.join(self.get_util_home(), "etc"),
                      os.path.join(os.path.expanduser("~"), ".metomi")]
-            paths += os.getenv("ROSE_CONF_PATH", "").split(os.pathsep)
+            if "ROSE_CONF_PATH" in os.environ:
+                paths += os.getenv("ROSE_CONF_PATH", "").split(os.pathsep)
             self.conf = ConfigNode()
             config_loader = ConfigLoader()
             for path in paths:

@@ -122,7 +122,7 @@ class CommandNotDefinedEvent(Event):
 
     """An event raised when a command is not defined for an app."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return "command not defined"
@@ -1083,19 +1083,20 @@ class TaskRunner(Runner):
                 env_export(k, v, self.event_handler)
                 is_changed = True
 
-        if is_changed:
-            path_globs = opts.path_globs
-            if path_globs is None:
-                path_globs = []
-            for k, prepend_paths in get_prepend_paths(self.event_handler,
-                                                      t.suite_dir,
-                                                      *path_globs).items():
-                orig_paths = []
-                orig_v = os.getenv(k, "")
-                if orig_v:
-                    orig_paths = orig_v.split(os.pathsep)
-                v = os.pathsep.join(prepend_paths + orig_paths)
-                env_export(k, v, self.event_handler)
+        path_globs = opts.path_globs
+        if path_globs is None:
+            path_globs = []
+        prepend_paths_map = get_prepend_paths(self.event_handler,
+                                              t.suite_dir,
+                                              path_globs,
+                                              full_mode=is_changed)
+        for k, prepend_paths in prepend_paths_map.items():
+            orig_paths = []
+            orig_v = os.getenv(k, "")
+            if orig_v:
+                orig_paths = orig_v.split(os.pathsep)
+            v = os.pathsep.join(prepend_paths + orig_paths)
+            env_export(k, v, self.event_handler)
 
         # Name association with builtin applications
         builtin_app = None

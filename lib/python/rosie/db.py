@@ -32,6 +32,7 @@ import os
 import sqlalchemy as al
 
 import rose.config
+from rose.fs_util import FileSystemUtil
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
@@ -497,7 +498,7 @@ class RosieDatabaseCreateSkipEvent(Event):
 
     """Event raised when a Rosie database creation is skipped."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return "%s: DB already exists, skip." % (self.args[0])
@@ -517,7 +518,7 @@ class RosieDatabaseLoadSkipEvent(Event):
 
     """Event raised when a Rosie database load is skipped."""
 
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return "%s: DB not loaded." % (self.args[0])
@@ -529,14 +530,18 @@ class RosieDatabaseInitiator(object):
 
     LEN_DB_STRING = 1024
     LEN_STATUS = 2
+    SQLITE_PREFIX = "sqlite:///"
 
-    def __init__(self, event_handler=None, popen=None):
+    def __init__(self, event_handler=None, popen=None, fs_util=None):
         if event_handler is None:
             event_handler = self._dummy
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
         self.popen = popen
+        if fs_util is None:
+            fs_util = FileSystemUtil(event_handler)
+        self.fs_util = fs_util
 
     def _dummy(*args, **kwargs):
         pass
@@ -560,6 +565,9 @@ class RosieDatabaseInitiator(object):
         """Create database tables."""
         conf = ResourceLocator.default().get_conf()
         url = conf.get(["rosie-db", "db." + prefix]).value
+        if url.startswith(self.SQLITE_PREFIX):
+            d = os.path.dirname(url[len(self.SQLITE_PREFIX):])
+            self.fs_util.makedirs(d)
         try:
             engine = al.create_engine(url)
             metadata = al.MetaData()

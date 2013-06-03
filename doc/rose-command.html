@@ -529,11 +529,14 @@
     <dl>
       <dt><kbd>--config=DIR; -C DIR</kbd></dt>
 
-      <dd>Specify a configuration directory. (default=<var>$PWD</var>)</dd>
+      <dd>Change directory to <var>DIR</var> before looking for configuration
+      files. (default=<var>$PWD</var>)</dd>
 
       <dt><kbd>--file=FILE, -f FILE</kbd></dt>
 
-      <dd>Each of these specifies a configuration file.</dd>
+      <dd>Each of these specifies a configuration file. If
+      <kbd>--config=DIR</kbd> is specified and <var>FILE</var> is a relative
+      path, <var>FILE</var> is assumed to be relative to <var>DIR</var>.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -1801,7 +1804,7 @@ launcher-preopts.mpiexec=-n $NPROC
       <var>NAME</var> is not specified). If a relative path is given, it is
       relative to <var>$ROSE_SUITE_DIR</var>. An empty value resets the default
       and any previous <kbd>--path=PATTERN</kbd> settings.
-      (default=<kbd>share/fcm[_-]make*/*/bin</kbd>,
+      (Default for <var>PATH</var> is <kbd>share/fcm[_-]make*/*/bin</kbd> and
       <kbd>work/fcm[_-]make*/*/bin</kbd>)</dd>
 
       <dt><kbd>--prefix-delim=DELIMITER</kbd></dt>
@@ -2336,12 +2339,6 @@ abc01 from daisy
       <dt><kbd>--verbose; -v</kbd></dt>
 
       <dd>Display full info for each returned suite.</dd>
-
-      <dt><kbd>--ws-root=URL</kbd></dt>
-
-      <dd>Specify the root URL of a Rosie web service. (Override the setting in
-      the site/user configuration
-      <var>[rosie-ws-client]ws-root-default=URL</var>.)</dd>
     </dl>
 
     <h2 id="rosie-ls">rosie ls</h2>
@@ -2410,12 +2407,6 @@ abc01 from daisy
       <dt><kbd>--verbose; -v</kbd></dt>
 
       <dd>Display full info for each returned suite.</dd>
-
-      <dt><kbd>--ws-root=URL</kbd></dt>
-
-      <dd>Specify the root URL of a Rosie web service. (Override the setting in
-      the site/user configuration
-      <var>[rosie-ws-client]ws-root-default=URL</var>.)</dd>
     </dl>
   </div>
 </body>

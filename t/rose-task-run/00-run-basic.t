@@ -52,9 +52,16 @@ for P in $(ls -d -r $SUITE_RUN_DIR/etc/my-path/*); do
     if [[ -n $MY_PATH ]]; then
         MY_PATH="$P:$MY_PATH"
     else
-        MY_PATH=$P
+        MY_PATH="$P"
     fi
 done
+if [[ -d $SUITE_RUN_DIR/etc/your-path ]]; then
+    if [[ -n $MY_PATH ]]; then
+        MY_PATH="$SUITE_RUN_DIR/etc/your-path:$MY_PATH"
+    else
+        MY_PATH="$SUITE_RUN_DIR/etc/your-path"
+    fi
+fi
 PREV_CYCLE=
 for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY=$TEST_KEY_BASE-file-$CYCLE

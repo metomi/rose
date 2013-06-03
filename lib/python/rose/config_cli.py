@@ -35,7 +35,7 @@ class MetadataNotFoundEvent(Event):
     """Warn when there is no metadata."""
 
     LEVEL = Event.WARN
-    TYPE = Event.TYPE_ERR
+    KIND = Event.KIND_ERR
 
     def __str__(self):
         return "%s: metadata not found" % str(self.args[0])

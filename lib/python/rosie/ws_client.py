@@ -75,21 +75,22 @@ class RosieWSClient(object):
 
     """A Client for the Rosie Web Service."""
 
-    def __init__(self, root=None, prefix=None):
-        if root is None:
-            conf = ResourceLocator.default().get_conf()
-            root = conf.get_value(["rosie-ws-client", "ws-root-default"])
-        self.root = root
+    def __init__(self, prefix=None):
         if prefix is None:
             prefix = SuiteId.get_prefix_default()
         self.prefix = prefix
+        conf = ResourceLocator.default().get_conf()
+        root = conf.get_value(["rosie-id", "prefix-ws." + self.prefix])
+        if not root.endswith("/"):
+            root += "/"
+        self.root = root
 
     def _get(self, method, **kwargs):
         """Send a JSON object to the web server and retrieve results."""
         if method == "address":
             url = kwargs.pop("url").replace("&format=json", "")
         else:
-            url = self.root + self.prefix + "/" + method
+            url = self.root + method
         kwargs["format"] = "json"
         try:
             response = requests.get(url, params=kwargs)
@@ -114,17 +115,8 @@ class RosieWSClient(object):
     def get_optional_keys(self):
         return self._get("get_optional_keys")[0]
 
-    def get_prefix(self):
-        return self.prefix
-
-    def get_root(self):
-        return self.root
-
     def get_query_operators(self):
         return self._get("get_query_operators")[0]
-
-    def get_query_prefix(self):
-        return self.get_root() + self.get_prefix() + "/"
 
     def query(self, q, **kwargs):
         return self._get("query", q=q, **kwargs)
@@ -175,10 +167,10 @@ class SuiteInfo(Event):
 def local_suites(argv):
     """CLI command to list all the locally checked out suites"""
     opt_parser = RoseOptionParser().add_my_options(
-            "format", "no_headers", "prefix", "reverse", "sort", "ws_root",)
+            "format", "no_headers", "prefix", "reverse", "sort")
     opts, args = opt_parser.parse_args(argv)
 
-    ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
+    ws_client = RosieWSClient(prefix=opts.prefix)
     if opts.prefix is not None:
         results, id_list = get_local_suite_details(opts.prefix)
         return _display_maps(opts, ws_client, results, local_suites=id_list)
@@ -208,7 +200,7 @@ def lookup(argv):
     """CLI command to run the various search types"""
     opt_parser = RoseOptionParser().add_my_options(
             "all_revs", "format", "no_headers", "prefix", "query", "reverse", 
-            "search", "sort", "url", "ws_root")
+            "search", "sort", "url")
     opts, args = opt_parser.parse_args(argv)
     if not args:
         sys.exit(opt_parser.print_usage())
@@ -217,9 +209,9 @@ def lookup(argv):
             opts.url = True
         else:
             opts.search = True
+    ws_client = RosieWSClient(prefix=opts.prefix)
     results = None
     if opts.url:
-        ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
         addr = args[0]
 
         if opts.debug_mode:
@@ -235,13 +227,11 @@ def lookup(argv):
             sys.exit(ERR_SYNTAX.format(" ".join(args)))
         for i, p in enumerate(q):
             q[i] = " ".join(p)
-        ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
         if opts.all_revs:
             results, url = ws_client.query(q, all_revs=True)
         else:
             results, url = ws_client.query(q)
     elif opts.search:
-        ws_client = RosieWSClient(prefix=opts.prefix, root=opts.ws_root)
         if opts.all_revs:
             results, url = ws_client.search(args, all_revs=True)
         else:
@@ -301,13 +291,13 @@ def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
        a search or query.
        """
     if prefix == None:
-        return
+        return [], []
 
     if id_list == None:
         id_list = get_local_suites(skip_status=skip_status)
 
     if not id_list:
-        return []
+        return [], []
 
     result_maps = []
     q = []
