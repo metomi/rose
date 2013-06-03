@@ -54,7 +54,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self._popup_menu_func = popup_menu_func
         self._ask_can_show_func = ask_can_show_func
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        self.set_shadow_type(gtk.SHADOW_OUT)
         self.panel_top = gtk.TreeViewColumn()
         self.panel_top.set_title(rose.config_editor.TREE_PANEL_TITLE)
         self.cell_error_icon = gtk.CellRendererPixbuf()
@@ -92,6 +92,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self.filter_model.set_visible_func(self._get_should_show)
         self.tree.set_model(self.filter_model)
         self.tree.show()
+        self.name_iter_map = {}
         self.add(self.tree)
         self.load_tree(None, namespace_tree)
         self.tree.connect('button_press_event',
@@ -108,7 +109,6 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self.tree.columns_autosize()
         self.tree.connect('enter-notify-event',
                           lambda t, e: self.update_row_tooltips())
-        self.name_iter_map = {}
         self.visible_iter_map = {}
 
     def get_treeview_tooltip(self, view, row_iter, col_index, tip):
@@ -145,7 +145,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
     def load_tree(self, row, namespace_subtree):
         expanded_rows = []
         self.tree.map_expanded_rows(lambda r, d: expanded_rows.append(d))
-        self.recursively_load_tree(row, namespace_subtree)
+        self.load_tree_stack(row, namespace_subtree)
         self.set_expansion()
         for this_row in expanded_rows:
             self.tree.expand_to_path(this_row)
@@ -163,7 +163,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             self.tree.expand_to_path(path)
             r_iter = self.filter_model.iter_next(r_iter)
 
-    def recursively_load_tree(self, row, namespace_subtree):
+    def load_tree_stack(self, row, namespace_subtree):
         """Update the tree store recursively using namespace_subtree."""
         self.name_iter_map = {}
         self.visible_iter_map = {}
@@ -171,9 +171,19 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             self.data_store.clear()
         initials = namespace_subtree.items()
         initials.sort(self.sort_tree_items)
-        stack = [[row] + list(i) for i in initials]
+        stack = []
+        if row is None:
+            start_keylist = []
+        else:
+            path = self.data_store.get_path(row)
+            start_keylist = self.get_name(path, unfiltered=True).split("/")
+        for item in initials:
+            key, value_meta_tuple = item
+            stack.append([row] + [list(start_keylist)] + list(item))
+        self.name_iter_map.setdefault(True, {})  # True maps to unfiltered.
+        name_iter_map = self.name_iter_map[True]
         while stack:
-            row, key, value_meta_tuple = stack[0]
+            row, keylist, key, value_meta_tuple = stack[0]
             value, meta, statuses, change = value_meta_tuple
             title = meta[rose.META_PROP_TITLE]
             latent_status = statuses[rose.config_editor.SHOW_MODE_LATENT]
@@ -187,11 +197,13 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                                                    ignored_status,
                                                    '',
                                                    change])
+            new_keylist = keylist + [key]
+            name_iter_map["/".join(new_keylist)] = new_row
             if type(value) is dict:
                 newer_initials = value.items()
                 newer_initials.sort(self.sort_tree_items)
                 for x in newer_initials:
-                    stack.append([new_row] + list(x))
+                    stack.append([new_row] + [list(new_keylist)] + list(x))
             stack.pop(0)
 
     def _set_title_markup(self, column, cell, model, r_iter, index):
@@ -210,12 +222,13 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def sort_tree_items(self, row_item_1, row_item_2):
         """Sort tree items according to name and sort key."""
-        main_sort_func = rose.config.sort_settings
         sort_key_1 = row_item_1[1][1].get(rose.META_PROP_SORT_KEY, '')
         sort_key_2 = row_item_2[1][1].get(rose.META_PROP_SORT_KEY, '')
+        if sort_key_1 == sort_key_2:
+            return rose.config.sort_element(row_item_1[0], row_item_2[0])
         sort_key_1 = sort_key_1 + '~' + row_item_1[0]
         sort_key_2 = sort_key_2 + '~' + row_item_2[0]
-        return main_sort_func(sort_key_1, sort_key_2)
+        return cmp(sort_key_1, sort_key_2)
 
     def set_row_icon(self, names, ind_count=0, ind_type='changed'):
         """Set the icons for row status on or off. Check parent icons.
@@ -334,7 +347,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         if row_names is None:
             return
         path = self.get_path_from_names(row_names, unfiltered=True)
-        path = self.filter_model.convert_child_path_to_path(path)
+        try:
+            path = self.filter_model.convert_child_path_to_path(path)
+        except TypeError:
+            path = None
         if path is not None:
             i = 1
             while self.tree.row_expanded(path[:i]) and i <= len(path):
@@ -351,14 +367,17 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             tree_model = self.filter_model
         self.name_iter_map.setdefault(unfiltered, {})
         name_iter_map = self.name_iter_map[unfiltered]
-        key = tuple(row_names)
+        key = "/".join(row_names)
         if key in name_iter_map:
             return tree_model.get_path(name_iter_map[key])
+        if unfiltered:
+            # This would be cached in name_iter_map by load_tree_stack.
+            return None
         my_iter = tree_model.get_iter_first()
         these_names = []
         good_paths = [row_names[:i] for i in range(len(row_names) + 1)]
         for names in reversed(good_paths):
-            subkey = tuple(names)
+            subkey = "/".join(names)
             if subkey in name_iter_map:
                 my_iter = name_iter_map[subkey]
                 these_names = names[:-1]
@@ -366,7 +385,8 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         while my_iter is not None:
             branch_name = tree_model.get_value(my_iter, 3)
             my_names = these_names + [branch_name]
-            name_iter_map.update({tuple(my_names): my_iter})
+            subkey = "/".join(my_names)
+            name_iter_map[subkey] = my_iter
             if my_names in good_paths:
                 if my_names == row_names:
                     return tree_model.get_path(my_iter)
@@ -376,6 +396,22 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             else:
                 my_iter = tree_model.iter_next(my_iter)
         return None
+
+    def get_change_error_totals(self):
+        """Return the changed and error totals for the root nodes."""
+        tree_model = self.data_store
+        iter_ = self.data_store.get_iter_first()
+        changes = 0
+        errors = 0
+        while iter_ is not None:
+            iter_changes = self.data_store.get_value(iter_, 7)
+            iter_errors = self.data_store.get_value(iter_, 5)
+            if iter_changes is not None:
+                changes += iter_changes
+            if iter_errors is not None:
+                errors += iter_errors
+            iter_ = self.data_store.iter_next(iter_)
+        return changes, errors
 
     def handle_activation(self, treeview=None, event=None, somewidget=None):
         """Send a page launch request based on left or middle clicks."""

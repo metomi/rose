@@ -77,8 +77,10 @@ TOP_MENU_VIEW_LATENT_PAGES = "View Latent _Pages"
 TOP_MENU_VIEW_IGNORED_PAGES = "View All _Ignored Pages"
 TOP_MENU_VIEW_USER_IGNORED_PAGES = "View _User Ignored Pages"
 TOP_MENU_VIEW_WITHOUT_TITLES = "Hide _Titles"
+TOP_MENU_VIEW_FLAG_OPT_CONF_VARS = "Flag Opt _Config Variables"
 TOP_MENU_VIEW_FLAG_OPTIONAL_VARS = "Flag _Optional Variables"
 TOP_MENU_VIEW_FLAG_NO_METADATA_VARS = "Flag _No-metadata Variables"
+TOP_MENU_VIEW_STATUS_BAR = "View _Status Bar"
 TOP_MENU_PAGE = "_Page"
 TOP_MENU_PAGE_ADD = "_Add"
 TOP_MENU_PAGE_REVERT = "_Revert to Saved"
@@ -153,12 +155,31 @@ LABEL_PAGE_HELP = "Page help"
 LABEL_PAGE_MACRO_BUTTON = "Macros"
 
 # Loading strings
-LOAD_CONFIG = "reading    "
-LOAD_DONE = "loading GUI"
-LOAD_ERRORS = "errors: {0}"
-LOAD_METADATA = "configuring"
+EVENT_LOAD_CONFIG = "{0} - reading    "
+EVENT_LOAD_DONE = "{0} - loading GUI"
+EVENT_LOAD_ERRORS = "{0} - errors: {1}"
+EVENT_LOAD_METADATA = "{0} - configuring"
+EVENT_LOAD_STATUSES = "{0} - checking   "
 LOAD_NUMBER_OF_EVENTS = 2
-LOAD_STATUSES = "checking   "
+
+# Other event strings
+EVENT_ERR_MARKUP = "<span color='red'>{0}</span>"
+EVENT_FOUND_ID = "Found {0}"
+EVENT_MACRO_CONFIGS = "{0} configurations"
+EVENT_MACRO_TRANSFORM = "{1}: {0}: {2} changes"
+EVENT_MACRO_TRANSFORM_ALL = "Transforms: {0}: {1} changes"
+EVENT_MACRO_TRANSFORM_ALL_OK = "Transforms: {0}: no changes"
+EVENT_MACRO_TRANSFORM_OK = "{1}: {0}: no changes"
+EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
+EVENT_MACRO_VALIDATE_ALL = "Validators: {0}: {1} errors"
+EVENT_MACRO_VALIDATE_ALL_OK = "Validators: {0}: all OK"
+EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
+EVENT_REDO = "{0}"
+EVENT_REVERT = "Reverted {0}"
+EVENT_TIME = "%H:%M:%S"
+EVENT_TIME_LONG = "%a %H:%M:%S"
+EVENT_UNDO = "{0}"
+EVENT_UNDO_ACTION_ID = "{0} {1}"
 
 # Widget strings
 
@@ -186,8 +207,16 @@ ERROR_FILE_DELETE_FAILED = "Delete failed. {0}"
 ERROR_IMPORT_CLASS = "Could not retrieve class {0}"
 ERROR_IMPORT_WIDGET = "Could not import widget: {0}"
 ERROR_IMPORT_WIDGET_TITLE = "Error importing widget."
+ERROR_LOAD_OPT_CONFS = "Could not load optional configurations:\n{0}"
+ERROR_LOAD_OPT_CONFS_FORMAT = "{0}\n    {1}: {2}\n"
+ERROR_LOAD_OPT_CONFS_TITLE = "Error loading opt configs"
 ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
+ERROR_METADATA_CHECKER_TITLE = "Flawed metadata warning"
+ERROR_METADATA_CHECKER_TEXT = ( 
+                       "{0} problem(s) found in metadata at {1}.\n" +
+                       "Some functionality has been switched off.\n\n" +
+                       "Run rose metadata-check for more info.")
 ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
 ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
 ERROR_NO_OUTPUT = "No output found for {0}"
@@ -199,6 +228,8 @@ ERROR_REMOVE_FILE = "Could not remove file {0}: {1}"
 ERROR_RUN_MACRO_TITLE = "Error in running {0}"
 ERROR_SUITE_RUN_INVALID = "Could not run suite - no suite config loaded."
 ERROR_SAVE_PATH_FAIL = "Could not save to path!\n {0}"
+ERROR_SAVE_BLANK = "Cannot save configuration {0}.\nUnnamed variable in {1}"
+ERROR_SAVE_TITLE = "Error saving {0}"
 IGNORED_STATUS_CONFIG = "from configuration."
 IGNORED_STATUS_DEFAULT = "from default."
 IGNORED_STATUS_MANUAL = "from manual intervention."
@@ -247,15 +278,17 @@ META_PROP_INTERNAL = "_internal"
 
 # Setting visibility modes
 SHOW_MODE_FIXED = "fixed"
-SHOW_MODE_FLAG_OPTIONAL = "flag:optional"
 SHOW_MODE_FLAG_NO_META = "flag:no-meta"
+SHOW_MODE_FLAG_OPT_CONF = "flag:optional-conf"
+SHOW_MODE_FLAG_OPTIONAL = "flag:optional"
 SHOW_MODE_IGNORED = "ignored"
 SHOW_MODE_USER_IGNORED = "user-ignored"
 SHOW_MODE_LATENT = "latent"
 SHOW_MODE_NO_TITLE = "title"
 
-SHOULD_SHOW_FLAG_OPTIONAL_VARS = False
 SHOULD_SHOW_FLAG_NO_META_VARS = False
+SHOULD_SHOW_FLAG_OPT_CONF_VARS = True
+SHOULD_SHOW_FLAG_OPTIONAL_VARS = False
 SHOULD_SHOW_ALL_COMMENTS = False
 SHOULD_SHOW_FIXED_VARS = False
 SHOULD_SHOW_IGNORED_PAGES = False
@@ -266,6 +299,8 @@ SHOULD_SHOW_LATENT_PAGES = False
 SHOULD_SHOW_LATENT_VARS = False
 SHOULD_SHOW_NO_TITLE = False
 
+SHOULD_SHOW_STATUS_BAR = True
+
 # Window sizes
 WIDTH_TREE_PANEL = 256
 SIZE_MACRO_DIALOG_MAX = (800, 600)
@@ -274,6 +309,13 @@ SIZE_PAGE_DETACH = (650, 600)
 SIZE_WINDOW = (900, 600)
 SPACING_PAGE = 10
 SPACING_SUB_PAGE = 5
+
+# Status bar configuration
+STATUS_BAR_CONSOLE_TIP = "View more messages (Console)"
+STATUS_BAR_CONSOLE_CATEGORY_ERROR = "Error"
+STATUS_BAR_CONSOLE_CATEGORY_INFO = "Info"
+STATUS_BAR_MESSAGE_LIMIT = 1000
+STATUS_BAR_VERBOSITY = 0  # Compare with rose.reporter.Reporter.
 
 # Stack action names and presentation
 STACK_GROUP_ADD = "Add"
@@ -455,9 +497,15 @@ TREE_PANEL_ERRORS = " ({0} errors)"
 TREE_PANEL_MODIFIED = " (modified)"
 TERMINAL_TIP_CLOSE = "Close terminal"
 VAR_COMMENT_TIP = "# {0}"
+VAR_FLAG_MARKUP = "<span size='x-small'>{0}</span>"
 VAR_FLAG_TIP_FIXED = "Fixed variable (only one allowed value)"
-VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
+VAR_FLAG_TIP_OPT_CONF = "Optional conf overrides:\n{0}"
+# Numbers below mean: 0-opt config name, 1-id state/value.
+VAR_FLAG_TIP_OPT_CONF_INFO = "    {0}: {1}\n"
+# Numbers below mean: 0-sect state, 1-sect, 2-opt state, 3-opt, 4-opt value. 
+VAR_FLAG_TIP_OPT_CONF_STATE = "{0}{1}={2}{3}={4}"
+VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_MENU_TIP_ERROR = "Error "
 VAR_MENU_TIP_LATENT = "This variable could be added to the configuration."
 VAR_MENU_TIP_WARNING = "Warning "
@@ -469,8 +517,9 @@ VAR_WIDGET_ENV_INFO = "Set to environment variable"
 FLAG_TYPE_DEFAULT = "Default flag"
 FLAG_TYPE_ERROR = "Error flag"
 FLAG_TYPE_FIXED = "Fixed flag"
-FLAG_TYPE_OPTIONAL = "Optional flag"
 FLAG_TYPE_NO_META = "No metadata flag"
+FLAG_TYPE_OPT_CONF = "Opt conf override flag"
+FLAG_TYPE_OPTIONAL = "Optional flag"
 
 # Relevant metadata properties
 

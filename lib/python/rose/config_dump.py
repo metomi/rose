@@ -24,6 +24,7 @@ import filecmp
 import fnmatch
 import os
 from rose.config import ConfigDumper, ConfigLoader
+from rose.fs_util import FileSystemUtil
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Event, Reporter
 from tempfile import NamedTemporaryFile
@@ -42,14 +43,17 @@ def main():
     opts, args = opt_parser.parse_args()
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
+    fs_util = FileSystemUtil(report)
     if opts.conf_dir:
-        os.chdir(opts.conf_dir)
+        fs_util.chdir(opts.conf_dir)
     files = []
     if opts.files:
         files = opts.files
-    for dirpath, dirnames, filenames in os.walk("."):
-        for filename in fnmatch.filter(filenames, "rose-*.conf"):
-            files.append(os.path.join(dirpath, filename))
+    else:
+        for dirpath, dirnames, filenames in os.walk("."):
+            for filename in fnmatch.filter(filenames, "rose-*.conf"):
+                p = os.path.join(dirpath, filename)[2:] # remove leading ./
+                files.append(p)
     for file in files:
         t = NamedTemporaryFile()
         node = ConfigLoader()(file)

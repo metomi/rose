@@ -192,8 +192,8 @@ __CONF__
 cp f4 app/baz/rose-app.conf
 run_pass "$TEST_KEY" rose config-dump
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-[INFO] M ./rose-suite.conf
-[INFO] M ./app/bar/rose-app.conf
+[INFO] M rose-suite.conf
+[INFO] M app/bar/rose-app.conf
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.f1" f1 rose-suite.conf

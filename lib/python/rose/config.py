@@ -65,6 +65,7 @@ import sys
 CHAR_ASSIGN = "="
 CHAR_COMMENT = "#"
 
+OPT_CONFIG_DIR = "opt"
 REC_SETTING_ELEMENT = re.compile(r"^(.+?)\(([^)]+)\)$")
 
 
@@ -404,7 +405,7 @@ class ConfigLoader(object):
         for key in opt_conf_keys:
             opt_conf_file_name_base = source_root + "-" + key + source_ext
             opt_conf_file_name = os.path.join(
-                    source_dir, "opt", opt_conf_file_name_base)
+                    source_dir, OPT_CONFIG_DIR, opt_conf_file_name_base)
             if os.access(opt_conf_file_name, os.F_OK | os.R_OK):
                 self.load(opt_conf_file_name, node)
             elif ignore_missing_more_keys and key in more_keys:
@@ -428,7 +429,7 @@ class ConfigLoader(object):
             node = ConfigNode()
         f, file_name = self._get_file_and_name(source)
         keys = []
-        type = None
+        type_ = None
         comments = None
         line_num = 0
         # Note: "for line in f:" hangs for sys.stdin
@@ -448,7 +449,7 @@ class ConfigLoader(object):
                     comments.append(self._comment_strip(line))
                 continue
             # Handle option continuation.
-            if type == self.TYPE_OPTION and line[0].isspace():
+            if type_ == self.TYPE_OPTION and line[0].isspace():
                 value = node.get(keys[:]).value
                 value_cont = line.strip()
                 if value_cont.startswith(self.char_assign):
@@ -459,16 +460,16 @@ class ConfigLoader(object):
             match = self.RE_SECTION.match(line)
             if match:
                 section, state = match.group("section", "state")
-                if type == self.TYPE_OPTION:
+                if type_ == self.TYPE_OPTION:
                     keys.pop()
                 if keys:
                     keys.pop()
                 if section:
                     keys.append(section)
-                    type = self.TYPE_SECTION
+                    type_ = self.TYPE_SECTION
                 else:
                     keys = []
-                    type = None
+                    type_ = None
                 section_node = node.get(keys[:])
                 if section_node is None:
                     node.set(keys[:], {}, state, comments)
@@ -483,10 +484,10 @@ class ConfigLoader(object):
             if not match:
                 raise ConfigSyntaxError(file_name, line_num, line)
             option, value, state = match.group("option", "value", "state")
-            if type == self.TYPE_OPTION:
+            if type_ == self.TYPE_OPTION:
                 keys.pop()
             keys.append(option)
-            type = self.TYPE_OPTION
+            type_ = self.TYPE_OPTION
             value = value.strip()
             node.set(keys[:], value.strip(), state, comments)
             comments = []
@@ -538,17 +539,24 @@ def load(source, root=None):
     return ConfigLoader()(source, root)
 
 
+def sort_element(elem_1, elem_2):
+    """Sort pieces of text, numerically if possible."""
+    if elem_1.isdigit():
+        if elem_2.isdigit():
+            return cmp(int(elem_1), int(elem_2))
+        return -1
+    elif elem_2.isdigit():
+        return 1
+    return cmp(elem_1, elem_2)
+
+
 def sort_settings(setting_1, setting_2):
+    """Sort sections and options, by numeric element if possible."""
     match_1 = REC_SETTING_ELEMENT.match(setting_1)
     match_2 = REC_SETTING_ELEMENT.match(setting_2)
     if match_1 and match_2:
         text_1, num_1 = match_1.groups()
         text_2, num_2 = match_2.groups()
         if text_1 == text_2:
-            if num_1.isdigit():
-                if num_2.isdigit():
-                    return cmp(int(num_1), int(num_2))
-                return -1
-            elif num_2.isdigit():
-                return 1
+            return sort_element(num_1, num_2)
     return cmp(setting_1, setting_2)

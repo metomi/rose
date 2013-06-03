@@ -36,12 +36,13 @@ class GroupOperations(object):
 
     """Class to perform actions on groups of sections and/or options."""
 
-    def __init__(self, data, util, undo_stack, redo_stack,
+    def __init__(self, data, util, reporter, undo_stack, redo_stack,
                  section_ops_inst,
                  variable_ops_inst,
                  view_page_func, reload_ns_tree_func):
         self.data = data
         self.util = util
+        self.reporter = reporter
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack
         self.sect_ops = section_ops_inst
@@ -77,10 +78,12 @@ class GroupOperations(object):
             metadata = self.data.helper.get_metadata_for_config_id(
                                             var_id, config_name)
             metadata['full_ns'] = namespace
+            flags = self.data.load_option_flags(config_name, section, option)
             ignored_reason = {}  # This may not be safe.
             var = rose.variable.Variable(opt_name, value,
                                          metadata, ignored_reason,
-                                         error={})
+                                         error={},
+                                         flags=flags)
             self.var_ops.add_var(var, skip_update=True)
         self.reload_ns_tree_func(namespace)
         for stack_item in self.undo_stack[start_stack_index:]:

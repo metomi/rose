@@ -301,13 +301,13 @@ def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
        a search or query.
        """
     if prefix == None:
-        return
+        return [], []
 
     if id_list == None:
         id_list = get_local_suites(skip_status=skip_status)
 
     if not id_list:
-        return []
+        return [], []
 
     result_maps = []
     q = []
@@ -318,7 +318,11 @@ def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
             q.extend(["or ( idx eq " + id_.idx,
                       "and branch eq " + id_.branch + " )"])
     ws_client = RosieWSClient(prefix=prefix)
-    result_maps, url = ws_client.query(q)
+    if q:
+        result_maps, url = ws_client.query(q)
+    else:
+        result_maps = []
+        url = None
     result_idx_branches = [(r[u"idx"], r[u"branch"]) for r in result_maps]
     q = []
     for id_ in prefix_id_list:

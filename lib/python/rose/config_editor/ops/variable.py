@@ -35,7 +35,7 @@ class VariableOperations(object):
 
     """A class to hold functions that act on variables and their storage."""
 
-    def __init__(self, data, util, undo_stack, redo_stack,
+    def __init__(self, data, util, reporter, undo_stack, redo_stack,
                  add_section_func,
                  check_cannot_enable_func=rose.config_editor.false_function, 
                  update_ns_func=rose.config_editor.false_function,
@@ -43,6 +43,7 @@ class VariableOperations(object):
                  search_id_func=rose.config_editor.false_function):
         self.__data = data
         self.__util = util
+        self.__reporter = reporter
         self.__undo_stack = undo_stack
         self.__redo_stack = redo_stack
         self.__add_section_func = add_section_func
@@ -68,6 +69,8 @@ class VariableOperations(object):
         config_name = self.__util.split_full_ns(self.__data, namespace)[0]
         config_data = self.__data.config[config_name]
         old_metadata = copy.deepcopy(variable.metadata)
+        flags = self.__data.load_option_flags(config_name, sect, opt)
+        variable.flags.update(flags)
         metadata = self.__data.helper.get_metadata_for_config_id(var_id,
                                                                  config_name)
         variable.process_metadata(metadata)

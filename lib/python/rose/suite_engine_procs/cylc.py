@@ -46,6 +46,9 @@ class CylcProcessor(SuiteEngineProcessor):
 
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "submit-fail",
+              "started": "init",
+              "succeeded": "pass",
+              "failed": "fail",
               "execution started": "init",
               "execution succeeded": "pass",
               "execution failed": "fail",
@@ -558,7 +561,7 @@ class CylcProcessor(SuiteEngineProcessor):
         else:
             out, err = self.popen(bash_cmd, shell=True)
         if err:
-            self.handle_event(err, type=Event.TYPE_ERR)
+            self.handle_event(err, kind=Event.KIND_ERR)
         if out:
             self.handle_event(out)
 

@@ -25,22 +25,21 @@ class Updater(object):
 
     """This handles the updating of various statuses and displays."""
 
-    def __init__(self, data, util, mainwindow, main_handle,
+    def __init__(self, data, util, reporter, mainwindow, main_handle,
                  nav_controller, get_pagelist_func,
-                 loader_update_func,
-                 update_bar_sensitivity_func,
+                 update_bar_widgets_func,
                  refresh_metadata_func,
                  is_pluggable=False):
         self.data = data
         self.util = util
+        self.reporter = reporter
         self.mainwindow = mainwindow
         self.main_handle = main_handle
         self.nav_controller = nav_controller
         self.get_pagelist_func = get_pagelist_func
         self.pagelist = []  # This is the current list of pages open.
         self.load_errors = 0
-        self.loader_update_func = loader_update_func
-        self.update_bar_sensitivity_func = update_bar_sensitivity_func
+        self.update_bar_widgets_func = update_bar_widgets_func
         self.refresh_metadata_func = refresh_metadata_func
         self.is_pluggable = is_pluggable
         self.nav_panel = None  # This may be set later.
@@ -97,11 +96,12 @@ class Updater(object):
 
     def update_ns_tree_states(self, namespace):
         """Refresh the tree panel states for a single row (namespace)."""
-        latent_status = self.data.helper.get_ns_latent_status(namespace)
-        ignored_status = self.data.helper.get_ns_ignored_status(namespace)
-        ns_names = namespace.lstrip("/").split("/")
-        self.nav_panel.update_statuses(ns_names, latent_status,
-                                       ignored_status)
+        if self.nav_panel is not None:
+            latent_status = self.data.helper.get_ns_latent_status(namespace)
+            ignored_status = self.data.helper.get_ns_ignored_status(namespace)
+            ns_names = namespace.lstrip("/").split("/")
+            self.nav_panel.update_statuses(ns_names, latent_status,
+                                           ignored_status)
 
     def tree_trigger_update(self, only_this_namespace=None):
         """Reload the tree panel, and perform an update.
@@ -181,7 +181,7 @@ class Updater(object):
                 self.update_tree_status(page)  # Faster.
             else:
                 self.update_tree_status(ns)
-        self.update_bar_sensitivity_func()
+        self.update_bar_widgets_func()
         self.update_stack_viewer_if_open()
         for config_name in configs:
             self.update_metadata_id(config_name)
@@ -205,7 +205,7 @@ class Updater(object):
                 self.perform_error_check(namespace)
             self.update_tree_status(namespace)
             if not is_loading:
-                self.update_bar_sensitivity_func()
+                self.update_bar_widgets_func()
             self.update_stack_viewer_if_open()
             self.update_ns_tree_states(namespace)
             if namespace in self.data.config.keys():
@@ -224,7 +224,7 @@ class Updater(object):
         if not are_errors_done:
             self.perform_error_check(page.namespace)
         self.update_tree_status(page)
-        self.update_bar_sensitivity_func()
+        self.update_bar_widgets_func()
         self.update_stack_viewer_if_open()
         page.update_info()
         self.update_ns_tree_states(page.namespace)
@@ -566,7 +566,7 @@ class Updater(object):
                                                   config_data.config)
         if config_data.meta_id != new_meta_id:
             config_data.meta_id = new_meta_id
-            self.refresh_metadata_func(only_this_config=config_name)
+            self.refresh_metadata_func(config_name=config_name)
 
     def perform_startup_check(self):
         """Fix any relevant type errors."""
@@ -703,11 +703,12 @@ class Updater(object):
                 map_ = id_error_dict
                 if is_loading:
                     self.load_errors += 1
-                    update_text = rose.config_editor.LOAD_ERRORS.format(
-                                                          self.load_errors)
-                    self.loader_update_func(update_text,
-                                            self.data.top_level_name,
-                                            no_progress=True)
+                    update_text = rose.config_editor.EVENT_LOAD_ERRORS.format(
+                                                     self.data.top_level_name,
+                                                     self.load_errors)
+                    
+                    self.reporter.report_load_event(update_text,
+                                                    no_progress=True)
             if setting_id in map_:
                 # No need for further update, already had warning/error.
                 map_.pop(setting_id)

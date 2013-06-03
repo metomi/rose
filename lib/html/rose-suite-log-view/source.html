@@ -54,6 +54,20 @@
     display: inline;
     font-size: inherit;
 }
+#lines .prefix-FAIL {
+    background: red;
+    font-weight: bold;
+}
+#lines .prefix-INFO {
+    background: #e0ffff;
+}
+#lines .prefix-OK {
+    background: #5efb6e;
+}
+#lines .prefix-WARN {
+    background: #ffbf00;
+    font-weight: bold;
+}
 #line_numbers,
 #lines {
     margin: 0;
@@ -160,7 +174,11 @@ $(function() {
                 $("#lines").text(data);
             }
             else {
-                $("#lines").html(data.replace(/\n/g, "<br/>"));
+                var d = data.replace(
+                    /^(\[\s*(OK|INFO|WARN|FAIL)\s*\])/mg,
+                    "<span class=\"prefix-$2\">$1</span>");
+                d = d.replace(/\n/g, "<br/>");
+                $("#lines").html(d);
             }
             if (data.length < AUTO_ADD_THRESHOLD) {
                 line_numbers_add(data, 0);

@@ -57,13 +57,15 @@ DIALOG_PADDING = 10
 DIALOG_SUB_PADDING = 5
 
 DIALOG_SIZE_PROCESS = (400, 100)
-DIALOG_SIZE_SCROLLED = (600, 600)
+DIALOG_SIZE_SCROLLED_MAX = (600, 600)
+DIALOG_SIZE_SCROLLED_MIN = (300, 100)
 
 DIALOG_TEXT_SHUTDOWN_ASAP = "Shutdown ASAP."
 DIALOG_TEXT_SHUTTING_DOWN = "Shutting down."
 DIALOG_TEXT_UNCAUGHT_EXCEPTION = ("{0} has crashed. {1}" +
                                   "\n\n<b>{2}</b>: {3}\n{4}")
 DIALOG_TITLE_UNCAUGHT_EXCEPTION = "Critical error"
+DIALOG_TITLE_EXTRA_INFO = "Further information"
 DIALOG_TYPE_ERROR = gtk.MESSAGE_ERROR
 DIALOG_TYPE_INFO = gtk.MESSAGE_INFO
 DIALOG_TYPE_WARNING = gtk.MESSAGE_WARNING
@@ -568,9 +570,9 @@ class SplashScreen(gtk.Window):
         while gtk.events_pending():
             gtk.main_iteration()
 
-    def update(self, event, data_name, no_progress=False):
+    def update(self, event, no_progress=False):
         """Show text corresponding to an event."""
-        text = data_name + " - " + event
+        text = str(event)
         if self.total_number_of_events == 0:
             fraction = 1.0
         else:
@@ -976,13 +978,26 @@ def _handle_command_arg_response(dialog, response, run_hook, entry):
 
 
 def run_dialog(dialog_type, text, title=None, modal=True,
-               cancel=False):
+               cancel=False, extra_text=None):
     """Run a simple dialog with an 'OK' button and some text."""
     parent_window = get_dialog_parent()
     dialog = gtk.Dialog(parent=parent_window)
+    if parent_window is None:
+        locator = rose.resource.ResourceLocator(paths=sys.path)
+        icon_path = locator.locate('etc/images/rose-icon-trim.png')
+        dialog.set_icon_from_file(icon_path)
     if cancel:
         cancel_button = dialog.add_button(gtk.STOCK_CANCEL,
                                           gtk.RESPONSE_CANCEL)
+    if extra_text:
+        info_button = gtk.Button(stock=gtk.STOCK_INFO)
+        info_button.show()
+        info_title = DIALOG_TITLE_EXTRA_INFO
+        info_button.connect("clicked",
+                            lambda b:run_scrolled_dialog(
+                                         extra_text,
+                                         title=info_title))
+        dialog.action_area.pack_start(info_button, expand=False, fill=False)                                   
     ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
     if dialog_type == gtk.MESSAGE_INFO:
         stock_id = gtk.STOCK_DIALOG_INFO
@@ -1050,9 +1065,14 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     dialog.set_default_size(*new_size)
     ok_button.grab_focus()
-    response = dialog.run()
-    dialog.destroy()
-    return (response == gtk.RESPONSE_OK)
+    if modal or cancel:
+        dialog.show()
+        response = dialog.run()
+        dialog.destroy()
+        return (response == gtk.RESPONSE_OK)
+    else:
+        ok_button.connect("clicked", lambda b: dialog.destroy())
+        dialog.show()
 
 
 def run_hyperlink_dialog(stock_id=None, text="", title=None,
@@ -1155,9 +1175,9 @@ def run_scrolled_dialog(text, title=None):
     window.set_transient_for(parent_window)
     window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
     window.set_border_width(DIALOG_SUB_PADDING)
+    window.set_default_size(*DIALOG_SIZE_SCROLLED_MIN)
     if title is not None:
         window.set_title(title)
-    window.set_default_size(*DIALOG_SIZE_SCROLLED)
     scrolled = gtk.ScrolledWindow()
     scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     scrolled.show()
@@ -1169,11 +1189,19 @@ def run_scrolled_dialog(text, title=None):
     else:
         label.set_markup(text)
     label.show()
+    filler_eb = gtk.EventBox()
+    filler_eb.show()
     label_box = gtk.VBox()
-    label_box.pack_start(label, expand=True, fill=True)
+    label_box.pack_start(label, expand=False, fill=False)
+    label_box.pack_start(filler_eb, expand=True, fill=True)
     label_box.show()
+    width, height = label.size_request()
+    max_width, max_height = DIALOG_SIZE_SCROLLED_MAX
+    width = min([max_width, width]) + 2 * DIALOG_PADDING
+    height = min([max_height, height]) + 2 * DIALOG_PADDING
     scrolled.add_with_viewport(label_box)
     scrolled.get_child().set_shadow_type(gtk.SHADOW_NONE)
+    scrolled.set_size_request(width, height)
     button = gtk.Button(stock=gtk.STOCK_OK)
     button.connect("clicked", lambda b: window.destroy())
     button.show()
@@ -1187,6 +1215,7 @@ def run_scrolled_dialog(text, title=None):
     main_vbox.show()
     window.add(main_vbox)
     window.show()
+    label.set_selectable(True)
     return False
 
 

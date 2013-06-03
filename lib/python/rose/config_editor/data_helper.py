@@ -51,14 +51,7 @@ class ConfigDataHelper(object):
     def is_ns_sub_data(self, ns):
         """Return whether a namespace is mentioned in summary data."""
         ns_meta = self.data.namespace_meta_lookup.get(ns, {})
-        if (ns_meta.get(rose.META_PROP_DUPLICATE) == rose.META_PROP_VALUE_TRUE
-            and not ns.split("/")[-1].isdigit() and
-            len([n for n in self.data.namespace_meta_lookup
-                 if n.startswith(ns)]) > 1):
-            return True
-        if ns.split("/")[-1] == rose.SUB_CONFIG_FILE_DIR:
-            return True
-        return False
+        return ns_meta.get("has_sub_data", False)
 
     def is_ns_content(self, ns):
         """Return whether a namespace has any existing content."""
@@ -114,7 +107,8 @@ class ConfigDataHelper(object):
                                              rose.META_PROP_MACRO, "")
         if not ns_macros_text:
             return {}
-        ns_macros = rose.variable.array_split(ns_macros_text)
+        ns_macros = rose.variable.array_split(ns_macros_text,
+                                              only_this_delim=",")
         module_prefix = self.get_macro_module_prefix(config_name)
         for i, ns_macro in enumerate(ns_macros):
             ns_macros[i] = module_prefix + ns_macro
@@ -225,24 +219,10 @@ class ConfigDataHelper(object):
 
     def get_all_namespaces(self, only_this_config=None):
         """Return all unique namespaces."""
-        all_namespaces = []
-        if only_this_config is None:
-            configs = self.data.config.keys()
-        else:
-            configs = [only_this_config]
-        for config_name in configs:
-            all_namespaces += [config_name]
-            self.data.load_node_namespaces(config_name)
-            for var in self.data.config[config_name].vars.get_all():
-                all_namespaces.append(var.metadata["full_ns"])
-            for sect_data in self.data.config[config_name].sections.now.values():
-                all_namespaces.append(sect_data.metadata["full_ns"])
-        unique_namespaces = []
-        for ns in all_namespaces:
-            if ns not in unique_namespaces:
-                unique_namespaces.append(ns)
-        unique_namespaces.sort(lambda x, y: y.count('/') - x.count('/'))
-        return unique_namespaces
+        nses = self.data.namespace_meta_lookup.keys()
+        if only_this_config is not None:
+            nses = [n for n in nses if n.startswith(only_this_config)]
+        return nses
 
     def get_missing_sections(self, config_name=None):
         """Return full section ids that are missing."""

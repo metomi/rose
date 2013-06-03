@@ -5,6 +5,63 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (End of 2013-Q2)
+
+### Highlight Changes
+
+Changes that have significant impact on user experience.
+
+\#668: rose config-edit: support new configuration metadata `value-titles` to
+define a list of titles to associate with a corresponding `values` setting.
+
+\#666, #690: rose task-env and rose task-run: the `--path=[NAME=]GLOB` option can
+now be used in either command. Note, however, if `rose task-env` is used before
+`rose task-run`, options shared between the 2 commands, (but not
+`--path=[NAME=]GLOB`) options will be ignored by the subsequent `rose task-run`
+command. This may some minor change in behaviour of some existing suites as
+`PATH` would be modified by `rose task-env`.
+
+\#661: rose metadata-check: new command to validate configuration metadata.
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+\#675: rose config-edit: The quoted widget no longer messes with the quote
+characters when a non-quote related error occurs.
+
+\#672: rose config-edit: titles and descriptions in the `Add` menu.
+
+\#671: rose suite-log-view: HTML view: fix delta time sort.
+
+\#670: rose config-edit: information on optional configuration. If a setting
+can be modified in an optional configuration, the information will now be
+shown with the setting's label.
+
+\#665: rose config-edit: fix ignore status logic.
+
+\#663: rose suite-hook and rose suite-log-view: more efficient logic.
+
+\#659, #664: rose suite-run site/user configuration: configure a list of
+scannable hosts. This is useful when a set of hosts are no longer intended to be
+used to run new suites but still have running suites on them.
+
+\#652: rosie go: can now navigate home view.
+
+\#650: rosie go: no longer crash when copying an empty suite.
+
+\#649: rose suite-shutdown: improve interface with `cylc shutdown`.
+
+\#647: rosie ls: now a query.
+
+\#634: rose config-edit: support latent ignored pages.
+
+\#628: rose mpi-launch: new `--file=FILE` option or `$PWD/rose-mpi-launch.rc`
+to specify a command file to use with the MPI launcher.
+
+--------------------------------------------------------------------------------
+
 ## 2013-05 (2013-05-15)
 
 This release of Rose works with cylc 5.2.0.
