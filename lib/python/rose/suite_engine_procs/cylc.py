@@ -306,24 +306,23 @@ class CylcProcessor(SuiteEngineProcessor):
                 for name in ["submit", "init", "exit"]:
                     submits[-1]["events"][name] = None
             submit = submits[submit_num - 1]
-            submit["events"][event] = event_time
-            status = None
             if event in ["init"]:
+                submit["events"][event] = event_time
                 if submit["events"]["submit"] is None:
                     submit["events"]["submit"] = event_time
             elif event in ["pass", "fail"]:
-                status = event
                 submit["events"]["exit"] = event_time
-                submit["status"] = status
+                submit["status"] = event
                 if key == "signaled":
                     submit["signal"] = message.rsplit(None, 1)[-1]
-                if submit["events"]["submit"] is None:
-                    submit["events"]["submit"] = event_time
-                if submit["events"]["init"] is None:
-                    submit["events"]["init"] = event_time
+                for name in ["submit", "init"]:
+                    if submit["events"][name] is None:
+                        submit["events"][name] = event_time
             elif event in ["submit-fail"]:
                 submit["events"]["submit"] = event_time
                 submit["status"] = event
+            else:
+                submit["events"][event] = event_time
 
         # Job log files
         for cycle_time, datum in data.items():
