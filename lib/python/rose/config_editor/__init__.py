@@ -533,6 +533,7 @@ LAUNCH_COMMAND = "rose config-edit"
 LAUNCH_COMMAND_CONFIG = "rose config-edit -C"
 LAUNCH_SUITE_RUN = "rose suite-run"
 LAUNCH_SUITE_RUN_HELP = "rose help suite-run"
+MAX_APPS = 10
 MIN_PYGTK_VERSION = (2, 12, 0)
 PROGRAM_NAME = "rose edit"
 PROJECT_URL = "http://github.com/metomi/rose/"

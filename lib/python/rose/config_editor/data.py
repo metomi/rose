@@ -208,12 +208,11 @@ class ConfigDataManager(object):
                              is_discovery=is_discovery)
         self.saved_config_names = set(self.config.keys())
 
-    def load_top_config(self, top_level_directory):
+    def load_top_config(self, top_level_directory, preview=False):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
         
-        #counter
-        
+        app_count = 0
         if top_level_directory is None:
             self.top_level_name = rose.config_editor.UNTITLED_NAME
         else:
@@ -223,11 +222,21 @@ class ConfigDataManager(object):
             if os.path.isdir(config_container_dir):
                 sub_contents = os.listdir(config_container_dir)
                 sub_contents.sort()
+                
                 for config_dir in sub_contents:
                     conf_path = os.path.join(config_container_dir, config_dir)
                     if (os.path.isdir(conf_path) and
                         not config_dir.startswith('.')):
-                        self.load_config(conf_path)
+                            app_count += 1
+                
+                if app_count > rose.config_editor.MAX_APPS:
+                    preview = True
+                
+                for config_dir in sub_contents:
+                    conf_path = os.path.join(config_container_dir, config_dir)
+                    if (os.path.isdir(conf_path) and
+                        not config_dir.startswith('.')):
+                        self.load_config(conf_path, preview=preview)
             self.load_config(top_level_directory)
             self.reload_ns_tree_func()
 
