@@ -220,17 +220,18 @@ SPLASH_SETUP_WINDOW = "main window"
 def load_override_config():
     """Load any overrides of the above settings."""
     conf = ResourceLocator.default().get_conf()
-    node = conf.get(["rosie-browse"], no_ignore=True)
-    if node is None:
-        return
-    for key, node in node.value.items():
-        if node.is_ignored():
+    for s in ["rosie-browse", "rosie-go"]:
+        node = conf.get([s], no_ignore=True)
+        if node is None:
             continue
-        try:
-            cast_value = ast.literal_eval(node.value)
-        except Exception:
-            cast_value = node.value
-        globals()[key.replace("-", "_").upper()] = cast_value
+        for key, node in node.value.items():
+            if node.is_ignored():
+                continue
+            try:
+                cast_value = ast.literal_eval(node.value)
+            except Exception:
+                cast_value = node.value
+            globals()[key.replace("-", "_").upper()] = cast_value
 
 
 load_override_config()

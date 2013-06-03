@@ -181,8 +181,7 @@ class MainWindow(gtk.Window):
             # convert partial addresses to full ones for purposes of searching
             if (address_url.startswith("search?s=") or 
                 address_url.startswith("query?q=")):
-                address_url = (self.search_manager.ws_client.get_query_prefix()
-                              + address_url)
+                address_url = self.search_manager.ws_client.root + address_url
             try:
                 items.update({"url": address_url})
                 results, url = self.search_manager.address_lookup(**items)

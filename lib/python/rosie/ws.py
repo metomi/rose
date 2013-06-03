@@ -190,6 +190,8 @@ def start(is_main=False):
     if is_main and rose_conf.get_value(["rosie-ws", "log-dir"]) is not None:
         log_dir_value = rose_conf.get_value(["rosie-ws", "log-dir"])
         log_dir = env_var_process(os.path.expanduser(log_dir_value))
+        if not os.path.isdir(log_dir):
+            os.makedirs(log_dir)
         log_file = os.path.join(log_dir, "server.log")
         log_error_file = os.path.join(log_dir, "server.err.log")
         cherrypy.config["log.error_file"] = log_error_file
