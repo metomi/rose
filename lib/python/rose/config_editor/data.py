@@ -287,8 +287,8 @@ class ConfigDataManager(object):
                     sys.exit(2)
                     
             if config_directory != self.top_level_directory:
-                config = {}
-                s_config = {}
+                config = rose.config.ConfigNode()
+                s_config = rose.config.ConfigNode()
             else:
                 config, s_config = self.load_config_file(config_path)               # loads in the config
         opt_conf_lookup = self.load_optional_configs(config_directory)
