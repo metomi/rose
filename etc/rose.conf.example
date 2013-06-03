@@ -21,6 +21,10 @@
 #-------------------------------------------------------------------------------
 
 # Common site configuration.
+## Paths to locate configuration metadata
+#  meta-path=DIR1[:DIR2[:...]]
+## E.g.:
+#  meta-path=/opt/rose-meta
 ## URL to Rose documentation.
 #  rose-doc=http://metomi.github.io/rose/doc/
 
@@ -44,31 +48,31 @@
 # See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
 #
 ## Path to a picture containing the suite engine icon.
-#  icon-path-scheduler = /opt/cylc/images/icon.svg
+#  icon-path-scheduler=/opt/cylc/images/icon.svg
 ## Hyperlink to Rose project page. (default=https://github.com/metomi/rose/).
-#  project-url = https://host/rose/
+#  project-url=https://host/rose/
 [rose-config-edit]
 
 # Configuration related to "rose host-select".
 #
 ## The default arguments to use for this command.
-#  default = GROUP/HOST ...
+#  default=GROUP/HOST ...
 ## E.g.:
 #  default=hpc
 ## Declare a named group of hosts.
-#  group{NAME} = GROUP/HOST ...
+#  group{NAME}=GROUP/HOST ...
 ## E.g.:
 #  group{hpc}=hpc1 hpc2
 #  group{hpc1}=hpc1a hpc1b hpc1c hpc1d
 #  group{hpc2}=hpc2a hpc2b hpc2c hpc2d
 ## Declare the default ranking method for a group of hosts.
-#  method{NAME} = METHOD[:METHOD-ARG]
+#  method{NAME}=METHOD[:METHOD-ARG]
 ## E.g.:
-#  method{hpc} = random
+#  method{hpc}=random
 ## Declare the default threshold(s) for a group of hosts.
-#  thresholds{NAME} = [METHOD[:METHOD-ARG]:]VALUE ...
+#  thresholds{NAME}=[METHOD[:METHOD-ARG]:]VALUE ...
 ## E.g.:
-#  thresholds{hpc} = fs:/var/tmp:75 fs:/tmp:75
+#  thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
 [rose-host-select]
 
 # Configuration related to "rose suite-log-view"
@@ -76,7 +80,7 @@
 ## Mapping $HOME/cylc-run/SUITE to a http:// URL.
 ## E.g. If $HOME/public_html/cylc-run is a symlink of $HOME/cylc-run
 ##      and $HOME/public_html/ is served as http://host/~$USER/:
-#  home-public-html = http://host/~$USER public_html
+#  home-public-html=http://host/~$USER public_html
 [rose-suite-log-view]
 
 # Configuration related to "rose mpi-launch".
@@ -146,41 +150,49 @@
 # Configuration related to the database of the Rosie web service server
 #
 ## The database location of a given repository prefix, from within the server
-#  db.PREFIX = URL
-## E.g.:
+#  db.PREFIX=URL
+## E.g. (To create/reference an SQLite DB at "/opt/rosie/foo-db.sqlite"):
 #  db.foo=sqlite:////opt/rosie/foo-db.sqlite 
 ## The path to the repository of a given prefix, from within the server
-#  repos.PREFIX = URL
+#  repos.PREFIX=DIR
 ## E.g.:
 #  repos.foo=/opt/svn-repos/foo
 [rosie-db]
 
-# Configuration related to Rosie browse/go GUI
+# Configuration related to "rosie go" GUI
 # See the $ROSE_HOME/lib/python/rosie/browser/__init__.py for detail.
 #
 ## Path to a picture containing the suite engine icon.
-#  icon-path-scheduler = /opt/cylc/images/icon.svg
+#  icon-path-scheduler=/opt/cylc/images/icon.svg
 ## Hyperlink to Rose project page. (default=https://github.com/metomi/rose/).
-#  project-url = https://host/rose/
-[rosie-browse]
+#  project-url=https://host/rose/
+[rosie-go]
 
 # Configuration related to Rosie client commands
 #
 ## Root directory of local (working) copies of suites (default=$HOME/roses)
-#  local-copy-root = $HOME/roses
-## The default prefix
-#  prefix-default = name1
+#  local-copy-root=DIR
+## E.g.:
+#  local-copy-root=$HOME/my-work/roses
+## The default ID prefix (an identifier for a Rosie repository/service)
+#  prefix-default=PREFIX
+## E.g.:
+#  prefix-default=foo
 ## URL of the repository of an ID prefix, no trailing slash
-#  prefix-location.PREFIX = URL
+#  prefix-location.PREFIX=URL
 ## E.g.:
 #  prefix-location.foo=svn://host/foo
 ## Source browser URL of the repository of an ID prefix
-#  prefix-web.PREFIX = URL
+#  prefix-web.PREFIX=URL
 ## E.g.:
 #  prefix-web.foo=http://host/projects/foo
+## Web service URL of an ID prefix
+#  prefix-ws.PREFIX=URL
+## E.g.:
+#  prefix-ws.foo=http://host:port/rosie/foo
 [rosie-id]
 
-# Configuration related to Rosie web service server
+# Configuration related to the adhoc Rosie web service server
 #
 ## Adhoc Rosie web server log directory
 #  log-dir=DIR
@@ -191,9 +203,3 @@
 ## E.g.:
 #  port=8080
 [rosie-ws]
-
-# Configuration related to Rosie client commands
-#
-## Root URL of the Rosie web server, trailing slash
-#  ws-root-default = http://host:port/
-[rosie-ws-client]
