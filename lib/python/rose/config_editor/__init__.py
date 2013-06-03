@@ -301,7 +301,7 @@ SHOULD_SHOW_NO_TITLE = False
 #     "{name} - {description}"
 
 CUSTOM_FORMAT_DESCRIPTION = "{name}: {description}"
-CUSTOM_FORMAT_HELP = "{title}\n{help}"
+CUSTOM_FORMAT_HELP = "{title}\n\n{help}"
 CUSTOM_FORMAT_TITLE = "{title} ({name})"
 
 # Window sizes

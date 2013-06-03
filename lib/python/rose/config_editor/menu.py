@@ -83,9 +83,9 @@ class MenuBar(object):
         <menuitem action="Switch off metadata"/>
         <separator name="sep_view_generic"/>
         <menu action="Prefs">
-          <menuitem action="View without titles"/>
           <menuitem action="View without descriptions"/>
           <menuitem action="View without help"/>
+          <menuitem action="View without titles"/>
           <separator name="sep_alter"/>
           <menuitem action="View custom descriptions"/>
           <menuitem action="View custom help"/>
