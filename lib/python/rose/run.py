@@ -666,7 +666,15 @@ class SuiteRunner(Runner):
                       "ROSE_VERSION": ResourceLocator.default().get_version(),
                       suite_engine_key: suite_engine_version}
         for k, v in auto_items.items():
-            config.set(["env", k], v)
+            requested_value = config.get_value(["env", k])
+            if requested_value:
+                if k == "ROSE_VERSION" and v != requested_value:
+                    raise ConfigValueError(["env", k],
+                                           requested_value,
+                                           "(Used ROSE_VERSION=%s)" % v)
+                v = requested_value
+            else:
+                config.set(["env", k], v)
             config.set([jinja2_section, k], '"' + v + '"')
 
         # See if suite is running or not
