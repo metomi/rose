@@ -41,6 +41,7 @@ class StatusReporter(rose.reporter.Reporter):
     def __init__(self, loader_update_func, status_bar_update_func):
         self._loader_update_func = loader_update_func
         self._status_bar_update_func = status_bar_update_func
+        self._no_load = False
 
     def event_handler(self, message, kind=None, level=None, prefix=None,
                       clip=None):
@@ -52,7 +53,7 @@ class StatusReporter(rose.reporter.Reporter):
             if level is None:
                 level = message.level
             message_kwargs = message.kwargs
-        if kind == self.EVENT_KIND_LOAD:
+        if kind == self.EVENT_KIND_LOAD and not self._no_load:
             return self._loader_update_func(str(message), **message_kwargs)
         return self._status_bar_update_func(message, kind, level)
 
@@ -62,6 +63,9 @@ class StatusReporter(rose.reporter.Reporter):
                                     kind=self.EVENT_KIND_LOAD,
                                     no_progress=no_progress)
         self.report(event)
+        
+    def set_no_load(self):
+        self._no_load = True
 
 
 class StatusBar(gtk.VBox):

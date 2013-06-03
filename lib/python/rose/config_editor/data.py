@@ -149,7 +149,7 @@ class ConfigData(object):
 
     def __init__(self, config, s_config, directory, opt_conf_lookup, meta,
                  meta_id, meta_files, macros, is_top, is_disc,
-                 var_data=None, sect_data=None):
+                 var_data=None, sect_data=None, preview=False):
         self.config = config
         self.save_config = s_config
         self.directory = directory
@@ -162,6 +162,7 @@ class ConfigData(object):
         self.is_discovery = is_disc
         self.vars = var_data
         self.sections = sect_data
+        self.preview = preview
 
 
 class ConfigDataManager(object):
@@ -210,6 +211,9 @@ class ConfigDataManager(object):
     def load_top_config(self, top_level_directory):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
+        
+        #counter
+        
         if top_level_directory is None:
             self.top_level_name = rose.config_editor.UNTITLED_NAME
         else:
@@ -239,7 +243,7 @@ class ConfigDataManager(object):
     def load_config(self, config_directory=None,
                     config_name=None, config=None,
                     reload_tree_on=False, is_discovery=False,
-                    skip_load_event=False):
+                    skip_load_event=False, preview=True):
         """Load the configuration and meta-data. Load namespaces."""
         is_top_level = False
         if config_directory is None:
@@ -286,13 +290,21 @@ class ConfigDataManager(object):
                                              text, title)
                     sys.exit(2)
                     
-            if config_directory != self.top_level_directory:
+            if config_directory != self.top_level_directory and preview:                   #load with empty ConfigNodes for initial app access
+                preview = True
                 config = rose.config.ConfigNode()
                 s_config = rose.config.ConfigNode()
             else:
-                config, s_config = self.load_config_file(config_path)               # loads in the config
+                config, s_config = self.load_config_file(config_path)
+        
+        
+        if config_directory != self.top_level_directory and preview: 
+            meta_config = rose.config.ConfigNode()
+        else:
+            meta_config = self.load_meta_config(config, config_directory) 
+                
         opt_conf_lookup = self.load_optional_configs(config_directory)
-        meta_config = self.load_meta_config(config, config_directory)
+        
         meta_files = self.load_meta_files(config, config_directory)
         macro_module_prefix = self.helper.get_macro_module_prefix(name)
         macros = rose.macro.load_meta_macro_modules(
@@ -302,7 +314,9 @@ class ConfigDataManager(object):
         self.config[name] = ConfigData(config, s_config, config_directory,
                                        opt_conf_lookup, meta_config,
                                        meta_id, meta_files, macros,
-                                       is_top_level, is_discovery)
+                                       is_top_level, is_discovery, 
+                                       preview=preview)
+        
         self.load_builtin_macros(name)
         self.load_file_metadata(name)
         self.filter_meta_config(name)

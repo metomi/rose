@@ -47,7 +47,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def __init__(self, namespace_tree, launch_ns_func,
                  get_metadata_comments_func,
-                 popup_menu_func, ask_can_show_func):
+                 popup_menu_func, ask_can_show_func, ask_is_preview):
         super(PageNavigationPanel, self).__init__()
         self._launch_ns_func = launch_ns_func
         self._get_metadata_comments_func = get_metadata_comments_func

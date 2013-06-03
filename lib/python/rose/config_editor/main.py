@@ -275,6 +275,8 @@ class MainController(object):
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
+        self.reporter.set_no_load()
+        
 #------------------ Setting up main component functions ----------------------
 
     def generate_toolbar(self):
@@ -534,7 +536,8 @@ class MainController(object):
                               self.handle_launch_request,
                               self.nav_handle.get_ns_metadata_and_comments,
                               self.nav_handle.popup_panel_menu,
-                              self.nav_handle.get_can_show_page)
+                              self.nav_handle.get_can_show_page,
+                              self.nav_handle.ask_is_preview)
 
     def generate_status_bar(self):
         """Create a status bar."""
@@ -556,6 +559,13 @@ class MainController(object):
         """
         if not namespace_name.startswith('/'):
             namespace_name = '/' + namespace_name
+            
+        config_name = self.util.split_full_ns(self.data, namespace_name)[0]
+        config_data = self.data.config[config_name]
+        if config_data.preview:
+            self.data.load_config(config_data.directory, preview=False)
+            self.reload_namespace_tree()
+        
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)
             self.notebook.set_current_page(index)

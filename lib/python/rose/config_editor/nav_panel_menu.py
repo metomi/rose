@@ -79,6 +79,12 @@ class NavPanelHandler(object):
                                     config_names, choices_help, help_str)
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section, page_launch=True)
+
+    def ask_is_preview(self, base_ns):
+        namespace = "/" + base_ns.lstrip("/")
+        config_name = self.util.split_full_ns(self.data, namespace)[0]
+        config_data = self.data.config[config_name]
+        return config_data.preview
         
     def copy_request(self, base_ns, new_section=None, skip_update=False):
         """Handle a copy request for a section and its options."""
