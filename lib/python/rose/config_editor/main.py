@@ -122,6 +122,12 @@ class MainController(object):
 
         # Set page variable 'verbosity' defaults.
         self.page_var_show_modes = {
+             rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
+             rose.config_editor.SHOULD_SHOW_CUSTOM_DESCRIPTION,
+             rose.config_editor.SHOW_MODE_CUSTOM_HELP:
+             rose.config_editor.SHOULD_SHOW_CUSTOM_HELP,
+             rose.config_editor.SHOW_MODE_CUSTOM_TITLE:
+             rose.config_editor.SHOULD_SHOW_CUSTOM_TITLE,
              rose.config_editor.SHOW_MODE_FIXED:
              rose.config_editor.SHOULD_SHOW_FIXED_VARS,
              rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
@@ -398,18 +404,30 @@ class MainController(object):
                       lambda m: self._set_page_var_show_modes(
                                   rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
                                   m.get_active())),
-                     ('/TopMenuBar/Metadata/View without descriptions',
+                     ('/TopMenuBar/Metadata/Prefs/View without descriptions',
                       lambda m: self._set_page_show_modes(
                                  rose.config_editor.SHOW_MODE_NO_DESCRIPTION,
                                  m.get_active())),
-                     ('/TopMenuBar/Metadata/View without help',
+                     ('/TopMenuBar/Metadata/Prefs/View without help',
                       lambda m: self._set_page_show_modes(
                                      rose.config_editor.SHOW_MODE_NO_HELP,
                                      m.get_active())),
-                     ('/TopMenuBar/Metadata/View without titles',
+                     ('/TopMenuBar/Metadata/Prefs/View without titles',
                       lambda m: self._set_page_show_modes(
                                      rose.config_editor.SHOW_MODE_NO_TITLE,
                                      m.get_active())),
+                     ('/TopMenuBar/Metadata/Prefs/View custom descriptions',
+                      lambda m: self._set_page_show_modes(
+                                  rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION,
+                                  m.get_active())),
+                     ('/TopMenuBar/Metadata/Prefs/View custom help',
+                      lambda m: self._set_page_show_modes(
+                                  rose.config_editor.SHOW_MODE_CUSTOM_HELP,
+                                  m.get_active())),
+                     ('/TopMenuBar/Metadata/Prefs/View custom titles',
+                      lambda m: self._set_page_show_modes(
+                                  rose.config_editor.SHOW_MODE_CUSTOM_TITLE,
+                                  m.get_active())),
                      ('/TopMenuBar/Metadata/All V',
                       lambda m: self.main_handle.run_custom_macro(
                                      method_name=rose.macro.VALIDATE_METHOD)),
@@ -445,32 +463,38 @@ class MainController(object):
                      ('/TopMenuBar/Help/GUI Help', self.main_handle.help),
                      ('/TopMenuBar/Help/About', self.main_handle.about_dialog)]
         is_toggled = dict(
-                  [('/TopMenuBar/View/View fixed vars',
-                    rose.config_editor.SHOULD_SHOW_FIXED_VARS),
-                   ('/TopMenuBar/View/View ignored vars',
-                    rose.config_editor.SHOULD_SHOW_IGNORED_VARS),
-                    ('/TopMenuBar/View/View user-ignored vars',
-                    rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS),
-                    ('/TopMenuBar/View/View latent vars',
-                    rose.config_editor.SHOULD_SHOW_LATENT_VARS),
-                    ('/TopMenuBar/Metadata/View without descriptions',
-                    rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION),
-                    ('/TopMenuBar/Metadata/View without help',
-                    rose.config_editor.SHOULD_SHOW_NO_HELP),
-                    ('/TopMenuBar/Metadata/View without titles',
-                    rose.config_editor.SHOULD_SHOW_NO_TITLE),
-                    ('/TopMenuBar/View/View ignored pages',
-                    rose.config_editor.SHOULD_SHOW_IGNORED_PAGES),
-                    ('/TopMenuBar/View/View user-ignored pages',
-                    rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES),
-                    ('/TopMenuBar/View/View latent pages',
-                    rose.config_editor.SHOULD_SHOW_LATENT_PAGES),
-                    ('/TopMenuBar/View/Flag opt config vars',
-                    rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS),
-                    ('/TopMenuBar/View/Flag optional vars',
-                    rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS),
-                    ('/TopMenuBar/View/Flag no-metadata vars',
-                    rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS)])
+              [('/TopMenuBar/View/View fixed vars',
+                rose.config_editor.SHOULD_SHOW_FIXED_VARS),
+                ('/TopMenuBar/View/View ignored vars',
+                rose.config_editor.SHOULD_SHOW_IGNORED_VARS),
+                ('/TopMenuBar/View/View user-ignored vars',
+                rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS),
+                ('/TopMenuBar/View/View latent vars',
+                rose.config_editor.SHOULD_SHOW_LATENT_VARS),
+                ('/TopMenuBar/Metadata/Prefs/View without descriptions',
+                rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION),
+                ('/TopMenuBar/Metadata/Prefs/View without help',
+                rose.config_editor.SHOULD_SHOW_NO_HELP),
+                ('/TopMenuBar/Metadata/Prefs/View without titles',
+                rose.config_editor.SHOULD_SHOW_NO_TITLE),
+                ('/TopMenuBar/Metadata/Prefs/View custom descriptions',
+                rose.config_editor.SHOULD_SHOW_CUSTOM_DESCRIPTION),
+                ('/TopMenuBar/Metadata/Prefs/View custom help',
+                rose.config_editor.SHOULD_SHOW_CUSTOM_HELP),
+                ('/TopMenuBar/Metadata/Prefs/View custom titles',
+                rose.config_editor.SHOULD_SHOW_CUSTOM_TITLE),
+                ('/TopMenuBar/View/View ignored pages',
+                rose.config_editor.SHOULD_SHOW_IGNORED_PAGES),
+                ('/TopMenuBar/View/View user-ignored pages',
+                rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES),
+                ('/TopMenuBar/View/View latent pages',
+                rose.config_editor.SHOULD_SHOW_LATENT_PAGES),
+                ('/TopMenuBar/View/Flag opt config vars',
+                rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS),
+                ('/TopMenuBar/View/Flag optional vars',
+                rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS),
+                ('/TopMenuBar/View/Flag no-metadata vars',
+                rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS)])
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})

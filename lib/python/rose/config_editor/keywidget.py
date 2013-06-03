@@ -99,13 +99,33 @@ class KeyWidget(gtk.VBox):
         self.update_comment_display()
         self.entry.show()
         for key, value in self.show_modes.items():
-            self.set_show_mode(key, value)
+            if key not in [rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION,
+                           rose.config_editor.SHOW_MODE_CUSTOM_HELP,
+                           rose.config_editor.SHOW_MODE_CUSTOM_TITLE]:
+                self.set_show_mode(key, value)
         if (rose.META_PROP_VALUES in self.meta and
             len(self.meta[rose.META_PROP_VALUES]) == 1):
             self.add_flag(rose.config_editor.FLAG_TYPE_FIXED,
                           rose.config_editor.VAR_FLAG_TIP_FIXED)
         event_box.show()
         self.show()
+
+    def add_flag(self, flag_type, tooltip_text=None):
+        """Set the display of a flag denoting a property."""
+        if flag_type in self.var_flags:
+            return
+        self.var_flags.append(flag_type)
+        stock_id = self.FLAG_ICON_MAP[flag_type]
+        event_box = gtk.EventBox()
+        event_box._flag_type = flag_type
+        image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
+        image.set_tooltip_text(tooltip_text)
+        image.show()
+        event_box.add(image)
+        event_box.show()
+        event_box.connect("button-press-event", self._toggle_flag_label)
+        self.hbox.pack_end(event_box, expand=False, fill=False,
+                           padding=rose.config_editor.SPACING_SUB_PAGE)
 
     def get_centre_height(self):
         """Return the vertical displacement of the centre of this widget."""
@@ -115,7 +135,30 @@ class KeyWidget(gtk.VBox):
         """Handle launching help."""
         if event.type == gtk.gdk.BUTTON_PRESS and event.button != 3:
             self.launch_help()
-        
+
+    def launch_edit_comments(self, *args):
+        """Launch an edit comments dialog."""
+        text = "\n".join(self.my_variable.comments)
+        title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
+                                   self.my_variable.metadata['id'])
+        rose.gtk.util.run_edit_dialog(text,
+                                      finish_hook=self._edit_finish_hook,
+                                      title=title)
+
+    def refresh(self, variable=None):
+        """Reload the contents - however, no need for this at present."""
+        self.my_variable = variable
+
+    def remove_flag(self, flag_type):
+        """Remove the flag from the widget."""
+        for widget in self.get_children():
+            if (isinstance(widget, gtk.EventBox) and
+                getattr(widget, "_flag_type", None) == flag_type):
+                self.remove(widget)
+        if flag_type in self.var_flags:
+            self.var_flags.remove(flag_type)
+        return True
+
     def set_ignored(self):
         """Update the ignored display."""
         self.ignored_label.set_markup(
@@ -127,45 +170,37 @@ class KeyWidget(gtk.VBox):
             hover_string += key + " " + value + "\n"
         self.ignored_label.set_tooltip_text(hover_string.strip())
 
-    def update_comment_display(self):
-        """Update the display of variable comments."""
-        if self.my_variable.comments == self._last_var_comments:
-            return
-        self._last_var_comments = self.my_variable.comments
-        if (self.my_variable.comments or
-            rose.config_editor.SHOULD_SHOW_ALL_COMMENTS):
-            format = rose.config_editor.VAR_COMMENT_TIP
-            comments = [format.format(c) for c in self.my_variable.comments]
-            tooltip_text = "\n".join(comments)
-            comment_widgets = self.comments_box.get_children()
-            if comment_widgets:
-                comment_widgets[0].set_tooltip_text(tooltip_text)
-            else:
-                edit_eb = gtk.EventBox()
-                edit_eb.show()
-                edit_label = gtk.Label("#")
-                edit_label.show()
-                edit_eb.add(edit_label)
-                edit_eb.set_tooltip_text(tooltip_text)
-                edit_eb.connect("button-press-event",
-                                self._handle_comment_click)
-                edit_eb.connect("enter-notify-event",
-                                self._handle_comment_enter_leave, True)
-                edit_eb.connect("leave-notify-event",
-                                self._handle_comment_enter_leave, False)
-                self.comments_box.pack_start(
-                              edit_eb, expand=False, fill=False,
-                              padding=rose.config_editor.SPACING_SUB_PAGE)
-            self.comments_box.show()
+    def set_modified(self, is_modified):
+        """Set the display of modified status in the text."""
+        if is_modified:
+            if isinstance(self.entry, gtk.Label):
+                att_list = self.entry.get_attributes()
+                if att_list is None:
+                    att_list = pango.AttrList()
+                att_list.insert(pango.AttrForeground(
+                                      self.MODIFIED_COLOUR.red,
+                                      self.MODIFIED_COLOUR.green,
+                                      self.MODIFIED_COLOUR.blue,
+                                      start_index=0,
+                                      end_index=-1))
+                self.entry.set_attributes(att_list)
         else:
-            self.comments_box.hide()
+            if isinstance(self.entry, gtk.Label):
+                att_list = self.entry.get_attributes()
+                if att_list is not None:
+                    att_list = att_list.filter(
+                        lambda a: a.type != pango.ATTR_FOREGROUND)
 
-    def refresh(self, variable=None):
-        """Reload the contents - however, no need for this at present."""
-        self.my_variable = variable
+                if att_list is None:
+                    att_list = pango.AttrList()
+                self.entry.set_attributes(att_list)
 
     def set_show_mode(self, show_mode, should_show_mode):
         """Set the display of a mode on or off."""
+        if show_mode in [rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION,
+                         rose.config_editor.SHOW_MODE_CUSTOM_HELP,
+                         rose.config_editor.SHOW_MODE_CUSTOM_TITLE]:
+            return self._set_show_custom_meta_text(show_mode, should_show_mode)
         if show_mode == rose.config_editor.SHOW_MODE_NO_TITLE:
             return self._set_show_title(not should_show_mode)
         if show_mode == rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
@@ -205,14 +240,88 @@ class KeyWidget(gtk.VBox):
                                     text)
             return self.remove_flag(rose.config_editor.FLAG_TYPE_OPT_CONF)
 
+    def update_comment_display(self):
+        """Update the display of variable comments."""
+        if self.my_variable.comments == self._last_var_comments:
+            return
+        self._last_var_comments = self.my_variable.comments
+        if (self.my_variable.comments or
+            rose.config_editor.SHOULD_SHOW_ALL_COMMENTS):
+            format = rose.config_editor.VAR_COMMENT_TIP
+            comments = [format.format(c) for c in self.my_variable.comments]
+            tooltip_text = "\n".join(comments)
+            comment_widgets = self.comments_box.get_children()
+            if comment_widgets:
+                comment_widgets[0].set_tooltip_text(tooltip_text)
+            else:
+                edit_eb = gtk.EventBox()
+                edit_eb.show()
+                edit_label = gtk.Label("#")
+                edit_label.show()
+                edit_eb.add(edit_label)
+                edit_eb.set_tooltip_text(tooltip_text)
+                edit_eb.connect("button-press-event",
+                                self._handle_comment_click)
+                edit_eb.connect("enter-notify-event",
+                                self._handle_comment_enter_leave, True)
+                edit_eb.connect("leave-notify-event",
+                                self._handle_comment_enter_leave, False)
+                self.comments_box.pack_start(
+                              edit_eb, expand=False, fill=False,
+                              padding=rose.config_editor.SPACING_SUB_PAGE)
+            self.comments_box.show()
+        else:
+            self.comments_box.hide()
+
+    def _get_metadata_formatting(self, mode):
+        """Apply the correct formatting for a metadata property."""
+        mode_format = "{" + mode + "}"
+        if (mode == rose.META_PROP_DESCRIPTION and
+            self.show_modes[
+                      rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION]):
+            mode_format = rose.config_editor.CUSTOM_FORMAT_DESCRIPTION
+        if (mode == rose.META_PROP_HELP and
+            self.show_modes[rose.config_editor.SHOW_MODE_CUSTOM_HELP]):
+            mode_format = rose.config_editor.CUSTOM_FORMAT_HELP
+        if (mode == rose.META_PROP_TITLE and
+            self.show_modes[rose.config_editor.SHOW_MODE_CUSTOM_TITLE]):
+            mode_format = rose.config_editor.CUSTOM_FORMAT_TITLE
+        mode_string = rose.variable.expand_format_string(mode_format,
+                                                         self.my_variable)
+        if mode_string is None:
+            return self.my_variable.metadata[mode]
+        return mode_string
+
+    def _set_show_custom_meta_text(self, mode, should_show_mode):
+        """Set the display of a custom format for a metadata property."""
+        if mode == rose.config_editor.SHOW_MODE_CUSTOM_TITLE:
+            return self._set_show_title(
+                         not self.show_modes[
+                                  rose.config_editor.SHOW_MODE_NO_TITLE])
+        if mode == rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
+            is_shown = not self.show_modes[
+                            rose.config_editor.SHOW_MODE_NO_DESCRIPTION]
+            if is_shown:
+                self._set_show_meta_text_mode(rose.META_PROP_DESCRIPTION,
+                                              False)
+                self._set_show_meta_text_mode(rose.META_PROP_DESCRIPTION,
+                                              True)
+        if mode == rose.config_editor.SHOW_MODE_CUSTOM_HELP:
+            is_shown = not self.show_modes[
+                                rose.config_editor.SHOW_MODE_NO_HELP]
+            if is_shown:
+                self._set_show_meta_text_mode(rose.META_PROP_HELP, False)
+                self._set_show_meta_text_mode(rose.META_PROP_HELP, True)
+                                          
+
     def _set_show_meta_text_mode(self, mode, should_show_mode):
         """Set the display of description or help below the title/name."""
         if should_show_mode:
             search_func = lambda i: self.var_ops.search_for_var(
                                                  self.meta["full_ns"], i)
-            mode_text = self.meta.get(mode)
-            if mode_text is None:
+            if mode not in self.meta:
                 return
+            mode_text = self._get_metadata_formatting(mode)
             mode_text = rose.gtk.util.safe_str(mode_text)
             mode_text = rose.config_editor.VAR_FLAG_MARKUP.format(mode_text)
             label = rose.gtk.util.get_hyperlink_label(mode_text, search_func)
@@ -221,7 +330,19 @@ class KeyWidget(gtk.VBox):
             hbox.show()
             hbox.pack_start(label, expand=False, fill=False)
             hbox._show_mode = mode
-            self.pack_start(hbox, expand=False, fill=False)
+            self.pack_start(hbox, expand=False, fill=False,
+                            padding=rose.config_editor.SPACING_SUB_PAGE)
+            show_mode_widget_indices = []
+            for i, widget in enumerate(self.get_children()):
+                if hasattr(widget, "_show_mode"):
+                   show_mode_widget_indices.append((widget._show_mode, i))
+            show_mode_widget_indices.sort()
+            for j, (show_mode, i) in enumerate(show_mode_widget_indices):
+                if show_mode == mode and j < len(show_mode_widget_indices) - 1:
+                    # The new widget goes before the next one alphabetically.
+                    new_index = show_mode_widget_indices[j + 1][1]
+                    self.reorder_child(hbox, new_index)
+                    break
         else:
             for widget in self.get_children():
                 if (isinstance(widget, gtk.HBox) and
@@ -234,53 +355,13 @@ class KeyWidget(gtk.VBox):
         if not self.my_variable.name:
             return False
         if should_show_title:
-            if (rose.META_PROP_TITLE in self.meta and 
-                self.entry.get_text() != self.meta[rose.META_PROP_TITLE]):
-                return self.entry.set_text(self.meta[rose.META_PROP_TITLE])
+            if rose.META_PROP_TITLE in self.meta:
+                title_string = self._get_metadata_formatting(
+                                         rose.META_PROP_TITLE)
+                if title_string != self.entry.get_text():
+                    return self.entry.set_text(title_string)
         if self.entry.get_text() != self.my_variable.name:
             self.entry.set_text(self.my_variable.name)
-        
-    def set_modified(self, is_modified):
-        """Set the display of modified status in the text."""
-        if is_modified:
-            if isinstance(self.entry, gtk.Label):
-                att_list = self.entry.get_attributes()
-                if att_list is None:
-                    att_list = pango.AttrList()
-                att_list.insert(pango.AttrForeground(
-                                      self.MODIFIED_COLOUR.red,
-                                      self.MODIFIED_COLOUR.green,
-                                      self.MODIFIED_COLOUR.blue,
-                                      start_index=0,
-                                      end_index=-1))
-                self.entry.set_attributes(att_list)
-        else:
-            if isinstance(self.entry, gtk.Label):
-                att_list = self.entry.get_attributes()
-                if att_list is not None:
-                    att_list = att_list.filter(
-                        lambda a: a.type != pango.ATTR_FOREGROUND)
-
-                if att_list is None:
-                    att_list = pango.AttrList()
-                self.entry.set_attributes(att_list)
-
-    def add_flag(self, flag_type, tooltip_text=None):
-        """Set the display of a flag denoting a property."""
-        if flag_type in self.var_flags:
-            return
-        self.var_flags.append(flag_type)
-        stock_id = self.FLAG_ICON_MAP[flag_type]
-        event_box = gtk.EventBox()
-        event_box._flag_type = flag_type
-        image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
-        image.set_tooltip_text(tooltip_text)
-        image.show()
-        event_box.add(image)
-        event_box.show()
-        event_box.connect("button-press-event", self._toggle_flag_label)
-        self.hbox.pack_end(event_box, expand=False, fill=False,
-                           padding=rose.config_editor.SPACING_SUB_PAGE)
 
     def _toggle_flag_label(self, event_box, event, text=None):
         """Toggle a label describing the flag."""
@@ -302,25 +383,6 @@ class KeyWidget(gtk.VBox):
         hbox.show()
         self.pack_start(hbox, expand=False, fill=False)
 
-    def remove_flag(self, flag_type):
-        """Remove the flag from the widget."""
-        for widget in self.get_children():
-            if (isinstance(widget, gtk.EventBox) and
-                getattr(widget, "_flag_type", None) == flag_type):
-                self.remove(widget)
-        if flag_type in self.var_flags:
-            self.var_flags.remove(flag_type)
-        return True
-
-    def launch_edit_comments(self, *args):
-        """Launch an edit comments dialog."""
-        text = "\n".join(self.my_variable.comments)
-        title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
-                                   self.my_variable.metadata['id'])
-        rose.gtk.util.run_edit_dialog(text,
-                                      finish_hook=self._edit_finish_hook,
-                                      title=title)
-
     def _edit_finish_hook(self, text):
         self.var_ops.set_var_comments(self.my_variable, text.splitlines())
         self.update_status()
@@ -334,21 +396,23 @@ class KeyWidget(gtk.VBox):
             self.launch_edit_comments()
 
     def _handle_enter(self, event_box):
+        label_text = self.entry.get_text()
+        tooltip_text = ""
         if rose.META_PROP_DESCRIPTION in self.meta:
-            tooltip_text = self.meta[rose.META_PROP_DESCRIPTION]
-            if rose.META_PROP_TITLE in self.meta:
-                if self.entry.get_text() == self.meta[rose.META_PROP_TITLE]:
-                    tooltip_text += ("\n (" + self.my_variable.name + ")")
-                else:
-                    tooltip_text += ("\n (" +  
-                                     rose.META_PROP_TITLE.capitalize() + 
-                                     ": '" +
-                                     self.meta['title'] + "')")
-        elif (rose.META_PROP_TITLE in self.meta and
-              self.entry.get_text() == self.meta[rose.META_PROP_TITLE]):
-            tooltip_text = "(" + self.my_variable.name + ")"
-        else:
-            tooltip_text = ''
+            tooltip_text = self._get_metadata_formatting(
+                                         rose.META_PROP_DESCRIPTION)
+        if rose.META_PROP_TITLE in self.meta:
+            if self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE]:
+                # Titles are hidden, so show them in the hover-over.
+                tooltip_text += ("\n (" +  
+                                    rose.META_PROP_TITLE.capitalize() + 
+                                    ": '" +
+                                    self.meta[rose.META_PROP_TITLE] + "')")
+            elif (self.my_variable.name not in label_text or
+                  not self.show_modes[
+                                rose.config_editor.SHOW_MODE_CUSTOM_TITLE]):
+                # No custom title, or a custom title without the name.
+                tooltip_text += ("\n (" + self.my_variable.name + ")")
         if self.my_variable.comments:
             format = rose.config_editor.VAR_COMMENT_TIP
             if tooltip_text:
@@ -368,6 +432,7 @@ class KeyWidget(gtk.VBox):
             'http://' in self.my_variable.value):
             new_url = re.search('(http://[^ ]+)',
                                 self.my_variable.value).group()
+            # This is not very nice.
             self.meta.update({rose.META_PROP_URL: new_url})
         if (rose.META_PROP_HELP in self.meta or
             rose.META_PROP_URL in self.meta):

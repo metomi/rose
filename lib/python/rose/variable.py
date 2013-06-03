@@ -190,6 +190,21 @@ def _scan_string(string, delim=','):
         yield item
 
 
+def expand_format_string(format_string, variable):
+    """Expand a string that references variable properties or metadata."""
+    data_metadata = {}
+    for attr in dir(variable):
+        if attr.startswith("_"):
+            continue
+        data_metadata[attr] = str(getattr(variable, attr))
+    data_metadata.update(variable.metadata)
+    try:
+        format_string = format_string.format(**data_metadata)
+    except (IndexError, KeyError):
+        return None
+    return format_string
+
+
 def get_ignored_markup(variable):
     """Return pango markup for a variable's ignored reason."""
     markup = ""
