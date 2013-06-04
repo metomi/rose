@@ -906,23 +906,23 @@ sort-key=do-not-like-00
       </dd>
 
       <dt>value-titles</dt>
-      
+
       <dd>
-        <p>Define a comma <kbd>,</kbd> separated list of titles to associate 
-        with each of the elements of <code>values</code> which will be 
-        displayed instead of the value. This list should contain the same 
+        <p>Define a comma <kbd>,</kbd> separated list of titles to associate
+        with each of the elements of <code>values</code> which will be
+        displayed instead of the value. This list should contain the same
         number of elements as the <code>values</code> entry.</p>
-        
+
         <p>For example, given the following metadata:</p>
         <pre class="prettyprint lang-rose_conf">
 [env=HEAT]
 values=0, 1, 2
 value-titles=low, medium, high
 </pre>
-        <p>config edit will display <samp>low</samp> for option value 
-        <samp>0</samp>, <samp>medium</samp> for <samp>1</samp> and 
-        <samp>high</samp> for <samp>2</samp>.</p>
 
+        <p>config edit will display <samp>low</samp> for option value
+        <samp>0</samp>, <samp>medium</samp> for <samp>1</samp> and
+        <samp>high</samp> for <samp>2</samp>.</p>
       </dd>
 
       <dt>range</dt>
@@ -1283,7 +1283,9 @@ help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
 
         <p>The config editor will also use descriptions set for sections or
         namespaces as page header text (appears at the top of a panel or page),
-        with clickable id and URL links as in help.</p>
+        with clickable id and URL links as in help. Descriptions set for
+        variables may be automatically shown underneath the variable name in
+        the config editor, depending on view options.</p>
       </dd>
 
       <dt>title</dt>
