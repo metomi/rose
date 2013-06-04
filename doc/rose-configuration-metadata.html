@@ -41,6 +41,10 @@
   <div id="body-main">
     <h1>Rose Reference Guide: Configuration Metadata</h1>
 
+    <div id="content"></div>
+
+    <h2 id="format-location">Format and Location</h2>
+
     <p>See <a href="rose-configuration.html#format">Configuration
     Format</a>.</p>
 
@@ -88,9 +92,9 @@
     details.</p>
 
     <p>The configuration metadata that controls default behaviour will be
-    located in <samp>$ROSE_HOME/etc/metadata/</samp>.</p>
+    located in <samp>$ROSE_HOME/etc/rose-meta/</samp>.</p>
 
-    <h3 id="meta.conf">Configuration Metadata File</h3>
+    <h2 id="meta.conf">Configuration Metadata File</h2>
 
     <p>The <samp>rose-meta.conf</samp> contains a serialised data structure
     that is an unordered map (sections=) of unordered maps (keys=values).</p>
@@ -120,7 +124,7 @@
     <p>The metadata for a configuration fall into 4 categories: sorting,
     values, behaviour and help. They are be described separated below:</p>
 
-    <h4 id="meta.conf.sorting">Metadata for Sorting</h4>
+    <h3 id="meta.conf.sorting">Metadata for Sorting</h3>
 
     <p>These configuration metadata are used for grouping and sorting the IDs
     of the configurations.</p>
@@ -184,7 +188,7 @@ sort-key=do-not-like-00
       </dd>
     </dl>
 
-    <h4 id="meta.conf.value">Metadata for Values</h4>
+    <h3 id="meta.conf.value">Metadata for Values</h3>
 
     <p>These configuration metadata are used to define the valid values of a
     setting. A Rose utility such as the config editor can use these metadata to
@@ -459,7 +463,7 @@ warn-if=True;  # This option is deprecated
       </dd>
     </dl>
 
-    <h4 id="meta.conf.behaviour">Metadata for Behaviour</h4>
+    <h3 id="meta.conf.behaviour">Metadata for Behaviour</h3>
 
     <p>These metadata are used to define how the setting should behave in
     different states.</p>
@@ -664,7 +668,7 @@ widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons
       </dd>
     </dl>
 
-    <h4 id="meta.conf.help">Metadata for Help</h4>
+    <h3 id="meta.conf.help">Metadata for Help</h3>
 
     <p>These metadata provide help for a configuration.</p>
 
@@ -918,6 +922,9 @@ meta=my-command/t123
 
     <p>The mini-language supports writing a logical expression in Python-like
     syntax, using variable ids to reference values.</p>
+    
+    <p>Expressions are set as the value of metadata properties such as
+    <samp>fail-if</samp> and <samp>range</samp>.</p>
 
     <h3 id="appendix-mini-language-operators">Operators</h3>
 
@@ -939,6 +946,7 @@ meta=my-command/t123
 %      # formatting - e.g. "foo %s baz" % "bar" implies "foo bar baz"
 in     # contained in (True/False) - e.g. "oo" in "foobar" implies True
 not in # opposite sense of in
+
 # Where m, n are integers or expressions that evaluate to integers
 # (negative numbers count from the end of the string):
 [n]   # get nth character from string - e.g. "foo"[1] implies "o"
@@ -956,13 +964,13 @@ not   # Logical NOT
 
     <p>The following <em>comparison</em> operators are supported:</p>
     <pre class="prettyprint lang-python">
+is    # Is the same object as (usually used for 'is none')
 &lt;     # Less than 
 &gt;     # Greater than
 ==    # Equal to
 &gt;=    # Greater than or equal to
 &lt;=    # Less than or equal to
 !=    # Not equal to
-is    # Is the same object as (usually used for 'is none')
 </pre>
 
     <h3 id="appendix-mini-language-constants">Constants</h3>
@@ -981,19 +989,19 @@ true  # Python True
     "http://docs.python.org/2/library/ast.html#ast.literal_eval">cast</a> and
     substituted into the expression.</p>
 
-    <p>For example, with a configuration that looks like this:</p>
+    <p>For example, if we have a configuration that looks like this:</p>
     <pre class="prettyprint lang-rose_conf">
 [namelist:zoo]
 num_elephants=2
 elephant_mood='peaceful'
 </pre>
 
-    <p>An expression in the configuration metadata, that looked like this:</p>
+    <p>and an expression in the configuration metadata:</p>
     <pre class="prettyprint lang-python">
 namelist:zoo=elephant_type != 'annoyed' and num_elephants &gt;= 2
 </pre>
 
-    <p>becomes, when evaluated:</p>
+    <p>then the expression would become:</p>
     <pre class="prettyprint lang-python">
 'peaceful' != 'annoyed' and 2 &gt;= 2
 </pre>
@@ -1007,7 +1015,7 @@ namelist:zoo=elephant_type != 'annoyed' and num_elephants &gt;= 2
     <p>In this case the expression would be false.</p>
 
     <p>You may use <samp>this</samp> as a placeholder for the current variable
-    id - for example:</p>
+    id - for example, the fail-if expression:</p>
     <pre class="prettyprint lang-rose_conf">
 [namelist:foo=bar]
 fail-if = namelist:foo=bar &gt; 100 and namelist:foo=bar % 2 == 1
@@ -1041,12 +1049,13 @@ bar='a', 'b', 'c', 'd'
 </pre>
 
     <p><samp>namelist:foo=bar(2)</samp> would get substituted in an expression
-    with <samp>'b'</samp> when the expression was evaluated. For example:</p>
+    with <samp>'b'</samp> when the expression was evaluated. For example, an
+    expression that contained:</p>
     <pre class="prettyprint lang-python">
 namelist:foo=bar(2) == 'c'
 </pre>
 
-    <p>would become:</p>
+    <p>would be evaluated like this:</p>
     <pre class="prettyprint lang-python">
 'b' == 'c'
 </pre>
@@ -1074,9 +1083,9 @@ any(namelist:foo=bar == 'e')
 all(namelist:foo=bar == 'e')
 </pre>
 
-    <p>evaluates true if <em>all</em> elements are <samp>'e'. Again, with the
+    <p>evaluates true if <em>all</em> elements are <samp>'e'</samp>. Again, with the
     above configuration, this would be expanded before proper
-    evaluation:</samp></p>
+    evaluation:</p>
     <pre class="prettyprint lang-python">
 <samp>'a' == 'e' and 'b' == 'e' and 'c' == 'e' and 'd' == 'e'
 </samp>
@@ -1084,9 +1093,9 @@ all(namelist:foo=bar == 'e')
 
     <h3 id="appendix-mini-language-internals">Internals</h3>
 
-    <p><samp>Rose uses an external engine to evaluate the raw language string
+    <p>Rose uses an external engine to evaluate the raw language string
     after variable ids and any <samp>any()</samp> and <samp>all()</samp>
-    functions have been substituted and expanded.</samp></p>
+    functions have been substituted and expanded.</p>
 
     <p>The current choice of engine is <a href=
     "http://jinja.pocoo.org/docs/">Jinja2</a>, which is responsible for the
