@@ -312,6 +312,28 @@ accel-find-next=F3
     following sections and root level options:</p>
 
     <dl>
+      <dt><code>[env]</code></dt>
+
+      <dd>Specify the environment variables to export to the suite daemon. The
+      usual <var>$NAME</var> or <var>${NAME}</var> syntax can be used in values
+      to reference environment variables that are already defined before the
+      suite runner is invoked. However, it is unsafe to reference other
+      environment variables defined in this section. If the value of an
+      environment variable setting begins with a tilde <kbd>~</kbd>, all of the
+      characters preceding the 1st slash <kbd>/</kbd> are considered a
+      <em>tilde-prefix</em>. Where possible, a tilde-prefix is replaced with the
+      home directory associated with the specified login name at run time. There
+      are 2 special environment variables which can be specified in this section:
+
+        <ul>
+          <li><var>ROSE_VERSION</var>: If specified, the version of Rose that
+          starts the suite run must match the specified version.</li>
+
+          <li><var>CYLC_VERSION</var>: If specified for a cylc suite, the Rose
+          suite runner will attempt to use this version of cylc.</li>
+        </ul>
+      </dd>
+
       <dt><code>[jinja2:suite.rc]</code></dt>
 
       <dd>For a cylc suite, if <a href=
@@ -504,17 +526,17 @@ accel-find-next=F3
       <dt><code>[env]</code></dt>
 
       <dd>Specify input environment variables to the command, in KEY=VALUE
-      pairs. The usual shell syntax can be used in values to reference
-      environment variables that are already defined when the application
-      runner is invoked. However, it is unsafe to reference other environment
-      variables defined in this section. Note: <var>UNDEF</var> is a special
-      variable that is always undefined at run time. Reference to it will cause
-      a failure at run time. It can be used to indicate that a value must be
-      overridden at run time. If the value of an environment variable setting
-      begins with a tilde <kbd>~</kbd>, all of the characters preceding the 1st
-      slash <kbd>/</kbd> are considered a <em>tilde-prefix</em>. Where
-      possible, a tilde-prefix is replaced with the home directory associated
-      with the specified login name at run time.</dd>
+      pairs. The usual <var>$NAME</var> or <var>${NAME}</var> syntax can be used
+      in values to reference environment variables that are already defined when
+      the application runner is invoked. However, it is unsafe to reference
+      other environment variables defined in this section. Note:
+      <var>UNDEF</var> is a special variable that is always undefined at run
+      time. Reference to it will cause a failure at run time. It can be used to
+      indicate that a value must be overridden at run time. If the value of an
+      environment variable setting begins with a tilde <kbd>~</kbd>, all of the
+      characters preceding the 1st slash <kbd>/</kbd> are considered a
+      <em>tilde-prefix</em>. Where possible, a tilde-prefix is replaced with the
+      home directory associated with the specified login name at run time.</dd>
 
       <dt><code>[etc]</code></dt>
 
