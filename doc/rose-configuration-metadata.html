@@ -342,7 +342,7 @@ value-titles=low, medium, high
 
       <dd>
         <p>Specify a range of values. It can either be a simple comma
-        <kbd>,</kbd> separated list of allowed values, or a logical expression.
+        <kbd>,</kbd> separated list of allowed values, or a logical expression in the Rose metadata mini-language.
         This metadata is only valid if <code>type</code> is either
         <samp>integer</samp> or <samp>real</samp>.</p>
 
@@ -351,9 +351,9 @@ value-titles=low, medium, high
         be 1, 2, between 4 and 8 inclusive, or any values greater than or equal
         to 10.)</p>
 
-        <p>A logical expression uses a Python-like syntax and the variable
-        <var>this</var> to denote the value of the current setting, e.g.
-        <samp>this &lt;-1 and this &gt;1</samp>.</p>
+        <p>A logical expression uses the Rose <a href="#appendix-mini-language">mini-language</a>,
+        using the variable <var>this</var> to denote the value of the current setting, e.g.
+        <samp>this &lt;-1 and this &gt;1</samp>. Inter-variable comparisons are not permitted (but see the <samp>fail-if</samp> property for a way to implement this.</p>
       </dd>
 
       <dt>pattern</dt>
@@ -366,12 +366,13 @@ value-titles=low, medium, high
       <dt>fail-if, warn-if</dt>
 
       <dd>
-        <p>Specify a logical expression to validate the value of the current
+        <p>Specify a logical expression using the Rose
+        <a href="#appendix-mini-language">mini-language</a> to validate the value of the current
         setting with respect to other settings. If the logical expression
         evaluates to true in a <code>fail-if</code> metadata, the system will
         consider the setting in error. On the other hand, in a
         <code>warn-if</code> metadata, the system will only issue a warning.
-        The logical expression uses a Python-like syntax. It can reference the
+        The logical expression uses a Python-like syntax (documented fully in the <a href="#appendix-mini-language">appendix</a>). It can reference the
         value of the current setting with the <var>this</var> variable and the
         value of other settings with their IDs. E.g.:</p>
         <pre class="prettyprint lang-rose_conf">
@@ -579,8 +580,10 @@ trigger=env=IS_ICE: true;
         <var>env=IS_WATER</var> and <var>env=IS_COLD</var> are
         <samp>true</samp> and enabled. Otherwise, it is ignored.</p>
 
-        <p>The trigger syntax also supports a logical expression in the same
-        format as range or fail-if metadata:</p>
+        <p>The trigger syntax also supports a logical expression using the
+        Rose metadata <a href="#appendix-mini-language">mini-language</a>, in the
+        same way as the <samp>range</samp> or <samp>fail-if</samp> metadata. As with
+        <samp>range</samp>, inter-variable comparisons are not allowed.</p>
         <pre class="prettyprint lang-rose_conf">
 [env=SNOWFLAKE_SIDES]
 trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
@@ -905,6 +908,194 @@ meta=my-command/t123
     changes (or to use a branch of the suite which you are happy to
     discard).</p>
 
+    <h2 id="appendix-mini-language">Appendix: Metadata Mini-Language</h2>
+    
+    <p>The mini-language supports writing a logical expression in Python-like
+    syntax, using variable ids to reference values.</p>
+    
+    <h3 id="appendix-mini-language-operators">Operators</h3>
+
+    <p>The following <em>numeric</em> operators are supported:</p>
+    <pre class="prettyprint lang-python">
++     # add
+-     # subtract
+*     # multiply
+**    # power or exponent - e.g. 2 ** 3 implies 8
+/     # divide
+//    # integer divide (floor) - e.g. 3 // 2 implies 1
+%     # remainder e.g. 5 % 3 implies 2
+</pre>
+
+    <p>The following <em>string</em> operators are supported:</p>
+    <pre class="prettyprint lang-python">
++      # concatenate - e.g. "foo" + "bar" implies "foobar"
+*      # self-concatenate some number of times - e.g. "foo" * 2 implies "foofoo"
+%      # formatting - e.g. "foo %s baz" % "bar" implies "foo bar baz"
+in     # contained in (True/False) - e.g. "oo" in "foobar" implies True
+not in # opposite sense of in
+# Where m, n are integers or expressions that evaluate to integers
+# (negative numbers count from the end of the string):
+[n]   # get nth character from string - e.g. "foo"[1] implies "o"
+[m:n] # get slice of string from m to n - e.g. "foobar"[1:5] implies "ooba"
+[m:]  # get slice of string from m onwards - e.g. "foobar"[1:] implies "oobar"
+[:n]  # get slice of string up to n - e.g. "foobar"[:5] implies "fooba"
+</pre>
+
+    <p>The following <em>logical</em> operators are supported:</p>
+    <pre class="prettyprint lang-python">
+and   # Logical AND
+or    # Logical OR
+not   # Logical NOT
+</pre>
+
+    <p>The following <em>comparison</em> operators are supported:</p>
+    <pre class="prettyprint lang-python">
+<     # Less than 
+>     # Greater than
+==    # Equal to
+>=    # Greater than or equal to
+<=    # Less than or equal to
+!=    # Not equal to
+is    # Is the same object as (usually used for 'is none')
+</pre>
+
+    <h3 id="appendix-mini-language-constants">Constants</h3>
+    
+    <p>The following are special constants:</p>
+    <pre class="prettyprint lang-python">
+none  # Python None
+false # Python False
+true  # Python True
+</pre>
+
+    <h3 id="appendix-mini-language-ids">Using Variable Ids</h3>
+
+    <p>Putting a variable id in the expression means that when the
+    expression is evaluated, the string value of the variable is
+    <a href="http://docs.python.org/2/library/ast.html#ast.literal_eval">cast</a>
+    and substituted into the expression.</p>
+    
+    <p>For example, with a configuration that looks like this:</p>
+    
+    <pre class="prettyprint lang-rose_conf">
+[namelist:zoo]
+num_elephants=2
+elephant_mood='peaceful'
+</pre>
+
+    <p>An expression in the configuration metadata, that looked like this:</p>
+    <pre class="prettyprint lang-python">
+namelist:zoo=elephant_type != 'annoyed' and num_elephants >= 2
+</pre>
+
+    <p>becomes, when evaluated:</p>
+
+    <pre class="prettyprint lang-python">
+'peaceful' != 'annoyed' and 2 >= 2
+</pre>
+
+    <p>If the variable is not currently
+    available (ignored or missing) then the expression cannot be evaluated.
+    If inter-variable comparisons are not allowed for the expression's parent option
+    (such as with <samp>trigger</samp> and <samp>range</samp>) then referencing
+    other variable ids is not allowed.</p>
+
+    <p>In this case the expression would be false.</p>
+
+    <p>You may use <samp>this</samp> as a placeholder for the current variable
+    id - for example:</p>
+    
+    <pre class="prettyprint lang-rose_conf">
+[namelist:foo=bar]
+fail-if = namelist:foo=bar > 100 and namelist:foo=bar % 2 == 1
+</pre>
+
+    <p>is the same as:</p>
+
+    <pre class="prettyprint lang-rose_conf">
+[namelist:foo=bar]
+fail-if = this > 100 and this % 2 == 1
+</pre>
+
+    <h3 id="appendix-mini-language">Arrays</h3>
+    
+    <p>The syntax has some special ways of dealing with variable values that
+    are arrays - i.e. comma-separated lists.</p>
+    
+    <p>You can refer to a single element of the value for a given variable id
+    (or <samp>this</samp>) by suffixing a number in round brackets - e.g.:</p>
+    
+    <pre class="prettyprint lang-python">
+namelist:foo=bar(2)
+</pre>
+
+    <p>references the second element in the value for <samp>bar</samp> in the
+    section <samp>namelist:foo</samp> (following Fortran index numbering and syntax).</p>
+    
+    <p>If we had a configuration:</p>
+
+    <pre class="prettyprint lang-rose_conf">
+[namelist:foo]
+bar='a', 'b', 'c', 'd'
+</pre>
+
+    <p><samp>namelist:foo=bar(2)</samp> would get substituted in an expression with <samp>'b'</samp>
+    when the expression was evaluated. For example:</p>
+    
+    <pre class="prettyprint lang-python">
+namelist:foo=bar(2) == 'c'
+</pre>
+
+    <p>would become:</p>
+    
+    <pre class="prettyprint lang-python">
+'b' == 'c'
+</pre>
+
+    <p>There are two special array functions, <samp>any</samp> and <samp>all</samp>,
+    which behave in a similar fashion to their Python and Fortran equivalents, but have
+    a different syntax.</p>
+    
+    <p>They allow you to write a shorthand expression within an <samp>any()</samp> or
+    <samp>all()</samp> bracket which implies a loop over each array element. For example:</p>
+    
+    <pre class="prettyprint lang-python">
+any(namelist:foo=bar == 'e')
+</pre>
+
+    <p>evaluates true if any elements in the value of <samp>bar</samp> in the section
+    <samp>namelist:foo</samp> are <samp>'e'</samp>. For the above configuration snippet,
+    this would be expanded before evaluation to be:</p>
+
+    <pre class="prettyprint lang-python">
+'a' == 'e' or 'b' == 'e' or 'c' == 'e' or 'd' == 'e'
+</pre>
+
+    <p>Similarly,</p>
+    
+    <pre class="prettyprint lang-python">
+all(namelist:foo=bar == 'e')
+</pre>
+
+    <p>evaluates true if <em>all</em> elements are <samp>'e'. Again, with the above
+    configuration, this would be expanded before proper evaluation:</p>
+    
+    <pre class="prettyprint lang-python">
+'a' == 'e' and 'b' == 'e' and 'c' == 'e' and 'd' == 'e'
+</pre>
+
+    <h3 id="appendix-mini-language">Internals</h3>
+    
+    <p>Rose uses an external engine to evaluate the raw language string after
+    variable ids and any <samp>any()</samp> and <samp>all()</samp> functions
+    have been substituted and expanded.</p>
+    
+    <p>The current choice of engine is <a href="http://jinja.pocoo.org/docs/">Jinja2</a>,
+    which is responsible for the details of the supported Pythonic syntax. This may
+    change.</p>
+    
+    <p><strong>Do not use any Jinja2-specific syntax</strong>.</p>
+ 
     <h2 id="appendix-ignored-config-edit">Appendix: Config Editor Ignored
     Mechanics</h2>
 
