@@ -118,6 +118,14 @@ class TaskAppNotFoundError(Exception):
         return "%s (key=%s): task has no associated application." % self.args
 
 
+class VersionMismatchError(Exception):
+
+    """An exception raised when there is a version mismatch."""
+
+    def __str__(self):
+        return "Version expected=%s, actual=%s" % self.args
+
+
 class CommandNotDefinedEvent(Event):
 
     """An event raised when a command is not defined for an app."""
@@ -669,9 +677,8 @@ class SuiteRunner(Runner):
             requested_value = config.get_value(["env", k])
             if requested_value:
                 if k == "ROSE_VERSION" and v != requested_value:
-                    raise ConfigValueError(["env", k],
-                                           requested_value,
-                                           "(Used ROSE_VERSION=%s)" % v)
+                    e = VersionMismatchError(requested_value, v)
+                    raise ConfigValueError(["env", k], requested_value, e)
                 v = requested_value
             else:
                 config.set(["env", k], v)
