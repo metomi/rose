@@ -994,9 +994,8 @@ class MainController(object):
     def save_to_file(self, only_config_name=None):
         """Dump the component configurations in memory to disk."""
         if only_config_name is None:
-            configs = self.data.config.keys()
             config_names = []
-            for c in configs:
+            for c in self.data.config.keys():
                 if not self.data.config[c].preview:
                     config_names.append(c)
         else:
