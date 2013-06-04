@@ -772,7 +772,7 @@ class ConfigDataManager(object):
         state.
 
         'Doc table' in the comments refers to
-        doc/rose-configuration.html#appendix-ignored-config-edit
+        doc/rose-configuration-metadata.html#appendix-ignored-config-edit
 
         """
         self.trigger[config_name] = rose.macros.trigger.TriggerMacro()
