@@ -107,12 +107,16 @@ class StatusBar(gtk.VBox):
             self.messages.pop(0)
         self._update_message_widget(str(message), kind=kind)
         self._update_console()
+        while gtk.gdk.events_pending():
+            gtk.main_iteration()
 
     def set_num_errors(self, new_num_errors):
         """Update the number of errors."""
         if new_num_errors != self.num_errors:
             self.num_errors = new_num_errors
             self._update_error_widget()
+            while gtk.gdk.events_pending():
+                gtk.main_iteration()
 
     def _generate_error_widget(self):
         # Generate the error display widget.
