@@ -585,8 +585,13 @@ class MainController(object):
         config_name = self.util.split_full_ns(self.data, namespace_name)[0]
         config_data = self.data.config[config_name]
         if config_data.preview:
+            self.reporter.report_load_event(
+                       rose.config_editor.EVENT_LOAD_ATTEMPT.format(
+                       namespace_name))
             self.data.load_config(config_data.directory, preview=False)
             self.reload_namespace_tree()
+            self.reporter.report_load_event(
+                       rose.config_editor.EVENT_LOADED.format(namespace_name))
         
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)

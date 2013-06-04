@@ -252,7 +252,7 @@ class ConfigDataManager(object):
     def load_config(self, config_directory=None,
                     config_name=None, config=None,
                     reload_tree_on=False, is_discovery=False,
-                    skip_load_event=False, preview=True):
+                    skip_load_event=False, preview=False):
         """Load the configuration and meta-data. Load namespaces."""
         is_top_level = False
         if config_directory is None:
@@ -300,7 +300,6 @@ class ConfigDataManager(object):
                     sys.exit(2)
                     
             if config_directory != self.top_level_directory and preview:                   #load with empty ConfigNodes for initial app access
-                preview = True
                 config = rose.config.ConfigNode()
                 s_config = rose.config.ConfigNode()
             else:

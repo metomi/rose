@@ -171,6 +171,8 @@ LOAD_NUMBER_OF_EVENTS = 2
 # Other event strings
 EVENT_ERR_MARKUP = "<span color='red'>{0}</span>"
 EVENT_FOUND_ID = "Found {0}"
+EVENT_LOAD_ATTEMPT = "Attempting to load {0}"
+EVENT_LOADED = "Loaded {0}"
 EVENT_MACRO_CONFIGS = "{0} configurations"
 EVENT_MACRO_TRANSFORM = "{1}: {0}: {2} changes"
 EVENT_MACRO_TRANSFORM_ALL = "Transforms: {0}: {1} changes"
