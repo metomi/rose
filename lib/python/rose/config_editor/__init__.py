@@ -540,7 +540,7 @@ UNTITLED_NAME = "Untitled"
 VAR_ID_IN_CONFIG = "Variable id {0} from the configuration {1}"
 
 
-def false_function(*args):
+def false_function(*args, **kwargs):
     """Return False, no matter what the arguments are."""
     return False
 
