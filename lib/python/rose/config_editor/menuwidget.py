@@ -283,9 +283,8 @@ class MenuWidget(gtk.HBox):
             remove_item.set_sensitive(False)
         help_item = uimanager.get_widget('/Options/Help')
         help_item.connect("activate",
-                          lambda b: self.launch_help(
-                                         self.my_variable.metadata['help']))
-        if 'help' not in self.my_variable.metadata:
+                          lambda b: self.launch_help())
+        if rose.META_PROP_HELP not in self.my_variable.metadata:
             help_item.set_sensitive(False)
         url_item = uimanager.get_widget('/Options/Web Help')
         if url_item is not None and 'url' in self.my_variable.metadata:

@@ -81,15 +81,19 @@ class MenuBar(object):
         <menuitem action="View status bar"/>
       </menu>
       <menu action="Metadata">
-      <menuitem action="Reload metadata"/>
-      <menuitem action="Switch off metadata"/>
-      <separator name="sep_view_generic"/>
-      <menuitem action="View without titles"/>
-      <separator name="sep_checking"/>
-      <menuitem action="Extra checks"/>
-      <separator name="sep macro"/>
-      <menuitem action="All V"/>
-      <menuitem action="Autofix"/>
+        <menuitem action="Reload metadata"/>
+        <menuitem action="Switch off metadata"/>
+        <separator name="sep_view_generic"/>
+        <menu action="Prefs">
+          <menuitem action="View without descriptions"/>
+          <menuitem action="View without help"/>
+          <menuitem action="View without titles"/>
+        </menu>
+        <separator name="sep_checking"/>
+        <menuitem action="Extra checks"/>
+        <separator name="sep macro"/>
+        <menuitem action="All V"/>
+        <menuitem action="Autofix"/>
       </menu>
       <menu action="Tools">
         <menu action="Run Suite">
@@ -166,6 +170,8 @@ class MenuBar(object):
                       ('Reload metadata', gtk.STOCK_REFRESH,
                        rose.config_editor.TOP_MENU_METADATA_REFRESH,
                        rose.config_editor.ACCEL_METADATA_REFRESH),
+                      ('Prefs', gtk.STOCK_PREFERENCES,
+                       rose.config_editor.TOP_MENU_METADATA_PREFERENCES),
                       ('All V', gtk.STOCK_DIALOG_QUESTION,
                        rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
                       ('Autofix', gtk.STOCK_CONVERT,
@@ -208,6 +214,10 @@ class MenuBar(object):
                        rose.config_editor.TOP_MENU_VIEW_IGNORED_VARS),
                       ('View user-ignored vars', None,
                        rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_VARS),
+                      ('View without descriptions', None,
+                       rose.config_editor.TOP_MENU_VIEW_WITHOUT_DESCRIPTIONS),
+                      ('View without help', None,
+                       rose.config_editor.TOP_MENU_VIEW_WITHOUT_HELP),
                       ('View without titles', None,
                        rose.config_editor.TOP_MENU_VIEW_WITHOUT_TITLES),
                       ('View ignored pages', None,
