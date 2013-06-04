@@ -47,52 +47,38 @@ class PageTable(gtk.Table):
         super(PageTable, self).__init__(rows=self.MAX_ROWS,
                                         columns=self.MAX_COLS,
                                         homogeneous=False)
-        self.num_removes = 0
         self.panel_data = panel_data
         self.ghost_data = ghost_data
         self.var_ops = var_ops
         self.show_modes = show_modes
+        variable_is_ghost_list = self._get_sorted_variables()
         r = 0
-        for variable in self.panel_data:
+        for variable, is_ghost in variable_is_ghost_list:
             variablewidget = rose.config_editor.variable.VariableWidget(
                                                 variable,
                                                 self.var_ops,
-                                                is_ghost=False,
+                                                is_ghost=is_ghost,
                                                 show_modes=self.show_modes)
             variablewidget.insert_into(self, self.MAX_COLS, r + 1)
+            if is_ghost:
+                variablewidget.set_sensitive(False)
+                if (not self._is_var_compulsory(variable) and
+                    not self.show_modes[rose.config_editor.SHOW_MODE_LATENT]):
+                    # Hidden if not compulsory and not SHOW_MODE_LATENT.
+                    variablewidget.hide()
             if (self._should_hide_var_fixed(variable) and 
                 not variable.error):
                 variablewidget.hide()
             r = r + 1
-        ghost_r = 0
-        for variable in self.ghost_data:
-            if self._is_var_compulsory(variable):
-                variablewidget = rose.config_editor.variable.VariableWidget(
-                                                    variable,
-                                                    self.var_ops,
-                                                    is_ghost=True,
-                                                    show_modes=self.show_modes)
-                variablewidget.insert_into(self, self.MAX_COLS,
-                                           ghost_r + r + 1)
-                variablewidget.set_sensitive(False)
-                ghost_r = ghost_r + 1
-        if self.show_modes[rose.config_editor.SHOW_MODE_LATENT]:
-            for variable in self.ghost_data:
-                if self._is_var_compulsory(variable):
-                    continue
-                variablewidget = rose.config_editor.variable.VariableWidget(
-                                                    variable,
-                                                    self.var_ops,
-                                                    is_ghost=True,
-                                                    show_modes=self.show_modes)
-                variablewidget.insert_into(self, self.MAX_COLS,
-                                           ghost_r + r + 1)
-                variablewidget.set_sensitive(False)
-                ghost_r = ghost_r + 1
         self.show()
 
     def add_variable_widget(self, variable):
         """Add a variable widget that was previously in ghost_data."""
+        new_variablewidget = rose.config_editor.variable.VariableWidget(
+                                                variable,
+                                                self.var_ops,
+                                                is_ghost=False,
+                                                show_modes=self.show_modes)
         widget_coordinate_list = []
         for child in self.get_children():
             top_row = self.child_get(child, 'top_attach')[0]
@@ -100,32 +86,38 @@ class PageTable(gtk.Table):
             if variablewidget not in [x[0] for x in widget_coordinate_list]:
                 widget_coordinate_list.append((variablewidget, top_row))
         widget_coordinate_list.sort(lambda x, y: cmp(x[1], y[1]))
-        num_vars_above_this = self.panel_data.index(variable)
-        if num_vars_above_this == 0:
-            row_above_new = -1
-        else:
-            row_above_new = widget_coordinate_list[num_vars_above_this - 1][1]
-        new_variablewidget = rose.config_editor.variable.VariableWidget(
-                                                variable,
-                                                self.var_ops,
-                                                is_ghost=False,
-                                                show_modes=self.show_modes)
-        for variablewidget, widget_row in widget_coordinate_list:
-            if widget_row > row_above_new:
-                for child in self.get_children():
-                    if child.get_parent() == variablewidget:
-                        self.remove(child)
-        new_variablewidget.insert_into(self, self.MAX_COLS, row_above_new + 1)
-        if (self._should_hide_var_fixed(variable) and 
-            not variable.error):
-            new_variablewidget.hide()
-        r = row_above_new + 2
-        for variablewidget, widget_row in widget_coordinate_list:
-            if (widget_row > row_above_new and
-                variablewidget.variable.metadata.get('id') !=
-                variable.metadata.get('id')):
-                variablewidget.insert_into(self, self.MAX_COLS, r)
-                r += 1
+        old_index = None
+        for widget, index in widget_coordinate_list:
+            if widget.variable.metadata["id"] == variable.metadata["id"]:
+                old_index = index
+                parent = widget.get_parent()
+                break
+        if old_index is None:
+            variable_is_ghost_list = self._get_sorted_variables()
+            variables = [x[0] for x in variable_is_ghost_list]
+            num_vars_above_this = variables.index(variable)
+            if num_vars_above_this == 0:
+                row_above_new = -1
+            else:
+                row_above_new = widget_coordinate_list[num_vars_above_this - 1][1]
+            for variablewidget, widget_row in widget_coordinate_list:
+                if widget_row > row_above_new:
+                    for child in self.get_children():
+                        if child.get_parent() == variablewidget:
+                            self.remove(child)
+            new_variablewidget.insert_into(self, self.MAX_COLS, row_above_new + 1)
+            if (self._should_hide_var_fixed(variable) and 
+                not variable.error):
+                new_variablewidget.hide()
+            r = row_above_new + 2
+            for variablewidget, widget_row in widget_coordinate_list:
+                if (widget_row > row_above_new and
+                    variablewidget.variable.metadata.get('id') !=
+                    variable.metadata.get('id')):
+                    variablewidget.insert_into(self, self.MAX_COLS, r)
+                    r += 1
+        else:            
+            self.reload_variable_widget(variable)
 
     def reload_variable_widget(self, variable):
         """Reload the widgets for the given variable."""
@@ -136,6 +128,13 @@ class PageTable(gtk.Table):
                                                 is_ghost,
                                                 show_modes=self.show_modes)
         new_variablewidget.set_sensitive(not is_ghost)
+        if (is_ghost and
+            not self._is_var_compulsory(variable) and
+            not self.show_modes[rose.config_editor.SHOW_MODE_LATENT]):
+            # Hidden if not compulsory and not SHOW_MODE_LATENT.
+            new_variablewidget.hide()
+        else:
+            new_variablewidget.show()
         focus_dict = {"had_focus": False}
         for child in self.get_children():
             variablewidget = child.get_parent()
@@ -157,60 +156,21 @@ class PageTable(gtk.Table):
             if focus_dict["had_focus"]:
                 new_variablewidget.grab_focus(index=focus_dict.get("index"))
 
-
     def remove_variable_widget(self, variable):
         """Remove the selected widget and/or relocate to ghosts."""
-        was_removed = 0
-        for child in self.get_children():
-            variablewidget = child.get_parent()
-            if (not variablewidget.is_ghost and
-                variablewidget.variable.name == variable.name and
-                variablewidget.variable.metadata.get('id') ==
-                variable.metadata.get('id')):
-                self.remove(child)
-                child.destroy()
-                was_removed = 1
-        self.num_removes += was_removed
-        if (self.show_modes[rose.config_editor.SHOW_MODE_LATENT] or
-            self._is_var_compulsory(variable)):
-            widget_coordinate_list = []
-            ghost_top_row = 0
-            for child in self.get_children():
-                top_row = self.child_get(child, 'top_attach')[0]
-                if (child.get_parent() not in
-                    [x[0] for x in widget_coordinate_list]):
-                    widget_coordinate_list.append((child.get_parent(),
-                                                   top_row))
-                if (ghost_top_row is None or top_row > ghost_top_row):
-                    if not self._is_vwidget_optional_ghost(
-                                            child.get_parent()):
-                        ghost_top_row = top_row
-            for child in self.get_children():
-                top_row = self.child_get(child, 'top_attach')[0]
-                if self._is_vwidget_optional_ghost(child.get_parent()):
-                    self.remove(child)
-            ghost_top_row += 1
-            new_variablewidget = rose.config_editor.variable.VariableWidget(
-                                                    variable,
-                                                    self.var_ops,
-                                                    is_ghost=True,
-                                                    show_modes=self.show_modes)
-            new_variablewidget.set_sensitive(False)
-            if (self._should_hide_var_fixed(variable) and 
-                not variable.error):
-                new_variablewidget.hide()
-            if variable.name == '':
-                new_variablewidget.hide()
-            row_cmp = lambda x, y: cmp(x[1], y[1])
-            widget_coordinate_list.sort(row_cmp)
-            new_variablewidget.insert_into(self, self.MAX_COLS, ghost_top_row)
-            r = ghost_top_row + 1
-            for variablewidget, top_row in widget_coordinate_list:
-                if self._is_vwidget_optional_ghost(variablewidget):
-                    variablewidget.insert_into(self, self.MAX_COLS, r)
-                    r += 1
-            for child in self.get_children():
-                top_row = self.child_get(child, 'top_attach')[0]
+        self.reload_variable_widget(variable)
+
+    def _get_sorted_variables(self):
+        sort_key_vars = []
+        for v in self.panel_data + self.ghost_data:
+            sort_key = v.metadata.get("sort-key", "") + "~" + v.metadata["id"]
+            is_ghost = v in self.ghost_data
+            sort_key_vars.append((sort_key, v, is_ghost))
+        sort_key_vars.sort(
+               lambda x, y: rose.config.sort_settings(x[0], y[0]))
+        sort_key_vars.sort(lambda x, y: cmp("=null" in x[1].metadata["id"],
+                                            "=null" in y[1].metadata["id"]))
+        return [(x[1], x[2]) for x in sort_key_vars]
 
     def _is_var_compulsory(self, variable):
         comp_val = variable.metadata.get(rose.META_PROP_COMPULSORY)
@@ -237,32 +197,14 @@ class PageTable(gtk.Table):
 
     def _show_latent(self, should_show_latent=False):
         """Display or remove 'ghost' variables."""
-        max_normal_row = 0
         for child in self.get_children():
-            top_row = self.child_get(child, 'top_attach')[0]
-            if top_row > max_normal_row:
-                var = child.get_parent().variable
-                if not self._is_vwidget_optional_ghost(child.get_parent()):
-                    max_normal_row = top_row
-        ghost_row = max_normal_row + 1
-        if should_show_latent:
-            for variable in self.ghost_data:
-                if (variable.metadata.get(rose.META_PROP_COMPULSORY) ==
-                    rose.META_PROP_VALUE_TRUE):
-                    continue
-                variablewidget = rose.config_editor.variable.VariableWidget(
-                                                    variable,
-                                                    self.var_ops,
-                                                    is_ghost=True,
-                                                    show_modes=self.show_modes)
-                variablewidget.insert_into(self, self.MAX_COLS, ghost_row + 1)
-                variablewidget.set_sensitive(False)
-                ghost_row = ghost_row + 1
-        else:
-            for child in self.get_children():
-                top_row = self.child_get(child, 'top_attach')[0]
-                if top_row >= ghost_row:
-                    self.remove(child)
+            variablewidget = child.get_parent()
+            variable = variablewidget.variable
+            if variablewidget.is_ghost:
+                if should_show_latent:
+                    variablewidget.show()
+                elif not self._is_var_compulsory(variable):
+                    variablewidget.hide()
 
     def show_mode_change(self, mode, mode_on=False):
         done_variable_widgets = []
