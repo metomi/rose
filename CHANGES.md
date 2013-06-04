@@ -11,6 +11,16 @@ for a full listing of issues for each release.
 
 Changes that have significant impact on user experience.
 
+\#709: rose config-edit: now has a status bar and a console to view errors
+and information.
+
+\#707: rosie site/user configuration: Site administrator should take note. A
+new site/user configuration setting `[rosie-id]prefix-ws.PREFIX=URL` is
+introduced to configure the web service URL of each `PREFIX`.
+* The `[rosie-ws-client]ws-root-default=URL` site/user configuration setting is
+  removed.
+* The `--ws-root=URL` option is removed from `rosie lookup` and `rosie ls`.
+
 \#668: rose config-edit: support new configuration metadata `value-titles` to
 define a list of titles to associate with a corresponding `values` setting.
 
@@ -27,6 +37,9 @@ command. This may some minor change in behaviour of some existing suites as
 
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
+
+\#707: rosie site/user configuration: The `[rosie-browse]` section is now
+`[rosie-go]`.
 
 \#675: rose config-edit: The quoted widget no longer messes with the quote
 characters when a non-quote related error occurs.

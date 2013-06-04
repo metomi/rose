@@ -489,11 +489,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_false",
                         "dest": "web_browser_mode",
                         "default": True,
-                        "help": "Do not open web browser."}],
-               "ws_root": [
-                       ["--ws-root"],
-                       {"metavar": "URL",
-                        "help": "Specify the web service root URL."}]}
+                        "help": "Do not open web browser."}]}
 
     def __init__(self, *args, **kwargs):
         if hasattr(kwargs, "prog"):
