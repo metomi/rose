@@ -73,7 +73,8 @@ class NavPanelHandler(object):
             help_str = None
             config_name = None
         choices_help = self.data.helper.get_missing_sections(config_name)
-        config_names = [n for n in self.data.config]
+        
+        config_names = [n for n in self.data.config if not self.ask_is_preview(n)]
         config_names.sort(lambda x, y: (y == config_name) -(x == config_name))
         config_name, section = self.mainwindow.launch_add_dialog(
                                     config_names, choices_help, help_str)
