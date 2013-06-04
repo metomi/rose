@@ -926,6 +926,16 @@ meta=my-command/t123
     <p>Expressions are set as the value of metadata properties such as
     <samp>fail-if</samp> and <samp>range</samp>.</p>
 
+    <p>The language is a small sub-set of Python - a limited set of operators
+    is supported. No built-in object methods, functions, or modules are
+    supported - neither are control blocks such as
+    <samp>if</samp>/<samp>for</samp>, statements such as <samp>del</samp> or
+    <samp>with</samp>, or defining your own functions or classes. Anything that
+    requires that kind of power should be in proper Python code as a macro.</p>
+
+    <p>Nevertheless, the language allows considerable power in terms of
+    defining simple rules for variable values.</p>
+
     <h3 id="appendix-mini-language-operators">Operators</h3>
 
     <p>The following <em>numeric</em> operators are supported:</p>

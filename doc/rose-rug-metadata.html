@@ -82,7 +82,7 @@
         <li>rose config-edit</li>
 
         <li>rose macro</li>
-        
+
         <li>rose app-upgrade, rose stem</li>
       </ul>
     </div>
@@ -103,8 +103,8 @@
 
       <p>Metadata for <samp>rose-suite.conf</samp> (and
       <samp>rose-app.conf</samp>) settings can be <a href=
-      "rose-configuration-metadata.html">referenced</a> by the <samp>meta</samp>
-      flag in an app config, e.g.:</p>
+      "rose-configuration-metadata.html">referenced</a> by the
+      <samp>meta</samp> flag in an app config, e.g.:</p>
       <pre class="prettyprint lang-rose_conf">
 meta=rose-demo-upgrade/27.1
 </pre>
@@ -227,6 +227,15 @@ warn-if=this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
     </div>
 
     <div class="slide">
+      <h4 class="alwayshidden">Configuration Metadata - Logic Syntax
+      Reference</h4>
+
+      <p>For more information, see the <a href=
+      "rose-configuration-metadata.html#appendix-mini-language">reference
+      page</a>.</p>
+    </div>
+
+    <div class="slide">
       <h3 id="metadata-fancy-options">More Metadata Options</h3>
 
       <p>See <a href="rose-configuration-metadata.html">Metadata Reference</a>
@@ -264,13 +273,12 @@ warn-if=this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
       <dl>
         <dt><code>value-titles</code></dt>
 
-        <dd>Allows you to set a title to display for each of the values in 
+        <dd>Allows you to set a title to display for each of the values in
         <code>values</code> rather than the actual value e.g. for
         <samp>values=0, 1</samp> and <samp>value-titles=False, True</samp>
-        "False" is displayed instead of the value "0" and "True" is displayed 
-        instead of the value "1". The length of <code>value-titles</code> 
+        "False" is displayed instead of the value "0" and "True" is displayed
+        instead of the value "1". The length of <code>value-titles</code>
         should be the same as the length of <code>values</code>.</dd>
-
       </dl>
     </div>
 
@@ -302,7 +310,7 @@ fail-if=any(namelist:test=ctrl_array % this == 0)
         <dt><code>macro</code></dt>
 
         <dd>Used to associate a setting with a set of custom macros.</dd>
-      
+
         <dt><code>widget</code></dt>
 
         <dd>Used to set a custom or different built-in widget for the setting
@@ -441,9 +449,10 @@ Accept y/n (default n)?
       <p><code>rose stem</code> is a testing system for use with Rose. It
       provides a user-friendly way of defining source trees and tasks on the
       command line which are then passed by <code>rose stem</code> to the suite
-      as Jinja2 variables. There is a <a href="rose-rug-stem.html">User Guide
-      </a> section and an <a href="rose-rug-advanced-tutorials-rose-stem.html">
-      Advanced Tutorial</a> for <code>rose-stem</code>.</p>
+      as Jinja2 variables. There is a <a href="rose-rug-stem.html">User
+      Guide</a> section and an <a href=
+      "rose-rug-advanced-tutorials-rose-stem.html">Advanced Tutorial</a> for
+      <code>rose-stem</code>.</p>
     </div>
 
     <div class="slide">
