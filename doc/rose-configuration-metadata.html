@@ -922,7 +922,7 @@ meta=my-command/t123
 
     <p>The mini-language supports writing a logical expression in Python-like
     syntax, using variable ids to reference values.</p>
-    
+
     <p>Expressions are set as the value of metadata properties such as
     <samp>fail-if</samp> and <samp>range</samp>.</p>
 
@@ -1083,8 +1083,8 @@ any(namelist:foo=bar == 'e')
 all(namelist:foo=bar == 'e')
 </pre>
 
-    <p>evaluates true if <em>all</em> elements are <samp>'e'</samp>. Again, with the
-    above configuration, this would be expanded before proper
+    <p>evaluates true if <em>all</em> elements are <samp>'e'</samp>. Again,
+    with the above configuration, this would be expanded before proper
     evaluation:</p>
     <pre class="prettyprint lang-python">
 <samp>'a' == 'e' and 'b' == 'e' and 'c' == 'e' and 'd' == 'e'
@@ -1093,9 +1093,9 @@ all(namelist:foo=bar == 'e')
 
     <h3 id="appendix-mini-language-internals">Internals</h3>
 
-    <p>Rose uses an external engine to evaluate the raw language string
-    after variable ids and any <samp>any()</samp> and <samp>all()</samp>
-    functions have been substituted and expanded.</p>
+    <p>Rose uses an external engine to evaluate the raw language string after
+    variable ids and any <samp>any()</samp> and <samp>all()</samp> functions
+    have been substituted and expanded.</p>
 
     <p>The current choice of engine is <a href=
     "http://jinja.pocoo.org/docs/">Jinja2</a>, which is responsible for the
