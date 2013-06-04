@@ -76,7 +76,12 @@ TOP_MENU_VIEW_USER_IGNORED_VARS = "View _User Ignored Variables"
 TOP_MENU_VIEW_LATENT_PAGES = "View Latent _Pages"
 TOP_MENU_VIEW_IGNORED_PAGES = "View All _Ignored Pages"
 TOP_MENU_VIEW_USER_IGNORED_PAGES = "View _User Ignored Pages"
-TOP_MENU_VIEW_WITHOUT_TITLES = "Hide _Titles"
+TOP_MENU_VIEW_WITHOUT_DESCRIPTIONS = "Hide Variable Descriptions"
+TOP_MENU_VIEW_WITHOUT_HELP = "Hide Variable Help"
+TOP_MENU_VIEW_WITHOUT_TITLES = "Hide Variable _Titles"
+TOP_MENU_VIEW_CUSTOM_DESCRIPTIONS = "Use Custom _Description Format"
+TOP_MENU_VIEW_CUSTOM_HELP = "Use Custom _Help Format"
+TOP_MENU_VIEW_CUSTOM_TITLES = "Use Custom _Title Format"
 TOP_MENU_VIEW_FLAG_OPT_CONF_VARS = "Flag Opt _Config Variables"
 TOP_MENU_VIEW_FLAG_OPTIONAL_VARS = "Flag _Optional Variables"
 TOP_MENU_VIEW_FLAG_NO_METADATA_VARS = "Flag _No-metadata Variables"
@@ -92,6 +97,7 @@ TOP_MENU_METADATA_CHECK = "_Check fail-if, warn-if"
 TOP_MENU_METADATA_MACRO_ALL_V = "Check All _Validator Macros"
 TOP_MENU_METADATA_MACRO_AUTOFIX = "_Auto-fix all configurations"
 TOP_MENU_METADATA_MACRO_CONFIG = "{0}"
+TOP_MENU_METADATA_PREFERENCES = "Layout _Preferences"
 TOP_MENU_METADATA_REFRESH = "_Refresh Metadata"
 TOP_MENU_METADATA_SWITCH_OFF = "_Switch off Metadata"
 TOP_MENU_TOOLS = "_Tools"
@@ -277,6 +283,9 @@ FILE_TYPE_TOP = "suite"
 META_PROP_INTERNAL = "_internal"
 
 # Setting visibility modes
+SHOW_MODE_CUSTOM_DESCRIPTION = "custom-description"
+SHOW_MODE_CUSTOM_HELP = "custom-help"
+SHOW_MODE_CUSTOM_TITLE = "custom-title"
 SHOW_MODE_FIXED = "fixed"
 SHOW_MODE_FLAG_NO_META = "flag:no-meta"
 SHOW_MODE_FLAG_OPT_CONF = "flag:optional-conf"
@@ -284,8 +293,13 @@ SHOW_MODE_FLAG_OPTIONAL = "flag:optional"
 SHOW_MODE_IGNORED = "ignored"
 SHOW_MODE_USER_IGNORED = "user-ignored"
 SHOW_MODE_LATENT = "latent"
+SHOW_MODE_NO_DESCRIPTION = "description"
+SHOW_MODE_NO_HELP = "help"
 SHOW_MODE_NO_TITLE = "title"
 
+SHOULD_SHOW_CUSTOM_DESCRIPTION = False
+SHOULD_SHOW_CUSTOM_HELP = False
+SHOULD_SHOW_CUSTOM_TITLE = False
 SHOULD_SHOW_FLAG_NO_META_VARS = False
 SHOULD_SHOW_FLAG_OPT_CONF_VARS = True
 SHOULD_SHOW_FLAG_OPTIONAL_VARS = False
@@ -297,9 +311,19 @@ SHOULD_SHOW_USER_IGNORED_PAGES = True
 SHOULD_SHOW_USER_IGNORED_VARS = True
 SHOULD_SHOW_LATENT_PAGES = False
 SHOULD_SHOW_LATENT_VARS = False
+SHOULD_SHOW_NO_DESCRIPTION = False
+SHOULD_SHOW_NO_HELP = True
 SHOULD_SHOW_NO_TITLE = False
-
 SHOULD_SHOW_STATUS_BAR = True
+
+# Metadata representation strings:
+#     {name} gets replaced with the data/metadata property name.
+# For example, you may want to have the description format as:
+#     "{name} - {description}"
+
+CUSTOM_FORMAT_DESCRIPTION = "{name}: {description}"
+CUSTOM_FORMAT_HELP = "{title}\n\n{help}"
+CUSTOM_FORMAT_TITLE = "{title} ({name})"
 
 # Window sizes
 WIDTH_TREE_PANEL = 256
@@ -497,7 +521,7 @@ TREE_PANEL_ERRORS = " ({0} errors)"
 TREE_PANEL_MODIFIED = " (modified)"
 TERMINAL_TIP_CLOSE = "Close terminal"
 VAR_COMMENT_TIP = "# {0}"
-VAR_FLAG_MARKUP = "<span size='x-small'>{0}</span>"
+VAR_FLAG_MARKUP = "<span size='small'>{0}</span>"
 VAR_FLAG_TIP_FIXED = "Fixed variable (only one allowed value)"
 VAR_FLAG_TIP_NO_META = "Flag: no metadata"
 VAR_FLAG_TIP_OPT_CONF = "Optional conf overrides:\n{0}"

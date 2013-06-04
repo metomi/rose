@@ -48,13 +48,16 @@ class VariableWidget(object):
 
     """
 
-    def __init__(self, variable, var_ops, is_ghost=False, show_modes={}):
+    def __init__(self, variable, var_ops, is_ghost=False, show_modes=None):
         self.variable = variable
         self.key = variable.name
         self.value = variable.value
         self.meta = variable.metadata
         self.is_ghost = is_ghost
         self.var_ops = var_ops
+        if show_modes is None:
+            show_modes = {}
+        self.show_modes = show_modes
         self.insensitive_colour = gtk.Style().bg[0]
         self.bad_colour = gtk.gdk.color_parse(
                         rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
@@ -415,10 +418,18 @@ class VariableWidget(object):
 
     def launch_help(self, text_or_url=None):
         if text_or_url is None:
-            if 'help' in self.meta:
-                text_or_url = self.meta['help']
+            if rose.META_PROP_HELP in self.meta:
+                text_or_url = None
+                if self.show_modes.get(
+                             rose.config_editor.SHOW_MODE_CUSTOM_HELP):
+                    format_string = rose.config_editor.CUSTOM_FORMAT_HELP
+                    text_or_url = rose.variable.expand_format_string(
+                                                       format_string,
+                                                       self.variable)
+                if text_or_url is None:
+                    text_or_url = self.meta[rose.META_PROP_HELP]
             elif 'url' in self.meta:
-                text_or_url = self.meta['url']
+                text_or_url = self.meta[rose.META_PROP_URL]
             else:
                 return
         if (text_or_url.startswith('http://') or
