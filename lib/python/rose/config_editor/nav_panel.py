@@ -487,10 +487,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def popup_menu(self, path, event):
         """Launch a popup menu for add/clone/remove."""
-        if path is None or len(path) <= 1:
-            path_name = None
+        if path:
+            path_name = "/" + self.get_name(path)        
         else:
-            path_name = "/" + self.get_name(path)
+            path_name = None
         return self._popup_menu_func(path_name, event)
 
     def collapse_reset(self):
