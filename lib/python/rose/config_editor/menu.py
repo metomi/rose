@@ -814,7 +814,7 @@ class MainMenuHandler(object):
         if not any([c.is_top_level for c in self.data.config.values()]):
             rose.gtk.util.run_dialog(
                      rose.gtk.util.DIALOG_TYPE_ERROR,
-                     rose.config_editor.ERROR_SUITE_RUN,
+                     rose.config_editor.ERROR_SUITE_RUN_INVALID,
                      title=rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR)
             return False
         if not isinstance(args, list):
