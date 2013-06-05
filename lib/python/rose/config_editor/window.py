@@ -116,6 +116,7 @@ class MainWindow(object):
                                          gtk.RESPONSE_REJECT,
                                          gtk.STOCK_OK,
                                          gtk.RESPONSE_ACCEPT))
+        ok_button = add_dialog.action_area.get_children()[0]
         config_label = gtk.Label(rose.config_editor.DIALOG_BODY_ADD_CONFIG)
         config_label.show()
         label = gtk.Label(rose.config_editor.DIALOG_BODY_ADD_SECTION)
@@ -136,13 +137,16 @@ class MainWindow(object):
         choices = []
         self._reload_choices(liststore, names[0], add_choices)
         section_box.show()
-        config_name_box.connect('changed',
+        config_name_box.connect("changed",
                                 lambda c: self._reload_choices(
                                             liststore,
                                             names[c.get_active()],
                                             add_choices))
-        section_box.connect('activate',
+        section_box.connect("activate",
                             lambda s: add_dialog.response(gtk.RESPONSE_OK))
+        section_box.connect("changed",
+                            lambda s: ok_button.set_sensitive(
+                                                    bool(s.get_text())))
         vbox = gtk.VBox(spacing=10)
         vbox.pack_start(config_label, expand=False, fill=False, padding=5)
         vbox.pack_start(config_name_box, expand=False, fill=False, padding=5)
@@ -156,6 +160,7 @@ class MainWindow(object):
         section_box.grab_focus()
         section_box.set_position(-1)
         section_completion.complete()
+        ok_button.set_sensitive(bool(section_box.get_text()))
         response = add_dialog.run()
         if response in [gtk.RESPONSE_OK, gtk.RESPONSE_YES,
                         gtk.RESPONSE_ACCEPT]:

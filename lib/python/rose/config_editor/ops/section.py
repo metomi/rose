@@ -64,6 +64,11 @@ class SectionOperations(object):
         config_data = self.__data.config[config_name]
         new_section_data = None
         was_latent = False
+        if not section or section in config_data.sections.now:
+            self.__reporter.report(
+                        rose.config_editor.ERROR_SECTION_ADD.format(section),
+                        self.__reporter.KIND_ERR)
+            return False
         if section in config_data.sections.latent:
             new_section_data = config_data.sections.latent.pop(section)
             was_latent = True
