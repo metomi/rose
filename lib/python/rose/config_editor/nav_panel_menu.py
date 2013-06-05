@@ -57,6 +57,7 @@ class NavPanelHandler(object):
         """Handle an add section dialog and request."""
         if base_ns is not None and '/' in base_ns:
             config_name, subsp = self.util.split_full_ns(self.data, base_ns)
+            config_data = self.data.config[config_name]
             if config_name == base_ns:
                 help_str = ''
             else:
@@ -66,9 +67,11 @@ class NavPanelHandler(object):
                     help_str = subsp.replace('/', ':')
                 else:
                     help_str = sections[0]
-                help_str = help_str + ':'
-                if help_str.count(':') > 1:
-                    help_str = help_str.split(':', 1)[0] + ':'
+                help_str = help_str.split(':', 1)[0]
+                for config_section in (config_data.sections.now.keys() +
+                                       config_data.sections.latent.keys()):
+                    if config_section.startswith(help_str + ":"):
+                        help_str = help_str + ":"
         else:
             help_str = None
             config_name = None
