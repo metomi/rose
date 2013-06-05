@@ -811,12 +811,6 @@ class MainMenuHandler(object):
 
     def run_suite(self, args=None, **kwargs):
         """Run the suite, if possible."""
-        if not any([c.is_top_level for c in self.data.config.values()]):
-            rose.gtk.util.run_dialog(
-                     rose.gtk.util.DIALOG_TYPE_ERROR,
-                     rose.config_editor.ERROR_SUITE_RUN,
-                     title=rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR)
-            return False
         if not isinstance(args, list):
             args = []
         for key, value in kwargs.items():
