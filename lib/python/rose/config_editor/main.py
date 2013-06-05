@@ -1194,11 +1194,12 @@ class MainController(object):
         # Alter sensitivity of 'unsaved changes' related widgets.
         self.toolbar.set_widget_sensitive('Save', is_changed)
         self._get_menu_widget('/Save').set_sensitive(is_changed)
-        self._toolbar_run_button.set_sensitive(not is_changed)
+        is_top = any([v.is_top_level for v in self.data.config.values()])
+        self._toolbar_run_button.set_sensitive(is_top and not is_changed)
         self._get_menu_widget('/Run Suite custom').set_sensitive(
-                                                       not is_changed)
+                                                    is_top and not is_changed)
         self._get_menu_widget('/Run Suite default').set_sensitive(
-                                                        not is_changed)
+                                                    is_top and not is_changed)
 
     def _refresh_metadata_if_on(self, config_name=None):
         if not self.metadata_off:
