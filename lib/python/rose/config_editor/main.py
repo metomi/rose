@@ -348,8 +348,6 @@ class MainController(object):
                           menu_funcs=[self.main_handle.get_run_suite_args],
                           tip_text=rose.config_editor.TOOLBAR_SUITE_RUN)
         self._toolbar_run_button.connect("clicked", self.main_handle.run_suite)
-        self._toolbar_run_button.set_sensitive(
-              any([c.is_top_level for c in self.data.config.values()]))
         self.toolbar.insert(self._toolbar_run_button, -1)
         
         self.toolbar.set_widget_sensitive(
@@ -1194,12 +1192,11 @@ class MainController(object):
         # Alter sensitivity of 'unsaved changes' related widgets.
         self.toolbar.set_widget_sensitive('Save', is_changed)
         self._get_menu_widget('/Save').set_sensitive(is_changed)
-        is_top = any([c.is_top_level for c in self.data.config.values()])
-        self._toolbar_run_button.set_sensitive(is_top and not is_changed)
+        self._toolbar_run_button.set_sensitive(not is_changed)
         self._get_menu_widget('/Run Suite custom').set_sensitive(
-                                                    is_top and not is_changed)
+                                                       not is_changed)
         self._get_menu_widget('/Run Suite default').set_sensitive(
-                                                    is_top and not is_changed)
+                                                        not is_changed)
 
     def _refresh_metadata_if_on(self, config_name=None):
         if not self.metadata_off:
