@@ -53,6 +53,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self._get_metadata_comments_func = get_metadata_comments_func
         self._popup_menu_func = popup_menu_func
         self._ask_can_show_func = ask_can_show_func
+        self._ask_is_preview = ask_is_preview
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_OUT)
         self.panel_top = gtk.TreeViewColumn()
