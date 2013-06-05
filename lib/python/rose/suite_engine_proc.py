@@ -278,12 +278,24 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_suite_events(self, suite_name, log_archive_threshold=None):
-        """Get suite events.
-        Return a data structure that looks like:
+    def get_suite_events(self, suite_name, task_ids=None,
+                         log_archive_threshold=None):
+        """Get suite task events.
+
+        suite_name -- The name of the suite.
+        task_ids -- A list of relevant task IDs. Only suite task events for
+                    tasks in this list are returned. Cannot be specified with
+                    log_archive_threshold.
+        log_archive_threshold -- A cycle time. Only suite task events for tasks
+                                 (with unarchived job logs) at this cycle time
+                                 or before this cycle time are returned. Cannot
+                                 be specified with task_ids.
+
+        Assume current working directory is suite's log directory.
+
+        Return a  data structure that looks like:
         {   <cycle time string>: {
                 "cycle_time": <cycle time>,
-                "is_archived": True, # if job logs of this cycle are archived
                 "tasks": {
                     <task name>: [
                         {   "events": {
@@ -302,10 +314,10 @@ class SuiteEngineProcessor(object):
                         },
                         # ... more re-submits of the task
                     ],
-                    # ... more task names
+                    # ... more relevant task names
                 }
             }
-            # ... more cycle times
+            # ... more relevant cycle times
         }
         """
         raise NotImplementedError()

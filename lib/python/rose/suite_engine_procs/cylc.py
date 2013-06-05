@@ -44,6 +44,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
+    CYCLE_LOG_ARCHIVE_PREFIX = "job-"
+    CYCLE_LOG_ARCHIVE_SUFFIX = ".tar.gz"
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "submit-fail",
               "started": "init",
@@ -198,7 +200,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def get_cycle_log_archive_name(self, cycle_time):
         """Return the jobs log archive file name of a given cycle time."""
-        return "job-" + cycle_time + ".tar.gz"
+        return (self.CYCLE_LOG_ARCHIVE_PREFIX + cycle_time +
+                self.CYCLE_LOG_ARCHIVE_SUFFIX)
 
     def get_suite_db_file(self, suite_name):
         """Return the path to the suite runtime database file."""
@@ -212,12 +215,18 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
-    def get_suite_events(self, suite_name, task_ids):
+    def get_suite_events(self, suite_name, task_ids=None,
+                         log_archive_threshold=None):
         """Parse the cylc suite running database for task events.
 
         suite_name -- The name of the suite.
-        task_ids -- A list of relevant task IDs. If empty or None, all tasks
-                    are relevant.
+        task_ids -- A list of relevant task IDs. Only suite task events for
+                    tasks in this list are returned. Cannot be specified with
+                    log_archive_threshold.
+        log_archive_threshold -- A cycle time. Only suite task events for tasks
+                                 (with unarchived job logs) at this cycle time
+                                 or before this cycle time are returned. Cannot
+                                 be specified with task_ids.
 
         Assume current working directory is suite's log directory.
 
@@ -252,19 +261,31 @@ class CylcProcessor(SuiteEngineProcessor):
         # Read task events from suite runtime database
         where = ""
         where_args = []
-        for task_id in task_ids:
-            cycle = None
-            if self.TASK_ID_DELIM in task_id:
-                name, cycle = task_id.split(self.TASK_ID_DELIM, 1)
-                where_args += [name, cycle]
-            else:
-                where_args.append(task_id)
-            if where:
-                where += " OR"
-            where += " (name=?"
-            if cycle is not None:
-                where += " AND cycle=?"
-            where += ")"
+        if task_ids:
+            for task_id in task_ids:
+                cycle = None
+                if self.TASK_ID_DELIM in task_id:
+                    name, cycle = task_id.split(self.TASK_ID_DELIM, 1)
+                    where_args += [name, cycle]
+                else:
+                    where_args.append(task_id)
+                if where:
+                    where += " OR"
+                where += " (name==?"
+                if cycle is not None:
+                    where += " AND cycle==?"
+                where += ")"
+        elif log_archive_threshold:
+            for name in glob(self.get_cycle_log_archive_name("*")):
+                cycle = name[len(self.CYCLE_LOG_ARCHIVE_PREFIX) :
+                             -len(self.CYCLE_LOG_ARCHIVE_SUFFIX)]
+                # FIXME: leakage of concerns here
+                data_file_name = "rose-suite-log-view-" + cycle + ".json"
+                if not os.path.exists(data_file_name):
+                    if where:
+                        where += " OR"
+                    where += " cycle==?"
+                    where_args.append(cycle)
         if where:
             where = " WHERE" + where
         rows = []
@@ -272,6 +293,8 @@ class CylcProcessor(SuiteEngineProcessor):
             try:
                 conn = sqlite3.connect(self.get_suite_db_file(suite_name))
                 c = conn.cursor()
+                print where
+                print where_args
                 rows = c.execute(
                         "SELECT time,name,cycle,submit_num,event,message" +
                         " FROM task_events" +

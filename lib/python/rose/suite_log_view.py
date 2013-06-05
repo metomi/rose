@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import errno
 from glob import glob
 import json
 import os
@@ -110,25 +111,30 @@ class SuiteLogViewGenerator(object):
         cwd = os.getcwd()
         if suite_log_dir is not None:
             self.fs_util.chdir(suite_log_dir)
-        lock = os.path.join(os.getcwd(), self.LOCK)
         try:
-            os.mkdir(lock)
-        except OSError:
-            self.handle_event(LockEvent(lock))
-            return
+            lock = os.path.join(os.getcwd(), self.LOCK)
+            try:
+                os.mkdir(lock)
+            except OSError:
+                self.handle_event(LockEvent(lock))
+                return
+            finally:
+                if task_ids:
+                    for task_id in task_ids:
+                        self.fs_util.touch(os.path.join(lock, task_id))
+                elif full_mode or log_archive_threshold:
+                    self.fs_util.touch(os.path.join(lock, "." + self.NS))
+            while os.path.isdir(lock):
+                try:
+                    self._generate(suite_name, full_mode, log_archive_threshold)
+                finally:
+                    # FIXME: but what if a lock is left behind?
+                    try:
+                        os.rmdir(lock)
+                    except OSError as e:
+                        if e.errno != errno.ENOTEMPTY:
+                            raise e
         finally:
-            if task_ids:
-                for task_id in task_ids:
-                    self.fs_util.touch(os.path.join(lock, task_id))
-        try:
-            if full_mode or log_archive_threshold:
-                self._generate(suite_name, full_mode, log_archive_threshold)
-            while os.listdir(lock):
-                self._generate(suite_name, full_mode, log_archive_threshold)
-        finally:
-            for name in os.listdir(lock):
-                os.unlink(os.path.join(lock, name))
-            os.rmdir(lock)
             try:
                 self.fs_util.chdir(cwd)
             except OSError:
@@ -162,10 +168,19 @@ class SuiteLogViewGenerator(object):
                                                   name, source))
                 os.utime(name, None)
 
-        # (Re-)Create view data file
+        # Remove view data files, where necessary
         if full_mode:
             for p in glob(self.NS + "*.json"):
                 self.fs_util.delete(p)
+        elif log_archive_threshold:
+            for p in glob(self.NS + "-*.json"):
+                cycle = p[len(self.NS) + 1:-len(".json")]
+                arch = self.suite_engine_proc.get_cycle_log_archive_name(cycle)
+                if cycle <= log_archive_threshold and not os.path.exists(arch):
+                    self.fs_util.delete(p)
+            self.suite_engine_proc.archive_job_logs(suite_name,
+                                                    log_archive_threshold)
+        # (Re-)Create view data file
         main_data_dump_path = self.NS + ".json"
         main_data = {"suite": suite_name,
                      "suite_info": {},
@@ -184,17 +199,20 @@ class SuiteLogViewGenerator(object):
                         main_data["suite_info"][key] = node.value
         suite_db_file = self.suite_engine_proc.get_suite_db_file(suite_name)
         if os.path.exists(suite_db_file):
-            while True:
-                task_ids = os.listdir(self.LOCK)
-                if not task_ids and glob(self.NS + "-*.json"):
-                    break
-                for name in task_ids:
+            names = os.listdir(self.LOCK)
+            has_done_nothing = True
+            while names or has_done_nothing:
+                task_ids = []
+                for name in names:
+                    if name != "." + self.NS:
+                        task_ids.append(name)
                     self.fs_util.delete(os.path.join(self.LOCK, name))
-                self.suite_engine_proc.update_job_log(suite_name, task_ids)
-                data = self.suite_engine_proc.get_suite_events(suite_name,
-                                                               task_ids)
-                if not data:
-                    break
+                if task_ids:
+                    self.suite_engine_proc.update_job_log(suite_name, task_ids)
+                data = self.suite_engine_proc.get_suite_events(
+                        suite_name,
+                        task_ids=task_ids,
+                        log_archive_threshold=log_archive_threshold)
                 for cycle_time, new_datum in data.items():
                     cycle_time_f_name = self.NS + "-" + cycle_time + ".json"
                     if os.access(cycle_time_f_name, os.F_OK | os.R_OK):
@@ -205,9 +223,8 @@ class SuiteLogViewGenerator(object):
                     json.dump(datum, open(cycle_time_f_name, "wb"), indent=0)
                     self.handle_event(
                             FileSystemEvent("update", cycle_time_f_name))
-        if log_archive_threshold:
-            self.suite_engine_proc.archive_job_logs(suite_name,
-                                                    log_archive_threshold)
+                names = os.listdir(self.LOCK)
+                has_done_nothing = False
         for name in glob(self.NS + "-*.json"):
             cycle = name[len(self.NS) + 1 : -len(".json")]
             p = self.suite_engine_proc.get_cycle_log_archive_name(cycle)
