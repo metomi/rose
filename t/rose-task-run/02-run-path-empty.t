@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose task-run" and "rose task-env", without site/user configurations.
+# Test "rose task-run --path=", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 export ROSE_CONF_IGNORE=true
 
 #-------------------------------------------------------------------------------
-tests 43
+tests 5
 #-------------------------------------------------------------------------------
 # Run the suite.
 TEST_KEY=$TEST_KEY_BASE
@@ -47,47 +47,13 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-MY_PATH=
-for P in $(ls -d $SUITE_RUN_DIR/etc/my-path/*); do
-    if [[ -n $MY_PATH ]]; then
-        MY_PATH="$P:$MY_PATH"
-    else
-        MY_PATH="$P"
-    fi
-done
-if [[ -d $SUITE_RUN_DIR/etc/your-path ]]; then
-    if [[ -n $MY_PATH ]]; then
-        MY_PATH="$SUITE_RUN_DIR/etc/your-path:$MY_PATH"
-    else
-        MY_PATH="$SUITE_RUN_DIR/etc/your-path"
-    fi
-fi
+MY_PATH="$SUITE_RUN_DIR/etc/your-path"
 PREV_CYCLE=
 for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
     TASK=my_task_1
     FILE=$HOME/cylc-run/$NAME/log/job/$TASK.$CYCLE.1.txt
-    file_test "$TEST_KEY" $FILE
-    file_grep "$TEST_KEY-ROSE_SUITE_DIR" "ROSE_SUITE_DIR=$SUITE_RUN_DIR" $FILE
-    file_grep "$TEST_KEY-ROSE_SUITE_DIR_REL" \
-        "ROSE_SUITE_DIR_REL=${SUITE_RUN_DIR#$HOME/}" $FILE
-    file_grep "$TEST_KEY-ROSE_SUITE_NAME" "ROSE_SUITE_NAME=$NAME" $FILE
-    file_grep "$TEST_KEY-ROSE_TASK_NAME" "ROSE_TASK_NAME=$TASK" $FILE
-    file_grep "$TEST_KEY-ROSE_TASK_CYCLE_TIME" \
-        "ROSE_TASK_CYCLE_TIME=$CYCLE" $FILE
-    file_grep "$TEST_KEY-ROSE_TASK_LOG_ROOT" \
-        "ROSE_TASK_LOG_ROOT=${FILE%.txt}" $FILE
-    file_grep "$TEST_KEY-ROSE_DATA" "ROSE_DATA=$SUITE_RUN_DIR/share/data" $FILE
-    file_grep "$TEST_KEY-ROSE_DATAC" \
-        "ROSE_DATAC=$SUITE_RUN_DIR/share/data/$CYCLE" $FILE
-    if [[ -n $PREV_CYCLE ]]; then
-        file_grep "$TEST_KEY-ROSE_DATACT12H" \
-            "ROSE_DATACT12H=$SUITE_RUN_DIR/share/data/$PREV_CYCLE" $FILE
-    fi
-    file_grep "$TEST_KEY-ROSE_ETC" "ROSE_ETC=$SUITE_RUN_DIR/etc" $FILE
-    file_grep "$TEST_KEY-ROSE_TASK_PREFIX" "ROSE_TASK_PREFIX=my" $FILE
-    file_grep "$TEST_KEY-ROSE_TASK_SUFFIX" "ROSE_TASK_SUFFIX=1" $FILE
-    file_grep "$TEST_KEY-MY_PATH" "MY_PATH=$MY_PATH" $FILE
+    file_grep "$TEST_KEY-PATH" "PATH=$SUITE_RUN_DIR/app/$TASK/bin:$SUITE_RUN_DIR/etc/your-path" $FILE
     PREV_CYCLE=$CYCLE
 done
 #-------------------------------------------------------------------------------
