@@ -86,7 +86,7 @@ class NavPanelHandler(object):
         try:        
             config_name = self.util.split_full_ns(self.data, namespace)[0]
             config_data = self.data.config[config_name]
-            return config_data.preview
+            return config_data.is_preview
         except KeyError:
             print config_name
             return False
@@ -276,7 +276,7 @@ class NavPanelHandler(object):
         else:
             namespace = "/" + base_ns.lstrip("/")
         
-        if self.data.config[namespace].preview:
+        if self.data.config[namespace].is_preview:
             return False    
             
         ui_config_string = """<ui> <popup name='Popup'>"""

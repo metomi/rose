@@ -583,7 +583,7 @@ class MainController(object):
         config_name = self.util.split_full_ns(self.data, namespace_name)[0]
         config_data = self.data.config[config_name]
         
-        if config_data.preview:
+        if config_data.is_preview:
             self.reporter.report_load_event(
                        rose.config_editor.EVENT_LOAD_ATTEMPT.format(
                        namespace_name), 
@@ -998,7 +998,7 @@ class MainController(object):
         if only_config_name is None:
             config_names = []
             for c in self.data.config.keys():
-                if not self.data.config[c].preview:
+                if not self.data.config[c].is_preview:
                     config_names.append(c)
         else:
             config_names = [only_config_name]

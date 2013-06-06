@@ -162,7 +162,7 @@ class ConfigData(object):
         self.is_discovery = is_disc
         self.vars = var_data
         self.sections = sect_data
-        self.preview = is_preview
+        self.is_preview = is_preview
 
 
 class ConfigDataManager(object):
