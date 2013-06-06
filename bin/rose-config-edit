@@ -26,6 +26,9 @@
 # DESCRIPTION
 #     Launch the GTK+ GUI to edit a suite or application configuration.
 #
+#     If a suite contains more than 10 applications then they will be loaded 
+#     into config edit on demand.
+#
 # OPTIONS
 #     --config=DIR; -C DIR
 #        A path to either
@@ -36,6 +39,10 @@
 #        2) a directory containing a single 'application' - a file named
 #           'rose-app.conf' and an optional subdirectory called 'file'
 #           with other application files.
+#     --load-all-apps
+#        Force loading of all applications on startup.
+#     --load-on-demand
+#        Load applications in the suite on demand.
 #     --meta-path=PATH; -M PATH
 #        Prepend PATH to the search path for metadata (look here first).
 #        This option can be used repeatedly to load multiple paths.

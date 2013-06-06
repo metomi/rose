@@ -556,6 +556,9 @@
     <h3>DESCRIPTION</h3>
 
     <p>Launch the GTK+ GUI to edit a suite or application configuration.</p>
+    
+    <p>If a suite contains more than 10 applications then they will be loaded 
+    into config-edit on demand.</p>
 
     <h3>OPTIONS</h3>
 
@@ -576,6 +579,14 @@
           <var>file</var> with other application files.</li>
         </ol>
       </dd>
+
+      <dt><kbd>--load-all-apps</kbd></dt>
+      
+      <dd>Force loading of all applications on startup.</dd>
+
+      <dt><kbd>--load-on-demand</kbd></dt>
+      
+      <dd>Load applications in the suite on demand.</dd>
 
       <dt><kbd>--meta-path=PATH; -M PATH</kbd></dt>
 
