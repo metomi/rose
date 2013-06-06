@@ -350,8 +350,6 @@ class MainController(object):
                           menu_funcs=[self.main_handle.get_run_suite_args],
                           tip_text=rose.config_editor.TOOLBAR_SUITE_RUN)
         self._toolbar_run_button.connect("clicked", self.main_handle.run_suite)
-        self._toolbar_run_button.set_sensitive(
-              any([c.is_top_level for c in self.data.config.values()]))
         self.toolbar.insert(self._toolbar_run_button, -1)
         
         self.toolbar.set_widget_sensitive(

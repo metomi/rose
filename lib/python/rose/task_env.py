@@ -80,7 +80,7 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=[],
         for name, path_globs in PATH_GLOBS.items():
             path_globs_map[name] = path_globs
     for path_glob_arg in path_glob_args:
-        if not path_glob_arg:
+        if path_glob_arg is None:
             continue
         if "=" in path_glob_arg:
             name, value = path_glob_arg.split("=", 1)
@@ -110,6 +110,8 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=[],
             prepend_paths_map[name].extend(more_prepend_paths)
         elif more_prepend_paths:
             prepend_paths_map[name] = more_prepend_paths
+    for key, prepend_paths in prepend_paths_map.items():
+        prepend_paths.reverse()
 
     return prepend_paths_map
 

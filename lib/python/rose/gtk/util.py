@@ -43,10 +43,10 @@ import rose.resource
 
 DIALOG_BUTTON_CLOSE = "Close"
 DIALOG_LABEL_README = "README"
-REC_DIALOG_HYPERLINK_ID_OR_URL = re.compile(r"""(?P<start_break>\b)
-                                            (?P<url>[\w:-]+=\w+|https?://\S+)
-                                            (?P<end_break>\b)""",
-                                            re.X)
+REC_DIALOG_HYPERLINK_ID_OR_URL = re.compile(
+                     r"""(?P<start_break>\b)
+                         (?P<url>[\w:-]+=\w+|https?://[^\s<]+)
+                         (?P<end_break>\b)""", re.X)
 DIALOG_MARKUP_URL_HTML = (r"""\g<start_break>""" +
                           r"""<a href='\g<url>'>\g<url></a>""" + 
                           r"""\g<end_break>""")
