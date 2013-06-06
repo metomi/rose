@@ -169,6 +169,7 @@ class SuiteLogViewGenerator(object):
                 os.utime(name, None)
 
         # Remove view data files, where necessary
+        archived_cycles = []
         if full_mode:
             for p in glob(self.NS + "*.json"):
                 self.fs_util.delete(p)
@@ -177,6 +178,7 @@ class SuiteLogViewGenerator(object):
                 cycle = p[len(self.NS) + 1:-len(".json")]
                 arch = self.suite_engine_proc.get_cycle_log_archive_name(cycle)
                 if cycle <= log_archive_threshold and not os.path.exists(arch):
+                    archived_cycles.append(cycle)
                     self.fs_util.delete(p)
             self.suite_engine_proc.archive_job_logs(suite_name,
                                                     log_archive_threshold)
@@ -201,6 +203,7 @@ class SuiteLogViewGenerator(object):
         if os.path.exists(suite_db_file):
             names = os.listdir(self.LOCK)
             has_done_nothing = True
+            data = {}
             while names or has_done_nothing:
                 task_ids = []
                 for name in names:
@@ -209,22 +212,26 @@ class SuiteLogViewGenerator(object):
                     self.fs_util.delete(os.path.join(self.LOCK, name))
                 if task_ids:
                     self.suite_engine_proc.update_job_log(suite_name, task_ids)
-                data = self.suite_engine_proc.get_suite_events(
+                new_data = self.suite_engine_proc.get_suite_events(
                         suite_name,
                         task_ids=task_ids,
-                        log_archive_threshold=log_archive_threshold)
-                for cycle_time, new_datum in data.items():
-                    cycle_time_f_name = self.NS + "-" + cycle_time + ".json"
-                    if os.access(cycle_time_f_name, os.F_OK | os.R_OK):
-                        datum = json.load(open(cycle_time_f_name))
-                        datum["tasks"].update(new_datum["tasks"])
+                        cycles=archived_cycles)
+                for cycle, new_datum in new_data.items():
+                    cycle_f_name = self.NS + "-" + cycle + ".json"
+                    if cycle in data:
+                        data[cycle]["tasks"].update(new_datum["tasks"])
+                    elif os.access(cycle_f_name, os.F_OK | os.R_OK):
+                        data[cycle] = json.load(open(cycle_f_name))
+                        data[cycle]["tasks"].update(new_datum["tasks"])
                     else:
-                        datum = new_datum
-                    json.dump(datum, open(cycle_time_f_name, "wb"), indent=0)
-                    self.handle_event(
-                            FileSystemEvent("update", cycle_time_f_name))
+                        data[cycle] = new_datum
                 names = os.listdir(self.LOCK)
+                archived_cycles = []
                 has_done_nothing = False
+            for cycle, datum in data.items():
+                cycle_f_name = self.NS + "-" + cycle + ".json"
+                json.dump(datum, open(cycle_f_name, "wb"), indent=0)
+                self.handle_event(FileSystemEvent("update", cycle_f_name))
         for name in glob(self.NS + "-*.json"):
             cycle = name[len(self.NS) + 1 : -len(".json")]
             p = self.suite_engine_proc.get_cycle_log_archive_name(cycle)

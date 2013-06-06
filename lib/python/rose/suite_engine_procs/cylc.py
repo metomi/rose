@@ -215,18 +215,14 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
-    def get_suite_events(self, suite_name, task_ids=None,
-                         log_archive_threshold=None):
+    def get_suite_events(self, suite_name, cycles=None, task_ids=None):
         """Parse the cylc suite running database for task events.
 
         suite_name -- The name of the suite.
+        cycles -- A list of relevant cycle times. Only suite task events for
+                  tasks in the specified cycles are retured.
         task_ids -- A list of relevant task IDs. Only suite task events for
-                    tasks in this list are returned. Cannot be specified with
-                    log_archive_threshold.
-        log_archive_threshold -- A cycle time. Only suite task events for tasks
-                                 (with unarchived job logs) at this cycle time
-                                 or before this cycle time are returned. Cannot
-                                 be specified with task_ids.
+                    tasks in this list are returned.
 
         Assume current working directory is suite's log directory.
 
@@ -275,17 +271,12 @@ class CylcProcessor(SuiteEngineProcessor):
                 if cycle is not None:
                     where += " AND cycle==?"
                 where += ")"
-        elif log_archive_threshold:
-            for name in glob(self.get_cycle_log_archive_name("*")):
-                cycle = name[len(self.CYCLE_LOG_ARCHIVE_PREFIX) :
-                             -len(self.CYCLE_LOG_ARCHIVE_SUFFIX)]
-                # FIXME: leakage of concerns here
-                data_file_name = "rose-suite-log-view-" + cycle + ".json"
-                if not os.path.exists(data_file_name):
-                    if where:
-                        where += " OR"
-                    where += " cycle==?"
-                    where_args.append(cycle)
+        if cycles:
+            for cycle in cycles:
+                if where:
+                    where += " OR"
+                where += " cycle==?"
+                where_args.append(cycle)
         if where:
             where = " WHERE" + where
         rows = []
@@ -293,8 +284,6 @@ class CylcProcessor(SuiteEngineProcessor):
             try:
                 conn = sqlite3.connect(self.get_suite_db_file(suite_name))
                 c = conn.cursor()
-                print where
-                print where_args
                 rows = c.execute(
                         "SELECT time,name,cycle,submit_num,event,message" +
                         " FROM task_events" +
