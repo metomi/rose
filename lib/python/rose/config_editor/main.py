@@ -592,7 +592,7 @@ class MainController(object):
             self.reload_namespace_tree()
             self.reporter.report_load_event(
                        rose.config_editor.EVENT_LOADED.format(namespace_name),
-                       no_progress=False)
+                       no_progress=True)
             self.reporter.stop()
         
         if namespace_name in self.notebook.get_page_ids():
