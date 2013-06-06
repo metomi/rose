@@ -68,6 +68,11 @@ class StatusReporter(rose.reporter.Reporter):
     def set_no_load(self):
         self._no_load = True
 
+    def stop(self):
+        try:
+            self._loader_update_func.stop()
+        except:
+            pass
 
 class StatusBar(gtk.VBox):
 

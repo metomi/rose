@@ -183,9 +183,17 @@ class RoseOptionParser(OptionParser):
                        ["--latest"],
                        {"action": "store_true",
                         "help": "Print the latest ID in the repository."}],
+               "load_all_apps": [
+                       ["--load-all-apps"],
+                       {"action": "store_true",
+                        "dest": "load_all_apps",
+                        "default": False,
+                        "help": "Override preview mode and load in all apps"}],
                "load_on_demand": [
                        ["--load-on-demand"],
                        {"action": "store_true",
+                        "dest": "load_on_demand",
+                        "default": False,
                         "help": "Load app configs on demand."}],
                "local_only": [
                        ["--local-only"],

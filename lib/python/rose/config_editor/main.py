@@ -104,7 +104,8 @@ class MainController(object):
 
     def __init__(self, config_directory=None, config_objs=None,
                  pluggable=False,
-                 loader_update=rose.config_editor.false_function):
+                 loader_update=rose.config_editor.false_function,
+                 load_all_apps=False, load_on_demand=False):
         if config_objs is None:
             config_objs = {}
         if pluggable:
@@ -239,7 +240,8 @@ class MainController(object):
                              self._refresh_metadata_if_on,
                              self.is_pluggable)
 
-        self.data.load(config_directory, config_objs) #this is the point at which data.config is populated...
+        self.data.load(config_directory, config_objs, 
+                       load_all_apps, load_on_demand) #this is the point at which data.config is populated...
 
         self.reporter.report_load_event(
                       rose.config_editor.EVENT_LOAD_STATUSES.format(
@@ -285,8 +287,6 @@ class MainController(object):
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
-        #self.reporter.set_no_load()
-        
 #------------------ Setting up main component functions ----------------------
 
     def generate_toolbar(self):
@@ -595,6 +595,7 @@ class MainController(object):
             self.reporter.report_load_event(
                        rose.config_editor.EVENT_LOADED.format(namespace_name),
                        no_progress=False)
+            self.reporter.stop()
         
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)
@@ -1593,7 +1594,8 @@ class MainController(object):
 
 # ----------------------- System functions -----------------------------------
 
-def spawn_window(config_directory_path=None, debug_mode=False):
+def spawn_window(config_directory_path=None, debug_mode=False, 
+                 load_all_apps=False, load_on_demand=False):
     """Create a window and load the configuration into it. Run gtk."""
     RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
     rose.gtk.util.rc_setup(
@@ -1619,7 +1621,9 @@ def spawn_window(config_directory_path=None, debug_mode=False):
                                                         number_of_events)
     try:
         MainController(config_directory_path,
-                       loader_update=splash_screen)
+                       loader_update=splash_screen,
+                       load_all_apps=load_all_apps,
+                       load_on_demand=load_on_demand)
     except BaseException as e:
         splash_screen.stop()
         if debug_mode and isinstance(e, Exception):
@@ -1676,7 +1680,7 @@ if __name__ == '__main__':
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode", 
-                              "load_on_demand")
+                              "load_on_demand", "load_all_apps")
     opts, args = opt_parser.parse_args()
     if args:
         opt_parser.print_usage(sys.stderr)
@@ -1703,10 +1707,14 @@ if __name__ == '__main__':
     rose.gtk.util.set_exception_hook(keep_alive=True)
     if opts.profile_mode:
         f = tempfile.NamedTemporaryFile()
-        cProfile.runctx("spawn_window(cwd, debug_mode=opts.debug_mode)",
+        cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,
+                                        load_all_apps=opts.load_all_apps,
+                                        load_on_demand=opts.load_on_demand)""",
                         globals(), locals(), f.name)
         p = pstats.Stats(f.name)
         p.strip_dirs().sort_stats('cumulative').print_stats(200)
         f.close()
     else:
-        spawn_window(cwd, debug_mode=opts.debug_mode)
+        spawn_window(cwd, debug_mode=opts.debug_mode, 
+                     load_all_apps=opts.load_all_apps,
+                     load_on_demand=opts.load_on_demand)

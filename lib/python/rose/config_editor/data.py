@@ -189,11 +189,14 @@ class ConfigDataManager(object):
         self._config_section_namespace_lookup = {}  # Store section namespaces
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
 
-    def load(self, top_level_directory, config_obj_dict):
+    def load(self, top_level_directory, config_obj_dict, 
+             load_all_apps=False, load_on_demand=False):
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
                 if filename in [rose.TOP_CONFIG_NAME, rose.SUB_CONFIG_NAME]:
-                    self.load_top_config(top_level_directory)
+                    self.load_top_config(top_level_directory, 
+                                         load_all_apps=load_all_apps,
+                                         load_on_demand=load_on_demand)
                     break
             else:
                 self.load_top_config(None)
@@ -208,7 +211,8 @@ class ConfigDataManager(object):
                              is_discovery=is_discovery)
         self.saved_config_names = set(self.config.keys())
 
-    def load_top_config(self, top_level_directory, preview=False):
+    def load_top_config(self, top_level_directory, preview=False, 
+                        load_all_apps=False, load_on_demand=False):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
         
@@ -223,14 +227,19 @@ class ConfigDataManager(object):
                 sub_contents = os.listdir(config_container_dir)
                 sub_contents.sort()
                 
-                for config_dir in sub_contents:
-                    conf_path = os.path.join(config_container_dir, config_dir)
-                    if (os.path.isdir(conf_path) and
-                        not config_dir.startswith('.')):
-                            app_count += 1
+                if not load_all_apps:
+                    if load_on_demand:
+                        preview = True
+                    else:
+                        for config_dir in sub_contents:
+                            conf_path = os.path.join(config_container_dir,
+                                                     config_dir)
+                            if (os.path.isdir(conf_path) and
+                                not config_dir.startswith('.')):
+                                    app_count += 1
                 
-                if app_count > rose.config_editor.MAX_APPS:
-                    preview = True
+                        if app_count > rose.config_editor.MAX_APPS:
+                            preview = True
                 
                 for config_dir in sub_contents:
                     conf_path = os.path.join(config_container_dir, config_dir)
