@@ -285,7 +285,7 @@ class MainController(object):
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
-        self.reporter.set_no_load()
+        #self.reporter.set_no_load()
         
 #------------------ Setting up main component functions ----------------------
 
@@ -584,14 +584,17 @@ class MainController(object):
             
         config_name = self.util.split_full_ns(self.data, namespace_name)[0]
         config_data = self.data.config[config_name]
+        
         if config_data.preview:
             self.reporter.report_load_event(
                        rose.config_editor.EVENT_LOAD_ATTEMPT.format(
-                       namespace_name))
+                       namespace_name), 
+                       new_total_events=3)
             self.data.load_config(config_data.directory, preview=False)
             self.reload_namespace_tree()
             self.reporter.report_load_event(
-                       rose.config_editor.EVENT_LOADED.format(namespace_name))
+                       rose.config_editor.EVENT_LOADED.format(namespace_name),
+                       no_progress=False)
         
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)

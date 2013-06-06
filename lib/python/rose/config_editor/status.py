@@ -57,13 +57,14 @@ class StatusReporter(rose.reporter.Reporter):
             return self._loader_update_func(str(message), **message_kwargs)
         return self._status_bar_update_func(message, kind, level)
 
-    def report_load_event(self, text, no_progress=False):
+    def report_load_event(self, text, no_progress=False, new_total_events=None):
         """Report a load-related event (to rose.gtk.util.SplashScreen)."""
         event = rose.reporter.Event(text,
                                     kind=self.EVENT_KIND_LOAD,
-                                    no_progress=no_progress)
+                                    no_progress=no_progress, 
+                                    new_total_events=new_total_events)
         self.report(event)
-        
+    
     def set_no_load(self):
         self._no_load = True
 
