@@ -46,6 +46,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     CYCLE_LOG_ARCHIVE_PREFIX = "job-"
     CYCLE_LOG_ARCHIVE_SUFFIX = ".tar.gz"
+    DB_SELECT_RETRY_DELAY = 0.5
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "submit-fail",
               "started": "init",
@@ -55,7 +56,8 @@ class CylcProcessor(SuiteEngineProcessor):
               "execution succeeded": "pass",
               "execution failed": "fail",
               "signaled": "fail"}
-    N_DB_CONNECT_RETRIES = 3
+    N_DB_SELECT_TRIES = 20
+    N_DB_SELECT_EMPTY_TRIES = 1
     PYRO_TIMEOUT = 5
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
@@ -69,17 +71,8 @@ class CylcProcessor(SuiteEngineProcessor):
         Assume current working directory is suite's log directory.
         
         """
-        rows = []
-        for i in range(self.N_DB_CONNECT_RETRIES):
-            try:
-                conn = sqlite3.connect(self.get_suite_db_file(suite_name))
-                c = conn.cursor()
-                rows = c.execute("SELECT DISTINCT cycle FROM task_events")
-            except sqlite3.OperationalError:
-                sleep(1.0)
-            else:
-                break
-        for row in rows:
+        stmt = "SELECT DISTINCT cycle FROM task_events"
+        for row in self._select(suite_name, stmt):
             cycle_time = row[0]
             archive_file_name = self.get_cycle_log_archive_name(cycle_time)
             if (os.path.exists(archive_file_name) or
@@ -256,15 +249,15 @@ class CylcProcessor(SuiteEngineProcessor):
 
         # Read task events from suite runtime database
         where = ""
-        where_args = []
+        stmt_args = []
         if task_ids:
             for task_id in task_ids:
                 cycle = None
                 if self.TASK_ID_DELIM in task_id:
                     name, cycle = task_id.split(self.TASK_ID_DELIM, 1)
-                    where_args += [name, cycle]
+                    stmt_args += [name, cycle]
                 else:
-                    where_args.append(task_id)
+                    stmt_args.append(task_id)
                 if where:
                     where += " OR"
                 where += " (name==?"
@@ -276,26 +269,13 @@ class CylcProcessor(SuiteEngineProcessor):
                 if where:
                     where += " OR"
                 where += " cycle==?"
-                where_args.append(cycle)
+                stmt_args.append(cycle)
         if where:
             where = " WHERE" + where
-        rows = []
-        for i in range(self.N_DB_CONNECT_RETRIES):
-            try:
-                conn = sqlite3.connect(self.get_suite_db_file(suite_name))
-                c = conn.cursor()
-                rows = c.execute(
-                        "SELECT time,name,cycle,submit_num,event,message" +
-                        " FROM task_events" +
-                        where +
-                        " ORDER BY time", where_args)
-            except sqlite3.OperationalError as e:
-                sleep(1.0)
-            else:
-                break
-
+        stmt = ("SELECT time,name,cycle,submit_num,event,message" +
+                " FROM task_events" + where + " ORDER BY time")
         data = {}
-        for row in rows:
+        for row in self._select(suite_name, stmt, stmt_args):
             ev_time, name, cycle_time, submit_num, key, message = row
             event = self.EVENTS.get(key, None)
             if event is None:
@@ -376,20 +356,19 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def get_suite_jobs_auths(self, suite_name, cycle_time=None,
                              task_name=None):
-        """Return remote [(user, host), ...] for submitted jobs (of a task)."""
-        conn = sqlite3.connect(self.get_suite_db_file(suite_name))
-        c = conn.cursor()
+        """Return remote ["[user@]host", ...] for submitted jobs."""
         auths = []
         stmt = "SELECT DISTINCT misc FROM task_events WHERE "
-        stmt_args = tuple()
+        stmt_args = []
         if cycle_time:
             stmt += "cycle==? AND "
-            stmt_args = stmt_args + (cycle_time,)
+            stmt_args.append(cycle_time)
         if task_name:
             stmt += "name==? AND "
-            stmt_args = stmt_args + (task_name,)
-        stmt += "event=='submission succeeded'"
-        for row in c.execute(stmt, stmt_args):
+            stmt_args.append(task_name)
+        stmt += "event==?"
+        stmt_args.append("submission succeeded")
+        for row in self._select(suite_name, stmt, stmt_args):
             if row and "@" in row[0]:
                 auth = self._parse_user_host(auth=row[0])
                 if auth:
@@ -702,3 +681,20 @@ class CylcProcessor(SuiteEngineProcessor):
         else:
             auth = None
         return auth
+
+    def _select(self, suite_name, stmt, stmt_args=None):
+        if stmt_args is None:
+            stmt_args = []
+        for i in range(self.N_DB_SELECT_TRIES):
+            try:
+                conn = sqlite3.connect(self.get_suite_db_file(suite_name))
+                c = conn.cursor()
+                c.execute(stmt, stmt_args)
+            except sqlite3.OperationalError as e:
+                sleep(self.DB_SELECT_RETRY_DELAY)
+            else:
+                break
+        if c is None:
+            return []
+        else:
+            return c

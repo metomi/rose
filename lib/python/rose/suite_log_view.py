@@ -210,7 +210,7 @@ class SuiteLogViewGenerator(object):
                     if name != "." + self.NS:
                         task_ids.append(name)
                     self.fs_util.delete(os.path.join(self.LOCK, name))
-                if task_ids:
+                if task_ids or (full_mode and has_done_nothing):
                     self.suite_engine_proc.update_job_log(suite_name, task_ids)
                 new_data = self.suite_engine_proc.get_suite_events(
                         suite_name,
