@@ -46,7 +46,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     CYCLE_LOG_ARCHIVE_PREFIX = "job-"
     CYCLE_LOG_ARCHIVE_SUFFIX = ".tar.gz"
-    DB_SELECT_RETRY_DELAY = 0.5
+    DB_SELECT_RETRY_DELAY = 0.25
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "submit-fail",
               "started": "init",
@@ -57,7 +57,6 @@ class CylcProcessor(SuiteEngineProcessor):
               "execution failed": "fail",
               "signaled": "fail"}
     N_DB_SELECT_TRIES = 20
-    N_DB_SELECT_EMPTY_TRIES = 1
     PYRO_TIMEOUT = 5
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
