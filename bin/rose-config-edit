@@ -26,8 +26,8 @@
 # DESCRIPTION
 #     Launch the GTK+ GUI to edit a suite or application configuration.
 #
-#     If a suite contains more than 10 applications then they will be loaded 
-#     into config edit on demand.
+#     If a suite contains more than 10 applications then they will only be 
+#     loaded after startup, on demand.
 #
 # OPTIONS
 #     --config=DIR; -C DIR
@@ -41,7 +41,7 @@
 #           with other application files.
 #     --load-all-apps
 #        Force loading of all applications on startup.
-#     --load-on-demand
+#     --load-no-apps
 #        Load applications in the suite on demand.
 #     --meta-path=PATH; -M PATH
 #        Prepend PATH to the search path for metadata (look here first).

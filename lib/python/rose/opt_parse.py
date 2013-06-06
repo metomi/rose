@@ -189,10 +189,10 @@ class RoseOptionParser(OptionParser):
                         "dest": "load_all_apps",
                         "default": False,
                         "help": "Override preview mode and load in all apps"}],
-               "load_on_demand": [
-                       ["--load-on-demand"],
+               "load_no_apps": [
+                       ["--load-no-apps"],
                        {"action": "store_true",
-                        "dest": "load_on_demand",
+                        "dest": "load_no_apps",
                         "default": False,
                         "help": "Load app configs on demand."}],
                "local_only": [

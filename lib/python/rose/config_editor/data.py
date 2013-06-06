@@ -149,7 +149,7 @@ class ConfigData(object):
 
     def __init__(self, config, s_config, directory, opt_conf_lookup, meta,
                  meta_id, meta_files, macros, is_top, is_disc,
-                 var_data=None, sect_data=None, preview=False):
+                 var_data=None, sect_data=None, is_preview=False):
         self.config = config
         self.save_config = s_config
         self.directory = directory
@@ -162,7 +162,7 @@ class ConfigData(object):
         self.is_discovery = is_disc
         self.vars = var_data
         self.sections = sect_data
-        self.preview = preview
+        self.preview = is_preview
 
 
 class ConfigDataManager(object):
@@ -190,13 +190,13 @@ class ConfigDataManager(object):
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
 
     def load(self, top_level_directory, config_obj_dict, 
-             load_all_apps=False, load_on_demand=False):
+             load_all_apps=False, load_no_apps=False):
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
                 if filename in [rose.TOP_CONFIG_NAME, rose.SUB_CONFIG_NAME]:
                     self.load_top_config(top_level_directory, 
                                          load_all_apps=load_all_apps,
-                                         load_on_demand=load_on_demand)
+                                         load_no_apps=load_no_apps)
                     break
             else:
                 self.load_top_config(None)
@@ -212,7 +212,7 @@ class ConfigDataManager(object):
         self.saved_config_names = set(self.config.keys())
 
     def load_top_config(self, top_level_directory, preview=False, 
-                        load_all_apps=False, load_on_demand=False):
+                        load_all_apps=False, load_no_apps=False):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
         
@@ -228,7 +228,7 @@ class ConfigDataManager(object):
                 sub_contents.sort()
                 
                 if not load_all_apps:
-                    if load_on_demand:
+                    if load_no_apps:
                         preview = True
                     else:
                         for config_dir in sub_contents:
@@ -238,7 +238,7 @@ class ConfigDataManager(object):
                                 not config_dir.startswith('.')):
                                     app_count += 1
                 
-                        if app_count > rose.config_editor.MAX_APPS:
+                        if app_count > rose.config_editor.MAX_APPS_THRESHOLD:
                             preview = True
                 
                 for config_dir in sub_contents:
@@ -332,7 +332,7 @@ class ConfigDataManager(object):
                                        opt_conf_lookup, meta_config,
                                        meta_id, meta_files, macros,
                                        is_top_level, is_discovery, 
-                                       preview=preview)
+                                       is_preview=preview)
         
         self.load_builtin_macros(name)
         self.load_file_metadata(name)

@@ -71,7 +71,7 @@ class StatusReporter(rose.reporter.Reporter):
     def stop(self):
         try:
             self._loader_update_func.stop()
-        except:
+        except Exception:
             pass
 
 class StatusBar(gtk.VBox):
