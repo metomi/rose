@@ -74,7 +74,6 @@ class SplashScreenProcess(object):
                 self.process.stdin.write(json_text + "\n")
             except IOError as e:
                 self.start()
-                print "start"
                 self.process.stdin.write(json_text + "\n")
             else:
                 break

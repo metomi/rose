@@ -214,6 +214,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             title = rose.config_editor.TITLE_PAGE_ROOT_MARKUP.format(title)
         latent_status = model.get_value(r_iter, 8)
         ignored_status = model.get_value(r_iter, 9)
+        name = self.get_name(model.get_path(r_iter))
+        preview_status = self._ask_is_preview(name)
+        if preview_status:
+            title = rose.config_editor.TITLE_PAGE_PREVIEW_MARKUP.format(title)
         if latent_status:
             title = rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(title)
         if ignored_status:
