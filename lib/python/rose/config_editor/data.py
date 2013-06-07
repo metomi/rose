@@ -317,12 +317,14 @@ class ConfigDataManager(object):
         
         if config_directory != self.top_level_directory and preview: 
             meta_config = rose.config.ConfigNode()
+            meta_files = []
         else:
-            meta_config = self.load_meta_config(config, config_directory) 
+            meta_config = self.load_meta_config(config, config_directory)
+            meta_files = self.load_meta_files(config, config_directory)
                 
         opt_conf_lookup = self.load_optional_configs(config_directory)
         
-        meta_files = self.load_meta_files(config, config_directory)
+        
         macro_module_prefix = self.helper.get_macro_module_prefix(name)
         macros = rose.macro.load_meta_macro_modules(
                       meta_files, module_prefix=macro_module_prefix)

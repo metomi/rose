@@ -594,6 +594,8 @@ class MainController(object):
                        rose.config_editor.EVENT_LOADED.format(namespace_name),
                        no_progress=True)
             self.reporter.stop()
+            if hasattr(self, 'menubar'):
+                self.main_handle.load_macro_menu(self.menubar)
         
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)
