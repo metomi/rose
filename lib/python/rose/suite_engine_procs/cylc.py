@@ -684,16 +684,24 @@ class CylcProcessor(SuiteEngineProcessor):
     def _select(self, suite_name, stmt, stmt_args=None):
         if stmt_args is None:
             stmt_args = []
+        if not hasattr(self, "cursor"):
+            self.cursor = None
+        if self.cursor is None:
+            for i in range(self.N_DB_SELECT_TRIES):
+                try:
+                    conn = sqlite3.connect(self.get_suite_db_file(suite_name))
+                    self.cursor = conn.cursor()
+                except sqlite3.OperationalError as e:
+                    sleep(self.DB_SELECT_RETRY_DELAY)
+                else:
+                    break
+        if self.cursor is None:
+            return []
         for i in range(self.N_DB_SELECT_TRIES):
             try:
-                conn = sqlite3.connect(self.get_suite_db_file(suite_name))
-                c = conn.cursor()
-                c.execute(stmt, stmt_args)
+                self.cursor.execute(stmt, stmt_args)
             except sqlite3.OperationalError as e:
                 sleep(self.DB_SELECT_RETRY_DELAY)
             else:
                 break
-        if c is None:
-            return []
-        else:
-            return c
+        return self.cursor
