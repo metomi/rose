@@ -605,7 +605,8 @@ class SuiteRunner(Runner):
                "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
                "restart_mode", "run_mode", "strict_mode"]
 
-    REC_DONT_SYNC = re.compile(r"\A(?:\..*|log(?:\..*)*|state|share|work)\Z")
+    REC_DONT_SYNC = re.compile(
+            r"\A(?:\..*|cylc-suite\.db.*|log(?:\..*)*|state|share|work)\Z")
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
