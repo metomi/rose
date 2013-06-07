@@ -11,6 +11,9 @@ for a full listing of issues for each release.
 
 Changes that have significant impact on user experience.
 
+\#732: rose config-edit: ability to load application configurations on demand
+for large suites.
+
 \#709: rose config-edit: now has a status bar and a console to view errors
 and information.
 
