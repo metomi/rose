@@ -41,6 +41,7 @@ class StatusReporter(rose.reporter.Reporter):
     def __init__(self, loader_update_func, status_bar_update_func):
         self._loader_update_func = loader_update_func
         self._status_bar_update_func = status_bar_update_func
+        self._no_load = False
 
     def event_handler(self, message, kind=None, level=None, prefix=None,
                       clip=None):
@@ -52,17 +53,26 @@ class StatusReporter(rose.reporter.Reporter):
             if level is None:
                 level = message.level
             message_kwargs = message.kwargs
-        if kind == self.EVENT_KIND_LOAD:
+        if kind == self.EVENT_KIND_LOAD and not self._no_load:
             return self._loader_update_func(str(message), **message_kwargs)
         return self._status_bar_update_func(message, kind, level)
 
-    def report_load_event(self, text, no_progress=False):
+    def report_load_event(self, text, no_progress=False, new_total_events=None):
         """Report a load-related event (to rose.gtk.util.SplashScreen)."""
         event = rose.reporter.Event(text,
                                     kind=self.EVENT_KIND_LOAD,
-                                    no_progress=no_progress)
+                                    no_progress=no_progress, 
+                                    new_total_events=new_total_events)
         self.report(event)
+    
+    def set_no_load(self):
+        self._no_load = True
 
+    def stop(self):
+        try:
+            self._loader_update_func.stop()
+        except Exception:
+            pass
 
 class StatusBar(gtk.VBox):
 

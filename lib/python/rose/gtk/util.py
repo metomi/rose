@@ -570,28 +570,38 @@ class SplashScreen(gtk.Window):
         while gtk.events_pending():
             gtk.main_iteration()
 
-    def update(self, event, no_progress=False):
+    def update(self, event, no_progress=False, new_total_events=None):
         """Show text corresponding to an event."""
         text = str(event)
+        if new_total_events is not None:
+            self.total_number_of_events = new_total_events
+            self.event_count = 0.0
+            
+        if not no_progress:
+            self.event_count += 1.0
+            
         if self.total_number_of_events == 0:
             fraction = 1.0
         else:
             fraction = min([1.0, self.event_count /
                                  self.total_number_of_events])
         self._stop_pulse()
+        
         if not no_progress:
             gobject.idle_add(self.progress_bar.set_fraction, fraction)
             self._progress_fraction = fraction
-            self.event_count += 1.0
+            
         self.progress_bar.set_text(text)
         self._progress_message = text
         gobject.timeout_add(self.TIME_IDLE_BEFORE_PULSE,
                             self._start_pulse, fraction, text)
-        while gtk.events_pending():
-            gtk.main_iteration()
+
         if fraction == 1.0 and not no_progress:
             gobject.timeout_add(self.TIME_WAIT_FINISH,
                                 lambda: self.finish())
+
+        while gtk.events_pending():
+            gtk.main_iteration()
 
     def _start_pulse(self, idle_fraction, idle_message):
         """Start the progress bar pulsing (moving side-to-side)."""
