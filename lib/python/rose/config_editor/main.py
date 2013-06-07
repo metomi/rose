@@ -104,7 +104,8 @@ class MainController(object):
 
     def __init__(self, config_directory=None, config_objs=None,
                  pluggable=False,
-                 loader_update=rose.config_editor.false_function):
+                 loader_update=rose.config_editor.false_function,
+                 load_all_apps=False, load_no_apps=False):
         if config_objs is None:
             config_objs = {}
         if pluggable:
@@ -239,7 +240,8 @@ class MainController(object):
                              self._refresh_metadata_if_on,
                              self.is_pluggable)
 
-        self.data.load(config_directory, config_objs)
+        self.data.load(config_directory, config_objs, 
+                       load_all_apps, load_no_apps)
 
         self.reporter.report_load_event(
                       rose.config_editor.EVENT_LOAD_STATUSES.format(
@@ -554,7 +556,8 @@ class MainController(object):
                               self.handle_launch_request,
                               self.nav_handle.get_ns_metadata_and_comments,
                               self.nav_handle.popup_panel_menu,
-                              self.nav_handle.get_can_show_page)
+                              self.nav_handle.get_can_show_page,
+                              self.nav_handle.ask_is_preview)
 
     def generate_status_bar(self):
         """Create a status bar."""
@@ -576,6 +579,24 @@ class MainController(object):
         """
         if not namespace_name.startswith('/'):
             namespace_name = '/' + namespace_name
+            
+        config_name = self.util.split_full_ns(self.data, namespace_name)[0]
+        config_data = self.data.config[config_name]
+        
+        if config_data.is_preview:
+            self.reporter.report_load_event(
+                       rose.config_editor.EVENT_LOAD_ATTEMPT.format(
+                       namespace_name), 
+                       new_total_events=3)
+            self.data.load_config(config_data.directory, preview=False)
+            self.reload_namespace_tree()
+            self.reporter.report_load_event(
+                       rose.config_editor.EVENT_LOADED.format(namespace_name),
+                       no_progress=True)
+            self.reporter.stop()
+            if hasattr(self, 'menubar'):
+                self.main_handle.load_macro_menu(self.menubar)
+        
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)
             self.notebook.set_current_page(index)
@@ -977,7 +998,10 @@ class MainController(object):
     def save_to_file(self, only_config_name=None):
         """Dump the component configurations in memory to disk."""
         if only_config_name is None:
-            config_names = self.data.config.keys()
+            config_names = []
+            for c in self.data.config.keys():
+                if not self.data.config[c].is_preview:
+                    config_names.append(c)
         else:
             config_names = [only_config_name]
         save_ok = True
@@ -1570,7 +1594,8 @@ class MainController(object):
 
 # ----------------------- System functions -----------------------------------
 
-def spawn_window(config_directory_path=None, debug_mode=False):
+def spawn_window(config_directory_path=None, debug_mode=False, 
+                 load_all_apps=False, load_no_apps=False):
     """Create a window and load the configuration into it. Run gtk."""
     RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
     rose.gtk.util.rc_setup(
@@ -1596,7 +1621,9 @@ def spawn_window(config_directory_path=None, debug_mode=False):
                                                         number_of_events)
     try:
         MainController(config_directory_path,
-                       loader_update=splash_screen)
+                       loader_update=splash_screen,
+                       load_all_apps=load_all_apps,
+                       load_no_apps=load_no_apps)
     except BaseException as e:
         splash_screen.stop()
         if debug_mode and isinstance(e, Exception):
@@ -1652,7 +1679,8 @@ if __name__ == '__main__':
         sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
-    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode")
+    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode", 
+                              "load_no_apps", "load_all_apps")
     opts, args = opt_parser.parse_args()
     if args:
         opt_parser.print_usage(sys.stderr)
@@ -1679,10 +1707,14 @@ if __name__ == '__main__':
     rose.gtk.util.set_exception_hook(keep_alive=True)
     if opts.profile_mode:
         f = tempfile.NamedTemporaryFile()
-        cProfile.runctx("spawn_window(cwd, debug_mode=opts.debug_mode)",
+        cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,
+                                        load_all_apps=opts.load_all_apps,
+                                        load_no_apps=opts.load_no_apps)""",
                         globals(), locals(), f.name)
         p = pstats.Stats(f.name)
         p.strip_dirs().sort_stats('cumulative').print_stats(200)
         f.close()
     else:
-        spawn_window(cwd, debug_mode=opts.debug_mode)
+        spawn_window(cwd, debug_mode=opts.debug_mode, 
+                     load_all_apps=opts.load_all_apps,
+                     load_no_apps=opts.load_no_apps)

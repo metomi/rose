@@ -47,12 +47,13 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def __init__(self, namespace_tree, launch_ns_func,
                  get_metadata_comments_func,
-                 popup_menu_func, ask_can_show_func):
+                 popup_menu_func, ask_can_show_func, ask_is_preview):
         super(PageNavigationPanel, self).__init__()
         self._launch_ns_func = launch_ns_func
         self._get_metadata_comments_func = get_metadata_comments_func
         self._popup_menu_func = popup_menu_func
         self._ask_can_show_func = ask_can_show_func
+        self._ask_is_preview = ask_is_preview
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_OUT)
         self.panel_top = gtk.TreeViewColumn()
@@ -213,6 +214,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             title = rose.config_editor.TITLE_PAGE_ROOT_MARKUP.format(title)
         latent_status = model.get_value(r_iter, 8)
         ignored_status = model.get_value(r_iter, 9)
+        name = self.get_name(model.get_path(r_iter))
+        preview_status = self._ask_is_preview(name)
+        if preview_status:
+            title = rose.config_editor.TITLE_PAGE_PREVIEW_MARKUP.format(title)
         if latent_status:
             title = rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(title)
         if ignored_status:
@@ -487,10 +492,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def popup_menu(self, path, event):
         """Launch a popup menu for add/clone/remove."""
-        if path is None or len(path) <= 1:
-            path_name = None
+        if path:
+            path_name = "/" + self.get_name(path)        
         else:
-            path_name = "/" + self.get_name(path)
+            path_name = None
         return self._popup_menu_func(path_name, event)
 
     def collapse_reset(self):

@@ -76,12 +76,23 @@ class NavPanelHandler(object):
             help_str = None
             config_name = None
         choices_help = self.data.helper.get_missing_sections(config_name)
-        config_names = [n for n in self.data.config]
+        
+        config_names = [n for n in self.data.config if not self.ask_is_preview(n)]
         config_names.sort(lambda x, y: (y == config_name) -(x == config_name))
         config_name, section = self.mainwindow.launch_add_dialog(
                                     config_names, choices_help, help_str)
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section, page_launch=True)
+
+    def ask_is_preview(self, base_ns):
+        namespace = "/" + base_ns.lstrip("/")
+        try:        
+            config_name = self.util.split_full_ns(self.data, namespace)[0]
+            config_data = self.data.config[config_name]
+            return config_data.is_preview
+        except KeyError:
+            print config_name
+            return False
         
     def copy_request(self, base_ns, new_section=None, skip_update=False):
         """Handle a copy request for a section and its options."""
@@ -267,6 +278,10 @@ class NavPanelHandler(object):
             namespace = None
         else:
             namespace = "/" + base_ns.lstrip("/")
+        
+        if self.data.config[namespace].is_preview:
+            return False    
+            
         ui_config_string = """<ui> <popup name='Popup'>"""
         actions = [('New', gtk.STOCK_NEW,
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),

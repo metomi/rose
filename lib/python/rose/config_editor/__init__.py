@@ -171,6 +171,8 @@ LOAD_NUMBER_OF_EVENTS = 2
 # Other event strings
 EVENT_ERR_MARKUP = "<span color='red'>{0}</span>"
 EVENT_FOUND_ID = "Found {0}"
+EVENT_LOAD_ATTEMPT = "Attempting to load {0}"
+EVENT_LOADED = "Loaded {0}"
 EVENT_MACRO_CONFIGS = "{0} configurations"
 EVENT_MACRO_TRANSFORM = "{1}: {0}: {2} changes"
 EVENT_MACRO_TRANSFORM_ALL = "Transforms: {0}: {1} changes"
@@ -456,6 +458,9 @@ TITLE_PAGE_LATENT_COLOUR = "grey"
 TITLE_PAGE_LATENT_MARKUP = ("<span foreground='" +
                             TITLE_PAGE_LATENT_COLOUR +
                             "'><i>{0}</i>" + "</span>")
+TITLE_PAGE_PREVIEW_MARKUP = ("<span foreground='" +
+                            TITLE_PAGE_LATENT_COLOUR +
+                            "'><u>{0}</u>" + "</span>")
 TITLE_PAGE_ROOT_MARKUP = "<b>{0}</b>"
 TITLE_PAGE_SUITE = "suite conf"
 TREE_PANEL_MAX_EXPANDED = 5
@@ -558,6 +563,7 @@ LAUNCH_COMMAND = "rose config-edit"
 LAUNCH_COMMAND_CONFIG = "rose config-edit -C"
 LAUNCH_SUITE_RUN = "rose suite-run"
 LAUNCH_SUITE_RUN_HELP = "rose help suite-run"
+MAX_APPS_THRESHOLD = 10
 MIN_PYGTK_VERSION = (2, 12, 0)
 PROGRAM_NAME = "rose edit"
 PROJECT_URL = "http://github.com/metomi/rose/"
