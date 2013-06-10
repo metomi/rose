@@ -992,6 +992,11 @@ is    # Is the same object as (usually used for 'is none')
 !=    # Not equal to
 </pre>
 
+    <p>Operator precedence is intended to be the same as Python. However, with
+    the current choice of language engine, the <samp>%</samp> and
+    <samp>//</samp> operators may not obey this - make sure you force the
+    correct behaviour using brackets.</p>
+
     <h3 id="appendix-mini-language-constants">Constants</h3>
 
     <p>The following are special constants:</p>
