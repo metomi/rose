@@ -60,9 +60,7 @@ class QuotedTextValueWidget(gtk.HBox):
                              insensitive_colour)
         self.in_error = not self.type_checker(self.value)
         self.set_entry_text()
-        self.entry.connect_after("key-release-event", self.setter)
-        self.entry.connect_after("button-release-event", self.setter)
-        self.entry.connect_after("paste-clipboard", self.setter)
+        self.entry.connect_after("changed", self.setter)
         self.entry.show()
         self.pack_start(self.entry, expand=True, fill=True,
                         padding=0)
