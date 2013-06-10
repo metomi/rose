@@ -130,7 +130,7 @@
     of the configurations.</p>
 
     <dl>
-      <dt>ns</dt>
+      <dt id="meta.conf.sorting.ns">ns</dt>
 
       <dd>
         <p>A forward slash <kbd>/</kbd> delimited hierarchical namespace for
@@ -148,7 +148,7 @@
         will become the default for all the settings in that section.</p>
       </dd>
 
-      <dt>sort-key</dt>
+      <dt id="meta.conf.sorting.sort-key">sort-key</dt>
 
       <dd>
         <p>A character string that can be used as a sort key for ordering an
@@ -197,7 +197,7 @@ sort-key=do-not-like-00
     variable, these metadata will normally be ignored.</p>
 
     <dl>
-      <dt>type</dt>
+      <dt id="meta.conf.value.type">type</dt>
 
       <dd>
         <p>The type/class of the setting. The type names are based on the
@@ -290,7 +290,8 @@ sort-key=do-not-like-00
         </dl>
 
         <p>Note that not all inputs need to have <code>type</code> defined. In
-        some cases using <code>values</code> or <code>pattern</code> is
+        some cases using <a href="#meta.conf.value.values"><code>values</code></a>
+        or <a href="#meta.conf.value.values"><code>pattern</code></a> is
         better.</p>
 
         <p>A derived type may be defined by a comma <kbd>,</kbd> separated list
@@ -298,7 +299,7 @@ sort-key=do-not-like-00
         integer</samp>. The default is a raw string.</p>
       </dd>
 
-      <dt>length</dt>
+      <dt id="meta.conf.value.length">length</dt>
 
       <dd>
         <p>Define the length of an array. If not present, the setting is
@@ -306,13 +307,14 @@ sort-key=do-not-like-00
         array. A colon <kbd>:</kbd> defines a dynamic length array.</p>
       </dd>
 
-      <dt>values</dt>
+      <dt id="meta.conf.value.values">values</dt>
 
       <dd>
         <p>Define a comma <kbd>,</kbd> separated list of permitted values of a
         setting (or an element in the setting if it is an array). This metadata
-        overrides the <code>type</code>, <code>range</code> and
-        <code>pattern</code> metadata.</p>
+        overrides the <a href="#meta.conf.value.type"><code>type</code></a>,
+        <a href="#meta.conf.value.range"><code>range</code></a> and
+        <a href="#meta.conf.value.pattern"><code>pattern</code></a> metadata.</p>
 
         <p>For example, the config editor may use this list to determine the
         widget to display the setting. It may display the choices using a set
@@ -322,11 +324,12 @@ sort-key=do-not-like-00
         value, and may display it as a special setting.</p>
       </dd>
 
-      <dt>value-titles</dt>
+      <dt id="meta.conf.value.value-titles">value-titles</dt>
 
       <dd>
         <p>Define a comma <kbd>,</kbd> separated list of titles to associate
-        with each of the elements of <code>values</code> which will be
+        with each of the elements of
+        <a href="#meta.conf.value.values"><code>values</code></a> which will be
         displayed instead of the value. This list should contain the same
         number of elements as the <code>values</code> entry.</p>
 
@@ -337,18 +340,19 @@ values=0, 1, 2
 value-titles=low, medium, high
 </pre>
 
-        <p>config edit will display <samp>low</samp> for option value
+        <p>the config editor will display <samp>low</samp> for option value
         <samp>0</samp>, <samp>medium</samp> for <samp>1</samp> and
         <samp>high</samp> for <samp>2</samp>.</p>
       </dd>
 
-      <dt>range</dt>
+      <dt id="meta.conf.value.range">range</dt>
 
       <dd>
         <p>Specify a range of values. It can either be a simple comma
         <kbd>,</kbd> separated list of allowed values, or a logical expression
-        in the Rose metadata mini-language. This metadata is only valid if
-        <code>type</code> is either <samp>integer</samp> or
+        in the Rose metadata <a href="#appendix-mini-language">mini-language</a>.
+        This metadata is only valid if
+        <a href="#meta.conf.value.type"><code>type</code></a> is either <samp>integer</samp> or
         <samp>real</samp>.</p>
 
         <p>A simple list may contain a mixture of allowed numbers and number
@@ -356,22 +360,22 @@ value-titles=low, medium, high
         be 1, 2, between 4 and 8 inclusive, or any values greater than or equal
         to 10.)</p>
 
-        <p>A logical expression uses the Rose <a href=
+        <p>A logical expression uses the Rose metadata <a href=
         "#appendix-mini-language">mini-language</a>, using the variable
         <var>this</var> to denote the value of the current setting, e.g.
         <samp>this &lt;-1 and this &gt;1</samp>. Inter-variable comparisons are
-        not permitted (but see the <samp>fail-if</samp> property for a way to
-        implement this.</p>
+        not permitted (but see the <a href="#meta.conf.value.fail-if"><code>fail-if</code></a> property below for a way to
+        implement this).</p>
       </dd>
 
-      <dt>pattern</dt>
+      <dt id="meta.conf.value.pattern">pattern</dt>
 
       <dd>
         <p>Specify a regular expression (Python's extended regular expression
         syntax) that the value of the setting must match.</p>
       </dd>
 
-      <dt>fail-if, warn-if</dt>
+      <dt id="meta.conf.value.fail-if">fail-if, warn-if</dt>
 
       <dd>
         <p>Specify a logical expression using the Rose <a href=
@@ -469,7 +473,7 @@ warn-if=True;  # This option is deprecated
     different states.</p>
 
     <dl>
-      <dt>compulsory</dt>
+      <dt id="meta.conf.behaviour.compulsory">compulsory</dt>
 
       <dd>
         <p>A <kbd>true</kbd> value indicates that the setting should be
@@ -483,7 +487,7 @@ warn-if=True;  # This option is deprecated
         variable that only has a single permitted value.</p>
       </dd>
 
-      <dt>trigger</dt>
+      <dt id="meta.conf.behaviour.trigger">trigger</dt>
 
       <dd>
         <p>A setting has the following states:</p>
@@ -591,9 +595,9 @@ trigger=env=IS_ICE: true;
 
         <p>The trigger syntax also supports a logical expression using the Rose
         metadata <a href="#appendix-mini-language">mini-language</a>, in the
-        same way as the <samp>range</samp> or <samp>fail-if</samp> metadata. As
-        with <samp>range</samp>, inter-variable comparisons are not
-        allowed.</p>
+        same way as the <a href="#meta.conf.value.range"><code>range</code></a>
+        or <a href="#meta.conf.value.fail-if"><code>fail-if</code></a> metadata. As
+        with <code>range</code>, inter-variable comparisons are disallowed.</p>
         <pre class="prettyprint lang-rose_conf">
 [env=SNOWFLAKE_SIDES]
 trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
@@ -622,7 +626,7 @@ trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
         sections that are found with multiple copies or an index.</p>
       </dd>
 
-      <dt>macro</dt>
+      <dt id="meta.conf.behaviour.macro">macro</dt>
 
       <dd>
         <p>Associate a setting with a comma-delimited set of custom macros (but
@@ -643,7 +647,7 @@ macro=fib.Fibonacci.validate
 </pre>
       </dd>
 
-      <dt>widget[gui-application]</dt>
+      <dt id="meta.conf.behaviour.widget">widget[gui-application]</dt>
 
       <dd>
         <p>Indicate that the gui-application (e.g. config-edit) should use a
@@ -673,7 +677,7 @@ widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons
     <p>These metadata provide help for a configuration.</p>
 
     <dl>
-      <dt>url</dt>
+      <dt id="meta.conf.help.url">url</dt>
 
       <dd>
         <p>A web URL containing help for the setting. For example:</p>
@@ -685,7 +689,7 @@ url=http://www-nwp/~frve/VER/view/dev/doc/GTDP5.html
         this when a variable name is clicked.</p>
       </dd>
 
-      <dt>help</dt>
+      <dt id="meta.conf.help.help">help</dt>
 
       <dd>
         <p>(Long) help for the setting. For example, the config editor will use
@@ -701,7 +705,7 @@ help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
         as links in the config editor.</p>
       </dd>
 
-      <dt>description</dt>
+      <dt id="meta.conf.help.description">description</dt>
 
       <dd>
         <p>(Medium) description for the setting. For example, the configuration
@@ -714,7 +718,7 @@ help=Used in conjunction with namelist:Var_DiagnosticsNL=n_linear_adj_test to
         the config editor, depending on view options.</p>
       </dd>
 
-      <dt>title</dt>
+      <dt id="meta.conf.help.title">title</dt>
 
       <dd>
         <p>(Short) title for the setting. For example, the config editor can
@@ -920,11 +924,12 @@ meta=my-command/t123
 
     <h2 id="appendix-mini-language">Appendix: Metadata Mini-Language</h2>
 
-    <p>The mini-language supports writing a logical expression in Python-like
-    syntax, using variable ids to reference values.</p>
+    <p>The Rose metadata mini-language supports writing a logical expression in Python-like
+    syntax, using variable ids to reference their associated values.</p>
 
     <p>Expressions are set as the value of metadata properties such as
-    <samp>fail-if</samp> and <samp>range</samp>.</p>
+    <a href="#meta.conf.value.fail-if"><code>fail-if</code></a> and
+    <a href="#meta.conf.value.range"><code>range</code></a>.</p>
 
     <p>The language is a small sub-set of Python - a limited set of operators
     is supported. No built-in object methods, functions, or modules are
@@ -987,9 +992,9 @@ is    # Is the same object as (usually used for 'is none')
 
     <p>The following are special constants:</p>
     <pre class="prettyprint lang-python">
-none  # Python None
-false # Python False
-true  # Python True
+None  # Python None
+False # Python False
+True  # Python True
 </pre>
 
     <h3 id="appendix-mini-language-ids">Using Variable Ids</h3>
@@ -1049,8 +1054,9 @@ namelist:foo=bar(2)
 </pre>
 
     <p>references the second element in the value for <samp>bar</samp> in the
-    section <samp>namelist:foo</samp> (following Fortran index numbering and
-    syntax).</p>
+    section <samp>namelist:foo</samp>. This follows Fortran index numbering and
+    syntax, which starts at 1 rather than 0 - i.e. referencing the 1st element
+    in the array <var>foo</var> is written as <samp>foo(1)</samp>.</p>
 
     <p>If we had a configuration:</p>
     <pre class="prettyprint lang-rose_conf">
@@ -1065,7 +1071,7 @@ bar='a', 'b', 'c', 'd'
 namelist:foo=bar(2) == 'c'
 </pre>
 
-    <p>would be evaluated like this:</p>
+    <p>would be evaluated as:</p>
     <pre class="prettyprint lang-python">
 'b' == 'c'
 </pre>
