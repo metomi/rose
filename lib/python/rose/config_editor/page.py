@@ -145,8 +145,13 @@ class ConfigPage(gtk.VBox):
         self.scroll_vadj = self.scrolled_main_window.get_vadjustment()
         self.scrolled_main_window.connect(
                      "button-press-event",
-                     lambda b, e: e.button == 3 and 
-                                  self.launch_add_menu(e.button, e.time))
+                     self._handle_click_main_window)
+
+    def _handle_click_main_window(self, widget, event):
+        if event.button != 3:
+            return False
+        self.launch_add_menu(event.button, event.time)
+        return False
 
     def get_label_widget(self, is_detached=False):
         """Return a container of widgets for the notebook tab label."""
