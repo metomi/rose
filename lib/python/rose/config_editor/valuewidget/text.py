@@ -40,7 +40,6 @@ class RawValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-
         self.entry = gtk.Entry()
         insensitive_colour = gtk.Style().bg[0]
         self.entry.modify_bg(gtk.STATE_INSENSITIVE,
@@ -52,9 +51,7 @@ class RawValueWidget(gtk.HBox):
             self.entry.set_tooltip_text(
                        rose.config_editor.VAR_WIDGET_ENV_INFO)
         self.entry.set_text(self.value)
-        self.entry.connect_after("paste-clipboard", self.setter)
-        self.entry.connect_after("key-release-event", self.setter)
-        self.entry.connect_after("button-release-event", self.setter)
+        self.entry.connect_after("changed", self.setter)
         self.entry.show()
         self.pack_start(self.entry, expand=True, fill=True,
                                     padding=0)

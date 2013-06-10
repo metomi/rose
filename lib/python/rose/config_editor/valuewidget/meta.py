@@ -37,9 +37,7 @@ class MetaValueWidget(gtk.HBox):
         self.normal_colour = self.entry.style.text[gtk.STATE_NORMAL]
         self.insens_colour = self.entry.style.text[gtk.STATE_INSENSITIVE]
         self.entry.set_text(self.value)
-        self.entry.connect_after("paste-clipboard", self._check_diff)
-        self.entry.connect_after("key-release-event", self._check_diff)
-        self.entry.connect_after("button-release-event", self._check_diff)
+        self.entry.connect_after("changed", self._check_diff)
         self.entry.connect("activate", self._setter)
         self.entry.connect("focus-out-event", self._setter)
         self.entry.show()
