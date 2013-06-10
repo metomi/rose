@@ -307,8 +307,8 @@
 
     <p>Rosie stores suites using Subversion repositories, with databases behind
     a web interface for suite discovery and lookup. You will need to select a
-    machine to host the Subversion repositories. This machine will also host the
-    web server and databases.</p>
+    machine to host the Subversion repositories. This machine will also host
+    the web server and databases.</p>
 
     <p>Login to your host, create one or more Subversion FSFS repositories.</p>
 
@@ -316,10 +316,10 @@
     "http://www.metoffice.gov.uk/research/collaboration/fcm">FCM</a> for your
     version control, you should set a special property on the repository to
     allow branching and merging with FCM in the Rosie convention. For example,
-    if your repository is served from
-    <var>HOST_AND_PATH</var> (e.g. <samp>myhost001/svn-repos</samp>) with given
-    repository base name <var>NAME</var> (e.g. <samp>roses_mo1</samp>), change
-    into a new directory and enter the following commands:</p>
+    if your repository is served from <var>HOST_AND_PATH</var> (e.g.
+    <samp>myhost001/svn-repos</samp>) with given repository base name
+    <var>NAME</var> (e.g. <samp>roses_mo1</samp>), change into a new directory
+    and enter the following commands:</p>
     <pre>
 svn co -q svn://${HOST_AND_PATH}/${NAME}/
 svn ps fcm:layout -F - ${NAME} &lt;&lt;'__FCM_LAYOUT__'
@@ -446,18 +446,19 @@ sub-project experiment model
 
     <h2 id="meta">Storing Configuration Metadata</h2>
 
-    <p>Some <a href="rose-configuration.html#meta">configuration metadata</a>
-    will need to be centrally stored in a globally readable location. Projects
-    using Rose will usually have metadata stored under a <samp>rose-meta</samp>
-    directory in their source tree, and this needs to be centrally located in
-    order to be retrieved by Rose utilities such as the config editor.</p>
+    <p>Some <a href="rose-configuration-metadata.html">configuration
+    metadata</a> will need to be centrally stored in a globally readable
+    location. Projects using Rose will usually have metadata stored under a
+    <samp>rose-meta</samp> directory in their source tree, and this needs to be
+    centrally located in order to be retrieved by Rose utilities such as the
+    config editor.</p>
 
     <p>Each sub-directory under a <samp>rose-meta</samp> directory needs to be
     replicated under a central location. The central location should be stored
     as the value of the site configuration <samp>meta-path</samp> option.</p>
 
     <p>For full details, see <a href=
-    "rose-configuration.html#appendix-metadata-location">Metadata
+    "rose-configuration-metadata.html#appendix-metadata-location">Metadata
     Location</a>.</p>
   </div>
 </body>
