@@ -290,9 +290,9 @@ sort-key=do-not-like-00
         </dl>
 
         <p>Note that not all inputs need to have <code>type</code> defined. In
-        some cases using <a href="#meta.conf.value.values"><code>values</code></a>
-        or <a href="#meta.conf.value.values"><code>pattern</code></a> is
-        better.</p>
+        some cases using <a href=
+        "#meta.conf.value.values"><code>values</code></a> or <a href=
+        "#meta.conf.value.values"><code>pattern</code></a> is better.</p>
 
         <p>A derived type may be defined by a comma <kbd>,</kbd> separated list
         of intrinsic types, e.g. <samp>integer, character, real,
@@ -313,8 +313,8 @@ sort-key=do-not-like-00
         <p>Define a comma <kbd>,</kbd> separated list of permitted values of a
         setting (or an element in the setting if it is an array). This metadata
         overrides the <a href="#meta.conf.value.type"><code>type</code></a>,
-        <a href="#meta.conf.value.range"><code>range</code></a> and
-        <a href="#meta.conf.value.pattern"><code>pattern</code></a> metadata.</p>
+        <a href="#meta.conf.value.range"><code>range</code></a> and <a href=
+        "#meta.conf.value.pattern"><code>pattern</code></a> metadata.</p>
 
         <p>For example, the config editor may use this list to determine the
         widget to display the setting. It may display the choices using a set
@@ -328,8 +328,8 @@ sort-key=do-not-like-00
 
       <dd>
         <p>Define a comma <kbd>,</kbd> separated list of titles to associate
-        with each of the elements of
-        <a href="#meta.conf.value.values"><code>values</code></a> which will be
+        with each of the elements of <a href=
+        "#meta.conf.value.values"><code>values</code></a> which will be
         displayed instead of the value. This list should contain the same
         number of elements as the <code>values</code> entry.</p>
 
@@ -350,10 +350,10 @@ value-titles=low, medium, high
       <dd>
         <p>Specify a range of values. It can either be a simple comma
         <kbd>,</kbd> separated list of allowed values, or a logical expression
-        in the Rose metadata <a href="#appendix-mini-language">mini-language</a>.
-        This metadata is only valid if
-        <a href="#meta.conf.value.type"><code>type</code></a> is either <samp>integer</samp> or
-        <samp>real</samp>.</p>
+        in the Rose metadata <a href=
+        "#appendix-mini-language">mini-language</a>. This metadata is only
+        valid if <a href="#meta.conf.value.type"><code>type</code></a> is
+        either <samp>integer</samp> or <samp>real</samp>.</p>
 
         <p>A simple list may contain a mixture of allowed numbers and number
         ranges such as <samp>1, 2, 4:8, 10:</samp>, (which means the value can
@@ -364,8 +364,9 @@ value-titles=low, medium, high
         "#appendix-mini-language">mini-language</a>, using the variable
         <var>this</var> to denote the value of the current setting, e.g.
         <samp>this &lt;-1 and this &gt;1</samp>. Inter-variable comparisons are
-        not permitted (but see the <a href="#meta.conf.value.fail-if"><code>fail-if</code></a> property below for a way to
-        implement this).</p>
+        not permitted (but see the <a href=
+        "#meta.conf.value.fail-if"><code>fail-if</code></a> property below for
+        a way to implement this).</p>
       </dd>
 
       <dt id="meta.conf.value.pattern">pattern</dt>
@@ -596,8 +597,9 @@ trigger=env=IS_ICE: true;
         <p>The trigger syntax also supports a logical expression using the Rose
         metadata <a href="#appendix-mini-language">mini-language</a>, in the
         same way as the <a href="#meta.conf.value.range"><code>range</code></a>
-        or <a href="#meta.conf.value.fail-if"><code>fail-if</code></a> metadata. As
-        with <code>range</code>, inter-variable comparisons are disallowed.</p>
+        or <a href="#meta.conf.value.fail-if"><code>fail-if</code></a>
+        metadata. As with <code>range</code>, inter-variable comparisons are
+        disallowed.</p>
         <pre class="prettyprint lang-rose_conf">
 [env=SNOWFLAKE_SIDES]
 trigger=env=CUSTOM_SNOWFLAKE_GEOMETRY: this != 6;
@@ -924,12 +926,13 @@ meta=my-command/t123
 
     <h2 id="appendix-mini-language">Appendix: Metadata Mini-Language</h2>
 
-    <p>The Rose metadata mini-language supports writing a logical expression in Python-like
-    syntax, using variable ids to reference their associated values.</p>
+    <p>The Rose metadata mini-language supports writing a logical expression in
+    Python-like syntax, using variable ids to reference their associated
+    values.</p>
 
-    <p>Expressions are set as the value of metadata properties such as
-    <a href="#meta.conf.value.fail-if"><code>fail-if</code></a> and
-    <a href="#meta.conf.value.range"><code>range</code></a>.</p>
+    <p>Expressions are set as the value of metadata properties such as <a href=
+    "#meta.conf.value.fail-if"><code>fail-if</code></a> and <a href=
+    "#meta.conf.value.range"><code>range</code></a>.</p>
 
     <p>The language is a small sub-set of Python - a limited set of operators
     is supported. No built-in object methods, functions, or modules are
