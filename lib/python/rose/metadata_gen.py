@@ -28,7 +28,8 @@ import rose.config
 import rose.formats.namelist
 import rose.macro
 import rose.macros.value
-from rose.opt_parse import RoseOptionParser
+import rose.meta_type
+import rose.opt_parse
 
 
 def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
@@ -94,19 +95,14 @@ def type_gen(value):
         return None, str(length)
     for val in rose.variable.array_split(value):
         length += 1
-        if rose.formats.namelist.REC_INTEGER.match(val):
-            types.append("integer")
-        elif rose.formats.namelist.REC_REAL.match(val):
-            types.append("real")
-        elif rose.formats.namelist.REC_CHARACTER.match(val):
-            types.append("character")
-        elif rose.formats.namelist.REC_LOGICAL.match(val):
-            types.append("logical")
-        elif val in [rose.TYPE_BOOLEAN_VALUE_FALSE,
-                     rose.TYPE_BOOLEAN_VALUE_TRUE]:
-            types.append("boolean")
-        else:
-            types.append("raw")
+        val_meta_type = "raw"
+        for meta_type in ["integer", "real", "quoted", "character", "logical",
+                          "boolean"]:
+            is_ok, err_text = rose.meta_type.meta_type_checker(val, meta_type)
+            if is_ok:
+                val_meta_type = meta_type
+                break
+        types.append(val_meta_type)
     if not any([t != "raw" for t in types]):
         length = 1
         return None, str(length)
@@ -125,7 +121,7 @@ def type_gen(value):
 
 
 def main():
-    opt_parser = RoseOptionParser()
+    opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("auto_type", "conf_dir", "output_dir")
     opts, args = opt_parser.parse_args()
 
