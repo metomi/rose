@@ -278,10 +278,7 @@ class NavPanelHandler(object):
             namespace = None
         else:
             namespace = "/" + base_ns.lstrip("/")
-        
-        if self.data.config[namespace].is_preview:
-            return False    
-            
+                   
         ui_config_string = """<ui> <popup name='Popup'>"""
         actions = [('New', gtk.STOCK_NEW,
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),
@@ -318,6 +315,8 @@ class NavPanelHandler(object):
         is_empty = (not self.data.config)
         if namespace is not None:
             config_name = self.util.split_full_ns(self.data, namespace)[0]
+            if self.data.config[config_name].is_preview:
+                return False
             cloneable = self.is_ns_duplicate(namespace)
             is_top = (namespace in self.data.config.keys())
             is_fixable = bool(self.get_ns_errors(namespace))
