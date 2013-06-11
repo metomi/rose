@@ -25,7 +25,7 @@ import rose.variable
 REC_CHARACTER = re.compile(r"'(?:[^']|'')*'$")
 
 
-class MetaType():
+class MetaType(object):
 
     KEY = None
     meta_type_classes = {}

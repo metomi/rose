@@ -22,30 +22,31 @@
 . $(dirname $0)/test_header
 init <<__CONFIG__
 [env]
-my_boolean = false
+my_boolean=false
+my_quoted="fooington"
 
 [namelist:testnl1]
-my_char = 'Character string'
-my_char_array = 'a', 'b', 'c'
-my_int = 1
-my_int_array_long = 1, 2, 3, 4, 5, 6
-my_raw = Raw string
-my_real = 1.0
-my_real_array = 1.0, 2.0, 3.0
-my_logical = .false.
-my_logical_array = .false., .true., .false.
-my_derived = 'String', 1.0, 2, .false.
-my_derived_array = 'String1', 1.0, 2, .false., 'String2', 3.0, 4, .true.,
-                   'String3', 5.0, 6, .false., 'String4', 7.0, 8, .true.
+my_char='Character string'
+my_char_array='a', 'b', 'c'
+my_int=1
+my_int_array_long=1, 2, 3, 4, 5, 6
+my_raw=Raw string
+my_real=1.0
+my_real_array=1.0, 2.0, 3.0
+my_logical=.false.
+my_logical_array=.false., .true., .false.
+my_derived='String', 1.0, 2, .false.
+my_derived_array='String1', 1.0, 2, .false., 'String2', 3.0, 4, .true.,
+                 'String3', 5.0, 6, .false., 'String4', 7.0, 8, .true.
 
 [namelist:testnl2(1)]
-my_int = -3000
+my_int=-3000
 
 [namelist:testnl3{mod1}]
-my_real = 2.0
+my_real=2.0
 
 [namelist:testnl4{mod1}(1)]
-my_logical = .false.
+my_logical=.false.
 __CONFIG__
 #-------------------------------------------------------------------------------
 tests 4
@@ -61,6 +62,9 @@ file_cmp "$TEST_KEY.conf" ../config/meta/rose-meta.conf - <<'__CONTENT__'
 
 [env=my_boolean]
 type=boolean
+
+[env=my_quoted]
+type=quoted
 
 [namelist:testnl1]
 
