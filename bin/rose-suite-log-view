@@ -21,30 +21,33 @@
 #     rose suite-log-view
 #
 # SYNOPSIS
-#     rose suite-log-view [OPTIONS] [TASK ...]
+#     1. rose suite-log-view [--view]
+#     2. rose suite-log-view --update [ITEM ...]
+#        rose suite-log-view --update '*' # all task jobs
+#     3. rose suite-log-view --archive CYCLE ...
 #
 # DESCRIPTION
-#     Generate and browse the log view of a suite.
+#     View or update suite log.
 #
-#     If one or more TASK is specified, re-sync their logs if they are
-#     submitted remotely.
-#
-#     Analyse the suite log to generate a JSON file for feeding into an HTML
-#     based viewer. If --name=SUITE-NAME is not specified, the basename of $PWD
-#     is assumed to be the suite name.
-#
-#     If the DISPLAY environment variable is defined. Launch the web browser to
-#     display the log view unless --no-web-browse is specified.
+#     1. Launch web browser to view suite log.
+#     2. Update the suite log view information for specified cycle times or
+#        task IDs (e.g. "task.cycle" in cylc suites).
+#     3. Archive (tar-gzip) job logs at or older than the specified cycle time.
 #
 # OPTIONS
-#     --full, -f
-#         Re-sync all remote task logs, regardless of the TASK arguments.
-#     --log-archive-threshold=CYCLE-TIME
-#         Switch on job log archiving by specifying a cycle time threshold. All
-#         job logs at this cycle time or older will be archived. Implies --full.
-#     --name=SUITE-NAME
-#         Specify the suite name.
-#     --no-web-browse
-#         Do not open a web browser to display the log view.
+#     --archive
+#         Archive (tar-gzip) job logs at specified cycle times. Imply --update.
+#     --force, -f
+#         Imply "rose suite-log-view --update '*'" and force update the HTML
+#         display libraries.
+#     --name=SUITE-NAME, -n SUITE-NAME
+#         Specify the suite name, instead of using basename of $PWD.
+#     --tidy-remote
+#         If specified, remove job logs from remote hosts after pulling them to
+#         suite host.
+#     --update, -u
+#         Update job logs and index for items specified in arguments.
+#     --view
+#         Launch web browser to view suite log.
 #-------------------------------------------------------------------------------
 exec python -m rose.suite_log_view "$@"

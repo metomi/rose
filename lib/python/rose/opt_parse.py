@@ -50,7 +50,12 @@ class RoseOptionParser(OptionParser):
                        ["--app-mode"],
                        {"action": "store",
                         "metavar": "MODE",
-                        "help": "Run a command or a builtin application"}],
+                        "help": "Run a command or a builtin application."}],
+               "archive_mode": [
+                       ["--archive"],
+                       {"action": "store_true",
+                        "dest": "archive_mode",
+                        "help": "Switch on archive mode."}],
                "auto_type": [
                        ["--auto-type"],
                        {"action": "store_true",
@@ -139,13 +144,7 @@ class RoseOptionParser(OptionParser):
                        ["--force", "-f"],
                        {"action": "store_true",
                         "dest": "force_mode",
-                        "help": ("Force file installation " +
-                                 "even if it may be unsafe.")}],
-               "full_mode": [
-                       ["--full", "-f"],
-                       {"action": "store_true",
-                        "dest": "full_mode",
-                        "help": ("Full update.")}],
+                        "help": ("Switch on force mode.")}],
                "format": [
                        ["--format", "-f"],
                        {"metavar": "FORMAT",
@@ -205,12 +204,6 @@ class RoseOptionParser(OptionParser):
                         "default": True,
                         "dest": "log_archive_mode",
                         "help": "Do not archive old logs."}],
-               "log_archive_threshold": [
-                       ["--log-archive-threshold"],
-                       {"action": "store",
-                        "metavar": "CYCLE-TIME",
-                        "help": "Specify the cycle at and before which job" +
-                                "logs can be archived."}],
                "log_keep": [
                        ["--log-keep"],
                        {"action": "store",
@@ -449,6 +442,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "thresholds",
                         "metavar": "METHOD:METHOD-ARG:NUMBER",
                         "help": "Specify one or more threshold."}],
+               "tidy_remote_mode": [
+                       ["--tidy-remote"],
+                       {"action": "store_true",
+                        "dest": "tidy_remote_mode",
+                        "help": "Remove remote job logs after retrieval."}],
                "to_local_copy": [
                        ["--to-local-copy"],
                        {"action": "store_true",
@@ -469,6 +467,12 @@ class RoseOptionParser(OptionParser):
                        ["--unbound", "--undef"],
                        {"metavar": "STRING",
                         "help": "Substitute unbound variables with STRING"}],
+               "update_mode": [
+                       ["--update", "-u"],
+                       {"action": "store_true",
+                        "dest": "update_mode",
+                        "default": False,
+                        "help": "Switch on update mode."}],
                "upper": [
                        ["--upper", "-u"],
                        {"action": "store_const",
@@ -492,12 +496,12 @@ class RoseOptionParser(OptionParser):
                         "default": 1,
                         "dest": "verbosity",
                         "help": "Increment verbosity."}],
-               "web_browser_mode": [
-                       ["--no-web-browse"],
-                       {"action": "store_false",
-                        "dest": "web_browser_mode",
-                        "default": True,
-                        "help": "Do not open web browser."}]}
+               "view_mode": [
+                       ["--view"],
+                       {"action": "store_true",
+                        "dest": "view_mode",
+                        "default": False,
+                        "help": "View with web browser."}]}
 
     def __init__(self, *args, **kwargs):
         if hasattr(kwargs, "prog"):
