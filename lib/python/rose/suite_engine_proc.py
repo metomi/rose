@@ -458,7 +458,8 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def job_logs_pull_remote(self, suite_name, items=None):
+    def job_logs_pull_remote(self, suite_name, items=None,
+                             tidy_remote_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.

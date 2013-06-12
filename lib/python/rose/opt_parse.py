@@ -144,7 +144,7 @@ class RoseOptionParser(OptionParser):
                        ["--force", "-f"],
                        {"action": "store_true",
                         "dest": "force_mode",
-                        "help": ("Switch on force mode.")}],
+                        "help": "Switch on force mode."}],
                "format": [
                        ["--format", "-f"],
                        {"metavar": "FORMAT",
@@ -327,7 +327,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "dest": "path_globs",
                         "metavar": "PATTERN",
-                        "help": ("Paths to prepend to PATH.")}],
+                        "help": "Paths to prepend to PATH."}],
                "prefix": [
                        ["--prefix"],
                        {"metavar": "PREFIX",
@@ -339,7 +339,7 @@ class RoseOptionParser(OptionParser):
                "print_format": [
                        ["--print-format"],
                        {"metavar": "FORMAT",
-                        "help": ("Specify the format for printing.")}],
+                        "help": "Specify the format for printing."}],
                "profile_mode": [
                        ["--profile"],
                        {"action": "store_true",
