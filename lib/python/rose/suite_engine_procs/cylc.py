@@ -506,8 +506,8 @@ class CylcProcessor(SuiteEngineProcessor):
                             "glob_": glob_}
                     cmd = self.popen.get_cmd(
                             "ssh", auth,
-                            "cd %(log_dir_rel)s && " +
-                            "(! test -f %(uuid)s && ls %(glob_)s)" % data)
+                            ("cd %(log_dir_rel)s && " +
+                             "(! test -f %(uuid)s && ls %(glob_)s)") % data)
                     if self.popen.run(*cmd)[0]:
                         continue
                     try:

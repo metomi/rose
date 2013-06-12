@@ -155,7 +155,7 @@ class SuiteLogViewGenerator(object):
                     self._generate(suite_name, items, tidy_remote_mode,
                                    archive_mode, force_lib_mode)
                 finally:
-                    items = None
+                    items = []
                     tidy_remote_mode = False
                     archive_mode = False
                     force_lib_mode = False
