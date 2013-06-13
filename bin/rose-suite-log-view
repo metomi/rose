@@ -17,37 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# NAME
-#     rose suite-log-view
-#
-# SYNOPSIS
-#     1. rose suite-log-view [--view]
-#     2. rose suite-log-view --update [ITEM ...]
-#        rose suite-log-view --update '*' # all task jobs
-#     3. rose suite-log-view --archive CYCLE ...
-#
-# DESCRIPTION
-#     View or update suite log.
-#
-#     1. Launch web browser to view suite log.
-#     2. Update the suite log view information for specified cycle times or
-#        task IDs (e.g. "task.cycle" in cylc suites).
-#     3. Archive (tar-gzip) job logs at or older than the specified cycle time.
-#
-# OPTIONS
-#     --archive
-#         Archive (tar-gzip) job logs at specified cycle times. Imply --update.
-#     --force, -f
-#         Imply "rose suite-log-view --update '*'" and force update the HTML
-#         display libraries.
-#     --name=SUITE-NAME, -n SUITE-NAME
-#         Specify the suite name, instead of using basename of $PWD.
-#     --tidy-remote
-#         If specified, remove job logs from remote hosts after pulling them to
-#         suite host.
-#     --update, -u
-#         Update job logs and index for items specified in arguments.
-#     --view
-#         Launch web browser to view suite log.
+# Alias of "rose suite-log".
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_log_view "$@"
+exec $(dirname $0)/rose-suite-log "$@"

@@ -325,7 +325,7 @@ class SuiteEngineProcessor(object):
         if not os.path.exists(log_index):
             return None
         conf = ResourceLocator.default().get_conf()
-        value = conf.get_value(["rose-suite-log-view", "home-public-html"])
+        value = conf.get_value(["rose-suite-log", "home-public-html"])
         if value is None:
             return "file://" + log_index
         values = env_var_process(value).split(None, 1)

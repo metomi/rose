@@ -80,7 +80,7 @@ class WebBrowserEvent(Event):
 class SuiteLogViewGenerator(object):
     """Generate the log view for a suite."""
 
-    NS = "rose-suite-log-view"
+    NS = "rose-suite-log"
     ITEM_ALL = ".all"
     LOCK = "." + NS + ".lock"
     UPDATE_POLL_LOCK_DELAY = 1

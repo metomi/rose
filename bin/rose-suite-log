@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-3 Met Office.
+# 
+# This file is part of Rose, a framework for scientific suites.
+# 
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose suite-log
+#
+# SYNOPSIS
+#     1. rose suite-log [--view]
+#     2. rose suite-log --update [ITEM ...]
+#        rose suite-log --update '*' # all task jobs
+#     3. rose suite-log --archive CYCLE ...
+#
+# DESCRIPTION
+#     View or update suite log.
+#
+#     1. Launch web browser to view suite log.
+#     2. Update the suite log view information for specified cycle times or
+#        task IDs (e.g. "task.cycle" in cylc suites).
+#     3. Archive (tar-gzip) job logs at or older than the specified cycle time.
+#
+# OPTIONS
+#     --archive
+#         Archive (tar-gzip) job logs at specified cycle times. Imply --update.
+#     --force, -f
+#         Imply "rose suite-log --update '*'" and force update the HTML
+#         display libraries.
+#     --name=SUITE-NAME, -n SUITE-NAME
+#         Specify the suite name, instead of using basename of $PWD.
+#     --tidy-remote
+#         If specified, remove job logs from remote hosts after pulling them to
+#         suite host.
+#     --update, -u
+#         Update job logs and index for items specified in arguments.
+#     --view
+#         Launch web browser to view suite log.
+#-------------------------------------------------------------------------------
+exec python -m rose.suite_log_view "$@"

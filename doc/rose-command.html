@@ -126,7 +126,7 @@
 
       <dt><a href="#rose-slv">rose slv</a></dt>
 
-      <dd>(=suite-log-view)</dd>
+      <dd>(=suite-log)</dd>
 
       <dt><a href="#rose-suite-clean">rose suite-clean</a></dt>
 
@@ -140,9 +140,13 @@
 
       <dd>Provide a common event hook for Cylc suites and tasks.</dd>
 
-      <dt><a href="#rose-suite-log-view">rose suite-log-view</a></dt>
+      <dt><a href="#rose-suite-log">rose suite-log</a></dt>
 
       <dd>Generate and browse the log view of SUITE.</dd>
+
+      <dt><a href="#rose-suite-log-view">rose suite-log-view</a></dt>
+
+      <dd>(=suite-log)</dd>
 
       <dt><a href="#rose-suite-restart">rose suite-restart</a></dt>
 
@@ -1231,7 +1235,7 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <h2 id="rose-slv">rose slv</h2>
 
-    <p>See <a href="#rose-suite-log-view">rose suite-log-view</a>.</p>
+    <p>See <a href="#rose-suite-log">rose suite-log</a>.</p>
 
     <h2 id="rose-suite-clean">rose suite-clean</h2>
 
@@ -1375,23 +1379,23 @@ launcher-preopts.mpiexec=-n $NPROC
       <dd>Increment verbosity.</dd>
     </dl>
 
-    <h2 id="rose-suite-log-view">rose suite-log-view</h2>
+    <h2 id="rose-suite-log">rose suite-log</h2>
 
     <h3>NAME</h3>
 
     <ol>
-      <li><kbd>rose suite-log-view [--view]</kbd></li>
+      <li><kbd>rose suite-log [--view]</kbd></li>
 
-      <li><kbd>rose suite-log-view --update [ITEM ...]</kbd><br />
-      <kbd>rose suite-log-view --update '*' # all task jobs</kbd></li>
+      <li><kbd>rose suite-log --update [ITEM ...]</kbd><br />
+      <kbd>rose suite-log --update '*' # all task jobs</kbd></li>
 
-      <li><kbd>rose suite-log-view --archive CYCLE ...</kbd></li>
+      <li><kbd>rose suite-log --archive CYCLE ...</kbd></li>
     </ol>
-    <p><kbd>rose suite-log-view</kbd></p>
+    <p><kbd>rose suite-log</kbd></p>
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose suite-log-view [OPTIONS] [TASK ...]</kbd></p>
+    <p><kbd>rose suite-log [OPTIONS] [TASK ...]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
@@ -1419,7 +1423,7 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>--force, -f</kbd></dt>
 
-      <dd>Imply <kbd>rose suite-log-view --update '*'</kbd> and force update
+      <dd>Imply <kbd>rose suite-log --update '*'</kbd> and force update
       the HTML display libraries.</dd>
 
       <dt><kbd>--name=SUITE-NAME</kbd>, <kbd>-n SUITE-NAME</kbd></dt>
@@ -1439,6 +1443,10 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dd>Launch web browser to view suite log.</dd>
     </dl>
+
+    <h2 id="rose-suite-log-view">rose suite-log-view</h2>
+
+    <p>See <a href="#rose-suite-log">rose suite-log</a>.</p>
 
     <h2 id="rose-suite-restart">rose suite-restart</h2>
 
