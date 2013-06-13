@@ -56,7 +56,7 @@ class CylcProcessor(SuiteEngineProcessor):
               "signaled": "fail"}
     N_DB_SELECT_TRIES = 20
     PYRO_TIMEOUT = 5
-    REC_CYCLE_TIME = re.compile(r"\A\d+(?:T\d+)?\Z") # Good enough?
+    REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
