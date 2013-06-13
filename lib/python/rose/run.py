@@ -707,13 +707,14 @@ class SuiteRunner(Runner):
             hosts = suite_run_hosts
         else:
             if self.suite_engine_proc.is_suite_running(suite_name, hosts):
+                suite_run_hosts = self.suite_engine_proc.ping(suite_name,
+                                                              hosts)
                 if opts.force_mode:
                     opts.install_only_mode = True
-                    suite_run_hosts = self.suite_engine_proc.ping(suite_name,
-                                                                  hosts)
+                elif suite_run_hosts:
+                    raise AlreadyRunningError(suite_name, suite_run_hosts[0])
                 else:
-                    raise AlreadyRunningError(suite_name, 
-                                              suite_run_hosts[0])
+                    raise AlreadyRunningError(suite_name, "?")
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)

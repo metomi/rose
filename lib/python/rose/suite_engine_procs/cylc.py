@@ -483,8 +483,7 @@ class CylcProcessor(SuiteEngineProcessor):
             if host == "localhost":
                 continue
             cmd = self.popen.get_cmd("ssh", host, "test", "-f", rel_path)
-            proc = self.popen.run_bg(""
-            host_proc_dict[host] = proc
+            host_proc_dict[host] = self.popen.run_bg(*cmd)
         is_running = False
         while host_proc_dict:
             for host, proc in host_proc_dict.items():
