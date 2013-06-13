@@ -469,6 +469,35 @@ class CylcProcessor(SuiteEngineProcessor):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
+    def is_suite_running(self, suite_name, hosts=None):
+        """Return True if it looks like suite is running on one of hosts."""
+        if not hosts:
+            hosts = ["localhost"]
+        rel_path = os.path.join(".cylc", "ports", suite_name)
+        if "localhost" in hosts:
+            home = os.path.expanduser("~")
+            if os.path.exists(os.path.join(home, rel_path)):
+                return True
+        host_proc_dict = {}
+        for host in sorted(hosts):
+            if host == "localhost":
+                continue
+            cmd = self.popen.get_cmd("ssh", host, "test", "-f", rel_path)
+            proc = self.popen.run_bg(""
+            host_proc_dict[host] = proc
+        is_running = False
+        while host_proc_dict:
+            for host, proc in host_proc_dict.items():
+                rc = proc.poll()
+                if rc is not None:
+                    host_proc_dict.pop(host)
+                    if rc == 0:
+                        is_running = True
+            if host_proc_dict:
+                sleep(0.1)
+                
+        return is_running
+
     def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
         if not hosts:

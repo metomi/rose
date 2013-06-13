@@ -692,26 +692,28 @@ class SuiteRunner(Runner):
         conf = ResourceLocator.default().get_conf()
         
         known_hosts = self.host_selector.expand(
+              ["localhost"] +
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
-              ["localhost"])[0]
+              conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
         known_hosts = list(set(known_hosts))
         
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
-        suite_running_hosts = self.suite_engine_proc.ping(suite_name, hosts)
         if opts.run_mode == "reload":
-            if not suite_running_hosts:
+            suite_run_hosts = self.suite_engine_proc.ping(suite_name, hosts)
+            if not suite_run_hosts:
                 raise NotRunningError(suite_name)
-            hosts = suite_running_hosts
+            hosts = suite_run_hosts
         else:
-            if suite_running_hosts:
+            if self.suite_engine_proc.is_suite_running(suite_name, hosts):
                 if opts.force_mode:
                     opts.install_only_mode = True
+                    suite_run_hosts = self.suite_engine_proc.ping(suite_name,
+                                                                  hosts)
                 else:
                     raise AlreadyRunningError(suite_name, 
-                                              suite_running_hosts[0])
+                                              suite_run_hosts[0])
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
@@ -867,8 +869,8 @@ class SuiteRunner(Runner):
         ret = 0
         if opts.install_only_mode:
             host = None
-            if suite_running_hosts:
-                host = suite_running_hosts[0]
+            if suite_run_hosts:
+                host = suite_run_hosts[0]
         else:
             host = hosts[0]
             # FIXME: should sync files to suite host?
