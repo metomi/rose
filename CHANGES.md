@@ -41,6 +41,9 @@ command. This may some minor change in behaviour of some existing suites as
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#712: rose config-edit: can show variable descriptions and help in-page. 
+Descriptions are shown by default. Customisable formatting.
+
 \#707: rosie site/user configuration: The `[rosie-browse]` section is now
 `[rosie-go]`.
 
