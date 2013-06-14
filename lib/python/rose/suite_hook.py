@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-"""Hook functionalities for a suite task."""
+"""Hook functionalities for a suite."""
 
 from email.mime.text import MIMEText
 import os
@@ -32,7 +32,7 @@ from smtplib import SMTP
 
 class RoseSuiteHook(object):
 
-    """Hook functionalities for a suite task."""
+    """Hook functionalities for a suite."""
 
     def __init__(self, event_handler=None, popen=None, suite_engine_proc=None):
         self.event_handler = event_handler
@@ -53,12 +53,13 @@ class RoseSuiteHook(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def run(self, suite, task, hook_event, hook_message=None,
+    def run(self, suite_name, task_id, hook_event, hook_message=None,
             should_mail=False, mail_cc_list=None, should_shutdown=False):
         """
-        Invoke the hook for a suite task.
+        Invoke the hook for a suite.
 
-        1. If the task runs remotely, retrieve its log from the remote host.
+        1. For a task hook, if the task runs remotely, retrieve its log from
+           the remote host.
         2. Generate the suite log view.
         3. If "should_mail", send an email notification to the current user,
            and those in the "mail_cc_list".
@@ -66,19 +67,20 @@ class RoseSuiteHook(object):
 
         """
         # Retrieve log and generate code view
-        tasks = []
-        if task:
-            tasks = [task]
-        self.suite_log_view_generator(suite, tasks)
+        task_ids = []
+        if task_id:
+            task_ids = [task_id]
+        self.suite_log_view_generator.generate(suite_name, task_ids,
+                                               lock_exit_mode=True)
 
         # Send email notification if required
         if should_mail:
             text = ""
-            if task:
-                text += "Task: %s\n" % task
+            if task_id:
+                text += "Task: %s\n" % task_id
             if hook_message:
                 text += "Message: %s\n" % hook_message
-            url = self.suite_engine_proc.get_suite_log_url(suite)
+            url = self.suite_engine_proc.get_suite_log_url(suite_name)
             text += "See: %s\n" % (url)
             msg = MIMEText(text)
             user = pwd.getpwuid(os.getuid()).pw_name
@@ -88,14 +90,14 @@ class RoseSuiteHook(object):
                 msg["Cc"] = ", ".join(mail_cc_list)
             else:
                 mail_cc_list = []
-            msg["Subject"] = "[%s] %s" % (hook_event, suite)
+            msg["Subject"] = "[%s] %s" % (hook_event, suite_name)
             smtp = SMTP('localhost')
             smtp.sendmail(user, [user] + mail_cc_list, msg.as_string())
             smtp.quit()
 
         # Shut down if required
         if should_shutdown:
-            self.suite_engine_proc.shutdown(suite)
+            self.suite_engine_proc.shutdown(suite_name)
 
     __call__ = run
         

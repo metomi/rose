@@ -66,9 +66,11 @@ class FileSystemUtil(object):
     def chdir(self, path):
         """Wrap os.chdir."""
 
+        cwd = os.getcwd()
         os.chdir(path)
-        event = FileSystemEvent(FileSystemEvent.CHDIR, path + "/")
-        self.handle_event(event)
+        if cwd != os.getcwd():
+            event = FileSystemEvent(FileSystemEvent.CHDIR, path + "/")
+            self.handle_event(event)
 
     def delete(self, path):
         """Delete a file or a directory."""

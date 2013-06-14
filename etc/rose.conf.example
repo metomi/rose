@@ -75,13 +75,13 @@
 #  thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
 [rose-host-select]
 
-# Configuration related to "rose suite-log-view"
+# Configuration related to "rose suite-log"
 #
 ## Mapping $HOME/cylc-run/SUITE to a http:// URL.
 ## E.g. If $HOME/public_html/cylc-run is a symlink of $HOME/cylc-run
 ##      and $HOME/public_html/ is served as http://host/~$USER/:
 #  home-public-html=http://host/~$USER public_html
-[rose-suite-log-view]
+[rose-suite-log]
 
 # Configuration related to "rose mpi-launch".
 #
