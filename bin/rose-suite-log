@@ -45,6 +45,12 @@
 #     --tidy-remote
 #         If specified, remove job logs from remote hosts after pulling them to
 #         suite host.
+#     --timeout=DELAY
+#         Specify a timeout. Normally, a lock is put in place to prevent
+#         other instances of "rose suite-hook" or "rose suite-log --update"
+#         from updating the suite log at the same time. The command hangs as it
+#         attempts to grab the lock. This option specify a timeout (in number
+#         of seconds) for the attempt. (default=300.0)
 #     --update, -u
 #         Update job logs and index for items specified in arguments.
 #     --view

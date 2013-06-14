@@ -84,7 +84,7 @@ class SuiteLogViewGenerator(object):
     ITEM_ALL = ".all"
     LOCK = "." + NS + ".lock"
     UPDATE_POLL_LOCK_DELAY = 1
-    UPDATE_TIMEOUT = 600
+    LOCK_TIMEOUT = 300.0
 
     def __init__(self, event_handler=None, fs_util=None, popen=None,
                  suite_engine_proc=None):
@@ -115,7 +115,7 @@ class SuiteLogViewGenerator(object):
 
     def generate(self, suite_name, items, tidy_remote_mode=False,
                  archive_mode=False, force_lib_mode=False,
-                 lock_exit_mode=False):
+                 lock_exit_mode=False, lock_timeout=None):
         """Update the files for generating the log view of a suite.
 
         suite_name -- The name of the suite.
@@ -129,6 +129,9 @@ class SuiteLogViewGenerator(object):
         lock_exit_mode -- If True, exit on lock.
 
         """
+        if lock_timeout is None:
+            lock_timeout = self.LOCK_TIMEOUT
+        lock_timeout = float(lock_timeout)
         suite_log_dir = self.suite_engine_proc.get_suite_dir(suite_name, "log")
         cwd = os.getcwd()
         if suite_log_dir is not None:
@@ -145,8 +148,8 @@ class SuiteLogViewGenerator(object):
                         for item in items:
                             self.fs_util.touch(os.path.join(lock, item))
                         return
-                    if time() - t_init > self.UPDATE_TIMEOUT:
-                        raise LockTimeoutError(suite_name, self.UPDATE_TIMEOUT)
+                    if time() - t_init > lock_timeout:
+                        raise LockTimeoutError(lock, lock_timeout)
                     sleep(self.UPDATE_POLL_LOCK_DELAY)
                 else:
                     break
@@ -289,7 +292,8 @@ class SuiteLogViewGenerator(object):
 def main():
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("archive_mode", "force_mode", "name",
-                              "tidy_remote_mode", "update_mode", "view_mode")
+                              "tidy_remote_mode", "timeout", "update_mode",
+                              "view_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -315,7 +319,7 @@ def suite_log_view(opts, args, event_handler=None):
         opts.update_mode = True
     if opts.update_mode:
         g.generate(suite_name, args, opts.tidy_remote_mode, opts.archive_mode,
-                   force_lib_mode=opts.force_mode)
+                   force_lib_mode=opts.force_mode, lock_timeout=opts.timeout)
     if opts.view_mode or not opts.update_mode:
         g.view_suite_log_url(suite_name)
     return

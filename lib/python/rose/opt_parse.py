@@ -447,6 +447,10 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "tidy_remote_mode",
                         "help": "Remove remote job logs after retrieval."}],
+               "timeout": [
+                       ["--timeout"],
+                       {"metavar": "DELAY",
+                        "help": "Set a timeout."}],
                "to_local_copy": [
                        ["--to-local-copy"],
                        {"action": "store_true",

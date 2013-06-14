@@ -1435,6 +1435,16 @@ launcher-preopts.mpiexec=-n $NPROC
       <dd>If specified, remove job logs from remote hosts after pulling them to
       suite host.</dd>
 
+      <dt><kbd>--timeout=DELAY</kbd></dt>
+
+      <dd>Specify a timeout. Normally, a lock is put in place to prevent other
+      instances of <a href="#rose-suite-hook">rose suite-hook</a> or <kbd>rose
+      suite-log --update</kbd> from updating the suite log at the same time. The
+      command hangs as it attempts to grab the lock. This option specify a
+      timeout (in number of seconds) for the attempt.
+      (default=<kbd>300.0</kbd>)</dd>
+
+
       <dt><kbd>--update</kbd>, <kbd>-u</kbd></dt>
 
       <dd>Update job logs and index for items specified in arguments.</dd>
