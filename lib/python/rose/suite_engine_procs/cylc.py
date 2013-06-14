@@ -110,35 +110,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 except RosePopenError as e:
                     self.handle_event(e, level=Reporter.WARN)
 
-    def clean(self, suite_name):
-        """Remove items created by the previous run of a suite.
-
-        Change to user's $HOME for safety.
-
-        """
-        os.chdir(os.path.expanduser('~'))
-        if not os.path.isdir(self.get_suite_dir_rel(suite_name)):
-            return
-        hostnames = ["localhost"]
-        host_file_path = self.get_suite_dir_rel(
-                suite_name, "log", "rose-suite-run.host")
-        if os.access(host_file_path, os.F_OK | os.R_OK):
-            for line in open(host_file_path):
-                hostnames.append(line.strip())
-        conf = ResourceLocator.default().get_conf()
-        
-        hostnames = self.host_selector.expand(
-              conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
-              ["localhost"])[0]
-        hostnames = list(set(hostnames))
-        hosts_str = conf.get_value(["rose-suite-run", "scan-hosts"])
-        
-        hosts = []
-        for h in hostnames:
-            if h not in hosts:
-                hosts.append(h)
-            
+    def clean(self, suite_name, hosts=None):
+        """Remove items created by the previous run of a suite."""
         running_hosts = self.ping(suite_name, hosts)
         if running_hosts:
             raise StillRunningError(suite_name, running_hosts[0])
@@ -148,6 +121,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 job_auths = self.get_suite_jobs_auths(suite_name)
             except sqlite3.OperationalError as e:
                 pass
+        conf = ResourceLocator.default().get_conf()
         for job_auth in job_auths + ["localhost"]:
             if "@" in job_auth:
                 job_host = job_auth.split("@", 1)[1]

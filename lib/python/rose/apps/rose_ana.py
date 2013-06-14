@@ -34,7 +34,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
-from rose.run import BuiltinApp
+from rose.app_run import BuiltinApp
 
 WARN = -1
 PASS = 0
