@@ -38,7 +38,7 @@ class NavPanelHandler(object):
 
     def __init__(self, data, util, reporter, mainwindow,
                  undo_stack, redo_stack, add_config_func,
-                 section_ops_inst, variable_ops_inst,
+                 group_ops_inst, section_ops_inst, variable_ops_inst,
                  kill_page_func, reload_ns_tree_func, transform_default_func):
         self.data = data
         self.util = util
@@ -46,6 +46,7 @@ class NavPanelHandler(object):
         self.mainwindow = mainwindow
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack
+        self.group_ops = group_ops_inst
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self._add_config = add_config_func
@@ -103,7 +104,8 @@ class NavPanelHandler(object):
         section = sections.pop()
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
-        return self.copy_section(config_name, section, skip_update=skip_update)
+        return self.group_ops.copy_section(config_name, section,
+                                           skip_update=skip_update)
 
     def create_request(self):
         """Handle a create configuration request."""

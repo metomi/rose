@@ -225,6 +225,7 @@ class MainController(object):
                              self.mainwindow,
                              self.undo_stack, self.redo_stack,
                              self._add_config,
+                             self.group_ops,
                              self.section_ops,
                              self.variable_ops,
                              self.kill_page,

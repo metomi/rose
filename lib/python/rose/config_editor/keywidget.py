@@ -423,7 +423,7 @@ class KeyWidget(gtk.VBox):
             tooltip_text += "\n".join(comments)
         changes = self.var_ops.get_var_changes(self.my_variable)
         if changes != '' and tooltip_text != '':
-            tooltip_text += '\n' + changes
+            tooltip_text += '\n\n' + changes
         else:
             tooltip_text += changes
         tooltip_text.strip()
