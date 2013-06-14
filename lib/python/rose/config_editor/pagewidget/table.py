@@ -120,6 +120,7 @@ class PageTable(gtk.Table):
                                                 show_modes=self.show_modes)
         new_variablewidget.set_sensitive(not is_ghost)
         focus_dict = {"had_focus": False}
+        variable_row = None
         for child in self.get_children():
             variablewidget = child.get_parent()
             if (variablewidget.variable.name == variable.name and
@@ -133,6 +134,8 @@ class PageTable(gtk.Table):
                 variable_row = top_row
                 self.remove(child)
                 child.destroy()
+        if variable_row is None:
+            return False
         new_variablewidget.insert_into(self, self.MAX_COLS, variable_row)
         self._show_and_hide_variable_widgets(new_variablewidget)
         if focus_dict["had_focus"]:
