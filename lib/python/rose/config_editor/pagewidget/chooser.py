@@ -211,7 +211,8 @@ class PageFormatTree(gtk.VBox):
             is_ghost = (variable not in self.panel_data)
             widget = rose.config_editor.variable.VariableWidget(
                                         variable, self.var_ops,
-                                        is_ghost=is_ghost)
+                                        is_ghost=is_ghost,
+                                        show_modes=self.show_modes)
             widget.set_sensitive(not is_ghost)
             widget.insert_into(table, self.MAX_COLS_SOURCE - 1, r + 1)
             if variable.name in [rose.FILE_VAR_CHECKSUM, rose.FILE_VAR_MODE]:
