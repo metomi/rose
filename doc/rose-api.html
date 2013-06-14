@@ -474,6 +474,13 @@ different cases.
       None</code></dt>
 
       <dd>will be called when a variable is removed.</dd>
+
+      <dt><code>def update_ignored(self) -&gt; None</code></dt>
+
+      <dd>will be called to allow you to update ignored widget display, if (for
+      example) you show/hide ignored variables. If you don't have any custom
+      behaviour for ignored variables, it's worth writing a method that does
+      nothing - e.g. one that contains just <code>pass</code>).</dd>
     </dl>
 
     <p>If you take the step of using your own variable widgets, rather than the
@@ -976,9 +983,10 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
 
     <p>The URLs to access the web API of a Rosie web service (with a given
     prefix name) can be found in your rose site configuration file as the value
-    of <var>[rosie-id]prefix-ws.PREFIX_NAME</var>. To access the API for a given
-    repository with prefix PREFIX_NAME, you must select a format (the only
-    currently supported format is 'json') and use a url that looks like:</p>
+    of <var>[rosie-id]prefix-ws.PREFIX_NAME</var>. To access the API for a
+    given repository with prefix PREFIX_NAME, you must select a format (the
+    only currently supported format is 'json') and use a url that looks
+    like:</p>
     <pre>
 http://host/PREFIX_NAME/get_known_keys?format=json
 </pre>

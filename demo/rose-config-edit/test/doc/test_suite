@@ -1,0 +1,115 @@
+## Test suite
+
+# Preparation
+
+Remove all .pyc files.
+
+# Menu and toolbars
+
+File-> Open wrong-path dialog-close dialog-cancel correct-path-enter correct-path_OK repeat_with_new_window
+Toolbar Open wrong-path dialog-close dialog-cancel correct-path-enter correct-path_OK repeat_with_new_window
+File-> Save no_changes do_some_changes change_ignored
+Toolbar Save no_changes do_some_changes change_ignored
+Check changed icons work after a save
+File-> Quit no-changes unsaved-changes
+Window Close no-changes unsaved-changes
+open_page, change a variable, remove it, change another variable, add a variable, change it
+open another page, repeat first changes and ignore a variable under No Metadata
+open another page, remove a variable under No Metadata that's otherwise on another page
+open another page, repeat first changes, add blank and close page
+open another page, remove an ignored variable, add a variable with an error
+open another page, repeat first changes and open in new window
+open another page, open in new window and repeat
+Edit-> Undo normal held_down
+Edit-> Redo normal held_down
+View-> Action Stack
+Edit-> Undo
+Edit-> Redo
+Ctrl_Z
+Ctrl_shift_Z
+Edit-> Find nothing something_on-current_page something_not_on_current_page something_not_existing
+Edit-> Find Next for nothing something_on-current_page something_not_on_current_page something_not_existing
+Edit-> Find check tree panel current page view is correct after Find
+Edit-> Preferences
+View-> Latent no_open_pages open_page_without_latent open_page_with_latent now_open_a_page_with_latent now_open_a_page_without_latent
+View-> Fixed no_open_pages open_page_without_fixed open_page_with_fixed now_open_a_page_with_fixed now_open_a_page_without_fixed
+View-> Ignored no_open_pages open_page_without_ignored open_page_with_ignored
+now_open_a_page_with_ignored now_open_a_page_without_ignored
+View-> No Metadata no_open_pages lots_of_open_pages now_open_page redundant_page opened_in_new_window_page (switch on and off)
+View-> No Title open pages no_open_pages no_metadata changed_variables
+repeat View-> Latent, Fixed, No Metadata in combinations
+Help-> GUI Help
+Help-> About
+Toolbar Add (blank, from_metadata) no_page totally_empty_page file_page no_metadata_page and check all added variables exist properly
+Toolbar Add variable with same name as existing page variable (no longer active part of test)
+Toolbar Add multiple blank variables, remove, repeat under show latent, add and remove different variables and check under undo/redo and latent, ignore and enable an added from latent variable
+Toolbar Revert no_page, add_variables_change_remove_some, change_variables_remove_some, revert_inconsistency revert_missing_compulsory, revert ignored and enabled, revert manual ignored and enabled, revert an added from latent, then manually ignored variable. Undo and Redo revert.
+Open_in_New_Window Add blank variables to just-added page
+Open_in_New_Window Add blank, from_metadata) no_page totally_empty_page no_metadata_page and check all added variables exist properly
+Open_in_New_Window Add variable with same name as existing page variable (no longer active part of test)
+Open_in_New_Window Revert no_page, add_variables_change_remove_some, change_variables_remove_some, revert_inconsistency revert_missing_compulsory
+
+
+# Tree panel
+
+Expand all trees and check hierarchy
+Load many pages
+Load many pages with middle click
+Remove leaf
+Remove non-leaf node
+Remove root
+Remove node with ignored or trigger variables
+Add section and test add, revert as above
+Add section with defined metadata and test add, revert as above
+Remove added section
+Clone a section
+Ignore/Enable a section
+Ignore/Enable a section with relevant ignored error
+Namespace info
+Help
+Web Help
+Test Undo for add and remove and clone and ignore and enable sections
+Force inconsistency and check icons
+Force changed and check icons
+Remove inconsistency and check icons
+Remove changed and check icons
+Remove non-metadata variable and check icons
+Page change (new page, notebook switching and closing, open window, undo and redo with all of these) and check tree panel 'current page' indicator
+
+# Notebook
+
+Close pages
+Open in new window
+
+# Top-level
+
+Check all accelerators
+
+# Variable widgets
+
+Menu-> Remove (normal, compulsory)
+Menu-> Help
+Menu-> Hover-over
+Menu-> Add
+Menu-> Auto-fix Error
+Key click help
+Hide Help on/off
+Key descriptions: normal, after changed value, after add
+Hide Descriptions on/off
+Key titles
+Hide Titles on/off
+Value widgets test all types (combo_box radio_buttons radio_button entry spin_button file_chooser format_chooser etc) under the conditions: test changes, test changes after adding, test changes after removing and adding, test changes under inconsistency, test modified indicators for a generic variable widget under change, add, remove, add, undo/redo and after a save.
+Test loaded ignored variables
+Test inconsistent ignored variables
+Switch on/off ignored variables, value-based and list. Repeat with View->Ignored on/off combinations. Test Menu functions.
+Test trigger on/off of a variable that is only in metadata.
+Test loading with cyclic/inter-sibling dependency.
+Test loading with a trigger variable with no metadata entry.
+
+
+Macros:
+
+Test custom macro run from menu
+Test custom macro run from in-page button
+Test status bar updates, error console
+

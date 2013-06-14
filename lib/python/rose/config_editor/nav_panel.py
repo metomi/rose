@@ -305,6 +305,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 iter_stack.append(self.data_store.iter_children(my_iter))
         for path in paths:
             path_iter = self.data_store.get_iter(path)
+            title = self.data_store.get_value(path_iter, 2)
             name = self.data_store.get_value(path_iter, 3)
             num_errors = self.data_store.get_value(path_iter, 4)
             mods = self.data_store.get_value(path_iter, 6)
@@ -312,24 +313,23 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             metadata, comment = self._get_metadata_comments_func(proper_name)
             description = metadata.get(rose.META_PROP_DESCRIPTION, "")
             change = self.data_store.get_value(path_iter, 11)
-            if description:
-                text = description
-            else:
-                text = name
+            text = title
+            if name != title:
+                text += " (" + name + ")"
             if mods > 0:
-                text += rose.config_editor.TREE_PANEL_MODIFIED
+                text += " - " + rose.config_editor.TREE_PANEL_MODIFIED
+            if description:
+                text += ":\n" + description
             if num_errors > 0:
                 if num_errors == 1:
                     text += rose.config_editor.TREE_PANEL_ERROR
                 else:
                     text += rose.config_editor.TREE_PANEL_ERRORS.format(
                                                           num_errors)
-            if description:
-                text += "\n(" + name + ")"
             if comment:
                 text += "\n" + comment
             if change:
-                text += "\n" + change
+                text += "\n\n" + change
             self.data_store.set_value(path_iter, 10, text)
 
     def update_change(self, row_names, new_change):

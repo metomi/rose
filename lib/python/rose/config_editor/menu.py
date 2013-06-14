@@ -789,9 +789,11 @@ class MainMenuHandler(object):
         g = rose.suite_log_view.SuiteLogViewGenerator()
         url = g.get_suite_log_url(self.data.top_level_name)
         if url is None:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
-                                     rose.config_editor.ERROR_NO_OUTPUT.format(
-                                     self.data.top_level_name))
+            rose.gtk.util.run_dialog(
+                              rose.gtk.util.DIALOG_TYPE_ERROR,
+                              rose.config_editor.ERROR_NO_OUTPUT.format(
+                              self.data.top_level_name),
+                              rose.config_editor.DIALOG_TITLE_ERROR)
         else:
             g.view_suite_log_url(self.data.top_level_name)
 
