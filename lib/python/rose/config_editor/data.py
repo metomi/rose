@@ -801,7 +801,8 @@ class ConfigDataManager(object):
                                      text, title, modal=False,
                                      extra_text=reports_text)
         for report in reports:
-            meta_config.unset([report.section, report.option])
+            if report.option != rose.META_PROP_TRIGGER:
+                meta_config.unset([report.section, report.option])
 
     def load_ignored_data(self, config_name):
         """Deal with ignored variables and sections.
@@ -834,6 +835,9 @@ class ConfigDataManager(object):
                                                       meta_config)
         if bad_list:
             self.trigger[config_name].trigger_family_lookup.clear()
+            event = rose.config_editor.EVENT_INVALID_TRIGGERS.format(
+                                             config_name.strip("/"))
+            self.reporter.report(event, self.reporter.KIND_ERR)
             return
         trig_config, change_list = self.trigger[config_name].transform(
                                         config_for_macro, meta_config)
