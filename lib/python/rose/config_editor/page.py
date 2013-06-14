@@ -1007,7 +1007,7 @@ class ConfigPage(gtk.VBox):
             if var_id in old_id_list:
                 index = old_id_list.index(var_id)
                 old_variable = self.ghost_data[index]
-                old_variable.metadata = variable.metadata
+                old_variable.metadata = variable.metadata.copy()
                 old_variable.ignored_reason = variable.ignored_reason.copy()
                 if old_variable.value != variable.value:
                     old_variable.value = variable.value

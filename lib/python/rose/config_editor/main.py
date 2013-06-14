@@ -341,8 +341,6 @@ class MainController(object):
         add_icon = self.toolbar.item_dict.get(
                         rose.config_editor.TOOLBAR_ADD)['widget']
         add_icon.connect('button_press_event', self.add_page_variable)
-        self.toolbar.set_widget_function(rose.config_editor.TOOLBAR_REVERT,
-                                         self.revert_to_saved_data)
         custom_text = rose.config_editor.TOOLBAR_SUITE_RUN_MENU
         self._toolbar_run_button = rose.gtk.util.CustomMenuButton(
                           stock_id=gtk.STOCK_MEDIA_PLAY,
