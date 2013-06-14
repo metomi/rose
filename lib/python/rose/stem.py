@@ -27,7 +27,7 @@ from rose.fs_util import FileSystemUtil
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
-import rose.run
+from rose.run import SuiteRunner
 
 DEFAULT_TEST_DIR = 'rose-stem'
 OPTIONS = ['group', 'source', 'task', ]
@@ -295,7 +295,7 @@ def main():
     # Process options
     opt_parser = RoseOptionParser()
 
-    option_keys = rose.run.SuiteRunner.OPTIONS + OPTIONS
+    option_keys = SuiteRunner.OPTIONS + OPTIONS
     opt_parser.add_my_options(*option_keys)
     opts, args = opt_parser.parse_args()
 
@@ -312,9 +312,9 @@ def main():
 
 
     # Get the suiterunner object and execute
-    runner = rose.run.SuiteRunner(event_handler=stem.reporter, 
-                                  popen=stem.popen,
-                                  fs_util=stem.fs_util)
+    runner = SuiteRunner(event_handler=stem.reporter, 
+                         popen=stem.popen,
+                         fs_util=stem.fs_util)
     if opts.debug_mode:
         sys.exit(runner(opts, args))
     try:

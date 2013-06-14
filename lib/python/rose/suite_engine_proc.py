@@ -24,7 +24,6 @@ import os
 import re
 from rose.env import env_var_process
 from rose.fs_util import FileSystemUtil
-from rose.host_select import HostSelector
 from rose.popen import RosePopener
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
@@ -232,8 +231,7 @@ class SuiteEngineProcessor(object):
             key = cls.SCHEME_DEFAULT
         return cls.SCHEME_HANDLER_MANAGER.get_handler(key)
 
-    def __init__(self, event_handler=None, popen=None, fs_util=None,
-                 host_selector=None, **kwargs):
+    def __init__(self, event_handler=None, popen=None, fs_util=None, **kwargs):
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -241,9 +239,6 @@ class SuiteEngineProcessor(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        if host_selector is None:
-            host_selector = HostSelector(event_handler, popen)
-        self.host_selector = host_selector
 
     def clean(self, suite_name, host=None):
         """Remove items created by the previous run of a suite."""
