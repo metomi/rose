@@ -494,7 +494,7 @@ class NavPanelHandler(object):
                 return False
             # Latent page, latent pages allowed (but may be ignored...).
         if ignored_status:
-            if ignored_status == rose.variable.IGNORED_BY_USER:
+            if ignored_status == rose.config.ConfigNode.STATE_USER_IGNORED:
                 if show_ignored or show_user_ignored:
                     # This is an allowed user-ignored page.
                     return True
