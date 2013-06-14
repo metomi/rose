@@ -62,4 +62,4 @@
 #     rose app-run
 #     rose task-env
 #-------------------------------------------------------------------------------
-exec python -m rose.run task "$@"
+exec python -m rose.task_run "$@"

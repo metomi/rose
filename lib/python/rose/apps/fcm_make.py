@@ -20,7 +20,7 @@
 """Builtin application: run "fcm make"."""
 
 from rose.env import env_export
-from rose.run import BuiltinApp
+from rose.app_run import BuiltinApp
 import os
 import shlex
 import sys

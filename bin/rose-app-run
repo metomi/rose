@@ -71,4 +71,4 @@
 #     optional ROSE_FILE_INSTALL_ROOT
 #         If specified, change to the specified directory to install files.
 #-------------------------------------------------------------------------------
-exec python -m rose.run app "$@"
+exec python -m rose.app_run "$@"

@@ -63,44 +63,18 @@ class CylcProcessor(SuiteEngineProcessor):
     TASK_ID_DELIM = "."
     TASK_LOG_DELIM = "."
 
-    def clean(self, suite_name):
-        """Remove items created by the previous run of a suite.
-
-        Change to user's $HOME for safety.
-
-        """
-        os.chdir(os.path.expanduser('~'))
-        if not os.path.isdir(self.get_suite_dir_rel(suite_name)):
-            return
-        hostnames = ["localhost"]
-        host_file_path = self.get_suite_dir_rel(
-                suite_name, "log", "rose-suite-run.host")
-        if os.access(host_file_path, os.F_OK | os.R_OK):
-            for line in open(host_file_path):
-                hostnames.append(line.strip())
-        conf = ResourceLocator.default().get_conf()
-        
-        hostnames = self.host_selector.expand(
-              conf.get_value(["rose-suite-run", "hosts"], "").split() +
-              conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
-              ["localhost"])[0]
-        hostnames = list(set(hostnames))
-        hosts_str = conf.get_value(["rose-suite-run", "scan-hosts"])
-        
-        hosts = []
-        for h in hostnames:
-            if h not in hosts:
-                hosts.append(h)
-            
-        running_hosts = self.ping(suite_name, hosts)
-        if running_hosts:
-            raise StillRunningError(suite_name, running_hosts[0])
+    def clean(self, suite_name, hosts=None):
+        """Remove items created by the previous run of a suite."""
+        if self.is_suite_running(suite_name, hosts):
+            raise StillRunningError(suite_name,
+                                    self.ping(suite_name, hosts)[0])
         job_auths = []
         if os.access(self.get_suite_db_file(suite_name), os.F_OK | os.R_OK):
             try:
                 job_auths = self.get_suite_jobs_auths(suite_name)
             except sqlite3.OperationalError as e:
                 pass
+        conf = ResourceLocator.default().get_conf()
         for job_auth in job_auths + ["localhost"]:
             if "@" in job_auth:
                 job_host = job_auth.split("@", 1)[1]
@@ -130,6 +104,10 @@ class CylcProcessor(SuiteEngineProcessor):
                 command = self.popen.get_cmd("ssh", job_auth, "rm", "-rf")
                 command += dirs
                 self.popen(*command)
+                for d in dirs:
+                    ev = FileSystemEvent(FileSystemEvent.DELETE,
+                                         job_auth + ":" + d)
+                    self.handle_event(ev)
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
@@ -414,6 +392,34 @@ class CylcProcessor(SuiteEngineProcessor):
         """Call self.event_handler if it is callable."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
+
+    def is_suite_running(self, suite_name, hosts=None):
+        """Return True if it looks like suite is running on one of hosts."""
+        if not hosts:
+            hosts = ["localhost"]
+        rel_path = os.path.join(".cylc", "ports", suite_name)
+        if "localhost" in hosts:
+            home = os.path.expanduser("~")
+            if os.path.exists(os.path.join(home, rel_path)):
+                return True
+        host_proc_dict = {}
+        for host in sorted(hosts):
+            if host == "localhost":
+                continue
+            cmd = self.popen.get_cmd("ssh", host, "test", "-f", rel_path)
+            host_proc_dict[host] = self.popen.run_bg(*cmd)
+        is_running = False
+        while host_proc_dict:
+            for host, proc in host_proc_dict.items():
+                rc = proc.poll()
+                if rc is not None:
+                    host_proc_dict.pop(host)
+                    if rc == 0:
+                        is_running = True
+            if host_proc_dict:
+                sleep(0.1)
+                
+        return is_running
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
