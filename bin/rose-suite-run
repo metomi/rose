@@ -115,4 +115,4 @@
 #     "cylc help register"
 #     "cylc help run"
 #-------------------------------------------------------------------------------
-exec python -m rose.run suite "$@"
+exec python -m rose.suite_run "$@"

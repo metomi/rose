@@ -23,7 +23,7 @@ import multiprocessing
 
 from rose.gtk.util import DialogProcess
 from rose.opt_parse import RoseOptionParser
-from rose.run import SuiteRunner
+from rose.suite_run import SuiteRunner
 from rose.reporter import Reporter, ReporterContextQueue
 
 
