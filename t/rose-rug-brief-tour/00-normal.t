@@ -54,7 +54,7 @@ fi
 # See if rose suite-hook has dumped out the event data
 TEST_KEY=$TEST_KEY_BASE-hook
 run_pass "$TEST_KEY-cycle_times_current" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log-view.json" <<'__PYTHON__'
+    "$HOME/cylc-run/$NAME/log/rose-suite-log.json" <<'__PYTHON__'
 import json, sys
 sys.exit(json.load(open(sys.argv[1]))["cycle_times_current"] !=
          ["2013010200", "2013010118", "2013010112", "2013010106", "2013010100"])
@@ -68,7 +68,7 @@ EXPECTED='
 '
 for CYCLE in 2013010200 2013010118 2013010112 2013010106 2013010100; do
     run_pass "$TEST_KEY-cycle_time-$CYCLE" python - \
-        "$HOME/cylc-run/$NAME/log/rose-suite-log-view-$CYCLE.json" \
+        "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json" \
         $(awk "/$CYCLE/" <<<"$EXPECTED") <<'__PYTHON__'
 import json, sys
 file_name, cycle, tasks_str = sys.argv[1:]

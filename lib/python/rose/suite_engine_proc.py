@@ -245,10 +245,6 @@ class SuiteEngineProcessor(object):
             host_selector = HostSelector(event_handler, popen)
         self.host_selector = host_selector
 
-    def archive_job_logs(self, suite_name, log_archive_threshold):
-        """Archive cycle job logs older than a threshold."""
-        raise NotImplementedError()
-
     def clean(self, suite_name, host=None):
         """Remove items created by the previous run of a suite."""
         raise NotImplementedError()
@@ -278,14 +274,12 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_suite_events(self, suite_name, cycles=None, task_ids=None):
+    def get_suite_events(self, suite_name, items=None):
         """Get suite task events.
 
         suite_name -- The name of the suite.
-        cycles -- A list of relevant cycle times. Only suite task events for
-                  tasks in the specified cycles are retured.
-        task_ids -- A list of relevant task IDs. Only suite task events for
-                    tasks in this list are returned.
+        items -- A list of relevant cycle times or task IDs. Only suite task
+                 events for tasks in the specified list are retured.
 
         Assume current working directory is suite's log directory.
 
@@ -331,7 +325,7 @@ class SuiteEngineProcessor(object):
         if not os.path.exists(log_index):
             return None
         conf = ResourceLocator.default().get_conf()
-        value = conf.get_value(["rose-suite-log-view", "home-public-html"])
+        value = conf.get_value(["rose-suite-log", "home-public-html"])
         if value is None:
             return "file://" + log_index
         values = env_var_process(value).split(None, 1)
@@ -353,10 +347,6 @@ class SuiteEngineProcessor(object):
 
     def get_tasks_auths(self, suite_name):
         """Return a list of [user@]host for remote tasks in a suite."""
-        raise NotImplementedError()
-
-    def get_task_log_dir_rel(self, suite):
-        """Return the relative path to the log directory for suite tasks."""
         raise NotImplementedError()
 
     def get_task_props(self, *args, **kwargs):
@@ -459,6 +449,26 @@ class SuiteEngineProcessor(object):
         """Launch control GUI for a suite_name running at a host."""
         raise NotImplementedError()
 
+    def job_logs_archive(self, suite_name, items):
+        """Archive cycle job logs.
+
+        suite_name -- The name of a suite.
+        items -- A list of relevant items.
+
+        """
+        raise NotImplementedError()
+
+    def job_logs_pull_remote(self, suite_name, items=None,
+                             tidy_remote_mode=False):
+        """Pull and housekeep the job logs on remote task hosts.
+
+        suite_name -- The name of a suite.
+        items -- A list of relevant items.
+        tidy_remote_mode -- Remove remote job logs after pulling them.
+
+        """
+        raise NotImplementedError()
+
     def ping(self, suite_name, host_names=None):
         """Return a list of host names where suite_name is running."""
         raise NotImplementedError()
@@ -479,14 +489,6 @@ class SuiteEngineProcessor(object):
 
     def shutdown(self, suite_name, host=None, engine_version=None, args=None):
         """Shut down the suite."""
-        raise NotImplementedError()
-
-    def update_job_log(self, suite_name, task_ids=None):
-        """Update the log(s) of task jobs in suite_name.
-
-        If "task_ids" is None, update the logs for all task jobs.
-
-        """
         raise NotImplementedError()
 
     def validate(self, suite_name, strict_mode=False):
