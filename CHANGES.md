@@ -11,6 +11,20 @@ for a full listing of issues for each release.
 
 Changes that have significant impact on user experience.
 
+\#739: rose suite-log: replace `rose suite-log-view`. The old command is now an
+alias of the new command with an improved interface. Support view and update
+modes.
+* In update mode, arguments can now be a `*` (for all task jobs), a cycle
+  time or a task ID.
+* Support a `--tidy-remote` option to remove job logs on remote hosts
+  after their retrieval.
+* Support a `--archive` option (and removed `--log-archive-threshold=CYCLE`) to
+  switch on archive mode on the specified cycle times in the argument list.
+* Switch off view mode by default in update mode, but can be turned on
+  explicitly with an `--view`.
+* The `[rose-suite-log-view]` section in site/user `rose.conf` is renamed
+  `[rose-suite-log]`.
+
 \#732: rose config-edit: ability to load application configurations on demand
 for large suites.
 
@@ -40,6 +54,9 @@ command. This may some minor change in behaviour of some existing suites as
 
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
+
+\#712: rose config-edit: can show variable descriptions and help in-page. 
+Descriptions are shown by default. Customisable formatting.
 
 \#707: rosie site/user configuration: The `[rosie-browse]` section is now
 `[rosie-go]`.

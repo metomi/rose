@@ -126,7 +126,7 @@
 
       <dt><a href="#rose-slv">rose slv</a></dt>
 
-      <dd>(=suite-log-view)</dd>
+      <dd>(=suite-log)</dd>
 
       <dt><a href="#rose-suite-clean">rose suite-clean</a></dt>
 
@@ -140,9 +140,13 @@
 
       <dd>Provide a common event hook for Cylc suites and tasks.</dd>
 
-      <dt><a href="#rose-suite-log-view">rose suite-log-view</a></dt>
+      <dt><a href="#rose-suite-log">rose suite-log</a></dt>
 
       <dd>Generate and browse the log view of SUITE.</dd>
+
+      <dt><a href="#rose-suite-log-view">rose suite-log-view</a></dt>
+
+      <dd>(=suite-log)</dd>
 
       <dt><a href="#rose-suite-restart">rose suite-restart</a></dt>
 
@@ -1231,7 +1235,7 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <h2 id="rose-slv">rose slv</h2>
 
-    <p>See <a href="#rose-suite-log-view">rose suite-log-view</a>.</p>
+    <p>See <a href="#rose-suite-log">rose suite-log</a>.</p>
 
     <h2 id="rose-suite-clean">rose suite-clean</h2>
 
@@ -1375,50 +1379,84 @@ launcher-preopts.mpiexec=-n $NPROC
       <dd>Increment verbosity.</dd>
     </dl>
 
-    <h2 id="rose-suite-log-view">rose suite-log-view</h2>
+    <h2 id="rose-suite-log">rose suite-log</h2>
 
     <h3>NAME</h3>
 
-    <p><kbd>rose suite-log-view</kbd></p>
+    <ol>
+      <li><kbd>rose suite-log [--view]</kbd></li>
+
+      <li><kbd>rose suite-log --update [ITEM ...]</kbd><br />
+      <kbd>rose suite-log --update '*' # all task jobs</kbd></li>
+
+      <li><kbd>rose suite-log --archive CYCLE ...</kbd></li>
+    </ol>
+    <p><kbd>rose suite-log</kbd></p>
 
     <h3>SYNOPSIS</h3>
 
-    <p><kbd>rose suite-log-view [OPTIONS] [TASK ...]</kbd></p>
+    <p><kbd>rose suite-log [OPTIONS] [TASK ...]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
-    <p>Generate and browse the log view of a suite.</p>
+    <p>View or update suite log.</p>
 
-    <p>Analyse the suite log to generate a JSON file for feeding into an HTML
-    based viewer. If <kbd>--name=SUITE-NAME</kbd> is not specified, the
-    basename of <var>$PWD</var> is assumed to be the suite name.</p>
+    <ol>
+      <li>Launch web browser to view suite log.</li>
 
-    <p>If the <var>DISPLAY</var> environment variable is defined. Launch the
-    web browser to display the log view unless <kbd>--no-web-browse</kbd> is
-    specified.</p>
+      <li>Update the suite log view information for specified cycle times or
+      task IDs (e.g. <samp>my_task.2013010100</samp> in cylc suites). A
+      <kbd>'*'</kbd> in the argument list implies all task jobs in all cycle
+      times.</li>
+
+      <li>Archive (tar-gzip) job logs at or older than the specified cycle
+      time.</li>
+    </ol>
 
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbd>--full, -f</kbd></dt>
+      <dt><kbd>--archive</kbd></dt>
 
-      <dd>Re-sync all remote task logs, regardless of the <var>TASK</var>
-      arguments.</dd>
+      <dd>Archive (tar-gzip) job logs at specified cycle times. Imply
+      <kbd>--update</kbd>.</dd>
 
-      <dt><kbd>--log-archive-threshold=CYCLE-TIME</kbd></dt>
+      <dt><kbd>--force, -f</kbd></dt>
 
-      <dd>Switch on job log archiving by specifying a cycle time threshold. All
-      job logs at this cycle time or older will be archived. Implies
-      <kbd>--full</kbd>.</dd>
+      <dd>Imply <kbd>rose suite-log --update '*'</kbd> and force update
+      the HTML display libraries.</dd>
 
-      <dt><kbd>--name=SUITE-NAME</kbd></dt>
+      <dt><kbd>--name=SUITE-NAME</kbd>, <kbd>-n SUITE-NAME</kbd></dt>
 
       <dd>Specify the suite name.</dd>
 
-      <dt><kbd>--no-web-browse</kbd></dt>
+      <dt><kbd>--tidy-remote</kbd></dt>
 
-      <dd>Do not open a web browser to display the log view.</dd>
+      <dd>If specified, remove job logs from remote hosts after pulling them to
+      suite host.</dd>
+
+      <dt><kbd>--timeout=DELAY</kbd></dt>
+
+      <dd>Specify a timeout. Normally, a lock is put in place to prevent other
+      instances of <a href="#rose-suite-hook">rose suite-hook</a> or <kbd>rose
+      suite-log --update</kbd> from updating the suite log at the same time. The
+      command hangs as it attempts to grab the lock. This option specify a
+      timeout (in number of seconds) for the attempt.
+      (default=<kbd>300.0</kbd>)</dd>
+
+
+      <dt><kbd>--update</kbd>, <kbd>-u</kbd></dt>
+
+      <dd>Update job logs and index for items specified in arguments.</dd>
+
+      <dt><kbd>--view</kbd></dt>
+
+      <dd>Launch web browser to view suite log.</dd>
     </dl>
+
+    <h2 id="rose-suite-log-view">rose suite-log-view</h2>
+
+    <p>See <a href="#rose-suite-log">rose suite-log</a>.</p>
 
     <h2 id="rose-suite-restart">rose suite-restart</h2>
 

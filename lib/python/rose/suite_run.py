@@ -274,6 +274,9 @@ class SuiteRunner(Runner):
             self.event_handler.contexts[uuid].handle = log_file
             temp_log_file.close()
 
+        # Create the suite log view
+        self.suite_log_view_gen.generate(suite_name, [], force_lib_mode=True)
+
         # Install share/work directories (local)
         for name in ["share", "work"]:
             self._run_init_dir_work(opts, suite_name, name, config)
@@ -400,9 +403,6 @@ class SuiteRunner(Runner):
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
         if os.getenv("DISPLAY") and host and opts.gcontrol_mode:
             self.suite_engine_proc.gcontrol(suite_name, host)
-
-        # Create the suite log view
-        self.suite_log_view_gen(suite_name)
 
         return ret
 

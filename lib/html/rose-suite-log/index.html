@@ -532,7 +532,7 @@ $(function() {
         }
         if (cycle_times.length) {
             var cycle_time = cycle_times.shift();
-            var url = "rose-suite-log-view-" + cycle_time + ".json";
+            var url = "rose-suite-log-" + cycle_time + ".json";
             $.ajax({
                 "url": url,
                 "cache": false,
@@ -578,7 +578,7 @@ $(function() {
         }
     }
 
-    var url_main = "rose-suite-log-view.json";
+    var url_main = "rose-suite-log.json";
     $.ajax({
         "url": url_main,
         "cache": false,

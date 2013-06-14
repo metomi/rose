@@ -19,13 +19,11 @@
 #-----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
-import ast
 from fnmatch import fnmatchcase
 from glob import glob
 import os
 import pwd
 import re
-import rose.config
 from rose.env import env_var_process
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
@@ -33,11 +31,11 @@ from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import \
         StillRunningError, SuiteEngineProcessor, SuiteScanResult, TaskProps
-import shlex
 import socket
 import sqlite3
 import tarfile
 from time import mktime, sleep, strptime
+from uuid import uuid4
 
 
 class CylcProcessor(SuiteEngineProcessor):
@@ -58,57 +56,12 @@ class CylcProcessor(SuiteEngineProcessor):
               "signaled": "fail"}
     N_DB_SELECT_TRIES = 20
     PYRO_TIMEOUT = 5
+    REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
     RUN_DIR_REL_ROOT = "cylc-run"
     SCHEME = "cylc"
     SUITE_CONF = "suite.rc"
     TASK_ID_DELIM = "."
     TASK_LOG_DELIM = "."
-
-    def archive_job_logs(self, suite_name, log_archive_threshold):
-        """Archive cycle job logs older than a threshold.
-
-        Assume current working directory is suite's log directory.
-        
-        """
-        stmt = "SELECT DISTINCT cycle FROM task_events"
-        for row in self._select(suite_name, stmt):
-            cycle_time = row[0]
-            archive_file_name = self.get_cycle_log_archive_name(cycle_time)
-            if (os.path.exists(archive_file_name) or
-                cycle_time > log_archive_threshold): # str cmp
-                continue
-            # Pull from each remote host all job log files of this
-            # cycle time.
-            auths = self.get_suite_jobs_auths(suite_name, cycle_time)
-            log_dir_rel = self.get_task_log_dir_rel(suite_name)
-            log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
-            glob_pat = self.TASK_LOG_DELIM.join(["*", cycle_time, "*"])
-            for auth in auths:
-                r_glob = "%s:%s/%s" % (auth, log_dir_rel, glob_pat)
-                cmd = self.popen.get_cmd("rsync", r_glob, log_dir)
-                try:
-                    out, err = self.popen(*cmd)
-                except RosePopenError as e:
-                    self.handle_event(e, level=Reporter.WARN)
-            # Create the job log archive for this cycle time.
-            tar = tarfile.open(archive_file_name, "w:gz")
-            names = glob("job/" + glob_pat)
-            for name in names:
-                tar.add(name)
-            tar.close()
-            self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
-                                              archive_file_name))
-            # Remove local job log files of this cycle time.
-            for name in names:
-                self.fs_util.delete(name)
-            # Remove remote job log files of this cycle time.
-            for auth in auths:
-                r_glob = "%s/%s" % (log_dir_rel, glob_pat)
-                cmd = self.popen.get_cmd("ssh", auth, "rm", "-f", r_glob)
-                try:
-                    out, err = self.popen(*cmd)
-                except RosePopenError as e:
-                    self.handle_event(e, level=Reporter.WARN)
 
     def clean(self, suite_name, hosts=None):
         """Remove items created by the previous run of a suite."""
@@ -185,14 +138,12 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
 
-    def get_suite_events(self, suite_name, cycles=None, task_ids=None):
+    def get_suite_events(self, suite_name, items):
         """Parse the cylc suite running database for task events.
 
         suite_name -- The name of the suite.
-        cycles -- A list of relevant cycle times. Only suite task events for
-                  tasks in the specified cycles are retured.
-        task_ids -- A list of relevant task IDs. Only suite task events for
-                    tasks in this list are returned.
+        items -- A list of relevant cycle times or task IDs. Only suite task
+                 events for tasks in the specified list are retured.
 
         Assume current working directory is suite's log directory.
 
@@ -227,26 +178,21 @@ class CylcProcessor(SuiteEngineProcessor):
         # Read task events from suite runtime database
         where = ""
         stmt_args = []
-        if task_ids:
-            for task_id in task_ids:
-                cycle = None
-                if self.TASK_ID_DELIM in task_id:
-                    name, cycle = task_id.split(self.TASK_ID_DELIM, 1)
-                    stmt_args += [name, cycle]
-                else:
-                    stmt_args.append(task_id)
+        if "*" not in items:
+            for item in items:
+                cycle, name = self._parse_task_cycle_id(item)
                 if where:
                     where += " OR"
-                where += " (name==?"
-                if cycle is not None:
-                    where += " AND cycle==?"
+                where += " ("
+                if cycle:
+                    where += "cycle==?"
+                    stmt_args.append(cycle)
+                if name:
+                    if cycle:
+                        where += " AND "
+                    where += "name==?"
+                    stmt_args.append(name)
                 where += ")"
-        if cycles:
-            for cycle in cycles:
-                if where:
-                    where += " OR"
-                where += " cycle==?"
-                stmt_args.append(cycle)
         if where:
             where = " WHERE" + where
         stmt = ("SELECT time,name,cycle,submit_num,event,message" +
@@ -343,14 +289,18 @@ class CylcProcessor(SuiteEngineProcessor):
         if task_name:
             stmt += "name==? AND "
             stmt_args.append(task_name)
-        stmt += "event==?"
-        stmt_args.append("submission succeeded")
+        stmt += "(event==? OR event==? OR event==?)"
+        stmt_args += ["submission succeeded", "succeeded", "failed"]
         for row in self._select(suite_name, stmt, stmt_args):
             if row and "@" in row[0]:
                 auth = self._parse_user_host(auth=row[0])
                 if auth:
                     auths.append(auth)
         return auths
+
+    def get_suite_jobs_log_dir_rel(self, suite):
+        """Return the relative path to the log directory for suite tasks."""
+        return self.get_suite_dir_rel(suite, "log", "job")
 
     def get_task_auth(self, suite_name, task_name):
         """
@@ -403,10 +353,6 @@ class CylcProcessor(SuiteEngineProcessor):
             if auth and auth not in auths:
                 auths.append(auth)
         return auths
-
-    def get_task_log_dir_rel(self, suite):
-        """Return the relative path to the log directory for suite tasks."""
-        return self.get_suite_dir_rel(suite, "log", "job")
 
     def get_task_props_from_env(self):
         """Get attributes of a suite task from environment variables.
@@ -474,6 +420,121 @@ class CylcProcessor(SuiteEngineProcessor):
                 sleep(0.1)
                 
         return is_running
+
+    def job_logs_archive(self, suite_name, items):
+        """Archive cycle job logs.
+
+        suite_name -- The name of a suite.
+        items -- A list of relevant items.
+
+        """
+        cycles = []
+        if "*" in items:
+            rows = self._select("SELECT DISTINCT cycle in task_events")
+            for row in rows:
+                cycles.append(row[0])
+        else:
+            for item in items:
+                cycle = self._parse_task_cycle_id(item)[0]
+                if cycle:
+                    cycles.append(cycle)
+        self.job_logs_pull_remote(suite_name, cycles, tidy_remote_mode=True)
+        log_dir_rel = self.get_suite_dir_rel(suite_name, "log")
+        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+        cwd = os.getcwd()
+        self.fs_util.chdir(log_dir)
+        try:
+            for cycle in cycles:
+                archive_file_name = self.get_cycle_log_archive_name(cycle)
+                if os.path.exists(archive_file_name):
+                    continue
+                glob_ = self.TASK_ID_DELIM.join(["*", cycle, "*"])
+                names = glob(os.path.join("job", glob_))
+                if not names:
+                    continue
+                tar = tarfile.open(archive_file_name, "w:gz")
+                for name in names:
+                    tar.add(name)
+                tar.close()
+                self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
+                                                  archive_file_name))
+                for name in names:
+                    self.fs_util.delete(name)
+        finally:
+            try:
+                self.fs_util.chdir(cwd)
+            except OSError:
+                pass
+
+    def job_logs_pull_remote(self, suite_name, items, tidy_remote_mode=False):
+        """Pull and housekeep the job logs on remote task hosts.
+
+        suite_name -- The name of a suite.
+        items -- A list of relevant items.
+        tidy_remote_mode -- Remove remote job logs after pulling them.
+
+        """
+        # Create a file with a uuid name, so system knows to do nothing on
+        # shared file systems.
+        uuid = str(uuid4())
+        log_dir_rel = self.get_suite_jobs_log_dir_rel(suite_name)
+        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+        uuid_file_name = os.path.join(log_dir, uuid)
+        self.fs_util.touch(uuid_file_name)
+        try:
+            glob_auths_map = {}
+            if "*" in items:
+                auths = self.get_suite_jobs_auths(suite_name)
+                if auths:
+                    glob_auths_map["*"] = self.get_suite_jobs_auths(suite_name)
+            else:
+                for item in items:
+                    cycle, name = self._parse_task_cycle_id(item)
+                    arch_f_name = self.get_cycle_log_archive_name(cycle)
+                    if os.path.exists(arch_f_name):
+                        continue
+                    auths = self.get_suite_jobs_auths(suite_name, cycle, name)
+                    if auths:
+                        glob_names = []
+                        for v in [name, cycle, None]:
+                            if v is None:
+                                glob_names.append("*")
+                            else:
+                                glob_names.append(v)
+                        glob_ = self.TASK_ID_DELIM.join(glob_names)
+                        glob_auths_map[glob_] = auths
+            # FIXME: more efficient if auth is key?
+            for glob_, auths in glob_auths_map.items():
+                for auth in auths:
+                    data = {"auth": auth,
+                            "log_dir_rel": log_dir_rel,
+                            "uuid": uuid,
+                            "glob_": glob_}
+                    cmd = self.popen.get_cmd(
+                            "ssh", auth,
+                            ("cd %(log_dir_rel)s && " +
+                             "(! test -f %(uuid)s && ls %(glob_)s)") % data)
+                    if self.popen.run(*cmd)[0]:
+                        continue
+                    try:
+                        cmd = self.popen.get_cmd(
+                                "rsync",
+                                "%(auth)s:%(log_dir_rel)s/%(glob_)s" % data,
+                                log_dir)
+                        self.popen(*cmd)
+                    except RosePopenError as e:
+                        self.handle_event(e, level=Reporter.WARN)
+                    if not tidy_remote_mode:
+                        continue
+                    try:
+                        cmd = self.popen.get_cmd(
+                                "ssh", auth,
+                                "cd %(log_dir_rel)s && rm -f %(glob_)s" % data)
+                        self.popen(*cmd)
+                    except RosePopenError as e:
+                        self.handle_event(e, level=Reporter.WARN)
+        finally:
+            self.fs_util.delete(uuid_file_name)
 
     def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
@@ -597,39 +658,6 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen.run_simple(
                 *command, env=environ, stderr=stderr, stdout=stdout)
 
-    def update_job_log(self, suite_name, task_ids=None):
-        """Update the log(s) of task jobs in suite_name.
-
-        If "task_ids" is None, update the logs for all task jobs.
-
-        """
-        id_auth_set = set()
-        if task_ids:
-            for task_id in task_ids:
-                task_name, cycle_time = task_id.split(self.TASK_ID_DELIM)
-                archive_file_name = self.get_cycle_log_archive_name(cycle_time)
-                if os.path.exists(archive_file_name):
-                    continue
-                auths = self.get_suite_jobs_auths(suite_name, cycle_time,
-                                                  task_name)
-                for auth in auths:
-                    id_auth_set.add((task_id, auth))
-        else:
-            auths = self.get_suite_jobs_auths(suite_name)
-            for auth in auths:
-                id_auth_set.add(("", auth))
-
-        log_dir_rel = self.get_task_log_dir_rel(suite_name)
-        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
-        for task_id, auth in id_auth_set:
-            r_log_dir = ""
-            r_log_dir += "%s:%s/%s*" % (auth, log_dir_rel, task_id)
-            cmd = self.popen.get_cmd("rsync", r_log_dir, log_dir)
-            try:
-                out, err = self.popen(*cmd)
-            except RosePopenError as e:
-                self.handle_event(e, level=Reporter.WARN)
-
     def validate(self, suite_name, strict_mode=False):
         """(Re-)register and validate a suite."""
         suite_dir_rel = self.get_suite_dir_rel(suite_name)
@@ -659,6 +687,16 @@ class CylcProcessor(SuiteEngineProcessor):
             command.append("--strict")
         command.append(suite_name)
         self.popen.run_simple(*command, stdout_level=Event.V)
+
+    def _parse_task_cycle_id(self, item):
+        cycle, name = None, None
+        if self.REC_CYCLE_TIME.match(item):
+            cycle = item
+        elif self.TASK_ID_DELIM in item:
+            name, cycle = item.split(self.TASK_ID_DELIM, 1)
+        else:
+            name = item
+        return (cycle, name)
 
     def _parse_user_host(self, auth=None, user=None, host=None):
         if getattr(self, "user", None) is None:
