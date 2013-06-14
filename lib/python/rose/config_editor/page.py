@@ -95,7 +95,7 @@ class ConfigPage(gtk.VBox):
         self._last_info_labels = None
         self.generate_main_container()
         self.get_page()
-        self.update_ignored()
+        self.update_ignored(no_refresh=True)
 
     def get_page(self):
         """Generate a container of widgets for page content and a label."""
@@ -620,9 +620,10 @@ class ConfigPage(gtk.VBox):
         if hasattr(self.main_container, 'add_variable_widget'):
             self.main_container.add_variable_widget(variable)
             self.trigger_update_status()
+            self.update_ignored()
         else:
             self.refresh()
-        self.update_ignored()
+            self.update_ignored(no_refresh=True)
         self.set_main_focus(variable.metadata.get('id'))
 
     def generate_main_container(self, override_custom=False):
@@ -807,7 +808,7 @@ class ConfigPage(gtk.VBox):
             self.scrolled_vbox.pack_start(self.main_container, expand=False,
                                           fill=True)
             self.choose_focus(focus_var)
-            self.update_ignored()
+            self.update_ignored(no_refresh=True)
             self.trigger_update_status()
 
     def get_main_variable_widgets(self):
@@ -870,9 +871,9 @@ class ConfigPage(gtk.VBox):
     def react_to_show_modes(self, mode_key, is_mode_on):
         self.show_modes[mode_key] = is_mode_on
         if hasattr(self.main_container, 'show_mode_change'):
+            self.update_ignored()
             react_func = getattr(self.main_container, 'show_mode_change')
             react_func(mode_key, is_mode_on)
-            self.update_ignored()
         elif mode_key in [rose.config_editor.SHOW_MODE_IGNORED,
                           rose.config_editor.SHOW_MODE_USER_IGNORED]:
             self.update_ignored()
@@ -887,7 +888,7 @@ class ConfigPage(gtk.VBox):
             else:
                 widget.update_status()
 
-    def update_ignored(self):
+    def update_ignored(self, no_refresh=False):
         """Set variable widgets to 'ignored' or 'enabled' status."""
         new_tuples = []
         for variable in self.panel_data + self.ghost_data:
@@ -922,6 +923,10 @@ class ConfigPage(gtk.VBox):
                                         target.variable.metadata['id'])
                         target.errors = target.variable.error.keys()
             target_widgets_done.append(target)
+        if hasattr(self.main_container, "update_ignored"):
+            self.main_container.update_ignored()
+        elif not no_refresh::
+            self.refresh()
         for variable_id in refresh_list:
             self.refresh(variable_id)
 
@@ -935,8 +940,6 @@ class ConfigPage(gtk.VBox):
 
     def _set_widget_ignored(self, widget, help_text, enabled=False):
         if self._check_show_ignored_reason(widget.variable.ignored_reason):
-            if hasattr(widget, 'show'):
-                widget.show()
             if hasattr(widget, 'set_ignored'):
                 widget.set_ignored()
             elif hasattr(widget, 'set_sensitive'):
@@ -947,10 +950,6 @@ class ConfigPage(gtk.VBox):
                     widget.set_ignored()
                 elif hasattr(widget, 'set_sensitive'):
                     widget.set_sensitive(enabled)
-                if enabled:
-                    widget.show()
-                elif not widget.variable.error:
-                    widget.hide()
 
     def reload_from_data(self, new_config_data, new_ghost_data):
         """Load the new data into the page as gracefully as possible."""

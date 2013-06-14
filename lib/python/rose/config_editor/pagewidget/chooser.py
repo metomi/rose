@@ -329,3 +329,7 @@ class PageFormatTree(gtk.VBox):
     def refresh(self, var_id=None):
         """Reload the container - don't need this at the moment."""
         pass
+
+    def update_ignored(self):
+        """Update ignored statuses - don't need show/hide here."""
+        pass

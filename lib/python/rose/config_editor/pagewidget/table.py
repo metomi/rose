@@ -60,16 +60,9 @@ class PageTable(gtk.Table):
                                                 is_ghost=is_ghost,
                                                 show_modes=self.show_modes)
             variablewidget.insert_into(self, self.MAX_COLS, r + 1)
-            if is_ghost:
-                variablewidget.set_sensitive(False)
-                if (not self._is_var_compulsory(variable) and
-                    not self.show_modes[rose.config_editor.SHOW_MODE_LATENT]):
-                    # Hidden if not compulsory and not SHOW_MODE_LATENT.
-                    variablewidget.hide()
-            if (self._should_hide_var_fixed(variable) and 
-                not variable.error):
-                variablewidget.hide()
+            variablewidget.set_sensitive(not is_ghost)
             r = r + 1
+        self._show_and_hide_variable_widgets()
         self.show()
 
     def add_variable_widget(self, variable):
@@ -106,9 +99,7 @@ class PageTable(gtk.Table):
                         if child.get_parent() == variablewidget:
                             self.remove(child)
             new_variablewidget.insert_into(self, self.MAX_COLS, row_above_new + 1)
-            if (self._should_hide_var_fixed(variable) and 
-                not variable.error):
-                new_variablewidget.hide()
+            self._show_and_hide_variable_widgets(new_variablewidget)
             r = row_above_new + 2
             for variablewidget, widget_row in widget_coordinate_list:
                 if (widget_row > row_above_new and
@@ -128,13 +119,6 @@ class PageTable(gtk.Table):
                                                 is_ghost,
                                                 show_modes=self.show_modes)
         new_variablewidget.set_sensitive(not is_ghost)
-        if (is_ghost and
-            not self._is_var_compulsory(variable) and
-            not self.show_modes[rose.config_editor.SHOW_MODE_LATENT]):
-            # Hidden if not compulsory and not SHOW_MODE_LATENT.
-            new_variablewidget.hide()
-        else:
-            new_variablewidget.show()
         focus_dict = {"had_focus": False}
         for child in self.get_children():
             variablewidget = child.get_parent()
@@ -150,11 +134,9 @@ class PageTable(gtk.Table):
                 self.remove(child)
                 child.destroy()
         new_variablewidget.insert_into(self, self.MAX_COLS, variable_row)
-        if (self._should_hide_var_fixed(variable) and not variable.error):
-            new_variablewidget.hide()
-        else:
-            if focus_dict["had_focus"]:
-                new_variablewidget.grab_focus(index=focus_dict.get("index"))
+        self._show_and_hide_variable_widgets(new_variablewidget)
+        if focus_dict["had_focus"]:
+            new_variablewidget.grab_focus(index=focus_dict.get("index"))
 
     def remove_variable_widget(self, variable):
         """Remove the selected widget and/or relocate to ghosts."""
@@ -172,39 +154,37 @@ class PageTable(gtk.Table):
                                             "=null" in y[1].metadata["id"]))
         return [(x[1], x[2]) for x in sort_key_vars]
 
-    def _is_var_compulsory(self, variable):
-        comp_val = variable.metadata.get(rose.META_PROP_COMPULSORY)
-        return comp_val == rose.META_PROP_VALUE_TRUE
-
-    def _should_hide_var_fixed(self, variable):
-        return (not self.show_modes[rose.config_editor.SHOW_MODE_FIXED] and
-                len(variable.metadata.get(rose.META_PROP_VALUES, [])) == 1 and
-                variable not in self.ghost_data)
-
-    def _is_vwidget_optional_ghost(self, variablewidget):
-        return (variablewidget.is_ghost and
-                not self._is_var_compulsory(variablewidget.variable))
-
-    def _show_fixed(self, should_show_fixed=False):
-        """Display or hide 'fixed' variables."""
-        for child in self.get_children():
-            variable = child.get_parent().variable
-            if len(variable.metadata.get(rose.META_PROP_VALUES, [])) == 1:
-                if should_show_fixed:
-                    child.get_parent().show()
-                elif not variable.error:
-                    child.get_parent().hide()
-
-    def _show_latent(self, should_show_latent=False):
-        """Display or remove 'ghost' variables."""
-        for child in self.get_children():
-            variablewidget = child.get_parent()
+    def _show_and_hide_variable_widgets(self, just_this_widget=None):
+        """Figure out whether to display a widget or not."""
+        modes = self.show_modes
+        if just_this_widget:
+            variablewidgets = [just_this_widget]
+        else:
+            variablewidgets = []
+            for child in self.get_children():
+                if child.get_parent() not in variablewidgets:
+                    variablewidgets.append(child.get_parent())
+        for variablewidget in variablewidgets:
             variable = variablewidget.variable
-            if variablewidget.is_ghost:
-                if should_show_latent:
-                    variablewidget.show()
-                elif not self._is_var_compulsory(variable):
-                    variablewidget.hide()
+            ign_reason = variable.ignored_reason
+            if variable.error:
+                variablewidget.show()
+            elif (len(variable.metadata.get(rose.META_PROP_VALUES, [])) == 1
+                  and not modes[rose.config_editor.SHOW_MODE_FIXED]):
+                variablewidget.hide()
+            elif (variablewidget.is_ghost and
+                  not modes[rose.config_editor.SHOW_MODE_LATENT]):
+                variablewidget.hide()
+            elif ((rose.variable.IGNORED_BY_SYSTEM in ign_reason or
+                   rose.variable.IGNORED_BY_SECTION in ign_reason) and
+                  not modes[rose.config_editor.SHOW_MODE_IGNORED]):
+                variablewidget.hide()
+            elif (rose.variable.IGNORED_BY_USER in ign_reason and
+                  not (modes[rose.config_editor.SHOW_MODE_IGNORED] or
+                       modes[rose.config_editor.SHOW_MODE_USER_IGNORED])):
+                variablewidget.hide()
+            else:
+                variablewidget.show()
 
     def show_mode_change(self, mode, mode_on=False):
         done_variable_widgets = []
@@ -214,10 +194,10 @@ class PageTable(gtk.Table):
                 continue
             parent.set_show_mode(mode, mode_on)
             done_variable_widgets.append(parent)
-        if mode == rose.config_editor.SHOW_MODE_LATENT:
-            self._show_latent(mode_on)
-        elif mode == rose.config_editor.SHOW_MODE_FIXED:
-            self._show_fixed(mode_on)
+        self._show_and_hide_variable_widgets()
+
+    def update_ignored(self):
+        self._show_and_hide_variable_widgets()
 
 
 class PageLatentTable(gtk.Table):
@@ -288,4 +268,8 @@ class PageLatentTable(gtk.Table):
 
     def refresh(self, var_id=None):
         """Reload the container - don't need this at the moment."""
+        pass
+
+    def update_ignored(self):
+        """Update ignored statuses - no need to do anything extra here."""
         pass
