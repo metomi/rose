@@ -925,7 +925,7 @@ class ConfigPage(gtk.VBox):
             target_widgets_done.append(target)
         if hasattr(self.main_container, "update_ignored"):
             self.main_container.update_ignored()
-        elif not no_refresh::
+        elif not no_refresh:
             self.refresh()
         for variable_id in refresh_list:
             self.refresh(variable_id)
