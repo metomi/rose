@@ -228,7 +228,7 @@ class StemRunner(object):
             dummy, basedir, dum2, dum3 = self._ascertain_project(os.getcwd())
             
         suitedir = os.path.join(basedir, DEFAULT_TEST_DIR)
-        suitefile = os.path.join(suitedir, rose.TOP_CONFIG_NAME)
+        suitefile = os.path.join(suitedir, "rose-suite.conf")
 
         if not os.path.isfile(suitefile):
             raise RoseSuiteConfNotFoundException(suitedir)
