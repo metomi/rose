@@ -38,7 +38,7 @@ class NavPanelHandler(object):
 
     def __init__(self, data, util, reporter, mainwindow,
                  undo_stack, redo_stack, add_config_func,
-                 section_ops_inst, variable_ops_inst,
+                 group_ops_inst, section_ops_inst, variable_ops_inst,
                  kill_page_func, reload_ns_tree_func, transform_default_func):
         self.data = data
         self.util = util
@@ -46,6 +46,7 @@ class NavPanelHandler(object):
         self.mainwindow = mainwindow
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack
+        self.group_ops = group_ops_inst
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self._add_config = add_config_func
@@ -103,7 +104,8 @@ class NavPanelHandler(object):
         section = sections.pop()
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
-        return self.copy_section(config_name, section, skip_update=skip_update)
+        return self.group_ops.copy_section(config_name, section,
+                                           skip_update=skip_update)
 
     def create_request(self):
         """Handle a create configuration request."""
@@ -278,10 +280,7 @@ class NavPanelHandler(object):
             namespace = None
         else:
             namespace = "/" + base_ns.lstrip("/")
-        
-        if self.data.config[namespace].is_preview:
-            return False    
-            
+                   
         ui_config_string = """<ui> <popup name='Popup'>"""
         actions = [('New', gtk.STOCK_NEW,
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),
@@ -318,6 +317,8 @@ class NavPanelHandler(object):
         is_empty = (not self.data.config)
         if namespace is not None:
             config_name = self.util.split_full_ns(self.data, namespace)[0]
+            if self.data.config[config_name].is_preview:
+                return False
             cloneable = self.is_ns_duplicate(namespace)
             is_top = (namespace in self.data.config.keys())
             is_fixable = bool(self.get_ns_errors(namespace))
@@ -495,7 +496,7 @@ class NavPanelHandler(object):
                 return False
             # Latent page, latent pages allowed (but may be ignored...).
         if ignored_status:
-            if ignored_status == rose.variable.IGNORED_BY_USER:
+            if ignored_status == rose.config.ConfigNode.STATE_USER_IGNORED:
                 if show_ignored or show_user_ignored:
                     # This is an allowed user-ignored page.
                     return True

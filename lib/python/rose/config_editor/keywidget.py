@@ -94,7 +94,7 @@ class KeyWidget(gtk.VBox):
         self.hbox.pack_start(self.comments_box, expand=False, fill=False)
         self.grab_focus = lambda : self.entry.grab_focus()
         self.set_sensitive(True)
-        self.set_sensitive = self.entry.set_sensitive 
+        self.set_sensitive = self._set_sensitive
         event_box.connect('button-press-event', self.handle_launch_help)
         self.update_comment_display()
         self.entry.show()
@@ -329,6 +329,7 @@ class KeyWidget(gtk.VBox):
             hbox = gtk.HBox()
             hbox.show()
             hbox.pack_start(label, expand=False, fill=False)
+            hbox.set_sensitive(self.entry.get_property("sensitive"))
             hbox._show_mode = mode
             self.pack_start(hbox, expand=False, fill=False,
                             padding=rose.config_editor.SPACING_SUB_PAGE)
@@ -380,6 +381,7 @@ class KeyWidget(gtk.VBox):
         hbox = gtk.HBox()
         hbox._flag_type = flag_type
         hbox.pack_start(label, expand=False, fill=False)
+        hbox.set_sensitive(self.entry.get_property("sensitive"))
         hbox.show()
         self.pack_start(hbox, expand=False, fill=False)
 
@@ -421,7 +423,7 @@ class KeyWidget(gtk.VBox):
             tooltip_text += "\n".join(comments)
         changes = self.var_ops.get_var_changes(self.my_variable)
         if changes != '' and tooltip_text != '':
-            tooltip_text += '\n' + changes
+            tooltip_text += '\n\n' + changes
         else:
             tooltip_text += changes
         tooltip_text.strip()
@@ -461,6 +463,13 @@ class KeyWidget(gtk.VBox):
         if isinstance(self.entry, gtk.Label):
             self._set_underline(self.entry, underline=False)       
         return False
+
+    def _set_sensitive(self, is_sensitive):
+        self.entry.set_sensitive(is_sensitive)
+        for child in self.get_children():
+            if (hasattr(child, "_flag_type") or
+                hasattr(child, "_show_mode")):
+                child.set_sensitive(is_sensitive)
 
     def _setter(self, widget, variable):
         """Re-set the name of the variable in the dictionary object."""

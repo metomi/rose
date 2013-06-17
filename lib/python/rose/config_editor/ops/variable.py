@@ -76,11 +76,8 @@ class VariableOperations(object):
         variable.process_metadata(metadata)
         variable.metadata.update(old_metadata)
         variables = config_data.vars.now.get(sect, [])
-        latent_variables = config_data.vars.latent.get(sect, [])
         copy_var = variable.copy()
         v_id = variable.metadata.get('id')
-        if existing_variable in latent_variables:
-            latent_variables.remove(existing_variable)
         if v_id in [v.metadata.get('id') for v in variables]:
             # This is the case of adding a blank variable and 
             # renaming it to an existing variable's name.
@@ -95,6 +92,10 @@ class VariableOperations(object):
                 self.__add_section_func(config_name, sect)
                 for item in self.__undo_stack[start_stack_index:]:
                     item.group = group
+            latent_variables = config_data.vars.latent.get(sect, [])
+            for latent_var in list(latent_variables):
+                if latent_var.metadata["id"] == v_id:
+                    latent_variables.remove(latent_var)
             config_data.vars.now.setdefault(sect, [])
             config_data.vars.now[sect].append(variable)
             self.__undo_stack.append(
