@@ -5,7 +5,9 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (End of 2013-Q2)
+## Next Release (End of 2013-06)
+
+This release of Rose will work with cylc 5.3.0.
 
 ### Highlight Changes
 
@@ -22,8 +24,8 @@ modes.
   switch on archive mode on the specified cycle times in the argument list.
 * Switch off view mode by default in update mode, but can be turned on
   explicitly with an `--view`.
-* The `[rose-suite-log-view]` section in site/user `rose.conf` is renamed
-  `[rose-suite-log]`.
+* *Admin Change*: The `[rose-suite-log-view]` section in site/user `rose.conf` is
+  renamed `[rose-suite-log]`.
 
 \#732: rose config-edit: ability to load application configurations on demand
 for large suites.
@@ -31,9 +33,10 @@ for large suites.
 \#709: rose config-edit: now has a status bar and a console to view errors
 and information.
 
-\#707: rosie site/user configuration: Site administrator should take note. A
-new site/user configuration setting `[rosie-id]prefix-ws.PREFIX=URL` is
-introduced to configure the web service URL of each `PREFIX`.
+\#707: rosie site/user configuration:
+* *Admin Change*: A new site/user configuration setting
+  `[rosie-id]prefix-ws.PREFIX=URL` is introduced to configure the web service URL
+  of each `PREFIX`.
 * The `[rosie-ws-client]ws-root-default=URL` site/user configuration setting is
   removed.
 * The `--ws-root=URL` option is removed from `rosie lookup` and `rosie ls`.
