@@ -71,21 +71,6 @@ class Runner(object):
     NAME = None
     OPTIONS = []
     REC_OPT_DEFINE = re.compile(r"\A(?:\[([^\]]+)\])?([^=]+)?(?:=(.*))?\Z")
-    runner_classes = {}
-
-    @classmethod
-    def get_runner_class(cls, name):
-        """Return the class for a named runner."""
-
-        if cls.runner_classes.has_key(name):
-            return cls.runner_classes[name]
-        # Try values already imported into globals
-        for c in globals().values():
-            if isinstance(c, type) and c != cls and issubclass(c, cls):
-                if c.NAME == name:
-                    cls.runner_classes[name] = c
-                    return c
-        raise KeyError(name)
 
     def __init__(self, event_handler=None, popen=None, config_pm=None,
                  fs_util=None, suite_engine_proc=None):
