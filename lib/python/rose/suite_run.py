@@ -372,8 +372,8 @@ class SuiteRunner(Runner):
         ret = 0
         if opts.install_only_mode:
             host = None
-            if suite_running_hosts:
-                host = suite_running_hosts[0]
+            if suite_run_hosts:
+                host = suite_run_hosts[0]
         else:
             host = hosts[0]
             # FIXME: should sync files to suite host?
