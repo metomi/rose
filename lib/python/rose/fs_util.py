@@ -136,19 +136,22 @@ class FileSystemUtil(object):
         
         Create directory of target if it does not exist.
         If no_overwrite_mode is not specified or not True, remove target if it
-        exists, and is not a symbolic link pointing to source.
+        is not a symbolic link pointing to source.
 
         """
 
-        if not os.path.exists(self.dirname(target)):
-            self.makedirs(self.dirname(target))
-        if (not no_overwrite_mode and os.path.exists(target) and
-            (not os.path.islink(target) or not os.readlink(target) == source)):
+        self.makedirs(self.dirname(target))
+        if (not no_overwrite_mode and
+            not (os.path.islink(target) and os.readlink(target) == source)):
             self.delete(target)
-        if not os.path.exists(target):
+        try:
             os.symlink(source, target)
-            event = FileSystemEvent(FileSystemEvent.SYMLINK, source, target)
-            self.handle_event(event)
+        except OSError as e:
+            if e.filename is None: # Python does not set filename :-(
+                e.filename = target
+            raise e
+        event = FileSystemEvent(FileSystemEvent.SYMLINK, source, target)
+        self.handle_event(event)
 
     def touch(self, path):
         """Touch a file."""
