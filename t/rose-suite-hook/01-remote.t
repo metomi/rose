@@ -17,15 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-hook", remote jobs, file system not shared.
+# Test "rose suite-hook", remote jobs.
+# 01 - Test with a remote host without a shared $HOME.
+# 02 - Test with a remote host with a shared $HOME.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
 tests 5
-HOST=$(rose config 't:rose-suite-hook' 'host{01-remote}')
+HOST=$(rose config 't:rose-suite-hook' "host{${0%.t}}")
 if [[ -z $HOST ]]; then
-    skip 5 '[t:rose-suite-hook]01-remote{host} not defined'
+    skip 5 "[t:rose-suite-hook]host{${0%.t}} not defined"
     exit 0
 fi
 export ROSE_CONF_IGNORE=true
@@ -37,7 +39,6 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost \
     "--define=[jinja2:suite.rc]HOST=\"$HOST\""
-cat "$TEST_KEY.err"
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-ok
