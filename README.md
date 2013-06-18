@@ -2,6 +2,8 @@
 
 Rose is a framework for managing and running scientific suites.
 
+See <http://metomi.github.io/rose/>.
+
 ## Copyright
 
 British Crown Copyright 2012-3 Met Office.
@@ -25,7 +27,22 @@ Rose documentation is licensed under the British Open Government
 Licence. See doc/rose-terms-of-use.html and
 <http://www.nationalarchives.gov.uk/doc/open-government-licence/>
 
+See <http://metomi.github.io/rose/doc/rose-terms-of-use.html>.
+
+## Installation
+
+See <http://metomi.github.io/rose/doc/rose-install.html>.
+
 ## Acknowledgement
+
+Code contributors:
+* Andrew Clark (Met Office, UK)
+* Ben Fitzpatrick (Met Office, UK)
+* Hilary Oliver (National Institute of Water and Atmospheric Research, New Zealand)
+* Dave Matthews (Met Office, UK)
+* Stephen Oxley (Met Office, UK)
+* Matt Shin (Met Office, UK)
+* Stuart Whitehouse (Met Office, UK)
 
 Licences for non-Rose works included in this distribution can be
 found in the licences/ directory.
