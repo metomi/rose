@@ -212,11 +212,14 @@
 #  00-basic{groups}=my-hpc my-cluster
 [t:rose-host-select]
 
-
 # Test Battery Configuration: rose-suite-hook
 #
 ## A remote host that does not share its HOME directory with localhost
 #  01-remote{host}=HOST
 ## E.g.:
 #  01-remote{host}=my-hpc01
+## A remote host that shares its HOME directory with localhost
+#  02-remote-with-share{host}=HOST
+## E.g.:
+#  02-remote-with-share{host}=my-cluster01
 [t:rose-suite-hook]
