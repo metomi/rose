@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-printenv "$@" >$ROSE_TASK_LOG_ROOT.txt
