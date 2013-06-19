@@ -140,9 +140,10 @@ class FileSystemUtil(object):
 
         """
 
+        if os.path.islink(target) and os.readlink(target) == source:
+            return
         self.makedirs(self.dirname(target))
-        if (not no_overwrite_mode and
-            not (os.path.islink(target) and os.readlink(target) == source)):
+        if not no_overwrite_mode:
             self.delete(target)
         try:
             os.symlink(source, target)
