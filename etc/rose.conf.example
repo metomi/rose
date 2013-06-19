@@ -207,19 +207,19 @@
 # Test Battery Configuration: rose-host-select
 #
 ## Basic Tests: List of host groups
-#  00-basic{groups}=GROUP ...
+#  host-groups{00-basic}=GROUP ...
 ## E.g.:
-#  00-basic{groups}=my-hpc my-cluster
+#  host-groups{00-basic}=my-hpc my-cluster
 [t:rose-host-select]
 
 # Test Battery Configuration: rose-suite-hook
 #
 ## A remote host that does not share its HOME directory with localhost
-#  01-remote{host}=HOST
+#  host{01-remote}=HOST
 ## E.g.:
-#  01-remote{host}=my-hpc01
+#  host{01-remote}=my-hpc01
 ## A remote host that shares its HOME directory with localhost
-#  02-remote-with-share{host}=HOST
+#  host{02-remote-with-share}=HOST
 ## E.g.:
-#  02-remote-with-share{host}=my-cluster01
+#  host{02-remote-with-share}=my-cluster01
 [t:rose-suite-hook]

@@ -25,11 +25,12 @@
 
 #-------------------------------------------------------------------------------
 tests 5
-HOST=$(rose config 't:rose-suite-hook' "host{${0%.t}}")
+HOST=$(rose config 't:rose-suite-hook' "host{$(basename $0 .t)}")
 if [[ -z $HOST ]]; then
     skip 5 "[t:rose-suite-hook]host{${0%.t}} not defined"
     exit 0
 fi
+HOST=$(rose host-select $HOST)
 export ROSE_CONF_IGNORE=true
 #-------------------------------------------------------------------------------
 # Run the suite.
