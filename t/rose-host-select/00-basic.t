@@ -17,66 +17,39 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose config-dump".
+# Test "rose host-select".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 4
+HOST_GROUPS=$(rose config 't:rose-host-select' "host-groups{$(basename $0 .t)}")
+if [[ -n $HOST_GROUPS ]]; then
+    N_HOST_GROUPS=0
+    for HOST_GROUP in $HOST_GROUPS; do
+        ((++N_HOST_GROUPS))
+    done
+else
+    N_HOST_GROUPS=1
+fi
+tests $((N_HOST_GROUPS * 2 + 2))
 #-------------------------------------------------------------------------------
-# Mixed string-integer section indices.
-TEST_KEY=$TEST_KEY_BASE-sort-indices
-setup
-cat > f1 <<'__CONF__'
-[namelist:foo(1)]
-baz=1
-
-[namelist:foo(5)]
-baz=5
-
-[namelist:foo(10)]
-baz=10
-
-[namelist:foo(50)]
-baz=50
-
-[namelist:foo(10abc)]
-baz=10abc
-
-[namelist:foo(1abc)]
-baz=1abc
-
-[namelist:foo(5abc)]
-baz=5abc
-
-[namelist:foo(5xyz)]
-baz=5xyz
-
-[namelist:foo(abc)]
-baz=abc
-
-[namelist:foo(abcd)]
-baz=abcd
-
-[namelist:foo(xyz)]
-baz=xyz
-
-[namelist:spam(1)]
-
-[namelist:spam(5)]
-
-[namelist:spam(6)]
-
-[namelist:spam(10)]
-
-[namelist:spam(50)]
-
-[namelist:spam(51)]
-__CONF__
-cp f1 rose-app.conf
-run_pass "$TEST_KEY" rose config-dump
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-file_cmp "$TEST_KEY.f1" f1 rose-app.conf
-teardown
+# Host groups that can be tested.
+if [[ -n $HOST_GROUPS ]]; then
+    for HOST_GROUP in $HOST_GROUPS; do
+        TEST_KEY=$TEST_KEY_BASE-group-$HOST_GROUP
+        run_pass "$TEST_KEY" rose 'host-select' $HOST_GROUP
+        file_test "$TEST_KEY.out" "$TEST_KEY.out" -s
+    done
+else
+    skip 2 '[t:rose-host-select]groups not defined'
+fi
+#-------------------------------------------------------------------------------
+# Default host group.
+TEST_KEY=$TEST_KEY_BASE-default
+if [[ -n $(rose config 'rose-host-select' 'default') ]]; then
+    run_pass "$TEST_KEY" rose 'host-select'
+    file_test "$TEST_KEY.out" "$TEST_KEY.out" -s
+else
+    skip 2 'rose-host-select default not set'
+fi
 #-------------------------------------------------------------------------------
 exit 0

@@ -203,3 +203,23 @@
 ## E.g.:
 #  port=8080
 [rosie-ws]
+
+# Test Battery Configuration: rose-host-select
+#
+## Basic Tests: List of host groups
+#  host-groups{00-basic}=GROUP ...
+## E.g.:
+#  host-groups{00-basic}=my-hpc my-cluster
+[t:rose-host-select]
+
+# Test Battery Configuration: rose-suite-hook
+#
+## A remote host that does not share its HOME directory with localhost
+#  host{01-remote}=HOST
+## E.g.:
+#  host{01-remote}=my-hpc01
+## A remote host that shares its HOME directory with localhost
+#  host{02-remote-with-share}=HOST
+## E.g.:
+#  host{02-remote-with-share}=my-cluster01
+[t:rose-suite-hook]

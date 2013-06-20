@@ -1,82 +1,53 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose config-dump".
+# Test "rose suite-hook --shutdown", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+export ROSE_CONF_IGNORE=true
+
 #-------------------------------------------------------------------------------
-tests 4
+tests 2
 #-------------------------------------------------------------------------------
-# Mixed string-integer section indices.
-TEST_KEY=$TEST_KEY_BASE-sort-indices
-setup
-cat > f1 <<'__CONF__'
-[namelist:foo(1)]
-baz=1
-
-[namelist:foo(5)]
-baz=5
-
-[namelist:foo(10)]
-baz=10
-
-[namelist:foo(50)]
-baz=50
-
-[namelist:foo(10abc)]
-baz=10abc
-
-[namelist:foo(1abc)]
-baz=1abc
-
-[namelist:foo(5abc)]
-baz=5abc
-
-[namelist:foo(5xyz)]
-baz=5xyz
-
-[namelist:foo(abc)]
-baz=abc
-
-[namelist:foo(abcd)]
-baz=abcd
-
-[namelist:foo(xyz)]
-baz=xyz
-
-[namelist:spam(1)]
-
-[namelist:spam(5)]
-
-[namelist:spam(6)]
-
-[namelist:spam(10)]
-
-[namelist:spam(50)]
-
-[namelist:spam(51)]
-__CONF__
-cp f1 rose-app.conf
-run_pass "$TEST_KEY" rose config-dump
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-file_cmp "$TEST_KEY.f1" f1 rose-app.conf
-teardown
+# Run the suite.
+TEST_KEY=$TEST_KEY_BASE
+SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
+NAME=$(basename $SUITE_RUN_DIR)
+run_pass "$TEST_KEY" \
+    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
 #-------------------------------------------------------------------------------
+# Wait for the suite to complete, test shutdown on fail
+TEST_KEY=$TEST_KEY_BASE-suite-hook-shutdown
+TIMEOUT=$(($(date +%s) + 36000)) # wait 10 minutes
+OK=false
+while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
+    sleep 1
+done
+if [[ -e $HOME/.cylc/ports/$NAME ]]; then
+    fail "$TEST_KEY"
+    exit 1
+else
+    OK=true
+    pass "$TEST_KEY"
+fi
+#-------------------------------------------------------------------------------
+if $OK; then
+    rm -r $SUITE_RUN_DIR
+fi
 exit 0
