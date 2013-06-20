@@ -79,7 +79,7 @@ function help_util() {
 }
 
 function print_version() {
-    echo "Rose $ROSE_VERSION ($(rose_readlink_canonicalize $ROSE_HOME))"
+    echo "Rose $ROSE_VERSION ($ROSE_HOME)"
 }
 
 #-------------------------------------------------------------------------------
