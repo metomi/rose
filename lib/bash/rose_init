@@ -34,7 +34,6 @@ function rose_init() {
     set -eu
     ROSE_NS=$(basename $0)
     ROSE_HOME_BIN=$(cd $(dirname $0) && pwd)
-    ROSE_HOME_BIN=$(readlink -f $ROSE_HOME_BIN)
     ROSE_HOME=$(dirname $ROSE_HOME_BIN)
     eval $(grep 'ROSE_VERSION' $ROSE_HOME/doc/rose-version.js)
     local DESC=
