@@ -33,6 +33,8 @@
 # FUNCTIONS
 #     tests N
 #         echo "1..$N".
+#     skip N REASON
+#         echo "ok $((++T)) # skip REASON" N times, where T is the test number.
 #     pass TEST_KEY
 #         echo "ok $T - $TEST_KEY" where T is the current test number.
 #     fail TEST_KEY
@@ -74,6 +76,15 @@ TEST_NUMBER=0
 
 function tests() {
     echo "1..$1"
+}
+
+function skip() {
+    local N_SKIPS=$1
+    shift 1
+    local I=0
+    while ((I++ < N_SKIPS)); do
+        echo "ok $((++TEST_NUMBER)) # skip $@"
+    done
 }
 
 function pass() {

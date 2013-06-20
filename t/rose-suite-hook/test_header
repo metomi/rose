@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Provides header for "rose task-run" tests.
+# Provides header for "rose suite-hook" tests.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/test_header
 TEST_KEY_BASE=$(basename $0 .t)

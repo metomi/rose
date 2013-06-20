@@ -17,23 +17,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose task-run --path=", without site/user configurations.
+# Test "rose suite-hook", remote jobs.
+# 01 - Test with a remote host without a shared $HOME.
+# 02 - Test with a remote host with a shared $HOME.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-export ROSE_CONF_IGNORE=true
 
 #-------------------------------------------------------------------------------
 tests 5
+HOST=$(rose config 't:rose-suite-hook' "host{$(basename $0 .t)}")
+if [[ -z $HOST ]]; then
+    skip 5 "[t:rose-suite-hook]host{${0%.t}} not defined"
+    exit 0
+fi
+HOST=$(rose host-select $HOST)
+export ROSE_CONF_IGNORE=true
 #-------------------------------------------------------------------------------
 # Run the suite.
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
-    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
+    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost \
+    "--define=[jinja2:suite.rc]HOST=\"$HOST\""
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
+TEST_KEY=$TEST_KEY_BASE-suite-run-ok
 TIMEOUT=$(($(date +%s) + 36000)) # wait 10 minutes
 OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
@@ -47,15 +56,17 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-MY_PATH="$SUITE_RUN_DIR/etc/your-path"
-PREV_CYCLE=
-for CYCLE in 2013010100 2013010112 2013010200; do
-    TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
-    TASK=my_task_1
-    FILE=$HOME/cylc-run/$NAME/log/job/$TASK.$CYCLE.1.txt
-    file_grep "$TEST_KEY-PATH" "PATH=$SUITE_RUN_DIR/app/$TASK/bin:$SUITE_RUN_DIR/etc/your-path" $FILE
-    PREV_CYCLE=$CYCLE
-done
+# Test for local copy of remote job logs.
+TEST_KEY=$TEST_KEY_BASE-log
+(
+    cd $SUITE_RUN_DIR/log/job
+    file_test "$TEST_KEY-my_task_1.out" "my_task_1.1.1.out"
+    file_test "$TEST_KEY-my_task_1.err" "my_task_1.1.1.txt"
+    file_cmp "$TEST_KEY-my_task_1.txt" "my_task_1.1.1.txt" <<'__CONTENT__'
+Hello World
+__CONTENT__
+)
+
 #-------------------------------------------------------------------------------
 if $OK; then
     rm -r $SUITE_RUN_DIR
