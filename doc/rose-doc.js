@@ -177,4 +177,15 @@ $(function() {
     if (typeof prettyPrint != 'undefined') {
         prettyPrint();
     }
+    
+    // Time now in Cylc Format
+    NODE = $("#cylc-time");
+    if (NODE) {
+        NODE.each(function(){
+            var d = new Date();
+            var now = d.toISOString().replace(
+                        RegExp("[\\-:T]", "g"),"").slice(0,10)
+            $(this).text(now);
+        });
+    }
 });

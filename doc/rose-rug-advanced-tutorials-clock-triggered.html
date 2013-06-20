@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Clock triggered tasks</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Clock triggered tasks</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through using clock 
+      triggered tasks.</p>
+
+      <p>This allows you to trigger tasks based on the actual time.</p>
+      
+      <pre>
+      <span id="cylc-time"></span>
+      </pre>
+
+    </div>
+
+    <div class="slide">
+      <h2 id="purpose">Purpose</h2>
+
+      <p>Retries can be useful for tasks that may occasionally fail due to
+      external events, and are routinely fixable when they do - an example
+      would be a task that is dependent on a system that experiences temporary
+      outages.</p>
+
+      <p>If a task fails, the cylc retry mechanism can resubmit it after a
+      pre-determined delay. An environment variable,
+      <code>$CYLC_TASK_TRY_NUMBER</code> is incremented and passed into the
+      task - this means you can write your task script so that it changes
+      behaviour accordingly.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="example">Example</h2>
+
+      <p>Our example suite will simulate trying to roll doubles using two
+      dice.</p>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory somewhere - e.g. in your homespace) containing a blank
+      <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file with the
+      following contents:</p>
+    </div>
+    
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc</h3>
+      
+      <pre class="prettyprint lang-cylc">
+#!jinja2
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+[scheduling]
+    initial cycle time = <span id="cylc-time"></span>
+    [[special tasks]] 
+        clock-triggered = bell(0)
+    [[dependencies]]
+        [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
+            graph = "bell"
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook --mail"
+    [[bell]]
+        environment scripting = "eval $(rose task-env)"
+        command scripting = "yes 'bong' | head -n $(rose date --format=%H)"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Runtime</h3>
+
+      <p>We'll add some standard information in the <samp>[runtime]</samp>
+      section:</p>
+      <pre class="prettyprint lang-cylc">
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            failed handler = "rose suite-hook"
+            succeeded handler = "rose suite-hook"
+    [[start]]
+    [[win]]
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Task Runtime</h3>
+
+      <p>We need to add a rolling doubles task - add these lines to the end of
+      your <samp>suite.rc</samp> file:</p>
+      <pre class="prettyprint lang-cylc">
+    [[roll_doubles]]
+        command scripting = """
+sleep 10
+RANDOM=$$  # Seed $RANDOM
+if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
+    echo "doubles!"
+else
+    exit 1
+fi
+        """
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="running-no-retries">Running It without Retries</h2>
+
+      <p>Let's see what happens when we run the suite as it is.</p>
+
+      <p>Make sure you are in the root directory of your suite.</p>
+
+      <p>Run the suite using:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="retry-delays">Results</h2>
+
+      <p>Unless you're lucky, the suite should fail at the
+      <samp>roll_doubles</samp> task.</p>
+
+      <p>We need to tell cylc to retry it a few times - replace the line
+      <samp>[[roll_doubles]]</samp> in the <samp>suite.rc</samp> file with:</p>
+      <pre class="prettyprint lang-cylc">
+    [[roll_doubles]]
+        retry delays = 5*0.1
+</pre>
+
+      <p>This means that if the <samp>roll_doubles</samp> task fails, cylc
+      expects to retry it 5 times before finally failing. Each retry will have
+      a delay of <samp>0.1</samp> minutes.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Explanation</h3>
+
+      <p><samp>retry delays</samp> can have varying amounts (e.g. <samp>retry
+      delays = 0.25, 10, 60, 180</samp> to perform the first retry after 15
+      seconds, the second after 10 minutes, then an hour, then three
+      hours).</p>
+
+      <p>We've chosen 0.1 minutes (6 seconds) because it's relatively easy to
+      observe for this example.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="running-retries">Running It with Retries</h2>
+
+      <p>Stop the running suite and re-run the suite using:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+    </div>
+
+    <div class="slide">
+      <h2 id="results-retries">Results</h2>
+
+      <p>What you should see is cylc retrying the <samp>roll_doubles</samp>
+      task. Hopefully, it will succeed (about a 1 in 3 <a href=
+      "http://en.wikipedia.org/wiki/E_%28mathematical_constant%29">chance of
+      every task failing</a>) and the suite will continue.</p>
+
+      <p>If you go to the suite output (run <code>rose suite-log</code> in
+      your root suite directory), you can see the separate retry instances of
+      the task.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="alter">Altering Behaviour</h2>
+
+      <p>We can alter the behaviour of the task based on the number of retries,
+      using <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
+      <pre class="prettyprint lang-cylc">
+        command scripting = """
+sleep 10
+if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
+   echo "doubles!"  # Cheat!
+   exit 0
+fi
+RANDOM=$$
+if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
+    echo "doubles!"
+else
+    exit 1
+fi
+        """
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Results</h3>
+
+      <p>If your suite is still running, stop it. Run it again using:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+
+      <p>This time, the task should definitely succeed before the third
+      retry.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="further">Further Reading</h2>
+
+      <p>For more information, see the <a href=
+      "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user
+      guide</a>.</p>
+    </div>
+  </div>
+</body>
+</html>
