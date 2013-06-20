@@ -30,11 +30,18 @@
 #     * load the "rose_usage" function.
 #     * load any FUNC specified in the argument list.
 #-------------------------------------------------------------------------------
+function rose_readlink_canonicalize() { # "readlink -f" is GNU extension
+    readlink -f $1 2>/dev/null || python - $1 <<'__PYTHON__'
+import os, sys
+print os.path.realpath(sys.argv[1])
+__PYTHON__
+}
+
 function rose_init() {
     set -eu
     ROSE_NS=$(basename $0)
     ROSE_HOME_BIN=$(cd $(dirname $0) && pwd)
-    ROSE_HOME_BIN=$(readlink -f $ROSE_HOME_BIN)
+    ROSE_HOME_BIN=$(rose_readlink_canonicalize $ROSE_HOME_BIN)
     ROSE_HOME=$(dirname $ROSE_HOME_BIN)
     eval $(grep 'ROSE_VERSION' $ROSE_HOME/doc/rose-version.js)
     local DESC=
