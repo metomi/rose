@@ -23,7 +23,7 @@
 export ROSE_CONF_IGNORE=true
 
 #-------------------------------------------------------------------------------
-tests 2
+tests 3
 #-------------------------------------------------------------------------------
 # Run the suite.
 TEST_KEY=$TEST_KEY_BASE
@@ -47,7 +47,5 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-if $OK; then
-    rm -r $SUITE_RUN_DIR
-fi
+run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
 exit 0

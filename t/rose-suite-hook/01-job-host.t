@@ -24,10 +24,11 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 5
-HOST=$(rose config 't:rose-suite-hook' "host{$(basename $0 .t)}")
+tests 6
+KEY=${TEST_KEY_BASE#0?-}
+HOST=$(rose config 't:rose-suite-hook' $KEY)
 if [[ -z $HOST ]]; then
-    skip 5 "[t:rose-suite-hook]host{${0%.t}} not defined"
+    skip 6 "[t:rose-suite-hook]$KEY not defined"
     exit 0
 fi
 HOST=$(rose host-select $HOST)
@@ -58,17 +59,14 @@ fi
 #-------------------------------------------------------------------------------
 # Test for local copy of remote job logs.
 TEST_KEY=$TEST_KEY_BASE-log
-(
-    cd $SUITE_RUN_DIR/log/job
-    file_test "$TEST_KEY-my_task_1.out" "my_task_1.1.1.out"
-    file_test "$TEST_KEY-my_task_1.err" "my_task_1.1.1.txt"
-    file_cmp "$TEST_KEY-my_task_1.txt" "my_task_1.1.1.txt" <<'__CONTENT__'
+cd $SUITE_RUN_DIR/log/job
+file_test "$TEST_KEY-my_task_1.out" "my_task_1.1.1.out"
+file_test "$TEST_KEY-my_task_1.err" "my_task_1.1.1.txt"
+file_cmp "$TEST_KEY-my_task_1.txt" "my_task_1.1.1.txt" <<'__CONTENT__'
 Hello World
 __CONTENT__
-)
+cd $OLDPWD
 
 #-------------------------------------------------------------------------------
-if $OK; then
-    rm -r $SUITE_RUN_DIR
-fi
+run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
 exit 0

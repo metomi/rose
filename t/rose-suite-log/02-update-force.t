@@ -20,17 +20,32 @@
 # Test "rose suite-log --force", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-export ROSE_CONF_IGNORE=true
 
 #-------------------------------------------------------------------------------
-tests 15
+tests 22
+#-------------------------------------------------------------------------------
+if [[ $TEST_KEY_BASE == *-remote* ]]; then
+    JOB_HOST=$(rose config 't:rose-suite-log' 'job-host')
+    if [[ -z $JOB_HOST ]]; then
+        skip 22 "[t:rose-suite-log]job-host not defined"
+        exit 0
+    fi
+    JOB_HOST=$(rose host-select $JOB_HOST)
+fi
 #-------------------------------------------------------------------------------
 # Run the suite.
+export ROSE_CONF_IGNORE=true
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
+if [[ -n ${JOB_HOST:-} ]]; then
+    run_pass "$TEST_KEY" \
+        rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost \
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\""
+else
+    run_pass "$TEST_KEY" \
+        rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
+fi
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete, test shutdown on fail
 TEST_KEY="$TEST_KEY_BASE-complete"
@@ -73,6 +88,10 @@ for CYCLE in $CYCLES; do
     TEST_KEY="$TEST_KEY_BASE-after-$CYCLE"
     run_pass "$TEST_KEY" \
         test -s "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json"
+    file_test "$TEST_KEY-after-log-1.out" \
+        $SUITE_RUN_DIR/log/job/my_task_1.$CYCLE.1.out
+    file_test "$TEST_KEY-after-log-2.out" \
+        $SUITE_RUN_DIR/log/job/my_task_2.$CYCLE.1.out
 done
 TEST_KEY="$TEST_KEY_BASE-main-after"
 run_pass "$TEST_KEY" python - \
@@ -83,7 +102,5 @@ d = json.load(open(file_name))
 sys.exit(len(d["cycle_times_current"]) != 3)
 __PYTHON__
 #-------------------------------------------------------------------------------
-if $OK; then
-    rm -r $SUITE_RUN_DIR
-fi
+run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
 exit 0

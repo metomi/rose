@@ -16,14 +16,18 @@ my_task_2
 
 [runtime]
     [[root]]
-        command scripting = "true"
+        command scripting = "echo Hello"
         [[[event hooks]]]
-           failed handler = "rose suite-hook --shutdown"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook"
-           execution timeout handler = "rose suite-hook"
-           submission timeout = 1
-           execution timeout  = 1
+            failed handler = "rose suite-hook --shutdown"
+            submission failed handler = "rose suite-hook --shutdown"
+            submission timeout handler = "rose suite-hook"
+            execution timeout handler = "rose suite-hook"
+            submission timeout = 1
+            execution timeout  = 1
+{% if HOST is defined %}
+        [[[remote]]]
+            host = {{HOST}}
+{% endif %}
     [[my_task_1]]
         [[[event hooks]]]
            succeeded handler = "rose suite-hook"

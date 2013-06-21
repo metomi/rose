@@ -85,11 +85,12 @@ class CylcProcessor(SuiteEngineProcessor):
                 item_root = None
                 node_value = conf.get_value(
                         ["rose-suite-run", "root-dir-" + key])
-                for line in node_value.strip().splitlines():
-                    pattern, value = line.strip().split("=", 1)
-                    if fnmatchcase(job_host, pattern):
-                        item_root = value.strip()
-                        break
+                if node_value is not None:
+                    for line in node_value.strip().splitlines():
+                        pattern, value = line.strip().split("=", 1)
+                        if fnmatchcase(job_host, pattern):
+                            item_root = value.strip()
+                            break
                 if item_root is not None:
                     dir_rel = self.get_suite_dir_rel(suite_name, key)
                     item_path_source = os.path.join(item_root, dir_rel)

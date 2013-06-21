@@ -20,17 +20,32 @@
 # Test "rose suite-log --update TASK", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-export ROSE_CONF_IGNORE=true
 
 #-------------------------------------------------------------------------------
-tests 7
+tests 10
+#-------------------------------------------------------------------------------
+if [[ $TEST_KEY_BASE == *-remote* ]]; then
+    JOB_HOST=$(rose config 't:rose-suite-log' "job-host")
+    if [[ -z $JOB_HOST ]]; then
+        skip 10 "[t:rose-suite-log]job-host not defined"
+        exit 0
+    fi
+    JOB_HOST=$(rose host-select $JOB_HOST)
+fi
 #-------------------------------------------------------------------------------
 # Run the suite.
+export ROSE_CONF_IGNORE=true
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
+if [[ -n ${JOB_HOST:-} ]]; then
+    run_pass "$TEST_KEY" \
+        rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost \
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\""
+else
+    run_pass "$TEST_KEY" \
+        rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
+fi
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete, test shutdown on fail
 TEST_KEY="$TEST_KEY_BASE-complete"
@@ -47,26 +62,34 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-run_pass "$TEST_KEY-before" python - \
+run_pass "$TEST_KEY_BASE-before" python - \
     "$HOME/cylc-run/$NAME/log/rose-suite-log-1.json" 'my_task_2' <<'__PYTHON__'
 import json, sys
 file_name, task_name = sys.argv[1:]
 d = json.load(open(file_name))
 sys.exit(task_name in d["tasks"])
 __PYTHON__
-run_pass "$TEST_KEY-command" rose suite-log -n $NAME -u 'my_task_2' --debug
-file_grep "$TEST_KEY-command.out" '\[INFO\] update: rose-suite-log-1.json' \
-    "$TEST_KEY-command.out"
-file_cmp "$TEST_KEY-command.err" "$TEST_KEY-command.err" </dev/null
-run_pass "$TEST_KEY-after" python - \
+TEST_KEY=$TEST_KEY_BASE-before-log.out
+if [[ -n ${JOB_HOST:-} ]]; then
+    run_fail "$TEST_KEY-log.out" \
+        test -f $SUITE_RUN_DIR/log/job/my_task_2.1.1.out
+else
+    pass "$TEST_KEY-log.out"
+fi
+TEST_KEY=$TEST_KEY_BASE-command
+run_pass "$TEST_KEY" rose suite-log -n $NAME -u 'my_task_2' --debug
+file_grep "$TEST_KEY.out" '\[INFO\] update: rose-suite-log-1.json' \
+    "$TEST_KEY.out"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+TEST_KEY=$TEST_KEY_BASE-after
+run_pass "$TEST_KEY" python - \
     "$HOME/cylc-run/$NAME/log/rose-suite-log-1.json" 'my_task_2' <<'__PYTHON__'
 import json, sys
 file_name, task_name = sys.argv[1:]
 d = json.load(open(file_name))
 sys.exit(task_name not in d["tasks"])
 __PYTHON__
+file_test "$TEST_KEY-log.out" $SUITE_RUN_DIR/log/job/my_task_2.1.1.out
 #-------------------------------------------------------------------------------
-if $OK; then
-    rm -r $SUITE_RUN_DIR
-fi
+run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y --debug $NAME
 exit 0

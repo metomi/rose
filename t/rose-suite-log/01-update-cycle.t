@@ -21,17 +21,32 @@
 # Test "rose suite-log --archive CYCLE", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-export ROSE_CONF_IGNORE=true
 
 #-------------------------------------------------------------------------------
-tests 23
+tests 30
+#-------------------------------------------------------------------------------
+if [[ $TEST_KEY_BASE == *-remote* ]]; then
+    JOB_HOST=$(rose config 't:rose-suite-log' "job-host")
+    if [[ -z $JOB_HOST ]]; then
+        skip 30 "[t:rose-suite-log]job-host not defined"
+        exit 0
+    fi
+    JOB_HOST=$(rose host-select $JOB_HOST)
+fi
 #-------------------------------------------------------------------------------
 # Run the suite.
+export ROSE_CONF_IGNORE=true
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
+if [[ -n ${JOB_HOST:-} ]]; then
+    run_pass "$TEST_KEY" \
+        rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost \
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\""
+else
+    run_pass "$TEST_KEY" \
+        rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
+fi
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete, test shutdown on fail
 TEST_KEY="$TEST_KEY_BASE-complete"
@@ -68,12 +83,32 @@ sys.exit(cycle not in d["cycle_times_current"]
          or cycle in d["cycle_times_archived"])
 __PYTHON__
 run_pass "$TEST_KEY-list-job-logs-before" ls $SUITE_RUN_DIR/log/job/*$CYCLE*
+if [[ -n ${JOB_HOST:-} ]]; then
+    run_pass "$TEST_KEY-job-log.out-before-jobhost" \
+        ssh -oBatchMode=yes $JOB_HOST \
+        test -f cylc-run/$NAME/log/job/my_task_2.$CYCLE.1.out
+    run_fail "$TEST_KEY-job-log.out-before-localhost" \
+        test -f $SUITE_RUN_DIR/log/job/my_task_2.$CYCLE.1.out
+else
+    pass "$TEST_KEY-job-log.out-before-jobhost"
+    pass "$TEST_KEY-job-log.out-before-localhost"
+fi
 N_JOB_LOGS=$(wc -l "$TEST_KEY-list-job-logs-before.out" | cut -d' ' -f1)
 run_pass "$TEST_KEY-command" rose suite-log -n $NAME --archive $CYCLE --debug
 run_fail "$TEST_KEY-list-job-logs-after" ls $SUITE_RUN_DIR/log/job/*$CYCLE*
+if [[ -n ${JOB_HOST:-} ]]; then
+    ((N_JOB_LOGS += 3)) # script, out and err files
+    run_fail "$TEST_KEY-job-log.out-after-jobhost" \
+        ssh -oBatchMode=yes $JOB_HOST \
+        test -f cylc-run/$NAME/log/job/my_task_2.$CYCLE.1.out
+else
+    pass "$TEST_KEY-job-log.out-after-jobhost"
+fi
 file_test "$TEST_KEY-tar-exist" $SUITE_RUN_DIR/log/job-$CYCLE.tar.gz
-N_JOB_LOGS_ARCH=$(tar -tzf $SUITE_RUN_DIR/log/job-$CYCLE.tar.gz | wc -l \
-    | cut -d' ' -f1)
+JOB_LOGS_ARCH=$(tar -tzf $SUITE_RUN_DIR/log/job-$CYCLE.tar.gz)
+run_pass "$TEST_KEY-after-log.out" \
+    grep -q "job/my_task_2.$CYCLE.1.out" <<<"$JOB_LOGS_ARCH"
+N_JOB_LOGS_ARCH=$(echo "$JOB_LOGS_ARCH" | wc -l | cut -d' ' -f1)
 if ((N_JOB_LOGS == N_JOB_LOGS_ARCH)); then
     pass "$TEST_KEY-n-arch"
 else
@@ -124,9 +159,9 @@ file_name, task_name = sys.argv[1:]
 d = json.load(open(file_name))
 sys.exit(task_name not in d["tasks"])
 __PYTHON__
+    file_test "$TEST_KEY-after-log.out" \
+        $SUITE_RUN_DIR/log/job/my_task_2.$CYCLE.1.out
 done
 #-------------------------------------------------------------------------------
-if $OK; then
-    rm -r $SUITE_RUN_DIR
-fi
+run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
 exit 0
