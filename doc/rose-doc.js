@@ -178,7 +178,7 @@ $(function() {
         prettyPrint();
     }
     
-    // Time now in Cylc Format
+    // Current time in Cylc Format
     NODE = $("#cylc-time");
     if (NODE) {
         NODE.each(function(){

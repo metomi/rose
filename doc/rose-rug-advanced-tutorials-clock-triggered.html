@@ -79,32 +79,25 @@
 
       <p>This allows you to trigger tasks based on the actual time.</p>
       
-      <pre>
-      <span id="cylc-time"></span>
-      </pre>
-
     </div>
 
     <div class="slide">
       <h2 id="purpose">Purpose</h2>
 
-      <p>Retries can be useful for tasks that may occasionally fail due to
-      external events, and are routinely fixable when they do - an example
-      would be a task that is dependent on a system that experiences temporary
-      outages.</p>
+      <p>The typical use of clock triggered tasks is to perform real-time data 
+      retrieval</p>
 
-      <p>If a task fails, the cylc retry mechanism can resubmit it after a
-      pre-determined delay. An environment variable,
-      <code>$CYLC_TASK_TRY_NUMBER</code> is incremented and passed into the
-      task - this means you can write your task script so that it changes
-      behaviour accordingly.</p>
+      <p>In general, most tasks in a suite do not care about the wall clock 
+      time, simply running once their prerequesites are met. Clock-triggered 
+      tasks, however, wait for a particular wall clock time to be reached 
+      <em>in addition</em> to their other prerequesites.</p>
+      
     </div>
 
     <div class="slide">
       <h2 id="example">Example</h2>
 
-      <p>Our example suite will simulate trying to roll doubles using two
-      dice.</p>
+      <p>Our example suite will simulate a clock chiming on the hour.</p>
 
       <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
       new directory somewhere - e.g. in your homespace) containing a blank
@@ -124,12 +117,16 @@
         timeout = 4320 # 3 days
 [scheduling]
     initial cycle time = <span id="cylc-time"></span>
-    [[special tasks]] 
-        clock-triggered = bell(0)
     [[dependencies]]
         [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
             graph = "bell"
+</pre>
+    </div>
 
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc (2)</h3>
+
+    <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         [[[event hooks]]]
@@ -142,141 +139,85 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Runtime</h3>
+      <h3 class="alwayshidden">Example suite.rc (3)</h3>
 
-      <p>We'll add some standard information in the <samp>[runtime]</samp>
-      section:</p>
-      <pre class="prettyprint lang-cylc">
-[runtime]
-    [[root]]
-        [[[event hooks]]]
-            failed handler = "rose suite-hook"
-            succeeded handler = "rose suite-hook"
-    [[start]]
-    [[win]]
-</pre>
-    </div>
+      <p>We now have a simple suite with a single task that prints "bong" a 
+      number of times equal to the hour.</p>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Task Runtime</h3>
-
-      <p>We need to add a rolling doubles task - add these lines to the end of
-      your <samp>suite.rc</samp> file:</p>
-      <pre class="prettyprint lang-cylc">
-    [[roll_doubles]]
-        command scripting = """
-sleep 10
-RANDOM=$$  # Seed $RANDOM
-if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
-    echo "doubles!"
-else
-    exit 1
-fi
-        """
-</pre>
-    </div>
-
-    <div class="slide">
-      <h2 id="running-no-retries">Running It without Retries</h2>
-
-      <p>Let's see what happens when we run the suite as it is.</p>
-
-      <p>Make sure you are in the root directory of your suite.</p>
-
-      <p>Run the suite using:</p>
+      <p>Run your suite using:</p>
       <pre class="shell">
 rose suite-run
 </pre>
+      <p>and stop it after a few cycles using the stop button in the cylc 
+      gui. Notice how the tasks run as soon as possible rather than waiting
+      for the actual time to be equal to the cycle time.</p>
     </div>
 
     <div class="slide">
-      <h2 id="retry-delays">Results</h2>
+      <h3 class="alwayshidden">Example suite.rc (4)</h3>
+      
+      <p>Use <samp>rose suite-log</samp> to view the suite logs and look at the
+      output for one of the bell tasks to confirm it is behaving as 
+      expected. N.B. this particular clock is running in UTC so the number of
+      "bong"s may vary from your local time.</p>
+    </div>
 
-      <p>Unless you're lucky, the suite should fail at the
-      <samp>roll_doubles</samp> task.</p>
 
-      <p>We need to tell cylc to retry it a few times - replace the line
-      <samp>[[roll_doubles]]</samp> in the <samp>suite.rc</samp> file with:</p>
-      <pre class="prettyprint lang-cylc">
-    [[roll_doubles]]
-        retry delays = 5*0.1
+    <div class="slide">
+      <h2 id="clock-triggering">Clock triggering tasks</h2>
+
+      <p>We want out clock to only ring in real time rather than the 
+      accelerated cycle time.</p>
+      
+      <p>To do this add these lines to the <samp>[scheduling]</samp> section of
+      your <var>suite.rc</var>:
+<pre class="prettypring lang-cylc">
+    [[special tasks]] 
+        clock-triggered = bell(0)
 </pre>
+    
+      <p>Save your changes and run your suite.</p>
+    </div>
 
-      <p>This means that if the <samp>roll_doubles</samp> task fails, cylc
-      expects to retry it 5 times before finally failing. Each retry will have
-      a delay of <samp>0.1</samp> minutes.</p>
+    <div class="slide">
+      <h2 id="results">Results</h2>
+
+      <p>Your suite should now be running the bell task in realtime. Any cycle
+      times that have already passed (such as the one defined by 
+      <samp>initial cycle time</samp>) will be run as soon as possible, while
+      those in the future will wait for that time to pass.</p>
+
+      <p>At this point you may want to leave your suite running until the next
+      hour has passed in order to confirm the clock tiggering is working 
+      correctly. Once you are satisfied, stop your suite.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Explanation</h3>
 
-      <p><samp>retry delays</samp> can have varying amounts (e.g. <samp>retry
-      delays = 0.25, 10, 60, 180</samp> to perform the first retry after 15
-      seconds, the second after 10 minutes, then an hour, then three
-      hours).</p>
-
-      <p>We've chosen 0.1 minutes (6 seconds) because it's relatively easy to
-      observe for this example.</p>
     </div>
 
     <div class="slide">
-      <h2 id="running-retries">Running It with Retries</h2>
+      <h2 id="further-triggering">Further clock triggering</h2>
 
-      <p>Stop the running suite and re-run the suite using:</p>
-      <pre class="shell">
-rose suite-run
-</pre>
     </div>
 
     <div class="slide">
-      <h2 id="results-retries">Results</h2>
+      <h2 id="results-further">Results</h2>
 
-      <p>What you should see is cylc retrying the <samp>roll_doubles</samp>
-      task. Hopefully, it will succeed (about a 1 in 3 <a href=
-      "http://en.wikipedia.org/wiki/E_%28mathematical_constant%29">chance of
-      every task failing</a>) and the suite will continue.</p>
 
-      <p>If you go to the suite output (run <code>rose suite-log</code> in
-      your root suite directory), you can see the separate retry instances of
-      the task.</p>
     </div>
 
-    <div class="slide">
-      <h2 id="alter">Altering Behaviour</h2>
-
-      <p>We can alter the behaviour of the task based on the number of retries,
-      using <code>$CYLC_TASK_TRY_NUMBER</code>:</p>
-      <pre class="prettyprint lang-cylc">
-        command scripting = """
-sleep 10
-if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
-   echo "doubles!"  # Cheat!
-   exit 0
-fi
-RANDOM=$$
-if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
-    echo "doubles!"
-else
-    exit 1
-fi
-        """
-</pre>
-    </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Results</h3>
+      <h2 id="summary">Summary</h2>
 
-      <p>If your suite is still running, stop it. Run it again using:</p>
-      <pre class="shell">
-rose suite-run
-</pre>
-
-      <p>This time, the task should definitely succeed before the third
-      retry.</p>
-    </div>
-
-    <div class="slide">
-      <h2 id="further">Further Reading</h2>
+      <p>You have now successfully created and run a suite that:</p>
+      <ul>
+        <li>runs a <var>bell</var> task in realtime on the hour</li>
+        <li>runs different chimeing tasks at quarter-past, half-past and 
+        quarter-to the hour</li> 
+      </ul>
 
       <p>For more information, see the <a href=
       "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user
