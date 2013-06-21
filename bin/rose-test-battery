@@ -21,61 +21,18 @@
 #     rose-test-battery
 #
 # SYNOPSIS
-#     rose test-battery [-v] [UTIL ...]
+#     rose test-battery [PROVE-ARGS ...]
 #
 # DESCRIPTION
 #     Run the Rose test battery.
 #
-#     If no argument is specified, run available tests for all utilities.
-#     Otherwise, run only the tests for the utilities in the argument list.
-#
-# OPTIONS
-#     -v  Run tests in verbose mode, if applicable.
+#     Change to $ROSE_HOME/t and run the "prove" command.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
 rose_init
-ROSE_TEST=${ROSE_TEST:-$ROSE_HOME/t}
-UTIL_LIST="$(cd $ROSE_TEST && ls -d rose[-.]* | sed 's/^rose[-.]//')"
-ALT_UTIL_LIST="$(cd $ROSE_TEST && ls -d ros*)"
-#-------------------------------------------------------------------------------
-VERBOSE=
-if [[ -n ${1:-} && $1 == '-v' ]]; then
-    VERBOSE=$1
-    shift 1
+cd $ROSE_HOME
+if (($# == 0)); then
+    exec prove -r $ROSE_HOME/t
+else
+    exec prove "$@"
 fi
-UTIL_LIST_ARG=${@:-$UTIL_LIST}
-#-------------------------------------------------------------------------------
-N_DONE=0
-N_PASS=0
-for UTIL in $UTIL_LIST_ARG; do
-    TEST_DIR=
-    if grep -q "^$UTIL$" <<<"$UTIL_LIST"; then
-        TEST_DIR=$ROSE_TEST/rose-$UTIL
-        if [[ ! -d $TEST_DIR ]]; then
-            TEST_DIR=$ROSE_TEST/rose.$UTIL
-        fi
-    elif grep -q "^$UTIL$" <<<"$ALT_UTIL_LIST"; then
-        TEST_DIR=$ROSE_TEST/$UTIL
-    fi
-    if [[ -n $TEST_DIR ]]; then
-        echo -e "[TEST-INIT] "$(basename $TEST_DIR)
-        TEST_RC=0
-        $TEST_DIR/tests $VERBOSE || TEST_RC=$?
-        if ((TEST_RC == 0)); then
-            ((++N_PASS))
-        fi
-        ((++N_DONE))
-        echo -e "[TEST-EXIT] "$(basename $TEST_DIR)" ($TEST_RC)"
-    fi 
-done
-#-------------------------------------------------------------------------------
-if ((N_PASS != N_DONE)); then
-    if [[ -t 1 ]]; then
-        echo -e "\e[1;31m[FAIL]\e[0m $N_PASS/$N_DONE" # red
-    else
-        echo "[FAIL] $N_PASS/$N_DONE"
-    fi
-    exit 1
-fi
-echo "[PASS] $N_PASS/$N_DONE"
-exit 0

@@ -103,4 +103,5 @@ sys.exit(len(d["cycle_times_current"]) != 3)
 __PYTHON__
 #-------------------------------------------------------------------------------
 run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
+rmdir $SUITE_RUN_DIR
 exit 0

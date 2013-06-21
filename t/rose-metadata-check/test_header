@@ -19,7 +19,8 @@
 #-------------------------------------------------------------------------------
 # Provides init, setup and teardown functions for rose metadata-check tests.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/../lib/bash/test_header
+TEST_SOURCE_DIR=$(cd $(dirname $0) && pwd)
+. $TEST_SOURCE_DIR/../lib/bash/test_header
 TEST_KEY_BASE=$(basename $0 .t)
 
 function init() {
