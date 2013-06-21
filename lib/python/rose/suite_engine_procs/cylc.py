@@ -490,9 +490,10 @@ class CylcProcessor(SuiteEngineProcessor):
             else:
                 for item in items:
                     cycle, name = self._parse_task_cycle_id(item)
-                    arch_f_name = self.get_cycle_log_archive_name(cycle)
-                    if os.path.exists(arch_f_name):
-                        continue
+                    if cycle is not None:
+                        arch_f_name = self.get_cycle_log_archive_name(cycle)
+                        if os.path.exists(arch_f_name):
+                            continue
                     auths = self.get_suite_jobs_auths(suite_name, cycle, name)
                     if auths:
                         glob_names = []
