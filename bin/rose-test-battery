@@ -30,9 +30,9 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
 rose_init
-cd $ROSE_HOME
+cd $ROSE_HOME/t
 if (($# == 0)); then
-    exec prove -r $ROSE_HOME/t
+    exec prove -r
 else
     exec prove "$@"
 fi

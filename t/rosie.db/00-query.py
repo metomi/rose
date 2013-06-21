@@ -18,12 +18,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
+"""Test the ability of the query parser to generate logical expressions."""
 
 import ast
 import sys
+from rosie.db import DAO, RosieDatabaseInitiator
+from tempfile import NamedTemporaryFile
 
-import rosie.db
 
 if __name__ == "__main__":
-    input_obj = ast.literal_eval(sys.argv[1])
-    print str(rosie.db.test_query_parsing(input_obj))
+    f = NamedTemporaryFile()
+    db_url = "sqlite:////" + f.name
+    RosieDatabaseInitiator().create(db_url)
+    dao = DAO(db_url)
+    print str(dao.parse_filters_to_expr(ast.literal_eval(sys.argv[1])))

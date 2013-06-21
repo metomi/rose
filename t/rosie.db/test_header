@@ -17,20 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Provides init, setup and teardown functions for rosie db tests.
+# Provides common variables for rosie db tests.
 #-------------------------------------------------------------------------------
 TEST_SOURCE_DIR=$(cd $(dirname $0) && pwd)
 . $TEST_SOURCE_DIR/../lib/bash/test_header
 TEST_KEY_BASE=$(basename $0 .t)
-
-function init() {
-    export PATH=$TEST_SOURCE_DIR:$PATH
-}
-
-function setup() {
-    :
-}
-
-function teardown() {
-    :
-}
