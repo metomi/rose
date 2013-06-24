@@ -1981,18 +1981,14 @@ environment scripting = "eval $(rose task-env)"
 
     <h3>DESCRIPTION</h3>
 
-    <p>Run the Rose test suite.</p>
+    <p>Run the Rose test battery.</p>
 
-    <p>If no argument is specified, run available tests for all utilities.
-    Otherwise, run only the tests for the utilities in the argument list.</p>
+    <p>Change to <var>$ROSE_HOME/t</var> and run the <code>prove</code>
+    command. If no argument is specified, run <code>prove -r</code>.</p>
 
-    <h3>OPTIONS</h3>
+    <h3>SEE ALSO</h3>
 
-    <dl>
-      <dt><kbd>-v</kbd></dt>
-
-      <dd>Run tests in verbose mode, if applicable.</dd>
-    </dl>
+    <p><a href="http://perldoc.perl.org/prove.html">prove(1)</a></p>
 
     <h2 id="rosie-checkout">rosie checkout</h2>
 

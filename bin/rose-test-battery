@@ -26,7 +26,11 @@
 # DESCRIPTION
 #     Run the Rose test battery.
 #
-#     Change to $ROSE_HOME/t and run the "prove" command.
+#     Change to $ROSE_HOME/t and run the "prove" command. If no argument is
+#     specified, run "prove -r".
+#
+# SEE ALSO
+#     prove(1)
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
 rose_init
