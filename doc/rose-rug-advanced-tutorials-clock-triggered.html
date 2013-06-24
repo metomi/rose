@@ -171,7 +171,7 @@ rose suite-run
       
       <p>To do this add these lines to the <samp>[scheduling]</samp> section of
       your <var>suite.rc</var>:
-<pre class="prettypring lang-cylc">
+<pre class="prettyprint lang-cylc">
     [[special tasks]] 
         clock-triggered = bell(0)
 </pre>
@@ -188,19 +188,60 @@ rose suite-run
       those in the future will wait for that time to pass.</p>
 
       <p>At this point you may want to leave your suite running until the next
-      hour has passed in order to confirm the clock tiggering is working 
+      hour has passed in order to confirm the clock triggering is working 
       correctly. Once you are satisfied, stop your suite.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Explanation</h3>
 
+      <p>By making the <var>[[bell]]</var> task a clock triggered task we have 
+      made it run in realtime. Thus, when the time caught up with the cycle 
+      time, the bell task triggered.</p>
+
     </div>
 
     <div class="slide">
       <h2 id="further-triggering">Further clock triggering</h2>
 
+      <p>When clock triggering tasks we can use different offsets to the cycle
+      time as follows:</p>
+
+<pre class="prettyprint lang-cylc">
+        clock-triggered = taskname(CYCLE_OFFSET)
+</pre>
+
+      <p>We will now modify our suite to run tasks at quarter-past, half-past 
+      and quarter-to the hour.</p>
     </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Further clock triggering (2)</h3>
+
+    <p>Open your <var>suite.rc</var> and modify the <var>[runtime]</var> 
+    section by adding the following:</p>
+
+<pre class="prettyprint lang-cylc">
+    [[quarter_past, half_past, quarter_to]]
+        command scripting = "echo 'chimes'"
+</pre>
+
+    <p>Similarly, modify the <var>[[scheduling]]</var> section as follows:</p>
+
+<pre class="prettyprint lang-cylc">
+    [[special tasks]] 
+        clock-triggered = bell(0), quarter_past(0.25), half_past(0.5), quarter_to(0.75)
+    [[dependencies]]
+        [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
+            graph = "bell => quarter_past => half_past => quarter_to"
+</pre>    
+
+    <p>Note the different values used for the cycle offsets of the 
+    clock-triggered tasks.</p>    
+
+    </div>
+
+
 
     <div class="slide">
       <h2 id="results-further">Results</h2>
