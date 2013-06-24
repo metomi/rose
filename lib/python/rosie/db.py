@@ -322,6 +322,7 @@ class DAO(object):
 
     def parse_filters_to_expr(self, filters, from_obj=None):
         """Construct an SQL expression from a list of string-tuples."""
+        self._connect()
         if from_obj is None:
             from_obj, cols = self._get_join_and_columns()
         item_list = []
@@ -546,13 +547,13 @@ class RosieDatabaseInitiator(object):
     def _dummy(*args, **kwargs):
         pass
 
-    def create_and_load(self, prefix):
+    def create_and_load(self, db_url, repos_path):
         try:
-            self.create(prefix)
+            self.create(db_url)
         except al.exc.OperationalError as e:
             pass
         else:
-            self.load(prefix)
+            self.load(db_url, repos_path)
 
     __call__ = create_and_load
 
@@ -561,15 +562,13 @@ class RosieDatabaseInitiator(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def create(self, prefix):
+    def create(self, db_url):
         """Create database tables."""
-        conf = ResourceLocator.default().get_conf()
-        url = conf.get(["rosie-db", "db." + prefix]).value
-        if url.startswith(self.SQLITE_PREFIX):
-            d = os.path.dirname(url[len(self.SQLITE_PREFIX):])
+        if db_url.startswith(self.SQLITE_PREFIX):
+            d = os.path.dirname(db_url[len(self.SQLITE_PREFIX):])
             self.fs_util.makedirs(d)
         try:
-            engine = al.create_engine(url)
+            engine = al.create_engine(db_url)
             metadata = al.MetaData()
             db_string = al.String(self.LEN_DB_STRING)
             tables = []
@@ -583,12 +582,15 @@ class RosieDatabaseInitiator(object):
                               primary_key=True),
                     al.Column("branch", db_string, nullable=False,
                               primary_key=True),
-                    al.Column("status", al.String(self.LEN_STATUS), nullable=False),
+                    al.Column("status", al.String(self.LEN_STATUS),
+                              nullable=False),
                     al.Column("from_idx", db_string)))
             tables.append(al.Table(
                     "main", metadata,
-                    al.Column("idx", db_string, primary_key=True, nullable=False),
-                    al.Column("branch", db_string, primary_key=True, nullable=False),
+                    al.Column("idx", db_string, primary_key=True,
+                              nullable=False),
+                    al.Column("branch", db_string, primary_key=True,
+                              nullable=False),
                     al.Column("owner", db_string, nullable=False),
                     al.Column("project", db_string, nullable=False),
                     al.Column("title", db_string, nullable=False)))
@@ -618,48 +620,34 @@ class RosieDatabaseInitiator(object):
             for table in tables:
                 table.create(engine)
             connection = engine.connect()
-            self.handle_event(RosieDatabaseCreateEvent(prefix))
+            self.handle_event(RosieDatabaseCreateEvent(db_url))
         except al.exc.OperationalError as e:
-            self.handle_event(RosieDatabaseCreateSkipEvent(prefix))
+            self.handle_event(RosieDatabaseCreateSkipEvent(db_url))
             raise e
 
-    def load(self, prefix):
+    def load(self, db_url, repos_path):
         """Load database contents from a repository."""
-        conf = ResourceLocator.default().get_conf()
-        node = conf.get(["rosie-db", "repos." + prefix])
-        location = node.value
-        location = os.path.abspath(location)
-        if not os.path.exists(location):
-            self.handle_event(RosieDatabaseLoadSkipEvent(prefix))
+        if not repos_path or not os.path.exists(repos_path):
+            self.handle_event(RosieDatabaseLoadSkipEvent(repos_path))
             return
-        youngest = int(self.popen("svnlook", "youngest", location)[0])
+        repos_path = os.path.abspath(repos_path)
+        youngest = int(self.popen("svnlook", "youngest", repos_path)[0])
         util_home = ResourceLocator.default().get_util_home()
         rosa = os.path.join(util_home, "sbin", "rosa")
         revision = 1
         while revision <= youngest:
-            out, err = self.popen(rosa, "svn-post-commit", location, str(revision))
-            event = RosieDatabaseLoadEvent(prefix, revision, youngest)
+            out, err = self.popen(rosa, "svn-post-commit", repos_path,
+                                  str(revision))
+            event = RosieDatabaseLoadEvent(repos_path, revision, youngest)
             if revision == youngest:
                 # Check if any new revisions have been added.
-                youngest = int(self.popen("svnlook", "youngest", location)[0])
+                youngest = self.popen("svnlook", "youngest", repos_path)[0]
+                youngest = int(youngest)
             if revision == youngest:
                 event.level = event.DEFAULT
             self.handle_event(event)
             revision += 1
         return revision
-
-
-def test_query_parsing(filters):
-    """Test the ability of the query parser to generate logical expressions."""
-    url = None
-    conf = ResourceLocator.default().get_conf()
-    for key, node in reversed(conf.get(["rosie-db"]).value.items()):
-        if key.startswith("db.") and key[3:]:
-            url = node.value
-            break
-    dao = DAO(url)
-    dao._connect()
-    return str(dao.parse_filters_to_expr(filters))
 
 
 def main():
@@ -670,10 +658,13 @@ def main():
         opts, args = RoseOptionParser().parse_args()
         reporter = Reporter(opts.verbosity - opts.quietness)
         init = RosieDatabaseInitiator(event_handler=reporter)
+        conf = ResourceLocator.default().get_conf()
         for key, node in db_conf.value.items():
             if key.startswith("db."):
                 prefix = key.replace("db.", "", 1)
-                init(prefix)
+                db_url = conf.get_value(["rosie-db", "db." + prefix])
+                repos_path = conf.get_value(["rosie-db", "repos." + prefix])
+                init(db_url, repos_path)
 
 if __name__ == "__main__":
     main()

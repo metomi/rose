@@ -85,7 +85,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Basic, altenate launcher 2.
 TEST_KEY=$TEST_KEY_BASE-alt-2
-PATH=$(dirname $0)/bin2:$PATH \
+PATH=$TEST_SOURCE_DIR/bin2:$PATH \
     run_pass "$TEST_KEY" rose mpi-launch true to your heart
 TRUE=$(which true)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__

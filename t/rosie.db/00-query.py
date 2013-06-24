@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 # 
@@ -17,4 +18,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-prove -r $(dirname $0) "$@"
+"""Test the ability of the query parser to generate logical expressions."""
+
+import ast
+import sys
+from rosie.db import DAO, RosieDatabaseInitiator
+from tempfile import NamedTemporaryFile
+
+
+if __name__ == "__main__":
+    f = NamedTemporaryFile()
+    db_url = "sqlite:////" + f.name
+    RosieDatabaseInitiator().create(db_url)
+    dao = DAO(db_url)
+    print str(dao.parse_filters_to_expr(ast.literal_eval(sys.argv[1])))

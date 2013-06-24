@@ -24,10 +24,11 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 5
-HOST=$(rose config 't:rose-suite-hook' "host{$(basename $0 .t)}")
+tests 6
+KEY=${TEST_KEY_BASE#0?-}
+HOST=$(rose config 't:rose-suite-hook' $KEY)
 if [[ -z $HOST ]]; then
-    skip 5 "[t:rose-suite-hook]host{${0%.t}} not defined"
+    skip 6 "[t:rose-suite-hook]$KEY not defined"
     exit 0
 fi
 HOST=$(rose host-select $HOST)
@@ -38,12 +39,13 @@ TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
-    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost \
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+    --no-gcontrol --host=localhost \
     "--define=[jinja2:suite.rc]HOST=\"$HOST\""
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-ok
-TIMEOUT=$(($(date +%s) + 36000)) # wait 10 minutes
+TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
 OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
@@ -58,17 +60,15 @@ fi
 #-------------------------------------------------------------------------------
 # Test for local copy of remote job logs.
 TEST_KEY=$TEST_KEY_BASE-log
-(
-    cd $SUITE_RUN_DIR/log/job
-    file_test "$TEST_KEY-my_task_1.out" "my_task_1.1.1.out"
-    file_test "$TEST_KEY-my_task_1.err" "my_task_1.1.1.txt"
-    file_cmp "$TEST_KEY-my_task_1.txt" "my_task_1.1.1.txt" <<'__CONTENT__'
+cd $SUITE_RUN_DIR/log/job
+file_test "$TEST_KEY-my_task_1.out" "my_task_1.1.1.out"
+file_test "$TEST_KEY-my_task_1.err" "my_task_1.1.1.txt"
+file_cmp "$TEST_KEY-my_task_1.txt" "my_task_1.1.1.txt" <<'__CONTENT__'
 Hello World
 __CONTENT__
-)
+cd $OLDPWD
 
 #-------------------------------------------------------------------------------
-if $OK; then
-    rm -r $SUITE_RUN_DIR
-fi
+run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
+rmdir $SUITE_RUN_DIR 2</dev/null || true
 exit 0

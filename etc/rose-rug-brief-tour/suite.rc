@@ -46,10 +46,10 @@
         # End Rose recommended event hook block
     [[locate_fred]]
         command scripting = """
-            sleep 10 && echo 'fred is in '$(find /usr/share/zoneinfo/[A-Z]*/ -type f -printf "%f\n" | shuf -n 1 || echo 'the pub')
+            {{SLEEP}} && echo 'fred is in '$(find /usr/share/zoneinfo/[A-Z]*/ -type f -printf "%f\n" | shuf -n 1 || echo 'the pub')
         """
     [[fcm_make]]
-        pre-command scripting = "sleep 10"  # Slow down fcm make so we can see it run
+        pre-command scripting = "{{SLEEP}}"  # Slow down fcm make so we can see it run
     # Tasks need defining in runtime sections, even when identical to root.
     [[my_hello_world]]
     [[fred_hello_world]]
