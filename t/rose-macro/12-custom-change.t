@@ -31,7 +31,7 @@ tests 7
 TEST_KEY=$TEST_KEY_BASE-discovery
 setup
 init_meta </dev/null
-init_macro envswitch.py < $(dirname $0)/lib/custom_macro_change.py
+init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro_change.py
 run_pass "$TEST_KEY" rose macro --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [V] rose.macros.DefaultValidators
@@ -48,8 +48,9 @@ teardown
 TEST_KEY=$TEST_KEY_BASE-change
 setup
 init_meta </dev/null
-init_macro envswitch.py < $(dirname $0)/lib/custom_macro_change.py
-run_pass "$TEST_KEY" rose macro --non-interactive --config=../config envswitch.LogicalTransformer
+init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro_change.py
+run_pass "$TEST_KEY" \
+    rose macro --non-interactive --config=../config envswitch.LogicalTransformer
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 [T] envswitch.LogicalTransformer: changes: 1
     env=TRANSFORM_SWITCH=false

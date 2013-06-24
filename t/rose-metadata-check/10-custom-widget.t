@@ -30,7 +30,7 @@ init <<__META_CONFIG__
 [namelist:widget_nl=my_widget_var1]
 widget[rose-config-edit]=spin.SpinnerValueWidget
 __META_CONFIG__
-init_widget spin.py < $(dirname $0)/lib/custom_widget.py
+init_widget spin.py < $TEST_SOURCE_DIR/lib/custom_widget.py
 run_pass "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -88,7 +88,7 @@ init <<__META_CONFIG__
 [namelist:widget_nl=my_widget_var1]
 widget[rose-config-edit]=spin.SpinnerValueWidget
 __META_CONFIG__
-init_widget spin.py < $(dirname $0)/lib/custom_widget_corrupt.py
+init_widget spin.py < $TEST_SOURCE_DIR/lib/custom_widget_corrupt.py
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
