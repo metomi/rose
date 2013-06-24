@@ -51,7 +51,7 @@ fi
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete, test shutdown on fail
 TEST_KEY="$TEST_KEY_BASE-complete"
-TIMEOUT=$(($(date +%s) + 36000)) # wait 10 minutes
+TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
 OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1

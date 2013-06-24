@@ -38,7 +38,7 @@ run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 36000)) # wait 10 minutes
+TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
 OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
