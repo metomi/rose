@@ -39,7 +39,8 @@ TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
-    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost \
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+    --no-gcontrol --host=localhost \
     "--define=[jinja2:suite.rc]HOST=\"$HOST\""
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
@@ -69,5 +70,5 @@ cd $OLDPWD
 
 #-------------------------------------------------------------------------------
 run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR
+rmdir $SUITE_RUN_DIR 2</dev/null || true
 exit 0

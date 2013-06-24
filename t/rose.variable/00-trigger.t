@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 init </dev/null
 rm config/rose-app.conf
-export PYTHONPATH=$(dirname $0)/../../lib/python
+TEST_PARSER="python $TEST_SOURCE_DIR/$TEST_KEY_BASE.py"
 #-------------------------------------------------------------------------------
 tests 24
 #-------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ tests 24
 # Easy no-value trigger.
 TEST_KEY=$TEST_KEY_BASE-single-no-value
 setup
-run_pass "$TEST_KEY" parse_trigger "namelist:nl1=my_single_var"
+run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_single_var"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 {'namelist:nl1=my_single_var': []}
 __CONTENT__
@@ -41,7 +41,7 @@ teardown
 # Easy no-value trigger, ending with semi-colon.
 TEST_KEY=$TEST_KEY_BASE-single-no-value-end
 setup
-run_pass "$TEST_KEY" parse_trigger "namelist:nl1=my_single_var;"
+run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_single_var;"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 {'namelist:nl1=my_single_var': []}
 __CONTENT__
@@ -52,7 +52,7 @@ teardown
 # Easy single-value trigger.
 TEST_KEY=$TEST_KEY_BASE-single-value
 setup
-run_pass "$TEST_KEY" parse_trigger "namelist:nl1=my_single_var: red"
+run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_single_var: red"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 {'namelist:nl1=my_single_var': ['red']}
 __CONTENT__
@@ -63,7 +63,7 @@ teardown
 # Easy multiple-value trigger.
 TEST_KEY=$TEST_KEY_BASE-single-multiple-values
 setup
-run_pass "$TEST_KEY" parse_trigger "namelist:nl1=my_single_var: red, 40, blue, x"
+run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_single_var: red, 40, blue, x"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 {'namelist:nl1=my_single_var': ['red', '40', 'blue', 'x']}
 __CONTENT__
@@ -74,7 +74,7 @@ teardown
 # Easy logical-expression trigger.
 TEST_KEY=$TEST_KEY_BASE-single-logical-expression
 setup
-run_pass "$TEST_KEY" parse_trigger "namelist:nl1=my_single_var: this != green or this != blue"
+run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_single_var: this != green or this != blue"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 {'namelist:nl1=my_single_var': ['this != green or this != blue']}
 __CONTENT__
@@ -85,7 +85,7 @@ teardown
 # Standard trigger expression.
 TEST_KEY=$TEST_KEY_BASE-standard
 setup
-run_pass "$TEST_KEY" parse_trigger "namelist:nl1=my_numeric: 40, 50; namelist:nl1=my_no_values; namelist:nl1=my_other_no_values;"
+run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_numeric: 40, 50; namelist:nl1=my_no_values; namelist:nl1=my_other_no_values;"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 {'namelist:nl1=my_other_no_values': [], 'namelist:nl1=my_numeric': ['40', '50'], 'namelist:nl1=my_no_values': []}
 __CONTENT__
@@ -95,7 +95,7 @@ teardown
 # More complex expression
 TEST_KEY=$TEST_KEY_BASE-complex
 setup
-run_pass "$TEST_KEY" parse_trigger "namelist:nl1=my_numeric: 40, 50; namelist:nl1=my_logical_expr: this != 40; namelist:nl1=my_strings: \;range\;, quadrillion, 'hopefully, a joined-up string; a block of characters'"
+run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_numeric: 40, 50; namelist:nl1=my_logical_expr: this != 40; namelist:nl1=my_strings: \;range\;, quadrillion, 'hopefully, a joined-up string; a block of characters'"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 {'namelist:nl1=my_logical_expr': ['this != 40'], 'namelist:nl1=my_numeric': ['40', '50'], 'namelist:nl1=my_strings': [';range;', 'quadrillion', "'hopefully, a joined-up string; a block of characters'"]}
 __CONTENT__
@@ -105,7 +105,7 @@ teardown
 # Lots of escaped characters in an expression.
 TEST_KEY=$TEST_KEY_BASE-escaped-chars
 setup
-run_pass "$TEST_KEY" parse_trigger "namelist:nl1=my_escaped_strings: comma\,comma\,, slash\\\\, semicolon\;, colon:;"
+run_pass "$TEST_KEY" $TEST_PARSER "namelist:nl1=my_escaped_strings: comma\,comma\,, slash\\\\, semicolon\;, colon:;"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 {'namelist:nl1=my_escaped_strings': ['comma,comma,', 'slash\\\\', 'semicolon;', 'colon:']}
 __CONTENT__

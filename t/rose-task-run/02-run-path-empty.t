@@ -30,7 +30,8 @@ TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
-    rose suite-run -C ${0%.t} --name=$NAME --no-gcontrol --host=localhost
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+    --no-gcontrol --host=localhost
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
