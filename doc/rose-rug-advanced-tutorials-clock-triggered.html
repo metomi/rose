@@ -120,13 +120,7 @@
     [[dependencies]]
         [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
             graph = "bell"
-</pre>
-    </div>
 
-    <div class="slide">
-      <h3 class="alwayshidden">Example suite.rc (2)</h3>
-
-    <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         [[[event hooks]]]
@@ -139,7 +133,7 @@
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Example suite.rc (3)</h3>
+      <h3 class="alwayshidden">Example suite.rc (2)</h3>
 
       <p>We now have a simple suite with a single task that prints "bong" a 
       number of times equal to the hour.</p>
@@ -154,7 +148,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Example suite.rc (4)</h3>
+      <h3 class="alwayshidden">Example suite.rc (3)</h3>
       
       <p>Use <samp>rose suite-log</samp> to view the suite logs and look at the
       output for one of the bell tasks to confirm it is behaving as 
@@ -241,11 +235,19 @@ rose suite-run
 
     </div>
 
-
-
     <div class="slide">
-      <h2 id="results-further">Results</h2>
+      <h3 class="alwayshidden">Further clock triggering (3)</h3>
 
+      <p>Save your changes and run your suite using:</p>
+
+<pre class="shell">
+rose suite-run now
+</pre>
+
+      <p>which will run your suite using the current time as the initial cycle 
+      time.</p>
+      
+      <p></p>
 
     </div>
 
