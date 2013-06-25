@@ -28,82 +28,118 @@ from rose.reporter import Reporter
 import sys
 
 
-FORMATS = ["%a %b %d %H:%M:%S %Y",    # ctime
-           "%a %b %d %H:%M:%S %Z %Y", # Unix "date"
-           "%Y-%m-%dT%H:%M:%S",       # ISO8601, normal
-           "%Y%m%dT%H%M%S",           # ISO8601, abbr
-           "%Y%m%d%H"];               # Cylc
+class OffsetValueError(ValueError):
+
+    """Bad offset value."""
+
+    def __str__(self):
+        return "%s: bad offset value" % self.args[0]
 
 
-UNITS = {"w": "weeks",
-         "d": "days",
-         "h": "hours",
-         "m": "minutes",
-         "s": "seconds"}
+class RoseDateShifter(object):
+
+    """A class to parse and print date string with an offset."""
+
+    PARSE_FORMATS = ["%a %b %d %H:%M:%S %Y",    # ctime
+                     "%a %b %d %H:%M:%S %Z %Y", # Unix "date"
+                     "%Y-%m-%dT%H:%M:%S",       # ISO8601, normal
+                     "%Y%m%dT%H%M%S",           # ISO8601, abbr
+                     "%Y%m%d%H"];               # Cylc
 
 
-REC_OFFSET = re.compile(
-        r"""\A(?P<sign>[\+\-])?(?P<num>\d+)(?P<unit>[wdhms])\Z""", re.I)
+    UNITS = {"w": "weeks",
+             "d": "days",
+             "h": "hours",
+             "m": "minutes",
+             "s": "seconds"}
 
 
-def date_shift(offsets=None, parse_format=None, print_format=None,
-               task_cycle_time_mode=None, *args):
-    """Return a date string with an offset.
+    REC_OFFSET = re.compile(
+            r"""(?P<sign>[\+\-])?(?P<num>\d+)(?P<unit>[wdhms])""", re.I)
 
-    If args specified, use args[0] as the date-time string. If args not
-    specified and if task_cycle_time_mode is True, use ROSE_TASK_CYCLE_TIME
-    environment variable if it is defined. Otherwise, use current time.
+    TASK_CYCLE_TIME_MODE_ENV = "ROSE_TASK_CYCLE_TIME"
 
-    If offsets is specified, it should be a list of offsets that have the
-    format "[+/-]nU" where "n" is an integer, and U is a unit matching a key in
-    rose.date.UNITS.
 
-    If parse_format is specified, parse args[0] with the specified format.
-    Otherwise, parse args[0] with one of the format strings in
-    rose.date.FORMATS. The format should be a string compatible to strptime(3).
+    def __init__(self, parse_format=None, print_format=None,
+                 task_cycle_time_mode=None):
+        """Constructor.
 
-    If print_format is specified, return a string as specified in the format.
-    Otherwise, use the parse_format.
+        parse_format -- If specified, parse with the specified format.
+                        Otherwise, parse with one of the format strings in
+                        self.PARSE_FORMATS. The format should be a string
+                        compatible to strptime(3).
 
-    """
-    # Parse
-    parse_formats = FORMATS
-    if parse_format:
-        parse_formats = [parse_format]
-    if not args and task_cycle_time_mode:
-        arg = os.getenv("ROSE_TASK_CYCLE_TIME")
-        if arg is None:
-            raise UnboundEnvironmentVariableError("ROSE_TASK_CYCLE_TIME")
-        args = [arg]
-    if not args or args[0] == "now":
-        d, parse_format = (datetime.now(), parse_formats[0])
-    else:
-        while parse_formats:
-            parse_format = parse_formats.pop(0)
-            try:
-                d = datetime.strptime(args[0], parse_format)
-                break
-            except ValueError as e:
-                if not parse_formats:
-                    raise e
+        print_format -- If specified, return a string as specified in the
+                        format. Otherwise, use the parse_format.
 
-    # Offset
-    if offsets is not None:
-        for offset in offsets:
-            match = REC_OFFSET.match(offset.lower())
-            if not match:
-                raise ValueError(offset)
-            sign, num, unit = match.group("sign", "num", "unit")
-            num = int(num)
-            if sign == "-":
-                num = -num
-            key = UNITS[unit]
-            d += timedelta(**{key: num})
+        task_cycle_time_mode -- If True, use the value of the environment
+                                variable ROSE_TASK_CYCLE_TIME (if it is
+                                specified) instead of the current time as the
+                                reference time.
 
-    # Format
-    if print_format is None:
-        print_format = parse_format
-    return d.strftime(print_format)
+        """
+        self.parse_formats = self.PARSE_FORMATS
+        if parse_format:
+            self.parse_formats = [parse_format]
+        self.print_format = print_format
+        self.task_cycle_time = None
+        if task_cycle_time_mode:
+            self.task_cycle_time = os.getenv(self.TASK_CYCLE_TIME_MODE_ENV)
+
+    def date_shift(self, ref_time=None, offset=None):
+        """Return a date string with an offset.
+
+        ref_time -- If specified, use as the reference date-time string. If not
+                    specified and if self.task_cycle_time_mode is True, use
+                    ROSE_TASK_CYCLE_TIME environment variable if it is defined.
+                    Otherwise, use current time.
+
+        offset -- If specified, it should be a string containing the offset
+                  that has the repeatable format "[+/-]nU" where "n" is an
+                  integer, and U is a unit matching a key in self.UNITS.
+
+        """
+        # Parse
+        if not ref_time and self.task_cycle_time is not None:
+            ref_time = self.task_cycle_time
+        if not ref_time or ref_time == "now":
+            d, parse_format = (datetime.now(), self.parse_formats[0])
+        else:
+            while self.parse_formats:
+                parse_format = self.parse_formats.pop(0)
+                try:
+                    d = datetime.strptime(ref_time, parse_format)
+                    break
+                except ValueError as e:
+                    if not self.parse_formats:
+                        raise e
+
+        # Offset
+        if offset:
+            if not self.is_offset(offset):
+                raise OffsetValueError(offset)
+            for sign, num, unit in self.REC_OFFSET.findall(offset.lower()):
+                num = int(num)
+                if sign == "-":
+                    num = -num
+                key = self.UNITS[unit]
+                d += timedelta(**{key: num})
+
+        # Format
+        print_format = self.print_format
+        if print_format is None:
+            print_format = parse_format
+        return d.strftime(print_format)
+
+    __call__ = date_shift
+
+    def is_task_cycle_time_mode(self):
+        """Return True if task_cycle_time_mode is True."""
+        return (self.task_cycle_time is not None)
+
+    def is_offset(self, offset):
+        """Return True if the string offset can be parsed as an offset."""
+        return (self.REC_OFFSET.match(offset.lower()) is not None)
 
 
 def main():
@@ -113,9 +149,18 @@ def main():
                               "task_cycle_time_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
+    ref_time = None
+    if args:
+        ref_time = args[0]
+    offset = None
+    if opts.offsets:
+        offset = "".join(opts.offsets)
     try:
-        print date_shift(opts.offsets, opts.parse_format, opts.print_format,
-                         opts.task_cycle_time_mode, *args)
+        ds = RoseDateShifter(opts.parse_format, opts.print_format,
+                             opts.task_cycle_time_mode)
+        if opts.task_cycle_time_mode and ds.task_cycle_time is None:
+            raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
+        print ds(ref_time, offset)
     except Exception as e:
         if opts.debug_mode:
             import traceback
