@@ -122,8 +122,12 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
 
+    def get_cycle_items_globs(self, cycle):
+        """Return a list of globs to match items created for a given cycle."""
+        return ["share/data/" + cycle, "work/*." + cycle]
+
     def get_cycle_log_archive_name(self, cycle_time):
-        """Return the jobs log archive file name of a given cycle time."""
+        """Return the jobs log archive file name of a given cycle."""
         return (self.CYCLE_LOG_ARCHIVE_PREFIX + cycle_time +
                 self.CYCLE_LOG_ARCHIVE_SUFFIX)
 

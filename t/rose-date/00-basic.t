@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 20
+tests 23
 #-------------------------------------------------------------------------------
 # Ensure it can parse its own output.
 TEST_KEY=$TEST_KEY_BASE
@@ -50,6 +50,14 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 2012122500
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Bad offsets.
+TEST_KEY=$TEST_KEY_BASE-offsets-bad
+run_fail "$TEST_KEY" rose date -s junk "2013010618"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] junk: bad offset value
+__ERR__
 #-------------------------------------------------------------------------------
 # Parse a Cylc date and print in ISO format.
 TEST_KEY=$TEST_KEY_BASE-format-iso
