@@ -24,6 +24,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
+import rose.config_editor
 
 class IntSpinButtonValueWidget(gtk.HBox):
 
@@ -40,7 +41,7 @@ class IntSpinButtonValueWidget(gtk.HBox):
         self.hook = hook
         self.upper = sys.maxint
         self.lower = -sys.maxint - 1
-       
+
         tooltip_text = None
         try:
             int_value = int(value)
@@ -48,29 +49,67 @@ class IntSpinButtonValueWidget(gtk.HBox):
             int_value = 0
             tooltip_text = self.WARNING_MESSAGE.format(value,
                                                        int_value)
+        
+        if int_value > self.upper or int_value < self.lower:
+            acceptable = False
+        else:
+            acceptable = True
+        
+        if acceptable:
+            entry = self.make_spinner(int_value)
+            signal = 'value-changed'
+        else:
+            entry = gtk.Entry()
+            entry.set_text(self.value)
+            signal = 'activate'
+
+        self.change_id = entry.connect(signal, self.setter)
+        
+        entry.set_tooltip_text(tooltip_text)
+        entry.show()
+
+        self.pack_start(entry, False, False, 0)
+        
+        if not acceptable:
+            self.warning_img = gtk.Image()
+            self.warning_img.set_from_stock(gtk.STOCK_DIALOG_WARNING, 
+                                    gtk.ICON_SIZE_MENU)
+            self.warning_img.set_tooltip_text(
+                            rose.config_editor.WARNING_INTEGER_OUT_OF_BOUNDS)
+            self.warning_img.show()
+            self.pack_start(self.warning_img, False, False, 0)
+        
+        self.grab_focus = lambda : self.hook.get_focus(entry)
+
+    def make_spinner(self, int_value):
         my_adj = gtk.Adjustment(value=int_value,
                                 upper=self.upper,
                                 lower=self.lower,
                                 step_incr=1)
-        if int_value > self.upper or int_value < self.lower:   
-            print "Value truncated" #set an image, grey out text....
 
         spin_button = gtk.SpinButton(adjustment=my_adj, digits=0)
         spin_button.connect('focus-in-event',
                             self.hook.trigger_scroll)
+                            
         spin_button.set_numeric(True)
-        spin_button.set_tooltip_text(tooltip_text)
-        spin_button.show()
-        self.change_id = spin_button.connect(
-                            'value-changed',
-                            self.setter)
-        self.pack_start(spin_button, False, False, 0)
-        self.grab_focus = lambda : self.hook.get_focus(spin_button)
+        
+        return spin_button
+
 
     def setter(self, widget):
-        #undo crap in setter...
-        if str(widget.get_value_as_int()) != self.value:
-            self.value = str(widget.get_value_as_int())
-            self.set_value(self.value)
-            widget.set_tooltip_text(None)
+    
+        if isinstance(widget, gtk.Entry):
+            if widget.get_text != self.value:
+                self.set_value(widget.get_text())
+                if (int(widget.get_text()) > self.upper or
+                    int(widget.get_text()) < self.lower):
+                    self.warning_img.show()
+                else:
+                    self.warning_img.hide()
+        else:
+            if str(widget.get_value_as_int()) != self.value:
+                self.value = str(widget.get_value_as_int())
+                self.set_value(self.value)
+                widget.set_tooltip_text(None)
+            
         return False
