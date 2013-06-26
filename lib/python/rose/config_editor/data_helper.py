@@ -189,9 +189,14 @@ class ConfigDataHelper(object):
             return [s for s in sections]
         base, subsp = self.util.split_full_ns(self.data, namespace)
         ns_section = subsp.replace('/', ':')
-        if (ns_section in self.data.config[base].sections.now or
-            ns_section in self.data.config[base].sections.latent):
-            return [ns_section]
+        if ns_section in self.data.config[base].sections.now:
+            sect_data = self.data.config[base].sections.now[ns_section]
+            if sect_data.metadata["full_ns"] == namespace:
+                return [ns_section]
+        if ns_section in self.data.config[base].sections.latent:
+            sect_data = self.data.config[base].sections.latent[ns_section]
+            if sect_data.metadata["full_ns"] == namespace:
+                return [ns_section]
         return []
 
     def get_ns_is_default(self, namespace):
@@ -409,7 +414,15 @@ class ConfigDataHelper(object):
         for section in sections:
             if section in config_data.sections.now:
                 # It has a current section associated.
-                return False
+                section_namespace = (
+                        config_data.sections.now[section].metadata["full_ns"])
+                if section_namespace == namespace:
+                    # This is a default page for an existing section.
+                    return False
+                for variable in config_data.vars.now.get(section, []):
+                    if variable.metadata["full_ns"] == namespace:
+                        # This contains an existing variable.
+                        return False
         if self.is_ns_sub_data(namespace) or not sections:
             # It has sub-data or has nothing at all.
             return False
