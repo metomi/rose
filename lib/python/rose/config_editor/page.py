@@ -519,8 +519,9 @@ class ConfigPage(gtk.VBox):
                 if variable.metadata['id'] == item.var_id:
                     self.add_row(variable)
                     return
-        if (self.section is not None and 
-            self.section.name.startswith('file:')):
+        if (len(self.sections) == 1 and
+            self.sections[0].name.startswith('file:')):
+            # This page only contains a file section.
             return None
         add_ui_start = """<ui> <popup name='Popup'>
                          <menu action="Add meta">"""
@@ -658,8 +659,9 @@ class ConfigPage(gtk.VBox):
         std_table = rose.config_editor.pagewidget.table.PageTable
         file_chooser = rose.config_editor.pagewidget.chooser.PageFormatTree
         disc_table = rose.config_editor.pagewidget.table.PageLatentTable
-        if (self.section is not None and
-            self.section.name.startswith('file:')):
+        if (len(self.sections) == 1 and
+            self.sections[0].name.startswith('file:')):
+            # This page only contains a file section.
             self.main_container = file_chooser(
                                        self.panel_data,
                                        self.ghost_data,

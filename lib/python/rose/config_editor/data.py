@@ -1166,6 +1166,7 @@ class ConfigDataManager(object):
                 self.namespace_meta_lookup[config_name].setdefault(
                                                   rose.META_PROP_SORT_KEY,
                                                   " 0")
+
     def load_namespace_has_sub_data(self, config_name=None):
         """Load namespace sub-data status."""
         file_ns = "/" + rose.SUB_CONFIG_FILE_DIR
@@ -1176,14 +1177,20 @@ class ConfigDataManager(object):
                 parent_ns = ns.rsplit("/", 1)[0]
                 ns_hierarchy.setdefault(parent_ns, [])
                 ns_hierarchy[parent_ns].append(ns)
+        if config_name is None:
+            configs = self.config.keys()
+        else:
+            configs = [config_name]
+        # File root pages have summary data for files.
+        for alt_config_name in configs:
+            file_root_ns = alt_config_name + file_ns
+            self.namespace_meta_lookup.setdefault(file_root_ns, {})
+            self.namespace_meta_lookup[file_root_ns].setdefault(
+                                            "has_sub_data", True)
+        # Duplicate root pages have summary data for their members.
         for ns, prop_map in self.namespace_meta_lookup.items():
-            if config_name is None or ns.startswith(config_name):
-                if file_ns_sub in ns:
-                    title = re.sub(".*" + file_ns_sub, "", ns)
-                    prop_map.setdefault(rose.META_PROP_TITLE,
-                                        title.replace(":", "/"))
-                elif ns.endswith(file_ns):
-                    prop_map.setdefault("has_sub_data", True)
-                elif (rose.META_PROP_DUPLICATE in prop_map and
-                    ns_hierarchy.get(ns, [])):
-                    prop_map.setdefault("has_sub_data", True)
+            if config_name is not None and not ns.startswith(config_name):
+                continue
+            if (rose.META_PROP_DUPLICATE in prop_map and
+                ns_hierarchy.get(ns, [])):
+                prop_map.setdefault("has_sub_data", True)
