@@ -21,8 +21,9 @@
 
 from glob import glob
 import os
-from rose.app_run import BuiltinApp
+from rose.app_run import BuiltinApp, ConfigValueError
 from rose.date import RoseDateShifter, OffsetValueError
+from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 from rose.suite_log_view import SuiteLogViewGenerator
@@ -45,14 +46,26 @@ class RosePruneApp(BuiltinApp):
         suite_name = os.getenv("ROSE_SUITE_NAME")
         if not suite_name:
             return
-        cycles = shlex.split(config.get_value([self.SECTION, "cycles"]))
+        config_cycles_str = config.get_value([self.SECTION, "cycles"])
         config_globs_str = config.get_value([self.SECTION, "globs"])
-        if not cycles and not config_globs_str:
+        if not config_cycles_str and not config_globs_str:
             return
+        try:
+            config_cycles_str = env_var_process(config_cycles_str)
+        except UnboundEnvironmentVariableError as e:
+            raise ConfigValueError(
+                    [self.SECTION, "cycles"], config_cycles_str, e)
+        try:
+            config_globs_str = env_var_process(config_globs_str)
+        except UnboundEnvironmentVariableError as e:
+            raise ConfigValueError(
+                    [self.SECTION, "globs"], config_globs_str, e)
         ds = RoseDateShifter(task_cycle_time_mode=True)
-        for cycle in cycles:
+        cycles = []
+        for cycle in shlex.split(config_cycles_str):
             if ds.is_task_cycle_time_mode() and ds.is_offset(cycle):
                 cycle = ds.date_shift(offset=cycle)
+            cycles.append(cycle)
         if cycles:
             slvg = SuiteLogViewGenerator(
                     event_handler=app_runner.event_handler,
@@ -69,7 +82,7 @@ class RosePruneApp(BuiltinApp):
         hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
         suite_dir_rel = suite_engine_proc.get_suite_dir_rel(suite_name)
         sh_cmd_args = {"d": suite_dir_rel, "g": " ".join(globs)}
-        sh_cmd = "cd %(d)s && ls -d %(g)s && rm -rf %(g)" % sh_cmd_args
+        sh_cmd = "cd %(d)s && ls -d %(g)s && rm -rf %(g)s" % sh_cmd_args
         for host in hosts:
             cmd = app_runner.popen.get_cmd("ssh", host, sh_cmd)
             try:
@@ -82,11 +95,11 @@ class RosePruneApp(BuiltinApp):
                     event = FileSystemEvent(FileSystemEvent.DELETE, name)
                     app_runner.handle_event(event)
         cwd = os.getcwd()
-        app_runner.chdir(app_runner.get_suite_dir(suite_name))
+        app_runner.fs_util.chdir(suite_engine_proc.get_suite_dir(suite_name))
         try:
             for g in globs:
                 for name in glob(g):
                     app_runner.fs_util.delete(name)
         finally:
-            app_runner.chdir(cwd)
+            app_runner.fs_util.chdir(cwd)
         return
