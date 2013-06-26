@@ -282,7 +282,8 @@ def get_local_suites(prefix=None, skip_status=False):
         except SuiteIdError as e:
             continue
         if prefix is None or id_.prefix == prefix:
-            local_copies.append(id_)
+            if str(id_) == path:
+                local_copies.append(id_)
     return local_copies
 
 
