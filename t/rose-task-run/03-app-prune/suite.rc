@@ -1,0 +1,43 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout handler = "rose suite-hook --shutdown"
+        timeout = 2
+[scheduling]
+    initial cycle time = 2013010100
+    final cycle time   = 2013010200
+    [[special tasks]]
+        cold-start = cold
+    [[dependencies]]
+        [[[ 0, 12 ]]]
+            graph = """
+my_task_1
+{% if HOST is defined %}
+my_task_2
+{% endif %}
+cold | WARM[T-12]:finish-all => rose_prune
+"""
+
+[runtime]
+    [[root]]
+        command scripting = "rose task-run"
+        [[[event hooks]]]
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook"
+            submission failed handler = "rose suite-hook --shutdown"
+            submission timeout handler = "rose suite-hook"
+            execution timeout handler = "rose suite-hook"
+            submission timeout = 1
+            execution timeout  = 1
+    [[cold]]
+        command scripting = "true"
+    [[WARM]]
+    [[my_task_1, rose_prune]]
+        inherit = WARM
+{% if HOST is defined %}
+    [[my_task_2]]
+        inherit = WARM
+        [[[remote]]]
+            host = {{HOST}}
+{% endif %}

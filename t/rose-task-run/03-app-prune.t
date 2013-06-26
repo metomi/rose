@@ -17,19 +17,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-log --update TASK", without site/user configurations.
+# Test rose_prune built-in application, basic cycle housekeep usage.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 10
+tests 9
 #-------------------------------------------------------------------------------
-if [[ $TEST_KEY_BASE == *-remote* ]]; then
-    JOB_HOST=$(rose config 't' 'job-host')
-    if [[ -z $JOB_HOST ]]; then
-        skip 10 '[t]job-host not defined'
-        exit 0
-    fi
+JOB_HOST=$(rose config --default= 't' 'job-host')
+if [[ -z $JOB_HOST ]]; then
+    skip 3 '[t]job-host not defined'
+    :
+else
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
@@ -49,8 +48,8 @@ else
         --no-gcontrol --host=localhost
 fi
 #-------------------------------------------------------------------------------
-# Wait for the suite to complete, test shutdown on fail
-TEST_KEY="$TEST_KEY_BASE-complete"
+# Wait for the suite to complete
+TEST_KEY=$TEST_KEY_BASE-suite-run-wait
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
 OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
@@ -64,35 +63,57 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-run_pass "$TEST_KEY_BASE-before" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log-1.json" 'my_task_2' <<'__PYTHON__'
-import json, sys
-file_name, task_name = sys.argv[1:]
-d = json.load(open(file_name))
-sys.exit(task_name in d["tasks"])
-__PYTHON__
-TEST_KEY=$TEST_KEY_BASE-before-log.out
-if [[ -n ${JOB_HOST:-} ]]; then
-    run_fail "$TEST_KEY-log.out" \
-        test -f $SUITE_RUN_DIR/log/job/my_task_2.1.1.out
-else
-    pass "$TEST_KEY-log.out"
-fi
-TEST_KEY=$TEST_KEY_BASE-command
-run_pass "$TEST_KEY" rose suite-log -n $NAME -u 'my_task_2' --debug
-file_grep "$TEST_KEY.out" '\[INFO\] update: rose-suite-log-1.json' \
-    "$TEST_KEY.out"
+TEST_KEY=$TEST_KEY_BASE-ls
+run_pass "$TEST_KEY" \
+    ls $SUITE_RUN_DIR/log/job-*.tar.gz $SUITE_RUN_DIR/{log/job,share/data,work}
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+$SUITE_RUN_DIR/log/job-2013010100.tar.gz
+$SUITE_RUN_DIR/log/job-2013010112.tar.gz
+
+$SUITE_RUN_DIR/log/job:
+my_task_1.2013010200.1
+my_task_1.2013010200.1.err
+my_task_1.2013010200.1.out
+my_task_1.2013010200.1.status
+my_task_2.2013010200.1
+my_task_2.2013010200.1.err
+my_task_2.2013010200.1.out
+my_task_2.2013010200.1.status
+rose_prune.2013010200.1
+rose_prune.2013010200.1.err
+rose_prune.2013010200.1.out
+rose_prune.2013010200.1.status
+
+$SUITE_RUN_DIR/share/data:
+2013010200
+
+$SUITE_RUN_DIR/work:
+my_task_1.2013010200
+rose_prune.2013010200
+__OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-TEST_KEY=$TEST_KEY_BASE-after
-run_pass "$TEST_KEY" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log-1.json" 'my_task_2' <<'__PYTHON__'
-import json, sys
-file_name, task_name = sys.argv[1:]
-d = json.load(open(file_name))
-sys.exit(task_name not in d["tasks"])
-__PYTHON__
-file_test "$TEST_KEY-log.out" $SUITE_RUN_DIR/log/job/my_task_2.1.1.out
 #-------------------------------------------------------------------------------
-run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y --debug $NAME
-rmdir $SUITE_RUN_DIR 2</dev/null || true
+if [[ -n $JOB_HOST ]]; then
+    TEST_KEY=$TEST_KEY_BASE-host-ls
+    run_pass "$TEST_KEY" ssh -oBatchMode=yes $JOB_HOST \
+        ls cylc-run/$NAME/{log/job,share/data,work}
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+cylc-run/$NAME/log/job:
+my_task_2.2013010200.1
+my_task_2.2013010200.1.err
+my_task_2.2013010200.1.out
+my_task_2.2013010200.1.status
+
+cylc-run/$NAME/share/data:
+2013010200
+
+cylc-run/$NAME/work:
+my_task_2.2013010200
+__OUT__
+    file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+fi
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-clean
+run_pass "$TEST_KEY" rose suite-clean -y $NAME
+rmdir $SUITE_RUN_DIR || true
 exit 0

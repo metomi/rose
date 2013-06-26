@@ -28,6 +28,7 @@ from rose.reporter import Event, Reporter
 from rose.run import Runner
 from rose.task_env import get_prepend_paths
 import sys
+import traceback
 
 
 class TaskAppNotFoundError(Exception):
