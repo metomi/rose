@@ -995,6 +995,14 @@ class ConfigDataManager(object):
                 continue
             if not sect_node.is_ignored() and section.startswith("file:"):
                 file_sections.append(section)
+        for meta_id, sect_node in meta_config.value.items():
+            section, option = self.util.get_section_option_from_id(
+                                                                meta_id)
+            if option is None:
+                if not isinstance(sect_node.value, dict):
+                    continue
+                if not sect_node.is_ignored() and section.startswith("file:"):
+                    file_sections.append(section)
         file_ids = []
         for setting_id, sect_node in meta_config.value.items():
             # The following 'wildcard-esque' id is an exception.
