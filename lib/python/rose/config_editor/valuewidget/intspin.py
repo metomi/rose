@@ -71,6 +71,7 @@ class IntSpinButtonValueWidget(gtk.HBox):
 
         self.pack_start(entry, False, False, 0)
         
+        self.warning_img = gtk.Image()
         if not acceptable:
             self.warning_img = gtk.Image()
             self.warning_img.set_from_stock(gtk.STOCK_DIALOG_WARNING, 
@@ -102,7 +103,8 @@ class IntSpinButtonValueWidget(gtk.HBox):
         if isinstance(widget, gtk.Entry):
             if widget.get_text != self.value:
                 self.set_value(widget.get_text())
-                if (int(widget.get_text()) > self.upper or
+                if (not widget.get_text().isdigit() or
+                    int(widget.get_text()) > self.upper or
                     int(widget.get_text()) < self.lower):
                     self.warning_img.show()
                 else:
