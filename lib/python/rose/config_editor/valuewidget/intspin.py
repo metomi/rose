@@ -26,6 +26,7 @@ import gtk
 
 import rose.config_editor
 
+
 class IntSpinButtonValueWidget(gtk.HBox):
 
     """This is a class to represent an integer with a spin button."""
