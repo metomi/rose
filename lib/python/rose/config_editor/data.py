@@ -1022,6 +1022,10 @@ class ConfigDataManager(object):
                 setting_id.startswith("file:*=")):
                 file_ids.append(setting_id)
         for section in file_sections:
+            title = meta_config.get_value([section, rose.META_PROP_TITLE])
+            if title is None:
+                meta_config.set([section, rose.META_PROP_TITLE],
+                                section.replace("file:", "", 1))
             for file_entry in file_ids:
                 sect_node = meta_config.get([file_entry])
                 for meta_prop, opt_node in sect_node.value.items():
