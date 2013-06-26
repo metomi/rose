@@ -174,7 +174,7 @@ class MainWindow(gtk.Window):
             self.nav_bar.simple_search_entry.set_text(address_url)
             self.handle_search(None)
         elif address_url == "rosie://home":
-            self.display_local_suites(None)
+            self.display_local_suites()
         else:
             items = {}
             
