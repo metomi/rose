@@ -87,9 +87,23 @@
       retrieval</p>
 
       <p>In general, most tasks in a suite do not care about the wall clock
-      time, simply running once their prerequesites are met. Clock triggered
+      time, simply running once their prerequisites are met. Clock triggered
       tasks, however, wait for a particular wall clock time to be reached
-      <em>in addition</em> to their other prerequesites.</p>
+      <em>in addition</em> to their other prerequisites.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="further-triggering">Further clock triggering</h2>
+
+      <p>When clock triggering tasks we can use different offsets to the cycle
+      time as follows:</p>
+      <pre class="prettyprint lang-cylc">
+        clock-triggered = taskname(CYCLE_OFFSET)
+</pre>
+
+      <p>Note that, regardless of the offset used, the task still belongs to
+      the cycle from which the offset has been applied.</p>
+
     </div>
 
     <div class="slide">
@@ -133,7 +147,7 @@
       <h3 class="alwayshidden">Example suite.rc (2)</h3>
 
       <p>We now have a simple suite with a single task that prints "bong" a
-      number of times equal to the hour.</p>
+      number of times equal to the (cycle time) hour.</p>
 
       <p>Run your suite using:</p>
       <pre class="shell">
@@ -165,6 +179,9 @@ rose suite-run
       <pre class="prettyprint lang-cylc">
     [[special tasks]] 
         clock-triggered = bell(0)
+        
+      <p>This tells the suite to clock trigger the <var>bell</var> task with
+      a cycle offset of 0.</p>
 </pre>
 
       <p>Save your changes and run your suite.</p>
@@ -186,7 +203,7 @@ rose suite-run
     <div class="slide">
       <h3 class="alwayshidden">Explanation</h3>
 
-      <p>By making the <var>[[bell]]</var> task a clock triggered task we have
+      <p>By making the <var>bell</var> task a clock triggered task we have
       made it run in realtime. Thus, when the time caught up with the cycle
       time, the bell task triggered.</p>
     </div>
@@ -194,21 +211,8 @@ rose suite-run
     <div class="slide">
       <h2 id="further-triggering">Further clock triggering</h2>
 
-      <p>When clock triggering tasks we can use different offsets to the cycle
-      time as follows:</p>
-      <pre class="prettyprint lang-cylc">
-        clock-triggered = taskname(CYCLE_OFFSET)
-</pre>
-
-      <p>Note that, regardless of the offset used, the task still belongs to
-      the cycle from which the offset has been applied.</p>
-
       <p>We will now modify our suite to run tasks at quarter-past, half-past
       and quarter-to the hour.</p>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Further clock triggering (2)</h3>
 
       <p>Open your <var>suite.rc</var> and modify the <var>[runtime]</var>
       section by adding the following:</p>
@@ -232,7 +236,7 @@ rose suite-run
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Further clock triggering (3)</h3>
+      <h3 class="alwayshidden">Further clock triggering (2)</h3>
 
       <p>Save your changes and run your suite using:</p>
       <pre class="shell">
