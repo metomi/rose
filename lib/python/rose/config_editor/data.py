@@ -995,6 +995,7 @@ class ConfigDataManager(object):
                 continue
             if not sect_node.is_ignored() and section.startswith("file:"):
                 file_sections.append(section)
+        duplicate_file_sections = []
         for meta_id, sect_node in meta_config.value.items():
             section, option = self.util.get_section_option_from_id(
                                                                 meta_id)
@@ -1003,6 +1004,16 @@ class ConfigDataManager(object):
                     continue
                 if not sect_node.is_ignored() and section.startswith("file:"):
                     file_sections.append(section)
+                    if (sect_node.get_value([rose.META_PROP_DUPLICATE]) ==
+                        rose.META_PROP_VALUE_TRUE):
+                        duplicate_file_sections.append(section)
+        # Remove metadata for individual duplicate sections - no need.
+        for section in list(file_sections):
+            if section in duplicate_file_sections:
+                continue
+            base_section = rose.macro.REC_ID_STRIP.sub("", section)
+            if base_section in duplicate_file_sections:
+                file_sections.remove(section)
         file_ids = []
         for setting_id, sect_node in meta_config.value.items():
             # The following 'wildcard-esque' id is an exception.

@@ -519,7 +519,8 @@ class ConfigPage(gtk.VBox):
                 if variable.metadata['id'] == item.var_id:
                     self.add_row(variable)
                     return
-        if "/file/" in self.namespace:  # Don't like this.
+        if (self.section is not None and 
+            self.section.name.startswith('file:')):
             return None
         add_ui_start = """<ui> <popup name='Popup'>
                          <menu action="Add meta">"""
@@ -657,7 +658,8 @@ class ConfigPage(gtk.VBox):
         std_table = rose.config_editor.pagewidget.table.PageTable
         file_chooser = rose.config_editor.pagewidget.chooser.PageFormatTree
         disc_table = rose.config_editor.pagewidget.table.PageLatentTable
-        if "/file/" in self.namespace:  # Don't like this!
+        if (self.section is not None and
+            self.section.name.startswith('file:')):
             self.main_container = file_chooser(
                                        self.panel_data,
                                        self.ghost_data,
