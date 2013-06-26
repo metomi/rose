@@ -184,7 +184,7 @@ $(function() {
         NODE.each(function(){
             var d = new Date();
             var now = d.toISOString().replace(
-                        RegExp("[\\-:T]", "g"),"").slice(0,10)
+                        RegExp("[\\-:T]", "g"),"").slice(0,10);
             $(this).text(now);
         });
     }
