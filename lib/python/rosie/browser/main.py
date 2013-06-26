@@ -170,10 +170,10 @@ class MainWindow(gtk.Window):
         if not (address_url.startswith("http://") or 
                 address_url.startswith("search?s=") or 
                 address_url.startswith("query?q=") or
-                address_url == "rosie://home"):
+                address_url == "roses:/"):
             self.nav_bar.simple_search_entry.set_text(address_url)
             self.handle_search(None)
-        elif address_url == "rosie://home":
+        elif address_url == "roses:/":
             self.display_local_suites()
         else:
             items = {}
@@ -262,8 +262,8 @@ class MainWindow(gtk.Window):
     def display_local_suites(self, a_widget=None, navigate=True):
         """Get and display the locally stored suites."""
         self.local_updater.update_now()
-        self.nav_bar.address_box.child.set_text("rosie://home")
-        self.refresh_url = "rosie://home"
+        self.nav_bar.address_box.child.set_text("roses:/")
+        self.refresh_url = "roses:/"
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
@@ -771,7 +771,7 @@ class MainWindow(gtk.Window):
     def handle_refresh(self, *args):
         """Handles refreshing the search results."""
         self.nav_bar.address_box.child.set_text(self.refresh_url)
-        if self.nav_bar.address_box.child.get_text() == "rosie://home":
+        if self.nav_bar.address_box.child.get_text() == "roses:/":
             self.display_local_suites()
         else:
              self.address_bar_lookup(None, False)
@@ -862,7 +862,7 @@ class MainWindow(gtk.Window):
             elif search.h_type == "home":
                 self.clear_filters()
                 self.nav_bar.simple_search_entry.set_text("")
-                self.nav_bar.address_box.child.set_text("rosie://home")    
+                self.nav_bar.address_box.child.set_text("roses:/")    
                 self.display_local_suites(navigate=False) #need to do something with this...
             else:
                 if next:
