@@ -13,6 +13,8 @@ This release of Rose will work with cylc 5.3.0.
 
 Changes that have significant impact on user experience.
 
+\#761: rose_prune: new built-in application to housekeep a cycling suite.
+
 \#739: rose suite-log: replace `rose suite-log-view`. The old command is now an
 alias of the new command with an improved interface. Support view and update
 modes.
