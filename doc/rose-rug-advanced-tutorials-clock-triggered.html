@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose Advanced Tutorial: Clock triggered tasks</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="defaultView" content="outline" />
+  <meta name="controlVis" content="visible" />
+  <link rel="stylesheet" href="S5/slides.css" type="text/css" media=
+  "projection" id="slideProj" />
+  <link rel="stylesheet" href="S5/outline-rose.css" type="text/css" media=
+  "screen" id="outlineStyle" />
+  <link rel="stylesheet" href="S5/opera.css" type="text/css" media="projection"
+  id="operaFix" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <script src="S5/slides.js" type="text/javascript">
+</script>
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="prettify-cylc-suite-rc.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+
+    <div id="currentSlide">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div id="controls">
+      <!-- DO NOT EDIT -->
+    </div>
+
+    <div class="header-footer" id="footer"></div>
+  </div>
+
+  <div id="body-main" class="presentation">
+    <div class="slide">
+      <h1>Rose Advanced Tutorial: Clock triggered tasks</h1>
+    </div>
+
+    <div class="handout" id="content"></div>
+
+    <div class="slide">
+      <h2 id="intro">Introduction</h2>
+
+      <p>This part of the Rose user guide walks you through using clock
+      triggered tasks.</p>
+
+      <p>This allows you to trigger tasks based on the actual time.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="purpose">Purpose</h2>
+
+      <p>The typical use of clock triggered tasks is to perform real-time data
+      retrieval</p>
+
+      <p>In general, most tasks in a suite do not care about the wall clock
+      time, simply running once their prerequisites are met. Clock triggered
+      tasks, however, wait for a particular wall clock time to be reached
+      <em>in addition</em> to their other prerequisites.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="clock-triggering">Clock triggering</h2>
+
+      <p>When clock triggering tasks we can use different offsets to the cycle
+      time as follows:</p>
+      <pre class="prettyprint lang-cylc">
+        clock-triggered = taskname(CYCLE_OFFSET)
+</pre>
+
+      <p>Note that, regardless of the offset used, the task still belongs to
+      the cycle from which the offset has been applied.</p>
+
+    </div>
+
+    <div class="slide">
+      <h2 id="example">Example</h2>
+
+      <p>Our example suite will simulate a clock chiming on the hour.</p>
+
+      <p>Create a <a href="rose-rug-brief-tour#cli">new suite</a> (or just a
+      new directory somewhere - e.g. in your homespace) containing a blank
+      <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file with the
+      following contents:</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc</h3>
+      <pre class="prettyprint lang-cylc">
+#!jinja2
+[cylc]
+    UTC mode = True # Ignore DST
+    [[event hooks]]
+        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout = 4320 # 3 days
+[scheduling]
+    initial cycle time = <span id="cylc-time"></span>
+    [[dependencies]]
+        [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
+            graph = "bell"
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            succeeded handler = "rose suite-hook"
+            failed handler = "rose suite-hook --mail"
+    [[bell]]
+        environment scripting = "eval $(rose task-env)"
+        command scripting = "yes 'bong' | head -n $(rose date --format=%H)"
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc (2)</h3>
+
+      <p>We now have a simple suite with a single task that prints "bong" a
+      number of times equal to the (cycle time) hour.</p>
+
+      <p>Run your suite using:</p>
+      <pre class="shell">
+rose suite-run
+</pre>
+
+      <p>and stop it after a few cycles using the stop button in the cylc gui.
+      Notice how the tasks run as soon as possible rather than waiting for the
+      actual time to be equal to the cycle time.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example suite.rc (3)</h3>
+
+      <p>Use <samp>rose suite-log</samp> to view the suite logs and look at the
+      output for one of the bell tasks to confirm it is behaving as expected.
+      N.B. this particular clock is running in UTC so the number of "bong"s may
+      vary from your local time.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="clock-triggering">Clock triggering tasks</h2>
+
+      <p>We want our clock to only ring in real time rather than the
+      accelerated cycle time.</p>
+
+      <p>To do this, add the following lines to the <samp>[scheduling]</samp>
+      section of your <var>suite.rc</var>:</p>
+      <pre class="prettyprint lang-cylc">
+    [[special tasks]] 
+        clock-triggered = bell(0)
+        
+      <p>This tells the suite to clock trigger the <var>bell</var> task with
+      a cycle offset of 0 hours.</p>
+</pre>
+
+      <p>Save your changes and run your suite.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="results">Results</h2>
+
+      <p>Your suite should now be running the bell task in realtime. Any cycle
+      times that have already passed (such as the one defined by <samp>initial
+      cycle time</samp>) will be run as soon as possible, while those in the
+      future will wait for that time to pass.</p>
+
+      <p>At this point you may want to leave your suite running until the next
+      hour has passed in order to confirm the clock triggering is working
+      correctly. Once you are satisfied, stop your suite.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Explanation</h3>
+
+      <p>By making the <var>bell</var> task a clock triggered task we have
+      made it run in realtime. Thus, when the time caught up with the cycle
+      time, the bell task triggered.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="further-triggering">Further clock triggering</h2>
+
+      <p>We will now modify our suite to run tasks at quarter-past, half-past
+      and quarter-to the hour.</p>
+
+      <p>Open your <var>suite.rc</var> and modify the <var>[runtime]</var>
+      section by adding the following:</p>
+      <pre class="prettyprint lang-cylc">
+    [[quarter_past, half_past, quarter_to]]
+        command scripting = "echo 'chimes'"
+</pre>
+
+      <p>Similarly, modify the <var>[[scheduling]]</var> section as
+      follows:</p>
+      <pre class="prettyprint lang-cylc">
+    [[special tasks]] 
+        clock-triggered = bell(0), quarter_past(0.25), half_past(0.5), quarter_to(0.75)
+    [[dependencies]]
+        [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
+            graph = "bell =&gt; quarter_past =&gt; half_past =&gt; quarter_to"
+</pre>
+
+      <p>Note the different values used for the cycle offsets of the
+      clock-triggered tasks.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Further clock triggering (2)</h3>
+
+      <p>Save your changes and run your suite using:</p>
+      <pre class="shell">
+rose suite-run now
+</pre>
+
+      <p>which will run your suite using the current time as the initial cycle
+      time.</p>
+
+      <p>Again, notice how the tasks trigger until the current time is
+      reached.</p>
+
+      <p>Leave your suite running for a while to confirm it is working as
+      expected and then shut it down using the stop button in the cylc gui.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="summary">Summary</h2>
+
+      <p>You have now successfully created and run a suite that:</p>
+
+      <ul>
+        <li>runs a <var>bell</var> task in realtime on the hour</li>
+
+        <li>runs different chiming tasks at quarter-past, half-past and
+        quarter-to the hour</li>
+      </ul>
+
+      <p>For more information, see the <a href=
+      "http://cylc.github.com/cylc/html/single/cug-html.html">cylc user
+      guide</a>.</p>
+    </div>
+  </div>
+</body>
+</html>
