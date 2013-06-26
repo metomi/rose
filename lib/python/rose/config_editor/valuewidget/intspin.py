@@ -38,6 +38,8 @@ class IntSpinButtonValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
+        self.upper = sys.maxint
+        self.lower = -sys.maxint - 1
        
         tooltip_text = None
         try:
@@ -47,9 +49,12 @@ class IntSpinButtonValueWidget(gtk.HBox):
             tooltip_text = self.WARNING_MESSAGE.format(value,
                                                        int_value)
         my_adj = gtk.Adjustment(value=int_value,
-                                upper=sys.maxint,
-                                lower=-sys.maxint - 1,
+                                upper=self.upper,
+                                lower=self.lower,
                                 step_incr=1)
+        if int_value > self.upper or int_value < self.lower:   
+            print "Value truncated" #set an image, grey out text....
+
         spin_button = gtk.SpinButton(adjustment=my_adj, digits=0)
         spin_button.connect('focus-in-event',
                             self.hook.trigger_scroll)
@@ -63,6 +68,7 @@ class IntSpinButtonValueWidget(gtk.HBox):
         self.grab_focus = lambda : self.hook.get_focus(spin_button)
 
     def setter(self, widget):
+        #undo crap in setter...
         if str(widget.get_value_as_int()) != self.value:
             self.value = str(widget.get_value_as_int())
             self.set_value(self.value)
