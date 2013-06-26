@@ -26,9 +26,9 @@
 #-------------------------------------------------------------------------------
 tests 6
 KEY=${TEST_KEY_BASE#0?-}
-HOST=$(rose config 't:rose-suite-hook' $KEY)
+HOST=$(rose config 't' $KEY)
 if [[ -z $HOST ]]; then
-    skip 6 "[t:rose-suite-hook]$KEY not defined"
+    skip 6 "[t]$KEY not defined"
     exit 0
 fi
 HOST=$(rose host-select $HOST)

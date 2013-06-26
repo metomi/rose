@@ -24,9 +24,9 @@
 #-------------------------------------------------------------------------------
 tests 9
 #-------------------------------------------------------------------------------
-JOB_HOST=$(rose config --default= 't:rose-task-run' "job-host")
+JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -z $JOB_HOST ]]; then
-    skip 3 "[t:rose-task-run]job-host not defined"
+    skip 3 '[t]job-host not defined'
     :
 else
     JOB_HOST=$(rose host-select $JOB_HOST)

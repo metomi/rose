@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-HOST_GROUPS=$(rose config 't:rose-host-select' "host-groups{$TEST_KEY_BASE}")
+HOST_GROUPS=$(rose config 't' "host-groups")
 if [[ -n $HOST_GROUPS ]]; then
     N_HOST_GROUPS=0
     for HOST_GROUP in $HOST_GROUPS; do

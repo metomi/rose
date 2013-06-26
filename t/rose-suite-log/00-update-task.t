@@ -25,9 +25,9 @@
 tests 10
 #-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
-    JOB_HOST=$(rose config 't:rose-suite-log' "job-host")
+    JOB_HOST=$(rose config 't' 'job-host')
     if [[ -z $JOB_HOST ]]; then
-        skip 10 "[t:rose-suite-log]job-host not defined"
+        skip 10 '[t]job-host not defined'
         exit 0
     fi
     JOB_HOST=$(rose host-select $JOB_HOST)
