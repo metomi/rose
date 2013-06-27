@@ -50,6 +50,7 @@
             echo 'fred is in '$(find /usr/share/zoneinfo/[A-Z]*/ -type f -printf "%f\n" | shuf -n 1 || echo 'the pub')
         """
     # Tasks need defining in runtime sections, even when identical to root.
+    [[fcm_make]]
     [[my_hello_world]]
     [[fred_hello_world]]
     [[my_hello_mars]]
