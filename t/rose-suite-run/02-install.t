@@ -26,7 +26,6 @@ N_TESTS=7
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
-N_JOB_HOST_TESTS=1
 if [[ -n $JOB_HOST ]]; then
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
@@ -42,13 +41,17 @@ fi
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
+OPTION=-i
+if [[ $TEST_KEY_BASE == *local* ]]; then
+    OPTION=-l
+fi
 if [[ -n $JOB_HOST ]]; then
-    run_pass "$TEST_KEY" rose suite-run \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol \
-        -S "HOST=\"$JOB_HOST\"" --debug
+    run_pass "$TEST_KEY" rose suite-run --debug \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE $OPTION --name=$NAME --no-gcontrol \
+        -S "HOST=\"$JOB_HOST\""
 else
-    run_pass "$TEST_KEY" rose suite-run \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol --debug
+    run_pass "$TEST_KEY" rose suite-run --debug \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE $OPTION --name=$NAME --no-gcontrol
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-port-file
@@ -65,7 +68,9 @@ junk
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-items-$JOB_HOST
-if [[ -n $JOB_HOST ]]; then
+if [[ $TEST_KEY_BASE == *local* ]]; then
+    skip 2 "$TEST_KEY: local-install-only"
+elif [[ -n $JOB_HOST ]]; then
     run_pass "$TEST_KEY" \
         ssh -oBatchMode=yes $JOB_HOST ls cylc-run/$NAME/{app,etc}
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
@@ -76,7 +81,7 @@ cylc-run/$NAME/etc:
 junk
 __OUT__
 else
-    skip 1 "$TEST_KEY"
+    skip 2 "$TEST_KEY_BASE-items: [t]job-host not defined"
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-clean

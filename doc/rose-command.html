@@ -1537,10 +1537,15 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>--install-only, -i</kbd></dt>
 
-      <dd>Install the suite, but do not run it. Imply
+      <dd>Install the suite. Do not run it. Imply
       <kbd>--no-gcontrol</kbd>.</dd>
 
-      <dt><kbd>--id=NAME, -n NAME</kbd></dt>
+      <dt><kbd>--local-install-only, -i</kbd></dt>
+
+      <dd>Install the suite locally. Do not install to job hosts. Do not run
+      it. Imply <kbd>--no-gcontrol</kbd>.</dd>
+
+      <dt><kbd>--name=NAME, -n NAME</kbd></dt>
 
       <dd>Specify the suite <var>NAME</var> in Cylc, instead of using the
       basename of the configuration directory.</dd>

@@ -98,8 +98,8 @@ class SuiteRunner(Runner):
 
     SLEEP_PIPE = 0.05
     NAME = "suite"
-    OPTIONS = ["conf_dir", "defines", "defines_suite",
-               "gcontrol_mode", "host", "install_only_mode",
+    OPTIONS = ["conf_dir", "defines", "defines_suite", "gcontrol_mode", "host",
+               "install_only_mode", "local_install_only_mode",
                "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
                "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
                "restart_mode", "run_mode", "strict_mode"]
@@ -229,7 +229,7 @@ class SuiteRunner(Runner):
             os.chdir(suite_dir)
 
         # Housekeep log files
-        if not opts.install_only_mode:
+        if not opts.install_only_mode and not opts.local_install_only_mode:
             self._run_init_dir_log(opts, suite_name, config)
         self.fs_util.makedirs("log/suite")
 
@@ -238,7 +238,12 @@ class SuiteRunner(Runner):
         run_mode = opts.run_mode
         if run_mode not in ["reload", "restart", "run"]:
             run_mode = "run"
-        prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), run_mode)
+        mode = run_mode
+        if opts.install_only_mode:
+            mode = "install-only"
+        elif opts.local_install_only_mode:
+            mode = "local-install-only"
+        prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), mode)
 
         # Dump the actual configuration as rose-suite-run.conf
         ConfigDumper()(config, "log/" + prefix + ".conf")
@@ -290,6 +295,9 @@ class SuiteRunner(Runner):
         # Register the suite
         self.suite_engine_proc.validate(suite_name, opts.strict_mode)
 
+        if opts.local_install_only_mode:
+            return
+
         # Install suite files to each remote [user@]host
         for name in ["", "log/", "share/", "work/"]:
             uuid_file = os.path.abspath(name + uuid)
@@ -339,15 +347,15 @@ class SuiteRunner(Runner):
 
         while queue:
             sleep(self.SLEEP_PIPE)
-            pipe, command, mode, auth = queue.pop(0)
+            pipe, command, command_name, auth = queue.pop(0)
             if pipe.poll() is None:
-                queue.append([pipe, command, mode, auth]) # put it back
+                queue.append([pipe, command, command_name, auth]) # put it back
                 continue
             rc = pipe.wait()
             out, err = pipe.communicate()
             if rc:
                 raise RosePopenError(command, rc, out, err)
-            if mode == "rsync":
+            if command_name == "rsync":
                 self.handle_event(out, level=Event.VV)
                 continue
             else:

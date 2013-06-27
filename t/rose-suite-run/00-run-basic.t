@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-N_TESTS=10
+N_TESTS=12
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
@@ -35,6 +35,7 @@ else
     export ROSE_CONF_IGNORE=true
 fi
 TEST_KEY=$TEST_KEY_BASE
+mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
@@ -43,23 +44,14 @@ HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
 #-------------------------------------------------------------------------------
 # "rose suite-run" should not work while suite is running.
 # except --reload mode.
-TEST_KEY=$TEST_KEY_BASE-running-run
-run_fail "$TEST_KEY" rose suite-run -i \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+for OPTION in -i -l '' --restart; do
+    TEST_KEY=$TEST_KEY_BASE-running$OPTION
+    run_fail "$TEST_KEY" rose suite-run $OPTION \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
+    file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] $NAME: is already running on $HOST
 __ERR__
-run_fail "$TEST_KEY" rose suite-run \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is already running on $HOST
-__ERR__
-TEST_KEY=$TEST_KEY_BASE-running-restart
-run_fail "$TEST_KEY" rose suite-run --restart \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is already running on $HOST
-__ERR__
+done
 TEST_KEY=$TEST_KEY_BASE-running-reload
 run_pass "$TEST_KEY" rose suite-run --reload \
     -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
