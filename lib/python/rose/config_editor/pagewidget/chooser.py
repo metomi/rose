@@ -87,7 +87,6 @@ class PageFormatTree(gtk.VBox):
         else:
             self.source_vbox.hide()
             empty_trigger_widget.set_active(True)
-        return
 
     def _variable_toggle(self, check, var_widget):
         """Only add the variable if the check box is enabled."""
@@ -111,7 +110,11 @@ class PageFormatTree(gtk.VBox):
         source_vars = [rose.FILE_VAR_SOURCE, rose.FILE_VAR_CHECKSUM,
                        rose.FILE_VAR_MODE]
         if self._state == "source":
-            for var in list(self.ghost_data):
+            # Add variables, starting with 'source'.
+            sorted_ghosts = list(self.ghost_data)
+            sorted_ghosts.sort(lambda x, y: (y.name == rose.FILE_VAR_SOURCE) -
+                                            (x.name == rose.FILE_VAR_SOURCE))
+            for var in sorted_ghosts:
                 if var.name in source_vars:
                     if ((var.name == rose.FILE_VAR_CHECKSUM and
                          not var.value) or (var.name == rose.FILE_VAR_MODE and
@@ -120,7 +123,11 @@ class PageFormatTree(gtk.VBox):
                     self.var_ops.add_var(var)
             self.source_vbox.show()
         else:
-            for var in list(self.panel_data):
+            # Remove variables, ending with 'source'.
+            sorted_vars = list(self.panel_data)
+            sorted_vars.sort(lambda x, y: (x.name == rose.FILE_VAR_SOURCE) -
+                                          (y.name == rose.FILE_VAR_SOURCE))
+            for var in sorted_vars:
                 self.var_ops.remove_var(var)
             self.source_vbox.hide()
         return False

@@ -995,6 +995,7 @@ class ConfigDataManager(object):
                 continue
             if not sect_node.is_ignored() and section.startswith("file:"):
                 file_sections.append(section)
+        duplicate_file_sections = []
         for meta_id, sect_node in meta_config.value.items():
             section, option = self.util.get_section_option_from_id(
                                                                 meta_id)
@@ -1003,6 +1004,16 @@ class ConfigDataManager(object):
                     continue
                 if not sect_node.is_ignored() and section.startswith("file:"):
                     file_sections.append(section)
+                    if (sect_node.get_value([rose.META_PROP_DUPLICATE]) ==
+                        rose.META_PROP_VALUE_TRUE):
+                        duplicate_file_sections.append(section)
+        # Remove metadata for individual duplicate sections - no need.
+        for section in list(file_sections):
+            if section in duplicate_file_sections:
+                continue
+            base_section = rose.macro.REC_ID_STRIP.sub("", section)
+            if base_section in duplicate_file_sections:
+                file_sections.remove(section)
         file_ids = []
         for setting_id, sect_node in meta_config.value.items():
             # The following 'wildcard-esque' id is an exception.
@@ -1011,6 +1022,10 @@ class ConfigDataManager(object):
                 setting_id.startswith("file:*=")):
                 file_ids.append(setting_id)
         for section in file_sections:
+            title = meta_config.get_value([section, rose.META_PROP_TITLE])
+            if title is None:
+                meta_config.set([section, rose.META_PROP_TITLE],
+                                section.replace("file:", "", 1))
             for file_entry in file_ids:
                 sect_node = meta_config.get([file_entry])
                 for meta_prop, opt_node in sect_node.value.items():
@@ -1155,6 +1170,7 @@ class ConfigDataManager(object):
                 self.namespace_meta_lookup[config_name].setdefault(
                                                   rose.META_PROP_SORT_KEY,
                                                   " 0")
+
     def load_namespace_has_sub_data(self, config_name=None):
         """Load namespace sub-data status."""
         file_ns = "/" + rose.SUB_CONFIG_FILE_DIR
@@ -1165,14 +1181,20 @@ class ConfigDataManager(object):
                 parent_ns = ns.rsplit("/", 1)[0]
                 ns_hierarchy.setdefault(parent_ns, [])
                 ns_hierarchy[parent_ns].append(ns)
+        if config_name is None:
+            configs = self.config.keys()
+        else:
+            configs = [config_name]
+        # File root pages have summary data for files.
+        for alt_config_name in configs:
+            file_root_ns = alt_config_name + file_ns
+            self.namespace_meta_lookup.setdefault(file_root_ns, {})
+            self.namespace_meta_lookup[file_root_ns].setdefault(
+                                            "has_sub_data", True)
+        # Duplicate root pages have summary data for their members.
         for ns, prop_map in self.namespace_meta_lookup.items():
-            if config_name is None or ns.startswith(config_name):
-                if file_ns_sub in ns:
-                    title = re.sub(".*" + file_ns_sub, "", ns)
-                    prop_map.setdefault(rose.META_PROP_TITLE,
-                                        title.replace(":", "/"))
-                elif ns.endswith(file_ns):
-                    prop_map.setdefault("has_sub_data", True)
-                elif (rose.META_PROP_DUPLICATE in prop_map and
-                    ns_hierarchy.get(ns, [])):
-                    prop_map.setdefault("has_sub_data", True)
+            if config_name is not None and not ns.startswith(config_name):
+                continue
+            if (rose.META_PROP_DUPLICATE in prop_map and
+                ns_hierarchy.get(ns, [])):
+                prop_map.setdefault("has_sub_data", True)
