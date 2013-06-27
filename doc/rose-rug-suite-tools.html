@@ -346,8 +346,8 @@ rose task-run -D '[env]!BAZ='
     <dl>
       <dt><kbd>[prune]cycles</kbd></dt>
 
-      <dd>A list of cycles, normally expressed as date/time offsets relative to
-      the current cycle, in a format recognised by the
+      <dd>A space delimited list of cycles, normally expressed as date/time
+      offsets relative to the current cycle, in a format recognised by the
       <code>--offset=OFFSET</code> option of <code>rose date</code>. E.g.
       <kbd>-6h</kbd> is 6 hours before the current cycle time. In a cylc suite,
       for a given cycle <var>$C</var> in the list, the application will:
@@ -363,9 +363,9 @@ rose task-run -D '[env]!BAZ='
 
       <dt><kbd>[prune]globs</kbd></dt>
 
-      <dd>A list of glob patterns for matching files and directories relative to
-      <var>$ROSE_SUITE_DIR</var>. Files and directories matching these patterns
-      will be removed from all task hosts.</dd>
+      <dd>A space delimited list of glob patterns for matching files and
+      directories relative to <var>$ROSE_SUITE_DIR</var>. Files and directories
+      matching these patterns will be removed from all task hosts.</dd>
     </dl>
 
     <p>E.g.:</p>

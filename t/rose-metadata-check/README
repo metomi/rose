@@ -1,7 +1,0 @@
-Tests for "rose metadata-check". Invoke tests with the "prove" command:
-
-    prove -r $PATH_TO_THIS_DIRECTORY [-v]
-
-E.g. (assume $PWD is this directory):
-
-    prove -r .
