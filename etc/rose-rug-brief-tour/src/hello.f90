@@ -50,7 +50,6 @@ do i_arg = 1, command_argument_count()
     call get_command_argument(i_arg, file_name, status=code)
     if (code == 0) then
         open(10, file=file_name, action='write')
-        call system("sleep 5")
         do i = 1, num_targets
             write(10, '(a,a,1x,a)') trim(greeter), ': ' // salutation, trim(targets(i))
         end do
@@ -58,7 +57,6 @@ do i_arg = 1, command_argument_count()
     end if
 end do
 do i = 1, num_targets
-    call system("sleep 1")
     write(*, '(a,a,1x,a)') trim(greeter), ': ' // salutation, trim(targets(i))
 end do
 write(0, '(a,1x,a,a,1x,i0,1x,a)') &
