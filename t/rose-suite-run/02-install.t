@@ -22,10 +22,15 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-N_TESTS=10
+N_TESTS=7
 tests $N_TESTS
 #-------------------------------------------------------------------------------
-# Run the suite.
+JOB_HOST=$(rose config --default= 't' 'job-host')
+N_JOB_HOST_TESTS=1
+if [[ -n $JOB_HOST ]]; then
+    JOB_HOST=$(rose host-select $JOB_HOST)
+fi
+#-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *conf ]]; then
     if ! rose config -q 'rose-suite-run' 'hosts'; then
         skip $N_TESTS '[rose-suite-run]hosts not defined'
@@ -37,50 +42,44 @@ fi
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
-#-------------------------------------------------------------------------------
-# "rose suite-run" should not work while suite is running.
-# except --reload mode.
-TEST_KEY=$TEST_KEY_BASE-running-run
-run_fail "$TEST_KEY" rose suite-run -i \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is already running on $HOST
-__ERR__
-run_fail "$TEST_KEY" rose suite-run \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is already running on $HOST
-__ERR__
-TEST_KEY=$TEST_KEY_BASE-running-restart
-run_fail "$TEST_KEY" rose suite-run --restart \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is already running on $HOST
-__ERR__
-TEST_KEY=$TEST_KEY_BASE-running-reload
-run_pass "$TEST_KEY" rose suite-run --reload \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-touch $SUITE_RUN_DIR/flag # allow the task to die
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
+if [[ -n $JOB_HOST ]]; then
+    run_pass "$TEST_KEY" rose suite-run \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol \
+        -S "HOST=\"$JOB_HOST\"" --debug
 else
-    OK=true
-    pass "$TEST_KEY"
+    run_pass "$TEST_KEY" rose suite-run \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol --debug
+fi
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-port-file
+run_fail "$TEST_KEY" test -e $HOME/.cylc/ports/$NAME
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-items
+run_pass "$TEST_KEY" ls $SUITE_RUN_DIR/{app,etc}
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+$SUITE_RUN_DIR/app:
+my_task_1
+
+$SUITE_RUN_DIR/etc:
+junk
+__OUT__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-items-$JOB_HOST
+if [[ -n $JOB_HOST ]]; then
+    run_pass "$TEST_KEY" \
+        ssh -oBatchMode=yes $JOB_HOST ls cylc-run/$NAME/{app,etc}
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+cylc-run/$NAME/app:
+my_task_1
+
+cylc-run/$NAME/etc:
+junk
+__OUT__
+else
+    skip 1 "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-clean
 run_pass "$TEST_KEY" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2</dev/null || true
+rmdir $SUITE_RUN_DIR || true
 exit 0

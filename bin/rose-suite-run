@@ -51,13 +51,10 @@
 #         or even --define=[!SECTION]. See also --define-suite.
 #     --define-suite=KEY=VALUE, -S KEY=VALUE
 #         As --define, but with an implicit [SECTION] for suite variables.
-#     --force, -f
-#         Reinstall the suite even if it is already running.
 #     --host=HOST
 #         Specify a host for running the suite.
 #     --install-only, -i
-#         Install the suite, but do not run it. (This option is implied if
-#         --force mode is specified and the suite is already running.)
+#         Install the suite, but do not run it. Imply --no-gcontrol.
 #     --log-keep=DAYS
 #         Specify the number of days to keep log directories/archives.
 #         Do not housekeep if not specified. Named log directories (created by

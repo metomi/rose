@@ -98,7 +98,7 @@ class SuiteRunner(Runner):
 
     SLEEP_PIPE = 0.05
     NAME = "suite"
-    OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
+    OPTIONS = ["conf_dir", "defines", "defines_suite",
                "gcontrol_mode", "host", "install_only_mode",
                "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
                "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
@@ -205,15 +205,11 @@ class SuiteRunner(Runner):
             if not suite_run_hosts:
                 raise NotRunningError(suite_name)
             hosts = suite_run_hosts
-        else:
-            if self.suite_engine_proc.is_suite_running(suite_name, hosts):
-                if opts.force_mode:
-                    opts.install_only_mode = True
-                else:
-                    suite_run_hosts = self.suite_engine_proc.ping(suite_name,
-                                                                  hosts)
-                    raise AlreadyRunningError(suite_name,
-                                              suite_run_hosts[0])
+        elif self.suite_engine_proc.is_suite_running(suite_name, hosts):
+            suite_run_hosts = self.suite_engine_proc.ping(suite_name,
+                                                          hosts)
+            raise AlreadyRunningError(suite_name,
+                                      suite_run_hosts[0])
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
@@ -368,36 +364,34 @@ class SuiteRunner(Runner):
                 queue.append([self.popen.run_bg(*cmd), cmd, "rsync", auth])
 
         # Start the suite
+        if opts.install_only_mode:
+            return
+
         self.fs_util.chdir("log")
         ret = 0
-        if opts.install_only_mode:
-            host = None
-            if suite_run_hosts:
-                host = suite_run_hosts[0]
-        else:
-            host = hosts[0]
-            # FIXME: should sync files to suite host?
-            if opts.host:
-                hosts = [host]
+        host = hosts[0]
+        # FIXME: should sync files to suite host?
+        if opts.host:
+            hosts = [host]
+        
+        #use the list of hosts on which you can run
+        if opts.run_mode != "reload" and not opts.host:
+            hosts = []
+            v = conf.get_value(["rose-suite-run", "hosts"], "localhost")
+            known_hosts = self.host_selector.expand(v.split())[0]
+            for known_host in known_hosts:
+                if known_host not in hosts:
+                    hosts.append(known_host)    
             
-            #use the list of hosts on which you can run
-            if opts.run_mode != "reload" and not opts.host:
-                hosts = []
-                v = conf.get_value(["rose-suite-run", "hosts"], "localhost")
-                known_hosts = self.host_selector.expand(v.split())[0]
-                for known_host in known_hosts:
-                    if known_host not in hosts:
-                        hosts.append(known_host)    
-                
-            if hosts == ["localhost"]:
-                host = hosts[0]
-            else:
-                host = self.host_selector(hosts)[0][0]
-            self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
-            # FIXME: values in environ were expanded in the localhost
-            self.suite_engine_proc.run(
-                    suite_name, host, environ, opts.run_mode, args)
-            open("rose-suite-run.host", "w").write(host + "\n")
+        if hosts == ["localhost"]:
+            host = hosts[0]
+        else:
+            host = self.host_selector(hosts)[0][0]
+        self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
+        # FIXME: values in environ were expanded in the localhost
+        self.suite_engine_proc.run(
+                suite_name, host, environ, opts.run_mode, args)
+        open("rose-suite-run.host", "w").write(host + "\n")
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
