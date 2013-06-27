@@ -118,10 +118,10 @@
       <h3 class="alwayshidden">What does this part cover? continued</h3>
 
       <ul class="incremental">
-        <li>Rose output viewer</li>
+        <li>Suite log viewer, and other Rose utilities</li>
 
-        <li>Utilities - <kbd>fcm make</kbd>, housekeeping, <kbd>rose
-        ana</kbd>...</li>
+        <li>Built-in applications - <kbd>fcm_make</kbd>, <kbd>rose_ana</kbd>,
+        <kbd>rose_prune</kbd>...</li>
 
         <li>In Depth Usage</li>
       </ul>
@@ -618,7 +618,7 @@ type=boolean
       <h2 id="event-hooks">Event Hooks</h2>
 
       <p>Suites also need some standard Rose <em>event hooks</em> to construct
-      the Rose output viewer (more later) and report or shutdown on
+      the suite log viewer (more later) and report or shutdown on
       failure.</p>
 
       <p><strong>The following should be in every Rose suite:</strong></p>
@@ -972,7 +972,7 @@ type=boolean
         <li><var>ROSE_TASK_LOG_ROOT</var>, the name of the task including the
         cycle time - if you prefix a filename with
         <samp>$ROSE_TASK_LOG_ROOT</samp> in the <samp>log/job/</samp>
-        directory, it will be associated with the task in the output
+        directory, it will be associated with the task in the suite log
         viewer.</li>
       </ul>
     </div>
@@ -1032,7 +1032,7 @@ type=boolean
       <ul class="incremental">
         <li>Used to store output, including error messages.</li>
 
-        <li>Rose stores an <samp>index.html</samp> page (the output viewer)
+        <li>Rose stores an <samp>index.html</samp> page (the suite log viewer)
         under this directory.</li>
 
         <li>The <samp>job/</samp> subdirectory contains task scripts and their
@@ -1151,17 +1151,15 @@ type=boolean
     </div>
 
     <div class="slide">
-      <h2 id="utils">Rose Built-in Apps/Utilities</h2>
+      <h2 id="built-in-apps">Rose Built-in Applications</h2>
 
       <ul class="incremental">
-        <li><kbd>fcm make</kbd> - invoked using a Rose application beginning
-        with <samp>fcm_make</samp>, with an <samp>fcm-make.cfg</samp> under the
-        <samp>file/</samp> directory.</li>
+        <li><kbd>fcm_make</kbd> - built-in application to run <code>fcm
+        make</code>.</li>
 
-        <li><kbd>rose ana</kbd> - a Rose analysis engine, for comparing
-        output</li>
+        <li><kbd>rose_ana</kbd> - an engine to compare program outputs</li>
 
-        <li>Housekeeping</li>
+        <li><kbd>rose_prune</kbd> - housekeep a cycling suite</li>
       </ul>
     </div>
 
@@ -1169,13 +1167,13 @@ type=boolean
       <h3 class="alwayshidden">Suite Utilities (continued)</h3>
 
       <ul class="incremental">
-        <li><kbd>rose date</kbd> - manipulate date/time strings</li>
+        <li><kbd>rose date</kbd> - flexible way to manipulate date/time strings
+        with or without an offset.</li>
 
-        <li><kbd>rose mpi-launch</kbd> - a portable way to launch an MPI
-        command</li>
+        <li><kbd>rose mpi-launch</kbd> - configurable MPI program launcher</li>
 
-        <li><kbd>rose host-select</kbd> - select from available remote hosts
-        based on things like load and disk space</li>
+        <li><kbd>rose host-select</kbd> - configurable remote hosts
+        selector</li>
       </ul>
     </div>
 

@@ -1,9 +1,0 @@
-Tests for rosie database functions. Invoke tests with the "prove" command:
-
-    prove -r $PATH_TO_THIS_DIRECTORY [-v]
-
-E.g. (assume $PWD is this directory):
-
-    prove -r .
-
-These tests must be run on a host with access to the database files.
