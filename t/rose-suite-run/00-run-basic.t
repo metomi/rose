@@ -82,5 +82,5 @@ fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-clean
 run_pass "$TEST_KEY" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2</dev/null || true
+rmdir $SUITE_RUN_DIR 2>/dev/null || true
 exit 0
