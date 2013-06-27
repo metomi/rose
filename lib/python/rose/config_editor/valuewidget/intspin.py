@@ -99,10 +99,10 @@ class IntSpinButtonValueWidget(gtk.HBox):
 
 
     def setter(self, widget):
-    
         if isinstance(widget, gtk.Entry):
             if widget.get_text != self.value:
-                self.set_value(widget.get_text())
+                self.value = widget.get_text()
+                self.set_value(self.value)
                 if (not widget.get_text().isdigit() or
                     int(widget.get_text()) > self.upper or
                     int(widget.get_text()) < self.lower):
