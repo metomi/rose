@@ -1001,7 +1001,7 @@ class ConfigPage(gtk.VBox):
                 old_variable.error = variable.error.copy()
                 old_variable.warning = variable.warning.copy()
             else:
-                self.variable_ops.add_var(variable)
+                self.variable_ops.add_var(variable.copy())
         for variable in new_ghost_data:
             # Update or remove variables
             var_id = variable.metadata['id']
@@ -1018,7 +1018,7 @@ class ConfigPage(gtk.VBox):
                 old_variable.error = variable.error.copy()
                 old_variable.warning = variable.warning.copy()
             else:
-                self.ghost_data.append(variable)
+                self.ghost_data.append(variable.copy())
         self.refresh()
         self.trigger_update_status()
         return False
