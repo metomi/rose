@@ -5,9 +5,9 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (End of 2013-06)
+## 2013-06 (2013-06-28)
 
-This release of Rose will work with cylc 5.3.0.
+This release of Rose works with cylc 5.3.0.
 
 ### Highlighted Changes
 
