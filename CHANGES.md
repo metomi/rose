@@ -68,6 +68,11 @@ Integrated into rose config-edit start-up checking.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#758: rosie go: home view now has `roses:/` displayed in the address bar for
+the home view.
+
+\#753: rose documentation: added advice for delivery of training courses.
+
 \#712: rose config-edit: can show variable descriptions and help in-page. 
 Descriptions are shown by default. Customisable formatting.
 
