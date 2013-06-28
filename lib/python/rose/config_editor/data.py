@@ -391,7 +391,12 @@ class ConfigDataManager(object):
         opt_glob = os.path.join(opt_dir, rose.GLOB_OPT_CONFIG_FILE)
         for path in glob.glob(opt_glob):
             if os.access(path, os.F_OK | os.R_OK):
-                name = re.search(rose.RE_OPT_CONFIG_FILE, path).group(1)
+                filename = os.path.basename(path)
+                # filename is a null string if path is to a directory.
+                result = re.match(rose.RE_OPT_CONFIG_FILE, filename)
+                if not result:
+                    continue                    
+                name = result.group(1)
                 try:
                     opt_config = rose.config.load(path)
                 except Exception as e:
