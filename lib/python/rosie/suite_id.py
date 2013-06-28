@@ -39,6 +39,7 @@ from rose.resource import ResourceLocator
 from rose.suite_log_view import SuiteLogViewGenerator
 import string
 import sys
+import traceback
 import xml.parsers.expat
 
 
@@ -388,6 +389,7 @@ class SuiteId(object):
 
     def to_web(self):
         """Return the source browse URL for this suite."""
+        # FIXME: This is Trac specific.
         prefix_source = self.get_prefix_web(self.prefix)
         url = prefix_source + "/browser/" + "/".join(self._get_sid())
         branch = self.branch
@@ -429,15 +431,21 @@ def main():
             for arg in args:
                 report(str(SuiteId(id_text=arg).to_web()) + "\n", level=0)
         elif opts.latest:
-            report(str(SuiteId.get_latest(prefix=arg)) + "\n", level=0)
+            s = SuiteId.get_latest(prefix=arg)
+            if s is not None:
+                report(str(s) + "\n", level=0)
         elif opts.next:
-            report(str(SuiteId.get_next(prefix=arg)) + "\n", level=0)
+            s = SuiteId.get_next(prefix=arg)
+            if s is not None:
+                report(str(s) + "\n", level=0)
         else:
             if not arg:
                 arg = os.getcwd()
             report(str(SuiteId(location=arg)) + "\n", level=0)
     except SuiteIdError as e:
         report(e)
+        if opts.debug_mode:
+            traceback.print_exc(e)
         sys.exit(1)
 
 
