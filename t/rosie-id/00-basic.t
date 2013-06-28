@@ -102,7 +102,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 mkdir -p $HOME/cylc-run/foo-aa000/log
 rose suite-log -q -u -n foo-aa000
 TEST_KEY=$TEST_KEY_BASE-1-to-output.2
-ROSE_CONF_IGNORE=true run_pass "$TEST_KEY" rosie id --to-output foo-aa000
+run_pass "$TEST_KEY" rosie id --to-output foo-aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 file://$HOME/cylc-run/foo-aa000/log/index.html
 __OUT__
