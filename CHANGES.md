@@ -13,8 +13,12 @@ This release of Rose will work with cylc 5.3.0.
 
 Changes that have significant impact on user experience.
 
-\#769: rose suite-run: remove `--force` option. User should use `--reload` to
-install to a running suite.
+\#769: rose suite-run:
+* Remove `--force` option. User should use `--reload` to install to a running
+  suite.
+* New option `--local-install-only` or `-l` to install suite locally only.
+  With this option, it will not install the suite to remote job hosts.
+* `--install-only` now implies `--no-gcontrol`.
 
 \#761: rose_prune: new built-in application to housekeep a cycling suite.
 
