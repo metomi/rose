@@ -172,7 +172,7 @@ class RoseOptionParser(OptionParser):
                        ["--install-only", "-i"],
                        {"action": "store_true",
                         "dest": "install_only_mode",
-                        "help": "Install files only. Don't run."}],
+                        "help": "Install only. Don't run."}],
                "keys": [
                        ["--keys", "-k"],
                        {"action": "store_true",
@@ -194,6 +194,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "load_no_apps",
                         "default": False,
                         "help": "Load app configs on demand."}],
+               "local_install_only_mode": [
+                       ["--local-install-only", "-l"],
+                       {"action": "store_true",
+                        "dest": "local_install_only_mode",
+                        "help": "Install locally only. Don't run."}],
                "local_only": [
                        ["--local-only"],
                        {"action": "store_true",
@@ -298,7 +303,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "dest": "offsets",
                         "metavar": "OFFSET",
-                        "help": ("Specify an offset.")}],
+                        "help": "Specify an offset."}],
                "opt_conf_keys": [
                        ["--opt-conf-key", "-O"],
                        {"action": "append",
@@ -321,7 +326,7 @@ class RoseOptionParser(OptionParser):
                "parse_format": [
                        ["--parse-format", "--format"],
                        {"metavar": "FORMAT",
-                        "help": ("Specify the format for parsing.")}],
+                        "help": "Specify the format for parsing."}],
                "path_globs": [
                        ["--path", "-P"],
                        {"action": "append",
@@ -350,7 +355,7 @@ class RoseOptionParser(OptionParser):
                        ["--property", "-p"],
                        {"action": "append",
                         "metavar": "PROPERTY",
-                        "help": ("Specify a property.")}],
+                        "help": "Specify a property."}],
                "query": [
                        ["--query", "-Q"],
                        {"action": "store_true",

@@ -20,7 +20,6 @@
 # Provides init, setup and teardown functions for rose macro tests.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/test_header
-TEST_KEY_BASE=$(basename $0 .t)
 
 function init() {
     mkdir -p $TEST_DIR/config

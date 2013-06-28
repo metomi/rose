@@ -94,5 +94,5 @@ __PYTHON__
 file_test "$TEST_KEY-log.out" $SUITE_RUN_DIR/log/job/my_task_2.1.1.out
 #-------------------------------------------------------------------------------
 run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y --debug $NAME
-rmdir $SUITE_RUN_DIR 2</dev/null || true
+rmdir $SUITE_RUN_DIR 2>/dev/null || true
 exit 0
