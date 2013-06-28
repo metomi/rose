@@ -13,7 +13,7 @@ This release of Rose will work with cylc 5.3.0.
 
 Changes that have significant impact on user experience.
 
-\#769: rose suite-run: remote `--force` option. User should use `--reload` to
+\#769: rose suite-run: remove `--force` option. User should use `--reload` to
 install to a running suite.
 
 \#761: rose_prune: new built-in application to housekeep a cycling suite.

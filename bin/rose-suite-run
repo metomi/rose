@@ -54,10 +54,10 @@
 #     --host=HOST
 #         Specify a host for running the suite.
 #     --install-only, -i
-#         Install the suite. Do not run it. Imply --no-gcontrol.
+#         Install the suite. Do not run it. Implies --no-gcontrol.
 #     --local-install-only, -l
 #         Install the suite locally. Do not install to job hosts. Do not run
-#         it. Imply --no-gcontrol.
+#         it. Implies --no-gcontrol.
 #     --log-keep=DAYS
 #         Specify the number of days to keep log directories/archives.
 #         Do not housekeep if not specified. Named log directories (created by

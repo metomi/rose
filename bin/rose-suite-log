@@ -36,10 +36,11 @@
 #
 # OPTIONS
 #     --archive
-#         Archive (tar-gzip) job logs at specified cycle times. Imply --update.
+#         Archive (tar-gzip) job logs at specified cycle times. Implies
+#         --update.
 #     --force, -f
-#         Imply "rose suite-log --update '*'" and force update the HTML
-#         display libraries.
+#         Force update the HTML display libraries. Implies "rose suite-log
+#         --update '*'".
 #     --name=SUITE-NAME, -n SUITE-NAME
 #         Specify the suite name, instead of using basename of $PWD.
 #     --tidy-remote
