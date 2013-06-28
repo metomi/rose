@@ -151,6 +151,7 @@ function file_grep() {
 ROSE_HOME=${ROSE_HOME:-$(cd $(dirname $BASH_SOURCE)/../../.. && pwd)}
 PATH=$ROSE_HOME/bin:$PATH
 
+TEST_KEY_BASE=$(basename $0 .t)
 TEST_SOURCE_DIR=$(cd $(dirname $0) && pwd)
 TEST_DIR=$(mktemp -d)
 cd $TEST_DIR

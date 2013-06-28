@@ -20,6 +20,5 @@
 # Provides header for "rose date" tests.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/test_header
-TEST_KEY_BASE=$(basename $0 .t)
 export ROSE_CONF_PATH=$TEST_SOURCE_DIR/etc
 export PATH=$TEST_SOURCE_DIR/bin:$PATH

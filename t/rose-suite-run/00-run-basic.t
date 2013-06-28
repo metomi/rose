@@ -17,34 +17,48 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-hook", remote jobs.
-# 01 - Test with a remote host without a shared $HOME.
-# 02 - Test with a remote host with a shared $HOME.
+# Test "rose suite-run", with and without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 6
-KEY=${TEST_KEY_BASE#0?-}
-HOST=$(rose config 't' $KEY)
-if [[ -z $HOST ]]; then
-    skip 6 "[t]$KEY not defined"
-    exit 0
-fi
-HOST=$(rose host-select $HOST)
-export ROSE_CONF_IGNORE=true
+N_TESTS=12
+tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
+if [[ $TEST_KEY_BASE == *conf ]]; then
+    if ! rose config -q 'rose-suite-run' 'hosts'; then
+        skip $N_TESTS '[rose-suite-run]hosts not defined'
+        exit 0
+    fi
+else
+    export ROSE_CONF_IGNORE=true
+fi
 TEST_KEY=$TEST_KEY_BASE
+mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost \
-    "--define=[jinja2:suite.rc]HOST=\"$HOST\""
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
+HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
+#-------------------------------------------------------------------------------
+# "rose suite-run" should not work while suite is running.
+# except --reload mode.
+for OPTION in -i -l '' --restart; do
+    TEST_KEY=$TEST_KEY_BASE-running$OPTION
+    run_fail "$TEST_KEY" rose suite-run $OPTION \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
+    file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] $NAME: is already running on $HOST
+__ERR__
+done
+TEST_KEY=$TEST_KEY_BASE-running-reload
+run_pass "$TEST_KEY" rose suite-run --reload \
+    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-ok
+TEST_KEY=$TEST_KEY_BASE-suite-run-wait
+touch $SUITE_RUN_DIR/flag # allow the task to die
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
 OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
@@ -58,17 +72,7 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-# Test for local copy of remote job logs.
-TEST_KEY=$TEST_KEY_BASE-log
-cd $SUITE_RUN_DIR/log/job
-file_test "$TEST_KEY-my_task_1.out" "my_task_1.1.1.out"
-file_test "$TEST_KEY-my_task_1.err" "my_task_1.1.1.txt"
-file_cmp "$TEST_KEY-my_task_1.txt" "my_task_1.1.1.txt" <<'__CONTENT__'
-Hello World
-__CONTENT__
-cd $OLDPWD
-
-#-------------------------------------------------------------------------------
-run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
+TEST_KEY=$TEST_KEY_BASE-clean
+run_pass "$TEST_KEY" rose suite-clean -y $NAME
 rmdir $SUITE_RUN_DIR 2>/dev/null || true
 exit 0

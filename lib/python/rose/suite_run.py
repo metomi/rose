@@ -98,8 +98,8 @@ class SuiteRunner(Runner):
 
     SLEEP_PIPE = 0.05
     NAME = "suite"
-    OPTIONS = ["conf_dir", "defines", "defines_suite", "force_mode",
-               "gcontrol_mode", "host", "install_only_mode",
+    OPTIONS = ["conf_dir", "defines", "defines_suite", "gcontrol_mode", "host",
+               "install_only_mode", "local_install_only_mode",
                "log_archive_mode", "log_keep", "log_name", "name", "new_mode",
                "no_overwrite_mode", "opt_conf_keys", "reload_mode", "remote",
                "restart_mode", "run_mode", "strict_mode"]
@@ -205,15 +205,11 @@ class SuiteRunner(Runner):
             if not suite_run_hosts:
                 raise NotRunningError(suite_name)
             hosts = suite_run_hosts
-        else:
-            if self.suite_engine_proc.is_suite_running(suite_name, hosts):
-                if opts.force_mode:
-                    opts.install_only_mode = True
-                else:
-                    suite_run_hosts = self.suite_engine_proc.ping(suite_name,
-                                                                  hosts)
-                    raise AlreadyRunningError(suite_name,
-                                              suite_run_hosts[0])
+        elif self.suite_engine_proc.is_suite_running(suite_name, hosts):
+            suite_run_hosts = self.suite_engine_proc.ping(suite_name,
+                                                          hosts)
+            raise AlreadyRunningError(suite_name,
+                                      suite_run_hosts[0])
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
@@ -233,7 +229,7 @@ class SuiteRunner(Runner):
             os.chdir(suite_dir)
 
         # Housekeep log files
-        if not opts.install_only_mode:
+        if not opts.install_only_mode and not opts.local_install_only_mode:
             self._run_init_dir_log(opts, suite_name, config)
         self.fs_util.makedirs("log/suite")
 
@@ -242,7 +238,12 @@ class SuiteRunner(Runner):
         run_mode = opts.run_mode
         if run_mode not in ["reload", "restart", "run"]:
             run_mode = "run"
-        prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), run_mode)
+        mode = run_mode
+        if opts.install_only_mode:
+            mode = "install-only"
+        elif opts.local_install_only_mode:
+            mode = "local-install-only"
+        prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), mode)
 
         # Dump the actual configuration as rose-suite-run.conf
         ConfigDumper()(config, "log/" + prefix + ".conf")
@@ -294,6 +295,9 @@ class SuiteRunner(Runner):
         # Register the suite
         self.suite_engine_proc.validate(suite_name, opts.strict_mode)
 
+        if opts.local_install_only_mode:
+            return
+
         # Install suite files to each remote [user@]host
         for name in ["", "log/", "share/", "work/"]:
             uuid_file = os.path.abspath(name + uuid)
@@ -343,15 +347,15 @@ class SuiteRunner(Runner):
 
         while queue:
             sleep(self.SLEEP_PIPE)
-            pipe, command, mode, auth = queue.pop(0)
+            pipe, command, command_name, auth = queue.pop(0)
             if pipe.poll() is None:
-                queue.append([pipe, command, mode, auth]) # put it back
+                queue.append([pipe, command, command_name, auth]) # put it back
                 continue
             rc = pipe.wait()
             out, err = pipe.communicate()
             if rc:
                 raise RosePopenError(command, rc, out, err)
-            if mode == "rsync":
+            if command_name == "rsync":
                 self.handle_event(out, level=Event.VV)
                 continue
             else:
@@ -368,36 +372,34 @@ class SuiteRunner(Runner):
                 queue.append([self.popen.run_bg(*cmd), cmd, "rsync", auth])
 
         # Start the suite
+        if opts.install_only_mode:
+            return
+
         self.fs_util.chdir("log")
         ret = 0
-        if opts.install_only_mode:
-            host = None
-            if suite_run_hosts:
-                host = suite_run_hosts[0]
-        else:
-            host = hosts[0]
-            # FIXME: should sync files to suite host?
-            if opts.host:
-                hosts = [host]
+        host = hosts[0]
+        # FIXME: should sync files to suite host?
+        if opts.host:
+            hosts = [host]
+        
+        #use the list of hosts on which you can run
+        if opts.run_mode != "reload" and not opts.host:
+            hosts = []
+            v = conf.get_value(["rose-suite-run", "hosts"], "localhost")
+            known_hosts = self.host_selector.expand(v.split())[0]
+            for known_host in known_hosts:
+                if known_host not in hosts:
+                    hosts.append(known_host)    
             
-            #use the list of hosts on which you can run
-            if opts.run_mode != "reload" and not opts.host:
-                hosts = []
-                v = conf.get_value(["rose-suite-run", "hosts"], "localhost")
-                known_hosts = self.host_selector.expand(v.split())[0]
-                for known_host in known_hosts:
-                    if known_host not in hosts:
-                        hosts.append(known_host)    
-                
-            if hosts == ["localhost"]:
-                host = hosts[0]
-            else:
-                host = self.host_selector(hosts)[0][0]
-            self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
-            # FIXME: values in environ were expanded in the localhost
-            self.suite_engine_proc.run(
-                    suite_name, host, environ, opts.run_mode, args)
-            open("rose-suite-run.host", "w").write(host + "\n")
+        if hosts == ["localhost"]:
+            host = hosts[0]
+        else:
+            host = self.host_selector(hosts)[0][0]
+        self.handle_event(SuiteHostSelectEvent(suite_name, run_mode, host))
+        # FIXME: values in environ were expanded in the localhost
+        self.suite_engine_proc.run(
+                suite_name, host, environ, opts.run_mode, args)
+        open("rose-suite-run.host", "w").write(host + "\n")
 
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?

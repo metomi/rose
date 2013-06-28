@@ -1418,13 +1418,13 @@ launcher-preopts.mpiexec=-n $NPROC
     <dl>
       <dt><kbd>--archive</kbd></dt>
 
-      <dd>Archive (tar-gzip) job logs at specified cycle times. Imply
+      <dd>Archive (tar-gzip) job logs at specified cycle times. Implies
       <kbd>--update</kbd>.</dd>
 
       <dt><kbd>--force, -f</kbd></dt>
 
-      <dd>Imply <kbd>rose suite-log --update '*'</kbd> and force update
-      the HTML display libraries.</dd>
+      <dd>Force update the HTML display libraries. Implies <kbd>rose suite-log
+      --update '*'</kbd>.</dd>
 
       <dt><kbd>--name=SUITE-NAME</kbd>, <kbd>-n SUITE-NAME</kbd></dt>
 
@@ -1531,21 +1531,21 @@ launcher-preopts.mpiexec=-n $NPROC
       <dd>As <kbd>--define</kbd>, but with an implicit <var>[SECTION]</var> for
       suite variables.</dd>
 
-      <dt><kbd>--force, -f</kbd></dt>
-
-      <dd>Reinstall the suite even if it is already running.</dd>
-
       <dt><kbd>--host=HOST</kbd></dt>
 
       <dd>Specify a host for running the suite.</dd>
 
       <dt><kbd>--install-only, -i</kbd></dt>
 
-      <dd>Install the suite, but do not run it. (This option is implied if
-      <kbd>--force</kbd> mode is specified and the suite is already
-      running.)</dd>
+      <dd>Install the suite. Do not run it. Implies
+      <kbd>--no-gcontrol</kbd>.</dd>
 
-      <dt><kbd>--id=NAME, -n NAME</kbd></dt>
+      <dt><kbd>--local-install-only, -i</kbd></dt>
+
+      <dd>Install the suite locally. Do not install to job hosts. Do not run
+      it. Implies <kbd>--no-gcontrol</kbd>.</dd>
+
+      <dt><kbd>--name=NAME, -n NAME</kbd></dt>
 
       <dd>Specify the suite <var>NAME</var> in Cylc, instead of using the
       basename of the configuration directory.</dd>
