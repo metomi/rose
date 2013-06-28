@@ -60,7 +60,8 @@ now be used in either command. Note, however, if `rose task-env` is used before
 command. This may some minor change in behaviour of some existing suites as
 `PATH` would be modified by `rose task-env`.
 
-\#661: rose metadata-check: new command to validate configuration metadata. Integrated into rose config-edit start-up checking.
+\#661: rose metadata-check: new command to validate configuration metadata. 
+Integrated into rose config-edit start-up checking.
 
 ### Other Changes
 
