@@ -21,6 +21,7 @@
 import inspect
 import shlex
 import subprocess
+import sys
 
 import pygtk
 pygtk.require('2.0')
@@ -387,7 +388,11 @@ class MainMenuHandler(object):
                 # There are differences in state between now and then.
                 self.mainwindow.launch_exit_warning_dialog()
                 return True
-        gtk.main_quit()
+        try:
+            gtk.main_quit()
+        except RuntimeError:
+            # This can occur before gtk.main() is called, during the load.
+            sys.exit()
 
     def check_all_extra(self):
         """Check fail-if, warn-if, and run all validator macros."""
