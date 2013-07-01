@@ -36,7 +36,7 @@
 rose_init
 cd $ROSE_HOME/t
 if (($# == 0)); then
-    exec prove -j 6 -r -s
+    exec prove -j 9 -r -s
 else
     exec prove "$@"
 fi
