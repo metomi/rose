@@ -32,7 +32,7 @@ if [[ -z $HOST ]]; then
     exit 0
 fi
 HOST=$(rose host-select $HOST)
-export ROSE_CONF_IGNORE=true
+export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 # Run the suite.
 TEST_KEY=$TEST_KEY_BASE
