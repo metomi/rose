@@ -21,13 +21,25 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
+HOSTNAME=$(hostname) # FIXME: need testing for non-network computer
+function port_is_busy() {
+    local PORT=$1
+    if type -P netcat 1>/dev/null; then
+        netcat -z $HOSTNAME $PORT
+        return $?
+    else
+        netstat -atun | grep -q "127.0.0.1:$PORT"
+        return $?
+    fi
+}
+#-------------------------------------------------------------------------------
 tests 13
 #-------------------------------------------------------------------------------
 mkdir svn
 svnadmin create svn/foo
 URL=file://$PWD/svn/foo
 PORT=8080
-while nc -z localhost $PORT; do
+while port_is_busy $PORT; do
     ((++PORT))
 done
 cat >rose.conf <<__ROSE_CONF__
@@ -50,10 +62,10 @@ TEST_KEY=$TEST_KEY_BASE-rosa-ws
 $ROSE_HOME/sbin/rosa ws 0</dev/null 1>rosa-ws.out 2>rosa-ws.err &
 ROSA_WS_PID=$!
 T_INIT=$(date +%s)
-while ! nc -z localhost $PORT && (($(date +%s) < T_INIT + 60)); do
+while ! port_is_busy $PORT && (($(date +%s) < T_INIT + 60)); do
     sleep 1
 done
-if nc -z localhost $PORT; then
+if port_is_busy $PORT; then
     pass "$TEST_KEY"
 else
     fail "$TEST_KEY"
@@ -62,16 +74,16 @@ else
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-root
-run_pass "$TEST_KEY" curl -I http://localhost:$PORT/
+run_pass "$TEST_KEY" curl -I http://$HOSTNAME:$PORT/
 file_grep "$TEST_KEY.out" 'HTTP/.* 200 OK' "$TEST_KEY.out"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo
-run_pass "$TEST_KEY" curl -I http://localhost:$PORT/foo/
+run_pass "$TEST_KEY" curl -I http://$HOSTNAME:$PORT/foo/
 file_grep "$TEST_KEY.out" 'HTTP/.* 200 OK' "$TEST_KEY.out"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo-get_query_operators
 run_pass "$TEST_KEY" \
-    curl http://localhost:$PORT/foo/get_query_operators?format=json
+    curl http://$HOSTNAME:$PORT/foo/get_query_operators?format=json
 run_pass "$TEST_KEY.out" python - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 d = sorted(json.load(open(sys.argv[1])))
@@ -81,7 +93,7 @@ __PYTHON__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo-get_known_keys
 run_pass "$TEST_KEY" \
-    curl http://localhost:$PORT/foo/get_known_keys?format=json
+    curl http://$HOSTNAME:$PORT/foo/get_known_keys?format=json
 run_pass "$TEST_KEY.out" python - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 d = sorted(json.load(open(sys.argv[1])))
@@ -91,12 +103,12 @@ __PYTHON__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo-empty-search
 run_pass "$TEST_KEY" \
-    curl "http://localhost:$PORT/foo/search?s=fish+and+chips&format=json"
+    curl "http://$HOSTNAME:$PORT/foo/search?s=fish+and+chips&format=json"
 echo -n '[]' >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo-empty-query
-Q="http://localhost:$PORT/foo/query"
+Q="http://$HOSTNAME:$PORT/foo/query"
 run_pass "$TEST_KEY" \
     curl "$Q?q=project+eq+food+and+title+contains+fish+and+chips&format=json"
 echo -n '[]' >"$TEST_KEY.out.1"
