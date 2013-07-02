@@ -36,7 +36,7 @@ if [[ $TEST_KEY_BASE == *conf ]]; then
         exit 0
     fi
 else
-    export ROSE_CONF_IGNORE=true
+    export ROSE_CONF_PATH=
 fi
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')

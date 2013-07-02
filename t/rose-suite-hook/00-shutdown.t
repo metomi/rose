@@ -20,7 +20,7 @@
 # Test "rose suite-hook --shutdown", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-export ROSE_CONF_IGNORE=true
+export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
 tests 3

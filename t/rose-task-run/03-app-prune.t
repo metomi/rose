@@ -33,7 +33,7 @@ else
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
-export ROSE_CONF_IGNORE=true
+export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)

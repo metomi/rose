@@ -119,7 +119,6 @@ class PrefixRoot(object):
         if format == "json":
             return simplejson.dumps(self.dao.get_optional_keys())
 
-    @cherrypy.expose
     def _render(self, all_revs=False, data=None, filters=None, s=None):
         if data:
             for item in data:
