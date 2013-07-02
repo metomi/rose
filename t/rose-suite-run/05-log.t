@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-run", with and without site/user configurations.
+# Test --*-log-* options of "rose suite-run".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
