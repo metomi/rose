@@ -108,7 +108,7 @@ def svnlook(*args):
     (out, err) = p.communicate()
     rc = p.wait()
     if rc:
-        sys.exit("[FAIL] %s # rc=%d" % (" ".join(["svnlook"] + list(args)), rc))
+        sys.exit("[FAIL] %s # return code=%d" % (" ".join(["svnlook"] + list(args)), rc))
     return out
 
 
