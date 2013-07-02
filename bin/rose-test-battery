@@ -27,7 +27,7 @@
 #     Run the Rose test battery.
 #
 #     Change to $ROSE_HOME/t and run the "prove" command. If no argument is
-#     specified, run "prove -j 6 -r -s".
+#     specified, run "prove -j 9 -r -s".
 #
 # SEE ALSO
 #     prove(1)
