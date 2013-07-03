@@ -112,7 +112,7 @@ setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q -D '[!env]'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ $FOO
 $BAZ
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------

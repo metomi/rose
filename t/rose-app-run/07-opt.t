@@ -88,7 +88,7 @@ foo
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ setup
 run_fail "$TEST_KEY" rose app-run --config=../config --opt-conf-key=$OPT_3 -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ foolish fool
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ foolish fool
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ foolish fool
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -172,7 +172,7 @@ foolish fool
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 rm -r ../config2
 teardown
