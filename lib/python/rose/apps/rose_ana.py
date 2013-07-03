@@ -156,8 +156,9 @@ class Analyse(object):
 
                 # Extract data from results and from kgoX
                 task = self.do_extract(task, "result")
-                for i in range(1, task.numkgofiles + 1):
-                    var = "kgo" + str(i)
+
+                for i in range(task.numkgofiles):
+                    var = "kgo" + str(i + 1)
                     task = self.do_extract(task, var)
 
                 task = self.do_comparison(task)
@@ -296,6 +297,7 @@ class Analyse(object):
 
             # Allow for multiple KGO, e.g. kgo1file, kgo2file, for
             # statistical comparisons of results
+            newtask.numkgofiles = 0
             for i in range(1, MAX_KGO_FILES):
                 kgovar = "kgo" + str(i)
                 kgofilevar = kgovar + "file"
