@@ -28,45 +28,27 @@ class Mandatory(object):
         """Perform an exact comparison between the result and the KGO data"""
         failures = 0
         if len(task.resultdata) == 0:
-            task.set_failure(MandatoryStringFailure(task))
+            task.set_failure(MandatoryStringResult(task, FAIL))
         else:
-            task.set_pass(MandatoryStringSuccess(task))
+            task.set_pass(MandatoryStringResult(task, PASS))
         return task
 
 
-class MandatoryStringFailure(object):
+class MandatoryStringResult(object):
 
-    """Class used if file does not contain specified text."""
+    """Result of mandatory text examination."""
 
-    def __init__(self, task):
+    def __init__(self, task, status):
         self.resultfile = task.resultfile
         self.extract = task.extract
+        self.status = status
         if hasattr(task, "subextract"):
             self.subextract = task.subextract
         else:
             self.subextract = "unknown"
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, self.resultfile, FAIL, 
-                                 self.subextract)
-
-    __str__ = __repr__
-
-
-class MandatoryStringSuccess(object):
-
-    """Class used if file contains specified text."""
-
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.extract = task.extract
-        if hasattr(task, "subextract"):
-            self.subextract = task.subextract
-        else:
-            self.subextract = "unknown"
-
-    def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, self.resultfile, PASS, 
+        return OUTPUT_STRING % ( self.extract, self.resultfile, self.status, 
                                  self.subextract)
 
     __str__ = __repr__

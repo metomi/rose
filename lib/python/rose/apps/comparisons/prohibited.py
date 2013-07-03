@@ -28,45 +28,27 @@ class Prohibited(object):
         """Perform an exact comparison between the result and the KGO data"""
         failures = 0
         if len(task.resultdata) == 0:
-            task.set_pass(ProhibitedStringSuccess(task))
+            task.set_pass(ProhibitedStringResult(task, PASS))
         else:
-            task.set_failure(ProhibitedStringFailure(task))
+            task.set_failure(ProhibitedStringResult(task, FAIL))
         return task
 
 
-class ProhibitedStringFailure(object):
+class ProhibitedStringResult(object):
 
-    """Class used if file contains specified text."""
+    """Result of prohibited text examination."""
 
-    def __init__(self, task):
+    def __init__(self, task, status):
         self.resultfile = task.resultfile
         self.extract = task.extract
+        self.status = status
         if hasattr(task, "subextract"):
             self.subextract = task.subextract
         else:
             self.subextract = "unknown"
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, self.resultfile, FAIL, 
-                                 self.subextract)
-
-    __str__ = __repr__
-
-
-class ProhibitedStringSuccess(object):
-
-    """Class used if file does not contain specified text."""
-
-    def __init__(self, task):
-        self.resultfile = task.resultfile
-        self.extract = task.extract
-        if hasattr(task, "subextract"):
-            self.subextract = task.subextract
-        else:
-            self.subextract = "unknown"
-
-    def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, self.resultfile, PASS, 
+        return OUTPUT_STRING % ( self.extract, self.resultfile, self.status, 
                                  self.subextract)
 
     __str__ = __repr__

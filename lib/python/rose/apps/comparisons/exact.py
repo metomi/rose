@@ -32,7 +32,7 @@ class Exact(object):
         if len(task.resultdata) != len(task.kgo1data):
             raise DataLengthError(task)
         location = 0
-        if len(task.resultdata) == 0:
+        if not task.resultdata:
             task.set_pass(ExactComparisonSuccess(task))
             return task
         for val1, val2 in zip(task.resultdata, task.kgo1data):
