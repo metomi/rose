@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-run", with and without site/user configurations.
+# Test "rose suite-clean", normal mode.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-N_TESTS=7
+N_TESTS=3
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
@@ -30,62 +30,43 @@ if [[ -n $JOB_HOST ]]; then
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
-if [[ $TEST_KEY_BASE == *conf ]]; then
-    if ! rose config -q 'rose-suite-run' 'hosts'; then
-        skip $N_TESTS '[rose-suite-run]hosts not defined'
-        exit 0
-    fi
-else
-    export ROSE_CONF_PATH=
-fi
+export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-OPTION=-i
-if [[ $TEST_KEY_BASE == *local* ]]; then
-    OPTION=-l
-fi
+# Install suite, and prove that directories are created
 if [[ -n $JOB_HOST ]]; then
-    run_pass "$TEST_KEY" rose suite-run --debug \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE $OPTION --name=$NAME --no-gcontrol \
-        -S "HOST=\"$JOB_HOST\""
+    rose suite-run --debug \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol \
+        -S "HOST=\"$JOB_HOST\"" 1>/dev/null
+    ls -ld $HOME/cylc-run/$NAME 1>/dev/null
+    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
 else
-    run_pass "$TEST_KEY" rose suite-run --debug \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE $OPTION --name=$NAME --no-gcontrol
+    rose suite-run --debug \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol 1>/dev/null
+    ls -ld $HOME/cylc-run/$NAME 1>/dev/null
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-port-file
-run_fail "$TEST_KEY" test -e $HOME/.cylc/ports/$NAME
-#-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-items
-run_pass "$TEST_KEY" ls $SUITE_RUN_DIR/{app,etc}
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-$SUITE_RUN_DIR/app:
-my_task_1
-
-$SUITE_RUN_DIR/etc:
-junk
-__OUT__
-#-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-items-$JOB_HOST
-if [[ $TEST_KEY_BASE == *local* ]]; then
-    skip 2 "$TEST_KEY: local-install-only"
-elif [[ -n $JOB_HOST ]]; then
-    run_pass "$TEST_KEY" \
-        ssh -oBatchMode=yes $JOB_HOST ls cylc-run/$NAME/{app,etc}
-    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-cylc-run/$NAME/app:
-my_task_1
-
-cylc-run/$NAME/etc:
-junk
-__OUT__
-else
-    skip 2 "$TEST_KEY_BASE-items: [t]job-host not defined"
+TEST_KEY=$TEST_KEY_BASE-ans-empty
+run_fail "$TEST_KEY" rose suite-clean $NAME <<<''
+ls -ld $HOME/cylc-run/$NAME 1>/dev/null
+if [[ -n $JOB_HOST ]]; then
+    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-clean
-run_pass "$TEST_KEY" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+TEST_KEY=$TEST_KEY_BASE-ans-n
+run_fail "$TEST_KEY" rose suite-clean $NAME <<<'n'
+ls -ld $HOME/cylc-run/$NAME 1>/dev/null
+if [[ -n $JOB_HOST ]]; then
+    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
+fi
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-ans-y
+run_pass "$TEST_KEY" rose suite-clean $NAME <<<'y'
+! ls -ld $HOME/cylc-run/$NAME 2>/dev/null
+if [[ -n $JOB_HOST ]]; then
+    ssh $JOB_HOST "! ls -ld cylc-run/$NAME 2>/dev/null"
+fi
+#-------------------------------------------------------------------------------
 exit 0
