@@ -41,7 +41,7 @@ if [[ -n $JOB_HOST ]]; then
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol \
         -S "HOST=\"$JOB_HOST\"" 1>/dev/null
     ls -ld $HOME/cylc-run/$NAME 1>/dev/null
-    ssh $HOST ls -ld cylc-run/$NAME 1>/dev/null
+    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
 else
     rose suite-run --debug \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol 1>/dev/null
@@ -52,21 +52,21 @@ TEST_KEY=$TEST_KEY_BASE-ans-empty
 run_fail "$TEST_KEY" rose suite-clean $NAME <<<''
 ls -ld $HOME/cylc-run/$NAME 1>/dev/null
 if [[ -n $JOB_HOST ]]; then
-    ssh $HOST ls -ld cylc-run/$NAME 1>/dev/null
+    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ans-n
 run_fail "$TEST_KEY" rose suite-clean $NAME <<<'n'
 ls -ld $HOME/cylc-run/$NAME 1>/dev/null
 if [[ -n $JOB_HOST ]]; then
-    ssh $HOST ls -ld cylc-run/$NAME 1>/dev/null
+    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ans-y
 run_pass "$TEST_KEY" rose suite-clean $NAME <<<'y'
 ! ls -ld $HOME/cylc-run/$NAME 2>/dev/null
 if [[ -n $JOB_HOST ]]; then
-    ssh $HOST "! ls -ld cylc-run/$NAME 2>/dev/null"
+    ssh $JOB_HOST "! ls -ld cylc-run/$NAME 2>/dev/null"
 fi
 #-------------------------------------------------------------------------------
 exit 0
