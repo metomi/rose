@@ -45,7 +45,7 @@ class RosePopenError(Exception):
         tail = ""
         if self.stderr:
             tail = ", stderr=\n%s" % self.stderr
-        return "%s # rc=%d%s" % (cmd_str, self.rc, tail)
+        return "%s # return-code=%d%s" % (cmd_str, self.rc, tail)
 
 
 class RosePopenEvent(Event):
