@@ -43,9 +43,11 @@
 #         --update '*'".
 #     --name=SUITE-NAME, -n SUITE-NAME
 #         Specify the suite name, instead of using basename of $PWD.
-#     --tidy-remote
+#     --prune-remote
 #         If specified, remove job logs from remote hosts after pulling them to
 #         suite host.
+#     --tidy-remote
+#         Deprecated. Use --prune-remote instead.
 #     --timeout=DELAY
 #         Specify a timeout. Normally, a lock is put in place to prevent
 #         other instances of "rose suite-hook" or "rose suite-log --update"

@@ -122,9 +122,18 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
 
-    def get_cycle_items_globs(self, cycle):
-        """Return a list of globs to match items created for a given cycle."""
-        return ["share/data/" + cycle, "work/*." + cycle]
+    def get_cycle_items_globs(self, name, cycle):
+        """Return a glob to match named items created for a given cycle.
+
+        E.g.:
+        suite_engine_proc.get_cycle_items_globs("datac", "2013010100")
+        # return "share/data/2013010100"
+
+        Return None if named item not supported.
+
+        """
+        d = {"datac": "share/data/" + cycle, "work": "work/*." + cycle}
+        return d.get(name)
 
     def get_cycle_log_archive_name(self, cycle_time):
         """Return the jobs log archive file name of a given cycle."""
@@ -443,7 +452,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 cycle = self._parse_task_cycle_id(item)[0]
                 if cycle:
                     cycles.append(cycle)
-        self.job_logs_pull_remote(suite_name, cycles, tidy_remote_mode=True)
+        self.job_logs_pull_remote(suite_name, cycles, prune_remote_mode=True)
         log_dir_rel = self.get_suite_dir_rel(suite_name, "log")
         log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
         cwd = os.getcwd()
@@ -463,7 +472,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 tar.close()
                 self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
                                                   archive_file_name))
-                for name in names:
+                for name in sorted(names):
                     self.fs_util.delete(name)
         finally:
             try:
@@ -471,12 +480,12 @@ class CylcProcessor(SuiteEngineProcessor):
             except OSError:
                 pass
 
-    def job_logs_pull_remote(self, suite_name, items, tidy_remote_mode=False):
+    def job_logs_pull_remote(self, suite_name, items, prune_remote_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
         items -- A list of relevant items.
-        tidy_remote_mode -- Remove remote job logs after pulling them.
+        prune_remote_mode -- Remove remote job logs after pulling them.
 
         """
         # Create a file with a uuid name, so system knows to do nothing on
@@ -530,7 +539,7 @@ class CylcProcessor(SuiteEngineProcessor):
                         self.popen(*cmd)
                     except RosePopenError as e:
                         self.handle_event(e, level=Reporter.WARN)
-                    if not tidy_remote_mode:
+                    if not prune_remote_mode:
                         continue
                     try:
                         cmd = self.popen.get_cmd(

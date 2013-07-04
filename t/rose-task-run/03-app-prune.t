@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 9
+tests 10
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -z $JOB_HOST ]]; then
@@ -63,33 +63,60 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-prune-log
+sed '/^\[INFO\] \(create\|delete\|update\)/!d;
+     /[0-9a-h]\{8\}\(-[0-9a-h]\{4\}\)\{3\}-[0-9a-h]\{12\}$/d' \
+    $SUITE_RUN_DIR/prune.log >edited-prune.log
+if [[ -n $JOB_HOST ]]; then
+    sed "s/\\\$JOB_HOST/$JOB_HOST/g" \
+        $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
+else
+    sed '/\$JOB_HOST/d' $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
+fi
+file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
+#-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ls
 run_pass "$TEST_KEY" \
     ls $SUITE_RUN_DIR/log/job-*.tar.gz $SUITE_RUN_DIR/{log/job,share/data,work}
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 $SUITE_RUN_DIR/log/job-2013010100.tar.gz
 $SUITE_RUN_DIR/log/job-2013010112.tar.gz
+$SUITE_RUN_DIR/log/job-2013010200.tar.gz
 
 $SUITE_RUN_DIR/log/job:
-my_task_1.2013010200.1
-my_task_1.2013010200.1.err
-my_task_1.2013010200.1.out
-my_task_1.2013010200.1.status
-my_task_2.2013010200.1
-my_task_2.2013010200.1.err
-my_task_2.2013010200.1.out
-my_task_2.2013010200.1.status
-rose_prune.2013010200.1
-rose_prune.2013010200.1.err
-rose_prune.2013010200.1.out
-rose_prune.2013010200.1.status
+my_task_1.2013010212.1
+my_task_1.2013010212.1.err
+my_task_1.2013010212.1.out
+my_task_1.2013010212.1.status
+my_task_1.2013010300.1
+my_task_1.2013010300.1.err
+my_task_1.2013010300.1.out
+my_task_1.2013010300.1.status
+my_task_2.2013010212.1
+my_task_2.2013010212.1.err
+my_task_2.2013010212.1.out
+my_task_2.2013010212.1.status
+my_task_2.2013010300.1
+my_task_2.2013010300.1.err
+my_task_2.2013010300.1.out
+my_task_2.2013010300.1.status
+rose_prune.2013010212.1
+rose_prune.2013010212.1.err
+rose_prune.2013010212.1.out
+rose_prune.2013010212.1.status
+rose_prune.2013010300.1
+rose_prune.2013010300.1.err
+rose_prune.2013010300.1.out
+rose_prune.2013010300.1.status
 
 $SUITE_RUN_DIR/share/data:
 2013010200
+2013010212
+2013010300
 
 $SUITE_RUN_DIR/work:
-my_task_1.2013010200
-rose_prune.2013010200
+my_task_1.2013010300
+rose_prune.2013010300
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -99,16 +126,18 @@ if [[ -n $JOB_HOST ]]; then
         ls cylc-run/$NAME/{log/job,share/data,work}
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 cylc-run/$NAME/log/job:
-my_task_2.2013010200.1
-my_task_2.2013010200.1.err
-my_task_2.2013010200.1.out
-my_task_2.2013010200.1.status
+my_task_2.2013010300.1
+my_task_2.2013010300.1.err
+my_task_2.2013010300.1.out
+my_task_2.2013010300.1.status
 
 cylc-run/$NAME/share/data:
 2013010200
+2013010212
+2013010300
 
 cylc-run/$NAME/work:
-my_task_2.2013010200
+my_task_2.2013010300
 __OUT__
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 fi
