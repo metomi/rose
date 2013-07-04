@@ -376,7 +376,7 @@ class RosieVCClient(object):
         elif prefix is None:
             prefix = SuiteId.get_prefix_default()
         owner = res_loc.get_conf().get_value(
-                ["rosie-id", "prefix-user." + prefix],
+                ["rosie-id", "prefix-owner-default." + prefix],
                 pwd.getpwuid(os.getuid())[0])
         info_config.set(["owner"], owner)
         if from_project:
