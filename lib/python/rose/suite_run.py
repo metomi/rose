@@ -48,7 +48,8 @@ class AlreadyRunningError(Exception):
     """An exception raised when a suite is already running."""
 
     def __str__(self):
-        return "%s: is already running on %s" % self.args
+        name, reason = self.args
+        return "%s: is already running (detected %s)" % (name, reason)
 
 
 class NotRunningError(Exception):
@@ -205,11 +206,10 @@ class SuiteRunner(Runner):
             if not suite_run_hosts:
                 raise NotRunningError(suite_name)
             hosts = suite_run_hosts
-        elif self.suite_engine_proc.is_suite_running(suite_name, hosts):
-            suite_run_hosts = self.suite_engine_proc.ping(suite_name,
-                                                          hosts)
-            raise AlreadyRunningError(suite_name,
-                                      suite_run_hosts[0])
+        else:
+            reason = self.suite_engine_proc.is_suite_running(suite_name, hosts)
+            if reason:
+                raise AlreadyRunningError(suite_name, reason)
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
