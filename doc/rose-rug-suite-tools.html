@@ -339,41 +339,55 @@ rose task-run -D '[env]!BAZ='
     automatically if a task has a name that starts with
     <code>rose_prune*</code>.</p>
 
-    <p>The application is normally configured via a Rose application
-    configuration. The following settings are accepted in
-    <var>rose-app.conf</var>:</p>
+    <p>The application is normally configured in the <kbd>[prune]</kbd> in a
+    <var>rose-app.conf</var>.</p>
+    
+    <p>All settings are expressed as a space delimited list of cycles, normally
+    as date/time offsets relative to the current cycle, in a format recognised
+    by the <code>--offset=OFFSET</code> option of <code>rose date</code>. E.g.
+    <kbd>-1d6h</kbd> is 1 day and 6 hours before the current cycle time.</p>
+
+    <p>The cycles of some settings also accept an optional argument followed by
+    a colon. In these, the argument should be globs for matching items in the
+    directory. If two or more globs are required, they should be separated by a
+    space. In which case, either the argument should be quoted or the space
+    should be escaped by a backslash.</p>
+        
+    <p>The following settings are accepted:</p>
 
     <dl>
-      <dt><kbd>[prune]cycles</kbd></dt>
+      <dt><kbd>prune-remote-logs-at=cycle ...</kbd></dt>
 
-      <dd>A space delimited list of cycles, normally expressed as date/time
-      offsets relative to the current cycle, in a format recognised by the
-      <code>--offset=OFFSET</code> option of <code>rose date</code>. E.g.
-      <kbd>-6h</kbd> is 6 hours before the current cycle time. In a cylc suite,
-      for a given cycle <var>$C</var> in the list, the application will:
+      <dd>Re-sync remote job logs at these cycles and remove them from remote
+      hosts.</dd>
 
-        <ul>
-          <li>Run the equivalent of <code>rose suite-log --archive $C</code> to
-          archive the job log files of cycle <var>$C</var>.</li>
+      <dt><kbd>archive-logs-at=cycle ...</kbd></dt>
 
-          <li>Remove <var>$ROSE_SUITE_DIR/share/data/$C</var> and
-          <var>$ROSE_SUITE_DIR/work/*.$C</var> from all task hosts.</li>
-        </ul>
-     </dd>
+      <dd>Archive all job logs at these cycles. Remove remote job logs on
+      success.</dd>
 
-      <dt><kbd>[prune]globs</kbd></dt>
+      <dt><kbd>prune-work-at=cycle[:globs] ...</kbd></dt>
 
-      <dd>A space delimited list of glob patterns for matching files and
-      directories relative to <var>$ROSE_SUITE_DIR</var>. Files and directories
-      matching these patterns will be removed from all task hosts.</dd>
+      <dd>Remove the work directories of the specified cycles. If globs are
+      specified for a cycle, only items matching the globs in the work
+      directories of the specified cycle will be pruned.</dd>
+
+      <dt><kbd>prune-datac-at=cycle[:globs] ...</kbd></dt>
+
+      <dd>Remove the <var>ROSE_DATAC</var> of the specified cycles. If globs are
+      specified for a cycle, only items matching the globs in the
+      <var>ROSE_DATAC</var> directories of the specified cycle will be
+      pruned.</dd>
     </dl>
 
     <p>E.g.:</p>
 
     <pre class="prettyprint lang-rose_conf">
 [prune]
-cycles=-6h -12h
-globs=etc/this* etc/that/*
+prune-remote-logs-at=-6h
+archive-remote-logs-at=-1d
+prune-work-at=-12h
+prune-datac-at=-6h:foo* -12h:'bar* *.baz*' -1d
 </pre>
 
     <h2 id="rose-task-env">rose task-env</h2>
