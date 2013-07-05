@@ -54,8 +54,9 @@ class RoseDateShifter(object):
              "s": "seconds"}
 
 
-    REC_OFFSET = re.compile(
-            r"""(?P<sign>[\+\-])?(?P<num>\d+)(?P<unit>[wdhms])""", re.I)
+    REC_OFFSET = re.compile(r"""\A[\+\-]?(?:\d+[wdhms])+\Z""", re.I)
+
+    REC_OFFSET_FIND = re.compile(r"""(?P<num>\d+)(?P<unit>[wdhms])""")
 
     TASK_CYCLE_TIME_MODE_ENV = "ROSE_TASK_CYCLE_TIME"
 
@@ -95,7 +96,7 @@ class RoseDateShifter(object):
                     Otherwise, use current time.
 
         offset -- If specified, it should be a string containing the offset
-                  that has the repeatable format "[+/-]nU" where "n" is an
+                  that has the format "[+/-]nU[nU...]" where "n" is an
                   integer, and U is a unit matching a key in self.UNITS.
 
         """
@@ -105,20 +106,25 @@ class RoseDateShifter(object):
         if not ref_time or ref_time == "now":
             d, parse_format = (datetime.now(), self.parse_formats[0])
         else:
-            while self.parse_formats:
-                parse_format = self.parse_formats.pop(0)
+            parse_formats = list(self.parse_formats)
+            while parse_formats:
+                parse_format = parse_formats.pop(0)
                 try:
                     d = datetime.strptime(ref_time, parse_format)
                     break
                 except ValueError as e:
-                    if not self.parse_formats:
+                    if not parse_formats:
                         raise e
 
         # Offset
         if offset:
             if not self.is_offset(offset):
                 raise OffsetValueError(offset)
-            for sign, num, unit in self.REC_OFFSET.findall(offset.lower()):
+            sign = "+"
+            if offset.startswith("-") or offset.startswith("+"):
+                sign = offset[0]
+                offset = offset[1:]
+            for num, unit in self.REC_OFFSET_FIND.findall(offset.lower()):
                 num = int(num)
                 if sign == "-":
                     num = -num
@@ -139,7 +145,7 @@ class RoseDateShifter(object):
 
     def is_offset(self, offset):
         """Return True if the string offset can be parsed as an offset."""
-        return (self.REC_OFFSET.match(offset.lower()) is not None)
+        return (self.REC_OFFSET.match(offset) is not None)
 
 
 def main():
@@ -152,15 +158,16 @@ def main():
     ref_time = None
     if args:
         ref_time = args[0]
-    offset = None
-    if opts.offsets:
-        offset = "".join(opts.offsets)
     try:
         ds = RoseDateShifter(opts.parse_format, opts.print_format,
                              opts.task_cycle_time_mode)
         if opts.task_cycle_time_mode and ds.task_cycle_time is None:
             raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
-        print ds(ref_time, offset)
+        ref_time = ds(ref_time)
+        if opts.offsets:
+            for offset in opts.offsets:
+                ref_time = ds(ref_time, offset)
+        print ref_time
     except Exception as e:
         if opts.debug_mode:
             import traceback

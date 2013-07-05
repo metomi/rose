@@ -244,8 +244,16 @@ class SuiteEngineProcessor(object):
         """Remove items created by the previous run of a suite."""
         raise NotImplementedError()
 
-    def get_cycle_items_globs(self, cycle):
-        """Return a list of globs to match items created for a given cycle."""
+    def get_cycle_items_globs(self, name, cycle):
+        """Return a glob to match named items created for a given cycle.
+
+        E.g.:
+        suite_engine_proc.get_cycle_items_globs("datac", "2013010100")
+        # return "share/data/2013010100"
+
+        Return None if named item not supported.
+
+        """
         raise NotImplementedError()
 
     def get_cycle_log_archive_name(self, cycle):
@@ -462,12 +470,12 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def job_logs_pull_remote(self, suite_name, items=None,
-                             tidy_remote_mode=False):
+                             prune_remote_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
         items -- A list of relevant items.
-        tidy_remote_mode -- Remove remote job logs after pulling them.
+        prune_remote_mode -- Remove remote job logs after pulling them.
 
         """
         raise NotImplementedError()

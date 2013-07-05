@@ -45,7 +45,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Parse a Cylc date time with some negative offsets.
 TEST_KEY=$TEST_KEY_BASE-offsets-neg
-run_pass "$TEST_KEY" rose date -s -6h -s -12h -s -12d "2013010618"
+run_pass "$TEST_KEY" rose date -s -6h -s -12d12h "2013010618"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 2012122500
 __OUT__

@@ -356,6 +356,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "metavar": "PROPERTY",
                         "help": "Specify a property."}],
+               "prune_remote_mode": [
+                       ["--tidy-remote"],
+                       {"action": "store_true",
+                        "dest": "prune_remote_mode",
+                        "help": "Remove remote job logs after retrieval."}],
                "query": [
                        ["--query", "-Q"],
                        {"action": "store_true",
@@ -447,11 +452,6 @@ class RoseOptionParser(OptionParser):
                         "dest": "thresholds",
                         "metavar": "METHOD:METHOD-ARG:NUMBER",
                         "help": "Specify one or more threshold."}],
-               "tidy_remote_mode": [
-                       ["--tidy-remote"],
-                       {"action": "store_true",
-                        "dest": "tidy_remote_mode",
-                        "help": "Remove remote job logs after retrieval."}],
                "timeout": [
                        ["--timeout"],
                        {"metavar": "DELAY",

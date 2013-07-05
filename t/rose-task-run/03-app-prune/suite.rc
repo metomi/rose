@@ -3,10 +3,10 @@
     UTC mode = True
     [[event hooks]]
         timeout handler = "rose suite-hook --shutdown"
-        timeout = 2
+        timeout = 1
 [scheduling]
     initial cycle time = 2013010100
-    final cycle time   = 2013010200
+    final cycle time   = 2013010300
     [[special tasks]]
         cold-start = cold
     [[dependencies]]
@@ -33,7 +33,7 @@ cold | WARM[T-12]:finish-all => rose_prune
     [[cold]]
         command scripting = "true"
     [[WARM]]
-    [[my_task_1, rose_prune]]
+    [[my_task_1]]
         inherit = WARM
 {% if HOST is defined %}
     [[my_task_2]]
@@ -41,3 +41,8 @@ cold | WARM[T-12]:finish-all => rose_prune
         [[[remote]]]
             host = {{HOST}}
 {% endif %}
+    [[rose_prune]]
+        inherit = WARM
+        command scripting = """
+rose task-run --debug | tee -a $CYLC_SUITE_RUN_DIR/prune.log
+"""

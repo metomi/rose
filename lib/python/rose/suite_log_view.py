@@ -113,7 +113,7 @@ class SuiteLogViewGenerator(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def generate(self, suite_name, items, tidy_remote_mode=False,
+    def generate(self, suite_name, items, prune_remote_mode=False,
                  archive_mode=False, force_lib_mode=False,
                  lock_exit_mode=False, lock_timeout=None):
         """Update the files for generating the log view of a suite.
@@ -121,7 +121,7 @@ class SuiteLogViewGenerator(object):
         suite_name -- The name of the suite.
         items -- A list of relevant cycle times or task IDs. A "*" in the list
                  indicates that all items are relevant.
-        tidy_remote_mode -- If True, clear relevant job logs from remote
+        prune_remote_mode -- If True, clear relevant job logs from remote
                             hosts after they are retrieved.
         archive_mode -- If True, archive relevant job logs. All "items" must be
                         cycle times.
@@ -155,11 +155,11 @@ class SuiteLogViewGenerator(object):
                     break
             while os.path.isdir(lock):
                 try:
-                    self._generate(suite_name, items, tidy_remote_mode,
+                    self._generate(suite_name, items, prune_remote_mode,
                                    archive_mode, force_lib_mode)
                 finally:
                     items = []
-                    tidy_remote_mode = False
+                    prune_remote_mode = False
                     archive_mode = False
                     force_lib_mode = False
                     try:
@@ -175,7 +175,7 @@ class SuiteLogViewGenerator(object):
 
     __call__ = generate
 
-    def _generate(self, suite_name, items, tidy_remote_mode, archive_mode,
+    def _generate(self, suite_name, items, prune_remote_mode, archive_mode,
                   force_lib_mode):
 
         # Copy presentation files into the log directory
@@ -219,7 +219,8 @@ class SuiteLogViewGenerator(object):
             while items:
                 for item in items:
                     self.fs_util.delete(os.path.join(self.LOCK, item))
-                self.suite_engine_proc.job_logs_pull_remote(suite_name, items)
+                self.suite_engine_proc.job_logs_pull_remote(suite_name, items,
+                                                            prune_remote_mode)
                 new_data = self.suite_engine_proc.get_suite_events(suite_name,
                                                                    items)
                 for cycle, new_datum in new_data.items():
@@ -292,7 +293,7 @@ class SuiteLogViewGenerator(object):
 def main():
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("archive_mode", "force_mode", "name",
-                              "tidy_remote_mode", "timeout", "update_mode",
+                              "prune_remote_mode", "timeout", "update_mode",
                               "view_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
@@ -318,7 +319,7 @@ def suite_log_view(opts, args, event_handler=None):
     if opts.archive_mode:
         opts.update_mode = True
     if opts.update_mode:
-        g.generate(suite_name, args, opts.tidy_remote_mode, opts.archive_mode,
+        g.generate(suite_name, args, opts.prune_remote_mode, opts.archive_mode,
                    force_lib_mode=opts.force_mode, lock_timeout=opts.timeout)
     if opts.view_mode or not opts.update_mode:
         g.view_suite_log_url(suite_name)
