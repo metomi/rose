@@ -408,32 +408,37 @@ class CylcProcessor(SuiteEngineProcessor):
             return self.event_handler(*args, **kwargs)
 
     def is_suite_running(self, suite_name, hosts=None):
-        """Return True if it looks like suite is running on one of hosts."""
+        """Return the port file path if it looks like suite is running.
+
+        If port file exists, return "PORT-FILE-PATH".
+        If port file exists on a host, return "HOSTNAME:PORT-FILE-PATH".
+        Or None otherwise.
+
+        """
         if not hosts:
             hosts = ["localhost"]
-        rel_path = os.path.join(".cylc", "ports", suite_name)
+        port_file = os.path.join("~", ".cylc", "ports", suite_name)
         if "localhost" in hosts:
-            home = os.path.expanduser("~")
-            if os.path.exists(os.path.join(home, rel_path)):
-                return True
+            if os.path.exists(os.path.expanduser(port_file)):
+                return port_file
         host_proc_dict = {}
         for host in sorted(hosts):
             if host == "localhost":
                 continue
-            cmd = self.popen.get_cmd("ssh", host, "test", "-f", rel_path)
+            cmd = self.popen.get_cmd("ssh", host, "test", "-f", port_file)
             host_proc_dict[host] = self.popen.run_bg(*cmd)
-        is_running = False
+        reason = None
         while host_proc_dict:
             for host, proc in host_proc_dict.items():
                 rc = proc.poll()
                 if rc is not None:
                     host_proc_dict.pop(host)
                     if rc == 0:
-                        is_running = True
+                        reason = host + ":" + port_file
             if host_proc_dict:
                 sleep(0.1)
                 
-        return is_running
+        return reason
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.

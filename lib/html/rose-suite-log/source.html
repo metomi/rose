@@ -147,29 +147,34 @@ $(function() {
             $("#loading").hide();
         }
     };
-    var suite = get_opt("suite");
     var path = get_opt("path");
     var text_mode = get_opt("text_mode");
     $("#view-raw").attr("href", path);
-    var href = location.pathname + "?suite=" + suite + "&path=" + path
+    var href = location.pathname + "?path=" + path
     if (text_mode) {
         $("#view-mode").attr("href", href).text("HTML mode");
     }
     else {
         $("#view-mode").attr("href", href + "&text_mode=1").text("text mode");
     }
-    var title = path.substring(path.lastIndexOf("/") + 1);
-    title = title.replace(/-\d+\.\d+\.?/, " ") + " - " + suite;
-    document.title = title;
-    $("#heading").text(title);
+    $.ajax({
+        "url": "rose-suite-log.json",
+        "cache": false,
+        "dataType": "json",
+        "success": function(data) {
+            var title = path.substring(path.lastIndexOf("/") + 1);
+            title = title.replace(/-\d+\.\d+\.?/, " ") + " - " + data["suite"];
+            document.title = title;
+            $("#heading").text(title);
+        },
+        "error": function() {alert(path + ": could not load data");}
+    });
     $("#loading").text(ST_FILE_LOADING);
     $.ajax({
-        url : path,
-        dataType: "text",
-        error: function(request, errortype, exception) {
-            alert(errortype + ": could not load \"" + path + "\"");
-        },
-        success: function(data) {
+        "url" : path,
+        "cache": false,
+        "dataType": "text",
+        "success": function(data) {
             if (text_mode) {
                 $("#lines").text(data);
             }
@@ -189,7 +194,8 @@ $(function() {
                 anchor.click(function() {line_numbers_add(data, 0)});
                 anchor.text(ST_LINE_NUMBERS_ADD);
             }
-        }
+        },
+        "error": function() {alert(path + ": could not load data");}
     });
 });
 </script>
