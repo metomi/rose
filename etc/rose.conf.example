@@ -182,6 +182,10 @@
 #  prefix-location.PREFIX=URL
 ## E.g.:
 #  prefix-location.foo=svn://host/foo
+## Default owner when creating a suite in the repository of an ID prefix
+#  prefix-owner-default.PREFIX=USER-ID
+## E.g.:
+#  prefix-owner-default.foo=tinky-winky
 ## Source browser URL of the repository of an ID prefix
 #  prefix-web.PREFIX=URL
 ## E.g.:

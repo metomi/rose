@@ -28,6 +28,7 @@ import rose.external
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
+from rose.resource import ResourceLocator
 from rosie.suite_id import SuiteId, SuiteIdOverflowError
 import shlex
 import shutil
@@ -345,7 +346,7 @@ class RosieVCClient(object):
             self.event_handler(SuiteDeleteEvent(id))
         return id
 
-    def generate_info_config(self, from_id=None):
+    def generate_info_config(self, from_id=None, prefix=None):
         """Generate a rose.config.ConfigNode for a rose-suite.info.
 
         This is suitable for passing into the create method of this
@@ -367,14 +368,16 @@ class RosieVCClient(object):
             if from_config.get(["title"]) is not None:
                 from_title = from_config.get(["title"]).value
 
-        # TODO: use rose.resource?
-        info_config_src = os.path.join(os.getenv("ROSE_HOME"),
-                                       "etc",
-                                       "rosie-create",
-                                       "rose-suite.info")
-        info_config = rose.config.load(info_config_src)
-        # FIXME: Not necessarily true in an externally hosted repository.
-        owner = pwd.getpwuid(os.getuid())[0]
+        res_loc = ResourceLocator.default()
+        info_config = rose.config.load(
+                res_loc.locate("rosie-create/rose-suite.info"))
+        if from_id is not None:
+            prefix = from_id.prefix
+        elif prefix is None:
+            prefix = SuiteId.get_prefix_default()
+        owner = res_loc.get_conf().get_value(
+                ["rosie-id", "prefix-owner-default." + prefix],
+                pwd.getpwuid(os.getuid())[0])
         info_config.set(["owner"], owner)
         if from_project:
             info_config.set(["project"], from_project)
@@ -423,7 +426,7 @@ def create(argv):
             from_id.revision = from_id.REV_HEAD
     if opts.info_file is None:
         try:
-            info_config = client.generate_info_config(from_id)
+            info_config = client.generate_info_config(from_id, opts.prefix)
         except (RosePopenError) as e:
             report(e)
             sys.exit(1)

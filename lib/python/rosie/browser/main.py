@@ -615,7 +615,8 @@ class MainWindow(gtk.Window):
 
     def handle_create(self, from_id=None):
         """Create a new suite."""
-        config = self.suite_director.vc_client.generate_info_config(from_id)
+        config = self.suite_director.vc_client.generate_info_config(
+                from_id, self.search_manager.ws_client.prefix)
         finish_func = functools.partial(self._create_suite_hook,
                                         from_id=from_id)
         return self.suite_director.run_new_suite_wizard(
