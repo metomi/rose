@@ -179,9 +179,9 @@ class SuiteId(object):
     def get_local_copy_root(cls):
         """Return the root directory for hosting the local suite copies."""
         config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", "local-copy-root"], no_ignore=True)
-        if node:
-            local_copy_root = node.value
+        value = config.get_value(["rosie-id", "local-copy-root"])
+        if value:
+            local_copy_root = value
         else:
             local_copy_root = "$HOME/roses"
         local_copy_root = rose.env.env_var_process(local_copy_root)
@@ -202,10 +202,10 @@ class SuiteId(object):
     def get_prefix_default(cls):
         """Return the default prefix."""
         config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", "prefix-default"], no_ignore=True)
-        if node is None:
+        value = config.get_value(["rosie-id", "prefix-default"])
+        if value is None:
             raise SuiteIdPrefixError()
-        return node.value
+        return value
 
     @classmethod
     def get_prefix_location(cls, prefix=None):
@@ -214,10 +214,10 @@ class SuiteId(object):
             prefix = cls.get_prefix_default()
         key = "prefix-location." + prefix
         config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", key], no_ignore=True)
-        if node is None:
+        value = config.get_value(["rosie-id", key])
+        if value is None:
             raise SuiteIdPrefixError(prefix)
-        return node.value.rstrip("/")
+        return value.rstrip("/")
 
     @classmethod
     def get_prefix_locations(cls):
@@ -243,10 +243,10 @@ class SuiteId(object):
             prefix = cls.get_prefix_default()
         key = "prefix-web." + prefix
         config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", key], no_ignore=True)
-        if node is None:
+        value = config.get_value(["rosie-id", key])
+        if value is None:
             raise SuiteIdPrefixError(prefix)
-        return node.value.rstrip("/")
+        return value.rstrip("/")
 
     def __init__(self, id_text=None, location=None, skip_status=False):
         """Initialise either from an id_text or from a location."""
