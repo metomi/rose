@@ -49,8 +49,8 @@ ERR_NO_TARGET_AT_REV = "{0}: target does not exist at this revision"
 ERR_SYNTAX = "Syntax error: {0}"
 ERR_USAGE = "rosie: incorrect usage"
 
-FORMAT_DEFAULT = "%local %suite %owner %project %title"
-FORMAT_QUIET = "%suite"
+PRINT_FORMAT_DEFAULT = "%local %suite %owner %project %title"
+PRINT_FORMAT_QUIET = "%suite"
 
 REC_COL_IN_FORMAT = re.compile("(?:^|[^%])%([\w-]+)")
 REC_ID = re.compile("\A(?:(\w+)-)?(\w+)(?:/([^\@/]+))?(?:@([^\@/]+))?\Z")
@@ -167,7 +167,7 @@ class SuiteInfo(Event):
 def local_suites(argv):
     """CLI command to list all the locally checked out suites"""
     opt_parser = RoseOptionParser().add_my_options(
-            "format", "no_headers", "prefix", "reverse", "sort")
+            "no_headers", "prefix", "print_format", "reverse", "sort")
     opts, args = opt_parser.parse_args(argv)
 
     ws_client = RosieWSClient(prefix=opts.prefix)
@@ -199,8 +199,8 @@ def local_suites(argv):
 def lookup(argv):
     """CLI command to run the various search types"""
     opt_parser = RoseOptionParser().add_my_options(
-            "all_revs", "format", "no_headers", "prefix", "query", "reverse", 
-            "search", "sort", "url")
+            "all_revs", "no_headers", "prefix", "print_format", "query",
+            "reverse", "search", "sort", "url")
     opts, args = opt_parser.parse_args(argv)
     if not args:
         sys.exit(opt_parser.print_usage())
@@ -395,16 +395,16 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         opts.prefix = ws_client.prefix
 
     if opts.quietness:
-        opts.format = FORMAT_QUIET
-    elif not opts.format:
-        opts.format = FORMAT_DEFAULT
+        opts.print_format = PRINT_FORMAT_QUIET
+    elif not opts.print_format:
+        opts.print_format = PRINT_FORMAT_DEFAULT
 
     all_keys = ws_client.get_known_keys()
 
     if local_suites == None:
         local_suites = get_local_suites(opts.prefix)
 
-    check_local = "%local" in opts.format
+    check_local = "%local" in opts.print_format
 
     for dict_row in dict_rows:
         dict_row["suite"] = "%s/%s@%s" % (
@@ -422,7 +422,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         all_keys += ["local"]
 
     more_keys = []
-    for key in REC_COL_IN_FORMAT.findall(opts.format):
+    for key in REC_COL_IN_FORMAT.findall(opts.print_format):
         if key not in all_keys:
             more_keys.append(key)
     all_keys += more_keys
@@ -435,7 +435,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
 
     keylist = []
     for key in all_keys:
-        if "%" + key in opts.format:
+        if "%" + key in opts.print_format:
             keylist.append(key)
 
     if not opts.no_headers:
@@ -447,7 +447,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     dict_rows = align(dict_rows, keylist)
 
     for dict_row in dict_rows:
-        out = opts.format
+        out = opts.print_format
         for key, value in dict_row.items():
             if "%" + key in out:
                 out = out.replace("%" + key, str(value), 1)

@@ -634,7 +634,7 @@
       Multiple offsets can be specified with multiple
       <kbd>--offset=OFFSET</kbd> options.</dd>
 
-      <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>--format=FORMAT</kbd></dt>
+      <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>-p FORMAT</kbd></dt>
 
       <dd>
         Specify a format for parsing <var>DATE-TIME</var>, which should be
@@ -655,7 +655,8 @@
         </ul>
       </dd>
 
-      <dt><kbd>--print-format=FORMAT</kbd></dt>
+      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT</kbd>, <kbd>-f
+      FORMAT</kbd></dt>
 
       <dd>Specify a format for printing the result. Default to the same format
       as the parse format.</dd>
@@ -2349,7 +2350,16 @@ environment scripting = "eval $(rose task-env)"
 
       <dd>Specify whether to search deleted suites and superceded suites.</dd>
 
-      <dt><kbd>--format=FORMAT; -f FORMAT</kbd></dt>
+      <dt><kbd>--no-headers; -H</kbd></dt>
+
+      <dd>Do not print column headers.</dd>
+
+      <dt><kbd>--prefix=PREFIX</kbd></dt>
+
+      <dd>Specify the name of the suite repository to use.</dd>
+
+      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT; -f
+      FORMAT</kbd></dt>
 
       <dd>Control the output format of the results using a string containing
       column names or properties preceded by <kbd>%</kbd>.</dd>
@@ -2361,14 +2371,6 @@ environment scripting = "eval $(rose task-env)"
 abc01 from daisy
 </pre>
       </dd>
-
-      <dt><kbd>--no-headers; -H</kbd></dt>
-
-      <dd>Do not print column headers.</dd>
-
-      <dt><kbd>--prefix=PREFIX</kbd></dt>
-
-      <dd>Specify the name of the suite repository to use.</dd>
 
       <dt><kbd>--query; -Q</kbd></dt>
 
@@ -2428,12 +2430,17 @@ abc01 from daisy
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--no-headers; -H</kbd></dt>
+
+      <dd>Do not print column headers.</dd>
+
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
       <dd>Display locally checked out suites from the specified suite
       repository.</dd>
 
-      <dt><kbd>--format=FORMAT; -f FORMAT</kbd></dt>
+      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT; -f
+      FORMAT</kbd></dt>
 
       <dd>Control the output format of the results using a string containing
       column names or properties preceded by <kbd>%</kbd>.</dd>
@@ -2445,10 +2452,6 @@ abc01 from daisy
 abc01 from daisy
 </pre>
       </dd>
-
-      <dt><kbd>--no-headers; -H</kbd></dt>
-
-      <dd>Do not print column headers.</dd>
 
       <dt><kbd>--quiet; -q</kbd></dt>
 
