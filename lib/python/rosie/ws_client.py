@@ -167,15 +167,15 @@ class SuiteInfo(Event):
 def local_suites(argv):
     """CLI command to list all the locally checked out suites"""
     opt_parser = RoseOptionParser().add_my_options(
-            "format", "no_headers", "prefix", "reverse", "sort")
+            "format", "no_headers", "prefix", "reverse", "sort", "user")
     opts, args = opt_parser.parse_args(argv)
 
     ws_client = RosieWSClient(prefix=opts.prefix)
     if opts.prefix is not None:
-        results, id_list = get_local_suite_details(opts.prefix)
+        results, id_list = get_local_suite_details(opts.prefix, user=opts.user)
         return _display_maps(opts, ws_client, results, local_suites=id_list)
     else:
-        id_list = get_local_suites()
+        id_list = get_local_suites(user=opts.user)
         if len(id_list) > 0:
             prefixes = []
             for id_ in id_list:
@@ -189,7 +189,7 @@ def local_suites(argv):
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
 
-                results, other_id_list = get_local_suite_details(p, id_list)
+                results, other_id_list = get_local_suite_details(p, id_list, user=opts.user)
                 opts.prefix = p
                 _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
@@ -269,10 +269,17 @@ def query_split(args):
     return q
 
 
-def get_local_suites(prefix=None, skip_status=False):
+def get_local_suites(prefix=None, skip_status=False, user=None):
     """Returns a dict of prefixes and id tuples for locally-present suites."""
     local_copies = []
-    local_copy_root = SuiteId.get_local_copy_root()
+    
+    if user:
+        local_copy_root = os.path.expanduser(user) + "/roses"
+    else:
+        local_copy_root = SuiteId.get_local_copy_root()
+    
+    print "local_copy_root:" + local_copy_root
+    
     if not os.path.isdir(local_copy_root):
         return local_copies
     for path in os.listdir(local_copy_root):
@@ -287,7 +294,7 @@ def get_local_suites(prefix=None, skip_status=False):
     return local_copies
 
 
-def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
+def get_local_suite_details(prefix=None, id_list=None, skip_status=False, user=None):
     """returns details of the local suites as if they had been obtained using
        a search or query.
        """
@@ -295,7 +302,7 @@ def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
         return [], []
 
     if id_list == None:
-        id_list = get_local_suites(skip_status=skip_status)
+        id_list = get_local_suites(skip_status=skip_status, user=user)
 
     if not id_list:
         return [], []
