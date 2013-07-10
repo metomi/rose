@@ -61,17 +61,13 @@ class RoseDateShifter(object):
     TASK_CYCLE_TIME_MODE_ENV = "ROSE_TASK_CYCLE_TIME"
 
 
-    def __init__(self, parse_format=None, print_format=None,
-                 task_cycle_time_mode=None):
+    def __init__(self, parse_format=None, task_cycle_time_mode=None):
         """Constructor.
 
         parse_format -- If specified, parse with the specified format.
                         Otherwise, parse with one of the format strings in
                         self.PARSE_FORMATS. The format should be a string
                         compatible to strptime(3).
-
-        print_format -- If specified, return a string as specified in the
-                        format. Otherwise, use the parse_format.
 
         task_cycle_time_mode -- If True, use the value of the environment
                                 variable ROSE_TASK_CYCLE_TIME (if it is
@@ -82,25 +78,33 @@ class RoseDateShifter(object):
         self.parse_formats = self.PARSE_FORMATS
         if parse_format:
             self.parse_formats = [parse_format]
-        self.print_format = print_format
         self.task_cycle_time = None
         if task_cycle_time_mode:
             self.task_cycle_time = os.getenv(self.TASK_CYCLE_TIME_MODE_ENV)
 
-    def date_shift(self, ref_time=None, offset=None):
-        """Return a date string with an offset.
+    def date_format(self, print_format, ref_time=None):
+        """Reformat ref_time according to print_format.
 
         ref_time -- If specified, use as the reference date-time string. If not
                     specified and if self.task_cycle_time_mode is True, use
                     ROSE_TASK_CYCLE_TIME environment variable if it is defined.
                     Otherwise, use current time.
 
-        offset -- If specified, it should be a string containing the offset
-                  that has the format "[+/-]nU[nU...]" where "n" is an
-                  integer, and U is a unit matching a key in self.UNITS.
+        """
+        return self.date_parse(ref_time)[0].strftime(print_format)
+
+    def date_parse(self, ref_time=None):
+        """Parse ref_time.
+
+        Return (t, format) where t is a datetime.datetime object and format is
+        the format that matches ref_time.
+
+        ref_time -- If specified, use as the reference date-time string. If not
+                    specified and if self.task_cycle_time_mode is True, use
+                    ROSE_TASK_CYCLE_TIME environment variable if it is defined.
+                    Otherwise, use current time.
 
         """
-        # Parse
         if not ref_time and self.task_cycle_time is not None:
             ref_time = self.task_cycle_time
         if not ref_time or ref_time == "now":
@@ -115,6 +119,22 @@ class RoseDateShifter(object):
                 except ValueError as e:
                     if not parse_formats:
                         raise e
+        return d, parse_format
+
+    def date_shift(self, ref_time=None, offset=None):
+        """Return a date string with an offset.
+
+        ref_time -- If specified, use as the reference date-time string. If not
+                    specified and if self.task_cycle_time_mode is True, use
+                    ROSE_TASK_CYCLE_TIME environment variable if it is defined.
+                    Otherwise, use current time.
+
+        offset -- If specified, it should be a string containing the offset
+                  that has the format "[+/-]nU[nU...]" where "n" is an
+                  integer, and U is a unit matching a key in self.UNITS.
+
+        """
+        d, parse_format = self.date_parse(ref_time)
 
         # Offset
         if offset:
@@ -132,10 +152,7 @@ class RoseDateShifter(object):
                 d += timedelta(**{key: num})
 
         # Format
-        print_format = self.print_format
-        if print_format is None:
-            print_format = parse_format
-        return d.strftime(print_format)
+        return d.strftime(parse_format)
 
     __call__ = date_shift
 
@@ -159,15 +176,17 @@ def main():
     if args:
         ref_time = args[0]
     try:
-        ds = RoseDateShifter(opts.parse_format, opts.print_format,
-                             opts.task_cycle_time_mode)
+        ds = RoseDateShifter(opts.parse_format, opts.task_cycle_time_mode)
         if opts.task_cycle_time_mode and ds.task_cycle_time is None:
             raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
         ref_time = ds(ref_time)
         if opts.offsets:
             for offset in opts.offsets:
                 ref_time = ds(ref_time, offset)
-        print ref_time
+        if opts.print_format:
+            print ds.date_format(opts.print_format, ref_time)
+        else:
+            print ref_time
     except Exception as e:
         if opts.debug_mode:
             import traceback

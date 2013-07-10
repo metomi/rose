@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 23
+tests 26
 #-------------------------------------------------------------------------------
 # Ensure it can parse its own output.
 TEST_KEY=$TEST_KEY_BASE
@@ -64,6 +64,14 @@ TEST_KEY=$TEST_KEY_BASE-format-iso
 run_pass "$TEST_KEY" rose date --print-format="%Y%m%dT%H%M%S" "2012122515"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 20121225T150000
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format with offset.
+TEST_KEY=$TEST_KEY_BASE-format-and-offset
+run_pass "$TEST_KEY" rose date --offset=-3h --print-format="%Y%m" "2012122515" --debug
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+201212
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
