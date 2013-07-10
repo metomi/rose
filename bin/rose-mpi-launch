@@ -77,10 +77,6 @@
 # ENVIRONMENT VARIABLES
 #     optional ROSE_LAUNCHER
 #         Specify the launcher program.
-#     optional ROSE_LAUNCH_INNER
-#         Only relevant when launching with a command. Specify an inner wrapper
-#         to be run by launcher, can be set to a null string to call the
-#         executable directly. Default is "$0 --inner".
 #     optional ROSE_LAUNCHER_LIST
 #         Override "launcher-list" setting in configuration.
 #     optional ROSE_LAUNCHER_FILEOPTS
@@ -93,10 +89,11 @@
 #         Override "launcher-postopts.LAUNCHER" setting for the selected
 #         LAUNCHER.
 #     optional ROSE_LAUNCHER_ULIMIT_OPTS
-#         Only relevant if $ROSE_LAUNCH_INNER is used. Specify the arguments to
-#         ulimit. Setting this variable to "-a -s unlimited -d unlimited -a"
+#         Only relevant when launching with a command. Tell launcher to run
+#         "rose mpi-launch --inner $@". Specify the arguments to ulimit.
+#         E.g. Setting this variable to "-a -s unlimited -d unlimited -a"
 #         results in "ulimit -a; ulimit -s unlimited; ulimit -d unlimited;
-#         ulimit -a"
+#         ulimit -a".
 #     optional NPROC
 #         Specify the number of processors to run on. Default is 1.
 #
@@ -230,7 +227,8 @@ if [[ -n $ROSE_COMMAND_FILE ]]; then
     eval "exec $ROSE_LAUNCHER $ROSE_LAUNCHER_FILEOPTS $@"
 else
     if [[ -n $ROSE_LAUNCHER_BASE ]]; then
-        if ! printenv ROSE_LAUNCH_INNER 1>/dev/null; then
+        ROSE_LAUNCH_INNER=
+        if [[ -n ${ROSE_LAUNCHER_ULIMIT_OPTS:-} ]]; then
              ROSE_LAUNCH_INNER="${0}$(optv) --inner"
         fi
         # Options
