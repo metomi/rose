@@ -1030,13 +1030,15 @@ type=boolean
       <p><samp>log/</samp>, <samp>log.*/</samp> sub-directories:</p>
 
       <ul class="incremental">
-        <li>Used to store output, including error messages.</li>
+        <li>Used to suite logs, including <var>STDOUT</var> and
+        <var>STDERR</var> outputs.</li>
 
         <li>Rose stores an <samp>index.html</samp> page (the suite log viewer)
         under this directory.</li>
 
-        <li>The <samp>job/</samp> subdirectory contains task scripts and their
-        output and error.</li>
+        <li>The <samp>job/</samp> subdirectory contains the job scripts for
+        submitting the tasks, their <var>STDOUT</var> and
+        <var>STDERR</var> outputs.</li>
 
         <li>The <samp>rose-suite.version</samp> file, which records any version
         control information about the suite, including any local
@@ -1129,7 +1131,7 @@ type=boolean
 
         <li>Easy stop/start interface</li>
 
-        <li>Get task output, error, state</li>
+        <li>Get task <var>STDOUT</var>, <var>STDERR</var>, state</li>
 
         <li>Manual trigger/reset of tasks</li>
       </ul>
