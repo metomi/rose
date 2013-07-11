@@ -145,10 +145,6 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "force_mode",
                         "help": "Switch on force mode."}],
-               "format": [
-                       ["--format", "-f"],
-                       {"metavar": "FORMAT",
-                        "help": "Specify the output format of each result."}],
                "gcontrol_mode": [
                        ["--no-gcontrol"],
                        {"action": "store_false",
@@ -324,9 +320,9 @@ class RoseOptionParser(OptionParser):
                         "metavar": "FILE",
                         "help": "Specify the name of the output file."}],
                "parse_format": [
-                       ["--parse-format", "--format"],
+                       ["--parse-format", "-p"],
                        {"metavar": "FORMAT",
-                        "help": "Specify the format for parsing."}],
+                        "help": "Specify the format for parsing inputs."}],
                "path_globs": [
                        ["--path", "-P"],
                        {"action": "append",
@@ -342,9 +338,9 @@ class RoseOptionParser(OptionParser):
                        {"metavar": "DELIMITER",
                         "help": "Specify the prefix delimiter."}],
                "print_format": [
-                       ["--print-format"],
+                       ["--print-format", "--format", "-f"],
                        {"metavar": "FORMAT",
-                        "help": "Specify the format for printing."}],
+                        "help": "Specify the format for printing results."}],
                "profile_mode": [
                        ["--profile"],
                        {"action": "store_true",
