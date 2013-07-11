@@ -494,7 +494,7 @@ class RoseOptionParser(OptionParser):
                         "default": False,
                         "help": "Use search url"}],
                "user": [
-                       ["--user", "-U"],
+                       ["--user", "-u"],
                        {"action": "store",
                         "default": None,
                         "dest": "user",
