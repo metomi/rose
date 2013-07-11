@@ -33,7 +33,7 @@
 #         days, h for hours, m for minutes and s for seconds) and n is an
 #         positive or negative integer. Multiple offsets can be specified with
 #         multiple --offset=OFFSET options.
-#     --parse-format=FORMAT, --format=FORMAT
+#     --parse-format=FORMAT, -p FORMAT
 #         Specify a format for parsing DATE-TIME, which should be compatible
 #         with the format documented in Python's time.strftime. If not
 #         specified, the system will attempt to parse DATE-TIME using the
@@ -42,7 +42,7 @@
 #         * Unix date: "%a %b %d %H:%M:%S %Z %Y"
 #         * ISO8601: "%Y-%m-%dT%H:%M:%S", "%Y%m%dT%H%M%S"
 #         * Cylc: "%Y%m%d%H"
-#     --print-format=FORMAT
+#     --print-format=FORMAT, --format=FORMAT, -f FORMAT
 #         Specify a format for printing the result. Default to the same format
 #         as the parse format.
 #     --use-task-cycle-time, -c
