@@ -29,7 +29,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
-from rosie.suite_id import SuiteId, SuiteIdOverflowError
+from rosie.suite_id import SuiteId, SuiteIdOverflowError, SuiteIdPrefixError
 import shlex
 import shutil
 from StringIO import StringIO
@@ -398,13 +398,17 @@ def checkout(argv):
     report = Reporter(verbosity)
     client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
     SuiteId.svn.event_handler = client.event_handler # FIXME: ugly?
+    rc = 0
     for arg in args:
         try:
             client.checkout(arg)
-        except (FileExistError, RosePopenError) as e:
+        except (FileExistError, RosePopenError, SuiteIdPrefixError) as e:
+            rc = 1
             report(e)
             if not opts.force_mode:
                 sys.exit(1)
+    if rc:
+        sys.exit(rc)
 
 
 def create(argv):
