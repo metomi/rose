@@ -139,7 +139,7 @@
             failed handler = "rose suite-hook --mail"
     [[bell]]
         environment scripting = "eval $(rose task-env)"
-        command scripting = "yes 'bong' | head -n $(rose date --format=%H)"
+        command scripting = "yes 'bong' | head -n $(rose date -c --format=%H)"
 </pre>
     </div>
 
