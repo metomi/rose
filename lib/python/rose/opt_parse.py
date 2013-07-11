@@ -489,6 +489,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Use search url"}],
+               "user": [
+                       ["--user", "-u"],
+                       {"action": "store",
+                        "default": None,
+                        "dest": "user",
+                        "help": "User to list roses directory for."}],
                "validate_all": [
                        ["--validate", "-V"],
                        {"action": "store_true",
