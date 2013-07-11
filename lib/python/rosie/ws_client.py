@@ -155,7 +155,7 @@ class SuiteInfo(Event):
             if key != "idx":
                 if value and isinstance(value, list):
                     value = " ".join(value)
-                if key == "date":
+                if key == "date" and isinstance(value, int):
                     out = (out + "\t" + key + ": " +
                            time.strftime(time_format,
                                          time.localtime(value)) + "\n")
@@ -169,6 +169,12 @@ def local_suites(argv):
     opt_parser = RoseOptionParser().add_my_options(
             "format", "no_headers", "prefix", "reverse", "sort", "user")
     opts, args = opt_parser.parse_args(argv)
+
+    if opts.user:
+        report = Reporter(opts.verbosity - opts.quietness)
+        alternative_roses_dir = os.path.expanduser(opts.user) + "/roses"
+        report(SuiteEvent("Listing suites in: " + alternative_roses_dir),
+                          prefix=None)
 
     ws_client = RosieWSClient(prefix=opts.prefix)
     if opts.prefix is not None:
@@ -277,8 +283,6 @@ def get_local_suites(prefix=None, skip_status=False, user=None):
         local_copy_root = os.path.expanduser(user) + "/roses"
     else:
         local_copy_root = SuiteId.get_local_copy_root()
-    
-    print "local_copy_root:" + local_copy_root
     
     if not os.path.isdir(local_copy_root):
         return local_copies
