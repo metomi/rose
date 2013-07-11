@@ -139,6 +139,10 @@ class SuiteEvent(Event):
     def __str__(self):
         return self.args[0]
 
+class UserSpecificRoses(Event):
+
+    def __str__(self):
+        return "Listing suites in: " + self.args[0]
 
 class SuiteInfo(Event):
 
@@ -173,8 +177,7 @@ def local_suites(argv):
     if opts.user:
         report = Reporter(opts.verbosity - opts.quietness)
         alternative_roses_dir = os.path.expanduser(opts.user) + "/roses"
-        report(SuiteEvent("Listing suites in: " + alternative_roses_dir),
-                          prefix=None)
+        report(UserSpecificRoses(alternative_roses_dir), prefix=None)
 
     ws_client = RosieWSClient(prefix=opts.prefix)
     if opts.prefix is not None:
@@ -195,7 +198,8 @@ def local_suites(argv):
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
 
-                results, other_id_list = get_local_suite_details(p, id_list, user=opts.user)
+                results, other_id_list = get_local_suite_details(p, id_list, 
+                                                                user=opts.user)
                 opts.prefix = p
                 _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
@@ -298,7 +302,8 @@ def get_local_suites(prefix=None, skip_status=False, user=None):
     return local_copies
 
 
-def get_local_suite_details(prefix=None, id_list=None, skip_status=False, user=None):
+def get_local_suite_details(prefix=None, id_list=None, skip_status=False,
+                            user=None):
     """returns details of the local suites as if they had been obtained using
        a search or query.
        """
