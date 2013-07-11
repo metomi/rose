@@ -5,6 +5,46 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2013-Q3)
+
+This release of Rose will work with cylc 5.3.0 or above.
+
+### Highlighted Changes
+
+Changes that have significant impact on user experience.
+
+\#799: rose date: now supports letter options for both `--*-format=FORMAT`
+options.
+* `--parse-format=FORMAT` can now be `-p FORMAT` (for `strptime`).
+* `--format=FORMAT` is now a shorthand for `--print-format=FORMAT`.
+  **It is no longer a shorthand for `--parse-format=FORMAT`.**
+* `--print-format=FORMAT` can now be `-f FORMAT` (for `strftime`).
+
+\#789: rose_prune: user interface refreshed. Functionalities now divided into 4
+settings:
+* `prune-remote-logs-at=cycle ...`
+* `archive-logs-at=cycle ...`
+* `prune-work-at=cycle[:globs] ...`
+* `prune-datac-at=cycle[:globs] ...`
+
+The 1st two functionalities call the underlying libraries of `rose
+suite-log` to re-sync the remote job logs, prune them from the remote
+hosts, (and archive the cycle job logs).
+
+The last two functionalities are to prune items in the work directories
+and the share cycle data directories. Globs can be specified for each
+cycle so that only matched items in the relevant directories are
+pruned.
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+None yet.
+
+--------------------------------------------------------------------------------
+
 ## 2013-06 (2013-06-28)
 
 This release of Rose works with cylc 5.3.0.
