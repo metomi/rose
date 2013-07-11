@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 26
+tests 29
 #-------------------------------------------------------------------------------
 # Ensure it can parse its own output.
 TEST_KEY=$TEST_KEY_BASE
@@ -32,6 +32,15 @@ TEST_KEY=$TEST_KEY_BASE-parse
 run_pass "$TEST_KEY" rose date "$DATE_TIME_STR"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 $DATE_TIME_STR
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Parse format and print format.
+TEST_KEY=$TEST_KEY_BASE-offsets
+run_pass "$TEST_KEY" rose date -p '%d/%m/%Y %H:%M:%S' -f '%Y-%m-%dT%H:%M:%S' \
+    '24/12/2012 06:00:00'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2012-12-24T06:00:00
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -69,7 +78,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Print format with offset.
 TEST_KEY=$TEST_KEY_BASE-format-and-offset
-run_pass "$TEST_KEY" rose date --offset=-3h --print-format="%Y%m" "2012122515" --debug
+run_pass "$TEST_KEY" rose date --offset=-3h -f "%Y%m" "2012122515" --debug
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 201212
 __OUT__
