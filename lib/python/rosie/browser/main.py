@@ -170,11 +170,15 @@ class MainWindow(gtk.Window):
         if not (address_url.startswith("http://") or 
                 address_url.startswith("search?s=") or 
                 address_url.startswith("query?q=") or
-                address_url == "roses:/"):
+                address_url.startswith("roses:")):
             self.nav_bar.simple_search_entry.set_text(address_url)
             self.handle_search(None)
-        elif address_url == "roses:/":
-            self.display_local_suites()
+        elif address_url.startswith("roses:"):
+            user = address_url[:-1]
+            user = user.replace("roses:", "")
+            if user == "":
+                user = None
+            self.display_local_suites(user=user)
         else:
             items = {}
             
@@ -259,24 +263,31 @@ class MainWindow(gtk.Window):
         
         self.handle_checkout(id_=new_id)
 
-    def display_local_suites(self, a_widget=None, navigate=True):
+    def display_local_suites(self, a_widget=None, navigate=True, user=None):
         """Get and display the locally stored suites."""
         self.local_updater.update_now()
-        self.nav_bar.address_box.child.set_text("roses:/")
-        self.refresh_url = "roses:/"
+        if user is not None:
+            self.refresh_url = "roses:" + user + "/"
+            stype = "url"
+            srch = repr(self.refresh_url)
+        else:
+            self.nav_bar.address_box.child.set_text("roses:/")
+            self.refresh_url = "roses:/"
+            stype = "home"
+            srch = repr("home")
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
         res, id_list = rosie.ws_client.get_local_suite_details( 
                                 self.search_manager.get_datasource(),
-                                skip_status=True)
+                                skip_status=True, user=user)
         self.display_maps_result(res, is_local=True)
         self.repeat_last_request = self.display_local_suites
         self.statusbar.set_progressbar_pulsing(False)
         if navigate:
-            recorded = self.hist.record_search("home", repr("home"), False)
+            recorded = self.hist.record_search("home", srch, False)
             if recorded:
-                self.handle_record_search_ui("home", repr("home"), False)
+                self.handle_record_search_ui("home", srch, False)
 
     def display_maps_result(self, result_maps, is_local=False):
         """Process the results of calling function(*function_args)."""
@@ -863,8 +874,13 @@ class MainWindow(gtk.Window):
             elif search.h_type == "home":
                 self.clear_filters()
                 self.nav_bar.simple_search_entry.set_text("")
-                self.nav_bar.address_box.child.set_text("roses:/")    
-                self.display_local_suites(navigate=False) #need to do something with this...
+                if search.details == "home":
+                    self.nav_bar.address_box.child.set_text("roses:/")
+                    user = None
+                else:
+                    user = search.details[:-1].replace("roses:","")
+                    self.nav_bar.address_box.child.set_text(search.details)
+                self.display_local_suites(navigate=False, user=user) #need to do something with this...
             else:
                 if next:
                     msg = rosie.browser.ERROR_UNRECOGNISED_NEXT_SEARCH
