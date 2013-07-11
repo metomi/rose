@@ -1228,15 +1228,37 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <dd>(<code>__init__.py</code>) stores some constants used by Rose
       programs.</dd>
 
-      <dt><code>rose.ana</code></dt>
+      <dt><code>rose.app_run</code></dt>
 
-      <dd>callable, invokes an analysis engine for testing suites/apps.</dd>
+      <dd>callable, Rose application runner.</dd>
+
+      <dt><code>rose.apps.*</code></dt>
+
+      <dd>(package) built-in Rose applications.</dd>
+
+      <dt><code>rose.c3</code></dt>
+
+      <dd>library, implements the C3 algorithm (e.g. to linearise multiple
+      inheritance).</dd>
+
+      <dt><code>rose.checksum</code></dt>
+
+      <dd>library, determine the MD5 checksum for a file or files in a
+      directory.</dd>
 
       <dt><code>rose.config</code></dt>
 
-      <dd>callable, parses and dumps rose configuration files. Contains the
+      <dd>library, parses and dumps rose configuration files. Contains the
       main configuration object <code>rose.config.ConfigNode</code> which is
       manipulated in most rose programs.</dd>
+
+      <dt><code>rose.config_cli</code></dt>
+
+      <dd>callable, implements the <kbd>rose config</kbd> command.</dd>
+
+      <dt><code>rose.config_dump</code></dt>
+
+      <dd>callable, implements the <kbd>rose config-dump</kbd> command.</dd>
 
       <dt><code>rose.config_processor</code></dt>
 
@@ -1246,10 +1268,18 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>(package) subclasses for rose configuration processing.</dd>
 
+      <dt><code>rose.date</code></dt>
+
+      <dd>callable, implements the <kbd>rose date</kbd> command. Contains date
+      shift library.</dd>
+
       <dt><code>rose.env</code></dt>
 
-      <dd>library, handles environment processing for
-      <code>rose.app_run</code>.</dd>
+      <dd>library, handles environment variable substitution.</dd>
+
+      <dt><code>rose.env_cat</code></dt>
+
+      <dd>callable, implements <kbd>rose env-cat</kbd> command.</dd>
 
       <dt><code>rose.external</code></dt>
 
@@ -1275,6 +1305,10 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>callable, ranks and selects host machines.</dd>
 
+      <dt><code>rose.job_runner</code></dt>
+
+      <dd>library, run jobs with multiple processes.</dd>
+
       <dt><code>rose.macro</code></dt>
 
       <dd>callable, runs internal and custom macros for an application or
@@ -1284,6 +1318,10 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>library, classes for the various metadata <code>type</code>
       groups.</dd>
+
+      <dt><code>rose.metadata_check</code></dt>
+
+      <dd>callable, validates configuration metadata.</dd>
 
       <dt><code>rose.metadata_gen</code></dt>
 
@@ -1308,8 +1346,7 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dt><code>rose.run</code></dt>
 
-      <dd>callable, contains classes for running suites, applications, tasks
-      and so on.</dd>
+      <dd>library, base class for application, suite and task runners.</dd>
 
       <dt><code>rose.section</code></dt>
 
@@ -1321,6 +1358,15 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <dd>callable, converts user-friendly options for testing code into
       options for rose suite-run.</dd>
 
+      <dt><code>rose.suite_clean</code></dt>
+
+      <dd>callable, remove runtime directories of suites.</dd>
+
+      <dt><code>rose.suite_control</code></dt>
+
+      <dd>Invoke control commands (currently gcontrol and shutdown) of a
+      running suite.</dd>
+
       <dt><code>rose.suite_engine_proc</code></dt>
 
       <dd>library, base class and utilities for interacting with a suite
@@ -1330,18 +1376,17 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
 
       <dd>(package) library for interacting with specific suite engines.</dd>
 
-      <dt><code>rose.suite_control</code></dt>
-
-      <dd>Invoke control commands (currently gcontrol and shutdown) of a
-      running suite.</dd>
-
       <dt><code>rose.suite_hook</code></dt>
 
-      <dd>callable, reacts to suite engine events.</dd>
+      <dd>callable, hooks to suite engine events.</dd>
 
       <dt><code>rose.suite_log_view</code></dt>
 
-      <dd>callable, sets up suite log for the log viewer.</dd>
+      <dd>callable, sets up suite log viewer.</dd>
+
+      <dt><code>rose.suite_run</code></dt>
+
+      <dd>callable, suite runner.</dd>
 
       <dt><code>rose.suite_scan</code></dt>
 
@@ -1350,6 +1395,10 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <dt><code>rose.task_env</code></dt>
 
       <dd>callable, provides an environment for a suite task.</dd>
+
+      <dt><code>rose.task_run</code></dt>
+
+      <dd>callable, task runner.</dd>
 
       <dt><code>rose.upgrade</code></dt>
 
@@ -1526,6 +1575,33 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
       <code>rosie info</code>, <code>rosie search</code> and <code>rosie
       browse</code>.</dd>
     </dl>
+
+    <h2 id="bash">Rose Bash Library</h2>
+
+    <p>They live under <code>lib/bash/</code>. Each module contains a set of
+    functions. To import a module, load the file into your script. E.g. To load
+    <kbd>rose_usage</kbd>, you would do:</p>
+
+    <pre class="prettyprint">
+. $ROSE_HOME/lib/bash/rose_usage
+</pre>
+
+    <p>The modules are:</p>
+
+    <dt><code>rose_init</code></dt>
+
+    <dd>Called by <kbd>rose</kbd> on initialisation. This is not meant to be a
+    module for general use.</dd>
+
+    <dt><code>rose_log</code></dt>
+
+    <dd>Provide functions to print log messages.</dd>
+
+    <dt><code>rose_usage</code></dt>
+
+    <dd>If your script has a header similar to the ones used by a Rose command
+    line utility, you can use this function to print the synopsis section of the
+    script header.</dd>
   </div>
 </body>
 </html>
