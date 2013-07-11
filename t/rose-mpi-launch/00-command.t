@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 21
+tests 18
 #-------------------------------------------------------------------------------
 # No argument.
 TEST_KEY=$TEST_KEY_BASE-null
@@ -38,7 +38,7 @@ TEST_KEY=$TEST_KEY_BASE
 run_pass "$TEST_KEY" rose mpi-launch true to your heart
 TRUE=$(which true)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[my-launcher] -n 1 $ROSE_HOME/bin/rose-mpi-launch --inner $TRUE to your heart
+[my-launcher] -n 1 $TRUE to your heart
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -49,17 +49,7 @@ NPROC=$NPROC \
     run_pass "$TEST_KEY" rose mpi-launch true to your heart
 TRUE=$(which true)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[my-launcher] -n $NPROC $ROSE_HOME/bin/rose-mpi-launch --inner $TRUE to your heart
-__OUT__
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#-------------------------------------------------------------------------------
-# Basic, no inner
-TEST_KEY=$TEST_KEY_BASE-no-inner
-ROSE_LAUNCH_INNER= \
-    run_pass "$TEST_KEY" rose mpi-launch true to your heart
-TRUE=$(which true)
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[my-launcher] -n 1 $TRUE to your heart
+[my-launcher] -n $NPROC $TRUE to your heart
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -69,7 +59,7 @@ ROSE_TEST_RC=1 \
     run_fail "$TEST_KEY" rose mpi-launch true to your heart
 TRUE=$(which true)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[my-launcher] -n 1 $ROSE_HOME/bin/rose-mpi-launch --inner $TRUE to your heart
+[my-launcher] -n 1 $TRUE to your heart
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -79,7 +69,7 @@ ROSE_LAUNCHER=our-launcher \
     run_pass "$TEST_KEY" rose mpi-launch true to your heart
 TRUE=$(which true)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[our-launcher] $ROSE_HOME/bin/rose-mpi-launch --inner $TRUE -n 1 to your heart
+[our-launcher] $TRUE -n 1 to your heart
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -89,7 +79,7 @@ PATH=$TEST_SOURCE_DIR/bin2:$PATH \
     run_pass "$TEST_KEY" rose mpi-launch true to your heart
 TRUE=$(which true)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[test-launcher] $ROSE_HOME/bin/rose-mpi-launch --inner $TRUE to your heart
+[test-launcher] $TRUE to your heart
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
