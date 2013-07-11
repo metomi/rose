@@ -139,6 +139,10 @@ class SuiteEvent(Event):
     def __str__(self):
         return self.args[0]
 
+class UserSpecificRoses(Event):
+
+    def __str__(self):
+        return "Listing suites in: " + self.args[0]
 
 class SuiteInfo(Event):
 
@@ -155,7 +159,7 @@ class SuiteInfo(Event):
             if key != "idx":
                 if value and isinstance(value, list):
                     value = " ".join(value)
-                if key == "date":
+                if key == "date" and isinstance(value, int):
                     out = (out + "\t" + key + ": " +
                            time.strftime(time_format,
                                          time.localtime(value)) + "\n")
@@ -167,15 +171,20 @@ class SuiteInfo(Event):
 def local_suites(argv):
     """CLI command to list all the locally checked out suites"""
     opt_parser = RoseOptionParser().add_my_options(
-            "no_headers", "prefix", "print_format", "reverse", "sort")
+            "no_headers", "prefix", "print_format", "reverse", "sort", "user")
     opts, args = opt_parser.parse_args(argv)
+
+    if opts.user:
+        report = Reporter(opts.verbosity - opts.quietness)
+        alternative_roses_dir = os.path.expanduser(opts.user) + "/roses"
+        report(UserSpecificRoses(alternative_roses_dir), prefix=None)
 
     ws_client = RosieWSClient(prefix=opts.prefix)
     if opts.prefix is not None:
-        results, id_list = get_local_suite_details(opts.prefix)
+        results, id_list = get_local_suite_details(opts.prefix, user=opts.user)
         return _display_maps(opts, ws_client, results, local_suites=id_list)
     else:
-        id_list = get_local_suites()
+        id_list = get_local_suites(user=opts.user)
         if len(id_list) > 0:
             prefixes = []
             for id_ in id_list:
@@ -189,7 +198,8 @@ def local_suites(argv):
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
 
-                results, other_id_list = get_local_suite_details(p, id_list)
+                results, other_id_list = get_local_suite_details(p, id_list, 
+                                                                user=opts.user)
                 opts.prefix = p
                 _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
@@ -269,10 +279,15 @@ def query_split(args):
     return q
 
 
-def get_local_suites(prefix=None, skip_status=False):
+def get_local_suites(prefix=None, skip_status=False, user=None):
     """Returns a dict of prefixes and id tuples for locally-present suites."""
     local_copies = []
-    local_copy_root = SuiteId.get_local_copy_root()
+    
+    if user:
+        local_copy_root = os.path.expanduser(user) + "/roses"
+    else:
+        local_copy_root = SuiteId.get_local_copy_root()
+    
     if not os.path.isdir(local_copy_root):
         return local_copies
     for path in os.listdir(local_copy_root):
@@ -287,7 +302,8 @@ def get_local_suites(prefix=None, skip_status=False):
     return local_copies
 
 
-def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
+def get_local_suite_details(prefix=None, id_list=None, skip_status=False,
+                            user=None):
     """returns details of the local suites as if they had been obtained using
        a search or query.
        """
@@ -295,7 +311,7 @@ def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
         return [], []
 
     if id_list == None:
-        id_list = get_local_suites(skip_status=skip_status)
+        id_list = get_local_suites(skip_status=skip_status, user=user)
 
     if not id_list:
         return [], []
