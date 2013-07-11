@@ -1059,12 +1059,6 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dd>Specify the launcher program.</dd>
 
-      <dt><kbd>optional ROSE_LAUNCH_INNER</kbd></dt>
-
-      <dd>Only relevant when launching with a command. Specify an inner wrapper
-      to be run by launcher, can be set to a null string to call the executable
-      directly. Default is <kbd>$0 --inner</kbd>.</dd>
-
       <dt><kbd>optional ROSE_LAUNCHER_LIST</kbd></dt>
 
       <dd>Override <var>launcher-list</var> setting in configuration.</dd>
@@ -1086,10 +1080,11 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>optional ROSE_LAUNCHER_ULIMIT_OPTS</kbd></dt>
 
-      <dd>Only relevant if <var>$ROSE_LAUNCH_INNER</var> is used. Specify the
-      arguments to <kbd>ulimit</kbd>. Setting this variable to <kbd>-a -s
-      unlimited -d unlimited -a</kbd> results in <kbd>ulimit -a; ulimit -s
-      unlimited; ulimit -d unlimited; ulimit -a</kbd></dd>
+      <dd>Only relevant when launching with a command. Tell launcher to run
+      <kbd>rose mpi-launch --inner $@</kbd>. Specify the arguments to
+      <kbd>ulimit</kbd>. Setting this variable to <kbd>-a -s unlimited -d
+      unlimited -a</kbd> results in <kbd>ulimit -a; ulimit -s unlimited; ulimit
+      -d unlimited; ulimit -a</kbd>.</dd>
 
       <dt><kbd>optional NPROC</kbd></dt>
 

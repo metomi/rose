@@ -190,19 +190,6 @@
       <li>rose</li>
     </ul>
 
-    <h2 id="ROSE_LAUNCH_INNER"><var>ROSE_LAUNCH_INNER</var></h2>
-
-    <h3>Description</h3>
-
-    <p>Specifies an inner wrapper to be run by launcher, can be set to "" to
-    call the executable directly. Default is <kbd>$0 --inner</kbd>.</p>
-
-    <h3>Used By</h3>
-
-    <ul>
-      <li><a href="rose-command.html#rose-mpi-launch">rose mpi-launch</a></li>
-    </ul>
-
     <h2 id="ROSE_LAUNCHER"><var>ROSE_LAUNCHER</var></h2>
 
     <h3>Description</h3>
@@ -272,9 +259,10 @@
 
     <h3>Description</h3>
 
-    <p>Specifies the arguments to ulimit. Setting this variable to <kbd>-a -s
+    <p>Tell launcher to run <kbd>rose mpi-launch --inner $@</kbd>. Specify the
+    arguments to <kbd>ulimit</kbd>. E.g. Setting this variable to <kbd>-a -s
     unlimited -d unlimited -a</kbd> results in <kbd>ulimit -a; ulimit -s
-    unlimited; ulimit -d unlimited; ulimit -a</kbd></p>
+    unlimited; ulimit -d unlimited; ulimit -a</kbd>.</p>
 
     <h3>Used By</h3>
 
