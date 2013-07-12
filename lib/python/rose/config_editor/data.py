@@ -190,13 +190,14 @@ class ConfigDataManager(object):
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
 
     def load(self, top_level_directory, config_obj_dict, 
-             load_all_apps=False, load_no_apps=False):
+             load_all_apps=False, load_no_apps=False, metadata_off=False):
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
                 if filename in [rose.TOP_CONFIG_NAME, rose.SUB_CONFIG_NAME]:
                     self.load_top_config(top_level_directory, 
                                          load_all_apps=load_all_apps,
-                                         load_no_apps=load_no_apps)
+                                         load_no_apps=load_no_apps,
+                                         metadata_off=metadata_off)
                     break
             else:
                 self.load_top_config(None)
@@ -212,7 +213,8 @@ class ConfigDataManager(object):
         self.saved_config_names = set(self.config.keys())
 
     def load_top_config(self, top_level_directory, preview=False, 
-                        load_all_apps=False, load_no_apps=False):
+                        load_all_apps=False, load_no_apps=False,
+                        metadata_off=False):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
         
@@ -245,7 +247,8 @@ class ConfigDataManager(object):
                     conf_path = os.path.join(config_container_dir, config_dir)
                     if (os.path.isdir(conf_path) and
                         not config_dir.startswith('.')):
-                        self.load_config(conf_path, preview=preview)
+                        self.load_config(conf_path, preview=preview, 
+                                         metadata_off=metadata_off)
             self.load_config(top_level_directory)
             self.reload_ns_tree_func()
 
@@ -261,7 +264,7 @@ class ConfigDataManager(object):
     def load_config(self, config_directory=None,
                     config_name=None, config=None,
                     reload_tree_on=False, is_discovery=False,
-                    skip_load_event=False, preview=False):
+                    skip_load_event=False, preview=False, metadata_off=False):
         """Load the configuration and meta-data. Load namespaces."""
         is_top_level = False
         if config_directory is None:
@@ -315,7 +318,8 @@ class ConfigDataManager(object):
                 config, s_config = self.load_config_file(config_path)
         
         
-        if config_directory != self.top_level_directory and preview: 
+        if ((config_directory != self.top_level_directory and preview) or
+            metadata_off): 
             meta_config = rose.config.ConfigNode()
             meta_files = []
         else:
