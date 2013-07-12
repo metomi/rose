@@ -1684,7 +1684,7 @@ if __name__ == '__main__':
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode", 
-                              "load_no_apps", "load_all_apps", "metadata_off")
+                              "load_no_apps", "load_all_apps", "no_metadata")
     opts, args = opt_parser.parse_args()
     if args:
         opt_parser.print_usage(sys.stderr)
@@ -1714,7 +1714,7 @@ if __name__ == '__main__':
         cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,
                                         load_all_apps=opts.load_all_apps,
                                         load_no_apps=opts.load_no_apps,
-                                        metadata_off=opts.metadata_off)""",
+                                        metadata_off=opts.no_metadata)""",
                         globals(), locals(), f.name)
         p = pstats.Stats(f.name)
         p.strip_dirs().sort_stats('cumulative').print_stats(200)
@@ -1723,4 +1723,4 @@ if __name__ == '__main__':
         spawn_window(cwd, debug_mode=opts.debug_mode, 
                      load_all_apps=opts.load_all_apps,
                      load_no_apps=opts.load_no_apps,
-                     metadata_off=opts.metadata_off)
+                     metadata_off=opts.no_metadata)

@@ -253,13 +253,6 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "ADMIN-ONLY: Create the metadata suite."}],
-               "metadata_off": [
-                       ["--metadata-off"],
-                       {"action": "store_true",
-                        "dest": "metadata_off",
-                        "default": False,
-                        "help": "Start config editor without metadata " + 
-                                "switched on."}],
                "name": [
                        ["--name", "-n"],
                        {"action": "store",
@@ -291,6 +284,13 @@ class RoseOptionParser(OptionParser):
                         "dest": "no_ignore",
                         "default": True,
                         "help": "Print ignored settings where relevant."}],
+               "no_metadata": [
+                       ["--no-metadata"],
+                       {"action": "store_true",
+                        "dest": "no_metadata",
+                        "default": False,
+                        "help": "Start config editor without metadata " + 
+                                "switched on."}],
                "no_opts": [
                        ["--no-opts"],
                        {"action": "store_true",
