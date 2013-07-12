@@ -398,11 +398,14 @@ class MainMenuHandler(object):
         """Check the fail-if and warn-if conditions of the configurations."""
         macro = rose.macros.rule.FailureRuleChecker()
         macro_fullname = "rule.FailureRuleChecker.validate"
+        error_count = 0
         for config_name, config_data in self.data.config.items():
             config = config_data.config
             meta = config_data.meta
             try:
                 return_value = macro.validate(config, meta)
+                if return_value:
+                    error_count += 1
             except Exception as e:
                 rose.gtk.util.run_dialog(
                               rose.gtk.util.DIALOG_TYPE_ERROR,
@@ -417,6 +420,15 @@ class MainMenuHandler(object):
             self.handle_macro_validation(config_name, macro_fullname,
                                          config, return_value,
                                          no_display=(not return_value))
+        if error_count > 0:
+            msg = rose.config_editor.EVENT_MACRO_VALIDATE_PROBLEMS_FOUND
+            info_text = msg.format(error_count)
+            kind = self.reporter.KIND_ERR
+        else:
+            info_text = rose.config_editor.EVENT_MACRO_VALIDATE_NO_PROBLEMS
+            kind = self.reporter.KIND_OUT
+        self.reporter.report(info_text, kind=kind)
+            
 
     def clear_page_menu(self, menubar, add_menuitem):
         """Clear all page add variable items."""
@@ -736,9 +748,9 @@ class MainMenuHandler(object):
         macro_type = ".".join(macro_name.split(".")[:-1])
         self.apply_macro_validation(config_name, macro_type, problem_list)
         search = lambda i: self.find_ns_id_func(config_name, i)
+        self._report_macro_validation(config_name, macro_name,
+                                      len(problem_list))
         if not no_display:
-            self._report_macro_validation(config_name, macro_name,
-                                          len(problem_list))
             self.mainwindow.launch_macro_changes_dialog(
                             config_name, macro_type, problem_list,
                             mode="validate", search_func=search)
