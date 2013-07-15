@@ -312,6 +312,14 @@ rose task-run -D '[env]!BAZ='
     <var>ROSE_TASK_OPTIONS</var>: This can be used to pass extra options to the
     <code>fcm make</code> command.</p>
 
+    <p>E.g.:</p>
+
+    <pre class="prettyprint lang-rose_conf">
+meta=fcm_make
+mode=fcm_make
+opts.jobs=8
+</pre>
+
     <h3 id="rose-task-run.util.rose_ana">Builtin Application: rose_ana</h3>
 
     <p>This built-in application runs <code>rose-ana</code>, the Rose
@@ -383,6 +391,9 @@ rose task-run -D '[env]!BAZ='
     <p>E.g.:</p>
 
     <pre class="prettyprint lang-rose_conf">
+meta=rose_prune
+mode=rose_prune
+
 [prune]
 prune-remote-logs-at=-6h
 archive-logs-at=-1d

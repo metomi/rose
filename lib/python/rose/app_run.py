@@ -68,6 +68,14 @@ class PollTimeoutError(Exception):
                 strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), dt, items_str)
 
 
+class UnknownBuiltinAppError(Exception):
+
+    """An exception raised on attempt to run an unknown builtin application."""
+
+    def __str__(self):
+        return "%s: no such built-in application" % self.args
+
+
 class CommandNotDefinedEvent(Event):
 
     """An event raised when a command is not defined for an app."""
@@ -157,6 +165,8 @@ class AppRunner(Runner):
             return self._command(config, opts, args, uuid, work_files)
         else:
             builtin_app = self.builtins_manager.get_handler(app_mode)
+            if builtin_app is None:
+                raise UnknownBuiltinAppError(app_mode)
             return builtin_app.run(self, config, opts, args, uuid, work_files)
 
     def _poll(self, config, opts, args, uuid, work_files):
