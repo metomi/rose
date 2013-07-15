@@ -318,7 +318,7 @@ class ConfigDataManager(object):
                 config, s_config = self.load_config_file(config_path)
         
         
-        if ((config_directory != self.top_level_directory and preview)): 
+        if config_directory != self.top_level_directory and preview: 
             meta_config = rose.config.ConfigNode()
             meta_files = []
         elif metadata_off:
