@@ -591,7 +591,7 @@ class MainController(object):
                        rose.config_editor.EVENT_LOAD_ATTEMPT.format(
                        namespace_name), 
                        new_total_events=3)
-            self.data.load_config(config_data.directory, preview=False)
+            self.data.load_config(config_data.directory, preview=False, metadata_off=self.metadata_off)
             self.reload_namespace_tree()
             self.reporter.report_load_event(
                        rose.config_editor.EVENT_LOADED.format(namespace_name),
