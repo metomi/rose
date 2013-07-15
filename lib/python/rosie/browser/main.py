@@ -170,7 +170,8 @@ class MainWindow(gtk.Window):
         if not (address_url.startswith("http://") or 
                 address_url.startswith("search?s=") or 
                 address_url.startswith("query?q=") or
-                address_url.startswith("roses:")):
+                (address_url.startswith("roses:") and 
+                address_url.endswith("/"))):
             self.nav_bar.simple_search_entry.set_text(address_url)
             self.handle_search(None)
         elif address_url.startswith("roses:"):
@@ -178,6 +179,8 @@ class MainWindow(gtk.Window):
             user = user.replace("roses:", "")
             if user == "":
                 user = None
+            elif not user.startswith("~"):
+                user = "~" + user
             self.display_local_suites(user=user)
         else:
             items = {}
