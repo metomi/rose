@@ -46,7 +46,7 @@ function port_is_busy() {
     fi
 }
 #-------------------------------------------------------------------------------
-tests 17
+tests 19
 #-------------------------------------------------------------------------------
 mkdir svn
 svnadmin create svn/foo
@@ -61,6 +61,7 @@ db.foo=sqlite:///$PWD/rosie/foo.db.sqlite
 repos.foo=$PWD/svn/foo
 
 [rosie-id]
+local-copy-root=$PWD/roses
 prefix-default=foo
 prefix-location.foo=$SVN_URL
 
@@ -126,9 +127,17 @@ run_pass "$TEST_KEY" \
 echo -n '[]' >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 #-------------------------------------------------------------------------------
-for FILE in $(ls $TEST_SOURCE_DIR/$TEST_KEY_BASE); do
-    rosie create -q -y --info-file=$TEST_SOURCE_DIR/$TEST_KEY_BASE/$FILE \
-        --no-checkout
+for FILE in $(ls $TEST_SOURCE_DIR/$TEST_KEY_BASE/*.conf); do
+    rosie create -q -y --info-file=$FILE --no-checkout
+    $ROSE_HOME/sbin/rosa svn-post-commit \
+        $PWD/svn/foo $(svnlook youngest $PWD/svn/foo)
+done
+#-------------------------------------------------------------------------------
+for FILE in $(ls $TEST_SOURCE_DIR/$TEST_KEY_BASE/*.conf.1); do
+    ID=foo-$(basename $FILE .conf.1)
+    rosie checkout -q $ID
+    cat <$FILE >$PWD/roses/$ID/rose-suite.info
+    svn ci -q -m 'test' $PWD/roses/$ID
     $ROSE_HOME/sbin/rosa svn-post-commit \
         $PWD/svn/foo $(svnlook youngest $PWD/svn/foo)
 done
@@ -138,11 +147,11 @@ run_pass "$TEST_KEY" curl "${URL_FOO_S}s=apple&format=json"
 run_pass "$TEST_KEY-out" python - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 expected_d = [{"idx": "foo-aa001",
-               "title": "apple juice",
+               "title": "apple cider",
                "project": "drink",
                "owner": "ben"},
               {"idx": "foo-aa006",
-               "title": "apple pie",
+               "title": "apple tart",
                "access-list": ["*"],
                "project": "food",
                "owner": "rosie"}]
@@ -159,12 +168,13 @@ sys.exit(len(d) != len(expected_d) or
 __PYTHON__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-curl-foo-query
+Q='q=project+eq+food&q=and+title+contains+apple'
 run_pass "$TEST_KEY" \
-    curl "${URL_FOO_Q}q=project+eq+food&q=and+title+contains+apple&format=json"
+    curl "${URL_FOO_Q}${Q}&format=json"
 run_pass "$TEST_KEY-out" python - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 expected_d = [{"idx": "foo-aa006",
-               "title": "apple pie",
+               "title": "apple tart",
                "access-list": ["*"],
                "project": "food",
                "owner": "rosie"}]
@@ -174,6 +184,38 @@ sys.exit(len(d) != len(expected_d) or
          d[0]["title"] != expected_d[0]["title"] or
          d[0]["project"] != expected_d[0]["project"] or
          d[0]["owner"] != expected_d[0]["owner"])
+__PYTHON__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-curl-foo-query-all-revs
+Q='q=project+eq+food&q=and+title+contains+apple'
+run_pass "$TEST_KEY" \
+    curl "${URL_FOO_Q}${Q}&all_revs=1&format=json"
+run_pass "$TEST_KEY-out" python - "$TEST_KEY.out" <<'__PYTHON__'
+import json, sys
+expected_d = [{"idx": "foo-aa006",
+               "title": "apple pie",
+               "access-list": ["*"],
+               "project": "food",
+               "owner": "rosie",
+               "revision": 7},
+              {"idx": "foo-aa006",
+               "title": "apple tart",
+               "access-list": ["*"],
+               "project": "food",
+               "owner": "rosie",
+               "revision": 9}]
+d = json.load(open(sys.argv[1]))
+sys.exit(len(d) != len(expected_d) or
+         d[0]["idx"] != expected_d[0]["idx"] or
+         d[0]["title"] != expected_d[0]["title"] or
+         d[0]["project"] != expected_d[0]["project"] or
+         d[0]["owner"] != expected_d[0]["owner"] or
+         d[0]["revision"] != expected_d[0]["revision"] or
+         d[1]["idx"] != expected_d[1]["idx"] or
+         d[1]["title"] != expected_d[1]["title"] or
+         d[1]["project"] != expected_d[1]["project"] or
+         d[1]["owner"] != expected_d[1]["owner"] or
+         d[1]["revision"] != expected_d[1]["revision"])
 __PYTHON__
 #-------------------------------------------------------------------------------
 exit 0
