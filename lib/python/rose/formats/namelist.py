@@ -35,12 +35,11 @@ def _rec(exp):
 # Matches a separator
 RE_SEP = r","
 # Matches a natural number counter
-RE_NATURAL = r"[1-9]\d*"
-RE_NATURAL0 = r"0|(?:" + RE_NATURAL + r")"
+RE_NATURAL = r"\d+"
 # Matches a number with a floating point
-RE_FLOAT = r"(?:\.\d+)|(?:" + RE_NATURAL0 + r")(?:\.\d*)?"
+RE_FLOAT = r"(?:\.\d+)|(?:" + RE_NATURAL + r")(?:\.\d*)?"
 # Matches namelist literals for intrinsic types
-RE_INTEGER = r"[\+\-]?(?:" + RE_NATURAL0 + r")"
+RE_INTEGER = r"[\+\-]?(?:" + RE_NATURAL + r")"
 REC_INTEGER = _rec(r"\A(?:" + RE_INTEGER + r")\Z")
 RE_REAL = r"(?i)[\+\-]?(?:" + RE_FLOAT + r")(?:[de][\+\-]?\d+)?"
 REC_REAL = _rec(r"\A(?:" + RE_REAL + r")\Z")
@@ -83,9 +82,11 @@ REC_REAL_TIDY = [[_rec(r"[DdE]"), r"e"],                  # 1.d0, 1.D0, 1.E0 => 
                  [_rec(r"\A([\+\-]?)\."), r"\g<1>0."],    # .1 => 0.1, -.1 => -0.1
                  [_rec(r"\A([\+\-]?\d+)(e)"), r"\1.0\2"], # 1e1 => 1.0e1
                  [_rec(r"e[\+\-]?0+\Z"), r""],            # 1.0e0 => 1.0
-                 [_rec(r"e([\+\-])?0+"), r"e\1"],         # 1.0e01 => 1.0e1
-                 [_rec(r"\.(e|\Z)"), r".0\1"]]            # 1. => 1.0, 1.e0 => 1.0e0
-
+                 [_rec(r"e0+"), r"e"],                    # 1.0e01 => 1.0e1
+                 [_rec(r"e([\+\-])0+"), r"e\1"],          # 1.0e-01 => 1.0e-1
+                 [_rec(r"\.(e|\Z)"), r".0\1"],            # 1. => 1.0, 1.e0 => 1.0e0
+                 [_rec(r"^0+(\d)"), r"\1"],               # 02.0 => 2.0, 000.5 => 0.5
+                 [_rec(r"^([+-])0+(\d)"), r"\1\2"]]       # +02.0 => +2.0, -000.5 => -0.5
 
 class NamelistGroup(object):
     """Represent a namelist group.
