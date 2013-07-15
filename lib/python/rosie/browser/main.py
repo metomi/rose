@@ -270,13 +270,15 @@ class MainWindow(gtk.Window):
         """Get and display the locally stored suites."""
         self.local_updater.update_now()
         if user is not None:
-            self.refresh_url = "roses:" + user + "/"
-            stype = "url"
+            if user.startswith("~"):
+                uname = user[1:]
+            else:
+                uname = user
+            self.refresh_url = "roses:" + uname + "/"
             srch = repr(self.refresh_url)
         else:
             self.nav_bar.address_box.child.set_text("roses:/")
             self.refresh_url = "roses:/"
-            stype = "home"
             srch = repr("home")
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
@@ -885,6 +887,8 @@ class MainWindow(gtk.Window):
                     user = None
                 else:
                     user = search.details[:-1].replace("roses:","")
+                    if not user.startswith("~"):
+                        user = "~" + user
                     self.nav_bar.address_box.child.set_text(search.details)
                 self.display_local_suites(navigate=False, user=user) #need to do something with this...
             else:
