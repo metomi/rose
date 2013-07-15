@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Basic tests for "rosie create".
+# Basic tests for "rosie checkout".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ for I in $(seq 1 6); do
 done
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-bad-prefix
-run_fail "$TEST_KEY" rosie checkout bo-nd007
+run_fail "$TEST_KEY" rosie checkout -q bo-nd007
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] bo: cannot determine prefix location
@@ -97,18 +97,18 @@ __ERR__
 TEST_KEY=$TEST_KEY_BASE-normal-multi-repeat-force
 run_pass "$TEST_KEY" rosie checkout -f foo-aa003 foo-aa004 foo-aa005
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $PWD/roses/foo-aa003/
 [INFO] foo-aa003: local copy created at $PWD/roses/foo-aa003
 [INFO] foo-aa004: local copy created at $PWD/roses/foo-aa004
 [INFO] foo-aa005: local copy created at $PWD/roses/foo-aa005
 __OUT__
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[WARN] $PWD/roses/foo-aa003: deleted
-__ERR__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-normal-multi-bad-force
 rm -rf roses
 run_fail "$TEST_KEY" rosie checkout --force foo-aa001 hi-gl055 foo-aa005
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] create: $PWD/roses
 [INFO] foo-aa001: local copy created at $PWD/roses/foo-aa001
 [INFO] foo-aa005: local copy created at $PWD/roses/foo-aa005
 __OUT__
