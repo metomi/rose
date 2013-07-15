@@ -284,7 +284,7 @@ class MainWindow(gtk.Window):
         res, id_list = rosie.ws_client.get_local_suite_details( 
                                 self.search_manager.get_datasource(),
                                 skip_status=True, user=user)
-        self.display_maps_result(res, is_local=True)
+        self.display_maps_result(res, is_local=True, user=user)
         self.repeat_last_request = self.display_local_suites
         self.statusbar.set_progressbar_pulsing(False)
         if navigate:
@@ -292,7 +292,7 @@ class MainWindow(gtk.Window):
             if recorded:
                 self.handle_record_search_ui("home", srch, False)
 
-    def display_maps_result(self, result_maps, is_local=False):
+    def display_maps_result(self, result_maps, is_local=False, user=None):
         """Process the results of calling function(*function_args)."""
         self.statusbar.set_datasource(self.search_manager.get_datasource())
         while gtk.events_pending():
@@ -349,9 +349,12 @@ class MainWindow(gtk.Window):
             self.statusbar.set_status_text(
                            rosie.browser.STATUS_LOCAL_GOT.format(
                            len(results),str(now)), instant=True)
-        elif is_local and len(results) == 0:                       
+        elif is_local and len(results) == 0:
+            if user is None:
+                user="~"
+            path = os.path.expanduser(user)
             self.statusbar.set_status_text(
-                 rosie.browser.STATUS_NO_LOCAL_SUITES.format(str(now)),  
+                 rosie.browser.STATUS_NO_LOCAL_SUITES.format(path, str(now)),  
                  instant=True)
 
     def display_toggle(self, title):
