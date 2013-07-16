@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 init </dev/null
 #-------------------------------------------------------------------------------
-tests 18
+tests 21
 #-------------------------------------------------------------------------------
 # Normal mode, no command.
 TEST_KEY=$TEST_KEY_BASE-no-command
@@ -81,6 +81,16 @@ setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q cat <<<$(pwd)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<$(pwd)
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Normal mode, bad builtin application.
+TEST_KEY=$TEST_KEY_BASE-bad-builtin
+setup
+run_fail "$TEST_KEY" rose app-run --config=../config -q -Dmode=bad
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] bad: no such built-in application
+__ERR__
 teardown
 #-------------------------------------------------------------------------------
 exit
