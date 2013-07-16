@@ -68,6 +68,7 @@ run_pass "$TEST_KEY" rosie create --info-file=rose-suite.info <<<y
 {
     echo -n 'Create? y/n (default n) '
     echo "[INFO] foo-aa000: created at $URL/a/a/0/0/0"
+    echo "[INFO] create: $PWD/roses"
     echo "[INFO] foo-aa000: local copy created at $PWD/roses/foo-aa000"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
