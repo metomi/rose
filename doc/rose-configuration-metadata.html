@@ -416,6 +416,13 @@ fail-if=any(namelist:test=ctrl_array &lt; this);
 fail-if=all(this == 0);
 </pre>
 
+        <p>Similarly, the number of array elements can be checked using
+<code>len</code>. E.g.:</p>
+        <pre class="prettyprint lang-rose_conf">
+fail-if=len(namelist:test=ctrl_array &lt; this);
+fail-if=len(this == 0);
+</pre>
+
         <p>Expressions can be chained together and brackets used:</p>
         <pre class="prettyprint lang-rose_conf">
 fail-if=this(4) == "'0A'" and (namelist:test=ctrl_var_1 != "'N'" or namelist:test=ctrl_var_2 != "'Y'" or all(namelist:test=ctrl_arr_3 == 'N'));
