@@ -177,6 +177,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                        (?:\(\d+\))?   (?# Optional element for the option )
                       )               (?# End ID capture )
                       (?:\W|$)        (?# Break or end)""", re.X)
+    REC_LEN_FUNC = re.compile(r"(\W)len\( *(\S+) *(\S+) *(.*?) *\)(\W)")
     REC_SCI_NUM = re.compile(r"""
                      (?:\W|^)    (?# Break or beginning)
                      (           (?# Begin number capture)
@@ -221,6 +222,15 @@ class RuleEvaluator(rose.macro.MacroBase):
                         new_string += self.ARRAY_FUNC_LOGIC[array_func_key]
                 new_string += ")" + end
                 rule = rec_regex.sub(new_string, rule, count=1)
+        for search_result in self.REC_LEN_FUNC.findall(rule):
+            start, var_id, operator, value, end = search_result
+            if var_id == "this":
+                var_id = setting_id
+            setting_value = self._get_value_from_id(var_id, config)
+            array_value = rose.variable.array_split(setting_value)
+            new_string = (start + "(" + str(len(array_value)) +
+                          operator + value + ")" + end)
+            rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
         for search_result in self.REC_SCI_NUM.findall(rule):
             sci_num_count += 1
             key = self.INTERNAL_ID_SCI_NUM.format(sci_num_count)
