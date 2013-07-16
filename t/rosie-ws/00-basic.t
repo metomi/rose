@@ -46,7 +46,7 @@ function port_is_busy() {
     fi
 }
 #-------------------------------------------------------------------------------
-tests 19
+tests 21
 #-------------------------------------------------------------------------------
 mkdir svn
 svnadmin create svn/foo
@@ -175,7 +175,6 @@ run_pass "$TEST_KEY-out" python - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 expected_d = [{"idx": "foo-aa006",
                "title": "apple tart",
-               "access-list": ["*"],
                "project": "food",
                "owner": "rosie"}]
 d = json.load(open(sys.argv[1]))
@@ -194,13 +193,42 @@ run_pass "$TEST_KEY-out" python - "$TEST_KEY.out" <<'__PYTHON__'
 import json, sys
 expected_d = [{"idx": "foo-aa006",
                "title": "apple pie",
-               "access-list": ["*"],
                "project": "food",
                "owner": "rosie",
                "revision": 7},
               {"idx": "foo-aa006",
                "title": "apple tart",
-               "access-list": ["*"],
+               "project": "food",
+               "owner": "rosie",
+               "revision": 9}]
+d = json.load(open(sys.argv[1]))
+sys.exit(len(d) != len(expected_d) or
+         d[0]["idx"] != expected_d[0]["idx"] or
+         d[0]["title"] != expected_d[0]["title"] or
+         d[0]["project"] != expected_d[0]["project"] or
+         d[0]["owner"] != expected_d[0]["owner"] or
+         d[0]["revision"] != expected_d[0]["revision"] or
+         d[1]["idx"] != expected_d[1]["idx"] or
+         d[1]["title"] != expected_d[1]["title"] or
+         d[1]["project"] != expected_d[1]["project"] or
+         d[1]["owner"] != expected_d[1]["owner"] or
+         d[1]["revision"] != expected_d[1]["revision"])
+__PYTHON__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-curl-foo-query-brace
+# (=%28 and )=%29
+Q='q=%28+owner+eq+rose&q=or+owner+eq+rosie+%29&q=and+project+eq+food'
+run_pass "$TEST_KEY" \
+    curl "${URL_FOO_Q}${Q}&format=json"
+run_pass "$TEST_KEY-out" python - "$TEST_KEY.out" <<'__PYTHON__'
+import json, sys
+expected_d = [{"idx": "foo-aa005",
+               "title": "carrot cake",
+               "project": "food",
+               "owner": "rose",
+               "revision": 6},
+              {"idx": "foo-aa006",
+               "title": "apple tart",
                "project": "food",
                "owner": "rosie",
                "revision": 9}]
