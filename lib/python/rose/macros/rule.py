@@ -29,29 +29,6 @@ import rose.macro
 import rose.variable
 
 
-REC_EXPR_IS_THIS_RULE = (
-             """(?:^.*[^\w:=]|^)   (?# Break or beginning)
-                 this              (?# 'this')
-                 (?:               (?# Followed by:)
-                   $               (?# the end)
-                  |                (?# or)
-                   \W              (?# break plus)
-                   .*              (?# anything)
-                   (               (?# Start operator)
-                     [%<>=-+/*]    (?# Arithmetic)
-                    |              (?# or)
-                     in\s          (?# String)
-                    |              (?# or)
-                     not\s         (?# Logical not)
-                    |              (?# or)
-                     and\s         (?# Logical and)
-                    |              (?# or)
-                     or\s          (?# Logical or)
-                   )               (?# End operator)
-                   .*              (?# anything)
-                   $               (?# the end)
-                 )""", re.X)
-
 
 REC_EXPR_IS_THIS_RULE = re.compile(
              """(?:^.*[^\w:=]|^)   (?# Break or beginning)
@@ -177,7 +154,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                        (?:\(\d+\))?   (?# Optional element for the option )
                       )               (?# End ID capture )
                       (?:\W|$)        (?# Break or end)""", re.X)
-    REC_LEN_FUNC = re.compile(r"(\W)len\( *(\S+) *(\S+) *(.*?) *\)(\W)")
+    REC_LEN_FUNC = re.compile(r"(\W)len\( *(\S+) *\)(\W)")
     REC_SCI_NUM = re.compile(r"""
                      (?:\W|^)    (?# Break or beginning)
                      (           (?# Begin number capture)
@@ -223,13 +200,12 @@ class RuleEvaluator(rose.macro.MacroBase):
                 new_string += ")" + end
                 rule = rec_regex.sub(new_string, rule, count=1)
         for search_result in self.REC_LEN_FUNC.findall(rule):
-            start, var_id, operator, value, end = search_result
+            start, var_id, end = search_result
             if var_id == "this":
                 var_id = setting_id
             setting_value = self._get_value_from_id(var_id, config)
             array_value = rose.variable.array_split(setting_value)
-            new_string = (start + "(" + str(len(array_value)) +
-                          operator + value + ")" + end)
+            new_string = start + str(len(array_value)) + end
             rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
         for search_result in self.REC_SCI_NUM.findall(rule):
             sci_num_count += 1
