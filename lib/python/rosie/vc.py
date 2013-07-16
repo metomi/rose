@@ -25,6 +25,7 @@ import pwd
 import re
 import rose.config
 import rose.external
+from rose.fs_util import FileSystemUtil
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
@@ -36,20 +37,6 @@ from StringIO import StringIO
 import sys
 import tempfile
 import time
-
-
-PROMPT_CREATE = "Create? y/n (default n) "
-PROMPT_DELETE = "Delete {0}? y/n (default n) "
-PROMPT_DELETE_ALL = "Delete {0}? y/n/a (default n, a=yes-to-all) "
-
-
-class DeleteWarning(Event):
-    """Raised when a user is about to delete a repository copy of a suite."""
-    KIND = Event.KIND_ERR
-    DELETE_WARNING = ("This will delete both local and repository " +
-                          "copies of your suite")    
-    def __str__(self):
-        return self.DELETE_WARNING
 
 
 class FileExistError(Exception):
@@ -84,32 +71,6 @@ class SuiteInfoFieldError(Exception):
     """Raised when the rose-suite.info doesn't contain a required field."""
     def __str__(self):
         return "rose-suite.info: compulsory field \"%s\" not defined" % self.args[0]
-
-
-class FileCreateEvent(Event):
-    """An event raised after when items are created in the file system.
-
-    event.args is a list containing the path of the items created.
-
-    """
-
-    LEVEL = Reporter.V
-
-    def __str__(self):
-        return "%s: created" % " ".join(self.args)
-
-
-class FileDeleteEvent(Event):
-    """An event raised after items are removed from the file system.
-
-    event.args is a list containing the path of the items removed.
-
-    """
-
-    KIND = Reporter.KIND_ERR
-
-    def __str__(self):
-        return "%s: deleted" % " ".join(self.args)
 
 
 class LocalCopyCreateEvent(Event):
@@ -170,20 +131,24 @@ class SuiteDeleteEvent(Event):
 
     def __str__(self):
         id = self.args[0]
-        return "%s: deleted" % id.to_origin()
+        return "delete: %s" % id.to_origin()
 
 
 class RosieVCClient(object):
 
     """Client for version control functionalities."""
 
-    def __init__(self, event_handler=None, popen=None, force_mode=False):
+    def __init__(self, event_handler=None, popen=None, fs_util=None,
+                 force_mode=False):
         if event_handler is None:
             event_handler = self._dummy
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
         self.popen = popen
+        if fs_util is None:
+            fs_util = FileSystemUtil(event_handler)
+        self.fs_util = fs_util
         self.force_mode = force_mode
         self._work_dir = None
         atexit.register(self._delete_work_dir)
@@ -220,17 +185,12 @@ class RosieVCClient(object):
                 self.event_handler(LocalCopyCreateSkipEvent(id))
                 return id
             elif self.force_mode:
-                if os.path.isfile(local_copy):
-                    unlink(local_copy)
-                else:
-                    shutil.rmtree(local_copy)
-                self.event_handler(FileDeleteEvent(local_copy))
+                self.fs_util.delete(local_copy)
             else:
                 raise FileExistError(local_copy)
         local_copy_dir = os.path.dirname(local_copy)
         if not os.path.isdir(local_copy_dir):
-            os.makedirs(os.path.dirname(local_copy))
-            self.event_handler(FileCreateEvent(local_copy_dir))
+            self.fs_util.makedirs(os.path.dirname(local_copy))
         origin = id.to_origin() + "/" + id.branch + "@" + id.revision
         self.popen("svn", "checkout", "-q", origin, local_copy)
         self.event_handler(LocalCopyCreateEvent(id))
@@ -335,10 +295,8 @@ class RosieVCClient(object):
                 if status:
                     raise LocalCopyStatusError(id, status)
             if os.getcwd() == local_copy:
-                # TODO: Event?
-                os.chdir(os.path.expanduser("~"))
-            shutil.rmtree(local_copy)
-            self.event_handler(FileDeleteEvent(local_copy))
+                self.fs_util.chdir(os.path.expanduser("~"))
+            self.fs_util.delete(local_copy)
         if not local_only:    
             self.popen("svn", "delete",
                        "-q", "-m", "%s: deleted." % str(id),
@@ -449,7 +407,7 @@ def create(argv):
         info_config = rose.config.load(opts.info_file)
     if not opts.non_interactive:
         try:
-            response = raw_input(PROMPT_CREATE)
+            response = raw_input("Create? y/n (default n) ")
         except EOFError:
             sys.exit(1)
         if response != 'y':
@@ -478,31 +436,37 @@ def delete(argv):
     SuiteId.svn.event_handler = client.event_handler # FIXME
     if not args:
         args.append(SuiteId(location=os.getcwd()))
-    skip_prompt = opts.non_interactive
-    prompt = PROMPT_DELETE
-    if len(args) > 1:
-        prompt = PROMPT_DELETE_ALL
+    interactive_mode = not opts.non_interactive
+    prompt = ("%s: delete local+repository copies? " +
+              "y/n/a (default n, a=yes-to-all) ")
+    if opts.local_only:
+        prompt = "%s: delete local copy? y/n/a (default n, a=yes-to-all) "
+    rc = 0
     for arg in args:
-        if not skip_prompt:
+        if interactive_mode:
             try:
-                if not opts.local_only:
-                    report(DeleteWarning())
-                response = raw_input(prompt.format(arg))
+                response = raw_input(prompt % arg)
             except EOFError:
+                rc = 1
                 continue
-            if response == 'a' and len(args) > 1:
-                skip_prompt = True
+            if response == 'a':
+                interactive_mode = False
             elif response != 'y':
+                rc = 1
                 continue
         if opts.debug_mode:
             client.delete(arg, opts.local_only)
         else:    
             try:
                 client.delete(arg, opts.local_only)
-            except (LocalCopyStatusError, RosePopenError) as e:
+            except (LocalCopyStatusError, RosePopenError,
+                    SuiteIdPrefixError) as e:
                 client.event_handler(e)
+                rc = 1
                 if not opts.force_mode:
                     sys.exit(1)
+    if rc:
+        sys.exit(rc)
 
 
 def main():
