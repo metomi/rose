@@ -123,9 +123,11 @@ class MenuWidget(gtk.HBox):
             old_middle = option_ui_middle
             option_ui_middle = ''
             for err in variable.error:
-                option_ui_middle += "<menuitem action='Error_" + err + "'/>"
-                e_string = "(" + err + ")"
-                actions.append(("Error_" + err, gtk.STOCK_DIALOG_WARNING,
+                err_name = err.replace("/", "_")
+                option_ui_middle += ("<menuitem action='Error_" + err_name +
+                                     "'/>")
+                e_string = "(" + err.replace("_", "__") + ")"
+                actions.append(("Error_" + err_name, gtk.STOCK_DIALOG_WARNING,
                                 e_string))
             option_ui_middle += "<separator name='sepError'/>" + old_middle
         if self.is_ghost:
@@ -220,7 +222,8 @@ class MenuWidget(gtk.HBox):
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
         dialog_func = rose.gtk.util.run_hyperlink_dialog
         for error in errors:
-            action_name = "Error_" + error
+            err_name = error.replace("/", "_")
+            action_name = "Error_" + err_name
             if "action='" + action_name + "'" not in option_ui:
                 continue
             err_item = uimanager.get_widget('/Options/' + action_name)
