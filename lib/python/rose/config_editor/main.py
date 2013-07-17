@@ -105,7 +105,7 @@ class MainController(object):
     def __init__(self, config_directory=None, config_objs=None,
                  pluggable=False,
                  loader_update=rose.config_editor.false_function,
-                 load_all_apps=False, load_no_apps=False):
+                 load_all_apps=False, load_no_apps=False, metadata_off=False):
         if config_objs is None:
             config_objs = {}
         if pluggable:
@@ -118,7 +118,7 @@ class MainController(object):
         self.redo_stack = [] # Nothing to redo yet
         self.find_hist = {'regex': '', 'ids': []}
         self.util = rose.config_editor.util.Lookup()
-        self.metadata_off = False
+        self.metadata_off = metadata_off
 
         # Set page variable 'verbosity' defaults.
         self.page_var_show_modes = {
@@ -242,7 +242,7 @@ class MainController(object):
                              self.is_pluggable)
 
         self.data.load(config_directory, config_objs, 
-                       load_all_apps, load_no_apps)
+                       load_all_apps, load_no_apps, metadata_off)
 
         self.reporter.report_load_event(
                       rose.config_editor.EVENT_LOAD_STATUSES.format(
@@ -491,7 +491,9 @@ class MainController(object):
                 ('/TopMenuBar/View/Flag no-metadata vars',
                 rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS),
                 ('/TopMenuBar/View/View status bar',
-                rose.config_editor.SHOULD_SHOW_STATUS_BAR)])
+                rose.config_editor.SHOULD_SHOW_STATUS_BAR),
+                ('/TopMenuBar/Metadata/Switch off metadata',
+                self.metadata_off)])
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
@@ -500,6 +502,8 @@ class MainController(object):
                 if (address.endswith("View user-ignored") and
                     rose.config_editor.SHOULD_SHOW_IGNORED):
                     widget.set_sensitive(False)
+            if address.endswith("Reload metadata") and self.metadata_off:
+                widget.set_sensitive(False)
             widget.connect('activate', action)
         page_menu = self.menubar.uimanager.get_widget("/TopMenuBar/Page")
         add_menuitem = self.menubar.uimanager.get_widget(
@@ -587,7 +591,7 @@ class MainController(object):
                        rose.config_editor.EVENT_LOAD_ATTEMPT.format(
                        namespace_name), 
                        new_total_events=3)
-            self.data.load_config(config_data.directory, preview=False)
+            self.data.load_config(config_data.directory, preview=False, metadata_off=self.metadata_off)
             self.reload_namespace_tree()
             self.reporter.report_load_event(
                        rose.config_editor.EVENT_LOADED.format(namespace_name),
@@ -1594,7 +1598,7 @@ class MainController(object):
 # ----------------------- System functions -----------------------------------
 
 def spawn_window(config_directory_path=None, debug_mode=False, 
-                 load_all_apps=False, load_no_apps=False):
+                 load_all_apps=False, load_no_apps=False, metadata_off=False):
     """Create a window and load the configuration into it. Run gtk."""
     RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
     rose.gtk.util.rc_setup(
@@ -1622,7 +1626,8 @@ def spawn_window(config_directory_path=None, debug_mode=False,
         MainController(config_directory_path,
                        loader_update=splash_screen,
                        load_all_apps=load_all_apps,
-                       load_no_apps=load_no_apps)
+                       load_no_apps=load_no_apps,
+                       metadata_off=metadata_off)
     except BaseException as e:
         splash_screen.stop()
         if debug_mode and isinstance(e, Exception):
@@ -1679,7 +1684,7 @@ if __name__ == '__main__':
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode", 
-                              "load_no_apps", "load_all_apps")
+                              "load_no_apps", "load_all_apps", "no_metadata")
     opts, args = opt_parser.parse_args()
     if args:
         opt_parser.print_usage(sys.stderr)
@@ -1708,7 +1713,8 @@ if __name__ == '__main__':
         f = tempfile.NamedTemporaryFile()
         cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,
                                         load_all_apps=opts.load_all_apps,
-                                        load_no_apps=opts.load_no_apps)""",
+                                        load_no_apps=opts.load_no_apps,
+                                        metadata_off=opts.no_metadata)""",
                         globals(), locals(), f.name)
         p = pstats.Stats(f.name)
         p.strip_dirs().sort_stats('cumulative').print_stats(200)
@@ -1716,4 +1722,5 @@ if __name__ == '__main__':
     else:
         spawn_window(cwd, debug_mode=opts.debug_mode, 
                      load_all_apps=opts.load_all_apps,
-                     load_no_apps=opts.load_no_apps)
+                     load_no_apps=opts.load_no_apps,
+                     metadata_off=opts.no_metadata)

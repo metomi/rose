@@ -48,5 +48,7 @@
 #        This option can be used repeatedly to load multiple paths.
 #     --new
 #        Launch, ignoring any configuration.
+#     --no-metadata
+#        Launch with metadata switched off.
 #-------------------------------------------------------------------------------
 exec python -m rose.config_editor.main "$@"
