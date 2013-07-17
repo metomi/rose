@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 12
+tests 9
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 cat </dev/null >tests
@@ -72,10 +72,8 @@ done <tests
 #-------------------------------------------------------------------------------
 # Tidy up
 while read OPT_KEY SUITE_RUN_DIR; do
-    TEST_KEY=$TEST_KEY_BASE-clean-$OPT_KEY
     NAME=$(basename $SUITE_RUN_DIR)
-    run_pass "$TEST_KEY" rose suite-clean -y $NAME
-    rmdir $SUITE_RUN_DIR 2>/dev/null || true
+    rose suite-clean -q -y $NAME
 done <tests
 #-------------------------------------------------------------------------------
 exit 0
