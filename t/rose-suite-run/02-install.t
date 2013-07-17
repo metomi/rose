@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-N_TESTS=7
+N_TESTS=6
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
@@ -85,7 +85,5 @@ else
     skip 2 "$TEST_KEY_BASE-items: [t]job-host not defined"
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-clean
-run_pass "$TEST_KEY" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

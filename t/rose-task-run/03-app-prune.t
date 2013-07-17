@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 10
+tests 9
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -z $JOB_HOST ]]; then
@@ -35,6 +35,7 @@ fi
 # Run the suite.
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
+mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 if [[ -n ${JOB_HOST:-} ]]; then
@@ -51,7 +52,6 @@ fi
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -59,7 +59,6 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
@@ -76,7 +75,6 @@ else
     sed '/\$JOB_HOST/d' $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
 fi
 file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
-diff -u expected-prune.log edited-prune.log
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ls
 run_pass "$TEST_KEY" \
@@ -84,7 +82,6 @@ run_pass "$TEST_KEY" \
 sed "s?\\\$SUITE_RUN_DIR?$SUITE_RUN_DIR?g" \
     $TEST_SOURCE_DIR/$TEST_KEY.out >expected-ls.out
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-ls.out
-diff -u "$TEST_KEY.out" expected-ls.out
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 if [[ -n $JOB_HOST ]]; then
@@ -94,11 +91,8 @@ if [[ -n $JOB_HOST ]]; then
     sed "s/\\\$NAME/$NAME/g" \
         $TEST_SOURCE_DIR/$TEST_KEY.out >expected-host-ls.out
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-host-ls.out
-    diff -u "$TEST_KEY.out" expected-host-ls.out
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-clean
-run_pass "$TEST_KEY" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

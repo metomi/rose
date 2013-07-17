@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 3
+tests 5
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
@@ -39,7 +39,9 @@ run_fail "$TEST_KEY" rose suite-clean -y $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] $NAME: cannot clean, still running on localhost
 __ERR__
-ls -ld $HOME/cylc-run/$NAME 1>/dev/null
+if [[ ! -d $HOME/cylc-run/$NAME ]]; then
+    exit 1
+fi
 #-------------------------------------------------------------------------------
 touch $SUITE_RUN_DIR/flag # let the suite stop
 # Wait for the suite to complete
@@ -52,6 +54,9 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
 fi
 TEST_KEY=$TEST_KEY_BASE-stopped
 run_pass "$TEST_KEY" rose suite-clean -y $NAME
-! ls -ld $HOME/cylc-run/$NAME 2>/dev/null
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $SUITE_RUN_DIR/
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 exit 0
