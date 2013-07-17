@@ -24,6 +24,7 @@ It also stores macro base classes and macro library functions.
 
 """
 
+import ast
 import copy
 import imp
 import inspect
@@ -442,7 +443,18 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 macro_inst = getattr(module, class_name)()
                 macro_method = getattr(macro_inst, method)
                 break
-        return macro_method(config, meta_config)
+        arglist = inspect.getargspec(macro_method).args
+        defaultlist = inspect.getargspec(macro_method).defaults
+        optionals = {}
+        while len(defaultlist) > 0:
+            if arglist[-1] not in ["self", "config", "meta_config"]:
+                optionals[arglist[-1]] = defaultlist[-1]
+                arglist = arglist[0:-1]
+                defaultlist = defaultlist[0:-1]
+            else:
+                break
+        res = _get_user_values(optionals)
+        return macro_method(config, meta_config, **res)
     return config, []
 
 
@@ -698,6 +710,7 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
 
 def _handle_transform(app_config, new_config, change_list, macro_id,
                       opt_conf_dir, opt_output_dir, opt_non_interactive):
+
     user_allowed_changes = False
     has_changes = any([not i.is_warning for i in change_list])
     sys.stdout.write(get_reports_as_text(change_list, macro_id,
@@ -721,6 +734,20 @@ def _get_user_accept():
         user_allowed_changes = (user_input == PROMPT_OK)
     return user_allowed_changes
 
+def _get_user_values(options):
+    for k,v in options.items():
+        try:
+            user_input = raw_input(str(k) + " (press enter for default=" +
+                                   str(v) + "): ")
+        except EOFError:
+            user_input = ""
+        if len(user_input) > 0:
+            print user_input
+            try:
+                options[k] = ast.literal_eval(user_input)
+            except ValueError:
+               sys.stderr.write("Invalid entry, using default")
+    return options
 
 def dump_config(app_config, opt_conf_dir, opt_output_dir=None):
     """Dump the config in a standard form."""
