@@ -26,7 +26,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      &copy; British Crown Copyright 2012-3 <a href=
+      © British Crown Copyright 2012-3 <a href=
       "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
       "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
@@ -1092,7 +1092,22 @@ namelist:foo=bar(2) == 'c'
 'b' == 'c'
 </pre>
 
-    <p>There are two special array functions, <samp>any</samp> and
+    <p>Should you wish to make use of the array length in an expression you can
+    make use of the <samp>len</samp> function, which behaves in the same manner
+    as its Python and Fortran equivalents to return the array length. For
+    example:</p>
+    <pre class="prettyprint lang-python">
+len(namelist:foo=bar) &gt; 3
+</pre>
+
+    <p>would be expanded to:</p>
+    <pre class="prettyprint lang-python">
+4 &gt; 3
+</pre>
+
+    <p>and evaluate as true.</p>
+
+    <p>There are two other special array functions, <samp>any</samp> and
     <samp>all</samp>, which behave in a similar fashion to their Python and
     Fortran equivalents, but have a different syntax.</p>
 
