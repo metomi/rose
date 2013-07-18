@@ -46,6 +46,8 @@ test_array_any_pass = 2, 5, 6, 7
 test_array_any_fail = 2, 0, 6, 7
 test_array_all_pass = 0, 0, 0, 1, 0
 test_array_all_fail = 0, 0, 0, 0, 0
+test_array_len_pass = 0, 1, 2, 3, 4
+test_array_len_fail = 0, 1, 2
 
 [complex:scalar_test]
 test_var_multi_odd_positive_pass = -2
@@ -71,6 +73,9 @@ control_array_any_lt = 9, 8, 5, 7, 13, 45
 test_var_all_ne_pass = 3
 test_var_all_ne_fail = 6
 control_array_all_ne = 1, 2, 3, 4, 5, 7, 8
+test_array_len_pass = 0, 1, 2, 3, 4
+test_array_len_fail = 0, 1, 2
+control_len_array = 0, 1, 2, 3, 4
 
 [simple:warn_test]
 test_var_1 = 1
@@ -154,6 +159,16 @@ fail-if = all(this == 0)
 length = :
 description = Fail if all elements are zero
 fail-if = all(this == 0)
+
+[simple:array_test=test_array_len_pass]
+length = :
+description = Fail if array is wrong length
+fail-if = len(this) != 5
+
+[simple:array_test=test_array_len_fail]
+length = :
+description = Fail if array is wrong length
+fail-if = len(this) != 5
 
 [complex:scalar_test=test_var_multi_odd_positive_pass]
 type = real
@@ -252,6 +267,16 @@ length = :
 type = integer
 length = :
 
+[complex:array_test=test_array_len_pass]
+length = :
+description = Fail if array is wrong length
+fail-if = len(this) > len(complex:array_test=control_len_array) or len(this) < len(complex:array_test=control_len_array)
+
+[complex:array_test=test_array_len_fail]
+length = :
+description = Fail if array is wrong length
+fail-if = len(this) > len(complex:array_test=control_len_array) or len(this) < len(complex:array_test=control_len_array)
+
 [simple:warn_test=test_var_1]
 type = integer
 warn-if = this > 0
@@ -269,7 +294,9 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 16
+[V] rose.macros.DefaultValidators: issues: 18
+    complex:array_test=test_array_len_fail=0, 1, 2
+        failed because: len(this) > len(complex:array_test=control_len_array) or len(this) < len(complex:array_test=control_len_array)
     complex:array_test=test_var_all_ne_fail=6
         failed because: all(complex:array_test=control_array_all_ne != this)
     complex:array_test=test_var_any_lt_fail=6
@@ -294,6 +321,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         failed because: any(this == 0)
     simple:array_test=test_array_fail='0A', '2A', '0A', '0A'
         failed because: this(2) != "'0A'" and this(4) == "'0A'"
+    simple:array_test=test_array_len_fail=0, 1, 2
+        failed because: len(this) != 5
     simple:scalar_test=test_substring_fail="ABCDEFG"
         failed because: "D" in this
     simple:scalar_test=test_var_lt_control_fail=3
