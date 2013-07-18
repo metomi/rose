@@ -59,7 +59,6 @@ def main():
         node = ConfigLoader()(file_name)
         ConfigDumper()(node, t)
         t.seek(0)
-        t.seek(0)
         if not filecmp.cmp(t.name, file_name, shallow=False):
             report(ConfigDumpEvent(file_name))
             ConfigDumper()(node, file_name)
