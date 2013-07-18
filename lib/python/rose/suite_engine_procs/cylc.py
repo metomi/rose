@@ -74,6 +74,10 @@ class CylcProcessor(SuiteEngineProcessor):
                 job_auths = self.get_suite_jobs_auths(suite_name)
             except sqlite3.OperationalError as e:
                 pass
+            finally:
+                # N.B. Must close cursor to ensure that DB file can be removed.
+                self.cursor.close()
+                self.cursor = None
         conf = ResourceLocator.default().get_conf()
         for job_auth in job_auths + ["localhost"]:
             if "@" in job_auth:
@@ -95,13 +99,14 @@ class CylcProcessor(SuiteEngineProcessor):
                     dir_rel = self.get_suite_dir_rel(suite_name, key)
                     item_path_source = os.path.join(item_root, dir_rel)
                     dirs.append(item_path_source)
-            dirs.append(self.get_suite_dir_rel(suite_name))
             if job_auth == "localhost":
+                dirs.append(self.get_suite_dir(suite_name))
                 for d in dirs:
-                    d = os.path.realpath(env_var_process(d))
+                    d = os.path.abspath(env_var_process(d))
                     if os.path.exists(d):
                         self.fs_util.delete(d)
             else:
+                dirs.append(self.get_suite_dir_rel(suite_name))
                 command = self.popen.get_cmd("ssh", job_auth, "rm", "-rf")
                 command += dirs
                 self.popen(*command)

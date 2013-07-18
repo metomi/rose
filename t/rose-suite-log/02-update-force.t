@@ -22,12 +22,12 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 22
+tests 21
 #-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')
     if [[ -z $JOB_HOST ]]; then
-        skip 22 '[t]job-host not defined'
+        skip 21 '[t]job-host not defined'
         exit 0
     fi
     JOB_HOST=$(rose host-select $JOB_HOST)
@@ -52,7 +52,6 @@ fi
 # Wait for the suite to complete, test shutdown on fail
 TEST_KEY="$TEST_KEY_BASE-complete"
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -60,7 +59,6 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
@@ -104,6 +102,5 @@ d = json.load(open(file_name))
 sys.exit(len(d["cycle_times_current"]) != 3)
 __PYTHON__
 #-------------------------------------------------------------------------------
-run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

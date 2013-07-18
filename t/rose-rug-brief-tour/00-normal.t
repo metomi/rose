@@ -40,7 +40,6 @@ run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol -S SLEEP=\":\"
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -48,7 +47,6 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
@@ -82,7 +80,5 @@ sys.exit(d["cycle_time"] != cycle or len(d["tasks"]) != len(tasks) or
 __PYTHON__
 done
 #-------------------------------------------------------------------------------
-if $OK; then
-    rm -r $SUITE_RUN_DIR
-fi
+rose suite-clean -q -y $NAME
 exit 0

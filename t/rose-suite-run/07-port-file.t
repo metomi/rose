@@ -37,4 +37,6 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] $NAME: is already running (detected ~/.cylc/ports/$NAME)
 __ERR__
 #-------------------------------------------------------------------------------
+rm $HOME/.cylc/ports/$NAME
+rose suite-clean -q -y $NAME
 exit 0

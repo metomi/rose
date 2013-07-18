@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 32
+tests 31
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 mkdir -p $HOME/cylc-run
@@ -54,7 +54,6 @@ for I in $(seq 0 $N_RUNS); do
     # Wait for the suite to complete
     TEST_KEY=$TEST_KEY_BASE-$I-wait
     TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-    OK=false
     while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
         sleep 1
     done
@@ -62,7 +61,6 @@ for I in $(seq 0 $N_RUNS); do
         fail "$TEST_KEY"
         exit 1
     else
-        OK=true
         pass "$TEST_KEY"
     fi
     TEST_KEY=$TEST_KEY_BASE-$I-log
@@ -85,7 +83,6 @@ run_pass "$TEST_KEY" $ROSE_SUITE_RUN --log-keep=0
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-log-keep-0-wait
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -93,7 +90,6 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 
@@ -108,7 +104,5 @@ $SUITE_RUN_DIR/log.keep
 __OUT__
 
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-clean
-run_pass "$TEST_KEY" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

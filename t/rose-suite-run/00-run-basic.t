@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-N_TESTS=12
+N_TESTS=11
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
@@ -60,7 +60,6 @@ run_pass "$TEST_KEY" rose suite-run --reload \
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
 touch $SUITE_RUN_DIR/flag # allow the task to die
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -68,11 +67,8 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-clean
-run_pass "$TEST_KEY" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0
