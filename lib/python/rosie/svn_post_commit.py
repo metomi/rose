@@ -283,11 +283,6 @@ def main(repos, rev):
                        status=status, from_idx=copy_idx)
 
 
-def parse_known_keys(repos, file_path, rev):
-    """Parse the file containing whitespace-separated known keys."""
-    key_string = svnlook("cat", "-r", rev, repos, file_path)
-    return " ".join(shlex.split(key_string))
-
 
 if __name__ == "__main__":
     opt_parser = RoseOptionParser()
