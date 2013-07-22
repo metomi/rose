@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 17
+tests 25
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -75,7 +75,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-info-edit
-cat >$TEST_KEY_BASE-edit.in <<__INFO__
+cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
 access-list=*
 owner=$USER
 project=don't fail
@@ -97,7 +97,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-info-edit-no-checkout
-cat >$TEST_KEY_BASE-edit.in <<__INFO__
+cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
 access-list=*
 owner=$USER
 project=don't fail please
@@ -113,6 +113,63 @@ __INFO__
 {
     echo -n 'Create? y/n (default n) '
     echo "[INFO] foo-aa002: created at $URL/a/a/0/0/2"
+}>"$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-copy-empty
+cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
+access-list=*
+owner=$USER
+project=fork
+title=divide and conquer 2
+__INFO__
+run_pass "$TEST_KEY" rosie create foo-aa002 <<<y
+file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+access-list=*
+owner=fred
+project=don't fail please
+title=Copy of foo-aa002: this should never ever fail
+__INFO__
+{
+    echo -n 'Create? y/n (default n) '
+    echo "[INFO] foo-aa003: created at $URL/a/a/0/0/3"
+    echo '[INFO] foo-aa003: copied items from foo-aa002'
+    echo "[INFO] foo-aa003: local copy created at $PWD/roses/foo-aa003"
+}>"$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-copy-not-empty
+# Add something to an existing suite working copy
+mkdir -p $PWD/roses/foo-aa001/{app/hello,etc}
+cat >$PWD/roses/foo-aa001/app/hello/rose-app.conf <<'__ROSE_APP_CONF__'
+[command]
+default=echo Hello
+__ROSE_APP_CONF__
+echo $(($RANDOM % 10)) >$PWD/roses/foo-aa001/etc/number
+svn add -q $PWD/roses/foo-aa001/{app,etc}
+svn ci -q -m 't' $PWD/roses/foo-aa001
+svn up -q $PWD/roses/foo-aa001
+# Issue the copy command
+cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
+access-list=*
+owner=$USER
+project=fork
+title=divide and conquer
+__INFO__
+run_pass "$TEST_KEY" rosie create foo-aa001 <<<y
+file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+access-list=*
+owner=fred
+project=don't fail
+title=Copy of foo-aa001: this should never fail
+__INFO__
+{
+    echo -n 'Create? y/n (default n) '
+    echo "[INFO] foo-aa004: created at $URL/a/a/0/0/4"
+    echo '[INFO] foo-aa004: copied items from foo-aa001'
+    echo "[INFO] foo-aa004: local copy created at $PWD/roses/foo-aa004"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null

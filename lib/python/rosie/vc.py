@@ -197,16 +197,18 @@ class RosieVCClient(object):
         return id
 
     def create(self, info_config, from_id=None, prefix=None,
-               create_meta_suite=False):
+               meta_suite_mode=False):
         """Create a suite.
 
-        info_config should be a rose.config.ConfigNode object,
-        which will be used as the content of the "rose-suite.info" file of the
-        new suite.
-        If from_id is defined, copy items from it.
-        If prefix is defined, create the suite in the suite repository named by
-        the prefix instead of the default one.
-        If create_meta_suite is True, create the special metadata suite.
+        info_config -- A rose.config.ConfigNode object, which will be used as
+                       the content of the "rose-suite.info" file of the new
+                       suite.
+        from_id -- If defined, copy items from it.
+        prefix -- If defined, create the suite in the suite repository named by
+                  the prefix instead of the default one.
+        meta_suite_mode -- If True, create the special metadata suite.
+                           Ignored if from_id is not None.
+
         Return the SuiteId of the suite on success.
 
         """
@@ -214,10 +216,10 @@ class RosieVCClient(object):
             if not info_config.get([key], no_ignore=True):
                 raise SuiteInfoFieldError(key)
         if from_id is not None:
-            prefix = from_id.prefix
+            return self._copy(info_config, from_id)
         new_id = None
         while new_id is None:
-            if create_meta_suite:
+            if meta_suite_mode:
                 if prefix is None:
                     new_id = SuiteId(id_text="ROSIE")
                 else:
@@ -231,52 +233,19 @@ class RosieVCClient(object):
             open(os.path.join(dir, "rose-suite.conf"), "w").close()
             try:
                 self.popen("svn", "import",
-                          "-q",
-                          "-m", "%s: new suite." % str(new_id),
-                          dir,
-                          new_origin)
+                           "-q",
+                           "-m", "%s: new suite." % str(new_id),
+                           dir,
+                           new_origin)
                 self.event_handler(SuiteCreateEvent(new_id))
                 self._delete_work_dir()
             except RosePopenError as e:
                 try:
                     self.popen("svn", "info", new_origin)
-                    if not create_meta_suite:
+                    if not meta_suite_mode:
                         new_id = None
                 except RosePopenError:
                     raise e
-        if from_id is None:
-            return new_id
-        from_origin_base = "%s/%s" % (from_id.to_origin(), from_id.branch)
-        from_origin = "%s@%s" % (from_origin_base, from_id.revision)
-        copy_command_list = ["copy", "-q"]
-        from_item_list = []
-        for from_item in self.popen("svn", "ls", from_origin)[0].split():
-            if from_item not in ["rose-suite.conf", "rose-suite.info"]:
-                item = "%s/%s@%s" % (from_origin_base, from_item, from_id.revision)
-                copy_command_list.append(item)
-                from_item_list.append(item)
-        copy_command_list.append(".")
-        if not from_item_list:
-            return new_id
-        log = "%s: copy items from %s" % (str(new_id),
-                                          from_id.to_string_with_version())
-        temp_local_copy = os.path.join(self._get_work_dir(), "work")
-        try:
-            self.popen("svn", "checkout", new_origin, temp_local_copy)
-            cwd = os.getcwd()
-            os.chdir(temp_local_copy)
-            self.popen("svn", *copy_command_list)
-            from_conf = "%s/%s@%s" % (from_origin_base,
-                                      "rose-suite.conf",
-                                      from_id.revision)
-            f = open("rose-suite.conf", "w")
-            f.write(self.popen("svn", "cat", from_conf)[0])
-            f.close()
-            self.popen("svn", "commit", "-m", log)
-            self.event_handler(SuiteCopyEvent(new_id, from_id))
-        finally:
-            os.chdir(cwd)
-            self._delete_work_dir()
         return new_id
 
     def delete(self, id, local_only=False):
@@ -347,6 +316,46 @@ class RosieVCClient(object):
             info_config.set(["title"], "")
         return info_config
 
+    def _copy(self, info_config, from_id):
+        from_id_url = "%s/%s@%s" % (from_id.to_origin(), from_id.branch,
+                                    from_id.revision)
+        self.popen("svn", "info", from_id_url) # Die if from_id not exists
+        prefix = from_id.prefix
+        temp_local_copy = os.path.join(self._get_work_dir(), "work")
+        new_id = None
+        # N.B. This is probably the simplest logic to maintain,
+        #      but not the most efficient for runtime. Does it matter?
+        while new_id is None:
+            if os.path.exists(temp_local_copy):
+                shutil.rmtree(temp_local_copy)
+            self.popen("svn", "checkout", "-q", "--depth", "empty",
+                       SuiteId.get_prefix_location(prefix), temp_local_copy)
+            new_id = SuiteId.get_next(prefix)
+            for i in range(len(new_id.sid)):
+                d = os.path.join(temp_local_copy,
+                                 os.sep.join(new_id.sid[0:i + 1]))
+                self.popen("svn", "update", "-q", "--depth", "empty", d)
+                if not os.path.isdir(d):
+                    os.mkdir(d)
+                    self.popen("svn", "add", "-q", d)
+            d = os.path.join(temp_local_copy, os.sep.join(new_id.sid))
+            self.popen("svn", "cp", "-q", from_id_url, os.path.join(d, "trunk"))
+            rose.config.dump(info_config,
+                             os.path.join(d, "trunk", "rose-suite.info"))
+            message = "%s: new suite, a copy of %s" % (new_id, from_id)
+            try:
+                self.popen("svn", "commit", "-q", "-m", message, d)
+                self.event_handler(SuiteCreateEvent(new_id))
+                self.event_handler(SuiteCopyEvent(new_id, from_id))
+                self._delete_work_dir()
+            except RosePopenError as e:
+                try:
+                    self.popen("svn", "info", new_id.to_origin())
+                    new_id = None
+                except RosePopenError:
+                    raise e
+        return new_id
+
 
 def checkout(argv):
     """CLI function: checkout."""
@@ -373,7 +382,7 @@ def create(argv):
     """CLI function: create and copy."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("checkout_mode", "info_file",
-                              "meta_suite", "non_interactive", "prefix")
+                              "meta_suite_mode", "non_interactive", "prefix")
     opts, args = opt_parser.parse_args(argv)
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
@@ -413,7 +422,8 @@ def create(argv):
         if response != 'y':
             sys.exit(1)
     try:
-        id = client.create(info_config, from_id, opts.prefix, opts.meta_suite)
+        id = client.create(info_config, from_id, opts.prefix,
+                           opts.meta_suite_mode)
     except (RosePopenError, SuiteInfoFieldError, SuiteIdOverflowError) as e:
         report(e)
         sys.exit(1)
