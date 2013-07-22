@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 20
+tests 45
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo || exit 1
@@ -62,7 +62,7 @@ file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
 cat $PWD/rosa-svn-post-commit.err
 file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
-file_cmp "$TEST_KEY-db-select.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
 foo-aa000|trunk|ivy|hook|test post commit hook: create
 __OUT__
 #-------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
 file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
 file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
-file_cmp "$TEST_KEY-db-select.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
 foo-aa000|trunk|ivy|hook|test post commit hook: create
 foo-aa001|trunk|ivy|hook|test post commit hook: copy empty
 __OUT__
@@ -104,7 +104,7 @@ file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
 file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
 file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
-file_cmp "$TEST_KEY-db-select.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
 foo-aa000|trunk|ivy|hook|test post commit hook: create
 foo-aa001|trunk|ivy|hook|test post commit hook: copy empty
 __OUT__
@@ -118,7 +118,7 @@ file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
 file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
 file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
-file_cmp "$TEST_KEY-db-select.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
 foo-aa000|trunk|ivy|sticky|test post commit hook: create
 foo-aa001|trunk|ivy|hook|test post commit hook: copy empty
 __OUT__
@@ -135,10 +135,106 @@ file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
 file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
 file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
-file_cmp "$TEST_KEY-db-select.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
 foo-aa000|trunk|ivy|sticky|test post commit hook: create
 foo-aa001|trunk|ivy|hook|test post commit hook: copy empty
 foo-aa002|trunk|ivy|sticky tape|test post commit hook: copy suite with content
+__OUT__
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-meta"
+cat >rose-suite.info <<'__ROSE_SUITE_INFO'
+access-list=*
+owner=rosie
+project=meta
+title=configuration metadata for discovery information
+__ROSE_SUITE_INFO
+rosie create -q -y --info-file=rose-suite.info --no-checkout --meta-suite
+file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
+file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
+file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
+sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
+file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+foo-aa000|trunk|ivy|sticky|test post commit hook: create
+foo-aa001|trunk|ivy|hook|test post commit hook: copy empty
+foo-aa002|trunk|ivy|sticky tape|test post commit hook: copy suite with content
+foo-ROSIE|trunk|rosie|meta|configuration metadata for discovery information
+__OUT__
+sqlite3 $PWD/repos/foo.db 'SELECT * FROM meta' >"$TEST_KEY-db-select.out" \
+    || exit 1
+file_cmp "$TEST_KEY-db-select-meta.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+__OUT__
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-meta-edit"
+rosie checkout -q foo-ROSIE || exit 1
+echo 'world galaxy universe' >$PWD/roses/foo-ROSIE/rosie-keys
+svn add -q $PWD/roses/foo-ROSIE/rosie-keys || exit 1
+svn ci -q -m t $PWD/roses/foo-ROSIE || exit 1
+file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
+file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
+file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
+sqlite3 $PWD/repos/foo.db 'SELECT * FROM meta' >"$TEST_KEY-db-select.out"
+file_cmp "$TEST_KEY-db-select.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+known_keys|world galaxy universe
+__OUT__
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-branch"
+svn cp -m t -q $SVN_URL/a/a/0/0/0/trunk $SVN_URL/a/a/0/0/0/hello || exit 1
+file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
+file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
+file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
+sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
+file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+foo-aa000|trunk|ivy|sticky|test post commit hook: create
+foo-aa001|trunk|ivy|hook|test post commit hook: copy empty
+foo-aa002|trunk|ivy|sticky tape|test post commit hook: copy suite with content
+foo-ROSIE|trunk|rosie|meta|configuration metadata for discovery information
+foo-aa000|hello|ivy|sticky|test post commit hook: create
+__OUT__
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-branch-update"
+#rosie checkout -q foo-aa000
+svn switch -q $SVN_URL/a/a/0/0/0/hello $PWD/roses/foo-aa000 || exit 1
+sed -i 's/^title=.*$/title=test post commit hook: branch update/' \
+    $PWD/roses/foo-aa000/rose-suite.info || exit 1
+svn ci -q -m t $PWD/roses/foo-aa000
+svn switch -q $SVN_URL/a/a/0/0/0/trunk $PWD/roses/foo-aa000 || exit 1
+file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
+file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
+file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
+sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
+file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+foo-aa000|trunk|ivy|sticky|test post commit hook: create
+foo-aa001|trunk|ivy|hook|test post commit hook: copy empty
+foo-aa002|trunk|ivy|sticky tape|test post commit hook: copy suite with content
+foo-ROSIE|trunk|rosie|meta|configuration metadata for discovery information
+foo-aa000|hello|ivy|sticky|test post commit hook: branch update
+__OUT__
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-branch-delete"
+svn rm -q -m t $SVN_URL/a/a/0/0/0/hello || exit 1
+file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
+file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
+file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
+sqlite3 $PWD/repos/foo.db \
+    'SELECT status,idx,branch FROM changeset
+         WHERE idx=="foo-aa000" AND status=="D "' \
+    >"$TEST_KEY-db-select.out"
+file_cmp "$TEST_KEY-db-select-changeset.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+D |foo-aa000|hello
+__OUT__
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-suite-delete"
+svn rm -q -m t $SVN_URL/a/a/0/0/0 || exit 1
+file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
+file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
+file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
+sqlite3 $PWD/repos/foo.db \
+    'SELECT status,idx,branch FROM changeset
+        WHERE idx=="foo-aa000" AND status=="D "' \
+    >"$TEST_KEY-db-select.out"
+file_cmp "$TEST_KEY-db-select-changeset.out" "$TEST_KEY-db-select.out" <<'__OUT__'
+D |foo-aa000|hello
+D |foo-aa000|trunk
 __OUT__
 #-------------------------------------------------------------------------------
 exit 0

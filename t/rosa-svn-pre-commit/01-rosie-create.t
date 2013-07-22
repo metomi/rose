@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 8
+tests 16
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo
@@ -101,6 +101,45 @@ file_cmp "$TEST_KEY.changed.1" "$TEST_KEY.changed" <<'__CHANGED__'
 A   a/a/0/0/1/
 A   a/a/0/0/1/trunk/
 U   a/a/0/0/1/trunk/rose-suite.info
+__CHANGED__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-meta-empty
+cat >rose-suite.info <<__INFO__
+access-list=*
+owner=$USER
+project=meta
+title=configuration metadata for discovery information
+__INFO__
+run_pass "$TEST_KEY" \
+    rosie create -y --meta-suite --info-file=rose-suite.info --no-checkout
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] foo-ROSIE: created at $SVN_URL/R/O/S/I/E
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+svnlook changed repos/foo >"$TEST_KEY.changed"
+file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
+A   R/
+A   R/O/
+A   R/O/S/
+A   R/O/S/I/
+A   R/O/S/I/E/
+A   R/O/S/I/E/trunk/
+A   R/O/S/I/E/trunk/rose-suite.conf
+A   R/O/S/I/E/trunk/rose-suite.info
+__CHANGED__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-meta-keys-file
+rosie checkout -q foo-ROSIE
+cat >$PWD/roses/foo-ROSIE/rosie-keys <<__KEYS__
+world galaxy universe
+__KEYS__
+svn add -q $PWD/roses/foo-ROSIE/rosie-keys
+run_pass "$TEST_KEY" svn commit -q -m 't' $PWD/roses/foo-ROSIE
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+svnlook changed repos/foo >"$TEST_KEY.changed"
+file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
+A   R/O/S/I/E/trunk/rosie-keys
 __CHANGED__
 #-------------------------------------------------------------------------------
 exit 0

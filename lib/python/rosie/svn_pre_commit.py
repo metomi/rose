@@ -57,7 +57,7 @@ class RosieSvnPreCommitHook(object):
 
     """
 
-    RE_ID_NAMES = [r"[a-z]", r"[a-z]", r"\d", r"\d", r"\d"]
+    RE_ID_NAMES = [r"[Ra-z]", r"[Oa-z]", r"[S\d]", r"[I\d]", r"[E\d]"]
     LEN_ID = len(RE_ID_NAMES)
     TRUNK_INFO_FILE = "trunk/rose-suite.info"
     TRUNK_KNOWN_KEYS_FILE = "trunk/rosie-keys"
@@ -111,24 +111,22 @@ class RosieSvnPreCommitHook(object):
                 names.pop()
 
             # Directories above the suites must match the ID patterns
-            is_meta_suite = False
-            if len(names) >= self.LEN_ID and names[0:self.LEN_ID] == "ROSIE":
-                is_meta_suite = True
-            else:
-                is_bad = False
-                for name, pattern in zip(names, self.RE_ID_NAMES):
-                    if not re.compile(r"\A" + pattern + r"\Z").match(name):
-                        is_bad = True
-                        break
-                if is_bad:
-                    bad_changes.add((status, path))
-                    continue
+            is_bad = False
+            for name, pattern in zip(names, self.RE_ID_NAMES):
+                if not re.compile(r"\A" + pattern + r"\Z").match(name):
+                    is_bad = True
+                    break
+            if is_bad:
+                bad_changes.add((status, path))
+                continue
 
             # Can only add directories at levels above the suites
             if len(names) < self.LEN_ID:
                 if status[0] != self.ST_ADD:
                     bad_changes.add((status, path))
                 continue
+            else:
+                is_meta_suite = "".join(names[0:self.LEN_ID]) == "ROSIE"
 
             # No need to check non-trunk changes
             if len(names) > self.LEN_ID and names[self.LEN_ID] != "trunk":

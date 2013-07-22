@@ -177,7 +177,7 @@ def main(repos, rev):
                 is_new_copied_branch = True
         if (sid == "ROSIE" and branch == "trunk" and
             path == branch_path + "/" + KNOWN_KEYS_FILE):
-            keys_str = svnlook("cat", "-r", rev, repos, file_path)
+            keys_str = svnlook("cat", "-r", rev, repos, path)
             keys_str = " ".join(shlex.split(keys_str))
             if keys_str:
                 try:
