@@ -326,7 +326,7 @@ class MacroUpgradeManager(object):
                 arglist = inspect.getargspec(func).args
                 defaultlist = inspect.getargspec(func).defaults
                 optionals = {}
-                while len(defaultlist) > 0:
+                while defaultlist is not None and len(defaultlist) > 0:
                     if arglist[-1] not in ["self", "config", "meta_config"]:
                         optionals[arglist[-1]] = defaultlist[-1]
                         arglist = arglist[0:-1]

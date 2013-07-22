@@ -425,14 +425,15 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                 arglist = inspect.getargspec(macro_meth).args
                 defaultlist = inspect.getargspec(macro_meth).defaults
                 optionals = {}
-                while len(defaultlist) > 0:
+                while defaultlist is not None and len(defaultlist) > 0:
                     if arglist[-1] not in ["self", "config", "meta_config"]:
                         optionals[arglist[-1]] = defaultlist[-1]
                         arglist = arglist[0:-1]
                         defaultlist = defaultlist[0:-1]
                     else:
                         break
-                res = _get_user_values(optionals)
+                if optionals:
+                    res = _get_user_values(optionals)
             problem_list = macro_meth(app_config, meta_config, **res)
             if not isinstance(problem_list, list):
                 raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
@@ -461,14 +462,15 @@ def transform_config(config, meta_config, transformer_macro, modules,
             arglist = inspect.getargspec(macro_method).args
             defaultlist = inspect.getargspec(macro_method).defaults
             optionals = {}
-            while len(defaultlist) > 0:
+            while defaultlist is not None and len(defaultlist) > 0:
                 if arglist[-1] not in ["self", "config", "meta_config"]:
                     optionals[arglist[-1]] = defaultlist[-1]
                     arglist = arglist[0:-1]
                     defaultlist = defaultlist[0:-1]
                 else:
                     break
-            res = _get_user_values(optionals)
+            if optionals:
+                res = _get_user_values(optionals)
         return macro_method(config, meta_config, **res)
     return config, []
 
