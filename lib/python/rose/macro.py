@@ -409,7 +409,7 @@ def get_macros_for_config(app_config=None,
 
 
 def validate_config(app_config, meta_config, run_macro_list, modules,
-                    macro_info_tuples):
+                    macro_info_tuples, opt_non_interactive=False):
     """Run validator custom macros on the config and return problems."""
     macro_problem_dict = {}
     for module_name, class_name, method, help in macro_info_tuples:
@@ -420,17 +420,19 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                     macro_inst = getattr(module, class_name)()
                     macro_meth = getattr(macro_inst, method)
                     break
-            arglist = inspect.getargspec(macro_meth).args
-            defaultlist = inspect.getargspec(macro_meth).defaults
-            optionals = {}
-            while len(defaultlist) > 0:
-                if arglist[-1] not in ["self", "config", "meta_config"]:
-                    optionals[arglist[-1]] = defaultlist[-1]
-                    arglist = arglist[0:-1]
-                    defaultlist = defaultlist[0:-1]
-                else:
-                    break
-            res = _get_user_values(optionals)
+            res = {}
+            if not opt_non_interactive:
+                arglist = inspect.getargspec(macro_meth).args
+                defaultlist = inspect.getargspec(macro_meth).defaults
+                optionals = {}
+                while len(defaultlist) > 0:
+                    if arglist[-1] not in ["self", "config", "meta_config"]:
+                        optionals[arglist[-1]] = defaultlist[-1]
+                        arglist = arglist[0:-1]
+                        defaultlist = defaultlist[0:-1]
+                    else:
+                        break
+                res = _get_user_values(optionals)
             problem_list = macro_meth(app_config, meta_config, **res)
             if not isinstance(problem_list, list):
                 raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
@@ -440,7 +442,7 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
 
 
 def transform_config(config, meta_config, transformer_macro, modules,
-                     macro_info_tuples):
+                     macro_info_tuples, opt_non_interactive=False):
     """Run transformer custom macros on the config and return problems."""
     macro_change_dict = {}
     for module_name, class_name, method, help in macro_info_tuples:
@@ -454,17 +456,19 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 macro_inst = getattr(module, class_name)()
                 macro_method = getattr(macro_inst, method)
                 break
-        arglist = inspect.getargspec(macro_method).args
-        defaultlist = inspect.getargspec(macro_method).defaults
-        optionals = {}
-        while len(defaultlist) > 0:
-            if arglist[-1] not in ["self", "config", "meta_config"]:
-                optionals[arglist[-1]] = defaultlist[-1]
-                arglist = arglist[0:-1]
-                defaultlist = defaultlist[0:-1]
-            else:
-                break
-        res = _get_user_values(optionals)
+        res = {}
+        if not opt_non_interactive:
+            arglist = inspect.getargspec(macro_method).args
+            defaultlist = inspect.getargspec(macro_method).defaults
+            optionals = {}
+            while len(defaultlist) > 0:
+                if arglist[-1] not in ["self", "config", "meta_config"]:
+                    optionals[arglist[-1]] = defaultlist[-1]
+                    arglist = arglist[0:-1]
+                    defaultlist = defaultlist[0:-1]
+                else:
+                    break
+            res = _get_user_values(optionals)
         return macro_method(config, meta_config, **res)
     return config, []
 
@@ -620,7 +624,8 @@ def run_macros(app_config, meta_config, config_name, macro_names,
         config_problem_dict = validate_config(app_config, meta_config,
                                               macros_by_type[VALIDATE_METHOD],
                                               modules,
-                                              macro_tuples)
+                                              macro_tuples, 
+                                              opt_non_interactive)
         if config_problem_dict:
             RC = 1
             if not opt_quietness:
@@ -702,7 +707,8 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
         return_value = transform_config(macro_config,
                                         meta_config,
                                         transformer_macro,
-                                        modules, macro_tuples)
+                                        modules, macro_tuples,
+                                        opt_non_interactive)
         err_bad_return_value = ERROR_RETURN_VALUE.format(
                                      transformer_macro)
         if (not isinstance(return_value, tuple) or
@@ -748,12 +754,12 @@ def _get_user_accept():
 def _get_user_values(options):
     for k,v in options.items():
         try:
-            user_input = raw_input(str(k) + " (press enter for default=" +
+            user_input = raw_input("Value to use for " + str(k) + 
+                                   " (press enter for default=" +
                                    str(v) + "): ")
         except EOFError:
             user_input = ""
         if len(user_input) > 0:
-            print user_input
             try:
                 options[k] = ast.literal_eval(user_input)
             except ValueError:

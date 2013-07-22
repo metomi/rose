@@ -313,7 +313,7 @@ class MacroUpgradeManager(object):
             return []
         return self.version_macros[start_index: end_index + 1]
 
-    def transform(self, config, meta_config=None):
+    def transform(self, config, meta_config=None, opt_non_interactive=False):
         """Transform a configuration by looping over upgrade macros."""
         self.reports = []
         for macro in self.get_macros():
@@ -321,17 +321,19 @@ class MacroUpgradeManager(object):
                 func = macro.downgrade
             else:
                 func = macro.upgrade
-            arglist = inspect.getargspec(func).args
-            defaultlist = inspect.getargspec(func).defaults
-            optionals = {}
-            while len(defaultlist) > 0:
-                if arglist[-1] not in ["self", "config", "meta_config"]:
-                    optionals[arglist[-1]] = defaultlist[-1]
-                    arglist = arglist[0:-1]
-                    defaultlist = defaultlist[0:-1]
-                else:
-                    break
-            res = rose.macro._get_user_values(optionals)
+            res = {}
+            if not opt_non_interactive:
+                arglist = inspect.getargspec(func).args
+                defaultlist = inspect.getargspec(func).defaults
+                optionals = {}
+                while len(defaultlist) > 0:
+                    if arglist[-1] not in ["self", "config", "meta_config"]:
+                        optionals[arglist[-1]] = defaultlist[-1]
+                        arglist = arglist[0:-1]
+                        defaultlist = defaultlist[0:-1]
+                    else:
+                        break
+                res = rose.macro._get_user_values(optionals)
             upgrade_macro_result = func(config, meta_config, **res)
             config, i_changes = upgrade_macro_result
             self.reports += i_changes
@@ -435,7 +437,7 @@ def main():
     upgrade_manager.set_new_tag(user_choice)
     macro_config = copy.deepcopy(app_config)
     new_config, change_list = upgrade_manager.transform(
-                                      macro_config, meta_config)
+                               macro_config, meta_config, opts.non_interactive)
     method_id = UPGRADE_METHOD.upper()[0]
     if opts.downgrade:
         method_id = DOWNGRADE_METHOD.upper()[0]
