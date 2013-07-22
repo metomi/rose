@@ -422,8 +422,6 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                     break
             arglist = inspect.getargspec(macro_meth).args
             defaultlist = inspect.getargspec(macro_meth).defaults
-            print arglist
-            print defaultlist
             optionals = {}
             while len(defaultlist) > 0:
                 if arglist[-1] not in ["self", "config", "meta_config"]:
@@ -433,8 +431,6 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                 else:
                     break
             res = _get_user_values(optionals)
-            print res
-            print type(res['allowed'])
             problem_list = macro_meth(app_config, meta_config, **res)
             if not isinstance(problem_list, list):
                 raise ValueError(ERROR_RETURN_VALUE.format(macro_name))

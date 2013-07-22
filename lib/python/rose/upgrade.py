@@ -321,7 +321,18 @@ class MacroUpgradeManager(object):
                 func = macro.downgrade
             else:
                 func = macro.upgrade
-            upgrade_macro_result = func(config, meta_config)
+            arglist = inspect.getargspec(func).args
+            defaultlist = inspect.getargspec(func).defaults
+            optionals = {}
+            while len(defaultlist) > 0:
+                if arglist[-1] not in ["self", "config", "meta_config"]:
+                    optionals[arglist[-1]] = defaultlist[-1]
+                    arglist = arglist[0:-1]
+                    defaultlist = defaultlist[0:-1]
+                else:
+                    break
+            res = rose.macro._get_user_values(optionals)
+            upgrade_macro_result = func(config, meta_config, **res)
             config, i_changes = upgrade_macro_result
             self.reports += i_changes
         opt_node = config.get([rose.CONFIG_SECT_TOP,
