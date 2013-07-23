@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
@@ -73,14 +73,14 @@ class RosieSvnPreCommitHook(object):
             popen = RosePopener(self.event_handler)
         self.popen = popen
 
-    def get_access_info(self, repos, path_head, txn=None):
+    def _get_access_info(self, repos, path_head, txn=None):
         """Return the owner and the access list of a suite (path_head)."""
         opt_txn = []
         if txn is not None:
             opt_txn = ["-t", txn]
         f = tempfile.TemporaryFile()
-        f.write(self.svnlook("cat", repos, path_head + self.TRUNK_INFO_FILE,
-                             *opt_txn))
+        f.write(self._svnlook("cat", repos, path_head + self.TRUNK_INFO_FILE,
+                              *opt_txn))
         f.seek(0)
         node = ConfigLoader()(f)
         f.close()
@@ -89,7 +89,7 @@ class RosieSvnPreCommitHook(object):
         access_list.sort()
         return owner, access_list
 
-    def svnlook(self, *args):
+    def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
         command = ["svnlook"] + list(args)
         return self.popen(*command, stderr=sys.stderr)[0]
@@ -97,7 +97,7 @@ class RosieSvnPreCommitHook(object):
     def run(self, repos, txn):
         """Apply the rule engine on transaction "txn" to repository "repos"."""
         changes = set() # set([(status, path), ...])
-        for line in self.svnlook("changed", "-t", txn, repos).splitlines():
+        for line in self._svnlook("changed", "-t", txn, repos).splitlines():
             status, path = line.split(None, 1)
             changes.add((status, path))
         bad_changes = set()
@@ -145,10 +145,10 @@ class RosieSvnPreCommitHook(object):
             # The rest are trunk changes in a suite
             path_head = "/".join(names[0:self.LEN_ID]) + "/"
             path_tail = path[len(path_head):]
-            
+
             # For meta suite, make sure keys in keys file can be parsed
             if is_meta_suite and path_tail == self.TRUNK_KNOWN_KEYS_FILE:
-                out = self.svnlook("cat", "-t", txn, repos, path)
+                out = self._svnlook("cat", "-t", txn, repos, path)
                 try:
                     shlex.split(out)
                 except ValueError:
@@ -157,8 +157,8 @@ class RosieSvnPreCommitHook(object):
 
             # New suite trunk information file must have an owner
             if status == self.ST_ADD and path_tail == self.TRUNK_INFO_FILE:
-                owner, access_list = self.get_access_info(repos, path_head,
-                                                          txn)
+                owner, access_list = self._get_access_info(repos, path_head,
+                                                           txn)
                 if not owner:
                     bad_changes.add((status, path))
                 continue
@@ -181,13 +181,13 @@ class RosieSvnPreCommitHook(object):
 
             # See whether author has permission to make changes
             if author is None:
-                author = self.svnlook("author", "-t", txn, repos).strip()
+                author = self._svnlook("author", "-t", txn, repos).strip()
             if super_users is None:
                 conf = ResourceLocator.default().get_conf()
                 keys = ["rosa-svn-pre-commit", "super-users"]
                 super_users = conf.get_value(keys, "").split()
             if not access_info_map.has_key(path_head):
-                access_info = self.get_access_info(repos, path_head)
+                access_info = self._get_access_info(repos, path_head)
                 access_info_map[path_head] = access_info
             owner, access_list = access_info_map[path_head]
             admin_users = super_users + [owner]
@@ -197,8 +197,8 @@ class RosieSvnPreCommitHook(object):
                 bad_changes.add((status, path))
                 continue
 
-            # Admin users and those in access list can modify everything in trunk
-            # apart from specific entries in the trunk info file
+            # Admin users and those in access list can modify everything in
+            # trunk apart from specific entries in the trunk info file
             if "*" in access_list or author in admin_users + access_list:
                 if path_tail != self.TRUNK_INFO_FILE:
                     continue
@@ -207,7 +207,7 @@ class RosieSvnPreCommitHook(object):
 
             # The owner must not be deleted
             if not txn_access_info_map.has_key(path_head):
-                txn_access_info = self.get_access_info(repos, path_head, txn)
+                txn_access_info = self._get_access_info(repos, path_head, txn)
                 txn_access_info_map[path_head] = txn_access_info
             txn_owner, txn_access_list = txn_access_info_map[path_head]
             if not txn_owner:

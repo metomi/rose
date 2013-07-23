@@ -59,7 +59,6 @@ __ROSE_SUITE_INFO
 rosie create -q -y --info-file=rose-suite.info --no-checkout
 file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
 file_cmp "$TEST_KEY-hook.err" $PWD/rosa-svn-post-commit.err </dev/null
-cat $PWD/rosa-svn-post-commit.err
 file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 sqlite3 $PWD/repos/foo.db 'SELECT * FROM main' >"$TEST_KEY-db-select.out"
 file_cmp "$TEST_KEY-db-select-main.out" "$TEST_KEY-db-select.out" <<'__OUT__'
