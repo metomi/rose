@@ -326,7 +326,6 @@ class HostSelector(object):
                         scorer = rank_conf["scorer"]
                         method_arg = rank_conf["method_arg"]
                         score = scorer.command_out_parser(out, method_arg)
-                        reverse = scorer.REVERSE_SORT
                         host_score_list.append((host_name, score))
                         self.handle_event(HostSelectScoreEvent(host_name, score))
             if can_timeout:
@@ -343,6 +342,8 @@ class HostSelector(object):
             
         if not host_score_list:
             raise NoHostSelectError()
+        scorer = rank_conf["scorer"]
+        reverse = scorer.REVERSE_SORT
         if reverse:
             host_score_list.sort(lambda a, b: cmp(a[1], b[1]),reverse=True)
         else:
@@ -417,7 +418,7 @@ class MemoryScorerConf(RandomScorerConf):
     """Score host by amount of free memory"""
     
     KEY = "mem"
-    CMD = "echo mem=$(free -m | grep Mem  | awk '{print $4}')\n"
+    CMD = "echo mem=$(free -m | grep s/c  | awk '{print $4}')\n"
     REVERSE_SORT = True
 
     def command_out_parser(self, out, method_arg=None):
