@@ -593,6 +593,7 @@ class MainController(object):
                        new_total_events=3)
             self.data.load_config(config_data.directory, preview=False, metadata_off=self.metadata_off)
             self.reload_namespace_tree()
+            self.nav_panel.update_row_tooltips()
             self.reporter.report_load_event(
                        rose.config_editor.EVENT_LOADED.format(namespace_name),
                        no_progress=True)
