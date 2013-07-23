@@ -41,7 +41,16 @@ pruned.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-None yet.
+\#811: rose config-edit: rule checker will now display message on the status
+bar if everything is OK.
+
+\#809: rose namelist-dump: allow and tidy zero-padded numeric inputs.
+
+\#808: rosie go: can now list the state of the suites in other user's
+`$HOME/roses/` directory.
+
+\#804: rosie ls: new `--user=NAME` option to list the state of the suites in
+other user's `$HOME/roses/` directory.
 
 --------------------------------------------------------------------------------
 
