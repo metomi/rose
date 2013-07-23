@@ -312,13 +312,13 @@ class HostSelector(object):
                         scorer = threshold_conf["scorer"]
                         method_arg = threshold_conf["method_arg"]
                         score = scorer.command_out_parser(out, method_arg)
-                        invert = scorer.INVERT_SORT
-                        if (invert is False and 
+                        reverse = scorer.REVERSE_SORT
+                        if (reverse is False and 
                             score > float(threshold_conf["value"])):
                             self.handle_event(HostExceedThresholdEvent(
                                     host_name, threshold_conf, score))
                             break
-                        elif invert and score < float(threshold_conf["value"]):
+                        elif reverse and score < float(threshold_conf["value"]):
                             self.handle_event(HostBelowThresholdEvent(
                                     host_name, threshold_conf, score))
                             break
@@ -326,7 +326,7 @@ class HostSelector(object):
                         scorer = rank_conf["scorer"]
                         method_arg = rank_conf["method_arg"]
                         score = scorer.command_out_parser(out, method_arg)
-                        invert = scorer.INVERT_SORT
+                        reverse = scorer.REVERSE_SORT
                         host_score_list.append((host_name, score))
                         self.handle_event(HostSelectScoreEvent(host_name, score))
             if can_timeout:
@@ -343,7 +343,7 @@ class HostSelector(object):
             
         if not host_score_list:
             raise NoHostSelectError()
-        if invert:
+        if reverse:
             host_score_list.sort(lambda a, b: cmp(a[1], b[1]),reverse=True)
         else:
             host_score_list.sort(lambda a, b: cmp(a[1], b[1]))
@@ -365,7 +365,7 @@ class RandomScorerConf(object):
     KEY = "random"
     CMD = "true\n"
     CMD_IS_FORMAT = False
-    INVERT_SORT = False
+    REVERSE_SORT = False
 
     def get_command(self, method_arg=None):
         """Return a shell command to get the info for scoring a host."""
@@ -418,7 +418,7 @@ class MemoryScorerConf(RandomScorerConf):
     
     KEY = "mem"
     CMD = "echo mem=$(free -m | grep Mem  | awk '{print $4}')\n"
-    INVERT_SORT = True
+    REVERSE_SORT = True
 
     def command_out_parser(self, out, method_arg=None):
         if method_arg is None:
