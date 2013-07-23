@@ -238,7 +238,6 @@ class RosieVCClient(object):
                            dir,
                            new_origin)
                 self.event_handler(SuiteCreateEvent(new_id))
-                self._delete_work_dir()
             except RosePopenError as e:
                 try:
                     self.popen("svn", "info", new_origin)
@@ -246,6 +245,8 @@ class RosieVCClient(object):
                         new_id = None
                 except RosePopenError:
                     raise e
+            finally:
+                self._delete_work_dir()
         return new_id
 
     def delete(self, id, local_only=False):
@@ -347,13 +348,14 @@ class RosieVCClient(object):
                 self.popen("svn", "commit", "-q", "-m", message, d)
                 self.event_handler(SuiteCreateEvent(new_id))
                 self.event_handler(SuiteCopyEvent(new_id, from_id))
-                self._delete_work_dir()
             except RosePopenError as e:
                 try:
                     self.popen("svn", "info", new_id.to_origin())
                     new_id = None
                 except RosePopenError:
                     raise e
+            finally:
+                self._delete_work_dir()
         return new_id
 
 
