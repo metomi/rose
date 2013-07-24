@@ -27,7 +27,6 @@ tests 9
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -z $JOB_HOST ]]; then
     skip 3 '[t]job-host not defined'
-    :
 else
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
@@ -72,7 +71,8 @@ if [[ -n $JOB_HOST ]]; then
     sed "s/\\\$JOB_HOST/$JOB_HOST/g" \
         $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
 else
-    sed '/\$JOB_HOST/d' $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
+    sed '/\$JOB_HOST/d; /my_task_2/d' \
+        $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
 fi
 file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
 #-------------------------------------------------------------------------------
@@ -81,6 +81,9 @@ run_pass "$TEST_KEY" \
     ls $SUITE_RUN_DIR/log/job-*.tar.gz $SUITE_RUN_DIR/{log/job,share/data,work}
 sed "s?\\\$SUITE_RUN_DIR?$SUITE_RUN_DIR?g" \
     $TEST_SOURCE_DIR/$TEST_KEY.out >expected-ls.out
+if [[ -z $JOB_HOST ]]; then
+    sed -i "/my_task_2/d" expected-ls.out
+fi
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-ls.out
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

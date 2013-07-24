@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 36
+tests 42
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -54,7 +54,7 @@ owner=$USER
 project=rose tea
 title=Identify the best rose tea in the world
 __INFO__
-rosie create -q -y --info-file=$INFO_FILE
+rosie create -q -y --info-file=$INFO_FILE || exit 1
 
 TEST_KEY=$TEST_KEY_BASE-1-latest
 run_pass "$TEST_KEY" rosie id --latest
@@ -129,6 +129,21 @@ TEST_KEY=$TEST_KEY_BASE-1-url-id
 run_pass "$TEST_KEY" rosie id $URL/a/a/0/0/0
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 foo-aa000
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Latest and next should still be correct if latest suite removed from HEAD
+TEST_KEY=$TEST_KEY_BASE-latest-not-at-head
+rosie delete -f -q -y foo-aa000 || exit 1
+run_pass "$TEST_KEY" rosie id --latest
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+foo-aa000
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+TEST_KEY=$TEST_KEY_BASE-next-with-latest-not-at-head
+run_pass "$TEST_KEY" rosie id --next
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+foo-aa001
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

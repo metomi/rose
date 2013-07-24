@@ -13,6 +13,19 @@ This release of Rose will work with cylc 5.3.0 or above.
 
 Changes that have significant impact on user experience.
 
+\#823: rosie create FROM-ID: suite copy is now done in a single changeset.
+Previously, it was done in two changesets, one to create the suite, the other
+to copy items from `FROM-ID`. The previous way can become unfriendly in merging
+as Subversion adds `svn:mergeinfo` for each of the copied items from the
+original suite.
+
+Both `rosa svn-pre-commit` and `rosa svn-post-commit` have been modified to
+handle this change. This version of `rosie create FROM-ID` will fail if the
+`pre-commit` hook of the repository is still connected to the previous version
+of `rosa svn-pre-commit`. An old version of `rosa svn-post-commit` will not
+update the Rosie web service database correctly when this version of `rosie
+create FROM-ID` is used to copy a suite.
+
 \#799: rose date: now supports letter options for both `--*-format=FORMAT`
 options.
 * `--parse-format=FORMAT` can now be `-p FORMAT` (for `strptime`).
@@ -41,7 +54,16 @@ pruned.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-None yet.
+\#811: rose config-edit: rule checker will now display message on the status
+bar if everything is OK.
+
+\#809: rose namelist-dump: allow and tidy zero-padded numeric inputs.
+
+\#808: rosie go: can now list the state of the suites in other user's
+`$HOME/roses/` directory.
+
+\#804: rosie ls: new `--user=NAME` option to list the state of the suites in
+other user's `$HOME/roses/` directory.
 
 --------------------------------------------------------------------------------
 

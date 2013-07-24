@@ -46,22 +46,22 @@ def main():
     fs_util = FileSystemUtil(report)
     if opts.conf_dir:
         fs_util.chdir(opts.conf_dir)
-    files = []
+    file_names = []
     if opts.files:
-        files = opts.files
+        file_names = opts.files
     else:
         for dirpath, dirnames, filenames in os.walk("."):
             for filename in fnmatch.filter(filenames, "rose-*.conf"):
                 p = os.path.join(dirpath, filename)[2:] # remove leading ./
-                files.append(p)
-    for file in files:
+                file_names.append(p)
+    for file_name in file_names:
         t = NamedTemporaryFile()
-        node = ConfigLoader()(file)
+        node = ConfigLoader()(file_name)
         ConfigDumper()(node, t)
         t.seek(0)
-        if not filecmp.cmp(t.name, file):
-            report(ConfigDumpEvent(file))
-            ConfigDumper()(node, file)
+        if not filecmp.cmp(t.name, file_name, shallow=False):
+            report(ConfigDumpEvent(file_name))
+            ConfigDumper()(node, file_name)
 
 
 if __name__ == "__main__":
