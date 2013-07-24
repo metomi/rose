@@ -248,9 +248,10 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "metavar": "PATH",
                         "help": "Prepend items to the metadata search path."}],
-               "meta_suite": [
+               "meta_suite_mode": [
                        ["--meta-suite"],
                        {"action": "store_true",
+                        "dest": "meta_suite_mode",
                         "default": False,
                         "help": "ADMIN-ONLY: Create the metadata suite."}],
                "name": [
