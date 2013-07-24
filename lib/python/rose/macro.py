@@ -433,7 +433,7 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                     else:
                         break
                 if optionals:
-                    res = _get_user_values(optionals)
+                    res = get_user_values(optionals)
             problem_list = macro_meth(app_config, meta_config, **res)
             if not isinstance(problem_list, list):
                 raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
@@ -470,7 +470,7 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 else:
                     break
             if optionals:
-                res = _get_user_values(optionals)
+                res = get_user_values(optionals)
         return macro_method(config, meta_config, **res)
     return config, []
 
@@ -753,19 +753,24 @@ def _get_user_accept():
         user_allowed_changes = (user_input == PROMPT_OK)
     return user_allowed_changes
 
-def _get_user_values(options):
+def get_user_values(options):
     for k,v in options.items():
-        try:
-            user_input = raw_input("Value to use for " + str(k) + 
-                                   " (press enter for default=" +
-                                   str(v) + "): ")
-        except EOFError:
-            user_input = ""
-        if len(user_input) > 0:
+        entered = False
+        while entered == False:
             try:
-                options[k] = ast.literal_eval(user_input)
-            except ValueError:
-               sys.stderr.write("Invalid entry, using default")
+                user_input = raw_input("Value for " + str(k) + " (default " +
+                                       str(v) + "): ")
+            except EOFError:
+                user_input = ""
+                entered = True
+            if len(user_input) > 0:
+                    try:
+                        options[k] = ast.literal_eval(user_input)
+                        entered = True
+                    except ValueError:
+                        sys.stderr.write("Invalid entry, please try again\n")
+            else:
+                entered = True
     return options
 
 def dump_config(app_config, opt_conf_dir, opt_output_dir=None):

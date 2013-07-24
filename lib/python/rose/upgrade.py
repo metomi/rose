@@ -333,7 +333,7 @@ class MacroUpgradeManager(object):
                         defaultlist = defaultlist[0:-1]
                     else:
                         break
-                res = rose.macro._get_user_values(optionals)
+                res = rose.macro.get_user_values(optionals)
             upgrade_macro_result = func(config, meta_config, **res)
             config, i_changes = upgrade_macro_result
             self.reports += i_changes
