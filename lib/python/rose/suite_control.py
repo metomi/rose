@@ -88,7 +88,7 @@ class SuiteControl(object):
                   True.
         stderr: A file handle for stderr, if relevant for suite engine.
         stdout: A file handle for stdout, if relevant for suite engine.
-        args: extra arguments for the suite engine's gcontrol command.
+        args: extra arguments for the suite engine's shutdown command.
 
         """
         engine_version = self._get_engine_version(suite_name)
