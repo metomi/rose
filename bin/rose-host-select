@@ -46,6 +46,7 @@
 #                 METHOD-ARG must be a valid file system in all the given hosts
 #                 and host groups. The default is to use the "~" directory.
 #             "mem" (by largest amount of free memory as reported by free):
+#                 Uses free -m to return memory in Mb 
 #             "random"
 #     --threshold=[METHOD[:METHOD-ARG]:]VALUE
 #         Each of these option specifies a numeric value of a threshold of which
