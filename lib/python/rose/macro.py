@@ -24,6 +24,7 @@ It also stores macro base classes and macro library functions.
 
 """
 
+import ast
 import copy
 import imp
 import inspect
@@ -408,7 +409,7 @@ def get_macros_for_config(app_config=None,
 
 
 def validate_config(app_config, meta_config, run_macro_list, modules,
-                    macro_info_tuples):
+                    macro_info_tuples, opt_non_interactive=False):
     """Run validator custom macros on the config and return problems."""
     macro_problem_dict = {}
     for module_name, class_name, method, help in macro_info_tuples:
@@ -419,7 +420,21 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
                     macro_inst = getattr(module, class_name)()
                     macro_meth = getattr(macro_inst, method)
                     break
-            problem_list = macro_meth(app_config, meta_config)
+            res = {}
+            if not opt_non_interactive:
+                arglist = inspect.getargspec(macro_meth).args
+                defaultlist = inspect.getargspec(macro_meth).defaults
+                optionals = {}
+                while defaultlist is not None and len(defaultlist) > 0:
+                    if arglist[-1] not in ["self", "config", "meta_config"]:
+                        optionals[arglist[-1]] = defaultlist[-1]
+                        arglist = arglist[0:-1]
+                        defaultlist = defaultlist[0:-1]
+                    else:
+                        break
+                if optionals:
+                    res = get_user_values(optionals)
+            problem_list = macro_meth(app_config, meta_config, **res)
             if not isinstance(problem_list, list):
                 raise ValueError(ERROR_RETURN_VALUE.format(macro_name))
             if problem_list:
@@ -428,7 +443,7 @@ def validate_config(app_config, meta_config, run_macro_list, modules,
 
 
 def transform_config(config, meta_config, transformer_macro, modules,
-                     macro_info_tuples):
+                     macro_info_tuples, opt_non_interactive=False):
     """Run transformer custom macros on the config and return problems."""
     macro_change_dict = {}
     for module_name, class_name, method, help in macro_info_tuples:
@@ -442,7 +457,21 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 macro_inst = getattr(module, class_name)()
                 macro_method = getattr(macro_inst, method)
                 break
-        return macro_method(config, meta_config)
+        res = {}
+        if not opt_non_interactive:
+            arglist = inspect.getargspec(macro_method).args
+            defaultlist = inspect.getargspec(macro_method).defaults
+            optionals = {}
+            while defaultlist is not None and len(defaultlist) > 0:
+                if arglist[-1] not in ["self", "config", "meta_config"]:
+                    optionals[arglist[-1]] = defaultlist[-1]
+                    arglist = arglist[0:-1]
+                    defaultlist = defaultlist[0:-1]
+                else:
+                    break
+            if optionals:
+                res = get_user_values(optionals)
+        return macro_method(config, meta_config, **res)
     return config, []
 
 
@@ -597,7 +626,8 @@ def run_macros(app_config, meta_config, config_name, macro_names,
         config_problem_dict = validate_config(app_config, meta_config,
                                               macros_by_type[VALIDATE_METHOD],
                                               modules,
-                                              macro_tuples)
+                                              macro_tuples, 
+                                              opt_non_interactive)
         if config_problem_dict:
             RC = 1
             if not opt_quietness:
@@ -679,7 +709,8 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
         return_value = transform_config(macro_config,
                                         meta_config,
                                         transformer_macro,
-                                        modules, macro_tuples)
+                                        modules, macro_tuples,
+                                        opt_non_interactive)
         err_bad_return_value = ERROR_RETURN_VALUE.format(
                                      transformer_macro)
         if (not isinstance(return_value, tuple) or
@@ -698,6 +729,7 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
 
 def _handle_transform(app_config, new_config, change_list, macro_id,
                       opt_conf_dir, opt_output_dir, opt_non_interactive):
+
     user_allowed_changes = False
     has_changes = any([not i.is_warning for i in change_list])
     sys.stdout.write(get_reports_as_text(change_list, macro_id,
@@ -721,6 +753,25 @@ def _get_user_accept():
         user_allowed_changes = (user_input == PROMPT_OK)
     return user_allowed_changes
 
+def get_user_values(options):
+    for k,v in options.items():
+        entered = False
+        while entered == False:
+            try:
+                user_input = raw_input("Value for " + str(k) + " (default " +
+                                       str(v) + "): ")
+            except EOFError:
+                user_input = ""
+                entered = True
+            if len(user_input) > 0:
+                try:
+                    options[k] = ast.literal_eval(user_input)
+                    entered = True
+                except ValueError:
+                    sys.stderr.write("Invalid entry, please try again\n")
+            else:
+                entered = True
+    return options
 
 def dump_config(app_config, opt_conf_dir, opt_output_dir=None):
     """Dump the config in a standard form."""
