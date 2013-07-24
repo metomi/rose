@@ -418,7 +418,7 @@ class MemoryScorerConf(RandomScorerConf):
     """Score host by amount of free memory"""
     
     KEY = "mem"
-    CMD = "echo mem=$(free -m | grep s/c  | awk '{print $4}')\n"
+    CMD = """echo mem=$(free -m | sed '3!d; s/^.* //')\n"""
     REVERSE_SORT = True
 
     def command_out_parser(self, out, method_arg=None):
