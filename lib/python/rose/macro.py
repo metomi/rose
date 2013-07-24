@@ -764,11 +764,11 @@ def get_user_values(options):
                 user_input = ""
                 entered = True
             if len(user_input) > 0:
-                    try:
-                        options[k] = ast.literal_eval(user_input)
-                        entered = True
-                    except ValueError:
-                        sys.stderr.write("Invalid entry, please try again\n")
+                try:
+                    options[k] = ast.literal_eval(user_input)
+                    entered = True
+                except ValueError:
+                    sys.stderr.write("Invalid entry, please try again\n")
             else:
                 entered = True
     return options
