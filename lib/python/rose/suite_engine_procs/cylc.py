@@ -671,7 +671,16 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def shutdown(self, suite_name, host=None, engine_version=None, args=None,
                  stderr=None, stdout=None):
-        """Shut down the suite."""
+        """Shut down the suite.
+
+        suite_name -- the name of the suite.
+        host -- a host where the suite is running.
+        engine_version -- if specified, use this version of Cylc.
+        stderr -- A file handle for stderr, if relevant for suite engine.
+        stdout -- A file handle for stdout, if relevant for suite engine.
+        args -- extra arguments for "cylc shutdown".
+
+        """
         command = ["cylc", "shutdown", suite_name, "--force"]
         if host:
             command += ["--host=%s" % host]
