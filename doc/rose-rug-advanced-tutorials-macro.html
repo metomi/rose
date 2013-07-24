@@ -432,31 +432,29 @@ rose edit
     </div>
 
     <div class="slide">
-      <h2 id="macro-option">macro Metadata Option</h2>
-      
-      <p>If a macro addresses particular sections, namespaces, or options,
-      then it makes sense to write the relationship down in the metadata for
-      the particular settings. You can do this using the metadata option
-      <pre>macro</pre>.</p>
+      <h2 id="macro-option">Metadata Option</h2>
 
+      <p>If a macro addresses particular sections, namespaces, or options, then
+      it makes sense to write the relationship down in the metadata for the
+      particular settings. You can do this using the metadata option
+      <samp>macro</samp>.</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">macro Example</h3>
 
       <p>For example, our validator and transformer macros above are both
-      specific to <var>env=WORLD</var>. Open the file <samp>app/fred_hello_world/meta/rose-meta.conf</samp>
-      in a text editor, and make sure the file contains the following text:</p>
-      
-      <pre class="lang-rose.conf">
+      specific to <var>env=WORLD</var>. Open the file
+      <samp>app/fred_hello_world/meta/rose-meta.conf</samp> in a text editor,
+      and make sure the file contains the following text:</p>
+      <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
 macro=planet.PlanetChecker, planet.PlanetChanger
 </pre>
 
-      <p>Close the config editor if it's still open, and open the app in
-      the config editor again. The <var>env</var> page should now contain
-      a convenient macro launcher for the two macros.</p>
-
+      <p>Close the config editor if it's still open, and open the app in the
+      config editor again. The <var>env</var> page should now contain a
+      convenient macro launcher for the two macros.</p>
     </div>
 
     <div class="slide">
