@@ -1113,9 +1113,10 @@ class ConfigPage(gtk.VBox):
         button_list = []
         label_list = []
         # No content warning, if applicable.
-        if (self.section is None and
-            not self.ghost_data and
-            self.sub_data is None):
+        has_no_content = (self.section is None and
+                          not self.ghost_data and
+                          self.sub_data is None)
+        if has_no_content:
             info = rose.config_editor.PAGE_WARNING_NO_CONTENT
             tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
             error_button = rose.gtk.util.CustomButton(
@@ -1157,6 +1158,26 @@ class ConfigPage(gtk.VBox):
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)
+        has_data = has_no_content
+        has_data = has_data or (self.sub_data is not None)
+        has_data = has_data or bool(self.panel_data)
+        if not has_data:
+            for section in self.sections:
+                if section.metadata["full_ns"] == self.namespace:
+                    has_data = True
+                    break
+        if not has_data:
+            # This is a latent namespace page.
+            latent_button = rose.gtk.util.CustomButton(
+                         stock_id=gtk.STOCK_INFO,
+                         as_tool=True,
+                         tip_text=rose.config_editor.TIP_LATENT_PAGE)
+            latent_label = gtk.Label()
+            latent_label.set_text(
+                         rose.config_editor.PAGE_WARNING_LATENT)
+            latent_label.show()
+            button_list.append(latent_button)
+            label_list.append(latent_label)
         # This adds error notification for sections.
         for sect_data in self.sections:
             for err, info in sect_data.error.items():
