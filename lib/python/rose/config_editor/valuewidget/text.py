@@ -51,7 +51,13 @@ class RawValueWidget(gtk.HBox):
             self.entry.set_tooltip_text(
                        rose.config_editor.VAR_WIDGET_ENV_INFO)
         self.entry.set_text(self.value)
-        self.entry.connect_after("changed", self.setter)
+        self.entry.connect("button-release-event",
+                           self._handle_middle_click_paste)
+        self.entry.connect_after("paste-clipboard", self.setter)
+        self.entry.connect_after("key-release-event",
+                                 lambda e, v: self.setter(e))
+        self.entry.connect_after("button-release-event",
+                                 lambda e, v: self.setter(e))
         self.entry.show()
         self.pack_start(self.entry, expand=True, fill=True,
                                     padding=0)
@@ -82,6 +88,11 @@ class RawValueWidget(gtk.HBox):
         if focus_index is None:
             return False
         self.entry.set_position(focus_index)
+
+    def _handle_middle_click_paste(self, widget, event):
+        if event.button == 2:
+            self.setter(widget)
+        return False
 
 
 class TextMultilineValueWidget(gtk.HBox):
