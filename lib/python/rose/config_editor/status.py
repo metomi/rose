@@ -34,12 +34,21 @@ import rose.reporter
 
 class StatusReporter(rose.reporter.Reporter):
 
-    """Handle event notification."""
+    """Handle event notification.
+
+    load_updater must be a rose.gtk.splash.SplashScreenProcess
+    instance (or have the same interface to update and stop methods).
+
+    status_bar_update_func must be a function that accepts a
+    rose.reporter.Event, a rose.reporter kind-of-event string, and a
+    level of importance/verbosity. See rose.reporter for more details.
+
+    """
 
     EVENT_KIND_LOAD = "load"
 
-    def __init__(self, loader_update_func, status_bar_update_func):
-        self._loader_update_func = loader_update_func
+    def __init__(self, load_updater, status_bar_update_func):
+        self._load_updater = load_updater
         self._status_bar_update_func = status_bar_update_func
         self._no_load = False
 
@@ -54,7 +63,7 @@ class StatusReporter(rose.reporter.Reporter):
                 level = message.level
             message_kwargs = message.kwargs
         if kind == self.EVENT_KIND_LOAD and not self._no_load:
-            return self._loader_update_func(str(message), **message_kwargs)
+            return self._load_updater.update(str(message), **message_kwargs)
         return self._status_bar_update_func(message, kind, level)
 
     def report_load_event(self, text, no_progress=False, new_total_events=None):
@@ -69,10 +78,9 @@ class StatusReporter(rose.reporter.Reporter):
         self._no_load = True
 
     def stop(self):
-        try:
-            self._loader_update_func.stop()
-        except Exception:
-            pass
+        """Stop the updater."""
+        self._load_updater.stop()
+
 
 class StatusBar(gtk.VBox):
 
