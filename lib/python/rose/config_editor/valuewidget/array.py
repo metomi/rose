@@ -252,7 +252,13 @@ class EntryArrayValueWidget(gtk.HBox):
         entry.set_text(value_item)
         entry.connect('focus-in-event',
                       self._handle_focus_on_entry)
-        entry.connect_after('changed', self.setter)
+        entry.connect("button-release-event",
+                      self._handle_middle_click_paste)
+        entry.connect_after("paste-clipboard", self.setter)
+        entry.connect_after("key-release-event",
+                            lambda e, v: self.setter(e))
+        entry.connect_after("button-release-event",
+                            lambda e, v: self.setter(e))
         entry.connect('focus-out-event',
                       self._handle_focus_off_entry)
         entry.set_width_chars(self.chars_width - 1)
@@ -436,6 +442,11 @@ class EntryArrayValueWidget(gtk.HBox):
         if widget.get_text() != '':
             widget.select_region(widget.get_position(),
                                  widget.get_position())
+        return False
+
+    def _handle_middle_click_paste(self, widget, event):
+        if event.button == 2:
+            self.setter(widget)
         return False
 
 
