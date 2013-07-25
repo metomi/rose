@@ -461,6 +461,24 @@ class MainMenuHandler(object):
                                   macro_func, help, image,
                                   self.run_custom_macro)
 
+    def inspect_custom_macro(self, macro_meth):
+        """Inspect a custom macro for kwargs and return any"""
+        arglist = inspect.getargspec(macro_meth).args
+        defaultlist = inspect.getargspec(macro_meth).defaults
+        optionals = {}
+        while defaultlist is not None and len(defaultlist) > 0:
+            if arglist[-1] not in ["self", "config", "meta_config"]:
+                optionals[arglist[-1]] = defaultlist[-1]
+                arglist = arglist[0:-1]
+                defaultlist = defaultlist[0:-1]
+            else:
+                break
+        return optionals
+
+    def override_macro_defaults(self, optionals):
+        """Launch a dialog to handle capture of any override args to macro"""
+        return rose.macro.get_user_values(optionals)
+
     def run_custom_macro(self, config_name=None, module_name=None,
                          class_name=None, method_name=None):
         """Run the custom macro method and launch a dialog."""
@@ -520,8 +538,19 @@ class MainMenuHandler(object):
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             macro_method = getattr(macro_inst, methname)
+            
+            print "running a macro"
+            print str(type(macro_method))
+            print str(methname)
+            print str(macro_fullname)
+            
+            optionals = self.inspect_custom_macro(macro_method)            
+            res = self.override_macro_defaults(optionals)
+            print res
+
+            
             try:
-                return_value = macro_method(macro_config, meta_config)
+                return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
                 rose.gtk.util.run_dialog(
                               rose.gtk.util.DIALOG_TYPE_ERROR,
