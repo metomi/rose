@@ -73,6 +73,7 @@
 #  thresholds{NAME}=[METHOD[:METHOD-ARG]:]VALUE ...
 ## E.g.:
 #  thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
+#  thresholds{linux}=mem::8000
 [rose-host-select]
 
 # Configuration related to "rose suite-log"

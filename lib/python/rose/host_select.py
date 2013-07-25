@@ -343,12 +343,8 @@ class HostSelector(object):
         if not host_score_list:
             raise NoHostSelectError()
         scorer = rank_conf["scorer"]
-        reverse = scorer.REVERSE_SORT
-        if reverse:
-            host_score_list.sort(lambda a, b: cmp(a[1], b[1]),reverse=True)
-        else:
-            host_score_list.sort(lambda a, b: cmp(a[1], b[1]))
-        
+        host_score_list.sort(lambda a, b: cmp(a[1], b[1]), 
+                             reverse=scorer.REVERSE_SORT)
         return host_score_list
 
     __call__ = select
