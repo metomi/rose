@@ -17,9 +17,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""This package contains the specific Python code driving the config editor.
+"""This package contains the code for the Rose config editor.
 
 This module contains constants that are only used in the config editor.
+
+To override constants at runtime, place a section
+
+[rose-config-edit]
+
+in your site or user configuration file for Rose, convert the name
+of the constants to lowercase, and place constant=value lines in the
+section. For example, to override the "ACCEL_HELP_GUI" constant, you
+could put the following in your site or user configuration:
+
+[rose-config-edit]
+accel_help_gui="<Ctrl>H"
+
+The values you enter will be cast by Python's ast.literal_eval, so:
+foo=100
+will be cast to an integer, but:
+bar="100"
+will be cast to a string.
 
 """
 
@@ -29,7 +47,7 @@ import os
 from rose.resource import ResourceLocator
 
 # Accelerators
-
+# These control the keyboard shortcut mapping.
 ACCEL_NEW = "<Ctrl>N"
 ACCEL_OPEN = "<Ctrl>O"
 ACCEL_SAVE = "<Ctrl>S"
@@ -304,6 +322,7 @@ SHOW_MODE_NO_DESCRIPTION = "description"
 SHOW_MODE_NO_HELP = "help"
 SHOW_MODE_NO_TITLE = "title"
 
+# Defaults for the view and layout modes.
 SHOULD_SHOW_CUSTOM_DESCRIPTION = False
 SHOULD_SHOW_CUSTOM_HELP = False
 SHOULD_SHOW_CUSTOM_TITLE = False

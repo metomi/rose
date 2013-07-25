@@ -17,9 +17,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""This package contains the specific Python code driving the config editor.
+"""This package contains the specific Python code driving rosie go.
 
-This module contains constants that are only used in the config editor.
+This module contains constants that are only used in rosie go.
+
+To override constants at runtime, place a section
+
+[rosie-go]
+
+in your site or user configuration file for Rose, convert the name
+of the constants to lowercase, and place constant=value lines in the
+section. For example, to override the "ACCEL_REFRESH" constant, you
+could put the following in your site or user configuration:
+
+[rosie-go]
+accel_refresh="<Ctrl>R"
+
+The values you enter will be cast by Python's ast.literal_eval, so:
+foo=100
+will be cast to an integer, but:
+bar="100"
+will be cast to a string.
 
 """
 

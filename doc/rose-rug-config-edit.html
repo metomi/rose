@@ -9,7 +9,13 @@
   <link rel="icon" href="rose-icon.png" type="image/png" />
   <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
   <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
   <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
 </script>
   <script type="text/javascript" src="rose-doc.js">
 </script>
@@ -63,7 +69,7 @@ rose config-edit -C ~/my_suites/this_suite
     <p><img width="80%" src="rose-config-edit-expand-tree.png" alt=
     "expand tree image" /></p>
 
-    <table>
+    <table summary="Caption table">
       <tr>
         <td><em>The 'expander' triangles can expand the list of available
         pages. You can left or right click here.</em></td>
@@ -79,7 +85,7 @@ rose config-edit -C ~/my_suites/this_suite
     <p><img width="80%" src="rose-config-edit-launch-page.png" alt=
     "launch page image" /></p>
 
-    <table>
+    <table summary="Caption table">
       <tr>
         <td><em>You can launch a tab by clicking on a row in the left hand
         navigation list (left or middle click), or open a tab in a new window
@@ -104,7 +110,7 @@ rose config-edit -C ~/my_suites/this_suite
     <p><img width="80%" src="rose-config-edit-hover-and-alter.png" alt=
     "hover and alter" /></p>
 
-    <table>
+    <table summary="Caption table">
       <tr>
         <td><em>The blue disc icon in the page list indicates changed values,
         as does the blue text at the mouse pointer. The hover-over text gives
@@ -121,9 +127,10 @@ rose config-edit -C ~/my_suites/this_suite
     for this page. If you choose a blank variable, you must then enter the name
     when the widget appears, using the entry box next to the menu button.</p>
 
-    <p><img width="80%" src="rose-config-edit-add-menu.png" alt="add menu image" /></p>
+    <p><img width="80%" src="rose-config-edit-add-menu.png" alt=
+    "add menu image" /></p>
 
-    <table>
+    <table summary="Caption table">
       <tr>
         <td><em>The add menu, indicating which settings are available for this
         page. A setting with a custom name can also be added ("Add blank
@@ -134,7 +141,7 @@ rose config-edit -C ~/my_suites/this_suite
     <p><img width="80%" src="rose-config-edit-add-blank-var.png" alt=
     "add blank variable image" /></p>
 
-    <table>
+    <table summary="Caption table">
       <tr>
         <td><em>Entering a name for a custom setting, after selecting "Add
         blank variable" from the above add menu.</em></td>
@@ -149,7 +156,7 @@ rose config-edit -C ~/my_suites/this_suite
     <p><img width="80%" src="rose-config-edit-add-latent-var.png" alt=
     "add from latent image" /></p>
 
-    <table>
+    <table summary="Caption table">
       <tr>
         <td><em>Adding an available setting, using the <kbd>View -&gt; View
         Latent</kbd> view option.</em></td>
@@ -183,7 +190,7 @@ rose config-edit -C ~/my_suites/this_suite
     <p><img width="80%" src="rose-config-edit-fixed-vars.png" alt=
     "fixed ignored variables image" /></p>
 
-    <table>
+    <table summary="Caption table">
       <tr>
         <td><em>The figure shows a 'fixed' variable.</em></td>
       </tr>
@@ -195,7 +202,7 @@ rose config-edit -C ~/my_suites/this_suite
     <p><img width="80%" src="rose-config-edit-ignored-vars.png" alt=
     "fixed ignored variables image" /></p>
 
-    <table>
+    <table summary="Caption table">
       <tr>
         <td><em>The figure shows a 'user-ignored' variable.</em></td>
       </tr>
@@ -243,7 +250,7 @@ rose config-edit -C ~/my_suites/this_suite
 
     <p><img width="80%" src="rose-config-edit-layout.png" alt="layout" /></p>
 
-    <table>
+    <table summary="Layout caption table">
       <tr>
         <td>
           <em>Layout:</em>
@@ -299,7 +306,7 @@ rose config-edit -C ~/my_suites/this_suite
 
     <h2 id="customisation">Customising Rose Config-Edit</h2>
 
-    <h3 id="themes">Themes and Colours</h3>
+    <h3 id="themes">Customising Themes and Colours</h3>
 
     <p>Themes will be picked up by default (this will be the desktop theme if
     you are running on a GNOME desktop) and can be altered by running</p>
@@ -311,32 +318,59 @@ gnome-appearance-properties
     overridden if the theme is substantially different from the standard blue
     widget/grey background. These live in the <a href=
     "https://github.com/metomi/rose/blob/master/lib/python/rose/config_editor/__init__.py">
-    config_editor/__init__.py</a> file. They can be overridden by creating a
-    file</p>
-    <pre>
-~/.metomi/rose.conf
-</pre>
+    config_editor/__init__.py</a> file.</p>
 
-    <p>in your home directory, if it doesn't already exist, and adding to it in
-    the following way:</p>
-    <pre>
-
+    <p>They can be overridden by creating a <a href=
+    "rose-configuration.html#site">user configuration</a> file
+    <samp>~/.metomi/rose.conf</samp> in your home directory, if it doesn't
+    already exist, and adding text such as this:</p>
+    <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
-colour-valuewidget-base-selected=Lemon Chiffon
-colour-variable-text-val-env=green
-colour-variable-changed=Medium Orchid
+colour_valuewidget_base_selected=Lemon Chiffon
+colour_variable_text_val_env=green
+colour_variable_changed=Medium Orchid
 </pre>
 
-    <p>These option names are lowercased, hyphen-separated translations of the
-    constants in the <a href=
+    <p>These option names are lowercased translations of the constants in the
+    <a href=
     "https://github.com/metomi/rose/blob/master/lib/python/rose/config_editor/__init__.py">
-    config_editor/__init__.py</a> file. Any of the colours specified there can
-    be changed easily. The allowed colour strings are specified in the X11
-    <var>rgb.txt</var> file.</p>
+    config_editor/__init__.py</a> file. Any of the colours specified there
+    (constants that begin with "COLOUR") can be changed easily. The allowed
+    colour strings are specified in the X11 <var>rgb.txt</var> file and are
+    quite extensive.</p>
+
+    <h3 id="views">Customising Views and Layouts</h3>
 
     <p>Changes are not restricted to colours - any constants in this python
-    module can be overridden in your <var>rose.conf</var> file (but be careful
-    with some of them!).</p>
+    module can be overridden in your <samp>rose.conf</samp> file (but be
+    careful with some of them!).</p>
+
+    <p>The view and layout defaults in the config editor can be overridden
+    using the <samp>rose.conf</samp> file. Have a look at the constants in
+    <a href=
+    "https://github.com/metomi/rose/blob/master/lib/python/rose/config_editor/__init__.py">
+    config_editor/__init__.py</a> beginning with "SHOULD_SHOW".</p>
+
+    <p>These can be altered by adding to your site or user configuration as in
+    <a href="#themes">Customising Themes and Colours</a> - for example, to show
+    latent pages and variables by default, include the following in your site
+    or user configuration:</p>
+    <pre class="prettyprint lang-rose_conf">
+[rose-config-edit]
+should_show_latent_pages=True
+should_show_latent_vars=True
+</pre>
+
+    <p>You can even set custom layout strings for the title, description, and
+    help of settings - see the constants beginning with "SHOULD_SHOW_CUSTOM"
+    and "CUSTOM_FORMAT". For example, to always include the description of a
+    setting in the help string presented to the user, you could set this in
+    your site or user configuration:</p>
+    <pre class="prettyprint lang-rose_conf">
+[rose-config-edit]
+custom_format_help="{description}\n\n{help}"
+should_show_custom_help=True
+</pre>
   </div>
 </body>
 </html>
