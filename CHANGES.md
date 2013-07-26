@@ -54,6 +54,11 @@ pruned.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#827: rose suite-hook --shutdown: add `--kill --now` as options to `cylc
+shutdown`.
+
+\#824: rose macro: add support for macro arguments.
+
 \#811: rose config-edit: rule checker will now display message on the status
 bar if everything is OK.
 
