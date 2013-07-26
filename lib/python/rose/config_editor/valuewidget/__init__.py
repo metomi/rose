@@ -21,7 +21,9 @@
 import re
 
 import rose
-import array
+import array.entry
+import array.mixed
+import array.logical
 import booltoggle
 import character
 import combobox
@@ -77,8 +79,8 @@ def chooser(value, metadata, error):
             return combobox.ComboBoxValueWidget
     elif type(m_type) is not list:
         if m_type in ['logical', 'boolean']:
-           return array.LogicalArrayValueWidget
-        return array.EntryArrayValueWidget
+           return array.logical.LogicalArrayValueWidget
+        return array.entry.EntryArrayValueWidget
     if m_type == 'integer':
         return intspin.IntSpinButtonValueWidget
     if m_type in [rose.config_editor.FILE_TYPE_NORMAL,
@@ -91,5 +93,5 @@ def chooser(value, metadata, error):
     if m_type in ["character", "quoted"]:
         return character.QuotedTextValueWidget
     if type(m_type) is list:
-        return array.MixedArrayValueWidget
+        return array.mixed.MixedArrayValueWidget
     return text.RawValueWidget
