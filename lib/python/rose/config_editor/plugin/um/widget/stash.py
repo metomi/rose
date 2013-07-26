@@ -665,7 +665,7 @@ class BaseStashSummaryDataPanelv1(
             package_menu = gtk.Menu()
             enable_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_YES)
             enable_menuitem.set_label(label="Enable all")
-            enable_menuitem._connect_args = (package, True)
+            enable_menuitem._connect_args = (package, False)
             enable_menuitem.connect(
                    "button-release-event",
                    lambda m, e: self._packages_enable(*m._connect_args))
@@ -674,7 +674,7 @@ class BaseStashSummaryDataPanelv1(
             package_menu.append(enable_menuitem)
             ignore_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_NO)
             ignore_menuitem.set_label(label="Ignore all")
-            ignore_menuitem._connect_args = (package, False)
+            ignore_menuitem._connect_args = (package, True)
             ignore_menuitem.connect(
                    "button-release-event",
                    lambda m, e: self._packages_enable(*m._connect_args))
@@ -762,6 +762,6 @@ class BaseStashSummaryDataPanelv1(
                         if sect not in sections_for_changing:
                            is_ignored = (rose.variable.IGNORED_BY_USER in
                                          self.sections[sect].ignored_reason)
-                           if is_ignored == disable:
+                           if is_ignored != disable:
                                sections_for_changing.append(sect)
-        self.sub_ops.ignore_sections(sections_for_changing, not disable)
+        self.sub_ops.ignore_sections(sections_for_changing, disable)
