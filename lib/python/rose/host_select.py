@@ -66,8 +66,11 @@ class HostExceedThresholdEvent(Event):
         host, threshold_conf, score = self.args
         fmt_map = {"host": host, "score": score}
         fmt_map.update(threshold_conf)
+        for k, v in fmt_map.items():
+            if v == None:
+                fmt_map[k] = ""
         return self.FMT % fmt_map
-
+            
 
 class HostBelowThresholdEvent(Event):
 
@@ -80,6 +83,9 @@ class HostBelowThresholdEvent(Event):
         host, threshold_conf, score = self.args
         fmt_map = {"host": host, "score": score}
         fmt_map.update(threshold_conf)
+        for k, v in fmt_map.items():
+            if v == None:
+                fmt_map[k] = ""
         return self.FMT % fmt_map
 
 
