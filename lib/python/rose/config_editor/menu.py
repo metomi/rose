@@ -832,11 +832,11 @@ class MainMenuHandler(object):
         rose.gtk.run.run_suite(*args)
         return False
 
-    def transform_default(self, only_this_config_name=None):
+    def transform_default(self, only_this_config=None):
         """Run the Rose built-in transformer macros."""
-        if (only_this_config_name is not None and
-            only_this_config_name in self.data.config.keys()):
-            config_keys = [only_this_config_name]
+        if (only_this_config is not None and
+            only_this_config in self.data.config.keys()):
+            config_keys = [only_this_config]
             text = rose.config_editor.DIALOG_LABEL_AUTOFIX
         else:
             config_keys = sorted(self.data.config.keys())

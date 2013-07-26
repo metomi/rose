@@ -352,6 +352,7 @@ STATUS_BAR_VERBOSITY = 0  # Compare with rose.reporter.Reporter.
 # Stack action names and presentation
 STACK_GROUP_ADD = "Add"
 STACK_GROUP_COPY = "Copy"
+STACK_GROUP_IGNORE = "Ignore"
 STACK_GROUP_DELETE = "Delete"
 STACK_GROUP_RENAME = "Rename"
 STACK_GROUP_REORDER = "Reorder"

@@ -39,7 +39,8 @@ class GroupOperations(object):
     def __init__(self, data, util, reporter, undo_stack, redo_stack,
                  section_ops_inst,
                  variable_ops_inst,
-                 view_page_func, reload_ns_tree_func):
+                 view_page_func, update_ns_sub_data_func,
+                 reload_ns_tree_func):
         self.data = data
         self.util = util
         self.reporter = reporter
@@ -48,6 +49,7 @@ class GroupOperations(object):
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self.view_page_func = view_page_func
+        self.update_ns_sub_data_func = update_ns_sub_data_func
         self.reload_ns_tree_func = reload_ns_tree_func
 
     def add_section_with_options(self, config_name, new_section_name,
@@ -133,6 +135,32 @@ class GroupOperations(object):
             stack_item.group = group
         return new_section
 
+    def ignore_sections(self, config_name, sections, is_ignored,
+                        skip_update=False):
+        """Implement a mass user-ignore or enable of sections."""
+        start_stack_index = len(self.undo_stack)
+        group = rose.config_editor.STACK_GROUP_IGNORE + "-" + str(time.time())
+        nses = []
+        for section in sections:
+            ns = self.data.helper.get_default_namespace_for_section(
+                                              section, config_name)
+            if ns not in nses:
+                nses.append(ns)
+            skipped_nses = self.sect_ops.ignore_section(config_name, section,
+                                                        is_ignored,
+                                                        skip_update=True)
+            for ns in skipped_nses:
+                if ns not in nses:
+                    nses.append(ns)
+        for stack_item in self.undo_stack[start_stack_index:]:
+            stack_item.group = group
+        if not skip_update:
+            for ns in nses:
+                self.sect_ops.trigger_update(ns, skip_sub_data_update=True)
+                self.sect_ops.trigger_info_update(ns)
+            self.sect_ops.trigger_update(config_name)
+            self.update_ns_sub_data_func(config_name)
+
     def remove_section(self, config_name, section, skip_update=False):
         """Implement a remove of a section and its options."""
         start_stack_index = len(self.undo_stack)
@@ -160,8 +188,7 @@ class GroupOperations(object):
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
         if not skip_update:
-            for ns in nses:
-                self.reload_ns_tree_func(ns)
+            self.reload_ns_tree_func(only_this_config=config_name)
 
     def get_sub_ops_for_namespace(self, namespace):
         """Return data functions for summary (sub) data panels."""
@@ -173,6 +200,7 @@ class GroupOperations(object):
                     self.add_section_with_options,
                     self.copy_section,
                     self.sect_ops.ignore_section,
+                    self.ignore_sections,
                     self.remove_section,
                     self.remove_sections,
                     get_var_id_values_func=(
@@ -185,13 +213,14 @@ class SubDataOperations(object):
 
     def __init__(self, config_name,
                  add_section_func, clone_section_func,
-                 ignore_section_func, remove_section_func,
-                 remove_sections_func,
+                 ignore_section_func, ignore_sections_func,
+                 remove_section_func, remove_sections_func,
                  get_var_id_values_func):
         self.config_name = config_name
         self._add_section_func = add_section_func
         self._clone_section_func = clone_section_func
         self._ignore_section_func = ignore_section_func
+        self._ignore_sections_func = ignore_sections_func
         self._remove_section_func = remove_section_func
         self._remove_sections_func = remove_sections_func
         self._get_var_id_values_func = get_var_id_values_func
@@ -210,6 +239,13 @@ class SubDataOperations(object):
         return self._ignore_section_func(
                             self.config_name,
                             ignore_section_name,
+                            is_ignored)
+
+    def ignore_sections(self, ignore_sections_list, is_ignored):
+        """User-ignore or enable a list of sections."""
+        return self._ignore_sections_func(
+                            self.config_name,
+                            ignore_sections_list,
                             is_ignored)
 
     def remove_section(self, remove_section_name):
