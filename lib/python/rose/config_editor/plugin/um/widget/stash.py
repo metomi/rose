@@ -760,10 +760,8 @@ class BaseStashSummaryDataPanelv1(
                         sect, opt = self.util.get_section_option_from_id(
                                                   var.metadata["id"])
                         if sect not in sections_for_changing:
-                            sections_for_changing.append(sect)
-        for sect in sections_for_changing:
-            is_ignored = (rose.variable.IGNORED_BY_USER in
-                          self.sections[sect].ignored_reason)
-            if is_ignored != disable:
-                continue
-            self.sub_ops.ignore_section(sect, not disable)
+                           is_ignored = (rose.variable.IGNORED_BY_USER in
+                                         self.sections[sect].ignored_reason)
+                           if is_ignored == disable:
+                               sections_for_changing.append(sect)
+        self.sub_ops.ignore_sections(sections_for_changing, not disable)

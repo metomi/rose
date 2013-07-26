@@ -116,11 +116,13 @@ class Updater(object):
             if only_this_namespace is None:
                 self.update_all()
             else:
-                self.update_all(skip_checking=True)
+                self.update_all(skip_checking=True, skip_sub_data_update=True)
                 spaces = only_this_namespace.lstrip("/").split("/")
                 for i in range(len(spaces), 0, -1):
                     update_ns = "/" + "/".join(spaces[:i])
-                    self.update_namespace(update_ns, skip_config_update=True)
+                    self.update_namespace(update_ns, skip_config_update=True,
+                                          skip_sub_data_update=True)
+                self.update_ns_sub_data(only_this_namespace)
 
     def refresh_ids(self, config_name, setting_ids, is_loading=False,
                     are_errors_done=False):
@@ -152,7 +154,7 @@ class Updater(object):
             self.update_namespace(ns, is_loading=is_loading)
 
     def update_all(self, only_this_config=None, is_loading=False,
-                   skip_checking=False):
+                   skip_checking=False, skip_sub_data_update=False):
         """Loop over all namespaces and update."""
         unique_namespaces = self.data.helper.get_all_namespaces(
                                                      only_this_config)
@@ -185,17 +187,20 @@ class Updater(object):
         self.update_stack_viewer_if_open()
         for config_name in configs:
             self.update_metadata_id(config_name)
-        self.update_ns_sub_data()
+        if not skip_sub_data_update:
+            self.update_ns_sub_data()
 
     def update_namespace(self, namespace, are_errors_done=False,
-                         is_loading=False, skip_config_update=False):
+                         is_loading=False, skip_config_update=False,
+                         skip_sub_data_update=False):
         """Update driver function. Updates the page if open."""
         self.pagelist = self.get_pagelist_func()
         if namespace in [p.namespace for p in self.pagelist]:
             index = [p.namespace for p in self.pagelist].index(namespace)
             page = self.pagelist[index]
             self.update_status(page, are_errors_done=are_errors_done,
-                               skip_config_update=skip_config_update)
+                               skip_config_update=skip_config_update,
+                               skip_sub_data_update=skip_sub_data_update)
         else:
             if not skip_config_update:
                 self.update_config(namespace)
@@ -210,10 +215,11 @@ class Updater(object):
             self.update_ns_tree_states(namespace)
             if namespace in self.data.config.keys():
                 self.update_metadata_id(namespace)
-            self.update_ns_sub_data(namespace)
+            if not skip_sub_data_update:
+                self.update_ns_sub_data(namespace)
 
     def update_status(self, page, are_errors_done=False,
-                      skip_config_update=False):
+                      skip_config_update=False, skip_sub_data_update=False):
         """Update ignored statuses and update the tree statuses."""
         self.pagelist = self.get_pagelist_func()
         self.sync_page_var_lists(page)
@@ -230,7 +236,8 @@ class Updater(object):
         self.update_ns_tree_states(page.namespace)
         if page.namespace in self.data.config.keys():
             self.update_metadata_id(page.namespace)
-        self.update_ns_sub_data(page.namespace)
+        if not skip_sub_data_update:
+            self.update_ns_sub_data(page.namespace)
 
     def update_ns_sub_data(self, namespace=None):
         """Update any relevant summary data on another page."""

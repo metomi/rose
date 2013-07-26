@@ -110,8 +110,13 @@ class SectionOperations(object):
             self.trigger_update(ns)
 
     def ignore_section(self, config_name, section, is_ignored,
-                       override=False):
-        """Ignore or enable a section for this configuration."""
+                       override=False, skip_update=False):
+        """Ignore or enable a section for this configuration.
+
+        Returns a list of namespaces that need further updates. This is
+        empty if skip_update is False.
+
+        """
         config_data = self.__data.config[config_name]
         sect_data = config_data.sections.now[section]
         if is_ignored:
@@ -185,10 +190,13 @@ class SectionOperations(object):
                 var.ignored_reason.pop(rose.variable.IGNORED_BY_SECTION)
             else:
                 continue
+        if skip_update:
+            return nses_to_do
         for ns in nses_to_do:
             self.trigger_update(ns)
             self.trigger_info_update(ns)
-            self.trigger_update(config_name)
+        self.trigger_update(config_name)
+        return []
 
     def remove_section(self, config_name, section, skip_update=False):
         """Remove a section from this configuration."""

@@ -184,8 +184,8 @@ class MainController(object):
                                 self.data, self.util, self.reporter,
                                 self.undo_stack, self.redo_stack,
                                 self.check_cannot_enable_setting,
-                                lambda n: self.updater.update_namespace(n),
-                                lambda n: self.updater.update_ns_info(n),
+                                self.update_namespace,
+                                self.update_ns_info,
                                 update_tree_func=self.reload_namespace_tree,
                                 view_page_func=self.view_page,
                                 kill_page_func=self.kill_page)
@@ -196,7 +196,7 @@ class MainController(object):
                                    self.undo_stack, self.redo_stack,
                                    self.section_ops.add_section,
                                    self.check_cannot_enable_setting,
-                                   lambda n: self.updater.update_namespace(n),
+                                   self.update_namespace,
                                    search_id_func=self.perform_find_by_id))
 
         self.group_ops = rose.config_editor.ops.group.GroupOperations(
@@ -205,6 +205,7 @@ class MainController(object):
                              self.section_ops,
                              self.variable_ops,
                              self.view_page,
+                             self.update_ns_sub_data,
                              self.reload_namespace_tree)
 
         # Add in the main menu bar and tool bar handler.
@@ -946,6 +947,18 @@ class MainController(object):
     def tree_trigger_update(self, *args, **kwargs):
         """Placeholder for updater function of the same name."""
         self.updater.tree_trigger_update(*args, **kwargs)
+
+    def update_namespace(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.update_namespace(*args, **kwargs)
+
+    def update_ns_info(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.update_ns_info(*args, **kwargs)
+
+    def update_ns_sub_data(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.update_ns_sub_data(*args, **kwargs)
 
 #------------------ Page viewer function -------------------------------------
 

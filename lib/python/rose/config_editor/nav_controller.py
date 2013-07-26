@@ -45,7 +45,8 @@ class NavTreeManager(object):
         return True
 
     def reload_namespace_tree(self, only_this_namespace=None,
-                              only_this_config_name=None):
+                              only_this_config_name=None,
+                              skip_update=False):
         """Make the tree of namespaces and load to the tree panel."""
         # Clear the old namespace tree information (selectively if necessary).
         if (only_this_namespace is not None and
@@ -101,8 +102,9 @@ class NavTreeManager(object):
                 self.update_namespace_tree(spaces,
                                            self.namespace_tree,
                                            prev_spaces=[])
-        # Perform an update.
-        self.tree_trigger_update(only_this_namespace=only_this_namespace)
+        if not skip_update:
+            # Perform an update.
+            self.tree_trigger_update(only_this_namespace=only_this_namespace)
 
     def clear_namespace_tree(self, namespace=None):
         """Clear the namespace tree, or a subtree from namespace."""
