@@ -308,8 +308,8 @@ rose config-edit -C ~/my_suites/this_suite
 
     <h3 id="themes">Customising Themes and Colours</h3>
 
-    <p>Themes will be picked up by default (this will be the desktop theme if
-    you are running on a GNOME desktop) and can be altered by running</p>
+    <p>The default style, font, and some colours of the config editor are
+    controlled by the GNOME desktop theme. This can be altered by running:</p>
     <pre>
 gnome-appearance-properties
 </pre>
@@ -351,10 +351,10 @@ colour_variable_changed=Medium Orchid
     "https://github.com/metomi/rose/blob/master/lib/python/rose/config_editor/__init__.py">
     config_editor/__init__.py</a> beginning with "SHOULD_SHOW".</p>
 
-    <p>These can be altered by adding to your site or user configuration as in
-    <a href="#themes">Customising Themes and Colours</a> - for example, to show
-    latent pages and variables by default, include the following in your site
-    or user configuration:</p>
+    <p>These can be altered by adding to your site or user configuration as
+    explained in <a href="#themes">Customising Themes and Colours</a> - for
+    example, to show latent pages and variables by default, include the
+    following in your site or user configuration:</p>
     <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
 should_show_latent_pages=True
@@ -364,8 +364,8 @@ should_show_latent_vars=True
     <p>You can even set custom layout strings for the title, description, and
     help of settings - see the constants beginning with "SHOULD_SHOW_CUSTOM"
     and "CUSTOM_FORMAT". For example, to always include the description of a
-    setting in the help string presented to the user, you could set this in
-    your site or user configuration:</p>
+    setting in the help string presented to the user, you could place the
+    following text in your site or user configuration:</p>
     <pre class="prettyprint lang-rose_conf">
 [rose-config-edit]
 custom_format_help="{description}\n\n{help}"

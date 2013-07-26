@@ -21,7 +21,7 @@
 
 This module contains constants that are only used in rosie go.
 
-To override constants at runtime, place a section
+To override constants at runtime, place a section:
 
 [rosie-go]
 

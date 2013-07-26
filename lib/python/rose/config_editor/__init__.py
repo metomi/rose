@@ -21,7 +21,7 @@
 
 This module contains constants that are only used in the config editor.
 
-To override constants at runtime, place a section
+To override constants at runtime, place a section:
 
 [rose-config-edit]
 
@@ -47,7 +47,7 @@ import os
 from rose.resource import ResourceLocator
 
 # Accelerators
-# These control the keyboard shortcut mapping.
+# Keyboard shortcut mappings.
 ACCEL_NEW = "<Ctrl>N"
 ACCEL_OPEN = "<Ctrl>O"
 ACCEL_SAVE = "<Ctrl>S"
