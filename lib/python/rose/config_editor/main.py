@@ -76,6 +76,7 @@ import rose.config_editor.updater
 import rose.config_editor.util
 import rose.config_editor.variable
 import rose.config_editor.window
+import rose.gtk.dialog
 import rose.gtk.splash
 import rose.gtk.util
 import rose.macro
@@ -1020,8 +1021,8 @@ class MainController(object):
                     self.view_page(var.metadata["full_ns"],
                                    var.metadata["id"])
                     page_address = var.metadata["full_ns"].lstrip("/")
-                    rose.gtk.util.run_dialog(
-                             rose.gtk.util.DIALOG_TYPE_ERROR,
+                    rose.gtk.dialog.run_dialog(
+                             rose.gtk.dialog.DIALOG_TYPE_ERROR,
                              rose.config_editor.ERROR_SAVE_BLANK.format(
                                                 short_config_name,
                                                 page_address),
@@ -1051,8 +1052,8 @@ class MainController(object):
             try:
                 rose.config.dump(config, save_path)
             except (OSError, IOError) as e:
-                rose.gtk.util.run_dialog(
-                          rose.gtk.util.DIALOG_TYPE_ERROR,
+                rose.gtk.dialog.run_dialog(
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
                           rose.config_editor.ERROR_SAVE_PATH_FAIL.format(e),
                           title=rose.config_editor.ERROR_SAVE_TITLE.format(
                                                          short_config_name),
@@ -1126,8 +1127,8 @@ class MainController(object):
             text = rose.config_editor.ERROR_CONFIG_CREATE.format(
                                             new_path, type(e), str(e))
             title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text, title)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text, title)
             return False
         self.data.load_config(os.path.dirname(new_path), reload_tree_on=True,
                               skip_load_event=True)
@@ -1169,8 +1170,8 @@ class MainController(object):
                 text = rose.config_editor.ERROR_CONFIG_DELETE.format(
                                                 dir_path, type(e), str(e))
                 title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         text, title)
+                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                           text, title)
                 return False
         self.data.config.pop(config_name)
         self.reload_namespace_tree()
@@ -1357,10 +1358,10 @@ class MainController(object):
                                     0, gtk.STOCK_DIALOG_WARNING)
                     self.find_entry.set_icon_tooltip_text(0, text)
                 except AttributeError:
-                    rose.gtk.util.run_dialog(
-                                  rose.gtk.util.DIALOG_TYPE_INFO,
-                                  text,
-                                  rose.config_editor.WARNING_NOT_FOUND_TITLE)
+                    rose.gtk.dialog.run_dialog(
+                             rose.gtk.dialog.DIALOG_TYPE_INFO,
+                             text,
+                             rose.config_editor.WARNING_NOT_FOUND_TITLE)
             else:
                 if var_id is not None:
                     self.reporter.report(
@@ -1409,8 +1410,8 @@ class MainController(object):
         try:
             reg_find = re.compile(expression).search
         except sre_constants.error as e:
-            rose.gtk.util.run_dialog(
-                     rose.gtk.util.DIALOG_TYPE_ERROR,
+            rose.gtk.dialog.run_dialog(
+                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                      rose.config_editor.ERROR_NOT_REGEX.format(
                                         expression, str(e)))
             return None, None
@@ -1676,8 +1677,8 @@ if __name__ == '__main__':
         this_version = '{0}.{1}.{2}'.format(*gtk.pygtk_version)
         required_version = '{0}.{1}.{2}'.format(
                                         *rose.config_editor.MIN_PYGTK_VERSION)
-        rose.gtk.util.run_dialog(
-                 rose.gtk.util.DIALOG_TYPE_ERROR,
+        rose.gtk.dialog.run_dialog(
+                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                  rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
                                     required_version, this_version),
                  rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE)
@@ -1709,7 +1710,7 @@ if __name__ == '__main__':
     cwd = os.getcwd()
     if opts.new_mode:
         cwd = None
-    rose.gtk.util.set_exception_hook(keep_alive=True)
+    rose.gtk.dialog.set_exception_hook_dialog(keep_alive=True)
     if opts.profile_mode:
         f = tempfile.NamedTemporaryFile()
         cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,

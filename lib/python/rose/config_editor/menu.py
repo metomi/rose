@@ -29,8 +29,8 @@ import gtk
 import rose.config
 import rose.config_editor
 import rose.external
+import rose.gtk.dialog
 import rose.gtk.run
-import rose.gtk.util
 import rose.macro
 import rose.macros
 import rose.suite_control
@@ -407,11 +407,11 @@ class MainMenuHandler(object):
                 if return_value:
                     error_count += 1
             except Exception as e:
-                rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_ERROR,
-                              str(e),
-                              rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                           macro_fullname))
+                rose.gtk.dialog.run_dialog(
+                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                         str(e),
+                         rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                                                            macro_fullname))
                 continue
             sorter = rose.config.sort_settings
             to_id = lambda s: self.util.get_id_from_section_option(
@@ -500,8 +500,8 @@ class MainMenuHandler(object):
                         try:
                             macro_inst = obj()
                         except Exception as e:
-                            rose.gtk.util.run_dialog(
-                                 rose.gtk.util.DIALOG_TYPE_ERROR,
+                            rose.gtk.dialog.run_dialog(
+                                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                  str(e), err_text)
                             continue
                         if hasattr(macro_inst, method_name):
@@ -523,11 +523,11 @@ class MainMenuHandler(object):
             try:
                 return_value = macro_method(macro_config, meta_config)
             except Exception as e:
-                rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_ERROR,
-                              str(e),
-                              rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                                 macro_fullname))
+                rose.gtk.dialog.run_dialog(
+                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                         str(e),
+                         rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                                                            macro_fullname))
                 continue
             if methname == rose.macro.TRANSFORM_METHOD:
                 if (not isinstance(return_value, tuple) or
@@ -592,12 +592,12 @@ class MainMenuHandler(object):
         return ", ".join(config_names)
 
     def _handle_bad_macro_return(self, macro_fullname, return_value):
-        rose.gtk.util.run_dialog(
-            rose.gtk.util.DIALOG_KIND_ERROR,
-            rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
-                                                return_value),
-            rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                macro_fullname))
+        rose.gtk.dialog.run_dialog(
+                 rose.gtk.dialog.DIALOG_KIND_ERROR,
+                 rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
+                                                    return_value),
+                 rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                                                    macro_fullname))
 
     def handle_macro_transforms(self, config_name, macro_name,
                                 macro_config, change_list, no_display=False,
@@ -801,11 +801,11 @@ class MainMenuHandler(object):
         g = rose.suite_log_view.SuiteLogViewGenerator()
         url = g.get_suite_log_url(self.data.top_level_name)
         if url is None:
-            rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_ERROR,
-                              rose.config_editor.ERROR_NO_OUTPUT.format(
-                              self.data.top_level_name),
-                              rose.config_editor.DIALOG_TITLE_ERROR)
+            rose.gtk.dialog.run_dialog(
+                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                rose.config_editor.ERROR_NO_OUTPUT.format(
+                                            self.data.top_level_name),
+                                rose.config_editor.DIALOG_TITLE_ERROR)
         else:
             g.view_suite_log_url(self.data.top_level_name)
 
@@ -814,9 +814,9 @@ class MainMenuHandler(object):
         help_cmds = shlex.split(rose.config_editor.LAUNCH_SUITE_RUN_HELP)
         help_text = subprocess.Popen(help_cmds,
                                      stdout=subprocess.PIPE).communicate()[0]
-        rose.gtk.util.run_command_arg_dialog(
-                          rose.config_editor.LAUNCH_SUITE_RUN,
-                          help_text, self.run_suite_check_args)
+        rose.gtk.dialog.run_command_arg_dialog(
+                            rose.config_editor.LAUNCH_SUITE_RUN,
+                            help_text, self.run_suite_check_args)
 
     def run_suite_check_args(self, args):
         if args is None:
@@ -841,11 +841,11 @@ class MainMenuHandler(object):
         else:
             config_keys = sorted(self.data.config.keys())
             text = rose.config_editor.DIALOG_LABEL_AUTOFIX_ALL
-        proceed = rose.gtk.util.run_dialog(
-                                    rose.gtk.util.DIALOG_TYPE_WARNING,
-                                    text,
-                                    rose.config_editor.DIALOG_TITLE_AUTOFIX,
-                                    cancel=True)
+        proceed = rose.gtk.dialog.run_dialog(
+                                  rose.gtk.dialog.DIALOG_TYPE_WARNING,
+                                  text,
+                                  rose.config_editor.DIALOG_TITLE_AUTOFIX,
+                                  cancel=True)
         if not proceed:
             return False
         sorter = rose.config.sort_settings

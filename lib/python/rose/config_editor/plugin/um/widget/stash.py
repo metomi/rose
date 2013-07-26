@@ -30,6 +30,7 @@ import gtk
 
 import rose.config
 import rose.config_editor.panelwidget.summary_data
+import rose.gtk.dialog
 import rose.gtk.util
 import rose.config_editor.plugin.um.widget.stash_add
 
@@ -361,8 +362,8 @@ class BaseStashSummaryDataPanelv1(
                        self.STREQ_NL_ITEM_OPT: item}
         new_section = self.add_section(None, opt_map=new_opt_map)
         if launch_dialog:
-            rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_INFO,
+            rose.gtk.dialog.run_dialog(
+                              rose.gtk.dialog.DIALOG_TYPE_INFO,
                               "Added request as {0}".format(new_section),
                               "New Request")
 

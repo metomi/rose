@@ -35,6 +35,7 @@ import rose.config_editor.stack
 import rose.config_editor.util
 import rose.config_editor.variable
 import rose.formats
+import rose.gtk.dialog
 import rose.gtk.util
 import rose.variable
 
@@ -368,7 +369,7 @@ class ConfigPage(gtk.VBox):
     def launch_help(self, *args):
         """Launch the page help."""
         title = rose.config_editor.DIALOG_HELP_TITLE.format(self.label)
-        rose.gtk.util.run_hyperlink_dialog(
+        rose.gtk.dialog.run_hyperlink_dialog(
                                  gtk.STOCK_DIALOG_INFO,
                                  str(self.help),
                                  title)
@@ -587,7 +588,7 @@ class ConfigPage(gtk.VBox):
 
     def _launch_section_chooser(self, section_choices):
         """Choose a section to add a blank variable to."""
-        section = rose.gtk.util.run_choices_dialog(
+        section = rose.gtk.dialog.run_choices_dialog(
                        rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR,
                        section_choices,
                        rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)

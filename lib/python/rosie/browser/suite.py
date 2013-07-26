@@ -43,7 +43,8 @@ class SuiteDirector():
             return False
         else:
             id_text = id_.to_string_with_version()
-        rc = rose.gtk.util.DialogProcess([self.vc_client.checkout, id_],
+        rc = rose.gtk.dialog.DialogProcess(
+                      [self.vc_client.checkout, id_],
                       description=rosie.browser.DIALOG_MESSAGE_CHECKOUT.format(
                                                 id_text), 
                       title=rosie.browser.DIALOG_TITLE_CHECKOUT).run()
@@ -67,13 +68,14 @@ class SuiteDirector():
             try:
                 self.vc_client.delete(to_delete)
             except rose.popen.RosePopenError as e:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR, 
-                                         rosie.browser.ERROR_PERMISSIONS 
-                                         + "\n\n" + str(e))
+                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR, 
+                                           rosie.browser.ERROR_PERMISSIONS +
+                                           "\n\n" + str(e))
             except rosie.vc.LocalCopyStatusError as e:
-                 rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR, 
-                               rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
-                               "\n\n" + str(e))               
+                 rose.gtk.dialog.run_dialog(
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR, 
+                          rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
+                          "\n\n" + str(e))               
             return True
         
         return False
@@ -94,13 +96,14 @@ class SuiteDirector():
             try:
                 self.vc_client.delete(sid, True)
             except rose.popen.RosePopenError as e:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR, 
-                                         rosie.browser.ERROR_PERMISSIONS 
-                                         + "\n\n" + str(e))
+                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR, 
+                                           rosie.browser.ERROR_PERMISSIONS +
+                                           "\n\n" + str(e))
             except rosie.vc.LocalCopyStatusError as e:
-                 rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR, 
-                               rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
-                               "\n\n" + str(e))               
+                 rose.gtk.dialog.run_dialog(
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR, 
+                          rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
+                          "\n\n" + str(e))               
             return True
         
         return False

@@ -25,6 +25,8 @@ import gtk
 
 import rose.config_editor
 import rose.config_editor.util
+import rose.gtk.dialog
+import rose.gtk.util
 
 
 class MenuWidget(gtk.HBox):
@@ -220,7 +222,7 @@ class MenuWidget(gtk.HBox):
         warnings = self.my_variable.warning.keys()
         ns = self.my_variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
-        dialog_func = rose.gtk.util.run_hyperlink_dialog
+        dialog_func = rose.gtk.dialog.run_hyperlink_dialog
         for error in errors:
             err_name = error.replace("/", "_")
             action_name = "Error_" + err_name
@@ -317,9 +319,9 @@ class MenuWidget(gtk.HBox):
         text = "\n".join(self.my_variable.comments)
         title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
                                    self.my_variable.metadata['id'])
-        rose.gtk.util.run_edit_dialog(text,
-                                      finish_hook=self._edit_finish_hook,
-                                      title=title)
+        rose.gtk.dialog.run_edit_dialog(text,
+                                        finish_hook=self._edit_finish_hook,
+                                        title=title)
 
     def _edit_finish_hook(self, text):
         self.var_ops.set_var_comments(self.my_variable, text.splitlines())

@@ -31,11 +31,12 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
-import rose.gtk.util
 import rose.config_editor.keywidget
 import rose.config_editor.menuwidget
 import rose.config_editor.valuewidget
 import rose.config_editor.util
+import rose.gtk.dialog
+import rose.gtk.util
 
 
 class VariableWidget(object):
@@ -443,8 +444,8 @@ class VariableWidget(object):
                                           self.variable.metadata['id'])
         ns = self.variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
-        rose.gtk.util.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO,
-                                           text, title, search_function)
+        rose.gtk.dialog.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO,
+                                             text, title, search_function)
         return False
 
     def _set_inconsistent(self, valuewidget, variable):
