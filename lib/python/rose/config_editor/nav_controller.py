@@ -45,31 +45,31 @@ class NavTreeManager(object):
         return True
 
     def reload_namespace_tree(self, only_this_namespace=None,
-                              only_this_config_name=None,
+                              only_this_config=None,
                               skip_update=False):
         """Make the tree of namespaces and load to the tree panel."""
         # Clear the old namespace tree information (selectively if necessary).
         if (only_this_namespace is not None and
-            only_this_config_name is None):
+            only_this_config is None):
             config_name = self.util.split_full_ns(self.data,
                                                   only_this_namespace)[0]
-            only_this_config_name = config_name
+            only_this_config = config_name
             clear_namespace = only_this_namespace.rsplit("/", 1)[0]
             self.clear_namespace_tree(clear_namespace)
-        elif only_this_config_name is not None:
-            self.clear_namespace_tree(only_this_config_name)
+        elif only_this_config is not None:
+            self.clear_namespace_tree(only_this_config)
         else:
             self.clear_namespace_tree()
         view_missing = self.data.page_ns_show_modes[
                                  rose.config_editor.SHOW_MODE_LATENT]
         # Reload the information into the tree.
-        if only_this_config_name is None:
+        if only_this_config is None:
             configs = self.data.config.keys()
             configs.sort(rose.config.sort_settings)
             configs.sort(lambda x, y: cmp(self.data.config[y].is_top_level,
                                           self.data.config[x].is_top_level))
         else:
-            configs = [only_this_config_name]
+            configs = [only_this_config]
         for config_name in configs:
             config_data = self.data.config[config_name]
             if only_this_namespace:
@@ -104,7 +104,8 @@ class NavTreeManager(object):
                                            prev_spaces=[])
         if not skip_update:
             # Perform an update.
-            self.tree_trigger_update(only_this_namespace=only_this_namespace)
+            self.tree_trigger_update(only_this_config=only_this_config,
+                                     only_this_namespace=only_this_namespace)
 
     def clear_namespace_tree(self, namespace=None):
         """Clear the namespace tree, or a subtree from namespace."""

@@ -188,8 +188,7 @@ class GroupOperations(object):
         for stack_item in self.undo_stack[start_stack_index:]:
             stack_item.group = group
         if not skip_update:
-            for ns in nses:
-                self.reload_ns_tree_func(ns)
+            self.reload_ns_tree_func(only_this_config=config_name)
 
     def get_sub_ops_for_namespace(self, namespace):
         """Return data functions for summary (sub) data panels."""

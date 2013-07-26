@@ -103,10 +103,14 @@ class Updater(object):
             self.nav_panel.update_statuses(ns_names, latent_status,
                                            ignored_status)
 
-    def tree_trigger_update(self, only_this_namespace=None):
+    def tree_trigger_update(self, only_this_config=None,
+                            only_this_namespace=None):
         """Reload the tree panel, and perform an update.
 
-        If "only_this_namespace" is not None, perform a selective update
+        If only_this_config is not None, perform an update only on the
+        particular configuration namespaces.
+
+        If only_this_namespace is not None, perform a selective update
         to save time.
 
         """
@@ -114,7 +118,7 @@ class Updater(object):
             self.nav_panel.load_tree(None,
                                      self.nav_controller.namespace_tree)
             if only_this_namespace is None:
-                self.update_all()
+                self.update_all(only_this_config=only_this_config)
             else:
                 self.update_all(skip_checking=True, skip_sub_data_update=True)
                 spaces = only_this_namespace.lstrip("/").split("/")
