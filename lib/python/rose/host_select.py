@@ -66,6 +66,26 @@ class HostExceedThresholdEvent(Event):
         host, threshold_conf, score = self.args
         fmt_map = {"host": host, "score": score}
         fmt_map.update(threshold_conf)
+        for k, v in fmt_map.items():
+            if v == None:
+                fmt_map[k] = ""
+        return self.FMT % fmt_map
+            
+
+class HostBelowThresholdEvent(Event):
+
+    """An error raised when a host is below a threshold."""
+
+    KIND = Event.KIND_ERR
+    FMT = "%(host)s: %(score)s < threshold %(method)s:%(method_arg)s:%(value)s"
+
+    def __str__(self):
+        host, threshold_conf, score = self.args
+        fmt_map = {"host": host, "score": score}
+        fmt_map.update(threshold_conf)
+        for k, v in fmt_map.items():
+            if v == None:
+                fmt_map[k] = ""
         return self.FMT % fmt_map
 
 
@@ -109,6 +129,7 @@ class HostSelector(object):
     RANK_METHOD_LOAD = "load"
     RANK_METHOD_FS = "fs"
     RANK_METHOD_RANDOM = "random"
+    RANK_METHOD_MEM = "mem"
     RANK_METHOD_DEFAULT = RANK_METHOD_LOAD
     TIMEOUT_DELAY = 1.0
 
@@ -208,8 +229,9 @@ class HostSelector(object):
                      The "load" methods determines the load using the average
                      load as returned by the "uptime" command divided by the
                      number of CPUs. The "fs" method determines the load using
-                     the usage in the file system specified by FS. The
-                     "random" method ranks everything by random.
+                     the usage in the file system specified by FS. The "mem"
+                     method ranks by highest free memory. The "random" method 
+                     ranks everything by random.
 
         thresholds: a list of thresholds which each host must not exceed.
                     Should be in the format rank_method:value, where rank_method
@@ -296,8 +318,14 @@ class HostSelector(object):
                         scorer = threshold_conf["scorer"]
                         method_arg = threshold_conf["method_arg"]
                         score = scorer.command_out_parser(out, method_arg)
-                        if score > float(threshold_conf["value"]):
+                        reverse = scorer.REVERSE_SORT
+                        if (reverse is False and 
+                            score > float(threshold_conf["value"])):
                             self.handle_event(HostExceedThresholdEvent(
+                                    host_name, threshold_conf, score))
+                            break
+                        elif reverse and score < float(threshold_conf["value"]):
+                            self.handle_event(HostBelowThresholdEvent(
                                     host_name, threshold_conf, score))
                             break
                     else:
@@ -320,7 +348,9 @@ class HostSelector(object):
             
         if not host_score_list:
             raise NoHostSelectError()
-        host_score_list.sort(lambda a, b: cmp(a[1], b[1]))
+        scorer = rank_conf["scorer"]
+        host_score_list.sort(lambda a, b: cmp(a[1], b[1]), 
+                             reverse=scorer.REVERSE_SORT)
         return host_score_list
 
     __call__ = select
@@ -338,6 +368,7 @@ class RandomScorerConf(object):
     KEY = "random"
     CMD = "true\n"
     CMD_IS_FORMAT = False
+    REVERSE_SORT = False
 
     def get_command(self, method_arg=None):
         """Return a shell command to get the info for scoring a host."""
@@ -382,6 +413,24 @@ class LoadScorerConf(RandomScorerConf):
         if load is None or not nprocs:
             return None
         return float(load) / float(nprocs)
+
+
+class MemoryScorerConf(RandomScorerConf):
+
+    """Score host by amount of free memory"""
+    
+    KEY = "mem"
+    CMD = """echo mem=$(free -m | sed '3!d; s/^.* //')\n"""
+    REVERSE_SORT = True
+
+    def command_out_parser(self, out, method_arg=None):
+        if method_arg is None:
+            method_arg = self.ARG
+        mem = None
+        for line in out.splitlines():
+            if line.startswith("mem="):
+                mem = line.split("=", 1)[1]
+        return float(mem)
 
 
 class FileSystemScorerConf(RandomScorerConf):
