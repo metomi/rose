@@ -24,7 +24,8 @@
 #     rose host-select [OPTIONS] [GROUP/HOST ...]
 #
 # DESCRIPTION
-#     Select a host from a set of groups or names by load or by random.
+#     Select a host from a set of groups or names by load, by free memory
+#     or by random.
 #
 #     Use settings in $ROSE_HOME/etc/rose.conf and $HOME/.metomi/rose.conf to
 #     determine the ranking method.
@@ -45,14 +46,18 @@
 #             "fs" (by % usage of a file system as reported by df):
 #                 METHOD-ARG must be a valid file system in all the given hosts
 #                 and host groups. The default is to use the "~" directory.
+#             "mem" (by largest amount of free memory:
+#                 Uses free -m to return memory in Mb 
 #             "random"
 #     --threshold=[METHOD[:METHOD-ARG]:]VALUE
 #         Each of these option specifies a numeric value of a threshold of which
-#         the hosts must not exceed. Accepts the same METHOD and METHOD-ARG
+#         the hosts must either not exceed or must be greater than depending on 
+#         the specified method . Accepts the same METHOD and METHOD-ARG
 #         (and the same defaults) as the --rank-method=METHOD[:METHOD-ARG]
 #         option. (Obviously, the "random" method does not make sense in this
-#         case.) A host exceeding a threshold will be excluded from the ranking
-#         list.
+#         case.) "load" and "fs" must not exceed threshold while "mem" 
+#         must be greater than threshold. A host not meeting a threshold 
+#         condition will be excluded from the ranking list.
 #     --verbose, -v
 #         Increment verbosity.
 #

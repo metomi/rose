@@ -30,7 +30,7 @@ if [[ -n $HOST_GROUPS ]]; then
 else
     N_HOST_GROUPS=1
 fi
-tests $((N_HOST_GROUPS * 2 + 2))
+tests $((N_HOST_GROUPS * 2 + 4))
 #-------------------------------------------------------------------------------
 # Host groups that can be tested.
 if [[ -n $HOST_GROUPS ]]; then
@@ -47,6 +47,15 @@ fi
 TEST_KEY=$TEST_KEY_BASE-default
 if [[ -n $(rose config 'rose-host-select' 'default') ]]; then
     run_pass "$TEST_KEY" rose 'host-select'
+    file_test "$TEST_KEY.out" "$TEST_KEY.out" -s
+else
+    skip 2 'rose-host-select default not set'
+fi
+#-------------------------------------------------------------------------------
+# Default host group using memory rank method
+TEST_KEY=$TEST_KEY_BASE-default-mem
+if [[ -n $(rose config 'rose-host-select' 'default') ]]; then
+    run_pass "$TEST_KEY" rose 'host-select' --rank-method=mem
     file_test "$TEST_KEY.out" "$TEST_KEY.out" -s
 else
     skip 2 'rose-host-select default not set'
