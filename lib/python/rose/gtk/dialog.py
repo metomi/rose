@@ -747,7 +747,7 @@ def _run_exception_dialog(exc_class, exc_inst, tback, hook, keep_alive):
         return False
     hook(exc_class, exc_inst, tback)
     program_name = rose.resource.ResourceLocator().get_util_name()
-    tback_text = safe_str("".join(traceback.format_tb(tback)))
+    tback_text = rose.gtk.util.safe_str("".join(traceback.format_tb(tback)))
     shutdown_text = DIALOG_TEXT_SHUTTING_DOWN
     if keep_alive:
         shutdown_text = DIALOG_TEXT_SHUTDOWN_ASAP
