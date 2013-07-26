@@ -1158,9 +1158,9 @@ class ConfigPage(gtk.VBox):
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)
-        has_data = has_no_content
-        has_data = has_data or (self.sub_data is not None)
-        has_data = has_data or bool(self.panel_data)
+        has_data = (has_no_content or
+                    self.sub_data is not None or
+                    bool(self.panel_data))
         if not has_data:
             for section in self.sections:
                 if section.metadata["full_ns"] == self.namespace:
