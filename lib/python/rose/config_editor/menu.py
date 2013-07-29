@@ -515,7 +515,8 @@ class MainMenuHandler(object):
                 table.attach(entry, 1, 2, i, i+1)
             dialog.show_all()
             response = dialog.run()
-            if response == gtk.RESPONSE_CANCEL or response == gtk.RESPONSE_CLOSE:
+            if (response == gtk.RESPONSE_CANCEL or 
+                response == gtk.RESPONSE_CLOSE):
                 res = optionals
                 dialog.destroy()
                 break
@@ -602,7 +603,7 @@ class MainMenuHandler(object):
                               rose.gtk.util.DIALOG_TYPE_ERROR,
                               str(e),
                               rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                                 macro_fullname))
+                                                 macro_fullname))
                 continue
             if methname == rose.macro.TRANSFORM_METHOD:
                 if (not isinstance(return_value, tuple) or
