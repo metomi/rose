@@ -25,6 +25,7 @@ pygtk.require("2.0")
 import gtk
 
 import rose.external
+import rose.gtk.dialog
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 import rosie.browser
@@ -504,8 +505,8 @@ class AdvancedSearchWidget(gtk.VBox):
             known_keys = search_manager.ws_client.get_known_keys()
             query_operators = search_manager.ws_client.get_query_operators()
         except rosie.ws_client.QueryError as e:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     str(e))
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       str(e))
             sys.exit(str(e))
         self.display_columns = ["local"] + known_keys
         self.display_filters = {}
@@ -728,9 +729,10 @@ class AdvancedSearchWidget(gtk.VBox):
                                (expr_combo, self.filter_exprs)]:
             value = widget.get_active()
             if value == -1:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                              rosie.browser.DIALOG_MESSAGE_UNCOMPLETED_FILTER, 
-                              rosie.browser.DIALOG_TITLE_UNCOMPLETED_FILTER)
+                rose.gtk.dialog.run_dialog(
+                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                         rosie.browser.DIALOG_MESSAGE_UNCOMPLETED_FILTER,
+                         rosie.browser.DIALOG_TITLE_UNCOMPLETED_FILTER)
                 raise FilterError
             filter_strings.append(f_list[value])
             if widget == and_or_combo:
@@ -765,9 +767,9 @@ class AdvancedSearchWidget(gtk.VBox):
             filters.append(" ".join(filter_tuple))
         if group_num != 0:
             text = rosie.browser.ERROR_INVALID_QUERY.format(" ".join(filters))
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text,
-                                     rosie.browser.TITLE_INVALID_QUERY)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text,
+                                       rosie.browser.TITLE_INVALID_QUERY)
             return None, False      
     
         return filters, True
@@ -794,9 +796,9 @@ class AdvancedSearchWidget(gtk.VBox):
     def run_invalid_query_dialog(self, error_info):
         """Notify the user of an invalid query."""
         text = rosie.browser.ERROR_INVALID_QUERY.format(error_info)
-        rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                 text,
-                                 rosie.browser.TITLE_INVALID_QUERY)
+        rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                   text,
+                                   rosie.browser.TITLE_INVALID_QUERY)
 
     def set_button_visibility(self, visible):
         """Set the visibility of the search, add and clear buttons"""
@@ -844,7 +846,7 @@ class AdvancedSearchWidget(gtk.VBox):
         
 def launch_about_dialog(self, *args):
     """Create a dialog showing the 'About' information."""
-    return rose.gtk.util.run_about_dialog(
+    return rose.gtk.dialog.run_about_dialog(
                 rosie.browser.PROGRAM_NAME,
                 rosie.browser.COPYRIGHT,
                 rosie.browser.LOGO_PATH,

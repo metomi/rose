@@ -27,6 +27,7 @@ import gtk
 
 import rose.config_editor
 import rose.gtk.choice
+import rose.gtk.dialog
 import rose.opt_parse
 import rose.variable
 
@@ -198,8 +199,8 @@ class ChoicesValueWidget(gtk.HBox):
         if not new_name:
             text = rose.config_editor.ERROR_BAD_NAME.format("''")
             title = rose.config_editor.DIALOG_TITLE_ERROR
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text, title)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text, title)
             return False
         new_values = self._get_value_values() + [entry.get_text()]
         entry.set_text("")
