@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import ast
 import inspect
 import shlex
 import subprocess
@@ -475,9 +476,61 @@ class MainMenuHandler(object):
                 break
         return optionals
 
-    def override_macro_defaults(self, optionals):
+    def override_macro_defaults(self, optionals, methname):
         """Launch a dialog to handle capture of any override args to macro"""
-        return rose.macro.get_user_values(optionals)
+        res = {}
+        #create the text input field
+        entries = {}
+        errs = {}
+        succeeded = False
+        while True:
+            dialog = gtk.MessageDialog(
+                None,
+                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                gtk.MESSAGE_QUESTION,
+                gtk.BUTTONS_OK_CANCEL,
+                None)
+            dialog.set_markup('Specify overrides for macro arguments:')
+            dialog.set_title(methname)
+            
+            for k,v in optionals.items():
+                entry = gtk.Entry()
+                if res.get(k):
+                    entry.set_text(str(res[k]))
+                elif errs.get(k):
+                    entry.set_text(str(errs[k]))
+                else:
+                    entry.set_text(str(v))
+                entries[k] = entry
+                hbox = gtk.HBox()
+                if errs.get(k):
+                    lab = '<span foreground="red">{0}</span>'.format(k+':')
+                    label = gtk.Label()
+                    label.set_markup(lab)
+                    hbox.pack_start(label, False, 5, 5)
+                else:
+                    hbox.pack_start(gtk.Label(str(k)+":"), False, 5, 5)
+            
+                hbox.pack_end(entry)
+                #add it and show it
+                dialog.vbox.pack_end(hbox, True, True, 0)
+            dialog.show_all()
+            response = dialog.run()
+            if response == gtk.RESPONSE_CANCEL or response == gtk.RESPONSE_CLOSE:
+                res = optionals
+                dialog.destroy()
+                break
+            errs = {}
+            res = {}
+            for k,box in entries.items():
+                try:
+                    res[k] = ast.literal_eval(box.get_text())
+                except:
+                    errs[k] = box.get_text()
+            dialog.destroy()
+            if not errs:
+                break
+        return res
 
     def run_custom_macro(self, config_name=None, module_name=None,
                          class_name=None, method_name=None):
@@ -538,17 +591,8 @@ class MainMenuHandler(object):
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             macro_method = getattr(macro_inst, methname)
-            
-            print "running a macro"
-            print str(type(macro_method))
-            print str(methname)
-            print str(macro_fullname)
-            
             optionals = self.inspect_custom_macro(macro_method)            
-            res = self.override_macro_defaults(optionals)
-            print res
-
-            
+            res = self.override_macro_defaults(optionals, objname)
             try:
                 return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
