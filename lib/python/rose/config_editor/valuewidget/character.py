@@ -60,7 +60,13 @@ class QuotedTextValueWidget(gtk.HBox):
                              insensitive_colour)
         self.in_error = not self.type_checker(self.value)
         self.set_entry_text()
-        self.entry.connect_after("changed", self.setter)
+        self.entry.connect("button-release-event",
+                           self._handle_middle_click_paste)
+        self.entry.connect_after("paste-clipboard", self.setter)
+        self.entry.connect_after("key-release-event",
+                                 lambda e, v: self.setter(e))
+        self.entry.connect_after("button-release-event",
+                                 lambda e, v: self.setter(e))
         self.entry.show()
         self.pack_start(self.entry, expand=True, fill=True,
                         padding=0)
@@ -127,6 +133,11 @@ class QuotedTextValueWidget(gtk.HBox):
             return False
         self.set_entry_text()
         self.entry.set_position(position)
+
+    def _handle_middle_click_paste(self, widget, event):
+        if event.button == 2:
+            self.setter()
+        return False
 
 
 def text_for_character_widget(text):

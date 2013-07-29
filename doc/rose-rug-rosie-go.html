@@ -46,7 +46,8 @@ rosie go
 
     <h2 id="layout">Rosie Go Layout</h2>
 
-    <p><img width="80%" src="rosie-go-layout.png" alt="rosie go layout picture" /></p>
+    <p><img width="80%" src="rosie-go-layout.png" alt=
+    "rosie go layout picture" /></p>
 
     <ol>
       <li><em>Menubar</em></li>
@@ -310,6 +311,32 @@ rosie go
     Alternatively, you can view a suite and click the <kbd>View Output</kbd>
     button on the toolbar. If no output is available to look at then the menu
     option and button will be greyed out.</p>
+
+    <h2 id="customisation">Customising Rosie Go</h2>
+
+    <h3 id="themes">Customising Themes</h3>
+
+    <p>The default style, font, and some colours of <code>rosie go</code> are
+    controlled by the GNOME desktop theme. This can be altered by running:</p>
+    <pre>
+    gnome-appearance-properties
+</pre>
+
+    <h3 id="general">General Customisation</h3>
+
+    <p>Constants used in <code>rosie go</code> are located in a <a href=
+    "https://github.com/metomi/rose/blob/master/lib/python/rosie/browser/__init__.py">
+    rosie/browser/__init__.py</a> file. They can be overridden by creating a
+    <a href="rose-configuration.html#site">user configuration</a> file
+    <samp>~/.metomi/rose.conf</samp> in your home directory, if it doesn't
+    already exist, and adding text such as this:</p>
+    <pre class="prettyprint lang-rose_conf">
+[rosie-go]
+accel_previous_search="&lt;Ctrl&gt;G"
+</pre>
+
+    <p>Option names here should be lowercase translations of the constants in
+    the <samp>__init__.py</samp> file.</p>
   </div>
 </body>
 </html>

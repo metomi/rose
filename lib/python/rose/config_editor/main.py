@@ -94,23 +94,38 @@ class MainController(object):
     Call with a configuration directory and/or a dict of
     configuration names and objects.
     
-    If pluggable is True, return containers for plugging into other
-    GTK applications.
-    If pluggable is False, launch the standalone application.
-    
+    pluggable is a boolean that if True, returns containers for
+    plugging into other GTK applications. If pluggable is False,
+    launch the standalone application.
+
+    load_updater is a rose.gtk.splash.SplashScreenProcess instance or
+    None, in which case it will be set to a
+    rose.gtk.splash.NullSplashScreenProcess.
+
+    load_all_apps is a boolean that overrides the load-on-demand
+    automation to always load all sub configurations at start time.
+
+    load_no_apps is a boolean that overrides the load-on-demand
+    automation to always skip loading sub configurations at start time.
+
+    metadata_off is a boolean that controls whether the suite or app
+    should load with metadata on or off.
+
     """
 
     RE_ARRAY_ELEMENT = re.compile('\([\d:, ]+\)$')
 
     def __init__(self, config_directory=None, config_objs=None,
                  pluggable=False,
-                 loader_update=rose.config_editor.false_function,
+                 load_updater=None,
                  load_all_apps=False, load_no_apps=False, metadata_off=False):
         if config_objs is None:
             config_objs = {}
         if pluggable:
             rose.macro.add_site_meta_paths()
             rose.macro.add_env_meta_paths()
+        if load_updater is None:
+            load_updater = rose.gtk.splash.NullSplashScreenProcess()
         self.is_pluggable = pluggable
         self.tab_windows = []  # No child windows yet
         self.orphan_pages = []
@@ -161,7 +176,7 @@ class MainController(object):
              rose.config_editor.SHOULD_SHOW_NO_TITLE}
 
         self.reporter = rose.config_editor.status.StatusReporter(
-                             loader_update,
+                             load_updater,
                              self.update_status_text)
 
         # Load the top configuration directory
@@ -184,8 +199,8 @@ class MainController(object):
                                 self.data, self.util, self.reporter,
                                 self.undo_stack, self.redo_stack,
                                 self.check_cannot_enable_setting,
-                                lambda n: self.updater.update_namespace(n),
-                                lambda n: self.updater.update_ns_info(n),
+                                self.update_namespace,
+                                self.update_ns_info,
                                 update_tree_func=self.reload_namespace_tree,
                                 view_page_func=self.view_page,
                                 kill_page_func=self.kill_page)
@@ -196,7 +211,7 @@ class MainController(object):
                                    self.undo_stack, self.redo_stack,
                                    self.section_ops.add_section,
                                    self.check_cannot_enable_setting,
-                                   lambda n: self.updater.update_namespace(n),
+                                   self.update_namespace,
                                    search_id_func=self.perform_find_by_id))
 
         self.group_ops = rose.config_editor.ops.group.GroupOperations(
@@ -205,6 +220,7 @@ class MainController(object):
                              self.section_ops,
                              self.variable_ops,
                              self.view_page,
+                             self.update_ns_sub_data,
                              self.reload_namespace_tree)
 
         # Add in the main menu bar and tool bar handler.
@@ -947,6 +963,18 @@ class MainController(object):
         """Placeholder for updater function of the same name."""
         self.updater.tree_trigger_update(*args, **kwargs)
 
+    def update_namespace(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.update_namespace(*args, **kwargs)
+
+    def update_ns_info(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.update_ns_info(*args, **kwargs)
+
+    def update_ns_sub_data(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.update_ns_sub_data(*args, **kwargs)
+
 #------------------ Page viewer function -------------------------------------
 
     def view_page(self, page_id, var_id=None):
@@ -1625,7 +1653,7 @@ def spawn_window(config_directory_path=None, debug_mode=False,
                                                         number_of_events)
     try:
         MainController(config_directory_path,
-                       loader_update=splash_screen,
+                       load_updater=splash_screen,
                        load_all_apps=load_all_apps,
                        load_no_apps=load_no_apps,
                        metadata_off=metadata_off)

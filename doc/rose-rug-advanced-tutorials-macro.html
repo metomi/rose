@@ -432,9 +432,37 @@ rose edit
     </div>
 
     <div class="slide">
+      <h2 id="macro-option">Metadata Option</h2>
+
+      <p>If a macro addresses particular sections, namespaces, or options, then
+      it makes sense to write the relationship down in the metadata for the
+      particular settings. You can do this using the <samp>macro</samp>
+      metadata option.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example Metadata Option</h3>
+
+      <p>For example, our validator and transformer macros above are both
+      specific to <var>env=WORLD</var>. Open the file
+      <samp>app/fred_hello_world/meta/rose-meta.conf</samp> in a text editor,
+      and make sure the file contains the following text:</p>
+      <pre class="prettyprint lang-rose_conf">
+[env=WORLD]
+macro=planet.PlanetChecker, planet.PlanetChanger
+</pre>
+
+      <p>Close the config editor if it is still open, and open the app in the
+      config editor again. The <var>env</var> page should now contain a
+      dropdown menu at the top of the page for launching the two macros.</p>
+    </div>
+
+    <div class="slide">
       <h2>Further Reading</h2>
 
       <p>For more information, see the <a href="rose-api.html#macro">Rose API
+      reference</a> and the Rose configuration metadata <a href=
+      "rose-configuration-metadata.html#meta.conf.behaviour.macro">macro option
       reference</a>.</p>
     </div>
   </div>

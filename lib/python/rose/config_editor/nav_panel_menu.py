@@ -200,7 +200,7 @@ class NavPanelHandler(object):
             return False
         base_ns = "/" + base_ns.lstrip("/")
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
-        self._transform_default_func(only_this_config_name=config_name)
+        self._transform_default_func(only_this_config=config_name)
 
     def get_ns_metadata_and_comments(self, namespace):
         """Return metadata dict and comments list."""

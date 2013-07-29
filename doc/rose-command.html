@@ -90,8 +90,8 @@
 
       <dt><a href="#rose-host-select">rose host-select</a></dt>
 
-      <dd>Select a host from a set of groups or names by load or by
-      random.</dd>
+      <dd>Select a host from a set of groups or names by load, by free
+	memory or by random.</dd>
 
       <dt><a href="#rose-macro">rose macro</a></dt>
 
@@ -725,8 +725,8 @@
 
     <h3>DESCRIPTION</h3>
 
-    <p>Select a host from a set of groups or names by load or by random. Use
-    settings in <var>$ROSE_HOME/etc/rose.conf</var> and
+    <p>Select a host from a set of groups or names by load, by free memory or
+    by random. Use settings in <var>$ROSE_HOME/etc/rose.conf</var> and
     <var>$HOME/.metomi/rose.conf</var> to determine the ranking method.</p>
 
     <p>Print the selected host name.</p>
@@ -769,6 +769,14 @@
             </ul>
           </li>
 
+	  <li>
+            <var>mem</var> (by largest amount of free memory):
+
+            <ul>
+              <li>Uses <var>free -m</var> to return memory in Mb</li>
+            </ul>
+          </li>
+
           <li><var>random</var></li>
         </ul>
       </dd>
@@ -776,11 +784,14 @@
       <dt><kbd>--threshold=[METHOD[:METHOD-ARG]:]VALUE</kbd></dt>
 
       <dd>Each of these option specifies a numeric value of a threshold of which
-      the hosts must not exceed. Accepts the same <var>METHOD</var> and
+      the hosts must either not exceed or must be greater than depending on the
+      specified method. Accepts the same <var>METHOD</var> and
       <var>METHOD-ARG</var> (and the same defaults) as the
       <kbd>--rank-method=METHOD[:METHOD-ARG]</kbd> option. (Obviously, the
-      <var>random</var> method does not make sense in this case.) A host
-      exceeding a threshold will be excluded from the ranking list.</dd>
+      <var>random</var> method does not make sense in this case.) 
+      <var>load</var> and <var>fs</var> must not exceed threshold while 
+      <var>mem</var> must be greater than threshold. A host not meeting 
+      a threshold condition will be excluded from the ranking list.</dd>
 
       <dt><kbd>--verbose, -v</kbd></dt>
 
