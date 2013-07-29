@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import ast
 import inspect
 import re
 import rose.variable
@@ -100,6 +101,19 @@ class IntegerMetaType(MetaType):
         return [True, None]
 
 
+class PythonListMetaType(MetaType):
+
+    KEY = "python_list"
+    WARNING = "Not a valid Python list format: {0}"
+    
+    def is_valid(self, value):
+        try:
+            cast_value = ast.literal_eval(value)
+        except SyntaxError:
+            return [False, self.WARNING.format(repr(value))]
+        return [True, None]
+
+
 class LogicalMetaType(MetaType):
 
     KEY = "logical"
@@ -167,6 +181,7 @@ def meta_type_checker(value, meta_type):
     c = MetaType.get_meta_type(meta_type)
     c = c()
     return c.is_valid(value)
+
 
 def meta_type_transform(value, meta_type):
     c = MetaType.get_meta_type(meta_type)

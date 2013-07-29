@@ -26,7 +26,7 @@
 <body>
   <div class="header-footer" id="body-header">
     <address>
-      © British Crown Copyright 2012-3 <a href=
+      &copy; British Crown Copyright 2012-3 <a href=
       "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
       "rose-terms-of-use.html">Terms of Use</a>.<br />
       This document is released under the <a href=
@@ -249,6 +249,18 @@ sort-key=do-not-like-00
             <p><dfn>usage:</dfn> Fortran logical types</p>
           </dd>
 
+          <dt><code>python_list</code></dt>
+
+          <dd>
+            <p><dfn>description:</dfn> used to signify a Python-compatible
+            formatted list such as <samp>["Foo", 50, False]</samp>. This
+            encapsulates <samp>length</samp>, so do not use a separate
+            <samp>length</samp> declaration for this setting.</p>
+
+            <p><dfn>usage:</dfn> use for inputs that expect a string that looks
+            like a Python list - e.g. Jinja2 list input variables.</p>
+          </dd>
+
           <dt><code>quoted</code></dt>
 
           <dd>
@@ -305,6 +317,9 @@ sort-key=do-not-like-00
         <p>Define the length of an array. If not present, the setting is
         assumed to be a scalar. A positive integer defines a fixed length
         array. A colon <kbd>:</kbd> defines a dynamic length array.</p>
+
+        <p>N.B. You do not need to use <samp>length</samp> if you already
+        have <samp>type=python_list</samp> for a setting.</p>
       </dd>
 
       <dt id="meta.conf.value.values">values</dt>

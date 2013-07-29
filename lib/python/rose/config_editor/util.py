@@ -216,6 +216,32 @@ def launch_error_dialog(exception=None, text=""):
                              text, rose.config_editor.DIALOG_TITLE_ERROR)
 
 
+def text_for_character_widget(text):
+    """Strip an enclosing single quote pair from a piece of text."""
+    if text.startswith("'") and text.endswith("'"):
+        text = text[1:-1]
+    text = text.replace("''", "'")
+    return text
+
+
+def text_from_character_widget(text):
+    """Surround text with single quotes; escape existing ones."""
+    return "'" + text.replace("'", "''") + "'"
+
+
+def text_for_quoted_widget(text):
+    """Strip an enclosing double quote pair from a piece of text."""
+    if text.startswith('"') and text.endswith('"'):
+        text = text[1:-1]
+    text = text.replace('\\"', '"')
+    return text
+
+
+def text_from_quoted_widget(text):
+    """Surround text with double quotes; escape existing ones."""
+    return '"' + text.replace('"', '\\"') + '"'
+
+
 def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
     """Return a wrapped string - 'textwrap' is not flexible enough for this."""
     lines = [""]
