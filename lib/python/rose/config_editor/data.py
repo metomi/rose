@@ -39,7 +39,7 @@ import tempfile
 
 import rose.config
 import rose.config_editor.data_helper
-import rose.gtk.util
+import rose.gtk.dialog
 import rose.macro
 import rose.metadata_check
 import rose.resource
@@ -307,11 +307,13 @@ class ConfigDataManager(object):
                     text = rose.config_editor.ERROR_NOT_FOUND.format(
                                                               config_path)
                     title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-                    rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                             text, title)
+                    rose.gtk.dialog.run_dialog(
+                                        rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                        text, title)
                     sys.exit(2)
                     
-            if config_directory != self.top_level_directory and preview:                   #load with empty ConfigNodes for initial app access
+            if config_directory != self.top_level_directory and preview:
+                # Load with empty ConfigNodes for initial app access.
                 config = rose.config.ConfigNode()
                 s_config = rose.config.ConfigNode()
             else:
@@ -375,8 +377,8 @@ class ConfigDataManager(object):
             text = rose.config_editor.ERROR_LOAD_SYNTAX.format(
                                                     config_path, e)
             title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-            rose.gtk.util.run_dialog(
-                            rose.gtk.util.DIALOG_TYPE_ERROR,
+            rose.gtk.dialog.run_dialog(
+                            rose.gtk.dialog.DIALOG_TYPE_ERROR,
                             text, title)
             sys.exit(2)
         else:
@@ -418,8 +420,8 @@ class ConfigDataManager(object):
             err_text = err_text.rstrip()
             text = rose.config_editor.ERROR_LOAD_OPT_CONFS.format(err_text)
             title = rose.config_editor.ERROR_LOAD_OPT_CONFS_TITLE
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text, title=title, modal=False)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text, title=title, modal=False)
         return opt_conf_lookup
 
     def load_builtin_macros(self, config_name):
@@ -808,9 +810,9 @@ class ConfigDataManager(object):
             reports_text = rose.macro.get_reports_as_text(
                                       reports,
                                       "rose.metadata_check.MetadataChecker")
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text, title, modal=False,
-                                     extra_text=reports_text)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text, title, modal=False,
+                                       extra_text=reports_text)
         for report in reports:
             if report.option != rose.META_PROP_TRIGGER:
                 meta_config.unset([report.section, report.option])

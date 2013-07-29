@@ -28,6 +28,7 @@ import pango
 
 import rose.config_editor
 import rose.external
+import rose.gtk.dialog
 import rose.gtk.util
 
 
@@ -96,8 +97,8 @@ class FileSystemPanel(gtk.ScrolledWindow):
             target_func(target)
         except Exception as e:
             title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     str(e), title)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       str(e), title)
 
     def _handle_click(self, view, event):
         pathinfo = view.get_path_at_pos(int(event.x), int(event.y))

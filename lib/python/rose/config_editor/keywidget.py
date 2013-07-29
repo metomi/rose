@@ -26,6 +26,8 @@ pygtk.require('2.0')
 import gtk
 
 import rose.config_editor
+import rose.gtk.dialog
+import rose.gtk.util
 import rose.variable
 
 
@@ -141,9 +143,9 @@ class KeyWidget(gtk.VBox):
         text = "\n".join(self.my_variable.comments)
         title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
                                    self.my_variable.metadata['id'])
-        rose.gtk.util.run_edit_dialog(text,
-                                      finish_hook=self._edit_finish_hook,
-                                      title=title)
+        rose.gtk.dialog.run_edit_dialog(text,
+                                        finish_hook=self._edit_finish_hook,
+                                        title=title)
 
     def refresh(self, variable=None):
         """Reload the contents - however, no need for this at present."""
@@ -481,7 +483,7 @@ class KeyWidget(gtk.VBox):
                     text = rose.config_editor.DIALOG_BODY_NL_CASE_CHANGE
                     text = text.format(new_name.lower())
                     title = rose.config_editor.DIALOG_TITLE_NL_CASE_WARNING
-                    new_name = rose.gtk.util.run_choices_dialog(
+                    new_name = rose.gtk.dialog.run_choices_dialog(
                                         text, [new_name.lower(), new_name],
                                         title)
                     if new_name is None:
