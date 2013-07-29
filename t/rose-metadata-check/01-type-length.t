@@ -60,6 +60,9 @@ type=integer
 length=6
 type=integer
 
+[namelist:values_nl1=my_python_list]
+type=python_list
+
 [namelist:values_nl1=my_real_sci_notation_pos]
 type=real
 
@@ -162,6 +165,10 @@ type=integer
 length=6
 type=integer
 
+[namelist:values_nl1=my_python_list]
+length=:
+type=python_list
+
 [namelist:values_nl1=my_real_sci_notation_pos]
 type=real
 
@@ -203,7 +210,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] rose.metadata_check.MetadataChecker: issues: 9
+[V] rose.metadata_check.MetadataChecker: issues: 10
     namelist:values_nl1=my_boolean_array_any=type=booleans
         Unknown type: booleans
     namelist:values_nl1=my_boolean_false=type=booleans
@@ -220,6 +227,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
         Invalid syntax: ::
     namelist:values_nl1=my_int_sci_notation=type=integer (that means whole numbers)
         Unknown type: integer (that means whole numbers)
+    namelist:values_nl1=my_python_list=length=:
+        Incompatible with type
     namelist:values_nl1=my_quoted_complex_esc=type=string
         Unknown type: string
 __ERROR__
@@ -231,7 +240,7 @@ setup
 run_fail "$TEST_KEY" rose metadata-check -C ../config --property=type
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] rose.metadata_check.MetadataChecker: issues: 6
+[V] rose.metadata_check.MetadataChecker: issues: 7
     namelist:values_nl1=my_boolean_array_any=type=booleans
         Unknown type: booleans
     namelist:values_nl1=my_boolean_false=type=booleans
@@ -242,6 +251,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
         Unknown type: string
     namelist:values_nl1=my_int_sci_notation=type=integer (that means whole numbers)
         Unknown type: integer (that means whole numbers)
+    namelist:values_nl1=my_python_list=length=:
+        Incompatible with type
     namelist:values_nl1=my_quoted_complex_esc=type=string
         Unknown type: string
 __ERROR__
@@ -253,13 +264,15 @@ setup
 run_fail "$TEST_KEY" rose metadata-check -C ../config --property=length
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] rose.metadata_check.MetadataChecker: issues: 3
+[V] rose.metadata_check.MetadataChecker: issues: 4
     namelist:values_nl1=my_char_array_any=length=-1
         Invalid syntax: -1
     namelist:values_nl1=my_char_array_fixed=length=four
         Invalid syntax: four
     namelist:values_nl1=my_int_array_any=length=::
         Invalid syntax: ::
+    namelist:values_nl1=my_python_list=length=:
+        Incompatible with type
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------
@@ -269,7 +282,7 @@ setup
 run_fail "$TEST_KEY" rose metadata-check -C ../config --property=length --property=type
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[V] rose.metadata_check.MetadataChecker: issues: 9
+[V] rose.metadata_check.MetadataChecker: issues: 10
     namelist:values_nl1=my_boolean_array_any=type=booleans
         Unknown type: booleans
     namelist:values_nl1=my_boolean_false=type=booleans
@@ -286,6 +299,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
         Invalid syntax: ::
     namelist:values_nl1=my_int_sci_notation=type=integer (that means whole numbers)
         Unknown type: integer (that means whole numbers)
+    namelist:values_nl1=my_python_list=length=:
+        Incompatible with type
     namelist:values_nl1=my_quoted_complex_esc=type=string
         Unknown type: string
 __ERROR__
