@@ -24,6 +24,7 @@ import rose
 import array.entry
 import array.mixed
 import array.logical
+import array.python_list
 import booltoggle
 import character
 import combobox
@@ -92,6 +93,8 @@ def chooser(value, metadata, error):
         return text.TextMultilineValueWidget
     if m_type in ["character", "quoted"]:
         return character.QuotedTextValueWidget
+    if m_type == "python_list":
+        return array.python_list.PythonListValueWidget
     if type(m_type) is list:
         return array.mixed.MixedArrayValueWidget
     return text.RawValueWidget

@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import ast
 import re
 import sys
 
@@ -31,9 +32,9 @@ import rose.gtk.util
 import rose.variable
 
 
-class EntryArrayValueWidget(gtk.HBox):
+class PythonListValueWidget(gtk.HBox):
 
-    """This is a class to represent multiple array entries."""
+    """This is a class to represent a Python-compatible list format."""
 
     TIP_ADD = "Add array element"
     TIP_DEL = "Remove array element"
@@ -43,40 +44,17 @@ class EntryArrayValueWidget(gtk.HBox):
     TIP_RIGHT = "Move array element right"
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(EntryArrayValueWidget, self).__init__(homogeneous=False,
+        super(PythonListValueWidget, self).__init__(homogeneous=False,
                                                     spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
         self.last_value = value
-        self.max_length = self.metadata[rose.META_PROP_LENGTH]
-
-        value_array = rose.variable.array_split(self.value)
+        self.max_length = ":"
+        value_array = python_array_split(self.value)
         self.chars_width = max([len(v) for v in value_array] + [1]) + 1
         self.last_selected_src = None
-        arr_type = self.metadata.get(rose.META_PROP_TYPE)
-        self.is_char_array = (arr_type == "character")
-        self.is_quoted_array = (arr_type == "quoted")
-        # Do not treat character or quoted arrays specially when incorrect.
-        if self.is_char_array:
-            checker = rose.macros.value.ValueChecker()
-            for val in value_array:
-                if not checker.check_character(val):
-                    self.is_char_array = False
-        if self.is_quoted_array:
-            checker = rose.macros.value.ValueChecker()
-            for val in value_array:
-                if not checker.check_quoted(val):
-                    self.is_quoted_array = False
-        if self.is_char_array:
-            for i, val in enumerate(value_array):
-                value_array[i] = (
-                      rose.config_editor.util.text_for_character_widget(val))
-        if self.is_quoted_array:
-            for i, val in enumerate(value_array):
-                value_array[i] = (
-                      rose.config_editor.util.text_for_quoted_widget(val))
         # Designate the number of allowed columns - 10 for 4 chars width
         self.num_allowed_columns = 3
         self.entry_table = gtk.Table(rows=1,
@@ -106,13 +84,9 @@ class EntryArrayValueWidget(gtk.HBox):
 
     def get_focus_index(self):
         """Get the focus and position within the table of entries."""
-        text = ''
+        text = '['
         for entry in self.entries:
             val = entry.get_text()
-            if self.is_char_array:
-                val = rose.config_editor.util.text_from_character_widget(val)
-            elif self.is_quoted_array:
-                val = rose.config_editor.util.text_from_quoted_widget(val)
             prefix = get_next_delimiter(self.last_value[len(text):], val)
             if entry == self.entry_table.focus_child:
                 return len(text + prefix) + entry.get_position()
@@ -123,8 +97,8 @@ class EntryArrayValueWidget(gtk.HBox):
         """Set the focus and position within the table of entries."""
         if focus_index is None:
             return
-        value_array = rose.variable.array_split(self.value)
-        text = ''
+        value_array = python_array_split(self.value)
+        text = '['
         for i, val in enumerate(value_array):
             j = len(text)
             v = self.value[j:].index(val)
@@ -135,8 +109,6 @@ class EntryArrayValueWidget(gtk.HBox):
                 if len(self.entries) > i:
                     self.entries[i].grab_focus()
                     val_offset = focus_index - len(text + prefix)
-                    if self.is_char_array or self.is_quoted_array:
-                        val_offset = max([0, val_offset - 1])
                     self.entries[i].set_position(val_offset)
                     return
             text += prefix + val
@@ -144,7 +116,7 @@ class EntryArrayValueWidget(gtk.HBox):
     def generate_entries(self, value_array=None):
         """Create the gtk.Entry objects for elements in the array."""
         if value_array is None:
-            value_array = rose.variable.array_split(self.value)
+            value_array = python_array_split(self.value)
         entries = []
         existing_entries_text = [e.get_text() for e in self.entries]
         for value_item in value_array:
@@ -311,12 +283,7 @@ class EntryArrayValueWidget(gtk.HBox):
             self.set_arrow_sensitive(False, False)      
         for i, widget in enumerate(table_widgets):
             if isinstance(widget, gtk.Entry):
-                if self.is_char_array or self.is_quoted_array:
-                    w_value = widget.get_text()
-                    widget.set_tooltip_text(self.TIP_ELEMENT_CHAR.format(
-                                            (i + 1), w_value))
-                else:
-                    widget.set_tooltip_text(self.TIP_ELEMENT.format((i + 1)))
+                widget.set_tooltip_text(self.TIP_ELEMENT.format((i + 1)))
             row = i // self.num_allowed_columns
             column = i % self.num_allowed_columns
             self.entry_table.attach(widget,
@@ -384,30 +351,21 @@ class EntryArrayValueWidget(gtk.HBox):
                 widget.set_position(len(widget.get_text()))
                 widget.select_region(widget.get_position(),
                                      widget.get_position())
-        if self.is_char_array:
-            for i, val in enumerate(val_array):
-                val_array[i] = (
-                      rose.config_editor.util.text_from_character_widget(val))
-        elif self.is_quoted_array:
-            for i, val in enumerate(val_array):
-                val_array[i] = (
-                      rose.config_editor.util.text_from_quoted_widget(val))
         entries_have_commas = any(["," in v for v in val_array])
-        new_value = rose.variable.array_join(val_array)
+        new_value = python_array_join(val_array)
         if new_value != self.value:
             self.last_value = new_value
             self.set_value(new_value)
             self.value = new_value
-            if (entries_have_commas and
-                not (self.is_char_array or self.is_quoted_array)):
-                new_val_array = rose.variable.array_split(new_value)
+            if entries_have_commas:
+                new_val_array = python_array_split(new_value)
                 if len(new_val_array) != len(self.entries):
                     self.generate_entries()
                     focus_index = None
                     for i, val in enumerate(val_array):
                         if "," in val:
                             val_post_comma = val[:val.index(",") + 1]
-                            focus_index = len(rose.variable.array_join(
+                            focus_index = len(python_array_join(
                                   new_val_array[:i] + [val_post_comma]))
                     self.populate_table()
                     self.set_focus_index(focus_index)
@@ -462,3 +420,25 @@ def get_next_delimiter(array_text, next_element):
         if array_text[v] == ",":
             v += 1
     return array_text[:v]
+
+
+def python_array_join(values):
+    """Create a Python-compliant list value from values."""
+    return "[" + ", ".join(values) + "]"
+
+
+def python_array_split(value):
+    """Split the value into elements with appropriate string values."""
+    try:
+        value_array = ast.literal_eval(value)
+    except SyntaxError:
+        value_no_brackets = value.lstrip("[").rstrip("]")
+        value_array = rose.variable.array_split(value_no_brackets)
+        return value_array
+    cast_value_array = []
+    for value in value_array:
+        if isinstance(value, basestring):
+            cast_value_array.append('"' + value + '"')
+        else:
+            cast_value_array.append(str(value))
+    return cast_value_array
