@@ -492,8 +492,10 @@ class MainMenuHandler(object):
                 None)
             dialog.set_markup('Specify overrides for macro arguments:')
             dialog.set_title(methname)
-            
-            for k,v in optionals.items():
+            table = gtk.Table(len(optionals.items()), 2, True)
+            dialog.vbox.add(table)
+            for i in range(len(optionals.items())):
+                k, v = optionals.items()[i]
                 entry = gtk.Entry()
                 if res.get(k):
                     entry.set_text(str(res[k]))
@@ -507,13 +509,10 @@ class MainMenuHandler(object):
                     lab = '<span foreground="red">{0}</span>'.format(k+':')
                     label = gtk.Label()
                     label.set_markup(lab)
-                    hbox.pack_start(label, False, 5, 5)
+                    table.attach(label, 0, 1, i, i+1)
                 else:
-                    hbox.pack_start(gtk.Label(str(k)+":"), False, 5, 5)
-            
-                hbox.pack_end(entry)
-                #add it and show it
-                dialog.vbox.pack_end(hbox, True, True, 0)
+                    table.attach(gtk.Label(str(k)+":"), 0, 1, i, i+1)
+                table.attach(entry, 1, 2, i, i+1)
             dialog.show_all()
             response = dialog.run()
             if response == gtk.RESPONSE_CANCEL or response == gtk.RESPONSE_CLOSE:
@@ -591,8 +590,11 @@ class MainMenuHandler(object):
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             macro_method = getattr(macro_inst, methname)
-            optionals = self.inspect_custom_macro(macro_method)            
-            res = self.override_macro_defaults(optionals, objname)
+            optionals = self.inspect_custom_macro(macro_method)
+            if optionals:
+                res = self.override_macro_defaults(optionals, objname)
+            else:
+                res = {}
             try:
                 return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
