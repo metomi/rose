@@ -293,11 +293,12 @@ $(function() {
     function populate_cycle_tasks_data(data) {
         var cycle_time = data["cycle_time"];
         var cycle_time_archive = null;
-        var opts_archived
-            = $("#cycle_times_archived option:contains(" + cycle_time + ")");
-        if (opts_archived.size() > 0) {
-            cycle_time_archive = "job-" + cycle_time + ".tar.gz";
-        }
+        $("#cycle_times_archived option").each(function() {
+            if ($(this).text() == cycle_time) {
+                cycle_time_archive = "job-" + cycle_time + ".tar.gz";
+                return false;
+            }
+        });
         var option_node = $("#cycle_time option:contains(" + cycle_time + ")");
         option_node.attr("selected", "selected");
         var URL_PREFIX = "source.html?suite=" + data["suite"] + "\&path=";
