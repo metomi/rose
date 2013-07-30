@@ -1441,7 +1441,8 @@ class MainController(object):
             rose.gtk.dialog.run_dialog(
                      rose.gtk.dialog.DIALOG_TYPE_ERROR,
                      rose.config_editor.ERROR_NOT_REGEX.format(
-                                        expression, str(e)))
+                                        expression, str(e)),
+                     rose.config_editor.ERROR_BAD_FIND)
             return None, None
         if self.find_hist['regex'] != expression:
             self.find_hist['ids'] = []
