@@ -33,10 +33,10 @@ Edit-> Find check tree panel current page view is correct after Find
 Edit-> Preferences
 View-> Latent no_open_pages open_page_without_latent open_page_with_latent now_open_a_page_with_latent now_open_a_page_without_latent
 View-> Fixed no_open_pages open_page_without_fixed open_page_with_fixed now_open_a_page_with_fixed now_open_a_page_without_fixed
-View-> Ignored no_open_pages open_page_without_ignored open_page_with_ignored
+View-> (User/All) Ignored no_open_pages open_page_without_ignored open_page_with_ignored
 now_open_a_page_with_ignored now_open_a_page_without_ignored
-View-> No Metadata no_open_pages lots_of_open_pages now_open_page redundant_page opened_in_new_window_page (switch on and off)
-View-> No Title open pages no_open_pages no_metadata changed_variables
+Metadata -> Switch off Metadata no_open_pages lots_of_open_pages now_open_page redundant_page opened_in_new_window_page (switch on and off)
+Metadata-> Layout Preferences - open pages no_open_pages no_metadata changed_variables
 repeat View-> Latent, Fixed, No Metadata in combinations
 Help-> GUI Help
 Help-> About
@@ -49,6 +49,9 @@ Open_in_New_Window Add blank, from_metadata) no_page totally_empty_page no_metad
 Open_in_New_Window Add variable with same name as existing page variable (no longer active part of test)
 Open_in_New_Window Revert no_page, add_variables_change_remove_some, change_variables_remove_some, revert_inconsistency revert_missing_compulsory
 
+# File panel
+
+Add new file, modify file, hide available sections, use check boxes for checksum/mode, toggle empty/source.
 
 # Tree panel
 

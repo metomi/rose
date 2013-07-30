@@ -220,11 +220,12 @@ CHOICE_TITLE_INCLUDED = "Included"
 
 # Error and warning strings
 ERROR_ADD_FILE = "Could not add file {0}: {1}"
+ERROR_BAD_FIND = "Bad search expression"
 ERROR_BAD_NAME = "{0}: invalid name"
+ERROR_BAD_MACRO_RETURN = "Bad return value {0}"
 ERROR_BAD_TRIGGER = ("{0}\nfor <b>{1}</b>\n"
                      "from the configuration <b>{2}</b>. "
                      "\nDisabling triggers for this configuration.")
-ERROR_BAD_MACRO_RETURN = "Bad return value {0}"
 ERROR_CONFIG_CREATE = ("Error creating application config at {0}:" +
                        "\n  {1}, {2}")
 ERROR_CONFIG_CREATE_TITLE = "Error in creating configuration"
