@@ -5,6 +5,29 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (End of 2013-08?)
+
+This release of Rose will work with cylc 5.3.0 or above.
+
+### Highlighted Changes
+
+Changes that have significant impact on user experience.
+
+-None yet-
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+\#847: rose suite-scan HOST: fixed.
+
+\#846: rose app-run, rose suite-run, rose task-run: fixed incorrect incremental
+mode behaviour. When `mode=symlink` is removed from a target, the target should
+be recreated, instead of being left to point to the old symbolic link.
+
+--------------------------------------------------------------------------------
+
 ## 2013-07 (2013-07-31)
 
 This release of Rose works with cylc 5.3.0 or above.
