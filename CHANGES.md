@@ -7,7 +7,7 @@ for a full listing of issues for each release.
 
 ## 2013-07 (2013-07-31)
 
-This release of Rose will work with cylc 5.3.0 or above.
+This release of Rose works with cylc 5.3.0 or above.
 
 ### Highlighted Changes
 
