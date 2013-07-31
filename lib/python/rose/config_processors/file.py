@@ -188,14 +188,17 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         not os.path.islink(target.name) or
                         target.real_name != os.readlink(target.name))
             elif target.mode == "mkdir":
-                target.is_out_of_date = not os.path.isdir(target.name)
+                target.is_out_of_date = (os.path.islink(target.name) or
+                                         not os.path.isdir(target.name))
             else:
-                if os.path.exists(target.name):
+                if (os.path.exists(target.name) and
+                    not os.path.islink(target.name)):
                     for path, checksum in get_checksum(target.name):
                         target.add_path(path, checksum)
                     target.paths.sort()
                 prev_target = loc_dao.select(target.name)
                 target.is_out_of_date = (
+                        os.path.islink(target.name) or
                         not os.path.exists(target.name) or
                         prev_target is None or
                         prev_target.mode != target.mode or
@@ -224,11 +227,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 self.manager.fs_util.symlink(target.real_name, target.name)
                 loc_dao.update(target)
             elif target.mode == "mkdir":
+                if os.path.islink(target.name):
+                    self.manager.fs_util.delete(target.name)
                 self.manager.fs_util.makedirs(target.name)
                 loc_dao.update(target)
                 target.loc_type = target.TYPE_TREE
                 target.add_path(target.BLOB, None)
             elif target.dep_locs:
+                if os.path.islink(target.name):
+                    self.manager.fs_util.delete(target.name)
                 jobs[target.name] = JobProxy(target)
                 for source in target.dep_locs:
                     if not jobs.has_key(source.name):

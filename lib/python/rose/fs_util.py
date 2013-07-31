@@ -103,8 +103,7 @@ class FileSystemUtil(object):
 
     def install(self, path):
         """Create an empty file in path."""
-        if os.path.exists(path):
-            self.delete(path)
+        self.delete(path)
         open(path, "wb").close()
         event = FileSystemEvent(FileSystemEvent.INSTALL, path)
         self.handle_event(event)
