@@ -668,6 +668,22 @@ class SomeTransformer(rose.macro.MacroBase):
         return config, self.reports
 </pre>
 
+    <p>Macros also support the use of keyword arguments, giving you the ability
+    to have the user specify some input or override to your macro. For example
+    a transformer macro could be written as follows to allow the user to input
+    <code>some_value</code>:</p>
+    <pre class="prettyprint">
+    def transform(self, config, meta_config=None, some_value=None):
+        """Some transformer macro"""
+        return
+</pre>
+    <p>Note that the extra arguments require default values (<code>=None</code>
+    in this example) and that you should add error handling for the input 
+    accordingly.</p>
+    
+    <p>On running your macro the user will be prompted to supply values for 
+    these arguments or accept the default values.</p> 
+
     <h2 id="upgrade">Rose Upgrade Macros</h2>
 
     <p>Rose upgrade macros are used to upgrade application configurations
