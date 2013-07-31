@@ -311,7 +311,7 @@ class CylcProcessor(SuiteEngineProcessor):
         stmt += "(event==? OR event==? OR event==?)"
         stmt_args += ["submission succeeded", "succeeded", "failed"]
         for row in self._select(suite_name, stmt, stmt_args):
-            if row and "@" in row[0]:
+            if row and row[0]:
                 auth = self._parse_user_host(auth=row[0])
                 if auth:
                     auths.append(auth)
