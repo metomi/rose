@@ -23,7 +23,7 @@
 . $(dirname $0)/test_header
 HOSTS=$(rose config rose-suite-run hosts)
 if [[ -z $HOSTS ]]; then
-    skip 6 '[rose-suit-run]hosts not defined'
+    skip 6 '[rose-suite-run]hosts not defined'
 fi
 HOST=$(rose host-select $HOSTS)
 #-------------------------------------------------------------------------------
