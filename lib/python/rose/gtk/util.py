@@ -611,6 +611,19 @@ def get_hyperlink_label(text, search_func=lambda i: False):
     return label
 
 
+def get_icon(system="rose"):
+    """Return a gtk.gdk.Pixbuf for the system icon."""
+    locator = rose.resource.ResourceLocator(paths=sys.path)
+    icon_path = locator.locate("etc/images/{0}-icon-trim.svg".format(system))
+    try:
+        pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
+    except Exception:
+        icon_path = locator.locate(
+                            "etc/images/{0}-icon-trim.png".format(system))
+        pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
+    return pixbuf
+
+
 def handle_link(url, search_function, handle_web=False):
     if url.startswith("http"):
         if handle_web:
@@ -676,9 +689,7 @@ def setup_stock_icons():
         pixbuf = gtk.gdk.pixbuf_new_from_file(path)
         new_icon_factory.add("rose-gtk-" + istring,
                              gtk.IconSet(pixbuf))
-    exp_icon_path = locator.locate("etc/images/rose-icon-trim.png")
-    exp_icon_pixbuf = gtk.gdk.pixbuf_new_from_file(exp_icon_path)
-
+    exp_icon_pixbuf = get_icon()
     new_icon_factory.add("rose-exp-logo", gtk.IconSet(exp_icon_pixbuf))
     new_icon_factory.add_default()
 

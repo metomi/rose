@@ -333,9 +333,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     parent_window = get_dialog_parent()
     dialog = gtk.Dialog(parent=parent_window)
     if parent_window is None:
-        locator = rose.resource.ResourceLocator(paths=sys.path)
-        icon_path = locator.locate('etc/images/rose-icon-trim.png')
-        dialog.set_icon_from_file(icon_path)
+        dialog.set_icon(rose.gtk.util.get_icon())
     if cancel:
         cancel_button = dialog.add_button(gtk.STOCK_CANCEL,
                                           gtk.RESPONSE_CANCEL)
