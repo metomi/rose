@@ -30,6 +30,7 @@ import gtk
 
 import rose.config
 import rose.config_editor.panelwidget.summary_data
+import rose.gtk.dialog
 import rose.gtk.util
 import rose.config_editor.plugin.um.widget.stash_add
 
@@ -57,11 +58,20 @@ class BaseStashSummaryDataPanelv1(
     file. An argument to the widget metadata option can also be used to
     provide this information.
 
+    Subclasses should override the STASHMASTER_META_PATH attribute with
+    an absolute path to a directory containing a
+    'STASHmaster-meta.conf' file that provides metadata for STASHmaster
+    fields and values.
+
     """
 
     # These attributes must/should be overridden:
     STASH_PACKAGE_PATH = None
     STASHMASTER_PATH = None
+    STASHMASTER_META_PATH = None
+
+    # This attribute may be overridden, if necessary:
+    STASHMASTER_META_FILENAME = "STASHmaster-meta.conf"
 
     # These attributes are generic titles.
     ADD_NEW_STASH_LABEL = "New"
@@ -240,6 +250,45 @@ class BaseStashSummaryDataPanelv1(
         """(Override) Return the column index for the section (Rose section)."""
         return self.column_names.index(self.SECTION_INDEX_TITLE)
 
+    def get_stashmaster_meta_lookup_dict(self):
+        """Return a nested dictionary with STASHmaster metadata.
+
+        This stores metadata about STASHmaster fields and their values.
+        Field metadata is stored as field_name => metadata_property =>
+        metadata_value. Field value metadata (for a particular value of
+        a field) is under (field_name + "=" + value) =>
+        metadata_property => metadata_value.
+        
+        For example, if the nested dictionary is called
+        'stash_meta_dict':
+        stash_meta_dict["grid"]["title"]
+        would be something like:
+        "Grid code"
+        and:
+        stash_meta_dict["grid=2"]["description"]
+        would be something like:
+        "A grid code of 2 means...."
+
+        """
+        if self.STASHMASTER_META_PATH is None:
+            return {}
+        try:
+            config = rose.config.load(os.path.join(
+                                         self.STASHMASTER_META_PATH,
+                                         self.STASHMASTER_META_FILENAME))
+        except (rose.config.ConfigSyntaxError, IOError, OSError) as e:
+            sys.stderr.write("Error loading STASHmaster metadata resource: ")
+            sys.stderr.write(type(e).__name__ + ": " + str(e) + "\n")
+            return {}
+        stash_meta_dict = {}
+        for keys, node in config.walk(no_ignore=True):
+            if len(keys) == 2:
+                address = keys[0].replace("stashmaster:", "", 1)
+                prop = keys[1]
+                stash_meta_dict.setdefault(address, {})
+                stash_meta_dict[address][prop] = node.value
+        return stash_meta_dict
+
     def set_tree_cell_status(self, col, cell, model, row_iter):
         """(Override) Set the status-related markup for a cell."""
         col_index = self._view.get_columns().index(col)
@@ -361,8 +410,8 @@ class BaseStashSummaryDataPanelv1(
                        self.STREQ_NL_ITEM_OPT: item}
         new_section = self.add_section(None, opt_map=new_opt_map)
         if launch_dialog:
-            rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_INFO,
+            rose.gtk.dialog.run_dialog(
+                              rose.gtk.dialog.DIALOG_TYPE_INFO,
                               "Added request as {0}".format(new_section),
                               "New Request")
 
@@ -408,6 +457,8 @@ class BaseStashSummaryDataPanelv1(
         self.package_config = rose.config.ConfigLoader().load_with_opts(
                                           package_config_file)
         self.generate_package_lookup()
+        self._stashmaster_meta_lookup = (
+                          self.get_stashmaster_meta_lookup_dict())
 
     def _add_new_diagnostic_launcher(self):
         # Create a button for launching the "Add new STASH" dialog.
@@ -538,6 +589,7 @@ class BaseStashSummaryDataPanelv1(
                                               self._stash_lookup,
                                               request_lookup,
                                               request_changes,
+                                              self._stashmaster_meta_lookup,
                                               add_new_func,
                                               self.scroll_to_section,
                                               self._refresh_diagnostic_window)

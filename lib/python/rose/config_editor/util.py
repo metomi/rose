@@ -36,6 +36,7 @@ pygtk.require("2.0")
 import gtk
 
 import rose
+import rose.gtk.dialog
 import rose.gtk.util
 
 
@@ -202,8 +203,8 @@ def launch_node_info_dialog(node, changes, search_function):
         elif att_val != {} and att_val != []:
             text += wrap_string(att_val, lenval, indent0)
         text += "\n"
-    rose.gtk.util.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO, text, title,
-                                       search_function)
+    rose.gtk.dialog.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO, text, title,
+                                         search_function)
 
 
 def launch_error_dialog(exception=None, text=""):
@@ -212,8 +213,34 @@ def launch_error_dialog(exception=None, text=""):
         text += "\n"
     if exception is not None:
         text += type(exception).__name__ + ": " + str(exception)
-    rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                             text, rose.config_editor.DIALOG_TITLE_ERROR)
+    rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                               text, rose.config_editor.DIALOG_TITLE_ERROR)
+
+
+def text_for_character_widget(text):
+    """Strip an enclosing single quote pair from a piece of text."""
+    if text.startswith("'") and text.endswith("'"):
+        text = text[1:-1]
+    text = text.replace("''", "'")
+    return text
+
+
+def text_from_character_widget(text):
+    """Surround text with single quotes; escape existing ones."""
+    return "'" + text.replace("'", "''") + "'"
+
+
+def text_for_quoted_widget(text):
+    """Strip an enclosing double quote pair from a piece of text."""
+    if text.startswith('"') and text.endswith('"'):
+        text = text[1:-1]
+    text = text.replace('\\"', '"')
+    return text
+
+
+def text_from_quoted_widget(text):
+    """Surround text with double quotes; escape existing ones."""
+    return '"' + text.replace('"', '\\"') + '"'
 
 
 def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):

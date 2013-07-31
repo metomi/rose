@@ -39,6 +39,7 @@ import rose.config_editor
 import rose.config_editor.main
 import rose.env
 import rose.external
+import rose.gtk.dialog
 import rose.gtk.run
 import rose.gtk.splash
 import rose.gtk.util
@@ -229,9 +230,9 @@ class MainWindow(gtk.Window):
                                                      self.search_history)
                 
             except rosie.ws_client.QueryError as e:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         str(e),
-                                         rosie.browser.TITLE_INVALID_QUERY)
+                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                           str(e),
+                                           rosie.browser.TITLE_INVALID_QUERY)
                 results = []
             self.display_maps_result(results)
 
@@ -253,9 +254,9 @@ class MainWindow(gtk.Window):
             new_id = self.suite_director.vc_client.create(config, from_id,
                                          self.search_manager.ws_client.prefix)
         except Exception as e:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     type(e).__name__ + ": " + str(e),
-                                     title=rosie.browser.TITLE_ERROR)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       type(e).__name__ + ": " + str(e),
+                                       title=rosie.browser.TITLE_ERROR)
             return None
 
         # Poll for new entry in db.
@@ -699,17 +700,18 @@ class MainWindow(gtk.Window):
             elif q_type == "url":
                 self.address_bar_lookup(None, True)
             else:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
+                rose.gtk.dialog.run_dialog(
+                              rose.gtk.dialog.DIALOG_TYPE_ERROR,
                               rosie.browser.ERROR_CORRUPTED_HISTORY_ITEM,
                               rosie.browser.DIALOG_TITLE_HISTORY_ERROR,
                               modal=True)                
 
     def handle_info(self, *args):
         """Handle display of suite info."""
-        rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_INFO,
-                                 self.display_box.get_info_text(),
-                                 rosie.browser.DIALOG_TITLE_INFO,
-                                 modal=False)
+        rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_INFO,
+                                   self.display_box.get_info_text(),
+                                   rosie.browser.DIALOG_TITLE_INFO,
+                                   modal=False)
 
     def handle_launch_terminal(self, *args):
         """Launch a terminal at the current suite directory."""
@@ -772,9 +774,9 @@ class MainWindow(gtk.Window):
                         self.handle_record_search_ui("query", msg, 
                                                      self.search_history)
             except rosie.ws_client.QueryError as e:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         str(e),
-                                         rosie.browser.TITLE_INVALID_QUERY)
+                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                           str(e),
+                                           rosie.browser.TITLE_INVALID_QUERY)
                 results = []
             self.statusbar.set_progressbar_pulsing(False)
             self.display_maps_result(results)
@@ -807,8 +809,8 @@ class MainWindow(gtk.Window):
         help_cmds = ["rose", "help", "suite-run"]
         help_text = subprocess.Popen(help_cmds,
                                      stdout=subprocess.PIPE).communicate()[0]
-        rose.gtk.util.run_command_arg_dialog("rose suite-run", help_text, 
-                                             self._run_suite_check_args)
+        rose.gtk.dialog.run_command_arg_dialog("rose suite-run", help_text, 
+                                               self._run_suite_check_args)
 
     def handle_run_scheduler(self, *args):
         """Run the scheduler for this suite."""
@@ -820,9 +822,9 @@ class MainWindow(gtk.Window):
         self.local_updater.update_now()
         search_text = self.nav_bar.simple_search_entry.get_text()
         if not search_text:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     rosie.browser.ERROR_ENTER_SEARCH,
-                                     rosie.browser.TITLE_INVALID_QUERY)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       rosie.browser.ERROR_ENTER_SEARCH,
+                                       rosie.browser.TITLE_INVALID_QUERY)
             return
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING,
                                        instant=True)
@@ -841,9 +843,9 @@ class MainWindow(gtk.Window):
                     self.handle_record_search_ui("search", search_text,
                                                  self.search_history)
         except rosie.ws_client.QueryError as e:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     str(e),
-                                     rosie.browser.TITLE_INVALID_QUERY)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       str(e),
+                                       rosie.browser.TITLE_INVALID_QUERY)
             results = []
         self.display_maps_result(results)
         self.repeat_last_request = self.handle_search
@@ -898,17 +900,19 @@ class MainWindow(gtk.Window):
                     msg = rosie.browser.ERROR_UNRECOGNISED_NEXT_SEARCH
                 else:
                     msg = rosie.browser.ERROR_UNRECOGNISED_LAST_SEARCH
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                              msg,
-                              rosie.browser.TITLE_HISTORY_NAVIGATION_ERROR)
+                rose.gtk.dialog.run_dialog(
+                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                msg,
+                                rosie.browser.TITLE_HISTORY_NAVIGATION_ERROR)
         else:
             if next:
                 err = rosie.browser.ERROR_NO_NEXT_SEARCH
             else:
                 err = rosie.browser.ERROR_NO_PREVIOUS_SEARCH
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                              err,
-                              rosie.browser.TITLE_HISTORY_NAVIGATION_ERROR)        
+            rose.gtk.dialog.run_dialog(
+                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                err,
+                                rosie.browser.TITLE_HISTORY_NAVIGATION_ERROR)        
 
     def handle_show_hide_query_panel(self):
         """Handle resizing window contents on query panel visibility change."""
@@ -995,9 +999,9 @@ class MainWindow(gtk.Window):
             try:
                 args = [rose.env.environment_variable_process(arg) for arg in args]
             except rose.env.UnboundEnvironmentVariableError as e:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                         str(e),
-                                         rosie.browser.TITLE_INVALID_QUERY)
+                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                           str(e),
+                                           rosie.browser.TITLE_INVALID_QUERY)
                 self.advanced_search_widget.add_filter()
                 return
             filters = rosie.ws_client.query_split(args)
@@ -1314,7 +1318,7 @@ if __name__ == "__main__":
         args = rosie.browser.DEFAULT_QUERY
     sys.path.append(os.getenv('ROSE_HOME'))
     rose.gtk.util.setup_stock_icons()
-    rose.gtk.util.set_exception_hook()
+    rose.gtk.dialog.set_exception_hook_dialog()
     
     locator = rose.resource.ResourceLocator(paths=sys.path)
     logo = locator.locate('etc/images/rose-splash-logo.png')

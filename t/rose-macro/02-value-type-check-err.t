@@ -64,9 +64,11 @@ my_derived_type_raw_log_char_real = raw ^%75\\, .true., 'a simple character quot
 my_derived_type_raw_log_char_real_array = xlkdf",", .true., 'I\'m a bad character quoted', 3.0e-3,
                                           asp'\,', .false., 'I also like to quote ''stuff''', -42
 my_derived_type_real_int_null_comp_array = 2.0,,4.0,,2.3e+2, 1
+my_python_list=["Spam", True, "Cheese, False, 2000.0]
+my_python_list_empty=
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 27
+tests 30
 #-------------------------------------------------------------------------------
 # Check boolean type checking.
 TEST_KEY=$TEST_KEY_BASE-boolean-err
@@ -306,6 +308,28 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         Not a real number: '45.0p2'
     namelist:values_nl1=my_derived_type_raw_log_char_real_array='I\'m a bad character quoted'
         Not in a valid single quoted format: "'I\\'m a bad character quoted'"
+__CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Check Python List type checking.
+TEST_KEY=$TEST_KEY_BASE-python-list-err
+setup
+init_meta <<__META_CONFIG__
+[namelist:values_nl1=my_python_list]
+type=python_list
+
+[namelist:values_nl1=my_python_list_empty]
+type=python_list
+__META_CONFIG__
+run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+# Note - the format of the value changes due to the namelist-specific formatting.
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+[V] rose.macros.DefaultValidators: issues: 2
+    namelist:values_nl1=my_python_list=["Spam",True,"Cheese, False, 2000.0]
+        Not a valid Python list format: '["Spam",True,"Cheese, False, 2000.0]'
+    namelist:values_nl1=my_python_list_empty=
+        Not a valid Python list format: ''
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------

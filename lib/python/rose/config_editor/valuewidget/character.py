@@ -25,6 +25,7 @@ pygtk.require('2.0')
 import gtk
 
 import rose.config_editor
+import rose.config_editor.util
 
 
 class QuotedTextValueWidget(gtk.HBox):
@@ -40,14 +41,18 @@ class QuotedTextValueWidget(gtk.HBox):
         checker = rose.macros.value.ValueChecker()
         if self.type == "character":
             self.type_checker = checker.check_character
-            self.format_text_in = text_for_character_widget
-            self.format_text_out = text_from_character_widget
+            self.format_text_in = (
+                        rose.config_editor.util.text_for_character_widget)
+            self.format_text_out = (
+                        rose.config_editor.util.text_from_character_widget)
             self.quote_char = "'"
             self.esc_quote_chars = "''"
         elif self.type == "quoted":
             self.type_checker = checker.check_quoted
-            self.format_text_in = text_for_quoted_widget
-            self.format_text_out = text_from_quoted_widget
+            self.format_text_in = (
+                        rose.config_editor.util.text_for_quoted_widget)
+            self.format_text_out = (
+                        rose.config_editor.util.text_from_quoted_widget)
             self.quote_char = '"'
             self.esc_quote_chars = '\\"'
         self.value = value
@@ -138,22 +143,3 @@ class QuotedTextValueWidget(gtk.HBox):
         if event.button == 2:
             self.setter()
         return False
-
-
-def text_for_character_widget(text):
-    if text.startswith("'") and text.endswith("'"):
-        text = text[1:-1]
-    text = text.replace("''", "'")
-    return text
-
-def text_from_character_widget(text):
-    return "'" + text.replace("'", "''") + "'"
-
-def text_for_quoted_widget(text):
-    if text.startswith('"') and text.endswith('"'):
-        text = text[1:-1]
-    text = text.replace('\\"', '"')
-    return text
-
-def text_from_quoted_widget(text):
-    return '"' + text.replace('"', '\\"') + '"'

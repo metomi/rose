@@ -5,9 +5,9 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2013-Q3)
+## 2013-07 (2013-07-31)
 
-This release of Rose will work with cylc 5.3.0 or above.
+This release of Rose works with cylc 5.3.0 or above.
 
 ### Highlighted Changes
 
@@ -54,6 +54,13 @@ pruned.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#840: rose config-edit: improved metadata display for the UM STASH plugin 
+widget.
+
+\#839: rose metadata: new 'python_list' type for use with interfaces that
+support Pythonic-format lists as input - e.g. Jinja2 via the rose-suite.conf
+file.
+
 \#829: rose host-select: add a new method to rank and set thresholds for hosts
 by the amount of free memory.
 
@@ -61,6 +68,8 @@ by the amount of free memory.
 shutdown`.
 
 \#824: rose macro: add support for macro arguments.
+
+\#815: rose metadata: len function now available for fail-if, warn-if, etc.
 
 \#811: rose config-edit: rule checker will now display message on the status
 bar if everything is OK.
