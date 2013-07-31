@@ -61,11 +61,15 @@ doc/google-code-prettify/*:
 
 doc/rose-icon.png,
 etc/images/rose-icon.png,
+etc/images/rose-icon.svg,
 etc/images/rose-icon-trim.png,
+etc/images/rose-icon-trim.svg,
 etc/images/rose-logo.png,
 etc/images/rose-splash-logo.png,
 etc/images/rosie-icon.png,
+etc/images/rosie-icon.svg,
 etc/images/rosie-icon-trim.png,
+etc/images/rosie-icon-trim.svg,
 etc/metadata/all/etc/images/icon.png:
 * These icons are all derived from the public domain image at
   <http://www.clker.com/clipart-compass-rose-variation.html>.

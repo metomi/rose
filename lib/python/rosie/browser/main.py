@@ -77,8 +77,7 @@ class MainWindow(gtk.Window):
                                     rosie.browser.PROGRAM_NAME,
                                     rosie.browser.SPLASH_CONFIG))
         self.config = locator.get_conf()
-        icon_path = locator.locate(rosie.browser.ICON_PATH_WINDOW)
-        self.set_icon_from_file(icon_path)
+        self.set_icon(rose.gtk.util.get_icon(system="rosie"))
         if rosie.browser.ICON_PATH_SCHEDULER is None:
             self.sched_icon_path = None
         else:
