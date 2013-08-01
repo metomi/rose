@@ -34,6 +34,7 @@ import gtk
 import gobject
 import pango
 
+import rose.gtk.util
 import rose.popen
 
 gobject.threads_init()
@@ -57,13 +58,7 @@ class SplashScreen(gtk.Window):
         self.set_title(title)
         self.set_decorated(False)
         self.stopped = False
-        try:
-            locator = rose.resource.ResourceLocator(paths=sys.path)
-            icon_path = locator.locate('etc/images/rose-icon-trim.png')
-        except rose.resource.ResourceError:
-            pass
-        else:
-            self.set_icon_from_file(icon_path)
+        self.set_icon(rose.gtk.util.get_icon())
         self.modify_bg(gtk.STATE_NORMAL,
                        gtk.gdk.color_parse(self.BACKGROUND_COLOUR))
         self.set_gravity(gtk.gdk.GRAVITY_CENTER)

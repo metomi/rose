@@ -31,6 +31,7 @@ import pango
 
 import rose.config
 import rose.gtk.dialog
+import rose.gtk.util
 import rose.resource
 
 
@@ -51,9 +52,7 @@ class MainWindow(object):
         self.window.set_title(name + ' - ' +
                               rose.config_editor.LAUNCH_COMMAND)
         self.util = rose.config_editor.util.Lookup()
-        locator = rose.resource.ResourceLocator(paths=sys.path)
-        icon_path = locator.locate('etc/images/rose-icon-trim.png')
-        self.window.set_icon_from_file(icon_path)
+        self.window.set_icon(rose.gtk.util.get_icon())
         gtk.window_set_default_icon_list(self.window.get_icon())
         self.window.set_default_size(*rose.config_editor.SIZE_WINDOW)
         self.window.set_destroy_with_parent(False)
