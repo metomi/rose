@@ -476,60 +476,63 @@ class MainMenuHandler(object):
                 break
         return optionals
 
+    def check_entry_value(self, entry, dialog, entries, labels):
+        is_valid = True
+        for k, entry in entries.items():
+            try:
+                ast.literal_eval(entry.get_text())
+                labels[k].set_text(str(k) + ":")
+            except (ValueError, EOFError, SyntaxError):
+                lab = '<span foreground="red">{0}</span>'.format(str(k)+":")
+                labels[k].set_markup(lab)
+                is_valid = False
+        dialog.set_response_sensitive(gtk.RESPONSE_OK, is_valid)
+        return
+
     def override_macro_defaults(self, optionals, methname):
         """Launch a dialog to handle capture of any override args to macro"""
         res = {}
         #create the text input field
         entries = {}
+        labels = {}
         errs = {}
         succeeded = False
-        while True:
-            dialog = gtk.MessageDialog(
+        dialog = gtk.MessageDialog(
                 None,
                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                 gtk.MESSAGE_QUESTION,
                 gtk.BUTTONS_OK_CANCEL,
                 None)
-            dialog.set_markup('Specify overrides for macro arguments:')
-            dialog.set_title(methname)
-            table = gtk.Table(len(optionals.items()), 2, True)
-            dialog.vbox.add(table)
-            for i in range(len(optionals.items())):
-                k, v = optionals.items()[i]
-                entry = gtk.Entry()
-                if res.get(k):
-                    entry.set_text(str(res[k]))
-                elif errs.get(k):
-                    entry.set_text(str(errs[k]))
-                else:
-                    entry.set_text(str(v))
-                entries[k] = entry
-                hbox = gtk.HBox()
-                if errs.get(k):
-                    lab = '<span foreground="red">{0}</span>'.format(k + ':')
-                    label = gtk.Label()
-                    label.set_markup(lab)
-                    table.attach(label, 0, 1, i, i+1)
-                else:
-                    table.attach(gtk.Label(str(k)+":"), 0, 1, i, i+1)
-                table.attach(entry, 1, 2, i, i+1)
-            dialog.show_all()
-            response = dialog.run()
-            if (response == gtk.RESPONSE_CANCEL or 
-                response == gtk.RESPONSE_CLOSE):
-                res = optionals
-                dialog.destroy()
-                break
-            errs = {}
+        dialog.set_markup('Specify overrides for macro arguments:')
+        dialog.set_title(methname)
+        table = gtk.Table(len(optionals.items()), 2, False)
+        dialog.vbox.add(table)
+        for i in range(len(optionals.items())):
+            k, v = optionals.items()[i]
+            label = gtk.Label(str(k) + ":")
+            entry = gtk.Entry()
+            if isinstance(v,str):
+                entry.set_text("'" + v + "'")
+            else:
+                entry.set_text(str(v))
+            entry.connect("changed", self.check_entry_value, dialog, entries, labels)
+            entries[k] = entry
+            labels[k] = label
+            table.attach(entry, 1, 2, i, i+1)
+            hbox = gtk.HBox()
+            hbox.pack_start(label, expand=False)
+            table.attach(hbox, 0, 1, i, i+1)
+        dialog.show_all()
+        response = dialog.run()
+        if (response == gtk.RESPONSE_CANCEL or 
+            response == gtk.RESPONSE_CLOSE):
+            res = optionals
+            dialog.destroy()
+        else:
             res = {}
             for k,box in entries.items():
-                try:
-                    res[k] = ast.literal_eval(box.get_text())
-                except SyntaxError:
-                    errs[k] = box.get_text()
-            dialog.destroy()
-            if not errs:
-                break
+                res[k] = ast.literal_eval(box.get_text())
+        dialog.destroy()
         return res
 
     def run_custom_macro(self, config_name=None, module_name=None,
