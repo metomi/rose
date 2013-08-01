@@ -506,7 +506,7 @@ class MainMenuHandler(object):
                 entries[k] = entry
                 hbox = gtk.HBox()
                 if errs.get(k):
-                    lab = '<span foreground="red">{0}</span>'.format(k+':')
+                    lab = '<span foreground="red">{0}</span>'.format(k + ':')
                     label = gtk.Label()
                     label.set_markup(lab)
                     table.attach(label, 0, 1, i, i+1)
@@ -525,7 +525,7 @@ class MainMenuHandler(object):
             for k,box in entries.items():
                 try:
                     res[k] = ast.literal_eval(box.get_text())
-                except:
+                except SyntaxError:
                     errs[k] = box.get_text()
             dialog.destroy()
             if not errs:
@@ -597,8 +597,6 @@ class MainMenuHandler(object):
             else:
                 res = {}
             try:
-                print "res is: "
-                print res
                 return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
                 rose.gtk.dialog.run_dialog(
