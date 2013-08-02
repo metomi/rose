@@ -97,15 +97,16 @@ class RowArrayValueWidget(gtk.HBox):
             self.max_rows = 1
             self.unlimited = False
             return
+        columns = len(self.type)
         if self.CHECK_NAME_IS_ELEMENT(self.metadata['id']):
             self.unlimited = False
         if self.unlimited:
-            self.num_rows, rem = divmod(len(self.value_array), self.num_cols)
+            self.num_rows, rem = divmod(len(self.value_array), columns)
             self.num_rows += [1, 0][rem == 0]
             self.max_rows = sys.maxint
         else:
             self.num_rows = int(self.array_length)
-            num, rem = divmod(len(self.value_array), self.num_cols)
+            num, rem = divmod(len(self.value_array), columns)
             if self.num_rows == 0:
                self.num_rows = 1
             self.max_rows = self.num_rows
@@ -245,7 +246,8 @@ class RowArrayValueWidget(gtk.HBox):
             self.entry_table.remove(entry)
         self.rows.pop(-1)
         self.entry_table.resize(r, self.num_cols)
-        chop_index = len(self.value_array) - self.num_cols
+        
+        chop_index = len(self.value_array) - len(self.get_types())
         self.value_array = self.value_array[:chop_index]
         self.value = rose.variable.array_join(self.value_array)
         self.set_value(self.value)
@@ -348,6 +350,8 @@ class RowArrayValueWidget(gtk.HBox):
         max_width = {}
         # Get max width
         for widgets in self.rows:
+            if element >= len(widgets):
+                continue
             e_widget = widgets[element]
             i = 0
             child_list = e_widget.get_children()
@@ -368,6 +372,8 @@ class RowArrayValueWidget(gtk.HBox):
                 max_width[key] = self.MIN_WIDTH_CHARS
         # Set max width
         for widgets in self.rows:
+            if element >= len(widgets):
+                continue
             e_widget = widgets[element]
             i = 0
             child_list = e_widget.get_children()
