@@ -305,14 +305,7 @@ class MainController(object):
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
             
-        if (load_all_apps or 
-            self.data.app_count <= rose.config_editor.MAX_APPS_THRESHOLD):
-            self.toolbar.set_widget_sensitive(
-                                        rose.config_editor.TOOLBAR_LOAD_APPS,
-                                        False)
-            widget = self.menubar.uimanager.get_widget(
-                                        '/TopMenuBar/File/Load All Apps')
-            widget.set_sensitive(False)
+        self.update_bar_widgets()
 
 #------------------ Setting up main component functions ----------------------
 
@@ -660,6 +653,7 @@ class MainController(object):
             self.reporter.stop()
             if hasattr(self, 'menubar'):
                 self.main_handle.load_macro_menu(self.menubar)
+            self.update_bar_widgets()
         
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)
@@ -1262,6 +1256,13 @@ class MainController(object):
                 return self.menu_widgets[address]
         return None
 
+    def _has_preview_apps(self):
+        for item in self.data.config.keys():
+            if self.data.config[item].is_preview:
+                return True
+        else:
+            return False
+
     def update_bar_widgets(self):
         """Update bar functionality like Undo and Redo."""
         if not hasattr(self, 'toolbar'):
@@ -1274,6 +1275,10 @@ class MainController(object):
         self._get_menu_widget('/Redo').set_sensitive(len(self.redo_stack) > 0)
         self._get_menu_widget('/Find Next').set_sensitive(
                                             len(self.find_hist['ids']) > 0)
+        self._get_menu_widget('/Load All Apps').set_sensitive(
+                                                    self._has_preview_apps())
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_LOAD_APPS,
+                                          self._has_preview_apps())
         if not hasattr(self, "nav_panel"):
             return False
         changes, errors = self.nav_panel.get_change_error_totals()
