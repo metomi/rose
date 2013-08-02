@@ -353,6 +353,8 @@ class MainMenuHandler(object):
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self.find_ns_id_func = find_ns_id_func
+        self.bad_colour = gtk.gdk.color_parse(
+                          rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
 
     def about_dialog(self, args):
         self.mainwindow.launch_about_dialog()
@@ -476,18 +478,33 @@ class MainMenuHandler(object):
                 break
         return optionals
 
-    def check_entry_value(self, entry, dialog, entries, labels):
+    def check_entry_value(self, entry, dialog, entries, labels, optionals):
         is_valid = True
+        for k, entry in entries.items():
+            this_is_valid = True
+            try:
+                new_val = ast.literal_eval(entry.get_text())
+                entry.modify_text(gtk.STATE_NORMAL, None)
+            except (ValueError, EOFError, SyntaxError):
+                entry.modify_text(gtk.STATE_NORMAL, self.bad_colour)
+                is_valid = False
+                this_is_valid = False
+            if not this_is_valid or new_val != optionals[k]:
+                lab = '<span foreground="blue">{0}</span>'.format(str(k)+":")
+                labels[k].set_markup(lab)
+            else:
+                labels[k].set_text(str(k) + ":")
+        dialog.set_response_sensitive(gtk.RESPONSE_OK, is_valid)
+        return
+
+    def handle_macro_entry_activate(self, entry, dialog, entries):
         for k, entry in entries.items():
             try:
                 ast.literal_eval(entry.get_text())
-                labels[k].set_text(str(k) + ":")
             except (ValueError, EOFError, SyntaxError):
-                lab = '<span foreground="red">{0}</span>'.format(str(k)+":")
-                labels[k].set_markup(lab)
-                is_valid = False
-        dialog.set_response_sensitive(gtk.RESPONSE_OK, is_valid)
-        return
+                break
+        else:
+            dialog.response(gtk.RESPONSE_OK)
 
     def override_macro_defaults(self, optionals, methname):
         """Launch a dialog to handle capture of any override args to macro"""
@@ -515,7 +532,10 @@ class MainMenuHandler(object):
                 entry.set_text("'" + v + "'")
             else:
                 entry.set_text(str(v))
-            entry.connect("changed", self.check_entry_value, dialog, entries, labels)
+            entry.connect("changed", self.check_entry_value, dialog, 
+                          entries, labels, optionals)
+            entry.connect("activate", self.handle_macro_entry_activate, 
+                          dialog, entries)
             entries[k] = entry
             labels[k] = label
             table.attach(entry, 1, 2, i, i+1)
