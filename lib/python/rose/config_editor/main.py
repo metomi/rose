@@ -304,6 +304,15 @@ class MainController(object):
                                                self.data.top_level_name))
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
+            
+        if (load_all_apps or 
+            self.data.app_count <= rose.config_editor.MAX_APPS_THRESHOLD):
+            self.toolbar.set_widget_sensitive(
+                                        rose.config_editor.TOOLBAR_LOAD_APPS,
+                                        False)
+            widget = self.menubar.uimanager.get_widget(
+                                        '/TopMenuBar/File/Load All Apps')
+            widget.set_sensitive(False)
 
 #------------------ Setting up main component functions ----------------------
 
@@ -313,6 +322,7 @@ class MainController(object):
                 widgets=[
                    (rose.config_editor.TOOLBAR_OPEN, 'gtk.STOCK_OPEN'),
                    (rose.config_editor.TOOLBAR_SAVE, 'gtk.STOCK_SAVE'),
+                   (rose.config_editor.TOOLBAR_LOAD_APPS, 'gtk.STOCK_CDROM'),
                    (rose.config_editor.TOOLBAR_BROWSE, 'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_UNDO, 'gtk.STOCK_UNDO'),
                    (rose.config_editor.TOOLBAR_REDO, 'gtk.STOCK_REDO'),
@@ -338,6 +348,7 @@ class MainController(object):
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
+        assign(rose.config_editor.TOOLBAR_LOAD_APPS, self.handle_load_all)
         assign(rose.config_editor.TOOLBAR_BROWSE,
                self.main_handle.launch_browser)
         assign(rose.config_editor.TOOLBAR_UNDO, self.perform_undo)
@@ -382,6 +393,8 @@ class MainController(object):
         self.menu_widgets = {}
         menu_list = [('/TopMenuBar/File/Open...', self.load_from_file),
                      ('/TopMenuBar/File/Save', lambda m: self.save_to_file()),
+                     ('/TopMenuBar/File/Load All Apps',
+                      lambda m: self.handle_load_all()),
                      ('/TopMenuBar/File/Quit', self.main_handle.destroy),
                      ('/TopMenuBar/Edit/Undo', 
                       lambda m: self.perform_undo()),
@@ -587,6 +600,35 @@ class MainController(object):
 
 #------------------ Page manipulation functions ------------------------------
 
+    def handle_load_all(self, *args):
+        load_these = []
+        for item in self.data.config.keys():
+            if self.data.config[item].is_preview:
+                load_these.append(item)
+        load_these.sort()
+        for namespace_name in load_these:
+            config_data = self.data.config[namespace_name]
+            self.reporter.report_load_event(
+                           rose.config_editor.EVENT_LOAD_ATTEMPT.format(
+                           namespace_name), 
+                           new_total_events=3)
+            self.data.load_config(config_data.directory, preview=False, 
+                                  metadata_off=self.metadata_off)
+            self.reporter.report_load_event(
+                        rose.config_editor.EVENT_LOADED.format(namespace_name),
+                        no_progress=True)
+            self.reporter.stop()
+            self.reload_namespace_tree()
+                
+        self.nav_panel.update_row_tooltips()
+        if hasattr(self, 'menubar'):
+            self.main_handle.load_macro_menu(self.menubar)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_LOAD_APPS,
+                                          False)
+        widget = self.menubar.uimanager.get_widget(
+                                        '/TopMenuBar/File/Load All Apps')
+        widget.set_sensitive(False)
+        return
 
     def handle_launch_request(self, namespace_name, as_new=False):
         """Handle a request to create a page.
@@ -608,7 +650,8 @@ class MainController(object):
                        rose.config_editor.EVENT_LOAD_ATTEMPT.format(
                        namespace_name), 
                        new_total_events=3)
-            self.data.load_config(config_data.directory, preview=False, metadata_off=self.metadata_off)
+            self.data.load_config(config_data.directory, preview=False, 
+                                  metadata_off=self.metadata_off)
             self.reload_namespace_tree()
             self.nav_panel.update_row_tooltips()
             self.reporter.report_load_event(

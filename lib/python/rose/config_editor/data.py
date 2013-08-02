@@ -218,7 +218,7 @@ class ConfigDataManager(object):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
         
-        app_count = 0
+        self.app_count = 0
         if top_level_directory is None:
             self.top_level_name = rose.config_editor.UNTITLED_NAME
         else:
@@ -238,9 +238,10 @@ class ConfigDataManager(object):
                                                      config_dir)
                             if (os.path.isdir(conf_path) and
                                 not config_dir.startswith('.')):
-                                    app_count += 1
+                                    self.app_count += 1
                 
-                        if app_count > rose.config_editor.MAX_APPS_THRESHOLD:
+                        if (self.app_count > 
+                            rose.config_editor.MAX_APPS_THRESHOLD):
                             preview = True
                 
                 for config_dir in sub_contents:
