@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import ast
 import inspect
 import shlex
 import subprocess
@@ -355,6 +356,8 @@ class MainMenuHandler(object):
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self.find_ns_id_func = find_ns_id_func
+        self.bad_colour = gtk.gdk.color_parse(
+                          rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
 
     def about_dialog(self, args):
         self.mainwindow.launch_about_dialog()
@@ -464,6 +467,98 @@ class MainMenuHandler(object):
                                   macro_func, help, image,
                                   self.run_custom_macro)
 
+    def inspect_custom_macro(self, macro_meth):
+        """Inspect a custom macro for kwargs and return any"""
+        arglist = inspect.getargspec(macro_meth).args
+        defaultlist = inspect.getargspec(macro_meth).defaults
+        optionals = {}
+        while defaultlist is not None and len(defaultlist) > 0:
+            if arglist[-1] not in ["self", "config", "meta_config"]:
+                optionals[arglist[-1]] = defaultlist[-1]
+                arglist = arglist[0:-1]
+                defaultlist = defaultlist[0:-1]
+            else:
+                break
+        return optionals
+
+    def check_entry_value(self, entry_widget, dialog, entries, 
+                          labels, optionals):
+        is_valid = True
+        for k, entry in entries.items():
+            this_is_valid = True
+            try:
+                new_val = ast.literal_eval(entry.get_text())
+                entry.modify_text(gtk.STATE_NORMAL, None)
+            except (ValueError, EOFError, SyntaxError):
+                entry.modify_text(gtk.STATE_NORMAL, self.bad_colour)
+                is_valid = False
+                this_is_valid = False
+            if not this_is_valid or new_val != optionals[k]:
+                lab = '<span foreground="blue">{0}</span>'.format(str(k)+":")
+                labels[k].set_markup(lab)
+            else:
+                labels[k].set_text(str(k) + ":")
+        dialog.set_response_sensitive(gtk.RESPONSE_OK, is_valid)
+        return
+
+    def handle_macro_entry_activate(self, entry_widget, dialog, entries):
+        for k, entry in entries.items():
+            try:
+                ast.literal_eval(entry.get_text())
+            except (ValueError, EOFError, SyntaxError):
+                break
+        else:
+            dialog.response(gtk.RESPONSE_OK)
+
+    def override_macro_defaults(self, optionals, methname):
+        """Launch a dialog to handle capture of any override args to macro"""
+        res = {}
+        #create the text input field
+        entries = {}
+        labels = {}
+        errs = {}
+        succeeded = False
+        dialog = gtk.MessageDialog(
+                None,
+                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                gtk.MESSAGE_QUESTION,
+                gtk.BUTTONS_OK_CANCEL,
+                None)
+        dialog.set_markup('Specify overrides for macro arguments:')
+        dialog.set_title(methname)
+        table = gtk.Table(len(optionals.items()), 2, False)
+        dialog.vbox.add(table)
+        for i in range(len(optionals.items())):
+            k, v = optionals.items()[i]
+            label = gtk.Label(str(k) + ":")
+            entry = gtk.Entry()
+            if isinstance(v,str):
+                entry.set_text("'" + v + "'")
+            else:
+                entry.set_text(str(v))
+            entry.connect("changed", self.check_entry_value, dialog, 
+                          entries, labels, optionals)
+            entry.connect("activate", self.handle_macro_entry_activate, 
+                          dialog, entries)
+            entries[k] = entry
+            labels[k] = label
+            table.attach(entry, 1, 2, i, i+1)
+            hbox = gtk.HBox()
+            hbox.pack_start(label, expand=False)
+            table.attach(hbox, 0, 1, i, i+1)
+        dialog.show_all()
+        response = dialog.run()
+        if (response == gtk.RESPONSE_CANCEL or 
+            response == gtk.RESPONSE_CLOSE):
+            res = optionals
+            dialog.destroy()
+        else:
+            res = {}
+            for k,box in entries.items():
+                res[k] = ast.literal_eval(box.get_text())
+        dialog.destroy()
+        return res
+
     def run_custom_macro(self, config_name=None, module_name=None,
                          class_name=None, method_name=None):
         """Run the custom macro method and launch a dialog."""
@@ -523,8 +618,13 @@ class MainMenuHandler(object):
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             macro_method = getattr(macro_inst, methname)
+            optionals = self.inspect_custom_macro(macro_method)
+            if optionals:
+                res = self.override_macro_defaults(optionals, objname)
+            else:
+                res = {}
             try:
-                return_value = macro_method(macro_config, meta_config)
+                return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
                 rose.gtk.dialog.run_dialog(
                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
