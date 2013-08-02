@@ -18,6 +18,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import shlex
+
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -52,26 +54,13 @@ class PageTable(gtk.Table):
         self.var_ops = var_ops
         self.show_modes = show_modes
         variable_is_ghost_list = self._get_sorted_variables()
-        r = 0
-        for variable, is_ghost in variable_is_ghost_list:
-            variablewidget = rose.config_editor.variable.VariableWidget(
-                                                variable,
-                                                self.var_ops,
-                                                is_ghost=is_ghost,
-                                                show_modes=self.show_modes)
-            variablewidget.insert_into(self, self.MAX_COLS, r + 1)
-            variablewidget.set_sensitive(not is_ghost)
-            r = r + 1
+        self.attach_variable_widgets(variable_is_ghost_list, start_index=0)
         self._show_and_hide_variable_widgets()
         self.show()
 
     def add_variable_widget(self, variable):
         """Add a variable widget that was previously in ghost_data."""
-        new_variablewidget = rose.config_editor.variable.VariableWidget(
-                                                variable,
-                                                self.var_ops,
-                                                is_ghost=False,
-                                                show_modes=self.show_modes)
+        new_variablewidget = self.get_variable_widget(variable)
         widget_coordinate_list = []
         for child in self.get_children():
             top_row = self.child_get(child, 'top_attach')[0]
@@ -110,14 +99,27 @@ class PageTable(gtk.Table):
         else:            
             self.reload_variable_widget(variable)
 
+    def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
+        """Create and attach variable widgets for these inputs."""
+        r = start_index
+        for variable, is_ghost in variable_is_ghost_list:
+            variablewidget = self.get_variablewidget(variable, is_ghost)
+            variablewidget.insert_into(self, self.MAX_COLS, r + 1)
+            variablewidget.set_sensitive(not is_ghost)
+            r = r + 1
+
+    def get_variablewidget(self, variable, is_ghost=False):
+        """Create a variable widget for this variable."""
+        return rose.config_editor.variable.VariableWidget(
+                                                variable,
+                                                self.var_ops,
+                                                is_ghost=is_ghost,
+                                                show_modes=self.show_modes)
+
     def reload_variable_widget(self, variable):
         """Reload the widgets for the given variable."""
         is_ghost = variable in self.ghost_data
-        new_variablewidget = rose.config_editor.variable.VariableWidget(
-                                                variable,
-                                                self.var_ops,
-                                                is_ghost,
-                                                show_modes=self.show_modes)
+        new_variablewidget = self.get_variablewidget(variable, is_ghost)
         new_variablewidget.set_sensitive(not is_ghost)
         focus_dict = {"had_focus": False}
         variable_row = None
@@ -201,6 +203,58 @@ class PageTable(gtk.Table):
 
     def update_ignored(self):
         self._show_and_hide_variable_widgets()
+
+
+class PageArrayTable(PageTable):
+
+    """Return a widget table that treats array values as row elements."""
+
+    def __init__(self, *args, **kwargs):
+        arg_str = kwargs.get("arg_str", "")
+        if arg_str is None:
+            arg_str = ""
+        self.headings = shlex.split(arg_str)
+        super(PageArrayTable, self).__init__(*args, **kwargs)
+        self._set_length()
+
+    def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
+        """Create and attach variable widgets for these inputs."""
+        self._set_length()
+        r = start_index
+        for variable, is_ghost in variable_is_ghost_list:
+            variablewidget = self.get_variable_widget(variable, is_ghost)
+            variablewidget.insert_into(self, self.MAX_COLS, r + 1)
+            variablewidget.set_sensitive(not is_ghost)
+            r = r + 1
+
+    def get_variable_widget(self, variable, is_ghost=False):
+        """Create a variable widget for this variable."""
+        if (rose.META_PROP_LENGTH in variable.metadata or
+            isinstance(variable.metadata.get(rose.META_PROP_TYPE), list)):
+            return rose.config_editor.variable.RowVariableWidget(
+                                                variable,
+                                                self.var_ops,
+                                                is_ghost=is_ghost,
+                                                show_modes=self.show_modes,
+                                                length=self.array_length)                                   
+        return rose.config_editor.variable.VariableWidget(
+                                                variable,
+                                                self.var_ops,
+                                                is_ghost=is_ghost,
+                                                show_modes=self.show_modes)
+
+    def _set_length(self):
+        max_meta_length = 0
+        max_values_length = 0
+        for variable in self.panel_data + self.ghost_data:
+            length = variable.metadata.get(rose.META_PROP_LENGTH)
+            if (length is not None and length.isdigit() and
+                int(length) > max_meta_length):
+                max_meta_length = int(length)
+            values_length = len(rose.variable.array_split(variable.value))
+            if values_length > max_values_length:
+                max_values_length = values_length
+        self.array_length = max([max_meta_length, max_values_length])
 
 
 class PageLatentTable(gtk.Table):
