@@ -616,11 +616,7 @@ class MainController(object):
         self.nav_panel.update_row_tooltips()
         if hasattr(self, 'menubar'):
             self.main_handle.load_macro_menu(self.menubar)
-        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_LOAD_APPS,
-                                          False)
-        widget = self.menubar.uimanager.get_widget(
-                                        '/TopMenuBar/File/Load All Apps')
-        widget.set_sensitive(False)
+        self.update_bar_widgets()
         return
 
     def handle_launch_request(self, namespace_name, as_new=False):
