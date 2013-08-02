@@ -478,7 +478,8 @@ class MainMenuHandler(object):
                 break
         return optionals
 
-    def check_entry_value(self, entry, dialog, entries, labels, optionals):
+    def check_entry_value(self, entry_widget, dialog, entries, 
+                          labels, optionals):
         is_valid = True
         for k, entry in entries.items():
             this_is_valid = True
@@ -497,7 +498,7 @@ class MainMenuHandler(object):
         dialog.set_response_sensitive(gtk.RESPONSE_OK, is_valid)
         return
 
-    def handle_macro_entry_activate(self, entry, dialog, entries):
+    def handle_macro_entry_activate(self, entry_widget, dialog, entries):
         for k, entry in entries.items():
             try:
                 ast.literal_eval(entry.get_text())
