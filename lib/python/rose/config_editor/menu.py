@@ -402,13 +402,17 @@ class MainMenuHandler(object):
         macro = rose.macros.rule.FailureRuleChecker()
         macro_fullname = "rule.FailureRuleChecker.validate"
         error_count = 0
-        for config_name, config_data in self.data.config.items():
+        config_names = sorted(self.data.config.keys())
+        for config_name in sorted(self.data.config.keys()):
+            config_data = self.data.config[config_name]
+            if config_data.is_preview:
+                continue
             config = config_data.config
             meta = config_data.meta
             try:
                 return_value = macro.validate(config, meta)
                 if return_value:
-                    error_count += 1
+                    error_count += len(return_value)
             except Exception as e:
                 rose.gtk.dialog.run_dialog(
                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
@@ -424,14 +428,14 @@ class MainMenuHandler(object):
                                          config, return_value,
                                          no_display=(not return_value))
         if error_count > 0:
-            msg = rose.config_editor.EVENT_MACRO_VALIDATE_PROBLEMS_FOUND
+            msg = rose.config_editor.EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND
             info_text = msg.format(error_count)
             kind = self.reporter.KIND_ERR
         else:
-            info_text = rose.config_editor.EVENT_MACRO_VALIDATE_NO_PROBLEMS
+            msg = rose.config_editor.EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS
+            info_text = msg
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
-            
 
     def clear_page_menu(self, menubar, add_menuitem):
         """Clear all page add variable items."""
@@ -564,6 +568,9 @@ class MainMenuHandler(object):
             configs = self.data.config.keys()
         else:
             configs = [config_name]
+        for name in list(configs):
+            if self.data.config[name].is_preview:
+                configs.remove(name)
         if method_name is None:
             method_names = [rose.macro.VALIDATE_METHOD,
                             rose.macro.TRANSFORM_METHOD]
@@ -573,7 +580,7 @@ class MainMenuHandler(object):
             config_mod_prefix = self.data.helper.get_macro_module_prefix(config_name)
             if not module_name.startswith(config_mod_prefix):
                 module_name = config_mod_prefix + module_name
-        for config_name in configs:
+        for config_name in sorted(configs):
             config_data = self.data.config[config_name]
             for module in config_data.macros:
                 if module_name is not None and module.__name__ != module_name:
@@ -640,9 +647,9 @@ class MainMenuHandler(object):
                 if not change_list:
                     continue
                 change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
-                num_changes = self.handle_macro_transforms(
-                                                config_name, macro_fullname,
-                                                macro_config, change_list)
+                num_changes = len(change_list)
+                self.handle_macro_transforms(config_name, macro_fullname,
+                                             macro_config, change_list)
                 config_macro_changes.append((config_name,
                                              macro_fullname,
                                              num_changes))
@@ -667,13 +674,14 @@ class MainMenuHandler(object):
             if rose.macro.VALIDATE_METHOD in method_names:
                 null_format = rose.config_editor.EVENT_MACRO_VALIDATE_ALL_OK
                 change_format = rose.config_editor.EVENT_MACRO_VALIDATE_ALL
-                num_issues = len(config_macro_errors)
-                issue_confs = sorted(set(e[0] for e in config_macro_errors))
+                num_issues = sum([e[2] for e in config_macro_errors])
+                issue_confs = [e[0] for e in config_macro_errors if e[2]]
             else:
                 null_format = rose.config_editor.EVENT_MACRO_TRANSFORM_ALL_OK
                 change_format = rose.config_editor.EVENT_MACRO_TRANSFORM_ALL
-                num_issues = len(config_macro_changes)
-                issue_confs = sorted(set(e[0] for e in config_macro_changes))
+                num_issues = sum([e[2] for e in config_macro_changes])
+                issue_confs = [e[0] for e in config_macro_changes if e[2]]
+            issue_confs = sorted(set(issue_confs))
             if num_issues:
                 issue_conf_text = self._format_macro_config_names(issue_confs)
                 self.reporter.report(change_format.format(issue_conf_text,
@@ -687,7 +695,8 @@ class MainMenuHandler(object):
 
     def _format_macro_config_names(self, config_names):
         if len(config_names) > 5:
-            return rose.config_editor.EVENT_CONFIGS.format(len(config_names))
+            return rose.config_editor.EVENT_MACRO_CONFIGS.format(
+                                            len(config_names))
         config_names = [c.lstrip("/") for c in config_names]
         return ", ".join(config_names)
 

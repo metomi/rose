@@ -198,11 +198,15 @@ EVENT_MACRO_TRANSFORM_ALL = "Transforms: {0}: {1} changes"
 EVENT_MACRO_TRANSFORM_ALL_OK = "Transforms: {0}: no changes"
 EVENT_MACRO_TRANSFORM_OK = "{1}: {0}: no changes"
 EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
-EVENT_MACRO_VALIDATE_ALL = "Validators: {0}: {1} errors"
-EVENT_MACRO_VALIDATE_ALL_OK = "Validators: {0}: all OK"
+EVENT_MACRO_VALIDATE_ALL = "Custom Validators: {0}: {1} errors"
+EVENT_MACRO_VALIDATE_ALL_OK = "Custom Validators: {0}: all OK"
 EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
-EVENT_MACRO_VALIDATE_NO_PROBLEMS = "Validators: No problems found"
-EVENT_MACRO_VALIDATE_PROBLEMS_FOUND = "Validators: {0} problems found"
+EVENT_MACRO_VALIDATE_NO_PROBLEMS = "Custom Validators: No problems found"
+EVENT_MACRO_VALIDATE_PROBLEMS_FOUND = "Custom Validators: {0} problems found"
+EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS = (
+                     "FailureRuleChecker: No problems found")
+EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND = (
+                     "FailureRuleChecker: {0} problems found")
 EVENT_REDO = "{0}"
 EVENT_REVERT = "Reverted {0}"
 EVENT_TIME = "%H:%M:%S"
