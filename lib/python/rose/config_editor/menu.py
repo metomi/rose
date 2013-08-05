@@ -565,7 +565,7 @@ class MainMenuHandler(object):
         """Run the custom macro method and launch a dialog."""
         macro_data = []
         if config_name is None:
-            configs = self.data.config.keys()
+            configs = sorted(self.data.config.keys())
         else:
             configs = [config_name]
         for name in list(configs):
@@ -580,7 +580,7 @@ class MainMenuHandler(object):
             config_mod_prefix = self.data.helper.get_macro_module_prefix(config_name)
             if not module_name.startswith(config_mod_prefix):
                 module_name = config_mod_prefix + module_name
-        for config_name in sorted(configs):
+        for config_name in configs:
             config_data = self.data.config[config_name]
             for module in config_data.macros:
                 if module_name is not None and module.__name__ != module_name:
