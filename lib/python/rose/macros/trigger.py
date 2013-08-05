@@ -18,6 +18,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import copy
+
 import rose.macro
 import rose.macros.rule
 
@@ -27,6 +29,7 @@ class TriggerMacro(rose.macro.MacroBase):
     """Class to load and check trigger dependencies."""
 
     ERROR_BAD_EXPR = "Invalid trigger expression: {0}"
+    ERROR_BAD_STATE = "State should be {0}"
     ERROR_CYCLIC = 'Cyclic dependency detected: {0} to {1}'
     ERROR_DUPL_TRIG = "Badly defined trigger - {0} is 'duplicate'"
     ERROR_MISSING_METADATA = 'No metadata entry found'
@@ -226,6 +229,36 @@ class TriggerMacro(rose.macro.MacroBase):
             meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
+        enabled = rose.config.ConfigNode.STATE_NORMAL
+        trig_ignored = rose.config.ConfigNode.STATE_SYST_IGNORED
+        user_ignored = rose.config.ConfigNode.STATE_USER_IGNORED
+        state_map = {enabled: 'enabled     ',
+                     trig_ignored: 'trig-ignored',
+                     user_ignored: 'user-ignored'}
+        
+        invalid_trigger_reports = self.validate_dependencies(config,
+                                                             meta_config)
+        if invalid_trigger_reports:
+            return invalid_trigger_reports
+        macro_config = copy.deepcopy(config)
+        trig_config, reports = self.transform(macro_config, meta_config)
+        transform_reports = copy.deepcopy(reports)
+        del self.reports[:]
+        for report in transform_reports:
+            config_node = config.get([report.section, report.option])
+            trig_config_node = trig_config.get([report.section, report.option])
+            if report.option is None:
+                value = None
+            else:
+                value = trig_config_node.value
+            after_state_string = state_map[trig_config_node.state].strip()
+            info = self.ERROR_BAD_STATE.format(after_state_string)
+            self.add_report(report.section, report.option,
+                            value, info)
+        return self.reports
+
+    def validate_dependencies(self, config, meta_config):
+        """Validate the trigger setup - e.g. check for cyclic dependencies."""
         config_sections = config.value.keys()
         meta_settings = [k for k in meta_config.value.keys()
                          if not meta_config.value[k].is_ignored()]
