@@ -259,6 +259,15 @@ class TriggerMacro(rose.macro.MacroBase):
 
     def validate_dependencies(self, config, meta_config):
         """Validate the trigger setup - e.g. check for cyclic dependencies."""
+        self.reports = []
+        if (not isinstance(meta_config, rose.config.ConfigNode) and
+            meta_config is not None):
+            meta_config = rose.config.ConfigLoader().load_with_opts(
+                    meta_config)
+        elif meta_config is None:
+            meta_config = rose.config.ConfigNode()
+        if not hasattr(self, 'trigger_family_lookup'):
+            self._setup_triggers(meta_config)
         config_sections = config.value.keys()
         meta_settings = [k for k in meta_config.value.keys()
                          if not meta_config.value[k].is_ignored()]
