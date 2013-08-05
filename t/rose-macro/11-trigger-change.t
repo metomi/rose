@@ -874,8 +874,8 @@ b=.false.
 c=2
 
 [namelist:trigger_logical_expression]
-!!x=.false.
 trig_x_if_not_2=2
+!!x=.false.
 
 [!!namelist:triggered_ignored_namelist]
 !!ab_trig_var1=2
