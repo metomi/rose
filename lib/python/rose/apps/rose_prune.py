@@ -78,34 +78,37 @@ class RosePruneApp(BuiltinApp):
                     globs.append(head)
         hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
         suite_dir_rel = suite_engine_proc.get_suite_dir_rel(suite_name)
-        sh_cmd_args = {"d": suite_dir_rel, "g": " ".join(globs)}
-        sh_cmd = ((r"set -e; " +
-                   r"cd %(d)s; " +
-                   r"(ls -d %(g)s 2>/dev/null || true) | sort; " +
-                   r"rm -rf %(g)s") % sh_cmd_args)
-        for host in hosts:
-            cmd = app_runner.popen.get_cmd("ssh", host, sh_cmd)
+        form_dict = {"d": suite_dir_rel, "g": " ".join(globs)}
+        sh_cmd_head = r"set -e; cd %(d)s; " % form_dict
+        sh_cmd_tail = (r"ls -d %(g)s 2>/dev/null || true; rm -rf %(g)s" %
+                       form_dict)
+        cwd = os.getcwd()
+        for host in hosts + ["localhost"]:
+            d = None
             try:
-                out, err = app_runner.popen.run_ok(*cmd)
+                if host == "localhost":
+                    d = suite_engine_proc.get_suite_dir(suite_name)
+                    app_runner.fs_util.chdir(d)
+                    out, err = app_runner.popen.run_ok(sh_cmd_tail, shell=True)
+                else:
+                    cmd = app_runner.popen.get_cmd("ssh", host,
+                                                   sh_cmd_head + sh_cmd_tail)
+                    out, err = app_runner.popen.run_ok(*cmd)
             except RosePopenError as e:
                 app_runner.handle_event(e)
-                print e
             else:
-                event = FileSystemEvent(FileSystemEvent.CHDIR,
-                                        host + ":" + suite_dir_rel)
-                app_runner.handle_event(event)
-                for line in out.splitlines():
-                    event = FileSystemEvent(FileSystemEvent.DELETE,
-                                            host + ":" + line)
+                if d is None:
+                    event = FileSystemEvent(FileSystemEvent.CHDIR,
+                                            host + ":" + suite_dir_rel)
                     app_runner.handle_event(event)
-        cwd = os.getcwd()
-        app_runner.fs_util.chdir(suite_engine_proc.get_suite_dir(suite_name))
-        try:
-            for g in globs:
-                for name in sorted(glob(g)):
-                    app_runner.fs_util.delete(name)
-        finally:
-            app_runner.fs_util.chdir(cwd)
+                for line in sorted(out.splitlines()):
+                    if host != "localhost":
+                        line = host + ":" + line
+                    event = FileSystemEvent(FileSystemEvent.DELETE, line)
+                    app_runner.handle_event(event)
+            finally:
+                if d:
+                    app_runner.fs_util.chdir(cwd)
         return
 
     def _get_conf(self, config, key, arg_ok=False):
