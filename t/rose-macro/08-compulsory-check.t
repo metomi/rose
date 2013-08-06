@@ -134,7 +134,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+[V] rose.macros.DefaultValidators: issues: 7
     namelist:compulsory_nl1=my_var1=None
         Variable set as compulsory, but not in configuration.
     namelist:compulsory_nl2=None=None
@@ -147,6 +147,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         Variable set as compulsory, but not in configuration.
     namelist:compulsory_nl5=my_var5=true
         Compulsory settings should not be user-ignored.
+    namelist:compulsory_nl5=my_var5=true
+        State should be enabled
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------

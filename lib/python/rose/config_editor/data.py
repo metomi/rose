@@ -844,7 +844,8 @@ class ConfigDataManager(object):
                 continue
             config_for_macro.set(keylist, copy.deepcopy(node.value))
         meta_config = self.config[config_name].meta
-        bad_list = self.trigger[config_name].validate(config_for_macro,
+        bad_list = self.trigger[config_name].validate_dependencies(
+                                                      config_for_macro,
                                                       meta_config)
         if bad_list:
             self.trigger[config_name].trigger_family_lookup.clear()
