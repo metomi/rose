@@ -318,8 +318,8 @@ sort-key=do-not-like-00
         assumed to be a scalar. A positive integer defines a fixed length
         array. A colon <kbd>:</kbd> defines a dynamic length array.</p>
 
-        <p>N.B. You do not need to use <samp>length</samp> if you already
-        have <samp>type=python_list</samp> for a setting.</p>
+        <p>N.B. You do not need to use <samp>length</samp> if you already have
+        <samp>type=python_list</samp> for a setting.</p>
       </dd>
 
       <dt id="meta.conf.value.values">values</dt>
@@ -1172,6 +1172,13 @@ all(namelist:foo=bar == 'e')
     an ignored state mismatch for a setting - e.g. a setting might be enabled
     when it should be trigger-ignored.</p>
 
+    <p>The config editor differs from the strict command line macro equivalent
+    because the <dfn>Switch Off Metadata</dfn> mode and accidentally
+    metadata-less configurations need to be presented in a nice way without
+    lots of not-necessarily-errors. The config editor should only report the
+    errors where the state is definitely wrong or makes a material difference
+    to the user.</p>
+
     <p>The table contains error and fixing information for some varieties of
     ignored state mismatches. The actual situations are considerably more
     varied, given section-ignoring and latent variables - the table holds the
@@ -1240,10 +1247,7 @@ all(namelist:foo=bar == 'e')
 
         <td>None</td>
 
-        <td>config editor shows non-functional E option for implementation
-        reasons. <span class="user-ignored">I<sub>U</sub></span> is possible as
-        well, but creates a more confused state and presents an ignored option
-        for an already-ignored setting</td>
+        <td>&nbsp;</td>
       </tr>
 
       <tr>
@@ -1271,7 +1275,7 @@ all(namelist:foo=bar == 'e')
 
         <td>E</td>
 
-        <td class="caption">I<sub>U</sub> not given for above reasons.</td>
+        <td>&nbsp;</td>
       </tr>
 
       <tr>
@@ -1300,8 +1304,7 @@ all(namelist:foo=bar == 'e')
         <td>E</td>
 
         <td>overlooking mainly in order to de-clutter the <kbd>No
-        Metadata</kbd> view. <span class="user-ignored">I<sub>U</sub></span>
-        not given for above reasons.</td>
+        Metadata</kbd> view.</td>
       </tr>
 
       <tr>
@@ -1315,8 +1318,7 @@ all(namelist:foo=bar == 'e')
 
         <td>None</td>
 
-        <td>same basic state, won't mess with trigger too much. macro will ask
-        to fix this.</td>
+        <td>same basic state - macro will ask to fix this.</td>
       </tr>
 
       <tr class="odd">
@@ -1414,8 +1416,7 @@ all(namelist:foo=bar == 'e')
 
         <td class="trigger-ignored">I<sub>T</sub></td>
 
-        <td>adding the <span class="user-ignored">I<sub>U</sub></span> option
-        would be confusing.</td>
+        <td>&nbsp;</td>
       </tr>
 
       <tr>
