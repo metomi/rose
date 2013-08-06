@@ -17,6 +17,7 @@ blockquote b i {font-style: italic;}
 
 sup {font-size: smaller; line-height: 1px;}
 
+.slide {z-index: -1}
 .slide pre {font-size: 75%}
 .slide ul {margin-left: 5%; margin-right: 7%; list-style: disc;}
 .slide li {margin-top: 0.75em; margin-right: 0;}
