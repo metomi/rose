@@ -635,9 +635,9 @@ class MainController(object):
         else:
             n = self.notebook.get_current_page()
             self.notebook.insert_page(page, page.labelwidget, n)
+            self.notebook.set_current_page(n)
             if n != -1:
                 self.notebook.remove_page(n + 1)
-            self.notebook.set_current_page(n)
         self.notebook.set_tab_label_packing(page)
 
     def make_page(self, namespace_name):
