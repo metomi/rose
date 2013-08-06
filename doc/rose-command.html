@@ -90,8 +90,8 @@
 
       <dt><a href="#rose-host-select">rose host-select</a></dt>
 
-      <dd>Select a host from a set of groups or names by load, by free
-	memory or by random.</dd>
+      <dd>Select a host from a set of groups or names by load, by free memory
+      or by random.</dd>
 
       <dt><a href="#rose-macro">rose macro</a></dt>
 
@@ -297,7 +297,7 @@
       <dt><kbd>--opt-conf-key=KEY, -O KEY</kbd></dt>
 
       <dd>Each of these switches on an optional configuration identified by
-      <var>KEY</var>.</dd>
+      <var>KEY</var>. The configurations are applied first-to-last.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -314,7 +314,7 @@
       <dt><kbd>optional ROSE_APP_OPT_CONF_KEYS</kbd></dt>
 
       <dd>Each KEY in this space delimited list switches on an optional
-      configuration.</dd>
+      configuration. The configurations are applied first-to-last.</dd>
 
       <dt><kbd>optional ROSE_FILE_INSTALL_ROOT</kbd></dt>
 
@@ -564,8 +564,8 @@
     <h3>DESCRIPTION</h3>
 
     <p>Launch the GTK+ GUI to edit a suite or application configuration.</p>
-    
-    <p>If a suite contains more than 10 applications then they will only be 
+
+    <p>If a suite contains more than 10 applications then they will only be
     loaded after startup, on demand.</p>
 
     <h3>OPTIONS</h3>
@@ -589,11 +589,11 @@
       </dd>
 
       <dt><kbd>--load-all-apps</kbd></dt>
-      
+
       <dd>Force loading of all applications on startup.</dd>
 
       <dt><kbd>--load-no-apps</kbd></dt>
-      
+
       <dd>Load applications in the suite on demand.</dd>
 
       <dt><kbd>--meta-path=PATH; -M PATH</kbd></dt>
@@ -604,7 +604,7 @@
       <dt><kbd>--new</kbd></dt>
 
       <dd>Launch, ignoring any configuration.</dd>
-      
+
       <dt><kbd>--no-metadata</kbd></dt>
 
       <dd>Launch with metadata switched off.</dd>
@@ -769,7 +769,7 @@
             </ul>
           </li>
 
-	  <li>
+          <li>
             <var>mem</var> (by largest amount of free memory):
 
             <ul>
@@ -783,15 +783,15 @@
 
       <dt><kbd>--threshold=[METHOD[:METHOD-ARG]:]VALUE</kbd></dt>
 
-      <dd>Each of these option specifies a numeric value of a threshold of which
-      the hosts must either not exceed or must be greater than depending on the
-      specified method. Accepts the same <var>METHOD</var> and
+      <dd>Each of these option specifies a numeric value of a threshold of
+      which the hosts must either not exceed or must be greater than depending
+      on the specified method. Accepts the same <var>METHOD</var> and
       <var>METHOD-ARG</var> (and the same defaults) as the
       <kbd>--rank-method=METHOD[:METHOD-ARG]</kbd> option. (Obviously, the
-      <var>random</var> method does not make sense in this case.) 
-      <var>load</var> and <var>fs</var> must not exceed threshold while 
-      <var>mem</var> must be greater than threshold. A host not meeting 
-      a threshold condition will be excluded from the ranking list.</dd>
+      <var>random</var> method does not make sense in this case.)
+      <var>load</var> and <var>fs</var> must not exceed threshold while
+      <var>mem</var> must be greater than threshold. A host not meeting a
+      threshold condition will be excluded from the ranking list.</dd>
 
       <dt><kbd>--verbose, -v</kbd></dt>
 
@@ -1000,14 +1000,14 @@
       the MPI launcher command.</li>
     </ol>
 
-    <p>In all cases, the remaining arguments will be added to the command line of
-    the launcher program.</p>
+    <p>In all cases, the remaining arguments will be added to the command line
+    of the launcher program.</p>
 
     <h3>OPTIONS</h3>
 
     <dl>
       <dt><kbd>--command-file=FILE</kbd>, <kbd>-f FILE</kbd></dt>
-      
+
       <dd>Specify a command file for the MPI launcher.</dd>
 
       <dt><kbd>--debug</kbd></dt>
@@ -1034,8 +1034,8 @@
     <dl>
       <dt><kbd>launcher-list=LIST</kbd></dt>
 
-      <dd>Specify a list of launcher commands. E.g.:
-
+      <dd>
+        Specify a list of launcher commands. E.g.:
         <pre class="prettyprint lang-rose_conf">
 launcher-list=poe mpiexec
 </pre>
@@ -1043,25 +1043,26 @@ launcher-list=poe mpiexec
 
       <dt><kbd>launcher-fileopts.LAUNCHER=OPTION-TEMPLATE</kbd></dt>
 
-      <dd>Specify the options to a <var>LAUNCHER</var> for launching with a
-      command file.  The template string should contain
-      <var>$ROSE_COMMAND_FILE</var> (or <var>${ROSE_COMMAND_FILE}</var>), which
-      will be expanded to the path to the command file. E.g.:
-
+      <dd>
+        Specify the options to a <var>LAUNCHER</var> for launching with a
+        command file. The template string should contain
+        <var>$ROSE_COMMAND_FILE</var> (or <var>${ROSE_COMMAND_FILE}</var>),
+        which will be expanded to the path to the command file. E.g.:
         <pre class="prettyprint lang-rose_conf">
 launcher-fileopts.mpiexec=-f $ROSE_COMMAND_FILE
 launcher-fileopts.poe=-cmdfile $ROSE_COMMAND_FILE
 </pre>
       </dd>
 
-      <dt><kbd>launcher-preopts.LAUNCHER=OPTIONS</kbd><br/>
+      <dt><kbd>launcher-preopts.LAUNCHER=OPTIONS</kbd><br />
       <kbd>launcher-postopts.LAUNCHER=OPTIONS</kbd></dt>
 
-      <dd>Specify the options to a <var>LAUNCHER</var> for launching with a
-      command.  <var>preopts</var> are options placed after the launcher command
-      but before <var>COMMAND</var>. <var>postopts</var> are options placed
-      after <var>COMMAND</var> but before the remaining arguments. E.g.:
-
+      <dd>
+        Specify the options to a <var>LAUNCHER</var> for launching with a
+        command. <var>preopts</var> are options placed after the launcher
+        command but before <var>COMMAND</var>. <var>postopts</var> are options
+        placed after <var>COMMAND</var> but before the remaining arguments.
+        E.g.:
         <pre class="prettyprint lang-rose_conf">
 launcher-preopts.mpiexec=-n $NPROC
 </pre>
@@ -1402,6 +1403,7 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <li><kbd>rose suite-log --archive CYCLE ...</kbd></li>
     </ol>
+
     <p><kbd>rose suite-log</kbd></p>
 
     <h3>SYNOPSIS</h3>
@@ -1454,11 +1456,10 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dd>Specify a timeout. Normally, a lock is put in place to prevent other
       instances of <a href="#rose-suite-hook">rose suite-hook</a> or <kbd>rose
-      suite-log --update</kbd> from updating the suite log at the same time. The
-      command hangs as it attempts to grab the lock. This option specify a
+      suite-log --update</kbd> from updating the suite log at the same time.
+      The command hangs as it attempts to grab the lock. This option specify a
       timeout (in number of seconds) for the attempt.
       (default=<kbd>300.0</kbd>)</dd>
-
 
       <dt><kbd>--update</kbd>, <kbd>-u</kbd></dt>
 
@@ -1604,7 +1605,7 @@ launcher-preopts.mpiexec=-n $NPROC
       <dt><kbd>--opt-conf-key=KEY, -O KEY</kbd></dt>
 
       <dd>Each of these switches on an optional configuration identified by
-      <var>KEY</var>.</dd>
+      <var>KEY</var>. The configurations are applied first-to-last.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -1647,7 +1648,7 @@ launcher-preopts.mpiexec=-n $NPROC
       <dt><kbd>optional ROSE_SUITE_OPT_CONF_KEYS</kbd></dt>
 
       <dd>Each KEY in this space delimited list switches on an optional
-      configuration.</dd>
+      configuration. The configurations are applied first-to-last.</dd>
     </dl>
 
     <h3>JINJA2</h3>
@@ -1876,8 +1877,8 @@ launcher-preopts.mpiexec=-n $NPROC
       environment variable called <var>NAME</var> (or <var>PATH</var> if
       <var>NAME</var> is not specified). If a relative path is given, it is
       relative to <var>$ROSE_SUITE_DIR</var>. An empty value resets the default
-      and any previous <kbd>--path=PATTERN</kbd> settings.
-      (Default for <var>PATH</var> is <kbd>share/fcm[_-]make*/*/bin</kbd> and
+      and any previous <kbd>--path=PATTERN</kbd> settings. (Default for
+      <var>PATH</var> is <kbd>share/fcm[_-]make*/*/bin</kbd> and
       <kbd>work/fcm[_-]make*/*/bin</kbd>)</dd>
 
       <dt><kbd>--prefix-delim=DELIMITER</kbd></dt>
@@ -1999,7 +2000,8 @@ environment scripting = "eval $(rose task-env)"
     <p>Run the Rose test battery.</p>
 
     <p>Change to <var>$ROSE_HOME/t</var> and run the <code>prove</code>
-    command. If no argument is specified, run <code>prove -j 9 -r -s</code>.</p>
+    command. If no argument is specified, run <code>prove -j 9 -r
+    -s</code>.</p>
 
     <h3>SEE ALSO</h3>
 
@@ -2477,7 +2479,7 @@ abc01 from daisy
 
       <dt><kbd>--user=~USERNAME; -u ~USERNAME</kbd></dt>
 
-      <dd>Specify another user whose roses directory you want to list e.g. 
+      <dd>Specify another user whose roses directory you want to list e.g.
       <code>--user=~bob</code></dd>
 
       <dt><kbd>--verbose; -v</kbd></dt>

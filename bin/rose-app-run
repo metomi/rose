@@ -59,6 +59,7 @@
 #         Do not overwrite existing files.
 #     --opt-conf-key=KEY, -O KEY
 #         Each of these switches on an optional configuration identified by KEY.
+#         The configurations are applied first-to-last.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --verbose; -v
@@ -67,7 +68,7 @@
 # ENVIRONMENT VARIABLES
 #     optional ROSE_APP_OPT_CONF_KEYS
 #         Each KEY in this space delimited list switches on an optional
-#         configuration.
+#         configuration. The configurations are applied first-to-last.
 #     optional ROSE_FILE_INSTALL_ROOT
 #         If specified, change to the specified directory to install files.
 #-------------------------------------------------------------------------------

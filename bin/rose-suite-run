@@ -83,6 +83,7 @@
 #         Do not validate (suite engine configuration) in strict mode.
 #     --opt-conf-key=KEY, -O KEY
 #         Each of these switches on an optional configuration identified by KEY.
+#         The configurations are applied first-to-last.
 #     --quiet, -q
 #         Decrement verbosity.
 #     --reload
@@ -102,7 +103,7 @@
 #         The name of the host where the "rose suite-run" command was invoked.
 #     optional ROSE_SUITE_OPT_CONF_KEYS
 #         Each KEY in this space delimited list switches on an optional
-#         configuration.
+#         configuration. The configurations are applied first-to-last.
 #
 # JINJA2 VARIABLES
 #     "rose suite-run" provides the following Jinja2 variables to the suite.
