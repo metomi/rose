@@ -224,7 +224,8 @@ TOPPING=fudge
       <samp>rose-app-chocofudge.conf</samp> file at runtime.</p>
 
       <p>We can add as many <samp>--opt-conf-key</samp> options to <samp>rose
-      task-run</samp> as we like - not just the one.</p>
+      task-run</samp> as we like - not just the one. This would apply each
+      optional configuration in first-to-last order.</p>
 
       <p>Try running the suite - it should apply the optional configuration
       correctly.</p>
@@ -263,10 +264,10 @@ TOPPING=fudge
 opts=chocofudge
 </pre>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Default Optional Configurations (2)</h3>
-     
+
       <p>We now don't need to specify it at all for <code>rose task-run</code>
       - get rid of the environment variable in the <samp>suite.rc</samp> file,
       so that the <samp>order_icecream</samp> task runtime configuration looks
