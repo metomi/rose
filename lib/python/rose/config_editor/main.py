@@ -599,20 +599,20 @@ class MainController(object):
             if self.data.config[item].is_preview:
                 load_these.append(item)
         load_these.sort()
+        number_of_events = (len(load_these) *
+                            rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
+        self.reporter.report_load_event(
+                           "Loading all preview apps", 
+                           new_total_events=number_of_events)
         for namespace_name in load_these:
             config_data = self.data.config[namespace_name]
-            self.reporter.report_load_event(
-                           rose.config_editor.EVENT_LOAD_ATTEMPT.format(
-                           namespace_name), 
-                           new_total_events=3)
             self.data.load_config(config_data.directory, preview=False, 
                                   metadata_off=self.metadata_off)
             self.reporter.report_load_event(
                         rose.config_editor.EVENT_LOADED.format(namespace_name),
                         no_progress=True)
-            self.reporter.stop()
-            self.reload_namespace_tree()
-                
+        self.reload_namespace_tree()
+        self.reporter.stop()
         self.nav_panel.update_row_tooltips()
         if hasattr(self, 'menubar'):
             self.main_handle.load_macro_menu(self.menubar)
