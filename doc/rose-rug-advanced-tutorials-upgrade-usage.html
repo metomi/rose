@@ -134,11 +134,24 @@ rose app-upgrade
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Upgrading to non-named versions</h3>
+
+      <p>There can often be more versions than you can see by just running
+      <code>rose app-upgrade</code>. They will not have formal metadata, and
+      represent intermediary steps along the way between proper
+      <dfn>named</dfn> versions. You can see all the possible versions by
+      running:</p>
+      <pre class="shell">
+rose app-upgrade --all-versions
+</pre>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Upgrading with rose app-upgrade</h3>
 
       <p>You can upgrade directly to the latest (<samp>garden0.9</samp>) or to
-      intermediate versions - let's choose <samp>garden0.2</samp> to start
-      with. Run:</p>
+      other versions - let's choose <samp>garden0.2</samp> to start with.
+      Run:</p>
       <pre class="shell">
 rose app-upgrade garden0.2
 </pre>

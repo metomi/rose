@@ -136,9 +136,15 @@ class BaseStashSummaryDataPanelv1(
             cell_for_value.set_property("editable", True)
             cell_for_value.set_property("model", listmodel)
             cell_for_value.set_property("text-column", 0)
-            cell_for_value.connect("changed",
-                                   self._handle_cell_combo_change,
-                                   col_title)
+            try:
+                cell_for_value.connect("changed",
+                                       self._handle_cell_combo_change,
+                                       col_title)
+            except TypeError:
+                # PyGTK 2.14 - changed signal.
+                cell_for_value.connect("edited",
+                                       self._handle_cell_combo_change,
+                                       col_title)
             col.pack_start(cell_for_value, expand=True)
             col.set_cell_data_func(cell_for_value,
                                    self._set_tree_cell_value_combo)
@@ -502,10 +508,13 @@ class BaseStashSummaryDataPanelv1(
         id_ = self.util.get_id_from_section_option(section, option)
         self.search_function(id_)
 
-    def _handle_cell_combo_change(self, combo_cell, path_string, combo_iter,
+    def _handle_cell_combo_change(self, combo_cell, path_string, new,
                                   col_title):
         # Handle a gtk.CellRendererCombo (variable) value change.
-        new_value = combo_cell.get_property("model").get_value(combo_iter, 0)
+        if isinstance(new, basestring):
+            new_value = new
+        else:
+            new_value = combo_cell.get_property("model").get_value(new, 0)
         row_iter = self._view.get_model().get_iter(path_string)
         sect_index = self.get_section_column_index()
         section = self._view.get_model().get_value(row_iter, sect_index)

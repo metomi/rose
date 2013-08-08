@@ -81,12 +81,12 @@ class UpgradeGarden03(rose.upgrade.MacroUpgrade):
         return shrub_num
 
 
-class UpgradeGarden04(rose.upgrade.MacroUpgrade):
+class UpgradeGarden041(rose.upgrade.MacroUpgrade):
 
     """'...the two-level effect with a little path running down the middle'"""
 
     BEFORE_TAG = "garden0.4"
-    AFTER_TAG = "garden0.5"
+    AFTER_TAG = "garden0.4.1"
 
     def downgrade(self, config, meta_config=None):
         self.act_from_files(config, downgrade=True)
@@ -97,11 +97,11 @@ class UpgradeGarden04(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class UpgradeGarden05(rose.upgrade.MacroUpgrade):
+class UpgradeGarden09(rose.upgrade.MacroUpgrade):
 
     """'cut down the mightiest tree in the forest... with... a herring!'"""
     
-    BEFORE_TAG = "garden0.5"
+    BEFORE_TAG = "garden0.4.1"
     AFTER_TAG = "garden0.9"
     
     def downgrade(self, config, meta_config=None):

@@ -457,6 +457,8 @@ class MainController(object):
                       lambda m: self._refresh_metadata_if_on()),
                      ('/TopMenuBar/Metadata/Switch off metadata',
                       lambda m: self.refresh_metadata(m.get_active())),
+                     ('/TopMenuBar/Metadata/Upgrade',
+                      lambda m: self.main_handle.handle_upgrade()),
                      ('/TopMenuBar/Tools/Run Suite/Run Suite default',
                       self.main_handle.run_suite),
                      ('/TopMenuBar/Tools/Run Suite/Run Suite custom',
