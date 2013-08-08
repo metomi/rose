@@ -135,7 +135,7 @@ meta=test-app-upgrade/0.1
 A=4
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade 0.1 0.2 0.3
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -171,7 +171,7 @@ meta=test-app-upgrade/0.1
 A=4
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade 0.1 0.2 0.3
 init_macro test-app-upgrade << '__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -207,7 +207,7 @@ meta=test-app-upgrade/0.3
 A=4
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade 0.1 0.2 0.3
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -243,7 +243,7 @@ meta=test-app-upgrade/0.3
 A=4
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade 0.1 0.2 0.3
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -256,6 +256,55 @@ run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 0.1: invalid version.
+__ERROR__
+teardown
+exit
+#-------------------------------------------------------------------------------
+# Check upgrading to a bad version (v).
+TEST_KEY=$TEST_KEY_BASE-upgrade-bad-version-v
+init <<'__CONFIG__'
+meta=test-app-upgrade/0.1
+
+[env]
+A=4
+__CONFIG__
+setup
+# No named metadata version for 0.3.
+init_meta test-app-upgrade 0.1 0.2
+init_macro test-app-upgrade <<'__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+import rose.upgrade
+
+
+class Upgrade01to02(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 0.1 to 0.2."""
+
+    BEFORE_TAG = "0.1"
+    AFTER_TAG = "0.2"
+
+    def upgrade(self, config, meta_config=None):
+        return config, self.reports
+
+
+class Upgrade02to03(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from 0.2 to 0.3."""
+
+    BEFORE_TAG = "0.2"
+    AFTER_TAG = "0.3"
+
+    def upgrade(self, config, meta_config=None):
+        return config, self.reports
+__MACRO__
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config 0.3
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+0.3: invalid version.
 __ERROR__
 teardown
 exit
