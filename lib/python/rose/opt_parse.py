@@ -42,7 +42,7 @@ class RoseOptionParser(OptionParser):
                         "default": False,
                         "help": "Return all revisions of matched items."}],
                "all_versions": [
-                       ["--all_versions", "-a"],
+                       ["--all-versions", "-a"],
                        {"action": "store_true",
                         "default": False,
                         "help": "Use all tagged versions."}],

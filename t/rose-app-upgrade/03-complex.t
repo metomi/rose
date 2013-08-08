@@ -123,7 +123,7 @@ change_opt_if_true=.true.
 !change_opt_if_true=.true.
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade apple fig
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -508,7 +508,7 @@ change_opt_if_true=.true.
 !change_opt_if_true=.true.
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade apple fig
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
