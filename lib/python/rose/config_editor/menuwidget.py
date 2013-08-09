@@ -161,7 +161,7 @@ class MenuWidget(gtk.HBox):
         # FIXME: Try to popup the menu at the button, instead of the cursor.
         self.button.connect(
                 "activate",
-                lambda b: _popup_option_menu(
+                lambda b: self._popup_option_menu(
                               self.option_ui,
                               self.actions,
                               1,

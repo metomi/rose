@@ -693,7 +693,7 @@ class MainMenuHandler(object):
 
     def _handle_bad_macro_return(self, macro_fullname, return_value):
         rose.gtk.dialog.run_dialog(
-                 rose.gtk.dialog.DIALOG_KIND_ERROR,
+                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                  rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
                                                     return_value),
                  rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
@@ -870,11 +870,6 @@ class MainMenuHandler(object):
                                 name, macro)
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
-
-    def handle_run_scheduler(self, *args):
-        """Run the scheduler for this suite."""
-        this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
-        return rose.suite_control.SuiteControl().gcontrol(this_id)
     
     def help(self, *args):
         # Handle a GUI help request.
