@@ -107,7 +107,7 @@ ERROR_HISTORY_LOAD = "An error occurred when trying to load your search history.
 ERROR_HISTORY_WRITE = "Unable to save your search history."
 ERROR_INVALID_QUERY = "Invalid query syntax: {0}"
 ERROR_MODIFIED_LOCAL_COPY_DELETE = "Error: Local copy has uncommitted changes"
-EROOR_NO_NEXT_SEARCH = "No next search"
+ERROR_NO_NEXT_SEARCH = "No next search"
 ERROR_NO_PREVIOUS_SEARCH = "No previous search"
 ERROR_PERMISSIONS = ("Error: You do not have the required permissions to " + 
                      "delete this suite")

@@ -801,7 +801,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
         opts, args = opt_parser.parse_args(argv)
     opts, args = opt_parser.parse_args(argv)
     if mode == "upgrade" and len(args) > 1:
-        sys.stderr.write(parser.get_usage())
+        sys.stderr.write(opt_parser.get_usage())
         return None
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
