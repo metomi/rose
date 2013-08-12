@@ -791,7 +791,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
     if mode == "macro":
         options.extend(["fix", "validate_all"])
     elif mode == "upgrade":
-        options.extend(["downgrade"])
+        options.extend(["downgrade", "all_versions"])
     else:
         raise KeyError("Wrong mode: {0}".format(mode))
     opt_parser.add_my_options(*options)

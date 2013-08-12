@@ -16,6 +16,8 @@
 #         "*" indicates the default version to change to.
 #
 # OPTION
+#     --all-versions; -a;
+#         Use all tagged versions.
 #     --config=DIR; -C DIR
 #         Use configuration in DIR instead of $PWD.
 #     --downgrade; -d;

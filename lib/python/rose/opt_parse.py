@@ -41,6 +41,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Return all revisions of matched items."}],
+               "all_versions": [
+                       ["--all-versions", "-a"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Use all tagged versions."}],
                "app_key": [
                        ["--app-key"],
                        {"action": "store",
