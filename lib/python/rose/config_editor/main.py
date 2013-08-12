@@ -609,8 +609,8 @@ class MainController(object):
             self.data.load_config(config_data.directory, preview=False, 
                                   metadata_off=self.metadata_off)
             self.reporter.report_load_event(
-                        rose.config_editor.EVENT_LOADED.format(namespace_name),
-                        no_progress=True)
+                    rose.config_editor.EVENT_LOADED.format(namespace_name[1:]),
+                    no_progress=True)
         self.reload_namespace_tree()
         self.reporter.stop()
         self.nav_panel.update_row_tooltips()
