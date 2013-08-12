@@ -304,6 +304,8 @@ class MainController(object):
                                                self.data.top_level_name))
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
+            
+        self.update_bar_widgets()
 
 #------------------ Setting up main component functions ----------------------
 
@@ -313,6 +315,7 @@ class MainController(object):
                 widgets=[
                    (rose.config_editor.TOOLBAR_OPEN, 'gtk.STOCK_OPEN'),
                    (rose.config_editor.TOOLBAR_SAVE, 'gtk.STOCK_SAVE'),
+                   (rose.config_editor.TOOLBAR_LOAD_APPS, 'gtk.STOCK_CDROM'),
                    (rose.config_editor.TOOLBAR_BROWSE, 'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_UNDO, 'gtk.STOCK_UNDO'),
                    (rose.config_editor.TOOLBAR_REDO, 'gtk.STOCK_REDO'),
@@ -338,6 +341,7 @@ class MainController(object):
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
+        assign(rose.config_editor.TOOLBAR_LOAD_APPS, self.handle_load_all)
         assign(rose.config_editor.TOOLBAR_BROWSE,
                self.main_handle.launch_browser)
         assign(rose.config_editor.TOOLBAR_UNDO, self.perform_undo)
@@ -382,6 +386,8 @@ class MainController(object):
         self.menu_widgets = {}
         menu_list = [('/TopMenuBar/File/Open...', self.load_from_file),
                      ('/TopMenuBar/File/Save', lambda m: self.save_to_file()),
+                     ('/TopMenuBar/File/Load All Apps',
+                      lambda m: self.handle_load_all()),
                      ('/TopMenuBar/File/Quit', self.main_handle.destroy),
                      ('/TopMenuBar/Edit/Undo', 
                       lambda m: self.perform_undo()),
@@ -592,6 +598,31 @@ class MainController(object):
 
 #------------------ Page manipulation functions ------------------------------
 
+    def handle_load_all(self, *args):
+        load_these = []
+        for item in self.data.config.keys():
+            if self.data.config[item].is_preview:
+                load_these.append(item)
+        load_these.sort()
+        number_of_events = (len(load_these) *
+                            rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
+        self.reporter.report_load_event(
+                           "Loading all preview apps", 
+                           new_total_events=number_of_events)
+        for namespace_name in load_these:
+            config_data = self.data.config[namespace_name]
+            self.data.load_config(config_data.directory, preview=False, 
+                                  metadata_off=self.metadata_off)
+            self.reporter.report_load_event(
+                    rose.config_editor.EVENT_LOADED.format(namespace_name[1:]),
+                    no_progress=True)
+        self.reload_namespace_tree()
+        self.reporter.stop()
+        self.nav_panel.update_row_tooltips()
+        if hasattr(self, 'menubar'):
+            self.main_handle.load_macro_menu(self.menubar)
+        self.update_bar_widgets()
+        return
 
     def handle_launch_request(self, namespace_name, as_new=False):
         """Handle a request to create a page.
@@ -613,7 +644,8 @@ class MainController(object):
                        rose.config_editor.EVENT_LOAD_ATTEMPT.format(
                        namespace_name), 
                        new_total_events=3)
-            self.data.load_config(config_data.directory, preview=False, metadata_off=self.metadata_off)
+            self.data.load_config(config_data.directory, preview=False, 
+                                  metadata_off=self.metadata_off)
             self.reload_namespace_tree()
             self.nav_panel.update_row_tooltips()
             self.reporter.report_load_event(
@@ -622,6 +654,7 @@ class MainController(object):
             self.reporter.stop()
             if hasattr(self, 'menubar'):
                 self.main_handle.load_macro_menu(self.menubar)
+            self.update_bar_widgets()
         
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)
@@ -1229,6 +1262,13 @@ class MainController(object):
                 return self.menu_widgets[address]
         return None
 
+    def _has_preview_apps(self):
+        for item in self.data.config.keys():
+            if self.data.config[item].is_preview:
+                return True
+        else:
+            return False
+
     def update_bar_widgets(self):
         """Update bar functionality like Undo and Redo."""
         if not hasattr(self, 'toolbar'):
@@ -1241,6 +1281,10 @@ class MainController(object):
         self._get_menu_widget('/Redo').set_sensitive(len(self.redo_stack) > 0)
         self._get_menu_widget('/Find Next').set_sensitive(
                                             len(self.find_hist['ids']) > 0)
+        self._get_menu_widget('/Load All Apps').set_sensitive(
+                                                    self._has_preview_apps())
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_LOAD_APPS,
+                                          self._has_preview_apps())
         if not hasattr(self, "nav_panel"):
             return False
         changes, errors = self.nav_panel.get_change_error_totals()
