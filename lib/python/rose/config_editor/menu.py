@@ -29,6 +29,7 @@ import gtk
 
 import rose.config
 import rose.config_editor
+import rose.config_editor.upgrade_controller
 import rose.external
 import rose.gtk.dialog
 import rose.gtk.run
@@ -91,6 +92,8 @@ class MenuBar(object):
           <menuitem action="View without help"/>
           <menuitem action="View without titles"/>
         </menu>
+        <separator name="sep_upgrade"/>
+        <menuitem action="Upgrade"/>
         <separator name="sep_checking"/>
         <menuitem action="Extra checks"/>
         <separator name="sep macro"/>
@@ -176,6 +179,8 @@ class MenuBar(object):
                        rose.config_editor.ACCEL_METADATA_REFRESH),
                       ('Prefs', gtk.STOCK_PREFERENCES,
                        rose.config_editor.TOP_MENU_METADATA_PREFERENCES),
+                      ('Upgrade', gtk.STOCK_GO_UP,
+                       rose.config_editor.TOP_MENU_METADATA_UPGRADE),
                       ('All V', gtk.STOCK_DIALOG_QUESTION,
                        rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
                       ('Autofix', gtk.STOCK_CONVERT,
@@ -696,7 +701,7 @@ class MainMenuHandler(object):
 
     def _handle_bad_macro_return(self, macro_fullname, return_value):
         rose.gtk.dialog.run_dialog(
-                 rose.gtk.dialog.DIALOG_KIND_ERROR,
+                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                  rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
                                                     return_value),
                  rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
@@ -874,11 +879,20 @@ class MainMenuHandler(object):
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
 
-    def handle_run_scheduler(self, *args):
-        """Run the scheduler for this suite."""
-        this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
-        return rose.suite_control.SuiteControl().gcontrol(this_id)
-    
+    def handle_upgrade(self, only_this_config_name=None):
+        """Run the upgrade manager for this suite."""
+        config_dict = {}
+        for config_name in self.data.config.keys():
+            config_data = self.data.config[config_name]
+            if config_data.is_preview:
+                continue
+            if (only_this_config_name is None or
+                config_name == only_this_config_name):
+                config_dict[config_name] = config_data.config
+        rose.config_editor.upgrade_controller.UpgradeController(
+                           config_dict, self.handle_macro_transforms,
+                           parent_window=self.mainwindow.window)
+
     def help(self, *args):
         # Handle a GUI help request.
         self.mainwindow.launch_help_dialog()

@@ -96,7 +96,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self.name_iter_map = {}
         self.add(self.tree)
         self.load_tree(None, namespace_tree)
-        self.tree.connect('button_press_event',
+        self.tree.connect('button-press-event',
                           self.handle_activation)
         self._last_tree_activation_path = None
         self.tree.connect('row_activated',
@@ -356,13 +356,16 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             path = self.filter_model.convert_child_path_to_path(path)
         except TypeError:
             path = None
-        if path is not None:
+        if path is None:
+            dest_path = (0,)
+        else:
             i = 1
             while self.tree.row_expanded(path[:i]) and i <= len(path):
                 i += 1
-            self.tree.set_cursor(path[:i])
-        if path is None:
-            self.tree.set_cursor((0,))
+            dest_path = path[:i]
+        cursor_path, cursor_column = self.tree.get_cursor()
+        if cursor_path != dest_path:
+            self.tree.set_cursor(dest_path)
 
     def get_path_from_names(self, row_names, unfiltered=False):
         """Return a row path corresponding to the list of branch names."""

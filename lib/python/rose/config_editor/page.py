@@ -632,7 +632,7 @@ class ConfigPage(gtk.VBox):
     def generate_main_container(self, override_custom=False):
         """Choose a container to interface with variables in panel_data."""
         if self.custom_widget is not None and not override_custom:
-            widget_name_args = self.custom_sub_widget.split(None, 1)
+            widget_name_args = self.custom_widget.split(None, 1)
             if len(widget_name_args) > 1:
                 widget_path, widget_args = widget_name_args
             else:
@@ -648,11 +648,11 @@ class ConfigPage(gtk.VBox):
                                                        widget_path)
                 self.handle_bad_custom_main_widget(text)
             try:
-                self.main_container = self.custom_widget(self.panel_data,
-                                                         self.ghost_data,
-                                                         self.variable_ops,
-                                                         self.show_modes,
-                                                         arg_str=widget_args)
+                self.main_container = custom_widget(self.panel_data,
+                                                    self.ghost_data,
+                                                    self.variable_ops,
+                                                    self.show_modes,
+                                                    arg_str=widget_args)
             except Exception as e:
                 self.handle_bad_custom_main_widget(e)
             else:

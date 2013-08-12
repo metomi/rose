@@ -80,7 +80,8 @@ class GroupOperations(object):
             metadata = self.data.helper.get_metadata_for_config_id(
                                             var_id, config_name)
             metadata['full_ns'] = namespace
-            flags = self.data.load_option_flags(config_name, section, option)
+            flags = self.data.load_option_flags(config_name,
+                                                new_section_name, opt_name)
             ignored_reason = {}  # This may not be safe.
             var = rose.variable.Variable(opt_name, value,
                                          metadata, ignored_reason,

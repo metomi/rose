@@ -141,7 +141,7 @@ class MacroUpgrade(rose.macro.MacroBase):
         node = config.get([section, option])
         if node is None:
             if forced:
-                return self.add_setting(config, keys, value, state,
+                return self.add_setting(config, keys, value, node.state,
                                         comments, info)
             return False
         if node.value == value:
@@ -233,6 +233,7 @@ class MacroUpgradeManager(object):
         self.app_config = app_config
         self.downgrade = downgrade
         self.new_version = None
+        self.named_tags = []
         opt_node = app_config.get([rose.CONFIG_SECT_TOP,
                                    rose.CONFIG_OPT_META_TYPE], no_ignore=True)
         tag_items = opt_node.value.split("/")
@@ -249,6 +250,11 @@ class MacroUpgradeManager(object):
                                                        is_upgrade=True)
         if meta_path is None:
             raise OSError(rose.macro.ERROR_LOAD_CONF_META_NODE)
+        self.named_tags = []
+        for node in os.listdir(meta_path):
+            node_meta = os.path.join(meta_path, node, rose.META_CONFIG_NAME)
+            if os.path.exists(node_meta):
+                self.named_tags.append(node)
         sys.path.append(os.path.abspath(meta_path))
         try:
             self.version_module = __import__(MACRO_UPGRADE_MODULE)
@@ -274,15 +280,18 @@ class MacroUpgradeManager(object):
                         version_macros.append(macro_inst)
         self._load_version_macros(version_macros)
 
-    def get_tags(self):
+    def get_tags(self, only_named=False):
         """Return relevant tags, reversed order for downgrades."""
+        tags = [m.AFTER_TAG for m in self.version_macros]
         if self.downgrade:
-            return [m.BEFORE_TAG for m in self.version_macros]
-        return [m.AFTER_TAG for m in self.version_macros]
+            tags = [m.BEFORE_TAG for m in self.version_macros]
+        if only_named:
+            return [t for t in tags if t in self.named_tags]
+        return tags
         
-    def get_new_tag(self):
+    def get_new_tag(self, only_named=False):
         """Obtain the default upgrade version."""
-        tags = self.get_tags()
+        tags = self.get_tags(only_named=only_named)
         if not tags:
             return None
         return tags[-1]
@@ -414,7 +423,7 @@ def main():
         upgrade_manager = MacroUpgradeManager(app_config, opts.downgrade)
     except OSError as e:
         sys.exit(e)
-    ok_versions = upgrade_manager.get_tags()
+    ok_versions = upgrade_manager.get_tags(only_named=not opts.all_versions)
     if args:
         user_choice = args[0]
     else:

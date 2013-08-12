@@ -791,7 +791,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
     if mode == "macro":
         options.extend(["fix", "validate_all"])
     elif mode == "upgrade":
-        options.extend(["downgrade"])
+        options.extend(["downgrade", "all_versions"])
     else:
         raise KeyError("Wrong mode: {0}".format(mode))
     opt_parser.add_my_options(*options)
@@ -801,7 +801,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
         opts, args = opt_parser.parse_args(argv)
     opts, args = opt_parser.parse_args(argv)
     if mode == "upgrade" and len(args) > 1:
-        sys.stderr.write(parser.get_usage())
+        sys.stderr.write(opt_parser.get_usage())
         return None
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()

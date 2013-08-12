@@ -30,18 +30,9 @@ import rose.gtk.util
 import rose.variable
 
 
-class MixedArrayValueWidget(gtk.HBox):
+class RowArrayValueWidget(gtk.HBox):
 
-    """This is a class to represent a derived type variable as a table.
-    
-    The type (variable.metadata['type']) should be a list, e.g.
-    ['integer', 'real']. There can optionally be a length
-    (variable.metadata['length'] for derived type arrays.
-    
-    This will create a table containing different types (horizontally)
-    and different array elements (vertically).
-    
-    """
+    """This is a class to represent a value as part of a row."""
 
     BAD_COLOUR = gtk.gdk.color_parse(
                         rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
@@ -52,8 +43,8 @@ class MixedArrayValueWidget(gtk.HBox):
     MIN_WIDTH_CHARS = 7
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(MixedArrayValueWidget, self).__init__(homogeneous=False,
-                                                    spacing=0)
+        super(RowArrayValueWidget, self).__init__(homogeneous=False,
+                                                  spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -64,14 +55,22 @@ class MixedArrayValueWidget(gtk.HBox):
         self.element_values = []
         self.rows = []
         self.widgets = []
-        self.unlimited = (metadata.get(rose.META_PROP_LENGTH) == ':')
+        self.has_length_error = False
+        self.length = metadata.get(rose.META_PROP_LENGTH)
+        self.type = metadata.get(rose.META_PROP_TYPE, "raw")
+        self.num_cols = len(self.value_array)
+        if arg_str is None:
+            if isinstance(self.type, list):
+                self.num_cols = len(self.type)
+            elif self.length is not None and self.length.isdigit():
+                self.num_cols = int(self.length)
+        else:
+            self.num_cols = int(arg_str)
+        self.unlimited = (self.length == ':')
         if self.unlimited:
             self.array_length = 1
         else:
             self.array_length = metadata.get(rose.META_PROP_LENGTH, 1)
-        self.num_cols = len(metadata[rose.META_PROP_TYPE])
-        self.types_row = [t for t in
-                          metadata[rose.META_PROP_TYPE]]
         log_imgs = [(gtk.STOCK_MEDIA_STOP, gtk.ICON_SIZE_MENU),
                     (gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU),
                     (gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_MENU)]
@@ -79,30 +78,35 @@ class MixedArrayValueWidget(gtk.HBox):
         self.set_num_rows()
         self.entry_table = gtk.Table(rows=self.num_rows,
                                      columns=self.num_cols,
-                                     homogeneous=False)
+                                     homogeneous=True)
         self.entry_table.connect('focus-in-event',
                                  self.hook.trigger_scroll)
         self.entry_table.show()
-        r = 0
         for r in range(self.num_rows):
             self.insert_row(r)
         self.normalise_width_widgets()
-        self.generate_buttons()
+        self.generate_buttons(is_for_elements=not isinstance(self.type, list))
         self.pack_start(self.add_del_button_box, expand=False, fill=False)
         self.pack_start(self.entry_table, expand=True, fill=True)
         self.show()
 
     def set_num_rows(self):
         """Derive the number of columns and rows."""
+        if not isinstance(self.type, list):
+            self.num_rows = 1
+            self.max_rows = 1
+            self.unlimited = False
+            return
+        columns = len(self.type)
         if self.CHECK_NAME_IS_ELEMENT(self.metadata['id']):
             self.unlimited = False
         if self.unlimited:
-            self.num_rows, rem = divmod(len(self.value_array), self.num_cols)
+            self.num_rows, rem = divmod(len(self.value_array), columns)
             self.num_rows += [1, 0][rem == 0]
             self.max_rows = sys.maxint
         else:
             self.num_rows = int(self.array_length)
-            num, rem = divmod(len(self.value_array), self.num_cols)
+            num, rem = divmod(len(self.value_array), columns)
             if self.num_rows == 0:
                self.num_rows = 1
             self.max_rows = self.num_rows
@@ -112,18 +116,44 @@ class MixedArrayValueWidget(gtk.HBox):
             self.num_rows = 1
             self.max_rows = 1
             self.unlimited = False
-            self.types_row = ['_error_']
+            self.has_length_error = True
             self.value_array = [self.value]
         if self.num_rows == 0:
             self.num_rows = 1
         if self.max_rows == 0:
             self.max_rows = 1
-   
+
+    def get_type(self, index):
+        """Get the metadata type for this value index."""
+        return self.get_types()[index]
+
+    def get_types(self):
+        """Get a list of metadata types for the value."""
+        if isinstance(self.type, list):
+            return self.type
+        return [self.type] * self.num_cols
+
     def grab_focus(self):
         if self.entry_table.focus_child is None:
             self.hook.get_focus(self.rows[-1][-1])
         else:
             self.hook.get_focus(self.entry_table.focus_child)
+
+    def add_element(self, *args):
+        """Create a new element (non-derived types)."""
+        new_index = len(self.value_array)
+        w_value = rose.variable.get_value_from_metadata(
+                               {rose.META_PROP_TYPE: self.type})
+        self.value_array = self.value_array + [w_value]
+        self.value = rose.variable.array_join(self.value_array)
+        self.last_value = self.value
+        self.set_value(self.value)
+        for child in self.entry_table.get_children():
+            self.entry_table.remove(child)
+        for r in range(self.num_rows):
+            self.insert_row(r)
+        self.normalise_width_widgets()
+        self._decide_show_buttons()
 
     def add_row(self, *args):
         """Create a new row of widgets."""
@@ -145,6 +175,9 @@ class MixedArrayValueWidget(gtk.HBox):
         text = ''
         for r, widget_list in enumerate(self.rows):
             for i, widget in enumerate(widget_list):
+                value_index = r * self.num_cols + i
+                if value_index > len(self.value_array) - 1:
+                    return len(text)
                 val = self.value_array[r * self.num_cols + i]
                 prefix_text = get_next_delimiter(self.last_value[len(text):],
                                                  val)
@@ -157,7 +190,7 @@ class MixedArrayValueWidget(gtk.HBox):
                             if not hasattr(child, "get_position"):
                                 continue
                             position = child.get_position()
-                            if self.types_row[i] in ["character", "quoted"]:
+                            if self.get_type(i) in ["character", "quoted"]:
                                 position += 1
                             return len(text + prefix_text) + position
                     return len(text + prefix_text) + len(val)
@@ -173,8 +206,7 @@ class MixedArrayValueWidget(gtk.HBox):
         widgets = []
         for widget_list in self.rows:
             widgets.extend(widget_list)
-        types = self.types_row * len(self.rows)
-        if len(types) == 1:  # Special invalid length widget
+        if self.has_error:  # Special invalid length widget
             widgets[0].grab_focus()
             if hasattr(widgets[0], "set_focus_index"):
                 widgets[0].set_focus_index(focus_index)
@@ -191,46 +223,86 @@ class MixedArrayValueWidget(gtk.HBox):
                     return
             text += prefix + val
 
+    def del_element(self, *args):
+        """Create a new element (non-derived types)."""
+        self.value_array.pop()
+        self.value = rose.variable.array_join(self.value_array)
+        self.last_value = self.value
+        self.set_value(self.value)
+        for child in self.entry_table.get_children():
+            self.entry_table.remove(child)
+        for r in range(self.num_rows):
+            self.insert_row(r)
+        self.normalise_width_widgets()
+        self._decide_show_buttons()
+
     def del_row(self, *args):
         """Delete the last row of widgets."""
         r = self.entry_table.child_get_property(self.rows[-1][-1],
                                                 'top-attach')
-        for i in range(len(self.types_row)):
+        for i in range(len(self.get_types())):
             entry = self.rows[-1][-1]
             self.rows[-1].pop(-1)
             self.entry_table.remove(entry)
         self.rows.pop(-1)
         self.entry_table.resize(r, self.num_cols)
-        chop_index = len(self.value_array) - self.num_cols
+        
+        chop_index = len(self.value_array) - len(self.get_types())
         self.value_array = self.value_array[:chop_index]
         self.value = rose.variable.array_join(self.value_array)
         self.set_value(self.value)
         self.set_num_rows()
+        self.normalise_width_widgets()
         self._decide_show_buttons()
         return False
 
     def _decide_show_buttons(self):
         # Show or hide the add row and delete row buttons.
-        if len(self.rows) >= self.max_rows and not self.unlimited:
-            self.add_button.hide()
-            self.del_button.show()
+        if isinstance(self.type, list):
+            if len(self.rows) >= self.max_rows and not self.unlimited:
+                self.add_button.hide()
+                self.del_button.show()
+            else:
+                self.add_button.show()
+                self.del_button.show()
+            if len(self.rows) == 1:
+                self.del_button.hide()
+            else:
+                self.add_button.show()
         else:
-            self.add_button.show()
-            self.del_button.show()
-        if len(self.rows) == 1:
-            self.del_button.hide()
-        else:
-            self.add_button.show()
+            if (self.length is not None and self.length.isdigit() and
+                len(self.value_array) >= int(self.length)):
+                self.add_button.hide()
+                self.del_button.show()
+            else:
+                self.add_button.show()
+                self.del_button.show()
+            if len(self.value_array) == 1:
+                self.del_button.hide()
 
     def insert_row(self, row_index):
         """Create a row of widgets from type_list."""
         widget_list = []
         new_values = []
-        for c, el_piece_type in enumerate(self.types_row):
+        for c, el_piece_type in enumerate(self.get_types()):
             unwrapped_index = row_index * self.num_cols + c
             value_index = unwrapped_index
+            if (not isinstance(self.type, list) and
+                value_index >= len(self.value_array)):
+                widget = gtk.HBox()
+                eb0 = gtk.EventBox()
+                eb0.show()
+                widget.pack_start(eb0, expand=True, fill=True)
+                widget.show()
+                self.entry_table.attach(widget,
+                                        c, c + 1,
+                                        row_index, row_index + 1,
+                                        xoptions=gtk.EXPAND|gtk.FILL,
+                                        yoptions=gtk.SHRINK)
+                widget_list.append(widget)
+                continue
             while value_index > len(self.value_array) - 1:
-                value_index -= len(self.types_row)
+                value_index -= len(self.get_types())
             if value_index < 0:
                 w_value = rose.variable.get_value_from_metadata(
                                {rose.META_PROP_TYPE: el_piece_type})
@@ -259,7 +331,7 @@ class MixedArrayValueWidget(gtk.HBox):
             self.entry_table.attach(widget,
                                     c, c + 1,
                                     row_index, row_index + 1,
-                                    xoptions=gtk.SHRINK,
+                                    xoptions=gtk.EXPAND|gtk.FILL,
                                     yoptions=gtk.SHRINK)
             widget_list.append(widget)
         self.rows.append(widget_list)
@@ -278,6 +350,8 @@ class MixedArrayValueWidget(gtk.HBox):
         max_width = {}
         # Get max width
         for widgets in self.rows:
+            if element >= len(widgets):
+                continue
             e_widget = widgets[element]
             i = 0
             child_list = e_widget.get_children()
@@ -298,6 +372,8 @@ class MixedArrayValueWidget(gtk.HBox):
                 max_width[key] = self.MIN_WIDTH_CHARS
         # Set max width
         for widgets in self.rows:
+            if element >= len(widgets):
+                continue
             e_widget = widgets[element]
             i = 0
             child_list = e_widget.get_children()
@@ -312,16 +388,20 @@ class MixedArrayValueWidget(gtk.HBox):
                     child_list.append(child.get_child())
                 i += 1
 
-    def generate_buttons(self):
+    def generate_buttons(self, is_for_elements=False):
         """Insert an add row and delete row button."""
         del_image = gtk.image_new_from_stock(gtk.STOCK_REMOVE,
                                              gtk.ICON_SIZE_MENU)
         del_image.show()
         self.del_button = gtk.EventBox()
-        self.del_button.set_tooltip_text(self.TIP_ADD)
+        self.del_button.set_tooltip_text(self.TIP_DELETE)
         self.del_button.add(del_image)
         self.del_button.show()
-        self.del_button.connect('button-release-event', self.del_row)
+        if is_for_elements:
+            delete_func = self.del_element
+        else:
+            delete_func = self.del_row
+        self.del_button.connect('button-release-event', delete_func)
         self.del_button.connect('enter-notify-event',
                                 lambda b, e: b.set_state(gtk.STATE_ACTIVE))
         self.del_button.connect('leave-notify-event',
@@ -332,7 +412,11 @@ class MixedArrayValueWidget(gtk.HBox):
         self.add_button.set_tooltip_text(self.TIP_ADD)
         self.add_button.add(add_image)
         self.add_button.show()
-        self.add_button.connect('button-release-event', self.add_row)
+        if is_for_elements:
+            add_func = self.add_element
+        else:
+            add_func = self.add_row
+        self.add_button.connect('button-release-event', add_func)
         self.add_button.connect('enter-notify-event',
                                 lambda b, e: b.set_state(gtk.STATE_ACTIVE))
         self.add_button.connect('leave-notify-event',
