@@ -684,7 +684,7 @@ macro=fib.Fibonacci.validate
         specified after the widget name. E.g. to set up a hypothetical table
         with named columns X, Y, VCT, and Level, we may do:</p>
         <pre class="prettyprint lang-rose_conf">
-widget[rose-config-edit]=table X Y VCT Level
+widget[rose-config-edit]=table.TableWidget X Y VCT Level
 </pre>
 
         <p>You may override to a Rose built-in widget by specifying a full
@@ -692,7 +692,34 @@ widget[rose-config-edit]=table X Y VCT Level
         radiobuttons for an option with <a href=
         "#meta.conf.value.values"><code>values</code></a> set:</p>
         <pre class="prettyprint lang-rose_conf">
-widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons
+widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
+</pre>
+
+        <p>Another useful Rose built-in widget to use is the array element
+        aligning <a href="rose-api.html#gtk:config-edit:pages">page widget</a>,
+        <samp>rose.config_editor.pagewidget.table.PageArrayTable</samp>. You
+        can set this for a section or namespace to make sure each <em>n</em>th
+        variable value element lines up horizontally. For example:</p>
+        <pre class="prettyprint lang-rose_conf">
+[namelist:meal_choices]
+customers='Athos','Porthos','Aramis','d''Artagnan'
+entrees='soup','pate','soup','asparagus'
+main='beef','spaghetti','coq au vin','lamb'
+petits_fours=.false.,.true.,.false.,.true.
+</pre>
+
+        <p>could use the following metadata:</p>
+        <pre class="prettyprint lang-rose_conf">
+[namelist:meal_choices]
+widget[rose-config-edit]=rose.config_editor.pagewidget.table.PageArrayTable
+</pre>
+
+        <p>to align the elements on the page like this:</p>
+        <pre>
+customers        Athos      Porthos      Aramis      d'Artagnan
+entrees          soup        pate         soup       asparagus
+main             beef      spaghetti   coq au vin       lamb
+petits_fours    .false.     .true.       .false.       .true.
 </pre>
       </dd>
     </dl>
