@@ -322,11 +322,6 @@ class VariableWidget(object):
         for widget in self.get_children():
             widget.show()
 
-    def check_is_missing_compulsory(self):
-        """Checks whether the variable is a missing compulsory variable."""
-        return (self.meta.get(rose.META_COMPULSORY) == 'true' and
-                self.is_ghost)
-
     def set_show_mode(self, show_mode, should_show_mode):
         """Sets or unsets special displays for a variable."""
         self.keywidget.set_show_mode(show_mode, should_show_mode)

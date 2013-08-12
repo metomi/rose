@@ -197,7 +197,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             self._prev_store = store
         else:
             store = self._prev_store
-        parent_iter_ = None
+        parent_iter = None
         for i, row_data in enumerate(data_rows):
             insert_iter = store.iter_nth_child(None, i)
             if insert_iter is not None:

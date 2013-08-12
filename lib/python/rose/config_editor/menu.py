@@ -698,7 +698,7 @@ class MainMenuHandler(object):
 
     def _handle_bad_macro_return(self, macro_fullname, return_value):
         rose.gtk.dialog.run_dialog(
-                 rose.gtk.dialog.DIALOG_KIND_ERROR,
+                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                  rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
                                                     return_value),
                  rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
@@ -876,11 +876,6 @@ class MainMenuHandler(object):
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
 
-    def handle_run_scheduler(self, *args):
-        """Run the scheduler for this suite."""
-        this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
-        return rose.suite_control.SuiteControl().gcontrol(this_id)
-
     def handle_upgrade(self, only_this_config_name=None):
         """Run the upgrade manager for this suite."""
         config_dict = {}
@@ -894,7 +889,7 @@ class MainMenuHandler(object):
         rose.config_editor.upgrade_controller.UpgradeController(
                            config_dict, self.handle_macro_transforms,
                            parent_window=self.mainwindow.window)
-        
+
     def help(self, *args):
         # Handle a GUI help request.
         self.mainwindow.launch_help_dialog()

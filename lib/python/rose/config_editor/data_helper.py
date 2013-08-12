@@ -135,8 +135,6 @@ class ConfigDataHelper(object):
             sect_ns = sect_data.metadata["full_ns"]
             if sect_ns.startswith(ns):
                 sub_data["sections"].update({sect: sect_data})
-        sub_data["get_var_id_values_func"] = (
-                lambda: self.get_sub_data_var_id_values(config_name))
         for sect, variables in config_data.vars.now.items():
             for variable in variables:
                 if variable.metadata["full_ns"].startswith(ns):

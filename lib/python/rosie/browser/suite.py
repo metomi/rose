@@ -163,7 +163,7 @@ class SuiteDirector():
         page = page_container.get_children()[0]
         if page.validate_errors():
             ok_dialog = gtk.MessageDialog(
-                           parent=dialog,
+                           parent=window,
                            message_format=rosie.browser.LABEL_ERROR_DISCOVERY,
                            type=gtk.MESSAGE_ERROR,
                            buttons=gtk.BUTTONS_NONE)
