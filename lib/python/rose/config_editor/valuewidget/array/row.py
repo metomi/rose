@@ -206,7 +206,7 @@ class RowArrayValueWidget(gtk.HBox):
         widgets = []
         for widget_list in self.rows:
             widgets.extend(widget_list)
-        if self.has_error:  # Special invalid length widget
+        if self.has_length_error:  # Special invalid length widget
             widgets[0].grab_focus()
             if hasattr(widgets[0], "set_focus_index"):
                 widgets[0].set_focus_index(focus_index)
