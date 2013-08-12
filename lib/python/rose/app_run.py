@@ -30,6 +30,7 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sys
 from time import localtime, sleep, strftime, time
+import traceback
 from uuid import uuid4
 
 

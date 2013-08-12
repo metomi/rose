@@ -372,18 +372,6 @@ class MixedArrayValueWidget(gtk.HBox):
             self.set_value(new_val)
             self.value = new_val
 
-    def _logical_setter(self, widget):
-        widget.set_image(self.make_log_image(widget.get_active()))
-        widget.set_tooltip_text(widget.options[widget.get_active()])
-        widget.set_label(widget.labels[widget.get_active()])
-        self.setter()
-
-    def _logical_getter(self, widget):
-        value = widget.get_tooltip_text()
-        if value is None:
-            return ""
-        return value
-
 
 class ArrayElementSetter(object):
 

@@ -518,8 +518,11 @@ class MainController(object):
             self.menu_widgets.update({address: widget})
             if address in is_toggled:
                 widget.set_active(is_toggled[address])
-                if (address.endswith("View user-ignored") and
-                    rose.config_editor.SHOULD_SHOW_IGNORED):
+                if (address.endswith("View user-ignored pages") and
+                    rose.config_editor.SHOULD_SHOW_IGNORED_PAGES):
+                    widget.set_sensitive(False)
+                if (address.endswith("View user-ignored vars") and
+                    rose.config_editor.SHOULD_SHOW_IGNORED_VARS):
                     widget.set_sensitive(False)
             if address.endswith("Reload metadata") and self.metadata_off:
                 widget.set_sensitive(False)
@@ -928,6 +931,11 @@ class MainController(object):
         """Set namespace view options."""
         self.page_ns_show_modes[key] = is_key_allowed
         self.reload_namespace_tree()  # This knows page_ns_show_modes.
+        if (hasattr(self, "menubar") and 
+            key == rose.config_editor.SHOW_MODE_IGNORED):
+            user_ign_item = self.menubar.uimanager.get_widget(
+                                 "/TopMenuBar/View/View user-ignored pages")
+            user_ign_item.set_sensitive(not is_key_allowed)
 
     def _set_page_var_show_modes(self, key, is_key_allowed):
         self.page_var_show_modes[key] = is_key_allowed
@@ -1198,7 +1206,7 @@ class MainController(object):
                 shutil.rmtree(dirpath)
             except Exception as e:
                 text = rose.config_editor.ERROR_CONFIG_DELETE.format(
-                                                dir_path, type(e), str(e))
+                                                dirpath, type(e), str(e))
                 title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            text, title)

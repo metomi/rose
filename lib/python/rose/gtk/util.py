@@ -697,4 +697,4 @@ def setup_stock_icons():
 def safe_str(value):
     """Formats a value safely for use in pango markup."""
     string = str(value).replace("&", "&amp;")
-    return  string.replace(">", "&gt;").replace("<", "&lt;")
+    return string.replace(">", "&gt;").replace("<", "&lt;")

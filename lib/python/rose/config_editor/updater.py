@@ -443,7 +443,8 @@ class Updater(object):
                 # Trigger-enabled sections
                 if (rose.variable.IGNORED_BY_USER in reason):
                     # User-ignored but trigger-enabled
-                    if (meta.get([section, rose.META_PROP_COMPULSORY]).value
+                    if (meta_config.get(
+                            [section, rose.META_PROP_COMPULSORY]).value
                         == rose.META_PROP_VALUE_TRUE):
                         # Doc table: I_u -> E -> compulsory
                         sect_data.error.update(
