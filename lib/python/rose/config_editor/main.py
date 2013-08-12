@@ -315,6 +315,7 @@ class MainController(object):
                 widgets=[
                    (rose.config_editor.TOOLBAR_OPEN, 'gtk.STOCK_OPEN'),
                    (rose.config_editor.TOOLBAR_SAVE, 'gtk.STOCK_SAVE'),
+                   (rose.config_editor.TOOLBAR_CHECK_AND_SAVE, 'gtk.STOCK_SPELL_CHECK'),
                    (rose.config_editor.TOOLBAR_LOAD_APPS, 'gtk.STOCK_CDROM'),
                    (rose.config_editor.TOOLBAR_BROWSE, 'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_UNDO, 'gtk.STOCK_UNDO'),
@@ -332,7 +333,7 @@ class MainController(object):
                     'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_SUITE_GCONTROL,
                     'rose-gtk-scheduler')],
-                sep_on_name=[rose.config_editor.TOOLBAR_SAVE,
+                sep_on_name=[rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
                              rose.config_editor.TOOLBAR_BROWSE,
                              rose.config_editor.TOOLBAR_REDO,
                              rose.config_editor.TOOLBAR_REVERT,
@@ -341,6 +342,7 @@ class MainController(object):
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
+        assign(rose.config_editor.TOOLBAR_CHECK_AND_SAVE, self.save_to_file)
         assign(rose.config_editor.TOOLBAR_LOAD_APPS, self.handle_load_all)
         assign(rose.config_editor.TOOLBAR_BROWSE,
                self.main_handle.launch_browser)
@@ -386,6 +388,7 @@ class MainController(object):
         self.menu_widgets = {}
         menu_list = [('/TopMenuBar/File/Open...', self.load_from_file),
                      ('/TopMenuBar/File/Save', lambda m: self.save_to_file()),
+                     ('/TopMenuBar/File/Check and save', lambda m: self.save_to_file()),
                      ('/TopMenuBar/File/Load All Apps',
                       lambda m: self.handle_load_all()),
                      ('/TopMenuBar/File/Quit', self.main_handle.destroy),
@@ -1301,8 +1304,13 @@ class MainController(object):
 
     def _update_change_widget_sensitivity(self, is_changed=False):
         # Alter sensitivity of 'unsaved changes' related widgets.
-        self.toolbar.set_widget_sensitive('Save', is_changed)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_SAVE,
+                                          is_changed)
+        self.toolbar.set_widget_sensitive(
+                                rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+                                is_changed)
         self._get_menu_widget('/Save').set_sensitive(is_changed)
+        self._get_menu_widget('/Check and save').set_sensitive(is_changed)
         self._toolbar_run_button.set_sensitive(not is_changed)
         self._get_menu_widget('/Run Suite custom').set_sensitive(
                                                        not is_changed)
