@@ -315,7 +315,8 @@ class MainController(object):
                 widgets=[
                    (rose.config_editor.TOOLBAR_OPEN, 'gtk.STOCK_OPEN'),
                    (rose.config_editor.TOOLBAR_SAVE, 'gtk.STOCK_SAVE'),
-                   (rose.config_editor.TOOLBAR_CHECK_AND_SAVE, 'gtk.STOCK_SPELL_CHECK'),
+                   (rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+                    'gtk.STOCK_SPELL_CHECK'),
                    (rose.config_editor.TOOLBAR_LOAD_APPS, 'gtk.STOCK_CDROM'),
                    (rose.config_editor.TOOLBAR_BROWSE, 'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_UNDO, 'gtk.STOCK_UNDO'),
@@ -342,7 +343,8 @@ class MainController(object):
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
-        assign(rose.config_editor.TOOLBAR_CHECK_AND_SAVE, self.save_to_file, [None, True])
+        assign(rose.config_editor.TOOLBAR_CHECK_AND_SAVE, self.save_to_file,
+               [None, True])
         assign(rose.config_editor.TOOLBAR_LOAD_APPS, self.handle_load_all)
         assign(rose.config_editor.TOOLBAR_BROWSE,
                self.main_handle.launch_browser)
