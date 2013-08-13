@@ -315,6 +315,8 @@ class MainController(object):
                 widgets=[
                    (rose.config_editor.TOOLBAR_OPEN, 'gtk.STOCK_OPEN'),
                    (rose.config_editor.TOOLBAR_SAVE, 'gtk.STOCK_SAVE'),
+                   (rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+                    'gtk.STOCK_SPELL_CHECK'),
                    (rose.config_editor.TOOLBAR_LOAD_APPS, 'gtk.STOCK_CDROM'),
                    (rose.config_editor.TOOLBAR_BROWSE, 'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_UNDO, 'gtk.STOCK_UNDO'),
@@ -332,7 +334,7 @@ class MainController(object):
                     'gtk.STOCK_DIRECTORY'),
                    (rose.config_editor.TOOLBAR_SUITE_GCONTROL,
                     'rose-gtk-scheduler')],
-                sep_on_name=[rose.config_editor.TOOLBAR_SAVE,
+                sep_on_name=[rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
                              rose.config_editor.TOOLBAR_BROWSE,
                              rose.config_editor.TOOLBAR_REDO,
                              rose.config_editor.TOOLBAR_REVERT,
@@ -341,6 +343,8 @@ class MainController(object):
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
+        assign(rose.config_editor.TOOLBAR_CHECK_AND_SAVE, self.save_to_file,
+               [None, True])
         assign(rose.config_editor.TOOLBAR_LOAD_APPS, self.handle_load_all)
         assign(rose.config_editor.TOOLBAR_BROWSE,
                self.main_handle.launch_browser)
@@ -386,6 +390,8 @@ class MainController(object):
         self.menu_widgets = {}
         menu_list = [('/TopMenuBar/File/Open...', self.load_from_file),
                      ('/TopMenuBar/File/Save', lambda m: self.save_to_file()),
+                     ('/TopMenuBar/File/Check and save', 
+                      lambda m: self.save_to_file(check_on_save=True)),
                      ('/TopMenuBar/File/Load All Apps',
                       lambda m: self.handle_load_all()),
                      ('/TopMenuBar/File/Quit', self.main_handle.destroy),
@@ -1071,7 +1077,7 @@ class MainController(object):
         else:
             spawn_subprocess_window(dirname)
 
-    def save_to_file(self, only_config_name=None):
+    def save_to_file(self, only_config_name=None, check_on_save=False):
         """Dump the component configurations in memory to disk."""
         if only_config_name is None:
             config_names = []
@@ -1081,7 +1087,10 @@ class MainController(object):
         else:
             config_names = [only_config_name]
         save_ok = True
-        for config_name in config_names:
+        if check_on_save:
+            self.main_handle.check_all_extra()
+        
+        for config_name in sorted(config_names):
             short_config_name = config_name.lstrip("/")
             config = self.data.dump_to_internal_config(config_name)
             new_save_config = self.data.dump_to_internal_config(config_name)
@@ -1108,6 +1117,26 @@ class MainController(object):
             directory = config_data.directory
             config_vars = config_data.vars
             config_sections = config_data.sections
+            
+            # Run check fail-if, warn-if and validator macros if check_on_save
+            if check_on_save:
+                changes, errors = self.nav_panel.get_change_error_totals(
+                                                 config_name=short_config_name)
+                if errors > 0:
+                    dialog = gtk.MessageDialog(
+                             None, 
+                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
+                             gtk.MESSAGE_INFO, 
+                             gtk.BUTTONS_YES_NO, 
+                             None)
+                    dialog.set_markup(
+                        rose.config_editor.WARNING_ERRORS_FOUND_ON_SAVE.format(
+                                                            short_config_name))
+                    res = dialog.run()
+                    dialog.destroy()
+                    if res == gtk.RESPONSE_NO:
+                        continue
+            
             # Dump the configuration.
             filename = rose.SUB_CONFIG_NAME
             if directory is None:
@@ -1301,8 +1330,13 @@ class MainController(object):
 
     def _update_change_widget_sensitivity(self, is_changed=False):
         # Alter sensitivity of 'unsaved changes' related widgets.
-        self.toolbar.set_widget_sensitive('Save', is_changed)
+        self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_SAVE,
+                                          is_changed)
+        self.toolbar.set_widget_sensitive(
+                                rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+                                is_changed)
         self._get_menu_widget('/Save').set_sensitive(is_changed)
+        self._get_menu_widget('/Check and save').set_sensitive(is_changed)
         self._toolbar_run_button.set_sensitive(not is_changed)
         self._get_menu_widget('/Run Suite custom').set_sensitive(
                                                        not is_changed)

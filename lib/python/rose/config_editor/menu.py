@@ -53,6 +53,7 @@ class MenuBar(object):
       <menu action="File">
         <menuitem action="Open..."/>
         <menuitem action="Save"/>
+        <menuitem action="Check and save"/>
         <menuitem action="Load All Apps"/>
         <separator name="sep_save"/>
         <menuitem action="Quit"/>
@@ -135,6 +136,8 @@ class MenuBar(object):
                       ('Save', gtk.STOCK_SAVE,
                        rose.config_editor.TOP_MENU_FILE_SAVE,
                        rose.config_editor.ACCEL_SAVE),
+                      ('Check and save', gtk.STOCK_SPELL_CHECK,
+                       rose.config_editor.TOP_MENU_FILE_CHECK_AND_SAVE),
                       ('Load All Apps', gtk.STOCK_CDROM,
                        rose.config_editor.TOP_MENU_FILE_LOAD_APPS),
                       ('Quit', gtk.STOCK_QUIT,

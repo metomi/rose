@@ -405,10 +405,14 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 my_iter = tree_model.iter_next(my_iter)
         return None
 
-    def get_change_error_totals(self):
-        """Return the changed and error totals for the root nodes."""
+    def get_change_error_totals(self, config_name=None):
+        """Return the number of changes and total errors for the root nodes."""
         tree_model = self.data_store
-        iter_ = self.data_store.get_iter_first()
+        if config_name:
+            path = self.get_path_from_names([config_name], unfiltered=True)
+            iter_ = self.data_store.get_iter(path)
+        else:
+            iter_ = self.data_store.get_iter_first()
         changes = 0
         errors = 0
         while iter_ is not None:
@@ -418,7 +422,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 changes += iter_changes
             if iter_errors is not None:
                 errors += iter_errors
-            iter_ = self.data_store.iter_next(iter_)
+            if config_name:
+                break
+            else:
+                iter_ = self.data_store.iter_next(iter_)
         return changes, errors
 
     def handle_activation(self, treeview=None, event=None, somewidget=None):
