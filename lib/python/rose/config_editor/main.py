@@ -447,7 +447,7 @@ class MainController(object):
                                      rose.config_editor.SHOW_MODE_NO_TITLE,
                                      m.get_active())),
                      ('/TopMenuBar/Metadata/All V',
-                      lambda m: self.main_handle.run_custom_macro(
+                      lambda m: self.main_handle.handle_run_custom_macro(
                                      method_name=rose.macro.VALIDATE_METHOD)),
                      ('/TopMenuBar/Metadata/Autofix',
                       lambda m: self.main_handle.transform_default()),
@@ -740,19 +740,19 @@ class MainController(object):
         launch_edit = lambda: self.nav_handle.edit_request(
                                                    namespace_name)
         page = rose.config_editor.page.ConfigPage(
-                                  page_metadata,
-                                  data,
-                                  latent_data,
-                                  sect_ops,
-                                  var_ops,
-                                  section_data_objects,
-                                  self.data.helper.get_format_sections,
-                                  directory,
-                                  sub_data=sub_data,
-                                  sub_ops=sub_ops,
-                                  launch_info_func=launch_info,
-                                  launch_edit_func=launch_edit,
-                                  launch_macro_func=self.main_handle.run_custom_macro)
+                page_metadata,
+                data,
+                latent_data,
+                sect_ops,
+                var_ops,
+                section_data_objects,
+                self.data.helper.get_format_sections,
+                directory,
+                sub_data=sub_data,
+                sub_ops=sub_ops,
+                launch_info_func=launch_info,
+                launch_edit_func=launch_edit,
+                launch_macro_func=self.main_handle.handle_run_custom_macro)
         #FIXME: These three should go.
         page.trigger_tab_detach = lambda b: self._handle_detach_request(page)
         var_ops.trigger_ignored_update = lambda v: page.update_ignored()

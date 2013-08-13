@@ -200,6 +200,10 @@ EVENT_MACRO_TRANSFORM_OK = "{1}: {0}: no changes"
 EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
 EVENT_MACRO_VALIDATE_ALL = "Custom Validators: {0}: {1} errors"
 EVENT_MACRO_VALIDATE_ALL_OK = "Custom Validators: {0}: all OK"
+EVENT_MACRO_VALIDATE_CHECK_ALL = (
+           "Custom Validators, FailureRuleChecker: {0} total problems found")
+EVENT_MACRO_VALIDATE_CHECK_ALL_OK = (
+           "Custom Validators, FailureRuleChecker: No problems found")
 EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
 EVENT_MACRO_VALIDATE_NO_PROBLEMS = "Custom Validators: No problems found"
 EVENT_MACRO_VALIDATE_PROBLEMS_FOUND = "Custom Validators: {0} problems found"

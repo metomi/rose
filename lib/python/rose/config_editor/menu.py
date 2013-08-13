@@ -394,8 +394,17 @@ class MainMenuHandler(object):
 
     def check_all_extra(self):
         """Check fail-if, warn-if, and run all validator macros."""
-        self.check_fail_rules()
-        self.run_custom_macro(method_name=rose.macro.VALIDATE_METHOD)
+        num_errors = self.check_fail_rules()
+        num_errors += self.run_custom_macro(
+            method_name=rose.macro.VALIDATE_METHOD)
+        if num_errors:
+            text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL.format(
+                                                                 num_errors)
+            kind = self.reporter.KIND_ERR
+        else:
+            text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL_OK
+            kind = self.reporter.KIND_OUT
+        self.reporter.report(text, kind=kind)
 
     def check_fail_rules(self):
         """Check the fail-if and warn-if conditions of the configurations."""
@@ -436,6 +445,7 @@ class MainMenuHandler(object):
             info_text = msg
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
+        return error_count
 
     def clear_page_menu(self, menubar, add_menuitem):
         """Clear all page add variable items."""
@@ -466,7 +476,7 @@ class MainMenuHandler(object):
             for macro_mod, macro_cls, macro_func, help in macro_tuples:
                 menubar.add_macro(config_name, macro_mod, macro_cls,
                                   macro_func, help, image,
-                                  self.run_custom_macro)
+                                  self.handle_run_custom_macro)
 
     def inspect_custom_macro(self, macro_meth):
         """Inspect a custom macro for kwargs and return any"""
@@ -560,6 +570,11 @@ class MainMenuHandler(object):
         dialog.destroy()
         return res
 
+    def handle_run_custom_macro(self, *args, **kwargs):
+        """Wrap the method so that this returns False for GTK callbacks."""
+        self.run_custom_macro(*args, **kwargs)
+        return False
+
     def run_custom_macro(self, config_name=None, module_name=None,
                          class_name=None, method_name=None):
         """Run the custom macro method and launch a dialog."""
@@ -611,7 +626,7 @@ class MainMenuHandler(object):
                                                module.__name__, obj_name,
                                                method_name))
         if not macro_data:
-            return None
+            return 0
         sorter = rose.config.sort_settings
         to_id = lambda s: self.util.get_id_from_section_option(s.section,
                                                                s.option)
@@ -691,7 +706,7 @@ class MainMenuHandler(object):
                 all_conf_text = self._format_macro_config_names(configs)
                 self.reporter.report(null_format.format(all_conf_text),
                                      kind=self.reporter.KIND_OUT)
-        return False                          
+        return len(config_macro_errors) + len(config_macro_changes)
 
     def _format_macro_config_names(self, config_names):
         if len(config_names) > 5:
