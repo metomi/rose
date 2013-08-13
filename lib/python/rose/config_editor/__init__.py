@@ -282,6 +282,7 @@ WARNING_APP_CONFIG_CREATE_TITLE = "Warning - application configuration."
 WARNING_CONFIG_DELETE = ("Cannot remove a whole configuration:\n{0}\n" +
                          "This must be done externally.")
 WARNING_CONFIG_DELETE_TITLE = "Can't remove configuration"
+WARNING_ERRORS_FOUND_ON_SAVE = "Errors found in {0}. Save app anyway?"
 WARNING_FILE_DELETE = ("Not a configuration file entry!\n" +
                        "This file must be manually removed" +
                        " in the filesystem:\n {0}.")
