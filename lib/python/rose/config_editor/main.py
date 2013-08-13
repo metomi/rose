@@ -1088,7 +1088,7 @@ class MainController(object):
         if check_on_save:
             self.main_handle.check_all_extra()
         
-        for config_name in config_names:
+        for config_name in sorted(config_names):
             short_config_name = config_name.lstrip("/")
             config = self.data.dump_to_internal_config(config_name)
             new_save_config = self.data.dump_to_internal_config(config_name)

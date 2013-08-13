@@ -74,7 +74,7 @@ TAB_MENU_INFO = "Info"
 TAB_MENU_OPEN_NEW = "Open in a new window"
 TAB_MENU_WEB_HELP = "Web Help"
 TOP_MENU_FILE = "_File"
-TOP_MENU_FILE_CHECK_AND_SAVE = "_Check and save"
+TOP_MENU_FILE_CHECK_AND_SAVE = "_Check And Save"
 TOP_MENU_FILE_LOAD_APPS = "_Load All Apps"
 TOP_MENU_FILE_NEW = "_New"
 TOP_MENU_FILE_OPEN = "_Open..."
@@ -282,7 +282,7 @@ WARNING_APP_CONFIG_CREATE_TITLE = "Warning - application configuration."
 WARNING_CONFIG_DELETE = ("Cannot remove a whole configuration:\n{0}\n" +
                          "This must be done externally.")
 WARNING_CONFIG_DELETE_TITLE = "Can't remove configuration"
-WARNING_ERRORS_FOUND_ON_SAVE = "Errors found in {0}. Save app anyway?"
+WARNING_ERRORS_FOUND_ON_SAVE = "Errors found in {0}. Save anyway?"
 WARNING_FILE_DELETE = ("Not a configuration file entry!\n" +
                        "This file must be manually removed" +
                        " in the filesystem:\n {0}.")
