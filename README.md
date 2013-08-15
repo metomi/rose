@@ -38,8 +38,9 @@ See <http://metomi.github.io/rose/doc/rose-install.html>.
 Code contributors:
 * Andrew Clark (Met Office, UK)
 * Ben Fitzpatrick (Met Office, UK)
-* Hilary Oliver (National Institute of Water and Atmospheric Research, New Zealand)
+* Joseph Mancell (Met Office, UK)
 * Dave Matthews (Met Office, UK)
+* Hilary Oliver (National Institute of Water and Atmospheric Research, New Zealand)
 * Stephen Oxley (Met Office, UK)
 * Matt Shin (Met Office, UK)
 * Stuart Whitehouse (Met Office, UK)

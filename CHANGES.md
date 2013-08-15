@@ -20,11 +20,27 @@ Changes that have significant impact on user experience.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#868: rose config-edit: added check on save toolbar and menu item.
+
+\#864: rose config-edit: added support for application configuration upgrade.
+
+\#856: rose config-edit: improved reporting of results from macros.
+
+\#855: rose macro: added command line trigger state validation.
+
+\#851: rose app-run: rose_prune: modified to use the default shell to delete
+files at the suite host. This should allow more powerful glob matching than
+what is provided by the Python standard library.
+
+\#849: rose config-edit: added load all apps toolbar and menu item.
+
 \#847: rose suite-scan HOST: fixed.
 
 \#846: rose app-run, rose suite-run, rose task-run: fixed incorrect incremental
 mode behaviour. When `mode=symlink` is removed from a target, the target should
 be recreated, instead of being left to point to the old symbolic link.
+
+\#845: rose config-edit: support macro arguments.
 
 --------------------------------------------------------------------------------
 
