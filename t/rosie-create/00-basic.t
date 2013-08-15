@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 25
+tests 28
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -172,6 +172,25 @@ __INFO__
     echo "[INFO] foo-aa004: local copy created at $PWD/roses/foo-aa004"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-copy-mkdir-parents"
+set -e
+for I in $(seq 5 9); do
+    cat >rose-suite.info <<__INFO__
+access-list=*
+owner=$USER
+project=don't fail
+title=this should not fail
+__INFO__
+    rosie create -q --info-file=rose-suite.info -y --no-checkout
+done
+set +e
+run_pass "$TEST_KEY" rosie create foo-aa001 -y --no-checkout
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] foo-aa010: created at $URL/a/a/0/1/0
+[INFO] foo-aa010: copied items from foo-aa001
+__OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 exit 0

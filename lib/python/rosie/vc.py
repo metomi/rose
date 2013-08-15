@@ -345,7 +345,7 @@ class RosieVCClient(object):
                              os.path.join(d, "trunk", "rose-suite.info"))
             message = "%s: new suite, a copy of %s" % (new_id, from_id)
             try:
-                self.popen("svn", "commit", "-q", "-m", message, d)
+                self.popen("svn", "commit", "-q", "-m", message, temp_local_copy)
                 self.event_handler(SuiteCreateEvent(new_id))
                 self.event_handler(SuiteCopyEvent(new_id, from_id))
             except RosePopenError as e:
