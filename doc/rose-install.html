@@ -346,7 +346,7 @@ rm -rf ${NAME}
       <dd>
         <pre>
 #!/bin/bash
-exec $ROSE_HOME/sbin/rosa svn-pre-commit "$@"
+exec /path/to/rose/sbin/rosa svn-pre-commit "$@"
 </pre>
       </dd>
 
@@ -355,12 +355,13 @@ exec $ROSE_HOME/sbin/rosa svn-pre-commit "$@"
       <dd>
         <pre>
 #!/bin/bash
-exec $ROSE_HOME/sbin/rosa svn-post-commit "$@"
+exec /path/to/rose/sbin/rosa svn-post-commit "$@"
 </pre>
       </dd>
     </dl>
 
-    <p>where <var>$ROSE_HOME</var> the root of your Rose installation.</p>
+    <p>You should replace <var>/path/to/rose/</var> with the location of your
+    Rose installation.</p>
 
     <p>Make sure the hook scripts are executable.</p>
 
@@ -372,7 +373,7 @@ exec $ROSE_HOME/sbin/rosa svn-post-commit "$@"
 
     <p>Once you have done that, create the Rosie database by running:</p>
     <pre>
-$ROSE_HOME/sbin/rosa db-create
+/path/to/rose/sbin/rosa db-create
 </pre>
 
     <p>Make sure that the account that runs the repository hooks has read/write
