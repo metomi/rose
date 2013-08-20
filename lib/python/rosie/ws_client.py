@@ -71,6 +71,13 @@ class QueryError(Exception):
     pass
 
 
+class UnknownRootError(Exception):
+
+    """Raised if a prefix has no config."""
+
+    pass
+
+
 class RosieWSClient(object):
 
     """A Client for the Rosie Web Service."""
@@ -81,6 +88,8 @@ class RosieWSClient(object):
         self.prefix = prefix
         conf = ResourceLocator.default().get_conf()
         root = conf.get_value(["rosie-id", "prefix-ws." + self.prefix])
+        if root is None:
+            raise UnknownRootError(self.prefix)
         if not root.endswith("/"):
             root += "/"
         self.root = root
@@ -181,8 +190,13 @@ def local_suites(argv):
 
     ws_client = RosieWSClient(prefix=opts.prefix)
     if opts.prefix is not None:
-        results, id_list = get_local_suite_details(opts.prefix, user=opts.user)
-        return _display_maps(opts, ws_client, results, local_suites=id_list)
+        try:
+            results, id_list = get_local_suite_details(opts.prefix,
+                                                       user=opts.user)
+            return _display_maps(opts, ws_client, 
+                                 results, local_suites=id_list)
+        except QueryError:
+            sys.exit("Error querying details of local suites")
     else:
         id_list = get_local_suites(user=opts.user)
         if len(id_list) > 0:
@@ -219,11 +233,13 @@ def lookup(argv):
             opts.url = True
         else:
             opts.search = True
-    ws_client = RosieWSClient(prefix=opts.prefix)
+    try:
+        ws_client = RosieWSClient(prefix=opts.prefix)
+    except UnknownRootError:
+        sys.exit("No settings found for prefix: '%s'" % opts.prefix)
     results = None
     if opts.url:
         addr = args[0]
-
         if opts.debug_mode:
             results, url = ws_client.address_search(None, url=addr)
         else:
