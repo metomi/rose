@@ -190,8 +190,13 @@ def local_suites(argv):
 
     ws_client = RosieWSClient(prefix=opts.prefix)
     if opts.prefix is not None:
-        results, id_list = get_local_suite_details(opts.prefix, user=opts.user)
-        return _display_maps(opts, ws_client, results, local_suites=id_list)
+        try:
+            results, id_list = get_local_suite_details(opts.prefix,
+                                                       user=opts.user)
+            return _display_maps(opts, ws_client, 
+                                 results, local_suites=id_list)
+        except QueryError:
+            sys.exit("Error querying details of local suites")
     else:
         id_list = get_local_suites(user=opts.user)
         if len(id_list) > 0:
