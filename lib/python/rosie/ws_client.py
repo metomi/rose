@@ -72,8 +72,8 @@ class QueryError(Exception):
 
 
 class UnknownRootError(Exception):
-    
-    """Raised if a prefix is unknown."""
+
+    """Raised if a prefix has no config."""
 
     pass
 
@@ -500,7 +500,6 @@ def main():
         f = globals()[argv[0]]  # Potentially bad.
     except KeyError:
         sys.exit("rosie.ws_client: %s: incorrect usage" % argv[0])
-        
     sys.exit(f(argv[1:]))
 
 
