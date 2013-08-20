@@ -28,6 +28,7 @@ import subprocess
 import sys
 import threading
 import time
+import traceback
 import urllib
 import webbrowser
 
@@ -71,7 +72,16 @@ class MainWindow(gtk.Window):
         splash_updater.update(rosie.browser.SPLASH_LOADING.format(
                                     rosie.browser.PROGRAM_NAME,
                                     rosie.browser.SPLASH_SEARCH_MANAGER))
-        self.search_manager = rosie.browser.search.SearchManager(opts.prefix)        
+        try:
+            self.search_manager = rosie.browser.search.SearchManager(
+                                                       opts.prefix)
+        except rosie.ws_client.UnknownRootError:
+            splash_updater.stop()
+            rose.gtk.dialog.run_dialog(
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                          rosie.browser.LABEL_ERROR_PREFIX.format(opts.prefix),
+                          rosie.browser.TITLE_INVALID_PREFIX)
+            sys.exit(1)
         locator = ResourceLocator(paths=sys.path)
         splash_updater.update(rosie.browser.SPLASH_LOADING.format(
                                     rosie.browser.PROGRAM_NAME,
@@ -285,9 +295,15 @@ class MainWindow(gtk.Window):
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING, 
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
-        res, id_list = rosie.ws_client.get_local_suite_details( 
-                                self.search_manager.get_datasource(),
-                                skip_status=True, user=user)
+        try:
+            res, id_list = rosie.ws_client.get_local_suite_details( 
+                                    self.search_manager.get_datasource(),
+                                    skip_status=True, user=user)
+        except rosie.ws_client.QueryError:
+            res = []
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       rosie.browser.LABEL_ERROR_LOCAL,
+                                       rosie.browser.TITLE_INVALID_QUERY)
         self.display_maps_result(res, is_local=True, user=user)
         self.repeat_last_request = self.display_local_suites
         self.statusbar.set_progressbar_pulsing(False)
@@ -1334,6 +1350,9 @@ if __name__ == "__main__":
         for thread in threading.enumerate():
             if hasattr(thread, "stop"):
                 thread.stop()
+        if opts.debug_mode and isinstance(e, Exception):
+            # Write out origin information - this is otherwise lost.
+            traceback.print_exc()
         raise e
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
