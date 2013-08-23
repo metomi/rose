@@ -687,6 +687,8 @@ class Updater(object):
                 sect_data = config_sections.now.get(section)
                 if sect_data is None:
                     sect_data = config_sections.latent.get(section)
+                if sect_data is None:
+                    continue
                 if bad_report.is_warning:
                     sect_data.warning.setdefault(macro_type, info)
                 else:
