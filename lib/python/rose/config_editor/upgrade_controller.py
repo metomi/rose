@@ -64,13 +64,6 @@ class UpgradeController(object):
             self.config_dict[config_name] = app_config
             self.config_manager_dict[config_name] = manager
             self._update_treemodel_data(config_name)
-            listmodel = gtk.ListStore(str)
-            tags = manager.get_tags(only_named=not self.use_all_versions)
-            if not tags:
-                tags = [manager.tag]
-            for tag in tags:
-                listmodel.append([tag])
-            self._config_version_model_dict[config_name] = listmodel
         self.treeview.set_model(self.treemodel)
         self.treeview.set_rules_hint(True)
         self.treewindow = gtk.ScrolledWindow()
@@ -180,7 +173,7 @@ class UpgradeController(object):
     def _handle_toggle_all_versions(self, button):
         self.use_all_versions = button.get_active()
         self.treemodel = gtk.TreeStore(str, str, str, bool)
-        del self._configs_with_version_models[:]
+        self._config_version_model_dict.clear()
         for config_name in sorted(self.config_dict.keys()):
             self._update_treemodel_data(config_name)
         self.treeview.set_model(self.treemodel)
@@ -238,3 +231,10 @@ class UpgradeController(object):
                             None,
                             [config_name, current_tag,
                             next_tag, True])
+        listmodel = gtk.ListStore(str)
+        tags = manager.get_tags(only_named=not self.use_all_versions)
+        if not tags:
+            tags = [manager.tag]
+        for tag in tags:
+            listmodel.append([tag])
+        self._config_version_model_dict[config_name] = listmodel
