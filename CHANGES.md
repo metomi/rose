@@ -32,6 +32,9 @@ The following are worth mentioning:
 files at the suite host. This should allow more powerful glob matching than
 what is provided by the Python standard library.
 
+\#850: rose config-edit: add and document custom page for aligning variable 
+value elements.
+
 \#849: rose config-edit: added load all apps toolbar and menu item.
 
 \#847: rose suite-scan HOST: fixed.
