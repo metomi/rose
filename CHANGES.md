@@ -20,6 +20,8 @@ Changes that have significant impact on user experience.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#878: rosie: fix invalid prefix and local suite error crash bugs
+
 \#868: rose config-edit: added check on save toolbar and menu item.
 
 \#864: rose config-edit: added support for application configuration upgrade.
