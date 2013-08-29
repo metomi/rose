@@ -1,0 +1,20 @@
+#!/bin/bash
+PREFIX=
+if [[ ${ROSE_TASK_CYCLE_TIME:-} ]]; then
+    PREFIX="[$ROSE_TASK_CYCLE_TIME] "
+fi
+mkdir -p $ROSE_DATAC/hello
+echo "${PREFIX}Hello Earth" >$ROSE_DATAC/hello/earth.txt
+echo "${PREFIX}Hello Dark Matter" >$ROSE_DATAC/hello/dark-matter.txt
+for I in $(seq 1 9); do
+    echo "${PREFIX}Hello Planet $I" >$ROSE_DATAC/hello/planet-$I.txt
+done
+for I in $(seq 1 9); do
+    echo "${PREFIX}Hello Spaceship $I" >$ROSE_DATAC/hello/spaceship-$I.txt
+done
+for I in $(seq 1 9); do
+    echo "${PREFIX}Hello Star $I" >$ROSE_DATAC/star-$I.txt
+done
+for I in $(seq 1 9); do
+    echo "${PREFIX}Hello Stuff $I" >$ROSE_DATAC/stuffing-$I.txt
+done
