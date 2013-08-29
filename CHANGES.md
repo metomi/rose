@@ -5,20 +5,24 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (End of 2013-08?)
+## 2013-08 (2013-08-30)
 
-This release of Rose will work with cylc 5.3.0 or above.
+This release of Rose works with cylc 5.3.0 or above.
 
 ### Highlighted Changes
 
 Changes that have significant impact on user experience.
 
--None yet-
+None in this release.
 
 ### Other Changes
 
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
+
+\#883: rose_arch: new built-in application: a generic solution to configure
+site-specific archiving of suite files. (This built-in application should be
+considered experimental at this release.)
 
 \#878: rosie: fix invalid prefix and local suite error crash bugs
 
