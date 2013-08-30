@@ -44,7 +44,7 @@ Hello and good bye.
 __CONTENT__
 OUT=$(cd config/file && cat hello1 hello2 hello3/text)
 #-------------------------------------------------------------------------------
-tests 59
+tests 62
 #-------------------------------------------------------------------------------
 # Normal mode with free format files.
 TEST_KEY=$TEST_KEY_BASE
@@ -114,6 +114,33 @@ $(</etc/passwd)
 $(</etc/profile)
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Normal mode with free format files and a file with globs sources.
+TEST_KEY="$TEST_KEY_BASE-globs"
+setup
+mkdir -p "$TEST_DIR/$TEST_KEY"
+for I in $(seq 1 9); do
+    echo "Hello World $I" >"$TEST_DIR/$TEST_KEY/hello-$I.txt"
+done
+run_pass "$TEST_KEY" rose app-run --config=../config -q \
+    --command-key=test-sources \
+    '--define=[file:hello4/text]source='"$TEST_DIR/$TEST_KEY"'/hello-*.txt'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
+$OUT
+Hello World 1
+Hello World 2
+Hello World 3
+Hello World 4
+Hello World 5
+Hello World 6
+Hello World 7
+Hello World 8
+Hello World 9
+__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+(cd "$TEST_DIR/$TEST_KEY"; rm hello-*.txt)
+rmdir "$TEST_DIR/$TEST_KEY"
 teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files and a directory.

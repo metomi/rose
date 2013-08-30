@@ -20,6 +20,7 @@
 """Process "file:*" sections in a rose.config.ConfigNode."""
 
 from fnmatch import fnmatch
+from glob import glob
 from hashlib import md5
 import os
 import re
@@ -126,23 +127,31 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             target_sources = []
             for k in ["content", "source"]:
                 source_str = node.get_value([k])
-                if source_str is not None:
-                    try:
-                        source_str = env_var_process(source_str)
-                    except UnboundEnvironmentVariableError as e:
-                        raise ConfigProcessError([key, k], source_str, e)
-                    for source_name in shlex.split(source_str):
-                        if targets[name].mode == "symlink":
-                            if targets[name].real_name:
-                                # Symlink mode can only have 1 source
-                                raise ConfigProcessError([key, k], source_str)
-                            targets[name].real_name = source_name
-                        else:
-                            if not sources.has_key(source_name):
-                                sources[source_name] = Loc(source_name)
-                                sources[source_name].action_key = Loc.A_SOURCE
-                            sources[source_name].used_by_names.append(name)
-                            target_sources.append(sources[source_name])
+                if source_str is None:
+                    continue
+                try:
+                    source_str = env_var_process(source_str)
+                except UnboundEnvironmentVariableError as e:
+                    raise ConfigProcessError([key, k], source_str, e)
+                source_names = []
+                for source_glob in shlex.split(source_str):
+                    names = glob(source_glob)
+                    if names:
+                        source_names += sorted(names)
+                    else:
+                        source_names.append(source_glob)
+                for source_name in source_names:
+                    if targets[name].mode == "symlink":
+                        if targets[name].real_name:
+                            # Symlink mode can only have 1 source
+                            raise ConfigProcessError([key, k], source_str)
+                        targets[name].real_name = source_name
+                    else:
+                        if not sources.has_key(source_name):
+                            sources[source_name] = Loc(source_name)
+                            sources[source_name].action_key = Loc.A_SOURCE
+                        sources[source_name].used_by_names.append(name)
+                        target_sources.append(sources[source_name])
             targets[name].dep_locs = target_sources
 
         # Determine the scheme of the location from configuration.
