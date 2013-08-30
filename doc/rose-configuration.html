@@ -679,10 +679,11 @@ delays=0,6*10s,60*1m,1h
       <dt><code>source</code></dt>
 
       <dd>A space delimited list of sources for generating this file. A source
-      can be the path to a regular file or directory in the file system, or it
-      may be a URI to a resource. If a source is a URI, it may point to a
-      section with a supported scheme in the current configuration, e.g. a
-      <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
+      can be the path to a regular file or directory in the file system
+      (globbing is also supported - e.g. using "*.conf" to mean all .conf
+      files), or it may be a URI to a resource. If a source is a URI, it may
+      point to a section with a supported scheme in the current configuration,
+      e.g. a <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
       supported scheme or be given sufficient information for the system to
       determine its scheme, e.g. via the <code>schemes</code> setting described
       below.</dd>
