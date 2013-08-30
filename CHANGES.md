@@ -5,6 +5,27 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2013-Q4)
+
+This release of Rose will work with cylc 5.3.0 or above.
+
+### Highlighted Changes
+
+Changes that have significant impact on user experience.
+
+-None yet-
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+\#885: rose-app.conf, rose-suite.conf: A `SOURCE` in the `source=SOURCE ...`
+declaration in a `[file:NAME]` section can now be a glob for matching files
+names in the file system.
+
+--------------------------------------------------------------------------------
+
 ## 2013-08 (2013-08-30)
 
 This release of Rose works with cylc 5.3.0 or above.
