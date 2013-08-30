@@ -514,17 +514,11 @@ class ConfigSyntaxError(Exception):
 
     """Exception raised for syntax error loading a configuration file."""
 
-    def __init__(self, file_name, line_number, line, e=None):
-        Exception.__init__(self, file_name, line_number, line, e)
+    E = """Expecting "[SECTION]" or "KEY=VALUE" at column 1."""
 
     def __str__(self):
-        file_name, line_number, line, e = self.args
-        e_string = ""
-        if e:
-            e_string = "%s:" % (e)
-        else:
-            e_string = "[SYNTAX ERROR]"
-        return "%s %s:%d:\n%s" % (e_string, file_name, line_number, line)
+        file_name, line_number, line = self.args
+        return "%s(%d): %s\n%s^" % (file_name, line_number, self.E, line)
 
 
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,
