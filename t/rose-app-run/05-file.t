@@ -20,7 +20,7 @@
 # Test "rose app-run", generation of files.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init <<'__CONFIG__'
+test_init <<'__CONFIG__'
 [command]
 default = cat hello1 hello2 hello3/text
 test-empty = cat hello1 hello2 hello3/text && cmp hello4 /dev/null
@@ -48,35 +48,35 @@ tests 62
 #-------------------------------------------------------------------------------
 # Normal mode with free format files.
 TEST_KEY=$TEST_KEY_BASE
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files and an empty file.
 TEST_KEY=$TEST_KEY_BASE-empty
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q \
     --command-key=test-empty --define='[file:hello4]'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files and a file with an invalid content.
 TEST_KEY=$TEST_KEY_BASE-invalid-content
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q \
     --define='[file:hello4]source=stuff:ing'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] file:hello4=source=stuff:ing: stuff:ing
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Verbose mode with free format files.
 TEST_KEY=$TEST_KEY_BASE-v1
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
@@ -100,11 +100,11 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 $OUT
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files and a file with multiple sources.
 TEST_KEY=$TEST_KEY_BASE-sources
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q \
     --command-key=test-sources \
     '--define=[file:hello4/text]source=/etc/passwd /etc/profile'
@@ -114,11 +114,11 @@ $(</etc/passwd)
 $(</etc/profile)
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files and a file with globs sources.
 TEST_KEY="$TEST_KEY_BASE-globs"
-setup
+test_setup
 mkdir -p "$TEST_DIR/$TEST_KEY"
 for I in $(seq 1 9); do
     echo "Hello World $I" >"$TEST_DIR/$TEST_KEY/hello-$I.txt"
@@ -141,21 +141,21 @@ __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 (cd "$TEST_DIR/$TEST_KEY"; rm hello-*.txt)
 rmdir "$TEST_DIR/$TEST_KEY"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files and a directory.
 TEST_KEY=$TEST_KEY_BASE-directory
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q \
     --command-key=test-directory \
     --define='[file:hello4/directory]mode=mkdir'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # As above, but directory already exists with a file.
 TEST_KEY=$TEST_KEY_BASE-directory-exists
-setup
+test_setup
 mkdir -p hello4/directory
 touch hello4/directory/file
 run_pass "$TEST_KEY" rose app-run --config=../config -q \
@@ -164,11 +164,11 @@ run_pass "$TEST_KEY" rose app-run --config=../config -q \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_test "$TEST_KEY.hello4/directory/file" hello4/directory/file
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, copying in an executable file.
 TEST_KEY=$TEST_KEY_BASE-file-mod-bits
-setup
+test_setup
 TRUE_PATH=$(which true)
 run_pass "$TEST_KEY" rose app-run --config=../config -q \
     --define="[file:bin/my-true]source=$TRUE_PATH"
@@ -178,31 +178,31 @@ file_cmp "$TEST_KEY.my-true" 'bin/my-true' "$TRUE_PATH"
 ACT_STAT=$(stat -c %a 'bin/my-true')
 EXP_STAT=$(stat -c %a "$TRUE_PATH")
 run_pass "$TEST_KEY.mod" test "$ACT_STAT" = "$EXP_STAT"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files and an existing file, with --no-overwrite.
 TEST_KEY=$TEST_KEY_BASE--no-overwrite
-setup
+test_setup
 touch hello1
 run_fail "$TEST_KEY" rose app-run --config=../config -q --no-overwrite
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] file:hello1: hello1: file already exists (and in no-overwrite mode)
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with free format files, overwrite an existing file.
 TEST_KEY=$TEST_KEY_BASE-overwrite
-setup
+test_setup
 touch hello1
 run_pass "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Install-only mode with free format files.
 TEST_KEY=$TEST_KEY_BASE--install-only
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config --install-only
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
@@ -219,11 +219,11 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.hello1" hello1 ../config/file/hello1
 file_cmp "$TEST_KEY.hello2" hello2 ../config/file/hello2
 file_cmp "$TEST_KEY.hello3" hello3/text ../config/file/hello3/text
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with an alternate install root, specified in the environment.
 TEST_KEY=$TEST_KEY_BASE-env-root
-setup
+test_setup
 ROSE_FILE_INSTALL_ROOT="$TEST_DIR/test-root" \
 TEST_DIR=$TEST_DIR \
     run_pass "$TEST_KEY" \
@@ -234,11 +234,11 @@ run_pass "$TEST_KEY.db" test -f ".rose-config_processors-file.db"
 run_pass "$TEST_KEY.hello1" test -f "$TEST_DIR/test-root/hello1"
 run_pass "$TEST_KEY.hello2" test -f "$TEST_DIR/test-root/hello2"
 run_pass "$TEST_KEY.hello3" test -f "$TEST_DIR/test-root/hello3/text"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with an alternate install root, specified in the configuration.
 TEST_KEY=$TEST_KEY_BASE-conf-root
-setup
+test_setup
 TEST_DIR=$TEST_DIR \
     run_pass "$TEST_KEY" \
     rose app-run --config=../config -q --command-key=test-root \
@@ -250,11 +250,11 @@ run_pass "$TEST_KEY.db" test -f ".rose-config_processors-file.db"
 run_pass "$TEST_KEY.hello1" test -f "$TEST_DIR/test-root/hello1"
 run_pass "$TEST_KEY.hello2" test -f "$TEST_DIR/test-root/hello2"
 run_pass "$TEST_KEY.hello3" test -f "$TEST_DIR/test-root/hello3/text"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with environment variable substituion syntax in target name.
 TEST_KEY=$TEST_KEY_BASE-target-env-syntax
-setup
+test_setup
 HELLO=hello \
 HELLO_NUM=4 \
     run_pass "$TEST_KEY" rose app-run --config=../config -q \
@@ -266,6 +266,6 @@ $(</etc/passwd)
 $(</etc/profile)
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit

@@ -20,7 +20,7 @@
 # Test "rose app-run", STDIN.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init <<'__CONFIG__'
+test_init <<'__CONFIG__'
 [command]
 default = cat
 
@@ -31,15 +31,15 @@ tests 21
 #-------------------------------------------------------------------------------
 # Normal mode, empty STDIN.
 TEST_KEY=$TEST_KEY_BASE-empty
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run -C ../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Verbose mode, empty STDIN.
 TEST_KEY=$TEST_KEY_BASE-empty-v1
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
@@ -47,20 +47,20 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] command: cat <STDIN
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, STDIN is /etc/passwd.
 TEST_KEY=$TEST_KEY_BASE
-setup
+test_setup
 run_pass "$TEST_KEY" \
     rose app-run -C ../config '--define=[file:STDIN]source=/etc/passwd' -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" /etc/passwd
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Verbose mode, STDIN is /etc/passwd.
 TEST_KEY=$TEST_KEY_BASE--v1
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run \
      -C ../config \
     '--define=[file:STDIN]source=/etc/passwd'
@@ -72,11 +72,11 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 $(</etc/passwd)
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, STDIN is /etc/passwd, --checksum.
 TEST_KEY=$TEST_KEY_BASE-checksum
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run \
      -q \
      -C ../config \
@@ -84,11 +84,11 @@ run_pass "$TEST_KEY" rose app-run \
     "--define=[file:STDIN]checksum=$(md5sum /etc/passwd | cut -d\  -f1)"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" /etc/passwd
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, STDIN is /etc/passwd, --checksum, --verbose.
 TEST_KEY=$TEST_KEY_BASE-checksum-verbose
-setup
+test_setup
 MD5_EXP=$(md5sum /etc/passwd | cut -d\  -f1)
 run_pass "$TEST_KEY" rose app-run -v \
      -q \
@@ -104,11 +104,11 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 $(< /etc/passwd)
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, STDIN is /etc/passwd, --checksum, incorrect checksum.
 TEST_KEY=$TEST_KEY_BASE-checksum-incorrect
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run \
      -q \
      -C ../config \
@@ -120,6 +120,6 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [FAIL] file:STDIN=checksum=$MD5_EXP: Unmatched checksum, expected=$MD5_EXP, actual=$MD5_ACT
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit
