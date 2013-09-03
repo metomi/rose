@@ -48,6 +48,7 @@ class ConfigValueError(Exception):
             key = "[" + "][".join(keys) + "]" + key
         return "%s=%s: configuration value error: %s" % (key, value, str(e))
 
+
 class NewModeError(Exception):
 
     """An exception raised for --new mode is not supported."""
