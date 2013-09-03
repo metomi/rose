@@ -225,7 +225,7 @@ class RoseArchApp(BuiltinApp):
             try:
                 value = env_var_process(value)
             except UnboundEnvironmentVariableError as e:
-                raise ConfigValueError(keys, value, e)
+                raise ConfigValueError([key], value, e)
         return value
 
 

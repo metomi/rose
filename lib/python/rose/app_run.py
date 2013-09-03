@@ -42,6 +42,7 @@ class ConfigValueError(Exception):
 
     def __str__(self):
         keys, value, e = self.args
+        keys = list(keys)
         key = keys.pop()
         if keys:
             key = "[" + "][".join(keys) + "]" + key
