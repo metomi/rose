@@ -42,11 +42,11 @@ class ConfigValueError(Exception):
 
     def __str__(self):
         keys, value, e = self.args
+        keys = list(keys)
         key = keys.pop()
         if keys:
             key = "[" + "][".join(keys) + "]" + key
         return "%s=%s: configuration value error: %s" % (key, value, str(e))
-
 
 class NewModeError(Exception):
 
