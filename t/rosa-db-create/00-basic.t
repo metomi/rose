@@ -76,9 +76,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] $PWD/repos/foo: DB loaded, r1 of 1.
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-cat "$TEST_KEY.err"
 sqlite3 $PWD/repos/foo.db '.dump' >"$TEST_KEY.dump"
 file_cmp "$TEST_KEY.dump" "$TEST_KEY.dump" "$TEST_SOURCE_DIR/$TEST_KEY.dump"
-diff -u "$TEST_KEY.dump" "$TEST_SOURCE_DIR/$TEST_KEY.dump"
 #-------------------------------------------------------------------------------
 exit 0
