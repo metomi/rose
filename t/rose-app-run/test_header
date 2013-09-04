@@ -21,17 +21,17 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/test_header
 
-function init() {
+function test_init() {
     mkdir $TEST_DIR/config
     cat >$TEST_DIR/config/rose-app.conf
 }
 
-function setup() {
+function test_setup() {
     mkdir $TEST_DIR/run
     cd $TEST_DIR/run
 }
 
-function teardown() {
+function test_teardown() {
     cd $TEST_DIR
     rm -rf $TEST_DIR/run
 }

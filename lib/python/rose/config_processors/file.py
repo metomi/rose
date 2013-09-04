@@ -254,10 +254,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     jobs[target.name].pending_for[source.name] = job
             else:
                 self.manager.fs_util.install(target.name)
-                loc_dao.update(target)
                 target.loc_type = target.TYPE_BLOB
                 for path, checksum in get_checksum(target.name):
                     target.add_path(path, checksum)
+                loc_dao.update(target)
 
         if jobs:
             work_dir = mkdtemp()

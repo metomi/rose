@@ -24,7 +24,7 @@ FOO='foo foolish food'
 BAR='bar barley barcelona barcode'
 BAZ='baz'
 USER=${USER:-$(whoami)}
-init <<__CONFIG__
+test_init <<__CONFIG__
 [command]
 default = printenv FOO BAR BAZ
 
@@ -39,7 +39,7 @@ tests 24
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 $FOO
@@ -47,11 +47,11 @@ $BAR
 $BAZ
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Verbose mode.
 TEST_KEY=$TEST_KEY_BASE-v1
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export BAR=bar\ barley\ barcelona\ barcode
@@ -65,11 +65,11 @@ $BAR
 $BAZ
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, redefine BAR using --define=SECTION=KEY=VALUE.
 TEST_KEY=$TEST_KEY_BASE--define
-setup
+test_setup
 REDEFINED_BAR='a man walks into a bar'
 run_pass "$TEST_KEY" \
     rose app-run --config=../config -q "--define=[env]BAR=$REDEFINED_BAR"
@@ -79,11 +79,11 @@ $REDEFINED_BAR
 $BAZ
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, redefine BAR to an undefined environment variable.
 TEST_KEY=$TEST_KEY_BASE-unbound-env
-setup
+test_setup
 if printenv NO_SUCH_VARIABLE 1>/dev/null; then
     unset NO_SUCH_VARIABLE
 fi
@@ -93,32 +93,32 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] env=BAR: NO_SUCH_VARIABLE: unbound variable
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, redefine BAR to UNDEF.
 TEST_KEY=$TEST_KEY_BASE-undef-env
-setup
+test_setup
 export UNDEF=false
 run_fail "$TEST_KEY" rose app-run --config=../config -q -D '[env]BAR=$UNDEF'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] env=BAR: UNDEF: unbound variable
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, disable the env section.
 TEST_KEY=$TEST_KEY_BASE-env-disabled
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q -D '[!env]'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, disable the env=BAR.
 TEST_KEY=$TEST_KEY_BASE-env-BAR-disabled
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q -D '[env]!BAR'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 $FOO
@@ -127,11 +127,11 @@ __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, tilde expansion.
 TEST_KEY=$TEST_KEY_BASE-env-tilde
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q -D '[env]MY_HOME=~' \
     printenv FOO BAR BAZ MY_HOME
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
@@ -141,6 +141,6 @@ $BAZ
 $HOME
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit

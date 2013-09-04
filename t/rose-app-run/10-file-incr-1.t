@@ -28,7 +28,7 @@ DIR2=$TEST_DIR/man/man2
 DIR3=$TEST_DIR/man/man3
 echo "cook a yummy burger" >$DIR2/burger_cook.2
 echo "cook a yummy chilli burger" >$DIR3/burger_cook_f.3
-init <<__CONFIG__
+test_init <<__CONFIG__
 [command]
 default=true
 
@@ -49,7 +49,7 @@ tests 7
 #-------------------------------------------------------------------------------
 # Remove symlink mode
 TEST_KEY=$TEST_KEY_BASE-mode-symlink-to-auto
-setup
+test_setup
 rose app-run --config=../config -q || exit 1
 sed -i '/mode=symlink/d; s/source=.*3$/mode=mkdir/' ../config/rose-app.conf
 run_pass "$TEST_KEY" rose app-run --config=../config -q
@@ -75,6 +75,6 @@ else
 fi
 ls man/man3 >"$TEST_KEY.3.content.out" 2>/dev/null
 file_cmp "$TEST_KEY.3.file-content" "$TEST_KEY.3.content.out" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit

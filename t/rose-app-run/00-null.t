@@ -20,38 +20,38 @@
 # Test "rose app-run" in the absence of a rose-app.conf.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init </dev/null
+test_init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
 tests 12
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err" "$PWD/rose-app.conf" "$TEST_KEY.err"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, --config.
 TEST_KEY=$TEST_KEY_BASE--config
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err" "../config/rose-app.conf" "$TEST_KEY.err"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Verbose mode.
 TEST_KEY=$TEST_KEY_BASE-v
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run -v
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err" "$PWD/rose-app.conf" "$TEST_KEY.err"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Unknown option.
 TEST_KEY=$TEST_KEY_BASE-uknown-option
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --unknown-option
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
@@ -59,6 +59,6 @@ Usage: rose app-run [OPTIONS] [--] [COMMAND ...]
 
 rose app-run: error: no such option: --unknown-option
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit
