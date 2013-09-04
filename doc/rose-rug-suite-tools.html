@@ -220,8 +220,7 @@ rose task-run -D '[env]!BAZ='
     configurations can be selected using:</p>
 
     <ol>
-      <li>The <var>opts=KEY ...</var> setting in
-      <var>rose-app.conf</var>.</li>
+      <li>The <var>opts=KEY ...</var> setting in <var>rose-app.conf</var>.</li>
 
       <li>The <var>ROSE_APP_OPT_CONF_KEYS</var> environment variable, which
       should contain a list of space delimited keys.</li>
@@ -313,7 +312,6 @@ rose task-run -D '[env]!BAZ='
     <code>fcm make</code> command.</p>
 
     <p>E.g.:</p>
-
     <pre class="prettyprint lang-rose_conf">
 meta=fcm_make
 mode=fcm_make
@@ -363,9 +361,9 @@ opts.jobs=8
 
       <li>Rename of source files.</li>
 
-      <li>Tar-Gzip or Gzip source files before sending them to the archive.</li>
+      <li>Tar-Gzip or Gzip source files before sending them to the
+      archive.</li>
     </ul>
-
 
     <p>The following settings are accepted in <kbd>[arch]</kbd> and
     <kbd>[arch:TARGET]</kbd> sections:</p>
@@ -385,8 +383,8 @@ opts.jobs=8
       is automatically determined by the file extension of the target, if it
       matches one of the allowed values. For the <var>pax|tar</var> scheme, the
       sources will be placed in a TAR archive before being sent to the target.
-      For the <var>pax.gz|tar.gz|tgz</var> scheme, the sources will be placed in
-      a TAR-GZIP file before being sent to the target. For the <var>gz</var>
+      For the <var>pax.gz|tar.gz|tgz</var> scheme, the sources will be placed
+      in a TAR-GZIP file before being sent to the target. For the <var>gz</var>
       scheme, each source file will be compressed by GZIP before being sent to
       the target.</dd>
 
@@ -410,11 +408,12 @@ opts.jobs=8
       <dt><kbd>source=NAME</kbd></dt>
 
       <dd>Compulsory for each <kbd>[arch:TARGET]</kbd> section. Specify a list
-      of space delimited source file names and/or globs for matching source file
-      names. (File names with space or quote characters can be escaped using
-      quotes or backslashes, like in a shell.) Paths are assumed to be relative
-      to <var>$ROSE_SUITE_DIR</var> or to <var>$ROSE_SUITE_DIR/PREFIX</var> if
-      <kbd>source-prefix=PREFIX</kbd> is specified.</dd>
+      of space delimited source file names and/or globs for matching source
+      file names. (File names with space or quote characters can be escaped
+      using quotes or backslashes, like in a shell.) Paths are assumed to be
+      relative to <var>$ROSE_SUITE_DIR</var> or to
+      <var>$ROSE_SUITE_DIR/PREFIX</var> if <kbd>source-prefix=PREFIX</kbd> is
+      specified.</dd>
 
       <dt><kbd>source-prefix=PREFIX</kbd></dt>
 
@@ -431,13 +430,12 @@ opts.jobs=8
       <dt><kbd>target-prefix=PREFIX</kbd></dt>
 
       <dd>Optional. Add a prefix to each target declaration. This setting
-      provides a way to avoid typing the same thing repeatedly. A trailing slash
-      (or whatever is relevant for the archiving system) should be added for a
-      directory.</dd>
+      provides a way to avoid typing the same thing repeatedly. A trailing
+      slash (or whatever is relevant for the archiving system) should be added
+      for a directory.</dd>
     </dl>
 
     <p>E.g.:</p>
-
     <pre class="prettyprint lang-rose_conf">
 # General settings
 [arch]
@@ -475,7 +473,7 @@ rename-format=%(cycle)s-%(name)s
 # Source name transformation with a rename-parser
 [arch:unknown/stuff.pax]
 rename-format=hello/%(cycle)s-%(name_head)s%(name_tail)s
-rename-parser=^(?P<name_head>stuff)ing(?P<name_tail>-.*)$
+rename-parser=^(?P&lt;name_head&gt;stuff)ing(?P&lt;name_tail&gt;-.*)$
 source=stuffing-*.txt
 
 # ...
@@ -494,7 +492,7 @@ source=stuffing-*.txt
 
     <p>The application is normally configured in the <kbd>[prune]</kbd> section
     in a <var>rose-app.conf</var>.</p>
-    
+
     <p>All settings are expressed as a space delimited list of cycles, normally
     as date/time offsets relative to the current cycle, in a format recognised
     by the <code>--offset=OFFSET</code> option of <code>rose date</code>. E.g.
@@ -527,14 +525,13 @@ source=stuffing-*.txt
 
       <dt><kbd>prune-datac-at=cycle[:globs] ...</kbd></dt>
 
-      <dd>Remove the <var>ROSE_DATAC</var> of the specified cycles. If globs are
-      specified for a cycle, only items matching the globs in the
+      <dd>Remove the <var>ROSE_DATAC</var> of the specified cycles. If globs
+      are specified for a cycle, only items matching the globs in the
       <var>ROSE_DATAC</var> directories of the specified cycle will be
       pruned.</dd>
     </dl>
 
     <p>E.g.:</p>
-
     <pre class="prettyprint lang-rose_conf">
 meta=rose_prune
 mode=rose_prune
@@ -595,9 +592,9 @@ eval $(rose task-env)
     web browser. Or if for whatever reasons <code>rose suite-hook</code> has
     failed to update the view, you can use this command to force an update.</p>
 
-    <p>See <a href="rose-command.html#rose-suite-log">Rose Reference
-    Guide: CLI &gt; rose suite-log</a> for a full list of environment
-    variables provided by this command.</p>
+    <p>See <a href="rose-command.html#rose-suite-log">Rose Reference Guide: CLI
+    &gt; rose suite-log</a> for a full list of environment variables provided
+    by this command.</p>
 
     <h2 id="other">Other Useful Tools</h2>
 
