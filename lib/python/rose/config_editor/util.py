@@ -203,7 +203,8 @@ def launch_error_dialog(exception=None, text=""):
     if exception is not None:
         text += type(exception).__name__ + ": " + str(exception)
     rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                               text, rose.config_editor.DIALOG_TITLE_ERROR)
+                               text, rose.config_editor.DIALOG_TITLE_ERROR,
+                               modal=False)
 
 
 def text_for_character_widget(text):
