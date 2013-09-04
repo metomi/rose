@@ -20,7 +20,7 @@
 # Test "rose app-run", optional configuration selection.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init <<'__CONFIG__'
+test_init <<'__CONFIG__'
 [command]
 default=true
 [poll]
@@ -34,7 +34,7 @@ tests 12
 #-------------------------------------------------------------------------------
 # Timeout test 1.
 TEST_KEY=$TEST_KEY_BASE-timeout-1
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err.0" \
@@ -42,11 +42,11 @@ file_grep "$TEST_KEY.err.0" \
 file_grep "$TEST_KEY.err.1" '* test' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.2" '* any-files' "$TEST_KEY.err"
 file_grep "$TEST_KEY.err.3" '* all-files:file1 file2' "$TEST_KEY.err"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # OK test 1.
 TEST_KEY=$TEST_KEY_BASE-ok-1
-setup
+test_setup
 (sleep 2; touch file1 file2) &
 (sleep 2; touch file3) &
 (sleep 2; touch file5) &
@@ -54,11 +54,11 @@ run_pass "$TEST_KEY" rose app-run --config=../config -q -D '[poll]delays=5*1'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 wait
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # OK test 2.
 TEST_KEY=$TEST_KEY_BASE-ok-2
-setup
+test_setup
 touch file1 file2 file4
 (sleep 2; echo "hello" | tee file1 >file2) &
 (sleep 2; echo "hello" >file4) &
@@ -69,6 +69,6 @@ run_pass "$TEST_KEY" rose app-run --config=../config -q \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 wait
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit

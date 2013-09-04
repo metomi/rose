@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 USER=${USER:-$(whoami)}
-init <<__CONFIG__
+test_init <<__CONFIG__
 [command]
 default = true
 false = false
@@ -39,40 +39,40 @@ tests 12
 #-------------------------------------------------------------------------------
 # Normal mode, command=true.
 TEST_KEY=$TEST_KEY_BASE-true
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run -C ../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, alternate command key, command-key=false.
 TEST_KEY=$TEST_KEY_BASE-false
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run -C ../config -q -c false
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] false # return-code=1
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, alternate command key, command-key=hello-world.
 TEST_KEY=$TEST_KEY_BASE-hello-world
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run -C ../config -q --command-key=hello-world
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 Hello world!
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, alternate command key, command-key=hello-user.
 TEST_KEY=$TEST_KEY_BASE-hello-user
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run -C ../config -q --command-key=hello-user
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 Hello $USER!
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit
