@@ -25,6 +25,7 @@
 #     2. rose suite-log --update [ITEM ...]
 #        rose suite-log --update '*' # all task jobs
 #     3. rose suite-log --archive CYCLE ...
+#        rose suite-log --archive '*' # all cycles
 #
 # DESCRIPTION
 #     View or update suite log.
