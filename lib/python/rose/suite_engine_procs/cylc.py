@@ -454,7 +454,8 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         cycles = []
         if "*" in items:
-            rows = self._select("SELECT DISTINCT cycle in task_events")
+            rows = self._select(suite_name,
+                                "SELECT DISTINCT cycle from task_events")
             for row in rows:
                 cycles.append(row[0])
         else:
