@@ -60,7 +60,7 @@ class SplashScreen(gtk.Window):
         self.stopped = False
         self.set_icon(rose.gtk.util.get_icon())
         self.modify_bg(gtk.STATE_NORMAL,
-                       gtk.gdk.color_parse(self.BACKGROUND_COLOUR))
+                       rose.gtk.util.color_parse(self.BACKGROUND_COLOUR))
         self.set_gravity(gtk.gdk.GRAVITY_CENTER)
         self.set_position(gtk.WIN_POS_CENTER)
         main_vbox = gtk.VBox()

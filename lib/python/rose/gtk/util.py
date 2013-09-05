@@ -38,7 +38,9 @@ import gobject
 import glib
 import pango
 
+import rose.reporter
 import rose.resource
+
 
 REC_HYPERLINK_ID_OR_URL = re.compile(
                     r"""(?P<start_break>\b)
@@ -584,6 +586,16 @@ class TreeModelSortUtil(object):
 
 run_gtk_main = gtk.main
 quit_gtk_main = gtk.main_quit
+
+
+def color_parse(color_specification):
+    """Wrap gtk.gdk.color_parse and report errors with the specification."""
+    try:
+        return gtk.gdk.color_parse(color_specification)
+    except ValueError as e:
+        rose.reporter.Reporter().report(e)
+        # Return a strange and noticeable colour.
+        return gtk.gdk.color_parse("#00FF00")  # Lime
 
 
 def get_hyperlink_label(text, search_func=lambda i: False):
