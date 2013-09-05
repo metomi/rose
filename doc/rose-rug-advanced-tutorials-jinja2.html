@@ -167,7 +167,8 @@
       (<samp>{{</samp> to <samp>}}</samp>) a number <samp>num</samp> in the
       line each time.</p>
 
-      <p>When evaluated, it will produce something that is nearly correct:</p>
+      <p>When evaluated, it will produce something that is very nearly
+      correct:</p>
       <pre class="prettyprint lang-cylc">
             ignite_rocket_0 =&gt; \
             ignite_rocket_1 =&gt; \
@@ -189,7 +190,7 @@
       loop text with:</p>
       <pre class="prettyprint lang-cylc">
 {%- for num in range(16) %}
-{% set num_label = '%02d' % num %}
+{%- set num_label = '%02d' % num %}
            ignite_rocket_{{ num_label }} =&gt; \
 {%- endfor %}
 </pre>
@@ -201,19 +202,9 @@
       <p>This would produce output like this:</p>
       <pre class="prettyprint lang-cylc">
            ignite_rocket_00 =&gt; \
-           
            ignite_rocket_01 =&gt; \
-           
            ignite_rocket_02 =&gt; \
            ...
-</pre>
-
-      <p>which is almost there! We forgot to add the <samp>-</samp> after
-      <samp>{%</samp>, which removes the newline for the <samp>set
-      num_label</samp> line. Fix this by adding it in so that the line
-      reads:</p>
-      <pre class="prettyprint lang-cylc">
-{%- set num_label = '%02d' % num %}
 </pre>
     </div>
 
