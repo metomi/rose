@@ -54,6 +54,14 @@ MARKUP_URL_UNDERLINE = (r"""\g<start_break>""" +
                         r"""\g<end_break>""")
 
 
+class ColourParseError(ValueError):
+
+    """An exception raised when gtk colour parsing fails."""
+
+    def __str__(self):
+        return "unable to parse colour specification: %s" % self.args[0]
+
+
 class CustomButton(gtk.Button):
 
     """Returns a custom gtk.Button."""
@@ -592,10 +600,11 @@ def color_parse(color_specification):
     """Wrap gtk.gdk.color_parse and report errors with the specification."""
     try:
         return gtk.gdk.color_parse(color_specification)
-    except ValueError as e:
-        rose.reporter.Reporter().report(e)
-        # Return a strange and noticeable colour.
-        return gtk.gdk.color_parse("#00FF00")  # Lime
+    except ValueError:
+        rose.reporter.Reporter().report(
+                ColourParseError(color_specification))
+        # Return a noticeable colour.
+        return gtk.gdk.color_parse("#0000FF")  # Blue
 
 
 def get_hyperlink_label(text, search_func=lambda i: False):
