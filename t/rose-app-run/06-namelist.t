@@ -92,7 +92,7 @@ red_onion = 3
 carrot = 1
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 18
+tests 21
 #-------------------------------------------------------------------------------
 # Normal mode with namelist files.
 TEST_KEY=$TEST_KEY_BASE
@@ -203,6 +203,18 @@ TEST_KEY=$TEST_KEY_BASE-non-existent
 test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q \
     '--define=[file:shopping-list-3.nl]source=namelist:shopping_list'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+[FAIL] file:shopping-list-3.nl=source=namelist:shopping_list: bad setting
+__CONTENT__
+test_teardown
+#-------------------------------------------------------------------------------
+# Normal mode with file referencing an ignored namelist section.
+TEST_KEY=$TEST_KEY_BASE-ignored
+test_setup
+run_fail "$TEST_KEY" rose app-run --config=../config -q \
+    '--define=[file:shopping-list-3.nl]source=namelist:shopping_list' \
+    '--define=[!namelist:shopping_list]'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] file:shopping-list-3.nl=source=namelist:shopping_list: bad setting

@@ -77,6 +77,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 sqlite3 $PWD/repos/foo.db '.dump' >"$TEST_KEY.dump"
-file_cmp "$TEST_KEY.dump" "$TEST_KEY.dump" "$TEST_SOURCE_DIR/$TEST_KEY.dump"
+sed "s/\\\$USER/$USER/" "$TEST_SOURCE_DIR/$TEST_KEY.dump" >"$TEST_KEY.dump.expected"
+file_cmp "$TEST_KEY.dump" "$TEST_KEY.dump" "$TEST_KEY.dump.expected"
 #-------------------------------------------------------------------------------
 exit 0

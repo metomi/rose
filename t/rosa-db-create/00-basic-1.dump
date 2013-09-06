@@ -10,7 +10,7 @@ CREATE TABLE changeset (
 	from_idx VARCHAR(1024), 
 	PRIMARY KEY (revision, idx, branch)
 );
-INSERT INTO "changeset" VALUES(1,'frsn',1234567890,'foo-aa000','trunk','A ',NULL);
+INSERT INTO "changeset" VALUES(1,'$USER',1234567890,'foo-aa000','trunk','A ',NULL);
 CREATE TABLE main (
 	idx VARCHAR(1024) NOT NULL, 
 	branch VARCHAR(1024) NOT NULL, 
