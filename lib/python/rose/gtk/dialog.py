@@ -585,7 +585,7 @@ def get_naming_dialog(label, checker, ok_tip=None,
 
 def _name_checker(entry, checker, ok_button, ok_tip, err_tip):
     good_colour = ok_button.style.text[gtk.STATE_NORMAL]
-    bad_colour = gtk.gdk.color_parse(
+    bad_colour = rose.gtk.util.color_parse(
                          rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
     name = entry.get_text()
     if checker(name):

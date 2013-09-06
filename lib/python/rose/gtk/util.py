@@ -38,7 +38,9 @@ import gobject
 import glib
 import pango
 
+import rose.reporter
 import rose.resource
+
 
 REC_HYPERLINK_ID_OR_URL = re.compile(
                     r"""(?P<start_break>\b)
@@ -50,6 +52,14 @@ MARKUP_URL_HTML = (r"""\g<start_break>""" +
 MARKUP_URL_UNDERLINE = (r"""\g<start_break>""" +
                         r"""<u>\g<url></u>""" + 
                         r"""\g<end_break>""")
+
+
+class ColourParseError(ValueError):
+
+    """An exception raised when gtk colour parsing fails."""
+
+    def __str__(self):
+        return "unable to parse colour specification: %s" % self.args[0]
 
 
 class CustomButton(gtk.Button):
@@ -584,6 +594,17 @@ class TreeModelSortUtil(object):
 
 run_gtk_main = gtk.main
 quit_gtk_main = gtk.main_quit
+
+
+def color_parse(color_specification):
+    """Wrap gtk.gdk.color_parse and report errors with the specification."""
+    try:
+        return gtk.gdk.color_parse(color_specification)
+    except ValueError:
+        rose.reporter.Reporter().report(
+                ColourParseError(color_specification))
+        # Return a noticeable colour.
+        return gtk.gdk.color_parse("#0000FF")  # Blue
 
 
 def get_hyperlink_label(text, search_func=lambda i: False):
