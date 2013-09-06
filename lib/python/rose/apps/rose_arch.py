@@ -23,7 +23,8 @@ import errno
 from glob import glob
 import os
 import re
-from rose.app_run import BuiltinApp, ConfigValueError
+from rose.app_run import (BuiltinApp, ConfigValueError,
+    CompulsoryConfigValueError)
 from rose.checksum import get_checksum
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.reporter import Event
@@ -195,8 +196,12 @@ class RoseArchApp(BuiltinApp):
                         sources.append(source.path)
                 sources_str = app_runner.popen.list_to_shell_str(sources)
                 target_str = app_runner.popen.list_to_shell_str([target.name])
-                command = target.command_format % {"sources": sources_str,
-                                                   "target": target_str}
+                try:
+                    command = target.command_format % {"sources": sources_str,
+                                                       "target": target_str}
+                except KeyError as e:
+                    raise ConfigValueError(
+                                ["command-format"], target.command_format, e)
                 rc, out, err = app_runner.popen.run(command, shell=True)
                 target.command_rc = rc
                 dao.update_command_rc(target)
@@ -220,7 +225,8 @@ class RoseArchApp(BuiltinApp):
                         [key],
                         r_node.get_value([self.SECTION, key], default=default))
         if compulsory and not value:
-            raise ConfigValueError([self.SECTION, key], None, KeyError(key))
+            raise CompulsoryConfigValueError([key], None,
+                                             KeyError(key))
         if value:
             try:
                 value = env_var_process(value)
