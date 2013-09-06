@@ -149,16 +149,14 @@ def get_suite_name(event_handler=None):
     suite_name = None
     conf_dir = os.getcwd()
     while True:
-        conf = os.path.join(conf_dir,'rose-suite.conf')
-        if os.path.exists(conf):
-            suite_name = os.path.basename(conf_dir)
-            break
-        else:
-            up_dir = fs_util.dirname(conf_dir)
-            if up_dir == conf_dir:
-                raise SuiteNotFoundError(os.getcwd())
-            conf_dir = up_dir        
-    return suite_name
+        for tail in ["rose-suite.conf", "rose-stem/rose-suite.conf"]:
+            conf = os.path.join(conf_dir, tail)
+            if os.path.exists(conf):
+                return os.path.basename(conf_dir)
+        up_dir = fs_util.dirname(conf_dir)
+        if up_dir == conf_dir:
+            raise SuiteNotFoundError(os.getcwd())
+        conf_dir = up_dir        
 
 def prompt(action, suite_name, host):
     """Prompt user to confirm action for suite_name at host."""
