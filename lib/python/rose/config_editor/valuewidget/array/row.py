@@ -34,7 +34,7 @@ class RowArrayValueWidget(gtk.HBox):
 
     """This is a class to represent a value as part of a row."""
 
-    BAD_COLOUR = gtk.gdk.color_parse(
+    BAD_COLOUR = rose.gtk.util.color_parse(
                         rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
     CHECK_NAME_IS_ELEMENT = re.compile('.*\(\d+\)$').match
     TIP_ADD = 'Add array element'

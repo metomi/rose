@@ -364,7 +364,7 @@ class MainMenuHandler(object):
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self.find_ns_id_func = find_ns_id_func
-        self.bad_colour = gtk.gdk.color_parse(
+        self.bad_colour = rose.gtk.util.color_parse(
                           rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
 
     def about_dialog(self, args):

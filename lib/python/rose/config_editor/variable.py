@@ -61,9 +61,9 @@ class VariableWidget(object):
             show_modes = {}
         self.show_modes = show_modes
         self.insensitive_colour = gtk.Style().bg[0]
-        self.bad_colour = gtk.gdk.color_parse(
+        self.bad_colour = rose.gtk.util.color_parse(
                         rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
-        self.hidden_colour = gtk.gdk.color_parse(
+        self.hidden_colour = rose.gtk.util.color_parse(
                         rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT)
         self.keywidget = self.get_keywidget(variable, show_modes)
         self.generate_valuewidget(variable)
@@ -206,7 +206,7 @@ class VariableWidget(object):
 
     def handle_focus_in(self, widget, event):
         widget._first_colour = widget.style.base[gtk.STATE_NORMAL]
-        new_colour = gtk.gdk.color_parse(
+        new_colour = rose.gtk.util.color_parse(
                          rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED)
         widget.modify_base(gtk.STATE_NORMAL, new_colour)
 

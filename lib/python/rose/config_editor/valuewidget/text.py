@@ -25,8 +25,9 @@ import gtk
 import rose.config_editor
 import rose.config_editor.valuewidget
 import rose.env
+import rose.gtk.util
 
-ENV_COLOUR = gtk.gdk.color_parse(
+ENV_COLOUR = rose.gtk.util.color_parse(
                      rose.config_editor.COLOUR_VARIABLE_TEXT_VAL_ENV)
 
 

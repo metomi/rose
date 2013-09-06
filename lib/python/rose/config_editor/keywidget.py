@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 
 import re
+import sys
 
 import pango
 import pygtk
@@ -49,8 +50,9 @@ class KeyWidget(gtk.VBox):
              rose.config_editor.FLAG_TYPE_NO_META:
                   gtk.STOCK_DIALOG_QUESTION}
 
-    MODIFIED_COLOUR = gtk.gdk.color_parse(
-                              rose.config_editor.COLOUR_VARIABLE_CHANGED)
+    MODIFIED_COLOUR = rose.gtk.util.color_parse(
+                               rose.config_editor.COLOUR_VARIABLE_CHANGED)
+                                  
     LABEL_X_OFFSET = 0.01
     
 
