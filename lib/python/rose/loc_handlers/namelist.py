@@ -57,8 +57,6 @@ class NamelistLocHandler(object):
         """Write namelist to loc.cache."""
         if not loc.loc_type:
             self.parse(loc, config)
-        f = open(loc.cache, "wb")
-
         if loc.name.endswith("(:)"):
             name = loc.name[0:-2]
             sections = [k for k in config.value.keys() if k.startswith(name)]
@@ -68,10 +66,11 @@ class NamelistLocHandler(object):
             raise ValueError(loc.name)
         if loc.name.endswith("(:)"):
             sections.sort(rose.config.sort_settings)
+        f = open(loc.cache, "wb")
         for section in sections:
             section_node = config.get([section], no_ignore=True)
-            if section_node.state:
-                continue
+            if section_node is None:
+                raise ValueError(loc.name)
             group = RE_NAMELIST_GROUP.match(section).group(1)
             nlg = "&" + group + "\n"
             for key, node in sorted(section_node.value.items()):
