@@ -39,6 +39,7 @@ class ConfigValueError(Exception):
     """An exception raised when a config value is incorrect."""
 
     SYNTAX = "syntax"
+    ERROR_FORMAT = "%s=%s: configuration value error: %s"
 
     def __str__(self):
         keys, value, e = self.args
@@ -46,7 +47,12 @@ class ConfigValueError(Exception):
         key = keys.pop()
         if keys:
             key = "[" + "][".join(keys) + "]" + key
-        return "%s=%s: configuration value error: %s" % (key, value, str(e))
+        return self.ERROR_FORMAT % (key, value, str(e))
+
+
+class CompulsoryConfigValueError(ConfigValueError):
+
+    ERROR_FORMAT = "%s=%s: missing configuration error: %s"
 
 
 class NewModeError(Exception):

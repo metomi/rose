@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 15
+tests 18
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -71,6 +71,19 @@ for CYCLE in 2013010100 2013010112 2013010200; do
             $ACTUAL "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out"
     done
 done
+CYCLE=2013010112
+TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_1.$CYCLE.1.err" <<__ERROR__
+[FAIL] command-format=foo put %(target)s %(source)s: configuration value error: 'source'
+__ERROR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-2"
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_2.$CYCLE.1.err" <<__ERROR__
+[FAIL] source=None: missing configuration error: 'source'
+__ERROR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-3"
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_3.$CYCLE.1.err" <<'__ERROR__'
+[FAIL] source=$UNBOUND_PLANET-[1-9].txt: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNBOUND_PLANET
+__ERROR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0
