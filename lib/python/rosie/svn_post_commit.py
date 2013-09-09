@@ -135,7 +135,7 @@ class RosieSvnPostCommitHook(object):
         return True
 
 
-    def run(self, repos, rev):
+    def run(self, repos, rev, *args):
         """Update database with changes in a changeset."""
         conf = ResourceLocator.default().get_conf()
         rosie_db_node = conf.get(["rosie-db"], no_ignore=True)
@@ -309,11 +309,10 @@ class RosieSvnPostCommitHook(object):
 if __name__ == "__main__":
     opt_parser = RoseOptionParser()
     opts, args = opt_parser.parse_args()
-    repos, rev = args
     report = Reporter(opts.verbosity - opts.quietness)
     hook = RosieSvnPostCommitHook(report)
     try:
-        hook(repos, rev)
+        hook(*args)
     except Exception as e:
         report(e)
         if opts.debug_mode:
