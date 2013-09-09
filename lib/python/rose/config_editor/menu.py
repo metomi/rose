@@ -35,6 +35,7 @@ import rose.gtk.dialog
 import rose.gtk.run
 import rose.macro
 import rose.macros
+import rose.popen
 import rose.suite_control
 import rose.suite_log_view
 
@@ -938,7 +939,13 @@ class MainMenuHandler(object):
         
     def launch_terminal(self):
         # Handle a launch terminal request.
-        rose.external.launch_terminal()
+        try:
+            rose.external.launch_terminal()
+        except rose.popen.RosePopenError as e:
+            rose.gtk.dialog.run_dialog(
+                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                str(e),
+                                rose.config_editor.DIALOG_TITLE_ERROR)
 
     def launch_output_viewer(self):
         """View a suite's output, if any."""

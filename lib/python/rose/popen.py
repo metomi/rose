@@ -178,6 +178,8 @@ class RosePopener(object):
             else:
                 p = Popen(args, **kwargs)
         except OSError as e:
+            if e.filename is None and args:
+                e.filename = args[0]
             raise RosePopenError(args, 1, "", str(e))
         return p
 
@@ -228,3 +230,27 @@ class RosePopener(object):
                 return file_name
 
     __call__ = run_ok
+
+
+if __name__ == "__main__":
+    import errno
+    import unittest
+
+
+    class _TestOSErrorFilename(unittest.TestCase):
+        """Ensure an OSError has a filename."""
+
+        def test_oserror_has_filename(self):
+            """Does what it says."""
+            rose_popen = RosePopener()
+            name = "bad-command"
+            try:
+                rose_popen.run(name)
+            except RosePopenError as e:
+                ose = OSError(errno.ENOENT, os.strerror(errno.ENOENT), name)
+                self.assertEqual(str(ose), e.stderr)
+            else:
+                self.fail("should return OSError")
+
+
+    unittest.main()

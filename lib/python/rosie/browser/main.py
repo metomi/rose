@@ -45,6 +45,7 @@ import rose.gtk.run
 import rose.gtk.splash
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
+from rose.popen import RosePopenError
 from rose.resource import ResourceLocator, ResourceError
 from rose.suite_control import SuiteControl
 from rose.suite_log_view import SuiteLogViewGenerator, WebBrowserEvent
@@ -731,7 +732,14 @@ class MainWindow(gtk.Window):
     def handle_launch_terminal(self, *args):
         """Launch a terminal at the current suite directory."""
         id_text = self.get_selected_suite_id()
-        rose.external.launch_terminal(cwd=SuiteId(id_text).to_local_copy())
+        try:
+            rose.external.launch_terminal(cwd=SuiteId(id_text).to_local_copy())
+        except RosePopenError as e:
+            rose.gtk.dialog.run_dialog(
+                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                str(e),
+                                rosie.browser.TITLE_ERROR)
+
 
     def handle_next_search(self, *args):
         """Handles trying to run next search."""
