@@ -417,6 +417,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
         If port file exists, return "PORT-FILE-PATH".
         If port file exists on a host, return "HOSTNAME:PORT-FILE-PATH".
+        If no port file but process exists on a host return:
+            "process running for this suite on HOSTNAME"
         Or None otherwise.
 
         """
@@ -442,7 +444,20 @@ class CylcProcessor(SuiteEngineProcessor):
                         reason = host + ":" + port_file
             if host_proc_dict:
                 sleep(0.1)
-                
+        if reason is None:
+            for host in sorted(hosts):
+                if host == "localhost":
+                    continue
+                cmd = self.popen.get_cmd("ssh", host, "pgrep", "-u", 
+                                         os.environ['USER'], suite_name, '-f')
+                host_proc_dict[host] = self.popen.run_bg(*cmd)
+            while host_proc_dict:
+                for host, proc in host_proc_dict.items():
+                    rc = proc.poll()
+                    if rc is not None:
+                        host_proc_dict.pop(host)
+                        if rc == 0:
+                            reason = "process running for this suite on " + host
         return reason
 
     def job_logs_archive(self, suite_name, items):
