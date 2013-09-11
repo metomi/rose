@@ -448,8 +448,9 @@ class CylcProcessor(SuiteEngineProcessor):
             for host in sorted(hosts):
                 if host == "localhost":
                     continue
-                cmd = self.popen.get_cmd("ssh", host, "pgrep", "-u", 
-                                         os.environ['USER'], suite_name, '-f')
+                cmd = self.popen.get_cmd("ssh", host, "pgrep", "-u",
+                                         pwd.getpwuid(os.getuid()).pw_name,
+                                         suite_name, '-f')
                 host_proc_dict[host] = self.popen.run_bg(*cmd)
             while host_proc_dict:
                 for host, proc in host_proc_dict.items():
