@@ -149,10 +149,11 @@ def get_suite_name(event_handler=None):
     suite_name = None
     conf_dir = os.getcwd()
     while True:
-        for tail in ["rose-suite.conf", "rose-stem/rose-suite.conf"]:
-            conf = os.path.join(conf_dir, tail)
-            if os.path.exists(conf):
-                return os.path.basename(conf_dir)
+        if os.path.basename(conf_dir) != "rose-stem":
+            for tail in ["rose-suite.conf", "rose-stem/rose-suite.conf"]:
+                conf = os.path.join(conf_dir, tail)
+                if os.path.exists(conf):
+                    return os.path.basename(conf_dir)
         up_dir = fs_util.dirname(conf_dir)
         if up_dir == conf_dir:
             raise SuiteNotFoundError(os.getcwd())
