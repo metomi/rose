@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 20
+tests 21
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -90,6 +90,15 @@ __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-5"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5.$CYCLE.1.err" <<'__ERR__'
 [FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: 'hello/mercurry.txt'
+__ERR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
+diff -u - "${FILE_PREFIX}6.$CYCLE.1.err" <<__ERR__
+[FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/data/2013010112/hello/mars.txt # return-code=1, stderr=
+[FAIL] foo: push: unknown action
+__ERR__
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}6.$CYCLE.1.err" <<__ERR__
+[FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/data/2013010112/hello/mars.txt # return-code=1, stderr=
+[FAIL] foo: push: unknown action
 __ERR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
