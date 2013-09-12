@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 18
+tests 20
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -55,7 +55,6 @@ for CYCLE in 2013010100 2013010112 2013010200; do
         >"$TEST_KEY-$CYCLE.out"
     file_cmp "$TEST_KEY-$CYCLE.out" \
         "$TEST_KEY-$CYCLE.out" "$TEST_SOURCE_DIR/$TEST_KEY.out"
-    diff -u "$TEST_KEY-$CYCLE.out" "$TEST_SOURCE_DIR/$TEST_KEY.out"
     TEST_KEY="$TEST_KEY_BASE-unknown-stuff"
     tar -tf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/unknown/stuff.pax | sort \
         >"$TEST_KEY-$CYCLE.out"
@@ -63,7 +62,6 @@ for CYCLE in 2013010100 2013010112 2013010200; do
         >"$TEST_KEY-$CYCLE.out.expected"
     file_cmp "$TEST_KEY-$CYCLE.out" \
         "$TEST_KEY-$CYCLE.out" "$TEST_KEY-$CYCLE.out.expected"
-    diff -u "$TEST_KEY-$CYCLE.out" "$TEST_KEY-$CYCLE.out.expected"
     TEST_KEY="$TEST_KEY_BASE-db"
     for TRY in 1 2; do
         ACTUAL=$SUITE_RUN_DIR/work/archive.$CYCLE/rose-arch-db-$TRY.out
@@ -73,17 +71,26 @@ for CYCLE in 2013010100 2013010112 2013010200; do
 done
 CYCLE=2013010112
 TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
-file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_1.$CYCLE.1.err" <<__ERROR__
-[FAIL] command-format=foo put %(target)s %(source)s: configuration value error: 'source'
-__ERROR__
+FILE_PREFIX="$SUITE_RUN_DIR/log/job/archive_bad_"
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}1.$CYCLE.1.err" <<'__ERR__'
+[FAIL] [foo://2013010112/hello/worlds/planet-n.tar.gz]command-format=foo put %(target)s %(source)s: configuration value error: 'source'
+__ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-2"
-file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_2.$CYCLE.1.err" <<__ERROR__
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}2.$CYCLE.1.err" <<'__ERR__'
 [FAIL] source=None: missing configuration error: 'source'
-__ERROR__
+__ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-3"
-file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_3.$CYCLE.1.err" <<'__ERROR__'
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}3.$CYCLE.1.err" <<'__ERR__'
 [FAIL] source=$UNBOUND_PLANET-[1-9].txt: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNBOUND_PLANET
-__ERROR__
+__ERR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-4"
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}4.$CYCLE.1.err" <<'__ERR__'
+[FAIL] [arch:$UNKNOWN_DARK_PLANETS.tar.gz]=: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNKNOWN_DARK_PLANETS
+__ERR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-5"
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5.$CYCLE.1.err" <<'__ERR__'
+[FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: 'hello/mercurry.txt'
+__ERR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0
