@@ -20,7 +20,29 @@ Changes that have significant impact on user experience.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-\#885: rose-app.conf, rose-suite.conf: A `SOURCE` in the `source=SOURCE ...`
+\#917, \#897, \#896, \#894: rose_arch: improve diagnostics.
+
+\#913: rose suite-run: use `pgrep` to check if suite is running or not.
+
+\#912: rose.popen: ensure that an `OSError` has the command name. This improves
+diagnostics on command-not-found errors.
+
+\#911: rosa svn-post-commit: modify for Subversion 1.8.
+
+\#908: rose app-run: improve diagnostics for reference to ignored namelists.
+
+\#902: rose suite-log: fix `--archive '*'`.
+
+\#901: rose config-edit and rosie go: improve invalid colour diagnostics.
+
+\#900: rose config-edit: fix modal metadata dialog.
+
+\#891: rose suite-run: fix repeated jinja2 insertion when `rose suite-run` is
+invoked from the installed suite directory.
+
+\#889: rose config: improve syntax error diagnostics.
+
+\#888: rose-app.conf, rose-suite.conf: A `SOURCE` in the `source=SOURCE ...`
 declaration in a `[file:NAME]` section can now be a glob for matching files
 names in the file system.
 
