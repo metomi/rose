@@ -176,7 +176,7 @@ class RoseArchApp(BuiltinApp):
                 if rename_parser:
                     try:
                         rename_parser = re.compile(rename_parser)
-                    except Exception as e:
+                    except re.error as e:
                         raise RoseArchRenameParserError(
                             t_key, rename_parser, e)
                 for source in target.sources.values():
