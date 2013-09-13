@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ from rose.suite_engine_proc import \
 import socket
 import sqlite3
 import tarfile
-from time import mktime, sleep, strptime
+from time import sleep
 from uuid import uuid4
 
 
@@ -44,47 +44,65 @@ class CylcProcessor(SuiteEngineProcessor):
 
     CYCLE_LOG_ARCHIVE_PREFIX = "job-"
     CYCLE_LOG_ARCHIVE_SUFFIX = ".tar.gz"
-    DB_SELECT_RETRY_DELAY = 0.25
     EVENTS = {"submission succeeded": "submit",
-              "submission failed": "submit-fail",
+              "submission failed": "fail(submit)",
+              "submitting now": "submit-init",
               "started": "init",
-              "succeeded": "pass",
+              "succeeded": "success",
               "failed": "fail",
               "execution started": "init",
-              "execution succeeded": "pass",
+              "execution succeeded": "success",
               "execution failed": "fail",
-              "signaled": "fail"}
-    N_DB_SELECT_TRIES = 20
+              "signaled": "fail(%s)"}
+    EVENT_TIME_INDICES = {"submit-init": 0, "init": 1, "success": 2, "fail": 2}
+    EVENT_RANKS = {"submit-init": 0, "submit": 1, "fail(submit)": 1, "init": 2,
+                   "success": 3, "fail": 3, "fail(%s)": 4}
+    JOB_LOGS_DB = "log/rose-job-logs.db"
+    JOB_LOG_TAIL_KEYS = {"": "00-script", "out": "01-out", "err": "02-err"}
+    ORDERS = {
+            "time_desc": "time DESC, submit_num DESC, name DESC, cycle DESC",
+            "time_asc": "time ASC, submit_num ASC, name ASC, cycle ASC",
+            "cycle_desc_name_asc": "cycle DESC, name ASC, submit_num DESC",
+            "cycle_desc_name_desc": "cycle DESC, name DESC, submit_num DESC",
+            "cycle_asc_name_asc": "cycle ASC, name ASC, submit_num DESC",
+            "cycle_asc_name_desc": "cycle ASC, name DESC, submit_num DESC",
+            "name_asc_cycle_asc": "name ASC, cycle ASC, submit_num DESC",
+            "name_desc_cycle_asc": "name DESC, cycle ASC, submit_num DESC",
+            "name_asc_cycle_desc": "name ASC, cycle DESC, submit_num DESC",
+            "name_desc_cycle_desc": "name DESC, cycle DESC, submit_num DESC"}
     PYRO_TIMEOUT = 5
     REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
-    RUN_DIR_REL_ROOT = "cylc-run"
+    REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     SCHEME = "cylc"
+    STATUSES = {"active": ["submitting", "submitted", "running"],
+                "fail": ["submission failed", "failed"],
+                "success": ["succeeded"]}
     SUITE_CONF = "suite.rc"
+    SUITE_DB = "cylc-suite.db"
+    SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
-    TASK_LOG_DELIM = "."
+
+    def __init__(self, *args, **kwargs):
+        SuiteEngineProcessor.__init__(self, *args, **kwargs)
+        self.daos = {self.SUITE_DB: {}, self.JOB_LOGS_DB: {}}
 
     def clean(self, suite_name, hosts=None):
         """Remove items created by the previous run of a suite."""
-        if self.is_suite_running(suite_name, hosts):
+        if self.is_suite_running(None, suite_name, hosts):
             raise StillRunningError(suite_name,
                                     self.ping(suite_name, hosts)[0])
         job_auths = []
-        if os.access(self.get_suite_db_file(suite_name), os.F_OK | os.R_OK):
-            try:
-                job_auths = self.get_suite_jobs_auths(suite_name)
-            except sqlite3.OperationalError as e:
-                pass
-            finally:
-                # N.B. Must close cursor to ensure that DB file can be removed.
-                self.cursor.close()
-                self.cursor = None
+        try:
+            job_auths = self.get_suite_jobs_auths(suite_name)
+        except sqlite3.OperationalError as e:
+            pass
         conf = ResourceLocator.default().get_conf()
         for job_auth in job_auths + ["localhost"]:
             if "@" in job_auth:
                 job_host = job_auth.split("@", 1)[1]
             else:
                 job_host = job_auth
-            dirs = [] 
+            dirs = []
             for key in ["share", "work"]:
                 item_root = None
                 node_value = conf.get_value(
@@ -140,161 +158,183 @@ class CylcProcessor(SuiteEngineProcessor):
         d = {"datac": "share/data/" + cycle, "work": "work/*." + cycle}
         return d.get(name)
 
-    def get_cycle_log_archive_name(self, cycle_time):
-        """Return the jobs log archive file name of a given cycle."""
-        return (self.CYCLE_LOG_ARCHIVE_PREFIX + cycle_time +
-                self.CYCLE_LOG_ARCHIVE_SUFFIX)
-
-    def get_suite_db_file(self, suite_name):
-        """Return the path to the suite runtime database file."""
-        return self.get_suite_dir(suite_name, "cylc-suite.db")
-
-    def get_suite_dir_rel(self, suite_name, *args):
+    def get_suite_dir_rel(self, suite_name, *paths):
         """Return the relative path to the suite running directory.
 
-        Extra args, if specified, are added to the end of the path.
+        paths -- if specified, are added to the end of the path.
 
         """
-        return os.path.join(self.RUN_DIR_REL_ROOT, suite_name, *args)
+        return os.path.join(self.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
-    def get_suite_events(self, suite_name, items):
-        """Parse the cylc suite running database for task events.
+    def get_suite_job_events(self, user_name, suite_name, cycles, tasks,
+                             no_statuses, order, limit, offset):
+        """Return suite job events.
 
-        suite_name -- The name of the suite.
-        items -- A list of relevant cycle times or task IDs. Only suite task
-                 events for tasks in the specified list are retured.
+        user -- A string containing a valid user ID
+        suite -- A string containing a valid suite ID
+        cycles -- Display only task jobs matching these cycles. A value in the
+                  list can be a cycle, the string "before|after CYCLE", or a
+                  glob to match cycles.
+        tasks -- Display only jobs for task names matching these names. Values
+                 can be a valid task name or a glob like pattern for matching
+                 valid task names.
+        no_statues -- Do not display jobs with these statuses. Valid values are
+                      the keys of CylcProcessor.STATUSES.
+        order -- Order search in a predetermined way. A valid value is one of
+                 the keys in CylcProcessor.ORDERS.
+        limit -- Limit number of returned entries
+        offset -- Offset entry number
 
-        Assume current working directory is suite's log directory.
+        Return (entries, of_n_entries) where:
+        entries -- A list of matching entries
+        of_n_entries -- Total number of entries matching query
 
-        Return a  data structure that looks like:
-        {   <cycle time string>: {
-                "cycle_time": <cycle time>,
-                "tasks": {
-                    <task name>: [
-                        {   "events": {
-                                "submit": <seconds-since-epoch>,
-                                "init": <seconds-since-epoch>,
-                                "exit": <seconds-since-epoch>,
-                            },
-                            "files": {
-                                "script": {"n_bytes": <n_bytes>},
-                                "out": {"n_bytes": <n_bytes>},
-                                "err": {"n_bytes": <n_bytes>},
-                                # ... more files
-                            },
-                            "signal": <signal-name-if-job-killed-by-signal>,
-                            "status": <"pass"|"fail">,
-                        },
-                        # ... more re-submits of the task
-                    ],
-                    # ... more relevant task names
-                }
-            }
-            # ... more relevant cycle times
-        }
+        Each entry is a dict:
+            {"cycle": cycle, "name": name, "submit_num": submit_num,
+             "events": [time_submit, time_init, time_exit],
+             "status": None|"submit|fail(submit)|init|success|fail|fail(%s)",
+             "logs": {"script": {"path": path, "path_in_tar", path_in_tar,
+                                 "size": size, "mtime": mtime},
+                      "out": {...},
+                      "err": {...},
+                      ...}}
+
         """
-
-        # Read task events from suite runtime database
+        # Build WHERE expression to select by cycles and/or task names
         where = ""
         stmt_args = []
-        if "*" not in items:
-            for item in items:
-                cycle, name = self._parse_task_cycle_id(item)
-                if where:
-                    where += " OR"
-                where += " ("
-                if cycle:
-                    where += "cycle==?"
-                    stmt_args.append(cycle)
-                if name:
-                    if cycle:
-                        where += " AND "
-                    where += "name==?"
-                    stmt_args.append(name)
-                where += ")"
+        if cycles:
+            where_fragments = []
+            for cycle in cycles:
+                if cycle.startswith("before "):
+                    value = cycle.split(None, 1)[-1]
+                    where_fragments.append("cycle <= ?")
+                elif cycle.startswith("after "):
+                    value = cycle.split(None, 1)[-1]
+                    where_fragments.append("cycle >= ?")
+                else:
+                    value = cycle
+                    where_fragments.append("cycle GLOB ?")
+                stmt_args.append(value)
+            where += " AND (" + " OR ".join(where_fragments) + ")"
+        if tasks:
+            where_fragments = []
+            for task in tasks:
+                where_fragments.append("name GLOB ?")
+                stmt_args.append(task)
+            where += " AND (" + " OR ".join(where_fragments) + ")"
+        if no_statuses:
+            where_fragments = []
+            for no_status in no_statuses:
+                for status in self.STATUSES.get(no_status, []):
+                    where_fragments.append("status != ?")
+                    stmt_args.append(status)
+            where += " AND (" + " AND ".join(where_fragments) + ")"
+        # Execute query to get number of entries
+        of_n_entries = 0
+        stmt = ("SELECT COUNT(*) FROM" +
+                " task_events JOIN task_states USING (cycle,name,submit_num)" +
+                " WHERE event==?")
         if where:
-            where = " WHERE" + where
-        stmt = ("SELECT time,name,cycle,submit_num,event,message" +
-                " FROM task_events" + where + " ORDER BY time")
-        data = {}
-        for row in self._select(suite_name, stmt, stmt_args):
-            ev_time, name, cycle_time, submit_num, key, message = row
-            event = self.EVENTS.get(key, None)
-            if event is None:
-                continue
-            event_time = mktime(strptime(ev_time, "%Y-%m-%dT%H:%M:%S"))
-            task_id = name + self.TASK_ID_DELIM + cycle_time
-            if cycle_time not in data:
-                data[cycle_time] = {"cycle_time": cycle_time, "tasks": {}}
-            if name not in data[cycle_time]["tasks"]:
-                data[cycle_time]["tasks"][name] = []
-            submits = data[cycle_time]["tasks"][name]
-            submit_num = int(submit_num)
-            if not submit_num:
-                continue
-            while submit_num > len(submits):
-                submits.append({"events": {},
-                                "status": None,
-                                "signal": None,
-                                "files": {}})
-                for name in ["submit", "init", "exit"]:
-                    submits[-1]["events"][name] = None
-            submit = submits[submit_num - 1]
-            if event in ["init"]:
-                submit["events"][event] = event_time
-                if submit["events"]["submit"] is None:
-                    submit["events"]["submit"] = event_time
-            elif event in ["pass", "fail"]:
-                submit["events"]["exit"] = event_time
-                submit["status"] = event
-                if key == "signaled":
-                    submit["signal"] = message.rsplit(None, 1)[-1]
-                for name in ["submit", "init"]:
-                    if submit["events"][name] is None:
-                        submit["events"][name] = event_time
-            elif event in ["submit-fail"]:
-                submit["events"]["submit"] = event_time
-                submit["status"] = event
+            stmt += " " + where
+        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
+                                 ["submitting now"] + stmt_args):
+            of_n_entries = row[0]
+            break
+        if not of_n_entries:
+            return ([], 0)
+        # Execute query to get entries
+        entries = []
+        stmt = ("SELECT" +
+                " cycle, name, submit_num," +
+                " group_concat(time), group_concat(event)," +
+                " group_concat(message) " +
+                " FROM" +
+                " task_events JOIN task_states USING (cycle,name,submit_num)" +
+                " WHERE" +
+                " (event==? OR event==? OR event==? OR" +
+                "  event==? OR event==? OR event==?)" +
+                where +
+                " GROUP BY cycle, name, submit_num" +
+                " ORDER BY " +
+                self.ORDERS.get(order, self.ORDERS["time_desc"]))
+        stmt_args_head = ["submitting now", "submission failed", "started",
+                          "succeeded", "failed", "signaled"]
+        stmt_args_tail = []
+        if limit:
+            stmt += " LIMIT ? OFFSET ?"
+            stmt_args_tail = [limit, offset]
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name, stmt,
+                stmt_args_head + stmt_args + stmt_args_tail):
+            cycle, name, submit_num, times_str, events_str, messages_str = row
+            entry = {"cycle": cycle, "name": name, "submit_num": submit_num,
+                     "events": [None, None, None], "status": None, "logs": {},
+                     "seq_logs_indexes": {}}
+            entries.append(entry)
+            events = events_str.split(",")
+            times = times_str.split(",")
+            if messages_str:
+                messages = messages_str.split(",")
             else:
-                submit["events"][event] = event_time
+                messages = []
+            event_rank = -1
+            for event, t, message in zip(events, times, messages):
+                my_event = self.EVENTS.get(event)
+                if self.EVENT_TIME_INDICES.get(my_event) is not None:
+                    entry["events"][self.EVENT_TIME_INDICES[my_event]] = t
+                if (self.EVENT_RANKS.get(my_event) is not None and
+                    self.EVENT_RANKS[my_event] > event_rank):
+                    entry["status"] = my_event
+                    event_rank = self.EVENT_RANKS[my_event]
+                    if my_event == "fail(%s)":
+                        signal = message.rsplit(None, 1)[-1]
+                        entry["status"] = "fail(%s)" % signal
 
-        # Job log files
-        for cycle_time, datum in data.items():
-            archive_file_name = self.get_cycle_log_archive_name(cycle_time)
-            # Job logs of this cycle already archived
-            if os.access(archive_file_name, os.F_OK | os.R_OK):
-                datum["is_archived"] = True
-                tar = tarfile.open(archive_file_name, "r:gz")
-                for tarinfo in tar:
-                    size = tarinfo.size
-                    name = tarinfo.name[len("job/"):]
-                    names = name.split(self.TASK_LOG_DELIM, 3)
-                    if len(names) == 3:
-                        key = "script"
-                        task_name, c, submit_num = names
-                    elif len(names) == 4:
-                        task_name, c, submit_num, key = names
-                        if key == "status":
-                            continue
-                    if task_name in datum["tasks"]:
-                        submit = datum["tasks"][task_name][int(submit_num) - 1]
-                        submit["files"][key] = {"n_bytes": size}
-                tar.close()
+        self._db_close(self.SUITE_DB, user_name, suite_name)
+
+        # Job logs DB
+        stmt = ("SELECT key,path,path_in_tar,mtime,size FROM log_files " +
+                "WHERE cycle==? AND task==? AND submit_num==?")
+        prefix = "~"
+        if user_name:
+            prefix += user_name
+        user_suite_dir = os.path.join(os.path.expanduser(prefix),
+                                      self.get_suite_dir_rel(suite_name))
+        for entry in entries:
+            stmt_args = [entry["cycle"], entry["name"], entry["submit_num"]]
+            cursor = self._db_exec(self.JOB_LOGS_DB, user_name, suite_name,
+                                   stmt, stmt_args)
+            if cursor is None:
                 continue
-            # Check stats of job logs of this cycle
-            for name, submits in datum["tasks"].items():
-                for i, submit in enumerate(submits):
-                    delim = self.TASK_LOG_DELIM
-                    root = "job/" + delim.join([name, cycle_time, str(i + 1)])
-                    for path in glob(root + "*"):
-                        key = path[len(root) + 1:]
-                        if not key:
-                            key = "script"
-                        elif key == "status":
-                            continue
-                        n_bytes = os.stat(path).st_size
-                        submit["files"][key] = {"n_bytes": n_bytes}
-        return data
+            for row in cursor:
+                key, path, path_in_tar, mtime, size = row
+                abs_path = os.path.join(user_suite_dir, path)
+                entry["logs"][key] = {"path": path,
+                                      "path_in_tar": path_in_tar,
+                                      "mtime": mtime,
+                                      "size": size,
+                                      "exists": os.path.exists(abs_path),
+                                      "seq_key": None}
+                seq_log_match = self.REC_SEQ_LOG.match(key)
+                if seq_log_match:
+                    head, index_str, tail = seq_log_match.groups()
+                    if not tail:
+                        tail = ""
+                    seq_key = head + "*" + tail
+                    entry["logs"][key]["seq_key"] = seq_key
+                    if seq_key not in entry["seq_logs_indexes"]:
+                        entry["seq_logs_indexes"][seq_key] = {}
+                    entry["seq_logs_indexes"][seq_key][int(index_str)] = key
+
+        for seq_key, indexes in entry["seq_logs_indexes"].items():
+            if len(indexes) <= 1:
+                entry["seq_logs_indexes"].pop(seq_key)
+        for key, log_dict in entry["logs"].items():
+            if log_dict["seq_key"] not in entry["seq_logs_indexes"]:
+                log_dict["seq_key"] = None
+        self._db_close(self.JOB_LOGS_DB, user_name, suite_name)
+        return (entries, of_n_entries)
 
     def get_suite_jobs_auths(self, suite_name, cycle_time=None,
                              task_name=None):
@@ -310,16 +350,74 @@ class CylcProcessor(SuiteEngineProcessor):
             stmt_args.append(task_name)
         stmt += "(event==? OR event==? OR event==?)"
         stmt_args += ["submission succeeded", "succeeded", "failed"]
-        for row in self._select(suite_name, stmt, stmt_args):
+        for row in self._db_exec(self.SUITE_DB, None, suite_name, stmt,
+                                 stmt_args):
             if row and row[0]:
                 auth = self._parse_user_host(auth=row[0])
                 if auth:
                     auths.append(auth)
+        self._db_close(self.SUITE_DB, None, suite_name)
         return auths
 
-    def get_suite_jobs_log_dir_rel(self, suite):
-        """Return the relative path to the log directory for suite tasks."""
-        return self.get_suite_dir_rel(suite, "log", "job")
+    def get_suite_logs_info(self, user_name, suite_name):
+        """Return the information of the suite logs.
+
+        Return a tuple that looks like:
+            ("cylc-run",
+             {"err": {"path": "log/suite/err", "mtime": mtime, "size": size},
+              "log": {"path": "log/suite/log", "mtime": mtime, "size": size},
+              "out": {"path": "log/suite/out", "mtime": mtime, "size": size}})
+
+        """
+        logs_info = {}
+        prefix = "~"
+        if user_name:
+            prefix += user_name
+        d_rel = self.get_suite_dir_rel(suite_name)
+        d = os.path.expanduser(os.path.join(prefix, d_rel))
+        for key in ["cylc-suite-env",
+                    "log/suite/err", "log/suite/log", "log/suite/out",
+                    "suite.rc", "suite.rc.processed"]:
+            f_name = os.path.join(d, key)
+            if os.path.isfile(f_name):
+                s = os.stat(f_name)
+                logs_info[key] = {"path": key,
+                                  "mtime": s.st_mtime,
+                                  "size": s.st_size}
+        return ("cylc", logs_info)
+
+    def get_suite_state_summary(self, user_name, suite_name):
+        """Return a the state summary of a user's suite.
+
+        Return {"last_activity_time": s, "is_running": b, "is_failed": b}
+        where:
+        * last_activity_time is a string in %Y-%m-%dT%H:%M:%S format,
+          the time of the latest activity in the suite
+        * is_running is a boolean to indicate if the suite is running
+        * is_failed: a boolean to indicate if any tasks (submit) failed
+
+        """
+        last_activity_time = None
+        stmt = "SELECT time FROM task_events ORDER BY time DESC LIMIT 1"
+        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
+            last_activity_time = row[0]
+            break
+
+        is_running = self.is_suite_running(user_name, suite_name)
+        is_running = bool(is_running)
+
+        is_failed = False
+        stmt = "SELECT status FROM task_states WHERE status GLOB ? LIMIT 1"
+        stmt_args = ["*failed"]
+        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
+                                 stmt_args):
+            is_failed = True
+            break
+        self._db_close(self.SUITE_DB, user_name, suite_name)
+
+        return {"last_activity_time": last_activity_time,
+                "is_running": is_running,
+                "is_failed": is_failed}
 
     def get_task_auth(self, suite_name, task_name):
         """
@@ -360,7 +458,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 u = items.pop(0).replace("*", " ")
             if items:
                 h = items.pop(0).replace("*", " ")
-            if actual_hosts.has_key(h):
+            if h in actual_hosts:
                 h = str(actual_hosts[h])
                 auth = self._parse_user_host(user=u, host=h)
             else:
@@ -382,7 +480,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
         suite_name = os.environ["CYLC_SUITE_REG_NAME"]
         suite_dir_rel = self.get_suite_dir_rel(suite_name)
-        suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
+        suite_dir = self.get_suite_dir(suite_name)
         task_id = os.environ["CYLC_TASK_ID"]
         task_name = os.environ["CYLC_TASK_NAME"]
         task_cycle_time = os.environ["CYLC_TASK_CYCLE_TIME"]
@@ -407,12 +505,7 @@ class CylcProcessor(SuiteEngineProcessor):
         out, err = self.popen("cylc", "--version")
         return out.strip()
 
-    def handle_event(self, *args, **kwargs):
-        """Call self.event_handler if it is callable."""
-        if callable(self.event_handler):
-            return self.event_handler(*args, **kwargs)
-
-    def is_suite_running(self, suite_name, hosts=None):
+    def is_suite_running(self, user_name, suite_name, hosts=None):
         """Return the port file path if it looks like suite is running.
 
         If port file exists, return "PORT-FILE-PATH".
@@ -424,10 +517,13 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         if not hosts:
             hosts = ["localhost"]
-        port_file = os.path.join("~", ".cylc", "ports", suite_name)
-        if "localhost" in hosts:
-            if os.path.exists(os.path.expanduser(port_file)):
-                return port_file
+        prefix = "~"
+        if user_name:
+            prefix += user_name
+        port_file = os.path.join(prefix, ".cylc", "ports", suite_name)
+        if ("localhost" in hosts and
+            os.path.exists(os.path.expanduser(port_file))):
+            return port_file
         host_proc_dict = {}
         for host in sorted(hosts):
             if host == "localhost":
@@ -444,6 +540,7 @@ class CylcProcessor(SuiteEngineProcessor):
                         reason = host + ":" + port_file
             if host_proc_dict:
                 sleep(0.1)
+
         if reason is None:
             for host in sorted(hosts):
                 if host == "localhost":
@@ -470,10 +567,10 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         cycles = []
         if "*" in items:
-            rows = self._select(suite_name,
-                                "SELECT DISTINCT cycle from task_events")
-            for row in rows:
+            stmt = "SELECT DISTINCT cycle FROM task_events"
+            for row in self._db_exec(self.SUITE_DB, None, suite_name, stmt):
                 cycles.append(row[0])
+            self._db_close(self.SUITE_DB, None, suite_name)
         else:
             for item in items:
                 cycle = self._parse_task_cycle_id(item)[0]
@@ -481,12 +578,14 @@ class CylcProcessor(SuiteEngineProcessor):
                     cycles.append(cycle)
         self.job_logs_pull_remote(suite_name, cycles, prune_remote_mode=True)
         log_dir_rel = self.get_suite_dir_rel(suite_name, "log")
-        log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
+        log_dir = self.get_suite_dir(suite_name, "log")
         cwd = os.getcwd()
         self.fs_util.chdir(log_dir)
         try:
+            stmt = ("UPDATE log_files SET path=?, path_in_tar=? " +
+                    "WHERE cycle==? AND task==? AND submit_num==? AND key==?")
             for cycle in cycles:
-                archive_file_name = self.get_cycle_log_archive_name(cycle)
+                archive_file_name = self._get_cycle_log_archive_name(cycle)
                 if os.path.exists(archive_file_name):
                     continue
                 glob_ = self.TASK_ID_DELIM.join(["*", cycle, "*"])
@@ -501,11 +600,41 @@ class CylcProcessor(SuiteEngineProcessor):
                                                   archive_file_name))
                 for name in sorted(names):
                     self.fs_util.delete(name)
+                for name in names:
+                    # cycle, task, submit_num, extension
+                    c, t, s, e = self._parse_job_log_base_name(name)
+                    key = e
+                    if e in self.JOB_LOG_TAIL_KEYS:
+                        key = self.JOB_LOG_TAIL_KEYS[e]
+                    stmt_args = [os.path.join("log", archive_file_name),
+                                 name, c, t, s, key]
+                    self._db_exec(self.JOB_LOGS_DB, None, suite_name,
+                                  stmt, stmt_args, commit=True)
         finally:
             try:
                 self.fs_util.chdir(cwd)
             except OSError:
                 pass
+        self._db_close(self.JOB_LOGS_DB, None, suite_name)
+
+    def job_logs_db_create(self, suite_name, close=False):
+        """Create the job logs database."""
+        if (None, suite_name) in self.daos[self.JOB_LOGS_DB]:
+            return self.daos[self.JOB_LOGS_DB][(None, suite_name)]
+        db_f_name = self.get_suite_dir(suite_name, self.JOB_LOGS_DB)
+        dao = DAO(db_f_name)
+        if os.access(db_f_name, os.R_OK | os.F_OK):
+            return dao
+        self.daos[self.JOB_LOGS_DB][(None, suite_name)] = dao
+        dao.connect(is_new=True)
+        stmt = ("CREATE TABLE log_files(" +
+                "cycle TEXT, task TEXT, submit_num TEXT, key TEXT, " +
+                "path TEXT, path_in_tar TEXT, mtime TEXT, size INTEGER, " +
+                "PRIMARY KEY(cycle, task, submit_num, key))")
+        dao.execute(stmt, commit=True)
+        if close:
+            dao.close()
+        return dao
 
     def job_logs_pull_remote(self, suite_name, items, prune_remote_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
@@ -515,10 +644,11 @@ class CylcProcessor(SuiteEngineProcessor):
         prune_remote_mode -- Remove remote job logs after pulling them.
 
         """
+        # Pull from remote.
         # Create a file with a uuid name, so system knows to do nothing on
         # shared file systems.
         uuid = str(uuid4())
-        log_dir_rel = self.get_suite_jobs_log_dir_rel(suite_name)
+        log_dir_rel = self.get_suite_dir_rel(suite_name, "log", "job")
         log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
         uuid_file_name = os.path.join(log_dir, uuid)
         self.fs_util.touch(uuid_file_name)
@@ -532,7 +662,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 for item in items:
                     cycle, name = self._parse_task_cycle_id(item)
                     if cycle is not None:
-                        arch_f_name = self.get_cycle_log_archive_name(cycle)
+                        arch_f_name = self._get_cycle_log_archive_name(cycle)
                         if os.path.exists(arch_f_name):
                             continue
                     auths = self.get_suite_jobs_auths(suite_name, cycle, name)
@@ -578,6 +708,35 @@ class CylcProcessor(SuiteEngineProcessor):
         finally:
             self.fs_util.delete(uuid_file_name)
 
+        # Update job log DB
+        dao = self.job_logs_db_create(suite_name)
+        d = self.get_suite_dir(suite_name)
+        stmt = ("REPLACE INTO log_files VALUES(?, ?, ?, ?, ?, ?, ?, ?)")
+        for item in items:
+            cycle, name = self._parse_task_cycle_id(item)
+            if not cycle:
+                cycle = "*"
+            if not name:
+                name = "*"
+            logs_prefix = self.get_suite_dir(
+                            suite_name,
+                            "log/job/%s.%s." % (name, cycle))
+            for f_name in glob(logs_prefix + "*"):
+                if f_name.endswith(".status"):
+                    continue
+                stat = os.stat(f_name)
+                rel_f_name = f_name[len(d) + 1:]
+                # cycle, task, submit_num, extension
+                c, t, s, e = self._parse_job_log_base_name(f_name)
+                key = e
+                if e in self.JOB_LOG_TAIL_KEYS:
+                    key = self.JOB_LOG_TAIL_KEYS[e]
+                stmt_args = [c, t, s, key, rel_f_name, "",
+                             stat.st_mtime, stat.st_size]
+                dao.execute(stmt, stmt_args)
+        dao.commit()
+        dao.close()
+
     def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
         if not hosts:
@@ -585,7 +744,7 @@ class CylcProcessor(SuiteEngineProcessor):
         host_proc_dict = {}
         for host in sorted(hosts):
             proc = self.popen.run_bg(
-                    "cylc", "ping", "--host=" + host, suite_name, 
+                    "cylc", "ping", "--host=" + host, suite_name,
                     "--pyro-timeout=" + str(timeout))
             host_proc_dict[host] = proc
         ping_ok_hosts = []
@@ -612,7 +771,7 @@ class CylcProcessor(SuiteEngineProcessor):
     def run(self, suite_name, host=None, host_environ=None, run_mode=None,
             args=None):
         """Invoke "cylc run" (in a specified host).
-        
+
         The current working directory is assumed to be the suite log directory.
 
         suite_name: the name of the suite.
@@ -620,7 +779,7 @@ class CylcProcessor(SuiteEngineProcessor):
         host_environ: a dict of environment variables to export in host.
         run_mode: call "cylc restart|reload" instead of "cylc run".
         args: arguments to pass to "cylc run".
- 
+
         """
 
         # Check that "host" is not the localhost
@@ -709,11 +868,9 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen.run_simple(
                 *command, env=environ, stderr=stderr, stdout=stdout)
 
-    def validate(self, suite_name, strict_mode=False):
+    def validate(self, suite_name, strict_mode=False, debug_mode=False):
         """(Re-)register and validate a suite."""
-        suite_dir_rel = self.get_suite_dir_rel(suite_name)
-        home = os.path.expanduser("~")
-        suite_dir = os.path.join(home, suite_dir_rel)
+        suite_dir = self.get_suite_dir(suite_name)
         rc, out, err = self.popen.run("cylc", "get-directory", suite_name)
         suite_dir_old = None
         if out:
@@ -726,7 +883,7 @@ class CylcProcessor(SuiteEngineProcessor):
             suite_dir_old = None
         if suite_dir_old is None:
             self.popen.run_simple("cylc", "register", suite_name, suite_dir)
-        passphrase_dir_root = os.path.join(home, ".cylc")
+        passphrase_dir_root = os.path.expanduser("~/.cylc")
         for name in os.listdir(passphrase_dir_root):
             p = os.path.join(passphrase_dir_root, name)
             if os.path.islink(p) and not os.path.exists(p):
@@ -734,10 +891,43 @@ class CylcProcessor(SuiteEngineProcessor):
         passphrase_dir = os.path.join(passphrase_dir_root, suite_name)
         self.fs_util.symlink(suite_dir, passphrase_dir)
         command = ["cylc", "validate", "-v"]
+        if debug_mode:
+            command.append("--debug")
         if strict_mode:
             command.append("--strict")
         command.append(suite_name)
         self.popen.run_simple(*command, stdout_level=Event.V)
+
+    def _db_close(self, db_name, user_name, suite_name):
+        key = (user_name, suite_name)
+        if self.daos[db_name].get(key) is not None:
+            self.daos[db_name][key].close()
+
+    def _db_exec(self, db_name, user_name, suite_name, stmt, stmt_args=None,
+                 commit=False):
+        key = (user_name, suite_name)
+        if key not in self.daos[db_name]:
+            prefix = "~"
+            if user_name:
+                prefix += user_name
+            db_f_name = os.path.expanduser(os.path.join(
+                    prefix, self.get_suite_dir_rel(suite_name, db_name)))
+            self.daos[db_name][key] = DAO(db_f_name)
+        return self.daos[db_name][key].execute(stmt, stmt_args, commit)
+
+    def _get_cycle_log_archive_name(self, cycle_time):
+        """Return the jobs log archive file name of a given cycle."""
+        return (self.CYCLE_LOG_ARCHIVE_PREFIX + cycle_time +
+                self.CYCLE_LOG_ARCHIVE_SUFFIX)
+
+    def _parse_job_log_base_name(self, f_name):
+        """Return (cycle, task, submit_num, ext)."""
+        b_names = os.path.basename(f_name).split(self.TASK_ID_DELIM, 3)
+        task, cycle, submit_num = b_names[0:3]
+        ext = ""
+        if len(b_names) > 3:
+            ext = b_names[3]
+        return (cycle, task, submit_num, ext)
 
     def _parse_task_cycle_id(self, item):
         cycle, name = None, None
@@ -776,27 +966,70 @@ class CylcProcessor(SuiteEngineProcessor):
             auth = None
         return auth
 
-    def _select(self, suite_name, stmt, stmt_args=None):
+
+class DAO(object):
+
+    """Generic SQLite Data Access Object."""
+
+    CONNECT_RETRY_DELAY = 0.1
+    N_CONNECT_TRIES = 5
+
+    def __init__(self, db_f_name):
+        self.db_f_name = db_f_name
+        self.conn = None
+        self.cursor = None
+
+    def close(self):
+        """Close the DB connection."""
+        if self.conn is not None:
+            try:
+                self.conn.close()
+            except (sqlite3.OperationalError, sqlite3.ProgrammingError) as e:
+                pass
+        self.cursor = None
+        self.conn = None
+
+    def commit(self):
+        """Commit any changes to current connection."""
+        if self.conn is not None:
+            self.conn.commit()
+
+    def connect(self, is_new=False):
+        """Connect to the DB. Set the cursor. Return the connection."""
+        if self.cursor is not None:
+            return self.cursor
+        if not is_new and not os.access(self.db_f_name, os.F_OK | os.R_OK):
+            return None
+        for i in range(self.N_CONNECT_TRIES):
+            try:
+                self.conn = sqlite3.connect(self.db_f_name)
+                self.cursor = self.conn.cursor()
+            except sqlite3.OperationalError as e:
+                sleep(self.CONNECT_RETRY_DELAY)
+                self.conn = None
+                self.cursor = None
+            else:
+                break
+        return self.conn
+
+    def execute(self, stmt, stmt_args=None, commit=False):
+        """Execute a statement. Return the cursor."""
         if stmt_args is None:
             stmt_args = []
-        if not hasattr(self, "cursor"):
-            self.cursor = None
-        if self.cursor is None:
-            for i in range(self.N_DB_SELECT_TRIES):
-                try:
-                    conn = sqlite3.connect(self.get_suite_db_file(suite_name))
-                    self.cursor = conn.cursor()
-                except sqlite3.OperationalError as e:
-                    sleep(self.DB_SELECT_RETRY_DELAY)
-                else:
-                    break
-        if self.cursor is None:
-            return []
-        for i in range(self.N_DB_SELECT_TRIES):
+        for i in range(self.N_CONNECT_TRIES):
+            if self.connect() is None:
+                return []
             try:
                 self.cursor.execute(stmt, stmt_args)
             except sqlite3.OperationalError as e:
-                sleep(self.DB_SELECT_RETRY_DELAY)
+                sleep(self.CONNECT_RETRY_DELAY)
+                self.conn = None
+                self.cursor = None
+            except sqlite3.ProgrammingError as e:
+                self.conn = None
+                self.cursor = None
             else:
                 break
+        if commit:
+            self.commit()
         return self.cursor

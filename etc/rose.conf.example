@@ -82,6 +82,8 @@
 ## E.g. If $HOME/public_html/cylc-run is a symlink of $HOME/cylc-run
 ##      and $HOME/public_html/ is served as http://host/~$USER/:
 #  home-public-html=http://host/~$USER public_html
+## URL to the site's Rose Bush web service.
+#  rose-bush=http://host/rose-bush/
 [rose-suite-log]
 
 # Configuration related to "rose mpi-launch".

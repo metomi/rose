@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>{{suite}}~{{user}}: Rose Bush</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link type="text/css" href="{{script}}/etc/bootstrap/css/bootstrap.min.css"
+rel="stylesheet" media="screen" />
+<link type="text/css" href="{{script}}/rose-bush.css" rel="stylesheet" media="screen" />
+</head>
+<body>
+<div class="navbar navbar-static-top">
+<div class="navbar-inner">
+<a class="brand" href="{{script}}/">
+<img src="/favicon.ico" alt="Rose Bush" title="Rose Bush" /></a>
+<ul class="nav">
+<li><a href="{{script}}/summary/{{user}}">{{user}}</a></li>
+<li class="active"><a><strong>{{suite}}</strong></a></li>
+{% if files -%}
+{% for scheme, scheme_files in files|dictsort -%}
+{% if scheme_files -%}
+<li class="dropdown">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+{{scheme}} files <b class="caret"></b>
+</a>
+<ul class="dropdown-menu">
+{% for key, log in scheme_files|dictsort -%}
+<li><a href="{{script}}/view/{{user}}/{{suite}}?path={{log.path}}"
+title="{{log.size}} bytes">{{key}}</a></li>
+{% endfor -%}
+</ul>
+</li>
+{% endif -%}
+{% endfor -%}
+{% endif -%}
+{% if info -%}
+<li>
+<a data-toggle="modal" role="button" href="#suite-info">rose-suite.info</a>
+<div id="suite-info" class="modal hide fade" tabindex="-1"
+role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+<h3 id="suite-info-label">Suite Info</h3>
+</div>
+<div class="modal-body">
+<dl class="dl-horizontal">
+{% for key, value in info|dictsort -%}
+{% if info[key] -%}
+<dt>{{key}}</dt>
+<dd>{{info[key]}}</dd>
+{% endif -%}
+{% endfor -%}
+</dl>
+</div>
+</div>
+</li>
+{% endif -%}
+{% if states.is_running -%}
+<li><a><span class="label label-info">running</span></a></li>
+{% endif -%}
+{% if states.is_failed -%}
+<li><a><span class="label label-important">failed task(s)</span></a></li>
+{% endif -%}
+</ul>
+<ul class="nav pull-right">
+{% if states.last_activity_time -%}
+<li><a class="text-info">activity
+<abbr class="livestamp" title=
+"{{states.last_activity_time}}Z">{{states.last_activity_time}}Z</abbr></a>
+</li><!-- last activity time -->
+{% endif -%}
+<li><a class="text-info">page loaded
+<abbr class="livestamp" title="{{time}}">{{time}}</abbr></a>
+</li>
+<li id="toggle-fuzzy-time"><a href="#">time as duration</a></li>
+</ul>
+</div>
+</div>
+<div class="page-header">
+
+<div class="accordian" id="accordian-0">
+
+<div class="accordion-group">
+<div class="accordion-heading">
+<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-0"
+href="#filter">Display Options</a>
+</div>
+<div id="filter" class="accordion-body collapse in">
+<div class="accordion-inner">
+<form action="{{script}}/list">
+<input type="hidden" name="user" value="{{user}}" />
+<input type="hidden" name="suite" value="{{suite}}" />
+<fieldset class="container-fluid">
+<div class="row-fluid">
+<div class="span6">
+<input id="cycles" type="text" name="cycles" class="input-block-level"
+title="Cycle globs, &quot;before|after CYCLE&quot;"
+placeholder="Cycle globs, &quot;before|after CYCLE&quot;"
+{% if cycles -%}
+value="{{cycles|escape}}"
+{% endif -%}
+/>
+</div>
+<div class="span6">
+<input id="tasks" type="text" name="tasks" class="input-block-level"
+title="Task names globs"
+placeholder="Task names globs"
+{% if tasks -%}
+value="{{tasks|escape}}"
+{% endif -%}
+/>
+</div>
+</div>
+<div class="row-fluid">
+<div class="span1">
+<label class="checkbox inline" for="per_page_max">
+<input id="per_page_max" type="checkbox" name="per_page"
+value="{{per_page_max}}"
+title="Display maximum {{per_page_max}} number of entries"
+{% if per_page_max <= per_page -%}
+checked="checked"
+{% endif -%}
+/>
+Max
+</label>
+</div>
+<div class="span2">
+<input id="per_page" type="text" name="per_page" class="input-block-level"
+title="Entries/Page, 0=unlimited" placeholder="Entries/Page"
+{% if per_page_max <= per_page -%}
+disabled="disabled"
+{% elif per_page is defined and per_page != per_page_default -%}
+value="{{per_page}}"
+{% endif -%}
+/>
+</div>
+<div class="span3">
+{% for status in ["active", "success", "fail"] -%}
+<label class="checkbox inline" for="no_status_{{status}}">
+<input id="no_status_{{status}}" type="checkbox" name="no_status"
+{% if no_statuses and status in no_statuses -%}
+checked="checked"
+{% endif -%}
+value="{{status}}" />
+No {{status}}?</label>
+{% endfor -%}
+</div>
+<div class="span5">
+<select name="order" title="Sort order">
+{% for k, v in [("time_desc", "new-&gt;old"),
+                ("time_asc", "old-&gt;new"),
+                ("cycle_desc_name_asc", "new-&gt;old cycle, a-z task name"),
+                ("cycle_desc_name_desc", "new-&gt;old cycle, z-a task name"),
+                ("cycle_asc_name_asc", "old-&gt;new cycle, a-z task name"),
+                ("cycle_asc_name_desc", "old-&gt;new cycle, z-a task name"),
+                ("name_asc_cycle_desc", "a-z task name, new-&gt;old cycle"),
+                ("name_desc_cycle_desc", "z-a task name, new-&gt;old cycle"),
+                ("name_asc_cycle_asc", "a-z task name, old-&gt;new cycle"),
+                ("name_desc_cycle_asc", "z-a task name, old-&gt;new cycle")] -%}
+<option
+{% if order and order == k -%}
+selected="selected"
+{% endif -%}
+value="{{k}}">{{v}}</option>
+{% endfor -%}
+</select>
+</div>
+<div class="span1">
+<input type="submit" class="btn btn-primary" value="update" />
+</div>
+</div>
+</fieldset>
+</form>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="container-fluid">
+<div class="row-fluid">
+{% if of_n_entries == 0 -%}
+<div class="span12 text-right">
+<span class="text-info">No match</span>
+</div>
+{% elif per_page == 0 or per_page >= of_n_entries -%}
+<div class="span12 text-right">
+<span class="text-info">Page 1 of 1 Entries 1-{{of_n_entries}}</span>
+</div>
+{% else -%}
+<div class="span12 text-right">
+<form action="{{script}}/list" class="form-inline">
+<input type="hidden" name="user" value="{{user}}" />
+<input type="hidden" name="suite" value="{{suite}}" />
+{% if cycles -%}
+<input type="hidden" name="cycles" value="{{cycles}}" />
+{% endif -%}
+{% if tasks -%}
+<input type="hidden" name="tasks" value="{{tasks}}" />
+{% endif -%}
+<input type="hidden" name="per_page" value="{{per_page}}" />
+{% for status in ["active", "success", "fail"] -%}
+{% if no_statuses and status in no_statuses -%}
+<input type="hidden" name="no_status" value="{{status}}" />
+{% endif -%}
+{% endfor -%}
+<ul class="inline">
+<li class="previous">
+<button id="page-prev" title="previous"
+{% if page == 1 -%}
+class="btn btn-link disabled"
+disabled="disabled"
+{% else %}
+class="btn btn-link"
+{% endif %}
+>&laquo;</button>
+</li>
+<li>
+<select id="page" name="page">
+{% for i_page in range(n_pages) -%}
+<option
+{% if i_page + 1 == page -%}
+selected="selected"
+{% endif -%}
+value="{{i_page + 1}}">Page {{i_page + 1}} of {{n_pages}}
+~
+{% if (i_page + 1) * per_page < of_n_entries -%}
+Entries {{i_page * per_page + 1}}-{{(i_page + 1) * per_page}}
+{% else -%}
+Entries {{i_page * per_page + 1}}-{{of_n_entries}}
+{% endif -%}
+of {{of_n_entries}}
+</option>
+{% endfor -%}
+</select>
+</li>
+<li class="next">
+<button id="page-next" title="next"
+{% if page == n_pages -%}
+class="btn btn-link disabled"
+disabled="disabled"
+{% else -%}
+class="btn btn-link"
+{% endif -%}
+>&raquo;</button>
+</li>
+</ul>
+</form>
+</div><!-- pager -->
+{% endif -%}
+</div>
+</div>
+
+<div class="container-fluid"><!-- entries -->
+{% for entry in entries -%}
+<div class="row-fluid entry"><!-- entry row -->
+<div class="span8"><!-- entry: cycle, name, submit_num, files -->
+{% if entry.cycle != "1" -%}
+<abbr class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</abbr>
+{% endif -%}
+{{entry.name}}
+{% if entry.submit_num != 1 -%}
+<span class="badge badge-inverse"
+title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
+{% endif -%}
+<br/>
+
+{% if entry.logs -%}
+<ul class="inline">
+{% for key, log in entry.logs|dictsort if not log.seq_key -%}
+<li>
+{% if key == "00-script" -%}
+{% set key = "script" -%}
+{% elif key == "01-out" -%}
+{% set key = "out" -%}
+{% elif key == "02-err" -%}
+{% set key = "err" -%}
+{% endif -%}
+{% if log.exists and log.size -%}
+{% if log.path_in_tar -%}
+<a
+href="{{script}}/view/{{user}}/{{suite}}?path={{log.path}}&amp;path_in_tar={{log.path_in_tar}}"
+title="{{log.size}} bytes">{{key}}</a>
+{% else -%}
+<a
+href="{{script}}/view/{{user}}/{{suite}}?path={{log.path}}"
+title="{{log.size}} bytes">{{key}}</a>
+{% endif -%}
+{% elif log.exists -%}
+<span class="muted" title="{{log.size}} bytes">{{key}} <small>(empty)</small></span>
+{% else -%}
+<span class="muted" title="{{log.size}} bytes">{{key}} <small>(gone)</small></span>
+{% endif -%}
+</li>
+{% endfor -%}
+
+{% for seq_key, indexes in entry.seq_logs_indexes|dictsort -%}
+<li>
+<form action="{{script}}/view" class="form-inline">
+<input type="hidden" name="user" value="{{user}}"/>
+<input type="hidden" name="suite" value="{{suite}}"/>
+{% if entry.logs[indexes.values()|first].path_in_tar -%}
+<input type="hidden" name="path" value="{{entry.logs[indexes.values()|first].path}}"/>
+<select class="seq_log" name="path_in_tar">
+<option disabled="disabled" selected="selected">{{seq_key}}</option>
+{% for index, key in indexes|dictsort -%}
+{% set log = entry.logs[key] -%}
+<option title="{{log.size}} bytes" value="{{log.path_in_tar}}">{{key}}</option>
+{% endfor -%}
+</select>
+{% else -%}
+<select class="seq_log" name="path">
+<option disabled="disabled" selected="selected">{{seq_key}}</option>
+{% for index, key in indexes|dictsort -%}
+{% set log = entry.logs[key] -%}
+<option title="{{log.size}} bytes" value="{{log.path}}">{{key}}</option>
+{% endfor -%}
+</select>
+{% endif -%}
+</form>
+</li>
+{% endfor -%}
+</ul>
+{% endif -%}
+
+</div><!-- entry: cycle, name, submit_num, files -->
+<div class="span4 text-right"><!-- entry: time and status -->
+<small>
+<abbr class="t_submit livestamp"
+title="{{entry.events[0]}}Z">{{entry.events[0]}}Z</abbr>
+<!-- entry: submit time -->
+<!-- entry: init time -->
+{% if entry.events[1] -%}
+<abbr title="Started">R:</abbr> <abbr class="t_init"
+title="{{entry.events[1]}}Z">{{entry.events[1]}}Z</abbr>
+{% endif -%}
+<!-- entry: exit time -->
+{% if entry.events[2] -%}
+<abbr title="Exited">E:</abbr> <abbr class="t_exit"
+title="{{entry.events[2]}}Z">{{entry.events[2]}}Z</abbr>
+{% endif -%}
+<!-- entry: exit time -->
+</small>
+<!-- entry: status -->
+{% if entry.status and "fail" in entry.status -%}
+<span class="label label-important">{{entry.status}}</span>
+{% elif entry.status == "success" -%}
+<span class="label label-success">{{entry.status}}</span>
+{% elif entry.status == "init" -%}
+<span class="label label-info">{{entry.status}}</span>
+{% elif entry.status -%}
+<span class="label">{{entry.status}}</span>
+{% endif -%}
+<!-- entry: status -->
+</div><!-- time and status -->
+</div><!-- entry row -->
+{% endfor -%}
+</div><!-- entries -->
+
+<script type="text/javascript" src="{{script}}/etc/jquery.min.js"></script>
+<script type="text/javascript" src="{{script}}/etc/bootstrap/js/bootstrap.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/etc/moment.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/etc/livestamp.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/rose-bush.js">
+</script>
+</body>
+</html>

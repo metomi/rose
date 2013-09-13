@@ -62,6 +62,10 @@
 
       <dd>Upgrade or downgrade an application according to metadata.</dd>
 
+      <dt><a href="#rose-bush">rose bush</a></dt>
+
+      <dd>Start/stop ad-hoc Rose Bush web service server.</dd>
+
       <dt><a href="#rose-config">rose config</a></dt>
 
       <dd>Parse a set of rose configuration files.</dd>
@@ -384,9 +388,40 @@
       used, use the earliest version available.</dd>
     </dl>
 
+    <h2 id="rose-bush">rose bush</h2>
+
+    <h3>NAME</h3>
+
+    <p><kbd>rose bush</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <dl>
+      <dt><kbd>rose bush start</kbd></dt>
+
+      <dd>Start ad-hoc web service server</dd>
+
+      <dt><kbd>rose bush stop</kbd></dt>
+
+      <dd>Stop ad-hoc web service server</dd>
+
+      <dt><kbd>rose bush</kbd></dt>
+
+      <dd>Print status of ad-hoc web service server</dd>
+    </dl>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Start/stop ad-hoc Rose Bush web service server.</p>
+
+    <p>Rose Bush is a web service for browsing users' Rose suite logs via an
+    HTTP interface.</p>
+
     <h2 id="rose-config">rose config</h2>
 
-    <h3>NAME</h3><kbd>rose config</kbd>
+    <h3>NAME</h3>
+
+    <p><kbd>rose config</kbd></p>
 
     <h3>SYNOPSIS</h3>
 
@@ -1395,6 +1430,10 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <h3>NAME</h3>
 
+    <p><kbd>rose suite-log</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
     <ol>
       <li><kbd>rose suite-log [--view]</kbd></li>
 
@@ -1405,23 +1444,16 @@ launcher-preopts.mpiexec=-n $NPROC
       <kbd>rose suite-log --archive '*' # all cycles</kbd></li>
     </ol>
 
-    <p><kbd>rose suite-log</kbd></p>
-
-    <h3>SYNOPSIS</h3>
-
-    <p><kbd>rose suite-log [OPTIONS] [TASK ...]</kbd></p>
-
     <h3>DESCRIPTION</h3>
 
     <p>View or update suite log.</p>
 
     <ol>
-      <li>Launch web browser to view suite log.</li>
+      <li>Launch web browser to view suite log. If <dfn>rose bush</dfn> is not
+      configured, the command will offer to start it.</li>
 
-      <li>Update the suite log view information for specified cycle times or
-      task IDs (e.g. <samp>my_task.2013010100</samp> in cylc suites). A
-      <kbd>'*'</kbd> in the argument list implies all task jobs in all cycle
-      times.</li>
+      <li>Update the suite's job logs by pulling them back from any remote hosts
+      for specified cycle times or task names or IDs.</li>
 
       <li>Archive (tar-gzip) job logs at or older than the specified cycle
       time.</li>
@@ -1453,18 +1485,13 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dd>Deprecated. Use <kbd>--prune-remote</kbd> instead.</dd>
 
-      <dt><kbd>--timeout=DELAY</kbd></dt>
-
-      <dd>Specify a timeout. Normally, a lock is put in place to prevent other
-      instances of <a href="#rose-suite-hook">rose suite-hook</a> or <kbd>rose
-      suite-log --update</kbd> from updating the suite log at the same time.
-      The command hangs as it attempts to grab the lock. This option specify a
-      timeout (in number of seconds) for the attempt.
-      (default=<kbd>300.0</kbd>)</dd>
-
-      <dt><kbd>--update</kbd>, <kbd>-u</kbd></dt>
+      <dt><kbd>--update</kbd>, <kbd>-U</kbd></dt>
 
       <dd>Update job logs and index for items specified in arguments.</dd>
+
+      <dt><kbd>--user=USER-NAME</kbd>, <kbd>-u USER-NAME</kbd></dt>
+
+      <dd>View mode only. View logs of a suite of a different user.</dd>
 
       <dt><kbd>--view</kbd></dt>
 

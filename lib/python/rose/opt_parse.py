@@ -486,7 +486,7 @@ class RoseOptionParser(OptionParser):
                        {"metavar": "STRING",
                         "help": "Substitute unbound variables with STRING"}],
                "update_mode": [
-                       ["--update", "-u"],
+                       ["--update", "-U"],
                        {"action": "store_true",
                         "dest": "update_mode",
                         "default": False,
@@ -507,7 +507,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "default": None,
                         "dest": "user",
-                        "help": "User to list roses directory for."}],
+                        "help": "Apply to specified user."}],
                "validate_all": [
                        ["--validate", "-V"],
                        {"action": "store_true",
