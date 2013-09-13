@@ -27,6 +27,7 @@ from rose.app_run import (BuiltinApp, ConfigValueError,
     CompulsoryConfigValueError)
 from rose.checksum import get_checksum
 from rose.env import env_var_process, UnboundEnvironmentVariableError
+from rose.popen import RosePopenError
 from rose.reporter import Event
 from rose.scheme_handler import SchemeHandlersManager
 import shlex
@@ -117,6 +118,10 @@ class RoseArchApp(BuiltinApp):
                 continue
             target_prefix = self._get_conf(
                         config, t_node, "target-prefix", default="")
+            try:
+                s_key_tail = env_var_process(s_key_tail)
+            except UnboundEnvironmentVariableError as e:
+                raise ConfigValueError([t_key, ""], "", e)
             target_name = target_prefix + s_key_tail
             target = RoseArchTarget(target_name)
             target.command_format = self._get_conf(
@@ -126,7 +131,15 @@ class RoseArchApp(BuiltinApp):
             source_prefix = self._get_conf(
                         config, t_node, "source-prefix", default="")
             for source_glob in shlex.split(source_str):
-                for path in glob(source_prefix + source_glob):
+                paths = glob(source_prefix + source_glob)
+                if not paths:
+                    e = OSError(errno.ENOENT, os.strerror(errno.ENOENT),
+                                source_glob)
+                    app_runner.handle_event(ConfigValueError(
+                                [t_key, "source"], source_glob, e))
+                    target.status = target.ST_BAD
+                    continue
+                for path in paths:
                     # N.B. source_prefix may not be a directory
                     name = path[len(source_prefix):]
                     for p, checksum in get_checksum(path):
@@ -140,17 +153,15 @@ class RoseArchApp(BuiltinApp):
                         else: # path is a file
                             target.sources[checksum] = RoseArchSource(
                                             checksum, name, path)
-            if not target.sources:
-                e = OSError(errno.ENOENT, os.strerror(errno.ENOENT),
-                            source_str)
-                raise ConfigValueError([self.SECTION, "source"], source_str, e)
             target.compress_scheme = self._get_conf(config, t_node, "compress")
             if target.compress_scheme:
                 if (compress_manager.get_handler(target.compress_scheme) is
                     None):
-                    raise ConfigValueError([self.SECTION, "compress"],
-                                           target.compress_scheme,
-                                           KeyError(target.compress_scheme))
+                    app_runner.handle_event(ConfigValueError(
+                                [t_key, "compress"],
+                                target.compress_scheme,
+                                KeyError(target.compress_scheme)))
+                    target.status = target.ST_BAD
             else:
                 target_base = target.name
                 if "/" in target.name:
@@ -196,6 +207,9 @@ class RoseArchApp(BuiltinApp):
                 continue
             target.command_rc = 1
             dao.insert(target)
+            if target.status == target.ST_BAD:
+                app_runner.handle_event(RoseArchEvent(target))
+                continue
             work_dir = mkdtemp()
             try:
                 # Rename sources
@@ -228,25 +242,28 @@ class RoseArchApp(BuiltinApp):
                     command = target.command_format % {"sources": sources_str,
                                                        "target": target_str}
                 except KeyError as e:
-                    raise ConfigValueError(
-                                ["command-format"], target.command_format, e)
-                rc, out, err = app_runner.popen.run(command, shell=True)
-                target.command_rc = rc
-                dao.update_command_rc(target)
+                    target.status = target.ST_BAD
+                    app_runner.handle_event(ConfigValueError(
+                                [target.name, "command-format"],
+                                target.command_format,
+                                e))
+                else:
+                    rc, out, err = app_runner.popen.run(command, shell=True)
+                    if rc:
+                        target.status = target.ST_BAD
+                        app_runner.handle_event(
+                                    RosePopenError([command], rc, out, err))
+                    else:
+                        target.status = target.ST_NEW
+                        app_runner.handle_event(err, kind=Event.KIND_ERR)
+                    app_runner.handle_event(out)
+                    target.command_rc = rc
+                    dao.update_command_rc(target)
             finally:
                 app_runner.fs_util.delete(work_dir)
-            if rc:
-                app_runner.handle_event(err,
-                                        kind=Event.KIND_ERR, level=Event.FAIL)
-                app_runner.handle_event(out)
-                target.status = target.ST_BAD
-            else:
-                app_runner.handle_event(err, kind=Event.KIND_ERR)
-                app_runner.handle_event(out)
-                target.status = target.ST_NEW
             app_runner.handle_event(RoseArchEvent(target))
 
-        return len(targets) - [t.command_rc for t in targets].count(0)
+        return [t.status for t in targets].count(RoseArchTarget.ST_BAD)
 
     def _get_conf(self, r_node, t_node, key, compulsory=False, default=None):
         value = t_node.get_value(
