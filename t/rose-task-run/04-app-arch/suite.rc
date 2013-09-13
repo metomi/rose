@@ -10,7 +10,11 @@
     [[dependencies]]
         [[[ 12 ]]]
             graph="""
-archive => archive_bad_1 & archive_bad_2 & archive_bad_3
+archive => archive_bad_1
+archive => archive_bad_2
+archive => archive_bad_3
+archive => archive_bad_4
+archive => archive_bad_5
 """
         [[[ 0, 12 ]]]
             graph="""
@@ -41,7 +45,7 @@ sqlite3 .rose-arch.db 'SELECT * FROM sources;' | sort
 } >rose-arch-db-$CYLC_TASK_TRY_NUMBER.out
 ((RC==0))
 """
-    [[archive_bad_1,archive_bad_2,archive_bad_3]]
+    [[archive_bad_1,archive_bad_2,archive_bad_3,archive_bad_4,archive_bad_5]]
         command scripting = """rose task-run || true; RC=$?"""
         retry delays=
     [[install]]

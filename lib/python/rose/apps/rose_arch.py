@@ -35,6 +35,26 @@ import sys
 from tempfile import mkdtemp
 
 
+class RoseArchRenameFormatError(KeyError):
+
+    """An error raised when trying to construct a rename format."""
+
+    ERROR_FORMAT = "%s: rename format: %s: error: %s"
+
+    def __str__(self):
+        return self.ERROR_FORMAT % self.args
+
+
+class RoseArchRenameParserError(KeyError):
+
+    """An error raised when trying to construct a rename regex."""
+
+    ERROR_FORMAT = "%s: rename parser: %s: error: %s"
+
+    def __str__(self):
+        return self.ERROR_FORMAT % self.args
+
+
 class RoseArchEvent(Event):
 
     """Event raised on an archiving target."""
@@ -143,14 +163,22 @@ class RoseArchApp(BuiltinApp):
             if rename_format:
                 rename_parser = self._get_conf(config, t_node, "rename-parser")
                 if rename_parser:
-                    rename_parser = re.compile(rename_parser)
+                    try:
+                        rename_parser = re.compile(rename_parser)
+                    except Exception as e:
+                        raise RoseArchRenameParserError(
+                            t_key, rename_parser, e)
                 for source in target.sources.values():
                     d = {"cycle": cycle, "name": source.name}
                     if rename_parser:
                         match = rename_parser.match(source.name)
                         if match:
                             d.update(match.groupdict())
-                    source.name = rename_format % d
+                    try:
+                        source.name = rename_format % d
+                    except (KeyError, ValueError) as e:
+                        raise RoseArchRenameFormatError(
+                             t_key, rename_format, e)
             old_target = dao.select(target.name)
             if old_target is None or old_target != target:
                 dao.delete(target)

@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 18
+tests 20
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -83,6 +83,14 @@ __ERROR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-3"
 file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_3.$CYCLE.1.err" <<'__ERROR__'
 [FAIL] source=$UNBOUND_PLANET-[1-9].txt: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNBOUND_PLANET
+__ERROR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-4"
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_4.$CYCLE.1.err" <<'__ERROR__'
+[FAIL] arch:planet-n.tar.gz: rename format: %(planet?maybedwarfplanet???)s: error: 'planet?maybedwarfplanet???'
+__ERROR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-5"
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_5.$CYCLE.1.err" <<'__ERROR__'
+[FAIL] arch:planet-n.tar.gz: rename parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
 __ERROR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
