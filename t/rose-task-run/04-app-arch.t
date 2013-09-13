@@ -83,7 +83,6 @@ TEST_KEY="$TEST_KEY_BASE-bad-archive-3"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}3.$CYCLE.1.err" <<'__ERR__'
 [FAIL] source=$UNBOUND_PLANET-[1-9].txt: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNBOUND_PLANET
 __ERR__
-__ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-4"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}4.$CYCLE.1.err" <<'__ERR__'
 [FAIL] [arch:$UNKNOWN_DARK_PLANETS.tar.gz]=: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNKNOWN_DARK_PLANETS
