@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 21
+tests 23
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -99,6 +99,14 @@ __ERR__
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}6.$CYCLE.1.err" <<__ERR__
 [FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/data/2013010112/hello/mars.txt # return-code=1, stderr=
 [FAIL] foo: push: unknown action
+__ERR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-7"
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_7.$CYCLE.1.err" <<'__ERR__'
+[FAIL] arch:planet-n.tar.gz: rename format: %(planet?maybedwarfplanet???)s: error: 'planet?maybedwarfplanet???'
+__ERR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-8"
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_8.$CYCLE.1.err" <<'__ERR__'
+[FAIL] arch:planet-n.tar.gz: rename parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
 __ERR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
