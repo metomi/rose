@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
@@ -33,6 +33,8 @@
 #     Print the selected host name.
 #
 # OPTIONS
+#     --choice=N
+#         Choose from any of the top N hosts.
 #     --debug
 #         Print stack trace on error.
 #     --quiet, -q
@@ -47,16 +49,16 @@
 #                 METHOD-ARG must be a valid file system in all the given hosts
 #                 and host groups. The default is to use the "~" directory.
 #             "mem" (by largest amount of free memory:
-#                 Uses free -m to return memory in Mb 
+#                 Uses free -m to return memory in Mb
 #             "random"
 #     --threshold=[METHOD[:METHOD-ARG]:]VALUE
 #         Each of these option specifies a numeric value of a threshold of which
-#         the hosts must either not exceed or must be greater than depending on 
+#         the hosts must either not exceed or must be greater than depending on
 #         the specified method . Accepts the same METHOD and METHOD-ARG
 #         (and the same defaults) as the --rank-method=METHOD[:METHOD-ARG]
 #         option. (Obviously, the "random" method does not make sense in this
-#         case.) "load" and "fs" must not exceed threshold while "mem" 
-#         must be greater than threshold. A host not meeting a threshold 
+#         case.) "load" and "fs" must not exceed threshold while "mem"
+#         must be greater than threshold. A host not meeting a threshold
 #         condition will be excluded from the ranking list.
 #     --verbose, -v
 #         Increment verbosity.

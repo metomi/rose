@@ -80,6 +80,12 @@ class RoseOptionParser(OptionParser):
                         "default": True,
                         "dest": "checkout_mode",
                         "help": "Do not checkout after creating the suite."}],
+               "choice": [
+                       ["--choice"],
+                       {"action": "store",
+                        "default": 1,
+                        "metavar": "N",
+                        "help": "Choose from any of the top N items."}],
                "command_key": [
                        ["--command-key", "-c"],
                        {"action": "store",
