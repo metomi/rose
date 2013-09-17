@@ -34,7 +34,7 @@
 #
 # OPTIONS
 #     --choice=N
-#         Choose any from the top N hosts.
+#         Choose from any of the top N hosts.
 #     --debug
 #         Print stack trace on error.
 #     --quiet, -q

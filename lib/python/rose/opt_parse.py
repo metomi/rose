@@ -85,7 +85,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "default": 1,
                         "metavar": "N",
-                        "help": "Choose any from top N items."}],
+                        "help": "Choose from any of the top N items."}],
                "command_key": [
                        ["--command-key", "-c"],
                        {"action": "store",
