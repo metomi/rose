@@ -55,7 +55,7 @@ class DeadHostEvent(Event):
         return self.args[0] + ": (ssh failed)"
 
 
-class HostNotMeetThresholdEvent(Event):
+class HostThresholdNotMetEvent(Event):
 
     """An error raised when a host does not meet a threshold."""
 
@@ -307,7 +307,7 @@ class HostSelector(object):
                         threshold_value = float(threshold_conf["value"])
                         reverse = scorer.SIGN
                         if scorer.SIGN * cmp(score, threshold_value) > 0:
-                            self.handle_event(HostNotMeetThresholdEvent(
+                            self.handle_event(HostThresholdNotMetEvent(
                                     host_name, threshold_conf, scorer.SIGN,
                                     score))
                             break
