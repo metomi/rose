@@ -769,6 +769,10 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--choice=N</kbd></dt>
+
+      <dd>Choose from any of the top <var>N</var> hosts.</dd>
+
       <dt><kbd>--debug</kbd></dt>
 
       <dd>Print stack trace on error.</dd>
@@ -1340,8 +1344,14 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <p>Launch suite engine's suite control GUI for a suite.</p>
 
-    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the basename of
-    <var>$PWD</var> is assumed to be the suite name.</p>
+    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the name will be
+    determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
+    or its nearest parent directories. In a normal suite, the basename of the
+    (nearest parent) directory containing the <var>rose-suite.conf</var> file
+    is assumed to be the suite name. In a project containing a <a
+    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    directory containing the <var>rose-stem/rose-suite.conf</var> file is
+    assumed to be the suite name.</p>
 
     <p>This wrapper is to deal with the use case where a suite may be running
     on dedicated servers at a site. The wrapper will make an attempt to detect
@@ -1458,6 +1468,15 @@ launcher-preopts.mpiexec=-n $NPROC
       <li>Archive (tar-gzip) job logs at or older than the specified cycle
       time.</li>
     </ol>
+
+    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the name will be
+    determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
+    or its nearest parent directories. In a normal suite, the basename of the
+    (nearest parent) directory containing the <var>rose-suite.conf</var> file
+    is assumed to be the suite name. In a project containing a <a
+    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    directory containing the <var>rose-stem/rose-suite.conf</var> file is
+    assumed to be the suite name.</p>
 
     <h3>OPTIONS</h3>
 
@@ -1744,8 +1763,14 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <p>Shutdown a running suite.</p>
 
-    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the basename of
-    <var>$PWD</var> is assumed to be the suite name.</p>
+    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the name will be
+    determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
+    or its nearest parent directories. In a normal suite, the basename of the
+    (nearest parent) directory containing the <var>rose-suite.conf</var> file
+    is assumed to be the suite name. In a project containing a <a
+    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    directory containing the <var>rose-stem/rose-suite.conf</var> file is
+    assumed to be the suite name.</p>
 
     <p>This wrapper is to deal with the use case where a suite may be running
     on dedicated servers at a site. The wrapper will make an attempt to detect

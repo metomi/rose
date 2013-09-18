@@ -185,13 +185,13 @@ class SuiteRunner(Runner):
         if opts.host:
             hosts.append(opts.host)
         conf = ResourceLocator.default().get_conf()
-        
+
         known_hosts = self.host_selector.expand(
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
               conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
               ["localhost"])[0]
         known_hosts = list(set(known_hosts))
-        
+
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
@@ -253,7 +253,7 @@ class SuiteRunner(Runner):
             for i, url in enumerate(opts.source):
                 if os.path.isdir(url):
                     write_source_vc_info(
-                        url, "log/" + opts.project[i] + "-" + str(i) + 
+                        url, "log/" + opts.project[i] + "-" + str(i) +
                         ".version", self.popen)
 
         for ext in [".conf", ".version"]:
@@ -377,7 +377,7 @@ class SuiteRunner(Runner):
         # FIXME: should sync files to suite host?
         if opts.host:
             hosts = [host]
-        
+
         #use the list of hosts on which you can run
         if opts.run_mode != "reload" and not opts.host:
             hosts = []
@@ -385,8 +385,8 @@ class SuiteRunner(Runner):
             known_hosts = self.host_selector.expand(v.split())[0]
             for known_host in known_hosts:
                 if known_host not in hosts:
-                    hosts.append(known_host)    
-            
+                    hosts.append(known_host)
+
         if hosts == ["localhost"]:
             host = hosts[0]
         else:

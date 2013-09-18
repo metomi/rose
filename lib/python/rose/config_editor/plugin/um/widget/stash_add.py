@@ -560,7 +560,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         # Create a menu below the widget for view options.
         menu = gtk.Menu()
         meta_menuitem = gtk.CheckMenuItem(label="Show expanded value info")
-        if len(self.column_names) == self._visible_metadata_columns:
+        if len(self.column_names) == len(self._visible_metadata_columns):
             meta_menuitem.set_active(True)
         meta_menuitem.connect("toggled", self._toggle_show_more_info)
         meta_menuitem.show()
