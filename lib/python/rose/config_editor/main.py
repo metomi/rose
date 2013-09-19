@@ -26,8 +26,6 @@ Classes:
 """
 
 import cProfile
-import copy
-import itertools
 import os
 import pstats
 import re
@@ -605,6 +603,7 @@ class MainController(object):
 #------------------ Page manipulation functions ------------------------------
 
     def handle_load_all(self, *args):
+        """Handle a request to load all preview configurations."""
         load_these = []
         for item in self.data.config.keys():
             if self.data.config[item].is_preview:
@@ -677,11 +676,11 @@ class MainController(object):
             self.notebook.append_page(page, page.labelwidget)
             self.notebook.set_current_page(-1)
         else:
-            n = self.notebook.get_current_page()
-            self.notebook.insert_page(page, page.labelwidget, n)
-            self.notebook.set_current_page(n)
-            if n != -1:
-                self.notebook.remove_page(n + 1)
+            index = self.notebook.get_current_page()
+            self.notebook.insert_page(page, page.labelwidget, index)
+            self.notebook.set_current_page(index)
+            if index != -1:
+                self.notebook.remove_page(index + 1)
         self.notebook.set_tab_label_packing(page)
 
     def make_page(self, namespace_name):
@@ -691,11 +690,10 @@ class MainController(object):
         data, latent_data = self.data.helper.get_data_for_namespace(
                                                       namespace_name)
         config_data = self.data.config[config_name]
-        meta_config = config_data.meta
         ns_metadata = self.data.namespace_meta_lookup.get(namespace_name, {})
         description = ns_metadata.get(rose.META_PROP_DESCRIPTION, '')
         duplicate = ns_metadata.get(rose.META_PROP_DUPLICATE)
-        help = ns_metadata.get(rose.META_PROP_HELP)
+        help_ = ns_metadata.get(rose.META_PROP_HELP)
         url = ns_metadata.get(rose.META_PROP_URL)
         custom_widget = ns_metadata.get(rose.config_editor.META_PROP_WIDGET)
         custom_sub_widget = ns_metadata.get(
@@ -743,13 +741,14 @@ class MainController(object):
             sub_data = self.data.helper.get_sub_data_for_namespace(
                                                          namespace_name)
             sub_ops = self.group_ops.get_sub_ops_for_namespace(namespace_name)
-        macro_info = self.data.helper.get_macro_info_for_namespace(namespace_name)
+        macro_info = self.data.helper.get_macro_info_for_namespace(
+            namespace_name)
         page_metadata = {'namespace': namespace_name,
                          'ns_is_default': is_default,
                          'label': label,
                          'description': description,
                          'duplicate': duplicate,
-                         'help': help,
+                         'help': help_,
                          'url': url,
                          'macro': macro_info,
                          'widget': custom_widget,
@@ -824,9 +823,9 @@ class MainController(object):
         else:
             tab_window = old_window
         notebook_index = None
-        for n, notebook_page in enumerate(self.notebook.get_pages()):
+        for index, notebook_page in enumerate(self.notebook.get_pages()):
             if notebook_page == page:
-                notebook_index = n
+                notebook_index = index
                 break
         add_button = rose.gtk.util.CustomButton(
                               stock_id=gtk.STOCK_ADD,
@@ -860,14 +859,15 @@ class MainController(object):
     def handle_page_change(self, *args):
         """Handle a page change and select the correct tree row."""
         current_page = self._get_current_page()
-        self.update_page_menubar_toolbar_sensitivity(current_page)
+        self.update_page_bar_sensitivity(current_page)
         if current_page is None:
             self.nav_panel.select_row(None)
             return False
         self.set_current_page_indicator(current_page.namespace)
         return False
 
-    def update_page_menubar_toolbar_sensitivity(self, current_page):
+    def update_page_bar_sensitivity(self, current_page):
+        """Update the top 'Page' menu and the toolbar."""
         if not hasattr(self, 'toolbar') or not hasattr(self, 'menubar'):
             return False
         page_icons = ['Add to page...', 'Revert page to saved']
@@ -892,6 +892,7 @@ class MainController(object):
                                          rose.META_PROP_URL in metadata)
 
     def set_current_page_indicator(self, namespace):
+        """Make sure the current page is highlighted in the nav panel."""
         if hasattr(self, 'nav_panel'):
             self.nav_panel.select_row(namespace.lstrip('/').split('/'))
 
@@ -922,9 +923,9 @@ class MainController(object):
         """Load an attribute self.pagelist with a list of open pages."""
         self.pagelist = []
         if hasattr(self, 'notebook'):
-            for n in range(self.notebook.get_n_pages()):
-                if hasattr(self.notebook.get_nth_page(n), 'panel_data'):
-                    self.pagelist.append(self.notebook.get_nth_page(n))
+            for index in range(self.notebook.get_n_pages()):
+                if hasattr(self.notebook.get_nth_page(index), 'panel_data'):
+                    self.pagelist.append(self.notebook.get_nth_page(index))
         if hasattr(self, 'tab_windows'):
             for window in self.tab_windows:
                 if hasattr(window.get_child(), 'panel_data'):
@@ -933,6 +934,7 @@ class MainController(object):
         return self.pagelist
 
     def _get_current_page(self):
+        """Return the currently focused page."""
         self._get_pagelist()
         if not self.pagelist:
             return None
@@ -943,11 +945,12 @@ class MainController(object):
             if page.get_toplevel().is_active():
                 return page
         if hasattr(self, "notebook"):
-            n = self.notebook.get_current_page()
-            return self.notebook.get_nth_page(n)
+            index = self.notebook.get_current_page()
+            return self.notebook.get_nth_page(index)
         return None
 
     def _get_current_page_and_id(self):
+        """Return the currently focused page and the variable id (if any)."""
         page = self._get_current_page()
         if page is None:
             return None, None
@@ -977,6 +980,7 @@ class MainController(object):
             user_ign_item.set_sensitive(not is_key_allowed)
 
     def _set_page_var_show_modes(self, key, is_key_allowed):
+        """Set variable widgets' view options."""
         self.page_var_show_modes[key] = is_key_allowed
         self._get_pagelist()
         for page in self.pagelist:
@@ -1040,12 +1044,12 @@ class MainController(object):
         self._get_pagelist()
         if (page_id not in [p.namespace for p in self.pagelist]):
             self.handle_launch_request(page_id, as_new=True)
-            n = self.notebook.get_current_page()
-            page = self.notebook.get_nth_page(n)
+            index = self.notebook.get_current_page()
+            page = self.notebook.get_nth_page(index)
         if page_id in self.notebook.get_page_ids():
-            n = self.notebook.get_page_ids().index(page_id)
-            page = self.notebook.get_nth_page(n)
-            self.notebook.set_current_page(n)
+            index = self.notebook.get_page_ids().index(page_id)
+            page = self.notebook.get_nth_page(index)
+            self.notebook.set_current_page(index)
             if not self.mainwindow.window.is_active():
                 self.mainwindow.window.present()
             page.set_main_focus(var_id)
@@ -1067,7 +1071,6 @@ class MainController(object):
         if dirname is None or not os.path.isdir(dirname):
             return False
         if (self.data.top_level_directory is None and not self.is_pluggable):
-            config_objs = {}
             self.data.load_top_config(dirname)
             self.data.saved_config_names = set(self.data.config.keys())
             self.mainwindow.window.set_title(self.data.top_level_name +
@@ -1081,9 +1084,9 @@ class MainController(object):
         """Dump the component configurations in memory to disk."""
         if only_config_name is None:
             config_names = []
-            for c in self.data.config.keys():
-                if not self.data.config[c].is_preview:
-                    config_names.append(c)
+            for config_name in self.data.config.keys():
+                if not self.data.config[config_name].is_preview:
+                    config_names.append(config_name)
         else:
             config_names = [only_config_name]
         save_ok = True
@@ -1204,10 +1207,11 @@ class MainController(object):
 #------------------ Secondary Menu/Dialog handling functions -----------------
 
     def apply_macro_transform(self, *args, **kwargs):
-        """Placeholder for updater function."""
+        """Placeholder for updater module function."""
         self.updater.apply_macro_transform(*args, **kwargs)
 
     def apply_macro_validation(self, *args, **kwargs):
+        """Placeholder for updater module function."""
         self.updater.apply_macro_validation(*args, **kwargs)
 
     def _add_config(self, config_name, meta=None):
@@ -1223,7 +1227,7 @@ class MainController(object):
         try:
             os.mkdir(os.path.dirname(new_path))
             rose.config.dump(new_config, new_path)
-        except Exception as e:
+        except (OSError, IOError) as e:
             text = rose.config_editor.ERROR_CONFIG_CREATE.format(
                                             new_path, type(e), str(e))
             title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
@@ -1266,7 +1270,7 @@ class MainController(object):
         if dirpath is not None:
             try:
                 shutil.rmtree(dirpath)
-            except Exception as e:
+            except (shutil.Error, OSError, IOError) as e:
                 text = rose.config_editor.ERROR_CONFIG_DELETE.format(
                                                 dirpath, type(e), str(e))
                 title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
@@ -1286,12 +1290,14 @@ class MainController(object):
             self.redo_stack.pop()
 
     def _get_menu_widget(self, suffix):
+        """Return the menu widget whose ui address ends with suffix."""
         for address in self.menu_widgets:
             if address.endswith(suffix):
                 return self.menu_widgets[address]
         return None
 
     def _has_preview_apps(self):
+        """Return whether any configurations are currently just previews."""
         for item in self.data.config.keys():
             if self.data.config[item].is_preview:
                 return True
@@ -1329,7 +1335,7 @@ class MainController(object):
             self.status_bar.set_message(*args, **kwargs)
 
     def _update_change_widget_sensitivity(self, is_changed=False):
-        # Alter sensitivity of 'unsaved changes' related widgets.
+        """Alter sensitivity of 'unsaved changes' related widgets."""
         self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_SAVE,
                                           is_changed)
         self.toolbar.set_widget_sensitive(
@@ -1344,6 +1350,7 @@ class MainController(object):
                                                         not is_changed)
 
     def _refresh_metadata_if_on(self, config_name=None):
+        """Reload any metadata, if present - otherwise do nothing."""
         if not self.metadata_off:
             self.refresh_metadata(only_this_config=config_name)
 
@@ -1351,8 +1358,8 @@ class MainController(object):
         """Switch metadata on/off and reloads namespaces."""
         self.metadata_off = metadata_off
         if hasattr(self, 'menubar'):
-           self._get_menu_widget('/Reload metadata').set_sensitive(
-                                                  not self.metadata_off)
+            self._get_menu_widget('/Reload metadata').set_sensitive(
+                not self.metadata_off)
         if only_this_config is None:
             configs = self.data.config.keys()
         else:
@@ -1453,8 +1460,9 @@ class MainController(object):
             config_name = self.util.split_full_ns(self.data,
                                                   current_namespace)[0]
             self._get_pagelist()
+            page_namespaces = [page.namespace for page in self.pagelist]
             if config_name in configs:
-                if current_namespace in [p.namespace for p in self.pagelist]:
+                if current_namespace in page_namespaces:
                     self.view_page(current_namespace, current_id)
 
 #------------------ Data-intensive menu functions / utilities ----------------
@@ -1505,7 +1513,6 @@ class MainController(object):
 
     def perform_find_by_id(self, config_name, setting_id):
         """Drive the finding of a setting id within the data."""
-        config_data = self.data.config[config_name]
         section, option = self.util.get_section_option_from_id(setting_id)
         if option is None:
             page_id = self.data.helper.get_default_namespace_for_section(
@@ -1593,6 +1600,7 @@ class MainController(object):
         return None, None
 
     def check_cannot_enable_setting(self, config_name, setting_id):
+        """Check if the setting is involved in the trigger mechanism."""
         return setting_id in self.data.trigger[config_name].get_all_ids()
 
     def perform_undo(self, redo_mode_on=False):
@@ -1788,7 +1796,8 @@ def get_number_of_configs(config_directory_path=None):
     return number_to_load
 
 
-if __name__ == '__main__':
+def main():
+    """Launch from the command line."""
     if (gtk.pygtk_version[0] < rose.config_editor.MIN_PYGTK_VERSION[0]
         or gtk.pygtk_version[1] < rose.config_editor.MIN_PYGTK_VERSION[1]):
         this_version = '{0}.{1}.{2}'.format(*gtk.pygtk_version)
@@ -1843,3 +1852,7 @@ if __name__ == '__main__':
                      load_all_apps=opts.load_all_apps,
                      load_no_apps=opts.load_no_apps,
                      metadata_off=opts.no_metadata)
+
+
+if __name__ == '__main__':
+    main()
