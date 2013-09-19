@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -89,10 +89,10 @@ RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
 class MainController(object):
 
     """The main controller class.
-    
+
     Call with a configuration directory and/or a dict of
     configuration names and objects.
-    
+
     pluggable is a boolean that if True, returns containers for
     plugging into other GTK applications. If pluggable is False,
     launch the standalone application.
@@ -128,140 +128,140 @@ class MainController(object):
         self.is_pluggable = pluggable
         self.tab_windows = []  # No child windows yet
         self.orphan_pages = []
-        self.undo_stack = [] # Nothing to undo yet
-        self.redo_stack = [] # Nothing to redo yet
+        self.undo_stack = []  # Nothing to undo yet
+        self.redo_stack = []  # Nothing to redo yet
         self.find_hist = {'regex': '', 'ids': []}
         self.util = rose.config_editor.util.Lookup()
         self.metadata_off = metadata_off
 
         # Set page variable 'verbosity' defaults.
         self.page_var_show_modes = {
-             rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
-             rose.config_editor.SHOULD_SHOW_CUSTOM_DESCRIPTION,
-             rose.config_editor.SHOW_MODE_CUSTOM_HELP:
-             rose.config_editor.SHOULD_SHOW_CUSTOM_HELP,
-             rose.config_editor.SHOW_MODE_CUSTOM_TITLE:
-             rose.config_editor.SHOULD_SHOW_CUSTOM_TITLE,
-             rose.config_editor.SHOW_MODE_FIXED:
-             rose.config_editor.SHOULD_SHOW_FIXED_VARS,
-             rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
-             rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS,
-             rose.config_editor.SHOW_MODE_FLAG_OPT_CONF:
-             rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS,
-             rose.config_editor.SHOW_MODE_FLAG_NO_META:
-             rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS,
-             rose.config_editor.SHOW_MODE_IGNORED:
-             rose.config_editor.SHOULD_SHOW_IGNORED_VARS,
-             rose.config_editor.SHOW_MODE_USER_IGNORED:
-             rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
-             rose.config_editor.SHOW_MODE_LATENT:
-             rose.config_editor.SHOULD_SHOW_LATENT_VARS,
-             rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
-             rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION,
-             rose.config_editor.SHOW_MODE_NO_HELP:
-             rose.config_editor.SHOULD_SHOW_NO_HELP,
-             rose.config_editor.SHOW_MODE_NO_TITLE:
-             rose.config_editor.SHOULD_SHOW_NO_TITLE}
+            rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
+            rose.config_editor.SHOULD_SHOW_CUSTOM_DESCRIPTION,
+            rose.config_editor.SHOW_MODE_CUSTOM_HELP:
+            rose.config_editor.SHOULD_SHOW_CUSTOM_HELP,
+            rose.config_editor.SHOW_MODE_CUSTOM_TITLE:
+            rose.config_editor.SHOULD_SHOW_CUSTOM_TITLE,
+            rose.config_editor.SHOW_MODE_FIXED:
+            rose.config_editor.SHOULD_SHOW_FIXED_VARS,
+            rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
+            rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS,
+            rose.config_editor.SHOW_MODE_FLAG_OPT_CONF:
+            rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS,
+            rose.config_editor.SHOW_MODE_FLAG_NO_META:
+            rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS,
+            rose.config_editor.SHOW_MODE_IGNORED:
+            rose.config_editor.SHOULD_SHOW_IGNORED_VARS,
+            rose.config_editor.SHOW_MODE_USER_IGNORED:
+            rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
+            rose.config_editor.SHOW_MODE_LATENT:
+            rose.config_editor.SHOULD_SHOW_LATENT_VARS,
+            rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
+            rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION,
+            rose.config_editor.SHOW_MODE_NO_HELP:
+            rose.config_editor.SHOULD_SHOW_NO_HELP,
+            rose.config_editor.SHOW_MODE_NO_TITLE:
+            rose.config_editor.SHOULD_SHOW_NO_TITLE}
 
         # Set page tree 'verbosity' defaults.
         self.page_ns_show_modes = {
-             rose.config_editor.SHOW_MODE_IGNORED:
-             rose.config_editor.SHOULD_SHOW_IGNORED_PAGES,
-             rose.config_editor.SHOW_MODE_USER_IGNORED:
-             rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES,
-             rose.config_editor.SHOW_MODE_LATENT:
-             rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
-             rose.config_editor.SHOW_MODE_NO_TITLE:
-             rose.config_editor.SHOULD_SHOW_NO_TITLE}
+            rose.config_editor.SHOW_MODE_IGNORED:
+            rose.config_editor.SHOULD_SHOW_IGNORED_PAGES,
+            rose.config_editor.SHOW_MODE_USER_IGNORED:
+            rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES,
+            rose.config_editor.SHOW_MODE_LATENT:
+            rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
+            rose.config_editor.SHOW_MODE_NO_TITLE:
+            rose.config_editor.SHOULD_SHOW_NO_TITLE}
 
         self.reporter = rose.config_editor.status.StatusReporter(
-                             load_updater,
-                             self.update_status_text)
+            load_updater,
+            self.update_status_text)
 
         # Load the top configuration directory
         self.data = rose.config_editor.data.ConfigDataManager(
-                                self.util,
-                                self.reporter,
-                                self.page_ns_show_modes,
-                                self.reload_namespace_tree)
+            self.util,
+            self.reporter,
+            self.page_ns_show_modes,
+            self.reload_namespace_tree)
 
         self.nav_controller = (
-                  rose.config_editor.nav_controller.NavTreeManager(
-                                self.data,
-                                self.util,
-                                self.reporter,
-                                self.tree_trigger_update))
+            rose.config_editor.nav_controller.NavTreeManager(
+                self.data,
+                self.util,
+                self.reporter,
+                self.tree_trigger_update))
 
         self.mainwindow = rose.config_editor.window.MainWindow()
 
         self.section_ops = rose.config_editor.ops.section.SectionOperations(
-                                self.data, self.util, self.reporter,
-                                self.undo_stack, self.redo_stack,
-                                self.check_cannot_enable_setting,
-                                self.update_namespace,
-                                self.update_ns_info,
-                                update_tree_func=self.reload_namespace_tree,
-                                view_page_func=self.view_page,
-                                kill_page_func=self.kill_page)
+            self.data, self.util, self.reporter,
+            self.undo_stack, self.redo_stack,
+            self.check_cannot_enable_setting,
+            self.update_namespace,
+            self.update_ns_info,
+            update_tree_func=self.reload_namespace_tree,
+            view_page_func=self.view_page,
+            kill_page_func=self.kill_page)
 
         self.variable_ops = (
-                      rose.config_editor.ops.variable.VariableOperations(
-                                   self.data, self.util, self.reporter,
-                                   self.undo_stack, self.redo_stack,
-                                   self.section_ops.add_section,
-                                   self.check_cannot_enable_setting,
-                                   self.update_namespace,
-                                   search_id_func=self.perform_find_by_id))
+            rose.config_editor.ops.variable.VariableOperations(
+                self.data, self.util, self.reporter,
+                self.undo_stack, self.redo_stack,
+                self.section_ops.add_section,
+                self.check_cannot_enable_setting,
+                self.update_namespace,
+                search_id_func=self.perform_find_by_id))
 
         self.group_ops = rose.config_editor.ops.group.GroupOperations(
-                             self.data, self.util, self.reporter,
-                             self.undo_stack, self.redo_stack,
-                             self.section_ops,
-                             self.variable_ops,
-                             self.view_page,
-                             self.update_ns_sub_data,
-                             self.reload_namespace_tree)
+            self.data, self.util, self.reporter,
+            self.undo_stack, self.redo_stack,
+            self.section_ops,
+            self.variable_ops,
+            self.view_page,
+            self.update_ns_sub_data,
+            self.reload_namespace_tree)
 
         # Add in the main menu bar and tool bar handler.
         self.main_handle = rose.config_editor.menu.MainMenuHandler(
-                             self.data, self.util, self.reporter,
-                             self.mainwindow,
-                             self.undo_stack, self.redo_stack,
-                             self.perform_undo,
-                             self.apply_macro_transform,
-                             self.apply_macro_validation,
-                             self.section_ops,
-                             self.variable_ops,
-                             self.perform_find_by_ns_id)
+            self.data, self.util, self.reporter,
+            self.mainwindow,
+            self.undo_stack, self.redo_stack,
+            self.perform_undo,
+            self.apply_macro_transform,
+            self.apply_macro_validation,
+            self.section_ops,
+            self.variable_ops,
+            self.perform_find_by_ns_id)
 
         # Add in the navigation panel menu handler.
         self.nav_handle = rose.config_editor.nav_panel_menu.NavPanelHandler(
-                             self.data, self.util, self.reporter,
-                             self.mainwindow,
-                             self.undo_stack, self.redo_stack,
-                             self._add_config,
-                             self.group_ops,
-                             self.section_ops,
-                             self.variable_ops,
-                             self.kill_page,
-                             self.reload_namespace_tree,
-                             self.main_handle.transform_default)
+            self.data, self.util, self.reporter,
+            self.mainwindow,
+            self.undo_stack, self.redo_stack,
+            self._add_config,
+            self.group_ops,
+            self.section_ops,
+            self.variable_ops,
+            self.kill_page,
+            self.reload_namespace_tree,
+            self.main_handle.transform_default)
 
         self.updater = rose.config_editor.updater.Updater(
-                             self.data, self.util, self.reporter,
-                             self.mainwindow, self.main_handle,
-                             self.nav_controller,
-                             self._get_pagelist,
-                             self.update_bar_widgets,
-                             self._refresh_metadata_if_on,
-                             self.is_pluggable)
+            self.data, self.util, self.reporter,
+            self.mainwindow, self.main_handle,
+            self.nav_controller,
+            self._get_pagelist,
+            self.update_bar_widgets,
+            self._refresh_metadata_if_on,
+            self.is_pluggable)
 
-        self.data.load(config_directory, config_objs, 
+        self.data.load(config_directory, config_objs,
                        load_all_apps, load_no_apps, metadata_off)
 
         self.reporter.report_load_event(
-                      rose.config_editor.EVENT_LOAD_STATUSES.format(
-                                                    self.data.top_level_name))
+            rose.config_editor.EVENT_LOAD_STATUSES.format(
+                self.data.top_level_name))
 
         if not self.is_pluggable:
             self.generate_toolbar()
@@ -293,16 +293,16 @@ class MainController(object):
                                                  self.handle_page_change)
         self.updater.update_all(is_loading=True)
         self.reporter.report_load_event(
-                      rose.config_editor.EVENT_LOAD_ERRORS.format(
-                                              self.data.top_level_name,
-                                              self.updater.load_errors))
+            rose.config_editor.EVENT_LOAD_ERRORS.format(
+                self.data.top_level_name,
+                self.updater.load_errors))
         self.updater.perform_startup_check()
         self.reporter.report_load_event(
-                      rose.config_editor.EVENT_LOAD_DONE.format(
-                                               self.data.top_level_name))
+            rose.config_editor.EVENT_LOAD_DONE.format(
+                self.data.top_level_name))
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
-            
+
         self.update_bar_widgets()
 
 #------------------ Setting up main component functions ----------------------
@@ -310,34 +310,38 @@ class MainController(object):
     def generate_toolbar(self):
         """Link in the toolbar functionality."""
         self.toolbar = rose.gtk.util.ToolBar(
-                widgets=[
-                   (rose.config_editor.TOOLBAR_OPEN, 'gtk.STOCK_OPEN'),
-                   (rose.config_editor.TOOLBAR_SAVE, 'gtk.STOCK_SAVE'),
-                   (rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
-                    'gtk.STOCK_SPELL_CHECK'),
-                   (rose.config_editor.TOOLBAR_LOAD_APPS, 'gtk.STOCK_CDROM'),
-                   (rose.config_editor.TOOLBAR_BROWSE, 'gtk.STOCK_DIRECTORY'),
-                   (rose.config_editor.TOOLBAR_UNDO, 'gtk.STOCK_UNDO'),
-                   (rose.config_editor.TOOLBAR_REDO, 'gtk.STOCK_REDO'),
-                   (rose.config_editor.TOOLBAR_ADD, 'gtk.STOCK_ADD'),
-                   (rose.config_editor.TOOLBAR_REVERT,
-                    'gtk.STOCK_REVERT_TO_SAVED'),
-                   (rose.config_editor.TOOLBAR_FIND, 'gtk.Entry'),
-                   (rose.config_editor.TOOLBAR_FIND_NEXT, 'gtk.STOCK_FIND'),
-                   (rose.config_editor.TOOLBAR_VALIDATE,
-                    'gtk.STOCK_DIALOG_QUESTION'),
-                   (rose.config_editor.TOOLBAR_TRANSFORM,
-                    'gtk.STOCK_CONVERT'),
-                   (rose.config_editor.TOOLBAR_VIEW_OUTPUT,
-                    'gtk.STOCK_DIRECTORY'),
-                   (rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-                    'rose-gtk-scheduler')],
-                sep_on_name=[rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
-                             rose.config_editor.TOOLBAR_BROWSE,
-                             rose.config_editor.TOOLBAR_REDO,
-                             rose.config_editor.TOOLBAR_REVERT,
-                             rose.config_editor.TOOLBAR_FIND_NEXT,
-                             rose.config_editor.TOOLBAR_TRANSFORM])
+            widgets=[
+                (rose.config_editor.TOOLBAR_OPEN, 'gtk.STOCK_OPEN'),
+                (rose.config_editor.TOOLBAR_SAVE, 'gtk.STOCK_SAVE'),
+                (rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+                 'gtk.STOCK_SPELL_CHECK'),
+                (rose.config_editor.TOOLBAR_LOAD_APPS, 'gtk.STOCK_CDROM'),
+                (rose.config_editor.TOOLBAR_BROWSE, 'gtk.STOCK_DIRECTORY'),
+                (rose.config_editor.TOOLBAR_UNDO, 'gtk.STOCK_UNDO'),
+                (rose.config_editor.TOOLBAR_REDO, 'gtk.STOCK_REDO'),
+                (rose.config_editor.TOOLBAR_ADD, 'gtk.STOCK_ADD'),
+                (rose.config_editor.TOOLBAR_REVERT,
+                 'gtk.STOCK_REVERT_TO_SAVED'),
+                (rose.config_editor.TOOLBAR_FIND, 'gtk.Entry'),
+                (rose.config_editor.TOOLBAR_FIND_NEXT, 'gtk.STOCK_FIND'),
+                (rose.config_editor.TOOLBAR_VALIDATE,
+                 'gtk.STOCK_DIALOG_QUESTION'),
+                (rose.config_editor.TOOLBAR_TRANSFORM,
+                 'gtk.STOCK_CONVERT'),
+                (rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+                 'gtk.STOCK_DIRECTORY'),
+                (rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+                 'rose-gtk-scheduler')
+            ],
+            sep_on_name=[
+                rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+                rose.config_editor.TOOLBAR_BROWSE,
+                rose.config_editor.TOOLBAR_REDO,
+                rose.config_editor.TOOLBAR_REVERT,
+                rose.config_editor.TOOLBAR_FIND_NEXT,
+                rose.config_editor.TOOLBAR_TRANSFORM
+            ]
+        )
         assign = self.toolbar.set_widget_function
         assign(rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
         assign(rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
@@ -354,33 +358,33 @@ class MainController(object):
                self.main_handle.check_all_extra)
         assign(rose.config_editor.TOOLBAR_TRANSFORM,
                self.main_handle.transform_default)
-        assign(rose.config_editor.TOOLBAR_VIEW_OUTPUT, 
-               self.main_handle.launch_output_viewer )
+        assign(rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+               self.main_handle.launch_output_viewer)
         assign(rose.config_editor.TOOLBAR_SUITE_GCONTROL,
                self.main_handle.launch_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
-                               rose.config_editor.TOOLBAR_FIND)['widget']
+            rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
         self.find_entry.connect("changed", self._clear_find)
         add_icon = self.toolbar.item_dict.get(
-                        rose.config_editor.TOOLBAR_ADD)['widget']
+            rose.config_editor.TOOLBAR_ADD)['widget']
         add_icon.connect('button_press_event', self.add_page_variable)
         custom_text = rose.config_editor.TOOLBAR_SUITE_RUN_MENU
         self._toolbar_run_button = rose.gtk.util.CustomMenuButton(
-                          stock_id=gtk.STOCK_MEDIA_PLAY,
-                          menu_items=[(custom_text, gtk.STOCK_MEDIA_PLAY)],
-                          menu_funcs=[self.main_handle.get_run_suite_args],
-                          tip_text=rose.config_editor.TOOLBAR_SUITE_RUN)
+            stock_id=gtk.STOCK_MEDIA_PLAY,
+            menu_items=[(custom_text, gtk.STOCK_MEDIA_PLAY)],
+            menu_funcs=[self.main_handle.get_run_suite_args],
+            tip_text=rose.config_editor.TOOLBAR_SUITE_RUN)
         self._toolbar_run_button.connect("clicked", self.main_handle.run_suite)
         self.toolbar.insert(self._toolbar_run_button, -1)
-        
-        self.toolbar.set_widget_sensitive(
-              rose.config_editor.TOOLBAR_SUITE_GCONTROL, 
-              any([c.is_top_level for c in self.data.config.values()]))
 
         self.toolbar.set_widget_sensitive(
-              rose.config_editor.TOOLBAR_VIEW_OUTPUT,
-              any([c.is_top_level for c in self.data.config.values()]))
+            rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+            any([c.is_top_level for c in self.data.config.values()]))
+
+        self.toolbar.set_widget_sensitive(
+            rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+            any([c.is_top_level for c in self.data.config.values()]))
 
     def generate_menubar(self):
         """Link in the menu functionality and accelerators."""
@@ -388,14 +392,14 @@ class MainController(object):
         self.menu_widgets = {}
         menu_list = [('/TopMenuBar/File/Open...', self.load_from_file),
                      ('/TopMenuBar/File/Save', lambda m: self.save_to_file()),
-                     ('/TopMenuBar/File/Check and save', 
+                     ('/TopMenuBar/File/Check and save',
                       lambda m: self.save_to_file(check_on_save=True)),
                      ('/TopMenuBar/File/Load All Apps',
                       lambda m: self.handle_load_all()),
                      ('/TopMenuBar/File/Quit', self.main_handle.destroy),
-                     ('/TopMenuBar/Edit/Undo', 
+                     ('/TopMenuBar/Edit/Undo',
                       lambda m: self.perform_undo()),
-                     ('/TopMenuBar/Edit/Redo', 
+                     ('/TopMenuBar/Edit/Redo',
                       lambda m: self.perform_undo(redo_mode_on=True)),
                      ('/TopMenuBar/Edit/Find', self._launch_find),
                      ('/TopMenuBar/Edit/Find Next',
@@ -404,61 +408,75 @@ class MainController(object):
                      ('/TopMenuBar/Edit/Stack', self.main_handle.view_stack),
                      ('/TopMenuBar/View/View fixed vars',
                       lambda m: self._set_page_var_show_modes(
-                                     rose.config_editor.SHOW_MODE_FIXED,
-                                     m.get_active())),
+                          rose.config_editor.SHOW_MODE_FIXED,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/View ignored vars',
                       lambda m: self._set_page_var_show_modes(
-                                  rose.config_editor.SHOW_MODE_IGNORED,
-                                  m.get_active())),
+                          rose.config_editor.SHOW_MODE_IGNORED,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/View user-ignored vars',
                       lambda m: self._set_page_var_show_modes(
-                                   rose.config_editor.SHOW_MODE_USER_IGNORED,
-                                   m.get_active())),
+                          rose.config_editor.SHOW_MODE_USER_IGNORED,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/View latent vars',
                       lambda m: self._set_page_var_show_modes(
-                                     rose.config_editor.SHOW_MODE_LATENT,
-                                     m.get_active())),
+                          rose.config_editor.SHOW_MODE_LATENT,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/View ignored pages',
                       lambda m: self._set_page_ns_show_modes(
-                                     rose.config_editor.SHOW_MODE_IGNORED,
-                                     m.get_active())),
+                          rose.config_editor.SHOW_MODE_IGNORED,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/View user-ignored pages',
                       lambda m: self._set_page_ns_show_modes(
-                                   rose.config_editor.SHOW_MODE_USER_IGNORED,
-                                   m.get_active())),
+                          rose.config_editor.SHOW_MODE_USER_IGNORED,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/View latent pages',
                       lambda m: self._set_page_ns_show_modes(
-                                  rose.config_editor.SHOW_MODE_LATENT,
-                                  m.get_active())),
+                          rose.config_editor.SHOW_MODE_LATENT,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/Flag no-metadata vars',
                       lambda m: self._set_page_var_show_modes(
-                                   rose.config_editor.SHOW_MODE_FLAG_NO_META,
-                                   m.get_active())),
+                          rose.config_editor.SHOW_MODE_FLAG_NO_META,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/Flag opt config vars',
                       lambda m: self._set_page_var_show_modes(
-                                  rose.config_editor.SHOW_MODE_FLAG_OPT_CONF,
-                                  m.get_active())),
+                          rose.config_editor.SHOW_MODE_FLAG_OPT_CONF,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/Flag optional vars',
                       lambda m: self._set_page_var_show_modes(
-                                  rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
-                                  m.get_active())),
+                          rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/View/View status bar',
                       lambda m: self._set_show_status_bar(m.get_active())),
                      ('/TopMenuBar/Metadata/Prefs/View without descriptions',
                       lambda m: self._set_page_show_modes(
-                                 rose.config_editor.SHOW_MODE_NO_DESCRIPTION,
-                                 m.get_active())),
+                          rose.config_editor.SHOW_MODE_NO_DESCRIPTION,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/Metadata/Prefs/View without help',
                       lambda m: self._set_page_show_modes(
-                                     rose.config_editor.SHOW_MODE_NO_HELP,
-                                     m.get_active())),
+                          rose.config_editor.SHOW_MODE_NO_HELP,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/Metadata/Prefs/View without titles',
                       lambda m: self._set_page_show_modes(
-                                     rose.config_editor.SHOW_MODE_NO_TITLE,
-                                     m.get_active())),
+                          rose.config_editor.SHOW_MODE_NO_TITLE,
+                          m.get_active()
+                      )),
                      ('/TopMenuBar/Metadata/All V',
                       lambda m: self.main_handle.handle_run_custom_macro(
-                                     method_name=rose.macro.VALIDATE_METHOD)),
+                          method_name=rose.macro.VALIDATE_METHOD
+                      )),
                      ('/TopMenuBar/Metadata/Autofix',
                       lambda m: self.main_handle.transform_default()),
                      ('/TopMenuBar/Metadata/Extra checks',
@@ -485,7 +503,8 @@ class MainController(object):
                       lambda m: self.revert_to_saved_data()),
                      ('/TopMenuBar/Page/Page Info',
                       lambda m: self.nav_handle.info_request(
-                                     self._get_current_page().namespace)),
+                          self._get_current_page().namespace
+                      )),
                      ('/TopMenuBar/Page/Page Help',
                       lambda m: self._get_current_page().launch_help()),
                      ('/TopMenuBar/Page/Page Web Help',
@@ -493,111 +512,116 @@ class MainController(object):
                      ('/TopMenuBar/Help/GUI Help', self.main_handle.help),
                      ('/TopMenuBar/Help/About', self.main_handle.about_dialog)]
         is_toggled = dict(
-              [('/TopMenuBar/View/View fixed vars',
-                rose.config_editor.SHOULD_SHOW_FIXED_VARS),
-                ('/TopMenuBar/View/View ignored vars',
-                rose.config_editor.SHOULD_SHOW_IGNORED_VARS),
-                ('/TopMenuBar/View/View user-ignored vars',
-                rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS),
-                ('/TopMenuBar/View/View latent vars',
-                rose.config_editor.SHOULD_SHOW_LATENT_VARS),
-                ('/TopMenuBar/Metadata/Prefs/View without descriptions',
-                rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION),
-                ('/TopMenuBar/Metadata/Prefs/View without help',
-                rose.config_editor.SHOULD_SHOW_NO_HELP),
-                ('/TopMenuBar/Metadata/Prefs/View without titles',
-                rose.config_editor.SHOULD_SHOW_NO_TITLE),
-                ('/TopMenuBar/View/View ignored pages',
-                rose.config_editor.SHOULD_SHOW_IGNORED_PAGES),
-                ('/TopMenuBar/View/View user-ignored pages',
-                rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES),
-                ('/TopMenuBar/View/View latent pages',
-                rose.config_editor.SHOULD_SHOW_LATENT_PAGES),
-                ('/TopMenuBar/View/Flag opt config vars',
-                rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS),
-                ('/TopMenuBar/View/Flag optional vars',
-                rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS),
-                ('/TopMenuBar/View/Flag no-metadata vars',
-                rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS),
-                ('/TopMenuBar/View/View status bar',
-                rose.config_editor.SHOULD_SHOW_STATUS_BAR),
-                ('/TopMenuBar/Metadata/Switch off metadata',
-                self.metadata_off)])
+            [('/TopMenuBar/View/View fixed vars',
+              rose.config_editor.SHOULD_SHOW_FIXED_VARS),
+             ('/TopMenuBar/View/View ignored vars',
+              rose.config_editor.SHOULD_SHOW_IGNORED_VARS),
+             ('/TopMenuBar/View/View user-ignored vars',
+              rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS),
+             ('/TopMenuBar/View/View latent vars',
+              rose.config_editor.SHOULD_SHOW_LATENT_VARS),
+             ('/TopMenuBar/Metadata/Prefs/View without descriptions',
+              rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION),
+             ('/TopMenuBar/Metadata/Prefs/View without help',
+              rose.config_editor.SHOULD_SHOW_NO_HELP),
+             ('/TopMenuBar/Metadata/Prefs/View without titles',
+              rose.config_editor.SHOULD_SHOW_NO_TITLE),
+             ('/TopMenuBar/View/View ignored pages',
+              rose.config_editor.SHOULD_SHOW_IGNORED_PAGES),
+             ('/TopMenuBar/View/View user-ignored pages',
+              rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES),
+             ('/TopMenuBar/View/View latent pages',
+              rose.config_editor.SHOULD_SHOW_LATENT_PAGES),
+             ('/TopMenuBar/View/Flag opt config vars',
+              rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS),
+             ('/TopMenuBar/View/Flag optional vars',
+              rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS),
+             ('/TopMenuBar/View/Flag no-metadata vars',
+              rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS),
+             ('/TopMenuBar/View/View status bar',
+              rose.config_editor.SHOULD_SHOW_STATUS_BAR),
+             ('/TopMenuBar/Metadata/Switch off metadata',
+              self.metadata_off)]
+        )
         for (address, action) in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
             if address in is_toggled:
                 widget.set_active(is_toggled[address])
                 if (address.endswith("View user-ignored pages") and
-                    rose.config_editor.SHOULD_SHOW_IGNORED_PAGES):
+                        rose.config_editor.SHOULD_SHOW_IGNORED_PAGES):
                     widget.set_sensitive(False)
                 if (address.endswith("View user-ignored vars") and
-                    rose.config_editor.SHOULD_SHOW_IGNORED_VARS):
+                        rose.config_editor.SHOULD_SHOW_IGNORED_VARS):
                     widget.set_sensitive(False)
             if address.endswith("Reload metadata") and self.metadata_off:
                 widget.set_sensitive(False)
             widget.connect('activate', action)
         page_menu = self.menubar.uimanager.get_widget("/TopMenuBar/Page")
         add_menuitem = self.menubar.uimanager.get_widget(
-                                              "/TopMenuBar/Page/Add variable")
-        page_menu.connect("activate",
-                          lambda m: self.main_handle.load_page_menu(
-                                                self.menubar,
-                                                add_menuitem,
-                                                self._get_current_page()))
+            "/TopMenuBar/Page/Add variable")
+        page_menu.connect(
+            "activate",
+            lambda m: self.main_handle.load_page_menu(
+                self.menubar,
+                add_menuitem,
+                self._get_current_page()
+            ))
         page_menu.get_submenu().connect(
-                          "deactivate",
-                          lambda m: self.main_handle.clear_page_menu(
-                                                      self.menubar,
-                                                      add_menuitem))
+            "deactivate",
+            lambda m: self.main_handle.clear_page_menu(
+                self.menubar,
+                add_menuitem
+            ))
         self.main_handle.load_macro_menu(self.menubar)
         if not any([c.is_top_level for c in self.data.config.values()]):
             self.menubar.uimanager.get_widget(
-                         "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
+                "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
         self.update_bar_widgets()
         self.top_menu = self.menubar.uimanager.get_widget('/TopMenuBar')
         # Load the keyboard accelerators.
         accel = {
             rose.config_editor.ACCEL_UNDO:
-                        lambda: self.perform_undo(),
+            lambda: self.perform_undo(),
             rose.config_editor.ACCEL_REDO:
-                        lambda: self.perform_undo(redo_mode_on=True),
+            lambda: self.perform_undo(redo_mode_on=True),
             rose.config_editor.ACCEL_FIND:
-                        lambda: self.find_entry.grab_focus(),
+            lambda: self.find_entry.grab_focus(),
             rose.config_editor.ACCEL_FIND_NEXT:
-                        lambda: self.perform_find(self.find_hist['regex']),
+            lambda: self.perform_find(self.find_hist['regex']),
             rose.config_editor.ACCEL_HELP_GUI:
-                        lambda: self.main_handle.help(),
+            lambda: self.main_handle.help(),
             rose.config_editor.ACCEL_OPEN:
-                        lambda: self.load_from_file(),
+            lambda: self.load_from_file(),
             rose.config_editor.ACCEL_SAVE:
-                        lambda: self.save_to_file(),
+            lambda: self.save_to_file(),
             rose.config_editor.ACCEL_QUIT:
-                        lambda: self.main_handle.destroy(),
+            lambda: self.main_handle.destroy(),
             rose.config_editor.ACCEL_METADATA_REFRESH:
-                        lambda: self._refresh_metadata_if_on(),
+            lambda: self._refresh_metadata_if_on(),
             rose.config_editor.ACCEL_SUITE_RUN:
-                        lambda: self.main_handle.run_suite(),
+            lambda: self.main_handle.run_suite(),
             rose.config_editor.ACCEL_BROWSER:
-                        lambda: self.main_handle.launch_browser(),
+            lambda: self.main_handle.launch_browser(),
             rose.config_editor.ACCEL_TERMINAL:
-                        lambda: self.main_handle.launch_terminal()}
+            lambda: self.main_handle.launch_terminal()
+        }
         self.menubar.set_accelerators(accel)
 
     def generate_nav_panel(self):
         """"Create tree panel and link functions."""
         self.nav_panel = rose.config_editor.nav_panel.PageNavigationPanel(
-                              self.nav_controller.namespace_tree,
-                              self.handle_launch_request,
-                              self.nav_handle.get_ns_metadata_and_comments,
-                              self.nav_handle.popup_panel_menu,
-                              self.nav_handle.get_can_show_page,
-                              self.nav_handle.ask_is_preview)
+            self.nav_controller.namespace_tree,
+            self.handle_launch_request,
+            self.nav_handle.get_ns_metadata_and_comments,
+            self.nav_handle.popup_panel_menu,
+            self.nav_handle.get_can_show_page,
+            self.nav_handle.ask_is_preview)
 
     def generate_status_bar(self):
         """Create a status bar."""
         self.status_bar = rose.config_editor.status.StatusBar(
-                          verbosity=rose.config_editor.STATUS_BAR_VERBOSITY)
+            verbosity=rose.config_editor.STATUS_BAR_VERBOSITY)
         self._set_show_status_bar(rose.config_editor.SHOULD_SHOW_STATUS_BAR)
 
 #------------------ Page manipulation functions ------------------------------
@@ -612,15 +636,15 @@ class MainController(object):
         number_of_events = (len(load_these) *
                             rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
         self.reporter.report_load_event(
-                           "Loading all preview apps", 
-                           new_total_events=number_of_events)
+            "Loading all preview apps",
+            new_total_events=number_of_events)
         for namespace_name in load_these:
             config_data = self.data.config[namespace_name]
-            self.data.load_config(config_data.directory, preview=False, 
+            self.data.load_config(config_data.directory, preview=False,
                                   metadata_off=self.metadata_off)
             self.reporter.report_load_event(
-                    rose.config_editor.EVENT_LOADED.format(namespace_name[1:]),
-                    no_progress=True)
+                rose.config_editor.EVENT_LOADED.format(namespace_name[1:]),
+                no_progress=True)
         self.reload_namespace_tree()
         self.reporter.stop()
         self.nav_panel.update_row_tooltips()
@@ -640,27 +664,27 @@ class MainController(object):
         """
         if not namespace_name.startswith('/'):
             namespace_name = '/' + namespace_name
-            
+
         config_name = self.util.split_full_ns(self.data, namespace_name)[0]
         config_data = self.data.config[config_name]
-        
+
         if config_data.is_preview:
             self.reporter.report_load_event(
-                       rose.config_editor.EVENT_LOAD_ATTEMPT.format(
-                       namespace_name), 
-                       new_total_events=3)
-            self.data.load_config(config_data.directory, preview=False, 
+                rose.config_editor.EVENT_LOAD_ATTEMPT.format(
+                    namespace_name),
+                new_total_events=3)
+            self.data.load_config(config_data.directory, preview=False,
                                   metadata_off=self.metadata_off)
             self.reload_namespace_tree()
             self.nav_panel.update_row_tooltips()
             self.reporter.report_load_event(
-                       rose.config_editor.EVENT_LOADED.format(namespace_name),
-                       no_progress=True)
+                rose.config_editor.EVENT_LOADED.format(namespace_name),
+                no_progress=True)
             self.reporter.stop()
             if hasattr(self, 'menubar'):
                 self.main_handle.load_macro_menu(self.menubar)
             self.update_bar_widgets()
-        
+
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)
             self.notebook.set_current_page(index)
@@ -688,7 +712,7 @@ class MainController(object):
         config_name, subspace = self.util.split_full_ns(self.data,
                                                         namespace_name)
         data, latent_data = self.data.helper.get_data_for_namespace(
-                                                      namespace_name)
+            namespace_name)
         config_data = self.data.config[config_name]
         ns_metadata = self.data.namespace_meta_lookup.get(namespace_name, {})
         description = ns_metadata.get(rose.META_PROP_DESCRIPTION, '')
@@ -697,7 +721,7 @@ class MainController(object):
         url = ns_metadata.get(rose.META_PROP_URL)
         custom_widget = ns_metadata.get(rose.config_editor.META_PROP_WIDGET)
         custom_sub_widget = ns_metadata.get(
-                               rose.config_editor.META_PROP_WIDGET_SUB_NS)
+            rose.config_editor.META_PROP_WIDGET_SUB_NS)
         has_sub_data = self.data.helper.is_ns_sub_data(namespace_name)
         label = ns_metadata.get(rose.META_PROP_TITLE)
         if label is None:
@@ -739,7 +763,7 @@ class MainController(object):
         sub_ops = None
         if has_sub_data:
             sub_data = self.data.helper.get_sub_data_for_namespace(
-                                                         namespace_name)
+                namespace_name)
             sub_ops = self.group_ops.get_sub_ops_for_namespace(namespace_name)
         macro_info = self.data.helper.get_macro_info_for_namespace(
             namespace_name)
@@ -760,42 +784,42 @@ class MainController(object):
         if len(sections) == 1:
             page_metadata.update({'id': sections.pop()})
         sect_ops = rose.config_editor.ops.section.SectionOperations(
-                                self.data, self.util, self.reporter,
-                                self.undo_stack, self.redo_stack,
-                                self.check_cannot_enable_setting,
-                                self.updater.update_namespace,
-                                self.updater.update_ns_info,
-                                update_tree_func=self.reload_namespace_tree,
-                                view_page_func=self.view_page,
-                                kill_page_func=self.kill_page)
+            self.data, self.util, self.reporter,
+            self.undo_stack, self.redo_stack,
+            self.check_cannot_enable_setting,
+            self.updater.update_namespace,
+            self.updater.update_ns_info,
+            update_tree_func=self.reload_namespace_tree,
+            view_page_func=self.view_page,
+            kill_page_func=self.kill_page)
         var_ops = rose.config_editor.ops.variable.VariableOperations(
-                                self.data, self.util, self.reporter,
-                                self.undo_stack, self.redo_stack,
-                                sect_ops.add_section,
-                                self.check_cannot_enable_setting,
-                                self.updater.update_namespace,
-                                search_id_func=self.perform_find_by_id)
+            self.data, self.util, self.reporter,
+            self.undo_stack, self.redo_stack,
+            sect_ops.add_section,
+            self.check_cannot_enable_setting,
+            self.updater.update_namespace,
+            search_id_func=self.perform_find_by_id)
         directory = None
         if namespace_name == config_name:
             directory = config_data.directory
         launch_info = lambda: self.nav_handle.info_request(
-                                                   namespace_name)
+            namespace_name)
         launch_edit = lambda: self.nav_handle.edit_request(
-                                                   namespace_name)
+            namespace_name)
         page = rose.config_editor.page.ConfigPage(
-                page_metadata,
-                data,
-                latent_data,
-                sect_ops,
-                var_ops,
-                section_data_objects,
-                self.data.helper.get_format_sections,
-                directory,
-                sub_data=sub_data,
-                sub_ops=sub_ops,
-                launch_info_func=launch_info,
-                launch_edit_func=launch_edit,
-                launch_macro_func=self.main_handle.handle_run_custom_macro)
+            page_metadata,
+            data,
+            latent_data,
+            sect_ops,
+            var_ops,
+            section_data_objects,
+            self.data.helper.get_format_sections,
+            directory,
+            sub_data=sub_data,
+            sub_ops=sub_ops,
+            launch_info_func=launch_info,
+            launch_edit_func=launch_edit,
+            launch_macro_func=self.main_handle.handle_run_custom_macro)
         #FIXME: These three should go.
         page.trigger_tab_detach = lambda b: self._handle_detach_request(page)
         var_ops.trigger_ignored_update = lambda v: page.update_ignored()
@@ -828,15 +852,15 @@ class MainController(object):
                 notebook_index = index
                 break
         add_button = rose.gtk.util.CustomButton(
-                              stock_id=gtk.STOCK_ADD,
-                              tip_text=rose.config_editor.TIP_ADD_TO_PAGE,
-                              size=gtk.ICON_SIZE_LARGE_TOOLBAR,
-                              as_tool=True)
+            stock_id=gtk.STOCK_ADD,
+            tip_text=rose.config_editor.TIP_ADD_TO_PAGE,
+            size=gtk.ICON_SIZE_LARGE_TOOLBAR,
+            as_tool=True)
         revert_button = rose.gtk.util.CustomButton(
-                                 stock_id=gtk.STOCK_REVERT_TO_SAVED,
-                                 tip_text=rose.config_editor.TIP_REVERT_PAGE,
-                                 size=gtk.ICON_SIZE_LARGE_TOOLBAR,
-                                 as_tool=True)
+            stock_id=gtk.STOCK_REVERT_TO_SAVED,
+            tip_text=rose.config_editor.TIP_REVERT_PAGE,
+            size=gtk.ICON_SIZE_LARGE_TOOLBAR,
+            as_tool=True)
         add_button.connect('button_press_event', self.add_page_variable)
         revert_button.connect('clicked',
                               lambda b: self.revert_to_saved_data())
@@ -887,9 +911,9 @@ class MainController(object):
             ns = current_page.namespace
             metadata = self.data.namespace_meta_lookup.get(ns, {})
             get_widget("/TopMenuBar/Page/Page Help").set_sensitive(
-                                         rose.META_PROP_HELP in metadata)
+                rose.META_PROP_HELP in metadata)
             get_widget("/TopMenuBar/Page/Page Web Help").set_sensitive(
-                                         rose.META_PROP_URL in metadata)
+                rose.META_PROP_URL in metadata)
 
     def set_current_page_indicator(self, namespace):
         """Make sure the current page is highlighted in the nav panel."""
@@ -912,12 +936,12 @@ class MainController(object):
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         self.data.load_node_namespaces(config_name, from_saved=True)
         config_data, ghost_data = self.data.helper.get_data_for_namespace(
-                                            namespace, from_saved=True)
+            namespace, from_saved=True)
         page.reload_from_data(config_data, ghost_data)
         self.data.load_node_namespaces(config_name)
         self.updater.update_status(page)
         self.reporter.report(rose.config_editor.EVENT_REVERT.format(
-                                         namespace.lstrip("/")))
+            namespace.lstrip("/")))
 
     def _get_pagelist(self):
         """Load an attribute self.pagelist with a list of open pages."""
@@ -973,10 +997,10 @@ class MainController(object):
         """Set namespace view options."""
         self.page_ns_show_modes[key] = is_key_allowed
         self.reload_namespace_tree()  # This knows page_ns_show_modes.
-        if (hasattr(self, "menubar") and 
-            key == rose.config_editor.SHOW_MODE_IGNORED):
+        if (hasattr(self, "menubar") and
+                key == rose.config_editor.SHOW_MODE_IGNORED):
             user_ign_item = self.menubar.uimanager.get_widget(
-                                 "/TopMenuBar/View/View user-ignored pages")
+                "/TopMenuBar/View/View user-ignored pages")
             user_ign_item.set_sensitive(not is_key_allowed)
 
     def _set_page_var_show_modes(self, key, is_key_allowed):
@@ -985,10 +1009,10 @@ class MainController(object):
         self._get_pagelist()
         for page in self.pagelist:
             page.react_to_show_modes(key, is_key_allowed)
-        if (hasattr(self, "menubar") and 
-            key == rose.config_editor.SHOW_MODE_IGNORED):
+        if (hasattr(self, "menubar") and
+                key == rose.config_editor.SHOW_MODE_IGNORED):
             user_ign_item = self.menubar.uimanager.get_widget(
-                                 "/TopMenuBar/View/View user-ignored vars")
+                "/TopMenuBar/View/View user-ignored vars")
             user_ign_item.set_sensitive(not is_key_allowed)
 
     def kill_page(self, namespace):
@@ -1092,7 +1116,7 @@ class MainController(object):
         save_ok = True
         if check_on_save:
             self.main_handle.check_all_extra()
-        
+
         for config_name in sorted(config_names):
             short_config_name = config_name.lstrip("/")
             config = self.data.dump_to_internal_config(config_name)
@@ -1105,13 +1129,15 @@ class MainController(object):
                                    var.metadata["id"])
                     page_address = var.metadata["full_ns"].lstrip("/")
                     rose.gtk.dialog.run_dialog(
-                             rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                             rose.config_editor.ERROR_SAVE_BLANK.format(
-                                                short_config_name,
-                                                page_address),
-                             title=rose.config_editor.ERROR_SAVE_TITLE.format(
-                                                            short_config_name),
-                             modal=False)
+                        rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                        rose.config_editor.ERROR_SAVE_BLANK.format(
+                            short_config_name,
+                            page_address
+                        ),
+                        title=rose.config_editor.ERROR_SAVE_TITLE.format(
+                            short_config_name),
+                        modal=False
+                    )
                     vars_ok = False
                     break
             if not vars_ok:
@@ -1120,35 +1146,35 @@ class MainController(object):
             directory = config_data.directory
             config_vars = config_data.vars
             config_sections = config_data.sections
-            
+
             # Run check fail-if, warn-if and validator macros if check_on_save
             if check_on_save:
                 changes, errors = self.nav_panel.get_change_error_totals(
-                                                 config_name=short_config_name)
+                    config_name=short_config_name)
                 if errors > 0:
                     dialog = gtk.MessageDialog(
-                             None, 
-                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
-                             gtk.MESSAGE_INFO, 
-                             gtk.BUTTONS_YES_NO, 
-                             None)
+                        None,
+                        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                        gtk.MESSAGE_INFO,
+                        gtk.BUTTONS_YES_NO,
+                        None)
                     dialog.set_markup(
                         rose.config_editor.WARNING_ERRORS_FOUND_ON_SAVE.format(
-                                                            short_config_name))
+                            short_config_name))
                     res = dialog.run()
                     dialog.destroy()
                     if res == gtk.RESPONSE_NO:
                         continue
-            
+
             # Dump the configuration.
             filename = rose.SUB_CONFIG_NAME
             if directory is None:
                 if config_data.is_discovery:
                     filename = rose.INFO_CONFIG_NAME
                     directory = self.data.top_level_directory
-            elif (directory.rstrip('/') == 
-                self.data.top_level_directory.rstrip('/') and
-                rose.TOP_CONFIG_NAME in os.listdir(directory)):
+            elif (directory.rstrip('/') ==
+                  self.data.top_level_directory.rstrip('/') and
+                  rose.TOP_CONFIG_NAME in os.listdir(directory)):
                 filename = rose.TOP_CONFIG_NAME
             save_path = os.path.join(directory, filename)
             rose.macro.pretty_format_config(config)
@@ -1156,11 +1182,12 @@ class MainController(object):
                 rose.config.dump(config, save_path)
             except (OSError, IOError) as e:
                 rose.gtk.dialog.run_dialog(
-                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                          rose.config_editor.ERROR_SAVE_PATH_FAIL.format(e),
-                          title=rose.config_editor.ERROR_SAVE_TITLE.format(
-                                                         short_config_name),
-                          modal=False)
+                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    rose.config_editor.ERROR_SAVE_PATH_FAIL.format(e),
+                    title=rose.config_editor.ERROR_SAVE_TITLE.format(
+                        short_config_name),
+                    modal=False
+                )
                 save_ok = False
                 continue
             # Un-prettify.
@@ -1229,7 +1256,7 @@ class MainController(object):
             rose.config.dump(new_config, new_path)
         except (OSError, IOError) as e:
             text = rose.config_editor.ERROR_CONFIG_CREATE.format(
-                                            new_path, type(e), str(e))
+                new_path, type(e), str(e))
             title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        text, title)
@@ -1237,11 +1264,12 @@ class MainController(object):
         self.data.load_config(os.path.dirname(new_path), reload_tree_on=True,
                               skip_load_event=True)
         stack_item = rose.config_editor.stack.StackItem(
-                          config_name,
-                          rose.config_editor.STACK_ACTION_ADDED,
-                          rose.variable.Variable('', '', {}),
-                          self._remove_config,
-                          (config_name, meta))
+            config_name,
+            rose.config_editor.STACK_ACTION_ADDED,
+            rose.variable.Variable('', '', {}),
+            self._remove_config,
+            (config_name, meta)
+        )
         self.undo_stack.append(stack_item)
         while self.redo_stack:
             self.redo_stack.pop()
@@ -1272,7 +1300,7 @@ class MainController(object):
                 shutil.rmtree(dirpath)
             except (shutil.Error, OSError, IOError) as e:
                 text = rose.config_editor.ERROR_CONFIG_DELETE.format(
-                                                dirpath, type(e), str(e))
+                    dirpath, type(e), str(e))
                 title = rose.config_editor.ERROR_CONFIG_CREATE_TITLE
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            text, title)
@@ -1280,11 +1308,12 @@ class MainController(object):
         self.data.config.pop(config_name)
         self.reload_namespace_tree()
         stack_item = rose.config_editor.stack.StackItem(
-                          config_name,
-                          rose.config_editor.STACK_ACTION_REMOVED,
-                          rose.variable.Variable('', '', {}),
-                          self._add_config,
-                          (config_name, meta))
+            config_name,
+            rose.config_editor.STACK_ACTION_REMOVED,
+            rose.variable.Variable('', '', {}),
+            self._add_config,
+            (config_name, meta)
+        )
         self.undo_stack.append(stack_item)
         while self.redo_stack:
             self.redo_stack.pop()
@@ -1315,9 +1344,9 @@ class MainController(object):
         self._get_menu_widget('/Undo').set_sensitive(len(self.undo_stack) > 0)
         self._get_menu_widget('/Redo').set_sensitive(len(self.redo_stack) > 0)
         self._get_menu_widget('/Find Next').set_sensitive(
-                                            len(self.find_hist['ids']) > 0)
+            len(self.find_hist['ids']) > 0)
         self._get_menu_widget('/Load All Apps').set_sensitive(
-                                                    self._has_preview_apps())
+            self._has_preview_apps())
         self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_LOAD_APPS,
                                           self._has_preview_apps())
         if not hasattr(self, "nav_panel"):
@@ -1339,15 +1368,15 @@ class MainController(object):
         self.toolbar.set_widget_sensitive(rose.config_editor.TOOLBAR_SAVE,
                                           is_changed)
         self.toolbar.set_widget_sensitive(
-                                rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
-                                is_changed)
+            rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+            is_changed)
         self._get_menu_widget('/Save').set_sensitive(is_changed)
         self._get_menu_widget('/Check and save').set_sensitive(is_changed)
         self._toolbar_run_button.set_sensitive(not is_changed)
         self._get_menu_widget('/Run Suite custom').set_sensitive(
-                                                       not is_changed)
+            not is_changed)
         self._get_menu_widget('/Run Suite default').set_sensitive(
-                                                        not is_changed)
+            not is_changed)
 
     def _refresh_metadata_if_on(self, config_name=None):
         """Reload any metadata, if present - otherwise do nothing."""
@@ -1387,14 +1416,14 @@ class MainController(object):
             # Load section and variable data into the object.
             sects, l_sects = self.data.load_sections_from_config(config_name)
             s_sects, s_l_sects = self.data.load_sections_from_config(
-                                                config_name, save=True)
+                config_name, save=True)
             config_data.sections = rose.config_editor.data.SectData(
-                        sects, l_sects, s_sects, s_l_sects)
+                sects, l_sects, s_sects, s_l_sects)
             var, l_var = self.data.load_vars_from_config(config_name)
             s_var, s_l_var = self.data.load_vars_from_config(
-                                                 config_name, save=True)
+                config_name, save=True)
             config_data.vars = rose.config_editor.data.VarData(
-                        var, l_var, s_var, s_l_var)
+                var, l_var, s_var, s_l_var)
             config_data.meta_files = meta_files
             config_data.macros = macros
             self.data.load_node_namespaces(config_name)
@@ -1427,7 +1456,7 @@ class MainController(object):
             if config_name not in configs:
                 continue
             data, missing_data = self.data.helper.get_data_for_namespace(
-                                                               namespace)
+                namespace)
             if len(data + missing_data) > 0:
                 new_page = self.make_page(namespace)
                 if new_page is None:
@@ -1479,17 +1508,18 @@ class MainController(object):
                 text = rose.config_editor.WARNING_NOT_FOUND
                 try:  # Needs PyGTK >= 2.16
                     self.find_entry.set_icon_from_stock(
-                                    0, gtk.STOCK_DIALOG_WARNING)
+                        0, gtk.STOCK_DIALOG_WARNING)
                     self.find_entry.set_icon_tooltip_text(0, text)
                 except AttributeError:
                     rose.gtk.dialog.run_dialog(
-                             rose.gtk.dialog.DIALOG_TYPE_INFO,
-                             text,
-                             rose.config_editor.WARNING_NOT_FOUND_TITLE)
+                        rose.gtk.dialog.DIALOG_TYPE_INFO,
+                        text,
+                        rose.config_editor.WARNING_NOT_FOUND_TITLE
+                    )
             else:
                 if var_id is not None:
                     self.reporter.report(
-                         rose.config_editor.EVENT_FOUND_ID.format(var_id))
+                        rose.config_editor.EVENT_FOUND_ID.format(var_id))
                 self._clear_find()
 
     def _clear_find(self, *args):
@@ -1516,7 +1546,7 @@ class MainController(object):
         section, option = self.util.get_section_option_from_id(setting_id)
         if option is None:
             page_id = self.data.helper.get_default_namespace_for_section(
-                                                   section, config_name)
+                section, config_name)
             self.view_page(page_id)
         else:
             var = self.data.helper.get_variable_by_id(setting_id, config_name)
@@ -1534,10 +1564,10 @@ class MainController(object):
             reg_find = re.compile(expression).search
         except sre_constants.error as e:
             rose.gtk.dialog.run_dialog(
-                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                     rose.config_editor.ERROR_NOT_REGEX.format(
-                                        expression, str(e)),
-                     rose.config_editor.ERROR_BAD_FIND)
+                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                rose.config_editor.ERROR_NOT_REGEX.format(
+                    expression, str(e)),
+                rose.config_editor.ERROR_BAD_FIND)
             return None, None
         if self.find_hist['regex'] != expression:
             self.find_hist['ids'] = []
@@ -1557,13 +1587,13 @@ class MainController(object):
         for config_name in config_keys:
             config_data = self.data.config[config_name]
             search_vars = config_data.vars.get_all(
-                           no_latent=not self.page_var_show_modes["latent"])
+                no_latent=not self.page_var_show_modes["latent"])
             found_ns_vars = {}
             for variable in search_vars:
                 var_id = variable.metadata.get('id')
                 ns = variable.metadata.get('full_ns')
                 if (rose.META_PROP_TITLE in variable.metadata and
-                    reg_find(variable.metadata[rose.META_PROP_TITLE])):
+                        reg_find(variable.metadata[rose.META_PROP_TITLE])):
                     found_ns_vars.setdefault(ns, [])
                     found_ns_vars[ns].append(variable)
                     continue
@@ -1580,10 +1610,10 @@ class MainController(object):
                     var_id = variable.metadata['id']
                     if (config_name, var_id) not in self.find_hist['ids']:
                         if (not self.page_var_show_modes['fixed'] and
-                            len(variable.metadata.get('values', [])) == 1):
+                                len(variable.metadata.get('values', [])) == 1):
                             continue
                         if (not self.page_var_show_modes['ignored'] and
-                            variable.ignored_reason):
+                                variable.ignored_reason):
                             continue
                         self.find_hist['ids'].append((config_name, var_id))
                         return ns, var_id
@@ -1623,7 +1653,7 @@ class MainController(object):
         # We should undo/redo all same-grouped items together.
         for stack_item in reversed(stack[:-1]):
             if (stack_item.group is None or
-                stack_item.group != do_list[0].group):
+                    stack_item.group != do_list[0].group):
                 break
             do_list.append(stack_item)
         group = do_list[0].group
@@ -1650,15 +1680,15 @@ class MainController(object):
                 if namespace is None:
                     namespace = stack_item.page_label
                 config_name = self.util.split_full_ns(
-                                        self.data, namespace)[0]
+                    self.data, namespace)[0]
                 node.process_metadata(
-                     self.data.helper.get_metadata_for_config_id(node_id,
-                                                                 config_name))
+                    self.data.helper.get_metadata_for_config_id(node_id,
+                                                                config_name))
                 self.data.load_ns_for_node(node, config_name)
                 namespace = node.metadata.get('full_ns')
             if (not is_group and
-                self.nav_controller.is_ns_in_tree(namespace) and
-                not node_is_section):
+                    self.nav_controller.is_ns_in_tree(namespace) and
+                    not node_is_section):
                 page = self.view_page(namespace, node_id)
             redo_items = [x for x in self.redo_stack]
             if stack_item.undo_args:
@@ -1710,7 +1740,7 @@ class MainController(object):
             if not is_group:
                 self.updater.focus_sub_page_if_open(namespace, node_id)
                 id_text = rose.config_editor.EVENT_UNDO_ACTION_ID.format(
-                                      action, node_id)
+                    action, node_id)
                 self.reporter.report(event_text.format(id_text))
         if is_group:
             group_name = do_list[0].group.split("-")[0]
@@ -1724,12 +1754,13 @@ class MainController(object):
 
 # ----------------------- System functions -----------------------------------
 
-def spawn_window(config_directory_path=None, debug_mode=False, 
+
+def spawn_window(config_directory_path=None, debug_mode=False,
                  load_all_apps=False, load_no_apps=False, metadata_off=False):
     """Create a window and load the configuration into it. Run gtk."""
     RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
     rose.gtk.util.rc_setup(
-         RESOURCER.locate('etc/rose-config-edit/.gtkrc-2.0'))
+        RESOURCER.locate('etc/rose-config-edit/.gtkrc-2.0'))
     rose.gtk.util.setup_stock_icons()
     logo = RESOURCER.locate("etc/images/rose-splash-logo.png")
     if rose.config_editor.ICON_PATH_SCHEDULER is None:
@@ -1737,7 +1768,7 @@ def spawn_window(config_directory_path=None, debug_mode=False,
     else:
         try:
             gcontrol_icon = RESOURCER.locate(
-                                    rose.config_editor.ICON_PATH_SCHEDULER)
+                rose.config_editor.ICON_PATH_SCHEDULER)
         except rose.resource.ResourceError:
             gcontrol_icon = None
     rose.gtk.util.setup_scheduler_icon(gcontrol_icon)
@@ -1791,27 +1822,28 @@ def get_number_of_configs(config_directory_path=None):
         if os.path.exists(app_dir):
             for entry in os.listdir(app_dir):
                 if (os.path.isdir(os.path.join(app_dir, entry)) and
-                    not entry.startswith('.')):
+                        not entry.startswith('.')):
                     number_to_load += 1
     return number_to_load
 
 
 def main():
     """Launch from the command line."""
-    if (gtk.pygtk_version[0] < rose.config_editor.MIN_PYGTK_VERSION[0]
-        or gtk.pygtk_version[1] < rose.config_editor.MIN_PYGTK_VERSION[1]):
+    if (gtk.pygtk_version[0] < rose.config_editor.MIN_PYGTK_VERSION[0] or
+            gtk.pygtk_version[1] < rose.config_editor.MIN_PYGTK_VERSION[1]):
         this_version = '{0}.{1}.{2}'.format(*gtk.pygtk_version)
         required_version = '{0}.{1}.{2}'.format(
-                                        *rose.config_editor.MIN_PYGTK_VERSION)
+            *rose.config_editor.MIN_PYGTK_VERSION)
         rose.gtk.dialog.run_dialog(
-                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                 rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
-                                    required_version, this_version),
-                 rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE)
+            rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
+                required_version, this_version),
+            rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE
+        )
         sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = rose.opt_parse.RoseOptionParser()
-    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode", 
+    opt_parser.add_my_options("conf_dir", "meta_path", "new_mode",
                               "load_no_apps", "load_all_apps", "no_metadata")
     opts, args = opt_parser.parse_args()
     if args:
@@ -1848,7 +1880,7 @@ def main():
         p.strip_dirs().sort_stats('cumulative').print_stats(200)
         f.close()
     else:
-        spawn_window(cwd, debug_mode=opts.debug_mode, 
+        spawn_window(cwd, debug_mode=opts.debug_mode,
                      load_all_apps=opts.load_all_apps,
                      load_no_apps=opts.load_no_apps,
                      metadata_off=opts.no_metadata)
