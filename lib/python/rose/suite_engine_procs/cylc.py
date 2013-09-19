@@ -178,8 +178,8 @@ class CylcProcessor(SuiteEngineProcessor):
         tasks -- Display only jobs for task names matching these names. Values
                  can be a valid task name or a glob like pattern for matching
                  valid task names.
-        no_statues -- Do not display jobs with these statuses. Valid values are
-                      the keys of CylcProcessor.STATUSES.
+        no_statuses -- Do not display jobs with these statuses. Valid values
+                       are the keys of CylcProcessor.STATUSES.
         order -- Order search in a predetermined way. A valid value is one of
                  the keys in CylcProcessor.ORDERS.
         limit -- Limit number of returned entries

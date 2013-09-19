@@ -949,7 +949,7 @@ class MainMenuHandler(object):
 
     def launch_output_viewer(self):
         """View a suite's output, if any."""
-        p = rose.suite_engine_proc.SuiteEngineProcessor.get_processor()
+        g = rose.suite_engine_proc.SuiteEngineProcessor.get_processor()
         try:
             g.launch_suite_log_browser(None, self.data.top_level_name)
         except rose.suite_engine_proc.NoSuiteLogError:

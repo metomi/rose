@@ -32,9 +32,7 @@ import sys
 import rose.config
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter
-from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
-import socket
 import tarfile
 from tempfile import NamedTemporaryFile
 from time import gmtime, strftime

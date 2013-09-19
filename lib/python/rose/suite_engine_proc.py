@@ -535,7 +535,7 @@ class SuiteEngineProcessor(object):
         if not url:
             arg = suite_name
             if user_name:
-                arg += "~" + user_name
+                arg += " ~" + user_name
             raise NoSuiteLogError(arg)
         w = webbrowser.get()
         w.open(url, new=True, autoraise=True)
