@@ -190,7 +190,8 @@ class MainController(object):
                 self.data,
                 self.util,
                 self.reporter,
-                self.tree_trigger_update))
+                self.tree_trigger_update
+            ))
 
         self.mainwindow = rose.config_editor.window.MainWindow()
 
@@ -202,7 +203,8 @@ class MainController(object):
             self.update_ns_info,
             update_tree_func=self.reload_namespace_tree,
             view_page_func=self.view_page,
-            kill_page_func=self.kill_page)
+            kill_page_func=self.kill_page
+        )
 
         self.variable_ops = (
             rose.config_editor.ops.variable.VariableOperations(
@@ -211,7 +213,8 @@ class MainController(object):
                 self.section_ops.add_section,
                 self.check_cannot_enable_setting,
                 self.update_namespace,
-                search_id_func=self.perform_find_by_id))
+                search_id_func=self.perform_find_by_id
+            ))
 
         self.group_ops = rose.config_editor.ops.group.GroupOperations(
             self.data, self.util, self.reporter,
@@ -220,7 +223,8 @@ class MainController(object):
             self.variable_ops,
             self.view_page,
             self.update_ns_sub_data,
-            self.reload_namespace_tree)
+            self.reload_namespace_tree
+        )
 
         # Add in the main menu bar and tool bar handler.
         self.main_handle = rose.config_editor.menu.MainMenuHandler(
@@ -232,7 +236,8 @@ class MainController(object):
             self.apply_macro_validation,
             self.section_ops,
             self.variable_ops,
-            self.perform_find_by_ns_id)
+            self.perform_find_by_ns_id
+        )
 
         # Add in the navigation panel menu handler.
         self.nav_handle = rose.config_editor.nav_panel_menu.NavPanelHandler(
@@ -245,7 +250,8 @@ class MainController(object):
             self.variable_ops,
             self.kill_page,
             self.reload_namespace_tree,
-            self.main_handle.transform_default)
+            self.main_handle.transform_default
+        )
 
         self.updater = rose.config_editor.updater.Updater(
             self.data, self.util, self.reporter,
@@ -254,7 +260,8 @@ class MainController(object):
             self._get_pagelist,
             self.update_bar_widgets,
             self._refresh_metadata_if_on,
-            self.is_pluggable)
+            self.is_pluggable
+        )
 
         self.data.load(config_directory, config_objs,
                        load_all_apps, load_no_apps, metadata_off)
@@ -295,11 +302,13 @@ class MainController(object):
         self.reporter.report_load_event(
             rose.config_editor.EVENT_LOAD_ERRORS.format(
                 self.data.top_level_name,
-                self.updater.load_errors))
+                self.updater.load_errors
+            ))
         self.updater.perform_startup_check()
         self.reporter.report_load_event(
             rose.config_editor.EVENT_LOAD_DONE.format(
-                self.data.top_level_name))
+                self.data.top_level_name
+            ))
         if (self.data.top_level_directory is None and not self.data.config):
             self.load_from_file()
 
@@ -616,7 +625,8 @@ class MainController(object):
             self.nav_handle.get_ns_metadata_and_comments,
             self.nav_handle.popup_panel_menu,
             self.nav_handle.get_can_show_page,
-            self.nav_handle.ask_is_preview)
+            self.nav_handle.ask_is_preview
+        )
 
     def generate_status_bar(self):
         """Create a status bar."""
@@ -637,14 +647,16 @@ class MainController(object):
                             rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
         self.reporter.report_load_event(
             "Loading all preview apps",
-            new_total_events=number_of_events)
+            new_total_events=number_of_events
+        )
         for namespace_name in load_these:
             config_data = self.data.config[namespace_name]
             self.data.load_config(config_data.directory, preview=False,
                                   metadata_off=self.metadata_off)
             self.reporter.report_load_event(
                 rose.config_editor.EVENT_LOADED.format(namespace_name[1:]),
-                no_progress=True)
+                no_progress=True
+            )
         self.reload_namespace_tree()
         self.reporter.stop()
         self.nav_panel.update_row_tooltips()
@@ -791,14 +803,16 @@ class MainController(object):
             self.updater.update_ns_info,
             update_tree_func=self.reload_namespace_tree,
             view_page_func=self.view_page,
-            kill_page_func=self.kill_page)
+            kill_page_func=self.kill_page
+        )
         var_ops = rose.config_editor.ops.variable.VariableOperations(
             self.data, self.util, self.reporter,
             self.undo_stack, self.redo_stack,
             sect_ops.add_section,
             self.check_cannot_enable_setting,
             self.updater.update_namespace,
-            search_id_func=self.perform_find_by_id)
+            search_id_func=self.perform_find_by_id
+        )
         directory = None
         if namespace_name == config_name:
             directory = config_data.directory
@@ -819,7 +833,8 @@ class MainController(object):
             sub_ops=sub_ops,
             launch_info_func=launch_info,
             launch_edit_func=launch_edit,
-            launch_macro_func=self.main_handle.handle_run_custom_macro)
+            launch_macro_func=self.main_handle.handle_run_custom_macro
+        )
         #FIXME: These three should go.
         page.trigger_tab_detach = lambda b: self._handle_detach_request(page)
         var_ops.trigger_ignored_update = lambda v: page.update_ignored()
@@ -855,12 +870,14 @@ class MainController(object):
             stock_id=gtk.STOCK_ADD,
             tip_text=rose.config_editor.TIP_ADD_TO_PAGE,
             size=gtk.ICON_SIZE_LARGE_TOOLBAR,
-            as_tool=True)
+            as_tool=True
+        )
         revert_button = rose.gtk.util.CustomButton(
             stock_id=gtk.STOCK_REVERT_TO_SAVED,
             tip_text=rose.config_editor.TIP_REVERT_PAGE,
             size=gtk.ICON_SIZE_LARGE_TOOLBAR,
-            as_tool=True)
+            as_tool=True
+        )
         add_button.connect('button_press_event', self.add_page_variable)
         revert_button.connect('clicked',
                               lambda b: self.revert_to_saved_data())
@@ -1157,10 +1174,12 @@ class MainController(object):
                         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                         gtk.MESSAGE_INFO,
                         gtk.BUTTONS_YES_NO,
-                        None)
+                        None
+                    )
                     dialog.set_markup(
                         rose.config_editor.WARNING_ERRORS_FOUND_ON_SAVE.format(
-                            short_config_name))
+                            short_config_name
+                        ))
                     res = dialog.run()
                     dialog.destroy()
                     if res == gtk.RESPONSE_NO:
@@ -1369,7 +1388,8 @@ class MainController(object):
                                           is_changed)
         self.toolbar.set_widget_sensitive(
             rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
-            is_changed)
+            is_changed
+        )
         self._get_menu_widget('/Save').set_sensitive(is_changed)
         self._get_menu_widget('/Check and save').set_sensitive(is_changed)
         self._toolbar_run_button.set_sensitive(not is_changed)
