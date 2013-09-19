@@ -984,7 +984,7 @@ class DAO(object):
         if self.conn is not None:
             try:
                 self.conn.close()
-            except (sqlite3.OperationalError, sqlite3.ProgrammingError) as e:
+            except (sqlite3.OperationalError, sqlite3.ProgrammingError):
                 pass
         self.cursor = None
         self.conn = None
