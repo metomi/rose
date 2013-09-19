@@ -1317,7 +1317,7 @@ class MainController(object):
                     tab_nses = [w.get_child().namespace
                                 for w in self.tab_windows]
                     page_window = self.tab_windows[tab_nses.index(name)]
-                    page.window.destroy()
+                    page_window.destroy()
         self.group_ops.remove_sections(config_name,
                                        config_data.sections.now.keys())
         if dirpath is not None:
