@@ -161,7 +161,8 @@ class MainController(object):
             rose.config_editor.SHOW_MODE_NO_HELP:
             rose.config_editor.SHOULD_SHOW_NO_HELP,
             rose.config_editor.SHOW_MODE_NO_TITLE:
-            rose.config_editor.SHOULD_SHOW_NO_TITLE}
+            rose.config_editor.SHOULD_SHOW_NO_TITLE
+        }
 
         # Set page tree 'verbosity' defaults.
         self.page_ns_show_modes = {
@@ -172,18 +173,21 @@ class MainController(object):
             rose.config_editor.SHOW_MODE_LATENT:
             rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
             rose.config_editor.SHOW_MODE_NO_TITLE:
-            rose.config_editor.SHOULD_SHOW_NO_TITLE}
+            rose.config_editor.SHOULD_SHOW_NO_TITLE
+        }
 
         self.reporter = rose.config_editor.status.StatusReporter(
             load_updater,
-            self.update_status_text)
+            self.update_status_text
+        )
 
         # Load the top configuration directory
         self.data = rose.config_editor.data.ConfigDataManager(
             self.util,
             self.reporter,
             self.page_ns_show_modes,
-            self.reload_namespace_tree)
+            self.reload_namespace_tree
+        )
 
         self.nav_controller = (
             rose.config_editor.nav_controller.NavTreeManager(
@@ -268,7 +272,8 @@ class MainController(object):
 
         self.reporter.report_load_event(
             rose.config_editor.EVENT_LOAD_STATUSES.format(
-                self.data.top_level_name))
+                self.data.top_level_name)
+        )
 
         if not self.is_pluggable:
             self.generate_toolbar()
@@ -290,7 +295,7 @@ class MainController(object):
                                  status_bar=self.status_bar,
                                  notebook=self.notebook,
                                  page_change_func=self.handle_page_change,
-                                 save_func=self.save_to_file,)
+                                 save_func=self.save_to_file)
             self.mainwindow.window.connect('destroy', self.main_handle.destroy)
             self.mainwindow.window.connect('delete-event',
                                            self.main_handle.destroy)
@@ -399,127 +404,129 @@ class MainController(object):
         """Link in the menu functionality and accelerators."""
         self.menubar = rose.config_editor.menu.MenuBar()
         self.menu_widgets = {}
-        menu_list = [('/TopMenuBar/File/Open...', self.load_from_file),
-                     ('/TopMenuBar/File/Save', lambda m: self.save_to_file()),
-                     ('/TopMenuBar/File/Check and save',
-                      lambda m: self.save_to_file(check_on_save=True)),
-                     ('/TopMenuBar/File/Load All Apps',
-                      lambda m: self.handle_load_all()),
-                     ('/TopMenuBar/File/Quit', self.main_handle.destroy),
-                     ('/TopMenuBar/Edit/Undo',
-                      lambda m: self.perform_undo()),
-                     ('/TopMenuBar/Edit/Redo',
-                      lambda m: self.perform_undo(redo_mode_on=True)),
-                     ('/TopMenuBar/Edit/Find', self._launch_find),
-                     ('/TopMenuBar/Edit/Find Next',
-                      lambda m: self.perform_find(self.find_hist['regex'])),
-                     ('/TopMenuBar/Edit/Preferences', self.main_handle.prefs),
-                     ('/TopMenuBar/Edit/Stack', self.main_handle.view_stack),
-                     ('/TopMenuBar/View/View fixed vars',
-                      lambda m: self._set_page_var_show_modes(
-                          rose.config_editor.SHOW_MODE_FIXED,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/View ignored vars',
-                      lambda m: self._set_page_var_show_modes(
-                          rose.config_editor.SHOW_MODE_IGNORED,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/View user-ignored vars',
-                      lambda m: self._set_page_var_show_modes(
-                          rose.config_editor.SHOW_MODE_USER_IGNORED,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/View latent vars',
-                      lambda m: self._set_page_var_show_modes(
-                          rose.config_editor.SHOW_MODE_LATENT,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/View ignored pages',
-                      lambda m: self._set_page_ns_show_modes(
-                          rose.config_editor.SHOW_MODE_IGNORED,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/View user-ignored pages',
-                      lambda m: self._set_page_ns_show_modes(
-                          rose.config_editor.SHOW_MODE_USER_IGNORED,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/View latent pages',
-                      lambda m: self._set_page_ns_show_modes(
-                          rose.config_editor.SHOW_MODE_LATENT,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/Flag no-metadata vars',
-                      lambda m: self._set_page_var_show_modes(
-                          rose.config_editor.SHOW_MODE_FLAG_NO_META,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/Flag opt config vars',
-                      lambda m: self._set_page_var_show_modes(
-                          rose.config_editor.SHOW_MODE_FLAG_OPT_CONF,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/Flag optional vars',
-                      lambda m: self._set_page_var_show_modes(
-                          rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/View/View status bar',
-                      lambda m: self._set_show_status_bar(m.get_active())),
-                     ('/TopMenuBar/Metadata/Prefs/View without descriptions',
-                      lambda m: self._set_page_show_modes(
-                          rose.config_editor.SHOW_MODE_NO_DESCRIPTION,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/Metadata/Prefs/View without help',
-                      lambda m: self._set_page_show_modes(
-                          rose.config_editor.SHOW_MODE_NO_HELP,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/Metadata/Prefs/View without titles',
-                      lambda m: self._set_page_show_modes(
-                          rose.config_editor.SHOW_MODE_NO_TITLE,
-                          m.get_active()
-                      )),
-                     ('/TopMenuBar/Metadata/All V',
-                      lambda m: self.main_handle.handle_run_custom_macro(
-                          method_name=rose.macro.VALIDATE_METHOD
-                      )),
-                     ('/TopMenuBar/Metadata/Autofix',
-                      lambda m: self.main_handle.transform_default()),
-                     ('/TopMenuBar/Metadata/Extra checks',
-                      lambda m: self.main_handle.check_fail_rules()),
-                     ('/TopMenuBar/Metadata/Reload metadata',
-                      lambda m: self._refresh_metadata_if_on()),
-                     ('/TopMenuBar/Metadata/Switch off metadata',
-                      lambda m: self.refresh_metadata(m.get_active())),
-                     ('/TopMenuBar/Metadata/Upgrade',
-                      lambda m: self.main_handle.handle_upgrade()),
-                     ('/TopMenuBar/Tools/Run Suite/Run Suite default',
-                      self.main_handle.run_suite),
-                     ('/TopMenuBar/Tools/Run Suite/Run Suite custom',
-                      self.main_handle.get_run_suite_args),
-                     ('/TopMenuBar/Tools/Browser',
-                      lambda m: self.main_handle.launch_browser()),
-                     ('/TopMenuBar/Tools/Terminal',
-                      lambda m: self.main_handle.launch_terminal()),
-                     ('/TopMenuBar/Tools/View Output',
-                      lambda m: self.main_handle.launch_output_viewer()),
-                     ('/TopMenuBar/Tools/Open Suite GControl',
-                      lambda m: self.main_handle.launch_scheduler()),
-                     ('/TopMenuBar/Page/Revert',
-                      lambda m: self.revert_to_saved_data()),
-                     ('/TopMenuBar/Page/Page Info',
-                      lambda m: self.nav_handle.info_request(
-                          self._get_current_page().namespace
-                      )),
-                     ('/TopMenuBar/Page/Page Help',
-                      lambda m: self._get_current_page().launch_help()),
-                     ('/TopMenuBar/Page/Page Web Help',
-                      lambda m: self._get_current_page().launch_url()),
-                     ('/TopMenuBar/Help/GUI Help', self.main_handle.help),
-                     ('/TopMenuBar/Help/About', self.main_handle.about_dialog)]
+        menu_list = [
+            ('/TopMenuBar/File/Open...', self.load_from_file),
+            ('/TopMenuBar/File/Save', lambda m: self.save_to_file()),
+            ('/TopMenuBar/File/Check and save',
+             lambda m: self.save_to_file(check_on_save=True)),
+            ('/TopMenuBar/File/Load All Apps',
+             lambda m: self.handle_load_all()),
+            ('/TopMenuBar/File/Quit', self.main_handle.destroy),
+            ('/TopMenuBar/Edit/Undo',
+             lambda m: self.perform_undo()),
+            ('/TopMenuBar/Edit/Redo',
+             lambda m: self.perform_undo(redo_mode_on=True)),
+            ('/TopMenuBar/Edit/Find', self._launch_find),
+            ('/TopMenuBar/Edit/Find Next',
+             lambda m: self.perform_find(self.find_hist['regex'])),
+            ('/TopMenuBar/Edit/Preferences', self.main_handle.prefs),
+            ('/TopMenuBar/Edit/Stack', self.main_handle.view_stack),
+            ('/TopMenuBar/View/View fixed vars',
+             lambda m: self._set_page_var_show_modes(
+                 rose.config_editor.SHOW_MODE_FIXED,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/View ignored vars',
+             lambda m: self._set_page_var_show_modes(
+                 rose.config_editor.SHOW_MODE_IGNORED,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/View user-ignored vars',
+             lambda m: self._set_page_var_show_modes(
+                 rose.config_editor.SHOW_MODE_USER_IGNORED,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/View latent vars',
+             lambda m: self._set_page_var_show_modes(
+                 rose.config_editor.SHOW_MODE_LATENT,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/View ignored pages',
+             lambda m: self._set_page_ns_show_modes(
+                 rose.config_editor.SHOW_MODE_IGNORED,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/View user-ignored pages',
+             lambda m: self._set_page_ns_show_modes(
+                 rose.config_editor.SHOW_MODE_USER_IGNORED,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/View latent pages',
+             lambda m: self._set_page_ns_show_modes(
+                 rose.config_editor.SHOW_MODE_LATENT,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/Flag no-metadata vars',
+             lambda m: self._set_page_var_show_modes(
+                 rose.config_editor.SHOW_MODE_FLAG_NO_META,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/Flag opt config vars',
+             lambda m: self._set_page_var_show_modes(
+                 rose.config_editor.SHOW_MODE_FLAG_OPT_CONF,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/Flag optional vars',
+             lambda m: self._set_page_var_show_modes(
+                 rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/View/View status bar',
+             lambda m: self._set_show_status_bar(m.get_active())),
+            ('/TopMenuBar/Metadata/Prefs/View without descriptions',
+             lambda m: self._set_page_show_modes(
+                 rose.config_editor.SHOW_MODE_NO_DESCRIPTION,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/Metadata/Prefs/View without help',
+             lambda m: self._set_page_show_modes(
+                 rose.config_editor.SHOW_MODE_NO_HELP,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/Metadata/Prefs/View without titles',
+             lambda m: self._set_page_show_modes(
+                 rose.config_editor.SHOW_MODE_NO_TITLE,
+                 m.get_active()
+             )),
+            ('/TopMenuBar/Metadata/All V',
+             lambda m: self.main_handle.handle_run_custom_macro(
+                 method_name=rose.macro.VALIDATE_METHOD
+             )),
+            ('/TopMenuBar/Metadata/Autofix',
+             lambda m: self.main_handle.transform_default()),
+            ('/TopMenuBar/Metadata/Extra checks',
+             lambda m: self.main_handle.check_fail_rules()),
+            ('/TopMenuBar/Metadata/Reload metadata',
+             lambda m: self._refresh_metadata_if_on()),
+            ('/TopMenuBar/Metadata/Switch off metadata',
+             lambda m: self.refresh_metadata(m.get_active())),
+            ('/TopMenuBar/Metadata/Upgrade',
+             lambda m: self.main_handle.handle_upgrade()),
+            ('/TopMenuBar/Tools/Run Suite/Run Suite default',
+             self.main_handle.run_suite),
+            ('/TopMenuBar/Tools/Run Suite/Run Suite custom',
+             self.main_handle.get_run_suite_args),
+            ('/TopMenuBar/Tools/Browser',
+             lambda m: self.main_handle.launch_browser()),
+            ('/TopMenuBar/Tools/Terminal',
+             lambda m: self.main_handle.launch_terminal()),
+            ('/TopMenuBar/Tools/View Output',
+             lambda m: self.main_handle.launch_output_viewer()),
+            ('/TopMenuBar/Tools/Open Suite GControl',
+             lambda m: self.main_handle.launch_scheduler()),
+            ('/TopMenuBar/Page/Revert',
+             lambda m: self.revert_to_saved_data()),
+            ('/TopMenuBar/Page/Page Info',
+             lambda m: self.nav_handle.info_request(
+                 self._get_current_page().namespace
+             )),
+            ('/TopMenuBar/Page/Page Help',
+             lambda m: self._get_current_page().launch_help()),
+            ('/TopMenuBar/Page/Page Web Help',
+             lambda m: self._get_current_page().launch_url()),
+            ('/TopMenuBar/Help/GUI Help', self.main_handle.help),
+            ('/TopMenuBar/Help/About', self.main_handle.about_dialog)
+        ]
         is_toggled = dict(
             [('/TopMenuBar/View/View fixed vars',
               rose.config_editor.SHOULD_SHOW_FIXED_VARS),
@@ -779,22 +786,24 @@ class MainController(object):
             sub_ops = self.group_ops.get_sub_ops_for_namespace(namespace_name)
         macro_info = self.data.helper.get_macro_info_for_namespace(
             namespace_name)
-        page_metadata = {'namespace': namespace_name,
-                         'ns_is_default': is_default,
-                         'label': label,
-                         'description': description,
-                         'duplicate': duplicate,
-                         'help': help_,
-                         'url': url,
-                         'macro': macro_info,
-                         'widget': custom_widget,
-                         'widget_sub_ns': custom_sub_widget,
-                         'see_also': see_also,
-                         'config_name': config_name,
-                         'show_modes': self.page_var_show_modes,
-                         'icon': icon_path}
+        page_metadata = {
+            "namespace": namespace_name,
+            "ns_is_default": is_default,
+            "label": label,
+            "description": description,
+            "duplicate": duplicate,
+            "help": help_,
+            "url": url,
+            "macro": macro_info,
+            "widget": custom_widget,
+            "widget_sub_ns": custom_sub_widget,
+            "see_also": see_also,
+            "config_name": config_name,
+            "show_modes": self.page_var_show_modes,
+            "icon": icon_path
+        }
         if len(sections) == 1:
-            page_metadata.update({'id': sections.pop()})
+            page_metadata.update({"id": sections.pop()})
         sect_ops = rose.config_editor.ops.section.SectionOperations(
             self.data, self.util, self.reporter,
             self.undo_stack, self.redo_stack,
@@ -861,11 +870,6 @@ class MainController(object):
                                self.tab_windows.remove(w) and False)
         else:
             tab_window = old_window
-        notebook_index = None
-        for index, notebook_page in enumerate(self.notebook.get_pages()):
-            if notebook_page == page:
-                notebook_index = index
-                break
         add_button = rose.gtk.util.CustomButton(
             stock_id=gtk.STOCK_ADD,
             tip_text=rose.config_editor.TIP_ADD_TO_PAGE,
@@ -1111,7 +1115,7 @@ class MainController(object):
         dirname = self.mainwindow.launch_open_dirname_dialog()
         if dirname is None or not os.path.isdir(dirname):
             return False
-        if (self.data.top_level_directory is None and not self.is_pluggable):
+        if self.data.top_level_directory is None and not self.is_pluggable:
             self.data.load_top_config(dirname)
             self.data.saved_config_names = set(self.data.config.keys())
             self.mainwindow.window.set_title(self.data.top_level_name +
@@ -1268,8 +1272,10 @@ class MainController(object):
         new_path = os.path.join(root, config_short_name, rose.SUB_CONFIG_NAME)
         new_config = rose.config.ConfigNode()
         if meta is not None:
-            new_config.set([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],
-                           meta)
+            new_config.set(
+                [rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],
+                meta
+            )
         try:
             os.mkdir(os.path.dirname(new_path))
             rose.config.dump(new_config, new_path)
