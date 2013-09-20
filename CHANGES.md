@@ -20,7 +20,18 @@ Changes that have significant impact on user experience.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-\#917, \#897, \#896, \#894: rose_arch: improve diagnostics.
+\#926: rose mpi-launch: fix unbound `ROSE_LAUNCHER_BASE` on usage with a null
+configuration.
+
+\#925: rose_arch: fix incorrect behaviour if a source is a directory.
+
+\#921: rose host-select: new `--choice=N` option to choose a top from any of
+the top `N` hosts.
+
+\#919, \#917, \#897, \#896, \#894: rose_arch: improve diagnostics.
+
+\#915: rose suite-clean, rose suite-gcontrol, rose suite-stop: improve support
+for determining the names of `rose-stem` suites.
 
 \#913: rose suite-run: use `pgrep` to check if suite is running or not.
 
