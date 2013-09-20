@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 18
+tests 21
 #-------------------------------------------------------------------------------
 # No argument.
 TEST_KEY=$TEST_KEY_BASE-null
@@ -40,6 +40,12 @@ TRUE=$(which true)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [my-launcher] -n 1 $TRUE to your heart
 __OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Basic, with no config
+TEST_KEY=$TEST_KEY_BASE-no-config
+ROSE_CONF_PATH= run_pass "$TEST_KEY" rose mpi-launch pwd
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$PWD"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Basic, NPROC
