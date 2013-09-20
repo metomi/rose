@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 PREFIX=
 if [[ ${ROSE_TASK_CYCLE_TIME:-} ]]; then
     PREFIX="[$ROSE_TASK_CYCLE_TIME] "
@@ -20,4 +21,11 @@ for I in $(seq 1 9); do
 done
 for I in $(seq 1 9); do
     echo "${PREFIX}Hello Stuff $I" >$ROSE_DATAC/stuffing-$I.txt
+done
+mkdir -p $ROSE_DATAC/hello/organisms/{plants,animals}
+for NAME in lily jasmine holly iris daisy; do
+    echo "${PREFIX}Hello $NAME" >$ROSE_DATAC/hello/organisms/plants/$NAME.txt
+done
+for NAME in elephant tiger goose crocodile; do
+    echo "${PREFIX}Hello $NAME" >$ROSE_DATAC/hello/organisms/animals/$NAME.txt
 done

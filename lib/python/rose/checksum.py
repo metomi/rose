@@ -42,6 +42,7 @@ def get_checksum(name):
     if not os.path.exists(name):
         raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), name)
 
+    name = os.path.normpath(name)
     path_and_checksum_list = []
     if os.path.isfile(name):
         m = _load(name)
