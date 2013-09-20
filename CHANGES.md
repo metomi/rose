@@ -20,6 +20,8 @@ Changes that have significant impact on user experience.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#927: rose app-run: fix default `[poll]delays=0`.
+
 \#926: rose mpi-launch: fix unbound `ROSE_LAUNCHER_BASE` on usage with a null
 configuration.
 
