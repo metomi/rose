@@ -266,6 +266,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                     value = stash_request_num + " total"
         if name == "Section":
             meta_key = self.STASH_PARSE_SECT_OPT + "=" + value
+        elif name == "Description":
+            meta_key = self.STASH_PARSE_DESC_OPT + "=" + value
         else:
             meta_key = name + "=" + value
         value_meta = self.stash_meta_lookup.get(meta_key, {})
