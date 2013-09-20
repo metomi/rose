@@ -217,6 +217,7 @@ fi
 #-------------------------------------------------------------------------------
 # 3. Launch the program.
 #-------------------------------------------------------------------------------
+ROSE_LAUNCHER_BASE=${ROSE_LAUNCHER_BASE:-}
 if [[ -n $ROSE_COMMAND_FILE ]]; then
     if [[ -z $ROSE_LAUNCHER_BASE ]]; then
         err "ROSE_LAUNCHER not defined, command file not supported."
