@@ -149,7 +149,7 @@ class RoseArchApp(BuiltinApp):
                             target.sources[checksum] = RoseArchSource(
                                             checksum,
                                             os.path.join(name, p),
-                                            os,path.join(path, p))
+                                            os.path.join(path, p))
                         else: # path is a file
                             target.sources[checksum] = RoseArchSource(
                                             checksum, name, path)
