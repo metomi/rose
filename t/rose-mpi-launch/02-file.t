@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 12
+tests 15
 #-------------------------------------------------------------------------------
 # No argument, rose-mpi-launch.rc exists.
 TEST_KEY=$TEST_KEY_BASE-null
@@ -31,6 +31,16 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [my-launcher] -file $PWD/rose-mpi-launch.rc
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# No configuration, rose-mpi-launch.rc exists.
+TEST_KEY=$TEST_KEY_BASE-no-config
+touch rose-mpi-launch.rc
+ROSE_CONF_PATH= run_fail "$TEST_KEY" rose mpi-launch
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] ROSE_LAUNCHER not defined, command file not supported.
+[FAIL] exit 1
+__ERR__
 #-------------------------------------------------------------------------------
 # No argument, rose-mpi-launch.rc exists, modified ROSE_LAUNCHER_FILEOPTS.
 TEST_KEY=$TEST_KEY_BASE-null-env
