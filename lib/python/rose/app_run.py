@@ -212,7 +212,8 @@ class AppRunner(Runner):
             # m: minutes
             # h: hours
             # N*: repeat the value N times
-            poll_delays_value = config.get_value(["poll", "delays"]).strip()
+            poll_delays_value = config.get_value(
+                ["poll", "delays"], default="").strip()
             units = {"h": 3600, "m": 60, "s": 1}
             if poll_delays_value:
                 for item in poll_delays_value.split(","):
