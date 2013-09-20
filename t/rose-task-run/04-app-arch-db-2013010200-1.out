@@ -1,5 +1,6 @@
 foo://2013010200/hello/worlds/dark-matter.txt||FOO_RC=$((2 - 1)) foo put %(target)s %(sources)s|1
 foo://2013010200/hello/worlds/earth.txt||foo put %(target)s %(sources)s|0
+foo://2013010200/hello/worlds/organisms.tar.gz|tar.gz|foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/planet-n.tar.gz|tar.gz|foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/spaceships/|gz|foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/stars/||foo put %(target)s %(sources)s|0
@@ -7,6 +8,15 @@ foo://2013010200/hello/worlds/try.nl||foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/unknown/stuff.pax|pax|foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/dark-matter.txt|hello/dark-matter.txt|f95326c55075aa12d3a3aaf5958dbe67
 foo://2013010200/hello/worlds/earth.txt|hello/earth.txt|dde4e4b505256a1fe9f30fe80b892d24
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/crocodile.txt|9bfd75677f1d17b743d9d0d7c9b829d3
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/elephant.txt|00f9c60bc048ae85ded02eda20ff2a13
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/goose.txt|5b1dcbc37c4cd2a2cc17d963434b27ae
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/tiger.txt|2354b097ab9d01694c9682862d7eb52c
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/daisy.txt|cd8dd4f0a17bac9c34c6efbb6c6effd4
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/holly.txt|1493ae47a78b2635763a27cd990f17ba
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/iris.txt|6017dedd8b56768e0727ad0ab97c65e3
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/jasmine.txt|6cf624f7247999827b10ca64332880e8
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/lily.txt|ed649bdb0d00b739d0188fc181c4bf62
 foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-1.txt|7872cf18ded524b0cd03d366eeb4d4f7
 foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-2.txt|081e8a0a6ec6e363b3a260f71d4c191d
 foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-3.txt|8b346e7aa5b52b4f8b0ad587a744f775
