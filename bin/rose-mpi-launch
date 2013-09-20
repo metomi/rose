@@ -205,6 +205,7 @@ fi
 #-------------------------------------------------------------------------------
 # 2. Find the full path of ROSE_LAUNCHER and set up the pre/post options.
 #-------------------------------------------------------------------------------
+ROSE_LAUNCHER_BASE=
 if [[ -n $ROSE_LAUNCHER ]]; then
     # Path
     if ! ROSE_LAUNCHER_PATH=$(type -P $ROSE_LAUNCHER); then
