@@ -56,7 +56,7 @@ source=foo bar baz
 
 # File 2
 [file:2]
-source=egg ham bacon
+source=namelist:egg namelist:ham namelist:bacon
 __CONF__
 cat > f2 <<'__CONF__'
 # HEAD comments
