@@ -23,7 +23,7 @@
 init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
-tests 27
+tests 30
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE-base
@@ -93,7 +93,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
-# Null metadata.
+# Null metadata (verbose).
 init </dev/null
 init_meta </dev/null
 TEST_KEY=$TEST_KEY_BASE-null-metadata-verbose
@@ -131,6 +131,19 @@ sed -in '/Error/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] ImportError: No module named looking_glass
 [FAIL] Error: could not find macro tumtum.Jubjub
+__ERR__
+teardown
+#-------------------------------------------------------------------------------
+# Bad metadata location.
+init <<'__CONFIG__'
+meta=metadata/metadata-for-metadata
+__CONFIG__
+TEST_KEY=$TEST_KEY_BASE-bad-metadata-file
+setup
+run_fail "$TEST_KEY" rose macro -V -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] Could not find metadata for metadata/metadata-for-metadata
 __ERR__
 teardown
 #-------------------------------------------------------------------------------

@@ -687,10 +687,11 @@ def run_macros(app_config, meta_config, config_name, macro_names,
                 problem_list.sort(report_sort)
                 method_id = VALIDATE_METHOD.upper()[0]
                 macro_id = MACRO_OUTPUT_ID.format(method_id, macro_name)
-                reporter(get_reports_as_text(
-                    problem_list, macro_id, is_from_transform=False),
-                         level=reporter.V, kind=reporter.KIND_ERR,
-                         prefix="")
+                reporter(
+                    get_reports_as_text(
+                        problem_list, macro_id, is_from_transform=False),
+                    level=reporter.V, kind=reporter.KIND_ERR, prefix=""
+                )
 
     no_changes = True
 

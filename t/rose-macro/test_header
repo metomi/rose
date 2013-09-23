@@ -44,4 +44,5 @@ function setup() {
 function teardown() {
     cd $TEST_DIR
     rm -rf $TEST_DIR/run
+    rm -rf $TEST_DIR/config/meta
 }
