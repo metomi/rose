@@ -776,16 +776,44 @@ class AdvancedSearchWidget(gtk.VBox):
 
     def remove_filter(self, filter_number=None):
         """Remove a row of widgets for a filter."""
+        max_top_row = 0
         for child in self.filter_table.get_children():
             top_row = self.filter_table.child_get(child, 'top_attach')[0]
+            if top_row > max_top_row:
+                max_top_row = top_row
             if top_row == filter_number or filter_number is None:
                 self.filter_table.remove(child)
+        if filter_number is not None:
+            for row in range(filter_number + 1, max_top_row + 1):
+                for child in self.filter_table.get_children():
+                    top_row = self.filter_table.child_get(
+                        child, 'top_attach')[0]
+                    if top_row == row:
+                        # Remove the child and attach it one row up.
+                        left_attach = self.filter_table.child_get(
+                            child, "left_attach")[0]
+                        xoptions, yoptions, xpadding, ypadding = (
+                            self.filter_table.child_get(
+                                child,"x-options", "y-options",
+                                "x-padding", "y-padding"
+                            )
+                        )
+                        self.filter_table.remove(child)
+                        self.filter_table.attach(
+                            child, left_attach, left_attach + 1, top_row - 1,
+                            top_row, xoptions=xoptions, yoptions=yoptions,
+                            xpadding=xpadding, ypadding=ypadding
+                        )
+                        if hasattr(child, "_number"):
+                            child._number = top_row - 1
+                        if top_row - 1 == 0 and left_attach == 0:
+                            # This is the top left conjunction widget.
+                            child.set_sensitive(False)           
         if filter_number is None:
             self.filter_expr_getters = []
             self.num_filters = 0
         else:
-            self.filter_expr_getters[filter_number] = lambda: None
-            self.filter_table.get_children()[-1].set_sensitive(False)
+            self.filter_expr_getters.pop(filter_number)
             self.num_filters -= 1
             if self.num_filters == 1:
                 for widget in reversed(self.filter_table.get_children()):
