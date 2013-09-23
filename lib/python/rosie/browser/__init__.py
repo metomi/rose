@@ -216,6 +216,7 @@ TITLE_INVALID_QUERY = "Error"
 
 # Miscellaneous
 COPYRIGHT = "(C) British Crown Copyright 2012-3 Met Office."
+DEFAULT_FILTER_EXPR = "eq"
 DEFAULT_QUERY = "list_my_suites"
 DELIM_KEYVAL = ": "
 HELP_FILE = "rose-rug-rosie-go.html"
