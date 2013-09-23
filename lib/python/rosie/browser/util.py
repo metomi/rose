@@ -586,8 +586,11 @@ class AdvancedSearchWidget(gtk.VBox):
         column_combo.show()
         column_combo.set_tooltip_text(rosie.browser.TIP_FILTER_COLUMN)
         expr_combo = gtk.combo_box_new_text()
-        for expr in self.filter_exprs:
+        for ind in range(len(self.filter_exprs)):
+            expr = self.filter_exprs[ind]
             expr_combo.append_text(expr)
+            if expr == rosie.browser.DEFAULT_FILTER_EXPR:
+                expr_combo.set_active(ind)
         expr_combo.show()
         expr_combo.set_tooltip_text(rosie.browser.TIP_FILTER_ACTION)
         string_entry = gtk.Entry()
