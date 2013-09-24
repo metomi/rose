@@ -819,7 +819,7 @@ class AdvancedSearchWidget(gtk.VBox):
                 for widget in reversed(self.filter_table.get_children()):
                     if hasattr(widget, "_number"):
                         widget.set_sensitive(False)
-                        break   
+                        break
 
     def run_invalid_query_dialog(self, error_info):
         """Notify the user of an invalid query."""
