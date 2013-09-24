@@ -44,6 +44,11 @@
 #  terminal=konsole
 [external]
 
+# Configuration specific to the Rosie svn-pre-commit-hook.
+## Admin users allowed to write to the trunk of any suite.
+#  super-users=spiderman batman
+[rosa-svn-pre-commit]
+
 # Configuration specific to "rose config-edit".
 # See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
 #
