@@ -320,7 +320,7 @@ def main():
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "property")
     opts, args = opt_parser.parse_args()
-
+    reporter = rose.reporter.Reporter(opts.verbosity - opts.quietness)
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
@@ -344,10 +344,11 @@ def main():
     text = rose.macro.get_reports_as_text(
                                     reports,
                                     macro_id)
+    reporter = rose.reporter
     if reports:
-        sys.stderr.write(text)
+        reporter(text, kind=reporter.KIND_ERR, level=reporter.FAIL, prefix="")
         sys.exit(1)
-
+    reporter(rose.macro.MacroTransformOKEvent(), level=reporter.V)
 
 if __name__ == "__main__":
     main()

@@ -46,6 +46,7 @@ import rose.gtk.splash
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopenError
+import rose.reporter
 from rose.resource import ResourceLocator, ResourceError
 from rose.suite_control import SuiteControl
 from rose.suite_log_view import SuiteLogViewGenerator, WebBrowserEvent
@@ -1200,7 +1201,7 @@ class MainWindow(gtk.Window):
             items = {}
             results, url = self.search_manager.ws_query(filters, **items)
         except Exception as e:
-            sys.stderr.write(str(e))
+            rose.reporter.Reporter()(e)
             results = []
         if len(results) == 0:
             return False
