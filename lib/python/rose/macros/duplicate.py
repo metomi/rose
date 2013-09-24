@@ -58,6 +58,22 @@ class DuplicateChecker(rose.macro.MacroBase):
                     if no_index_section != section:
                         basic_section = no_index_section
                     warning = self.WARNING_NUM_SECT_NO_DUPL
-                    self.add_report(section, None, None,
-                                    warning.format(basic_section))
+                    if self._get_has_metadata(metadata, basic_section,
+                                              meta_config):
+                        self.add_report(section, None, None,
+                                        warning.format(basic_section))
         return self.reports
+
+    def _get_has_metadata(self, metadata, basic_section, meta_config):
+        if metadata.keys() != ["id"]:
+            return True
+        for meta_keys, meta_node in meta_config.walk(no_ignore=True):
+            meta_section = meta_keys[0]
+            if len(meta_keys) > 1:
+                continue
+            if ((meta_section == basic_section or
+                    meta_section.startswith(
+                    basic_section + rose.CONFIG_DELIMITER)) and
+                    isinstance(meta_node.value, dict)):
+                return True
+        return False
