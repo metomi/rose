@@ -23,7 +23,7 @@
 init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
-tests 15
+tests 30
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE-base
@@ -31,7 +31,7 @@ setup
 run_fail "$TEST_KEY" rose macro
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-$PWD: not an application directory.
+[FAIL] $PWD: not an application directory.
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ setup
 run_fail "$TEST_KEY" rose macro -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-../config: not an application directory.
+[FAIL] ../config: not an application directory.
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -71,6 +71,18 @@ __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
+# No metadata, quiet.
+init </dev/null
+TEST_KEY=$TEST_KEY_BASE-no-metadata-quiet
+setup
+run_pass "$TEST_KEY" rose macro -q -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+[V] rose.macros.DefaultValidators
+[T] rose.macros.DefaultTransforms
+__CONTENT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
 # Null metadata.
 init </dev/null
 init_meta </dev/null
@@ -79,6 +91,60 @@ setup
 run_pass "$TEST_KEY" rose macro -V -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Null metadata (verbose).
+init </dev/null
+init_meta </dev/null
+TEST_KEY=$TEST_KEY_BASE-null-metadata-verbose
+setup
+run_pass "$TEST_KEY" rose macro -v -V -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[INFO] Configurations OK
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Wrong macro name.
+init </dev/null
+init_meta </dev/null
+TEST_KEY=$TEST_KEY_BASE-macro-not-found
+setup
+run_fail "$TEST_KEY" rose macro -C ../config manxome.Foe
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] Error: could not find macro manxome.Foe
+__ERR__
+teardown
+#-------------------------------------------------------------------------------
+# Bad macro code.
+init </dev/null
+init_meta </dev/null
+init_macro tumtum.py <<'__MACRO__'
+from looking_glass import Jabberwocky
+__MACRO__
+TEST_KEY=$TEST_KEY_BASE-bad-macro-code
+setup
+run_fail "$TEST_KEY" rose macro -C ../config tumtum.Jubjub
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+sed -in '/Error/!d' "$TEST_KEY.err"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] ImportError: No module named looking_glass
+[FAIL] Error: could not find macro tumtum.Jubjub
+__ERR__
+teardown
+#-------------------------------------------------------------------------------
+# Bad metadata location.
+init <<'__CONFIG__'
+meta=metadata/metadata-for-metadata
+__CONFIG__
+TEST_KEY=$TEST_KEY_BASE-bad-metadata-file
+setup
+run_fail "$TEST_KEY" rose macro -V -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] Could not find metadata for metadata/metadata-for-metadata
+__ERR__
 teardown
 #-------------------------------------------------------------------------------
 exit
