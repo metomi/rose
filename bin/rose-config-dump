@@ -41,6 +41,8 @@
 #         Each of these specifies a configuration file. If --config=DIR is
 #         specified and FILE is a relative path, FILE is assumed to be relative
 #         to DIR.
+#     --pretty, -p
+#         Apply format-specific prettyprinting.
 #     --quiet, -q
 #         Decrement verbosity. Do not report modified files.
 #-------------------------------------------------------------------------------
