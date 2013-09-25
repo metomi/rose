@@ -20,6 +20,20 @@ Changes that have significant impact on user experience.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
+\#938: rosie go: improve filter removal.
+
+\#937: rose macro: diagnostic is now more similar to other Rose CLI commands.
+
+\#936: rosie go: default operator for query.
+
+\#933: rosa svn-pre-commit: document super users functionality in
+configuration example.
+
+\#932: rose config-dump --pretty: new option to tell command to apply format
+specific pretty printing.
+
+\#931: rose config-edit, rose-macro: reduce reporting of duplicated errors.
+
 \#927: rose app-run: fix default `[poll]delays=0`.
 
 \#926: rose mpi-launch: fix unbound `ROSE_LAUNCHER_BASE` on usage with a null
