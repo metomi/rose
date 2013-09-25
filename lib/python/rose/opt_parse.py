@@ -356,6 +356,11 @@ class RoseOptionParser(OptionParser):
                        ["--prefix-delim"],
                        {"metavar": "DELIMITER",
                         "help": "Specify the prefix delimiter."}],
+               "pretty": [
+                       ["--pretty", "-p"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Switch on prettyprinting."}],
                "print_format": [
                        ["--print-format", "--format", "-f"],
                        {"metavar": "FORMAT",
