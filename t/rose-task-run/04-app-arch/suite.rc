@@ -46,7 +46,7 @@ sqlite3 .rose-arch.db 'SELECT * FROM sources;' | sort
 """
     [[ARCHIVE_BAD]]
         command scripting = """rose task-run || true; RC=$?"""
-        retry delays=
+        retry delays=0
 {% for bad_num in bad_nums %}
     [[archive_bad_{{bad_num}}]]
         inherit=ARCHIVE_BAD
