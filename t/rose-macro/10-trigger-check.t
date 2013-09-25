@@ -846,7 +846,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 40
+[V] rose.macros.DefaultValidators: issues: 39
     namelist:already_triggered_ignored_namelist=ab_trig_var1=2
         State should be trig-ignored
     namelist:already_triggered_ignored_namelist=ab_trig_var2=2
@@ -899,8 +899,6 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         State should be trig-ignored
     namelist:trig_dupl(2)=a=2
         State should be trig-ignored
-    namelist:trig_not_dupl(1)=None=None
-        namelist:trig_not_dupl requires "duplicate=true" metadata
     namelist:trigger_logical_expression=x=.false.
         State should be trig-ignored
     namelist:triggered_ignored_namelist=None=None
