@@ -26,6 +26,7 @@ import sys
 
 import rose.config
 import rose.macro
+import rose.reporter
 
 
 BEST_VERSION_MARKER = "* "
@@ -47,6 +48,13 @@ UPGRADE_METHOD = "upgrade"
 IGNORE_MAP = {rose.config.ConfigNode.STATE_NORMAL: "enabled",
               rose.config.ConfigNode.STATE_USER_IGNORED: "user-ignored",
               rose.config.ConfigNode.STATE_SYST_IGNORED: "trig-ignored"}
+
+class UpgradeVersionError(NameError):
+
+    """Raise this error when an incorrect upgrade version is selected."""
+
+    def __str__(self):
+        return ERROR_UPGRADE_VERSION.format(self.args[0])
 
 
 class MacroUpgrade(rose.macro.MacroBase):
@@ -414,15 +422,19 @@ def main():
     if return_objects is None:
         sys.exit(1)
     app_config, meta_config, config_name, args, opts = return_objects
+    verbosity = 1 + opts.verbosity - opts.quietness
+    reporter = rose.reporter.Reporter(verbosity)
     meta_opt_node = app_config.get([rose.CONFIG_SECT_TOP,
                                     rose.CONFIG_OPT_META_TYPE],
                                    no_ignore=True)
     if meta_opt_node is None or len(meta_opt_node.value.split("/")) < 2:
-        sys.exit(rose.macro.ERROR_LOAD_CONF_META_NODE)
+        reporter(rose.macro.MetaConfigFlagMissingError())
+        sys.exit(1)
     try:
         upgrade_manager = MacroUpgradeManager(app_config, opts.downgrade)
     except OSError as e:
-        sys.exit(e)
+        reporter(e)
+        sys.exit(1)
     ok_versions = upgrade_manager.get_tags(only_named=not opts.all_versions)
     if args:
         user_choice = args[0]
@@ -439,10 +451,11 @@ def main():
             if all_versions:
                 all_versions[-1] = best_mark + all_versions[-1].lstrip()
             all_versions.insert(0, curr_mark + upgrade_manager.tag)
-        print "\n".join(all_versions)
+        reporter("\n".join(all_versions) + "\n", prefix="")
         sys.exit()
     if user_choice not in ok_versions:
-        sys.exit(ERROR_UPGRADE_VERSION.format(user_choice))
+        reporter(UpgradeVersionError(user_choice))
+        sys.exit(1)
     upgrade_manager.set_new_tag(user_choice)
     macro_config = copy.deepcopy(app_config)
     new_config, change_list = upgrade_manager.transform(
@@ -454,7 +467,7 @@ def main():
                                                  upgrade_manager.get_name())
     rose.macro._handle_transform(app_config, new_config, change_list,
                                  macro_id, opts.conf_dir, opts.output_dir,
-                                 opts.non_interactive)
+                                 opts.non_interactive, reporter)
 
 if __name__ == "__main__":
     rose.macro.add_site_meta_paths()

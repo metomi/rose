@@ -31,7 +31,7 @@ setup
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
-$PWD: not an application directory.
+[FAIL] $PWD: not an application directory.
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ setup
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-../config: not an application directory.
+[FAIL] ../config: not an application directory.
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ setup
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-Error: could not find meta flag
+[FAIL] Error: could not find meta flag
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ setup
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-Error: could not find meta flag
+[FAIL] Error: could not find meta flag
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ setup
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-Error: could not find meta flag
+[FAIL] Error: could not find meta flag
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ setup
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-Error: could not find meta flag
+[FAIL] Error: could not find meta flag
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ setup
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-Error: could not find meta flag
+[FAIL] Error: could not find meta flag
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
@@ -158,7 +158,7 @@ run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.2 
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-0.2: invalid version.
+[FAIL] 0.2: invalid version.
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-0.3: invalid version.
+[FAIL] 0.3: invalid version.
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------
@@ -230,7 +230,7 @@ run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.4
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-0.4: invalid version.
+[FAIL] 0.4: invalid version.
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------
@@ -255,7 +255,7 @@ run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-0.1: invalid version.
+[FAIL] 0.1: invalid version.
 __ERROR__
 teardown
 exit
@@ -304,7 +304,7 @@ run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-0.3: invalid version.
+[FAIL] 0.3: invalid version.
 __ERROR__
 teardown
 exit
