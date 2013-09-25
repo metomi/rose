@@ -5,20 +5,19 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2013-Q4)
+## 2013-09 (2013-09-26)
 
-This release of Rose will work with cylc 5.3.0 or above.
+This release of Rose works with cylc 5.3.0 or above.
 
 ### Highlighted Changes
 
 Changes that have significant impact on user experience.
 
--None yet-
+-None-
 
-### Other Changes
+### Noteworthy Changes
 
-Lots of bug fixes and enhancements, and documentation improvements.
-The following are worth mentioning:
+Bug fixes, minor enhancements and documentation improvements:
 
 \#938: rosie go: improve filter removal.
 
