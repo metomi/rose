@@ -26,7 +26,6 @@ from rose.date import RoseDateShifter, OffsetValueError
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
-from rose.suite_log_view import SuiteLogViewGenerator
 import shlex
 
 class RosePruneApp(BuiltinApp):
@@ -50,20 +49,16 @@ class RosePruneApp(BuiltinApp):
                                                   "prune-remote-logs-at")
         archive_logs_cycles = self._get_conf(config, "archive-logs-at")
         if prune_remote_logs_cycles or archive_logs_cycles:
-            slvg = SuiteLogViewGenerator(
-                    event_handler=app_runner.event_handler,
-                    fs_util=app_runner.fs_util,
-                    popen=app_runner.popen,
-                    suite_engine_proc=app_runner.suite_engine_proc)
             prune_remote_logs_cycles = filter(
                     lambda c: c not in archive_logs_cycles,
                     prune_remote_logs_cycles)
             if prune_remote_logs_cycles:
-                slvg.generate(suite_name, prune_remote_logs_cycles,
-                              prune_remote_mode=True)
+                app_runner.suite_engine_proc.job_logs_pull_remote(
+                            suite_name, prune_remote_logs_cycles,
+                            prune_remote_mode=True)
             if archive_logs_cycles:
-                slvg.generate(suite_name, archive_logs_cycles,
-                              archive_mode=True)
+                app_runner.suite_engine_proc.job_logs_archive(
+                            suite_name, archive_logs_cycles)
         globs = []
         suite_engine_proc = app_runner.suite_engine_proc
         for key in ["datac", "work"]:

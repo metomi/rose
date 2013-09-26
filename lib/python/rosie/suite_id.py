@@ -36,7 +36,7 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
-from rose.suite_log_view import SuiteLogViewGenerator
+from rose.suite_engine_proc import SuiteEngineProcessor
 import string
 import sys
 import traceback
@@ -402,7 +402,8 @@ class SuiteId(object):
 
     def to_output(self):
         """Return the output directory for this suite."""
-        return SuiteLogViewGenerator().get_suite_log_url(str(self))
+        p = SuiteEngineProcessor.get_processor()
+        return p.get_suite_log_url(None, str(self))
 
 
 def main():
@@ -426,7 +427,10 @@ def main():
                 report(str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0)
         elif opts.to_output:
             for arg in args:
-                report(str(SuiteId(id_text=arg).to_output()) + "\n", level=0)
+                url = SuiteId(id_text=arg).to_output()
+                if not url:
+                    url = ""
+                report(str(url) + "\n", level=0)
         elif opts.to_web:
             for arg in args:
                 report(str(SuiteId(id_text=arg).to_web()) + "\n", level=0)
