@@ -37,7 +37,7 @@ import rose.macro
 import rose.macros
 import rose.popen
 import rose.suite_control
-import rose.suite_log_view
+import rose.suite_engine_proc
 
 
 class MenuBar(object):
@@ -949,16 +949,15 @@ class MainMenuHandler(object):
 
     def launch_output_viewer(self):
         """View a suite's output, if any."""
-        g = rose.suite_log_view.SuiteLogViewGenerator()
-        url = g.get_suite_log_url(self.data.top_level_name)
-        if url is None:
+        g = rose.suite_engine_proc.SuiteEngineProcessor.get_processor()
+        try:
+            g.launch_suite_log_browser(None, self.data.top_level_name)
+        except rose.suite_engine_proc.NoSuiteLogError:
             rose.gtk.dialog.run_dialog(
                                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                 rose.config_editor.ERROR_NO_OUTPUT.format(
                                             self.data.top_level_name),
                                 rose.config_editor.DIALOG_TITLE_ERROR)
-        else:
-            g.view_suite_log_url(self.data.top_level_name)
 
     def get_run_suite_args(self, *args):
         """Ask the user for custom arguments to suite run."""

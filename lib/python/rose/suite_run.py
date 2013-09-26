@@ -33,8 +33,7 @@ from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
-from rose.run_source_vc import write_source_vc_info
-from rose.suite_log_view import SuiteLogViewGenerator
+from rose.run_source_vc import write_source_vc_info 
 import socket
 import sys
 import tarfile
@@ -110,11 +109,6 @@ class SuiteRunner(Runner):
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
-        self.suite_log_view_gen = SuiteLogViewGenerator(
-                event_handler=self.event_handler,
-                fs_util=self.fs_util,
-                popen=self.popen,
-                suite_engine_proc=self.suite_engine_proc)
         self.host_selector = HostSelector(self.event_handler, self.popen)
 
     def run_impl(self, opts, args, uuid, work_files):
@@ -207,7 +201,8 @@ class SuiteRunner(Runner):
                 raise NotRunningError(suite_name)
             hosts = suite_run_hosts
         else:
-            reason = self.suite_engine_proc.is_suite_running(suite_name, hosts)
+            reason = self.suite_engine_proc.is_suite_running(
+                        None, suite_name, hosts)
             if reason:
                 raise AlreadyRunningError(suite_name, reason)
 
@@ -276,7 +271,7 @@ class SuiteRunner(Runner):
             temp_log_file.close()
 
         # Create the suite log view
-        self.suite_log_view_gen.generate(suite_name, [], force_lib_mode=True)
+        self.suite_engine_proc.job_logs_db_create(suite_name, close=True)
 
         # Install share/work directories (local)
         for name in ["share", "work"]:
@@ -293,7 +288,8 @@ class SuiteRunner(Runner):
         self.config_pm(config, "jinja2")
 
         # Register the suite
-        self.suite_engine_proc.validate(suite_name, opts.strict_mode)
+        self.suite_engine_proc.validate(suite_name, opts.strict_mode,
+                                        opts.debug_mode)
 
         if opts.local_install_only_mode:
             return

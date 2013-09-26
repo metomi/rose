@@ -26,8 +26,8 @@ import pwd
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
+from rose.resource import ResourceLocator 
 from rose.suite_engine_proc import SuiteEngineProcessor
-from rose.suite_log_view import SuiteLogViewGenerator
 from smtplib import SMTP
 
 class RoseSuiteHook(object):
@@ -43,10 +43,6 @@ class RoseSuiteHook(object):
             suite_engine_proc = SuiteEngineProcessor.get_processor(
                     event_handler=event_handler, popen=popen)
         self.suite_engine_proc = suite_engine_proc
-        self.suite_log_view_generator = SuiteLogViewGenerator(
-                event_handler=event_handler,
-                popen=popen,
-                suite_engine_proc=suite_engine_proc)
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler if it is callabale."""
@@ -60,18 +56,16 @@ class RoseSuiteHook(object):
 
         1. For a task hook, if the task runs remotely, retrieve its log from
            the remote host.
-        2. Generate the suite log view.
-        3. If "should_mail", send an email notification to the current user,
+        2. If "should_mail", send an email notification to the current user,
            and those in the "mail_cc_list".
-        4. If "should_shutdown", shut down the suite.
+        3. If "should_shutdown", shut down the suite.
 
         """
         # Retrieve log and generate code view
         task_ids = []
         if task_id:
             task_ids = [task_id]
-        self.suite_log_view_generator.generate(suite_name, task_ids,
-                                               lock_exit_mode=True)
+            self.suite_engine_proc.job_logs_pull_remote(suite_name, task_ids)
 
         # Send email notification if required
         if should_mail:
@@ -80,7 +74,7 @@ class RoseSuiteHook(object):
                 text += "Task: %s\n" % task_id
             if hook_message:
                 text += "Message: %s\n" % hook_message
-            url = self.suite_engine_proc.get_suite_log_url(suite_name)
+            url = self.suite_engine_proc.get_suite_log_url(None, suite_name)
             text += "See: %s\n" % (url)
             msg = MIMEText(text)
             user = pwd.getpwuid(os.getuid()).pw_name
