@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 23
+tests 38
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -70,6 +70,15 @@ for CYCLE in 2013010100 2013010112 2013010200; do
             "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" $ACTUAL
         diff -u "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" $ACTUAL
     done
+    for KEY in dark-matter.txt jupiter.txt try.nl uranus.txt; do
+        TEST_KEY="$TEST_KEY_BASE-$CYCLE-grep-$KEY-foo-log-2"
+        file_grep "$TEST_KEY" $KEY $SUITE_RUN_DIR/foo.log.$CYCLE.2
+    done
+    if test $(wc -l <$SUITE_RUN_DIR/foo.log.$CYCLE.2) -eq 4; then
+        pass "$TEST_KEY_BASE-$CYCLE-foo-log-2-wc-l"
+    else
+        fail "$TEST_KEY_BASE-$CYCLE-foo-log-2-wc-l"
+    fi
 done
 CYCLE=2013010112
 TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
