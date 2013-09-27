@@ -24,7 +24,7 @@ from email.mime.text import MIMEText
 import os
 import pwd
 from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener, RosePopenError
+from rose.popen import RosePopener
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator 
 from rose.suite_engine_proc import SuiteEngineProcessor
@@ -76,12 +76,20 @@ class RoseSuiteHook(object):
                 text += "Message: %s\n" % hook_message
             url = self.suite_engine_proc.get_suite_log_url(None, suite_name)
             text += "See: %s\n" % (url)
-            msg = MIMEText(text)
             user = pwd.getpwuid(os.getuid()).pw_name
-            msg["From"] = user
-            msg["To"] = user
+            conf = ResourceLocator.default().get_conf()
+            host = conf.get_value(["rose-suite-hook", "email-host"],
+                                    default="localhost")
+            msg = MIMEText(text)
+            msg["From"] = user + "@" + host
+            msg["To"] = msg["From"]
             if mail_cc_list:
-                msg["Cc"] = ", ".join(mail_cc_list)
+                mail_cc_addresses = []
+                for mail_cc_address in mail_cc_list:
+                    if "@" not in mail_cc_address:
+                        mail_cc_address += "@" + host
+                    mail_cc_addresses.append(mail_cc_address)
+                msg["Cc"] = ", ".join(mail_cc_addresses)
             else:
                 mail_cc_list = []
             msg["Subject"] = "[%s] %s" % (hook_event, suite_name)

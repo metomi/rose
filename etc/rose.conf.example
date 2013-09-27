@@ -81,6 +81,14 @@
 #  thresholds{linux}=mem:8000
 [rose-host-select]
 
+# Configuration related to "rose suite-hook"
+#
+## Default host name for email addresses. (Use "localhost" if not specified.)
+#  email-host=HOST
+## E.g.:
+#  email-host=myorganisation.org
+[rose-suite-hook]
+
 # Configuration related to "rose suite-log"
 #
 ## Mapping $HOME/cylc-run/SUITE to a http:// URL.
