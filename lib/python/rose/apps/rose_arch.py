@@ -25,7 +25,7 @@ import os
 import re
 from rose.app_run import (BuiltinApp, ConfigValueError,
     CompulsoryConfigValueError)
-from rose.checksum import get_checksum
+from rose.checksum import get_checksum, get_checksum_func
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.popen import RosePopenError
 from rose.reporter import Event
@@ -130,6 +130,13 @@ class RoseArchApp(BuiltinApp):
                         config, t_node, "source", compulsory=True)
             source_prefix = self._get_conf(
                         config, t_node, "source-prefix", default="")
+            update_check_str = self._get_conf(
+                        config, t_node, "update-check", default="md5sum")
+            try:
+                checksum_func = get_checksum_func(update_check_str)
+            except KeyError as e:
+                raise ConfigValueError([t_key, "update-check"],
+                                       update_check_str, e)
             for source_glob in shlex.split(source_str):
                 paths = glob(source_prefix + source_glob)
                 if not paths:
@@ -142,7 +149,7 @@ class RoseArchApp(BuiltinApp):
                 for path in paths:
                     # N.B. source_prefix may not be a directory
                     name = path[len(source_prefix):]
-                    for p, checksum in get_checksum(path):
+                    for p, checksum in get_checksum(path, checksum_func):
                         if checksum is None: # is directory
                             continue
                         if p:
