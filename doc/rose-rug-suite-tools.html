@@ -433,6 +433,14 @@ opts.jobs=8
       provides a way to avoid typing the same thing repeatedly. A trailing
       slash (or whatever is relevant for the archiving system) should be added
       for a directory.</dd>
+
+      <dt><kbd>update-check=md5sum|mtime+size</kbd></dt>
+
+      <dd>Optional. Specify the method for checking whether a source has changed
+      since the previous run. The default is to use the MD5 checksum of the
+      content of each source file. The alternate method is to use the modified
+      time and size of the source, which is useful for large files, but is less
+      correct.</dd>
     </dl>
 
     <p>E.g.:</p>
@@ -459,6 +467,8 @@ source=hello/worlds/*
 [arch:galaxies.tar.gz]
 source-prefix=hello/
 source=galaxies/*
+# File with multiple galaxies may be large, don't do its checksum
+update-check=mtime+size
 
 # Force gzip each source file
 [arch:stars/]
