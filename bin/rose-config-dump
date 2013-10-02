@@ -43,7 +43,7 @@
 #         specified and FILE is a relative path, FILE is assumed to be relative
 #         to DIR.
 #     --no-pretty, -n
-#         Do not apply format-specific prettyprinting.
+#         Do not apply format-specific pretty-printing.
 #     --quiet, -q
 #         Decrement verbosity. Do not report modified files.
 #-------------------------------------------------------------------------------
