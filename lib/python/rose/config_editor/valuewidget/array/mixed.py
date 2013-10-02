@@ -143,6 +143,8 @@ class MixedArrayValueWidget(gtk.HBox):
 
     def get_focus_index(self):
         text = ''
+        if not self.value_array:
+            return 0
         for r, widget_list in enumerate(self.rows):
             for i, widget in enumerate(widget_list):
                 val = self.value_array[r * self.num_cols + i]
