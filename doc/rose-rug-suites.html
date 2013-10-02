@@ -618,8 +618,7 @@ type=boolean
       <h2 id="event-hooks">Event Hooks</h2>
 
       <p>Suites also need some standard Rose <em>event hooks</em> to construct
-      the suite log viewer (more later) and report or shutdown on
-      failure.</p>
+      the suite log viewer (more later) and report or shutdown on failure.</p>
 
       <p><strong>The following should be in every Rose suite:</strong></p>
       <pre class="prettyprint lang-cylc">
@@ -634,7 +633,8 @@ type=boolean
     <div class="slide">
       <h3 class="alwayshidden">Event Hooks Explained</h3>
 
-      <p>Here, when a suite times out, the user will receive an email
+      <p>Here, when the time since the last task state change exceeds the value
+      of <kbd>timeout</kbd> the suite times out, the user will receive an email
       (<kbd>--mail</kbd>) and the suite will shutdown
       (<kbd>--shutdown</kbd>).</p>
     </div>
@@ -1002,11 +1002,9 @@ type=boolean
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">cylc-run directories: roses vs cylc-run</h3>
-      <img src=
-      "roses-vs-cylc-run.png" width="65%" height="65%" 
-      alt="roses directory vs. cylc-run directory" />
-    </div>
+    <h3 class="alwayshidden">cylc-run directories: roses vs
+    cylc-run</h3><img src="roses-vs-cylc-run.png" width="65%" height="65%" alt=
+    "roses directory vs. cylc-run directory" /></div>
 
     <div class="slide">
       <h3 class="alwayshidden">cylc-run directories: work/share</h3>
@@ -1034,8 +1032,8 @@ type=boolean
         including <var>STDOUT</var> and <var>STDERR</var> outputs.</li>
 
         <li>The <samp>job/</samp> subdirectory contains the job scripts for
-        submitting the tasks, their <var>STDOUT</var> and
-        <var>STDERR</var> outputs.</li>
+        submitting the tasks, their <var>STDOUT</var> and <var>STDERR</var>
+        outputs.</li>
 
         <li>Rose adds the library files for the suite log viewer under this
         directory.</li>
