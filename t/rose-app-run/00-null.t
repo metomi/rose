@@ -30,7 +30,7 @@ TEST_KEY=$TEST_KEY_BASE
 test_setup
 run_fail "$TEST_KEY" rose app-run
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" "$PWD/rose-app.conf" "$TEST_KEY.err"
+file_grep "$TEST_KEY.err" "$PWD: rose-app.conf" "$TEST_KEY.err"
 test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, --config.
@@ -38,7 +38,7 @@ TEST_KEY=$TEST_KEY_BASE--config
 test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" "../config/rose-app.conf" "$TEST_KEY.err"
+file_grep "$TEST_KEY.err" "../config: rose-app.conf" "$TEST_KEY.err"
 test_teardown
 #-------------------------------------------------------------------------------
 # Verbose mode.
@@ -46,7 +46,7 @@ TEST_KEY=$TEST_KEY_BASE-v
 test_setup
 run_fail "$TEST_KEY" rose app-run -v
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" "$PWD/rose-app.conf" "$TEST_KEY.err"
+file_grep "$TEST_KEY.err" "$PWD: rose-app.conf" "$TEST_KEY.err"
 test_teardown
 #-------------------------------------------------------------------------------
 # Unknown option.

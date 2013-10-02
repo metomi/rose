@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Process an env section in a rose.config.ConfigNode."""
+"""Process an env section in node of a rose.config_tree.ConfigTree."""
 
 import os
 import re
@@ -31,9 +31,10 @@ class ConfigProcessorForEnv(ConfigProcessorBase):
 
     SCHEME = "env"
 
-    def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
-        """Export environment variables in an env section in "config"."""
-        env_node = config.get([item], no_ignore=True)
+    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
+                **kwargs):
+        """Export environment variables in an [env] in "conf_tree.node"."""
+        env_node = conf_tree.node.get([item], no_ignore=True)
         if env_node is None:
             return
         if os.environ.has_key("UNDEF"):

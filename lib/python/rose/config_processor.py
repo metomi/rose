@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Process named settings in rose.config.ConfigNode."""
+"""Process named settings in rose.config.ConfigTree."""
 
 import os
 from rose.env import UnboundEnvironmentVariableError
@@ -78,7 +78,7 @@ class ConfigProcessorBase(object):
         if self.SCHEME is not None:
             self.PREFIX = self.SCHEME + ":"
 
-    def process(self, config, item, orig_keys=None, orig_value=None):
+    def process(self, conf_tree, item, orig_keys=None, orig_value=None):
         pass
 
 
@@ -101,12 +101,13 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
-        """Process a named item in the config.
+    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
+                **kwargs):
+        """Process a named item in the conf_tree.
 
-        orig_keys: The keys for locating the originating setting in config
+        orig_keys: The keys for locating the originating setting in conf_tree.
                    in a recursive processing. None implies a top level call.
-        orig_value: The value of orig_keys in config.
+        orig_value: The value of orig_keys in conf_tree.
         kwargs: Some processor may accept extra keyword arguments.
 
         """
@@ -117,5 +118,6 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         if processor is None:
             e = UnknownContentError(scheme)
             raise ConfigProcessError(orig_keys, orig_value, e)
-        return processor.process(config, item, orig_keys, orig_value, **kwargs)
+        return processor.process(conf_tree, item, orig_keys, orig_value,
+                                 **kwargs)
     __call__ = process

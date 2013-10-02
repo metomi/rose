@@ -223,8 +223,10 @@ class TriggerMacro(rose.macro.MacroBase):
         self.reports = []
         if (not isinstance(meta_config, rose.config.ConfigNode) and
             meta_config is not None):
-            meta_config = rose.config.ConfigLoader().load_with_opts(
-                    meta_config)
+            meta_config_source = meta_config
+            meta_config = rose.config.ConfigNode()
+            rose.config.ConfigLoader().load_with_opts(meta_config_source,
+                                                      meta_config)
         elif meta_config is None:
             meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):

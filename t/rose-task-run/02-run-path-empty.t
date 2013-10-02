@@ -46,13 +46,13 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-MY_PATH="$SUITE_RUN_DIR/etc/your-path"
 PREV_CYCLE=
 for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
     TASK=my_task_1
     FILE=$HOME/cylc-run/$NAME/log/job/$TASK.$CYCLE.1.txt
-    file_grep "$TEST_KEY-PATH" "PATH=$SUITE_RUN_DIR/app/$TASK/bin:$SUITE_RUN_DIR/etc/your-path" $FILE
+    file_grep "$TEST_KEY-PATH" \
+        "PATH=$SUITE_RUN_DIR/app/$TASK/bin:$SUITE_RUN_DIR/etc/your-path" $FILE
     PREV_CYCLE=$CYCLE
 done
 #-------------------------------------------------------------------------------
