@@ -175,7 +175,7 @@ class StemRunner(object):
         rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
         if rc != 0:
             raise ProjectNotFoundException(item, stderr)
-        result = re.search(r'url:\s*(file|svn)(://.*)', output)
+        result = re.search(r'url:\s*(file|svn|https|svn\+ssh)(://.*)', output)
         
         # Generate a unique name for this project based on fcm kp
         if result:
