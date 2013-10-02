@@ -47,7 +47,7 @@ perfect=6,
 powers_of_one=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 __CONF__
 cp f1 rose-app.conf
-run_pass "$TEST_KEY" rose config-dump -p
+run_pass "$TEST_KEY" rose config-dump
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [INFO] M rose-app.conf
 __OUT__

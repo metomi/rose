@@ -561,10 +561,11 @@
 
     <p>Re-dump Rose configuration files in the common format.</p>
 
-    <p>Load and dump <var>rose-*.conf</var> files in place.</p>
+    <p>Load and dump <var>rose-*.conf</var> files in place. Apply
+    format-specific pretty-printing.</p>
 
     <p>By default, it recursively loads and dumps all <var>rose-*.conf</var>
-    files in the current working directory.Parse a set of rose configuration
+    files in the current working directory. Parse a set of rose configuration
     files.</p>
 
     <h3>OPTIONS</h3>
@@ -581,9 +582,9 @@
       <kbd>--config=DIR</kbd> is specified and <var>FILE</var> is a relative
       path, <var>FILE</var> is assumed to be relative to <var>DIR</var>.</dd>
 
-      <dt><kbd>--pretty, -p</kbd></dt>
+      <dt><kbd>--no-pretty, -n</kbd></dt>
 
-      <dd>Apply format-specific prettyprinting.</dd>
+      <dd>Do not apply format-specific pretty-printing.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 

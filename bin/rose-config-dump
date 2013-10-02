@@ -28,7 +28,8 @@
 # DESCRIPTION
 #     Re-dump Rose configuration files in the common format.
 #
-#     Load and dump "rose-*.conf" files in place.
+#     Load and dump "rose-*.conf" files in place. Apply format-specific
+#     pretty-printing.
 #
 #     By default, it recursively loads and dumps all rose-*.conf files in the
 #     current working directory.
@@ -41,8 +42,8 @@
 #         Each of these specifies a configuration file. If --config=DIR is
 #         specified and FILE is a relative path, FILE is assumed to be relative
 #         to DIR.
-#     --pretty, -p
-#         Apply format-specific prettyprinting.
+#     --no-pretty, -n
+#         Do not apply format-specific prettyprinting.
 #     --quiet, -q
 #         Decrement verbosity. Do not report modified files.
 #-------------------------------------------------------------------------------
