@@ -33,9 +33,8 @@ See <http://metomi.github.io/rose/doc/rose-terms-of-use.html>.
 
 See <http://metomi.github.io/rose/doc/rose-install.html>.
 
-## Acknowledgement
+## Code Contributors
 
-Code contributors:
 * Andrew Clark (Met Office, UK)
 * Ben Fitzpatrick (Met Office, UK)
 * Joseph Mancell (Met Office, UK)
@@ -45,17 +44,19 @@ Code contributors:
 * Matt Shin (Met Office, UK)
 * Stuart Whitehouse (Met Office, UK)
 
+## Acknowledgement for non-Rose Work
+
 Licences for non-Rose works included in this distribution can be
 found in the licences/ directory.
 
 doc/jquery.min.js:
-* Unmodified external software library. See lib/html/external/jquery/.
+* Unmodified external software library. See lib/html/external/jquery.min.js.
 
-doc/S5/*:
+doc/S5/:
 * Slightly modified version of S5, in the public domain.
   See meyerweb.com/eric/tools/s5/.
   
-doc/google-code-prettify/*:
+doc/google-code-prettify/:
 * External software library, licensed under the Apache License 2.0.
   See http://code.google.com/p/google-code-prettify/.
   Minor modification made to doc/google-code-prettify/prettify.css.
@@ -98,7 +99,23 @@ etc/images/rose-config-edit/gnome_package_system_*:
   * etc/images/rose-config-edit/gnome_package_system.png, and are
     distributed in their preferred PNG form.
 
-lib/html/external/*:
-* These directories contain unmodified versions of external software
-  packages. Licences on usage and re-distribution are included for
-  each package. Please refer to them for detail.
+lib/html/bootstrap/:
+* Unmodified external software library copyright 2013 Twitter Inc
+  released under the Apache 2.0 license.
+  See <http://getbootstrap.com/>.
+
+lib/html/external/DataTables/:
+* Unmodified external software library released under the MIT license.
+  See <http://www.datatables.net/>.
+
+lib/html/external/jquery.min.js:
+* Unmodified external software library released under GPLv2 and BSD.
+  See <http://jquery.com/>.
+
+lib/html/external/livestamp.min.js:
+* Unmodified external software library released under the MIT license.
+  See <http://mattbradley.github.io/livestampjs/>.
+
+lib/html/external/moment.min.js:
+* Unmodified external software library released under the MIT license.
+  See <http://momentjs.com/>
