@@ -1,13 +1,17 @@
 foo://2013010200/hello/worlds/dark-matter.txt||FOO_RC=$((2 - 1)) foo put %(target)s %(sources)s|1
 foo://2013010200/hello/worlds/earth.txt||foo put %(target)s %(sources)s|0
+foo://2013010200/hello/worlds/jupiter.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010200/hello/t-ref share/data/2013010200/hello/jupiter.txt|0
 foo://2013010200/hello/worlds/organisms.tar.gz|tar.gz|foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/planet-n.tar.gz|tar.gz|foo put %(target)s %(sources)s|0
+foo://2013010200/hello/worlds/saturn.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010200/hello/t-ref share/data/2013010200/hello/saturn.txt|0
 foo://2013010200/hello/worlds/spaceships/|gz|foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/stars/||foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/try.nl||foo put %(target)s %(sources)s|0
 foo://2013010200/hello/worlds/unknown/stuff.pax|pax|foo put %(target)s %(sources)s|0
+foo://2013010200/hello/worlds/uranus.txt||foo put %(target)s %(sources)s; echo 'Hello Uranus and Moons' >share/data/2013010200/hello/uranus.txt|0
 foo://2013010200/hello/worlds/dark-matter.txt|hello/dark-matter.txt|f95326c55075aa12d3a3aaf5958dbe67
 foo://2013010200/hello/worlds/earth.txt|hello/earth.txt|dde4e4b505256a1fe9f30fe80b892d24
+foo://2013010200/hello/worlds/jupiter.txt|hello/jupiter.txt|source=share/data/2013010200/hello/jupiter.txt:mtime=1321819860.0:size=27
 foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/crocodile.txt|9bfd75677f1d17b743d9d0d7c9b829d3
 foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/elephant.txt|00f9c60bc048ae85ded02eda20ff2a13
 foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/goose.txt|5b1dcbc37c4cd2a2cc17d963434b27ae
@@ -26,6 +30,7 @@ foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-6.txt|c6472fcfaec7c7d
 foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-7.txt|983986ac3106b7efd60a790c74bdc7db
 foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-8.txt|2b22ba129c5612b7b79849b9ed01008a
 foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-9.txt|bbc786cc7bf549b4d8961637a30a55d8
+foo://2013010200/hello/worlds/saturn.txt|hello/saturn.txt|f64ee10b051aef75cacb7432d4727be4
 foo://2013010200/hello/worlds/spaceships/|hello/spaceship-1.txt|622ddf104b916b570fa1696836733af9
 foo://2013010200/hello/worlds/spaceships/|hello/spaceship-2.txt|bd471940b75b2d9566a303ab4c50019e
 foo://2013010200/hello/worlds/spaceships/|hello/spaceship-3.txt|47961a4566744bd7e235d777c7130453
@@ -54,3 +59,4 @@ foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-6.txt|d3d
 foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-7.txt|d7460d3030472da78033d8379fa170bb
 foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-8.txt|dfd16f24fd6b2741309374400ce36ce1
 foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-9.txt|e20b79c09d28ca648541f14c790f9ee7
+foo://2013010200/hello/worlds/uranus.txt|hello/uranus.txt|2dab142f8baf877e2cf9a92d93454276

@@ -100,6 +100,6 @@ def _md5_hexdigest(source):
 def _mtime_and_size(source):
     """Return a string containing the name, its modified time and its size."""
     stat = os.stat(os.path.realpath(source))
-    return os.pathsep.join(["source=" + source,
+    return os.pathsep.join(["source=" + os.path.relpath(source),
                             "mtime=" + str(stat.st_mtime),
                             "size=" + str(stat.st_size)])
