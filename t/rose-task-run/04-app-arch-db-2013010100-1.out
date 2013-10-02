@@ -11,7 +11,7 @@ foo://2013010100/hello/worlds/unknown/stuff.pax|pax|foo put %(target)s %(sources
 foo://2013010100/hello/worlds/uranus.txt||foo put %(target)s %(sources)s; echo 'Hello Uranus and Moons' >share/data/2013010100/hello/uranus.txt|0
 foo://2013010100/hello/worlds/dark-matter.txt|hello/dark-matter.txt|d849987cf8a372771652794bc80ee175
 foo://2013010100/hello/worlds/earth.txt|hello/earth.txt|25205c990e801b32e192f72c362d97eb
-foo://2013010100/hello/worlds/jupiter.txt|hello/jupiter.txt|source=share/data/2013010100/hello/jupiter.txt:mtime=1321819860.0:size=27
+foo://2013010100/hello/worlds/jupiter.txt|hello/jupiter.txt|source=.:mtime=1321819860.0:size=27
 foo://2013010100/hello/worlds/organisms.tar.gz|hello/organisms/animals/crocodile.txt|2984b5f5271a31321c97c707ff2e3e6a
 foo://2013010100/hello/worlds/organisms.tar.gz|hello/organisms/animals/elephant.txt|66a7288e1580a8f43c232ebf36920eda
 foo://2013010100/hello/worlds/organisms.tar.gz|hello/organisms/animals/goose.txt|56e752501c971965d760fa3bc9783261

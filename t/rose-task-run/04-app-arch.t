@@ -49,7 +49,6 @@ fi
 TEST_KEY="$TEST_KEY_BASE-find-foo"
 (cd $SUITE_RUN_DIR; find foo -type f |sort) >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_SOURCE_DIR/$TEST_KEY.out" "$TEST_KEY.out"
-diff -u  "$TEST_SOURCE_DIR/$TEST_KEY.out" "$TEST_KEY.out"
 for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY="$TEST_KEY_BASE-planet-n"
     tar -tzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/planet-n.tar.gz | sort \
@@ -68,7 +67,6 @@ for CYCLE in 2013010100 2013010112 2013010200; do
         ACTUAL=$SUITE_RUN_DIR/work/archive.$CYCLE/rose-arch-db-$TRY.out
         file_cmp "$TEST_KEY-$CYCLE.out" \
             "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" $ACTUAL
-        diff -u "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" $ACTUAL
     done
     for KEY in dark-matter.txt jupiter.txt try.nl uranus.txt; do
         TEST_KEY="$TEST_KEY_BASE-$CYCLE-grep-$KEY-foo-log-2"
