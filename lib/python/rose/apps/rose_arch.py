@@ -36,6 +36,16 @@ import sys
 from tempfile import mkdtemp
 
 
+class RoseArchCommandFormatError(KeyError):
+
+    """An error raised when trying to construct a command format."""
+
+    ERROR_FORMAT = "%s: bad command-format: %s: error: %s: %s"
+
+    def __str__(self):
+        return self.ERROR_FORMAT % self.args
+
+
 class RoseArchRenameFormatError(KeyError):
 
     """An error raised when trying to construct a rename format."""
@@ -250,10 +260,14 @@ class RoseArchApp(BuiltinApp):
                                                        "target": target_str}
                 except KeyError as e:
                     target.status = target.ST_BAD
-                    app_runner.handle_event(ConfigValueError(
-                                [target.name, "command-format"],
-                                target.command_format,
-                                e))
+                    app_runner.handle_event(
+                        RoseArchCommandFormatError(
+                            target.name,
+                            target.command_format,
+                            type(e).__name__,
+                            e
+                        )
+                    )
                 else:
                     rc, out, err = app_runner.popen.run(command, shell=True)
                     if rc:
