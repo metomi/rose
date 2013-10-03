@@ -82,7 +82,7 @@ CYCLE=2013010112
 TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
 FILE_PREFIX="$SUITE_RUN_DIR/log/job/archive_bad_"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}1.$CYCLE.1.err" <<'__ERR__'
-[FAIL] [foo://2013010112/hello/worlds/planet-n.tar.gz]command-format=foo put %(target)s %(source)s: configuration value error: 'source'
+[FAIL] foo://2013010112/hello/worlds/planet-n.tar.gz: bad command-format: foo put %(target)s %(source)s: error: KeyError: 'source'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-2"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}2.$CYCLE.1.err" <<'__ERR__'
