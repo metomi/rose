@@ -33,6 +33,9 @@
 #     # Print the OPTION=VALUE pairs in SECTION.
 #     rose config SECTION
 #
+#     # Print the value of a top level OPTION.
+#     rose config OPTION
+#
 #     # Print the OPTION keys in SECTION.
 #     rose config --keys SECTION
 #
@@ -56,10 +59,9 @@
 #     rose config --meta-key=KEY
 #
 # DESCRIPTION
-#     Parse a set of rose configuration files.
+#     Parse and print rose configuration files.
 #
-#     With no option specified, it prints value of the configuration setting of
-#     a given OPTION in a SECTION.  Return 0 if the SECTION and OPTION exist.
+#     With no option and no argument, print the Rose site + user configuration.
 #
 # OPTIONS
 #     --default

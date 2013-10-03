@@ -444,6 +444,10 @@
 
       <dd>Print the <var>OPTION=VALUE</var> pairs in <var>SECTION</var>.</dd>
 
+      <dt><kbd>rose config OPTION</kbd></dt>
+
+      <dd>Print the value of a top level <var>OPTION</var>.</dd>
+
       <dt><kbd>rose config --keys SECTION</kbd></dt>
 
       <dd>Print the <var>OPTION</var> keys in <var>SECTION</var>.</dd>
@@ -478,11 +482,10 @@
 
     <h3>DESCRIPTION</h3>
 
-    <p>Parse a set of rose configuration files.</p>
+    <p>Parse and print rose configuration files.</p>
 
-    <p>With no option specified, it prints value of the configuration setting
-    of a given <var>OPTION</var> in a <var>SECTION</var>. Return 0 if the
-    <var>SECTION</var> and <var>OPTION</var> exist.</p>
+    <p>With no option and no argument, print the Rose site + user
+    configuration.</p>
 
     <h3>OPTIONS</h3>
 
