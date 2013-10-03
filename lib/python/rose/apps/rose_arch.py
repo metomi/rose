@@ -35,11 +35,12 @@ import sqlite3
 import sys
 from tempfile import mkdtemp
 
+
 class RoseArchCommandFormatError(KeyError):
 
     """An error raised when trying to construct a command format."""
 
-    ERROR_FORMAT = "command-format=%s: %s: %s"
+    ERROR_FORMAT = "%s: bad command-format: %s: error: %s: %s"
 
     def __str__(self):
         return self.ERROR_FORMAT % self.args
@@ -261,7 +262,12 @@ class RoseArchApp(BuiltinApp):
                     target.status = target.ST_BAD
                     app_runner.handle_event(
                         RoseArchCommandFormatError(
-                                target.command_format, type(e).__name__, e))
+                            target.name,
+                            target.command_format,
+                            type(e).__name__,
+                            e
+                        )
+                    )
                 else:
                     rc, out, err = app_runner.popen.run(command, shell=True)
                     if rc:
