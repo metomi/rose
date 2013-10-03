@@ -36,3 +36,5 @@ touch -t 201111202011.00 $ROSE_DATAC/hello/jupiter.txt
 echo "${PREFIX}Hello saturn" >$ROSE_DATAC/hello/saturn.txt
 touch -t 201111202011.00 $ROSE_DATAC/hello/saturn.txt
 echo "${PREFIX}Hello uranus" >$ROSE_DATAC/hello/uranus.txt
+echo "${PREFIX}Hello Io" >$ROSE_DATAC/hello/jupiter-moon-1.txt
+echo "${PREFIX}Hello Triton" >$ROSE_DATAC/hello/neptune-1.txt
