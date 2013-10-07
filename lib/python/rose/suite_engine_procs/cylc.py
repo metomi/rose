@@ -547,7 +547,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     continue
                 cmd = self.popen.get_cmd("ssh", host, "pgrep", "-u",
                                          pwd.getpwuid(os.getuid()).pw_name,
-                                         suite_name, '-f')
+                                         suite_name, '-f', '-x')
                 host_proc_dict[host] = self.popen.run_bg(*cmd)
             while host_proc_dict:
                 for host, proc in host_proc_dict.items():
