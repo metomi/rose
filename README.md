@@ -109,7 +109,7 @@ lib/html/external/DataTables/:
   See <http://www.datatables.net/>.
 
 lib/html/external/jquery.min.js:
-* Unmodified external software library released under GPLv2 and BSD.
+* Unmodified external software library released under the MIT license.
   See <http://jquery.com/>.
 
 lib/html/external/livestamp.min.js:
