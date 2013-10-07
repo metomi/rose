@@ -190,7 +190,7 @@ PUB=bar
 meta=my-bar/HEAD
 __CONF__
 cp f4 app/baz/rose-app.conf
-run_pass "$TEST_KEY" rose config-dump -n
+run_pass "$TEST_KEY" rose config-dump --no-pretty
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [INFO] M rose-suite.conf
 [INFO] M app/bar/rose-app.conf

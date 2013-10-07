@@ -314,7 +314,7 @@ class RoseOptionParser(OptionParser):
                         "dest": "no_overwrite_mode",
                         "help": "Do not overwrite existing files."}],
                "no_pretty": [
-                       ["--no-pretty", "-n"],
+                       ["--no-pretty"],
                        {"action": "store_true",
                         "default": False,
                         "help": "Switch off format-specific prettyprinting."}],
