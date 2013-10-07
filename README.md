@@ -105,7 +105,7 @@ lib/html/bootstrap/:
   See <http://getbootstrap.com/>.
 
 lib/html/external/DataTables/:
-* Unmodified external software library released under the MIT license.
+* Unmodified external software library released under GPLv2 and BSD.
   See <http://www.datatables.net/>.
 
 lib/html/external/jquery.min.js:
