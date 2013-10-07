@@ -415,6 +415,15 @@ opts.jobs=8
       <var>$ROSE_SUITE_DIR/PREFIX</var> if <kbd>source-prefix=PREFIX</kbd> is
       specified.</dd>
 
+      <dt><kbd>source-edit-format=FORMAT</kbd></dt>
+
+      <dd>Optional. A Pythonic <code>printf</code> style format string to
+      construct a command to edit or modify the content of source files before
+      archiving them. It must contain the placeholders <var>%(in)s</var> and
+      <var>%(out)s</var> for substitution of the path to the source file and the
+      path to the modified source file (which will be created in a temporary
+      working directory).</dd>
+
       <dt><kbd>source-prefix=PREFIX</kbd></dt>
 
       <dd>Optional. Add a prefix to each value in a source declaration. A
@@ -479,6 +488,7 @@ compress=gzip
 [arch:moons.tar.gz]
 source=moons/*
 rename-format=%(cycle)s-%(name)s
+source-edit-format=sed 's/Hello/Greet/g' %(in)s &gt;%(out)s
 
 # Source name transformation with a rename-parser
 [arch:unknown/stuff.pax]
