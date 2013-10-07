@@ -60,10 +60,10 @@ class NamelistLocHandler(object):
         if loc.name.endswith("(:)"):
             name = loc.name[0:-2]
             sections = [k for k in conf_tree.node.value.keys()
-                              if k.startswith(name)]
+                        if k.startswith(name)]
         else:
             sections = [k for k in conf_tree.node.value.keys()
-                              if k == loc.name]
+                        if k == loc.name]
         if not sections:
             raise ValueError(loc.name)
         if loc.name.endswith("(:)"):
