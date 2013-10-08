@@ -839,7 +839,7 @@ class MainWindow(gtk.Window):
         """Run the scheduler for this suite."""
         this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
         
-        if SuiteControl().suite_engine_proc.is_suite_registered(this_id) == 0:
+        if SuiteControl().suite_engine_proc.is_suite_registered(this_id):
             return SuiteControl().gcontrol(this_id)
         else:
             msg = rosie.browser.DIALOG_MESSAGE_UNREGISTERED_SUITE.format(

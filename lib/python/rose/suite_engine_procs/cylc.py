@@ -511,7 +511,7 @@ class CylcProcessor(SuiteEngineProcessor):
             Return None otherwise
         """
         rc, out, err = self.popen.run("cylc", "get-directory", suite_name)
-        return rc
+        return rc == 0
 
     def is_suite_running(self, user_name, suite_name, hosts=None):
         """Return the port file path if it looks like suite is running.
