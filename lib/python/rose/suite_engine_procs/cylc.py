@@ -507,8 +507,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def is_suite_registered(self, suite_name):
         """See if a suite is registered
-            Return the run directory for a suite if it is registered
-            Return None otherwise
+            Return True directory for a suite if it is registered
+            Return False otherwise
         """
         rc, out, err = self.popen.run("cylc", "get-directory", suite_name)
         return rc == 0

@@ -497,6 +497,10 @@ class SuiteEngineProcessor(object):
         """Launch control GUI for a suite_name running at a host."""
         raise NotImplementedError()
 
+    def is_suite_registered(self, suite_name):
+        """Return whether or not a suite is running."""
+        raise NotImplementedError()
+
     def is_suite_running(self, user_name, suite_name, hosts=None):
         """Return the reason if it looks like suite is running."""
         raise NotImplementedError()
