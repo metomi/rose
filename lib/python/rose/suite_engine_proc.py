@@ -498,7 +498,7 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def is_suite_registered(self, suite_name):
-        """Return whether or not a suite is running."""
+        """Return whether or not a suite is registered."""
         raise NotImplementedError()
 
     def is_suite_running(self, user_name, suite_name, hosts=None):
