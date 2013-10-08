@@ -838,7 +838,16 @@ class MainWindow(gtk.Window):
     def handle_run_scheduler(self, *args):
         """Run the scheduler for this suite."""
         this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
-        return SuiteControl().gcontrol(this_id)
+        
+        if SuiteControl().suite_engine_proc.is_suite_registered(this_id) == 0:
+            return SuiteControl().gcontrol(this_id)
+        else:
+            msg = rosie.browser.DIALOG_MESSAGE_UNREGISTERED_SUITE.format(
+                                                                      this_id)
+            return rose.gtk.dialog.run_dialog(
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                          msg,
+                          rosie.browser.DIALOG_TITLE_UNREGISTERED_SUITE)
 
     def handle_search(self, widget=None, record=True, *args):
         """Get results that contain the values in the search widget."""

@@ -505,6 +505,14 @@ class CylcProcessor(SuiteEngineProcessor):
         out, err = self.popen("cylc", "--version")
         return out.strip()
 
+    def is_suite_registered(self, suite_name):
+        """See if a suite is registered
+            Return the run directory for a suite if it is registered
+            Return None otherwise
+        """
+        rc, out, err = self.popen.run("cylc", "get-directory", suite_name)
+        return rc
+
     def is_suite_running(self, user_name, suite_name, hosts=None):
         """Return the port file path if it looks like suite is running.
 
