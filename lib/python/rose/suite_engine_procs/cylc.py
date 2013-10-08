@@ -555,7 +555,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     out = out.split('\n')
                     for line in out:
                         if suite_name in line.split() and "python" in line.split():
-                            reason = "process running for this suite on " + host
+                            reason = host + ":process=" + line
                             return reason
         return reason
 
