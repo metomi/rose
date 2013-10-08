@@ -542,20 +542,21 @@ class CylcProcessor(SuiteEngineProcessor):
                 sleep(0.1)
 
         if reason is None:
+            if user_name is None:
+                user_name = pwd.getpwuid(os.getuid()).pw_name
             for host in sorted(hosts):
                 if host == "localhost":
                     continue
                 cmd = self.popen.get_cmd("ssh", host, "pgrep", "-u",
-                                         pwd.getpwuid(os.getuid()).pw_name,
-                                         suite_name, '-f', '-x')
-                host_proc_dict[host] = self.popen.run_bg(*cmd)
-            while host_proc_dict:
-                for host, proc in host_proc_dict.items():
-                    rc = proc.poll()
-                    if rc is not None:
-                        host_proc_dict.pop(host)
-                        if rc == 0:
+                                         user_name,
+                                         suite_name, '-f', '-l')
+                rc, out, err = self.popen.run(*cmd)
+                if rc == 0:
+                    out = out.split('\n')
+                    for line in out:
+                        if suite_name in line.split() and "python" in line.split():
                             reason = "process running for this suite on " + host
+                            return reason
         return reason
 
     def job_logs_archive(self, suite_name, items):
