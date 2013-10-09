@@ -325,6 +325,96 @@ should-show-ignored=True
     </div>
 
     <div class="slide">
+      <h3 id="installation">Installing Files/Directories</h3>
+      
+      <p>The <samp>rose-app.conf</samp> and <samp>rose-suite.conf</samp> files both
+      allow the user to construct/install files (and directories) for using at runtime.
+      This gets done at the start before the actual suite or app is run.</p>
+
+      <p>Typically, you'd use this to fetch resources that your apps or executables
+      might use when they run. This uses sections that look like <samp>[file:TARGET]</samp> which
+      accept particular options (<samp>source</samp>, <samp>mode</samp>, and <samp>checksum</samp>)
+      to build a <samp>TARGET</samp>.</p>
+      
+   </div>
+   
+   <div class="slide">
+     <h3 class="alwayshidden">Namelist Files</h3>
+     
+     <p>This is most often seen in apps where you want to build a file that contains
+     a few namelists:</p>
+      
+     <pre class="prettyprint lang-rose_conf">
+[file:christmas_tree.nl]
+source=namelist:baubles namelist:tinsel namelist:fairy_lights
+</pre>
+
+     <p>where the namelists are also specified in the same file.</p>
+     
+     <p>However, you can retrieve files from other locations such as Subversion
+     repositories, elsewhere in the filesystem, and via ssh.</p>
+
+   </div>
+
+   <div class="slide">
+     <h3 class="alwayshidden">Filesystem Files/Directories</h3>
+
+     <p>If you make the entries in <samp>source</samp> for a given
+     <samp>file:TARGET</samp> look like
+     filesystem paths, the app or suite will try to copy these into
+     <samp>TARGET</samp>. For example, to copy a file <samp>/data/stuff/pi_to_a_million_places</samp>
+     to a TARGET within the app runtime directory of <samp>constants/pi</p>, you would write:</p>
+     
+     <pre class="prettyprint lang-rose_conf">
+[file:constants/pi]
+source=/data/stuff/pi_to_a_million_places
+</pre>
+
+      <p>If this file is a bit large to copy over, you could consider asking for
+      a symbolic link instead of a copy:</p>
+     <pre class="prettyprint lang-rose_conf">
+[file:constants/pi]
+mode=symlink
+source=/data/stuff/pi_to_a_million_places
+</pre>
+   
+   </div>
+
+   <div class="slide">
+     <h3 class="alwayshidden">Directories</h3>
+
+     <p>You can also use directories as targets/sources (trailing slashes optional):</p>
+     
+     <pre class="prettyprint lang-rose_conf">
+[file:constants/]
+source=/data/stuff/
+</pre>
+
+   </div>
+
+   <div class="slide">
+     <h3 class="alwayshidden">Subversion Files/Directories</h3>
+
+      <p>You may want to retrieve a resource at the start of a suite
+      from a Subversion repository. In that case, you might have this in your
+      <samp>rose-suite.conf</samp>:</p>
+      
+      <pre class="prettyprint lang-rose_conf">
+[file:share/icecreams.dat]
+source=svn://host/nice_things_svn/trunk/icecreams.dat@100
+</pre>
+
+      <p>This would install a file <samp>icecreams.dat</samp> in the <samp>share/</samp>
+      directory of the running suite.</p>
+   </div>
+   
+   <div class="slide">
+     <h3 class="alwayshidden">Installation Reference</h3>
+     
+     <p>You can find out more at the <a href="rose-configuration.html#appendix-file-creation-mode">File Creation Reference Page</a>.</p>
+   </div>
+
+    <div class="slide">
       <h3 id="rose-config">rose config</h3>
 
       <p>There is a convenient command line utility for accessing Rose
