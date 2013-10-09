@@ -561,7 +561,7 @@ class CylcProcessor(SuiteEngineProcessor):
             rc, out, err = self.popen.run(*cmd)
             if rc:
                 continue
-            for line in out.split("\n"):
+            for line in out.splitlines():
                 if suite_name in line.split() and "python" in line.split():
                     return host + ":process=" + line
         return
