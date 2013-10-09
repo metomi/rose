@@ -521,6 +521,11 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self.generate_tree_view()
         return False  
 
+    def _launch_record_help(self, menuitem):
+        """Launch the help from a menu."""
+        rose.gtk.dialog.run_scrolled_dialog(menuitem._help_text,
+                                            menuitem._help_title)
+
     def _popup_tree_menu(self, path, col, event):
         """Launch a menu for this main treeview row."""
         menu = gtk.Menu()
@@ -546,10 +551,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             help_menuitem.set_label("Help")
             help_menuitem._help_text = desc_meta_help
             help_menuitem._help_title = "Help for %s" % stash_desc_value
-            help_menuitem.connect(
-                "activate",
-                lambda i: rose.gtk.dialog.run_scrolled_dialog(
-                    i._help_text, i._help_title))
+            help_menuitem.connect("activate", self._launch_record_help)
             help_menuitem.show()
             menu.append(help_menuitem)
         streqs = self.request_lookup.get(section, {}).get(item, {}).keys()

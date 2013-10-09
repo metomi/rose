@@ -630,7 +630,7 @@ class BaseStashSummaryDataPanelv1(
         self._add_button.set_sensitive(False)
 
     def _launch_record_help(self, menuitem):
-        # Launch the help from a menu.
+        """Launch the help from a menu."""
         rose.gtk.dialog.run_scrolled_dialog(menuitem._help_text,
                                             menuitem._help_title)
 
