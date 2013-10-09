@@ -44,10 +44,13 @@ test_array_pass = '0A', '0A', '0A', '0A'
 test_array_fail = '0A', '2A', '0A', '0A'
 test_array_any_pass = 2, 5, 6, 7
 test_array_any_fail = 2, 0, 6, 7
+test_array_1_any_pass = 2
 test_array_all_pass = 0, 0, 0, 1, 0
 test_array_all_fail = 0, 0, 0, 0, 0
+test_array_1_all_pass = 1
 test_array_len_pass = 0, 1, 2, 3, 4
 test_array_len_fail = 0, 1, 2
+test_array_1_len_pass = 0
 
 [complex:scalar_test]
 test_var_multi_odd_positive_pass = -2
@@ -150,12 +153,22 @@ length = :
 description = Fail if any elements are zero
 fail-if = any(this == 0)
 
+[simple:array_test=test_array_1_any_pass]
+length = :
+description = Fail if any elements are zero
+fail-if = any(this == 0)
+
 [simple:array_test=test_array_all_pass]
 length = :
 description = Fail if all elements are zero
 fail-if = all(this == 0)
 
 [simple:array_test=test_array_all_fail]
+length = :
+description = Fail if all elements are zero
+fail-if = all(this == 0)
+
+[simple:array_test=test_array_1_all_pass]
 length = :
 description = Fail if all elements are zero
 fail-if = all(this == 0)
@@ -169,6 +182,11 @@ fail-if = len(this) != 5
 length = :
 description = Fail if array is wrong length
 fail-if = len(this) != 5
+
+[simple:array_test=test_array_1_len_pass]
+length = :
+description = Fail if array is wrong length
+fail-if = len(this) != 1
 
 [complex:scalar_test=test_var_multi_odd_positive_pass]
 type = real
