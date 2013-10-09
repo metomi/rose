@@ -147,12 +147,15 @@ DIALOG_MESSAGE_DELETE_CONFIRMATION = ("Warning: you are about to delete " +
                        "\"{0}\". This will permanently delete all branches, "+ 
                        "trunk and any local copy." + 
                        "\n\nAre you sure you wish to proceed?")
-DIALOG_MESSAGE_UNCOMPLETED_FILTER = "Uncompleted filter"                       
+DIALOG_MESSAGE_UNCOMPLETED_FILTER = "Uncompleted filter"
+DIALOG_MESSAGE_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +
+                                     "suite {0} is not registered.")
 DIALOG_TITLE_CHECKOUT = "Checkout"
 DIALOG_TITLE_DELETE = "Confirm Delete"
 DIALOG_TITLE_HISTORY_ERROR = "History Error"
 DIALOG_TITLE_INFO = "Suite Info"
 DIALOG_TITLE_UNCOMPLETED_FILTER = "Filter error"
+DIALOG_TITLE_UNREGISTERED_SUITE = "Suite not registered"
 
 # Tool-tip text
 
@@ -216,6 +219,7 @@ TITLE_INVALID_QUERY = "Error"
 
 # Miscellaneous
 COPYRIGHT = "(C) British Crown Copyright 2012-3 Met Office."
+DEFAULT_FILTER_EXPR = "eq"
 DEFAULT_QUERY = "list_my_suites"
 DELIM_KEYVAL = ": "
 HELP_FILE = "rose-rug-rosie-go.html"

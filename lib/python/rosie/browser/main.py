@@ -49,7 +49,7 @@ from rose.popen import RosePopenError
 import rose.reporter
 from rose.resource import ResourceLocator, ResourceError
 from rose.suite_control import SuiteControl
-from rose.suite_log_view import SuiteLogViewGenerator, WebBrowserEvent
+from rose.suite_engine_proc import SuiteEngineProcessor, WebBrowserEvent
 import rosie.browser.history
 import rosie.browser.result
 import rosie.browser.search
@@ -127,7 +127,7 @@ class MainWindow(gtk.Window):
         self.nav_bar.simple_search_entry.grab_focus()
         splash_updater.update(rosie.browser.SPLASH_READY.format(
                                             rosie.browser.PROGRAM_NAME))
-        self.suite_log_view_generator = SuiteLogViewGenerator(
+        self.suite_engine_proc = SuiteEngineProcessor.get_processor(
                 event_handler=self.handle_view_output_event)
         self.show()
 
@@ -839,7 +839,16 @@ class MainWindow(gtk.Window):
     def handle_run_scheduler(self, *args):
         """Run the scheduler for this suite."""
         this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
-        return SuiteControl().gcontrol(this_id)
+        
+        if SuiteControl().suite_engine_proc.is_suite_registered(this_id):
+            return SuiteControl().gcontrol(this_id)
+        else:
+            msg = rosie.browser.DIALOG_MESSAGE_UNREGISTERED_SUITE.format(
+                                                                      this_id)
+            return rose.gtk.dialog.run_dialog(
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                          msg,
+                          rosie.browser.DIALOG_TITLE_UNREGISTERED_SUITE)
 
     def handle_search(self, widget=None, record=True, *args):
         """Get results that contain the values in the search widget."""
@@ -973,10 +982,10 @@ class MainWindow(gtk.Window):
         path = kwargs.get("path", None)
         id_ = SuiteId(id_text=self.get_selected_suite_id(path))
         if kwargs.get("test", False):
-            url = self.suite_log_view_generator.get_suite_log_url(str(id_))
+            url = self.suite_engine_proc.get_suite_log_url(None, str(id_))
             return (url is not None)
         else:
-            self.suite_log_view_generator.view_suite_log_url(str(id_))
+            self.suite_engine_proc.launch_suite_log_browser(None, str(id_))
 
     def handle_view_output_event(self, event, *args, **kwargs):
         if isinstance(event, WebBrowserEvent):

@@ -42,7 +42,7 @@
 #     --rank-method=METHOD[:METHOD-ARG]
 #         Specify the method for ranking a list of hosts. The method can be:
 #             "load" (by average load as reported by "uptime" divided by number
-#                     of processors):
+#                     of virtual processors):
 #                 If METHOD-ARG is specified, it must be "1", "5" or "15". The
 #                 default is to use the 15 minute load.
 #             "fs" (by % usage of a file system as reported by df):

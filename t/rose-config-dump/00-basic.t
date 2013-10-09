@@ -34,7 +34,7 @@ teardown
 # Basic usage, empty files in directory.
 TEST_KEY=$TEST_KEY_BASE-basic-empty-files
 setup
-run_pass "$TEST_KEY" rose config-dump
+run_pass "$TEST_KEY" rose config-dump --no-pretty
 touch rose-suite.conf
 mkdir app
 mkdir app/{foo,bar,baz}
@@ -56,7 +56,7 @@ source=foo bar baz
 
 # File 2
 [file:2]
-source=egg ham bacon
+source=namelist:egg namelist:ham namelist:bacon
 __CONF__
 cat > f2 <<'__CONF__'
 # HEAD comments
@@ -190,7 +190,7 @@ PUB=bar
 meta=my-bar/HEAD
 __CONF__
 cp f4 app/baz/rose-app.conf
-run_pass "$TEST_KEY" rose config-dump
+run_pass "$TEST_KEY" rose config-dump --no-pretty
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [INFO] M rose-suite.conf
 [INFO] M app/bar/rose-app.conf

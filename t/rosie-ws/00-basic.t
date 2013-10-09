@@ -51,9 +51,9 @@ tests 21
 mkdir svn
 svnadmin create svn/foo
 SVN_URL=file://$PWD/svn/foo
-PORT=8080
+PORT=$RANDOM
 while port_is_busy $PORT; do
-    ((++PORT))
+    PORT=$RANDOM
 done
 cat >rose.conf <<__ROSE_CONF__
 [rosie-db]

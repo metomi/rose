@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -21,13 +21,39 @@
 
 from datetime import datetime, timedelta
 import os
+import pwd
 import re
 from rose.env import env_var_process
 from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
+from rose.reporter import Event
 from rose.resource import ResourceLocator
 from rose.scheme_handler import SchemeHandlersManager
 import sys
+import webbrowser
+
+
+class NoSuiteLogError(Exception):
+
+    """An exception raised on a missing suite log."""
+
+    def __str__(self):
+        return "%s: suite log not found" % self.args[0]
+
+
+class WebBrowserEvent(Event):
+
+    """An event raised when a web browser is launched."""
+
+    LEVEL = Event.V
+
+    def __init__(self, *args):
+        Event.__init__(self, *args)
+        self.browser, self.url = args
+
+    def __str__(self):
+        return "%s %s" % self.args
+
 
 class SuiteScanResult(object):
 
@@ -208,13 +234,9 @@ class TaskProps(object):
 class SuiteEngineProcessor(object):
     """An abstract suite engine processor."""
 
-    CYCLE_INTERVAL = 6
-    RUN_DIR_REL_ROOT = None
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
     SCHEME_HANDLER_MANAGER = None
     SCHEME_DEFAULT = "cylc" # TODO: site configuration?
-    TASK_ID_DELIM = None # Delimiter of task ID
-    TASK_LOG_DELIM = None # Delimiter of task ID in log files
 
     @classmethod
     def get_processor(cls, key=None, event_handler=None, popen=None,
@@ -256,97 +278,116 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_cycle_log_archive_name(self, cycle):
-        """Return the jobs log archive file name of a given cycle."""
-        raise NotImplementedError()
-
-    def get_suite_db_file(self, suite_name):
-        """Return the path to the suite runtime database file."""
-        raise NotImplementedError()
-
-    def get_suite_dir(self, suite_name, *args):
+    def get_suite_dir(self, suite_name, *paths):
         """Return the path to the suite running directory.
 
-        Extra args, if specified, are added to the end of the path.
+        paths -- if specified, are added to the end of the path.
 
         """
         return os.path.join(os.path.expanduser("~"),
-                            self.get_suite_dir_rel(suite_name, *args))
+                            self.get_suite_dir_rel(suite_name, *paths))
 
-    def get_suite_dir_rel(self, suite_name, *args):
+    def get_suite_dir_rel(self, suite_name, *paths):
         """Return the relative path to the suite running directory.
 
-        Extra args, if specified, are added to the end of the path.
+        paths -- if specified, are added to the end of the path.
 
         """
         raise NotImplementedError()
 
-    def get_suite_events(self, suite_name, items=None):
-        """Get suite task events.
+    def get_suite_job_events(self, user_name, suite_name, cycles, tasks,
+                             no_statuses, order, limit, offset):
+        """Return suite job events.
 
-        suite_name -- The name of the suite.
-        items -- A list of relevant cycle times or task IDs. Only suite task
-                 events for tasks in the specified list are retured.
+        user -- A string containing a valid user ID
+        suite -- A string containing a valid suite ID
+        cycles -- Display only task jobs matching these cycles. A value in the
+                  list can be a cycle, the string "before|after CYCLE", or a
+                  glob to match cycles.
+        tasks -- Display only jobs for task names matching these names. Values
+                 can be a valid task name or a glob like pattern for matching
+                 valid task names.
+        no_statues -- Do not display jobs with these statuses. Valid values are
+                      the keys of CylcProcessor.STATUSES.
+        order -- Order search in a predetermined way. A valid value is one of
+                 the keys in CylcProcessor.ORDERS.
+        limit -- Limit number of returned entries
+        offset -- Offset entry number
 
-        Assume current working directory is suite's log directory.
+        Return (entries, of_n_entries) where:
+        entries -- A list of matching entries
+        of_n_entries -- Total number of entries matching query
 
-        Return a  data structure that looks like:
-        {   <cycle time string>: {
-                "cycle_time": <cycle time>,
-                "tasks": {
-                    <task name>: [
-                        {   "events": {
-                                "submit": <seconds-since-epoch>,
-                                "init": <seconds-since-epoch>,
-                                "exit": <seconds-since-epoch>,
-                            },
-                            "files": {
-                                "script": {"n_bytes": <n_bytes>},
-                                "out": {"n_bytes": <n_bytes>},
-                                "err": {"n_bytes": <n_bytes>},
-                                # ... more files
-                            },
-                            "signal": <signal-name-if-job-killed-by-signal>,
-                            "status": <"pass"|"fail">,
-                        },
-                        # ... more re-submits of the task
-                    ],
-                    # ... more relevant task names
-                }
-            }
-            # ... more relevant cycle times
-        }
+        Each entry is a dict:
+            {"cycle": cycle, "name": name, "submit_num": submit_num,
+             "events": [time_submit, time_init, time_exit],
+             "status": None|"submit|fail(submit)|init|success|fail|fail(%s)",
+             "logs": {"script": {"path": path, "path_in_tar", path_in_tar,
+                                 "size": size, "mtime": mtime},
+                      "out": {...},
+                      "err": {...},
+                      ...}}
+
         """
         raise NotImplementedError()
 
-    def get_suite_log_url(self, suite_name):
-        """Return the URL to the suite log directory.
-
-        Use the "home-public-html" setting in the site/user configuration to
-        determine the URL.
-        If no such setting is defined, return the suite running directory as a
-        "file://" URL.
-
-        """
-        log_index = self.get_suite_dir(suite_name, "log", "index.html")
-        if not os.path.exists(log_index):
+    def get_suite_log_url(self, user_name, suite_name):
+        """Return the "rose bush" URL for a user's suite."""
+        prefix = "~"
+        if user_name:
+            prefix += user_name
+        suite_d = os.path.join(prefix, self.get_suite_dir_rel(suite_name))
+        suite_d = os.path.expanduser(suite_d)
+        if not os.path.isdir(suite_d):
             return None
-        conf = ResourceLocator.default().get_conf()
-        value = conf.get_value(["rose-suite-log", "home-public-html"])
-        if value is None:
-            return "file://" + log_index
-        values = env_var_process(value).split(None, 1)
-        if len(values) == 1:
-            url_prefix = values[0]
-            public_html = ""
-        else:
-            url_prefix, public_html = values
-        home = os.path.expanduser("~")
-        dir_rel = self.get_suite_dir_rel(suite_name, "log")
-        if os.path.exists(os.path.join(home, public_html, dir_rel)):
-            return url_prefix + "/" + dir_rel
-        else:
-            return "file://" + log_index
+        rose_bush_status_f_name = os.path.expanduser(
+                    "~/.metomi/rose-bush.status")
+        rose_bush_url = None
+        if os.path.isfile(rose_bush_status_f_name):
+            status = {}
+            for line in open(rose_bush_status_f_name):
+                k, v = line.strip().split("=", 1)
+                status[k] = v
+            if status.get("host"):
+                rose_bush_url = "http://" + status["host"]
+                if status.get("port"):
+                    rose_bush_url += ":" + status["port"]
+            rose_bush_url += "/"
+        if not rose_bush_url:
+            conf = ResourceLocator.default().get_conf()
+            rose_bush_url = conf.get_value(["rose-suite-log", "rose-bush"])
+        if not rose_bush_url:
+            return "file://" + suite_d
+        if not rose_bush_url.endswith("/"):
+            rose_bush_url += "/"
+        if not user_name:
+            user_name = pwd.getpwuid(os.getuid()).pw_name
+        return rose_bush_url + "/".join(["list", user_name, suite_name])
+
+    def get_suite_logs_info(self, user_name, suite_name):
+        """Return the information of the suite logs.
+
+        Return a tuple that looks like:
+            ("cylc-run",
+             {"err": {"path": "log/suite/err", "mtime": mtime, "size": size},
+              "log": {"path": "log/suite/log", "mtime": mtime, "size": size},
+              "out": {"path": "log/suite/out", "mtime": mtime, "size": size}})
+
+        """
+        raise NotImplementedError()
+
+    def get_suite_state_summary(self, user_name, suite_name):
+        """Return a the state summary of a user's suite.
+
+        Return {"last_activity_time": s, "is_running": b, "is_failed": b}
+        where:
+        * last_activity_time is a string in %Y-%m-%dT%H:%M:%S format,
+          the time of the latest activity in the suite
+        * is_running is a boolean to indicate if the suite is running
+        * is_failed: a boolean to indicate if any tasks (submit) failed
+
+        """
+        raise NotImplementedError()
 
     def get_task_auth(self, suite_name, task_name):
         """Return [user@]host for a remote task in a suite."""
@@ -456,7 +497,11 @@ class SuiteEngineProcessor(object):
         """Launch control GUI for a suite_name running at a host."""
         raise NotImplementedError()
 
-    def is_suite_running(self, suite_name, hosts=None):
+    def is_suite_registered(self, suite_name):
+        """Return whether or not a suite is registered."""
+        raise NotImplementedError()
+
+    def is_suite_running(self, user_name, suite_name, hosts=None):
         """Return the reason if it looks like suite is running."""
         raise NotImplementedError()
 
@@ -469,6 +514,10 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
+    def job_logs_db_create(self, suite_name, close=False):
+        """Create the job logs database."""
+        raise NotImplementedError()
+
     def job_logs_pull_remote(self, suite_name, items=None,
                              prune_remote_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
@@ -479,6 +528,23 @@ class SuiteEngineProcessor(object):
 
         """
         raise NotImplementedError()
+
+    def launch_suite_log_browser(self, user_name, suite_name):
+        """Launch web browser to view suite log.
+
+        Return URL of suite log on success, None otherwise.
+
+        """
+        url = self.get_suite_log_url(user_name, suite_name)
+        if not url:
+            arg = suite_name
+            if user_name:
+                arg += " ~" + user_name
+            raise NoSuiteLogError(arg)
+        w = webbrowser.get()
+        w.open(url, new=True, autoraise=True)
+        self.handle_event(WebBrowserEvent(w.name, url))
+        return url
 
     def ping(self, suite_name, host_names=None):
         """Return a list of host names where suite_name is running."""

@@ -1,13 +1,21 @@
-foo://2013010112/hello/worlds/dark-matter.txt||FOO_RC=$((2 - 1)) foo put %(target)s %(sources)s|1
-foo://2013010112/hello/worlds/earth.txt||foo put %(target)s %(sources)s|0
-foo://2013010112/hello/worlds/organisms.tar.gz|tar.gz|foo put %(target)s %(sources)s|0
-foo://2013010112/hello/worlds/planet-n.tar.gz|tar.gz|foo put %(target)s %(sources)s|0
-foo://2013010112/hello/worlds/spaceships/|gz|foo put %(target)s %(sources)s|0
-foo://2013010112/hello/worlds/stars/||foo put %(target)s %(sources)s|0
-foo://2013010112/hello/worlds/try.nl||foo put %(target)s %(sources)s|0
-foo://2013010112/hello/worlds/unknown/stuff.pax|pax|foo put %(target)s %(sources)s|0
+foo://2013010112/hello/worlds/dark-matter.txt||FOO_RC=$((2 - 1)) foo put %(target)s %(sources)s|1|
+foo://2013010112/hello/worlds/earth.txt||foo put %(target)s %(sources)s|0|
+foo://2013010112/hello/worlds/jupiter-moons.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|sed 's/Hello/Greet/' %(in)s >%(out)s
+foo://2013010112/hello/worlds/jupiter.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010112/hello/t-ref share/data/2013010112/hello/jupiter.txt|0|
+foo://2013010112/hello/worlds/neptune-1.txt||foo put %(target)s %(sources)s|0|sed 's/Hello/Greet/' %(in)s >%(out)s
+foo://2013010112/hello/worlds/organisms.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|
+foo://2013010112/hello/worlds/planet-n.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|
+foo://2013010112/hello/worlds/saturn.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010112/hello/t-ref share/data/2013010112/hello/saturn.txt|0|
+foo://2013010112/hello/worlds/spaceships/|gz|foo put %(target)s %(sources)s|0|
+foo://2013010112/hello/worlds/stars/||foo put %(target)s %(sources)s|0|
+foo://2013010112/hello/worlds/try.nl||foo put %(target)s %(sources)s|0|
+foo://2013010112/hello/worlds/unknown/stuff.pax|pax|foo put %(target)s %(sources)s|0|
+foo://2013010112/hello/worlds/uranus.txt||foo put %(target)s %(sources)s; echo 'Hello Uranus and Moons' >share/data/2013010112/hello/uranus.txt|0|
 foo://2013010112/hello/worlds/dark-matter.txt|hello/dark-matter.txt|0752d8326a675d55ed2568648b347faf
 foo://2013010112/hello/worlds/earth.txt|hello/earth.txt|58a85149e24a2f26af37bbe10d0b4fef
+foo://2013010112/hello/worlds/jupiter-moons.tar.gz|hello/jupiter-1.txt|265db2877a7af1802852a73e2a076ed5
+foo://2013010112/hello/worlds/jupiter.txt|hello/jupiter.txt|source=.:mtime=1321819860.0:size=27
+foo://2013010112/hello/worlds/neptune-1.txt|hello/neptune-1.txt|5b8a580f298b438f6d4809220bb93f6c
 foo://2013010112/hello/worlds/organisms.tar.gz|hello/organisms/animals/crocodile.txt|c8ab09ebc9f0ea252c85e3226cd4bf1b
 foo://2013010112/hello/worlds/organisms.tar.gz|hello/organisms/animals/elephant.txt|8dd338fe56dd28f396e1c75c94734c19
 foo://2013010112/hello/worlds/organisms.tar.gz|hello/organisms/animals/goose.txt|1b4ef04cce16c5a3aac9d20b7c7cf6bc
@@ -26,6 +34,7 @@ foo://2013010112/hello/worlds/planet-n.tar.gz|hello/planet-6.txt|9a5f76a75db01ef
 foo://2013010112/hello/worlds/planet-n.tar.gz|hello/planet-7.txt|745c76cc66714b9e873788da107e4fe0
 foo://2013010112/hello/worlds/planet-n.tar.gz|hello/planet-8.txt|502b76b6d087909c3917581d36964b64
 foo://2013010112/hello/worlds/planet-n.tar.gz|hello/planet-9.txt|261fb06dd2ab0b47c9392c980301bd93
+foo://2013010112/hello/worlds/saturn.txt|hello/saturn.txt|46b1a2f9195d1f20cf3a066b7e2080bc
 foo://2013010112/hello/worlds/spaceships/|hello/spaceship-1.txt|b42cd0e5be5b59c1429d21b0980d2dd1
 foo://2013010112/hello/worlds/spaceships/|hello/spaceship-2.txt|af0c44faeb1ffb0dc0762cb8f27675c6
 foo://2013010112/hello/worlds/spaceships/|hello/spaceship-3.txt|d9a7dbccda0949b5f87c584bdb4349d9
@@ -54,3 +63,4 @@ foo://2013010112/hello/worlds/unknown/stuff.pax|hello/2013010112-stuff-6.txt|385
 foo://2013010112/hello/worlds/unknown/stuff.pax|hello/2013010112-stuff-7.txt|6fdbffac3e5e6ccc93d18c3ccc85c1e5
 foo://2013010112/hello/worlds/unknown/stuff.pax|hello/2013010112-stuff-8.txt|7cd7d544a86e68e6c0e2dfd8d56bd5a7
 foo://2013010112/hello/worlds/unknown/stuff.pax|hello/2013010112-stuff-9.txt|08f4d477bdedd2ed61061323c2b98e70
+foo://2013010112/hello/worlds/uranus.txt|hello/uranus.txt|e5cd66df5b026f01413aede53add68c3

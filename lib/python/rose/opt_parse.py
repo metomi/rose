@@ -313,6 +313,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "no_overwrite_mode",
                         "help": "Do not overwrite existing files."}],
+               "no_pretty_mode": [
+                       ["--no-pretty"],
+                       {"action": "store_true",
+                        "default": False,
+                        "dest": "no_pretty_mode",
+                        "help": "Switch off format-specific prettyprinting."}],
                "offsets": [
                        ["--offset", "-s"],
                        {"action": "append",
@@ -492,7 +498,7 @@ class RoseOptionParser(OptionParser):
                        {"metavar": "STRING",
                         "help": "Substitute unbound variables with STRING"}],
                "update_mode": [
-                       ["--update", "-u"],
+                       ["--update", "-U"],
                        {"action": "store_true",
                         "dest": "update_mode",
                         "default": False,
@@ -513,7 +519,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "default": None,
                         "dest": "user",
-                        "help": "User to list roses directory for."}],
+                        "help": "Apply to specified user."}],
                "validate_all": [
                        ["--validate", "-V"],
                        {"action": "store_true",

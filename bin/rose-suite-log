@@ -30,10 +30,11 @@
 # DESCRIPTION
 #     View or update suite log.
 #
-#     1. Launch web browser to view suite log.
-#     2. Update the suite log view information for specified cycle times or
-#        task IDs (e.g. "task.cycle" in cylc suites).
-#     3. Archive (tar-gzip) job logs at or older than the specified cycle time.
+#     1. Launch web browser to view suite log. If "rose bush" is not
+#        configured, the command will offer to start it.
+#     2. Update the suite's job logs by pulling them back from any remote hosts
+#        for specified cycle times or task names or IDs.
+#     3. Archive (tar-gzip) job logs at the specified cycle time.
 #
 #     If --name=SUITE-NAME is not specified, the name will be determined by
 #     locating a rose-suite.conf file in $PWD or its nearest parent
@@ -57,15 +58,11 @@
 #         suite host.
 #     --tidy-remote
 #         Deprecated. Use --prune-remote instead.
-#     --timeout=DELAY
-#         Specify a timeout. Normally, a lock is put in place to prevent
-#         other instances of "rose suite-hook" or "rose suite-log --update"
-#         from updating the suite log at the same time. The command hangs as it
-#         attempts to grab the lock. This option specify a timeout (in number
-#         of seconds) for the attempt. (default=300.0)
-#     --update, -u
-#         Update job logs and index for items specified in arguments.
+#     --update, -U
+#         Update job logs for items specified in arguments.
+#     --user=USER-NAME, -u USER-NAME
+#         View mode only. View logs of a suite of a different user.
 #     --view
 #         Launch web browser to view suite log.
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_log_view "$@"
+exec python -m rose.suite_log "$@"

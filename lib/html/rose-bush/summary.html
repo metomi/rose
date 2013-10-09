@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>{{user}}: Rose Bush</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="{{script}}/favicon.ico" />
+<link rel="shortcut icon" href="{{script}}/favicon.ico" />
+<link type="text/css" href="{{script}}/etc/bootstrap/css/bootstrap.min.css"
+rel="stylesheet" media="screen" />
+<link type="text/css" href="{{script}}/rose-bush.css" rel="stylesheet" media="screen" />
+</head>
+<body>
+<div class="navbar navbar-static-top">
+<div class="navbar-inner">
+<a class="brand" href="{{script}}/">Rose Bush @ {{host}}</a>
+<ul class="nav">
+<li class="active"><a><strong>{{user}}</strong></a></li>
+</ul>
+<ul class="nav pull-right">
+<li><a class="text-info">page loaded
+<abbr class="livestamp" title="{{time}}">{{time}}</abbr></a></li>
+</ul>
+</div>
+</div>
+<div class="page-header">
+<p>User has {{entries|length}} suite(s) installed.</p>
+</div>
+<div class="container-fluid">
+{% for entry in entries -%}
+<div class="row-fluid entry">
+<div class="span10">
+<p><a href="{{script}}/list/{{user}}/{{entry.name}}">{{entry.name}}</a>
+{% if entry.states.is_running -%}
+<span class="label label-info">
+<i class="icon-play icon-white" title="running"></i>
+</span>
+{% endif -%}
+{% if entry.states.is_failed -%}
+<span class="label label-important">
+<i class="icon-warning-sign icon-white" title="failed task(s)"></i>
+</span>
+{% endif -%}
+</p>
+{% if entry.files or entry.info -%}
+<ul class="inline">
+{% for scheme, scheme_files in entry.files|dictsort -%}
+{% if scheme_files -%}
+<li><dfn>{{scheme}}:</dfn>
+{% for key, log in scheme_files|dictsort -%}
+{% if not loop.first -%}
+|
+{% endif %}
+<a href="{{script}}/view/{{user}}/{{entry.name}}?path={{log.path}}"
+title="{{log.size}} bytes">{{key}}</a>
+{% endfor -%}
+</li>
+{% endif -%}
+{% endfor -%}
+{% for key in ["project", "title"] -%}
+{% if entry.info[key] -%}
+<li><dfn>{{key}}:</dfn> {{entry.info[key]|truncate}}</li>
+{% endif -%}
+{% endfor -%}
+</ul>
+{% endif -%}
+</div>
+<div class="span2 text-right">
+{% if entry.states.last_activity_time -%}
+<span class="text-info">last active
+<abbr class="livestamp" title="{{entry.states.last_activity_time}}+0000">{{entry.states.last_activity_time}}+0000</abbr></span>
+{% endif -%}
+</div>
+</div>
+{% endfor -%}
+</div>
+
+<script type="text/javascript" src="{{script}}/etc/jquery.min.js"></script>
+<script type="text/javascript" src="{{script}}/etc/bootstrap/js/bootstrap.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/etc/moment.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/etc/livestamp.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/rose-bush.js">
+</script>
+</body>
+</html>

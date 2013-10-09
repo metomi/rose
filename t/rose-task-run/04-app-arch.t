@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 23
+tests 44
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -45,10 +45,10 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-# Results
+# Results, good ones
 TEST_KEY="$TEST_KEY_BASE-find-foo"
 (cd $SUITE_RUN_DIR; find foo -type f |sort) >"$TEST_KEY.out"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_SOURCE_DIR/$TEST_KEY.out"
+file_cmp "$TEST_KEY.out" "$TEST_SOURCE_DIR/$TEST_KEY.out" "$TEST_KEY.out"
 for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY="$TEST_KEY_BASE-planet-n"
     tar -tzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/planet-n.tar.gz | sort \
@@ -66,14 +66,36 @@ for CYCLE in 2013010100 2013010112 2013010200; do
     for TRY in 1 2; do
         ACTUAL=$SUITE_RUN_DIR/work/archive.$CYCLE/rose-arch-db-$TRY.out
         file_cmp "$TEST_KEY-$CYCLE.out" \
-            $ACTUAL "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out"
+            "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" $ACTUAL
     done
+    for KEY in dark-matter.txt jupiter.txt try.nl uranus.txt; do
+        TEST_KEY="$TEST_KEY_BASE-$CYCLE-grep-$KEY-foo-log-2"
+        file_grep "$TEST_KEY" $KEY $SUITE_RUN_DIR/foo.log.$CYCLE.2
+    done
+    if test $(wc -l <$SUITE_RUN_DIR/foo.log.$CYCLE.2) -eq 4; then
+        pass "$TEST_KEY_BASE-$CYCLE-foo-log-2-wc-l"
+    else
+        fail "$TEST_KEY_BASE-$CYCLE-foo-log-2-wc-l"
+    fi
+    TEST_KEY="$TEST_KEY_BASE-$CYCLE-neptune-1.txt"
+    file_cmp "$TEST_KEY" \
+        $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/neptune-1.txt <<__TXT__
+[$CYCLE] Greet Triton
+__TXT__
+    TEST_KEY="$TEST_KEY_BASE-$CYCLE-jupiter-moons.tar.gz"
+    tar -xzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/jupiter-moons.tar.gz -O \
+        >"$TEST_KEY.out"
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__TXT__
+[$CYCLE] Greet Io
+__TXT__
 done
+#-------------------------------------------------------------------------------
+# Results, bad ones
 CYCLE=2013010112
 TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
 FILE_PREFIX="$SUITE_RUN_DIR/log/job/archive_bad_"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}1.$CYCLE.1.err" <<'__ERR__'
-[FAIL] [foo://2013010112/hello/worlds/planet-n.tar.gz]command-format=foo put %(target)s %(source)s: configuration value error: 'source'
+[FAIL] foo://2013010112/hello/worlds/planet-n.tar.gz: bad command-format: foo put %(target)s %(source)s: KeyError: 'source'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-2"
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}2.$CYCLE.1.err" <<'__ERR__'
@@ -92,21 +114,17 @@ file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5.$CYCLE.1.err" <<'__ERR__'
 [FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: 'hello/mercurry.txt'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
-diff -u - "${FILE_PREFIX}6.$CYCLE.1.err" <<__ERR__
-[FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/data/2013010112/hello/mars.txt # return-code=1, stderr=
-[FAIL] foo: push: unknown action
-__ERR__
 file_cmp "$TEST_KEY.err" "${FILE_PREFIX}6.$CYCLE.1.err" <<__ERR__
 [FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/data/2013010112/hello/mars.txt # return-code=1, stderr=
 [FAIL] foo: push: unknown action
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-7"
 file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_7.$CYCLE.1.err" <<'__ERR__'
-[FAIL] arch:planet-n.tar.gz: rename format: %(planet?maybedwarfplanet???)s: error: 'planet?maybedwarfplanet???'
+[FAIL] foo://2013010112/planet-n.tar.gz: bad rename-format: %(planet?maybedwarfplanet???)s: KeyError: 'planet?maybedwarfplanet???'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-8"
 file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_8.$CYCLE.1.err" <<'__ERR__'
-[FAIL] arch:planet-n.tar.gz: rename parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
+[FAIL] foo://2013010112/planet-n.tar.gz: bad rename-parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
 __ERR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

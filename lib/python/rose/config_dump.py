@@ -25,6 +25,7 @@ import fnmatch
 import os
 from rose.config import ConfigDumper, ConfigLoader
 from rose.fs_util import FileSystemUtil
+from rose.macro import pretty_format_config
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Event, Reporter
 from tempfile import NamedTemporaryFile
@@ -39,7 +40,7 @@ class ConfigDumpEvent(Event):
 def main():
     """Implement the "rose config-dump" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("conf_dir", "files")
+    opt_parser.add_my_options("conf_dir", "files", "no_pretty_mode")
     opts, args = opt_parser.parse_args()
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
@@ -57,6 +58,8 @@ def main():
     for file_name in file_names:
         t = NamedTemporaryFile()
         node = ConfigLoader()(file_name)
+        if not opts.no_pretty_mode:
+            pretty_format_config(node)
         ConfigDumper()(node, t)
         t.seek(0)
         if not filecmp.cmp(t.name, file_name, shallow=False):
