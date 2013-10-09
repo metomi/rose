@@ -17,26 +17,38 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-run" when port file exists.
+# Test "rose suite-run" when a running suite's port file is removed,
+# so will rely on pgrep to detect whether it is still running or not.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 3
+tests 2
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/.cylc/ports
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-touch $HOME/.cylc/ports/$NAME
+set -e
+rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
+TIME_OUT=$(($(date +%s) + 120))
+while ! grep -q 'CYLC_JOB_EXIT=' "$SUITE_RUN_DIR/log/job/my_task_1.1.1.status" \
+    2>/dev/null
+do
+    if (($(date +%s) > $TIME_OUT)); then
+        break
+    fi
+    sleep 1
+done
+mv $HOME/.cylc/ports/$NAME $NAME.port
 run_fail "$TEST_KEY" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is still running (detected ~/.cylc/ports/$NAME)
-__ERR__
+file_grep "$TEST_KEY.err" \
+    '\[FAIL\] '$NAME': is still running (detected localhost:process=' \
+    "$TEST_KEY.err"
+mv $NAME.port $HOME/.cylc/ports/$NAME
 #-------------------------------------------------------------------------------
-rm $HOME/.cylc/ports/$NAME
-rose suite-clean -q -y $NAME
+cylc shutdown --timeout=120 --kill --wait $NAME 1>/dev/null 2>&1
+rose suite-clean --debug -q -y $NAME
 exit 0

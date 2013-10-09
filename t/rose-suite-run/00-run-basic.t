@@ -49,7 +49,7 @@ for OPTION in -i -l '' --restart; do
     run_fail "$TEST_KEY" rose suite-run $OPTION \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
     file_grep "$TEST_KEY.err" \
-        "\\[FAIL\\] $NAME: is already running (detected .*~/\\.cylc/ports/$NAME)" \
+        "\\[FAIL\\] $NAME: is still running (detected .*~/\\.cylc/ports/$NAME)" \
         "$TEST_KEY.err"
 done
 TEST_KEY=$TEST_KEY_BASE-running-reload

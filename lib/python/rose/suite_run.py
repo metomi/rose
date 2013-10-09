@@ -34,21 +34,13 @@ from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
 from rose.run_source_vc import write_source_vc_info 
+from rose.suite_engine_proc import StillRunningError
 import socket
 import sys
 import tarfile
 from tempfile import TemporaryFile
 from time import sleep, strftime, time
 import traceback
-
-
-class AlreadyRunningError(Exception):
-
-    """An exception raised when a suite is already running."""
-
-    def __str__(self):
-        name, reason = self.args
-        return "%s: is already running (detected %s)" % (name, reason)
 
 
 class NotRunningError(Exception):
@@ -204,7 +196,7 @@ class SuiteRunner(Runner):
             reason = self.suite_engine_proc.is_suite_running(
                         None, suite_name, hosts)
             if reason:
-                raise AlreadyRunningError(suite_name, reason)
+                raise StillRunningError(suite_name, reason)
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)

@@ -88,9 +88,9 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def clean(self, suite_name, hosts=None):
         """Remove items created by the previous run of a suite."""
-        if self.is_suite_running(None, suite_name, hosts):
-            raise StillRunningError(suite_name,
-                                    self.ping(suite_name, hosts)[0])
+        reason = self.is_suite_running(None, suite_name, hosts)
+        if reason:
+            raise StillRunningError(suite_name, reason)
         job_auths = []
         try:
             job_auths = self.get_suite_jobs_auths(suite_name)
@@ -540,24 +540,23 @@ class CylcProcessor(SuiteEngineProcessor):
                         reason = host + ":" + port_file
             if host_proc_dict:
                 sleep(0.1)
+        if reason:
+            return reason
 
-        if reason is None:
-            if user_name is None:
-                user_name = pwd.getpwuid(os.getuid()).pw_name
-            for host in sorted(hosts):
-                if host == "localhost":
-                    continue
-                cmd = self.popen.get_cmd("ssh", host, "pgrep", "-u",
-                                         user_name,
-                                         suite_name, '-f', '-l')
-                rc, out, err = self.popen.run(*cmd)
-                if rc == 0:
-                    out = out.split('\n')
-                    for line in out:
-                        if suite_name in line.split() and "python" in line.split():
-                            reason = host + ":process=" + line
-                            return reason
-        return reason
+        if user_name is None:
+            user_name = pwd.getpwuid(os.getuid()).pw_name
+        for host in sorted(hosts):
+            cmd = ["pgrep", "-u", user_name,
+                   "python.*cylc-(run|restart).*" + suite_name, "-f", "-l"]
+            if host != "localhost":
+                cmd = self.popen.get_cmd("ssh", host) + cmd
+            rc, out, err = self.popen.run(*cmd)
+            if rc:
+                continue
+            for line in out.split("\n"):
+                if suite_name in line.split() and "python" in line.split():
+                    return host + ":process=" + line
+        return
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
