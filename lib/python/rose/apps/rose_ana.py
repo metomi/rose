@@ -54,7 +54,7 @@ class RoseAnaApp(BuiltinApp):
 
     SCHEME = "rose_ana"
 
-    def run(self, app_runner, config, opts, args, uuid, work_files):
+    def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Implement the "rose ana" command"""
 
         # Get config file option for user-specified method paths
@@ -68,7 +68,7 @@ class RoseAnaApp(BuiltinApp):
                 method_paths.append(item)
 
         # Initialise the analysis engine
-        engine = Analyse(config, opts, args, method_paths,
+        engine = Analyse(conf_tree.node, opts, args, method_paths,
                          reporter=app_runner.event_handler,
                          popen=app_runner.popen)
 

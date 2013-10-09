@@ -48,27 +48,29 @@ class NamelistLocHandler(object):
     def can_pull(self, loc):
         return loc.name.startswith(self.SCHEME + ":")
 
-    def parse(self, loc, config):
+    def parse(self, loc, conf_tree):
         """Set loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEME
         loc.loc_type = loc.TYPE_BLOB
 
-    def pull(self, loc, config):
+    def pull(self, loc, conf_tree):
         """Write namelist to loc.cache."""
         if not loc.loc_type:
-            self.parse(loc, config)
+            self.parse(loc, conf_tree)
         if loc.name.endswith("(:)"):
             name = loc.name[0:-2]
-            sections = [k for k in config.value.keys() if k.startswith(name)]
+            sections = [k for k in conf_tree.node.value.keys()
+                        if k.startswith(name)]
         else:
-            sections = [k for k in config.value.keys() if k == loc.name]
+            sections = [k for k in conf_tree.node.value.keys()
+                        if k == loc.name]
         if not sections:
             raise ValueError(loc.name)
         if loc.name.endswith("(:)"):
             sections.sort(rose.config.sort_settings)
         f = open(loc.cache, "wb")
         for section in sections:
-            section_node = config.get([section], no_ignore=True)
+            section_node = conf_tree.node.get([section], no_ignore=True)
             if section_node is None:
                 raise ValueError(loc.name)
             group = RE_NAMELIST_GROUP.match(section).group(1)

@@ -50,7 +50,7 @@ class SvnLocHandler(object):
                 not os.path.exists(loc.name) and
                 not self.manager.popen.run(self.svn, "info", loc.name)[0])
 
-    def parse(self, loc, config):
+    def parse(self, loc, conf_tree):
         """Set loc.real_name, loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEMES[0]
         xml_str, err = self.manager.popen(self.svn, "info", "--xml", loc.name)
@@ -62,7 +62,7 @@ class SvnLocHandler(object):
         loc.real_name = "%s@%s" % (info_entry["url"], info_entry["revision"])
         loc.key = info_entry["commit:revision"]
 
-    def pull(self, loc, config):
+    def pull(self, loc, conf_tree):
         """Run "svn export" to get loc to its cache."""
         if not loc.real_name:
             self.parse(loc)

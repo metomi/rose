@@ -145,10 +145,9 @@ def main():
     meta_path = os.path.join(opts.conf_dir,
                              rose.CONFIG_META_DIR,
                              rose.META_CONFIG_NAME)
+    metadata_config = rose.config.ConfigNode()
     if os.path.isfile(meta_path):
-        metadata_config = rose.config.ConfigLoader().load_with_opts(meta_path)
-    else:
-        metadata_config = rose.config.ConfigNode()
+        rose.config.ConfigLoader().load_with_opts(meta_path, metadata_config)
     metadata_config = metadata_gen(source_config,
                                    metadata_config,
                                    auto_type=opts.type,

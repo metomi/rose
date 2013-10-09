@@ -30,6 +30,7 @@ class FileSystemEvent(Event):
     """An event raised on a file system operation."""
 
     CHDIR = "chdir"
+    COPY = "copy"
     CREATE = "create"
     DELETE = "delete"
     INSTALL = "install"
@@ -39,6 +40,9 @@ class FileSystemEvent(Event):
 
     def __init__(self, action, target, source=None):
         self.action = action
+        # FIXME: We need to sort out the verbosity for file system events
+        if self.action == self.COPY:
+            self.level = Event.V
         self.target = target
         self.source = source
         Event.__init__(self, action, target, source)
@@ -71,6 +75,22 @@ class FileSystemUtil(object):
         if cwd != os.getcwd():
             event = FileSystemEvent(FileSystemEvent.CHDIR, path + "/")
             self.handle_event(event)
+
+    def copy2(self, source, target):
+        """Wrap shutil.copy2."""
+
+        self.makedirs(self.dirname(target))
+        shutil.copy2(source, target)
+        event = FileSystemEvent(FileSystemEvent.COPY, source, target)
+        self.handle_event(event)
+
+    def copytree(self, source, target):
+        """Wrap shutil.copytree."""
+
+        self.makedirs(self.dirname(target))
+        shutil.copytree(source, target)
+        event = FileSystemEvent(FileSystemEvent.COPY, source, target)
+        self.handle_event(event)
 
     def delete(self, path):
         """Delete a file or a directory."""
@@ -128,8 +148,7 @@ class FileSystemUtil(object):
     def rename(self, source, target):
         """Wrap os.rename. Create directory of target if it does not exist."""
 
-        if not os.path.exists(self.dirname(target)):
-            self.makedirs(self.dirname(target))
+        self.makedirs(self.dirname(target))
         os.rename(source, target)
         event = FileSystemEvent(FileSystemEvent.RENAME, source, target)
         self.handle_event(event)

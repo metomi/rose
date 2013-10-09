@@ -64,7 +64,7 @@ TEST_KEY=$TEST_KEY_BASE-bad
 test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config --opt-conf-key=bad -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" "../config/opt/rose-app-bad.conf" "$TEST_KEY.err"
+file_grep "$TEST_KEY.err" "Bad optional configuration key(s): bad" "$TEST_KEY.err"
 test_teardown
 #-------------------------------------------------------------------------------
 # Add option 1.
