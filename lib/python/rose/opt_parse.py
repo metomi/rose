@@ -313,6 +313,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "no_overwrite_mode",
                         "help": "Do not overwrite existing files."}],
+               "no_pretty_mode": [
+                       ["--no-pretty"],
+                       {"action": "store_true",
+                        "default": False,
+                        "dest": "no_pretty_mode",
+                        "help": "Switch off format-specific prettyprinting."}],
                "offsets": [
                        ["--offset", "-s"],
                        {"action": "append",
@@ -356,11 +362,6 @@ class RoseOptionParser(OptionParser):
                        ["--prefix-delim"],
                        {"metavar": "DELIMITER",
                         "help": "Specify the prefix delimiter."}],
-               "pretty": [
-                       ["--pretty", "-p"],
-                       {"action": "store_true",
-                        "default": False,
-                        "help": "Switch on prettyprinting."}],
                "print_format": [
                        ["--print-format", "--format", "-f"],
                        {"metavar": "FORMAT",
