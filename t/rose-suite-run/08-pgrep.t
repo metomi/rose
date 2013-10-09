@@ -21,44 +21,62 @@
 # so will rely on pgrep to detect whether it is still running or not.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+set -eu
 #-------------------------------------------------------------------------------
-tests 4
+N_TESTS=4
+tests $N_TESTS
+#-------------------------------------------------------------------------------
+HOST=
+OPT_HOST=
+if [[ $TEST_KEY_BASE == *conf ]]; then
+    HOST_GROUP=$(rose config --default= 'rose-suite-run' 'hosts')
+    if [[ -z $HOST_GROUP ]]; then
+        skip $N_TESTS '[rose-suite-run]hosts not defined'
+        exit 0
+    fi
+    HOST=$(rose 'host-select' -q $HOST_GROUP)
+    OPT_HOST="--host=$HOST"
+fi
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/.cylc/ports
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-set -e
-rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
+rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME $OPT_HOST \
+    --no-gcontrol
 TIME_OUT=$(($(date +%s) + 120))
-while ! grep -q 'CYLC_JOB_EXIT=' "$SUITE_RUN_DIR/log/job/my_task_1.1.1.status" \
-    2>/dev/null
-do
+GREP="grep -q CYLC_JOB_EXIT= ~/cylc-run/$NAME/log/job/my_task_1.1.1.status"
+if [[ -n $HOST ]]; then
+    CMD_PREFIX="ssh -oBatchMode=yes $HOST"
+else
+    CMD_PREFIX=eval
+fi
+while ! $CMD_PREFIX "$GREP" 2>/dev/null; do
     if (($(date +%s) > $TIME_OUT)); then
         break
     fi
     sleep 1
 done
-mv $HOME/.cylc/ports/$NAME $NAME.port
+$CMD_PREFIX "mv ~/.cylc/ports/$NAME $NAME.port"
+ERR_HOST=${HOST:-localhost}
 run_fail "$TEST_KEY" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol
+    $OPT_HOST --no-gcontrol
 file_grep "$TEST_KEY.err" \
-    '\[FAIL\] '$NAME': is still running (detected localhost:process=' \
+    '\[FAIL\] '$NAME': is still running (detected '$ERR_HOST':process=' \
     "$TEST_KEY.err"
 run_pass "$TEST_KEY.NAME1" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=${NAME}1 \
-    --no-gcontrol
-run_pass "$TEST_KEY.SHORTNAME".\
+    $OPT_HOST --no-gcontrol
+run_pass "$TEST_KEY.SHORTNAME" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=${NAME%?} \
-    --no-gcontrol
-mv $NAME.port $HOME/.cylc/ports/$NAME
+    $OPT_HOST --no-gcontrol
+$CMD_PREFIX "mv $NAME.port ~/.cylc/ports/$NAME"
 #-------------------------------------------------------------------------------
-cylc shutdown --timeout=120 --kill --wait $NAME 1>/dev/null 2>&1
+cylc shutdown $OPT_HOST --timeout=120 --kill --wait $NAME 1>/dev/null 2>&1
 rose suite-clean --debug -q -y $NAME
-cylc shutdown --timeout=120 --kill --wait ${NAME}1 1>/dev/null 2>&1
+cylc shutdown $OPT_HOST --timeout=120 --kill --wait ${NAME}1 1>/dev/null 2>&1
 rose suite-clean --debug -q -y ${NAME}1
-cylc shutdown --timeout=120 --kill --wait ${NAME%?} 1>/dev/null 2>&1
+cylc shutdown $OPT_HOST --timeout=120 --kill --wait ${NAME%?} 1>/dev/null 2>&1
 rose suite-clean --debug -q -y ${NAME%?}1
 exit 0
