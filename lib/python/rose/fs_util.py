@@ -40,6 +40,9 @@ class FileSystemEvent(Event):
 
     def __init__(self, action, target, source=None):
         self.action = action
+        # FIXME: We need to sort out the verbosity for file system events
+        if self.action == self.COPY:
+            self.level = Event.V
         self.target = target
         self.source = source
         Event.__init__(self, action, target, source)
