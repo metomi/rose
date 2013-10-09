@@ -40,7 +40,7 @@ class ConfigDumpEvent(Event):
 def main():
     """Implement the "rose config-dump" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("conf_dir", "files", "no_pretty")
+    opt_parser.add_my_options("conf_dir", "files", "no_pretty_mode")
     opts, args = opt_parser.parse_args()
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
@@ -58,7 +58,7 @@ def main():
     for file_name in file_names:
         t = NamedTemporaryFile()
         node = ConfigLoader()(file_name)
-        if not opts.no_pretty:
+        if not opts.no_pretty_mode:
             pretty_format_config(node)
         ConfigDumper()(node, t)
         t.seek(0)
