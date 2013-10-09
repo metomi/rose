@@ -22,7 +22,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 2
+tests 3
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
@@ -47,8 +47,13 @@ run_fail "$TEST_KEY" \
 file_grep "$TEST_KEY.err" \
     '\[FAIL\] '$NAME': is still running (detected localhost:process=' \
     "$TEST_KEY.err"
+run_pass "$TEST_KEY.NAME1" \
+    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=${NAME}1 \
+    --no-gcontrol
 mv $NAME.port $HOME/.cylc/ports/$NAME
 #-------------------------------------------------------------------------------
 cylc shutdown --timeout=120 --kill --wait $NAME 1>/dev/null 2>&1
 rose suite-clean --debug -q -y $NAME
+cylc shutdown --timeout=120 --kill --wait ${NAME}1 1>/dev/null 2>&1
+rose suite-clean --debug -q -y ${NAME}1
 exit 0
