@@ -289,15 +289,16 @@ rose suite-run -C $TMPDIR/simplesuite   # Run the suite!
       <p>As we saw before, the suite will run and shutdown when all tasks are
       successful - in this case, the only task is <samp>hello_world</samp>.</p>
 
-      <p>The output will be in our <samp>cylc-run</samp> directory, accessible
-      via <samp>rose suite-log --name=simplesuite</samp>.</p>
+      <p>The suite output will be in our <samp>cylc-run</samp> directory, which
+      you can also access by running <samp>rose suite-log
+      --name=simplesuite</samp>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Hello World Rose Suite</h3>
 
-      <p>Tasks like our <samp>hello_world</samp> task above are generic - they
-      can be Rose applications, or commands or executables as above.</p>
+      <p>Tasks such as our <samp>hello_world</samp> task above are generic -
+      they can be Rose applications, or commands or executables as above.</p>
 
       <p>If we wanted to invoke a Rose application, we'd make an app called
       <samp>hello_world</samp>, by making an <samp>app/hello_world/</samp>
