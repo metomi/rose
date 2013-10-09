@@ -20,10 +20,10 @@
 # Test "rose suite-hook --shutdown", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-export ROSE_CONF_IGNORE=true
+export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 3
+tests 2
 #-------------------------------------------------------------------------------
 # Run the suite.
 TEST_KEY=$TEST_KEY_BASE
@@ -35,8 +35,7 @@ run_pass "$TEST_KEY" \
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete, test shutdown on fail
 TEST_KEY=$TEST_KEY_BASE-suite-hook-shutdown
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
+TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -44,10 +43,8 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

@@ -38,8 +38,9 @@ INFO_CONFIG_NAME = "rose-suite.info"
 TOP_CONFIG_NAME = "rose-suite.conf"
 META_DEFAULT_VN_DIR = "HEAD"
 
+# Optional configurations - not applicable to rose.conf optional configs.
 GLOB_OPT_CONFIG_FILE = "rose-*-*.conf"
-RE_OPT_CONFIG_FILE = "rose-.*-(.+).conf$"
+RE_OPT_CONFIG_FILE = "rose-.*?-(.+).conf$"
 
 
 # Configuration specification names
@@ -86,7 +87,7 @@ META_PROP_VALUE_FALSE = "false"  # Not actually used.
 # "meta" and "file" are for internal use.
 TYPE_VALUES = ["boolean", "character", "integer",
                "logical", "quoted", "raw", "real",
-               "meta", "file"]
+               "meta", "file", "python_list"]
  
 # Preferred Fortran logical and environment boolean syntax
 TYPE_BOOLEAN_VALUE_FALSE = "false"

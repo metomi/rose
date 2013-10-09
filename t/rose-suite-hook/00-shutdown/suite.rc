@@ -8,6 +8,7 @@
     [[dependencies]]
         graph = """
 my_task_1
+my_task_2
 """
 
 [runtime]
@@ -22,3 +23,5 @@ my_task_1
            execution timeout  = 1
     [[my_task_1]]
         command scripting = "false"
+    [[my_task_2]]
+        command scripting = "sleep 600"

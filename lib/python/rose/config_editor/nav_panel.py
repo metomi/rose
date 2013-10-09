@@ -96,7 +96,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self.name_iter_map = {}
         self.add(self.tree)
         self.load_tree(None, namespace_tree)
-        self.tree.connect('button_press_event',
+        self.tree.connect('button-press-event',
                           self.handle_activation)
         self._last_tree_activation_path = None
         self.tree.connect('row_activated',
@@ -356,13 +356,16 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             path = self.filter_model.convert_child_path_to_path(path)
         except TypeError:
             path = None
-        if path is not None:
+        if path is None:
+            dest_path = (0,)
+        else:
             i = 1
             while self.tree.row_expanded(path[:i]) and i <= len(path):
                 i += 1
-            self.tree.set_cursor(path[:i])
-        if path is None:
-            self.tree.set_cursor((0,))
+            dest_path = path[:i]
+        cursor_path, cursor_column = self.tree.get_cursor()
+        if cursor_path != dest_path:
+            self.tree.set_cursor(dest_path)
 
     def get_path_from_names(self, row_names, unfiltered=False):
         """Return a row path corresponding to the list of branch names."""
@@ -402,10 +405,14 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 my_iter = tree_model.iter_next(my_iter)
         return None
 
-    def get_change_error_totals(self):
-        """Return the changed and error totals for the root nodes."""
+    def get_change_error_totals(self, config_name=None):
+        """Return the number of changes and total errors for the root nodes."""
         tree_model = self.data_store
-        iter_ = self.data_store.get_iter_first()
+        if config_name:
+            path = self.get_path_from_names([config_name], unfiltered=True)
+            iter_ = self.data_store.get_iter(path)
+        else:
+            iter_ = self.data_store.get_iter_first()
         changes = 0
         errors = 0
         while iter_ is not None:
@@ -415,7 +422,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 changes += iter_changes
             if iter_errors is not None:
                 errors += iter_errors
-            iter_ = self.data_store.iter_next(iter_)
+            if config_name:
+                break
+            else:
+                iter_ = self.data_store.iter_next(iter_)
         return changes, errors
 
     def handle_activation(self, treeview=None, event=None, somewidget=None):

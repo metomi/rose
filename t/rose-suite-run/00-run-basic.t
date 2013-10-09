@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-N_TESTS=12
+N_TESTS=11
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
@@ -32,7 +32,7 @@ if [[ $TEST_KEY_BASE == *conf ]]; then
         exit 0
     fi
 else
-    export ROSE_CONF_IGNORE=true
+    export ROSE_CONF_PATH=
 fi
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
@@ -48,9 +48,9 @@ for OPTION in -i -l '' --restart; do
     TEST_KEY=$TEST_KEY_BASE-running$OPTION
     run_fail "$TEST_KEY" rose suite-run $OPTION \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-    file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is already running on $HOST
-__ERR__
+    file_grep "$TEST_KEY.err" \
+        "\\[FAIL\\] $NAME: is already running (detected .*~/\\.cylc/ports/$NAME)" \
+        "$TEST_KEY.err"
 done
 TEST_KEY=$TEST_KEY_BASE-running-reload
 run_pass "$TEST_KEY" rose suite-run --reload \
@@ -60,7 +60,6 @@ run_pass "$TEST_KEY" rose suite-run --reload \
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
 touch $SUITE_RUN_DIR/flag # allow the task to die
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -68,11 +67,8 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-clean
-run_pass "$TEST_KEY" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

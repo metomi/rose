@@ -76,10 +76,14 @@ class FileSystemUtil(object):
         """Delete a file or a directory."""
 
         if os.path.islink(path) or os.path.isfile(path):
-            ret = os.unlink(path)
+            os.unlink(path)
             self.handle_event(FileSystemEvent(FileSystemEvent.DELETE, path))
         elif os.path.isdir(path):
-            ret = shutil.rmtree(path, ignore_errors=True)
+            # Ignore errors, so that broken symlinks are ignored
+            shutil.rmtree(path, ignore_errors=True)
+            # Try again w/o ignore_errors, if required
+            if os.path.isdir(path):
+                shutil.rmtree(path)
             event = FileSystemEvent(FileSystemEvent.DELETE, path + "/")
             self.handle_event(event)
 
@@ -99,8 +103,7 @@ class FileSystemUtil(object):
 
     def install(self, path):
         """Create an empty file in path."""
-        if os.path.exists(path):
-            self.delete(path)
+        self.delete(path)
         open(path, "wb").close()
         event = FileSystemEvent(FileSystemEvent.INSTALL, path)
         self.handle_event(event)

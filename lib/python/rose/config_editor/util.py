@@ -36,6 +36,7 @@ pygtk.require("2.0")
 import gtk
 
 import rose
+import rose.gtk.dialog
 import rose.gtk.util
 
 
@@ -177,7 +178,6 @@ def launch_node_info_dialog(node, changes, search_function):
         att_list.append([key, value])
     delim = rose.config_editor.DIALOG_NODE_INFO_DELIMITER
     name = rose.config_editor.DIALOG_NODE_INFO_ATTRIBUTE
-    sub_name = rose.config_editor.DIALOG_NODE_INFO_SUB_ATTRIBUTE
     maxlen = rose.config_editor.DIALOG_NODE_INFO_MAX_LEN
     for i, (att_name, att_val) in enumerate(att_list):
         if (att_name == 'metadata' or att_name.startswith("_") or
@@ -189,21 +189,11 @@ def launch_node_info_dialog(node, changes, search_function):
         indent0 = len(prefix)
         text += prefix
         lenval = maxlen - indent0
-        if isinstance(att_val, dict) and att_val:
-            for key, val in att_val.items():
-                text += "\n" + " " * indent0
-                sub_prefix = sub_name.format(safe_str(key)) + delim
-                sub_ind0 = indent0 + len(sub_prefix)
-                sub_lenval = lenval - len(sub_prefix)
-                text += sub_prefix + wrap_string(val, sub_lenval, sub_ind0)
-        elif isinstance(att_val, list) and att_val:
-            val = ",".join(att_val)
-            text += wrap_string(val, lenval, indent0)
-        elif att_val != {} and att_val != []:
-            text += wrap_string(att_val, lenval, indent0)
+        text += _pretty_format_data(att_val, global_indent=indent0,
+                                    width=lenval)
         text += "\n"
-    rose.gtk.util.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO, text, title,
-                                       search_function)
+    rose.gtk.dialog.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO, text, title,
+                                         search_function)
 
 
 def launch_error_dialog(exception=None, text=""):
@@ -212,8 +202,35 @@ def launch_error_dialog(exception=None, text=""):
         text += "\n"
     if exception is not None:
         text += type(exception).__name__ + ": " + str(exception)
-    rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                             text, rose.config_editor.DIALOG_TITLE_ERROR)
+    rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                               text, rose.config_editor.DIALOG_TITLE_ERROR,
+                               modal=False)
+
+
+def text_for_character_widget(text):
+    """Strip an enclosing single quote pair from a piece of text."""
+    if text.startswith("'") and text.endswith("'"):
+        text = text[1:-1]
+    text = text.replace("''", "'")
+    return text
+
+
+def text_from_character_widget(text):
+    """Surround text with single quotes; escape existing ones."""
+    return "'" + text.replace("'", "''") + "'"
+
+
+def text_for_quoted_widget(text):
+    """Strip an enclosing double quote pair from a piece of text."""
+    if text.startswith('"') and text.endswith('"'):
+        text = text[1:-1]
+    text = text.replace('\\"', '"')
+    return text
+
+
+def text_from_quoted_widget(text):
+    """Surround text with double quotes; escape existing ones."""
+    return '"' + text.replace('"', '\\"') + '"'
 
 
 def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
@@ -230,4 +247,27 @@ def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
     if len(lines) > maxlines:
         lines = lines[:4] + ["..."]
     return "\n".join(lines)
-    
+
+
+def _pretty_format_data(data, global_indent=0, indent=4, width=60):
+    sub_name = rose.config_editor.DIALOG_NODE_INFO_SUB_ATTRIBUTE
+    safe_str = rose.gtk.util.safe_str
+    delim = rose.config_editor.DIALOG_NODE_INFO_DELIMITER
+    if isinstance(data, dict) and data:
+        text = ""
+        for key, val in data.items():
+            text += "\n" + " " * global_indent
+            sub_prefix = sub_name.format(safe_str(key)) + delim
+            sub_ind0 = global_indent + len(sub_prefix)
+            sub_lenval = width - len(sub_prefix)
+            indent_next = global_indent + indent
+            str_val = _pretty_format_data(val,
+                                          global_indent=indent_next)
+            text += sub_prefix + str_val
+        return text
+    if isinstance(data, list) and data:
+        text = ",".join([_pretty_format_data(v) for v in data])
+        return wrap_string(text, width, global_indent)
+    if data != {} and data != []:
+        return wrap_string(str(data), width, global_indent)
+    return ""

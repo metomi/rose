@@ -30,6 +30,7 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 import sys
 from time import localtime, sleep, strftime, time
+import traceback
 from uuid import uuid4
 
 
@@ -38,13 +39,20 @@ class ConfigValueError(Exception):
     """An exception raised when a config value is incorrect."""
 
     SYNTAX = "syntax"
+    ERROR_FORMAT = "%s=%s: configuration value error: %s"
 
     def __str__(self):
         keys, value, e = self.args
+        keys = list(keys)
         key = keys.pop()
         if keys:
             key = "[" + "][".join(keys) + "]" + key
-        return "%s=%s: configuration value error: %s" % (key, value, str(e))
+        return self.ERROR_FORMAT % (key, value, str(e))
+
+
+class CompulsoryConfigValueError(ConfigValueError):
+
+    ERROR_FORMAT = "%s=%s: missing configuration error: %s"
 
 
 class NewModeError(Exception):
@@ -66,6 +74,14 @@ class PollTimeoutError(Exception):
             items_str += "\n* " + item
         return "%s poll timeout after %ds:%s" % (
                 strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), dt, items_str)
+
+
+class UnknownBuiltinAppError(Exception):
+
+    """An exception raised on attempt to run an unknown builtin application."""
+
+    def __str__(self):
+        return "%s: no such built-in application" % self.args
 
 
 class CommandNotDefinedEvent(Event):
@@ -157,6 +173,8 @@ class AppRunner(Runner):
             return self._command(config, opts, args, uuid, work_files)
         else:
             builtin_app = self.builtins_manager.get_handler(app_mode)
+            if builtin_app is None:
+                raise UnknownBuiltinAppError(app_mode)
             return builtin_app.run(self, config, opts, args, uuid, work_files)
 
     def _poll(self, config, opts, args, uuid, work_files):
@@ -194,7 +212,8 @@ class AppRunner(Runner):
             # m: minutes
             # h: hours
             # N*: repeat the value N times
-            poll_delays_value = config.get_value(["poll", "delays"]).strip()
+            poll_delays_value = config.get_value(
+                ["poll", "delays"], default="").strip()
             units = {"h": 3600, "m": 60, "s": 1}
             if poll_delays_value:
                 for item in poll_delays_value.split(","):

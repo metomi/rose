@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #------------------------------------------------------------------------------
 """Select an available host machine by load or by random."""
 
-from random import random
+from random import choice, random
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
@@ -55,17 +55,24 @@ class DeadHostEvent(Event):
         return self.args[0] + ": (ssh failed)"
 
 
-class HostExceedThresholdEvent(Event):
+class HostThresholdNotMetEvent(Event):
 
-    """An error raised when a host exceeds a threshold."""
+    """An error raised when a host does not meet a threshold."""
 
     KIND = Event.KIND_ERR
-    FMT = "%(host)s: %(score)s > threshold %(method)s:%(method_arg)s:%(value)s"
+    FMT = ("%(host)s: %(method)s:%(method_arg)s threshold not met: " +
+           "%(score)s %(scorer_op)s %(value)s")
 
     def __str__(self):
-        host, threshold_conf, score = self.args
-        fmt_map = {"host": host, "score": score}
+        host, threshold_conf, scorer_sign, score = self.args
+        scorer_op = ">"
+        if scorer_sign < 0:
+            scorer_op = "<"
+        fmt_map = {"host": host, "score": score, "scorer_op": scorer_op}
         fmt_map.update(threshold_conf)
+        for k, v in fmt_map.items():
+            if v == None:
+                fmt_map[k] = ""
         return self.FMT % fmt_map
 
 
@@ -109,6 +116,7 @@ class HostSelector(object):
     RANK_METHOD_LOAD = "load"
     RANK_METHOD_FS = "fs"
     RANK_METHOD_RANDOM = "random"
+    RANK_METHOD_MEM = "mem"
     RANK_METHOD_DEFAULT = RANK_METHOD_LOAD
     TIMEOUT_DELAY = 1.0
 
@@ -183,7 +191,6 @@ class HostSelector(object):
                         thresholds_set.add(())
                     else:
                         thresholds_set.add(tuple(sorted(shlex.split(t))))
-                    
 
         # If default rank method differs in hosts, use load:15.
         if rank_method is None:
@@ -208,8 +215,9 @@ class HostSelector(object):
                      The "load" methods determines the load using the average
                      load as returned by the "uptime" command divided by the
                      number of CPUs. The "fs" method determines the load using
-                     the usage in the file system specified by FS. The
-                     "random" method ranks everything by random.
+                     the usage in the file system specified by FS. The "mem"
+                     method ranks by highest free memory. The "random" method
+                     ranks everything by random.
 
         thresholds: a list of thresholds which each host must not exceed.
                     Should be in the format rank_method:value, where rank_method
@@ -296,9 +304,12 @@ class HostSelector(object):
                         scorer = threshold_conf["scorer"]
                         method_arg = threshold_conf["method_arg"]
                         score = scorer.command_out_parser(out, method_arg)
-                        if score > float(threshold_conf["value"]):
-                            self.handle_event(HostExceedThresholdEvent(
-                                    host_name, threshold_conf, score))
+                        threshold_value = float(threshold_conf["value"])
+                        reverse = scorer.SIGN
+                        if scorer.SIGN * cmp(score, threshold_value) > 0:
+                            self.handle_event(HostThresholdNotMetEvent(
+                                    host_name, threshold_conf, scorer.SIGN,
+                                    score))
                             break
                     else:
                         scorer = rank_conf["scorer"]
@@ -317,10 +328,13 @@ class HostSelector(object):
                         sleep(timeout - dt)
         for host_name in sorted(host_proc_dict.keys()):
             self.handle_event(TimedOutHostEvent(host_name))
-            
+
         if not host_score_list:
             raise NoHostSelectError()
-        host_score_list.sort(lambda a, b: cmp(a[1], b[1]))
+        scorer = rank_conf["scorer"]
+        host_score_list.sort(
+                    lambda a, b: cmp(a[1], b[1]),
+                    reverse=scorer.SIGN < 0)
         return host_score_list
 
     __call__ = select
@@ -329,15 +343,16 @@ class HostSelector(object):
 class RandomScorerConf(object):
 
     """Base class for ranking configuration.
-    
+
     Score host by random.
- 
+
     """
 
     ARG = None
     KEY = "random"
     CMD = "true\n"
     CMD_IS_FORMAT = False
+    SIGN = 1 # Positive
 
     def get_command(self, method_arg=None):
         """Return a shell command to get the info for scoring a host."""
@@ -349,7 +364,7 @@ class RandomScorerConf(object):
 
     def command_out_parser(self, out, method_arg=None):
         """Parse command output to return a numeric score.
-        
+
         Sub-class should override this to parse "out", the standard output
         returned by the command run on the remote host. Otherwise, this method
         returns a random number.
@@ -384,6 +399,24 @@ class LoadScorerConf(RandomScorerConf):
         return float(load) / float(nprocs)
 
 
+class MemoryScorerConf(RandomScorerConf):
+
+    """Score host by amount of free memory"""
+
+    KEY = "mem"
+    CMD = """echo mem=$(free -m | sed '3!d; s/^.* //')\n"""
+    SIGN = -1 # Negative
+
+    def command_out_parser(self, out, method_arg=None):
+        if method_arg is None:
+            method_arg = self.ARG
+        mem = None
+        for line in out.splitlines():
+            if line.startswith("mem="):
+                mem = line.split("=", 1)[1]
+        return float(mem)
+
+
 class FileSystemScorerConf(RandomScorerConf):
 
     """Score host by average file system percentage usage."""
@@ -404,7 +437,7 @@ class FileSystemScorerConf(RandomScorerConf):
 def main():
     """Implement the "rose host-select" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("rank_method", "thresholds")
+    opt_parser.add_my_options("choice", "rank_method", "thresholds")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     popen = RosePopener(event_handler=report)
@@ -423,7 +456,8 @@ def main():
         except Exception as e:
             report(e)
             sys.exit(1)
-    report(host_score_list[0][0] + "\n", level=0)
+    opts.choice = int(opts.choice)
+    report(choice(host_score_list[0:opts.choice])[0] + "\n", level=0)
 
 
 if __name__ == "__main__":

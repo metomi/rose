@@ -28,8 +28,7 @@ import gtk
 
 import rose.config
 import rose.config_editor.util
-import rose.gtk.util
-
+import rose.gtk.dialog
 
 
 class NavPanelHandler(object):
@@ -112,8 +111,8 @@ class NavPanelHandler(object):
         if not any([v.is_top_level for v in self.data.config.values()]):
             text = rose.config_editor.WARNING_APP_CONFIG_CREATE
             title = rose.config_editor.WARNING_APP_CONFIG_CREATE_TITLE
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR, 
-                                     text, title)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text, title)
             return False
         # Need an application configuration to be created.
         root = os.path.join(self.data.top_level_directory,
@@ -180,7 +179,7 @@ class NavPanelHandler(object):
         if not sections:
             return False
         if len(sections) > 1:
-            section = rose.gtk.util.run_choices_dialog(
+            section = rose.gtk.dialog.run_choices_dialog(
                           rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_EDIT,
                           sections,
                           rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
@@ -192,7 +191,7 @@ class NavPanelHandler(object):
         text = "\n".join(config_data.sections.now[section].comments)
         finish = lambda t: self.sect_ops.set_section_comments(
                                      config_name, section,t.splitlines())
-        rose.gtk.util.run_edit_dialog(text, finish_hook=finish, title=title)
+        rose.gtk.dialog.run_edit_dialog(text, finish_hook=finish, title=title)
 
     def fix_request(self, base_ns):
         """Handle a request to auto-fix a configuration."""
@@ -200,7 +199,7 @@ class NavPanelHandler(object):
             return False
         base_ns = "/" + base_ns.lstrip("/")
         config_name, subsp = self.util.split_full_ns(self.data, base_ns)
-        self._transform_default_func(only_this_config_name=config_name)
+        self._transform_default_func(only_this_config=config_name)
 
     def get_ns_metadata_and_comments(self, namespace):
         """Return metadata dict and comments list."""
@@ -427,7 +426,7 @@ class NavPanelHandler(object):
                 search_function = lambda i: self.search_request(namespace, i)
                 help_item.connect(
                           "activate",
-                          lambda b: rose.gtk.util.run_hyperlink_dialog(
+                          lambda b: rose.gtk.dialog.run_hyperlink_dialog(
                                          gtk.STOCK_DIALOG_INFO,
                                          help, help_title,
                                          search_function))

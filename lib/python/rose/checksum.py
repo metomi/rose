@@ -25,9 +25,14 @@ from hashlib import md5
 import os
 
 
-def get_checksum(name):
+def get_checksum(name, checksum_func=None):
     """
-    Calculate the MD5 checksum of content in a file or directory called "name".
+    Calculate "checksum" of content in a file or directory called "name".
+
+    By default, the "checksum" is MD5 checksum. This can modified by "impl",
+    which should be a function with the interface:
+
+        checksum_str = checksum_func(source_str)
 
     Return a list of 2-element tuples. Each tuple represents a path in "name"
     and the checksum of that path. If the path is a directory, the checksum is
@@ -42,23 +47,44 @@ def get_checksum(name):
     if not os.path.exists(name):
         raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), name)
 
+    if checksum_func is None:
+        checksum_func = get_checksum_func()
+    name = os.path.normpath(name)
     path_and_checksum_list = []
     if os.path.isfile(name):
-        m = _load(name)
-        path_and_checksum_list.append(("", m.hexdigest()))
+        checksum = checksum_func(name, name)
+        path_and_checksum_list.append(("", checksum))
     else: # if os.path.isdir(path):
         path_and_checksum_list = []
         for dirpath, dirnames, filenames in os.walk(name):
             path = dirpath[len(name) + 1:]
             path_and_checksum_list.append((path, None))
             for filename in filenames:
-                m = _load(os.path.join(dirpath, filename))
                 filepath = os.path.join(path, filename)
-                path_and_checksum_list.append((filepath, m.hexdigest()))
+                checksum = checksum_func(os.path.join(name, filepath), name)
+                path_and_checksum_list.append((filepath, checksum))
     return path_and_checksum_list
 
-def _load(source):
-    """Load content of source into an md5 object, and return it."""
+
+def get_checksum_func(key=None):
+    """Return a checksum function suitable for get_checksum.
+    
+    If key=="md5" or not specified, return function to do MD5 checksum.
+    if key=="mtime+size", return function generate a string that contains the
+    source name, its modified time and its size.
+    Otherwise, raise KeyError(key).
+
+    """
+    if not key or key == "md5sum":
+        return _md5_hexdigest
+    elif key == "mtime+size":
+        return _mtime_and_size
+    else:
+        raise KeyError(key)
+
+
+def _md5_hexdigest(source, root):
+    """Load content of source into an md5 object, and return its hexdigest."""
     m = md5()
     s = open(source)
     f_bsize = os.statvfs(source).f_bsize
@@ -68,4 +94,12 @@ def _load(source):
             break
         m.update(bytes)
     s.close()
-    return m
+    return m.hexdigest()
+
+
+def _mtime_and_size(source, root):
+    """Return a string containing the name, its modified time and its size."""
+    stat = os.stat(os.path.realpath(source))
+    return os.pathsep.join(["source=" + os.path.relpath(source, root),
+                            "mtime=" + str(stat.st_mtime),
+                            "size=" + str(stat.st_size)])

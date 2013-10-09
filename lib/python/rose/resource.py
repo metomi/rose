@@ -55,10 +55,7 @@ class ResourceLocator(object):
             h = self.get_util_home()
             n = self.get_util_name("-")
             self.paths = [os.path.join(h, "etc", n), os.path.join(h, "etc")]
-        if os.getenv("ROSE_CONF_IGNORE") in ["true"]:
-            self.conf = ConfigNode()
-        else:
-            self.conf = None
+        self.conf = None
 
     def get_conf(self):
         """Return the site/user configuration root node."""
@@ -66,7 +63,11 @@ class ResourceLocator(object):
             paths = [os.path.join(self.get_util_home(), "etc"),
                      os.path.join(os.path.expanduser("~"), ".metomi")]
             if "ROSE_CONF_PATH" in os.environ:
-                paths += os.getenv("ROSE_CONF_PATH", "").split(os.pathsep)
+                paths_str = os.getenv("ROSE_CONF_PATH").strip()
+                if paths_str:
+                    paths = paths_str.split(os.pathsep)
+                else:
+                    paths = []
             self.conf = ConfigNode()
             config_loader = ConfigLoader()
             for path in paths:
@@ -128,7 +129,7 @@ class ResourceLocator(object):
         """Return ROSE_VERSION."""
         version = os.getenv("ROSE_VERSION")
         if version is None:
-            for line in open(get_util_home("doc", "rose-version.js")):
+            for line in open(self.get_util_home("doc", "rose-version.js")):
                 if line.startswith("ROSE_VERSION="):
                     value = line.replace("ROSE_VERSION=", "")
                     version = value.strip(string.whitespace + "\";")

@@ -71,19 +71,21 @@ setup
 init_meta <<__META_CONFIG__
 [namelist:nl1]
 duplicate = true
+
+[namelist:nl2]
+
+[namelist:nl3=foo]
 __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 4
+[V] rose.macros.DefaultValidators: issues: 3
     namelist:nl1=None=None
         incorrect "duplicate=true" metadata
     namelist:nl2(1)=None=None
         namelist:nl2 requires "duplicate=true" metadata
     namelist:nl3{modifier}=None=None
         namelist:nl3 requires "duplicate=true" metadata
-    namelist:nl4{modifier}(1)=None=None
-        namelist:nl4{modifier} requires "duplicate=true" metadata
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------

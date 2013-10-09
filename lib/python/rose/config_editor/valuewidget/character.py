@@ -25,6 +25,7 @@ pygtk.require('2.0')
 import gtk
 
 import rose.config_editor
+import rose.config_editor.util
 
 
 class QuotedTextValueWidget(gtk.HBox):
@@ -40,14 +41,18 @@ class QuotedTextValueWidget(gtk.HBox):
         checker = rose.macros.value.ValueChecker()
         if self.type == "character":
             self.type_checker = checker.check_character
-            self.format_text_in = text_for_character_widget
-            self.format_text_out = text_from_character_widget
+            self.format_text_in = (
+                        rose.config_editor.util.text_for_character_widget)
+            self.format_text_out = (
+                        rose.config_editor.util.text_from_character_widget)
             self.quote_char = "'"
             self.esc_quote_chars = "''"
         elif self.type == "quoted":
             self.type_checker = checker.check_quoted
-            self.format_text_in = text_for_quoted_widget
-            self.format_text_out = text_from_quoted_widget
+            self.format_text_in = (
+                        rose.config_editor.util.text_for_quoted_widget)
+            self.format_text_out = (
+                        rose.config_editor.util.text_from_quoted_widget)
             self.quote_char = '"'
             self.esc_quote_chars = '\\"'
         self.value = value
@@ -60,7 +65,13 @@ class QuotedTextValueWidget(gtk.HBox):
                              insensitive_colour)
         self.in_error = not self.type_checker(self.value)
         self.set_entry_text()
-        self.entry.connect_after("changed", self.setter)
+        self.entry.connect("button-release-event",
+                           self._handle_middle_click_paste)
+        self.entry.connect_after("paste-clipboard", self.setter)
+        self.entry.connect_after("key-release-event",
+                                 lambda e, v: self.setter(e))
+        self.entry.connect_after("button-release-event",
+                                 lambda e, v: self.setter(e))
         self.entry.show()
         self.pack_start(self.entry, expand=True, fill=True,
                         padding=0)
@@ -128,21 +139,7 @@ class QuotedTextValueWidget(gtk.HBox):
         self.set_entry_text()
         self.entry.set_position(position)
 
-
-def text_for_character_widget(text):
-    if text.startswith("'") and text.endswith("'"):
-        text = text[1:-1]
-    text = text.replace("''", "'")
-    return text
-
-def text_from_character_widget(text):
-    return "'" + text.replace("'", "''") + "'"
-
-def text_for_quoted_widget(text):
-    if text.startswith('"') and text.endswith('"'):
-        text = text[1:-1]
-    text = text.replace('\\"', '"')
-    return text
-
-def text_from_quoted_widget(text):
-    return '"' + text.replace('"', '\\"') + '"'
+    def _handle_middle_click_paste(self, widget, event):
+        if event.button == 2:
+            self.setter()
+        return False

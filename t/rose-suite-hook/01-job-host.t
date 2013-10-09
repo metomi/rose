@@ -24,15 +24,15 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 6
+tests 5
 KEY=${TEST_KEY_BASE#0?-}
 HOST=$(rose config 't' $KEY)
 if [[ -z $HOST ]]; then
-    skip 6 "[t]$KEY not defined"
+    skip 5 "[t]$KEY not defined"
     exit 0
 fi
 HOST=$(rose host-select $HOST)
-export ROSE_CONF_IGNORE=true
+export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 # Run the suite.
 TEST_KEY=$TEST_KEY_BASE
@@ -46,7 +46,6 @@ run_pass "$TEST_KEY" \
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-ok
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -54,7 +53,6 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
@@ -69,6 +67,5 @@ __CONTENT__
 cd $OLDPWD
 
 #-------------------------------------------------------------------------------
-run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

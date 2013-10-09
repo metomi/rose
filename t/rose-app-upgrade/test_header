@@ -29,6 +29,11 @@ function init() {
 function init_meta() {
     category=$1
     mkdir -p $TEST_DIR/rose-meta/$category/
+    shift
+    for version; do
+        mkdir -p $TEST_DIR/rose-meta/$category/$version/
+        touch $TEST_DIR/rose-meta/$category/$version/rose-meta.conf
+    done
 }
 
 function init_macro() {

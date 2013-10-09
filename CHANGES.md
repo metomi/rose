@@ -5,11 +5,207 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (End of 2013-06)
+## 2013-09 (2013-09-26)
 
-This release of Rose will work with cylc 5.3.0.
+This release of Rose works with cylc 5.3.0 or above.
 
-### Highlight Changes
+### Highlighted Changes
+
+Changes that have significant impact on user experience.
+
+-None-
+
+### Noteworthy Changes
+
+Bug fixes, minor enhancements and documentation improvements:
+
+\#938: rosie go: improve filter removal.
+
+\#937: rose macro: diagnostic is now more similar to other Rose CLI commands.
+
+\#936: rosie go: default operator for query.
+
+\#933: rosa svn-pre-commit: document super users functionality in
+configuration example.
+
+\#932: rose config-dump --pretty: new option to tell command to apply format
+specific pretty printing.
+
+\#931: rose config-edit, rose-macro: reduce reporting of duplicated errors.
+
+\#927: rose app-run: fix default `[poll]delays=0`.
+
+\#926: rose mpi-launch: fix unbound `ROSE_LAUNCHER_BASE` on usage with a null
+configuration.
+
+\#925: rose_arch: fix incorrect behaviour if a source is a directory.
+
+\#921: rose host-select: new `--choice=N` option to choose a top from any of
+the top `N` hosts.
+
+\#919, \#917, \#897, \#896, \#894: rose_arch: improve diagnostics.
+
+\#915: rose suite-clean, rose suite-gcontrol, rose suite-stop: improve support
+for determining the names of `rose-stem` suites.
+
+\#913: rose suite-run: use `pgrep` to check if suite is running or not.
+
+\#912: rose.popen: ensure that an `OSError` has the command name. This improves
+diagnostics on command-not-found errors.
+
+\#911: rosa svn-post-commit: modify for Subversion 1.8.
+
+\#908: rose app-run: improve diagnostics for reference to ignored namelists.
+
+\#902: rose suite-log: fix `--archive '*'`.
+
+\#901: rose config-edit and rosie go: improve invalid colour diagnostics.
+
+\#900: rose config-edit: fix modal metadata dialog.
+
+\#891: rose suite-run: fix repeated jinja2 insertion when `rose suite-run` is
+invoked from the installed suite directory.
+
+\#889: rose config: improve syntax error diagnostics.
+
+\#888: rose-app.conf, rose-suite.conf: A `SOURCE` in the `source=SOURCE ...`
+declaration in a `[file:NAME]` section can now be a glob for matching files
+names in the file system.
+
+--------------------------------------------------------------------------------
+
+## 2013-08 (2013-08-30)
+
+This release of Rose works with cylc 5.3.0 or above.
+
+### Highlighted Changes
+
+Changes that have significant impact on user experience.
+
+None in this release.
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+\#883: rose_arch: new built-in application: a generic solution to configure
+site-specific archiving of suite files. (This built-in application should be
+considered experimental at this release.)
+
+\#878: rosie: fix invalid prefix and local suite error crash bugs
+
+\#868: rose config-edit: added check on save toolbar and menu item.
+
+\#864: rose config-edit: added support for application configuration upgrade.
+
+\#856: rose config-edit: improved reporting of results from macros.
+
+\#855: rose macro: added command line trigger state validation.
+
+\#851: rose app-run: rose_prune: modified to use the default shell to delete
+files at the suite host. This should allow more powerful glob matching than
+what is provided by the Python standard library.
+
+\#850: rose config-edit: add and document custom page for aligning variable 
+value elements.
+
+\#849: rose config-edit: added load all apps toolbar and menu item.
+
+\#847: rose suite-scan HOST: fixed.
+
+\#846: rose app-run, rose suite-run, rose task-run: fixed incorrect incremental
+mode behaviour. When `mode=symlink` is removed from a target, the target should
+be recreated, instead of being left to point to the old symbolic link.
+
+\#845: rose config-edit: support macro arguments.
+
+--------------------------------------------------------------------------------
+
+## 2013-07 (2013-07-31)
+
+This release of Rose works with cylc 5.3.0 or above.
+
+### Highlighted Changes
+
+Changes that have significant impact on user experience.
+
+\#823: rosie create FROM-ID: suite copy is now done in a single changeset.
+Previously, it was done in two changesets, one to create the suite, the other
+to copy items from `FROM-ID`. The previous way can become unfriendly in merging
+as Subversion adds `svn:mergeinfo` for each of the copied items from the
+original suite.
+
+Both `rosa svn-pre-commit` and `rosa svn-post-commit` have been modified to
+handle this change. This version of `rosie create FROM-ID` will fail if the
+`pre-commit` hook of the repository is still connected to the previous version
+of `rosa svn-pre-commit`. An old version of `rosa svn-post-commit` will not
+update the Rosie web service database correctly when this version of `rosie
+create FROM-ID` is used to copy a suite.
+
+\#799: rose date: now supports letter options for both `--*-format=FORMAT`
+options.
+* `--parse-format=FORMAT` can now be `-p FORMAT` (for `strptime`).
+* `--format=FORMAT` is now a shorthand for `--print-format=FORMAT`.
+  **It is no longer a shorthand for `--parse-format=FORMAT`.**
+* `--print-format=FORMAT` can now be `-f FORMAT` (for `strftime`).
+
+\#789: rose_prune: user interface refreshed. Functionalities now divided into 4
+settings:
+* `prune-remote-logs-at=cycle ...`
+* `archive-logs-at=cycle ...`
+* `prune-work-at=cycle[:globs] ...`
+* `prune-datac-at=cycle[:globs] ...`
+
+The 1st two functionalities call the underlying libraries of `rose
+suite-log` to re-sync the remote job logs, prune them from the remote
+hosts, (and archive the cycle job logs).
+
+The last two functionalities are to prune items in the work directories
+and the share cycle data directories. Globs can be specified for each
+cycle so that only matched items in the relevant directories are
+pruned.
+
+### Other Changes
+
+Lots of bug fixes and enhancements, and documentation improvements.
+The following are worth mentioning:
+
+\#840: rose config-edit: improved metadata display for the UM STASH plugin 
+widget.
+
+\#839: rose metadata: new 'python_list' type for use with interfaces that
+support Pythonic-format lists as input - e.g. Jinja2 via the rose-suite.conf
+file.
+
+\#829: rose host-select: add a new method to rank and set thresholds for hosts
+by the amount of free memory.
+
+\#827: rose suite-hook --shutdown: add `--kill --now` as options to `cylc
+shutdown`.
+
+\#824: rose macro: add support for macro arguments.
+
+\#815: rose metadata: len function now available for fail-if, warn-if, etc.
+
+\#811: rose config-edit: rule checker will now display message on the status
+bar if everything is OK.
+
+\#809: rose namelist-dump: allow and tidy zero-padded numeric inputs.
+
+\#808: rosie go: can now list the state of the suites in other user's
+`$HOME/roses/` directory.
+
+\#804: rosie ls: new `--user=NAME` option to list the state of the suites in
+other user's `$HOME/roses/` directory.
+
+--------------------------------------------------------------------------------
+
+## 2013-06 (2013-06-28)
+
+This release of Rose works with cylc 5.3.0.
+
+### Highlighted Changes
 
 Changes that have significant impact on user experience.
 
@@ -60,12 +256,18 @@ now be used in either command. Note, however, if `rose task-env` is used before
 command. This may some minor change in behaviour of some existing suites as
 `PATH` would be modified by `rose task-env`.
 
-\#661: rose metadata-check: new command to validate configuration metadata.
+\#661: rose metadata-check: new command to validate configuration metadata. 
+Integrated into rose config-edit start-up checking.
 
 ### Other Changes
 
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
+
+\#758: rosie go: home view now has `roses:/` displayed in the address bar for
+the home view.
+
+\#753: rose documentation: added advice for delivery of training courses.
 
 \#712: rose config-edit: can show variable descriptions and help in-page. 
 Descriptions are shown by default. Customisable formatting.
@@ -111,7 +313,7 @@ to specify a command file to use with the MPI launcher.
 
 This release of Rose works with cylc 5.2.0.
 
-### Highlight Changes
+### Highlighted Changes
 
 Changes that have significant impact on user experience.
 
@@ -169,7 +371,7 @@ User guide: added many new tutorials.
 
 This is the 3rd release of Rose.
 
-### Highlight Changes
+### Highlighted Changes
 
 Changes that have significant impact on user experience.
 
@@ -199,7 +401,7 @@ header.
 
 This is the 2nd release of Rose. We hope you find it useful.
 
-### Highlight Changes
+### Highlighted Changes
 
 Changes that have significant impact on user experience.
 

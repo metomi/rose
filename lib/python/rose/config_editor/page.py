@@ -35,6 +35,7 @@ import rose.config_editor.stack
 import rose.config_editor.util
 import rose.config_editor.variable
 import rose.formats
+import rose.gtk.dialog
 import rose.gtk.util
 import rose.variable
 
@@ -368,7 +369,7 @@ class ConfigPage(gtk.VBox):
     def launch_help(self, *args):
         """Launch the page help."""
         title = rose.config_editor.DIALOG_HELP_TITLE.format(self.label)
-        rose.gtk.util.run_hyperlink_dialog(
+        rose.gtk.dialog.run_hyperlink_dialog(
                                  gtk.STOCK_DIALOG_INFO,
                                  str(self.help),
                                  title)
@@ -587,7 +588,7 @@ class ConfigPage(gtk.VBox):
 
     def _launch_section_chooser(self, section_choices):
         """Choose a section to add a blank variable to."""
-        section = rose.gtk.util.run_choices_dialog(
+        section = rose.gtk.dialog.run_choices_dialog(
                        rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR,
                        section_choices,
                        rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
@@ -631,7 +632,7 @@ class ConfigPage(gtk.VBox):
     def generate_main_container(self, override_custom=False):
         """Choose a container to interface with variables in panel_data."""
         if self.custom_widget is not None and not override_custom:
-            widget_name_args = self.custom_sub_widget.split(None, 1)
+            widget_name_args = self.custom_widget.split(None, 1)
             if len(widget_name_args) > 1:
                 widget_path, widget_args = widget_name_args
             else:
@@ -647,11 +648,11 @@ class ConfigPage(gtk.VBox):
                                                        widget_path)
                 self.handle_bad_custom_main_widget(text)
             try:
-                self.main_container = self.custom_widget(self.panel_data,
-                                                         self.ghost_data,
-                                                         self.variable_ops,
-                                                         self.show_modes,
-                                                         arg_str=widget_args)
+                self.main_container = custom_widget(self.panel_data,
+                                                    self.ghost_data,
+                                                    self.variable_ops,
+                                                    self.show_modes,
+                                                    arg_str=widget_args)
             except Exception as e:
                 self.handle_bad_custom_main_widget(e)
             else:
@@ -1113,9 +1114,10 @@ class ConfigPage(gtk.VBox):
         button_list = []
         label_list = []
         # No content warning, if applicable.
-        if (self.section is None and
-            not self.ghost_data and
-            self.sub_data is None):
+        has_no_content = (self.section is None and
+                          not self.ghost_data and
+                          self.sub_data is None)
+        if has_no_content:
             info = rose.config_editor.PAGE_WARNING_NO_CONTENT
             tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
             error_button = rose.gtk.util.CustomButton(
@@ -1157,6 +1159,26 @@ class ConfigPage(gtk.VBox):
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)
+        has_data = (has_no_content or
+                    self.sub_data is not None or
+                    bool(self.panel_data))
+        if not has_data:
+            for section in self.sections:
+                if section.metadata["full_ns"] == self.namespace:
+                    has_data = True
+                    break
+        if not has_data:
+            # This is a latent namespace page.
+            latent_button = rose.gtk.util.CustomButton(
+                         stock_id=gtk.STOCK_INFO,
+                         as_tool=True,
+                         tip_text=rose.config_editor.TIP_LATENT_PAGE)
+            latent_label = gtk.Label()
+            latent_label.set_text(
+                         rose.config_editor.PAGE_WARNING_LATENT)
+            latent_label.show()
+            button_list.append(latent_button)
+            label_list.append(latent_label)
         # This adds error notification for sections.
         for sect_data in self.sections:
             for err, info in sect_data.error.items():

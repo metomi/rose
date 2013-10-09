@@ -34,7 +34,6 @@ from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
 from rose.run_source_vc import write_source_vc_info 
-from rose.suite_log_view import SuiteLogViewGenerator
 import socket
 import sys
 import tarfile
@@ -48,7 +47,8 @@ class AlreadyRunningError(Exception):
     """An exception raised when a suite is already running."""
 
     def __str__(self):
-        return "%s: is already running on %s" % self.args
+        name, reason = self.args
+        return "%s: is already running (detected %s)" % (name, reason)
 
 
 class NotRunningError(Exception):
@@ -109,11 +109,6 @@ class SuiteRunner(Runner):
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
-        self.suite_log_view_gen = SuiteLogViewGenerator(
-                event_handler=self.event_handler,
-                fs_util=self.fs_util,
-                popen=self.popen,
-                suite_engine_proc=self.suite_engine_proc)
         self.host_selector = HostSelector(self.event_handler, self.popen)
 
     def run_impl(self, opts, args, uuid, work_files):
@@ -190,13 +185,13 @@ class SuiteRunner(Runner):
         if opts.host:
             hosts.append(opts.host)
         conf = ResourceLocator.default().get_conf()
-        
+
         known_hosts = self.host_selector.expand(
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
               conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
               ["localhost"])[0]
         known_hosts = list(set(known_hosts))
-        
+
         for known_host in known_hosts:
             if known_host not in hosts:
                 hosts.append(known_host)
@@ -205,11 +200,11 @@ class SuiteRunner(Runner):
             if not suite_run_hosts:
                 raise NotRunningError(suite_name)
             hosts = suite_run_hosts
-        elif self.suite_engine_proc.is_suite_running(suite_name, hosts):
-            suite_run_hosts = self.suite_engine_proc.ping(suite_name,
-                                                          hosts)
-            raise AlreadyRunningError(suite_name,
-                                      suite_run_hosts[0])
+        else:
+            reason = self.suite_engine_proc.is_suite_running(
+                        None, suite_name, hosts)
+            if reason:
+                raise AlreadyRunningError(suite_name, reason)
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
@@ -258,7 +253,7 @@ class SuiteRunner(Runner):
             for i, url in enumerate(opts.source):
                 if os.path.isdir(url):
                     write_source_vc_info(
-                        url, "log/" + opts.project[i] + "-" + str(i) + 
+                        url, "log/" + opts.project[i] + "-" + str(i) +
                         ".version", self.popen)
 
         for ext in [".conf", ".version"]:
@@ -276,7 +271,7 @@ class SuiteRunner(Runner):
             temp_log_file.close()
 
         # Create the suite log view
-        self.suite_log_view_gen.generate(suite_name, [], force_lib_mode=True)
+        self.suite_engine_proc.job_logs_db_create(suite_name, close=True)
 
         # Install share/work directories (local)
         for name in ["share", "work"]:
@@ -293,7 +288,8 @@ class SuiteRunner(Runner):
         self.config_pm(config, "jinja2")
 
         # Register the suite
-        self.suite_engine_proc.validate(suite_name, opts.strict_mode)
+        self.suite_engine_proc.validate(suite_name, opts.strict_mode,
+                                        opts.debug_mode)
 
         if opts.local_install_only_mode:
             return
@@ -381,7 +377,7 @@ class SuiteRunner(Runner):
         # FIXME: should sync files to suite host?
         if opts.host:
             hosts = [host]
-        
+
         #use the list of hosts on which you can run
         if opts.run_mode != "reload" and not opts.host:
             hosts = []
@@ -389,8 +385,8 @@ class SuiteRunner(Runner):
             known_hosts = self.host_selector.expand(v.split())[0]
             for known_host in known_hosts:
                 if known_host not in hosts:
-                    hosts.append(known_host)    
-            
+                    hosts.append(known_host)
+
         if hosts == ["localhost"]:
             host = hosts[0]
         else:

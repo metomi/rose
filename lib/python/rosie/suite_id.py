@@ -36,9 +36,10 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter
 from rose.resource import ResourceLocator
-from rose.suite_log_view import SuiteLogViewGenerator
+from rose.suite_engine_proc import SuiteEngineProcessor
 import string
 import sys
+import traceback
 import xml.parsers.expat
 
 
@@ -178,9 +179,9 @@ class SuiteId(object):
     def get_local_copy_root(cls):
         """Return the root directory for hosting the local suite copies."""
         config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", "local-copy-root"], no_ignore=True)
-        if node:
-            local_copy_root = node.value
+        value = config.get_value(["rosie-id", "local-copy-root"])
+        if value:
+            local_copy_root = value
         else:
             local_copy_root = "$HOME/roses"
         local_copy_root = rose.env.env_var_process(local_copy_root)
@@ -201,10 +202,10 @@ class SuiteId(object):
     def get_prefix_default(cls):
         """Return the default prefix."""
         config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", "prefix-default"], no_ignore=True)
-        if node is None:
+        value = config.get_value(["rosie-id", "prefix-default"])
+        if value is None:
             raise SuiteIdPrefixError()
-        return node.value
+        return value
 
     @classmethod
     def get_prefix_location(cls, prefix=None):
@@ -213,10 +214,10 @@ class SuiteId(object):
             prefix = cls.get_prefix_default()
         key = "prefix-location." + prefix
         config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", key], no_ignore=True)
-        if node is None:
+        value = config.get_value(["rosie-id", key])
+        if value is None:
             raise SuiteIdPrefixError(prefix)
-        return node.value.rstrip("/")
+        return value.rstrip("/")
 
     @classmethod
     def get_prefix_locations(cls):
@@ -242,10 +243,10 @@ class SuiteId(object):
             prefix = cls.get_prefix_default()
         key = "prefix-web." + prefix
         config = ResourceLocator.default().get_conf()
-        node = config.get(["rosie-id", key], no_ignore=True)
-        if node is None:
+        value = config.get_value(["rosie-id", key])
+        if value is None:
             raise SuiteIdPrefixError(prefix)
-        return node.value.rstrip("/")
+        return value.rstrip("/")
 
     def __init__(self, id_text=None, location=None, skip_status=False):
         """Initialise either from an id_text or from a location."""
@@ -388,6 +389,7 @@ class SuiteId(object):
 
     def to_web(self):
         """Return the source browse URL for this suite."""
+        # FIXME: This is Trac specific.
         prefix_source = self.get_prefix_web(self.prefix)
         url = prefix_source + "/browser/" + "/".join(self._get_sid())
         branch = self.branch
@@ -400,7 +402,8 @@ class SuiteId(object):
 
     def to_output(self):
         """Return the output directory for this suite."""
-        return SuiteLogViewGenerator().get_suite_log_url(str(self))
+        p = SuiteEngineProcessor.get_processor()
+        return p.get_suite_log_url(None, str(self))
 
 
 def main():
@@ -424,20 +427,29 @@ def main():
                 report(str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0)
         elif opts.to_output:
             for arg in args:
-                report(str(SuiteId(id_text=arg).to_output()) + "\n", level=0)
+                url = SuiteId(id_text=arg).to_output()
+                if not url:
+                    url = ""
+                report(str(url) + "\n", level=0)
         elif opts.to_web:
             for arg in args:
                 report(str(SuiteId(id_text=arg).to_web()) + "\n", level=0)
         elif opts.latest:
-            report(str(SuiteId.get_latest(prefix=arg)) + "\n", level=0)
+            s = SuiteId.get_latest(prefix=arg)
+            if s is not None:
+                report(str(s) + "\n", level=0)
         elif opts.next:
-            report(str(SuiteId.get_next(prefix=arg)) + "\n", level=0)
+            s = SuiteId.get_next(prefix=arg)
+            if s is not None:
+                report(str(s) + "\n", level=0)
         else:
             if not arg:
                 arg = os.getcwd()
             report(str(SuiteId(location=arg)) + "\n", level=0)
     except SuiteIdError as e:
         report(e)
+        if opts.debug_mode:
+            traceback.print_exc(e)
         sys.exit(1)
 
 

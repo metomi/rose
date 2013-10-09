@@ -249,6 +249,18 @@ sort-key=do-not-like-00
             <p><dfn>usage:</dfn> Fortran logical types</p>
           </dd>
 
+          <dt><code>python_list</code></dt>
+
+          <dd>
+            <p><dfn>description:</dfn> used to signify a Python-compatible
+            formatted list such as <samp>["Foo", 50, False]</samp>. This
+            encapsulates <samp>length</samp>, so do not use a separate
+            <samp>length</samp> declaration for this setting.</p>
+
+            <p><dfn>usage:</dfn> use for inputs that expect a string that looks
+            like a Python list - e.g. Jinja2 list input variables.</p>
+          </dd>
+
           <dt><code>quoted</code></dt>
 
           <dd>
@@ -305,6 +317,9 @@ sort-key=do-not-like-00
         <p>Define the length of an array. If not present, the setting is
         assumed to be a scalar. A positive integer defines a fixed length
         array. A colon <kbd>:</kbd> defines a dynamic length array.</p>
+
+        <p>N.B. You do not need to use <samp>length</samp> if you already have
+        <samp>type=python_list</samp> for a setting.</p>
       </dd>
 
       <dt id="meta.conf.value.values">values</dt>
@@ -414,6 +429,13 @@ fail-if=this(2) != "'0A'" and this(4) == "'0A'";
         <pre class="prettyprint lang-rose_conf">
 fail-if=any(namelist:test=ctrl_array &lt; this);
 fail-if=all(this == 0);
+</pre>
+
+        <p>Similarly, the number of array elements can be checked using
+        <code>len</code>. E.g.:</p>
+        <pre class="prettyprint lang-rose_conf">
+fail-if=len(namelist:test=ctrl_array) &lt; this;
+fail-if=len(this) == 0;
 </pre>
 
         <p>Expressions can be chained together and brackets used:</p>
@@ -662,7 +684,7 @@ macro=fib.Fibonacci.validate
         specified after the widget name. E.g. to set up a hypothetical table
         with named columns X, Y, VCT, and Level, we may do:</p>
         <pre class="prettyprint lang-rose_conf">
-widget[rose-config-edit]=table X Y VCT Level
+widget[rose-config-edit]=table.TableWidget X Y VCT Level
 </pre>
 
         <p>You may override to a Rose built-in widget by specifying a full
@@ -670,7 +692,34 @@ widget[rose-config-edit]=table X Y VCT Level
         radiobuttons for an option with <a href=
         "#meta.conf.value.values"><code>values</code></a> set:</p>
         <pre class="prettyprint lang-rose_conf">
-widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons
+widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
+</pre>
+
+        <p>Another useful Rose built-in widget to use is the array element
+        aligning <a href="rose-api.html#gtk:config-edit:pages">page widget</a>,
+        <samp>rose.config_editor.pagewidget.table.PageArrayTable</samp>. You
+        can set this for a section or namespace to make sure each <em>n</em>th
+        variable value element lines up horizontally. For example:</p>
+        <pre class="prettyprint lang-rose_conf">
+[namelist:meal_choices]
+customers='Athos','Porthos','Aramis','d''Artagnan'
+entrees='soup','pate','soup','asparagus'
+main='beef','spaghetti','coq au vin','lamb'
+petits_fours=.false.,.true.,.false.,.true.
+</pre>
+
+        <p>could use the following metadata:</p>
+        <pre class="prettyprint lang-rose_conf">
+[namelist:meal_choices]
+widget[rose-config-edit]=rose.config_editor.pagewidget.table.PageArrayTable
+</pre>
+
+        <p>to align the elements on the page like this:</p>
+        <pre>
+customers        Athos      Porthos      Aramis      d'Artagnan
+entrees          soup        pate         soup       asparagus
+main             beef      spaghetti   coq au vin       lamb
+petits_fours    .false.     .true.       .false.       .true.
 </pre>
       </dd>
     </dl>
@@ -1085,7 +1134,22 @@ namelist:foo=bar(2) == 'c'
 'b' == 'c'
 </pre>
 
-    <p>There are two special array functions, <samp>any</samp> and
+    <p>Should you wish to make use of the array length in an expression you can
+    make use of the <samp>len</samp> function, which behaves in the same manner
+    as its Python and Fortran equivalents to return the array length. For
+    example:</p>
+    <pre class="prettyprint lang-python">
+len(namelist:foo=bar) &gt; 3
+</pre>
+
+    <p>would be expanded to:</p>
+    <pre class="prettyprint lang-python">
+4 &gt; 3
+</pre>
+
+    <p>and evaluate as true.</p>
+
+    <p>There are two other special array functions, <samp>any</samp> and
     <samp>all</samp>, which behave in a similar fashion to their Python and
     Fortran equivalents, but have a different syntax.</p>
 
@@ -1134,6 +1198,13 @@ all(namelist:foo=bar == 'e')
     <p>This describes the intended behaviour of the config editor when there is
     an ignored state mismatch for a setting - e.g. a setting might be enabled
     when it should be trigger-ignored.</p>
+
+    <p>The config editor differs from the strict command line macro equivalent
+    because the <dfn>Switch Off Metadata</dfn> mode and accidentally
+    metadata-less configurations need to be presented in a nice way without
+    lots of not-necessarily-errors. The config editor should only report the
+    errors where the state is definitely wrong or makes a material difference
+    to the user.</p>
 
     <p>The table contains error and fixing information for some varieties of
     ignored state mismatches. The actual situations are considerably more
@@ -1203,10 +1274,7 @@ all(namelist:foo=bar == 'e')
 
         <td>None</td>
 
-        <td>config editor shows non-functional E option for implementation
-        reasons. <span class="user-ignored">I<sub>U</sub></span> is possible as
-        well, but creates a more confused state and presents an ignored option
-        for an already-ignored setting</td>
+        <td>&nbsp;</td>
       </tr>
 
       <tr>
@@ -1234,7 +1302,7 @@ all(namelist:foo=bar == 'e')
 
         <td>E</td>
 
-        <td class="caption">I<sub>U</sub> not given for above reasons.</td>
+        <td>&nbsp;</td>
       </tr>
 
       <tr>
@@ -1263,8 +1331,7 @@ all(namelist:foo=bar == 'e')
         <td>E</td>
 
         <td>overlooking mainly in order to de-clutter the <kbd>No
-        Metadata</kbd> view. <span class="user-ignored">I<sub>U</sub></span>
-        not given for above reasons.</td>
+        Metadata</kbd> view.</td>
       </tr>
 
       <tr>
@@ -1278,8 +1345,7 @@ all(namelist:foo=bar == 'e')
 
         <td>None</td>
 
-        <td>same basic state, won't mess with trigger too much. macro will ask
-        to fix this.</td>
+        <td>same basic state - macro will ask to fix this.</td>
       </tr>
 
       <tr class="odd">
@@ -1377,8 +1443,7 @@ all(namelist:foo=bar == 'e')
 
         <td class="trigger-ignored">I<sub>T</sub></td>
 
-        <td>adding the <span class="user-ignored">I<sub>U</sub></span> option
-        would be confusing.</td>
+        <td>&nbsp;</td>
       </tr>
 
       <tr>

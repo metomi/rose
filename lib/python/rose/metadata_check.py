@@ -31,6 +31,7 @@ import rose.macros
 
 import rose.opt_parse
 
+
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
 INVALID_IMPORT = "Could not import {0}: {1}"
 INCOMPATIBLE = "Incompatible with {0}"
@@ -242,6 +243,13 @@ def metadata_check(meta_config, meta_dir=None,
                     reports.append(rose.macro.MacroReport(
                                               section, type_like_prop,
                                               value, info))
+        if node.get_value([rose.META_PROP_TYPE]) == "python_list":
+            if node.get_value([rose.META_PROP_LENGTH]):
+                info = INCOMPATIBLE.format(rose.META_PROP_TYPE)
+                value = node.get_value([rose.META_PROP_LENGTH])
+                reports.append(rose.macro.MacroReport(
+                                          section, rose.META_PROP_LENGTH,
+                                          value, info))
         options = node.value.keys()
         options.sort(rose.config.sort_settings)
         for option in options:

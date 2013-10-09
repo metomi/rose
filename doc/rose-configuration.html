@@ -231,6 +231,17 @@ key-4=value 4
     utilities may also read optional configuration keys from environment
     variables and/or command line options.</p>
 
+    <p>Where multiple <var>$KEY</var> settings are given, the optional
+    configurations are applied in that order - for example, a setting:</p>
+    <pre class="prettyprint lang-rose_conf">
+opts=ketchup mayonnaise
+</pre>
+
+    <p>implies loading the optional configuration
+    <var>rose-app-ketchup.conf</var> and then the optional configuration
+    <var>rose-app-mayonnaise.conf</var>, which may override the previous
+    one.</p>
+
     <h2 id="site">Site and User Configuration</h2>
 
     <p>Aspects of some Rose utilities can be configured per installation via
@@ -314,16 +325,18 @@ accel-find-next=F3
     <dl>
       <dt><code>[env]</code></dt>
 
-      <dd>Specify the environment variables to export to the suite daemon. The
-      usual <var>$NAME</var> or <var>${NAME}</var> syntax can be used in values
-      to reference environment variables that are already defined before the
-      suite runner is invoked. However, it is unsafe to reference other
-      environment variables defined in this section. If the value of an
-      environment variable setting begins with a tilde <kbd>~</kbd>, all of the
-      characters preceding the 1st slash <kbd>/</kbd> are considered a
-      <em>tilde-prefix</em>. Where possible, a tilde-prefix is replaced with the
-      home directory associated with the specified login name at run time. There
-      are 2 special environment variables which can be specified in this section:
+      <dd>
+        Specify the environment variables to export to the suite daemon. The
+        usual <var>$NAME</var> or <var>${NAME}</var> syntax can be used in
+        values to reference environment variables that are already defined
+        before the suite runner is invoked. However, it is unsafe to reference
+        other environment variables defined in this section. If the value of an
+        environment variable setting begins with a tilde <kbd>~</kbd>, all of
+        the characters preceding the 1st slash <kbd>/</kbd> are considered a
+        <em>tilde-prefix</em>. Where possible, a tilde-prefix is replaced with
+        the home directory associated with the specified login name at run
+        time. There are 2 special environment variables which can be specified
+        in this section:
 
         <ul>
           <li><var>ROSE_VERSION</var>: If specified, the version of Rose that
@@ -526,17 +539,18 @@ accel-find-next=F3
       <dt><code>[env]</code></dt>
 
       <dd>Specify input environment variables to the command, in KEY=VALUE
-      pairs. The usual <var>$NAME</var> or <var>${NAME}</var> syntax can be used
-      in values to reference environment variables that are already defined when
-      the application runner is invoked. However, it is unsafe to reference
-      other environment variables defined in this section. Note:
+      pairs. The usual <var>$NAME</var> or <var>${NAME}</var> syntax can be
+      used in values to reference environment variables that are already
+      defined when the application runner is invoked. However, it is unsafe to
+      reference other environment variables defined in this section. Note:
       <var>UNDEF</var> is a special variable that is always undefined at run
       time. Reference to it will cause a failure at run time. It can be used to
       indicate that a value must be overridden at run time. If the value of an
       environment variable setting begins with a tilde <kbd>~</kbd>, all of the
       characters preceding the 1st slash <kbd>/</kbd> are considered a
-      <em>tilde-prefix</em>. Where possible, a tilde-prefix is replaced with the
-      home directory associated with the specified login name at run time.</dd>
+      <em>tilde-prefix</em>. Where possible, a tilde-prefix is replaced with
+      the home directory associated with the specified login name at run
+      time.</dd>
 
       <dt><code>[etc]</code></dt>
 
@@ -665,10 +679,11 @@ delays=0,6*10s,60*1m,1h
       <dt><code>source</code></dt>
 
       <dd>A space delimited list of sources for generating this file. A source
-      can be the path to a regular file or directory in the file system, or it
-      may be a URI to a resource. If a source is a URI, it may point to a
-      section with a supported scheme in the current configuration, e.g. a
-      <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
+      can be the path to a regular file or directory in the file system
+      (globbing is also supported - e.g. using "*.conf" to mean all .conf
+      files), or it may be a URI to a resource. If a source is a URI, it may
+      point to a section with a supported scheme in the current configuration,
+      e.g. a <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
       supported scheme or be given sufficient information for the system to
       determine its scheme, e.g. via the <code>schemes</code> setting described
       below.</dd>

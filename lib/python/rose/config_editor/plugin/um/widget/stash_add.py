@@ -37,7 +37,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
     STASH_PARSE_SECT_OPT = "sectn"
 
     def __init__(self, stash_lookup, request_lookup,
-                 changed_request_lookup, add_stash_request_func,
+                 changed_request_lookup, stash_meta_lookup,
+                 add_stash_request_func,
                  navigate_to_stash_request_func,
                  refresh_stash_requests_func):
         """Create a widget displaying STASHmaster information.
@@ -59,6 +60,13 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         changed_request_lookup is a dictionary of changed streq
         namelists (keys) and their change description text (values).
 
+        stash_meta_lookup is a dictionary of STASHmaster property
+        names (keys) with value-metadata-dict key-value pairs (values).
+        To extract the metadata dict for a 'grid' value of "2", look
+        at stash_meta_lookup["grid=2"] which should be a dict of normal
+        Rose metadata key-value pairs such as:
+        {"description": "2 means Something something"}.
+
         add_stash_request_func is a hook function that should take a
         STASH section number argument and a STASH item number argument,
         and add this request as a new namelist in a configuration.
@@ -70,16 +78,30 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         refresh_stash_requests_func is a hook function that should call
         the update_request_info method with updated streq namelist
         info.
+
         """
         super(AddStashDiagnosticsPanelv1, self).__init__(self)
         self.set_property("homogeneous", False)
         self.stash_lookup = stash_lookup
         self.request_lookup = request_lookup
         self.changed_request_lookup = changed_request_lookup
+        self.stash_meta_lookup = stash_meta_lookup
         self._add_stash_request = add_stash_request_func
         self.navigate_to_stash_request = navigate_to_stash_request_func
         self.refresh_stash_requests = refresh_stash_requests_func
         self.group_index = 0
+        self._visible_metadata_columns = ["Section"]
+
+        # Automatically hide columns which have fixed-value metadata.
+        self._hidden_column_names = []
+        for key, metadata in self.stash_meta_lookup.items():
+            if "=" in key:
+                continue
+            values_string = metadata.get(rose.META_PROP_VALUES, "0, 1")
+            if len(rose.variable.array_split(values_string)) == 1:
+                self._hidden_column_names.append(key)
+
+        self._should_show_meta_column_titles = False
         self.control_widget_hbox = self._get_control_widget_hbox()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
         self._view = rose.gtk.util.TooltipTreeView(
@@ -120,7 +142,15 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._view.set_model(self.get_tree_model())
         for i, column_name in enumerate(self.column_names):
             col = gtk.TreeViewColumn()
-            col.set_title(column_name.replace("_", "__"))
+            if column_name in self._hidden_column_names:
+                col.set_visible(False)
+            col_title = column_name.replace("_", "__")
+            if self._should_show_meta_column_titles:
+                col_meta = self.stash_meta_lookup.get(column_name, {})
+                title = col_meta.get(rose.META_PROP_TITLE)
+                if title is not None:
+                    col_title = title
+            col.set_title(col_title)
             self.add_cell_renderer_for_value(col)
             if i < len(self.column_names) - 1:
                 col.set_resizable(True)
@@ -234,6 +264,17 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                     value = "\n    " + "\n    ".join(streqs)
                 else:
                     value = stash_request_num + " total"
+        if name == "Section":
+            meta_key = self.STASH_PARSE_SECT_OPT + "=" + value
+        else:
+            meta_key = name + "=" + value
+        value_meta = self.stash_meta_lookup.get(meta_key, {})
+        title = value_meta.get(rose.META_PROP_TITLE, "")
+        help = value_meta.get(rose.META_PROP_HELP, "")
+        if title and not help:
+            value += "\n" + title
+        if help:
+            value += "\n" + rose.gtk.util.safe_str(help)
         text = name + ": " + str(value) + "\n\n"
         text += "Section: " + str(stash_section) + "\n"
         text += "Item: " + str(stash_item) + "\n"
@@ -282,8 +323,6 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             self._store.set_value(parent_iter, streq_info_index,
                                   streq_info_children)
             parent_iter = self._store.iter_next(parent_iter)
-            
-            
                     
     def _update_row_request_info(self, model, path, iter_, user_data):
         # Update the streq namelist information for a model row.
@@ -359,6 +398,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self._filter_widget.set_width_chars(
                      rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
         self._filter_widget.connect("changed", self._filter_refresh)
+        self._filter_widget.set_tooltip_text("Filter by literal values")
         self._filter_widget.show()
         group_label = gtk.Label(
                      rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
@@ -384,13 +424,19 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                                      lambda b: self.refresh_stash_requests())
         self._refresh_button.connect("clicked",
                                      lambda b: self.refresh_stash_requests())
-         
+        self._view_button = rose.gtk.util.CustomButton(
+                                 label="View",
+                                 tip_text="Select view options",
+                                 has_menu=True)
+        self._view_button.connect("button-press-event",
+                                  self._popup_view_menu)
         filter_hbox = gtk.HBox()
         filter_hbox.pack_start(group_label, expand=False, fill=False)
         filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
         filter_hbox.pack_start(filter_label, expand=False, fill=False,
                                padding=10)
         filter_hbox.pack_start(self._filter_widget, expand=False, fill=False)
+        filter_hbox.pack_end(self._view_button, expand=False, fill=False)
         filter_hbox.pack_end(self._refresh_button, expand=False, fill=False)
         filter_hbox.pack_end(self._add_button, expand=False, fill=False)
         filter_hbox.show()
@@ -458,6 +504,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         model = combobox.get_model()
         col_name = model.get_value(combobox.get_active_iter(), 0)
         if col_name:
+            if col_name in self._hidden_column_names:
+                self._hidden_column_names.remove(col_name)
             group_index = self.column_names.index(col_name)
             # Any existing grouping changes the order of self.column_names.
             if (self.group_index is not None and
@@ -508,13 +556,75 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         menu.popup(None, None, None, event.button, event.time)
         return False
 
+    def _popup_view_menu(self, widget, event):
+        # Create a menu below the widget for view options.
+        menu = gtk.Menu()
+        meta_menuitem = gtk.CheckMenuItem(label="Show expanded value info")
+        if len(self.column_names) == len(self._visible_metadata_columns):
+            meta_menuitem.set_active(True)
+        meta_menuitem.connect("toggled", self._toggle_show_more_info)
+        meta_menuitem.show()
+        if not self.stash_meta_lookup:
+            meta_menuitem.set_sensitive(False)
+        menu.append(meta_menuitem)
+        col_title_menuitem = gtk.CheckMenuItem(
+                  label="Show expanded column titles")
+        if self._should_show_meta_column_titles:
+            col_title_menuitem.set_active(True)
+        col_title_menuitem.connect("toggled",
+                                   self._toggle_show_meta_column_titles)
+        col_title_menuitem.show()
+        if not self.stash_meta_lookup:
+            col_title_menuitem.set_sensitive(False)
+        menu.append(col_title_menuitem)
+        sep = gtk.SeparatorMenuItem()
+        sep.show()
+        menu.append(sep)
+        show_column_menuitem = gtk.MenuItem("Show/hide columns")
+        show_column_menuitem.show()
+        show_column_menu = gtk.Menu()
+        show_column_menuitem.set_submenu(show_column_menu)
+        menu.append(show_column_menuitem)
+        for i, column in enumerate(self._view.get_columns()):
+            col_name = self.column_names[i]
+            col_title = col_name.replace("_", "__")
+            if self._should_show_meta_column_titles:
+                col_meta = self.stash_meta_lookup.get(col_name, {})
+                title = col_meta.get(rose.META_PROP_TITLE)
+                if title is not None:
+                    col_title = title
+            col_menuitem = gtk.CheckMenuItem(label=col_title,
+                                             use_underline=False)
+            col_menuitem.show()
+            col_menuitem.set_active(column.get_visible())
+            col_menuitem._connect_args = (col_name,)
+            col_menuitem.connect(
+                    "toggled",
+                    lambda c: self._toggle_show_column_name(*c._connect_args))
+            show_column_menu.append(col_menuitem)
+        menu.popup(None, None, widget.position_menu, event.button,
+                   event.time, widget)
+
     def _set_tree_cell_value(self, column, cell, treemodel, iter_):
         # Extract an appropriate value for this cell from the model.
         cell.set_property("visible", True)
         col_index = self._view.get_columns().index(column)
         col_title = self.column_names[col_index]
         value = self._view.get_model().get_value(iter_, col_index)
-        max_len = 30
+        if (col_title in self._visible_metadata_columns and
+            value is not None):
+            if col_title == "Section":
+                key = self.STASH_PARSE_SECT_OPT + "=" + value
+            else:
+                key = col_title + "=" + value
+            value_meta = self.stash_meta_lookup.get(key, {})
+            title = value_meta.get(rose.META_PROP_TITLE, "")
+            if title:
+                value = title
+            desc = value_meta.get(rose.META_PROP_DESCRIPTION, "")
+            if desc:
+                value += ": " + desc
+        max_len = 36
         if (value is not None and len(value) > max_len
             and col_index != 0):
             cell.set_property("width-chars", max_len)
@@ -531,6 +641,34 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         x = row1[sort_index]
         y = row2[sort_index]
         return fac * self.sort_util.cmp_(x, y)
+
+    def _toggle_show_column_name(self, column_name):
+        # Handle a show/hide of a particular column.
+        col_index = self.column_names.index(column_name)
+        column = self._view.get_columns()[col_index]
+        if column.get_visible():
+            return column.set_visible(False)
+        return column.set_visible(True)
+
+    def _toggle_show_more_info(self, widget, column_name=None):
+        # Handle a show/hide of extra information.
+        should_show = widget.get_active()
+        if column_name is None:
+            column_names = self.column_names
+        else:
+            column_names = [column_name]
+        for name in column_names:
+            if should_show:
+                if name not in self._visible_metadata_columns:
+                    self._visible_metadata_columns.append(name)
+            elif name in self._visible_metadata_columns:
+                if name != "Section":
+                    self._visible_metadata_columns.remove(name)
+        self._view.columns_autosize()
+
+    def _toggle_show_meta_column_titles(self, widget):
+         self._should_show_meta_column_titles = widget.get_active()
+         self.generate_tree_view()
 
     def _update_control_widget_sensitivity(self):
         section, item = self._get_current_section_item()

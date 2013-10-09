@@ -20,7 +20,7 @@
 # Test "rose app-run", optional configuration selection.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init <<'__CONFIG__'
+test_init <<'__CONFIG__'
 [command]
 default = printenv FOO BAR BAZ
 
@@ -49,7 +49,7 @@ tests 30
 #-------------------------------------------------------------------------------
 # Control run.
 TEST_KEY=$TEST_KEY_BASE-control
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 foo
@@ -57,19 +57,19 @@ bar
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Bad option.
 TEST_KEY=$TEST_KEY_BASE-bad
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config --opt-conf-key=bad -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err" "../config/opt/rose-app-bad.conf" "$TEST_KEY.err"
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Add option 1.
 TEST_KEY=$TEST_KEY_BASE-opt-1
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config --opt-conf-key=$OPT_1 -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 foolish fool
@@ -77,34 +77,34 @@ bar
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Add option 2.
 TEST_KEY=$TEST_KEY_BASE-opt-2
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config --opt-conf-key=$OPT_2 -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
 foo
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Add option 3.
 TEST_KEY=$TEST_KEY_BASE-opt-3
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config --opt-conf-key=$OPT_3 -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Add option 1 and 2.
 TEST_KEY=$TEST_KEY_BASE-opt-1-2
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config \
     --opt-conf-key=$OPT_1 --opt-conf-key=$OPT_2 -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
@@ -112,13 +112,13 @@ foolish fool
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Add option 3, 1 and 2.
 TEST_KEY=$TEST_KEY_BASE-opt-3-1-2
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config \
     --opt-conf-key=$OPT_3 --opt-conf-key=$OPT_1 --opt-conf-key=$OPT_2 -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
@@ -126,13 +126,13 @@ foolish fool
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Add option 3, 1 and 2, with environment variable.
 TEST_KEY=$TEST_KEY_BASE-env-opt-3-1-2
-setup
+test_setup
 ROSE_APP_OPT_CONF_KEYS="$OPT_3 $OPT_1 $OPT_2" \
     run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
@@ -140,13 +140,13 @@ foolish fool
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Add option 1 and 2 + define.
 TEST_KEY=$TEST_KEY_BASE-opt-1-2-d
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config \
     --opt-conf-key=$OPT_1 --opt-conf-key=$OPT_2 \
     '--define=[env]BAR=barman' -q
@@ -156,11 +156,11 @@ barman
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # In-place optional configuration, add option 3, 1 and 2.
 TEST_KEY=$TEST_KEY_BASE-opt-3-1-2-opts
-setup
+test_setup
 cp -r ../config ../config2
 {
     echo '[]'
@@ -172,9 +172,9 @@ foolish fool
 baz
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] printenv FOO BAR BAZ # rc=1
+[FAIL] printenv FOO BAR BAZ # return-code=1
 __CONTENT__
 rm -r ../config2
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit

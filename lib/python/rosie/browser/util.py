@@ -25,6 +25,7 @@ pygtk.require("2.0")
 import gtk
 
 import rose.external
+import rose.gtk.dialog
 import rose.gtk.util
 from rose.opt_parse import RoseOptionParser
 import rosie.browser
@@ -504,8 +505,8 @@ class AdvancedSearchWidget(gtk.VBox):
             known_keys = search_manager.ws_client.get_known_keys()
             query_operators = search_manager.ws_client.get_query_operators()
         except rosie.ws_client.QueryError as e:
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     str(e))
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       str(e))
             sys.exit(str(e))
         self.display_columns = ["local"] + known_keys
         self.display_filters = {}
@@ -585,8 +586,11 @@ class AdvancedSearchWidget(gtk.VBox):
         column_combo.show()
         column_combo.set_tooltip_text(rosie.browser.TIP_FILTER_COLUMN)
         expr_combo = gtk.combo_box_new_text()
-        for expr in self.filter_exprs:
+        for ind in range(len(self.filter_exprs)):
+            expr = self.filter_exprs[ind]
             expr_combo.append_text(expr)
+            if expr == rosie.browser.DEFAULT_FILTER_EXPR:
+                expr_combo.set_active(ind)
         expr_combo.show()
         expr_combo.set_tooltip_text(rosie.browser.TIP_FILTER_ACTION)
         string_entry = gtk.Entry()
@@ -728,9 +732,10 @@ class AdvancedSearchWidget(gtk.VBox):
                                (expr_combo, self.filter_exprs)]:
             value = widget.get_active()
             if value == -1:
-                rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                              rosie.browser.DIALOG_MESSAGE_UNCOMPLETED_FILTER, 
-                              rosie.browser.DIALOG_TITLE_UNCOMPLETED_FILTER)
+                rose.gtk.dialog.run_dialog(
+                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                         rosie.browser.DIALOG_MESSAGE_UNCOMPLETED_FILTER,
+                         rosie.browser.DIALOG_TITLE_UNCOMPLETED_FILTER)
                 raise FilterError
             filter_strings.append(f_list[value])
             if widget == and_or_combo:
@@ -765,38 +770,65 @@ class AdvancedSearchWidget(gtk.VBox):
             filters.append(" ".join(filter_tuple))
         if group_num != 0:
             text = rosie.browser.ERROR_INVALID_QUERY.format(" ".join(filters))
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text,
-                                     rosie.browser.TITLE_INVALID_QUERY)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text,
+                                       rosie.browser.TITLE_INVALID_QUERY)
             return None, False      
     
         return filters, True
 
     def remove_filter(self, filter_number=None):
         """Remove a row of widgets for a filter."""
+        max_top_row = 0
         for child in self.filter_table.get_children():
             top_row = self.filter_table.child_get(child, 'top_attach')[0]
+            if top_row > max_top_row:
+                max_top_row = top_row
             if top_row == filter_number or filter_number is None:
                 self.filter_table.remove(child)
         if filter_number is None:
             self.filter_expr_getters = []
             self.num_filters = 0
-        else:
-            self.filter_expr_getters[filter_number] = lambda: None
-            self.filter_table.get_children()[-1].set_sensitive(False)
-            self.num_filters -= 1
-            if self.num_filters == 1:
-                for widget in reversed(self.filter_table.get_children()):
-                    if hasattr(widget, "_number"):
-                        widget.set_sensitive(False)
-                        break   
+            return
+        for row in range(filter_number + 1, max_top_row + 1):
+            for child in self.filter_table.get_children():
+                top_row = self.filter_table.child_get(
+                    child, 'top_attach')[0]
+                if top_row == row:
+                    # Remove the child and attach it one row up.
+                    left_attach = self.filter_table.child_get(
+                        child, "left_attach")[0]
+                    xoptions, yoptions, xpadding, ypadding = (
+                        self.filter_table.child_get(
+                            child,"x-options", "y-options",
+                            "x-padding", "y-padding"
+                        )
+                    )
+                    self.filter_table.remove(child)
+                    self.filter_table.attach(
+                        child, left_attach, left_attach + 1, top_row - 1,
+                        top_row, xoptions=xoptions, yoptions=yoptions,
+                        xpadding=xpadding, ypadding=ypadding
+                    )
+                    if hasattr(child, "_number"):
+                        child._number = top_row - 1
+                    if top_row - 1 == 0 and left_attach == 0:
+                        # This is the top left conjunction widget.
+                        child.set_sensitive(False)           
+        self.filter_expr_getters.pop(filter_number)
+        self.num_filters -= 1
+        if self.num_filters == 1:
+            for widget in reversed(self.filter_table.get_children()):
+                if hasattr(widget, "_number"):
+                    widget.set_sensitive(False)
+                    break
 
     def run_invalid_query_dialog(self, error_info):
         """Notify the user of an invalid query."""
         text = rosie.browser.ERROR_INVALID_QUERY.format(error_info)
-        rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                 text,
-                                 rosie.browser.TITLE_INVALID_QUERY)
+        rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                   text,
+                                   rosie.browser.TITLE_INVALID_QUERY)
 
     def set_button_visibility(self, visible):
         """Set the visibility of the search, add and clear buttons"""
@@ -844,7 +876,7 @@ class AdvancedSearchWidget(gtk.VBox):
         
 def launch_about_dialog(self, *args):
     """Create a dialog showing the 'About' information."""
-    return rose.gtk.util.run_about_dialog(
+    return rose.gtk.dialog.run_about_dialog(
                 rosie.browser.PROGRAM_NAME,
                 rosie.browser.COPYRIGHT,
                 rosie.browser.LOGO_PATH,

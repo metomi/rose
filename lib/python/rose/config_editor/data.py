@@ -39,7 +39,7 @@ import tempfile
 
 import rose.config
 import rose.config_editor.data_helper
-import rose.gtk.util
+import rose.gtk.dialog
 import rose.macro
 import rose.metadata_check
 import rose.resource
@@ -190,13 +190,14 @@ class ConfigDataManager(object):
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
 
     def load(self, top_level_directory, config_obj_dict, 
-             load_all_apps=False, load_no_apps=False):
+             load_all_apps=False, load_no_apps=False, metadata_off=False):
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
                 if filename in [rose.TOP_CONFIG_NAME, rose.SUB_CONFIG_NAME]:
                     self.load_top_config(top_level_directory, 
                                          load_all_apps=load_all_apps,
-                                         load_no_apps=load_no_apps)
+                                         load_no_apps=load_no_apps,
+                                         metadata_off=metadata_off)
                     break
             else:
                 self.load_top_config(None)
@@ -212,11 +213,12 @@ class ConfigDataManager(object):
         self.saved_config_names = set(self.config.keys())
 
     def load_top_config(self, top_level_directory, preview=False, 
-                        load_all_apps=False, load_no_apps=False):
+                        load_all_apps=False, load_no_apps=False,
+                        metadata_off=False):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
         
-        app_count = 0
+        self.app_count = 0
         if top_level_directory is None:
             self.top_level_name = rose.config_editor.UNTITLED_NAME
         else:
@@ -236,16 +238,18 @@ class ConfigDataManager(object):
                                                      config_dir)
                             if (os.path.isdir(conf_path) and
                                 not config_dir.startswith('.')):
-                                    app_count += 1
+                                    self.app_count += 1
                 
-                        if app_count > rose.config_editor.MAX_APPS_THRESHOLD:
+                        if (self.app_count > 
+                            rose.config_editor.MAX_APPS_THRESHOLD):
                             preview = True
                 
                 for config_dir in sub_contents:
                     conf_path = os.path.join(config_container_dir, config_dir)
                     if (os.path.isdir(conf_path) and
                         not config_dir.startswith('.')):
-                        self.load_config(conf_path, preview=preview)
+                        self.load_config(conf_path, preview=preview, 
+                                         metadata_off=metadata_off)
             self.load_config(top_level_directory)
             self.reload_ns_tree_func()
 
@@ -261,7 +265,7 @@ class ConfigDataManager(object):
     def load_config(self, config_directory=None,
                     config_name=None, config=None,
                     reload_tree_on=False, is_discovery=False,
-                    skip_load_event=False, preview=False):
+                    skip_load_event=False, preview=False, metadata_off=False):
         """Load the configuration and meta-data. Load namespaces."""
         is_top_level = False
         if config_directory is None:
@@ -304,11 +308,13 @@ class ConfigDataManager(object):
                     text = rose.config_editor.ERROR_NOT_FOUND.format(
                                                               config_path)
                     title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-                    rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                             text, title)
+                    rose.gtk.dialog.run_dialog(
+                                        rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                        text, title)
                     sys.exit(2)
                     
-            if config_directory != self.top_level_directory and preview:                   #load with empty ConfigNodes for initial app access
+            if config_directory != self.top_level_directory and preview:
+                # Load with empty ConfigNodes for initial app access.
                 config = rose.config.ConfigNode()
                 s_config = rose.config.ConfigNode()
             else:
@@ -317,6 +323,9 @@ class ConfigDataManager(object):
         
         if config_directory != self.top_level_directory and preview: 
             meta_config = rose.config.ConfigNode()
+            meta_files = []
+        elif metadata_off:
+            meta_config = self.load_meta_config()
             meta_files = []
         else:
             meta_config = self.load_meta_config(config, config_directory)
@@ -369,8 +378,8 @@ class ConfigDataManager(object):
             text = rose.config_editor.ERROR_LOAD_SYNTAX.format(
                                                     config_path, e)
             title = rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
-            rose.gtk.util.run_dialog(
-                            rose.gtk.util.DIALOG_TYPE_ERROR,
+            rose.gtk.dialog.run_dialog(
+                            rose.gtk.dialog.DIALOG_TYPE_ERROR,
                             text, title)
             sys.exit(2)
         else:
@@ -391,7 +400,12 @@ class ConfigDataManager(object):
         opt_glob = os.path.join(opt_dir, rose.GLOB_OPT_CONFIG_FILE)
         for path in glob.glob(opt_glob):
             if os.access(path, os.F_OK | os.R_OK):
-                name = re.search(rose.RE_OPT_CONFIG_FILE, path).group(1)
+                filename = os.path.basename(path)
+                # filename is a null string if path is to a directory.
+                result = re.match(rose.RE_OPT_CONFIG_FILE, filename)
+                if not result:
+                    continue                    
+                name = result.group(1)
                 try:
                     opt_config = rose.config.load(path)
                 except Exception as e:
@@ -407,8 +421,8 @@ class ConfigDataManager(object):
             err_text = err_text.rstrip()
             text = rose.config_editor.ERROR_LOAD_OPT_CONFS.format(err_text)
             title = rose.config_editor.ERROR_LOAD_OPT_CONFS_TITLE
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text, title=title, modal=False)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text, title=title, modal=False)
         return opt_conf_lookup
 
     def load_builtin_macros(self, config_name):
@@ -797,9 +811,9 @@ class ConfigDataManager(object):
             reports_text = rose.macro.get_reports_as_text(
                                       reports,
                                       "rose.metadata_check.MetadataChecker")
-            rose.gtk.util.run_dialog(rose.gtk.util.DIALOG_TYPE_ERROR,
-                                     text, title, modal=False,
-                                     extra_text=reports_text)
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       text, title, modal=False,
+                                       extra_text=reports_text)
         for report in reports:
             if report.option != rose.META_PROP_TRIGGER:
                 meta_config.unset([report.section, report.option])
@@ -831,7 +845,8 @@ class ConfigDataManager(object):
                 continue
             config_for_macro.set(keylist, copy.deepcopy(node.value))
         meta_config = self.config[config_name].meta
-        bad_list = self.trigger[config_name].validate(config_for_macro,
+        bad_list = self.trigger[config_name].validate_dependencies(
+                                                      config_for_macro,
                                                       meta_config)
         if bad_list:
             self.trigger[config_name].trigger_family_lookup.clear()

@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import ast
 import inspect
 import shlex
 import subprocess
@@ -29,13 +30,15 @@ import gtk
 
 import rose.config
 import rose.config_editor
+import rose.config_editor.upgrade_controller
 import rose.external
+import rose.gtk.dialog
 import rose.gtk.run
-import rose.gtk.util
 import rose.macro
 import rose.macros
+import rose.popen
 import rose.suite_control
-import rose.suite_log_view
+import rose.suite_engine_proc
 
 
 class MenuBar(object):
@@ -52,6 +55,8 @@ class MenuBar(object):
       <menu action="File">
         <menuitem action="Open..."/>
         <menuitem action="Save"/>
+        <menuitem action="Check and save"/>
+        <menuitem action="Load All Apps"/>
         <separator name="sep_save"/>
         <menuitem action="Quit"/>
       </menu>
@@ -90,6 +95,8 @@ class MenuBar(object):
           <menuitem action="View without help"/>
           <menuitem action="View without titles"/>
         </menu>
+        <separator name="sep_upgrade"/>
+        <menuitem action="Upgrade"/>
         <separator name="sep_checking"/>
         <menuitem action="Extra checks"/>
         <separator name="sep macro"/>
@@ -131,6 +138,10 @@ class MenuBar(object):
                       ('Save', gtk.STOCK_SAVE,
                        rose.config_editor.TOP_MENU_FILE_SAVE,
                        rose.config_editor.ACCEL_SAVE),
+                      ('Check and save', gtk.STOCK_SPELL_CHECK,
+                       rose.config_editor.TOP_MENU_FILE_CHECK_AND_SAVE),
+                      ('Load All Apps', gtk.STOCK_CDROM,
+                       rose.config_editor.TOP_MENU_FILE_LOAD_APPS),
                       ('Quit', gtk.STOCK_QUIT,
                        rose.config_editor.TOP_MENU_FILE_QUIT,
                        rose.config_editor.ACCEL_QUIT),
@@ -173,6 +184,8 @@ class MenuBar(object):
                        rose.config_editor.ACCEL_METADATA_REFRESH),
                       ('Prefs', gtk.STOCK_PREFERENCES,
                        rose.config_editor.TOP_MENU_METADATA_PREFERENCES),
+                      ('Upgrade', gtk.STOCK_GO_UP,
+                       rose.config_editor.TOP_MENU_METADATA_UPGRADE),
                       ('All V', gtk.STOCK_DIALOG_QUESTION,
                        rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
                       ('Autofix', gtk.STOCK_CONVERT,
@@ -353,6 +366,8 @@ class MainMenuHandler(object):
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self.find_ns_id_func = find_ns_id_func
+        self.bad_colour = rose.gtk.util.color_parse(
+                          rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
 
     def about_dialog(self, args):
         self.mainwindow.launch_about_dialog()
@@ -396,24 +411,40 @@ class MainMenuHandler(object):
 
     def check_all_extra(self):
         """Check fail-if, warn-if, and run all validator macros."""
-        self.check_fail_rules()
-        self.run_custom_macro(method_name=rose.macro.VALIDATE_METHOD)
+        num_errors = self.check_fail_rules()
+        num_errors += self.run_custom_macro(
+            method_name=rose.macro.VALIDATE_METHOD)
+        if num_errors:
+            text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL.format(
+                                                                 num_errors)
+            kind = self.reporter.KIND_ERR
+        else:
+            text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL_OK
+            kind = self.reporter.KIND_OUT
+        self.reporter.report(text, kind=kind)
 
     def check_fail_rules(self):
         """Check the fail-if and warn-if conditions of the configurations."""
         macro = rose.macros.rule.FailureRuleChecker()
         macro_fullname = "rule.FailureRuleChecker.validate"
-        for config_name, config_data in self.data.config.items():
+        error_count = 0
+        config_names = sorted(self.data.config.keys())
+        for config_name in sorted(self.data.config.keys()):
+            config_data = self.data.config[config_name]
+            if config_data.is_preview:
+                continue
             config = config_data.config
             meta = config_data.meta
             try:
                 return_value = macro.validate(config, meta)
+                if return_value:
+                    error_count += len(return_value)
             except Exception as e:
-                rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_ERROR,
-                              str(e),
-                              rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                           macro_fullname))
+                rose.gtk.dialog.run_dialog(
+                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                         str(e),
+                         rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                                                            macro_fullname))
                 continue
             sorter = rose.config.sort_settings
             to_id = lambda s: self.util.get_id_from_section_option(
@@ -422,6 +453,16 @@ class MainMenuHandler(object):
             self.handle_macro_validation(config_name, macro_fullname,
                                          config, return_value,
                                          no_display=(not return_value))
+        if error_count > 0:
+            msg = rose.config_editor.EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND
+            info_text = msg.format(error_count)
+            kind = self.reporter.KIND_ERR
+        else:
+            msg = rose.config_editor.EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS
+            info_text = msg
+            kind = self.reporter.KIND_OUT
+        self.reporter.report(info_text, kind=kind)
+        return error_count
 
     def clear_page_menu(self, menubar, add_menuitem):
         """Clear all page add variable items."""
@@ -452,16 +493,116 @@ class MainMenuHandler(object):
             for macro_mod, macro_cls, macro_func, help in macro_tuples:
                 menubar.add_macro(config_name, macro_mod, macro_cls,
                                   macro_func, help, image,
-                                  self.run_custom_macro)
+                                  self.handle_run_custom_macro)
+
+    def inspect_custom_macro(self, macro_meth):
+        """Inspect a custom macro for kwargs and return any"""
+        arglist = inspect.getargspec(macro_meth).args
+        defaultlist = inspect.getargspec(macro_meth).defaults
+        optionals = {}
+        while defaultlist is not None and len(defaultlist) > 0:
+            if arglist[-1] not in ["self", "config", "meta_config"]:
+                optionals[arglist[-1]] = defaultlist[-1]
+                arglist = arglist[0:-1]
+                defaultlist = defaultlist[0:-1]
+            else:
+                break
+        return optionals
+
+    def check_entry_value(self, entry_widget, dialog, entries, 
+                          labels, optionals):
+        is_valid = True
+        for k, entry in entries.items():
+            this_is_valid = True
+            try:
+                new_val = ast.literal_eval(entry.get_text())
+                entry.modify_text(gtk.STATE_NORMAL, None)
+            except (ValueError, EOFError, SyntaxError):
+                entry.modify_text(gtk.STATE_NORMAL, self.bad_colour)
+                is_valid = False
+                this_is_valid = False
+            if not this_is_valid or new_val != optionals[k]:
+                lab = '<span foreground="blue">{0}</span>'.format(str(k)+":")
+                labels[k].set_markup(lab)
+            else:
+                labels[k].set_text(str(k) + ":")
+        dialog.set_response_sensitive(gtk.RESPONSE_OK, is_valid)
+        return
+
+    def handle_macro_entry_activate(self, entry_widget, dialog, entries):
+        for k, entry in entries.items():
+            try:
+                ast.literal_eval(entry.get_text())
+            except (ValueError, EOFError, SyntaxError):
+                break
+        else:
+            dialog.response(gtk.RESPONSE_OK)
+
+    def override_macro_defaults(self, optionals, methname):
+        """Launch a dialog to handle capture of any override args to macro"""
+        res = {}
+        #create the text input field
+        entries = {}
+        labels = {}
+        errs = {}
+        succeeded = False
+        dialog = gtk.MessageDialog(
+                None,
+                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                gtk.MESSAGE_QUESTION,
+                gtk.BUTTONS_OK_CANCEL,
+                None)
+        dialog.set_markup('Specify overrides for macro arguments:')
+        dialog.set_title(methname)
+        table = gtk.Table(len(optionals.items()), 2, False)
+        dialog.vbox.add(table)
+        for i in range(len(optionals.items())):
+            k, v = optionals.items()[i]
+            label = gtk.Label(str(k) + ":")
+            entry = gtk.Entry()
+            if isinstance(v,str):
+                entry.set_text("'" + v + "'")
+            else:
+                entry.set_text(str(v))
+            entry.connect("changed", self.check_entry_value, dialog, 
+                          entries, labels, optionals)
+            entry.connect("activate", self.handle_macro_entry_activate, 
+                          dialog, entries)
+            entries[k] = entry
+            labels[k] = label
+            table.attach(entry, 1, 2, i, i+1)
+            hbox = gtk.HBox()
+            hbox.pack_start(label, expand=False)
+            table.attach(hbox, 0, 1, i, i+1)
+        dialog.show_all()
+        response = dialog.run()
+        if (response == gtk.RESPONSE_CANCEL or 
+            response == gtk.RESPONSE_CLOSE):
+            res = optionals
+            dialog.destroy()
+        else:
+            res = {}
+            for k,box in entries.items():
+                res[k] = ast.literal_eval(box.get_text())
+        dialog.destroy()
+        return res
+
+    def handle_run_custom_macro(self, *args, **kwargs):
+        """Wrap the method so that this returns False for GTK callbacks."""
+        self.run_custom_macro(*args, **kwargs)
+        return False
 
     def run_custom_macro(self, config_name=None, module_name=None,
                          class_name=None, method_name=None):
         """Run the custom macro method and launch a dialog."""
         macro_data = []
         if config_name is None:
-            configs = self.data.config.keys()
+            configs = sorted(self.data.config.keys())
         else:
             configs = [config_name]
+        for name in list(configs):
+            if self.data.config[name].is_preview:
+                configs.remove(name)
         if method_name is None:
             method_names = [rose.macro.VALIDATE_METHOD,
                             rose.macro.TRANSFORM_METHOD]
@@ -493,8 +634,8 @@ class MainMenuHandler(object):
                         try:
                             macro_inst = obj()
                         except Exception as e:
-                            rose.gtk.util.run_dialog(
-                                 rose.gtk.util.DIALOG_TYPE_ERROR,
+                            rose.gtk.dialog.run_dialog(
+                                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                  str(e), err_text)
                             continue
                         if hasattr(macro_inst, method_name):
@@ -502,7 +643,7 @@ class MainMenuHandler(object):
                                                module.__name__, obj_name,
                                                method_name))
         if not macro_data:
-            return None
+            return 0
         sorter = rose.config.sort_settings
         to_id = lambda s: self.util.get_id_from_section_option(s.section,
                                                                s.option)
@@ -513,14 +654,19 @@ class MainMenuHandler(object):
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             macro_method = getattr(macro_inst, methname)
+            optionals = self.inspect_custom_macro(macro_method)
+            if optionals:
+                res = self.override_macro_defaults(optionals, objname)
+            else:
+                res = {}
             try:
-                return_value = macro_method(macro_config, meta_config)
+                return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
-                rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_ERROR,
-                              str(e),
-                              rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                                 macro_fullname))
+                rose.gtk.dialog.run_dialog(
+                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                         str(e),
+                         rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                                                            macro_fullname))
                 continue
             if methname == rose.macro.TRANSFORM_METHOD:
                 if (not isinstance(return_value, tuple) or
@@ -533,9 +679,9 @@ class MainMenuHandler(object):
                 if not change_list:
                     continue
                 change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
-                num_changes = self.handle_macro_transforms(
-                                                config_name, macro_fullname,
-                                                macro_config, change_list)
+                num_changes = len(change_list)
+                self.handle_macro_transforms(config_name, macro_fullname,
+                                             macro_config, change_list)
                 config_macro_changes.append((config_name,
                                              macro_fullname,
                                              num_changes))
@@ -560,13 +706,14 @@ class MainMenuHandler(object):
             if rose.macro.VALIDATE_METHOD in method_names:
                 null_format = rose.config_editor.EVENT_MACRO_VALIDATE_ALL_OK
                 change_format = rose.config_editor.EVENT_MACRO_VALIDATE_ALL
-                num_issues = len(config_macro_errors)
-                issue_confs = sorted(set(e[0] for e in config_macro_errors))
+                num_issues = sum([e[2] for e in config_macro_errors])
+                issue_confs = [e[0] for e in config_macro_errors if e[2]]
             else:
                 null_format = rose.config_editor.EVENT_MACRO_TRANSFORM_ALL_OK
                 change_format = rose.config_editor.EVENT_MACRO_TRANSFORM_ALL
-                num_issues = len(config_macro_changes)
-                issue_confs = sorted(set(e[0] for e in config_macro_changes))
+                num_issues = sum([e[2] for e in config_macro_changes])
+                issue_confs = [e[0] for e in config_macro_changes if e[2]]
+            issue_confs = sorted(set(issue_confs))
             if num_issues:
                 issue_conf_text = self._format_macro_config_names(issue_confs)
                 self.reporter.report(change_format.format(issue_conf_text,
@@ -576,21 +723,22 @@ class MainMenuHandler(object):
                 all_conf_text = self._format_macro_config_names(configs)
                 self.reporter.report(null_format.format(all_conf_text),
                                      kind=self.reporter.KIND_OUT)
-        return False                          
+        return len(config_macro_errors) + len(config_macro_changes)
 
     def _format_macro_config_names(self, config_names):
         if len(config_names) > 5:
-            return rose.config_editor.EVENT_CONFIGS.format(len(config_names))
+            return rose.config_editor.EVENT_MACRO_CONFIGS.format(
+                                            len(config_names))
         config_names = [c.lstrip("/") for c in config_names]
         return ", ".join(config_names)
 
     def _handle_bad_macro_return(self, macro_fullname, return_value):
-        rose.gtk.util.run_dialog(
-            rose.gtk.util.DIALOG_KIND_ERROR,
-            rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
-                                                return_value),
-            rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                macro_fullname))
+        rose.gtk.dialog.run_dialog(
+                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                 rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
+                                                    return_value),
+                 rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                                                    macro_fullname))
 
     def handle_macro_transforms(self, config_name, macro_name,
                                 macro_config, change_list, no_display=False,
@@ -741,9 +889,9 @@ class MainMenuHandler(object):
         macro_type = ".".join(macro_name.split(".")[:-1])
         self.apply_macro_validation(config_name, macro_type, problem_list)
         search = lambda i: self.find_ns_id_func(config_name, i)
+        self._report_macro_validation(config_name, macro_name,
+                                      len(problem_list))
         if not no_display:
-            self._report_macro_validation(config_name, macro_name,
-                                          len(problem_list))
             self.mainwindow.launch_macro_changes_dialog(
                             config_name, macro_type, problem_list,
                             mode="validate", search_func=search)
@@ -764,11 +912,20 @@ class MainMenuHandler(object):
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
 
-    def handle_run_scheduler(self, *args):
-        """Run the scheduler for this suite."""
-        this_id = str(SuiteId(id_text=self.get_selected_suite_id()))
-        return rose.suite_control.SuiteControl().gcontrol(this_id)
-    
+    def handle_upgrade(self, only_this_config_name=None):
+        """Run the upgrade manager for this suite."""
+        config_dict = {}
+        for config_name in self.data.config.keys():
+            config_data = self.data.config[config_name]
+            if config_data.is_preview:
+                continue
+            if (only_this_config_name is None or
+                config_name == only_this_config_name):
+                config_dict[config_name] = config_data.config
+        rose.config_editor.upgrade_controller.UpgradeController(
+                           config_dict, self.handle_macro_transforms,
+                           parent_window=self.mainwindow.window)
+
     def help(self, *args):
         # Handle a GUI help request.
         self.mainwindow.launch_help_dialog()
@@ -787,29 +944,34 @@ class MainMenuHandler(object):
         
     def launch_terminal(self):
         # Handle a launch terminal request.
-        rose.external.launch_terminal()
+        try:
+            rose.external.launch_terminal()
+        except rose.popen.RosePopenError as e:
+            rose.gtk.dialog.run_dialog(
+                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                str(e),
+                                rose.config_editor.DIALOG_TITLE_ERROR)
 
     def launch_output_viewer(self):
         """View a suite's output, if any."""
-        g = rose.suite_log_view.SuiteLogViewGenerator()
-        url = g.get_suite_log_url(self.data.top_level_name)
-        if url is None:
-            rose.gtk.util.run_dialog(
-                              rose.gtk.util.DIALOG_TYPE_ERROR,
-                              rose.config_editor.ERROR_NO_OUTPUT.format(
-                              self.data.top_level_name),
-                              rose.config_editor.DIALOG_TITLE_ERROR)
-        else:
-            g.view_suite_log_url(self.data.top_level_name)
+        g = rose.suite_engine_proc.SuiteEngineProcessor.get_processor()
+        try:
+            g.launch_suite_log_browser(None, self.data.top_level_name)
+        except rose.suite_engine_proc.NoSuiteLogError:
+            rose.gtk.dialog.run_dialog(
+                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                rose.config_editor.ERROR_NO_OUTPUT.format(
+                                            self.data.top_level_name),
+                                rose.config_editor.DIALOG_TITLE_ERROR)
 
     def get_run_suite_args(self, *args):
         """Ask the user for custom arguments to suite run."""
         help_cmds = shlex.split(rose.config_editor.LAUNCH_SUITE_RUN_HELP)
         help_text = subprocess.Popen(help_cmds,
                                      stdout=subprocess.PIPE).communicate()[0]
-        rose.gtk.util.run_command_arg_dialog(
-                          rose.config_editor.LAUNCH_SUITE_RUN,
-                          help_text, self.run_suite_check_args)
+        rose.gtk.dialog.run_command_arg_dialog(
+                            rose.config_editor.LAUNCH_SUITE_RUN,
+                            help_text, self.run_suite_check_args)
 
     def run_suite_check_args(self, args):
         if args is None:
@@ -825,20 +987,20 @@ class MainMenuHandler(object):
         rose.gtk.run.run_suite(*args)
         return False
 
-    def transform_default(self, only_this_config_name=None):
+    def transform_default(self, only_this_config=None):
         """Run the Rose built-in transformer macros."""
-        if (only_this_config_name is not None and
-            only_this_config_name in self.data.config.keys()):
-            config_keys = [only_this_config_name]
+        if (only_this_config is not None and
+            only_this_config in self.data.config.keys()):
+            config_keys = [only_this_config]
             text = rose.config_editor.DIALOG_LABEL_AUTOFIX
         else:
             config_keys = sorted(self.data.config.keys())
             text = rose.config_editor.DIALOG_LABEL_AUTOFIX_ALL
-        proceed = rose.gtk.util.run_dialog(
-                                    rose.gtk.util.DIALOG_TYPE_WARNING,
-                                    text,
-                                    rose.config_editor.DIALOG_TITLE_AUTOFIX,
-                                    cancel=True)
+        proceed = rose.gtk.dialog.run_dialog(
+                                  rose.gtk.dialog.DIALOG_TYPE_WARNING,
+                                  text,
+                                  rose.config_editor.DIALOG_TITLE_AUTOFIX,
+                                  cancel=True)
         if not proceed:
             return False
         sorter = rose.config.sort_settings

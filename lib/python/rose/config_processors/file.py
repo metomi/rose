@@ -20,6 +20,7 @@
 """Process "file:*" sections in a rose.config.ConfigNode."""
 
 from fnmatch import fnmatch
+from glob import glob
 from hashlib import md5
 import os
 import re
@@ -126,23 +127,31 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             target_sources = []
             for k in ["content", "source"]:
                 source_str = node.get_value([k])
-                if source_str is not None:
-                    try:
-                        source_str = env_var_process(source_str)
-                    except UnboundEnvironmentVariableError as e:
-                        raise ConfigProcessError([key, k], source_str, e)
-                    for source_name in shlex.split(source_str):
-                        if targets[name].mode == "symlink":
-                            if targets[name].real_name:
-                                # Symlink mode can only have 1 source
-                                raise ConfigProcessError([key, k], source_str)
-                            targets[name].real_name = source_name
-                        else:
-                            if not sources.has_key(source_name):
-                                sources[source_name] = Loc(source_name)
-                                sources[source_name].action_key = Loc.A_SOURCE
-                            sources[source_name].used_by_names.append(name)
-                            target_sources.append(sources[source_name])
+                if source_str is None:
+                    continue
+                try:
+                    source_str = env_var_process(source_str)
+                except UnboundEnvironmentVariableError as e:
+                    raise ConfigProcessError([key, k], source_str, e)
+                source_names = []
+                for source_glob in shlex.split(source_str):
+                    names = glob(source_glob)
+                    if names:
+                        source_names += sorted(names)
+                    else:
+                        source_names.append(source_glob)
+                for source_name in source_names:
+                    if targets[name].mode == "symlink":
+                        if targets[name].real_name:
+                            # Symlink mode can only have 1 source
+                            raise ConfigProcessError([key, k], source_str)
+                        targets[name].real_name = source_name
+                    else:
+                        if not sources.has_key(source_name):
+                            sources[source_name] = Loc(source_name)
+                            sources[source_name].action_key = Loc.A_SOURCE
+                        sources[source_name].used_by_names.append(name)
+                        target_sources.append(sources[source_name])
             targets[name].dep_locs = target_sources
 
         # Determine the scheme of the location from configuration.
@@ -188,14 +197,17 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         not os.path.islink(target.name) or
                         target.real_name != os.readlink(target.name))
             elif target.mode == "mkdir":
-                target.is_out_of_date = not os.path.isdir(target.name)
+                target.is_out_of_date = (os.path.islink(target.name) or
+                                         not os.path.isdir(target.name))
             else:
-                if os.path.exists(target.name):
+                if (os.path.exists(target.name) and
+                    not os.path.islink(target.name)):
                     for path, checksum in get_checksum(target.name):
                         target.add_path(path, checksum)
                     target.paths.sort()
                 prev_target = loc_dao.select(target.name)
                 target.is_out_of_date = (
+                        os.path.islink(target.name) or
                         not os.path.exists(target.name) or
                         prev_target is None or
                         prev_target.mode != target.mode or
@@ -224,11 +236,15 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 self.manager.fs_util.symlink(target.real_name, target.name)
                 loc_dao.update(target)
             elif target.mode == "mkdir":
+                if os.path.islink(target.name):
+                    self.manager.fs_util.delete(target.name)
                 self.manager.fs_util.makedirs(target.name)
                 loc_dao.update(target)
                 target.loc_type = target.TYPE_TREE
                 target.add_path(target.BLOB, None)
             elif target.dep_locs:
+                if os.path.islink(target.name):
+                    self.manager.fs_util.delete(target.name)
                 jobs[target.name] = JobProxy(target)
                 for source in target.dep_locs:
                     if not jobs.has_key(source.name):
@@ -238,10 +254,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     jobs[target.name].pending_for[source.name] = job
             else:
                 self.manager.fs_util.install(target.name)
-                loc_dao.update(target)
                 target.loc_type = target.TYPE_BLOB
                 for path, checksum in get_checksum(target.name):
                     target.add_path(path, checksum)
+                loc_dao.update(target)
 
         if jobs:
             work_dir = mkdtemp()

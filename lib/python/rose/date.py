@@ -54,23 +54,20 @@ class RoseDateShifter(object):
              "s": "seconds"}
 
 
-    REC_OFFSET = re.compile(
-            r"""(?P<sign>[\+\-])?(?P<num>\d+)(?P<unit>[wdhms])""", re.I)
+    REC_OFFSET = re.compile(r"""\A[\+\-]?(?:\d+[wdhms])+\Z""", re.I)
+
+    REC_OFFSET_FIND = re.compile(r"""(?P<num>\d+)(?P<unit>[wdhms])""")
 
     TASK_CYCLE_TIME_MODE_ENV = "ROSE_TASK_CYCLE_TIME"
 
 
-    def __init__(self, parse_format=None, print_format=None,
-                 task_cycle_time_mode=None):
+    def __init__(self, parse_format=None, task_cycle_time_mode=None):
         """Constructor.
 
         parse_format -- If specified, parse with the specified format.
                         Otherwise, parse with one of the format strings in
                         self.PARSE_FORMATS. The format should be a string
                         compatible to strptime(3).
-
-        print_format -- If specified, return a string as specified in the
-                        format. Otherwise, use the parse_format.
 
         task_cycle_time_mode -- If True, use the value of the environment
                                 variable ROSE_TASK_CYCLE_TIME (if it is
@@ -81,10 +78,48 @@ class RoseDateShifter(object):
         self.parse_formats = self.PARSE_FORMATS
         if parse_format:
             self.parse_formats = [parse_format]
-        self.print_format = print_format
         self.task_cycle_time = None
         if task_cycle_time_mode:
             self.task_cycle_time = os.getenv(self.TASK_CYCLE_TIME_MODE_ENV)
+
+    def date_format(self, print_format, ref_time=None):
+        """Reformat ref_time according to print_format.
+
+        ref_time -- If specified, use as the reference date-time string. If not
+                    specified and if self.task_cycle_time_mode is True, use
+                    ROSE_TASK_CYCLE_TIME environment variable if it is defined.
+                    Otherwise, use current time.
+
+        """
+        return self.date_parse(ref_time)[0].strftime(print_format)
+
+    def date_parse(self, ref_time=None):
+        """Parse ref_time.
+
+        Return (t, format) where t is a datetime.datetime object and format is
+        the format that matches ref_time.
+
+        ref_time -- If specified, use as the reference date-time string. If not
+                    specified and if self.task_cycle_time_mode is True, use
+                    ROSE_TASK_CYCLE_TIME environment variable if it is defined.
+                    Otherwise, use current time.
+
+        """
+        if not ref_time and self.task_cycle_time is not None:
+            ref_time = self.task_cycle_time
+        if not ref_time or ref_time == "now":
+            d, parse_format = (datetime.now(), self.parse_formats[0])
+        else:
+            parse_formats = list(self.parse_formats)
+            while parse_formats:
+                parse_format = parse_formats.pop(0)
+                try:
+                    d = datetime.strptime(ref_time, parse_format)
+                    break
+                except ValueError as e:
+                    if not parse_formats:
+                        raise e
+        return d, parse_format
 
     def date_shift(self, ref_time=None, offset=None):
         """Return a date string with an offset.
@@ -95,30 +130,21 @@ class RoseDateShifter(object):
                     Otherwise, use current time.
 
         offset -- If specified, it should be a string containing the offset
-                  that has the repeatable format "[+/-]nU" where "n" is an
+                  that has the format "[+/-]nU[nU...]" where "n" is an
                   integer, and U is a unit matching a key in self.UNITS.
 
         """
-        # Parse
-        if not ref_time and self.task_cycle_time is not None:
-            ref_time = self.task_cycle_time
-        if not ref_time or ref_time == "now":
-            d, parse_format = (datetime.now(), self.parse_formats[0])
-        else:
-            while self.parse_formats:
-                parse_format = self.parse_formats.pop(0)
-                try:
-                    d = datetime.strptime(ref_time, parse_format)
-                    break
-                except ValueError as e:
-                    if not self.parse_formats:
-                        raise e
+        d, parse_format = self.date_parse(ref_time)
 
         # Offset
         if offset:
             if not self.is_offset(offset):
                 raise OffsetValueError(offset)
-            for sign, num, unit in self.REC_OFFSET.findall(offset.lower()):
+            sign = "+"
+            if offset.startswith("-") or offset.startswith("+"):
+                sign = offset[0]
+                offset = offset[1:]
+            for num, unit in self.REC_OFFSET_FIND.findall(offset.lower()):
                 num = int(num)
                 if sign == "-":
                     num = -num
@@ -126,10 +152,7 @@ class RoseDateShifter(object):
                 d += timedelta(**{key: num})
 
         # Format
-        print_format = self.print_format
-        if print_format is None:
-            print_format = parse_format
-        return d.strftime(print_format)
+        return d.strftime(parse_format)
 
     __call__ = date_shift
 
@@ -139,7 +162,7 @@ class RoseDateShifter(object):
 
     def is_offset(self, offset):
         """Return True if the string offset can be parsed as an offset."""
-        return (self.REC_OFFSET.match(offset.lower()) is not None)
+        return (self.REC_OFFSET.match(offset) is not None)
 
 
 def main():
@@ -152,15 +175,18 @@ def main():
     ref_time = None
     if args:
         ref_time = args[0]
-    offset = None
-    if opts.offsets:
-        offset = "".join(opts.offsets)
     try:
-        ds = RoseDateShifter(opts.parse_format, opts.print_format,
-                             opts.task_cycle_time_mode)
+        ds = RoseDateShifter(opts.parse_format, opts.task_cycle_time_mode)
         if opts.task_cycle_time_mode and ds.task_cycle_time is None:
             raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
-        print ds(ref_time, offset)
+        ref_time = ds(ref_time)
+        if opts.offsets:
+            for offset in opts.offsets:
+                ref_time = ds(ref_time, offset)
+        if opts.print_format:
+            print ds.date_format(opts.print_format, ref_time)
+        else:
+            print ref_time
     except Exception as e:
         if opts.debug_mode:
             import traceback

@@ -49,8 +49,8 @@ ERR_NO_TARGET_AT_REV = "{0}: target does not exist at this revision"
 ERR_SYNTAX = "Syntax error: {0}"
 ERR_USAGE = "rosie: incorrect usage"
 
-FORMAT_DEFAULT = "%local %suite %owner %project %title"
-FORMAT_QUIET = "%suite"
+PRINT_FORMAT_DEFAULT = "%local %suite %owner %project %title"
+PRINT_FORMAT_QUIET = "%suite"
 
 REC_COL_IN_FORMAT = re.compile("(?:^|[^%])%([\w-]+)")
 REC_ID = re.compile("\A(?:(\w+)-)?(\w+)(?:/([^\@/]+))?(?:@([^\@/]+))?\Z")
@@ -71,6 +71,13 @@ class QueryError(Exception):
     pass
 
 
+class UnknownRootError(Exception):
+
+    """Raised if a prefix has no config."""
+
+    pass
+
+
 class RosieWSClient(object):
 
     """A Client for the Rosie Web Service."""
@@ -81,6 +88,8 @@ class RosieWSClient(object):
         self.prefix = prefix
         conf = ResourceLocator.default().get_conf()
         root = conf.get_value(["rosie-id", "prefix-ws." + self.prefix])
+        if root is None:
+            raise UnknownRootError(self.prefix)
         if not root.endswith("/"):
             root += "/"
         self.root = root
@@ -139,6 +148,10 @@ class SuiteEvent(Event):
     def __str__(self):
         return self.args[0]
 
+class UserSpecificRoses(Event):
+
+    def __str__(self):
+        return "Listing suites in: " + self.args[0]
 
 class SuiteInfo(Event):
 
@@ -155,7 +168,7 @@ class SuiteInfo(Event):
             if key != "idx":
                 if value and isinstance(value, list):
                     value = " ".join(value)
-                if key == "date":
+                if key == "date" and isinstance(value, int):
                     out = (out + "\t" + key + ": " +
                            time.strftime(time_format,
                                          time.localtime(value)) + "\n")
@@ -167,15 +180,25 @@ class SuiteInfo(Event):
 def local_suites(argv):
     """CLI command to list all the locally checked out suites"""
     opt_parser = RoseOptionParser().add_my_options(
-            "format", "no_headers", "prefix", "reverse", "sort")
+            "no_headers", "prefix", "print_format", "reverse", "sort", "user")
     opts, args = opt_parser.parse_args(argv)
+
+    if opts.user:
+        report = Reporter(opts.verbosity - opts.quietness)
+        alternative_roses_dir = os.path.expanduser(opts.user) + "/roses"
+        report(UserSpecificRoses(alternative_roses_dir), prefix=None)
 
     ws_client = RosieWSClient(prefix=opts.prefix)
     if opts.prefix is not None:
-        results, id_list = get_local_suite_details(opts.prefix)
-        return _display_maps(opts, ws_client, results, local_suites=id_list)
+        try:
+            results, id_list = get_local_suite_details(opts.prefix,
+                                                       user=opts.user)
+            return _display_maps(opts, ws_client, 
+                                 results, local_suites=id_list)
+        except QueryError:
+            sys.exit("Error querying details of local suites")
     else:
-        id_list = get_local_suites()
+        id_list = get_local_suites(user=opts.user)
         if len(id_list) > 0:
             prefixes = []
             for id_ in id_list:
@@ -189,7 +212,8 @@ def local_suites(argv):
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
 
-                results, other_id_list = get_local_suite_details(p, id_list)
+                results, other_id_list = get_local_suite_details(p, id_list, 
+                                                                user=opts.user)
                 opts.prefix = p
                 _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
@@ -199,8 +223,8 @@ def local_suites(argv):
 def lookup(argv):
     """CLI command to run the various search types"""
     opt_parser = RoseOptionParser().add_my_options(
-            "all_revs", "format", "no_headers", "prefix", "query", "reverse", 
-            "search", "sort", "url")
+            "all_revs", "no_headers", "prefix", "print_format", "query",
+            "reverse", "search", "sort", "url")
     opts, args = opt_parser.parse_args(argv)
     if not args:
         sys.exit(opt_parser.print_usage())
@@ -209,11 +233,13 @@ def lookup(argv):
             opts.url = True
         else:
             opts.search = True
-    ws_client = RosieWSClient(prefix=opts.prefix)
+    try:
+        ws_client = RosieWSClient(prefix=opts.prefix)
+    except UnknownRootError:
+        sys.exit("No settings found for prefix: '%s'" % opts.prefix)
     results = None
     if opts.url:
         addr = args[0]
-
         if opts.debug_mode:
             results, url = ws_client.address_search(None, url=addr)
         else:
@@ -269,10 +295,15 @@ def query_split(args):
     return q
 
 
-def get_local_suites(prefix=None, skip_status=False):
+def get_local_suites(prefix=None, skip_status=False, user=None):
     """Returns a dict of prefixes and id tuples for locally-present suites."""
     local_copies = []
-    local_copy_root = SuiteId.get_local_copy_root()
+    
+    if user:
+        local_copy_root = os.path.expanduser(user) + "/roses"
+    else:
+        local_copy_root = SuiteId.get_local_copy_root()
+    
     if not os.path.isdir(local_copy_root):
         return local_copies
     for path in os.listdir(local_copy_root):
@@ -287,7 +318,8 @@ def get_local_suites(prefix=None, skip_status=False):
     return local_copies
 
 
-def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
+def get_local_suite_details(prefix=None, id_list=None, skip_status=False,
+                            user=None):
     """returns details of the local suites as if they had been obtained using
        a search or query.
        """
@@ -295,7 +327,7 @@ def get_local_suite_details(prefix=None, id_list=None, skip_status=False):
         return [], []
 
     if id_list == None:
-        id_list = get_local_suites(skip_status=skip_status)
+        id_list = get_local_suites(skip_status=skip_status, user=user)
 
     if not id_list:
         return [], []
@@ -395,16 +427,16 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         opts.prefix = ws_client.prefix
 
     if opts.quietness:
-        opts.format = FORMAT_QUIET
-    elif not opts.format:
-        opts.format = FORMAT_DEFAULT
+        opts.print_format = PRINT_FORMAT_QUIET
+    elif not opts.print_format:
+        opts.print_format = PRINT_FORMAT_DEFAULT
 
     all_keys = ws_client.get_known_keys()
 
     if local_suites == None:
         local_suites = get_local_suites(opts.prefix)
 
-    check_local = "%local" in opts.format
+    check_local = "%local" in opts.print_format
 
     for dict_row in dict_rows:
         dict_row["suite"] = "%s/%s@%s" % (
@@ -422,7 +454,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         all_keys += ["local"]
 
     more_keys = []
-    for key in REC_COL_IN_FORMAT.findall(opts.format):
+    for key in REC_COL_IN_FORMAT.findall(opts.print_format):
         if key not in all_keys:
             more_keys.append(key)
     all_keys += more_keys
@@ -435,7 +467,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
 
     keylist = []
     for key in all_keys:
-        if "%" + key in opts.format:
+        if "%" + key in opts.print_format:
             keylist.append(key)
 
     if not opts.no_headers:
@@ -447,7 +479,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     dict_rows = align(dict_rows, keylist)
 
     for dict_row in dict_rows:
-        out = opts.format
+        out = opts.print_format
         for key, value in dict_row.items():
             if "%" + key in out:
                 out = out.replace("%" + key, str(value), 1)

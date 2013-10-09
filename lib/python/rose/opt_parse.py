@@ -41,6 +41,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Return all revisions of matched items."}],
+               "all_versions": [
+                       ["--all-versions", "-a"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Use all tagged versions."}],
                "app_key": [
                        ["--app-key"],
                        {"action": "store",
@@ -75,6 +80,12 @@ class RoseOptionParser(OptionParser):
                         "default": True,
                         "dest": "checkout_mode",
                         "help": "Do not checkout after creating the suite."}],
+               "choice": [
+                       ["--choice"],
+                       {"action": "store",
+                        "default": 1,
+                        "metavar": "N",
+                        "help": "Choose from any of the top N items."}],
                "command_key": [
                        ["--command-key", "-c"],
                        {"action": "store",
@@ -145,10 +156,6 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "force_mode",
                         "help": "Switch on force mode."}],
-               "format": [
-                       ["--format", "-f"],
-                       {"metavar": "FORMAT",
-                        "help": "Specify the output format of each result."}],
                "gcontrol_mode": [
                        ["--no-gcontrol"],
                        {"action": "store_false",
@@ -252,9 +259,10 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "metavar": "PATH",
                         "help": "Prepend items to the metadata search path."}],
-               "meta_suite": [
+               "meta_suite_mode": [
                        ["--meta-suite"],
                        {"action": "store_true",
+                        "dest": "meta_suite_mode",
                         "default": False,
                         "help": "ADMIN-ONLY: Create the metadata suite."}],
                "name": [
@@ -288,6 +296,13 @@ class RoseOptionParser(OptionParser):
                         "dest": "no_ignore",
                         "default": True,
                         "help": "Print ignored settings where relevant."}],
+               "no_metadata": [
+                       ["--no-metadata"],
+                       {"action": "store_true",
+                        "dest": "no_metadata",
+                        "default": False,
+                        "help": "Start config editor without metadata " + 
+                                "switched on."}],
                "no_opts": [
                        ["--no-opts"],
                        {"action": "store_true",
@@ -298,6 +313,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "no_overwrite_mode",
                         "help": "Do not overwrite existing files."}],
+               "no_pretty_mode": [
+                       ["--no-pretty"],
+                       {"action": "store_true",
+                        "default": False,
+                        "dest": "no_pretty_mode",
+                        "help": "Switch off format-specific prettyprinting."}],
                "offsets": [
                        ["--offset", "-s"],
                        {"action": "append",
@@ -324,9 +345,9 @@ class RoseOptionParser(OptionParser):
                         "metavar": "FILE",
                         "help": "Specify the name of the output file."}],
                "parse_format": [
-                       ["--parse-format", "--format"],
+                       ["--parse-format", "-p"],
                        {"metavar": "FORMAT",
-                        "help": "Specify the format for parsing."}],
+                        "help": "Specify the format for parsing inputs."}],
                "path_globs": [
                        ["--path", "-P"],
                        {"action": "append",
@@ -342,9 +363,9 @@ class RoseOptionParser(OptionParser):
                        {"metavar": "DELIMITER",
                         "help": "Specify the prefix delimiter."}],
                "print_format": [
-                       ["--print-format"],
+                       ["--print-format", "--format", "-f"],
                        {"metavar": "FORMAT",
-                        "help": "Specify the format for printing."}],
+                        "help": "Specify the format for printing results."}],
                "profile_mode": [
                        ["--profile"],
                        {"action": "store_true",
@@ -356,6 +377,11 @@ class RoseOptionParser(OptionParser):
                        {"action": "append",
                         "metavar": "PROPERTY",
                         "help": "Specify a property."}],
+               "prune_remote_mode": [
+                       ["--tidy-remote"],
+                       {"action": "store_true",
+                        "dest": "prune_remote_mode",
+                        "help": "Remove remote job logs after retrieval."}],
                "query": [
                        ["--query", "-Q"],
                        {"action": "store_true",
@@ -447,11 +473,6 @@ class RoseOptionParser(OptionParser):
                         "dest": "thresholds",
                         "metavar": "METHOD:METHOD-ARG:NUMBER",
                         "help": "Specify one or more threshold."}],
-               "tidy_remote_mode": [
-                       ["--tidy-remote"],
-                       {"action": "store_true",
-                        "dest": "tidy_remote_mode",
-                        "help": "Remove remote job logs after retrieval."}],
                "timeout": [
                        ["--timeout"],
                        {"metavar": "DELAY",
@@ -477,7 +498,7 @@ class RoseOptionParser(OptionParser):
                        {"metavar": "STRING",
                         "help": "Substitute unbound variables with STRING"}],
                "update_mode": [
-                       ["--update", "-u"],
+                       ["--update", "-U"],
                        {"action": "store_true",
                         "dest": "update_mode",
                         "default": False,
@@ -493,6 +514,12 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "default": False,
                         "help": "Use search url"}],
+               "user": [
+                       ["--user", "-u"],
+                       {"action": "store",
+                        "default": None,
+                        "dest": "user",
+                        "help": "Apply to specified user."}],
                "validate_all": [
                        ["--validate", "-V"],
                        {"action": "store_true",

@@ -26,6 +26,7 @@ import sys
 
 import rose.config
 import rose.macro
+import rose.reporter
 
 
 BEST_VERSION_MARKER = "* "
@@ -47,6 +48,13 @@ UPGRADE_METHOD = "upgrade"
 IGNORE_MAP = {rose.config.ConfigNode.STATE_NORMAL: "enabled",
               rose.config.ConfigNode.STATE_USER_IGNORED: "user-ignored",
               rose.config.ConfigNode.STATE_SYST_IGNORED: "trig-ignored"}
+
+class UpgradeVersionError(NameError):
+
+    """Raise this error when an incorrect upgrade version is selected."""
+
+    def __str__(self):
+        return ERROR_UPGRADE_VERSION.format(self.args[0])
 
 
 class MacroUpgrade(rose.macro.MacroBase):
@@ -141,7 +149,7 @@ class MacroUpgrade(rose.macro.MacroBase):
         node = config.get([section, option])
         if node is None:
             if forced:
-                return self.add_setting(config, keys, value, state,
+                return self.add_setting(config, keys, value, node.state,
                                         comments, info)
             return False
         if node.value == value:
@@ -233,6 +241,7 @@ class MacroUpgradeManager(object):
         self.app_config = app_config
         self.downgrade = downgrade
         self.new_version = None
+        self.named_tags = []
         opt_node = app_config.get([rose.CONFIG_SECT_TOP,
                                    rose.CONFIG_OPT_META_TYPE], no_ignore=True)
         tag_items = opt_node.value.split("/")
@@ -249,6 +258,11 @@ class MacroUpgradeManager(object):
                                                        is_upgrade=True)
         if meta_path is None:
             raise OSError(rose.macro.ERROR_LOAD_CONF_META_NODE)
+        self.named_tags = []
+        for node in os.listdir(meta_path):
+            node_meta = os.path.join(meta_path, node, rose.META_CONFIG_NAME)
+            if os.path.exists(node_meta):
+                self.named_tags.append(node)
         sys.path.append(os.path.abspath(meta_path))
         try:
             self.version_module = __import__(MACRO_UPGRADE_MODULE)
@@ -274,15 +288,18 @@ class MacroUpgradeManager(object):
                         version_macros.append(macro_inst)
         self._load_version_macros(version_macros)
 
-    def get_tags(self):
+    def get_tags(self, only_named=False):
         """Return relevant tags, reversed order for downgrades."""
+        tags = [m.AFTER_TAG for m in self.version_macros]
         if self.downgrade:
-            return [m.BEFORE_TAG for m in self.version_macros]
-        return [m.AFTER_TAG for m in self.version_macros]
+            tags = [m.BEFORE_TAG for m in self.version_macros]
+        if only_named:
+            return [t for t in tags if t in self.named_tags]
+        return tags
         
-    def get_new_tag(self):
+    def get_new_tag(self, only_named=False):
         """Obtain the default upgrade version."""
-        tags = self.get_tags()
+        tags = self.get_tags(only_named=only_named)
         if not tags:
             return None
         return tags[-1]
@@ -313,7 +330,7 @@ class MacroUpgradeManager(object):
             return []
         return self.version_macros[start_index: end_index + 1]
 
-    def transform(self, config, meta_config=None):
+    def transform(self, config, meta_config=None, opt_non_interactive=False):
         """Transform a configuration by looping over upgrade macros."""
         self.reports = []
         for macro in self.get_macros():
@@ -321,7 +338,20 @@ class MacroUpgradeManager(object):
                 func = macro.downgrade
             else:
                 func = macro.upgrade
-            upgrade_macro_result = func(config, meta_config)
+            res = {}
+            if not opt_non_interactive:
+                arglist = inspect.getargspec(func).args
+                defaultlist = inspect.getargspec(func).defaults
+                optionals = {}
+                while defaultlist is not None and len(defaultlist) > 0:
+                    if arglist[-1] not in ["self", "config", "meta_config"]:
+                        optionals[arglist[-1]] = defaultlist[-1]
+                        arglist = arglist[0:-1]
+                        defaultlist = defaultlist[0:-1]
+                    else:
+                        break
+                res = rose.macro.get_user_values(optionals)
+            upgrade_macro_result = func(config, meta_config, **res)
             config, i_changes = upgrade_macro_result
             self.reports += i_changes
         opt_node = config.get([rose.CONFIG_SECT_TOP,
@@ -392,16 +422,20 @@ def main():
     if return_objects is None:
         sys.exit(1)
     app_config, meta_config, config_name, args, opts = return_objects
+    verbosity = 1 + opts.verbosity - opts.quietness
+    reporter = rose.reporter.Reporter(verbosity)
     meta_opt_node = app_config.get([rose.CONFIG_SECT_TOP,
                                     rose.CONFIG_OPT_META_TYPE],
                                    no_ignore=True)
     if meta_opt_node is None or len(meta_opt_node.value.split("/")) < 2:
-        sys.exit(rose.macro.ERROR_LOAD_CONF_META_NODE)
+        reporter(rose.macro.MetaConfigFlagMissingError())
+        sys.exit(1)
     try:
         upgrade_manager = MacroUpgradeManager(app_config, opts.downgrade)
     except OSError as e:
-        sys.exit(e)
-    ok_versions = upgrade_manager.get_tags()
+        reporter(e)
+        sys.exit(1)
+    ok_versions = upgrade_manager.get_tags(only_named=not opts.all_versions)
     if args:
         user_choice = args[0]
     else:
@@ -417,14 +451,15 @@ def main():
             if all_versions:
                 all_versions[-1] = best_mark + all_versions[-1].lstrip()
             all_versions.insert(0, curr_mark + upgrade_manager.tag)
-        print "\n".join(all_versions)
+        reporter("\n".join(all_versions) + "\n", prefix="")
         sys.exit()
     if user_choice not in ok_versions:
-        sys.exit(ERROR_UPGRADE_VERSION.format(user_choice))
+        reporter(UpgradeVersionError(user_choice))
+        sys.exit(1)
     upgrade_manager.set_new_tag(user_choice)
     macro_config = copy.deepcopy(app_config)
     new_config, change_list = upgrade_manager.transform(
-                                      macro_config, meta_config)
+                               macro_config, meta_config, opts.non_interactive)
     method_id = UPGRADE_METHOD.upper()[0]
     if opts.downgrade:
         method_id = DOWNGRADE_METHOD.upper()[0]
@@ -432,7 +467,7 @@ def main():
                                                  upgrade_manager.get_name())
     rose.macro._handle_transform(app_config, new_config, change_list,
                                  macro_id, opts.conf_dir, opts.output_dir,
-                                 opts.non_interactive)
+                                 opts.non_interactive, reporter)
 
 if __name__ == "__main__":
     rose.macro.add_site_meta_paths()

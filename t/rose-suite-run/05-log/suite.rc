@@ -1,0 +1,19 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout handler = "rose suite-hook --shutdown"
+        timeout = 1
+[scheduling]
+    initial cycle time = 2013010100
+    final cycle time = 2012010100 # deliberate, so no task is run
+    [[dependencies]]
+        [[[0]]]
+            graph = """
+my_task_1
+"""
+
+[runtime]
+    [[root]]
+        command scripting = "true"
+    [[my_task_1]]

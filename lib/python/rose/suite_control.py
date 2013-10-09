@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ class SuiteControl(object):
                   True.
         stderr: A file handle for stderr, if relevant for suite engine.
         stdout: A file handle for stdout, if relevant for suite engine.
-        args: extra arguments for the suite engine's gcontrol command.
+        args: extra arguments for the suite engine's shutdown command.
 
         """
         engine_version = self._get_engine_version(suite_name)
@@ -103,13 +103,13 @@ class SuiteControl(object):
         else:
             conf = ResourceLocator.default().get_conf()
             hosts = None
-            
+
             known_hosts = self.host_selector.expand(
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
               conf.get_value(["rose-suite-run", "scan-hosts"], "").split() +
               ["localhost"])[0]
             known_hosts = list(set(known_hosts))
-            
+
             if known_hosts:
                 hosts = self.suite_engine_proc.ping(
                         suite_name,
@@ -149,16 +149,15 @@ def get_suite_name(event_handler=None):
     suite_name = None
     conf_dir = os.getcwd()
     while True:
-        conf = os.path.join(conf_dir,'rose-suite.conf')
-        if os.path.exists(conf):
-            suite_name = os.path.basename(conf_dir)
-            break
-        else:
-            up_dir = fs_util.dirname(conf_dir)
-            if up_dir == conf_dir:
-                raise SuiteNotFoundError(os.getcwd())
-            conf_dir = up_dir        
-    return suite_name
+        if os.path.basename(conf_dir) != "rose-stem":
+            for tail in ["rose-suite.conf", "rose-stem/rose-suite.conf"]:
+                conf = os.path.join(conf_dir, tail)
+                if os.path.exists(conf):
+                    return os.path.basename(conf_dir)
+        up_dir = fs_util.dirname(conf_dir)
+        if up_dir == conf_dir:
+            raise SuiteNotFoundError(os.getcwd())
+        conf_dir = up_dir
 
 def prompt(action, suite_name, host):
     """Prompt user to confirm action for suite_name at host."""

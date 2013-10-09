@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 60
+tests 63
 
 #-------------------------------------------------------------------------------
 # Check basic downgrading.
@@ -32,7 +32,7 @@ meta=test-app-upgrade/1.0
 Z=5
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -91,12 +91,12 @@ class Upgrade03to04(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class Upgrade04to05(rose.upgrade.MacroUpgrade):
+class Upgrade04to041(rose.upgrade.MacroUpgrade):
 
-    """Upgrade from 0.4 to 0.5."""
+    """Upgrade from 0.4 to 0.4.1."""
 
     BEFORE_TAG = "0.4"
-    AFTER_TAG = "0.5"
+    AFTER_TAG = "0.4.1"
 
     def downgrade(self, config, meta_config=None):
         self.add_setting(config, ["env", "A"], "4")
@@ -107,11 +107,11 @@ class Upgrade04to05(rose.upgrade.MacroUpgrade):
         return config, self.reports
 
 
-class Upgrade05to10(rose.upgrade.MacroUpgrade):
+class Upgrade041to10(rose.upgrade.MacroUpgrade):
 
-    """Upgrade from 0.5 to 1.0."""
+    """Upgrade from 0.4.1 to 1.0."""
     
-    BEFORE_TAG = "0.5"
+    BEFORE_TAG = "0.4.1"
     AFTER_TAG = "1.0"
 
     def downgrade(self, config, meta_config=None):
@@ -133,7 +133,21 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
   0.2
   0.3
   0.4
-  0.5
+= 1.0
+__OUTPUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+
+#-----------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-downgrade-change-start-version-all
+# Check correct start version
+run_pass "$TEST_KEY" rose app-upgrade --downgrade \
+ --meta-path=../rose-meta/ -C ../config --all-versions
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
+* 0.1
+  0.2
+  0.3
+  0.4
+  0.4.1
 = 1.0
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -142,17 +156,17 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 TEST_KEY=$TEST_KEY_BASE-downgrade-change
 # Check changing within a downgrade
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
- --non-interactive --meta-path=../rose-meta/ -C ../config 0.5
+ --non-interactive --meta-path=../rose-meta/ -C ../config -a 0.4.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade1.0-0.5: changes: 2
+[D] Downgrade1.0-0.4.1: changes: 2
     env=Z=1
         Value: '5' -> '1'
-    =meta=test-app-upgrade/0.5
-        Downgraded from 1.0 to 0.5
+    =meta=test-app-upgrade/0.4.1
+        Downgraded from 1.0 to 0.4.1
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.file" ../config/rose-app.conf <<'__CONFIG__'
-meta=test-app-upgrade/0.5
+meta=test-app-upgrade/0.4.1
 
 [env]
 Z=1
@@ -168,7 +182,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
   0.2
   0.3
   0.4
-= 0.5
+= 0.4.1
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
@@ -176,7 +190,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 # Check the next step in the downgrade
 TEST_KEY=$TEST_KEY_BASE-downgrade-add
 init <<'__CONFIG__'
-meta=test-app-upgrade/0.5
+meta=test-app-upgrade/0.4.1
 
 [env]
 Z=1
@@ -184,11 +198,11 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.4
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade0.5-0.4: changes: 2
+[D] Downgrade0.4.1-0.4: changes: 2
     env=A=4
         Added with value '4'
     =meta=test-app-upgrade/0.4
-        Downgraded from 0.5 to 0.4
+        Downgraded from 0.4.1 to 0.4
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.file" ../config/rose-app.conf <<'__CONFIG__'
@@ -372,7 +386,7 @@ meta=test-app-upgrade/0.5
 A=4
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -418,7 +432,7 @@ run_fail "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-0.1: invalid version.
+[FAIL] 0.1: invalid version.
 __ERROR__
 teardown
 
@@ -433,7 +447,7 @@ meta=test-app-upgrade/0.3
 Z=1
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade 0.1 0.2 0.3 0.4 0.5
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -553,7 +567,7 @@ spam=eggs
 [namelist:something]
 __CONFIG__
 setup
-init_meta test-app-upgrade
+init_meta test-app-upgrade 0.1 0.2
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-

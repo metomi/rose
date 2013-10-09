@@ -25,6 +25,8 @@ import gtk
 
 import rose.config_editor
 import rose.config_editor.util
+import rose.gtk.dialog
+import rose.gtk.util
 
 
 class MenuWidget(gtk.HBox):
@@ -123,9 +125,11 @@ class MenuWidget(gtk.HBox):
             old_middle = option_ui_middle
             option_ui_middle = ''
             for err in variable.error:
-                option_ui_middle += "<menuitem action='Error_" + err + "'/>"
-                e_string = "(" + err + ")"
-                actions.append(("Error_" + err, gtk.STOCK_DIALOG_WARNING,
+                err_name = err.replace("/", "_")
+                option_ui_middle += ("<menuitem action='Error_" + err_name +
+                                     "'/>")
+                e_string = "(" + err.replace("_", "__") + ")"
+                actions.append(("Error_" + err_name, gtk.STOCK_DIALOG_WARNING,
                                 e_string))
             option_ui_middle += "<separator name='sepError'/>" + old_middle
         if self.is_ghost:
@@ -157,7 +161,7 @@ class MenuWidget(gtk.HBox):
         # FIXME: Try to popup the menu at the button, instead of the cursor.
         self.button.connect(
                 "activate",
-                lambda b: _popup_option_menu(
+                lambda b: self._popup_option_menu(
                               self.option_ui,
                               self.actions,
                               1,
@@ -218,9 +222,10 @@ class MenuWidget(gtk.HBox):
         warnings = self.my_variable.warning.keys()
         ns = self.my_variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
-        dialog_func = rose.gtk.util.run_hyperlink_dialog
+        dialog_func = rose.gtk.dialog.run_hyperlink_dialog
         for error in errors:
-            action_name = "Error_" + error
+            err_name = error.replace("/", "_")
+            action_name = "Error_" + err_name
             if "action='" + action_name + "'" not in option_ui:
                 continue
             err_item = uimanager.get_widget('/Options/' + action_name)
@@ -314,9 +319,9 @@ class MenuWidget(gtk.HBox):
         text = "\n".join(self.my_variable.comments)
         title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
                                    self.my_variable.metadata['id'])
-        rose.gtk.util.run_edit_dialog(text,
-                                      finish_hook=self._edit_finish_hook,
-                                      title=title)
+        rose.gtk.dialog.run_edit_dialog(text,
+                                        finish_hook=self._edit_finish_hook,
+                                        title=title)
 
     def _edit_finish_hook(self, text):
         self.var_ops.set_var_comments(self.my_variable, text.splitlines())

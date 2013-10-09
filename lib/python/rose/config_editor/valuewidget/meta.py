@@ -37,7 +37,11 @@ class MetaValueWidget(gtk.HBox):
         self.normal_colour = self.entry.style.text[gtk.STATE_NORMAL]
         self.insens_colour = self.entry.style.text[gtk.STATE_INSENSITIVE]
         self.entry.set_text(self.value)
-        self.entry.connect_after("changed", self._check_diff)
+        self.entry.connect("button-release-event",
+                           self._handle_middle_click_paste)
+        self.entry.connect_after("paste-clipboard", self._check_diff)
+        self.entry.connect_after("key-release-event", self._check_diff)
+        self.entry.connect_after("button-release-event", self._check_diff)
         self.entry.connect("activate", self._setter)
         self.entry.connect("focus-out-event", self._setter)
         self.entry.show()
@@ -81,3 +85,7 @@ class MetaValueWidget(gtk.HBox):
             return False
         self.entry.set_position(focus_index)
 
+    def _handle_middle_click_paste(self, widget, event):
+        if event.button == 2:
+            self._check_diff()
+        return False

@@ -1,0 +1,66 @@
+foo://2013010200/hello/worlds/dark-matter.txt||FOO_RC=$((2 - 1)) foo put %(target)s %(sources)s|1|
+foo://2013010200/hello/worlds/earth.txt||foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/jupiter-moons.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|sed 's/Hello/Greet/' %(in)s >%(out)s
+foo://2013010200/hello/worlds/jupiter.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010200/hello/t-ref share/data/2013010200/hello/jupiter.txt|0|
+foo://2013010200/hello/worlds/neptune-1.txt||foo put %(target)s %(sources)s|0|sed 's/Hello/Greet/' %(in)s >%(out)s
+foo://2013010200/hello/worlds/organisms.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/planet-n.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/saturn.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010200/hello/t-ref share/data/2013010200/hello/saturn.txt|0|
+foo://2013010200/hello/worlds/spaceships/|gz|foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/stars/||foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/try.nl||foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/unknown/stuff.pax|pax|foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/uranus.txt||foo put %(target)s %(sources)s; echo 'Hello Uranus and Moons' >share/data/2013010200/hello/uranus.txt|0|
+foo://2013010200/hello/worlds/dark-matter.txt|hello/dark-matter.txt|f95326c55075aa12d3a3aaf5958dbe67
+foo://2013010200/hello/worlds/earth.txt|hello/earth.txt|dde4e4b505256a1fe9f30fe80b892d24
+foo://2013010200/hello/worlds/jupiter-moons.tar.gz|hello/jupiter-1.txt|2771a019e844e7064e83c62c05899b29
+foo://2013010200/hello/worlds/jupiter.txt|hello/jupiter.txt|source=.:mtime=1321819860.0:size=27
+foo://2013010200/hello/worlds/neptune-1.txt|hello/neptune-1.txt|cb38085eee420b15d56f8f701f988fe0
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/crocodile.txt|9bfd75677f1d17b743d9d0d7c9b829d3
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/elephant.txt|00f9c60bc048ae85ded02eda20ff2a13
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/goose.txt|5b1dcbc37c4cd2a2cc17d963434b27ae
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/tiger.txt|2354b097ab9d01694c9682862d7eb52c
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/daisy.txt|cd8dd4f0a17bac9c34c6efbb6c6effd4
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/holly.txt|1493ae47a78b2635763a27cd990f17ba
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/iris.txt|6017dedd8b56768e0727ad0ab97c65e3
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/jasmine.txt|6cf624f7247999827b10ca64332880e8
+foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/plants/lily.txt|ed649bdb0d00b739d0188fc181c4bf62
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-1.txt|7872cf18ded524b0cd03d366eeb4d4f7
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-2.txt|081e8a0a6ec6e363b3a260f71d4c191d
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-3.txt|8b346e7aa5b52b4f8b0ad587a744f775
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-4.txt|d4df3fa6d6c7d2120c99860052824bb3
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-5.txt|aa11498fc107960dd566c724a5acdab5
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-6.txt|c6472fcfaec7c7d30fe073ef61235735
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-7.txt|983986ac3106b7efd60a790c74bdc7db
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-8.txt|2b22ba129c5612b7b79849b9ed01008a
+foo://2013010200/hello/worlds/planet-n.tar.gz|hello/planet-9.txt|bbc786cc7bf549b4d8961637a30a55d8
+foo://2013010200/hello/worlds/saturn.txt|hello/saturn.txt|f64ee10b051aef75cacb7432d4727be4
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-1.txt|622ddf104b916b570fa1696836733af9
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-2.txt|bd471940b75b2d9566a303ab4c50019e
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-3.txt|47961a4566744bd7e235d777c7130453
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-4.txt|7a31bae335beaeed95606d112cc5fb87
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-5.txt|f750bcaf029dfd240ffced5fa366335f
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-6.txt|efa2e30a88a7103159dae389e8a625b1
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-7.txt|b34229653cc3777bbf014bce7951f561
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-8.txt|b85c1af20ab98d4ea802c1759ec106f4
+foo://2013010200/hello/worlds/spaceships/|hello/spaceship-9.txt|16e43b020bd5663975127d254eabe822
+foo://2013010200/hello/worlds/stars/|2013010200-star-1.txt|8c2a0d15d8cd6fba73428a100e550703
+foo://2013010200/hello/worlds/stars/|2013010200-star-2.txt|ade63a122327162704babf710f568f43
+foo://2013010200/hello/worlds/stars/|2013010200-star-3.txt|af8c4ee4a3736460fee81b5dc30b5f6d
+foo://2013010200/hello/worlds/stars/|2013010200-star-4.txt|0e1a7856bd01167ea1a036a0fb91e2df
+foo://2013010200/hello/worlds/stars/|2013010200-star-5.txt|8a383df47cb3f95c5ab33ae6bde180be
+foo://2013010200/hello/worlds/stars/|2013010200-star-6.txt|47a3811278ed6a61e7023ac8628f80d1
+foo://2013010200/hello/worlds/stars/|2013010200-star-7.txt|7465d240a0327709ae2a3b24e77801a0
+foo://2013010200/hello/worlds/stars/|2013010200-star-8.txt|c1e0f63664cb0d09f5f476ebccb4ab59
+foo://2013010200/hello/worlds/stars/|2013010200-star-9.txt|91b8a489d5d7e5cfb9046793f697eb15
+foo://2013010200/hello/worlds/try.nl|try.nl|2185bc8a21ae6a853bd74b01ad25af85
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-1.txt|2bd50a3c0038365f2be7351e9f19c657
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-2.txt|506b8c86bd209ff2ce8f7d04c3aba289
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-3.txt|8852f32a11e8c5fcffeb416eefcbe862
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-4.txt|b2c9991b5e641463e667f8d7f99cd6b8
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-5.txt|12b01d5bb26618a10330e9f305ae9e40
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-6.txt|d3df294cd6a6021a4c75bebae56c0921
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-7.txt|d7460d3030472da78033d8379fa170bb
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-8.txt|dfd16f24fd6b2741309374400ce36ce1
+foo://2013010200/hello/worlds/unknown/stuff.pax|hello/2013010200-stuff-9.txt|e20b79c09d28ca648541f14c790f9ee7
+foo://2013010200/hello/worlds/uranus.txt|hello/uranus.txt|2dab142f8baf877e2cf9a92d93454276

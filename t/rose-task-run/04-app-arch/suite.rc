@@ -1,0 +1,54 @@
+#!jinja2
+{% set bad_nums=["1", "2", "3", "4", "5", "6", "7", "8"] %}
+[cylc]
+    UTC mode=True
+    [[event hooks]]
+        timeout handler=rose suite-hook --shutdown
+        timeout=1
+[scheduling]
+    initial cycle time=2013010100
+    final cycle time=2013010200
+    [[dependencies]]
+        [[[ 12 ]]]
+            graph="""
+{% for bad_num in bad_nums %}
+install => archive_bad_{{bad_num}}
+{% endfor %}
+"""
+        [[[ 0, 12 ]]]
+            graph="""
+install => archive
+archive[T-12] => archive
+"""
+
+[runtime]
+    [[root]]
+        command scripting="""
+RC=0
+rose task-run --debug || RC=$?
+"""
+        retry delays=0.01 # minutes
+        [[[event hooks]]]
+            succeeded handler=rose suite-hook
+            failed handler=rose suite-hook
+            submission failed handler=rose suite-hook --shutdown
+            submission timeout handler=rose suite-hook
+            execution timeout handler=rose suite-hook
+            submission timeout=1
+            execution timeout=1
+    [[archive]]
+        post-command scripting="""
+{
+sqlite3 .rose-arch.db 'SELECT * FROM targets;' | sort
+sqlite3 .rose-arch.db 'SELECT * FROM sources;' | sort
+} >rose-arch-db-$CYLC_TASK_TRY_NUMBER.out
+((RC==0))
+"""
+    [[ARCHIVE_BAD]]
+        command scripting = """rose task-run || true; RC=$?"""
+        retry delays=0
+{% for bad_num in bad_nums %}
+    [[archive_bad_{{bad_num}}]]
+        inherit=ARCHIVE_BAD
+{% endfor %}
+    [[install]]

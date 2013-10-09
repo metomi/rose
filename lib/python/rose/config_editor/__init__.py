@@ -17,9 +17,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""This package contains the specific Python code driving the config editor.
+"""This package contains the code for the Rose config editor.
 
 This module contains constants that are only used in the config editor.
+
+To override constants at runtime, place a section:
+
+[rose-config-edit]
+
+in your site or user configuration file for Rose, convert the name
+of the constants to lowercase, and place constant=value lines in the
+section. For example, to override the "ACCEL_HELP_GUI" constant, you
+could put the following in your site or user configuration:
+
+[rose-config-edit]
+accel_help_gui="<Ctrl>H"
+
+The values you enter will be cast by Python's ast.literal_eval, so:
+foo=100
+will be cast to an integer, but:
+bar="100"
+will be cast to a string.
 
 """
 
@@ -29,7 +47,7 @@ import os
 from rose.resource import ResourceLocator
 
 # Accelerators
-
+# Keyboard shortcut mappings.
 ACCEL_NEW = "<Ctrl>N"
 ACCEL_OPEN = "<Ctrl>O"
 ACCEL_SAVE = "<Ctrl>S"
@@ -56,6 +74,8 @@ TAB_MENU_INFO = "Info"
 TAB_MENU_OPEN_NEW = "Open in a new window"
 TAB_MENU_WEB_HELP = "Web Help"
 TOP_MENU_FILE = "_File"
+TOP_MENU_FILE_CHECK_AND_SAVE = "_Check And Save"
+TOP_MENU_FILE_LOAD_APPS = "_Load All Apps"
 TOP_MENU_FILE_NEW = "_New"
 TOP_MENU_FILE_OPEN = "_Open..."
 TOP_MENU_FILE_SAVE = "_Save"
@@ -100,6 +120,7 @@ TOP_MENU_METADATA_MACRO_CONFIG = "{0}"
 TOP_MENU_METADATA_PREFERENCES = "Layout _Preferences"
 TOP_MENU_METADATA_REFRESH = "_Refresh Metadata"
 TOP_MENU_METADATA_SWITCH_OFF = "_Switch off Metadata"
+TOP_MENU_METADATA_UPGRADE = "_Upgrade..."
 TOP_MENU_TOOLS = "_Tools"
 TOP_MENU_TOOLS_BROWSER = "Launch _File Browser"
 TOP_MENU_TOOLS_SUITE_RUN = "_Run Suite"
@@ -110,6 +131,8 @@ TOP_MENU_TOOLS_VIEW_OUTPUT = "View _Output"
 TOP_MENU_HELP = "_Help"
 TOP_MENU_HELP_GUI = "_GUI Help"
 TOP_MENU_HELP_ABOUT = "_About"
+TOOLBAR_CHECK_AND_SAVE = "Check and save"
+TOOLBAR_LOAD_APPS = "Load All Apps"
 TOOLBAR_NEW = "New"
 TOOLBAR_OPEN = "Open..."
 TOOLBAR_SAVE = "Save"
@@ -180,9 +203,19 @@ EVENT_MACRO_TRANSFORM_ALL = "Transforms: {0}: {1} changes"
 EVENT_MACRO_TRANSFORM_ALL_OK = "Transforms: {0}: no changes"
 EVENT_MACRO_TRANSFORM_OK = "{1}: {0}: no changes"
 EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
-EVENT_MACRO_VALIDATE_ALL = "Validators: {0}: {1} errors"
-EVENT_MACRO_VALIDATE_ALL_OK = "Validators: {0}: all OK"
+EVENT_MACRO_VALIDATE_ALL = "Custom Validators: {0}: {1} errors"
+EVENT_MACRO_VALIDATE_ALL_OK = "Custom Validators: {0}: all OK"
+EVENT_MACRO_VALIDATE_CHECK_ALL = (
+           "Custom Validators, FailureRuleChecker: {0} total problems found")
+EVENT_MACRO_VALIDATE_CHECK_ALL_OK = (
+           "Custom Validators, FailureRuleChecker: No problems found")
 EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
+EVENT_MACRO_VALIDATE_NO_PROBLEMS = "Custom Validators: No problems found"
+EVENT_MACRO_VALIDATE_PROBLEMS_FOUND = "Custom Validators: {0} problems found"
+EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS = (
+                     "FailureRuleChecker: No problems found")
+EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND = (
+                     "FailureRuleChecker: {0} problems found")
 EVENT_REDO = "{0}"
 EVENT_REVERT = "Reverted {0}"
 EVENT_TIME = "%H:%M:%S"
@@ -200,11 +233,12 @@ CHOICE_TITLE_INCLUDED = "Included"
 
 # Error and warning strings
 ERROR_ADD_FILE = "Could not add file {0}: {1}"
+ERROR_BAD_FIND = "Bad search expression"
 ERROR_BAD_NAME = "{0}: invalid name"
+ERROR_BAD_MACRO_RETURN = "Bad return value {0}"
 ERROR_BAD_TRIGGER = ("{0}\nfor <b>{1}</b>\n"
                      "from the configuration <b>{2}</b>. "
                      "\nDisabling triggers for this configuration.")
-ERROR_BAD_MACRO_RETURN = "Bad return value {0}"
 ERROR_CONFIG_CREATE = ("Error creating application config at {0}:" +
                        "\n  {1}, {2}")
 ERROR_CONFIG_CREATE_TITLE = "Error in creating configuration"
@@ -247,6 +281,7 @@ IGNORED_STATUS_MACRO = "from macro."
 PAGE_WARNING = "Error ({0}): {1}"
 PAGE_WARNING_IGNORED_SECTION = "Ignored section: {0}"
 PAGE_WARNING_IGNORED_SECTION_TIP = "Ignored section"
+PAGE_WARNING_LATENT = "Latent page - no data"
 PAGE_WARNING_NO_CONTENT = "No data associated with this page."
 PAGE_WARNING_NO_CONTENT_TIP = ("No associated configuration or summary data " +
                                "for this page.")
@@ -255,6 +290,7 @@ WARNING_APP_CONFIG_CREATE_TITLE = "Warning - application configuration."
 WARNING_CONFIG_DELETE = ("Cannot remove a whole configuration:\n{0}\n" +
                          "This must be done externally.")
 WARNING_CONFIG_DELETE_TITLE = "Can't remove configuration"
+WARNING_ERRORS_FOUND_ON_SAVE = "Errors found in {0}. Save anyway?"
 WARNING_FILE_DELETE = ("Not a configuration file entry!\n" +
                        "This file must be manually removed" +
                        " in the filesystem:\n {0}.")
@@ -302,6 +338,7 @@ SHOW_MODE_NO_DESCRIPTION = "description"
 SHOW_MODE_NO_HELP = "help"
 SHOW_MODE_NO_TITLE = "title"
 
+# Defaults for the view and layout modes.
 SHOULD_SHOW_CUSTOM_DESCRIPTION = False
 SHOULD_SHOW_CUSTOM_HELP = False
 SHOULD_SHOW_CUSTOM_TITLE = False
@@ -349,6 +386,7 @@ STATUS_BAR_VERBOSITY = 0  # Compare with rose.reporter.Reporter.
 # Stack action names and presentation
 STACK_GROUP_ADD = "Add"
 STACK_GROUP_COPY = "Copy"
+STACK_GROUP_IGNORE = "Ignore"
 STACK_GROUP_DELETE = "Delete"
 STACK_GROUP_RENAME = "Rename"
 STACK_GROUP_REORDER = "Reorder"
@@ -398,6 +436,7 @@ DIALOG_BODY_NL_CASE_CHANGE = ("Mixed-case names cause trouble in namelists." +
                               "\nSuggested: {0}")
 DIALOG_BODY_REMOVE_CONFIG = "Choose configuration"
 DIALOG_BODY_REMOVE_SECTION = "Choose the section to remove"
+DIALOG_COLUMNS_UPGRADE = ["Name", "Version", "Upgrade Version", "Upgrade?"]
 DIALOG_HELP_TITLE = "Help for {0}"
 DIALOG_LABEL_AUTOFIX = "Run built-in transform (fixer) macros?"
 DIALOG_LABEL_AUTOFIX_ALL = "Run built-in transform (fixer) macros for all configurations?"
@@ -414,6 +453,7 @@ DIALOG_LABEL_MACRO_VALIDATE_NONE = "The configuration looks OK."
 DIALOG_LABEL_MACRO_WARN_ISSUES = ("warnings: {0}")
 DIALOG_LABEL_PREFERENCES = ("Please edit your site and user " +
                             "configurations to make changes.")
+DIALOG_LABEL_UPGRADE_ALL = "Show all possible versions"
 DIALOG_TIP_SUITE_RUN_HELP = "Read the help for rose suite-run"
 DIALOG_TEXT_MACRO_CHANGED = "changed"
 DIALOG_TEXT_MACRO_ERROR = "error"
@@ -439,6 +479,7 @@ DIALOG_TITLE_NL_CASE_WARNING = "Mixed-case warning"
 DIALOG_TITLE_PREFERENCES = "Configure preferences"
 DIALOG_TITLE_REMOVE = "Remove section"
 DIALOG_TITLE_SAVE_CHANGES = "Save changes?"
+DIALOG_TITLE_UPGRADE = "Upgrade configurations"
 DIALOG_TITLE_WARNING = "Warning"
 DIALOG_VARIABLE_ERROR_TITLE = "{0} error for {1}"
 DIALOG_VARIABLE_WARNING_TITLE = "{0} warning for {1}"
@@ -520,6 +561,7 @@ TIP_CONFIG_CHOOSE_META = "Enter a metadata identifier for the new config"
 TIP_CONFIG_CHOOSE_NAME = "Enter a directory name for the new config."
 TIP_CONFIG_CHOOSE_NAME_ERROR = "Invalid directory name for the new config."
 TIP_ADD_TO_PAGE = "Add to page..."
+TIP_LATENT_PAGE = "Latent page"
 TIP_MACRO_RUN_PAGE = "Choose a macro to run for this page"
 TIP_REVERT_PAGE = "Revert page to last save"
 TIP_SUITE_RUN_ARG = "Enter extra suite run arguments"

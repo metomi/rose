@@ -22,19 +22,20 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 22
+N_TESTS=15
+tests $N_TESTS
 #-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')
     if [[ -z $JOB_HOST ]]; then
-        skip 22 '[t]job-host not defined'
+        skip $N_TESTS '[t]job-host not defined'
         exit 0
     fi
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
-export ROSE_CONF_IGNORE=true
+export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
@@ -52,7 +53,6 @@ fi
 # Wait for the suite to complete, test shutdown on fail
 TEST_KEY="$TEST_KEY_BASE-complete"
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -60,7 +60,6 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
@@ -71,39 +70,43 @@ for CYCLE in $CYCLES; do
     run_fail "$TEST_KEY" \
         test -f "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json"
 done
-TEST_KEY="$TEST_KEY_BASE-main-before"
-run_pass "$TEST_KEY" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log.json" <<'__PYTHON__'
-import json, sys
-file_name = sys.argv[1]
-d = json.load(open(file_name))
-sys.exit(len(d["cycle_times_current"]))
-__PYTHON__
+TEST_KEY="$TEST_KEY_BASE-db-before"
+sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
+    'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 TEST_KEY="$TEST_KEY_BASE-command"
 run_pass "$TEST_KEY" rose suite-log -n $NAME -f --debug
-for CYCLE in $CYCLES; do
-    file_grep "$TEST_KEY.out-$CYCLE" \
-        "\\[INFO\\] update: rose-suite-log-$CYCLE.json" "$TEST_KEY.out"
-done
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 for CYCLE in $CYCLES; do
     TEST_KEY="$TEST_KEY_BASE-after-$CYCLE"
-    run_pass "$TEST_KEY" \
-        test -s "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json"
     file_test "$TEST_KEY-after-log-1.out" \
         $SUITE_RUN_DIR/log/job/my_task_1.$CYCLE.1.out
     file_test "$TEST_KEY-after-log-2.out" \
         $SUITE_RUN_DIR/log/job/my_task_2.$CYCLE.1.out
 done
-TEST_KEY="$TEST_KEY_BASE-main-after"
-run_pass "$TEST_KEY" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log.json" <<'__PYTHON__'
-import json, sys
-file_name = sys.argv[1]
-d = json.load(open(file_name))
-sys.exit(len(d["cycle_times_current"]) != 3)
-__PYTHON__
+TEST_KEY="$TEST_KEY_BASE-db-after"
+sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
+    'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+log/job/my_task_1.2013010100.1|00-script
+log/job/my_task_1.2013010100.1.err|02-err
+log/job/my_task_1.2013010100.1.out|01-out
+log/job/my_task_1.2013010112.1|00-script
+log/job/my_task_1.2013010112.1.err|02-err
+log/job/my_task_1.2013010112.1.out|01-out
+log/job/my_task_1.2013010200.1|00-script
+log/job/my_task_1.2013010200.1.err|02-err
+log/job/my_task_1.2013010200.1.out|01-out
+log/job/my_task_2.2013010100.1|00-script
+log/job/my_task_2.2013010100.1.err|02-err
+log/job/my_task_2.2013010100.1.out|01-out
+log/job/my_task_2.2013010112.1|00-script
+log/job/my_task_2.2013010112.1.err|02-err
+log/job/my_task_2.2013010112.1.out|01-out
+log/job/my_task_2.2013010200.1|00-script
+log/job/my_task_2.2013010200.1.err|02-err
+log/job/my_task_2.2013010200.1.out|01-out
+__OUT__
 #-------------------------------------------------------------------------------
-run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

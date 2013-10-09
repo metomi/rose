@@ -23,19 +23,19 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 30
+tests 18
 #-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')
     if [[ -z $JOB_HOST ]]; then
-        skip 30 '[t]job-host not defined'
+        skip 18 '[t]job-host not defined'
         exit 0
     fi
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
-export ROSE_CONF_IGNORE=true
+export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
@@ -53,7 +53,6 @@ fi
 # Wait for the suite to complete, test shutdown on fail
 TEST_KEY="$TEST_KEY_BASE-complete"
 TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-OK=false
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -61,40 +60,34 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
     fail "$TEST_KEY"
     exit 1
 else
-    OK=true
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
 # Test --archive.
 CYCLE=2013010100
-TEST_KEY="$TEST_KEY_BASE-$CYCLE"
-run_pass "$TEST_KEY-before" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json" \
-    'my_task_2' <<'__PYTHON__'
-import json, sys
-file_name, task_name = sys.argv[1:]
-d = json.load(open(file_name))
-sys.exit(task_name in d["tasks"])
-__PYTHON__
-run_pass "$TEST_KEY-main-before" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log.json" $CYCLE <<'__PYTHON__'
-import json, sys
-file_name, cycle = sys.argv[1:]
-d = json.load(open(file_name))
-sys.exit(cycle not in d["cycle_times_current"]
-         or cycle in d["cycle_times_archived"])
-__PYTHON__
-run_pass "$TEST_KEY-list-job-logs-before" ls $SUITE_RUN_DIR/log/job/*$CYCLE*
+TEST_KEY="$TEST_KEY_BASE-archive-$CYCLE"
+set -e
+ls $SUITE_RUN_DIR/log/job/*$CYCLE* >"$TEST_KEY-list-job-logs-before.out"
 if [[ -n ${JOB_HOST:-} ]]; then
-    run_pass "$TEST_KEY-job-log.out-before-jobhost" \
-        ssh -oBatchMode=yes $JOB_HOST \
+    ssh -oBatchMode=yes $JOB_HOST \
         test -f cylc-run/$NAME/log/job/my_task_2.$CYCLE.1.out
-    run_fail "$TEST_KEY-job-log.out-before-localhost" \
-        test -f $SUITE_RUN_DIR/log/job/my_task_2.$CYCLE.1.out
-else
-    pass "$TEST_KEY-job-log.out-before-jobhost"
-    pass "$TEST_KEY-job-log.out-before-localhost"
+    ! test -f $SUITE_RUN_DIR/log/job/my_task_2.$CYCLE.1.out
 fi
+set +e
+sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
+    'SELECT path,path_in_tar,key FROM log_files ORDER BY path,path_in_tar ASC;' \
+    >"$TEST_KEY-db-1.out"
+file_cmp "$TEST_KEY-db-1.out" "$TEST_KEY-db-1.out" <<'__OUT__'
+log/job/my_task_1.2013010100.1||00-script
+log/job/my_task_1.2013010100.1.err||02-err
+log/job/my_task_1.2013010100.1.out||01-out
+log/job/my_task_1.2013010112.1||00-script
+log/job/my_task_1.2013010112.1.err||02-err
+log/job/my_task_1.2013010112.1.out||01-out
+log/job/my_task_1.2013010200.1||00-script
+log/job/my_task_1.2013010200.1.err||02-err
+log/job/my_task_1.2013010200.1.out||01-out
+__OUT__
 N_JOB_LOGS=$(wc -l "$TEST_KEY-list-job-logs-before.out" | cut -d' ' -f1)
 run_pass "$TEST_KEY-command" rose suite-log -n $NAME --archive $CYCLE --debug
 run_fail "$TEST_KEY-list-job-logs-after" ls $SUITE_RUN_DIR/log/job/*$CYCLE*
@@ -116,55 +109,56 @@ if ((N_JOB_LOGS == N_JOB_LOGS_ARCH)); then
 else
     fail "$TEST_KEY-n-arch"
 fi
-file_grep "$TEST_KEY-command.out" \
-    "\\[INFO\\] update: rose-suite-log-$CYCLE.json" \
-    "$TEST_KEY-command.out"
 file_cmp "$TEST_KEY-command.err" "$TEST_KEY-command.err" </dev/null
-run_pass "$TEST_KEY-after" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json" \
-    'my_task_2' <<'__PYTHON__'
-import json, sys
-file_name, task_name = sys.argv[1:]
-d = json.load(open(file_name))
-sys.exit(task_name not in d["tasks"])
-__PYTHON__
-run_pass "$TEST_KEY-main-after" python - \
-    "$HOME/cylc-run/$NAME/log/rose-suite-log.json" $CYCLE <<'__PYTHON__'
-import json, sys
-file_name, cycle = sys.argv[1:]
-d = json.load(open(file_name))
-sys.exit(cycle in d["cycle_times_current"]
-         or cycle not in d["cycle_times_archived"])
-__PYTHON__
+sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
+    'SELECT path,path_in_tar,key FROM log_files ORDER BY path,path_in_tar ASC;' \
+    >"$TEST_KEY-db-2.out"
+file_cmp "$TEST_KEY-db-2.out" "$TEST_KEY-db-2.out" <<'__OUT__'
+log/job-2013010100.tar.gz|job/my_task_1.2013010100.1|00-script
+log/job-2013010100.tar.gz|job/my_task_1.2013010100.1.err|02-err
+log/job-2013010100.tar.gz|job/my_task_1.2013010100.1.out|01-out
+log/job-2013010100.tar.gz|job/my_task_2.2013010100.1|00-script
+log/job-2013010100.tar.gz|job/my_task_2.2013010100.1.err|02-err
+log/job-2013010100.tar.gz|job/my_task_2.2013010100.1.out|01-out
+log/job/my_task_1.2013010112.1||00-script
+log/job/my_task_1.2013010112.1.err||02-err
+log/job/my_task_1.2013010112.1.out||01-out
+log/job/my_task_1.2013010200.1||00-script
+log/job/my_task_1.2013010200.1.err||02-err
+log/job/my_task_1.2013010200.1.out||01-out
+__OUT__
 #-------------------------------------------------------------------------------
 # Test --update.
 for CYCLE in 2013010112 2013010200; do
     TEST_KEY="$TEST_KEY_BASE-$CYCLE"
-    run_pass "$TEST_KEY-before" python - \
-        "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json" \
-        'my_task_2' <<'__PYTHON__'
-import json, sys
-file_name, task_name = sys.argv[1:]
-d = json.load(open(file_name))
-sys.exit(task_name in d["tasks"])
-__PYTHON__
     run_pass "$TEST_KEY-command" rose suite-log -n $NAME --update $CYCLE --debug
-    file_grep "$TEST_KEY-command.out" \
-        "\\[INFO\\] update: rose-suite-log-$CYCLE.json" \
-        "$TEST_KEY-command.out"
     file_cmp "$TEST_KEY-command.err" "$TEST_KEY-command.err" </dev/null
-    run_pass "$TEST_KEY-after" python - \
-        "$HOME/cylc-run/$NAME/log/rose-suite-log-$CYCLE.json" \
-        'my_task_2' <<'__PYTHON__'
-import json, sys
-file_name, task_name = sys.argv[1:]
-d = json.load(open(file_name))
-sys.exit(task_name not in d["tasks"])
-__PYTHON__
     file_test "$TEST_KEY-after-log.out" \
         $SUITE_RUN_DIR/log/job/my_task_2.$CYCLE.1.out
 done
+sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
+    'SELECT path,path_in_tar,key FROM log_files ORDER BY path,path_in_tar ASC;' \
+    >"$TEST_KEY_BASE-db-final.out"
+file_cmp "$TEST_KEY_BASE-db-final.out" "$TEST_KEY_BASE-db-final.out" <<'__OUT__'
+log/job-2013010100.tar.gz|job/my_task_1.2013010100.1|00-script
+log/job-2013010100.tar.gz|job/my_task_1.2013010100.1.err|02-err
+log/job-2013010100.tar.gz|job/my_task_1.2013010100.1.out|01-out
+log/job-2013010100.tar.gz|job/my_task_2.2013010100.1|00-script
+log/job-2013010100.tar.gz|job/my_task_2.2013010100.1.err|02-err
+log/job-2013010100.tar.gz|job/my_task_2.2013010100.1.out|01-out
+log/job/my_task_1.2013010112.1||00-script
+log/job/my_task_1.2013010112.1.err||02-err
+log/job/my_task_1.2013010112.1.out||01-out
+log/job/my_task_1.2013010200.1||00-script
+log/job/my_task_1.2013010200.1.err||02-err
+log/job/my_task_1.2013010200.1.out||01-out
+log/job/my_task_2.2013010112.1||00-script
+log/job/my_task_2.2013010112.1.err||02-err
+log/job/my_task_2.2013010112.1.out||01-out
+log/job/my_task_2.2013010200.1||00-script
+log/job/my_task_2.2013010200.1.err||02-err
+log/job/my_task_2.2013010200.1.out||01-out
+__OUT__
 #-------------------------------------------------------------------------------
-run_pass "$TEST_KEY_BASE-clean" rose suite-clean -y $NAME
-rmdir $SUITE_RUN_DIR 2>/dev/null || true
+rose suite-clean -q -y $NAME
 exit 0

@@ -1,0 +1,20 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout handler = "rose suite-hook --shutdown"
+        timeout = 1
+[scheduling]
+    [[dependencies]]
+        graph = """
+my_task_1
+"""
+
+[runtime]
+    [[root]]
+    [[my_task_1]]
+        command scripting = """
+while [[ ! -e $CYLC_SUITE_RUN_DIR/flag ]]; do
+    sleep 1
+done
+"""

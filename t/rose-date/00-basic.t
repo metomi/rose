@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 23
+tests 29
 #-------------------------------------------------------------------------------
 # Ensure it can parse its own output.
 TEST_KEY=$TEST_KEY_BASE
@@ -35,6 +35,15 @@ $DATE_TIME_STR
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
+# Parse format and print format.
+TEST_KEY=$TEST_KEY_BASE-offsets
+run_pass "$TEST_KEY" rose date -p '%d/%m/%Y %H:%M:%S' -f '%Y-%m-%dT%H:%M:%S' \
+    '24/12/2012 06:00:00'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2012-12-24T06:00:00
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
 # Parse an ISO date time with some offsets.
 TEST_KEY=$TEST_KEY_BASE-offsets
 run_pass "$TEST_KEY" rose date -s 18h -s 6d "2012-12-24T06:00:00"
@@ -45,7 +54,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Parse a Cylc date time with some negative offsets.
 TEST_KEY=$TEST_KEY_BASE-offsets-neg
-run_pass "$TEST_KEY" rose date -s -6h -s -12h -s -12d "2013010618"
+run_pass "$TEST_KEY" rose date -s -6h -s -12d12h "2013010618"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 2012122500
 __OUT__
@@ -64,6 +73,14 @@ TEST_KEY=$TEST_KEY_BASE-format-iso
 run_pass "$TEST_KEY" rose date --print-format="%Y%m%dT%H%M%S" "2012122515"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 20121225T150000
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format with offset.
+TEST_KEY=$TEST_KEY_BASE-format-and-offset
+run_pass "$TEST_KEY" rose date --offset=-3h -f "%Y%m" "2012122515" --debug
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+201212
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

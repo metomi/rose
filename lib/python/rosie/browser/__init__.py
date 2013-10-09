@@ -17,9 +17,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""This package contains the specific Python code driving the config editor.
+"""This package contains the specific Python code driving rosie go.
 
-This module contains constants that are only used in the config editor.
+This module contains constants that are only used in rosie go.
+
+To override constants at runtime, place a section:
+
+[rosie-go]
+
+in your site or user configuration file for Rose, convert the name
+of the constants to lowercase, and place constant=value lines in the
+section. For example, to override the "ACCEL_REFRESH" constant, you
+could put the following in your site or user configuration:
+
+[rosie-go]
+accel_refresh="<Ctrl>R"
+
+The values you enter will be cast by Python's ast.literal_eval, so:
+foo=100
+will be cast to an integer, but:
+bar="100"
+will be cast to a string.
 
 """
 
@@ -89,7 +107,7 @@ ERROR_HISTORY_LOAD = "An error occurred when trying to load your search history.
 ERROR_HISTORY_WRITE = "Unable to save your search history."
 ERROR_INVALID_QUERY = "Invalid query syntax: {0}"
 ERROR_MODIFIED_LOCAL_COPY_DELETE = "Error: Local copy has uncommitted changes"
-EROOR_NO_NEXT_SEARCH = "No next search"
+ERROR_NO_NEXT_SEARCH = "No next search"
 ERROR_NO_PREVIOUS_SEARCH = "No previous search"
 ERROR_PERMISSIONS = ("Error: You do not have the required permissions to " + 
                      "delete this suite")
@@ -102,7 +120,7 @@ ERROR_UNRECOGNISED_SEARCH = "Unrecognised search type"
 STATUS_FETCHING = "Fetching records..."
 STATUS_GOT = "{0} records found at {1}"
 STATUS_LOCAL_GOT = "{0} local suites found at {1}" 
-STATUS_NO_LOCAL_SUITES = "No local suites could be found {0}"
+STATUS_NO_LOCAL_SUITES = "No local suites could be found in {0} {1}"
 STATUS_OPENING_HELP = "Opened help in browser"
 STATUS_OPENING_LOG = "Opened web browser on {0}"
 STATUS_OPENING_WEB = "Opened suite web view"
@@ -129,12 +147,15 @@ DIALOG_MESSAGE_DELETE_CONFIRMATION = ("Warning: you are about to delete " +
                        "\"{0}\". This will permanently delete all branches, "+ 
                        "trunk and any local copy." + 
                        "\n\nAre you sure you wish to proceed?")
-DIALOG_MESSAGE_UNCOMPLETED_FILTER = "Uncompleted filter"                       
+DIALOG_MESSAGE_UNCOMPLETED_FILTER = "Uncompleted filter"
+DIALOG_MESSAGE_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +
+                                     "suite {0} is not registered.")
 DIALOG_TITLE_CHECKOUT = "Checkout"
 DIALOG_TITLE_DELETE = "Confirm Delete"
 DIALOG_TITLE_HISTORY_ERROR = "History Error"
 DIALOG_TITLE_INFO = "Suite Info"
 DIALOG_TITLE_UNCOMPLETED_FILTER = "Filter error"
+DIALOG_TITLE_UNREGISTERED_SUITE = "Suite not registered"
 
 # Tool-tip text
 
@@ -185,16 +206,20 @@ TITLEBAR = "{0} - rosie go"
 LABEL_ADVANCED_SEARCH = "Advanced Search"
 LABEL_EDIT_PROJECT = "New suite project:"
 LABEL_ERROR_DISCOVERY = "Ignore errors in suite info?"
+LABEL_ERROR_LOCAL = "Unable to retrieve details for local suites."
+LABEL_ERROR_PREFIX = "Unable to retrieve settings for prefix: {0}"
 LABEL_HISTORY_TREEVIEW = "Search History"
 TITLE_NEW_SUITE_WIZARD = "Edit new suite information"
 TITLE_ERROR_DISCOVERY = "Errors found"
 TITLE_HISTORY_IO_ERROR = "History read/write error"
 TITLE_HISTORY_NAVIGATION_ERROR = "History navigation error"
 TITLE_ERROR = "Error"
+TITLE_INVALID_PREFIX = "Error"
 TITLE_INVALID_QUERY = "Error"
 
 # Miscellaneous
 COPYRIGHT = "(C) British Crown Copyright 2012-3 Met Office."
+DEFAULT_FILTER_EXPR = "eq"
 DEFAULT_QUERY = "list_my_suites"
 DELIM_KEYVAL = ": "
 HELP_FILE = "rose-rug-rosie-go.html"

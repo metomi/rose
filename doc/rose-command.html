@@ -62,6 +62,10 @@
 
       <dd>Upgrade or downgrade an application according to metadata.</dd>
 
+      <dt><a href="#rose-bush">rose bush</a></dt>
+
+      <dd>Start/stop ad-hoc Rose Bush web service server.</dd>
+
       <dt><a href="#rose-config">rose config</a></dt>
 
       <dd>Parse a set of rose configuration files.</dd>
@@ -90,8 +94,8 @@
 
       <dt><a href="#rose-host-select">rose host-select</a></dt>
 
-      <dd>Select a host from a set of groups or names by load or by
-      random.</dd>
+      <dd>Select a host from a set of groups or names by load, by free memory
+      or by random.</dd>
 
       <dt><a href="#rose-macro">rose macro</a></dt>
 
@@ -297,7 +301,7 @@
       <dt><kbd>--opt-conf-key=KEY, -O KEY</kbd></dt>
 
       <dd>Each of these switches on an optional configuration identified by
-      <var>KEY</var>.</dd>
+      <var>KEY</var>. The configurations are applied first-to-last.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -314,7 +318,7 @@
       <dt><kbd>optional ROSE_APP_OPT_CONF_KEYS</kbd></dt>
 
       <dd>Each KEY in this space delimited list switches on an optional
-      configuration.</dd>
+      configuration. The configurations are applied first-to-last.</dd>
 
       <dt><kbd>optional ROSE_FILE_INSTALL_ROOT</kbd></dt>
 
@@ -347,6 +351,10 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--all-versions, -a</kbd></dt>
+      
+      <dd>Use all tagged versions.</dd>
+
       <dt><kbd>--config=DIR; -C DIR</kbd></dt>
 
       <dd>Use configuration in <var>DIR</var> instead of <var>$PWD</var>.</dd>
@@ -384,9 +392,40 @@
       used, use the earliest version available.</dd>
     </dl>
 
+    <h2 id="rose-bush">rose bush</h2>
+
+    <h3>NAME</h3>
+
+    <p><kbd>rose bush</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <dl>
+      <dt><kbd>rose bush start</kbd></dt>
+
+      <dd>Start ad-hoc web service server</dd>
+
+      <dt><kbd>rose bush stop</kbd></dt>
+
+      <dd>Stop ad-hoc web service server</dd>
+
+      <dt><kbd>rose bush</kbd></dt>
+
+      <dd>Print status of ad-hoc web service server</dd>
+    </dl>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Start/stop ad-hoc Rose Bush web service server.</p>
+
+    <p>Rose Bush is a web service for browsing users' Rose suite logs via an
+    HTTP interface.</p>
+
     <h2 id="rose-config">rose config</h2>
 
-    <h3>NAME</h3><kbd>rose config</kbd>
+    <h3>NAME</h3>
+
+    <p><kbd>rose config</kbd></p>
 
     <h3>SYNOPSIS</h3>
 
@@ -408,6 +447,10 @@
       <dt><kbd>rose config SECTION</kbd></dt>
 
       <dd>Print the <var>OPTION=VALUE</var> pairs in <var>SECTION</var>.</dd>
+
+      <dt><kbd>rose config OPTION</kbd></dt>
+
+      <dd>Print the value of a top level <var>OPTION</var>.</dd>
 
       <dt><kbd>rose config --keys SECTION</kbd></dt>
 
@@ -443,11 +486,10 @@
 
     <h3>DESCRIPTION</h3>
 
-    <p>Parse a set of rose configuration files.</p>
+    <p>Parse and print rose configuration files.</p>
 
-    <p>With no option specified, it prints value of the configuration setting
-    of a given <var>OPTION</var> in a <var>SECTION</var>. Return 0 if the
-    <var>SECTION</var> and <var>OPTION</var> exist.</p>
+    <p>With no option and no argument, print the Rose site + user
+    configuration.</p>
 
     <h3>OPTIONS</h3>
 
@@ -526,10 +568,11 @@
 
     <p>Re-dump Rose configuration files in the common format.</p>
 
-    <p>Load and dump <var>rose-*.conf</var> files in place.</p>
+    <p>Load and dump <var>rose-*.conf</var> files in place. Apply
+    format-specific pretty-printing.</p>
 
     <p>By default, it recursively loads and dumps all <var>rose-*.conf</var>
-    files in the current working directory.Parse a set of rose configuration
+    files in the current working directory. Parse a set of rose configuration
     files.</p>
 
     <h3>OPTIONS</h3>
@@ -545,6 +588,10 @@
       <dd>Each of these specifies a configuration file. If
       <kbd>--config=DIR</kbd> is specified and <var>FILE</var> is a relative
       path, <var>FILE</var> is assumed to be relative to <var>DIR</var>.</dd>
+
+      <dt><kbd>--no-pretty</kbd></dt>
+
+      <dd>Do not apply format-specific pretty-printing.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -564,8 +611,8 @@
     <h3>DESCRIPTION</h3>
 
     <p>Launch the GTK+ GUI to edit a suite or application configuration.</p>
-    
-    <p>If a suite contains more than 10 applications then they will only be 
+
+    <p>If a suite contains more than 10 applications then they will only be
     loaded after startup, on demand.</p>
 
     <h3>OPTIONS</h3>
@@ -589,11 +636,11 @@
       </dd>
 
       <dt><kbd>--load-all-apps</kbd></dt>
-      
+
       <dd>Force loading of all applications on startup.</dd>
 
       <dt><kbd>--load-no-apps</kbd></dt>
-      
+
       <dd>Load applications in the suite on demand.</dd>
 
       <dt><kbd>--meta-path=PATH; -M PATH</kbd></dt>
@@ -604,6 +651,10 @@
       <dt><kbd>--new</kbd></dt>
 
       <dd>Launch, ignoring any configuration.</dd>
+
+      <dt><kbd>--no-metadata</kbd></dt>
+
+      <dd>Launch with metadata switched off.</dd>
     </dl>
 
     <h2 id="rose-date">rose date</h2>
@@ -634,7 +685,7 @@
       Multiple offsets can be specified with multiple
       <kbd>--offset=OFFSET</kbd> options.</dd>
 
-      <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>--format=FORMAT</kbd></dt>
+      <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>-p FORMAT</kbd></dt>
 
       <dd>
         Specify a format for parsing <var>DATE-TIME</var>, which should be
@@ -655,7 +706,8 @@
         </ul>
       </dd>
 
-      <dt><kbd>--print-format=FORMAT</kbd></dt>
+      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT</kbd>, <kbd>-f
+      FORMAT</kbd></dt>
 
       <dd>Specify a format for printing the result. Default to the same format
       as the parse format.</dd>
@@ -720,8 +772,8 @@
 
     <h3>DESCRIPTION</h3>
 
-    <p>Select a host from a set of groups or names by load or by random. Use
-    settings in <var>$ROSE_HOME/etc/rose.conf</var> and
+    <p>Select a host from a set of groups or names by load, by free memory or
+    by random. Use settings in <var>$ROSE_HOME/etc/rose.conf</var> and
     <var>$HOME/.metomi/rose.conf</var> to determine the ranking method.</p>
 
     <p>Print the selected host name.</p>
@@ -729,6 +781,10 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--choice=N</kbd></dt>
+
+      <dd>Choose from any of the top <var>N</var> hosts.</dd>
+
       <dt><kbd>--debug</kbd></dt>
 
       <dd>Print stack trace on error.</dd>
@@ -745,7 +801,7 @@
         <ul>
           <li>
             <var>load</var> (by average load as reported by <kbd>uptime</kbd>
-            divided by number of processors):
+            divided by number of virtual processors):
 
             <ul>
               <li>If <var>METHOD-ARG</var> is specified, it must be "1", "5" or
@@ -764,18 +820,29 @@
             </ul>
           </li>
 
+          <li>
+            <var>mem</var> (by largest amount of free memory):
+
+            <ul>
+              <li>Uses <var>free -m</var> to return memory in Mb</li>
+            </ul>
+          </li>
+
           <li><var>random</var></li>
         </ul>
       </dd>
 
       <dt><kbd>--threshold=[METHOD[:METHOD-ARG]:]VALUE</kbd></dt>
 
-      <dd>Each of these option specifies a numeric value of a threshold of which
-      the hosts must not exceed. Accepts the same <var>METHOD</var> and
+      <dd>Each of these option specifies a numeric value of a threshold of
+      which the hosts must either not exceed or must be greater than depending
+      on the specified method. Accepts the same <var>METHOD</var> and
       <var>METHOD-ARG</var> (and the same defaults) as the
       <kbd>--rank-method=METHOD[:METHOD-ARG]</kbd> option. (Obviously, the
-      <var>random</var> method does not make sense in this case.) A host
-      exceeding a threshold will be excluded from the ranking list.</dd>
+      <var>random</var> method does not make sense in this case.)
+      <var>load</var> and <var>fs</var> must not exceed threshold while
+      <var>mem</var> must be greater than threshold. A host not meeting a
+      threshold condition will be excluded from the ranking list.</dd>
 
       <dt><kbd>--verbose, -v</kbd></dt>
 
@@ -984,14 +1051,14 @@
       the MPI launcher command.</li>
     </ol>
 
-    <p>In all cases, the remaining arguments will be added to the command line of
-    the launcher program.</p>
+    <p>In all cases, the remaining arguments will be added to the command line
+    of the launcher program.</p>
 
     <h3>OPTIONS</h3>
 
     <dl>
       <dt><kbd>--command-file=FILE</kbd>, <kbd>-f FILE</kbd></dt>
-      
+
       <dd>Specify a command file for the MPI launcher.</dd>
 
       <dt><kbd>--debug</kbd></dt>
@@ -1018,8 +1085,8 @@
     <dl>
       <dt><kbd>launcher-list=LIST</kbd></dt>
 
-      <dd>Specify a list of launcher commands. E.g.:
-
+      <dd>
+        Specify a list of launcher commands. E.g.:
         <pre class="prettyprint lang-rose_conf">
 launcher-list=poe mpiexec
 </pre>
@@ -1027,25 +1094,26 @@ launcher-list=poe mpiexec
 
       <dt><kbd>launcher-fileopts.LAUNCHER=OPTION-TEMPLATE</kbd></dt>
 
-      <dd>Specify the options to a <var>LAUNCHER</var> for launching with a
-      command file.  The template string should contain
-      <var>$ROSE_COMMAND_FILE</var> (or <var>${ROSE_COMMAND_FILE}</var>), which
-      will be expanded to the path to the command file. E.g.:
-
+      <dd>
+        Specify the options to a <var>LAUNCHER</var> for launching with a
+        command file. The template string should contain
+        <var>$ROSE_COMMAND_FILE</var> (or <var>${ROSE_COMMAND_FILE}</var>),
+        which will be expanded to the path to the command file. E.g.:
         <pre class="prettyprint lang-rose_conf">
 launcher-fileopts.mpiexec=-f $ROSE_COMMAND_FILE
 launcher-fileopts.poe=-cmdfile $ROSE_COMMAND_FILE
 </pre>
       </dd>
 
-      <dt><kbd>launcher-preopts.LAUNCHER=OPTIONS</kbd><br/>
+      <dt><kbd>launcher-preopts.LAUNCHER=OPTIONS</kbd><br />
       <kbd>launcher-postopts.LAUNCHER=OPTIONS</kbd></dt>
 
-      <dd>Specify the options to a <var>LAUNCHER</var> for launching with a
-      command.  <var>preopts</var> are options placed after the launcher command
-      but before <var>COMMAND</var>. <var>postopts</var> are options placed
-      after <var>COMMAND</var> but before the remaining arguments. E.g.:
-
+      <dd>
+        Specify the options to a <var>LAUNCHER</var> for launching with a
+        command. <var>preopts</var> are options placed after the launcher
+        command but before <var>COMMAND</var>. <var>postopts</var> are options
+        placed after <var>COMMAND</var> but before the remaining arguments.
+        E.g.:
         <pre class="prettyprint lang-rose_conf">
 launcher-preopts.mpiexec=-n $NPROC
 </pre>
@@ -1058,12 +1126,6 @@ launcher-preopts.mpiexec=-n $NPROC
       <dt><kbd>optional ROSE_LAUNCHER</kbd></dt>
 
       <dd>Specify the launcher program.</dd>
-
-      <dt><kbd>optional ROSE_LAUNCH_INNER</kbd></dt>
-
-      <dd>Only relevant when launching with a command. Specify an inner wrapper
-      to be run by launcher, can be set to a null string to call the executable
-      directly. Default is <kbd>$0 --inner</kbd>.</dd>
 
       <dt><kbd>optional ROSE_LAUNCHER_LIST</kbd></dt>
 
@@ -1086,10 +1148,11 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>optional ROSE_LAUNCHER_ULIMIT_OPTS</kbd></dt>
 
-      <dd>Only relevant if <var>$ROSE_LAUNCH_INNER</var> is used. Specify the
-      arguments to <kbd>ulimit</kbd>. Setting this variable to <kbd>-a -s
-      unlimited -d unlimited -a</kbd> results in <kbd>ulimit -a; ulimit -s
-      unlimited; ulimit -d unlimited; ulimit -a</kbd></dd>
+      <dd>Only relevant when launching with a command. Tell launcher to run
+      <kbd>rose mpi-launch --inner $@</kbd>. Specify the arguments to
+      <kbd>ulimit</kbd>. Setting this variable to <kbd>-a -s unlimited -d
+      unlimited -a</kbd> results in <kbd>ulimit -a; ulimit -s unlimited; ulimit
+      -d unlimited; ulimit -a</kbd>.</dd>
 
       <dt><kbd>optional NPROC</kbd></dt>
 
@@ -1293,8 +1356,14 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <p>Launch suite engine's suite control GUI for a suite.</p>
 
-    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the basename of
-    <var>$PWD</var> is assumed to be the suite name.</p>
+    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the name will be
+    determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
+    or its nearest parent directories. In a normal suite, the basename of the
+    (nearest parent) directory containing the <var>rose-suite.conf</var> file
+    is assumed to be the suite name. In a project containing a <a
+    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    directory containing the <var>rose-stem/rose-suite.conf</var> file is
+    assumed to be the suite name.</p>
 
     <p>This wrapper is to deal with the use case where a suite may be running
     on dedicated servers at a site. The wrapper will make an attempt to detect
@@ -1383,35 +1452,43 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <h3>NAME</h3>
 
+    <p><kbd>rose suite-log</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
     <ol>
       <li><kbd>rose suite-log [--view]</kbd></li>
 
       <li><kbd>rose suite-log --update [ITEM ...]</kbd><br />
       <kbd>rose suite-log --update '*' # all task jobs</kbd></li>
 
-      <li><kbd>rose suite-log --archive CYCLE ...</kbd></li>
+      <li><kbd>rose suite-log --archive CYCLE ...</kbd><br />
+      <kbd>rose suite-log --archive '*' # all cycles</kbd></li>
     </ol>
-    <p><kbd>rose suite-log</kbd></p>
-
-    <h3>SYNOPSIS</h3>
-
-    <p><kbd>rose suite-log [OPTIONS] [TASK ...]</kbd></p>
 
     <h3>DESCRIPTION</h3>
 
     <p>View or update suite log.</p>
 
     <ol>
-      <li>Launch web browser to view suite log.</li>
+      <li>Launch web browser to view suite log. If <dfn>rose bush</dfn> is not
+      configured, the command will offer to start it.</li>
 
-      <li>Update the suite log view information for specified cycle times or
-      task IDs (e.g. <samp>my_task.2013010100</samp> in cylc suites). A
-      <kbd>'*'</kbd> in the argument list implies all task jobs in all cycle
-      times.</li>
+      <li>Update the suite's job logs by pulling them back from any remote hosts
+      for specified cycle times or task names or IDs.</li>
 
       <li>Archive (tar-gzip) job logs at or older than the specified cycle
       time.</li>
     </ol>
+
+    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the name will be
+    determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
+    or its nearest parent directories. In a normal suite, the basename of the
+    (nearest parent) directory containing the <var>rose-suite.conf</var> file
+    is assumed to be the suite name. In a project containing a <a
+    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    directory containing the <var>rose-stem/rose-suite.conf</var> file is
+    assumed to be the suite name.</p>
 
     <h3>OPTIONS</h3>
 
@@ -1430,24 +1507,22 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dd>Specify the suite name.</dd>
 
-      <dt><kbd>--tidy-remote</kbd></dt>
+      <dt><kbd>--prune-remote</kbd></dt>
 
       <dd>If specified, remove job logs from remote hosts after pulling them to
       suite host.</dd>
 
-      <dt><kbd>--timeout=DELAY</kbd></dt>
+      <dt><kbd>--tidy-remote</kbd></dt>
 
-      <dd>Specify a timeout. Normally, a lock is put in place to prevent other
-      instances of <a href="#rose-suite-hook">rose suite-hook</a> or <kbd>rose
-      suite-log --update</kbd> from updating the suite log at the same time. The
-      command hangs as it attempts to grab the lock. This option specify a
-      timeout (in number of seconds) for the attempt.
-      (default=<kbd>300.0</kbd>)</dd>
+      <dd>Deprecated. Use <kbd>--prune-remote</kbd> instead.</dd>
 
-
-      <dt><kbd>--update</kbd>, <kbd>-u</kbd></dt>
+      <dt><kbd>--update</kbd>, <kbd>-U</kbd></dt>
 
       <dd>Update job logs and index for items specified in arguments.</dd>
+
+      <dt><kbd>--user=USER-NAME</kbd>, <kbd>-u USER-NAME</kbd></dt>
+
+      <dd>View mode only. View logs of a suite of a different user.</dd>
 
       <dt><kbd>--view</kbd></dt>
 
@@ -1589,7 +1664,7 @@ launcher-preopts.mpiexec=-n $NPROC
       <dt><kbd>--opt-conf-key=KEY, -O KEY</kbd></dt>
 
       <dd>Each of these switches on an optional configuration identified by
-      <var>KEY</var>.</dd>
+      <var>KEY</var>. The configurations are applied first-to-last.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -1632,7 +1707,7 @@ launcher-preopts.mpiexec=-n $NPROC
       <dt><kbd>optional ROSE_SUITE_OPT_CONF_KEYS</kbd></dt>
 
       <dd>Each KEY in this space delimited list switches on an optional
-      configuration.</dd>
+      configuration. The configurations are applied first-to-last.</dd>
     </dl>
 
     <h3>JINJA2</h3>
@@ -1700,8 +1775,14 @@ launcher-preopts.mpiexec=-n $NPROC
 
     <p>Shutdown a running suite.</p>
 
-    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the basename of
-    <var>$PWD</var> is assumed to be the suite name.</p>
+    <p>If <kbd>--name=SUITE-NAME</kbd> is not specified, the name will be
+    determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
+    or its nearest parent directories. In a normal suite, the basename of the
+    (nearest parent) directory containing the <var>rose-suite.conf</var> file
+    is assumed to be the suite name. In a project containing a <a
+    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    directory containing the <var>rose-stem/rose-suite.conf</var> file is
+    assumed to be the suite name.</p>
 
     <p>This wrapper is to deal with the use case where a suite may be running
     on dedicated servers at a site. The wrapper will make an attempt to detect
@@ -1861,8 +1942,8 @@ launcher-preopts.mpiexec=-n $NPROC
       environment variable called <var>NAME</var> (or <var>PATH</var> if
       <var>NAME</var> is not specified). If a relative path is given, it is
       relative to <var>$ROSE_SUITE_DIR</var>. An empty value resets the default
-      and any previous <kbd>--path=PATTERN</kbd> settings.
-      (Default for <var>PATH</var> is <kbd>share/fcm[_-]make*/*/bin</kbd> and
+      and any previous <kbd>--path=PATTERN</kbd> settings. (Default for
+      <var>PATH</var> is <kbd>share/fcm[_-]make*/*/bin</kbd> and
       <kbd>work/fcm[_-]make*/*/bin</kbd>)</dd>
 
       <dt><kbd>--prefix-delim=DELIMITER</kbd></dt>
@@ -1984,7 +2065,8 @@ environment scripting = "eval $(rose task-env)"
     <p>Run the Rose test battery.</p>
 
     <p>Change to <var>$ROSE_HOME/t</var> and run the <code>prove</code>
-    command. If no argument is specified, run <code>prove -j 6 -r</code>.</p>
+    command. If no argument is specified, run <code>prove -j 9 -r
+    -s</code>.</p>
 
     <h3>SEE ALSO</h3>
 
@@ -2345,7 +2427,16 @@ environment scripting = "eval $(rose task-env)"
 
       <dd>Specify whether to search deleted suites and superceded suites.</dd>
 
-      <dt><kbd>--format=FORMAT; -f FORMAT</kbd></dt>
+      <dt><kbd>--no-headers; -H</kbd></dt>
+
+      <dd>Do not print column headers.</dd>
+
+      <dt><kbd>--prefix=PREFIX</kbd></dt>
+
+      <dd>Specify the name of the suite repository to use.</dd>
+
+      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT; -f
+      FORMAT</kbd></dt>
 
       <dd>Control the output format of the results using a string containing
       column names or properties preceded by <kbd>%</kbd>.</dd>
@@ -2357,14 +2448,6 @@ environment scripting = "eval $(rose task-env)"
 abc01 from daisy
 </pre>
       </dd>
-
-      <dt><kbd>--no-headers; -H</kbd></dt>
-
-      <dd>Do not print column headers.</dd>
-
-      <dt><kbd>--prefix=PREFIX</kbd></dt>
-
-      <dd>Specify the name of the suite repository to use.</dd>
 
       <dt><kbd>--query; -Q</kbd></dt>
 
@@ -2424,12 +2507,17 @@ abc01 from daisy
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--no-headers; -H</kbd></dt>
+
+      <dd>Do not print column headers.</dd>
+
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
       <dd>Display locally checked out suites from the specified suite
       repository.</dd>
 
-      <dt><kbd>--format=FORMAT; -f FORMAT</kbd></dt>
+      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT; -f
+      FORMAT</kbd></dt>
 
       <dd>Control the output format of the results using a string containing
       column names or properties preceded by <kbd>%</kbd>.</dd>
@@ -2442,10 +2530,6 @@ abc01 from daisy
 </pre>
       </dd>
 
-      <dt><kbd>--no-headers; -H</kbd></dt>
-
-      <dd>Do not print column headers.</dd>
-
       <dt><kbd>--quiet; -q</kbd></dt>
 
       <dd>Shorthand for <kbd>--format="%idx".</kbd></dd>
@@ -2457,6 +2541,11 @@ abc01 from daisy
       <dt><kbd>--sort=FIELD; -s FIELD</kbd></dt>
 
       <dd>Sort results by the field <var>FIELD</var> instead of revision.</dd>
+
+      <dt><kbd>--user=~USERNAME; -u ~USERNAME</kbd></dt>
+
+      <dd>Specify another user whose roses directory you want to list e.g.
+      <code>--user=~bob</code></dd>
 
       <dt><kbd>--verbose; -v</kbd></dt>
 

@@ -197,7 +197,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             self._prev_store = store
         else:
             store = self._prev_store
-        parent_iter_ = None
+        parent_iter = None
         for i, row_data in enumerate(data_rows):
             insert_iter = store.iter_nth_child(None, i)
             if insert_iter is not None:
@@ -213,7 +213,8 @@ class BaseSummaryDataPanel(gtk.VBox):
                 store.append(parent_iter, row_data)
         for extra_index in range(i + 1, store.iter_n_children(None)):
             remove_iter = store.iter_nth_child(None, extra_index)
-            store.remove(remove_iter)
+            if remove_iter is not None:
+                store.remove(remove_iter)
         if need_new_store:
             filter_model = store.filter_new()
             filter_model.set_visible_func(self._filter_visible)

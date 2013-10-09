@@ -20,21 +20,21 @@
 # Test "rose app-run" in the presence of an empty rose-app.conf.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init </dev/null
+test_init </dev/null
 #-------------------------------------------------------------------------------
-tests 18
+tests 21
 #-------------------------------------------------------------------------------
 # Normal mode, no command.
 TEST_KEY=$TEST_KEY_BASE-no-command
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Verbose mode, no command.
 TEST_KEY=$TEST_KEY_BASE-no-command-v1
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
@@ -42,19 +42,19 @@ __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__CONTENT__
 [WARN] command not defined
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, runs pwd.
 TEST_KEY=$TEST_KEY_BASE-pwd
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q pwd
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<$(pwd)
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Verbose mode, runs pwd.
 TEST_KEY=$TEST_KEY_BASE-pwd-v
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config pwd
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
@@ -62,25 +62,35 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 $(pwd)
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Install-only mode, runs pwd.
 TEST_KEY=$TEST_KEY_BASE-pwd-n
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -i pwd
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] command: pwd
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode, runs cat, pipe result of pwd into STDIN.
 TEST_KEY=$TEST_KEY_BASE-cat-pwd
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q cat <<<$(pwd)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<$(pwd)
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
+#-------------------------------------------------------------------------------
+# Normal mode, bad builtin application.
+TEST_KEY=$TEST_KEY_BASE-bad-builtin
+test_setup
+run_fail "$TEST_KEY" rose app-run --config=../config -q -Dmode=bad
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] bad: no such built-in application
+__ERR__
+test_teardown
 #-------------------------------------------------------------------------------
 exit

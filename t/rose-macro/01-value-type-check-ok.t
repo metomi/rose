@@ -70,9 +70,11 @@ my_derived_type_real_int_null_array = 2.0,,4.0,,2.3e+2, 1
 my_real_array_element(5)=5.0
 my_real_array_slice(5:8)=5.0,6.0,7.0,8.0
 my_real_array_slice_2d(5:90,1)=5.0,6.0,3.0
+my_python_list=["Spam", True, "Cheese", False, 2000.0]
+my_python_list_empty=[]
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 27
+tests 30
 #-------------------------------------------------------------------------------
 # Check boolean type checking.
 TEST_KEY=$TEST_KEY_BASE-boolean-ok
@@ -274,6 +276,21 @@ length=:
 type=real, integer
 length=:
 
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro -V --config=../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Check Python List type checking.
+TEST_KEY=$TEST_KEY_BASE-python-list-ok
+setup
+init_meta <<__META_CONFIG__
+[namelist:values_nl1=my_python_list]
+type=python_list
+
+[namelist:values_nl1=my_python_list_empty]
+type=python_list
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null

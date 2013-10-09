@@ -1,0 +1,40 @@
+#!/bin/bash
+set -eu
+PREFIX=
+if [[ ${ROSE_TASK_CYCLE_TIME:-} ]]; then
+    PREFIX="[$ROSE_TASK_CYCLE_TIME] "
+fi
+mkdir -p $ROSE_DATAC/hello
+echo "${PREFIX}Hello Earth" >$ROSE_DATAC/hello/earth.txt
+echo "${PREFIX}Hello Dark Matter" >$ROSE_DATAC/hello/dark-matter.txt
+echo "${PREFIX}Hello Mars" >$ROSE_DATAC/hello/mars.txt
+echo "${PREFIX}Hello Venus" >$ROSE_DATAC/hello/venus.txt
+echo "${PREFIX}Hello mercury" >$ROSE_DATAC/hello/mercury.txt
+for I in $(seq 1 9); do
+    echo "${PREFIX}Hello Planet $I" >$ROSE_DATAC/hello/planet-$I.txt
+done
+for I in $(seq 1 9); do
+    echo "${PREFIX}Hello Spaceship $I" >$ROSE_DATAC/hello/spaceship-$I.txt
+done
+for I in $(seq 1 9); do
+    echo "${PREFIX}Hello Star $I" >$ROSE_DATAC/star-$I.txt
+done
+for I in $(seq 1 9); do
+    echo "${PREFIX}Hello Stuff $I" >$ROSE_DATAC/stuffing-$I.txt
+done
+mkdir -p $ROSE_DATAC/hello/organisms/{plants,animals}
+for NAME in lily jasmine holly iris daisy; do
+    echo "${PREFIX}Hello $NAME" >$ROSE_DATAC/hello/organisms/plants/$NAME.txt
+done
+for NAME in elephant tiger goose crocodile; do
+    echo "${PREFIX}Hello $NAME" >$ROSE_DATAC/hello/organisms/animals/$NAME.txt
+done
+touch $ROSE_DATAC/hello/t-ref
+touch -t 201212202012.00 $ROSE_DATAC/hello/t-ref
+echo "${PREFIX}Hello jupiter" >$ROSE_DATAC/hello/jupiter.txt
+touch -t 201111202011.00 $ROSE_DATAC/hello/jupiter.txt
+echo "${PREFIX}Hello saturn" >$ROSE_DATAC/hello/saturn.txt
+touch -t 201111202011.00 $ROSE_DATAC/hello/saturn.txt
+echo "${PREFIX}Hello uranus" >$ROSE_DATAC/hello/uranus.txt
+echo "${PREFIX}Hello Io" >$ROSE_DATAC/hello/jupiter-moon-1.txt
+echo "${PREFIX}Hello Triton" >$ROSE_DATAC/hello/neptune-1.txt

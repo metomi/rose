@@ -432,9 +432,76 @@ rose edit
     </div>
 
     <div class="slide">
+      <h2 id="macro-args">Macro Arguments</h2>
+
+      <p>From time to time, we may want to change some macro settings. Rather
+      than altering the macro each time or creating a separate macro for every
+      possible setting, we can make use of Python keyword arguments.</p>
+
+      <p>We will alter the transformer macro to allow us to specify the name of
+      the planet we want to use.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Editing the transformer macro</h3>
+
+      <p>Open <code>planet.py</code> and alter the <code>PlanetChanger</code> 
+      class to look like <a href=
+      "etc/rose-rug-advanced-tutorials-macro/planet.py.transform-kwargs.html">this</a>.</p>
+
+      <p>This adds the <code>planet_name</code> argument to the transform
+      method with a default value of <code>None</code>. On running the macro it
+      will give you the option to specify a value for <code>planet_name</code>.
+      If you do, then that will be used as the new planet.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Running the transformer macro</h3>
+
+      <p>Save your changes and run the transformer macro either from the
+      command line or rose edit. You should be prompted to provide a value for
+      <code>planet_name</code>. At the command line this will take the form of
+      a prompt while in rose edit you will be presented with a dialog to enter
+      values in, with defaults already entered for you.</p>
+
+      <p>Specify a value to use for <code>planet_name</code> using a quoted
+      string, e.g. <code>"Bob"</code> and accept the proposed changes. The
+      <code>WORLD</code> variable should now be set to <code>Bob</code>. Check
+      your configuration to confirm this.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="macro-option">Metadata Option</h2>
+
+      <p>If a macro addresses particular sections, namespaces, or options, then
+      it makes sense to write the relationship down in the metadata for the
+      particular settings. You can do this using the <samp>macro</samp>
+      metadata option.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example Metadata Option</h3>
+
+      <p>For example, our validator and transformer macros above are both
+      specific to <var>env=WORLD</var>. Open the file
+      <samp>app/fred_hello_world/meta/rose-meta.conf</samp> in a text editor,
+      and make sure the file contains the following text:</p>
+      <pre class="prettyprint lang-rose_conf">
+[env=WORLD]
+macro=planet.PlanetChecker, planet.PlanetChanger
+</pre>
+
+      <p>Close the config editor if it is still open, and open the app in the
+      config editor again. The <var>env</var> page should now contain a
+      dropdown menu at the top of the page for launching the two macros.</p>
+    </div>
+
+    <div class="slide">
       <h2>Further Reading</h2>
 
       <p>For more information, see the <a href="rose-api.html#macro">Rose API
+      reference</a> and the Rose configuration metadata <a href=
+      "rose-configuration-metadata.html#meta.conf.behaviour.macro">macro option
       reference</a>.</p>
     </div>
   </div>

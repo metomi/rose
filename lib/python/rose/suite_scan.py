@@ -50,9 +50,9 @@ class SuiteScan(object):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def scan(self, *args):
-        """Scan for running suites (in args)."""
-        if not args:
+    def scan(self, *hosts):
+        """Scan for running suites (in hosts)."""
+        if not hosts:
             conf = ResourceLocator.default().get_conf()
             hosts = self.host_selector.expand(
                ["localhost"] +

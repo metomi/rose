@@ -29,6 +29,7 @@ pygtk.require('2.0')
 import gtk
 
 import rose.config_editor.stack
+import rose.gtk.dialog
 import rose.gtk.util
 
 
@@ -65,8 +66,8 @@ class SectionOperations(object):
         new_section_data = None
         was_latent = False
         if not section or section in config_data.sections.now:
-            rose.gtk.util.run_dialog(
-                     rose.gtk.util.DIALOG_TYPE_ERROR,
+            rose.gtk.dialog.run_dialog(
+                     rose.gtk.dialog.DIALOG_TYPE_ERROR,
                      rose.config_editor.ERROR_SECTION_ADD.format(section),
                      title=rose.config_editor.ERROR_SECTION_ADD_TITLE,
                      modal=False)
@@ -110,8 +111,13 @@ class SectionOperations(object):
             self.trigger_update(ns)
 
     def ignore_section(self, config_name, section, is_ignored,
-                       override=False):
-        """Ignore or enable a section for this configuration."""
+                       override=False, skip_update=False):
+        """Ignore or enable a section for this configuration.
+
+        Returns a list of namespaces that need further updates. This is
+        empty if skip_update is False.
+
+        """
         config_data = self.__data.config[config_name]
         sect_data = config_data.sections.now[section]
         if is_ignored:
@@ -120,8 +126,8 @@ class SectionOperations(object):
             if (not override and (sect_data.ignored_reason or
                 sect_data.metadata.get(rose.META_PROP_COMPULSORY) ==
                 rose.META_PROP_VALUE_TRUE)):
-                rose.gtk.util.run_dialog(
-                        rose.gtk.util.DIALOG_TYPE_ERROR,
+                rose.gtk.dialog.run_dialog(
+                        rose.gtk.dialog.DIALOG_TYPE_ERROR,
                         rose.config_editor.WARNING_CANNOT_USER_IGNORE.format(
                                         section),
                         rose.config_editor.WARNING_CANNOT_IGNORE_TITLE)
@@ -150,8 +156,8 @@ class SectionOperations(object):
                 and all([e not in my_errors for e in ign_errors])
                 and self.check_cannot_enable_setting(config_name,
                                                      section)):
-                rose.gtk.util.run_dialog(
-                      rose.gtk.util.DIALOG_TYPE_ERROR,
+                rose.gtk.dialog.run_dialog(
+                      rose.gtk.dialog.DIALOG_TYPE_ERROR,
                       rose.config_editor.WARNING_CANNOT_ENABLE.format(
                                          section),
                       rose.config_editor.WARNING_CANNOT_ENABLE_TITLE)
@@ -185,10 +191,13 @@ class SectionOperations(object):
                 var.ignored_reason.pop(rose.variable.IGNORED_BY_SECTION)
             else:
                 continue
+        if skip_update:
+            return nses_to_do
         for ns in nses_to_do:
             self.trigger_update(ns)
             self.trigger_info_update(ns)
-            self.trigger_update(config_name)
+        self.trigger_update(config_name)
+        return []
 
     def remove_section(self, config_name, section, skip_update=False):
         """Remove a section from this configuration."""

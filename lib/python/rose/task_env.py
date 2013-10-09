@@ -101,7 +101,7 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=[],
                     path_glob = os.path.expanduser(path_glob)
                 if not os.path.isabs(path_glob):
                     path_glob = os.path.join(path_root, path_glob)
-                for path in glob(path_glob):
+                for path in sorted(glob(path_glob)):
                     more_prepend_paths_map[name].append(path)
             else:
                 more_prepend_paths_map[name] = [] # empty value resets

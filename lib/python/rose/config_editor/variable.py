@@ -31,11 +31,13 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
-import rose.gtk.util
 import rose.config_editor.keywidget
 import rose.config_editor.menuwidget
 import rose.config_editor.valuewidget
+import rose.config_editor.valuewidget.array.row as row
 import rose.config_editor.util
+import rose.gtk.dialog
+import rose.gtk.util
 
 
 class VariableWidget(object):
@@ -59,9 +61,9 @@ class VariableWidget(object):
             show_modes = {}
         self.show_modes = show_modes
         self.insensitive_colour = gtk.Style().bg[0]
-        self.bad_colour = gtk.gdk.color_parse(
+        self.bad_colour = rose.gtk.util.color_parse(
                         rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
-        self.hidden_colour = gtk.gdk.color_parse(
+        self.hidden_colour = rose.gtk.util.color_parse(
                         rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT)
         self.keywidget = self.get_keywidget(variable, show_modes)
         self.generate_valuewidget(variable)
@@ -136,14 +138,20 @@ class VariableWidget(object):
         self.var_ops.set_var_value(self.variable, value)
         self.update_status()
 
-    def generate_valuewidget(self, variable, override_custom=False):
+    def generate_valuewidget(self, variable, override_custom=False,
+                             use_this_valuewidget=None):
         """Creates the valuewidget attribute, based on value and metadata."""
         set_value = self._valuewidget_set_value
         hook_object = rose.config_editor.valuewidget.ValueWidgetHook(
                                   rose.config_editor.false_function,
                                   self._get_focus)
         metadata = copy.deepcopy(variable.metadata)
-        if (rose.config_editor.META_PROP_WIDGET in self.meta and
+        if use_this_valuewidget is not None:
+            self.valuewidget = use_this_valuewidget(variable.value,
+                                                    metadata,
+                                                    set_value,
+                                                    hook_object)
+        elif (rose.config_editor.META_PROP_WIDGET in self.meta and
             not override_custom):
             w_val = self.meta[rose.config_editor.META_PROP_WIDGET]
             info = w_val.split(None, 1)
@@ -198,7 +206,7 @@ class VariableWidget(object):
 
     def handle_focus_in(self, widget, event):
         widget._first_colour = widget.style.base[gtk.STATE_NORMAL]
-        new_colour = gtk.gdk.color_parse(
+        new_colour = rose.gtk.util.color_parse(
                          rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED)
         widget.modify_base(gtk.STATE_NORMAL, new_colour)
 
@@ -313,11 +321,6 @@ class VariableWidget(object):
     def show(self):
         for widget in self.get_children():
             widget.show()
-
-    def check_is_missing_compulsory(self):
-        """Checks whether the variable is a missing compulsory variable."""
-        return (self.meta.get(rose.META_COMPULSORY) == 'true' and
-                self.is_ghost)
 
     def set_show_mode(self, show_mode, should_show_mode):
         """Sets or unsets special displays for a variable."""
@@ -443,8 +446,8 @@ class VariableWidget(object):
                                           self.variable.metadata['id'])
         ns = self.variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
-        rose.gtk.util.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO,
-                                           text, title, search_function)
+        rose.gtk.dialog.run_hyperlink_dialog(gtk.STOCK_DIALOG_INFO,
+                                             text, title, search_function)
         return False
 
     def _set_inconsistent(self, valuewidget, variable):
@@ -523,3 +526,27 @@ class VariableWidget(object):
         self.valuewidget.handle_type_error(rose.META_PROP_TYPE in self.errors)
         self.menuwidget.refresh(variable)
         self.keywidget.refresh(variable)
+
+
+class RowVariableWidget(VariableWidget):
+
+    """This class generates a set of widgets for use as a row in a table."""
+
+    def __init__(self, *args, **kwargs):
+        self.length = kwargs.pop("length")
+        super(RowVariableWidget, self).__init__(*args, **kwargs)
+
+    def generate_valuewidget(self, variable, override_custom=False):
+        """Creates the valuewidget attribute, based on value and metadata."""
+        if (rose.META_PROP_LENGTH in variable.metadata or
+            isinstance(variable.metadata.get(rose.META_PROP_TYPE), list)):
+            use_this_valuewidget = self.make_row_valuewidget
+        else:
+            use_this_valuewidget = None
+        super(RowVariableWidget, self).generate_valuewidget(
+                           variable, override_custom=override_custom,
+                           use_this_valuewidget=use_this_valuewidget)
+
+    def make_row_valuewidget(self, *args, **kwargs):
+        kwargs.update({"arg_str": str(self.length)})
+        return row.RowArrayValueWidget(*args, **kwargs)

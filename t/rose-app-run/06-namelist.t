@@ -20,7 +20,7 @@
 # Test "rose app-run", generation of files with namelists.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-init <<'__CONFIG__'
+test_init <<'__CONFIG__'
 [command]
 default = mkdir out && cp *.nl out/
 
@@ -92,11 +92,11 @@ red_onion = 3
 carrot = 1
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 18
+tests 21
 #-------------------------------------------------------------------------------
 # Normal mode with namelist files.
 TEST_KEY=$TEST_KEY_BASE
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -171,11 +171,11 @@ milk=2,0.5,
 sugar=1.0,
 /
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Install-only mode with namelist files.
 TEST_KEY=$TEST_KEY_BASE-install-only
-setup
+test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config -i --debug
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
@@ -196,22 +196,34 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] command: mkdir out && cp *.nl out/
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with file referencing a non-existent namelist.
 TEST_KEY=$TEST_KEY_BASE-non-existent
-setup
+test_setup
 run_fail "$TEST_KEY" rose app-run --config=../config -q \
     '--define=[file:shopping-list-3.nl]source=namelist:shopping_list'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] file:shopping-list-3.nl=source=namelist:shopping_list: bad setting
 __CONTENT__
-teardown
+test_teardown
+#-------------------------------------------------------------------------------
+# Normal mode with file referencing an ignored namelist section.
+TEST_KEY=$TEST_KEY_BASE-ignored
+test_setup
+run_fail "$TEST_KEY" rose app-run --config=../config -q \
+    '--define=[file:shopping-list-3.nl]source=namelist:shopping_list' \
+    '--define=[!namelist:shopping_list]'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+[FAIL] file:shopping-list-3.nl=source=namelist:shopping_list: bad setting
+__CONTENT__
+test_teardown
 #-------------------------------------------------------------------------------
 # Normal mode with namelist referencing an unbound environment variable.
 TEST_KEY=$TEST_KEY_BASE-unbound-variable
-setup
+test_setup
 unset NO_SUCH_VARIABLE
 run_fail "$TEST_KEY" rose app-run --config=../config -q \
     '--define=[namelist:hello]greeting=$NO_SUCH_VARIABLE'
@@ -219,6 +231,6 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [FAIL] namelist:hello=greeting: NO_SUCH_VARIABLE: unbound variable
 __CONTENT__
-teardown
+test_teardown
 #-------------------------------------------------------------------------------
 exit

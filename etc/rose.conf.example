@@ -44,6 +44,11 @@
 #  terminal=konsole
 [external]
 
+# Configuration specific to the Rosie svn-pre-commit-hook.
+## Admin users allowed to write to the trunk of any suite.
+#  super-users=spiderman batman
+[rosa-svn-pre-commit]
+
 # Configuration specific to "rose config-edit".
 # See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
 #
@@ -73,7 +78,16 @@
 #  thresholds{NAME}=[METHOD[:METHOD-ARG]:]VALUE ...
 ## E.g.:
 #  thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
+#  thresholds{linux}=mem:8000
 [rose-host-select]
+
+# Configuration related to "rose suite-hook"
+#
+## Default host name for email addresses. (Use "localhost" if not specified.)
+#  email-host=HOST
+## E.g.:
+#  email-host=myorganisation.org
+[rose-suite-hook]
 
 # Configuration related to "rose suite-log"
 #
@@ -81,6 +95,8 @@
 ## E.g. If $HOME/public_html/cylc-run is a symlink of $HOME/cylc-run
 ##      and $HOME/public_html/ is served as http://host/~$USER/:
 #  home-public-html=http://host/~$USER public_html
+## URL to the site's Rose Bush web service.
+#  rose-bush=http://host/rose-bush/
 [rose-suite-log]
 
 # Configuration related to "rose mpi-launch".
@@ -182,6 +198,10 @@
 #  prefix-location.PREFIX=URL
 ## E.g.:
 #  prefix-location.foo=svn://host/foo
+## Default owner when creating a suite in the repository of an ID prefix
+#  prefix-owner-default.PREFIX=USER-ID
+## E.g.:
+#  prefix-owner-default.foo=tinky-winky
 ## Source browser URL of the repository of an ID prefix
 #  prefix-web.PREFIX=URL
 ## E.g.:

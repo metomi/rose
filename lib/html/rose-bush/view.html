@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>{{path}} {{suite}}~{{user}}: Rose Bush @{{host}}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="{{script}}/favicon.ico" />
+<link rel="shortcut icon" href="{{script}}/favicon.ico" />
+<link type="text/css" href="{{script}}/etc/bootstrap/css/bootstrap.min.css"
+rel="stylesheet" media="screen" />
+<link type="text/css" href="{{script}}/rose-bush.css" rel="stylesheet" media="screen" />
+</head>
+<body>
+<div class="navbar navbar-static-top">
+<div class="navbar-inner">
+<a class="brand" href="{{script}}/">Rose Bush @ {{host}}</a>
+<ul class="nav">
+<li><a href="{{script}}/summary/{{user}}">{{user}}</a></li>
+<li><a href="{{script}}/list/{{user}}/{{suite}}">{{suite}}</a></li>
+</ul>
+<ul class="nav pull-right">
+<li><a class="text-info">page loaded
+<abbr class="livestamp" title="{{time}}">{{time}}</abbr></a></li>
+{% if mode != "text" -%}
+<li class="active"><a>Normal</a></li>
+<li><a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}&amp;mode=text">Text</a></li>
+{% else -%}
+<li><a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}">Normal</a></li>
+<li class="active"><a>Text</a></li>
+{% endif -%}
+<li><a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}&amp;mode=download">Raw</a></li>
+</ul>
+</div>
+</div>
+<div class="page-header">
+{% if path_in_tar -%}
+<h1>{{path_in_tar}}
+<small>&lt; {{path}}</small>
+</h1>
+{% else -%}
+<h1>{{path}}</h1>
+{% endif -%}
+</div>
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span1 text-right">
+<pre>
+{% for i in range(1, lines|length + 1) -%}
+<span><a id="{{i}}" href="#{{i}}">{{i}}</a></span>
+{% endfor -%}
+</pre>
+</div>
+<div class="span11">
+<pre>
+{%- set PREFIXES = {"[FAIL]": "text-error", "[INFO]": "text-info", "[ OK ]": "text-success", "[WARN]": "text-warning"} -%}
+{%- for line in lines -%}
+{%- if line|length > 6 and line[0:6] in PREFIXES -%}
+<span class={{PREFIXES[line[0:6]]}}>{{line[0:6]}}</span>{{line[6:]}}<br />
+{%- else -%}
+{{line}}<br />
+{%- endif -%}
+{%- endfor -%}
+</pre>
+</div>
+</div>
+</div>
+
+<script type="text/javascript" src="{{script}}/etc/jquery.min.js"></script>
+<script type="text/javascript" src="{{script}}/etc/bootstrap/js/bootstrap.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/etc/moment.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/etc/livestamp.min.js">
+</script>
+<script type="text/javascript" src="{{script}}/rose-bush.js">
+</script>
+</body>
+</html>
