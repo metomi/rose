@@ -1,17 +1,21 @@
-foo://2013010200/hello/worlds/dark-matter.txt||FOO_RC=$((2 - 1)) foo put %(target)s %(sources)s|1
-foo://2013010200/hello/worlds/earth.txt||foo put %(target)s %(sources)s|0
-foo://2013010200/hello/worlds/jupiter.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010200/hello/t-ref share/data/2013010200/hello/jupiter.txt|0
-foo://2013010200/hello/worlds/organisms.tar.gz|tar.gz|foo put %(target)s %(sources)s|0
-foo://2013010200/hello/worlds/planet-n.tar.gz|tar.gz|foo put %(target)s %(sources)s|0
-foo://2013010200/hello/worlds/saturn.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010200/hello/t-ref share/data/2013010200/hello/saturn.txt|0
-foo://2013010200/hello/worlds/spaceships/|gz|foo put %(target)s %(sources)s|0
-foo://2013010200/hello/worlds/stars/||foo put %(target)s %(sources)s|0
-foo://2013010200/hello/worlds/try.nl||foo put %(target)s %(sources)s|0
-foo://2013010200/hello/worlds/unknown/stuff.pax|pax|foo put %(target)s %(sources)s|0
-foo://2013010200/hello/worlds/uranus.txt||foo put %(target)s %(sources)s; echo 'Hello Uranus and Moons' >share/data/2013010200/hello/uranus.txt|0
+foo://2013010200/hello/worlds/dark-matter.txt||FOO_RC=$((2 - 1)) foo put %(target)s %(sources)s|1|
+foo://2013010200/hello/worlds/earth.txt||foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/jupiter-moons.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|sed 's/Hello/Greet/' %(in)s >%(out)s
+foo://2013010200/hello/worlds/jupiter.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010200/hello/t-ref share/data/2013010200/hello/jupiter.txt|0|
+foo://2013010200/hello/worlds/neptune-1.txt||foo put %(target)s %(sources)s|0|sed 's/Hello/Greet/' %(in)s >%(out)s
+foo://2013010200/hello/worlds/organisms.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/planet-n.tar.gz|tar.gz|foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/saturn.txt||foo put %(target)s %(sources)s; touch -r share/data/2013010200/hello/t-ref share/data/2013010200/hello/saturn.txt|0|
+foo://2013010200/hello/worlds/spaceships/|gz|foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/stars/||foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/try.nl||foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/unknown/stuff.pax|pax|foo put %(target)s %(sources)s|0|
+foo://2013010200/hello/worlds/uranus.txt||foo put %(target)s %(sources)s; echo 'Hello Uranus and Moons' >share/data/2013010200/hello/uranus.txt|0|
 foo://2013010200/hello/worlds/dark-matter.txt|hello/dark-matter.txt|f95326c55075aa12d3a3aaf5958dbe67
 foo://2013010200/hello/worlds/earth.txt|hello/earth.txt|dde4e4b505256a1fe9f30fe80b892d24
+foo://2013010200/hello/worlds/jupiter-moons.tar.gz|hello/jupiter-1.txt|2771a019e844e7064e83c62c05899b29
 foo://2013010200/hello/worlds/jupiter.txt|hello/jupiter.txt|source=.:mtime=1321819860.0:size=27
+foo://2013010200/hello/worlds/neptune-1.txt|hello/neptune-1.txt|cb38085eee420b15d56f8f701f988fe0
 foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/crocodile.txt|9bfd75677f1d17b743d9d0d7c9b829d3
 foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/elephant.txt|00f9c60bc048ae85ded02eda20ff2a13
 foo://2013010200/hello/worlds/organisms.tar.gz|hello/organisms/animals/goose.txt|5b1dcbc37c4cd2a2cc17d963434b27ae

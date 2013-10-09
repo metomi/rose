@@ -351,6 +351,10 @@
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--all-versions, -a</kbd></dt>
+      
+      <dd>Use all tagged versions.</dd>
+
       <dt><kbd>--config=DIR; -C DIR</kbd></dt>
 
       <dd>Use configuration in <var>DIR</var> instead of <var>$PWD</var>.</dd>
@@ -444,6 +448,10 @@
 
       <dd>Print the <var>OPTION=VALUE</var> pairs in <var>SECTION</var>.</dd>
 
+      <dt><kbd>rose config OPTION</kbd></dt>
+
+      <dd>Print the value of a top level <var>OPTION</var>.</dd>
+
       <dt><kbd>rose config --keys SECTION</kbd></dt>
 
       <dd>Print the <var>OPTION</var> keys in <var>SECTION</var>.</dd>
@@ -478,11 +486,10 @@
 
     <h3>DESCRIPTION</h3>
 
-    <p>Parse a set of rose configuration files.</p>
+    <p>Parse and print rose configuration files.</p>
 
-    <p>With no option specified, it prints value of the configuration setting
-    of a given <var>OPTION</var> in a <var>SECTION</var>. Return 0 if the
-    <var>SECTION</var> and <var>OPTION</var> exist.</p>
+    <p>With no option and no argument, print the Rose site + user
+    configuration.</p>
 
     <h3>OPTIONS</h3>
 
@@ -561,10 +568,11 @@
 
     <p>Re-dump Rose configuration files in the common format.</p>
 
-    <p>Load and dump <var>rose-*.conf</var> files in place.</p>
+    <p>Load and dump <var>rose-*.conf</var> files in place. Apply
+    format-specific pretty-printing.</p>
 
     <p>By default, it recursively loads and dumps all <var>rose-*.conf</var>
-    files in the current working directory.Parse a set of rose configuration
+    files in the current working directory. Parse a set of rose configuration
     files.</p>
 
     <h3>OPTIONS</h3>
@@ -581,9 +589,9 @@
       <kbd>--config=DIR</kbd> is specified and <var>FILE</var> is a relative
       path, <var>FILE</var> is assumed to be relative to <var>DIR</var>.</dd>
 
-      <dt><kbd>--pretty, -p</kbd></dt>
+      <dt><kbd>--no-pretty</kbd></dt>
 
-      <dd>Apply format-specific prettyprinting.</dd>
+      <dd>Do not apply format-specific pretty-printing.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 

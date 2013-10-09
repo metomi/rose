@@ -1,6 +1,8 @@
 foo/2013010100/hello/worlds/dark-matter.txt
 foo/2013010100/hello/worlds/earth.txt
+foo/2013010100/hello/worlds/jupiter-moons.tar.gz
 foo/2013010100/hello/worlds/jupiter.txt
+foo/2013010100/hello/worlds/neptune-1.txt
 foo/2013010100/hello/worlds/organisms.tar.gz
 foo/2013010100/hello/worlds/planet-n.tar.gz
 foo/2013010100/hello/worlds/saturn.txt
@@ -18,8 +20,10 @@ foo/2013010100/hello/worlds/unknown/stuff.pax
 foo/2013010100/hello/worlds/uranus.txt
 foo/2013010112/hello/worlds/dark-matter.txt
 foo/2013010112/hello/worlds/earth.txt
+foo/2013010112/hello/worlds/jupiter-moons.tar.gz
 foo/2013010112/hello/worlds/jupiter.txt
 foo/2013010112/hello/worlds/mars.txt.gz
+foo/2013010112/hello/worlds/neptune-1.txt
 foo/2013010112/hello/worlds/organisms.tar.gz
 foo/2013010112/hello/worlds/planet-n.tar.gz
 foo/2013010112/hello/worlds/saturn.txt
@@ -37,7 +41,9 @@ foo/2013010112/hello/worlds/unknown/stuff.pax
 foo/2013010112/hello/worlds/uranus.txt
 foo/2013010200/hello/worlds/dark-matter.txt
 foo/2013010200/hello/worlds/earth.txt
+foo/2013010200/hello/worlds/jupiter-moons.tar.gz
 foo/2013010200/hello/worlds/jupiter.txt
+foo/2013010200/hello/worlds/neptune-1.txt
 foo/2013010200/hello/worlds/organisms.tar.gz
 foo/2013010200/hello/worlds/planet-n.tar.gz
 foo/2013010200/hello/worlds/saturn.txt

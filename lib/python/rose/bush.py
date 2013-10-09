@@ -28,6 +28,7 @@ import pwd
 import shlex
 import simplejson
 import signal
+import socket
 import sys
 import rose.config
 from rose.opt_parse import RoseOptionParser
@@ -58,6 +59,7 @@ class Root(object):
         self.exposed = True
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
         self.template_env = template_env
+        self.host_name = socket.gethostname()
 
     @cherrypy.expose
     def index(self):
@@ -65,7 +67,8 @@ class Root(object):
         # TODO: some way to allow autocomplete of user field?
         try:
             template = self.template_env.get_template("index.html")
-            return template.render(script=cherrypy.request.script_name)
+            return template.render(host=self.host_name,
+                                   script=cherrypy.request.script_name)
         except Exception as e:
             traceback.print_exc(e)
 
@@ -113,10 +116,20 @@ class Root(object):
         no_statuses = no_status
         if no_status and not isinstance(no_status, list):
             no_statuses = [no_status]
-        data = {"user": user, "suite": suite, "cycles": cycles, "tasks": tasks,
-                "no_statuses": no_statuses, "order": order,
-                "per_page": per_page, "per_page_default": self.PER_PAGE,
-                "per_page_max": self.PER_PAGE_MAX, "page": page, "states": {}}
+        data = {
+            "host": self.host_name,
+            "user": user,
+            "suite": suite,
+            "cycles": cycles,
+            "tasks": tasks,
+            "no_statuses": no_statuses,
+            "order": order,
+            "per_page": per_page,
+            "per_page_default": self.PER_PAGE,
+            "per_page_max": self.PER_PAGE_MAX,
+            "page": page,
+            "states": {},
+        }
         # TODO: add paths to other suite files
         if cycles:
             cycles = shlex.split(cycles)
@@ -157,7 +170,7 @@ class Root(object):
 
         """
         user_suite_dir_root = self._get_user_suite_dir_root(user)
-        data = {"user": user, "entries": []}
+        data = {"host": self.host_name, "user": user, "entries": []}
         if os.path.isdir(user_suite_dir_root):
             for name in os.listdir(user_suite_dir_root):
                 entry = {"name": name, "states": {}}
@@ -230,6 +243,7 @@ class Root(object):
         return template.render(
                 script=cherrypy.request.script_name,
                 time=strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
+                host=self.host_name,
                 user=user,
                 suite=suite,
                 path=path,
