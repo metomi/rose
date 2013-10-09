@@ -41,6 +41,10 @@ NAME=$(basename $SUITE_RUN_DIR)
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
 HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
+TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
+while [[ ! -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
+    sleep 1
+done
 #-------------------------------------------------------------------------------
 # "rose suite-run" should not work while suite is running.
 # except --reload mode.
@@ -48,9 +52,9 @@ for OPTION in -i -l '' --restart; do
     TEST_KEY=$TEST_KEY_BASE-running$OPTION
     run_fail "$TEST_KEY" rose suite-run $OPTION \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-    file_grep "$TEST_KEY.err" \
-        "\\[FAIL\\] $NAME: is still running (detected .*~/\\.cylc/ports/$NAME)" \
-        "$TEST_KEY.err"
+    file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] $NAME: is still running (detected ~/.cylc/ports/$NAME)
+__ERR__
 done
 TEST_KEY=$TEST_KEY_BASE-running-reload
 run_pass "$TEST_KEY" rose suite-run --reload \

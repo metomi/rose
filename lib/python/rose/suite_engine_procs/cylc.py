@@ -532,11 +532,24 @@ class CylcProcessor(SuiteEngineProcessor):
         if ("localhost" in hosts and
             os.path.exists(os.path.expanduser(port_file))):
             return port_file
+        if user_name is None:
+            user_name = pwd.getpwuid(os.getuid()).pw_name
+        pgrep = ["pgrep", "-f", "-l", "-u", user_name,
+                 "python.*cylc-(run|restart).*" + suite_name]
+        rc, out, err = self.popen.run(*pgrep)
+        if rc == 0:
+            for line in out.splitlines():
+                if suite_name in line.split():
+                    return "localhost:process=" + line
         host_proc_dict = {}
         for host in sorted(hosts):
             if host == "localhost":
                 continue
-            cmd = self.popen.get_cmd("ssh", host, "test", "-f", port_file)
+            cmd = self.popen.get_cmd("ssh", host,
+                                     "ls " + port_file +
+                                     " || pgrep -f -l -u `whoami`" +
+                                     " 'python.*cylc-(run|restart).*' " +
+                                     suite_name)
             host_proc_dict[host] = self.popen.run_bg(*cmd)
         reason = None
         while host_proc_dict:
@@ -545,26 +558,12 @@ class CylcProcessor(SuiteEngineProcessor):
                 if rc is not None:
                     host_proc_dict.pop(host)
                     if rc == 0:
-                        reason = host + ":" + port_file
+                        for line in out.splitlines():
+                            if suite_name in line.split():
+                                reason = host + ":" + line
             if host_proc_dict:
                 sleep(0.1)
-        if reason:
-            return reason
-
-        if user_name is None:
-            user_name = pwd.getpwuid(os.getuid()).pw_name
-        for host in sorted(hosts):
-            cmd = ["pgrep", "-u", user_name,
-                   "python.*cylc-(run|restart).*" + suite_name, "-f", "-l"]
-            if host != "localhost":
-                cmd = self.popen.get_cmd("ssh", host) + cmd
-            rc, out, err = self.popen.run(*cmd)
-            if rc:
-                continue
-            for line in out.splitlines():
-                if suite_name in line.split() and "python" in line.split():
-                    return host + ":process=" + line
-        return
+        return reason
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
