@@ -28,8 +28,8 @@ import rose.config_editor.util
 import rose.formats.namelist
 import rose.macro
 import rose.macros
-
 import rose.opt_parse
+import rose.reporter
 
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
@@ -344,11 +344,10 @@ def main():
     text = rose.macro.get_reports_as_text(
                                     reports,
                                     macro_id)
-    reporter = rose.reporter
     if reports:
         reporter(text, kind=reporter.KIND_ERR, level=reporter.FAIL, prefix="")
         sys.exit(1)
-    reporter(rose.macro.MacroTransformOKEvent(), level=reporter.V)
+    reporter(rose.macro.MacroFinishNothingEvent(), level=reporter.V)
 
 if __name__ == "__main__":
     main()

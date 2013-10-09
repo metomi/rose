@@ -74,8 +74,10 @@ compulsory=true
 [namelist:compulsory_nl7=my_var9]
 compulsory=true
 __META_CONFIG__
-run_pass "$TEST_KEY" rose metadata-check -C ../config
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+run_pass "$TEST_KEY" rose metadata-check -v -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] Configurations OK
+__OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
