@@ -25,6 +25,14 @@ from rose.config import ConfigNode, ConfigLoader
 import shlex
 
 
+class BadOptionalConfigurationKeysError(Exception):
+
+    """A error raised when bad optional configuration keys are specified."""
+
+    def __str__(self):
+        return "Bad optional configuration key(s): " + ", ".join(self.args[0])
+
+
 class ConfigTree(object):
 
     """Represent a (runtime) Rose configuration (directory) with inheritance.
@@ -68,13 +76,21 @@ class ConfigTreeLoader(object):
         conf_dir = self._search(conf_dir, [os.getcwd()] + conf_dir_paths)
         nodes = {} # {conf_dir: node, ...}
         conf_file_name = os.path.join(conf_dir, conf_name)
+        used_keys = []
         nodes[conf_dir] = self.node_loader.load_with_opts(
-                conf_file_name, more_keys=opt_keys,
-                ignore_missing_more_keys=True)
+                conf_file_name, more_keys=opt_keys, used_keys=used_keys)
 
         config_tree = ConfigTree()
         config_tree.conf_dirs = mro(conf_dir, self._get_base_names, conf_name,
-                                    conf_dir_paths, opt_keys, nodes)
+                                    conf_dir_paths, opt_keys, used_keys, nodes)
+
+        if opt_keys:
+            bad_keys = []
+            for opt_key in opt_keys:
+                if opt_key not in used_keys:
+                    bad_keys.append(opt_key)
+            if bad_keys:
+                raise BadOptionalConfigurationKeysError(bad_keys)
 
         config_tree.node = ConfigNode()
         for t_conf_dir in config_tree.conf_dirs:
@@ -85,8 +101,11 @@ class ConfigTreeLoader(object):
                 if config_tree.node.get_value(keys) is None:
                     config_tree.node.set(keys, sub_node.value)
             for dir_path, dir_names, file_names in os.walk(t_conf_dir):
+                names = [d for d in dir_names if d.startswith(".")]
+                for name in names:
+                    dir_names.remove(name)
                 for file_name in file_names:
-                    if file_name == conf_name:
+                    if file_name == conf_name or file_name.startswith("."):
                         continue
                     path = os.path.join(dir_path, file_name)
                     rel_path = os.path.relpath(path, t_conf_dir)
@@ -98,7 +117,7 @@ class ConfigTreeLoader(object):
     __call__ = load
 
     def _get_base_names(self, my_conf_dir, conf_name, conf_dir_paths, opt_keys,
-                        nodes):
+                        used_keys, nodes):
         values = shlex.split(nodes[my_conf_dir].get_value(["import"], ""))
         i_conf_dirs = []
         for value in values:
@@ -108,18 +127,18 @@ class ConfigTreeLoader(object):
             if nodes.get(i_conf_dir) is None:
                 nodes[i_conf_dir] = self.node_loader.load_with_opts(
                         i_conf_file_name, more_keys=opt_keys,
-                        ignore_missing_more_keys=True)
+                        used_keys=used_keys)
             i_conf_dirs.append(i_conf_dir)
         return i_conf_dirs
 
     def _search(self, conf_dir, conf_dir_paths):
         if os.path.isabs(conf_dir):
-            return os.path.realpath(conf_dir)
+            return os.path.abspath(conf_dir)
         for conf_dir_path in conf_dir_paths:
             d = os.path.join(conf_dir_path, conf_dir)
             if os.path.isdir(d):
-                return os.path.realpath(d)
-        return os.path.realpath(os.path.join(conf_dir_paths[0], conf_dir))
+                return os.path.abspath(d)
+        return os.path.abspath(os.path.join(conf_dir_paths[0], conf_dir))
 
 
 class _Test(object):

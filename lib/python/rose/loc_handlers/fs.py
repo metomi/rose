@@ -32,7 +32,7 @@ class FileSystemLocHandler(object):
     def can_pull(self, loc):
         return os.path.exists(loc.name)
 
-    def parse(self, loc, config):
+    def parse(self, loc, conf_tree):
         """Set loc.scheme, loc.loc_type, loc.paths."""
         loc.scheme = "fs"
         name = os.path.expanduser(loc.name)
@@ -44,7 +44,7 @@ class FileSystemLocHandler(object):
         else:
             loc.loc_type = loc.TYPE_TREE
 
-    def pull(self, loc, config):
+    def pull(self, loc, conf_tree):
         """If loc is in the file system, sets loc.cache to loc.name.
 
         Otherwise, raise an OSError.

@@ -35,7 +35,7 @@ class RosePruneApp(BuiltinApp):
     SCHEME = "rose_prune"
     SECTION = "prune"
 
-    def run(self, app_runner, config, opts, args, uuid, work_files):
+    def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Suite housekeeping application.
 
         This application is designed to work under "rose task-run" in a cycling
@@ -45,9 +45,9 @@ class RosePruneApp(BuiltinApp):
         suite_name = os.getenv("ROSE_SUITE_NAME")
         if not suite_name:
             return
-        prune_remote_logs_cycles = self._get_conf(config,
+        prune_remote_logs_cycles = self._get_conf(conf_tree,
                                                   "prune-remote-logs-at")
-        archive_logs_cycles = self._get_conf(config, "archive-logs-at")
+        archive_logs_cycles = self._get_conf(conf_tree, "archive-logs-at")
         if prune_remote_logs_cycles or archive_logs_cycles:
             prune_remote_logs_cycles = filter(
                     lambda c: c not in archive_logs_cycles,
@@ -63,7 +63,7 @@ class RosePruneApp(BuiltinApp):
         suite_engine_proc = app_runner.suite_engine_proc
         for key in ["datac", "work"]:
             k = "prune-" + key + "-at"
-            for cycle, cycle_args_str in self._get_conf(config, k,
+            for cycle, cycle_args_str in self._get_conf(conf_tree, k,
                                                         arg_ok=True):
                 head = suite_engine_proc.get_cycle_items_globs(key, cycle)
                 if cycle_args_str:
@@ -106,7 +106,7 @@ class RosePruneApp(BuiltinApp):
                     app_runner.fs_util.chdir(cwd)
         return
 
-    def _get_conf(self, config, key, arg_ok=False):
+    def _get_conf(self, conf_tree, key, arg_ok=False):
         """Get a list of cycles from a configuration setting.
 
         key -- An option key in self.SECTION to locate the setting.
@@ -126,7 +126,7 @@ class RosePruneApp(BuiltinApp):
         If arg_ok is True, return a list of (cycle, arg)
 
         """
-        items_str = config.get_value([self.SECTION, key])
+        items_str = conf_tree.node.get_value([self.SECTION, key])
         if items_str is None:
             return []
         try:

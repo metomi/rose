@@ -68,7 +68,7 @@ class RoseArchApp(BuiltinApp):
     SCHEME = "rose_arch"
     SECTION = "arch"
 
-    def run(self, app_runner, config, *args, **kwargs):
+    def run(self, app_runner, conf_tree, *args, **kwargs):
         """Transform and archive suite files.
 
         This application is designed to work under "rose task-run" in a suite.
@@ -82,7 +82,7 @@ class RoseArchApp(BuiltinApp):
         cwd = os.getcwd()
         app_runner.fs_util.chdir(suite_dir)
         try:
-            return self._run(dao, app_runner, config)
+            return self._run(dao, app_runner, conf_tree.node)
         finally:
             app_runner.fs_util.chdir(cwd)
             dao.close()
