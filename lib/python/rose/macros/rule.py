@@ -190,7 +190,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                 if var_id == "this":
                     var_id = setting_id
                 setting_value = self._get_value_from_id(var_id, config)
-                array_value = rose.variable.array_split(setting_value)
+                array_value = rose.variable.array_split(str(setting_value))
                 new_string = start + "("
                 for elem_num in range(1, len(array_value) + 1):
                     new_string += self.ARRAY_EXPR.format(var_id, elem_num,
@@ -204,7 +204,7 @@ class RuleEvaluator(rose.macro.MacroBase):
             if var_id == "this":
                 var_id = setting_id
             setting_value = self._get_value_from_id(var_id, config)
-            array_value = rose.variable.array_split(setting_value)
+            array_value = rose.variable.array_split(str(setting_value))
             new_string = start + str(len(array_value)) + end
             rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
         for search_result in self.REC_SCI_NUM.findall(rule):
