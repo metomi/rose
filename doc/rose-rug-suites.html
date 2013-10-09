@@ -237,7 +237,7 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]                     # Scheduling section
     [[dependencies]]             # Dependencies sub-section
-        graph = """my_task"""    # Graph Setting, option = value
+        graph = "my_task"        # Graph Setting, option = value
 [runtime]                        # Runtime Section
     [[my_task]]                  # User-specified task sub-section
         [[[environment]]]        # Environment sub-sub-section
@@ -250,7 +250,7 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = """hello_world"""
+        graph = "hello_world"
 [runtime]
     [[hello_world]]
         command scripting = "echo 'Hello World'"
@@ -274,7 +274,7 @@ touch $TMPDIR/simplesuite/rose-suite.conf  # Create a blank rose-suite.conf file
 cat &gt;$TMPDIR/simplesuite/suite.rc &lt;&lt;__SUITE_RC__
 [scheduling]
     [[dependencies]]
-        graph = """hello_world"""
+        graph = "hello_world"
 [runtime]
     [[hello_world]]
         command scripting = "echo 'Hello World'"
