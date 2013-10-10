@@ -262,8 +262,6 @@
       <p>This will run a cylc task called <samp>hello_world</samp> that prints
       <samp>Hello World</samp> to standard out.</p>
 
-      <p>For a suite to be valid in Rose, it needs a
-      <samp>rose-suite.conf</samp> file as well.</p>
     </div>
 
     <div class="slide">
@@ -272,7 +270,7 @@
       <p>Demo this by creating and running the simple cylc suite:</p>
       <pre class="prettyprint lang_sh">
 mkdir $TMPDIR/simplesuite  # Make the suite directory
-touch $TMPDIR/simplesuite/rose-suite.conf  # Create a blank rose-suite.conf
+touch $TMPDIR/simplesuite/rose-suite.conf  # Rose needs a rose-suite.conf
 cat &gt;$TMPDIR/simplesuite/suite.rc &lt;&lt;__SUITE_RC__
 [scheduling]
     [[dependencies]]
