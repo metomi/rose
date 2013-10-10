@@ -137,10 +137,11 @@ class CycleOffset(object):
 
 class StillRunningError(Exception):
 
-    """An exception raised when trying to clean a running suite."""
+    """An exception raised when a suite is still running."""
 
     def __str__(self):
-        return "%s: cannot clean, still running on %s" % self.args
+        name, reason = self.args
+        return "%s: is still running (detected %s)" % (name, reason)
 
 
 class CycleOffsetError(ValueError):
