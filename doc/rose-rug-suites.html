@@ -247,6 +247,9 @@
 
     <div class="slide">
       <h2 id="hello-world">Hello World cylc Suite</h2>
+
+      <p>A simple cylc suite has a single <samp>suite.rc</samp> file that looks
+      like this:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
@@ -259,9 +262,8 @@
       <p>This will run a cylc task called <samp>hello_world</samp> that prints
       <samp>Hello World</samp> to standard out.</p>
 
-      <p>To run this, all we need is a blank directory containing a
-      <samp>suite.rc</samp> file with this text. Rose also requires an (empty)
-      <samp>rose-suite.conf</samp> file in the same directory.</p>
+      <p>For a suite to be valid in Rose, it needs a
+      <samp>rose-suite.conf</samp> file as well.</p>
     </div>
 
     <div class="slide">
@@ -270,7 +272,7 @@
       <p>Demo this by creating and running the simple cylc suite:</p>
       <pre class="prettyprint lang_sh">
 mkdir $TMPDIR/simplesuite  # Make the suite directory
-touch $TMPDIR/simplesuite/rose-suite.conf  # Create a blank rose-suite.conf file
+touch $TMPDIR/simplesuite/rose-suite.conf  # Create a blank rose-suite.conf
 cat &gt;$TMPDIR/simplesuite/suite.rc &lt;&lt;__SUITE_RC__
 [scheduling]
     [[dependencies]]
