@@ -542,14 +542,17 @@ class CylcProcessor(SuiteEngineProcessor):
                 if suite_name in line.split():
                     return "localhost:process=" + line
         host_proc_dict = {}
+        opt_user = "-u `whoami`"
+        if user_name:
+            opt_user = "-u " + user_name
         for host in sorted(hosts):
             if host == "localhost":
                 continue
             cmd = self.popen.get_cmd("ssh", host,
                                      "ls " + port_file +
-                                     " || pgrep -f -l -u `whoami`" +
-                                     " 'python.*cylc-(run|restart).*' " +
-                                     suite_name)
+                                     " || pgrep -f -l " + opt_user +
+                                     " 'python.*cylc-(run|restart).*\\<" +
+                                     suite_name + "\\>'")
             host_proc_dict[host] = self.popen.run_bg(*cmd)
         reason = None
         while host_proc_dict:
@@ -558,6 +561,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 if rc is not None:
                     host_proc_dict.pop(host)
                     if rc == 0:
+                        out, err = proc.communicate()
                         for line in out.splitlines():
                             if suite_name in line.split():
                                 reason = host + ":" + line

@@ -60,10 +60,10 @@ done
 $CMD_PREFIX "mv ~/.cylc/ports/$NAME $NAME.port"
 ERR_HOST=${HOST:-localhost}
 run_fail "$TEST_KEY" \
-    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     $OPT_HOST --no-gcontrol
 file_grep "$TEST_KEY.err" \
-    '\[FAIL\] '$NAME': is still running (detected '$ERR_HOST':process=' \
+    '\[FAIL\] '$NAME': is still running (detected '$ERR_HOST \
     "$TEST_KEY.err"
 run_pass "$TEST_KEY.NAME1" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=${NAME}1 \
@@ -73,10 +73,8 @@ run_pass "$TEST_KEY.SHORTNAME" \
     $OPT_HOST --no-gcontrol
 $CMD_PREFIX "mv $NAME.port ~/.cylc/ports/$NAME"
 #-------------------------------------------------------------------------------
-cylc shutdown $OPT_HOST --timeout=120 --kill --wait $NAME 1>/dev/null 2>&1
-rose suite-clean --debug -q -y $NAME
-cylc shutdown $OPT_HOST --timeout=120 --kill --wait ${NAME}1 1>/dev/null 2>&1
-rose suite-clean --debug -q -y ${NAME}1
-cylc shutdown $OPT_HOST --timeout=120 --kill --wait ${NAME%?} 1>/dev/null 2>&1
-rose suite-clean --debug -q -y ${NAME%?}1
+rose suite-shutdown --debug -q -y -n $NAME -- --timeout=120 --kill --wait
+rose suite-shutdown --debug -q -y -n ${NAME}1 -- --timeout=120 --kill --wait
+rose suite-shutdown --debug -q -y -n ${NAME%?} -- --timeout=120 --kill --wait
+rose suite-clean --debug -q -y $NAME ${NAME}1 ${NAME%?}
 exit 0
