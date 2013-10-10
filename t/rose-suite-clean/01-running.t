@@ -39,7 +39,6 @@ run_fail "$TEST_KEY" rose suite-clean -y $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] $NAME: is still running (detected ~/.cylc/ports/$NAME)
 __ERR__
-cat "$TEST_KEY.err"
 if [[ ! -d $HOME/cylc-run/$NAME ]]; then
     exit 1
 fi
