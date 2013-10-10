@@ -535,7 +535,7 @@ class CylcProcessor(SuiteEngineProcessor):
         if user_name is None:
             user_name = pwd.getpwuid(os.getuid()).pw_name
         pgrep = ["pgrep", "-f", "-l", "-u", user_name,
-                 "python.*cylc-(run|restart).*" + suite_name]
+                 "python.*cylc-(run|restart).*\\<" + suite_name + "\\>"]
         rc, out, err = self.popen.run(*pgrep)
         if rc == 0:
             for line in out.splitlines():
