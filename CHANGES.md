@@ -5,6 +5,55 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2013-Q4)
+
+This release of Rose works with cylc 5.3.0 or above.
+
+### Highlighted Changes
+
+Changes that have significant impact on user experience.
+
+\#964, #857 : rose bush: a web service to browse user suite logs.
+This replaces the old client side technology generated at suite run time via
+`rose suite-run`, `rose suite-hook` and `rose suite-log`.
+* Site/user configurable location of the Rose Bush web service.
+* `rose bush` new command to start/stop an ad-hoc web service server.
+* `rose suite-run` and `rose suite-hook`: modified to generate job log files DB
+  for Rose Bush instead of files for the old client side suite log viewer.
+* `rose suite-log`: modified to use Rose Bush web service by default.
+* `rose suite-log --update`: the shorthand for this option is not `-U`.
+* `rose suite-log --user=USER` or `-u USER` can now be used to view the suite
+  log of an alternate user.
+
+### Noteworthy Changes
+
+Bug fixes, minor enhancements and documentation improvements:
+
+\#971: rose macro: fix `fail-if` array variables that look like single float
+values.
+
+\#970: rosie go: check suite is registered prior to running gui on it.
+
+\#969, \#966: rose suite-run, etc: use `pgrep` as well as port files to
+determine if a suite is still running or not.
+
+\#968: rose stem: accept more schemes for Subversion URLs.
+
+\#960: rose_arch: new `source-edit` setting to specify a command to transform
+the content of the source file before sending it to the archive.
+
+\#957: rose config-edit: fix add latent mixed widget.
+
+\#956: rose config-dump: new `--no-pretty` option. Pretty print is now the
+default.
+
+\#949: rose_arch: allow use of file modified time and size instead of MD5
+checksum to determine whether a source file is changed.
+
+\#947: rose suite-hook --mail: configurable email host
+
+--------------------------------------------------------------------------------
+
 ## 2013-09 (2013-09-26)
 
 This release of Rose works with cylc 5.3.0 or above.
