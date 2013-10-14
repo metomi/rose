@@ -754,6 +754,30 @@ def get_reports_as_text(reports, macro_id, is_from_transform=False):
     return text
 
 
+def handle_transform(app_config, new_config, change_list, macro_id,
+                     opt_conf_dir, opt_output_dir, opt_non_interactive,
+                     reporter):
+    """Prompt the user to go ahead with macro changes and dump the output."""
+    user_allowed_changes = False
+    has_changes = any([not i.is_warning for i in change_list])
+    sys.stdout.write(get_reports_as_text(change_list, macro_id,
+                                         is_from_transform=True))
+    if has_changes:
+        if opt_non_interactive:
+            user_allowed_changes = True
+        else:
+            user_allowed_changes = _get_user_accept()
+        if user_allowed_changes:
+            app_config = new_config
+            dump_config(app_config, opt_conf_dir, opt_output_dir)
+            if reporter is not None:
+                reporter(MacroTransformDumpEvent(opt_conf_dir,
+                                                 opt_output_dir),
+                         level=reporter.VV)
+            return True
+    return False
+
+
 def _run_transform_macros(macros, config_name, app_config, meta_config,
                           modules, macro_tuples, opt_non_interactive=False,
                           opt_conf_dir=None, opt_output_dir=None,
@@ -779,33 +803,11 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
             no_changes = False
         method_id = TRANSFORM_METHOD.upper()[0]
         macro_id = MACRO_OUTPUT_ID.format(method_id, transformer_macro)
-        _handle_transform(app_config, new_config, change_list, macro_id,
+        handle_transform(app_config, new_config, change_list, macro_id,
                           opt_conf_dir, opt_output_dir, opt_non_interactive,
                           reporter)
     return no_changes
 
-
-def _handle_transform(app_config, new_config, change_list, macro_id,
-                      opt_conf_dir, opt_output_dir, opt_non_interactive,
-                      reporter):
-
-    user_allowed_changes = False
-    has_changes = any([not i.is_warning for i in change_list])
-    sys.stdout.write(get_reports_as_text(change_list, macro_id,
-                                         is_from_transform=True))
-    if has_changes:
-        if opt_non_interactive:
-            user_allowed_changes = True
-        else:
-            user_allowed_changes = _get_user_accept()
-        if user_allowed_changes:
-            app_config = new_config
-            dump_config(app_config, opt_conf_dir, opt_output_dir)
-            if reporter is not None:
-                reporter(MacroTransformDumpEvent(opt_conf_dir,
-                                                 opt_output_dir),
-                         level=reporter.VV)
-            
 
 def _get_user_accept():
     try:

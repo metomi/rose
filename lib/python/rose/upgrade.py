@@ -26,6 +26,7 @@ import sys
 
 import rose.config
 import rose.macro
+import rose.macros.trigger
 import rose.reporter
 
 
@@ -465,9 +466,23 @@ def main():
         method_id = DOWNGRADE_METHOD.upper()[0]
     macro_id = rose.macro.MACRO_OUTPUT_ID.format(method_id,
                                                  upgrade_manager.get_name())
-    rose.macro._handle_transform(app_config, new_config, change_list,
-                                 macro_id, opts.conf_dir, opts.output_dir,
-                                 opts.non_interactive, reporter)
+    has_changed = rose.macro.handle_transform(app_config, new_config,
+                                              change_list, macro_id,
+                                              opts.conf_dir, opts.output_dir,
+                                              opts.non_interactive, reporter)
+    new_meta_config = rose.macro.load_meta_config(
+        app_config, directory=opts.conf_dir) # TODO: add this:, config_type=rose.SUB_CONFIG_NAME)
+    if has_changed:
+        new_trig_config, change_list = (
+            rose.macros.trigger.TriggerMacro().transform(
+                new_config, new_meta_config)
+        )
+        print new_meta_config.get_value(["env=A"])
+        if change_list:
+            rose.macro.handle_transform(app_config, new_config,
+                                        change_list, macro_id,
+                                        opts.conf_dir, opts.output_dir,
+                                        opts.non_interactive, reporter)
 
 if __name__ == "__main__":
     rose.macro.add_site_meta_paths()

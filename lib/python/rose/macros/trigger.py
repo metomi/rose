@@ -58,6 +58,7 @@ class TriggerMacro(rose.macro.MacroBase):
                     if values == []:
                         id_value_dict.update({trig_id: [None]})
                 self.trigger_family_lookup.update({setting_id: id_value_dict})
+        self._trigger_involved_ids = self.get_all_ids()
 
     def transform(self, config, meta_config=None):
         """Apply metadata trigger expressions to variables."""
@@ -96,7 +97,8 @@ class TriggerMacro(rose.macro.MacroBase):
             elif var_id in prev_ignoreds[trig_ignored]:
                 node.state = enabled
                 old, new = state_map[trig_ignored], state_map[enabled]
-            elif var_id in prev_ignoreds[user_ignored]:
+            elif (var_id in prev_ignoreds[user_ignored] and
+                  var_id in self._trigger_involved_ids):
                 node.state = enabled
                 old, new = state_map[user_ignored], state_map[enabled]
             if old != new:

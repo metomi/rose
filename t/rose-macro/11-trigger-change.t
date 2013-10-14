@@ -695,7 +695,7 @@ trigger=namelist:trig_absent=two_values_triggered: 1, 2
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultTransforms
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
-[T] rose.macros.DefaultTransforms: changes: 38
+[T] rose.macros.DefaultTransforms: changes: 31
     namelist:already_triggered_ignored_namelist=ab_trig_var1=2
         enabled      -> trig-ignored
     namelist:already_triggered_ignored_namelist=ab_trig_var2=2
@@ -712,8 +712,6 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
         enabled      -> trig-ignored
     namelist:already_triggered_ignored_namelist=trig_var_err4=2
         enabled      -> trig-ignored
-    namelist:already_triggered_ignored_namelist=user_sw_var=5
-        user-ignored -> enabled     
     namelist:ignored_error_namelist=en_trig_e_err_comp_var=2
         enabled      -> trig-ignored
     namelist:ignored_error_namelist=en_trig_e_err_opt_var=2
@@ -726,14 +724,6 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
         trig-ignored -> enabled     
     namelist:ignored_error_namelist=en_trig_nt_err_opt_var=2
         trig-ignored -> enabled     
-    namelist:ignored_error_namelist=en_user_sw_comp_var=6
-        user-ignored -> enabled     
-    namelist:ignored_error_namelist=en_user_sw_opt_var=5
-        user-ignored -> enabled     
-    namelist:ignored_namelist=None=None
-        user-ignored -> enabled     
-    namelist:ignored_namelist=ign_user_sw_var=6
-        user-ignored -> enabled     
     namelist:trig_absent=no_value_triggered=.false.
         enabled      -> trig-ignored
     namelist:trig_absent=one_value_triggered=.false.
@@ -766,12 +756,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
         enabled      -> trig-ignored
     namelist:triggered_ignored_namelist=trig_var_err4=2
         enabled      -> trig-ignored
-    namelist:triggered_ignored_namelist=user_sw_var=5
-        user-ignored -> enabled     
     namelist:triggered_namelist=trig_var=2
         trig-ignored -> enabled     
-    namelist:triggered_namelist=user_sw_var=6
-        user-ignored -> enabled     
 __CONTENT__
 file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONTENT__'
 [command]
@@ -824,7 +810,7 @@ normal_variable4=normal
 !!trig_var_err2=2
 !!trig_var_err3=2
 !!trig_var_err4=2
-user_sw_var=5
+!user_sw_var=5
 
 [namelist:ignored_error_namelist]
 en_normal_var=normal
@@ -836,13 +822,13 @@ en_trig_i_err_opt_var=2
 en_trig_nt_err_comp_var=2
 en_trig_nt_err_opt_var=2
 !!en_trig_opt_var=2
-en_user_sw_comp_var=6
-en_user_sw_opt_var=5
+!en_user_sw_comp_var=6
+!en_user_sw_opt_var=5
 
-[namelist:ignored_namelist]
+[!namelist:ignored_namelist]
 ign_normal_var=normal
 !!ign_trig_var=2
-ign_user_sw_var=6
+!ign_user_sw_var=6
 
 [namelist:near_cyclic_namelist]
 !!a=2
@@ -910,12 +896,12 @@ normal_variable4=normal
 !!trig_var_err2=2
 !!trig_var_err3=2
 !!trig_var_err4=2
-user_sw_var=5
+!user_sw_var=5
 
 [namelist:triggered_namelist]
 trig_var=2
 trigger_env_variable=normal
-user_sw_var=6
+!user_sw_var=6
 
 [namelist:triggering_cascade]
 a_trig_b_4_v_3=3
