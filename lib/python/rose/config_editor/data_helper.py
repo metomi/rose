@@ -42,21 +42,6 @@ class ConfigDataHelper(object):
                 return type_node.value
         return None
 
-    def get_config_type(self, config):
-        """Return a guess for the configuration type."""
-        # The logic here will be improved once suite integration is worked on.
-        if (config.get([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_PROJECT])
-                is not None):
-            return rose.INFO_CONFIG_NAME
-        if (config.get([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_OWNER])
-                is not None):
-            return rose.INFO_CONFIG_NAME
-        if config.get([rose.CONFIG_SECT_CMD]) is not None:
-            return rose.SUB_CONFIG_NAME
-        if config.get(["jinja2:suite.rc"]) is not None:
-            return rose.TOP_CONFIG_NAME
-        return rose.SUB_CONFIG_NAME
-
     def is_ns_sub_data(self, ns):
         """Return whether a namespace is mentioned in summary data."""
         ns_meta = self.data.namespace_meta_lookup.get(ns, {})

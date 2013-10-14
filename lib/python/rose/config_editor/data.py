@@ -211,8 +211,6 @@ class ConfigDataManager(object):
             self.top_level_directory = None
         for name, obj in config_obj_dict.items():
             config_type = config_obj_type_dict.get(name)
-            if config_type is None:
-                config_type = self.helper.get_config_type(obj)
             self.load_config(config_name=name, config=obj,
                              config_type=config_type)
         self.saved_config_names = set(self.config.keys())
