@@ -32,6 +32,8 @@ import rose.config
 import rose.config_editor.panelwidget.summary_data
 import rose.gtk.dialog
 import rose.gtk.util
+import rose.reporter
+
 import rose.config_editor.plugin.um.widget.stash_add
 
 
@@ -283,8 +285,12 @@ class BaseStashSummaryDataPanelv1(
                                          self.STASHMASTER_META_PATH,
                                          self.STASHMASTER_META_FILENAME))
         except (rose.config.ConfigSyntaxError, IOError, OSError) as e:
-            sys.stderr.write("Error loading STASHmaster metadata resource: ")
-            sys.stderr.write(type(e).__name__ + ": " + str(e) + "\n")
+            rose.reporter.Reporter()(
+                "Error loading STASHmaster metadata resource: " +
+                type(e).__name__ + ": " + str(e) + "\n",
+                kind=rose.reporter.Reporter.KIND_ERR,
+                level=rose.reporter.Reporter.FAIL
+            )
             return {}
         stash_meta_dict = {}
         for keys, node in config.walk(no_ignore=True):

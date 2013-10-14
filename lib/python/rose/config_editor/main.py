@@ -837,6 +837,7 @@ class MainController(object):
             var_ops,
             section_data_objects,
             self.data.helper.get_format_sections,
+            self.reporter,
             directory,
             sub_data=sub_data,
             sub_ops=sub_ops,

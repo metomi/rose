@@ -116,6 +116,9 @@ class StatusBar(gtk.VBox):
                 level = message.level
         if level > self.verbosity:
             return
+        if isinstance(message, Exception):
+            kind = rose.reporter.Reporter.KIND_ERR
+            level = rose.reporter.Reporter.FAIL
         self.messages.append((kind, str(message), time.time()))
         if len(self.messages) > rose.config_editor.STATUS_BAR_MESSAGE_LIMIT:
             self.messages.pop(0)
@@ -208,7 +211,8 @@ class StatusBar(gtk.VBox):
         else:
             self._message_widget_error_image.hide()
             self._message_widget_info_image.show()
-        self._message_widget_label.set_text(message_text)
+        last_line = message_text.splitlines()[-1]
+        self._message_widget_label.set_text(last_line)
 
     def _handle_enter_message_widget(self, *args):
         tooltip_text = ""
