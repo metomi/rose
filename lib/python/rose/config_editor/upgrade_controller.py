@@ -143,8 +143,27 @@ class UpgradeController(object):
                     new_config, change_list = manager.transform(macro_config)
                     macro_id = (type(manager).__name__ + "." +
                                 rose.macro.TRANSFORM_METHOD)
-                    handle_transform_func(config_name, macro_id,
-                                          new_config, change_list)
+                    if handle_transform_func(config_name, macro_id,
+                                             new_config, change_list,
+                                             triggers_ok=True):
+                        meta_config = rose.macro.load_meta_config(
+                            new_config, ignore_meta_error=True) # TODO: add config_type keyword argument
+                        trig_macro = rose.macros.trigger.TriggerMacro()
+                        macro_config = copy.deepcopy(new_config)
+                        macro_id = (
+                            rose.upgrade.MACRO_UPGRADE_TRIGGER_NAME + "." +
+                            rose.macro.TRANSFORM_METHOD
+                        )
+                        if not trig_macro.validate_dependencies(macro_config,
+                                                                meta_config):
+                            new_trig_config, trig_change_list = (
+                                rose.macros.trigger.TriggerMacro().transform(
+                                    macro_config, meta_config)
+                            )
+                            handle_transform_func(config_name, macro_id,
+                                                  new_trig_config,
+                                                  trig_change_list,
+                                                  triggers_ok=True)
                 iter_ = self.treemodel.iter_next(iter_)
         self.window.destroy()
 
