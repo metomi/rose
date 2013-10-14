@@ -100,6 +100,14 @@ class Lookup(object):
         return self.full_ns_split_lookup.get(full_namespace, (None, None))
 
 
+class ImportWidgetError(Exception):
+
+    """An exception raised when an imported widget cannot be used."""
+
+    def __str__(self):
+        return self.args[0]
+
+
 def import_object(import_string, from_files, error_handler,
                   module_prefix=None):
     """Import a Python callable.

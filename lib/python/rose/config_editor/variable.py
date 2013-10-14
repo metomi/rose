@@ -38,6 +38,7 @@ import rose.config_editor.valuewidget.array.row as row
 import rose.config_editor.util
 import rose.gtk.dialog
 import rose.gtk.util
+import rose.reporter
 
 
 class VariableWidget(object):
@@ -201,7 +202,8 @@ class VariableWidget(object):
     def handle_bad_valuewidget(self, error_info, variable, set_value):
         """Handle a bad custom valuewidget import."""
         text = rose.config_editor.ERROR_IMPORT_WIDGET.format(error_info)
-        sys.stderr.write(text + "\n")
+        rose.reporter.Reporter()(
+            rose.config_editor.util.ImportWidgetError(text))
         self.generate_valuewidget(variable, override_custom=True)
 
     def handle_focus_in(self, widget, event):

@@ -832,7 +832,11 @@ def get_user_values(options):
                     options[k] = ast.literal_eval(user_input)
                     entered = True
                 except ValueError:
-                    sys.stderr.write("Invalid entry, please try again\n")
+                    rose.reporter.Reporter()(
+                        "Invalid entry, please try again\n",
+                        kind=rose.reporter.Reporter.KIND_ERR,
+                        level=rose.reporter.Reporter.FAIL
+                    )
             else:
                 entered = True
     return options
@@ -905,12 +909,16 @@ def parse_macro_mode_args(mode="macro", argv=None):
 
 
 def _report_error(exception=None, text=""):
-    """This will be replaced by rose.reporter utilities."""
+    """Report an error via rose.reporter utilities."""
     if text:
         text += "\n"
     if exception is not None:
         text += type(exception).__name__ + ": " + str(exception) + "\n"
-    sys.stderr.write(text + "\n")
+    rose.reporter.Reporter()(
+        text + "\n",
+        kind=rose.reporter.Reporter.KIND_ERR,
+        level=rose.reporter.Reporter.FAIL
+    )
 
 
 def main():
