@@ -353,14 +353,15 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
     return None, warning
 
 
-def load_meta_config(config, directory=None, error_handler=None):
+def load_meta_config(config, directory=None, error_handler=None,
+                     ignore_meta_error=False):
     """Return the metadata config for a configuration."""
     if error_handler is None:
         error_handler = _report_error
     meta_config = rose.config.ConfigNode()
     meta_list = ['rose-all/' + rose.META_CONFIG_NAME]
     config_meta_path, warning = load_meta_path(config, directory)
-    if warning is not None:
+    if warning is not None and not ignore_meta_error:
         error_handler(text=warning)
     if config_meta_path is not None:
         path = os.path.join(config_meta_path, rose.META_CONFIG_NAME)
@@ -369,7 +370,7 @@ def load_meta_config(config, directory=None, error_handler=None):
     locator = rose.resource.ResourceLocator(paths=sys.path)
     opt_node = config.get([rose.CONFIG_SECT_TOP,
                            rose.CONFIG_OPT_META_TYPE], no_ignore=True)
-    ignore_meta_error = opt_node is None
+    ignore_meta_error = ignore_meta_error or opt_node is None
     config_loader = rose.config.ConfigLoader()
     for meta_key in meta_list:
         try:

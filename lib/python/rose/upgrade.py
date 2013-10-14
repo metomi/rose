@@ -40,6 +40,7 @@ MACRO_UPGRADE_MODULE = "versions"
 MACRO_UPGRADE_RESOURCE_DIR = "etc"
 MACRO_UPGRADE_RESOURCE_FILE_ADD = "rose-macro-add.conf"
 MACRO_UPGRADE_RESOURCE_FILE_REMOVE = "rose-macro-remove.conf"
+MACRO_UPGRADE_TRIGGER_NAME = "UpgradeTriggerFixing"
 NAME_DOWNGRADE = "Downgrade{0}-{1}"
 NAME_UPGRADE = "Upgrade{0}-{1}"
 
@@ -471,16 +472,19 @@ def main():
                                               opts.conf_dir, opts.output_dir,
                                               opts.non_interactive, reporter)
     new_meta_config = rose.macro.load_meta_config(
-        app_config, directory=opts.conf_dir) # TODO: add this:, config_type=rose.SUB_CONFIG_NAME)
+        app_config, directory=opts.conf_dir, ignore_meta_error=True) # TODO: add this:, config_type=rose.SUB_CONFIG_NAME)
     if has_changed:
         new_trig_config, change_list = (
             rose.macros.trigger.TriggerMacro().transform(
                 new_config, new_meta_config)
         )
-        print new_meta_config.get_value(["env=A"])
+        trig_macro_id = rose.macro.MACRO_OUTPUT_ID.format(
+            rose.macro.TRANSFORM_METHOD.upper()[0],
+            MACRO_UPGRADE_TRIGGER_NAME
+        )
         if change_list:
             rose.macro.handle_transform(app_config, new_config,
-                                        change_list, macro_id,
+                                        change_list, trig_macro_id,
                                         opts.conf_dir, opts.output_dir,
                                         opts.non_interactive, reporter)
 
