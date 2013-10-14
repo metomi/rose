@@ -31,9 +31,10 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
     MSG_DONE = "{# Rose Configuration Insertion: Done #}\n"
     MSG_INIT = "{# Rose Configuration Insertion: Init #}\n"
 
-    def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
-        """Process jinja2:* sections in "config"."""
-        for key, node in sorted(config.value.items()):
+    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
+                **kwargs):
+        """Process [jinja2:*] in "conf_tree.node"."""
+        for key, node in sorted(conf_tree.node.value.items()):
             if (node.is_ignored() or
                 not key.startswith(self.PREFIX) or
                 not node.value):

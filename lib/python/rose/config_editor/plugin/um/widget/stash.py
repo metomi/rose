@@ -466,8 +466,9 @@ class BaseStashSummaryDataPanelv1(
         self._stash_lookup = self.get_stashmaster_lookup_dict()
         package_config_file = os.path.join(self.STASH_PACKAGE_PATH,
                                            rose.SUB_CONFIG_NAME)
-        self.package_config = rose.config.ConfigLoader().load_with_opts(
-                                          package_config_file)
+        self.package_config = rose.config.ConfigNode()
+        rose.config.ConfigLoader().load_with_opts(package_config_file,
+                                                  self.package_config)
         self.generate_package_lookup()
         self._stashmaster_meta_lookup = (
                           self.get_stashmaster_meta_lookup_dict())

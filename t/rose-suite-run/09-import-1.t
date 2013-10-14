@@ -17,25 +17,45 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose task-run --path=", without site/user configurations.
+# Test "rose suite-run", import.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+tests 6
+#-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
-
 #-------------------------------------------------------------------------------
-tests 5
-#-------------------------------------------------------------------------------
-# Run the suite.
-TEST_KEY=$TEST_KEY_BASE
+mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost
 #-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
+# Install the "hello_earth" suite
+TEST_KEY="$TEST_KEY_BASE-local-install"
+run_pass "$TEST_KEY" \
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/hello_earth -n $NAME -l
+(cd ~/cylc-run/$NAME; find app bin -type f | sort) >"$TEST_KEY.find"
+file_cmp "$TEST_KEY.find" "$TEST_KEY.find" <<'__FIND__'
+app/hello/rose-app.conf
+bin/my-hello
+__FIND__
+{
+    CONF=$HOME/cylc-run/$NAME/log/rose-suite-run.conf
+    rose config -f $CONF jinja2:suite.rc hello
+    rose config -f $CONF jinja2:suite.rc worlds
+} >"$TEST_KEY.conf"
+file_cmp "$TEST_KEY.conf" "$TEST_KEY.conf" <<'__FIND__'
+"Hello"
+["Earth", "Moon"]
+__FIND__
+#-------------------------------------------------------------------------------
+# Start the "hello_earth" suite
+TEST_KEY="$TEST_KEY_BASE-suite-run"
+run_pass "$TEST_KEY" \
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/hello_earth \
+    -n $NAME --no-gcontrol
+#-------------------------------------------------------------------------------
+# Wait for the "hello_earth" suite to complete
+TEST_KEY="$TEST_KEY_BASE-suite-run-wait"
+TIMEOUT=$(($(date +%s) + 120)) # wait 2 minutes
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
@@ -46,15 +66,16 @@ else
     pass "$TEST_KEY"
 fi
 #-------------------------------------------------------------------------------
-PREV_CYCLE=
-for CYCLE in 2013010100 2013010112 2013010200; do
-    TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
-    TASK=my_task_1
-    FILE=$HOME/cylc-run/$NAME/log/job/$TASK.$CYCLE.1.txt
-    file_grep "$TEST_KEY-PATH" \
-        "PATH=$SUITE_RUN_DIR/app/$TASK/bin:$SUITE_RUN_DIR/etc/your-path" $FILE
-    PREV_CYCLE=$CYCLE
-done
+TEST_KEY="$TEST_KEY_BASE-suite-run-my-hello.log"
+sort $SUITE_RUN_DIR/my-hello.log >"$TEST_KEY"
+file_cmp "$TEST_KEY" "$TEST_KEY" <<'__LOG__'
+[2013010100] Hello Earth
+[2013010100] Hello Moon
+[2013010112] Hello Earth
+[2013010112] Hello Moon
+[2013010200] Hello Earth
+[2013010200] Hello Moon
+__LOG__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0

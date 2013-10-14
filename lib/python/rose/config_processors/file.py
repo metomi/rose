@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
-"""Process "file:*" sections in a rose.config.ConfigNode."""
+"""Process "file:*" sections in node of a rose.config_tree.ConfigTree."""
 
 from fnmatch import fnmatch
 from glob import glob
@@ -25,7 +25,6 @@ from hashlib import md5
 import os
 import re
 from rose.checksum import get_checksum
-import rose.config
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.job_runner import JobManager, JobProxy, JobRunner
@@ -40,7 +39,7 @@ from urlparse import urlparse
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
-    """Processor for "file:*" sections in a rose.config.ConfigNode."""
+    """Processor for [file:*] in node of a rose.config_tree.ConfigTree."""
 
     SCHEME = "file"
 
@@ -55,8 +54,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         """Invoke event handler with *args, if there is one."""
         self.manager.handle_event(*args)
 
-    def process(self, config, item, orig_keys=None, orig_value=None, **kwargs):
-        """Install files according to the file:* sections in "config".
+    def process(self, conf_tree, item, orig_keys=None, orig_value=None, **kwargs):
+        """Install files according to [file:*] in conf_tree.
 
         kwargs["no_overwrite_mode"]: fail if a target file already exists.
 
@@ -65,12 +64,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # Find all the "file:*" nodes.
         nodes = {}
         if item == self.SCHEME:
-            for key, node in config.value.items():
+            for key, node in conf_tree.node.value.items():
                 if node.is_ignored() or not key.startswith(self.PREFIX):
                     continue
                 nodes[key] = node
         else:
-            node = config.get([item], no_ignore=True)
+            node = conf_tree.node.get([item], no_ignore=True)
             if node is None:
                 raise ConfigProcessError(orig_keys, item)
             nodes[item] = node
@@ -84,7 +83,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         loc_dao.create()
 
         cwd = os.getcwd()
-        file_install_root = config.get_value(
+        file_install_root = conf_tree.node.get_value(
                 ["file-install-root"],
                 os.getenv("ROSE_FILE_INSTALL_ROOT", None))
         if file_install_root:
@@ -92,14 +91,14 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             self.manager.fs_util.makedirs(file_install_root)
             self.manager.fs_util.chdir(file_install_root)
         try:
-            self._process(config, nodes, loc_dao,
+            self._process(conf_tree, nodes, loc_dao,
                           orig_keys=None, orig_value=None, **kwargs)
         finally:
             if cwd != os.getcwd():
                 self.manager.fs_util.chdir(cwd)
 
 
-    def _process(self, config, nodes, loc_dao,
+    def _process(self, conf_tree, nodes, loc_dao,
                  orig_keys=None, orig_value=None, **kwargs):
         """Helper for self.process."""
         # Ensure that everything is overwritable
@@ -155,7 +154,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             targets[name].dep_locs = target_sources
 
         # Determine the scheme of the location from configuration.
-        config_schemes_str = config.get_value(["schemes"])
+        config_schemes_str = conf_tree.node.get_value(["schemes"])
         config_schemes = [] # [(pattern, scheme), ...]
         if config_schemes_str:
             for line in config_schemes_str.splitlines():
@@ -174,7 +173,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     if fnmatch(source.name, p):
                         source.scheme = s
                         break
-                self.loc_handlers_manager.parse(source, config)
+                self.loc_handlers_manager.parse(source, conf_tree)
             except ValueError as e:
                 raise ConfigProcessError([key, "source"], source.name, e)
             prev_source = loc_dao.select(source.name)
@@ -263,12 +262,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             work_dir = mkdtemp()
             try:
                 nproc_keys = ["rose.config_processors.file", "nproc"]
-                nproc_str = config.get_value(nproc_keys)
+                nproc_str = conf_tree.node.get_value(nproc_keys)
                 nproc = None
                 if nproc_str is not None:
                     nproc = int(nproc_str)
                 job_runner = JobRunner(self, nproc)
-                job_runner(JobManager(jobs), config, loc_dao, work_dir)
+                job_runner(JobManager(jobs), conf_tree, loc_dao, work_dir)
             except ValueError as e:
                 if e.args and jobs.has_key(e.args[0]):
                     job = jobs[e.args[0]]
@@ -285,7 +284,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             if not target.is_out_of_date or target.loc_type == target.TYPE_TREE:
                 continue
             keys = [self.PREFIX + target.name, "checksum"]
-            checksum_expected = config.get_value(keys)
+            checksum_expected = conf_tree.node.get_value(keys)
             if checksum_expected is None:
                 continue
             checksum = target.paths[0].checksum
@@ -295,14 +294,14 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             event = ChecksumEvent(target.name, checksum)
             self.handle_event(event)
 
-    def process_job(self, job, config, loc_dao, work_dir):
+    def process_job(self, job, conf_tree, loc_dao, work_dir):
         """Process a job, helper for "process"."""
         for key, method in [(Loc.A_INSTALL, self._target_install),
                             (Loc.A_SOURCE, self._source_pull)]:
             if job.context.action_key == key:
-                return method(job.context, config, work_dir)
+                return method(job.context, conf_tree, work_dir)
 
-    def post_process_job(self, job, config, loc_dao, work_dir):
+    def post_process_job(self, job, conf_tree, loc_dao, work_dir):
         """Post-process a successful job, helper for "process"."""
         loc_dao.update(job.context)
 
@@ -313,14 +312,14 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         except AttributeError:
             pass
 
-    def _source_pull(self, source, config, work_dir):
+    def _source_pull(self, source, conf_tree, work_dir):
         """Pulls a source to its cache in the work directory."""
         m = md5()
         m.update(source.name)
         source.cache = os.path.join(work_dir, m.hexdigest())
-        return self.loc_handlers_manager.pull(source, config)
+        return self.loc_handlers_manager.pull(source, conf_tree)
 
-    def _target_install(self, target, config, work_dir):
+    def _target_install(self, target, conf_tree, work_dir):
         """Install target.
 
         Build target using its source(s).
@@ -606,7 +605,7 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def parse(self, loc, config):
+    def parse(self, loc, conf_tree):
         """Parse loc.name.
         
         Set loc.real_name, loc.scheme, loc.loc_type, loc.key, loc.paths, etc.
@@ -629,10 +628,10 @@ class PullableLocHandlersManager(SchemeHandlersManager):
                     raise ValueError(loc.name)
             else:
                 handler = self.get_handler(self.DEFAULT_SCHEME)
-        return handler.parse(loc, config)
+        return handler.parse(loc, conf_tree)
 
-    def pull(self, loc, config):
+    def pull(self, loc, conf_tree):
         """Pull loc to its cache."""
         if loc.scheme is None:
-            self.parse(loc, config)
-        return self.get_handler(loc.scheme).pull(loc, config)
+            self.parse(loc, conf_tree)
+        return self.get_handler(loc.scheme).pull(loc, conf_tree)

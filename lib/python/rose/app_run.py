@@ -131,10 +131,10 @@ class BuiltinApp(object):
         """Return the application key for a given (task) name."""
         return None
 
-    def run(self, config, opts, args, uuid, work_files):
+    def run(self, conf_tree, opts, args, uuid, work_files):
         """Run the logic of a builtin application.
 
-        config -- root node of the application configuration file.
+        conf_tree -- ConfigTree of the application configuration.
         See Runner.run and Runner.run_impl for definitions for opts, args,
         uuid, work_files.
 
@@ -161,27 +161,28 @@ class AppRunner(Runner):
         """The actual logic for a run."""
 
         # Preparation.
-        config = self.config_load(opts)
-        self._prep(config, opts, args, uuid, work_files)
-        self._poll(config, opts, args, uuid, work_files)
+        conf_tree = self.config_load(opts)
+        self._prep(conf_tree, opts, args, uuid, work_files)
+        self._poll(conf_tree, opts, args, uuid, work_files)
 
         # Run the application or the command.
-        app_mode = config.get_value(["mode"])
+        app_mode = conf_tree.node.get_value(["mode"])
         if app_mode is None:
             app_mode = opts.app_mode
         if app_mode in [None, "command"]:
-            return self._command(config, opts, args, uuid, work_files)
+            return self._command(conf_tree, opts, args, uuid, work_files)
         else:
             builtin_app = self.builtins_manager.get_handler(app_mode)
             if builtin_app is None:
                 raise UnknownBuiltinAppError(app_mode)
-            return builtin_app.run(self, config, opts, args, uuid, work_files)
+            return builtin_app.run(self, conf_tree, opts, args, uuid,
+                                   work_files)
 
-    def _poll(self, config, opts, args, uuid, work_files):
+    def _poll(self, conf_tree, opts, args, uuid, work_files):
         """Poll for prerequisites of applications."""
         # Poll configuration
-        poll_test = config.get_value(["poll", "test"])
-        poll_all_files_value = config.get_value(["poll", "all-files"])
+        poll_test = conf_tree.node.get_value(["poll", "test"])
+        poll_all_files_value = conf_tree.node.get_value(["poll", "all-files"])
         poll_all_files = []
         if poll_all_files_value:
             try:
@@ -190,7 +191,7 @@ class AppRunner(Runner):
             except UnboundEnvironmentVariableError as e:
                 raise ConfigValueError(["poll", "all-files"],
                                        poll_all_files_value, e)
-        poll_any_files_value = config.get_value(["poll", "any-files"])
+        poll_any_files_value = conf_tree.node.get_value(["poll", "any-files"])
         poll_any_files = []
         if poll_any_files_value:
             try:
@@ -201,7 +202,7 @@ class AppRunner(Runner):
                                        poll_any_files_value, e)
         poll_file_test = None
         if poll_all_files or poll_any_files:
-            poll_file_test = config.get_value(["poll", "file-test"])
+            poll_file_test = conf_tree.node.get_value(["poll", "file-test"])
             if poll_file_test and "{}" not in poll_file_test:
                 raise ConfigValueError(["poll", "file-test"], poll_file_test,
                                        ConfigValueError.SYNTAX)
@@ -212,8 +213,9 @@ class AppRunner(Runner):
             # m: minutes
             # h: hours
             # N*: repeat the value N times
-            poll_delays_value = config.get_value(
-                ["poll", "delays"], default="").strip()
+            poll_delays_value = conf_tree.node.get_value(["poll", "delays"],
+                                                         default="")
+            poll_delays_value = poll_delays_value.strip()
             units = {"h": 3600, "m": 60, "s": 1}
             if poll_delays_value:
                 for item in poll_delays_value.split(","):
@@ -294,7 +296,7 @@ class AppRunner(Runner):
         self.handle_event(PollEvent(time(), "file:" + file, ok))
         return ok
 
-    def _prep(self, config, opts, args, uuid, work_files):
+    def _prep(self, conf_tree, opts, args, uuid, work_files):
         """Prepare to run the application."""
 
         if opts.new_mode:
@@ -305,51 +307,39 @@ class AppRunner(Runner):
                 self.fs_util.delete(p)
 
         # Dump the actual configuration as rose-app-run.conf
-        ConfigDumper()(config, "rose-app-run.conf")
+        ConfigDumper()(conf_tree.node, "rose-app-run.conf")
 
         # Environment variables: PATH
-        conf_dir = opts.conf_dir
-        if conf_dir is None:
-            conf_dir = os.getcwd()
-        conf_bin_dir = os.path.join(conf_dir, "bin")
-        if os.path.isdir(conf_bin_dir):
-            value = conf_bin_dir + os.pathsep + os.getenv("PATH")
-            config.set(["env", "PATH"], value)
+        paths = []
+        for conf_dir in conf_tree.conf_dirs:
+            conf_bin_dir = os.path.join(conf_dir, "bin")
+            if os.path.isdir(conf_bin_dir):
+                paths.append(conf_bin_dir)
+        if paths:
+            value = os.pathsep.join(paths + [os.getenv("PATH")])
+            conf_tree.node.set(["env", "PATH"], value)
         else:
-            config.set(["env", "PATH"], os.getenv("PATH"))
+            conf_tree.node.set(["env", "PATH"], os.getenv("PATH"))
 
         # Free format files not defined in the configuration file
-        conf_file_dir = os.path.join(conf_dir, "file")
         file_section_prefix = self.config_pm.get_handler("file").PREFIX
-        if os.path.isdir(conf_file_dir):
-            dirs = []
-            files = []
-            for dirpath, dirnames, filenames in os.walk(conf_file_dir):
-                for dirname in dirnames:
-                    if dirname.startswith("."):
-                        dirnames.remove(dirname)
-                dir = dirpath[len(conf_file_dir) + 1 :]
-                files += [os.path.join(dir, filename) for filename in filenames]
-                if dirpath != conf_file_dir:
-                    dirs.append(dir)
-            for target in dirs:
-                section = file_section_prefix + target
-                if config.get([section], no_ignore=True) is None:
-                    config.set([section, "mode"], "mkdir")
-            for target in files:
-                section = file_section_prefix + target
-                if config.get([section], no_ignore=True) is None:
-                    source = os.path.join(conf_file_dir, target)
-                    config.set([section, "source"], source)
+        for rel_path, conf_dir in conf_tree.files.items():
+            if not rel_path.startswith("file" + os.sep):
+                continue
+            name = rel_path[len("file" + os.sep):]
+            section = file_section_prefix + name
+            if conf_tree.node.get([section], no_ignore=True) is None:
+                conf_tree.node.set([section, "source"],
+                                   os.path.join(conf_dir, rel_path))
 
         # Process Environment Variables
-        self.config_pm(config, "env")
+        self.config_pm(conf_tree, "env")
 
         # Process Files
-        self.config_pm(config, "file",
+        self.config_pm(conf_tree, "file",
                        no_overwrite_mode=opts.no_overwrite_mode)
 
-    def _command(self, config, opts, args, uuid, work_files):
+    def _command(self, conf_tree, opts, args, uuid, work_files):
         """Run the command."""
 
         command = self.popen.list_to_shell_str(args)
@@ -358,13 +348,12 @@ class AppRunner(Runner):
             for name in names:
                 if not name:
                     continue
-                node = config.get(["command", name], no_ignore=True)
-                if node is not None:
+                command = conf_tree.node.get_value(["command", name])
+                if command is not None:
                     break
             else:
                 self.handle_event(CommandNotDefinedEvent())
                 return
-            command = node.value
         if os.access("STDIN", os.F_OK | os.R_OK):
             command += " <STDIN"
         self.handle_event("command: %s" % command)

@@ -26,6 +26,7 @@ from glob import glob
 import os
 import re
 from rose.config import ConfigDumper, ConfigLoader
+from rose.config_tree import ConfigTreeLoader
 from rose.env import env_var_process
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
@@ -34,6 +35,7 @@ from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
 from rose.run_source_vc import write_source_vc_info 
+from rose.suite_engine_proc import StillRunningError
 import socket
 import sys
 import tarfile
@@ -42,30 +44,12 @@ from time import sleep, strftime, time
 import traceback
 
 
-class AlreadyRunningError(Exception):
-
-    """An exception raised when a suite is already running."""
-
-    def __str__(self):
-        name, reason = self.args
-        return "%s: is already running (detected %s)" % (name, reason)
-
-
 class NotRunningError(Exception):
 
     """An exception raised when a suite is not running."""
 
     def __str__(self):
         return "%s: is not running" % (self.args)
-
-
-class ConfigNotFoundError(Exception):
-
-    """An exception raised when a config can't be found at or below cwd."""
-
-    def __str__(self):
-        return ("%s - no configuration found for this path." %
-                self.args[0])
 
 
 class VersionMismatchError(Exception):
@@ -135,17 +119,8 @@ class SuiteRunner(Runner):
             # opts.name always set for remote.
             return self._run_remote(opts, opts.name)
 
-        while True:
-            try:
-                config = self.config_load(opts)
-                break
-            except (OSError, IOError) as e:
-                opts.conf_dir = self.fs_util.dirname(opts.conf_dir)
-                if opts.conf_dir == self.fs_util.dirname(opts.conf_dir):
-                    raise ConfigNotFoundError(os.getcwd())
-        if opts.conf_dir != os.getcwd():
-            self.fs_util.chdir(opts.conf_dir)
-            opts.conf_dir = None
+        conf_tree = self.config_load(opts)
+        self.fs_util.chdir(conf_tree.conf_dirs[0])
 
         suite_name = opts.name
         if not opts.name:
@@ -170,15 +145,15 @@ class SuiteRunner(Runner):
                       "ROSE_VERSION": ResourceLocator.default().get_version(),
                       suite_engine_key: suite_engine_version}
         for k, v in auto_items.items():
-            requested_value = config.get_value(["env", k])
+            requested_value = conf_tree.node.get_value(["env", k])
             if requested_value:
                 if k == "ROSE_VERSION" and v != requested_value:
                     e = VersionMismatchError(requested_value, v)
                     raise ConfigValueError(["env", k], requested_value, e)
                 v = requested_value
             else:
-                config.set(["env", k], v)
-            config.set([jinja2_section, k], '"' + v + '"')
+                conf_tree.node.set(["env", k], v)
+            conf_tree.node.set([jinja2_section, k], '"' + v + '"')
 
         # See if suite is running or not
         hosts = []
@@ -204,9 +179,10 @@ class SuiteRunner(Runner):
             reason = self.suite_engine_proc.is_suite_running(
                         None, suite_name, hosts)
             if reason:
-                raise AlreadyRunningError(suite_name, reason)
+                raise StillRunningError(suite_name, reason)
 
         # Install the suite to its run location
+        # TODO: files from inherited locations
         suite_dir_rel = self._suite_dir_rel(suite_name)
         suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
 
@@ -219,13 +195,16 @@ class SuiteRunner(Runner):
             self.fs_util.delete(suite_dir)
         if os.getcwd() != suite_dir:
             self.fs_util.makedirs(suite_dir)
-            cmd = self._get_cmd_rsync(suite_dir)
-            self.popen(*cmd)
             os.chdir(suite_dir)
+        cwd = os.getcwd()
+        for rel_path, conf_dir in conf_tree.files.items():
+            if conf_dir == cwd or self.REC_DONT_SYNC.match(rel_path):
+                continue
+            self.fs_util.copy2(os.path.join(conf_dir, rel_path), rel_path)
 
         # Housekeep log files
         if not opts.install_only_mode and not opts.local_install_only_mode:
-            self._run_init_dir_log(opts, suite_name, config)
+            self._run_init_dir_log(opts, suite_name, conf_tree)
         self.fs_util.makedirs("log/suite")
 
         # Rose configuration and version logs
@@ -241,7 +220,7 @@ class SuiteRunner(Runner):
         prefix = "rose-conf/%s-%s" % (strftime("%Y%m%dT%H%M%S"), mode)
 
         # Dump the actual configuration as rose-suite-run.conf
-        ConfigDumper()(config, "log/" + prefix + ".conf")
+        ConfigDumper()(conf_tree.node, "log/" + prefix + ".conf")
 
         # Install version information file
         write_source_vc_info(
@@ -275,17 +254,17 @@ class SuiteRunner(Runner):
 
         # Install share/work directories (local)
         for name in ["share", "work"]:
-            self._run_init_dir_work(opts, suite_name, name, config)
+            self._run_init_dir_work(opts, suite_name, name, conf_tree)
 
         # Process Environment Variables
-        environ = self.config_pm(config, "env")
+        environ = self.config_pm(conf_tree, "env")
 
         # Process Files
-        self.config_pm(config, "file",
+        self.config_pm(conf_tree, "file",
                        no_overwrite_mode=opts.no_overwrite_mode)
 
         # Process Jinja2 configuration
-        self.config_pm(config, "jinja2")
+        self.config_pm(conf_tree, "jinja2")
 
         # Register the suite
         self.suite_engine_proc.validate(suite_name, opts.strict_mode,
@@ -333,7 +312,7 @@ class SuiteRunner(Runner):
                           "root-dir-work"]
             rose_sr += " --remote=uuid=" + uuid
             for key in host_confs:
-                value = self._run_conf(key, host=host, config=config)
+                value = self._run_conf(key, host=host, conf_tree=conf_tree)
                 if value is not None:
                     v = self.popen.list_to_shell_str([str(value)])
                     rose_sr += "," + key + "=" + v
@@ -405,7 +384,7 @@ class SuiteRunner(Runner):
         return ret
 
     def _run_conf(
-            self, key, default=None, host=None, config=None, r_opts=None):
+            self, key, default=None, host=None, conf_tree=None, r_opts=None):
         """Return the value of a setting given by a key for a given host. If
         r_opts is defined, we are alerady in a remote host, so there is no need
         to do a host match. Otherwise, the setting may be found in the run time
@@ -418,7 +397,7 @@ class SuiteRunner(Runner):
         if host is None:
             host = "localhost"
         for conf, keys in [
-                (config, []),
+                (conf_tree.node, []),
                 (ResourceLocator.default().get_conf(), ["rose-suite-run"])]:
             if conf is None:
                 continue
@@ -436,7 +415,7 @@ class SuiteRunner(Runner):
                     return value.strip()
         return default
 
-    def _run_init_dir_log(self, opts, suite_name, config=None, r_opts=None):
+    def _run_init_dir_log(self, opts, suite_name, conf_tree=None, r_opts=None):
         """Create the suite's log/ directory. Housekeep, archive old ones."""
         # Do nothing in log append mode if log directory already exists
         if opts.run_mode in ["reload", "restart"] and os.path.isdir("log"):
@@ -496,13 +475,13 @@ class SuiteRunner(Runner):
                 self.handle_event(SuiteLogArchiveEvent(log_tar_gz, log))
                 self.fs_util.delete(log)
 
-    def _run_init_dir_work(self, opts, suite_name, name, config=None,
+    def _run_init_dir_work(self, opts, suite_name, name, conf_tree=None,
                            r_opts=None):
         """Create a named suite's directory."""
         item_path = os.path.realpath(name)
         item_path_source = item_path
         key = "root-dir-" + name
-        item_root = self._run_conf(key, config=config, r_opts=r_opts)
+        item_root = self._run_conf(key, conf_tree=conf_tree, r_opts=r_opts)
         if item_root is not None:
             item_root = env_var_process(item_root)
             suite_dir_rel = self._suite_dir_rel(suite_name)

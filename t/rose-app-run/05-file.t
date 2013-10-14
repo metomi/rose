@@ -78,15 +78,16 @@ test_teardown
 TEST_KEY=$TEST_KEY_BASE-v1
 test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config
+DIR=$(cd ..; pwd)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] create: hello3
 [INFO] install: hello3/text
-[INFO]     source: ../config/file/hello3/text
+[INFO]     source: $DIR/config/file/hello3/text
 [INFO] install: hello2
-[INFO]     source: ../config/file/hello2
+[INFO]     source: $DIR/config/file/hello2
 [INFO] install: hello1
-[INFO]     source: ../config/file/hello1
+[INFO]     source: $DIR/config/file/hello1
 [INFO] command: cat hello1 hello2 hello3/text
 $OUT
 __CONTENT__
@@ -204,15 +205,16 @@ test_teardown
 TEST_KEY=$TEST_KEY_BASE--install-only
 test_setup
 run_pass "$TEST_KEY" rose app-run --config=../config --install-only
+DIR=$(cd ..; pwd)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
 [INFO] create: hello3
 [INFO] install: hello3/text
-[INFO]     source: ../config/file/hello3/text
+[INFO]     source: $DIR/config/file/hello3/text
 [INFO] install: hello2
-[INFO]     source: ../config/file/hello2
+[INFO]     source: $DIR/config/file/hello2
 [INFO] install: hello1
-[INFO]     source: ../config/file/hello1
+[INFO]     source: $DIR/config/file/hello1
 [INFO] command: cat hello1 hello2 hello3/text
 __CONTENT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -245,7 +247,6 @@ TEST_DIR=$TEST_DIR \
     -D "file-install-root=$TEST_DIR/test-root"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<"$OUT"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-cat "$TEST_KEY.err"
 run_pass "$TEST_KEY.db" test -f ".rose-config_processors-file.db"
 run_pass "$TEST_KEY.hello1" test -f "$TEST_DIR/test-root/hello1"
 run_pass "$TEST_KEY.hello2" test -f "$TEST_DIR/test-root/hello2"

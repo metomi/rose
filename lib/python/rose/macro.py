@@ -895,7 +895,7 @@ def parse_macro_mode_args(mode="macro", argv=None):
     standard_format_config(app_config)
 
     # Load meta config if it exists.
-    meta_config = None
+    meta_config = rose.config.ConfigNode()
     meta_path, warning = load_meta_path(app_config, opts.conf_dir)
     if meta_path is None:
         if mode == "macro":

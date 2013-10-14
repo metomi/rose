@@ -21,8 +21,8 @@
 
 import os
 import re
-from rose.config import ConfigLoader
 from rose.config_processor import ConfigProcessorsManager
+from rose.config_tree import ConfigTreeLoader
 from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
 from rose.suite_engine_proc import SuiteEngineProcessor
@@ -30,6 +30,14 @@ import shlex
 import shutil
 from tempfile import TemporaryFile
 from uuid import uuid4
+
+
+class ConfigNotFoundError(Exception):
+
+    """An exception raised when a config cannot be found at or below cwd."""
+
+    def __str__(self):
+        return "%s: %s not found." % self.args
 
 
 class ConfigValueError(Exception):
@@ -90,6 +98,7 @@ class Runner(object):
             suite_engine_proc = SuiteEngineProcessor.get_processor(
                     event_handler=event_handler, popen=popen, fs_util=fs_util)
         self.suite_engine_proc = suite_engine_proc
+        self.conf_tree_loader = ConfigTreeLoader()
 
     def handle_event(self, *args, **kwargs):
         """Handle an event using the runner's event handler."""
@@ -100,7 +109,7 @@ class Runner(object):
     def config_load(self, opts):
         """Combine main config file with optional ones and defined ones.
 
-        Return a ConfigNode.
+        Return an instance of rose.config_tree.ConfigTree.
 
         """
 
@@ -108,40 +117,46 @@ class Runner(object):
         conf_dir = opts.conf_dir
         if conf_dir is None:
             conf_dir = os.getcwd()
-        source = os.path.join(conf_dir, "rose-" + self.CONF_NAME + ".conf")
+        conf_dir_orig = conf_dir
+        conf_name = "rose-" + self.CONF_NAME + ".conf"
+        while not os.access(os.path.join(conf_dir, conf_name),
+                            os.F_OK | os.R_OK):
+            conf_dir = self.fs_util.dirname(conf_dir) 
+            if conf_dir == self.fs_util.dirname(conf_dir): # is root
+                raise ConfigNotFoundError(conf_dir_orig, conf_name)
 
         # Optional configuration files
         opt_conf_keys = []
-        opt_conf_keys_env_name = "ROSE_" + self.CONF_NAME.upper() + "_OPT_CONF_KEYS"
-        opt_conf_keys_env = os.getenv(opt_conf_keys_env_name)
+        opt_conf_keys_env = os.getenv("ROSE_%s_OPT_CONF_KEYS" %
+                                      self.CONF_NAME.upper())
         if opt_conf_keys_env:
             opt_conf_keys += shlex.split(opt_conf_keys_env)
         if opts.opt_conf_keys:
             opt_conf_keys += opts.opt_conf_keys
 
-        config_loader = ConfigLoader()
-        node = config_loader.load_with_opts(source, more_keys=opt_conf_keys)
+        conf_tree = self.conf_tree_loader.load(conf_dir, conf_name,
+                                               opt_keys=opt_conf_keys)
 
         # Optional defines
         # N.B. In theory, we should write the values in "opts.defines" to
-        # "node" directly. However, the values in "opts.defines" may contain
-        # "ignore" flags. Rather than replicating the logic for parsing ignore
-        # flags in here, it is actually easier to write the values in
+        # "conf_tree.node" directly. However, the values in "opts.defines" may
+        # contain "ignore" flags. Rather than replicating the logic for parsing
+        # ignore flags in here, it is actually easier to write the values in
         # "opts.defines" to a file and pass it to the loader to parse it.
         if opts.defines:
             source = TemporaryFile()
             for define in opts.defines:
-                section, key, value = self.REC_OPT_DEFINE.match(define).groups()
-                if section is None:
-                    section = ""
+                sect, key, value = self.REC_OPT_DEFINE.match(define).groups()
+                if sect is None:
+                    sect = ""
                 if value is None:
                     value = ""
-                source.write("[%s]\n" % section)
+                source.write("[%s]\n" % sect)
                 if key is not None:
                     source.write("%s=%s\n" % (key, value))
             source.seek(0)
-            config_loader.load(source, node)
-        return node
+            self.conf_tree_loader.node_loader.load(source, conf_tree.node)
+        return conf_tree
 
     def run(self, opts, args):
 

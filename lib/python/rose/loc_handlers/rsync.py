@@ -47,7 +47,7 @@ class RsyncLocHandler(object):
         else:
             return self.bad_address is None or address != self.bad_address
 
-    def parse(self, loc, config):
+    def parse(self, loc, conf_tree):
         """Set loc.scheme, loc.loc_type, loc.paths."""
         loc.scheme = "rsync"
         # Attempt to obtain the checksum(s) via "ssh"
@@ -82,7 +82,7 @@ class RsyncLocHandler(object):
                 checksum = None
             loc.add_path(name, checksum)
 
-    def pull(self, loc, config):
+    def pull(self, loc, conf_tree):
         """Run "rsync" to pull files or directories of loc to its cache."""
         name = loc.name
         if loc.loc_type == loc.TYPE_TREE:

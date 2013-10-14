@@ -88,9 +88,9 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def clean(self, suite_name, hosts=None):
         """Remove items created by the previous run of a suite."""
-        if self.is_suite_running(None, suite_name, hosts):
-            raise StillRunningError(suite_name,
-                                    self.ping(suite_name, hosts)[0])
+        reason = self.is_suite_running(None, suite_name, hosts)
+        if reason:
+            raise StillRunningError(suite_name, reason)
         job_auths = []
         try:
             job_auths = self.get_suite_jobs_auths(suite_name)
@@ -532,11 +532,27 @@ class CylcProcessor(SuiteEngineProcessor):
         if ("localhost" in hosts and
             os.path.exists(os.path.expanduser(port_file))):
             return port_file
+        if user_name is None:
+            user_name = pwd.getpwuid(os.getuid()).pw_name
+        pgrep = ["pgrep", "-f", "-l", "-u", user_name,
+                 "python.*cylc-(run|restart).*\\<" + suite_name + "\\>"]
+        rc, out, err = self.popen.run(*pgrep)
+        if rc == 0:
+            for line in out.splitlines():
+                if suite_name in line.split():
+                    return "localhost:process=" + line
         host_proc_dict = {}
+        opt_user = "-u `whoami`"
+        if user_name:
+            opt_user = "-u " + user_name
         for host in sorted(hosts):
             if host == "localhost":
                 continue
-            cmd = self.popen.get_cmd("ssh", host, "test", "-f", port_file)
+            cmd = self.popen.get_cmd("ssh", host,
+                                     "ls " + port_file +
+                                     " || pgrep -f -l " + opt_user +
+                                     " 'python.*cylc-(run|restart).*\\<" +
+                                     suite_name + "\\>'")
             host_proc_dict[host] = self.popen.run_bg(*cmd)
         reason = None
         while host_proc_dict:
@@ -545,25 +561,12 @@ class CylcProcessor(SuiteEngineProcessor):
                 if rc is not None:
                     host_proc_dict.pop(host)
                     if rc == 0:
-                        reason = host + ":" + port_file
+                        out, err = proc.communicate()
+                        for line in out.splitlines():
+                            if suite_name in line.split():
+                                reason = host + ":" + line
             if host_proc_dict:
                 sleep(0.1)
-
-        if reason is None:
-            for host in sorted(hosts):
-                if host == "localhost":
-                    continue
-                cmd = self.popen.get_cmd("ssh", host, "pgrep", "-u",
-                                         pwd.getpwuid(os.getuid()).pw_name,
-                                         suite_name, '-f', '-x')
-                host_proc_dict[host] = self.popen.run_bg(*cmd)
-            while host_proc_dict:
-                for host, proc in host_proc_dict.items():
-                    rc = proc.poll()
-                    if rc is not None:
-                        host_proc_dict.pop(host)
-                        if rc == 0:
-                            reason = "process running for this suite on " + host
         return reason
 
     def job_logs_archive(self, suite_name, items):

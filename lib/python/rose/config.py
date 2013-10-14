@@ -375,17 +375,22 @@ class ConfigLoader(object):
             + r"\s*(?P<value>.*)$")
 
     def load_with_opts(self, source, node=None, more_keys=None,
-                       ignore_missing_more_keys=False):
+                       used_keys=None):
         """Read a source configuration file with optional configurations.
 
         Arguments:
-        source -- a string for a file path.
-        node --- a ConfigNode object if specified, otherwise created.
-        more_keys -- a list of additional optional configuration names. If
+        source -- A string for a file path.
+        node --- A ConfigNode object if specified, otherwise created.
+        more_keys -- A list of additional optional configuration names. If
                      source is "rose-${TYPE}.conf", the file of each name
                      should be "opt/rose-${TYPE}-${NAME}.conf".
-        ignore_missing_more_keys -- a flag to indicate whether non-existent
-                                    more_keys should be ignored or not.
+        used_keys -- If defined, it should be a list for this method to append
+                     to. The key of each successfully loaded optional
+                     configuration will be appended to the list (unless the key
+                     is already in the list). Missing optional configurations
+                     that are specified in more_keys will not raise an error.
+                     If not defined, any missing optional configuration will
+                     trigger an OSError.
 
         Return node.
         
@@ -408,9 +413,11 @@ class ConfigLoader(object):
                     source_dir, OPT_CONFIG_DIR, opt_conf_file_name_base)
             if os.access(opt_conf_file_name, os.F_OK | os.R_OK):
                 self.load(opt_conf_file_name, node)
-            elif ignore_missing_more_keys and key in more_keys:
-                continue
+                if used_keys is not None and key not in used_keys:
+                    used_keys.append(key)
             else:
+                if used_keys is not None and key in more_keys:
+                    continue
                 raise OSError(errno.ENOENT, os.strerror(errno.ENOENT),
                               opt_conf_file_name)
         return node
