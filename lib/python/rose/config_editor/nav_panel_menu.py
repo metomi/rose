@@ -108,7 +108,8 @@ class NavPanelHandler(object):
 
     def create_request(self):
         """Handle a create configuration request."""
-        if not any([v.is_top_level for v in self.data.config.values()]):
+        if not any([v.config_type == rose.TOP_CONFIG_NAME
+                    for v in self.data.config.values()]):
             text = rose.config_editor.WARNING_APP_CONFIG_CREATE
             title = rose.config_editor.WARNING_APP_CONFIG_CREATE_TITLE
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,

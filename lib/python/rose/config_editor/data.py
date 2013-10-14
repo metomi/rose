@@ -148,7 +148,7 @@ class ConfigData(object):
     """Stores information about a configuration."""
 
     def __init__(self, config, s_config, directory, opt_conf_lookup, meta,
-                 meta_id, meta_files, macros, is_top, is_disc,
+                 meta_id, meta_files, macros, config_type,
                  var_data=None, sect_data=None, is_preview=False):
         self.config = config
         self.save_config = s_config
@@ -158,8 +158,7 @@ class ConfigData(object):
         self.meta_id = meta_id
         self.meta_files = meta_files
         self.macros = macros
-        self.is_top_level = is_top
-        self.is_discovery = is_disc
+        self.config_type = config_type
         self.vars = var_data
         self.sections = sect_data
         self.is_preview = is_preview
@@ -189,8 +188,12 @@ class ConfigDataManager(object):
         self._config_section_namespace_lookup = {}  # Store section namespaces
         self.locator = rose.resource.ResourceLocator(paths=sys.path)
 
-    def load(self, top_level_directory, config_obj_dict, 
-             load_all_apps=False, load_no_apps=False, metadata_off=False):
+    def load(self, top_level_directory, config_obj_dict,
+             config_obj_type_dict=None, load_all_apps=False, load_no_apps=False,
+             metadata_off=False):
+        """Load configurations and their metadata."""
+        if config_obj_type_dict is None:
+            config_obj_type_dict = {}
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
                 if filename in [rose.TOP_CONFIG_NAME, rose.SUB_CONFIG_NAME]:
@@ -207,9 +210,11 @@ class ConfigDataManager(object):
             self.top_level_name = config_obj_dict.keys()[0]
             self.top_level_directory = None
         for name, obj in config_obj_dict.items():
-            is_discovery = self.helper.get_config_is_discovery(obj)
+            config_type = config_obj_type_dict.get(name)
+            if config_type is None:
+                config_type = self.helper.get_config_type(obj)
             self.load_config(config_name=name, config=obj,
-                             is_discovery=is_discovery)
+                             config_type=config_type)
         self.saved_config_names = set(self.config.keys())
 
     def load_top_config(self, top_level_directory, preview=False, 
@@ -260,14 +265,15 @@ class ConfigDataManager(object):
         if os.path.isfile(disc_path):
             config_obj, master_obj = self.load_config_file(disc_path)
             self.load_config(config_name="/" + self.top_level_name + "-info",
-                             config=config_obj, is_discovery=True)
+                             config=config_obj,
+                             config_type=rose.INFO_CONFIG_NAME)
 
     def load_config(self, config_directory=None,
                     config_name=None, config=None,
-                    reload_tree_on=False, is_discovery=False,
-                    skip_load_event=False, preview=False, metadata_off=False):
-        """Load the configuration and meta-data. Load namespaces."""
-        is_top_level = False
+                    config_type=None, reload_tree_on=False,
+                    skip_load_event=False, preview=False,
+                    metadata_off=False):
+        """Load the configuration and metadata."""
         if config_directory is None:
             name = "/" + config_name.lstrip("/")
             config = config
@@ -286,13 +292,17 @@ class ConfigDataManager(object):
                     name = "/" + os.path.join(tail, name).rstrip('/')
                     head, tail = os.path.split(head)
                 name = "/" + name.lstrip("/")
+                config_type = rose.SUB_CONFIG_NAME
             elif rose.TOP_CONFIG_NAME not in os.listdir(config_directory):
                 # Just editing a single sub configuration, not a suite
                 name = "/" + self.top_level_name
+                config_type = rose.SUB_CONFIG_NAME
             else:
-                # A suite configuration
+                # Make sure we also load any discovery (info) configuration
                 self.load_info_config(config_directory)
+                # A suite configuration
                 name = "/" + self.top_level_name + "-conf"
+                config_type = rose.TOP_CONFIG_NAME
             if not skip_load_event:
                 self.reporter.report_load_event(
                               rose.config_editor.EVENT_LOAD_CONFIG.format(
@@ -303,7 +313,7 @@ class ConfigDataManager(object):
                     os.path.abspath(self.top_level_directory)):
                     config_path = os.path.join(config_directory,
                                                rose.TOP_CONFIG_NAME)
-                    is_top_level = True
+                    config_type = rose.TOP_CONFIG_NAME
                 else:
                     text = rose.config_editor.ERROR_NOT_FOUND.format(
                                                               config_path)
@@ -325,10 +335,11 @@ class ConfigDataManager(object):
             meta_config = rose.config.ConfigNode()
             meta_files = []
         elif metadata_off:
-            meta_config = self.load_meta_config()
+            meta_config = self.load_meta_config(config_type=config_type)
             meta_files = []
         else:
-            meta_config = self.load_meta_config(config, config_directory)
+            meta_config = self.load_meta_config(config, config_directory,
+                                                config_type=config_type)
             meta_files = self.load_meta_files(config, config_directory)
                 
         opt_conf_lookup = self.load_optional_configs(config_directory)
@@ -342,8 +353,7 @@ class ConfigDataManager(object):
         self.config[name] = ConfigData(config, s_config, config_directory,
                                        opt_conf_lookup, meta_config,
                                        meta_id, meta_files, macros,
-                                       is_top_level, is_discovery, 
-                                       is_preview=preview)
+                                       config_type, is_preview=preview)
         
         self.load_builtin_macros(name)
         self.load_file_metadata(name)
@@ -741,13 +751,14 @@ class ConfigDataManager(object):
         if config_name in self._config_section_namespace_lookup:
             self._config_section_namespace_lookup.pop(config_name)
 
-    def load_meta_config(self, config=None, directory=None):
+    def load_meta_config(self, config=None, directory=None, config_type=None):
         """Load the main metadata, and any specified in 'config'."""
         if config is None:
             config = rose.config.ConfigNode()
         error_handler = rose.config_editor.util.launch_error_dialog
         return rose.macro.load_meta_config(config, directory,
-                                           error_handler)
+                                           config_type=config_type,
+                                           error_handler=error_handler)
 
     def load_meta_files(self, config=None, directory=None):
         """Load the file paths of files within the metadata directory."""
@@ -769,35 +780,11 @@ class ConfigDataManager(object):
         return meta_filepaths
 
     def filter_meta_config(self, config_name):
-        """Filter out invalid metadata e.g. app metadata for suite configs."""
-        # TODO: Remove after different default metadata for different configs
+        """Filter out invalid metadata."""
         config_data = self.config[config_name]
         config = config_data.config
         meta_config = config_data.meta
         directory = config_data.directory
-        if config_data.is_top_level:
-            good_id_prefixes = rose.TOP_CONFIG_DEFAULT_META_IDS
-            bad_id_prefixes = (rose.INFO_CONFIG_DEFAULT_META_IDS +
-                               rose.SUB_CONFIG_DEFAULT_META_IDS)
-        elif config_data.is_discovery:
-            good_id_prefixes = rose.INFO_CONFIG_DEFAULT_META_IDS
-            bad_id_prefixes = (rose.SUB_CONFIG_DEFAULT_META_IDS +
-                               rose.TOP_CONFIG_DEFAULT_META_IDS)
-        else:
-            good_id_prefixes = rose.SUB_CONFIG_DEFAULT_META_IDS
-            bad_id_prefixes = (rose.INFO_CONFIG_DEFAULT_META_IDS +
-                               rose.TOP_CONFIG_DEFAULT_META_IDS)
-        for key in good_id_prefixes:
-            if key in bad_id_prefixes:
-                bad_id_prefixes.remove(key)
-            for bad_key in list(bad_id_prefixes):
-                if bad_key.startswith(key):
-                    bad_id_prefixes.remove(bad_key)
-        for key in meta_config.value.keys():
-            for bad_key in bad_id_prefixes:
-                if key.startswith(bad_key):
-                    meta_config.value.pop(key)
-                    break
         meta_dir_path = self.load_meta_path(config, directory)[0]
         reports = rose.metadata_check.metadata_check(meta_config,
                                                      directory)
@@ -1171,14 +1158,15 @@ class ConfigDataManager(object):
             self.namespace_meta_lookup.setdefault(config_name, {})
             self.namespace_meta_lookup[config_name].setdefault(
                                                     "icon", icon_path)
-            if self.config[config_name].is_top_level:
+            if self.config[config_name].config_type == rose.TOP_CONFIG_NAME:
                 self.namespace_meta_lookup[config_name].setdefault(
                                     rose.META_PROP_TITLE,
                                     rose.config_editor.TITLE_PAGE_SUITE)
                 self.namespace_meta_lookup[config_name].setdefault(
                                                   rose.META_PROP_SORT_KEY,
                                                   " 1")
-            elif self.config[config_name].is_discovery:
+            elif (self.config[config_name].config_type ==
+                      rose.INFO_CONFIG_NAME):
                 self.namespace_meta_lookup[config_name].setdefault(
                                     rose.META_PROP_TITLE,
                                     rose.config_editor.TITLE_PAGE_INFO)

@@ -48,6 +48,7 @@ CONFIG_SECT_CMD = "command"
 CONFIG_SECT_TOP = ""
 CONFIG_OPT_META_PATH = "meta-path"
 CONFIG_OPT_META_TYPE = "meta"
+CONFIG_OPT_OWNER = "owner"
 CONFIG_OPT_PROJECT = "project"
 INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=issue-list",
                                 "=owner", "=project", "=sub-project",
