@@ -490,10 +490,9 @@ class ConfigPage(gtk.VBox):
 
     def handle_bad_custom_sub_widget(self, error_info):
         text = rose.config_editor.ERROR_IMPORT_WIDGET.format(
-                                               traceback.format_exc())
-        self.reporter(text + "\n",
-                      kind=self.reporter.KIND_ERR,
-                      level=self.reporter.FAIL)
+            error_info)
+        self.reporter(
+            rose.config_editor.util.ImportWidgetError(text))
         self.generate_sub_data_panel(override_custom=True)
 
     def update_sub_data(self):
@@ -651,6 +650,7 @@ class ConfigPage(gtk.VBox):
                 text = rose.config_editor.ERROR_IMPORT_CLASS.format(
                                                        widget_path)
                 self.handle_bad_custom_main_widget(text)
+                return
             try:
                 self.main_container = custom_widget(self.panel_data,
                                                     self.ghost_data,
@@ -687,8 +687,9 @@ class ConfigPage(gtk.VBox):
     def handle_bad_custom_main_widget(self, error_info):
         """Handle a bad custom page widget import."""
         text = rose.config_editor.ERROR_IMPORT_WIDGET.format(
-                                               traceback.format_exc())
-        self.reporter.report(text + "\n", kind=self.reporter.KIND_ERR)
+            error_info)
+        self.reporter.report(
+            rose.config_editor.util.ImportWidgetError(text))
         self.generate_main_container(override_custom=True)
 
     def validate_errors(self, variable_id=None):
