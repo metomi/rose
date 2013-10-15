@@ -339,6 +339,13 @@ class BaseStashSummaryDataPanelv1(
                 tip_text = str(view.get_model().get_value(row_iter,
                                                           col_index))
                 tip_text += "\n" + section
+            if col_name == self.DESCRIPTION_TITLE:
+                value = view.get_model().get_value(row_iter, col_index)
+                meta_key = self.STASH_PARSE_DESC_OPT + "=" + str(value)
+                metadata = self._stashmaster_meta_lookup.get(meta_key, {})
+                help = metadata.get(rose.META_PROP_HELP)
+                if help is not None:
+                    tip_text += "\n\n" + help
         else:
             option = self.column_names[col_index]
             id_ = self.util.get_id_from_section_option(section, option)
@@ -379,10 +386,24 @@ class BaseStashSummaryDataPanelv1(
         model = self._view.get_model()
         col_index = self._view.get_columns().index(col)
         col_title = self.column_names[col_index]
-        if col_title not in self.OPTION_NL_MAP:
+        if (col_title not in self.OPTION_NL_MAP and
+                col_title != self.DESCRIPTION_TITLE):
             return []
         iter_ = model.get_iter(path)
         value = model.get_value(iter_, col_index)
+        if col_title == self.DESCRIPTION_TITLE:
+            meta_key = self.STASH_PARSE_DESC_OPT + "=" + str(value)
+            metadata = self._stashmaster_meta_lookup.get(meta_key, {})
+            help = metadata.get(rose.META_PROP_HELP)
+            if help is not None:
+                menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_HELP)
+                menuitem.set_label(label="Help")
+                menuitem._help_text = help
+                menuitem._help_title = "Help for %s" % value
+                menuitem.connect("activate", self._launch_record_help)
+                menuitem.show()
+                return [menuitem]
+            return []
         location = self._profile_location_map[col_title][value]
         profile_id = self._profile_location_map[col_title][value]
         profile_string = ""
@@ -614,6 +635,11 @@ class BaseStashSummaryDataPanelv1(
         window.connect("destroy", self._handle_close_diagnostic_window)
         window.show()
         self._add_button.set_sensitive(False)
+
+    def _launch_record_help(self, menuitem):
+        """Launch the help from a menu."""
+        rose.gtk.dialog.run_scrolled_dialog(menuitem._help_text,
+                                            menuitem._help_title)
 
     def _refresh_diagnostic_window(self):
         # Refresh information in the "new STASH request" dialog.
