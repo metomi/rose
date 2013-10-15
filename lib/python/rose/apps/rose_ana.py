@@ -261,7 +261,7 @@ class Analyse(object):
             setattr(task, configvar, getattr(task, filevar))
             filenames = glob.glob(env_var_process(getattr(task, filevar)))
             if len(filenames) > 0:
-                setattr(task, filevar, filenames[0])
+                setattr(task, filevar, os.path.abspath(filenames[0]))
         return task
 
     def load_tasks(self):
