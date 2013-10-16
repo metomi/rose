@@ -60,6 +60,8 @@ class Root(object):
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
         self.template_env = template_env
         self.host_name = socket.gethostname()
+        if self.host_name and "." in self.host_name:
+            self.host_name = self.host_name.split(".", 1)[0]
 
     @cherrypy.expose
     def index(self):

@@ -277,7 +277,7 @@ class CylcProcessor(SuiteEngineProcessor):
             if messages_str:
                 messages = messages_str.split(",")
             else:
-                messages = []
+                messages = events
             event_rank = -1
             for event, t, message in zip(events, times, messages):
                 my_event = self.EVENTS.get(event)
