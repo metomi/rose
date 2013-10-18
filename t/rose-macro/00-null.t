@@ -23,7 +23,7 @@
 init </dev/null
 rm config/rose-app.conf
 #-------------------------------------------------------------------------------
-tests 30
+tests 33
 #-------------------------------------------------------------------------------
 # Normal mode.
 TEST_KEY=$TEST_KEY_BASE-base
@@ -145,6 +145,15 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] Could not find metadata for metadata/metadata-for-metadata
 __ERR__
+teardown
+#-------------------------------------------------------------------------------
+# Check default metadata.
+init </dev/null
+TEST_KEY=$TEST_KEY_BASE-default-metadata
+setup
+run_pass "$TEST_KEY" rose macro -V -C ../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 exit
