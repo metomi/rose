@@ -42,12 +42,6 @@ class ConfigDataHelper(object):
                 return type_node.value
         return None
 
-    def get_config_is_discovery(self, config):
-        """Return whether a configuration is a discovery configuration."""
-        # The logic here will be improved once suite integration is worked on.
-        node = config.get([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_PROJECT])
-        return node is not None
-
     def is_ns_sub_data(self, ns):
         """Return whether a namespace is mentioned in summary data."""
         ns_meta = self.data.namespace_meta_lookup.get(ns, {})

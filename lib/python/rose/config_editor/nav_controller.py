@@ -66,8 +66,12 @@ class NavTreeManager(object):
         if only_this_config is None:
             configs = self.data.config.keys()
             configs.sort(rose.config.sort_settings)
-            configs.sort(lambda x, y: cmp(self.data.config[y].is_top_level,
-                                          self.data.config[x].is_top_level))
+            configs.sort(
+                lambda x, y: cmp(
+                    self.data.config[y].config_type == rose.TOP_CONFIG_NAME,
+                    self.data.config[x].config_type == rose.TOP_CONFIG_NAME
+                )
+            )
         else:
             configs = [only_this_config]
         for config_name in configs:
