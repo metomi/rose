@@ -1,0 +1,83 @@
+[INFO] ! foo://2013010112/hello/worlds/dark-matter.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] !	hello/dark-matter.txt (hello/dark-matter.txt)
+[INFO] + foo://2013010112/hello/worlds/earth.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/earth.txt (hello/earth.txt)
+[INFO] + foo://2013010112/hello/worlds/jupiter-moons.tar.gz [compress=tar.gz, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/jupiter-1.txt (hello/jupiter-moon-1.txt)
+[INFO] + foo://2013010112/hello/worlds/jupiter.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/jupiter.txt (hello/jupiter.txt)
+[INFO] + foo://2013010112/hello/worlds/neptune-1.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/neptune-1.txt (hello/neptune-1.txt)
+[INFO] + foo://2013010112/hello/worlds/organisms.tar.gz [compress=tar.gz, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/organisms/animals/crocodile.txt (hello/organisms/animals/crocodile.txt)
+[INFO] +	hello/organisms/animals/elephant.txt (hello/organisms/animals/elephant.txt)
+[INFO] +	hello/organisms/animals/goose.txt (hello/organisms/animals/goose.txt)
+[INFO] +	hello/organisms/animals/tiger.txt (hello/organisms/animals/tiger.txt)
+[INFO] +	hello/organisms/plants/daisy.txt (hello/organisms/plants/daisy.txt)
+[INFO] +	hello/organisms/plants/holly.txt (hello/organisms/plants/holly.txt)
+[INFO] +	hello/organisms/plants/iris.txt (hello/organisms/plants/iris.txt)
+[INFO] +	hello/organisms/plants/jasmine.txt (hello/organisms/plants/jasmine.txt)
+[INFO] +	hello/organisms/plants/lily.txt (hello/organisms/plants/lily.txt)
+[INFO] + foo://2013010112/hello/worlds/planet-n.tar.gz [compress=tar.gz, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/planet-1.txt (hello/planet-1.txt)
+[INFO] +	hello/planet-2.txt (hello/planet-2.txt)
+[INFO] +	hello/planet-3.txt (hello/planet-3.txt)
+[INFO] +	hello/planet-4.txt (hello/planet-4.txt)
+[INFO] +	hello/planet-5.txt (hello/planet-5.txt)
+[INFO] +	hello/planet-6.txt (hello/planet-6.txt)
+[INFO] +	hello/planet-7.txt (hello/planet-7.txt)
+[INFO] +	hello/planet-8.txt (hello/planet-8.txt)
+[INFO] +	hello/planet-9.txt (hello/planet-9.txt)
+[INFO] + foo://2013010112/hello/worlds/saturn.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/saturn.txt (hello/saturn.txt)
+[INFO] + foo://2013010112/hello/worlds/spaceships/ [compress=gz, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/spaceship-1.txt (hello/spaceship-1.txt)
+[INFO] +	hello/spaceship-2.txt (hello/spaceship-2.txt)
+[INFO] +	hello/spaceship-3.txt (hello/spaceship-3.txt)
+[INFO] +	hello/spaceship-4.txt (hello/spaceship-4.txt)
+[INFO] +	hello/spaceship-5.txt (hello/spaceship-5.txt)
+[INFO] +	hello/spaceship-6.txt (hello/spaceship-6.txt)
+[INFO] +	hello/spaceship-7.txt (hello/spaceship-7.txt)
+[INFO] +	hello/spaceship-8.txt (hello/spaceship-8.txt)
+[INFO] +	hello/spaceship-9.txt (hello/spaceship-9.txt)
+[INFO] + foo://2013010112/hello/worlds/stars/ [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	2013010112-star-1.txt (star-1.txt)
+[INFO] +	2013010112-star-2.txt (star-2.txt)
+[INFO] +	2013010112-star-3.txt (star-3.txt)
+[INFO] +	2013010112-star-4.txt (star-4.txt)
+[INFO] +	2013010112-star-5.txt (star-5.txt)
+[INFO] +	2013010112-star-6.txt (star-6.txt)
+[INFO] +	2013010112-star-7.txt (star-7.txt)
+[INFO] +	2013010112-star-8.txt (star-8.txt)
+[INFO] +	2013010112-star-9.txt (star-9.txt)
+[INFO] + foo://2013010112/hello/worlds/try.nl [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	try.nl (try.nl)
+[INFO] + foo://2013010112/hello/worlds/unknown/stuff.pax [compress=pax, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/2013010112-stuff-1.txt (stuffing-1.txt)
+[INFO] +	hello/2013010112-stuff-2.txt (stuffing-2.txt)
+[INFO] +	hello/2013010112-stuff-3.txt (stuffing-3.txt)
+[INFO] +	hello/2013010112-stuff-4.txt (stuffing-4.txt)
+[INFO] +	hello/2013010112-stuff-5.txt (stuffing-5.txt)
+[INFO] +	hello/2013010112-stuff-6.txt (stuffing-6.txt)
+[INFO] +	hello/2013010112-stuff-7.txt (stuffing-7.txt)
+[INFO] +	hello/2013010112-stuff-8.txt (stuffing-8.txt)
+[INFO] +	hello/2013010112-stuff-9.txt (stuffing-9.txt)
+[INFO] + foo://2013010112/hello/worlds/uranus.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/uranus.txt (hello/uranus.txt)
+[INFO] + foo://2013010112/hello/worlds/dark-matter.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/dark-matter.txt (hello/dark-matter.txt)
+[INFO] = foo://2013010112/hello/worlds/earth.txt [compress=None]
+[INFO] = foo://2013010112/hello/worlds/jupiter-moons.tar.gz [compress=tar.gz]
+[INFO] + foo://2013010112/hello/worlds/jupiter.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/jupiter.txt (hello/jupiter.txt)
+[INFO] = foo://2013010112/hello/worlds/neptune-1.txt [compress=None]
+[INFO] = foo://2013010112/hello/worlds/organisms.tar.gz [compress=tar.gz]
+[INFO] = foo://2013010112/hello/worlds/planet-n.tar.gz [compress=tar.gz]
+[INFO] = foo://2013010112/hello/worlds/saturn.txt [compress=None]
+[INFO] = foo://2013010112/hello/worlds/spaceships/ [compress=gz]
+[INFO] = foo://2013010112/hello/worlds/stars/ [compress=None]
+[INFO] + foo://2013010112/hello/worlds/try.nl [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	try.nl (try.nl)
+[INFO] = foo://2013010112/hello/worlds/unknown/stuff.pax [compress=pax]
+[INFO] + foo://2013010112/hello/worlds/uranus.txt [compress=None, t(init)=YYYY-mm-DDTHH:MM:SSZ, dt(tran)=SSSSs, dt(arch)=SSSSs]
+[INFO] +	hello/uranus.txt (hello/uranus.txt)
