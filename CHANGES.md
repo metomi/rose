@@ -13,7 +13,7 @@ This release of Rose works with cylc 5.3.0 or above.
 
 Changes that have significant impact on user experience.
 
-\#964, #857 : rose bush: a web service to browse user suite logs.
+\#980, \#964, #857 : rose bush: a web service to browse user suite logs.
 This replaces the old client side technology generated at suite run time via
 `rose suite-run`, `rose suite-hook` and `rose suite-log`.
 * Site/user configurable location of the Rose Bush web service.
@@ -28,6 +28,13 @@ This replaces the old client side technology generated at suite run time via
 ### Noteworthy Changes
 
 Bug fixes, minor enhancements and documentation improvements:
+
+\#982: rose_arch: add time diagnostics.
+
+\#981: rose config-edit: handle unregistered suite `gcylc` launch failure.
+
+\#978: rose metadata: different default metadata for different Rose
+configuration files.
 
 \#971: rose macro: fix `fail-if` array variables that look like single float
 values.
