@@ -266,6 +266,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                     value = stash_request_num + " total"
         if name == "Section":
             meta_key = self.STASH_PARSE_SECT_OPT + "=" + value
+        elif name == "Description":
+            meta_key = self.STASH_PARSE_DESC_OPT + "=" + value
         else:
             meta_key = name + "=" + value
         value_meta = self.stash_meta_lookup.get(meta_key, {})
@@ -519,6 +521,11 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         self.generate_tree_view()
         return False  
 
+    def _launch_record_help(self, menuitem):
+        """Launch the help from a menu."""
+        rose.gtk.dialog.run_scrolled_dialog(menuitem._help_text,
+                                            menuitem._help_title)
+
     def _popup_tree_menu(self, path, col, event):
         """Launch a menu for this main treeview row."""
         menu = gtk.Menu()
@@ -534,6 +541,19 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                              lambda i: self.add_stash_request(section, item))
         add_menuitem.show()
         menu.append(add_menuitem)
+        stash_desc_index = self.column_names.index("Description")
+        stash_desc_value = model.get_value(row_iter, stash_desc_index)
+        desc_meta = self.stash_meta_lookup.get(
+            self.STASH_PARSE_DESC_OPT + "=" + str(stash_desc_value), {})
+        desc_meta_help = desc_meta.get(rose.META_PROP_HELP)
+        if desc_meta_help is not None:
+            help_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_HELP)
+            help_menuitem.set_label("Help")
+            help_menuitem._help_text = desc_meta_help
+            help_menuitem._help_title = "Help for %s" % stash_desc_value
+            help_menuitem.connect("activate", self._launch_record_help)
+            help_menuitem.show()
+            menu.append(help_menuitem)
         streqs = self.request_lookup.get(section, {}).get(item, {}).keys()
         if streqs:
             view_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_FIND)

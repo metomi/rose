@@ -237,7 +237,7 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]                     # Scheduling section
     [[dependencies]]             # Dependencies sub-section
-        graph = """my_task"""    # Graph Setting, option = value
+        graph = "my_task"        # Graph Setting, option = value
 [runtime]                        # Runtime Section
     [[my_task]]                  # User-specified task sub-section
         [[[environment]]]        # Environment sub-sub-section
@@ -247,23 +247,58 @@
 
     <div class="slide">
       <h2 id="hello-world">Hello World cylc Suite</h2>
+
+      <p>A simple cylc suite has a single <samp>suite.rc</samp> file that looks
+      like this:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = """hello_world"""
+        graph = "hello_world"
 [runtime]
     [[hello_world]]
         command scripting = "echo 'Hello World'"
 </pre>
 
-      <p>This will run a cylc task called <samp>hello_world</samp>.</p>
+      <p>This will run a cylc task called <samp>hello_world</samp> that prints
+      <samp>Hello World</samp> to standard out.</p>
+
+    </div>
+
+    <div class="slide">
+      <h3 id="hello-world-demo">Demoing the Hello World cylc Suite</h3>
+
+      <p>Demo this by creating and running the simple cylc suite:</p>
+      <pre class="prettyprint lang_sh">
+mkdir $TMPDIR/simplesuite  # Make the suite directory
+touch $TMPDIR/simplesuite/rose-suite.conf  # Rose needs a rose-suite.conf
+cat &gt;$TMPDIR/simplesuite/suite.rc &lt;&lt;__SUITE_RC__
+[scheduling]
+    [[dependencies]]
+        graph = "hello_world"
+[runtime]
+    [[hello_world]]
+        command scripting = "echo 'Hello World'"
+__SUITE_RC__
+rose suite-run -C $TMPDIR/simplesuite   # Run the suite!
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Demo Output</h3>
+
+      <p>As we saw before, the suite will run and shutdown when all tasks are
+      successful - in this case, the only task is <samp>hello_world</samp>.</p>
+
+      <p>The suite output will be in our <samp>cylc-run</samp> directory, which
+      you can also access by running <samp>rose suite-log
+      --name=simplesuite</samp>.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Hello World Rose Suite</h3>
 
-      <p>Tasks are generic - they can be Rose applications, or commands or
-      executables as above.</p>
+      <p>Tasks such as our <samp>hello_world</samp> task above are generic -
+      they can be Rose applications, or commands or executables as above.</p>
 
       <p>If we wanted to invoke a Rose application, we'd make an app called
       <samp>hello_world</samp>, by making an <samp>app/hello_world/</samp>
