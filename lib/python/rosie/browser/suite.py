@@ -123,6 +123,8 @@ class SuiteDirector():
             window.vbox.remove(child)
         editor = rose.config_editor.main.MainController(
                              config_objs={"discovery": config},
+                             config_obj_types={"discovery":
+                                               rose.INFO_CONFIG_NAME},
                              pluggable=True)
         page_box = editor.get_orphan_page("/discovery")
         page = page_box.get_children()[0]

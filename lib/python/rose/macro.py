@@ -47,7 +47,7 @@ ERROR_LOAD_CONFIG_DIR = "{0}: not an application directory.\n"
 ERROR_LOAD_MACRO = "Could not load macro {0}: {1}"
 ERROR_LOAD_METADATA = "Could not load metadata {0}\n"
 ERROR_LOAD_CHOSEN_META_PATH = "Could not find metadata for {0}, using {1}\n"
-ERROR_LOAD_META_PATH = "Could not find metadata for {0}\n"
+ERROR_LOAD_META_PATH = "Could not find metadata for {0}"
 ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACROS = "Please specify a macro name.\n"
@@ -163,11 +163,12 @@ class MacroBase(object):
             return cmp(rep1.value, rep2.value)
         return rose.config.sort_settings(id1, id2)
 
-    def _load_meta_config(self, config, meta=None, directory=None):
+    def _load_meta_config(self, config, meta=None, directory=None,
+                          config_type=None):
         """Return a metadata configuration object."""
         if isinstance(meta, rose.config.ConfigNode):
             return meta
-        return load_meta_config(config, directory)
+        return load_meta_config(config, directory, config_type=config_type)
 
     def get_metadata_for_config_id(self, setting_id, meta_config):
         return get_metadata_for_config_id(setting_id, meta_config)
@@ -353,12 +354,16 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
     return None, warning
 
 
-def load_meta_config(config, directory=None, error_handler=None):
+def load_meta_config(config, directory=None, config_type=None,
+                     error_handler=None, ignore_meta_error=False):
     """Return the metadata config for a configuration."""
     if error_handler is None:
         error_handler = _report_error
     meta_config = rose.config.ConfigNode()
-    meta_list = ['rose-all/' + rose.META_CONFIG_NAME]
+    meta_list = ["rose-all/" + rose.META_CONFIG_NAME]
+    if config_type is not None:
+        default_meta_dir = config_type.replace(".", "-")
+        meta_list.append(default_meta_dir + "/" + rose.META_CONFIG_NAME)
     config_meta_path, warning = load_meta_path(config, directory)
     if warning is not None:
         error_handler(text=warning)
@@ -369,7 +374,7 @@ def load_meta_config(config, directory=None, error_handler=None):
     locator = rose.resource.ResourceLocator(paths=sys.path)
     opt_node = config.get([rose.CONFIG_SECT_TOP,
                            rose.CONFIG_OPT_META_TYPE], no_ignore=True)
-    ignore_meta_error = opt_node is None
+    ignore_meta_error = ignore_meta_error or opt_node is None
     config_loader = rose.config.ConfigLoader()
     for meta_key in meta_list:
         try:
@@ -902,9 +907,10 @@ def parse_macro_mode_args(mode="macro", argv=None):
                                      level=rose.reporter.Reporter.FAIL)
             return None
     else:
-        meta_config_path = os.path.join(meta_path, rose.META_CONFIG_NAME)
-        if os.path.isfile(meta_config_path):
-            config_loader.load_with_opts(meta_config_path, meta_config)
+        meta_config = load_meta_config(app_config,
+                                       directory=opts.conf_dir,
+                                       config_type=rose.SUB_CONFIG_NAME,
+                                       ignore_meta_error=True)
     return app_config, meta_config, config_name, args, opts
 
 
