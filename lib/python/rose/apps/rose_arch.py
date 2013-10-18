@@ -34,6 +34,7 @@ import shlex
 import sqlite3
 import sys
 from tempfile import mkdtemp
+from time import gmtime, strftime, time
 
 
 class RoseArchValueError(KeyError):
@@ -52,12 +53,24 @@ class RoseArchEvent(Event):
 
     def __str__(self):
         target = self.args[0]
-        ret = "%s %s (compress=%s)" % (target.status, target.name,
-                                       target.compress_scheme)
+        t_info = ""
+        if len(self.args) > 1:
+            times = self.args[1]
+            t_init, t_tran, t_arch = times
+            t_info = ", t(init)=%s, dt(tran)=%ds, dt(arch)=%ds" % (
+                strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(t_init)),
+                t_tran - t_init,
+                t_arch - t_tran
+            )
+        ret = "%s %s [compress=%s%s]" % (target.status,
+                                         target.name,
+                                         target.compress_scheme,
+                                         t_info)
         if target.status != target.ST_OLD:
             for source in sorted(target.sources.values(),
                                  lambda s1, s2: cmp(s1.name, s2.name)):
-                ret += "\n      %s (%s)" % (source.name, source.orig_path)
+                ret += "\n%s\t%s (%s)" % (
+                            target.status, source.name, source.orig_name)
         return ret
 
 
@@ -254,6 +267,8 @@ class RoseArchApp(BuiltinApp):
                 app_runner.handle_event(RoseArchEvent(target))
                 continue
             work_dir = mkdtemp()
+            t_init = time()
+            t_tran, t_arch = t_init, t_init
             try:
                 # Rename/edit sources
                 rename_required = False
@@ -278,6 +293,7 @@ class RoseArchApp(BuiltinApp):
                 if target.compress_scheme:
                     c = compress_manager.get_handler(target.compress_scheme)
                     c.compress_sources(target, work_dir)
+                t_tran = time()
                 # Run archive command
                 sources = []
                 if target.work_source_path:
@@ -290,6 +306,7 @@ class RoseArchApp(BuiltinApp):
                 command = target.command_format % {"sources": sources_str,
                                                    "target": target_str}
                 rc, out, err = app_runner.popen.run(command, shell=True)
+                t_arch = time()
                 if rc:
                     target.status = target.ST_BAD
                     app_runner.handle_event(
@@ -302,7 +319,9 @@ class RoseArchApp(BuiltinApp):
                 dao.update_command_rc(target)
             finally:
                 app_runner.fs_util.delete(work_dir)
-            app_runner.handle_event(RoseArchEvent(target))
+                app_runner.handle_event(
+                        RoseArchEvent(
+                                target, [t_init, t_tran, t_arch]))
 
         return [t.status for t in targets].count(RoseArchTarget.ST_BAD)
 
