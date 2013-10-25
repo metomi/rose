@@ -469,7 +469,8 @@ class SuiteRunner(Runner):
                 if os.path.isfile(log):
                     continue
                 log_tar_gz = log + ".tar.gz"
-                f = tarfile.open(log_tar_gz, "w:gz")
+                f_bsize = os.statvfs(log).f_bsize
+                f = tarfile.open(log_tar_gz, "w:gz", bufsize=f_bsize)
                 f.add(log)
                 f.close()
                 self.handle_event(SuiteLogArchiveEvent(log_tar_gz, log))

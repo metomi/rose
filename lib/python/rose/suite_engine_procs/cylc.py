@@ -603,7 +603,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 names = glob(os.path.join("job", glob_))
                 if not names:
                     continue
-                tar = tarfile.open(archive_file_name, "w:gz")
+                f_bsize = os.statvfs(".").f_bsize
+                tar = tarfile.open(archive_file_name, "w:gz", bufsize=f_bsize)
                 for name in names:
                     tar.add(name)
                 tar.close()

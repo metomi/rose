@@ -53,7 +53,9 @@ class RoseArchTarGzip(object):
         scheme_ext = self.SCHEME_EXTS.get(target.compress_scheme, "")
         scheme_format = self.SCHEME_FORMATS.get(target.compress_scheme,
                                                 tarfile.DEFAULT_FORMAT)
-        t = tarfile.open(tmp_name, "w" + scheme_ext, format=scheme_format)
+        f_bsize = os.statvfs(work_dir).f_bsize
+        t = tarfile.open(tmp_name, "w" + scheme_ext, bufsize=f_bsize,
+                         format=scheme_format)
         for source in sources:
             f = open(source.path)
             tarinfo = t.gettarinfo(arcname=source.name, fileobj=f)
