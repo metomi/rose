@@ -232,9 +232,7 @@ class CylcProcessor(SuiteEngineProcessor):
             where += " AND (" + " AND ".join(where_fragments) + ")"
         # Execute query to get number of entries
         of_n_entries = 0
-        stmt = ("SELECT COUNT(*) FROM" +
-                " task_events JOIN task_states USING (cycle,name,submit_num)" +
-                " WHERE event==?")
+        stmt = "SELECT COUNT(*) FROM task_events WHERE event==?"
         if where:
             stmt += " " + where
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
@@ -250,7 +248,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 " group_concat(time), group_concat(event)," +
                 " group_concat(message) " +
                 " FROM" +
-                " task_events JOIN task_states USING (cycle,name,submit_num)" +
+                " task_events" +
                 " WHERE" +
                 " (event==? OR event==? OR event==? OR" +
                 "  event==? OR event==? OR event==?)" +
@@ -269,8 +267,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 stmt_args_head + stmt_args + stmt_args_tail):
             cycle, name, submit_num, times_str, events_str, messages_str = row
             entry = {"cycle": cycle, "name": name, "submit_num": submit_num,
-                     "events": [None, None, None], "status": None, "logs": {},
-                     "seq_logs_indexes": {}}
+                     "submit_num_max": 1, "events": [None, None, None],
+                     "status": None, "logs": {}, "seq_logs_indexes": {}}
             entries.append(entry)
             events = events_str.split(",")
             times = times_str.split(",")
@@ -290,6 +288,19 @@ class CylcProcessor(SuiteEngineProcessor):
                     if my_event == "fail(%s)":
                         signal = message.rsplit(None, 1)[-1]
                         entry["status"] = "fail(%s)" % signal
+
+        submit_num_max_of = {}
+        for entry in entries:
+            cycle = entry["cycle"]
+            name = entry["name"]
+            if (cycle, name) not in submit_num_max_of:
+                stmt = ("SELECT submit_num FROM task_states" +
+                        " WHERE cycle==? AND name==?")
+                for row in self._db_exec(self.SUITE_DB, user_name, suite_name,
+                                         stmt, [cycle, name]):
+                    submit_num_max_of[(cycle, name)] = row[0]
+                    break
+            entry["submit_num_max"] = submit_num_max_of[(cycle, name)]
 
         self._db_close(self.SUITE_DB, user_name, suite_name)
 
@@ -1042,6 +1053,8 @@ class DAO(object):
                 self.cursor = None
             else:
                 break
+        if self.cursor is None:
+            return []
         if commit:
             self.commit()
         return self.cursor
