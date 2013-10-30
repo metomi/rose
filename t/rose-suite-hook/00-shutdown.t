@@ -45,6 +45,7 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
 else
     pass "$TEST_KEY"
 fi
+sleep 1
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0

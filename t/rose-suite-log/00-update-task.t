@@ -61,6 +61,7 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
 else
     pass "$TEST_KEY"
 fi
+sleep 1
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-db-before"
 sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
