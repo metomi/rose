@@ -42,8 +42,6 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
-    CYCLE_LOG_ARCHIVE_PREFIX = "job-"
-    CYCLE_LOG_ARCHIVE_SUFFIX = ".tar.gz"
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "fail(submit)",
               "submitting now": "submit-init",
@@ -607,7 +605,8 @@ class CylcProcessor(SuiteEngineProcessor):
             stmt = ("UPDATE log_files SET path=?, path_in_tar=? " +
                     "WHERE cycle==? AND task==? AND submit_num==? AND key==?")
             for cycle in cycles:
-                archive_file_name = self._get_cycle_log_archive_name(cycle)
+                archive_file_name0 = "job-" + cycle + ".tar"
+                archive_file_name = archive_file_name0 + ".gz"
                 if os.path.exists(archive_file_name):
                     continue
                 glob_ = self.TASK_ID_DELIM.join(["*", cycle, "*"])
@@ -615,10 +614,12 @@ class CylcProcessor(SuiteEngineProcessor):
                 if not names:
                     continue
                 f_bsize = os.statvfs(".").f_bsize
-                tar = tarfile.open(archive_file_name, "w:gz", bufsize=f_bsize)
+                tar = tarfile.open(archive_file_name0, "w", bufsize=f_bsize)
                 for name in names:
                     tar.add(name)
                 tar.close()
+                # N.B. Python's gzip is slow
+                self.popen.run_simple("gzip", archive_file_name0)
                 self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
                                                   archive_file_name))
                 for name in sorted(names):
@@ -685,7 +686,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 for item in items:
                     cycle, name = self._parse_task_cycle_id(item)
                     if cycle is not None:
-                        arch_f_name = self._get_cycle_log_archive_name(cycle)
+                        arch_f_name = "job-" + cycle + ".tar.gz"
                         if os.path.exists(arch_f_name):
                             continue
                     auths = self.get_suite_jobs_auths(suite_name, cycle, name)
@@ -937,11 +938,6 @@ class CylcProcessor(SuiteEngineProcessor):
                     prefix, self.get_suite_dir_rel(suite_name, db_name)))
             self.daos[db_name][key] = DAO(db_f_name)
         return self.daos[db_name][key].execute(stmt, stmt_args, commit)
-
-    def _get_cycle_log_archive_name(self, cycle_time):
-        """Return the jobs log archive file name of a given cycle."""
-        return (self.CYCLE_LOG_ARCHIVE_PREFIX + cycle_time +
-                self.CYCLE_LOG_ARCHIVE_SUFFIX)
 
     def _parse_job_log_base_name(self, f_name):
         """Return (cycle, task, submit_num, ext)."""
