@@ -62,6 +62,7 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
 else
     pass "$TEST_KEY"
 fi
+sleep 1
 #-------------------------------------------------------------------------------
 # Test --archive.
 CYCLE=2013010100

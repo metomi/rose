@@ -71,10 +71,15 @@ run_pass "$TEST_KEY.NAME1" \
 run_pass "$TEST_KEY.SHORTNAME" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=${NAME%?} \
     $OPT_HOST --no-gcontrol
-$CMD_PREFIX "mv $NAME.port ~/.cylc/ports/$NAME"
 #-------------------------------------------------------------------------------
-rose suite-shutdown --debug -q -y -n $NAME -- --timeout=120 --kill --wait
-rose suite-shutdown --debug -q -y -n ${NAME}1 -- --timeout=120 --kill --wait
-rose suite-shutdown --debug -q -y -n ${NAME%?} -- --timeout=120 --kill --wait
+set +e
+sleep 1
+$CMD_PREFIX "mv $NAME.port ~/.cylc/ports/$NAME"
+SHUTDOWN_OPTS='--kill --max-polls=24 --interval=5'
+for N in $NAME ${NAME}1 ${NAME%?}; do
+    if $CMD_PREFIX test -f ~/.cylc/ports/$N; then
+        rose suite-shutdown --debug -q -y -n $N -- $SHUTDOWN_OPTS 2>/dev/null
+    fi
+done
 rose suite-clean --debug -q -y $NAME ${NAME}1 ${NAME%?}
 exit 0

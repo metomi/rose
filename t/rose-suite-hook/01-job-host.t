@@ -55,6 +55,7 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
 else
     pass "$TEST_KEY"
 fi
+sleep 1
 #-------------------------------------------------------------------------------
 # Test for local copy of remote job logs.
 TEST_KEY=$TEST_KEY_BASE-log
