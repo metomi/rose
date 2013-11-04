@@ -40,7 +40,16 @@ rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
 HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
-run_pass "$TEST_KEY" rose suite-stop -y -n $NAME -- --wait --timeout=60
+sleep 1
+if [[ $TEST_KEY_BASE == *conf ]]; then
+    ssh -oBatchMode=yes $HOST "ls -l ~/.cylc/ports/$NAME"
+fi
+run_pass "$TEST_KEY" rose suite-stop -y -n $NAME -- --max-polls=12 --interval=5
+cat "$TEST_KEY.out"
+cat "$TEST_KEY.err"
+if [[ $TEST_KEY_BASE == *conf ]]; then
+    ssh -oBatchMode=yes $HOST "ls -l ~/.cylc/ports/$NAME"
+fi
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0
