@@ -87,7 +87,7 @@
       <dt>Python: <a href="http://www.cherrypy.org/">cherrypy</a></dt>
 
       <dd>
-        <p><dfn>used by:</dfn> Rosie web service.</p>
+        <p><dfn>used by:</dfn> Rose Bush and Rosie web service.</p>
 
         <p><dfn>tested with version:</dfn> 3.2.2</p>
       </dd>
@@ -96,7 +96,7 @@
 
       <dd>
         <p><dfn>used by:</dfn> <code>rose suite-run</code>, <code>rose
-        macro</code>, Rosie web service.</p>
+        macro</code>, Rose Bush and Rosie web service.</p>
 
         <p><dfn>tested with version:</dfn> 2.6.</p>
 
@@ -117,7 +117,7 @@
       "http://github.com/simplejson/simplejson/">simplejson</a></dt>
 
       <dd>
-        <p><dfn>used by:</dfn> Rosie web service and its client.</p>
+        <p><dfn>used by:</dfn> Rose Bush, Rosie web service and its client.</p>
 
         <p><dfn>tested with version:</dfn> 2.0.9.</p>
 
@@ -210,7 +210,7 @@
         <p><dfn>Installation requirements:</dfn></p>
 
         <ul>
-          <li>Rose, cylc, Bash, Python, jinja2, Pyro.</li>
+          <li>Rose, cylc, Bash, Python, cherrypy, jinja2, simplejson, Pyro.</li>
 
           <li>Subversion &amp; FCM (only if you want rose suite-run to install
           files from Subversion using FCM keywords).</li>
@@ -220,7 +220,10 @@
 
         <ul>
           <li>Must be able to submit tasks to the hosts which run the suite
-          tasks, either directly or via ssh access to another host.</li>
+          tasks, either directly or via SSH access to another host.</li>
+
+          <li>Must be able to run Rose Bush web server, which must have read
+          access to all user suite logs.</li>
         </ul>
       </dd>
 
@@ -235,7 +238,7 @@
           <li>Subversion &amp; FCM (only if you want to use the Rose install
           utility to install files from Subversion using FCM keywords).</li>
 
-          <li>Pyro (unless you configure cylc to use ssh for task
+          <li>Pyro (unless you configure cylc to use SSH for task
           communication).</li>
         </ul>
 
@@ -243,7 +246,7 @@
 
         <ul>
           <li>Must be able to communicate back to the hosts running the cylc
-          suites via Pyro or ssh.</li>
+          suites via Pyro or SSH.</li>
         </ul>
       </dd>
 
@@ -266,7 +269,8 @@
           <li>Must have access to the Rosie Subversion repositories via the
           appropriate protocol.</li>
 
-          <li>Must have ssh access to the hosts running the cylc suites.</li>
+          <li>Must have HTTP and SSH access to the hosts running the cylc
+          suites.</li>
 
           <li>Must share user accounts and $HOME directories with the hosts
           running the cylc suites.</li>
@@ -389,19 +393,15 @@ setsid sbin/rosa ws 0/dev/null 2&gt;&amp;1 &amp;
 
     <p>Alternatively you can run the Rosie web service under Apache mod_wsgi.
     To do this you will need to set up an Apache module configuration file
-    (typically in <samp>/etc/httpd/conf.d/rosie-wsgi.conf</samp>) containing
+    (typically in <samp>/etc/httpd/conf.d/rose-wsgi.conf</samp>) containing
     the following (with the paths set appropriately):</p>
     <pre>
-SetEnv ROSE_HOME /path/to/rose
-SetEnv ROSE_NS rosa
-SetEnv ROSE_UTIL ws
-
 WSGIPythonPath /path/to/rose/lib/python
 WSGIScriptAlias /rosie /path/to/rose/lib/python/rosie/ws.py
 </pre>
 
-    <p>Use the Apache log at <samp>/var/log/httpd/</samp> to debug
-    problems.</p>
+    <p>Use the Apache log at e.g. <samp>/var/log/httpd/</samp> to debug
+    problems. See also <a href="#rose-bush">Configuring Rose Bush</a> below.</p>
 
     <p>Hopefully, you should now have a working Rosie service. Configure the
     client settings by editing the <var>[rosie-id]</var> settings in
@@ -444,6 +444,28 @@ sub-project experiment model
 
     <p>You can continue to modify the list by changing the file contents and
     committing.</p>
+
+    <h2 id="rose-bush">Configuring Rose Bush</h2>
+
+    <p>You can start an ad-hoc Rose Bush web server by running:</p>
+    <pre>
+setsid rose bush 0/dev/null 2&gt;&amp;1 &amp;
+</pre>
+
+    <p>You will find the access and error logs under
+    <samp>~/.metomi/rose-bush*</samp>.</p>
+
+    <p>Alternatively you can run the Rose Bush web service under Apache mod_wsgi.
+    To do this you will need to set up an Apache module configuration file
+    (typically in <samp>/etc/httpd/conf.d/rose-wsgi.conf</samp>) containing
+    the following (with the paths set appropriately):</p>
+    <pre>
+WSGIPythonPath /path/to/rose/lib/python
+WSGIScriptAlias /rose-bush /path/to/rose/lib/python/rose/bush.py
+</pre>
+
+    <p>Use the Apache log at e.g. <samp>/var/log/httpd/</samp> to debug
+    problems. See also <a href="#rosie">Configuring Rosie</a> above.</p>
 
     <h2 id="meta">Storing Configuration Metadata</h2>
 
