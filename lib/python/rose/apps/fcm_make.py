@@ -68,19 +68,20 @@ class FCMMakeApp(BuiltinApp):
             env_export("MIRROR_TARGET", target, app_runner.event_handler)
 
         cmd = ["fcm", "make"]
-        for c in [os.path.abspath("fcm-make.cfg"),
-                  os.path.join(t.suite_dir, "etc", t.task_name + ".cfg")]:
-            if os.access(c, os.F_OK | os.R_OK):
-                cmd += ["-f", c]
+        for cfg in ["fcm-make.cfg",
+                    os.path.join(t.suite_dir, "etc", t.task_name + ".cfg")]:
+            if os.access(cfg, os.F_OK | os.R_OK):
+                if cfg != "fcm-make.cfg" or not use_pwd:
+                    cmd += ["-f", os.path.abspath(cfg)]
                 break
         if not use_pwd:
             cmd += ["-C", os.path.join(t.suite_dir, "share", t.task_name)]
         cmd_opt_jobs = conf_tree.node.get_value(
                 ["opt.jobs"], os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))
         cmd += ["-j", cmd_opt_jobs]
-        cmd_opts = conf_tree.node.get_value(["opts"],
+        cmd_args = conf_tree.node.get_value(["args"],
                                             os.getenv("ROSE_TASK_OPTIONS"))
-        cmd += shlex.split(cmd_opts)
+        cmd += shlex.split(cmd_args)
         cmd += args
         app_runner.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
 
@@ -95,8 +96,8 @@ class FCMMakeApp(BuiltinApp):
         cmd_opt_jobs = conf_tree.node.get_value(
                 ["opt.jobs"], os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))
         cmd += ["-j", cmd_opt_jobs]
-        cmd_opts = conf_tree.node.get_value(["opts"],
+        cmd_args = conf_tree.node.get_value(["args"],
                                             os.getenv("ROSE_TASK_OPTIONS"))
-        cmd += shlex.split(cmd_opts)
+        cmd += shlex.split(cmd_args)
         cmd += args
         app_runner.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
