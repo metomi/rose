@@ -322,6 +322,30 @@ def _handle_error():
     cherrypy.response.status = 500
     print cherrypy._cperror.format_exc()
 
+def main():
+    """Start quick server."""
+    opt_parser = RoseOptionParser()
+    opt_parser.add_my_options("non_interactive")
+    opts, args = opt_parser.parse_args()
+    arg = None
+    if sys.argv[1:]:
+        arg = sys.argv[1]
+    if arg == "start":
+        start(is_main=True)
+    else:
+        report = Reporter(opts.verbosity - opts.quietness)
+        status = rose_bush_quick_server_status()
+        level = Reporter.DEFAULT
+        if arg != "stop":
+           level = 0
+        for k, v in sorted(status.items()):
+            report("%s=%s" % (k, v), level=level)
+        if (arg == "stop" and status.get("pid") and
+            (opts.non_interactive or
+             raw_input("Stop server? y/n (default=n)") == "y")):
+            os.kill(int(status["pid"]), signal.SIGTERM)
+            # TODO: should check whether it is killed or not
+
 
 def start(is_main=False):
     """Create the server.
@@ -402,28 +426,7 @@ def rose_bush_quick_server_status():
 
 
 if __name__ == "__main__":
-    # Quick server
-    opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("non_interactive")
-    opts, args = opt_parser.parse_args()
-    arg = None
-    if sys.argv[1:]:
-        arg = sys.argv[1]
-    if arg == "start":
-        start(is_main=True)
-    else:
-        report = Reporter(opts.verbosity - opts.quietness)
-        status = rose_bush_quick_server_status()
-        level = Reporter.DEFAULT
-        if arg != "stop":
-           level = 0
-        for k, v in sorted(status.items()):
-            report("%s=%s" % (k, v), level=level)
-        if (arg == "stop" and status.get("pid") and
-            (opts.non_interactive or
-             raw_input("Stop server? y/n (default=n)") == "y")):
-            os.kill(int(status["pid"]), signal.SIGTERM)
-            # TODO: should check whether it is killed or not
+    main()
 else:
     # WSGI server
     application = start()
