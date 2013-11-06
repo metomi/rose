@@ -388,7 +388,7 @@ exec /path/to/rose/sbin/rosa svn-post-commit "$@"
     configure the web server's log directory and port number. Start the web
     server by running:</p>
     <pre>
-setsid sbin/rosa ws 0/dev/null 2&gt;&amp;1 &amp;
+setsid /path/to/rose/sbin/rosa ws 0&lt;/dev/null 1&1t;/dev/null 2&gt;&amp;1 &amp;
 </pre>
 
     <p>Alternatively you can run the Rosie web service under Apache mod_wsgi.
@@ -449,7 +449,7 @@ sub-project experiment model
 
     <p>You can start an ad-hoc Rose Bush web server by running:</p>
     <pre>
-setsid rose bush 0/dev/null 2&gt;&amp;1 &amp;
+setsid /path/to/rose/bin/rose bush 0&lt;/dev/null 1&gt;/dev/null 2&gt;&amp;1 &amp;
 </pre>
 
     <p>You will find the access and error logs under
