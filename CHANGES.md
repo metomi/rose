@@ -13,9 +13,9 @@ This release of Rose works with cylc 5.3.0 or above.
 
 Changes that have significant impact on user experience.
 
-\#980, \#964, #857 : rose bush: a web service to browse user suite logs.
-This replaces the old client side technology generated at suite run time via
-`rose suite-run`, `rose suite-hook` and `rose suite-log`.
+\#993, #988, #980, #964, #857 : rose bush: a web service to browse user suite
+logs. This replaces the old client side technology generated at suite run time
+via `rose suite-run`, `rose suite-hook` and `rose suite-log`.
 * Site/user configurable location of the Rose Bush web service.
 * `rose bush` new command to start/stop an ad-hoc web service server.
 * `rose suite-run` and `rose suite-hook`: modified to generate job log files DB
@@ -28,6 +28,10 @@ This replaces the old client side technology generated at suite run time via
 ### Noteworthy Changes
 
 Bug fixes, minor enhancements and documentation improvements:
+
+\#992: Use the `gzip` command instead of Python's `gzip` library to write `*.gz`
+files because the command is 10 times faster than Python's library. This
+affects `rose suite-run`, `rose suite-log`, `rose_prune`, `rose_arch`.
 
 \#982: rose_arch: add time diagnostics.
 
