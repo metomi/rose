@@ -307,15 +307,15 @@ rose task-run -D '[env]!BAZ='
     <var>ROSE_TASK_N_JOBS</var>: This can be used to control the number of
     processes <code>fcm make</code> would use in parallel. (default=4)</p>
 
-    <p><kbd>opts</kbd> or the environment variable
-    <var>ROSE_TASK_OPTIONS</var>: This can be used to pass extra options to the
-    <code>fcm make</code> command.</p>
+    <p><kbd>args</kbd> or the environment variable <var>ROSE_TASK_OPTIONS</var>:
+    This can be used to pass extra arguments to the <code>fcm make</code>
+    command.</p>
 
     <p>E.g.:</p>
     <pre class="prettyprint lang-rose_conf">
 meta=fcm_make
 mode=fcm_make
-opts.jobs=8
+opt.jobs=8
 </pre>
 
     <h3 id="rose-task-run.util.rose_ana">Builtin Application: rose_ana</h3>

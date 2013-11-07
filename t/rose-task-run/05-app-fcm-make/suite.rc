@@ -1,0 +1,31 @@
+#!jinja2
+[cylc]
+UTC mode=True
+[[event hooks]]
+timeout handler=rose suite-hook --shutdown
+timeout=5
+[scheduling]
+[[dependencies]]
+graph="""
+fcm_make_t1 # basic
+fcm_make_t2 # use-pwd
+fcm_make_t3 # opt.jobs
+fcm_make_t4 # args
+{% if HOST is defined %}
+fcm_make_t5 => fcm_make2_t5 # mirror
+{% endif %}
+"""
+[runtime]
+[[root]]
+command scripting=rose task-run -v -v --debug
+[[[event hooks]]]
+succeeded handler=rose suite-hook
+failed handler=rose suite-hook --shutdown
+submission failed handler=rose suite-hook --shutdown
+[[fcm_make_t1,fcm_make_t2,fcm_make_t3,fcm_make_t4]]
+{% if HOST is defined %}
+[[fcm_make_t5]]
+[[fcm_make2_t5]]
+[[[remote]]]
+host={{HOST}}
+{% endif %}
