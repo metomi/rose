@@ -29,6 +29,9 @@ via `rose suite-run`, `rose suite-hook` and `rose suite-log`.
 
 Bug fixes, minor enhancements and documentation improvements:
 
+\#996: rose task-run `fcm_make` built-in app configuration: `args` can now be
+used to specify more options and arguments to the `fcm make` command.
+
 \#992: Use the `gzip` command instead of Python's `gzip` library to write `*.gz`
 files because the command is 10 times faster than Python's library. This
 affects `rose suite-run`, `rose suite-log`, `rose_prune`, `rose_arch`.
