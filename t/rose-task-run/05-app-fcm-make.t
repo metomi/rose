@@ -123,4 +123,5 @@ else
 fi
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
+cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

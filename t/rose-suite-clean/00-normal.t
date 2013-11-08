@@ -69,4 +69,5 @@ if [[ -n $JOB_HOST ]]; then
     ssh $JOB_HOST "! ls -ld cylc-run/$NAME 2>/dev/null"
 fi
 #-------------------------------------------------------------------------------
+cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

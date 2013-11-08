@@ -134,4 +134,5 @@ file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_8.$CYCLE.1.err" <<'
 __ERR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
+cylc unregister $NAME 1>/dev/null 2>&1
 exit 0
