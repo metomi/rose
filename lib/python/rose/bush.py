@@ -134,9 +134,9 @@ class Root(object):
         }
         # TODO: add paths to other suite files
         if cycles:
-            cycles = shlex.split(cycles)
+            cycles = shlex.split(str(cycles))
         if tasks:
-            tasks = shlex.split(tasks)
+            tasks = shlex.split(str(tasks))
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
                 self.suite_engine_proc.get_suite_state_summary(user, suite))
