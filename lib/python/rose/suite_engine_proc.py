@@ -263,10 +263,6 @@ class SuiteEngineProcessor(object):
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
 
-    def clean(self, suite_name, host=None):
-        """Remove items created by the previous run of a suite."""
-        raise NotImplementedError()
-
     def get_cycle_items_globs(self, name, cycle):
         """Return a glob to match named items created for a given cycle.
 
