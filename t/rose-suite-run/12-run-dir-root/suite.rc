@@ -7,9 +7,19 @@ timeout=1
 
 [scheduling]
 [[dependencies]]
-graph=my_task_1
+graph="""
+my_task_1
+{% if JOB_HOST is defined %}
+my_task_2
+{% endif %}
+"""
 
 [runtime]
 [[root]]
 command scripting=true
 [[my_task_1]]
+{% if JOB_HOST is defined %}
+[[my_task_2]]
+[[[remote]]]
+host={{JOB_HOST}}
+{% endif %}
