@@ -44,4 +44,5 @@ sleep 1
 run_pass "$TEST_KEY" rose suite-stop -y -n $NAME -- --max-polls=12 --interval=5
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
+cylc unregister $NAME 1>/dev/null 2>&1
 exit 0
