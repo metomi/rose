@@ -60,6 +60,8 @@ class Root(object):
         self.suite_engine_proc = SuiteEngineProcessor.get_processor()
         self.template_env = template_env
         self.host_name = socket.gethostname()
+        if self.host_name and "." in self.host_name:
+            self.host_name = self.host_name.split(".", 1)[0]
 
     @cherrypy.expose
     def index(self):
@@ -132,9 +134,9 @@ class Root(object):
         }
         # TODO: add paths to other suite files
         if cycles:
-            cycles = shlex.split(cycles)
+            cycles = shlex.split(str(cycles))
         if tasks:
-            tasks = shlex.split(tasks)
+            tasks = shlex.split(str(tasks))
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
                 self.suite_engine_proc.get_suite_state_summary(user, suite))
@@ -320,6 +322,30 @@ def _handle_error():
     cherrypy.response.status = 500
     print cherrypy._cperror.format_exc()
 
+def main():
+    """Start quick server."""
+    opt_parser = RoseOptionParser()
+    opt_parser.add_my_options("non_interactive")
+    opts, args = opt_parser.parse_args()
+    arg = None
+    if sys.argv[1:]:
+        arg = sys.argv[1]
+    if arg == "start":
+        start(is_main=True)
+    else:
+        report = Reporter(opts.verbosity - opts.quietness)
+        status = rose_bush_quick_server_status()
+        level = Reporter.DEFAULT
+        if arg != "stop":
+           level = 0
+        for k, v in sorted(status.items()):
+            report("%s=%s" % (k, v), level=level)
+        if (arg == "stop" and status.get("pid") and
+            (opts.non_interactive or
+             raw_input("Stop server? y/n (default=n)") == "y")):
+            os.kill(int(status["pid"]), signal.SIGTERM)
+            # TODO: should check whether it is killed or not
+
 
 def start(is_main=False):
     """Create the server.
@@ -400,28 +426,7 @@ def rose_bush_quick_server_status():
 
 
 if __name__ == "__main__":
-    # Quick server
-    opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("non_interactive")
-    opts, args = opt_parser.parse_args()
-    arg = None
-    if sys.argv[1:]:
-        arg = sys.argv[1]
-    if arg == "start":
-        start(is_main=True)
-    else:
-        report = Reporter(opts.verbosity - opts.quietness)
-        status = rose_bush_quick_server_status()
-        level = Reporter.DEFAULT
-        if arg != "stop":
-           level = 0
-        for k, v in sorted(status.items()):
-            report("%s=%s" % (k, v), level=level)
-        if (arg == "stop" and status.get("pid") and
-            (opts.non_interactive or
-             raw_input("Stop server? y/n (default=n)") == "y")):
-            os.kill(int(status["pid"]), signal.SIGTERM)
-            # TODO: should check whether it is killed or not
+    main()
 else:
     # WSGI server
     application = start()

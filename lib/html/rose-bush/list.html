@@ -12,7 +12,7 @@ rel="stylesheet" media="screen" />
 <body>
 <div class="navbar navbar-static-top">
 <div class="navbar-inner">
-<a class="brand" href="{{script}}/">Rose Bush @ {{host}}</a>
+<a class="brand" href="{{script}}/">Rose Bush <small>@ {{host}}</small></a>
 <ul class="nav">
 <li><a href="{{script}}/summary/{{user}}">{{user}}</a></li>
 <li class="active"><a><strong>{{suite}}</strong></a></li>
@@ -287,9 +287,14 @@ class="btn btn-link"
 <abbr class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</abbr>
 {% endif -%}
 {{entry.name}}
-{% if entry.submit_num != 1 -%}
+{% if entry.submit_num_max > 1 -%}
+{% if entry.submit_num == entry.submit_num_max -%}
 <span class="badge badge-inverse"
 title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
+{% else -%}
+<span class="badge"
+title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
+{% endif -%}
 {% endif -%}
 <br/>
 
@@ -354,17 +359,17 @@ title="{{log.size}} bytes">{{key}}</a>
 </div><!-- entry: cycle, name, submit_num, files -->
 <div class="span4 text-right"><!-- entry: time -->
 <small>
-<abbr class="t_submit livestamp"
+<i class="icon-info-sign" title="Submitted"></i> <abbr class="t_submit livestamp"
 title="{{entry.events[0]}}Z">{{entry.events[0]}}Z</abbr>
 <!-- entry: submit time -->
 <!-- entry: init time -->
 {% if entry.events[1] -%}
-<abbr title="Started">R:</abbr> <abbr class="t_init"
+<i class="icon-play" title="Started"></i> <abbr class="t_init"
 title="{{entry.events[1]}}Z">{{entry.events[1]}}Z</abbr>
 {% endif -%}
 <!-- entry: exit time -->
 {% if entry.events[2] -%}
-<abbr title="Exited">E:</abbr> <abbr class="t_exit"
+<i class="icon-stop" title="Exited"></i> <abbr class="t_exit"
 title="{{entry.events[2]}}Z">{{entry.events[2]}}Z</abbr>
 {% endif -%}
 <!-- entry: exit time -->

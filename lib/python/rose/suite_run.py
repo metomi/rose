@@ -468,11 +468,14 @@ class SuiteRunner(Runner):
             for log in list(logs):
                 if os.path.isfile(log):
                     continue
-                log_tar_gz = log + ".tar.gz"
-                f = tarfile.open(log_tar_gz, "w:gz")
+                log_tar = log + ".tar"
+                f_bsize = os.statvfs(log).f_bsize
+                f = tarfile.open(log_tar, "w", bufsize=f_bsize)
                 f.add(log)
                 f.close()
-                self.handle_event(SuiteLogArchiveEvent(log_tar_gz, log))
+                # N.B. Python's gzip is slow
+                self.popen.run_simple("gzip", log_tar)
+                self.handle_event(SuiteLogArchiveEvent(log_tar + ".gz", log))
                 self.fs_util.delete(log)
 
     def _run_init_dir_work(self, opts, suite_name, name, conf_tree=None,

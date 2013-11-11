@@ -940,7 +940,16 @@ class MainMenuHandler(object):
     def launch_scheduler(self, *args):
         """Run the scheduler for a suite open in config edit."""
         this_id = self.data.top_level_name
-        return rose.suite_control.SuiteControl().gcontrol(this_id)
+        scontrol = rose.suite_control.SuiteControl()
+        if scontrol.suite_engine_proc.is_suite_registered(this_id):
+            return scontrol.gcontrol(this_id)
+        else:
+            msg = rose.config_editor.DIALOG_TEXT_UNREGISTERED_SUITE.format(
+                                                                       this_id)
+            return rose.gtk.dialog.run_dialog(
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                          msg,
+                          rose.config_editor.DIALOG_TITLE_UNREGISTERED_SUITE)
         
     def launch_terminal(self):
         # Handle a launch terminal request.

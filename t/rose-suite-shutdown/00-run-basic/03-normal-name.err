@@ -1,2 +1,0 @@
-'ERROR, suite not found: 00-run-basic'
-[FAIL] cylc shutdown 00-run-basic --force --host=localhost --wait --timeout=60 # return-code=1

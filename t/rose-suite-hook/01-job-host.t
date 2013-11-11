@@ -55,6 +55,7 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
 else
     pass "$TEST_KEY"
 fi
+sleep 1
 #-------------------------------------------------------------------------------
 # Test for local copy of remote job logs.
 TEST_KEY=$TEST_KEY_BASE-log
@@ -68,4 +69,5 @@ cd $OLDPWD
 
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
+cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

@@ -35,8 +35,9 @@ TEST_KEY=$TEST_KEY_BASE
 mkdir -p $NAME
 ln -s $TEST_SOURCE_DIR/$TEST_KEY_BASE $NAME/rose-stem
 cd $NAME
-run_pass "$TEST_KEY" rose suite-stop -y -- --wait --timeout=60
+run_pass "$TEST_KEY" rose suite-stop -y -- --max-polls=12 --interval=5
 cd $OLDPWD
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
+cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

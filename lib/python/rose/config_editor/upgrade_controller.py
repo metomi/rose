@@ -147,7 +147,9 @@ class UpgradeController(object):
                                              new_config, change_list,
                                              triggers_ok=True):
                         meta_config = rose.macro.load_meta_config(
-                            new_config, ignore_meta_error=True) # TODO: add config_type keyword argument
+                            new_config, config_type=rose.SUB_CONFIG_NAME,
+                            ignore_meta_error=True
+                        )
                         trig_macro = rose.macros.trigger.TriggerMacro()
                         macro_config = copy.deepcopy(new_config)
                         macro_id = (

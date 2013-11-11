@@ -61,6 +61,7 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
 else
     pass "$TEST_KEY"
 fi
+sleep 1
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-db-before"
 sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
@@ -94,4 +95,5 @@ log/job/my_task_2.1.1.out|01-out
 __OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
+cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

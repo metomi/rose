@@ -472,7 +472,9 @@ def main():
                                               opts.conf_dir, opts.output_dir,
                                               opts.non_interactive, reporter)
     new_meta_config = rose.macro.load_meta_config(
-        app_config, directory=opts.conf_dir, ignore_meta_error=True) # TODO: add this:, config_type=rose.SUB_CONFIG_NAME)
+        app_config, directory=opts.conf_dir, config_type=rose.SUB_CONFIG_NAME,
+        ignore_meta_error=True
+    )
     if has_changed:
         new_trig_config, change_list = (
             rose.macros.trigger.TriggerMacro().transform(

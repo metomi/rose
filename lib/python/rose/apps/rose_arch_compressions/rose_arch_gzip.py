@@ -20,8 +20,8 @@
 """Compress archive sources in gzip."""
 
 
-import gzip
 import os
+from rose.popen import RosePopenError
 
 
 class RoseArchGzip(object):
@@ -46,14 +46,7 @@ class RoseArchGzip(object):
             work_path_gz = os.path.join(work_dir, name_gz)
             self.app_runner.fs_util.makedirs(
                                 self.app_runner.fs_util.dirname(work_path_gz))
-            gz_f = gzip.open(work_path_gz, "wb")
-            f = open(source.path)
-            f_bsize = os.fstatvfs(f.fileno()).f_bsize
-            while True:
-                bytes = f.read(f_bsize)
-                if not bytes:
-                    break
-                gz_f.write(bytes)
-            f.close()
-            gz_f.close()
+            # N.B. Python's gzip is slow
+            command = "gzip -c '%s' >'%s'" % (source.path, work_path_gz)
+            self.app_runner.popen.run_simple(command, shell=True)
             source.path = work_path_gz

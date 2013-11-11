@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 44
+tests 47
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -50,6 +50,12 @@ TEST_KEY="$TEST_KEY_BASE-find-foo"
 (cd $SUITE_RUN_DIR; find foo -type f |sort) >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_SOURCE_DIR/$TEST_KEY.out" "$TEST_KEY.out"
 for CYCLE in 2013010100 2013010112 2013010200; do
+    TEST_KEY="$TEST_KEY_BASE-$CYCLE.out"
+    sed '/^\[INFO\] [=!+]/!d;
+         s/\(t(init)=\)[^Z]*Z/\1YYYY-mm-DDTHH:MM:SSZ/;
+         s/\(dt(\(tran\|arch\))=\)[^s]*s/\1SSSSs/g' \
+         $SUITE_RUN_DIR/log/job/archive.$CYCLE.*.out >"$TEST_KEY"
+    file_cmp "$TEST_KEY" "$TEST_KEY" $TEST_SOURCE_DIR/$TEST_KEY_BASE-$CYCLE.out
     TEST_KEY="$TEST_KEY_BASE-planet-n"
     tar -tzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/planet-n.tar.gz | sort \
         >"$TEST_KEY-$CYCLE.out"
@@ -128,4 +134,5 @@ file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_8.$CYCLE.1.err" <<'
 __ERR__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
+cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

@@ -115,6 +115,7 @@ class MainController(object):
     RE_ARRAY_ELEMENT = re.compile('\([\d:, ]+\)$')
 
     def __init__(self, config_directory=None, config_objs=None,
+                 config_obj_types=None,
                  pluggable=False,
                  load_updater=None,
                  load_all_apps=False, load_no_apps=False, metadata_off=False):
@@ -268,7 +269,9 @@ class MainController(object):
         )
 
         self.data.load(config_directory, config_objs,
-                       load_all_apps, load_no_apps, metadata_off)
+                       config_obj_type_dict=config_obj_types,
+                       load_all_apps=load_all_apps,
+                       load_no_apps=load_no_apps)
 
         self.reporter.report_load_event(
             rose.config_editor.EVENT_LOAD_STATUSES.format(
@@ -394,11 +397,13 @@ class MainController(object):
 
         self.toolbar.set_widget_sensitive(
             rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-            any([c.is_top_level for c in self.data.config.values()]))
+            any([c.config_type == rose.TOP_CONFIG_NAME
+                 for c in self.data.config.values()]))
 
         self.toolbar.set_widget_sensitive(
             rose.config_editor.TOOLBAR_VIEW_OUTPUT,
-            any([c.is_top_level for c in self.data.config.values()]))
+            any([c.config_type == rose.TOP_CONFIG_NAME
+                 for c in self.data.config.values()]))
 
     def generate_menubar(self):
         """Link in the menu functionality and accelerators."""
@@ -590,7 +595,8 @@ class MainController(object):
                 add_menuitem
             ))
         self.main_handle.load_macro_menu(self.menubar)
-        if not any([c.is_top_level for c in self.data.config.values()]):
+        if not any([c.config_type == rose.TOP_CONFIG_NAME
+                    for c in self.data.config.values()]):
             self.menubar.uimanager.get_widget(
                 "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
         self.update_bar_widgets()
@@ -1191,15 +1197,10 @@ class MainController(object):
                         continue
 
             # Dump the configuration.
-            filename = rose.SUB_CONFIG_NAME
-            if directory is None:
-                if config_data.is_discovery:
-                    filename = rose.INFO_CONFIG_NAME
-                    directory = self.data.top_level_directory
-            elif (directory.rstrip('/') ==
-                  self.data.top_level_directory.rstrip('/') and
-                  rose.TOP_CONFIG_NAME in os.listdir(directory)):
-                filename = rose.TOP_CONFIG_NAME
+            filename = config_data.config_type
+            if (directory is None and
+                    config_data.config_type == rose.INFO_CONFIG_NAME):
+                directory = self.data.top_level_directory
             save_path = os.path.join(directory, filename)
             rose.macro.pretty_format_config(config)
             try:
@@ -1429,11 +1430,13 @@ class MainController(object):
             del config_data.macros
             meta_config = config_data.meta
             if metadata_off:
-                meta_config = self.data.load_meta_config()
+                meta_config = self.data.load_meta_config(
+                    config_type=config_data.config_type)
                 meta_files = []
                 macros = []
             else:
-                meta_config = self.data.load_meta_config(config, directory)
+                meta_config = self.data.load_meta_config(config, directory,
+                    config_type=config_data.config_type)
                 meta_files = self.data.load_meta_files(config, directory)
                 macros = rose.macro.load_meta_macro_modules(meta_files)
             config_data.meta = meta_config

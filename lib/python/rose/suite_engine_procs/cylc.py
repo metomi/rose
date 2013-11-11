@@ -42,8 +42,6 @@ class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
 
-    CYCLE_LOG_ARCHIVE_PREFIX = "job-"
-    CYCLE_LOG_ARCHIVE_SUFFIX = ".tar.gz"
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "fail(submit)",
               "submitting now": "submit-init",
@@ -232,9 +230,7 @@ class CylcProcessor(SuiteEngineProcessor):
             where += " AND (" + " AND ".join(where_fragments) + ")"
         # Execute query to get number of entries
         of_n_entries = 0
-        stmt = ("SELECT COUNT(*) FROM" +
-                " task_events JOIN task_states USING (cycle,name,submit_num)" +
-                " WHERE event==?")
+        stmt = "SELECT COUNT(*) FROM task_events WHERE event==?"
         if where:
             stmt += " " + where
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
@@ -250,7 +246,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 " group_concat(time), group_concat(event)," +
                 " group_concat(message) " +
                 " FROM" +
-                " task_events JOIN task_states USING (cycle,name,submit_num)" +
+                " task_events" +
                 " WHERE" +
                 " (event==? OR event==? OR event==? OR" +
                 "  event==? OR event==? OR event==?)" +
@@ -269,15 +265,15 @@ class CylcProcessor(SuiteEngineProcessor):
                 stmt_args_head + stmt_args + stmt_args_tail):
             cycle, name, submit_num, times_str, events_str, messages_str = row
             entry = {"cycle": cycle, "name": name, "submit_num": submit_num,
-                     "events": [None, None, None], "status": None, "logs": {},
-                     "seq_logs_indexes": {}}
+                     "submit_num_max": 1, "events": [None, None, None],
+                     "status": None, "logs": {}, "seq_logs_indexes": {}}
             entries.append(entry)
             events = events_str.split(",")
             times = times_str.split(",")
             if messages_str:
                 messages = messages_str.split(",")
             else:
-                messages = []
+                messages = events
             event_rank = -1
             for event, t, message in zip(events, times, messages):
                 my_event = self.EVENTS.get(event)
@@ -290,6 +286,19 @@ class CylcProcessor(SuiteEngineProcessor):
                     if my_event == "fail(%s)":
                         signal = message.rsplit(None, 1)[-1]
                         entry["status"] = "fail(%s)" % signal
+
+        submit_num_max_of = {}
+        for entry in entries:
+            cycle = entry["cycle"]
+            name = entry["name"]
+            if (cycle, name) not in submit_num_max_of:
+                stmt = ("SELECT submit_num FROM task_states" +
+                        " WHERE cycle==? AND name==?")
+                for row in self._db_exec(self.SUITE_DB, user_name, suite_name,
+                                         stmt, [cycle, name]):
+                    submit_num_max_of[(cycle, name)] = row[0]
+                    break
+            entry["submit_num_max"] = submit_num_max_of[(cycle, name)]
 
         self._db_close(self.SUITE_DB, user_name, suite_name)
 
@@ -596,17 +605,21 @@ class CylcProcessor(SuiteEngineProcessor):
             stmt = ("UPDATE log_files SET path=?, path_in_tar=? " +
                     "WHERE cycle==? AND task==? AND submit_num==? AND key==?")
             for cycle in cycles:
-                archive_file_name = self._get_cycle_log_archive_name(cycle)
+                archive_file_name0 = "job-" + cycle + ".tar"
+                archive_file_name = archive_file_name0 + ".gz"
                 if os.path.exists(archive_file_name):
                     continue
                 glob_ = self.TASK_ID_DELIM.join(["*", cycle, "*"])
                 names = glob(os.path.join("job", glob_))
                 if not names:
                     continue
-                tar = tarfile.open(archive_file_name, "w:gz")
+                f_bsize = os.statvfs(".").f_bsize
+                tar = tarfile.open(archive_file_name0, "w", bufsize=f_bsize)
                 for name in names:
                     tar.add(name)
                 tar.close()
+                # N.B. Python's gzip is slow
+                self.popen.run_simple("gzip", archive_file_name0)
                 self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
                                                   archive_file_name))
                 for name in sorted(names):
@@ -673,7 +686,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 for item in items:
                     cycle, name = self._parse_task_cycle_id(item)
                     if cycle is not None:
-                        arch_f_name = self._get_cycle_log_archive_name(cycle)
+                        arch_f_name = "job-" + cycle + ".tar.gz"
                         if os.path.exists(arch_f_name):
                             continue
                     auths = self.get_suite_jobs_auths(suite_name, cycle, name)
@@ -926,11 +939,6 @@ class CylcProcessor(SuiteEngineProcessor):
             self.daos[db_name][key] = DAO(db_f_name)
         return self.daos[db_name][key].execute(stmt, stmt_args, commit)
 
-    def _get_cycle_log_archive_name(self, cycle_time):
-        """Return the jobs log archive file name of a given cycle."""
-        return (self.CYCLE_LOG_ARCHIVE_PREFIX + cycle_time +
-                self.CYCLE_LOG_ARCHIVE_SUFFIX)
-
     def _parse_job_log_base_name(self, f_name):
         """Return (cycle, task, submit_num, ext)."""
         b_names = os.path.basename(f_name).split(self.TASK_ID_DELIM, 3)
@@ -1041,6 +1049,8 @@ class DAO(object):
                 self.cursor = None
             else:
                 break
+        if self.cursor is None:
+            return []
         if commit:
             self.commit()
         return self.cursor
