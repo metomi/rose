@@ -1,6 +1,6 @@
 # Rose
 
-Rose is a framework for managing and running scientific suites.
+Rose: a framework for managing and running meteorological suites.
 
 See <http://metomi.github.io/rose/>.
 
