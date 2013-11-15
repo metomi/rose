@@ -140,6 +140,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     else:
                         source_names.append(source_glob)
                 for source_name in source_names:
+                    if source_name.startswith("~"):
+                        source_name = os.path.expanduser(source_name)
                     if targets[name].mode == "symlink":
                         if targets[name].real_name:
                             # Symlink mode can only have 1 source
