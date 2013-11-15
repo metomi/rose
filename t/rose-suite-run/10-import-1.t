@@ -78,5 +78,4 @@ file_cmp "$TEST_KEY" "$TEST_KEY" <<'__LOG__'
 __LOG__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

@@ -56,8 +56,8 @@ TEST_KEY=$TEST_KEY_BASE-stopped
 run_pass "$TEST_KEY" rose suite-clean -y $NAME
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 [INFO] delete: $SUITE_RUN_DIR/
+[INFO] delete: $HOME/.cylc/$NAME
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

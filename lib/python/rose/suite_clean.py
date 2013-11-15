@@ -118,6 +118,7 @@ class SuiteRunCleaner(object):
                     ev = FileSystemEvent(FileSystemEvent.DELETE,
                                          auth + ":" + loc)
                     engine.handle_event(ev)
+        self.suite_engine_proc.clean_hook(suite_name)
 
     __call__ = clean
 

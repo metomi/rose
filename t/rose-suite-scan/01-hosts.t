@@ -60,5 +60,4 @@ while ! rose suite-clean -q -y $NAME 2>/dev/null && (($(date +%s) < TIMEOUT)); d
     sleep 1
 done
 #-------------------------------------------------------------------------------
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

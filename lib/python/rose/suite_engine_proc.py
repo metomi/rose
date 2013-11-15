@@ -263,6 +263,10 @@ class SuiteEngineProcessor(object):
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
 
+    def clean_hook(self, suite_name=None):
+        """Run suite engine dependent logic (at end of "rose suite-clean")."""
+        raise NotImplementedError()
+
     def get_cycle_items_globs(self, name, cycle):
         """Return a glob to match named items created for a given cycle.
 

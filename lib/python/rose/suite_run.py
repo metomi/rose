@@ -319,6 +319,7 @@ class SuiteRunner(Runner):
             rose_sr += " --run=" + opts.run_mode
             host_confs = ["root-dir", "root-dir-share", "root-dir-work"]
             rose_sr += " --remote=uuid=" + uuid
+            locs_conf.set([auth])
             for key in host_confs:
                 value = self._run_conf(key, host=host, conf_tree=conf_tree)
                 if value is not None:

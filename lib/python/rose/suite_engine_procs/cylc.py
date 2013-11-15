@@ -84,6 +84,15 @@ class CylcProcessor(SuiteEngineProcessor):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
         self.daos = {self.SUITE_DB: {}, self.JOB_LOGS_DB: {}}
 
+    def clean_hook(self, suite_name=None):
+        """Run "cylc refresh --unregister" (at end of "rose suite-clean")."""
+        self.popen.run("cylc", "refresh", "--unregister")
+        passphrase_dir_root = os.path.expanduser(os.path.join("~", ".cylc"))
+        for name in os.listdir(passphrase_dir_root):
+            p = os.path.join(passphrase_dir_root, name)
+            if os.path.islink(p) and not os.path.exists(p):
+                self.fs_util.delete(p)
+
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
         if not host:
@@ -853,19 +862,14 @@ class CylcProcessor(SuiteEngineProcessor):
         if out:
             suite_dir_old = out.strip()
         suite_passphrase = os.path.join(suite_dir, "passphrase")
-        self.popen.run_simple("cylc", "refresh", "--unregister",
-                              stdout_level=Event.VV)
+        self.clean_hook(suite_name)
         if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
             self.popen.run_simple("cylc", "unregister", suite_name)
             suite_dir_old = None
         if suite_dir_old is None:
             self.popen.run_simple("cylc", "register", suite_name, suite_dir)
-        passphrase_dir_root = os.path.expanduser("~/.cylc")
-        for name in os.listdir(passphrase_dir_root):
-            p = os.path.join(passphrase_dir_root, name)
-            if os.path.islink(p) and not os.path.exists(p):
-                self.fs_util.delete(p)
-        passphrase_dir = os.path.join(passphrase_dir_root, suite_name)
+        passphrase_dir = os.path.join("~", ".cylc", suite_name)
+        passphrase_dir = os.path.expanduser(passphrase_dir)
         self.fs_util.symlink(suite_dir, passphrase_dir)
         command = ["cylc", "validate", "-v"]
         if debug_mode:

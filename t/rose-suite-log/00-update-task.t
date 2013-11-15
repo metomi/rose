@@ -95,5 +95,4 @@ log/job/my_task_2.1.1.out|01-out
 __OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0
