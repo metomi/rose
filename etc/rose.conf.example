@@ -67,6 +67,7 @@
 ## Declare a named group of hosts.
 #  group{NAME}=GROUP/HOST ...
 ## E.g.:
+#  group{rose-vm}=rose-vm0 rose-vm1 rose-vm2 rose-vm3
 #  group{hpc}=hpc1 hpc2
 #  group{hpc1}=hpc1a hpc1b hpc1c hpc1d
 #  group{hpc2}=hpc2a hpc2b hpc2c hpc2d
@@ -126,19 +127,28 @@
 # Configuration related to "rose suite-run".
 #
 ## Hosts in [rose-host-select] section that can be used to run a suite.
-#  hosts=localhost
+#  hosts=HOST-GROUP|HOST ...
+## E.g.:
+#  hosts=rose-vm
 ## Hosts in [rose-host-select] section that can be scanned by rose utilities.
-#  scan-hosts=localhost
-## HOST-PATTERNS=DIR list, line delimited.
-## HOST-PATTERNS are glob patterns for matching host names.
-## DIR is the root location of a suite's "share" directory (default=$HOME)
-#  root-dir-share=hpc*=$DATADIR
-#                =*=$HOME
-## HOST-PATTERNS=DIR list, line delimited.
-## HOST-PATTERNS are glob patterns for matching host names.
-## DIR is the root location of a suite's "work" directory (default=$HOME)
-#  root-dir-work=hpc*=$WORKING
-#               =*=$DATADIR
+#  scan-hosts=HOST-GROUP|HOST ...
+## E.g.:
+#  scan-hosts=localhost rose-vm
+## Root location of a suite run directory (default=$HOME)
+#  root-dir=HOST-GLOB=$HOST-DIR
+#          =...
+## where HOST-GLOB is a glob for matching host names.
+##       HOST-DIR is value of the root location for matching hosts
+#  root-dir=hpc*=$DATADIR
+#          =*=$HOME
+## Root location of a suite run's "share/" directory (default=$HOME)
+## Syntax is the same as "root-dir".
+#  root-dir-share=HOST-GLOB=$HOST-DIR
+#                =...
+## Root location of a suite run's "work/" directory (default=$HOME)
+## Syntax is the same as "root-dir".
+#  root-dir-work=HOST-GLOB=$HOST-DIR
+#               =...
 [rose-suite-run]
 
 # Configuration related to "rose task-run".

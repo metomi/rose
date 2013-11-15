@@ -380,6 +380,24 @@ accel-find-next=F3
       used by various Rose utilities, such as the config editor GUI. It can be
       used to specify the suite type.</dd>
 
+      <dt><code>root-dir=LIST</code></dt>
+
+      <dd>A new line delimited list of <var>PATTERN=DIR</var> pairs. The
+      <var>PATTERN</var> should be a glob-like pattern for matching a host
+      name. The <var>DIR</var> should be the root directory to install a suite
+      run directory. E.g.:
+        <pre class="prettyprint lang-rose_conf">
+root-dir=hpc*=$WORKDIR
+        =*=$DATADIR
+</pre>
+        <p>In this example, <code>rose suite-run</code> of a suite with name
+        <var>$NAME</var> will create <var>~/cylc-run/$NAME</var> as a symbolic
+        link to <var>$DATADIR/cylc-run/$NAME/</var> on any machine, except those
+        with their hostnames matching <var>hpc*</var>. In which case, it will
+        create <var>~/cylc-run/$NAME</var> as a symbolic link to
+        <var>$WORKDIR/cylc-run/$NAME/</var>.</p>
+      </dd>
+
       <dt><code>root-dir-share=LIST</code></dt>
 
       <dd>A new line delimited list of <var>PATTERN=DIR</var> pairs. The
