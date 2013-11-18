@@ -767,19 +767,14 @@ def handle_transform(app_config, new_config, change_list, macro_id,
     has_changes = any([not i.is_warning for i in change_list])
     sys.stdout.write(get_reports_as_text(change_list, macro_id,
                                          is_from_transform=True))
-    if has_changes:
-        if opt_non_interactive:
-            user_allowed_changes = True
-        else:
-            user_allowed_changes = _get_user_accept()
-        if user_allowed_changes:
-            app_config = new_config
-            dump_config(app_config, opt_conf_dir, opt_output_dir)
-            if reporter is not None:
-                reporter(MacroTransformDumpEvent(opt_conf_dir,
-                                                 opt_output_dir),
-                         level=reporter.VV)
-            return True
+    if has_changes and (opt_non_interactive or _get_user_accept()):
+        app_config = new_config
+        dump_config(app_config, opt_conf_dir, opt_output_dir)
+        if reporter is not None:
+            reporter(MacroTransformDumpEvent(opt_conf_dir,
+                                             opt_output_dir),
+                     level=reporter.VV)
+        return True
     return False
 
 
