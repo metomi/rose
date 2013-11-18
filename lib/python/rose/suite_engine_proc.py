@@ -498,6 +498,10 @@ class SuiteEngineProcessor(object):
         """Launch control GUI for a suite_name running at a host."""
         raise NotImplementedError()
 
+    def is_conf(self, path):
+        """Return the file type if path is a config of this suite engine."""
+        raise NotImplementedError()
+
     def is_suite_registered(self, suite_name):
         """Return whether or not a suite is registered."""
         raise NotImplementedError()

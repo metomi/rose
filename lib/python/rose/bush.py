@@ -245,9 +245,10 @@ class Root(object):
         name = path
         if path_in_tar:
             name = path_in_tar
-        file_content = None
         if fnmatch(os.path.basename(path), "rose*.conf"):
             file_content = "rose-conf"
+        else:
+            file_content = self.suite_engine_proc.is_conf(path)
         template = self.template_env.get_template("view.html")
         return template.render(
                 script=cherrypy.request.script_name,
@@ -257,6 +258,7 @@ class Root(object):
                 suite=suite,
                 path=path,
                 path_in_tar=path_in_tar,
+                f_name=f_name,
                 mode=mode,
                 file_content=file_content,
                 lines=lines)
