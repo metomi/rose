@@ -846,7 +846,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 39
+[V] rose.macros.DefaultValidators: issues: 32
     namelist:already_triggered_ignored_namelist=ab_trig_var1=2
         State should be trig-ignored
     namelist:already_triggered_ignored_namelist=ab_trig_var2=2
@@ -863,8 +863,6 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         State should be trig-ignored
     namelist:already_triggered_ignored_namelist=trig_var_err4=2
         State should be trig-ignored
-    namelist:already_triggered_ignored_namelist=user_sw_var=5
-        State should be enabled
     namelist:ignored_error_namelist=en_trig_e_err_comp_var=2
         State should be trig-ignored
     namelist:ignored_error_namelist=en_trig_e_err_opt_var=2
@@ -879,14 +877,6 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         State should be enabled
     namelist:ignored_error_namelist=en_user_sw_comp_var=6
         Compulsory settings should not be user-ignored.
-    namelist:ignored_error_namelist=en_user_sw_comp_var=6
-        State should be enabled
-    namelist:ignored_error_namelist=en_user_sw_opt_var=5
-        State should be enabled
-    namelist:ignored_namelist=None=None
-        State should be enabled
-    namelist:ignored_namelist=ign_user_sw_var=6
-        State should be enabled
     namelist:trig_absent=no_value_triggered=.false.
         State should be trig-ignored
     namelist:trig_absent=one_value_triggered=.false.
@@ -919,11 +909,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         State should be trig-ignored
     namelist:triggered_ignored_namelist=trig_var_err4=2
         State should be trig-ignored
-    namelist:triggered_ignored_namelist=user_sw_var=5
-        State should be enabled
     namelist:triggered_namelist=trig_var=2
-        State should be enabled
-    namelist:triggered_namelist=user_sw_var=6
         State should be enabled
 __CONTENT__
 exit

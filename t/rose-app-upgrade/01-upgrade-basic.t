@@ -311,7 +311,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
 #-------------------------------------------------------------------------------
 # Check the next step in the upgrade
-TEST_KEY=$TEST_KEY_BASE-upgrade-change
+TEST_KEY=$TEST_KEY_BASE-upgrade-change-minor
 init <<'__CONFIG__'
 meta=test-app-upgrade/0.5
 
@@ -320,7 +320,6 @@ Z=1
 __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ -a 0.5.1
-
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade0.5-0.5.1: changes: 2
     env=C=8
@@ -338,7 +337,7 @@ Z=1
 __CONFIG__
 
 #-----------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-upgrade-change-end-version
+TEST_KEY=$TEST_KEY_BASE-upgrade-change-minor-end-version
 # Check correct end version
 run_pass "$TEST_KEY" rose app-upgrade \
  --meta-path=../rose-meta/ -C ../config/

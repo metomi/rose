@@ -26,6 +26,7 @@ import sys
 
 import rose.config
 import rose.macro
+import rose.macros.trigger
 import rose.reporter
 
 
@@ -39,6 +40,7 @@ MACRO_UPGRADE_MODULE = "versions"
 MACRO_UPGRADE_RESOURCE_DIR = "etc"
 MACRO_UPGRADE_RESOURCE_FILE_ADD = "rose-macro-add.conf"
 MACRO_UPGRADE_RESOURCE_FILE_REMOVE = "rose-macro-remove.conf"
+MACRO_UPGRADE_TRIGGER_NAME = "UpgradeTriggerFixing"
 NAME_DOWNGRADE = "Downgrade{0}-{1}"
 NAME_UPGRADE = "Upgrade{0}-{1}"
 
@@ -465,9 +467,28 @@ def main():
         method_id = DOWNGRADE_METHOD.upper()[0]
     macro_id = rose.macro.MACRO_OUTPUT_ID.format(method_id,
                                                  upgrade_manager.get_name())
-    rose.macro._handle_transform(app_config, new_config, change_list,
-                                 macro_id, opts.conf_dir, opts.output_dir,
-                                 opts.non_interactive, reporter)
+    has_changed = rose.macro.handle_transform(app_config, new_config,
+                                              change_list, macro_id,
+                                              opts.conf_dir, opts.output_dir,
+                                              opts.non_interactive, reporter)
+    new_meta_config = rose.macro.load_meta_config(
+        app_config, directory=opts.conf_dir, config_type=rose.SUB_CONFIG_NAME,
+        ignore_meta_error=True
+    )
+    if has_changed:
+        new_trig_config, change_list = (
+            rose.macros.trigger.TriggerMacro().transform(
+                new_config, new_meta_config)
+        )
+        trig_macro_id = rose.macro.MACRO_OUTPUT_ID.format(
+            rose.macro.TRANSFORM_METHOD.upper()[0],
+            MACRO_UPGRADE_TRIGGER_NAME
+        )
+        if change_list:
+            rose.macro.handle_transform(app_config, new_config,
+                                        change_list, trig_macro_id,
+                                        opts.conf_dir, opts.output_dir,
+                                        opts.non_interactive, reporter)
 
 if __name__ == "__main__":
     rose.macro.add_site_meta_paths()

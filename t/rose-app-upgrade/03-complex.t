@@ -319,6 +319,21 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Value: '.true.' -> '.false.'
     =meta=test-app-upgrade/fig
         Upgraded from apple to fig
+[T] UpgradeTriggerFixing: changes: 7
+    namelist:trig_ignore_sect_trig_ignored=None=None
+        trig-ignored -> enabled     
+    namelist:change_opt=trig_ignore_opt_has_changed=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_opt_trig_ignored=starts_off_trig_ignored=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_opt_ignored=already_ignored=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_opt_enabled=starts_off_enabled=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_sect_ignored=None=None
+        trig-ignored -> enabled     
+    namelist:trig_ignore_sect_enabled=None=None
+        trig-ignored -> enabled     
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.file" ../config/rose-app.conf <<'__CONFIG__'
@@ -344,7 +359,7 @@ new_opt=.true.
 [namelist:change_opt]
 !ignore_opt_has_changed=.true.
 opt_has_changed=.true.
-!!trig_ignore_opt_has_changed=.true.
+trig_ignore_opt_has_changed=.true.
 
 [namelist:change_opt_if_value]
 change_opt_if_true=.false.
@@ -392,19 +407,19 @@ starts_off_trig_ignored=.true.
 standard_opt=.true.
 
 [namelist:trig_ignore_opt_enabled]
-!!starts_off_enabled=.true.
+starts_off_enabled=.true.
 
 [namelist:trig_ignore_opt_ignored]
-!!already_ignored=.true.
+already_ignored=.true.
 
 [namelist:trig_ignore_opt_trig_ignored]
-!!starts_off_trig_ignored=.true.
+starts_off_trig_ignored=.true.
 
-[!!namelist:trig_ignore_sect_enabled]
+[namelist:trig_ignore_sect_enabled]
 
-[!!namelist:trig_ignore_sect_ignored]
+[namelist:trig_ignore_sect_ignored]
 
-[!!namelist:trig_ignore_sect_trig_ignored]
+[namelist:trig_ignore_sect_trig_ignored]
 __CONFIG__
 teardown
 
@@ -748,6 +763,21 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         good
     =meta=test-app-upgrade/fig
         Upgraded from apple to fig
+[T] UpgradeTriggerFixing: changes: 7
+    namelist:trig_ignore_sect_trig_ignored=None=None
+        trig-ignored -> enabled     
+    namelist:change_opt=trig_ignore_opt_has_changed=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_opt_trig_ignored=starts_off_trig_ignored=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_opt_ignored=already_ignored=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_opt_enabled=starts_off_enabled=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_sect_ignored=None=None
+        trig-ignored -> enabled     
+    namelist:trig_ignore_sect_enabled=None=None
+        trig-ignored -> enabled     
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.file" ../config/rose-app.conf <<'__CONFIG__'
@@ -773,7 +803,7 @@ new_opt=.true.
 [namelist:change_opt]
 !ignore_opt_has_changed=.true.
 opt_has_changed=.true.
-!!trig_ignore_opt_has_changed=.true.
+trig_ignore_opt_has_changed=.true.
 
 [namelist:change_opt_if_value]
 change_opt_if_true=.false.
@@ -821,18 +851,18 @@ starts_off_trig_ignored=.true.
 standard_opt=.true.
 
 [namelist:trig_ignore_opt_enabled]
-!!starts_off_enabled=.true.
+starts_off_enabled=.true.
 
 [namelist:trig_ignore_opt_ignored]
-!!already_ignored=.true.
+already_ignored=.true.
 
 [namelist:trig_ignore_opt_trig_ignored]
-!!starts_off_trig_ignored=.true.
+starts_off_trig_ignored=.true.
 
-[!!namelist:trig_ignore_sect_enabled]
+[namelist:trig_ignore_sect_enabled]
 
-[!!namelist:trig_ignore_sect_ignored]
+[namelist:trig_ignore_sect_ignored]
 
-[!!namelist:trig_ignore_sect_trig_ignored]
+[namelist:trig_ignore_sect_trig_ignored]
 __CONFIG__
 teardown
