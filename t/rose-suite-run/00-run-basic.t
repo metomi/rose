@@ -56,6 +56,15 @@ for OPTION in -i -l '' --restart; do
 [FAIL] $NAME: is still running (detected ~/.cylc/ports/$NAME)
 __ERR__
 done
+# Don't reload until tasks begin
+TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
+while (($(date +%s) < TIMEOUT)) && ! (
+    cd $SUITE_RUN_DIR/log/job/
+    test -f my_task_1.2013010100.1.out && test -f my_task_1.2013010112.1.out
+)
+do
+    sleep 1
+done
 TEST_KEY=$TEST_KEY_BASE-running-reload
 run_pass "$TEST_KEY" rose suite-run --reload \
     -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
@@ -63,7 +72,7 @@ run_pass "$TEST_KEY" rose suite-run --reload \
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
 touch $SUITE_RUN_DIR/flag # allow the task to die
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
+TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
