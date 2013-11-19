@@ -71,6 +71,8 @@ class SuiteControl(object):
         method.
 
         """
+        if not self.suite_engine_proc.is_suite_registered(suite_name):
+            raise SuiteNotRegisteredError(suite_name)
         engine_version = self._get_engine_version(suite_name)
         for host in self._get_hosts(suite_name, host):
             self.suite_engine_proc.gcontrol(
@@ -141,6 +143,14 @@ class SuiteNotFoundError(Exception):
     """An exception raised when a suite can't be found at or below cwd."""
     def __str__(self):
         return ("%s - no suite found for this path." % self.args[0])
+
+class SuiteNotRegisteredError(Exception):
+
+    """An exception raised when trying to launch gcontrol for a suite 
+       that has not been registered."""
+    def __str__(self):
+        return ("Cannot launch gcontrol - %s not a registered suite."
+                 % self.args[0])
 
 
 def get_suite_name(event_handler=None):
