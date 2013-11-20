@@ -19,7 +19,7 @@
 #-----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
-from fnmatch import fnmatchcase
+from fnmatch import fnmatch, fnmatchcase
 from glob import glob
 import os
 import pwd
@@ -133,6 +133,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
+        if not self.is_suite_registered(suite_name):
+            raise SuiteNotRegisteredError(suite_name)
         if not host:
             host = "localhost"
         environ = dict(os.environ)
@@ -513,6 +515,11 @@ class CylcProcessor(SuiteEngineProcessor):
         """Return Cylc's version."""
         out, err = self.popen("cylc", "--version")
         return out.strip()
+
+    def is_conf(self, path):
+        """Return "cylc-suite-rc" if path is a Cylc suite.rc file."""
+        if fnmatch(os.path.basename(path), "suite*.rc*"):
+            return "cylc-suite-rc"
 
     def is_suite_registered(self, suite_name):
         """See if a suite is registered
@@ -1054,3 +1061,11 @@ class DAO(object):
         if commit:
             self.commit()
         return self.cursor
+
+
+class SuiteNotRegisteredError(Exception):
+
+    """An exception raised when a suite is not registered."""
+    def __str__(self):
+        return ("%s: not a registered suite."
+                 % self.args[0])

@@ -20,6 +20,7 @@
 """Web service for browsing users' Rose suite logs via an HTTP interface."""
 
 import cherrypy
+from fnmatch import fnmatch
 from glob import glob
 import jinja2
 import mimetypes
@@ -33,6 +34,7 @@ import sys
 import rose.config
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Reporter
+from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import tarfile
 from tempfile import NamedTemporaryFile
@@ -62,6 +64,7 @@ class Root(object):
         self.host_name = socket.gethostname()
         if self.host_name and "." in self.host_name:
             self.host_name = self.host_name.split(".", 1)[0]
+        self.rose_version = ResourceLocator.default().get_version()
 
     @cherrypy.expose
     def index(self):
@@ -70,6 +73,7 @@ class Root(object):
         try:
             template = self.template_env.get_template("index.html")
             return template.render(host=self.host_name,
+                                   rose_version=self.rose_version,
                                    script=cherrypy.request.script_name)
         except Exception as e:
             traceback.print_exc(e)
@@ -130,6 +134,8 @@ class Root(object):
             "per_page_default": self.PER_PAGE,
             "per_page_max": self.PER_PAGE_MAX,
             "page": page,
+            "rose_version": self.rose_version,
+            "script": cherrypy.request.script_name,
             "states": {},
         }
         # TODO: add paths to other suite files
@@ -158,7 +164,7 @@ class Root(object):
             return simplejson.dumps(data)
         try:
             template = self.template_env.get_template("list.html")
-            return template.render(script=cherrypy.request.script_name, **data)
+            return template.render(**data)
         except Exception as e:
             traceback.print_exc(e)
 
@@ -172,7 +178,11 @@ class Root(object):
 
         """
         user_suite_dir_root = self._get_user_suite_dir_root(user)
-        data = {"host": self.host_name, "user": user, "entries": []}
+        data = {"host": self.host_name,
+                "rose_version": self.rose_version,
+                "script": cherrypy.request.script_name,
+                "user": user,
+                "entries": []}
         if os.path.isdir(user_suite_dir_root):
             for name in os.listdir(user_suite_dir_root):
                 entry = {"name": name, "states": {}}
@@ -185,7 +195,7 @@ class Root(object):
         if form == "json":
             return simplejson.dumps(data)
         template = self.template_env.get_template("summary.html")
-        return template.render(script=cherrypy.request.script_name, **data)
+        return template.render(**data)
 
     @cherrypy.expose
     def view(self, user, suite, path, path_in_tar=None, mode=None):
@@ -241,8 +251,16 @@ class Root(object):
         if mode == "text":
             s = jinja2.escape(s)
         lines = s.splitlines()
+        name = path
+        if path_in_tar:
+            name = path_in_tar
+        if fnmatch(os.path.basename(path), "rose*.conf"):
+            file_content = "rose-conf"
+        else:
+            file_content = self.suite_engine_proc.is_conf(path)
         template = self.template_env.get_template("view.html")
         return template.render(
+                rose_version=self.rose_version,
                 script=cherrypy.request.script_name,
                 time=strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime()),
                 host=self.host_name,
@@ -250,7 +268,9 @@ class Root(object):
                 suite=suite,
                 path=path,
                 path_in_tar=path_in_tar,
+                f_name=f_name,
                 mode=mode,
+                file_content=file_content,
                 lines=lines)
 
     def _get_suite_logs_info(self, user, suite):
