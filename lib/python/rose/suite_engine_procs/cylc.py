@@ -58,16 +58,26 @@ class CylcProcessor(SuiteEngineProcessor):
     JOB_LOGS_DB = "log/rose-job-logs.db"
     JOB_LOG_TAIL_KEYS = {"": "00-script", "out": "01-out", "err": "02-err"}
     ORDERS = {
-            "time_desc": "time DESC, submit_num DESC, name DESC, cycle DESC",
-            "time_asc": "time ASC, submit_num ASC, name ASC, cycle ASC",
-            "cycle_desc_name_asc": "cycle DESC, name ASC, submit_num DESC",
-            "cycle_desc_name_desc": "cycle DESC, name DESC, submit_num DESC",
-            "cycle_asc_name_asc": "cycle ASC, name ASC, submit_num DESC",
-            "cycle_asc_name_desc": "cycle ASC, name DESC, submit_num DESC",
-            "name_asc_cycle_asc": "name ASC, cycle ASC, submit_num DESC",
-            "name_desc_cycle_asc": "name DESC, cycle ASC, submit_num DESC",
-            "name_asc_cycle_desc": "name ASC, cycle DESC, submit_num DESC",
-            "name_desc_cycle_desc": "name DESC, cycle DESC, submit_num DESC"}
+            "time_desc":
+            "time DESC, task_events.submit_num DESC, name DESC, cycle DESC",
+            "time_asc":
+            "time ASC, task_events.submit_num ASC, name ASC, cycle ASC",
+            "cycle_desc_name_asc":
+            "cycle DESC, name ASC, task_events.submit_num DESC",
+            "cycle_desc_name_desc":
+            "cycle DESC, name DESC, task_events.submit_num DESC",
+            "cycle_asc_name_asc":
+            "cycle ASC, name ASC, task_events.submit_num DESC",
+            "cycle_asc_name_desc":
+            "cycle ASC, name DESC, task_events.submit_num DESC",
+            "name_asc_cycle_asc":
+            "name ASC, cycle ASC, task_events.submit_num DESC",
+            "name_desc_cycle_asc":
+            "name DESC, cycle ASC, task_events.submit_num DESC",
+            "name_asc_cycle_desc":
+            "name ASC, cycle DESC, task_events.submit_num DESC",
+            "name_desc_cycle_desc":
+            "name DESC, cycle DESC, task_events.submit_num DESC"}
     PYRO_TIMEOUT = 5
     REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
@@ -232,7 +242,9 @@ class CylcProcessor(SuiteEngineProcessor):
             where += " AND (" + " AND ".join(where_fragments) + ")"
         # Execute query to get number of entries
         of_n_entries = 0
-        stmt = "SELECT COUNT(*) FROM task_events WHERE event==?"
+        stmt = ("SELECT COUNT(*) FROM"
+                " task_events JOIN task_states USING (name,cycle)"
+                " WHERE event==?")
         if where:
             stmt += " " + where
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
@@ -244,16 +256,16 @@ class CylcProcessor(SuiteEngineProcessor):
         # Execute query to get entries
         entries = []
         stmt = ("SELECT" +
-                " cycle, name, submit_num," +
+                " cycle, name, task_events.submit_num," +
                 " group_concat(time), group_concat(event)," +
                 " group_concat(message) " +
                 " FROM" +
-                " task_events" +
+                " task_events JOIN task_states USING (cycle,name)" +
                 " WHERE" +
                 " (event==? OR event==? OR event==? OR" +
                 "  event==? OR event==? OR event==?)" +
                 where +
-                " GROUP BY cycle, name, submit_num" +
+                " GROUP BY cycle, name, task_events.submit_num" +
                 " ORDER BY " +
                 self.ORDERS.get(order, self.ORDERS["time_desc"]))
         stmt_args_head = ["submitting now", "submission failed", "started",
@@ -338,12 +350,12 @@ class CylcProcessor(SuiteEngineProcessor):
                         entry["seq_logs_indexes"][seq_key] = {}
                     entry["seq_logs_indexes"][seq_key][int(index_str)] = key
 
-        for seq_key, indexes in entry["seq_logs_indexes"].items():
-            if len(indexes) <= 1:
-                entry["seq_logs_indexes"].pop(seq_key)
-        for key, log_dict in entry["logs"].items():
-            if log_dict["seq_key"] not in entry["seq_logs_indexes"]:
-                log_dict["seq_key"] = None
+            for seq_key, indexes in entry["seq_logs_indexes"].items():
+                if len(indexes) <= 1:
+                    entry["seq_logs_indexes"].pop(seq_key)
+            for key, log_dict in entry["logs"].items():
+                if log_dict["seq_key"] not in entry["seq_logs_indexes"]:
+                    log_dict["seq_key"] = None
         self._db_close(self.JOB_LOGS_DB, user_name, suite_name)
         return (entries, of_n_entries)
 
