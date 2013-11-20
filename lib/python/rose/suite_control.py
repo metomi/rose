@@ -142,13 +142,6 @@ class SuiteNotFoundError(Exception):
     def __str__(self):
         return ("%s - no suite found for this path." % self.args[0])
 
-class SuiteNotRegisteredError(Exception):
-
-    """An exception raised when a suite is not registered."""
-    def __str__(self):
-        return ("%s: not a registered suite."
-                 % self.args[0])
-
 
 def get_suite_name(event_handler=None):
     """Find the top level of a suite directory structure"""

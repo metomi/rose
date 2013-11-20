@@ -29,7 +29,6 @@ from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
-from rose.suite_control import SuiteNotRegisteredError
 from rose.suite_engine_proc import \
         StillRunningError, SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
@@ -1057,3 +1056,11 @@ class DAO(object):
         if commit:
             self.commit()
         return self.cursor
+
+
+class SuiteNotRegisteredError(Exception):
+
+    """An exception raised when a suite is not registered."""
+    def __str__(self):
+        return ("%s: not a registered suite."
+                 % self.args[0])
