@@ -133,6 +133,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
+        if not self.is_suite_registered(suite_name):
+            raise SuiteNotRegisteredError(suite_name)
         if not host:
             host = "localhost"
         environ = dict(os.environ)
@@ -1059,3 +1061,11 @@ class DAO(object):
         if commit:
             self.commit()
         return self.cursor
+
+
+class SuiteNotRegisteredError(Exception):
+
+    """An exception raised when a suite is not registered."""
+    def __str__(self):
+        return ("%s: not a registered suite."
+                 % self.args[0])
