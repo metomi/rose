@@ -19,7 +19,7 @@
 #-----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
-from fnmatch import fnmatchcase
+from fnmatch import fnmatch, fnmatchcase
 from glob import glob
 import os
 import pwd
@@ -513,6 +513,11 @@ class CylcProcessor(SuiteEngineProcessor):
         """Return Cylc's version."""
         out, err = self.popen("cylc", "--version")
         return out.strip()
+
+    def is_conf(self, path):
+        """Return "cylc-suite-rc" if path is a Cylc suite.rc file."""
+        if fnmatch(os.path.basename(path), "suite*.rc*"):
+            return "cylc-suite-rc"
 
     def is_suite_registered(self, suite_name):
         """See if a suite is registered
