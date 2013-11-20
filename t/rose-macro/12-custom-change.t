@@ -25,7 +25,7 @@ init <<'__CONFIG__'
 TRANSFORM_SWITCH=false
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 7
+tests 11
 #-------------------------------------------------------------------------------
 # Check macro finding.
 TEST_KEY=$TEST_KEY_BASE-discovery
@@ -57,6 +57,25 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
         false -> true
 [INFO] M ../config
 __CONTENT__
+file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONFIG__'
+[env]
+TRANSFORM_SWITCH=true
+__CONFIG__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Check changing in quiet mode.
+TEST_KEY=$TEST_KEY_BASE-change-quiet
+setup
+init <<'__CONFIG__'
+[env]
+TRANSFORM_SWITCH=false
+__CONFIG__
+init_meta </dev/null
+init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro_change.py
+run_pass "$TEST_KEY" \
+    rose macro -q --non-interactive --config=../config envswitch.LogicalTransformer
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONFIG__'
 [env]
 TRANSFORM_SWITCH=true
