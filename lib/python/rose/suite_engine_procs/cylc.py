@@ -29,6 +29,7 @@ from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
+from rose.suite_control import SuiteNotRegisteredError
 from rose.suite_engine_proc import \
         StillRunningError, SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
@@ -133,6 +134,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
+        if not self.is_suite_registered(suite_name):
+            raise SuiteNotRegisteredError(suite_name)
         if not host:
             host = "localhost"
         environ = dict(os.environ)
