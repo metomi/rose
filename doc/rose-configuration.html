@@ -704,7 +704,15 @@ delays=0,6*10s,60*1m,1h
       e.g. a <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
       supported scheme or be given sufficient information for the system to
       determine its scheme, e.g. via the <code>schemes</code> setting described
-      below.</dd>
+      below.
+
+        <p>Normally, a source that does not exist would trigger an error in run
+        time. However, it may be useful to have an optional source for a file
+        sometimes. In which case, the syntax <var>source=(SOURCE)</var> can be
+        used to specify an optional source. E.g. <samp>source=namelist:foo
+        (namelist:bar)</samp> would allow <samp>namelist:bar</samp> to be
+        missing without an error.</p>
+      </dd>
 
       <dt><code>checksum</code></dt>
 
@@ -744,7 +752,8 @@ delays=0,6*10s,60*1m,1h
 
       <dt><code>mode=symlink,source=SOURCE</code></dt>
 
-      <dd>Target is created as a symlink of an FS <var>SOURCE</var>.</dd>
+      <dd>Target is created as a symlink of an FS <var>SOURCE</var>. N.B. In
+      this mode, <var>SOURCE</var> must be a single source.</dd>
     </dl>
 
     <p>The <code>schemes</code> setting: While the system would attempt to

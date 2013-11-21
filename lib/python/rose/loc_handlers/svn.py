@@ -53,7 +53,10 @@ class SvnLocHandler(object):
     def parse(self, loc, conf_tree):
         """Set loc.real_name, loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEMES[0]
-        xml_str, err = self.manager.popen(self.svn, "info", "--xml", loc.name)
+        rc, xml_str, err = self.manager.popen.run(self.svn, "info", "--xml",
+                                                  loc.name)
+        if rc:
+            raise ValueError(loc.name)
         info_entry = SvnInfoXMLParser()(xml_str)
         if info_entry["kind"] == "dir":
             loc.loc_type = loc.TYPE_TREE

@@ -36,6 +36,8 @@ class FileSystemLocHandler(object):
         """Set loc.scheme, loc.loc_type, loc.paths."""
         loc.scheme = "fs"
         name = os.path.expanduser(loc.name)
+        if not os.path.exists(name):
+            raise ValueError(loc.name)
         paths_and_checksums = get_checksum(name)
         for path, checksum in paths_and_checksums:
             loc.add_path(path, checksum)

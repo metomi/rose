@@ -60,7 +60,7 @@ class NewModeError(Exception):
     """An exception raised for --new mode is not supported."""
 
     def __str__(self):
-        return "%s=%s, --new mode not supported." % self.args
+        return "%s --new mode not supported on $PWD." % self.args
 
 
 class PollTimeoutError(Exception):

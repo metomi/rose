@@ -70,7 +70,7 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q \
     --define='[file:hello4]source=stuff:ing'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] file:hello4=source=stuff:ing: stuff:ing
+[FAIL] file:hello4=source=stuff:ing: bad setting
 __CONTENT__
 test_teardown
 #-------------------------------------------------------------------------------
