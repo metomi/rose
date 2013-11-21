@@ -52,11 +52,6 @@ class NamelistLocHandler(object):
         """Set loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEME
         loc.loc_type = loc.TYPE_BLOB
-
-    def pull(self, loc, conf_tree):
-        """Write namelist to loc.cache."""
-        if not loc.loc_type:
-            self.parse(loc, conf_tree)
         if loc.name.endswith("(:)"):
             name = loc.name[0:-2]
             sections = [k for k in conf_tree.node.value.keys()
@@ -64,18 +59,25 @@ class NamelistLocHandler(object):
         else:
             sections = [k for k in conf_tree.node.value.keys()
                         if k == loc.name]
+        for section in list(sections):
+            section_value = conf_tree.node.get_value([section])
+            if section_value is None:
+                sections.remove(section)
         if not sections:
             raise ValueError(loc.name)
+        return sections
+
+    def pull(self, loc, conf_tree):
+        """Write namelist to loc.cache."""
+        sections = self.parse(loc, conf_tree)
         if loc.name.endswith("(:)"):
             sections.sort(rose.config.sort_settings)
         f = open(loc.cache, "wb")
         for section in sections:
-            section_node = conf_tree.node.get([section], no_ignore=True)
-            if section_node is None:
-                raise ValueError(loc.name)
+            section_value = conf_tree.node.get_value([section])
             group = RE_NAMELIST_GROUP.match(section).group(1)
             nlg = "&" + group + "\n"
-            for key, node in sorted(section_node.value.items()):
+            for key, node in sorted(section_value.items()):
                 if node.state:
                     continue
                 try:

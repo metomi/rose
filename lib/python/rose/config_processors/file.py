@@ -133,13 +133,22 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 except UnboundEnvironmentVariableError as e:
                     raise ConfigProcessError([key, k], source_str, e)
                 source_names = []
-                for source_glob in shlex.split(source_str):
+                for raw_source_glob in shlex.split(source_str):
+                    source_glob = raw_source_glob
+                    if (raw_source_glob.startswith("(") and
+                        raw_source_glob.endswith(")")):
+                        source_glob = raw_source_glob[1:-1]
                     names = glob(source_glob)
                     if names:
                         source_names += sorted(names)
                     else:
-                        source_names.append(source_glob)
-                for source_name in source_names:
+                        source_names.append(raw_source_glob)
+                for raw_source_name in source_names:
+                    source_name = raw_source_name
+                    is_optional = (raw_source_name.startswith("(") and
+                                   raw_source_name.endswith(")"))
+                    if is_optional:
+                        source_name = raw_source_name[1:-1]
                     if source_name.startswith("~"):
                         source_name = os.path.expanduser(source_name)
                     if targets[name].mode == "symlink":
@@ -151,6 +160,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         if not sources.has_key(source_name):
                             sources[source_name] = Loc(source_name)
                             sources[source_name].action_key = Loc.A_SOURCE
+                            sources[source_name].is_optional = is_optional
                         sources[source_name].used_by_names.append(name)
                         target_sources.append(sources[source_name])
             targets[name].dep_locs = target_sources
@@ -177,7 +187,17 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         break
                 self.loc_handlers_manager.parse(source, conf_tree)
             except ValueError as e:
-                raise ConfigProcessError([key, "source"], source.name, e)
+                if source.is_optional:
+                    sources.pop(source.name)
+                    for name in source.used_by_names:
+                        targets[name].dep_locs.remove(source)
+                        event = SourceSkipEvent(name, source.name)
+                        self.handle_event(event)
+                    continue
+                else:
+                    raise ConfigProcessError(
+                            ["file:" + source.used_by_names[0], "source"],
+                            source.name)
             prev_source = loc_dao.select(source.name)
             source.is_out_of_date = (
                     not prev_source or
@@ -201,6 +221,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 target.is_out_of_date = (os.path.islink(target.name) or
                                          not os.path.isdir(target.name))
             else:
+                # See if target is modified compared with previous record
                 if (os.path.exists(target.name) and
                     not os.path.islink(target.name)):
                     for path, checksum in get_checksum(target.name):
@@ -219,6 +240,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         if prev_path != path:
                             target.is_out_of_date = True
                             break
+                # See if any sources out of date
                 if not target.is_out_of_date:
                     for dep_loc in target.dep_locs:
                         if dep_loc.is_out_of_date:
@@ -400,7 +422,26 @@ class FileOverwriteError(Exception):
 
 
 class Loc(object):
-    """Represent a location."""
+
+    """Represent a location.
+
+    A Loc object has the following attributes:
+    loc.name - The name of the location
+    loc.real_name - This loc is a symbolic link pointing to this value
+    loc.action_key - Either loc.A_SOURCE (a source) or loc.A_INSTALL (a target)
+    loc.scheme - The location scheme, e.g. "svn" for Subversion location
+    loc.dep_locs - A list of sources (Loc objects) of this target
+    loc.mode - Target installation mode, "auto", "symlink", "mkdir", etc
+    loc.loc_type - Either loc.TYPE_TREE (directory) or loc.TYPE_BLOB (file)
+    loc.paths - A list of sub-paths of this loc
+    loc.key - An key to indicate if this source is modified or not
+              (e.g. a SVN revision)
+    loc.cache - A cache for this source
+    loc.used_by_names - This source is used by this list of target names
+    loc.is_out_of_date - This loc is out of date
+    loc.is_optional - A boolean to indicate if a source is optional or not
+
+    """
 
     A_SOURCE = "source"
     A_INSTALL = "install"
@@ -421,6 +462,7 @@ class Loc(object):
         self.cache = None
         self.used_by_names = []
         self.is_out_of_date = None # boolean
+        self.is_optional = False
 
     def __str__(self):
         ret = self.name
@@ -637,3 +679,13 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         if loc.scheme is None:
             self.parse(loc, conf_tree)
         return self.get_handler(loc.scheme).pull(loc, conf_tree)
+
+
+class SourceSkipEvent(Event):
+
+    """Report skipping of a missing optional source."""
+
+    KIND = Event.KIND_ERR
+
+    def __str__(self):
+        return "file:%s: skip missing optional source: %s" % self.args
