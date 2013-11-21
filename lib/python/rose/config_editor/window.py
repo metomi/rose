@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -202,13 +202,13 @@ class MainWindow(object):
 
     def launch_ignore_dialog(self, name_section_dict, prefs, is_ignored):
         """Launch a dialog asking for a section name to ignore or enable.
-        
+
         name_section_dict is a dictionary containing config names
         as keys, and lists of available sections as values.
         prefs is in the same format, but indicates preferred values.
         is_ignored is a bool that controls whether this is an ignore
         section dialog or an enable section dialog.
-        
+
         """
         if is_ignored:
             dialog_title = rose.config_editor.DIALOG_TITLE_IGNORE
@@ -391,11 +391,11 @@ class MainWindow(object):
 
     def launch_remove_dialog(self, name_section_dict, prefs):
         """Launch a dialog asking for a section name to remove.
-        
+
         name_section_dict is a dictionary containing config names
         as keys, and lists of available sections as values.
         prefs is in the same format, but indicates preferred values.
-        
+
         """
         dialog_title = rose.config_editor.DIALOG_TITLE_REMOVE
         config_title = rose.config_editor.DIALOG_BODY_REMOVE_CONFIG
@@ -494,7 +494,7 @@ class MacroChangesDialog(gtk.Dialog):
         self.vbox.pack_end(hbox, expand=False, fill=True,
                              padding=rose.config_editor.SPACING_PAGE)
         self.set_focus(self.action_area.get_children()[0])
-        
+
     def display(self, changes):
         if not changes:
             # Shortcut, no changes.
@@ -531,7 +531,7 @@ class MacroChangesDialog(gtk.Dialog):
             item_mode = self.mode
             if item.is_warning:
                 item_mode = "warn"
-            item_att_list = [item.section, item.option, item_mode, 
+            item_att_list = [item.section, item.option, item_mode,
                              item.value, item.info]
             if item.section == last_section:
                 self.treemodel.append(last_section_iter, item_att_list)

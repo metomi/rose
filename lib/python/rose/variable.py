@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ REC_RANGE_NUM = re.compile(RE_CAPT_REAL + "$")
 REC_RANGE_SPLIT = re.compile('\s*(,)\s*')
 REC_RANGE_RANGE = re.compile(
         "(" + RE_REAL + "?)" + "\s*:\s*" +
-        "(" + RE_REAL + "?)" + 
+        "(" + RE_REAL + "?)" +
         "(?<!^:)$")  # Expression can't just be a colon.
 
 
@@ -97,13 +97,13 @@ class Variable(object):
             val_list = rose.variable.array_split(self.metadata['values'],
                                                  only_this_delim=",")
             self.metadata['values'] = val_list
-            
+
         if ('value-titles' in self.metadata and
             not isinstance(self.metadata['value-titles'], list)):
             # Replace this kind of thing with a proper metadata handler later.
             val_list = rose.variable.array_split(self.metadata['value-titles'])
             self.metadata['value-titles'] = val_list
-            
+
         return self.metadata
 
     def to_hashable(self):
@@ -184,7 +184,7 @@ def _scan_string(string, delim=','):
             item = ''
         else:
             item += letter
-    if (item != '' or 
+    if (item != '' or
         (letter == delim and not any(is_in_quotes.values()) and
          not was_escaped)):
         yield item
@@ -290,12 +290,12 @@ class CombinedRangeSubFunction(object):
 
     def __init__(self, *range_insts):
         self.range_insts = range_insts
-    
+
     def check(self, number):
         return all([r.check(number) for r in self.range_insts])
 
     def __repr__(self):
-        return ("<CombinedRangeSubFunction members:" + 
+        return ("<CombinedRangeSubFunction members:" +
                  ", ".join([repr(r) for r in self.range_insts]) + ">")
 
 
@@ -350,14 +350,14 @@ def parse_trigger_expression(expr):
 
 def parse_type_expression(expr):
     """Parse a string containing a variable type.
-    
+
     If the expression is a simple word such as integer or real, that
     is returned as is. Otherwise it is mapped to a list
     of types. For example:
-    
+
     'integer'       => 'integer'
     'integer, real' => ['integer', 'real']
-    
+
     """
     types = array_split(expr.strip(), only_this_delim=",")
     if len(types) == 1:
@@ -402,7 +402,7 @@ def _scan_trigger_string(string):
                     i += len(delim) - 1
                     is_letter_junk = True
                     break
-        is_escaped = (letter == esc_char and not is_escaped)      
+        is_escaped = (letter == esc_char and not is_escaped)
         if (letter == esc_char and is_escaped and
             not any(is_in_quotes.values()) and i + 1 < len(string)):
             for delim, token in delim_tokens.items():

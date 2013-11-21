@@ -201,7 +201,7 @@ considered experimental at this release.)
 files at the suite host. This should allow more powerful glob matching than
 what is provided by the Python standard library.
 
-\#850: rose config-edit: add and document custom page for aligning variable 
+\#850: rose config-edit: add and document custom page for aligning variable
 value elements.
 
 \#849: rose config-edit: added load all apps toolbar and menu item.
@@ -265,7 +265,7 @@ pruned.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-\#840: rose config-edit: improved metadata display for the UM STASH plugin 
+\#840: rose config-edit: improved metadata display for the UM STASH plugin
 widget.
 
 \#839: rose metadata: new 'python_list' type for use with interfaces that
@@ -350,7 +350,7 @@ now be used in either command. Note, however, if `rose task-env` is used before
 command. This may some minor change in behaviour of some existing suites as
 `PATH` would be modified by `rose task-env`.
 
-\#661: rose metadata-check: new command to validate configuration metadata. 
+\#661: rose metadata-check: new command to validate configuration metadata.
 Integrated into rose config-edit start-up checking.
 
 ### Other Changes
@@ -363,7 +363,7 @@ the home view.
 
 \#753: rose documentation: added advice for delivery of training courses.
 
-\#712: rose config-edit: can show variable descriptions and help in-page. 
+\#712: rose config-edit: can show variable descriptions and help in-page.
 Descriptions are shown by default. Customisable formatting.
 
 \#707: rosie site/user configuration: The `[rosie-browse]` section is now

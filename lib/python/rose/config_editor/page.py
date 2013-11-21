@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -191,7 +191,7 @@ class ConfigPage(gtk.VBox):
         style.ythickness = 0
         setattr(style, "inner-border", [0, 0, 0, 0] )
         close_button.modify_style(style)
-        
+
         label_box.pack_start(label_event_box, expand=False, fill=False,
                              padding=rose.config_editor.SPACING_SUB_PAGE)
         if not is_detached:
@@ -275,7 +275,7 @@ class ConfigPage(gtk.VBox):
             url_string = """<separator name="urlsep"/>
                              <menuitem action="Web_Help"/>"""
             ui_config_string_end = url_string + ui_config_string_end
-        
+
         uimanager = gtk.UIManager()
         actiongroup = gtk.ActionGroup('Popup')
         actiongroup.add_actions(actions)
@@ -394,7 +394,7 @@ class ConfigPage(gtk.VBox):
                 self.main_vpaned.remove(self.info_panel)
         elif has_content:
             self.main_vpaned.pack1(self.info_panel)
-        
+
     def generate_page_info(self, button_list=None, label_list=None):
         """Generate a widget giving information about sections."""
         info_container = gtk.VBox(homogeneous=False)
@@ -426,7 +426,7 @@ class ConfigPage(gtk.VBox):
             help_label_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
             help_label_window.show()
             width, height = help_label_window.size_request()
-            height = min([rose.config_editor.SIZE_WINDOW[1] / 3, 
+            height = min([rose.config_editor.SIZE_WINDOW[1] / 3,
                           help_label.size_request()[1]])
             help_label_window.set_size_request(width, height)
             help_hbox = gtk.HBox()
@@ -467,7 +467,7 @@ class ConfigPage(gtk.VBox):
             metadata_files.sort(lambda x, y: (widget_dir in y) -
                                              (widget_dir in x))
             prefix = re.sub("[^\w]", "_", self.config_name.strip("/"))
-            prefix += "/" + rose.META_DIR_WIDGET + "/"            
+            prefix += "/" + rose.META_DIR_WIDGET + "/"
             custom_widget = rose.config_editor.util.import_object(
                                         widget_path,
                                         metadata_files,
@@ -569,7 +569,7 @@ class ConfigPage(gtk.VBox):
         if 'Add blank' in add_ui:
             blank_item = uimanager.get_widget('/Popup/Add blank')
             if len(section_choices) > 1:
-                blank_item.connect("activate", 
+                blank_item.connect("activate",
                                    lambda b: self._launch_section_chooser(
                                                    section_choices))
             else:
@@ -616,8 +616,8 @@ class ConfigPage(gtk.VBox):
             else:
                 sect = section
             v_id = sect + '=null' + creation_time
-            variable = rose.variable.Variable('', '', 
-                                              {'id': v_id, 
+            variable = rose.variable.Variable('', '',
+                                              {'id': v_id,
                                                'full_ns': self.namespace})
             if section is None and self.section.ignored_reason:
                 # Cannot add to an ignored section.
@@ -759,7 +759,7 @@ class ConfigPage(gtk.VBox):
                     # Then it is an added ghost variable.
                     return self.handle_add_var_widget(variable)
                 # Then it has an existing variable widget.
-                if ((rose.META_PROP_TYPE in widget.errors) != 
+                if ((rose.META_PROP_TYPE in widget.errors) !=
                     (rose.META_PROP_TYPE in variable.error) and
                     hasattr(widget, "needs_type_error_refresh") and
                     not widget.needs_type_error_refresh()):
@@ -987,7 +987,7 @@ class ConfigPage(gtk.VBox):
                 old_variable.metadata = variable.metadata
                 if old_variable.value != variable.value:
                     # Reset the value.
-                    self.variable_ops.set_var_value(old_variable, 
+                    self.variable_ops.set_var_value(old_variable,
                                                     variable.value)
                 if old_variable.comments != variable.comments:
                     self.variable_ops.set_var_comments(old_variable,
@@ -1151,7 +1151,7 @@ class ConfigPage(gtk.VBox):
         elif (self.see_also == '' or
               rose.FILE_VAR_SOURCE not in self.see_also):
             # This adds an 'orphaned' warning, only if the section is enabled.
-            if (self.section is not None and 
+            if (self.section is not None and
                 self.section.name.startswith('namelist:')):
                 error_button = rose.gtk.util.CustomButton(
                       stock_id=gtk.STOCK_DIALOG_WARNING,

@@ -3,7 +3,7 @@
     # Begin Rose required event hook block
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
     # End Rose required event hook block
 [scheduling]
@@ -31,17 +31,17 @@
 
 [runtime]
     [[root]]
-        command scripting = "rose task-run -v"
-        pre-command scripting = "{{SLEEP}}"  # Slow down so we can see it run
+        command scripting = rose task-run -v
+        pre-command scripting = {{SLEEP}}  # Slow down so we can see it run
         [[[remote]]]
             host = {{ ROSE_ORIG_HOST }}
         # Begin Rose recommended event hook block
         [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook --mail"
-           execution timeout handler = "rose suite-hook --mail"
+           succeeded handler = rose suite-hook
+           failed handler = rose suite-hook --shutdown
+           submission failed handler = rose suite-hook --shutdown
+           submission timeout handler = rose suite-hook --mail
+           execution timeout handler = rose suite-hook --mail
            submission timeout = 1440 # 24 hours
            execution timeout  =  180 # 3 hours
         # End Rose recommended event hook block

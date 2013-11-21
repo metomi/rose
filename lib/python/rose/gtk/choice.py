@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ class ChoicesListView(gtk.TreeView):
             return False
         path, col, cell_x, cell_y = pathinfo
         iter_ = treeview.get_model().get_iter(path)
-        name = treeview.get_model().get_value(iter_, 0)  
+        name = treeview.get_model().get_value(iter_, 0)
         self._popup_menu(iter_, event)
         return False
 
@@ -145,24 +145,24 @@ class ChoicesListView(gtk.TreeView):
         model.connect_after("row-deleted", self._handle_reordering)
         self.set_model(model)
 
-    def _popup_menu(self, iter_, event): 
-        # Pop up a menu for the main list view. 
-        """Launch a popup menu for add/clone/remove.""" 
-        ui_config_string = """<ui> <popup name='Popup'> 
-                              <menuitem action="Remove"/> 
-                              </popup></ui>""" 
-        text = rose.config_editor.CHOICE_MENU_REMOVE 
-        actions = [("Remove", gtk.STOCK_DELETE, text)] 
-        uimanager = gtk.UIManager() 
-        actiongroup = gtk.ActionGroup('Popup') 
-        actiongroup.add_actions(actions) 
-        uimanager.insert_action_group(actiongroup, pos=0) 
-        uimanager.add_ui_from_string(ui_config_string) 
-        remove_item = uimanager.get_widget('/Popup/Remove') 
-        remove_item.connect("activate", 
-                            lambda b: self._remove_iter(iter_)) 
-        menu = uimanager.get_widget('/Popup') 
-        menu.popup(None, None, None, event.button, event.time) 
+    def _popup_menu(self, iter_, event):
+        # Pop up a menu for the main list view.
+        """Launch a popup menu for add/clone/remove."""
+        ui_config_string = """<ui> <popup name='Popup'>
+                              <menuitem action="Remove"/>
+                              </popup></ui>"""
+        text = rose.config_editor.CHOICE_MENU_REMOVE
+        actions = [("Remove", gtk.STOCK_DELETE, text)]
+        uimanager = gtk.UIManager()
+        actiongroup = gtk.ActionGroup('Popup')
+        actiongroup.add_actions(actions)
+        uimanager.insert_action_group(actiongroup, pos=0)
+        uimanager.add_ui_from_string(ui_config_string)
+        remove_item = uimanager.get_widget('/Popup/Remove')
+        remove_item.connect("activate",
+                            lambda b: self._remove_iter(iter_))
+        menu = uimanager.get_widget('/Popup')
+        menu.popup(None, None, None, event.button, event.time)
         return False
 
     def _remove_iter(self, iter_):
@@ -317,7 +317,7 @@ class ChoicesTreeView(gtk.TreeView):
             cell.set_property("sensitive", True)
             if not self._check_can_add(r_iter):
                 cell.set_property("sensitive", False)
- 
+
     def _handle_drag_begin(self, widget, drag):
         self._is_dragging = True
 
@@ -361,7 +361,7 @@ class ChoicesTreeView(gtk.TreeView):
 
     def _handle_cell_toggle(self, cell, path, should_turn_off=None):
         """Change the content variable value here.
-        
+
         cell is not used.
         path is the name to turn off or on.
         should_turn_off is as follows:
@@ -398,7 +398,7 @@ class ChoicesTreeView(gtk.TreeView):
 
     def _toggle_internal_base(self, base_iter, base_name, added=False):
         """Connect a toggle of a group to its children.
-        
+
         base_iter is the iter pointing to the group
         base_name is the name of the group
         added is a boolean denoting toggle state

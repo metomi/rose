@@ -193,7 +193,7 @@ def local_suites(argv):
         try:
             results, id_list = get_local_suite_details(opts.prefix,
                                                        user=opts.user)
-            return _display_maps(opts, ws_client, 
+            return _display_maps(opts, ws_client,
                                  results, local_suites=id_list)
         except QueryError:
             sys.exit("Error querying details of local suites")
@@ -212,7 +212,7 @@ def local_suites(argv):
                         if id_.prefix == p:
                             suites_this_prefix.append(id_)
 
-                results, other_id_list = get_local_suite_details(p, id_list, 
+                results, other_id_list = get_local_suite_details(p, id_list,
                                                                 user=opts.user)
                 opts.prefix = p
                 _display_maps(opts, ws_client, results,
@@ -298,12 +298,12 @@ def query_split(args):
 def get_local_suites(prefix=None, skip_status=False, user=None):
     """Returns a dict of prefixes and id tuples for locally-present suites."""
     local_copies = []
-    
+
     if user:
         local_copy_root = os.path.expanduser(user) + "/roses"
     else:
         local_copy_root = SuiteId.get_local_copy_root()
-    
+
     if not os.path.isdir(local_copy_root):
         return local_copies
     for path in os.listdir(local_copy_root):

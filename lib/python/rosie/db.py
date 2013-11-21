@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -91,9 +91,9 @@ class DAO(object):
 
     def _get_join_and_columns(self):
         """Create the main join.
-        
+
         Return the joined tables and the normal columns to return.
-        
+
         """
         main_cols = list(self.tables["main"].c)
         change_select_cols = []
@@ -169,12 +169,12 @@ class DAO(object):
             o_clause = (propss.c.idx == change.c.idx)
             o_clause &= (propss.c.branch == change.c.branch)
             o_clause &= (propss.c.revision <= change.c.revision)
-            
+
             my_full_sel = change.join(propss, onclause=o_clause)
             # We've now joined all past values of name to a revision row.
-            
+
             props_name_col = _col_by_key(propss, name)
-            
+
             full_columns = list(change.c)
             # We want only the most recent value for name - take max(revision)
             full_columns += [al.func.max(propss.c.revision).label("maxrev")]
@@ -188,13 +188,13 @@ class DAO(object):
             ch_columns = [c for c in full_sel.c if c.key != "maxrev"]
             change = al.sql.select(columns=ch_columns, from_obj=full_sel)
             change = change.alias("change_" + names[i + 1])
-        
-        for name in names[:-1]:  
+
+        for name in names[:-1]:
             if non_main_clause is None:
                 non_main_clause = mo_table.c.name != name
             else:
                 non_main_clause &= mo_table.c.name != name
-        
+
         # Now we need the 'optional' property information e.g. access-list.
         # This is nearly the same as the above loop logic but grouped by name.
         propss = al.sql.select(
@@ -207,9 +207,9 @@ class DAO(object):
         o_clause = (propss.c.idx == change.c.idx)
         o_clause &= (propss.c.branch == change.c.branch)
         o_clause &= (propss.c.revision <= change.c.revision)
-        
+
         my_full_sel = change.join(propss, onclause=o_clause)
-        
+
         full_columns = list(change.c)
         full_columns += [al.func.max(propss.c.revision).label("maxrev")]
         full_columns += [propss.c.name, propss.c.value]
@@ -298,7 +298,7 @@ class DAO(object):
          ('or', 'description', 'eq', 'happy', ')')]
         will return all suites that have an idx that starts with 'aba'
         and the property 'description' set to 'shiny' or 'happy'.
-        
+
         The logic for joining in the tuples together is based on the
         order in which they are given - e.g. [A, B, C] -> (A & B) & C
         This will be overridden by any bracketed groups.
@@ -355,7 +355,7 @@ class DAO(object):
         """Construct a complex logical expression containing "(", and, etc."""
         levels = [[[]]]
         level = 0
-        for i, item in enumerate(items):       
+        for i, item in enumerate(items):
             if item == "(":
                 level += 1
                 if level > len(levels) - 1:
@@ -428,7 +428,7 @@ class DAO(object):
 
     def search(self, s, all_revs=False):
         """Search database for rows with values matching the words in "s".
-        
+
         If all_revs is True, matching deleted suites and old revisions
         of suites will be returned.
         If all_revs is False, they won't be.

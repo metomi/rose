@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -109,10 +109,10 @@ class FileSystemUtil(object):
 
     def dirname(self, path):
         """Wrap os.path.dirname.
-        
+
         Unlike os.path.dirname, return "." instead of an empty string if result is
         the current working directory.
- 
+
         """
 
         d = os.path.dirname(path)
@@ -155,7 +155,7 @@ class FileSystemUtil(object):
 
     def symlink(self, source, target, no_overwrite_mode=False):
         """Wrap os.symlink.
-        
+
         Create directory of target if it does not exist.
         If no_overwrite_mode is not specified or not True, remove target if it
         is not a symbolic link pointing to source.

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -251,7 +251,7 @@ class RosieVCClient(object):
 
     def delete(self, id, local_only=False):
         """Delete the local copy and the origin of a suite.
-        
+
         It takes the suite ID as an argument.
         Return the SuiteId of the suite on success.
 
@@ -267,7 +267,7 @@ class RosieVCClient(object):
             if os.getcwd() == local_copy:
                 self.fs_util.chdir(os.path.expanduser("~"))
             self.fs_util.delete(local_copy)
-        if not local_only:    
+        if not local_only:
             self.popen("svn", "delete",
                        "-q", "-m", "%s: deleted." % str(id),
                        id.to_origin())
@@ -468,7 +468,7 @@ def delete(argv):
                 continue
         if opts.debug_mode:
             client.delete(arg, opts.local_only)
-        else:    
+        else:
             try:
                 client.delete(arg, opts.local_only)
             except (LocalCopyStatusError, RosePopenError,

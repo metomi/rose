@@ -103,7 +103,7 @@
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Task-based Example Suite</h3>
 
@@ -111,7 +111,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     initial cycle time = 2013010100
@@ -143,7 +143,7 @@
 [runtime]
     [[root]]
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
+            succeeded handler = rose suite-hook
     [[print_colour]]
         command scripting = """
             sleep 4

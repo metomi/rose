@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -509,7 +509,7 @@ class MainMenuHandler(object):
                 break
         return optionals
 
-    def check_entry_value(self, entry_widget, dialog, entries, 
+    def check_entry_value(self, entry_widget, dialog, entries,
                           labels, optionals):
         is_valid = True
         for k, entry in entries.items():
@@ -564,9 +564,9 @@ class MainMenuHandler(object):
                 entry.set_text("'" + v + "'")
             else:
                 entry.set_text(str(v))
-            entry.connect("changed", self.check_entry_value, dialog, 
+            entry.connect("changed", self.check_entry_value, dialog,
                           entries, labels, optionals)
-            entry.connect("activate", self.handle_macro_entry_activate, 
+            entry.connect("activate", self.handle_macro_entry_activate,
                           dialog, entries)
             entries[k] = entry
             labels[k] = label
@@ -576,7 +576,7 @@ class MainMenuHandler(object):
             table.attach(hbox, 0, 1, i, i+1)
         dialog.show_all()
         response = dialog.run()
-        if (response == gtk.RESPONSE_CANCEL or 
+        if (response == gtk.RESPONSE_CANCEL or
             response == gtk.RESPONSE_CLOSE):
             res = optionals
             dialog.destroy()
@@ -744,11 +744,11 @@ class MainMenuHandler(object):
                                 macro_config, change_list, no_display=False,
                                 triggers_ok=False):
         """Calculate needed changes and apply them if prompted to.
-        
+
         At the moment trigger-ignore of variables and sections is
         assumed to be the exclusive property of the Rose trigger
         macro and is not allowed for any other macro.
-        
+
         """
         if not change_list:
             self._report_macro_transform(config_name, macro_name, 0)
@@ -950,7 +950,7 @@ class MainMenuHandler(object):
                           rose.gtk.dialog.DIALOG_TYPE_ERROR,
                           msg,
                           rose.config_editor.DIALOG_TITLE_UNREGISTERED_SUITE)
-        
+
     def launch_terminal(self):
         # Handle a launch terminal request.
         try:

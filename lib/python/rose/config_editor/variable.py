@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -186,7 +186,7 @@ class VariableWidget(object):
                                 variable.value, variable.metadata,
                                 variable.error)
             self.valuewidget = widget_maker(variable.value,
-                                            metadata, set_value, 
+                                            metadata, set_value,
                                             hook_object)
         for child in self.valuewidget.get_children():
             child.connect('focus-in-event', self.handle_focus_in)
@@ -327,7 +327,7 @@ class VariableWidget(object):
     def set_show_mode(self, show_mode, should_show_mode):
         """Sets or unsets special displays for a variable."""
         self.keywidget.set_show_mode(show_mode, should_show_mode)
-        
+
     def set_ignored(self):
         """Sets or unsets a custom ignored state for the widgets."""
         ign_map = self.variable.ignored_reason

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ def get_allowed_metadata_properties():
     return properties
 
 
-def _check_compulsory(value):   
+def _check_compulsory(value):
     allowed_values = [rose.META_PROP_VALUE_TRUE,
                       rose.META_PROP_VALUE_FALSE]
     if value not in allowed_values:
@@ -213,7 +213,7 @@ def _get_module_files(meta_dir=None):
                                           os.path.join(dirpath, filename))
                         module_files.append(abs_filename)
     return module_files
-    
+
 
 def metadata_check(meta_config, meta_dir=None,
                    only_these_sections=None,

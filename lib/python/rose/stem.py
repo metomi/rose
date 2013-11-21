@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -37,9 +37,9 @@ SUITE_RC_PREFIX = '[jinja2:suite.rc]'
 class ConfigVariableSetEvent(Event):
 
    """Event to report a particular variable has been set."""
-   
+
    LEVEL = Event.V
-   
+
    def __repr__(self):
        return "Variable %s set to %s"%(self.args[0], self.args[1])
 
@@ -49,9 +49,9 @@ class ConfigVariableSetEvent(Event):
 class ConfigSourceTreeSetEvent(Event):
 
    """Event to report a source tree for config files."""
-   
+
    LEVEL = Event.V
-   
+
    def __repr__(self):
        return "Using config files from source %s"%(self.args[0])
 
@@ -69,10 +69,10 @@ class ProjectNotFoundException(Exception):
     def __repr__(self):
         if self.error is not None:
             return "Cannot ascertain project for source tree %s:\n%s"%(
-                      self.source, self.error) 
-        else:        
+                      self.source, self.error)
+        else:
             return "Cannot ascertain project for source tree %s"%(
-                    self.source) 
+                    self.source)
 
     __str__ = __repr__
 
@@ -98,9 +98,9 @@ class RoseSuiteConfNotFoundException(Exception):
 class SourceTreeAddedAsBranchEvent(Event):
 
    """Event to report a source tree has been added as a branch."""
-   
+
    LEVEL = Event.DEFAULT
-   
+
    def __repr__(self):
        return "Source tree %s added as branch"%(self.args[0])
 
@@ -110,9 +110,9 @@ class SourceTreeAddedAsBranchEvent(Event):
 class SourceTreeAddedAsTrunkEvent(Event):
 
    """Event to report a source tree has been added as a trunk."""
-   
+
    LEVEL = Event.DEFAULT
-   
+
    def __repr__(self):
        return "Source tree %s added as trunk"%(self.args[0])
 
@@ -122,9 +122,9 @@ class SourceTreeAddedAsTrunkEvent(Event):
 class SuiteSelectionEvent(Event):
 
    """Event to report a source tree for config files."""
-   
+
    LEVEL = Event.DEFAULT
-   
+
    def __repr__(self):
        return "Will run suite from %s"%(self.args[0])
 
@@ -152,10 +152,10 @@ class StemRunner(object):
 
     def _add_define_option(self, var, val):
         """Add a define option passed to the SuiteRunner."""
-        
+
         if self.opts.defines:
             self.opts.defines.append(SUITE_RC_PREFIX + var + '=' + val )
-        else: 
+        else:
             self.opts.defines= [ SUITE_RC_PREFIX + var + '=' + val ]
         self.reporter(ConfigVariableSetEvent(var, val))
         return
@@ -175,9 +175,9 @@ class StemRunner(object):
         rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
         if rc != 0:
             raise ProjectNotFoundException(item, stderr)
-        result = re.search(r'url:\s*(file|svn|https|http|svn\+ssh)(://.*)', 
+        result = re.search(r'url:\s*(file|svn|https|http|svn\+ssh)(://.*)',
                            output)
-        
+
         # Generate a unique name for this project based on fcm kp
         if result:
             urlstring = result.group(1) + result.group(2)
@@ -208,9 +208,9 @@ class StemRunner(object):
                 subtree = result2.group(1)
                 item = re.sub(subtree, r'', target)
 
-        # Remove trailing forwards-slash    
-        item = re.sub(r'/$',r'',item)    
-        return project, item, base, revision                    
+        # Remove trailing forwards-slash
+        item = re.sub(r'/$',r'',item)
+        return project, item, base, revision
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
@@ -222,12 +222,12 @@ class StemRunner(object):
         """Find the location of the suite in the first source tree."""
 
         # Get base of first source
-        basedir = ''        
+        basedir = ''
         if self.opts.source:
             basedir = self.opts.source[0]
         else:
             dummy, basedir, dum2, dum3 = self._ascertain_project(os.getcwd())
-            
+
         suitedir = os.path.join(basedir, DEFAULT_TEST_DIR)
         suitefile = os.path.join(suitedir, "rose-suite.conf")
 
@@ -261,7 +261,7 @@ class StemRunner(object):
         # Add configs source variables for first
         confsource = self.opts.source[0]
         confproject, url, base, rev = self._ascertain_project(confsource)
-        self._add_define_option('SOURCE_' + confproject.upper() + '_REV', '"' 
+        self._add_define_option('SOURCE_' + confproject.upper() + '_REV', '"'
                                 + rev + '"')
         self._add_define_option('SOURCE_' + confproject.upper() + '_BASE', '"'
                                 + base + '"')
@@ -270,7 +270,7 @@ class StemRunner(object):
         if self.opts.group:
             if not self.opts.defines:
                 self.opts.defines = []
-            self.opts.defines.append(SUITE_RC_PREFIX + 'RUN_NAMES=' + 
+            self.opts.defines.append(SUITE_RC_PREFIX + 'RUN_NAMES=' +
                                      str(self.opts.group))
 
         # Change into the suite directory
@@ -285,8 +285,8 @@ class StemRunner(object):
 
         # Create a default name for the suite; allow override by user
         if not self.opts.name:
-            self.opts.name = self._generate_name() 
-            
+            self.opts.name = self._generate_name()
+
         return self.opts
 
 
@@ -313,7 +313,7 @@ def main():
 
 
     # Get the suiterunner object and execute
-    runner = SuiteRunner(event_handler=stem.reporter, 
+    runner = SuiteRunner(event_handler=stem.reporter,
                          popen=stem.popen,
                          fs_util=stem.fs_util)
     if opts.debug_mode:

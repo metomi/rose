@@ -22,7 +22,7 @@
 import os
 from rose.checksum import get_checksum
 import socket
-from tempfile import TemporaryFile 
+from tempfile import TemporaryFile
 
 class RsyncLocHandler(object):
     """Handler of locations on remote hosts."""

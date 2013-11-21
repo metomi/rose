@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ class NavPanelHandler(object):
             help_str = None
             config_name = None
         choices_help = self.data.helper.get_missing_sections(config_name)
-        
+
         config_names = [n for n in self.data.config if not self.ask_is_preview(n)]
         config_names.sort(lambda x, y: (y == config_name) -(x == config_name))
         config_name, section = self.mainwindow.launch_add_dialog(
@@ -86,14 +86,14 @@ class NavPanelHandler(object):
 
     def ask_is_preview(self, base_ns):
         namespace = "/" + base_ns.lstrip("/")
-        try:        
+        try:
             config_name = self.util.split_full_ns(self.data, namespace)[0]
             config_data = self.data.config[config_name]
             return config_data.is_preview
         except KeyError:
             print config_name
             return False
-        
+
     def copy_request(self, base_ns, new_section=None, skip_update=False):
         """Handle a copy request for a section and its options."""
         namespace = "/" + base_ns.lstrip("/")
@@ -259,7 +259,7 @@ class NavPanelHandler(object):
             ns = sect_data.metadata["full_ns"]
             variable_sorter = lambda v, w: rose.config.sort_settings(
                                                         v.metadata['id'],
-                                                        w.metadata['id']) 
+                                                        w.metadata['id'])
             variables = list(config_data.vars.now.get(section, []))
             variables.sort(variable_sorter)
             variables.reverse()
@@ -280,7 +280,7 @@ class NavPanelHandler(object):
             namespace = None
         else:
             namespace = "/" + base_ns.lstrip("/")
-                   
+
         ui_config_string = """<ui> <popup name='Popup'>"""
         actions = [('New', gtk.STOCK_NEW,
                     rose.config_editor.TREE_PANEL_NEW_CONFIG),

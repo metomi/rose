@@ -292,7 +292,7 @@ class Analyse(object):
             newtask.comparison = self.config.get_value([task, "comparison"])
             newtask.tolerance = self.config.get_value([task, "tolerance"])
             newtask.warnonfail = (
-                    self.config.get_value([task, "warnonfail"]) in 
+                    self.config.get_value([task, "warnonfail"]) in
                     ["yes", "true"])
 
             # Allow for multiple KGO, e.g. kgo1file, kgo2file, for

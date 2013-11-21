@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ DIALOG_TYPE_WARNING = gtk.MESSAGE_WARNING
 class DialogProcess(object):
 
     """Run a forked process and display a dialog while it runs.
-    
+
     cmd_args can either be a list of shell command components
     e.g. ['sleep', '100'] or a list containing a python function
     followed by any function arguments e.g. [func, '100'].
@@ -345,7 +345,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
                             lambda b:run_scrolled_dialog(
                                          extra_text,
                                          title=info_title))
-        dialog.action_area.pack_start(info_button, expand=False, fill=False)                                   
+        dialog.action_area.pack_start(info_button, expand=False, fill=False)
     ok_button = dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
     if dialog_type == gtk.MESSAGE_INFO:
         stock_id = gtk.STOCK_DIALOG_INFO
@@ -358,10 +358,10 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     else:
         stock_id = None
 
-    if stock_id is not None: 
+    if stock_id is not None:
         dialog.image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_DIALOG)
         dialog.image.show()
-    
+
     dialog.label = gtk.Label(text)
     try:
         pango.parse_markup(text)
@@ -374,7 +374,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
         dialog.label.set_markup(text)
     dialog.label.show()
     hbox = gtk.HBox()
-    
+
     if stock_id is not None:
         image_vbox = gtk.VBox()
         image_vbox.pack_start(dialog.image, expand=False, fill=False,
@@ -382,9 +382,9 @@ def run_dialog(dialog_type, text, title=None, modal=True,
         image_vbox.show()
         hbox.pack_start(image_vbox, expand=False, fill=False,
                         padding=rose.config_editor.SPACING_PAGE)
-                        
+
     scrolled_window = gtk.ScrolledWindow()
-    scrolled_window.set_border_width(0)  
+    scrolled_window.set_border_width(0)
     scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
     vbox = gtk.VBox()
     vbox.pack_start(dialog.label, expand=True, fill=True)
@@ -396,20 +396,20 @@ def run_dialog(dialog_type, text, title=None, modal=True,
                     padding=rose.config_editor.SPACING_PAGE)
     hbox.show()
     dialog.vbox.pack_end(hbox, expand=True, fill=True)
-    
+
     if "\n" in text:
         dialog.label.set_line_wrap(False)
     dialog.set_resizable(True)
     dialog.set_modal(modal)
     if title is not None:
         dialog.set_title(title)
-    
+
     #ensure the dialog size does not exceed the maximum allowed
     max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
     my_size = dialog.size_request()
     new_size = [-1, -1]
     for i in [0, 1]:
-        new_size[i] = min([my_size[i], max_size[i]])        
+        new_size[i] = min([my_size[i], max_size[i]])
     scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     dialog.set_default_size(*new_size)
     ok_button.grab_focus()
@@ -444,18 +444,18 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     image.show()
     image_vbox.pack_start(image, expand=False, fill=False,
                           padding=DIALOG_PADDING)
-    main_hbox.pack_start(image_vbox, expand=False, fill=False, 
+    main_hbox.pack_start(image_vbox, expand=False, fill=False,
                          padding=DIALOG_PADDING)
     # Apply the text
     message_vbox = gtk.VBox()
     message_vbox.show()
-    label = rose.gtk.util.get_hyperlink_label(text, search_func)   
+    label = rose.gtk.util.get_hyperlink_label(text, search_func)
     message_vbox.pack_start(label, expand=True, fill=True,
                             padding=DIALOG_PADDING)
     scrolled_window = gtk.ScrolledWindow()
-    scrolled_window.set_border_width(DIALOG_PADDING)  
+    scrolled_window.set_border_width(DIALOG_PADDING)
     scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
-    scrolled_window.add_with_viewport(message_vbox)                        
+    scrolled_window.add_with_viewport(message_vbox)
     scrolled_window.child.set_shadow_type(gtk.SHADOW_NONE)
     scrolled_window.show()
     vbox = gtk.VBox()
@@ -484,8 +484,8 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     new_size = [-1, -1]
     for i in [0, 1]:
         new_size[i] = min([my_size[i], max_size[i]])
-    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)        
-    dialog.set_default_size(*new_size)    
+    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    dialog.set_default_size(*new_size)
     dialog.show()
     label.set_selectable(True)
     button.grab_focus()
@@ -627,7 +627,7 @@ def run_choices_dialog(text, choices, title=None):
                                            label=choice,
                                            use_underline=False)
             dialog.vbox.pack_start(radio_button, expand=False, fill=False)
-        getter = (lambda: 
+        getter = (lambda:
                   [b.get_label() for b in radio_button.get_group()
                    if b.get_active()].pop())
     else:
@@ -658,7 +658,7 @@ def run_edit_dialog(text, finish_hook=None, title=None):
     dialog.set_border_width(DIALOG_SUB_PADDING)
 
     scrolled_window = gtk.ScrolledWindow()
-    scrolled_window.set_border_width(DIALOG_SUB_PADDING)  
+    scrolled_window.set_border_width(DIALOG_SUB_PADDING)
     scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
 
     text_buffer = gtk.TextBuffer()
@@ -668,7 +668,7 @@ def run_edit_dialog(text, finish_hook=None, title=None):
     text_view.set_wrap_mode(gtk.WRAP_NONE)
     text_view.set_buffer(text_buffer)
     text_view.show()
-    
+
     scrolled_window.add_with_viewport(text_view)
     scrolled_window.show()
 
@@ -684,7 +684,7 @@ def run_edit_dialog(text, finish_hook=None, title=None):
     #hacky solution to get "true" size for dialog
     dialog.show()
     start_size = dialog.size_request()
-    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)  
+    scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     end_size = dialog.size_request()
     my_size = (max([start_size[0], end_size[0], min_size[0]])+20,
                max([start_size[1], end_size[1], min_size[1]])+20)

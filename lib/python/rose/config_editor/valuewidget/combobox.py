@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ class ComboBoxValueWidget(gtk.HBox):
         comboboxentry.pack_start(cell)
         comboboxentry.set_wrap_width(self.MAX_COLS)
         comboboxentry.add_attribute(cell, 'text', 0)
-        
+
         var_values = self.metadata[rose.META_PROP_VALUES]
         var_titles = self.metadata.get(rose.META_PROP_VALUE_TITLES)
         for k, entry in enumerate(var_values):

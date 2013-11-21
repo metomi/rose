@@ -57,7 +57,7 @@
 #         Sort results by the field FIELD instead of revision.
 #
 #     --user=~USERNAME; -u ~USERNAME
-#         Specify another user whose roses directory you want to list 
+#         Specify another user whose roses directory you want to list
 #         e.g. --user=~bob
 #
 #     --verbose; -v

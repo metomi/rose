@@ -237,7 +237,7 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]                     # Scheduling section
     [[dependencies]]             # Dependencies sub-section
-        graph = "my_task"        # Graph Setting, option = value
+        graph = my_task          # Graph Setting, option = value
 [runtime]                        # Runtime Section
     [[my_task]]                  # User-specified task sub-section
         [[[environment]]]        # Environment sub-sub-section
@@ -253,10 +253,10 @@
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "hello_world"
+        graph = hello_world
 [runtime]
     [[hello_world]]
-        command scripting = "echo 'Hello World'"
+        command scripting = echo 'Hello World'
 </pre>
 
       <p>This will run a cylc task called <samp>hello_world</samp> that prints
@@ -274,10 +274,10 @@ touch $TMPDIR/simplesuite/rose-suite.conf  # Rose needs a rose-suite.conf
 cat &gt;$TMPDIR/simplesuite/suite.rc &lt;&lt;__SUITE_RC__
 [scheduling]
     [[dependencies]]
-        graph = "hello_world"
+        graph = hello_world
 [runtime]
     [[hello_world]]
-        command scripting = "echo 'Hello World'"
+        command scripting = echo 'Hello World'
 __SUITE_RC__
 rose suite-run -C $TMPDIR/simplesuite   # Run the suite!
 </pre>
@@ -318,7 +318,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[hello_world]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
 </pre>
 
       <p><code>rose task-run</code> uses environment variables passed in by
@@ -336,7 +336,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
     [[hello_world]]
 </pre>
 
@@ -375,7 +375,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
     [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false # Shared env variable
@@ -393,7 +393,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
     [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false  # Shared env variable
@@ -426,7 +426,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
     [[HELLO_FAMILY]]
         [[[environment]]]
             IS_WORLD_A_PLANET = false  # Shared env variable
@@ -454,7 +454,7 @@ default=echo 'Hello World'
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "hello_pluto =&gt; hello_eris"
+        graph = hello_pluto =&gt; hello_eris
 </pre>
     </div>
 
@@ -468,7 +468,7 @@ default=echo 'Hello World'
     final cycle time = 2013010600    # 00:00, 6/1/2013
     [[dependencies]]
         [[[0, 12]]]  # run each day at 00:00 and 12:00
-            graph = "hello_pluto =&gt; hello_eris"
+            graph = hello_pluto =&gt; hello_eris
 </pre>
     </div>
 
@@ -661,7 +661,7 @@ type=boolean
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 </pre>
     </div>
@@ -683,12 +683,12 @@ type=boolean
 [runtime]
     [[root]]
         [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
-           retry handler = "rose suite-hook --mail"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook --mail"
-           execution timeout handler = "rose suite-hook --mail"
+           succeeded handler = rose suite-hook
+           failed handler = rose suite-hook --shutdown
+           retry handler = rose suite-hook --mail
+           submission failed handler = rose suite-hook --shutdown
+           submission timeout handler = rose suite-hook --mail
+           execution timeout handler = rose suite-hook --mail
            submission timeout = 1440 # 24 hours
            execution timeout  =  180 # 3 hours
 </pre>
@@ -726,7 +726,7 @@ type=boolean
             job_type         = serial
             notification     = error
             resources        = ConsumableMemory(5000)
-            wall_clock_limit = '1260,1200'
+            wall_clock_limit = 1260,1200
 </pre>
     </div>
 
@@ -761,7 +761,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a"
+        graph = a
 </pre>
     </div>
 
@@ -772,7 +772,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a =&gt; b"
+        graph = a =&gt; b
 </pre>
 
       <p>If task <var>c</var> depends on both task <var>a</var> <em>and</em>
@@ -780,7 +780,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a &amp; b =&gt; c"
+        graph = a &amp; b =&gt; c
 </pre>
     </div>
 
@@ -792,7 +792,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a | b =&gt; c"
+        graph = a | b =&gt; c
 </pre>
 
       <p>If <em>both</em> task <var>b</var> <em>and</em> task <var>c</var>
@@ -800,7 +800,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a =&gt; b &amp; c"
+        graph = a =&gt; b &amp; c
 </pre>
     </div>
 
@@ -812,14 +812,14 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a:fail =&gt; b"
+        graph = a:fail =&gt; b
 </pre>
 
       <p>If task <var>b</var> runs after task <var>a</var> <em>starts</em>:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a:start =&gt; b"
+        graph = a:start =&gt; b
 </pre>
     </div>
 
@@ -832,7 +832,7 @@ type=boolean
 [scheduling]
     [[dependencies]]
         [[[0, 6, 12, 18]]]
-            graph = "a[T-6] =&gt; a"
+            graph = a[T-6] =&gt; a
 </pre>
 
       <p>If task <var>b</var> depends on the previous cycle's task <var>a</var>
@@ -841,7 +841,7 @@ type=boolean
 [scheduling]
     [[dependencies]]
         [[[0, 6, 12, 18]]]
-            graph = "a[T-6]:fail =&gt; b"
+            graph = a[T-6]:fail =&gt; b
 </pre>
     </div>
 
@@ -853,7 +853,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a &amp; ( b | c ) =&gt; d"
+        graph = a &amp; ( b | c ) =&gt; d
 </pre>
     </div>
 
@@ -865,7 +865,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "a =&gt; !b"
+        graph = a =&gt; !b
 </pre>
 
       <p>Typically, <var>b</var> would be a failure recovery task that should
@@ -897,7 +897,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "FAMILY_A:succeed-any =&gt; b"
+        graph = FAMILY_A:succeed-any =&gt; b
 </pre>
 
       <p>If task <var>b</var> should run when all tasks in the
@@ -906,7 +906,7 @@ type=boolean
       <pre class="prettyprint lang-cylc">
 [scheduling]
     [[dependencies]]
-        graph = "FAMILY_A:finish-all =&gt; b"
+        graph = FAMILY_A:finish-all =&gt; b
 </pre>
     </div>
 

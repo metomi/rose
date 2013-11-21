@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -260,7 +260,7 @@ class PythonListValueWidget(gtk.HBox):
         num_fields = len(self.entries + [self.button_box])
         num_rows_now = 1 + (num_fields - 1) / self.num_allowed_columns
         self.entry_table.resize(num_rows_now, self.num_allowed_columns)
-        if (self.max_length.isdigit() and 
+        if (self.max_length.isdigit() and
             len(self.entries) >= int(self.max_length)):
             self.add_button.hide()
         else:
@@ -280,7 +280,7 @@ class PythonListValueWidget(gtk.HBox):
             elif index == len(self.entries) - 1:
                 self.set_arrow_sensitive(True, False)
         if len(self.entries) < 2:
-            self.set_arrow_sensitive(False, False)      
+            self.set_arrow_sensitive(False, False)
         for i, widget in enumerate(table_widgets):
             if isinstance(widget, gtk.Entry):
                 widget.set_tooltip_text(self.TIP_ELEMENT.format((i + 1)))

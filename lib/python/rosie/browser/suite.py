@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class SuiteDirector():
         self.last_vc_event = ""
         self.event_logged = False
         self.vc_client = RosieVCClient(event_handler=event_handler)
-        
+
     def checkout(self, *args, **kwargs):
         """Check out a suite."""
         id_ = kwargs.get("id_")
@@ -46,10 +46,10 @@ class SuiteDirector():
         rc = rose.gtk.dialog.DialogProcess(
                       [self.vc_client.checkout, id_],
                       description=rosie.browser.DIALOG_MESSAGE_CHECKOUT.format(
-                                                id_text), 
+                                                id_text),
                       title=rosie.browser.DIALOG_TITLE_CHECKOUT).run()
         if rc != 0:
-            return False    
+            return False
 
     def delete(self, to_delete, *args):
         """"Handles deletion of a suite."""
@@ -68,16 +68,16 @@ class SuiteDirector():
             try:
                 self.vc_client.delete(to_delete)
             except rose.popen.RosePopenError as e:
-                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR, 
+                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            rosie.browser.ERROR_PERMISSIONS +
                                            "\n\n" + str(e))
             except rosie.vc.LocalCopyStatusError as e:
                  rose.gtk.dialog.run_dialog(
-                          rose.gtk.dialog.DIALOG_TYPE_ERROR, 
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
                           rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
-                          "\n\n" + str(e))               
+                          "\n\n" + str(e))
             return True
-        
+
         return False
 
     def delete_local(self, sid, *args):
@@ -96,16 +96,16 @@ class SuiteDirector():
             try:
                 self.vc_client.delete(sid, True)
             except rose.popen.RosePopenError as e:
-                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR, 
+                rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            rosie.browser.ERROR_PERMISSIONS +
                                            "\n\n" + str(e))
             except rosie.vc.LocalCopyStatusError as e:
                  rose.gtk.dialog.run_dialog(
-                          rose.gtk.dialog.DIALOG_TYPE_ERROR, 
+                          rose.gtk.dialog.DIALOG_TYPE_ERROR,
                           rosie.browser.ERROR_MODIFIED_LOCAL_COPY_DELETE +
-                          "\n\n" + str(e))               
+                          "\n\n" + str(e))
             return True
-        
+
         return False
 
     def _edit_config(self, config, window, back_function, finish_function):

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -39,12 +39,12 @@ class RadioButtonsValueWidget(gtk.HBox):
 
         var_values = metadata[rose.META_PROP_VALUES]
         var_titles = metadata.get(rose.META_PROP_VALUE_TITLES)
-        
+
         if var_titles:
             vbox = gtk.VBox()
             self.pack_start(vbox)
             vbox.show()
-        
+
         for k, item in enumerate(var_values):
             button_label = str(item)
             if var_titles is not None and var_titles[k]:
@@ -67,7 +67,7 @@ class RadioButtonsValueWidget(gtk.HBox):
             radio_button.connect('toggled', self.setter)
             radio_button.connect('button-press-event', self.setter)
             radio_button.connect('activate', self.setter)
-            
+
             if var_titles:
                 vbox.pack_start(radio_button, False, False, 2)
             else:
@@ -75,7 +75,7 @@ class RadioButtonsValueWidget(gtk.HBox):
             radio_button.show()
             radio_button.connect('focus-in-event',
                                  self.hook.trigger_scroll)
-                
+
         self.grab_focus = lambda : self.hook.get_focus(radio_button)
         if len(var_values) == 1 and self.value == var_values[0]:
             radio_button.set_sensitive(False)

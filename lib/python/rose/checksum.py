@@ -37,7 +37,7 @@ def get_checksum(name, checksum_func=None):
     Return a list of 2-element tuples. Each tuple represents a path in "name"
     and the checksum of that path. If the path is a directory, the checksum is
     None.
-    
+
     If "name" is a file, it returns a one-element list with a ("", checksum)
     tuple.
 
@@ -68,7 +68,7 @@ def get_checksum(name, checksum_func=None):
 
 def get_checksum_func(key=None):
     """Return a checksum function suitable for get_checksum.
-    
+
     If key=="md5" or not specified, return function to do MD5 checksum.
     if key=="mtime+size", return function generate a string that contains the
     source name, its modified time and its size.

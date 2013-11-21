@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ class PageTable(gtk.Table):
                     variable.metadata.get('id')):
                     variable_widget.insert_into(self, self.MAX_COLS, r)
                     r += 1
-        else:            
+        else:
             self.reload_variable_widget(variable)
 
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
@@ -236,7 +236,7 @@ class PageArrayTable(PageTable):
                                                 self.var_ops,
                                                 is_ghost=is_ghost,
                                                 show_modes=self.show_modes,
-                                                length=self.array_length)                                   
+                                                length=self.array_length)
         return rose.config_editor.variable.VariableWidget(
                                                 variable,
                                                 self.var_ops,

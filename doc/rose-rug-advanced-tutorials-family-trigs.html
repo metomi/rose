@@ -103,7 +103,7 @@
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
 
@@ -111,18 +111,18 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
-        graph = "visit_mine =&gt; MINERS"
+        graph = visit_mine =&gt; MINERS
 [runtime]
     [[root]]
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
-            failed handler = "rose suite-hook"
+            succeeded handler = rose suite-hook
+            failed handler = rose suite-hook
     [[visit_mine]]
-        command scripting = "sleep 5; echo 'off to work we go'"
+        command scripting = sleep 5; echo 'off to work we go'
 </pre>
     </div>
 
@@ -130,10 +130,10 @@
       <h3 class="alwayshidden">Example (2)</h3>
       <pre class="prettyprint lang-cylc">
     [[MINERS]]
-        command scripting = """sleep 5; 
-                                if (($RANDOM % 2)); then 
+        command scripting = """sleep 5;
+                                if (($RANDOM % 2)); then
                                     echo 'Diamonds!'; true;
-                                else 
+                                else
                                     echo 'Nothing...'; false;
                                 fi
                             """
@@ -180,8 +180,8 @@
 
       <p>We can address this by using <em>family triggers</em>. In particular,
       we are going to use the <samp>finish-all</samp> trigger to check for all
-      members of the <samp>MINERS</samp> family finishing, and the 
-      <samp>succeed-any</samp> trigger to check for any of the tasks in the 
+      members of the <samp>MINERS</samp> family finishing, and the
+      <samp>succeed-any</samp> trigger to check for any of the tasks in the
       <samp>MINERS</samp> family succeeding.</p>
     </div>
 
@@ -200,7 +200,7 @@
       section:</p>
       <pre class="prettyprint lang-cylc">
     [[sell_diamonds]]
-        command scripting = "sleep 5"
+        command scripting = sleep 5
 </pre>
     </div>
 
@@ -249,7 +249,7 @@
       this:</p>
       <pre class="prettyprint lang-cylc">
     [[close_shafts, sell_diamonds]]
-        command scripting = "sleep 5"
+        command scripting = sleep 5
 </pre>
     </div>
 
@@ -258,9 +258,9 @@
 
       <p>These changes add a <samp>close_shafts</samp> task which is run once
       all the <samp>MINERS</samp> tasks have finished and any of them have
-      failed. On completion it applies a 
-      <a href="rose-rug-advanced-tutorials-suicide.html">suicide trigger</a> to 
-      the <samp>MINERS</samp> family in order to allow the suite to 
+      failed. On completion it applies a
+      <a href="rose-rug-advanced-tutorials-suicide.html">suicide trigger</a> to
+      the <samp>MINERS</samp> family in order to allow the suite to
       shutdown.</p>
 
       <p>Save your changes and run your suite. You should see the new
@@ -271,7 +271,7 @@
     <div class="slide">
       <h2 id="reference">Different triggers</h2>
 
-      <p>Other types of triggers beyond those covered in the example are also 
+      <p>Other types of triggers beyond those covered in the example are also
       available.</p>
 
       <p>The following types of "all" type triggers are available:</p>
@@ -316,10 +316,10 @@
         <li>Family triggers allow you to create dependencies on particular
         families.</li>
 
-        <li>Like task triggers, family triggers can be based on success, 
+        <li>Like task triggers, family triggers can be based on success,
         failure, starting and finishing of tasks in a family.</li>
 
-        <li>Family triggers can trigger off either <em>all</em> or 
+        <li>Family triggers can trigger off either <em>all</em> or
         <em>any</em> of the tasks in a family.</li>
       </ul>
     </div>

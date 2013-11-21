@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ import rose.variable
 class ChoicesValueWidget(gtk.HBox):
 
     """This represents a value as actual/available choices.
-    
+
     Arguments are standard, except for the custom arg_str argument,
     set in the metadata. In this case we take a shell command-like
     syntax:
@@ -54,7 +54,7 @@ class ChoicesValueWidget(gtk.HBox):
     #         The CHOICE that includes all other choices.
     #         For example: ALL, STANDARD
     #     --choices=CHOICE1[,CHOICE2,CHOICE3...]
-    #         Add a comma-delimited list of choice(s) to the list of 
+    #         Add a comma-delimited list of choice(s) to the list of
     #         available choices for the widget.
     #         This option can be used repeatedly.
     #     --editable
@@ -104,7 +104,7 @@ class ChoicesValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        
+
         self.opt_parser = rose.opt_parse.RoseOptionParser()
         self.opt_parser.OPTIONS = self.OPTIONS
         self.opt_parser.add_my_options(*self.OPTIONS.keys())
@@ -223,15 +223,15 @@ class ChoicesValueWidget(gtk.HBox):
 
     def _calc_should_show_kinship(self):
         """Calculate whether to show parent-child relationships.
-        
+
         Do not show any if any group has more than one parent group.
-        
+
         """
         for group in self.groups:
             grpset = set(group)
             if len([g for g in self.groups if set(g).issubset(grpset)]) > 1:
                 return False
-        return True      
+        return True
 
     def _get_groups(self, name, names):
         if self.all_group is not None:

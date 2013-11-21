@@ -48,7 +48,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     initial cycle time = 2013060100
@@ -64,13 +64,13 @@
             """
 [runtime]
     [[root]]
-        command scripting = "sleep 5"
+        command scripting = sleep 5
         [[[event hooks]]]
-            failed handler = "rose suite-hook"
-            succeeded handler = "rose suite-hook"
+            failed handler = rose suite-hook
+            succeeded handler = rose suite-hook
     [[arrival]]
     [[assign_gate]]
-        environment scripting = "eval $(rose task-env)"
+        environment scripting = eval $(rose task-env)
         command scripting = """
              GATE="A"$((RANDOM%3))
              echo "GATE=$GATE" &gt; $ROSE_DATAC/flight_gate

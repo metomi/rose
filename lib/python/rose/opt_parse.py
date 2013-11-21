@@ -301,7 +301,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "store_true",
                         "dest": "no_metadata",
                         "default": False,
-                        "help": "Start config editor without metadata " + 
+                        "help": "Start config editor without metadata " +
                                 "switched on."}],
                "no_opts": [
                        ["--no-opts"],

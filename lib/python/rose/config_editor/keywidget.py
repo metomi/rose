@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -52,9 +52,9 @@ class KeyWidget(gtk.VBox):
 
     MODIFIED_COLOUR = rose.gtk.util.color_parse(
                                rose.config_editor.COLOUR_VARIABLE_CHANGED)
-                                  
+
     LABEL_X_OFFSET = 0.01
-    
+
 
     def __init__(self, variable, var_ops, launch_help_func, update_func,
                  show_modes):
@@ -316,7 +316,7 @@ class KeyWidget(gtk.VBox):
             if is_shown:
                 self._set_show_meta_text_mode(rose.META_PROP_HELP, False)
                 self._set_show_meta_text_mode(rose.META_PROP_HELP, True)
-                                          
+
 
     def _set_show_meta_text_mode(self, mode, should_show_mode):
         """Set the display of description or help below the title/name."""
@@ -410,8 +410,8 @@ class KeyWidget(gtk.VBox):
         if rose.META_PROP_TITLE in self.meta:
             if self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE]:
                 # Titles are hidden, so show them in the hover-over.
-                tooltip_text += ("\n (" +  
-                                    rose.META_PROP_TITLE.capitalize() + 
+                tooltip_text += ("\n (" +
+                                    rose.META_PROP_TITLE.capitalize() +
                                     ": '" +
                                     self.meta[rose.META_PROP_TITLE] + "')")
             elif (self.my_variable.name not in label_text or
@@ -465,7 +465,7 @@ class KeyWidget(gtk.VBox):
     def _handle_leave(self, event_box):
         event_box.set_tooltip_text(None)
         if isinstance(self.entry, gtk.Label):
-            self._set_underline(self.entry, underline=False)       
+            self._set_underline(self.entry, underline=False)
         return False
 
     def _set_sensitive(self, is_sensitive):

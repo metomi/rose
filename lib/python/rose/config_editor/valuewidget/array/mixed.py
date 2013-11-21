@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -33,14 +33,14 @@ import rose.variable
 class MixedArrayValueWidget(gtk.HBox):
 
     """This is a class to represent a derived type variable as a table.
-    
+
     The type (variable.metadata['type']) should be a list, e.g.
     ['integer', 'real']. There can optionally be a length
     (variable.metadata['length'] for derived type arrays.
-    
+
     This will create a table containing different types (horizontally)
     and different array elements (vertically).
-    
+
     """
 
     BAD_COLOUR = rose.gtk.util.color_parse(
@@ -118,7 +118,7 @@ class MixedArrayValueWidget(gtk.HBox):
             self.num_rows = 1
         if self.max_rows == 0:
             self.max_rows = 1
-   
+
     def grab_focus(self):
         if self.entry_table.focus_child is None:
             self.hook.get_focus(self.rows[-1][-1])
@@ -129,7 +129,7 @@ class MixedArrayValueWidget(gtk.HBox):
         """Create a new row of widgets."""
         r = self.entry_table.child_get_property(self.rows[-1][-1],
                                                 'top-attach')
-        self.entry_table.resize(r + 2, self.num_cols) 
+        self.entry_table.resize(r + 2, self.num_cols)
         new_values = self.insert_row(r + 1)
         if any(new_values):
             self.value_array = self.value_array + new_values
@@ -273,7 +273,7 @@ class MixedArrayValueWidget(gtk.HBox):
             return
         for widget in self.rows[0]:
             self._normalise_width_chars(widget)
-                
+
     def _normalise_width_chars(self, widget):
         index = self.widgets.index(widget)
         element = index % self.num_cols

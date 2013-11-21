@@ -105,7 +105,7 @@ class SvnInfoXMLParser(object):
             if self.state["index"]:
                 name = self.state["index"] + ":" + key
             self.state["entry"][name] = value
-    
+
     def _handle_tag1(self, name):
         self.state["stack"].pop()
 

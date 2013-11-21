@@ -497,18 +497,18 @@ touch suite.rc
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
 [runtime]
     [[root]]
-        command scripting = "rose task-run --verbose"
+        command scripting = rose task-run --verbose
         [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook --mail"
-           execution timeout handler = "rose suite-hook --mail"
+           succeeded handler = rose suite-hook
+           failed handler = rose suite-hook --shutdown
+           submission failed handler = rose suite-hook --shutdown
+           submission timeout handler = rose suite-hook --mail
+           execution timeout handler = rose suite-hook --mail
            submission timeout = 1440 # 24 hours
            execution timeout  =  180 # 3 hours
 </pre>
@@ -769,7 +769,7 @@ rose suite-log
       <p>If you want a quick and easy way of visualising the output, try
       replacing the line:</p>
       <pre>
-  PRINT*, "New position, me hearties:",new_lat," ",new_long  
+  PRINT*, "New position, me hearties:",new_lat," ",new_long
 </pre>
 
       <p>in <samp>dead_reckoning.f90</samp> with</p>
@@ -899,7 +899,7 @@ chmod +x bin/sun_sight
       these lines to the file:</p>
       <pre class="prettyprint lang-cylc">
     [[take_sun_sight]]
-        command scripting = "sun_sight $CYLC_SUITE_SHARE_PATH/position"
+        command scripting = sun_sight $CYLC_SUITE_SHARE_PATH/position
 </pre>
     </div>
 

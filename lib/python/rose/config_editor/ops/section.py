@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class SectionOperations(object):
     """A class to hold functions that act on sections and their storage."""
 
     def __init__(self, data, util, reporter, undo_stack, redo_stack,
-                 check_cannot_enable_func=rose.config_editor.false_function, 
+                 check_cannot_enable_func=rose.config_editor.false_function,
                  update_ns_func=rose.config_editor.false_function,
                  update_info_func=rose.config_editor.false_function,
                  update_comments_func=rose.config_editor.false_function,
@@ -287,7 +287,7 @@ class SectionOperations(object):
             return rose.config_editor.KEY_TIP_TRIGGER_IGNORED
         if rose.variable.IGNORED_BY_USER in this_section.ignored_reason:
             return rose.config_editor.KEY_TIP_USER_IGNORED
-        return rose.config_editor.KEY_TIP_ENABLED       
+        return rose.config_editor.KEY_TIP_ENABLED
 
     def get_ns_metadata_files(self, namespace):
         """Retrieve filenames within the metadata for this namespace."""

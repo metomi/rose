@@ -46,7 +46,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
@@ -119,14 +119,14 @@
         [[[remote]]]
             host = $ROSE_ORIG_HOST
         [[[event hooks]]]
-            failed handler = "rose suite-hook"
-            succeeded handler = "rose suite-hook"
+            failed handler = rose suite-hook
+            succeeded handler = rose suite-hook
     [[DETONATE]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
         [[[environment]]]
             ROSE_TASK_APP = detonate
     [[IGNITE]]
-        command scripting = "sleep $((RANDOM % 2))"
+        command scripting = sleep $((RANDOM % 2))
     [[detonate_rocket_00]]
         inherit = DETONATE
         [[[environment]]]

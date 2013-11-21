@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -256,7 +256,7 @@ ERROR_LOAD_OPT_CONFS_TITLE = "Error loading opt configs"
 ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
 ERROR_METADATA_CHECKER_TITLE = "Flawed metadata warning"
-ERROR_METADATA_CHECKER_TEXT = ( 
+ERROR_METADATA_CHECKER_TEXT = (
                        "{0} problem(s) found in metadata at {1}.\n" +
                        "Some functionality has been switched off.\n\n" +
                        "Run rose metadata-check for more info.")
@@ -459,7 +459,7 @@ DIALOG_TEXT_MACRO_CHANGED = "changed"
 DIALOG_TEXT_MACRO_ERROR = "error"
 DIALOG_TEXT_MACRO_WARNING = "warning"
 DIALOG_TEXT_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +
-                                  "suite {0} is not registered.") 
+                                  "suite {0} is not registered.")
 DIALOG_TITLE_MACRO_TRANSFORM = "{0} - Changes for {1}"
 DIALOG_TITLE_MACRO_TRANSFORM_NONE = "{0}"
 DIALOG_TITLE_MACRO_VALIDATE = "{0} - Issues for {1}"
@@ -481,7 +481,7 @@ DIALOG_TITLE_NL_CASE_WARNING = "Mixed-case warning"
 DIALOG_TITLE_PREFERENCES = "Configure preferences"
 DIALOG_TITLE_REMOVE = "Remove section"
 DIALOG_TITLE_SAVE_CHANGES = "Save changes?"
-DIALOG_TITLE_UNREGISTERED_SUITE = "Suite not registered" 
+DIALOG_TITLE_UNREGISTERED_SUITE = "Suite not registered"
 DIALOG_TITLE_UPGRADE = "Upgrade configurations"
 DIALOG_TITLE_WARNING = "Warning"
 DIALOG_VARIABLE_ERROR_TITLE = "{0} error for {1}"
@@ -580,7 +580,7 @@ VAR_FLAG_TIP_NO_META = "Flag: no metadata"
 VAR_FLAG_TIP_OPT_CONF = "Optional conf overrides:\n{0}"
 # Numbers below mean: 0-opt config name, 1-id state/value.
 VAR_FLAG_TIP_OPT_CONF_INFO = "    {0}: {1}\n"
-# Numbers below mean: 0-sect state, 1-sect, 2-opt state, 3-opt, 4-opt value. 
+# Numbers below mean: 0-sect state, 1-sect, 2-opt state, 3-opt, 4-opt value.
 VAR_FLAG_TIP_OPT_CONF_STATE = "{0}{1}={2}{3}={4}"
 VAR_FLAG_TIP_OPTIONAL = "Flag: optional"
 VAR_MENU_TIP_ERROR = "Error "

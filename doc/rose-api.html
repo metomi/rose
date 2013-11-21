@@ -220,7 +220,7 @@ def grab_focus(self):
         <pre class="prettyprint">
         self.entry.connect('focus-in-event',
                            hook.trigger_scroll)
-        
+
 </pre>
 
         <p>This also is used to trigger a config editor page scroll to your
@@ -284,7 +284,7 @@ def get_focus_index(self):
 def handle_type_error(self, is_in_error):
     """Change behaviour based on whether the variable is_in_error."""
     icon_id = gtk.STOCK_DIALOG_ERROR if is_in_error else None
-    self.entry.set_icon_from_stock(0, gtk.STOCK_DIALOG_ERROR)       
+    self.entry.set_icon_from_stock(0, gtk.STOCK_DIALOG_ERROR)
 </pre>
 
         <p>For example, this is used in a built-in widget for the quoted string
@@ -897,7 +897,7 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
                     config, ["namelist:breakfast_nl", "coffee"]) == "'empty'":
             self.add_setting(config, ["namelist:breakfast_nl", "tea"],
                              "'extra_strong'")
-        return config, self.reports    
+        return config, self.reports
 </pre>
       </dd>
 
@@ -1023,7 +1023,7 @@ http://host/PREFIX_NAME/get_known_keys?format=json
 
         <p>may give</p>
         <pre class="prettyprint">
-["access-list", "idx", "issue-list", "branch", "owner", "project", "revision", "status",  "title"]  
+["access-list", "idx", "issue-list", "branch", "owner", "project", "revision", "status",  "title"]
 </pre>
       </dd>
 
@@ -1178,7 +1178,7 @@ http://host/PREFIX_NAME/search?var+bob+nowcast&amp;format=json
   "project": "um", "title": "A copy of um.alpra.", "status": "M ",
   "description": "Bob's UM suite"},
  {"idx": "mo1-aa092", "branch": "trunk", "revision": 340, "owner": "jim",
-  "project": "var", "title": "6D Quantum VAR.", "status": "M ", 
+  "project": "var", "title": "6D Quantum VAR.", "status": "M ",
   "location": "NAE"},
  {"idx": "mo1-aa100", "branch": "trunk", "revision": 352, "owner": "ops_account",
   "project": "nowcast", "title": "The operational Nowcast suite",
@@ -1216,9 +1216,9 @@ http://host/PREFIX_NAME/search?var+bob&amp;all_revs&amp;format=json
   "project": "var", "title": "6D Quantum VAR.", "status": "M ",
   "location": "Africa"},
  {"idx": "mo1-aa092", "branch": "trunk", "revision": 340, "owner": "jim",
-  "project": "var", "title": "6D Quantum VAR.", "status": "M ", 
+  "project": "var", "title": "6D Quantum VAR.", "status": "M ",
   "location": "NAE"}]
-      
+
 </pre>
       </dd>
 

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -297,7 +297,7 @@ class PageFormatTree(gtk.VBox):
     def _set_source_avail_treeview(self, new_value):
         """React to a set value request from the tree view."""
         self._set_source_value(new_value)
-        self._source_value_listview._populate()  
+        self._source_value_listview._populate()
 
     def _add_file_source(self, entry):
         """Add a file to the sources list."""
@@ -323,7 +323,7 @@ class PageFormatTree(gtk.VBox):
         source_var = variables[names.index(rose.FILE_VAR_SOURCE)]
         if source_var.value != new_value:
             self.var_ops.set_var_value(source_var, new_value)
-         
+
     def _sort_settings_duplicate(self, sect1, sect2):
         """Sort settings such that xyz(:) appears above xyz(1)."""
         sect1_base = sect1.rsplit("(", 1)[0]

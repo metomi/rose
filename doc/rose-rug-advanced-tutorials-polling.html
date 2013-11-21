@@ -99,7 +99,7 @@
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
 
@@ -107,7 +107,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
@@ -142,14 +142,14 @@
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting  = "sleep 10"
+        command scripting  = sleep 10
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
-            failed handler = "rose suite-hook"
+            succeeded handler = rose suite-hook
+            failed handler = rose suite-hook
     [[compose_letter]]
-        command scripting = "sleep 5; echo 'writing a letter to Bob...'"
+        command scripting = sleep 5; echo 'writing a letter to Bob...'
     [[send_letter]]
-        environment scripting = "eval `rose task-env`"
+        environment scripting = eval `rose task-env`
         command scripting = """sleep 5;
                                echo 'Hello Bob' &gt; $ROSE_DATA/letter.txt;
                                sleep 10"""
@@ -159,13 +159,13 @@
     <div class="slide">
       <h3 class="alwayshidden">Runtime (2)</h3>
       <pre class="prettyprint lang-cylc">
-    
+
     [[bob]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
     [[read_letter]]
-        environment scripting = "eval `rose task-env`"
-        command scripting = "sleep 5; cat $ROSE_DATA/letter.txt"
-        post-command scripting = "rm $ROSE_DATA/letter.txt"
+        environment scripting = eval `rose task-env`
+        command scripting = sleep 5; cat $ROSE_DATA/letter.txt
+        post-command scripting = rm $ROSE_DATA/letter.txt
 </pre>
     </div>
 

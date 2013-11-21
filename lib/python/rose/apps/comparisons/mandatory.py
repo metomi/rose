@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ PASS = "~~"
 FAIL = "!~"
 
 class Mandatory(object):
-    def run(self, task): 
+    def run(self, task):
         """Perform an exact comparison between the result and the KGO data"""
         failures = 0
         if len(task.resultdata) == 0:
@@ -48,7 +48,7 @@ class MandatoryStringResult(object):
             self.subextract = "unknown"
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, self.resultfile, self.status, 
+        return OUTPUT_STRING % ( self.extract, self.resultfile, self.status,
                                  self.subextract)
 
     __str__ = __repr__

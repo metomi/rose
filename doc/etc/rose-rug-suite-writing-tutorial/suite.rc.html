@@ -47,7 +47,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     initial cycle time = 2013060100
@@ -62,13 +62,13 @@
             """
 [runtime]
     [[root]]
-        command scripting = "rose task-run --verbose"
+        command scripting = rose task-run --verbose
         [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook --mail"
-           execution timeout handler = "rose suite-hook --mail"
+           succeeded handler = rose suite-hook
+           failed handler = rose suite-hook --shutdown
+           submission failed handler = rose suite-hook --shutdown
+           submission timeout handler = rose suite-hook --mail
+           execution timeout handler = rose suite-hook --mail
            submission timeout = 1440 # 24 hours
            execution timeout  =  180 # 3 hours
     [[fcm_make_navigate]]
@@ -79,7 +79,7 @@
     [[write_start_position]]
         command scripting = """
             echo '50.0 -3.0' &gt; $CYLC_SUITE_SHARE_PATH/position
-            """
+        """
 </pre>
   </div>
 </body>

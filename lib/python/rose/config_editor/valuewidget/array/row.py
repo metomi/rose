@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -159,7 +159,7 @@ class RowArrayValueWidget(gtk.HBox):
         """Create a new row of widgets."""
         r = self.entry_table.child_get_property(self.rows[-1][-1],
                                                 'top-attach')
-        self.entry_table.resize(r + 2, self.num_cols) 
+        self.entry_table.resize(r + 2, self.num_cols)
         new_values = self.insert_row(r + 1)
         if any(new_values):
             self.value_array = self.value_array + new_values
@@ -246,7 +246,7 @@ class RowArrayValueWidget(gtk.HBox):
             self.entry_table.remove(entry)
         self.rows.pop(-1)
         self.entry_table.resize(r, self.num_cols)
-        
+
         chop_index = len(self.value_array) - len(self.get_types())
         self.value_array = self.value_array[:chop_index]
         self.value = rose.variable.array_join(self.value_array)
@@ -343,7 +343,7 @@ class RowArrayValueWidget(gtk.HBox):
             return
         for widget in self.rows[0]:
             self._normalise_width_chars(widget)
-                
+
     def _normalise_width_chars(self, widget):
         index = self.widgets.index(widget)
         element = index % self.num_cols

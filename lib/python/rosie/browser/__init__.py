@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ ERROR_INVALID_QUERY = "Invalid query syntax: {0}"
 ERROR_MODIFIED_LOCAL_COPY_DELETE = "Error: Local copy has uncommitted changes"
 ERROR_NO_NEXT_SEARCH = "No next search"
 ERROR_NO_PREVIOUS_SEARCH = "No previous search"
-ERROR_PERMISSIONS = ("Error: You do not have the required permissions to " + 
+ERROR_PERMISSIONS = ("Error: You do not have the required permissions to " +
                      "delete this suite")
 ERROR_UNRECOGNISED_LAST_SEARCH = "Unrecognised last search type"
 ERROR_UNRECOGNISED_NEXT_SEARCH = "Unrecognised next search type"
@@ -119,7 +119,7 @@ ERROR_UNRECOGNISED_SEARCH = "Unrecognised search type"
 
 STATUS_FETCHING = "Fetching records..."
 STATUS_GOT = "{0} records found at {1}"
-STATUS_LOCAL_GOT = "{0} local suites found at {1}" 
+STATUS_LOCAL_GOT = "{0} local suites found at {1}"
 STATUS_NO_LOCAL_SUITES = "No local suites could be found in {0} {1}"
 STATUS_OPENING_HELP = "Opened help in browser"
 STATUS_OPENING_LOG = "Opened web browser on {0}"
@@ -143,9 +143,9 @@ DIALOG_MESSAGE_CHECKOUT = "checkout {0}"
 DIALOG_MESSAGE_CLEAR_HISTORY_CONFIRMATION = ("Delete search history?")
 DIALOG_MESSAGE_DELETE_LOCAL_CONFIRM = ("You are about to delete your local" +
                                        " copy of {0}")
-DIALOG_MESSAGE_DELETE_CONFIRMATION = ("Warning: you are about to delete " + 
-                       "\"{0}\". This will permanently delete all branches, "+ 
-                       "trunk and any local copy." + 
+DIALOG_MESSAGE_DELETE_CONFIRMATION = ("Warning: you are about to delete " +
+                       "\"{0}\". This will permanently delete all branches, "+
+                       "trunk and any local copy." +
                        "\n\nAre you sure you wish to proceed?")
 DIALOG_MESSAGE_UNCOMPLETED_FILTER = "Uncompleted filter"
 DIALOG_MESSAGE_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +

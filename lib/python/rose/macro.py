@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -175,14 +175,14 @@ class MacroBase(object):
 
     def get_resource_path(self, filename=''):
         """Load the resource according to the path of the calling macro.
-        
+
         The returned path will be based on the macro location under
         lib/python in the metadata directory.
 
         If the calling macro is lib/python/macro/levels.py,
         and the filename is 'rules.json', the returned path will be
         etc/macro/levels/rules.json .
-        
+
         """
         last_frame = inspect.getouterframes(inspect.currentframe())[1]
         macro_path = os.path.abspath(inspect.getfile(last_frame[0]))
@@ -225,7 +225,7 @@ class MacroValidatorCollection(MacroBase):
             p_list = macro_method(config, meta_config)
             p_list.sort(self._sorter)
             self.reports += p_list
-        return self.reports 
+        return self.reports
 
 
 class MacroTransformerCollection(MacroBase):
@@ -650,7 +650,7 @@ def run_macros(app_config, meta_config, config_name, macro_names,
                 reporter(MACRO_OUTPUT_HELP.format(help_line),
                          level=reporter.V, prefix="")
         sys.exit(0)
-    
+
     # Categorise macros given as arguments.
     macros_by_type = {}
     macros_not_found = [m for m in macro_names]
@@ -679,7 +679,7 @@ def run_macros(app_config, meta_config, config_name, macro_names,
         config_problem_dict = validate_config(app_config, meta_config,
                                               macros_by_type[VALIDATE_METHOD],
                                               modules,
-                                              macro_tuples, 
+                                              macro_tuples,
                                               opt_non_interactive)
         if config_problem_dict:
             rc = 1
@@ -688,7 +688,7 @@ def run_macros(app_config, meta_config, config_name, macro_names,
             for macro_name in problem_macros:
                 problem_list = config_problem_dict[macro_name]
                 sort = rose.config.sort_settings
-                
+
                 problem_list.sort(report_sort)
                 method_id = VALIDATE_METHOD.upper()[0]
                 macro_id = MACRO_OUTPUT_ID.format(method_id, macro_name)
@@ -937,7 +937,7 @@ def main():
                opts.conf_dir, opts.fix,
                opts.non_interactive, opts.output_dir,
                opts.validate_all, verbosity)
-               
+
 
 if __name__ == "__main__":
     main()

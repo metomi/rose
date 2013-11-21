@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
+#
 # This file is part of Rose, a framework for scientific suites.
-# 
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class Within(object):
             val2 = float(val2)
             lwr = 0
             upr = 0
-            result = re.search(r"%",task.tolerance) # Percentage or absolute 
+            result = re.search(r"%",task.tolerance) # Percentage or absolute
                                                     # difference?
             if result:
                 tol = float(re.sub(r"%", r"", task.tolerance))
@@ -74,8 +74,8 @@ class WithinComparisonFailure(object):
           self.percentage = "XX"
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, self.percentage, FAIL, 
-                                 self.tolerance, self.resultfile, 
+        return OUTPUT_STRING % ( self.extract, self.percentage, FAIL,
+                                 self.tolerance, self.resultfile,
                                  self.kgo1file,  )
 
     __str__ = __repr__
@@ -94,7 +94,7 @@ class WithinComparisonSuccess(object):
         self.tolerance = task.tolerance
 
     def __repr__(self):
-        return OUTPUT_STRING % ( self.extract, "all", PASS, self.tolerance, 
+        return OUTPUT_STRING % ( self.extract, "all", PASS, self.tolerance,
                                  self.resultfile, self.kgo1file )
 
     __str__ = __repr__
