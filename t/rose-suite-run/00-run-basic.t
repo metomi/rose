@@ -68,6 +68,7 @@ done
 TEST_KEY=$TEST_KEY_BASE-running-reload
 run_pass "$TEST_KEY" rose suite-run --reload \
     -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
+sleep 1
 #-------------------------------------------------------------------------------
 # Wait for the suite to complete
 TEST_KEY=$TEST_KEY_BASE-suite-run-wait
@@ -84,5 +85,4 @@ else
 fi
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

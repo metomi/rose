@@ -25,6 +25,7 @@
 #-------------------------------------------------------------------------------
 N_TESTS=3
 tests $N_TESTS
+export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
@@ -51,7 +52,7 @@ CYLC_VERSION=$(cylc --version)
 ROSE_ORIG_HOST=$(hostname)
 ROSE_VERSION=$(rose --version | cut -d' ' -f2)
 for I in $(seq 1 $N_TESTS); do
-    rose suite-run -C$SUITE_RUN_DIR --name=$NAME -l -q || break
+    rose suite-run -C$SUITE_RUN_DIR --name=$NAME -l -q --debug || break
     file_cmp "$TEST_KEY" "$SUITE_RUN_DIR/suite.rc" <<__SUITE_RC__
 #!jinja2
 {# Rose Configuration Insertion: Init #}
@@ -73,6 +74,5 @@ graph=x
 __SUITE_RC__
 done
 #-------------------------------------------------------------------------------
-rose suite-clean -q -y $NAME
-cylc unregister $NAME 1>/dev/null 2>&1
+rose suite-clean -q -y $NAME --debug
 exit 0

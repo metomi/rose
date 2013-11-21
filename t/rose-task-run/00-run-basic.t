@@ -91,5 +91,4 @@ for CYCLE in 2013010100 2013010112 2013010200; do
 done
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

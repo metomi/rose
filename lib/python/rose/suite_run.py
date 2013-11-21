@@ -25,7 +25,7 @@ from fnmatch import fnmatchcase
 from glob import glob
 import os
 import re
-from rose.config import ConfigDumper, ConfigLoader
+from rose.config import ConfigDumper, ConfigLoader, ConfigNode
 from rose.config_tree import ConfigTreeLoader
 from rose.env import env_var_process
 from rose.host_select import HostSelector
@@ -35,6 +35,7 @@ from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
 from rose.run_source_vc import write_source_vc_info 
+from rose.suite_clean import SuiteRunCleaner
 from rose.suite_engine_proc import StillRunningError
 import socket
 import sys
@@ -94,6 +95,10 @@ class SuiteRunner(Runner):
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
         self.host_selector = HostSelector(self.event_handler, self.popen)
+        self.suite_run_cleaner = SuiteRunCleaner(
+                event_handler=self.event_handler,
+                host_selector=self.host_selector,
+                suite_engine_proc=self.suite_engine_proc)
 
     def run_impl(self, opts, args, uuid, work_files):
         # Log file, temporary
@@ -187,14 +192,16 @@ class SuiteRunner(Runner):
         suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
 
         suite_conf_dir = os.getcwd()
+        locs_conf = ConfigNode()
         if opts.new_mode:
             if os.getcwd() == suite_dir:
                 raise NewModeError("PWD", os.getcwd())
             elif opts.run_mode in ["reload", "restart"]:
                 raise NewModeError("--run", opts.run_mode)
-            self.fs_util.delete(suite_dir)
+            self.suite_run_cleaner.clean(suite_name)
         if os.getcwd() != suite_dir:
-            self.fs_util.makedirs(suite_dir)
+            self._run_init_dir(opts, suite_name, conf_tree,
+                               locs_conf=locs_conf)
             os.chdir(suite_dir)
         cwd = os.getcwd()
         for rel_path, conf_dir in conf_tree.files.items():
@@ -254,7 +261,9 @@ class SuiteRunner(Runner):
 
         # Install share/work directories (local)
         for name in ["share", "work"]:
-            self._run_init_dir_work(opts, suite_name, name, conf_tree)
+            self._run_init_dir_work(opts, suite_name, name, conf_tree,
+                                    locs_conf=locs_conf)
+            # TODO: locs_conf.set(["localhost", ])
 
         # Process Environment Variables
         environ = self.config_pm(conf_tree, "env")
@@ -308,14 +317,15 @@ class SuiteRunner(Runner):
             if not opts.log_archive_mode:
                 rose_sr += " --no-log-archive"
             rose_sr += " --run=" + opts.run_mode
-            host_confs = ["root-dir-share",
-                          "root-dir-work"]
+            host_confs = ["root-dir", "root-dir-share", "root-dir-work"]
             rose_sr += " --remote=uuid=" + uuid
+            locs_conf.set([auth])
             for key in host_confs:
                 value = self._run_conf(key, host=host, conf_tree=conf_tree)
                 if value is not None:
                     v = self.popen.list_to_shell_str([str(value)])
                     rose_sr += "," + key + "=" + v
+                    locs_conf.set([auth, key], value)
             command += ["'" + rose_sr + "'"]
             pipe = self.popen.run_bg(*command)
             queue.append([pipe, command, "ssh", auth])
@@ -337,6 +347,7 @@ class SuiteRunner(Runner):
                 self.handle_event(out, level=Event.VV, prefix="[%s] " % auth)
             for line in out.split("\n"):
                 if "/" + uuid == line.strip():
+                    locs_conf.unset([auth])
                     break
             else:
                 filters = {"excludes": [], "includes": []}
@@ -346,10 +357,12 @@ class SuiteRunner(Runner):
                 cmd = self._get_cmd_rsync(target, **filters)
                 queue.append([self.popen.run_bg(*cmd), cmd, "rsync", auth])
 
-        # Start the suite
+        # Install ends
+        ConfigDumper()(locs_conf, os.path.join("log", "rose-suite-run.locs"))
         if opts.install_only_mode:
             return
 
+        # Start the suite
         self.fs_util.chdir("log")
         ret = 0
         host = hosts[0]
@@ -357,7 +370,7 @@ class SuiteRunner(Runner):
         if opts.host:
             hosts = [host]
 
-        #use the list of hosts on which you can run
+        # For run and restart, get host for running the suite
         if opts.run_mode != "reload" and not opts.host:
             hosts = []
             v = conf.get_value(["rose-suite-run", "hosts"], "localhost")
@@ -414,6 +427,27 @@ class SuiteRunner(Runner):
                 if fnmatchcase(host, pattern):
                     return value.strip()
         return default
+
+    def _run_init_dir(self, opts, suite_name, conf_tree=None, r_opts=None,
+                      locs_conf=None):
+        """Create the suite's directory."""
+        suite_dir_rel = self._suite_dir_rel(suite_name)
+        home = os.path.expanduser("~")
+        suite_dir_root = self._run_conf("root-dir", conf_tree=conf_tree,
+                                        r_opts=r_opts)
+        if suite_dir_root:
+            if locs_conf is not None:
+                locs_conf.set(["localhost", "root-dir"], suite_dir_root)
+            suite_dir_root = env_var_process(suite_dir_root)
+        suite_dir_home = os.path.join(home, suite_dir_rel)
+        if (suite_dir_root and
+            os.path.realpath(home) != os.path.realpath(suite_dir_root)):
+            suite_dir_real = os.path.join(suite_dir_root, suite_dir_rel)
+            self.fs_util.makedirs(suite_dir_real)
+            self.fs_util.symlink(suite_dir_real, suite_dir_home,
+                                 opts.no_overwrite_mode)
+        else:
+            self.fs_util.makedirs(suite_dir_home)
 
     def _run_init_dir_log(self, opts, suite_name, conf_tree=None, r_opts=None):
         """Create the suite's log/ directory. Housekeep, archive old ones."""
@@ -479,13 +513,15 @@ class SuiteRunner(Runner):
                 self.fs_util.delete(log)
 
     def _run_init_dir_work(self, opts, suite_name, name, conf_tree=None,
-                           r_opts=None):
+                           r_opts=None, locs_conf=None):
         """Create a named suite's directory."""
         item_path = os.path.realpath(name)
         item_path_source = item_path
         key = "root-dir-" + name
         item_root = self._run_conf(key, conf_tree=conf_tree, r_opts=r_opts)
         if item_root is not None:
+            if locs_conf is not None:
+                locs_conf.set(["localhost", key], item_root)
             item_root = env_var_process(item_root)
             suite_dir_rel = self._suite_dir_rel(suite_name)
             item_path_source = os.path.join(item_root, suite_dir_rel, name)
@@ -512,7 +548,7 @@ class SuiteRunner(Runner):
             self.handle_event("/" + r_opts["uuid"] + "\n", level=0)
         elif opts.new_mode:
             self.fs_util.delete(suite_dir_rel)
-        self.fs_util.makedirs(suite_dir_rel)
+        self._run_init_dir(opts, suite_name, r_opts=r_opts)
         os.chdir(suite_dir_rel)
         for name in ["share", "work"]:
             uuid_file = os.path.join(name, r_opts["uuid"])

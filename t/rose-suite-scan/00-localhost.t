@@ -50,6 +50,5 @@ while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
 rose suite-clean -q -y $NAME || exit 1
-cylc unregister $NAME 1>/dev/null 2>&1
 #-------------------------------------------------------------------------------
 exit 0

@@ -20,11 +20,15 @@
 """Implement the "rose suite-clean" command."""
 
 import os
-from rose.opt_parse import RoseOptionParser
+from rose.config import ConfigLoader, ConfigNode
+from rose.env import env_var_process
+from rose.fs_util import FileSystemEvent
 from rose.host_select import HostSelector
+from rose.opt_parse import RoseOptionParser
 from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
-from rose.suite_engine_proc import SuiteEngineProcessor
+from rose.suite_engine_proc import SuiteEngineProcessor, StillRunningError
+import shlex
 import sys
 import traceback
 
@@ -53,30 +57,68 @@ class SuiteRunCleaner(object):
 
         """
         os.chdir(os.path.expanduser('~'))
-        suite_dir_rel = self.suite_engine_proc.get_suite_dir_rel(suite_name)
+        engine = self.suite_engine_proc
+
+        # Ensure suite is not still running
+        suite_dir_rel = engine.get_suite_dir_rel(suite_name)
         if not os.path.isdir(suite_dir_rel):
             return
         hostnames = ["localhost"]
-        host_file_path = self.suite_engine_proc.get_suite_dir_rel(
+        host_file_path = engine.get_suite_dir_rel(
                 suite_name, "log", "rose-suite-run.host")
         if os.access(host_file_path, os.F_OK | os.R_OK):
             for line in open(host_file_path):
                 hostnames.append(line.strip())
         conf = ResourceLocator.default().get_conf()
-        
         hostnames = self.host_selector.expand(
               ["localhost"] +
               conf.get_value(["rose-suite-run", "hosts"], "").split() +
               conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
         hostnames = list(set(hostnames))
         hosts_str = conf.get_value(["rose-suite-run", "scan-hosts"])
-        
         hosts = []
         for h in hostnames:
             if h not in hosts:
                 hosts.append(h)
+        reason = engine.is_suite_running(None, suite_name, hosts)
+        if reason:
+            raise StillRunningError(suite_name, reason)
 
-        return self.suite_engine_proc.clean(suite_name, hosts)
+        # Clean
+        locs_file_path = engine.get_suite_dir(
+                suite_name, "log", "rose-suite-run.locs")
+        locs_conf = ConfigNode().set(["localhost"], {})
+        if os.access(locs_file_path, os.F_OK | os.R_OK):
+            locs_conf = ConfigLoader()(locs_file_path, locs_conf)
+        for auth, node in locs_conf.value.items():
+            locs = []
+            for key in ["share", "work", ""]:
+                conf_key = "root-dir"
+                if key:
+                    conf_key = "root-dir-" + key
+                item_root = node.get_value([conf_key])
+                if item_root:
+                    loc_rel = engine.get_suite_dir_rel(suite_name)
+                    if key:
+                        loc_rel = os.path.join(loc_rel, key)
+                    locs.append(os.path.join(item_root, loc_rel))
+            if auth == "localhost":
+                locs.append(engine.get_suite_dir(suite_name))
+                for loc in locs:
+                    loc = os.path.abspath(env_var_process(loc))
+                    engine.fs_util.delete(loc)
+            else:
+                locs.append(engine.get_suite_dir_rel(suite_name))
+                command = engine.popen.get_cmd(
+                        "ssh", auth, "bash", "--login", "-c")
+                rm_command = "rm -rf " + engine.popen.list_to_shell_str(locs)
+                command += ["'" + rm_command + "'"]
+                engine.popen(*command)
+                for loc in locs:
+                    ev = FileSystemEvent(FileSystemEvent.DELETE,
+                                         auth + ":" + loc)
+                    engine.handle_event(ev)
+        self.suite_engine_proc.clean_hook(suite_name)
 
     __call__ = clean
 

@@ -82,7 +82,4 @@ for N in $NAME ${NAME}1 ${NAME%?}; do
     fi
 done
 rose suite-clean --debug -q -y $NAME ${NAME}1 ${NAME%?}
-cylc unregister $NAME 1>/dev/null 2>&1
-cylc unregister ${NAME}1 1>/dev/null 2>&1
-cylc unregister ${NAME%?} 1>/dev/null 2>&1
 exit 0

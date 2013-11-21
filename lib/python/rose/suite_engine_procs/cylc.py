@@ -30,7 +30,7 @@ from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import \
-        StillRunningError, SuiteEngineProcessor, SuiteScanResult, TaskProps
+        SuiteEngineProcessor, SuiteScanResult, TaskProps
 import socket
 import sqlite3
 import tarfile
@@ -94,52 +94,14 @@ class CylcProcessor(SuiteEngineProcessor):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
         self.daos = {self.SUITE_DB: {}, self.JOB_LOGS_DB: {}}
 
-    def clean(self, suite_name, hosts=None):
-        """Remove items created by the previous run of a suite."""
-        reason = self.is_suite_running(None, suite_name, hosts)
-        if reason:
-            raise StillRunningError(suite_name, reason)
-        job_auths = []
-        try:
-            job_auths = self.get_suite_jobs_auths(suite_name)
-        except sqlite3.OperationalError as e:
-            pass
-        conf = ResourceLocator.default().get_conf()
-        for job_auth in job_auths + ["localhost"]:
-            if "@" in job_auth:
-                job_host = job_auth.split("@", 1)[1]
-            else:
-                job_host = job_auth
-            dirs = []
-            for key in ["share", "work"]:
-                item_root = None
-                node_value = conf.get_value(
-                        ["rose-suite-run", "root-dir-" + key])
-                if node_value is not None:
-                    for line in node_value.strip().splitlines():
-                        pattern, value = line.strip().split("=", 1)
-                        if fnmatchcase(job_host, pattern):
-                            item_root = value.strip()
-                            break
-                if item_root is not None:
-                    dir_rel = self.get_suite_dir_rel(suite_name, key)
-                    item_path_source = os.path.join(item_root, dir_rel)
-                    dirs.append(item_path_source)
-            if job_auth == "localhost":
-                dirs.append(self.get_suite_dir(suite_name))
-                for d in dirs:
-                    d = os.path.abspath(env_var_process(d))
-                    if os.path.exists(d):
-                        self.fs_util.delete(d)
-            else:
-                dirs.append(self.get_suite_dir_rel(suite_name))
-                command = self.popen.get_cmd("ssh", job_auth, "rm", "-rf")
-                command += dirs
-                self.popen(*command)
-                for d in dirs:
-                    ev = FileSystemEvent(FileSystemEvent.DELETE,
-                                         job_auth + ":" + d)
-                    self.handle_event(ev)
+    def clean_hook(self, suite_name=None):
+        """Run "cylc refresh --unregister" (at end of "rose suite-clean")."""
+        self.popen.run("cylc", "refresh", "--unregister")
+        passphrase_dir_root = os.path.expanduser(os.path.join("~", ".cylc"))
+        for name in os.listdir(passphrase_dir_root):
+            p = os.path.join(passphrase_dir_root, name)
+            if os.path.islink(p) and not os.path.exists(p):
+                self.fs_util.delete(p)
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
@@ -919,19 +881,14 @@ class CylcProcessor(SuiteEngineProcessor):
         if out:
             suite_dir_old = out.strip()
         suite_passphrase = os.path.join(suite_dir, "passphrase")
-        self.popen.run_simple("cylc", "refresh", "--unregister",
-                              stdout_level=Event.VV)
+        self.clean_hook(suite_name)
         if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
             self.popen.run_simple("cylc", "unregister", suite_name)
             suite_dir_old = None
         if suite_dir_old is None:
             self.popen.run_simple("cylc", "register", suite_name, suite_dir)
-        passphrase_dir_root = os.path.expanduser("~/.cylc")
-        for name in os.listdir(passphrase_dir_root):
-            p = os.path.join(passphrase_dir_root, name)
-            if os.path.islink(p) and not os.path.exists(p):
-                self.fs_util.delete(p)
-        passphrase_dir = os.path.join(passphrase_dir_root, suite_name)
+        passphrase_dir = os.path.join("~", ".cylc", suite_name)
+        passphrase_dir = os.path.expanduser(passphrase_dir)
         self.fs_util.symlink(suite_dir, passphrase_dir)
         command = ["cylc", "validate", "-v"]
         if debug_mode:

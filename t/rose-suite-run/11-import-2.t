@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-run", import.
+# Test "rose suite-run", multiple imports.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 tests 6
@@ -28,10 +28,10 @@ mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 #-------------------------------------------------------------------------------
-# Install the "hello_earth" suite
+# Install the "greet_earth" suite
 TEST_KEY="$TEST_KEY_BASE-local-install"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/hello_earth -n $NAME -l
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/greet_earth -n $NAME -l
 (cd ~/cylc-run/$NAME; find app bin -type f | sort) >"$TEST_KEY.find"
 file_cmp "$TEST_KEY.find" "$TEST_KEY.find" <<'__FIND__'
 app/hello/rose-app.conf
@@ -43,17 +43,18 @@ __FIND__
     rose config -f $CONF jinja2:suite.rc worlds
 } >"$TEST_KEY.conf"
 file_cmp "$TEST_KEY.conf" "$TEST_KEY.conf" <<'__FIND__'
-"Hello"
+"Greet"
 ["Earth", "Moon"]
 __FIND__
 #-------------------------------------------------------------------------------
-# Start the "hello_earth" suite
+# Start the "greet_earth" suite
 TEST_KEY="$TEST_KEY_BASE-suite-run"
 run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/hello_earth \
+    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE/greet_earth \
     -n $NAME --no-gcontrol
+cat "$TEST_KEY.err"
 #-------------------------------------------------------------------------------
-# Wait for the "hello_earth" suite to complete
+# Wait for the "greet_earth" suite to complete
 TEST_KEY="$TEST_KEY_BASE-suite-run-wait"
 TIMEOUT=$(($(date +%s) + 120)) # wait 2 minutes
 while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
@@ -69,14 +70,13 @@ fi
 TEST_KEY="$TEST_KEY_BASE-suite-run-my-hello.log"
 sort $SUITE_RUN_DIR/my-hello.log >"$TEST_KEY"
 file_cmp "$TEST_KEY" "$TEST_KEY" <<'__LOG__'
-[2013010100] Hello Earth
-[2013010100] Hello Moon
-[2013010112] Hello Earth
-[2013010112] Hello Moon
-[2013010200] Hello Earth
-[2013010200] Hello Moon
+[2013010100] Greet Earth
+[2013010100] Greet Moon
+[2013010112] Greet Earth
+[2013010112] Greet Moon
+[2013010200] Greet Earth
+[2013010200] Greet Moon
 __LOG__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

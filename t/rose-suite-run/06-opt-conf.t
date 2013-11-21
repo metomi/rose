@@ -74,7 +74,6 @@ done <tests
 while read OPT_KEY SUITE_RUN_DIR; do
     NAME=$(basename $SUITE_RUN_DIR)
     rose suite-clean -q -y $NAME
-    cylc unregister $NAME 1>/dev/null 2>&1
 done <tests
 #-------------------------------------------------------------------------------
 exit 0

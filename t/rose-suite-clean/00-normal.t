@@ -30,6 +30,7 @@ if [[ -n $JOB_HOST ]]; then
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
+set -e
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
@@ -40,34 +41,37 @@ if [[ -n $JOB_HOST ]]; then
     rose suite-run --debug \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol \
         -S "HOST=\"$JOB_HOST\"" 1>/dev/null
-    ls -ld $HOME/cylc-run/$NAME 1>/dev/null
-    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
+    ssh $JOB_HOST "ls -d cylc-run/$NAME 1>/dev/null"
 else
     rose suite-run --debug \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol 1>/dev/null
-    ls -ld $HOME/cylc-run/$NAME 1>/dev/null
 fi
+ls -d $HOME/cylc-run/$NAME 1>/dev/null
+ls -d $HOME/.cylc/$NAME 1>/dev/null
+ls -d $HOME/.cylc/REGDB/$NAME 1>/dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ans-empty
 run_fail "$TEST_KEY" rose suite-clean $NAME <<<''
-ls -ld $HOME/cylc-run/$NAME 1>/dev/null
+ls -d $HOME/cylc-run/$NAME 1>/dev/null
 if [[ -n $JOB_HOST ]]; then
-    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
+    ssh $JOB_HOST "ls -d cylc-run/$NAME 1>/dev/null"
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ans-n
 run_fail "$TEST_KEY" rose suite-clean $NAME <<<'n'
-ls -ld $HOME/cylc-run/$NAME 1>/dev/null
+ls -d $HOME/cylc-run/$NAME 1>/dev/null
 if [[ -n $JOB_HOST ]]; then
-    ssh $JOB_HOST ls -ld cylc-run/$NAME 1>/dev/null
+    ssh $JOB_HOST "ls -d cylc-run/$NAME 1>/dev/null"
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ans-y
-run_pass "$TEST_KEY" rose suite-clean $NAME <<<'y'
-! ls -ld $HOME/cylc-run/$NAME 2>/dev/null
+ls -l $HOME/cylc-run/$NAME/log
+run_pass "$TEST_KEY" rose suite-clean -v -v $NAME <<<'y'
+! ls -d $HOME/cylc-run/$NAME 1>/dev/null 2>&1
+! ls -d $HOME/.cylc/$NAME 1>/dev/null 2>&1
+! ls -d $HOME/.cylc/REGDB/$NAME 1>/dev/null 2>&1
 if [[ -n $JOB_HOST ]]; then
-    ssh $JOB_HOST "! ls -ld cylc-run/$NAME 2>/dev/null"
+    ssh $JOB_HOST "! ls -d cylc-run/$NAME 1>/dev/null 2>&1"
 fi
 #-------------------------------------------------------------------------------
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0

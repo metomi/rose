@@ -54,10 +54,7 @@ if [[ -e $HOME/.cylc/ports/$NAME ]]; then
 fi
 TEST_KEY=$TEST_KEY_BASE-stopped
 run_pass "$TEST_KEY" rose suite-clean -y $NAME
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[INFO] delete: $SUITE_RUN_DIR/
-__OUT__
+file_grep "$TEST_KEY.out" "\[INFO\] delete: $SUITE_RUN_DIR/" "$TEST_KEY.out"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-cylc unregister $NAME 1>/dev/null 2>&1
 exit 0
