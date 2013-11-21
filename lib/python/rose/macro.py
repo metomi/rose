@@ -765,8 +765,9 @@ def handle_transform(app_config, new_config, change_list, macro_id,
     """Prompt the user to go ahead with macro changes and dump the output."""
     user_allowed_changes = False
     has_changes = any([not i.is_warning for i in change_list])
-    sys.stdout.write(get_reports_as_text(change_list, macro_id,
-                                         is_from_transform=True))
+    reporter(get_reports_as_text(change_list, macro_id,
+                                 is_from_transform=True),
+             level=reporter.V, prefix="")
     if has_changes and (opt_non_interactive or _get_user_accept()):
         app_config = new_config
         dump_config(app_config, opt_conf_dir, opt_output_dir)
@@ -807,7 +808,6 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
                           opt_conf_dir, opt_output_dir, opt_non_interactive,
                           reporter)
     return no_changes
-
 
 def _get_user_accept():
     try:
