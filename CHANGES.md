@@ -5,6 +5,37 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2013-Q4?)
+
+This release of Rose will work best with Cylc 5.4.1 or above.
+
+### Highlighted Changes
+
+### Noteworthy Changes
+
+\#1024: rose bush: job list mode: fixed `no_statues` checkboxes returning nothing
+bug.
+
+\#1023: rose suite-gcontrol: raise exception on attempt to launch suite control
+GUI on an unregistered Cylc suite.
+
+\#1021: rose bush: view file mode: files are now prettified using Google code
+prettify JS library.
+
+\#1007: rose bush: now display Rose version that drives it.
+
+\#1005: rose suite-run, rose suite-clean: the root directory of
+`~/cylc-run/$SUITE/` is now configurable via site, user, or suite configuration.
+On installation of a suite, `rose suite-run` will store the locations of the job
+hosts in `~/cylc-run/$SUITE/log/rose-suite-run.locs`. The information can then
+be used by `rose suite-clean` to determine what to remove.
+
+\#1003: rose app-run, rose-suite-run, etc: file installation - a tilde `~`
+in front a path pointing to a Subversion working copy did not get expanded.
+This is now fixed.
+
+\#999: rose app-upgrade: apply trigger fixing after an upgrade.
+
 ## 2013-11 (2013-11-14)
 
 This release of Rose works with cylc 5.4.0 or above.
