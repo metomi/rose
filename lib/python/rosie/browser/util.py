@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -38,8 +38,8 @@ class AddressBar(rose.gtk.util.ToolBar):
 
     def __init__(self, expand_control=None, expander_tip=None):
         """Create a search box and button in the toolbar."""
-        super(AddressBar, self).__init__()        
-        
+        super(AddressBar, self).__init__()
+
         self.previous_search_button = gtk.ToolItem()
         button = rose.gtk.util.CustomButton(stock_id=gtk.STOCK_GO_BACK,
                                             as_tool=True)
@@ -48,7 +48,7 @@ class AddressBar(rose.gtk.util.ToolBar):
                                                 rosie.browser.TIP_PREV_SEARCH)
         self.previous_search_button.set_sensitive(False)
         self.previous_search_button.show()
-        self.insert(self.previous_search_button, -1)   
+        self.insert(self.previous_search_button, -1)
         self.next_search_button = gtk.ToolItem()
         button = rose.gtk.util.CustomButton(stock_id=gtk.STOCK_GO_FORWARD,
                                             as_tool=True)
@@ -59,14 +59,14 @@ class AddressBar(rose.gtk.util.ToolBar):
         self.insert(self.next_search_button, -1)
         self.address_box = gtk.combo_box_entry_new_text()
         self.address_box.show()
-        
+
         self.address_box.set_tooltip_text(rosie.browser.TIP_ADDRESS_BAR)
         address_toolitem = gtk.ToolItem()
         address_toolitem.add(self.address_box)
         address_toolitem.set_expand(True)
         address_toolitem.show()
         self.insert(address_toolitem, -1)
-                           
+
         self.refresh_button = gtk.ToolItem()
         button = rose.gtk.util.CustomButton(stock_id=gtk.STOCK_REFRESH,
                                             as_tool=True)
@@ -75,7 +75,7 @@ class AddressBar(rose.gtk.util.ToolBar):
         self.refresh_button.set_sensitive(True)
         self.refresh_button.show()
         self.insert(self.refresh_button, -1)
-        
+
         self.home_button = gtk.ToolItem()
         button = rose.gtk.util.CustomButton(stock_id=gtk.STOCK_HOME,
                                             as_tool=True)
@@ -83,7 +83,7 @@ class AddressBar(rose.gtk.util.ToolBar):
         self.home_button.set_tooltip_text(rosie.browser.TIP_LOCAL_SUITES)
         self.home_button.set_sensitive(True)
         self.home_button.show()
-        self.insert(self.home_button, -1)        
+        self.insert(self.home_button, -1)
         self.simple_search_entry = gtk.Entry()
         self.simple_search_entry.show()
         self.simple_search_entry.set_width_chars(20)
@@ -93,7 +93,7 @@ class AddressBar(rose.gtk.util.ToolBar):
         search_toolitem.add(self.simple_search_entry)
         search_toolitem.show()
         self.insert(search_toolitem, -1)
-        
+
         image = gtk.image_new_from_stock(gtk.STOCK_FIND,
                                          gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.search_button = gtk.ToolItem()
@@ -120,17 +120,17 @@ class AddressBar(rose.gtk.util.ToolBar):
     def clear_address_box(self, widget=None):
         """Clears the entries from the address box"""
         self.address_box.clear()
-        
+
     def pop_address_box(self, hist):
         """Populates the address box on startup."""
         for h in hist:
             if h.h_type == "url":
-                if (self.address_box.get_model().iter_n_children(None) < 
+                if (self.address_box.get_model().iter_n_children(None) <
                                                 rosie.browser.SIZE_ADDRESS):
                     self.address_box.append_text(h.details)
                 else:
                     break
-                    
+
 
 class BracketWidget(gtk.HBox):
 
@@ -235,7 +235,7 @@ class HistoryTreeview(gtk.VBox):
                                              gtk.POLICY_AUTOMATIC)
         self.treeview_scroll_hist.add(self.treeview_hist)
         self.treeview_scroll_hist.set_shadow_type(gtk.SHADOW_IN)
-        cols = [rosie.browser.HISTORY_TREEVIEW_TYPE,       
+        cols = [rosie.browser.HISTORY_TREEVIEW_TYPE,
                 rosie.browser.HISTORY_TREEVIEW_PARAMETERS,
                 rosie.browser.HISTORY_TREEVIEW_ALL_REVISIONS]
         for i, title in enumerate(cols):
@@ -261,23 +261,23 @@ class HistoryTreeview(gtk.VBox):
         self.close_button = rose.gtk.util.CustomButton(
                              stock_id=gtk.STOCK_CLOSE,
                              tip_text=rosie.browser.TIP_CLOSE_HISTORY_BUTTON)
-        
+
         style = gtk.RcStyle()
         style.xthickness = 0
         style.ythickness = 0
         setattr(style, "inner-border", [0, 0, 0, 0] )
-        self.close_button.modify_style(style)     
-                             
+        self.close_button.modify_style(style)
+
         self.close_button.show()
         label = gtk.Label()
-        label.set_text(rosie.browser.LABEL_HISTORY_TREEVIEW)                     
+        label.set_text(rosie.browser.LABEL_HISTORY_TREEVIEW)
         label.show()
         self.close_pane.pack_end(self.close_button, expand=False, fill=False)
         self.close_pane.pack_start(label, expand=False, fill=False, padding=5)
-        self.close_pane.show()        
+        self.close_pane.show()
         self.pack_start(self.close_pane, expand=False, fill=False)
         self.pack_start(self.treeview_scroll_hist, padding=5)
-        self.treeview_scroll_hist.show()                            
+        self.treeview_scroll_hist.show()
 
     def clear_treestore_history(self, widget=None):
         """Clear the history treeview"""
@@ -296,7 +296,7 @@ class HistoryTreeview(gtk.VBox):
             else:
                 self.treestore_hist.append(None, [h.h_type, str(h.details),
                                                   h.search_history])
-                                                  
+
 
 class MenuBar(object):
 
@@ -327,7 +327,7 @@ class MenuBar(object):
         <menuitem action="Show search history"/>
         <separator name="clear-hist-sep"/>
         <menuitem action="Clear history"/>
-      </menu>          
+      </menu>
       <menu action="Help">
         <menuitem action="GUI Help"/>
         <menuitem action="About"/>
@@ -336,25 +336,25 @@ class MenuBar(object):
     </ui>"""
 
     action_details = [('File', None, rosie.browser.TOP_MENU_FILE),
-                      ('New Suite', gtk.STOCK_NEW, 
-                       rosie.browser.TOP_MENU_NEW_SUITE, 
+                      ('New Suite', gtk.STOCK_NEW,
+                       rosie.browser.TOP_MENU_NEW_SUITE,
                        rose.config_editor.ACCEL_NEW),
-                      ('Quit', gtk.STOCK_QUIT, rosie.browser.TOP_MENU_QUIT, 
+                      ('Quit', gtk.STOCK_QUIT, rosie.browser.TOP_MENU_QUIT,
                        rose.config_editor.ACCEL_QUIT),
                       ('Edit', None, rosie.browser.TOP_MENU_EDIT),
-                      ('Source', gtk.STOCK_NETWORK, 
+                      ('Source', gtk.STOCK_NETWORK,
                        rosie.browser.TOP_MENU_SOURCE),
-                      ('Preferences', gtk.STOCK_PREFERENCES, 
+                      ('Preferences', gtk.STOCK_PREFERENCES,
                        rosie.browser.TOP_MENU_PREFERENCES),
                       ('View', None, rosie.browser.TOP_MENU_VIEW),
                       ('History', None, rosie.browser.TOP_MENU_HISTORY),
-                      ('Clear history', gtk.STOCK_CLEAR, 
-                       rosie.browser.TOP_MENU_CLEAR_HISTORY),                                             
+                      ('Clear history', gtk.STOCK_CLEAR,
+                       rosie.browser.TOP_MENU_CLEAR_HISTORY),
                       ('Help', None, rosie.browser.TOP_MENU_HELP),
-                      ('GUI Help', gtk.STOCK_HELP, 
-                       rosie.browser.TOP_MENU_GUI_HELP, 
+                      ('GUI Help', gtk.STOCK_HELP,
+                       rosie.browser.TOP_MENU_GUI_HELP,
                        rose.config_editor.ACCEL_HELP_GUI),
-                      ('About', gtk.STOCK_DIALOG_INFO, 
+                      ('About', gtk.STOCK_DIALOG_INFO,
                        rosie.browser.TOP_MENU_ABOUT)]
 
     radio_action_details = []
@@ -365,7 +365,7 @@ class MenuBar(object):
                              ('Include history', None,
                               rosie.browser.TOGGLE_ACTION_VIEW_ALL_REVISIONS),
                              ('Show search history', None,
-                              rosie.browser.TOGGLE_ACTION_VIEW_SEARCH_HISTORY, 
+                              rosie.browser.TOGGLE_ACTION_VIEW_SEARCH_HISTORY,
                               rosie.browser.ACCEL_HISTORY_SHOW)]
 
     def __init__(self, known_keys):
@@ -392,19 +392,19 @@ class MenuBar(object):
                                             search, repl, 1)
             self.radio_action_details.append(
                               ("_{0}_".format(prefix), None, prefix))
-                              
+
     def add_key_choices(self):
         """Add the key choices."""
-        
+
         for key in list(reversed(self.known_keys)):
             view = '<menu action="View">'
             repl = view + '<menuitem action="View _{0}_"/>'.format(key)
             self.ui_config_string = self.ui_config_string.replace(
                                             view, repl, 1)
             self.toggle_action_details.append(
-                                ("View _{0}_".format(key), None, 
+                                ("View _{0}_".format(key), None,
                                  "View " + key.replace("_","__")))
-    
+
     def set_accelerators(self, accel_dict):
         """Add the keyboard accelerators."""
         self.accelerators = gtk.AccelGroup()
@@ -424,7 +424,7 @@ class MenuBar(object):
 
 class StatusBarWidget(gtk.VBox):
 
-    """Class to create a statusbar with a datasource box, messagebox and a 
+    """Class to create a statusbar with a datasource box, messagebox and a
        progressbar."""
 
     def __init__(self, prefix=""):
@@ -434,9 +434,9 @@ class StatusBarWidget(gtk.VBox):
         hline = gtk.HSeparator()
         self.statusbar.pack_start(hline)
         hline.show()
-        
+
         hbox = gtk.HBox()
-        
+
         self.datasource_display = rose.gtk.util.AsyncLabel()
         self.datasource_display.set_text(prefix)
         self.datasource_display.set_width_chars(rosie.browser.PREFIX_LEN)
@@ -449,7 +449,7 @@ class StatusBarWidget(gtk.VBox):
         vline = gtk.VSeparator()
         vline.show()
         hbox.pack_start(vline, expand=False, fill=False)
-        
+
         self.statusbox = rose.gtk.util.AsyncLabel()
         x, y = self.statusbox.get_alignment()
         self.statusbox.set_alignment(0, y)
@@ -463,41 +463,41 @@ class StatusBarWidget(gtk.VBox):
         hbox.show()
         self.statusbar.pack_start(hbox, fill=True)
         self.statusbar.show()
-        
+
         self.pack_start(self.statusbar, fill=True)
         self.show()
-        
+
     def set_datasource(self, prefix):
         """Set the datasource to display on the statusbar."""
         self.datasource_display.set_text(prefix)
 
     def set_status_text(self, msg, instant=True):
         """Set the statusbar text."""
-        self.statusbox.put(msg, instant)       
-        
+        self.statusbox.put(msg, instant)
+
     def set_progressbar_visible(self, visible=False):
         """Show/hide the progress bar."""
         if visible:
             self.progressbar.show()
         else:
             self.progressbar.hide()
-            
+
     def set_progressbar_pulsing(self, pulsing=False):
-        """Start/stop the progress bar pulsing.""" 
+        """Start/stop the progress bar pulsing."""
         if pulsing:
             self.progressbar.start_pulsing()
-        else:               
-            self.progressbar.stop_pulsing()  
+        else:
+            self.progressbar.stop_pulsing()
 
 
 class AdvancedSearchWidget(gtk.VBox):
 
     """Widget to create and manipulate the query panel"""
 
-    def __init__(self, search_manager, adv_controls_on, query_handler, 
+    def __init__(self, search_manager, adv_controls_on, query_handler,
                  display_redrawer):
         """Create a list of filters and a "search" button."""
-        super(AdvancedSearchWidget, self).__init__()         
+        super(AdvancedSearchWidget, self).__init__()
         self.handle_query = query_handler
         self.adv_controls_on = adv_controls_on
         self.display_redrawer = display_redrawer
@@ -550,13 +550,13 @@ class AdvancedSearchWidget(gtk.VBox):
                              label=rosie.browser.LABEL_CLEAR_ADVANCED,
                              tip_text=rosie.browser.TIP_CLEAR_BUTTON)
         self.clear_button.connect("clicked", self.clear_filters)
-        
+
         button_bar = gtk.HBox()
         button_bar.pack_end(self.search_button, expand=False, fill=False)
         button_bar.pack_end(self.add_button, expand=False, fill=False)
         button_bar.pack_start(self.clear_button, expand=False, fill=False)
         button_bar.show()
-        
+
         self.button_top_vbox = gtk.VBox()
         filter_scroll.add_with_viewport(filter_sub_scroll)
         filter_scroll.get_child().set_shadow_type(gtk.SHADOW_NONE)
@@ -566,7 +566,7 @@ class AdvancedSearchWidget(gtk.VBox):
         self.pack_start(button_bar, expand=False, fill=False)
         self.connect("expose-event",
                      lambda w, e: self.filter_table.check_resize())
-        self.button_top_vbox.show()     
+        self.button_top_vbox.show()
         self.filter_scroll = filter_scroll
         self.toggle_visibility(None, False)
 
@@ -721,7 +721,7 @@ class AdvancedSearchWidget(gtk.VBox):
     def clear_filters(self, *args):
         """Remove all filters from the GUI."""
         self.remove_filter()
-        added_ok = self.add_filter() 
+        added_ok = self.add_filter()
 
     def get_filter(self, and_or_combo, left_bracket_box, column_combo,
                    expr_combo, string_entry, right_bracket_box):
@@ -751,9 +751,9 @@ class AdvancedSearchWidget(gtk.VBox):
     def get_query(self):
         """Get the query from the filters."""
         filters = []
-        group_num = 0        
-        
-        for function in self.filter_expr_getters: 
+        group_num = 0
+
+        for function in self.filter_expr_getters:
             try:
                 filter_tuple = function()
             except FilterError:
@@ -773,8 +773,8 @@ class AdvancedSearchWidget(gtk.VBox):
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        text,
                                        rosie.browser.TITLE_INVALID_QUERY)
-            return None, False      
-    
+            return None, False
+
         return filters, True
 
     def remove_filter(self, filter_number=None):
@@ -814,7 +814,7 @@ class AdvancedSearchWidget(gtk.VBox):
                         child._number = top_row - 1
                     if top_row - 1 == 0 and left_attach == 0:
                         # This is the top left conjunction widget.
-                        child.set_sensitive(False)           
+                        child.set_sensitive(False)
         self.filter_expr_getters.pop(filter_number)
         self.num_filters -= 1
         if self.num_filters == 1:
@@ -850,17 +850,17 @@ class AdvancedSearchWidget(gtk.VBox):
             pass
         for child in self.filter_table.get_children():
             if isinstance(child, rosie.browser.util.BracketWidget):
-                child.set_show_controls(self.adv_controls_on)  
+                child.set_show_controls(self.adv_controls_on)
 
     def toggle_visibility(self, widget=None, set_visibility=None):
         """Show/hide the filters menu"""
-        
+
         if set_visibility:
             self.show()
         else:
             self.hide()
         self.display_redrawer()
-        
+
     def update_filter_grouping(self):
         """Update the grouping of the filters."""
         group_num = 0
@@ -871,13 +871,13 @@ class AdvancedSearchWidget(gtk.VBox):
                 if child.is_end:
                     group_num -= child.number
                 else:
-                    group_num += child.number 
-                    
-        
+                    group_num += child.number
+
+
 def launch_about_dialog(self, *args):
     """Create a dialog showing the 'About' information."""
     return rose.gtk.dialog.run_about_dialog(
                 rosie.browser.PROGRAM_NAME,
                 rosie.browser.COPYRIGHT,
                 rosie.browser.LOGO_PATH,
-                rosie.browser.PROJECT_URL)      
+                rosie.browser.PROJECT_URL)

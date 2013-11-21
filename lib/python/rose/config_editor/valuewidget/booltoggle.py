@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ class BoolToggleValueWidget(gtk.HBox):
                        rose.TYPE_LOGICAL_FALSE_TITLE,
                        rose.TYPE_LOGICAL_VALUE_TRUE:
                        rose.TYPE_LOGICAL_TRUE_TITLE}
-        
+
         imgs = [gtk.image_new_from_stock(gtk.STOCK_MEDIA_STOP,
                                          gtk.ICON_SIZE_MENU),
                 gtk.image_new_from_stock(gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)]
@@ -79,7 +79,7 @@ class BoolToggleValueWidget(gtk.HBox):
         widget.set_label(title)
         widget.set_image(image)
         self.setter(widget)
-        
+
     def setter(self, widget):
         label_value = widget.get_label()
         for real_item, label in self.label_dict.items():

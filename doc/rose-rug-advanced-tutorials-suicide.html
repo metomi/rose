@@ -76,7 +76,7 @@
 
       <p>This tutorial walks you through using suicide triggers.</p>
 
-      <p>Suicide triggers allow you to remove tasks from the suite during 
+      <p>Suicide triggers allow you to remove tasks from the suite during
       runtime.</p>
     </div>
 
@@ -85,9 +85,9 @@
 
       <p>Suicide triggers can be used to remove any task from a suite while it
       is running.</p>
-      
-      <p>They work much like any other type of trigger in a suite, except that 
-      rather than running a particular task once the triggering condition is 
+
+      <p>They work much like any other type of trigger in a suite, except that
+      rather than running a particular task once the triggering condition is
       met, the task is instead removed from the suite.</p>
 
     </div>
@@ -100,7 +100,7 @@
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
 
@@ -108,7 +108,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
@@ -126,39 +126,39 @@
       </p>
       <ul>
         <li>a <samp>bake_cake</samp> task which either succeeds or fails</li>
-        <li>a <samp>buy_cake</samp> "recovery" task which is run if 
-        <samp>bake_cake</samp> fails</li>  
-        <li>an <samp>eat_cake</samp> task which runs once cake has been 
-        obtained i.e. once <samp>bake_cake</samp> or <samp>buy_cake</samp> has 
+        <li>a <samp>buy_cake</samp> "recovery" task which is run if
+        <samp>bake_cake</samp> fails</li>
+        <li>an <samp>eat_cake</samp> task which runs once cake has been
+        obtained i.e. once <samp>bake_cake</samp> or <samp>buy_cake</samp> has
         succeeded</li>
       </ul>
-      <p>For purposes of this tutorial <samp>buy_cake</samp> will always 
-      succeed as cake should be available to buy somewhere.</p> 
+      <p>For purposes of this tutorial <samp>buy_cake</samp> will always
+      succeed as cake should be available to buy somewhere.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Runtime</h3>
 
-      <p>It will need some runtime. Add the following to your 
+      <p>It will need some runtime. Add the following to your
       <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
-            failed handler = "rose suite-hook"
+            succeeded handler = rose suite-hook
+            failed handler = rose suite-hook
     [[bake_cake]]
-        command scripting = """ sleep 10; 
-                                if (($RANDOM % 2)); then 
+        command scripting = """ sleep 10;
+                                if (($RANDOM % 2)); then
                                     echo 'Success'; true;
-                                else 
+                                else
                                     echo 'Burned the cake!'; false;
                                 fi
                             """
     [[buy_cake]]
-        command scripting = "sleep 10; echo 'Off to the shops!'"
+        command scripting = sleep 10; echo 'Off to the shops!'
     [[eat_cake]]
-        command scripting = "sleep 10; echo 'Mmm cake!'"
+        command scripting = sleep 10; echo 'Mmm cake!'
 </pre>
     </div>
 
@@ -166,38 +166,38 @@
       <h3 class="alwayshidden">Run the suite</h3>
       <p>Save your changes and run the suite using <samp>rose suite-run</samp>
       </p>
-      
-      <p>The suite should now run. If <samp>bake_cake</samp> fails, 
+
+      <p>The suite should now run. If <samp>bake_cake</samp> fails,
       <samp>buy_cake</samp> is triggered which triggers <samp>eat_cake</samp>.
       Otherwise, <samp>bake_cake</samp> triggers <samp>eat_cake</samp>.</p>
 
-      <p>Notice that at once  <samp>eat_cake</samp> has completed the suite 
-      does not shut down. This is because either <samp>bake_cake</samp> is in 
-      the failed state or <samp>buy_cake</samp> is waiting to be triggered. 
+      <p>Notice that at once  <samp>eat_cake</samp> has completed the suite
+      does not shut down. This is because either <samp>bake_cake</samp> is in
+      the failed state or <samp>buy_cake</samp> is waiting to be triggered.
       Shut down the suite by pressing the stop button in the cylc gui.</p>
-    
+
       <p>You may want to run the suite again to see both situations.</p>
     </div>
 
     <div class="slide">
       <h2 id="example-trigger">Adding suicide triggers</h2>
-      <p>Since <samp>buy_cake</samp> has corrected for the failure of 
-      <samp>bake_cake</samp> we don't need the suite to keep 
-      running - we would like the suite to be able to shutdown once the final 
+      <p>Since <samp>buy_cake</samp> has corrected for the failure of
+      <samp>bake_cake</samp> we don't need the suite to keep
+      running - we would like the suite to be able to shutdown once the final
       cycle has completed.</p>
-      
-      <p>We can make use of a suicide trigger to remove the failed 
-      <samp>bake_cake</samp> task.</p> 
+
+      <p>We can make use of a suicide trigger to remove the failed
+      <samp>bake_cake</samp> task.</p>
 
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Adding suicide triggers (2)</h3>
 
-      <p>Once <samp>buy_cake</samp> has succeeded we no longer need 
-      <samp>bake_cake</samp> so we can use a suicide 
+      <p>Once <samp>buy_cake</samp> has succeeded we no longer need
+      <samp>bake_cake</samp> so we can use a suicide
       trigger to remove <samp>bake_cake</samp> from the suite.</p>
-      
+
       <p>Modify the <samp>[scheduling]</samp> section to look like the following:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
@@ -212,50 +212,50 @@
 
     <div class="slide">
       <h3 class="alwayshidden">Adding suicide triggers (3)</h3>
-      
-      <p>The line <samp>buy_cake =&gt; !bake_cake</samp> is the suicide 
-      trigger. When <samp>buy_cake</samp> succeeds, <samp>bake_cake</samp> is 
+
+      <p>The line <samp>buy_cake =&gt; !bake_cake</samp> is the suicide
+      trigger. When <samp>buy_cake</samp> succeeds, <samp>bake_cake</samp> is
       removed from the suite.</p>
-      
+
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Adding suicide triggers (4)</h3>
-      
+
       <p>We also need to remove the <samp>buy_cake</samp> from the suite if
       it is not needed i.e. when <samp>bake_cake</samp> succeeds.</p>
-      
-      <p>Add the line <samp>bake_cake =&gt; !buy_cake</samp> to the 
+
+      <p>Add the line <samp>bake_cake =&gt; !buy_cake</samp> to the
       dependencies graph.</p>
-      
-      <p>Save your changes and run your suite. You should now be able to 
-      <samp>eat_cake</samp> and not worry about previous tasks keeping the 
+
+      <p>Save your changes and run your suite. You should now be able to
+      <samp>eat_cake</samp> and not worry about previous tasks keeping the
       suite from shutting down.</p>
 
     </div>
-    
+
     <div class="slide">
-      <h2 id="notes">Note on suicide triggers</h2> 
-    
-      <p>While it is possible to have a task suicide triggering itself this is 
-      not recommended and may lead to difficulties if manual interaction with 
-      the suite is required to correct the problem (the task has been removed 
-      from the suite).</p> 
-      
+      <h2 id="notes">Note on suicide triggers</h2>
+
+      <p>While it is possible to have a task suicide triggering itself this is
+      not recommended and may lead to difficulties if manual interaction with
+      the suite is required to correct the problem (the task has been removed
+      from the suite).</p>
+
     </div>
-    
+
     <div class="slide">
-      <h3 class="alwayshidden">Note on suicide triggers (2)</h3> 
-          
-      <p>Depending on your needs, possible places to put the suicide trigger 
+      <h3 class="alwayshidden">Note on suicide triggers (2)</h3>
+
+      <p>Depending on your needs, possible places to put the suicide trigger
       are:</p>
       <ul>
         <li>triggering off the success of a recovery task</li>
         <li>triggering off the final task in a cycle</li>
         <li>triggering off a cleanup task in the suite</li>
-      </ul>    
+      </ul>
     </div>
-    
+
   </div>
 </body>
 </html>

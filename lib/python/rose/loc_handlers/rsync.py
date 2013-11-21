@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 #
-# This file is part of Rose, a framework for scientific suites.
+# This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 import os
 from rose.checksum import get_checksum
 import socket
-from tempfile import TemporaryFile 
+from tempfile import TemporaryFile
 
 class RsyncLocHandler(object):
     """Handler of locations on remote hosts."""

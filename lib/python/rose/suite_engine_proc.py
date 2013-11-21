@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 #
-# This file is part of Rose, a framework for scientific suites.
+# This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ class CycleOffset(object):
 
     def __init__(self, offset_text):
         """Parse offset_text into an instance of CycleOffset.
-        
+
         Expect offset_text in this format:
         * A __ double underscore denotes an offset to the future.
           Otherwise, it is an offset to the past.
@@ -409,12 +409,12 @@ class SuiteEngineProcessor(object):
             return t
 
         t = self.get_task_props_from_env()
-        
+
         if kwargs["cycle"] is not None:
-        
-            #If no unit is specified for the cycle and the length is at least 
+
+            #If no unit is specified for the cycle and the length is at least
             #10 it is assumed to be in YYYYmmddHH format (length 10)
-            if (not CycleOffset.REC_TEXT.match(kwargs["cycle"]).group("unit") 
+            if (not CycleOffset.REC_TEXT.match(kwargs["cycle"]).group("unit")
                 and len(kwargs["cycle"]) >= 10):
                 t.task_cycle_time = kwargs["cycle"]
             else:

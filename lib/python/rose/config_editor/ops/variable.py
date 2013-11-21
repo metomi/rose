@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class VariableOperations(object):
 
     def __init__(self, data, util, reporter, undo_stack, redo_stack,
                  add_section_func,
-                 check_cannot_enable_func=rose.config_editor.false_function, 
+                 check_cannot_enable_func=rose.config_editor.false_function,
                  update_ns_func=rose.config_editor.false_function,
                  ignore_update_func=rose.config_editor.false_function,
                  search_id_func=rose.config_editor.false_function):
@@ -79,7 +79,7 @@ class VariableOperations(object):
         copy_var = variable.copy()
         v_id = variable.metadata.get('id')
         if v_id in [v.metadata.get('id') for v in variables]:
-            # This is the case of adding a blank variable and 
+            # This is the case of adding a blank variable and
             # renaming it to an existing variable's name.
             # At the moment, assume this should just be skipped.
             pass
@@ -177,13 +177,13 @@ class VariableOperations(object):
                 new_reason_dict = {rose.variable.IGNORED_BY_SYSTEM:
                                    rose.config_editor.IGNORED_STATUS_MANUAL}
         self.set_var_ignored(variable, new_reason_dict)
-                
+
     def set_var_ignored(self, variable, new_reason_dict=None, override=False):
         """Set the ignored flag data for the variable.
-        
+
         new_reason_dict replaces the variable.ignored_reason attribute,
         except for the rose.variable.IGNORED_BY_SECTION key.
-        
+
         """
         if new_reason_dict is None:
             new_reason_dict = {}
@@ -287,7 +287,7 @@ class VariableOperations(object):
         if save_var is None:
             return None
         return save_var.ignored_reason
-  
+
     def get_var_original_value(self, variable):
         """Get the original value, if any."""
         var_id = variable.metadata['id']

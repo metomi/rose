@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class LogicalArrayValueWidget(gtk.HBox):
 
     TIP_ADD = 'Add array element'
     TIP_DEL = 'Delete array element'
-    
+
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(LogicalArrayValueWidget, self).__init__(homogeneous=False,
                                                       spacing=0)
@@ -59,7 +59,7 @@ class LogicalArrayValueWidget(gtk.HBox):
                        rose.TYPE_LOGICAL_FALSE_TITLE,
                        rose.TYPE_LOGICAL_VALUE_TRUE:
                        rose.TYPE_LOGICAL_TRUE_TITLE}
-        
+
         imgs = [(gtk.STOCK_MEDIA_STOP, gtk.ICON_SIZE_MENU),
                 (gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)]
         self.make_log_image = lambda i: gtk.image_new_from_stock(*imgs[i])
@@ -85,7 +85,7 @@ class LogicalArrayValueWidget(gtk.HBox):
         self.connect('focus-in-event',
                      lambda w, e: self.hook.get_focus(
                                                 self.get_focus_entry()))
-    
+
     def get_focus_entry(self):
         """Get either the last selected button or the last one."""
         return self.entries[-1]
@@ -170,12 +170,12 @@ class LogicalArrayValueWidget(gtk.HBox):
         num_fields = len(self.entries)
         num_rows_now = 1 + (num_fields - 1) / self.num_allowed_columns
         self.entry_table.resize(num_rows_now, self.num_allowed_columns)
-        if (self.max_length.isdigit() and 
+        if (self.max_length.isdigit() and
             len(self.entries) >= int(self.max_length)):
             self.add_button.hide()
         else:
             self.add_button.show()
-        if (self.max_length.isdigit() and 
+        if (self.max_length.isdigit() and
             len(self.entries) <= int(self.max_length)):
             self.del_button.hide()
         else:

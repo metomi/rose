@@ -48,7 +48,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
@@ -58,10 +58,10 @@
         """
 [runtime]
     [[root]]
-        command scripting = "sleep 5"
+        command scripting = sleep 5
         [[[event hooks]]]
-            failed handler = "rose suite-hook"
-            succeeded handler = "rose suite-hook"
+            failed handler = rose suite-hook
+            succeeded handler = rose suite-hook
         [[[remote]]]
             # Run on the computer that invoked 'rose suite-run'
             host = {{ ROSE_ORIG_HOST }}
@@ -75,8 +75,8 @@
             """
     # All competitors should inherit (directly or indirectly) from COMPETITOR_VEHICLE.
     [[COMPETITOR_VEHICLE]]
-        pre-command scripting = "printenv | sort | grep ^COMP"
-        command scripting = "race"
+        pre-command scripting = printenv | sort | grep ^COMP
+        command scripting = race
         [[[environment]]]
             COMP_OUTPUT_DIR = $CYLC_SUITE_SHARE_PATH
     # Families defining vehicle externals (body, wheels..)

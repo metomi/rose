@@ -83,12 +83,12 @@
     <div class="slide">
       <h2 id="purpose">Purpose</h2>
 
-      <p>Remote settings are used to specify the machine on which to run a 
+      <p>Remote settings are used to specify the machine on which to run a
       task.</p>
 
       <p>Remote names can either be hard coded or automatically selected for
-      you via <samp>rose host-select</samp>. Remote settings should be used to 
-      send tasks off to be run on remote machines rather than running on your 
+      you via <samp>rose host-select</samp>. Remote settings should be used to
+      send tasks off to be run on remote machines rather than running on your
       cylc server.</p>
     </div>
 
@@ -100,7 +100,7 @@
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
 
@@ -108,19 +108,19 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
-        graph = "initialise =&gt; short &amp; medium &amp; long"
+        graph = initialise =&gt; short &amp; medium &amp; long
 [runtime]
     [[root]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
         [[[environment]]]
-            ROSE_TASK_APP="calc_pi"
+            ROSE_TASK_APP=calc_pi
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
-            failed handler = "rose suite-hook"
+            succeeded handler = rose suite-hook
+            failed handler = rose suite-hook
 </pre>
     </div>
 
@@ -131,13 +131,13 @@
         command scripting = "echo 'initialising...'; sleep 10"
     [[short]]
         [[[environment]]]
-            NUM="50"
+            NUM=50
     [[medium]]
         [[[environment]]]
-            NUM="500"
+            NUM=500
     [[long]]
         [[[environment]]]
-            NUM="5000"
+            NUM=5000
 </pre>
     </div>
 
@@ -210,12 +210,12 @@ default=echo "scale=$NUM; 4*a(1)" | bc -l -q
       <samp>[[root]]</samp> task:</p>
       <pre class="prettyprint lang-cylc">
         [[[remote]]]
-            host = "my-desktop"
+            host = my-desktop
 </pre>
 
       <p>where <em>"my-desktop"</em> is the name of your desktop machine in
       quotes. This will result in all tasks running on your desktop
-      machine. If you don't know the name of your desktop, type 
+      machine. If you don't know the name of your desktop, type
       <samp>hostname</samp> into your terminal.</p>
     </div>
 
@@ -264,7 +264,7 @@ default=echo "scale=$NUM; 4*a(1)" | bc -l -q
 
       <p>Depending on your rose configuration you should see something along
       the lines of:</p>
-      <pre class="prettyprint lang-cylc">
+      <pre class="prettyprint lang-rose_conf">
 default=linux-servers
 group{linux-servers}=server01 server02 server03
 group{hpc}=node01 node02 node03
@@ -280,8 +280,8 @@ group{hpc}=node01 node02 node03
     <div class="slide">
       <h3 class="alwayshidden">Automating host selection (3)</h3>
 
-      <p>In your terminal, experiment with <samp>rose host-select</samp> and 
-      the names of the groups listed earlier to see what hostnames are 
+      <p>In your terminal, experiment with <samp>rose host-select</samp> and
+      the names of the groups listed earlier to see what hostnames are
       returned e.g. if you discovered a group called "linux-servers" see what
       is returned when you run <samp>rose host-select linux-servers</samp>.</p>
     </div>
@@ -297,14 +297,14 @@ group{hpc}=node01 node02 node03
       <pre class="prettyprint lang-cylc">
     [[medium]]
         [[[remote]]]
-            host = "`rose host-select`"
+            host = `rose host-select`
         [[[environment]]]
-            NUM="500"
+            NUM=500
     [[long]]
         [[[remote]]]
-            host = "`rose host-select groupname`"
+            host = `rose host-select groupname`
         [[[environment]]]
-            NUM="5000"
+            NUM=5000
 </pre>
     </div>
 

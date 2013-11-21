@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -47,10 +47,10 @@ REC_HYPERLINK_ID_OR_URL = re.compile(
                         (?P<url>[\w:-]+=\w+|https?://[^\s<]+)
                         (?P<end_break>\b)""", re.X)
 MARKUP_URL_HTML = (r"""\g<start_break>""" +
-                   r"""<a href='\g<url>'>\g<url></a>""" + 
+                   r"""<a href='\g<url>'>\g<url></a>""" +
                    r"""\g<end_break>""")
 MARKUP_URL_UNDERLINE = (r"""\g<start_break>""" +
-                        r"""<u>\g<url></u>""" + 
+                        r"""<u>\g<url></u>""" +
                         r"""\g<end_break>""")
 
 
@@ -77,13 +77,13 @@ class CustomButton(gtk.Button):
             self.label = gtk.Label()
             self.label.set_text(label)
             self.label.show()
-            
+
             if self.icon_at_start:
                 self.hbox.pack_end(self.label, expand=False, fill=False,
                                    padding=5)
             else:
                 self.hbox.pack_start(self.label, expand=False, fill=False,
-                                   padding=5)                       
+                                   padding=5)
         if stock_id is not None:
             self.stock_id = stock_id
             self.icon = gtk.Image()
@@ -136,42 +136,42 @@ class CustomButton(gtk.Button):
 class CustomExpandButton(gtk.Button):
 
     """Custom button for expanding/hiding something"""
-    
+
     def __init__(self, expander_function=None,
                  label=None,
                  size=gtk.ICON_SIZE_SMALL_TOOLBAR,
                  tip_text=None,
-                 as_tool=False, 
+                 as_tool=False,
                  icon_at_start=False,
                  minimised=True):
-    
+
         self.expander_function = expander_function
         self.minimised = minimised
 
         self.expand_id = gtk.STOCK_ADD
         self.minimise_id = gtk.STOCK_REMOVE
-        
+
         if minimised:
             self.stock_id = self.expand_id
         else:
             self.stock_id = self.minimise_id
-        
+
         self.hbox = gtk.HBox()
         self.size = size
         self.as_tool = as_tool
         self.icon_at_start = icon_at_start
-        
+
         if label is not None:
             self.label = gtk.Label()
             self.label.set_text(label)
             self.label.show()
-            
+
             if self.icon_at_start:
                 self.hbox.pack_end(self.label, expand=False, fill=False,
                                    padding=5)
             else:
                 self.hbox.pack_start(self.label, expand=False, fill=False,
-                                   padding=5)                       
+                                   padding=5)
         self.icon = gtk.Image()
         self.icon.set_from_stock(self.stock_id, size)
         self.icon.show()
@@ -181,7 +181,7 @@ class CustomExpandButton(gtk.Button):
             self.hbox.pack_end(self.icon, expand=False, fill=False)
         self.hbox.show()
         super(CustomExpandButton, self).__init__()
-        
+
         if self.as_tool:
             self.set_relief(gtk.RELIEF_NONE)
             self.connect("leave", lambda b: b.set_relief(gtk.RELIEF_NONE))
@@ -192,7 +192,7 @@ class CustomExpandButton(gtk.Button):
         self.connect("clicked", self.toggle)
 
     def set_stock_id(self, stock_id):
-        """Set the icon stock_id""" 
+        """Set the icon stock_id"""
         if hasattr(self, "icon"):
             self.hbox.remove(self.icon)
         self.icon.set_from_stock(stock_id, self.size)
@@ -206,8 +206,8 @@ class CustomExpandButton(gtk.Button):
     def set_tip_text(self, new_text):
         """Set the tip text"""
         self.set_tooltip_text(new_text)
-        
-    def toggle(self, minimise=None):    
+
+    def toggle(self, minimise=None):
         """Toggle between show/hide states"""
         if minimise is not None:
             if minimise == self.minimised:
@@ -218,7 +218,7 @@ class CustomExpandButton(gtk.Button):
         else:
             self.stock_id = self.minimise_id
         if self.expander_function is not None:
-            self.expander_function(set_visibility=not self.minimised)                                
+            self.expander_function(set_visibility=not self.minimised)
         self.set_stock_id(self.stock_id)
 
 
@@ -255,7 +255,7 @@ class CustomMenuButton(gtk.MenuToolButton):
             button_menu.append(new_item)
         button_menu.show()
         self.set_menu(button_menu)
-        
+
 
 class ToolBar(gtk.Toolbar):
 
@@ -386,7 +386,7 @@ class ThreadedProgressBar(gtk.ProgressBar):
         self.thread = threading.Thread()
         self.thread.run = lambda: gobject.timeout_add(50, self._run)
         self.thread.start()
-        
+
     def _run(self):
         gtk.gdk.threads_enter()
         self.pulse()
@@ -446,7 +446,7 @@ class Notebook(gtk.Notebook):
     def delete_by_label(self, label):
         """Remove the (unique) page with this label as title."""
         self.remove_page(self.get_page_labels().index(label))
-        
+
     def delete_by_id(self, page_id):
         """Use this only with pages with the attribute 'namespace'."""
         self.remove_page(self.get_page_ids().index(page_id))
@@ -505,12 +505,12 @@ class TooltipTreeView(gtk.TreeView):
 class TreeModelSortUtil(object):
 
     """This class contains useful sorting methods for TreeModelSort.
-    
+
     Arguments:
     sort_model_getter_func - a function accepting no arguments that
     returns the TreeModelSort. This is necessary if a combination
     of TreeModelFilter and TreeModelSort is used.
-    
+
     Keyword Arguments:
     multi_sort_num - the maximum number of columns to sort by. For
     example, setting this to 2 means that a single secondary sort
@@ -518,7 +518,7 @@ class TreeModelSortUtil(object):
 
     You must connect to both handle_sort_column_change and sort_column
     for multi-column sorting. Example code:
-    
+
     sort_model = gtk.TreeModelSort(filter_model)
     sort_util = TreeModelSortUtil(
                          lambda: sort_model,
@@ -589,7 +589,7 @@ class TreeModelSortUtil(object):
             val2 = model.get_value(iter2, next_id)
             rval = next_cmp_factor * self.cmp_(val1, val2)
             i += 1
-        return rval 
+        return rval
 
 
 run_gtk_main = gtk.main
@@ -653,7 +653,7 @@ def handle_link(url, search_function, handle_web=False):
         search_function(url)
     return False
 
-    
+
 def extract_link(label, search_function):
     text = label.get_text()
     bounds = label.get_selection_bounds()

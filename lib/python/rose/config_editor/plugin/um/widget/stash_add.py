@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -212,7 +212,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
                 self._store.append(parent_iter, row_data)
             else:
                 parent_data = [row_data[0]] + [None] * len(row_data[1:])
-                parent_iter = self._store.append(None, parent_data) 
+                parent_iter = self._store.append(None, parent_data)
                 self._store.append(parent_iter, row_data)
         filter_model = self._store.filter_new()
         filter_model.set_visible_func(self._filter_visible)
@@ -225,13 +225,13 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
 
     def set_tree_tip(self, treeview, row_iter, col_index, tip):
         """Add the hover-over text for a cell to 'tip'.
-        
+
         treeview is the gtk.TreeView object
         row_iter is the gtk.TreeIter for the row
         col_index is the index of the gtk.TreeColumn in
         e.g. treeview.get_columns()
         tip is the gtk.Tooltip object that the text needs to be set in.
-        
+
         """
         model = treeview.get_model()
         stash_section_index = self.column_names.index("Section")
@@ -325,7 +325,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             self._store.set_value(parent_iter, streq_info_index,
                                   streq_info_children)
             parent_iter = self._store.iter_next(parent_iter)
-                    
+
     def _update_row_request_info(self, model, path, iter_, user_data):
         # Update the streq namelist information for a model row.
         (sect_col_index, item_col_index,
@@ -369,7 +369,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             else:
                 rows_are_descendants.append(False)
                 last_entry = row[0]
-        return data_rows, column_names, rows_are_descendants  
+        return data_rows, column_names, rows_are_descendants
 
     def _filter_refresh(self, widget=None):
         # Hook function that reacts to a change in filter status.
@@ -519,7 +519,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             return False
         self.group_index = group_index
         self.generate_tree_view()
-        return False  
+        return False
 
     def _launch_record_help(self, menuitem):
         """Launch the help from a menu."""

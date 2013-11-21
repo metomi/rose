@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ import rose.gtk.util
 class BaseSummaryDataPanel(gtk.VBox):
 
     """A base class for summarising data across many namespaces.
-    
+
     Subclasses should provide the following methods:
     def add_cell_renderer_for_value(self, column, column_title):
     def get_model_data(self):
@@ -97,7 +97,7 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def get_model_data(self):
         """Return a list of data tuples, plus column names.
-        
+
         The returned list should contain lists of items for each row.
         The column names should be a list of strings for column titles.
 
@@ -106,7 +106,7 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def get_section_column_index(self):
         """Return the section name column index from the gtk.TreeView.
-        
+
         This may change based on the grouping (self.group_index).
 
         """
@@ -114,7 +114,7 @@ class BaseSummaryDataPanel(gtk.VBox):
 
     def set_tree_cell_status(self, column, cell, model, row_iter):
         """Add status markup to the cell - e.g. error notification.
-        
+
         column is the gtk.TreeColumn where the cell is
         cell is the gtk.CellRendererText to add markup to
         model is the gtk.TreeModel-derived data store
@@ -122,16 +122,16 @@ class BaseSummaryDataPanel(gtk.VBox):
 
         """
         raise NotImplementedError()
-    
+
     def set_tree_tip(self, treeview, row_iter, col_index, tip):
         """Add the hover-over text for a cell to 'tip'.
-        
+
         treeview is the gtk.TreeView object
         row_iter is the gtk.TreeIter for the row
         col_index is the index of the gtk.TreeColumn in
         e.g. treeview.get_columns()
         tip is the gtk.Tooltip object that the text needs to be set in.
-        
+
         """
         raise NotImplementedError()
 
@@ -209,7 +209,7 @@ class BaseSummaryDataPanel(gtk.VBox):
                 store.append(parent_iter, row_data)
             else:
                 parent_data = [row_data[0]] + [None] * len(row_data[1:])
-                parent_iter = store.append(None, parent_data) 
+                parent_iter = store.append(None, parent_data)
                 store.append(parent_iter, row_data)
         for extra_index in range(i + 1, store.iter_n_children(None)):
             remove_iter = store.iter_nth_child(None, extra_index)
@@ -345,13 +345,13 @@ class BaseSummaryDataPanel(gtk.VBox):
                 return True
             child_iter = model.iter_next(child_iter)
         return False
-         
+
     def _handle_activation(self, view, path, column):
         if path is None:
             return False
         model = view.get_model()
         row_iter = model.get_iter(path)
-        col_index = view.get_columns().index(column)       
+        col_index = view.get_columns().index(column)
         cell_data = model.get_value(row_iter, col_index)
         sect_index = self.get_section_column_index()
         section = model.get_value(row_iter, sect_index)
@@ -369,7 +369,7 @@ class BaseSummaryDataPanel(gtk.VBox):
             if event.button == 3:
                 self._popup_tree_menu(path, col, event)
             elif event.button == 2:
-                self._handle_activation(treeview, path, col)               
+                self._handle_activation(treeview, path, col)
         return False
 
     def _popup_tree_menu(self, path, col, event):

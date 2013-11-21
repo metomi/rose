@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ class VarData(object):
                 if var.metadata['id'] == var_id:
                     return var
         return None
-                
+
 
 class SectData(object):
 
@@ -197,7 +197,7 @@ class ConfigDataManager(object):
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
                 if filename in [rose.TOP_CONFIG_NAME, rose.SUB_CONFIG_NAME]:
-                    self.load_top_config(top_level_directory, 
+                    self.load_top_config(top_level_directory,
                                          load_all_apps=load_all_apps,
                                          load_no_apps=load_no_apps,
                                          metadata_off=metadata_off)
@@ -215,12 +215,12 @@ class ConfigDataManager(object):
                              config_type=config_type)
         self.saved_config_names = set(self.config.keys())
 
-    def load_top_config(self, top_level_directory, preview=False, 
+    def load_top_config(self, top_level_directory, preview=False,
                         load_all_apps=False, load_no_apps=False,
                         metadata_off=False):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
-        
+
         self.app_count = 0
         if top_level_directory is None:
             self.top_level_name = rose.config_editor.UNTITLED_NAME
@@ -231,7 +231,7 @@ class ConfigDataManager(object):
             if os.path.isdir(config_container_dir):
                 sub_contents = os.listdir(config_container_dir)
                 sub_contents.sort()
-                
+
                 if not load_all_apps:
                     if load_no_apps:
                         preview = True
@@ -242,16 +242,16 @@ class ConfigDataManager(object):
                             if (os.path.isdir(conf_path) and
                                 not config_dir.startswith('.')):
                                     self.app_count += 1
-                
-                        if (self.app_count > 
+
+                        if (self.app_count >
                             rose.config_editor.MAX_APPS_THRESHOLD):
                             preview = True
-                
+
                 for config_dir in sub_contents:
                     conf_path = os.path.join(config_container_dir, config_dir)
                     if (os.path.isdir(conf_path) and
                         not config_dir.startswith('.')):
-                        self.load_config(conf_path, preview=preview, 
+                        self.load_config(conf_path, preview=preview,
                                          metadata_off=metadata_off)
             self.load_config(top_level_directory)
             self.reload_ns_tree_func()
@@ -320,16 +320,16 @@ class ConfigDataManager(object):
                                         rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                         text, title)
                     sys.exit(2)
-                    
+
             if config_directory != self.top_level_directory and preview:
                 # Load with empty ConfigNodes for initial app access.
                 config = rose.config.ConfigNode()
                 s_config = rose.config.ConfigNode()
             else:
                 config, s_config = self.load_config_file(config_path)
-        
-        
-        if config_directory != self.top_level_directory and preview: 
+
+
+        if config_directory != self.top_level_directory and preview:
             meta_config = rose.config.ConfigNode()
             meta_files = []
         elif metadata_off:
@@ -339,10 +339,10 @@ class ConfigDataManager(object):
             meta_config = self.load_meta_config(config, config_directory,
                                                 config_type=config_type)
             meta_files = self.load_meta_files(config, config_directory)
-                
+
         opt_conf_lookup = self.load_optional_configs(config_directory)
-        
-        
+
+
         macro_module_prefix = self.helper.get_macro_module_prefix(name)
         macros = rose.macro.load_meta_macro_modules(
                       meta_files, module_prefix=macro_module_prefix)
@@ -352,11 +352,11 @@ class ConfigDataManager(object):
                                        opt_conf_lookup, meta_config,
                                        meta_id, meta_files, macros,
                                        config_type, is_preview=preview)
-        
+
         self.load_builtin_macros(name)
         self.load_file_metadata(name)
         self.filter_meta_config(name)
-        
+
         # Load section and variable data into the object.
         sects, l_sects = self.load_sections_from_config(name)
         s_sects, s_l_sects = self.load_sections_from_config(name)
@@ -365,7 +365,7 @@ class ConfigDataManager(object):
         var, l_var = self.load_vars_from_config(name)
         s_var, s_l_var = self.load_vars_from_config(name)
         self.config[name].vars = VarData(var, l_var, s_var, s_l_var)
-        
+
         if not skip_load_event:
             self.reporter.report_load_event(
                           rose.config_editor.EVENT_LOAD_METADATA.format(
@@ -412,7 +412,7 @@ class ConfigDataManager(object):
                 # filename is a null string if path is to a directory.
                 result = re.match(rose.RE_OPT_CONFIG_FILE, filename)
                 if not result:
-                    continue                    
+                    continue
                 name = result.group(1)
                 try:
                     opt_config = rose.config.load(path)
@@ -951,7 +951,7 @@ class ConfigDataManager(object):
                     # Doc table: I_t -> E
                     parents = self.trigger[config_name].enabled_dict.get(
                                                                 setting_id)
-                    help_str = (rose.config_editor.WARNING_NOT_ENABLED + 
+                    help_str = (rose.config_editor.WARNING_NOT_ENABLED +
                                 ', '.join(parents))
                     err_type = rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED
                     node_inst.error.update({err_type: help_str})
@@ -1018,7 +1018,7 @@ class ConfigDataManager(object):
         for setting_id, sect_node in meta_config.value.items():
             # The following 'wildcard-esque' id is an exception.
             # Wildcards are not supported in Rose metadata.
-            if (not sect_node.is_ignored() and 
+            if (not sect_node.is_ignored() and
                 setting_id.startswith("file:*=")):
                 file_ids.append(setting_id)
         for section in file_sections:
@@ -1058,7 +1058,7 @@ class ConfigDataManager(object):
             section_objects = config_sections.get_all(save=from_saved)
         for sect_obj in section_objects:
             self.load_ns_for_node(sect_obj, config_name)
-        
+
     def load_ns_for_node(self, node, config_name):
         """Load a namespace for a variable or section."""
         meta_config = self.config[config_name].meta

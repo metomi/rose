@@ -220,7 +220,7 @@ extended/overwritten by settings in red_car
 
       <p>In a diagram form, the inheritance now looks like:</p>
       <pre>
-       root 
+       root
       /   \__________
      /               \
 COMPETITOR_VEHICLE  ENGINE_ELECTRIC
@@ -268,7 +268,7 @@ extended/overwritten by red_car
       <pre class="prettyprint lang-cylc">
     [[red_car]]
         # From COMPETITOR_VEHICLE:
-        command scripting = "race"
+        command scripting = race
 
         [[[environment]]]
             # From ENGINE ELECTRIC:
@@ -343,8 +343,8 @@ extended/overwritten by red_car
       <samp>COMPETITOR_VEHICLE</samp> runtime to:</p>
       <pre class="prettyprint lang-cylc">
     [[COMPETITOR_VEHICLE]]
-        pre-command scripting = "printenv | sort | grep ^COMP"
-        command scripting = "race"
+        pre-command scripting = printenv | sort | grep ^COMP
+        command scripting = race
         [[[environment]]]
             COMP_MAX_POWER_KW = 130
             COMP_OUTPUT_DIR = $CYLC_SUITE_SHARE_PATH
@@ -382,7 +382,7 @@ settings in root
 extended/overwritten by settings in ENGINE_ELECTRIC
 extended/overwritten by settings in COMPETITOR_VEHICLE
 extended/overwritten by BODY_CAR
-extended/overwritten by red_car 
+extended/overwritten by red_car
 </pre>
     </div>
 
@@ -400,7 +400,7 @@ settings in root
 extended/overwritten by settings in COMPETITOR_VEHICLE
 extended/overwritten by settings in ENGINE_ELECTRIC
 extended/overwritten by BODY_CAR
-extended/overwritten by red_car 
+extended/overwritten by red_car
 </pre>
 
       <p>which is subtly different. This is a case of <a href=
@@ -429,7 +429,7 @@ extended/overwritten by red_car
       <samp>COMP_MAX_POWER_KW</samp> setting:</p>
       <pre class="prettyprint lang-cylc">
     [[ENGINE_PETROL]]
-        inherit = COMPETITOR_VEHICLE    
+        inherit = COMPETITOR_VEHICLE
         [[[environment]]]
             COMP_GEAR_RATIOS = 3.18 2.26 1.68 1.29 1.06
             COMP_POWER_FRAC_VS_1000_RPM = 0.18 0.3 0.6 0.88 1.0 0.6

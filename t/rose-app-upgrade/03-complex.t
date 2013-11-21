@@ -1,19 +1,19 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
@@ -196,13 +196,13 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
                             state=config.STATE_SYST_IGNORED)
         self.change_setting_value(config, ["namelist:standard_sect",
                                            "missing_opt"], "5")
-        self.change_setting_value(config, ["namelist:change_opt", 
+        self.change_setting_value(config, ["namelist:change_opt",
                                            "opt_has_changed"],
                                   ".true.")
-        self.change_setting_value(config, ["namelist:change_opt", 
+        self.change_setting_value(config, ["namelist:change_opt",
                                            "ignore_opt_has_changed"],
                                   ".true.")
-        self.change_setting_value(config, ["namelist:change_opt", 
+        self.change_setting_value(config, ["namelist:change_opt",
                                            "trig_ignore_opt_has_changed"],
                                   ".true.")
         self.remove_setting(config, ["namelist:missing_sect"])
@@ -625,13 +625,13 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
         self.change_setting_value(config, ["namelist:standard_sect",
                                            "missing_opt"], "5",
                                   info="good")
-        self.change_setting_value(config, ["namelist:change_opt", 
+        self.change_setting_value(config, ["namelist:change_opt",
                                            "opt_has_changed"],
                                   ".true.", info="good")
-        self.change_setting_value(config, ["namelist:change_opt", 
+        self.change_setting_value(config, ["namelist:change_opt",
                                            "ignore_opt_has_changed"],
                                   ".true.", info="good")
-        self.change_setting_value(config, ["namelist:change_opt", 
+        self.change_setting_value(config, ["namelist:change_opt",
                                            "trig_ignore_opt_has_changed"],
                                   ".true.", info="good")
         self.remove_setting(config, ["namelist:missing_sect"], info="bad")

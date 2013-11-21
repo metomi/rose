@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ class Updater(object):
         for config_name in configs:
             self.update_config(config_name)
         self.pagelist = self.get_pagelist_func()
-        
+
         if not skip_checking:
             for ns in unique_namespaces:
                 if ns in [p.namespace for p in self.pagelist]:
@@ -179,7 +179,7 @@ class Updater(object):
                 self.update_ignored_statuses(ns)
                 self.update_ns_tree_states(ns)
             self.perform_error_check(is_loading=is_loading)
-        
+
         for ns in unique_namespaces:
             if ns in [p.namespace for p in self.pagelist]:
                 index = [p.namespace for p in self.pagelist].index(ns)
@@ -272,7 +272,7 @@ class Updater(object):
                         (page_real.append, set(real) - set(page_real)),
                         (page_miss.remove, set(page_miss) - set(miss)),
                         (page_miss.append, set(miss) - set(page_miss))]
-        
+
         for action, v_set in action_vsets:
             for var in v_set:
                 if var not in refresh_vars:
@@ -306,7 +306,7 @@ class Updater(object):
                 var_id = variable.metadata['id']
                 option = self.util.get_section_option_from_id(var_id)[1]
                 sect_data.options.append(option)
-            
+
     def update_ignored_statuses(self, namespace):
         """Refresh the list of ignored variables and update relevant pages."""
         config_name = self.util.split_full_ns(self.data, namespace)[0]
@@ -392,7 +392,7 @@ class Updater(object):
         """Update the variable ignored flags ('reasons')."""
         config_data = self.data.config[config_name]
         trigger = self.data.trigger[config_name]
-        
+
         config = config_data.config
         meta_config = config_data.meta
         config_sections = config_data.sections
@@ -599,7 +599,7 @@ class Updater(object):
                 self.main_handle.handle_macro_validation(
                           config_name, 'format.FormatChecker.validate',
                           macro_config, problem_list)
-                   
+
     def perform_error_check(self, namespace=None, is_loading=False):
         """Loop through system macros and sum errors."""
         for macro_name in [rose.META_PROP_COMPULSORY, rose.META_PROP_TYPE]:
@@ -720,7 +720,7 @@ class Updater(object):
                     update_text = rose.config_editor.EVENT_LOAD_ERRORS.format(
                                                      self.data.top_level_name,
                                                      self.load_errors)
-                    
+
                     self.reporter.report_load_event(update_text,
                                                     no_progress=True)
             if setting_id in map_:

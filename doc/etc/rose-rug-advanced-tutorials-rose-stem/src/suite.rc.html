@@ -46,10 +46,10 @@
 [cylc]
     # Timeout handlers
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 1410 # 23.5 hours
 
-# This links a name specified on the command in rose-stem with a 
+# This links a name specified on the command in rose-stem with a
 # set of cylc task dependencies
 {# name_graphs contains test_option-dependency key-value pairs -#}
 {%- set name_graphs = {
@@ -101,24 +101,24 @@
 export CYLC_VERSION={{CYLC_VERSION}}
 export ROSE_VERSION={{ROSE_VERSION}}
 """
-        command scripting = "rose task-run --verbose"
-        environment scripting = "eval $(rose task-env)"
+        command scripting = rose task-run --verbose
+        environment scripting = eval $(rose task-env)
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
-            failed handler = "rose suite-hook"
-            retry handler = "rose suite-hook --mail"
-            submission failed handler = "rose suite-hook --mail"
+            succeeded handler = rose suite-hook
+            failed handler = rose suite-hook
+            retry handler = rose suite-hook --mail
+            submission failed handler = rose suite-hook --mail
             submission timeout = 720 # 12 hours
-            submission timeout handler = "rose suite-hook --mail"
+            submission timeout handler = rose suite-hook --mail
             execution timeout  =  180 # 3 hours
-            execution timeout handler = "rose suite-hook --mail"
+            execution timeout handler = rose suite-hook --mail
 
     [[fcm_make_spaceship]]
         [[[environment]]]
             SOURCE_SPACESHIP = {{SOURCE_SPACESHIP}}
-    
+
     [[spaceship]]
-    
+
     [[rose_ana_position]]
 </pre>
   </div>

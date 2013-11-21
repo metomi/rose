@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 #
-# This file is part of Rose, a framework for scientific suites.
+# This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -292,7 +292,7 @@ class Analyse(object):
             newtask.comparison = self.config.get_value([task, "comparison"])
             newtask.tolerance = self.config.get_value([task, "tolerance"])
             newtask.warnonfail = (
-                    self.config.get_value([task, "warnonfail"]) in 
+                    self.config.get_value([task, "warnonfail"]) in
                     ["yes", "true"])
 
             # Allow for multiple KGO, e.g. kgo1file, kgo2file, for

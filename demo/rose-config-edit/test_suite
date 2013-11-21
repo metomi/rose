@@ -102,5 +102,5 @@ Test inconsistent ignored variables
 Switch on/off ignored variables, value-based and list. Repeat with View->Ignored on/off combinations. Test Menu functions.
 Test trigger on/off of a variable that is only in metadata.
 Test loading with cyclic/inter-sibling dependency.
-Test loading with a trigger variable with no metadata entry. 
+Test loading with a trigger variable with no metadata entry.
 

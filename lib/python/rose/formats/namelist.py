@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -271,11 +271,11 @@ _PARSERS_FOR = {"": [[RE_GROUP_INIT, "group-init", "group"],
 
 def _parse_func(ctx):
     """The parsers at each "state" - each "state" has a set of parsers.
-    
+
     Each parser contains a regular expression, the item type to return
     on a match, and the name of the next state (if the match triggers
     a state change).
-    
+
     If the current string does not match, it will move on to the next
     parser. A syntax error is raised if no more parsers are available
     for the current state.

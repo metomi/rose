@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -192,12 +192,12 @@ class ConfigNode(object):
 
         state defines the node.state property at this position.
 
-        comments defines the node.comments property at this position.        
+        comments defines the node.comments property at this position.
 
         If value is None, the node is 'unset'.
-        
+
         If state is None, the node.state property is unchanged.
-        
+
         If comments is None, the node.comments property is unchanged.
 
         """
@@ -233,7 +233,7 @@ class ConfigNode(object):
         'keys'. If an entry in keys is the null string,
         it is skipped.
 
-        """        
+        """
         if keys is None:
             return None
         keys = list(keys)
@@ -393,7 +393,7 @@ class ConfigLoader(object):
                      trigger an OSError.
 
         Return node.
-        
+
         """
         node = self.load(source, node)
         opt_conf_keys_node = node.unset(["opts"])
@@ -430,7 +430,7 @@ class ConfigLoader(object):
         node --- a ConfigNode object if specified, otherwise created.
 
         Return node.
-        
+
         """
         if node is None:
             node = ConfigNode()

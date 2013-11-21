@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ STATUS_TIP = {rosie.ws_client.STATUS_CR: rosie.browser.LOCAL_STATUS_CORRUPT,
 class DisplayBox(gtk.VBox):
 
     """Custom widget for displaying search results"""
-    
+
     descending = None
     sort_title = None
     query_rows = None
@@ -69,7 +69,7 @@ class DisplayBox(gtk.VBox):
         self.treeview.show()
         self.treeview.set_rules_hint(True)
         self.treeview_scroll = gtk.ScrolledWindow()
-        self.treeview_scroll.set_policy(gtk.POLICY_AUTOMATIC, 
+        self.treeview_scroll.set_policy(gtk.POLICY_AUTOMATIC,
                                         gtk.POLICY_AUTOMATIC)
         self.treeview_scroll.show()
         self.treeview_scroll.add(self.treeview)
@@ -91,8 +91,8 @@ class DisplayBox(gtk.VBox):
     def get_info_text(self, path=None):
         """Select a suite to display properties for."""
         idx, branch, revision = self.get_suite_keys_treeview(path)
-        return self._result_info[(idx, branch, revision)] 
-        
+        return self._result_info[(idx, branch, revision)]
+
     def get_selected_suite_field(self, field=None):
         """Return the currently selected suite title."""
         if field is None:
@@ -110,8 +110,8 @@ class DisplayBox(gtk.VBox):
                 details = self.treestore.get_value(this_iter, index)
                 return details
             else:
-                return None   
-        
+                return None
+
     def get_suite_keys_treeview(self, path=None):
         """Return the suite keys for a selected suite"""
         if path is None:
@@ -157,7 +157,7 @@ class DisplayBox(gtk.VBox):
         i = self.get_column_index_by_name("local")
         if i is None:
             return False
-        return model.get_value(model.get_iter(path), i)    
+        return model.get_value(model.get_iter(path), i)
 
     def _get_treeview_tooltip(self, view, row_iter, col_index, tip):
         """Handle creating a tooltip for the treeview."""
@@ -181,7 +181,7 @@ class DisplayBox(gtk.VBox):
         sort_index = cols.index(column.get_widget().get_text())
         descending = (column.get_sort_order() == gtk.SORT_DESCENDING)
         self.descending = descending
-        self.update_treemodel(sort_index, descending) 
+        self.update_treemodel(sort_index, descending)
 
     def _handle_grouping(self, menuitem):
         """Handle grouping of treeview items"""
@@ -220,8 +220,8 @@ class DisplayBox(gtk.VBox):
         model.set_value(r_iter, index_map["local"], local_status)
         return False
 
-    def update_result_info(self, id_tuple, result_map, local_status, 
-                           search_manager, id_formatter): 
+    def update_result_info(self, id_tuple, result_map, local_status,
+                           search_manager, id_formatter):
         """Update the cached info for a suite."""
         idx, branch, revision = id_tuple
         id_text = id_formatter(idx, branch, revision)
@@ -240,7 +240,7 @@ class DisplayBox(gtk.VBox):
             line = key + rosie.browser.DELIM_KEYVAL + str(value)
             self._result_info[id_tuple] += line + "\n"
         self._result_info[id_tuple] = self._result_info[id_tuple].rstrip()
-    
+
     def update_treemodel(self, sort_index=0, descending=False):
         """Update or rearrange the main tree model."""
         display_columns = self.display_cols_getter()
@@ -265,7 +265,7 @@ class DisplayBox(gtk.VBox):
         cs = [c.get_widget().get_text() for c in self.treeview.get_columns()]
         for i, values in enumerate(results):
             row_vals = [v for v in values]
-            this_row = (row_vals + [""] * 
+            this_row = (row_vals + [""] *
                         (len(self.TREE_COLUMNS) - 1 - len(values)))
             if (this_row[0] in row_group_headers and
                 self.group_index is not None):
@@ -278,7 +278,7 @@ class DisplayBox(gtk.VBox):
         for group_val, row_iter in row_group_headers.items():
             if group_val in expanded_groups:
                 path = self.treestore.get_path(row_iter)
-                self.treeview.expand_to_path(path)        
+                self.treeview.expand_to_path(path)
 
     def update_treemodel_local_status(self, local_suites, search_manager):
         """Update the local status column in the main tree model."""
@@ -288,8 +288,8 @@ class DisplayBox(gtk.VBox):
             index_map.update({key: self.get_column_index_by_name(key)})
         self.treestore.foreach(self._update_local_status_row,
                                (index_map, local_suites, search_manager))
-                
-    def update_treeview(self, activation_handler, visibility_getter, 
+
+    def update_treeview(self, activation_handler, visibility_getter,
                         query_rows=None, sort_title=None, descending=False):
         """Insert query rows into treeview."""
         if query_rows is not None:
@@ -307,7 +307,7 @@ class DisplayBox(gtk.VBox):
 
         if old_descending is not None:
             self.descending = old_descending
-        
+
         for col in self.treeview.get_columns():
             self.treeview.remove_column(col)
         cols = self.get_tree_columns()
@@ -315,14 +315,14 @@ class DisplayBox(gtk.VBox):
 
         if sort_title is not None:
             self.sort_title = sort_title
-        
+
         if group_index is None:
             if sort_title is None:
                 if self.sort_title is None:
                     sort_title = "revision"
                 else:
                     sort_title = self.sort_title
-            if self.descending is None:        
+            if self.descending is None:
                 descending = True
             else:
                 descending = self.descending
@@ -342,7 +342,7 @@ class DisplayBox(gtk.VBox):
             for i in range(len(results[0]), len(self.TREE_COLUMNS)):
                 col_types.append(self.TREE_COLUMNS[i])
             self.treestore = gtk.TreeStore(*col_types)
-            self.treestore.connect("row-deleted", activation_handler) 
+            self.treestore.connect("row-deleted", activation_handler)
             self.treeview.set_model(self.treestore)
         else:
             self.treestore.clear()
@@ -378,6 +378,6 @@ class DisplayBox(gtk.VBox):
             col.connect("clicked", self.handle_column_sort)
             if not visibility_getter(title, True):
                 col.set_visible(False)
-        
+
         self.treeview.set_enable_search(False)
-        self.update_treemodel() 
+        self.update_treemodel()

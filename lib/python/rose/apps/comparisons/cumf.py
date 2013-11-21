@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -22,9 +22,9 @@
 from rose.apps.rose_ana import DataLengthError
 import re
 
-DIFF_INDEX = { "#" : 10, 
-               "X" : 1, 
-               "O" : 0.1, 
+DIFF_INDEX = { "#" : 10,
+               "X" : 1,
+               "O" : 0.1,
                "o" : 0.01,
                ":" : 0,
                "." : -1, }
@@ -56,8 +56,8 @@ class Cumf(object):
             if not task.ok:
                 task.set_failure(CumfComparisonFailure(task))
         else:
-            task.set_failure(CumfSummaryNotFoundFailure(task))      
-        return task    
+            task.set_failure(CumfSummaryNotFoundFailure(task))
+        return task
 
 
 class CumfWarnHeader(object):
@@ -70,7 +70,7 @@ class CumfWarnHeader(object):
             return task
         for line in task.cumfsummaryoutput:
             result = re.search(
-                       r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D", 
+                       r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D",
                                   line)
             if result:
                 task.set_warning(CumfComparisonHeaderWarning(task))
@@ -139,7 +139,7 @@ class CumfSummaryNotFoundFailure(object):
         self.resultdata = task.resultdata
 
     def __repr__(self):
-        return "Cannot ascertain cumf summary file from:\n%s"%( 
+        return "Cannot ascertain cumf summary file from:\n%s"%(
                self.resultdata)
 
     __str__ = __repr__
@@ -156,7 +156,7 @@ class CumfDiffNotFoundFailure(object):
         self.resultdata = task.resultdata
 
     def __repr__(self):
-        return "Cannot ascertain cumf diff file from:\n%s"%( 
+        return "Cannot ascertain cumf diff file from:\n%s"%(
                self.resultdata)
 
     __str__ = __repr__
@@ -165,15 +165,15 @@ class CumfDiffNotFoundFailure(object):
 class DiffNotUnderstoodException(Exception):
 
     """Exception for unexpected characters in the cumf diff map"""
-    
-    
+
+
     def __init__(self, task, character):
         self.character = character
         self.file1 = task.resultfile
         self.file2 = task.kgo1file
 
     def __repr__(self):
-        return "Invalid character '%s' in cumf diff between %s and %s"%( 
+        return "Invalid character '%s' in cumf diff between %s and %s"%(
                self.character, self.file1, self.file2)
 
     __str__ = __repr__
@@ -218,7 +218,7 @@ def analyse_cumf_diff(task):
                     task.errors[name] = max_error
             else:
                 task.errors[name] = max_error
-    return task                
+    return task
 
 
 def get_diff_map(field):

@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 #
-# This file is part of Rose, a framework for scientific suites.
+# This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ class Runner(object):
         conf_name = "rose-" + self.CONF_NAME + ".conf"
         while not os.access(os.path.join(conf_dir, conf_name),
                             os.F_OK | os.R_OK):
-            conf_dir = self.fs_util.dirname(conf_dir) 
+            conf_dir = self.fs_util.dirname(conf_dir)
             if conf_dir == self.fs_util.dirname(conf_dir): # is root
                 raise ConfigNotFoundError(conf_dir_orig, conf_name)
 

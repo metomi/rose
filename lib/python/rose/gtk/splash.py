@@ -2,19 +2,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ gobject.threads_init()
 class SplashScreen(gtk.Window):
 
     """Run a splash screen that receives update information."""
-    
+
     BACKGROUND_COLOUR = "white"  # Same as logo background.
     PADDING = 10
     SUB_PADDING = 5
@@ -99,21 +99,21 @@ class SplashScreen(gtk.Window):
         if new_total_events is not None:
             self.total_number_of_events = new_total_events
             self.event_count = 0.0
-            
+
         if not no_progress:
             self.event_count += 1.0
-            
+
         if self.total_number_of_events == 0:
             fraction = 1.0
         else:
             fraction = min([1.0, self.event_count /
                                  self.total_number_of_events])
         self._stop_pulse()
-        
+
         if not no_progress:
             gobject.idle_add(self.progress_bar.set_fraction, fraction)
             self._progress_fraction = fraction
-            
+
         self.progress_bar.set_text(text)
         self._progress_message = text
         gobject.timeout_add(self.TIME_IDLE_BEFORE_PULSE,
@@ -138,7 +138,7 @@ class SplashScreen(gtk.Window):
 
     def _stop_pulse(self):
         self._is_progress_bar_pulsing = False
-    
+
     def _pulse(self):
         if self._is_progress_bar_pulsing:
             self.progress_bar.pulse()
@@ -187,7 +187,7 @@ class SplashScreenProcess(object):
 
     def update(self, *args, **kwargs):
         """Communicate via stdin to SplashScreenManager.
-        
+
         args and kwargs are the update method args, kwargs.
 
         """
@@ -234,7 +234,7 @@ class SplashScreenProcess(object):
         if self.process is not None and not self.process.stdin.closed:
             self.process.communicate(input=json.dumps("stop") + "\n")
         self.process = None
-  
+
 
 class SplashScreenUpdaterThread(threading.Thread):
 

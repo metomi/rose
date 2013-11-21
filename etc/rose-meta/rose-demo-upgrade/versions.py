@@ -100,10 +100,10 @@ class UpgradeGarden041(rose.upgrade.MacroUpgrade):
 class UpgradeGarden09(rose.upgrade.MacroUpgrade):
 
     """'cut down the mightiest tree in the forest... with... a herring!'"""
-    
+
     BEFORE_TAG = "garden0.4.1"
     AFTER_TAG = "garden0.9"
-    
+
     def downgrade(self, config, meta_config=None):
         self.remove_setting(config, ["env", "AXE"])
         self.remove_setting(config, ["namelist:trees"])
@@ -112,4 +112,4 @@ class UpgradeGarden09(rose.upgrade.MacroUpgrade):
     def upgrade(self, config, meta_config=None):
         self.add_setting(config, ["namelist:trees", "mighty_tree"], "1")
         self.add_setting(config, ["env", "AXE"], "herring")
-        return config, self.reports   
+        return config, self.reports

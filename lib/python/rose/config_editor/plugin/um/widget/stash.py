@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class BaseStashSummaryDataPanelv1(
           rose.config_editor.panelwidget.summary_data.BaseSummaryDataPanel):
 
     """This is a base class for displaying and editing STASH requests.
-    
+
     It adds editing capability for option values, displays metadata
     fetched from the STASHmaster file, and can launch a custom dialog
     for adding/removing STASH requests.
@@ -54,7 +54,7 @@ class BaseStashSummaryDataPanelv1(
     Subclasses *must* override the STASH_PACKAGE_PATH attribute with an
     absolute path to a directory containing a rose-app.conf file with
     STASH request package information.
-    
+
     Subclasses should override the STASHMASTER_PATH attribute with an
     absolute path to a directory containing e.g. the STASHmaster_A
     file. An argument to the widget metadata option can also be used to
@@ -113,7 +113,7 @@ class BaseStashSummaryDataPanelv1(
 
         Record properties are stored under section_number =>
         item_number => property_name.
-        
+
         For example, if the nested dictionary is called 'stash_dict':
         stash_dict[section_number][item_number]['name']
         would be something like:
@@ -253,7 +253,7 @@ class BaseStashSummaryDataPanelv1(
         column_names = [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]
         column_names += sub_var_names + [self.SECTION_INDEX_TITLE]
         return data_rows, column_names
- 
+
     def get_section_column_index(self):
         """(Override) Return the column index for the section (Rose section)."""
         return self.column_names.index(self.SECTION_INDEX_TITLE)
@@ -266,7 +266,7 @@ class BaseStashSummaryDataPanelv1(
         metadata_value. Field value metadata (for a particular value of
         a field) is under (field_name + "=" + value) =>
         metadata_property => metadata_value.
-        
+
         For example, if the nested dictionary is called
         'stash_meta_dict':
         stash_meta_dict["grid"]["title"]
@@ -310,7 +310,7 @@ class BaseStashSummaryDataPanelv1(
             return cell.set_property("markup", None)
         if (col_index == sect_index or
             self.column_names[col_index] == self.DESCRIPTION_TITLE):
-            node_data = self.sections.get(section)          
+            node_data = self.sections.get(section)
         else:
             option = self.column_names[col_index]
             if option is None:
@@ -522,7 +522,7 @@ class BaseStashSummaryDataPanelv1(
         col_index = view.get_columns().index(column)
         col_title = self.column_names[col_index]
         if col_title in self.OPTION_NL_MAP:
-            return False 
+            return False
         cell_data = model.get_value(row_iter, col_index)
         sect_index = self.get_section_column_index()
         section = model.get_value(row_iter, sect_index)
@@ -604,7 +604,7 @@ class BaseStashSummaryDataPanelv1(
         changed_requests = {}
         for section, sect_data in self.sections.items():
             changes = self.sect_ops.get_section_changes(sect_data)
-            if changes:           
+            if changes:
                 changed_requests.update({section: changes})
         return changed_requests
 
@@ -842,7 +842,7 @@ class BaseStashSummaryDataPanelv1(
                                                             profile_id)[0]
                     sections_for_removing.append(profile_section)
         self.sub_ops.remove_sections(sections_for_removing)
-  
+
     def _packages_enable(self, only_this_package=None, disable=False):
         # Enable or user-ignore requests matching these packages.
         sections_for_changing = []

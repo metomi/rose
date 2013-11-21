@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             self._launch_ns_func(self.get_name(timeout_path),
                                  as_new=False)
         return False
-        
+
     def load_tree(self, row, namespace_subtree):
         expanded_rows = []
         self.tree.map_expanded_rows(lambda r, d: expanded_rows.append(d))
@@ -503,7 +503,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
     def popup_menu(self, path, event):
         """Launch a popup menu for add/clone/remove."""
         if path:
-            path_name = "/" + self.get_name(path)        
+            path_name = "/" + self.get_name(path)
         else:
             path_name = None
         return self._popup_menu_func(path_name, event)

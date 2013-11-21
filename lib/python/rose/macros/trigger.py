@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -239,7 +239,7 @@ class TriggerMacro(rose.macro.MacroBase):
         state_map = {enabled: 'enabled     ',
                      trig_ignored: 'trig-ignored',
                      user_ignored: 'user-ignored'}
-        
+
         invalid_trigger_reports = self.validate_dependencies(config,
                                                              meta_config)
         if invalid_trigger_reports:
@@ -330,8 +330,8 @@ class TriggerMacro(rose.macro.MacroBase):
                         grandchildren = self.trigger_family_lookup[
                                                             child_id].keys()
                         grandchildren.sort()
-                        stack.insert(1, (child_id, grandchildren)) 
-                        if (id_list.count(child_id) + 1 > 
+                        stack.insert(1, (child_id, grandchildren))
+                        if (id_list.count(child_id) + 1 >
                             allowed_repetitions[child_id] and
                             id_list.count(child_id) >= 2):
                             # Then it may be looping cyclically.
@@ -417,7 +417,7 @@ class TriggerMacro(rose.macro.MacroBase):
         if index_1 == 0:
             return id_copy_list
         index_2 = id_copy_list.index(child_id, index_1 + 1)
-        if (id_copy_list[:index_1] == 
+        if (id_copy_list[:index_1] ==
             id_copy_list[index_1 + 1: index_2]):
             return [i for i in reversed(id_copy_list[:index_2])]
         return []

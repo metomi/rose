@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class ValueChecker(rose.macro.MacroBase):
     def validate(self, config, meta_config=None):
         """Return a list of errors if found, None otherwise."""
         self.reports = []
-        meta_config = self._load_meta_config(config, meta_config)       
+        meta_config = self._load_meta_config(config, meta_config)
         for node_keys, node in config.walk():
             if isinstance(node.value, dict):
                 continue
@@ -154,8 +154,8 @@ class ValueChecker(rose.macro.MacroBase):
                                 self.bad_value_meta_map[goodness_id] = (
                                                     self.reports[-1].info)
                         except KeyError:
-                            pass    
-                    
+                            pass
+
                 else:
                     # The variable is an array or a derived type array.
                     if isinstance(meta_type, basestring):
@@ -168,7 +168,7 @@ class ValueChecker(rose.macro.MacroBase):
                     else:
                         array_length = num_elements
                     type_list = type_list * array_length
-                    
+
                     for type_name, val in zip(type_list, val_list):
                         if skip_nulls and not val:
                             continue
@@ -178,7 +178,7 @@ class ValueChecker(rose.macro.MacroBase):
                                                     self.reports[-1].info)
                                 break
                         except KeyError:
-                            pass 
+                            pass
             if rose.META_PROP_PATTERN in metadata:
                 pattern = metadata[rose.META_PROP_PATTERN]
                 if pattern not in self.pattern_comp_map:
@@ -212,7 +212,7 @@ class ValueChecker(rose.macro.MacroBase):
         res = rose.meta_type.meta_type_checker(value, meta_type)
         if not res[0]:
             self.add_report(sect, key, value, res[1])
-        return res[0]        
+        return res[0]
 
     def check_character(self, value):
         """Interface to check a 'character' type string."""

@@ -98,7 +98,7 @@
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file that looks
       like this:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
 
@@ -106,20 +106,20 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
-        graph = "gather_ingredients =&gt; breadmaker"
-        
+        graph = gather_ingredients =&gt; breadmaker
+
 [runtime]
     [[root]]
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
+            succeeded handler = rose suite-hook
     [[gather_ingredients]]
-        command scripting = "sleep 10; echo 'Done'"
+        command scripting = sleep 10; echo 'Done'
     [[breadmaker]]
-        command scripting = "rose task-run"        
+        command scripting = rose task-run
 </pre>
     </div>
 
@@ -186,7 +186,7 @@ timed_bread=sleep 15; echo 'fresh bread when you want it'
       the <samp>[[breadmaker]]</samp> task to look like this:</p>
       <pre class="prettyprint lang-cylc">
     [[breadmaker]]
-        command scripting="rose task-run --command-key='make_dough'"
+        command scripting=rose task-run --command-key=make_dough
 </pre>
     </div>
 

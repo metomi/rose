@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
@@ -24,9 +24,9 @@
 #     rose stem [options]
 #
 # DESCRIPTION
-#     Run a suitable suite with a specified set of source tree(s). 
+#     Run a suitable suite with a specified set of source tree(s).
 #
-#     Default values of some of these settings are suite-dependent, specified 
+#     Default values of some of these settings are suite-dependent, specified
 #     in the rose-suite.conf file.
 #
 # EXAMPLES
@@ -37,8 +37,8 @@
 #     All options of "rose suite-run" are supported. Additional options are:
 #
 #     --source=SOURCE, -s SOURCE
-#         Specify a source tree to include in a rose-stem suite. The first 
-#         source tree must be a working copy as the location of the suite and 
+#         Specify a source tree to include in a rose-stem suite. The first
+#         source tree must be a working copy as the location of the suite and
 #         fcm-make config files are taken from it. Further source trees can be
 #         added with additional --source arguments.
 #         Defaults to '.' if not specified.
@@ -52,7 +52,7 @@
 # JINJA2 VARIABLES
 #
 #     Note that <project> refers to the FCM keyword name of the repository in
-#     upper case. 
+#     upper case.
 #
 #     RUN_NAMES
 #         A list of groups to run in the rose-stem suite.

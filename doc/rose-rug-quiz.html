@@ -911,7 +911,7 @@ graph = """
                   <pre class="prettyprint lang-cylc">
 [runtime]
     [[root]]
-        command scripting = "rose app-run --verbose"
+        command scripting = rose app-run --verbose
 </pre>
                 </td>
               </tr>
@@ -924,7 +924,7 @@ graph = """
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 </pre>
                 </td>

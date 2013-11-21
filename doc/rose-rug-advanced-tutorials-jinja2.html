@@ -299,7 +299,7 @@
       sections <samp>ignite_rocket_00</samp> to <samp>ignite_rocket_29</samp>
       with:</p>
       <pre class="prettyprint lang-cylc">
-{%- for num in range(30) %}       
+{%- for num in range(30) %}
 {%- set num_label = '%02d' % num %}
     [[ignite_rocket_{{ num_label }}]]
         inherit = IGNITE

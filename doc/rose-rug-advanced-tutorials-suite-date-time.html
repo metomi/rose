@@ -133,7 +133,7 @@
       runtime section of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
     [[startup]]
-        environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
+        environment scripting = eval $(rose task-env --cycle-offset=T12H)
         command scripting = """
             GATE="A"$((RANDOM%3))
             echo "GATE=$GATE" &gt; $ROSE_DATACT12H/flight_gate
@@ -173,7 +173,7 @@
       <samp>[[boarding]]</samp> runtime section:</p>
       <pre class="prettyprint lang-cylc">
     [[boarding]]
-        environment scripting = "eval $(rose task-env --cycle-offset=T12H)"
+        environment scripting = eval $(rose task-env --cycle-offset=T12H)
 </pre>
     </div>
 

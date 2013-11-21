@@ -107,21 +107,19 @@
       <samp>rose-suite.conf</samp> and a <samp>suite.rc</samp> file with the
       following contents:</p>
     </div>
-    
+
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
-      
+
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     [[dependencies]]
-        graph = """
-            start =&gt; roll_doubles =&gt; win
-        """
+        graph = start =&gt; roll_doubles =&gt; win
 </pre>
     </div>
 
@@ -134,8 +132,8 @@
 [runtime]
     [[root]]
         [[[event hooks]]]
-            failed handler = "rose suite-hook"
-            succeeded handler = "rose suite-hook"
+            failed handler = rose suite-hook
+            succeeded handler = rose suite-hook
     [[start]]
     [[win]]
 </pre>

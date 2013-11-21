@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
 #
-# This file is part of Rose, a framework for scientific suites.
+# This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
-from rose.run_source_vc import write_source_vc_info 
+from rose.run_source_vc import write_source_vc_info
 from rose.suite_clean import SuiteRunCleaner
 from rose.suite_engine_proc import StillRunningError
 import socket

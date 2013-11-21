@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -171,7 +171,7 @@ class ConfigDataHelper(object):
         if var is None:
             var = config_data.vars.get_var(sect, opt, save=True)
         return var  # May be None.
-            
+
     def get_sections_from_namespace(self, namespace):
         """Return all sections contributing to a namespace."""
         # FIXME: What about files?
@@ -284,7 +284,7 @@ class ConfigDataHelper(object):
         """Return all format-like sections in the current data."""
         format_keys = []
         for section in self.data.config[config_name].sections.now:
-            if (section not in format_keys and 
+            if (section not in format_keys and
                 ':' in section and not section.startswith('file:')):
                 format_keys.append(section)
         format_keys.sort(rose.config.sort_settings)

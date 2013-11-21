@@ -124,22 +124,22 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[event hooks]]
-        timeout handler = "rose suite-hook --mail --shutdown"
+        timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
     initial cycle time = <span id="cylc-time"></span>
     [[dependencies]]
         [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
-            graph = "bell"
+            graph = bell
 
 [runtime]
     [[root]]
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
-            failed handler = "rose suite-hook --mail"
+            succeeded handler = rose suite-hook
+            failed handler = rose suite-hook --mail
     [[bell]]
-        environment scripting = "eval $(rose task-env)"
-        command scripting = "yes 'bong' | head -n $(rose date -c --format=%H)"
+        environment scripting = eval $(rose task-env)
+        command scripting = yes 'bong' | head -n $(rose date -c --format=%H)
 </pre>
     </div>
 
@@ -177,7 +177,7 @@ rose suite-run
       <p>To do this, add the following lines to the <samp>[scheduling]</samp>
       section of your <var>suite.rc</var>:</p>
       <pre class="prettyprint lang-cylc">
-    [[special tasks]] 
+    [[special tasks]]
         clock-triggered = bell(0)
 </pre>
 
@@ -218,17 +218,17 @@ rose suite-run
       section by adding the following:</p>
       <pre class="prettyprint lang-cylc">
     [[quarter_past, half_past, quarter_to]]
-        command scripting = "echo 'chimes'"
+        command scripting = echo 'chimes'
 </pre>
 
       <p>Similarly, modify the <var>[[scheduling]]</var> section as
       follows:</p>
       <pre class="prettyprint lang-cylc">
-    [[special tasks]] 
+    [[special tasks]]
         clock-triggered = bell(0), quarter_past(0.25), half_past(0.5), quarter_to(0.75)
     [[dependencies]]
         [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
-            graph = "bell =&gt; quarter_past =&gt; half_past =&gt; quarter_to"
+            graph = bell =&gt; quarter_past =&gt; half_past =&gt; quarter_to
 </pre>
 
       <p>Note the different values used for the cycle offsets of the

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-3 Met Office.
-# 
-# This file is part of Rose, a framework for scientific suites.
-# 
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
 # Rose is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Rose is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
@@ -572,9 +572,9 @@ class LocDAO(object):
 
     def select(self, name):
         """Query database for settings matching name.
-        
+
         Reconstruct setting as a Loc object and return it.
- 
+
         """
         conn = self.get_conn()
         c = conn.cursor()
@@ -651,7 +651,7 @@ class PullableLocHandlersManager(SchemeHandlersManager):
 
     def parse(self, loc, conf_tree):
         """Parse loc.name.
-        
+
         Set loc.real_name, loc.scheme, loc.loc_type, loc.key, loc.paths, etc.
         if relevant.
 
