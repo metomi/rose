@@ -17,6 +17,10 @@ This release of Rose will work best with Cylc 5.4.1 or above.
 
 \#1029: rose config-edit: fix file browser launch bug for unknown configuration.
 
+\#1026, #1033: rose app-run, rose suite-run, rose config-edit, etc: support
+optional source for file installation. E.g. In a `[file:path/to/file]` section,
+a `source=(namelist:foo)` will allow `[namelist:foo]` to be missing or ignored.
+
 \#1024: rose bush: job list mode: fixed `no_statues` checkboxes returning nothing
 bug.
 
