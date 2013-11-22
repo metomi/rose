@@ -91,13 +91,11 @@ rel="stylesheet" media="screen" />
 {% if file_content -%}
 <script type="text/javascript" src="{{script}}/etc/google-code-prettify/prettify.js">
 </script>
-{% endif -%}
-{% if file_content -%}
 <script type="text/javascript" src="{{script}}/etc/prettify-{{file_content}}.js">
 </script>
-{% endif -%}
 <script type="text/javascript">
 $(prettyPrint);
 </script>
+{% endif -%}
 </body>
 </html>
