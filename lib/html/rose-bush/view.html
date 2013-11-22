@@ -8,8 +8,10 @@
 <link type="text/css" href="{{script}}/etc/bootstrap/css/bootstrap.min.css"
 rel="stylesheet" media="screen" />
 <link type="text/css" href="{{script}}/rose-bush.css" rel="stylesheet" media="screen" />
+{% if file_content -%}
 <link type="text/css" href="{{script}}/etc/google-code-prettify/prettify.css"
 rel="stylesheet" media="screen" />
+{% endif -%}
 </head>
 <body>
 <div class="navbar navbar-static-top">
@@ -54,7 +56,7 @@ rel="stylesheet" media="screen" />
 </pre>
 </div>
 <div class="span11">
-<pre class="prettyprint{% if file_content -%} lang-{{file_content}}{% endif -%}">
+<pre{% if file_content %} class="prettyprint lang-{{file_content}}"{% endif %}>
 {%- set PREFIXES = {"[FAIL]": "text-error", "[INFO]": "text-info", "[ OK ]": "text-success", "[WARN]": "text-warning"} -%}
 {% for line in lines -%}
 {% if line|length > 6 and line[0:6] in PREFIXES -%}
@@ -86,8 +88,10 @@ rel="stylesheet" media="screen" />
 </script>
 <script type="text/javascript" src="{{script}}/rose-bush.js">
 </script>
+{% if file_content -%}
 <script type="text/javascript" src="{{script}}/etc/google-code-prettify/prettify.js">
 </script>
+{% endif -%}
 {% if file_content -%}
 <script type="text/javascript" src="{{script}}/etc/prettify-{{file_content}}.js">
 </script>
