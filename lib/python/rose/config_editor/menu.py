@@ -20,6 +20,7 @@
 
 import ast
 import inspect
+import os
 import shlex
 import subprocess
 import sys
@@ -935,7 +936,10 @@ class MainMenuHandler(object):
         self.mainwindow.launch_prefs()
 
     def launch_browser(self):
-        rose.external.launch_fs_browser(self.data.top_level_directory)
+        if self.data.top_level_directory is None:
+            rose.external.launch_fs_browser(os.getcwd())
+        else:
+            rose.external.launch_fs_browser(self.data.top_level_directory)
 
     def launch_scheduler(self, *args):
         """Run the scheduler for a suite open in config edit."""
