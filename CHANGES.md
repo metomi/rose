@@ -11,7 +11,11 @@ This release of Rose will work best with Cylc 5.4.1 or above.
 
 ### Highlighted Changes
 
+-none yet-
+
 ### Noteworthy Changes
+
+\#1029: rose config-edit: fix file browser launch bug for unknown configuration.
 
 \#1024: rose bush: job list mode: fixed `no_statues` checkboxes returning nothing
 bug.
@@ -19,8 +23,8 @@ bug.
 \#1023: rose suite-gcontrol: raise exception on attempt to launch suite control
 GUI on an unregistered Cylc suite.
 
-\#1021: rose bush: view file mode: files are now prettified using Google code
-prettify JS library.
+\#1021, #1031: rose bush: view file mode: some files are now prettified using
+Google code prettify JS library.
 
 \#1007: rose bush: now display Rose version that drives it.
 
