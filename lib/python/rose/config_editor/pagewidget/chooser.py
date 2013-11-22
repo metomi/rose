@@ -346,6 +346,17 @@ class PageFormatTree(gtk.VBox):
         variables = [v for v in self.panel_data + self.ghost_data]
         names = [v.name for v in variables]
         source_var = variables[names.index(rose.FILE_VAR_SOURCE)]
+        if source_var.value == new_value:
+            return
+        optional_values = []
+        for value in shlex.split(source_var.value):
+            if value.startswith("(") and value.endswith(")"):
+                optional_values.append(value[1:-1])
+        new_values = shlex.split(new_value)
+        for i, value in enumerate(new_values):
+            if value in optional_values:
+                new_values[i] = "(" + value + ")"
+        new_value = " ".join(new_values)
         if source_var.value != new_value:
             self.var_ops.set_var_value(source_var, new_value)
 
