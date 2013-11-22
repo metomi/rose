@@ -169,12 +169,14 @@ class PageFormatTree(gtk.VBox):
         treeviews_hbox = gtk.HPaned()
         treeviews_hbox.show()
         self._source_value_listview = rose.gtk.choice.ChoicesListView(
-                                      self._set_source_value_listview,
-                                      self._get_included_sources,
-                                      self._handle_search,
-                                      title=rose.FILE_VAR_SOURCE)
+            self._set_source_value_listview,
+            self._get_included_sources,
+            self._handle_search,
+            title=rose.FILE_VAR_SOURCE,
+            get_custom_menu_items=self._get_custom_menu_items
+        )
         self._source_value_listview.set_tooltip_text(
-                       rose.config_editor.FILE_CONTENT_PANEL_TIP)
+            rose.config_editor.FILE_CONTENT_PANEL_TIP)
         frame = gtk.Frame()
         frame.show()
         frame.add(self._source_value_listview)
@@ -248,7 +250,8 @@ class PageFormatTree(gtk.VBox):
                      self._get_included_sources,
                      self._get_available_sections,
                      self._get_groups,
-                     title=rose.config_editor.FILE_CONTENT_PANEL_TITLE)
+                     title=rose.config_editor.FILE_CONTENT_PANEL_TITLE,
+                     get_is_included=self._get_section_is_included)
         self._source_avail_treeview.set_tooltip_text(
                        rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP)
         self._source_avail_frame.show()
@@ -256,12 +259,34 @@ class PageFormatTree(gtk.VBox):
             self._source_avail_frame.hide()
         self._source_avail_frame.add(self._source_avail_treeview)
 
+    def _get_custom_menu_items(self):
+        """Return some custom menuitems for use in the list view."""
+        menuitem = gtk.ImageMenuItem(
+            rose.config_editor.FILE_CONTENT_PANEL_MENU_OPTIONAL)
+        image = gtk.image_new_from_stock(
+            gtk.STOCK_DIALOG_QUESTION, gtk.ICON_SIZE_MENU)
+        menuitem.set_image(image)
+        menuitem.connect(
+            "button-press-event", self._toggle_menu_optional_status)
+        menuitem.show()
+        return [menuitem]
+
     def _get_included_sources(self):
         """Return sections included in the source variable."""
         variables = [v for v in self.panel_data + self.ghost_data]
         names = [v.name for v in variables]
         content_value = variables[names.index(rose.FILE_VAR_SOURCE)].value
         return shlex.split(content_value)
+
+    def _get_section_is_included(self, section, included_sections=None):
+        """Return whether a section is included or not."""
+        if included_sections is None:
+            included_sections = self._get_included_sources()
+        for i, included_section in enumerate(included_sections):
+            if (included_section.startswith("(") and
+                included_section.endswith(")")):
+                included_sections[i] = included_section[1:-1]
+        return section in included_sections
 
     def _get_available_sections(self):
         """Return sections available to the source variable."""
@@ -321,6 +346,17 @@ class PageFormatTree(gtk.VBox):
         variables = [v for v in self.panel_data + self.ghost_data]
         names = [v.name for v in variables]
         source_var = variables[names.index(rose.FILE_VAR_SOURCE)]
+        if source_var.value == new_value:
+            return
+        optional_values = []
+        for value in shlex.split(source_var.value):
+            if value.startswith("(") and value.endswith(")"):
+                optional_values.append(value[1:-1])
+        new_values = shlex.split(new_value)
+        for i, value in enumerate(new_values):
+            if value in optional_values:
+                new_values[i] = "(" + value + ")"
+        new_value = " ".join(new_values)
         if source_var.value != new_value:
             self.var_ops.set_var_value(source_var, new_value)
 
@@ -333,6 +369,17 @@ class PageFormatTree(gtk.VBox):
         sect1_ind = sect1.replace(sect1_base, "", 1)
         sect2_ind = sect2.replace(sect2_base, "", 1)
         return (sect2_ind == "(:)") - (sect1_ind == "(:)")
+
+    def _toggle_menu_optional_status(self, menuitem, event):
+        """Toggle a source's optional status (surrounding brackets or not)."""
+        iter_ = menuitem._listview_iter
+        model = menuitem._listview_model
+        section_value = model.get_value(iter_, 0)
+        if section_value.startswith("(") and section_value.endswith(")"):
+            section_value = section_value[1:-1]
+        else:
+            section_value = "(" + section_value + ")"
+        model.set_value(iter_, 0, section_value)
 
     def refresh(self, var_id=None):
         """Reload the container - don't need this at the moment."""

@@ -35,15 +35,26 @@ class ChoicesListView(gtk.TreeView):
     handle_search is a function that accepts a name and triggers a
     search for it.
     title is displayed as the column header, if given.
+    get_custom_menu_items, if given, should be a function that
+    accepts no arguments and returns a list of gtk.MenuItem-derived
+    instances. The listview model and current TreeIter will be 
+    available as attributes "_listview_model" and "_listview_iter" set
+    on each menu item to optionally use during the menu item callbacks
+    - this means that they can use them to modify the model
+    information. Menuitems that do this should connect to
+    "button-press-event", as the model cleanup will take place as a
+    connect_after to the same event.
 
     """
 
     def __init__(self, set_value, get_data, handle_search,
-                 title=rose.config_editor.CHOICE_TITLE_INCLUDED):
+                 title=rose.config_editor.CHOICE_TITLE_INCLUDED,
+                 get_custom_menu_items=lambda: []):
         super(ChoicesListView, self).__init__()
         self._set_value = set_value
         self._get_data = get_data
         self._handle_search = handle_search
+        self._get_custom_menu_items = get_custom_menu_items
         self.enable_model_drag_dest(
                   [('text/plain', 0, 0)],
                   gtk.gdk.ACTION_MOVE)
@@ -162,6 +173,12 @@ class ChoicesListView(gtk.TreeView):
         remove_item.connect("activate",
                             lambda b: self._remove_iter(iter_))
         menu = uimanager.get_widget('/Popup')
+        for menuitem in self._get_custom_menu_items():
+            menuitem._listview_model = self.get_model()
+            menuitem._listview_iter = iter_
+            menuitem.connect_after(
+                "button-press-event", lambda b, e: self._handle_reordering())
+            menu.append(menuitem)
         menu.popup(None, None, None, event.button, event.time)
         return False
 
@@ -196,12 +213,16 @@ class ChoicesTreeView(gtk.TreeView):
     get_is_implicit is an optional function that accepts a name and
     returns whether the name is implicitly included in the content.
     title is displayed as the column header, if given.
+    get_is_included is an optional function that accepts a name and
+    an optional list of included names to test whether a
+    name is already included.
 
     """
 
     def __init__(self, set_value, get_data, get_available_data,
                  get_groups, get_is_implicit=None,
-                 title=rose.config_editor.CHOICE_TITLE_AVAILABLE):
+                 title=rose.config_editor.CHOICE_TITLE_AVAILABLE,
+                 get_is_included=None):
         super(ChoicesTreeView, self).__init__()
         # Generate the 'available' sections view.
         self._set_value = set_value
@@ -209,6 +230,7 @@ class ChoicesTreeView(gtk.TreeView):
         self._get_available_data = get_available_data
         self._get_groups = get_groups
         self._get_is_implicit = get_is_implicit
+        self._get_is_included_func = get_is_included
         self.set_headers_visible(True)
         self.set_rules_hint(True)
         self.enable_model_drag_dest(
@@ -241,6 +263,13 @@ class ChoicesTreeView(gtk.TreeView):
         self.show()
         self._populate()
 
+    def _get_is_included(self, name, ok_names=None):
+        if self._get_is_included_func is not None:
+            return self._get_is_included_func(name, ok_names)
+        if ok_names is None:
+            ok_names = self._get_available_data()
+        return name in ok_names
+
     def _populate(self):
         """Populate the 'available' sections view."""
         ok_content_sections = self._get_available_data()
@@ -251,10 +280,11 @@ class ChoicesTreeView(gtk.TreeView):
         self._name_iter_map = {}
         while sections_left:
             name = sections_left.pop(0)
-            is_included = name in ok_values
+            is_included = self._get_is_included(name, ok_values)
             groups = self._get_groups(name, ok_content_sections)
             if self._get_is_implicit is None:
-                is_implicit = any([g in ok_values for g in groups])
+                is_implicit = any(
+                    [self._get_is_included(g, ok_values) for g in groups])
             else:
                 is_implicit = self._get_is_implicit(name)
             if groups:
@@ -270,10 +300,11 @@ class ChoicesTreeView(gtk.TreeView):
         model = self.get_model()
         ok_content_sections = self._get_available_data()
         for name, iter_ in self._name_iter_map.items():
-            is_in_value = name in ok_values
+            is_in_value = self._get_is_included(name, ok_values)
             if self._get_is_implicit is None:
                 groups = self._get_groups(name, ok_content_sections)
-                is_implicit = any([g in ok_values for g in groups])
+                is_implicit = any(
+                    [self._get_is_included(g, ok_values) for g in groups])
             else:
                 is_implicit = self._get_is_implicit(name)
             if model.get_value(iter_, 1) != is_in_value:
@@ -379,7 +410,7 @@ class ChoicesTreeView(gtk.TreeView):
         can_add = self._check_can_add(r_iter)
         should_add = False
         if ((should_turn_off is None or should_turn_off)
-            and this_name in ok_values):
+            and self._get_is_included(this_name, ok_values)):
             ok_values.remove(this_name)
         elif should_turn_off is None or not should_turn_off:
             if not can_add:
