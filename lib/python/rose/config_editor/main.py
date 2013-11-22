@@ -777,6 +777,10 @@ class MainController(object):
                     if variable.name != rose.FILE_VAR_SOURCE:
                         continue
                     var_values = rose.variable.array_split(variable.value)
+                    for i, val in enumerate(var_values):
+                        if val.startswith("(") and val.endswith(")"):
+                            # It is optional - e.g. "(namelist:baz)".
+                            var_values[i] = val[1:-1]
                     if set(ok_names) & set(var_values):
                         var_id = variable.metadata['id']
                         see_also += ", " + var_id
