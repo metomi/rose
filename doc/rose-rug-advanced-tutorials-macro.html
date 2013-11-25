@@ -150,7 +150,8 @@ mkdir -p meta/lib/python/macros
 touch meta/lib/python/macros/__init__.py
 </pre>
 
-      <p>Create a file called <code>planet.py</code> in the directory:</p>
+      <p>Finally, create a file called <code>planet.py</code> in the
+      directory:</p>
       <pre class="shell">
 touch meta/lib/python/macros/planet.py
 </pre>
@@ -162,10 +163,17 @@ touch meta/lib/python/macros/planet.py
       <p>Open <code>planet.py</code> in a text editor and paste in this
       <a href="etc/rose-rug-advanced-tutorials-macro/planet.py.start.html">text</a>.</p>
 
-      <p>We need to check the value of the option (<samp>env=WORLD</samp>) in
-      our app configuration.</p>
+      <p>This is the bare bones of a rose macro - a bit of Python that is a
+      subclass of <code>rose.macro.MacroBase</code>. At the moment, it doesn't
+      do anything.</p>
+    </div>
 
-      <p>In this case we'll generate a list of allowed 'planet' choices.</p>
+    <div class="slide">
+      <h3 class="alwayshidden">Explanation</h3>
+
+      <p>We need to check the value of the option (<samp>env=WORLD</samp>) in
+      our app configuration. To do this, we'll generate a list of allowed
+      'planet' choices that aren't too far away from Earth at the moment.</p>
     </div>
 
     <div class="slide">
@@ -204,6 +212,7 @@ touch meta/lib/python/macros/planet.py
                                       r"\1", text))
         for planet, distance in zip(planets, distances):
             if float(distance) &gt; 5.0:
+                # The planet is more than 5 AU away.
                 planets.remove(planet)
         planets += ["Earth"]  # Distance ~ 0
         return planets
@@ -258,8 +267,12 @@ class PlanetChecker(rose.macro.MacroBase):
     <div class="slide">
       <h3 class="alwayshidden">Check explanation</h3>
 
-      <p>This adds some information to the <code>problem_list</code> if the
-      option value is not a valid planet.</p>
+      <p>The <code>self.add_report</code> call is invoked when the planet
+      choice the user has made is not in the allowed planets. It adds the error
+      information about the section and option (<var>env</var> and
+      <var>WORLD</var>) to the <code>self.reports</code> list, which is
+      returned to the rest of Rose to see if the macro reports any
+      problems.</p>
     </div>
 
     <div class="slide">
@@ -324,9 +337,22 @@ rose macro planet.PlanetChecker
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Explanation</h3>
+
+      <p>This is another bare-bones macro class, although this time it supplies
+      a <code>transform</code> method instead of a <code>validate</code>
+      method.</p>
+
+      <p>You can see that it returns a configuration object (<var>config</var>)
+      as well as <var>self.reports</var>. This means that you can modify the
+      configuration e.g. by adding or deleting a variable and then returning
+      the changed <var>config</var> object.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Editing</h3>
 
-      <p>We need to write some code to make some changes to the
+      <p>We need to add some code to make some changes to the
       configuration.</p>
 
       <p>Replace the line</p>
@@ -342,17 +368,13 @@ rose macro planet.PlanetChecker
       <pre class="prettyprint">
             if node is None or node.is_ignored():
                 continue
-            if node.value not in self.planets:
-                old_planet = node.value
+            old_planet = node.value
+            try:
+                index = self.planets.index(old_planet)
+            except (IndexError, ValueError):
                 new_planet = self.planets[0]
             else:
-                old_planet = node.value
-                index = self.planets.index(node.value)
-                if index == len(self.planets) - 1:
-                    new_index = 0
-                else:
-                    new_index = index + 1
-                new_planet = self.planets[new_index]
+                new_planet = self.planets[(index + 1) % len(self.planets)]
             config.set([section, option], new_planet)
 </pre>
     </div>
@@ -465,9 +487,9 @@ rose edit
       values in, with defaults already entered for you.</p>
 
       <p>Specify a value to use for <code>planet_name</code> using a quoted
-      string, e.g. <code>"Bob"</code> and accept the proposed changes. The
-      <code>WORLD</code> variable should now be set to <code>Bob</code>. Check
-      your configuration to confirm this.</p>
+      string, e.g. <code>"Vulcan"</code> and accept the proposed changes. The
+      <code>WORLD</code> variable should now be set to <code>Vulcan</code>.
+      Check your configuration to confirm this.</p>
     </div>
 
     <div class="slide">

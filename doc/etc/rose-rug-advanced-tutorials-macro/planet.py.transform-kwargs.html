@@ -56,20 +56,16 @@ class PlanetChanger(rose.macro.MacroBase):
             node = config.get([section, option])
             if node is None or node.is_ignored():
                 continue
-            if node.value not in self.planets and not planet_name:
-                old_planet = node.value
-                new_planet = self.planets[0]
-            elif planet_name:
-                old_planet = node.value
-                new_planet = str(planet_name)
-            else:
-                old_planet = node.value
-                index = self.planets.index(node.value)
-                if index == len(self.planets) - 1:
-                    new_index = 0
+            old_planet = node.value
+            if planet_name is None:
+                try:
+                    index = self.planets.index(old_planet)
+                except (IndexError, ValueError):
+                    new_planet = self.planets[0]
                 else:
-                    new_index = index + 1
-                new_planet = self.planets[new_index]
+                    new_planet = self.planets[(index + 1) % len(self.planets)]
+            else:
+                new_planet = planet_name
             config.set([section, option], new_planet)
             message = self.change_text.format(old_planet, new_planet)
             self.add_report(section, option, new_planet, message)
