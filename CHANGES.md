@@ -11,15 +11,25 @@ This release of Rose will work best with Cylc 5.4.1 or above.
 
 ### Highlighted Changes
 
--none yet-
-
-### Noteworthy Changes
-
-\#1029: rose config-edit: fix file browser launch bug for unknown configuration.
-
 \#1026, #1033: rose app-run, rose suite-run, rose config-edit, etc: support
 optional source for file installation. E.g. In a `[file:path/to/file]` section,
 a `source=(namelist:foo)` will allow `[namelist:foo]` to be missing or ignored.
+
+\#1005: rose suite-run, rose suite-clean: the root directory of
+`~/cylc-run/$SUITE/` is now configurable via site, user, or suite configuration.
+On installation of a suite, `rose suite-run` will store the locations of the job
+hosts in `~/cylc-run/$SUITE/log/rose-suite-run.locs`. The information can then
+be used by `rose suite-clean` to determine what to remove. (N.B. Unfortunately,
+this means that the new `rose suite-clean` may not correctly clean the suite
+directories on job hosts created by an old version of `rose suite-run`.)
+
+### Noteworthy Changes
+
+\#1039: rose config-edit: fix enable empty user-ignored section.
+
+\#1035: rose config-edit: fix orphaned warning for optional content sections.
+
+\#1029: rose config-edit: fix file browser launch bug for unknown configuration.
 
 \#1024: rose bush: job list mode: fixed `no_statues` checkboxes returning nothing
 bug.
@@ -31,12 +41,6 @@ GUI on an unregistered Cylc suite.
 Google code prettify JS library.
 
 \#1007: rose bush: now display Rose version that drives it.
-
-\#1005: rose suite-run, rose suite-clean: the root directory of
-`~/cylc-run/$SUITE/` is now configurable via site, user, or suite configuration.
-On installation of a suite, `rose suite-run` will store the locations of the job
-hosts in `~/cylc-run/$SUITE/log/rose-suite-run.locs`. The information can then
-be used by `rose suite-clean` to determine what to remove.
 
 \#1003: rose app-run, rose-suite-run, etc: file installation - a tilde `~`
 in front a path pointing to a Subversion working copy did not get expanded.
