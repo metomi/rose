@@ -19,18 +19,17 @@
 #-----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
-from fnmatch import fnmatch, fnmatchcase
+from fnmatch import fnmatch
 from glob import glob
 import os
 import pwd
 import re
-from rose.env import env_var_process
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
 from rose.reporter import Event, Reporter
-from rose.resource import ResourceLocator
 from rose.suite_engine_proc import \
-        SuiteEngineProcessor, SuiteScanResult, TaskProps
+        SuiteEngineProcessor, SuiteScanResult, \
+        SuiteEngineGlobalConfCompatError, TaskProps
 import socket
 import sqlite3
 import tarfile
@@ -93,6 +92,18 @@ class CylcProcessor(SuiteEngineProcessor):
     def __init__(self, *args, **kwargs):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
         self.daos = {self.SUITE_DB: {}, self.JOB_LOGS_DB: {}}
+
+    def check_global_conf_compat(self):
+        """Raise exception on incompatible Cylc global configuration."""
+        expected = os.path.join("~", self.SUITE_DIR_REL_ROOT)
+        expected = os.path.expanduser(expected)
+        for key in ["[hosts][localhost]run directory",
+                     "[hosts][localhost]work directory"]:
+            out, err = self.popen("cylc", "get-global-config", "-i", key)
+            lines = out.splitlines()
+            if lines and lines[0] != expected:
+                raise SuiteEngineGlobalConfCompatError(
+                            self.SCHEME, key, lines[0])
 
     def clean_hook(self, suite_name=None):
         """Run "cylc refresh --unregister" (at end of "rose suite-clean")."""

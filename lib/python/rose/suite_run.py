@@ -107,6 +107,9 @@ class SuiteRunner(Runner):
             log_context = ReporterContext(None, self.event_handler.VV, f)
             self.event_handler.contexts[uuid] = log_context
 
+        # Check suite engine specific compatibility
+        self.suite_engine_proc.check_global_conf_compat()
+
         # Suite name from the current working directory
         if opts.conf_dir:
             self.fs_util.chdir(opts.conf_dir)
