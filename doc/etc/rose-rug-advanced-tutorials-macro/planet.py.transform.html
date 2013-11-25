@@ -56,8 +56,7 @@ class PlanetChanger(rose.macro.MacroBase):
             node = config.get([section, option])
             if node is None or node.is_ignored():
                 continue
-            if node is None or node.is_ignored():
-                continue
+            old_planet = node.value
             try:
                 index = self.planets.index(old_planet)
             except (IndexError, ValueError):

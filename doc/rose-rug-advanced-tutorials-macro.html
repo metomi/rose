@@ -368,6 +368,7 @@ rose macro planet.PlanetChecker
       <pre class="prettyprint">
             if node is None or node.is_ignored():
                 continue
+            old_planet = node.value
             try:
                 index = self.planets.index(old_planet)
             except (IndexError, ValueError):
