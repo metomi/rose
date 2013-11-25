@@ -120,6 +120,7 @@ class SectionOperations(object):
         """
         config_data = self.__data.config[config_name]
         sect_data = config_data.sections.now[section]
+        nses_to_do = [sect_data.metadata["full_ns"]]
         if is_ignored:
             # User-ignore request for this section.
             # The section must be enabled and optional.
@@ -177,7 +178,6 @@ class SectionOperations(object):
                           (config_name, section, not is_ignored, True))
         self.__undo_stack.append(stack_item)
         del self.__redo_stack[:]
-        nses_to_do = []
         for var in (config_data.vars.now.get(section, []) +
                     config_data.vars.latent.get(section, [])):
             self.trigger_info_update(var)
