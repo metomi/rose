@@ -82,6 +82,7 @@ class PlanetChecker(rose.macro.MacroBase):
                                       r"\1", text))
         for planet, distance in zip(planets, distances):
             if float(distance) &gt; 5.0:
+                # The planet is more than 5 AU away.
                 planets.remove(planet)
         planets += ["Earth"]  # Distance ~ 0
         return planets
