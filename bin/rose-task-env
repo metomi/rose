@@ -96,7 +96,7 @@
 #         (Default="_")
 #     --quiet, -q
 #         Decrement verbosity.
-#     --verbose; -v
+#     --verbose, -v
 #         Increment verbosity.
 #
 # NOTE ON CYCLE TIME

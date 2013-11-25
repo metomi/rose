@@ -16,20 +16,20 @@
 #         "*" indicates the default version to change to.
 #
 # OPTION
-#     --all-versions; -a;
+#     --all-versions, -a
 #         Use all tagged versions.
-#     --config=DIR; -C DIR
+#     --config=DIR, -C DIR
 #         Use configuration in DIR instead of $PWD.
-#     --downgrade; -d;
+#     --downgrade, -d
 #         Downgrade the version instead of upgrade.
-#     --meta-path=PATH; -M PATH
+#     --meta-path=PATH, -M PATH
 #         Prepend PATH to the metadata search path.
 #     --non-interactive, --yes, -y
 #         Switch off interactive prompting.
-#     --output=DIR; -O DIR
+#     --output=DIR, -O DIR
 #         The location of the output directory. Only meaningful if
 #         there is at least one transformer in the argument list.
-#     --quiet; -q
+#     --quiet, -q
 #         Reduce verbosity.
 #
 # ARGUMENTS

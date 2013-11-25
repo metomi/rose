@@ -42,15 +42,15 @@
 #     --app-mode=MODE
 #         Run a builtin application identified by MODE. The default MODE is
 #         "command".
-#     --config=DIR; -C DIR
+#     --config=DIR, -C DIR
 #         Specify the configuration directory of the application. (default=$PWD)
-#     --command-key=KEY; -c KEY
+#     --command-key=KEY, -c KEY
 #         Invoke the command specified in [command]KEY.
-#     --define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE
+#     --define=[SECTION]KEY=VALUE, -D [SECTION]KEY=VALUE
 #         Each of these overrides the [SECTION]KEY setting with a given VALUE.
 #         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
 #         or even --define=[!SECTION].
-#     --install-only; -i
+#     --install-only, -i
 #         Install files only. Do not invoke the run.
 #     --new, -N
 #         Remove all items in $PWD before doing anything. This option only
@@ -62,7 +62,7 @@
 #         The configurations are applied first-to-last.
 #     --quiet, -q
 #         Decrement verbosity.
-#     --verbose; -v
+#     --verbose, -v
 #         Increment verbosity.
 #
 # ENVIRONMENT VARIABLES

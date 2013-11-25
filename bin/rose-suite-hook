@@ -42,9 +42,9 @@
 #         Trigger an email notification to the user.
 #     --shutdown
 #         Trigger a shutdown of the suite.
-#     --quiet; -q
+#     --quiet, -q
 #         Decrement verbosity.
-#     --verbose; -v
+#     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
 exec python -m rose.suite_hook "$@"

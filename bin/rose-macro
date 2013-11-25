@@ -27,20 +27,20 @@
 #     List or run macros associated with a suite or application.
 #
 # OPTION
-#     --config=DIR; -C DIR
+#     --config=DIR, -C DIR
 #         Use configuration in DIR instead of $PWD.
-#     --fix; -F
+#     --fix, -F
 #         Run Rose internal transformer (fixer) macros.
-#     --meta-path=PATH; -M PATH
+#     --meta-path=PATH, -M PATH
 #         Prepend PATH to the metadata search path.
 #     --non-interactive, --yes, -y
 #         Switch off interactive prompting (=answer yes to everything).
-#     --output=DIR; -O DIR
+#     --output=DIR, -O DIR
 #         The location of the output directory. Only meaningful if
 #         there is at least one transformer in the argument list.
-#     --quiet; -q
+#     --quiet, -q
 #         Reduce verbosity.
-#     --validate; -V
+#     --validate, -V
 #         Prepend all validators to the argument list.
 #
 # ARGUMENTS
