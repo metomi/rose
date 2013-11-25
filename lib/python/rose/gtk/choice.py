@@ -177,7 +177,9 @@ class ChoicesListView(gtk.TreeView):
             menuitem._listview_model = self.get_model()
             menuitem._listview_iter = iter_
             menuitem.connect_after(
-                "button-press-event", lambda b, e: self._handle_reordering())
+                "button-press-event",
+                lambda b, e: self._handle_reordering()
+            )
             menu.append(menuitem)
         menu.popup(None, None, None, event.button, event.time)
         return False
