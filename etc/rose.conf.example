@@ -212,10 +212,10 @@
 #  prefix-owner-default.PREFIX=USER-ID
 ## E.g.:
 #  prefix-owner-default.foo=tinky-winky
-## Source browser URL of the repository of an ID prefix
+## Source browser (e.g. Trac) URL of the repository of an ID prefix
 #  prefix-web.PREFIX=URL
 ## E.g.:
-#  prefix-web.foo=http://host/projects/foo
+#  prefix-web.foo=http://host/projects/foo/intertrac/source:
 ## Web service URL of an ID prefix
 #  prefix-ws.PREFIX=URL
 ## E.g.:
