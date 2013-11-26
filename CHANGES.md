@@ -7,7 +7,7 @@ for a full listing of issues for each release.
 
 ## Next Release (2013-Q4?)
 
-This release of Rose will work best with Cylc 5.4.1 or above.
+This release of Rose will work best with Cylc 5.4.2 or above.
 
 ### Highlighted Changes
 
