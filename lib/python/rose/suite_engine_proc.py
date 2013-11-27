@@ -135,6 +135,16 @@ class CycleOffset(object):
         return timedelta(**{timedelta_unit: multiplier * amount})
 
 
+class SuiteEngineGlobalConfCompatError(Exception):
+
+    """An exception raised on incompatible global configuration."""
+
+    def __str__(self):
+        engine, key, value = self.args
+        return ("%s global configuration incompatible to Rose: %s=%s" %
+                (engine, key, value))
+
+
 class StillRunningError(Exception):
 
     """An exception raised when a suite is still running."""
@@ -262,6 +272,14 @@ class SuiteEngineProcessor(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
+
+    def check_global_conf_compat(self):
+        """Raise exception on suite engine specific incompatibity.
+
+        Should raise SuiteEngineGlobalConfCompatError.
+
+        """
+        raise NotImplementedError()
 
     def clean_hook(self, suite_name=None):
         """Run suite engine dependent logic (at end of "rose suite-clean")."""
