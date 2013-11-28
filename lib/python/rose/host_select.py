@@ -264,35 +264,37 @@ class HostSelector(object):
                                   "value": value}
                 threshold_confs.append(threshold_conf)
 
+        # Timeout
+        conf = ResourceLocator.default().get_conf()
+        timeout = conf.get_value(["rose-host-select", "timeout"])
+
         # ssh to each host to return its score(s).
         host_proc_dict = {}
         for host_name in sorted(host_names):
-            command = ""
+            command = []
             if host_name != "localhost":
-                command = self.popen.list_to_shell_str(
-                        self.popen.get_cmd("ssh", host_name))
-            command += " bash <<'__BASH__'\n"
-            command += rank_conf["scorer"].get_command(rank_conf["method_arg"])
+                command_args = []
+                if timeout:
+                    command_args.append("-oConnectTimeout=%d" % int(timeout))
+                command_args.append(host_name)
+                command = self.popen.get_cmd("ssh", *command_args)
+            command.append("bash")
+            stdin = rank_conf["scorer"].get_command(rank_conf["method_arg"])
             for threshold_conf in threshold_confs:
                 scorer = threshold_conf["scorer"]
-                command += scorer.get_command(threshold_conf["method_arg"])
-            command += "__BASH__\n"
-            proc = self.popen.run_bg(command, shell=True)
+                stdin += scorer.get_command(threshold_conf["method_arg"])
+            stdin += "exit\n"
+            proc = self.popen.run_bg(*command, stdin=stdin)
+            proc.stdin.write(stdin)
+            proc.stdin.flush()
             host_proc_dict[host_name] = proc
 
         # Retrieve score for each host name
-        conf = ResourceLocator.default().get_conf()
-        timeout_node = conf.get(["rose-host-select", "timeout"],
-                                no_ignore=True)
-        timeout = getattr(timeout_node, "value", None)
-        can_timeout = timeout is not None
-        if can_timeout:
-            timeout = float(timeout)
-            time0 = time()
+        time0 = time()
         host_score_list = []
         while host_proc_dict:
             for host_name, proc in host_proc_dict.items():
-                if can_timeout and proc.poll() is None:
+                if timeout and proc.poll() is None:
                     score = None
                 elif proc.wait():
                     self.handle_event(DeadHostEvent(host_name))
@@ -317,17 +319,21 @@ class HostSelector(object):
                         score = scorer.command_out_parser(out, method_arg)
                         host_score_list.append((host_name, score))
                         self.handle_event(HostSelectScoreEvent(host_name, score))
-            if can_timeout:
+            if timeout:
                 dt = time() - time0
                 if host_proc_dict:
-                    if dt >= timeout:
+                    if dt >= float(timeout):
                         break
-                    if timeout - dt > self.TIMEOUT_DELAY:
+                    if float(timeout) - dt > self.TIMEOUT_DELAY:
                         sleep(self.TIMEOUT_DELAY)
                     else:
-                        sleep(timeout - dt)
-        for host_name in sorted(host_proc_dict.keys()):
+                        sleep(float(timeout) - dt)
+
+        # Report timed out hosts
+        for host_name, proc in sorted(host_proc_dict.items()):
             self.handle_event(TimedOutHostEvent(host_name))
+            proc.kill()
+            proc.wait()
 
         if not host_score_list:
             raise NoHostSelectError()

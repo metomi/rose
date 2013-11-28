@@ -1,0 +1,8 @@
+#!/bin/bash
+ME=$(basename $0)
+TIMEOUT=$1
+TIMEOUT=${TIMEOUT#*=}
+shift 1
+echo -e "$$\t$TIMEOUT\t$1" >>$ME.out
+sleep $((TIMEOUT * 2)) # A bit longer, so lingering process can be tested
+exit 255
