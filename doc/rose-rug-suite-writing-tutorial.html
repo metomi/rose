@@ -411,6 +411,17 @@ build.target{task} = link
       <p>This is a minimal <code>fcm</code> configuration for building the
       program.</p>
     </div>
+    
+    <div class="slide">
+      <h3 id="explain-fcm">Explaining the fcm_make Magic</h3>
+
+      <p>Rose knows to ask <code>fcm make</code> to build the executable
+      within the <samp>share/</samp> directory of our running suite so other
+      tasks can use it. Our executable will be built in the <samp>share/fcm_make_navigate/build/bin/</samp> directory.</p>
+      
+      <p>Paths to this kind of directory will get automatically added by Rose for subsequent tasks.
+      This means that we don't need to refer to this directory to use <samp>dead_reckoning.exe</samp>.</p>
+    </div>
 
     <div class="slide">
       <h3 id="content">Suite Contents So Far</h3>

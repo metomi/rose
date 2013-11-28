@@ -480,7 +480,7 @@ default=echo 'Hello World'
       cluster/supercomputer.</p>
 
       <p>We could set <samp>hello_eris</samp> to run on a given host by setting
-      <samp>[[remote]]</samp> section settings:</p>
+      <samp>[[[remote]]]</samp> section settings:</p>
       <pre class="prettyprint lang-cylc">
     [[hello_eris]]
         inherit = HELLO_FAMILY
@@ -886,6 +886,17 @@ type=boolean
 
       <p>See the <a href="rose-rug-advanced-tutorials-suicide.html">suicide
       triggering tutorial</a> for more details.</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Dependency Syntax a =&gt; FAMILY_B</h3>
+
+      <p>If all the tasks in <var>FAMILY_B</var> should run when <var>a</var> succeeds:</p>
+      <pre class="prettyprint lang-cylc">
+[scheduling]
+    [[dependencies]]
+        graph = a =&gt; FAMILY_B
+</pre>
     </div>
 
     <div class="slide">
