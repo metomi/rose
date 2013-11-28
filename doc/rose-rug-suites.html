@@ -202,8 +202,8 @@
     <h3 class="alwayshidden">Scheduling Cycling Tasks</h3>
 
     <p>Most meteorological suites repeat over time (cycling):</p><img src=
-    "http://cylc.github.io/cylc/graphics/png/scaled/dep-multi-cycle.png"
-    width="40%" alt="multi-cycle dependencies" /></div>
+    "http://cylc.github.io/cylc/graphics/png/scaled/dep-multi-cycle.png" width=
+    "40%" alt="multi-cycle dependencies" /></div>
 
     <div class="slide">
     <h3 class="alwayshidden">A Cycle isn't A Prison</h3>
@@ -261,7 +261,6 @@
 
       <p>This will run a cylc task called <samp>hello_world</samp> that prints
       <samp>Hello World</samp> to standard out.</p>
-
     </div>
 
     <div class="slide">
@@ -480,7 +479,7 @@ default=echo 'Hello World'
       cluster/supercomputer.</p>
 
       <p>We could set <samp>hello_eris</samp> to run on a given host by setting
-      <samp>[[remote]]</samp> section settings:</p>
+      <samp>[[[remote]]]</samp> section settings:</p>
       <pre class="prettyprint lang-cylc">
     [[hello_eris]]
         inherit = HELLO_FAMILY
@@ -889,6 +888,18 @@ type=boolean
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Dependency Syntax a =&gt; FAMILY_B</h3>
+
+      <p>If all the tasks in <var>FAMILY_B</var> should run when <var>a</var>
+      succeeds:</p>
+      <pre class="prettyprint lang-cylc">
+[scheduling]
+    [[dependencies]]
+        graph = a =&gt; FAMILY_B
+</pre>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Dependency Syntax FAMILY_A:succeed-any =&gt;
       b</h3>
 
@@ -1191,7 +1202,7 @@ type=boolean
         make</code></li>
 
         <li><kbd>rose_ana</kbd> - an engine to compare program outputs</li>
-        
+
         <li><kbd>rose_arch</kbd> - archive output</li>
 
         <li><kbd>rose_prune</kbd> - housekeep a cycling suite</li>
