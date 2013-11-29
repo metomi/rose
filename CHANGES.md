@@ -11,6 +11,10 @@ This release of Rose will work best with Cylc 5.4.2 or above.
 
 ### Highlighted Changes
 
+\#1040: rose suite-run: check incompatible Cylc global config. In particular,
+`rose suite-run` will now raise an exception if `[host][localhost]run directory`
+and/or `[host][localhost]work directory` are not the defaults.
+
 \#1026, #1033: rose app-run, rose suite-run, rose config-edit, etc: support
 optional source for file installation. E.g. In a `[file:path/to/file]` section,
 a `source=(namelist:foo)` will allow `[namelist:foo]` to be missing or ignored.
@@ -25,7 +29,11 @@ directories on job hosts created by an old version of `rose suite-run`.)
 
 ### Noteworthy Changes
 
+\#1045: rosie id --to-web: fix hard coded Trac assumption.
+
 \#1039: rose config-edit: fix enable empty user-ignored section.
+
+\#1037: rose config-edit: custom sub-panel widgets API documented.
 
 \#1035: rose config-edit: fix orphaned warning for optional content sections.
 
