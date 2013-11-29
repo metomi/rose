@@ -30,7 +30,7 @@ cat >rose.conf <<__ROSE_CONF__
 local-copy-root=$PWD/roses
 prefix-default=foo
 prefix-location.foo=$URL
-prefix-web.foo=http://trac-host/foo
+prefix-web.foo=http://trac-host/foo/intertrac/source:
 __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD
 #-------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 TEST_KEY=$TEST_KEY_BASE-1-to-web
 run_pass "$TEST_KEY" rosie id --to-web foo-aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-http://trac-host/foo/browser/a/a/0/0/0/trunk?rev=HEAD
+http://trac-host/foo/intertrac/source:/a/a/0/0/0/trunk@HEAD
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
