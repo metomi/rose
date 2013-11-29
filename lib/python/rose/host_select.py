@@ -277,7 +277,8 @@ class HostSelector(object):
             if host_name != "localhost":
                 command_args = []
                 if timeout:
-                    command_args.append("-oConnectTimeout=%d" % int(timeout))
+                    command_args.append("-oConnectTimeout=%d" %
+                                        int(float(timeout)))
                 command_args.append(host_name)
                 command = self.popen.get_cmd("ssh", *command_args)
             command.append("bash")
