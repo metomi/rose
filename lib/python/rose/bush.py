@@ -359,11 +359,11 @@ def main():
         if arg != "stop":
            level = 0
         for k, v in sorted(status.items()):
-            report("%s=%s" % (k, v), level=level)
+            report("%s=%s\n" % (k, v), level=level)
         if (arg == "stop" and status.get("pid") and
             (opts.non_interactive or
              raw_input("Stop server? y/n (default=n)") == "y")):
-            os.kill(int(status["pid"]), signal.SIGTERM)
+            os.killpg(int(status["pid"]), signal.SIGTERM)
             # TODO: should check whether it is killed or not
 
 

@@ -19,12 +19,14 @@
 #------------------------------------------------------------------------------
 """Select an available host machine by load or by random."""
 
+import os
 from random import choice, random
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
 from rose.resource import ResourceLocator
 import shlex
+import signal
 import sys
 from time import sleep, time
 
@@ -284,7 +286,8 @@ class HostSelector(object):
                 scorer = threshold_conf["scorer"]
                 stdin += scorer.get_command(threshold_conf["method_arg"])
             stdin += "exit\n"
-            proc = self.popen.run_bg(*command, stdin=stdin)
+            proc = self.popen.run_bg(*command, stdin=stdin,
+                                     preexec_fn=os.setpgrp)
             proc.stdin.write(stdin)
             proc.stdin.flush()
             host_proc_dict[host_name] = proc
@@ -332,7 +335,7 @@ class HostSelector(object):
         # Report timed out hosts
         for host_name, proc in sorted(host_proc_dict.items()):
             self.handle_event(TimedOutHostEvent(host_name))
-            proc.kill()
+            os.killpg(proc.pid, signal.SIGTERM)
             proc.wait()
 
         if not host_score_list:
