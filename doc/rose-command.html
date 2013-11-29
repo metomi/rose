@@ -1360,8 +1360,8 @@ launcher-preopts.mpiexec=-n $NPROC
     determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
     or its nearest parent directories. In a normal suite, the basename of the
     (nearest parent) directory containing the <var>rose-suite.conf</var> file
-    is assumed to be the suite name. In a project containing a <a
-    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    is assumed to be the suite name. In a project containing a <a href=
+    "#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
     directory containing the <var>rose-stem/rose-suite.conf</var> file is
     assumed to be the suite name.</p>
 
@@ -1474,8 +1474,8 @@ launcher-preopts.mpiexec=-n $NPROC
       <li>Launch web browser to view suite log. If <dfn>rose bush</dfn> is not
       configured, the command will offer to start it.</li>
 
-      <li>Update the suite's job logs by pulling them back from any remote hosts
-      for specified cycle times or task names or IDs.</li>
+      <li>Update the suite's job logs by pulling them back from any remote
+      hosts for specified cycle times or task names or IDs.</li>
 
       <li>Archive (tar-gzip) job logs at or older than the specified cycle
       time.</li>
@@ -1485,8 +1485,8 @@ launcher-preopts.mpiexec=-n $NPROC
     determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
     or its nearest parent directories. In a normal suite, the basename of the
     (nearest parent) directory containing the <var>rose-suite.conf</var> file
-    is assumed to be the suite name. In a project containing a <a
-    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    is assumed to be the suite name. In a project containing a <a href=
+    "#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
     directory containing the <var>rose-stem/rose-suite.conf</var> file is
     assumed to be the suite name.</p>
 
@@ -1554,27 +1554,21 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dt><kbd>rose suite-run</kbd></dt>
 
-      <dd>As above, but start the suite in simulation mode.</dd>
+      <dd>Install and run a Cylc suite in <var>$PWD</var>.</dd>
 
       <dt><kbd>rose suite-run -- --mode=simulation</kbd></dt>
 
-      <dd>Install the suite in <var>$PWD</var>, and register it as
-      <var>my.suite</var>.</dd>
+      <dd>As above, but start the suite in simulation mode.</dd>
 
       <dt><kbd>rose suite-run -n my.suite</kbd></dt>
 
-      <dd>Install the suite in <var>/dir/to/suite</var>, and register it as
+      <dd>Install and run the suite in <var>$PWD</var>, and register it as
       <var>my.suite</var>.</dd>
 
       <dt><kbd>rose suite-run -C /dir/to/my.suite</kbd></dt>
 
-      <dd>Equivalent to (<kbd>cd /dir/to/my.suite &amp;&amp; rose
-      suite-run</kbd>)</dd>
-
-      <dt><kbd>rose suite-run -C /dir/to/suite -n my.suite</kbd></dt>
-
-      <dd>Equivalent to (<kbd>cd /dir/to/suite &amp;&amp; rose suite-run
-      my.suite</kbd>)</dd>
+      <dd>Install and run suite in <samp>/dir/to/my.suite</samp>. Equivalent to
+      (<kbd>cd /dir/to/my.suite &amp;&amp; rose suite-run</kbd>).</dd>
     </dl>
 
     <h3>DESCRIPTION</h3>
@@ -1779,8 +1773,8 @@ launcher-preopts.mpiexec=-n $NPROC
     determined by locating a <var>rose-suite.conf</var> file in <var>$PWD</var>
     or its nearest parent directories. In a normal suite, the basename of the
     (nearest parent) directory containing the <var>rose-suite.conf</var> file
-    is assumed to be the suite name. In a project containing a <a
-    href="#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
+    is assumed to be the suite name. In a project containing a <a href=
+    "#rose-stem">rose stem</a> suite, the basename of the (nearest parent)
     directory containing the <var>rose-stem/rose-suite.conf</var> file is
     assumed to be the suite name.</p>
 
