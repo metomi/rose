@@ -5,7 +5,7 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2013-Q4?)
+## 2013-12 (2013-12-02)
 
 This release of Rose will work best with Cylc 5.4.2 or above.
 
@@ -28,6 +28,16 @@ this means that the new `rose suite-clean` may not correctly clean the suite
 directories on job hosts created by an old version of `rose suite-run`.)
 
 ### Noteworthy Changes
+
+\#1055: rose_arch: fix `update-check=mtime+size` uniqueness problem for file
+sources with identical modified times and sizes.
+
+\#1053: rose config-edit: fix custom macro status bar reporting.
+
+\#1049: rose host-select: run SSH commands with `-oConnectTimeout=T`,
+and wait for all child processes to complete.
+
+\#1046: rose config-edit: fix macro metadata setting for section.
 
 \#1045: rosie id --to-web: fix hard coded Trac assumption.
 
