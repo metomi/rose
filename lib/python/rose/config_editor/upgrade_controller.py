@@ -140,7 +140,17 @@ class UpgradeController(object):
                 if ok_to_upgrade and next_version != curr_version:
                     manager.set_new_tag(next_version)
                     macro_config = copy.deepcopy(config)
-                    new_config, change_list = manager.transform(macro_config)
+                    try:
+                        new_config, change_list = manager.transform(macro_config)
+                    except Exception as e:
+                        rose.gtk.dialog.run_dialog(
+                            rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                            type(e).__name__ + ": " + str(e),
+                            rose.config_editor.ERROR_UPGRADE.format(
+                                config_name.lstrip("/"))
+                        )
+                        iter_ = self.treemodel.iter_next(iter_)
+                        continue
                     macro_id = (type(manager).__name__ + "." +
                                 rose.macro.TRANSFORM_METHOD)
                     if handle_transform_func(config_name, macro_id,
