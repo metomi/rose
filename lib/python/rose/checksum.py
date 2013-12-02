@@ -49,12 +49,12 @@ def get_checksum(name, checksum_func=None):
 
     if checksum_func is None:
         checksum_func = get_checksum_func()
-    name = os.path.normpath(name)
     path_and_checksum_list = []
     if os.path.isfile(name):
-        checksum = checksum_func(name, name)
+        checksum = checksum_func(name, "")
         path_and_checksum_list.append(("", checksum))
     else: # if os.path.isdir(path):
+        name = os.path.normpath(name)
         path_and_checksum_list = []
         for dirpath, dirnames, filenames in os.walk(name):
             path = dirpath[len(name) + 1:]
@@ -100,6 +100,8 @@ def _md5_hexdigest(source, root):
 def _mtime_and_size(source, root):
     """Return a string containing the name, its modified time and its size."""
     stat = os.stat(os.path.realpath(source))
-    return os.pathsep.join(["source=" + os.path.relpath(source, root),
+    if root:
+        source = os.path.relpath(source, root)
+    return os.pathsep.join(["source=" + source,
                             "mtime=" + str(stat.st_mtime),
                             "size=" + str(stat.st_size)])
