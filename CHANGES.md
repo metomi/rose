@@ -49,7 +49,7 @@ and wait for all child processes to complete.
 
 \#1029: rose config-edit: fix file browser launch bug for unknown configuration.
 
-\#1024: rose bush: job list mode: fixed `no_statues` checkboxes returning nothing
+\#1024: rose bush: job list mode: fixed `no_statuses` checkboxes returning nothing
 bug.
 
 \#1023: rose suite-gcontrol: raise exception on attempt to launch suite control
