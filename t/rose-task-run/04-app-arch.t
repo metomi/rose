@@ -70,9 +70,10 @@ for CYCLE in 2013010100 2013010112 2013010200; do
         "$TEST_KEY-$CYCLE.out" "$TEST_KEY-$CYCLE.out.expected"
     TEST_KEY="$TEST_KEY_BASE-db"
     for TRY in 1 2; do
-        ACTUAL=$SUITE_RUN_DIR/work/archive.$CYCLE/rose-arch-db-$TRY.out
-        file_cmp "$TEST_KEY-$CYCLE.out" \
-            "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" $ACTUAL
+        FILE=$SUITE_RUN_DIR/work/archive.$CYCLE/rose-arch-db-$TRY.out
+        sed "s?\\\$ROSE_DATAC?$SUITE_RUN_DIR/share/data/$CYCLE?" \
+            "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" >$FILE.expected
+        file_cmp "$TEST_KEY-$CYCLE.out" $FILE.expected $FILE
     done
     for KEY in dark-matter.txt jupiter.txt try.nl uranus.txt; do
         TEST_KEY="$TEST_KEY_BASE-$CYCLE-grep-$KEY-foo-log-2"
