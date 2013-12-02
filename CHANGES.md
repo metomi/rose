@@ -39,7 +39,9 @@ and wait for all child processes to complete.
 
 \#1046: rose config-edit: fix macro metadata setting for section.
 
-\#1045: rosie id --to-web: fix hard coded Trac assumption.
+\#1045: rosie id --to-web: fix hard coded Trac assumption. Note: requires a
+change in the site configuration value [rosie-id]prefix-web. See example site
+configuration file.
 
 \#1039: rose config-edit: fix enable empty user-ignored section.
 
