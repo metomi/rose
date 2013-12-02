@@ -1,0 +1,269 @@
+#!/bin/bash
+
+_rose() {
+    local current previous options ROSE_DIR suboptions subcommand metavar prev_option comp_options possible_subcommand
+    COMPREPLY=()
+    current="${COMP_WORDS[COMP_CWORD]}"
+    previous="${COMP_WORDS[COMP_CWORD-1]}"
+    possible_subcommand="${COMP_WORDS[1]:-}"
+    ROSE_DIR=$(rose --version | sed "s/.*(\(.*\))/\1/")
+    options=$(cd $ROSE_DIR/bin && ls rose-* | sed "s/^rose-//g")
+
+    subcommand=
+    if [[ -n $possible_subcommand ]]; then
+        for option in $options; do
+            if [[ $option == $possible_subcommand ]]; then
+                subcommand=$possible_subcommand
+                break
+            fi
+        done
+    fi
+    if [[ -n $subcommand && -L $ROSE_DIR/bin/rose-$subcommand ]]; then
+        subcommand=$(readlink $subcommand)
+    fi          
+
+    prev_option=$(printf "%s\n" "${COMP_WORDS[@]}" | grep "^-" | tail -1)
+
+    if [[ -n $subcommand ]]; then
+        suboption_lines=$(__rose_help $subcommand | sed -n '/^ *-/p')
+        suboptions=$(__rose_help $subcommand | sed -n '/^ *-/p' | sed 's/^ *//g; s/, \(-\)/\n\1/g; s/=/ /g')
+        if echo "$suboptions" | grep -q "^$prev_option\>" && [[ $current != $prev_option ]]; then
+            # The current string must be an argument to the option.
+            current_option_args=
+            if [[ $current != "=" ]]; then
+                current_option_args=$current
+            fi
+            metavar=$(echo "$suboptions" | grep "^$prev_option " | grep -o '[^ ]*$')
+            if [[ $metavar == "DIR" || $metavar == "PATH" || $metavar = "FILE" ]]; then
+                return 0
+            fi
+            formal_prev_option=$(echo "$suboption_lines" | \
+                                 sed -n "s/^ *\(-[^ =]*\).*, $prev_option\b.*/\1/p")
+            if [[ -n $formal_prev_option ]]; then
+                prev_option=$formal_prev_option
+            fi
+            custom_function_name="_rose_"${subcommand//-/_}${prev_option//-/_}
+            if type -t $custom_function_name 1>/dev/null 2>&1; then
+                $custom_function_name "$current_option_args"
+                return $?
+            fi
+            COMPREPLY=
+            return 1
+        fi
+        suboptions=$(rose help $subcommand | sed -n '/^ *-/p' | \
+                        sed 's/^ *//g; s/, \(-\)/\n\1/g; s/=.*$/=/g; s/  *.*$//g; s/ *$//g; s/[^=]$/ /g')
+        COMPREPLY=( $(compgen -o nospace -W "$suboptions" -- "$current") )
+        return 0
+    fi
+    COMPREPLY=( $(compgen -W "$options" -- "$current") )
+    return 0
+}
+
+_rose_app_run__app_mode() {
+    COMPREPLY=( $(compgen -W "fcm_make rose_ana rose_arch rose_prune" -- $1) )
+}
+
+_rose_app_run__command_key() {
+    local config_dir command_keys
+    config_dir=$(__rose_get_config_dir)
+    if [[ -d $config_dir ]]; then
+        command_keys=$(rose config --keys --file=$config_dir/rose-app.conf command 2>/dev/null)
+        COMPREPLY=( $(compgen -W "$command_keys" -- $1) )
+        return 0
+    fi
+    echo "    oh no $config_dir"
+    return 1
+}
+
+_rose_app_run__opt_conf_key() {
+    local config_dir opt_conf_keys
+    config_dir=$(__rose_get_config_dir)
+    if [[ -d $config_dir/opt ]]; then
+        opt_conf_keys=$(cd $config_dir/opt/ && ls rose-app-*.conf | sed "s/rose-app-\(.*\).conf/\1/g")
+        COMPREPLY=( $(compgen -W "$opt_conf_keys" -- $1) )
+        return 0
+    fi
+    return 1
+}
+
+_rose_host_select__rank_method() {
+    COMPREPLY=( $(compgen -W "load fs mem random" $1) )
+}
+
+_rose_stem__group() {
+    local config_dir groups
+    config_dir=$(__rose_stem_get_config_dir)
+    if [[ ! -e $config_dir/meta/rose-meta.conf ]]; then
+        return 1
+    fi
+    groups=$(rose config --file=$config_dir/meta/rose-meta.conf \
+             jinja2:suite.rc=RUN_NAMES widget[rose-config-edit] | \
+             grep -o "\-\-choices=[^ ]*" | sed "s/--choices\(=\| \)//g;" | \
+             tr '\n' ',' | tr ',' ' ')
+    COMPREPLY=( $(compgen -W "$groups" -- $1) )
+    return 0
+}
+
+# Should we amalgamate this into _rose_stem__group?
+_rose_stem__task() {
+    local config_dir groups
+    config_dir=$(__rose_stem_get_config_dir)
+    if [[ ! -e $config_dir/meta/rose-meta.conf ]]; then
+        return 1
+    fi
+    tasks=$(rose config --file=$config_dir/meta/rose-meta.conf \
+            jinja2:suite.rc=RUN_NAMES widget[rose-config-edit] | \
+            tr ' ' '\n' | sed -n '/rose.config_editor.*/d; /^\([^-].*\)/p')
+    COMPREPLY=( $(compgen -W "$tasks" -- $1) )
+    return 0
+}
+
+_rose_suite_gcontrol__name() {
+    local names
+    names=$(ls ~/.cylc/ports/ 2>/dev/null)
+    COMPREPLY=( $(compgen -W "$names" -- $1) )
+}
+
+_rose_suite_hook__mail_cc() {
+    local users
+    prev_users=$1
+    user_tail=${prev_users##*,}
+    user_head=${prev_users%,*}
+    users=$(__rose_get_users)
+    if [[ -n $user_tail ]] && echo $users | grep -q "\<$user_tail\>"; then
+        # A complete user name, now need a comma.
+        users=$(echo $users | sed "s/^/$prev_users,/; s/ / $prev_users,/g")
+        COMPREPLY=( $(compgen -W "$users" -- $prev_users) )
+        return
+    fi
+    if [[ -n $user_head && $user_head != $prev_users ]]; then
+        users=$(echo $users | sed "s/^/$user_head,/; s/ / $user_head,/g")
+    fi
+    COMPREPLY=( $(compgen -W "$users" -- $prev_users) )
+}
+
+_rose_suite_log__name() {
+    local names
+    names=$(ls ~/cylc-run/)
+    COMPREPLY=( $(compgen -W "$names" -- $1) )
+}
+
+_rose_suite_log__user() {
+    local users
+    users=$(__rose_get_users)
+    COMPREPLY=( $(compgen -W "$users" -- $1) )
+}
+
+_rose_suite_run__host() {
+    local hosts
+    hosts=$(rose config rose-suite-run hosts 2>/dev/null)
+    hosts=$(__rose_get_expanded_hosts $hosts)
+    COMPREPLY=( $(compgen -W "$hosts" -- $1) )
+}
+
+_rose_suite_run__opt_conf_key() {
+    local config_dir opt_conf_keys
+    config_dir=$(__rose_get_config_dir)
+    if [[ -d $config_dir/opt ]]; then
+        opt_conf_keys=$(cd $config_dir/opt/ && ls rose-suite-*.conf | sed "s/rose-suite-\(.*\).conf/\1/g")
+        COMPREPLY=( $(compgen -W "$opt_conf_keys" -- $1) )
+        return 0
+    fi
+    return 1
+}
+
+_rose_suite_run__run() {
+    COMPREPLY=( $(compgen -W "reload restart run" -- $1) )
+}
+
+_rose_suite_shutdown__host() {
+    local hosts
+    hosts=$(rose config rose-suite-run hosts 2>/dev/null)
+    hosts=$(__rose_get_expanded_hosts $hosts)
+    COMPREPLY=( $(compgen -W "$hosts" -- $1) )
+}
+
+_rose_suite_shutdown__name() {
+    local names
+    names=$(ls ~/.cylc/ports/)
+    COMPREPLY=( $(compgen -W "$names" -- $1) )
+}
+
+_rose_task_run__app_mode() {
+    _rose_app_run__app_mode "$@"
+    return $?
+}
+
+_rose_task_run__command_key() {
+    export COMP_WORDS
+    _rose_app_run__command_key "$@"
+    return $?
+}
+
+_rose_task_run__opt_conf_key() {
+    _rose_app_run__opt_conf_key "$@"
+    return $?
+}
+
+__rose_get_config_dir() {
+    local config_dir
+    config_dir=$(printf "%s " "${COMP_WORDS[@]}" | sed -n "s/.*--config = \([^ ]*\).*/\1/p; s/.*-C *\([^ ]*\).*/\1/p")
+    if [[ -z $config_dir ]]; then
+        config_dir=$PWD
+    fi
+    eval config_dir="$config_dir"
+    echo $(cd $config_dir && pwd -P)
+}
+
+__rose_stem_get_config_dir() {
+    local config_dir
+    config_dir=$(__rose_get_config_dir)
+    if [[ ! -e $config_dir/rose-stem/suite.rc ]]; then
+        while [[ ! -d $config_dir/rose-stem ]] && svn info $config_dir >/dev/null 2>&1; do
+            new_config_dir=$(cd $config_dir/.. && pwd -P)
+            echo "    $new_config_dir"
+            if [[ $new_config_dir == $config_dir ]]; then
+                return 1
+            fi
+            config_dir=$new_config_dir
+        done
+        if [[ ! -e $config_dir/rose-stem/suite.rc ]]; then
+            return 1
+        fi
+    fi
+    config_dir=$config_dir/rose-stem
+    echo $config_dir
+}
+
+__rose_get_expanded_hosts() {
+    for host in "$@"; do
+        rose config rose-host-select group{$host} || echo $host
+    done
+}
+
+__rose_get_users() {
+    getent aliases | sed "s/^\([^:]*\) *:.*/\1/p" | sort
+}
+    
+__rose_help() {
+    local subcommand
+    subcommand=$1
+    if type -t _rose_help__${subcommand//-/_}; then
+        _rose_help__${subcommand//-/_}
+        return
+    fi
+    rose help $subcommand
+}
+
+_rose_help__stem() {
+    rose help stem
+    rose help suite-run
+}
+
+_rose_help__task_run() {
+    rose help task-run
+    rose help app-run
+    rose help task-env
+}
+
+complete -o bashdefault -o default -o nospace -F _rose rose
