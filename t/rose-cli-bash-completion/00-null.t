@@ -735,7 +735,7 @@ prefix-ws.electron=http://host/rosie/electron
 prefix-ws.muon=http://host/rosie/muon
 prefix-ws.tau=http://host/rosie/tau
 __CONF__
-export ROSE_CONF_PATH=
+export ROSE_CONF_PATH=$PWD
 COMP_WORDS=( rosie create --prefix = "" )
 COMP_CWORD=4
 COMPREPLY=
