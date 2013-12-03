@@ -38,7 +38,7 @@
 #        variable, then the value of the setting is used as the command.
 #     4. Invoke the command specified in [command]default.
 #
-# OPTION
+# OPTIONS
 #     --app-mode=MODE
 #         Run a builtin application identified by MODE. The default MODE is
 #         "command".

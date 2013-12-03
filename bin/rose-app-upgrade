@@ -15,7 +15,7 @@
 #         "=" indicates the current version.
 #         "*" indicates the default version to change to.
 #
-# OPTION
+# OPTIONS
 #     --all-versions, -a
 #         Use all tagged versions.
 #     --config=DIR, -C DIR

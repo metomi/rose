@@ -26,7 +26,7 @@
 # DESCRIPTION
 #     List or run macros associated with a suite or application.
 #
-# OPTION
+# OPTIONS
 #     --config=DIR, -C DIR
 #         Use configuration in DIR instead of $PWD.
 #     --fix, -F
