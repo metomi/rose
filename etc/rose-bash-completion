@@ -8,7 +8,7 @@ _rose() {
     possible_subcommand="${COMP_WORDS[1]:-}"
     rose_command="${COMP_WORDS[0]}"
     rose --version 1>/dev/null 2>&1 || return 1
-    ROSE_DIR=$(rose --version | sed "s/.*(\(.*\))/\1/")
+    ROSE_DIR=$(__rose_get_rose_dir)
     options=$(cd $ROSE_DIR/bin && ls $rose_command-* | sed "s/^$rose_command-//g")
 
     subcommand=
@@ -55,7 +55,7 @@ _rose() {
         fi
         if [[ -z $prev_option ]] || [[ $this_index -gt $prev_index && -n $prev_option_argument ]]; then
             # No relevant previous option, or a previous option that was completed.
-           # echo "get arg"
+           # echo "get arg" $subcommand
             custom_function_name="_${rose_command}_"${subcommand//-/_}_ARGS
             args=
             if type -t $custom_function_name 1>/dev/null 2>&1; then
@@ -123,6 +123,21 @@ _rose_app_run__opt_conf_key() {
         return 0
     fi
     return 1
+}
+
+_rose_app_upgrade_ARGS() {
+    local config_dir meta_path meta_path_option all_versions_option versions 
+    config_dir=$(__rose_get_config_dir)
+    meta_path=$(__rose_get_meta_path)
+    all_versions_option=
+    meta_path_option="--meta-path=$meta_path"
+    if [[ -z $meta_path ]]; then
+        meta_path_option=
+    fi
+    if printf "%s " "${COMP_WORDS[@]}" | grep -q " --all-versions\| -a "; then
+        all_versions_option="--all-versions"
+    fi
+    rose app-upgrade $all_versions_option $meta_path_option --config=$config_dir 2>/dev/null | sed 's/^. \(.*\)$/\1/g'
 }
 
 _rose_host_select__rank_method() {
@@ -233,6 +248,16 @@ _rose_suite_shutdown__name() {
     COMPREPLY=( $(compgen -W "$names" -- $1) )
 }
 
+_rose_suite_stop__host() {
+    _rose_suite_shutdown__host "$@"
+    return $?
+}
+
+_rose_suite_stop__name() {
+    _rose_suite_stop__name "$@"
+    return $?
+}
+
 _rose_task_run__app_mode() {
     _rose_app_run__app_mode "$@"
     return $?
@@ -247,6 +272,12 @@ _rose_task_run__command_key() {
 _rose_task_run__opt_conf_key() {
     _rose_app_run__opt_conf_key "$@"
     return $?
+}
+
+_rose_test_battery_ARGS() {
+    local subtests ROSE_DIR
+    ROSE_DIR=$(__rose_get_rose_dir)
+    cd $ROSE_DIR/t && ls -d ros*
 }
 
 _rosie_create__prefix() {
@@ -311,6 +342,10 @@ __rose_get_meta_path() {
         eval meta_path="$meta_path"
         echo $(cd $meta_path 1>/dev/null 2>&1 && pwd -P)
     fi
+}
+
+__rose_get_rose_dir() {
+    rose --version | sed "s/.*(\(.*\))/\1/"
 }
 
 __rose_get_users() {

@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 168
+tests 193
 setup
 #-------------------------------------------------------------------------------
 # Source the script.
@@ -199,7 +199,6 @@ command2
 command3
 __REPLY__
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-cat $TEST_KEY.err >/dev/tty
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # List option arguments for "rose app-run --app-mode=fcm_make --config=../config/ --command-key= ".
@@ -255,6 +254,103 @@ compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 bar
 foo
 __REPLY__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# List option arguments for "rose app-upgrade ".
+TEST_KEY=$TEST_KEY_BASE-rose-app-upgrade
+setup
+init <<'__CONFIG__'
+meta=jupiter_moons/io
+
+[env]
+SEMI_MAJOR_AXIS_M=4.2e8
+__CONFIG__
+init_upgrade_meta jupiter_moons io europa ganymede callisto
+init_upgrade_macro jupiter_moons <<'__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+import rose.upgrade
+
+
+class UpgradeIotoEuropa(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from Io to Europa."""
+
+    BEFORE_TAG = "io"
+    AFTER_TAG = "europa"
+
+    def upgrade(self, config, meta_config=None):
+        self.change_setting_value(config, ["env", "SEMI_MAJOR_AXIS_M"], "6.7e8")
+        return config, self.reports
+
+
+class UpgradeEuropatoGanymede(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from Europa to Ganymede."""
+
+    BEFORE_TAG = "europa"
+    AFTER_TAG = "ganymede"
+
+    def upgrade(self, config, meta_config=None):
+        self.change_setting_value(config, ["env", "SEMI_MAJOR_AXIS_M"], "1.0e9")
+        return config, self.reports
+
+
+class UpgradeGanymedetoCallisto(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from Ganymede to Callisto."""
+
+    BEFORE_TAG = "ganymede"
+    AFTER_TAG = "callisto"
+
+    def upgrade(self, config, meta_config=None):
+        self.change_setting_value(config, ["env", "SEMI_MAJOR_AXIS_M"], "1.9e9")
+        return config, self.reports
+
+
+class UpgradeCallistotoThemisto(rose.upgrade.MacroUpgrade):
+
+    """Upgrade from Callisto to Themisto."""
+
+    BEFORE_TAG = "callisto"
+    AFTER_TAG = "themisto"
+
+    def upgrade(self, config, meta_config=None):
+        self.change_setting_value(config, ["env", "SEMI_MAJOR_AXIS_M"], "7.4e9")
+        return config, self.reports
+__MACRO__
+COMP_WORDS=( rose app-upgrade --config = $TEST_DIR/config --meta-path = $TEST_DIR/rose-meta "" )
+COMP_CWORD=8
+COMPREPLY=
+run_pass "$TEST_KEY" _rose
+compreply_grep "$TEST_KEY.reply1" '^io$'
+compreply_grep "$TEST_KEY.reply2" '^europa$'
+compreply_grep "$TEST_KEY.reply3" '^ganymede$'
+compreply_grep "$TEST_KEY.reply4" '^callisto$'
+compreply_grep "$TEST_KEY.reply5" '^--config=$'
+compreply_grep "$TEST_KEY.reply6" '^--meta-path=$'
+compreply_grep "$TEST_KEY.reply7" '^-a$'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# List option arguments for "rose app-upgrade -a ".
+TEST_KEY=$TEST_KEY=$TEST_KEY_BASE-rose-app-upgrade-a
+COMP_WORDS=( rose app-upgrade -a --config = $TEST_DIR/config --meta-path = $TEST_DIR/rose-meta "" )
+COMP_CWORD=9
+COMPREPLY=
+run_pass "$TEST_KEY" _rose
+compreply_grep "$TEST_KEY.reply1" '^io$'
+compreply_grep "$TEST_KEY.reply2" '^europa$'
+compreply_grep "$TEST_KEY.reply3" '^ganymede$'
+compreply_grep "$TEST_KEY.reply4" '^callisto$'
+compreply_grep "$TEST_KEY.reply5" '^themisto$'
+compreply_grep "$TEST_KEY.reply6" '^--config=$'
+compreply_grep "$TEST_KEY.reply7" '^--meta-path=$'
+compreply_grep "$TEST_KEY.reply8" '^-a$'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -382,28 +478,13 @@ task_8
 __REPLY__
 file_cmp "$TEST_KEY.out" "$TEST_DIR/config/$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_DIR/config/$TEST_KEY.err" </dev/null
-teardown
 #-------------------------------------------------------------------------------
 # List option arguments for "rose stem --task= ".
 TEST_KEY=$TEST_KEY_BASE-rose-stem-task
-setup
-init_rose_stem_meta <<'__META__'
-[jinja2:suite.rc=RUN_NAMES]
-widget[rose-config-edit]=rose.config_editor.valuewidget.choice.ChoicesValueWidget
-                        =--all-group=all --editable --format=python --guess-groups
-                        =--choices=all,many,lots --choices=more,extra
-                        = --choices=superfluous task_1 task_2
-                        = task_3
-                        =task_4
-                        = task_5 task_6
-                        =task_6 task_7
-                        =task_8
-__META__
-COMP_WORDS=( rose stem -C $TEST_DIR/config/meta --task = "" )
-COMP_CWORD=4
+COMP_WORDS=( rose stem -C $TEST_DIR/config/ --task = "" )
+COMP_CWORD=6
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-printf "%s\n" "${COMPREPLY[@]:-}"
 compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 all
 many
@@ -608,7 +689,6 @@ COMP_WORDS=( rose suite-stop --host = "" )
 COMP_CWORD=4
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-printf "%s\n" "${COMPREPLY[@]:-ohnoes}" >/dev/tty
 compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 up
 down
@@ -715,6 +795,19 @@ compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 bar
 foo
 __REPLY__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# List arguments for "rose test-battery ".
+TEST_KEY=$TEST_KEY_BASE-rose-test-battery
+setup
+COMP_WORDS=( rose test-battery "" )
+COMP_CWORD=2
+COMPREPLY=
+run_pass "$TEST_KEY" _rose
+TEST_CATEGORY="$(dirname $0)"
+compreply_grep "$TEST_KEY.reply" "$TEST_CATEGORY"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

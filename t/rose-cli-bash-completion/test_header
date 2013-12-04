@@ -63,6 +63,21 @@ function init_suite() {
     cat >$TEST_DIR/config/rose-suite.conf
 }
 
+function init_upgrade_macro() {
+    category=$1
+    cat >$TEST_DIR/rose-meta/$category/versions.py
+}
+
+function init_upgrade_meta() {
+    category=$1
+    mkdir -p $TEST_DIR/rose-meta/$category/
+    shift
+    for version; do
+        mkdir -p $TEST_DIR/rose-meta/$category/$version/
+        touch $TEST_DIR/rose-meta/$category/$version/rose-meta.conf
+    done
+}
+
 function setup() {
     mkdir $TEST_DIR/run
     cd $TEST_DIR/run
@@ -98,7 +113,7 @@ function compreply_grep() {
     if [[ -n ${COMPREPLY:-} ]]; then
         printf "%s\n" "${COMPREPLY[@]}" > $ENV_ACTUAL_TEMP_FILE
     fi
-    if grep "$TEST_PATTERN" "$ENV_ACTUAL_TEMP_FILE"; then
+    if grep -q "$TEST_PATTERN" "$ENV_ACTUAL_TEMP_FILE"; then
         pass $TEST_KEY
         return
     fi
