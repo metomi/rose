@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-scan", on localhost, without site/user configurations.
+# Test the rose CLI bash completion script for running suites.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 export ROSE_CONF_PATH=
-tests 16
+tests 20
 #-------------------------------------------------------------------------------
 # Source the script.
 . $ROSE_HOME/etc/rose-bash-completion || exit 1
@@ -69,6 +69,17 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 TEST_KEY=$TEST_KEY_BASE
 TEST_KEY=$TEST_KEY_BASE-shutdown-name
 COMP_WORDS=( rose suite-shutdown --name = "" )
+COMP_CWORD=4
+COMPREPLY=
+run_pass "$TEST_KEY" _rose
+compreply_grep "$TEST_KEY.reply" '^'"$NAME"'$'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# rose suite-stop --name
+TEST_KEY=$TEST_KEY_BASE
+TEST_KEY=$TEST_KEY_BASE-stop-name
+COMP_WORDS=( rose suite-stop --name = "" )
 COMP_CWORD=4
 COMPREPLY=
 run_pass "$TEST_KEY" _rose

@@ -281,7 +281,7 @@ _rose_suite_stop__host() {
 }
 
 _rose_suite_stop__name() {
-    _rose_suite_stop__name "$@"
+    _rose_suite_shutdown__name "$@"
     return $?
 }
 
