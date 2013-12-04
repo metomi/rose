@@ -1,20 +1,50 @@
 #!/bin/bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-3 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose-bash-completion
+#
+# SYNOPSIS
+#     . $ROSE_HOME/etc/rose-bash-completion
+#
+# DESCRIPTION
+#     Set Bash auto-completion for rose/rosie commands.
+#-------------------------------------------------------------------------------
 
 _rose() {
-    local current previous options ROSE_DIR suboptions subcommand rose_command metavar prev_option comp_options possible_subcommand
+    local current possible_subcommand rose_command ROSE_DIR ok_subcommands subcommand
+    local current_option_line current_option_arg_index current_option current_option_arg
+    local current_index suboption_lines suboption_sep_lines suboptions
+    local sub_args custom_function_name metavar formal_current_option
     COMPREPLY=()
     current="${COMP_WORDS[COMP_CWORD]}"
-    previous="${COMP_WORDS[COMP_CWORD-1]}"
     possible_subcommand="${COMP_WORDS[1]:-}"
     rose_command="${COMP_WORDS[0]}"
     rose --version 1>/dev/null 2>&1 || return 1
     ROSE_DIR=$(__rose_get_rose_dir)
-    options=$(cd $ROSE_DIR/bin && ls $rose_command-* | sed "s/^$rose_command-//g")
+    ok_subcommands=$(cd $ROSE_DIR/bin && ls $rose_command-* | sed "s/^$rose_command-//g")
 
+    # Determine the subcommand (e.g. app-run for rose app-run)
     subcommand=
     if [[ -n $possible_subcommand ]]; then
-        for option in $options; do
-            if [[ $option == $possible_subcommand ]]; then
+        for ok_subcommand in $ok_subcommands; do
+            if [[ $ok_subcommand == $possible_subcommand ]]; then
                 subcommand=$possible_subcommand
                 break
             fi
@@ -24,65 +54,61 @@ _rose() {
         subcommand=$(readlink $subcommand)
     fi          
 
-    prev_option_line=$(printf "%s\n" "${COMP_WORDS[@]}" | grep -n "^-" | tail -1)
-    if [[ -n $prev_option_line ]]; then
-        prev_index=$(echo $prev_option_line | grep -o "^[0-9][0-9]*")
-        prev_option=$(echo $prev_option_line | grep -o '\-.*$')
-        prev_option_argument="${COMP_WORDS[$prev_index]:-}"
-        if [[ $prev_option_argument == "=" ]]; then
-            prev_index=$(( prev_index + 1 ))
-            prev_option_argument="${COMP_WORDS[$prev_index]:-}"
+    # Determine whether we are filling in an option, or an argument to an option.
+    current_option_line=$(printf "%s\n" "${COMP_WORDS[@]}" | grep -n "^-" | tail -1)
+    if [[ -n $current_option_line ]]; then
+        current_option_arg_index=$(echo $current_option_line | grep -o "^[0-9][0-9]*")
+        current_option=$(echo $current_option_line | grep -o '\-.*$')
+        current_option_arg="${COMP_WORDS[$current_option_arg_index]:-}"
+        if [[ $current_option_arg == "=" ]]; then
+            current_option_arg_index=$(( current_option_arg_index + 1 ))
+            current_option_arg="${COMP_WORDS[$current_option_arg_index]:-}"
         fi
     else
-        prev_index=
-        prev_option_argument=
-        prev_option=
+        current_option_arg_index=
+        current_option_arg=
+        current_option=
     fi
-    this_index=${#COMP_WORDS[@]}
-    this_index=$(( this_index - 1 ))
-    
- #   echo "Prev index:$prev_index:Prev option:$prev_option:Prev option argument:$prev_option_argument:"
- #   echo "This index:$this_index:"
-    
- #   printf "%s\n" "${COMP_WORDS[@]}"
+    current_index=${#COMP_WORDS[@]}
+    current_index=$(( current_index - 1 ))
 
+    # Supply any completion information if we can.
     if [[ -n $subcommand ]]; then
         suboption_lines=$(__${rose_command}_help $subcommand | sed -n '/^    -/p')
         suboption_sep_lines=$(echo "$suboption_lines" | sed 's/^ *//g; s/, \(-\)/\n\1/g')
         suboptions=$(echo "$suboption_sep_lines" | sed 's/=/ /g')
-        if echo "$suboptions" | grep -q '^'$prev_option'$'; then
-            prev_option=
+        if echo "$suboptions" | grep -q '^'$current_option'$'; then
+            # The current option does not take an argument, so forget about it.
+            current_option=
         fi
-        if [[ -z $prev_option ]] || [[ $this_index -gt $prev_index && -n $prev_option_argument ]]; then
-            # No relevant previous option, or a previous option that was completed.
-           # echo "get arg" $subcommand
+        if [[ -z $current_option ]] || [[ $current_index -gt $current_option_arg_index && -n $current_option_arg ]]; then
+            # There is no relevant current option - supply new list of options and arguments (if any).
             custom_function_name="_${rose_command}_"${subcommand//-/_}_ARGS
-            args=
+            sub_args=
             if type -t $custom_function_name 1>/dev/null 2>&1; then
-                args=$($custom_function_name "$current")
+                sub_args=$($custom_function_name "$current")
             fi
             suboptions=$(echo -e "$suboption_sep_lines" | \
                          sed 's/=.*$/=/g; s/  *.*$//g; s/ *$//g;')
-            COMPREPLY=( $(compgen -W "$suboptions $args" -- "$current") )
+            COMPREPLY=( $(compgen -W "$suboptions $sub_args" -- "$current") )
             return 0
         fi
-        if echo "$suboptions" | grep -q "^$prev_option\>" && [[ $current != $prev_option ]]; then
+        if echo "$suboptions" | grep -q "^$current_option\>" && [[ $current != $current_option ]]; then
             # The current string must be an argument to the option.
-          #  echo "get option arg"
             current_option_args=
             if [[ $current != "=" ]]; then
                 current_option_args=$current
             fi
-            metavar=$(echo "$suboptions" | grep "^$prev_option " | grep -o '[^ ]*$')
+            metavar=$(echo "$suboptions" | grep "^$current_option " | grep -o '[^ ]*$')
             if [[ $metavar == "DIR" || $metavar == "PATH" || $metavar = "FILE" ]]; then
                 return 0
             fi
-            formal_prev_option=$(echo -e "$suboption_lines" | \
-                                 sed -n "s/^ *\(-[^ =]*\).*, $prev_option\b.*/\1/p")
-            if [[ -n $formal_prev_option ]]; then
-                prev_option=$formal_prev_option
+            formal_current_option=$(echo -e "$suboption_lines" | \
+                                    sed -n "s/^ *\(-[^ =]*\).*, $current_option\b.*/\1/p")
+            if [[ -n $formal_current_option ]]; then
+                current_option=$formal_current_option
             fi
-            custom_function_name="_${rose_command}_"${subcommand//-/_}${prev_option//-/_}
+            custom_function_name="_${rose_command}_"${subcommand//-/_}${current_option//-/_}
             if type -t $custom_function_name 1>/dev/null 2>&1; then
                 $custom_function_name "$current_option_args"
                 return $?
@@ -95,7 +121,8 @@ _rose() {
         COMPREPLY=( $(compgen -W "$suboptions" -- "$current") )
         return 0
     fi
-    COMPREPLY=( $(compgen -W "$options" -- "$current") )
+    # There is an incomplete subcommand or none at all - supply a list of them.
+    COMPREPLY=( $(compgen -W "$ok_subcommands" -- "$current") )
     return 0
 }
 
@@ -126,7 +153,7 @@ _rose_app_run__opt_conf_key() {
 }
 
 _rose_app_upgrade_ARGS() {
-    local config_dir meta_path meta_path_option all_versions_option versions 
+    local config_dir meta_path meta_path_option all_versions_option
     config_dir=$(__rose_get_config_dir)
     meta_path=$(__rose_get_meta_path)
     all_versions_option=
@@ -145,7 +172,7 @@ _rose_host_select__rank_method() {
 }
 
 _rose_macro_ARGS() {
-    local config_dir meta_path meta_path_option macros
+    local config_dir meta_path meta_path_option
     config_dir=$(__rose_get_config_dir)
     meta_path=$(__rose_get_meta_path)
     meta_path_option="--meta-path=$meta_path"
