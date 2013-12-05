@@ -1144,6 +1144,7 @@ class ConfigDataManager(object):
                         # ns created from variables, not a section - no title.
                         continue
                     if key == rose.META_PROP_MACRO:
+                        macro_info = value
                         if key in ns_metadata:
                             ns_metadata[rose.META_PROP_MACRO] += ", " + macro_info
                         else:

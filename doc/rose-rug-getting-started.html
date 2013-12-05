@@ -95,12 +95,13 @@ geditor=gvim -f
     <h2 id="site">Site Configuration</h2>
 
     <p>You can configure Rose for your site by creating and editing the
-    <var>etc/rose.conf</var> file in a Rose distribution.</p>
+    <var>etc/rose.conf</var> file in a Rose distribution. Valid settings are
+    documented in the <var>etc/rose.conf.example</var> file in a Rose
+    distribution.</p>
 
-    <p>Essential setup includes changing the options in
-    <samp>[rose-host-select]</samp> and <samp>[rose-suite-run]</samp> to
-    appropriate hostnames. You should also probably change the path settings in
-    <samp>[rose-task-run]</samp> to their equivalent for your site.</p>
+    <p>As a start, you should probably change <var>root-dir*</var> settings in
+    <var>[rose-suite-run]</var> section and the <var>path*</var> settings in
+    <var>[rose-task-run]</var> section to suit your site.</p>
 
     <p>If you are using Rosie, you will need to change the paths, urls, and
     hostnames in the <samp>rosie</samp> sections as well.</p>
@@ -108,12 +109,19 @@ geditor=gvim -f
     <p>You may want to make sure the default programs referred to in
     <samp>[external]</samp> are sensible.</p>
 
-    <h2 id="plugins">Plugins</h2>
+    <h2 id="cylc">Configuring Cylc</h2>
 
-    <p>You may want to set up cylc-specific text editor plugins - see the
-    <a href=
-    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-530008.2">Cylc
-    User Guide</a> for details.</p>
+    <p>See <a href=
+    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-160004.2">Cylc
+    Use Guide</a> for detail.</p>
+
+    <p>DO NOT modify the <var>[hosts] &rarr; HOST &rarr; run directory</var> and
+    <var>[hosts] &rarr; HOST &rarr; work directory</var> settings, and they are
+    incompatible with Rose. Equivalent functionalities are provided by the
+    <var>[rose-suite-run]root-dir*</var> settings in the Rose site/user
+    configuration.</p>
+
+    <h2 id="plugins">Plugins</h2>
 
     <p>There are gedit, kate, and vim plugins for syntax highlighting of Rose
     configuration files, located at:</p>
@@ -129,6 +137,11 @@ geditor=gvim -f
     <p><samp>$ROSE_HOME</samp> should be replaced with the path to the root
     directory of your local Rose installation, which you can locate by running
     <code>rose --version</code>. See the files themselves for setup notes.</p>
+
+    <p>You may want to set up cylc-specific text editor plugins - see the
+    <a href=
+    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-530008.2">Cylc
+    User Guide</a> for details.</p>
   </div>
 </body>
 </html>

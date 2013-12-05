@@ -80,6 +80,10 @@
 ## E.g.:
 #  thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
 #  thresholds{linux}=mem:8000
+## Time out (in number of seconds) for SSH connection to hosts
+#  timeout=T
+## E.g.:
+#  timeout=5
 [rose-host-select]
 
 # Configuration related to "rose suite-hook"
@@ -212,10 +216,10 @@
 #  prefix-owner-default.PREFIX=USER-ID
 ## E.g.:
 #  prefix-owner-default.foo=tinky-winky
-## Source browser URL of the repository of an ID prefix
+## Source browser (e.g. Trac) URL of the repository of an ID prefix
 #  prefix-web.PREFIX=URL
 ## E.g.:
-#  prefix-web.foo=http://host/projects/foo
+#  prefix-web.foo=http://host/projects/foo/intertrac/source:
 ## Web service URL of an ID prefix
 #  prefix-ws.PREFIX=URL
 ## E.g.:

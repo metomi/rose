@@ -164,7 +164,7 @@ set_value("20")
       <dt><code>arg_str</code></dt>
 
       <dd>
-        <p>is a keyword argument that stores extra text given to the
+        <p>a keyword argument that stores extra text given to the
         <samp>widget</samp> option in the metadata, if any:</p>
         <pre class="prettyprint lang-rose_conf">
 widget[rose-config-edit]=modulename.ClassName arg1 arg2 arg3 ...
@@ -300,7 +300,7 @@ def handle_type_error(self, is_in_error):
 
     <p>All the existing variable value widgets are implemented using this API,
     so a good resource is the modules within the
-    lib/python/rose/config_editor/valuewidget package.</p>
+    <samp>lib/python/rose/config_editor/valuewidget</samp> package.</p>
 
     <h3 id="gtk:config-edit:pages">Config Editor Custom Pages</h3>
 
@@ -335,7 +335,7 @@ def handle_type_error(self, is_in_error):
     class MyGreatBigTable(gtk.Table):
 
         def __init__(self, real_variable_list, missing_variable_list,
-                     variable_functions_class_inst, show_modes_dict,
+                     variable_functions_inst, show_modes_dict,
                      arg_str=None):
 </pre>
 
@@ -358,7 +358,7 @@ def handle_type_error(self, is_in_error):
       them by implementing the <code>'View Latent'</code> menu functionality
       that we'll discuss further on.</dd>
 
-      <dt><code>variable_functions_class_inst</code></dt>
+      <dt><code>variable_functions_inst</code></dt>
 
       <dd>an instance of the class
       rose.config_editor.ops.variable.VariableOperations.This contains methods
@@ -437,7 +437,7 @@ def show_fixed(self, should_show)
       <dt><code>arg_str</code></dt>
 
       <dd>
-        <p>is a keyword argument that stores extra text given to the
+        <p>a keyword argument that stores extra text given to the
         <samp>widget</samp> option in the metadata, if any:</p>
         <pre class="prettyprint lang-rose_conf">
 widget[rose-config-edit] = modulename.ClassName arg1 arg2 arg3 ...
@@ -495,7 +495,7 @@ different cases.
     e.g. by greying out part of it.</p>
 
     <p>All existing page widgets use this API, so a good resource is the
-    modules in lib/python/rose/config_editor/pagewidget/.</p>
+    modules in <samp>lib/python/rose/config_editor/pagewidget/</samp>.</p>
 
     <p>Generally speaking, a visible change, click, or key press in the custom
     page widget should make instant changes to variable value(s), and the value
@@ -512,6 +512,130 @@ different cases.
     page operations - it should be capable of displaying variables even when
     they have no or very little metadata, and still make sense if some
     variables are missing or new.</p>
+
+    <h3 id="gtk:config-edit:sub-panel">Config Editor Custom Sub Panels</h3>
+
+    <p>A 'sub panel' or 'summary panel' in the config editor is a panel that
+    appears at the bottom of a page and is intended to display some summarised
+    information about sub-pages (sub-namespaces) underneath the page. For
+    example, the top-level file page, by default, has a sub panel to summarise
+    the individual file sections.</p>
+
+    <p>Any actual data belonging to the page will appear above the sub panel in
+    a separate representation.</p>
+
+    <p>Sub panels are capable of using quite a lot of functionality such as
+    modifying the sections and options in the sub-pages directly.</p>
+
+    <h4 id="gtk:config-edit:sub-panel:api">API Reference</h4>
+
+    <p>The procedure for generating a custom sub panel widget is as
+    follows:</p>
+
+    <p>Assign a <code>widget[rose-config-edit:sub-ns]</code> option to the
+    relevant namespace in the metadata configuration, e.g.</p>
+    <pre class="prettyprint lang-rose_conf">
+    [ns:namelist/all_the_foo_namelists]
+    widget[rose-config-edit:sub-ns]=module_name.MySubPanelForFoos
+</pre>
+
+    <p>Note that because the actual data on the page has a separate
+    representation, you need to write <samp>[rose-config-edit:sub-ns]</samp>
+    rather than just <samp>[rose-config-edit]</samp>.</p>
+
+    <p>The widget class should have a constructor of the form</p>
+    <pre class="prettyprint">
+    class MySubPanelForFoos(gtk.VBox):
+
+        def __init__(self, section_dict, variable_dict,
+                     section_functions_inst, variable_functions_inst,
+                     search_for_id_function, sub_functions_inst,
+                     is_duplicate_boolean, arg_str=None):
+</pre>
+
+    <p>The class can inherit from any <code>gtk.Container</code>-derived
+    class.</p>
+
+    <p>The constructor arguments are:</p>
+
+    <dl>
+      <dt><code>section_dict</code></dt>
+
+      <dd>a dictionary (map, hash) of section name keys and section data object
+      values (instances of the <code>rose.section.Section</code> class). These
+      contain some of the data such as section ignored status and comments that
+      you may want to present. These objects can usually be used by the
+      <code>section_functions_inst</code> methods as arguments - for example,
+      passed in in order to ignore or enable a section.</dd>
+
+      <dt><code>variable_dict</code></dt>
+
+      <dd>a dictionary (map, hash) of section name keys and lists of variable
+      data objects (instances of the <code>rose.variable.Variable</code>
+      class). These contain useful information for the variable (option) such
+      as state, value, and comments. Like section data objects, these can
+      usually be used as arguments to the <code>variable_functions_inst</code>
+      methods to accomplish things like changing a variable value or adding or
+      removing a variable.</dd>
+
+      <dt><code>section_functions_inst</code></dt>
+
+      <dd>an instance of the class
+      rose.config_editor.ops.section.SectionOperations. This contains methods
+      to operate on the variables. These will update the undo stack and take
+      care of any errors. Together with <code>sub_functions_inst</code>, these
+      methods are the only ways that you should write to the section states or
+      other attributes. For documentation, see the module
+      lib/python/rose/config_editor/ops/section.py.</dd>
+
+      <dt><code>variable_functions_inst</code></dt>
+
+      <dd>an instance of the class
+      rose.config_editor.ops.variable.VariableOperations. This contains methods
+      to operate on the variables. These will update the undo stack and take
+      care of any errors. These methods are the only ways that you should write
+      to the variable states or values. For documentation, see the module
+      lib/python/rose/config_editor/ops/variable.py.</dd>
+
+      <dt><code>search_for_id_function</code></dt>
+
+      <dd>a function that accepts a setting id (a section name, or a variable
+      id) as an argument and asks the config editor to navigate to the page for
+      that setting. You could use this to allow a click on a section name in
+      your widget to launch the page for the section.</dd>
+
+      <dt><code>sub_functions_inst</code></dt>
+
+      <dd>an instance of the class
+      rose.config_editor.ops.group.SubDataOperations. This contains some
+      convenience methods specifically for sub panels, such as operating on
+      many sections at once in an optimised way. For documentation, see the
+      module lib/python/rose/config_editor/ops/group.py.</dd>
+
+      <dt><code>is_duplicate_boolean</code></dt>
+
+      <dd>a boolean that denotes whether or not the sub-namespaces in the
+      summary data consist only of duplicate sections (e.g. only
+      <samp>namelist:foo(1)</samp>, <samp>namelist:foo(2)</samp>, ...). For
+      example, this could be used by your widget to decide whether to implement
+      a <q>Copy section</q> user option.</dd>
+
+      <dt><code>arg_str</code></dt>
+
+      <dd>
+        <p>a keyword argument that stores extra text given to the
+        <samp>widget</samp> option in the metadata, if any - e.g.:</p>
+        <pre class="prettyprint lang-rose_conf">
+widget[rose-config-edit:sub-ns] = modulename.ClassName arg1 arg2 arg3 ...
+</pre>
+
+        <p>would give a <code>arg_str</code> of <code>"arg1 arg2 arg3
+        ..."</code>. You can use this to help configure your widget.</p>
+      </dd>
+    </dl>
+
+    <p>All existing sub panel widgets use this API, so a good resource is the
+    modules in <samp>lib/python/rose/config_editor/panelwidget/</samp>.</p>
 
     <h2 id="macro">Rose Macros</h2>
 

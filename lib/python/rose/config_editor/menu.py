@@ -724,7 +724,9 @@ class MainMenuHandler(object):
                 all_conf_text = self._format_macro_config_names(configs)
                 self.reporter.report(null_format.format(all_conf_text),
                                      kind=self.reporter.KIND_OUT)
-        return len(config_macro_errors) + len(config_macro_changes)
+        num_errors = sum([e[2] for e in config_macro_errors])
+        num_changes = sum([c[2] for c in config_macro_changes])
+        return num_errors + num_changes
 
     def _format_macro_config_names(self, config_names):
         if len(config_names) > 5:

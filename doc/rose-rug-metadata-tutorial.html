@@ -103,8 +103,8 @@
       tour and follow the instructions to check it out or recreate it.</p>
 
       <p>We are going to develop metadata for the app
-      <code>my_hello_mars</code>. Change directory to the suite directory, then
-      change directory to <code>app/my_hello_mars/</code>.</p>
+      <code>my_hello_mars</code>. Change directory to the suite directory,
+      then change directory to <code>app/my_hello_mars/</code>.</p>
     </div>
 
     <div class="slide">
@@ -124,10 +124,18 @@ WORLD=Mars
     </div>
 
     <div class="slide">
+      <h3 class="alwayshidden">Example: text editor</h3>
+
+      <p>This configuration will run <samp>hello.exe</samp> with some
+      environment variables set up - <var>MAX_TARGETS</var>,
+      <var>LANG_JUPITER</var>, and <var>WORLD</var>.</p>
+    </div>
+
+    <div class="slide">
       <h3 class="alwayshidden">Example: config editor</h3>
 
-      <p>We can compare this text with the display in the Rose config
-      editor.</p>
+      <p>We can compare the text in the <code>rose-app.conf</code> with the
+      display in the Rose config editor.</p>
 
       <p>Open this application directory in the Rose config editor by
       typing:</p>
@@ -166,7 +174,7 @@ rose edit
       <h3 class="alwayshidden">Example: metadata directory</h3>
 
       <p>Create the sub directory <code>meta/</code> in your application
-      directory (inside <samp>app/my_hello_mars/</samp>):</p>
+      directory (inside <code>app/my_hello_mars/</code>):</p>
       <pre class="shell">
 mkdir meta
 </pre>
@@ -184,9 +192,12 @@ touch meta/rose-meta.conf
     <div class="slide">
       <h3 class="alwayshidden">Example: metadata setting</h3>
 
-      <p>Let's provide some type information about <var>MAX_TARGETS</var>. The
-      id for this variable is <var>env=MAX_TARGETS</var>, so add a section into
-      the file:</p>
+      <p>Let's provide some type information about <var>MAX_TARGETS</var>, an
+      environment variable from our <code>rose-app.conf</code>. This is read in
+      as an integer by our <code>hello.exe</code> program.</p>
+
+      <p>The id for this variable is <var>env=MAX_TARGETS</var>, so add a
+      section into the file:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
 </pre>
@@ -219,8 +230,13 @@ type=integer
       <p>Now if we save the file and open the application in the config editor
       again, we see that the value of <var>MAX_TARGETS</var> now appears in a
       special numeric widget, and that the title has replaced the name. You can
-      see the difference easily by refreshing the metadata (menu <kbd>Metadata
-      -&gt; Refresh Metadata</kbd>).</p>
+      see the difference easily by switching off the metadata via the menu
+      option <kbd>Metadata -&gt; Switch Off Metadata</kbd>. Remember to switch
+      the metadata back on for the next part!</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Example: type checking</h3>
 
       <p>Setting the type does more than change the widget - it also instructs
       Rose to check that the input is valid for that type. If the value of
@@ -242,7 +258,7 @@ type=integer
       <p>We've set the type of <var>MAX_TARGETS</var> to <samp>integer</samp>,
       but we haven't ruled out choices of integer that would crash our code,
       such as negative integers. We need to restrict the number using a range.
-      To do this add a range as follows:</p>
+      To do this, add a range as follows:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=MAX_TARGETS]
 range=0:
@@ -388,26 +404,29 @@ values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
       choose from. Isn't that nice! Rose will now check <var>WORLD</var> in the
       future to make sure its value is in this list.</p>
 
-      <p>Set the <var>WORLD</var> value to <samp>Jupiter using the drop-down
-      list.</samp></p>
+      <p>Set the <var>WORLD</var> value to <samp>Jupiter</samp> using the
+      drop-down list.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Example: metadata trigger</h3>
 
-      <p>Looking at the other variables in the configuration, it doesn't appear
-      as if we really need a Jupiter language <var>LANG_JUPITER</var> set when
-      <var>WORLD</var> is not <samp>Jupiter</samp>. Let's add a
-      <samp>trigger</samp> to automatically handle this:</p>
+      <p>Looking at the other variables, it doesn't appear as if we really need
+      a Jupiter language <var>LANG_JUPITER</var> set when <var>WORLD</var> is
+      not <samp>Jupiter</samp>. Let's add a <samp>trigger</samp> to
+      automatically handle this:</p>
       <pre class="prettyprint lang-rose_conf">
 [env=WORLD]
 description=Choose your target world to say hello to.
 title=World
-trigger=env=LANG_JUPITER: Jupiter
+trigger=env=LANG_JUPITER: Jupiter;
 values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 
 [env=LANG_JUPITER]
 </pre>
+
+      <p>We also need a <samp>env=LANG_JUPITER</samp> section, as we're
+      referencing it in a <samp>trigger</samp>.</p>
     </div>
 
     <div class="slide">
@@ -416,7 +435,7 @@ values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
       <p>This means that <var>LANG_JUPITER</var> will be <em>ignored</em> when
       <var>WORLD</var> is not <samp>Jupiter</samp> - but it will be
       <em>enabled</em> when it is. Ignored variables won't get passed into our
-      <var>hello.exe</var> application.</p>
+      <code>hello.exe</code> application.</p>
     </div>
 
     <div class="slide">
@@ -442,7 +461,7 @@ values=Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 
       <p>An important advantage of adding metadata is that it acts as a memory
       of inputs. If you remove <var>WORLD</var> (in a text editor or using the
-      little button next to the title in the config editor) and save, any
+      little button next to the title in the config editor) and then save, any
       information about the variable <var>WORLD</var> is lost from your
       physical copy of the application. Close the config editor and check the
       application file.</p>

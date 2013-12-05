@@ -14,7 +14,7 @@ foo://2013010100/hello/worlds/uranus.txt||foo put %(target)s %(sources)s; echo '
 foo://2013010100/hello/worlds/dark-matter.txt|hello/dark-matter.txt|d849987cf8a372771652794bc80ee175
 foo://2013010100/hello/worlds/earth.txt|hello/earth.txt|25205c990e801b32e192f72c362d97eb
 foo://2013010100/hello/worlds/jupiter-moons.tar.gz|hello/jupiter-1.txt|cf77cebd08316ae60133c75fcbaeb4ce
-foo://2013010100/hello/worlds/jupiter.txt|hello/jupiter.txt|source=.:mtime=1356034320.0:size=27
+foo://2013010100/hello/worlds/jupiter.txt|hello/jupiter.txt|source=$ROSE_DATAC/hello/jupiter.txt:mtime=1356034320.0:size=27
 foo://2013010100/hello/worlds/neptune-1.txt|hello/neptune-1.txt|f390e332a8dc1186a9c81353cd7f1023
 foo://2013010100/hello/worlds/organisms.tar.gz|hello/organisms/animals/crocodile.txt|2984b5f5271a31321c97c707ff2e3e6a
 foo://2013010100/hello/worlds/organisms.tar.gz|hello/organisms/animals/elephant.txt|66a7288e1580a8f43c232ebf36920eda

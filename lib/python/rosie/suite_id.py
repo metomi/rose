@@ -391,14 +391,14 @@ class SuiteId(object):
         """Return the source browse URL for this suite."""
         # FIXME: This is Trac specific.
         prefix_source = self.get_prefix_web(self.prefix)
-        url = prefix_source + "/browser/" + "/".join(self._get_sid())
+        url = prefix_source + "/" + "/".join(self._get_sid())
         branch = self.branch
         if not branch:
             branch = self.BRANCH_TRUNK
         revision = self.revision
         if not revision:
             revision = self.REV_HEAD
-        return url + "/" + branch + "?rev=" + revision
+        return url + self.FORMAT_VERSION % (branch, revision)
 
     def to_output(self):
         """Return the output directory for this suite."""

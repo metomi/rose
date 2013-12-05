@@ -186,6 +186,8 @@ project=refresh-Q-2013
 sub-project=improve-B
 title=Run XYZ for A, with improved B
 </pre>
+
+      <p>N.B. special case of no (or <q>root</q>) section.</p>
     </div>
 
     <div class="slide">
@@ -378,7 +380,7 @@ source=/data/stuff/pi_to_a_million_places
       <pre class="prettyprint lang-rose_conf">
 [file:constants/pi]
 mode=symlink
-source=/data/stuff/pi_to_a_million_places
+source=/data/stuff/pi_to_a_trillion_places
 </pre>
     </div>
 
@@ -496,7 +498,8 @@ rose config --meta env=SPAM_NUMBER help
 
       <ul class="incremental">
         <li><kbd>rose suite-run --install-only</kbd>: construct all
-        rose-suite.conf files, but do not run.</li>
+        rose-suite.conf files, copy over files to cylc-run directory, but do
+        not run.</li>
 
         <li><kbd>rose suite-run -- --mode=simulation</kbd>: (<kbd>cylc
         run</kbd>option) execute all tasks/apps as 'sleep 10'.</li>

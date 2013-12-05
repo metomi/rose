@@ -5,23 +5,53 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2013-Q4?)
+## 2013-12 (2013-12-02)
 
-This release of Rose will work best with Cylc 5.4.1 or above.
+This release of Rose will work best with Cylc 5.4.2 or above.
 
 ### Highlighted Changes
 
--none yet-
-
-### Noteworthy Changes
-
-\#1029: rose config-edit: fix file browser launch bug for unknown configuration.
+\#1040: rose suite-run: check incompatible Cylc global config. In particular,
+`rose suite-run` will now raise an exception if `[host][localhost]run directory`
+and/or `[host][localhost]work directory` are not the defaults.
 
 \#1026, #1033: rose app-run, rose suite-run, rose config-edit, etc: support
 optional source for file installation. E.g. In a `[file:path/to/file]` section,
 a `source=(namelist:foo)` will allow `[namelist:foo]` to be missing or ignored.
 
-\#1024: rose bush: job list mode: fixed `no_statues` checkboxes returning nothing
+\#1005: rose suite-run, rose suite-clean: the root directory of
+`~/cylc-run/$SUITE/` is now configurable via site, user, or suite configuration.
+On installation of a suite, `rose suite-run` will store the locations of the job
+hosts in `~/cylc-run/$SUITE/log/rose-suite-run.locs`. The information can then
+be used by `rose suite-clean` to determine what to remove. (N.B. Unfortunately,
+this means that the new `rose suite-clean` may not correctly clean the suite
+directories on job hosts created by an old version of `rose suite-run`.)
+
+### Noteworthy Changes
+
+\#1055: rose_arch: fix `update-check=mtime+size` uniqueness problem for file
+sources with identical modified times and sizes.
+
+\#1053: rose config-edit: fix custom macro status bar reporting.
+
+\#1049: rose host-select: run SSH commands with `-oConnectTimeout=T`,
+and wait for all child processes to complete.
+
+\#1046: rose config-edit: fix macro metadata setting for section.
+
+\#1045: rosie id --to-web: fix hard coded Trac assumption. Note: requires a
+change in the site configuration value `[rosie-id]prefix-web`. See example site
+configuration file.
+
+\#1039: rose config-edit: fix enable empty user-ignored section.
+
+\#1037: rose config-edit: custom sub-panel widgets API documented.
+
+\#1035: rose config-edit: fix orphaned warning for optional content sections.
+
+\#1029: rose config-edit: fix file browser launch bug for unknown configuration.
+
+\#1024: rose bush: job list mode: fixed `no_statuses` checkboxes returning nothing
 bug.
 
 \#1023: rose suite-gcontrol: raise exception on attempt to launch suite control
@@ -31,12 +61,6 @@ GUI on an unregistered Cylc suite.
 Google code prettify JS library.
 
 \#1007: rose bush: now display Rose version that drives it.
-
-\#1005: rose suite-run, rose suite-clean: the root directory of
-`~/cylc-run/$SUITE/` is now configurable via site, user, or suite configuration.
-On installation of a suite, `rose suite-run` will store the locations of the job
-hosts in `~/cylc-run/$SUITE/log/rose-suite-run.locs`. The information can then
-be used by `rose suite-clean` to determine what to remove.
 
 \#1003: rose app-run, rose-suite-run, etc: file installation - a tilde `~`
 in front a path pointing to a Subversion working copy did not get expanded.
