@@ -832,7 +832,6 @@ export ROSE_CONF_PATH=$PWD
 COMP_WORDS=( rosie create --prefix = "" )
 COMP_CWORD=4
 COMPREPLY=
-_rose >~/rose.out 2>~/rose.err || true
 run_pass "$TEST_KEY" _rose
 compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 electron
