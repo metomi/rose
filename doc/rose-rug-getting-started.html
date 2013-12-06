@@ -112,8 +112,8 @@ geditor=gvim -f
     <h2 id="cylc">Configuring Cylc</h2>
 
     <p>See <a href=
-    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-160004.2">Cylc
-    Use Guide</a> for detail.</p>
+    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-160004.2">Cylc Use
+    Guide</a> for detail.</p>
 
     <p>DO NOT modify the <var>[hosts] &rarr; HOST &rarr; run directory</var> and
     <var>[hosts] &rarr; HOST &rarr; work directory</var> settings, and they are
@@ -122,6 +122,8 @@ geditor=gvim -f
     configuration.</p>
 
     <h2 id="plugins">Plugins</h2>
+
+    <h3 id="plugins:syntax">Syntax Highlighting</h3>
 
     <p>There are gedit, kate, and vim plugins for syntax highlighting of Rose
     configuration files, located at:</p>
@@ -142,6 +144,22 @@ geditor=gvim -f
     <a href=
     "http://cylc.github.io/cylc/html/single/cug-html.html#x1-530008.2">Cylc
     User Guide</a> for details.</p>
+
+    <h3 id="plugins:bash-completion">Bash Auto-Completion</h3>
+
+    <p>There is a Rose bash completion script that you can source to enhance
+    the Rose command line interface within an interactive Bash shell.</p>
+
+    <p>The script allows you to tab-complete Rose commands, options, and
+    arguments.</p>
+
+    <p>You can find the file at
+    <samp>$ROSE_HOME/etc/rose-bash-completion</samp>. The file contains the
+    instructions for using it.</p>
+
+    <p>As with the <a href="#plugins:syntax">syntax highlighting
+    instructions</a> above, you can locate your <samp>$ROSE_HOME</samp> by
+    running <code>rose --version</code>.</p>
   </div>
 </body>
 </html>
