@@ -28,7 +28,7 @@
 #
 #     Users should source this file in their ~/.bashrc, using something
 #     like this:
-#     if [[ -o interactive && -f /path/to/rose-bash-completion ]]; then
+#     if [[ $- =~ i && -f /path/to/rose-bash-completion ]]; then
 #         . /path/to/rose-bash-completion
 #     fi
 #     where /path/to/rose-bash-completion is replaced by the path to
