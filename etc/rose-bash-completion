@@ -49,7 +49,12 @@ _rose() {
     possible_subcommand="${COMP_WORDS[1]:-}"
     rose_command="${COMP_WORDS[0]}"
     rose --version 1>/dev/null 2>&1 || return 1
-    ROSE_DIR=$(__rose_get_rose_dir)
+    if grep -q "bin/ros[^/]*$" <<<"$rose_command"; then
+        ROSE_DIR=$(dirname $(cd $(dirname "$rose_command") && pwd -P))
+        rose_command=$(basename "$rose_command")
+    else
+        ROSE_DIR=$(__rose_get_rose_dir)
+    fi
     ok_subcommands=$(cd $ROSE_DIR/bin && ls $rose_command-* | \
                      sed "s/^$rose_command-//g")
 
