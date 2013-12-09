@@ -339,8 +339,6 @@ _rose_task_run__opt_conf_key() {
 }
 
 _rose_test_battery_ARGS() {
-    local subtests ROSE_DIR
-    ROSE_DIR=$(__rose_get_rose_dir)
     cd $ROSE_DIR/t && ls -d ros*
 }
 
