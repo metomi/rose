@@ -35,7 +35,7 @@ init_macro bad.py < $TEST_SOURCE_DIR/lib/custom_macro_change_bad.py
 run_fail "$TEST_KEY" rose macro --config=../config \
     bad.InvalidCommentsTransformer
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" "node.comments: invalid returned type" "$TEST_KEY.err"
+file_grep "$TEST_KEY.err" "node\.comments: invalid returned type" "$TEST_KEY.err"
 file_cmp "$TEST_KEY.config" ../config/rose-app.conf <<'__CONFIG__'
 [env]
 TRANSFORM_SWITCH=false
@@ -91,7 +91,7 @@ init_macro bad.py < $TEST_SOURCE_DIR/lib/custom_macro_change_bad.py
 run_fail "$TEST_KEY" rose macro --config=../config \
     bad.InvalidStateTransformer
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" "node.state: invalid returned value" "$TEST_KEY.err"
+file_grep "$TEST_KEY.err" "node\.state: invalid returned value" "$TEST_KEY.err"
 file_cmp "$TEST_KEY.config" ../config/rose-app.conf <<'__CONFIG__'
 [env]
 TRANSFORM_SWITCH=false
@@ -110,7 +110,7 @@ init_macro bad.py < $TEST_SOURCE_DIR/lib/custom_macro_change_bad.py
 run_fail "$TEST_KEY" rose macro --config=../config \
     bad.InvalidValueTransformer
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_grep "$TEST_KEY.err" "node.value: invalid returned type" "$TEST_KEY.err"
+file_grep "$TEST_KEY.err" "node\.value: invalid returned type" "$TEST_KEY.err"
 file_cmp "$TEST_KEY.config" ../config/rose-app.conf <<'__CONFIG__'
 [env]
 TRANSFORM_SWITCH=false
