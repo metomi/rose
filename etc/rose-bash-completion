@@ -50,7 +50,9 @@ _rose() {
     rose_command="${COMP_WORDS[0]}"
     rose --version 1>/dev/null 2>&1 || return 1
     if grep -q "bin/ros[^/]*$" <<<"$rose_command"; then
-        ROSE_DIR=$(dirname $(cd $(dirname "$rose_command") && pwd -P))
+        ROSE_DIR=$(dirname "$rose_command")
+        eval ROSE_DIR="$ROSE_DIR"
+        ROSE_DIR=$(dirname $(cd $ROSE_DIR && pwd -P))
         rose_command=$(basename "$rose_command")
     else
         ROSE_DIR=$(__rose_get_rose_dir)
