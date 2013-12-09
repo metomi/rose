@@ -676,6 +676,12 @@ class MainMenuHandler(object):
                     not isinstance(return_value[1], list)):
                     self._handle_bad_macro_return(macro_fullname, return_value)
                     continue
+                integrity_exception = rose.macro.check_config_integrity(
+                    return_value[0])
+                if integrity_exception is not None:
+                    self._handle_bad_macro_return(macro_fullname,
+                                                  integrity_exception)
+                    continue
                 macro_config, change_list = return_value
                 if not change_list:
                     continue

@@ -51,7 +51,9 @@ ERROR_LOAD_META_PATH = "Could not find metadata for {0}"
 ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACROS = "Please specify a macro name.\n"
+ERROR_RETURN_TYPE = "{0}: {1}: invalid returned type: {2}, expect {3}"
 ERROR_RETURN_VALUE = "{0}: incorrect return value"
+ERROR_RETURN_VALUE_STATE = "{0}: node.state: invalid returned value"
 MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"),
                              rose.META_DIR_MACRO)
 MACRO_EXT = ".py"
@@ -458,6 +460,45 @@ def get_macros_for_config(app_config=None,
     return get_macro_class_methods(modules)
 
 
+def check_config_integrity(app_config):
+    """Verify that the configuration is sane - return an error otherwise."""
+    try:
+        keys_and_nodes = list(app_config.walk())
+    except Exception as e:
+        return e
+    keys_and_nodes.insert(0, ([], app_config))
+    for keys, node in keys_and_nodes:
+        if not isinstance(node, rose.config.ConfigNode):
+            return TypeError(ERROR_RETURN_TYPE.format(
+                node, "node", type(node), "rose.config.ConfigNode"))
+        if (not isinstance(node.value, dict) and
+            not isinstance(node.value, basestring)):
+            return TypeError(ERROR_RETURN_TYPE.format(
+                node.value, "node.value", type(node.value),
+                "dict, basestring"
+            ))
+        if not isinstance(node.state, basestring):
+            return TypeError(ERROR_RETURN_TYPE.format(
+                node.state, "node.state", type(node.state), "basestring"))
+        if node.state not in [rose.config.ConfigNode.STATE_NORMAL,
+                              rose.config.ConfigNode.STATE_SYST_IGNORED,
+                              rose.config.ConfigNode.STATE_USER_IGNORED]:
+            return ValueError(ERROR_RETURN_VALUE_STATE.format(node.state))
+        if not isinstance(node.comments, list):
+            return TypeError(ERROR_RETURN_TYPE.format(
+                node.comments, "node.comments", type(node.comments),
+                "list"
+            ))
+        for comment in node.comments:
+            if not isinstance(comment, basestring):
+                return TypeError(ERROR_RETURN_TYPE.format(
+                    comment, "comment", type(comment), "basestring"))
+        for key in keys:
+            if not isinstance(key, basestring):
+                return TypeError(ERROR_RETURN_TYPE.format(
+                    key, "key", type(key), "basestring"))
+
+
 def validate_config(app_config, meta_config, run_macro_list, modules,
                     macro_info_tuples, opt_non_interactive=False):
     """Run validator custom macros on the config and return problems."""
@@ -800,6 +841,9 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
         if (not isinstance(new_config, rose.config.ConfigNode) or
             not isinstance(change_list, list)):
             raise ValueError(err_bad_return_value)
+        exception = check_config_integrity(new_config)
+        if exception is not None:
+            raise exception
         if change_list:
             no_changes = False
         method_id = TRANSFORM_METHOD.upper()[0]
