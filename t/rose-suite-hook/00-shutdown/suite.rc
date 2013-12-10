@@ -1,9 +1,9 @@
 #!jinja2
 [cylc]
-    UTC mode = True
+    UTC mode=True
     [[event hooks]]
-        timeout handler = "rose suite-hook --shutdown"
-        timeout = 1
+        timeout handler=rose suite-hook --shutdown
+        timeout=1
 [scheduling]
     [[dependencies]]
         graph = """
@@ -14,14 +14,14 @@ my_task_2
 [runtime]
     [[root]]
         [[[event hooks]]]
-           succeeded handler = "rose suite-hook"
-           failed handler = "rose suite-hook --shutdown"
-           submission failed handler = "rose suite-hook --shutdown"
-           submission timeout handler = "rose suite-hook"
-           execution timeout handler = "rose suite-hook"
-           submission timeout = 1
-           execution timeout  = 1
+           succeeded handler=rose suite-hook
+           failed handler=rose suite-hook --shutdown
+           submission failed handler=rose suite-hook --shutdown
+           submission timeout handler=rose suite-hook
+           execution timeout handler=rose suite-hook
+           submission timeout=1
+           execution timeout=1
     [[my_task_1]]
-        command scripting = "false"
+        command scripting=false
     [[my_task_2]]
-        command scripting = "sleep 600"
+        command scripting=true
