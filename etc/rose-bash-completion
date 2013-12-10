@@ -328,7 +328,6 @@ _rose_task_run__app_mode() {
 }
 
 _rose_task_run__command_key() {
-    export COMP_WORDS
     _rose_app_run__command_key "$@"
     return $?
 }
