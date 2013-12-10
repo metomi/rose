@@ -266,16 +266,16 @@
       <dd>Run a builtin application identified by MODE. The default
       <var>MODE</var> is <kbd>command</kbd>.</dd>
 
-      <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+      <dt><kbd>--config=DIR, -C DIR</kbd></dt>
 
       <dd>Specify the configuration directory of the application.
       (default=<var>$PWD</var>)</dd>
 
-      <dt><kbd>--command-key=KEY; -c KEY</kbd></dt>
+      <dt><kbd>--command-key=KEY, -c KEY</kbd></dt>
 
       <dd>Invoke the command specified in <var>[command]KEY</var>.</dd>
 
-      <dt><kbd>--define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE</kbd></dt>
+      <dt><kbd>--define=[SECTION]KEY=VALUE, -D [SECTION]KEY=VALUE</kbd></dt>
 
       <dd>Each of these overrides the <var>[SECTION]KEY</var> setting with a
       given <var>VALUE</var>.</dd>
@@ -284,7 +284,7 @@
       <kbd>--define=[SECTION]!KEY</kbd> or even
       <kbd>--define=[!SECTION]</kbd>.</dd>
 
-      <dt><kbd>--install-only; -i</kbd></dt>
+      <dt><kbd>--install-only, -i</kbd></dt>
 
       <dd>Install files only. Do not invoke the run.</dd>
 
@@ -307,7 +307,7 @@
 
       <dd>Decrement verbosity.</dd>
 
-      <dt><kbd>--verbose; -v</kbd></dt>
+      <dt><kbd>--verbose, -v</kbd></dt>
 
       <dd>Increment verbosity.</dd>
     </dl>
@@ -355,15 +355,15 @@
 
       <dd>Use all tagged versions.</dd>
 
-      <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+      <dt><kbd>--config=DIR, -C DIR</kbd></dt>
 
       <dd>Use configuration in <var>DIR</var> instead of <var>$PWD</var>.</dd>
 
-      <dt><kbd>--downgrade; -d;</kbd></dt>
+      <dt><kbd>--downgrade, -d;</kbd></dt>
 
       <dd>Downgrade the version instead of upgrade.</dd>
 
-      <dt><kbd>--meta-path=PATH; -M PATH</kbd></dt>
+      <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
 
       <dd>Prepend <var>PATH</var> to the metadata search path.</dd>
 
@@ -371,12 +371,12 @@
 
       <dd>Switch off interactive prompting (=answer yes to everything).</dd>
 
-      <dt><kbd>--output=DIR; -O DIR</kbd></dt>
+      <dt><kbd>--output=DIR, -O DIR</kbd></dt>
 
       <dd>The location of the output directory. Only meaningful if there is at
       least one transformer in the argument list.</dd>
 
-      <dt><kbd>--quiet; -q</kbd></dt>
+      <dt><kbd>--quiet, -q</kbd></dt>
 
       <dd>Reduce verbosity.</dd>
     </dl>
@@ -578,7 +578,7 @@
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+      <dt><kbd>--config=DIR, -C DIR</kbd></dt>
 
       <dd>Change directory to <var>DIR</var> before looking for configuration
       files. (default=<var>$PWD</var>)</dd>
@@ -618,7 +618,7 @@
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+      <dt><kbd>--config=DIR, -C DIR</kbd></dt>
 
       <dd>
         A path to either
@@ -643,7 +643,7 @@
 
       <dd>Load applications in the suite on demand.</dd>
 
-      <dt><kbd>--meta-path=PATH; -M PATH</kbd></dt>
+      <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
 
       <dd>Prepend <var>PATH</var> to the search path for metadata (look here
       first). This option can be used repeatedly to load multiple paths.</dd>
@@ -893,15 +893,15 @@
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbd>--config=DIR; -C DIR</kbd></dt>
+      <dt><kbd>--config=DIR, -C DIR</kbd></dt>
 
       <dd>Use configuration in <var>DIR</var> instead of <var>$PWD</var>.</dd>
 
-      <dt><kbd>--fix; -F</kbd></dt>
+      <dt><kbd>--fix, -F</kbd></dt>
 
       <dd>Run Rose internal transformer (fixer) macros.</dd>
 
-      <dt><kbd>--meta-path=PATH; -M PATH</kbd></dt>
+      <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
 
       <dd>Prepend <var>PATH</var> to the metadata search path.</dd>
 
@@ -909,16 +909,16 @@
 
       <dd>Switch off interactive prompting (=answer yes to everything).</dd>
 
-      <dt><kbd>--output=DIR; -O DIR</kbd></dt>
+      <dt><kbd>--output=DIR, -O DIR</kbd></dt>
 
       <dd>The location of the output directory. Only meaningful if there is at
       least one transformer in the argument list.</dd>
 
-      <dt><kbd>--quiet; -q</kbd></dt>
+      <dt><kbd>--quiet, -q</kbd></dt>
 
       <dd>Reduce verbosity.</dd>
 
-      <dt><kbd>--validate; -V</kbd></dt>
+      <dt><kbd>--validate, -V</kbd></dt>
 
       <dd>Prepend all validators to the argument list.</dd>
     </dl>
@@ -1069,7 +1069,7 @@
 
       <dd>Decrement verbosity.</dd>
 
-      <dt><kbd>--verbose; -v</kbd></dt>
+      <dt><kbd>--verbose, -v</kbd></dt>
 
       <dd>Increment verbosity. Print command on <var>-v</var> mode. Run
       <code>printenv</code>, <code>ldd</code> on a binary executable, and
@@ -1439,11 +1439,11 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dd>Trigger a shutdown of the suite.</dd>
 
-      <dt><kbd>--quiet; -q</kbd></dt>
+      <dt><kbd>--quiet, -q</kbd></dt>
 
       <dd>Decrement verbosity.</dd>
 
-      <dt><kbd>--verbose; -v</kbd></dt>
+      <dt><kbd>--verbose, -v</kbd></dt>
 
       <dd>Increment verbosity.</dd>
     </dl>
@@ -1588,14 +1588,14 @@ launcher-preopts.mpiexec=-n $NPROC
       <dd>Specify the configuration directory of the suite.
       (default=<var>$PWD</var>)</dd>
 
-      <dt><kbd>--define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE</kbd></dt>
+      <dt><kbd>--define=[SECTION]KEY=VALUE, -D [SECTION]KEY=VALUE</kbd></dt>
 
       <dd>Each of these overrides the <var>[SECTION]KEY</var> setting with a
       given <var>VALUE</var>. Can be used to disable a setting using the syntax
       <kbd>--define=[SECTION]!KEY</kbd> or even <kbd>--define=[!SECTION]</kbd>.
       See also <kbd>--suite-define</kbd>.</dd>
 
-      <dt><kbd>--define-suite=KEY=VALUE; -S KEY=VALUE</kbd></dt>
+      <dt><kbd>--define-suite=KEY=VALUE, -S KEY=VALUE</kbd></dt>
 
       <dd>As <kbd>--define</kbd>, but with an implicit <var>[SECTION]</var> for
       suite variables.</dd>
@@ -1954,7 +1954,7 @@ launcher-preopts.mpiexec=-n $NPROC
 
       <dd>Decrement verbosity.</dd>
 
-      <dt><kbd>--verbose; -v</kbd></dt>
+      <dt><kbd>--verbose, -v</kbd></dt>
 
       <dd>Increment verbosity.</dd>
     </dl>
@@ -2295,17 +2295,17 @@ environment scripting = "eval $(rose task-env)"
 
       <dd>Specify whether to search deleted suites and superceded suites.</dd>
 
-      <dt><kbd>--query; -Q</kbd></dt>
+      <dt><kbd>--query, -Q</kbd></dt>
 
       <dd>Run the suite search specified by <var>[SEARCH]</var> as a
       query.</dd>
 
-      <dt><kbd>--search; -S</kbd></dt>
+      <dt><kbd>--search, -S</kbd></dt>
 
       <dd>Run the suite search specified by <var>[SEARCH]</var> as a keyword
       search.</dd>
 
-      <dt><kbd>--url; -U</kbd></dt>
+      <dt><kbd>--url, -U</kbd></dt>
 
       <dd>Run the suite search specified by <var>[SEARCH]</var> as a url
       search.</dd>
@@ -2421,7 +2421,7 @@ environment scripting = "eval $(rose task-env)"
 
       <dd>Specify whether to search deleted suites and superceded suites.</dd>
 
-      <dt><kbd>--no-headers; -H</kbd></dt>
+      <dt><kbd>--no-headers, -H</kbd></dt>
 
       <dd>Do not print column headers.</dd>
 
@@ -2429,7 +2429,7 @@ environment scripting = "eval $(rose task-env)"
 
       <dd>Specify the name of the suite repository to use.</dd>
 
-      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT; -f
+      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT, -f
       FORMAT</kbd></dt>
 
       <dd>Control the output format of the results using a string containing
@@ -2443,31 +2443,31 @@ abc01 from daisy
 </pre>
       </dd>
 
-      <dt><kbd>--query; -Q</kbd></dt>
+      <dt><kbd>--query, -Q</kbd></dt>
 
       <dd>Run the lookup as a query.</dd>
 
-      <dt><kbd>--quiet; -q</kbd></dt>
+      <dt><kbd>--quiet, -q</kbd></dt>
 
       <dd>Shorthand for <kbd>--format="%idx"</kbd>.</dd>
 
-      <dt><kbd>--reverse; -r</kbd></dt>
+      <dt><kbd>--reverse, -r</kbd></dt>
 
       <dd>Reverse sort order.</dd>
 
-      <dt><kbd>--search; -S</kbd></dt>
+      <dt><kbd>--search, -S</kbd></dt>
 
       <dd>Run the lookup as a keyword search.</dd>
 
-      <dt><kbd>--sort=FIELD; -s FIELD</kbd></dt>
+      <dt><kbd>--sort=FIELD, -s FIELD</kbd></dt>
 
       <dd>Sort results by the field <var>FIELD</var> instead of revision.</dd>
 
-      <dt><kbd>--url; -U</kbd></dt>
+      <dt><kbd>--url, -U</kbd></dt>
 
       <dd>Use a url for the lookup.</dd>
 
-      <dt><kbd>--verbose; -v</kbd></dt>
+      <dt><kbd>--verbose, -v</kbd></dt>
 
       <dd>Display full info for each returned suite.</dd>
     </dl>
@@ -2501,7 +2501,7 @@ abc01 from daisy
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbd>--no-headers; -H</kbd></dt>
+      <dt><kbd>--no-headers, -H</kbd></dt>
 
       <dd>Do not print column headers.</dd>
 
@@ -2510,7 +2510,7 @@ abc01 from daisy
       <dd>Display locally checked out suites from the specified suite
       repository.</dd>
 
-      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT; -f
+      <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT, -f
       FORMAT</kbd></dt>
 
       <dd>Control the output format of the results using a string containing
@@ -2524,24 +2524,24 @@ abc01 from daisy
 </pre>
       </dd>
 
-      <dt><kbd>--quiet; -q</kbd></dt>
+      <dt><kbd>--quiet, -q</kbd></dt>
 
       <dd>Shorthand for <kbd>--format="%idx".</kbd></dd>
 
-      <dt><kbd>--reverse; -r</kbd></dt>
+      <dt><kbd>--reverse, -r</kbd></dt>
 
       <dd>Reverse sort order.</dd>
 
-      <dt><kbd>--sort=FIELD; -s FIELD</kbd></dt>
+      <dt><kbd>--sort=FIELD, -s FIELD</kbd></dt>
 
       <dd>Sort results by the field <var>FIELD</var> instead of revision.</dd>
 
-      <dt><kbd>--user=~USERNAME; -u ~USERNAME</kbd></dt>
+      <dt><kbd>--user=~USERNAME, -u ~USERNAME</kbd></dt>
 
       <dd>Specify another user whose roses directory you want to list e.g.
       <code>--user=~bob</code></dd>
 
-      <dt><kbd>--verbose; -v</kbd></dt>
+      <dt><kbd>--verbose, -v</kbd></dt>
 
       <dd>Display full info for each returned suite.</dd>
     </dl>
