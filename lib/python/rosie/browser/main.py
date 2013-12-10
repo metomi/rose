@@ -1130,8 +1130,8 @@ class MainWindow(gtk.Window):
         uimanager.insert_action_group(actiongroup, pos=0)
         uimanager.add_ui_from_string(ui_config_string)
         status = self.display_box._get_treeview_path_status(path)
-        can_edit = (status in [rosie.ws_client.STATUS_OK,
-                               rosie.ws_client.STATUS_MO])
+        can_edit =  (status not in [rosie.ws_client.STATUS_CR,
+                                    rosie.ws_client.STATUS_NO])
         can_checkout = (status == rosie.ws_client.STATUS_NO)
         info_item = uimanager.get_widget("/Popup/Info")
         info_item.connect("activate", self.handle_info)
@@ -1326,8 +1326,8 @@ class MainWindow(gtk.Window):
                 path is not None)
         if path is not None:
             status = self.display_box._get_treeview_path_status(path)
-            can_edit = (status in [rosie.ws_client.STATUS_OK,
-                                   rosie.ws_client.STATUS_MO])
+            can_edit = (status not in [rosie.ws_client.STATUS_CR,
+                                       rosie.ws_client.STATUS_NO])
             can_checkout = (status == rosie.ws_client.STATUS_NO)
             has_output = self.handle_view_output(test=True)
             self.toolbar.set_widget_sensitive("Edit", can_edit)
