@@ -806,8 +806,7 @@ COMP_WORDS=( rose test-battery "" )
 COMP_CWORD=2
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-TEST_CATEGORY="$(dirname $0)"
-compreply_grep "$TEST_KEY.reply" "$TEST_CATEGORY"
+compreply_grep "$TEST_KEY.reply" "^rose-cli-bash-completion$"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
