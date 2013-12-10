@@ -68,7 +68,7 @@
 #     ROSE_TASK_SUFFIX
 #         The suffix in the task name.
 #
-# OPTION
+# OPTIONS
 #     --cycle=TIME, -t TIME
 #         Specify the cycle time. If not defined, use the cycle time provided
 #         by the suite environment. TIME can be in YYYYmmddHH format or a
@@ -96,7 +96,7 @@
 #         (Default="_")
 #     --quiet, -q
 #         Decrement verbosity.
-#     --verbose; -v
+#     --verbose, -v
 #         Increment verbosity.
 #
 # NOTE ON CYCLE TIME

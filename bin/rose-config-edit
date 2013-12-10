@@ -30,7 +30,7 @@
 #     loaded after startup, on demand.
 #
 # OPTIONS
-#     --config=DIR; -C DIR
+#     --config=DIR, -C DIR
 #        A path to either
 #        1) a directory containing a suite with a file named
 #           'suite.rc' and a directory called 'app' containing
@@ -43,7 +43,7 @@
 #        Force loading of all applications on startup.
 #     --load-no-apps
 #        Load applications in the suite on demand.
-#     --meta-path=PATH; -M PATH
+#     --meta-path=PATH, -M PATH
 #        Prepend PATH to the search path for metadata (look here first).
 #        This option can be used repeatedly to load multiple paths.
 #     --new

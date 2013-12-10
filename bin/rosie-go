@@ -42,13 +42,13 @@
 #     --all-revs
 #         Specify whether to search deleted suites and superceded suites.
 #
-#     --query; -Q
+#     --query, -Q
 #         Run the suite search specified by [SEARCH] as a query.
 #
-#     --search; -S
+#     --search, -S
 #         Run the suite search specified by [SEARCH] as a keyword search.
 #
-#     --url; -U
+#     --url, -U
 #         Run the suite search specified by [SEARCH] as a url search.
 #
 # ARGUMENTS

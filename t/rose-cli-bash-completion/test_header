@@ -1,0 +1,137 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-3 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# Provides init, setup and teardown functions for rose macro tests.
+#-------------------------------------------------------------------------------
+. $(dirname $0)/../lib/bash/test_header
+
+function init() {
+    mkdir -p $TEST_DIR/config
+    cat >$TEST_DIR/config/rose-app.conf
+}
+
+function init_macro() {
+    mkdir -p $TEST_DIR/config/etc/rose-meta/$1/HEAD/lib/python/macros/
+    touch $TEST_DIR/config/etc/rose-meta/$1/HEAD/rose-meta.conf
+    cat >$TEST_DIR/config/etc/rose-meta/$1/HEAD/lib/python/macros/$2
+}
+
+function init_meta() {
+    mkdir -p $TEST_DIR/config/meta
+    cat >$TEST_DIR/config/meta/rose-meta.conf
+}
+
+function init_opt_app() {
+    mkdir -p $TEST_DIR/config/opt
+    touch $TEST_DIR/config/opt/rose-app-"$1".conf
+}
+
+function init_opt_suite() {
+    mkdir -p $TEST_DIR/config/opt
+    touch $TEST_DIR/config/opt/rose-suite-"$1".conf
+}
+
+function init_rose_stem_meta() {
+    svnadmin create --fs-type fsfs $TEST_DIR/test_repos 1>/dev/null 2>&1
+    REPOS_URL="file://$TEST_DIR/test_repos"
+    svn mkdir -q $REPOS_URL/trunk -m "make trunk"
+    svn co -q $REPOS_URL/trunk $TEST_DIR/config
+    mkdir -p $TEST_DIR/config/rose-stem/meta
+    touch $TEST_DIR/config/rose-stem/suite.rc
+    cat >$TEST_DIR/config/rose-stem/meta/rose-meta.conf
+    svn add $TEST_DIR/config/rose-stem 1>/dev/null 2>&1
+}
+
+function init_suite() {
+    mkdir -p $TEST_DIR/config
+    cat >$TEST_DIR/config/rose-suite.conf
+}
+
+function init_upgrade_macro() {
+    category=$1
+    cat >$TEST_DIR/rose-meta/$category/versions.py
+}
+
+function init_upgrade_meta() {
+    category=$1
+    mkdir -p $TEST_DIR/rose-meta/$category/
+    shift
+    for version; do
+        mkdir -p $TEST_DIR/rose-meta/$category/$version/
+        touch $TEST_DIR/rose-meta/$category/$version/rose-meta.conf
+    done
+}
+
+function setup() {
+    mkdir $TEST_DIR/run
+    cd $TEST_DIR/run
+}
+
+function teardown() {
+    cd $TEST_DIR
+    rm -rf $TEST_DIR/run
+    rm -rf $TEST_DIR/config/meta
+    rm -rf $TEST_DIR/config/rose-stem
+    rm -rf $TEST_DIR/config/rose*conf
+    rm -rf $TEST_DIR/config/.svn
+    rm -rf $TEST_DIR/test_repos
+}
+
+function compreply_cmp() {
+    local TEST_KEY=$1
+    local ENV_ACTUAL_TEMP_FILE=$(mktemp)
+    if [[ -n ${COMPREPLY:-} ]]; then
+        printf "%s\n" "${COMPREPLY[@]}" > $ENV_ACTUAL_TEMP_FILE
+    fi
+    if cmp $ENV_ACTUAL_TEMP_FILE -; then
+        pass $TEST_KEY
+        return
+    fi
+    fail $TEST_KEY
+}
+
+function compreply_grep() {
+    local TEST_KEY=$1
+    local TEST_PATTERN=$2
+    local ENV_ACTUAL_TEMP_FILE=$(mktemp)
+    if [[ -n ${COMPREPLY:-} ]]; then
+        printf "%s\n" "${COMPREPLY[@]}" > $ENV_ACTUAL_TEMP_FILE
+    fi
+    if grep -q "$TEST_PATTERN" "$ENV_ACTUAL_TEMP_FILE"; then
+        pass $TEST_KEY
+        return
+    fi
+    fail $TEST_KEY
+}
+
+function compreply_test() {
+    local TEST_KEY=$1
+    local TEST_CMD=$2
+    if [[ -z ${COMPREPLY:-} ]]; then
+        fail $TEST_KEY
+    fi
+    for reply in "${COMPREPLY[@]}"; do
+        $TEST_CMD $reply 1>/dev/null 2>&1
+        if [[ $? -ne 0 ]]; then
+            fail $TEST_KEY
+            return
+        fi
+    done
+    pass $TEST_KEY
+}

@@ -47,7 +47,7 @@
 # OPTIONS
 #     --config=DIR, -C DIR
 #         Specify the configuration directory of the suite. (default=$PWD)
-#     --define=[SECTION]KEY=VALUE; -D [SECTION]KEY=VALUE
+#     --define=[SECTION]KEY=VALUE, -D [SECTION]KEY=VALUE
 #         Each of these overrides the [SECTION]KEY setting with a given VALUE.
 #         Can be used to disable a setting using the syntax --define=[SECTION]!KEY
 #         or even --define=[!SECTION]. See also --define-suite.

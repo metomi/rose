@@ -46,7 +46,7 @@
 #         Specify a group name to run. Additional groups can be specified
 #         with further --group arguments. The suite will then convert the groups
 #         into a series of tasks to run..
-#    --task=GROUP, -t GROUP
+#     --task=GROUP, -t GROUP
 #         Synonym for --group.
 #
 # JINJA2 VARIABLES
