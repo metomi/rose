@@ -2329,6 +2329,46 @@ environment scripting = "eval $(rose task-env)"
 
     <p><kbd>rosie id [OPTIONS]</kbd></p>
 
+    <p><kbd>rosie id --to-origin [ID]</kbd></p>
+
+      <p>Print the repository URL of a given suite <var>ID</var></p>
+
+      <p><kbd>rosie id --to-local-copy [ID]</kbd></p>
+
+      <p>Print the local location of a given suite <var>ID</var></p>
+
+      <p><kbd>rosie id --to-output [ID]</kbd></p>
+
+      <p>Print the output directory of a given suite <var>ID</var></p>
+
+      <p><kbd>rosie id --to-web [ID]</kbd></p>
+
+      <p>Print the web URL of a given suite <var>ID</var></p>
+
+      <p><kbd>rosie id</kbd></p>
+
+      <p>Print suite <var>ID</var> of working copy in <var>$PWD</var></p>
+
+      <p><kbd>rosie id /path/to/working/copy</kbd></p>
+
+      <p>Print suite <var>ID</var> of working copy in a directory</p>
+
+      <p><kbd>rosie id svn://fcm1/rose_mo1_svn/a/b/c/4/5</kbd></p>
+
+      <p>Print suite <var>ID</var> of a given URL</p>
+
+      <p><kbd>rosie id --latest</kbd></p>
+
+      <p>Print latest suite <var>ID</var> in the default repository</p>
+
+      <p><kbd>rosie id --latest mot</kbd></p>
+
+      <p>Print latest suite <var>ID</var> in the given repository</p>
+
+      <p><kbd>rosie id --next</kbd></p>
+
+      <p>Print next suite <var>ID</var> in the default repository</p>
+
     <h3>DESCRIPTION</h3>
 
     <p>Utility for working with suite IDs.</p>
@@ -2336,45 +2376,29 @@ environment scripting = "eval $(rose task-env)"
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbd>rosie id --to-origin [ID]</kbd></dt>
+      <dt><kbd>--latest</kbd></dt>
+      
+      <dd>Print the latest suite ID in the repository</dd>
 
-      <dd>Print the repository URL of a given suite <var>ID</var></dd>
+      <dt><kbd>--to-local-copy</kbd></dt>
+      
+      <dd>Print the local location of a given suite ID</dd>
+      
+      <dt><kbd>--to-origin</kbd></dt>
+      
+      <dd>Print the repository URL of a given suite ID</dd>
 
-      <dt><kbd>rosie id --to-local-copy [ID]</kbd></dt>
+      <dt><kbd>--to-output</kbd></dt>
+      
+      <dd>Print the output directory of a given suite ID</dd>
+      
+      <dt><kbd>--to-web</kbd></dt>
+      
+      <dd>Print the web URL of a given suite ID</dd>
 
-      <dd>Print the local location of a given suite <var>ID</var></dd>
-
-      <dt><kbd>rosie id --to-output [ID]</kbd></dt>
-
-      <dd>Print the output directory of a given suite <var>ID</var></dd>
-
-      <dt><kbd>rosie id --to-web [ID]</kbd></dt>
-
-      <dd>Print the web URL of a given suite <var>ID</var></dd>
-
-      <dt><kbd>rosie id</kbd></dt>
-
-      <dd>Print suite <var>ID</var> of working copy in <var>$PWD</var></dd>
-
-      <dt><kbd>rosie id /path/to/working/copy</kbd></dt>
-
-      <dd>Print suite <var>ID</var> of working copy in a directory</dd>
-
-      <dt><kbd>rosie id svn://fcm1/rose_mo1_svn/a/b/c/4/5</kbd></dt>
-
-      <dd>Print suite <var>ID</var> of a given URL</dd>
-
-      <dt><kbd>rosie id --latest</kbd></dt>
-
-      <dd>Print latest suite <var>ID</var> in the default repository</dd>
-
-      <dt><kbd>rosie id --latest mot</kbd></dt>
-
-      <dd>Print latest suite <var>ID</var> in the given repository</dd>
-
-      <dt><kbd>rosie id --next</kbd></dt>
-
-      <dd>Print next suite <var>ID</var> in the default repository</dd>
+      <dt><kbd>--next</kbd></dt>
+      
+      <dd>Print the next available suite ID in the repository</dd>
     </dl>
 
     <h2 id="rosie-lookup">rosie lookup</h2>
