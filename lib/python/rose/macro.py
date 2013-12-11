@@ -113,6 +113,14 @@ class MacroTransformDumpEvent(rose.reporter.Event):
         return "M %s -> %s" % (self.args[0], self.args[1])
 
 
+class MacroReturnedCorruptConfigError(TypeError):
+
+    """Raise this error if a macro's returned config is corrupt."""
+
+    def __str__(self):
+        return "Macro tried to corrupt the config: %s" % self.args[0]
+
+
 class MacroValidateError(Exception):
 
     """Raise this error if validation parsing fails."""
@@ -465,37 +473,38 @@ def check_config_integrity(app_config):
     try:
         keys_and_nodes = list(app_config.walk())
     except Exception as e:
-        return e
+        return MacroReturnedCorruptConfigError(str(e))
     keys_and_nodes.insert(0, ([], app_config))
     for keys, node in keys_and_nodes:
         if not isinstance(node, rose.config.ConfigNode):
-            return TypeError(ERROR_RETURN_TYPE.format(
+            return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node, "node", type(node), "rose.config.ConfigNode"))
         if (not isinstance(node.value, dict) and
             not isinstance(node.value, basestring)):
-            return TypeError(ERROR_RETURN_TYPE.format(
+            return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.value, "node.value", type(node.value),
                 "dict, basestring"
             ))
         if not isinstance(node.state, basestring):
-            return TypeError(ERROR_RETURN_TYPE.format(
+            return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.state, "node.state", type(node.state), "basestring"))
         if node.state not in [rose.config.ConfigNode.STATE_NORMAL,
                               rose.config.ConfigNode.STATE_SYST_IGNORED,
                               rose.config.ConfigNode.STATE_USER_IGNORED]:
-            return ValueError(ERROR_RETURN_VALUE_STATE.format(node.state))
+            return MacroReturnedCorruptConfigError(
+                ERROR_RETURN_VALUE_STATE.format(node.state))
         if not isinstance(node.comments, list):
-            return TypeError(ERROR_RETURN_TYPE.format(
+            return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.comments, "node.comments", type(node.comments),
                 "list"
             ))
         for comment in node.comments:
             if not isinstance(comment, basestring):
-                return TypeError(ERROR_RETURN_TYPE.format(
+                return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                     comment, "comment", type(comment), "basestring"))
         for key in keys:
             if not isinstance(key, basestring):
-                return TypeError(ERROR_RETURN_TYPE.format(
+                return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                     key, "key", type(key), "basestring"))
 
 

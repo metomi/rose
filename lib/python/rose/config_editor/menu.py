@@ -741,11 +741,15 @@ class MainMenuHandler(object):
         config_names = [c.lstrip("/") for c in config_names]
         return ", ".join(config_names)
 
-    def _handle_bad_macro_return(self, macro_fullname, return_value):
+    def _handle_bad_macro_return(self, macro_fullname, info):
+        if isinstance(info, Exception):
+            text = rose.config_editor.ERROR_BAD_MACRO_EXCEPTION.format(
+                type(info).__name__, str(info))
+        else:
+            text = rose.config_editor.ERROR_BAD_MACRO_RETURN.format(info)
         rose.gtk.dialog.run_dialog(
                  rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                 rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
-                                                    return_value),
+                 text,
                  rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
                                                     macro_fullname))
 
