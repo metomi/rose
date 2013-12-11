@@ -81,7 +81,7 @@ class CylcProcessor(SuiteEngineProcessor):
     REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     SCHEME = "cylc"
-    STATUSES = {"active": ["submitting", "submitted", "running"],
+    STATUSES = {"active": ["ready", "submitting", "submitted", "running"],
                 "fail": ["submission failed", "failed"],
                 "success": ["succeeded"]}
     SUITE_CONF = "suite.rc"
