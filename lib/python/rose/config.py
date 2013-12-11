@@ -60,6 +60,7 @@ import re
 from rose.env import env_var_escape
 import shlex
 import sys
+from tempfile import NamedTemporaryFile
 
 
 CHAR_ASSIGN = "="
@@ -288,7 +289,8 @@ class ConfigDumper(object):
                 target_dir = "."
             if not os.path.isdir(target_dir):
                 os.makedirs(target_dir)
-            f = open(target, "w")
+            f = NamedTemporaryFile(prefix=os.path.basename(target),
+                                   dir=target_dir, delete=False)
         blank = ""
         if root.comments:
             for comment in root.comments:
@@ -322,6 +324,7 @@ class ConfigDumper(object):
                 self._string_node_dump(key, value, f, env_escape_ok)
         if f is not target:
             f.close()
+            os.rename(f.name, target)
 
     __call__ = dump
 
