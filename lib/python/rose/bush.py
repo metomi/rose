@@ -30,7 +30,6 @@ import shlex
 import simplejson
 import signal
 import socket
-import sqlite3
 import sys
 import rose.config
 from rose.opt_parse import RoseOptionParser
