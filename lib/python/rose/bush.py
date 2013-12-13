@@ -30,6 +30,7 @@ import shlex
 import simplejson
 import signal
 import socket
+import sqlite3
 import sys
 import rose.config
 from rose.opt_parse import RoseOptionParser
@@ -200,10 +201,21 @@ class Root(object):
     @cherrypy.expose
     def view(self, user, suite, path, path_in_tar=None, mode=None):
         """View a text log file."""
+        print "VIEW", user, suite, path
         f_name = self._get_user_suite_dir(user, suite, path)
         if not os.access(f_name, os.F_OK | os.R_OK):
             raise cherrypy.HTTPError(404)
-        if path_in_tar:
+        import time
+        t0 = time.time()
+        try:
+            custom_text = self.suite_engine_proc.get_custom_text_for_file(
+                user, suite, path)
+        except Exception as e:
+            print "OH NO!!!", e
+        print time.time() - t0
+        if custom_text is not None:
+            s = custom_text
+        elif path_in_tar:
             tar_f = tarfile.open(f_name, 'r:gz')
             try:
                 tar_info = tar_f.getmember(path_in_tar)
