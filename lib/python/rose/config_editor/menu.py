@@ -747,11 +747,13 @@ class MainMenuHandler(object):
                 type(info).__name__, str(info))
         else:
             text = rose.config_editor.ERROR_BAD_MACRO_RETURN.format(info)
+        summary = rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+            macro_fullname)
+        self.reporter.report(summary,
+                             kind=self.reporter.KIND_ERR)
         rose.gtk.dialog.run_dialog(
-                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                 text,
-                 rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                    macro_fullname))
+            rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            text, summary)
 
     def handle_macro_transforms(self, config_name, macro_name,
                                 macro_config, change_list, no_display=False,
