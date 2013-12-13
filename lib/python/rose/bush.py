@@ -201,20 +201,17 @@ class Root(object):
     @cherrypy.expose
     def view(self, user, suite, path, path_in_tar=None, mode=None):
         """View a text log file."""
-        print "VIEW", user, suite, path
         f_name = self._get_user_suite_dir(user, suite, path)
         if not os.access(f_name, os.F_OK | os.R_OK):
             raise cherrypy.HTTPError(404)
-        import time
-        t0 = time.time()
-        try:
-            custom_text = self.suite_engine_proc.get_custom_text_for_file(
-                user, suite, path)
-        except Exception as e:
-            print "OH NO!!!", e
-        print time.time() - t0
+        custom_text = self.suite_engine_proc.get_custom_text_for_file(
+            user, suite, path)
         if custom_text is not None:
             s = custom_text
+            if mode == "download":
+                mime = mimetypes.guess_type(urllib.pathname2url(f_name))[0]
+                cherrypy.response.headers["Content-Type"] = mime
+                return cherrypy.lib.static.serve_file(f_name, mime)
         elif path_in_tar:
             tar_f = tarfile.open(f_name, 'r:gz')
             try:

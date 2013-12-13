@@ -132,26 +132,19 @@ class CylcProcessor(SuiteEngineProcessor):
         """Return custom text for particular files - otherwise return None."""
         if file_path != self.SUITE_DB:
             return None
-        import time
-        text = "sqlite3 dump for " + file_path + "\n\n"
+        text = "Dump for " + file_path + " ....\n\n"
         for table in ["task_events", "task_states", "broadcast_settings"]:
             text += "TABLE: " + table + "\n"
             stmt = "PRAGMA table_info(" + table + ")"
-            t0 = time.time()
             for row in self._db_exec(self.SUITE_DB, user_name, suite_name,
                                      stmt):
                 text += row[1] + "|"
             text = text.rstrip("|") + "\n"
-            print "pragma", table, time.time() - t0
             stmt = "SELECT * from " + table
-            t0 = time.time()
             data = self._db_exec(self.SUITE_DB, user_name, suite_name,
                                      stmt)
-            print "select", table, time.time() - t0
-            t0 = time.time()
             for row in data:
                 text += "|".join([str(r) for r in row]) + "\n"
-            print "extract", table, time.time() - t0
             text += "\n"
         text = text.rstrip("\n") + "\n"
         self._db_close(self.SUITE_DB, user_name, suite_name)
