@@ -16,62 +16,45 @@ rel="stylesheet" media="screen" />
 <ul class="nav">
 <li class="active"><a><strong>{{user}}</strong></a></li>
 </ul>
-<ul class="nav pull-right">
-<li><a class="text-info">page loaded
-<abbr class="livestamp" title="{{time}}">{{time}}</abbr></a></li>
-</ul>
 </div>
 </div>
 <div class="page-header">
-<p>User has {{entries|length}} suite(s) installed.</p>
+<p>User {{user}} has {{entries|length}} suite(s) installed.
+<span class="label"><abbr class="livestamp" title="{{time}}">{{time}}</abbr></span></p>
 </div>
 <div class="container-fluid">
 {% for entry in entries -%}
 <div class="row-fluid entry">
-<div class="span10">
-<p><a href="{{script}}/list/{{user}}/{{entry.name}}">{{entry.name}}</a>
-{% if entry.states.is_running -%}
-<span class="label label-info">
-<i class="icon-play icon-white" title="running"></i>
-</span>
-{% endif -%}
-{% if entry.states.is_failed -%}
-<span class="label label-important">
-<i class="icon-warning-sign icon-white" title="failed task(s)"></i>
-</span>
-{% endif -%}
-</p>
-{% if entry.files or entry.info -%}
-<ul class="inline">
-{% for scheme, scheme_files in entry.files|dictsort -%}
-{% if scheme_files -%}
-<li><dfn>{{scheme}}:</dfn>
-{% for key, log in scheme_files|dictsort -%}
-{% if not loop.first -%}
-|
-{% endif %}
-<a href="{{script}}/view/{{user}}/{{entry.name}}?path={{log.path}}"
-title="{{log.size}} bytes">{{key}}</a>
-{% endfor -%}
-</li>
-{% endif -%}
-{% endfor -%}
-{% for key in ["project", "title"] -%}
-{% if entry.info[key] -%}
-<li><dfn>{{key}}:</dfn> {{entry.info[key]|truncate}}</li>
-{% endif -%}
-{% endfor -%}
-</ul>
-{% endif -%}
-</div>
-<div class="span2 text-right">
-{% if entry.states.last_activity_time -%}
-<span class="text-info">last active
-<abbr class="livestamp" title="{{entry.states.last_activity_time}}+0000">{{entry.states.last_activity_time}}+0000</abbr></span>
-{% endif -%}
+<div class="span2">
+{{entry.name}}
+<div class="pull-right">
+<a href="{{script}}/cycles/{{user}}/{{entry.name}}">
+<i class="icon icon-tasks" title="cycles list"></i>
+</a>
+<a href="{{script}}/jobs/{{user}}/{{entry.name}}">
+<i class="icon icon-th-list" title="jobs list"></i>
+</a>
 </div>
 </div>
+<div class="span2">
+{% if entry.last_activity_time -%}
+<span class="text-info"><i class="icon-time" title="last active"></i>
+<abbr class="livestamp"
+title="{{entry.last_activity_time}}">{{entry.last_activity_time}}</abbr></span>
+{% endif -%}{# entry.last_activity_time #}
+</div>
+{% for key, icon, span, maxlen in [("project", "tag", "2", 32), ("title", "comment", "6", 80)] -%}
+<div class="span{{span}}">
+<i class="icon-{{icon}}" title="{{key}}"></i>
+{% if entry.info[key]|length > maxlen -%}
+<abbr title="{{entry.info[key]}}">{{entry.info[key]|truncate(maxlen)}}</abbr>
+{% else -%}
+{{entry.info[key]}}
+{% endif -%}
+</div>
 {% endfor -%}
+</div>
+{% endfor -%}{# entry in entries #}
 </div>
 
 <div class="container-fluid">

@@ -79,9 +79,38 @@ class Root(object):
             traceback.print_exc(e)
 
     @cherrypy.expose
-    def list(self, user, suite, page=1, cycles=None, tasks=None,
+    def cycles(self, user, suite, form=None):
+        """List cycles of a running or completed suite."""
+        user_suite_dir = self._get_user_suite_dir(user, suite)
+        if not os.path.isdir(user_suite_dir):
+            raise cherrypy.HTTPError(400)
+        entries = self.suite_engine_proc.get_suite_cycles_summary(user, suite)
+        data = {
+            "host": self.host_name,
+            "user": user,
+            "suite": suite,
+            "rose_version": self.rose_version,
+            "script": cherrypy.request.script_name,
+            "states": {},
+            "entries": entries,
+        }
+        data.update(self._get_suite_logs_info(user, suite))
+        data["states"].update(
+                self.suite_engine_proc.get_suite_state_summary(user, suite))
+        data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+        if form == "json":
+            return simplejson.dumps(data)
+        try:
+            template = self.template_env.get_template("cycles.html")
+            return template.render(**data)
+        except Exception as e:
+            traceback.print_exc(e)
+        return simplejson.dumps(data)
+
+    @cherrypy.expose
+    def jobs(self, user, suite, page=1, cycles=None, tasks=None,
              no_status=None, order=None, per_page=PER_PAGE, form=None):
-        """List tasks of a running or completed suite.
+        """List jobs of a running or completed suite.
 
         user -- A string containing a valid user ID
         suite -- A string containing a valid suite ID
@@ -163,14 +192,20 @@ class Root(object):
         if form == "json":
             return simplejson.dumps(data)
         try:
-            template = self.template_env.get_template("list.html")
+            template = self.template_env.get_template("jobs.html")
             return template.render(**data)
         except Exception as e:
             traceback.print_exc(e)
 
     @cherrypy.expose
-    def summary(self, user, form=None):
-        """Summarise a user's installed suites.
+    def list(self, user, suite, page=1, cycles=None, tasks=None,
+             no_status=None, order=None, per_page=PER_PAGE, form=None):
+        return self.jobs(user, suite, page, cycles, tasks, no_status, order,
+                         per_page, form)
+
+    @cherrypy.expose
+    def suites(self, user, form=None):
+        """List (installed) suites of a user.
 
         user -- A string containing a valid user ID
         form -- Specify return format. If None, display HTML page. If "json",
@@ -185,17 +220,39 @@ class Root(object):
                 "entries": []}
         if os.path.isdir(user_suite_dir_root):
             for name in os.listdir(user_suite_dir_root):
-                entry = {"name": name, "states": {}}
+                suite_conf = os.path.join(user_suite_dir_root, name,
+                                          self.suite_engine_proc.SUITE_CONF)
+                if not os.path.exists(suite_conf):
+                    continue
+                suite_db = os.path.join(user_suite_dir_root, name,
+                                        self.suite_engine_proc.SUITE_DB)
+                try:
+                    last_activity_time = strftime(
+                                "%Y-%m-%dT%H:%M:%S+0000",
+                                gmtime(os.stat(suite_db).st_mtime))
+                except OSError:
+                    last_activity_time = None
+                entry = {"name": name, "info": {},
+                         "last_activity_time": last_activity_time}
                 data["entries"].append(entry)
-                entry.update(self._get_suite_logs_info(user, name))
-                s = self.suite_engine_proc.get_suite_state_summary(user, name)
-                entry["states"].update(s)
+                rose_suite_info = os.path.join(user_suite_dir_root, name,
+                                               "rose-suite.info")
+                if os.access(rose_suite_info, os.F_OK | os.R_OK):
+                    info_root = rose.config.load(rose_suite_info)
+                    for key, node in info_root.value.items():
+                        if node.is_ignored() or not isinstance(node.value, str):
+                            continue
+                        entry["info"][key] = node.value
             data["entries"].sort(self._sort_summary_entries)
         data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
         if form == "json":
             return simplejson.dumps(data)
-        template = self.template_env.get_template("summary.html")
+        template = self.template_env.get_template("suites.html")
         return template.render(**data)
+
+    @cherrypy.expose
+    def summary(self, user, form=None):
+        return self.suites(user, form)
 
     @cherrypy.expose
     def view(self, user, suite, path, path_in_tar=None, mode=None):
@@ -332,8 +389,8 @@ class Root(object):
                     *paths)
 
     def _sort_summary_entries(self, a, b):
-        return (cmp(b["states"].get("last_activity_time"),
-                    a["states"].get("last_activity_time")) or
+        return (cmp(b.get("last_activity_time"),
+                    a.get("last_activity_time")) or
                 cmp(a["name"], b["name"]))
 
 
