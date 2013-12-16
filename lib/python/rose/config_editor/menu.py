@@ -676,6 +676,12 @@ class MainMenuHandler(object):
                     not isinstance(return_value[1], list)):
                     self._handle_bad_macro_return(macro_fullname, return_value)
                     continue
+                integrity_exception = rose.macro.check_config_integrity(
+                    return_value[0])
+                if integrity_exception is not None:
+                    self._handle_bad_macro_return(macro_fullname,
+                                                  integrity_exception)
+                    continue
                 macro_config, change_list = return_value
                 if not change_list:
                     continue
@@ -735,13 +741,19 @@ class MainMenuHandler(object):
         config_names = [c.lstrip("/") for c in config_names]
         return ", ".join(config_names)
 
-    def _handle_bad_macro_return(self, macro_fullname, return_value):
+    def _handle_bad_macro_return(self, macro_fullname, info):
+        if isinstance(info, Exception):
+            text = rose.config_editor.ERROR_BAD_MACRO_EXCEPTION.format(
+                type(info).__name__, str(info))
+        else:
+            text = rose.config_editor.ERROR_BAD_MACRO_RETURN.format(info)
+        summary = rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+            macro_fullname)
+        self.reporter.report(summary,
+                             kind=self.reporter.KIND_ERR)
         rose.gtk.dialog.run_dialog(
-                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                 rose.config_editor.ERROR_BAD_MACRO_RETURN.format(
-                                                    return_value),
-                 rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
-                                                    macro_fullname))
+            rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            text, summary)
 
     def handle_macro_transforms(self, config_name, macro_name,
                                 macro_config, change_list, no_display=False,

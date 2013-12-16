@@ -5,9 +5,31 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-Q1)
+
+This release of Rose will work best with Cylc 5.4.4 or above.
+
+### Hightlighted Changes
+
+\#1057: rose CLI: bash command completion.
+
+### Noteworthy Changes
+
+\#1068: rose bush: recognise the `ready` status.
+
+\#1067: rose.config.dump: use temporary file to stage.
+
+\#1065: rose-bush.js: fix format string and int rounding.
+
+\#1064: rosie go: allow actions on out of date working copies.
+
+\#1058: rose config-edit: add macro config vetting.
+
+\#1056: rose config-edit: trap upgrade macro errors.
+
 ## 2013-12 (2013-12-02)
 
-This release of Rose will work best with Cylc 5.4.2 or above.
+This release of Rose works best with Cylc 5.4.2 or above.
 
 ### Highlighted Changes
 
