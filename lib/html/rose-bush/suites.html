@@ -25,16 +25,16 @@ rel="stylesheet" media="screen" />
 <div class="container-fluid">
 {% for entry in entries -%}
 <div class="row-fluid entry">
+<div class="span2">{{entry.name}}</div>
 <div class="span2">
-{{entry.name}}
-<div class="pull-right">
-<a href="{{script}}/cycles/{{user}}/{{entry.name}}">
+<a class="btn btn-mini" href="{{script}}/cycles/{{user}}/{{entry.name}}">
 <i class="icon icon-tasks" title="cycles list"></i>
+cycles list
 </a>
-<a href="{{script}}/jobs/{{user}}/{{entry.name}}">
+<a class="btn btn-mini" href="{{script}}/jobs/{{user}}/{{entry.name}}">
 <i class="icon icon-th-list" title="jobs list"></i>
+jobs list
 </a>
-</div>
 </div>
 <div class="span2">
 {% if entry.last_activity_time -%}
@@ -43,7 +43,7 @@ rel="stylesheet" media="screen" />
 title="{{entry.last_activity_time}}">{{entry.last_activity_time}}</abbr></span>
 {% endif -%}{# entry.last_activity_time #}
 </div>
-{% for key, icon, span, maxlen in [("project", "tag", "2", 32), ("title", "comment", "6", 80)] -%}
+{% for key, icon, span, maxlen in [("project", "tag", "2", 32), ("title", "comment", "4", 80)] -%}
 <div class="span{{span}}">
 <i class="icon-{{icon}}" title="{{key}}"></i>
 {% if entry.info[key]|length > maxlen -%}
