@@ -20,7 +20,7 @@
 """Select an available host machine by load or by random."""
 
 import os
-from random import choice, random
+from random import choice, random, shuffle
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener
 from rose.reporter import Reporter, Event
@@ -29,6 +29,7 @@ import shlex
 import signal
 import sys
 from time import sleep, time
+import traceback
 
 
 class NoHostError(Exception):
@@ -66,12 +67,14 @@ class HostThresholdNotMetEvent(Event):
            "%(score)s %(scorer_op)s %(value)s")
 
     def __str__(self):
-        host, threshold_conf, scorer_sign, score = self.args
+        host, threshold_conf, score = self.args
         scorer_op = ">"
-        if scorer_sign < 0:
+        if threshold_conf.scorer.SIGN < 0:
             scorer_op = "<"
-        fmt_map = {"host": host, "score": score, "scorer_op": scorer_op}
-        fmt_map.update(threshold_conf)
+        fmt_map = {"host": host, "score": score, "scorer_op": scorer_op,
+                   "method": threshold_conf.method,
+                   "method_arg": threshold_conf.method_arg,
+                   "value": threshold_conf.value}
         for k, v in fmt_map.items():
             if v == None:
                 fmt_map[k] = ""
@@ -136,7 +139,7 @@ class HostSelector(object):
         if not self.scorers.has_key(method):
             for value in globals().values():
                 if (isinstance(value, type) and
-                    issubclass(value, RandomScorerConf) and
+                    issubclass(value, RandomScorer) and
                     value.KEY == method):
                     self.scorers[method] = value()
         return self.scorers[method]
@@ -237,9 +240,7 @@ class HostSelector(object):
                 rank_method, rank_method_arg = rank_method.split(":", 1)
         else:
             rank_method = self.RANK_METHOD_DEFAULT
-        rank_conf = {"scorer": self.get_scorer(rank_method),
-                     "method": rank_method,
-                     "method_arg": rank_method_arg}
+        rank_conf = ScorerConf(self.get_scorer(rank_method), rank_method_arg)
         self.handle_event(RankMethodEvent(rank_method, rank_method_arg))
 
         threshold_confs = []
@@ -260,11 +261,21 @@ class HostSelector(object):
                 scorer = self.get_scorer(method)
                 if method_arg is None:
                     method_arg = scorer.ARG
-                threshold_conf = {"scorer": self.get_scorer(method),
-                                  "method": method,
-                                  "method_arg": method_arg,
-                                  "value": value}
+                threshold_conf = ScorerConf(self.get_scorer(method),
+                                            method_arg, value)
                 threshold_confs.append(threshold_conf)
+
+        # Random selection with no thresholds. Return the 1st available host.
+        if rank_conf.method == self.RANK_METHOD_RANDOM and not threshold_confs:
+            shuffle(host_names)
+            for host_name in host_names:
+                if host_name == "localhost":
+                    return [("localhost", 1)]
+                command = self.popen.get_cmd("ssh", host_name, "true")
+                if self.popen.run(*command)[0] == 0:
+                    return [(host_name, 1)]
+            else:
+                raise NoHostSelectError()
 
         # ssh to each host to return its score(s).
         host_proc_dict = {}
@@ -275,10 +286,9 @@ class HostSelector(object):
                 command_args.append(host_name)
                 command = self.popen.get_cmd("ssh", *command_args)
             command.append("bash")
-            stdin = rank_conf["scorer"].get_command(rank_conf["method_arg"])
+            stdin = rank_conf.get_command()
             for threshold_conf in threshold_confs:
-                scorer = threshold_conf["scorer"]
-                stdin += scorer.get_command(threshold_conf["method_arg"])
+                stdin += threshold_conf.get_command()
             stdin += "exit\n"
             proc = self.popen.run_bg(*command, stdin=stdin,
                                      preexec_fn=os.setpgrp)
@@ -299,20 +309,12 @@ class HostSelector(object):
                     out, err = proc.communicate()
                     host_proc_dict.pop(host_name)
                     for threshold_conf in threshold_confs:
-                        scorer = threshold_conf["scorer"]
-                        method_arg = threshold_conf["method_arg"]
-                        score = scorer.command_out_parser(out, method_arg)
-                        threshold_value = float(threshold_conf["value"])
-                        reverse = scorer.SIGN
-                        if scorer.SIGN * cmp(score, threshold_value) > 0:
+                        if threshold_conf.check_threshold(out):
                             self.handle_event(HostThresholdNotMetEvent(
-                                    host_name, threshold_conf, scorer.SIGN,
-                                    score))
+                                    host_name, threshold_conf, score))
                             break
                     else:
-                        scorer = rank_conf["scorer"]
-                        method_arg = rank_conf["method_arg"]
-                        score = scorer.command_out_parser(out, method_arg)
+                        score = rank_conf.command_out_parser(out)
                         host_score_list.append((host_name, score))
                         self.handle_event(HostSelectScoreEvent(host_name, score))
 
@@ -324,18 +326,41 @@ class HostSelector(object):
 
         if not host_score_list:
             raise NoHostSelectError()
-        scorer = rank_conf["scorer"]
         host_score_list.sort(
                     lambda a, b: cmp(a[1], b[1]),
-                    reverse=scorer.SIGN < 0)
+                    reverse=rank_conf.scorer.SIGN < 0)
         return host_score_list
 
     __call__ = select
 
 
-class RandomScorerConf(object):
+class ScorerConf(object):
 
-    """Base class for ranking configuration.
+    """Wrap a threshold/ranking scorer + extra configuration."""
+
+    def __init__(self, scorer, method_arg, value=None):
+        self.scorer = scorer
+        self.method = scorer.KEY
+        self.method_arg = method_arg
+        self.value = value
+
+    def get_command(self):
+        """Return a shell command to get the info for scoring a host."""
+        return self.scorer.get_command(self.method_arg)
+
+    def check_threshold(self, out):
+        """Parse command output. Return True if threshold not met."""
+        score = self.command_out_parser(out)
+        return (self.scorer.SIGN * cmp(score, self.value) > 0)
+
+    def command_out_parser(self, out):
+        """Parse command output to return a numeric score."""
+        return self.scorer.command_out_parser(out, self.method_arg)
+
+
+class RandomScorer(object):
+
+    """Base class for threshold/ranking scorer.
 
     Score host by random.
 
@@ -366,7 +391,7 @@ class RandomScorerConf(object):
         return random()
 
 
-class LoadScorerConf(RandomScorerConf):
+class LoadScorer(RandomScorer):
 
     """Score host by average uptime load."""
 
@@ -392,7 +417,7 @@ class LoadScorerConf(RandomScorerConf):
         return float(load) / float(nprocs)
 
 
-class MemoryScorerConf(RandomScorerConf):
+class MemoryScorer(RandomScorer):
 
     """Score host by amount of free memory"""
 
@@ -410,7 +435,7 @@ class MemoryScorerConf(RandomScorerConf):
         return float(mem)
 
 
-class FileSystemScorerConf(RandomScorerConf):
+class FileSystemScorer(RandomScorer):
 
     """Score host by average file system percentage usage."""
 
@@ -435,20 +460,16 @@ def main():
     report = Reporter(opts.verbosity - opts.quietness)
     popen = RosePopener(event_handler=report)
     select = HostSelector(event_handler=report, popen=popen)
-    if opts.debug_mode:
+    try:
         host_score_list = select(
                 names=args,
                 rank_method=opts.rank_method,
                 thresholds=opts.thresholds)
-    else:
-        try:
-            host_score_list = select(
-                    names=args,
-                    rank_method=opts.rank_method,
-                    thresholds=opts.thresholds)
-        except Exception as e:
-            report(e)
-            sys.exit(1)
+    except Exception as e:
+        report(e)
+        if opts.debug_mode:
+            traceback.print_exc(e)
+        sys.exit(1)
     opts.choice = int(opts.choice)
     report(choice(host_score_list[0:opts.choice])[0] + "\n", level=0)
 
