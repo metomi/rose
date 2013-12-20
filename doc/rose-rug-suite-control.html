@@ -1,0 +1,450 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Rose User Guide: Suite Control</title>
+  <meta name="author" content="Rose Team, Met Office, UK" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="icon" href="rose-icon.png" type="image/png" />
+  <link rel="shortcut icon" href="rose-icon.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="rose-doc.css" />
+  <link rel="stylesheet" type="text/css" href=
+  "google-code-prettify/prettify.css" />
+  <script type="text/javascript" src="jquery.min.js">
+</script>
+  <script type="text/javascript" src="google-code-prettify/prettify.js">
+</script>
+  <script type="text/javascript" src="prettify-rose-conf.js">
+</script>
+  <script type="text/javascript" src="rose-doc.js">
+</script>
+  <script type="text/javascript" src="rose-version.js">
+</script>
+</head>
+
+<body>
+  <div class="header-footer" id="body-header">
+    <address>
+      &copy; British Crown Copyright 2012-3 <a href=
+      "http://www.metoffice.gov.uk">Met Office</a>. See <a href=
+      "rose-terms-of-use.html">Terms of Use</a>.<br />
+      This document is released under the <a href=
+      "http://www.nationalarchives.gov.uk/doc/open-government-licence/" rel=
+      "license">Open Government Licence</a>.<br />
+      <span id="rose-version"></span>
+    </address>
+
+    <div class="rose-link">
+      <img id="rose-icon" src="rose-icon.png" alt="Rose" />
+
+      <p><a id="doc-home-link" href="." name="doc-home-link">Rose
+      Documentation</a></p>
+    </div>
+  </div>
+
+  <div id="body-main">
+    <h1>Rose User Guide: Suite Control</h1>
+
+    <div id="content"></div>
+
+    <h2 id="intro">Introduction</h2>
+
+    <p>This chapter of the user guide discusses the Rose utilities for
+    controlling and monitoring Rose/Cylc suites.</p>
+
+    <h2 id="rose-suite-run">rose suite-run</h2>
+
+    <p>If you have been following this user guide, you would have used the
+    <code>rose suite-run</code> command in previous chapters. In normal usage,
+    the command sets up the environment of a Rose/Cylc suite, installs and runs
+    it. We'll discuss the detail in this section.</p>
+
+    <p>See <a href="rose-command.html#rose-suite-run">Rose Reference Guide: CLI
+    &gt; rose suite-run</a> for a full command reference.</p>
+
+    <p>See <a href="rose-configuration.html#format">Rose Reference Guide:
+    Configuration &gt; Configuration Format</a> for more information on Rose
+    configuration format.</p>
+
+    <p>See <a href="rose-configuration.html#suite">Rose Reference Guide:
+    Configuration &gt; Suite Configuration</a> for more information on how to
+    set up a Rose suite configuration.</p>
+
+    <h3 id="rose-suite-run.locations">Locations</h3>
+
+    <p>The main functionality of <code>rose suite-run</code> is to install a
+    suite from the configuration directory to its run time location.</p>
+    
+    <dl>
+      <dt>The configuration directory</dt>
+      
+      <dd>This is <var>$PWD</var> by default, but it can be modified using the
+      <code>--config=DIR</code> or <code>-C DIR</code> option of the
+      <code>rose suite-run</code> command.</dd>
+
+      <dt>The run time location</dt>
+
+      <dd>This is <var>$HOME/cylc-run/$NAME/</var> where <var>$NAME</var> is the
+      name of the suite. The name of the suite is the base name of the
+      configuration directory by default, but it can be modified using the
+      <code>--name=NAME</code> or <code>-n NAME</code> option of the <code>rose
+      suite-run</code> command. The uniformity of the run time location allows
+      users to be able to easily look for their installed suites. It also allows
+      for simple logic in Rose. However, Rose allows the actual root location of
+      each <var>$HOME/cylc-run/$NAME/</var> to be configured to suit the need
+      for individual sites or users, which may have very little disk spaces in
+      <var>$HOME</var>. In which case, <var>$HOME/cylc-run/$NAME</var> would
+      become a symbolic link to the actual physical location. We'll discuss this
+      functionality in more detail later in this section.</dd>
+    </dl>
+
+    <h3 id="rose-suite-run.install-items">Install Items</h3>
+
+    <p>What does <code>rose suite-run</code> install in the run time location?
+    Here is a list:</p>
+
+    <ul>
+      <li>The run time directory structure of the suite, including the
+      <var>log/</var>, the <var>share/</var> and the <var>work/</var>
+      directories. (See also <a href="#rose-suite-run.log">Log
+      Rotation</a> and <a href="rose-suite-run.root">Configuring the Install Root
+      Locations</a>.)</li>
+
+      <li>Everything in the suite configuration directory, except hidden files
+      and directories.</li>
+
+      <li><var>log/rose-conf/DATETIME-RUNMODE.conf &lt;-
+      log/rose-suite-run.conf</var> A copy of the <var>rose-suite.conf</var>
+      with any added optional configurations and command line
+      <code>--define=[SECTION]NAME=VALUE</code> settings.</li>
+
+      <li><var>log/rose-conf/DATETIME-RUNMODE.version &lt;-
+      log/rose-suite-run.version</var> Version control information file of the
+      configuration directory. If the configuration directory is a Subversion
+      working copy, the file would contain the output of <code>svn info</code>,
+      <code>svn status</code> and <code>svn diff</code>. If the configuration is
+      a Git clone, the file would contain the output of <code>git
+      describe</code>, <code>git status</code> and <code>git diff</code>.</li>
+
+      <li><var>log/rose-suite-run.log</var> The <code>-v -v</code> output of the
+      <code>rose suite-run</code> command.</li>
+
+      <li><var>log/rose-job-logs.db</var> The job logs database for <a href=
+      "#rose-bush">Rose Bush</a>.</li>
+
+      <li>Any files specified in <var>[file:*]</var> sections of the
+      <var>rose-suite.conf</var> file. (See <a href=
+      "rose-configuration.html#appendix-file-creation-mode">Rose Reference
+      Guide: Configuration &gt; Appendix: File Creation Mode</a>.) This
+      functionality is useful for files that are used by the suite itself and/or
+      many task jobs running on different hosts. For large files used only on
+      specific tasks hosts, we would recommend against using this functionality.
+      Instead, the suite should have a start up task to install those files on
+      the specific task hosts.</li>
+
+      <li>For suites with tasks running on alternate any <var>USER@HOST</var>,
+      <code>rose suite-run</code> will <code>cylc register</code> and <code>cylc
+      validate</code> the suite before creating the run time directory structure
+      and mirroring its items to these alternate <var>USER@HOST</var>.</li>
+
+      <li><var>log/rose-suite-run.locs</var> Configuration of the install root
+      location on the suite host and any remote task job hosts. (See <a href=
+      "rose-suite-run.root">Configuring the Install Root Locations</a>.)</li>
+
+      <li><var>log/rose-suite-run.host</var> Contain the host name where the
+      suite will run on.</li>
+    </ul>
+
+    <h3 id="rose-suite-run.install-modes">Install Modes</h3>
+
+    <p>The <code>rose suite-run</code> command would normally install from the
+    configuration directory into the run time location incrementally. If this is
+    not desirable, the <code>--new</code> or <code>-N</code> option should be
+    used to remove and re-create the run time location.</p>
+
+    <p>There are times when you only want to install the suite but not (re-)run
+    it, e.g. during development, for analysing its structure, or to modify an
+    application configuration during run time, etc, you can use the
+    <code>--install-only</code> or <code>-i</code> option or even the
+    <code>--local-install-only</code> or <code>-l</code> option. The former will
+    stop after validating the suite and installing it to the task hosts. The
+    latter wills top after validating the suite.</p>
+
+    <h3 id="rose-suite-run.environment">Environment and Jinja2 Settings</h3>
+
+    <p>Environment variables defined in the <var>[env]</var> section of the
+    <var>rose-suite.conf</var> file are exported to the environment before the
+    <var>[file:*]</var> and <var>[jinja2:*]</var> sections are processed, and
+    before <code>cylc run|restart|reload</code> is invoked.</p>
+
+    <p>Settings defined in each <var>[jinja2:FILE]</var> section of the
+    <var>rose-suite.conf</var> file are added to the header of the named
+    <var>FILE</var> at installation time. The main use of this functionlity is
+    to modify the behaviour of a Cylc's <var>suite.rc</var> file with settings
+    in the <var>[jinja2:suite.rc]</var> section at installation time.</p>
+
+    <p>In addition, the following settings are automatically exported to the
+    environment and added to the <var>[jinja2:suite.rc]</var> section.</p>
+
+    <dl>
+      <dt><var>CYLE_VERSION</var></dt>
+
+      <dd>The current version of Cylc.</dd>
+
+      <dt><var>ROSE_ORIG_HOST</var></dt>
+
+      <dd>The name of the host where the <code>rose suite-run</code> command was
+      invoked.</dd>
+
+      <dt><var>ROSE_VERSION</var></dt>
+
+      <dd>The current version of Rose.</dd>
+    </dl>
+    
+    <p>For example, if we add these settings to <var>rose-suite.conf</var>:</p>
+
+    <pre class="prettyprint lang-rose_conf">
+[jinja2:suite.rc]
+HELLO="Greeting"
+WORLDS=["Earth", "Moon", "Mars"]
+</pre>
+
+    <p>Then the following example header will be added to the
+    <var>suite.rc</var> file:</p>
+
+    <pre>
+#!jinja2
+{# Rose Configuration Insertion: Init #}
+{% set CYLC_VERSION="5.4.5" %}
+{% set HELLO="Greeting" %}
+{% set ROSE_ORIG_HOST="alien" %}
+{% set ROSE_VERSION="2013-12" %}
+{% set WORLDS=["Earth", "Moon", "Mars"] %}
+{# Rose Configuration Insertion: Done #}
+</pre>
+
+    <h3 id="rose-suite-run.run-mode">Run Modes</h3>
+
+    <p>The <code>rose suite-run</code> command has 3 run modes: run (default),
+    restart and reload. The mode can be specified using the command line option
+    <code>--run=reload|restart|run</code>, <code>--restart</code> or
+    <code>--reload</code>.</p>
+
+    <p>In run and restart mode, <code>rose suite-run</code> checks that the
+    suite is not already running on <var>localhost</var> and/or any suite hosts
+    defined in the lists in the <var>hosts</var> and <var>scan-hosts</var>
+    settings in the <var>[rose-suite-run]</var> section in the site/user
+    configuration. In reload mode, it does the opposite to ensure that the suite
+    is already running on one of these hosts.</p>
+
+    <p>In run and restart mode, <code>rose suite-run</code> would ensure that
+    the suite is registered with Cylc. In all modes, it will then attempt to
+    validate the Cylc's <var>suite.rc</var> file using <code>cylc validate
+    --strict</code>, although the <code>--no-strict</code> option can be usedto
+    switch off the <code>--strict</code> option to <code>cylc
+    validate</code>.</p>
+
+    <p>Once the <var>suite.rc</var> file is validated, <code>rose
+    suite-run</code> would invoke <code>cylc run</code>, <code>cylc
+    restart</code> or <code>cylc reload</code>. For run and restart mode, if the
+    <var>hosts</var> settings in the <var>[rose-suite-run]</var> section in the
+    site/user configuration is defined, <code>rose suite-run</code> will select
+    a host according to the defined selection criteria to invoke <code>cylc
+    run|restart</code>. For reload mode, <code>rose suite-run</code> will invoke
+    <code>cylc reload</code> on the same host where the suite is still
+    running.</p>
+
+    <p>If you need to pass extra options and arguments to the <code>cylc
+    run|restart|reload</code> command, you can specify them on the command line
+    like this:</p>
+
+    <pre class="shell">
+rose suite-run -- --mode=simulation
+</pre>
+
+    <p>In this example, <code>--mode=simulation</code> will be passed to
+    <code>cylc run</code>.</p>
+
+    <p>On success, <code>rose suite-run</code> will launch the <code>cylc
+    gui</code> to connect to the suite, unless the <code>--no-gcontrol</code>
+    option is specified or the <var>DISPLAY</var> environment variable is not
+    defined.</p>
+
+    <h3 id="rose-suite-run.log">Log Rotation</h3>
+
+    <p>In normal run mode, <code>rose suite-run</code> would create a
+    <var>log.DATETIME/</var> directory in the run time location, and (re-)create
+    the symbolic link <var>log</var> to point to it. The
+    <var>log.DATETIME/</var> directory from previous runs would then be
+    compressed into a Tar-Gzip archive <var>log.DATETIME.tar.gz</var>, unless
+    the <code>--no-log-archive</code> option is specified or if it is being
+    pointed to by a symbolic link matching the glob <var>log.*</var> in the same
+    directory.</p>
+
+    <h3 id="rose-suite-run.root">Configuring the Install Root Locations</h3>
+
+    <p>As discussed earlier, if <var>$HOME/cylc-run/$NAME/</var> is not a
+    suitable physical location for hosting the suite run time files, (perhaps
+    the disk does not have enough disk space or have poor performance), it is
+    possible to configure the root of an alternate physical location using the
+    setting <var>root-dir=LIST</var> in the suite's <var>rose-suite.conf</var>
+    or the same setting under the <var>[rose-suite-run</var> section of the
+    Rose site/user configuration. The <var>LIST</var> should be a new line
+    delimited list of <var>PATTERN=DIR</var> pairs. The <var>PATTERN</var>
+    should be a glob-like pattern for matching a host name. The <var>DIR</var>
+    should be the root directory to install a suite run directory. E.g.:</p>
+
+    <pre class="prettyprint lang-rose_conf">
+root-dir=hpc*=$WORKDIR
+        =*=$DATADIR
+</pre>
+
+    <p>In this example, <code>rose suite-run</code> of a suite with name
+    <var>$NAME</var> will create <var>~/cylc-run/$NAME</var> as a symbolic
+    link to <var>$DATADIR/cylc-run/$NAME/</var> on any machine, except those
+    with their hostnames matching <var>hpc*</var>. In which case, it will
+    create <var>~/cylc-run/$NAME</var> as a symbolic link to
+    <var>$WORKDIR/cylc-run/$NAME/</var>.</p>
+
+    <p>In additional to main suite directory, the <var>share/</var> and
+    <var>work/</var> sub-directories can also be configured in this way, using
+    the settings <var>root-dir-share</var> and <var>root-dir-work</var>
+    respectively.</p>
+
+    <h2 id="rose-bush">Rose Bush</h2>
+
+    <p>Rose Bush allows you to browse the suite logs and on your web browser. If
+    it is not already configured at your site, see <a href=
+    "rose-install.html#rose-bush">Rose: Installation &gt; Configuring Rose
+    Bush</a> on how to configure it. If you do not have the authority to do so,
+    you should still be able to start an ad-hoc Rose Bush web server by
+    typing:</p>
+
+    <pre class="shell">
+/path/to/rose/bin/rose bush start [PORT]
+</pre>
+
+    <p>If <var>[PORT]</var> is not specified, the default is 8080.</p>
+
+    <p>Once configured (or you have started an ad-hoc server), typing <code>rose
+    suite-log</code> in a suite directory would launch Rose Bush on your web
+    browser.</p>
+
+    <p>You can also use Rose Bush to:</p>
+
+    <ul>
+      <li>View the list the suites in your <var>$HOME/cylc-run/</var>
+      directory.</li>
+
+      <li>View log files, including those in Tar-Gzip archives.</li>
+
+      <li>View suite logs of other users (if the Rose Bush server has access to
+      their <var>$HOME/cylc-run/</var> directory.</li>
+    </ul>
+
+    <h2 id="rose-suite-hook">rose suite-hook</h2>
+
+    <p>This command provide a common way to handle suite and task events of a
+    Cylc suite. The command is normally called as a handler in the event hooks
+    section of a Cylc suite's <var>suite.rc</var> file. For a task event for a
+    remote task, it would attempt to pull the task logs back from the remote
+    host running the task. For all other events, it will update the database for
+    Rose Bush.</p>
+    
+    <p>If the <code>--mail</code> option is specified on the command line,
+    the command will email you with the message of the event. This may be
+    useful for monitoring failures or timeouts. If the <code>--shutdown</code>
+    option is specified, the command will attempt to shutdown the suite
+    immediately. This may be useful, for example, if you want the suite to
+    shutdown immediately on any failures.</p>
+
+    <p>As discussed in the <a href="rose-rug-suites.html">Rose User Guide:
+    Suites</a> chapter, we recommend adding the following to all your
+    suites, (but adjust the timeout and remove <code>--shutdown</code> options
+    to suit your situations):</p>
+
+      <pre class="prettyprint lang-cylc">
+[cylc]
+    UTC mode=True
+    [[event hooks]]
+        timeout handler=rose suite-hook --mail --shutdown
+        timeout=4320 # 3 days
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+           succeeded handler=rose suite-hook
+           failed handler=rose suite-hook --shutdown
+           retry handler=rose suite-hook --mail
+           submission failed handler=rose suite-hook --shutdown
+           submission timeout handler=rose suite-hook --mail
+           execution timeout handler=rose suite-hook --mail
+           submission timeout=1440 # 24 hours
+           execution timeout=180 # 3 hours
+</pre>
+
+    <p>See <a href="rose-command.html#rose-suite-hook">Rose Reference Guide:
+    CLI &gt; rose suite-hook</a> for more information.</p>
+
+    <h2 id="rose-suite-log">rose suite-log</h2>
+
+    <p>There are 2 usages of this command.</p>
+    
+    <p>In normal or view mode, this command launches a web browser to display
+    the logs of a running or stopped suite in Rose Bush.</p>
+
+    <p>In update mode, this command updates the logs and/or the Rose Bush
+    databse of a suite. This mode is useful in the situations when <a href=
+    "#rose-suite-hook">rose suite-hook</a> did not manage to update the logs
+    and/or the Rose Bush database successfully.</p>
+
+    <p>See <a href="rose-command.html#rose-suite-log">Rose Reference Guide: CLI
+    &gt; rose suite-log</a> for more information.</p>
+
+    <h2 id="rose-suite-gcontrol">rose suite-gcontrol</h2>
+
+    <p>Or <code>rose sgc</code>. A convenient way to launch <code>cylc
+    gui</code>. In the absence of arguments, the command assumes that base name
+    of the current directory is the name of the suite you want to launch
+    <code>cylc gui</code> on.  If your suite is running on a dedicated suite
+    host as specified by the Rose site/user configuration, it will automatically
+    connect to the suite at the correct host.</p>
+
+    <p>See <a href="rose-command.html#rose-suite-gcontrol">Rose Reference
+    Guide: CLI &gt; rose suite-gcontrol</a> for more information.</p>
+
+    <h2 id="rose-suite-scan">rose suite-scan</h2>
+
+    <p>A wrapper of <code>cylc scan</code>. The command scans for your
+    running suites in the dedicated suite hosts as specified by the Rose
+    site/user configuration.</p>
+
+    <p>See <a href="rose-command.html#rose-suite-scan">Rose Reference
+    Guide: CLI &gt; rose suite-scan</a> for more information.</p>
+
+    <h2 id="rose-suite-shutdown">rose suite-shutdown</h2>
+
+    <p>Or <code>rose suite-stop</code>. A convenient way to run <code>cylc
+    shutdown</code>. In the absence of arguments, the command assumes that base
+    name of the current directory is the name of the suite you want to run
+    <code>cylc shutdown</code> on. If your suite is running on a dedicated suite
+    host as specified by the Rose site/user configuration, it will automatically
+    connect to the suite at the correct host.</p>
+
+    <p>See <a href="rose-command.html#rose-suite-shutdown">Rose Reference
+    Guide: CLI &gt; rose suite-shutdown</a> for more information.</p>
+
+    <h2 id="rose-suite-clean">rose suite-clean</h2>
+
+    <p>This command correctly removes items created by <a href=
+    "#rose-suite-run">rose suite-run</a>, including items in
+    <var>$HOME/.cylc/</var>, items in task job hosts and actual run locations
+    under alternate disks. In the absence of arguments, the command assumes that
+    base name of the current directory is the name of the suite you want to
+    clean. It checks that the suite is not running before doing any removal.</p>
+
+    <p>See <a href="rose-command.html#rose-suite-clean">Rose Reference
+    Guide: CLI &gt; rose suite-clean</a> for more information.</p>
+  </div>
+</body>
+</html>

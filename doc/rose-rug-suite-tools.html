@@ -54,99 +54,6 @@
     utilities that can be used to simplify the logic of a suite and/or provide
     a common approach of doing the same things.</p>
 
-    <h2 id="general">General Usage</h2>
-
-    <p>The tools and utilities discussed in this chapter are accessed via
-    Unix/Linux commands that have a common syntax:</p>
-    <pre class="shell">
-rose UTIL [OPTS] [ARG ...]
-</pre>
-
-    <p>See <a href="rose-command.html">Rose Reference Guide: CLI</a> for a
-    complete reference.</p>
-
-    <p>All commands described in this chapter accept the following standard
-    options:</p>
-
-    <dl>
-      <dt><code>--debug</code></dt>
-
-      <dd>This option is useful for debugging purpose as it would instruct the
-      system to print a traceback on error.</dd>
-
-      <dt><code>--quiet, -q</code></dt>
-
-      <dd>Each <code>--quiet</code> or <code>-q</code> on the command line
-      decrements the verbosity of the output by 1. The default verbosity is 1.
-      If you want to command to only print what is essential to the
-      <var>STDOUT</var> and suppress warnings on <var>STDERR</var>, you can
-      specify a single <code>--quiet</code> to reduce the verbosity to 0.</dd>
-
-      <dt><code>--verbose, -v</code></dt>
-
-      <dd>Each <code>--verbose</code> or <code>-v</code> on the command line
-      increments the verbosity of the output by 1. The default verbosity is 1.
-      The highest verbosity is 3. A single <code>--verbose</code> would
-      increase the verbosity to <var>STDOUT</var>. A double <code>--verbose
-      --verbose</code> or <code>-v -v</code> would increase the verbosity to
-      the highest level. (More <code>--verbose</code> can be specified on the
-      command line, but would probably have no effect.)</dd>
-    </dl>
-
-    <h2 id="rose-suite-run">rose suite-run</h2>
-
-    <p>Some aspects of the <code>rose suite-run</code> command has already been
-    discussed in <a href="rose-rug-brief-tour.html">A Brief Tour</a>. Here, we
-    are going to discuss some other features of the command.</p>
-
-    <p>See <a href="rose-command.html#rose-suite-run">Rose Reference Guide: CLI
-    &gt; rose suite-run</a> for a full command reference.</p>
-
-    <p>See <a href="rose-configuration.html#suite">Rose Reference Guide:
-    Configuration &gt; Suite Configuration</a> for more information on how to
-    set up a Rose suite configuration.</p>
-
-    <h3 id="rose-suite-run.opt">Optional Configuration Selection</h3>
-
-    <p>If a suite configuration is used in different ways, each requiring a set
-    of coordinated changes, the optional configuration may come in handy.
-    Optional configuration files are stored in the <var>opt/</var> directory of
-    a suite configuration. Each file has a name that looks like
-    <var>opt/rose-suite-KEY.conf</var>. One or more optional configurations can
-    be selected using:</p>
-
-    <ol>
-      <li>The <var>opts=KEY ...</var> setting in
-      <var>rose-suite.conf</var>.</li>
-
-      <li>The <var>ROSE_SUITE_OPT_CONF_KEYS</var> environment variable, which
-      should contain a list of space delimited keys.</li>
-
-      <li>The <code>--opt-conf-key=KEY</code> or <code>-O KEY</code> option of
-      the <code>rose suite-run</code> command.</li>
-    </ol>
-
-    <p>For each specified optional configuration, the content of its file is
-    appended to the main configuration file before the whole configuration is
-    parsed. This allows settings to accumulate and/or be overridden in the
-    correct order.</p>
-
-    <h3 id="rose-suite-run.def">Re-define Configuration</h3>
-
-    <p>If all you need to do is to test out a small change to a suite
-    configuration, it may be easier to use the
-    <code>--define=[SECTION]KEY=VALUE</code> or <code>-D
-    [SECTION]KEY=VALUE</code> option on the command line. This option overrides
-    everything in the main and optional configurations. E.g.:</p>
-    <pre class="shell">
-# Set [env]FOO=foo, and [env]BAR=bar
-# (Overridding any original settings of [env]FOO or [env]BAR)
-rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
-
-# Switch off [env]BAZ
-rose task-run -D '[env]!BAZ='
-</pre>
-
     <h2 id="rose-task-run">rose task-run</h2>
 
     <p>The command uses the suite engine environment to set up some standard
@@ -156,6 +63,10 @@ rose task-run -D '[env]!BAZ='
 
     <p>See <a href="rose-command.html#rose-task-run">Rose Reference Guide: CLI
     &gt; rose task-run</a> for a full command reference.</p>
+
+    <p>See <a href="rose-configuration.html#format">Rose Reference Guide:
+    Configuration &gt; Configuration Format</a> for more information on Rose
+    configuration format.</p>
 
     <p>See <a href="rose-configuration.html#app">Rose Reference Guide:
     Configuration &gt; Application Configuration</a> for more information on
@@ -210,47 +121,7 @@ rose task-run -D '[env]!BAZ='
     <p>See <a href="rose-configuration.html#appendix-file-creation-mode">Rose
     Reference Guide: Configuration &gt; Appendix: File Creation Mode</a>.</p>
 
-    <h3 id="rose-task-run.opt">Optional Configuration Selection</h3>
-
-    <p>If an application configuration is shared by a set of tasks, each
-    requiring a set of coordinated changes, the optional configurations may
-    come in handy. Optional configuration files are stored in the
-    <var>opt/</var> directory of an application configuration. Each file has a
-    name that looks like <var>opt/rose-app-KEY.conf</var>. One or more optional
-    configurations can be selected using:</p>
-
-    <ol>
-      <li>The <var>opts=KEY ...</var> setting in <var>rose-app.conf</var>.</li>
-
-      <li>The <var>ROSE_APP_OPT_CONF_KEYS</var> environment variable, which
-      should contain a list of space delimited keys.</li>
-
-      <li>The <code>--opt-conf-key=KEY</code> or <code>-O KEY</code> option of
-      the <code>rose task-run</code> command.</li>
-    </ol>
-
-    <p>For each specified optional configuration, the content of its file is
-    appended to the main configuration file before the whole configuration is
-    parsed. This allows settings to accumulate and/or be overridden in the
-    correct order.</p>
-
-    <h3 id="rose-task-run.def">Re-define Configuration</h3>
-
-    <p>If all you need to do is to test out a small change to an application
-    configuration, it may be easier to use the
-    <code>--define=[SECTION]KEY=VALUE</code> or <code>-D
-    [SECTION]KEY=VALUE</code> option on the command line. This option overrides
-    everything in the main and optional configurations. E.g.:</p>
-    <pre class="shell">
-# Set [env]FOO=foo, and [env]BAR=bar
-# (Overridding any original settings of [env]FOO or [env]BAR)
-rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
-
-# Switch off [env]BAZ
-rose task-run -D '[env]!BAZ='
-</pre>
-
-    <h3 id="rose-task-run.builtin-app">Builtin Applications</h3>
+    <h3 id="rose-task-run.builtin-app">Builtin Applications Selection</h3>
 
     <p>Apart from running command normally, the <code>rose task-run</code>
     command (or the <code>rose app-run</code> command) also has a set of
@@ -269,8 +140,8 @@ rose task-run -D '[env]!BAZ='
       instead of a command defined in the application configuration.</li>
     </ol>
 
-    <h3 id="rose-task-run.builtin-app.fcm_make">Builtin Application:
-    fcm_make</h3>
+    <h2 id="rose-task-run.builtin-app.fcm_make">Builtin Application:
+    fcm_make</h2>
 
     <p>The <code>fcm_make</code> built-in applications is provided for running
     <code>fcm make</code>.</p>
@@ -318,7 +189,7 @@ mode=fcm_make
 opt.jobs=8
 </pre>
 
-    <h3 id="rose-task-run.util.rose_ana">Builtin Application: rose_ana</h3>
+    <h2 id="rose-task-run.util.rose_ana">Builtin Application: rose_ana</h2>
 
     <p>This built-in application runs <code>rose-ana</code>, the Rose
     comparison engine. This compares files against each other using a
@@ -334,7 +205,7 @@ opt.jobs=8
     using the <var>method-path</var> variable in the <var>[rose-ana]</var>
     section.</p>
 
-    <h3 id="rose-task-run.util.rose_arch">Builtin Application: rose_arch</h3>
+    <h2 id="rose-task-run.util.rose_arch">Builtin Application: rose_arch</h2>
 
     <p>This built-in application provides a generic solution to configure site
     specific archiving of suite files. It is designed to work under <code>rose
@@ -499,7 +370,7 @@ source=stuffing-*.txt
 # ...
 </pre>
 
-    <h3 id="rose-task-run.util.rose_prune">Builtin Application: rose_prune</h3>
+    <h2 id="rose-task-run.util.rose_prune">Builtin Application: rose_prune</h2>
 
     <p>This built-in application offers a way to housekeep a cycling suite. It
     prunes files and directories generated by suite tasks. It is designed to
@@ -582,97 +453,18 @@ eval $(rose task-env)
     &gt; rose task-env</a> for a full list of environment variables provided by
     this command.</p>
 
-    <h2 id="rose-suite-hook">rose suite-hook</h2>
+    <h2 id="rose-app-run">rose app-run</h2>
 
-    <p>This command provide a common way to handle suite and task events of a
-    Cylc suite. The command is normally called as a handler in the event hooks
-    section of a Cylc suite's <var>suite.rc</var> file. For a task event for a
-    remote task, it would attempt to pull the task logs back from the remote
-    host running the task. For all other events, it will update the suite log
-    view. If the <code>--mail</code> option is specified on the command line,
-    the command will email you with the message of the event. This may be
-    useful for monitoring failures or timeouts. If the <code>--shutdown</code>
-    option is specified, the command will attempt to shutdown the suite
-    immediately. This may be useful, for example, if you want the suite to
-    shutdown immediately on any failures.</p>
+    <p>Run an application according to its configuration, outside of a
+    suite task environment. Although you will normally launch a Rose
+    application using <code>rose task-run</code>, there are situations when
+    you may have a standalone Rose application configuration that you just
+    want to run outside of a suite. This is where <code>rose app-run</code>
+    may come in handy.</p>
 
-    <p>See <a href="rose-command.html#rose-suite-hook">Rose Reference Guide:
-    CLI &gt; rose suite-hook</a> for a full list of environment variables
+    <p>See <a href="rose-command.html#rose-app-run">Rose Reference Guide:
+    CLI &gt; rose app-run</a> for a full list of environment variables
     provided by this command.</p>
-
-    <h2 id="rose-suite-log">rose suite-log</h2>
-
-    <p>This command inspects the log of a running or stopped suite to generate
-    a view and display it by launching a web browser (which must be compliant
-    to XHTML 1.0, JavaScript 1.8 and CSS 2.1). The <code>rose suite-run</code>
-    command calls (the library of) this command to generate the initial view.
-    The <code>rose suite-hook</code> command calls (the library of) this
-    command to update the view on task events. If you are already in the
-    directory of a suite, you can use this command to bring up its output on a
-    web browser. Or if for whatever reasons <code>rose suite-hook</code> has
-    failed to update the view, you can use this command to force an update.</p>
-
-    <p>See <a href="rose-command.html#rose-suite-log">Rose Reference Guide: CLI
-    &gt; rose suite-log</a> for a full list of environment variables provided
-    by this command.</p>
-
-    <h2 id="other">Other Useful Tools</h2>
-
-    <dl>
-      <dt>rose suite-gcontrol</dt>
-
-      <dd>
-        <p>A convenient way to launch <code>cylc gui</code>. In the absence of
-        arguments, the command assumes that base name of the current directory
-        is the name of the suite you want to launch <code>cylc gui</code> on.
-        If your suite is running on a dedicated suite host as specified by the
-        Rose site/user configuration, it will automatically connect to the
-        suite at the correct host.</p>
-
-        <p>See <a href="rose-command.html#rose-suite-gcontrol">Rose Reference
-        Guide: CLI &gt; rose suite-gcontrol</a> for more information.</p>
-      </dd>
-
-      <dt>rose suite-scan</dt>
-
-      <dd>
-        <p>A wrapper of <code>cylc scan</code>. The command scans for your
-        running suites in the dedicated suite hosts as specified by the Rose
-        site/user configuration.</p>
-
-        <p>See <a href="rose-command.html#rose-suite-scan">Rose Reference
-        Guide: CLI &gt; rose suite-scan</a> for more information.</p>
-      </dd>
-
-      <dt>rose suite-shutdown</dt>
-
-      <dd>
-        <p>A convenient way to run <code>cylc shutdown</code>. In the absence
-        of arguments, the command assumes that base name of the current
-        directory is the name of the suite you want to run <code>cylc
-        shutdown</code> on. If your suite is running on a dedicated suite host
-        as specified by the Rose site/user configuration, it will automatically
-        connect to the suite at the correct host.</p>
-
-        <p>See <a href="rose-command.html#rose-suite-shutdown">Rose Reference
-        Guide: CLI &gt; rose suite-shutdown</a> for more information.</p>
-      </dd>
-
-      <dt>rose app-run</dt>
-
-      <dd>
-        <p>Run an application according to its configuration, outside of a
-        suite task environment. Although you will normally launch a Rose
-        application using <code>rose task-run</code>, there are situations when
-        you may have a standalone Rose application configuration that you just
-        want to run outside of a suite. This is where <code>rose app-run</code>
-        may come in handy.</p>
-
-        <p>See <a href="rose-command.html#rose-app-run">Rose Reference Guide:
-        CLI &gt; rose app-run</a> for a full list of environment variables
-        provided by this command.</p>
-      </dd>
-    </dl>
   </div>
 </body>
 </html>

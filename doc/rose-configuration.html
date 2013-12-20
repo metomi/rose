@@ -242,6 +242,40 @@ opts=ketchup mayonnaise
     <var>rose-app-mayonnaise.conf</var>, which may override the previous
     one.</p>
 
+    <p>Some Rose utilities (e.g. <a href=
+    "rose-command.html#rose-suite-run">rose suite-run</a>, <a href=
+    "rose-command.html#rose-task-run">rose task-run</a>, <a href=
+    "rose-command.html#rose-app-run">rose app-run</a>, etc) allows optional
+    configuration to be selected at run time using:</p>
+    
+    <ol>
+      <li>Environment variables. (See reference of individual commands for
+      detail.)</li>
+
+      <li>The command line option <code>--opt-conf-key=KEY</code> or
+      <code>-O KEY</code>.</li>
+    </ol>
+
+    <h2 id="defines">Re-define Configuration at Run Time</h2>
+
+    <p>Some Rose utilities (e.g. <a href=
+    "rose-command.html#rose-suite-run">rose suite-run</a>, <a href=
+    "rose-command.html#rose-task-run">rose task-run</a>, <a href=
+    "rose-command.html#rose-app-run">rose app-run</a>, etc) allows you to
+    re-define configuration settings at run time using the
+    <code>--define=[SECTION]NAME=VALUE</code> or <code>-D
+    [SECTION]NAME=VALUE</code> options on the command line. This would override
+    any settings in the main and optional configurations. E.g.:</p>
+
+    <pre class="shell">
+# Set [env]FOO=foo, and [env]BAR=bar
+# (Overridding any original settings of [env]FOO or [env]BAR)
+rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
+
+# Switch off [env]BAZ
+rose task-run -D '[env]!BAZ='
+</pre>
+
     <h2 id="site">Site and User Configuration</h2>
 
     <p>Aspects of some Rose utilities can be configured per installation via

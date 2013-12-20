@@ -224,6 +224,43 @@
       <dd>List the local suites.</dd>
     </dl>
 
+    <h2 id="general">General Usage</h2>
+
+    <p>The tools and utilities discussed in this chapter are accessed via
+    Unix/Linux commands that have a common syntax:</p>
+    <pre class="shell">
+rose UTIL [OPTS] [ARG ...]
+rosie UTIL [OPTS] [ARG ...]
+</pre>
+
+    <p>All commands described in this chapter accept the following standard
+    options:</p>
+
+    <dl>
+      <dt><code>--debug</code></dt>
+
+      <dd>This option is useful for debugging purpose as it would instruct the
+      system to print a traceback on error.</dd>
+
+      <dt><code>--quiet, -q</code></dt>
+
+      <dd>Each <code>--quiet</code> or <code>-q</code> on the command line
+      decrements the verbosity of the output by 1. The default verbosity is 1.
+      If you want to command to only print what is essential to the
+      <var>STDOUT</var> and suppress warnings on <var>STDERR</var>, you can
+      specify a single <code>--quiet</code> to reduce the verbosity to 0.</dd>
+
+      <dt><code>--verbose, -v</code></dt>
+
+      <dd>Each <code>--verbose</code> or <code>-v</code> on the command line
+      increments the verbosity of the output by 1. The default verbosity is 1.
+      The highest verbosity is 3. A single <code>--verbose</code> would
+      increase the verbosity to <var>STDOUT</var>. A double <code>--verbose
+      --verbose</code> or <code>-v -v</code> would increase the verbosity to
+      the highest level. (More <code>--verbose</code> can be specified on the
+      command line, but would probably have no effect.)</dd>
+    </dl>
+
     <h2 id="rose-app-run">rose app-run</h2>
 
     <h3>NAME</h3>
@@ -401,9 +438,9 @@
     <h3>SYNOPSIS</h3>
 
     <dl>
-      <dt><kbd>rose bush start</kbd></dt>
+      <dt><kbd>rose bush start [PORT]</kbd></dt>
 
-      <dd>Start ad-hoc web service server</dd>
+      <dd>Start ad-hoc web service server (on <var>PORT</var>)</dd>
 
       <dt><kbd>rose bush stop</kbd></dt>
 
@@ -417,6 +454,9 @@
     <h3>DESCRIPTION</h3>
 
     <p>Start/stop ad-hoc Rose Bush web service server.</p>
+
+    <p>For <code>rose bush start</code>, if <var>PORT</var> is not specified,
+    use port 8080.</p>
 
     <p>Rose Bush is a web service for browsing users' Rose suite logs via an
     HTTP interface.</p>
