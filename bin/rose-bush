@@ -21,12 +21,14 @@
 #     rose bush
 #
 # SYNOPSIS
-#     rose bush start # start ad-hoc web service server
-#     rose bush stop  # stop ad-hoc web service server
-#     rose bush       # print status of ad-hoc web service server
+#     rose bush start [PORT] # start ad-hoc web service server (on PORT)
+#     rose bush stop         # stop ad-hoc web service server
+#     rose bush              # print status of ad-hoc web service server
 #
 # DESCRIPTION
 #     Start/stop ad-hoc Rose Bush web service server.
+#
+#     For "rose bush start", if PORT is not specified, use port 8080.
 #
 #     Rose Bush is a web service for browsing users' Rose suite logs via an
 #     HTTP interface.
