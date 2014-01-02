@@ -6,7 +6,7 @@ See <http://metomi.github.io/rose/>.
 
 ## Copyright
 
-British Crown Copyright 2012-3 Met Office.
+British Crown Copyright 2012-4 Met Office.
 
 ## Terms of Use
 
