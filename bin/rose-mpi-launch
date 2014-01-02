@@ -127,8 +127,13 @@ while (($# > 0)); do
                 OPT $ROSE_LAUNCHER_ULIMIT_OPTS
             do
                 case "$OPT" in
-                  '?') return 1;;
-                    *) ulimit -$OPT $OPTARG || return $?;;
+                  '?')
+                      err "ROSE_LAUNCHER_ULIMIT_OPTS=$ROSE_LAUNCHER_ULIMIT_OPTS"
+                      :;;
+                    *)
+                      ulimit -$OPT $OPTARG || err \
+                          "ROSE_LAUNCHER_ULIMIT_OPTS=$ROSE_LAUNCHER_ULIMIT_OPTS"
+                      :;;
                 esac
             done
         fi
