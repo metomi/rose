@@ -261,15 +261,16 @@ opts=ketchup mayonnaise
     <p>Some Rose utilities (e.g. <a href=
     "rose-command.html#rose-suite-run">rose suite-run</a>, <a href=
     "rose-command.html#rose-task-run">rose task-run</a>, <a href=
-    "rose-command.html#rose-app-run">rose app-run</a>, etc) allows you to
+    "rose-command.html#rose-app-run">rose app-run</a>, etc) allow you to
     re-define configuration settings at run time using the
     <code>--define=[SECTION]NAME=VALUE</code> or <code>-D
-    [SECTION]NAME=VALUE</code> options on the command line. This would override
-    any settings in the main and optional configurations. E.g.:</p>
+    [SECTION]NAME=VALUE</code> options on the command line. This would add new
+    settings or override any settings defined in the main and optional
+    configurations. E.g.:</p>
 
     <pre class="shell">
 # Set [env]FOO=foo, and [env]BAR=bar
-# (Overridding any original settings of [env]FOO or [env]BAR)
+# (Overriding any original settings of [env]FOO or [env]BAR)
 rose task-run -D '[env]FOO=foo' -D '[env]BAR=bar'
 
 # Switch off [env]BAZ

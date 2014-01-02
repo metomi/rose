@@ -233,32 +233,33 @@ rose UTIL [OPTS] [ARG ...]
 rosie UTIL [OPTS] [ARG ...]
 </pre>
 
-    <p>All commands described in this chapter accept the following standard
+    <p>All the commands described in this chapter accept the following standard
     options:</p>
 
     <dl>
       <dt><code>--debug</code></dt>
 
-      <dd>This option is useful for debugging purpose as it would instruct the
+      <dd>This option is useful for debugging purposes as it would instruct the
       system to print a traceback on error.</dd>
 
       <dt><code>--quiet, -q</code></dt>
 
       <dd>Each <code>--quiet</code> or <code>-q</code> on the command line
-      decrements the verbosity of the output by 1. The default verbosity is 1.
-      If you want to command to only print what is essential to the
+      decrements the verbosity of the command output by 1. The default verbosity
+      is 1.  If you want the command to only print what is essential to
       <var>STDOUT</var> and suppress warnings on <var>STDERR</var>, you can
-      specify a single <code>--quiet</code> to reduce the verbosity to 0.</dd>
+      specify a single <code>--quiet</code> to reduce the verbosity to 0 (the
+      loweest verbosity).</dd>
 
       <dt><code>--verbose, -v</code></dt>
 
       <dd>Each <code>--verbose</code> or <code>-v</code> on the command line
       increments the verbosity of the output by 1. The default verbosity is 1.
-      The highest verbosity is 3. A single <code>--verbose</code> would
+      The highest verbosity is normally 3. A single <code>--verbose</code> would
       increase the verbosity to <var>STDOUT</var>. A double <code>--verbose
       --verbose</code> or <code>-v -v</code> would increase the verbosity to
       the highest level. (More <code>--verbose</code> can be specified on the
-      command line, but would probably have no effect.)</dd>
+      command line, but would normally have no effect.)</dd>
     </dl>
 
     <h2 id="rose-app-run">rose app-run</h2>
