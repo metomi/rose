@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 6
+tests 12
 #-------------------------------------------------------------------------------
 # Basic.
 TEST_KEY=$TEST_KEY_BASE
@@ -33,12 +33,33 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Use ROSE_LAUNCHER_ULIMIT_OPTS.
-TEST_KEY=$TEST_KEY_BASE
+TEST_KEY=$TEST_KEY_BASE-ulimit-good
 ROSE_LAUNCHER_ULIMIT_OPTS='-s unlimited' \
     run_pass "$TEST_KEY" rose mpi-launch --inner bash -c 'ulimit -s'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 unlimited
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Use bad ROSE_LAUNCHER_ULIMIT_OPTS.
+TEST_KEY=$TEST_KEY_BASE-ulimit-bad-opt
+ROSE_LAUNCHER_ULIMIT_OPTS='-Z' run_fail "$TEST_KEY" rose mpi-launch --inner true
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+sed -i '1d' "$TEST_KEY.err" # bash error string may not be portable
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] ROSE_LAUNCHER_ULIMIT_OPTS=-Z
+[FAIL] exit 1
+__ERR__
+#-------------------------------------------------------------------------------
+# Use bad argument in ROSE_LAUNCHER_ULIMIT_OPTS.
+TEST_KEY=$TEST_KEY_BASE-ulimit-bad-opt-arg
+ROSE_LAUNCHER_ULIMIT_OPTS='-s bad' run_fail "$TEST_KEY" \
+    rose mpi-launch --inner true
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+sed -i '1d' "$TEST_KEY.err" # bash error string may not be portable
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] ROSE_LAUNCHER_ULIMIT_OPTS=-s bad
+[FAIL] exit 1
+__ERR__
 #-------------------------------------------------------------------------------
 exit
