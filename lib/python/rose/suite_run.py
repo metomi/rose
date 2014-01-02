@@ -459,7 +459,7 @@ class SuiteRunner(Runner):
             return
 
         # Log directory of this run
-        now_str = datetime.now().strftime("%Y%m%dT%H%M%S")
+        now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
         now_log = "log." + now_str
         self.fs_util.makedirs(now_log)
         self.fs_util.symlink(now_log, "log")

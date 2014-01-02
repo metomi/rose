@@ -745,8 +745,9 @@ class CylcProcessor(SuiteEngineProcessor):
                     cmd = self.popen.get_cmd(
                             "ssh", auth,
                             ("cd %(log_dir_rel)s && " +
-                             "(! test -f %(uuid)s && ls %(glob_)s)") % data)
-                    if self.popen.run(*cmd)[0]:
+                             "(! test -f %(uuid)s && ls -d %(glob_)s)") % data)
+                    rc, ssh_ls_out, err = self.popen.run(*cmd)
+                    if rc:
                         continue
                     try:
                         cmd = self.popen.get_cmd(
@@ -765,6 +766,11 @@ class CylcProcessor(SuiteEngineProcessor):
                         self.popen(*cmd)
                     except RosePopenError as e:
                         self.handle_event(e, level=Reporter.WARN)
+                    else:
+                        for line in sorted(ssh_ls_out.splitlines()):
+                            event = FileSystemEvent(FileSystemEvent.DELETE,
+                                                    auth + ":" + line)
+                            self.handle_event(event)
         finally:
             self.fs_util.delete(uuid_file_name)
 

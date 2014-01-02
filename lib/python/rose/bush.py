@@ -408,7 +408,10 @@ def main():
     if sys.argv[1:]:
         arg = sys.argv[1]
     if arg == "start":
-        start(is_main=True)
+        port = None
+        if sys.argv[2:]:
+            port = sys.argv[2]
+        start(is_main=True, port=port)
     else:
         report = Reporter(opts.verbosity - opts.quietness)
         status = rose_bush_quick_server_status()
@@ -424,7 +427,7 @@ def main():
             # TODO: should check whether it is killed or not
 
 
-def start(is_main=False):
+def start(is_main=False, port=None):
     """Create the server.
 
     If is_main, invoke cherrypy.quickstart.
@@ -477,6 +480,8 @@ def start(is_main=False):
         open(cherrypy.config["log.error_file"], "w").close()
         cherrypy.config["request.error_response"] = _handle_error
         config["global"] = {"server.socket_host": "0.0.0.0"}
+        if port:
+            config["global"] = {"server.socket_port": int(port)}
         f = open(LOG_STATUS, "w")
         f.write("host=%s\n" % cherrypy.server.socket_host)
         f.write("port=%d\n" % cherrypy.server.socket_port)
