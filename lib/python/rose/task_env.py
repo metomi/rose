@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# (C) British Crown Copyright 2012-3 Met Office.
+# (C) British Crown Copyright 2012-4 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
