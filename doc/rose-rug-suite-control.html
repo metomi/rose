@@ -294,7 +294,7 @@ rose suite-run -- --mode=simulation
     "#rose-suite-run.locations">Locations</a>, if
     <var>$HOME/cylc-run/$NAME/</var> is not a suitable physical location for
     hosting the suite runtime files, (perhaps the disk does not have enough
-    space or have poor performance), it is possible to configure the root of an
+    space or has poor performance), it is possible to configure the root of an
     alternate physical location using the setting <var>root-dir=LIST</var> in
     the suite's <var>rose-suite.conf</var> or the same setting under the
     <var>[rose-suite-run</var> section of the Rose site/user configuration. The
@@ -315,7 +315,7 @@ root-dir=hpc*=$WORKDIR
     create <var>~/cylc-run/$NAME</var> as a symbolic link to
     <var>$WORKDIR/cylc-run/$NAME/</var>.</p>
 
-    <p>In additional to the main suite directory, the <var>share/</var> and
+    <p>In addition to the main suite directory, the <var>share/</var> and
     <var>work/</var> sub-directories can also be configured using the settings
     <var>root-dir-share</var> and <var>root-dir-work</var> respectively.</p>
 
