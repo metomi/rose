@@ -123,6 +123,7 @@ class MainWindow(gtk.Window):
                                      self.search_manager.get_datasource()))
         splash_updater.update(rosie.browser.SPLASH_INITIAL_QUERY.format(
                                             rosie.browser.PROGRAM_NAME))
+        self.viewing_user = None
         self.initial_filter(opts, args)
         self.nav_bar.simple_search_entry.grab_focus()
         splash_updater.update(rosie.browser.SPLASH_READY.format(
@@ -290,10 +291,12 @@ class MainWindow(gtk.Window):
                 uname = user
             self.refresh_url = "roses:" + uname + "/"
             srch = repr(self.refresh_url)
+            self.viewing_user = uname
         else:
             self.nav_bar.address_box.child.set_text("roses:/")
             self.refresh_url = "roses:/"
             srch = repr("home")
+            self.viewing_user = None
         self.statusbar.set_status_text(rosie.browser.STATUS_FETCHING,
                                        instant=True)
         self.statusbar.set_progressbar_pulsing(True)
@@ -982,10 +985,12 @@ class MainWindow(gtk.Window):
         path = kwargs.get("path", None)
         id_ = SuiteId(id_text=self.get_selected_suite_id(path))
         if kwargs.get("test", False):
-            url = self.suite_engine_proc.get_suite_log_url(None, str(id_))
+            url = self.suite_engine_proc.get_suite_log_url(self.viewing_user,
+                                                           str(id_))
             return (url is not None)
         else:
-            self.suite_engine_proc.launch_suite_log_browser(None, str(id_))
+            self.suite_engine_proc.launch_suite_log_browser(self.viewing_user,
+                                                            str(id_))
 
     def handle_view_output_event(self, event, *args, **kwargs):
         if isinstance(event, WebBrowserEvent):
