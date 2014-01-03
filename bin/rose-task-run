@@ -39,12 +39,6 @@
 #     Additional options are:
 #     --app-key=KEY
 #         Specify a named application configuration.
-#     --app-mode=MODE
-#         Run a builtin application identified by MODE. Disable automatic task
-#         name association with a builtin application. If this option is not
-#         specified, it will attempt use the task name to look for a builtin
-#         application. If the task name does not match a builtin application,
-#         the default MODE is to run the command.
 #
 # ENVIRONMENT VARIABLES
 #     All environment variables of "rose app-run" and "rose task-env" are
