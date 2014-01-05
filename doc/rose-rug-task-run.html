@@ -88,7 +88,7 @@
     <h3 id="rose-task-run.app">Application Configuration Selection</h3>
 
     <p>The <code>rose task-run</code> command selects its application
-    configuration with the following logic:</p>
+    configuration the following logic:</p>
 
     <ol>
       <li>If the <code>--config=DIR</code> option is specified, it uses the
@@ -117,17 +117,18 @@
     Guide: CLI &gt; rose task-env</a>.</p>
 
     <p>The <code>rose task-run</code> command also sets up the <var>PATH</var>
-    environment variable, and if relevant other PATH-like environment variables,
+    environment variable and, if relevant other PATH-like environment variables,
     (e.g. <var>PYTHONPATH</var>). The following logic is applied in order:</p>
 
     <ol>
-      <li>The command looks for <var>[rose-task-run]path-prepend</var> (for
-      <var>PATH</var>) or <var>[rose-task-run]path-prepend.NAME</var> (where
-      <var>NAME</var> is the name of a PATH-like variable) settings in the
-      site/user configuration files. The values of these settings are expected
-      to be space delimited lists of directory paths. For each directory path,
-      the command will check that it exists before prepending it to the
-      relevant environment variable. E.g.:
+      <li>The command looks for <var>[rose-task-run]path-prepend.NAME</var>
+      settings in the site/user configuration files, where <var>NAME</var> is
+      <var>PATH</var> or the name of a PATH-like variable. (The
+      <var>[rose-task-run]path-prepend</var> setting can be used as a shorthand
+      for <var>[rose-task-run]path-prepend.PATH</var>.) The values of these
+      settings are expected to be space delimited lists of directory paths. For
+      each directory path, the command will check that it exists before
+      prepending it to relevant environment variable. E.g.:
 
         <pre class="prettyprint lang-rose_conf">
 [rose-task-run]
@@ -184,19 +185,19 @@ WORLDS=Mars Jupiter Saturn
     other locations in the suite. It does the following:</p>
     
     <ul>
-      <li>It looks for <var>[file:*]</var> sections of the
+      <li>Install items specified in the <var>[file:*]</var> sections of the
       <var>rose-app.conf</var> file. See <a href=
       "rose-configuration.html#appendix-file-creation-mode">Rose Reference
       Guide: Configuration &gt; Appendix: File Creation Mode</a> for
       detail.</li>
     
-      <li>Any regular files under the <var>file/</var> sub-directory of the
-      application configuration will be copied to the working directory.</li>
+      <li>Copy any any regular files under the <var>file/</var> sub-directory
+      of the application configuration to the working directory.</li>
     </ul>
 
     <p>If the command for the application requires some pre-defined standard
     input, a file called <var>STDIN</var> can be installed in the working
-    directory. When the command is invoked, the content of the file will be
+    directory. When the command is invoked, the contents of the file will be
     piped to the standard input of the command.</p>
 
     <p>The <code>rose task-run</code> command (or the <code>rose app-run</code>
@@ -207,7 +208,7 @@ WORLDS=Mars Jupiter Saturn
 
     <h3 id="rose-task-run.command">Command Selection</h3>
 
-    <p>In command mode (default), the <code>rose task-run</code> command (or the
+    <p>By default, the <code>rose task-run</code> command (or the
     <code>rose app-run</code> command) invokes a shell command. (Alternatively,
     the <code>rose task-run</code> command invokes a built-in application. See
     <a href="#rose-task-run.built-in-app">Built-in Applications Selection</a> for
@@ -265,7 +266,7 @@ greet_martians=echo Greeting Martians
       <li>A built-in application may use a different working directory to a Rose
       application.</li>
 
-      <li>A built-in application will run some pre-defined commands or logics
+      <li>A built-in application will run some pre-defined commands or logic
       instead of a command defined in the application configuration.</li>
     </ol>
 
