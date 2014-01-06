@@ -655,7 +655,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     tar.add(name)
                 tar.close()
                 # N.B. Python's gzip is slow
-                self.popen.run_simple("gzip", archive_file_name0)
+                self.popen.run_simple("gzip", "-f", archive_file_name0)
                 self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
                                                   archive_file_name))
                 for name in sorted(names):
