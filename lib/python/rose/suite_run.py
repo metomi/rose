@@ -392,6 +392,11 @@ class SuiteRunner(Runner):
                 suite_name, host, environ, opts.run_mode, args)
         open("rose-suite-run.host", "w").write(host + "\n")
 
+        # Disconnect log file handle, so monitoring tool command will no longer
+        # be associated with the log file.
+        self.event_handler.contexts[uuid].handle.close()
+        self.event_handler.contexts.pop(uuid)
+
         # Launch the monitoring tool
         # Note: maybe use os.ttyname(sys.stdout.fileno())?
         if os.getenv("DISPLAY") and host and opts.gcontrol_mode:
@@ -511,7 +516,7 @@ class SuiteRunner(Runner):
                 f.add(log)
                 f.close()
                 # N.B. Python's gzip is slow
-                self.popen.run_simple("gzip", log_tar)
+                self.popen.run_simple("gzip", "-f", log_tar)
                 self.handle_event(SuiteLogArchiveEvent(log_tar + ".gz", log))
                 self.fs_util.delete(log)
 
