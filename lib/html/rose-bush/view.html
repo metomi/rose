@@ -18,12 +18,14 @@ rel="stylesheet" media="screen" />
 <div class="navbar-inner">
 <a class="brand" href="{{script}}/">Rose Bush <small>@ {{host}}</small></a>
 <ul class="nav">
-<li><a href="{{script}}/summary/{{user}}">{{user}}</a></li>
-<li><a href="{{script}}/list/{{user}}/{{suite}}">{{suite}}</a></li>
+<li><a href="{{script}}/suites/{{user}}">{{user}}</a></li>
+<li><a><strong>{{suite}}</strong></a></li>
+<li><a href="{{script}}/cycles/{{user}}/{{suite}}">
+<i class="icon icon-tasks" title="cycles list"></i> cycles list</a></li>
+<li><a href="{{script}}/jobs/{{user}}/{{suite}}">
+<i class="icon icon-th-list" title="jobs list"></i> jobs list</a></li>
 </ul>
 <ul class="nav pull-right">
-<li><a class="text-info">page loaded
-<abbr class="livestamp" title="{{time}}">{{time}}</abbr></a></li>
 {% if mode != "text" -%}
 <li class="active"><a>Normal</a></li>
 <li><a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}{%- if path_in_tar -%}&amp;path_in_tar={{path_in_tar}}{%- endif -%}&amp;mode=text">Text</a></li>
@@ -40,10 +42,18 @@ rel="stylesheet" media="screen" />
 <h1>{{path_in_tar}}
 <small>&lt; {{path}}</small>
 </h1>
-<div class="text-right"><small><a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}">{{f_name}}</a></small></div>
+<div><small>
+<a href="{{script}}/view/{{user}}/{{suite}}?path={{path}}">{{f_name}}</a>
+<span class="label">Content loaded
+<abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
+</small></div>
 {% else -%}
 <h1>{{path}}</h1>
-<div class="text-right"><small>{{f_name}}</small></div>
+<div><small>
+{{f_name}}
+<span class="label">Content loaded
+<abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
+</small></div>
 {% endif -%}
 </div>
 <div class="container-fluid">

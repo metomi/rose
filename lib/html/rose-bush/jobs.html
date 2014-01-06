@@ -14,8 +14,12 @@ rel="stylesheet" media="screen" />
 <div class="navbar-inner">
 <a class="brand" href="{{script}}/">Rose Bush <small>@ {{host}}</small></a>
 <ul class="nav">
-<li><a href="{{script}}/summary/{{user}}">{{user}}</a></li>
-<li class="active"><a><strong>{{suite}}</strong></a></li>
+<li><a href="{{script}}/suites/{{user}}">{{user}}</a></li>
+<li><a><strong>{{suite}}</strong></a></li>
+<li><a href="{{script}}/cycles/{{user}}/{{suite}}">
+<i class="icon icon-tasks" title="cycles list"></i> cycles list</a></li>
+<li class="active"><a>
+<i class="icon icon-th-list" title="jobs list"></i> jobs list</a></li>
 {% if files -%}
 {% for scheme, scheme_files in files|dictsort -%}
 {% if scheme_files -%}
@@ -55,32 +59,26 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 </div>
 </li>
 {% endif -%}
-{% if states.is_running or states.is_failed -%}
-<li><a>
-{% if states.is_running -%}
-<span class="label label-info">
-<i class="icon-play icon-white" title="running"></i>
-</span>
-{% endif -%}
 {% if states.is_failed -%}
-<span class="label label-important">
+<li><a><span class="label label-important">
 <i class="icon-warning-sign icon-white" title="failed task(s)"></i>
-</span>
+</span></a></li>
+{% endif -%}
+{% if states.is_running -%}
+<li><a><span class="label label-info">
+<i class="icon-play icon-white" title="running"></i></span>
+{% if states.last_activity_time -%}
+<abbr class="livestamp" title=
+"{{states.last_activity_time}}Z">{{states.last_activity_time}}Z</abbr>
 {% endif -%}
 </a></li>
-{% endif -%}
-</ul>
-<ul class="nav pull-right">
-{% if states.last_activity_time -%}
-<li><a class="text-info">activity
+{% elif states.last_activity_time -%}
+<li><a>
+<i class="icon-stop" title="last active"></i>
 <abbr class="livestamp" title=
-"{{states.last_activity_time}}Z">{{states.last_activity_time}}Z</abbr></a>
-</li><!-- last activity time -->
+"{{states.last_activity_time}}Z">{{states.last_activity_time}}Z</abbr>
+</a></li>
 {% endif -%}
-<li><a class="text-info">page loaded
-<abbr class="livestamp" title="{{time}}">{{time}}</abbr></a>
-</li>
-<li id="toggle-fuzzy-time"><a href="#">time as duration</a></li>
 </ul>
 </div>
 </div>
@@ -95,7 +93,7 @@ href="#filter"><i class="icon-wrench"></i> Display Options</a>
 </div>
 <div id="filter" class="accordion-body collapse in">
 <div class="accordion-inner">
-<form action="{{script}}/list">
+<form action="{{script}}/jobs">
 <input type="hidden" name="user" value="{{user}}" />
 <input type="hidden" name="suite" value="{{suite}}" />
 <fieldset class="container-fluid">
@@ -189,16 +187,20 @@ value="{{k}}">{{v}}</option>
 <div class="container-fluid">
 <div class="row-fluid">
 {% if of_n_entries == 0 -%}
-<div class="span12 text-right">
+<div class="span11">
+<span class="label">Result loaded
+<abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
 <span class="text-info">No match</span>
 </div>
 {% elif per_page == 0 or per_page >= of_n_entries -%}
-<div class="span12 text-right">
+<div class="span11">
+<span class="label">Result loaded
+<abbr class="livestamp" title="{{time}}">{{time}}</abbr></span>
 <span class="text-info">Page 1 of 1 Entries 1-{{of_n_entries}}</span>
 </div>
 {% else -%}
-<div class="span12 text-right">
-<form action="{{script}}/list" class="form-inline">
+<div class="span11">
+<form action="{{script}}/jobs" class="form-inline">
 <input type="hidden" name="user" value="{{user}}" />
 <input type="hidden" name="suite" value="{{suite}}" />
 {% if cycles -%}
@@ -253,10 +255,15 @@ class="btn btn-link"
 {% endif -%}
 >&raquo;</button>
 </li>
+<li><span class="label">Result loaded
+<abbr class="livestamp" title="{{time}}">{{time}}</abbr></span></li>
 </ul>
 </form>
 </div><!-- pager -->
 {% endif -%}
+<div class="span1 text-right">
+<small id="toggle-fuzzy-time"><a href="#">toggle &Delta;t</a></small>
+</div>
 </div>
 </div>
 
@@ -295,6 +302,10 @@ title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
 <span class="badge"
 title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
 {% endif -%}
+{% endif -%}
+<!-- entry: host, submit_method and submit_method_id -->
+{% if entry.status and entry.status == "init" and entry.submit_method_id -%}
+<code class="pull-right">{{entry.host}}: {{entry.submit_method}}: {{entry.submit_method_id}}</code>
 {% endif -%}
 <br/>
 

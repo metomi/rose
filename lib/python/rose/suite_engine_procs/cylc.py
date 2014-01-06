@@ -81,7 +81,8 @@ class CylcProcessor(SuiteEngineProcessor):
     REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     SCHEME = "cylc"
-    STATUSES = {"active": ["ready", "submitting", "submitted", "running"],
+    STATUSES = {"active": ["ready", "queued", "submitting", "submitted",
+                           "submit-retrying", "running", "retrying"],
                 "fail": ["submission failed", "failed"],
                 "success": ["succeeded"]}
     SUITE_CONF = "suite.rc"
@@ -92,6 +93,11 @@ class CylcProcessor(SuiteEngineProcessor):
     def __init__(self, *args, **kwargs):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
         self.daos = {self.SUITE_DB: {}, self.JOB_LOGS_DB: {}}
+        # N.B. Should be considered a constant after initialisation
+        self.STATE_OF = {}
+        for status, names in self.STATUSES.items():
+            for name in names:
+                self.STATE_OF[name] = status
 
     def check_global_conf_compat(self):
         """Raise exception on incompatible Cylc global configuration."""
@@ -274,18 +280,24 @@ class CylcProcessor(SuiteEngineProcessor):
                         signal = message.rsplit(None, 1)[-1]
                         entry["status"] = "fail(%s)" % signal
 
-        submit_num_max_of = {}
+        other_info_of = {}
         for entry in entries:
             cycle = entry["cycle"]
             name = entry["name"]
-            if (cycle, name) not in submit_num_max_of:
-                stmt = ("SELECT submit_num FROM task_states" +
+            if (cycle, name) not in other_info_of:
+                stmt = ("SELECT" +
+                        " submit_num,host,submit_method,submit_method_id" +
+                        " FROM task_states" +
                         " WHERE cycle==? AND name==?")
                 for row in self._db_exec(self.SUITE_DB, user_name, suite_name,
                                          stmt, [cycle, name]):
-                    submit_num_max_of[(cycle, name)] = row[0]
+                    other_info_of[(cycle, name)] = list(row)
                     break
-            entry["submit_num_max"] = submit_num_max_of[(cycle, name)]
+            entry["submit_num_max"] = other_info_of[(cycle, name)][0]
+            if entry["submit_num"] == entry["submit_num_max"]:
+                entry["host"] = other_info_of[(cycle, name)][1]
+                entry["submit_method"] = other_info_of[(cycle, name)][2]
+                entry["submit_method_id"] = other_info_of[(cycle, name)][3]
 
         self._db_close(self.SUITE_DB, user_name, suite_name)
 
@@ -382,6 +394,38 @@ class CylcProcessor(SuiteEngineProcessor):
                                   "size": s.st_size}
         return ("cylc", logs_info)
 
+    def get_suite_cycles_summary(self, user_name, suite_name):
+        """Return a the state summary (of each cycle) of a user's suite.
+
+        Return a data structure that looks like:
+            [   {   "cycle": cycle,
+                    "n_states": {"active": N, "success": M, "fail": L}},
+                },
+                # ...
+            ]
+        where:
+        * cycle is a date-time cycle label
+        * N, M, L are the numbers of tasks in given states
+
+        """
+        stmt_args = self.STATE_OF.keys()
+        stmt = "SELECT cycle,group_concat(status) FROM task_states WHERE"
+        for i in range(len(stmt_args)):
+            if i:
+                stmt += " OR"
+            stmt += " status==?"
+        stmt += " GROUP BY cycle ORDER BY cycle DESC"
+        entries = []
+        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
+                                 stmt_args):
+            cycle, statuses_str = row
+            entry = {"cycle": cycle,
+                     "n_states": {"active": 0, "success": 0, "fail": 0}}
+            entries.append(entry)
+            for status in statuses_str.split(","):
+                entry["n_states"][self.STATE_OF[status]] += 1
+        return entries
+
     def get_suite_state_summary(self, user_name, suite_name):
         """Return a the state summary of a user's suite.
 
@@ -393,27 +437,27 @@ class CylcProcessor(SuiteEngineProcessor):
         * is_failed: a boolean to indicate if any tasks (submit) failed
 
         """
-        last_activity_time = None
+        ret = {"last_activity_time": None,
+               "is_running": False,
+               "is_failed": False}
+        dao = self._db_init(self.SUITE_DB, user_name, suite_name)
+        if not os.access(dao.db_f_name, os.F_OK | os.R_OK):
+            return ret
         stmt = "SELECT time FROM task_events ORDER BY time DESC LIMIT 1"
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
-            last_activity_time = row[0]
+            ret["last_activity_time"] = row[0]
             break
 
-        is_running = self.is_suite_running(user_name, suite_name)
-        is_running = bool(is_running)
+        ret["is_running"] = bool(self.is_suite_running(user_name, suite_name))
 
-        is_failed = False
         stmt = "SELECT status FROM task_states WHERE status GLOB ? LIMIT 1"
         stmt_args = ["*failed"]
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
                                  stmt_args):
-            is_failed = True
+            ret["is_failed"] = True
             break
-        self._db_close(self.SUITE_DB, user_name, suite_name)
 
-        return {"last_activity_time": last_activity_time,
-                "is_running": is_running,
-                "is_failed": is_failed}
+        return ret
 
     def get_task_auth(self, suite_name, task_name):
         """
@@ -922,6 +966,10 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def _db_exec(self, db_name, user_name, suite_name, stmt, stmt_args=None,
                  commit=False):
+        dao = self._db_init(db_name, user_name, suite_name)
+        return dao.execute(stmt, stmt_args, commit)
+
+    def _db_init(self, db_name, user_name, suite_name):
         key = (user_name, suite_name)
         if key not in self.daos[db_name]:
             prefix = "~"
@@ -930,7 +978,7 @@ class CylcProcessor(SuiteEngineProcessor):
             db_f_name = os.path.expanduser(os.path.join(
                     prefix, self.get_suite_dir_rel(suite_name, db_name)))
             self.daos[db_name][key] = DAO(db_f_name)
-        return self.daos[db_name][key].execute(stmt, stmt_args, commit)
+        return self.daos[db_name][key]
 
     def _parse_job_log_base_name(self, f_name):
         """Return (cycle, task, submit_num, ext)."""
