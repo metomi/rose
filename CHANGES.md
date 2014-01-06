@@ -15,6 +15,12 @@ This release of Rose will work best with Cylc 5.4.4 or above.
 
 ### Noteworthy Changes
 
+\#1072: rose bush: cycles summary and other improvements.
+* New: Cycles list: list numbers of active, succeeded and failed jobs for
+  each cycle time.
+* Jobs list: display host, submit method and ID for running jobs.
+* Suites list: reduce amount of information displayed for efficiency.
+
 \#1068: rose bush: recognise the `ready` status.
 
 \#1067: rose.config.dump: use temporary file to stage.
