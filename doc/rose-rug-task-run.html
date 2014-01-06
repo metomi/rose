@@ -88,7 +88,7 @@
     <h3 id="rose-task-run.app">Application Configuration Selection</h3>
 
     <p>The <code>rose task-run</code> command selects its application
-    configuration the following logic:</p>
+    configuration in the following order:</p>
 
     <ol>
       <li>If the <code>--config=DIR</code> option is specified, it uses the
@@ -117,7 +117,7 @@
     Guide: CLI &gt; rose task-env</a>.</p>
 
     <p>The <code>rose task-run</code> command also sets up the <var>PATH</var>
-    environment variable and, if relevant other PATH-like environment variables,
+    environment variable and if relevant, other PATH-like environment variables,
     (e.g. <var>PYTHONPATH</var>). The following logic is applied in order:</p>
 
     <ol>
@@ -191,8 +191,8 @@ WORLDS=Mars Jupiter Saturn
       Guide: Configuration &gt; Appendix: File Creation Mode</a> for
       detail.</li>
     
-      <li>Copy any any regular files under the <var>file/</var> sub-directory
-      of the application configuration to the working directory.</li>
+      <li>Copy any regular files under the <var>file/</var> sub-directory of the
+      application configuration to the working directory.</li>
     </ul>
 
     <p>If the command for the application requires some pre-defined standard
