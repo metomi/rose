@@ -11,15 +11,17 @@ This release of Rose will work best with Cylc 5.4.4 or above.
 
 ### Hightlighted Changes
 
-\#1057: rose CLI: bash command completion.
-
-### Noteworthy Changes
-
 \#1072: rose bush: cycles summary and other improvements.
 * New: Cycles list: list numbers of active, succeeded and failed jobs for
   each cycle time.
 * Jobs list: display host, submit method and ID for running jobs.
 * Suites list: reduce amount of information displayed for efficiency.
+
+\#1057: rose CLI: bash command completion.
+
+### Noteworthy Changes
+
+\#1081: rose config-edit: fix file page unexpected content.
 
 \#1068: rose bush: recognise the `ready` status.
 
