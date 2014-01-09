@@ -35,6 +35,12 @@ TEST_KEY=$TEST_KEY_BASE
 mkdir -p $NAME
 ln -s $TEST_SOURCE_DIR/$TEST_KEY_BASE $NAME/rose-stem
 cd $NAME
+TIMEOUT=$(($(date +%s) + 60))
+while (($(date +%s) < $TIMEOUT)) \
+    && [[ ! -e $SUITE_RUN_DIR/log/job/my_task_1.1.1.status ]]
+do
+    sleep 1
+done
 run_pass "$TEST_KEY" rose suite-stop -y -- --max-polls=12 --interval=5
 cd $OLDPWD
 #-------------------------------------------------------------------------------
