@@ -31,6 +31,8 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
+from rosie.db import (
+    LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 import shlex
 import sqlalchemy as al
 import sys
@@ -42,11 +44,6 @@ import traceback
 class RosieWriteDAO(object):
 
     """Data Access Object for writing to the Rosie web service database."""
-
-    T_LATEST = "latest"
-    T_MAIN = "main"
-    T_OPTIONAL = "optional"
-    T_META = "meta"
 
     def __init__(self, db_url):
         engine = al.create_engine(db_url)
@@ -202,11 +199,11 @@ class RosieSvnPostCommitHook(object):
                 keys_str = " ".join(shlex.split(keys_str))
                 if keys_str:
                     try:
-                        dao.insert(dao.T_META, name="known_keys",
+                        dao.insert(META_TABLE_NAME, name="known_keys",
                                    value=keys_str)
                     except al.exc.IntegrityError:
-                        dao.update(dao.T_META, ("name",), name="known_keys",
-                                   value=keys_str)
+                        dao.update(META_TABLE_NAME, ("name",),
+                                   name="known_keys", value=keys_str)
             status_0 = " "
             from_idx = None
             if (path_num in path_copies and
@@ -288,17 +285,17 @@ class RosieSvnPostCommitHook(object):
                                     status[1])
             optional = suite_info.pop("optional")
             for key, value in optional.items():
-                dao.insert(dao.T_OPTIONAL, idx=idx, branch=branch,
+                dao.insert(OPTIONAL_TABLE_NAME, idx=idx, branch=branch,
                            revision=revision, name=key, value=value)
-            dao.insert(dao.T_MAIN, idx=idx, branch=branch, revision=revision,
-                       **suite_info)
+            dao.insert(MAIN_TABLE_NAME, idx=idx, branch=branch,
+                       revision=revision, **suite_info)
             try:
-                dao.delete(dao.T_LATEST, idx=idx, branch=branch)
+                dao.delete(LATEST_TABLE_NAME, idx=idx, branch=branch)
             except al.exc.IntegrityError:
                 # idx and branch were just added: there is no previous record.
                 pass
             if suite_info["status"][0] != self.ST_DELETED:
-                dao.insert(dao.T_LATEST, idx=idx, branch=branch,
+                dao.insert(LATEST_TABLE_NAME, idx=idx, branch=branch,
                            revision=revision)
 
     def _get_config_node(self, repos, info_file_path, revision):

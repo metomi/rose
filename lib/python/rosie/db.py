@@ -40,6 +40,12 @@ from rose.resource import ResourceLocator
 import rosie.suite_id
 
 
+LATEST_TABLE_NAME = "latest"
+MAIN_TABLE_NAME = "main"
+META_TABLE_NAME = "meta"
+OPTIONAL_TABLE_NAME = "optional"
+
+
 def _col_by_key(table, key):
     for c in table.c:
         if c.key == key:
@@ -76,7 +82,8 @@ class DAO(object):
         self.db_metadata = al.MetaData(self.db_engine)
         self.results = None
         self.tables = {}
-        for n in ["latest", "main", "optional", "meta"]:
+        for n in [LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME,
+                  OPTIONAL_TABLE_NAME]:
             self.tables[n] = al.Table(n, self.db_metadata, autoload=True)
 
     def _execute(self, query):
@@ -91,22 +98,25 @@ class DAO(object):
         Return the joined tables object and columns.
 
         """
-        la_table = self.tables["latest"]
-        mn_table = self.tables["main"]
-        op_table = self.tables["optional"]
-        joined_column_keys = [c.key for c in mn_table.c]
+        latest_table = self.tables[LATEST_TABLE_NAME]
+        main_table = self.tables[MAIN_TABLE_NAME]
+        optional_table = self.tables[OPTIONAL_TABLE_NAME]
+        joined_column_keys = [c.key for c in main_table.c]
         joined_column_keys += ["name", "value"]
-        joined_columns = list(mn_table.c) + [
-            op_table.c.name, op_table.c.value]
+        joined_columns = list(main_table.c) + [
+            optional_table.c.name, optional_table.c.value]
         expr = al.sql.select(joined_columns)
-        m_clause = la_table.c.idx == mn_table.c.idx
-        m_clause &= la_table.c.branch == mn_table.c.branch
-        m_clause &= la_table.c.revision == mn_table.c.revision
-        from_obj = la_table.join(mn_table, onclause=m_clause)
-        o_clause = mn_table.c.idx == op_table.c.idx
-        o_clause &= mn_table.c.branch == op_table.c.branch
-        o_clause &= mn_table.c.revision == op_table.c.revision
-        from_obj = from_obj.outerjoin(op_table, onclause=o_clause)
+        join_main_clause = latest_table.c.idx == main_table.c.idx
+        join_main_clause &= latest_table.c.branch == main_table.c.branch
+        join_main_clause &= latest_table.c.revision == main_table.c.revision
+        from_obj = latest_table.join(main_table,
+                                     onclause=join_main_clause)
+        join_optional_clause = main_table.c.idx == optional_table.c.idx
+        join_optional_clause &= main_table.c.branch == optional_table.c.branch
+        join_optional_clause &= (
+            main_table.c.revision == optional_table.c.revision)
+        from_obj = from_obj.outerjoin(optional_table,
+                                      onclause=join_optional_clause)
         return_cols = []
         for key in joined_column_keys:
             for col in from_obj.c:
@@ -121,17 +131,19 @@ class DAO(object):
         Return the joined tables object and columns.
 
         """
-        mn_table = self.tables["main"]
-        op_table = self.tables["optional"]
-        joined_column_keys = [c.key for c in mn_table.c]
+        main_table = self.tables["main"]
+        optional_table = self.tables["optional"]
+        joined_column_keys = [c.key for c in main_table.c]
         joined_column_keys += ["name", "value"]
-        joined_columns = list(mn_table.c) + [
-            op_table.c.name, op_table.c.value]
+        joined_columns = list(main_table.c) + [
+            optional_table.c.name, optional_table.c.value]
         expr = al.sql.select(joined_columns)
-        o_clause = mn_table.c.idx == op_table.c.idx
-        o_clause &= mn_table.c.branch == op_table.c.branch
-        o_clause &= mn_table.c.revision == op_table.c.revision
-        from_obj = mn_table.outerjoin(op_table, onclause=o_clause)
+        join_optional_clause = main_table.c.idx == optional_table.c.idx
+        join_optional_clause &= main_table.c.branch == optional_table.c.branch
+        join_optional_clause &= (
+            main_table.c.revision == optional_table.c.revision)
+        from_obj = main_table.outerjoin(optional_table,
+                                        onclause=join_optional_clause)
         return_cols = []
         for key in joined_column_keys:
             for col in from_obj.c:
@@ -149,9 +161,10 @@ class DAO(object):
     def get_known_keys(self):
         """Return all known field names."""
         common_keys = self.get_common_keys()
+        meta_table = self.tables[META_TABLE_NAME]
         self._connect()
-        where = (self.tables["meta"].c.name == "known_keys")
-        select = al.sql.select([self.tables["meta"].c.value],
+        where = (meta_table.c.name == "known_keys")
+        select = al.sql.select([meta_table.c.value],
                                whereclause=where)
         self.results = [r[0] for r in self._execute(select)]  # De-proxy.
         if any(self.results):
@@ -288,8 +301,8 @@ class DAO(object):
         return False
 
     def _get_sql_expr(self, expr_tuple, from_obj):
-        opt_name_col = _col_by_key(from_obj, "name")
-        opt_value_col = _col_by_key(from_obj, "value")
+        optional_name_col = _col_by_key(from_obj, "name")
+        optional_value_col = _col_by_key(from_obj, "value")
         column, operator, value = expr_tuple
         if operator not in self.QUERY_OPERATORS:
             return False
@@ -305,8 +318,8 @@ class DAO(object):
                 expr = getattr(col, operator)(value)
                 break
         else:
-            expr1 = opt_name_col == column
-            expr2 = getattr(opt_value_col, operator)(value)
+            expr1 = optional_name_col == column
+            expr2 = getattr(optional_value_col, operator)(value)
             expr = expr1 & expr2
         return expr
 
@@ -339,7 +352,7 @@ class DAO(object):
         else:
             from_obj, cols = self._get_join_and_columns()
         where = None
-        opt_value_col = _col_by_key(from_obj, "value")
+        optional_value_col = _col_by_key(from_obj, "value")
         if not isinstance(s, list):
             s = s.split()
         where = None
@@ -472,7 +485,7 @@ class RosieDatabaseInitiator(object):
             db_string = al.String(self.LEN_DB_STRING)
             tables = []
             tables.append(al.Table(
-                    "latest", metadata,
+                    LATEST_TABLE_NAME, metadata,
                     al.Column("idx", db_string, nullable=False,
                               primary_key=True),
                     al.Column("branch", db_string, nullable=False,
@@ -480,7 +493,7 @@ class RosieDatabaseInitiator(object):
                     al.Column("revision", al.Integer, nullable=False,
                               primary_key=True)))
             tables.append(al.Table(
-                    "main", metadata,
+                    MAIN_TABLE_NAME, metadata,
                     al.Column("idx", db_string, nullable=False,
                               primary_key=True),
                     al.Column("branch", db_string, nullable=False,
@@ -496,7 +509,7 @@ class RosieDatabaseInitiator(object):
                               nullable=False),
                     al.Column("from_idx", db_string)))
             tables.append(al.Table(
-                    "optional", metadata,
+                    OPTIONAL_TABLE_NAME, metadata,
                     al.Column("idx", db_string, nullable=False,
                               primary_key=True),
                     al.Column("branch", db_string, nullable=False,
@@ -507,7 +520,7 @@ class RosieDatabaseInitiator(object):
                               primary_key=True),
                     al.Column("value", db_string)))
             tables.append(al.Table(
-                    "meta", metadata,
+                    META_TABLE_NAME, metadata,
                     al.Column("name", db_string, primary_key=True,
                               nullable=False),
                     al.Column("value", db_string)))
