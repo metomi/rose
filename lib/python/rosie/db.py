@@ -57,10 +57,6 @@ class DAO(object):
     It stores the results of the request in the attribute "results"
     (self.results). This is always a list.
 
-    For example:
-    >>> print DataFetcher("get_main_columns", []).results
-    will print a list of column names in the main table.
-
     """
 
     QUERY_OP_ALIASES = {"eq": "__eq__", "ge": "__ge__", "gt": "__gt__",
@@ -80,7 +76,7 @@ class DAO(object):
         self.db_metadata = al.MetaData(self.db_engine)
         self.results = None
         self.tables = {}
-        for n in ["changeset", "main", "optional", "modified", "meta"]:
+        for n in ["latest", "main", "optional", "meta"]:
             self.tables[n] = al.Table(n, self.db_metadata, autoload=True)
 
     def _execute(self, query):
@@ -90,48 +86,29 @@ class DAO(object):
         return self.results
 
     def _get_join_and_columns(self):
-        """Create the main join.
+        """Create a join of the latest information.
 
-        Return the joined tables and the normal columns to return.
+        Return the joined tables object and columns.
 
         """
-        main_cols = list(self.tables["main"].c)
-        change_select_cols = []
-        change_cols = []
-        ch_table = self.tables["changeset"]
+        la_table = self.tables["latest"]
         mn_table = self.tables["main"]
         op_table = self.tables["optional"]
-        for col in ch_table.c:
-            if col.key == "revision":
-                # Only accept the latest revision info.
-                change_select_cols.append(al.func.max(col).label("revision"))
-                change_cols.append(al.func.max(col).label("revision"))
-            else:
-                change_select_cols.append(col)
-                if col.key not in [c.key for c in main_cols]:
-                    change_cols.append(col)
-        cols = main_cols + change_cols
-        # Extract the latest changeset info for an idx and branch.
-        latest = al.sql.select(change_select_cols)
-        latest = latest.group_by(ch_table.c.idx, ch_table.c.branch)
-        latest = latest.alias("latest")
-
-        # Join the latest changeset info to the main table.
-        c_clause = mn_table.c.idx == latest.c.idx
-        c_clause &= mn_table.c.branch == latest.c.branch
-        c_clause &= latest.c.status != self.TEXT_ST_DELETED
-        from_obj = mn_table.join(latest, onclause=c_clause)
-
-        # Join this to the optional table information.
+        joined_column_keys = [c.key for c in mn_table.c]
+        joined_column_keys += ["name", "value"]
+        joined_columns = list(mn_table.c) + [
+            op_table.c.name, op_table.c.value]
+        expr = al.sql.select(joined_columns)
+        m_clause = la_table.c.idx == mn_table.c.idx
+        m_clause &= la_table.c.branch == mn_table.c.branch
+        m_clause &= la_table.c.revision == mn_table.c.revision
+        from_obj = la_table.join(mn_table, onclause=m_clause)
         o_clause = mn_table.c.idx == op_table.c.idx
         o_clause &= mn_table.c.branch == op_table.c.branch
-        from_obj = from_obj.join(op_table, onclause=o_clause)
-        common_keys = _col_keys(mn_table)
-        for col in ch_table.c:
-            if col.key not in common_keys:
-                common_keys.append(col.key)
+        o_clause &= mn_table.c.revision == op_table.c.revision
+        from_obj = from_obj.outerjoin(op_table, onclause=o_clause)
         return_cols = []
-        for key in common_keys + ["name", "value"]:
+        for key in joined_column_keys:
             for col in from_obj.c:
                 if col.key == key:
                     return_cols.append(col)
@@ -139,109 +116,34 @@ class DAO(object):
         return from_obj, return_cols
 
     def _get_hist_join_and_columns(self):
-        """Create a historical join by extrapolating properties.
+        """Create a join for information across all revisions.
 
-        Return the joined tables and the normal columns to return.
+        Return the joined tables object and columns.
 
         """
-        ch_table = self.tables["changeset"]
         mn_table = self.tables["main"]
-        mo_table = self.tables["modified"]
-        names = []
-        for col in mn_table.c:
-            if col.key not in _col_keys(ch_table):
-                names.append(col.key)
-        names += ["all_main"]  # Just an alias.
-
-        # We want to get all the information for each revision in changeset.
-        change = ch_table.select().alias("change_" + names[0])
-        non_main_clause = None
-        # Now loop over main column properties such as owner, project, title.
-        for i, name in enumerate(names[:-1]):
-            # Find the most recent value of owner, etc for a revision.
-            propss = al.sql.select(
-                      [mo_table.c.revision,
-                       mo_table.c.idx,
-                       mo_table.c.branch,
-                       mo_table.c.new_value.label(name)])
-            propss = propss.where(mo_table.c.name == name)
-            propss = propss.alias("prop_" + name)
-            o_clause = (propss.c.idx == change.c.idx)
-            o_clause &= (propss.c.branch == change.c.branch)
-            o_clause &= (propss.c.revision <= change.c.revision)
-
-            my_full_sel = change.join(propss, onclause=o_clause)
-            # We've now joined all past values of name to a revision row.
-
-            props_name_col = _col_by_key(propss, name)
-
-            full_columns = list(change.c)
-            # We want only the most recent value for name - take max(revision)
-            full_columns += [al.func.max(propss.c.revision).label("maxrev")]
-            full_columns += [props_name_col]
-            full_sel = al.sql.select(
-                          columns=full_columns,
-                          from_obj=my_full_sel,
-                          group_by=change.c.revision)
-            # full_sel now contains all our info.
-            # We don't want 'maxrev' anymore, though.
-            ch_columns = [c for c in full_sel.c if c.key != "maxrev"]
-            change = al.sql.select(columns=ch_columns, from_obj=full_sel)
-            change = change.alias("change_" + names[i + 1])
-
-        for name in names[:-1]:
-            if non_main_clause is None:
-                non_main_clause = mo_table.c.name != name
-            else:
-                non_main_clause &= mo_table.c.name != name
-
-        # Now we need the 'optional' property information e.g. access-list.
-        # This is nearly the same as the above loop logic but grouped by name.
-        propss = al.sql.select(
-                    [mo_table.c.revision,
-                     mo_table.c.idx,
-                     mo_table.c.branch,
-                     mo_table.c.name,
-                     mo_table.c.new_value.label("value")])
-        propss = propss.where(non_main_clause).alias("prop_other")
-        o_clause = (propss.c.idx == change.c.idx)
-        o_clause &= (propss.c.branch == change.c.branch)
-        o_clause &= (propss.c.revision <= change.c.revision)
-
-        my_full_sel = change.join(propss, onclause=o_clause)
-
-        full_columns = list(change.c)
-        full_columns += [al.func.max(propss.c.revision).label("maxrev")]
-        full_columns += [propss.c.name, propss.c.value]
-        full_sel = al.sql.select(
-                      columns=full_columns,
-                      from_obj=my_full_sel,
-                      group_by=[change.c.revision, propss.c.name])
-        ch_columns = [c for c in full_sel.c if c.key != "maxrev"]
-        change = al.sql.select(columns=ch_columns, from_obj=full_sel)
-        change = change.alias("change_all")
-        # Now our joined table contains both 'main' and 'optional' info.
-        common_keys = _col_keys(mn_table)
-        for col in ch_table.c:
-            if col.key not in common_keys:
-                common_keys.append(col.key)
+        op_table = self.tables["optional"]
+        joined_column_keys = [c.key for c in mn_table.c]
+        joined_column_keys += ["name", "value"]
+        joined_columns = list(mn_table.c) + [
+            op_table.c.name, op_table.c.value]
+        expr = al.sql.select(joined_columns)
+        o_clause = mn_table.c.idx == op_table.c.idx
+        o_clause &= mn_table.c.branch == op_table.c.branch
+        o_clause &= mn_table.c.revision == op_table.c.revision
+        from_obj = mn_table.outerjoin(op_table, onclause=o_clause)
         return_cols = []
-        for key in common_keys + ["name", "value"]:
-            return_cols.append(_col_by_key(change, key))
-        return change, return_cols
+        for key in joined_column_keys:
+            for col in from_obj.c:
+                if col.key == key:
+                    return_cols.append(col)
+                    break
+        return from_obj, return_cols
 
     def get_common_keys(self, *args):
         """Return the names of the main and changeset table fields."""
         self._connect()
         self.results = _col_keys(self.tables["main"])
-        for col in self.tables["changeset"].c:
-            if col.key in self.results:
-                continue
-            if col.key == "revision":
-                index = self.results.index("branch") + 1
-                self.results.insert(index, col.key)
-            else:
-                self.results.append(col.key)
         return self.results
 
     def get_known_keys(self):
@@ -261,12 +163,9 @@ class DAO(object):
     def get_optional_keys(self, *args):
         """Return the names of the optional fields."""
         self._connect()
-        select = al.sql.select([self.tables["modified"].c.name])
+        select = al.sql.select([self.tables["optional"].c.name])
         self._execute(select.distinct())
         self.results = [r.pop() for r in self.results]
-        for column_name in self.get_common_keys():
-            if column_name in self.results:
-                self.results.remove(column_name)
         self.results.sort()
         return self.results
 
@@ -573,45 +472,40 @@ class RosieDatabaseInitiator(object):
             db_string = al.String(self.LEN_DB_STRING)
             tables = []
             tables.append(al.Table(
-                    "changeset", metadata,
-                    al.Column("revision", al.Integer, nullable=False,
-                              primary_key=True),
-                    al.Column("author", db_string, nullable=False),
-                    al.Column("date", al.Integer, nullable=False),
+                    "latest", metadata,
                     al.Column("idx", db_string, nullable=False,
                               primary_key=True),
                     al.Column("branch", db_string, nullable=False,
                               primary_key=True),
+                    al.Column("revision", al.Integer, nullable=False,
+                              primary_key=True)))
+            tables.append(al.Table(
+                    "main", metadata,
+                    al.Column("idx", db_string, nullable=False,
+                              primary_key=True),
+                    al.Column("branch", db_string, nullable=False,
+                              primary_key=True),
+                    al.Column("revision", al.Integer, nullable=False,
+                              primary_key=True),
+                    al.Column("owner", db_string, nullable=False),
+                    al.Column("project", db_string, nullable=False),
+                    al.Column("title", db_string, nullable=False),
+                    al.Column("author", db_string, nullable=False),
+                    al.Column("date", al.Integer, nullable=False),
                     al.Column("status", al.String(self.LEN_STATUS),
                               nullable=False),
                     al.Column("from_idx", db_string)))
             tables.append(al.Table(
-                    "main", metadata,
-                    al.Column("idx", db_string, primary_key=True,
-                              nullable=False),
-                    al.Column("branch", db_string, primary_key=True,
-                              nullable=False),
-                    al.Column("owner", db_string, nullable=False),
-                    al.Column("project", db_string, nullable=False),
-                    al.Column("title", db_string, nullable=False)))
-            tables.append(al.Table(
                     "optional", metadata,
-                    al.Column("my_key", al.Integer, primary_key=True,
-                              nullable=False, autoincrement=True),
-                    al.Column("idx", db_string, nullable=False),
-                    al.Column("branch", db_string, nullable=False),
-                    al.Column("name", db_string, nullable=False),
+                    al.Column("idx", db_string, nullable=False,
+                              primary_key=True),
+                    al.Column("branch", db_string, nullable=False,
+                              primary_key=True),
+                    al.Column("revision", al.Integer, nullable=False,
+                              primary_key=True),
+                    al.Column("name", db_string, nullable=False,
+                              primary_key=True),
                     al.Column("value", db_string)))
-            tables.append(al.Table(
-                    "modified", metadata,
-                    al.Column("my_key", al.Integer, primary_key=True,
-                              nullable=False, autoincrement=True),
-                    al.Column("revision", al.Integer, nullable=False),
-                    al.Column("idx", db_string, nullable=False),
-                    al.Column("branch", db_string, nullable=False),
-                    al.Column("name", db_string, nullable=False),
-                    al.Column("old_value", db_string),
-                    al.Column("new_value", db_string)))
             tables.append(al.Table(
                     "meta", metadata,
                     al.Column("name", db_string, primary_key=True,

@@ -1,48 +1,35 @@
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
-CREATE TABLE changeset (
-	revision INTEGER NOT NULL, 
-	author VARCHAR(1024) NOT NULL, 
-	date INTEGER NOT NULL, 
+CREATE TABLE latest (
 	idx VARCHAR(1024) NOT NULL, 
 	branch VARCHAR(1024) NOT NULL, 
-	status VARCHAR(2) NOT NULL, 
-	from_idx VARCHAR(1024), 
-	PRIMARY KEY (revision, idx, branch)
+	revision INTEGER NOT NULL, 
+	PRIMARY KEY (idx, branch, revision)
 );
-INSERT INTO "changeset" VALUES(1,'$USER',1234567890,'foo-aa000','trunk','A ',NULL);
+INSERT INTO "latest" VALUES('foo-aa000','trunk',1);
 CREATE TABLE main (
 	idx VARCHAR(1024) NOT NULL, 
 	branch VARCHAR(1024) NOT NULL, 
+	revision INTEGER NOT NULL, 
 	owner VARCHAR(1024) NOT NULL, 
 	project VARCHAR(1024) NOT NULL, 
 	title VARCHAR(1024) NOT NULL, 
-	PRIMARY KEY (idx, branch)
+	author VARCHAR(1024) NOT NULL, 
+	date INTEGER NOT NULL, 
+	status VARCHAR(2) NOT NULL, 
+	from_idx VARCHAR(1024), 
+	PRIMARY KEY (idx, branch, revision)
 );
-INSERT INTO "main" VALUES('foo-aa000','trunk','iris','eye pad','Should have gone to ...');
+INSERT INTO "main" VALUES('foo-aa000','trunk',1,'iris','eye pad','Should have gone to ...','$USER',1234567890,'A ',NULL);
 CREATE TABLE optional (
-	my_key INTEGER NOT NULL, 
 	idx VARCHAR(1024) NOT NULL, 
 	branch VARCHAR(1024) NOT NULL, 
+	revision INTEGER NOT NULL, 
 	name VARCHAR(1024) NOT NULL, 
 	value VARCHAR(1024), 
-	PRIMARY KEY (my_key)
+	PRIMARY KEY (idx, branch, revision, name)
 );
-INSERT INTO "optional" VALUES(1,'foo-aa000','trunk','access-list','*');
-CREATE TABLE modified (
-	my_key INTEGER NOT NULL, 
-	revision INTEGER NOT NULL, 
-	idx VARCHAR(1024) NOT NULL, 
-	branch VARCHAR(1024) NOT NULL, 
-	name VARCHAR(1024) NOT NULL, 
-	old_value VARCHAR(1024), 
-	new_value VARCHAR(1024), 
-	PRIMARY KEY (my_key)
-);
-INSERT INTO "modified" VALUES(1,1,'foo-aa000','trunk','access-list',NULL,'*');
-INSERT INTO "modified" VALUES(2,1,'foo-aa000','trunk','owner',NULL,'iris');
-INSERT INTO "modified" VALUES(3,1,'foo-aa000','trunk','project',NULL,'eye pad');
-INSERT INTO "modified" VALUES(4,1,'foo-aa000','trunk','title',NULL,'Should have gone to ...');
+INSERT INTO "optional" VALUES('foo-aa000','trunk',1,'access-list','*');
 CREATE TABLE meta (
 	name VARCHAR(1024) NOT NULL, 
 	value VARCHAR(1024), 

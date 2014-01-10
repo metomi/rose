@@ -48,16 +48,17 @@ __POST_COMMIT__
 chmod +x repos/foo/hooks/post-commit
 export LANG=C
 $ROSE_HOME/sbin/rosa db-create -q || exit 1
-Q_CHANGESET='SELECT status,branch,from_idx FROM changeset'
-Q_MAIN='SELECT * FROM main'
+Q_LATEST='SELECT * FROM latest'
+Q_MAIN='SELECT idx,branch,revision,owner,project,title,author,status,from_idx FROM main'
 Q_META='SELECT * FROM meta'
-Q_MODIFIED='SELECT branch,name,old_value,new_value FROM modified'
+Q_OPTIONAL='SELECT * FROM optional'
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-create"
 cat >rose-suite.info <<'__ROSE_SUITE_INFO'
 access-list=*
 owner=ivy
 project=hook
+sub-project=post-commit
 title=test post commit hook: create
 __ROSE_SUITE_INFO
 rosie create -q -y --info-file=rose-suite.info --no-checkout
@@ -67,21 +68,19 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa000|trunk|ivy|hook|test post commit hook: create
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa000|trunk|1|ivy|hook|test post commit hook: create|$LOGNAME|A |
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||hook
-trunk|title||test post commit hook: create
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-aa000|trunk|1
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa000|trunk|1|access-list|*
+foo-aa000|trunk|1|sub-project|post-commit
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-copy-empty"
@@ -98,21 +97,18 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa001'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa001|trunk|ivy|hook|test post commit hook: copy empty
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa001|trunk|2|ivy|hook|test post commit hook: copy empty|$LOGNAME|A |foo-aa000
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa001'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||hook
-trunk|title||test post commit hook: copy empty
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa001'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-aa001|trunk|2
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa001'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|foo-aa000
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa001'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa001|trunk|2|access-list|*
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-edit"
@@ -138,27 +134,29 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa000|trunk|ivy|hook|test post commit hook: create
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa000|trunk|1|ivy|hook|test post commit hook: create|$LOGNAME|A |
+foo-aa000|trunk|3|ivy|hook|test post commit hook: create|$LOGNAME|M |
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||hook
-trunk|title||test post commit hook: create
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-aa000|trunk|3
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
-M |trunk|
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa000|trunk|1|access-list|*
+foo-aa000|trunk|1|sub-project|post-commit
+foo-aa000|trunk|3|access-list|*
+foo-aa000|trunk|3|sub-project|post-commit
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-edit-info"
 #rosie checkout -q foo-aa000
 sed -i 's/project=hook/project=sticky/' $PWD/roses/foo-aa000/rose-suite.info
+sed -i '/^sub-project=/d' $PWD/roses/foo-aa000/rose-suite.info
+echo "description=adhesive" >> $PWD/roses/foo-aa000/rose-suite.info
 svn commit -q -m 't' $PWD/roses/foo-aa000
 svn up -q $PWD/roses/foo-aa000
 file_cmp "$TEST_KEY-hook.out" $PWD/rosa-svn-post-commit.out </dev/null
@@ -167,24 +165,25 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa000|trunk|ivy|sticky|test post commit hook: create
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa000|trunk|1|ivy|hook|test post commit hook: create|$LOGNAME|A |
+foo-aa000|trunk|3|ivy|hook|test post commit hook: create|$LOGNAME|M |
+foo-aa000|trunk|4|ivy|sticky|test post commit hook: create|$LOGNAME| M|
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||hook
-trunk|title||test post commit hook: create
-trunk|project|hook|sticky
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-aa000|trunk|4
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
-M |trunk|
- M|trunk|
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa000|trunk|1|access-list|*
+foo-aa000|trunk|1|sub-project|post-commit
+foo-aa000|trunk|3|access-list|*
+foo-aa000|trunk|3|sub-project|post-commit
+foo-aa000|trunk|4|access-list|*
+foo-aa000|trunk|4|description|adhesive
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-copy-suite-with-content"
@@ -201,21 +200,18 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa002'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa002|trunk|ivy|sticky tape|test post commit hook: copy suite with content
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa002|trunk|5|ivy|sticky tape|test post commit hook: copy suite with content|$LOGNAME|A |foo-aa000
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa002'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||sticky tape
-trunk|title||test post commit hook: copy suite with content
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa002'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-aa002|trunk|5
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa002'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|foo-aa000
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa002'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa002|trunk|5|access-list|*
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-meta"
@@ -232,24 +228,21 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-ROSIE'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-ROSIE|trunk|rosie|meta|configuration metadata for discovery information
-__OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-ROSIE'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||rosie
-trunk|project||meta
-trunk|title||configuration metadata for discovery information
-__OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-ROSIE'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-ROSIE|trunk|6|rosie|meta|configuration metadata for discovery information|$LOGNAME|A |
 __OUT__
 sqlite3 $PWD/repos/foo.db "$Q_META" >"$TEST_KEY-meta.out" || exit 1
 file_cmp "$TEST_KEY-meta.out" "$TEST_KEY-meta.out" </dev/null
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-ROSIE'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-ROSIE|trunk|6
+__OUT__
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-ROSIE'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-ROSIE|trunk|6|access-list|*
+__OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-meta-edit"
 rosie checkout -q foo-ROSIE || exit 1
@@ -262,26 +255,24 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-ROSIE'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-ROSIE|trunk|rosie|meta|configuration metadata for discovery information
-__OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-ROSIE'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||rosie
-trunk|project||meta
-trunk|title||configuration metadata for discovery information
-__OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-ROSIE'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
-M |trunk|
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-ROSIE|trunk|6|rosie|meta|configuration metadata for discovery information|$LOGNAME|A |
+foo-ROSIE|trunk|7|rosie|meta|configuration metadata for discovery information|$LOGNAME|M |
 __OUT__
 sqlite3 $PWD/repos/foo.db "$Q_META" >"$TEST_KEY-meta.out"
 file_cmp "$TEST_KEY-meta.out" "$TEST_KEY-meta.out" <<'__OUT__'
 known_keys|world galaxy universe
+__OUT__
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-ROSIE'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-ROSIE|trunk|7
+__OUT__
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-ROSIE'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-ROSIE|trunk|6|access-list|*
+foo-ROSIE|trunk|7|access-list|*
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-branch"
@@ -292,36 +283,37 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa000|hello|ivy|sticky|test post commit hook: create
-foo-aa000|trunk|ivy|sticky|test post commit hook: create
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa000|hello|8|ivy|sticky|test post commit hook: create|$LOGNAME|A |
+foo-aa000|trunk|1|ivy|hook|test post commit hook: create|$LOGNAME|A |
+foo-aa000|trunk|3|ivy|hook|test post commit hook: create|$LOGNAME|M |
+foo-aa000|trunk|4|ivy|sticky|test post commit hook: create|$LOGNAME| M|
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||hook
-trunk|title||test post commit hook: create
-trunk|project|hook|sticky
-hello|access-list||*
-hello|owner||ivy
-hello|project||sticky
-hello|title||test post commit hook: create
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-aa000|hello|8
+foo-aa000|trunk|4
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
-M |trunk|
- M|trunk|
-A |hello|
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa000|hello|8|access-list|*
+foo-aa000|hello|8|description|adhesive
+foo-aa000|trunk|1|access-list|*
+foo-aa000|trunk|1|sub-project|post-commit
+foo-aa000|trunk|3|access-list|*
+foo-aa000|trunk|3|sub-project|post-commit
+foo-aa000|trunk|4|access-list|*
+foo-aa000|trunk|4|description|adhesive
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-branch-update"
 #rosie checkout -q foo-aa000
 svn switch -q $SVN_URL/a/a/0/0/0/hello $PWD/roses/foo-aa000 || exit 1
 sed -i 's/^title=.*$/title=test post commit hook: branch update/' \
+    $PWD/roses/foo-aa000/rose-suite.info || exit 1
+sed -i 's/^description=.*$/sub-title=This tests a branch update of the hook/'\
     $PWD/roses/foo-aa000/rose-suite.info || exit 1
 svn ci -q -m t $PWD/roses/foo-aa000
 svn switch -q $SVN_URL/a/a/0/0/0/trunk $PWD/roses/foo-aa000 || exit 1
@@ -331,32 +323,32 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa000|hello|ivy|sticky|test post commit hook: branch update
-foo-aa000|trunk|ivy|sticky|test post commit hook: create
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa000|hello|8|ivy|sticky|test post commit hook: create|$LOGNAME|A |
+foo-aa000|hello|9|ivy|sticky|test post commit hook: branch update|$LOGNAME| M|
+foo-aa000|trunk|1|ivy|hook|test post commit hook: create|$LOGNAME|A |
+foo-aa000|trunk|3|ivy|hook|test post commit hook: create|$LOGNAME|M |
+foo-aa000|trunk|4|ivy|sticky|test post commit hook: create|$LOGNAME| M|
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||hook
-trunk|title||test post commit hook: create
-trunk|project|hook|sticky
-hello|access-list||*
-hello|owner||ivy
-hello|project||sticky
-hello|title||test post commit hook: create
-hello|title|test post commit hook: create|test post commit hook: branch update
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-aa000|hello|9
+foo-aa000|trunk|4
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
-M |trunk|
- M|trunk|
-A |hello|
- M|hello|
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa000|hello|8|access-list|*
+foo-aa000|hello|8|description|adhesive
+foo-aa000|hello|9|access-list|*
+foo-aa000|hello|9|sub-title|This tests a branch update of the hook
+foo-aa000|trunk|1|access-list|*
+foo-aa000|trunk|1|sub-project|post-commit
+foo-aa000|trunk|3|access-list|*
+foo-aa000|trunk|3|sub-project|post-commit
+foo-aa000|trunk|4|access-list|*
+foo-aa000|trunk|4|description|adhesive
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-branch-delete"
@@ -367,33 +359,34 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa000|hello|ivy|sticky|test post commit hook: branch update
-foo-aa000|trunk|ivy|sticky|test post commit hook: create
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa000|hello|8|ivy|sticky|test post commit hook: create|$LOGNAME|A |
+foo-aa000|hello|9|ivy|sticky|test post commit hook: branch update|$LOGNAME| M|
+foo-aa000|hello|10|ivy|sticky|test post commit hook: branch update|$LOGNAME|D |
+foo-aa000|trunk|1|ivy|hook|test post commit hook: create|$LOGNAME|A |
+foo-aa000|trunk|3|ivy|hook|test post commit hook: create|$LOGNAME|M |
+foo-aa000|trunk|4|ivy|sticky|test post commit hook: create|$LOGNAME| M|
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||hook
-trunk|title||test post commit hook: create
-trunk|project|hook|sticky
-hello|access-list||*
-hello|owner||ivy
-hello|project||sticky
-hello|title||test post commit hook: create
-hello|title|test post commit hook: create|test post commit hook: branch update
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" <<'__OUT__'
+foo-aa000|trunk|4
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
-M |trunk|
- M|trunk|
-A |hello|
- M|hello|
-D |hello|
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa000|hello|8|access-list|*
+foo-aa000|hello|8|description|adhesive
+foo-aa000|hello|9|access-list|*
+foo-aa000|hello|9|sub-title|This tests a branch update of the hook
+foo-aa000|hello|10|access-list|*
+foo-aa000|hello|10|sub-title|This tests a branch update of the hook
+foo-aa000|trunk|1|access-list|*
+foo-aa000|trunk|1|sub-project|post-commit
+foo-aa000|trunk|3|access-list|*
+foo-aa000|trunk|3|sub-project|post-commit
+foo-aa000|trunk|4|access-list|*
+foo-aa000|trunk|4|description|adhesive
 __OUT__
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-suite-delete"
@@ -404,34 +397,35 @@ file_cmp "$TEST_KEY-hook.rc" $PWD/rosa-svn-post-commit.rc <<<0
 
 TEST_KEY="$TEST_KEY-db-select"
 sqlite3 $PWD/repos/foo.db "$Q_MAIN WHERE idx=='foo-aa000'" >"$TEST_KEY-main.out"
-file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<'__OUT__'
-foo-aa000|hello|ivy|sticky|test post commit hook: branch update
-foo-aa000|trunk|ivy|sticky|test post commit hook: create
+file_cmp "$TEST_KEY-main.out" "$TEST_KEY-main.out" <<__OUT__
+foo-aa000|hello|8|ivy|sticky|test post commit hook: create|$LOGNAME|A |
+foo-aa000|hello|9|ivy|sticky|test post commit hook: branch update|$LOGNAME| M|
+foo-aa000|hello|10|ivy|sticky|test post commit hook: branch update|$LOGNAME|D |
+foo-aa000|trunk|1|ivy|hook|test post commit hook: create|$LOGNAME|A |
+foo-aa000|trunk|3|ivy|hook|test post commit hook: create|$LOGNAME|M |
+foo-aa000|trunk|4|ivy|sticky|test post commit hook: create|$LOGNAME| M|
+foo-aa000|trunk|11|ivy|sticky|test post commit hook: create|$LOGNAME|D |
 __OUT__
-sqlite3 $PWD/repos/foo.db "$Q_MODIFIED WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-modified.out"
-file_cmp "$TEST_KEY-modified.out" "$TEST_KEY-modified.out" <<'__OUT__'
-trunk|access-list||*
-trunk|owner||ivy
-trunk|project||hook
-trunk|title||test post commit hook: create
-trunk|project|hook|sticky
-hello|access-list||*
-hello|owner||ivy
-hello|project||sticky
-hello|title||test post commit hook: create
-hello|title|test post commit hook: create|test post commit hook: branch update
-__OUT__
-sqlite3 $PWD/repos/foo.db "$Q_CHANGESET WHERE idx=='foo-aa000'" \
-    >"$TEST_KEY-changeset.out"
-file_cmp "$TEST_KEY-changeset.out" "$TEST_KEY-changeset.out" <<'__OUT__'
-A |trunk|
-M |trunk|
- M|trunk|
-A |hello|
- M|hello|
-D |hello|
-D |trunk|
+sqlite3 $PWD/repos/foo.db "$Q_LATEST WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-latest.out"
+file_cmp "$TEST_KEY-latest.out" "$TEST_KEY-latest.out" </dev/null
+sqlite3 $PWD/repos/foo.db "$Q_OPTIONAL WHERE idx=='foo-aa000'" \
+    >"$TEST_KEY-optional.out"
+file_cmp "$TEST_KEY-optional.out" "$TEST_KEY-optional.out" <<'__OUT__'
+foo-aa000|hello|8|access-list|*
+foo-aa000|hello|8|description|adhesive
+foo-aa000|hello|9|access-list|*
+foo-aa000|hello|9|sub-title|This tests a branch update of the hook
+foo-aa000|hello|10|access-list|*
+foo-aa000|hello|10|sub-title|This tests a branch update of the hook
+foo-aa000|trunk|1|access-list|*
+foo-aa000|trunk|1|sub-project|post-commit
+foo-aa000|trunk|3|access-list|*
+foo-aa000|trunk|3|sub-project|post-commit
+foo-aa000|trunk|4|access-list|*
+foo-aa000|trunk|4|description|adhesive
+foo-aa000|trunk|11|access-list|*
+foo-aa000|trunk|11|description|adhesive
 __OUT__
 #-------------------------------------------------------------------------------
 exit 0
