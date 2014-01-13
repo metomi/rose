@@ -136,10 +136,10 @@ meta/                   # Metadata for the Rose suite configuration:
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Suite Files (cylc)</h3>
+      <h3 class="alwayshidden">Suite Files (Cylc)</h3>
 
-      <p>There is also a cylc file, which is in a slightly different INI-based
-      format - <samp>suite.rc</samp>. This holds cylc suite dependencies and
+      <p>There is also a Cylc file, which is in a slightly different INI-based
+      format - <samp>suite.rc</samp>. This holds Cylc suite dependencies and
       configuration.</p>
     </div>
 
@@ -305,11 +305,11 @@ should-show-ignored=True
     </div>
 
     <div class="slide">
-      <h3 id="suite-rc">cylc suite.rc</h3>
+      <h3 id="suite-rc">Cylc suite.rc</h3>
 
       <p><em>(Different format)</em></p>
 
-      <p>This is the cylc configuration file - we'll discuss it properly in a
+      <p>This is the Cylc configuration file - we'll discuss it properly in a
       <a href="rose-rug-suites.html">later part</a> of the documentation.</p>
       <pre class="prettyprint lang-cylc">
 #!jinja2
@@ -498,8 +498,8 @@ rose config --meta env=SPAM_NUMBER help
 
       <ul class="incremental">
         <li><kbd>rose suite-run --install-only</kbd>: construct all
-        rose-suite.conf files, copy over files to cylc-run directory, but do
-        not run.</li>
+        <var>rose-suite.conf</var> files, copy over files to <var>~/cylc-run/</var>
+        directory, but do not run.</li>
 
         <li><kbd>rose suite-run -- --mode=simulation</kbd>: (<kbd>cylc
         run</kbd>option) execute all tasks/apps as 'sleep 10'.</li>
@@ -520,8 +520,8 @@ rose config --meta env=SPAM_NUMBER help
       <ul class="incremental">
         <li><kbd>rose suite-scan</kbd>: list your running suites.</li>
 
-        <li><kbd>rose suite-gcontrol</kbd>: launch the cylc gui for the suite
-        in <var>$PWD</var>.</li>
+        <li><kbd>rose suite-gcontrol</kbd>: launch the <code>cylc gui</code> for
+        the suite in <var>$PWD</var>.</li>
 
         <li><kbd>rose suite-shutdown</kbd>: shutdown the suite in
         <var>$PWD</var> at the next opportunity.</li>
@@ -610,7 +610,7 @@ rosie lookup -Q owner eq bob and title contains test
       <p>Points covered:</p>
 
       <ul>
-        <li>5 different Rose configuration files + 1 cylc file</li>
+        <li>5 different Rose configuration files + 1 Cylc file</li>
 
         <li>Running a suite - see also <a href="rose-quick-ref.html">Quick
         Reference</a></li>

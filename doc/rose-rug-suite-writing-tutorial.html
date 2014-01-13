@@ -483,7 +483,7 @@ dead_reckoning.f90
       executable via the <samp>navigate</samp> app config.</p>
 
       <p>We now need to link them together and handle the rest of the inputs,
-      via cylc.</p>
+      via Cylc.</p>
     </div>
 
     <div class="slide">
@@ -598,7 +598,7 @@ touch suite.rc
       <h3 id="clock">clock triggering</h3>
 
       <p>If we were writing a real suite, we'd use the
-      <samp>clock-triggered</samp> <samp>special tasks</samp> setting in cylc
+      <samp>clock-triggered</samp> <samp>special tasks</samp> setting in Cylc
       to make <samp>navigate</samp> trigger off the system wallclock time, and
       adjust the start/end dates to be more current. However, this doesn't
       matter for our example - and we don't want to wait 2 days for the suite
@@ -622,7 +622,7 @@ touch suite.rc
 
       <p>It's important to note that without runtime for each task, our suite
       will fail validation in <code>rose suite-run</code>. This is because
-      <code>rose suite-run</code> uses strict cylc validation to make sure the
+      <code>rose suite-run</code> uses strict Cylc validation to make sure the
       dependency tasks are actually the tasks you intended to run.</p>
 
       <p>You can switch this behaviour off by using the
@@ -661,7 +661,7 @@ touch suite.rc
       <h3 class="alwayshidden">suite.rc Runtime Results</h3>
 
       <p>This sets the environment for the app <samp>navigate</samp>.
-      <var>POS_FPATH</var> is using an environment variable that cylc provides,
+      <var>POS_FPATH</var> is using an environment variable that Cylc provides,
       <var>CYLC_SUITE_SHARE_PATH</var> to define the file path to the lat/long
       position file.</p>
 
@@ -675,7 +675,7 @@ touch suite.rc
       <p>We need to add something that makes our <samp>$POS_FPATH</samp>
       position file in the first place.</p>
 
-      <p>We won't bother with an app for this - we'll just write a little cylc
+      <p>We won't bother with an app for this - we'll just write a little Cylc
       task.</p>
 
       <p>We'll add a task called <samp>write_start_position</samp>. Add it as a
@@ -701,7 +701,7 @@ touch suite.rc
 </pre>
 
       <p>This is because we need both <samp>fcm_make_navigate</samp> and
-      <samp>write_start_position</samp> to run before cylc runs
+      <samp>write_start_position</samp> to run before Cylc runs
       <samp>navigate</samp>.</p>
     </div>
 
@@ -856,7 +856,7 @@ rose suite-log
       <p>It isn't necessary to put all scripting in an app or in the
       <samp>command scripting</samp> in the <samp>suite.rc</samp> - you can put
       scripts in the <samp>bin/</samp> directory of a suite, and they will be
-      added to cylc's path.</p>
+      added to Cylc's path.</p>
     </div>
 
     <div class="slide">
@@ -950,11 +950,11 @@ rose suite-run
     <div class="slide">
       <h2 id="further">Further Reading</h2>
 
-      <p>For examples of more advanced cylc suite functionality, see the
+      <p>For examples of more advanced Cylc suite functionality, see the
       <a href="rose.html#advanced">Advanced Suite Tutorials</a>.</p>
 
       <p>For more information about suites, see the <a href=
-      "http://cylc.github.io/cylc/html/single/cug-html.html">cylc User
+      "http://cylc.github.io/cylc/html/single/cug-html.html">Cylc User
       Guide</a>.</p>
     </div>
   </div>
