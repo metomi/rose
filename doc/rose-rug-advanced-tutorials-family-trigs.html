@@ -162,11 +162,11 @@
       <h3 class="alwayshidden">Run the suite</h3>
 
       <p>Save your changes and run the suite using <samp>rose suite-run</samp>.
-      The cylc gui should launch and you should see the <samp>visit_mine</samp>
-      task run, then trigger the members of the <samp>MINERS</samp> family.
-      Note that some of the <samp>MINERS</samp> tasks may fail so you should
-      stop your suite using the stop button in the cylc gui in order to allow
-      it to shutdown.</p>
+      The <code>cylc gui</code> should launch and you should see the
+      <samp>visit_mine</samp> task run, then trigger the members of the
+      <samp>MINERS</samp> family.  Note that some of the <samp>MINERS</samp>
+      tasks may fail so you should stop your suite using the stop button in the
+      <code>cylc gui</code> in order to allow it to shutdown.</p>
     </div>
 
     <div class="slide">
@@ -214,13 +214,13 @@
       <p>Save your changes and run your suite. You should see the new
       <samp>sell_diamonds</samp> task being run once all the miners have
       finished and at least one of them has succeeded. As before, stop your
-      suite using the stop button in the cylc gui</p>
+      suite using the stop button in the <code>cylc gui</code>.</p>
     </div>
 
     <div class="slide">
       <h2 id="rose-host-select">Family triggering: failure</h2>
 
-      <p>cylc also allows us to trigger off failure of tasks in a particular
+      <p>Cylc also allows us to trigger off failure of tasks in a particular
       family.</p>
 
       <p>We would like to add another task to close down unproductive
