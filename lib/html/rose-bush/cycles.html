@@ -93,10 +93,7 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 {% for entry in entries -%}
 <div class="row-fluid entry">
 <div class="span3">
-<abbr class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</abbr>
-<a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle}}">
-<i class="icon icon-chevron-right"></i>
-</a>
+<a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
 </div>
 {% for state, icon, label in [("active", "play", "info"), ("success", "ok", "success"), ("fail", "warning-sign", "important")] -%}
 {% set n_state = entry.n_states[state] -%}

@@ -276,6 +276,11 @@ class="btn btn-link"
 <span class="label label-important">
 <i class="icon-warning-sign icon-white" title="{{entry.status}}"></i>
 </span>
+{% if entry.status != "fail" and entry.status != "fail(ERR)" -%}
+<span class="label label-important">
+{{entry.status[5:-1]}}
+</span>
+{% endif -%}
 {% elif entry.status == "success" -%}
 <span class="label label-success">
 <i class="icon-ok icon-white" title="{{entry.status}}"></i>
@@ -291,9 +296,9 @@ class="btn btn-link"
 {% endif -%}
 <!-- entry: status -->
 {% if entry.cycle != "1" -%}
-<abbr class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</abbr>
+<a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
 {% endif -%}
-{{entry.name}}
+<a href="{{script}}/jobs/{{user}}/{{suite}}?tasks={{entry.name}}">{{entry.name}}</a>
 {% if entry.submit_num_max > 1 -%}
 {% if entry.submit_num == entry.submit_num_max -%}
 <span class="badge badge-inverse"
