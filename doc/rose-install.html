@@ -134,17 +134,21 @@
         <p><dfn>minimum version required:</dfn> 0.6.9.</p>
       </dd>
 
-      <dt><a href="http://cylc.github.io/cylc/">cylc</a></dt>
+      <dt><a href="http://cylc.github.io/cylc/">Cylc</a></dt>
 
       <dd>
         <p><dfn>used by:</dfn> Rose, as the supported suite engine.</p>
 
-        <p><dfn>tested with version:</dfn> HEAD.</p>
+        <p><dfn>tested with version:</dfn> See <a href=
+        "https://github.com/metomi/rose/blob/master/CHANGES.md">Rose Changes</a>
+        for compatible Cylc versions for this release of Rose.</p>
 
-        <p><dfn>minimum version required:</dfn> 5.3.0</p>
+        <p><dfn>minimum version required:</dfn> See <a href=
+        "https://github.com/metomi/rose/blob/master/CHANGES.md">Rose Changes</a>
+        for compatible Cylc versions for this release of Rose.</p>
 
         <p><dfn>additional requirements:</dfn> Pyro 3, Pygraphviz (for details
-        see the <a href="http://cylc.github.io/cylc/#requirements">cylc
+        see the <a href="http://cylc.github.io/cylc/#requirements">Cylc
         documentation</a>).</p>
       </dd>
 
@@ -171,13 +175,25 @@
 
         <p><dfn>minimum version required:</dfn> 2.3.</p>
       </dd>
+
+      <dt><a href="http://www.perl.org/">Perl</a></dt>
+
+      <dd>
+        <p><dfn>used by:</dfn> Rose test battery, which is a wrapper of the
+        <code>prove</code> command that comes with the <code>TAP::Harness</code>
+        Perl module.</p>
+
+        <p><dfn>tested with version:</dfn> 5.10.1.</p>
+
+        <p><dfn>minimum version required:</dfn> 5.10.1</p>
+      </dd>
     </dl>
 
     <h2 id="hosts">Host Requirements</h2>
 
-    <p>Whilst you can install and use Rose &amp; cylc on a single host (i.e.
+    <p>Whilst you can install and use Rose &amp; Cylc on a single host (i.e.
     machine), most installations are likely to be more complex. There are
-    actually four sets of hosts to consider when installing Rose &amp; cylc.
+    actually four sets of hosts to consider when installing Rose &amp; Cylc.
     Each host has slightly different requirements as follows:</p>
 
     <dl>
@@ -210,7 +226,7 @@
         <p><dfn>Installation requirements:</dfn></p>
 
         <ul>
-          <li>Rose, cylc, Bash, Python, cherrypy, jinja2, simplejson, Pyro.</li>
+          <li>Rose, Cylc, Bash, Python, cherrypy, jinja2, simplejson, Pyro.</li>
 
           <li>Subversion &amp; FCM (only if you want rose suite-run to install
           files from Subversion using FCM keywords).</li>
@@ -233,19 +249,19 @@
         <p><dfn>Installation requirements:</dfn></p>
 
         <ul>
-          <li>Rose, cylc, Bash, Python.</li>
+          <li>Rose, Cylc, Bash, Python.</li>
 
           <li>Subversion &amp; FCM (only if you want to use the Rose install
           utility to install files from Subversion using FCM keywords).</li>
 
-          <li>Pyro (unless you configure cylc to use SSH for task
+          <li>Pyro (unless you configure Cylc to use SSH for task
           communication).</li>
         </ul>
 
         <p><dfn>Connectivity requirements:</dfn></p>
 
         <ul>
-          <li>Must be able to communicate back to the hosts running the cylc
+          <li>Must be able to communicate back to the hosts running the Cylc
           suites via Pyro or SSH.</li>
         </ul>
       </dd>
@@ -256,7 +272,7 @@
         <p><dfn>Installation requirements:</dfn></p>
 
         <ul>
-          <li>Rose, cylc, Bash, Python, requests, simplejson, Subversion, FCM,
+          <li>Rose, Cylc, Bash, Python, requests, simplejson, Subversion, FCM,
           Pyro, Pygraphviz (+ graphviz), PyGTK (+ GTK).</li>
         </ul>
 
@@ -269,25 +285,25 @@
           <li>Must have access to the Rosie Subversion repositories via the
           appropriate protocol.</li>
 
-          <li>Must have HTTP and SSH access to the hosts running the cylc
+          <li>Must have HTTP and SSH access to the hosts running the Cylc
           suites.</li>
 
           <li>Must share user accounts and $HOME directories with the hosts
-          running the cylc suites.</li>
+          running the Cylc suites.</li>
         </ul>
       </dd>
     </dl>
 
-    <p>Note: this section has assumed that you wish to use Rose &amp; cylc
+    <p>Note: this section has assumed that you wish to use Rose &amp; Cylc
     (including their respective GUIs) and use Rosie to store your suites.
     However, there are many ways of using Rose. For instance:</p>
 
     <ul>
-      <li>You can use Rose without using cylc.</li>
+      <li>You can use Rose without using Cylc.</li>
 
-      <li>You can Rose &amp; cylc but not use Rosie.</li>
+      <li>You can Rose &amp; Cylc but not use Rosie.</li>
 
-      <li>You can use Rose &amp; cylc from the command line without using their
+      <li>You can use Rose &amp; Cylc from the command line without using their
       GUIs.</li>
     </ul>
 
