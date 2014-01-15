@@ -31,6 +31,8 @@ from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
+from rosie.db import (
+    LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 import shlex
 import sqlalchemy as al
 import sys
@@ -42,12 +44,6 @@ import traceback
 class RosieWriteDAO(object):
 
     """Data Access Object for writing to the Rosie web service database."""
-
-    T_CHANGESET = "changeset"
-    T_MAIN = "main"
-    T_OPTIONAL = "optional"
-    T_MODIFIED = "modified"
-    T_META = "meta"
 
     def __init__(self, db_url):
         engine = al.create_engine(db_url)
@@ -107,6 +103,7 @@ class RosieSvnPostCommitHook(object):
     ST_ADDED = "A"
     ST_DELETED = "D"
     ST_MODIFIED = "M"
+    ST_UPDATED = "U"
 
     def __init__(self, event_handler=None, popen=None):
         if event_handler is None:
@@ -121,7 +118,6 @@ class RosieSvnPostCommitHook(object):
         command = ["svnlook"] + list(args)
         return self.popen(*command)[0]
 
-
     def _check_path_is_sid(self, path):
         """Return whether the path contains a suffix-id."""
         names = path.split("/")
@@ -134,8 +130,7 @@ class RosieSvnPostCommitHook(object):
                 return False
         return True
 
-
-    def run(self, repos, rev, *args):
+    def run(self, repos, revision, *args):
         """Update database with changes in a changeset."""
         conf = ResourceLocator.default().get_conf()
         rosie_db_node = conf.get(["rosie-db"], no_ignore=True)
@@ -148,17 +143,18 @@ class RosieSvnPostCommitHook(object):
         else:
             return
         dao = RosieWriteDAO(conf.get_value(["rosie-db", "db." + prefix]))
-        statuses = {}
-        copies = {}
-        author = self._svnlook("author", "-r", rev, repos).strip()
+        idx_branch_rev_info = {}
+        author = self._svnlook("author", "-r", revision, repos).strip()
         os.environ["TZ"] = "UTC"
-        d, t, junk = self._svnlook("date", "-r", rev, repos).split(None, 2)
+        d, t, junk = self._svnlook("date", "-r", revision, repos).split(
+            None, 2)
         date = time.mktime(time.strptime(" ".join([d, t, "UTC"]),
                            self.DATE_FMT))
 
+        # Retrieve copied information on the suite-idx-level.
         path_copies = {}
         path_num = -1
-        copy_changes = self._svnlook("changed", "--copy-info", "-r", rev,
+        copy_changes = self._svnlook("changed", "--copy-info", "-r", revision,
                                      repos)
         for i, change in enumerate(copy_changes.splitlines()):
             copy_match = self.REC_COPY_INFO.match(change)
@@ -166,142 +162,169 @@ class RosieSvnPostCommitHook(object):
                 path_copies[path_num] = copy_match.groups()[0]
             else:
                 path_num += 1
-        changes = self._svnlook("changed", "-r", rev, repos)
+        
+        changes = self._svnlook("changed", "-r", revision, repos)
+        suite_statuses = {}
+        path_statuses = []
         for i, line in enumerate(changes.splitlines()):
-            is_new_copied_branch = False
-            status, path = line.split(None, 1)
+            path_status, path = line.rsplit(None, 1)
             if not self._check_path_is_sid(path):
+                # The path must contain a full suite id (e.g. a/a/0/0/1/).
                 continue
+            path_statuses.append((path_status, path, i))
+
+        # Loop through a stack of statuses, paths, and copy info pointers.
+        while path_statuses:
+            path_status, path, path_num = path_statuses.pop(0)
+            is_new_copied_branch = False
             names = path.split("/")
             sid = "".join(names[0:self.LEN_ID])
             idx = prefix + "-" + sid
             branch = names[self.LEN_ID]
-            if branch:
-                statuses.setdefault((rev, idx, branch), {0: " ", 1: " "})
             branch_path = "/".join(sid) + "/" + branch
             info_file_path = branch_path + "/" + self.INFO_FILE
-            if not branch and status[0] == self.ST_DELETED:
-                out = self._svnlook("tree", "-r", str(int(rev) - 1), "-N",
-                                    repos, path)
+            if not branch and path_status[0] == self.ST_DELETED:
+                # The suite has been deleted at the a/a/0/0/1/ level.
+                out = self._svnlook("tree", "-r", str(int(revision) - 1),
+                                    "-N", repos, path)
+                # Include all branches of the suite in the deletion info.
                 for line in out.splitlines()[1:]:
                     del_branch = line.strip().rstrip("/")
-                    statuses.setdefault((rev, idx, del_branch),
-                                        {0: " ", 1: " "})
-                    statuses[(rev, idx, del_branch)][0] = self.ST_DELETED
-            if i in path_copies and self._check_path_is_sid(path_copies[i]):
-                copy_names = path_copies[i].split("/")
-                copy_sid = "".join(copy_names[:self.LEN_ID])
-                if copy_sid != sid:
-                    copies.setdefault((rev, idx, branch), copy_sid)
-                elif branch_path + "/" == path:
-                    is_new_copied_branch = True
+                    path_statuses.append((path_status, path.rstrip("/") +
+                                            "/" + del_branch, None))
             if (sid == "ROSIE" and branch == "trunk" and
                 path == branch_path + "/" + self.KNOWN_KEYS_FILE):
-                keys_str = self._svnlook("cat", "-r", rev, repos, path)
+                # The known keys in the special R/O/S/I/E/ suite have changed.
+                keys_str = self._svnlook("cat", "-r", revision, repos, path)
                 keys_str = " ".join(shlex.split(keys_str))
                 if keys_str:
                     try:
-                        dao.insert(dao.T_META, name="known_keys",
+                        dao.insert(META_TABLE_NAME, name="known_keys",
                                    value=keys_str)
                     except al.exc.IntegrityError:
-                        dao.update(dao.T_META, ("name",), name="known_keys",
-                                   value=keys_str)
-
+                        dao.update(META_TABLE_NAME, ("name",),
+                                   name="known_keys", value=keys_str)
+            status_0 = " "
+            from_idx = None
+            if (path_num in path_copies and
+                self._check_path_is_sid(path_copies[path_num])):
+                copy_names = path_copies[path_num].split("/")
+                copy_sid = "".join(copy_names[:self.LEN_ID])
+                if copy_sid != sid and branch:
+                    # This has been copied from a different suite.
+                    from_idx = prefix + "-" + copy_sid
+                elif branch_path + "/" == path:
+                    # This is a new branch copied from the same suite.
+                    is_new_copied_branch = True
+            
+            # Figure out our status information.
             if path.rstrip("/") == branch_path:
-                if status[0] == self.ST_DELETED:
-                    statuses[(rev, idx, branch)][0] = self.ST_DELETED
-                    continue
-                if status[0] == self.ST_ADDED:
-                    statuses[(rev, idx, branch)][0] = self.ST_ADDED
-            if (len(path) > len(branch_path) and path != info_file_path and
-                statuses[(rev, idx, branch)][0].isspace()):
-                statuses[(rev, idx, branch)][0] = self.ST_MODIFIED
-            if (status[0] == self.ST_DELETED or
-                path != info_file_path and not is_new_copied_branch):
+                if path_status[0] == self.ST_DELETED:
+                    status_0 = self.ST_DELETED
+                if path_status[0] == self.ST_ADDED:
+                    status_0 = self.ST_ADDED
+            if (len(path.rstrip("/")) > len(branch_path) and
+                path != info_file_path and status_0.isspace()):
+                status_0 = self.ST_MODIFIED
+            suite_statuses.setdefault((idx, branch, revision),
+                                      {0: status_0, 1: " "})
+            status_info = suite_statuses[(idx, branch, revision)]
+            if not branch:
+                continue
+            if path.rstrip("/") not in [branch_path, info_file_path]:
+                if branch_path not in [i[1] for i in path_statuses]:
+                    # Make sure the branch gets noticed.
+                    path_statuses.append((self.ST_UPDATED, branch_path, None))
                 continue
 
-            f = tempfile.TemporaryFile()
-            f.write(self._svnlook("cat", "-r", rev, repos, info_file_path))
-            f.seek(0)
-            config = rose.config.load(f)
-            f.close()
+            # Start populating the idx+branch+revision info for this suite.
+            suite_info = idx_branch_rev_info.setdefault(
+                (idx, branch, revision), {})
+            suite_info["author"] = author
+            suite_info["date"] = date
+            suite_info.setdefault("from_idx", None)
+            if from_idx is not None:
+                suite_info["from_idx"] = from_idx
+            suite_info.setdefault("owner", "")
+            suite_info.setdefault("project", "")
+            suite_info.setdefault("title", "")
+            suite_info.setdefault("optional", {})
 
-            is_added = False
-            if status[0] == self.ST_ADDED:
-                old_config = rose.config.ConfigNode()
-                is_added = True
-            else:
-                f = tempfile.TemporaryFile()
-                try:
-                    f.write(self._svnlook("cat", "-r", str(int(rev) -1), repos,
-                                    info_file_path))
-                except RosePopenError:
-                    is_added = True
-                f.seek(0)
-                old_config = rose.config.load(f)
-                f.close()
+            config = self._get_config_node(repos, info_file_path, revision)
 
-            items = {"revision": rev, "idx": idx, "branch":branch}
-            for key, node in old_config.value.items():
-                if node.is_ignored():
-                    continue
-                new_node = config.get([key], no_ignore=True)
-                if new_node is None:
-                    statuses[(rev, idx, branch)].update({1: self.ST_MODIFIED})
-                    dao.insert(dao.T_MODIFIED, name=key, old_value=node.value,
-                               new_value=None, **items)
-                    if key not in ["owner", "project", "title"]:
-                        dao.delete(dao.T_OPTIONAL, idx=idx, branch=branch,
-                                   name=key)
-                elif node.value != new_node.value:
-                    statuses[(rev, idx, branch)].update({1: self.ST_MODIFIED})
-                    dao.insert(dao.T_MODIFIED, name=key, old_value=node.value,
-                               new_value=new_node.value, **items)
-                    if key not in ["owner", "project", "title"]:
-                        dao.update(dao.T_OPTIONAL, ("idx", "branch", "name"),
-                                   idx=idx, branch=branch, name=key,
-                                   value=new_node.value)
+            old_config = self._get_config_node(repos, info_file_path,
+                                               str(int(revision) - 1))
+
+            if config is None and old_config is None:
+                # A technically-invalid commit (likely to be historical).
+                idx_branch_rev_info.pop((idx, branch, revision))
+                continue
+
+            if config is None and status_info[0] == self.ST_DELETED:
+                config = old_config
+            if old_config is None and status_info[0] == self.ST_ADDED:
+                old_config = config
+
+            if self._get_configs_differ(old_config, config):
+                status_info[1] = self.ST_MODIFIED
+
             for key, node in config.value.items():
                 if node.is_ignored():
                     continue
-                old_node = old_config.get([key], no_ignore=True)
-                if old_node is None:
-                    statuses[(rev, idx, branch)].update({1: self.ST_MODIFIED})
-                    dao.insert(dao.T_MODIFIED, name=key, old_value=None,
-                               new_value=node.value, **items)
-                    if key not in ["owner", "project", "title"]:
-                        dao.insert(dao.T_OPTIONAL, idx=idx, branch=branch,
-                                   name=key, value=node.value)
+                if key in ["owner", "project", "title"]:
+                    suite_info[key] = node.value
+                else:
+                    suite_info["optional"][key] = node.value
 
-            items = {}
-            for key in ["owner", "project", "title"]:
-                items[key] = config.get([key], no_ignore=True).value
-            if is_added:
-                try:
-                    dao.insert(dao.T_MAIN, idx=idx, branch=branch, **items)
-                except al.exc.IntegrityError:
-                    dao.update(dao.T_MAIN, ("idx", "branch"), idx=idx,
-                               branch=branch, **items)
-            else:
-                dao.update(dao.T_MAIN, ("idx", "branch"), idx=idx,
-                           branch=branch, **items)
+        # Now loop over all idx+branch+revision suite groups.
+        for suite_id, suite_info in idx_branch_rev_info.items():
+            idx, branch, revision = suite_id
+            status = suite_statuses.get((idx, branch, revision),
+                                        {0: " ", 1: " "})
+            suite_info["status"] = (status[0] +
+                                    status[1])
+            optional = suite_info.pop("optional")
+            for key, value in optional.items():
+                dao.insert(OPTIONAL_TABLE_NAME, idx=idx, branch=branch,
+                           revision=revision, name=key, value=value)
+            dao.insert(MAIN_TABLE_NAME, idx=idx, branch=branch,
+                       revision=revision, **suite_info)
+            try:
+                dao.delete(LATEST_TABLE_NAME, idx=idx, branch=branch)
+            except al.exc.IntegrityError:
+                # idx and branch were just added: there is no previous record.
+                pass
+            if suite_info["status"][0] != self.ST_DELETED:
+                dao.insert(LATEST_TABLE_NAME, idx=idx, branch=branch,
+                           revision=revision)
 
-        # End loop over changes, update statuses.
-        for key, value in statuses.items():
-            rev, idx, branch = key
-            copy_idx = None
-            copy_sid = copies.get(key)
-            if copy_sid is not None:
-                copy_idx = prefix + "-" + copy_sid
-            status = ""
-            if value[0] == self.ST_ADDED:
-                value[1] = " "
-            for num in sorted(value.keys()):
-                status += value[num]
-            if not (status.isspace() and copy_idx is None):
-                dao.insert(dao.T_CHANGESET, revision=rev, idx=idx,
-                           branch=branch, author=author, date=date,
-                           status=status, from_idx=copy_idx)
+    def _get_config_node(self, repos, info_file_path, revision):
+        f = tempfile.TemporaryFile()
+        try:
+            f.write(self._svnlook("cat", "-r", revision, repos,
+                                  info_file_path))
+        except RosePopenError:
+            return None
+        f.seek(0)
+        config = rose.config.load(f)
+        f.close()
+        return config
+
+    def _get_configs_differ(self, config1, config2):
+        for keys1, node1 in config1.walk(no_ignore=True):
+            node2 = config2.get(keys1, no_ignore=True)
+            if type(node1) != type(node2):
+                return True
+            if (not isinstance(node1.value, dict) and
+                node1.value != node2.value):
+                return True
+            if node1.comments != node2.comments:
+                return True
+        for keys2, node2 in config2.walk(no_ignore=True):
+            node1 = config1.get(keys2, no_ignore=True)
+            if node1 is None:
+                return True
+        return False
 
     __call__ = run
 

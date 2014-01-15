@@ -23,7 +23,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 8
+tests 16
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo || exit 1
@@ -80,4 +80,50 @@ sqlite3 $PWD/repos/foo.db '.dump' >"$TEST_KEY.dump"
 sed "s/\\\$USER/$USER/" "$TEST_SOURCE_DIR/$TEST_KEY.dump" >"$TEST_KEY.dump.expected"
 file_cmp "$TEST_KEY.dump" "$TEST_KEY.dump" "$TEST_KEY.dump.expected"
 #-------------------------------------------------------------------------------
-exit 0
+TEST_KEY="$TEST_KEY_BASE-2"
+rm $PWD/repos/foo.db
+cat >rose-suite.info <<'__ROSE_SUITE_INFO'
+access-list=*
+owner=roses
+project=poetry
+title=Roses are Red,...
+__ROSE_SUITE_INFO
+rosie create -q -y --info-file=rose-suite.info || exit 1
+echo "2009-02-13T23:31:31.000000Z" >foo-date-2.txt
+svnadmin setrevprop $PWD/repos/foo -r 2 svn:date foo-date-2.txt
+cat >rose-suite.info <<'__ROSE_SUITE_INFO'
+access-list=*
+owner=roses
+project=poetry
+title=Roses are Red, Violets are Blue,...
+__ROSE_SUITE_INFO
+cp rose-suite.info $PWD/roses/foo-aa001/
+(cd $PWD/roses/foo-aa001 && svn commit -q -m "update" && \
+     svn update -q) || exit 1
+echo "2009-02-13T23:31:32.000000Z" >foo-date-3.txt
+svnadmin setrevprop $PWD/repos/foo -r 3 svn:date foo-date-3.txt
+run_pass "$TEST_KEY" $ROSE_HOME/sbin/rosa db-create
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] sqlite:///$PWD/repos/foo.db: DB created.
+[INFO] $PWD/repos/foo: DB loaded, r3 of 3.
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+sqlite3 $PWD/repos/foo.db '.dump' >"$TEST_KEY.dump"
+sed "s/\\\$USER/$USER/" "$TEST_SOURCE_DIR/$TEST_KEY.dump" >"$TEST_KEY.dump.expected"
+file_cmp "$TEST_KEY.dump" "$TEST_KEY.dump" "$TEST_KEY.dump.expected"
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-3"
+rm $PWD/repos/foo.db
+rosie delete -q -y foo-aa000 || exit 1
+echo "2009-02-13T23:31:33.000000Z" >foo-date-4.txt
+svnadmin setrevprop $PWD/repos/foo -r 4 svn:date foo-date-4.txt
+run_pass "$TEST_KEY" $ROSE_HOME/sbin/rosa db-create
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] sqlite:///$PWD/repos/foo.db: DB created.
+[INFO] $PWD/repos/foo: DB loaded, r4 of 4.
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+sqlite3 $PWD/repos/foo.db '.dump' >"$TEST_KEY.dump"
+sed "s/\\\$USER/$USER/" "$TEST_SOURCE_DIR/$TEST_KEY.dump" >"$TEST_KEY.dump.expected"
+file_cmp "$TEST_KEY.dump" "$TEST_KEY.dump" "$TEST_KEY.dump.expected"
+#-------------------------------------------------------------------------------

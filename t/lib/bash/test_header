@@ -126,6 +126,17 @@ function file_cmp() {
     fail $TEST_KEY
 }
 
+function file_xxdiff() {
+    local TEST_KEY=$1
+    local FILE_ACTUAL=$2
+    local FILE_EXPECT=${3:--}
+    if xxdiff -D $FILE_ACTUAL $FILE_EXPECT; then
+        pass $TEST_KEY
+        return
+    fi
+    fail $TEST_KEY
+}
+
 function file_test() {
     local TEST_KEY=$1
     local FILE=$2
