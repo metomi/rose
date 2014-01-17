@@ -5,21 +5,32 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q1)
+## Next Release (2014-01-??)
 
 This release of Rose will work best with Cylc 5.4.4 or above.
 
 ### Hightlighted Changes
 
-\#1072: rose bush: cycles summary and other improvements.
+\#1085: rosie web service: the web service database schema has been modified to
+improve performance. **This change requires the rosie web service database to
+be re-built.** To do so, shut down the web service. Remove (or move) the old
+database file(s) and run the `$ROSE_HOME/sbin/rosa db-create` command to
+re-build the database.
+
+\#1072, #1084: rose bush: cycles summary and other improvements.
 * New: Cycles list: list numbers of active, succeeded and failed jobs for
   each cycle time.
 * Jobs list: display host, submit method and ID for running jobs.
+* Jobs list: clickable cycles and task names.
 * Suites list: reduce amount of information displayed for efficiency.
 
 \#1057: rose CLI: bash command completion.
 
 ### Noteworthy Changes
+
+\#1090: rose_arch: fix None status in event when source-edit fails.
+
+\#1089: rose bush: catch unicode decode error in view.
 
 \#1081: rose config-edit: fix file page unexpected content.
 
