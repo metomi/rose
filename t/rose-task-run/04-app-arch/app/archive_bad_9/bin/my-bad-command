@@ -1,0 +1,4 @@
+#!/bin/bash
+THIS=$(basename $0)
+echo "[$THIS] $@" >&2
+exit 1

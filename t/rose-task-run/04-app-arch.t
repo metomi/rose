@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 47
+tests 49
 #-------------------------------------------------------------------------------
 # Run the suite, and wait for it to complete
 export ROSE_CONF_PATH=
@@ -133,6 +133,20 @@ TEST_KEY="$TEST_KEY_BASE-bad-archive-8"
 file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_8.$CYCLE.1.err" <<'__ERR__'
 [FAIL] foo://2013010112/planet-n.tar.gz: bad rename-parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
 __ERR__
+TEST_KEY="$TEST_KEY_BASE-bad-archive-9"
+sed '/^\[INFO\] [=!+]/!d;
+     s/\(t(init)=\)[^Z]*Z/\1YYYY-mm-DDTHH:MM:SSZ/;
+     s/\(dt(\(tran\|arch\))=\)[^s]*s/\1SSSSs/g' \
+    "$SUITE_RUN_DIR/log/job/archive_bad_9.$CYCLE.1.out" >"$TEST_KEY.out"
+file_cmp "$TEST_KEY.out" \
+    "$TEST_SOURCE_DIR/$TEST_KEY_BASE-bad-9.out" "$TEST_KEY.out"
+sed 's?\(hello/planet-5.txt\) .*\(/hello/planet-5.txt\)?\1 \2?' \
+    "$SUITE_RUN_DIR/log/job/archive_bad_9.$CYCLE.1.err" >"$TEST_KEY.err"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] my-bad-command $SUITE_RUN_DIR/share/data/2013010112/hello/planet-5.txt /hello/planet-5.txt # return-code=1, stderr=
+[FAIL] [my-bad-command] $SUITE_RUN_DIR/share/data/2013010112/hello/planet-5.txt /hello/planet-5.txt
+__ERR__
+
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0

@@ -271,6 +271,7 @@ class RoseArchApp(BuiltinApp):
             t_tran, t_arch = t_init, t_init
             try:
                 # Rename/edit sources
+                target.status = target.ST_BAD
                 rename_required = False
                 for source in target.sources.values():
                     if source.name != source.orig_name:
@@ -308,7 +309,6 @@ class RoseArchApp(BuiltinApp):
                 rc, out, err = app_runner.popen.run(command, shell=True)
                 t_arch = time()
                 if rc:
-                    target.status = target.ST_BAD
                     app_runner.handle_event(
                                 RosePopenError([command], rc, out, err))
                 else:
