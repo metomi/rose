@@ -47,6 +47,7 @@ UTIL = "bush"
 ROSE_UTIL = "rose-bush"
 LOG_ROOT = os.path.expanduser("~/.metomi/" + ROSE_UTIL)
 LOG_STATUS = LOG_ROOT + ".status"
+MIME_TEXT_PLAIN = "text/plain"
 
 
 class Root(object):
@@ -269,7 +270,7 @@ class Root(object):
             f_size = tar_info.size
             f = tar_f.extractfile(path_in_tar)
             if f.read(2) == "#!":
-                mime = "text/plain"
+                mime = MIME_TEXT_PLAIN
             else:
                 mime = mimetypes.guess_type(
                             urllib.pathname2url(path_in_tar))[0]
@@ -295,7 +296,7 @@ class Root(object):
         else:
             f_size = os.stat(f_name).st_size
             if open(f_name).read(2) == "#!":
-                mime = "text/plain"
+                mime = MIME_TEXT_PLAIN
             else:
                 mime = mimetypes.guess_type(urllib.pathname2url(f_name))[0]
             if (mode == "download" or
@@ -307,7 +308,10 @@ class Root(object):
             s = open(f_name).read()
         if mode == "text":
             s = jinja2.escape(s)
-        lines = s.splitlines()
+        try:
+            lines = [unicode(line) for line in s.splitlines()]
+        except UnicodeDecodeError:
+            return cherrypy.lib.static.serve_file(f_name, MIME_TEXT_PLAIN)
         name = path
         if path_in_tar:
             name = path_in_tar
