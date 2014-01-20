@@ -32,6 +32,8 @@ re-build the database.
 
 \#1089: rose bush: catch unicode decode error in view.
 
+\#1087: document how to contribute to Rose.
+
 \#1081: rose config-edit: fix file page unexpected content.
 
 \#1068: rose bush: recognise the `ready` status.
