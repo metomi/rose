@@ -20,7 +20,6 @@
 
 import os
 import pwd
-from rose.bush import rose_bush_quick_server_status
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
@@ -36,10 +35,7 @@ class RoseBushStartEvent(Event):
     """Event raised on "rose bush start"."""
 
     def __str__(self):
-        status = self.args[0]
-        host = status["host"]
-        port = status["port"]
-        return ("""Rose bush started: http://%s:%s/\n""" % (host, port) +
+        return ("""Rose bush started:\n%s""" % self.args[0] +
                 """Run "rose bush stop" when no longer required.""")
 
 def main():
@@ -83,9 +79,8 @@ def suite_log_view(opts, args, event_handler=None):
         if url.startswith("file://"):
             if (opts.non_interactive or
                 raw_input("Start rose bush? [y/n] (default=n) ") == "y"):
-                suite_engine_proc.popen(
-                            "nohup rose bush start </dev/null 1>/dev/null 2>&1 &",
-                            shell=True)
+                suite_engine_proc.popen.run_bg(
+                            "rose", "bush", "start", preexec_fn=os.setpgrp)
                 is_rose_bush_started = True
                 n_tries_left = 5 # Give the server a chance to start
         while n_tries_left:
@@ -98,7 +93,7 @@ def suite_log_view(opts, args, event_handler=None):
             suite_engine_proc.launch_suite_log_browser(opts.user, opts.name)
             break
         if is_rose_bush_started:
-            status = rose_bush_quick_server_status()
+            status = suite_engine_proc.popen("rose", "bush")[0]
             event_handler(RoseBushStartEvent(status))
     return
 
