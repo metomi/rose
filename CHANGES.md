@@ -5,6 +5,26 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2014-01-22 (2014-01-22)
+
+This release of Rose works best with Cylc 5.4.4 to 5.4.7.
+
+### Hightlighted Changes
+
+-none-
+
+### Noteworthy Changes
+
+\#1095: rose.config: fix bug introduced by #1067. Use of temporary file to dump
+configuration files results in files that are user read-write only. This fix
+ensures that files are dumped with the correct permission according to the
+umask in the environment.
+
+\#1092: rose bush: cycles list: display failed jobs totals, where relevant.
+
+\#1091: rose suite-log: no longer require `rose.bush`, which requires
+`cherrypy`.
+
 ## 2014-01 (2014-01-20)
 
 This release of Rose works best with Cylc 5.4.4 to 5.4.7.
