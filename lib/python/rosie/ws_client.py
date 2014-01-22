@@ -394,7 +394,14 @@ def align(res, keys):
     if len(res) <= 1:
         return res
     for k in keys:
-        if k != "date":
+        if k == "date":
+            time_format = "%Y-%m-%d %H:%M:%S %Z" #possibly put a T in
+            for r in res:
+                try:
+                    r[k] = time.strftime(time_format, time.localtime(r.get(k)))
+                except (TypeError):
+                    pass
+        else:
             try:
                 max_len = max([len(res[i].get(k, "%" + k))
                                for i in range(len(res))])
@@ -403,10 +410,6 @@ def align(res, keys):
                                                       len(r.get(k, "%" + k)))
             except (TypeError, KeyError):
                 pass
-        else:
-            time_format = "%Y-%m-%d %H:%M:%S %Z" #possibly put a T in
-            for r in res:
-                r[k] = time.strftime(time_format, time.localtime(r.get(k)))
     return res
 
 
