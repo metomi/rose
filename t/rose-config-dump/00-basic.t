@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 20
+tests 22
 #-------------------------------------------------------------------------------
 # Basic usage, empty directory.
 TEST_KEY=$TEST_KEY_BASE-basic-empty
@@ -34,11 +34,11 @@ teardown
 # Basic usage, empty files in directory.
 TEST_KEY=$TEST_KEY_BASE-basic-empty-files
 setup
-run_pass "$TEST_KEY" rose config-dump --no-pretty
 touch rose-suite.conf
 mkdir app
 mkdir app/{foo,bar,baz}
 touch app/{foo,bar,baz}/rose-app.conf
+run_pass "$TEST_KEY" rose config-dump --no-pretty
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -190,6 +190,8 @@ PUB=bar
 meta=my-bar/HEAD
 __CONF__
 cp f4 app/baz/rose-app.conf
+stat -c%a rose-suite.conf >"$TEST_KEY.suite.stat"
+stat -c%a app/bar/rose-app.conf >"$TEST_KEY.app-bar.stat"
 run_pass "$TEST_KEY" rose config-dump --no-pretty
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [INFO] M rose-suite.conf
@@ -197,6 +199,10 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 file_cmp "$TEST_KEY.f1" f1 rose-suite.conf
+file_cmp "$TEST_KEY.suite.stat" "$TEST_KEY.suite.stat" \
+    <<<$(stat -c%a rose-suite.conf)
+file_cmp "$TEST_KEY.app-bar.stat" "$TEST_KEY.app-bar.stat" \
+    <<<$(stat -c%a app/bar/rose-app.conf)
 file_cmp "$TEST_KEY.f2" f2 app/foo/rose-app.conf
 file_cmp "$TEST_KEY.f3" f3 app/bar/rose-app.conf
 file_cmp "$TEST_KEY.f4" f4 app/baz/rose-app.conf

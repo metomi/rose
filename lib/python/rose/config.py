@@ -324,6 +324,9 @@ class ConfigDumper(object):
                 self._string_node_dump(key, value, f, env_escape_ok)
         if f is not target:
             f.close()
+            if not os.path.exists(target):
+                open(target, "a").close()
+            os.chmod(f.name, os.stat(target).st_mode)
             os.rename(f.name, target)
 
     __call__ = dump
