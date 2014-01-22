@@ -141,8 +141,8 @@ value="{{per_page}}"
 />
 </div>
 <div class="span3">
-{% for status in ["active", "success", "fail"] -%}
-<label class="checkbox inline" for="no_status_{{status}}">
+{% for status, title in [["active", "active tasks"], ["success", "succeeded tasks"], ["fail", "failed tasks"]] -%}
+<label class="checkbox inline" for="no_status_{{status}}" title="Hide {{title}}">
 <input id="no_status_{{status}}" type="checkbox" name="no_status"
 {% if no_statuses and status in no_statuses -%}
 checked="checked"

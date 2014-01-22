@@ -409,18 +409,24 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
         stmt_args = self.STATE_OF.keys()
-        stmt = "SELECT cycle,group_concat(status) FROM task_states WHERE"
+        stmt = ("SELECT cycle, fail_count, group_concat(status) FROM task_states"
+                " LEFT JOIN (SELECT cycle, count(*) AS fail_count FROM task_events"
+                " WHERE event=='failed' OR event='submission failed'"
+                " GROUP BY cycle) USING (cycle) WHERE (")
         for i in range(len(stmt_args)):
             if i:
                 stmt += " OR"
             stmt += " status==?"
-        stmt += " GROUP BY cycle ORDER BY cycle DESC"
+        stmt += ") GROUP BY cycle ORDER BY cycle DESC"
         entries = []
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
                                  stmt_args):
-            cycle, statuses_str = row
+            cycle, job_fails, statuses_str = row
             entry = {"cycle": cycle,
-                     "n_states": {"active": 0, "success": 0, "fail": 0}}
+                     "n_states": {"active": 0, "success": 0, "fail": 0,
+                                  "job_fails": 0}}
+            if job_fails is not None:
+                entry["n_states"]["job_fails"] = job_fails
             entries.append(entry)
             for status in statuses_str.split(","):
                 entry["n_states"][self.STATE_OF[status]] += 1

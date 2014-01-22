@@ -95,7 +95,7 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 <div class="span3">
 <a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
 </div>
-{% for state, icon, label in [("active", "play", "info"), ("success", "ok", "success"), ("fail", "warning-sign", "important")] -%}
+{% for state, icon, label, title in [("active", "play", "info", "active tasks"), ("success", "ok", "success", "succeeded tasks"), ("fail", "warning-sign", "important", "failed tasks")] -%}
 {% set n_state = entry.n_states[state] -%}
 <div class="span2">
 {% if n_state -%}
@@ -105,8 +105,9 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 <span class="label{% if n_state %} label-{{label}}{% endif %}">
 <i class="icon-{{icon}} icon-white" title="{{state}}"></i>
 </span>
-<span class="badge{% if n_state %}  badge-{{label}}{% endif %}">{{entry.n_states[state]}}</span>
+<span class="badge{% if n_state %}  badge-{{label}}{% endif %}" title="{{title}}">{{entry.n_states[state]}}</span>
 {% if n_state %}</a>{% endif %}
+{% if state=="fail" and entry.n_states["job_fails"] > 0 %}(<span class="badge  badge-{{label}}" title="job failures">{{entry.n_states["job_fails"]}}</span>){% endif %}
 </div>
 {% endfor -%}
 </div>
