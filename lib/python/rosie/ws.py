@@ -122,7 +122,8 @@ class PrefixRoot(object):
     def _render(self, all_revs=False, data=None, filters=None, s=None):
         if data:
             for item in data:
-                suite_id = SuiteId(id_text=item["idx"])
+                suite_id = SuiteId.from_idx_branch_revision(
+                    item["idx"], item["branch"], item["revision"])
                 item["href"] = suite_id.to_web()
         template = self.template_env.get_template("prefix-index.html")
         return template.render(
