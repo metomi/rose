@@ -364,8 +364,8 @@ TEST_KEY=$TEST_KEY_BASE-custom-format-with-date
 run_pass "$TEST_KEY" rosie lookup --format="%suite by %owner at %date" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             by owner  at date
-foo-aa001/trunk@3 by roses  at 2009-02-13 23:31:32 GMT
-foo-aa002/trunk@5 by aphids at 2009-02-13 23:31:34 GMT
+foo-aa001/trunk@3 by roses  at 2009-02-13 23:31:32 +0000
+foo-aa002/trunk@5 by aphids at 2009-02-13 23:31:34 +0000
 url: http://$HOSTNAME:$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null

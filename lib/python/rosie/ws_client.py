@@ -395,7 +395,7 @@ def align(res, keys):
         return res
     for k in keys:
         if k == "date":
-            time_format = "%Y-%m-%d %H:%M:%S %Z" #possibly put a T in
+            time_format = "%Y-%m-%d %H:%M:%S %z" #possibly put a T in
             for r in res:
                 try:
                     r[k] = time.strftime(time_format, time.localtime(r.get(k)))
