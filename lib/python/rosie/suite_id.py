@@ -188,6 +188,17 @@ class SuiteId(object):
         return local_copy_root
 
     @classmethod
+    def from_idx_branch_revision(cls, idx, branch=None, revision=None):
+        id_ = cls(id_text=idx)
+        if not branch:
+            branch = self.BRANCH_TRUNK
+        if not revision:
+            revision = self.REV_HEAD
+        id_.branch = branch
+        id_.revision = revision
+        return cls(id_text=id_.to_string_with_version())
+
+    @classmethod
     def get_next(cls, prefix=None):
         """Return the next available ID in a repository."""
         id = cls.get_latest(prefix)
