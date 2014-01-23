@@ -23,10 +23,11 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 64
+tests 67
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.
 HOSTNAME=$(hostname)
+TZ=UTC
 if ! host $HOSTNAME 1>/dev/null 2>&1; then
     HOSTNAME=localhost # Handle computer no domain name
 fi
@@ -356,6 +357,16 @@ foo-aa001/trunk@3 =     %description              [u'roses', u'violets']
 foo-aa000/trunk@4       Bad corn ear and pew pull [u'*']
 foo-aa002/trunk@5 =     Nom nom nom roses         [u'allthebugs']
 url: http://$HOSTNAME:$PORT/foo/search?all_revs=True&s=a
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-custom-format-with-date
+run_pass "$TEST_KEY" rosie lookup --format="%suite by %owner at %date" a
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+suite             by owner  at date
+foo-aa001/trunk@3 by roses  at 2009-02-13 23:31:32 +0000
+foo-aa002/trunk@5 by aphids at 2009-02-13 23:31:34 +0000
+url: http://$HOSTNAME:$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
