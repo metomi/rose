@@ -34,11 +34,15 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Use ROSE_LAUNCHER_ULIMIT_OPTS.
 TEST_KEY=$TEST_KEY_BASE-ulimit-good
-ROSE_LAUNCHER_ULIMIT_OPTS='-s unlimited' \
+ULIMIT_STACK=$(ulimit -s)
+if [[ $ULIMIT_STACK == 'unlimited' ]]; then
+    ULIMIT_STACK_NEW=$ULIMIT_STACK
+else
+    ULIMIT_STACK_NEW=$(($(ulimit -s) / 2))
+fi
+ROSE_LAUNCHER_ULIMIT_OPTS="-s $ULIMIT_STACK_NEW" \
     run_pass "$TEST_KEY" rose mpi-launch --inner bash -c 'ulimit -s'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-unlimited
-__OUT__
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<$ULIMIT_STACK_NEW
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Use bad ROSE_LAUNCHER_ULIMIT_OPTS.
