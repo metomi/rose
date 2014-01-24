@@ -5,6 +5,21 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-Q1?)
+
+### Hightlighted Changes
+
+-none-
+
+### Noteworthy Changes
+
+\#1097: rosie.ws: fix Trac links in `all_revs` mode, which incorrectly used
+`trunk@HEAD` for everything.
+
+\#1094: rosie lookup: fix `%date` in custom format.
+
+--------------------------------------------------------------------------------
+
 ## 2014-01-22 (2014-01-22)
 
 This release of Rose works best with Cylc 5.4.4 to 5.4.7.
@@ -24,6 +39,8 @@ umask in the environment.
 
 \#1091: rose suite-log: no longer require `rose.bush`, which requires
 `cherrypy`.
+
+--------------------------------------------------------------------------------
 
 ## 2014-01 (2014-01-20)
 
@@ -67,6 +84,8 @@ re-build the database.
 \#1058: rose config-edit: add macro config vetting.
 
 \#1056: rose config-edit: trap upgrade macro errors.
+
+--------------------------------------------------------------------------------
 
 ## 2013-12 (2013-12-02)
 
@@ -130,6 +149,8 @@ in front a path pointing to a Subversion working copy did not get expanded.
 This is now fixed.
 
 \#999: rose app-upgrade: apply trigger fixing after an upgrade.
+
+--------------------------------------------------------------------------------
 
 ## 2013-11 (2013-11-14)
 
