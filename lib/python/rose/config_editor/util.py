@@ -108,66 +108,6 @@ class ImportWidgetError(Exception):
         return self.args[0]
 
 
-def import_object(import_string, from_files, error_handler,
-                  module_prefix=None):
-    """Import a Python callable.
-
-    import_string is the '.' delimited path to the callable,
-    as in normal Python - e.g.
-    rose.config_editor.pagewidget.table.PageTable
-    from_files is a list of available Python file paths to search in
-    error_handler is a function that accepts an Exception instance
-    or string and does something appropriate with it.
-    module_prefix is an optional string to prepend to the module
-    as an alias - this avoids any clashing between same-name modules.
-
-    """
-    is_builtin = False
-    module_name = ".".join(import_string.split(".")[:-1])
-    if module_name.startswith("rose."):
-        is_builtin = True
-    if module_prefix is None:
-        as_name = module_name
-    else:
-        as_name = module_prefix + module_name
-    class_name = import_string.split(".")[-1]
-    module_fpath = "/".join(import_string.rsplit(".")[:-1]) + ".py"
-    if module_fpath == ".py":
-        # Empty module.
-        return None
-    module_files = [f for f in from_files if f.endswith(module_fpath)]
-    if not module_files and not is_builtin:
-        return None
-    module_dirs = set([os.path.dirname(f) for f in module_files])
-    module = None
-    if is_builtin:
-        try:
-            module = __import__(module_name, globals(), locals(),
-                                [], 0)
-        except Exception as e:
-            error_handler(e)
-    else:
-        for filename in module_files:
-            sys.path.insert(0, os.path.dirname(filename))
-            try:
-                module = imp.load_source(as_name, filename)
-            except Exception as e:
-                error_handler(e)
-            sys.path.pop(0)
-    if module is None:
-        error_handler(
-              rose.config_editor.ERROR_LOCATE_OBJECT.format(module_name))
-        return None
-    for submodule in module_name.split(".")[1:]:
-        module = getattr(module, submodule)
-    contents = inspect.getmembers(module)
-    return_object = None
-    for obj_name, obj in contents:
-        if obj_name == class_name and inspect.isclass(obj):
-            return_object = obj
-    return return_object
-
-
 def launch_node_info_dialog(node, changes, search_function):
     """Launch a dialog displaying attributes of a variable or section."""
     title = node.__class__.__name__ + " " + node.metadata['id']

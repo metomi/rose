@@ -255,7 +255,6 @@ ERROR_LOAD_OPT_CONFS = "Could not load optional configurations:\n{0}"
 ERROR_LOAD_OPT_CONFS_FORMAT = "{0}\n    {1}: {2}\n"
 ERROR_LOAD_OPT_CONFS_TITLE = "Error loading opt configs"
 ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
-ERROR_LOCATE_OBJECT = "Could not locate {0}"
 ERROR_METADATA_CHECKER_TITLE = "Flawed metadata warning"
 ERROR_METADATA_CHECKER_TEXT = (
                        "{0} problem(s) found in metadata at {1}.\n" +
