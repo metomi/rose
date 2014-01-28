@@ -23,11 +23,11 @@
 ;; = Instructions =
 ;;    Place this file in a directory on your emacs load path (or symlink it)
 ;;    e.g.
-;;         ln -s $ROSE_HOME/etc/rose-conf-mode.el $HOME/.emacs.d/
+;;         ln -s $ROSE_HOME/etc/rose-conf-mode.el ~/.emacs.d/
 ;;
 ;;    and in your .emacs file:
 ;;
-;;         (add-to-list 'load-path "$HOME/.emacs.d/")
+;;         (add-to-list 'load-path "~/.emacs.d/")
 ;;         (require 'rose-conf-mode)
 ;;
 ;;    This mode introduces one non-standard face, for the ignored
@@ -77,27 +77,29 @@
   (font-lock-add-keywords nil '(("^#.*" . 'font-lock-comment-face)))
   ;; A ! at the start of the line de-activates that line
   (font-lock-add-keywords nil '(("^!.*" . 'font-lock-rose-ignored-face)))
-  (font-lock-add-keywords nil '(("^!\\(!.*\\)" 1 'font-lock-rose-ignored-face)))
   ;; A ! at the start of a section header de-activates that line
   (font-lock-add-keywords nil '(("\\[!.*\\]" . 'font-lock-rose-ignored-face)))
-  (font-lock-add-keywords nil '(("\\(\\[\\)!\\(!.*\\]\\)" 1 'font-lock-rose-ignored-face)))
-  (font-lock-add-keywords nil '(("\\(\\[\\)!\\(!.*\\]\\)" 2 'font-lock-rose-ignored-face)))
-  ;; And for double !! highlight one of them to make it stand out
-  (font-lock-add-keywords nil '(("\\(!\\)!" 1 'font-lock-constant-face)))
   ;; Any ! at the start of a section header de-activates the whole section
-  (font-lock-add-keywords nil '(("\\[!+.*]\\([^[]*\n\\)" 1 'font-lock-rose-ignored-face)))
+  (font-lock-add-keywords nil 
+    '(("^\\[!.*\\]\\(\\(.*\n\\)*?\\)\\(?:^\\[[^!]\\|\\(?:\n\\|\t\\)*\\'\\)" 
+        1 'font-lock-rose-ignored-face)))
+
   ;; Add the extend region hook to deal with the multiline matching above
   (add-hook 'font-lock-extend-region-functions
             'rose-font-lock-extend-region)
+
   ;; Make sure jit-lock scans larger multiline regions correctly
-  (set (make-local-variable 'jit-lock-contextually t))
+  (set (make-local-variable 'jit-lock-contextually) t)
 
   ;; Force any other fundamental mode inherit font-locking to be ignored, this
   ;; previously caused double-quotes to break the multiline highlighting
-  (set (make-local-variable 'font-lock-keywords-only t))
+  (set (make-local-variable 'font-lock-keywords-only) t)
 
   ;; And of course we need multiline mode
-  (set (make-local-variable 'font-lock-multiline t)))
+  (set (make-local-variable 'font-lock-multiline) t)
+
+  ;; Run the mode hooks to allow a user to execute mode-specific stuff
+  (run-hooks 'rose-conf-mode-hook))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("rose-.*.conf" . rose-conf-mode))
