@@ -24,12 +24,12 @@ import re
 import sys
 
 import rose.config
-import rose.config_editor.util
 import rose.formats.namelist
 import rose.macro
 import rose.macros
 import rose.opt_parse
 import rose.reporter
+import rose.resource
 
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
@@ -94,10 +94,9 @@ def _check_macro(value, module_files=None, meta_dir=None):
             macro.endswith("." + rose.macro.TRANSFORM_METHOD)):
             macro_name, method = macro.rsplit(".", 1)
         try:
-            macro_obj = rose.config_editor.util.import_object(
-                                                       macro_name,
-                                                       module_files,
-                                                       _import_err_handler)
+            macro_obj = rose.resource.import_object(macro_name,
+                                                    module_files,
+                                                    _import_err_handler)
         except Exception as e:
             return INVALID_IMPORT.format(
                                   macro,
@@ -189,12 +188,12 @@ def _check_widget(value, module_files=None, meta_dir=None):
         return
     widget_name = value.split()[0]
     try:
-        widget = rose.config_editor.util.import_object(widget_name,
-                                                       module_files,
-                                                       _import_err_handler)
+        widget = rose.resource.import_object(widget_name,
+                                             module_files,
+                                             _import_err_handler)
     except Exception as e:
         return INVALID_IMPORT.format(widget_name,
-                                            type(e).__name__ + ": " + str(e))
+                                     type(e).__name__ + ": " + str(e))
     if widget is None:
         return INVALID_OBJECT.format(value)
 

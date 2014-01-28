@@ -37,6 +37,7 @@ import rose.config_editor.variable
 import rose.formats
 import rose.gtk.dialog
 import rose.gtk.util
+import rose.resource
 import rose.variable
 
 
@@ -468,7 +469,7 @@ class ConfigPage(gtk.VBox):
                                              (widget_dir in x))
             prefix = re.sub("[^\w]", "_", self.config_name.strip("/"))
             prefix += "/" + rose.META_DIR_WIDGET + "/"
-            custom_widget = rose.config_editor.util.import_object(
+            custom_widget = rose.resource.import_object(
                                         widget_path,
                                         metadata_files,
                                         self.handle_bad_custom_sub_widget,
@@ -642,7 +643,7 @@ class ConfigPage(gtk.VBox):
                 widget_path, widget_args = widget_name_args[0], None
             metadata_files = self.section_ops.get_ns_metadata_files(
                                                   self.namespace)
-            custom_widget = rose.config_editor.util.import_object(
+            custom_widget = rose.resource.import_object(
                                         widget_path,
                                         metadata_files,
                                         self.handle_bad_custom_main_widget)
