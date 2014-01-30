@@ -38,5 +38,6 @@ cd "$TEST_KEY/$NAME"
 run_pass "$TEST_KEY" rose suite-stop -y -- --max-polls=12 --interval=5
 cd $OLDPWD
 #-------------------------------------------------------------------------------
+sleep 1
 rose suite-clean -q -y $NAME
 exit 0

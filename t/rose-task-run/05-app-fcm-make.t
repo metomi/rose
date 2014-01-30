@@ -31,7 +31,9 @@ if ! fcm help make 1>/dev/null 2>&1; then
 fi
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
-JOB_HOST=$(rose host-select $JOB_HOST)
+if [[ -n $JOB_HOST ]]; then
+    JOB_HOST=$(rose host-select $JOB_HOST)
+fi
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=

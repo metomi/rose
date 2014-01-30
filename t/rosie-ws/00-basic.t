@@ -20,6 +20,10 @@
 # Basic tests for "rosie.ws".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
+if ! python -c 'import sqlalchemy' 2>/dev/null; then
+    skip_all 'python: sqlalchemy not installed'
+fi
+#-------------------------------------------------------------------------------
 ROSA_WS_PID=
 function finally() {
     FINALLY $S
