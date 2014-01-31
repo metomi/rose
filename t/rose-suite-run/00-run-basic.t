@@ -20,10 +20,6 @@
 # Test "rose suite-run", with and without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-
-#-------------------------------------------------------------------------------
-N_TESTS=11
-tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
 if [[ $TEST_KEY_BASE == *conf ]]; then
@@ -33,6 +29,10 @@ if [[ $TEST_KEY_BASE == *conf ]]; then
 else
     export ROSE_CONF_PATH=
 fi
+#-------------------------------------------------------------------------------
+N_TESTS=11
+tests $N_TESTS
+#-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')

@@ -90,7 +90,7 @@ function skip() {
 }
 
 function skip_all() {
-    echo "1..0 # $@"
+    echo "1..0 # SKIP $@"
     exit
 }
 

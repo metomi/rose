@@ -22,14 +22,14 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-N_TESTS=6
-tests $N_TESTS
-#-------------------------------------------------------------------------------
 HOSTS=$(rose config rose-suite-run hosts)
 if [[ -z $HOSTS ]]; then
     skip_all '[rose-suite-run]hosts not defined'
 fi
 HOST=$(rose host-select $HOSTS)
+#-------------------------------------------------------------------------------
+N_TESTS=6
+tests $N_TESTS
 #-------------------------------------------------------------------------------
 # Run the suite.
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
