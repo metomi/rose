@@ -28,8 +28,7 @@ tests $N_TESTS
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')
     if [[ -z $JOB_HOST ]]; then
-        skip $N_TESTS '[t]job-host not defined'
-        exit 0
+        skip_all '[t]job-host not defined'
     fi
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi

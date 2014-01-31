@@ -26,8 +26,7 @@ N_TESTS=10
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 if ! fcm help make 1>/dev/null 2>&1; then
-    skip $N_TESTS 'fcm make unavailable'
-    exit 0
+    skip_all 'fcm make unavailable'
 fi
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')

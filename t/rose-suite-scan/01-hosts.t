@@ -27,8 +27,7 @@ tests $N_TESTS
 #-------------------------------------------------------------------------------
 HOSTS=$(rose config rose-suite-run hosts)
 if [[ -z $HOSTS ]]; then
-    skip $N_TESTS '[rose-suite-run]hosts not defined'
-    exit
+    skip_all '[rose-suite-run]hosts not defined'
 fi
 HOST=$(rose host-select $HOSTS)
 #-------------------------------------------------------------------------------

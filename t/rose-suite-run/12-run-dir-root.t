@@ -25,8 +25,7 @@ N_TESTS=7
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 if [[ -z $TMPDIR || -z $USER || $TMPDIR/$USER == $HOME ]]; then
-    skip $N_TESTS "TMPDIR or USER not defined or TMPDIR/USER is HOME"
-    exit 0
+    skip_all "TMPDIR or USER not defined or TMPDIR/USER is HOME"
 fi
 cp -r $TEST_SOURCE_DIR/$TEST_KEY_BASE/* .
 cat >rose-suite.conf <<__CONF__
