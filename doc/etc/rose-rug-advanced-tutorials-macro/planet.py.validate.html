@@ -74,7 +74,7 @@ class PlanetChecker(rose.macro.MacroBase):
                        "http://www.heavens-above.com/planetsummary.aspx"]
         p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
         text = p.communicate()[0]
-        planets = re.findall("(\w+)&lt;/a&gt;",
+        planets = re.findall("(\w+)&lt;/td&gt;",
                              re.sub('(?s)^.*(tablehead.*?ascension).*$',
                                     r"\1", text))
         distances = re.findall("([\d.]+)&lt;/td&gt;",
