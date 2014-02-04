@@ -27,8 +27,7 @@ tests $N_TESTS
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -z $JOB_HOST ]]; then
-    skip $N_TESTS "$TEST_KEY_BASE: [t]job-host not defined"
-    exit
+    skip_all "$TEST_KEY_BASE: [t]job-host not defined"
 fi
 set -e
 JOB_HOST=$(rose host-select $JOB_HOST)

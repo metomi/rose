@@ -23,21 +23,20 @@
 . $(dirname $0)/test_header
 set -eu
 #-------------------------------------------------------------------------------
-N_TESTS=4
-tests $N_TESTS
-#-------------------------------------------------------------------------------
 HOST=
 OPT_HOST=
 if [[ $TEST_KEY_BASE == *conf ]]; then
     HOST_GROUP=$(rose config --default= 'rose-suite-run' 'hosts')
     if [[ -z $HOST_GROUP ]]; then
-        skip $N_TESTS '[rose-suite-run]hosts not defined'
-        exit 0
+        skip_all '[rose-suite-run]hosts not defined'
     fi
     HOST=$(rose 'host-select' -q $HOST_GROUP)
     OPT_HOST="--host=$HOST"
 fi
 export ROSE_CONF_PATH=
+#-------------------------------------------------------------------------------
+N_TESTS=4
+tests $N_TESTS
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')

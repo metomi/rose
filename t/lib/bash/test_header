@@ -35,6 +35,8 @@
 #         echo "1..$N".
 #     skip N REASON
 #         echo "ok $((++T)) # skip REASON" N times, where T is the test number.
+#     skip_all REASON
+#         echo "1..0 # SKIP $REASON" and exit.
 #     pass TEST_KEY
 #         echo "ok $T - $TEST_KEY" where T is the current test number.
 #     fail TEST_KEY
@@ -85,6 +87,11 @@ function skip() {
     while ((I++ < N_SKIPS)); do
         echo "ok $((++TEST_NUMBER)) # skip $@"
     done
+}
+
+function skip_all() {
+    echo "1..0 # SKIP $@"
+    exit
 }
 
 function pass() {
