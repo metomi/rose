@@ -85,15 +85,8 @@ ${EDITOR:-vi} ~/.metomi/rose.conf
     editor used by GUIs) and the <var>[external] editor</var> (the external text
     editor used by CLI commands) settings in <var>~/.metomi/rose.conf</var> if
     you do not want to use the default.</p>
-    
-    <p>For <code>gvim</code>:</p>
-    <pre class="prettyprint lang-rose_conf">
-[external]
-editor=gvim -f
-geditor=gvim -f
-</pre>
 
-    <p>For <code>emacs</code> and most other text editors, you can do something
+    <p>For <code>emacs</code> and most text editors, you can do something
     like:</p>
     <pre class="prettyprint lang-rose_conf">
 [external]
@@ -101,9 +94,19 @@ editor=emacs
 geditor=emacs
 </pre>
 
+    <p>For any text editor command that normally forks and detaches from the
+    shell it is started it, you should use an option to ensure that the text
+    editor runs in the foreground to allow Rose to wait for the edit session to
+    finish. E.g. for <code>gvim</code>, you will do:</p>
+    <pre class="prettyprint lang-rose_conf">
+[external]
+editor=gvim -f
+geditor=gvim -f
+</pre>
+
     <h3 id="syntax">Editor Syntax Highlighting</h3>
 
-    <p>There are gedit, kate, vim, and emacs plugins for syntax highlighting 
+    <p>There are gedit, kate, vim, and emacs plugins for syntax highlighting
     of Rose configuration files, located at:</p>
 
     <ul>
@@ -112,7 +115,7 @@ geditor=emacs
       <li><samp>$ROSE_HOME/etc/rose-conf.xml</samp></li>
 
       <li><samp>$ROSE_HOME/etc/rose-conf.vim</samp></li>
-      
+
       <li><samp>$ROSE_HOME/etc/rose-conf-mode.el</samp></li>
     </ul>
 
