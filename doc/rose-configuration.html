@@ -734,8 +734,8 @@ delays=0,6*10s,60*1m,1h
       point to a section with a supported scheme in the current configuration,
       e.g. a <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
       supported scheme or be given sufficient information for the system to
-      determine its scheme, e.g. via the <code>schemes</code> setting described
-      below.
+      determine its scheme, e.g. via the root level <code>schemes</code> setting
+      described below.
 
         <p>Normally, a source that does not exist would trigger an error in run
         time. However, it may be useful to have an optional source for a file
@@ -787,13 +787,13 @@ delays=0,6*10s,60*1m,1h
       this mode, <var>SOURCE</var> must be a single source.</dd>
     </dl>
 
-    <p>The <code>schemes</code> setting: While the system would attempt to
-    automatically detect the scheme of a source, the name of the source can
-    sometimes be ambiguous. E.g. A URL with a <samp>http</samp> scheme can be a
-    path in a version control system, or a path to a plain file. The root level
-    <code>schemes</code> setting can be used to help the system to do the right
-    thing. The general syntax of the value of the <code>schemes</code> setting
-    looks like:</p>
+    <p>The root level <code>schemes</code> setting: While the system would
+    attempt to automatically detect the scheme of a source, the name of the
+    source can sometimes be ambiguous. E.g. A URL with a <samp>http</samp>
+    scheme can be a path in a version control system, or a path to a plain file.
+    The root level <code>schemes</code> setting can be used to help the system
+    to do the right thing. The general syntax of the value of the root level
+    <code>schemes</code> setting looks like:</p>
     <pre class="prettyprint lang-rose_conf">
 schemes=PATTERN-1=SCHEME-1
        =PATTERN-2=SCHEME-2
@@ -803,6 +803,12 @@ schemes=PATTERN-1=SCHEME-1
     <pre class="prettyprint lang-rose_conf">
 schemes=hpc*:*=rsync
        =http://host/svn-repos/*=svn
+
+[file:foo.txt]
+source=hpc1:/path/to/foo.txt
+
+[file:bar.txt]
+source=http://host/svn-repos/path/to/bar.txt
 </pre>
 
     <p>In this example, a URI matching the pattern <samp>hpc*:*</samp> would
