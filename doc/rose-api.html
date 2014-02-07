@@ -792,6 +792,11 @@ class SomeTransformer(rose.macro.MacroBase):
         return config, self.reports
 </pre>
 
+    <p>The current working directory within a macro is always the
+    configuration's directory. This makes it easy to access
+    non-<samp>rose-app.conf</samp> files (e.g. in the <samp>file/</samp>
+    subdirectory).</p>
+
     <p>Macros also support the use of keyword arguments, giving you the ability
     to have the user specify some input or override to your macro. For example
     a transformer macro could be written as follows to allow the user to input

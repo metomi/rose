@@ -596,6 +596,7 @@ class MainMenuHandler(object):
     def run_custom_macro(self, config_name=None, module_name=None,
                          class_name=None, method_name=None):
         """Run the custom macro method and launch a dialog."""
+        old_pwd = os.getcwd()
         macro_data = []
         if config_name is None:
             configs = sorted(self.data.config.keys())
@@ -615,6 +616,7 @@ class MainMenuHandler(object):
                 module_name = config_mod_prefix + module_name
         for config_name in configs:
             config_data = self.data.config[config_name]
+            os.chdir(config_data.directory)
             for module in config_data.macros:
                 if module_name is not None and module.__name__ != module_name:
                     continue
@@ -643,6 +645,7 @@ class MainMenuHandler(object):
                             macro_data.append((config_name, macro_inst,
                                                module.__name__, obj_name,
                                                method_name))
+        os.chdir(old_pwd)
         if not macro_data:
             return 0
         sorter = rose.config.sort_settings
@@ -653,13 +656,15 @@ class MainMenuHandler(object):
         for config_name, macro_inst, modname, objname, methname in macro_data:
             macro_fullname = '.'.join([modname, objname, methname])
             macro_config = self.data.dump_to_internal_config(config_name)
-            meta_config = self.data.config[config_name].meta
+            config_data = self.data.config[config_name]
+            meta_config = config_data.meta
             macro_method = getattr(macro_inst, methname)
             optionals = self.inspect_custom_macro(macro_method)
             if optionals:
                 res = self.override_macro_defaults(optionals, objname)
             else:
                 res = {}
+            os.chdir(config_data.directory)
             try:
                 return_value = macro_method(macro_config, meta_config, **res)
             except Exception as e:
@@ -705,7 +710,7 @@ class MainMenuHandler(object):
                                             len(return_value)))
                 self.handle_macro_validation(config_name, macro_fullname,
                                              macro_config, return_value)
-                continue
+        os.chdir(old_pwd)
         if class_name is None:
             # Construct a grouped report.
             config_macro_errors.sort()
@@ -936,7 +941,10 @@ class MainMenuHandler(object):
                 continue
             if (only_this_config_name is None or
                 config_name == only_this_config_name):
-                config_dict[config_name] = config_data.config
+                config_dict[config_name] = {
+                    "config": config_data.config,
+                    "directory": config_data.directory
+                }
         rose.config_editor.upgrade_controller.UpgradeController(
                            config_dict, self.handle_macro_transforms,
                            parent_window=self.mainwindow.window)
