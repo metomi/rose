@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 
 import copy
+import os
 
 import pygtk
 pygtk.require('2.0')
@@ -42,6 +43,7 @@ class UpgradeController(object):
         self.window.set_transient_for(parent_window)
         self.window.set_title(rose.config_editor.DIALOG_TITLE_UPGRADE)
         self.config_dict = {}
+        self.config_directory_dict = {}
         self.config_manager_dict = {}
         config_names = sorted(app_config_dict.keys())
         self._config_version_model_dict = {}
@@ -50,20 +52,25 @@ class UpgradeController(object):
         self.treeview = rose.gtk.util.TooltipTreeView(
                                       get_tooltip_func=self._get_tooltip)
         self.treeview.show()
+        old_pwd = os.getcwd()
         for config_name in config_names:
-            app_config = app_config_dict[config_name]
+            app_config = app_config_dict[config_name]["config"]
+            app_directory = app_config_dict[config_name]["directory"]
             meta_value = app_config.get_value([rose.CONFIG_SECT_TOP,
                                                rose.CONFIG_OPT_META_TYPE], "")
             if len(meta_value.split("/")) < 2:
                 continue
             try:
+                os.chdir(app_directory)
                 manager = rose.upgrade.MacroUpgradeManager(app_config)
             except OSError:
                 # This can occur when access is not allowed to metadata files.
                 continue
             self.config_dict[config_name] = app_config
+            self.config_directory_dict[config_name] = app_directory
             self.config_manager_dict[config_name] = manager
             self._update_treemodel_data(config_name)
+        os.chdir(old_pwd)
         self.treeview.set_model(self.treemodel)
         self.treeview.set_rules_hint(True)
         self.treewindow = gtk.ScrolledWindow()
@@ -128,6 +135,7 @@ class UpgradeController(object):
         self.treewindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.window.set_default_size(*new_size)
         response = self.window.run()
+        old_pwd = os.getcwd()
         if response == gtk.RESPONSE_ACCEPT:
             iter_ = self.treemodel.get_iter_first()
             while iter_ is not None:
@@ -137,46 +145,51 @@ class UpgradeController(object):
                 ok_to_upgrade = self.treemodel.get_value(iter_, 3)
                 config = self.config_dict[config_name]
                 manager = self.config_manager_dict[config_name]
-                if ok_to_upgrade and next_version != curr_version:
-                    manager.set_new_tag(next_version)
-                    macro_config = copy.deepcopy(config)
-                    try:
-                        new_config, change_list = manager.transform(macro_config)
-                    except Exception as e:
-                        rose.gtk.dialog.run_dialog(
-                            rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                            type(e).__name__ + ": " + str(e),
-                            rose.config_editor.ERROR_UPGRADE.format(
-                                config_name.lstrip("/"))
+                directory = self.config_directory_dict[config_name]
+                if not ok_to_upgrade or next_version == curr_version:
+                    iter_ = self.treemodel.iter_next(iter_)
+                    continue
+                os.chdir(directory)
+                manager.set_new_tag(next_version)
+                macro_config = copy.deepcopy(config)
+                try:
+                    new_config, change_list = manager.transform(macro_config)
+                except Exception as e:
+                    rose.gtk.dialog.run_dialog(
+                        rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                        type(e).__name__ + ": " + str(e),
+                        rose.config_editor.ERROR_UPGRADE.format(
+                            config_name.lstrip("/"))
+                    )
+                    iter_ = self.treemodel.iter_next(iter_)
+                    continue
+                macro_id = (type(manager).__name__ + "." +
+                            rose.macro.TRANSFORM_METHOD)
+                if handle_transform_func(config_name, macro_id,
+                                            new_config, change_list,
+                                            triggers_ok=True):
+                    meta_config = rose.macro.load_meta_config(
+                        new_config, config_type=rose.SUB_CONFIG_NAME,
+                        ignore_meta_error=True
+                    )
+                    trig_macro = rose.macros.trigger.TriggerMacro()
+                    macro_config = copy.deepcopy(new_config)
+                    macro_id = (
+                        rose.upgrade.MACRO_UPGRADE_TRIGGER_NAME + "." +
+                        rose.macro.TRANSFORM_METHOD
+                    )
+                    if not trig_macro.validate_dependencies(macro_config,
+                                                            meta_config):
+                        new_trig_config, trig_change_list = (
+                            rose.macros.trigger.TriggerMacro().transform(
+                                macro_config, meta_config)
                         )
-                        iter_ = self.treemodel.iter_next(iter_)
-                        continue
-                    macro_id = (type(manager).__name__ + "." +
-                                rose.macro.TRANSFORM_METHOD)
-                    if handle_transform_func(config_name, macro_id,
-                                             new_config, change_list,
-                                             triggers_ok=True):
-                        meta_config = rose.macro.load_meta_config(
-                            new_config, config_type=rose.SUB_CONFIG_NAME,
-                            ignore_meta_error=True
-                        )
-                        trig_macro = rose.macros.trigger.TriggerMacro()
-                        macro_config = copy.deepcopy(new_config)
-                        macro_id = (
-                            rose.upgrade.MACRO_UPGRADE_TRIGGER_NAME + "." +
-                            rose.macro.TRANSFORM_METHOD
-                        )
-                        if not trig_macro.validate_dependencies(macro_config,
-                                                                meta_config):
-                            new_trig_config, trig_change_list = (
-                                rose.macros.trigger.TriggerMacro().transform(
-                                    macro_config, meta_config)
-                            )
-                            handle_transform_func(config_name, macro_id,
-                                                  new_trig_config,
-                                                  trig_change_list,
-                                                  triggers_ok=True)
+                        handle_transform_func(config_name, macro_id,
+                                                new_trig_config,
+                                                trig_change_list,
+                                                triggers_ok=True)
                 iter_ = self.treemodel.iter_next(iter_)
+        os.chdir(old_pwd)
         self.window.destroy()
 
     def _get_tooltip(self, view, row_iter, col_index, tip):
