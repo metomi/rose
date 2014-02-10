@@ -13,7 +13,10 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
-\#1100, #1101: add syntax highlighting for Rose configuration file in emacs.
+\#1114: rose config-edit: run a macro or upgrade macro with the relevant
+configuration directory as the current working directory.
+
+\#1100, #1101: add syntax highlighting for Rose configuration file in Emacs.
 
 \#1097: rosie.ws: fix Trac links in `all_revs` mode, which incorrectly used
 `trunk@HEAD` for everything.
