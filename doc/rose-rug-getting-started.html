@@ -64,8 +64,6 @@
 rose config
 </pre>
 
-    <h2 id="user">User Configuration</h2>
-
     <p>You can configure Rose by creating and editing your user configuration
     file at <var>~/.metomi/rose.conf</var>. E.g.:</p>
     <pre class="shell">
@@ -76,56 +74,39 @@ ${EDITOR:-vi} ~/.metomi/rose.conf
     <p>Rose should work out of the box if it is configured correctly at your
     site.</p>
 
-    <p>However, you may want to change the <var>[external] geditor</var> (the
-    external text editor used by GUIs) and the <var>[external] editor</var>
-    (the external text editor used by CLI commands) settings. If these settings
-    are not defined in the user and site configuration, the default external
-    text editor used by GUIs is <code>gedit</code>. The default external text
-    editor used by CLI commands is the value of the <var>VISUAL</var> or
-    <var>EDITOR</var> environment variable, or <code>vi</code> if neither
-    environment variable is set. If, for example, you want to use
-    <code>gvim</code> as your text editor, you would add the following to your
-    <var>~/.metomi/rose.conf</var>:</p>
+    <h2 id="editor">Text Editor</h2>
+
+    <p>The default external text editor used by GUIs is <code>gedit</code>. The
+    default external text editor used by CLI commands is the value of the
+    <var>VISUAL</var> or <var>EDITOR</var> environment variable, or
+    <code>vi</code> if neither environment variable is set.</p>
+
+    <p>You should change the <var>[external] geditor</var> (the external text
+    editor used by GUIs) and the <var>[external] editor</var> (the external text
+    editor used by CLI commands) settings in <var>~/.metomi/rose.conf</var> if
+    you do not want to use the default.</p>
+
+    <p>For <code>emacs</code> and most text editors, you can do something
+    like:</p>
+    <pre class="prettyprint lang-rose_conf">
+[external]
+editor=emacs
+geditor=emacs
+</pre>
+
+    <p>For any text editor command that normally forks and detaches from the
+    shell it is started it, you should use an option to ensure that the text
+    editor runs in the foreground to allow Rose to wait for the edit session to
+    finish. E.g. for <code>gvim</code>, you will do:</p>
     <pre class="prettyprint lang-rose_conf">
 [external]
 editor=gvim -f
 geditor=gvim -f
 </pre>
 
-    <h2 id="site">Site Configuration</h2>
+    <h3 id="syntax">Editor Syntax Highlighting</h3>
 
-    <p>You can configure Rose for your site by creating and editing the
-    <var>etc/rose.conf</var> file in a Rose distribution. Valid settings are
-    documented in the <var>etc/rose.conf.example</var> file in a Rose
-    distribution.</p>
-
-    <p>As a start, you should probably change <var>root-dir*</var> settings in
-    <var>[rose-suite-run]</var> section and the <var>path*</var> settings in
-    <var>[rose-task-run]</var> section to suit your site.</p>
-
-    <p>If you are using Rosie, you will need to change the paths, urls, and
-    hostnames in the <samp>rosie</samp> sections as well.</p>
-
-    <p>You may want to make sure the default programs referred to in
-    <samp>[external]</samp> are sensible.</p>
-
-    <h2 id="cylc">Configuring Cylc</h2>
-
-    <p>See <a href=
-    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-160004.2">Cylc Use
-    Guide</a> for detail.</p>
-
-    <p>DO NOT modify the <var>[hosts] &rarr; HOST &rarr; run directory</var> and
-    <var>[hosts] &rarr; HOST &rarr; work directory</var> settings, and they are
-    incompatible with Rose. Equivalent functionalities are provided by the
-    <var>[rose-suite-run]root-dir*</var> settings in the Rose site/user
-    configuration.</p>
-
-    <h2 id="plugins">Plugins</h2>
-
-    <h3 id="plugins:syntax">Syntax Highlighting</h3>
-
-    <p>There are gedit, kate, vim, and emacs plugins for syntax highlighting 
+    <p>There are gedit, kate, vim, and emacs plugins for syntax highlighting
     of Rose configuration files, located at:</p>
 
     <ul>
@@ -134,7 +115,7 @@ geditor=gvim -f
       <li><samp>$ROSE_HOME/etc/rose-conf.xml</samp></li>
 
       <li><samp>$ROSE_HOME/etc/rose-conf.vim</samp></li>
-      
+
       <li><samp>$ROSE_HOME/etc/rose-conf-mode.el</samp></li>
     </ul>
 
@@ -142,12 +123,7 @@ geditor=gvim -f
     directory of your local Rose installation, which you can locate by running
     <code>rose --version</code>. See the files themselves for setup notes.</p>
 
-    <p>You may want to set up Cylc-specific text editor plugins - see the
-    <a href=
-    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-530008.2">Cylc
-    User Guide</a> for details.</p>
-
-    <h3 id="plugins:bash-completion">Bash Auto-Completion</h3>
+    <h3 id="bash-completion">Bash Auto-Completion</h3>
 
     <p>There is a Rose bash completion script that you can source to enhance
     the Rose command line interface within an interactive Bash shell.</p>
@@ -159,9 +135,26 @@ geditor=gvim -f
     <samp>$ROSE_HOME/etc/rose-bash-completion</samp>. The file contains the
     instructions for using it.</p>
 
-    <p>As with the <a href="#plugins:syntax">syntax highlighting
-    instructions</a> above, you can locate your <samp>$ROSE_HOME</samp> by
-    running <code>rose --version</code>.</p>
+    <p>As with the <a href="#syntax">Editor Syntax Highlighting</a> above, you
+    can locate your <samp>$ROSE_HOME</samp> by running <code>rose
+    --version</code>.</p>
+
+    <h2 id="cylc">Configuring Cylc</h2>
+
+    <p>See <a href=
+    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-160004.2">Cylc Use
+    Guide</a> for detail.</p>
+
+    <p>You may want to set up Cylc-specific text editor plugins - see the
+    <a href=
+    "http://cylc.github.io/cylc/html/single/cug-html.html#x1-530008.2">Cylc
+    User Guide</a> for details.</p>
+
+    <p>DO NOT modify the <var>[hosts] &rarr; HOST &rarr; run directory</var> and
+    <var>[hosts] &rarr; HOST &rarr; work directory</var> settings, and they are
+    incompatible with Rose. Equivalent functionalities are provided by the
+    <var>[rose-suite-run]root-dir*</var> settings in the Rose site/user
+    configuration.</p>
   </div>
 </body>
 </html>
