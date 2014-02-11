@@ -337,7 +337,7 @@ class Updater(object):
             return False
 
         var_id_map = {}
-        for var in config_data.vars.get_all(no_latent=True):
+        for var in config_data.vars.get_all(skip_latent=True):
             var_id = var.metadata['id']
             var_id_map.update({var_id: var})
 
@@ -639,7 +639,7 @@ class Updater(object):
             checker = (
                 self.data.builtin_macros[config_name][rose.META_PROP_TYPE])
             if namespace is None:
-                real_variables = config_data.vars.get_all(no_latent=True)
+                real_variables = config_data.vars.get_all(skip_latent=True)
             else:
                 real_variables, latent_variables = (
                     self.data.helper.get_data_for_namespace(namespace))

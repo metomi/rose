@@ -1158,7 +1158,7 @@ class MainController(object):
             new_save_config = self.data.dump_to_internal_config(config_name)
             config_data = self.data.config[config_name]
             vars_ok = True
-            for var in config_data.vars.get_all(no_latent=True):
+            for var in config_data.vars.get_all(skip_latent=True):
                 if not var.name:
                     self.view_page(var.metadata["full_ns"],
                                    var.metadata["id"])
@@ -1475,7 +1475,7 @@ class MainController(object):
         namespaces_updated = []
         for config_name in configs:
             config_data = self.data.config[config_name]
-            for variable in config_data.vars.get_all(no_latent=True):
+            for variable in config_data.vars.get_all(skip_latent=True):
                 ns = variable.metadata.get('full_ns')
                 if ns not in namespaces_updated:
                     self.updater.update_tree_status(ns, icon_type='changed')
@@ -1624,7 +1624,7 @@ class MainController(object):
         for config_name in config_keys:
             config_data = self.data.config[config_name]
             search_vars = config_data.vars.get_all(
-                no_latent=not self.page_var_show_modes["latent"])
+                skip_latent=not self.page_var_show_modes["latent"])
             found_ns_vars = {}
             for variable in search_vars:
                 var_id = variable.metadata.get('id')

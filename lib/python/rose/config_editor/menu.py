@@ -391,11 +391,11 @@ class MainMenuHandler(object):
         """Handle a destroy main program request."""
         for name in self.data.config:
             config_data = self.data.config[name]
-            variables = config_data.vars.get_all(no_latent=True)
-            save_vars = config_data.vars.get_all(save=True, no_latent=True)
-            sections = config_data.sections.get_all(no_latent=True)
+            variables = config_data.vars.get_all(skip_latent=True)
+            save_vars = config_data.vars.get_all(save=True, skip_latent=True)
+            sections = config_data.sections.get_all(skip_latent=True)
             save_sections = config_data.sections.get_all(save=True,
-                                                         no_latent=True)
+                                                         skip_latent=True)
             now_set = set([v.to_hashable() for v in variables])
             save_set = set([v.to_hashable() for v in save_vars])
             now_sect_set = set([s.to_hashable() for s in sections])

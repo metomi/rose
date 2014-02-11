@@ -69,7 +69,7 @@ class ConfigDataHelper(object):
         """Return the matching variable or None."""
         sect, opt = self.util.get_section_option_from_id(var_id)
         return self.data.config[config_name].vars.get_var(
-                         sect, opt, save, no_latent=not latent)
+                         sect, opt, save, skip_latent=not latent)
 
 #------------------ Data model helper functions ------------------------------
 

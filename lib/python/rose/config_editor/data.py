@@ -62,7 +62,7 @@ class VarData(object):
         self.save = save_v_map
         self.latent_save = latent_save_v_map
 
-    def foreach(self, save=False, no_latent=False):
+    def foreach(self, save=False, skip_latent=False):
         """Yield all (section, variables) tuples for real and latent."""
         if save:
             real = self.save
@@ -72,11 +72,11 @@ class VarData(object):
             latent = self.latent
         for section, variables in real.items():
             yield section, variables
-        if not no_latent:
+        if not skip_latent:
             for section, variables in latent.items():
                 yield section, variables
 
-    def get_all(self, save=False, no_latent=False, no_real=False):
+    def get_all(self, save=False, skip_latent=False, skip_real=False):
         """Return all real and latent variables."""
         if save:
             real = self.save
@@ -85,20 +85,20 @@ class VarData(object):
             real = self.now
             latent = self.latent
         all_vars = []
-        if not no_real:
+        if not skip_real:
             all_vars += list(itertools.chain(*real.values()))
-        if not no_latent:
+        if not skip_latent:
             all_vars += list(itertools.chain(*latent.values()))
         return all_vars
 
-    def get_var(self, section, option, save=False, no_latent=False):
+    def get_var(self, section, option, save=False, skip_latent=False):
         """Return the variable specified by section, option."""
         var_id = section + rose.CONFIG_DELIMITER + option
         if save:
             nodes = [self.save, self.latent_save]
         else:
             nodes = [self.now, self.latent]
-        if no_latent:
+        if skip_latent:
             nodes.pop()
         for node in nodes:
             for var in node.get(section, []):
@@ -118,7 +118,7 @@ class SectData(object):
         self.save = save_sections
         self.latent_save = latent_save_sections
 
-    def get_all(self, save=False, no_latent=False, no_real=False):
+    def get_all(self, save=False, skip_latent=False, skip_real=False):
         """Return all sections that match the save/latent criteria."""
         if save:
             real = self.save
@@ -127,19 +127,19 @@ class SectData(object):
             real = self.now
             latent = self.latent
         all_sections = []
-        if not no_real:
+        if not skip_real:
             all_sections += real.values()
-        if not no_latent:
+        if not skip_latent:
             all_sections += latent.values()
         return all_sections
 
-    def get_sect(self, section, save=False, no_latent=False):
+    def get_sect(self, section, save=False, skip_latent=False):
         """Return the section data specified by section."""
         if save:
             nodes = [self.save, self.latent_save]
         else:
             nodes = [self.now, self.latent]
-        if no_latent:
+        if skip_latent:
             nodes.pop()
         for node in nodes:
             if section in node:
