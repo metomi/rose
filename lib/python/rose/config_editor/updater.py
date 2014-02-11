@@ -535,7 +535,7 @@ class Updater(object):
         for section in ns_sections:
             if section in config_data.sections.now:
                 errors += config_data.sections.now[section].error.items()
-            else:
+            elif section in config_data.sections.latent:
                 errors += config_data.sections.latent[section].error.items()
                 
         # Set icons.
