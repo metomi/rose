@@ -22,7 +22,7 @@
 . $(dirname $0)/../lib/bash/test_header
 
 function test_init() {
-    mkdir $TEST_DIR/config
+    mkdir -p $TEST_DIR/config
     cat >$TEST_DIR/config/rose-app.conf
 }
 
