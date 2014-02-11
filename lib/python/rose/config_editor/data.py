@@ -76,7 +76,7 @@ class VarData(object):
             for section, variables in latent.items():
                 yield section, variables
 
-    def get_all(self, save=False, no_latent=False):
+    def get_all(self, save=False, no_latent=False, no_real=False):
         """Return all real and latent variables."""
         if save:
             real = self.save
@@ -84,7 +84,9 @@ class VarData(object):
         else:
             real = self.now
             latent = self.latent
-        all_vars = list(itertools.chain(*real.values()))
+        all_vars = []
+        if not no_real:
+            all_vars += list(itertools.chain(*real.values()))
         if not no_latent:
             all_vars += list(itertools.chain(*latent.values()))
         return all_vars
@@ -116,7 +118,7 @@ class SectData(object):
         self.save = save_sections
         self.latent_save = latent_save_sections
 
-    def get_all(self, save=False, no_latent=False):
+    def get_all(self, save=False, no_latent=False, no_real=False):
         """Return all sections that match the save/latent criteria."""
         if save:
             real = self.save
@@ -124,7 +126,9 @@ class SectData(object):
         else:
             real = self.now
             latent = self.latent
-        all_sections = real.values()
+        all_sections = []
+        if not no_real:
+            all_sections += real.values()
         if not no_latent:
             all_sections += latent.values()
         return all_sections
@@ -491,7 +495,7 @@ class ConfigDataManager(object):
             if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
-            if section in real_sect_ids:
+            if option is not None or section in real_sect_ids:
                 continue
             ignored_reason = {}
             meta_data = {}

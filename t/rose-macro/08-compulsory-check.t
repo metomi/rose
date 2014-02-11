@@ -22,119 +22,236 @@
 . $(dirname $0)/test_header
 init <<'__CONFIG__'
 [namelist:compulsory_nl1]
-my_var1 = 235
+my_var1=235
 
 [namelist:compulsory_nl2]
-my_var2 = 235
+my_var2=235
 
 [namelist:compulsory_nl3]
 
 [namelist:compulsory_nl4(1)]
-my_var3(1) = .true.
-my_var4 = .true.
+my_var3(1)=.true.
+my_var4=.true.
+
+[namelist:compulsory_nl4(2)]
+my_var3(1)=.true.
+my_var4=.true.
 
 [namelist:compulsory_nl5]
-my_var5(1) = .true.
+my_var5(1)=.true.
+!my_var5.5=.true.
 
 [namelist:compulsory_nl6{modifier}(1)]
-my_var6(2) = .true.
-my_var7 = .true.
+my_var6(2)=.true.
+my_var7=.true.
 
 [namelist:compulsory_nl7{modifier}]
-my_var8(2) = .true.
-my_var9 = .true.
+my_var8(2)=.true.
+my_var9=.true.
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 6
+tests 9
 #-------------------------------------------------------------------------------
 # Check compulsory checking.
 TEST_KEY=$TEST_KEY_BASE-ok
 setup
 init_meta <<__META_CONFIG__
 [namelist:compulsory_nl1=my_var1]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl2]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl2=my_var2]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl3]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl4]
-compulsory = true
-duplicate = true
+compulsory=true
+duplicate=true
 
 [namelist:compulsory_nl4=my_var3]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl4=my_var4]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl5=my_var5]
-compulsory = true
+compulsory=true
+
+[namelist:compulsory_nl5=my_var5.5]
 
 [namelist:compulsory_nl6]
-compulsory = true
-duplicate = true
+compulsory=true
+duplicate=true
 
 [namelist:compulsory_nl6{modifier}]
-duplicate = true
+duplicate=true
 
 [namelist:compulsory_nl6=my_var6]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl6=my_var7]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl7]
-duplicate = true
+duplicate=true
 
 [namelist:compulsory_nl7=my_var8]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl7=my_var9]
-compulsory = true
+compulsory=true
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
+# Check user-ignored checking.
+TEST_KEY=$TEST_KEY_BASE-ok
+setup
+init <<'__CONFIG__'
+[namelist:compulsory_nl1]
+my_var1=235
+
+[namelist:compulsory_nl2]
+!my_var2=235
+
+[namelist:compulsory_nl3]
+
+[namelist:compulsory_nl4(1)]
+my_var3(1)=.true.
+!my_var4=.true.
+
+[namelist:compulsory_nl4(2)]
+my_var3(1)=.true.
+my_var4=.true.
+
+[namelist:compulsory_nl4(3)]
+my_var3(1)=.true.
+!my_var4=.true.
+
+[namelist:compulsory_nl5]
+my_var5(1)=.true.
+!my_var5.5=.true.
+
+[namelist:compulsory_nl6{modifier}(1)]
+!my_var6(2)=.true.
+my_var7=.true.
+
+[namelist:compulsory_nl6{modifier}(2)]
+!my_var6(2)=.true.
+my_var7=.true.
+
+[namelist:compulsory_nl7{modifier}]
+my_var8(2)=.true.
+my_var9=.true.
+__CONFIG__
+init_meta <<__META_CONFIG__
+[namelist:compulsory_nl1=my_var1]
+compulsory=true
+
+[namelist:compulsory_nl2]
+compulsory=true
+
+[namelist:compulsory_nl2=my_var2]
+compulsory=true
+
+[namelist:compulsory_nl3]
+compulsory=true
+
+[namelist:compulsory_nl4]
+compulsory=true
+duplicate=true
+
+[namelist:compulsory_nl4=my_var3]
+compulsory=true
+
+[namelist:compulsory_nl4=my_var4]
+compulsory=true
+
+[namelist:compulsory_nl5=my_var5]
+compulsory=true
+
+[namelist:compulsory_nl6]
+compulsory=true
+duplicate=true
+
+[namelist:compulsory_nl6{modifier}]
+duplicate=true
+
+[namelist:compulsory_nl6=my_var6]
+compulsory=true
+
+[namelist:compulsory_nl6=my_var7]
+compulsory=true
+
+[namelist:compulsory_nl7]
+duplicate=true
+
+[namelist:compulsory_nl7=my_var8]
+compulsory=true
+
+[namelist:compulsory_nl7=my_var9]
+compulsory=true
+__META_CONFIG__
+run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[V] rose.macros.DefaultValidators: issues: 5
+    namelist:compulsory_nl2=my_var2=235
+        Compulsory settings should not be user-ignored.
+    namelist:compulsory_nl4(1)=my_var4=.true.
+        Compulsory settings should not be user-ignored.
+    namelist:compulsory_nl4(3)=my_var4=.true.
+        Compulsory settings should not be user-ignored.
+    namelist:compulsory_nl6{modifier}(1)=my_var6(2)=.true.
+        Compulsory settings should not be user-ignored.
+    namelist:compulsory_nl6{modifier}(2)=my_var6(2)=.true.
+        Compulsory settings should not be user-ignored.
+__ERR__
+teardown
+#-------------------------------------------------------------------------------
 # Check compulsory checking.
 TEST_KEY=$TEST_KEY_BASE-err
 setup
 init <<__CONFIG__
-[namelist:compulsory_nl4]
+[namelist:compulsory_nl4(1)]
+
+[namelist:compulsory_nl4(2)]
 
 [namelist:compulsory_nl5]
-!my_var5 = true
+!my_var5=true
 __CONFIG__
 init_meta <<__META_CONFIG__
 [namelist:compulsory_nl1=my_var1]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl2]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl2=my_var2]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl3]
-compulsory = true
+compulsory=true
+
+[namelist:compulsory_nl4]
+duplicate=true
 
 [namelist:compulsory_nl4=my_var4]
-compulsory = true
+compulsory=true
 
 [namelist:compulsory_nl5=my_var5]
-compulsory = true
+compulsory=true
 __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 6
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[V] rose.macros.DefaultValidators: issues: 7
     namelist:compulsory_nl1=my_var1=None
         Variable set as compulsory, but not in configuration.
     namelist:compulsory_nl2=None=None
@@ -143,11 +260,13 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         Variable set as compulsory, but not in configuration.
     namelist:compulsory_nl3=None=None
         Section set as compulsory, but not in configuration.
-    namelist:compulsory_nl4=my_var4=None
+    namelist:compulsory_nl4(1)=my_var4=None
+        Variable set as compulsory, but not in configuration.
+    namelist:compulsory_nl4(2)=my_var4=None
         Variable set as compulsory, but not in configuration.
     namelist:compulsory_nl5=my_var5=true
         Compulsory settings should not be user-ignored.
-__CONTENT__
+__ERR__
 teardown
 #-------------------------------------------------------------------------------
 exit

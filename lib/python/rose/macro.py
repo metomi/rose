@@ -219,6 +219,104 @@ class MacroBase(object):
         self.reports.append(MacroReport(*args, **kwargs))
 
 
+class MacroBaseForEditor(MacroBase):
+
+    """This class extends MacroBase to provide a non-ConfigNode API.
+
+    In the following methods, config_data can be a
+    rose.config.ConfigNode instance or a dictionary that
+    looks like this:
+    {"sections":
+        {"namelist:foo": rose.section.Section instance,
+         "env": rose.section.Section instance},
+        "variables":
+        {"namelist:foo": [rose.variable.Variable instance,
+                          rose.variable.Variable instance],
+         "env": [rose.variable.Variable instance]}
+    }
+    This makes it easy to interface with rose edit, which uses the
+    latter data structure internally.
+
+    """
+
+    def _get_config_sections(self, config_data):
+        """Return all sections within config_data."""
+        sections = []
+        if isinstance(config_data, rose.config.ConfigNode):
+            for key, node in config_data.value.items():
+                if isinstance(node.value, dict):
+                    sections.append(key)
+                elif "" not in sections:
+                    sections.append("")
+        else:
+            for key in set(config_data["sections"].keys() +
+                           config_data["variables"].keys()):
+                sections.append(key)
+        return sections
+
+    def _get_config_section_options(self, config_data, section):
+        """Return all options within a section in config_data."""
+        if isinstance(config_data, rose.config.ConfigNode):
+            names = []
+            for keylist, node in config_data.walk([section]):
+                names.append(keylist[-1])
+            return names
+        else:
+            return [v.name for v in config_data["variables"].get(section, [])]
+        return []
+
+    def _get_config_has_id(self, config_data, id_):
+        """Return whether the config_data contains the id_."""
+        section, option = self._get_section_option_from_id(id_)
+        if isinstance(config_data, rose.config.ConfigNode):
+            return (config_data.get([section, option]) is not None)
+        if option is None:
+            return section in config_data["sections"]
+        return option in [v.name for v in
+                          config_data["variables"].get(section, [])]
+
+    def _get_config_id_state(self, config_data, id_):
+        """Return the ConfigNode.STATE_* that applies to id_ or None."""
+        section, option = self._get_section_option_from_id(id_)
+        if isinstance(config_data, rose.config.ConfigNode):
+            node = config_data.get([section, option])
+            if node is None:
+                return None
+            return node.state
+        ignored_reason = None
+        if option is None:
+            if section in config_data["sections"]:
+                 ignored_reason = (
+                     config_data["sections"][section].ignored_reason)
+        else:
+            for variable in config_data["variables"].get(section, []):
+                if variable.name == option:
+                    ignored_reason = variable.ignored_reason
+                    break
+        if ignored_reason is None:
+            return None
+        if rose.variable.IGNORED_BY_USER in ignored_reason:
+            return rose.config.ConfigNode.STATE_USER_IGNORED
+        if rose.variable.IGNORED_BY_SYSTEM in ignored_reason:
+            return rose.config.ConfigNode.STATE_SYST_IGNORED
+        return rose.config.ConfigNode.STATE_NORMAL
+
+    def _get_config_id_value(self, config_data, id_):
+        """Return a value (if any) for id_ in the config_data."""
+        section, option = self._get_section_option_from_id(id_)
+        if option is None:
+            return None
+        if isinstance(config_data, rose.config.ConfigNode):
+            node = config_data.get([section, option])
+            if node is None:
+                return None
+            return node.value
+        for variable in config_data["variables"].get(section, []):
+            if variable.name == option:
+                return variable.value
+        return None
+
+
 class MacroValidatorCollection(MacroBase):
 
     """Collate several macros into one."""

@@ -45,8 +45,8 @@ class ConfigPage(gtk.VBox):
     """Returns a container for a tab."""
 
     def __init__(self, page_metadata, config_data, ghost_data, section_ops,
-                 variable_ops, sections, get_formats_func, reporter,
-                 directory=None, sub_data=None, sub_ops=None,
+                 variable_ops, sections, latent_sections, get_formats_func, 
+                 reporter, directory=None, sub_data=None, sub_ops=None,
                  launch_info_func=None, launch_edit_func=None,
                  launch_macro_func=None):
         super(ConfigPage, self).__init__(homogeneous=False)
@@ -68,6 +68,7 @@ class ConfigPage(gtk.VBox):
         if sections:
             self.section = sections[0]
         self.sections = sections
+        self.latent_sections = latent_sections
         self.icon_path = page_metadata.get('icon')
         self.reporter = reporter
         self.directory = directory
@@ -1128,7 +1129,8 @@ class ConfigPage(gtk.VBox):
         # No content warning, if applicable.
         has_no_content = (self.section is None and
                           not self.ghost_data and
-                          self.sub_data is None)
+                          self.sub_data is None and
+                          not self.latent_sections)
         if has_no_content:
             info = rose.config_editor.PAGE_WARNING_NO_CONTENT
             tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
@@ -1192,7 +1194,7 @@ class ConfigPage(gtk.VBox):
             button_list.append(latent_button)
             label_list.append(latent_label)
         # This adds error notification for sections.
-        for sect_data in self.sections:
+        for sect_data in self.sections + self.latent_sections:
             for err, info in sect_data.error.items():
                 error_button = rose.gtk.util.CustomButton(
                       stock_id=gtk.STOCK_DIALOG_ERROR,
