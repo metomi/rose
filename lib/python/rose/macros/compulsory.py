@@ -25,7 +25,7 @@ import rose.macro
 import rose.variable
 
 
-class CompulsoryChecker(rose.macro.MacroBaseForEditor):
+class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
 
     """Returns sections and options that are compulsory but missing.
 

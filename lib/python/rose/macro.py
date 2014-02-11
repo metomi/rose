@@ -219,7 +219,7 @@ class MacroBase(object):
         self.reports.append(MacroReport(*args, **kwargs))
 
 
-class MacroBaseForEditor(MacroBase):
+class MacroBaseRoseEdit(MacroBase):
 
     """This class extends MacroBase to provide a non-ConfigNode API.
 

@@ -25,7 +25,7 @@ import rose.macro
 import rose.macros.rule
 
 
-class TriggerMacro(rose.macro.MacroBaseForEditor):
+class TriggerMacro(rose.macro.MacroBaseRoseEdit):
 
     """Class to load and check trigger dependencies."""
 
