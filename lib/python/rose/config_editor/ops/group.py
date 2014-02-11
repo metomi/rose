@@ -61,7 +61,8 @@ class GroupOperations(object):
         """
         start_stack_index = len(self.undo_stack)
         group = rose.config_editor.STACK_GROUP_ADD + "-" + str(time.time())
-        self.sect_ops.add_section(config_name, new_section_name)
+        self.sect_ops.add_section(config_name, new_section_name,
+                                  skip_update=True)
         namespace = self.data.helper.get_default_namespace_for_section(
                                          new_section_name, config_name)
         config_data = self.data.config[config_name]
