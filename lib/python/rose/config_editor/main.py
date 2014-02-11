@@ -237,6 +237,7 @@ class MainController(object):
             self.mainwindow,
             self.undo_stack, self.redo_stack,
             self.perform_undo,
+            self.update_config,
             self.apply_macro_transform,
             self.apply_macro_validation,
             self.section_ops,
@@ -754,14 +755,11 @@ class MainController(object):
         if duplicate == rose.META_PROP_VALUE_TRUE and not has_sub_data:
             # For example, namelist/foo/1 should be shown as foo(1).
             label = "(".join(subspace.split('/')[-2:]) + ")"
-        sections = [s for s in ns_metadata.get('sections', [])]
-        section_data_objects = []
-        for section in sections:
-            sect_data = config_data.sections.now.get(section)
-            if sect_data is not None:
-                section_data_objects.append(sect_data)
+        section_data_objects, latent_section_data_objects = (
+            self.data.helper.get_section_data_for_namespace(namespace_name))
         # Related pages
         see_also = ''
+        sections = [s for s in ns_metadata.get('sections', [])]
         for section_name in [s for s in sections if s.startswith('namelist')]:
             no_num_name = rose.macro.REC_ID_STRIP_DUPL.sub("", section_name)
             no_mod_name = rose.macro.REC_ID_STRIP.sub("", section_name)
@@ -846,6 +844,7 @@ class MainController(object):
             sect_ops,
             var_ops,
             section_data_objects,
+            latent_section_data_objects,
             self.data.helper.get_format_sections,
             self.reporter,
             directory,
@@ -1073,6 +1072,10 @@ class MainController(object):
         """Placeholder for updater function of the same name."""
         self.updater.tree_trigger_update(*args, **kwargs)
 
+    def update_config(self, *args, **kwargs):
+        """Placeholder for updater function of the same name."""
+        self.updater.update_config(*args, **kwargs)
+
     def update_namespace(self, *args, **kwargs):
         """Placeholder for updater function of the same name."""
         self.updater.update_namespace(*args, **kwargs)
@@ -1155,7 +1158,7 @@ class MainController(object):
             new_save_config = self.data.dump_to_internal_config(config_name)
             config_data = self.data.config[config_name]
             vars_ok = True
-            for var in config_data.vars.get_all(no_latent=True):
+            for var in config_data.vars.get_all(skip_latent=True):
                 if not var.name:
                     self.view_page(var.metadata["full_ns"],
                                    var.metadata["id"])
@@ -1472,7 +1475,7 @@ class MainController(object):
         namespaces_updated = []
         for config_name in configs:
             config_data = self.data.config[config_name]
-            for variable in config_data.vars.get_all(no_latent=True):
+            for variable in config_data.vars.get_all(skip_latent=True):
                 ns = variable.metadata.get('full_ns')
                 if ns not in namespaces_updated:
                     self.updater.update_tree_status(ns, icon_type='changed')
@@ -1621,7 +1624,7 @@ class MainController(object):
         for config_name in config_keys:
             config_data = self.data.config[config_name]
             search_vars = config_data.vars.get_all(
-                no_latent=not self.page_var_show_modes["latent"])
+                skip_latent=not self.page_var_show_modes["latent"])
             found_ns_vars = {}
             for variable in search_vars:
                 var_id = variable.metadata.get('id')

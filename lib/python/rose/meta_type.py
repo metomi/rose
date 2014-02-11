@@ -109,7 +109,7 @@ class PythonListMetaType(MetaType):
     def is_valid(self, value):
         try:
             cast_value = ast.literal_eval(value)
-        except SyntaxError:
+        except (SyntaxError, ValueError):
             return [False, self.WARNING.format(repr(value))]
         return [True, None]
 

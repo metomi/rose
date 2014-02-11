@@ -20,11 +20,12 @@
 
 import copy
 
+import rose.config
 import rose.macro
 import rose.macros.rule
 
 
-class TriggerMacro(rose.macro.MacroBase):
+class TriggerMacro(rose.macro.MacroBaseRoseEdit):
 
     """Class to load and check trigger dependencies."""
 
@@ -110,12 +111,31 @@ class TriggerMacro(rose.macro.MacroBase):
                 self.add_report(section, option, value, info)
         return config, self.reports
 
-    def update(self, var_id, config, meta_config):
-        """Update enabled and ignored ids starting with var_id."""
+    def update(self, var_id, config_data, meta_config):
+        """Update enabled and ignored ids starting with var_id.
+
+        var_id - a setting id to start the triggering update at.
+        config_data - a rose.config.ConfigNode or a dictionary that
+        looks like this:
+        {"sections":
+            {"namelist:foo": rose.section.Section instance,
+             "env": rose.section.Section instance},
+         "variables":
+            {"namelist:foo": [rose.variable.Variable instance,
+                              rose.variable.Variable instance],
+             "env": [rose.variable.Variable instance]
+            }
+        }
+        meta_config - a rose.config.ConfigNode.
+        only_these_sections (default None) - a list of sections to
+        examine. If specified, checking for other sections will be
+        skipped.
+
+        """
         has_ignored_parent = True
-        config_sections = config.value.keys()
+        config_sections = self._get_config_sections(config_data)
         start_ids = [var_id]
-        alt_ids = self._get_id_duplicates(var_id, config, meta_config)
+        alt_ids = self._get_id_duplicates(var_id, config_data, meta_config)
         if alt_ids:
             start_ids = alt_ids
         id_stack = []
@@ -127,15 +147,16 @@ class TriggerMacro(rose.macro.MacroBase):
                         self.trigger_family_lookup.values()]):
                 has_ignored_parent = False
             section, option = self._get_section_option_from_id(start_id)
-            node = config.get([section, option])
+            is_node_present = self._get_config_has_id(config_data, start_id)
             if section in self.ignored_dict and option is not None:
                 has_ignored_parent = True
-            has_ignored_parent = has_ignored_parent or (node is None)
+            has_ignored_parent = has_ignored_parent or not is_node_present
             id_stack.append((start_id, has_ignored_parent))
         update_id_list = []
         while id_stack:
             this_id, has_ignored_parent = id_stack[0]
-            alt_ids = self._get_id_duplicates(this_id, config, meta_config)
+            alt_ids = self._get_id_duplicates(
+                this_id, config_data, meta_config)
             if alt_ids:
                 this_id = alt_ids.pop(0)
             for alt_id in alt_ids:
@@ -144,10 +165,10 @@ class TriggerMacro(rose.macro.MacroBase):
             # Triggered sections need their options to trigger sub children.
             if this_id in config_sections:
                 options = []
-                for keylist, node in config.walk([this_id]):
-                    if isinstance(node.value, dict):
-                        continue
-                    skip_id = self._get_id_from_section_option(*keylist)
+                for option in self._get_config_section_options(config_data,
+                                                               this_id):
+                    skip_id = self._get_id_from_section_option(
+                        this_id, option)
                     if skip_id in self.trigger_family_lookup:
                         id_stack.insert(1, (skip_id, has_ignored_parent))
             update_id_list.append(this_id)
@@ -156,13 +177,15 @@ class TriggerMacro(rose.macro.MacroBase):
                 continue
             if not has_ignored_parent:
                 section, option = self._get_section_option_from_id(this_id)
-                node = config.get([section, option])
-                if option is None:
-                    value = None if node is None else True
-                else:
-                    value = None if node is None else node.value
+                is_node_present = self._get_config_has_id(
+                    config_data, this_id)
+                value = self._get_config_id_value(
+                    config_data, this_id)
+                if option is None and is_node_present:
+                    value = True
             # Check the children of this id
-            id_val_map = self._get_family_dict(this_id, config, meta_config)
+            id_val_map = self._get_family_dict(
+                this_id, config_data, meta_config)
             for child_id, vals in id_val_map.items():
                 if has_ignored_parent or value is None:
                     help_text = self.IGNORED_STATUS_PARENT.format(this_id)
@@ -346,7 +369,7 @@ class TriggerMacro(rose.macro.MacroBase):
                 stack.pop(0)
         return []
 
-    def _get_family_dict(self, setting_id, config, meta_config):
+    def _get_family_dict(self, setting_id, config_data, meta_config):
         if self._check_is_id_dupl(setting_id, meta_config):
             sect, opt = self._get_section_option_from_id(setting_id)
             base_sect = rose.macro.REC_ID_STRIP.sub("", sect)
@@ -360,7 +383,7 @@ class TriggerMacro(rose.macro.MacroBase):
         else:
             items = self.trigger_family_lookup.get(setting_id, {}).items()
             for i, (child_id, vals) in enumerate(items):
-                alt_ids = self._get_id_duplicates(child_id, config,
+                alt_ids = self._get_id_duplicates(child_id, config_data,
                                                   meta_config)
                 if alt_ids:
                     items.remove((child_id, vals))
@@ -368,14 +391,13 @@ class TriggerMacro(rose.macro.MacroBase):
                         items.append((alt_id, vals))
         return dict(items)
 
-    def _get_id_duplicates(self, setting_id, config, meta_config):
+    def _get_id_duplicates(self, setting_id, config_data, meta_config):
         dupl_ids = []
         if self._check_is_id_dupl(setting_id, meta_config):
             sect, opt = self._get_section_option_from_id(setting_id)
             search_sect = sect + "("
-            for section, node in config.value.items():
-                if (section.startswith(search_sect) and
-                    isinstance(node.value, dict)):
+            for section in self._get_config_sections(config_data):
+                if section.startswith(search_sect):
                     new_id = self._get_id_from_section_option(section, opt)
                     dupl_ids.append(new_id)
         return dupl_ids

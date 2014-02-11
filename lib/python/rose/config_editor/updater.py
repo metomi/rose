@@ -45,6 +45,7 @@ class Updater(object):
         self.nav_panel = None  # This may be set later.
 
     def namespace_data_is_modified(self, namespace):
+        """Return a string for namespace modifications or null string.""" 
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         if config_name is None:
             return ""
@@ -124,7 +125,7 @@ class Updater(object):
                 spaces = only_this_namespace.lstrip("/").split("/")
                 for i in range(len(spaces), 0, -1):
                     update_ns = "/" + "/".join(spaces[:i])
-                    self.update_namespace(update_ns, skip_config_update=True,
+                    self.update_namespace(update_ns,
                                           skip_sub_data_update=True)
                 self.update_ns_sub_data(only_this_namespace)
 
@@ -195,7 +196,7 @@ class Updater(object):
             self.update_ns_sub_data()
 
     def update_namespace(self, namespace, are_errors_done=False,
-                         is_loading=False, skip_config_update=False,
+                         is_loading=False,
                          skip_sub_data_update=False):
         """Update driver function. Updates the page if open."""
         self.pagelist = self.get_pagelist_func()
@@ -203,11 +204,8 @@ class Updater(object):
             index = [p.namespace for p in self.pagelist].index(namespace)
             page = self.pagelist[index]
             self.update_status(page, are_errors_done=are_errors_done,
-                               skip_config_update=skip_config_update,
                                skip_sub_data_update=skip_sub_data_update)
         else:
-            if not skip_config_update:
-                self.update_config(namespace)
             self.update_sections(namespace)
             self.update_ignored_statuses(namespace)
             if not are_errors_done and not is_loading:
@@ -223,12 +221,10 @@ class Updater(object):
                 self.update_ns_sub_data(namespace)
 
     def update_status(self, page, are_errors_done=False,
-                      skip_config_update=False, skip_sub_data_update=False):
+                      skip_sub_data_update=False):
         """Update ignored statuses and update the tree statuses."""
         self.pagelist = self.get_pagelist_func()
         self.sync_page_var_lists(page)
-        if not skip_config_update:
-            self.update_config(page.namespace)
         self.update_sections(page.namespace)
         self.update_ignored_statuses(page.namespace)
         if not are_errors_done:
@@ -341,7 +337,7 @@ class Updater(object):
             return False
 
         var_id_map = {}
-        for var in config_data.vars.get_all(no_latent=True):
+        for var in config_data.vars.get_all(skip_latent=True):
             var_id = var.metadata['id']
             var_id_map.update({var_id: var})
 
@@ -396,7 +392,10 @@ class Updater(object):
         config = config_data.config
         meta_config = config_data.meta
         config_sections = config_data.sections
-        update_ids = trigger.update(var_id, config, meta_config)
+        config_data_for_trigger = {"sections": config_sections.now,
+                                   "variables": config_data.vars.now}
+        update_ids = trigger.update(var_id, config_data_for_trigger,
+                                    meta_config)
         update_vars = []
         update_sections = []
         for setting_id in update_ids:
@@ -536,6 +535,9 @@ class Updater(object):
         for section in ns_sections:
             if section in config_data.sections.now:
                 errors += config_data.sections.now[section].error.items()
+            elif section in config_data.sections.latent:
+                errors += config_data.sections.latent[section].error.items()
+                
         # Set icons.
         name_tree = namespace.lstrip('/').split('/')
         if icon_bool is None:
@@ -602,32 +604,50 @@ class Updater(object):
 
     def perform_error_check(self, namespace=None, is_loading=False):
         """Loop through system macros and sum errors."""
-        for macro_name in [rose.META_PROP_COMPULSORY, rose.META_PROP_TYPE]:
-            # We may need to speed up trigger for large configs.
-            self.perform_macro_validation(macro_name, namespace, is_loading,
-                                          is_macro_dynamic=True)
-
-    def perform_macro_validation(self, macro_type, namespace=None,
-                                 is_loading=False, is_macro_dynamic=False):
-        """Calculate errors for a given internal macro."""
         configs = self.data.config.keys()
         if namespace is not None:
             config_name = self.util.split_full_ns(self.data,
                                                   namespace)[0]
             configs = [config_name]
+        # Compulsory checking.
         for config_name in configs:
-            config = self.data.config[config_name].config
-            if (namespace is not None and
-                macro_type in [rose.META_PROP_TYPE,
-                               rose.META_PROP_COMPULSORY]):
-                config = self.data.dump_to_internal_config(config_name,
-                                                           namespace)
-            meta = self.data.config[config_name].meta
-            checker = self.data.builtin_macros[config_name][macro_type]
-            bad_list = checker.validate(config, meta)
-            self.apply_macro_validation(config_name, macro_type, bad_list,
+            config_data = self.data.config[config_name]
+            meta = config_data.meta
+            checker = (
+                self.data.builtin_macros[config_name][
+                    rose.META_PROP_COMPULSORY])
+            only_these_sections = None
+            if namespace is not None:
+                only_these_sections = (
+                    self.data.helper.get_sections_from_namespace(namespace))
+            config_data_for_compulsory = {
+                "sections": config_data.sections.now,
+                "variables": config_data.vars.now
+            }
+            bad_list = checker.validate_settings(
+                config_data_for_compulsory, config_data.meta,
+                only_these_sections=only_these_sections
+            )
+            self.apply_macro_validation(config_name,
+                                        rose.META_PROP_COMPULSORY, bad_list,
                                         namespace, is_loading=is_loading,
-                                        is_macro_dynamic=is_macro_dynamic)
+                                        is_macro_dynamic=True)
+        # Value checking.
+        for config_name in configs:
+            config_data = self.data.config[config_name]
+            meta = config_data.meta
+            checker = (
+                self.data.builtin_macros[config_name][rose.META_PROP_TYPE])
+            if namespace is None:
+                real_variables = config_data.vars.get_all(skip_latent=True)
+            else:
+                real_variables, latent_variables = (
+                    self.data.helper.get_data_for_namespace(namespace))
+            bad_list = checker.validate_variables(real_variables, meta)
+            self.apply_macro_validation(config_name, rose.META_PROP_TYPE,
+                                        bad_list,
+                                        namespace, is_loading=is_loading,
+                                        is_macro_dynamic=True)
 
     def apply_macro_validation(self, config_name, macro_type, bad_list=None,
                                namespace=None, is_loading=False,

@@ -20,10 +20,12 @@
 
 import re
 
+import rose.config
 import rose.macro
+import rose.variable
 
 
-class CompulsoryChecker(rose.macro.MacroBase):
+class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
 
     """Returns sections and options that are compulsory but missing.
 
@@ -40,22 +42,58 @@ class CompulsoryChecker(rose.macro.MacroBase):
     WARNING_COMPULSORY_USER_IGNORED = ('Compulsory settings should not be '
                                        'user-ignored.')
 
-    def validate(self, config, meta_config=None):
-        """Return a list of errors, if any."""
+    def validate(self, config_data, meta_config):
+        """Return a list of compulsory-related errors, if any.
+
+        config_data - a rose.config.ConfigNode or a dictionary that
+        looks like this:
+        {"sections":
+            {"namelist:foo": rose.section.Section instance,
+             "env": rose.section.Section instance},
+         "variables":
+            {"namelist:foo": [rose.variable.Variable instance,
+                              rose.variable.Variable instance],
+             "env": [rose.variable.Variable instance]
+            }
+        }
+        meta_config - a rose.config.ConfigNode.
+
+        """
         self.reports = []
-        meta_config = self._load_meta_config(config, meta_config)
+        return self.validate_settings(config_data, meta_config)
+
+    def validate_settings(self, config_data, meta_config,
+                          only_these_sections=None):
+        """Return a list of compulsory-related errors, if any.
+
+        config_data - a rose.config.ConfigNode or a dictionary that
+        looks like this:
+        {"sections":
+            {"namelist:foo": rose.section.Section instance,
+             "env": rose.section.Section instance},
+         "variables":
+            {"namelist:foo": [rose.variable.Variable instance,
+                              rose.variable.Variable instance],
+             "env": [rose.variable.Variable instance]
+            }
+        }
+        meta_config - a rose.config.ConfigNode.
+        only_these_sections (default None) - a list of sections to
+        examine. If specified, checking for other sections will be
+        skipped.
+
+        """
         if not hasattr(self, 'section_to_basic_map'):
             self.section_to_basic_map = {}
             self.section_from_basic_map = {}
-        for section, node in config.value.items():
-            if not isinstance(node.value, dict):
-                section = ""
+        for section in self._get_config_sections(config_data):
             if section not in self.section_to_basic_map:
                 basic_section = rose.macro.REC_ID_STRIP.sub('', section)
                 self.section_to_basic_map.update({section: basic_section})
                 self.section_from_basic_map.setdefault(basic_section, [])
                 self.section_from_basic_map[basic_section].append(section)
         if self.stored_compulsory_ids is None:
+            # Build a cache of basic ids known to be compulsory.
             self.stored_compulsory_ids = []
             for setting_id, sect_node in meta_config.value.items():
                 if sect_node.is_ignored() or isinstance(sect_node.value, str):
@@ -65,36 +103,66 @@ class CompulsoryChecker(rose.macro.MacroBase):
                         not opt_node.is_ignored() and
                         opt_node.value == rose.META_PROP_VALUE_TRUE):
                         self.stored_compulsory_ids.append(setting_id)
+        check_user_ignored_ids = []
         for setting_id in self.stored_compulsory_ids:
             section, option = self._get_section_option_from_id(setting_id)
-            node = config.get([section, option])
-            if node is None:
-                for sect in self.section_from_basic_map.get(section, []):
-                    if sect in config.value:
-                        node = config.get([sect])
-                        section = sect
-                        break
-                if node is None:
+            if (only_these_sections is not None and
+                    section not in only_these_sections):
+                continue
+            is_node_present = self._get_config_has_id(config_data, setting_id)
+            if is_node_present:
+                # It is present in the basic form - no duplicates/modifiers.
+                check_user_ignored_ids.append(setting_id)
+                continue
+            # Look for duplicates/modifiers - e.g. for foo(1) instead of foo.
+            found_the_section = False
+            for sect in self.section_from_basic_map.get(section, []):
+                # Loop through all known duplicate/modifiers for section.
+                # This includes the section itself.
+                sect_exists = self._get_config_has_id(config_data, sect)
+                if sect_exists:
+                    # A duplicate section exists - e.g. foo(1) for foo.
+                    found_the_section = True
                     if option is None:
-                        self.add_report(section, option, None,
-                                        self.WARNING_COMPULSORY_SECT_MISSING)
-                    else:
-                        self.add_report(section, option, None,
-                                        self.WARNING_COMPULSORY_OPT_MISSING)
-                elif option is not None:
-                    for opt, opt_node in node.value.items():
+                        # The compulsory condition for section is OK.
+                        check_user_ignored_ids.append(sect)
+                        break
+                    # We're looking for an option - look within the section.
+                    found_the_option = False
+                    for opt in self._get_config_section_options(
+                            config_data, sect):
                         if (opt == option or
                             opt.startswith(option + "(")):
-                            node = opt_node
-                            option = opt
-                            break
-                    else:
-                        self.add_report(section, option, None,
-                                        self.WARNING_COMPULSORY_OPT_MISSING)
-            if node is not None and node.state == node.STATE_USER_IGNORED:
-                value = node.value
-                if not isinstance(value, basestring):
-                    value = None
+                            # The option is present or in duplicate form.
+                            found_the_option = True
+                            var_id = self._get_id_from_section_option(
+                                sect, opt)
+                            check_user_ignored_ids.append(var_id)
+                    if not found_the_option:
+                        # This section is missing our compulsory option.
+                        self.add_report(
+                            sect, option, None,
+                            self.WARNING_COMPULSORY_OPT_MISSING
+                        )
+            if not found_the_section:
+                if option is None:
+                    # No valid duplicate sections found.
+                    self.add_report(
+                        section, None, None,
+                        self.WARNING_COMPULSORY_SECT_MISSING
+                    )
+                else:
+                    # No valid parent duplicate sections were found.
+                    self.add_report(
+                        section, option, None,
+                        self.WARNING_COMPULSORY_OPT_MISSING
+                    )
+        for setting_id in check_user_ignored_ids:
+            # These ids need checking to make sure they're not user-ignored.
+            if (self._get_config_id_state(config_data, setting_id) ==
+                    rose.config.ConfigNode.STATE_USER_IGNORED):
+                value = self._get_config_id_value(config_data, setting_id)
+                section, option = self._get_section_option_from_id(setting_id)
                 self.add_report(section, option, value,
                                 self.WARNING_COMPULSORY_USER_IGNORED)
         return self.reports
