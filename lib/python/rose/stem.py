@@ -253,9 +253,9 @@ class StemRunner(object):
             else:
                 repos[project] = [ url ]
                 self._add_define_option('SOURCE_' + project.upper() + '_REV', 
-                                '"' + rev + '"')
+                                        '"' + rev + '"')
                 self._add_define_option('SOURCE_' + project.upper() + '_BASE', 
-                                '"' + base + '"')
+                                        '"' + base + '"')
             self.reporter(SourceTreeAddedAsBranchEvent(url))
         for project, branches in repos.iteritems():
             var = 'SOURCE_' + project.upper()
