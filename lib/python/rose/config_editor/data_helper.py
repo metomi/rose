@@ -69,7 +69,7 @@ class ConfigDataHelper(object):
         """Return the matching variable or None."""
         sect, opt = self.util.get_section_option_from_id(var_id)
         return self.data.config[config_name].vars.get_var(
-                         sect, opt, save, no_latent=not latent)
+                         sect, opt, save, skip_latent=not latent)
 
 #------------------ Data model helper functions ------------------------------
 
@@ -119,6 +119,22 @@ class ConfigDataHelper(object):
                 key = this_macro_method_name.replace(module_prefix, "", 1)
                 ns_macro_info.update({key: this_info})
         return ns_macro_info
+
+    def get_section_data_for_namespace(self, ns):
+        """Return real and latent lists of Section objects for this ns."""
+        allowed_sections = (
+            self.data.helper.get_sections_from_namespace(ns))
+        config_name = self.util.split_full_ns(self.data, ns)[0]
+        config_data = self.data.config[config_name]
+        real_sections = []
+        for section, sect_data in config_data.sections.now.items():
+            if section in allowed_sections:
+                real_sections.append(sect_data)
+        latent_sections = []
+        for section, sect_data in config_data.sections.latent.items():
+            if section in allowed_sections:
+                latent_sections.append(sect_data)
+        return real_sections, latent_sections
 
     def get_sub_data_for_namespace(self, ns, from_saved=False):
         """Return any sections/variables below this namespace."""
@@ -355,6 +371,8 @@ class ConfigDataHelper(object):
         variable_statuses = {}
         for section in sections:
             sect_data = config_data.sections.get_sect(section)
+            if sect_data is None:
+                continue
             if sect_data.metadata["full_ns"] == namespace:
                 if not sect_data.ignored_reason:
                     return status

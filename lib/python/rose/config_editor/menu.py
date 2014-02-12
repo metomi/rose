@@ -353,6 +353,7 @@ class MainMenuHandler(object):
 
     def __init__(self, data, util, reporter, mainwindow,
                  undo_stack, redo_stack, undo_func,
+                 update_config_func,
                  apply_macro_transform_func, apply_macro_validation_func,
                  section_ops_inst, variable_ops_inst, find_ns_id_func):
         self.data = data
@@ -362,6 +363,7 @@ class MainMenuHandler(object):
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack
         self.perform_undo = undo_func
+        self.update_config = update_config_func
         self.apply_macro_transform = apply_macro_transform_func
         self.apply_macro_validation = apply_macro_validation_func
         self.sect_ops = section_ops_inst
@@ -389,11 +391,11 @@ class MainMenuHandler(object):
         """Handle a destroy main program request."""
         for name in self.data.config:
             config_data = self.data.config[name]
-            variables = config_data.vars.get_all(no_latent=True)
-            save_vars = config_data.vars.get_all(save=True, no_latent=True)
-            sections = config_data.sections.get_all(no_latent=True)
+            variables = config_data.vars.get_all(skip_latent=True)
+            save_vars = config_data.vars.get_all(save=True, skip_latent=True)
+            sections = config_data.sections.get_all(skip_latent=True)
             save_sections = config_data.sections.get_all(save=True,
-                                                         no_latent=True)
+                                                         skip_latent=True)
             now_set = set([v.to_hashable() for v in variables])
             save_set = set([v.to_hashable() for v in save_vars])
             now_sect_set = set([s.to_hashable() for s in sections])
@@ -412,9 +414,13 @@ class MainMenuHandler(object):
 
     def check_all_extra(self):
         """Check fail-if, warn-if, and run all validator macros."""
-        num_errors = self.check_fail_rules()
+        for config_name in self.data.config.keys():
+            if not self.data.config[config_name].is_preview:
+                self.update_config(config_name)
+        num_errors = self.check_fail_rules(configs_updated=True)
         num_errors += self.run_custom_macro(
-            method_name=rose.macro.VALIDATE_METHOD)
+            method_name=rose.macro.VALIDATE_METHOD,
+            configs_updated=True)
         if num_errors:
             text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL.format(
                                                                  num_errors)
@@ -424,8 +430,12 @@ class MainMenuHandler(object):
             kind = self.reporter.KIND_OUT
         self.reporter.report(text, kind=kind)
 
-    def check_fail_rules(self):
+    def check_fail_rules(self, configs_updated=False):
         """Check the fail-if and warn-if conditions of the configurations."""
+        if not configs_updated:
+            for config_name in self.data.config.keys():
+                if not self.data.config[config_name].is_preview:
+                    self.update_config(config_name)
         macro = rose.macros.rule.FailureRuleChecker()
         macro_fullname = "rule.FailureRuleChecker.validate"
         error_count = 0
@@ -594,7 +604,8 @@ class MainMenuHandler(object):
         return False
 
     def run_custom_macro(self, config_name=None, module_name=None,
-                         class_name=None, method_name=None):
+                         class_name=None, method_name=None,
+                         configs_updated=False):
         """Run the custom macro method and launch a dialog."""
         old_pwd = os.getcwd()
         macro_data = []
@@ -605,6 +616,9 @@ class MainMenuHandler(object):
         for name in list(configs):
             if self.data.config[name].is_preview:
                 configs.remove(name)
+                continue
+            if not configs_updated:
+                self.update_config(name)
         if method_name is None:
             method_names = [rose.macro.VALIDATE_METHOD,
                             rose.macro.TRANSFORM_METHOD]
@@ -939,6 +953,7 @@ class MainMenuHandler(object):
             config_data = self.data.config[config_name]
             if config_data.is_preview:
                 continue
+            self.update_config(config_name)
             if (only_this_config_name is None or
                 config_name == only_this_config_name):
                 config_dict[config_name] = {

@@ -87,7 +87,7 @@ class NavTreeManager(object):
             # Load tree from sections (usually vast majority of tree nodes)
             self.data.load_node_namespaces(config_name)
             for section_data in config_data.sections.get_all(
-                                            no_latent=not view_missing):
+                                            skip_latent=not view_missing):
                 ns = section_data.metadata["full_ns"]
                 self.data.namespace_meta_lookup.setdefault(ns, {})
                 self.data.namespace_meta_lookup[ns].setdefault(
@@ -97,7 +97,7 @@ class NavTreeManager(object):
                                            self.namespace_tree,
                                            prev_spaces=[])
             # Now load tree from variables
-            for var in config_data.vars.get_all(no_latent=not view_missing):
+            for var in config_data.vars.get_all(skip_latent=not view_missing):
                 ns = var.metadata['full_ns']
                 self.data.namespace_meta_lookup.setdefault(ns, {})
                 self.data.namespace_meta_lookup[ns].setdefault(
