@@ -167,8 +167,8 @@ class CylcProcessor(SuiteEngineProcessor):
         tasks -- Display only jobs for task names matching these names. Values
                  can be a valid task name or a glob like pattern for matching
                  valid task names.
-        only_statuses -- If given, only display tasks containing jobs of this
-                         status. Valid values are the keys of
+        only_statuses -- If given, only display jobs with this status. Valid
+                         values are the keys of
                          CylcProcessor.STATUSES.
         order -- Order search in a predetermined way. A valid value is one of
                  the keys in CylcProcessor.ORDERS.
@@ -231,7 +231,6 @@ class CylcProcessor(SuiteEngineProcessor):
         stmt_args_head = ["submitting now", "submission failed", "started",
                           "succeeded", "failed", "signaled"]
         stmt_args_tail = []
-        ok_task_name_cycles = []
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt,
                 stmt_args_head + stmt_args + stmt_args_tail):
@@ -257,24 +256,18 @@ class CylcProcessor(SuiteEngineProcessor):
                     if my_event == "fail(%s)":
                         signal = message.rsplit(None, 1)[-1]
                         entry["status"] = "fail(%s)" % signal
-            entries.append(entry)
             for only_status in only_statuses:
-                if only_status == "fail" and "fail" in entry["status"]:
-                    ok_task_name_cycles.append((name, cycle))
-                if only_status == "active" and entry["status"] == "init":
-                    ok_task_name_cycles.append((name, cycle))
-                if only_status == "success" and entry["status"] == "success":
-                    ok_task_name_cycles.append((name, cycle))
-        if only_statuses:
-            entries_shown = []
-            for entry in entries:
-                if (entry["name"], entry["cycle"]) in ok_task_name_cycles:
-                    entries_shown.append(entry)
-            entries = entries_shown
+                if ((only_status == "fail" and "fail" in entry["status"]) or
+                        (only_status == "active" and
+                         entry["status"] == "init") or
+                        (only_status == "success" and
+                         entry["status"] == "success")):
+                    entries.append(entry)
+            if not only_statuses:
+                entries.append(entry)
         of_n_entries = len(entries)
         if limit:
             entries = entries[offset:offset + limit]
-
         other_info_of = {}
         for entry in entries:
             cycle = entry["cycle"]

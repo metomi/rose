@@ -123,7 +123,7 @@ class Root(object):
                  The list should be specified as a string which will be
                  shlex.split by this method. Values can be a valid task name or
                  a glob like pattern for matching valid task names.
-        only_status -- Only display jobs of tasks that contain this job status.
+        only_status -- Only display jobs with this status.
                      The values in the list should be "active", "success" or
                      "fail".
         order -- Order search in a predetermined way. A valid value is one of

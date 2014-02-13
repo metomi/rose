@@ -141,10 +141,10 @@ value="{{per_page}}"
 />
 </div>
 <div class="span3">
-Only tasks with:
-{% for status, title in [["active", "Only tasks with active jobs"],
-                         ["success", "Only tasks with succeeded jobs"],
-                         ["fail", "Only tasks with failed jobs"]] -%}
+Only:
+{% for status, title in [["active", "Only active jobs"],
+                         ["success", "Only succeeded jobs"],
+                         ["fail", "Only failed jobs"]] -%}
 <label class="checkbox inline" for="only_status_{{status}}" title="{{title}}">
 <input id="only_status_{{status}}" type="checkbox" name="only_status"
 {% if only_statuses and status in only_statuses -%}
