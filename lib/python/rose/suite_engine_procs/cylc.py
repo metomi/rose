@@ -394,10 +394,16 @@ class CylcProcessor(SuiteEngineProcessor):
                                   "size": s.st_size}
         return ("cylc", logs_info)
 
-    def get_suite_cycles_summary(self, user_name, suite_name):
+    def get_suite_cycles_summary(self, user_name, suite_name, limit, offset):
         """Return a the state summary (of each cycle) of a user's suite.
 
-        Return a data structure that looks like:
+        user -- A string containing a valid user ID
+        suite -- A string containing a valid suite ID
+        limit -- Limit number of returned entries
+        offset -- Offset entry number
+
+        Return (entries, of_n_entries), where entries is a data structure that
+        looks like:
             [   {   "cycle": cycle,
                     "n_states": {"active": N, "success": M, "fail": L}},
                 },
@@ -407,7 +413,16 @@ class CylcProcessor(SuiteEngineProcessor):
         * cycle is a date-time cycle label
         * N, M, L are the numbers of tasks in given states
 
+        and of_n_entries is the total number of entries.
+
         """
+        stmt = "SELECT COUNT(DISTINCT cycle) FROM task_states"
+        of_n_entries = 0
+        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt):
+            of_n_entries = row[0]
+            break
+        if not of_n_entries:
+            return ([], 0)
         stmt_args = self.STATE_OF.keys()
         stmt = ("SELECT cycle, fail_count, group_concat(status) FROM task_states"
                 " LEFT JOIN (SELECT cycle, count(*) AS fail_count FROM task_events"
@@ -418,6 +433,9 @@ class CylcProcessor(SuiteEngineProcessor):
                 stmt += " OR"
             stmt += " status==?"
         stmt += ") GROUP BY cycle ORDER BY cycle DESC"
+        if limit:
+            stmt += " LIMIT ? OFFSET ?"
+            stmt_args += [limit, offset]
         entries = []
         for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
                                  stmt_args):
@@ -430,7 +448,7 @@ class CylcProcessor(SuiteEngineProcessor):
             entries.append(entry)
             for status in statuses_str.split(","):
                 entry["n_states"][self.STATE_OF[status]] += 1
-        return entries
+        return entries, of_n_entries
 
     def get_suite_state_summary(self, user_name, suite_name):
         """Return a the state summary of a user's suite.
