@@ -156,7 +156,7 @@ class CylcProcessor(SuiteEngineProcessor):
         return os.path.join(self.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
     def get_suite_job_events(self, user_name, suite_name, cycles, tasks,
-                             no_statuses, order, limit, offset):
+                             only_statuses, order, limit, offset):
         """Return suite job events.
 
         user -- A string containing a valid user ID
@@ -167,8 +167,9 @@ class CylcProcessor(SuiteEngineProcessor):
         tasks -- Display only jobs for task names matching these names. Values
                  can be a valid task name or a glob like pattern for matching
                  valid task names.
-        no_statuses -- Do not display jobs with these statuses. Valid values
-                       are the keys of CylcProcessor.STATUSES.
+        only_statuses -- If given, only display tasks containing jobs of this
+                         status. Valid values are the keys of
+                         CylcProcessor.STATUSES.
         order -- Order search in a predetermined way. A valid value is one of
                  the keys in CylcProcessor.ORDERS.
         limit -- Limit number of returned entries
@@ -212,26 +213,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 where_fragments.append("name GLOB ?")
                 stmt_args.append(task)
             where += " AND (" + " OR ".join(where_fragments) + ")"
-        if no_statuses:
-            where_fragments = []
-            for no_status in no_statuses:
-                for status in self.STATUSES.get(no_status, []):
-                    where_fragments.append("status != ?")
-                    stmt_args.append(status)
-            where += " AND (" + " AND ".join(where_fragments) + ")"
-        # Execute query to get number of entries
-        of_n_entries = 0
-        stmt = ("SELECT COUNT(*) FROM"
-                " task_events JOIN task_states USING (name,cycle)"
-                " WHERE event==?")
-        if where:
-            stmt += " " + where
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
-                                 ["submitting now"] + stmt_args):
-            of_n_entries = row[0]
-            break
-        if not of_n_entries:
-            return ([], 0)
         # Execute query to get entries
         entries = []
         stmt = ("SELECT" +
@@ -250,9 +231,7 @@ class CylcProcessor(SuiteEngineProcessor):
         stmt_args_head = ["submitting now", "submission failed", "started",
                           "succeeded", "failed", "signaled"]
         stmt_args_tail = []
-        if limit:
-            stmt += " LIMIT ? OFFSET ?"
-            stmt_args_tail = [limit, offset]
+        ok_task_name_cycles = []
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt,
                 stmt_args_head + stmt_args + stmt_args_tail):
@@ -260,7 +239,6 @@ class CylcProcessor(SuiteEngineProcessor):
             entry = {"cycle": cycle, "name": name, "submit_num": submit_num,
                      "submit_num_max": 1, "events": [None, None, None],
                      "status": None, "logs": {}, "seq_logs_indexes": {}}
-            entries.append(entry)
             events = events_str.split(",")
             times = times_str.split(",")
             if messages_str:
@@ -279,6 +257,23 @@ class CylcProcessor(SuiteEngineProcessor):
                     if my_event == "fail(%s)":
                         signal = message.rsplit(None, 1)[-1]
                         entry["status"] = "fail(%s)" % signal
+            entries.append(entry)
+            for only_status in only_statuses:
+                if only_status == "fail" and "fail" in entry["status"]:
+                    ok_task_name_cycles.append((name, cycle))
+                if only_status == "active" and entry["status"] == "init":
+                    ok_task_name_cycles.append((name, cycle))
+                if only_status == "success" and entry["status"] == "success":
+                    ok_task_name_cycles.append((name, cycle))
+        if only_statuses:
+            entries_shown = []
+            for entry in entries:
+                if (entry["name"], entry["cycle"]) in ok_task_name_cycles:
+                    entries_shown.append(entry)
+            entries = entries_shown
+        of_n_entries = len(entries)
+        if limit:
+            entries = entries[offset:offset + limit]
 
         other_info_of = {}
         for entry in entries:
