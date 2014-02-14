@@ -109,6 +109,8 @@ class PythonListMetaType(MetaType):
     def is_valid(self, value):
         try:
             cast_value = ast.literal_eval(value)
+            if not isinstance(cast_value, list):
+                return [False, self.WARNING.format(repr(value))]
         except (SyntaxError, ValueError):
             return [False, self.WARNING.format(repr(value))]
         return [True, None]

@@ -84,6 +84,8 @@ class PythonListValueWidget(gtk.HBox):
 
     def get_focus_index(self):
         """Get the focus and position within the table of entries."""
+        if not self.value.startswith("["):
+            return
         text = '['
         for entry in self.entries:
             val = entry.get_text()
@@ -98,6 +100,8 @@ class PythonListValueWidget(gtk.HBox):
         if focus_index is None:
             return
         value_array = python_array_split(self.value)
+        if not self.value.startswith("["):
+            return
         text = '['
         for i, val in enumerate(value_array):
             j = len(text)
@@ -431,7 +435,7 @@ def python_array_split(value):
     """Split the value into elements with appropriate string values."""
     try:
         value_array = ast.literal_eval(value)
-    except SyntaxError:
+    except (SyntaxError, ValueError):
         value_no_brackets = value.lstrip("[").rstrip("]")
         value_array = rose.variable.array_split(value_no_brackets)
         return value_array
