@@ -252,19 +252,15 @@ class StemRunner(object):
                 repos[project].append(url)
             else:
                 repos[project] = [ url ]
+                self._add_define_option('SOURCE_' + project.upper() + '_REV', 
+                                        '"' + rev + '"')
+                self._add_define_option('SOURCE_' + project.upper() + '_BASE', 
+                                        '"' + base + '"')
             self.reporter(SourceTreeAddedAsBranchEvent(url))
         for project, branches in repos.iteritems():
             var = 'SOURCE_' + project.upper()
             branchstring = RosePopener.list_to_shell_str(branches)
             self._add_define_option(var, '"' + branchstring + '"')
-
-        # Add configs source variables for first
-        confsource = self.opts.source[0]
-        confproject, url, base, rev = self._ascertain_project(confsource)
-        self._add_define_option('SOURCE_' + confproject.upper() + '_REV', '"'
-                                + rev + '"')
-        self._add_define_option('SOURCE_' + confproject.upper() + '_BASE', '"'
-                                + base + '"')
 
         # Generate the variable containing tasks to run
         if self.opts.group:
