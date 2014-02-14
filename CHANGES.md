@@ -13,6 +13,20 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1131: rosie create: obtain user name from `~/.subversion/servers`, where
+relevant.
+
+\#1130: Rose Bush: cycles: add paging function. Display 100 cycles per page.
+
+\#1127: Rose Bush: jobs: fix pager form to ensure that sort order is maintained.
+
+\#1121: rose stem: create `_REV` and `_BASE` variables for all projects.
+
+\#1119: rose config-edit: fix python list widget.
+
+\#1117: rose config-edit: improve performance by reducing updates to the
+internal data structure.
+
 \#1114: rose config-edit: run a macro or upgrade macro with the relevant
 configuration directory as the current working directory.
 
