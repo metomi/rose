@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 28
+tests 32
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -34,6 +34,7 @@ local-copy-root=$PWD/roses
 prefix-default=foo
 prefix-owner-default.foo=fred
 prefix-location.foo=$URL
+prefix-location.bar=https://my-host/bar
 __ROSE_CONF__
 export ROSE_CONF_PATH=$PWD
 #-------------------------------------------------------------------------------
@@ -93,6 +94,32 @@ __INFO__
     echo "[INFO] foo-aa001: created at $URL/a/a/0/0/1"
     echo "[INFO] foo-aa001: local copy created at $PWD/roses/foo-aa001"
 }>"$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-info-edit-with-svn-servers-conf
+cat >"$TEST_KEY_BASE-svn-servers-conf" <<'__CONF__'
+[groups]
+bar=my-host
+
+[bar]
+username=barn.owl
+__CONF__
+cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
+access-list=*
+owner=barn.owl
+project=don't fail
+title=this should never fail
+__INFO__
+ROSIE_SUBVERSION_SERVERS_CONF="$PWD/$TEST_KEY_BASE-svn-servers-conf" \
+    run_fail "$TEST_KEY" rosie create --prefix=bar <<<n
+file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+access-list=*
+owner=barn.owl
+project=
+title=
+__INFO__
+echo -n 'Create? y/n (default n) ' >"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

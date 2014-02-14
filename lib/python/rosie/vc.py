@@ -20,6 +20,7 @@
 """Wrap version control system functionalities required by Rosie."""
 
 import atexit
+from fnmatch import fnmatch
 import os
 import pwd
 import re
@@ -37,6 +38,7 @@ from StringIO import StringIO
 import sys
 import tempfile
 import time
+from urlparse import urlparse
 
 
 class FileExistError(Exception):
@@ -138,6 +140,8 @@ class RosieVCClient(object):
 
     """Client for version control functionalities."""
 
+    SUBVERSION_SERVERS_CONF = "~/.subversion/servers"
+
     def __init__(self, event_handler=None, popen=None, fs_util=None,
                  force_mode=False):
         if event_handler is None:
@@ -152,6 +156,15 @@ class RosieVCClient(object):
         self.force_mode = force_mode
         self._work_dir = None
         atexit.register(self._delete_work_dir)
+        self.subversion_servers_conf = None
+        subversion_servers_conf = os.getenv("ROSIE_SUBVERSION_SERVERS_CONF")
+        if subversion_servers_conf:
+            self.subversion_servers_conf = subversion_servers_conf
+        else:
+            subversion_servers_conf = os.path.expanduser(
+                                        self.SUBVERSION_SERVERS_CONF)
+            if os.path.exists(subversion_servers_conf):
+                self.subversion_servers_conf = subversion_servers_conf
 
     def _delete_work_dir(self):
         if self._work_dir is not None and os.path.isdir(self._work_dir):
@@ -303,10 +316,29 @@ class RosieVCClient(object):
             prefix = from_id.prefix
         elif prefix is None:
             prefix = SuiteId.get_prefix_default()
+
+        # Determine owner:
+        # 1. From user configuration [rosie-id]prefix-owner-default
+        # 2. From username of a matching group in [groups] in
+        #    ~/.subversion/servers
+        # 3. Current user ID
         owner = res_loc.get_conf().get_value(
-                ["rosie-id", "prefix-owner-default." + prefix],
-                pwd.getpwuid(os.getuid())[0])
+                        ["rosie-id", "prefix-owner-default." + prefix])
+        if not owner and self.subversion_servers_conf:
+            servers_conf = rose.config.load(self.subversion_servers_conf)
+            groups_node = servers_conf.get(["groups"])
+            if groups_node is not None:
+                group = None
+                prefix_loc = SuiteId.get_prefix_location(prefix)
+                prefix_host = urlparse(prefix_loc).hostname
+                for key, node in groups_node.value.items():
+                    if fnmatch(prefix_host, node.value):
+                        owner = servers_conf.get_value([key, "username"])
+                        break
+        if not owner:
+            owner = pwd.getpwuid(os.getuid())[0]
         info_config.set(["owner"], owner)
+
         if from_project:
             info_config.set(["project"], from_project)
         else:
