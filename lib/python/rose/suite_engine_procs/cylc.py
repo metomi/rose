@@ -134,6 +134,28 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
 
+    def get_custom_text_for_file(self, user_name, suite_name, file_path):
+        """Return custom text for particular files - otherwise return None."""
+        if file_path != self.SUITE_DB:
+            return None
+        text = "Dump for " + file_path + " ....\n\n"
+        for table in ["task_events", "task_states", "broadcast_settings"]:
+            text += "TABLE: " + table + "\n"
+            stmt = "PRAGMA table_info(" + table + ")"
+            for row in self._db_exec(self.SUITE_DB, user_name, suite_name,
+                                     stmt):
+                text += row[1] + "|"
+            text = text.rstrip("|") + "\n"
+            stmt = "SELECT * from " + table
+            data = self._db_exec(self.SUITE_DB, user_name, suite_name,
+                                     stmt)
+            for row in data:
+                text += "|".join([str(r) for r in row]) + "\n"
+            text += "\n"
+        text = text.rstrip("\n") + "\n"
+        self._db_close(self.SUITE_DB, user_name, suite_name)
+        return text
+
     def get_cycle_items_globs(self, name, cycle):
         """Return a glob to match named items created for a given cycle.
 
@@ -383,7 +405,7 @@ class CylcProcessor(SuiteEngineProcessor):
             prefix += user_name
         d_rel = self.get_suite_dir_rel(suite_name)
         d = os.path.expanduser(os.path.join(prefix, d_rel))
-        for key in ["cylc-suite-env",
+        for key in ["cylc-suite-env", "cylc-suite.db",
                     "log/suite/err", "log/suite/log", "log/suite/out",
                     "suite.rc", "suite.rc.processed"]:
             f_name = os.path.join(d, key)

@@ -283,7 +283,15 @@ class Root(object):
         f_name = self._get_user_suite_dir(user, suite, path)
         if not os.access(f_name, os.F_OK | os.R_OK):
             raise cherrypy.HTTPError(404)
-        if path_in_tar:
+        custom_text = self.suite_engine_proc.get_custom_text_for_file(
+            user, suite, path)
+        if custom_text is not None:
+            s = custom_text
+            if mode == "download":
+                mime = mimetypes.guess_type(urllib.pathname2url(f_name))[0]
+                cherrypy.response.headers["Content-Type"] = mime
+                return cherrypy.lib.static.serve_file(f_name, mime)
+        elif path_in_tar:
             tar_f = tarfile.open(f_name, 'r:gz')
             try:
                 tar_info = tar_f.getmember(path_in_tar)

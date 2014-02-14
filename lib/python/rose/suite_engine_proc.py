@@ -285,6 +285,10 @@ class SuiteEngineProcessor(object):
         """Run suite engine dependent logic (at end of "rose suite-clean")."""
         raise NotImplementedError()
 
+    def get_custom_text_for_file(self, user_name, suite_name, file_path):
+        """Return custom text for particular files - otherwise return None."""
+        raise NotImplementedError()
+
     def get_cycle_items_globs(self, name, cycle):
         """Return a glob to match named items created for a given cycle.
 
