@@ -213,6 +213,19 @@ class CylcProcessor(SuiteEngineProcessor):
                 where_fragments.append("name GLOB ?")
                 stmt_args.append(task)
             where += " AND (" + " OR ".join(where_fragments) + ")"
+        # Execute query to get number of entries
+        of_n_entries = 0
+        if limit and not only_statuses:
+            stmt = ("SELECT COUNT(*) FROM task_events WHERE event==?")
+            if where:
+                stmt += " " + where
+            for row in self._db_exec(self.SUITE_DB, user_name, suite_name,
+                                     stmt,
+                                     ["submitting now"] + stmt_args):
+                of_n_entries = row[0]
+                break
+            if not of_n_entries:
+                return ([], 0)
         # Execute query to get entries
         entries = []
         stmt = ("SELECT" +
@@ -220,7 +233,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 " group_concat(time), group_concat(event)," +
                 " group_concat(message) " +
                 " FROM" +
-                " task_events JOIN task_states USING (cycle,name)" +
+                " task_events" +
                 " WHERE" +
                 " (event==? OR event==? OR event==? OR" +
                 "  event==? OR event==? OR event==?)" +
@@ -231,6 +244,9 @@ class CylcProcessor(SuiteEngineProcessor):
         stmt_args_head = ["submitting now", "submission failed", "started",
                           "succeeded", "failed", "signaled"]
         stmt_args_tail = []
+        if limit and not only_statuses:
+            stmt += " LIMIT ? OFFSET ?"
+            stmt_args_tail = [limit, offset]
         for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt,
                 stmt_args_head + stmt_args + stmt_args_tail):
@@ -265,8 +281,9 @@ class CylcProcessor(SuiteEngineProcessor):
                     entries.append(entry)
             if not only_statuses:
                 entries.append(entry)
-        of_n_entries = len(entries)
-        if limit:
+        if of_n_entries == 0:
+            of_n_entries = len(entries)
+        if only_statuses and limit:
             entries = entries[offset:offset + limit]
         other_info_of = {}
         for entry in entries:
