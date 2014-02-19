@@ -74,6 +74,7 @@ def main():
         report(Exception("Cannot specify both a file and meta key."))
         sys.exit(1)
 
+    config_loader = ConfigLoader()
     sources = []
     if opts.files:
         root_node = ConfigNode()
@@ -82,6 +83,11 @@ def main():
                 sources.append(sys.stdin)
             else:
                 if opts.meta:
+                    try:
+                        root_node = config_loader.load(fname)
+                    except ConfigSyntaxError as e:
+                        report(e)
+                        sys.exit(1)
                     rel_path = os.sep.join(fname.split(os.sep)[:-1])
                     fpath = get_meta_path(root_node, rel_path)
                     if fpath is None:
@@ -94,6 +100,14 @@ def main():
         root_node = ConfigNode()
         if opts.meta_key:
             root_node.set(["meta"], opts.meta_key)
+        else:
+            fname = os.path.join(
+                os.getcwd(), rose.SUB_CONFIG_NAME)
+            try:
+                root_node = config_loader.load(fname)
+            except ConfigSyntaxError as e:
+                report(e)
+                sys.exit(1)
         fpath = get_meta_path(root_node, meta_key=opts.meta_key)
         root_node.unset(["meta"])
         if fpath is None:
@@ -104,7 +118,6 @@ def main():
     else:
         root_node = ResourceLocator.default().get_conf()
 
-    config_loader = ConfigLoader()
     for source in sources:
         try:
             if opts.meta or opts.no_opts:
