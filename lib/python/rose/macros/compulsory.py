@@ -83,6 +83,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
         skipped.
 
         """
+        self.reports = []
         if not hasattr(self, 'section_to_basic_map'):
             self.section_to_basic_map = {}
             self.section_from_basic_map = {}
