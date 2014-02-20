@@ -13,6 +13,8 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1136: rose config --meta: fix finding non-local metadata.
+
 \#1131: rosie create: obtain user name from `~/.subversion/servers`, where
 relevant.
 
