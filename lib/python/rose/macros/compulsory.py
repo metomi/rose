@@ -59,7 +59,6 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
         meta_config - a rose.config.ConfigNode.
 
         """
-        self.reports = []
         return self.validate_settings(config_data, meta_config)
 
     def validate_settings(self, config_data, meta_config,
