@@ -1795,6 +1795,8 @@ class MainController(object):
 def spawn_window(config_directory_path=None, debug_mode=False,
                  load_all_apps=False, load_no_apps=False, metadata_off=False):
     """Create a window and load the configuration into it. Run gtk."""
+    if not debug_mode:
+        warnings.filterwarnings('ignore')
     RESOURCER = rose.resource.ResourceLocator(paths=sys.path)
     rose.gtk.util.rc_setup(
         RESOURCER.locate('etc/rose-config-edit/.gtkrc-2.0'))

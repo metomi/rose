@@ -30,6 +30,7 @@ import threading
 import time
 import traceback
 import urllib
+import warnings
 import webbrowser
 
 import pygtk
@@ -1365,6 +1366,8 @@ if __name__ == "__main__":
     number_of_events = 6
     splash_screen = rose.gtk.splash.SplashScreenProcess(logo, title,
                                                         number_of_events)
+    if not opts.debug_mode:
+        warnings.filterwarnings('ignore')
     try:
         MainWindow(opts, args, splash_screen)
     except BaseException as e:
