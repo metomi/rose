@@ -1027,7 +1027,6 @@ class MainController(object):
     def _set_page_ns_show_modes(self, key, is_key_allowed):
         """Set namespace view options."""
         self.page_ns_show_modes[key] = is_key_allowed
-        self.reload_namespace_tree()  # This knows page_ns_show_modes.
         if (hasattr(self, "menubar") and
                 key == rose.config_editor.SHOW_MODE_IGNORED):
             user_ign_item = self.menubar.uimanager.get_widget(
