@@ -36,6 +36,12 @@ function init_meta() {
     done
 }
 
+function init_meta_content() {
+    category=$1
+    version=$2
+    cat >$TEST_DIR/rose-meta/$category/$version/rose-meta.conf
+}
+
 function init_macro() {
     category=$1
     cat >$TEST_DIR/rose-meta/$category/versions.py
