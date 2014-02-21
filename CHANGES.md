@@ -13,7 +13,13 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1141: rose config-edit: count latent section errors.
+
+\#1140: rose config-edit, rosie go: filter all warnings by default.
+
 \#1136: rose config --meta: fix finding non-local metadata.
+
+\#1132: rose app-upgrade: fix post-upgrade trigger metadata.
 
 \#1131: rosie create: obtain user name from `~/.subversion/servers`, where
 relevant.
