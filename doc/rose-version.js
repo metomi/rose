@@ -1,5 +1,5 @@
 /******************************************************************************
- * (C) British crown copyright 2012-3 Met Office.
+ * (C) British crown copyright 2012-4 Met Office.
  *
  * This file is part of Rose, a framework for scientific suites.
  *
@@ -18,4 +18,4 @@
  *
  ******************************************************************************/
 /* N.B. The following line is also used by a shell script. Do not add spaces. */
-ROSE_VERSION="2014-01-22+";
+ROSE_VERSION="2014-02+";

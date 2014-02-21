@@ -5,7 +5,9 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q1?)
+## 2014-02 (2014-02-21)
+
+This release of Rose works best with Cylc 5.4.8.
 
 ### Hightlighted Changes
 
