@@ -5,13 +5,37 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q1?)
+## 2014-02 (2014-02-21)
+
+This release of Rose works best with Cylc 5.4.8.
 
 ### Hightlighted Changes
 
 -none-
 
 ### Noteworthy Changes
+
+\#1141: rose config-edit: count latent section errors.
+
+\#1140: rose config-edit, rosie go: filter all warnings by default.
+
+\#1136: rose config --meta: fix finding non-local metadata.
+
+\#1132: rose app-upgrade: fix post-upgrade trigger metadata.
+
+\#1131: rosie create: obtain user name from `~/.subversion/servers`, where
+relevant.
+
+\#1130: Rose Bush: cycles: add paging function. Display 100 cycles per page.
+
+\#1127: Rose Bush: jobs: fix pager form to ensure that sort order is maintained.
+
+\#1121: rose stem: create `_REV` and `_BASE` variables for all projects.
+
+\#1119: rose config-edit: fix python list widget.
+
+\#1117: rose config-edit: improve performance by reducing updates to the
+internal data structure.
 
 \#1114: rose config-edit: run a macro or upgrade macro with the relevant
 configuration directory as the current working directory.

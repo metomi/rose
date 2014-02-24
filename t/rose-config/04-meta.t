@@ -23,8 +23,9 @@
 FILE=$PWD/rose-app.conf
 touch $FILE
 META_DIR=$PWD/meta
+CENTRAL_META_DIR=$PWD/rose-meta/coffee-black/HEAD/
 #-------------------------------------------------------------------------------
-tests 18
+tests 24
 #-------------------------------------------------------------------------------
 # No metadata for this file.
 TEST_KEY=$TEST_KEY_BASE-no-metadata
@@ -84,6 +85,38 @@ setup
 run_fail "$TEST_KEY" rose config -f $FILE --meta coffee=l_milk title
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Specific metadata section, option from central metadata
+TEST_KEY=$TEST_KEY_BASE-metadata-central-section-option
+rm -rf $META_DIR
+mkdir -p $CENTRAL_META_DIR
+cat >$FILE <<'__CONF__'
+meta=coffee-black/HEAD
+__CONF__
+cat >$CENTRAL_META_DIR/rose-meta.conf <<'__CONF__'
+[coffee=l_milk]
+description=Milk ruins good coffee
+type=logical
+__CONF__
+export ROSE_META_PATH=$(dirname $(dirname $CENTRAL_META_DIR))
+setup
+run_pass "$TEST_KEY" rose config -f $FILE --meta coffee=l_milk description
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+Milk ruins good coffee
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Specific metadata section, option from central metadata, no file
+TEST_KEY=$TEST_KEY_BASE-metadata-central-no-file-section-option
+OLDPWD=$PWD
+cd $(dirname $FILE)
+run_pass "$TEST_KEY" rose config --meta coffee=l_milk description
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+Milk ruins good coffee
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+cd $OLDPWD
 teardown
 #-------------------------------------------------------------------------------
 exit 0

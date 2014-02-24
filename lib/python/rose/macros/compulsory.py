@@ -59,7 +59,6 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
         meta_config - a rose.config.ConfigNode.
 
         """
-        self.reports = []
         return self.validate_settings(config_data, meta_config)
 
     def validate_settings(self, config_data, meta_config,
@@ -83,6 +82,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
         skipped.
 
         """
+        self.reports = []
         if not hasattr(self, 'section_to_basic_map'):
             self.section_to_basic_map = {}
             self.section_from_basic_map = {}

@@ -226,6 +226,9 @@ value="{{k}}">{{v}}</option>
 <input type="hidden" name="tasks" value="{{tasks}}" />
 {% endif -%}
 <input type="hidden" name="per_page" value="{{per_page}}" />
+{% if order -%}
+<input type="hidden" name="order" value="{{order}}" />
+{% endif -%}
 {% for status in ["active", "success", "fail"] -%}
 {% if only_statuses and status in only_statuses -%}
 <input type="hidden" name="only_status" value="{{status}}" />

@@ -54,8 +54,9 @@ class Root(object):
 
     """Serves the index page."""
 
-    PER_PAGE = 15
-    PER_PAGE_MAX = 300
+    CYCLES_PER_PAGE = 100
+    JOBS_PER_PAGE = 15
+    JOBS_PER_PAGE_MAX = 300
     VIEW_SIZE_MAX = 10 * 1024 * 1024 # 10MB
 
     def __init__(self, template_env):
@@ -80,12 +81,20 @@ class Root(object):
             traceback.print_exc(e)
 
     @cherrypy.expose
-    def cycles(self, user, suite, form=None):
+    def cycles(self, user, suite, page=1, per_page=CYCLES_PER_PAGE, form=None):
         """List cycles of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
         if not os.path.isdir(user_suite_dir):
             raise cherrypy.HTTPError(400)
-        entries = self.suite_engine_proc.get_suite_cycles_summary(user, suite)
+        if not isinstance(per_page, int):
+            if per_page:
+                per_page = int(per_page)
+            else:
+                per_page = self.JOBS_PER_PAGE
+        if page and per_page:
+            page = int(page)
+        else:
+            page = 1
         data = {
             "host": self.host_name,
             "user": user,
@@ -93,8 +102,21 @@ class Root(object):
             "rose_version": self.rose_version,
             "script": cherrypy.request.script_name,
             "states": {},
-            "entries": entries,
+            "per_page": per_page,
+            "page": page,
         }
+        data["offset"] = (page - 1) * per_page
+        entries, of_n_entries = (
+                        self.suite_engine_proc.get_suite_cycles_summary(
+                                        user, suite, per_page, data["offset"]))
+        data["entries"] = entries
+        data["of_n_entries"] = of_n_entries
+        if per_page:
+            data["n_pages"] = of_n_entries / per_page
+            if of_n_entries % per_page != 0:
+                data["n_pages"] += 1
+        else:
+            data["n_pages"] = 1
         data.update(self._get_suite_logs_info(user, suite))
         data["states"].update(
                 self.suite_engine_proc.get_suite_state_summary(user, suite))
@@ -110,7 +132,7 @@ class Root(object):
 
     @cherrypy.expose
     def jobs(self, user, suite, page=1, cycles=None, tasks=None,
-             only_status=None, order=None, per_page=PER_PAGE, form=None):
+             only_status=None, order=None, per_page=JOBS_PER_PAGE, form=None):
         """List jobs of a running or completed suite.
 
         user -- A string containing a valid user ID
@@ -144,7 +166,7 @@ class Root(object):
             if per_page:
                 per_page = int(per_page)
             else:
-                per_page = self.PER_PAGE
+                per_page = self.JOBS_PER_PAGE
         if page and per_page:
             page = int(page)
         else:
@@ -164,8 +186,8 @@ class Root(object):
             "only_statuses": only_statuses,
             "order": order,
             "per_page": per_page,
-            "per_page_default": self.PER_PAGE,
-            "per_page_max": self.PER_PAGE_MAX,
+            "per_page_default": self.JOBS_PER_PAGE,
+            "per_page_max": self.JOBS_PER_PAGE_MAX,
             "page": page,
             "rose_version": self.rose_version,
             "script": cherrypy.request.script_name,
@@ -203,7 +225,7 @@ class Root(object):
 
     @cherrypy.expose
     def list(self, user, suite, page=1, cycles=None, tasks=None,
-             only_status=None, order=None, per_page=PER_PAGE, form=None):
+             only_status=None, order=None, per_page=JOBS_PER_PAGE, form=None):
         return self.jobs(user, suite, page, cycles, tasks, only_status, order,
                          per_page, form)
 
