@@ -160,7 +160,8 @@ class SuiteRunner(Runner):
                     raise ConfigValueError(["env", k], requested_value, e)
                 v = requested_value
             else:
-                conf_tree.node.set(["env", k], v)
+                conf_tree.node.set(["env", k], v,
+                                   state=conf_tree.node.STATE_NORMAL)
             conf_tree.node.set([jinja2_section, k], '"' + v + '"')
 
         # See if suite is running or not
