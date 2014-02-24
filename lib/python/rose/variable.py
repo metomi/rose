@@ -241,8 +241,7 @@ def get_value_from_metadata(meta_data):
     """Use raw metadata to get a 'correct' value for a variable."""
     var_value = ''
     if rose.META_PROP_VALUES in meta_data:
-        var_value = meta_data[rose.META_PROP_VALUES].replace(' ', '')
-        var_value = var_value.replace(',', ' ').split()[0]
+        var_value = array_split(meta_data[rose.META_PROP_VALUES])[0]
     elif rose.META_PROP_TYPE in meta_data:
         var_type = meta_data[rose.META_PROP_TYPE]
         if var_type == 'logical':
