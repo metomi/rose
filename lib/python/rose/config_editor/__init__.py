@@ -447,10 +447,10 @@ DIALOG_LABEL_CONFIG_CHOOSE_META = "Metadata id:"
 DIALOG_LABEL_CONFIG_CHOOSE_NAME = "New config name:"
 DIALOG_LABEL_MACRO_TRANSFORM_CHANGES = ("<b>{0}:</b> <i>{1}</i>\n" +
                                         "changes: {2}")
-DIALOG_LABEL_MACRO_TRANSFORM_NONE = "The configuration needs no changes."
+DIALOG_LABEL_MACRO_TRANSFORM_NONE = "No changes from this macro."
 DIALOG_LABEL_MACRO_VALIDATE_ISSUES = ("<b>{0}</b> <i>{1}</i>\n" +
                                       "errors: {2}")
-DIALOG_LABEL_MACRO_VALIDATE_NONE = "The configuration looks OK."
+DIALOG_LABEL_MACRO_VALIDATE_NONE = "OK for this macro."
 DIALOG_LABEL_MACRO_WARN_ISSUES = ("warnings: {0}")
 DIALOG_LABEL_PREFERENCES = ("Please edit your site and user " +
                             "configurations to make changes.")
