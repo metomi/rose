@@ -675,19 +675,31 @@ def transform_config(config, meta_config, transformer_macro, modules,
 
 def pretty_format_config(config):
     """Improve configuration prettiness."""
-    for keylist, node in config.walk():
-        if len(keylist) == 2:
-            scheme, option = keylist
-            if ":" in scheme:
-                scheme = scheme.split(":", 1)[0]
-            try:
-                scheme_module = getattr(rose.formats, scheme)
-                pretty_format = getattr(scheme_module, "pretty_format")
-            except AttributeError:
-                continue
+    for section in config.value.keys():
+        keylist = [section]
+        scheme = keylist[0]
+        if ":" in scheme:
+            scheme = scheme.split(":", 1)[0]
+        try:
+            scheme_module = getattr(rose.formats, scheme)
+            pretty_format_keys = getattr(scheme_module, "pretty_format_keys")
+            pretty_format_value = getattr(scheme_module, "pretty_format_value")
+        except AttributeError:
+            continue
+        new_keylist = pretty_format_keys(keylist)
+        if new_keylist != keylist:
+            node = config.get(keylist)
+            config.unset(keylist)
+            config.set(new_keylist, node.value, node.state, node.comments)
+            section = new_keylist[0]
+        for keylist, node in list(config.walk([section])):
             values = rose.variable.array_split(node.value, ",")
-            node.value = pretty_format(values)
-
+            node.value = pretty_format_value(values)   
+            new_keylist = pretty_format_keys(keylist)
+            if new_keylist != keylist:
+                config.unset(keylist)
+                config.set(new_keylist, node.value, node.state, node.comments)
+                
 
 def standard_format_config(config):
     """Standardise any degenerate representations e.g. namelist repeats."""
