@@ -231,14 +231,11 @@ class CustomMenuButton(gtk.MenuToolButton):
                  menu_items=[], menu_funcs=[]):
         hbox = None
         if stock_id is not None:
-            hbox = gtk.HBox()
             self.stock_id = stock_id
             self.icon = gtk.Image()
             self.icon.set_from_stock(stock_id, size)
             self.icon.show()
-            hbox.pack_end(self.icon, expand=False, fill=False)
-            hbox.show()
-        gtk.MenuToolButton.__init__(self, hbox, label)
+        gtk.MenuToolButton.__init__(self, self.icon, label)
         self.set_tooltip_text(tip_text)
         self.show()
         button_menu = gtk.Menu()
