@@ -150,14 +150,15 @@ def main():
             keys.sort()
             for key in keys:
                 node_of_key = node.get([key], opts.no_ignore)
-                value = node_of_key.value
-                state = node_of_key.state
-                string = "%s%s=%s" % (state, key, value)
-                lines = string.splitlines()
-                print lines[0]
-                i_equal = len(state + key) + 1
-                for line in lines[1:]:
-                    print " " * i_equal + line
+                if node_of_key:
+                    value = node_of_key.value
+                    state = node_of_key.state
+                    string = "%s%s=%s" % (state, key, value)
+                    lines = string.splitlines()
+                    print lines[0]
+                    i_equal = len(state + key) + 1
+                    for line in lines[1:]:
+                        print " " * i_equal + line
         elif node is None:
             if opts.default is None:
                 sys.exit(1)
