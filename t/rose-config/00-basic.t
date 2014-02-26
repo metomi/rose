@@ -228,7 +228,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
 # Non-ignored keys
-TEST_KEY=$TEST_KEY_BASE-ignored-section
+TEST_KEY=$TEST_KEY_BASE-section-with-ignored-option
 setup
 run_pass "$TEST_KEY" rose config -f $FILE taxi
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
