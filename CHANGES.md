@@ -5,6 +5,26 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-Q1?)
+
+### Hightlighted Changes
+
+-none-
+
+### Noteworthy Changes
+
+\#1153: rose config: fix printing sections with ignored values.
+
+\#1149: rose config-dump: down cases namelist keys.
+
+\#1147: rose suite-run --reload: fix `!CYLC_VERSION` problem.
+
+\#1146: rose config-edit: improve specific macro messages.
+
+\#1145: rose metadata: fix null first values entry.
+
+--------------------------------------------------------------------------------
+
 ## 2014-02 (2014-02-21)
 
 This release of Rose works best with Cylc 5.4.8.
