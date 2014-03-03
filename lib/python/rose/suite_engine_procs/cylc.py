@@ -247,9 +247,10 @@ class CylcProcessor(SuiteEngineProcessor):
         if limit and not only_statuses:
             stmt += " LIMIT ? OFFSET ?"
             stmt_args_tail = [limit, offset]
-        for row in self._db_exec(
+        rows = self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt,
-                stmt_args_head + stmt_args + stmt_args_tail):
+                stmt_args_head + stmt_args + stmt_args_tail)
+        for row in rows:
             cycle, name, submit_num, times_str, events_str, messages_str = row
             entry = {"cycle": cycle, "name": name, "submit_num": submit_num,
                      "submit_num_max": 1, "events": [None, None, None],
@@ -281,6 +282,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     entries.append(entry)
             if not only_statuses:
                 entries.append(entry)
+        del rows
         if of_n_entries == 0:
             of_n_entries = len(entries)
         if only_statuses and limit:
