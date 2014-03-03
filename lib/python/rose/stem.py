@@ -208,8 +208,16 @@ class StemRunner(object):
                 subtree = result2.group(1)
                 item = re.sub(subtree, r'', target)
 
+        # Similarly for the 'base' variable we need to get the top level
+        # of the working copy
+        result = re.search(r'sub_tree:\s*(.*)', output)
+        if result:
+            subtree = result2.group(1)
+            base = re.sub("%s$"%(subtree), r'', base)
+
         # Remove trailing forwards-slash
         item = re.sub(r'/$',r'',item)
+        base = re.sub(r'/$',r'',base)
         return project, item, base, revision
 
     def _generate_name(self):
