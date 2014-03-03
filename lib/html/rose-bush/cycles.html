@@ -163,7 +163,7 @@ class="btn btn-link"
 <div class="span2">
 {% if n_state -%}
 {% set state_url = script ~ "/jobs/" ~ user ~ "/" ~ suite ~ "?cycles=" ~ entry.cycle -%}
-<a href="{{state_url}}{% for no_state in ["active", "success", "fail"] if no_state != state %}&amp;no_status={{no_state}}{% endfor %}">
+<a href="{{state_url}}{% for only_state in ["active", "success", "fail"] if only_state == state %}&amp;only_status={{only_state}}{% endfor %}">
 {% endif -%}
 <span class="label{% if n_state %} label-{{label}}{% endif %}">
 <i class="icon-{{icon}} icon-white" title="{{state}}"></i>

@@ -141,14 +141,30 @@ value="{{per_page}}"
 />
 </div>
 <div class="span3">
-{% for status, title in [["active", "active tasks"], ["success", "succeeded tasks"], ["fail", "failed tasks"]] -%}
-<label class="checkbox inline" for="no_status_{{status}}" title="Hide {{title}}">
-<input id="no_status_{{status}}" type="checkbox" name="no_status"
-{% if no_statuses and status in no_statuses -%}
+Only:
+{% for status, title in [["active", "Only active jobs"],
+                         ["success", "Only succeeded jobs"],
+                         ["fail", "Only failed jobs"]] -%}
+<label class="checkbox inline" for="only_status_{{status}}" title="{{title}}">
+<input id="only_status_{{status}}" type="checkbox" name="only_status"
+{% if only_statuses and status in only_statuses -%}
 checked="checked"
 {% endif -%}
 value="{{status}}" />
-No {{status}}?</label>
+{% if status == "fail" -%}
+<span class="label label-important">
+<i class="icon-warning-sign icon-white" title="{{title}}"></i>
+</span>
+{% elif status == "success" -%}
+<span class="label label-success">
+<i class="icon-ok icon-white" title="{{title}}"></i>
+</span>
+{% elif status == "active" -%}
+<span class="label label-info">
+<i class="icon-play icon-white" title="{{title}}"></i>
+</span>
+{% endif -%}
+</label>
 {% endfor -%}
 </div>
 <div class="span5">
@@ -214,8 +230,8 @@ value="{{k}}">{{v}}</option>
 <input type="hidden" name="order" value="{{order}}" />
 {% endif -%}
 {% for status in ["active", "success", "fail"] -%}
-{% if no_statuses and status in no_statuses -%}
-<input type="hidden" name="no_status" value="{{status}}" />
+{% if only_statuses and status in only_statuses -%}
+<input type="hidden" name="only_status" value="{{status}}" />
 {% endif -%}
 {% endfor -%}
 <ul class="inline">
@@ -224,9 +240,9 @@ value="{{k}}">{{v}}</option>
 {% if page == 1 -%}
 class="btn btn-link disabled"
 disabled="disabled"
-{% else %}
+{% else -%}
 class="btn btn-link"
-{% endif %}
+{% endif -%}
 >&laquo;</button>
 </li>
 <li>
