@@ -362,10 +362,15 @@ def _expand_repeats(val_item):
         return val_item
 
 
-def pretty_format(values):
+def pretty_format_value(values):
     """Pretty-format a namelist value list."""
     nm_item = NamelistObject("", values)
     return nm_item.get_rhs_as_string(wrapped=True)
+
+def pretty_format_keys(keys):
+    """Pretty-format namelist keys."""
+    return [item.lower() for item in keys]
+
 
 
 def validate_config(config, meta_config, add_report_func):

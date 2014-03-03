@@ -27,11 +27,11 @@ tests 4
 TEST_KEY=$TEST_KEY_BASE-basic
 setup
 cat > f1 <<'__CONF__'
-[namelist:bacon_and_beans]
+[namelist:Bacon_and_Beans]
 recipe='Fry ',6,'slices of bacon until nearly crispy then cut them up',' then chop ',1,' large onion and fry it with the bacon ', ' then add baked beans, mixed herbs, smoked paprika, chilli powder, and pepper and serve with ', ' a few ', ' slices of toast '
 
 [namelist:morse]
-signal='dot', 'dash', 'dash', 'dot', 'pause','dot', 'dot', 'pause','dash', 'dot', 'pause','dash', 'long pause','dot', 'dash', 'dot', 'dot', 'pause','dot', 'pause','dot', 'dash', 'dash', 'pause','dot', 'dot', 'pause','dot', 'dot', 'dot'
+Signal='dot', 'dash', 'dash', 'dot', 'pause','dot', 'dot', 'pause','dash', 'dot', 'pause','dash', 'long pause','dot', 'dash', 'dot', 'dot', 'pause','dot', 'pause','dot', 'dash', 'dash', 'pause','dot', 'dot', 'pause','dot', 'dot', 'dot'
 
 [namelist:sequences]
 fibonacci=0, 1, 1, 2, 3, 5, 8, 13, 21, 34,55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887, 9227465, 14930352, 24157817, 39088169

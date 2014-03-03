@@ -47,7 +47,7 @@ my-home=$HOME
 colour=green
 __CONF__
 #-------------------------------------------------------------------------------
-tests 48
+tests 51
 #-------------------------------------------------------------------------------
 # Empty file.
 TEST_KEY=$TEST_KEY_BASE-empty
@@ -223,6 +223,17 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 colour
 decks
 name
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Non-ignored keys
+TEST_KEY=$TEST_KEY_BASE-section-with-ignored-option
+setup
+run_pass "$TEST_KEY" rose config -f $FILE taxi
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+colour=black
+name=Hackney Carriage
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
