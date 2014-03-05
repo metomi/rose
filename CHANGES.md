@@ -13,7 +13,12 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1156: rose stem: ensure `_BASE` variables are working copy tops.
+
 \#1153: rose config: fix printing sections with ignored values.
+
+\#1151: rose config-edit, rosie go: fix toolbar GTK warning. This problem was
+discovered on an upgrade from GTK 2.18 to GTK 2.20.
 
 \#1149: rose config-dump: down cases namelist keys.
 
