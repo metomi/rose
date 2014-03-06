@@ -28,26 +28,7 @@ tests 3
 init </dev/null
 setup
 init_meta </dev/null
-init_macro cwd.py <<'__MACRO__'
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import os
-
-
-import rose.macro
-
-
-class PrintCwd(rose.macro.MacroBase):
-
-    """Upgrade from Apple to Fig."""
-
-    def validate(self, config, meta_config=None):
-        self.reports = []
-        print "Current directory:", os.getcwd()
-        return self.reports
-__MACRO__
-
+init_macro cwd.py < $TEST_SOURCE_DIR/lib/custom_macro_cwd.py
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-validate
 # Check a validator macro has the current working directory

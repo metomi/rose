@@ -30,29 +30,7 @@ meta=test-app-upgrade/apple
 __CONFIG__
 setup
 init_meta test-app-upgrade apple fig
-init_macro test-app-upgrade <<'__MACRO__'
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import os
-
-
-import rose.upgrade
-
-
-class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
-
-    """Upgrade from Apple to Fig."""
-
-    BEFORE_TAG = "apple"
-    AFTER_TAG = "fig"
-
-    def upgrade(self, config, meta_config=None):
-        self.add_setting(config, ["namelist:add_sect_only"])
-        print "Current directory:", os.getcwd()
-        return config, self.reports
-__MACRO__
-
+init_macro test-app-upgrade < $TEST_SOURCE_DIR/lib/versions_cwd.py
 #-----------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-upgrade
 # Check a complex upgrade
