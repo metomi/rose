@@ -1095,6 +1095,8 @@ def main():
     if return_objects is None:
         sys.exit(1)
     app_config, meta_config, config_name, args, opts = return_objects
+    if opts.conf_dir is not None:
+        os.chdir(opts.conf_dir)
     verbosity = 1 + opts.verbosity - opts.quietness
     run_macros(app_config, meta_config, config_name, args,
                opts.conf_dir, opts.fix,
