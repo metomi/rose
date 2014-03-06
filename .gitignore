@@ -2,7 +2,3 @@
 *.swp
 etc/rose.conf
 lib/bash/rose_init_site
-lib/python/cherrypy
-lib/python/jinja2
-lib/python/requests
-lib/python/sqlalchemy
