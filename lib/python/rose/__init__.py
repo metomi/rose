@@ -58,6 +58,9 @@ SUB_CONFIG_DEFAULT_META_IDS = ["=file-install-root", "=meta", "=mode",
 TOP_CONFIG_DEFAULT_META_IDS = ["file:", "jinja2:suite.rc", "=meta", "=opts",
                                "=root-dir", "=root-dir-share",
                                "=root-dir-work"]
+CONFIG_SETTING_INDEX_DEFAULT = "1"
+
+
 # Metadata specification names
 META_DIR_MACRO = "macros"
 META_DIR_WIDGET = "widget"

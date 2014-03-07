@@ -245,8 +245,11 @@ warn-if=this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
         <dt><code>compulsory</code></dt>
 
         <dd>The most controversial metadata option! Setting it to
-        <code>true</code> means that the setting should always be in the
-        configuration, ignored or not.</dd>
+        <code>true</code> for a section means that the section should always
+        be in the configuration, ignored or not. Setting it to
+        <code>true</code> for an option in a section means that the option
+        is required to be in the configuration, ignored or not, if and only
+        if its section is in the configuration.</dd>
       </dl>
     </div>
 
