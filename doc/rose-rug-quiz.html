@@ -308,21 +308,21 @@ rocket=30
 
         <li>
           <p>In a Rose metadata configuration file, what does setting
-          <samp>compulsory=true</samp> for an app configuration setting
+          <samp>compulsory=true</samp> for an app configuration option
           imply?</p>
 
           <div id="meta-compulsory-meaning" class="questions">
             <input type="radio" value="A" /><label for="A">it is always
             required by the input code</label><br />
             <input type="radio" value="B" /><label for="B">it should always be
-            in the app configuration, ignored or not</label><br />
+            in the app configuration</label><br />
             <input type="radio" value="C" /><label for="C">it should never be
             trigger-ignored</label><br />
-            <input type="radio" value="D" /><label for="D">it must have
-            non-null content</label><br />
+            <input type="radio" value="D" /><label for="D">it should be in the
+            app configuration if its parent section is present</label><br />
 
-            <p class="answers B"><em>it should always be in the app
-            configuration, ignored or not</em></p>
+            <p class="answers D"><em>it should be in the app configuration if
+            its parent section is present</em></p>
           </div>
         </li>
 
@@ -560,11 +560,10 @@ warn-if=True
             <p class="answers C"><em><samp>type</samp></em> - the
             <samp>values</samp> option supersedes other value definition
             options such as <samp>type</samp>, <samp>range</samp>, and
-            <samp>pattern</samp>. <samp>warn-if=True</samp> is a valid
-            way of warning a user when the setting is included in their
-            configuration - for example, if it is deprecated. It would
-            usually include a comment - e.g.
-            <samp>warn-if=True  #Deprecated.</samp>.</p>
+            <samp>pattern</samp>. <samp>warn-if=True</samp> is a valid way of
+            warning a user when the setting is included in their configuration
+            - for example, if it is deprecated. It would usually include a
+            comment - e.g. <samp>warn-if=True #Deprecated.</samp>.</p>
           </div>
         </li>
 
