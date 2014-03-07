@@ -450,6 +450,7 @@ class ConfigDataManager(object):
         sect_map = {}
         latent_sect_map = {}
         real_sect_ids = []
+        real_sect_basic_ids = []
         if save:
             config = self.config[config_name].save_config
         else:
@@ -474,6 +475,10 @@ class ConfigDataManager(object):
                                                            meta_data)})
             sect_map[section].comments = list(node.comments)
             real_sect_ids.append(section)
+            real_sect_basic_ids.extend(
+                [rose.macro.REC_ID_STRIP_DUPL.sub("", section),
+                 rose.macro.REC_ID_STRIP.sub("", section)]
+            )
             if node.is_ignored():
                 reason = {}
                 if (node.state ==
@@ -495,7 +500,8 @@ class ConfigDataManager(object):
             if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
-            if option is not None or section in real_sect_ids:
+            if (option is not None or section in real_sect_ids or
+                section in real_sect_basic_ids):
                 continue
             ignored_reason = {}
             meta_data = {}
@@ -503,10 +509,15 @@ class ConfigDataManager(object):
                 if opt_node.is_ignored():
                     continue
                 meta_data.update({prop_opt: opt_node.value})
-            meta_data.update({'id': setting_id})
+            latent_section_name = section
+            if (meta_data.get(rose.META_PROP_DUPLICATE) ==
+                    rose.META_PROP_VALUE_TRUE):
+                latent_section_name = section + "({0})".format(
+                    rose.CONFIG_SETTING_INDEX_DEFAULT)
+            meta_data.update({'id': latent_section_name})
             if section not in ['ns', 'file:*']:
-                latent_sect_map.update(
-                      {section: rose.section.Section(section, [], meta_data)})
+                latent_sect_map[latent_section_name] = rose.section.Section(
+                    latent_section_name, [], meta_data)
         return sect_map, latent_sect_map
 
     def load_vars_from_config(self, config_name, only_this_section=None,
@@ -588,6 +599,8 @@ class ConfigDataManager(object):
             if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
+            if section in ['ns', 'file:*']:
+                continue
             if section in basic_dupl_map:
                 # There is a matching duplicate e.g. foo(3) or foo{bar}(1)
                 for dupl_section in basic_dupl_map[section]:
@@ -598,6 +611,20 @@ class ConfigDataManager(object):
             if (only_this_section is not None and
                 section != only_this_section):
                 continue
+            if option is None:
+                # A section, not a variable.
+                continue
+            if setting_id in real_var_ids:
+                # This variable isn't missing, so skip.
+                continue
+            if (meta_config.get_value([section, rose.META_PROP_DUPLICATE]) ==
+                    rose.META_PROP_VALUE_TRUE and
+                    section not in basic_dupl_map and
+                    config.get([section]) is None):
+                section = section + "({0})".format(
+                    rose.CONFIG_SETTING_INDEX_DEFAULT)
+                setting_id = self.util.get_id_from_section_option(
+                    section, option)
             flags = self.load_option_flags(config_name, section, option)
             ignored_reason = {}
             sect_data = section_map.get(section)
@@ -613,27 +640,23 @@ class ConfigDataManager(object):
                     continue
                 meta_data.update({prop_opt: opt_node.value})
             meta_data.update({'id': setting_id})
-            if setting_id in real_var_ids:
-                # This variable isn't missing, so skip.
-                continue
-            if option is not None and section not in ['ns', 'file:*']:
-                value = rose.variable.get_value_from_metadata(meta_data)
-                latent_var_map.setdefault(section, [])
-                if update:
-                    id_list = [v.metadata['id'] for v in
-                               latent_var_map[section]]
-                    if setting_id in id_list:
-                        for var in latent_var_map[section]:
-                            if var.metadata['id'] == setting_id:
-                                latent_var_map[section].remove(var)
-                latent_var_map[section].append(
-                                rose.variable.Variable(
-                                               option,
-                                               value,
-                                               meta_data,
-                                               ignored_reason,
-                                               error={},
-                                               flags=flags))
+            value = rose.variable.get_value_from_metadata(meta_data)
+            latent_var_map.setdefault(section, [])
+            if update:
+                id_list = [v.metadata['id'] for v in
+                            latent_var_map[section]]
+                if setting_id in id_list:
+                    for var in latent_var_map[section]:
+                        if var.metadata['id'] == setting_id:
+                            latent_var_map[section].remove(var)
+            latent_var_map[section].append(
+                            rose.variable.Variable(
+                                            option,
+                                            value,
+                                            meta_data,
+                                            ignored_reason,
+                                            error={},
+                                            flags=flags))
         return var_map, latent_var_map
 
     def _load_dupl_sect_map(self, basic_dupl_map, section):

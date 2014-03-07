@@ -335,11 +335,12 @@ class NavPanelHandler(object):
                 for i, section in enumerate(latent_sections):
                     action_name = "Add {0}".format(i)
                     ui_config_string += '<menuitem action="{0}"/>'.format(
-                                                                   action_name)
+                        action_name)
                     actions.append(
-                            (action_name, gtk.STOCK_ADD,
-                             rose.config_editor.TREE_PANEL_ADD_SECTION.format(
-                                                               section)))
+                        (action_name, gtk.STOCK_ADD,
+                         rose.config_editor.TREE_PANEL_ADD_SECTION.format(
+                             section.replace("_", "__")))
+                    )
                 ui_config_string += '<separator name="addlatentsep"/>'
             ui_config_string += '<menuitem action="Add"/>'
             if cloneable:
@@ -479,9 +480,9 @@ class NavPanelHandler(object):
         namespace = "/" + base_ns.lstrip("/")
         return self.data.helper.get_ns_ignored_status(namespace)
 
-    def get_can_show_page(self, latent_status, ignored_status):
+    def get_can_show_page(self, latent_status, ignored_status, has_error):
         """Lookup whether to display a page based on the data status."""
-        if not ignored_status and not latent_status:
+        if has_error or (not ignored_status and not latent_status):
             # Always show this.
             return True
         show_ignored = self.data.page_ns_show_modes[
