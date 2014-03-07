@@ -1106,22 +1106,41 @@ class ConfigDataManager(object):
         """Load namespace metadata, e.g. namespace titles."""
         config_data = self.config[config_name]
         meta_config = config_data.meta
-        for section, sect_node in meta_config.value.items():
+        for setting_id, sect_node in meta_config.value.items():
             if sect_node.is_ignored():
                 continue
-            ns_match = REC_NS_SECTION.match(section)
-            if ns_match is not None:
-                base, subspace = ns_match.groups()
-                if subspace:
-                    namespace = config_name + "/" + subspace
+            section, option = self.util.get_section_option_from_id(
+                setting_id)
+            is_ns = (section == "ns")
+            is_duplicate_section = (
+                self.util.get_section_option_from_id(section)[1] is None and
+                sect_node.get_value([rose.META_PROP_DUPLICATE]) ==
+                rose.META_PROP_VALUE_TRUE
+            )
+            if is_ns or is_duplicate_section:
+                if is_ns:
+                    subspace = option
+                    if subspace:
+                        namespace = config_name + "/" + subspace
+                    else:
+                        namespace = config_name
                 else:
-                    namespace = config_name
+                    subspace = sect_node.get_value([rose.META_PROP_NS])
+                    if subspace is None:
+                        namespace = (
+                            self.helper.get_default_namespace_for_section(
+                                section, config_name))
+                    else:
+                        if subspace:
+                            namespace = config_name + "/" + subspace
+                        else:
+                            namespace = config_name
                 self.namespace_meta_lookup.setdefault(namespace, {})
                 ns_metadata = self.namespace_meta_lookup[namespace]
                 for option, opt_node in sect_node.value.items():
                     if opt_node.is_ignored():
                         continue
-                    value = meta_config[section][option].value
+                    value = meta_config[setting_id][option].value
                     if option == rose.META_PROP_MACRO:
                         if option in ns_metadata:
                             ns_metadata[option] += ", " + value
