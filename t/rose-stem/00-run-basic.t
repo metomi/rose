@@ -20,36 +20,36 @@
 # Test "rose stem" without site/user configuration
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
-export HERE=$PWD/$(dirname $0)
-export DELAY=20
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 if ! fcm --version 1>/dev/null 2>&1; then
     skip_all 'FCM not installed'
 fi
 #-------------------------------------------------------------------------------
-SUITENAME=rose-test-battery-stemtest
-#-------------------------------------------------------------------------------
 #Create repository to run on
-REPO=/var/tmp/$USER/rose-test-battery-stemtest-repo
+REPO=$PWD/rose-test-battery-stemtest-repo
 mkdir -p $REPO
 svnadmin create $REPO/foo
 URL=file://$REPO/foo
-(cd $(mktemp -d); mkdir -p trunk/rose-stem; svn import -q -m ""  $URL)
+BASEINSTALL=$(mktemp -d --tmpdir=$PWD)
+(cd $BASEINSTALL; mkdir -p trunk/rose-stem; svn import -q -m ""  $URL)
+cd $TEST_DIR
 #-------------------------------------------------------------------------------
 #Set up a keyword in the user's fcm keywords file (will delete later)
 #This should be replaced by the functionality in FCM:#105 when that is the 
 #site default.
+mkdir -p $HOME/.metomi/fcm
 cat >> $HOME/.metomi/fcm/keyword.cfg << __EOF__
 location{primary}[foo] = $URL
 __EOF__
 #-------------------------------------------------------------------------------
 #Check out a copy of the repository
-WORKINGCOPY=$PWD/$SUITENAME
+WORKINGCOPY=$(mktemp -d --tmpdir=$PWD)
+SUITENAME=$(basename $WORKINGCOPY)
 fcm checkout -q fcm:foo_tr $WORKINGCOPY
 #-------------------------------------------------------------------------------
 #Copy suite into working copy
-cp $HERE/00-run-basic/suite.rc $WORKINGCOPY/rose-stem
+cp $TEST_SOURCE_DIR/00-run-basic/suite.rc $WORKINGCOPY/rose-stem
 touch $WORKINGCOPY/rose-stem/rose-suite.conf
 #We should now have a valid rose-stem suite.
 #-------------------------------------------------------------------------------
@@ -59,7 +59,8 @@ tests $N_TESTS
 #Test for successful execution
 TEST_KEY=$TEST_KEY_BASE-basic-check
 run_pass "$TEST_KEY" \
-   rose stem --group=earl_grey --source=$WORKINGCOPY --source=fcm:foo_tr@head --no-gcontrol --name $SUITENAME -- --debug
+   rose stem --group=earl_grey --source=$WORKINGCOPY --source=fcm:foo_tr@head \
+             --no-gcontrol --name $SUITENAME -- --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
 TEST_KEY=$TEST_KEY_BASE-basic-groups-to-run
@@ -74,7 +75,8 @@ file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 # Second test, using suite redirection
 TEST_KEY=$TEST_KEY_BASE-suite-redirection
 run_pass "$TEST_KEY" \
-   rose stem --group=lapsang -C $WORKINGCOPY/rose-stem --source=fcm:foo_tr@head --no-gcontrol --name $SUITENAME -- --debug
+   rose stem --group=lapsang -C $WORKINGCOPY/rose-stem --source=fcm:foo_tr@head\
+             --no-gcontrol --name $SUITENAME -- --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
 TEST_KEY=$TEST_KEY_BASE-suite-redirection-groups-to-run
@@ -89,7 +91,8 @@ file_grep $TEST_KEY "SOURCE_FOO_REV=@1\$" $OUTPUT
 # Third test, checking subdirectory is working
 TEST_KEY=$TEST_KEY_BASE-subdirectory
 run_pass "$TEST_KEY" \
-   rose stem --group=assam --source=$WORKINGCOPY/rose-stem --no-gcontrol --name $SUITENAME -- --debug
+   rose stem --group=assam --source=$WORKINGCOPY/rose-stem --no-gcontrol \
+             --name $SUITENAME -- --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
 TEST_KEY=$TEST_KEY_BASE-subdirectory-groups-to-run
@@ -101,11 +104,7 @@ file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 #-------------------------------------------------------------------------------
-cd $HERE
-#Remove repository working copy
-rm -rf $WORKINGCOPY
-#Remove repository
-rm -rf $REPO
+cd $TEST_DIR
 #-------------------------------------------------------------------------------
 #Tidy up keyword.cfg - remove foo repository which is the last line
 sed -i '$d' $HOME/.metomi/fcm/keyword.cfg
