@@ -160,65 +160,95 @@ class StemRunner(object):
         self.reporter(ConfigVariableSetEvent(var, val))
         return
 
-    def _ascertain_project(self, item):
-        """Set the project name and top-level from 'fcm loc-layout'"""
-
-        project = ''
-        if re.search(r'^\.', item):
-            item = os.path.abspath(os.path.join(os.getcwd(), item))
-        result = re.search(r'\[(\w+)\]', item)
-        if result:
-            project = result.group(1)
-            item = re.sub(r'\[\w+\]', r'', item)
-            return project, item
-
+    def _get_base_dir(self, item):
+        """Given a source tree return the top-level of it."""
+        
         rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
         if rc != 0:
             raise ProjectNotFoundException(item, stderr)
         result = re.search(r'url:\s*(file|svn|https|http|svn\+ssh)(://.*)',
                            output)
-
-        # Generate a unique name for this project based on fcm kp
         if result:
-            urlstring = result.group(1) + result.group(2)
-            rc, kpoutput, stderr = self.popen.run('fcm', 'kp', urlstring)
-            kpresult = re.search(r'location{primary}\[(.*)\]\s*=', kpoutput)
-            if kpresult:
-                project = kpresult.group(1)
-        if not project:
+            self.urlstring = result.group(1) + result.group(2)
+        else:
+            self.urlstring = None
+
+        subtree_result = re.search(r'sub_tree:\s*(.*)', output)
+        if subtree_result:
+            self.subtree = subtree_result.group(1)
+        else:
+            self.subtree = None
+
+        pegrev_result = re.search(r'peg_rev:\s*(.*)', output)
+        if pegrev_result:
+            self.peg_rev = pegrev_result.group(1)
+        else:
+            self.peg_rev = None
+
+        branch_result = re.search(r'branch:\s*(.*)', output)
+        if branch_result:
+            self.branch = branch_result.group(1)
+        else:
+            self.branch = None
+
+        return            
+
+    def _get_project_from_url(self):
+        """Run fcm keyword-print to work out the project name."""
+
+        # Work out the repository root to search for in fcm kp
+        subdir = os.path.join(self.branch, self.subtree)
+        subdir = re.sub(r'/$', r'', subdir)
+        if self.peg_rev:
+          subdir = subdir + '@' + self.peg_rev
+        repo = re.sub(r'/%s'%(subdir), r'', self.urlstring)
+
+        rc, kpoutput, stderr = self.popen.run('fcm', 'kp', self.urlstring)
+
+        # Reformat stdout
+        kpoutput = ''.join(kpoutput)
+        kpoutput = kpoutput.split("\n")
+
+        self.project = None
+        for line in kpoutput:
+            if re.search(r'%s\s*$'%(repo), line):
+                kpresult = re.search(r'location{primary}\[(.*)\]', line)
+                if kpresult:
+                    self.project = kpresult.group(1)
+                    break
+        return 
+
+    def _ascertain_project(self, item):
+        """Set the project name and top-level from 'fcm loc-layout'"""
+
+        project = ''
+        if re.search(r'^\.$', item):
+            item = os.path.abspath(os.path.join(os.getcwd(), item))
+
+
+        self._get_base_dir(item)
+        self._get_project_from_url()
+
+        if not self.project:
             raise ProjectNotFoundException(item)
 
-        result = re.search(r'peg_rev:\s*(.*)', output)
-        if '@' in item and result:
-            revision = '@' + result.group(1)
+        if self.peg_rev and '@' in item:
+            revision = '@' + self.peg_rev
             base = re.sub(r'@.*', r'', item)
         else:
             revision = ''
-            base = item
+            base = item    
 
-        # If we're in a subdirectory of the source tree, find it and
-        # remove it leaving the top-level location
-        result = re.search(r'target:\s*(.*)', output)
-        target=''
-        if result:
-            target = result.group(1)
-            subtree=''
-            result2 = re.search(r'sub_tree:\s*(.*)', output)
-            if result2:
-                subtree = result2.group(1)
-                item = re.sub(subtree, r'', target)
-
-        # Similarly for the 'base' variable we need to get the top level
-        # of the working copy
-        result = re.search(r'sub_tree:\s*(.*)', output)
-        if result:
-            subtree = result2.group(1)
-            base = re.sub("%s$"%(subtree), r'', base)
+        # Remove subtree from base and item
+        if self.subtree:
+            item = re.sub(self.subtree, r'', item)
+            base = re.sub(self.subtree, r'', base)
 
         # Remove trailing forwards-slash
         item = re.sub(r'/$',r'',item)
         base = re.sub(r'/$',r'',base)
-        return project, item, base, revision
+
+        return self.project, item, base, revision
 
     def _generate_name(self):
         """Generate a suite name from the name of the first source tree."""
@@ -314,7 +344,6 @@ def main():
         except Exception as e:
             stem.reporter(e)
             sys.exit(1)
-
 
     # Get the suiterunner object and execute
     runner = SuiteRunner(event_handler=stem.reporter,
