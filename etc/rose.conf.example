@@ -92,6 +92,11 @@
 #  email-host=HOST
 ## E.g.:
 #  email-host=myorganisation.org
+#
+## SMTP server host. (Use "localhost" if not specified.)
+#  smtp-host=HOST[:PORT]
+## E.g.:
+#  smtp-host=mysmtp.myorganisation.org:2525
 [rose-suite-hook]
 
 # Configuration related to "rose suite-log"

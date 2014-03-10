@@ -13,6 +13,12 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1161: rose app-upgrade, rose macro: fix current working directory.
+
+\#1159: rose_ana: cumf: read output by lines to reduce memory footprint.
+
+\#1157: rose suite-hook --mail: configurable SMTP host.
+
 \#1156: rose stem: ensure `_BASE` variables are working copy tops.
 
 \#1153: rose config: fix printing sections with ignored values.
