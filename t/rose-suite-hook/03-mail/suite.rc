@@ -1,0 +1,9 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+[scheduling]
+    [[dependencies]]
+        graph=t1
+[runtime]
+    [[t1]]
+        command scripting=true
