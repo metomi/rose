@@ -27,8 +27,15 @@
 #     Populate the current directory for Rose User Guide: A Brief Tour.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
+echo Copying Rose brief tour files to current directory...
 rose_init rose_log
 run rsync \
     -a --exclude='.svn' --timeout=1800 \
     --rsh='ssh -oBatchMode=yes -oStrictHostKeyChecking=no' \
     $ROSE_HOME/etc/$(basename $0)/* .
+if [ $? == 0 ]; then
+    echo ...done
+else
+    echo ...failed
+    exit 1
+fi
