@@ -630,7 +630,8 @@ class MainMenuHandler(object):
                 module_name = config_mod_prefix + module_name
         for config_name in configs:
             config_data = self.data.config[config_name]
-            os.chdir(config_data.directory)
+            if config_data.directory is not None:
+                os.chdir(config_data.directory)
             for module in config_data.macros:
                 if module_name is not None and module.__name__ != module_name:
                     continue
