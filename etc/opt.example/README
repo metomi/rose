@@ -1,0 +1,7 @@
+Directory containing optional site configuration files. To use, rename this
+directory from "etc/opt.example/" to "etc/opt/". Add optional configuration
+files with names such as "rose-key1.conf", "rose-key2.conf", etc. In
+"etc/rose.conf", add "opts=key1 key2" to switch on the optional configurations.
+
+See http://metomi.github.io/rose/doc/rose-configuration.html#opts for
+information on optional configuration.
