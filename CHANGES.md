@@ -13,6 +13,8 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1167: rose config-edit: fix general checking for `rose-suite.info` suites.
+
 \#1161: rose app-upgrade, rose macro: fix current working directory.
 
 \#1159: rose_ana: cumf: read output by lines to reduce memory footprint.
