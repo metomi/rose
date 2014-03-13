@@ -548,8 +548,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         # Determine whether to show a row.
         latent_status = model.get_value(iter_, 8)
         ignored_status = model.get_value(iter_, 9)
+        has_error = bool(model.get_value(iter_, 4))
         child_iter = model.iter_children(iter_)
-        is_visible = self._ask_can_show_func(latent_status, ignored_status)
+        is_visible = self._ask_can_show_func(latent_status, ignored_status,
+                                             has_error)
         if is_visible:
             return True
         while child_iter is not None:
