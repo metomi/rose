@@ -220,7 +220,7 @@ class StemRunner(object):
 
         project = None
         for line in kpoutput:
-            if re.search(r'%s\s*$'%(repo), line):
+            if line.rstrip().endswith(repo):
                 kpresult = re.search(r'^location{primary}\[(.*)\]', line)
                 if kpresult:
                     project = kpresult.group(1)
@@ -257,8 +257,8 @@ class StemRunner(object):
 
         # Remove subtree from base and item
         if subtree:
-            item = re.sub(subtree, r'', item)
-            base = re.sub(subtree, r'', base)
+            item = item.replace(subtree, '', 1)
+            base = base.replace(subtree, '', 1)
 
         # Remove trailing forwards-slash
         item = re.sub(r'/$',r'',item)
