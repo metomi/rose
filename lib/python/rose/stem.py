@@ -161,12 +161,17 @@ class StemRunner(object):
         return
 
     def _get_base_dir(self, item):
-        """Given a source tree return the top-level of it."""
+        """Given a source tree return the following from 'fcm loc-layout':
+           * url
+           * sub_tree
+           * peg_rev
+           * root
+           * project
+        """
         
         urlstring = None
         subtree = None
         peg_rev = None
-        branch = None
         root = None
         
         rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
@@ -191,29 +196,20 @@ class StemRunner(object):
             if pegrev_result:
                 peg_rev = pegrev_result.group(1)
 
-            branch_result = re.search(r'^branch:\s*(.*)', line)
-            if branch_result:
-                branch = branch_result.group(1)
-
             root_result = re.search(r'^root:\s*(.*)', line)
             if root_result:
                 root = root_result.group(1)
 
-        return urlstring, subtree, peg_rev, branch, root
+            project_result = re.search(r'^project:\s*(.*)', line)
+            if project_result:
+                fcm_project = project_result.group(1)
 
-    def _get_project_from_url(self, urlstring, subtree, peg_rev, branch):
-        """Run fcm keyword-print to work out the project name."""
+        return urlstring, subtree, peg_rev, root, fcm_project
 
-        # Work out the repository root to search for in fcm kp
-        if subtree:
-            subdir = os.path.join(branch, subtree)
-        else:
-            subdir = branch
+    def _get_project_from_url(self, urlstring, root, fcm_project):
+        """Run 'fcm keyword-print' to work out the project name."""
 
-        subdir = re.sub(r'/$', r'', subdir)
-        if peg_rev:
-          subdir = subdir + '@' + peg_rev
-        repo = re.sub(r'/%s'%(subdir), r'', urlstring)
+        repo = re.sub(r'/$', r'', os.path.join(root, fcm_project))
 
         rc, kpoutput, stderr = self.popen.run('fcm', 'kp', urlstring)
 
@@ -240,13 +236,13 @@ class StemRunner(object):
         """
 
         project = ''
-        if re.search(r'^\.$', item):
+        if re.search(r'^\.', item):
             item = os.path.abspath(os.path.join(os.getcwd(), item))
 
 
-        urlstring, subtree, peg_rev, branch, root = self._get_base_dir(item)
-        project = self._get_project_from_url(urlstring, subtree, 
-                                             peg_rev, branch)
+        urlstring, subtree, peg_rev, root, fcm_project = \
+                                                      self._get_base_dir(item)
+        project = self._get_project_from_url(urlstring, root, fcm_project)
 
         if not project:
             raise ProjectNotFoundException(item)
