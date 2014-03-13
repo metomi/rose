@@ -169,11 +169,6 @@ class StemRunner(object):
            * project
         """
         
-        urlstring = None
-        subtree = None
-        peg_rev = None
-        root = None
-        fcm_project = None
         
         rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
         if rc != 0:
@@ -183,36 +178,24 @@ class StemRunner(object):
         output = ''.join(output)
         output = output.split("\n")
 
+        ret = {}
         for line in output:
-            result = re.search(r'^url:\s*(file|svn|https|http|svn\+ssh)(://.*)',
-                               line)
-            if result:
-                urlstring = result.group(1) + result.group(2)
+            if not ":" in line:
+              continue
+            key, value = line.split(":", 1)
+            if key:
+                if value:
+                    ret[key] = value.strip()
 
-            subtree_result = re.search(r'^sub_tree:\s*(.*)', line)
-            if subtree_result:
-                subtree = subtree_result.group(1)
+        return ret
 
-            pegrev_result = re.search(r'^peg_rev:\s*(.*)', line)
-            if pegrev_result:
-                peg_rev = pegrev_result.group(1)
-
-            root_result = re.search(r'^root:\s*(.*)', line)
-            if root_result:
-                root = root_result.group(1)
-
-            project_result = re.search(r'^project:\s*(.*)', line)
-            if project_result:
-                fcm_project = project_result.group(1)
-
-        return urlstring, subtree, peg_rev, root, fcm_project
-
-    def _get_project_from_url(self, urlstring, root, fcm_project):
+    def _get_project_from_url(self, source_dict):
         """Run 'fcm keyword-print' to work out the project name."""
 
-        repo = re.sub(r'/$', r'', os.path.join(root, fcm_project))
+        repo = re.sub(r'/$', r'', os.path.join(source_dict['root'], 
+                                               source_dict['project']))
 
-        rc, kpoutput, stderr = self.popen.run('fcm', 'kp', urlstring)
+        rc, kpoutput, stderr = self.popen.run('fcm', 'kp', source_dict['url'])
 
         # Reformat stdout
         kpoutput = ''.join(kpoutput)
@@ -240,25 +223,23 @@ class StemRunner(object):
         if re.search(r'^\.', item):
             item = os.path.abspath(os.path.join(os.getcwd(), item))
 
-
-        urlstring, subtree, peg_rev, root, fcm_project = \
-                                                      self._get_base_dir(item)
-        project = self._get_project_from_url(urlstring, root, fcm_project)
+        source_dict =  self._get_base_dir(item)
+        project = self._get_project_from_url(source_dict)
 
         if not project:
             raise ProjectNotFoundException(item)
 
-        if peg_rev and '@' in item:
-            revision = '@' + peg_rev
+        if 'peg_rev' in source_dict and '@' in item:
+            revision = '@' + source_dict['peg_rev']
             base = re.sub(r'@.*', r'', item)
         else:
             revision = ''
             base = item    
 
         # Remove subtree from base and item
-        if subtree:
-            item = item.replace(subtree, '', 1)
-            base = base.replace(subtree, '', 1)
+        if 'sub_tree' in source_dict:
+            item = item.replace(source_dict['sub_tree'], '', 1)
+            base = base.replace(source_dict['sub_tree'], '', 1)
 
         # Remove trailing forwards-slash
         item = re.sub(r'/$',r'',item)
