@@ -25,6 +25,11 @@ import rose.macro
 import rose.variable
 
 
+_OPTIONS_KEY = "options"
+_REPORTED_SECTION_KEY = "reported config sect"
+_SECTION_IS_COMPULSORY_KEY = "section is compulsory"
+
+
 class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
 
     """Returns sections and options that are compulsory but missing.
@@ -60,19 +65,19 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
                     self._get_section_option_from_id(setting_id))
                 compulsory_data.setdefault(
                     config_sect,
-                    {"section is compulsory": False,
-                     "reported config sect": config_sect,
-                     "options": []}
+                    {_SECTION_IS_COMPULSORY_KEY: False,
+                     _REPORTED_SECTION_KEY: config_sect,
+                     _OPTIONS_KEY: []}
                 )
                 if config_opt is None:
                     compulsory_data[config_sect][
-                        "section is compulsory"] = True
+                        _SECTION_IS_COMPULSORY_KEY] = True
                 else:
-                    compulsory_data[config_sect]["options"].append(
+                    compulsory_data[config_sect][_OPTIONS_KEY].append(
                         config_opt)
                 if (sect_node.get_value([rose.META_PROP_DUPLICATE]) ==
                         rose.META_PROP_VALUE_TRUE):
-                    compulsory_data[config_sect]["reported config sect"] = (
+                    compulsory_data[config_sect][_REPORTED_SECTION_KEY] = (
                         config_sect + "({0})".format(
                             rose.CONFIG_SETTING_INDEX_DEFAULT)
                     )
@@ -149,14 +154,14 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
             
             if not present_section_aliases:
                 # No sections in config_data that belong to basic_section.
-                if section_data["section is compulsory"]:
+                if section_data[_SECTION_IS_COMPULSORY_KEY]:
                     self.add_report(
-                        section_data["reported config sect"], None, None,
+                        section_data[_REPORTED_SECTION_KEY], None, None,
                         self.WARNING_COMPULSORY_SECT_MISSING
                     )
                 continue
 
-            if not section_data["options"]:
+            if not section_data[_OPTIONS_KEY]:
                 # There are no compulsory options set for basic_section.
                 continue
 
@@ -165,7 +170,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
                 if (only_these_sections is not None and
                         alias_section not in alias_sections_to_check):
                     continue
-                for option in section_data["options"]:
+                for option in section_data[_OPTIONS_KEY]:
                     present_option_aliases = []
                     for alias_option in self._get_config_section_options(
                             config_data, alias_section):
