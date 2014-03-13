@@ -173,6 +173,7 @@ class StemRunner(object):
         subtree = None
         peg_rev = None
         root = None
+        fcm_project = None
         
         rc, output, stderr = self.popen.run('fcm', 'loc-layout', item)
         if rc != 0:
