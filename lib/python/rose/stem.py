@@ -174,12 +174,8 @@ class StemRunner(object):
         if rc != 0:
             raise ProjectNotFoundException(item, stderr)
 
-        # Reformat stdout
-        output = ''.join(output)
-        output = output.split("\n")
-
         ret = {}
-        for line in output:
+        for line in output.splitlines():
             if not ":" in line:
               continue
             key, value = line.split(":", 1)
@@ -192,17 +188,14 @@ class StemRunner(object):
     def _get_project_from_url(self, source_dict):
         """Run 'fcm keyword-print' to work out the project name."""
 
-        repo = re.sub(r'/$', r'', os.path.join(source_dict['root'], 
-                                               source_dict['project']))
+        repo = source_dict['root']
+        if source_dict['project']:
+            repo += '/' + source_dict['project']
 
         rc, kpoutput, stderr = self.popen.run('fcm', 'kp', source_dict['url'])
 
-        # Reformat stdout
-        kpoutput = ''.join(kpoutput)
-        kpoutput = kpoutput.split("\n")
-
         project = None
-        for line in kpoutput:
+        for line in kpoutput.splitlines():
             if line.rstrip().endswith(repo):
                 kpresult = re.search(r'^location{primary}\[(.*)\]', line)
                 if kpresult:
