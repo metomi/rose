@@ -13,7 +13,12 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1169: rose stem: improve robustness of keyword match.
+
 \#1167: rose config-edit: fix general checking for `rose-suite.info` suites.
+
+\#1163: rose metadata: a `compulsory=true` option no longer requires its
+containing section to be compulsory as well.
 
 \#1161: rose app-upgrade, rose macro: fix current working directory.
 
