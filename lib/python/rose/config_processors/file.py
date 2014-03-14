@@ -123,6 +123,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             targets[name] = Loc(name)
             targets[name].action_key = Loc.A_INSTALL
             targets[name].mode = node.get_value(["mode"])
+            if targets[name].mode and targets[name].mode not in Loc.MODES:
+                raise ConfigProcessError([key, "mode"], targets[name].mode)
             target_sources = []
             for k in ["content", "source"]:
                 source_str = node.get_value([k])
@@ -151,7 +153,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         source_name = raw_source_name[1:-1]
                     if source_name.startswith("~"):
                         source_name = os.path.expanduser(source_name)
-                    if targets[name].mode == "symlink":
+                    if targets[name].mode == targets[name].MODE_SYMLINK:
                         if targets[name].real_name:
                             # Symlink mode can only have 1 source
                             raise ConfigProcessError([key, k], source_str)
@@ -217,7 +219,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 target.is_out_of_date = (
                         not os.path.islink(target.name) or
                         target.real_name != os.readlink(target.name))
-            elif target.mode == "mkdir":
+            elif target.mode == target.MODE_MKDIR:
                 target.is_out_of_date = (os.path.islink(target.name) or
                                          not os.path.isdir(target.name))
             else:
@@ -255,10 +257,10 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         for target in targets.values():
             if not target.is_out_of_date:
                 continue
-            if target.mode == "symlink":
+            if target.mode == target.MODE_SYMLINK:
                 self.manager.fs_util.symlink(target.real_name, target.name)
                 loc_dao.update(target)
-            elif target.mode == "mkdir":
+            elif target.mode == target.MODE_MKDIR:
                 if os.path.islink(target.name):
                     self.manager.fs_util.delete(target.name)
                 self.manager.fs_util.makedirs(target.name)
@@ -446,6 +448,10 @@ class Loc(object):
     A_SOURCE = "source"
     A_INSTALL = "install"
     BLOB = ""
+    MODE_AUTO = "auto"
+    MODE_MKDIR = "mkdir"
+    MODE_SYMLINK = "symlink"
+    MODES = (MODE_AUTO, MODE_MKDIR, MODE_SYMLINK)
     TYPE_TREE = "tree"
     TYPE_BLOB = "blob"
 
