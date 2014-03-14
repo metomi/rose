@@ -13,6 +13,8 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1171: rose_ana: print number of values compared.
+
 \#1169: rose stem: improve robustness of keyword match.
 
 \#1167: rose config-edit: fix general checking for `rose-suite.info` suites.
