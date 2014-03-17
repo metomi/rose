@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-N_TESTS=3
+N_TESTS=5
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
@@ -38,17 +38,15 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 # Install suite, and prove that directories are created
 if [[ -n $JOB_HOST ]]; then
-    rose suite-run --debug \
+    rose suite-run --debug -q \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol \
-        -S "HOST=\"$JOB_HOST\"" 1>/dev/null
+        -S "HOST=\"$JOB_HOST\""
     ssh $JOB_HOST "ls -d cylc-run/$NAME 1>/dev/null"
 else
-    rose suite-run --debug \
-        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol 1>/dev/null
+    rose suite-run --debug -q \
+        -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol
 fi
-ls -d $HOME/cylc-run/$NAME 1>/dev/null
-ls -d $HOME/.cylc/$NAME 1>/dev/null
-ls -d $HOME/.cylc/REGDB/$NAME 1>/dev/null
+ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ans-empty
 run_fail "$TEST_KEY" rose suite-clean $NAME <<<''
@@ -64,14 +62,25 @@ if [[ -n $JOB_HOST ]]; then
     ssh $JOB_HOST "ls -d cylc-run/$NAME 1>/dev/null"
 fi
 #-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE--name-ans-n
+run_fail "$TEST_KEY" rose suite-clean --name=$NAME <<<'n'
+ls -d $HOME/cylc-run/$NAME 1>/dev/null
+if [[ -n $JOB_HOST ]]; then
+    ssh $JOB_HOST "ls -d cylc-run/$NAME 1>/dev/null"
+fi
+#-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ans-y
-ls -l $HOME/cylc-run/$NAME/log
 run_pass "$TEST_KEY" rose suite-clean -v -v $NAME <<<'y'
-! ls -d $HOME/cylc-run/$NAME 1>/dev/null 2>&1
-! ls -d $HOME/.cylc/$NAME 1>/dev/null 2>&1
-! ls -d $HOME/.cylc/REGDB/$NAME 1>/dev/null 2>&1
+! ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null 2>&1
 if [[ -n $JOB_HOST ]]; then
     ssh $JOB_HOST "! ls -d cylc-run/$NAME 1>/dev/null 2>&1"
 fi
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE--name-ans-y
+rose suite-run --debug -q \
+    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol
+ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
+run_pass "$TEST_KEY" rose suite-clean -v -v -n $NAME <<<'y'
+! ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null 2>&1
 #-------------------------------------------------------------------------------
 exit 0
