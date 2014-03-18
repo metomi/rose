@@ -112,7 +112,6 @@ run_pass "$TEST_KEY" \
              --no-gcontrol --name $SUITENAME -- --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
-cp $OUTPUT ~/thingy
 TEST_KEY=$TEST_KEY_BASE-relative-path-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[ceylon\]" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-relative-path-source
