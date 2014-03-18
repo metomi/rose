@@ -13,6 +13,12 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
+\#1181: rose stem: fix `-C rel/path` usage.
+
+\#1173: rose app/suite/task-run: handle bad file install mode value.
+Previously, the system will assume the `auto` mode if it is given a bad file
+install mode value. It will now fail.
+
 \#1171: rose_ana: print number of values compared.
 
 \#1169: rose stem: improve robustness of keyword match.
