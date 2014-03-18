@@ -303,7 +303,6 @@ class StemRunner(object):
         else:
             thissuite = self._this_suite()
             self.fs_util.chdir(thissuite)
-            self.opts.conf_dir = thissuite
             self.reporter(SuiteSelectionEvent(thissuite))
 
         # Create a default name for the suite; allow override by user
