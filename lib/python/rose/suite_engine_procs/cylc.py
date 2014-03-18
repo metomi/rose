@@ -37,6 +37,10 @@ from time import sleep
 from uuid import uuid4
 
 
+_PORT_FILE = "port-file"
+_PORT_SCAN = "port-scan"
+
+
 class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the Cylc suite engine."""
@@ -77,7 +81,6 @@ class CylcProcessor(SuiteEngineProcessor):
             "name ASC, cycle DESC, task_events.submit_num DESC",
             "name_desc_cycle_desc":
             "name DESC, cycle DESC, task_events.submit_num DESC"}
-    PYRO_TIMEOUT = 5
     REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     SCHEME = "cylc"
@@ -89,6 +92,7 @@ class CylcProcessor(SuiteEngineProcessor):
     SUITE_DB = "cylc-suite.db"
     SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
+    TIMEOUT = 5 # seconds
 
     def __init__(self, *args, **kwargs):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
@@ -912,28 +916,72 @@ class CylcProcessor(SuiteEngineProcessor):
         if out:
             self.handle_event(out)
 
-    def scan(self, hosts=None):
-        """Return a list of SuiteScanResult for suites running in hosts.
+    def scan(self, hosts=None, timeout=None):
+        """Scan for running suites (in hosts).
+
+        Return (suite_scan_results, exceptions) where
+        suite_scan_results is a list of SuiteScanResult instances and
+        exceptions is a list of exceptions resulting from any failed scans
+
+        Default timeout for SSH and "cylc scan" command is 5 seconds.
+
         """
         if not hosts:
             hosts = ["localhost"]
-        host_proc_dict = {}
+        if not timeout:
+            timeout = self.TIMEOUT
+        procs = {}
         for host in sorted(hosts):
-            timeout = "--pyro-timeout=%s" % self.PYRO_TIMEOUT
-            proc = self.popen.run_bg("cylc", "scan", "--host=" + host, timeout)
-            host_proc_dict[host] = proc
-        ret = []
-        while host_proc_dict:
-            for host, proc in host_proc_dict.items():
+            cmd = ["cylc", "scan", "--host=" + host, "--pyro-timeout=%s" % timeout]
+            proc = self.popen.run_bg(*cmd)
+            procs[(host, _PORT_SCAN, tuple(cmd))] = proc
+            sh_cmd = "whoami && cd ~/.cylc/ports/ && ls || true"
+            if host == "localhost":
+                cmd = ["bash", "-c", sh_cmd]
+            else:
+                cmd = self.popen.get_cmd(
+                        "ssh", "-oConnectTimeout=%s" % timeout, host, sh_cmd)
+            proc = self.popen.run_bg(*cmd)
+            procs[(host, _PORT_FILE, tuple(cmd))] = proc
+        results = {}
+        exceptions = []
+        while procs:
+            for keys, proc in procs.items():
                 rc = proc.poll()
-                if rc is not None:
-                    host_proc_dict.pop(host)
-                    if rc == 0:
+                if rc is None:
+                    continue
+                procs.pop(keys)
+                host, key, cmd = keys
+                if rc == 0:
+                    if key == _PORT_SCAN:
                         for line in proc.communicate()[0].splitlines():
-                            ret.append(SuiteScanResult(*line.split()))
-            if host_proc_dict:
+                            name, user, host, port = line.split()
+                            auth = "%s@%s:%s" % (user, host, port)
+                            result = SuiteScanResult(name, auth)
+                            results[(name, host, key)] = result
+                            # N.B. Trust port-scan over port-file
+                            for i_host in hosts:
+                                try:
+                                    results.pop((name, i_host, _PORT_FILE))
+                                except KeyError:
+                                    pass
+                    else: # if key == _PORT_FILE:
+                        lines = proc.communicate()[0].splitlines()
+                        user = lines.pop(0)
+                        for name in lines:
+                            # N.B. Trust port-scan over port-file
+                            if (name, host, _PORT_SCAN) in results:
+                                continue
+                            location = "%s@%s:%s" % (
+                                    user, host, "~/.cylc/ports/" + name)
+                            result = SuiteScanResult(name, location)
+                            results[(name, host, key)] = result
+                else:
+                    out, err = proc.communicate()
+                    exceptions.append(RosePopenError(cmd, rc, out, err))
+            if procs:
                 sleep(0.1)
-        return ret
+        return (sorted(results.values()), exceptions)
 
     def shutdown(self, suite_name, host=None, engine_version=None, args=None,
                  stderr=None, stdout=None):

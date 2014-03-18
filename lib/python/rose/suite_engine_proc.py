@@ -55,28 +55,28 @@ class WebBrowserEvent(Event):
         return "%s %s" % self.args
 
 
-class SuiteScanResult(object):
+class SuiteScanResult(Event):
 
     """Information on where a suite is running.
 
-    suite_name: suite name
-    user: suite owner's user ID
-    host: host name of running suite
-    port: port at host name of running suite
+    name: suite name
+    location: can be one of: "user@host:port", location of port file, etc
 
     """
 
-    def __init__(self, suite_name, user, host, port=None):
-        self.suite_name = suite_name
-        self.user = user
-        self.host = host
-        self.port = port
+    LEVEL = 0
+
+    def __init__(self, name, location):
+        Event.__init__(self, name, location)
+        self.name = name
+        self.location = location
+
+    def __cmp__(self, other):
+        return (cmp(self.name, other.name) or
+                cmp(self.location, other.location))
 
     def __str__(self):
-        port = ""
-        if self.port:
-            port = ":" + self.port
-        return "%s %s@%s%s" % (self.suite_name, self.user, self.host, port)
+        return "%s %s\n" % (self.name, self.location)
 
 class CycleOffset(object):
     """Represent a cycle time offset."""
@@ -248,6 +248,7 @@ class SuiteEngineProcessor(object):
     TASK_NAME_DELIM = {"prefix": "_", "suffix": "_"}
     SCHEME_HANDLER_MANAGER = None
     SCHEME_DEFAULT = "cylc" # TODO: site configuration?
+    TIMEOUT = 5 # seconds
 
     @classmethod
     def get_processor(cls, key=None, event_handler=None, popen=None,
@@ -582,8 +583,15 @@ class SuiteEngineProcessor(object):
         """Start a suite (in a specified host)."""
         raise NotImplementedError()
 
-    def scan(self, host_names=None):
-        """Return a list of SuiteScanResult for suites running in host_names.
+    def scan(self, host_names=None, timeout=TIMEOUT):
+        """Scan for running suites (in hosts).
+
+        Return (suite_scan_results, exceptions) where
+        suite_scan_results is a list of SuiteScanResult instances and
+        exceptions is a list of exceptions resulting from any failed scans
+
+        Default timeout for SSH and "cylc scan" command is 5 seconds.
+
         """
         raise NotImplementedError()
 
