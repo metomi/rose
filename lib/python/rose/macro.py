@@ -1039,7 +1039,8 @@ def parse_macro_mode_args(mode="macro", argv=None):
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
-    opts.output_dir = os.path.abspath(ops.output_dir)
+    if opts.output_dir is not None:
+        opts.output_dir = os.path.abspath(opts.output_dir)
     sys.path.append(os.getenv("ROSE_HOME"))
     add_opt_meta_paths(opts.meta_path)
     config_name = os.path.basename(opts.conf_dir)
