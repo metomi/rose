@@ -7,9 +7,10 @@ for a full listing of issues for each release.
 
 ## Next Release (2014-Q1?)
 
-### Hightlighted Changes
+### Highlighted Changes
 
--none-
+\#1163: rose metadata: a `compulsory=true` option no longer requires its
+containing section to be compulsory as well.
 
 ### Noteworthy Changes
 
@@ -24,9 +25,6 @@ install mode value. It will now fail.
 \#1169: rose stem: improve robustness of keyword match.
 
 \#1167: rose config-edit: fix general checking for `rose-suite.info` suites.
-
-\#1163: rose metadata: a `compulsory=true` option no longer requires its
-containing section to be compulsory as well.
 
 \#1161: rose app-upgrade, rose macro: fix current working directory.
 
@@ -55,7 +53,7 @@ discovered on an upgrade from GTK 2.18 to GTK 2.20.
 
 This release of Rose works best with Cylc 5.4.8.
 
-### Hightlighted Changes
+### Highlighted Changes
 
 -none-
 
@@ -99,7 +97,7 @@ configuration directory as the current working directory.
 
 This release of Rose works best with Cylc 5.4.4 to 5.4.7.
 
-### Hightlighted Changes
+### Highlighted Changes
 
 -none-
 
@@ -121,7 +119,7 @@ umask in the environment.
 
 This release of Rose works best with Cylc 5.4.4 to 5.4.7.
 
-### Hightlighted Changes
+### Highlighted Changes
 
 \#1085: rosie web service: the web service database schema has been modified to
 improve performance. **This change requires the rosie web service database to
