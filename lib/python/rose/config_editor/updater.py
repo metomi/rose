@@ -576,8 +576,7 @@ class Updater(object):
     def update_metadata_id(self, config_name):
         """Update the metadata if the id has changed."""
         config_data = self.data.config[config_name]
-        new_meta_id = self.data.helper.get_config_meta_flag(
-                                                  config_data.config)
+        new_meta_id = self.data.helper.get_config_meta_flag(config_name)
         if config_data.meta_id != new_meta_id:
             config_data.meta_id = new_meta_id
             self.refresh_metadata_func(config_name=config_name)
