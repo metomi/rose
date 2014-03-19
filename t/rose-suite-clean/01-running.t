@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 5
+tests 7
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
@@ -30,12 +30,21 @@ mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 # Install suite, and prove that directories are created
-rose suite-run --debug \
-    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol 1>/dev/null
+rose suite-run --debug -q \
+    -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
 ls -ld $HOME/cylc-run/$NAME 1>/dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-running
 run_fail "$TEST_KEY" rose suite-clean -y $NAME
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] $NAME: is still running (detected ~/.cylc/ports/$NAME)
+__ERR__
+if [[ ! -d $HOME/cylc-run/$NAME ]]; then
+    exit 1
+fi
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-running-name
+run_fail "$TEST_KEY" rose suite-clean -y -n $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] $NAME: is still running (detected ~/.cylc/ports/$NAME)
 __ERR__

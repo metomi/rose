@@ -126,10 +126,12 @@ class SuiteRunCleaner(object):
 def main():
     """Implement the "rose suite-clean" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("non_interactive")
+    opt_parser.add_my_options("name", "non_interactive")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     cleaner = SuiteRunCleaner(event_handler=report)
+    if opts.name:
+        args.append(opts.name)
     if not args:
         args = [os.path.basename(os.getcwd())]
     os.chdir(os.path.expanduser('~'))
