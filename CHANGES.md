@@ -5,7 +5,7 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q1?)
+## 2014-03 (2014-03-19)
 
 ### Highlighted Changes
 
@@ -15,6 +15,13 @@ containing section to be compulsory as well.
 ### Noteworthy Changes
 
 \#1181: rose stem: fix `-C rel/path` usage.
+
+\#1180: rose suite-scan: scan port files as well. Report left behind port
+files. Report exceptions for failed `cylc scan` and `ssh` commands.
+
+\#1177: rose suite-clean: accept `--name=NAME`. If specified, `NAME` is
+appended to the end of the argument list. This allows the interface to be
+consistent with the other utilities.
 
 \#1173: rose app/suite/task-run: handle bad file install mode value.
 Previously, the system will assume the `auto` mode if it is given a bad file
