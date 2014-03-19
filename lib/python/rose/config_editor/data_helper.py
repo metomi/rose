@@ -33,13 +33,21 @@ class ConfigDataHelper(object):
         self.data = data
         self.util = util
 
-    def get_config_meta_flag(self, config):
+    def get_config_meta_flag(self, config_name, from_this_config_obj=None):
         """Return the metadata id flag."""
-        for keylist in [[rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],
-                        [rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_PROJECT]]:
-            type_node = config.get(keylist, no_ignore=True)
-            if type_node is not None and type_node.value:
-                return type_node.value
+        for section, option in [
+                [rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],
+                [rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_PROJECT]]:
+            if from_this_config_obj is not None:
+                type_node = from_this_config_obj.get(
+                    [section, option], no_ignore=True)
+                if type_node is not None and type_node.value:
+                    return type_node.value
+                continue
+            id_ = self.util.get_id_from_section_option(section, option)
+            var = self.get_variable_by_id(id_, config_name)
+            if var is not None:
+                return var.value
         return None
 
     def is_ns_sub_data(self, ns):
