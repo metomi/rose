@@ -968,8 +968,8 @@ def _run_transform_macros(macros, config_name, app_config, meta_config,
         method_id = TRANSFORM_METHOD.upper()[0]
         macro_id = MACRO_OUTPUT_ID.format(method_id, transformer_macro)
         handle_transform(app_config, new_config, change_list, macro_id,
-                          opt_conf_dir, opt_output_dir, opt_non_interactive,
-                          reporter)
+                         opt_conf_dir, opt_output_dir, opt_non_interactive,
+                         reporter)
     return no_changes
 
 def _get_user_accept():
@@ -1038,9 +1038,12 @@ def parse_macro_mode_args(mode="macro", argv=None):
         return None
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
+    opts.conf_dir = os.path.abspath(opts.conf_dir)
+    if opts.output_dir is not None:
+        opts.output_dir = os.path.abspath(opts.output_dir)
     sys.path.append(os.getenv("ROSE_HOME"))
     add_opt_meta_paths(opts.meta_path)
-    config_name = os.path.basename((os.path.abspath(opts.conf_dir)))
+    config_name = os.path.basename(opts.conf_dir)
     config_file_path = os.path.join(opts.conf_dir,
                                     rose.SUB_CONFIG_NAME)
     if (not os.path.exists(config_file_path) or
