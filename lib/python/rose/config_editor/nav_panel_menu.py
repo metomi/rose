@@ -38,7 +38,8 @@ class NavPanelHandler(object):
     def __init__(self, data, util, reporter, mainwindow,
                  undo_stack, redo_stack, add_config_func,
                  group_ops_inst, section_ops_inst, variable_ops_inst,
-                 kill_page_func, reload_ns_tree_func, transform_default_func):
+                 kill_page_func, reload_ns_tree_func, transform_default_func,
+                 graph_ns_func):
         self.data = data
         self.util = util
         self.reporter = reporter
@@ -52,6 +53,7 @@ class NavPanelHandler(object):
         self.kill_page_func = kill_page_func
         self.reload_ns_tree_func = reload_ns_tree_func
         self._transform_default_func = transform_default_func
+        self._graph_ns_func = graph_ns_func
 
     def add_dialog(self, base_ns):
         """Handle an add section dialog and request."""
@@ -227,6 +229,10 @@ class NavPanelHandler(object):
                 rose.config_editor.util.launch_node_info_dialog(
                             sect_data, "", search_function)
 
+    def graph_request(self, namespace):
+        """Handle a graph request for namespace info."""
+        self._graph_ns_func(namespace)
+
     def remove_request(self, base_ns):
         """Handle a delete section request."""
         config_names = self.data.config.keys()
@@ -298,6 +304,8 @@ class NavPanelHandler(object):
                     rose.config_editor.TREE_PANEL_ENABLE_GENERIC),
                    ('Enable section', gtk.STOCK_YES,
                     rose.config_editor.TREE_PANEL_ENABLE_SECTION),
+                   ('Graph', gtk.STOCK_SORT_ASCENDING,
+                    rose.config_editor.TREE_PANEL_GRAPH_SECTION),
                    ('Ignore', gtk.STOCK_NO,
                     rose.config_editor.TREE_PANEL_IGNORE_GENERIC),
                    ('Ignore section', gtk.STOCK_NO,
@@ -323,6 +331,8 @@ class NavPanelHandler(object):
             is_top = (namespace in self.data.config.keys())
             is_fixable = bool(self.get_ns_errors(namespace))
             has_content = self.data.helper.is_ns_content(namespace)
+            is_unsaved = self.data.helper.get_config_has_unsaved_changes(
+                config_name)
             ignored_sections = self.data.helper.get_ignored_sections(
                                                 namespace)
             enabled_sections = self.data.helper.get_ignored_sections(
@@ -353,6 +363,8 @@ class NavPanelHandler(object):
             if has_content:
                 ui_config_string += '<menuitem action="Info"/>'
                 ui_config_string += '<menuitem action="Edit"/>'
+                ui_config_string += '<separator name="graphsep"/>'
+                ui_config_string += '<menuitem action="Graph"/>'
             url = metadata.get(rose.META_PROP_URL)
             help = metadata.get(rose.META_PROP_HELP)
             if url is not None or help is not None:
@@ -420,6 +432,11 @@ class NavPanelHandler(object):
                 info_item = uimanager.get_widget('/Popup/Info')
                 info_item.connect("activate",
                                     lambda b: self.info_request(namespace))
+                graph_item = uimanager.get_widget("/Popup/Graph")
+                graph_item.connect("activate",
+                                   lambda b: self.graph_request(namespace))
+                if is_unsaved:
+                    graph_item.set_sensitive(False)
             if help is not None:
                 help_item = uimanager.get_widget('/Popup/Help')
                 help_title = namespace.split('/')[1:]

@@ -1,0 +1,48 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-4 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# Provides init, setup and teardown functions for rose macro tests.
+#-------------------------------------------------------------------------------
+. $(dirname $0)/../lib/bash/test_header
+
+function init() {
+    mkdir -p $TEST_DIR/config
+    cat >$TEST_DIR/config/rose-app.conf
+}
+
+function init_meta() {
+    mkdir -p $TEST_DIR/config/meta
+    cat >$TEST_DIR/config/meta/rose-meta.conf
+}
+
+function init_macro() {
+    mkdir -p $TEST_DIR/config/meta/lib/python/macros/
+    cat >$TEST_DIR/config/meta/lib/python/macros/$1
+}
+
+function setup() {
+    mkdir $TEST_DIR/run
+    cd $TEST_DIR/run
+}
+
+function teardown() {
+    cd $TEST_DIR
+    rm -rf $TEST_DIR/run
+    rm -rf $TEST_DIR/config/meta
+}

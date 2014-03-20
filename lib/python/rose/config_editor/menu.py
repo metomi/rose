@@ -98,6 +98,8 @@ class MenuBar(object):
         </menu>
         <separator name="sep_upgrade"/>
         <menuitem action="Upgrade"/>
+        <separator name="sep graph"/>
+        <menuitem action="Graph"/>
         <separator name="sep_checking"/>
         <menuitem action="Extra checks"/>
         <separator name="sep macro"/>
@@ -193,6 +195,8 @@ class MenuBar(object):
                        rose.config_editor.TOP_MENU_METADATA_MACRO_AUTOFIX),
                       ('Extra checks', gtk.STOCK_DIALOG_QUESTION,
                        rose.config_editor.TOP_MENU_METADATA_CHECK),
+                      ('Graph', gtk.STOCK_SORT_ASCENDING,
+                       rose.config_editor.TOP_MENU_METADATA_GRAPH),
                       ('Tools', None,
                        rose.config_editor.TOP_MENU_TOOLS),
                       ('Run Suite', gtk.STOCK_MEDIA_PLAY,
@@ -390,20 +394,7 @@ class MainMenuHandler(object):
     def destroy(self, *args):
         """Handle a destroy main program request."""
         for name in self.data.config:
-            config_data = self.data.config[name]
-            variables = config_data.vars.get_all(skip_latent=True)
-            save_vars = config_data.vars.get_all(save=True, skip_latent=True)
-            sections = config_data.sections.get_all(skip_latent=True)
-            save_sections = config_data.sections.get_all(save=True,
-                                                         skip_latent=True)
-            now_set = set([v.to_hashable() for v in variables])
-            save_set = set([v.to_hashable() for v in save_vars])
-            now_sect_set = set([s.to_hashable() for s in sections])
-            save_sect_set = set([s.to_hashable() for s in save_sections])
-            if (name not in self.data.saved_config_names or
-                now_set ^ save_set or
-                now_sect_set ^ save_sect_set):
-                # There are differences in state between now and then.
+            if self.data.helper.get_config_has_unsaved_changes(name):
                 self.mainwindow.launch_exit_warning_dialog()
                 return True
         try:
@@ -519,6 +510,23 @@ class MainMenuHandler(object):
             else:
                 break
         return optionals
+
+    def handle_graph(self):
+        """Handle a graph metadata request."""
+        config_sect_dict = {}
+        for config_name in self.data.config.keys():
+            config_data = self.data.config[config_name]
+            config_sect_dict[config_name] = config_data.sections.now.keys()
+            config_sect_dict[config_name].sort(rose.config.sort_settings)
+        config_name, section = self.mainwindow.launch_graph_dialog(
+            config_sect_dict)
+        if config_name is None:
+            return False
+        if section is None:
+            allowed_sections = None
+        else:
+            allowed_sections = [section]
+        self.launch_graph(config_name, allowed_sections=allowed_sections)
 
     def check_entry_value(self, entry_widget, dialog, entries,
                           labels, optionals):
@@ -978,6 +986,28 @@ class MainMenuHandler(object):
             rose.external.launch_fs_browser(os.getcwd())
         else:
             rose.external.launch_fs_browser(self.data.top_level_directory)
+
+    def launch_graph(self, namespace, allowed_sections=None):
+        try:
+            import pygraphviz
+        except ImportError as e:
+            title = rose.config_editor.WARNING_CANNOT_GRAPH
+            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                                       str(e), title)
+        config_name, subsp = self.util.split_full_ns(self.data, namespace)
+        self.update_config(config_name)
+        config_data = self.data.config[config_name]
+        if config_data.directory is None:
+            return False
+        if allowed_sections is None:
+            if config_name != namespace:
+                allowed_sections = (
+                    self.data.helper.get_sections_from_namespace(namespace))
+            else:
+                allowed_sections = []
+        cmd = (shlex.split(rose.config_editor.LAUNCH_COMMAND_GRAPH) +
+               [config_data.directory] + allowed_sections)
+        rose.popen.RosePopener().run_bg(*cmd)
 
     def launch_scheduler(self, *args):
         """Run the scheduler for a suite open in config edit."""

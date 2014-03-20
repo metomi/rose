@@ -33,6 +33,25 @@ class ConfigDataHelper(object):
         self.data = data
         self.util = util
 
+    def get_config_has_unsaved_changes(self, config_name):
+        """Return True if there are unsaved changes for config_name."""
+        config_data = self.data.config[config_name]
+        variables = config_data.vars.get_all(skip_latent=True)
+        save_vars = config_data.vars.get_all(save=True, skip_latent=True)
+        sections = config_data.sections.get_all(skip_latent=True)
+        save_sections = config_data.sections.get_all(save=True,
+                                                        skip_latent=True)
+        now_set = set([v.to_hashable() for v in variables])
+        save_set = set([v.to_hashable() for v in save_vars])
+        now_sect_set = set([s.to_hashable() for s in sections])
+        save_sect_set = set([s.to_hashable() for s in save_sections])
+        if (config_name not in self.data.saved_config_names or
+            now_set ^ save_set or
+            now_sect_set ^ save_sect_set):
+            # There are differences in state between now and then.
+            return True
+        return False
+
     def get_config_meta_flag(self, config):
         """Return the metadata id flag."""
         for keylist in [[rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],

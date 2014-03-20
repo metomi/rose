@@ -36,6 +36,8 @@
 #  geditor=gvim -f
 ## Launch graphical file system browser (default=nautilus).
 #  fs-browser=konqueror
+## Launch image viewer (default=eog).
+#  image-viewer=eog --new-instance
 ## The rsync command.
 #  rsync=rsync -a --exclude=.* --timeout=1800 --rsh='ssh -oBatchMode=yes'
 ## The ssh command.

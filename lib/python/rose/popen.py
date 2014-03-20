@@ -87,6 +87,7 @@ class RosePopener(object):
     CMDS = {"editor": ["vi"],
             "fs_browser": ["nautilus"],
             "geditor": ["gedit"],
+            "image_viewer": ["eog", "--new-instance"],
             "rsync": ["rsync", "-a", "--exclude=.*", "--timeout=1800",
                       "--rsh=ssh -oBatchMode=yes"],
             "ssh": ["ssh", "-oBatchMode=yes"],

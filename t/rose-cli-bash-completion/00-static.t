@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 193
+tests 209
 setup
 #-------------------------------------------------------------------------------
 # Source the script.
@@ -434,6 +434,62 @@ compreply_grep "$TEST_KEY.reply2" '^rose.macros.DefaultValidators$'
 compreply_grep "$TEST_KEY.reply3" '^burger.BeefBurgerTransformer$'
 compreply_grep "$TEST_KEY.reply4" '^--config=$'
 compreply_grep "$TEST_KEY.reply5" '^-C$'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# List arguments for "rose metadata-graph -C ../config".
+TEST_KEY=$TEST_KEY_BASE-rose-metadata-graph-C-config-args
+setup
+init <<'__CONFIG__'
+[env]
+
+[namelist:foo]
+
+[namelist:bar]
+__CONFIG__
+init_meta <<'__META__'
+[env]
+
+[namelist:qux]
+
+[namelist:wibble]
+
+[namelist:wibble=foo]
+__META__
+COMP_WORDS=( rose metadata-graph -C ../config "" )
+COMP_CWORD=4
+COMPREPLY=
+run_pass "$TEST_KEY" _rose
+compreply_grep "$TEST_KEY.reply1" '^env$'
+compreply_grep "$TEST_KEY.reply2" '^namelist:qux$'
+compreply_grep "$TEST_KEY.reply3" '^namelist:wibble$'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# List arguments for "rose metadata-graph -C ../config/meta/".
+TEST_KEY=$TEST_KEY_BASE-rose-metadata-graph-C-meta-config-args
+COMP_WORDS=( rose metadata-graph -C ../config/meta "" )
+COMP_CWORD=4
+COMPREPLY=
+run_pass "$TEST_KEY" _rose
+compreply_grep "$TEST_KEY.reply1" '^env$'
+compreply_grep "$TEST_KEY.reply2" '^namelist:qux$'
+compreply_grep "$TEST_KEY.reply3" '^namelist:wibble$'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# List option args for "rose metadata-graph -C ../config/meta --property=".
+TEST_KEY=$TEST_KEY_BASE-rose-metadata-graph-C-config-property
+COMP_WORDS=( rose metadata-graph -C ../config/meta --property = "" )
+COMP_CWORD=6
+COMPREPLY=
+run_pass "$TEST_KEY" _rose
+printf "%s\n" "${COMPREPLY[@]}" >/dev/tty
+compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
+trigger
+__REPLY__
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown

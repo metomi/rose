@@ -256,7 +256,8 @@ class MainController(object):
             self.variable_ops,
             self.kill_page,
             self.reload_namespace_tree,
-            self.main_handle.transform_default
+            self.main_handle.transform_default,
+            self.main_handle.launch_graph
         )
 
         self.updater = rose.config_editor.updater.Updater(
@@ -502,6 +503,8 @@ class MainController(object):
              lambda m: self.main_handle.transform_default()),
             ('/TopMenuBar/Metadata/Extra checks',
              lambda m: self.main_handle.check_fail_rules()),
+            ('/TopMenuBar/Metadata/Graph',
+             lambda m: self.main_handle.handle_graph()),
             ('/TopMenuBar/Metadata/Reload metadata',
              lambda m: self._refresh_metadata_if_on()),
             ('/TopMenuBar/Metadata/Switch off metadata',
@@ -1406,6 +1409,7 @@ class MainController(object):
         )
         self._get_menu_widget('/Save').set_sensitive(is_changed)
         self._get_menu_widget('/Check and save').set_sensitive(is_changed)
+        self._get_menu_widget('/Graph').set_sensitive(not is_changed)
         self._toolbar_run_button.set_sensitive(not is_changed)
         self._get_menu_widget('/Run Suite custom').set_sensitive(
             not is_changed)

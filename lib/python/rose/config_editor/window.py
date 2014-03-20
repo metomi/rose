@@ -194,6 +194,22 @@ class MainWindow(object):
                 gtk.main_quit()
         return False
 
+    def launch_graph_dialog(self, name_section_dict):
+        """Launch a dialog asking for a config and section to graph.
+
+        name_section_dict is a dictionary containing config names
+        as keys, and lists of available sections as values.
+
+        """
+        dialog_title = rose.config_editor.DIALOG_TITLE_GRAPH
+        config_title = rose.config_editor.DIALOG_BODY_GRAPH_CONFIG
+        section_title = rose.config_editor.DIALOG_BODY_GRAPH_SECTION
+        prefs = {}
+        return self._launch_config_section_chooser_dialog(
+                                 name_section_dict, prefs,
+                                 dialog_title, config_title,
+                                 section_title, null_section_choice=True)
+
     def launch_help_dialog(self, somewidget=None):
         """Launch a browser to open the help url."""
         webbrowser.open(rose.resource.ResourceLocator.default().get_doc_url() +
@@ -226,7 +242,8 @@ class MainWindow(object):
 
     def _launch_config_section_chooser_dialog(self, name_section_dict, prefs,
                                               dialog_title, config_title,
-                                              section_title):
+                                              section_title,
+                                              null_section_choice=False):
         chooser_dialog = gtk.Dialog(
                                 title=dialog_title,
                                 parent=self.window,
@@ -250,6 +267,15 @@ class MainWindow(object):
         config_name_box.show()
         section_box = gtk.VBox()
         section_box.show()
+        null_section_checkbutton = gtk.CheckButton(
+            rose.config_editor.DIALOG_LABEL_NULL_SECTION)
+        null_section_checkbutton.connect(
+            "toggled",
+            lambda b: section_box.set_sensitive(not b.get_active())
+        )
+        if null_section_choice:
+            null_section_checkbutton.show()
+            null_section_checkbutton.set_active(True)
         index = config_name_box.get_active()
         self._reload_section_choices(
                              section_box,
@@ -267,6 +293,7 @@ class MainWindow(object):
         vbox.pack_start(config_label, expand=False, fill=False)
         vbox.pack_start(config_name_box, expand=False, fill=False)
         vbox.pack_start(section_label, expand=False, fill=False)
+        vbox.pack_start(null_section_checkbutton, expand=False, fill=False)
         vbox.pack_start(section_box, expand=False, fill=False)
         vbox.show()
         hbox = gtk.HBox()
@@ -280,6 +307,9 @@ class MainWindow(object):
         if response in [gtk.RESPONSE_OK, gtk.RESPONSE_YES,
                         gtk.RESPONSE_ACCEPT]:
             config_name_entered = name_keys[config_name_box.get_active()]
+            if null_section_checkbutton.get_active():
+                chooser_dialog.destroy()
+                return config_name_entered, None
             for widget in section_box.get_children():
                 if hasattr(widget, 'get_active'):
                     index = widget.get_active()
