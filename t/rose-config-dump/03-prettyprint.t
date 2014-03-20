@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 4
+tests 8
 #-------------------------------------------------------------------------------
 # Mixed string-integer section indices.
 TEST_KEY=$TEST_KEY_BASE-basic
@@ -52,7 +52,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 [INFO] M rose-app.conf
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-cat > f1 <<'__CONF__'
+cat > f2 <<'__CONF__'
 [namelist:bacon_and_beans]
 recipe='Fry ',6,
       ='slices of bacon until nearly crispy then cut them up',
@@ -84,7 +84,21 @@ happy=1,7,10,13,19,23,28,31,32,44,49,68,70,79,82,86,91,94,97,100,
 perfect=6,28,496,8128,33550336,8589869056,137438691328
 powers_of_one=54*1
 __CONF__
-file_cmp "$TEST_KEY.f1" f1 rose-app.conf
+file_cmp "$TEST_KEY.f2" f2 rose-app.conf
+TEST_KEY=$TEST_KEY_BASE-basic-metadata
+rm rose-app.conf
+cat > f3 <<'__CONF__'
+[namelist:sequences=fibonacci]
+help=Here are some values in the sequence:
+    =0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,17711,28657,46368,75025,121393,196418,
+    =317811,514229,832040,1346269,2178309,3524578,5702887,
+    =9227465,14930352,24157817,39088169
+__CONF__
+cp f3 rose-meta.conf
+run_pass "$TEST_KEY" rose config-dump
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.f3" f3 rose-meta.conf
 teardown
 #-------------------------------------------------------------------------------
 exit 0

@@ -49,13 +49,14 @@ TEST_KEY=$TEST_KEY_BASE-change
 setup
 init_meta </dev/null
 init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro_change.py
+CONFIG_DIR=$(cd ../config && pwd -P)
 run_pass "$TEST_KEY" \
     rose macro -v --non-interactive --config=../config envswitch.LogicalTransformer
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [T] envswitch.LogicalTransformer: changes: 1
     env=TRANSFORM_SWITCH=false
         false -> true
-[INFO] M ../config
+[INFO] M $CONFIG_DIR
 __CONTENT__
 file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONFIG__'
 [env]

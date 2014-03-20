@@ -350,7 +350,8 @@ class ConfigDataManager(object):
         macro_module_prefix = self.helper.get_macro_module_prefix(name)
         macros = rose.macro.load_meta_macro_modules(
                       meta_files, module_prefix=macro_module_prefix)
-        meta_id = self.helper.get_config_meta_flag(config)
+        meta_id = self.helper.get_config_meta_flag(
+            name, from_this_config_obj=config)
         # Initialise configuration data object.
         self.config[name] = ConfigData(config, s_config, config_directory,
                                        opt_conf_lookup, meta_config,
