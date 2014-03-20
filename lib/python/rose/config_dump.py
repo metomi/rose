@@ -23,6 +23,8 @@
 import filecmp
 import fnmatch
 import os
+
+from rose import META_CONFIG_NAME
 from rose.config import ConfigDumper, ConfigLoader
 from rose.fs_util import FileSystemUtil
 from rose.macro import pretty_format_config
@@ -58,7 +60,7 @@ def main():
     for file_name in file_names:
         t = NamedTemporaryFile()
         node = ConfigLoader()(file_name)
-        if not opts.no_pretty_mode:
+        if not opts.no_pretty_mode and file_name != META_CONFIG_NAME:
             pretty_format_config(node)
         ConfigDumper()(node, t)
         t.seek(0)
