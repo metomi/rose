@@ -429,7 +429,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
     if not opts.prefix:
         opts.prefix = ws_client.prefix
 
-    if opts.quietness:
+    if opts.quietness and not opts.print_format:
         opts.print_format = PRINT_FORMAT_QUIET
     elif not opts.print_format:
         opts.print_format = PRINT_FORMAT_DEFAULT
