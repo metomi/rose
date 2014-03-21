@@ -69,6 +69,8 @@ CHAR_COMMENT = "#"
 OPT_CONFIG_DIR = "opt"
 REC_SETTING_ELEMENT = re.compile(r"^(.+?)\(([^)]+)\)$")
 
+STATE_SECT_IGNORED = "^"
+
 
 class ConfigNode(object):
 

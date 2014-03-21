@@ -486,7 +486,6 @@ COMP_WORDS=( rose metadata-graph -C ../config/meta --property = "" )
 COMP_CWORD=6
 COMPREPLY=
 run_pass "$TEST_KEY" _rose
-printf "%s\n" "${COMPREPLY[@]}" >/dev/tty
 compreply_cmp "$TEST_KEY.reply" <<'__REPLY__'
 trigger
 __REPLY__

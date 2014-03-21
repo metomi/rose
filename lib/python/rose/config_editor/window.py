@@ -201,14 +201,14 @@ class MainWindow(object):
         as keys, and lists of available sections as values.
 
         """
-        dialog_title = rose.config_editor.DIALOG_TITLE_GRAPH
-        config_title = rose.config_editor.DIALOG_BODY_GRAPH_CONFIG
-        section_title = rose.config_editor.DIALOG_BODY_GRAPH_SECTION
         prefs = {}
         return self._launch_config_section_chooser_dialog(
-                                 name_section_dict, prefs,
-                                 dialog_title, config_title,
-                                 section_title, null_section_choice=True)
+            name_section_dict, prefs,
+            rose.config_editor.DIALOG_TITLE_GRAPH,
+            rose.config_editor.DIALOG_BODY_GRAPH_CONFIG,
+            rose.config_editor.DIALOG_BODY_GRAPH_SECTION,
+            null_section_choice=True
+        )
 
     def launch_help_dialog(self, somewidget=None):
         """Launch a browser to open the help url."""
@@ -427,13 +427,12 @@ class MainWindow(object):
         prefs is in the same format, but indicates preferred values.
 
         """
-        dialog_title = rose.config_editor.DIALOG_TITLE_REMOVE
-        config_title = rose.config_editor.DIALOG_BODY_REMOVE_CONFIG
-        section_title = rose.config_editor.DIALOG_BODY_REMOVE_SECTION
         return self._launch_config_section_chooser_dialog(
-                                 name_section_dict, prefs,
-                                 dialog_title, config_title,
-                                 section_title)
+            name_section_dict, prefs,
+            rose.config_editor.DIALOG_TITLE_REMOVE,
+            rose.config_editor.DIALOG_BODY_REMOVE_CONFIG,
+            rose.config_editor.DIALOG_BODY_REMOVE_SECTION
+        )
 
     def launch_view_stack(self, undo_stack, redo_stack, undo_func):
         """Load a view of the stack."""

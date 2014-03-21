@@ -225,10 +225,10 @@ _rose_metadata_graph_ARGS() {
     if [[ -f $config_dir/rose-app.conf ]]; then
         PATH=$PATH:$meta_path rose config --meta --keys \
             --file=$config_dir/rose-app.conf 2>/dev/null | \
-            sed "/=/d"
+            sed '/=/d'
     else
         rose config --keys --file=$config_dir/rose-meta.conf 2>/dev/null | \
-            sed "/=/d"
+            sed '/=/d'
     fi
 }
 

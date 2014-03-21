@@ -17,96 +17,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose macro" in built-in trigger checking mode.
+# Test "rose metadata-graph" against just configuration metadata.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
 python -c "import pygraphviz" 2>/dev/null || \
     skip_all 'pygraphviz not installed'
 
-init <<'__CONFIG__'
-[env]
-!USER_IGNORED=0
-CONTROL=foo
-!!DEPENDENT1=bar
-!!DEPENDENT2=baz
-DEPENDENT3=foo
-!!DEPENDENT_DEPENDENT1=qux
-CONTROL_NAMELIST_QUX=foo
-CONTROL_NAMELIST_WIBBLE=bar
-CONTROL_NAMELIST_WIBBLE_WUBBLE=foo
-
-[!!namelist:qux]
-wobble=.false.
-!!wubble=.true.
-
-[namelist:wibble]
-wobble=.true.
-!!wubble=.true.
-__CONFIG__
 #-------------------------------------------------------------------------------
 tests 3
 #-------------------------------------------------------------------------------
-# Check trigger checking - this is nearly cyclic but should be fine.
+# Check full graphing.
 TEST_KEY=$TEST_KEY_BASE-ok-full
 setup
-init_meta <<'__META_CONFIG__'
-[env]
-
-[env=CONTROL]
-trigger=env=DEPENDENT1: bar, baz;
-        env=DEPENDENT2: bar;
-        env=DEPENDENT3;
-        env=DEPENDENT_MISSING1: foo, bar;
-values=foo,bar
-
-[env=CONTROL_NAMELIST_QUX]
-trigger=namelist:qux: bar;
-values=foo,bar
-
-[env=CONTROL_NAMELIST_WIBBLE]
-trigger=namelist:wibble: bar;
-values=foo,bar
-
-[env=CONTROL_NAMELIST_WIBBLE_WUBBLE]
-trigger=namelist:wibble=wubble: bar;
-
-[env=DEPENDENT1]
-
-[env=DEPENDENT2]
-
-[env=DEPENDENT3]
-
-[env=DEPENDENT_MISSING1]
-trigger=env=DEPENDENT_DEPENDENT1
-
-[env=DEPENDENT_DEPENDENT1]
-
-[env=USER_IGNORED]
-type=integer
-
-[env=MISSING_VARIABLE]
-
-[namelist:wibble]
-
-[namelist:wibble=wobble]
-trigger=namelist:wibble=wubble: .true.
-type=logical
-
-[namelist:wibble=wubble]
-type=logical
-
-[namelist:qux]
-
-[namelist:qux=wobble]
-trigger=namelist:qux=wubble: .true.
-type=logical
-
-[namelist:qux=wubble]
-type=logical
-__META_CONFIG__
+init < $TEST_SOURCE_DIR/lib/rose-app.conf
+init_meta < $TEST_SOURCE_DIR/lib/rose-meta.conf
 META_CONFIG_PATH=$(cd ../config/meta && pwd -P)
 run_pass "$TEST_KEY" rose metadata-graph --debug --config=../config/meta
+# Sort and filter out non-essential properties from the output file.
 sort "$TEST_KEY.out" -o "$TEST_KEY.out"
 sed -i -e 's/\(pos\|bb\|width\|height\|lp\)="[^"]*\("\|$\)//g;' \
        -e 's/[, ]*\]\?;\? *$//g; /^\t/!d;' "$TEST_KEY.out"

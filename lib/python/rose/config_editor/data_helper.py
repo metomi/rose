@@ -40,17 +40,14 @@ class ConfigDataHelper(object):
         save_vars = config_data.vars.get_all(save=True, skip_latent=True)
         sections = config_data.sections.get_all(skip_latent=True)
         save_sections = config_data.sections.get_all(save=True,
-                                                        skip_latent=True)
+                                                     skip_latent=True)
         now_set = set([v.to_hashable() for v in variables])
         save_set = set([v.to_hashable() for v in save_vars])
         now_sect_set = set([s.to_hashable() for s in sections])
         save_sect_set = set([s.to_hashable() for s in save_sections])
-        if (config_name not in self.data.saved_config_names or
-            now_set ^ save_set or
-            now_sect_set ^ save_sect_set):
-            # There are differences in state between now and then.
-            return True
-        return False
+        return (config_name not in self.data.saved_config_names or
+                now_set ^ save_set or
+                now_sect_set ^ save_sect_set)
 
     def get_config_meta_flag(self, config_name, from_this_config_obj=None):
         """Return the metadata id flag."""

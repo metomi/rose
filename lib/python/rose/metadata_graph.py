@@ -26,57 +26,59 @@ import tempfile
 import pygraphviz  # Graphviz and pygraphviz need to be installed.
 
 import rose.config
+import rose.config_tree
 import rose.external
 import rose.macro
 import rose.macros.trigger
 import rose.opt_parse
 import rose.reporter
+import rose.resource
+
+
+COLOUR_ENABLED = "green"
+COLOUR_IGNORED = "red"
+COLOUR_MISSING = "grey"
+COLOUR_USER_IGNORED = "orange"
+
+SHAPE_NODE_EXTERNAL = "rectangle"
+SHAPE_NODE_SECTION = "octagon"
+
+STATE_NORMAL = rose.config.ConfigNode.STATE_NORMAL
+
+STYLE_ARROWHEAD_EMPTY = "empty"
 
 
 def get_node_state_attrs(config, section, option=None, allowed_sections=None):
     """Get Graphviz node attributes like color for a given setting."""
     node_attrs = {}
     if option is None:
-        node_attrs["shape"] = "octagon"
+        node_attrs["shape"] = SHAPE_NODE_SECTION
     if not config.value.keys():
         # Empty configuration - we can assume pure metadata.
         return node_attrs
     if allowed_sections is None:
         allowed_sections = []
-    normal_state = rose.config.ConfigNode.STATE_NORMAL
     config_section_node = config.get([section])
     id_ = rose.macro.get_id_from_section_option(section, option)
     state = ""
-    is_section_ignored = False
-    is_trigger_ignored = False
-    is_user_ignored = False
-    is_missing = False
-    if (config_section_node is not None and
-            config_section_node.state != normal_state and
-            option is not None):
-        state = "^"
-        is_section_ignored = True
     config_node = config.get([section, option])
+    node_attrs["color"] = COLOUR_IGNORED
+    if (config_section_node is not None and
+            config_section_node.state != STATE_NORMAL and
+            option is not None):
+        state = rose.config.STATE_SECT_IGNORED
     if config_node is None:
-        is_missing = True
-    elif config_node.state != normal_state:
+        node_attrs["color"] = COLOUR_MISSING
+    elif config_node.state != STATE_NORMAL:
         state += config_node.state
         if config_node.state == config_node.STATE_USER_IGNORED:
-            is_user_ignored = True
-        if config_node.state == config_node.STATE_SYST_IGNORED:
-            is_trigger_ignored = True
+            node_attrs["color"] = COLOUR_USER_IGNORED
+    elif not state:
+        node_attrs["color"] = COLOUR_ENABLED
     if allowed_sections and section not in allowed_sections:
-        node_attrs["shape"] = "rectangle"
+        node_attrs["shape"] = SHAPE_NODE_EXTERNAL
     if state:
         node_attrs["label"] = state + id_
-    if is_missing:
-        node_attrs["color"] = "grey"
-    elif is_trigger_ignored or is_section_ignored:
-        node_attrs["color"] = "red"
-    elif is_user_ignored:
-        node_attrs["color"] = "orange"
-    else:
-        node_attrs["color"] = "green"
     return node_attrs
 
 
@@ -90,8 +92,8 @@ def get_graph(config, meta_config, name, allowed_sections=None,
     if err_reporter is None:
         err_reporter = rose.reporter.Reporter()
     graph = pygraphviz.AGraph(directed=True)
-    graph.graph_attr['rankdir'] = "LR"
-    graph.graph_attr['label'] = name
+    graph.graph_attr["rankdir"] = "LR"
+    graph.graph_attr["label"] = name
     if not allowed_properties or (
             allowed_properties and "trigger" in allowed_properties):
         add_trigger_graph(graph, config, meta_config,
@@ -112,7 +114,7 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
     for keylist, node in meta_config.walk(no_ignore=True):
         id_ = keylist[0]
         if (id_.startswith(rose.META_PROP_NS + rose.CONFIG_DELIMITER) or
-            id_.startswith(rose.SUB_CONFIG_FILE_DIR + ":*")):
+                id_.startswith(rose.SUB_CONFIG_FILE_DIR + ":*")):
             continue
         if isinstance(node.value, dict):
             section, option = (
@@ -132,43 +134,48 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
     for setting_id, id_value_dict in sorted(
             trigger.trigger_family_lookup.items()):
         section, option = rose.macro.get_section_option_from_id(setting_id)
+        section_node = config.get([section], no_ignore=True)
         node = config.get([section, option])
         if node is None:
             setting_value = None
         else:
             setting_value = node.value
-        setting_is_section_ignored = (
-            config.get([section], no_ignore=True) is None)
+        setting_is_section_ignored = (option is None and section_node is None)
         for dependent_id, values in sorted(id_value_dict.items()):
             dep_section, dep_option = rose.macro.get_section_option_from_id(
                 dependent_id)
-            if allowed_sections:
-                if (section not in allowed_sections and
-                        dep_section not in allowed_sections):
-                    continue
+            if (allowed_sections and
+                    (section not in allowed_sections and
+                     dep_section not in allowed_sections)):
+                continue
             if not values:
                 values = [None]
             has_success = False
             if setting_value is not None:
                 for value in values:
-                    if ((value is None and node.state == node.STATE_NORMAL and
-                             not setting_is_section_ignored) or 
-                            trigger._check_values_ok(
-                                setting_value, setting_id, [value])):
+                    if value is None:
+                        if (node.state == node.STATE_NORMAL and
+                                not setting_is_section_ignored):
+                            has_success = True
+                            break
+                    elif trigger._check_values_ok(
+                                 setting_value, setting_id, [value]):
                         has_success = True
+                        break
             for value in values:
                 value_id = setting_id + "=" + str(value)
                 dependent_attrs = {}
                 if setting_value is None:
-                    dependent_attrs["color"] = "grey"
+                    dependent_attrs["color"] = COLOUR_MISSING
                 else:
-                    if ((value is None and node.state == node.STATE_NORMAL and
-                             not setting_is_section_ignored) or 
-                            trigger._check_values_ok(
-                                setting_value, setting_id, [value])):
-                        dependent_attrs["color"] = "green"
-                    else:
-                        dependent_attrs["color"] = "red"
+                    dependent_attrs["color"] = COLOUR_IGNORED
+                    if value is None:
+                        if (node.state == node.STATE_NORMAL and
+                                not setting_is_section_ignored):
+                            dependent_attrs["color"] = COLOUR_ENABLED
+                    elif trigger._check_values_ok(
+                                 setting_value, setting_id, [value]):
+                        dependent_attrs["color"] = COLOUR_ENABLED
                 if not graph.has_node(setting_id):
                     node_attrs = get_node_state_attrs(
                         config, section, option,
@@ -192,28 +199,26 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
                 if setting_value is not None:
                     edge_attrs["label"] = setting_value
                 graph.add_edge(setting_id, value_id, **edge_attrs)
-                if dependent_attrs["color"] == "red" and has_success:
-                    dependent_attrs["arrowhead"] = "empty"
+                if dependent_attrs["color"] == COLOUR_IGNORED and has_success:
+                    dependent_attrs["arrowhead"] = STYLE_ARROWHEAD_EMPTY
                 graph.add_edge(value_id, dependent_id, **dependent_attrs)
 
 
-def output_graph(graph, debug_mode=False):
+def output_graph(graph, debug_mode=False, format="svg"):
     """Output a Graphviz Graph object.
 
     If debug_mode is True, print the 'dot' text output.
     Otherwise, save to a temporary file and launch in an image viewer.
 
     """
-    suffix = ".svg"
     if debug_mode:
-        suffix = ".dot"
-    image_file_handle = tempfile.NamedTemporaryFile(suffix=suffix)
+        format = "dot"
+    image_file_handle = tempfile.NamedTemporaryFile(suffix=("." + format))
     graph.draw(image_file_handle.name, prog='dot')
-    image_file_handle.seek(0)
     if debug_mode:
-        text = image_file_handle.read()
+        image_file_handle.seek(0)
+        print image_file_handle.read()
         image_file_handle.close()
-        print text
         return
     rose.external.launch_image_viewer(image_file_handle.name, run_fg=True)
 
@@ -227,28 +232,42 @@ def _exit_with_metadata_fail():
     sys.exit(1)
 
 
+def _load_override_config():
+    conf = rose.resource.ResourceLocator.default().get_conf().get(
+        ["rose-metadata-graph"])
+    if conf is None:
+        return
+    for key, node in conf.value.items():
+        if node.is_ignored():
+            continue
+        try:
+            cast_value = ast.literal_eval(node.value)
+        except Exception:
+            cast_value = node.value
+        globals()[key.replace("-", "_").upper()] = cast_value
+
+
 def main():
     """Run the metadata graphing from the command line."""
+    _load_override_config()
     rose.macro.add_site_meta_paths()
     rose.macro.add_env_meta_paths()
     opt_parser = rose.opt_parse.RoseOptionParser()
     options = ["conf_dir", "meta_path", "output_dir", "property"]
     opt_parser.add_my_options(*options)
     opts, args = opt_parser.parse_args()
-    if opts.conf_dir is None:
-        opts.conf_dir = os.getcwd()
-    else:
-        opts.conf_dir = os.path.abspath(opts.conf_dir)
-        os.chdir(opts.conf_dir)
-    sys.path.append(os.getenv("ROSE_HOME"))
+    if opts.conf_dir:
+       os.chdir(opts.conf_dir)
+    opts.conf_dir = os.getcwd()
+    sys.path.append(
+        rose.resource.ResourceLocator.default().get_util_home())
     rose.macro.add_opt_meta_paths(opts.meta_path)
 
-    config_file_path = os.path.join(os.getcwd(), rose.SUB_CONFIG_NAME)
-    meta_config_file_path = os.path.join(os.getcwd(), rose.META_CONFIG_NAME)
-    config_loader = rose.config.ConfigLoader()
+    config_file_path = os.path.join(opts.conf_dir, rose.SUB_CONFIG_NAME)
+    meta_config_file_path = os.path.join(opts.conf_dir, rose.META_CONFIG_NAME)
+    config_tree_loader = rose.config_tree.ConfigTreeLoader()
     if os.path.exists(config_file_path):
-        config = config_loader(config_file_path)
-        meta_config = rose.config.ConfigNode()
+        config = config_tree_loader(opts.conf_dir, rose.SUB_CONFIG_NAME).node
         meta_path, warning = rose.macro.load_meta_path(
             config, opts.conf_dir)
         if meta_path is None:
@@ -261,10 +280,11 @@ def main():
             _exit_with_metadata_fail()
     elif os.path.exists(meta_config_file_path):
         config = rose.config.ConfigNode()
-        meta_config = config_loader(meta_config_file_path)
+        meta_config = (
+            config_tree_loader(opts.conf_dir, rose.META_CONFIG_NAME)).node
     else:
         _exit_with_metadata_fail()
-    name = os.getcwd()
+    name = opts.conf_dir
     if args:
         name += ": " + ",".join(args)
     if opts.property:

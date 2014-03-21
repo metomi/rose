@@ -57,7 +57,8 @@ class ConfigTreeLoader(object):
     def __init__(self, *args, **kwargs):
         self.node_loader = ConfigLoader(*args, **kwargs)
 
-    def load(self, conf_dir, conf_name, conf_dir_paths=None, opt_keys=None):
+    def load(self, conf_dir, conf_name, conf_dir_paths=None, opt_keys=None,
+             no_ignore=False):
         """Load a (runtime) configuration directory with inheritance.
 
         Return a ConfigTree object that represents the result.
@@ -95,11 +96,12 @@ class ConfigTreeLoader(object):
         config_tree.node = ConfigNode()
         for t_conf_dir in config_tree.conf_dirs:
             node = nodes[t_conf_dir]
-            for keys, sub_node in node.walk(no_ignore=True):
+            for keys, sub_node in node.walk(no_ignore=no_ignore):
                 if keys == ["", "import"]:
                     continue
-                if config_tree.node.get_value(keys) is None:
-                    config_tree.node.set(keys, sub_node.value)
+                if config_tree.node.get(keys) is None:
+                    config_tree.node.set(keys, sub_node.value, sub_node.state,
+                                         sub_node.comments)
             for dir_path, dir_names, file_names in os.walk(t_conf_dir):
                 names = [d for d in dir_names if d.startswith(".")]
                 for name in names:
