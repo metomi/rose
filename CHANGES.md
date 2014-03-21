@@ -5,7 +5,27 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-Q2?)
+
+### Highlighted Changes
+
+-none-
+
+### Noteworthy Changes
+
+\#1190: rosie lookup: allow override of quiet mode print format.
+
+\#1187: rose config-dump: fix tidying metadata.
+
+\#1186: rose app-upgrade, rose macro: fix relative `--config=DIR`.
+
+\#1184: rose edit: fix change `meta` or `project` flag.
+
+--------------------------------------------------------------------------------
+
 ## 2014-03 (2014-03-19)
+
+This release of Rose works best with Cylc 5.4.11.
 
 ### Highlighted Changes
 
