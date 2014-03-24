@@ -160,17 +160,18 @@ class="btn btn-link"
 </div>
 {% for state, icon, label, title in [("active", "play", "info", "active tasks"), ("success", "ok", "success", "succeeded tasks"), ("fail", "warning-sign", "important", "failed tasks")] -%}
 {% set n_state = entry.n_states[state] -%}
+{% set show_url = (n_state or state == "fail" and entry.n_states["job_fails"] > 0) -%}
 <div class="span2">
-{% if n_state -%}
+{% if show_url -%}
 {% set state_url = script ~ "/jobs/" ~ user ~ "/" ~ suite ~ "?cycles=" ~ entry.cycle -%}
-<a href="{{state_url}}{% for only_state in ["active", "success", "fail"] if only_state == state %}&amp;only_status={{only_state}}{% endfor %}">
+<a href="{{state_url}}&amp;only_status={{state}}">
 {% endif -%}
 <span class="label{% if n_state %} label-{{label}}{% endif %}">
 <i class="icon-{{icon}} icon-white" title="{{state}}"></i>
 </span>
 <span class="badge{% if n_state %}  badge-{{label}}{% endif %}" title="{{title}}">{{entry.n_states[state]}}</span>
-{% if n_state %}</a>{% endif %}
-{% if state=="fail" and entry.n_states["job_fails"] > 0 %}(<span class="badge  badge-{{label}}" title="job failures">{{entry.n_states["job_fails"]}}</span>){% endif %}
+{% if state=="fail" and entry.n_states["job_fails"] > 0 %}<span class="badge  badge-warning" title="failed jobs">{{entry.n_states["job_fails"]}}</span>{% endif %}
+{% if show_url %}</a>{% endif %}
 </div>
 {% endfor -%}
 </div>
