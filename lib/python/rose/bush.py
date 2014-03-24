@@ -132,7 +132,8 @@ class Root(object):
 
     @cherrypy.expose
     def jobs(self, user, suite, page=1, cycles=None, tasks=None,
-             only_status=None, order=None, per_page=JOBS_PER_PAGE, form=None):
+             only_status=None, only_latest_jobs=False, order=None,
+             per_page=JOBS_PER_PAGE, form=None):
         """List jobs of a running or completed suite.
 
         user -- A string containing a valid user ID
@@ -148,6 +149,7 @@ class Root(object):
         only_status -- Only display jobs with this status.
                      The values in the list should be "active", "success" or
                      "fail".
+        only_latest_jobs -- Only display the latest job for each task.
         order -- Order search in a predetermined way. A valid value is one of
                  "time_desc", "time_asc","cycle_desc_name_desc",
                  "cycle_desc_name_asc", "cycle_asc_name_desc",
@@ -184,6 +186,7 @@ class Root(object):
             "cycles": cycles,
             "tasks": tasks,
             "only_statuses": only_statuses,
+            "only_latest_jobs": only_latest_jobs,
             "order": order,
             "per_page": per_page,
             "per_page_default": self.JOBS_PER_PAGE,
@@ -203,9 +206,11 @@ class Root(object):
                 self.suite_engine_proc.get_suite_state_summary(user, suite))
         data["offset"] = (page - 1) * per_page
         entries, of_n_entries = self.suite_engine_proc.get_suite_job_events(
-                                    user, suite,
-                                    cycles, tasks, only_statuses, order,
-                                    per_page, data["offset"])
+            user, suite,
+            cycles, tasks, only_statuses,
+            only_latest_jobs, order, per_page,
+            data["offset"]
+        )
         data["of_n_entries"] = of_n_entries
         if per_page:
             data["n_pages"] = of_n_entries / per_page
