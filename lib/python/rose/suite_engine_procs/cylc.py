@@ -246,7 +246,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 of_n_entries = row[0]
                 break
             if not of_n_entries:
-                print stmt, "submitting now", stmt_args
                 return ([], 0)
         # Execute query to get entries
         entries = []
@@ -271,11 +270,9 @@ class CylcProcessor(SuiteEngineProcessor):
         if limit and not only_statuses:
             stmt += " LIMIT ? OFFSET ?"
             stmt_args_tail = [limit, offset]
-        print stmt, stmt_args_head, stmt_args, stmt_args_tail
-        rows = self._db_exec(
+        for row in self._db_exec(
                 self.SUITE_DB, user_name, suite_name, stmt,
-                stmt_args_head + stmt_args + stmt_args_tail)
-        for row in rows:
+                stmt_args_head + stmt_args + stmt_args_tail):
             cycle, name, submit_num, times_str, events_str, messages_str = row
             entry = {"cycle": cycle, "name": name, "submit_num": submit_num,
                      "submit_num_max": 1, "events": [None, None, None],
@@ -309,7 +306,6 @@ class CylcProcessor(SuiteEngineProcessor):
                         entries.append(entry)
             else:
                 entries.append(entry)
-        del rows
         if of_n_entries == 0:
             of_n_entries = len(entries)
         if limit and only_statuses:
