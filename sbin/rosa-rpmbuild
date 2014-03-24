@@ -1,0 +1,101 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2006-14 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rosa-rpmbuild
+#
+# SYNOPSIS
+#     rosa-rpmbuild [REV]
+#     E.g.:
+#     rosa rpmbuild 2014-03
+#
+# DESCRIPTION
+#     Build an RPM for distributing Rose.
+#     Assume that the current working directory is a local Git clone containing
+#     the Rose project.
+#
+# ARGUMENTS
+#     REV - Revision to build. Default to HEAD.
+#-------------------------------------------------------------------------------
+
+NAME='rose'
+
+prefix_source() {
+    N=0
+    while read; do
+        echo "Source$((++N)): https://github.com/metomi/$NAME/commit/$REPLY"
+    done
+}
+
+set -eu
+
+rpmdev-setuptree
+
+# Create the source tree
+REV=${1:-HEAD}
+REV_NAME=$(git describe $REV)
+REV_BASE=$(git describe --abbrev=0 $REV)
+REV_BASE_DOT=$(sed 's/-/./g' <<<$REV_BASE)
+git archive --format=tar --prefix=$NAME-$REV_BASE_DOT/ $REV \
+    | (cd ~/rpmbuild/SOURCES/ && tar -xf -)
+echo "ROSE_VERSION=\"$REV_BASE_DOT\";" \
+    >~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/doc/$NAME-version.js
+rm -r ~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/{demo,t}
+
+# Create the rpmbuild spec file
+{
+    cat <<__SPEC__
+Name: $NAME
+Version: $REV_BASE_DOT
+Release: 1%{?dist}
+Summary: A framework for managing and running meteorological suites
+License: GPLv3
+URL: https://github.com/metomi/$NAME/
+Source0: https://github.com/metomi/$NAME/releases/
+__SPEC__
+    git log --format=%H --first-parent --reverse $REV_BASE..$REV_NAME \
+        | prefix_source
+    cat <<__SPEC__
+BuildArch: noarch
+Requires: bash fcm Jinja2 perl pygtk2 python python-cherrypy python-requests python-simplejson SQLAlchemy subversion
+
+%description
+Rose: a framework for managing and running meteorological suites
+
+%prep
+
+%build
+
+%install
+rm -fr %{buildroot}
+mkdir -p %{buildroot}/opt/
+cp -pr %_sourcedir/$NAME-$REV_BASE_DOT %{buildroot}/opt/$NAME
+
+%clean 
+rm -fr %{buildroot}
+
+%files
+/opt/$NAME
+__SPEC__
+} >~/rpmbuild/SPECS/$NAME.spec
+
+cd ~/rpmbuild/SPECS
+rpmbuild -ba $NAME.spec
+rm -fr ~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT
+exit

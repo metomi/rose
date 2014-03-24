@@ -17,25 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# NAME
-#     rose-rug-brief-tour
-#
-# SYNOPSIS
-#     rose rug-brief-tour
-#
-# DESCRIPTION
-#     Populate the current directory for Rose User Guide: A Brief Tour.
+# Test "rose suite-scan" with a bad host.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/../lib/bash/rose_init
-echo Copying Rose brief tour files to current directory...
-rose_init rose_log
-run rsync \
-    -a --exclude='.svn' --timeout=1800 \
-    --rsh='ssh -oBatchMode=yes -oStrictHostKeyChecking=no' \
-    $ROSE_HOME/etc/$(basename $0)/* .
-if [[ $? == 0 ]]; then
-    echo ...done
-else
-    echo ...failed
-    exit 1
-fi
+. $(dirname $0)/test_header
+tests 3
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE
+run_fail "$TEST_KEY" rose suite-scan badhost
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_grep "$TEST_KEY.err" badhost "$TEST_KEY.err"
+#-------------------------------------------------------------------------------
+exit

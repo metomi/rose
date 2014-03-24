@@ -1050,6 +1050,14 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
                             info="Cheeseburgers are for lunch")
         return config, self.reports
 </pre>
+
+        <p>Example of removing an entire namelist:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.remove_setting(config, ["namelist:breakfast_nl"],
+                            info="We don't serve breakfast anymore")
+        return config, self.reports
+</pre>
       </dd>
 
       <dt><code>def enable_setting(self, config, keys, info=None):</code></dt>

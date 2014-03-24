@@ -19,7 +19,6 @@
 #-----------------------------------------------------------------------------
 """Compare two UM output files using cumf."""
 
-from rose.apps.rose_ana import DataLengthError
 import re
 
 DIFF_INDEX = { "#" : 10,
@@ -34,10 +33,13 @@ PASS = "compare"
 FAIL = "differ"
 HEADER = "differ, however the data fields are identical"
 
+
 class Cumf(object):
+
+    """Analyse the output from the UM small exec cumf"""
+
     def run(self, task):
         """Analyse the output from the UM small exec cumf"""
-        summaryfile = ""
         for line in task.resultdata:
             result = re.search(r"Summary in:\s*(\S*)", line)
             if result:
@@ -46,12 +48,8 @@ class Cumf(object):
             task.set_failure(CumfSummaryNotFoundFailure(task))
             return task
         if task.cumfsummaryfile:
-            fh = open(task.cumfsummaryfile, "r")
-            task.cumfsummaryoutput = fh.readlines()
-            fh.close()
-            for line in task.cumfsummaryoutput:
-                result = re.search(r"files compare", line)
-                if result:
+            for line in open(task.cumfsummaryfile):
+                if "files compare" in line:
                     task.set_pass(CumfComparisonSuccess(task))
             if not task.ok:
                 task.set_failure(CumfComparisonFailure(task))
@@ -61,19 +59,22 @@ class Cumf(object):
 
 
 class CumfWarnHeader(object):
-    def run(self, task):
-        """As cumf, but issue a warning if only the header has changed"""
-        cumf = Cumf()
-        task = cumf.run(task)
 
-        if task.numericstatus == 0:
-            return task
-        for line in task.cumfsummaryoutput:
-            result = re.search(
-                       r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D",
-                                  line)
-            if result:
-                task.set_warning(CumfComparisonHeaderWarning(task))
+    """As cumf, but issue a warning if only the header has changed"""
+
+    RE_NUM_FIELDS = re.compile(
+                        r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D")
+
+    def __init__(self):
+        self.cumf = Cumf()
+
+    def run(self, task):
+        """As Cumf.run, but issue a warning if only the header has changed"""
+        self.cumf.run(task)
+        if task.numericstatus and task.cumfsummaryfile:
+            for line in open(task.cumfsummaryfile):
+                if self.RE_NUM_FIELDS.search(line):
+                    task.set_warning(CumfComparisonHeaderWarning(task))
         return task
 
 
@@ -92,7 +93,7 @@ class CumfComparisonFailure(object):
         errors = ""
         if self.errors:
             for error in self.errors:
-                errors += "\n         %s: >%s%%"%(error, self.errors[error])
+                errors += "\n         %s: >%s%%" % (error, self.errors[error])
         return OUTPUT_STRING % (FAIL, self.resultfile, self.kgo1file, errors)
 
     __str__ = __repr__
@@ -139,7 +140,7 @@ class CumfSummaryNotFoundFailure(object):
         self.resultdata = task.resultdata
 
     def __repr__(self):
-        return "Cannot ascertain cumf summary file from:\n%s"%(
+        return "Cannot ascertain cumf summary file from:\n%s" % (
                self.resultdata)
 
     __str__ = __repr__
@@ -156,8 +157,7 @@ class CumfDiffNotFoundFailure(object):
         self.resultdata = task.resultdata
 
     def __repr__(self):
-        return "Cannot ascertain cumf diff file from:\n%s"%(
-               self.resultdata)
+        return "Cannot ascertain cumf diff file from:\n%s" % (self.resultdata)
 
     __str__ = __repr__
 
@@ -166,14 +166,14 @@ class DiffNotUnderstoodException(Exception):
 
     """Exception for unexpected characters in the cumf diff map"""
 
-
     def __init__(self, task, character):
+        Exception.__init__(self, task, character)
         self.character = character
         self.file1 = task.resultfile
         self.file2 = task.kgo1file
 
     def __repr__(self):
-        return "Invalid character '%s' in cumf diff between %s and %s"%(
+        return "Invalid character '%s' in cumf diff between %s and %s" % (
                self.character, self.file1, self.file2)
 
     __str__ = __repr__
@@ -190,19 +190,14 @@ def analyse_cumf_diff(task):
         task.set_failure(CumfDiffNotFoundFailure(task))
         return task
     if task.cumfdifffile:
-        fh = open(task.cumfdifffile, "r")
-        task.cumfdiffoutput = fh.read()
-        fh.close()
+        task.cumfdiffoutput = open(task.cumfdifffile).read()
         fields = task.cumfdiffoutput.split("Field")
         for field in fields:
             name = ""
             result = re.search(r":.*:\s*(.*)", field)
             if result:
                 name = result.group(1)
-            if not name:
-                continue
-            result = re.search(r"OK", field)
-            if result:
+            if not name or "OK" in field:
                 continue
             diffmap = get_diff_map(field)
             max_error = DIFF_INDEX["."]
@@ -213,10 +208,7 @@ def analyse_cumf_diff(task):
                     raise DiffNotUnderstoodException(task, character)
                 if DIFF_INDEX[character] > max_error:
                     max_error = DIFF_INDEX[character]
-            if name in task.errors:
-                if task.errors[name] < max_error:
-                    task.errors[name] = max_error
-            else:
+            if name not in task.errors or task.errors[name] < max_error:
                 task.errors[name] = max_error
     return task
 
@@ -233,4 +225,3 @@ def get_diff_map(field):
             mapline = re.sub(r".*->", r"", line)
             diffmap += list(mapline)
     return diffmap
-

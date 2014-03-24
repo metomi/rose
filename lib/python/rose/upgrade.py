@@ -424,6 +424,8 @@ def main():
     if return_objects is None:
         sys.exit(1)
     app_config, meta_config, config_name, args, opts = return_objects
+    if opts.conf_dir is not None:
+        os.chdir(opts.conf_dir)
     verbosity = 1 + opts.verbosity - opts.quietness
     reporter = rose.reporter.Reporter(verbosity)
     meta_opt_node = app_config.get([rose.CONFIG_SECT_TOP,

@@ -502,12 +502,16 @@ warn-if=True;  # This option is deprecated
         <p>A <kbd>true</kbd> value indicates that the setting should be
         compulsory. If this flag is not set, the setting is optional.</p>
 
-        <p>Compulsory settings should be physically present in the
-        configuration at all times. Optional settings can be removed as the
-        user wishes. Compulsory settings may however be triggered ignored (see
-        below). For example, the config editor may issue a warning if a
-        compulsory setting is not defined. It may also hide a compulsory
-        variable that only has a single permitted value.</p>
+        <p>Compulsory sections should be physically present in the
+        configuration at all times. Compulsory options should be physically
+        present in the configuration if their parent section is physically
+        present.</p>
+
+        <p>Optional settings can be removed as the user wishes. Compulsory
+        settings may however be triggered ignored (see below). For example, the
+        config editor may issue a warning if a compulsory setting is not
+        defined. It may also hide a compulsory variable that only has a single
+        permitted value.</p>
       </dd>
 
       <dt id="meta.conf.behaviour.trigger">trigger</dt>

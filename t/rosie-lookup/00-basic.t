@@ -26,7 +26,7 @@
 if ! python -c 'import cherrypy, sqlalchemy' 2>/dev/null; then
     skip_all 'python: cherrypy or sqlalchemy not installed'
 fi
-tests 67
+tests 70
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.
 HOSTNAME=$(hostname)
@@ -370,6 +370,15 @@ suite             by owner  at date
 foo-aa001/trunk@3 by roses  at 2009-02-13 23:31:32 +0000
 foo-aa002/trunk@5 by aphids at 2009-02-13 23:31:34 +0000
 url: http://$HOSTNAME:$PORT/foo/search?s=a
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-custom-format-with-quiet-mode
+run_pass "$TEST_KEY" rosie lookup a -q --format="%suite by %owner at %date"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+suite             by owner  at date
+foo-aa001/trunk@3 by roses  at 2009-02-13 23:31:32 +0000
+foo-aa002/trunk@5 by aphids at 2009-02-13 23:31:34 +0000
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

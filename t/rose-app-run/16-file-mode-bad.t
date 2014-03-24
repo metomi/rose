@@ -17,25 +17,29 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# NAME
-#     rose-rug-brief-tour
-#
-# SYNOPSIS
-#     rose rug-brief-tour
-#
-# DESCRIPTION
-#     Populate the current directory for Rose User Guide: A Brief Tour.
+# Test "rose app-run", file installation, bad mode value.
 #-------------------------------------------------------------------------------
-. $(dirname $0)/../lib/bash/rose_init
-echo Copying Rose brief tour files to current directory...
-rose_init rose_log
-run rsync \
-    -a --exclude='.svn' --timeout=1800 \
-    --rsh='ssh -oBatchMode=yes -oStrictHostKeyChecking=no' \
-    $ROSE_HOME/etc/$(basename $0)/* .
-if [[ $? == 0 ]]; then
-    echo ...done
-else
-    echo ...failed
-    exit 1
-fi
+. $(dirname $0)/test_header
+#-------------------------------------------------------------------------------
+tests 3
+#-------------------------------------------------------------------------------
+test_init <<'__CONFIG__'
+[command]
+default=true
+
+[file:COPYING]
+source=$ROSE_HOME/COPYING
+# Oops, typos
+mode=5ym1ink
+__CONFIG__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE
+test_setup
+run_fail "$TEST_KEY" rose app-run --config=../config -q
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] file:COPYING=mode=5ym1ink: bad setting
+__ERR__
+test_teardown
+#-------------------------------------------------------------------------------
+exit

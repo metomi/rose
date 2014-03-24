@@ -79,7 +79,7 @@ class RoseSuiteHook(object):
             user = pwd.getpwuid(os.getuid()).pw_name
             conf = ResourceLocator.default().get_conf()
             host = conf.get_value(["rose-suite-hook", "email-host"],
-                                    default="localhost")
+                                  default="localhost")
             msg = MIMEText(text)
             msg["From"] = user + "@" + host
             msg["To"] = msg["From"]
@@ -93,7 +93,9 @@ class RoseSuiteHook(object):
             else:
                 mail_cc_list = []
             msg["Subject"] = "[%s] %s" % (hook_event, suite_name)
-            smtp = SMTP('localhost')
+            smtp_host = conf.get_value(["rose-suite-hook", "smtp-host"],
+                                       default="localhost")
+            smtp = SMTP(smtp_host)
             smtp.sendmail(user, [user] + mail_cc_list, msg.as_string())
             smtp.quit()
 

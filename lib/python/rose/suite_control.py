@@ -28,7 +28,7 @@ from rose.popen import RosePopener
 from rose.reporter import Event, Reporter
 from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
-from rose.suite_scan import SuiteScan
+from rose.suite_scan import SuiteScanner
 import sys
 
 
@@ -180,10 +180,9 @@ def main():
     if not opts.non_interactive:
         confirm = prompt
     if opts.all:
-        suite_scan = SuiteScan(event_handler=event_handler)
-        res = suite_scan.scan()
-        for r in res:
-            suite_names.append(str(r).split()[0])
+        suite_scanner = SuiteScanner(event_handler=event_handler)
+        results, exceptions = suite_scanner.scan()
+        suite_names = [result.name for result in results]
     else:
         if opts.name:
             suite_names.append(opts.name)
