@@ -154,16 +154,11 @@ class MacroBase(object):
 
     def _get_section_option_from_id(self, var_id):
         """Return a configuration section and option from an id."""
-        section_option = var_id.split(rose.CONFIG_DELIMITER, 1)
-        if len(section_option) == 1:
-            return var_id, None
-        return section_option
+        return get_section_option_from_id(var_id)
 
     def _get_id_from_section_option(self, section, option):
         """Return a variable id from a section and option."""
-        if option is None:
-            return section
-        return section + rose.CONFIG_DELIMITER + option
+        return get_id_from_section_option(section, option)
 
     def _sorter(self, rep1, rep2):
         # Sort [section], [section, option], [section, None]
@@ -397,6 +392,21 @@ def add_opt_meta_paths(meta_paths):
             for path in child_paths:
                 path = os.path.expandvars(os.path.expanduser(path))
                 sys.path.insert(0, os.path.abspath(path))
+
+
+def get_section_option_from_id(var_id):
+    """Return a configuration section and option from an id."""
+    section_option = var_id.split(rose.CONFIG_DELIMITER, 1)
+    if len(section_option) == 1:
+        return var_id, None
+    return section_option
+
+
+def get_id_from_section_option(section, option):
+    """Return a variable id from a section and option."""
+    if option is None:
+        return section
+    return section + rose.CONFIG_DELIMITER + option
 
 
 def load_meta_path(config=None, directory=None, is_upgrade=False,

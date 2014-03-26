@@ -209,7 +209,7 @@ def get_ignored_markup(variable):
     """Return pango markup for a variable's ignored reason."""
     markup = ""
     if IGNORED_BY_SECTION in variable.ignored_reason:
-        markup += '^'
+        markup += rose.config.STATE_SECT_IGNORED
     if IGNORED_BY_SYSTEM in variable.ignored_reason:
         markup += rose.config.ConfigNode.STATE_SYST_IGNORED
     elif IGNORED_BY_USER in variable.ignored_reason:

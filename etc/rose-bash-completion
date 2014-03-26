@@ -218,6 +218,25 @@ _rose_macro_ARGS() {
         sed "s/^\[.*\] //g"
 }
 
+_rose_metadata_graph_ARGS() {
+    local config_dir meta_path
+    config_dir=$(__rose_get_config_dir)
+    meta_path=$(__rose_get_meta_path)
+    if [[ -f $config_dir/rose-app.conf ]]; then
+        PATH=$PATH:$meta_path rose config --meta --keys \
+            --file=$config_dir/rose-app.conf 2>/dev/null | \
+            sed '/=/d'
+    else
+        rose config --keys --file=$config_dir/rose-meta.conf 2>/dev/null | \
+            sed '/=/d'
+    fi
+}
+
+_rose_metadata_graph__property() {
+    COMPREPLY=( $(compgen -W "trigger" -- $1) )
+    return 0
+}
+
 _rose_stem__group() {
     local config_dir groups
     config_dir=$(__rose_stem_get_config_dir)

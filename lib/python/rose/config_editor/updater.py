@@ -279,7 +279,7 @@ class Updater(object):
             page.refresh(var.metadata['id'])
 
     def update_config(self, namespace):
-        """Update the config object for the macros. To be removed."""
+        """Update the config object for the macros."""
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config = self.data.dump_to_internal_config(config_name)
         self.data.config[config_name].config = config
