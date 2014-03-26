@@ -1000,11 +1000,11 @@ class MainMenuHandler(object):
         if config_data.directory is None:
             return False
         if allowed_sections is None:
-            if config_name != namespace:
+            if config_name == namespace:
+                allowed_sections = []
+            else:
                 allowed_sections = (
                     self.data.helper.get_sections_from_namespace(namespace))
-            else:
-                allowed_sections = []
         cmd = (shlex.split(rose.config_editor.LAUNCH_COMMAND_GRAPH) +
                [config_data.directory] + allowed_sections)
         rose.popen.RosePopener().run_bg(*cmd)

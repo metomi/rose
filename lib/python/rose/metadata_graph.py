@@ -214,7 +214,7 @@ def output_graph(graph, debug_mode=False, format="svg"):
     if debug_mode:
         format = "dot"
     image_file_handle = tempfile.NamedTemporaryFile(suffix=("." + format))
-    graph.draw(image_file_handle.name, prog='dot')
+    graph.draw(image_file_handle.name, prog="dot")
     if debug_mode:
         image_file_handle.seek(0)
         print image_file_handle.read()
