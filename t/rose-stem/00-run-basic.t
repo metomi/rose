@@ -53,7 +53,7 @@ cp $TEST_SOURCE_DIR/00-run-basic/suite.rc $WORKINGCOPY/rose-stem
 touch $WORKINGCOPY/rose-stem/rose-suite.conf
 #We should now have a valid rose-stem suite.
 #-------------------------------------------------------------------------------
-N_TESTS=15
+N_TESTS=20
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 #Test for successful execution
@@ -66,7 +66,7 @@ OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
 TEST_KEY=$TEST_KEY_BASE-basic-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[earl_grey\]" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source
-file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY $URL/trunk@head" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY fcm:foo_tr@head" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source-base
 file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source-rev
@@ -82,7 +82,7 @@ OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
 TEST_KEY=$TEST_KEY_BASE-suite-redirection-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[lapsang\]" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-suite-redirection-source
-file_grep $TEST_KEY "SOURCE_FOO=$URL/trunk@head\$" $OUTPUT
+file_grep $TEST_KEY "SOURCE_FOO=fcm:foo_tr@head\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-suite-redirection-source-base
 file_grep $TEST_KEY "SOURCE_FOO_BASE=fcm:foo_tr\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-suite-redirection-source-rev
@@ -102,6 +102,23 @@ file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source-base
 file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source-rev
+file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
+#-------------------------------------------------------------------------------
+# Fourth test, checking relative path with -C is working
+TEST_KEY=$TEST_KEY_BASE-relative-path
+cd $WORKINGCOPY
+run_pass "$TEST_KEY" \
+   rose stem --group=ceylon -C rose-stem \
+             --no-gcontrol --name $SUITENAME -- --debug
+#Test output
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+TEST_KEY=$TEST_KEY_BASE-relative-path-groups-to-run
+file_grep $TEST_KEY "RUN_NAMES=\[ceylon\]" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-relative-path-source
+file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-relative-path-source-base
+file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-relative-path-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 #-------------------------------------------------------------------------------
 cd $TEST_DIR

@@ -5,13 +5,51 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q1?)
+## Next Release (2014-Q2?)
 
-### Hightlighted Changes
+### Highlighted Changes
 
 -none-
 
 ### Noteworthy Changes
+
+\#1190: rosie lookup: allow override of quiet mode print format.
+
+\#1187: rose config-dump: fix tidying metadata.
+
+\#1186: rose app-upgrade, rose macro: fix relative `--config=DIR`.
+
+\#1184: rose edit: fix change `meta` or `project` flag.
+
+--------------------------------------------------------------------------------
+
+## 2014-03 (2014-03-19)
+
+This release of Rose works best with Cylc 5.4.11.
+
+### Highlighted Changes
+
+\#1163: rose metadata: a `compulsory=true` option no longer requires its
+containing section to be compulsory as well.
+
+### Noteworthy Changes
+
+\#1181: rose stem: fix `-C rel/path` usage.
+
+\#1180: rose suite-scan: scan port files as well. Report left behind port
+files. Report exceptions for failed `cylc scan` and `ssh` commands.
+
+\#1177: rose suite-clean: accept `--name=NAME`. If specified, `NAME` is
+appended to the end of the argument list. This allows the interface to be
+consistent with the other utilities.
+
+\#1173: rose app/suite/task-run: handle bad file install mode value.
+Previously, the system will assume the `auto` mode if it is given a bad file
+install mode value. It will now fail.
+
+\#1171: rose_ana: print number of values compared.
+
+\#1169: rose stem: improve robustness of keyword match.
 
 \#1167: rose config-edit: fix general checking for `rose-suite.info` suites.
 
@@ -42,7 +80,7 @@ discovered on an upgrade from GTK 2.18 to GTK 2.20.
 
 This release of Rose works best with Cylc 5.4.8.
 
-### Hightlighted Changes
+### Highlighted Changes
 
 -none-
 
@@ -86,7 +124,7 @@ configuration directory as the current working directory.
 
 This release of Rose works best with Cylc 5.4.4 to 5.4.7.
 
-### Hightlighted Changes
+### Highlighted Changes
 
 -none-
 
@@ -108,7 +146,7 @@ umask in the environment.
 
 This release of Rose works best with Cylc 5.4.4 to 5.4.7.
 
-### Hightlighted Changes
+### Highlighted Changes
 
 \#1085: rosie web service: the web service database schema has been modified to
 improve performance. **This change requires the rosie web service database to

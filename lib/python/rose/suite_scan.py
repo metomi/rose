@@ -27,7 +27,7 @@ from rose.resource import ResourceLocator
 from rose.suite_engine_proc import SuiteEngineProcessor
 import sys
 
-class SuiteScan(object):
+class SuiteScanner(object):
 
     """Scan for running suites in suite hosts."""
 
@@ -51,14 +51,23 @@ class SuiteScan(object):
             return self.event_handler(*args, **kwargs)
 
     def scan(self, *hosts):
-        """Scan for running suites (in hosts)."""
+        """Scan for running suites (in hosts).
+
+        Return (suite_scan_results, exceptions) where suite_scan_results is a
+        list of rose.suite_engine_proc.SuiteScanResult instances and exceptions
+        is a list of exceptions resulting from any failed scans
+
+        """
+        conf = ResourceLocator.default().get_conf()
         if not hosts:
-            conf = ResourceLocator.default().get_conf()
             hosts = self.host_selector.expand(
                ["localhost"] +
                conf.get_value(["rose-suite-run", "hosts"], "").split() +
                conf.get_value(["rose-suite-run", "scan-hosts"], "").split())[0]
-        return self.suite_engine_proc.scan(set(hosts))
+        timeout = conf.get_value(["rose-suite-scan", "timeout"])
+        if timeout:
+            timeout = int(timeout)
+        return self.suite_engine_proc.scan(set(hosts), timeout=timeout)
 
     __call__ = scan
 
@@ -67,13 +76,18 @@ def main():
     opt_parser = RoseOptionParser()
     opts, args = opt_parser.parse_args()
     event_handler = Reporter(opts.verbosity - opts.quietness)
-    suite_scan = SuiteScan(event_handler=event_handler)
-    results = suite_scan(*args)
+    suite_scanner = SuiteScanner(event_handler=event_handler)
+    results, exceptions = SuiteScanner(event_handler=event_handler)(*args)
+    ret = 1
     if results:
+        ret = 0
         for result in results:
-            print(result)
-    else:
-        sys.exit(1)
+            suite_scanner.handle_event(result)
+    if exceptions:
+        ret = 2
+        for exception in exceptions:
+            event_handler(exception)
+    sys.exit(ret)
 
 
 if __name__ == "__main__":

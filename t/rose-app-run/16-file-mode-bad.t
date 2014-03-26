@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #-------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-4 Met Office.
 #
@@ -17,32 +17,29 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# NAME
-#     rose suite-clean
-#
-# SYNOPSIS
-#     rose suite-clean [OPTIONS] [SUITE-NAME [...]]
-#
-# DESCRIPTION
-#     Remove items created by the previous suite runs.
-#
-#     If no argument is specified, use the base-name of $PWD as suite name.
-#
-#     Correctly remove share/ and work/ directories and suite runtime
-#     directories on remote job hosts.
-#
-# OPTIONS
-#     --name=NAME, -n NAME
-#         Append NAME to the argument list.
-#     --non-interactive, --yes, -y
-#         Switch off interactive prompting (=answer yes to everything)
-#     --quiet, -q
-#         Decrement verbosity.
-#     --verbose, -v
-#         Increment verbosity.
-#
-# DIAGNOSTICS
-#     Return the difference between the number of arguments and number of
-#     successfully cleaned suites, i.e. 0 if all successful.
+# Test "rose app-run", file installation, bad mode value.
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_clean "$@"
+. $(dirname $0)/test_header
+#-------------------------------------------------------------------------------
+tests 3
+#-------------------------------------------------------------------------------
+test_init <<'__CONFIG__'
+[command]
+default=true
+
+[file:COPYING]
+source=$ROSE_HOME/COPYING
+# Oops, typos
+mode=5ym1ink
+__CONFIG__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE
+test_setup
+run_fail "$TEST_KEY" rose app-run --config=../config -q
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] file:COPYING=mode=5ym1ink: bad setting
+__ERR__
+test_teardown
+#-------------------------------------------------------------------------------
+exit

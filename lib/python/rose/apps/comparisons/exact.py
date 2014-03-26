@@ -21,7 +21,7 @@
 
 from rose.apps.rose_ana import DataLengthError
 
-OUTPUT_STRING = "%s %s: %s%%: File %s %s %s"
+OUTPUT_STRING = "%s %s: %s%%: File %s %s %s (%s values)"
 PASS = "=="
 FAIL = "!="
 
@@ -53,6 +53,7 @@ class ExactComparisonFailure(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        self.numvals = len(task.resultdata)
         if hasattr(task, "subextract"):
             self.extract = self.extract + ":" + task.subextract
         try:
@@ -71,7 +72,8 @@ class ExactComparisonFailure(object):
 
     def __repr__(self):
         return OUTPUT_STRING % ( self.extract, self.location, self.percentage,
-                                 self.resultfile, FAIL, self.kgo1file,)
+                                 self.resultfile, FAIL, self.kgo1file,
+                                 self.numvals)
 
     __str__ = __repr__
 
@@ -84,11 +86,13 @@ class ExactComparisonSuccess(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        self.numvals = len(task.resultdata)
         if hasattr(task, "subextract"):
             self.extract = self.extract + ":" + task.subextract
 
     def __repr__(self):
         return OUTPUT_STRING % ( self.extract, "all", 0,
-                                 self.resultfile, PASS, self.kgo1file, )
+                                 self.resultfile, PASS, self.kgo1file, 
+                                 self.numvals)
 
     __str__ = __repr__

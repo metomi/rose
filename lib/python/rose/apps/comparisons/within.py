@@ -22,7 +22,7 @@
 import re
 from rose.apps.rose_ana import DataLengthError
 
-OUTPUT_STRING = "%s %s%% %s %s: File %s c.f. %s"
+OUTPUT_STRING = "%s %s%% %s %s: File %s c.f. %s (%s values)"
 PASS = "<="
 FAIL = ">"
 
@@ -61,6 +61,7 @@ class WithinComparisonFailure(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        self.numvals = len(task.resultdata)
         if hasattr(task, "subextract"):
             self.extract = self.extract + ":" + task.subextract
         self.tolerance = task.tolerance
@@ -76,7 +77,7 @@ class WithinComparisonFailure(object):
     def __repr__(self):
         return OUTPUT_STRING % ( self.extract, self.percentage, FAIL,
                                  self.tolerance, self.resultfile,
-                                 self.kgo1file,  )
+                                 self.kgo1file,  self.numvals )
 
     __str__ = __repr__
 
@@ -89,13 +90,15 @@ class WithinComparisonSuccess(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        self.numvals = len(task.resultdata)
         if hasattr(task, "subextract"):
             self.extract = self.extract + ":" + task.subextract
         self.tolerance = task.tolerance
 
     def __repr__(self):
         return OUTPUT_STRING % ( self.extract, "all", PASS, self.tolerance,
-                                 self.resultfile, self.kgo1file )
+                                 self.resultfile, self.kgo1file,
+                                 self.numvals )
 
     __str__ = __repr__
 
