@@ -444,7 +444,7 @@ __rose_help() {
         _rose_help__${subcommand//-/_} | sed -n '/^OPTIONS$/,/^[^ ]$/p;'
         return
     fi
-    rose help $subcommand
+    rose help $subcommand 2>/dev/null
 }
 
 __rosie_get_prefixes() {

@@ -50,5 +50,9 @@
 #        Launch, ignoring any configuration.
 #     --no-metadata
 #        Launch with metadata switched off.
+#
+# ENVIRONMENT VARIABLES
+#     optional ROSE_META_PATH
+#         Prepend $ROSE_META_PATH to the metadata search path.
 #-------------------------------------------------------------------------------
 exec python -m rose.config_editor.main "$@"

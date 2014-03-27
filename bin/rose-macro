@@ -32,7 +32,8 @@
 #     --fix, -F
 #         Run Rose internal transformer (fixer) macros.
 #     --meta-path=PATH, -M PATH
-#         Prepend PATH to the metadata search path.
+#         Prepend PATH to the metadata search path (look here first).
+#         This option can be used repeatedly to load multiple paths.
 #     --non-interactive, --yes, -y
 #         Switch off interactive prompting (=answer yes to everything).
 #     --output=DIR, -O DIR
@@ -48,5 +49,9 @@
 #         A list of macro names to run. If no macro names are specified and
 #         --fix, --validate are not used, list all available macros.
 #         Otherwise, run the specified macro names.
+#
+# ENVIRONMENT VARIABLES
+#     optional ROSE_META_PATH
+#         Prepend $ROSE_META_PATH to the metadata search path.
 #-------------------------------------------------------------------------------
 exec python -m rose.macro "$@"

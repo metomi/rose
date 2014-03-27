@@ -23,7 +23,8 @@
 #     --downgrade, -d
 #         Downgrade the version instead of upgrade.
 #     --meta-path=PATH, -M PATH
-#         Prepend PATH to the metadata search path.
+#         Prepend PATH to the metadata search path. (look here first).
+#         This option can be used repeatedly to load multiple paths.
 #     --non-interactive, --yes, -y
 #         Switch off interactive prompting.
 #     --output=DIR, -O DIR
@@ -38,5 +39,9 @@
 #         versions. If --non-interactive is used, use the latest version
 #         available. If --non-interactive and --downgrade are used, use
 #         the earliest version available.
+#
+# ENVIRONMENT VARIABLES
+#     optional ROSE_META_PATH
+#         Prepend $ROSE_META_PATH to the metadata search path.
 #-------------------------------------------------------------------------------
 exec python -m rose.upgrade "$@"
