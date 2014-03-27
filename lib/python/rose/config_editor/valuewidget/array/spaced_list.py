@@ -84,9 +84,7 @@ class SpacedListValueWidget(gtk.HBox):
 
     def get_focus_index(self):
         """Get the focus and position within the table of entries."""
-        if not self.value.startswith("["):
-            return
-        text = '['
+        text = ''
         for entry in self.entries:
             val = entry.get_text()
             prefix = get_next_delimiter(self.last_value[len(text):], val)
@@ -100,22 +98,14 @@ class SpacedListValueWidget(gtk.HBox):
         if focus_index is None:
             return
         value_array = spaced_array_split(self.value)
-        if not self.value.startswith("["):
-            return
-        text = '['
+        value_array_old = spaced_array_split(self.last_value)
         for i, val in enumerate(value_array):
-            j = len(text)
-            v = self.value[j:].index(val)
-            prefix = get_next_delimiter(self.value[len(text):],
-                                        val)
-            if (len(text + prefix + val) >= focus_index or
-                i == len(value_array) - 1):
-                if len(self.entries) > i:
-                    self.entries[i].grab_focus()
-                    val_offset = focus_index - len(text + prefix)
-                    self.entries[i].set_position(val_offset)
-                    return
-            text += prefix + val
+            if i >= len(value_array_old):
+                self.entries[len(value_array)-1].grab_focus()
+                break
+            if val != value_array_old[i]:
+                self.entries[i].grab_focus()
+                break
 
     def generate_entries(self, value_array=None):
         """Create the gtk.Entry objects for elements in the array."""
@@ -358,7 +348,7 @@ class SpacedListValueWidget(gtk.HBox):
         entries_have_spaces = any([" " in v for v in val_array])
         new_value = spaced_array_join(val_array)
         if new_value != self.value:
-            self.last_value = new_value
+            self.last_value = self.value
             self.set_value(new_value)
             self.value = new_value
             if entries_have_spaces:
@@ -418,11 +408,6 @@ class SpacedListValueWidget(gtk.HBox):
 
 def get_next_delimiter(array_text, next_element):
     v = array_text.index(next_element)
-    if v == 0 and len(array_text) > 1:  # Null or whitespace element.
-        while array_text[v].isspace():
-            v += 1
-        if array_text[v] == " ":
-            v += 1
     return array_text[:v]
 
 
@@ -437,19 +422,4 @@ def spaced_array_split(value):
         value_array = value.split(" ")
     except (SyntaxError, ValueError):
         value_array = rose.variable.array_split(value)
-        return value_array
-    cast_value_array = []
-    print value_array
-    for value in value_array:
-        try:
-            value = ast.literal_eval(value)
-        except (SyntaxError, ValueError):
-            value_array = rose.variable.array_split(value)
-            return value_array
-        if isinstance(value, basestring):
-            cast_value_array.append('"' + value + '"')
-        elif isinstance(value, float) or isinstance(value, int):
-            cast_value_array.append(value) 
-        else:
-            cast_value_array.append(str(value))
-    return cast_value_array
+    return value_array

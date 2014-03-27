@@ -123,8 +123,8 @@ class SpacedListMetaType(MetaType):
     def is_valid(self, value):
         try:
             cast_value = value.split(" ")
-            for entry in cast_value:
-                ast.literal_eval(entry)
+            #for entry in cast_value:
+            #    ast.literal_eval(entry)
             if not isinstance(cast_value, list):
                 return [False, self.WARNING.format(repr(value))]
         except (SyntaxError, ValueError):
