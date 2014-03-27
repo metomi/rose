@@ -245,9 +245,9 @@ rosie UTIL [OPTS] [ARG ...]
       <dt><code>--quiet, -q</code></dt>
 
       <dd>Each <code>--quiet</code> or <code>-q</code> on the command line
-      decrements the verbosity of the command output by 1. The default verbosity
-      is 1.  If you want the command to only print what is essential to
-      <var>STDOUT</var> and suppress warnings on <var>STDERR</var>, you can
+      decrements the verbosity of the command output by 1. The default
+      verbosity is 1. If you want the command to only print what is essential
+      to <var>STDOUT</var> and suppress warnings on <var>STDERR</var>, you can
       specify a single <code>--quiet</code> to reduce the verbosity to 0 (the
       loweest verbosity).</dd>
 
@@ -255,11 +255,11 @@ rosie UTIL [OPTS] [ARG ...]
 
       <dd>Each <code>--verbose</code> or <code>-v</code> on the command line
       increments the verbosity of the output by 1. The default verbosity is 1.
-      The highest verbosity is normally 3. A single <code>--verbose</code> would
-      increase the verbosity to <var>STDOUT</var>. A double <code>--verbose
-      --verbose</code> or <code>-v -v</code> would increase the verbosity to
-      the highest level. (More <code>--verbose</code> can be specified on the
-      command line, but would normally have no effect.)</dd>
+      The highest verbosity is normally 3. A single <code>--verbose</code>
+      would increase the verbosity to <var>STDOUT</var>. A double
+      <code>--verbose --verbose</code> or <code>-v -v</code> would increase the
+      verbosity to the highest level. (More <code>--verbose</code> can be
+      specified on the command line, but would normally have no effect.)</dd>
     </dl>
 
     <h2 id="rose-app-run">rose app-run</h2>
@@ -350,7 +350,7 @@ rosie UTIL [OPTS] [ARG ...]
       <dd>Increment verbosity.</dd>
     </dl>
 
-    <h3>ENVIRONMENT</h3>
+    <h3>ENVIRONMENT VARIABLES</h3>
 
     <dl>
       <dt><kbd>optional ROSE_APP_OPT_CONF_KEYS</kbd></dt>
@@ -403,7 +403,8 @@ rosie UTIL [OPTS] [ARG ...]
 
       <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
 
-      <dd>Prepend <var>PATH</var> to the metadata search path.</dd>
+      <dd>Prepend <var>PATH</var> to the metadata search path (look here
+      first). This option can be used repeatedly to load multiple paths.</dd>
 
       <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
 
@@ -428,6 +429,14 @@ rosie UTIL [OPTS] [ARG ...]
       versions. If <kbd>--non-interactive</kbd> is used, use the latest version
       available. If <kbd>--non-interactive</kbd> and <kbd>--downgrade</kbd> are
       used, use the earliest version available.</dd>
+    </dl>
+
+    <h3>ENVIRONMENT VARIABLES</h3>
+
+    <dl>
+      <dt><kbd>optional ROSE_META_PATH</kbd></dt>
+
+      <dd>Prepend <var>$ROSE_META_PATH</var> to the metadata search path.</dd>
     </dl>
 
     <h2 id="rose-bush">rose bush</h2>
@@ -583,6 +592,14 @@ rosie UTIL [OPTS] [ARG ...]
       where relevant.</dd>
     </dl>
 
+    <h3>ENVIRONMENT VARIABLES</h3>
+
+    <dl>
+      <dt><kbd>optional ROSE_META_PATH</kbd></dt>
+
+      <dd>Prepend <var>$ROSE_META_PATH</var> to the metadata search path.</dd>
+    </dl>
+
     <h2 id="rose-config-dump">rose config-dump</h2>
 
     <h3>NAME</h3><kbd>rose config-dump</kbd>
@@ -696,6 +713,14 @@ rosie UTIL [OPTS] [ARG ...]
       <dt><kbd>--no-metadata</kbd></dt>
 
       <dd>Launch with metadata switched off.</dd>
+    </dl>
+
+    <h3>ENVIRONMENT VARIABLES</h3>
+
+    <dl>
+      <dt><kbd>optional ROSE_META_PATH</kbd></dt>
+
+      <dd>Prepend <var>$ROSE_META_PATH</var> to the metadata search path.</dd>
     </dl>
 
     <h2 id="rose-date">rose date</h2>
@@ -944,7 +969,8 @@ rosie UTIL [OPTS] [ARG ...]
 
       <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
 
-      <dd>Prepend <var>PATH</var> to the metadata search path.</dd>
+      <dd>Prepend <var>PATH</var> to the metadata search path (look here
+      first). This option can be used repeatedly to load multiple paths.</dd>
 
       <dt><kbd>--non-interactive, --yes, -y</kbd></dt>
 
@@ -972,6 +998,14 @@ rosie UTIL [OPTS] [ARG ...]
       <dd>A list of macro names to run. If no macro names are specified and
       <kbd>--validate</kbd> is not used, list all available macros. Otherwise,
       run the specified macro names.</dd>
+    </dl>
+
+    <h3>ENVIRONMENT VARIABLES</h3>
+
+    <dl>
+      <dt><kbd>optional ROSE_META_PATH</kbd></dt>
+
+      <dd>Prepend <var>$ROSE_META_PATH</var> to the metadata search path.</dd>
     </dl>
 
     <h2 id="rose-metadata-check">rose metadata-check</h2>
@@ -1058,9 +1092,63 @@ rosie UTIL [OPTS] [ARG ...]
       missing, the property will be set to a null string in each setting.</dd>
     </dl>
 
-    <h2 id="rose-mpi-launch">rose mpi-launch</h2>
+    <h2 id="rose-metadata-graph">rose metadata-graph</h2>
 
     <h3>NAME</h3>
+
+    <p><kbd>rose-metadata-graph</kbd></p>
+
+    <h3>SYNOPSIS</h3>
+
+    <p><kbd>rose metadata-graph [OPTIONS] [SECTION ...]</kbd></p>
+
+    <h3>DESCRIPTION</h3>
+
+    <p>Graph configuration metadata.</p>
+
+    <h3>OPTIONS</h3>
+
+    <dl>
+      <dt><kbd>--config=DIR, -C DIR</kbd></dt>
+
+      <dd>The directory containing either the configuration or the
+      configuration metadata. If the configuration is given, the metadata will
+      be looked up in the normal way (see also <kbd>--meta-path</kbd>,
+      <kbd>ROSE_META_PATH</kbd>). If the configuration metadata is given, there
+      will be no configuration data used in the graphing. If not specified, the
+      current directory will be used.</dd>
+
+      <dt><kbd>--meta-path=PATH, -M PATH</kbd></dt>
+
+      <dd>Prepend <var>PATH</var> to the metadata search path (look here
+      first). This option can be used repeatedly to load multiple paths.</dd>
+
+      <dt><kbd>--property=PROPERTY, -p PROPERTY</kbd></dt>
+
+      <dd>Graph a certain property such as <var>trigger</var>. If specified,
+      only this property will be graphed</dd>
+    </dl>
+
+    <h3>ARGUMENTS</h3>
+
+    <dl>
+      <dt><var>SECTION</var></dt>
+
+      <dd>One or more configuration sections to graph. If specified, only these
+      sections will be checked.</dd>
+    </dl>
+
+    <h3>ENVIRONMENT VARIABLES</h3>
+
+    <dl>
+      <dt><kbd>optional ROSE_META_PATH</kbd></dt>
+
+      <dd>Prepend <var>$ROSE_META_PATH</var> to the metadata search path.</dd>
+    </dl>
+
+    <h2 id="rose-mpi-launch"><kbd>rose mpi-launch</kbd></h2>
+
+    <h3><kbd>NAME</kbd></h3>
 
     <p><kbd>rose-mpi-launch</kbd></p>
 
@@ -1161,7 +1249,7 @@ launcher-preopts.mpiexec=-n $NPROC
       </dd>
     </dl>
 
-    <h3>ENVIRONMENT</h3>
+    <h3>ENVIRONMENT VARIABLES</h3>
 
     <dl>
       <dt><kbd>optional ROSE_LAUNCHER</kbd></dt>
@@ -1732,7 +1820,7 @@ launcher-preopts.mpiexec=-n $NPROC
       <dd>Increment verbosity.</dd>
     </dl>
 
-    <h3>ENVIRONMENT</h3>
+    <h3>ENVIRONMENT VARIABLES</h3>
 
     <p><kbd>rose suite-run</kbd> provides the following environment variables
     to the suite:</p>
@@ -2058,7 +2146,7 @@ environment scripting = "eval $(rose task-env)"
       <dd>Specify a named application configuration.</dd>
     </dl>
 
-    <h3>ENVIRONMENT</h3>
+    <h3>ENVIRONMENT VARIABLES</h3>
 
     <p>All environment variables of <kbd>rose app-run</kbd> and <kbd>rose
     task-env</kbd> are supported.</p>
