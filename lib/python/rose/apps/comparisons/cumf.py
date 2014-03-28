@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 """Compare two UM output files using cumf."""
 
+import os
 import re
 
 DIFF_INDEX = { "#" : 10,
@@ -28,7 +29,7 @@ DIFF_INDEX = { "#" : 10,
                ":" : 0,
                "." : -1, }
 MISSING_DATA = "~"
-OUTPUT_STRING = "Files %s: %s c.f. %s %s"
+OUTPUT_STRING = "Files %s: %s c.f. %s \n    (%s) %s"
 PASS = "compare"
 FAIL = "differ"
 HEADER = "differ, however the data fields are identical"
@@ -88,13 +89,15 @@ class CumfComparisonFailure(object):
         self.extract = task.extract
         task = analyse_cumf_diff(task)
         self.errors = task.errors
+        self.cumfdir = os.path.dirname(task.cumfsummaryfile)
 
     def __repr__(self):
         errors = ""
         if self.errors:
             for error in self.errors:
                 errors += "\n         %s: >%s%%" % (error, self.errors[error])
-        return OUTPUT_STRING % (FAIL, self.resultfile, self.kgo1file, errors)
+        return OUTPUT_STRING % (FAIL, self.resultfile, self.kgo1file, 
+                                self.cumfdir, errors)
 
     __str__ = __repr__
 
@@ -107,9 +110,11 @@ class CumfComparisonSuccess(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        self.cumfdir = os.path.dirname(task.cumfsummaryfile)
 
     def __repr__(self):
-        return OUTPUT_STRING % (PASS, self.resultfile, self.kgo1file, "")
+        return OUTPUT_STRING % (PASS, self.resultfile, self.kgo1file, 
+                                self.cumfdir, "")
 
     __str__ = __repr__
 
@@ -122,9 +127,11 @@ class CumfComparisonHeaderWarning(object):
         self.resultfile = task.resultfile
         self.kgo1file = task.kgo1file
         self.extract = task.extract
+        self.cumfdir = os.path.dirname(task.cumfsummaryfile)
 
     def __repr__(self):
-        return OUTPUT_STRING % (HEADER, self.resultfile, self.kgo1file,  "")
+        return OUTPUT_STRING % (HEADER, self.resultfile, self.kgo1file, 
+                                self.cumfdir,  "")
 
     __str__ = __repr__
 
