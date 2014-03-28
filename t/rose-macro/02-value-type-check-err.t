@@ -66,6 +66,7 @@ my_derived_type_raw_log_char_real_array = xlkdf",", .true., 'I\'m a bad characte
 my_derived_type_real_int_null_comp_array = 2.0,,4.0,,2.3e+2, 1
 my_python_list=["Spam", True, "Cheese, False, 2000.0]
 my_python_list_empty=
+my_spaced_list=1 2 3 "bob"
 __CONFIG__
 #-------------------------------------------------------------------------------
 tests 30
@@ -339,13 +340,18 @@ setup
 init_meta <<__META_CONFIG__
 [namelist:values_nl1=my_array_fixed]
 length=8
+
+[namelist:values_nl1=my_spaced_list]
+length=2
 __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 1
+[V] rose.macros.DefaultValidators: issues: 2
     namelist:values_nl1=my_array_fixed='x,',y,5.0e-3,5,6,y,21,o,(),opsdf,sdfkl
         Array longer than max length: 11 instead of 8
+    namelist:values_nl1=my_spaced_list=1 2 3 "bob"
+        Array longer than max length: 4 instead of 2
 __CONTENT__
 teardown
 #-------------------------------------------------------------------------------
