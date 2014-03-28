@@ -115,6 +115,9 @@ class FailureRuleChecker(rose.macro.MacroBase):
                     try:
                         test_failed = evaluator.evaluate_rule(
                                                 rule, setting_id, config)
+                    except (ZeroDivisionError or TypeError or ValueError or
+                            IndexError):
+                        test_failed = True
                     except RuleValueError as e:
                         continue
                     if test_failed:
@@ -175,6 +178,10 @@ class RuleEvaluator(rose.macro.MacroBase):
         rule_template_str, rule_id_values = self._process_rule(
                                    rule, setting_id, config)
         template = jinja2.Template(rule_template_str)
+        #try:
+        #    return_string = template.render(rule_id_values)
+        #except ZeroDivisionError as e:
+        #    raise Exception("Divide by zero error")
         return_string = template.render(rule_id_values)
         return ast.literal_eval(return_string)
 

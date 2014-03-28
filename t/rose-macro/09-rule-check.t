@@ -22,6 +22,7 @@
 . $(dirname $0)/test_header
 init <<'__CONFIG__'
 [simple:scalar_test]
+test_var_div_zero_fail=0
 test_var_odd_even = 3
 test_var_even_even = 4
 test_var_lt_control_pass = 5
@@ -92,6 +93,9 @@ tests 3
 TEST_KEY=$TEST_KEY_BASE-rule
 setup
 init_meta <<__META_CONFIG__
+[simple:scalar_test=test_var_div_zero_fail]
+fail-if=24 % this == 0
+
 [simple:scalar_test=test_var_even_pass]
 type = integer
 fail-if = this % 2 == 0
@@ -312,7 +316,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 18
+[V] rose.macros.DefaultValidators: issues: 19
     complex:array_test=test_array_len_fail=0, 1, 2
         failed because: len(this) > len(complex:array_test=control_len_array) or len(this) < len(complex:array_test=control_len_array)
     complex:array_test=test_var_all_ne_fail=6
@@ -343,6 +347,8 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         failed because: len(this) != 5
     simple:scalar_test=test_substring_fail="ABCDEFG"
         failed because: "D" in this
+    simple:scalar_test=test_var_div_zero_fail=0
+        failed because: 24 % this == 0
     simple:scalar_test=test_var_lt_control_fail=3
         failed because: this < simple:scalar_test=control_lt
     simple:scalar_test=test_var_mult_fail=5
