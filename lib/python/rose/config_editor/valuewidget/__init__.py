@@ -25,6 +25,7 @@ import array.entry
 import array.mixed
 import array.logical
 import array.python_list
+import array.spaced_list
 import booltoggle
 import character
 import combobox
@@ -95,6 +96,8 @@ def chooser(value, metadata, error):
         return character.QuotedTextValueWidget
     if m_type == "python_list" and not error:
         return array.python_list.PythonListValueWidget
+    if m_type == "spaced_list" and not error:
+        return array.spaced_list.SpacedListValueWidget
     if type(m_type) is list:
         return array.mixed.MixedArrayValueWidget
     return text.RawValueWidget

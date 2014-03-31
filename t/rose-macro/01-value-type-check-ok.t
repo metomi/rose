@@ -72,9 +72,10 @@ my_real_array_slice(5:8)=5.0,6.0,7.0,8.0
 my_real_array_slice_2d(5:90,1)=5.0,6.0,3.0
 my_python_list=["Spam", True, "Cheese", False, 2000.0]
 my_python_list_empty=[]
+my_spaced_list=1 2 3 "bob"
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 30
+tests 33
 #-------------------------------------------------------------------------------
 # Check boolean type checking.
 TEST_KEY=$TEST_KEY_BASE-boolean-ok
@@ -297,6 +298,18 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
+# Check Spaced List type checking.
+TEST_KEY=$TEST_KEY_BASE-spaced-list-ok
+setup
+init_meta <<__META_CONFIG__
+[namelist:values_nl1=my_spaced_list]
+type=spaced_list
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro -V --config=../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
 # Check length checking.
 TEST_KEY=$TEST_KEY_BASE-array-ok
 setup
@@ -330,5 +343,4 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
-
 exit
