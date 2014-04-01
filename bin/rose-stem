@@ -42,11 +42,11 @@
 #         fcm-make config files are taken from it. Further source trees can be
 #         added with additional --source arguments.
 #         Defaults to '.' if not specified.
-#     --group=GROUP, -g GROUP
+#     --group=GROUP[,GROUP2[,...]], -g GROUP[,GROUP2[,...]]
 #         Specify a group name to run. Additional groups can be specified
 #         with further --group arguments. The suite will then convert the groups
 #         into a series of tasks to run..
-#     --task=GROUP, -t GROUP
+#     --task=TASK[,TASK2[,...]], -t TASK[,TASK2[,...]]
 #         Synonym for --group.
 #
 # JINJA2 VARIABLES

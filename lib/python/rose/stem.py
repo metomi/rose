@@ -294,8 +294,11 @@ class StemRunner(object):
         if self.opts.group:
             if not self.opts.defines:
                 self.opts.defines = []
+            expanded_groups = []
+            for i in self.opts.group:
+                expanded_groups.extend(i.split(','))
             self.opts.defines.append(SUITE_RC_PREFIX + 'RUN_NAMES=' +
-                                     str(self.opts.group))
+                                     str(expanded_groups))
 
         # Change into the suite directory
         if self.opts.conf_dir:
