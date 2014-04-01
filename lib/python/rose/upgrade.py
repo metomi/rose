@@ -396,7 +396,7 @@ class MacroUpgradeManager(object):
             for macro in list(temp_list[1:]):
                 if macro.BEFORE_TAG not in next_taglist:
                     # Disconnected macro.
-                    temp_list.pop(macro)
+                    temp_list.remove(macro)
             if temp_list:
                 self.version_macros = [temp_list[-1]]
         if not self.version_macros:
