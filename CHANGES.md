@@ -9,9 +9,16 @@ for a full listing of issues for each release.
 
 ### Highlighted Changes
 
--none-
+\#1195, #1199: rose metadata: add spaced list type.
+
+\#1191, #1193: rose metadata-graph: new command using Graphviz for plotting
+metadata dependencies such as trigger.
 
 ### Noteworthy Changes
+
+\#1198: rose config-edit: run startup checks on loading previewed app(s).
+
+\#1194: rose_ana: cumf: include cumf output path in output.
 
 \#1190: rosie lookup: allow override of quiet mode print format.
 
