@@ -59,12 +59,14 @@ tests $N_TESTS
 #Test for successful execution
 TEST_KEY=$TEST_KEY_BASE-basic-check
 run_pass "$TEST_KEY" \
-   rose stem --group=earl_grey --source=$WORKINGCOPY --source=fcm:foo_tr@head \
-             --no-gcontrol --name $SUITENAME -- --debug
+   rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
+             --source=$WORKINGCOPY --source=fcm:foo_tr@head --no-gcontrol \
+             --name $SUITENAME -- --debug
 #Test output
 OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
 TEST_KEY=$TEST_KEY_BASE-basic-groups-to-run
-file_grep $TEST_KEY "RUN_NAMES=\[earl_grey\]" $OUTPUT
+file_grep $TEST_KEY "RUN_NAMES=\[earl_grey, milk, sugar, spoon, cup, milk\]" \
+          $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source
 file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY fcm:foo_tr@head" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-basic-source-base
