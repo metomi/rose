@@ -520,6 +520,11 @@ class RoseOptionParser(OptionParser):
                         "default": None,
                         "dest": "user",
                         "help": "Apply to specified user."}],
+               "utc": [
+                       ["--utc", "-u"],
+                       {"action": "store_true",
+                        "default": False,
+                        "help": "Switch on UTC mode."}],
                "validate_all": [
                        ["--validate", "-V"],
                        {"action": "store_true",

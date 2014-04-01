@@ -73,3 +73,7 @@ lib/html/external/livestamp.min.js:
 lib/html/external/moment.min.js:
 * Unmodified external software library released under the MIT license.
   See <http://momentjs.com/>
+
+lib/python/isodatetime/:
+* Unmodified external software library released under the LGPL license.
+  See <https://github.com/metomi/isodatetime>

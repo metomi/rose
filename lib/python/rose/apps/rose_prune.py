@@ -22,7 +22,7 @@
 from glob import glob
 import os
 from rose.app_run import BuiltinApp, ConfigValueError
-from rose.date import RoseDateShifter, OffsetValueError
+from rose.date import RoseDateShifter
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError

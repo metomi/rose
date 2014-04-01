@@ -29,26 +29,53 @@
 # OPTIONS
 #     --offset=OFFSET, -s OFFSET
 #         Specify an offset to add to the current or the specified DATE-TIME.
+#         OFFSET must follow the ISO 8601 duration representations such as
+#         PnW or PnYnMnDTnHnMnS - P followed by a series of nU where U is the
+#         unit (Y, M, D, H, M, S) and n is a positive integer. n may also have
+#         a decimal (e.g. PT5.5M) part for a unit provided no smaller units
+#         are supplied. It is not necessary to specify zero values for units.
+#         If OFFSET is negative, prefix a "-".
+#         For example:
+#         P6D - 6 day offset
+#         PT6H - 6 hour offset
+#         PT1M - 1 minute offset
+#         -PT1M - (negative) 1 minute offset
+#         P3M - 1 month offset
+#         P2W - 2 week offset (note no other units may be combined with weeks)
+#         The following deprecated syntax is supported:
 #         OFFSET must be in the form nU where U is the unit (w for weeks, d for
 #         days, h for hours, m for minutes and s for seconds) and n is an
 #         positive or negative integer. Multiple offsets can be specified with
 #         multiple --offset=OFFSET options.
 #     --parse-format=FORMAT, -p FORMAT
-#         Specify a format for parsing DATE-TIME, which should be compatible
-#         with the format documented in Python's time.strftime. If not
-#         specified, the system will attempt to parse DATE-TIME using the
-#         following formats:
+#         Specify a format for parsing DATE-TIME, which should
+#         be compatible with the POSIX strptime template format (see
+#         the strptime command help), with the following subset supported
+#         across all date/time ranges: %F, %H, %M, %S, %Y, %d, %j, %m, %s, %y,
+#         %z.
+#         If not specified, the system will attempt to parse DATE-TIME using
+#         the following formats:
 #         * ctime: "%a %b %d %H:%M:%S %Y"
 #         * Unix date: "%a %b %d %H:%M:%S %Z %Y"
 #         * ISO8601: "%Y-%m-%dT%H:%M:%S", "%Y%m%dT%H%M%S"
 #         * Cylc: "%Y%m%d%H"
+#         If none of these match, DATE-TIME will be parsed according to the
+#         ISO 8601 date/time standard.
 #     --print-format=FORMAT, --format=FORMAT, -f FORMAT
 #         Specify a format for printing the result. Default to the same format
-#         as the parse format.
+#         as the parse format. Also support the isodatetime library dump
+#         syntax which follows ISO 8601 example syntax - for example:
+#         'CCYY-MM-DDThh:mm:ss' -> '1955-11-05T09:28:00',
+#         'DD' -> '05',
+#         'CCYY' -> '1955',
+#         'CCYY-DDD' -> '1955-309',
+#         'CCYY-Www-D' -> '1955-W44-6'.
+#          Note that specifying an explicit timezone in this format (e.g.
+#          'CCYY-MM-DDThh:mm:ss+0100' or 'CCYYDDDThhmmZ' will automatically
+#          adapt the date/time to that timezone i.e. apply the correct hour/minute UTC offset.
 #     --use-task-cycle-time, -c
 #         Shorthand for `rose date $ROSE_TASK_CYCLE_TIME`.
 #     --utc, -u
-#         Parse/print date time in UTC instead of local time zone.
-#         (Does not work at the moment.)
+#         Parse/print date time in UTC instead of local or other time zones.
 #-------------------------------------------------------------------------------
 exec python -m rose.date "$@"
