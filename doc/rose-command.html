@@ -743,22 +743,56 @@ rosie UTIL [OPTS] [ARG ...]
     <dl>
       <dt><kbd>--offset=OFFSET</kbd>, <kbd>-s OFFSET</kbd></dt>
 
-      <dd>Specify an offset to add to the current or the specified
-      <var>DATE-TIME</var>. <var>OFFSET</var> must be in the form <var>nU</var>
-      where <var>U</var> is the unit (<kbd>w</kbd> for weeks, <kbd>d</kbd> for
-      days, <kbd>h</kbd> for hours, <kbd>m</kbd> for minutes and <kbd>s</kbd>
-      for seconds) and <var>n</var> is an positive or negative integer.
-      Multiple offsets can be specified with multiple
-      <kbd>--offset=OFFSET</kbd> options.</dd>
+      <dd>
+        <p>Specify an offset to add to the current or the specified
+        <var>DATE-TIME</var>. <var>OFFSET</var> must follow the <a href=
+        "http://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> duration
+        representations such as <var>PnW</var> or <var>PnYnMnDTnHnMnS</var> -
+        <var>P</var> followed by a series of <var>nU</var> where <var>U</var>
+        is the unit (<samp>Y</samp>, <samp>M</samp>, <samp>D</samp>,
+        <samp>H</samp>, <samp>M</samp>, <samp>S</samp>) and <samp>n</samp> is a
+        positive integer, where <samp>T</samp> delimits the date series from
+        the time series if any time units are used. <samp>n</samp> may also
+        have a decimal (e.g. <samp>PT5.5M</samp>) part for a unit provided no
+        smaller units are supplied. It is not necessary to specify zero values
+        for units. If <var>OFFSET</var> is negative, prefix a <samp>-</samp>.
+        For example:</p>
+
+        <ul>
+          <li><samp>P6D</samp> - 6 day offset</li>
+
+          <li><samp>PT6H</samp> - 6 hour offset</li>
+
+          <li><samp>PT1M</samp> - 1 minute offset</li>
+
+          <li><samp>-PT1M</samp> - (negative) 1 minute offset</li>
+
+          <li><samp>P3M</samp> - 1 month offset</li>
+
+          <li><samp>P2W</samp> - 2 week offset (note no other units may be
+          combined with weeks)</li>
+        </ul>
+
+        <p>The following deprecated syntax is also supported: <var>OFFSET</var>
+        in the form <var>nU</var> where <var>U</var> is the unit (<kbd>w</kbd>
+        for weeks, <kbd>d</kbd> for days, <kbd>h</kbd> for hours, <kbd>m</kbd>
+        for minutes and <kbd>s</kbd> for seconds) and <var>n</var> is an
+        positive or negative integer. Multiple offsets can be specified with
+        multiple <kbd>--offset=OFFSET</kbd> options.</p>
+      </dd>
 
       <dt><kbd>--parse-format=FORMAT</kbd>, <kbd>-p FORMAT</kbd></dt>
 
       <dd>
         Specify a format for parsing <var>DATE-TIME</var>, which should be
-        compatible with the format documented in Python's <a href=
-        "http://docs.python.org/library/time.html#time.strftime">time.strftime</a>.
-        If not specified, the system will attempt to parse <var>DATE-TIME</var>
-        using the following formats:
+        compatible with the <a href=
+        "http://www.unix.com/man-page/POSIX/3posix/strptime/">POSIX
+        strptime</a> template format (see the strptime command help), with the
+        following subset supported across all date/time ranges:
+        <samp>%F</samp>, <samp>%H</samp>, <samp>%M</samp>, <samp>%S</samp>,
+        <samp>%Y</samp>, <samp>%d</samp>, <samp>%j</samp>, <samp>%m</samp>,
+        <samp>%s</samp>, <samp>%z</samp>. If not specified, the system will
+        attempt to parse <var>DATE-TIME</var> using the following formats:
 
         <ul>
           <li><dfn>ctime</dfn>: <samp>%a %b %d %H:%M:%S %Y</samp></li>
@@ -775,8 +809,28 @@ rosie UTIL [OPTS] [ARG ...]
       <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT</kbd>, <kbd>-f
       FORMAT</kbd></dt>
 
-      <dd>Specify a format for printing the result. Default to the same format
-      as the parse format.</dd>
+      <dd>
+        <p>Specify a format for printing the result. Default to the same format
+        as the parse format. Also support the isodatetime library dump syntax
+        which is an adaptation of ISO 8601 example syntax - for example:</p>
+
+        <ul>
+          <li><samp>CCYY-MM-DDThh:mm:ss</samp> -&gt;
+          <samp>1955-11-05T09:28:00</samp></li>
+
+          <li><samp>DD</samp> -&gt; <samp>05</samp></li>
+
+          <li><samp>CCYY</samp> -&gt; <samp>1955</samp></li>
+
+          <li><samp>CCYY-DDD</samp> -&gt; <samp>1955-309</samp></li>
+        </ul>
+
+        <p>Usage of this ISO 8601-like syntax should be as ISO 8601-compliant
+        as possible. Note that specifying an explicit timezone in this format
+        (e.g. <samp>CCYY-MM-DDThh:mm:ss+0100</samp> or
+        <samp>CCYYDDDThhmmZ</samp> will automatically adapt the date/time to
+        that timezone i.e. apply the correct hour/minute UTC offset.</p>
+      </dd>
 
       <dt><kbd>--use-task-cycle-time, -c</kbd></dt>
 
