@@ -31,6 +31,14 @@ from rose.reporter import Reporter
 import sys
 
 
+class OffsetValueError(ValueError):
+
+    """Bad offset value."""
+
+    def __str__(self):
+        return "%s: bad offset value" % self.args[0]
+
+
 class RoseDateShifter(object):
 
     """A class to parse and print date string with an offset."""
@@ -43,6 +51,16 @@ class RoseDateShifter(object):
         ("%Y%m%dT%H%M%S", False),          # ISO8601, basic
         ("%Y%m%d%H", False)                # Cylc (current)
     ]
+
+    UNITS = {"w": "weeks",
+             "d": "days",
+             "h": "hours",
+             "m": "minutes",
+             "s": "seconds"}
+
+    REC_OFFSET = re.compile(r"""\A[\+\-]?(?:\d+[wdhms])+\Z""", re.I)
+
+    REC_OFFSET_FIND = re.compile(r"""(?P<num>\d+)(?P<unit>[wdhms])""")
 
     TASK_CYCLE_TIME_MODE_ENV = "ROSE_TASK_CYCLE_TIME"
 
@@ -88,7 +106,7 @@ class RoseDateShifter(object):
             try:
                 return d.strftime(print_format)
             except ValueError:
-                return 
+                return self.get_datetime_strftime(d, print_format)
         return isodatetime.dumpers.TimePointDumper().dump(d, print_format)
 
     def date_parse(self, ref_time=None):
@@ -156,17 +174,26 @@ class RoseDateShifter(object):
             if offset.startswith("-") or offset.startswith("+"):
                 sign = offset[0]
                 offset = offset[1:]
-            # Backwards compatibility for e.g. "-1h"
-            if not offset.startswith("P"):
-                offset = "P" + offset
-            offset = offset.upper()
-            
-            # Parse and apply.
-            interval = interval_parser.parse(offset)
-            if sign == "-":
-                d -= interval
+            if offset.startswith("P"):
+                # Parse and apply.
+                try:
+                    interval = interval_parser.parse(offset)
+                except ValueError:
+                    raise OffsetValueError(offset)
+                if sign == "-":
+                    d -= interval
+                else:
+                    d += interval
             else:
-                d += interval
+                # Backwards compatibility for e.g. "-1h"
+                if not self.is_offset(offset):
+                    raise OffsetValueError(offset)
+                for num, unit in self.REC_OFFSET_FIND.findall(offset.lower()):
+                    num = int(num)
+                    if sign == "-":
+                        num = -num
+                    key = self.UNITS[unit]
+                    d += isodatetime.data.TimeInterval(**{key: num})
 
         # Format
         if parse_format is None:

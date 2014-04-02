@@ -51,8 +51,7 @@
 #         Specify a format for parsing DATE-TIME, which should
 #         be compatible with the POSIX strptime template format (see
 #         the strptime command help), with the following subset supported
-#         across all date/time ranges: %F, %H, %M, %S, %Y, %d, %j, %m, %s, %y,
-#         %z.
+#         across all date/time ranges: %F, %H, %M, %S, %Y, %d, %j, %m, %s, %z.
 #         If not specified, the system will attempt to parse DATE-TIME using
 #         the following formats:
 #         * ctime: "%a %b %d %H:%M:%S %Y"
@@ -66,13 +65,15 @@
 #         as the parse format. Also support the isodatetime library dump
 #         syntax which follows ISO 8601 example syntax - for example:
 #         'CCYY-MM-DDThh:mm:ss' -> '1955-11-05T09:28:00',
-#         'DD' -> '05',
 #         'CCYY' -> '1955',
 #         'CCYY-DDD' -> '1955-309',
 #         'CCYY-Www-D' -> '1955-W44-6'.
-#          Note that specifying an explicit timezone in this format (e.g.
-#          'CCYY-MM-DDThh:mm:ss+0100' or 'CCYYDDDThhmmZ' will automatically
-#          adapt the date/time to that timezone i.e. apply the correct hour/minute UTC offset.
+#         Usage of this ISO 8601-like syntax should be as ISO 8601-compliant
+#         as possible.
+#         Note that specifying an explicit timezone in this format (e.g.
+#         'CCYY-MM-DDThh:mm:ss+0100' or 'CCYYDDDThhmmZ' will automatically
+#         adapt the date/time to that timezone i.e. apply the correct
+#         hour/minute UTC offset.
 #     --use-task-cycle-time, -c
 #         Shorthand for `rose date $ROSE_TASK_CYCLE_TIME`.
 #     --utc, -u
