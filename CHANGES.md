@@ -5,7 +5,7 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q2?)
+## 2014-04 (2014-04-??)
 
 ### Highlighted Changes
 
@@ -16,7 +16,12 @@ metadata dependencies such as trigger.
 
 ### Noteworthy Changes
 
+\#1200: rose app-upgrade: fix HEAD broken macro pathway.
+
 \#1198: rose config-edit: run startup checks on loading previewed app(s).
+
+\#1197: rose stem: allow comma separated values in `--task=TASKS`
+and `--group=GROUPS` options.
 
 \#1194: rose_ana: cumf: include cumf output path in output.
 
