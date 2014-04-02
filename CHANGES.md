@@ -9,6 +9,12 @@ for a full listing of issues for each release.
 
 ### Highlighted Changes
 
+\#1202: rose date: logic reimplemented using the new
+[isodatetime](https://github.com/metomi/isodatetime/) library. Date time and
+offset formats can now be specified using ISO8601 syntax. The command will
+also support pre-historic and futuristic date time. This change also fixes
+the `-u` option.
+
 \#1195, #1199: rose metadata: add spaced list type.
 
 \#1191, #1193: rose metadata-graph: new command using Graphviz for plotting
