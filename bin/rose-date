@@ -31,10 +31,11 @@
 #         Specify an offset to add to the current or the specified DATE-TIME.
 #         OFFSET must follow the ISO 8601 duration representations such as
 #         PnW or PnYnMnDTnHnMnS - P followed by a series of nU where U is the
-#         unit (Y, M, D, H, M, S) and n is a positive integer. n may also have
-#         a decimal (e.g. PT5.5M) part for a unit provided no smaller units
-#         are supplied. It is not necessary to specify zero values for units.
-#         If OFFSET is negative, prefix a "-".
+#         unit (Y, M, D, H, M, S) and n is a positive integer, where T
+#         delimits the date series from the time series if any time units are
+#         used. n may also have a decimal (e.g. PT5.5M) part for a unit
+#         provided no smaller units are supplied. It is not necessary to
+#         specify zero values for units. If OFFSET is negative, prefix a "-".
 #         For example:
 #         P6D - 6 day offset
 #         PT6H - 6 hour offset
@@ -42,11 +43,13 @@
 #         -PT1M - (negative) 1 minute offset
 #         P3M - 1 month offset
 #         P2W - 2 week offset (note no other units may be combined with weeks)
+#         P2DT5.5H - 2 day, 5.5 hour offset
+#         -P2YT4S - (negative) 2 year, 4 second offset
 #         The following deprecated syntax is supported:
-#         OFFSET must be in the form nU where U is the unit (w for weeks, d for
-#         days, h for hours, m for minutes and s for seconds) and n is an
-#         positive or negative integer. Multiple offsets can be specified with
-#         multiple --offset=OFFSET options.
+#         OFFSET in the form nU where U is the unit (w for weeks, d for days,
+#         h for hours, m for minutes and s for seconds) and n is a positive or
+#         negative integer. Multiple offsets can be specified with multiple
+#         --offset=OFFSET options.
 #     --parse-format=FORMAT, -p FORMAT
 #         Specify a format for parsing DATE-TIME, which should
 #         be compatible with the POSIX strptime template format (see

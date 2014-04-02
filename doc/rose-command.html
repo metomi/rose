@@ -751,11 +751,12 @@ rosie UTIL [OPTS] [ARG ...]
         <var>P</var> followed by a series of <var>nU</var> where <var>U</var>
         is the unit (<samp>Y</samp>, <samp>M</samp>, <samp>D</samp>,
         <samp>H</samp>, <samp>M</samp>, <samp>S</samp>) and <samp>n</samp> is a
-        positive integer. <samp>n</samp> may also have a decimal (e.g.
-        <samp>PT5.5M</samp>) part for a unit provided no smaller units are
-        supplied. It is not necessary to specify zero values for units. If
-        <var>OFFSET</var> is negative, prefix a <samp>-</samp>. For
-        example:</p>
+        positive integer, where <samp>T</samp> delimits the date series from
+        the time series if any time units are used. <samp>n</samp> may also
+        have a decimal (e.g. <samp>PT5.5M</samp>) part for a unit provided no
+        smaller units are supplied. It is not necessary to specify zero values
+        for units. If <var>OFFSET</var> is negative, prefix a <samp>-</samp>.
+        For example:</p>
 
         <ul>
           <li><samp>P6D</samp> - 6 day offset</li>
