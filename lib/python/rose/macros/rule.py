@@ -115,6 +115,10 @@ class FailureRuleChecker(rose.macro.MacroBase):
                     try:
                         test_failed = evaluator.evaluate_rule(
                                                 rule, setting_id, config)
+                    except (ZeroDivisionError, TypeError, 
+                            ValueError,IndexError) as e:
+                        test_failed = True
+                        message = e
                     except RuleValueError as e:
                         continue
                     if test_failed:
