@@ -29,6 +29,8 @@ metadata dependencies such as trigger.
 \#1197: rose stem: allow comma separated values in `--task=TASKS`
 and `--group=GROUPS` options.
 
+\#1196: rose metadata: fail-if: handle divide by zero exceptions.
+
 \#1194: rose_ana: cumf: include cumf output path in output.
 
 \#1190: rosie lookup: allow override of quiet mode print format.
