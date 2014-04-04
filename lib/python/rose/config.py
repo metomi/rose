@@ -263,7 +263,7 @@ class ConfigDumper(object):
         self.char_assign = char_assign
 
     def dump(self, root, target=sys.stdout, sort_sections=None,
-             sort_option_items=None, env_escape_ok=False):
+             sort_option_items=None, env_escape_ok=False, concat_mode=False):
         """Format a ConfigNode object and write result to target.
 
         Arguments:
@@ -278,6 +278,8 @@ class ConfigDumper(object):
         in string values.
         env_escape_ok -- an optional argument to indicate that $NAME
         and ${NAME} syntax in values should be escaped.
+        concat_mode -- switch on concatenation mode. If True, add []
+        before root level options.
 
         """
         if sort_sections is None:
@@ -310,6 +312,8 @@ class ConfigDumper(object):
         if root_option_keys:
             f.write(blank)
             blank = "\n"
+            if concat_mode:
+                f.write("[]\n")
             for key in root_option_keys:
                 self._string_node_dump(key, root.value[key], f, env_escape_ok)
         for section_key in section_keys:
