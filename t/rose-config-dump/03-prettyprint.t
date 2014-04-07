@@ -53,7 +53,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 cat > f2 <<'__CONF__'
-[namelist:bacon_and_beans]
+[namelist:Bacon_and_Beans]
 recipe='Fry ',6,
       ='slices of bacon until nearly crispy then cut them up',
       =' then chop ',1,' large onion and fry it with the bacon ',
