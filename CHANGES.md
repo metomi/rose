@@ -5,13 +5,33 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q2?)
+## 2014-04 (2014-04-??)
 
 ### Highlighted Changes
 
--none-
+\#1202: rose date: logic reimplemented using the new
+[isodatetime](https://github.com/metomi/isodatetime/) library. Date time and
+offset formats can now be specified using ISO8601 syntax. The command will
+also support pre-historic and futuristic date time. This change also fixes
+the `-u` option.
+
+\#1195, #1199: rose metadata: add spaced list type.
+
+\#1191, #1193: rose metadata-graph: new command using Graphviz for plotting
+metadata dependencies such as trigger.
 
 ### Noteworthy Changes
+
+\#1200: rose app-upgrade: fix HEAD broken macro pathway.
+
+\#1198: rose config-edit: run startup checks on loading previewed app(s).
+
+\#1197: rose stem: allow comma separated values in `--task=TASKS`
+and `--group=GROUPS` options.
+
+\#1196: rose metadata: fail-if: handle divide by zero exceptions.
+
+\#1194: rose_ana: cumf: include cumf output path in output.
 
 \#1190: rosie lookup: allow override of quiet mode print format.
 

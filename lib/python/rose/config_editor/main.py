@@ -680,6 +680,7 @@ class MainController(object):
         if hasattr(self, 'menubar'):
             self.main_handle.load_macro_menu(self.menubar)
         self.update_bar_widgets()
+        self.updater.perform_startup_check()
         return
 
     def handle_launch_request(self, namespace_name, as_new=False):
@@ -713,6 +714,7 @@ class MainController(object):
             if hasattr(self, 'menubar'):
                 self.main_handle.load_macro_menu(self.menubar)
             self.update_bar_widgets()
+            self.updater.perform_startup_check()
 
         if namespace_name in self.notebook.get_page_ids():
             index = self.notebook.get_page_ids().index(namespace_name)

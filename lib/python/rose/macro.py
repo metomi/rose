@@ -685,9 +685,8 @@ def transform_config(config, meta_config, transformer_macro, modules,
 
 def pretty_format_config(config):
     """Improve configuration prettiness."""
-    for section in config.value.keys():
-        keylist = [section]
-        scheme = keylist[0]
+    for s_key, s_node in config.value.items():
+        scheme = s_key
         if ":" in scheme:
             scheme = scheme.split(":", 1)[0]
         try:
@@ -696,19 +695,14 @@ def pretty_format_config(config):
             pretty_format_value = getattr(scheme_module, "pretty_format_value")
         except AttributeError:
             continue
-        new_keylist = pretty_format_keys(keylist)
-        if new_keylist != keylist:
-            node = config.get(keylist)
-            config.unset(keylist)
-            config.set(new_keylist, node.value, node.state, node.comments)
-            section = new_keylist[0]
-        for keylist, node in list(config.walk([section])):
+        for keylist, node in list(s_node.walk()):
+            # FIXME: Surely, only the scheme know how to splits its array?
             values = rose.variable.array_split(node.value, ",")
             node.value = pretty_format_value(values)   
             new_keylist = pretty_format_keys(keylist)
             if new_keylist != keylist:
-                config.unset(keylist)
-                config.set(new_keylist, node.value, node.state, node.comments)
+                s_node.unset(keylist)
+                s_node.set(new_keylist, node.value, node.state, node.comments)
                 
 
 def standard_format_config(config):

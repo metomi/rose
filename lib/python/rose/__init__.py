@@ -92,7 +92,7 @@ META_PROP_VALUE_FALSE = "false"  # Not actually used.
 # "meta" and "file" are for internal use.
 TYPE_VALUES = ["boolean", "character", "integer",
                "logical", "quoted", "raw", "real",
-               "meta", "file", "python_list"]
+               "meta", "file", "python_list", "spaced_list"]
 
 # Preferred Fortran logical and environment boolean syntax
 TYPE_BOOLEAN_VALUE_FALSE = "false"

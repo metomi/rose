@@ -115,6 +115,22 @@ class PythonListMetaType(MetaType):
             return [False, self.WARNING.format(repr(value))]
         return [True, None]
 
+class SpacedListMetaType(MetaType):
+
+    KEY = "spaced_list"
+    WARNING = "Not a valid spaced list format: {0}"
+
+    def is_valid(self, value):
+        try:
+            cast_value = value.split(" ")
+            #for entry in cast_value:
+            #    ast.literal_eval(entry)
+            if not isinstance(cast_value, list):
+                return [False, self.WARNING.format(repr(value))]
+        except (SyntaxError, ValueError):
+            return [False, self.WARNING.format(repr(value))]
+        return [True, None]
+
 
 class LogicalMetaType(MetaType):
 

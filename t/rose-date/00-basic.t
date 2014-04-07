@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 29
+tests 83
 #-------------------------------------------------------------------------------
 # Ensure it can parse its own output.
 TEST_KEY=$TEST_KEY_BASE
@@ -35,8 +35,8 @@ $DATE_TIME_STR
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-# Parse format and print format.
-TEST_KEY=$TEST_KEY_BASE-offsets
+# Parse format and print format (1).
+TEST_KEY=$TEST_KEY_BASE-parse-print-1
 run_pass "$TEST_KEY" rose date -p '%d/%m/%Y %H:%M:%S' -f '%Y-%m-%dT%H:%M:%S' \
     '24/12/2012 06:00:00'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
@@ -44,9 +44,122 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
-# Parse an ISO date time with some offsets.
+# Parse format and print format (2).
+TEST_KEY=$TEST_KEY_BASE-parse-print-2
+run_pass "$TEST_KEY" rose date -p '%Y,%M,%d,%H' -f '%Y%M%d%H' '2014,01,02,05'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2014010205
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Parse format and print format (3).
+TEST_KEY=$TEST_KEY_BASE-parse-print-3
+run_pass "$TEST_KEY" rose date -p "%Y%m%d" -f "%y%m%d" '20141231'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+141231
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Parse format and print format (4).
+TEST_KEY=$TEST_KEY_BASE-parse-print-4
+run_pass "$TEST_KEY" rose date -p "%Y%m%d%H%M%S" -f "%s" '20140402100000'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+1396432800
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Parse format and print format (5).
+TEST_KEY=$TEST_KEY_BASE-parse-print-5
+run_pass "$TEST_KEY" rose date -p "%s" -f "%Y%m%d%H%M%S%z" '1396432800'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+20140402100000+0000
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Parse format and print format (isodatetime print format).
+TEST_KEY=$TEST_KEY_BASE-parse-print-iso-print
+run_pass "$TEST_KEY" rose date -p '%d/%m/%Y %H:%M:%S' -f 'CCYY-MM-DDThh:mm' \
+    '24/12/2012 06:00:00'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2012-12-24T06:00
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Parse format and print format (isodatetime parse and print format).
+TEST_KEY=$TEST_KEY_BASE-parse-print-iso-parse-print
+run_pass "$TEST_KEY" rose date -f 'CCYY-MM-DDThh:mm+01:00' '2014-091T15:14:03Z'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2014-04-01T16:14+01:00
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format (1).
+TEST_KEY=$TEST_KEY_BASE-print-1
+run_pass "$TEST_KEY" rose date -f "%m" '2014-02-01T04:05:06'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+02
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format (2).
+TEST_KEY=$TEST_KEY_BASE-print-2
+run_pass "$TEST_KEY" rose date -f "%Y" '2014-02-01T04:05:06'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2014
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format (3).
+TEST_KEY=$TEST_KEY_BASE-print-3
+run_pass "$TEST_KEY" rose date -f "%H" '2014-02-01T04:05:06'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+04
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format (4).
+TEST_KEY=$TEST_KEY_BASE-print-4
+run_pass "$TEST_KEY" rose date -f "%Y%m%d_%H%M%S" '2014-02-01T04:05:06'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+20140201_040506
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format (5).
+TEST_KEY=$TEST_KEY_BASE-print-5
+run_pass "$TEST_KEY" rose date -f "%Y.file" '2014-02-01T04:05:06'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2014.file
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format (6).
+TEST_KEY=$TEST_KEY_BASE-print-6
+run_pass "$TEST_KEY" rose date -f "y%Ym%md%d" '2014-02-01T04:05:06'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+y2014m02d01
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Print format (7).
+TEST_KEY=$TEST_KEY_BASE-print-7
+run_pass "$TEST_KEY" rose date -f "%F" '2014-092'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2014-04-02
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Parse an date time with some offsets.
 TEST_KEY=$TEST_KEY_BASE-offsets
 run_pass "$TEST_KEY" rose date -s 18h -s 6d "2012-12-24T06:00:00"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2012-12-31T00:00:00
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Parse an ISO date time with some offsets.
+TEST_KEY=$TEST_KEY_BASE-offsets-iso
+run_pass "$TEST_KEY" rose date --debug -s PT18H -s P6D "2012-12-24T06:00:00"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 2012-12-31T00:00:00
 __OUT__
@@ -60,12 +173,28 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
+# Parse a Cylc date time with some negative offsets.
+TEST_KEY=$TEST_KEY_BASE-offsets-neg-iso
+run_pass "$TEST_KEY" rose date -s -PT6H -s -P12DT12H "2013010618"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+2012122500
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
 # Bad offsets.
 TEST_KEY=$TEST_KEY_BASE-offsets-bad
 run_fail "$TEST_KEY" rose date -s junk "2013010618"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [FAIL] junk: bad offset value
+__ERR__
+#-------------------------------------------------------------------------------
+# Bad offsets, ISO 8601.
+TEST_KEY=$TEST_KEY_BASE-offsets-bad-iso
+run_fail "$TEST_KEY" rose date -s Pjunk "2013010618"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+[FAIL] Pjunk: bad offset value
 __ERR__
 #-------------------------------------------------------------------------------
 # Parse a Cylc date and print in ISO format.
@@ -78,9 +207,9 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Print format with offset.
 TEST_KEY=$TEST_KEY_BASE-format-and-offset
-run_pass "$TEST_KEY" rose date --offset=-3h -f "%Y%m" "2012122515" --debug
+run_pass "$TEST_KEY" rose date --offset=-3h -f "%y%m" "2012112515" --debug
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-201212
+1211
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -90,6 +219,24 @@ ROSE_TASK_CYCLE_TIME=2012122500 \
     run_pass "$TEST_KEY" rose date -c
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 2012122500
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Test -c option, ISO 8601.
+TEST_KEY=$TEST_KEY_BASE-c-iso8601
+ROSE_TASK_CYCLE_TIME=20121225T0000Z \
+    run_pass "$TEST_KEY" rose date -c
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+20121225T0000Z
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Test -c option, --utc
+TEST_KEY=$TEST_KEY_BASE-c-utc
+ROSE_TASK_CYCLE_TIME=20121225T0000+0100 \
+    run_pass "$TEST_KEY" rose date -c --utc
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+20121224T2300+0000
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
