@@ -96,7 +96,7 @@ class RoseSuiteHook(object):
             smtp_host = conf.get_value(["rose-suite-hook", "smtp-host"],
                                        default="localhost")
             smtp = SMTP(smtp_host)
-            smtp.sendmail(user, [user] + mail_cc_list, msg.as_string())
+            smtp.sendmail(msg["From"], [msg["To"]] + mail_cc_list, msg.as_string())
             smtp.quit()
 
         # Shut down if required
