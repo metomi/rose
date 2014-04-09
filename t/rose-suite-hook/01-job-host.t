@@ -24,7 +24,6 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 5
 KEY=${TEST_KEY_BASE#0?-}
 HOST=$(rose config 't' $KEY)
 if [[ -z $HOST ]]; then
@@ -32,6 +31,8 @@ if [[ -z $HOST ]]; then
 fi
 HOST=$(rose host-select $HOST)
 export ROSE_CONF_PATH=
+#-------------------------------------------------------------------------------
+tests 5
 #-------------------------------------------------------------------------------
 # Run the suite.
 TEST_KEY=$TEST_KEY_BASE
