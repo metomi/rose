@@ -38,7 +38,7 @@ __CONF__
 export ROSE_CONF_PATH=$PWD/conf
 
 #-------------------------------------------------------------------------------
-tests 26
+tests 31
 #-------------------------------------------------------------------------------
 # Run the suite.
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
@@ -95,7 +95,8 @@ smtp-host=localhost:8025
 email-host=hms.beagle
 __CONF__
 run_pass "$TEST_KEY" rose suite-hook \
-    --mail --mail-cc=robert.fitzroy,charles.darwin succeeded $NAME t1.1 ''
+    --mail --mail-cc=robert.fitzroy,charles.darwin,nobody@home \
+    succeeded $NAME t1.1 ''
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 ((++N_QUIT))
@@ -106,14 +107,26 @@ do
     sleep 1
 done
 tail -2 smtpd.out >smtpd-tail.out
-file_grep "$TEST_KEY.smtp.from" "From: $USER@" smtpd-tail.out
+file_grep "$TEST_KEY.smtp.from" "From: $USER@hms.beagle" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.to" "To: $USER@hms.beagle" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.to" \
-    "Cc: robert.fitzroy@hms.beagle, charles.darwin@hms.beagle" smtpd-tail.out
+    "Cc: robert.fitzroy@hms.beagle, charles.darwin@hms.beagle, nobody@home" \
+    smtpd-tail.out
 file_grep "$TEST_KEY.smtp.subject" \
     "Subject: \\[succeeded\\] $NAME" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.content.1" "Task: t1.1" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.content.2" "See: file://$SUITE_RUN_DIR" smtpd-tail.out
+tail -20 smtpd.out >smtpd-tail.out
+file_grep "$TEST_KEY.smtp.mail.from" \
+    "^===> MAIL FROM:<$USER@hms.beagle>" smtpd-tail.out
+file_grep "$TEST_KEY.smtp.rcpt.to.1" \
+    "^===> RCPT TO:<$USER@hms.beagle>" smtpd-tail.out
+file_grep "$TEST_KEY.smtp.rcpt.to.2" \
+    "^===> RCPT TO:<robert.fitzroy@hms.beagle>" smtpd-tail.out
+file_grep "$TEST_KEY.smtp.rcpt.to.3" \
+    "^===> RCPT TO:<charles.darwin@hms.beagle>" smtpd-tail.out
+file_grep "$TEST_KEY.smtp.rcpt.to.4" \
+    "^===> RCPT TO:<nobody@home>" smtpd-tail.out
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 kill $SMTPD_PID

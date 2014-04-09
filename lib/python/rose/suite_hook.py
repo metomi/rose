@@ -90,6 +90,7 @@ class RoseSuiteHook(object):
                         mail_cc_address += "@" + host
                     mail_cc_addresses.append(mail_cc_address)
                 msg["Cc"] = ", ".join(mail_cc_addresses)
+                mail_cc_list = mail_cc_addresses
             else:
                 mail_cc_list = []
             msg["Subject"] = "[%s] %s" % (hook_event, suite_name)
