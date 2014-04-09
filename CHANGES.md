@@ -17,10 +17,18 @@ the `-u` option.
 
 \#1195, #1199: rose metadata: add spaced list type.
 
-\#1191, #1193: rose metadata-graph: new command using Graphviz for plotting
-metadata dependencies such as trigger.
+\#1191, #1193, #1212: rose metadata-graph: new command using Graphviz for
+plotting metadata dependencies such as trigger.
 
 ### Noteworthy Changes
+
+\#1209: rose suite-hook: use configured email host in email addresses without
+hosts.
+
+\#1208: rose config-edit: fix STASH widget starting from empty.
+
+\#1206: rose config-dump: don't down case for namelist group name. This change
+partially reversed #1149.
 
 \#1200: rose app-upgrade: fix HEAD broken macro pathway.
 
