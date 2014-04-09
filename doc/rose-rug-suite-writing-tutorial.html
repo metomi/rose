@@ -837,20 +837,6 @@ rose suite-log
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Extra Override Dependency Explanation</h3>
-
-      <p>The caveat with the lines we added above is that it will refuse to
-      start at an initial cycle time at 15 hours - this is because
-      <samp>navigate</samp> now requires the <samp>take_sun_sight[T-3]</samp>
-      task (added in an AND relationship to the existing dependencies in
-      <samp>[[[ 0, 3, 6 ... ]]]</samp>).</p>
-
-      <p>A good exercise for later would be to have a go at improving it so
-      that it will actually work when the <samp>initial cycle time</samp> ends
-      with <samp>15</samp>.</p>
-    </div>
-
-    <div class="slide">
       <h3 id="scripts">Adding a Script</h3>
 
       <p>It isn't necessary to put all scripting in an app or in the
