@@ -22,9 +22,6 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-N_TESTS=15
-tests $N_TESTS
-#-------------------------------------------------------------------------------
 if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose config 't' 'job-host')
     if [[ -z $JOB_HOST ]]; then
@@ -32,6 +29,8 @@ if [[ $TEST_KEY_BASE == *-remote* ]]; then
     fi
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
+#-------------------------------------------------------------------------------
+tests 15
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
