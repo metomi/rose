@@ -356,7 +356,7 @@ class BaseStashSummaryDataPanelv1(
             id_data = self.var_id_map[id_]
             value = str(view.get_model().get_value(row_iter, col_index))
             tip_text = rose.CONFIG_DELIMITER.join([section, option, value]) + "\n"
-            if option in self.OPTION_NL_MAP:
+            if option in self.OPTION_NL_MAP and option in self._profile_location_map.keys():
                 profile_id = self._profile_location_map[option].get(value)
                 if profile_id is not None:
                     profile_sect = self.util.get_section_option_from_id(
