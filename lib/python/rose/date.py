@@ -43,6 +43,7 @@ class RoseDateShifter(object):
 
     """A class to parse and print date string with an offset."""
 
+    DUMP_FORMAT_CURRENT = u"CCYY-MM-DDThh:mm:ss±hh:mm"
     # strptime formats and their compatibility with the ISO 8601 parser.
     PARSE_FORMATS = [
         ("%a %b %d %H:%M:%S %Y", True),    # ctime
@@ -125,13 +126,11 @@ class RoseDateShifter(object):
             ref_time = self.task_cycle_time
         if not ref_time or ref_time == "now":
             d = isodatetime.data.get_timepoint_for_now()
-            parse_format = None
+            d.set_time_zone_to_local()
+            parse_format = self.DUMP_FORMAT_CURRENT
         elif self.custom_parse_format is not None:
             parse_format = self.custom_parse_format
-            try:
-                d = self.isoparser.strptime(ref_time, parse_format)
-            except ValueError:
-                d = self.get_datetime_strptime(ref_time, parse_format)
+            d = self.strptime(ref_time, parse_format)
         else:
             parse_formats = list(self.parse_formats)
             d = None
@@ -199,7 +198,7 @@ class RoseDateShifter(object):
         if parse_format is None:
             return str(d.to_calendar_date())
         if "%" in parse_format:
-            return d.strftime(parse_format)
+            return self.strftime(d, parse_format)
         return isodatetime.dumpers.TimePointDumper().dump(d, parse_format)
 
     __call__ = date_shift
@@ -212,11 +211,29 @@ class RoseDateShifter(object):
         """Return True if the string offset can be parsed as an offset."""
         return (self.REC_OFFSET.match(offset) is not None)
 
+    def strftime(self, d, print_format):
+        """Use either the isodatetime or datetime strftime time formatting."""
+        try:
+            return d.strftime(print_format)
+        except ValueError:
+            return self.get_datetime_strftime(d, print_format)
+
+    def strptime(self, ref_time, parse_format):
+        """Use either the isodatetime or datetime strptime time parsing."""
+        try:
+            return self.isoparser.strptime(ref_time, parse_format)
+        except ValueError:
+            return self.get_datetime_strptime(d, parse_format)
+
     def get_datetime_strftime(self, d, print_format):
         """Use the datetime library's strftime as a fallback."""
         year, month, day = d.copy().to_calendar_date().get_calendar_date()
         hour, minute, second = d.get_hour_minute_second()
-        d = datetime(year, month, day, hour, minute, second)
+        microsecond = int(1.0e6 * (second - int(second)))
+        hour = int(hour)
+        minute = int(minute)
+        second = int(second)
+        d = datetime(year, month, day, hour, minute, second, microsecond)
         return d.strftime(print_format)
 
     def get_datetime_strptime(self, ref_time, parse_format):

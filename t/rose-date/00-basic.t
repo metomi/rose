@@ -21,19 +21,70 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 83
+tests 98
 #-------------------------------------------------------------------------------
-# Ensure it can parse its own output.
-TEST_KEY=$TEST_KEY_BASE
+# Produce the correct format for the current date/time.
+TEST_KEY=$TEST_KEY_BASE-current-format
 run_pass "$TEST_KEY" rose date
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+# The altering of the output is necessary until GNU coreutils 8.13.
+sed -i 's/:\([0-5][0-9]\)$/\1/g; s/T/ /g' $TEST_KEY.out
 DATE_TIME_STR="$(cat $TEST_KEY.out)"
+run_pass "$TEST_KEY-parse" date -d "$DATE_TIME_STR" +"%Y-%m-%d %H:%M:%S%z"
+file_cmp "$TEST_KEY-parse.out" "$TEST_KEY.out" <<__OUT__
+$DATE_TIME_STR
+__OUT__
+file_cmp "$TEST_KEY-parse.err" "$TEST_KEY.err" </dev/null
+# Produce date/time info near the current time.
+TEST_KEY=$TEST_KEY_BASE-current-is-correct
+T_START=$(date +%s)
+run_pass "$TEST_KEY" rose date --print-format="%s"
+T_TEST=$(cat $TEST_KEY.out)
+T_END=$(date +%s)
+if (( $T_TEST >= $T_START )) && (( $T_TEST <= $T_END )); then
+    pass "$TEST_KEY.out"
+else
+    fail "$TEST_KEY.out"
+fi
+#-------------------------------------------------------------------------------
+# Parse its own current date/time output.
+TEST_KEY=$TEST_KEY_BASE-current-parse
+run_pass "$TEST_KEY" rose date
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+DATE_TIME_STR=$(cat $TEST_KEY.out)
 TEST_KEY=$TEST_KEY_BASE-parse
 run_pass "$TEST_KEY" rose date "$DATE_TIME_STR"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 $DATE_TIME_STR
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# Produce an offset from the current date/time.
+TEST_KEY=$TEST_KEY_BASE-current-offset
+T_START=$(date +%s)
+run_pass "$TEST_KEY" rose date --offset=PT1H
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+# The altering of the output is necessary until GNU coreutils 8.13.
+sed -i 's/:\([0-5][0-9]\)$/\1/g; s/T/ /g' $TEST_KEY.out
+DATE_TIME_STR=$(cat $TEST_KEY.out)
+T_OFFSET=$(date -d "$DATE_TIME_STR" +%s)
+# Allow a minute either side of the 1 hour, expressed in seconds.
+if (( T_OFFSET - T_START > 3540 )) && (( T_OFFSET - T_START < 3660 )); then
+    pass "$TEST_KEY.out"
+else
+    fail "$TEST_KEY.out"
+fi
+#-------------------------------------------------------------------------------
+# Produce a print format from the current date/time.
+TEST_KEY=$TEST_KEY_BASE-current-print-format
+run_pass "$TEST_KEY" rose date --print-format="%D %r"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+DATE_TIME_STR=$(cat $TEST_KEY.out)
+run_pass "$TEST_KEY-vs-date" date -d "$DATE_TIME_STR" +"%D %r"
+file_cmp "$TEST_KEY-vs-date.err" "$TEST_KEY-vs-date.err" </dev/null
+file_cmp "$TEST_KEY-vs-date.out" "$TEST_KEY-vs-date.out" <<__OUT__
+$DATE_TIME_STR
+__OUT__
 #-------------------------------------------------------------------------------
 # Parse format and print format (1).
 TEST_KEY=$TEST_KEY_BASE-parse-print-1
@@ -70,9 +121,10 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Parse format and print format (5).
 TEST_KEY=$TEST_KEY_BASE-parse-print-5
+MY_TZ=$(date +%z)
 run_pass "$TEST_KEY" rose date -p "%s" -f "%Y%m%d%H%M%S%z" '1396432800'
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-20140402100000+0000
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+20140402100000$MY_TZ
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------

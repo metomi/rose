@@ -20,6 +20,7 @@
 
 
 from . import dumpers
+from . import timezone
 from . import util
 
 
@@ -582,7 +583,7 @@ class TimePoint(object):
         "day_of_year", "day_of_month", "day_of_week",
         "week_of_year", "hour_of_day", "minute_of_hour",
         "second_of_minute", "truncated", "truncated_property",
-        "dump_format"
+        "dump_format", "time_zone"
     ]
 
     def __init__(self, expanded_year_digits=0, year=None, month_of_year=None,
@@ -914,6 +915,11 @@ class TimePoint(object):
         self.apply_time_zone_offset(dest_time_zone - self.get_time_zone())
         self.time_zone = dest_time_zone
 
+    def set_time_zone_to_local(self):
+        """Set the time zone to the local timezone, if it's not already."""
+        local_hours, local_minutes = timezone.get_timezone_for_locale()
+        self.set_time_zone(TimeZone(hours=local_hours, minutes=local_minutes))
+
     def set_time_zone_to_utc(self):
         """Set the time zone to UTC, if it's not already."""
         self.set_time_zone(TimeZone(hours=0, minutes=0))
@@ -1134,7 +1140,10 @@ class TimePoint(object):
         """Return the data properties of this TimePoint."""
         hash_ = []
         for attr in self.DATA_ATTRIBUTES:
-            hash_.append((attr, getattr(self, attr, None)))
+            value = getattr(self, attr, None)
+            if callable(getattr(value, "copy", None)):
+                value = value.copy()
+            hash_.append((attr, value))
         return hash_
 
     def __cmp__(self, other):
@@ -1827,9 +1836,13 @@ def get_timepoint_from_seconds_since_unix_epoch(num_seconds):
 
 
 def get_timepoint_properties_from_seconds_since_unix_epoch(num_seconds):
-    """Translate Unix time into a dict of TimePoint properties."""
-    return dict(
+    """Translate Unix time into a dict of TimePoint constructor properties."""
+    properties = dict(
         get_timepoint_from_seconds_since_unix_epoch(num_seconds).get_props())
+    time_zone = properties.pop("time_zone")
+    properties["time_zone_hour"] = time_zone.hours
+    properties["time_zone_minute"] = time_zone.minutes
+    return properties
 
 
 def iter_months_days(year, month_of_year=None, day_of_month=None,

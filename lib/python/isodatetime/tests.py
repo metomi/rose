@@ -87,7 +87,8 @@ def get_timepoint_dumper_tests():
              (u"±XCCYYMMDDThh±hhmm", "+0000440104T05+0000"),
              (u"±XCCYY-MM-DDThh:mm:ss±hh:mm", "+000044-01-04T05:01:02+00:00"),
              ("DD/MM/CCYY is a silly format", "04/01/0044 is a silly format"),
-             ("ThhZ", "T05Z")]
+             ("ThhZ", "T05Z"),
+             ("%Y-%m-%dT%H:%M", "0044-01-04T05:01")]
         ),
         (
             {"year": 500200, "month_of_year": 7, "day_of_month": 28,
@@ -111,7 +112,8 @@ def get_timepoint_dumper_tests():
              (u"±XCCYY-MM-DDThh:mm:ss±hh:mm", "+500200-07-28T00:26:08-08:30"),
              (u"±XCCYY-MM-DDThh:mm:ssZ", "+500200-07-28T08:56:08Z"),
              ("DD/MM/CCYY is a silly format", "28/07/0200 is a silly format"),
-             ("ThhmmZ", "T0856Z")]
+             ("ThhmmZ", "T0856Z"),
+             ("%m-%dT%H:%M", "07-28T00:26")]
         ),
         (
             {"year": -56, "day_of_year": 318, "expanded_year_digits": 2,
@@ -133,7 +135,8 @@ def get_timepoint_dumper_tests():
              (u"±XCCYY-MM-DDThh:mm:ss±hh:mm", "-000056-11-13T05:01:00+06:00"),
              (u"±XCCYY-MM-DDThh:mm:ssZ", "-000056-11-12T23:01:00Z"),
              ("DD/MM/CCYY is a silly format", "13/11/0056 is a silly format"),
-             ("ThhmmZ", "T2301Z")]
+             ("ThhmmZ", "T2301Z"),
+             ("%Y-%m-%dT%H:%M", "0056-11-13T05:01")]
         ),
         (
             {"year": 1000, "week_of_year": 1, "day_of_week": 1,
@@ -141,14 +144,16 @@ def get_timepoint_dumper_tests():
             [("CCYY-MMDDThhmmZ", "0999-1230T0000Z"),
              ("CCYY-DDDThhmmZ", "0999-364T0000Z"),
              ("CCYY-Www-DThhmm+0200", "1000-W01-1T0200+0200"),
-             ("CCYY-Www-DThhmm-0200", "0999-W52-7T2200-0200")]
+             ("CCYY-Www-DThhmm-0200", "0999-W52-7T2200-0200"),
+             ("%Y-%m-%dT%H:%M", "0999-12-30T00:00")]
         ),
         (
             {"year": 999, "day_of_year": 364, "time_zone_hour": 0},
             [("CCYY-MMDDThhmmZ", "0999-1230T0000Z"),
              ("CCYY-DDDThhmmZ", "0999-364T0000Z"),
              ("CCYY-Www-DThhmm+0200", "1000-W01-1T0200+0200"),
-             ("CCYY-Www-DThhmm-0200", "0999-W52-7T2200-0200")]
+             ("CCYY-Www-DThhmm-0200", "0999-W52-7T2200-0200"),
+             ("%Y-%m-%dT%H:%M", "0999-12-30T00:00")]
         )
     ]
 
@@ -615,7 +620,8 @@ class TestSuite(unittest.TestCase):
             test_date = data.TimePoint(
                 year=my_date.year,
                 month_of_year=my_date.month,
-                day_of_month=my_date.day)
+                day_of_month=my_date.day
+            )
             test_data = test_date.get_week_date()
             self.assertEqual(test_data, ctrl_data)
             ctrl_data = (my_date.year, my_date.month, my_date.day)
@@ -671,6 +677,77 @@ class TestSuite(unittest.TestCase):
             self.assertEqual(test_data, ctrl_data)
             timedelta = datetime.timedelta(days=1)
             my_date += timedelta
+
+    def test_timepoint_timezone(self):
+        """Test the timezone handling of timepoint instances."""
+        import datetime
+        year = 2000
+        month_of_year = 1
+        day_of_month = 1
+        utc_offset = datetime.datetime.now() - datetime.datetime.utcnow()
+        utc_offset_hrs = (utc_offset.seconds + 1800) // 3600
+        utc_offset_minutes = (
+            ((utc_offset.seconds - 3600 * utc_offset_hrs) + 30) // 60
+        )
+        for hour_of_day in range(24):
+            for minute_of_hour in [0, 30]:
+                test_dates = [
+                    data.TimePoint(
+                        year=year,
+                        month_of_year=month_of_year,
+                        day_of_month=day_of_month,
+                        hour_of_day=hour_of_day,
+                        minute_of_hour=minute_of_hour
+                    )
+                ]
+                test_dates.append(test_dates[0].copy())
+                test_dates.append(test_dates[0].copy())
+                test_dates.append(test_dates[0].copy())
+                test_dates[0].set_time_zone_to_utc()
+                self.assertEqual(test_dates[0].time_zone.hours, 0,
+                                 test_dates[0])
+                self.assertEqual(test_dates[0].time_zone.minutes, 0,
+                                 test_dates[0])
+                test_dates[1].set_time_zone_to_local()
+                self.assertEqual(test_dates[1].time_zone.hours,
+                                 utc_offset_hrs, test_dates[1])
+                
+                self.assertEqual(test_dates[1].time_zone.minutes,
+                                 utc_offset_minutes, test_dates[1])
+                test_dates[2].set_time_zone(
+                    data.TimeZone(hours=-13, minutes=-45))
+                
+                test_dates[3].set_time_zone(
+                    data.TimeZone(hours=8, minutes=30))
+                for i in range(len(test_dates)):
+                    i_date_str = str(test_dates[i])
+                    date_no_tz = test_dates[i].copy()
+                    date_no_tz.time_zone = data.TimeZone(hours=0, minutes=0)
+
+                    # TODO: https://github.com/metomi/isodatetime/issues/34.
+                    if (test_dates[i].time_zone.hours >= 0 or
+                        test_dates[i].time_zone.minutes >= 0):
+                        utc_offset = date_no_tz - test_dates[i]
+                    else:
+                        utc_offset = (test_dates[i] - date_no_tz) * -1
+
+                    self.assertEqual(utc_offset.hours,
+                                     test_dates[i].time_zone.hours,
+                                     i_date_str + " utc offset (hrs)")
+                    self.assertEqual(utc_offset.minutes,
+                                     test_dates[i].time_zone.minutes,
+                                     i_date_str + " utc offset (mins)")       
+                    for j in range(len(test_dates)):
+                        j_date_str = str(test_dates[j])
+                        self.assertEqual(
+                            test_dates[i], test_dates[j],
+                            i_date_str + " == " + j_date_str
+                        )
+                        interval = test_dates[j] - test_dates[i]
+                        self.assertEqual(
+                            interval, data.TimeInterval(days=0),
+                            i_date_str + " - " + j_date_str
+                        )
 
     def test_timepoint_dumper(self):
         """Test the dumping of TimePoint instances."""
