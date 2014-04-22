@@ -41,7 +41,7 @@
 #         PT6H - 6 hour offset
 #         PT1M - 1 minute offset
 #         -PT1M - (negative) 1 minute offset
-#         P3M - 1 month offset
+#         P3M - 3 month offset
 #         P2W - 2 week offset (note no other units may be combined with weeks)
 #         P2DT5.5H - 2 day, 5.5 hour offset
 #         -P2YT4S - (negative) 2 year, 4 second offset
