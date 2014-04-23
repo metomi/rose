@@ -223,7 +223,7 @@ class RoseDateShifter(object):
         try:
             return self.isoparser.strptime(ref_time, parse_format)
         except ValueError:
-            return self.get_datetime_strptime(d, parse_format)
+            return self.get_datetime_strptime(ref_time, parse_format)
 
     def get_datetime_strftime(self, d, print_format):
         """Use the datetime library's strftime as a fallback."""
