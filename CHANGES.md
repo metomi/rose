@@ -24,6 +24,9 @@ plotting metadata dependencies such as trigger.
 
 ### Noteworthy Changes
 
+\#1225: rose app/suite/task-run: file installation: ensure that all relevant
+tables exist in the file installation configuration SQLite database file.
+
 \#1209: rose suite-hook: use configured email host in email addresses without
 hosts.
 
