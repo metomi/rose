@@ -429,8 +429,8 @@ class SuiteRunner(Runner):
             for line in node_value.strip().splitlines():
                 pattern, value = line.strip().split("=", 1)
                 if pattern.startswith("jinja2:"):
-                    section, key = pattern.rsplit(":", 1)
-                    p_node = conf.get([section, key], no_ignore=True)
+                    section, name = pattern.rsplit(":", 1)
+                    p_node = conf.get([section, name], no_ignore=True)
                     # Values in "jinja2:*" section are quoted.
                     pattern = ast.literal_eval(p_node.value)
                 if fnmatchcase(host, pattern):
