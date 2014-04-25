@@ -378,7 +378,7 @@ class RoseOptionParser(OptionParser):
                         "metavar": "PROPERTY",
                         "help": "Specify a property."}],
                "prune_remote_mode": [
-                       ["--tidy-remote"],
+                       ["--prune-remote", "--tidy-remote"],
                        {"action": "store_true",
                         "dest": "prune_remote_mode",
                         "help": "Remove remote job logs after retrieval."}],
