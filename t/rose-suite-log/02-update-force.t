@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 # Test "rose suite-log --force", without site/user configurations.
+# Test "rose suite-log -U --prune-remote", without site/user configurations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
@@ -30,7 +31,7 @@ if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
-tests 15
+tests 18
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
@@ -105,6 +106,46 @@ log/job/my_task_2.2013010200.1|00-script
 log/job/my_task_2.2013010200.1.err|02-err
 log/job/my_task_2.2013010200.1.out|01-out
 __OUT__
+#-------------------------------------------------------------------------------
+# Test --prune-remote.
+TEST_KEY="$TEST_KEY_BASE-prune-remote"
+if [[ -n ${JOB_HOST:-} ]]; then
+    run_pass "$TEST_KEY" \
+        rose suite-log -U -n $NAME --prune-remote 2013010100 2013010112
+    grep "\[INFO\] delete: $JOB_HOST:" "$TEST_KEY.out" >"$TEST_KEY.out.expected"
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out.expected" <<__OUT__
+[INFO] delete: $JOB_HOST:my_task_1.2013010100.1
+[INFO] delete: $JOB_HOST:my_task_1.2013010100.1.err
+[INFO] delete: $JOB_HOST:my_task_1.2013010100.1.out
+[INFO] delete: $JOB_HOST:my_task_1.2013010100.1.status
+[INFO] delete: $JOB_HOST:my_task_2.2013010100.1
+[INFO] delete: $JOB_HOST:my_task_2.2013010100.1.err
+[INFO] delete: $JOB_HOST:my_task_2.2013010100.1.out
+[INFO] delete: $JOB_HOST:my_task_2.2013010100.1.status
+[INFO] delete: $JOB_HOST:my_task_1.2013010112.1
+[INFO] delete: $JOB_HOST:my_task_1.2013010112.1.err
+[INFO] delete: $JOB_HOST:my_task_1.2013010112.1.out
+[INFO] delete: $JOB_HOST:my_task_1.2013010112.1.status
+[INFO] delete: $JOB_HOST:my_task_2.2013010112.1
+[INFO] delete: $JOB_HOST:my_task_2.2013010112.1.err
+[INFO] delete: $JOB_HOST:my_task_2.2013010112.1.out
+[INFO] delete: $JOB_HOST:my_task_2.2013010112.1.status
+__OUT__
+    ssh -oBatchMode=yes $JOB_HOST ls "~/cylc-run/$NAME/log/job" \
+        | sort >"$TEST_KEY.ls"
+    file_cmp "$TEST_KEY.ls" "$TEST_KEY.ls" <<'__LIST__'
+my_task_1.2013010200.1
+my_task_1.2013010200.1.err
+my_task_1.2013010200.1.out
+my_task_1.2013010200.1.status
+my_task_2.2013010200.1
+my_task_2.2013010200.1.err
+my_task_2.2013010200.1.out
+my_task_2.2013010200.1.status
+__LIST__
+else
+    skip 3 "$TEST_KEY: [t]job-host not defined"
+fi
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
 exit 0
