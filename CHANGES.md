@@ -24,6 +24,9 @@ plotting metadata dependencies such as trigger.
 
 ### Noteworthy Changes
 
+\#1228: rose suite-log --update --prune-remote: option now recognised as
+documented.
+
 \#1225: rose app/suite/task-run: file installation: ensure that all relevant
 tables exist in the file installation configuration SQLite database file.
 
