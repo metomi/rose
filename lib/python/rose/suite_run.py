@@ -191,7 +191,6 @@ class SuiteRunner(Runner):
                 raise StillRunningError(suite_name, reason)
 
         # Install the suite to its run location
-        # TODO: files from inherited locations
         suite_dir_rel = self._suite_dir_rel(suite_name)
         suite_dir = os.path.join(os.path.expanduser("~"), suite_dir_rel)
 
@@ -207,11 +206,11 @@ class SuiteRunner(Runner):
             self._run_init_dir(opts, suite_name, conf_tree,
                                locs_conf=locs_conf)
             os.chdir(suite_dir)
-        cwd = os.getcwd()
-        for rel_path, conf_dir in conf_tree.files.items():
-            if conf_dir == cwd or self.REC_DONT_SYNC.match(rel_path):
-                continue
-            self.fs_util.copy2(os.path.join(conf_dir, rel_path), rel_path)
+        #cwd = os.getcwd()
+        #for rel_path, conf_dir in conf_tree.files.items():
+        #    if conf_dir == cwd or self.REC_DONT_SYNC.match(rel_path):
+        #        continue
+        #    self.fs_util.copy2(os.path.join(conf_dir, rel_path), rel_path)
 
         # Housekeep log files
         if not opts.install_only_mode and not opts.local_install_only_mode:
@@ -273,6 +272,22 @@ class SuiteRunner(Runner):
         environ = self.config_pm(conf_tree, "env")
 
         # Process Files
+        cwd = os.getcwd()
+        for rel_path, conf_dir in conf_tree.files.items():
+            if conf_dir == cwd or self.REC_DONT_SYNC.match(rel_path):
+                continue
+            target_key = "file:" + rel_path
+            target_node = conf_tree.node.get([target_key])
+            if target_node is None:
+                conf_tree.node.set([target_key])
+                target_node = conf_tree.node.get([target_key])
+            elif target_node.is_ignored():
+                continue
+            source_node = target_node.get("source")
+            if source_node is None:
+                target_node.set(["source"], os.path.join(conf_dir, rel_path))
+            elif source_node.is_ignored():
+                continue
         self.config_pm(conf_tree, "file",
                        no_overwrite_mode=opts.no_overwrite_mode)
 

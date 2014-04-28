@@ -197,8 +197,6 @@ class ConfigNode(object):
 
         comments defines the node.comments property at this position.
 
-        If value is None, the node is 'unset'.
-
         If state is None, the node.state property is unchanged.
 
         If comments is None, the node.comments property is unchanged.
