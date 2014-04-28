@@ -7,6 +7,8 @@ for a full listing of issues for each release.
 
 ## 2014-04 (2014-04-28)
 
+This release of Rose works best with Cylc 5.4.12.
+
 ### Highlighted Changes
 
 \#1202, \#1219: rose date: logic reimplemented using the new
