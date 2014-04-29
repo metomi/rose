@@ -33,15 +33,11 @@ svnadmin create $REPO/foo
 URL=file://$REPO/foo
 BASEINSTALL=$(mktemp -d --tmpdir=$PWD)
 (cd $BASEINSTALL; mkdir -p trunk/rose-stem; svn import -q -m ""  $URL)
+#Keywords for the foo repository
+mkdir -p conf
+echo "location{primary}[foo]=$URL" >conf/keyword.cfg
+export FCM_CONF_PATH=$PWD/conf
 cd $TEST_DIR
-#-------------------------------------------------------------------------------
-#Set up a keyword in the user's fcm keywords file (will delete later)
-#This should be replaced by the functionality in FCM:#105 when that is the 
-#site default.
-mkdir -p $HOME/.metomi/fcm
-cat >> $HOME/.metomi/fcm/keyword.cfg << __EOF__
-location{primary}[foo] = $URL
-__EOF__
 #-------------------------------------------------------------------------------
 #Check out a copy of the repository
 WORKINGCOPY=$(mktemp -d --tmpdir=$PWD)
@@ -124,9 +120,6 @@ TEST_KEY=$TEST_KEY_BASE-relative-path-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 #-------------------------------------------------------------------------------
 cd $TEST_DIR
-#-------------------------------------------------------------------------------
-#Tidy up keyword.cfg - remove foo repository which is the last line
-sed -i '$d' $HOME/.metomi/fcm/keyword.cfg
 #-------------------------------------------------------------------------------
 #Clean suite
 rose suite-clean -q -y $SUITENAME
