@@ -274,7 +274,9 @@ class SuiteRunner(Runner):
         # Process Files
         cwd = os.getcwd()
         for rel_path, conf_dir in conf_tree.files.items():
-            if conf_dir == cwd or self.REC_DONT_SYNC.match(rel_path):
+            if (conf_dir == cwd or
+                    self.REC_DONT_SYNC.match(rel_path) or
+                    conf_tree.node.get(["jinja2:" + rel_path]) is not None):
                 continue
             target_key = "file:" + rel_path
             target_node = conf_tree.node.get([target_key])
@@ -294,9 +296,12 @@ class SuiteRunner(Runner):
         # Process Jinja2 configuration
         self.config_pm(conf_tree, "jinja2")
 
-        # Register the suite
-        self.suite_engine_proc.validate(suite_name, opts.strict_mode,
-                                        opts.debug_mode)
+        # Ask suite engine to parse suite configuration
+        # and determine if it is up to date (unchanged)
+        suite_conf_unchanged = self.suite_engine_proc.parse_suite_conf(
+                                                            suite_name,
+                                                            opts.strict_mode,
+                                                            opts.debug_mode)
 
         if opts.local_install_only_mode:
             return
@@ -378,7 +383,8 @@ class SuiteRunner(Runner):
 
         # Install ends
         ConfigDumper()(locs_conf, os.path.join("log", "rose-suite-run.locs"))
-        if opts.install_only_mode:
+        if (opts.install_only_mode or
+                (opts.run_mode == "reload" and suite_conf_unchanged)):
             return
 
         # Start the suite

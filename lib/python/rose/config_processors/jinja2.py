@@ -19,10 +19,12 @@
 #-----------------------------------------------------------------------------
 """Process a section in a rose.config.ConfigNode into a Jinja2 template."""
 
+import filecmp
 from rose.config_processor import ConfigProcessError, ConfigProcessorBase
 from rose.env import env_var_process, UnboundEnvironmentVariableError
+from rose.fs_util import FileSystemEvent
 import os
-from tempfile import TemporaryFile
+from tempfile import NamedTemporaryFile
 
 
 class ConfigProcessorForJinja2(ConfigProcessorBase):
@@ -34,29 +36,29 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
     def process(self, conf_tree, item, orig_keys=None, orig_value=None,
                 **kwargs):
         """Process [jinja2:*] in "conf_tree.node"."""
-        for key, node in sorted(conf_tree.node.value.items()):
-            if (node.is_ignored() or
-                not key.startswith(self.PREFIX) or
-                not node.value):
+        for s_key, s_node in sorted(conf_tree.node.value.items()):
+            if (s_node.is_ignored() or
+                not s_key.startswith(self.PREFIX) or
+                not s_node.value):
                 continue
-            target = key[len(self.PREFIX):]
+            target = s_key[len(self.PREFIX):]
             if not os.access(target, os.F_OK | os.R_OK | os.W_OK):
                 continue
-            f = TemporaryFile()
-            f.write("#!" + self.SCHEME + "\n")
-            f.write(self.MSG_INIT)
-            for k, n in sorted(node.value.items()):
-                if n.is_ignored():
+            tmp_file = NamedTemporaryFile()
+            tmp_file.write("#!" + self.SCHEME + "\n")
+            tmp_file.write(self.MSG_INIT)
+            for key, node in sorted(s_node.value.items()):
+                if node.is_ignored():
                     continue
                 try:
-                    value = env_var_process(n.value)
+                    value = env_var_process(node.value)
                 except UnboundEnvironmentVariableError as e:
-                    raise ConfigProcessError([key, k], n.value, e)
-                f.write("{%% set %s=%s %%}\n" % (k, value))
-            f.write(self.MSG_DONE)
+                    raise ConfigProcessError([s_key, key], node.value, e)
+                tmp_file.write("{%% set %s=%s %%}\n" % (key, value))
+            tmp_file.write(self.MSG_DONE)
             line_n = 0
             is_in_old_insert = False
-            for line in open(target):
+            for line in open(os.path.join(conf_tree.files[target], target)):
                 line_n += 1
                 if line_n == 1 and line.rstrip().lower() == "#!" + self.SCHEME:
                     continue
@@ -68,7 +70,18 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                     continue
                 elif is_in_old_insert:
                     continue
-                f.write(line)
-            f.seek(0)
-            open(target, "w").write(f.read())
-            f.close()
+                tmp_file.write(line)
+            tmp_file.seek(0)
+            if os.access(target, os.F_OK | os.R_OK):
+                if filecmp.cmp(target, tmp_file.name): # identical
+                    tmp_file.close()
+                    continue
+                else:
+                    self.manager.fs_util.delete(target)
+            # Write content to target
+            target_file = open(target, "w")
+            for line in tmp_file:
+                target_file.write(line)
+            event = FileSystemEvent(FileSystemEvent.INSTALL, target)
+            self.manager.handle_event(event)
+            tmp_file.close()

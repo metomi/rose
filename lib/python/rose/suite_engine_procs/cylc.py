@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
+import filecmp
 from fnmatch import fnmatch
 from glob import glob
 import os
@@ -33,6 +34,7 @@ from rose.suite_engine_proc import \
 import socket
 import sqlite3
 import tarfile
+from tempfile import mkstemp
 from time import sleep
 from uuid import uuid4
 
@@ -831,6 +833,52 @@ class CylcProcessor(SuiteEngineProcessor):
         dao.commit()
         dao.close()
 
+    def parse_suite_conf(self, suite_name, strict_mode=False,
+                         debug_mode=False):
+        """(Re-)register and validate the "suite.rc" file.
+
+        Raise RosePopenError on failure.
+        Return True if "suite.rc.processed" is unmodified c.f. previous run.
+        Return False otherwise.
+
+        """
+        suite_dir = self.get_suite_dir(suite_name)
+        rc, out, err = self.popen.run("cylc", "get-directory", suite_name)
+        suite_dir_old = None
+        if out:
+            suite_dir_old = out.strip()
+        suite_passphrase = os.path.join(suite_dir, "passphrase")
+        self.clean_hook(suite_name)
+        if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
+            self.popen.run_simple("cylc", "unregister", suite_name)
+            suite_dir_old = None
+        if suite_dir_old is None:
+            self.popen.run_simple("cylc", "register", suite_name, suite_dir)
+        passphrase_dir = os.path.join("~", ".cylc", suite_name)
+        passphrase_dir = os.path.expanduser(passphrase_dir)
+        self.fs_util.symlink(suite_dir, passphrase_dir)
+        command = ["cylc", "validate", "-v"]
+        if debug_mode:
+            command.append("--debug")
+        if strict_mode:
+            command.append("--strict")
+        command.append(suite_name)
+        suite_rc_processed = os.path.join(suite_dir, "suite.rc.processed")
+        old_suite_rc_processed = None
+        if os.path.exists(suite_rc_processed):
+            handle, old_suite_rc_processed = mkstemp(
+                                                dir=suite_dir,
+                                                prefix="suite.rc.processed.")
+            handle.close()
+            os.rename(suite_rc_processed, old_suite_rc_processed)
+        try:
+            self.popen.run_simple(*command, stdout_level=Event.V)
+            return (old_suite_rc_processed and
+                    filecmp.cmp(old_suite_rc_processed. suite_rc_processed))
+        finally:
+            if old_suite_rc_processed:
+                os.unlink(old_suite_rc_processed)
+
     def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""
         if not hosts:
@@ -1005,31 +1053,6 @@ class CylcProcessor(SuiteEngineProcessor):
             environ.update({self.get_version_env_name(): engine_version})
         self.popen.run_simple(
                 *command, env=environ, stderr=stderr, stdout=stdout)
-
-    def validate(self, suite_name, strict_mode=False, debug_mode=False):
-        """(Re-)register and validate a suite."""
-        suite_dir = self.get_suite_dir(suite_name)
-        rc, out, err = self.popen.run("cylc", "get-directory", suite_name)
-        suite_dir_old = None
-        if out:
-            suite_dir_old = out.strip()
-        suite_passphrase = os.path.join(suite_dir, "passphrase")
-        self.clean_hook(suite_name)
-        if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
-            self.popen.run_simple("cylc", "unregister", suite_name)
-            suite_dir_old = None
-        if suite_dir_old is None:
-            self.popen.run_simple("cylc", "register", suite_name, suite_dir)
-        passphrase_dir = os.path.join("~", ".cylc", suite_name)
-        passphrase_dir = os.path.expanduser(passphrase_dir)
-        self.fs_util.symlink(suite_dir, passphrase_dir)
-        command = ["cylc", "validate", "-v"]
-        if debug_mode:
-            command.append("--debug")
-        if strict_mode:
-            command.append("--strict")
-        command.append(suite_name)
-        self.popen.run_simple(*command, stdout_level=Event.V)
 
     def _db_close(self, db_name, user_name, suite_name):
         key = (user_name, suite_name)

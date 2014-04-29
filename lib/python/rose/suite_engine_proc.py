@@ -570,6 +570,18 @@ class SuiteEngineProcessor(object):
         self.handle_event(WebBrowserEvent(w.name, url))
         return url
 
+    def parse_suite_conf(self, suite_name, strict_mode=False,
+                         debug_mode=False):
+        """Ask suite engine to parse suite configuration.
+
+        An implementation of this method should:
+        * Raise an exception on failure.
+        * Return True if suite configuration is unmodified c.f. previous run.
+        * Return False otherwise.
+
+        """
+        raise NotImplementedError()
+
     def ping(self, suite_name, host_names=None):
         """Return a list of host names where suite_name is running."""
         raise NotImplementedError()
@@ -597,10 +609,6 @@ class SuiteEngineProcessor(object):
 
     def shutdown(self, suite_name, host=None, engine_version=None, args=None):
         """Shut down the suite."""
-        raise NotImplementedError()
-
-    def validate(self, suite_name, strict_mode=False):
-        """Validate a suite."""
         raise NotImplementedError()
 
     def _get_offset_cycle_time(self, cycle, cycle_offset):
