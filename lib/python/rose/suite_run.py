@@ -60,6 +60,14 @@ class VersionMismatchError(Exception):
         return "Version expected=%s, actual=%s" % self.args
 
 
+class SkipReloadEvent(Event):
+
+    """An event raised to report that suite configuration reload is skipped."""
+
+    def __str__(self):
+        return "%s: skip reload, \"%s\" unchanged" % self.args
+
+
 class SuiteHostSelectEvent(Event):
 
     """An event raised to report the host for running a suite."""
@@ -102,8 +110,8 @@ class SuiteRunner(Runner):
     def run_impl(self, opts, args, uuid, work_files):
         # Log file, temporary
         if hasattr(self.event_handler, "contexts"):
-            f = TemporaryFile()
-            log_context = ReporterContext(None, self.event_handler.VV, f)
+            t_file = TemporaryFile()
+            log_context = ReporterContext(None, self.event_handler.VV, t_file)
             self.event_handler.contexts[uuid] = log_context
 
         # Check suite engine specific compatibility
@@ -151,17 +159,17 @@ class SuiteRunner(Runner):
         auto_items = {"ROSE_ORIG_HOST": socket.gethostname(),
                       "ROSE_VERSION": ResourceLocator.default().get_version(),
                       suite_engine_key: suite_engine_version}
-        for k, v in auto_items.items():
-            requested_value = conf_tree.node.get_value(["env", k])
+        for key, val in auto_items.items():
+            requested_value = conf_tree.node.get_value(["env", key])
             if requested_value:
-                if k == "ROSE_VERSION" and v != requested_value:
-                    exc = VersionMismatchError(requested_value, v)
-                    raise ConfigValueError(["env", k], requested_value, exc)
-                v = requested_value
+                if key == "ROSE_VERSION" and val != requested_value:
+                    exc = VersionMismatchError(requested_value, val)
+                    raise ConfigValueError(["env", key], requested_value, exc)
+                val = requested_value
             else:
-                conf_tree.node.set(["env", k], v,
+                conf_tree.node.set(["env", key], val,
                                    state=conf_tree.node.STATE_NORMAL)
-            conf_tree.node.set([jinja2_section, k], '"' + v + '"')
+            conf_tree.node.set([jinja2_section, key], '"' + val + '"')
 
         # See if suite is running or not
         hosts = []
@@ -208,7 +216,7 @@ class SuiteRunner(Runner):
 
         # Housekeep log files
         if not opts.install_only_mode and not opts.local_install_only_mode:
-            self._run_init_dir_log(opts, suite_name, conf_tree)
+            self._run_init_dir_log(opts)
         self.fs_util.makedirs("log/suite")
 
         # Rose configuration and version logs
@@ -260,7 +268,6 @@ class SuiteRunner(Runner):
         for name in ["share", "work"]:
             self._run_init_dir_work(opts, suite_name, name, conf_tree,
                                     locs_conf=locs_conf)
-            # TODO: locs_conf.set(["localhost", ])
 
         # Process Environment Variables
         environ = self.config_pm(conf_tree, "env")
@@ -315,8 +322,8 @@ class SuiteRunner(Runner):
                 host = auth.split("@", 1)[1]
             command = self.popen.get_cmd("ssh", auth, "bash", "--login", "-c")
             rose_bin = "rose"
-            for h in [host, "*"]:
-                rose_home_node = conf.get(["rose-home-at", h],
+            for name in [host, "*"]:
+                rose_home_node = conf.get(["rose-home-at", name],
                                           no_ignore=True)
                 if rose_home_node is not None:
                     rose_bin = "%s/bin/rose" % (rose_home_node.value)
@@ -341,8 +348,8 @@ class SuiteRunner(Runner):
             for key in host_confs:
                 value = self._run_conf(key, host=host, conf_tree=conf_tree)
                 if value is not None:
-                    v = self.popen.list_to_shell_str([str(value)])
-                    rose_sr += "," + key + "=" + v
+                    val = self.popen.list_to_shell_str([str(value)])
+                    rose_sr += "," + key + "=" + val
                     locs_conf.set([auth, key], value)
             command += ["'" + rose_sr + "'"]
             pipe = self.popen.run_bg(*command)
@@ -377,8 +384,11 @@ class SuiteRunner(Runner):
 
         # Install ends
         ConfigDumper()(locs_conf, os.path.join("log", "rose-suite-run.locs"))
-        if (opts.install_only_mode or
-                (opts.run_mode == "reload" and suite_conf_unchanged)):
+        if opts.install_only_mode:
+            return
+        elif opts.run_mode == "reload" and suite_conf_unchanged:
+            conf_name = self.suite_engine_proc.SUITE_CONF
+            self.handle_event(SkipReloadEvent(suite_name, conf_name))
             return
 
         # Start the suite
@@ -392,8 +402,8 @@ class SuiteRunner(Runner):
         # For run and restart, get host for running the suite
         if opts.run_mode != "reload" and not opts.host:
             hosts = []
-            v = conf.get_value(["rose-suite-run", "hosts"], "localhost")
-            known_hosts = self.host_selector.expand(v.split())[0]
+            val = conf.get_value(["rose-suite-run", "hosts"], "localhost")
+            known_hosts = self.host_selector.expand(val.split())[0]
             for known_host in known_hosts:
                 if known_host not in hosts:
                     hosts.append(known_host)
@@ -474,7 +484,7 @@ class SuiteRunner(Runner):
         else:
             self.fs_util.makedirs(suite_dir_home)
 
-    def _run_init_dir_log(self, opts, suite_name, conf_tree=None, r_opts=None):
+    def _run_init_dir_log(self, opts):
         """Create the suite's log/ directory. Housekeep, archive old ones."""
         # Do nothing in log append mode if log directory already exists
         if opts.run_mode in ["reload", "restart"] and os.path.isdir("log"):
@@ -501,10 +511,10 @@ class SuiteRunner(Runner):
         # Housekeep old logs, if necessary
         log_keep = getattr(opts, "log_keep", None)
         if log_keep:
-            t = time() - abs(float(log_keep)) * 86400.0
+            t_threshold = time() - abs(float(log_keep)) * 86400.0
             for log in list(logs):
                 if os.path.isfile(log):
-                    if t > os.stat(log).st_mtime:
+                    if t_threshold > os.stat(log).st_mtime:
                         self.fs_util.delete(log)
                         logs.remove(log)
                 else:
@@ -513,7 +523,7 @@ class SuiteRunner(Runner):
                         for file_ in files:
                             path = os.path.join(root, file_)
                             if (os.path.exists(path) and
-                                os.stat(path).st_mtime >= t):
+                                os.stat(path).st_mtime >= t_threshold):
                                 keep = True
                                 break
                         if keep:
@@ -529,9 +539,9 @@ class SuiteRunner(Runner):
                     continue
                 log_tar = log + ".tar"
                 f_bsize = os.statvfs(log).f_bsize
-                f = tarfile.open(log_tar, "w", bufsize=f_bsize)
-                f.add(log)
-                f.close()
+                tar_handle = tarfile.open(log_tar, "w", bufsize=f_bsize)
+                tar_handle.add(log)
+                tar_handle.close()
                 # N.B. Python's gzip is slow
                 self.popen.run_simple("gzip", "-f", log_tar)
                 self.handle_event(SuiteLogArchiveEvent(log_tar + ".gz", log))
@@ -566,8 +576,8 @@ class SuiteRunner(Runner):
         suite_dir_rel = self._suite_dir_rel(suite_name)
         r_opts = {}
         for item in opts.remote.split(","):
-            k, v = item.split("=", 1)
-            r_opts[k] = v
+            key, val = item.split("=", 1)
+            r_opts[key] = val
         uuid_file = os.path.join(suite_dir_rel, r_opts["uuid"])
         if os.path.exists(uuid_file):
             self.handle_event("/" + r_opts["uuid"] + "\n", level=0)
@@ -586,7 +596,7 @@ class SuiteRunner(Runner):
             if os.path.exists(uuid_file):
                 self.handle_event("log/" + r_opts["uuid"] + "\n", level=0)
             else:
-                self._run_init_dir_log(opts, suite_name, r_opts=r_opts)
+                self._run_init_dir_log(opts)
         self.fs_util.makedirs("log/suite")
 
     def _get_cmd_rsync(self, target, excludes=None, includes=None):
@@ -595,16 +605,16 @@ class SuiteRunner(Runner):
             excludes = []
         if includes is None:
             includes = []
-        c = self.popen.get_cmd("rsync", "--delete-excluded")
+        cmd = self.popen.get_cmd("rsync", "--delete-excluded")
         for exclude in excludes:
-            c.append("--exclude=" + exclude)
+            cmd.append("--exclude=" + exclude)
         for include in includes:
-            c.append("--include=" + include)
+            cmd.append("--include=" + include)
         for item in os.listdir("."):
             if not self.REC_DONT_SYNC.match(item) or item in excludes:
-                c.append(item)
-        c.append(target)
-        return c
+                cmd.append(item)
+        cmd.append(target)
+        return cmd
 
     def _suite_dir_rel(self, suite_name):
         """Return the relative path to the suite running directory."""

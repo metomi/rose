@@ -1,0 +1,15 @@
+#!jinja2
+[cylc]
+UTC mode=True
+[[event hooks]]
+timeout handler=rose suite-hook --shutdown
+timeout=2
+[scheduling]
+initial cycle time=2013010100
+final cycle time=2013010112
+[[dependencies]]
+[[[0,12]]]
+graph="""t1[T-12]=>t1"""
+[runtime]
+[[t1]]
+command scripting=rose task-run {{ROSE_TASK_RUN_ARGS}}

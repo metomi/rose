@@ -527,6 +527,7 @@ class CylcProcessor(SuiteEngineProcessor):
         for line in out.splitlines():
             items = line.split(None, 2)
             user, host = (None, None)
+            items.pop(0)
             if items:
                 user = items.pop(0).replace("*", " ")
             if items:
