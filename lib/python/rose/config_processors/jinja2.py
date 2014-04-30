@@ -29,12 +29,13 @@ from tempfile import NamedTemporaryFile
 
 class ConfigProcessorForJinja2(ConfigProcessorBase):
 
+    """Processor for [jinja2:FILE] sections in a runtime configuration."""
+
     SCHEME = "jinja2"
     MSG_DONE = "{# Rose Configuration Insertion: Done #}\n"
     MSG_INIT = "{# Rose Configuration Insertion: Init #}\n"
 
-    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
-                **kwargs):
+    def process(self, conf_tree, item, orig_keys=None, orig_value=None, **_):
         """Process [jinja2:*] in "conf_tree.node"."""
         for s_key, s_node in sorted(conf_tree.node.value.items()):
             if (s_node.is_ignored() or
@@ -53,8 +54,8 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                     continue
                 try:
                     value = env_var_process(node.value)
-                except UnboundEnvironmentVariableError as e:
-                    raise ConfigProcessError([s_key, key], node.value, e)
+                except UnboundEnvironmentVariableError as exc:
+                    raise ConfigProcessError([s_key, key], node.value, exc)
                 tmp_file.write("{%% set %s=%s %%}\n" % (key, value))
             tmp_file.write(self.MSG_DONE)
             line_n = 0

@@ -542,8 +542,7 @@ class SuiteEngineProcessor(object):
         """Create the job logs database."""
         raise NotImplementedError()
 
-    def job_logs_pull_remote(self, suite_name, items=None,
-                             prune_remote_mode=False):
+    def job_logs_pull_remote(self, suite_name, items, prune_remote_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
@@ -582,12 +581,8 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def ping(self, suite_name, host_names=None):
+    def ping(self, suite_name, host_names=None, timeout=10):
         """Return a list of host names where suite_name is running."""
-        raise NotImplementedError()
-
-    def process_task_hook_args(self, *args, **kwargs):
-        """Rearrange args for TaskHook.run. Return the rearranged list."""
         raise NotImplementedError()
 
     def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
@@ -607,7 +602,8 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def shutdown(self, suite_name, host=None, engine_version=None, args=None):
+    def shutdown(self, suite_name, host=None, engine_version=None, args=None,
+                 stderr=None, stdout=None):
         """Shut down the suite."""
         raise NotImplementedError()
 

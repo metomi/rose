@@ -26,7 +26,6 @@ from glob import glob
 import os
 import re
 from rose.config import ConfigDumper, ConfigLoader, ConfigNode
-from rose.config_tree import ConfigTreeLoader
 from rose.env import env_var_process
 from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
@@ -156,8 +155,8 @@ class SuiteRunner(Runner):
             requested_value = conf_tree.node.get_value(["env", k])
             if requested_value:
                 if k == "ROSE_VERSION" and v != requested_value:
-                    e = VersionMismatchError(requested_value, v)
-                    raise ConfigValueError(["env", k], requested_value, e)
+                    exc = VersionMismatchError(requested_value, v)
+                    raise ConfigValueError(["env", k], requested_value, exc)
                 v = requested_value
             else:
                 conf_tree.node.set(["env", k], v,
@@ -206,11 +205,6 @@ class SuiteRunner(Runner):
             self._run_init_dir(opts, suite_name, conf_tree,
                                locs_conf=locs_conf)
             os.chdir(suite_dir)
-        #cwd = os.getcwd()
-        #for rel_path, conf_dir in conf_tree.files.items():
-        #    if conf_dir == cwd or self.REC_DONT_SYNC.match(rel_path):
-        #        continue
-        #    self.fs_util.copy2(os.path.join(conf_dir, rel_path), rel_path)
 
         # Housekeep log files
         if not opts.install_only_mode and not opts.local_install_only_mode:
@@ -360,10 +354,10 @@ class SuiteRunner(Runner):
             if pipe.poll() is None:
                 queue.append([pipe, command, command_name, auth]) # put it back
                 continue
-            rc = pipe.wait()
+            ret_code = pipe.wait()
             out, err = pipe.communicate()
-            if rc:
-                raise RosePopenError(command, rc, out, err)
+            if ret_code:
+                raise RosePopenError(command, ret_code, out, err)
             if command_name == "rsync":
                 self.handle_event(out, level=Event.VV)
                 continue
@@ -426,8 +420,9 @@ class SuiteRunner(Runner):
 
         return ret
 
+    @classmethod
     def _run_conf(
-            self, key, default=None, host=None, conf_tree=None, r_opts=None):
+            cls, key, default=None, host=None, conf_tree=None, r_opts=None):
         """Return the value of a setting given by a key for a given host. If
         r_opts is defined, we are alerady in a remote host, so there is no need
         to do a host match. Otherwise, the setting may be found in the run time
@@ -513,10 +508,10 @@ class SuiteRunner(Runner):
                         self.fs_util.delete(log)
                         logs.remove(log)
                 else:
-                    for root, dirs, files in os.walk(log):
+                    for root, _, files in os.walk(log):
                         keep = False
-                        for file in files:
-                            path = os.path.join(root, file)
+                        for file_ in files:
+                            path = os.path.join(root, file_)
                             if (os.path.exists(path) and
                                 os.stat(path).st_mtime >= t):
                                 keep = True
@@ -626,12 +621,12 @@ def main():
     runner = SuiteRunner(event_handler)
     try:
         sys.exit(runner(opts, args))
-    except Exception as e:
-        runner.handle_event(e)
+    except Exception as exc:
+        runner.handle_event(exc)
         if opts.debug_mode:
-            traceback.print_exc(e)
-        if isinstance(e, RosePopenError):
-            sys.exit(e.rc)
+            traceback.print_exc(exc)
+        if isinstance(exc, RosePopenError):
+            sys.exit(exc.rc)
         else:
             sys.exit(1)
 

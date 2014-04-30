@@ -100,10 +100,12 @@ class CylcProcessor(SuiteEngineProcessor):
         SuiteEngineProcessor.__init__(self, *args, **kwargs)
         self.daos = {self.SUITE_DB: {}, self.JOB_LOGS_DB: {}}
         # N.B. Should be considered a constant after initialisation
-        self.STATE_OF = {}
+        self.state_of = {}
         for status, names in self.STATUSES.items():
             for name in names:
-                self.STATE_OF[name] = status
+                self.state_of[name] = status
+        self.host = None
+        self.user = None
 
     def check_global_conf_compat(self):
         """Raise exception on incompatible Cylc global configuration."""
@@ -111,7 +113,7 @@ class CylcProcessor(SuiteEngineProcessor):
         expected = os.path.expanduser(expected)
         for key in ["[hosts][localhost]run directory",
                      "[hosts][localhost]work directory"]:
-            out, err = self.popen("cylc", "get-global-config", "-i", key)
+            out = self.popen("cylc", "get-global-config", "-i", key)[0]
             lines = out.splitlines()
             if lines and lines[0] != expected:
                 raise SuiteEngineGlobalConfCompatError(
@@ -122,9 +124,9 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen.run("cylc", "refresh", "--unregister")
         passphrase_dir_root = os.path.expanduser(os.path.join("~", ".cylc"))
         for name in os.listdir(passphrase_dir_root):
-            p = os.path.join(passphrase_dir_root, name)
-            if os.path.islink(p) and not os.path.exists(p):
-                self.fs_util.delete(p)
+            path = os.path.join(passphrase_dir_root, name)
+            if os.path.islink(path) and not os.path.exists(path):
+                self.fs_util.delete(path)
 
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
@@ -150,8 +152,8 @@ class CylcProcessor(SuiteEngineProcessor):
         Return None if named item not supported.
 
         """
-        d = {"datac": "share/data/" + cycle, "work": "work/*." + cycle}
-        return d.get(name)
+        dict_ = {"datac": "share/data/" + cycle, "work": "work/*." + cycle}
+        return dict_.get(name)
 
     def get_suite_dir_rel(self, suite_name, *paths):
         """Return the relative path to the suite running directory.
@@ -274,10 +276,10 @@ class CylcProcessor(SuiteEngineProcessor):
             else:
                 messages = events
             event_rank = -1
-            for event, t, message in zip(events, times, messages):
+            for event, time_, message in zip(events, times, messages):
                 my_event = self.EVENTS.get(event)
                 if self.EVENT_TIME_INDICES.get(my_event) is not None:
-                    entry["events"][self.EVENT_TIME_INDICES[my_event]] = t
+                    entry["events"][self.EVENT_TIME_INDICES[my_event]] = time_
                 if (self.EVENT_RANKS.get(my_event) is not None and
                     self.EVENT_RANKS[my_event] > event_rank):
                     entry["status"] = my_event
@@ -388,16 +390,16 @@ class CylcProcessor(SuiteEngineProcessor):
         if user_name:
             prefix += user_name
         d_rel = self.get_suite_dir_rel(suite_name)
-        d = os.path.expanduser(os.path.join(prefix, d_rel))
+        dir_ = os.path.expanduser(os.path.join(prefix, d_rel))
         for key in ["cylc-suite-env",
                     "log/suite/err", "log/suite/log", "log/suite/out",
                     "suite.rc", "suite.rc.processed"]:
-            f_name = os.path.join(d, key)
+            f_name = os.path.join(dir_, key)
             if os.path.isfile(f_name):
-                s = os.stat(f_name)
+                f_stat = os.stat(f_name)
                 logs_info[key] = {"path": key,
-                                  "mtime": s.st_mtime,
-                                  "size": s.st_size}
+                                  "mtime": f_stat.st_mtime,
+                                  "size": f_stat.st_size}
         return ("cylc", logs_info)
 
     def get_suite_cycles_summary(self, user_name, suite_name, limit, offset):
@@ -429,9 +431,11 @@ class CylcProcessor(SuiteEngineProcessor):
             break
         if not of_n_entries:
             return ([], 0)
-        stmt_args = self.STATE_OF.keys()
-        stmt = ("SELECT cycle, fail_count, group_concat(status) FROM task_states"
-                " LEFT JOIN (SELECT cycle, count(*) AS fail_count FROM task_events"
+        stmt_args = self.state_of.keys()
+        stmt = ("SELECT cycle, fail_count, group_concat(status)"
+                " FROM task_states"
+                " LEFT JOIN (SELECT cycle, count(*) AS fail_count"
+                " FROM task_events"
                 " WHERE event=='failed' OR event='submission failed'"
                 " GROUP BY cycle) USING (cycle) WHERE (")
         for i in range(len(stmt_args)):
@@ -453,7 +457,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 entry["n_states"]["job_fails"] = job_fails
             entries.append(entry)
             for status in statuses_str.split(","):
-                entry["n_states"][self.STATE_OF[status]] += 1
+                entry["n_states"][self.state_of[status]] += 1
         return entries, of_n_entries
 
     def get_suite_state_summary(self, user_name, suite_name):
@@ -497,46 +501,45 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
         try:
-            out, err = self.popen(
+            out = self.popen(
                     "cylc", "get-config", "-o",
                     "-i", "[runtime][%s][remote]owner" % task_name,
                     "-i", "[runtime][%s][remote]host" % task_name,
-                    suite_name)
+                    suite_name)[0]
         except RosePopenError:
             return
-        u, h = (None, None)
+        user, host = (None, None)
         items = out.strip().split(None, 1)
         if items:
-            u = items.pop(0).replace("*", " ")
+            user = items.pop(0).replace("*", " ")
         if items:
-            h = items.pop(0).replace("*", " ")
-        return self._parse_user_host(user=u, host=h)
+            host = items.pop(0).replace("*", " ")
+        return self._parse_user_host(user=user, host=host)
 
     def get_tasks_auths(self, suite_name):
         """Return a list of unique [user@]host for remote tasks in a suite."""
         actual_hosts = {}
         auths = []
-        out, err = self.popen("cylc", "get-config", "-ao",
-                              "-i", "[remote]owner",
-                              "-i", "[remote]host",
-                              suite_name)
+        out = self.popen("cylc", "get-config", "-ao",
+                         "-i", "[remote]owner",
+                         "-i", "[remote]host",
+                         suite_name)[0]
         for line in out.splitlines():
             items = line.split(None, 2)
-            task = items.pop(0).replace("*", " ")
-            u, h = (None, None)
+            user, host = (None, None)
             if items:
-                u = items.pop(0).replace("*", " ")
+                user = items.pop(0).replace("*", " ")
             if items:
-                h = items.pop(0).replace("*", " ")
-            if h in actual_hosts:
-                h = str(actual_hosts[h])
-                auth = self._parse_user_host(user=u, host=h)
+                host = items.pop(0).replace("*", " ")
+            if host in actual_hosts:
+                host = str(actual_hosts[host])
+                auth = self._parse_user_host(user=user, host=host)
             else:
-                auth = self._parse_user_host(user=u, host=h)
+                auth = self._parse_user_host(user=user, host=host)
                 if auth and "@" in auth:
-                    actual_hosts[h] = auth.split("@", 1)[1]
+                    actual_hosts[host] = auth.split("@", 1)[1]
                 else:
-                    actual_hosts[h] = auth
+                    actual_hosts[host] = auth
             if auth and auth not in auths:
                 auths.append(auth)
         return auths
@@ -572,8 +575,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def get_version(self):
         """Return Cylc's version."""
-        out, err = self.popen("cylc", "--version")
-        return out.strip()
+        return self.popen("cylc", "--version")[0].strip()
 
     def is_conf(self, path):
         """Return "cylc-suite-rc" if path is a Cylc suite.rc file."""
@@ -585,8 +587,7 @@ class CylcProcessor(SuiteEngineProcessor):
             Return True directory for a suite if it is registered
             Return False otherwise
         """
-        rc, out, err = self.popen.run("cylc", "get-directory", suite_name)
-        return rc == 0
+        return self.popen.run("cylc", "get-directory", suite_name)[0] == 0
 
     def is_suite_running(self, user_name, suite_name, hosts=None):
         """Return the port file path if it looks like suite is running.
@@ -611,8 +612,8 @@ class CylcProcessor(SuiteEngineProcessor):
             user_name = pwd.getpwuid(os.getuid()).pw_name
         pgrep = ["pgrep", "-f", "-l", "-u", user_name,
                  "python.*cylc-(run|restart).*\\<" + suite_name + "\\>"]
-        rc, out, err = self.popen.run(*pgrep)
-        if rc == 0:
+        ret_code, out, _ = self.popen.run(*pgrep)
+        if ret_code == 0:
             for line in out.splitlines():
                 if suite_name in line.split():
                     return "localhost:process=" + line
@@ -632,11 +633,11 @@ class CylcProcessor(SuiteEngineProcessor):
         reason = None
         while host_proc_dict:
             for host, proc in host_proc_dict.items():
-                rc = proc.poll()
-                if rc is not None:
+                ret_code = proc.poll()
+                if ret_code is not None:
                     host_proc_dict.pop(host)
-                    if rc == 0:
-                        out, err = proc.communicate()
+                    if ret_code == 0:
+                        out = proc.communicate()[0]
                         for line in out.splitlines():
                             if suite_name in line.split():
                                 reason = host + ":" + line
@@ -663,7 +664,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 if cycle:
                     cycles.append(cycle)
         self.job_logs_pull_remote(suite_name, cycles, prune_remote_mode=True)
-        log_dir_rel = self.get_suite_dir_rel(suite_name, "log")
         log_dir = self.get_suite_dir(suite_name, "log")
         cwd = os.getcwd()
         self.fs_util.chdir(log_dir)
@@ -692,12 +692,12 @@ class CylcProcessor(SuiteEngineProcessor):
                     self.fs_util.delete(name)
                 for name in names:
                     # cycle, task, submit_num, extension
-                    c, t, s, e = self._parse_job_log_base_name(name)
-                    key = e
-                    if e in self.JOB_LOG_TAIL_KEYS:
-                        key = self.JOB_LOG_TAIL_KEYS[e]
+                    cycle, task, s_n, ext = self._parse_job_log_base_name(name)
+                    key = ext
+                    if ext in self.JOB_LOG_TAIL_KEYS:
+                        key = self.JOB_LOG_TAIL_KEYS[ext]
                     stmt_args = [os.path.join("log", archive_file_name),
-                                 name, c, t, s, key]
+                                 name, cycle, task, s_n, key]
                     self._db_exec(self.JOB_LOGS_DB, None, suite_name,
                                   stmt, stmt_args, commit=True)
         finally:
@@ -758,11 +758,11 @@ class CylcProcessor(SuiteEngineProcessor):
                     auths = self.get_suite_jobs_auths(suite_name, cycle, name)
                     if auths:
                         glob_names = []
-                        for v in [name, cycle, None]:
-                            if v is None:
+                        for list_ in [name, cycle, None]:
+                            if list_ is None:
                                 glob_names.append("*")
                             else:
-                                glob_names.append(v)
+                                glob_names.append(list_)
                         glob_ = self.TASK_ID_DELIM.join(glob_names)
                         glob_auths_map[glob_] = auths
             # FIXME: more efficient if auth is key?
@@ -776,8 +776,8 @@ class CylcProcessor(SuiteEngineProcessor):
                             "ssh", auth,
                             ("cd %(log_dir_rel)s && " +
                              "(! test -f %(uuid)s && ls -d %(glob_)s)") % data)
-                    rc, ssh_ls_out, err = self.popen.run(*cmd)
-                    if rc:
+                    ret_code, ssh_ls_out, _ = self.popen.run(*cmd)
+                    if ret_code:
                         continue
                     try:
                         cmd = self.popen.get_cmd(
@@ -785,8 +785,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                 "%(auth)s:%(log_dir_rel)s/%(glob_)s" % data,
                                 log_dir)
                         self.popen(*cmd)
-                    except RosePopenError as e:
-                        self.handle_event(e, level=Reporter.WARN)
+                    except RosePopenError as exc:
+                        self.handle_event(exc, level=Reporter.WARN)
                     if not prune_remote_mode:
                         continue
                     try:
@@ -794,8 +794,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                 "ssh", auth,
                                 "cd %(log_dir_rel)s && rm -f %(glob_)s" % data)
                         self.popen(*cmd)
-                    except RosePopenError as e:
-                        self.handle_event(e, level=Reporter.WARN)
+                    except RosePopenError as exc:
+                        self.handle_event(exc, level=Reporter.WARN)
                     else:
                         for line in sorted(ssh_ls_out.splitlines()):
                             event = FileSystemEvent(FileSystemEvent.DELETE,
@@ -806,7 +806,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
         # Update job log DB
         dao = self.job_logs_db_create(suite_name)
-        d = self.get_suite_dir(suite_name)
+        dir_ = self.get_suite_dir(suite_name)
         stmt = ("REPLACE INTO log_files VALUES(?, ?, ?, ?, ?, ?, ?, ?)")
         for item in items:
             cycle, name = self._parse_task_cycle_id(item)
@@ -821,13 +821,13 @@ class CylcProcessor(SuiteEngineProcessor):
                 if f_name.endswith(".status"):
                     continue
                 stat = os.stat(f_name)
-                rel_f_name = f_name[len(d) + 1:]
+                rel_f_name = f_name[len(dir_) + 1:]
                 # cycle, task, submit_num, extension
-                c, t, s, e = self._parse_job_log_base_name(f_name)
-                key = e
-                if e in self.JOB_LOG_TAIL_KEYS:
-                    key = self.JOB_LOG_TAIL_KEYS[e]
-                stmt_args = [c, t, s, key, rel_f_name, "",
+                cycle, task, s_n, ext = self._parse_job_log_base_name(f_name)
+                key = ext
+                if ext in self.JOB_LOG_TAIL_KEYS:
+                    key = self.JOB_LOG_TAIL_KEYS[ext]
+                stmt_args = [cycle, task, s_n, key, rel_f_name, "",
                              stat.st_mtime, stat.st_size]
                 dao.execute(stmt, stmt_args)
         dao.commit()
@@ -843,7 +843,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
         suite_dir = self.get_suite_dir(suite_name)
-        rc, out, err = self.popen.run("cylc", "get-directory", suite_name)
+        out = self.popen.run("cylc", "get-directory", suite_name)[1]
         suite_dir_old = None
         if out:
             suite_dir_old = out.strip()
@@ -892,16 +892,17 @@ class CylcProcessor(SuiteEngineProcessor):
         ping_ok_hosts = []
         while host_proc_dict:
             for host, proc in host_proc_dict.items():
-                rc = proc.poll()
-                if rc is not None:
+                ret_code = proc.poll()
+                if ret_code is not None:
                     host_proc_dict.pop(host)
-                    if rc == 0:
+                    if ret_code == 0:
                         ping_ok_hosts.append(host)
             if host_proc_dict:
                 sleep(0.1)
         return ping_ok_hosts
 
-    def process_suite_hook_args(self, *args, **kwargs):
+    @classmethod
+    def process_suite_hook_args(cls, *args, **_):
         """Rearrange args for TaskHook.run."""
         task = None
         if len(args) == 3:
@@ -952,8 +953,8 @@ class CylcProcessor(SuiteEngineProcessor):
             bash_cmd_prefix += "cd %s\n" % log_dir
             if host_environ:
                 for key, value in host_environ.items():
-                    v = self.popen.list_to_shell_str([value])
-                    bash_cmd_prefix += "%s=%s\n" % (key, v)
+                    val = self.popen.list_to_shell_str([value])
+                    bash_cmd_prefix += "%s=%s\n" % (key, val)
                     bash_cmd_prefix += "export %s\n" % (key)
             ssh_cmd = self.popen.get_cmd("ssh", host, "bash", "--login")
             out, err = self.popen(*ssh_cmd, stdin=(bash_cmd_prefix + bash_cmd))
@@ -980,7 +981,8 @@ class CylcProcessor(SuiteEngineProcessor):
             timeout = self.TIMEOUT
         procs = {}
         for host in sorted(hosts):
-            cmd = ["cylc", "scan", "--host=" + host, "--pyro-timeout=%s" % timeout]
+            cmd = ["cylc", "scan", "--host=" + host,
+                   "--pyro-timeout=%s" % timeout]
             proc = self.popen.run_bg(*cmd)
             procs[(host, _PORT_SCAN, tuple(cmd))] = proc
             sh_cmd = "whoami && cd ~/.cylc/ports/ && ls || true"
@@ -995,12 +997,12 @@ class CylcProcessor(SuiteEngineProcessor):
         exceptions = []
         while procs:
             for keys, proc in procs.items():
-                rc = proc.poll()
-                if rc is None:
+                ret_code = proc.poll()
+                if ret_code is None:
                     continue
                 procs.pop(keys)
                 host, key, cmd = keys
-                if rc == 0:
+                if ret_code == 0:
                     if key == _PORT_SCAN:
                         for line in proc.communicate()[0].splitlines():
                             name, user, host, port = line.split()
@@ -1026,7 +1028,7 @@ class CylcProcessor(SuiteEngineProcessor):
                             results[(name, host, key)] = result
                 else:
                     out, err = proc.communicate()
-                    exceptions.append(RosePopenError(cmd, rc, out, err))
+                    exceptions.append(RosePopenError(cmd, ret_code, out, err))
             if procs:
                 sleep(0.1)
         return (sorted(results.values()), exceptions)
@@ -1055,16 +1057,19 @@ class CylcProcessor(SuiteEngineProcessor):
                 *command, env=environ, stderr=stderr, stdout=stdout)
 
     def _db_close(self, db_name, user_name, suite_name):
+        """Close a named database connection."""
         key = (user_name, suite_name)
         if self.daos[db_name].get(key) is not None:
             self.daos[db_name][key].close()
 
     def _db_exec(self, db_name, user_name, suite_name, stmt, stmt_args=None,
                  commit=False):
+        """Execute a query on a named database connection."""
         dao = self._db_init(db_name, user_name, suite_name)
         return dao.execute(stmt, stmt_args, commit)
 
     def _db_init(self, db_name, user_name, suite_name):
+        """Initialise a named database connection."""
         key = (user_name, suite_name)
         if key not in self.daos[db_name]:
             prefix = "~"
@@ -1085,6 +1090,7 @@ class CylcProcessor(SuiteEngineProcessor):
         return (cycle, task, submit_num, ext)
 
     def _parse_task_cycle_id(self, item):
+        """Parse name.cycle. Return (cycle, name)."""
         cycle, name = None, None
         if self.REC_CYCLE_TIME.match(item):
             cycle = item
@@ -1095,9 +1101,10 @@ class CylcProcessor(SuiteEngineProcessor):
         return (cycle, name)
 
     def _parse_user_host(self, auth=None, user=None, host=None):
-        if getattr(self, "user", None) is None:
+        """Parse user@host. Return normalised [user@]host string."""
+        if self.user is None:
             self.user = pwd.getpwuid(os.getuid()).pw_name
-        if getattr(self, "host", None) is None:
+        if self.host is None:
             self.host = socket.gethostname()
         if auth is not None:
             user = None
@@ -1155,11 +1162,11 @@ class DAO(object):
             return self.cursor
         if not is_new and not os.access(self.db_f_name, os.F_OK | os.R_OK):
             return None
-        for i in range(self.N_CONNECT_TRIES):
+        for _ in range(self.N_CONNECT_TRIES):
             try:
                 self.conn = sqlite3.connect(self.db_f_name)
                 self.cursor = self.conn.cursor()
-            except sqlite3.OperationalError as e:
+            except sqlite3.OperationalError:
                 sleep(self.CONNECT_RETRY_DELAY)
                 self.conn = None
                 self.cursor = None
@@ -1171,16 +1178,16 @@ class DAO(object):
         """Execute a statement. Return the cursor."""
         if stmt_args is None:
             stmt_args = []
-        for i in range(self.N_CONNECT_TRIES):
+        for _ in range(self.N_CONNECT_TRIES):
             if self.connect() is None:
                 return []
             try:
                 self.cursor.execute(stmt, stmt_args)
-            except sqlite3.OperationalError as e:
+            except sqlite3.OperationalError:
                 sleep(self.CONNECT_RETRY_DELAY)
                 self.conn = None
                 self.cursor = None
-            except sqlite3.ProgrammingError as e:
+            except sqlite3.ProgrammingError:
                 self.conn = None
                 self.cursor = None
             else:
