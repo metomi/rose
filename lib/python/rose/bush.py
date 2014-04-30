@@ -243,9 +243,9 @@ class Root(object):
                 "entries": []}
         if os.path.isdir(user_suite_dir_root):
             for name in os.listdir(user_suite_dir_root):
-                suite_conf = os.path.join(user_suite_dir_root, name,
-                                          self.suite_engine_proc.SUITE_CONF)
-                if not os.path.exists(suite_conf):
+                job_logs_db = os.path.join(user_suite_dir_root, name,
+                                          self.suite_engine_proc.JOB_LOGS_DB)
+                if not os.path.exists(job_logs_db):
                     continue
                 suite_db = os.path.join(user_suite_dir_root, name,
                                         self.suite_engine_proc.SUITE_DB)
