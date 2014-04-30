@@ -866,15 +866,15 @@ class CylcProcessor(SuiteEngineProcessor):
         suite_rc_processed = os.path.join(suite_dir, "suite.rc.processed")
         old_suite_rc_processed = None
         if os.path.exists(suite_rc_processed):
-            handle, old_suite_rc_processed = mkstemp(
+            f_desc, old_suite_rc_processed = mkstemp(
                                                 dir=suite_dir,
                                                 prefix="suite.rc.processed.")
-            handle.close()
+            os.close(f_desc)
             os.rename(suite_rc_processed, old_suite_rc_processed)
         try:
             self.popen.run_simple(*command, stdout_level=Event.V)
             return (old_suite_rc_processed and
-                    filecmp.cmp(old_suite_rc_processed. suite_rc_processed))
+                    filecmp.cmp(old_suite_rc_processed, suite_rc_processed))
         finally:
             if old_suite_rc_processed:
                 os.unlink(old_suite_rc_processed)

@@ -42,7 +42,8 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                 not s_node.value):
                 continue
             target = s_key[len(self.PREFIX):]
-            if not os.access(target, os.F_OK | os.R_OK | os.W_OK):
+            source = os.path.join(conf_tree.files[target], target)
+            if not os.access(source, os.F_OK | os.R_OK | os.W_OK):
                 continue
             tmp_file = NamedTemporaryFile()
             tmp_file.write("#!" + self.SCHEME + "\n")
@@ -58,7 +59,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
             tmp_file.write(self.MSG_DONE)
             line_n = 0
             is_in_old_insert = False
-            for line in open(os.path.join(conf_tree.files[target], target)):
+            for line in open(source):
                 line_n += 1
                 if line_n == 1 and line.rstrip().lower() == "#!" + self.SCHEME:
                     continue
