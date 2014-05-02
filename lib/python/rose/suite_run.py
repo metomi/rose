@@ -35,7 +35,6 @@ from rose.resource import ResourceLocator
 from rose.run import ConfigValueError, NewModeError, Runner
 from rose.run_source_vc import write_source_vc_info
 from rose.suite_clean import SuiteRunCleaner
-from rose.suite_engine_proc import StillRunningError
 import socket
 import sys
 import tarfile
@@ -192,10 +191,7 @@ class SuiteRunner(Runner):
                 raise NotRunningError(suite_name)
             hosts = suite_run_hosts
         else:
-            reason = self.suite_engine_proc.is_suite_running(
-                        None, suite_name, hosts)
-            if reason:
-                raise StillRunningError(suite_name, reason)
+            self.suite_engine_proc.check_suite_not_running(suite_name, hosts)
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)

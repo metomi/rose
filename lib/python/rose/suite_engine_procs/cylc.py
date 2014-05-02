@@ -639,22 +639,19 @@ class CylcProcessor(SuiteEngineProcessor):
     def is_suite_running(self, user_name, suite_name, hosts=None):
         """Return the port file path if it looks like suite is running.
 
-        If port file exists, return "PORT-FILE-PATH".
-        If port file exists on a host, return "HOSTNAME:PORT-FILE-PATH".
-        If no port file but process exists on a host return:
-            "process running for this suite on HOSTNAME"
-        Or None otherwise.
+        If pgrep "cylc-{run,restart} suite_name",
+        return (host, "process", pid).
+
+        If port file exists,
+        return (host, "port-file", "/path/to/.cylc/ports/suite_name").
+
+        Return () otherwise.
 
         """
         if not hosts:
             hosts = ["localhost"]
-        prefix = "~"
-        if user_name:
-            prefix += user_name
-        port_file = os.path.join(prefix, ".cylc", "ports", suite_name)
-        if ("localhost" in hosts and
-            os.path.exists(os.path.expanduser(port_file))):
-            return port_file
+
+        # localhost pgrep
         if user_name is None:
             user_name = pwd.getpwuid(os.getuid()).pw_name
         pgrep = ["pgrep", "-f", "-l", "-u", user_name,
@@ -663,8 +660,14 @@ class CylcProcessor(SuiteEngineProcessor):
         if ret_code == 0:
             for line in out.splitlines():
                 if suite_name in line.split():
-                    return "localhost:process=" + line
+                    return ("localhost", "process", line)
+
+        # remote hosts pgrep and ls port file
         host_proc_dict = {}
+        prefix = "~"
+        if user_name:
+            prefix += user_name
+        port_file = os.path.join(prefix, ".cylc", "ports", suite_name)
         opt_user = "-u `whoami`"
         if user_name:
             opt_user = "-u " + user_name
@@ -672,12 +675,11 @@ class CylcProcessor(SuiteEngineProcessor):
             if host == "localhost":
                 continue
             cmd = self.popen.get_cmd("ssh", host,
-                                     "ls " + port_file +
-                                     " || pgrep -f -l " + opt_user +
+                                     "pgrep -f -l " + opt_user +
                                      " 'python.*cylc-(run|restart).*\\<" +
-                                     suite_name + "\\>'")
+                                     suite_name + "\\>' || ls " + port_file)
             host_proc_dict[host] = self.popen.run_bg(*cmd)
-        reason = None
+        reason = ()
         while host_proc_dict:
             for host, proc in host_proc_dict.items():
                 ret_code = proc.poll()
@@ -686,10 +688,31 @@ class CylcProcessor(SuiteEngineProcessor):
                     if ret_code == 0:
                         out = proc.communicate()[0]
                         for line in out.splitlines():
-                            if suite_name in line.split():
-                                reason = host + ":" + line
+                            cols = line.split()
+                            if suite_name in cols:
+                                if cols[0].isdigit():
+                                    reason = (host, "process", line)
+                                else:
+                                    reason = (host, "port-file", line)
+                                break
+                        if reason:
+                            break
+            if reason:
+                for proc in host_proc_dict.values():
+                    proc.kill()
+                    proc.wait()
+                break
             if host_proc_dict:
                 sleep(0.1)
+
+        if reason:
+            return reason
+
+        # localhost ls port file
+        if ("localhost" in hosts and
+            os.path.exists(os.path.expanduser(port_file))):
+            reason = ("localhost", "port-file", port_file)
+
         return reason
 
     def job_logs_archive(self, suite_name, items):

@@ -145,13 +145,21 @@ class SuiteEngineGlobalConfCompatError(Exception):
                 (engine, key, value))
 
 
-class StillRunningError(Exception):
+class SuiteStillRunningError(Exception):
 
     """An exception raised when a suite is still running."""
 
+    FMT = ("Suite \"%(suite_name)s\" may still be running.\n" +
+           "Host \"%(host)s\" has %(reason_key)s:\n" +
+           "    %(reason_value)s\n" +
+           "Try \"rose suite-shutdown %(suite_name)s\" first?")
+
     def __str__(self):
-        name, reason = self.args
-        return "%s: is still running (detected %s)" % (name, reason)
+        suite_name, host, reason_key, reason_value = self.args
+        return self.FMT % {"suite_name": suite_name,
+                           "host": host,
+                           "reason_key": reason_key,
+                           "reason_value": reason_value}
 
 
 class CycleOffsetError(ValueError):
@@ -281,6 +289,14 @@ class SuiteEngineProcessor(object):
 
         """
         raise NotImplementedError()
+
+    def check_suite_not_running(self, suite_name, hosts=None):
+        """Raise SuiteStillRunningError if suite is still running."""
+        reason = self.is_suite_running(None, suite_name, hosts)
+        if reason:
+            host, reason_key, reason_value = reason
+            raise SuiteStillRunningError(suite_name, host, reason_key,
+                                         reason_value)
 
     def clean_hook(self, suite_name=None):
         """Run suite engine dependent logic (at end of "rose suite-clean")."""
