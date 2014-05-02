@@ -128,6 +128,52 @@ class CylcProcessor(SuiteEngineProcessor):
             if os.path.islink(path) and not os.path.exists(path):
                 self.fs_util.delete(path)
 
+    def cmp_suite_conf(self, suite_name, strict_mode=False, debug_mode=False):
+        """Parse and compare current "suite.rc" with that in the previous run.
+
+        (Re-)register and validate the "suite.rc" file.
+        Raise RosePopenError on failure.
+        Return True if "suite.rc.processed" is unmodified c.f. previous run.
+        Return False otherwise.
+
+        """
+        suite_dir = self.get_suite_dir(suite_name)
+        out = self.popen.run("cylc", "get-directory", suite_name)[1]
+        suite_dir_old = None
+        if out:
+            suite_dir_old = out.strip()
+        suite_passphrase = os.path.join(suite_dir, "passphrase")
+        self.clean_hook(suite_name)
+        if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
+            self.popen.run_simple("cylc", "unregister", suite_name)
+            suite_dir_old = None
+        if suite_dir_old is None:
+            self.popen.run_simple("cylc", "register", suite_name, suite_dir)
+        passphrase_dir = os.path.join("~", ".cylc", suite_name)
+        passphrase_dir = os.path.expanduser(passphrase_dir)
+        self.fs_util.symlink(suite_dir, passphrase_dir)
+        command = ["cylc", "validate", "-v"]
+        if debug_mode:
+            command.append("--debug")
+        if strict_mode:
+            command.append("--strict")
+        command.append(suite_name)
+        suite_rc_processed = os.path.join(suite_dir, "suite.rc.processed")
+        old_suite_rc_processed = None
+        if os.path.exists(suite_rc_processed):
+            f_desc, old_suite_rc_processed = mkstemp(
+                                                dir=suite_dir,
+                                                prefix="suite.rc.processed.")
+            os.close(f_desc)
+            os.rename(suite_rc_processed, old_suite_rc_processed)
+        try:
+            self.popen.run_simple(*command, stdout_level=Event.V)
+            return (old_suite_rc_processed and
+                    filecmp.cmp(old_suite_rc_processed, suite_rc_processed))
+        finally:
+            if old_suite_rc_processed:
+                os.unlink(old_suite_rc_processed)
+
     def gcontrol(self, suite_name, host=None, engine_version=None, args=None):
         """Launch control GUI for a suite_name running at a host."""
         if not self.is_suite_registered(suite_name):
@@ -833,52 +879,6 @@ class CylcProcessor(SuiteEngineProcessor):
                 dao.execute(stmt, stmt_args)
         dao.commit()
         dao.close()
-
-    def parse_suite_conf(self, suite_name, strict_mode=False,
-                         debug_mode=False):
-        """(Re-)register and validate the "suite.rc" file.
-
-        Raise RosePopenError on failure.
-        Return True if "suite.rc.processed" is unmodified c.f. previous run.
-        Return False otherwise.
-
-        """
-        suite_dir = self.get_suite_dir(suite_name)
-        out = self.popen.run("cylc", "get-directory", suite_name)[1]
-        suite_dir_old = None
-        if out:
-            suite_dir_old = out.strip()
-        suite_passphrase = os.path.join(suite_dir, "passphrase")
-        self.clean_hook(suite_name)
-        if suite_dir_old != suite_dir or not os.path.exists(suite_passphrase):
-            self.popen.run_simple("cylc", "unregister", suite_name)
-            suite_dir_old = None
-        if suite_dir_old is None:
-            self.popen.run_simple("cylc", "register", suite_name, suite_dir)
-        passphrase_dir = os.path.join("~", ".cylc", suite_name)
-        passphrase_dir = os.path.expanduser(passphrase_dir)
-        self.fs_util.symlink(suite_dir, passphrase_dir)
-        command = ["cylc", "validate", "-v"]
-        if debug_mode:
-            command.append("--debug")
-        if strict_mode:
-            command.append("--strict")
-        command.append(suite_name)
-        suite_rc_processed = os.path.join(suite_dir, "suite.rc.processed")
-        old_suite_rc_processed = None
-        if os.path.exists(suite_rc_processed):
-            f_desc, old_suite_rc_processed = mkstemp(
-                                                dir=suite_dir,
-                                                prefix="suite.rc.processed.")
-            os.close(f_desc)
-            os.rename(suite_rc_processed, old_suite_rc_processed)
-        try:
-            self.popen.run_simple(*command, stdout_level=Event.V)
-            return (old_suite_rc_processed and
-                    filecmp.cmp(old_suite_rc_processed, suite_rc_processed))
-        finally:
-            if old_suite_rc_processed:
-                os.unlink(old_suite_rc_processed)
 
     def ping(self, suite_name, hosts=None, timeout=10):
         """Return a list of host names where suite_name is running."""

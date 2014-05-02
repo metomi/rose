@@ -286,6 +286,17 @@ class SuiteEngineProcessor(object):
         """Run suite engine dependent logic (at end of "rose suite-clean")."""
         raise NotImplementedError()
 
+    def cmp_suite_conf(self, suite_name, strict_mode=False, debug_mode=False):
+        """Compare current suite configuration with that in the previous run.
+
+        An implementation of this method should:
+        * Raise an exception on failure.
+        * Return True if suite configuration is unmodified c.f. previous run.
+        * Return False otherwise.
+
+        """
+        raise NotImplementedError()
+
     def get_cycle_items_globs(self, name, cycle):
         """Return a glob to match named items created for a given cycle.
 
@@ -568,18 +579,6 @@ class SuiteEngineProcessor(object):
         w.open(url, new=True, autoraise=True)
         self.handle_event(WebBrowserEvent(w.name, url))
         return url
-
-    def parse_suite_conf(self, suite_name, strict_mode=False,
-                         debug_mode=False):
-        """Ask suite engine to parse suite configuration.
-
-        An implementation of this method should:
-        * Raise an exception on failure.
-        * Return True if suite configuration is unmodified c.f. previous run.
-        * Return False otherwise.
-
-        """
-        raise NotImplementedError()
 
     def ping(self, suite_name, host_names=None, timeout=10):
         """Return a list of host names where suite_name is running."""
