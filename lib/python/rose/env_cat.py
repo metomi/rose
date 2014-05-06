@@ -29,6 +29,7 @@ def main():
     """Implement "rose env-cat"."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("unbound")
+    opt_parser.add_my_options("braced_only")
     opts, args = opt_parser.parse_args()
     if not args:
         args = ["-"]
@@ -44,7 +45,7 @@ def main():
             if not line:
                 break
             try:
-                sys.stdout.write(env_var_process(line, opts.unbound))
+                sys.stdout.write(env_var_process(line, opts.unbound, opts.braced_only))
             except UnboundEnvironmentVariableError as e:
                 name = arg
                 if arg == "-":

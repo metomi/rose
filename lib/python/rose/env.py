@@ -95,7 +95,7 @@ def env_var_escape(s):
     return ret
 
 
-def env_var_process(s, unbound=None):
+def env_var_process(s, unbound=None, braced_only=False):
     """Substitute environment variables into a string.
 
     For each $NAME and ${NAME} in "s", substitute with the value
@@ -116,13 +116,15 @@ def env_var_process(s, unbound=None):
                 m["brace_open"] = ""
             symbol = m["sigil"] + m["brace_open"] + m["name"] + m["brace_close"]
             substitute = symbol
-            if len(m["escape"]) % 2 == 0:
-                if os.environ.has_key(m["name"]):
-                    substitute = os.environ[m["name"]]
-                elif unbound is not None:
-                    substitute = str(unbound)
-                else:
-                    raise UnboundEnvironmentVariableError(m["name"])
+
+            if (braced_only and m["brace_open"]) or not braced_only:
+                if len(m["escape"]) % 2 == 0:
+                    if os.environ.has_key(m["name"]):
+                        substitute = os.environ[m["name"]]
+                    elif unbound is not None:
+                        substitute = str(unbound)
+                    else:
+                        raise UnboundEnvironmentVariableError(m["name"])
             ret += m["head"] + m["escape"][0 : len(m["escape"]) / 2] + substitute
             tail = m["tail"]
         else:

@@ -67,6 +67,12 @@ class RoseOptionParser(OptionParser):
                         "default": False,
                         "dest": "type",
                         "help": "Automatically guess types of settings."}],
+               "braced_only": [
+                       ["--braced-only"],
+                       {"action": "store_true",
+                        "default": False,
+                        "dest": "braced_only",
+                        "help": "Only replace entries surrounded by braces."}],
                "case_mode": [
                        ["--case"],
                        {"action": "store",
