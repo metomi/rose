@@ -26,17 +26,23 @@
 # DESCRIPTION
 #     Run the Rose test battery.
 #
-#     Change to $ROSE_HOME/t and run the "prove" command. If no argument is
-#     specified, run "prove -j 9 -r -s".
+#     Change to $ROSE_HOME. Run the "prove" command with the specified
+#     arguments. If no argument is specified and "rose config t prove-options"
+#     returns 0, run "prove $(rose config t prove-options) -r t". Otherwise,
+#     run "prove -j 9 -s -r t".
 #
 # SEE ALSO
 #     prove(1)
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
 rose_init
-cd $ROSE_HOME/t
-if (($# == 0)); then
-    exec prove -j 9 -r -s
-else
-    exec prove "$@"
+if [[ $ROSE_HOME != $(rose_readlink_canonicalize .) ]]; then
+    cd $ROSE_HOME
 fi
+if (($# > 0)); then
+    exec prove "$@" || exit $?
+fi
+if PROVE_OPTIONS=$(rose config t prove-options); then
+    exec prove $PROVE_OPTIONS -r t || exit $?
+fi
+exec prove -j 9 -s -r t
