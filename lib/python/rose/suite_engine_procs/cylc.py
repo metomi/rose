@@ -83,6 +83,8 @@ class CylcProcessor(SuiteEngineProcessor):
             "name ASC, cycle DESC, task_events.submit_num DESC",
             "name_desc_cycle_desc":
             "name DESC, cycle DESC, task_events.submit_num DESC"}
+    REASON_KEY_PROC = "process"
+    REASON_KEY_FILE = "port-file"
     REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     SCHEME = "cylc"
@@ -660,7 +662,9 @@ class CylcProcessor(SuiteEngineProcessor):
         if ret_code == 0:
             for line in out.splitlines():
                 if suite_name in line.split():
-                    return ("localhost", "process", line)
+                    return [{"host": "localhost",
+                             "reason_key": self.REASON_KEY_PROC,
+                             "reason_value": line}]
 
         # remote hosts pgrep and ls port file
         host_proc_dict = {}
@@ -674,46 +678,54 @@ class CylcProcessor(SuiteEngineProcessor):
         for host in sorted(hosts):
             if host == "localhost":
                 continue
-            cmd = self.popen.get_cmd("ssh", host,
+            cmd = self.popen.get_cmd("ssh",
+                                     "-oConnectTimeout=%d" % self.TIMEOUT,
+                                     host,
                                      "pgrep -f -l " + opt_user +
                                      " 'python.*cylc-(run|restart).*\\<" +
                                      suite_name + "\\>' || ls " + port_file)
             host_proc_dict[host] = self.popen.run_bg(*cmd)
-        reason = ()
+        proc_reasons = []
+        file_reasons = []
         while host_proc_dict:
             for host, proc in host_proc_dict.items():
                 ret_code = proc.poll()
-                if ret_code is not None:
-                    host_proc_dict.pop(host)
-                    if ret_code == 0:
-                        out = proc.communicate()[0]
-                        for line in out.splitlines():
-                            cols = line.split()
-                            if suite_name in cols:
-                                if cols[0].isdigit():
-                                    reason = (host, "process", line)
-                                else:
-                                    reason = (host, "port-file", line)
-                                break
-                        if reason:
-                            break
-            if reason:
-                for proc in host_proc_dict.values():
-                    proc.kill()
-                    proc.wait()
-                break
+                if ret_code is None:
+                    continue
+                host_proc_dict.pop(host)
+                if ret_code != 0:
+                    continue
+                out = proc.communicate()[0]
+                for line in out.splitlines():
+                    cols = line.split()
+                    if suite_name in cols:
+                        if cols[0].isdigit():
+                            proc_reasons.append({
+                                        "host": host,
+                                        "reason_key": self.REASON_KEY_PROC,
+                                        "reason_value": line})
+                        else:
+                            file_reasons.append({
+                                        "host": host,
+                                        "reason_key": self.REASON_KEY_FILE,
+                                        "reason_value": line})
+                        break
             if host_proc_dict:
                 sleep(0.1)
 
-        if reason:
-            return reason
+        if proc_reasons:
+            return proc_reasons
 
         # localhost ls port file
+        # N.B. This logic means that on shared file systems, only the localhost
+        #      port file is reported.
         if ("localhost" in hosts and
-            os.path.exists(os.path.expanduser(port_file))):
-            reason = ("localhost", "port-file", port_file)
+                os.path.exists(os.path.expanduser(port_file))):
+            return [{"host":"localhost",
+                     "reason_key": self.REASON_KEY_FILE,
+                     "reason_value": port_file}]
 
-        return reason
+        return file_reasons
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
