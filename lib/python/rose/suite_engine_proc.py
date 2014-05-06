@@ -286,6 +286,17 @@ class SuiteEngineProcessor(object):
         """Run suite engine dependent logic (at end of "rose suite-clean")."""
         raise NotImplementedError()
 
+    def cmp_suite_conf(self, suite_name, strict_mode=False, debug_mode=False):
+        """Compare current suite configuration with that in the previous run.
+
+        An implementation of this method should:
+        * Raise an exception on failure.
+        * Return True if suite configuration is unmodified c.f. previous run.
+        * Return False otherwise.
+
+        """
+        raise NotImplementedError()
+
     def get_cycle_items_globs(self, name, cycle):
         """Return a glob to match named items created for a given cycle.
 
@@ -542,8 +553,7 @@ class SuiteEngineProcessor(object):
         """Create the job logs database."""
         raise NotImplementedError()
 
-    def job_logs_pull_remote(self, suite_name, items=None,
-                             prune_remote_mode=False):
+    def job_logs_pull_remote(self, suite_name, items, prune_remote_mode=False):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
@@ -570,12 +580,8 @@ class SuiteEngineProcessor(object):
         self.handle_event(WebBrowserEvent(w.name, url))
         return url
 
-    def ping(self, suite_name, host_names=None):
+    def ping(self, suite_name, host_names=None, timeout=10):
         """Return a list of host names where suite_name is running."""
-        raise NotImplementedError()
-
-    def process_task_hook_args(self, *args, **kwargs):
-        """Rearrange args for TaskHook.run. Return the rearranged list."""
         raise NotImplementedError()
 
     def run(self, suite_name, host=None, host_environ=None, restart_mode=False,
@@ -595,12 +601,9 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def shutdown(self, suite_name, host=None, engine_version=None, args=None):
+    def shutdown(self, suite_name, host=None, engine_version=None, args=None,
+                 stderr=None, stdout=None):
         """Shut down the suite."""
-        raise NotImplementedError()
-
-    def validate(self, suite_name, strict_mode=False):
-        """Validate a suite."""
         raise NotImplementedError()
 
     def _get_offset_cycle_time(self, cycle, cycle_offset):
