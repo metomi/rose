@@ -37,14 +37,14 @@
 #     prove(1)
 #-------------------------------------------------------------------------------
 . $(dirname $0)/../lib/bash/rose_init
+. $(dirname $0)/../lib/bash/rose_log
 rose_init
 if [[ $ROSE_HOME != $(rose_readlink_canonicalize .) ]]; then
+    info 1 cd $ROSE_HOME
     cd $ROSE_HOME
 fi
-if (($# > 0)); then
-    exec prove -r "$@" || exit $?
-fi
 if PROVE_OPTIONS=$(rose config t prove-options); then
-    exec prove $PROVE_OPTIONS -r t || exit $?
+    exec prove $PROVE_OPTIONS -r "${@:-t}"
+else
+    exec prove -j 9 -s -r "${@:-t}"
 fi
-exec prove -j 9 -s -r t
