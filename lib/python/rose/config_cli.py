@@ -60,7 +60,8 @@ def main():
     """Implement the "rose config" command."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options("default", "env_var_process_mode", "files",
-                              "keys", "meta", "meta_key", "no_ignore", "no_opts")
+                              "keys", "meta", "meta_key", "no_ignore",
+                              "no_opts", "print_conf_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -131,9 +132,9 @@ def main():
             source.close()
 
     if opts.quietness:
-        if root_node.get(args, opts.no_ignore) is None:
-            sys.exit(1)
-    elif opts.keys_mode:
+        sys.exit(root_node.get(args, opts.no_ignore) is None)
+
+    if opts.keys_mode:
         try:
             keys = root_node.get(args, opts.no_ignore).value.keys()
         except:
@@ -141,33 +142,48 @@ def main():
         keys.sort()
         for key in keys:
             print key
-    elif len(args) == 0:
-        ConfigDumper()(root_node)
+        sys.exit()
+
+    conf_dump = ConfigDumper()
+    if len(args) == 0:
+        conf_dump(root_node, concat_mode=opts.print_conf_mode)
+        sys.exit()
+
+    node = root_node.get(args, opts.no_ignore)
+
+    if node is not None and isinstance(node.value, dict):
+        if opts.print_conf_mode:
+            conf_dump(ConfigNode().set(args, node.value), concat_mode=True)
+            sys.exit()
+
+        keys = node.value.keys()
+        keys.sort()
+        for key in keys:
+            node_of_key = node.get([key], opts.no_ignore)
+            if node_of_key:
+                value = node_of_key.value
+                state = node_of_key.state
+                string = "%s%s=%s" % (state, key, value)
+                lines = string.splitlines()
+                print lines[0]
+                i_equal = len(state + key) + 1
+                for line in lines[1:]:
+                    print " " * i_equal + line
+        sys.exit()
+
+    if node is None:
+        if opts.default is None:
+            sys.exit(1)
+        value = opts.default
+    elif opts.env_var_process_mode:
+        value = env_var_process(node.value)
     else:
-        node = root_node.get(args, opts.no_ignore)
-        if node is not None and isinstance(node.value, dict):
-            keys = node.value.keys()
-            keys.sort()
-            for key in keys:
-                node_of_key = node.get([key], opts.no_ignore)
-                if node_of_key:
-                    value = node_of_key.value
-                    state = node_of_key.state
-                    string = "%s%s=%s" % (state, key, value)
-                    lines = string.splitlines()
-                    print lines[0]
-                    i_equal = len(state + key) + 1
-                    for line in lines[1:]:
-                        print " " * i_equal + line
-        elif node is None:
-            if opts.default is None:
-                sys.exit(1)
-            print opts.default
-        else:
-            value = node.value
-            if opts.env_var_process_mode:
-                value = env_var_process(value)
-            print value
+        value = node.value
+    if opts.print_conf_mode:
+        conf_dump(ConfigNode().set(args, value), concat_mode=True)
+    else:
+        print value
+    sys.exit()
 
 
 if __name__ == "__main__":

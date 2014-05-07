@@ -47,7 +47,7 @@ my-home=$HOME
 colour=green
 __CONF__
 #-------------------------------------------------------------------------------
-tests 51
+tests 69
 #-------------------------------------------------------------------------------
 # Empty file.
 TEST_KEY=$TEST_KEY_BASE-empty
@@ -124,12 +124,34 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
+# Value at root level, print-conf.
+TEST_KEY=$TEST_KEY_BASE-value-root--print-conf
+setup
+run_pass "$TEST_KEY" rose config -f $FILE --print-conf greeting
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[]
+greeting=Hello
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
 # Value.
 TEST_KEY=$TEST_KEY_BASE-value
 setup
 run_pass "$TEST_KEY" rose config -f $FILE bus colour
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 red
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Value.
+TEST_KEY=$TEST_KEY_BASE-value--print-conf
+setup
+run_pass "$TEST_KEY" rose config -f $FILE --print-conf bus colour
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[bus]
+colour=red
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -152,6 +174,17 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
+# Value, ignored, default, --print-conf
+TEST_KEY=$TEST_KEY_BASE-value-ignored-default--print-conf
+setup
+run_pass "$TEST_KEY" rose config -f $FILE --default=-na- --print-conf taxi decks
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[taxi]
+decks=-na-
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
 # Value, ignored, print.
 TEST_KEY=$TEST_KEY_BASE-value-ignored-print
 setup
@@ -170,12 +203,32 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
 #-------------------------------------------------------------------------------
+# Value, no-such-item.
+TEST_KEY=$TEST_KEY_BASE-value-no-such-item--print-conf
+setup
+run_fail "$TEST_KEY" rose config -f $FILE --print-conf taxi oyster
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
 # Value, no-such-item, default.
 TEST_KEY=$TEST_KEY_BASE-value-no-such-item-default
 setup
 run_pass "$TEST_KEY" rose config -f $FILE --default=false taxi oyster
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 false
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Value, no-such-item, default, --print-conf.
+TEST_KEY=$TEST_KEY_BASE-value-no-such-item-default--print-conf
+setup
+run_pass "$TEST_KEY" \
+    rose config -f $FILE --print-conf --default=false taxi oyster
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[taxi]
+oyster=false
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
@@ -233,6 +286,19 @@ setup
 run_pass "$TEST_KEY" rose config -f $FILE taxi
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 colour=black
+name=Hackney Carriage
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Non-ignored keys
+TEST_KEY=$TEST_KEY_BASE-section-with-ignored-option--print-conf
+setup
+run_pass "$TEST_KEY" rose config -f $FILE --print-conf taxi
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[taxi]
+colour=black
+!decks=1
 name=Hackney Carriage
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null

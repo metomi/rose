@@ -362,6 +362,11 @@ class RoseOptionParser(OptionParser):
                        ["--prefix-delim"],
                        {"metavar": "DELIMITER",
                         "help": "Specify the prefix delimiter."}],
+               "print_conf_mode": [
+                       ["--print-conf"],
+                       {"action": "store_true",
+                        "dest": "print_conf_mode",
+                        "help": "Print result in Rose configuration format."}],
                "print_format": [
                        ["--print-format", "--format", "-f"],
                        {"metavar": "FORMAT",

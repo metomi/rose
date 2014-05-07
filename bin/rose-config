@@ -87,6 +87,10 @@
 #         Cannot be used in conjunction with --file=FILE.
 #     --no-opts
 #         Do not load optional configurations.
+#     --print-conf
+#         If specified, prints result as a Rose configuration file snippet.
+#         This allows the output to be concatenated into another Rose
+#         configuration file.
 #     --print-ignored, -i
 #         If specified, the program will print ignored !OPTION=VALUE where
 #         relevant.
