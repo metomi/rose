@@ -40,7 +40,8 @@ fi
 . $(dirname $0)/../lib/bash/rose_init
 rose_init
 
-function get_alias() {
+# Print actual command of a command alias
+get_alias() {
     local NAME=$1
     local ALIAS=$(sed '/^#/d' $ROSE_HOME_BIN/$ROSE_NS-$NAME || true)
     if [[ $(wc -l <<<"$ALIAS") == 1 ]] \
@@ -52,7 +53,8 @@ function get_alias() {
     fi
 }
 
-function help_util() {
+# Print help for a given utility
+help_util() {
     local NAME=$1
     local COMMAND=$ROSE_HOME_BIN/$ROSE_NS-$NAME
     if [[ ! -r $COMMAND ]]; then
@@ -78,6 +80,29 @@ function help_util() {
     return
 }
 
+# Ensure that ITEM_STR is at the beginning of PATH_STR
+path_lead() {
+    local PATH_STR=$1
+    local ITEM_STR=$2
+    if [[ -z ${PATH_STR:-} ]]; then
+        echo "$ITEM_STR"
+    elif [[ "$PATH_STR" != "$ITEM_STR" && "$PATH_STR" != $ITEM_STR:* ]]; then
+        while [[ "$PATH_STR" == *:$ITEM_STR ]]; do
+            PATH_STR=${PATH_STR%:$ITEM_STR}
+        done
+        while [[ "$PATH_STR" == *:$ITEM_STR:* ]]; do
+            local PATH_HEAD=${PATH_STR%:$ITEM_STR:*}
+            local PATH_TAIL=${PATH_STR##*:$ITEM_STR:}
+            PATH_STR="$PATH_HEAD:$PATH_TAIL"
+        done
+        echo "$ITEM_STR:$PATH_STR"
+    else
+        echo "$PATH_STR"
+    fi
+}
+
+
+# Print Rose version
 function print_version() {
     echo "Rose $ROSE_VERSION ($ROSE_HOME)"
 }
@@ -137,14 +162,8 @@ if (($# > 0)) && [[ $1 == '--help' || $1 == '-h' ]]; then
     help_util $UTIL
     exit
 fi
-if [[ ${PATH:-} != *$ROSE_HOME_BIN:* ]]; then
-    PATH=$ROSE_HOME_BIN:${PATH:-}
-    export PATH
-fi
-if [[ ${PYTHONPATH:-} != *$ROSE_HOME/lib/python:* ]]; then
-    PYTHONPATH=$ROSE_HOME/lib/python:${PYTHONPATH:-}
-    export PYTHONPATH
-fi
+PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
+PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
 ROSE_UTIL=$UTIL
-export ROSE_UTIL
+export PATH PYTHONPATH ROSE_UTIL
 exec $COMMAND "$@"
