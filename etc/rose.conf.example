@@ -260,4 +260,11 @@
 #  job-host-with-share=HOST
 ## E.g.:
 #  job-host-with-share=my-cluster01
+#
+## Options for "prove" when calling "rose test-battery" with no arguments.
+## (default="-j9 -s")
+## Note that "-r t" is automatically added to the end of the command line.
+#  prove-options=PROVE-OPTIONS ...
+## E.g.:
+#  prove-options=-j 6 -s
 [t]
