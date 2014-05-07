@@ -2241,9 +2241,23 @@ environment scripting = "eval $(rose task-env)"
 
     <p>Run the Rose test battery.</p>
 
-    <p>Change to <var>$ROSE_HOME/t</var> and run the <code>prove</code>
-    command. If no argument is specified, run <code>prove -j 9 -r
-    -s</code>.</p>
+    <ol>
+      <li>Change to <var>$ROSE_HOME</var>.</li>
+      
+      <li>
+        <p>With arguments, exec <code>prove -r</code> with the specified
+        arguments.</p>
+
+        <p>With no arguments:</p>
+
+        <ul>
+          <li>If <code>rose config t prove-options</code> returns 0, exec
+          <code>prove $(rose config t prove-options) -r t</code>.</li>
+
+          <li>Otherwise, exec <code>prove -j 9 -s -r t</code>.</li>
+        </ul>
+      </li>
+    </ol>
 
     <h3>SEE ALSO</h3>
 
