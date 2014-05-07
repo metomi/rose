@@ -47,8 +47,10 @@ TIME_OUT=$(($(date +%s) + 120))
 GREP="grep -q CYLC_JOB_EXIT= ~/cylc-run/$NAME/log/job/my_task_1.1.1.status"
 if [[ -n $HOST ]]; then
     CMD_PREFIX="ssh -oBatchMode=yes $HOST"
+    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run.*\\<$NAME\\>'")
 else
     CMD_PREFIX=eval
+    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>")
 fi
 while ! $CMD_PREFIX "$GREP" 2>/dev/null; do
     if (($(date +%s) > $TIME_OUT)); then
@@ -61,9 +63,12 @@ ERR_HOST=${HOST:-localhost}
 run_fail "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     $OPT_HOST --no-gcontrol
-file_grep "$TEST_KEY.err" \
-    '\[FAIL\] '$NAME': is still running (detected '$ERR_HOST \
-    "$TEST_KEY.err"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
+[FAIL] Suite "$NAME" may still be running.
+[FAIL] Host "${HOST:-localhost}" has process:
+[FAIL]     $SUITE_PROC
+[FAIL] Try "rose suite-shutdown $NAME" first?
+__ERR__
 run_pass "$TEST_KEY.NAME1" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=${NAME}1 \
     $OPT_HOST --no-gcontrol
@@ -77,7 +82,8 @@ $CMD_PREFIX "mv $NAME.port ~/.cylc/ports/$NAME"
 SHUTDOWN_OPTS='--kill --max-polls=24 --interval=5'
 for N in $NAME ${NAME}1 ${NAME%?}; do
     if $CMD_PREFIX test -f ~/.cylc/ports/$N; then
-        rose suite-shutdown --debug -q -y -n $N -- $SHUTDOWN_OPTS 2>/dev/null
+        rose suite-shutdown --debug -q -y -n $N \
+            -- $SHUTDOWN_OPTS 1>/dev/null 2>&1
     fi
 done
 rose suite-clean --debug -q -y $NAME ${NAME}1 ${NAME%?}

@@ -34,7 +34,10 @@ run_fail "$TEST_KEY" \
     --no-gcontrol
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is still running (detected ~/.cylc/ports/$NAME)
+[FAIL] Suite "$NAME" may still be running.
+[FAIL] Host "localhost" has port-file:
+[FAIL]     ~$USER/.cylc/ports/$NAME
+[FAIL] Try "rose suite-shutdown $NAME" first?
 __ERR__
 #-------------------------------------------------------------------------------
 rm $HOME/.cylc/ports/$NAME

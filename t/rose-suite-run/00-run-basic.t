@@ -44,6 +44,12 @@ TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 while [[ ! -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
     sleep 1
 done
+if [[ $HOST == 'localhost' ]]; then
+    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>")
+else
+    CMD_PREFIX="ssh -oBatchMode=yes $HOST"
+    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run.*\\<$NAME\\>'")
+fi
 #-------------------------------------------------------------------------------
 # "rose suite-run" should not work while suite is running.
 # except --reload mode.
@@ -52,7 +58,10 @@ for OPTION in -i -l '' --restart; do
     run_fail "$TEST_KEY" rose suite-run $OPTION \
         -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $NAME: is still running (detected ~/.cylc/ports/$NAME)
+[FAIL] Suite "$NAME" may still be running.
+[FAIL] Host "${HOST:-localhost}" has process:
+[FAIL]     $SUITE_PROC
+[FAIL] Try "rose suite-shutdown $NAME" first?
 __ERR__
 done
 # Don't reload until tasks begin

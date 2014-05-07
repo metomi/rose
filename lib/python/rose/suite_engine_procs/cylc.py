@@ -83,6 +83,8 @@ class CylcProcessor(SuiteEngineProcessor):
             "name ASC, cycle DESC, task_events.submit_num DESC",
             "name_desc_cycle_desc":
             "name DESC, cycle DESC, task_events.submit_num DESC"}
+    REASON_KEY_PROC = "process"
+    REASON_KEY_FILE = "port-file"
     REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     SCHEME = "cylc"
@@ -639,22 +641,19 @@ class CylcProcessor(SuiteEngineProcessor):
     def is_suite_running(self, user_name, suite_name, hosts=None):
         """Return the port file path if it looks like suite is running.
 
-        If port file exists, return "PORT-FILE-PATH".
-        If port file exists on a host, return "HOSTNAME:PORT-FILE-PATH".
-        If no port file but process exists on a host return:
-            "process running for this suite on HOSTNAME"
-        Or None otherwise.
+        If pgrep "cylc-{run,restart} suite_name",
+        return (host, "process", pid).
+
+        If port file exists,
+        return (host, "port-file", "/path/to/.cylc/ports/suite_name").
+
+        Return () otherwise.
 
         """
         if not hosts:
             hosts = ["localhost"]
-        prefix = "~"
-        if user_name:
-            prefix += user_name
-        port_file = os.path.join(prefix, ".cylc", "ports", suite_name)
-        if ("localhost" in hosts and
-            os.path.exists(os.path.expanduser(port_file))):
-            return port_file
+
+        # localhost pgrep
         if user_name is None:
             user_name = pwd.getpwuid(os.getuid()).pw_name
         pgrep = ["pgrep", "-f", "-l", "-u", user_name,
@@ -663,34 +662,70 @@ class CylcProcessor(SuiteEngineProcessor):
         if ret_code == 0:
             for line in out.splitlines():
                 if suite_name in line.split():
-                    return "localhost:process=" + line
+                    return [{"host": "localhost",
+                             "reason_key": self.REASON_KEY_PROC,
+                             "reason_value": line}]
+
+        # remote hosts pgrep and ls port file
         host_proc_dict = {}
+        prefix = "~"
+        if user_name:
+            prefix += user_name
+        port_file = os.path.join(prefix, ".cylc", "ports", suite_name)
         opt_user = "-u `whoami`"
         if user_name:
             opt_user = "-u " + user_name
         for host in sorted(hosts):
             if host == "localhost":
                 continue
-            cmd = self.popen.get_cmd("ssh", host,
-                                     "ls " + port_file +
-                                     " || pgrep -f -l " + opt_user +
+            cmd = self.popen.get_cmd("ssh",
+                                     "-oConnectTimeout=%d" % self.TIMEOUT,
+                                     host,
+                                     "pgrep -f -l " + opt_user +
                                      " 'python.*cylc-(run|restart).*\\<" +
-                                     suite_name + "\\>'")
+                                     suite_name + "\\>' || ls " + port_file)
             host_proc_dict[host] = self.popen.run_bg(*cmd)
-        reason = None
+        proc_reasons = []
+        file_reasons = []
         while host_proc_dict:
             for host, proc in host_proc_dict.items():
                 ret_code = proc.poll()
-                if ret_code is not None:
-                    host_proc_dict.pop(host)
-                    if ret_code == 0:
-                        out = proc.communicate()[0]
-                        for line in out.splitlines():
-                            if suite_name in line.split():
-                                reason = host + ":" + line
+                if ret_code is None:
+                    continue
+                host_proc_dict.pop(host)
+                if ret_code != 0:
+                    continue
+                out = proc.communicate()[0]
+                for line in out.splitlines():
+                    cols = line.split()
+                    if suite_name in cols:
+                        if cols[0].isdigit():
+                            proc_reasons.append({
+                                        "host": host,
+                                        "reason_key": self.REASON_KEY_PROC,
+                                        "reason_value": line})
+                        else:
+                            file_reasons.append({
+                                        "host": host,
+                                        "reason_key": self.REASON_KEY_FILE,
+                                        "reason_value": line})
+                        break
             if host_proc_dict:
                 sleep(0.1)
-        return reason
+
+        if proc_reasons:
+            return proc_reasons
+
+        # localhost ls port file
+        # N.B. This logic means that on shared file systems, only the localhost
+        #      port file is reported.
+        if ("localhost" in hosts and
+                os.path.exists(os.path.expanduser(port_file))):
+            return [{"host":"localhost",
+                     "reason_key": self.REASON_KEY_FILE,
+                     "reason_value": port_file}]
+
+        return file_reasons
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.

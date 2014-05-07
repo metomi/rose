@@ -27,7 +27,7 @@ from rose.host_select import HostSelector
 from rose.opt_parse import RoseOptionParser
 from rose.reporter import Event, Reporter, ReporterContext
 from rose.resource import ResourceLocator
-from rose.suite_engine_proc import SuiteEngineProcessor, StillRunningError
+from rose.suite_engine_proc import SuiteEngineProcessor
 import shlex
 import sys
 import traceback
@@ -80,9 +80,7 @@ class SuiteRunCleaner(object):
         for h in hostnames:
             if h not in hosts:
                 hosts.append(h)
-        reason = engine.is_suite_running(None, suite_name, hosts)
-        if reason:
-            raise StillRunningError(suite_name, reason)
+        self.suite_engine_proc.check_suite_not_running(suite_name, hosts)
 
         # Clean
         locs_file_path = engine.get_suite_dir(

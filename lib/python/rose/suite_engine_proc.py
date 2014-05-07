@@ -145,13 +145,22 @@ class SuiteEngineGlobalConfCompatError(Exception):
                 (engine, key, value))
 
 
-class StillRunningError(Exception):
+class SuiteStillRunningError(Exception):
 
     """An exception raised when a suite is still running."""
 
+    FMT_HEAD = "Suite \"%(suite_name)s\" may still be running.\n"
+    FMT_BODY = "Host \"%(host)s\" has %(reason_key)s:\n    %(reason_value)s\n"
+    FMT_TAIL = "Try \"rose suite-shutdown %(suite_name)s\" first?"
+
+
     def __str__(self):
-        name, reason = self.args
-        return "%s: is still running (detected %s)" % (name, reason)
+        suite_name, reasons = self.args
+        ret = self.FMT_HEAD % {"suite_name": suite_name}
+        for reason in reasons:
+            ret += self.FMT_BODY % dict(reason)
+        ret += self.FMT_TAIL % {"suite_name": suite_name}
+        return ret
 
 
 class CycleOffsetError(ValueError):
@@ -281,6 +290,12 @@ class SuiteEngineProcessor(object):
 
         """
         raise NotImplementedError()
+
+    def check_suite_not_running(self, suite_name, hosts=None):
+        """Raise SuiteStillRunningError if suite is still running."""
+        reasons = self.is_suite_running(None, suite_name, hosts)
+        if reasons:
+            raise SuiteStillRunningError(suite_name, reasons)
 
     def clean_hook(self, suite_name=None):
         """Run suite engine dependent logic (at end of "rose suite-clean")."""
@@ -537,7 +552,15 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def is_suite_running(self, user_name, suite_name, hosts=None):
-        """Return the reason if it looks like suite is running."""
+        """Return a list of reasons if it looks like suite is running.
+
+        Each reason should be a dict with the following keys:
+        * "host": the host name where the suite appears to be running on.
+        * "reason_key": a key, such as "process-id", "port-file", etc.
+        * "reason_value": the value of the reason, e.g. the process ID, the
+                          path to a port file, etc.
+
+        """
         raise NotImplementedError()
 
     def job_logs_archive(self, suite_name, items):
