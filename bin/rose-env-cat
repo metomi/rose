@@ -34,6 +34,9 @@
 #     the syntax, e.g. \$NAME or \${NAME} will escape the substitution.
 #
 # OPTIONS
+#     --braced-only
+#         The command will only substitute environment variables in the FILE
+#         where the syntax is of the form ${NAME}
 #     --unbound=STRING, --undef=STRING
 #         The command will normally fail on unbound (or undefined) variables.
 #         If this option is specified, the command will substitute an unbound
