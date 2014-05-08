@@ -16,18 +16,23 @@ This release of Rose will work best with
 
 ### Noteworthy Changes
 
-\#1252: rose env-cat: new `--match-mode=brace` option to only perform
-substitution on `${NAME} syntax.
+[#1252](https://github.com/metomi/rose/pull/1252):
+rose env-cat: new `--match-mode=brace` option to only perform
+substitution on `${NAME}` syntax.
 
-\#1249: rose suite-run/clean: improve diagnostics if a suite is still running.
+[#1249](https://github.com/metomi/rose/pull/1249):
+rose suite-run/clean: improve diagnostics if a suite is still running.
 
-\#1244: rose: ensure Rose's `bin/`, `lib/python/` lead `PATH`, `PYTHONPATH`.
+[#1244](https://github.com/metomi/rose/pull/1244):
+rose: ensure Rose's `bin/`, `lib/python/` lead `PATH`, `PYTHONPATH`.
 
-\#1243: rose suite-run: file install and reload improvements.
+[#1243](https://github.com/metomi/rose/pull/1243):
+rose suite-run: file install and reload improvements.
 * Improve incremental file install.
 * On reload mode, call `cylc reload` only if necessary.
 
-\#1237: Rose Bush: display if job log db present.
+[#1237](https://github.com/metomi/rose/pull/1237):
+Rose Bush: display if job log db present.
 
 --------------------------------------------------------------------------------
 
