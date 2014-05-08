@@ -5,9 +5,46 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-05-??)
+
+This release of Rose will work best with
+[Cylc](https://github.com/cylc/cylc/) 5.4.13?
+
+### Highlighted Changes
+
+-none yet-
+
+### Noteworthy Changes
+
+\#1252: rose env-cat: new `--match-mode=brace` option to only perform
+substitution on `${NAME} syntax.
+
+\#1249: rose suite-run/clean: improve diagnostics if a suite is still running.
+
+\#1244: rose: ensure Rose's `bin/`, `lib/python/` lead `PATH`, `PYTHONPATH`.
+
+\#1243: rose suite-run: file install and reload improvements.
+* Improve incremental file install.
+* On reload mode, call `cylc reload` only if necessary.
+
+\#1237: Rose Bush: display if job log db present.
+
+--------------------------------------------------------------------------------
+
 ## 2014-04 (2014-04-28)
 
-This release of Rose works best with Cylc 5.4.12.
+This release of Rose works best with
+[Cylc](https://github.com/cylc/cylc/) 5.4.12.
+
+### Known Issues
+
+Unfortunately, `rose date` relies on a version of the
+[isodatetime](https://github.com/metomi/isodatetime/) library that is
+compatible with the version shipped with this release of Rose. The library
+that is shipped with Cylc 5.4.12 is an earlier version. When used in combination
+in the same environment, `rose date` will return an exception. A fix has been
+introduced in \#1244 for the next release, which will ensure that Rose
+always picks up its own version of the library.
 
 ### Highlighted Changes
 
