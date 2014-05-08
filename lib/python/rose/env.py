@@ -27,32 +27,66 @@ environment variables are left unchanged.
 import os
 import re
 from rose.reporter import Event
-import sys
 
-#_RE = re.compile(r"""
+
+#_RE_DEFAULT = re.compile(r"""
 #    \A                                 # start
 #    (?P<head>.*?)                      # shortest of anything
 #    (?P<escape>\\*)                    # escapes
-#    (?P<sigil>\$)                      # variable sigil, dollar
-#    (?P<brace_open>\{)?                # brace open, optional
-#    (?P<name>[A-z_]\w*)                # variable name
-#    (?P<brace_close>(?(brace_open)\})) # brace close, if brace_open matches
+#    (?P<symbol>                        # start symbol
+#        \$                                 # variable sigil, dollar
+#        (?P<brace_open>\{)?                # brace open, optional
+#        (?P<name>[A-z_]\w*)                # variable name
+#        (?(brace_open)\})                  # brace close, if brace_open
+#    )                                  # end symbol
 #    (?P<tail>.*)                       # rest of string
 #    \Z                                 # end
 #""", re.M | re.S | re.X)
-_RE = re.compile(r"\A"
+_RE_DEFAULT = re.compile(
+                 r"\A"
                  r"(?P<head>.*?)"
                  r"(?P<escape>\\*)"
-                 r"(?P<sigil>\$)"
+                 r"(?P<symbol>"
+                 r"\$"
                  r"(?P<brace_open>\{)?"
                  r"(?P<name>[A-z_]\w*)"
-                 r"(?P<brace_close>(?(brace_open)\}))"
+                 r"(?(brace_open)\})"
+                 r")"
                  r"(?P<tail>.*)"
                  r"\Z",
                  re.M | re.S)
 
 
+#_RE_BRACE = re.compile(r"""
+#    \A                                 # start
+#    (?P<head>.*?)                      # shortest of anything
+#    (?P<escape>\\*)                    # escapes
+#    (?P<symbol>\$\{                    # start symbol ${
+#        (?P<name>[A-z_]\w*)                # variable name
+#    \})                                # } end symbol
+#    (?P<tail>.*)                       # rest of string
+#    \Z                                 # end
+#""", re.M | re.S | re.X)
+_RE_BRACE = re.compile(
+                 r"\A"
+                 r"(?P<head>.*?)"
+                 r"(?P<escape>\\*)"
+                 r"(?P<symbol>\$\{"
+                 r"(?P<name>[A-z_]\w*)"
+                 r"\})"
+                 r"(?P<tail>.*)"
+                 r"\Z",
+                 re.M | re.S)
+
+
+_MATCH_MODES = {"brace": _RE_BRACE,
+                "default": _RE_DEFAULT,
+                None: _RE_DEFAULT}
+
+
 class EnvExportEvent(Event):
+
+    """Event raised when an environment variable is exported."""
 
     RE_SHELL_ESCAPE = re.compile(r"([\"'\s])")
 
@@ -63,6 +97,8 @@ class EnvExportEvent(Event):
 
 class UnboundEnvironmentVariableError(Exception):
 
+    """An error raised on attempt to substitute an unbound variable."""
+
     def __repr__(self):
         return "[UNDEFINED ENVIRONMENT VARIABLE] %s" % (self.args)
 
@@ -70,35 +106,33 @@ class UnboundEnvironmentVariableError(Exception):
 
 
 def env_export(key, value, event_handler=None):
+    """Export an environment variable."""
     os.environ[key] = value
     if callable(event_handler):
         event_handler(EnvExportEvent(key, value))
 
 
-def env_var_escape(s):
-    """Escape $NAME and ${NAME} syntax in "s".
-    """
+def env_var_escape(text, match_mode=None):
+    """Escape $NAME and ${NAME} syntax in "text"."""
     ret = ""
-    tail = s
+    tail = text
     while tail:
-        match = _RE.match(tail)
+        match = _MATCH_MODES[match_mode].match(tail)
         if match:
-            m = match.groupdict()
-            if not m["brace_open"]:
-                m["brace_open"] = ""
-            symbol = m["sigil"] + m["brace_open"] + m["name"] + m["brace_close"]
-            ret += m["head"] + m["escape"] * 2 + "\\" + symbol
-            tail = m["tail"]
+            groups = match.groupdict()
+            ret += (groups["head"] + groups["escape"] * 2 + "\\" +
+                    groups["symbol"])
+            tail = groups["tail"]
         else:
             ret += tail
             tail = ""
     return ret
 
 
-def env_var_process(s, unbound=None):
+def env_var_process(text, unbound=None, match_mode=None):
     """Substitute environment variables into a string.
 
-    For each $NAME and ${NAME} in "s", substitute with the value
+    For each $NAME and ${NAME} in "text", substitute with the value
     of the environment variable NAME. If NAME is not defined in the
     environment and "unbound" is None, raise an
     UnboundEnvironmentVariableError. If NAME is not defined in the
@@ -107,34 +141,30 @@ def env_var_process(s, unbound=None):
 
     """
     ret = ""
-    tail = s
+    tail = text
     while tail:
-        match = _RE.match(tail)
+        match = _MATCH_MODES[match_mode].match(tail)
         if match:
-            m = match.groupdict()
-            if not m["brace_open"]:
-                m["brace_open"] = ""
-            symbol = m["sigil"] + m["brace_open"] + m["name"] + m["brace_close"]
-            substitute = symbol
-            if len(m["escape"]) % 2 == 0:
-                if os.environ.has_key(m["name"]):
-                    substitute = os.environ[m["name"]]
+            groups = match.groupdict()
+            substitute = groups["symbol"]
+            if len(groups["escape"]) % 2 == 0:
+                if groups["name"] in os.environ:
+                    substitute = os.environ[groups["name"]]
                 elif unbound is not None:
                     substitute = str(unbound)
                 else:
-                    raise UnboundEnvironmentVariableError(m["name"])
-            ret += m["head"] + m["escape"][0 : len(m["escape"]) / 2] + substitute
-            tail = m["tail"]
+                    raise UnboundEnvironmentVariableError(groups["name"])
+            ret += (groups["head"] +
+                    groups["escape"][0 : len(groups["escape"]) / 2] +
+                    substitute)
+            tail = groups["tail"]
         else:
             ret += tail
             tail = ""
     return ret
 
 
-environment_variable_process = env_var_process
-
-
-def contains_env_var(s):
-    """Check if a string contains an environment variable."""
-    match = _RE.match(s)
+def contains_env_var(text, match_mode=None):
+    """Check if a string contains unescaped $NAME and/or ${NAME} syntax."""
+    match = _MATCH_MODES[match_mode].match(text)
     return (match and len(match.groupdict()["escape"]) % 2 == 0)

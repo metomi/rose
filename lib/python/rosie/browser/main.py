@@ -1036,7 +1036,7 @@ class MainWindow(gtk.Window):
         elif opts.query:
             self.nav_bar.expander.child.toggle(False)
             try:
-                args = [rose.env.environment_variable_process(arg) for arg in args]
+                args = [rose.env.env_var_process(arg) for arg in args]
             except rose.env.UnboundEnvironmentVariableError as e:
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            str(e),

@@ -354,6 +354,11 @@ class RoseOptionParser(OptionParser):
                         "dest": "path_globs",
                         "metavar": "PATTERN",
                         "help": "Paths to prepend to PATH."}],
+               "match_mode": [
+                       ["--match-mode", "-m"],
+                       {"metavar": "MODE",
+                        "choices": ["brace", "default"],
+                        "help": "Specify an alternate match mode."}],
                "prefix": [
                        ["--prefix"],
                        {"metavar": "PREFIX",

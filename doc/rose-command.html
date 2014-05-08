@@ -874,14 +874,28 @@ rosie UTIL [OPTS] [ARG ...]
     <var>FILE</var> argument may be <kbd>-</kbd>, which means read from
     <var>STDIN</var>.</p>
 
-    <p>The command will look for <kbd>$NAME</kbd> or <kbd>${NAME}</kbd> syntax
-    and substitute them with the value of the environment variable
-    <var>NAME</var>. A backslash in front of the syntax, e.g. <kbd>\$NAME</kbd>
-    or <kbd>\${NAME}</kbd> will escape the substitution.</p>
+    <p>In <var>match-mode=default</var>, the command will look for
+    <kbd>$NAME</kbd> or <kbd>${NAME}</kbd> syntax and substitute them with the
+    value of the environment variable <var>NAME</var>. A backslash in front of
+    the syntax, e.g. <kbd>\$NAME</kbd> or <kbd>\${NAME}</kbd> will escape the
+    substitution.</p>
+
+    <p>In <var>match-mode=brace</var>, the command will look for
+    <kbd>${NAME}</kbd> syntax only.</p>
 
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--match-mode=MODE</kbd>, <kbd>-m MODE</kbd></dt>
+
+      <dd>Specify the match mode, which can be <var>brace</var> or
+      <var>default</var>.</dd>
+
+      <dt><kbd>--output=FILE</kbd>, <kbd>-o FILE</kbd></dt>
+
+      <dd>Specify an output file. If no output file is specified or if
+      <var>FILE</var> is <kbd>-</kbd>, write output to <var>STDOUT</var>.</dd>
+
       <dt><kbd>--unbound=STRING</kbd>, <kbd>--undef=STRING</kbd></dt>
 
       <dd>The command will normally fail on unbound (or undefined) variables.
