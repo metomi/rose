@@ -603,17 +603,19 @@ source=stuffing-*.txt
       <dd>Archive all job logs at these cycles. Remove remote job logs on
       success.</dd>
 
-      <dt><kbd>prune-work-at=cycle[:globs] ...</kbd></dt>
+      <dt><kbd>prune-work-at=cycle[[:task-globs]:globs] ...</kbd></dt>
 
-      <dd>Remove the work directories of the specified cycles. If globs are
-      specified for a cycle, only items matching the globs in the work
-      directories of the specified cycle will be pruned.</dd>
+      <dd>Remove the work directories of the specified cycles. If
+      <var>globs</var> are specified for a cycle, it will attempt to prune only
+      items matching <var>work/*.CYCLE/GLOBS</var>. If <var>task-globs</var> are
+      specified, it will attempt to prune only items matching
+      <var>work/TASKS-GLOBS.CYCLE/GLOBS</var>.</dd>
 
       <dt><kbd>prune-datac-at=cycle[:globs] ...</kbd></dt>
 
-      <dd>Remove the <var>ROSE_DATAC</var> of the specified cycles. If globs
-      are specified for a cycle, only items matching the globs in the
-      <var>ROSE_DATAC</var> directories of the specified cycle will be
+      <dd>Remove the <var>ROSE_DATAC</var> of the specified cycles. If
+      <var>globs</var> are specified for a cycle, only items matching the globs
+      in the <var>ROSE_DATAC</var> directories of the specified cycle will be
       pruned.</dd>
     </dl>
 
@@ -625,7 +627,12 @@ mode=rose_prune
 [prune]
 prune-remote-logs-at=-6h
 archive-logs-at=-1d
-prune-work-at=-12h
+# N.B.: -18h:task_y*:* can also be written as -18h:task_y*:
+#       For "task_y*" to be recognised as a set of "task-globs",
+#       the trailing ":" is essential.
+#       Otherwise, it will be recognised as a set of "globs"
+#       (under "work/task.cycle/").
+prune-work-at=-6h:task_x*:big.dat -12h:other*.dat -18h:task_y*:* -24h
 prune-datac-at=-6h:foo* -12h:'bar* *.baz*' -1d
 </pre>
 

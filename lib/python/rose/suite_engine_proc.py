@@ -312,7 +312,7 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_cycle_items_globs(self, name, cycle):
+    def get_cycle_items_globs(self, name, cycle, task_glob=None):
         """Return a glob to match named items created for a given cycle.
 
         E.g.:
