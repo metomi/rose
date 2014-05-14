@@ -188,12 +188,12 @@
 #
 ## The database location of a given repository prefix, from within the server
 #  db.PREFIX=URL
-## E.g. (To create/reference an SQLite DB at "/opt/rosie/foo-db.sqlite"):
-#  db.foo=sqlite:////opt/rosie/foo-db.sqlite
+## E.g. (To create/reference an SQLite DB at "/srv/rosie/foo-db.sqlite"):
+#  db.foo=sqlite:////srv/rosie/foo-db.sqlite
 ## The path to the repository of a given prefix, from within the server
 #  repos.PREFIX=DIR
 ## E.g.:
-#  repos.foo=/opt/svn-repos/foo
+#  repos.foo=/srv/svn/foo
 [rosie-db]
 
 # Configuration related to "rosie go" GUI
@@ -238,7 +238,7 @@
 ## Adhoc Rosie web server log directory
 #  log-dir=DIR
 ## E.g.:
-#  log-dir=/opt/rosie/log
+#  log-dir=/var/log/rosie
 ## Adhoc Rosie web server port
 #  port=PORT-NUMBER
 ## E.g.:
