@@ -48,12 +48,15 @@ Unfortunately, `rose date` relies on a version of the
 compatible with the version shipped with this release of Rose. The library
 that is shipped with Cylc 5.4.12 is an earlier version. When used in combination
 in the same environment, `rose date` will return an exception. A fix has been
-introduced in \#1244 for the next release, which will ensure that Rose
-always picks up its own version of the library.
+introduced in [#1244](https://github.com/metomi/rose/pull/1244) for the next
+release, which will ensure that Rose always picks up its own version of the
+library.
 
 ### Highlighted Changes
 
-\#1202, \#1219: rose date: logic reimplemented using the new
+[#1202](https://github.com/metomi/rose/pull/1202),
+[#1219](https://github.com/metomi/rose/pull/1219):
+rose date: logic reimplemented using the new
 [isodatetime](https://github.com/metomi/isodatetime/) library. Date time and
 offset formats can now be specified using ISO 8601 syntax. The command will
 also support pre-historic and futuristic date time. This change also fixes
@@ -61,45 +64,64 @@ the `-u` option. When using the current system date/time, the default output
 format has changed to be ISO 8601 compatible (it follows
 `CCYY-MM-DDThh:mm:ss±hh:mm`).
 
-\#1195, #1199: rose metadata: add spaced list type.
+[#1195](https://github.com/metomi/rose/pull/1195),
+[#1199](https://github.com/metomi/rose/pull/1199):
+rose metadata: add spaced list type.
 
-\#1191, #1193, #1212: rose metadata-graph: new command using Graphviz for
+[#1191](https://github.com/metomi/rose/pull/1191),
+[#1193](https://github.com/metomi/rose/pull/1193),
+[#1212](https://github.com/metomi/rose/pull/1212):
+rose metadata-graph: new command using Graphviz for
 plotting metadata dependencies such as trigger.
 
 ### Noteworthy Changes
 
-\#1228: rose suite-log --update --prune-remote: option now recognised as
+[#1228](https://github.com/metomi/rose/pull/1228):
+rose suite-log --update --prune-remote: option now recognised as
 documented.
 
-\#1225: rose app/suite/task-run: file installation: ensure that all relevant
+[#1225](https://github.com/metomi/rose/pull/1225):
+rose app/suite/task-run: file installation: ensure that all relevant
 tables exist in the file installation configuration SQLite database file.
 
-\#1209: rose suite-hook: use configured email host in email addresses without
+[#1209](https://github.com/metomi/rose/pull/1209):
+rose suite-hook: use configured email host in email addresses without
 hosts.
 
-\#1208: rose config-edit: fix STASH widget starting from empty.
+[#1208](https://github.com/metomi/rose/pull/1208):
+rose config-edit: fix STASH widget starting from empty.
 
-\#1206: rose config-dump: don't down case for namelist group name. This change
-partially reversed #1149.
+[#1206](https://github.com/metomi/rose/pull/1206):
+rose config-dump: don't down case for namelist group name. This change
+partially reversed [#1149](https://github.com/metomi/rose/pull/1149).
 
-\#1200: rose app-upgrade: fix HEAD broken macro pathway.
+[#1200](https://github.com/metomi/rose/pull/1200):
+rose app-upgrade: fix HEAD broken macro pathway.
 
-\#1198: rose config-edit: run startup checks on loading previewed app(s).
+[#1198](https://github.com/metomi/rose/pull/1198):
+rose config-edit: run startup checks on loading previewed app(s).
 
-\#1197: rose stem: allow comma separated values in `--task=TASKS`
+[#1197](https://github.com/metomi/rose/pull/1197):
+rose stem: allow comma separated values in `--task=TASKS`
 and `--group=GROUPS` options.
 
-\#1196: rose metadata: fail-if: handle divide by zero exceptions.
+[#1196](https://github.com/metomi/rose/pull/1196):
+rose metadata: fail-if: handle divide by zero exceptions.
 
-\#1194: rose_ana: cumf: include cumf output path in output.
+[#1194](https://github.com/metomi/rose/pull/1194):
+rose_ana: cumf: include cumf output path in output.
 
-\#1190: rosie lookup: allow override of quiet mode print format.
+[#1190](https://github.com/metomi/rose/pull/1190):
+rosie lookup: allow override of quiet mode print format.
 
-\#1187: rose config-dump: fix tidying metadata.
+[#1187](https://github.com/metomi/rose/pull/1187):
+rose config-dump: fix tidying metadata.
 
-\#1186: rose app-upgrade, rose macro: fix relative `--config=DIR`.
+[#1186](https://github.com/metomi/rose/pull/1186):
+rose app-upgrade, rose macro: fix relative `--config=DIR`.
 
-\#1184: rose edit: fix change `meta` or `project` flag.
+[#1184](https://github.com/metomi/rose/pull/1184):
+rose edit: fix change `meta` or `project` flag.
 
 --------------------------------------------------------------------------------
 
@@ -109,50 +131,68 @@ This release of Rose works best with Cylc 5.4.11.
 
 ### Highlighted Changes
 
-\#1163: rose metadata: a `compulsory=true` option no longer requires its
+[#1163](https://github.com/metomi/rose/pull/1163):
+rose metadata: a `compulsory=true` option no longer requires its
 containing section to be compulsory as well.
 
 ### Noteworthy Changes
 
-\#1181: rose stem: fix `-C rel/path` usage.
+[#1181](https://github.com/metomi/rose/pull/1181):
+rose stem: fix `-C rel/path` usage.
 
-\#1180: rose suite-scan: scan port files as well. Report left behind port
+[#1180](https://github.com/metomi/rose/pull/1180):
+rose suite-scan: scan port files as well. Report left behind port
 files. Report exceptions for failed `cylc scan` and `ssh` commands.
 
-\#1177: rose suite-clean: accept `--name=NAME`. If specified, `NAME` is
+[#1177](https://github.com/metomi/rose/pull/1177):
+rose suite-clean: accept `--name=NAME`. If specified, `NAME` is
 appended to the end of the argument list. This allows the interface to be
 consistent with the other utilities.
 
-\#1173: rose app/suite/task-run: handle bad file install mode value.
+[#1173](https://github.com/metomi/rose/pull/1173):
+rose app/suite/task-run: handle bad file install mode value.
 Previously, the system will assume the `auto` mode if it is given a bad file
 install mode value. It will now fail.
 
-\#1171: rose_ana: print number of values compared.
+[#1171](https://github.com/metomi/rose/pull/1171):
+rose_ana: print number of values compared.
 
-\#1169: rose stem: improve robustness of keyword match.
+[#1169](https://github.com/metomi/rose/pull/1169):
+rose stem: improve robustness of keyword match.
 
-\#1167: rose config-edit: fix general checking for `rose-suite.info` suites.
+[#1167](https://github.com/metomi/rose/pull/1167):
+rose config-edit: fix general checking for `rose-suite.info` suites.
 
-\#1161: rose app-upgrade, rose macro: fix current working directory.
+[#1161](https://github.com/metomi/rose/pull/1161):
+rose app-upgrade, rose macro: fix current working directory.
 
-\#1159: rose_ana: cumf: read output by lines to reduce memory footprint.
+[#1159](https://github.com/metomi/rose/pull/1159):
+rose_ana: cumf: read output by lines to reduce memory footprint.
 
-\#1157: rose suite-hook --mail: configurable SMTP host.
+[#1157](https://github.com/metomi/rose/pull/1157):
+rose suite-hook --mail: configurable SMTP host.
 
-\#1156: rose stem: ensure `_BASE` variables are working copy tops.
+[#1156](https://github.com/metomi/rose/pull/1156):
+rose stem: ensure `_BASE` variables are working copy tops.
 
-\#1153: rose config: fix printing sections with ignored values.
+[#1153](https://github.com/metomi/rose/pull/1153):
+rose config: fix printing sections with ignored values.
 
-\#1151: rose config-edit, rosie go: fix toolbar GTK warning. This problem was
+[#1151](https://github.com/metomi/rose/pull/1151):
+rose config-edit, rosie go: fix toolbar GTK warning. This problem was
 discovered on an upgrade from GTK 2.18 to GTK 2.20.
 
-\#1149: rose config-dump: down cases namelist keys.
+[#1149](https://github.com/metomi/rose/pull/1149):
+rose config-dump: down cases namelist keys.
 
-\#1147: rose suite-run --reload: fix `!CYLC_VERSION` problem.
+[#1147](https://github.com/metomi/rose/pull/1147):
+rose suite-run --reload: fix `!CYLC_VERSION` problem.
 
-\#1146: rose config-edit: improve specific macro messages.
+[#1146](https://github.com/metomi/rose/pull/1146):
+rose config-edit: improve specific macro messages.
 
-\#1145: rose metadata: fix null first values entry.
+[#1145](https://github.com/metomi/rose/pull/1145):
+rose metadata: fix null first values entry.
 
 --------------------------------------------------------------------------------
 
@@ -166,37 +206,52 @@ This release of Rose works best with Cylc 5.4.8.
 
 ### Noteworthy Changes
 
-\#1141: rose config-edit: count latent section errors.
+[#1141](https://github.com/metomi/rose/pull/1141):
+rose config-edit: count latent section errors.
 
-\#1140: rose config-edit, rosie go: filter all warnings by default.
+[#1140](https://github.com/metomi/rose/pull/1140):
+rose config-edit, rosie go: filter all warnings by default.
 
-\#1136: rose config --meta: fix finding non-local metadata.
+[#1136](https://github.com/metomi/rose/pull/1136):
+rose config --meta: fix finding non-local metadata.
 
-\#1132: rose app-upgrade: fix post-upgrade trigger metadata.
+[#1132](https://github.com/metomi/rose/pull/1132):
+rose app-upgrade: fix post-upgrade trigger metadata.
 
-\#1131: rosie create: obtain user name from `~/.subversion/servers`, where
+[#1131](https://github.com/metomi/rose/pull/1131):
+rosie create: obtain user name from `~/.subversion/servers`, where
 relevant.
 
-\#1130: Rose Bush: cycles: add paging function. Display 100 cycles per page.
+[#1130](https://github.com/metomi/rose/pull/1130):
+Rose Bush: cycles: add paging function. Display 100 cycles per page.
 
-\#1127: Rose Bush: jobs: fix pager form to ensure that sort order is maintained.
+[#1127](https://github.com/metomi/rose/pull/1127):
+Rose Bush: jobs: fix pager form to ensure that sort order is maintained.
 
-\#1121: rose stem: create `_REV` and `_BASE` variables for all projects.
+[#1121](https://github.com/metomi/rose/pull/1121):
+rose stem: create `_REV` and `_BASE` variables for all projects.
 
-\#1119: rose config-edit: fix python list widget.
+[#1119](https://github.com/metomi/rose/pull/1119):
+rose config-edit: fix python list widget.
 
-\#1117: rose config-edit: improve performance by reducing updates to the
+[#1117](https://github.com/metomi/rose/pull/1117):
+rose config-edit: improve performance by reducing updates to the
 internal data structure.
 
-\#1114: rose config-edit: run a macro or upgrade macro with the relevant
+[#1114](https://github.com/metomi/rose/pull/1114):
+rose config-edit: run a macro or upgrade macro with the relevant
 configuration directory as the current working directory.
 
-\#1100, #1101: add syntax highlighting for Rose configuration file in Emacs.
+[#1100](https://github.com/metomi/rose/pull/1100),
+[#1101](https://github.com/metomi/rose/pull/1101):
+add syntax highlighting for Rose configuration file in Emacs.
 
-\#1097: rosie.ws: fix Trac links in `all_revs` mode, which incorrectly used
+[#1097](https://github.com/metomi/rose/pull/1097):
+rosie.ws: fix Trac links in `all_revs` mode, which incorrectly used
 `trunk@HEAD` for everything.
 
-\#1094: rosie lookup: fix `%date` in custom format.
+[#1094](https://github.com/metomi/rose/pull/1094):
+rosie lookup: fix `%date` in custom format.
 
 --------------------------------------------------------------------------------
 
@@ -210,14 +265,18 @@ This release of Rose works best with Cylc 5.4.4 to 5.4.7.
 
 ### Noteworthy Changes
 
-\#1095: rose.config: fix bug introduced by #1067. Use of temporary file to dump
+[#1095](https://github.com/metomi/rose/pull/1095):
+rose.config: fix bug introduced by
+[#1067](https://github.com/metomi/rose/pull/1067). Use of temporary file to dump
 configuration files results in files that are user read-write only. This fix
 ensures that files are dumped with the correct permission according to the
 umask in the environment.
 
-\#1092: rose bush: cycles list: display failed jobs totals, where relevant.
+[#1092](https://github.com/metomi/rose/pull/1092):
+rose bush: cycles list: display failed jobs totals, where relevant.
 
-\#1091: rose suite-log: no longer require `rose.bush`, which requires
+[#1091](https://github.com/metomi/rose/pull/1091):
+rose suite-log: no longer require `rose.bush`, which requires
 `cherrypy`.
 
 --------------------------------------------------------------------------------
@@ -228,42 +287,55 @@ This release of Rose works best with Cylc 5.4.4 to 5.4.7.
 
 ### Highlighted Changes
 
-\#1085: rosie web service: the web service database schema has been modified to
+[#1085](https://github.com/metomi/rose/pull/1085): rosie web service: the web service database schema has been modified to
 improve performance. **This change requires the rosie web service database to
 be re-built.** To do so, shut down the web service. Remove (or move) the old
 database file(s) and run the `$ROSE_HOME/sbin/rosa db-create` command to
 re-build the database.
 
-\#1072, #1084: rose bush: cycles summary and other improvements.
+[#1072](https://github.com/metomi/rose/pull/1072),
+[#1084](https://github.com/metomi/rose/pull/1084):
+rose bush: cycles summary and other improvements.
 * New: Cycles list: list numbers of active, succeeded and failed jobs for
   each cycle time.
 * Jobs list: display host, submit method and ID for running jobs.
 * Jobs list: clickable cycles and task names.
 * Suites list: reduce amount of information displayed for efficiency.
 
-\#1057: rose CLI: bash command completion.
+[#1057](https://github.com/metomi/rose/pull/1057):
+rose CLI: bash command completion.
 
 ### Noteworthy Changes
 
-\#1090: rose_arch: fix None status in event when source-edit fails.
+[#1090](https://github.com/metomi/rose/pull/1090):
+rose_arch: fix None status in event when source-edit fails.
 
-\#1089: rose bush: catch unicode decode error in view.
+[#1089](https://github.com/metomi/rose/pull/1089):
+rose bush: catch unicode decode error in view.
 
-\#1087: document how to contribute to Rose.
+[#1087](https://github.com/metomi/rose/pull/1087):
+document how to contribute to Rose.
 
-\#1081: rose config-edit: fix file page unexpected content.
+[#1081](https://github.com/metomi/rose/pull/1081):
+rose config-edit: fix file page unexpected content.
 
-\#1068: rose bush: recognise the `ready` status.
+[#1068](https://github.com/metomi/rose/pull/1068):
+rose bush: recognise the `ready` status.
 
-\#1067: rose.config.dump: use temporary file to stage.
+[#1067](https://github.com/metomi/rose/pull/1067):
+rose.config.dump: use temporary file to stage.
 
-\#1065: rose-bush.js: fix format string and int rounding.
+[#1065](https://github.com/metomi/rose/pull/1065):
+rose-bush.js: fix format string and int rounding.
 
-\#1064: rosie go: allow actions on out of date working copies.
+[#1064](https://github.com/metomi/rose/pull/1064):
+rosie go: allow actions on out of date working copies.
 
-\#1058: rose config-edit: add macro config vetting.
+[#1058](https://github.com/metomi/rose/pull/1058):
+rose config-edit: add macro config vetting.
 
-\#1056: rose config-edit: trap upgrade macro errors.
+[#1056](https://github.com/metomi/rose/pull/1056):
+rose config-edit: trap upgrade macro errors.
 
 --------------------------------------------------------------------------------
 
@@ -273,15 +345,19 @@ This release of Rose works best with Cylc 5.4.2 or above.
 
 ### Highlighted Changes
 
-\#1040: rose suite-run: check incompatible Cylc global config. In particular,
+[#1040](https://github.com/metomi/rose/pull/1040):
+rose suite-run: check incompatible Cylc global config. In particular,
 `rose suite-run` will now raise an exception if `[host][localhost]run directory`
 and/or `[host][localhost]work directory` are not the defaults.
 
-\#1026, #1033: rose app-run, rose suite-run, rose config-edit, etc: support
+[#1026](https://github.com/metomi/rose/pull/1026),
+[#1033](https://github.com/metomi/rose/pull/1033):
+rose app-run, rose suite-run, rose config-edit, etc: support
 optional source for file installation. E.g. In a `[file:path/to/file]` section,
 a `source=(namelist:foo)` will allow `[namelist:foo]` to be missing or ignored.
 
-\#1005: rose suite-run, rose suite-clean: the root directory of
+[#1005](https://github.com/metomi/rose/pull/1005):
+rose suite-run, rose suite-clean: the root directory of
 `~/cylc-run/$SUITE/` is now configurable via site, user, or suite configuration.
 On installation of a suite, `rose suite-run` will store the locations of the job
 hosts in `~/cylc-run/$SUITE/log/rose-suite-run.locs`. The information can then
@@ -291,44 +367,60 @@ directories on job hosts created by an old version of `rose suite-run`.)
 
 ### Noteworthy Changes
 
-\#1055: rose_arch: fix `update-check=mtime+size` uniqueness problem for file
+[#1055](https://github.com/metomi/rose/pull/1055):
+rose_arch: fix `update-check=mtime+size` uniqueness problem for file
 sources with identical modified times and sizes.
 
-\#1053: rose config-edit: fix custom macro status bar reporting.
+[#1053](https://github.com/metomi/rose/pull/1053):
+rose config-edit: fix custom macro status bar reporting.
 
-\#1049: rose host-select: run SSH commands with `-oConnectTimeout=T`,
+[#1049](https://github.com/metomi/rose/pull/1049):
+rose host-select: run SSH commands with `-oConnectTimeout=T`,
 and wait for all child processes to complete.
 
-\#1046: rose config-edit: fix macro metadata setting for section.
+[#1046](https://github.com/metomi/rose/pull/1046):
+rose config-edit: fix macro metadata setting for section.
 
-\#1045: rosie id --to-web: fix hard coded Trac assumption. Note: requires a
+[#1045](https://github.com/metomi/rose/pull/1045):
+rosie id --to-web: fix hard coded Trac assumption. Note: requires a
 change in the site configuration value `[rosie-id]prefix-web`. See example site
 configuration file.
 
-\#1039: rose config-edit: fix enable empty user-ignored section.
+[#1039](https://github.com/metomi/rose/pull/1039):
+rose config-edit: fix enable empty user-ignored section.
 
-\#1037: rose config-edit: custom sub-panel widgets API documented.
+[#1037](https://github.com/metomi/rose/pull/1037):
+rose config-edit: custom sub-panel widgets API documented.
 
-\#1035: rose config-edit: fix orphaned warning for optional content sections.
+[#1035](https://github.com/metomi/rose/pull/1035):
+rose config-edit: fix orphaned warning for optional content sections.
 
-\#1029: rose config-edit: fix file browser launch bug for unknown configuration.
+[#1029](https://github.com/metomi/rose/pull/1029):
+rose config-edit: fix file browser launch bug for unknown configuration.
 
-\#1024: rose bush: job list mode: fixed `no_statuses` checkboxes returning nothing
+[#1024](https://github.com/metomi/rose/pull/1024):
+rose bush: job list mode: fixed `no_statuses` checkboxes returning nothing
 bug.
 
-\#1023: rose suite-gcontrol: raise exception on attempt to launch suite control
+[#1023](https://github.com/metomi/rose/pull/1023):
+rose suite-gcontrol: raise exception on attempt to launch suite control
 GUI on an unregistered Cylc suite.
 
-\#1021, #1031: rose bush: view file mode: some files are now prettified using
+[#1021](https://github.com/metomi/rose/pull/1021),
+[#1031](https://github.com/metomi/rose/pull/1031):
+rose bush: view file mode: some files are now prettified using
 Google code prettify JS library.
 
-\#1007: rose bush: now display Rose version that drives it.
+[#1007](https://github.com/metomi/rose/pull/1007):
+rose bush: now display Rose version that drives it.
 
-\#1003: rose app-run, rose-suite-run, etc: file installation - a tilde `~`
+[#1003](https://github.com/metomi/rose/pull/1003):
+rose app-run, rose-suite-run, etc: file installation - a tilde `~`
 in front a path pointing to a Subversion working copy did not get expanded.
 This is now fixed.
 
-\#999: rose app-upgrade: apply trigger fixing after an upgrade.
+[#999](https://github.com/metomi/rose/pull/999):
+rose app-upgrade: apply trigger fixing after an upgrade.
 
 --------------------------------------------------------------------------------
 
@@ -340,7 +432,12 @@ This release of Rose works with cylc 5.4.0 or above.
 
 Changes that have significant impact on user experience.
 
-\#993, #988, #980, #964, #857 : rose bush: a web service to browse user suite
+[#993](https://github.com/metomi/rose/pull/993),
+[#988](https://github.com/metomi/rose/pull/988),
+[#980](https://github.com/metomi/rose/pull/980),
+[#964](https://github.com/metomi/rose/pull/964),
+[#857](https://github.com/metomi/rose/pull/857):
+rose bush: a web service to browse user suite
 logs. This replaces the old client side technology generated at suite run time
 via `rose suite-run`, `rose suite-hook` and `rose suite-log`.
 * Site/user configurable location of the Rose Bush web service.
@@ -356,42 +453,56 @@ via `rose suite-run`, `rose suite-hook` and `rose suite-log`.
 
 Bug fixes, minor enhancements and documentation improvements:
 
-\#996: rose task-run `fcm_make` built-in app configuration: `args` can now be
+[#996](https://github.com/metomi/rose/pull/996):
+rose task-run `fcm_make` built-in app configuration: `args` can now be
 used to specify more options and arguments to the `fcm make` command.
 
-\#992: Use the `gzip` command instead of Python's `gzip` library to write `*.gz`
+[#992](https://github.com/metomi/rose/pull/992):
+Use the `gzip` command instead of Python's `gzip` library to write `*.gz`
 files because the command is 10 times faster than Python's library. This
 affects `rose suite-run`, `rose suite-log`, `rose_prune`, `rose_arch`.
 
-\#982: rose_arch: add time diagnostics.
+[#982](https://github.com/metomi/rose/pull/982):
+rose_arch: add time diagnostics.
 
-\#981: rose config-edit: handle unregistered suite `gcylc` launch failure.
+[#981](https://github.com/metomi/rose/pull/981):
+rose config-edit: handle unregistered suite `gcylc` launch failure.
 
-\#978: rose metadata: different default metadata for different Rose
+[#978](https://github.com/metomi/rose/pull/978):
+rose metadata: different default metadata for different Rose
 configuration files.
 
-\#971: rose macro: fix `fail-if` array variables that look like single float
+[#971](https://github.com/metomi/rose/pull/971):
+rose macro: fix `fail-if` array variables that look like single float
 values.
 
-\#970: rosie go: check suite is registered prior to running gui on it.
+[#970](https://github.com/metomi/rose/pull/970):
+rosie go: check suite is registered prior to running gui on it.
 
-\#969, \#966: rose suite-run, etc: use `pgrep` as well as port files to
+[#969](https://github.com/metomi/rose/pull/969),
+[#966](https://github.com/metomi/rose/pull/966):
+rose suite-run, etc: use `pgrep` as well as port files to
 determine if a suite is still running or not.
 
-\#968: rose stem: accept more schemes for Subversion URLs.
+[#968](https://github.com/metomi/rose/pull/968): rose stem: accept more schemes for Subversion URLs.
 
-\#960: rose_arch: new `source-edit` setting to specify a command to transform
+[#960](https://github.com/metomi/rose/pull/960):
+rose_arch: new `source-edit` setting to specify a command to transform
 the content of the source file before sending it to the archive.
 
-\#957: rose config-edit: fix add latent mixed widget.
+[#957](https://github.com/metomi/rose/pull/957):
+rose config-edit: fix add latent mixed widget.
 
-\#956: rose config-dump: new `--no-pretty` option. Pretty print is now the
+[#956](https://github.com/metomi/rose/pull/956):
+rose config-dump: new `--no-pretty` option. Pretty print is now the
 default.
 
-\#949: rose_arch: allow use of file modified time and size instead of MD5
+[#949](https://github.com/metomi/rose/pull/949):
+rose_arch: allow use of file modified time and size instead of MD5
 checksum to determine whether a source file is changed.
 
-\#947: rose suite-hook --mail: configurable email host
+[#947](https://github.com/metomi/rose/pull/947):
+rose suite-hook --mail: configurable email host
 
 --------------------------------------------------------------------------------
 
@@ -409,56 +520,82 @@ Changes that have significant impact on user experience.
 
 Bug fixes, minor enhancements and documentation improvements:
 
-\#938: rosie go: improve filter removal.
+[#938](https://github.com/metomi/rose/pull/938):
+rosie go: improve filter removal.
 
-\#937: rose macro: diagnostic is now more similar to other Rose CLI commands.
+[#937](https://github.com/metomi/rose/pull/937):
+rose macro: diagnostic is now more similar to other Rose CLI commands.
 
-\#936: rosie go: default operator for query.
+[#936](https://github.com/metomi/rose/pull/936):
+rosie go: default operator for query.
 
-\#933: rosa svn-pre-commit: document super users functionality in
+[#933](https://github.com/metomi/rose/pull/933):
+rosa svn-pre-commit: document super users functionality in
 configuration example.
 
-\#932: rose config-dump --pretty: new option to tell command to apply format
+[#932](https://github.com/metomi/rose/pull/932):
+rose config-dump --pretty: new option to tell command to apply format
 specific pretty printing.
 
-\#931: rose config-edit, rose-macro: reduce reporting of duplicated errors.
+[#931](https://github.com/metomi/rose/pull/931):
+rose config-edit, rose-macro: reduce reporting of duplicated errors.
 
-\#927: rose app-run: fix default `[poll]delays=0`.
+[#927](https://github.com/metomi/rose/pull/927):
+rose app-run: fix default `[poll]delays=0`.
 
-\#926: rose mpi-launch: fix unbound `ROSE_LAUNCHER_BASE` on usage with a null
+[#926](https://github.com/metomi/rose/pull/926):
+rose mpi-launch: fix unbound `ROSE_LAUNCHER_BASE` on usage with a null
 configuration.
 
-\#925: rose_arch: fix incorrect behaviour if a source is a directory.
+[#925](https://github.com/metomi/rose/pull/925):
+rose_arch: fix incorrect behaviour if a source is a directory.
 
-\#921: rose host-select: new `--choice=N` option to choose a top from any of
+[#921](https://github.com/metomi/rose/pull/921):
+rose host-select: new `--choice=N` option to choose a top from any of
 the top `N` hosts.
 
-\#919, \#917, \#897, \#896, \#894: rose_arch: improve diagnostics.
+[#919](https://github.com/metomi/rose/pull/919),
+[#917](https://github.com/metomi/rose/pull/917),
+[#897](https://github.com/metomi/rose/pull/897),
+[#896](https://github.com/metomi/rose/pull/896),
+[#894](https://github.com/metomi/rose/pull/894):
+rose_arch: improve diagnostics.
 
-\#915: rose suite-clean, rose suite-gcontrol, rose suite-stop: improve support
+[#915](https://github.com/metomi/rose/pull/915):
+rose suite-clean, rose suite-gcontrol, rose suite-stop: improve support
 for determining the names of `rose-stem` suites.
 
-\#913: rose suite-run: use `pgrep` to check if suite is running or not.
+[#913](https://github.com/metomi/rose/pull/913):
+rose suite-run: use `pgrep` to check if suite is running or not.
 
-\#912: rose.popen: ensure that an `OSError` has the command name. This improves
+[#912](https://github.com/metomi/rose/pull/912):
+rose.popen: ensure that an `OSError` has the command name. This improves
 diagnostics on command-not-found errors.
 
-\#911: rosa svn-post-commit: modify for Subversion 1.8.
+[#911](https://github.com/metomi/rose/pull/911):
+rosa svn-post-commit: modify for Subversion 1.8.
 
-\#908: rose app-run: improve diagnostics for reference to ignored namelists.
+[#908](https://github.com/metomi/rose/pull/908):
+rose app-run: improve diagnostics for reference to ignored namelists.
 
-\#902: rose suite-log: fix `--archive '*'`.
+[#902](https://github.com/metomi/rose/pull/902):
+rose suite-log: fix `--archive '*'`.
 
-\#901: rose config-edit and rosie go: improve invalid colour diagnostics.
+[#901](https://github.com/metomi/rose/pull/901):
+rose config-edit and rosie go: improve invalid colour diagnostics.
 
-\#900: rose config-edit: fix modal metadata dialog.
+[#900](https://github.com/metomi/rose/pull/900):
+rose config-edit: fix modal metadata dialog.
 
-\#891: rose suite-run: fix repeated jinja2 insertion when `rose suite-run` is
+[#891](https://github.com/metomi/rose/pull/891):
+rose suite-run: fix repeated jinja2 insertion when `rose suite-run` is
 invoked from the installed suite directory.
 
-\#889: rose config: improve syntax error diagnostics.
+[#889](https://github.com/metomi/rose/pull/889):
+rose config: improve syntax error diagnostics.
 
-\#888: rose-app.conf, rose-suite.conf: A `SOURCE` in the `source=SOURCE ...`
+[#888](https://github.com/metomi/rose/pull/888):
+rose-app.conf, rose-suite.conf: A `SOURCE` in the `source=SOURCE ...`
 declaration in a `[file:NAME]` section can now be a glob for matching files
 names in the file system.
 
@@ -479,36 +616,48 @@ None in this release.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-\#883: rose_arch: new built-in application: a generic solution to configure
+[#883](https://github.com/metomi/rose/pull/883):
+rose_arch: new built-in application: a generic solution to configure
 site-specific archiving of suite files. (This built-in application should be
 considered experimental at this release.)
 
-\#878: rosie: fix invalid prefix and local suite error crash bugs
+[#878](https://github.com/metomi/rose/pull/878):
+rosie: fix invalid prefix and local suite error crash bugs
 
-\#868: rose config-edit: added check on save toolbar and menu item.
+[#868](https://github.com/metomi/rose/pull/868):
+rose config-edit: added check on save toolbar and menu item.
 
-\#864: rose config-edit: added support for application configuration upgrade.
+[#864](https://github.com/metomi/rose/pull/864):
+rose config-edit: added support for application configuration upgrade.
 
-\#856: rose config-edit: improved reporting of results from macros.
+[#856](https://github.com/metomi/rose/pull/856):
+rose config-edit: improved reporting of results from macros.
 
-\#855: rose macro: added command line trigger state validation.
+[#855](https://github.com/metomi/rose/pull/855):
+rose macro: added command line trigger state validation.
 
-\#851: rose app-run: rose_prune: modified to use the default shell to delete
+[#851](https://github.com/metomi/rose/pull/851):
+rose app-run: rose_prune: modified to use the default shell to delete
 files at the suite host. This should allow more powerful glob matching than
 what is provided by the Python standard library.
 
-\#850: rose config-edit: add and document custom page for aligning variable
+[#850](https://github.com/metomi/rose/pull/850):
+rose config-edit: add and document custom page for aligning variable
 value elements.
 
-\#849: rose config-edit: added load all apps toolbar and menu item.
+[#849](https://github.com/metomi/rose/pull/849):
+rose config-edit: added load all apps toolbar and menu item.
 
-\#847: rose suite-scan HOST: fixed.
+[#847](https://github.com/metomi/rose/pull/847):
+rose suite-scan HOST: fixed.
 
-\#846: rose app-run, rose suite-run, rose task-run: fixed incorrect incremental
+[#846](https://github.com/metomi/rose/pull/846):
+rose app-run, rose suite-run, rose task-run: fixed incorrect incremental
 mode behaviour. When `mode=symlink` is removed from a target, the target should
 be recreated, instead of being left to point to the old symbolic link.
 
-\#845: rose config-edit: support macro arguments.
+[#845](https://github.com/metomi/rose/pull/845):
+rose config-edit: support macro arguments.
 
 --------------------------------------------------------------------------------
 
@@ -520,7 +669,8 @@ This release of Rose works with cylc 5.3.0 or above.
 
 Changes that have significant impact on user experience.
 
-\#823: rosie create FROM-ID: suite copy is now done in a single changeset.
+[#823](https://github.com/metomi/rose/pull/823):
+rosie create FROM-ID: suite copy is now done in a single changeset.
 Previously, it was done in two changesets, one to create the suite, the other
 to copy items from `FROM-ID`. The previous way can become unfriendly in merging
 as Subversion adds `svn:mergeinfo` for each of the copied items from the
@@ -533,14 +683,15 @@ of `rosa svn-pre-commit`. An old version of `rosa svn-post-commit` will not
 update the Rosie web service database correctly when this version of `rosie
 create FROM-ID` is used to copy a suite.
 
-\#799: rose date: now supports letter options for both `--*-format=FORMAT`
-options.
+[#799](https://github.com/metomi/rose/pull/799):
+rose date: now supports letter options for both `--*-format=FORMAT` options.
 * `--parse-format=FORMAT` can now be `-p FORMAT` (for `strptime`).
 * `--format=FORMAT` is now a shorthand for `--print-format=FORMAT`.
   **It is no longer a shorthand for `--parse-format=FORMAT`.**
 * `--print-format=FORMAT` can now be `-f FORMAT` (for `strftime`).
 
-\#789: rose_prune: user interface refreshed. Functionalities now divided into 4
+[#789](https://github.com/metomi/rose/pull/789):
+rose_prune: user interface refreshed. Functionalities now divided into 4
 settings:
 * `prune-remote-logs-at=cycle ...`
 * `archive-logs-at=cycle ...`
@@ -561,32 +712,39 @@ pruned.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-\#840: rose config-edit: improved metadata display for the UM STASH plugin
-widget.
+[#840](https://github.com/metomi/rose/pull/840):
+rose config-edit: improved metadata display for the UM STASH plugin widget.
 
-\#839: rose metadata: new 'python_list' type for use with interfaces that
-support Pythonic-format lists as input - e.g. Jinja2 via the rose-suite.conf
-file.
+[#839](https://github.com/metomi/rose/pull/839):
+rose metadata: new 'python_list' type for use with interfaces that support
+Pythonic-format lists as input - e.g. Jinja2 via the rose-suite.conf file.
 
-\#829: rose host-select: add a new method to rank and set thresholds for hosts
+[#829](https://github.com/metomi/rose/pull/829):
+rose host-select: add a new method to rank and set thresholds for hosts
 by the amount of free memory.
 
-\#827: rose suite-hook --shutdown: add `--kill --now` as options to `cylc
-shutdown`.
+[#827](https://github.com/metomi/rose/pull/827):
+rose suite-hook --shutdown: add `--kill --now` as options to `cylc shutdown`.
 
-\#824: rose macro: add support for macro arguments.
+[#824](https://github.com/metomi/rose/pull/824):
+rose macro: add support for macro arguments.
 
-\#815: rose metadata: len function now available for fail-if, warn-if, etc.
+[#815](https://github.com/metomi/rose/pull/815):
+rose metadata: len function now available for fail-if, warn-if, etc.
 
-\#811: rose config-edit: rule checker will now display message on the status
+[#811](https://github.com/metomi/rose/pull/811):
+rose config-edit: rule checker will now display message on the status
 bar if everything is OK.
 
-\#809: rose namelist-dump: allow and tidy zero-padded numeric inputs.
+[#809](https://github.com/metomi/rose/pull/809):
+rose namelist-dump: allow and tidy zero-padded numeric inputs.
 
-\#808: rosie go: can now list the state of the suites in other user's
+[#808](https://github.com/metomi/rose/pull/808):
+rosie go: can now list the state of the suites in other user's
 `$HOME/roses/` directory.
 
-\#804: rosie ls: new `--user=NAME` option to list the state of the suites in
+[#804](https://github.com/metomi/rose/pull/804):
+rosie ls: new `--user=NAME` option to list the state of the suites in
 other user's `$HOME/roses/` directory.
 
 --------------------------------------------------------------------------------
@@ -599,16 +757,19 @@ This release of Rose works with cylc 5.3.0.
 
 Changes that have significant impact on user experience.
 
-\#769: rose suite-run:
+[#769](https://github.com/metomi/rose/pull/769):
+rose suite-run:
 * Remove `--force` option. User should use `--reload` to install to a running
   suite.
 * New option `--local-install-only` or `-l` to install suite locally only.
   With this option, it will not install the suite to remote job hosts.
 * `--install-only` now implies `--no-gcontrol`.
 
-\#761: rose_prune: new built-in application to housekeep a cycling suite.
+[#761](https://github.com/metomi/rose/pull/761):
+rose_prune: new built-in application to housekeep a cycling suite.
 
-\#739: rose suite-log: replace `rose suite-log-view`. The old command is now an
+[#739](https://github.com/metomi/rose/pull/739):
+rose suite-log: replace `rose suite-log-view`. The old command is now an
 alias of the new command with an improved interface. Support view and update
 modes.
 * In update mode, arguments can now be a `*` (for all task jobs), a cycle
@@ -622,13 +783,16 @@ modes.
 * *Admin Change*: The `[rose-suite-log-view]` section in site/user `rose.conf` is
   renamed `[rose-suite-log]`.
 
-\#732: rose config-edit: ability to load application configurations on demand
+[#732](https://github.com/metomi/rose/pull/732):
+rose config-edit: ability to load application configurations on demand
 for large suites.
 
-\#709: rose config-edit: now has a status bar and a console to view errors
+[#709](https://github.com/metomi/rose/pull/709):
+rose config-edit: now has a status bar and a console to view errors
 and information.
 
-\#707: rosie site/user configuration:
+[#707](https://github.com/metomi/rose/pull/707):
+rosie site/user configuration:
 * *Admin Change*: A new site/user configuration setting
   `[rosie-id]prefix-ws.PREFIX=URL` is introduced to configure the web service URL
   of each `PREFIX`.
@@ -636,17 +800,21 @@ and information.
   removed.
 * The `--ws-root=URL` option is removed from `rosie lookup` and `rosie ls`.
 
-\#668: rose config-edit: support new configuration metadata `value-titles` to
+[#668](https://github.com/metomi/rose/pull/668):
+rose config-edit: support new configuration metadata `value-titles` to
 define a list of titles to associate with a corresponding `values` setting.
 
-\#666, #690: rose task-env and rose task-run: the `--path=[NAME=]GLOB` option can
+[#666](https://github.com/metomi/rose/pull/666),
+[#690](https://github.com/metomi/rose/pull/690):
+rose task-env and rose task-run: the `--path=[NAME=]GLOB` option can
 now be used in either command. Note, however, if `rose task-env` is used before
 `rose task-run`, options shared between the 2 commands, (but not
 `--path=[NAME=]GLOB`) options will be ignored by the subsequent `rose task-run`
 command. This may some minor change in behaviour of some existing suites as
 `PATH` would be modified by `rose task-env`.
 
-\#661: rose metadata-check: new command to validate configuration metadata.
+[#661](https://github.com/metomi/rose/pull/661):
+rose metadata-check: new command to validate configuration metadata.
 Integrated into rose config-edit start-up checking.
 
 ### Other Changes
@@ -654,47 +822,65 @@ Integrated into rose config-edit start-up checking.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-\#758: rosie go: home view now has `roses:/` displayed in the address bar for
+[#758](https://github.com/metomi/rose/pull/758):
+rosie go: home view now has `roses:/` displayed in the address bar for
 the home view.
 
-\#753: rose documentation: added advice for delivery of training courses.
+[#753](https://github.com/metomi/rose/pull/753):
+rose documentation: added advice for delivery of training courses.
 
-\#712: rose config-edit: can show variable descriptions and help in-page.
+[#712](https://github.com/metomi/rose/pull/712):
+rose config-edit: can show variable descriptions and help in-page.
 Descriptions are shown by default. Customisable formatting.
 
-\#707: rosie site/user configuration: The `[rosie-browse]` section is now
+[#707](https://github.com/metomi/rose/pull/707):
+rosie site/user configuration: The `[rosie-browse]` section is now
 `[rosie-go]`.
 
-\#675: rose config-edit: The quoted widget no longer messes with the quote
+[#675](https://github.com/metomi/rose/pull/675):
+rose config-edit: The quoted widget no longer messes with the quote
 characters when a non-quote related error occurs.
 
-\#672: rose config-edit: titles and descriptions in the `Add` menu.
+[#672](https://github.com/metomi/rose/pull/672):
+rose config-edit: titles and descriptions in the `Add` menu.
 
-\#671: rose suite-log-view: HTML view: fix delta time sort.
+[#671](https://github.com/metomi/rose/pull/671):
+rose suite-log-view: HTML view: fix delta time sort.
 
-\#670: rose config-edit: information on optional configuration. If a setting
+[#670](https://github.com/metomi/rose/pull/670):
+rose config-edit: information on optional configuration. If a setting
 can be modified in an optional configuration, the information will now be
 shown with the setting's label.
 
-\#665: rose config-edit: fix ignore status logic.
+[#665](https://github.com/metomi/rose/pull/665):
+rose config-edit: fix ignore status logic.
 
-\#663: rose suite-hook and rose suite-log-view: more efficient logic.
+[#663](https://github.com/metomi/rose/pull/663):
+rose suite-hook and rose suite-log-view: more efficient logic.
 
-\#659, #664: rose suite-run site/user configuration: configure a list of
+[#659](https://github.com/metomi/rose/pull/659),
+[#664](https://github.com/metomi/rose/pull/664):
+rose suite-run site/user configuration: configure a list of
 scannable hosts. This is useful when a set of hosts are no longer intended to be
 used to run new suites but still have running suites on them.
 
-\#652: rosie go: can now navigate home view.
+[#652](https://github.com/metomi/rose/pull/652):
+rosie go: can now navigate home view.
 
-\#650: rosie go: no longer crash when copying an empty suite.
+[#650](https://github.com/metomi/rose/pull/650):
+rosie go: no longer crash when copying an empty suite.
 
-\#649: rose suite-shutdown: improve interface with `cylc shutdown`.
+[#649](https://github.com/metomi/rose/pull/649):
+rose suite-shutdown: improve interface with `cylc shutdown`.
 
-\#647: rosie ls: now a query.
+[#647](https://github.com/metomi/rose/pull/647):
+rosie ls: now a query.
 
-\#634: rose config-edit: support latent ignored pages.
+[#634](https://github.com/metomi/rose/pull/634):
+rose config-edit: support latent ignored pages.
 
-\#628: rose mpi-launch: new `--file=FILE` option or `$PWD/rose-mpi-launch.rc`
+[#628](https://github.com/metomi/rose/pull/628):
+rose mpi-launch: new `--file=FILE` option or `$PWD/rose-mpi-launch.rc`
 to specify a command file to use with the MPI launcher.
 
 --------------------------------------------------------------------------------
@@ -707,29 +893,38 @@ This release of Rose works with cylc 5.2.0.
 
 Changes that have significant impact on user experience.
 
-\#577: rose suite-log-view: now uses `--name=SUITE-NAME` instead of an argument
+[#577](https://github.com/metomi/rose/pull/577):
+rose suite-log-view: now uses `--name=SUITE-NAME` instead of an argument
 to specify a suite.
 
-\#559: rose config-edit: added custom interface to display STASH configuration.
+[#559](https://github.com/metomi/rose/pull/559):
+rose config-edit: added custom interface to display STASH configuration.
 
 ### Other Changes
 
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-\#620: rose suite-shutdown: added `--all` option to shutdown all of your
+[#620](https://github.com/metomi/rose/pull/620):
+rose suite-shutdown: added `--all` option to shutdown all of your
 running rose suites.
 
-\#621: rose stem: will now log version control information for each source.
+[#621](https://github.com/metomi/rose/pull/621):
+rose stem: will now log version control information for each source.
 
-\#617: rose suite-gcontrol: added `--all` option to launch the control
+[#617](https://github.com/metomi/rose/pull/617):
+rose suite-gcontrol: added `--all` option to launch the control
 GUI for all your running suites.
 
-\#605: rose configuration files: added syntax highlight for Kate.
+[#605](https://github.com/metomi/rose/pull/605):
+rose configuration files: added syntax highlight for Kate.
 
-\#604: rose date -c: new option, short for `rose date $ROSE_TASK_CYCLE_TIME`.
+[#604](https://github.com/metomi/rose/pull/604):
+rose date -c: new option, short for `rose date $ROSE_TASK_CYCLE_TIME`.
 
-\#603, #641: rose suite-log-view: new `--log-archive-threshold=CYCLE-TIME` option.
+[#603](https://github.com/metomi/rose/pull/603),
+[#641](https://github.com/metomi/rose/pull/641):
+rose suite-log-view: new `--log-archive-threshold=CYCLE-TIME` option.
 The option switches on job log archiving by specifying a cycle time threshold.
 All job logs at this cycle time or older will be archived.
 
@@ -738,20 +933,27 @@ cycle times only. The default view will ignore cycles with job logs that have
 been archived, but this can be modified via a multiple selection box and/or via
 URL query.
 
-\#595: rosie lookup, rosie ls: now output with column headings.
+[#595](https://github.com/metomi/rose/pull/595):
+rosie lookup, rosie ls: now output with column headings.
 
-\#571: user guide: added a quick reference guide.
+[#571](https://github.com/metomi/rose/pull/571):
+user guide: added a quick reference guide.
 
-\#567: rose suite-clean: new command to remove items created by suite runs.
+[#567](https://github.com/metomi/rose/pull/567):
+rose suite-clean: new command to remove items created by suite runs.
 
-\#546: rose metadata: new macro option.
+[#546](https://github.com/metomi/rose/pull/546):
+rose metadata: new macro option.
 
-\#534: rose_ana built-in application: now support arguments.
+[#534](https://github.com/metomi/rose/pull/534):
+rose_ana built-in application: now support arguments.
 
-\#475: rose suite-hook, rose suite-log-view: support latest naming convention
+[#475](https://github.com/metomi/rose/pull/475):
+rose suite-hook, rose suite-log-view: support latest naming convention
 of Cylc task ID. (Cylc 5.1.0)
 
-\#467: rose sgc: alias of `rose suite-gcontrol`.
+[#467](https://github.com/metomi/rose/pull/467):
+rose sgc: alias of `rose suite-gcontrol`.
 
 User guide: added many new tutorials.
 
@@ -765,7 +967,8 @@ This is the 3rd release of Rose.
 
 Changes that have significant impact on user experience.
 
-\#422: rose suite-run: will now call `cylc validate --strict` by default.
+[#422](https://github.com/metomi/rose/pull/422):
+rose suite-run: will now call `cylc validate --strict` by default.
 Use the `--no-strict` option if this is not desirable.
 
 ### Other Changes
@@ -773,16 +976,20 @@ Use the `--no-strict` option if this is not desirable.
 Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
-\#454: Optional configuration files are now supported by all types of Rose
+[#454](https://github.com/metomi/rose/pull/454):
+Optional configuration files are now supported by all types of Rose
 configurations. The `opts=KEY ...` setting in the main configuration file of a
 Rose configuration can now be used to select a list of optional configurations.
 
-\#451: rose config-edit: the description of a page is now displayed at its
+[#451](https://github.com/metomi/rose/pull/451):
+rose config-edit: the description of a page is now displayed at its
 header.
 
-\#443: rose config-edit: user can now reload metadata with a single menu command.
+[#443](https://github.com/metomi/rose/pull/443):
+rose config-edit: user can now reload metadata with a single menu command.
 
-\#418: rose suite-hook: support latest naming convention of Cylc task job log.
+[#418](https://github.com/metomi/rose/pull/418):
+rose suite-hook: support latest naming convention of Cylc task job log.
 (Cylc 5.0.1 - 5.0.3.)
 
 --------------------------------------------------------------------------------
@@ -795,12 +1002,16 @@ This is the 2nd release of Rose. We hope you find it useful.
 
 Changes that have significant impact on user experience.
 
-\#244, etc: Rose User Guide: Added S5 slide show enabled documentation chapters.
+[#244](https://github.com/metomi/rose/pull/244),
+etc: Rose User Guide: Added S5 slide show enabled documentation chapters.
 * Improved brief tour of the system.
 * Chapters: Introduction, In Depth Topics, Suites
 * Tutorials: Metadata, Suite Writing, Advanced (x9).
 
-\#165, #242, #243: rose suite-run: run modes and new log directory mechanism:
+[#165](https://github.com/metomi/rose/pull/165),
+[#242](https://github.com/metomi/rose/pull/242),
+[#243](https://github.com/metomi/rose/pull/243):
+rose suite-run: run modes and new log directory mechanism:
 * Log directories no longer rotated.
 * Introduce a run mode: `--run=reload|restart|run`.
   In reload and restart modes, the existing log directory is used.
@@ -815,7 +1026,8 @@ Changes that have significant impact on user experience.
 * If `--log-keep=DAYS` is specified, `log.DATETIME` directories with modified
   time older than the specified number of `DAYS` are removed.
 
-\#404: `rose task-run`'s *task utilities* are rebranded as `rose app-run`'s
+[#404](https://github.com/metomi/rose/pull/404):
+`rose task-run`'s *task utilities* are rebranded as `rose app-run`'s
 *built-in applications*. This makes it logical to introduce a mode setting in
 the `rose-app.conf` to specify a built-in application
 (as opposed to running a command).
@@ -836,36 +1048,46 @@ and lots of minor documentation improvements.
 
 Changes that are worth mentioning:
 
-\#396: rose ana: command replaced by the `rose_ana` builtin application.
+[#396](https://github.com/metomi/rose/pull/396):
+rose ana: command replaced by the `rose_ana` builtin application.
 
-\#390: rose config-edit: buttons to suite engine's gcontrol and log view.
+[#390](https://github.com/metomi/rose/pull/390):
+rose config-edit: buttons to suite engine's gcontrol and log view.
 
-\#388: rose suite-run, rose app-run:
+[#388](https://github.com/metomi/rose/pull/388):
+rose suite-run, rose app-run:
 --opt-conf-key=KEY can now be specified via the `ROSE_SUITE_OPT_CONF_KEYS` and
 `ROSE_APP_OPT_CONF_KEYS` environment variables
 
-\#386: rose suite-run, rose app-run:
-file install target names can now contain environment variable substitution
-syntax.
+[#386](https://github.com/metomi/rose/pull/386):
+rose suite-run, rose app-run: file install target names can now contain
+environment variable substitution syntax.
 
-\#375: Rose configuration: add syntax highlight files for `gedit` and `vim`.
+[#375](https://github.com/metomi/rose/pull/375):
+Rose configuration: add syntax highlight files for `gedit` and `vim`.
 
-\#368: rose suite-run: wait for `cylc run` to complete.
+[#368](https://github.com/metomi/rose/pull/368):
+rose suite-run: wait for `cylc run` to complete.
 
-\#350: rose suite-run: export Rose and suite engine versions to suite.
+[#350](https://github.com/metomi/rose/pull/350):
+rose suite-run: export Rose and suite engine versions to suite.
 
-\#349: rose env-cat: new command to substitute environment variables in input
+[#349](https://github.com/metomi/rose/pull/349):
+rose env-cat: new command to substitute environment variables in input
 files and print result.
 
-\#340: rose suite-run: tidy old symbolic links in `$HOME/.cylc/`.
+[#340](https://github.com/metomi/rose/pull/340):
+rose suite-run: tidy old symbolic links in `$HOME/.cylc/`.
 
-\#329: rose suite-shutdown: new command.
+[#329](https://github.com/metomi/rose/pull/329): rose suite-shutdown: new command.
 * rose suite-gcontrol: use `--name=SUITE-NAME` to specify a suite name instead
 of the last argument.
 
-\#313: rose config: added `--meta` and `--meta-key` options.
+[#313](https://github.com/metomi/rose/pull/313):
+rose config: added `--meta` and `--meta-key` options.
 
-\#299: rose task-run: the built-in `fcm_make(2)` task utilities can
+[#299](https://github.com/metomi/rose/pull/299):
+rose task-run: the built-in `fcm_make(2)` task utilities can
 now be configured using Rose application configurations.
 * `fcm_make2*` task will automatically use `fcm_make*` task's application
   configuration.
@@ -874,26 +1096,34 @@ now be configured using Rose application configurations.
 * Remove support for `ROSE_TASK_PRE_SCRIPT` - ask users to move to suite's pre
   command scripting.
 
-\#284: rose config-dump: new command to re-dump Rose configuration files in
+[#284](https://github.com/metomi/rose/pull/284):
+rose config-dump: new command to re-dump Rose configuration files in
 in a directory into a common format.
 
-\#282: rose suite-log-view: Index view:
+[#282](https://github.com/metomi/rose/pull/282):
+rose suite-log-view: Index view:
 * Allow display of suite information.
 * Added column for cycle time.
 * Added data generation date-time.
 
-\#273: geditor setting: no longer use the environment variables EDITOR/VISUAL
+[#273](https://github.com/metomi/rose/pull/273):
+geditor setting: no longer use the environment variables EDITOR/VISUAL
 to reduce the chance of opening a terminal based editor in a GUI environment.
 
-\#261, #263: rose config-edit: file `content` no longer supported.
+[#261](https://github.com/metomi/rose/pull/261),
+[#263](https://github.com/metomi/rose/pull/263):
+rose config-edit: file `content` no longer supported.
 
-\#248: rose-suite-log-view: Log file view:
+[#248](https://github.com/metomi/rose/pull/248):
+rose-suite-log-view: Log file view:
 * Added link to toggle between HTML and text.
 * Added link to view raw text.
 
-\#238: rose suite-log-view: New --full option to re-sync logs of remote tasks.
+[#238](https://github.com/metomi/rose/pull/238):
+rose suite-log-view: New --full option to re-sync logs of remote tasks.
 
-\#231: rose date: New command.
+[#231](https://github.com/metomi/rose/pull/231):
+rose date: New command.
 
 --------------------------------------------------------------------------------
 
