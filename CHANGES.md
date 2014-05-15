@@ -5,16 +5,19 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-05-??)
+## 2014-05 (2014-05-??)
 
 This release of Rose will work best with
-[Cylc](https://github.com/cylc/cylc/) 5.4.13?
+[Cylc](https://github.com/cylc/cylc/) 5.4.13 and 5.4.14.
 
 ### Highlighted Changes
 
--none yet-
+-none-
 
 ### Noteworthy Changes
+
+[#1256](https://github.com/metomi/rose/pull/1256):
+rose\_prune: work directory: support glob by task name.
 
 [#1252](https://github.com/metomi/rose/pull/1252):
 rose env-cat: new `--match-mode=brace` option to only perform
@@ -109,7 +112,7 @@ and `--group=GROUPS` options.
 rose metadata: fail-if: handle divide by zero exceptions.
 
 [#1194](https://github.com/metomi/rose/pull/1194):
-rose_ana: cumf: include cumf output path in output.
+rose\_ana: cumf: include cumf output path in output.
 
 [#1190](https://github.com/metomi/rose/pull/1190):
 rosie lookup: allow override of quiet mode print format.
@@ -155,7 +158,7 @@ Previously, the system will assume the `auto` mode if it is given a bad file
 install mode value. It will now fail.
 
 [#1171](https://github.com/metomi/rose/pull/1171):
-rose_ana: print number of values compared.
+rose\_ana: print number of values compared.
 
 [#1169](https://github.com/metomi/rose/pull/1169):
 rose stem: improve robustness of keyword match.
@@ -167,7 +170,7 @@ rose config-edit: fix general checking for `rose-suite.info` suites.
 rose app-upgrade, rose macro: fix current working directory.
 
 [#1159](https://github.com/metomi/rose/pull/1159):
-rose_ana: cumf: read output by lines to reduce memory footprint.
+rose\_ana: cumf: read output by lines to reduce memory footprint.
 
 [#1157](https://github.com/metomi/rose/pull/1157):
 rose suite-hook --mail: configurable SMTP host.
@@ -287,7 +290,8 @@ This release of Rose works best with Cylc 5.4.4 to 5.4.7.
 
 ### Highlighted Changes
 
-[#1085](https://github.com/metomi/rose/pull/1085): rosie web service: the web service database schema has been modified to
+[#1085](https://github.com/metomi/rose/pull/1085):
+rosie web service: the web service database schema has been modified to
 improve performance. **This change requires the rosie web service database to
 be re-built.** To do so, shut down the web service. Remove (or move) the old
 database file(s) and run the `$ROSE_HOME/sbin/rosa db-create` command to
@@ -308,7 +312,7 @@ rose CLI: bash command completion.
 ### Noteworthy Changes
 
 [#1090](https://github.com/metomi/rose/pull/1090):
-rose_arch: fix None status in event when source-edit fails.
+rose\_arch: fix None status in event when source-edit fails.
 
 [#1089](https://github.com/metomi/rose/pull/1089):
 rose bush: catch unicode decode error in view.
@@ -368,7 +372,7 @@ directories on job hosts created by an old version of `rose suite-run`.)
 ### Noteworthy Changes
 
 [#1055](https://github.com/metomi/rose/pull/1055):
-rose_arch: fix `update-check=mtime+size` uniqueness problem for file
+rose\_arch: fix `update-check=mtime+size` uniqueness problem for file
 sources with identical modified times and sizes.
 
 [#1053](https://github.com/metomi/rose/pull/1053):
@@ -463,7 +467,7 @@ files because the command is 10 times faster than Python's library. This
 affects `rose suite-run`, `rose suite-log`, `rose_prune`, `rose_arch`.
 
 [#982](https://github.com/metomi/rose/pull/982):
-rose_arch: add time diagnostics.
+rose\_arch: add time diagnostics.
 
 [#981](https://github.com/metomi/rose/pull/981):
 rose config-edit: handle unregistered suite `gcylc` launch failure.
@@ -487,7 +491,7 @@ determine if a suite is still running or not.
 [#968](https://github.com/metomi/rose/pull/968): rose stem: accept more schemes for Subversion URLs.
 
 [#960](https://github.com/metomi/rose/pull/960):
-rose_arch: new `source-edit` setting to specify a command to transform
+rose\_arch: new `source-edit` setting to specify a command to transform
 the content of the source file before sending it to the archive.
 
 [#957](https://github.com/metomi/rose/pull/957):
@@ -498,7 +502,7 @@ rose config-dump: new `--no-pretty` option. Pretty print is now the
 default.
 
 [#949](https://github.com/metomi/rose/pull/949):
-rose_arch: allow use of file modified time and size instead of MD5
+rose\_arch: allow use of file modified time and size instead of MD5
 checksum to determine whether a source file is changed.
 
 [#947](https://github.com/metomi/rose/pull/947):
@@ -548,7 +552,7 @@ rose mpi-launch: fix unbound `ROSE_LAUNCHER_BASE` on usage with a null
 configuration.
 
 [#925](https://github.com/metomi/rose/pull/925):
-rose_arch: fix incorrect behaviour if a source is a directory.
+rose\_arch: fix incorrect behaviour if a source is a directory.
 
 [#921](https://github.com/metomi/rose/pull/921):
 rose host-select: new `--choice=N` option to choose a top from any of
@@ -559,7 +563,7 @@ the top `N` hosts.
 [#897](https://github.com/metomi/rose/pull/897),
 [#896](https://github.com/metomi/rose/pull/896),
 [#894](https://github.com/metomi/rose/pull/894):
-rose_arch: improve diagnostics.
+rose\_arch: improve diagnostics.
 
 [#915](https://github.com/metomi/rose/pull/915):
 rose suite-clean, rose suite-gcontrol, rose suite-stop: improve support
@@ -617,7 +621,7 @@ Lots of bug fixes and enhancements, and documentation improvements.
 The following are worth mentioning:
 
 [#883](https://github.com/metomi/rose/pull/883):
-rose_arch: new built-in application: a generic solution to configure
+rose\_arch: new built-in application: a generic solution to configure
 site-specific archiving of suite files. (This built-in application should be
 considered experimental at this release.)
 
@@ -637,7 +641,7 @@ rose config-edit: improved reporting of results from macros.
 rose macro: added command line trigger state validation.
 
 [#851](https://github.com/metomi/rose/pull/851):
-rose app-run: rose_prune: modified to use the default shell to delete
+rose app-run: rose\_prune: modified to use the default shell to delete
 files at the suite host. This should allow more powerful glob matching than
 what is provided by the Python standard library.
 
@@ -691,7 +695,7 @@ rose date: now supports letter options for both `--*-format=FORMAT` options.
 * `--print-format=FORMAT` can now be `-f FORMAT` (for `strftime`).
 
 [#789](https://github.com/metomi/rose/pull/789):
-rose_prune: user interface refreshed. Functionalities now divided into 4
+rose\_prune: user interface refreshed. Functionalities now divided into 4
 settings:
 * `prune-remote-logs-at=cycle ...`
 * `archive-logs-at=cycle ...`
@@ -716,7 +720,7 @@ The following are worth mentioning:
 rose config-edit: improved metadata display for the UM STASH plugin widget.
 
 [#839](https://github.com/metomi/rose/pull/839):
-rose metadata: new 'python_list' type for use with interfaces that support
+rose metadata: new `python_list` type for use with interfaces that support
 Pythonic-format lists as input - e.g. Jinja2 via the rose-suite.conf file.
 
 [#829](https://github.com/metomi/rose/pull/829):
@@ -766,7 +770,7 @@ rose suite-run:
 * `--install-only` now implies `--no-gcontrol`.
 
 [#761](https://github.com/metomi/rose/pull/761):
-rose_prune: new built-in application to housekeep a cycling suite.
+rose\_prune: new built-in application to housekeep a cycling suite.
 
 [#739](https://github.com/metomi/rose/pull/739):
 rose suite-log: replace `rose suite-log-view`. The old command is now an
@@ -946,7 +950,7 @@ rose suite-clean: new command to remove items created by suite runs.
 rose metadata: new macro option.
 
 [#534](https://github.com/metomi/rose/pull/534):
-rose_ana built-in application: now support arguments.
+rose\_ana built-in application: now support arguments.
 
 [#475](https://github.com/metomi/rose/pull/475):
 rose suite-hook, rose suite-log-view: support latest naming convention
