@@ -1,0 +1,31 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[event hooks]]
+        timeout handler=rose suite-hook --shutdown
+        timeout=1
+[scheduling]
+    initial cycle time=2013010100
+    final cycle time=2013010300
+    [[dependencies]]
+        [[[ 0, 12 ]]]
+            graph="""
+root[T-12]:finish-all => rose_prune
+"""
+
+[runtime]
+    [[root]]
+        [[[event hooks]]]
+            succeeded handler=rose suite-hook
+            failed handler=rose suite-hook
+            submission failed handler=rose suite-hook --shutdown
+            submission timeout handler=rose suite-hook
+            execution timeout handler=rose suite-hook
+            submission timeout=1
+            execution timeout=1
+    [[t1,t2,t3]]
+        command scripting=rose task-run --app-key=hello
+    [[rose_prune]]
+        command scripting="""
+rose task-run -v -v --debug | tee -a $CYLC_SUITE_RUN_DIR/prune.log
+"""

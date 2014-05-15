@@ -19,7 +19,6 @@
 #-----------------------------------------------------------------------------
 """Builtin application: rose_prune: suite housekeeping application."""
 
-from glob import glob
 import os
 from rose.app_run import BuiltinApp, ConfigValueError
 from rose.date import RoseDateShifter
@@ -35,7 +34,7 @@ class RosePruneApp(BuiltinApp):
     SCHEME = "rose_prune"
     SECTION = "prune"
 
-    def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
+    def run(self, app_runner, conf_tree, *_):
         """Suite housekeeping application.
 
         This application is designed to work under "rose task-run" in a cycling
@@ -49,9 +48,11 @@ class RosePruneApp(BuiltinApp):
                                                   "prune-remote-logs-at")
         archive_logs_cycles = self._get_conf(conf_tree, "archive-logs-at")
         if prune_remote_logs_cycles or archive_logs_cycles:
-            prune_remote_logs_cycles = filter(
-                    lambda c: c not in archive_logs_cycles,
-                    prune_remote_logs_cycles)
+            tmp_prune_remote_logs_cycles = []
+            for cycle in prune_remote_logs_cycles:
+                if cycle not in archive_logs_cycles:
+                    tmp_prune_remote_logs_cycles.append(cycle)
+            prune_remote_logs_cycles = tmp_prune_remote_logs_cycles
             if prune_remote_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_pull_remote(
                             suite_name, prune_remote_logs_cycles,
@@ -61,16 +62,23 @@ class RosePruneApp(BuiltinApp):
                             suite_name, archive_logs_cycles)
         globs = []
         suite_engine_proc = app_runner.suite_engine_proc
-        for key in ["datac", "work"]:
-            k = "prune-" + key + "-at"
-            for cycle, cycle_args_str in self._get_conf(conf_tree, k,
-                                                        arg_ok=True):
-                head = suite_engine_proc.get_cycle_items_globs(key, cycle)
-                if cycle_args_str:
-                    for cycle_arg in shlex.split(cycle_args_str):
-                        globs.append(os.path.join(head, cycle_arg))
-                else:
-                    globs.append(head)
+        for key, max_args in [("datac", 1), ("work", 2)]:
+            for cycle, cycle_args in self._get_conf(conf_tree,
+                                                    "prune-" + key + "-at",
+                                                    max_args=max_args):
+                tail_globs = None
+                if cycle_args:
+                    tail_globs = shlex.split(cycle_args.pop())
+                head_globs = None
+                if cycle_args:
+                    head_globs = shlex.split(cycle_args.pop())
+                for head in suite_engine_proc.get_cycle_items_globs(
+                                                    key, cycle, head_globs):
+                    if tail_globs:
+                        for tail_glob in tail_globs:
+                            globs.append(os.path.join(head, tail_glob))
+                    else:
+                        globs.append(head)
         hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
         suite_dir_rel = suite_engine_proc.get_suite_dir_rel(suite_name)
         form_dict = {"d": suite_dir_rel, "g": " ".join(globs)}
@@ -79,20 +87,20 @@ class RosePruneApp(BuiltinApp):
                        form_dict)
         cwd = os.getcwd()
         for host in hosts + ["localhost"]:
-            d = None
+            sdir = None
             try:
                 if host == "localhost":
-                    d = suite_engine_proc.get_suite_dir(suite_name)
-                    app_runner.fs_util.chdir(d)
-                    out, err = app_runner.popen.run_ok(sh_cmd_tail, shell=True)
+                    sdir = suite_engine_proc.get_suite_dir(suite_name)
+                    app_runner.fs_util.chdir(sdir)
+                    out = app_runner.popen.run_ok(sh_cmd_tail, shell=True)[0]
                 else:
                     cmd = app_runner.popen.get_cmd("ssh", host,
                                                    sh_cmd_head + sh_cmd_tail)
-                    out, err = app_runner.popen.run_ok(*cmd)
-            except RosePopenError as e:
-                app_runner.handle_event(e)
+                    out = app_runner.popen.run_ok(*cmd)[0]
+            except RosePopenError as exc:
+                app_runner.handle_event(exc)
             else:
-                if d is None:
+                if sdir is None:
                     event = FileSystemEvent(FileSystemEvent.CHDIR,
                                             host + ":" + suite_dir_rel)
                     app_runner.handle_event(event)
@@ -102,28 +110,29 @@ class RosePruneApp(BuiltinApp):
                     event = FileSystemEvent(FileSystemEvent.DELETE, line)
                     app_runner.handle_event(event)
             finally:
-                if d:
+                if sdir:
                     app_runner.fs_util.chdir(cwd)
         return
 
-    def _get_conf(self, conf_tree, key, arg_ok=False):
+    def _get_conf(self, conf_tree, key, max_args=0):
         """Get a list of cycles from a configuration setting.
 
         key -- An option key in self.SECTION to locate the setting.
-        arg_ok -- A boolean to indicate whether an item in the list can have
-                  extra arguments or not.
+        max_args -- Maximum number of extra arguments for an item in the list.
 
         The value of the setting is expected to be split by shlex.split into a
-        list of items. If arg_ok is False, an item should be a string
-        representing a cycle or an cycle offset. If arg_ok is True, the cycle
-        or cycle offset string can, optionally, have an argument after a colon.
+        list of items. If max_args == 0, an item should be a string
+        representing a cycle or an cycle offset. If max_args > 0, the cycle
+        or cycle offset string can, optionally, have arguments. The arguments
+        are delimited by colons ":".
         E.g.:
 
         prune-remote-logs-at=-6h -12h
         prune-datac-at=-6h:foo/* -12h:'bar/* baz/*' -1d
+        prune-work-at=-6h:t1*:*.tar -12h:t1*: -12h:*.gz -1d
 
-        If arg_ok is False, return a list of cycles.
-        If arg_ok is True, return a list of (cycle, arg)
+        If max_args == 0, return a list of cycles.
+        If max_args > 0, return a list of (cycle, [arg, ...])
 
         """
         items_str = conf_tree.node.get_value([self.SECTION, key])
@@ -131,21 +140,19 @@ class RosePruneApp(BuiltinApp):
             return []
         try:
             items_str = env_var_process(items_str)
-        except UnboundEnvironmentVariableError as e:
-            raise ConfigValueError([self.SECTION, key], items_str, e)
+        except UnboundEnvironmentVariableError as exc:
+            raise ConfigValueError([self.SECTION, key], items_str, exc)
         items = []
-        ds = RoseDateShifter(task_cycle_time_mode=True)
+        dshift = RoseDateShifter(task_cycle_time_mode=True)
         for item_str in shlex.split(items_str):
-            if arg_ok and ":" in item_str:
-                item, arg = item_str.split(":", 1)
-            else:
-                item, arg = (item_str, None)
-            if ds.is_task_cycle_time_mode() and ds.is_offset(item):
-                cycle = ds.date_shift(offset=item)
+            args = item_str.split(":", max_args)
+            item = args.pop(0)
+            if dshift.is_task_cycle_time_mode() and dshift.is_offset(item):
+                cycle = dshift.date_shift(offset=item)
             else:
                 cycle = item
-            if arg_ok:
-                items.append((cycle, arg))
+            if max_args:
+                items.append((cycle, args))
             else:
                 items.append(cycle)
         return items

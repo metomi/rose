@@ -190,7 +190,7 @@ class CylcProcessor(SuiteEngineProcessor):
         self.popen(fmt % (host, suite_name, args_str, os.devnull),
                    env=environ, shell=True)
 
-    def get_cycle_items_globs(self, name, cycle):
+    def get_cycle_items_globs(self, name, cycle, task_globs=None):
         """Return a glob to match named items created for a given cycle.
 
         E.g.:
@@ -200,8 +200,15 @@ class CylcProcessor(SuiteEngineProcessor):
         Return None if named item not supported.
 
         """
-        dict_ = {"datac": "share/data/" + cycle, "work": "work/*." + cycle}
-        return dict_.get(name)
+        if task_globs is None:
+            task_globs = ["*"]
+        dict_ = {"datac": "share/data/%(cycle)s",
+                 "work": "work/%(task_glob)s.%(cycle)s"}
+        globs = []
+        for task_glob in task_globs:
+            glob_ = dict_.get(name) % {"cycle": cycle, "task_glob": task_glob}
+            globs.append(glob_)
+        return globs
 
     def get_suite_dir_rel(self, suite_name, *paths):
         """Return the relative path to the suite running directory.
