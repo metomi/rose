@@ -32,12 +32,12 @@ def _launch(name, event_handler=None, run_fg=False, *args, **kwargs):
 
 def launch_fs_browser(source, event_handler=None, **kwargs):
     """Launch a graphical filesystem browser e.g. nautilus."""
-    _launch("fs_browser", event_handler, source, **kwargs)
+    _launch("fs_browser", event_handler, False, source, **kwargs)
 
 
 def launch_geditor(source, event_handler=None, **kwargs):
     """Launch a graphical text editor for a path e.g. gedit."""
-    _launch("geditor", event_handler, source, **kwargs)
+    _launch("geditor", event_handler, False, source, **kwargs)
 
 
 def launch_image_viewer(source, event_handler=None, run_fg=False,
@@ -50,4 +50,4 @@ def launch_terminal(args=None, event_handler=None, **kwargs):
     """Launch a terminal e.g. gnome-terminal."""
     if args is None:
         args = []
-    _launch("terminal", event_handler, *args, **kwargs)
+    _launch("terminal", event_handler, False, *args, **kwargs)
