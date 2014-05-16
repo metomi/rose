@@ -327,10 +327,22 @@ class AppRunner(Runner):
             if not rel_path.startswith("file" + os.sep):
                 continue
             name = rel_path[len("file" + os.sep):]
-            section = file_section_prefix + name
-            if conf_tree.node.get([section], no_ignore=True) is None:
-                conf_tree.node.set([section, "source"],
-                                   os.path.join(conf_dir, rel_path))
+            # Top level only, very slow otherwise
+            if os.sep in name:
+                name = name.split(os.sep, 1)[0]
+            target_key = file_section_prefix + name
+            target_node = conf_tree.node.get([target_key])
+            if target_node is None:
+                conf_tree.node.set([target_key])
+                target_node = conf_tree.node.get([target_key])
+            elif target_node.is_ignored():
+                continue
+            source_node = target_node.get("source")
+            if source_node is None:
+                target_node.set(["source"],
+                                os.path.join(conf_dir, "file", name))
+            elif source_node.is_ignored():
+                continue
 
         # Process Environment Variables
         self.config_pm(conf_tree, "env")
