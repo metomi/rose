@@ -219,7 +219,9 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         if preview_status:
             title = rose.config_editor.TITLE_PAGE_PREVIEW_MARKUP.format(title)
         if latent_status:
-            title = rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(title)
+            if self._get_is_latent_sub_tree(model, r_iter):
+                title = rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(
+                    title)
         if ignored_status:
             title = rose.config_editor.TITLE_PAGE_IGNORED_MARKUP.format(
                                                   ignored_status, title)
@@ -543,6 +545,23 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 stack.append(treemodel.iter_children(iter_))
             if path != start_path:
                 stack.append(treemodel.iter_next(iter_))
+
+    def _get_is_latent_sub_tree(self, model, iter_):
+        """Return True if the whole model sub tree is latent."""
+        if not model.get_value(iter_, 8):
+            # This row is not latent.
+            return False
+        iter_stack = [model.iter_children(iter_)]
+        while iter_stack:
+            iter_ = iter_stack.pop(0)
+            if iter_ is None:
+                continue
+            if not model.get_value(iter_, 8):
+                # This sub-row is not latent.
+                return False
+            iter_stack.append(model.iter_children(iter_))
+            iter_stack.append(model.iter_next(iter_))
+        return True            
 
     def _get_should_show(self, model, iter_):
         # Determine whether to show a row.

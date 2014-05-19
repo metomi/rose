@@ -441,7 +441,7 @@ class ConfigDataHelper(object):
         return rose.config.ConfigNode.STATE_NORMAL
 
     def get_ns_latent_status(self, namespace):
-        """Return whether a page only contains missing content."""
+        """Return whether a page has no associated content."""
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
         sections = self.get_sections_from_namespace(namespace)
@@ -457,7 +457,4 @@ class ConfigDataHelper(object):
                     if variable.metadata["full_ns"] == namespace:
                         # This contains an existing variable.
                         return False
-        if self.is_ns_sub_data(namespace) or not sections:
-            # It has sub-data or has nothing at all.
-            return False
         return True
