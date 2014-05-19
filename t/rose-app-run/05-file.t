@@ -81,11 +81,11 @@ run_pass "$TEST_KEY" rose app-run --config=../config
 DIR=$(cd ..; pwd)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
-[INFO] create: hello3
-[INFO] install: hello3/text
-[INFO]     source: $DIR/config/file/hello3/text
 [INFO] install: hello2
 [INFO]     source: $DIR/config/file/hello2
+[INFO] create: hello3
+[INFO] install: hello3
+[INFO]     source: $DIR/config/file/hello3
 [INFO] install: hello1
 [INFO]     source: $DIR/config/file/hello1
 [INFO] command: cat hello1 hello2 hello3/text
@@ -208,11 +208,11 @@ run_pass "$TEST_KEY" rose app-run --config=../config --install-only
 DIR=$(cd ..; pwd)
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__CONTENT__
 [INFO] export PATH=$PATH
-[INFO] create: hello3
-[INFO] install: hello3/text
-[INFO]     source: $DIR/config/file/hello3/text
 [INFO] install: hello2
 [INFO]     source: $DIR/config/file/hello2
+[INFO] create: hello3
+[INFO] install: hello3
+[INFO]     source: $DIR/config/file/hello3
 [INFO] install: hello1
 [INFO]     source: $DIR/config/file/hello1
 [INFO] command: cat hello1 hello2 hello3/text
