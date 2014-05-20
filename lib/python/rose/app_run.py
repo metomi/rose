@@ -327,7 +327,7 @@ class AppRunner(Runner):
             if not rel_path.startswith("file" + os.sep):
                 continue
             name = rel_path[len("file" + os.sep):]
-            # Top level only, very slow otherwise
+            # No sub-directories, very slow otherwise
             if os.sep in name:
                 name = name.split(os.sep, 1)[0]
             target_key = file_section_prefix + name
