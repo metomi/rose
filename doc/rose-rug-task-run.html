@@ -156,9 +156,23 @@ path-prepend.PERL5LIB=/opt/stuff/lib/perl
 
     <p>The <code>rose task-run</code> command (or the <code>rose app-run</code>
     command) also exports each environment variables in the <var>[env]</var>
-    section in the application configuration file. (The environment variables
-    are exported in no particular oder, so they should not reference one
-    another.) E.g.:</p>
+    section in the application configuration file. N.B.:</p>
+    
+    <ul>
+      <li>The environment variables are exported in no particular oder, so they
+      should not reference one another.</li>
+
+      <li><code>$NAME</code> and <code>${NAME}</code> syntax in values of the
+      settings are substituted by the value of the environment variable
+      <var>NAME</var>. The command does not support any other Unix shell
+      variable substitution/manipulation syntax, nor does it support any Unix
+      shell syntax for sub-shell command substitution. The command fails if
+      <var>NAME</var> is not an environment variable. You can escape a
+      substitution by adding a backslash in front of the syntax, e.g.
+      <code>\$NAME</code> or <code>\${NAME}</code>.</li>
+    </ul>
+    
+    <p>E.g.:</p>
 
     <pre class="prettyprint lang-rose_conf">
 [command]
