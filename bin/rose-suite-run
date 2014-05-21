@@ -74,8 +74,9 @@
 #         configuration directory.
 #     --new, -N
 #         (Re-)create suite runtime locations. This option is equivalent to
-#         running "rose suite-clean -y && rose suite-run". User may want to
-#         take extra care when using this option.
+#         running "rose suite-clean -y && rose suite-run" and will remove
+#         previous runs. Users may want to take extra care when using this
+#         option.
 #     --no-gcontrol
 #         Do not run "cylc gui". Default is to run "cylc gui" if the suite is
 #         running and the DISPLAY environment variable is defined.
