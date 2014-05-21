@@ -46,10 +46,35 @@
 #  terminal=konsole
 [external]
 
-# Configuration specific to the Rosie svn-pre-commit-hook.
+## LDAP settings are only relevant if "[rosa-svn]user-tool=ldap".
+## The attributes for UID, common name and email in the LDAP directory.
+## (default=uid cn mail)
+#  attrs=uid cn mail
+## The base DN in the LDAP directory to search for users
+#  basedn=BASEDN
+## The DN in the LDAP server to bind with to search the directory
+#  binddn=BINDDN
+## The file containing the password to the LDAP server, if required.
+## (default=~/.ldappw)
+#  password-file=PASSWORD
+## The URI of the LDAP server
+#  uri=ldap://my-ldap.my-domain
+[rosa-ldap]
+
+# Configuration for "rosa svn-pre-commit" and "rosa svn-post-commit".
 ## Admin users allowed to write to the trunk of any suite.
+#  super-users=USER1 ...
+## E.g.
 #  super-users=spiderman batman
-[rosa-svn-pre-commit]
+## Notification email address (for the "From:" field in notification emails)
+#  notification-from=EMAIL-ADDRESS
+## E.g.:
+#  notification-from=notifications@my-host.my-org.org
+## Tool to obtain user information. LDAP or Unix getpwnam.
+#  user-tool=ldap|passwd
+## E.g.
+#  user-tool=ldap
+[rosa-svn]
 
 # Configuration specific to "rose config-edit".
 # See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.

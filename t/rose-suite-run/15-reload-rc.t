@@ -20,12 +20,6 @@
 # Test "rose suite-run", reload "suite.rc".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
-poll() {
-    local TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
-    while (($(date +%s) < TIMEOUT)) && eval "$@"; do
-        sleep 1
-    done
-}
 tests 4
 export ROSE_CONF_PATH=
 mkdir -p src

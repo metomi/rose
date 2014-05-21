@@ -24,16 +24,20 @@ Update the Rosie discovery database on changes.
 """
 
 
+from email.mime.text import MIMEText
 import os
 import re
 import rose.config
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
-from rose.reporter import Event, Reporter
+from rose.reporter import Reporter
 from rose.resource import ResourceLocator
+from rose.scheme_handler import SchemeHandlersManager
 from rosie.db import (
     LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
 import shlex
+from smtplib import SMTP
+import socket
 import sqlalchemy as al
 import sys
 import tempfile
@@ -52,6 +56,7 @@ class RosieWriteDAO(object):
         self.tables = {}
 
     def _get_table(self, key):
+        """(Create and) return table of a given key."""
         if not self.tables.has_key(key):
             self.tables[key] = al.Table(key, self.metadata, autoload=True)
         return self.tables[key]
@@ -112,6 +117,9 @@ class RosieSvnPostCommitHook(object):
         if popen is None:
             popen = RosePopener(self.event_handler)
         self.popen = popen
+        path = os.path.dirname(os.path.dirname(sys.modules["rosie"].__file__))
+        self.usertools_manager = SchemeHandlersManager(
+                [path], "rosie.usertools", ["get_emails"])
 
     def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
@@ -130,7 +138,7 @@ class RosieSvnPostCommitHook(object):
                 return False
         return True
 
-    def run(self, repos, revision, *args):
+    def run(self, repos, revision):
         """Update database with changes in a changeset."""
         conf = ResourceLocator.default().get_conf()
         rosie_db_node = conf.get(["rosie-db"], no_ignore=True)
@@ -146,9 +154,9 @@ class RosieSvnPostCommitHook(object):
         idx_branch_rev_info = {}
         author = self._svnlook("author", "-r", revision, repos).strip()
         os.environ["TZ"] = "UTC"
-        d, t, junk = self._svnlook("date", "-r", revision, repos).split(
-            None, 2)
-        date = time.mktime(time.strptime(" ".join([d, t, "UTC"]),
+        date_time_str = self._svnlook("date", "-r", revision, repos)
+        date, dtime, _ = date_time_str.split(None, 2)
+        date = time.mktime(time.strptime(" ".join([date, dtime, "UTC"]),
                            self.DATE_FMT))
 
         # Retrieve copied information on the suite-idx-level.
@@ -174,9 +182,9 @@ class RosieSvnPostCommitHook(object):
             path_statuses.append((path_status, path, i))
 
         # Loop through a stack of statuses, paths, and copy info pointers.
+        configs = {}
         while path_statuses:
             path_status, path, path_num = path_statuses.pop(0)
-            is_new_copied_branch = False
             names = path.split("/")
             sid = "".join(names[0:self.LEN_ID])
             idx = prefix + "-" + sid
@@ -213,9 +221,6 @@ class RosieSvnPostCommitHook(object):
                 if copy_sid != sid and branch:
                     # This has been copied from a different suite.
                     from_idx = prefix + "-" + copy_sid
-                elif branch_path + "/" == path:
-                    # This is a new branch copied from the same suite.
-                    is_new_copied_branch = True
             
             # Figure out our status information.
             if path.rstrip("/") == branch_path:
@@ -250,25 +255,35 @@ class RosieSvnPostCommitHook(object):
             suite_info.setdefault("title", "")
             suite_info.setdefault("optional", {})
 
-            config = self._get_config_node(repos, info_file_path, revision)
+            if (idx, branch, revision) not in configs:
+                new_config = self._get_config_node(
+                                repos, info_file_path, revision)
+                old_config = self._get_config_node(
+                                repos, info_file_path, str(int(revision) - 1))
+                configs[(idx, branch, revision)] = (new_config, old_config)
 
-            old_config = self._get_config_node(repos, info_file_path,
-                                               str(int(revision) - 1))
+                self._notify_access_changes(
+                                    "%s/%s@%s" % (idx, branch, revision),
+                                    suite_info["author"],
+                                    old_config,
+                                    new_config)
 
-            if config is None and old_config is None:
+            new_config, old_config = configs[(idx, branch, revision)]
+
+            if new_config is None and old_config is None:
                 # A technically-invalid commit (likely to be historical).
                 idx_branch_rev_info.pop((idx, branch, revision))
                 continue
 
-            if config is None and status_info[0] == self.ST_DELETED:
-                config = old_config
+            if new_config is None and status_info[0] == self.ST_DELETED:
+                new_config = old_config
             if old_config is None and status_info[0] == self.ST_ADDED:
-                old_config = config
+                old_config = new_config
 
-            if self._get_configs_differ(old_config, config):
+            if self._get_configs_differ(old_config, new_config):
                 status_info[1] = self.ST_MODIFIED
 
-            for key, node in config.value.items():
+            for key, node in new_config.value.items():
                 if node.is_ignored():
                     continue
                 if key in ["owner", "project", "title"]:
@@ -298,21 +313,26 @@ class RosieSvnPostCommitHook(object):
                 dao.insert(LATEST_TABLE_NAME, idx=idx, branch=branch,
                            revision=revision)
 
+    __call__ = run
+
     def _get_config_node(self, repos, info_file_path, revision):
-        f = tempfile.TemporaryFile()
+        """Load configuration file from info_file_path in repos @revision."""
+        t_handle = tempfile.TemporaryFile()
         try:
-            f.write(self._svnlook("cat", "-r", revision, repos,
-                                  info_file_path))
+            t_handle.write(
+                self._svnlook("cat", "-r", revision, repos, info_file_path))
         except RosePopenError:
             return None
-        f.seek(0)
-        config = rose.config.load(f)
-        f.close()
+        t_handle.seek(0)
+        config = rose.config.load(t_handle)
+        t_handle.close()
         return config
 
-    def _get_configs_differ(self, config1, config2):
-        for keys1, node1 in config1.walk(no_ignore=True):
-            node2 = config2.get(keys1, no_ignore=True)
+    @classmethod
+    def _get_configs_differ(cls, old_config, new_config):
+        """Return True if old_config differs from new_config."""
+        for keys1, node1 in old_config.walk(no_ignore=True):
+            node2 = new_config.get(keys1, no_ignore=True)
             if type(node1) != type(node2):
                 return True
             if (not isinstance(node1.value, dict) and
@@ -320,24 +340,101 @@ class RosieSvnPostCommitHook(object):
                 return True
             if node1.comments != node2.comments:
                 return True
-        for keys2, node2 in config2.walk(no_ignore=True):
-            node1 = config1.get(keys2, no_ignore=True)
+        for keys2, node2 in new_config.walk(no_ignore=True):
+            node1 = old_config.get(keys2, no_ignore=True)
             if node1 is None:
                 return True
         return False
 
-    __call__ = run
+    def _notify_access_changes(self, full_id, author, old_config, new_config):
+        """Email owner and/or access-list users on changes."""
+        conf = ResourceLocator.default().get_conf()
+        user_tool_name = conf.get_value(["rosa-svn", "user-tool"])
+        if not user_tool_name:
+            return
+
+        users = set()
+        if old_config is None:
+            new_access_str = new_config.get_value(["access-list"], "")
+            changes = {
+                ("owner", "+"): new_config.get_value(["owner"]),
+                ("access-list", "+"): new_access_str,
+            }
+            users.update(new_access_str.split())
+
+        elif new_config is None:
+            old_owner = old_config.get_value(["owner"])
+            old_access_str = old_config.get_value(["access-list"], "")
+            changes = {
+                ("owner", "-"): old_owner,
+                ("access-list", "-"): old_access_str,
+            }
+            users.add(old_owner)
+            users.update(old_access_str.split())
+
+        else:
+            changes = {}
+            old_owner = old_config.get_value(["owner"])
+            new_owner = new_config.get_value(["owner"])
+            if old_owner != new_owner:
+                changes[("owner", "-")] = old_owner
+                changes[("owner", "+")] = new_owner
+                users.add(old_owner)
+                users.add(new_owner)
+            old_access_str = old_config.get_value(["access-list"], "")
+            new_access_str = new_config.get_value(["access-list"], "")
+            old_access_set = set(old_access_str.split())
+            new_access_set = set(new_access_str.split())
+            if old_access_set != new_access_set:
+                changes[("access-list", "-")] = old_access_str
+                changes[("access-list", "+")] = new_access_str
+                users.update(old_access_set ^ new_access_set)
+
+        users.discard("*")
+        users.discard(author)
+        if not users or users == set([author]):
+            return
+
+        user_tool = self.usertools_manager.get_handler(user_tool_name)
+        users.add(author)
+        emails = sorted(user_tool.get_emails(users))
+        from_email = conf.get_value(["rosa-svn", "notification-from"],
+                                    "notications@" + socket.getfqdn())
+
+        text = ""
+        for key, status in [("owner", "-"),
+                    ("owner", "+"),
+                    ("access-list", "-"),
+                    ("access-list", "+")]:
+            if (key, status) in changes:
+                text += "%s %s=%s\n" % (status, key, changes[(key, status)])
+        msg = MIMEText(text)
+        msg.set_charset("utf-8")
+        msg["From"] = from_email
+        msg["To"] = ", ".join(emails)
+        msg["Subject"] = "[%s] owner/access-list change" % full_id
+        smtp_host = conf.get_value(["rosa-svn", "smtp-host"],
+                                   default="localhost")
+        smtp = SMTP(smtp_host)
+        smtp.sendmail(msg["From"], emails, msg.as_string())
+        smtp.quit()
 
 
-if __name__ == "__main__":
+def main():
+    """Implement "rosa svn-post-commit"."""
     opt_parser = RoseOptionParser()
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     hook = RosieSvnPostCommitHook(report)
     try:
-        hook(*args)
-    except Exception as e:
-        report(e)
+        repos, revision = args[0:2]
+        hook(repos, revision)
+    except Exception as exc:
+        report(exc)
         if opts.debug_mode:
-            traceback.print_exc(e)
+            traceback.print_exc(exc)
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
