@@ -90,8 +90,12 @@ class RoseDateShifter(object):
         if task_cycle_time_mode:
             self.task_cycle_time = os.getenv(self.TASK_CYCLE_TIME_MODE_ENV)
         self.utc_mode = utc_mode
+        if self.utc_mode:
+            assumed_time_zone = (0, 0)
+        else:
+            assumed_time_zone = None
         self.isoparser = isodatetime.parsers.TimePointParser(
-            assume_utc=utc_mode)
+            assumed_time_zone=assumed_time_zone)
 
     def date_format(self, print_format, ref_time=None):
         """Reformat ref_time according to print_format.

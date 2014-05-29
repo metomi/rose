@@ -5,10 +5,10 @@
         timeout handler = "rose suite-hook --shutdown"
         timeout = 2
 [scheduling]
-    initial cycle time = 2013010100
-    final cycle time   = 2013010200
+    initial cycle time = 20130101T0000Z
+    final cycle time   = 20130102T0000Z
     [[dependencies]]
-        [[[ 0, 12 ]]]
+        [[[ PT12H ]]]
             graph = """
 my_task_1
 """
@@ -16,7 +16,7 @@ my_task_1
 [runtime]
     [[root]]
         command scripting = """
-rose task-run --debug --cycle-offset=T12H --path=MY_PATH='etc/my-path/*'
+rose task-run --debug --cycle-offset=PT12H --path=MY_PATH='etc/my-path/*'
 """
         [[[event hooks]]]
            succeeded handler = "rose suite-hook"

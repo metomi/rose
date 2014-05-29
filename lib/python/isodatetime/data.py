@@ -259,6 +259,9 @@ class TimeInterval(object):
 
     """Represent a duration or period of time."""
 
+    DATA_ATTRIBUTES = [
+        "years", "months", "weeks", "days", "hours", "minutes", "seconds"]
+
     def __init__(self, years=0, months=0, weeks=0, days=0,
                  hours=0.0, minutes=0.0, seconds=0.0):
         _type_checker(
@@ -342,6 +345,14 @@ class TimeInterval(object):
             self.weeks = self.days / DAYS_IN_WEEK
             self.years, self.months, self.days = (None, None, None)
             self.hours, self.minutes, self.seconds = (None, None, None)
+
+    def __abs__(self):
+        new = self.copy()
+        for attribute in new.DATA_ATTRIBUTES:
+            attr_value = getattr(new, attribute)
+            if attr_value is not None:
+                setattr(new, attribute, abs(attr_value))
+        return new
 
     def __add__(self, other):
         new = self.copy()
@@ -435,6 +446,18 @@ class TimeInterval(object):
         start_string = "P"
         date_string = ""
         time_string = ""
+        is_fully_negative = False
+        for attribute in self.DATA_ATTRIBUTES:
+            attr_value = getattr(self, attribute)
+            if attr_value is not None:
+                if attr_value > 0:
+                    is_fully_negative = False
+                    break
+                if attr_value < 0:
+                    is_fully_negative = True
+        if is_fully_negative:
+            # This does not adhere to the standard... but it's useful...
+            return "-" + str(abs(self))
         if self.get_is_in_weeks():
             return (start_string + str(self.weeks) + "W").replace(".", ",")
         if self.years:
@@ -501,6 +524,9 @@ class TimeZone(TimeInterval):
                 time_string = "-%02d:%02d"
             return time_string % (abs(self.hours), abs(self.minutes))
 
+    def __repr__(self):
+        return "<isodatetime.data.TimeZone:" + repr(str(self)) + ">"
+
 
 class TimePoint(object):
 
@@ -560,11 +586,11 @@ class TimePoint(object):
     for leap seconds at 60 yet)
     second_of_minute_decimal - a float between 0 and 1, if using decimal
     accuracy for seconds.
-    time_zone_hour - (default 0) an integer denoting the hour timezone
+    time_zone_hour - (default 0) an integer denoting the hour time zone
     offset from UTC. Note that unless this is a truncated
     representation, 0 will be assumed if this is not provided.
     time_zone_minute - (default 0) an integer between 0 and 59 denoting
-    the minute component of the timezone offset from UTC.
+    the minute component of the time zone offset from UTC.
     dump_format - a custom format string to control the stringification
     of the timepoint. See isodatetime.parser_spec for more details.
     truncated - (default False) a boolean denoting whether the
@@ -916,8 +942,8 @@ class TimePoint(object):
         self.time_zone = dest_time_zone
 
     def set_time_zone_to_local(self):
-        """Set the time zone to the local timezone, if it's not already."""
-        local_hours, local_minutes = timezone.get_timezone_for_locale()
+        """Set the time zone to the local time zone, if it's not already."""
+        local_hours, local_minutes = timezone.get_local_time_zone()
         self.set_time_zone(TimeZone(hours=local_hours, minutes=local_minutes))
 
     def set_time_zone_to_utc(self):
@@ -1896,6 +1922,38 @@ def iter_months_days(year, month_of_year=None, day_of_month=None,
                 for day in day_range:
                     yield i + 1, day
 
+
+def set_360_calendar():
+    """Set constants for the 360 day calendar"""
+    globals()['DAYS_IN_MONTHS'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]
+    globals()['DAYS_IN_MONTHS_LEAP'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]
+    globals()['MONTHS_IN_YEAR'] = 12
+    globals()['ROUGH_DAYS_IN_MONTH'] = 30 # Used for duration conversion, nowhere else.
+    globals()['DAYS_IN_YEAR'] = 360
+    globals()['ROUGH_DAYS_IN_YEAR'] = 360
+    globals()['DAYS_IN_YEAR_LEAP'] = 360
+    globals()['HOURS_IN_YEAR'] = 360 * HOURS_IN_DAY
+    globals()['MINUTES_IN_YEAR'] = 360 * MINUTES_IN_DAY
+    globals()['SECONDS_IN_YEAR'] = 360 * SECONDS_IN_DAY
+    globals()['HOURS_IN_YEAR_LEAP'] = 360 * HOURS_IN_DAY
+    globals()['MINUTES_IN_YEAR_LEAP'] = 360 * MINUTES_IN_DAY
+    globals()['SECONDS_IN_YEAR_LEAP'] = 360 * SECONDS_IN_DAY
+
+def set_gregorian_calendar():
+    """Set constants for the gregorian calendar"""
+    globals()['DAYS_IN_MONTHS'] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    globals()['DAYS_IN_MONTHS_LEAP'] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    globals()['MONTHS_IN_YEAR'] = 12
+    globals()['ROUGH_DAYS_IN_MONTH'] = 30 # Used for duration conversion, nowhere else.
+    globals()['DAYS_IN_YEAR'] = sum(DAYS_IN_MONTHS)
+    globals()['ROUGH_DAYS_IN_YEAR'] = DAYS_IN_YEAR
+    globals()['DAYS_IN_YEAR_LEAP'] = sum(DAYS_IN_MONTHS_LEAP)
+    globals()['HOURS_IN_YEAR'] = DAYS_IN_YEAR* HOURS_IN_DAY
+    globals()['MINUTES_IN_YEAR'] = DAYS_IN_YEAR * MINUTES_IN_DAY
+    globals()['SECONDS_IN_YEAR'] = DAYS_IN_YEAR * SECONDS_IN_DAY
+    globals()['HOURS_IN_YEAR_LEAP'] = DAYS_IN_YEAR_LEAP * HOURS_IN_DAY
+    globals()['MINUTES_IN_YEAR_LEAP'] = DAYS_IN_YEAR_LEAP * MINUTES_IN_DAY
+    globals()['SECONDS_IN_YEAR_LEAP'] = DAYS_IN_YEAR_LEAP * SECONDS_IN_DAY
 
 def _int_caster(number, name="number", allow_none=False):
     if allow_none and number is None:

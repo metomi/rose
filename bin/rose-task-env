@@ -52,15 +52,23 @@
 #         relative to the current cycle time. ???? is a duration:
 #             * A "__" (double underscore) prefix denotes a cycle time in the
 #               future.  Otherwise, it is a cycle time in the past.
+#             * The rest should be an ISO 8601 interval or duration
+#               representation, such as:
+#               * P2W - 2 weeks
+#               * PT12H - 12 hours
+#               * P1DT6H - 1 day, 6 hours
+#               * P4M - 4 months
+#               * PT5M - 5 minutes
+#             Deprecated syntax:
 #             * nW denotes n weeks.
 #               n or nD denotes n days.
 #               Tn or TnH denotes n hours.
 #               TnM denotes n minutes.
 #               TnS denotes s seconds.
-#         E.g. ROSE_DATACT6H is the data directory of 6 hours before the
+#         E.g. ROSE_DATACPT6H is the data directory of 6 hours before the
 #              current cycle time.
-#         E.g. ROSE_DATAC1D and ROSE_DATACT24H are both the data directory of 1
-#              day before the current cycle time.
+#         E.g. ROSE_DATACP1D and ROSE_DATACPT24H are both the data directory
+#              of 1 day before the current cycle time.
 #     ROSE_ETC
 #         The path to the etc directory of the running suite.
 #     ROSE_TASK_PREFIX
@@ -71,15 +79,16 @@
 # OPTIONS
 #     --cycle=TIME, -t TIME
 #         Specify the cycle time. If not defined, use the cycle time provided
-#         by the suite environment. TIME can be in YYYYmmddHH format or a
-#         TIME-DELTA string described in the --cycle-offset=TIME-DELTA option.
+#         by the suite environment. TIME can be in an ISO date/time format,
+#         CCYYMMDDhh (deprecated) date/time format, or a TIME-DELTA string
+#         described in the --cycle-offset=TIME-DELTA option.
 #     --cycle-offset=TIME-DELTA, -T TIME-DELTA
 #         Specify one or more the cycle offsets to determine what
 #         ROSE_DATAC???? environment variables to export. The TIME-DELTA
 #         argument uses the syntax explained above in the ROSE_DATAC????
 #         environment variable.
-#         E.g. --cycle-offset=T3H --cycle-offset=T6H will tell "rose task-env"
-#         to export ROSE_DATACT3H and ROSE_DATACT6H.
+#         E.g. --cycle-offset=PT3H --cycle-offset=PT6H will tell
+#         "rose task-env" to export ROSE_DATACPT3H and ROSE_DATACPT6H.
 #     --path=[NAME=]PATTERN, -P [NAME=]PATTERN
 #         Each of these specify a glob pattern for paths to prepend to an
 #         environment variable called NAME (or PATH if NAME is not specified).
@@ -98,11 +107,6 @@
 #         Decrement verbosity.
 #     --verbose, -v
 #         Increment verbosity.
-#
-# NOTE ON CYCLE TIME
-#     Cycle time is expected to be in the YYYYmmdd[HH[MM]] format at the
-#     moment. It would be desirable to move to an ISO 8601 compliant format,
-#     e.g.  <date>[T<time>] where <date> is YYYYmmdd and <time> is HH[MM].
 #
 # USAGE IN SUITES
 #     rose task-env can be used to make environment variables available to a

@@ -20,9 +20,12 @@
 """Suite engine processor management."""
 
 from datetime import datetime, timedelta
+import isodatetime.data
+import isodatetime.parsers
 import os
 import pwd
 import re
+from rose.date import RoseDateShifter, OffsetValueError
 from rose.env import env_var_process
 from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
@@ -78,7 +81,18 @@ class SuiteScanResult(Event):
     def __str__(self):
         return "%s %s\n" % (self.name, self.location)
 
-class CycleOffset(object):
+
+class BaseCycleOffset(object):
+
+    """Represent a cycle time offset."""
+
+    def to_interval(self):
+        """Convert to a TimeInterval."""
+        raise NotImplementedError()
+
+
+class OldFormatCycleOffset(BaseCycleOffset):
+
     """Represent a cycle time offset."""
 
     REC_TEXT = re.compile(r"\A"
@@ -90,7 +104,7 @@ class CycleOffset(object):
     SIGN_DEFAULT = ""
 
     def __init__(self, offset_text):
-        """Parse offset_text into an instance of CycleOffset.
+        """Parse offset_text into a TimeInterval-convertible form.
 
         Expect offset_text in this format:
         * A __ double underscore denotes an offset to the future.
@@ -123,16 +137,49 @@ class CycleOffset(object):
     def __str__(self):
         return "%s%s%d%s" % (self.sign, self.is_time, self.amount, self.unit)
 
-    def to_timedelta(self):
+    def to_interval(self):
+        """Convert to a TimeInterval."""
         KEYS = {"W": ("days", 7),
                 "D": ("days", 1),
-                "H": ("seconds", 3600),
-                "M": ("seconds", 60)}
-        timedelta_unit, multiplier = KEYS[self.unit]
+                "H": ("hours", 1),
+                "M": ("minutes", 1)}
+        date_time_unit, multiplier = KEYS[self.unit]
         amount = self.amount
         if self.sign == self.SIGN_DEFAULT: # negative
             amount = -amount
-        return timedelta(**{timedelta_unit: multiplier * amount})
+        return isodatetime.data.TimeInterval(
+            **{date_time_unit: multiplier * amount})
+
+
+class ISOCycleOffset(BaseCycleOffset):
+
+    def __init__(self, offset_text):
+        """Parse offset_text into a TimeInterval-convertible form.
+
+        Expect offset_text in this format:
+        * A __ double underscore denotes an offset to the future.
+          Otherwise, it is an offset to the past.
+        * For the rest, use an ISO 8601 compatible interval/duration
+          representation.
+
+        """
+        if offset_text.startswith("__"):
+            self.sign_factor = 1
+        else:
+            self.sign_factor = -1
+        self.interval = isodatetime.parsers.TimeIntervalParser().parse(
+            offset_text)
+        self.interval *= self.sign_factor
+
+    def __str__(self):
+        interval_str = str(self.interval)
+        if interval_str.startswith("-"):
+            return interval_str[1:]
+        return "__" + interval_str
+
+    def to_interval(self):
+        """Convert to a TimeInterval."""
+        return self.interval
 
 
 class SuiteEngineGlobalConfCompatError(Exception):
@@ -224,7 +271,7 @@ class TaskProps(object):
                     if k == prefix or not k.startswith(prefix):
                         continue
                     try:
-                        cycle_offset = CycleOffset(k.replace(prefix, ""))
+                        cycle_offset = get_cycle_offset(k.replace(prefix, ""))
                     except ValueError as e:
                         continue
                     getattr(self, key)[cycle_offset] = v
@@ -282,6 +329,7 @@ class SuiteEngineProcessor(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
+        self.date_shifter = RoseDateShifter()
 
     def check_global_conf_compat(self):
         """Raise exception on suite engine specific incompatibity.
@@ -465,12 +513,12 @@ class SuiteEngineProcessor(object):
             else:
                 if t.task_cycle_time:
                     try:
-                        cycle_offset = CycleOffset(kwargs["cycle"])
+                        cycle_offset = get_cycle_offset(kwargs["cycle"])
                     except CycleOffsetError as e:
                         t.task_cycle_time = kwargs["cycle"]
                     else:
                         t.task_cycle_time = self._get_offset_cycle_time(
-                                t.task_cycle_time, cycle_offset)
+                            t.task_cycle_time, cycle_offset)
                 else:
                     t.task_cycle_time = kwargs["cycle"]
 
@@ -490,7 +538,7 @@ class SuiteEngineProcessor(object):
                 for v in kwargs.get("cycle_offsets"):
                     cycle_offset_strings.extend(v.split(","))
                 for v in cycle_offset_strings:
-                    cycle_offset = CycleOffset(v)
+                    cycle_offset = get_cycle_offset(v)
                     cycle_time = self._get_offset_cycle_time(
                             task_cycle_time, cycle_offset)
                     t.dir_data_cycle_offsets[str(cycle_offset)] = os.path.join(
@@ -630,10 +678,10 @@ class SuiteEngineProcessor(object):
         raise NotImplementedError()
 
     def _get_offset_cycle_time(self, cycle, cycle_offset):
-        """Return the actual date time of an CycleOffset against cycle.
+        """Return the actual date time of an BaseCycleOffset against cycle.
 
-        cycle: a YYYYmmddHH string.
-        cycle_offset: an instance of CycleOffset
+        cycle: a YYYYmmddHH or ISO 8601 date/time string.
+        cycle_offset: an instance of BaseCycleOffset.
 
         The returned date time would be an YYYYmmdd[HH[MM]] string.
 
@@ -642,11 +690,19 @@ class SuiteEngineProcessor(object):
         at the moment.
 
         """
-        dt = cycle_offset.to_timedelta()
-        for fmt in ["%Y%m%d", "%Y%m%d%H", "%Y%m%d%H%M"]:
-            try:
-                return (datetime.strptime(cycle, fmt) + dt).strftime(fmt)
-            except ValueError as e:
-                continue
-        raise CycleTimeError(cycle)
+        offset_string = str(cycle_offset.to_interval())
+        try:
+            return self.date_shifter.date_shift(cycle, offset_string)
+        except OffsetValueError:
+            raise
+        except ValueError:
+            raise CycleTimeError(cycle)
 
+
+def get_cycle_offset(offset_text):
+    """Return the correct BaseCycleOffset type for offset_text."""
+    try:
+        cycle_offset = OldFormatCycleOffset(offset_text)
+    except Exception:
+        cycle_offset = ISOCycleOffset(offset_text)
+    return cycle_offset
