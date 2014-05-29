@@ -275,7 +275,10 @@ class SuiteRunner(Runner):
                     self.REC_DONT_SYNC.match(rel_path) or
                     conf_tree.node.get(["jinja2:" + rel_path]) is not None):
                 continue
-            target_key = "file:" + rel_path
+            # No sub-directories, very slow otherwise
+            if os.sep in rel_path:
+                rel_path = rel_path.split(os.sep, 1)[0]
+            target_key = self.config_pm.get_handler("file").PREFIX + rel_path
             target_node = conf_tree.node.get([target_key])
             if target_node is None:
                 conf_tree.node.set([target_key])

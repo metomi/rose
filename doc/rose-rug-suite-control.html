@@ -163,9 +163,15 @@
     <h3 id="rose-suite-run.install-modes">Install Modes</h3>
 
     <p>The <code>rose suite-run</code> command will normally install from the
-    configuration directory into the runtime location incrementally. If this is
-    not desirable, the <code>--new</code> or <code>-N</code> option should be
-    used to remove and re-create the runtime location.</p>
+    configuration directory into the runtime location incrementally. N.B. The
+    command does not remove items that are not in the configuration directory
+    but exist in the runtime locations.</p>
+    
+    <p>If incremental mode is not desirable, the <code>--new</code> or
+    <code>-N</code> option can be used to remove and re-create all runtime
+    locations. N.B. the <code>--new</code> option is equivalent to running
+    <code>rose suite-clean -y &amp;&amp; rose suite-run</code>, so you
+    may want to take extra care when using this option.</p>
 
     <p>There are times when you only want to install the suite but not (re-)run
     it, (e.g. during development, for analysing its structure, or to modify an
