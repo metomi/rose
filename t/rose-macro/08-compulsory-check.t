@@ -50,7 +50,7 @@ my_var8(2)=.true.
 my_var9=.true.
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 15
+tests 18
 #-------------------------------------------------------------------------------
 # Check compulsory checking.
 TEST_KEY=$TEST_KEY_BASE-ok
@@ -506,5 +506,21 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
         enabled      -> trig-ignored
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-----------------------------------------------------------------------------
+init <<'__CONFIG__'
+[!namelist:icecream(1)]
+sprinkles=true
+__CONFIG__
+init_meta <<'__META_CONFIG__'
+[namelist:icecream]
+duplicate=true
+
+[namelist:icecream=sprinkles]
+compulsory=true
+type=boolean
+__META_CONFIG__
+TEST_KEY=$TEST_KEY_BASE-user-ignore-duplicate
+run_pass "$TEST_KEY" rose macro -V --config=../config --non-interactive
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 teardown
-exit

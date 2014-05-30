@@ -150,7 +150,8 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
                     basic_section, []):
                 if self._get_config_has_id(config_data, alias_section):
                     present_section_aliases.append(alias_section)
-                    check_user_ignored_ids.append(alias_section)
+                    if section_data[_SECTION_IS_COMPULSORY_KEY]:
+                        check_user_ignored_ids.append(alias_section)
             
             if not present_section_aliases:
                 # No sections in config_data that belong to basic_section.
