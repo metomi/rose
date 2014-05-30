@@ -5,16 +5,22 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## 2014-05 (2014-05-??)
+## 2014-05 (2014-05-30)
 
 This release of Rose will work best with
-[Cylc](https://github.com/cylc/cylc/) 5.4.13 and 5.4.14.
+[Cylc](https://github.com/cylc/cylc/) 5.4.12, 5.4.13 and 5.4.14.
 
 ### Highlighted Changes
 
 -none-
 
 ### Noteworthy Changes
+
+[#1274](https://github.com/metomi/rose/pull/1274):
+rose config-edit: fix right clicking on group in STASH widget.
+
+[#1259](https://github.com/metomi/rose/pull/1259):
+rose config-edit: fix launching of external utilities.
 
 [#1256](https://github.com/metomi/rose/pull/1256):
 rose\_prune: work directory: support glob by task name.
@@ -29,7 +35,8 @@ rose suite-run/clean: improve diagnostics if a suite is still running.
 [#1244](https://github.com/metomi/rose/pull/1244):
 rose: ensure Rose's `bin/`, `lib/python/` lead `PATH`, `PYTHONPATH`.
 
-[#1243](https://github.com/metomi/rose/pull/1243):
+[#1243](https://github.com/metomi/rose/pull/1243),
+[#1260](https://github.com/metomi/rose/pull/1260):
 rose suite-run: file install and reload improvements.
 * Improve incremental file install.
 * On reload mode, call `cylc reload` only if necessary.
