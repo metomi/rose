@@ -456,7 +456,7 @@ class TimeInterval(object):
                 if attr_value < 0:
                     is_fully_negative = True
         if is_fully_negative:
-            # This does not adhere to the standard... but it's useful...
+            # Support negative intervals as extensions to the standard.
             return "-" + str(abs(self))
         if self.get_is_in_weeks():
             return (start_string + str(self.weeks) + "W").replace(".", ",")

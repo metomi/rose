@@ -505,20 +505,14 @@ class SuiteEngineProcessor(object):
 
         if kwargs["cycle"] is not None:
 
-            #If no unit is specified for the cycle and the length is at least
-            #10 it is assumed to be in YYYYmmddHH format (length 10)
-            if (not CycleOffset.REC_TEXT.match(kwargs["cycle"]).group("unit")
-                and len(kwargs["cycle"]) >= 10):
+            try:
+                cycle_offset = get_cycle_offset(kwargs["cycle"])
+            except Exception:
                 t.task_cycle_time = kwargs["cycle"]
             else:
                 if t.task_cycle_time:
-                    try:
-                        cycle_offset = get_cycle_offset(kwargs["cycle"])
-                    except CycleOffsetError as e:
-                        t.task_cycle_time = kwargs["cycle"]
-                    else:
-                        t.task_cycle_time = self._get_offset_cycle_time(
-                            t.task_cycle_time, cycle_offset)
+                    t.task_cycle_time = self._get_offset_cycle_time(
+                        t.task_cycle_time, cycle_offset)
                 else:
                     t.task_cycle_time = kwargs["cycle"]
 

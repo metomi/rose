@@ -37,6 +37,13 @@ TEST_KEY=$TEST_KEY_BASE
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
+
+rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l
+if [[ $? -ne 0 ]]; then
+    skip 6
+    exit 0
+fi
+
 if [[ -n ${JOB_HOST:-} ]]; then
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
@@ -74,7 +81,7 @@ else
     sed '/\$JOB_HOST/d; /my_task_2/d' \
         $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
 fi
-file_xxdiff "$TEST_KEY" expected-prune.log edited-prune.log
+file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ls
 run_pass "$TEST_KEY" \
@@ -84,7 +91,7 @@ sed "s?\\\$SUITE_RUN_DIR?$SUITE_RUN_DIR?g" \
 if [[ -z $JOB_HOST ]]; then
     sed -i "/my_task_2/d" expected-ls.out
 fi
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" expected-ls.out
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-ls.out
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 if [[ -n $JOB_HOST ]]; then

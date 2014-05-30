@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
+from isodatetime.parsers import TimePointParser
 import filecmp
 from fnmatch import fnmatch
 from glob import glob
@@ -85,7 +86,8 @@ class CylcProcessor(SuiteEngineProcessor):
             "name DESC, cycle DESC, task_events.submit_num DESC"}
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
-    REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
+    REC_CYCLE_TIME = re.compile(
+        r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     SCHEME = "cylc"
     STATUSES = {"active": ["ready", "queued", "submitting", "submitted",
@@ -831,6 +833,7 @@ class CylcProcessor(SuiteEngineProcessor):
         log_dir = os.path.join(os.path.expanduser("~"), log_dir_rel)
         uuid_file_name = os.path.join(log_dir, uuid)
         self.fs_util.touch(uuid_file_name)
+        print "job logs pull remote", suite_name, items
         try:
             glob_auths_map = {}
             if "*" in items:
@@ -840,11 +843,13 @@ class CylcProcessor(SuiteEngineProcessor):
             else:
                 for item in items:
                     cycle, name = self._parse_task_cycle_id(item)
+                    print "    item, cycle, name", item, cycle, name
                     if cycle is not None:
                         arch_f_name = "job-" + cycle + ".tar.gz"
                         if os.path.exists(arch_f_name):
                             continue
                     auths = self.get_suite_jobs_auths(suite_name, cycle, name)
+                    print "        ", auths
                     if auths:
                         glob_names = []
                         for list_ in [name, cycle, None]:
@@ -854,6 +859,8 @@ class CylcProcessor(SuiteEngineProcessor):
                                 glob_names.append(list_)
                         glob_ = self.TASK_ID_DELIM.join(glob_names)
                         glob_auths_map[glob_] = auths
+            for glob_, auths in glob_auths_map.items():
+                print "    ", glob_, auths
             # FIXME: more efficient if auth is key?
             for glob_, auths in glob_auths_map.items():
                 for auth in auths:
