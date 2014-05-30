@@ -8,7 +8,7 @@ for a full listing of issues for each release.
 ## 2014-05 (2014-05-30)
 
 This release of Rose will work best with
-[Cylc](https://github.com/cylc/cylc/) 5.4.12, 5.4.13 and 5.4.14.
+[Cylc](https://github.com/cylc/cylc/) 5.4.12 and 5.4.13.
 
 ### Highlighted Changes
 
