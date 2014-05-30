@@ -697,6 +697,6 @@ def get_cycle_offset(offset_text):
     """Return the correct BaseCycleOffset type for offset_text."""
     try:
         cycle_offset = OldFormatCycleOffset(offset_text)
-    except Exception:
+    except CycleOffsetError:
         cycle_offset = ISOCycleOffset(offset_text)
     return cycle_offset
