@@ -2095,6 +2095,19 @@ launcher-preopts.mpiexec=-n $NPROC
           <li>A <var>__</var> (double underscore) prefix denotes a cycle time
           in the future. Otherwise, it is a cycle time in the past.</li>
 
+          <li>The rest should be an <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>
+          interval or duration representation, such as:
+          <ul>
+            <li><samp>P2W</samp> - 2 weeks</li>
+            <li><samp>PT12H</samp> - 12 hours</li>
+            <li><samp>P1DT6H</samp> - 1 day, 6 hours</li>
+            <li><samp>P4M</samp> - 4 months</li>
+            <li><samp>PT5M</samp> - 5 minutes</li>
+          </ul></li>
+          
+          <li>Deprecated syntax:
+            <ul>
+          
           <li><var>nW</var> denotes <var>n</var> weeks.</li>
 
           <li><var>n</var> or <var>nD</var> denotes <var>n</var> days.</li>
@@ -2104,11 +2117,12 @@ launcher-preopts.mpiexec=-n $NPROC
           <li><var>TnM</var> denotes <var>n</var> minutes.</li>
 
           <li><var>TnS</var> denotes <var>n</var> seconds.</li>
-        </ul>E.g. <var>ROSE_DATACT6H</var> is the data directory of 6 hours
+           </ul></li>
+        </ul>E.g. <var>ROSE_DATACPT6H</var> is the data directory of 6 hours
         before the current cycle time.
       </dd>
 
-      <dd>E.g. <var>ROSE_DATAC1D</var> and <var>ROSE_DATACT24H</var> are both
+      <dd>E.g. <var>ROSE_DATACP1D</var> and <var>ROSE_DATACPT24H</var> are both
       the data directory of 1 day before the current cycle time.</dd>
 
       <dt><var>ROSE_ETC</var></dt>
@@ -2130,7 +2144,7 @@ launcher-preopts.mpiexec=-n $NPROC
       <dt><kbd>--cycle=TIME, -t TIME</kbd></dt>
 
       <dd>Specify the cycle time. If not defined, use the cycle time provided
-      by the suite environment. <var>TIME</var> can be in YYYYmmddHH format or
+      by the suite environment. <var>TIME</var> can be in an <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> date/time format, CCYYMMDDhh (deprecated) date/time format or 
       a <var>TIME-DELTA</var> string described in the
       <kbd>--cycle-offset=TIME-DELTA</kbd> option.</dd>
 
@@ -2140,9 +2154,9 @@ launcher-preopts.mpiexec=-n $NPROC
       <var>ROSE_DATAC????</var> environment variables to export. The
       <var>TIME-DELTA</var> argument uses the syntax explained above in the
       <var>ROSE_DATAC????</var> environment variable.<br />
-      E.g. <kbd>--cycle-offset=T3H --cycle-offset=T6H</kbd> will tell <kbd>rose
-      task-env</kbd> to export <var>ROSE_DATACT3H</var> and
-      <var>ROSE_DATACT6H</var>.</dd>
+      E.g. <kbd>--cycle-offset=PT3H --cycle-offset=PT6H</kbd> will tell <kbd>rose
+      task-env</kbd> to export <var>ROSE_DATACPT3H</var> and
+      <var>ROSE_DATACPT6H</var>.</dd>
 
       <dt><kbd>--path=[NAME=]PATTERN, -P [NAME=]PATTERN</kbd></dt>
 

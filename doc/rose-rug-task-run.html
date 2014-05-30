@@ -596,7 +596,7 @@ source=stuffing-*.txt
     <p>All settings are expressed as a space delimited list of cycles, normally
     as date/time offsets relative to the current cycle, in a format recognised
     by the <code>--offset=OFFSET</code> option of <code>rose date</code>. E.g.
-    <kbd>-1d6h</kbd> is 1 day and 6 hours before the current cycle time.</p>
+    <kbd>-P1DT6H</kbd> is 1 day and 6 hours before the current cycle time.</p>
 
     <p>The cycles of some settings also accept an optional argument followed by
     a colon. In these, the argument should be globs for matching items in the
@@ -620,21 +620,21 @@ source=stuffing-*.txt
       <dt><kbd>prune-work-at=cycle[[:task-globs]:globs] ...</kbd></dt>
 
       <dd>Remove the work directories of the specified cycles. E.g. In Cylc, if
-      current cycle is <samp>2014122512</samp>, <kbd>prune-work-at=-12h</kbd>
+      current cycle is <samp>2014122512</samp>, <kbd>prune-work-at=-PT12H</kbd>
       will clear out all items matching <var>work/*.2014122500/</var>.
       
         <p>If <var>globs</var> are specified for a cycle, it will attempt to
         prune only items matching <var>work/*.CYCLE/GLOBS</var>. E.g. In Cylc,
         if current cycle is <samp>2014122512</samp>,
-        <kbd>prune-work-at=-12h:*.dat</kbd> will clear out all items matching
+        <kbd>prune-work-at=-PT12H:*.dat</kbd> will clear out all items matching
         <var>work/*.2014122500/*.dat</var>.</p>
       
         <p>If <var>task-globs</var> are specified, it will attempt to prune only
         items matching <var>work/TASKS-GLOBS.CYCLE/GLOBS</var>. E.g. In Cylc, if
         current cycle is <samp>2014122512</samp>,
-        <kbd>prune-work-at=-12h:foo*:*.dat</kbd> will clear out all items
+        <kbd>prune-work-at=-PT12H:foo*:*.dat</kbd> will clear out all items
         matching <var>work/foo*.2014122500/*.dat</var>, and
-        <kbd>prune-work-at=-12h:ba[rz]:</kbd> will clear out all items matching
+        <kbd>prune-work-at=-PT12H:ba[rz]:</kbd> will clear out all items matching
         <var>work/ba[rz].2014122500/</var>.</p>
       </dd>
 
@@ -652,15 +652,15 @@ meta=rose_prune
 mode=rose_prune
 
 [prune]
-prune-remote-logs-at=-6h
-archive-logs-at=-1d
-# N.B.: -18h:task_y*:* can also be written as -18h:task_y*:
+prune-remote-logs-at=-PT6H
+archive-logs-at=-P1D
+# N.B.: -PT18H:task_y*:* can also be written as -PT18H:task_y*:
 #       For "task_y*" to be recognised as a set of "task-globs",
 #       the trailing ":" is essential.
 #       Otherwise, it will be recognised as a set of "globs"
 #       (under "work/task.cycle/").
-prune-work-at=-6h:task_x*:big.dat -12h:other*.dat -18h:task_y*:* -24h
-prune-datac-at=-6h:foo* -12h:'bar* *.baz*' -1d
+prune-work-at=-PT6H:task_x*:big.dat -PT12H:other*.dat -PT18H:task_y*:* -PT24H
+prune-datac-at=-PT6H:foo* -PT12H:'bar* *.baz*' -P1D
 </pre>
 
     <h2 id="rose-task-env">rose task-env</h2>
