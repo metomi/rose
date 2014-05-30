@@ -1847,8 +1847,8 @@ launcher-preopts.mpiexec=-n $NPROC
       <dt><kbd>--new, -N</kbd></dt>
 
       <dd>(Re-)create working directories. This option is equivalent to running
-      <code>rose suite-clean -y &amp;&amp; rose suite-run</code> and will remove
-      previous runs. Users may want to take extra care when using this
+      <code>rose suite-clean -y &amp;&amp; rose suite-run</code> and will
+      remove previous runs. Users may want to take extra care when using this
       option.</dd>
 
       <dt><kbd>--no-gcontrol</kbd></dt>
@@ -2095,29 +2095,38 @@ launcher-preopts.mpiexec=-n $NPROC
           <li>A <var>__</var> (double underscore) prefix denotes a cycle time
           in the future. Otherwise, it is a cycle time in the past.</li>
 
-          <li>The rest should be an <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>
+          <li>The rest should be an <a href=
+          "http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>
           interval or duration representation, such as:
-          <ul>
-            <li><samp>P2W</samp> - 2 weeks</li>
-            <li><samp>PT12H</samp> - 12 hours</li>
-            <li><samp>P1DT6H</samp> - 1 day, 6 hours</li>
-            <li><samp>P4M</samp> - 4 months</li>
-            <li><samp>PT5M</samp> - 5 minutes</li>
-          </ul></li>
-          
-          <li>Deprecated syntax:
+
             <ul>
-          
-          <li><var>nW</var> denotes <var>n</var> weeks.</li>
+              <li><samp>P2W</samp> - 2 weeks</li>
 
-          <li><var>n</var> or <var>nD</var> denotes <var>n</var> days.</li>
+              <li><samp>PT12H</samp> - 12 hours</li>
 
-          <li><var>Tn</var> or <var>TnH</var> denotes <var>n</var> hours.</li>
+              <li><samp>P1DT6H</samp> - 1 day, 6 hours</li>
 
-          <li><var>TnM</var> denotes <var>n</var> minutes.</li>
+              <li><samp>P4M</samp> - 4 months</li>
 
-          <li><var>TnS</var> denotes <var>n</var> seconds.</li>
-           </ul></li>
+              <li><samp>PT5M</samp> - 5 minutes</li>
+            </ul>
+          </li>
+
+          <li>Deprecated syntax:
+
+            <ul>
+              <li><var>nW</var> denotes <var>n</var> weeks.</li>
+
+              <li><var>n</var> or <var>nD</var> denotes <var>n</var> days.</li>
+
+              <li><var>Tn</var> or <var>TnH</var> denotes <var>n</var>
+              hours.</li>
+
+              <li><var>TnM</var> denotes <var>n</var> minutes.</li>
+
+              <li><var>TnS</var> denotes <var>n</var> seconds.</li>
+            </ul>
+          </li>
         </ul>E.g. <var>ROSE_DATACPT6H</var> is the data directory of 6 hours
         before the current cycle time.
       </dd>
@@ -2144,9 +2153,10 @@ launcher-preopts.mpiexec=-n $NPROC
       <dt><kbd>--cycle=TIME, -t TIME</kbd></dt>
 
       <dd>Specify the cycle time. If not defined, use the cycle time provided
-      by the suite environment. <var>TIME</var> can be in an <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> date/time format, CCYYMMDDhh (deprecated) date/time format or 
-      a <var>TIME-DELTA</var> string described in the
-      <kbd>--cycle-offset=TIME-DELTA</kbd> option.</dd>
+      by the suite environment. <var>TIME</var> can be in an <a href=
+      "http://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> date/time format,
+      CCYYMMDDhh (deprecated) date/time format or a <var>TIME-DELTA</var>
+      string described in the <kbd>--cycle-offset=TIME-DELTA</kbd> option.</dd>
 
       <dt><kbd>--cycle-offset=TIME-DELTA, -T TIME-DELTA</kbd></dt>
 
@@ -2154,8 +2164,8 @@ launcher-preopts.mpiexec=-n $NPROC
       <var>ROSE_DATAC????</var> environment variables to export. The
       <var>TIME-DELTA</var> argument uses the syntax explained above in the
       <var>ROSE_DATAC????</var> environment variable.<br />
-      E.g. <kbd>--cycle-offset=PT3H --cycle-offset=PT6H</kbd> will tell <kbd>rose
-      task-env</kbd> to export <var>ROSE_DATACPT3H</var> and
+      E.g. <kbd>--cycle-offset=PT3H --cycle-offset=PT6H</kbd> will tell
+      <kbd>rose task-env</kbd> to export <var>ROSE_DATACPT3H</var> and
       <var>ROSE_DATACPT6H</var>.</dd>
 
       <dt><kbd>--path=[NAME=]PATTERN, -P [NAME=]PATTERN</kbd></dt>
@@ -2280,7 +2290,7 @@ environment scripting = "eval $(rose task-env)"
 
     <ol>
       <li>Change to <var>$ROSE_HOME</var>.</li>
-      
+
       <li>
         <p>With arguments, exec <code>prove -r</code> with the specified
         arguments.</p>

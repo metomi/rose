@@ -64,8 +64,8 @@
     &gt; rose task-run</a> for a full command reference.</p>
 
     <p>See <a href="rose-configuration.html#format">Rose Reference Guide:
-    Configuration &gt; Configuration Format</a> for more information on the Rose
-    configuration format.</p>
+    Configuration &gt; Configuration Format</a> for more information on the
+    Rose configuration format.</p>
 
     <p>See <a href="rose-configuration.html#app">Rose Reference Guide:
     Configuration &gt; Application Configuration</a> for more information on
@@ -75,15 +75,16 @@
 
     <p>The working directory of a task is dependent on the suite engine. For a
     task running under Cylc, the working directory of a task is normally
-    <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_NAME.$ROSE_TASK_CYCLE_TIME/</var>,
-    (or <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_NAME.1</var> for a non-cycling
+    <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_NAME.$ROSE_TASK_CYCLE_TIME/</var>, (or
+    <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_NAME.1</var> for a non-cycling
     task.)</p>
 
-    <p>The <code>rose task-run</code> (or the <code>rose app-run</code>) command
-    also dumps out a <var>rose-app-run.conf</var> file in the working directory.
-    The file contains the original <var>rose-app.conf</var> in the application
-    configuration with any added optional configurations and command line
-    settings set via <code>--define=[SECTION]NAME=VALUE</code>.</p>
+    <p>The <code>rose task-run</code> (or the <code>rose app-run</code>)
+    command also dumps out a <var>rose-app-run.conf</var> file in the working
+    directory. The file contains the original <var>rose-app.conf</var> in the
+    application configuration with any added optional configurations and
+    command line settings set via
+    <code>--define=[SECTION]NAME=VALUE</code>.</p>
 
     <h3 id="rose-task-run.app">Application Configuration Selection</h3>
 
@@ -99,26 +100,29 @@
       <var>KEY</var> sub-directory under the suite's <var>app/</var> directory
       as the application configuration directory.</li>
 
-      <li>If the <var>ROSE_TASK_APP=KEY</var> environment variable is specified,
-      it uses the <var>KEY</var> sub-directory under the suite's <var>app/</var>
-      directory as the application configuration directory.</li>
+      <li>If the <var>ROSE_TASK_APP=KEY</var> environment variable is
+      specified, it uses the <var>KEY</var> sub-directory under the suite's
+      <var>app/</var> directory as the application configuration
+      directory.</li>
 
       <li>Finally, it looks at the suite's <var>app/</var> directory for an
-      application configuration directory that matches the name of the
-      task. (The command fails if it is unable to locate an application
+      application configuration directory that matches the name of the task.
+      (The command fails if it is unable to locate an application
       configuration.)</li>
     </ol>
 
     <h3 id="rose-task-run.env">Environment Variables Export</h3>
 
-    <p>The <code>rose task-run</code> command exports a set of <var>ROSE_*</var>
-    environment variables to its environment before doing anything. The list is
-    documented in <a href="rose-command.html#rose-task-env">Rose Reference
-    Guide: CLI &gt; rose task-env</a>.</p>
+    <p>The <code>rose task-run</code> command exports a set of
+    <var>ROSE_*</var> environment variables to its environment before doing
+    anything. The list is documented in <a href=
+    "rose-command.html#rose-task-env">Rose Reference Guide: CLI &gt; rose
+    task-env</a>.</p>
 
     <p>The <code>rose task-run</code> command also sets up the <var>PATH</var>
-    environment variable and if relevant, other PATH-like environment variables,
-    (e.g. <var>PYTHONPATH</var>). The following logic is applied in order:</p>
+    environment variable and if relevant, other PATH-like environment
+    variables, (e.g. <var>PYTHONPATH</var>). The following logic is applied in
+    order:</p>
 
     <ol>
       <li>The command looks for <var>[rose-task-run]path-prepend.NAME</var>
@@ -129,7 +133,6 @@
       settings are expected to be space delimited lists of directory paths. For
       each directory path, the command will check that it exists before
       prepending it to relevant environment variable. E.g.:
-
         <pre class="prettyprint lang-rose_conf">
 [rose-task-run]
 # Prepend /opt/hello/bin /opt/greeting/bin to $PATH
@@ -141,8 +144,8 @@ path-prepend.PERL5LIB=/opt/stuff/lib/perl
 
       <li>The command looks for directories under <var>$ROSE_SUITE_DIR</var>
       that match the glob patterns <code>share/fcm[_-]make*/*/bin</code>,
-      <code>work/fcm[_-]make*/*/bin</code>. Matched directories are added to the
-      <var>PATH</var> environment variable.</li>
+      <code>work/fcm[_-]make*/*/bin</code>. Matched directories are added to
+      the <var>PATH</var> environment variable.</li>
 
       <li>The command accepts one or more <code>--path=[NAME=]PATTERN</code>
       command line option. Each of these specify a glob pattern for paths to
@@ -157,7 +160,7 @@ path-prepend.PERL5LIB=/opt/stuff/lib/perl
     <p>The <code>rose task-run</code> command (or the <code>rose app-run</code>
     command) also exports each environment variables in the <var>[env]</var>
     section in the application configuration file. N.B.:</p>
-    
+
     <ul>
       <li>The environment variables are exported in no particular oder, so they
       should not reference one another.</li>
@@ -171,9 +174,8 @@ path-prepend.PERL5LIB=/opt/stuff/lib/perl
       substitution by adding a backslash in front of the syntax, e.g.
       <code>\$NAME</code> or <code>\${NAME}</code>.</li>
     </ul>
-    
-    <p>The following is an example of using environment variables:</p>
 
+    <p>The following is an example of using environment variables:</p>
     <pre class="prettyprint lang-rose_conf">
 [command]
 default=echo "$HELLO $WORLDS"
@@ -182,7 +184,7 @@ default=echo "$HELLO $WORLDS"
 HELLO=Greeting
 WORLDS=Mars Jupiter Saturn
 </pre>
-    
+
     <p>Most other sections in the application configuration file, (e.g. the
     file installation sections and the application command) can reference the
     exported environment variables described above.</p>
@@ -197,16 +199,16 @@ WORLDS=Mars Jupiter Saturn
     <p>The <code>rose task-run</code> command (or the <code>rose app-run</code>
     command) can be configured to install files to the working directory or
     other locations in the suite. It does the following:</p>
-    
+
     <ul>
       <li>Install items specified in the <var>[file:*]</var> sections of the
       <var>rose-app.conf</var> file. See <a href=
       "rose-configuration.html#appendix-file-creation-mode">Rose Reference
       Guide: Configuration &gt; Appendix: File Creation Mode</a> for
       detail.</li>
-    
-      <li>Copy any regular files under the <var>file/</var> sub-directory of the
-      application configuration to the working directory.</li>
+
+      <li>Copy any regular files under the <var>file/</var> sub-directory of
+      the application configuration to the working directory.</li>
     </ul>
 
     <p>If the command for the application requires some pre-defined standard
@@ -217,16 +219,17 @@ WORLDS=Mars Jupiter Saturn
     <p>The <code>rose task-run</code> command (or the <code>rose app-run</code>
     command) caches file installation settings in the
     <var>.rose-config_processors-file.db</var> file in the working directory.
-    This allows file installation to be <em>incremental</em>. If the task is run
-    again, identical files will not have to be reinstalled.</p>
+    This allows file installation to be <em>incremental</em>. If the task is
+    run again, identical files will not have to be reinstalled.</p>
 
     <h3 id="rose-task-run.command">Command Selection</h3>
 
-    <p>By default, the <code>rose task-run</code> command (or the
-    <code>rose app-run</code> command) invokes a shell command. (Alternatively,
-    the <code>rose task-run</code> command invokes a built-in application. See
-    <a href="#rose-task-run.built-in-app">Built-in Applications Selection</a> for
-    detail.) It uses the following logic to select a shell command to run:</p>
+    <p>By default, the <code>rose task-run</code> command (or the <code>rose
+    app-run</code> command) invokes a shell command. (Alternatively, the
+    <code>rose task-run</code> command invokes a built-in application. See
+    <a href="#rose-task-run.built-in-app">Built-in Applications Selection</a>
+    for detail.) It uses the following logic to select a shell command to
+    run:</p>
 
     <ol>
       <li>If arguments are supplied to <code>rose task-run</code>, the
@@ -249,7 +252,6 @@ WORLDS=Mars Jupiter Saturn
     the command line.</p>
 
     <p>E.g.</p>
-
     <pre class="prettyprint lang-rose_conf">
 [command]
 default=echo Hello World
@@ -257,18 +259,18 @@ hello_earth=echo Hello Earth
 greet_martians=echo Greeting Martians
 </pre>
 
-    <p>In the above example, if the command key is <samp>hello_earth</samp>, the
-    application will echo <samp>Hello Earth</samp>. If the command key is not
-    defined, but the task name is <samp>greet_martians</samp>, the application
-    will echo <samp>Greeting Martians</samp>. For any other tasks using this
-    application configuration and if the command key is not defined, it will
-    echo <samp>Hello World</samp>.</p>
+    <p>In the above example, if the command key is <samp>hello_earth</samp>,
+    the application will echo <samp>Hello Earth</samp>. If the command key is
+    not defined, but the task name is <samp>greet_martians</samp>, the
+    application will echo <samp>Greeting Martians</samp>. For any other tasks
+    using this application configuration and if the command key is not defined,
+    it will echo <samp>Hello World</samp>.</p>
 
     <h3 id="rose-task-run.built-in-app">Built-in Applications Selection</h3>
 
     <p>Apart from running a shell command, the <code>rose task-run</code>
-    command (or the <code>rose app-run</code> command) may be configured to call
-    a built-in application. To use a built-in application, add the
+    command (or the <code>rose app-run</code> command) may be configured to
+    call a built-in application. To use a built-in application, add the
     <kbd>mode=KEY</kbd> top level setting in the application configuration,
     where <var>KEY</var> is the name of a built-in application. (Each built-in
     application is discussed individually later in this chapter.)</p>
@@ -277,8 +279,8 @@ greet_martians=echo Greeting Martians
     external command. The key differences are normally that:</p>
 
     <ol>
-      <li>A built-in application may use a different working directory to a Rose
-      application.</li>
+      <li>A built-in application may use a different working directory to a
+      Rose application.</li>
 
       <li>A built-in application will run some pre-defined commands or logic
       instead of a command defined in the application configuration.</li>
@@ -290,8 +292,8 @@ greet_martians=echo Greeting Martians
     However, there are times when it is more efficient to poll for a simple
     prerequisite before running a command. The <code>rose task-run</code>
     command (or the <code>rose app-run</code> command) provides a facility for
-    tasks to poll for some prerequisites before running the application command.
-    The facility supports 3 types of tests:</p>
+    tasks to poll for some prerequisites before running the application
+    command. The facility supports 3 types of tests:</p>
 
     <ul>
       <li><dfn>Poll all files</dfn> This can be configured by adding the
@@ -310,19 +312,19 @@ greet_martians=echo Greeting Martians
       passes if the command returns a 0 (zero) return code.</li>
     </ul>
 
-    <p>Normally, both <var>all-files</var> and <var>any-files</var> test for the
-    existence of file paths. If this is not enough, you can specify a
-    <var>[poll]file-test</var> setting to run a command on each file.  E.g. if
-    you want to test for the existence of a string in each file, you can do:</p>
-
+    <p>Normally, both <var>all-files</var> and <var>any-files</var> test for
+    the existence of file paths. If this is not enough, you can specify a
+    <var>[poll]file-test</var> setting to run a command on each file. E.g. if
+    you want to test for the existence of a string in each file, you can
+    do:</p>
     <pre class="prettyprint lang-rose_conf">
 all-files=file1 file2
 file-test=test -e {} &amp;&amp; grep -q 'hello' {}
 </pre>
 
-    <p>At runtime, any <code>{}</code> pattern in the above is replaced with the
-    name of the file. The above example checks that both <samp>file1</samp> and
-    <samp>file2</samp> exist and that they both contain the string
+    <p>At runtime, any <code>{}</code> pattern in the above is replaced with
+    the name of the file. The above example checks that both <samp>file1</samp>
+    and <samp>file2</samp> exist and that they both contain the string
     <samp>hello</samp>.</p>
 
     <p>By default, tests will only be performed once. If a list of
@@ -334,7 +336,6 @@ file-test=test -e {} &amp;&amp; grep -q 'hello' {}
     (default), <kbd>m</kbd> for minutes and <kbd>h</kbd> for hours),
     <var>T</var> is the number of units, and <var>R</var> is the number of
     repeats. E.g.:</p>
-
     <pre class="prettyprint lang-rose_conf">
 # Default
 delays=0
@@ -387,9 +388,9 @@ delays=0,6*10s,60*1m,1h
     <var>ROSE_TASK_N_JOBS</var>: This can be used to control the number of
     processes <code>fcm make</code> would use in parallel. (default=4)</p>
 
-    <p><kbd>args</kbd> or the environment variable <var>ROSE_TASK_OPTIONS</var>:
-    This can be used to pass extra arguments to the <code>fcm make</code>
-    command.</p>
+    <p><kbd>args</kbd> or the environment variable
+    <var>ROSE_TASK_OPTIONS</var>: This can be used to pass extra arguments to
+    the <code>fcm make</code> command.</p>
 
     <p>E.g.:</p>
     <pre class="prettyprint lang-rose_conf">
@@ -500,9 +501,9 @@ opt.jobs=8
       <dd>Optional. A Pythonic <code>printf</code> style format string to
       construct a command to edit or modify the content of source files before
       archiving them. It must contain the placeholders <var>%(in)s</var> and
-      <var>%(out)s</var> for substitution of the path to the source file and the
-      path to the modified source file (which will be created in a temporary
-      working directory).</dd>
+      <var>%(out)s</var> for substitution of the path to the source file and
+      the path to the modified source file (which will be created in a
+      temporary working directory).</dd>
 
       <dt><kbd>source-prefix=PREFIX</kbd></dt>
 
@@ -525,11 +526,11 @@ opt.jobs=8
 
       <dt><kbd>update-check=md5sum|mtime+size</kbd></dt>
 
-      <dd>Optional. Specify the method for checking whether a source has changed
-      since the previous run. The default is to use the MD5 checksum of the
-      content of each source file. The alternate method is to use the modified
-      time and size of the source, which is useful for large files, but is less
-      correct.</dd>
+      <dd>Optional. Specify the method for checking whether a source has
+      changed since the previous run. The default is to use the MD5 checksum of
+      the content of each source file. The alternate method is to use the
+      modified time and size of the source, which is useful for large files,
+      but is less correct.</dd>
     </dl>
 
     <p>E.g.:</p>
@@ -579,7 +580,8 @@ source=stuffing-*.txt
 # ...
 </pre>
 
-    <h2 id="rose-task-run.util.rose_prune">Built-in Application: rose_prune</h2>
+    <h2 id="rose-task-run.util.rose_prune">Built-in Application:
+    rose_prune</h2>
 
     <p>This built-in application offers a way to housekeep a cycling suite. It
     prunes files and directories generated by suite tasks. It is designed to
@@ -619,23 +621,25 @@ source=stuffing-*.txt
 
       <dt><kbd>prune-work-at=cycle[[:task-globs]:globs] ...</kbd></dt>
 
-      <dd>Remove the work directories of the specified cycles. E.g. In Cylc, if
-      current cycle is <samp>2014122512</samp>, <kbd>prune-work-at=-PT12H</kbd>
-      will clear out all items matching <var>work/*.2014122500/</var>.
-      
+      <dd>
+        Remove the work directories of the specified cycles. E.g. In Cylc, if
+        current cycle is <samp>2014122512</samp>,
+        <kbd>prune-work-at=-PT12H</kbd> will clear out all items matching
+        <var>work/*.2014122500/</var>.
+
         <p>If <var>globs</var> are specified for a cycle, it will attempt to
         prune only items matching <var>work/*.CYCLE/GLOBS</var>. E.g. In Cylc,
         if current cycle is <samp>2014122512</samp>,
         <kbd>prune-work-at=-PT12H:*.dat</kbd> will clear out all items matching
         <var>work/*.2014122500/*.dat</var>.</p>
-      
-        <p>If <var>task-globs</var> are specified, it will attempt to prune only
-        items matching <var>work/TASKS-GLOBS.CYCLE/GLOBS</var>. E.g. In Cylc, if
-        current cycle is <samp>2014122512</samp>,
+
+        <p>If <var>task-globs</var> are specified, it will attempt to prune
+        only items matching <var>work/TASKS-GLOBS.CYCLE/GLOBS</var>. E.g. In
+        Cylc, if current cycle is <samp>2014122512</samp>,
         <kbd>prune-work-at=-PT12H:foo*:*.dat</kbd> will clear out all items
         matching <var>work/foo*.2014122500/*.dat</var>, and
-        <kbd>prune-work-at=-PT12H:ba[rz]:</kbd> will clear out all items matching
-        <var>work/ba[rz].2014122500/</var>.</p>
+        <kbd>prune-work-at=-PT12H:ba[rz]:</kbd> will clear out all items
+        matching <var>work/ba[rz].2014122500/</var>.</p>
       </dd>
 
       <dt><kbd>prune-datac-at=cycle[:globs] ...</kbd></dt>
@@ -684,16 +688,15 @@ eval $(rose task-env)
 
     <h2 id="rose-app-run">rose app-run</h2>
 
-    <p>Run an application according to its configuration, outside of a
-    suite task environment. Although you will normally launch a Rose
-    application using <code>rose task-run</code>, there are situations when
-    you may have a standalone Rose application configuration that you just
-    want to run outside of a suite. This is where <code>rose app-run</code>
-    may come in handy.</p>
+    <p>Run an application according to its configuration, outside of a suite
+    task environment. Although you will normally launch a Rose application
+    using <code>rose task-run</code>, there are situations when you may have a
+    standalone Rose application configuration that you just want to run outside
+    of a suite. This is where <code>rose app-run</code> may come in handy.</p>
 
-    <p>See <a href="rose-command.html#rose-app-run">Rose Reference Guide:
-    CLI &gt; rose app-run</a> for a full list of environment variables
-    provided by this command.</p>
+    <p>See <a href="rose-command.html#rose-app-run">Rose Reference Guide: CLI
+    &gt; rose app-run</a> for a full list of environment variables provided by
+    this command.</p>
   </div>
 </body>
 </html>
