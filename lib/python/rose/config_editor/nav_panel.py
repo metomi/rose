@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 
 import os
+import re
 import sys
 import webbrowser
 
@@ -56,6 +57,9 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self._ask_is_preview = ask_is_preview
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_OUT)
+        self._rec_no_expand_leaves = re.compile(
+            rose.config_editor.TREE_PANEL_NO_EXPAND_LEAVES_REGEX
+        )       
         self.panel_top = gtk.TreeViewColumn()
         self.panel_top.set_title(rose.config_editor.TREE_PANEL_TITLE)
         self.cell_error_icon = gtk.CellRendererPixbuf()
@@ -154,7 +158,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
     def set_expansion(self):
         """Set the default expanded rows."""
         top_rows = self.filter_model.iter_n_children(None)
-        if top_rows > rose.config_editor.TREE_PANEL_MAX_EXPANDED:
+        if top_rows > rose.config_editor.TREE_PANEL_MAX_EXPANDED_ROOTS:
             return False
         if top_rows == 1:
             return self.expand_recursive(no_duplicates=True)
@@ -523,12 +527,14 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             start_path = treemodel.get_path(start_iter)
         if not no_duplicates:
             return self.tree.expand_row(start_path, open_all=True)
+        max_depth = rose.config_editor.TREE_PANEL_MAX_EXPANDED_DEPTH
         stack = [treemodel.get_iter(start_path)]
         while stack:
             iter_ = stack.pop(0)
             if iter_ is None:
                 continue
             path = treemodel.get_path(iter_)
+            name = self.get_name(path)
             child_iter = treemodel.iter_children(iter_)
             child_dups = []
             while child_iter is not None:
@@ -538,11 +544,13 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 dupl = metadata.get(rose.META_PROP_DUPLICATE)
                 child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)
-            if not all(child_dups):
-                self.tree.expand_row(path, open_all=False)
-                stack.append(treemodel.iter_children(iter_))
             if path != start_path:
                 stack.append(treemodel.iter_next(iter_))
+            if (not all(child_dups) and
+                    len(path) <= max_depth and
+                    not self._rec_no_expand_leaves.search(name)):
+                self.tree.expand_row(path, open_all=False)
+                stack.append(treemodel.iter_children(iter_))
 
     def _get_should_show(self, model, iter_):
         # Determine whether to show a row.
