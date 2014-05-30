@@ -380,26 +380,28 @@ class BaseSummaryDataPanel(gtk.VBox):
         row_iter = model.get_iter(path)
         sect_index = self.get_section_column_index()
         this_section = model.get_value(row_iter, sect_index)
-        menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_JUMP_TO)
-        label = rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
-                                           this_section.replace("_", "__"))
-        menuitem.set_label(label)
-        menuitem._section = this_section
-        menuitem.connect("activate",
-                         lambda i: self.search_function(i._section))
-        menuitem.show()
-        menu.append(menuitem)
-        sep = gtk.SeparatorMenuItem()
-        sep.show()
-        menu.append(sep)
+        if this_section is not None:
+            menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_JUMP_TO)
+            label = rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
+                this_section.replace("_", "__"))
+            menuitem.set_label(label)
+            menuitem._section = this_section
+            menuitem.connect("activate",
+                             lambda i: self.search_function(i._section))
+            menuitem.show()
+            menu.append(menuitem)
+            sep = gtk.SeparatorMenuItem()
+            sep.show()
+            menu.append(sep)
         extra_menuitems = self._get_custom_menu_items(path, col, event)
         if extra_menuitems:
             for extra_menuitem in extra_menuitems:
                 menu.append(extra_menuitem)
-            sep = gtk.SeparatorMenuItem()
-            sep.show()
-            menu.append(sep)
-        if self.is_duplicate:
+            if this_section is not None:
+                sep = gtk.SeparatorMenuItem()
+                sep.show()
+                menu.append(sep)
+        if self.is_duplicate and this_section is not None:
             add_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_ADD)
             add_menuitem.set_label(
                          rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
