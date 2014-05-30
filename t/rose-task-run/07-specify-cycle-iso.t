@@ -29,7 +29,8 @@ tests 1
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l
+rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l \
+    1>/dev/null 2>&1
 if [[ $? -ne 0 ]]; then
     skip 1
     exit 0

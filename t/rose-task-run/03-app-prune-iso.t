@@ -38,9 +38,14 @@ mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 
-rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l
+rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l \
+    1>/dev/null 2>&1
 if [[ $? -ne 0 ]]; then
-    skip 6
+    if [[ -z $JOB_HOST ]]; then
+        skip 6
+    else
+        skip 9
+    fi
     exit 0
 fi
 
