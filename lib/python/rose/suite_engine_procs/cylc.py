@@ -219,7 +219,8 @@ class CylcProcessor(SuiteEngineProcessor):
         return os.path.join(self.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
     def get_suite_job_events(self, user_name, suite_name, cycles, tasks,
-                             no_statuses, order, limit, offset):
+                             only_statuses, only_latest_jobs, order, limit,
+                             offset):
         """Return suite job events.
 
         user -- A string containing a valid user ID
@@ -230,8 +231,11 @@ class CylcProcessor(SuiteEngineProcessor):
         tasks -- Display only jobs for task names matching these names. Values
                  can be a valid task name or a glob like pattern for matching
                  valid task names.
-        no_statuses -- Do not display jobs with these statuses. Valid values
-                       are the keys of CylcProcessor.STATUSES.
+        only_statuses -- If given, only display jobs with this status. Valid
+                         values are the keys of
+                         CylcProcessor.STATUSES.
+        only_latest_jobs -- If True, only display the latest job for each
+                            task.
         order -- Order search in a predetermined way. A valid value is one of
                  the keys in CylcProcessor.ORDERS.
         limit -- Limit number of returned entries
@@ -260,60 +264,69 @@ class CylcProcessor(SuiteEngineProcessor):
             for cycle in cycles:
                 if cycle.startswith("before "):
                     value = cycle.split(None, 1)[-1]
-                    where_fragments.append("cycle <= ?")
+                    where_fragments.append("task_events.cycle <= ?")
                 elif cycle.startswith("after "):
                     value = cycle.split(None, 1)[-1]
-                    where_fragments.append("cycle >= ?")
+                    where_fragments.append("task_events.cycle >= ?")
                 else:
                     value = cycle
-                    where_fragments.append("cycle GLOB ?")
+                    where_fragments.append("task_events.cycle GLOB ?")
                 stmt_args.append(value)
             where += " AND (" + " OR ".join(where_fragments) + ")"
         if tasks:
             where_fragments = []
             for task in tasks:
-                where_fragments.append("name GLOB ?")
+                where_fragments.append("task_events.name GLOB ?")
                 stmt_args.append(task)
             where += " AND (" + " OR ".join(where_fragments) + ")"
-        if no_statuses:
-            where_fragments = []
-            for no_status in no_statuses:
-                for status in self.STATUSES.get(no_status, []):
-                    where_fragments.append("status != ?")
-                    stmt_args.append(status)
-            where += " AND (" + " AND ".join(where_fragments) + ")"
+        if only_latest_jobs:
+            table = (
+                "(SELECT task_events.* FROM task_events JOIN " +
+                "task_states ON " +
+                "task_events.name == task_states.name AND " +
+                "task_events.cycle == task_states.cycle AND " +
+                "task_events.submit_num == task_states.submit_num " +
+                where + ") " +
+                " task_events"
+            )
+            table_where_args = list(stmt_args)
+        else:
+            table = "task_events"
+            table_where_args = []
         # Execute query to get number of entries
         of_n_entries = 0
-        stmt = ("SELECT COUNT(*) FROM"
-                " task_events JOIN task_states USING (name,cycle)"
-                " WHERE event==?")
-        if where:
-            stmt += " " + where
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
-                                 ["submitting now"] + stmt_args):
-            of_n_entries = row[0]
-            break
-        if not of_n_entries:
-            return ([], 0)
+        if limit and not only_statuses:
+            stmt = "SELECT COUNT(*) FROM " + table + " WHERE event==?"
+            if where:
+                stmt += " " + where
+            for row in self._db_exec(
+                    self.SUITE_DB, user_name, suite_name, stmt,
+                    table_where_args + ["submitting now"] + stmt_args):
+                of_n_entries = row[0]
+                break
+            if not of_n_entries:
+                return ([], 0)
         # Execute query to get entries
         entries = []
         stmt = ("SELECT" +
-                " cycle, name, task_events.submit_num," +
+                " cycle, name, submit_num," +
                 " group_concat(time), group_concat(event)," +
                 " group_concat(message) " +
-                " FROM" +
-                " task_events JOIN task_states USING (cycle,name)" +
+                " FROM " +
+                table +
                 " WHERE" +
                 " (event==? OR event==? OR event==? OR" +
                 "  event==? OR event==? OR event==?)" +
                 where +
-                " GROUP BY cycle, name, task_events.submit_num" +
+                " GROUP BY cycle, name, submit_num" +
                 " ORDER BY " +
                 self.ORDERS.get(order, self.ORDERS["time_desc"]))
-        stmt_args_head = ["submitting now", "submission failed", "started",
-                          "succeeded", "failed", "signaled"]
+        stmt_args_head = table_where_args + [
+            "submitting now", "submission failed", "started",
+            "succeeded", "failed", "signaled"
+        ]
         stmt_args_tail = []
-        if limit:
+        if limit and not only_statuses:
             stmt += " LIMIT ? OFFSET ?"
             stmt_args_tail = [limit, offset]
         for row in self._db_exec(
@@ -323,7 +336,6 @@ class CylcProcessor(SuiteEngineProcessor):
             entry = {"cycle": cycle, "name": name, "submit_num": submit_num,
                      "submit_num_max": 1, "events": [None, None, None],
                      "status": None, "logs": {}, "seq_logs_indexes": {}}
-            entries.append(entry)
             events = events_str.split(",")
             times = times_str.split(",")
             if messages_str:
@@ -342,7 +354,21 @@ class CylcProcessor(SuiteEngineProcessor):
                     if my_event == "fail(%s)":
                         signal = message.rsplit(None, 1)[-1]
                         entry["status"] = "fail(%s)" % signal
-
+            if only_statuses:
+                for only_status in only_statuses:
+                    if ((only_status == "fail" and
+                             "fail" in entry["status"]) or
+                            (only_status == "active" and
+                             entry["status"] == "init") or
+                            (only_status == "success" and
+                             entry["status"] == "success")):
+                        entries.append(entry)
+            else:
+                entries.append(entry)
+        if of_n_entries == 0:
+            of_n_entries = len(entries)
+        if limit and only_statuses:
+            entries = entries[offset:offset + limit]
         other_info_of = {}
         for entry in entries:
             cycle = entry["cycle"]

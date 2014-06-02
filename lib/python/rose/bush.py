@@ -132,7 +132,8 @@ class Root(object):
 
     @cherrypy.expose
     def jobs(self, user, suite, page=1, cycles=None, tasks=None,
-             no_status=None, order=None, per_page=JOBS_PER_PAGE, form=None):
+             only_status=None, only_latest_jobs=False, order=None,
+             per_page=JOBS_PER_PAGE, form=None):
         """List jobs of a running or completed suite.
 
         user -- A string containing a valid user ID
@@ -145,9 +146,10 @@ class Root(object):
                  The list should be specified as a string which will be
                  shlex.split by this method. Values can be a valid task name or
                  a glob like pattern for matching valid task names.
-        no_status -- Do not display jobs of tasks matching these statuses.
+        only_status -- Only display jobs with this status.
                      The values in the list should be "active", "success" or
                      "fail".
+        only_latest_jobs -- Only display the latest job for each task.
         order -- Order search in a predetermined way. A valid value is one of
                  "time_desc", "time_asc","cycle_desc_name_desc",
                  "cycle_desc_name_asc", "cycle_asc_name_desc",
@@ -171,16 +173,20 @@ class Root(object):
             page = int(page)
         else:
             page = 1
-        no_statuses = no_status
-        if no_status and not isinstance(no_status, list):
-            no_statuses = [no_status]
+        if only_status is None:
+            only_statuses = []
+        elif isinstance(only_status, list):
+            only_statuses = only_status
+        else:
+            only_statuses = [only_status]
         data = {
             "host": self.host_name,
             "user": user,
             "suite": suite,
             "cycles": cycles,
             "tasks": tasks,
-            "no_statuses": no_statuses,
+            "only_statuses": only_statuses,
+            "only_latest_jobs": only_latest_jobs,
             "order": order,
             "per_page": per_page,
             "per_page_default": self.JOBS_PER_PAGE,
@@ -200,10 +206,11 @@ class Root(object):
                 self.suite_engine_proc.get_suite_state_summary(user, suite))
         data["offset"] = (page - 1) * per_page
         entries, of_n_entries = self.suite_engine_proc.get_suite_job_events(
-                                    user, suite,
-                                    cycles, tasks, no_statuses, order,
-                                    per_page, data["offset"])
-        data["entries"] = entries
+            user, suite,
+            cycles, tasks, only_statuses,
+            only_latest_jobs, order, per_page,
+            data["offset"]
+        )
         data["of_n_entries"] = of_n_entries
         if per_page:
             data["n_pages"] = of_n_entries / per_page
@@ -211,6 +218,7 @@ class Root(object):
                 data["n_pages"] += 1
         else:
             data["n_pages"] = 1
+        data["entries"] = entries
         data["time"] = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
         if form == "json":
             return simplejson.dumps(data)
@@ -222,8 +230,8 @@ class Root(object):
 
     @cherrypy.expose
     def list(self, user, suite, page=1, cycles=None, tasks=None,
-             no_status=None, order=None, per_page=JOBS_PER_PAGE, form=None):
-        return self.jobs(user, suite, page, cycles, tasks, no_status, order,
+             only_status=None, order=None, per_page=JOBS_PER_PAGE, form=None):
+        return self.jobs(user, suite, page, cycles, tasks, only_status, order,
                          per_page, form)
 
     @cherrypy.expose

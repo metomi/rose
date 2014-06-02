@@ -98,7 +98,7 @@ href="#filter"><i class="icon-wrench"></i> Display Options</a>
 <input type="hidden" name="suite" value="{{suite}}" />
 <fieldset class="container-fluid">
 <div class="row-fluid">
-<div class="span6">
+<div class="span4">
 <input id="cycles" type="text" name="cycles" class="input-block-level"
 title="Cycle globs, &quot;before|after CYCLE&quot;"
 placeholder="Cycle globs, &quot;before|after CYCLE&quot;"
@@ -107,7 +107,7 @@ value="{{cycles|escape}}"
 {% endif -%}
 />
 </div>
-<div class="span6">
+<div class="span4">
 <input id="tasks" type="text" name="tasks" class="input-block-level"
 title="Task names globs"
 placeholder="Task names globs"
@@ -116,9 +116,29 @@ value="{{tasks|escape}}"
 {% endif -%}
 />
 </div>
+<div class="span4">
+<select name="order" title="Sort order">
+{% for k, v in [("time_desc", "new-&gt;old"),
+                ("time_asc", "old-&gt;new"),
+                ("cycle_desc_name_asc", "new-&gt;old cycle, a-z task name"),
+                ("cycle_desc_name_desc", "new-&gt;old cycle, z-a task name"),
+                ("cycle_asc_name_asc", "old-&gt;new cycle, a-z task name"),
+                ("cycle_asc_name_desc", "old-&gt;new cycle, z-a task name"),
+                ("name_asc_cycle_desc", "a-z task name, new-&gt;old cycle"),
+                ("name_desc_cycle_desc", "z-a task name, new-&gt;old cycle"),
+                ("name_asc_cycle_asc", "a-z task name, old-&gt;new cycle"),
+                ("name_desc_cycle_asc", "z-a task name, old-&gt;new cycle")] -%}
+<option
+{% if order and order == k -%}
+selected="selected"
+{% endif -%}
+value="{{k}}">{{v}}</option>
+{% endfor -%}
+</select>
+</div>
 </div>
 <div class="row-fluid">
-<div class="span1">
+<div class="span2">
 <label class="checkbox inline" for="per_page_max">
 <input id="per_page_max" type="checkbox" name="per_page"
 value="{{per_page_max}}"
@@ -140,38 +160,42 @@ value="{{per_page}}"
 {% endif -%}
 />
 </div>
-<div class="span3">
-{% for status, title in [["active", "active tasks"], ["success", "succeeded tasks"], ["fail", "failed tasks"]] -%}
-<label class="checkbox inline" for="no_status_{{status}}" title="Hide {{title}}">
-<input id="no_status_{{status}}" type="checkbox" name="no_status"
-{% if no_statuses and status in no_statuses -%}
+<div class="span4">
+<span class="checkbox inline">Only:</span>
+{% for status, title in [["active", "Only active jobs"],
+                         ["success", "Only succeeded jobs"],
+                         ["fail", "Only failed jobs"]] -%}
+<label class="checkbox inline" for="only_status_{{status}}" title="{{title}}">
+<input id="only_status_{{status}}" type="checkbox" name="only_status"
+{% if only_statuses and status in only_statuses -%}
 checked="checked"
 {% endif -%}
 value="{{status}}" />
-No {{status}}?</label>
-{% endfor -%}
-</div>
-<div class="span5">
-<select name="order" title="Sort order">
-{% for k, v in [("time_desc", "new-&gt;old"),
-                ("time_asc", "old-&gt;new"),
-                ("cycle_desc_name_asc", "new-&gt;old cycle, a-z task name"),
-                ("cycle_desc_name_desc", "new-&gt;old cycle, z-a task name"),
-                ("cycle_asc_name_asc", "old-&gt;new cycle, a-z task name"),
-                ("cycle_asc_name_desc", "old-&gt;new cycle, z-a task name"),
-                ("name_asc_cycle_desc", "a-z task name, new-&gt;old cycle"),
-                ("name_desc_cycle_desc", "z-a task name, new-&gt;old cycle"),
-                ("name_asc_cycle_asc", "a-z task name, old-&gt;new cycle"),
-                ("name_desc_cycle_asc", "z-a task name, old-&gt;new cycle")] -%}
-<option
-{% if order and order == k -%}
-selected="selected"
+{% if status == "fail" -%}
+<span class="label label-important">
+<i class="icon-warning-sign icon-white" title="{{title}}"></i>
+</span>
+{% elif status == "success" -%}
+<span class="label label-success">
+<i class="icon-ok icon-white" title="{{title}}"></i>
+</span>
+{% elif status == "active" -%}
+<span class="label label-info">
+<i class="icon-play icon-white" title="{{title}}"></i>
+</span>
 {% endif -%}
-value="{{k}}">{{v}}</option>
+</label>
 {% endfor -%}
-</select>
+<label class="checkbox inline" for="only_latest_jobs"
+title="Only the latest job per task">
+<input id="only_latest_jobs" type="checkbox" name="only_latest_jobs"
+{% if only_latest_jobs -%}
+checked="checked"
+{% endif -%}
+value="True" />
+<span class="label label-inverse">Latest</span>
 </div>
-<div class="span1">
+<div class="span4">
 <input type="submit" class="btn btn-primary" value="update" />
 </div>
 </div>
@@ -214,8 +238,8 @@ value="{{k}}">{{v}}</option>
 <input type="hidden" name="order" value="{{order}}" />
 {% endif -%}
 {% for status in ["active", "success", "fail"] -%}
-{% if no_statuses and status in no_statuses -%}
-<input type="hidden" name="no_status" value="{{status}}" />
+{% if only_statuses and status in only_statuses -%}
+<input type="hidden" name="only_status" value="{{status}}" />
 {% endif -%}
 {% endfor -%}
 <ul class="inline">
@@ -224,9 +248,9 @@ value="{{k}}">{{v}}</option>
 {% if page == 1 -%}
 class="btn btn-link disabled"
 disabled="disabled"
-{% else %}
+{% else -%}
 class="btn btn-link"
-{% endif %}
+{% endif -%}
 >&laquo;</button>
 </li>
 <li>
@@ -303,13 +327,11 @@ class="btn btn-link"
 {% endif -%}
 <a href="{{script}}/jobs/{{user}}/{{suite}}?tasks={{entry.name}}">{{entry.name}}</a>
 {% if entry.submit_num_max > 1 -%}
-{% if entry.submit_num == entry.submit_num_max -%}
-<span class="badge badge-inverse"
-title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
-{% else -%}
-<span class="badge"
-title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
-{% endif -%}
+<span class="badge
+{%- if entry.submit_num == entry.submit_num_max %} badge-inverse{% endif %}"
+title="submit {{entry.submit_num}} / {{entry.submit_num_max}}">
+{{entry.submit_num}}&nbsp;/&nbsp;{{entry.submit_num_max}}
+</span>
 {% endif -%}
 <!-- entry: host, submit_method and submit_method_id -->
 {% if entry.status and entry.status == "init" and entry.submit_method_id -%}
