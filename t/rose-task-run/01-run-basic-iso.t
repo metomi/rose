@@ -23,18 +23,19 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 43
-#-------------------------------------------------------------------------------
 # Run the suite.
-TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l \
     1>/dev/null 2>&1
-if [[ $? -ne 0 ]]; then
-    skip 43
+if (($? != 0)); then
+    skip_all "cylc version not compatible with ISO 8601"
     exit 0
 fi
+#-------------------------------------------------------------------------------
+tests 43
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE
 run_pass "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost

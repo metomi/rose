@@ -74,7 +74,7 @@ else
     sed '/\$JOB_HOST/d; /my_task_2/d' \
         $TEST_SOURCE_DIR/$TEST_KEY_BASE.log >expected-prune.log
 fi
-file_xxdiff "$TEST_KEY" expected-prune.log edited-prune.log
+file_cmp "$TEST_KEY" expected-prune.log edited-prune.log
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-ls
 run_pass "$TEST_KEY" \
@@ -84,7 +84,7 @@ sed "s?\\\$SUITE_RUN_DIR?$SUITE_RUN_DIR?g" \
 if [[ -z $JOB_HOST ]]; then
     sed -i "/my_task_2/d" expected-ls.out
 fi
-file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" expected-ls.out
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-ls.out
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 if [[ -n $JOB_HOST ]]; then
@@ -97,5 +97,5 @@ if [[ -n $JOB_HOST ]]; then
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 fi
 #-------------------------------------------------------------------------------
-#rose suite-clean -q -y $NAME
+rose suite-clean -q -y $NAME
 exit 0

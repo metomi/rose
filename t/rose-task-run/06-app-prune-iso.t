@@ -22,6 +22,19 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
+# Test the suite.
+export ROSE_CONF_PATH=
+TEST_KEY=$TEST_KEY_BASE
+mkdir -p $HOME/cylc-run
+SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
+NAME=$(basename $SUITE_RUN_DIR)
+rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l \
+    1>/dev/null 2>&1
+if (($? != 0)); then
+    skip_all "cylc version not compatible with ISO 8601"
+    exit 0
+fi
+#-------------------------------------------------------------------------------
 tests 9
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
@@ -32,23 +45,6 @@ else
 fi
 #-------------------------------------------------------------------------------
 # Run the suite.
-export ROSE_CONF_PATH=
-TEST_KEY=$TEST_KEY_BASE
-mkdir -p $HOME/cylc-run
-SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
-NAME=$(basename $SUITE_RUN_DIR)
-
-rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME -l \
-    1>/dev/null 2>&1
-if [[ $? -ne 0 ]]; then
-    if [[ -z $JOB_HOST ]]; then
-        skip 6
-    else
-        skip 9
-    fi
-    exit 0
-fi
-
 if [[ -n ${JOB_HOST:-} ]]; then
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
@@ -109,5 +105,5 @@ if [[ -n $JOB_HOST ]]; then
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 fi
 #-------------------------------------------------------------------------------
-#rose suite-clean -q -y $NAME
+rose suite-clean -q -y $NAME
 exit 0
