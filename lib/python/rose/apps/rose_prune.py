@@ -147,10 +147,12 @@ class RosePruneApp(BuiltinApp):
         for item_str in shlex.split(items_str):
             args = item_str.split(":", max_args)
             item = args.pop(0)
-            if dshift.is_task_cycle_time_mode() and dshift.is_offset(item):
-                cycle = dshift.date_shift(offset=item)
-            else:
-                cycle = item
+            cycle = item
+            if dshift.is_task_cycle_time_mode():
+                try:
+                    cycle = dshift.date_shift(offset=item)
+                except ValueError:
+                    pass
             if max_args:
                 items.append((cycle, args))
             else:

@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------------------
 """Logic specific to the Cylc suite engine."""
 
+from isodatetime.parsers import TimePointParser
 import filecmp
 from fnmatch import fnmatch
 from glob import glob
@@ -85,7 +86,8 @@ class CylcProcessor(SuiteEngineProcessor):
             "name DESC, cycle DESC, task_events.submit_num DESC"}
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
-    REC_CYCLE_TIME = re.compile(r"\A[\+\-]?\d+(?:T\d+)?\Z") # Good enough?
+    REC_CYCLE_TIME = re.compile(
+        r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
     SCHEME = "cylc"
     STATUSES = {"active": ["ready", "queued", "submitting", "submitted",
