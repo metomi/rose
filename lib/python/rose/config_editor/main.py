@@ -1921,7 +1921,7 @@ def main():
                                         metadata_off=opts.no_metadata)""",
                         globals(), locals(), f.name)
         p = pstats.Stats(f.name)
-        p.strip_dirs().sort_stats('cumulative').print_stats(200)
+        p.strip_dirs().sort_stats("cumulative").print_stats(50)
         f.close()
     else:
         spawn_window(cwd, debug_mode=opts.debug_mode,

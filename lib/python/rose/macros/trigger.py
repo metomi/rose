@@ -41,6 +41,8 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
     IGNORED_STATUS_VALUES = ('from parent value: {0} with {1} '
                              'is not in the allowed values: {2}')
     PARENT_VALUE = 'value {0}'
+    _evaluated_rule_checks = {}
+    MAX_STORED_RULE_CHECKS = 10000
 
     def _setup_triggers(self, meta_config):
         self.trigger_family_lookup = {}
@@ -134,8 +136,13 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         """
         has_ignored_parent = True
         config_sections = self._get_config_sections(config_data)
+        config_sections_duplicate_map = self._get_duplicate_config_sections(
+            config_data, config_sections=config_sections)
         start_ids = [var_id]
-        alt_ids = self._get_id_duplicates(var_id, config_data, meta_config)
+        alt_ids = self._get_id_duplicates(
+            var_id, config_data, meta_config,
+            config_sections_duplicate_map=config_sections_duplicate_map
+        )
         if alt_ids:
             start_ids = alt_ids
         id_stack = []
@@ -156,7 +163,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         while id_stack:
             this_id, has_ignored_parent = id_stack[0]
             alt_ids = self._get_id_duplicates(
-                this_id, config_data, meta_config)
+                this_id, config_data, meta_config,
+                config_sections_duplicate_map=config_sections_duplicate_map
+            )
             if alt_ids:
                 this_id = alt_ids.pop(0)
             for alt_id in alt_ids:
@@ -369,6 +378,18 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                 stack.pop(0)
         return []
 
+    def _get_duplicate_config_sections(self, config_data,
+                                       config_sections=None):
+        if config_sections is None:
+            config_sections = self._get_config_sections(config_data)
+        config_sections_duplicate_map = {}
+        for section in config_sections:
+            if "(" in section:
+                base_section = section.split("(")[0]
+                config_sections_duplicate_map.setdefault(base_section, [])
+                config_sections_duplicate_map[base_section].append(section)
+        return config_sections_duplicate_map
+
     def _get_family_dict(self, setting_id, config_data, meta_config):
         if self._check_is_id_dupl(setting_id, meta_config):
             sect, opt = self._get_section_option_from_id(setting_id)
@@ -391,15 +412,17 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                         items.append((alt_id, vals))
         return dict(items)
 
-    def _get_id_duplicates(self, setting_id, config_data, meta_config):
+    def _get_id_duplicates(self, setting_id, config_data, meta_config,
+                           config_sections_duplicate_map=None):
         dupl_ids = []
         if self._check_is_id_dupl(setting_id, meta_config):
             sect, opt = self._get_section_option_from_id(setting_id)
-            search_sect = sect + "("
-            for section in self._get_config_sections(config_data):
-                if section.startswith(search_sect):
-                    new_id = self._get_id_from_section_option(section, opt)
-                    dupl_ids.append(new_id)
+            if config_sections_duplicate_map is None:
+                config_sections_duplicate_map = (
+                    self._get_duplicate_config_sections(config_data))
+            for section in config_sections_duplicate_map.get(sect, []):
+                new_id = self._get_id_from_section_option(section, opt)
+                dupl_ids.append(new_id)
         return dupl_ids
 
     def _check_is_id_dupl(self, setting_id, meta_config):
@@ -457,12 +480,18 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
 
     def evaluate_trig_rule(self, rule, setting_id, value):
         """Launch an evaluation of a custom trigger expression."""
-        section, option = self._get_section_option_from_id(setting_id)
-        tiny_config = rose.config.ConfigNode()
-        tiny_config.set([section, option], value)
-        check_failed = self.evaluator.evaluate_rule(
-                                    rule, setting_id, tiny_config)
-        return check_failed
+        try:
+            return self._evaluated_rule_checks[(rule, value)]
+        except KeyError:
+            section, option = self._get_section_option_from_id(setting_id)
+            tiny_config = rose.config.ConfigNode()
+            tiny_config.set([section, option], value)
+            check_failed = self.evaluator.evaluate_rule(
+                                        rule, setting_id, tiny_config)
+            if len(self._evaluated_rule_checks) > self.MAX_STORED_RULE_CHECKS:
+                self._evaluated_rule_checks.popitem()
+            self._evaluated_rule_checks[(rule, value)] = check_failed
+            return check_failed
 
     def get_all_ids(self):
         """Return all setting ids involved in the triggers."""

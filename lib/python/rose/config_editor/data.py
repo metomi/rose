@@ -367,8 +367,8 @@ class ConfigDataManager(object):
         s_sects, s_l_sects = self.load_sections_from_config(name)
         self.config[name].sections = SectData(sects, l_sects, s_sects,
                                               s_l_sects)
-        var, l_var = self.load_vars_from_config(name)
-        s_var, s_l_var = self.load_vars_from_config(name)
+        var, l_var, s_var, s_l_var = self.load_vars_from_config(
+            name, return_copies=True)
         self.config[name].vars = VarData(var, l_var, s_var, s_l_var)
 
         if not skip_load_event:
@@ -522,7 +522,7 @@ class ConfigDataManager(object):
         return sect_map, latent_sect_map
 
     def load_vars_from_config(self, config_name, only_this_section=None,
-                              save=False, update=False):
+                              save=False, update=False, return_copies=False):
         """Return maps of variables from the configuration"""
         config_data = self.config[config_name]
         if save:
@@ -544,6 +544,9 @@ class ConfigDataManager(object):
         else:
             var_map = {}
             latent_var_map = {}
+            if return_copies:
+                 var_map_copy = {}
+                 latent_var_map_copy = {}
         meta_ns_ids = []
         real_var_ids = []
         basic_dupl_map = {}
@@ -579,6 +582,8 @@ class ConfigDataManager(object):
             meta_data = self.helper.get_metadata_for_config_id(var_id,
                                                                config_name)
             var_map.setdefault(section, [])
+            if return_copies:
+                var_map_copy.setdefault(section, [])
             if update:
                 id_list = [v.metadata['id'] for v in var_map[section]]
                 if var_id in id_list:
@@ -586,14 +591,29 @@ class ConfigDataManager(object):
                         if var.metadata['id'] == var_id:
                             var_map[section].pop(i)
                             break
-            var_map[section].append(rose.variable.Variable(
-                                                  option,
-                                                  node.value,
-                                                  meta_data,
-                                                  ignored_reason,
-                                                  error={},
-                                                  flags=flags,
-                                                  comments=cfg_comments))
+            var_map[section].append(
+                rose.variable.Variable(
+                    option,
+                    node.value,
+                    meta_data,
+                    ignored_reason,
+                    error={},
+                    flags=flags,
+                    comments=cfg_comments
+                )
+            )
+            if return_copies:
+                var_map_copy[section].append(
+                    rose.variable.Variable(
+                        option,
+                        node.value,
+                        meta_data,
+                        ignored_reason,
+                        error={},
+                        flags=flags,
+                        comments=cfg_comments
+                    )
+                )
         id_node_stack = meta_config.value.items()
         while id_node_stack:
             setting_id, sect_node = id_node_stack.pop(0)
@@ -643,6 +663,8 @@ class ConfigDataManager(object):
             meta_data.update({'id': setting_id})
             value = rose.variable.get_value_from_metadata(meta_data)
             latent_var_map.setdefault(section, [])
+            if return_copies:
+                latent_var_map_copy.setdefault(section, [])
             if update:
                 id_list = [v.metadata['id'] for v in
                             latent_var_map[section]]
@@ -651,13 +673,28 @@ class ConfigDataManager(object):
                         if var.metadata['id'] == setting_id:
                             latent_var_map[section].remove(var)
             latent_var_map[section].append(
-                            rose.variable.Variable(
-                                            option,
-                                            value,
-                                            meta_data,
-                                            ignored_reason,
-                                            error={},
-                                            flags=flags))
+                rose.variable.Variable(
+                    option,
+                    value,
+                    meta_data,
+                    ignored_reason,
+                    error={},
+                    flags=flags
+                )
+            )
+            if return_copies:
+                latent_var_map_copy[section].append(
+                    rose.variable.Variable(
+                        option,
+                        value,
+                        meta_data,
+                        ignored_reason,
+                        error={},
+                        flags=flags
+                    )
+                )
+        if return_copies:
+            return var_map, latent_var_map, var_map_copy, latent_var_map_copy
         return var_map, latent_var_map
 
     def _load_dupl_sect_map(self, basic_dupl_map, section):
