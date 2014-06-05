@@ -299,7 +299,7 @@ class="btn btn-link"
 {% endif -%}
 <!-- entry: status -->
 {% if entry.cycle != "1" -%}
-<a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
+<a href="{{script}}/jobs/{{user}}/{{suite}}?cycles={{entry.cycle|replace('+', '%2B')}}" class="cycle" title="{{entry.cycle}}">{{entry.cycle}}</a>
 {% endif -%}
 <a href="{{script}}/jobs/{{user}}/{{suite}}?tasks={{entry.name}}">{{entry.name}}</a>
 {% if entry.submit_num_max > 1 -%}
