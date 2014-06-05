@@ -44,7 +44,7 @@ class ConfigProcessorForJinja2(ConfigProcessorBase):
                 continue
             target = s_key[len(self.PREFIX):]
             source = os.path.join(conf_tree.files[target], target)
-            if not os.access(source, os.F_OK | os.R_OK | os.W_OK):
+            if not os.access(source, os.F_OK | os.R_OK):
                 continue
             tmp_file = NamedTemporaryFile()
             tmp_file.write("#!" + self.SCHEME + "\n")
