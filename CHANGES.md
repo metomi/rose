@@ -5,9 +5,32 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (End of 2014-Q2?)
+
+This release of Rose will work best with the upcoming
+[Cylc](https://github.com/cylc/cylc/) 5.4.14.
+
+### Highlighted Changes
+
+[#1271](https://github.com/metomi/rose/pull/1271):
+rose task-env, rose\_prune: support ISO 8601 syntax.
+
+### Noteworthy Changes
+
+[#1279](https://github.com/metomi/rose/pull/1279):
+rose suite-run: fix failure when source `suite.rc` not writable.
+
+[#1272](https://github.com/metomi/rose/pull/1272):
+rose config-edit: fix user-ignoring duplicate section.
+
+[#1264](https://github.com/metomi/rose/pull/1264):
+rose bush: encode cycle time in URL.
+
+--------------------------------------------------------------------------------
+
 ## 2014-05 (2014-05-30)
 
-This release of Rose will work best with
+This release of Rose works best with
 [Cylc](https://github.com/cylc/cylc/) 5.4.12 and 5.4.13.
 
 ### Highlighted Changes
