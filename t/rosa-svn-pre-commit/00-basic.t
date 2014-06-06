@@ -70,7 +70,7 @@ run_fail "$TEST_KEY" \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: A   a/a/0/0/0/
+[FAIL] SUITE MUST HAVE TRUNK: A   a/a/0/0/0/
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-no-info
@@ -79,7 +79,7 @@ run_fail "$TEST_KEY" \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: A   a/a/0/0/0/
+[FAIL] SUITE MUST HAVE INFO FILE: A   a/a/0/0/0/
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-empty-info
@@ -90,7 +90,7 @@ run_fail "$TEST_KEY" \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: A   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] SUITE MUST HAVE OWNER: A   a/a/0/0/0/trunk/rose-suite.info
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-empty-owner
@@ -103,7 +103,7 @@ run_fail "$TEST_KEY" \
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: A   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] SUITE MUST HAVE OWNER: A   a/a/0/0/0/trunk/rose-suite.info
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-good-1
@@ -184,7 +184,7 @@ run_fail "$TEST_KEY" svn ci -q -m't' --username=daisy work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] SUITE MUST HAVE OWNER: U   a/a/0/0/0/trunk/rose-suite.info
 __ERR__
 svn revert -q -R work/aa000
 #-------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ run_fail "$TEST_KEY" svn ci -q -m't' --username=daisy work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: D   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] SUITE MUST HAVE INFO FILE: D   a/a/0/0/0/trunk/rose-suite.info
 __ERR__
 svn revert -q -R work/aa000
 #-------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ run_fail "$TEST_KEY" svn rm -q -m't' --username=daisy $SVN_URL/a/a/0/0/0/trunk
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: D   a/a/0/0/0/trunk/
+[FAIL] SUITE MUST HAVE TRUNK: D   a/a/0/0/0/trunk/
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-bad-chown
@@ -308,7 +308,7 @@ svn revert -q -R work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: access-list=fred
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-bad-chown-2
@@ -318,7 +318,7 @@ svn revert -q -R work/aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 sed -i '/^\[FAIL\]/!d' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: owner=fred
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-access-star-mod-anyone

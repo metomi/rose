@@ -21,19 +21,14 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
-python -m smtpd -c DebuggingServer -d -n 1>smtpd.out 2>&1 &
-SMTPD_PID=$!
-while ! grep -q 'DebuggingServer started' smtpd.out 2>/dev/null; do
-    if ps $SMTPD_PID 1>/dev/null 2>&1; then
-        sleep 1
-    else
-        skip_all "$TEST_KEY_BASE: cannot start SMTP server"
-    fi
-done
+mock_smtpd_init
+if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
+    skip_all "cannot start SMTP server"
+fi
 mkdir conf
-cat >conf/rose.conf <<'__CONF__'
+cat >conf/rose.conf <<__CONF__
 [rose-suite-hook]
-smtp-host=localhost:8025
+smtp-host=$TEST_SMTPD_HOST
 __CONF__
 export ROSE_CONF_PATH=$PWD/conf
 
@@ -54,11 +49,11 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 ((++N_QUIT))
 TIMEOUT=$(($(date +%s) + 10))
 while (($(date +%s) <= $TIMEOUT)) \
-    && (($(grep -c "Data: 'quit'" smtpd.out) < $N_QUIT))
+    && (($(grep -c "Data: 'quit'" "$TEST_SMTPD_LOG") < $N_QUIT))
 do
     sleep 1
 done
-tail -2 smtpd.out >smtpd-tail.out
+tail -2 "$TEST_SMTPD_LOG" >smtpd-tail.out
 file_grep "$TEST_KEY.smtp.from" "From: $USER@localhost" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.to" "To: $USER@localhost" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.subject" \
@@ -74,11 +69,11 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 ((++N_QUIT))
 TIMEOUT=$(($(date +%s) + 10))
 while (($(date +%s) <= $TIMEOUT)) \
-    && (($(grep -c "Data: 'quit'" smtpd.out) < $N_QUIT))
+    && (($(grep -c "Data: 'quit'" "$TEST_SMTPD_LOG") < $N_QUIT))
 do
     sleep 1
 done
-tail -2 smtpd.out >smtpd-tail.out
+tail -2 "$TEST_SMTPD_LOG" >smtpd-tail.out
 file_grep "$TEST_KEY.smtp.from" "From: $USER@localhost" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.to" "To: $USER@localhost" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.to" \
@@ -102,11 +97,11 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 ((++N_QUIT))
 TIMEOUT=$(($(date +%s) + 10))
 while (($(date +%s) <= $TIMEOUT)) \
-    && (($(grep -c "Data: 'quit'" smtpd.out) < $N_QUIT))
+    && (($(grep -c "Data: 'quit'" "$TEST_SMTPD_LOG") < $N_QUIT))
 do
     sleep 1
 done
-tail -2 smtpd.out >smtpd-tail.out
+tail -2 "$TEST_SMTPD_LOG" >smtpd-tail.out
 file_grep "$TEST_KEY.smtp.from" "From: $USER@hms.beagle" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.to" "To: $USER@hms.beagle" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.to" \
@@ -116,7 +111,7 @@ file_grep "$TEST_KEY.smtp.subject" \
     "Subject: \\[succeeded\\] $NAME" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.content.1" "Task: t1.1" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.content.2" "See: file://$SUITE_RUN_DIR" smtpd-tail.out
-tail -20 smtpd.out >smtpd-tail.out
+tail -20 "$TEST_SMTPD_LOG" >smtpd-tail.out
 file_grep "$TEST_KEY.smtp.mail.from" \
     "^===> MAIL FROM:<$USER@hms.beagle>" smtpd-tail.out
 file_grep "$TEST_KEY.smtp.rcpt.to.1" \
@@ -129,6 +124,5 @@ file_grep "$TEST_KEY.smtp.rcpt.to.4" \
     "^===> RCPT TO:<nobody@home>" smtpd-tail.out
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
-kill $SMTPD_PID
-wait $SMTPD_PID 2>/dev/null || true
+mock_smtpd_kill
 exit 0

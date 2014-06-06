@@ -34,16 +34,9 @@
 #     REV - Revision to build. Default to HEAD.
 #-------------------------------------------------------------------------------
 
-NAME='rose'
-
-prefix_source() {
-    N=0
-    while read; do
-        echo "Source$((++N)): https://github.com/metomi/$NAME/commit/$REPLY"
-    done
-}
-
 set -eu
+THIS=$(basename $0)
+NAME='rose'
 
 rpmdev-setuptree
 
@@ -51,6 +44,11 @@ rpmdev-setuptree
 REV=${1:-HEAD}
 REV_NAME=$(git describe $REV)
 REV_BASE=$(git describe --abbrev=0 $REV)
+RELEASE=1
+if [[ $REV_NAME != $REV_BASE ]]; then
+    COMMIT_DATE=$(date -u +%Y%m%dT%H%M "--date=$(git show -s --format=%ci $REV)")
+    RELEASE=${COMMIT_DATE}git${REV_NAME#$REV_BASE-*-g}
+fi
 REV_BASE_DOT=$(sed 's/-/./g' <<<$REV_BASE)
 git archive --format=tar --prefix=$NAME-$REV_BASE_DOT/ $REV \
     | (cd ~/rpmbuild/SOURCES/ && tar -xf -)
@@ -63,15 +61,11 @@ rm -r ~/rpmbuild/SOURCES/$NAME-$REV_BASE_DOT/{demo,t}
     cat <<__SPEC__
 Name: $NAME
 Version: $REV_BASE_DOT
-Release: 1%{?dist}
+Release: $RELEASE
 Summary: A framework for managing and running meteorological suites
 License: GPLv3
 URL: https://github.com/metomi/$NAME/
 Source0: https://github.com/metomi/$NAME/releases/
-__SPEC__
-    git log --format=%H --first-parent --reverse $REV_BASE..$REV_NAME \
-        | prefix_source
-    cat <<__SPEC__
 BuildArch: noarch
 Requires: bash fcm Jinja2 perl pygtk2 python python-cherrypy python-requests python-simplejson SQLAlchemy subversion
 
