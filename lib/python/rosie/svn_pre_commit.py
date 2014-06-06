@@ -115,7 +115,7 @@ class RosieSvnPreCommitHook(object):
         node = ConfigLoader()(t_handle)
         t_handle.close()
         owner = node.get_value(["owner"])
-        access_list = shlex.split(node.get_value(["access-list"], ""))
+        access_list = node.get_value(["access-list"], "").split()
         access_list.sort()
         return owner, access_list
 
