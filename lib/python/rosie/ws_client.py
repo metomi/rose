@@ -32,16 +32,15 @@ Functions:
 import os
 import re
 import requests
+from rosie.suite_id import SuiteId, SuiteIdError
+from rosie.ws_client_auth import (RosieWSClientAuthManager,
+                                  UndefinedRosiePrefixWS)
+from rose.opt_parse import RoseOptionParser
+from rose.popen import RosePopener, RosePopenError
+from rose.reporter import Reporter, Event
 import simplejson
 import sys
 import time
-
-import rose.config
-from rosie.suite_id import SuiteId, SuiteIdError
-from rose.opt_parse import RoseOptionParser
-from rose.popen import RosePopener
-from rose.reporter import Reporter, Event
-from rose.resource import ResourceLocator
 
 ERR_INVALID_URL = "Invalid url: {0}"
 ERR_NO_SUITES_FOUND = "{0}: no suites found."
@@ -71,28 +70,17 @@ class QueryError(Exception):
     pass
 
 
-class UnknownRootError(Exception):
-
-    """Raised if a prefix has no config."""
-
-    pass
-
-
 class RosieWSClient(object):
 
-    """A Client for the Rosie Web Service."""
+    """A client for the Rosie web service."""
 
-    def __init__(self, prefix=None):
+    def __init__(self, prefix=None, popen=None, prompt_func=None):
         if prefix is None:
             prefix = SuiteId.get_prefix_default()
         self.prefix = prefix
-        conf = ResourceLocator.default().get_conf()
-        root = conf.get_value(["rosie-id", "prefix-ws." + self.prefix])
-        if root is None:
-            raise UnknownRootError(self.prefix)
-        if not root.endswith("/"):
-            root += "/"
-        self.root = root
+        self.auth_manager = RosieWSClientAuthManager(
+                        self.prefix, popen=popen, prompt_func=prompt_func)
+        self.root = self.auth_manager.root
 
     def _get(self, method, **kwargs):
         """Send a JSON object to the web server and retrieve results."""
@@ -101,17 +89,28 @@ class RosieWSClient(object):
         else:
             url = self.root + method
         kwargs["format"] = "json"
-        try:
-            response = requests.get(url, params=kwargs)
-        except requests.exceptions.ConnectionError as e:
-            raise QueryError("%s: %s: %s" % (url, method, str(e)))
-        except requests.exceptions.MissingSchema as e:
-            raise QueryError("URL Error: %s" % (str(e)))
+
+        is_retry = False
+        while True:
+            auth = self.auth_manager.get_auth(is_retry)
+            try:
+                response = requests.get(url, params=kwargs, auth=auth)
+            except requests.exceptions.ConnectionError as exc:
+                raise QueryError("%s: %s: %s" % (url, method, str(exc)))
+            except requests.exceptions.MissingSchema as exc:
+                raise QueryError("URL Error: %s" % (str(exc)))
+
+            if response.status_code != requests.codes["unauthorized"]: # not 401
+                break
+            is_retry = True
 
         try:
             response.raise_for_status()
         except:
             raise QueryError("%s: %s: %s" % (url, kwargs, response.status_code))
+
+        self.auth_manager.store_password()
+
         try:
             response_url = response.url.replace("&format=json", "")
             return simplejson.loads(response.text), response_url
@@ -119,25 +118,37 @@ class RosieWSClient(object):
             raise QueryError("%s: %s" % (method, kwargs))
 
     def get_known_keys(self):
+        """Return the known query keys."""
         return self._get("get_known_keys")[0]
 
     def get_optional_keys(self):
+        """Return the optional query keys."""
         return self._get("get_optional_keys")[0]
 
     def get_query_operators(self):
+        """Return the query operators."""
         return self._get("get_query_operators")[0]
 
+    def hello(self):
+        """Ask the server to say hello."""
+        return self._get("hello")[0]
+
     def query(self, q, **kwargs):
+        """Query the Rosie database."""
         return self._get("query", q=q, **kwargs)
 
     def search(self, s, **kwargs):
+        """Search the Rosie database for a matching string."""
         return self._get("search", s=s, **kwargs)
 
     def address_search(self, a, **kwargs):
+        """Repeat a Rosie query or search by address."""
         return self._get("address", a=a, **kwargs)
 
 
 class URLEvent(Event):
+
+    """Print query URL."""
 
     def __str__(self):
         return "url: " + self.args[0]
@@ -145,15 +156,21 @@ class URLEvent(Event):
 
 class SuiteEvent(Event):
 
+    """Notify a suite is found."""
+
     def __str__(self):
         return self.args[0]
 
 class UserSpecificRoses(Event):
 
+    """Print local "roses" location."""
+
     def __str__(self):
         return "Listing suites in: " + self.args[0]
 
 class SuiteInfo(Event):
+
+    """Print suite info."""
 
     LEVEL = Event.V
 
@@ -177,11 +194,11 @@ class SuiteInfo(Event):
         return out
 
 
-def local_suites(argv):
+def list_local_suites(argv):
     """CLI command to list all the locally checked out suites"""
     opt_parser = RoseOptionParser().add_my_options(
             "no_headers", "prefix", "print_format", "reverse", "sort", "user")
-    opts, args = opt_parser.parse_args(argv)
+    opts = opt_parser.parse_args(argv)[0]
 
     if opts.user:
         report = Reporter(opts.verbosity - opts.quietness)
@@ -203,21 +220,31 @@ def local_suites(argv):
             prefixes = []
             for id_ in id_list:
                 prefixes.append(id_.prefix)
-            for p in sorted(set(prefixes)):
+            for prefix in sorted(set(prefixes)):
                 if len(prefixes) == 1:
                     suites_this_prefix = id_list
                 else:
                     suites_this_prefix = []
                     for id_ in id_list:
-                        if id_.prefix == p:
+                        if id_.prefix == prefix:
                             suites_this_prefix.append(id_)
 
-                results, other_id_list = get_local_suite_details(p, id_list,
-                                                                user=opts.user)
-                opts.prefix = p
+                results = get_local_suite_details(
+                                prefix, id_list, user=opts.user)[0]
+                opts.prefix = prefix
                 _display_maps(opts, ws_client, results,
                               local_suites=suites_this_prefix)
         return
+
+
+def hello(argv):
+    """Set up connection to a Rosie web service."""
+    opt_parser = RoseOptionParser().add_my_options("prefix")
+    opts = opt_parser.parse_args(argv)[0]
+    report = Reporter(opts.verbosity - opts.quietness)
+    popen = RosePopener(event_handler=report)
+    ws_client = RosieWSClient(prefix=opts.prefix, popen=popen)
+    report(ws_client.prefix + ": " + ws_client.hello(), level=0)
 
 
 def lookup(argv):
@@ -233,10 +260,7 @@ def lookup(argv):
             opts.url = True
         else:
             opts.search = True
-    try:
-        ws_client = RosieWSClient(prefix=opts.prefix)
-    except UnknownRootError:
-        sys.exit("No settings found for prefix: '%s'" % opts.prefix)
+    ws_client = RosieWSClient(prefix=opts.prefix)
     results = None
     if opts.url:
         addr = args[0]
@@ -245,18 +269,18 @@ def lookup(argv):
         else:
             try:
                 results, url = ws_client.address_search(None, url=addr)
-            except QueryError as e:
+            except QueryError:
                 sys.exit(ERR_INVALID_URL.format(args[0]))
     elif opts.query:
-        q = query_split(args)
-        if q is None:
+        q_items = query_split(args)
+        if q_items is None:
             sys.exit(ERR_SYNTAX.format(" ".join(args)))
-        for i, p in enumerate(q):
-            q[i] = " ".join(p)
+        for i, q_item in enumerate(q_items):
+            q_items[i] = " ".join(q_item)
         if opts.all_revs:
-            results, url = ws_client.query(q, all_revs=True)
+            results, url = ws_client.query(q_items, all_revs=True)
         else:
-            results, url = ws_client.query(q)
+            results, url = ws_client.query(q_items)
     elif opts.search:
         if opts.all_revs:
             results, url = ws_client.search(args, all_revs=True)
@@ -271,28 +295,29 @@ def query_split(args):
     args = list(args)
     if args[0] not in ["and", "or"]:
         args.insert(0, "and")
-    q = []  # Query list
-    p = []  # Individual query pieces list
+    q_list = []  # Query list
+    q_item = []  # Individual query pieces list
     level = 0  # Number of open brackets
     while args:
         arg = args.pop(0)
         arg_1 = args[0] if args else None
         if (arg in ["and", "or"] and arg_1 not in ["and", "or"]):
-            if len(p) >= 4:
-                q.append(p)
-                p = []
+            if len(q_item) >= 4:
+                q_list.append(q_item)
+                q_item = []
         elif not args:
-            p.append(arg)
-            if len(p) < 4:
-               return None
-            q.append(p)
-            p = []
-        p.append(arg)
+            q_item.append(arg)
+            if len(q_item) < 4:
+                return None
+            q_list.append(q_item)
+            q_item = []
+        q_item.append(arg)
         level += len(arg) if all([c == "(" for c in arg]) else 0
         level -= len(arg) if all([c == ")" for c in arg]) else 0
-    if len(p) > 1 or level != 0 or any([len(p) > 6 or len(p) < 4 for p in q]):
+    if (len(q_item) > 1 or level != 0 or
+            any([len(q_item) > 6 or len(q_item) < 4 for q_item in q_list])):
         return None
-    return q
+    return q_list
 
 
 def get_local_suites(prefix=None, skip_status=False, user=None):
@@ -310,7 +335,7 @@ def get_local_suites(prefix=None, skip_status=False, user=None):
         location = os.path.join(local_copy_root, path)
         try:
             id_ = SuiteId(location=location, skip_status=skip_status)
-        except SuiteIdError as e:
+        except SuiteIdError:
             continue
         if prefix is None or id_.prefix == prefix:
             if str(id_) == path:
@@ -333,29 +358,28 @@ def get_local_suite_details(prefix=None, id_list=None, skip_status=False,
         return [], []
 
     result_maps = []
-    q = []
+    q_list = []
     prefix_id_list = []
     for id_ in id_list:
         if id_.prefix == prefix:
             prefix_id_list.append(id_)
-            q.extend(["or ( idx eq " + id_.idx,
-                      "and branch eq " + id_.branch + " )"])
+            q_list.extend(["or ( idx eq " + id_.idx,
+                           "and branch eq " + id_.branch + " )"])
     ws_client = RosieWSClient(prefix=prefix)
-    if q:
-        result_maps, url = ws_client.query(q)
+    if q_list:
+        result_maps = ws_client.query(q_list)[0]
     else:
         result_maps = []
-        url = None
     result_idx_branches = [(r[u"idx"], r[u"branch"]) for r in result_maps]
-    q = []
+    q_list = []
     for id_ in prefix_id_list:
         if (id_.idx, id_.branch) not in result_idx_branches:
             # A branch may have been deleted - we need all_revs True.
             # We only want to use all_revs on demand as it's slow.
-            q.extend(["or ( idx eq " + id_.idx,
-                      "and branch eq " + id_.branch + " )"])
-    if q:
-        missing_result_maps, url = ws_client.query(q, all_revs=True)
+            q_list.extend(["or ( idx eq " + id_.idx,
+                           "and branch eq " + id_.branch + " )"])
+    if q_list:
+        missing_result_maps = ws_client.query(q_list, all_revs=True)[0]
         new_results = {}
         for result_map in missing_result_maps:
             missing_id = (result_map[u"idx"], result_map[u"branch"])
@@ -389,28 +413,29 @@ def get_local_status(suites, prefix, idx, branch, revision):
     return status
 
 
-def align(res, keys):
+def align(rows, keys):
     """Function to align results to be displayed by display map"""
-    if len(res) <= 1:
-        return res
+    if len(rows) <= 1:
+        return rows
     for k in keys:
         if k == "date":
             time_format = "%Y-%m-%d %H:%M:%S %z" #possibly put a T in
-            for r in res:
+            for row in rows:
                 try:
-                    r[k] = time.strftime(time_format, time.localtime(r.get(k)))
+                    row[k] = time.strftime(time_format,
+                                           time.localtime(row.get(k)))
                 except (TypeError):
                     pass
         else:
             try:
-                max_len = max([len(res[i].get(k, "%" + k))
-                               for i in range(len(res))])
-                for r in res:
-                    r[k] = r.get(k, "%" + k) + " " * (max_len -
-                                                      len(r.get(k, "%" + k)))
+                max_len = max([len(rows[i].get(k, "%" + k))
+                               for i in range(len(rows))])
+                for row in rows:
+                    row[k] = row.get(k, "%" + k) + " " * (max_len -
+                                                      len(row.get(k, "%" + k)))
             except (TypeError, KeyError):
                 pass
-    return res
+    return rows
 
 
 def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
@@ -420,7 +445,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
 
     try:
         terminal_cols = int(popen("stty size", shell=True)[0].split()[1])
-    except:
+    except (IndexError, RosePopenError, ValueError):
         terminal_cols = None
 
     if terminal_cols == 0:
@@ -491,7 +516,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None, local_suites=None):
         suite = SuiteEvent(out.expandtabs() + "\n", level=0)
 
         if (opts.verbosity - opts.quietness) <= report.DEFAULT:
-           report(suite, clip=terminal_cols)
+            report(suite, clip=terminal_cols)
         report(SuiteInfo(dict_row), prefix=None)
     if url is not None:
         if url.endswith("&format=json"):
@@ -505,14 +530,15 @@ def main():
     if not argv:
         return sys.exit(1)
     try:
-        f = globals()[argv[0]]  # Potentially bad.
+        func = globals()[argv[0]]  # Potentially bad.
     except KeyError:
         sys.exit("rosie.ws_client: %s: incorrect usage" % argv[0])
-    sys.exit(f(argv[1:]))
-
-
-if __name__ == "__main__":
     try:
-        main()
+        sys.exit(func(argv[1:]))
     except KeyboardInterrupt:
         pass
+    except UndefinedRosiePrefixWS as exc:
+        sys.exit(str(exc))
+
+if __name__ == "__main__":
+    main()

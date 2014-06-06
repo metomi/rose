@@ -556,8 +556,8 @@ class RoseOptionParser(OptionParser):
 
     def __init__(self, *args, **kwargs):
         if hasattr(kwargs, "prog"):
-            ns, util = kwargs["prog"].split(None, 1)
-            resource_loc = ResourceLocator(ns=ns, util=util)
+            namespace, util = kwargs["prog"].split(None, 1)
+            resource_loc = ResourceLocator(namespace=namespace, util=util)
         else:
             resource_loc = ResourceLocator.default()
         kwargs["prog"] = resource_loc.get_util_name()

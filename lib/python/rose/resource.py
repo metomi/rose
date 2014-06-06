@@ -30,10 +30,25 @@ import sys
 
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
-_DEFAULT_RESOURCE_LOCATOR = None
+
+def get_util_home(*args):
+    """Return ROSE_HOME or the dirname of the dirname of sys.argv[0].
+
+    If args are specified, they are added to the end of returned path.
+
+    """
+    try:
+        value = os.environ["ROSE_HOME"]
+    except KeyError:
+        value = os.path.abspath(__file__)
+        for _ in range(4):  # assume __file__ under $ROSE_HOME/lib/python/rose/
+            value = os.path.dirname(value)
+    return os.path.join(value, *args)
 
 
 class ResourceError(Exception):
+
+    """A named resource not found."""
 
     def __init__(self, key):
         Exception.__init__(self, "%s: resource not found." % key)
@@ -43,30 +58,34 @@ class ResourceLocator(object):
 
     """A class for searching resource files."""
 
+    SITE_CONF_PATH = get_util_home("etc")
+    USER_CONF_PATH = os.path.join(os.path.expanduser("~"), ".metomi")
+    ROSE_CONF = "rose.conf"
+    _DEFAULT_RESOURCE_LOCATOR = None
+
     @classmethod
     def default(cls, paths=None, reset=False):
         """Return the default resource locator."""
-        global _DEFAULT_RESOURCE_LOCATOR
-        if _DEFAULT_RESOURCE_LOCATOR is None or reset:
-            _DEFAULT_RESOURCE_LOCATOR = ResourceLocator(paths)
-        return _DEFAULT_RESOURCE_LOCATOR
+        if cls._DEFAULT_RESOURCE_LOCATOR is None or reset:
+            cls._DEFAULT_RESOURCE_LOCATOR = ResourceLocator(paths)
+        return cls._DEFAULT_RESOURCE_LOCATOR
 
-    def __init__(self, ns=None, util=None, paths=None):
-        self.ns = ns
+    def __init__(self, namespace=None, util=None, paths=None):
+        self.namespace = namespace
         self.util = util
         if paths:
             self.paths = list(paths)
         else:
-            h = self.get_util_home()
-            n = self.get_util_name("-")
-            self.paths = [os.path.join(h, "etc", n), os.path.join(h, "etc")]
+            home = self.get_util_home()
+            name = self.get_util_name("-")
+            self.paths = [os.path.join(home, "etc", name),
+                          os.path.join(home, "etc")]
         self.conf = None
 
     def get_conf(self):
         """Return the site/user configuration root node."""
         if self.conf is None:
-            paths = [os.path.join(self.get_util_home(), "etc"),
-                     os.path.join(os.path.expanduser("~"), ".metomi")]
+            paths = [self.SITE_CONF_PATH, self.USER_CONF_PATH]
             if "ROSE_CONF_PATH" in os.environ:
                 paths_str = os.getenv("ROSE_CONF_PATH").strip()
                 if paths_str:
@@ -76,9 +95,9 @@ class ResourceLocator(object):
             self.conf = ConfigNode()
             config_loader = ConfigLoader()
             for path in paths:
-                file = os.path.join(path, "rose.conf")
-                if os.path.isfile(file) and os.access(file, os.R_OK):
-                    config_loader.load_with_opts(file, self.conf)
+                name = os.path.join(path, self.ROSE_CONF)
+                if os.path.isfile(name) and os.access(name, os.R_OK):
+                    config_loader.load_with_opts(name, self.conf)
         return self.conf
 
     def get_doc_url(self):
@@ -97,20 +116,17 @@ class ResourceLocator(object):
                     return line.strip("#" + string.whitespace)
                 if line.rstrip() == "# SYNOPSIS":
                     in_synopsis = True
-        except:
+        except IOError:
             return None
 
-    def get_util_home(self, *args):
+    @classmethod
+    def get_util_home(cls, *args):
         """Return ROSE_HOME or the dirname of the dirname of sys.argv[0].
 
         If args are specified, they are added to the end of returned path.
 
         """
-        try:
-            d = os.getenv("ROSE_HOME")
-        except KeyError:
-            d = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
-        return os.path.join(d, *args)
+        return get_util_home(*args)
 
     def get_util_name(self, separator=" "):
         """Return the name of the Rose utility, e.g. "rose app-run".
@@ -119,14 +135,14 @@ class ResourceLocator(object):
         Use a separator (default=" ") between ROSE_NS and ROSE_UTIL.
 
         """
-        ns = self.ns
+        namespace = self.namespace
         util = self.util
         try:
-            if ns is None:
-                ns = os.getenv("ROSE_NS")
+            if namespace is None:
+                namespace = os.getenv("ROSE_NS")
             if util is None:
                 util = os.getenv("ROSE_UTIL")
-            return ns + separator + util
+            return namespace + separator + util
         except KeyError:
             return os.path.basename(sys.argv[0])
 
@@ -145,9 +161,9 @@ class ResourceLocator(object):
         """Return the location of the resource key."""
         key = os.path.expanduser(key)
         for path in self.paths:
-            file = os.path.join(path, key)
-            if os.path.exists(file):
-                return file
+            name = os.path.join(path, key)
+            if os.path.exists(name):
+                return name
         raise ResourceError(key)
 
 
@@ -186,21 +202,20 @@ def import_object(import_string, from_files, error_handler,
     module_files = [f for f in from_files if f.endswith(module_fpath)]
     if not module_files and not is_builtin:
         return None
-    module_dirs = set([os.path.dirname(f) for f in module_files])
     module = None
     if is_builtin:
         try:
             module = __import__(module_name, globals(), locals(),
                                 [], 0)
-        except Exception as e:
-            error_handler(e)
+        except ImportError as exc:
+            error_handler(exc)
     else:
         for filename in module_files:
             sys.path.insert(0, os.path.dirname(filename))
             try:
                 module = imp.load_source(as_name, filename)
-            except Exception as e:
-                error_handler(e)
+            except ImportError as exc:
+                error_handler(exc)
             sys.path.pop(0)
     if module is None:
         error_handler(

@@ -32,7 +32,7 @@ editor=$TEST_SOURCE_DIR/$TEST_KEY_BASE-edit
 [rosie-id]
 local-copy-root=$PWD/roses
 prefix-default=foo
-prefix-owner-default.foo=fred
+prefix-username.foo=fred
 prefix-location.foo=$URL
 prefix-location.bar=https://my-host/bar
 __ROSE_CONF__

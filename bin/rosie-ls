@@ -61,4 +61,4 @@
 #     --verbose, -v
 #         Display full info for each returned suite.
 #-------------------------------------------------------------------------------
-exec python -m rosie.ws_client local_suites "$@"
+exec python -m rosie.ws_client list_local_suites "$@"

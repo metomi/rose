@@ -318,12 +318,12 @@ class RosieVCClient(object):
             prefix = SuiteId.get_prefix_default()
 
         # Determine owner:
-        # 1. From user configuration [rosie-id]prefix-owner-default
+        # 1. From user configuration [rosie-id]prefix-username
         # 2. From username of a matching group in [groups] in
         #    ~/.subversion/servers
         # 3. Current user ID
         owner = res_loc.get_conf().get_value(
-                        ["rosie-id", "prefix-owner-default." + prefix])
+                        ["rosie-id", "prefix-username." + prefix])
         if not owner and self.subversion_servers_conf:
             servers_conf = rose.config.load(self.subversion_servers_conf)
             groups_node = servers_conf.get(["groups"])
