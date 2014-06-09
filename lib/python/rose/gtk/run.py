@@ -31,7 +31,7 @@ def run_suite(*args):
     """Run "rose suite-run [args]" with a GTK dialog."""
 
     # Set up reporter
-    queue = multiprocessing.Queue()
+    queue = multiprocessing.Manager().Queue()
     verbosity = Reporter.VV
     out_ctx = ReporterContextQueue(Reporter.KIND_OUT, verbosity, queue=queue)
     err_ctx = ReporterContextQueue(Reporter.KIND_ERR, verbosity, queue=queue)

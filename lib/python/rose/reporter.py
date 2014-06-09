@@ -255,7 +255,7 @@ class ReporterContextQueue(ReporterContext):
                  prefix=None):
         ReporterContext.__init__(self, kind, verbosity, None, prefix)
         if queue is None:
-            queue = multiprocessing.Queue()
+            queue = multiprocessing.Manager().Queue()
         self.queue = queue
         self.closed = False
         self._messages_pending = []
