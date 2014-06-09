@@ -254,7 +254,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
         # Set up jobs for rebuilding all out-of-date targets.
         jobs = {}
-        for target in targets.values():
+        for name, target in sorted(targets.items()):
             if not target.is_out_of_date:
                 continue
             if target.mode == target.MODE_SYMLINK:
@@ -277,6 +277,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         jobs[source.name].event_level = Event.V
                     job = jobs[source.name]
                     jobs[target.name].pending_for[source.name] = job
+                p_name = target.name
+                while (os.path.dirname(p_name) and
+                        os.path.dirname(p_name) != p_name):
+                    p_name = os.path.dirname(p_name)
+                    if p_name in jobs:
+                        jobs[target.name].pending_for[p_name] = jobs[p_name]
             else:
                 self.manager.fs_util.install(target.name)
                 target.loc_type = target.TYPE_BLOB
@@ -384,7 +390,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 args = []
                 if is_first:
                     self.manager.fs_util.makedirs(target.name)
-                    args.append("--delete-excluded")
                 args.extend(["--checksum", source.cache + "/", target.name])
                 cmd = self.manager.popen.get_cmd("rsync", *args)
                 self.manager.popen(*cmd)
