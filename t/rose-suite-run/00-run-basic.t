@@ -61,7 +61,7 @@ for OPTION in -i -l '' --restart; do
 [FAIL] Suite "$NAME" may still be running.
 [FAIL] Host "${HOST:-localhost}" has process:
 [FAIL]     $SUITE_PROC
-[FAIL] Try "rose suite-shutdown $NAME" first?
+[FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 done
 # Don't reload until tasks begin
