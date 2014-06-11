@@ -17,14 +17,31 @@ rose task-env, rose\_prune: support ISO 8601 syntax.
 
 ### Noteworthy Changes
 
+[#1282](https://github.com/metomi/rose/pull/1282):
+rose app-run, suite-run, task-run: allow file install targets to overlap.
+
+[#1281](https://github.com/metomi/rose/pull/1281):
+rose suite-run (gtk): fix RuntimeError for Queues.
+
 [#1279](https://github.com/metomi/rose/pull/1279):
 rose suite-run: fix failure when source `suite.rc` not writable.
+
+[#1278](https://github.com/metomi/rose/pull/1278):
+rosa svn-pre-commit: verify users in owner and access-list,
+and improve diagnostics.
+rosa svn-post-commit: notify users in owner and access-list on changes.
+
+[#1277](https://github.com/metomi/rose/pull/1277):
+rose edit: speed up slow loading-up code.
 
 [#1272](https://github.com/metomi/rose/pull/1272):
 rose config-edit: fix user-ignoring duplicate section.
 
 [#1264](https://github.com/metomi/rose/pull/1264):
 rose bush: encode cycle time in URL.
+
+[#1261](https://github.com/metomi/rose/pull/1261):
+rose edit: tweak latent page display.
 
 --------------------------------------------------------------------------------
 
