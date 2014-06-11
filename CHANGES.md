@@ -5,9 +5,9 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (End of 2014-Q2?)
+## 2014.06.0 (2014-06-11)
 
-This release of Rose will work best with the upcoming
+This release of Rose works best with
 [Cylc](https://github.com/cylc/cylc/) 5.4.14.
 
 ### Highlighted Changes
@@ -27,6 +27,7 @@ rose suite-run (gtk): fix RuntimeError for Queues.
 rose suite-run: fix failure when source `suite.rc` not writable.
 
 [#1278](https://github.com/metomi/rose/pull/1278):
+rosa svn-\*-commit: verify and notify owners and users on access-list.
 * rosa svn-pre-commit: verify users in owner and access-list,
   and improve diagnostics.
 * rosa svn-post-commit: notify users in owner and access-list on changes.
