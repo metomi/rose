@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-run", should work whether "suite.rc" is writable or not.
+# Test "rose suite-run", file install targets overlap.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 tests 3
