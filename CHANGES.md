@@ -36,6 +36,9 @@ rose suite-run: fix failure when source `suite.rc` not writable.
 [#1277](https://github.com/metomi/rose/pull/1277):
 rose edit: speed up slow loading-up code.
 
+[#1275](https://github.com/metomi/rose/pull/1275):
+rose config-edit: tweaks the default page expansion for a single app session.
+
 [#1272](https://github.com/metomi/rose/pull/1272):
 rose config-edit: fix user-ignoring duplicate section.
 
