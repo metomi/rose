@@ -29,6 +29,11 @@ if [[ -z ${TEST_SMTPD_HOST:-} ]]; then
     skip_all "cannot start mock SMTP server"
 fi
 
+# Sort email recipients
+sort_recips() {
+    perl -e 'print(join(", ", sort(@ARGV)), "\n")' "$@"
+}
+
 mkdir repos
 svnadmin create repos/foo
 SVN_URL=file://$PWD/repos/foo
@@ -90,8 +95,8 @@ rosie create -q -y --info-file=rose-suite.info --no-checkout
 
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \['$USER', 'root'\]" \
-    "$TEST_SMTPD_LOG"
+RECIPS=$(sort_recips "'$USER'" "'root'")
+file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
     "^Data: '.*Subject: \\[foo-aa001/trunk@2\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
@@ -114,8 +119,8 @@ svn ci -q -m'foo-aa000: chown' $PWD/roses/foo-aa000/rose-suite.info
 rm -fr $PWD/roses/foo-aa000
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \['$USER', 'root'\]" \
-    "$TEST_SMTPD_LOG"
+RECIPS=$(sort_recips "'$USER'" "'root'")
+file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
     "^Data: '.*Subject: \\[foo-aa000/trunk@3\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
@@ -138,8 +143,8 @@ svn ci -q -m'foo-aa001: chown' $PWD/roses/foo-aa001/rose-suite.info
 rm -fr $PWD/roses/foo-aa001
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \['$USER', 'root'\]" \
-    "$TEST_SMTPD_LOG"
+RECIPS=$(sort_recips "'$USER'" "'root'")
+file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
     "^Data: '.*Subject: \\[foo-aa001/trunk@4\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
@@ -162,8 +167,8 @@ svn ci -q -m'foo-aa001: chown' $PWD/roses/foo-aa001/rose-suite.info
 rm -fr $PWD/roses/foo-aa001
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \['bin', '$USER', 'root'\]" \
-    "$TEST_SMTPD_LOG"
+RECIPS=$(sort_recips "'bin'" "'$USER'" "'root'")
+file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
     "^Data: '.*Subject: \\[foo-aa001/trunk@5\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
@@ -177,8 +182,8 @@ cat /dev/null >"$TEST_SMTPD_LOG"
 rosie delete -y -q foo-aa001
 file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
     "$TEST_SMTPD_LOG"
-file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \['bin', '$USER', 'root'\]" \
-    "$TEST_SMTPD_LOG"
+RECIPS=$(sort_recips "'bin'" "'$USER'" "'root'")
+file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
     "^Data: '.*Subject: \\[foo-aa001/trunk@6\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
