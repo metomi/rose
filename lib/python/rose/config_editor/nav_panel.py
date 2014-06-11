@@ -45,6 +45,19 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     """
 
+    COLUMN_ERROR_ICON = 0
+    COLUMN_CHANGE_ICON = 1
+    COLUMN_TITLE = 2
+    COLUMN_NAME = 3
+    COLUMN_ERROR_INTERNAL = 4
+    COLUMN_ERROR_TOTAL = 5
+    COLUMN_CHANGE_INTERNAL = 6
+    COLUMN_CHANGE_TOTAL = 7
+    COLUMN_LATENT_STATUS = 8
+    COLUMN_IGNORED_STATUS = 9
+    COLUMN_TOOLTIP_TEXT = 10
+    COLUMN_CHANGE_TEXT = 11
+
     def __init__(self, namespace_tree, launch_ns_func,
                  get_metadata_comments_func,
                  popup_menu_func, ask_can_show_func, ask_is_preview):
@@ -66,14 +79,15 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self.panel_top.pack_start(self.cell_title, expand=False)
         self.panel_top.add_attribute(self.cell_error_icon,
                                      attribute='pixbuf',
-                                     column=0)
+                                     column=self.COLUMN_ERROR_ICON)
         self.panel_top.add_attribute(self.cell_changed_icon,
                                      attribute='pixbuf',
-                                     column=1)
+                                     column=self.COLUMN_CHANGE_ICON)
         self.panel_top.set_cell_data_func(self.cell_title,
-                                          self._set_title_markup, 2)
+                                          self._set_title_markup,
+                                          self.COLUMN_TITLE)
         # The columns in self.data_store correspond to: error_icon,
-        # change_icon, name, title, error and change totals (4),
+        # change_icon, title, name, error and change totals (4),
         # latent and ignored statuses, main tip text, and change text.
         self.data_store = gtk.TreeStore(gtk.gdk.Pixbuf, gtk.gdk.Pixbuf,
                                         str, str, int, int, int, int,
@@ -114,7 +128,8 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def get_treeview_tooltip(self, view, row_iter, col_index, tip):
         """Handle creating a tooltip for the treeview."""
-        tip.set_text(self.filter_model.get_value(row_iter, 10))
+        tip.set_text(self.filter_model.get_value(row_iter,
+                                                 self.COLUMN_TOOLTIP_TEXT))
         return True
 
     def add_cursor_extra(self, widget, event):
@@ -212,8 +227,8 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         title = rose.gtk.util.safe_str(title)
         if len(model.get_path(r_iter)) == 1:
             title = rose.config_editor.TITLE_PAGE_ROOT_MARKUP.format(title)
-        latent_status = model.get_value(r_iter, 8)
-        ignored_status = model.get_value(r_iter, 9)
+        latent_status = model.get_value(r_iter, self.COLUMN_LATENT_STATUS)
+        ignored_status = model.get_value(r_iter, self.COLUMN_IGNORED_STATUS)
         name = self.get_name(model.get_path(r_iter))
         preview_status = self._ask_is_preview(name)
         if preview_status:
@@ -245,14 +260,14 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         according to the status of their child row icons.
 
         """
-        ind_map = {'changed': {'icon_col': 1,
+        ind_map = {'changed': {'icon_col': self.COLUMN_CHANGE_ICON,
                                'icon': self.changed_icon,
-                               'int_col': 6,
-                               'total_col': 7},
-                   'error': {'icon_col': 0,
+                               'int_col': self.COLUMN_CHANGE_INTERNAL,
+                               'total_col': self.COLUMN_CHANGE_TOTAL},
+                   'error': {'icon_col': self.COLUMN_ERROR_ICON,
                              'icon': self.error_icon,
-                             'int_col': 4,
-                             'total_col': 5}}
+                             'int_col': self.COLUMN_ERROR_INTERNAL,
+                             'total_col': self.COLUMN_ERROR_TOTAL}}
         int_col = ind_map[ind_type]['int_col']
         total_col = ind_map[ind_type]['total_col']
         row_path = self.get_path_from_names(names, unfiltered=True)
@@ -307,14 +322,17 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 iter_stack.append(self.data_store.iter_children(my_iter))
         for path in paths:
             path_iter = self.data_store.get_iter(path)
-            title = self.data_store.get_value(path_iter, 2)
-            name = self.data_store.get_value(path_iter, 3)
-            num_errors = self.data_store.get_value(path_iter, 4)
-            mods = self.data_store.get_value(path_iter, 6)
+            title = self.data_store.get_value(path_iter, self.COLUMN_TITLE)
+            name = self.data_store.get_value(path_iter, self.COLUMN_NAME)
+            num_errors = self.data_store.get_value(path_iter,
+                                                   self.COLUMN_ERROR_INTERNAL)
+            mods = self.data_store.get_value(path_iter,
+                                             self.COLUMN_CHANGE_INTERNAL)
             proper_name = self.get_name(path, unfiltered=True)
             metadata, comment = self._get_metadata_comments_func(proper_name)
             description = metadata.get(rose.META_PROP_DESCRIPTION, "")
-            change = self.data_store.get_value(path_iter, 11)
+            change = self.data_store.get_value(
+                path_iter, self.COLUMN_CHANGE_TEXT)
             text = title
             if name != title:
                 text += " (" + name + ")"
@@ -332,16 +350,20 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 text += "\n" + comment
             if change:
                 text += "\n\n" + change
-            self.data_store.set_value(path_iter, 10, text)
+            self.data_store.set_value(
+                path_iter, self.COLUMN_TOOLTIP_TEXT, text)
 
     def update_change(self, row_names, new_change):
         """Update 'changed' text."""
-        self._set_row_names_value(row_names, 11, new_change)
+        self._set_row_names_value(
+            row_names, self.COLUMN_CHANGE_TEXT, new_change)
 
     def update_statuses(self, row_names, latent_status, ignored_status):
         """Update latent and ignored statuses."""
-        self._set_row_names_value(row_names, 8, latent_status)
-        self._set_row_names_value(row_names, 9, ignored_status)
+        self._set_row_names_value(
+            row_names, self.COLUMN_LATENT_STATUS, latent_status)
+        self._set_row_names_value(
+            row_names, self.COLUMN_IGNORED_STATUS, ignored_status)
 
     def _set_row_names_value(self, row_names, index, value):
         path = self.get_path_from_names(row_names, unfiltered=True)
@@ -393,7 +415,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
                 these_names = names[:-1]
                 break
         while my_iter is not None:
-            branch_name = tree_model.get_value(my_iter, 3)
+            branch_name = tree_model.get_value(my_iter, self.COLUMN_NAME)
             my_names = these_names + [branch_name]
             subkey = "/".join(my_names)
             name_iter_map[subkey] = my_iter
@@ -418,8 +440,10 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         changes = 0
         errors = 0
         while iter_ is not None:
-            iter_changes = self.data_store.get_value(iter_, 7)
-            iter_errors = self.data_store.get_value(iter_, 5)
+            iter_changes = self.data_store.get_value(
+                iter_, self.COLUMN_CHANGE_TOTAL)
+            iter_errors = self.data_store.get_value(
+                iter_, self.COLUMN_ERROR_TOTAL)
             if iter_changes is not None:
                 changes += iter_changes
             if iter_errors is not None:
@@ -476,12 +500,14 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             if unfiltered:
                 tree_model = tree_model.get_model()
             tree_iter = tree_model.get_iter(path)
-        row_name = str(tree_model.get_value(tree_iter, 3))
+        row_name = str(tree_model.get_value(tree_iter, self.COLUMN_NAME))
         full_name = row_name
         for parent in [path[:i] for i in range(len(path) - 1, 0, -1)]:
             parent_iter = tree_model.get_iter(parent)
-            full_name = (str(tree_model.get_value(parent_iter, 3) +
-                         "/" + full_name))
+            full_name = (
+                str(tree_model.get_value(parent_iter, self.COLUMN_NAME) +
+                "/" + full_name)
+            )
         return full_name
 
     def get_subtree_names(self, path=None):
@@ -548,7 +574,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def _get_is_latent_sub_tree(self, model, iter_):
         """Return True if the whole model sub tree is latent."""
-        if not model.get_value(iter_, 8):
+        if not model.get_value(iter_, self.COLUMN_LATENT_STATUS):
             # This row is not latent.
             return False
         iter_stack = [model.iter_children(iter_)]
@@ -556,7 +582,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             iter_ = iter_stack.pop(0)
             if iter_ is None:
                 continue
-            if not model.get_value(iter_, 8):
+            if not model.get_value(iter_, self.COLUMN_LATENT_STATUS):
                 # This sub-row is not latent.
                 return False
             iter_stack.append(model.iter_children(iter_))
@@ -565,9 +591,9 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def _get_should_show(self, model, iter_):
         # Determine whether to show a row.
-        latent_status = model.get_value(iter_, 8)
-        ignored_status = model.get_value(iter_, 9)
-        has_error = bool(model.get_value(iter_, 4))
+        latent_status = model.get_value(iter_, self.COLUMN_LATENT_STATUS)
+        ignored_status = model.get_value(iter_, self.COLUMN_IGNORED_STATUS)
+        has_error = bool(model.get_value(iter_, self.COLUMN_ERROR_INTERNAL))
         child_iter = model.iter_children(iter_)
         is_visible = self._ask_can_show_func(latent_status, ignored_status,
                                              has_error)
