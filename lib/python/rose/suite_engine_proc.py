@@ -198,7 +198,7 @@ class SuiteStillRunningError(Exception):
 
     FMT_HEAD = "Suite \"%(suite_name)s\" may still be running.\n"
     FMT_BODY = "Host \"%(host)s\" has %(reason_key)s:\n    %(reason_value)s\n"
-    FMT_TAIL = "Try \"rose suite-shutdown %(suite_name)s\" first?"
+    FMT_TAIL = "Try \"rose suite-shutdown --name=%(suite_name)s\" first?"
 
 
     def __str__(self):

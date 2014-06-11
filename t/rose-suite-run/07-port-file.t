@@ -37,7 +37,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] Suite "$NAME" may still be running.
 [FAIL] Host "localhost" has port-file:
 [FAIL]     ~$USER/.cylc/ports/$NAME
-[FAIL] Try "rose suite-shutdown $NAME" first?
+[FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 #-------------------------------------------------------------------------------
 rm $HOME/.cylc/ports/$NAME

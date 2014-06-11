@@ -67,7 +67,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] Suite "$NAME" may still be running.
 [FAIL] Host "${HOST:-localhost}" has process:
 [FAIL]     $SUITE_PROC
-[FAIL] Try "rose suite-shutdown $NAME" first?
+[FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 run_pass "$TEST_KEY.NAME1" \
     rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=${NAME}1 \
