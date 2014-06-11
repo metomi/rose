@@ -27,9 +27,11 @@ rose suite-run (gtk): fix RuntimeError for Queues.
 rose suite-run: fix failure when source `suite.rc` not writable.
 
 [#1278](https://github.com/metomi/rose/pull/1278):
-rosa svn-pre-commit: verify users in owner and access-list,
-and improve diagnostics.
-rosa svn-post-commit: notify users in owner and access-list on changes.
+* rosa svn-pre-commit: verify users in owner and access-list,
+  and improve diagnostics.
+* rosa svn-post-commit: notify users in owner and access-list on changes.
+* Site and user configuration `[rosa-svn-pre-commit]` section is renamed
+  `[rosa-svn]`.
 
 [#1277](https://github.com/metomi/rose/pull/1277):
 rose edit: speed up slow loading-up code.
