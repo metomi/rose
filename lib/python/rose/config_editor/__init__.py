@@ -518,7 +518,9 @@ TITLE_PAGE_PREVIEW_MARKUP = ("<span foreground='" +
                             "'><u>{0}</u>" + "</span>")
 TITLE_PAGE_ROOT_MARKUP = "<b>{0}</b>"
 TITLE_PAGE_SUITE = "suite conf"
-TREE_PANEL_MAX_EXPANDED = 5
+TREE_PANEL_MAX_EXPANDED_ROOTS = 5
+TREE_PANEL_MAX_EXPANDED_DEPTH = 2
+TREE_PANEL_NO_EXPAND_LEAVES_REGEX = "/file$"
 
 # File panel names
 

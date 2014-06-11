@@ -24,6 +24,7 @@ the Contributor Licence Agreement and Certificate of Origin detailed
 below:
 
 * Andrew Clark (Met Office, UK)
+* Kerry Day (Met Office, UK)
 * Ben Fitzpatrick (Met Office, UK)
 * Joseph Mancell (Met Office, UK)
 * Dave Matthews (Met Office, UK)

@@ -442,6 +442,60 @@ default=echo 'Hello World'
     </div>
 
     <div class="slide">
+      <h2 id="multiple-inheritance">Multiple Family Inheritance</h2>
+
+      <p>Cylc supports multiple inheritance, so tasks can combine useful
+      configuration from more than one separate family. If you set up families
+      like this:</p>
+      <pre class="prettyprint lang-cylc">
+    [[HELLO_FAMILY]]
+        [[[environment]]]
+            ROSE_TASK_APP = hello_world
+    [[GAS_GIANT_FAMILY]]
+        [[[environment]]]
+            ATMOSPHERE_ONLY = true
+    [[ROCKY_FAMILY]]
+        [[[environment]]]
+            ATMOSPHERE_ONLY = false
+</pre>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Multiple Family Inheritance (2)</h3>
+
+      <p>You can inherit them like this:</p>
+      <pre class="prettyprint lang-cylc">
+    [[hello_neptune]]
+        inherit = HELLO_FAMILY, GAS_GIANT_FAMILY
+        [[[environment]]]
+            WORLD = neptune
+</pre>
+
+    <div class="slide">
+      <h2 id="remote-hosts">Remote Hosts</h2>
+
+      <p>So far, the example tasks run on the localhost - it is usually better
+      to farm off tasks to a remote host like a compute server or a
+      cluster/supercomputer.</p>
+
+      <p>We could set <samp>hello_eris</samp> to run on a given host by setting
+      <samp>[[[remote]]]</samp> section settings:</p>
+      <pre class="prettyprint lang-cylc">
+    [[hello_eris]]
+        inherit = HELLO_FAMILY
+        [[[environment]]]
+            WORLD = eris
+        [[[remote]]]
+            host = voyager_1
+</pre>
+    </div>
+
+      <p>The order in which they are combined is essentially last to first -
+      e.g. <samp>HELLO_FAMILY</samp> will override any shared setting in
+      <samp>GAS_GIANT_FAMILY</samp>.</p>
+    </div>
+
+    <div class="slide">
       <h2 id="dependencies">Dependencies</h2>
 
       <p>We haven't looked at the <samp>[scheduling]</samp> part of the
@@ -468,25 +522,6 @@ default=echo 'Hello World'
     [[dependencies]]
         [[[0, 12]]]  # run each day at 00:00 and 12:00
             graph = hello_pluto =&gt; hello_eris
-</pre>
-    </div>
-
-    <div class="slide">
-      <h2 id="remote-hosts">Remote Hosts</h2>
-
-      <p>So far, both example tasks run on the localhost - it is usually better
-      to farm off tasks to a remote host like a compute server or a
-      cluster/supercomputer.</p>
-
-      <p>We could set <samp>hello_eris</samp> to run on a given host by setting
-      <samp>[[[remote]]]</samp> section settings:</p>
-      <pre class="prettyprint lang-cylc">
-    [[hello_eris]]
-        inherit = HELLO_FAMILY
-        [[[environment]]]
-            WORLD = eris
-        [[[remote]]]
-            host = voyager_1
 </pre>
     </div>
 
@@ -612,41 +647,6 @@ help=Decide whether to say hello to the moons of the world
 title=Include Moons when saying hello?
 type=boolean
 </pre>
-    </div>
-
-    <div class="slide">
-      <h2 id="multiple-inheritance">Multiple Family Inheritance</h2>
-
-      <p>Cylc supports multiple inheritance, so tasks can combine useful
-      configuration from more than one separate family. If you set up families
-      like this:</p>
-      <pre class="prettyprint lang-cylc">
-    [[HELLO_FAMILY]]
-        [[[environment]]]
-            ROSE_TASK_APP = hello_world
-    [[GAS_GIANT_FAMILY]]
-        [[[environment]]]
-            ATMOSPHERE_ONLY = true
-    [[ROCKY_FAMILY]]
-        [[[environment]]]
-            ATMOSPHERE_ONLY = false
-</pre>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">Multiple Family Inheritance (2)</h3>
-
-      <p>You can inherit them like this:</p>
-      <pre class="prettyprint lang-cylc">
-    [[hello_neptune]]
-        inherit = HELLO_FAMILY, GAS_GIANT_FAMILY
-        [[[environment]]]
-            WORLD = neptune
-</pre>
-
-      <p>The order in which they are combined is essentially last to first -
-      e.g. <samp>HELLO_FAMILY</samp> will override any shared setting in
-      <samp>GAS_GIANT_FAMILY</samp>.</p>
     </div>
 
     <div class="slide">
