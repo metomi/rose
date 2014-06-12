@@ -72,7 +72,7 @@ class RoseOptionParser(OptionParser):
                        {"action": "store",
                         "choices": ["360", "gregorian"],
                         "default": None,
-                        "dest": "cylc_calendar",
+                        "dest": "calendar_type",
                         "help": "Set the calendar."}],
                "case_mode": [
                        ["--case"],

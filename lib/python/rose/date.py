@@ -267,7 +267,7 @@ def main():
         ref_time = args[0]
     try:
         ds = RoseDateShifter(opts.parse_format, opts.task_cycle_time_mode,
-                             opts.utc, opts.cylc_calendar)
+                             opts.utc, opts.calendar_type)
         if opts.task_cycle_time_mode and ds.task_cycle_time is None:
             raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
         ref_time = ds(ref_time)
