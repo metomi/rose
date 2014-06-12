@@ -67,6 +67,13 @@ class RoseOptionParser(OptionParser):
                         "default": False,
                         "dest": "type",
                         "help": "Automatically guess types of settings."}],
+               "calendar": [
+                       ["--calendar"],
+                       {"action": "store",
+                        "choices": ["360", "gregorian"],
+                        "default": None,
+                        "dest": "calendar_type",
+                        "help": "Set the calendar."}],
                "case_mode": [
                        ["--case"],
                        {"action": "store",
