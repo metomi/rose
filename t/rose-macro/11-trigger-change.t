@@ -193,7 +193,7 @@ one_value_triggered=.false.
 two_values_triggered=.false.
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 4
+tests 8
 #-------------------------------------------------------------------------------
 # Check trigger changing.
 TEST_KEY=$TEST_KEY_BASE-change
@@ -694,7 +694,7 @@ trigger=namelist:trig_absent=two_values_triggered: 1, 2
 [namelist:trig_absent=two_values_triggered]
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --non-interactive --config=../config rose.macros.DefaultTransforms
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONFIG__'
 [T] rose.macros.DefaultTransforms: changes: 31
     namelist:already_triggered_ignored_namelist=ab_trig_var1=2
         enabled      -> trig-ignored
@@ -758,8 +758,8 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__CONTENT__'
         enabled      -> trig-ignored
     namelist:triggered_namelist=trig_var=2
         trig-ignored -> enabled     
-__CONTENT__
-file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONTENT__'
+__CONFIG__
+file_cmp ../config/rose-app.conf ../config/rose-app.conf <<'__CONFIG__'
 [command]
 alternate=alternate_command
 default=main_command
@@ -930,8 +930,70 @@ a_trig_b=.true.
 b_triglist_x_y=.true.
 x=6
 y=4
-__CONTENT__
+__CONFIG__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Check triggering into a duplicate namelist's options.
+TEST_KEY=$TEST_KEY_BASE-dupl-namelist-options
+setup
+init <<'__CONFIG__'
+[env]
+FOO=false
+
+[namelist:bar(1)]
+baz=0
+fred=0
+qux=0
+wibble=0
+wobble=0
+__CONFIG__
+init_meta <<'__META_CONFIG__'
+[env]
+
+[env=FOO]
+trigger=namelist:bar=baz: true;
+       =namelist:bar=fred: true;
+       =namelist:bar=wibble: true;
+       =namelist:bar=wobble: true;
+
+[namelist:bar]
+duplicate=true
+
+[namelist:bar=baz]
+
+[namelist:bar=fred]
+
+[namelist:bar=qux]
+
+[namelist:bar=wibble]
+
+[namelist:bar=wobble]
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro --non-interactive --fix --config=../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
+[T] rose.macros.DefaultTransforms: changes: 4
+    namelist:bar(1)=baz=0
+        enabled      -> trig-ignored
+    namelist:bar(1)=fred=0
+        enabled      -> trig-ignored
+    namelist:bar(1)=wibble=0
+        enabled      -> trig-ignored
+    namelist:bar(1)=wobble=0
+        enabled      -> trig-ignored
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+file_cmp "$TEST_KEY.config" ../config/rose-app.conf <<'__CONFIG__'
+[env]
+FOO=false
+
+[namelist:bar(1)]
+!!baz=0
+!!fred=0
+qux=0
+!!wibble=0
+!!wobble=0
+__CONFIG__
 teardown
 #-------------------------------------------------------------------------------
 exit

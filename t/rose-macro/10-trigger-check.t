@@ -38,7 +38,7 @@ atrig = 2
 btrig = 3
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 15
+tests 18
 #-------------------------------------------------------------------------------
 # Check trigger checking - this is nearly cyclic but should be fine.
 TEST_KEY=$TEST_KEY_BASE-ok
@@ -912,4 +912,46 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
     namelist:triggered_namelist=trig_var=2
         State should be enabled
 __CONTENT__
+teardown
+#-------------------------------------------------------------------------------
+# Check triggering into a duplicate namelist's options.
+TEST_KEY=$TEST_KEY_BASE-dupl-namelist-options
+setup
+init <<'__CONFIG__'
+[env]
+FOO=false
+
+[namelist:bar(1)]
+!!baz=0
+!!fred=0
+qux=0
+!!wibble=0
+!!wobble=0
+__CONFIG__
+init_meta <<__META_CONFIG__
+[env]
+
+[env=FOO]
+trigger=namelist:bar=baz: true;
+       =namelist:bar=fred: true;
+       =namelist:bar=wibble: true;
+       =namelist:bar=wobble: true;
+
+[namelist:bar]
+duplicate=true
+
+[namelist:bar=baz]
+
+[namelist:bar=fred]
+
+[namelist:bar=qux]
+
+[namelist:bar=wibble]
+
+[namelist:bar=wobble]
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
 exit

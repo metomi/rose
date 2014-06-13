@@ -401,16 +401,20 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                 if rose.macro.REC_ID_STRIP.sub("", ch_sect) == base_sect:
                     new_id = self._get_id_from_section_option(sect, ch_opt)
                     items[i] = (new_id, vals)
-        else:
-            items = self.trigger_family_lookup.get(setting_id, {}).items()
-            for i, (child_id, vals) in enumerate(items):
-                alt_ids = self._get_id_duplicates(child_id, config_data,
-                                                  meta_config)
-                if alt_ids:
-                    items.remove((child_id, vals))
-                    for alt_id in alt_ids:
-                        items.append((alt_id, vals))
-        return dict(items)
+            return dict(items)
+        items = self.trigger_family_lookup.get(setting_id, {}).items()
+        dupl_adjusted_items = []
+        i = 0
+        while items:
+            child_id, vals = items.pop(0)
+            alt_ids = self._get_id_duplicates(child_id, config_data,
+                                                meta_config)
+            if alt_ids:
+                for alt_id in alt_ids:
+                    dupl_adjusted_items.append((alt_id, vals))
+            else:
+                dupl_adjusted_items.append((child_id, vals))
+        return dict(dupl_adjusted_items)
 
     def _get_id_duplicates(self, setting_id, config_data, meta_config,
                            config_sections_duplicate_map=None):
