@@ -404,7 +404,6 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             return dict(items)
         items = self.trigger_family_lookup.get(setting_id, {}).items()
         dupl_adjusted_items = []
-        i = 0
         while items:
             child_id, vals = items.pop(0)
             alt_ids = self._get_id_duplicates(child_id, config_data,
