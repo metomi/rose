@@ -67,7 +67,7 @@ class RoseDateShifter(object):
 
 
     def __init__(self, parse_format=None, task_cycle_time_mode=None,
-                 utc_mode=False):
+                 utc_mode=False, calendar_mode=None):
         """Constructor.
 
         parse_format -- If specified, parse with the specified format.
@@ -94,6 +94,15 @@ class RoseDateShifter(object):
             assumed_time_zone = (0, 0)
         else:
             assumed_time_zone = None
+
+        if not calendar_mode: 
+            calendar_mode = os.getenv("CYLC_CALENDAR")
+
+        if calendar_mode == "360":
+            isodatetime.data.set_360_calendar()
+        elif calendar_mode == "gregorian":
+            isodatetime.data.set_gregorian_calendar()
+
         self.isoparser = isodatetime.parsers.TimePointParser(
             assumed_time_zone=assumed_time_zone)
 
@@ -249,8 +258,8 @@ class RoseDateShifter(object):
 def main():
     """Implement "rose date"."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("offsets", "parse_format", "print_format",
-                              "task_cycle_time_mode", "utc")
+    opt_parser.add_my_options("calendar", "offsets", "parse_format", 
+                              "print_format", "task_cycle_time_mode", "utc")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     ref_time = None
@@ -258,7 +267,7 @@ def main():
         ref_time = args[0]
     try:
         ds = RoseDateShifter(opts.parse_format, opts.task_cycle_time_mode,
-                             opts.utc)
+                             opts.utc, opts.calendar_type)
         if opts.task_cycle_time_mode and ds.task_cycle_time is None:
             raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
         ref_time = ds(ref_time)

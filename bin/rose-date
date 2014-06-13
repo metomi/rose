@@ -27,6 +27,8 @@
 #     Display the current or the specified DATE-TIME with an optional offset.
 #
 # OPTIONS
+#     --calendar=CALENDAR_TYPE
+#         Manually set the calendar to use: "gregorian" or "360".
 #     --offset=OFFSET, -s OFFSET
 #         Specify an offset to add to the current or the specified DATE-TIME.
 #         OFFSET must follow the ISO 8601 duration representations such as
