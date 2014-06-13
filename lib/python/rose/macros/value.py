@@ -63,13 +63,10 @@ class ValueChecker(rose.macro.MacroBase):
         """Return a list of errors if found, None otherwise."""
         self.reports = []
         meta_config = self._load_meta_config(config, meta_config)
-        for node_keys, node in config.walk():
+        for node_keys, node in config.walk(no_ignore=True):
             if isinstance(node.value, dict):
                 continue
             sect, key = node_keys
-            # Don't check ignored variables
-            if node.is_ignored():
-                continue
             value = node.value
             # Skip environment variable values
             if rose.env.contains_env_var(value):

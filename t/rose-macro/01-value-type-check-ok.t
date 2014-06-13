@@ -75,12 +75,12 @@ my_python_list_empty=[]
 my_spaced_list=1 2 3 "bob"
 __CONFIG__
 #-------------------------------------------------------------------------------
-tests 33
+tests 36
 #-------------------------------------------------------------------------------
 # Check boolean type checking.
 TEST_KEY=$TEST_KEY_BASE-boolean-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_boolean_true]
 type=boolean
 
@@ -104,7 +104,7 @@ teardown
 # Check character type checking.
 TEST_KEY=$TEST_KEY_BASE-character-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_char]
 type=character
 
@@ -133,7 +133,7 @@ teardown
 # Check integer type checking.
 TEST_KEY=$TEST_KEY_BASE-int-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_int]
 type=integer
 
@@ -159,7 +159,7 @@ teardown
 # Check raw (None) type checking.
 TEST_KEY=$TEST_KEY_BASE-value-type-raw-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_raw]
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
@@ -170,7 +170,7 @@ teardown
 # Check real type checking.
 TEST_KEY=$TEST_KEY_BASE-real-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_real]
 type=real
 
@@ -205,7 +205,7 @@ teardown
 # Check quoted string type checking.
 TEST_KEY=$TEST_KEY_BASE-string-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_quoted]
 type=quoted
 
@@ -235,7 +235,7 @@ teardown
 # Check logical type checking.
 TEST_KEY=$TEST_KEY_BASE-logical-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_logical_true]
 type=logical
 
@@ -258,7 +258,7 @@ teardown
 # Check derived type checking.
 TEST_KEY=$TEST_KEY_BASE-derived-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_derived_type_str_int_raw_bool]
 type=quoted, integer, raw, boolean
 
@@ -286,7 +286,7 @@ teardown
 # Check Python List type checking.
 TEST_KEY=$TEST_KEY_BASE-python-list-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_python_list]
 type=python_list
 
@@ -301,7 +301,7 @@ teardown
 # Check Spaced List type checking.
 TEST_KEY=$TEST_KEY_BASE-spaced-list-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_spaced_list]
 type=spaced_list
 __META_CONFIG__
@@ -313,7 +313,7 @@ teardown
 # Check length checking.
 TEST_KEY=$TEST_KEY_BASE-array-ok
 setup
-init_meta <<__META_CONFIG__
+init_meta <<'__META_CONFIG__'
 [namelist:values_nl1=my_array_any]
 length=:
 
@@ -337,6 +337,28 @@ length=8
 [namelist:values_nl1=my_real_array_slice_2d]
 type=real
 length=:
+__META_CONFIG__
+run_pass "$TEST_KEY" rose macro -V --config=../config
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+teardown
+#-------------------------------------------------------------------------------
+# Check ignored option/section skipping.
+TEST_KEY=$TEST_KEY_BASE-skip-ignored-ok
+setup
+init <<'__CONFIG__'
+[!namelist:values_nl1]
+my_boolean_true=oh no a bad boolean
+
+[namelist:values_nl2]
+!my_boolean_true=oh no an ignored boolean
+__CONFIG__
+init_meta <<'__META_CONFIG__'
+[namelist:values_nl1=my_boolean_true]
+type=boolean
+
+[namelist:values_nl2=my_boolean_true]
+type=boolean
 __META_CONFIG__
 run_pass "$TEST_KEY" rose macro -V --config=../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
