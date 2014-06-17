@@ -96,7 +96,7 @@ class RoseDateShifter(object):
             assumed_time_zone = None
 
         if not calendar_mode: 
-            calendar_mode = os.getenv("CYLC_CALENDAR")
+            calendar_mode = os.getenv("CYLC_CYCLING_MODE")
 
         if calendar_mode == "360":
             isodatetime.data.set_360_calendar()
