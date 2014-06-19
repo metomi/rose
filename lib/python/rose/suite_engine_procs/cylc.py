@@ -615,6 +615,7 @@ class CylcProcessor(SuiteEngineProcessor):
         task_id = os.environ["CYLC_TASK_ID"]
         task_name = os.environ["CYLC_TASK_NAME"]
         task_cycle_time = os.environ["CYLC_TASK_CYCLE_TIME"]
+        cycling_mode = os.environ.get("CYLC_CYCLING_MODE", "gregorian")
         if task_cycle_time == "1":
             task_cycle_time = None
         task_log_root = os.environ["CYLC_TASK_LOG_ROOT"]
@@ -629,7 +630,8 @@ class CylcProcessor(SuiteEngineProcessor):
                          task_name=task_name,
                          task_cycle_time=task_cycle_time,
                          task_log_root=task_log_root,
-                         task_is_cold_start=task_is_cold_start)
+                         task_is_cold_start=task_is_cold_start,
+                         cycling_mode=cycling_mode)
 
     def get_version(self):
         """Return Cylc's version."""

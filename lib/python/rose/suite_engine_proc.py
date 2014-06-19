@@ -235,6 +235,7 @@ class TaskProps(object):
     task_name: task name
     task_prefix: prefix in task name (optional)
     task_suffix: suffix in task name (optional)
+    cycling_mode: type of cycling used in the suite
     task_cycle_time: task cycle time
     task_log_root: path to the task log without file extension
     task_is_cold_start: string "true" for a cold start task
@@ -252,6 +253,7 @@ class TaskProps(object):
              "task_name": "ROSE_TASK_NAME",
              "task_prefix": "ROSE_TASK_PREFIX",
              "task_suffix": "ROSE_TASK_SUFFIX",
+             "cycling_mode": "ROSE_CYCLING_MODE",
              "task_cycle_time": "ROSE_TASK_CYCLE_TIME",
              "task_log_root": "ROSE_TASK_LOG_ROOT",
              "task_is_cold_start": "ROSE_TASK_IS_COLD_START",
