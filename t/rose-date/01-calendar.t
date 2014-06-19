@@ -25,12 +25,12 @@ tests 12
 #-------------------------------------------------------------------------------
 # Check correct setting of 360 day calendar via environment.
 TEST_KEY=$TEST_KEY_BASE-360-env
-ROSE_CYCLING_MODE=360 \
+ROSE_CYCLING_MODE=360day \
     run_pass "$TEST_KEY-back"  rose date 20130301 --offset=-P1D
 file_cmp "$TEST_KEY-back.out" "$TEST_KEY-back.out" <<__OUT__
 20130230
 __OUT__
-ROSE_CYCLING_MODE=360 \
+ROSE_CYCLING_MODE=360day \
     run_pass "$TEST_KEY-fwd" rose date 20130230 --offset=P1D
 file_cmp "$TEST_KEY-fwd.out" "$TEST_KEY-fwd.out" <<__OUT__
 20130301
@@ -38,11 +38,11 @@ __OUT__
 #-------------------------------------------------------------------------------
 # Check correct setting of 360 day calendar via args.
 TEST_KEY=$TEST_KEY_BASE-360-switch
-run_pass "$TEST_KEY-back"  rose date 20130301 --offset=-P1D --calendar=360
+run_pass "$TEST_KEY-back"  rose date 20130301 --offset=-P1D --calendar=360day
 file_cmp "$TEST_KEY-back.out" "$TEST_KEY-back.out" <<__OUT__
 20130230
 __OUT__
-run_pass "$TEST_KEY-fwd" rose date 20130230 --offset=P1D --calendar=360
+run_pass "$TEST_KEY-fwd" rose date 20130230 --offset=P1D --calendar=360day
 file_cmp "$TEST_KEY-fwd.out" "$TEST_KEY-fwd.out" <<__OUT__
 20130301
 __OUT__
@@ -50,12 +50,12 @@ __OUT__
 # Check args correctly override environment.
 TEST_KEY=$TEST_KEY_BASE-gregorian-override
 ROSE_CYCLING_MODE=gregorian \
-    run_pass "$TEST_KEY-back"  rose date 20130301 --offset=-P1D --calendar=360
+    run_pass "$TEST_KEY-back"  rose date 20130301 --offset=-P1D --calendar=360day
 file_cmp "$TEST_KEY-back.out" "$TEST_KEY-back.out" <<__OUT__
 20130230
 __OUT__
 ROSE_CYCLING_MODE=gregorian \
-    run_pass "$TEST_KEY-fwd" rose date 20130230 --offset=P1D --calendar=360
+    run_pass "$TEST_KEY-fwd" rose date 20130230 --offset=P1D --calendar=360day
 file_cmp "$TEST_KEY-fwd.out" "$TEST_KEY-fwd.out" <<__OUT__
 20130301
 __OUT__

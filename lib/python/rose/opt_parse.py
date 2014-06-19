@@ -70,7 +70,7 @@ class RoseOptionParser(OptionParser):
                "calendar": [
                        ["--calendar"],
                        {"action": "store",
-                        "choices": ["360", "gregorian"],
+                        "choices": ["360day", "gregorian"],
                         "default": None,
                         "dest": "calendar_type",
                         "help": "Set the calendar."}],

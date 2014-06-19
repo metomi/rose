@@ -98,7 +98,7 @@ class RoseDateShifter(object):
         if not calendar_mode: 
             calendar_mode = os.getenv("ROSE_CYCLING_MODE")
 
-        if calendar_mode == "360":
+        if calendar_mode == "360day":
             isodatetime.data.set_360_calendar()
         elif calendar_mode == "gregorian":
             isodatetime.data.set_gregorian_calendar()
