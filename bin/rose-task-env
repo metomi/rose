@@ -40,6 +40,8 @@
 #         The name of the suite task.
 #     ROSE_TASK_CYCLE_TIME
 #         The cycle time of the suite task, if there is one.
+#     ROSE_CYCLING_MODE
+#         The cycling mode of the running suite.
 #     ROSE_TASK_LOG_ROOT
 #         The root path for log files of the suite task.
 #     ROSE_DATA
