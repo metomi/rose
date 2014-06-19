@@ -146,6 +146,7 @@ class RosieWSClientAuthManager(object):
                                     self.username, self.password, is_retry)
             return
 
+        icon_path = ResourceLocator.default().locate("images/rosie-icon.png")
         if is_retry:
             username = ""
             if self.username:
@@ -156,6 +157,7 @@ class RosieWSClientAuthManager(object):
                 username = self.popen.run(
                             "zenity", "--entry",
                             "--title=Rosie",
+                            "--window-icon=" + icon_path,
                             "--text=" + prompt)[1].strip()
             else:
                 username = raw_input(prompt)
@@ -174,6 +176,7 @@ class RosieWSClientAuthManager(object):
                 password = self.popen.run(
                             "zenity", "--entry", "--hide-text",
                             "--title=Rosie",
+                            "--window-icon=" + icon_path,
                             "--text=" + prompt)[1].strip()
             else:
                 password = getpass(prompt)
