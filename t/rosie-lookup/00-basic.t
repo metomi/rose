@@ -62,7 +62,6 @@ db.foo=sqlite:///$PWD/repos/foo.db
 [rosie-id]
 local-copy-root=$PWD/roses
 prefix-default=foo
-prefix-owner-default.foo=fred
 prefix-location.foo=$SVN_URL
 prefix-ws.foo=http://$HOSTNAME:$PORT/foo
 
@@ -165,7 +164,7 @@ TEST_KEY=$TEST_KEY_BASE-bad-prefix
 run_fail "$TEST_KEY" rosie lookup --prefix=bar poetry
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-No settings found for prefix: 'bar'
+[rosie-id]prefix-ws.bar: configuration not defined
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-no-results

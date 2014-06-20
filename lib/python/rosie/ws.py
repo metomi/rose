@@ -32,7 +32,6 @@ import cherrypy
 import jinja2
 import os
 import simplejson
-import sys
 from rose.env import env_var_process
 from rose.resource import ResourceLocator
 import rosie.db
@@ -53,7 +52,8 @@ class Root(object):
             setattr(self, key, PrefixRoot(self.template_env, key, db_url))
 
     @cherrypy.expose
-    def index(self, *args):
+    def index(self, *_):
+        """Provide the root index page."""
         template = self.template_env.get_template("index.html")
         return template.render(web_prefix=cherrypy.request.script_name,
                                keys=sorted(self.db_url_map.keys()))
@@ -62,6 +62,8 @@ class Root(object):
 class PrefixRoot(object):
 
     """Serves the index page of the database of a given prefix."""
+
+    HELLO = "Hello %s\n"
 
     def __init__(self, template_env, prefix, db_url):
         self.exposed = True
@@ -76,8 +78,20 @@ class PrefixRoot(object):
         self.dao = rosie.db.DAO(db_url)
 
     @cherrypy.expose
-    def index(self, *args):
+    def index(self, *_):
+        """Provide the index page."""
         return self._render()
+
+    @cherrypy.expose
+    def hello(self, format=None):
+        """Say Hello on success."""
+        if cherrypy.request.login:
+            data = self.HELLO % cherrypy.request.login
+        else:
+            data = self.HELLO % "user"
+        if format == "json":
+            return simplejson.dumps(data)
+        return data
 
     @cherrypy.expose
     def query(self, q, all_revs=None, format=None):
@@ -120,6 +134,7 @@ class PrefixRoot(object):
             return simplejson.dumps(self.dao.get_optional_keys())
 
     def _render(self, all_revs=False, data=None, filters=None, s=None):
+        """Render return data with a template."""
         if data:
             for item in data:
                 suite_id = SuiteId.from_idx_branch_revision(
@@ -139,7 +154,7 @@ class PrefixRoot(object):
 
 
 def _query_parse_string(q_str):
-    # Split a query filter string into component parts.
+    """Split a query filter string into component parts."""
     conjunction, tail = q_str.split(" ", 1)
     if conjunction == "or" or conjunction == "and":
         q_str = tail
@@ -161,7 +176,7 @@ def _query_parse_string(q_str):
 
 
 def _handle_error():
-    # Handle an error occurring during a request in cherrypy.
+    """Handle an error occurring during a request in cherrypy."""
     cherrypy.response.status = 500
     print cherrypy._cperror.format_exc()
 
@@ -181,9 +196,9 @@ def start(is_main=False):
                 os.environ["ROSE_HOME"] = os.path.dirname(path)
                 break
             path = os.path.dirname(path)
-    for k, v in [("ROSE_NS", "rosa"), ("ROSE_UTIL", "ws")]:
-        if os.getenv(k) is None:
-            os.environ[k] = v
+    for key, value in [("ROSE_NS", "rosa"), ("ROSE_UTIL", "ws")]:
+        if os.getenv(key) is None:
+            os.environ[key] = value
 
     # CherryPy quick server configuration
     rose_conf = ResourceLocator.default().get_conf()
@@ -203,20 +218,19 @@ def start(is_main=False):
     for key, node in rose_conf.get(["rosie-db"]).value.items():
         if key.startswith("db.") and key[3:]:
             db_url_map[key[3:]] = node.value
-    ROSE_HOME = os.getenv("ROSE_HOME")
-    HTML_LIB = os.path.join(ROSE_HOME, "lib", "html")
-    ICON_PATH = os.path.join(ROSE_HOME, "etc", "images",
-                             "rosie-icon-trim.png")
-    tmpl_loader = jinja2.FileSystemLoader(os.path.join(HTML_LIB, "rosie-ws"))
+    res_loc = ResourceLocator.default()
+    html_lib = res_loc.get_util_home("lib", "html")
+    icon_path = res_loc.locate("images/rosie-icon-trim.png")
+    tmpl_loader = jinja2.FileSystemLoader(os.path.join(html_lib, "rosie-ws"))
     root = Root(jinja2.Environment(loader=tmpl_loader), db_url_map)
 
     # Configuration for static pages
     config = {"/etc": {
-                    "tools.staticdir.dir": os.path.join(HTML_LIB, "external"),
+                    "tools.staticdir.dir": os.path.join(html_lib, "external"),
                     "tools.staticdir.on": True},
               "/favicon.ico": {
                     "tools.staticfile.on": True,
-                    "tools.staticfile.filename": ICON_PATH}}
+                    "tools.staticfile.filename": icon_path}}
     if is_main:
         port = int(rose_conf.get_value(["rosie-ws", "port"], 8080))
         config.update({"global": {"server.socket_host": "0.0.0.0",

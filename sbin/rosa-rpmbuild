@@ -1,6 +1,6 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# (C) British Crown Copyright 2006-14 Met Office.
+# (C) British Crown Copyright 2012-14 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
 #
@@ -67,7 +67,7 @@ License: GPLv3
 URL: https://github.com/metomi/$NAME/
 Source0: https://github.com/metomi/$NAME/releases/
 BuildArch: noarch
-Requires: bash fcm Jinja2 perl pygtk2 python python-cherrypy python-requests python-simplejson SQLAlchemy subversion
+Requires: bash fcm filesystem Jinja2 perl pygtk2 python python-cherrypy python-requests python-simplejson SQLAlchemy subversion
 
 %description
 Rose: a framework for managing and running meteorological suites
@@ -78,14 +78,21 @@ Rose: a framework for managing and running meteorological suites
 
 %install
 rm -fr %{buildroot}
-mkdir -p %{buildroot}/opt/
+mkdir -p %{buildroot}/etc/bash_completion.d %{buildroot}/opt %{buildroot}/usr/bin
+cp -p %_sourcedir/$NAME-$REV_BASE_DOT/etc/rose-bash-completion %{buildroot}/etc/bash_completion.d
 cp -pr %_sourcedir/$NAME-$REV_BASE_DOT %{buildroot}/opt/$NAME
+cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rose
+cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rosie
 
 %clean 
 rm -fr %{buildroot}
 
 %files
+/etc/bash_completion.d
+/etc/bash_completion.d/rose-bash-completion
 /opt/$NAME
+/usr/bin/rose
+/usr/bin/rosie
 __SPEC__
 } >~/rpmbuild/SPECS/$NAME.spec
 
