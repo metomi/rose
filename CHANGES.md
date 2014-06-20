@@ -5,6 +5,30 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## 2014.06.1 (2014-06-20)
+
+This release of Rose works best with
+[Cylc](https://github.com/cylc/cylc/) 5.4.14 and 6.0.0alpha1.
+
+### Highlighted Changes
+
+[#1302](https://github.com/metomi/rose/pull/1302),
+[#1299](https://github.com/metomi/rose/pull/1299),
+[#1297](https://github.com/metomi/rose/pull/1297),
+[#1291](https://github.com/metomi/rose/pull/1291):
+rose date and rose task-env: support different cycling modes in Cylc.
+In particular, support 360-day calendar as well as the Gregorian calendar.
+
+### Noteworthy Changes
+
+[#1296](https://github.com/metomi/rose/pull/1296):
+rose metadata: fix check value for ignored sections' options.
+
+[#1295](https://github.com/metomi/rose/pull/1295):
+rose config-edit: fix triggering into duplicate namelists.
+
+--------------------------------------------------------------------------------
+
 ## 2014.06.0 (2014-06-11)
 
 This release of Rose works best with
@@ -35,7 +59,7 @@ rosa svn-\*-commit: verify and notify owners and users on access-list.
   `[rosa-svn]`.
 
 [#1277](https://github.com/metomi/rose/pull/1277):
-rose edit: speed up slow loading-up code.
+rose config-edit: speed up slow loading-up code.
 
 [#1275](https://github.com/metomi/rose/pull/1275):
 rose config-edit: tweaks the default page expansion for a single app session.
@@ -47,7 +71,7 @@ rose config-edit: fix user-ignoring duplicate section.
 rose bush: encode cycle time in URL.
 
 [#1261](https://github.com/metomi/rose/pull/1261):
-rose edit: tweak latent page display.
+rose config-edit: tweak latent page display.
 
 --------------------------------------------------------------------------------
 
@@ -177,7 +201,7 @@ rose config-dump: fix tidying metadata.
 rose app-upgrade, rose macro: fix relative `--config=DIR`.
 
 [#1184](https://github.com/metomi/rose/pull/1184):
-rose edit: fix change `meta` or `project` flag.
+rose config-edit: fix change `meta` or `project` flag.
 
 --------------------------------------------------------------------------------
 
