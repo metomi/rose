@@ -50,8 +50,8 @@ class RosieWSClientAuthManager(object):
 
     """Manage authentication info for a Rosie web service client."""
 
-    ST_UNC = "UNC" # Item is unchanged
-    ST_MOD = "MOD" # Item is modified
+    ST_UNC = "UNC"  # Item is unchanged
+    ST_MOD = "MOD"  # Item is modified
     PASSWORD_STORE_NAMES = [
         "GnomekeyringStore",
         #KeyringStore,
@@ -113,14 +113,14 @@ class RosieWSClientAuthManager(object):
         if (self.password_store is not None and
                 self.password and self.password_orig != self.password):
             self.password_store.store_password(
-                        self.scheme, self.host, self.username, self.password)
+                self.scheme, self.host, self.username, self.password)
 
     def _get_conf_value(self, name, default=None):
         """Return the value of a named conf setting for this prefix."""
         conf = ResourceLocator.default().get_conf()
         value = conf.get_value(
-                        ["rosie-id", "prefix-%s.%s" % (name, self.prefix)],
-                        default=default)
+            ["rosie-id", "prefix-%s.%s" % (name, self.prefix)],
+            default=default)
         if value:
             value = env_var_process(value)
         return value
@@ -131,7 +131,7 @@ class RosieWSClientAuthManager(object):
                 self.username and self.password is None):
             if self.password_store is not None:
                 self.password = self.password_store.find_password(
-                                        self.scheme, self.host, self.username)
+                    self.scheme, self.host, self.username)
                 if self.password_orig is None:
                     self.password_orig = self.password
 
@@ -143,7 +143,7 @@ class RosieWSClientAuthManager(object):
         """
         if callable(self.prompt_func):
             self.username, self.password = self.prompt_func(
-                                    self.username, self.password, is_retry)
+                self.username, self.password, is_retry)
             return
 
         icon_path = ResourceLocator.default().locate("images/rosie-icon.png")
@@ -155,10 +155,10 @@ class RosieWSClientAuthManager(object):
             prompt = self.PROMPT_USERNAME % {"prefix": self.prefix}
             if self.popen.which("zenity") and os.getenv("DISPLAY"):
                 username = self.popen.run(
-                            "zenity", "--entry",
-                            "--title=Rosie",
-                            "--window-icon=" + icon_path,
-                            "--text=" + prompt)[1].strip()
+                    "zenity", "--entry",
+                    "--title=Rosie",
+                    "--window-icon=" + icon_path,
+                    "--text=" + prompt)[1].strip()
             else:
                 username = raw_input(prompt)
             if not username:
@@ -174,10 +174,10 @@ class RosieWSClientAuthManager(object):
                                              "username": self.username}
             if self.popen.which("zenity") and os.getenv("DISPLAY"):
                 password = self.popen.run(
-                            "zenity", "--entry", "--hide-text",
-                            "--title=Rosie",
-                            "--window-icon=" + icon_path,
-                            "--text=" + prompt)[1].strip()
+                    "zenity", "--entry", "--hide-text",
+                    "--title=Rosie",
+                    "--window-icon=" + icon_path,
+                    "--text=" + prompt)[1].strip()
             else:
                 password = getpass(prompt)
             if not password:
@@ -206,7 +206,7 @@ class GnomekeyringStore(object):
         """Return the password of username@root."""
         try:
             res = gnomekeyring.find_network_password_sync(
-                                        username, None, host, None, scheme)
+                username, None, host, None, scheme)
             ring_id = res[0]["keyring"]
             item_id = res[0]["item_id"]
             self.item_ids[(scheme, host, username)] = (ring_id, item_id)
@@ -221,12 +221,12 @@ class GnomekeyringStore(object):
                 ring_id, item_id = self.item_ids[(scheme, host, username)]
                 gnomekeyring.item_delete_sync(ring_id, item_id)
             item_id = gnomekeyring.item_create_sync(
-                    None,
-                    gnomekeyring.ITEM_NETWORK_PASSWORD,
-                    host,
-                    {"user": username, "protocol": scheme, "server": host},
-                    password,
-                    True)
+                None,
+                gnomekeyring.ITEM_NETWORK_PASSWORD,
+                host,
+                {"user": username, "protocol": scheme, "server": host},
+                password,
+                True)
         except (gnomekeyring.CancelledError,
                 gnomekeyring.NoKeyringDaemonError):
             pass
