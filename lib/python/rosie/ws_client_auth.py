@@ -24,7 +24,7 @@ from getpass import getpass
 try:
     import gnomekeyring
     import gtk
-except ImportError:
+except (ImportError, RuntimeError):
     pass
 #try:
 #    import keyring
