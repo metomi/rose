@@ -43,6 +43,7 @@ MACRO_UPGRADE_RESOURCE_FILE_REMOVE = "rose-macro-remove.conf"
 MACRO_UPGRADE_TRIGGER_NAME = "UpgradeTriggerFixing"
 NAME_DOWNGRADE = "Downgrade{0}-{1}"
 NAME_UPGRADE = "Upgrade{0}-{1}"
+SAME_UPGRADE_VERSION = "{0}: already at this version."
 
 DOWNGRADE_METHOD = "downgrade"
 UPGRADE_METHOD = "upgrade"
@@ -57,6 +58,14 @@ class UpgradeVersionError(NameError):
 
     def __str__(self):
         return ERROR_UPGRADE_VERSION.format(self.args[0])
+
+
+class UpgradeVersionSame(NameError):
+
+    """Raise this error when an incorrect upgrade version is selected."""
+
+    def __str__(self):
+        return SAME_UPGRADE_VERSION.format(self.args[0])
 
 
 class MacroUpgrade(rose.macro.MacroBase):
@@ -457,7 +466,10 @@ def main():
             all_versions.insert(0, curr_mark + upgrade_manager.tag)
         reporter("\n".join(all_versions) + "\n", prefix="")
         sys.exit()
-    if user_choice not in ok_versions:
+    if user_choice == upgrade_manager.tag:
+        reporter(UpgradeVersionSame(user_choice))
+        sys.exit(1)
+    elif user_choice not in ok_versions:
         reporter(UpgradeVersionError(user_choice))
         sys.exit(1)
     upgrade_manager.set_new_tag(user_choice)

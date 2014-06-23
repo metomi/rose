@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 70
+tests 73
 
 #-------------------------------------------------------------------------------
 # Check basic upgrading.
@@ -478,6 +478,19 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [FAIL] 0.5: invalid version.
 __ERROR__
+
+#-------------------------------------------------------------------------------
+# Check broken upgrading to same version.
+
+TEST_KEY=$TEST_KEY_BASE-upgrade-same-version
+
+run_fail "$TEST_KEY" rose app-upgrade -y \
+ --meta-path=../rose-meta/ -C ../config/ 0.1
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
+[FAIL] 0.1: already at this version.
+__ERROR__
+
 teardown
 
 #-------------------------------------------------------------------------------
