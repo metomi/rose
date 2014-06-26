@@ -30,6 +30,14 @@
 #     --calendar=CALENDAR_TYPE
 #         Manually set the calendar to use: "gregorian" or "360day". Uses 
 #         $ROSE_CYCLING_MODE if this isn't set. Defaults to "gregorian".
+#     --diff=DIFF_DATE
+#         Specify a date to subtract from DATE-TIME, returning details of the 
+#         time interval. DIFF_DATE must be an earlier date than DATE-TIME. By 
+#         default the returned interval will take the form of a date-time
+#         offset. For example:
+#         rose date 20100301T00 --diff=20100102T12
+#         will return P57DT12H. The format of the output can be customised
+#         using the --print-format=FORMAT option.
 #     --offset=OFFSET, -s OFFSET
 #         Specify an offset to add to the current or the specified DATE-TIME.
 #         OFFSET must follow the ISO 8601 duration representations such as
@@ -67,9 +75,10 @@
 #         If none of these match, DATE-TIME will be parsed according to the
 #         ISO 8601 date/time standard.
 #     --print-format=FORMAT, --format=FORMAT, -f FORMAT
-#         Specify a format for printing the result. Default to the same format
-#         as the parse format. Also support the isodatetime library dump
-#         syntax which follows ISO 8601 example syntax - for example:
+#         Specify a format for printing the result. For non diff operations 
+#         this will default to the same format as the parse format. Also 
+#         supports the isodatetime library dump syntax for these operations 
+#         which follows ISO 8601 example syntax - for example:
 #         'CCYY-MM-DDThh:mm:ss' -> '1955-11-05T09:28:00',
 #         'CCYY' -> '1955',
 #         'CCYY-DDD' -> '1955-309',
@@ -80,6 +89,15 @@
 #         'CCYY-MM-DDThh:mm:ss+0100' or 'CCYYDDDThhmmZ' will automatically
 #         adapt the date/time to that timezone i.e. apply the correct
 #         hour/minute UTC offset.
+#         For diffs, the following can be used in format statements:
+#         y : years
+#         m : months
+#         d : days
+#         h : hours
+#         M : minutes
+#         s : seconds
+#         For example, for a time interval P57DT12H:
+#         'y,m,d,h' -> '0,0,57,12'
 #     --use-task-cycle-time, -c
 #         Shorthand for `rose date $ROSE_TASK_CYCLE_TIME`.
 #     --utc, -u

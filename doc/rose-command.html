@@ -763,6 +763,20 @@ rosie UTIL [OPTS] [ARG ...]
         set. Defaults to "gregorian".</p>
       </dd>
 
+      <dt><kbd>--diff=DIFF_DATE</kbd></dt>
+      <dd>
+        <p>Specify a date to subtract from <var>DATE-TIME</var>, returning 
+        details of the time interval. <var>DIFF_DATE</var> must be an earlier 
+        date than <var>DATE-TIME</var>. By default the returned interval will 
+        take the form of a date-time offset. For example:</p>
+
+        <samp>rose date 20100301T00 --diff=20100102T12</samp>
+
+        <p>will return P57DT12H. The format of the output can be customised
+        using the <var>--print-format=FORMAT</var> option.</p>
+
+      </dd>
+
       <dt><kbd>--offset=OFFSET</kbd>, <kbd>-s OFFSET</kbd></dt>
 
       <dd>
@@ -832,9 +846,10 @@ rosie UTIL [OPTS] [ARG ...]
       FORMAT</kbd></dt>
 
       <dd>
-        <p>Specify a format for printing the result. Default to the same format
-        as the parse format. Also support the isodatetime library dump syntax
-        which is an adaptation of ISO 8601 example syntax - for example:</p>
+        <p>Specify a format for printing the result. For non diff operations 
+        this will default to the same format as the parse format. Also 
+        supports the isodatetime library dump syntax for these operations 
+        which follows ISO 8601 example syntax - for example:</p>
 
         <ul>
           <li><samp>CCYY-MM-DDThh:mm:ss</samp> -&gt;
@@ -852,6 +867,21 @@ rosie UTIL [OPTS] [ARG ...]
         (e.g. <samp>CCYY-MM-DDThh:mm:ss+0100</samp> or
         <samp>CCYYDDDThhmmZ</samp> will automatically adapt the date/time to
         that timezone i.e. apply the correct hour/minute UTC offset.</p>
+        
+        <p>For diffs, the following can be used in format statements:</p>
+        
+        <ul>
+          <li><samp>y</samp> : years</li>
+          <li><samp>m</samp> : months</li>
+          <li><samp>d</samp> : days</li>
+          <li><samp>h</samp> : hours</li>
+          <li><samp>M</samp> : minutes</li>
+          <li><samp>s</samp> : seconds</li>
+        </ul>
+        
+        <p>For example, for a time interval <samp>P57DT12H</samp>:</p>
+        
+        <samp>'y,m,d,h'</samp> -&gt; <samp>'0,0,57,12'</samp>
       </dd>
 
       <dt><kbd>--use-task-cycle-time, -c</kbd></dt>

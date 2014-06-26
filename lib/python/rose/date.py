@@ -39,6 +39,15 @@ class OffsetValueError(ValueError):
         return "%s: bad offset value" % self.args[0]
 
 
+class DiffError(ValueError):
+
+    """Bad offset value."""
+
+    def __str__(self):
+        return "%s: cannot be subtracted from earlier date: %s" % (
+                                                self.args[0], self.args[1])
+
+
 class RoseDateShifter(object):
 
     """A class to parse and print date string with an offset."""
@@ -216,6 +225,13 @@ class RoseDateShifter(object):
 
     __call__ = date_shift
 
+    def date_diff(self, ref_time=None, target_time=None):
+        """Return a TimeInterval for the difference between two dates."""
+        ref = self.date_parse(ref_time)[0]
+        target = self.date_parse(target_time)[0]
+        diff = ref - target
+        return diff
+
     def is_task_cycle_time_mode(self):
         """Return True if task_cycle_time_mode is True."""
         return (self.task_cycle_time is not None)
@@ -258,7 +274,7 @@ class RoseDateShifter(object):
 def main():
     """Implement "rose date"."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("calendar", "offsets", "parse_format", 
+    opt_parser.add_my_options("calendar", "diff", "offsets", "parse_format",
                               "print_format", "task_cycle_time_mode", "utc")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
@@ -271,7 +287,28 @@ def main():
         if opts.task_cycle_time_mode and ds.task_cycle_time is None:
             raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
         ref_time = ds(ref_time)
-        if opts.offsets:
+        if opts.diff:
+            del_time = ds.date_diff(ref_time, opts.diff)
+            if ds.date_parse(opts.diff) > ds.date_parse(ref_time):
+                raise DiffError(opts.diff, ref_time)
+            if opts.print_format:
+                delta_lookup = { "y" : del_time.years,
+                                 "m" : del_time.months,
+                                 "d" : del_time.days,
+                                 "h" : del_time.hours,
+                                 "M" : del_time.minutes,
+                                 "s" : del_time.seconds }
+                expression = ""
+                for item in opts.print_format:
+                    if delta_lookup.has_key(item):
+                        expression += str(delta_lookup[item])
+                    else:
+                        expression += item
+                print expression
+            else:
+                print del_time
+            sys.exit()
+        elif opts.offsets:
             for offset in opts.offsets:
                 ref_time = ds(ref_time, offset)
         if opts.print_format:
