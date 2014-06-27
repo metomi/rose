@@ -137,6 +137,12 @@ class RoseOptionParser(OptionParser):
                         "dest": "defines_suite",
                         "metavar": "KEY=VALUE",
                         "help": "Set suite variable KEY to VALUE."}],
+               "diff": [
+                       ["--diff"],
+                       {"action": "store",
+                        "dest": "diff",
+                        "default": None,
+                        "help": "Set a datetime to subtract from DATE-TIME."}],
                "downgrade": [
                        ["--downgrade", "-d"],
                        {"action": "store_true",
