@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 6
+tests 8
 #-------------------------------------------------------------------------------
 # Check correct diffing of dates
 TEST_KEY=$TEST_KEY_BASE-diff-date
@@ -42,6 +42,13 @@ TEST_KEY=$TEST_KEY_BASE-formatting
 run_pass "$TEST_KEY"  rose date 20130301 --diff 20130101T12 -f "y,m,d,h,M,s"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 0,0,58,12,0,0
+__OUT__
+#-------------------------------------------------------------------------------
+# Check date offset working correctly in combination with diff
+TEST_KEY=$TEST_KEY_BASE-offset
+run_pass "$TEST_KEY" rose date 20100201T00 -s P1D --diff=20100101T00
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+P32D
 __OUT__
 #-------------------------------------------------------------------------------
 exit 0
