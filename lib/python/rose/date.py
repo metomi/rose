@@ -287,6 +287,9 @@ def main():
         if opts.task_cycle_time_mode and ds.task_cycle_time is None:
             raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
         ref_time = ds(ref_time)
+        if opts.offsets:
+            for offset in opts.offsets:
+                ref_time = ds(ref_time, offset)
         if opts.diff:
             del_time = ds.date_diff(ref_time, opts.diff)
             if ds.date_parse(opts.diff) > ds.date_parse(ref_time):
@@ -308,9 +311,6 @@ def main():
             else:
                 print del_time
             sys.exit()
-        elif opts.offsets:
-            for offset in opts.offsets:
-                ref_time = ds(ref_time, offset)
         if opts.print_format:
             print ds.date_format(opts.print_format, ref_time)
         else:
