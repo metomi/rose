@@ -270,7 +270,10 @@ class StemRunner(object):
         
         conf = ResourceLocator.default().get_conf()
         site = conf.get(["rose-stem", "site"])
-        return site.value
+        if site:
+            return site.value
+        else:
+            return None
 
     def process(self):
         """Process STEM options into 'rose suite-run' options."""
