@@ -34,7 +34,6 @@ class ComboBoxValueWidget(gtk.HBox):
     """
 
     FRAC_X_ALIGN = 0.9
-    MAX_COLS = 5
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
         super(ComboBoxValueWidget, self).__init__(homogeneous=False,
@@ -48,7 +47,6 @@ class ComboBoxValueWidget(gtk.HBox):
         cell = gtk.CellRendererText()
         cell.xalign = self.FRAC_X_ALIGN
         comboboxentry.pack_start(cell)
-        comboboxentry.set_wrap_width(self.MAX_COLS)
         comboboxentry.add_attribute(cell, 'text', 0)
 
         var_values = self.metadata[rose.META_PROP_VALUES]
@@ -59,9 +57,7 @@ class ComboBoxValueWidget(gtk.HBox):
             else:
                 liststore.append([entry])
         comboboxentry.set_model(liststore)
-        if self.value not in var_values:
-            pass #comboboxentry.set_active(0)
-        else:
+        if self.value in var_values:
             index = self.metadata['values'].index(self.value)
             comboboxentry.set_active(index)
         comboboxentry.connect('changed', self.setter)
