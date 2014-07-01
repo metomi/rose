@@ -176,16 +176,30 @@ class RuleEvaluator(rose.macro.MacroBase):
     REC_VALUE = re.compile(r'("[^"]*")')
 
     def evaluate_rule(self, rule, setting_id, config):
+        """Evaluate the logic in this rule based on config values."""
         rule_template_str, rule_id_values = self._process_rule(
                                    rule, setting_id, config)
         template = jinja2.Template(rule_template_str)
         return_string = template.render(rule_id_values)
         return ast.literal_eval(return_string)
 
-    def _process_rule(self, rule, setting_id, config):
+    def evaluate_rule_id_usage(self, rule, setting_id):
+        """Return a set of setting ids referenced in this rule."""
+        log_ids = set([])
+        self._process_rule(rule, setting_id, None,
+                           log_ids=log_ids)
+        return log_ids
+
+    def _process_rule(self, rule, setting_id, config, log_ids=None):
+        if log_ids is None:
+            get_value_from_id = self._get_value_from_id
+        else:
+            get_value_from_id = (
+                lambda id_, conf: self._log_id_usage(id_, conf, log_ids)
+            )
         if not (rule.startswith('{%') or rule.startswith('{-%')):
             rule = "{% if " + rule + " %}True{% else %}False{% endif %}"
-        local_map = {"this": self._get_value_from_id(setting_id, config)}
+        local_map = {"this": get_value_from_id(setting_id, config)}
         value_id_count = -1
         sci_num_count = -1
         for array_func_key, rec_regex in self.REC_ARRAY.items():
@@ -193,7 +207,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                 start, var_id, operator, value, end = search_result
                 if var_id == "this":
                     var_id = setting_id
-                setting_value = self._get_value_from_id(var_id, config)
+                setting_value = get_value_from_id(var_id, config)
                 array_value = rose.variable.array_split(str(setting_value))
                 new_string = start + "("
                 for elem_num in range(1, len(array_value) + 1):
@@ -207,7 +221,7 @@ class RuleEvaluator(rose.macro.MacroBase):
             start, var_id, end = search_result
             if var_id == "this":
                 var_id = setting_id
-            setting_value = self._get_value_from_id(var_id, config)
+            setting_value = get_value_from_id(var_id, config)
             array_value = rose.variable.array_split(str(setting_value))
             new_string = start + str(len(array_value)) + end
             rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
@@ -228,7 +242,7 @@ class RuleEvaluator(rose.macro.MacroBase):
             rule = rule.replace(search_result, key, 1)
         for search_result in self.REC_THIS_ELEMENT_ID.findall(rule):
             proper_id = search_result.replace("this", setting_id)
-            value_string = self._get_value_from_id(proper_id, config)
+            value_string = get_value_from_id(proper_id, config)
             for key, value in local_map.items():
                 if value == value_string:
                     break
@@ -239,7 +253,7 @@ class RuleEvaluator(rose.macro.MacroBase):
             rule = rule.replace(search_result, key, 1)
         config_id_count = -1
         for search_result in self.REC_CONFIG_ID.findall(rule):
-            value_string = self._get_value_from_id(search_result, config)
+            value_string = get_value_from_id(search_result, config)
             for key, value in local_map.items():
                 if value == value_string:
                     break
@@ -250,7 +264,13 @@ class RuleEvaluator(rose.macro.MacroBase):
             rule = rule.replace(search_result, key, 1)
         return rule, local_map
 
-    def _get_value_from_id(self, variable_id, config):
+    def _log_id_usage(self, variable_id, config, id_set):
+        id_set.add(variable_id)
+        if config is None:
+            return "None"
+        return self._get_value_from_id(variable_id, config)
+
+    def _get_value_from_id(self, variable_id, config, log_ids=None):
         section, option = self._get_section_option_from_id(variable_id)
         value = None
         opt_node = config.get([section, option], no_ignore=True)
