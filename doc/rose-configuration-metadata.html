@@ -301,21 +301,21 @@ sort-key=do-not-like-00
           </dd>
 
           <dt><code>spaced_list</code></dt>
+
           <dd>
-            <p><dfn>description:</dfn> used to signify a space separated
-            list such as <samp>"Foo" 50 False</samp>.</p>
+            <p><dfn>description:</dfn> used to signify a space separated list
+            such as <samp>"Foo" 50 False</samp>.</p>
 
             <p><dfn>usage:</dfn> use for inputs that expect a string that
-            contains a number of space separated items - e.g. in fcm_make
-            app configs.</p>
+            contains a number of space separated items - e.g. in fcm_make app
+            configs.</p>
           </dd>
-          
         </dl>
 
         <p>Note that not all inputs need to have <code>type</code> defined. In
         some cases using <a href=
         "#meta.conf.value.values"><code>values</code></a> or <a href=
-        "#meta.conf.value.values"><code>pattern</code></a> is better.</p>
+        "#meta.conf.value.pattern"><code>pattern</code></a> is better.</p>
 
         <p>A derived type may be defined by a comma <kbd>,</kbd> separated list
         of intrinsic types, e.g. <samp>integer, character, real,
@@ -400,6 +400,17 @@ value-titles=low, medium, high
       <dd>
         <p>Specify a regular expression (Python's extended regular expression
         syntax) that the value of the setting must match.</p>
+
+        <p>For example, if we write the following metadata:</p>
+        <pre class="prettyprint lang-rose_conf">
+[namelist:cheese=country_of_origin]
+pattern=^"[A-Z].+"$
+</pre>
+
+        <p>then we expect all valid values for <var>country_of_origin</var> to
+        start with a double quote (<samp>^"</samp>), begin with an uppercase
+        letter (<samp>[A-Z]</samp>), contain some other characters or spaces
+        (<samp>.+</samp>), and end with a quote (<samp>"$</samp>).</p>
       </dd>
 
       <dt id="meta.conf.value.fail-if">fail-if, warn-if</dt>
