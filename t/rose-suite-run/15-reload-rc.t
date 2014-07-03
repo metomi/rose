@@ -28,7 +28,7 @@ mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -n $NAME --no-gcontrol -C src
-poll ! test -e "$SUITE_RUN_DIR/log/job/t1.2013010100.1.status"
+poll ! test -e "$SUITE_RUN_DIR/log/job/2013010100/t1/01/job.status"
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE"
 cat >src/rose-suite.conf <<'__CONF__'
@@ -57,10 +57,10 @@ hello earth
 __TXT__
 # Wait for the suite to complete
 poll test -e "$HOME/.cylc/ports/$NAME"
-grep '^hello ' $SUITE_RUN_DIR/log/job/t1.*.1.out >"$TEST_KEY.job.out"
+grep '^hello ' $SUITE_RUN_DIR/log/job/*/t1/01/job.out >"$TEST_KEY.job.out"
 file_cmp "$TEST_KEY.job.out" "$TEST_KEY.job.out" <<__OUT__
-$SUITE_RUN_DIR/log/job/t1.2013010100.1.out:hello world
-$SUITE_RUN_DIR/log/job/t1.2013010112.1.out:hello earth
+$SUITE_RUN_DIR/log/job/2013010100/t1/01/job.out:hello world
+$SUITE_RUN_DIR/log/job/2013010112/t1/01/job.out:hello earth
 __OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

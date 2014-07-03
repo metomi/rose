@@ -20,6 +20,7 @@
 """Suite engine processor management."""
 
 from datetime import datetime, timedelta
+from glob import glob
 from isodatetime.data import Duration
 from isodatetime.parsers import DurationParser
 import os
@@ -260,6 +261,7 @@ class TaskProps(object):
              "task_suffix": "ROSE_TASK_SUFFIX",
              "cycling_mode": "ROSE_CYCLING_MODE",
              "task_cycle_time": "ROSE_TASK_CYCLE_TIME",
+             "task_log_dir": "ROSE_TASK_LOG_DIR",
              "task_log_root": "ROSE_TASK_LOG_ROOT",
              "task_is_cold_start": "ROSE_TASK_IS_COLD_START",
              "dir_data": "ROSE_DATA",
@@ -367,7 +369,7 @@ class SuiteEngineProcessor(object):
         """
         raise NotImplementedError()
 
-    def get_cycle_items_globs(self, name, cycle, task_glob=None):
+    def get_cycle_items_globs(self, name, cycle):
         """Return a glob to match named items created for a given cycle.
 
         E.g.:

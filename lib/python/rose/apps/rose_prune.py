@@ -34,7 +34,7 @@ class RosePruneApp(BuiltinApp):
     SCHEME = "rose_prune"
     SECTION = "prune"
 
-    def run(self, app_runner, conf_tree, *_):
+    def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Suite housekeeping application.
 
         This application is designed to work under "rose task-run" in a cycling
@@ -60,25 +60,9 @@ class RosePruneApp(BuiltinApp):
             if archive_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_archive(
                             suite_name, archive_logs_cycles)
-        globs = []
+        globs = (self._get_prune_globs(app_runner, conf_tree, "datac") +
+                 self._get_prune_globs(app_runner, conf_tree, "work"))
         suite_engine_proc = app_runner.suite_engine_proc
-        for key, max_args in [("datac", 1), ("work", 2)]:
-            for cycle, cycle_args in self._get_conf(conf_tree,
-                                                    "prune-" + key + "-at",
-                                                    max_args=max_args):
-                tail_globs = None
-                if cycle_args:
-                    tail_globs = shlex.split(cycle_args.pop())
-                head_globs = None
-                if cycle_args:
-                    head_globs = shlex.split(cycle_args.pop())
-                for head in suite_engine_proc.get_cycle_items_globs(
-                                                    key, cycle, head_globs):
-                    if tail_globs:
-                        for tail_glob in tail_globs:
-                            globs.append(os.path.join(head, tail_glob))
-                    else:
-                        globs.append(head)
         hosts = suite_engine_proc.get_suite_jobs_auths(suite_name)
         suite_dir_rel = suite_engine_proc.get_suite_dir_rel(suite_name)
         form_dict = {"d": suite_dir_rel, "g": " ".join(globs)}
@@ -164,3 +148,21 @@ class RosePruneApp(BuiltinApp):
             else:
                 items.append(cycle)
         return items
+
+    def _get_prune_globs(self, app_runner, conf_tree, key):
+        """Return prune globs for "key"."""
+        globs = []
+        for cycle, cycle_args in self._get_conf(conf_tree,
+                                                "prune-" + key + "-at",
+                                                max_args=1):
+            tail_globs = None
+            if cycle_args:
+                tail_globs = shlex.split(cycle_args.pop())
+            for head in app_runner.suite_engine_proc.get_cycle_items_globs(
+                    key, cycle):
+                if tail_globs:
+                    for tail_glob in tail_globs:
+                        globs.append(os.path.join(head, tail_glob))
+                else:
+                    globs.append(head)
+        return globs

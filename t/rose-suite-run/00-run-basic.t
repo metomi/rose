@@ -66,7 +66,7 @@ done
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 while (($(date +%s) < TIMEOUT)) && ! (
     cd $SUITE_RUN_DIR/log/job/
-    test -f my_task_1.2013010100.1.out && test -f my_task_1.2013010112.1.out
+    test -f 2013010100/my_task_1/01/job.out && test -f 2013010112/my_task_1/01/job.out
 )
 do
     sleep 1

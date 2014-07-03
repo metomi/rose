@@ -63,7 +63,7 @@ while read OPT_KEY SUITE_RUN_DIR; do
         fi
         VALUE=$(rose config -f $CONF 'jinja2:suite.rc' 'WORLD')
         TEST_KEY=$TEST_KEY_BASE-$OPT_KEY-txt
-        file_cmp "$TEST_KEY" $SUITE_RUN_DIR/log/job/my_task_1.1.1.txt <<__OUT__
+        file_cmp "$TEST_KEY" $SUITE_RUN_DIR/log/job/1/my_task_1/01/job.txt <<__OUT__
 Hello $VALUE
 __OUT__
     fi

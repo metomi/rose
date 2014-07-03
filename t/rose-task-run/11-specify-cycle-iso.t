@@ -40,6 +40,5 @@ rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost -- --debug
 #-------------------------------------------------------------------------------
 file_xxdiff "$TEST_KEY" "$SUITE_RUN_DIR/file" <<<'20121231T1200Z'
-cat $SUITE_RUN_DIR/log/job/t1*err >/dev/tty
 rose suite-clean -q -y $NAME
 exit 0

@@ -33,7 +33,7 @@ NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run --debug -q \
     -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
 ls -ld $HOME/cylc-run/$NAME 1>/dev/null
-poll ! test -e $SUITE_RUN_DIR/log/job/my_task_1.2013010100.1
+poll ! test -e $SUITE_RUN_DIR/log/job/2013010100/my_task_1/01/job
 SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>" \
     | awk '{print "[FAIL]     " $0}')
 #-------------------------------------------------------------------------------

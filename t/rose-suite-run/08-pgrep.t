@@ -44,7 +44,7 @@ NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME $OPT_HOST \
     --no-gcontrol
 TIME_OUT=$(($(date +%s) + 120))
-GREP="grep -q CYLC_JOB_EXIT= ~/cylc-run/$NAME/log/job/my_task_1.1.1.status"
+GREP="grep -q CYLC_JOB_EXIT= ~/cylc-run/$NAME/log/job/1/my_task_1/01/job.status"
 if [[ -n $HOST ]]; then
     CMD_PREFIX="ssh -oBatchMode=yes $HOST"
 else

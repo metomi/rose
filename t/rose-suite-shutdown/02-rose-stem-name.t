@@ -37,7 +37,7 @@ ln -s $TEST_SOURCE_DIR/$TEST_KEY_BASE $NAME/rose-stem
 cd $NAME
 TIMEOUT=$(($(date +%s) + 60))
 while (($(date +%s) < $TIMEOUT)) \
-    && [[ ! -e $SUITE_RUN_DIR/log/job/my_task_1.1.1.status ]]
+    && [[ ! -e $SUITE_RUN_DIR/log/job/1/my_task_1/01/job.status ]]
 do
     sleep 1
 done

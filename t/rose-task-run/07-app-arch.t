@@ -54,7 +54,7 @@ for CYCLE in 2013010100 2013010112 2013010200; do
     sed '/^\[INFO\] [=!+]/!d;
          s/\(t(init)=\)[^Z]*Z/\1YYYY-mm-DDTHH:MM:SSZ/;
          s/\(dt(\(tran\|arch\))=\)[^s]*s/\1SSSSs/g' \
-         $SUITE_RUN_DIR/log/job/archive.$CYCLE.*.out >"$TEST_KEY"
+         $SUITE_RUN_DIR/log/job/$CYCLE/archive/0*/job.out >"$TEST_KEY"
     file_cmp "$TEST_KEY" "$TEST_KEY" $TEST_SOURCE_DIR/$TEST_KEY_BASE-$CYCLE.out
     TEST_KEY="$TEST_KEY_BASE-planet-n"
     tar -tzf $SUITE_RUN_DIR/foo/$CYCLE/hello/worlds/planet-n.tar.gz | sort \
@@ -70,7 +70,7 @@ for CYCLE in 2013010100 2013010112 2013010200; do
         "$TEST_KEY-$CYCLE.out" "$TEST_KEY-$CYCLE.out.expected"
     TEST_KEY="$TEST_KEY_BASE-db"
     for TRY in 1 2; do
-        FILE=$SUITE_RUN_DIR/work/archive.$CYCLE/rose-arch-db-$TRY.out
+        FILE=$SUITE_RUN_DIR/work/$CYCLE/archive/rose-arch-db-$TRY.out
         sed "s?\\\$ROSE_DATAC?$SUITE_RUN_DIR/share/data/$CYCLE?" \
             "$TEST_SOURCE_DIR/$TEST_KEY-$CYCLE-$TRY.out" >$FILE.expected
         file_cmp "$TEST_KEY-$CYCLE.out" $FILE.expected $FILE
@@ -100,48 +100,48 @@ done
 # Results, bad ones
 CYCLE=2013010112
 TEST_KEY="$TEST_KEY_BASE-bad-archive-1"
-FILE_PREFIX="$SUITE_RUN_DIR/log/job/archive_bad_"
-file_cmp "$TEST_KEY.err" "${FILE_PREFIX}1.$CYCLE.1.err" <<'__ERR__'
+FILE_PREFIX="$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_"
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}1/01/job.err" <<'__ERR__'
 [FAIL] foo://2013010112/hello/worlds/planet-n.tar.gz: bad command-format: foo put %(target)s %(source)s: KeyError: 'source'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-2"
-file_cmp "$TEST_KEY.err" "${FILE_PREFIX}2.$CYCLE.1.err" <<'__ERR__'
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}2/01/job.err" <<'__ERR__'
 [FAIL] source=None: missing configuration error: 'source'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-3"
-file_cmp "$TEST_KEY.err" "${FILE_PREFIX}3.$CYCLE.1.err" <<'__ERR__'
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}3/01/job.err" <<'__ERR__'
 [FAIL] source=$UNBOUND_PLANET-[1-9].txt: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNBOUND_PLANET
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-4"
-file_cmp "$TEST_KEY.err" "${FILE_PREFIX}4.$CYCLE.1.err" <<'__ERR__'
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}4/01/job.err" <<'__ERR__'
 [FAIL] [arch:$UNKNOWN_DARK_PLANETS.tar.gz]=: configuration value error: [UNDEFINED ENVIRONMENT VARIABLE] UNKNOWN_DARK_PLANETS
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-5"
-file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5.$CYCLE.1.err" <<'__ERR__'
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}5/01/job.err" <<'__ERR__'
 [FAIL] [arch:inner.tar.gz]source=hello/mercurry.txt: configuration value error: [Errno 2] No such file or directory: 'hello/mercurry.txt'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-6"
-file_cmp "$TEST_KEY.err" "${FILE_PREFIX}6.$CYCLE.1.err" <<__ERR__
+file_cmp "$TEST_KEY.err" "${FILE_PREFIX}6/01/job.err" <<__ERR__
 [FAIL] foo push foo://2013010112/hello/worlds/mars.txt.gz $SUITE_RUN_DIR/share/data/2013010112/hello/mars.txt # return-code=1, stderr=
 [FAIL] foo: push: unknown action
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-7"
-file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_7.$CYCLE.1.err" <<'__ERR__'
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_7/01/job.err" <<'__ERR__'
 [FAIL] foo://2013010112/planet-n.tar.gz: bad rename-format: %(planet?maybedwarfplanet???)s: KeyError: 'planet?maybedwarfplanet???'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-8"
-file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/archive_bad_8.$CYCLE.1.err" <<'__ERR__'
+file_cmp "$TEST_KEY.err" "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_8/01/job.err" <<'__ERR__'
 [FAIL] foo://2013010112/planet-n.tar.gz: bad rename-parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: unbalanced parenthesis
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-9"
 sed '/^\[INFO\] [=!+]/!d;
      s/\(t(init)=\)[^Z]*Z/\1YYYY-mm-DDTHH:MM:SSZ/;
      s/\(dt(\(tran\|arch\))=\)[^s]*s/\1SSSSs/g' \
-    "$SUITE_RUN_DIR/log/job/archive_bad_9.$CYCLE.1.out" >"$TEST_KEY.out"
+    "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.out" >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" \
     "$TEST_SOURCE_DIR/$TEST_KEY_BASE-bad-9.out" "$TEST_KEY.out"
 sed 's?\(hello/planet-5.txt\) .*\(/hello/planet-5.txt\)?\1 \2?' \
-    "$SUITE_RUN_DIR/log/job/archive_bad_9.$CYCLE.1.err" >"$TEST_KEY.err"
+    "$SUITE_RUN_DIR/log/job/$CYCLE/archive_bad_9/01/job.err" >"$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] my-bad-command $SUITE_RUN_DIR/share/data/2013010112/hello/planet-5.txt /hello/planet-5.txt # return-code=1, stderr=
 [FAIL] [my-bad-command] $SUITE_RUN_DIR/share/data/2013010112/hello/planet-5.txt /hello/planet-5.txt
