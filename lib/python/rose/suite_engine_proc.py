@@ -197,15 +197,23 @@ class SuiteStillRunningError(Exception):
     """An exception raised when a suite is still running."""
 
     FMT_HEAD = "Suite \"%(suite_name)s\" may still be running.\n"
-    FMT_BODY = "Host \"%(host)s\" has %(reason_key)s:\n    %(reason_value)s\n"
     FMT_TAIL = "Try \"rose suite-shutdown --name=%(suite_name)s\" first?"
-
+    FMT_BODY1 = "Host \"%(host)s\" has %(reason_key)s:\n"
+    FMT_BODY2 = "    %(reason_value)s\n"
 
     def __str__(self):
         suite_name, reasons = self.args
         ret = self.FMT_HEAD % {"suite_name": suite_name}
+        host = None
+        reason_key = None
         for reason in reasons:
-            ret += self.FMT_BODY % dict(reason)
+            reason_dict = dict(reason)
+            if (reason_dict["host"] != host or
+                    reason_dict["reason_key"] != reason_key):
+                ret += self.FMT_BODY1 % reason_dict
+                host = reason_dict["host"]
+                reason_key = reason_dict["reason_key"]
+            ret += self.FMT_BODY2 % reason_dict
         ret += self.FMT_TAIL % {"suite_name": suite_name}
         return ret
 

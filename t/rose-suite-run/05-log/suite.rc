@@ -5,8 +5,8 @@
         timeout handler = "rose suite-hook --shutdown"
         timeout = 1
 [scheduling]
-    initial cycle time = 2013010100
-    final cycle time = 2012010100 # deliberate, so no task is run
+    initial cycle point = 2013010100
+    final cycle point = 2012010100 # deliberate, so no task is run
     [[dependencies]]
         [[[0]]]
             graph = """

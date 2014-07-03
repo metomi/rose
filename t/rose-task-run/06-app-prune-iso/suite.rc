@@ -5,8 +5,8 @@
         timeout handler = "rose suite-hook --shutdown"
         timeout = 1
 [scheduling]
-    initial cycle time = 20130101T0000Z
-    final cycle time   = 20130103T0000Z
+    initial cycle point = 20130101T0000Z
+    final cycle point   = 20130103T0000Z
     [[dependencies]]
         [[[ PT12H ]]]
             graph = """

@@ -32,15 +32,17 @@ NAME=$(basename $SUITE_RUN_DIR)
 # Install suite, and prove that directories are created
 rose suite-run --debug -q \
     -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME --no-gcontrol
-SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>")
 ls -ld $HOME/cylc-run/$NAME 1>/dev/null
+poll ! test -e $SUITE_RUN_DIR/log/job/my_task_1.2013010100.1
+SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>" \
+    | awk '{print "[FAIL]     " $0}')
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-running
 run_fail "$TEST_KEY" rose suite-clean -y $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] Suite "$NAME" may still be running.
 [FAIL] Host "localhost" has process:
-[FAIL]     $SUITE_PROC
+$SUITE_PROC
 [FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 if [[ ! -d $HOME/cylc-run/$NAME ]]; then
@@ -52,7 +54,7 @@ run_fail "$TEST_KEY" rose suite-clean -y -n $NAME
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] Suite "$NAME" may still be running.
 [FAIL] Host "localhost" has process:
-[FAIL]     $SUITE_PROC
+$SUITE_PROC
 [FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 if [[ ! -d $HOME/cylc-run/$NAME ]]; then
