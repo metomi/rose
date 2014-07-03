@@ -176,7 +176,7 @@ class RuleEvaluator(rose.macro.MacroBase):
     REC_VALUE = re.compile(r'("[^"]*")')
 
     def evaluate_rule(self, rule, setting_id, config):
-        """Evaluate the logic in this rule based on config values."""
+        """Evaluate the logic in the provided rule based on config values."""
         rule_template_str, rule_id_values = self._process_rule(
                                    rule, setting_id, config)
         template = jinja2.Template(rule_template_str)
@@ -184,13 +184,14 @@ class RuleEvaluator(rose.macro.MacroBase):
         return ast.literal_eval(return_string)
 
     def evaluate_rule_id_usage(self, rule, setting_id):
-        """Return a set of setting ids referenced in this rule."""
+        """Return a set of setting ids referenced in the provided rule."""
         log_ids = set([])
         self._process_rule(rule, setting_id, None,
                            log_ids=log_ids)
         return log_ids
 
     def _process_rule(self, rule, setting_id, config, log_ids=None):
+        """Pre-process the provided rule into valid jinja2."""
         if log_ids is None:
             get_value_from_id = self._get_value_from_id
         else:
@@ -265,12 +266,14 @@ class RuleEvaluator(rose.macro.MacroBase):
         return rule, local_map
 
     def _log_id_usage(self, variable_id, config, id_set):
+        """Wrap _get_value_from_id, storing variable_id in id_set."""
         id_set.add(variable_id)
         if config is None:
             return "None"
         return self._get_value_from_id(variable_id, config)
 
-    def _get_value_from_id(self, variable_id, config, log_ids=None):
+    def _get_value_from_id(self, variable_id, config):
+        """Extract a value for variable_id from config, or fail."""
         section, option = self._get_section_option_from_id(variable_id)
         value = None
         opt_node = config.get([section, option], no_ignore=True)
@@ -301,6 +304,7 @@ class RuleEvaluator(rose.macro.MacroBase):
         return self._evaluate(value)
 
     def _evaluate(self, string):
+        """Try to return string as a number, if possible."""
         try:
             return_value = float(string)
         except (TypeError, ValueError):
