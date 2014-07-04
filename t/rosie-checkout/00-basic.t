@@ -72,10 +72,10 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-normal-1-repeat
-run_fail "$TEST_KEY" rosie checkout foo-aa000
+run_pass "$TEST_KEY" rosie checkout foo-aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
-[FAIL] $PWD/roses/foo-aa000: already exists
+[WARN] foo-aa000: skip, local copy already exists at $PWD/roses/foo-aa000
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-normal-multi
@@ -87,6 +87,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
+(cd roses/foo-aa003 && touch foo && svn add foo && svn commit -m "")
 TEST_KEY=$TEST_KEY_BASE-normal-multi-repeat-1
 run_fail "$TEST_KEY" rosie checkout foo-aa003 foo-aa004 foo-aa005
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null

@@ -390,12 +390,21 @@ class SuiteId(object):
         return os.path.join(local_copy_root, self.idx)
 
     def to_string_with_version(self):
+        location = self.to_origin()
+        info_parser = SvnInfoXMLParser()
+        try:
+            info_entry = info_parser.parse(self.svn("info", "--xml", location))
+        except RosePopenError as e:
+            raise SuiteIdTextError(location)
+
         branch = self.branch
         if not branch:
             branch = self.BRANCH_TRUNK
         revision = self.revision
-        if not revision:
+        if not revision or revision == self.REV_HEAD:
             revision = self.REV_HEAD
+            if info_entry.has_key("commit:revision"):
+                revision = str(info_entry["commit:revision"])
         return str(self) + self.FORMAT_VERSION % (branch, revision)
 
     def to_web(self):
