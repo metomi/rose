@@ -68,8 +68,17 @@ def _check_duplicate(value):
         return INVALID_SYNTAX.format(value)
 
 
-def _check_fail_if(value):
-    pass
+def _check_rule(value, setting_id, meta_config):
+    evaluator = rose.macros.rule.RuleEvaluator()
+    ids_used = evaluator.evaluate_rule_id_usage(value, setting_id)
+    ids_not_found = []
+    for id_ in sorted(ids_used):
+        id_to_find = rose.macro.REC_ID_STRIP.sub("", id_)
+        node = meta_config.get([id_to_find], no_ignore=True)
+        if node is None:
+            ids_not_found.append(id_to_find)
+    if ids_not_found:
+        return INVALID_OBJECT.format(", ".join(sorted(ids_not_found)))
 
 
 def _check_length(value):
@@ -177,10 +186,6 @@ def _check_values(value):
         return INVALID_SYNTAX.format(value)
 
 
-def _check_warn_if(value):
-    return _check_fail_if(value)
-
-
 def _check_widget(value, module_files=None, meta_dir=None):
     if module_files is None:
         module_files = _get_module_files(meta_dir)
@@ -265,13 +270,16 @@ def metadata_check(meta_config, meta_dir=None,
                                                       value, info))
             if option.startswith(rose.META_PROP_WIDGET):
                 check_func = lambda v: _check_widget(
-                                 v, module_files)
+                    v, module_files)
             elif option == rose.META_PROP_MACRO:
                 check_func = lambda v: _check_macro(
-                                 v, module_files)
+                    v, module_files)
             elif option == rose.META_PROP_VALUE_TITLES:
                 check_func = lambda v: _check_value_titles(
-                                 v, node.get_value([rose.META_PROP_VALUES]))
+                    v, node.get_value([rose.META_PROP_VALUES]))
+            elif option in [rose.META_PROP_FAIL_IF, rose.META_PROP_WARN_IF]:
+                check_func = lambda v: _check_rule(
+                    v, section, meta_config)
             else:
                 func_name = "_check_" + option.replace("-", "_")
                 check_func = globals().get(func_name, lambda v: None)
