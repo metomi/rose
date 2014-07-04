@@ -33,7 +33,7 @@ TEST_KEY="$TEST_KEY_BASE-0"
 run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
 sed '1,/export ROSE_VERSION=/d' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
-[INFO] $NAME: skip reload, "suite.rc" unchanged
+[INFO] $NAME: reload complete. "suite.rc" unchanged
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" /dev/null
 #-------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ sed '1,/export ROSE_VERSION=/d' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] install: hello.txt
 [INFO]     source: $PWD/src/hello.txt
-[INFO] $NAME: skip reload, "suite.rc" unchanged
+[INFO] $NAME: reload complete. "suite.rc" unchanged
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" /dev/null
 # Wait for the suite to complete
