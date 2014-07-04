@@ -293,3 +293,11 @@
 ## E.g.:
 #  prove-options=-j 6 -s
 [t]
+
+# Configuration related to "rose stem".
+## Automatic options. These are added as if the user added them with 
+## --define-suite on the command line and can be accessed as Jinja2 variables 
+## in the suite.rc file. E.g.:
+# automatic-options=TEA=earl_grey
+## would set the Jinja2 variable TEA to be earl_grey
+[rose-stem]
