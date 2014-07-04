@@ -17,6 +17,13 @@ echo RUN_NAMES={{RUN_NAMES}}
 echo SOURCE_FOO={{SOURCE_FOO}}
 echo SOURCE_FOO_BASE={{SOURCE_FOO_BASE}}
 echo SOURCE_FOO_REV={{SOURCE_FOO_REV}}
+{%- if TEA is defined %}
+echo TEA={{TEA}}
+{%- endif %}
+{%- if MILK is defined %}
+echo MILK={{MILK}}
+{%- endif %}
+
 """
         [[[event hooks]]]
            succeeded handler=rose suite-hook

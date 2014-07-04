@@ -23,10 +23,12 @@ import os
 import re
 import sys
 
+import rose.config
 from rose.fs_util import FileSystemUtil
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
+from rose.resource import ResourceLocator
 from rose.suite_run import SuiteRunner
 
 DEFAULT_TEST_DIR = 'rose-stem'
@@ -263,6 +265,11 @@ class StemRunner(object):
             raise RoseSuiteConfNotFoundException(suitedir)
         return suitedir
 
+    def _read_site_config_and_return_options(self):
+        """Read the site rose.conf file."""
+        return ResourceLocator.default().get_conf().get_value(["rose-stem", 
+                "automatic-options"])
+
     def process(self):
         """Process STEM options into 'rose suite-run' options."""
 
@@ -299,6 +306,16 @@ class StemRunner(object):
                 expanded_groups.extend(i.split(','))
             self.opts.defines.append(SUITE_RC_PREFIX + 'RUN_NAMES=' +
                                      str(expanded_groups))
+
+        # Load the config file and return any automatic-options
+        auto_opts = self._read_site_config_and_return_options()
+        if auto_opts:
+            automatic_options = auto_opts.split()
+            for option in automatic_options:
+                elements = option.split("=")
+                if len(elements) == 2:
+                    self._add_define_option(elements[0], 
+                                      '"' + elements[1] + '"')
 
         # Change into the suite directory
         if self.opts.conf_dir:
