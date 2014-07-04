@@ -397,18 +397,22 @@ rose-stem/app/spaceship/rose-app.conf
       </div>
 
       <div class="slide">
-        <h2 id="portable">Portable Suites</h2>
+        <h2 id="autoopts">Automatic Options</h2>
 
-        <p>It is possible to create more portable rose-stem suites by using
-        a Jinja2 variable named <code>SITE</code> and triggering various
-        parts of the suite.rc using that. This variable can be set normally
-        in the <kbd>rose-suite.conf</kbd> file, or in a section named
-        <code>[rose-stem]</code> in the site <kbd>rose.conf</kbd> file using
-        the variable <code>site</code> (note the case), for example: </p>
+        <p>It is possible to automatically add options to rose-stem using
+        the <kbd>automatic-options</kbd> variable in a section named
+        <code>[rose-stem]</code> in the site <kbd>rose.conf</kbd> file. This
+        takes the syntax of key-value pairs on a single line, and is 
+        functionally equivalent to adding them using the -S option on the 
+        rose-stem command line. For example:</p>
         <pre>
 [rose-stem]
-site=myhouse
+automatic-options=GRAVITY=newtonian PLANET=jupiter
 </pre>
+        <p>sets the variable <kbd>GRAVITY</kbd> to have the value 
+        <code>newtonian</code>, and <kbd>PLANET</kbd> to be 
+        <code>jupiter</code>. These can then be used in the <kbd>suite.rc</kbd>
+        file as Jinja2 variables. </p>
       </div>
 
     </div>

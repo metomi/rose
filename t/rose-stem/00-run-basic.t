@@ -49,7 +49,7 @@ cp $TEST_SOURCE_DIR/00-run-basic/suite.rc $WORKINGCOPY/rose-stem
 touch $WORKINGCOPY/rose-stem/rose-suite.conf
 #We should now have a valid rose-stem suite.
 #-------------------------------------------------------------------------------
-N_TESTS=20
+N_TESTS=29
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 #Test for successful execution
@@ -120,6 +120,50 @@ TEST_KEY=$TEST_KEY_BASE-relative-path-source-rev
 file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
 #-------------------------------------------------------------------------------
 cd $TEST_DIR
+#-------------------------------------------------------------------------------
+# Test "rose stem" with site/user configuration
+export ROSE_CONF_PATH=$TEST_DIR
+cat > rose.conf << EOF
+[rose-stem]
+automatic-options=MILK=true
+EOF
+#-------------------------------------------------------------------------------
+# Fifth test - for successful execution with site/user configuration
+TEST_KEY=$TEST_KEY_BASE-check-with-config
+run_pass "$TEST_KEY" \
+   rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
+             --source=$WORKINGCOPY --source=fcm:foo_tr@head --no-gcontrol \
+             --name $SUITENAME -- --debug
+#Test output
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+TEST_KEY=$TEST_KEY_BASE-check-with-config-groups-to-run
+file_grep $TEST_KEY "RUN_NAMES=\[earl_grey, milk, sugar, spoon, cup, milk\]" \
+          $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-check-with-config-source
+file_grep $TEST_KEY "SOURCE_FOO=$WORKINGCOPY fcm:foo_tr@head" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-check-with-config-source-base
+file_grep $TEST_KEY "SOURCE_FOO_BASE=$WORKINGCOPY\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-check-with-config-source-rev
+file_grep $TEST_KEY "SOURCE_FOO_REV=\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-check-with-config-single-auto-option
+file_grep $TEST_KEY "MILK=true\$" $OUTPUT
+#-------------------------------------------------------------------------------
+# Sixth test - multiple automatic-options in the site/user configuration
+cat > rose.conf << EOF
+[rose-stem]
+automatic-options=MILK=true TEA=darjeeling
+EOF
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-check-with-config
+run_pass "$TEST_KEY" \
+   rose stem --group=assam --source=$WORKINGCOPY/rose-stem --no-gcontrol \
+             --name $SUITENAME -- --debug
+#Test output
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+TEST_KEY=$TEST_KEY_BASE-multi-auto-config-first
+file_grep $TEST_KEY "MILK=true\$" $OUTPUT
+TEST_KEY=$TEST_KEY_BASE-multi-auto-config-second
+file_grep $TEST_KEY "TEA=darjeeling\$" $OUTPUT
 #-------------------------------------------------------------------------------
 #Clean suite
 rose suite-clean -q -y $SUITENAME

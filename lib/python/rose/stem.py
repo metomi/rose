@@ -265,15 +265,10 @@ class StemRunner(object):
             raise RoseSuiteConfNotFoundException(suitedir)
         return suitedir
 
-    def _read_site_config_and_return_site(self):
+    def _read_site_config_and_return_options(self):
         """Read the site rose.conf file."""
-        
-        conf = ResourceLocator.default().get_conf()
-        site = conf.get(["rose-stem", "site"])
-        if site:
-            return site.value
-        else:
-            return None
+        return ResourceLocator.default().get_conf().get_value(["rose-stem", 
+                "automatic-options"])
 
     def process(self):
         """Process STEM options into 'rose suite-run' options."""
@@ -312,10 +307,15 @@ class StemRunner(object):
             self.opts.defines.append(SUITE_RC_PREFIX + 'RUN_NAMES=' +
                                      str(expanded_groups))
 
-        # Load the site config file
-        site = self._read_site_config_and_return_site()
-        if site:
-            self._add_define_option("SITE", '"' + site + '"')
+        # Load the config file and return any automatic-options
+        auto_opts = self._read_site_config_and_return_options()
+        if auto_opts:
+            automatic_options = auto_opts.split()
+            for option in automatic_options:
+                elements = option.split("=")
+                if len(elements) == 2:
+                    self._add_define_option(elements[0], 
+                                      '"' + elements[1] + '"')
 
         # Change into the suite directory
         if self.opts.conf_dir:
