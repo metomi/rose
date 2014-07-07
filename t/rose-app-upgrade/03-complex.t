@@ -252,7 +252,7 @@ TEST_KEY=$TEST_KEY_BASE-upgrade
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgradeapple-fig: changes: 33
+[U] Upgrade_apple-fig: changes: 33
     namelist:add_sect=new_opt=.true.
         Added with value '.true.'
     namelist:add_sect_only=None=None
@@ -696,7 +696,7 @@ TEST_KEY=$TEST_KEY_BASE-upgrade-info
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgradeapple-fig: changes: 33
+[U] Upgrade_apple-fig: changes: 33
     namelist:add_sect=new_opt=.true.
         good
     namelist:add_sect_only=None=None
