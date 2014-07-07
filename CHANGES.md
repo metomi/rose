@@ -5,6 +5,39 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-Q3)
+
+This release of Rose will work best with the upcoming
+[Cylc](https://github.com/cylc/cylc/) 6.0.0.
+
+### Highlighted Changes
+
+-none yet-
+
+### Noteworthy Changes
+
+[#1327](https://github.com/metomi/rose/pull/1327):
+rose app-upgrade: better output macro name.
+
+[#1320](https://github.com/metomi/rose/pull/1320):
+rose config-edit, rose macro: check id usage in `fail-if`, `warn-if`.
+
+[#1317](https://github.com/metomi/rose/pull/1317):
+rose stem: configurable autmatic options.
+
+[#1316](https://github.com/metomi/rose/pull/1316):
+rose date --diff: new option, print interval between 2 date-times.
+
+[#1306](https://github.com/metomi/rose/pull/1306):
+rose app-upgrade: better error message for upgrade to same version.
+
+[#1283](https://github.com/metomi/rose/pull/1283):
+rosie go, rosie lookup, rosie ls, etc: will now attempt to use
+[Gnome Keyring](https://wiki.gnome.org/GnomeKeyring) to store passwords for
+Rosie web services that require authentication.
+
+--------------------------------------------------------------------------------
+
 ## 2014.06.1 (2014-06-20)
 
 This release of Rose works best with
