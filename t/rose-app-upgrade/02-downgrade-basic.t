@@ -158,7 +158,7 @@ TEST_KEY=$TEST_KEY_BASE-downgrade-change
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  --non-interactive --meta-path=../rose-meta/ -C ../config -a 0.4.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade1.0-0.4.1: changes: 2
+[D] Downgrade_1.0-0.4.1: changes: 2
     env=Z=1
         Value: '5' -> '1'
     =meta=test-app-upgrade/0.4.1
@@ -198,7 +198,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.4
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade0.4.1-0.4: changes: 2
+[D] Downgrade_0.4.1-0.4: changes: 2
     env=A=4
         Added with value '4'
     =meta=test-app-upgrade/0.4
@@ -239,7 +239,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade0.4-0.3: changes: 2
+[D] Downgrade_0.4-0.3: changes: 2
     env=A=4
         enabled -> user-ignored
     =meta=test-app-upgrade/0.3
@@ -279,7 +279,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade0.3-0.2: changes: 2
+[D] Downgrade_0.3-0.2: changes: 2
     env=A=4
         user-ignored -> enabled
     =meta=test-app-upgrade/0.2
@@ -318,7 +318,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade0.2-0.1: changes: 2
+[D] Downgrade_0.2-0.1: changes: 2
     env=Z=None
         removed Z
     =meta=test-app-upgrade/0.1
@@ -354,7 +354,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade1.0-0.1: changes: 6
+[D] Downgrade_1.0-0.1: changes: 6
     env=Z=1
         Value: '5' -> '1'
     env=A=4
@@ -509,7 +509,7 @@ __MACRO__
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade0.3-0.1: changes: 3
+[D] Downgrade_0.3-0.1: changes: 3
     env=A=4
         user-ignored -> enabled
     env=Z=None
@@ -538,7 +538,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.4
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade0.5-0.4: changes: 2
+[D] Downgrade_0.5-0.4: changes: 2
     env=A=4
         Added with value '4'
     =meta=test-app-upgrade/0.4
@@ -626,7 +626,7 @@ TEST_KEY=$TEST_KEY_BASE-downgrade-patch-files
 run_pass "$TEST_KEY" rose app-upgrade --downgrade \
  -y --meta-path=../rose-meta/ -C ../config/ 0.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[D] Downgrade0.2-0.1: changes: 6
+[D] Downgrade_0.2-0.1: changes: 6
     env=A=5
         Added with value '5'
     namelist:something=foo=bar

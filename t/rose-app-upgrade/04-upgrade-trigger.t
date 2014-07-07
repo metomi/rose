@@ -76,7 +76,7 @@ TEST_KEY=$TEST_KEY_BASE-add-and-trigger-non-interactive
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.2
 file_xxdiff "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.1-0.2: changes: 2
+[U] Upgrade_0.1-0.2: changes: 2
     env=Z=1
         only one Z
     =meta=test-app-upgrade/0.2
@@ -107,7 +107,7 @@ run_pass "$TEST_KEY" rose app-upgrade \
 y
 y
 __INPUT__
-file_grep "$TEST_KEY.out.grep1" "Upgrade0.1-0.2: changes: 2" "$TEST_KEY.out"
+file_grep "$TEST_KEY.out.grep1" "Upgrade_0.1-0.2: changes: 2" "$TEST_KEY.out"
 file_grep "$TEST_KEY.out.grep2" "UpgradeTriggerFixing: changes: 1" \
     "$TEST_KEY.out"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null

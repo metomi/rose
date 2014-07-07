@@ -150,7 +150,7 @@ TEST_KEY=$TEST_KEY_BASE-upgrade-add
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config 0.2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.1-0.2: changes: 2
+[U] Upgrade_0.1-0.2: changes: 2
     env=Z=1
         only one Z
     =meta=test-app-upgrade/0.2
@@ -192,7 +192,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.2-0.3: changes: 2
+[U] Upgrade_0.2-0.3: changes: 2
     env=A=4
         enabled -> user-ignored
     =meta=test-app-upgrade/0.3
@@ -233,7 +233,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.4
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.3-0.4: changes: 2
+[U] Upgrade_0.3-0.4: changes: 2
     env=A=4
         user-ignored -> enabled
     =meta=test-app-upgrade/0.4
@@ -272,7 +272,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.5
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.4-0.5: changes: 2
+[U] Upgrade_0.4-0.5: changes: 2
     env=A=None
         Removed
     =meta=test-app-upgrade/0.5
@@ -321,7 +321,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ -a 0.5.1
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.5-0.5.1: changes: 2
+[U] Upgrade_0.5-0.5.1: changes: 2
     env=C=8
         Added with value '8'
     =meta=test-app-upgrade/0.5.1
@@ -359,7 +359,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 1.0
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.5.1-1.0: changes: 2
+[U] Upgrade_0.5.1-1.0: changes: 2
     env=Z=5
         Value: '1' -> '5'
     =meta=test-app-upgrade/1.0
@@ -395,7 +395,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 1.0
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.1-1.0: changes: 7
+[U] Upgrade_0.1-1.0: changes: 7
     env=Z=1
         only one Z
     env=A=4
@@ -552,7 +552,7 @@ __MACRO__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.1-0.3: changes: 3
+[U] Upgrade_0.1-0.3: changes: 3
     env=Z=1
         only one Z
     env=A=4
@@ -630,7 +630,7 @@ __MACRO__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.5
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.4-0.5: changes: 2
+[U] Upgrade_0.4-0.5: changes: 2
     env=A=None
         Removed
     =meta=test-app-upgrade/0.5
@@ -702,7 +702,7 @@ __CONFIG__
 run_pass "$TEST_KEY" rose app-upgrade -y \
  --meta-path=../rose-meta/ -C ../config/ 0.2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade0.1-0.2: changes: 8
+[U] Upgrade_0.1-0.2: changes: 8
     env=B=5
         Added with value '5'
     namelist:new=None=None
