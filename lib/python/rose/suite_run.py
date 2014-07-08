@@ -64,7 +64,7 @@ class SkipReloadEvent(Event):
     """An event raised to report that suite configuration reload is skipped."""
 
     def __str__(self):
-        return "%s: skip reload, \"%s\" unchanged" % self.args
+        return "%s: reload complete. \"%s\" unchanged" % self.args
 
 
 class SuiteHostSelectEvent(Event):
