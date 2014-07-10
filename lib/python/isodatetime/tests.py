@@ -19,12 +19,38 @@
 """This tests the ISO 8601 parsing and data model functionality."""
 
 import copy
+import multiprocessing
 import unittest
 
 from . import data
 from . import dumpers
 from . import parsers
 from . import parser_spec
+
+
+def get_timeinterval_tests():
+    """Yield tests for the time interval class."""
+    tests = {
+        "get_days_and_seconds": [
+            ([], {"hours": 25}, (1, 3600)),
+            ([], {"seconds": 59}, (0, 59)),
+            ([], {"minutes": 10}, (0, 600)),
+            ([], {"days": 5, "minutes": 2}, (5, 120)),
+            ([], {"hours": 2, "minutes": 5, "seconds": 11.5}, (0, 7511.5)),
+            ([], {"hours": 23, "minutes": 1446}, (1, 83160))
+        ],
+        "get_seconds": [
+            ([], {"hours": 25}, 90000),
+            ([], {"seconds": 59}, 59),
+            ([], {"minutes": 10}, 600),
+            ([], {"days": 5, "minutes": 2}, 432120),
+            ([], {"hours": 2, "minutes": 5, "seconds": 11.5}, 7511.5),
+            ([], {"hours": 23, "minutes": 1446}, 169560)
+        ]
+    }
+    for method, method_tests in tests.items():
+        for method_args, test_props, ctrl_results in method_tests:
+            yield test_props, method, method_args, ctrl_results
 
 
 def get_timeintervalparser_tests():
@@ -93,7 +119,11 @@ def get_timeintervaldumper_tests():
         "P100W": {"weeks": 100},
         "-P3YT4H2M": {"years": -3, "hours": -4, "minutes": -2},
         "-PT5M": {"minutes": -5},
-        "-P7Y": {"years": -7, "hours": 0}
+        "-P7Y": {"years": -7, "hours": 0},
+        "PT1H": {"seconds": 3600, "standardize": True},
+        "P1DT5M": {"minutes": 1445, "standardize": True},
+        "PT59S": {"seconds": 59, "standardize": True},
+        "PT1H4M56S": {"minutes": 10, "seconds": 3296, "standardize": True},
     }
     for expression, ctrl_result in test_expressions.items():
         yield expression, ctrl_result
@@ -553,6 +583,17 @@ def get_timerecurrence_expansion_tests():
           "-100024-02-11T04:00:00-12:30"])
     ]
 
+
+def get_timerecurrence_expansion_tests_for_alt_calendar(calendar_mode):
+    """Return alternate calendar tests for data.TimeRecurrence."""
+    if calendar_mode == "360":
+        return get_timerecurrence_expansion_tests_360()
+    if calendar_mode == "365":
+        return get_timerecurrence_expansion_tests_365()
+    if calendar_mode == "366":
+        return get_timerecurrence_expansion_tests_366()
+
+
 def get_timerecurrence_expansion_tests_360():
     """Return test expansion expressions for data.TimeRecurrence."""
     return [
@@ -582,6 +623,76 @@ def get_timerecurrence_expansion_tests_360():
          ["2003-02-30T00:00:00Z", "2004-02-30T00:00:00Z", "2005-02-30T00:00:00Z"]),
         ("R3/2003-02-30T00Z/P1Y",
          ["2003-02-30T00:00:00Z", "2004-02-30T00:00:00Z", "2005-02-30T00:00:00Z"]),
+    ]
+
+
+def get_timerecurrence_expansion_tests_365():
+    """Return test expansion expressions for data.TimeRecurrence."""
+    return [
+        ("R13/1984-01-30T00Z/P1M",
+         ["1984-01-30T00:00:00Z", "1984-02-28T00:00:00Z",
+          "1984-03-28T00:00:00Z", "1984-04-28T00:00:00Z",
+          "1984-05-28T00:00:00Z", "1984-06-28T00:00:00Z",
+          "1984-07-28T00:00:00Z", "1984-08-28T00:00:00Z",
+          "1984-09-28T00:00:00Z", "1984-10-28T00:00:00Z",
+          "1984-11-28T00:00:00Z", "1984-12-28T00:00:00Z",
+          "1985-01-28T00:00:00Z"]),
+        ("R13/1985-01-30T00Z/P1M",
+         ["1985-01-30T00:00:00Z", "1985-02-28T00:00:00Z",
+          "1985-03-28T00:00:00Z", "1985-04-28T00:00:00Z",
+          "1985-05-28T00:00:00Z", "1985-06-28T00:00:00Z",
+          "1985-07-28T00:00:00Z", "1985-08-28T00:00:00Z",
+          "1985-09-28T00:00:00Z", "1985-10-28T00:00:00Z",
+          "1985-11-28T00:00:00Z", "1985-12-28T00:00:00Z",
+          "1986-01-28T00:00:00Z"]),
+        ("R2/1984-01-30T00Z/P1D",
+         ["1984-01-30T00:00:00Z", "1984-01-31T00:00:00Z"]),
+        ("R2/P1D/1984-02-01T00Z",
+         ["1984-01-31T00:00:00Z", "1984-02-01T00:00:00Z"]),
+        ("R2/P1D/1984-01-01T00Z",
+         ["1983-12-31T00:00:00Z", "1984-01-01T00:00:00Z"]),
+        ("R2/1983-12-30T00Z/P1D",
+         ["1983-12-30T00:00:00Z", "1983-12-31T00:00:00Z"]),
+        ("R2/2000-02-28T00Z/P1Y1D",
+         ["2000-02-28T00:00:00Z", "2001-03-01T00:00:00Z"]),
+        ("R2/2001-02-28T00Z/P1Y1D",
+         ["2001-02-28T00:00:00Z", "2002-03-01T00:00:00Z"]),
+    ]
+
+
+def get_timerecurrence_expansion_tests_366():
+    """Return test expansion expressions for data.TimeRecurrence."""
+    return [
+        ("R13/1984-01-30T00Z/P1M",
+         ["1984-01-30T00:00:00Z", "1984-02-29T00:00:00Z",
+          "1984-03-29T00:00:00Z", "1984-04-29T00:00:00Z",
+          "1984-05-29T00:00:00Z", "1984-06-29T00:00:00Z",
+          "1984-07-29T00:00:00Z", "1984-08-29T00:00:00Z",
+          "1984-09-29T00:00:00Z", "1984-10-29T00:00:00Z",
+          "1984-11-29T00:00:00Z", "1984-12-29T00:00:00Z",
+          "1985-01-29T00:00:00Z"]),
+        ("R13/1985-01-30T00Z/P1M",
+         ["1985-01-30T00:00:00Z", "1985-02-29T00:00:00Z",
+          "1985-03-29T00:00:00Z", "1985-04-29T00:00:00Z",
+          "1985-05-29T00:00:00Z", "1985-06-29T00:00:00Z",
+          "1985-07-29T00:00:00Z", "1985-08-29T00:00:00Z",
+          "1985-09-29T00:00:00Z", "1985-10-29T00:00:00Z",
+          "1985-11-29T00:00:00Z", "1985-12-29T00:00:00Z",
+          "1986-01-29T00:00:00Z"]),
+        ("R2/1984-01-30T00Z/P1D",
+         ["1984-01-30T00:00:00Z", "1984-01-31T00:00:00Z"]),
+        ("R2/P1D/1984-02-01T00Z",
+         ["1984-01-31T00:00:00Z", "1984-02-01T00:00:00Z"]),
+        ("R2/P1D/1984-01-01T00Z",
+         ["1983-12-31T00:00:00Z", "1984-01-01T00:00:00Z"]),
+        ("R2/1983-12-30T00Z/P1D",
+         ["1983-12-30T00:00:00Z", "1983-12-31T00:00:00Z"]),
+        ("R2/1999-02-28T00Z/P1Y1D",
+         ["1999-02-28T00:00:00Z", "2000-02-29T00:00:00Z"]),
+        ("R2/2000-02-28T00Z/P1Y1D",
+         ["2000-02-28T00:00:00Z", "2001-02-29T00:00:00Z"]),
+        ("R2/2001-02-28T00Z/P1Y1D",
+         ["2001-02-28T00:00:00Z", "2002-02-29T00:00:00Z"]),
     ]
 
 
@@ -627,6 +738,9 @@ def get_timerecurrenceparser_tests():
             interval_tests = get_timeintervalparser_tests()
             start_point = point_parser.parse(point_expr)
             for interval_expr, interval_result in interval_tests:
+                if interval_expr.startswith("-P"):
+                    # Our negative intervals are not supported in recurrences.
+                    continue
                 interval = interval_parser.parse(interval_expr)
                 end_point = start_point + interval
                 if reps is not None:
@@ -670,6 +784,18 @@ class TestSuite(unittest.TestCase):
                     (source, test, control))
         super(TestSuite, self).assertEqual(test, control, info)
 
+    def test_timeinterval(self):
+        """Test the time interval class methods."""
+        for test_props, method, method_args, ctrl_results in (
+                get_timeinterval_tests()):
+            interval = data.TimeInterval(**test_props)
+            interval_method = getattr(interval, method)
+            test_results = interval_method(*method_args)
+            self.assertEqual(
+                test_results, ctrl_results,
+                "%s -> %s(%s)" % (test_props, method, method_args)
+            )
+
     def test_timeinterval_parser(self):
         """Test the time interval parsing."""
         parser = parsers.TimeIntervalParser()
@@ -693,78 +819,8 @@ class TestSuite(unittest.TestCase):
 
     def test_timepoint(self):
         """Test the time point data model (takes a while)."""
-        import datetime
-        import random
-        my_date = datetime.datetime(1801, 1, 1)
-        test_interval_attributes = [
-            ("weeks", 110),
-            ("days", 770),
-            ("hours", 770*24),
-            ("minutes", 770 * 24 * 60),
-            ("seconds", 770 * 24 * 60 * 60)
-        ]
-        while my_date <= datetime.datetime(2401, 2, 1):
-            ctrl_data = my_date.isocalendar()
-            test_date = data.TimePoint(
-                year=my_date.year,
-                month_of_year=my_date.month,
-                day_of_month=my_date.day
-            )
-            test_data = test_date.get_week_date()
-            self.assertEqual(test_data, ctrl_data)
-            ctrl_data = (my_date.year, my_date.month, my_date.day)
-            test_data = test_date.to_week_date().get_calendar_date()
-            self.assertEqual(test_data, ctrl_data)
-            ctrl_data = my_date.toordinal()
-            year, day_of_year = test_date.get_ordinal_date()
-            test_data = day_of_year
-            test_data += data.get_days_since_1_ad(year - 1)
-            self.assertEqual(test_data, ctrl_data)
-            for attribute, attr_max in test_interval_attributes:
-                delta_attr = random.randrange(0, attr_max)
-                kwargs = {attribute: delta_attr}
-                ctrl_data = my_date + datetime.timedelta(**kwargs)
-                ctrl_data = (ctrl_data.year, ctrl_data.month, ctrl_data.day)
-                test_data = (
-                    test_date + data.TimeInterval(
-                        **kwargs)).get_calendar_date()
-                self.assertEqual(test_data, ctrl_data)
-                ctrl_data = (my_date - datetime.timedelta(**kwargs))
-                ctrl_data = (ctrl_data.year, ctrl_data.month, ctrl_data.day)
-                test_data = (
-                    test_date - data.TimeInterval(
-                        **kwargs)).get_calendar_date()
-                self.assertEqual(test_data, ctrl_data)
-            kwargs = {}
-            for attribute, attr_max in test_interval_attributes:
-                delta_attr = random.randrange(0, attr_max)
-                kwargs[attribute] = delta_attr
-            test_date_minus = (
-                test_date - data.TimeInterval(**kwargs))
-            test_data = test_date - test_date_minus
-            ctrl_data = data.TimeInterval(**kwargs)
-            self.assertEqual(test_data, ctrl_data)
-            test_data = (test_date_minus + (test_date - test_date_minus))
-            ctrl_data = test_date
-            self.assertEqual(test_data, ctrl_data)
-            test_data = (test_date_minus + data.TimeInterval(**kwargs))
-            ctrl_data = test_date
-            self.assertEqual(test_data, ctrl_data)
-            ctrl_data = (my_date + datetime.timedelta(minutes=450) +
-                         datetime.timedelta(hours=5) -
-                         datetime.timedelta(seconds=500, weeks=5))
-            ctrl_data = [(ctrl_data.year, ctrl_data.month, ctrl_data.day),
-                         (ctrl_data.hour, ctrl_data.minute, ctrl_data.second)]
-            test_data = (
-                test_date + data.TimeInterval(minutes=450) +
-                data.TimeInterval(hours=5) -
-                data.TimeInterval(weeks=5, seconds=500)
-            )
-            test_data = [test_data.get_calendar_date(),
-                         test_data.get_hour_minute_second()]
-            self.assertEqual(test_data, ctrl_data)
-            timedelta = datetime.timedelta(days=1)
-            my_date += timedelta
+        pool = multiprocessing.Pool(processes=4)
+        pool.map_async(test_timepoint_at_year, range(1801, 2403)).get()
 
     def test_timepoint_time_zone(self):
         """Test the time zone handling of timepoint instances."""
@@ -1035,24 +1091,33 @@ class TestSuite(unittest.TestCase):
                 self.assertEqual(test_data, ctrl_data, test_dump + "\n" +
                                  strptime_string)
 
-    def test_timerecurrence_360(self):
-        """Test recurring date/time series data model for 360 day calendar"""
-        data.set_360_calendar()
-
-        parser = parsers.TimeRecurrenceParser()
-        for expression, ctrl_results in get_timerecurrence_expansion_tests_360():
-            try:
-                test_recurrence = parser.parse(expression)
-            except parsers.ISO8601SyntaxError:
-                raise ValueError(
-                    "TimeRecurrenceParser test failed to parse '%s'" %
-                    expression
-                )
-            test_results = []
-            for i, time_point in enumerate(test_recurrence):
-                test_results.append(str(time_point))
-            self.assertEqual(test_results, ctrl_results, expression)
-        data.set_gregorian_calendar()
+    def test_timerecurrence_alt_calendars(self):
+        """Test recurring date/time series for alternate calendars."""
+        for calendar_mode in ["360", "365", "366"]:
+            data.CALENDAR.set_mode(calendar_mode + "day")
+            self.assertEqual(
+                data.CALENDAR.mode,
+                getattr(data.Calendar, "MODE_%s" % calendar_mode)
+            )
+            parser = parsers.TimeRecurrenceParser()
+            tests = get_timerecurrence_expansion_tests_for_alt_calendar(
+                calendar_mode)
+            for expression, ctrl_results in tests:
+                try:
+                    test_recurrence = parser.parse(expression)
+                except parsers.ISO8601SyntaxError:
+                    raise ValueError(
+                        "TimeRecurrenceParser test failed to parse '%s'" %
+                        expression
+                    )
+                test_results = []
+                for i, time_point in enumerate(test_recurrence):
+                    test_results.append(str(time_point))
+                self.assertEqual(test_results, ctrl_results,
+                                 expression + "(%s)" % calendar_mode)
+            data.CALENDAR.set_mode()
+            self.assertEqual(data.CALENDAR.mode,
+                             data.Calendar.MODE_GREGORIAN)
 
     def test_timerecurrence(self):
         """Test the recurring date/time series data model."""
@@ -1118,6 +1183,89 @@ class TestSuite(unittest.TestCase):
                 raise ValueError("Parsing failed for %s" % expression)
             ctrl_data = str(data.TimeRecurrence(**test_info))
             self.assertEqual(test_data, ctrl_data, expression)
+
+
+def assert_equal(data1, data2):
+    """A function-level equivalent of the unittest method."""
+    assert data1 == data2
+
+
+def test_timepoint_at_year(test_year):
+    """Test the TimePoint and Calendar data model over a given year."""
+    import datetime
+    import random
+    my_date = datetime.datetime(test_year, 1, 1)
+    stop_date = datetime.datetime(test_year + 1, 1, 1)
+    test_interval_attributes = [
+        ("weeks", 110),
+        ("days", 770),
+        ("hours", 770*24),
+        ("minutes", 770 * 24 * 60),
+        ("seconds", 770 * 24 * 60 * 60)
+    ]
+    while my_date <= stop_date:
+        ctrl_data = my_date.isocalendar()
+        test_date = data.TimePoint(
+            year=my_date.year,
+            month_of_year=my_date.month,
+            day_of_month=my_date.day
+        )
+        test_week_date = test_date.to_week_date()
+        test_data = test_week_date.get_week_date()
+        assert_equal(test_data, ctrl_data)
+        ctrl_data = (my_date.year, my_date.month, my_date.day)
+        test_data = test_week_date.get_calendar_date()
+        assert_equal(test_data, ctrl_data)
+        ctrl_data = my_date.toordinal()
+        year, day_of_year = test_date.get_ordinal_date()
+        test_data = day_of_year
+        test_data += data.get_days_since_1_ad(year - 1)
+        assert_equal(test_data, ctrl_data)
+        for attribute, attr_max in test_interval_attributes:
+            delta_attr = random.randrange(0, attr_max)
+            kwargs = {attribute: delta_attr}
+            ctrl_data = my_date + datetime.timedelta(**kwargs)
+            ctrl_data = (ctrl_data.year, ctrl_data.month, ctrl_data.day)
+            test_data = (
+                test_date + data.TimeInterval(
+                    **kwargs)).get_calendar_date()
+            assert_equal(test_data, ctrl_data)
+            ctrl_data = (my_date - datetime.timedelta(**kwargs))
+            ctrl_data = (ctrl_data.year, ctrl_data.month, ctrl_data.day)
+            test_data = (
+                test_date - data.TimeInterval(
+                    **kwargs)).get_calendar_date()
+            assert_equal(test_data, ctrl_data)
+        kwargs = {}
+        for attribute, attr_max in test_interval_attributes:
+            delta_attr = random.randrange(0, attr_max)
+            kwargs[attribute] = delta_attr
+        test_date_minus = (
+            test_date - data.TimeInterval(**kwargs))
+        test_data = test_date - test_date_minus
+        ctrl_data = data.TimeInterval(**kwargs)
+        assert_equal(test_data, ctrl_data)
+        test_data = (test_date_minus + (test_date - test_date_minus))
+        ctrl_data = test_date
+        assert_equal(test_data, ctrl_data)
+        test_data = (test_date_minus + data.TimeInterval(**kwargs))
+        ctrl_data = test_date
+        assert_equal(test_data, ctrl_data)
+        ctrl_data = (my_date + datetime.timedelta(minutes=450) +
+                        datetime.timedelta(hours=5) -
+                        datetime.timedelta(seconds=500, weeks=5))
+        ctrl_data = [(ctrl_data.year, ctrl_data.month, ctrl_data.day),
+                        (ctrl_data.hour, ctrl_data.minute, ctrl_data.second)]
+        test_data = (
+            test_date + data.TimeInterval(minutes=450) +
+            data.TimeInterval(hours=5) -
+            data.TimeInterval(weeks=5, seconds=500)
+        )
+        test_data = [test_data.get_calendar_date(),
+                        test_data.get_hour_minute_second()]
+        assert_equal(test_data, ctrl_data)
+        timedelta = datetime.timedelta(days=1)
+        my_date += timedelta
 
 
 if __name__ == "__main__":

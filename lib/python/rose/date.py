@@ -19,10 +19,10 @@
 #-----------------------------------------------------------------------------
 """Parse and format date and time."""
 
-from datetime import datetime, timedelta
-import isodatetime.data
-import isodatetime.parsers
-import isodatetime.timezone
+from datetime import datetime
+from isodatetime.data import Calendar, TimeInterval, get_timepoint_for_now
+from isodatetime.dumpers import TimePointDumper
+from isodatetime.parsers import TimePointParser, TimeIntervalParser
 import os
 import re
 from rose.env import UnboundEnvironmentVariableError
@@ -39,28 +39,31 @@ class OffsetValueError(ValueError):
         return "%s: bad offset value" % self.args[0]
 
 
-class DiffError(ValueError):
-
-    """Bad offset value."""
-
-    def __str__(self):
-        return "%s: cannot be subtracted from earlier date: %s" % (
-                                                self.args[0], self.args[1])
-
-
-class RoseDateShifter(object):
+class RoseDateTimeOperator(object):
 
     """A class to parse and print date string with an offset."""
 
     DUMP_FORMAT_CURRENT = u"CCYY-MM-DDThh:mm:ss±hh:mm"
+
+    NEGATIVE = "-"
+
     # strptime formats and their compatibility with the ISO 8601 parser.
     PARSE_FORMATS = [
-        ("%a %b %d %H:%M:%S %Y", True),    # ctime
-        ("%a %b %d %H:%M:%S %Z %Y", True), # Unix "date"
-        ("%Y-%m-%dT%H:%M:%S", False),      # ISO8601, extended
-        ("%Y%m%dT%H%M%S", False),          # ISO8601, basic
-        ("%Y%m%d%H", False)                # Cylc (current)
+        ("%a %b %d %H:%M:%S %Y", True),     # ctime
+        ("%a %b %d %H:%M:%S %Z %Y", True),  # Unix "date"
+        ("%Y-%m-%dT%H:%M:%S", False),       # ISO8601, extended
+        ("%Y%m%dT%H%M%S", False),           # ISO8601, basic
+        ("%Y%m%d%H", False)                 # Cylc (current)
     ]
+
+    REC_OFFSET = re.compile(r"""\A[\+\-]?(?:\d+[wdhms])+\Z""", re.I)
+
+    REC_OFFSET_FIND = re.compile(r"""(?P<num>\d+)(?P<unit>[wdhms])""")
+
+    STR_NOW = "now"
+    STR_REF = "ref"
+
+    TASK_CYCLE_TIME_MODE_ENV = "ROSE_TASK_CYCLE_TIME"
 
     UNITS = {"w": "weeks",
              "d": "days",
@@ -68,15 +71,8 @@ class RoseDateShifter(object):
              "m": "minutes",
              "s": "seconds"}
 
-    REC_OFFSET = re.compile(r"""\A[\+\-]?(?:\d+[wdhms])+\Z""", re.I)
-
-    REC_OFFSET_FIND = re.compile(r"""(?P<num>\d+)(?P<unit>[wdhms])""")
-
-    TASK_CYCLE_TIME_MODE_ENV = "ROSE_TASK_CYCLE_TIME"
-
-
-    def __init__(self, parse_format=None, task_cycle_time_mode=None,
-                 utc_mode=False, calendar_mode=None):
+    def __init__(self, parse_format=None, utc_mode=False, calendar_mode=None,
+                 ref_time_point=None):
         """Constructor.
 
         parse_format -- If specified, parse with the specified format.
@@ -84,113 +80,110 @@ class RoseDateShifter(object):
                         self.PARSE_FORMATS. The format should be a string
                         compatible to strptime(3).
 
-        task_cycle_time_mode -- If True, use the value of the environment
-                                variable ROSE_TASK_CYCLE_TIME (if it is
-                                specified) instead of the current time as the
-                                reference time.
-
         utc_mode -- If True, parse/print in UTC mode rather than local or
                     other timezones.
+
+        calendar_mode -- Set calendar mode, for isodatetime.data.Calendar.
+
+        ref_time_point -- Set the reference time point for operations.
+                          If not specified, operations use current date time.
 
         """
         self.parse_formats = self.PARSE_FORMATS
         self.custom_parse_format = parse_format
-        self.task_cycle_time = None
-        if task_cycle_time_mode:
-            self.task_cycle_time = os.getenv(self.TASK_CYCLE_TIME_MODE_ENV)
         self.utc_mode = utc_mode
         if self.utc_mode:
             assumed_time_zone = (0, 0)
         else:
             assumed_time_zone = None
 
-        if not calendar_mode: 
+        if not calendar_mode:
             calendar_mode = os.getenv("ROSE_CYCLING_MODE")
 
-        if calendar_mode == "360day":
-            isodatetime.data.set_360_calendar()
-        elif calendar_mode == "gregorian":
-            isodatetime.data.set_gregorian_calendar()
+        if calendar_mode:
+            Calendar.default().set_mode(calendar_mode)
 
-        self.isoparser = isodatetime.parsers.TimePointParser(
+        self.time_point_dumper = TimePointDumper()
+        self.time_point_parser = TimePointParser(
             assumed_time_zone=assumed_time_zone)
+        self.time_interval_parser = TimeIntervalParser()
 
-    def date_format(self, print_format, ref_time=None):
-        """Reformat ref_time according to print_format.
+        self.ref_time_point = ref_time_point
 
-        ref_time -- If specified, use as the reference date-time string. If not
-                    specified and if self.task_cycle_time_mode is True, use
-                    ROSE_TASK_CYCLE_TIME environment variable if it is defined.
-                    Otherwise, use current time.
+    def date_format(self, print_format, time_point=None):
+        """Reformat time_point according to print_format.
+
+        time_point -- The time point to format.
+                      Otherwise, use current date time.
 
         """
-        d = self.date_parse(ref_time)[0]
         if "%" in print_format:
             try:
-                return d.strftime(print_format)
+                return time_point.strftime(print_format)
             except ValueError:
-                return self.get_datetime_strftime(d, print_format)
-        return isodatetime.dumpers.TimePointDumper().dump(d, print_format)
+                return self.get_datetime_strftime(time_point, print_format)
+        return self.time_point_dumper.dump(time_point, print_format)
 
-    def date_parse(self, ref_time=None):
-        """Parse ref_time.
+    def date_parse(self, time_point_str=None):
+        """Parse time_point_str.
 
         Return (t, format) where t is a datetime.datetime object and format is
-        the format that matches ref_time.
+        the format that matches time_point_str.
 
-        ref_time -- If specified, use as the reference date-time string. If not
-                    specified and if self.task_cycle_time_mode is True, use
-                    ROSE_TASK_CYCLE_TIME environment variable if it is defined.
-                    Otherwise, use current time.
+        time_point_str -- The time point string to parse.
+                          Otherwise, use current time.
 
         """
-        if not ref_time and self.task_cycle_time is not None:
-            ref_time = self.task_cycle_time
-        if not ref_time or ref_time == "now":
-            d = isodatetime.data.get_timepoint_for_now()
-            d.set_time_zone_to_local()
+        if time_point_str is None or time_point_str == self.STR_REF:
+            time_point_str = self.ref_time_point
+        if time_point_str is None or time_point_str == self.STR_NOW:
+            time_point = get_timepoint_for_now()
+            time_point.set_time_zone_to_local()
             parse_format = self.DUMP_FORMAT_CURRENT
         elif self.custom_parse_format is not None:
             parse_format = self.custom_parse_format
-            d = self.strptime(ref_time, parse_format)
+            time_point = self.strptime(time_point_str, parse_format)
         else:
             parse_formats = list(self.parse_formats)
-            d = None
+            time_point = None
             while parse_formats:
                 parse_format, should_use_datetime = parse_formats.pop(0)
                 try:
                     if should_use_datetime:
-                        d = self.get_datetime_strptime(ref_time, parse_format)
+                        time_point = self.get_datetime_strptime(
+                            time_point_str,
+                            parse_format)
                     else:
-                        d = self.isoparser.strptime(ref_time, parse_format)
+                        time_point = self.time_point_parser.strptime(
+                            time_point_str,
+                            parse_format)
                     break
                 except ValueError:
                     pass
-            if d is None:
-                d = self.isoparser.parse(ref_time, dump_as_parsed=True)
+            if time_point is None:
+                time_point = self.time_point_parser.parse(
+                    time_point_str,
+                    dump_as_parsed=True)
                 parse_format = None
         if self.utc_mode:
-            d.set_time_zone_to_utc()
-        return d, parse_format
+            time_point.set_time_zone_to_utc()
+        return time_point, parse_format
 
-    def date_shift(self, ref_time=None, offset=None):
+    def date_shift(self, time_point=None, offset=None):
         """Return a date string with an offset.
 
-        ref_time -- If specified, use as the reference date-time string. If not
-                    specified and if self.task_cycle_time_mode is True, use
-                    ROSE_TASK_CYCLE_TIME environment variable if it is defined.
-                    Otherwise, use current time.
+        time_point -- A time point or time point string.
+                      Otherwise, use current time.
 
         offset -- If specified, it should be a string containing the offset
                   that has the format "[+/-]nU[nU...]" where "n" is an
                   integer, and U is a unit matching a key in self.UNITS.
 
         """
-        d, parse_format = self.date_parse(ref_time)
-
+        if time_point is None:
+            time_point = self.date_parse()[0]
         # Offset
         if offset:
-            interval_parser = isodatetime.parsers.TimeIntervalParser()
             sign = "+"
             if offset.startswith("-") or offset.startswith("+"):
                 sign = offset[0]
@@ -198,13 +191,13 @@ class RoseDateShifter(object):
             if offset.startswith("P"):
                 # Parse and apply.
                 try:
-                    interval = interval_parser.parse(offset)
+                    interval = self.time_interval_parser.parse(offset)
                 except ValueError:
                     raise OffsetValueError(offset)
                 if sign == "-":
-                    d -= interval
+                    time_point -= interval
                 else:
-                    d += interval
+                    time_point += interval
             else:
                 # Backwards compatibility for e.g. "-1h"
                 if not self.is_offset(offset):
@@ -214,114 +207,158 @@ class RoseDateShifter(object):
                     if sign == "-":
                         num = -num
                     key = self.UNITS[unit]
-                    d += isodatetime.data.TimeInterval(**{key: num})
+                    time_point += TimeInterval(**{key: num})
 
-        # Format
-        if parse_format is None:
-            return str(d.to_calendar_date())
-        if "%" in parse_format:
-            return self.strftime(d, parse_format)
-        return isodatetime.dumpers.TimePointDumper().dump(d, parse_format)
+        return time_point
 
-    __call__ = date_shift
+    def date_diff(self, time_point_1=None, time_point_2=None):
+        """Return (time_interval, is_negative) between two TimePoint objects.
 
-    def date_diff(self, ref_time=None, target_time=None):
-        """Return a TimeInterval for the difference between two dates."""
-        ref = self.date_parse(ref_time)[0]
-        target = self.date_parse(target_time)[0]
-        diff = ref - target
-        return diff
+        time_interval -- is a TimeInterval instance.
+        is_negative -- is a RoseDateTimeOperator.NEGATIVE if time_point_2 is
+                       in the past of time_point_1.
+        """
+        if time_point_2 < time_point_1:
+            return (time_point_1 - time_point_2, self.NEGATIVE)
+        else:
+            return (time_point_2 - time_point_1, "")
 
-    def is_task_cycle_time_mode(self):
-        """Return True if task_cycle_time_mode is True."""
-        return (self.task_cycle_time is not None)
+    @classmethod
+    def date_diff_format(cls, print_format, time_interval, sign):
+        """Format a time interval."""
+        if print_format:
+            delta_lookup = {"y": time_interval.years,
+                            "m": time_interval.months,
+                            "d": time_interval.days,
+                            "h": time_interval.hours,
+                            "M": time_interval.minutes,
+                            "s": time_interval.seconds}
+            expression = ""
+            for item in print_format:
+                if item in delta_lookup:
+                    expression += str(delta_lookup[item])
+                else:
+                    expression += item
+            return sign + expression
+        else:
+            return sign + str(time_interval)
 
     def is_offset(self, offset):
         """Return True if the string offset can be parsed as an offset."""
         return (self.REC_OFFSET.match(offset) is not None)
 
-    def strftime(self, d, print_format):
+    def strftime(self, time_point, print_format):
         """Use either the isodatetime or datetime strftime time formatting."""
         try:
-            return d.strftime(print_format)
+            return time_point.strftime(print_format)
         except ValueError:
-            return self.get_datetime_strftime(d, print_format)
+            return self.get_datetime_strftime(time_point, print_format)
 
-    def strptime(self, ref_time, parse_format):
+    def strptime(self, time_point_str, parse_format):
         """Use either the isodatetime or datetime strptime time parsing."""
         try:
-            return self.isoparser.strptime(ref_time, parse_format)
+            return self.time_point_parser.strptime(time_point_str,
+                                                   parse_format)
         except ValueError:
-            return self.get_datetime_strptime(ref_time, parse_format)
+            return self.get_datetime_strptime(time_point_str, parse_format)
 
-    def get_datetime_strftime(self, d, print_format):
+    @classmethod
+    def get_datetime_strftime(cls, time_point, print_format):
         """Use the datetime library's strftime as a fallback."""
-        year, month, day = d.copy().to_calendar_date().get_calendar_date()
-        hour, minute, second = d.get_hour_minute_second()
+        calendar_date = time_point.copy().to_calendar_date()
+        year, month, day = calendar_date.get_calendar_date()
+        hour, minute, second = time_point.get_hour_minute_second()
         microsecond = int(1.0e6 * (second - int(second)))
         hour = int(hour)
         minute = int(minute)
         second = int(second)
-        d = datetime(year, month, day, hour, minute, second, microsecond)
-        return d.strftime(print_format)
+        time_point = datetime(year, month, day, hour, minute, second,
+                              microsecond)
+        return time_point.strftime(print_format)
 
-    def get_datetime_strptime(self, ref_time, parse_format):
+    def get_datetime_strptime(self, time_point_str, parse_format):
         """Use the datetime library's strptime as a fallback."""
-        d = datetime.strptime(ref_time, parse_format)
-        return self.isoparser.parse(d.isoformat())
+        time_point = datetime.strptime(time_point_str, parse_format)
+        return self.time_point_parser.parse(time_point.isoformat())
 
 
 def main():
     """Implement "rose date"."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("calendar", "diff", "offsets", "parse_format",
-                              "print_format", "task_cycle_time_mode", "utc")
+    opt_parser.add_my_options(
+        "calendar",
+        "diff",
+        "offsets1",
+        "offsets2",
+        "parse_format",
+        "print_format",
+        "task_cycle_time_mode",
+        "utc_mode")
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
-    ref_time = None
-    if args:
-        ref_time = args[0]
+
+    ref_time_point = None
+    if opts.task_cycle_time_mode:
+        ref_time_point = os.getenv(
+            RoseDateTimeOperator.TASK_CYCLE_TIME_MODE_ENV)
+        if ref_time_point is None:
+            exc = UnboundEnvironmentVariableError(
+                RoseDateTimeOperator.TASK_CYCLE_TIME_MODE_ENV)
+            report(exc)
+            if opts.debug_mode:
+                raise exc
+            sys.exit(1)
+
+    date_time_oper = RoseDateTimeOperator(
+        parse_format=opts.parse_format,
+        utc_mode=opts.utc_mode,
+        calendar_mode=opts.calendar,
+        ref_time_point=ref_time_point)
+
     try:
-        ds = RoseDateShifter(opts.parse_format, opts.task_cycle_time_mode,
-                             opts.utc, opts.calendar_type)
-        if opts.task_cycle_time_mode and ds.task_cycle_time is None:
-            raise UnboundEnvironmentVariableError(ds.TASK_CYCLE_TIME_MODE_ENV)
-        ref_time = ds(ref_time)
-        if opts.offsets:
-            for offset in opts.offsets:
-                ref_time = ds(ref_time, offset)
-        if opts.diff:
-            del_time = ds.date_diff(ref_time, opts.diff)
-            if ds.date_parse(opts.diff) > ds.date_parse(ref_time):
-                raise DiffError(opts.diff, ref_time)
-            if opts.print_format:
-                delta_lookup = { "y" : del_time.years,
-                                 "m" : del_time.months,
-                                 "d" : del_time.days,
-                                 "h" : del_time.hours,
-                                 "M" : del_time.minutes,
-                                 "s" : del_time.seconds }
-                expression = ""
-                for item in opts.print_format:
-                    if delta_lookup.has_key(item):
-                        expression += str(delta_lookup[item])
-                    else:
-                        expression += item
-                print expression
-            else:
-                print del_time
-            sys.exit()
-        if opts.print_format:
-            print ds.date_format(opts.print_format, ref_time)
+        if len(args) < 2:
+            _print_time_point(date_time_oper, opts, args)
         else:
-            print ref_time
-    except Exception as e:
+            _print_time_interval(date_time_oper, opts, args)
+    except OffsetValueError as exc:
+        report(exc)
         if opts.debug_mode:
-            import traceback
-            traceback.print_exc(e)
-        else:
-            report(e)
+            raise exc
         sys.exit(1)
+
+
+def _print_time_point(date_time_oper, opts, args):
+    """Implement usage 1 of "rose date", print time point."""
+
+    time_point_str = None
+    if args:
+        time_point_str = args[0]
+    time_point, parse_format = date_time_oper.date_parse(time_point_str)
+    if opts.offsets1:
+        for offset in opts.offsets1:
+            time_point = date_time_oper.date_shift(time_point, offset)
+    if opts.print_format:
+        print date_time_oper.date_format(opts.print_format, time_point)
+    elif parse_format:
+        print date_time_oper.date_format(parse_format, time_point)
+    else:
+        print str(time_point)
+
+
+def _print_time_interval(date_time_oper, opts, args):
+    """Implement usage 2 of "rose date", print time interval."""
+    time_point_str_1, time_point_str_2 = args
+    time_point_1 = date_time_oper.date_parse(time_point_str_1)[0]
+    time_point_2 = date_time_oper.date_parse(time_point_str_2)[0]
+    if opts.offsets1:
+        for offset in opts.offsets1:
+            time_point_1 = date_time_oper.date_shift(time_point_1, offset)
+    if opts.offsets2:
+        for offset in opts.offsets2:
+            time_point_2 = date_time_oper.date_shift(time_point_2, offset)
+    time_interval, sign = date_time_oper.date_diff(time_point_1, time_point_2)
+    print date_time_oper.date_diff_format(opts.print_format, time_interval,
+                                          sign)
 
 
 if __name__ == "__main__":
