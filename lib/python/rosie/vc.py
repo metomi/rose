@@ -344,7 +344,8 @@ class RosieVCClient(object):
         else:
             info_config.set(["project"], "")
         if from_title:
-            info_config.set(["title"], "Copy of %s: %s" % (from_id, from_title))
+            info_config.set(["title"], "Copy of %s: %s" % 
+                            (from_id.to_string_with_version(), from_title))
         else:
             info_config.set(["title"], "")
         return info_config
@@ -375,7 +376,8 @@ class RosieVCClient(object):
             self.popen("svn", "cp", "-q", from_id_url, os.path.join(d, "trunk"))
             rose.config.dump(info_config,
                              os.path.join(d, "trunk", "rose-suite.info"))
-            message = "%s: new suite, a copy of %s" % (new_id, from_id)
+            message = "%s: new suite, a copy of %s/%s@%s" % (new_id, from_id, 
+                       from_id.branch, from_id.to_string_with_version())
             try:
                 self.popen("svn", "commit", "-q", "-m", message, temp_local_copy)
                 self.event_handler(SuiteCreateEvent(new_id))
@@ -429,6 +431,7 @@ def create(argv):
             from_id.branch = from_id.BRANCH_TRUNK
         if from_id.revision is None:
             from_id.revision = from_id.REV_HEAD
+            from_id = SuiteId(id_text=from_id.to_string_with_version())
     if opts.info_file is None:
         try:
             info_config = client.generate_info_config(from_id, opts.prefix)

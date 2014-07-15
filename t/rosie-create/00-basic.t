@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 32
+tests 40
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -156,13 +156,36 @@ file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
 access-list=*
 owner=fred
 project=don't fail please
-title=Copy of foo-aa002: this should never ever fail
+title=Copy of foo-aa002/trunk@3: this should never ever fail
 __INFO__
 {
     echo -n 'Create? y/n (default n) '
     echo "[INFO] foo-aa003: created at $URL/a/a/0/0/3"
     echo '[INFO] foo-aa003: copied items from foo-aa002'
     echo "[INFO] foo-aa003: local copy created at $PWD/roses/foo-aa003"
+}>"$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-copy-empty-trunk-head
+cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
+access-list=*
+owner=$USER
+project=fork
+title=divide and conquer 4
+__INFO__
+run_pass "$TEST_KEY" rosie create foo-aa002/trunk@HEAD <<<y
+file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+access-list=*
+owner=fred
+project=don't fail please
+title=Copy of foo-aa002/trunk@3: this should never ever fail
+__INFO__
+{
+    echo -n 'Create? y/n (default n) '
+    echo "[INFO] foo-aa004: created at $URL/a/a/0/0/4"
+    echo '[INFO] foo-aa004: copied items from foo-aa002'
+    echo "[INFO] foo-aa004: local copy created at $PWD/roses/foo-aa004"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -190,13 +213,46 @@ file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
 access-list=*
 owner=fred
 project=don't fail
-title=Copy of foo-aa001: this should never fail
+title=Copy of foo-aa001/trunk@6: this should never fail
 __INFO__
 {
     echo -n 'Create? y/n (default n) '
-    echo "[INFO] foo-aa004: created at $URL/a/a/0/0/4"
-    echo '[INFO] foo-aa004: copied items from foo-aa001'
-    echo "[INFO] foo-aa004: local copy created at $PWD/roses/foo-aa004"
+    echo "[INFO] foo-aa005: created at $URL/a/a/0/0/5"
+    echo '[INFO] foo-aa005: copied items from foo-aa001'
+    echo "[INFO] foo-aa005: local copy created at $PWD/roses/foo-aa005"
+}>"$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-copy-not-empty-trunk-head
+# Add something to an existing suite working copy
+mkdir -p $PWD/roses/foo-aa001/{app/hello,etc}
+cat >$PWD/roses/foo-aa001/app/hello/rose-app.conf <<'__ROSE_APP_CONF__'
+[command]
+default=echo Hello
+__ROSE_APP_CONF__
+echo $(($RANDOM % 10)) >$PWD/roses/foo-aa001/etc/number
+svn ci -q -m 't' $PWD/roses/foo-aa001
+svn up -q $PWD/roses/foo-aa001
+# Issue the copy command
+cat >"$TEST_KEY_BASE-edit.in" <<__INFO__
+access-list=*
+owner=$USER
+project=fork
+title=divide and conquer 3
+__INFO__
+run_pass "$TEST_KEY" rosie create foo-aa001/trunk@HEAD <<<y
+file_cmp "$TEST_KEY.edit.out" "$TEST_KEY_BASE-edit.out" <<__INFO__
+access-list=*
+owner=fred
+project=don't fail
+title=Copy of foo-aa001/trunk@8: this should never fail
+__INFO__
+{
+    echo -n 'Create? y/n (default n) '
+    echo "[INFO] foo-aa006: created at $URL/a/a/0/0/6"
+    echo '[INFO] foo-aa006: copied items from foo-aa001'
+    echo "[INFO] foo-aa006: local copy created at $PWD/roses/foo-aa006"
 }>"$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" "$TEST_KEY.out.1"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -215,8 +271,8 @@ done
 set +e
 run_pass "$TEST_KEY" rosie create foo-aa001 -y --no-checkout
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[INFO] foo-aa010: created at $URL/a/a/0/1/0
-[INFO] foo-aa010: copied items from foo-aa001
+[INFO] foo-aa012: created at $URL/a/a/0/1/2
+[INFO] foo-aa012: copied items from foo-aa001
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
