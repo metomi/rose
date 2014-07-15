@@ -127,8 +127,8 @@ class RoseDateTimeOperator(object):
     def date_parse(self, time_point_str=None):
         """Parse time_point_str.
 
-        Return (t, format) where t is a datetime.datetime object and format is
-        the format that matches time_point_str.
+        Return (t, format) where t is a isodatetime.data.TimePoint object and
+        format is the format that matches time_point_str.
 
         time_point_str -- The time point string to parse.
                           Otherwise, use current time.
@@ -272,14 +272,14 @@ class RoseDateTimeOperator(object):
         hour = int(hour)
         minute = int(minute)
         second = int(second)
-        time_point = datetime(year, month, day, hour, minute, second,
-                              microsecond)
-        return time_point.strftime(print_format)
+        date_time = datetime(year, month, day, hour, minute, second,
+                             microsecond)
+        return date_time.strftime(print_format)
 
     def get_datetime_strptime(self, time_point_str, parse_format):
         """Use the datetime library's strptime as a fallback."""
-        time_point = datetime.strptime(time_point_str, parse_format)
-        return self.time_point_parser.parse(time_point.isoformat())
+        date_time = datetime.strptime(time_point_str, parse_format)
+        return self.time_point_parser.parse(date_time.isoformat())
 
 
 def main():
