@@ -1430,6 +1430,7 @@ class TimePoint(object):
             self.minute_of_hour = minutes
         if self.hour_of_day is not None:
             num_days, hours = divmod(self.hour_of_day, CALENDAR.HOURS_IN_DAY)
+            num_days = int(num_days)
             if self.day_of_week is not None:
                 self.day_of_week += num_days
             elif self.day_of_month is not None:
