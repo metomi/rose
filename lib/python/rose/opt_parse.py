@@ -71,9 +71,8 @@ class RoseOptionParser(OptionParser):
                        ["--calendar"],
                        {"action": "store",
                         "choices": ["360day", "gregorian"],
-                        "default": None,
-                        "dest": "calendar_type",
-                        "help": "Set the calendar."}],
+                        "metavar": "MODE",
+                        "help": "Set the calendar mode."}],
                "case_mode": [
                        ["--case"],
                        {"action": "store",
@@ -332,12 +331,18 @@ class RoseOptionParser(OptionParser):
                         "default": False,
                         "dest": "no_pretty_mode",
                         "help": "Switch off format-specific prettyprinting."}],
-               "offsets": [
-                       ["--offset", "-s"],
+               "offsets1": [
+                       ["--offset1", "--offset", "-s", "-1"],
                        {"action": "append",
-                        "dest": "offsets",
+                        "dest": "offsets1",
                         "metavar": "OFFSET",
-                        "help": "Specify an offset."}],
+                        "help": "Specify offsets for 1st date time point."}],
+               "offsets2": [
+                       ["--offset2", "-2"],
+                       {"action": "append",
+                        "dest": "offsets2",
+                        "metavar": "OFFSET",
+                        "help": "Specify offsets for 2nd date time point."}],
                "opt_conf_keys": [
                        ["--opt-conf-key", "-O"],
                        {"action": "append",
@@ -543,10 +548,11 @@ class RoseOptionParser(OptionParser):
                         "default": None,
                         "dest": "user",
                         "help": "Apply to specified user."}],
-               "utc": [
+               "utc_mode": [
                        ["--utc", "-u"],
                        {"action": "store_true",
                         "default": False,
+                        "dest": "utc_mode",
                         "help": "Switch on UTC mode."}],
                "validate_all": [
                        ["--validate", "-V"],

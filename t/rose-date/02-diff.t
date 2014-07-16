@@ -17,38 +17,36 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose date --diff".
+# Test "rose date" usage 2, print time intervals.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 8
+tests 10
 #-------------------------------------------------------------------------------
-# Check correct diffing of dates
-TEST_KEY=$TEST_KEY_BASE-diff-date
-run_pass "$TEST_KEY"  rose date 20130301 --diff 20130101T12
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-P58DT12H
-__OUT__
+# Positive interval
+TEST_KEY=$TEST_KEY_BASE-pos
+run_pass "$TEST_KEY" rose date 20130101T12 20130301
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'P58DT12H'
 #-------------------------------------------------------------------------------
-# Check rose date will fail to subtract a future date
-TEST_KEY=$TEST_KEY_BASE-fail
-run_fail "$TEST_KEY"  rose date 20130301 --diff 20150101T12
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__OUT__
-[FAIL] 20150101T12: cannot be subtracted from earlier date: 20130301
-__OUT__
+# Negative interval
+TEST_KEY=$TEST_KEY_BASE-neg
+run_pass "$TEST_KEY" rose date 20150101T12 20130301
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'-P671DT12H'
 #-------------------------------------------------------------------------------
-# Check rose date print format options for diff
+# Print format for time interval
 TEST_KEY=$TEST_KEY_BASE-formatting
-run_pass "$TEST_KEY"  rose date 20130301 --diff 20130101T12 -f "y,m,d,h,M,s"
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-0,0,58,12,0,0
-__OUT__
+run_pass "$TEST_KEY" rose date 20130101T12 20130301 -f "y,m,d,h,M,s"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'0,0,58,12,0,0'
 #-------------------------------------------------------------------------------
-# Check date offset working correctly in combination with diff
-TEST_KEY=$TEST_KEY_BASE-offset
-run_pass "$TEST_KEY" rose date 20100201T00 -s P1D --diff=20100101T00
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-P32D
-__OUT__
+# Offset 1, task cycle time mode
+TEST_KEY=$TEST_KEY_BASE-offset1
+ROSE_TASK_CYCLE_TIME=20150106 \
+    run_pass "$TEST_KEY" rose date -c -1 P11M24D 20140101 ref
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'P12D'
+#-------------------------------------------------------------------------------
+# Offset 2
+TEST_KEY=$TEST_KEY_BASE-offset2
+run_pass "$TEST_KEY" rose date 20100101T00 20100201T00 -2 P1D
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'P32D'
 #-------------------------------------------------------------------------------
 exit 0

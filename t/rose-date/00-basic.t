@@ -77,10 +77,10 @@ fi
 #-------------------------------------------------------------------------------
 # Produce a print format from the current date/time.
 TEST_KEY=$TEST_KEY_BASE-current-print-format
-run_pass "$TEST_KEY" rose date --print-format="%D %r"
+run_pass "$TEST_KEY" rose date --print-format="%D %R" now
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 DATE_TIME_STR=$(cat $TEST_KEY.out)
-run_pass "$TEST_KEY-vs-date" date -d "$DATE_TIME_STR" +"%D %r"
+run_pass "$TEST_KEY-vs-date" date -d "$DATE_TIME_STR" +"%D %R"
 file_cmp "$TEST_KEY-vs-date.err" "$TEST_KEY-vs-date.err" </dev/null
 file_cmp "$TEST_KEY-vs-date.out" "$TEST_KEY-vs-date.out" <<__OUT__
 $DATE_TIME_STR

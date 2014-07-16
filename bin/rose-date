@@ -21,33 +21,86 @@
 #     rose-date
 #
 # SYNOPSIS
-#     rose date [OPTIONS] [DATE-TIME]
+#     # 1. Print date time point
+#     # 1.1 Current date time with an optional offset
+#     rose date [--offset=OFFSET]
+#     rose date now [--offset=OFFSET]
+#     rose date ref [--offset=OFFSET]
+#     # 1.2 Task cycle date time with an optional offset
+#     #     Assume: export ROSE_TASK_CYCLE_TIME=20371225T000000Z
+#     rose date -c [--offset=OFFSET]
+#     rose date -c ref [--offset=OFFSET]
+#     # 1.3 A specific date time with an optional offset
+#     rose date 20380119T031407Z [--offset=OFFSET]
+#
+#     # 2. Print date time interval
+#     # 2.1 Between now (+ OFFSET1) and a future date time (+ OFFSET2)
+#     rose date now [--offset1=OFFSET1] 20380119T031407Z [--offset2=OFFSET2]
+#     # 2.2 Between a date time in the past and now
+#     rose date 19700101T000000Z now
+#     # 2.3 Between task cycle time (+ OFFSET1) and a future date time
+#     #     Assume: export ROSE_TASK_CYCLE_TIME=20371225T000000Z
+#     rose date -c ref [--offset1=OFFSET1] 20380119T031407Z
+#     # 2.4 Between task cycle time and now (+ OFFSET2)
+#     #     Assume: export ROSE_TASK_CYCLE_TIME=20371225T000000Z
+#     rose date -c ref now [--offset2=OFFSET2]
+#     # 2.5 Between a date time in the past and the task cycle date time
+#     #     Assume: export ROSE_TASK_CYCLE_TIME=20371225T000000Z
+#     rose date -c 19700101T000000Z ref
+#     # 2.6 Between 2 specific date times
+#     rose date 19700101T000000Z 20380119T031407Z
 #
 # DESCRIPTION
-#     Display the current or the specified DATE-TIME with an optional offset.
+#     Parse and print 1. a date time point or 2. a date time interval.
+#
+#     1. With 0 or 1 argument. Print the current or the specified date time
+#        point with an optional offset.
+#
+#     2. With 2 arguments. Print the time interval between the 2 arguments.
 #
 # OPTIONS
-#     --calendar=CALENDAR_TYPE
-#         Manually set the calendar to use: "gregorian" or "360day". Uses 
-#         $ROSE_CYCLING_MODE if this isn't set. Defaults to "gregorian".
-#     --diff=DIFF_DATE
-#         Specify a date to subtract from DATE-TIME, returning details of the 
-#         time interval. DIFF_DATE must be an earlier date than DATE-TIME. By 
-#         default the returned interval will take the form of a date-time
-#         offset. For example:
-#         rose date 20100301T00 --diff=20100102T12
-#         will return P57DT12H. The format of the output can be customised
-#         using the --print-format=FORMAT option.
-#     --offset=OFFSET, -s OFFSET
-#         Specify an offset to add to the current or the specified DATE-TIME.
-#         OFFSET must follow the ISO 8601 duration representations such as
-#         PnW or PnYnMnDTnHnMnS - P followed by a series of nU where U is the
-#         unit (Y, M, D, H, M, S) and n is a positive integer, where T
-#         delimits the date series from the time series if any time units are
-#         used. n may also have a decimal (e.g. PT5.5M) part for a unit
-#         provided no smaller units are supplied. It is not necessary to
-#         specify zero values for units. If OFFSET is negative, prefix a "-".
-#         For example:
+#     --calendar=gregorian|360day|365day|366day
+#         Specify the calendar mode. See CALENDAR MODE below.
+#     --offset1=OFFSET, --offset=OFFSET, -s OFFSET, -1 OFFSET
+#         Specify 1 or more offsets to add to argument 1 or the current time.
+#         See OFFSET FORMAT below.
+#     --offset2=OFFSET, -2 OFFSET
+#         Specify 1 or more offsets to add to argument 2.
+#         See OFFSET FORMAT below.
+#     --parse-format=FORMAT, -p FORMAT
+#         Specify a format for parsing DATE-TIME. See PARSE FORMAT below.
+#     --print-format=FORMAT, --format=FORMAT, -f FORMAT
+#         Specify a format for printing the result. See PRINT FORMAT below.
+#     --use-task-cycle-time, -c
+#         Use the value of the ROSE_TASK_CYCLE_TIME environment variable as the
+#         reference time instead of the current time.
+#     --utc, -u
+#         Assume date time in UTC instead of local or other time zones.
+#
+# CALENDAR MODE
+#     The calendar mode is determined (in order) by:
+#     1. The --calendar=MODE option.
+#     2. The ROSE_CYCLING_MODE environment variable.
+#     3. Default to "gregorian".
+#
+# ENVIRONMENT VARIABLES
+#     ROSE_CYCLING_MODE=gregorian|360day|365day|366day
+#         Specify the calendar mode. 
+#     ROSE_TASK_CYCLE_TIME
+#         Specify the current cycle time of a task in a suite. If the
+#         --use-task-cycle-time option is set, the value of this environment
+#         variable is used by the command as the reference time instead of the
+#         current time.
+#
+# OFFSET FORMAT
+#     OFFSET must follow the ISO 8601 duration representations such as
+#     PnW or PnYnMnDTnHnMnS - P followed by a series of nU where U is the
+#     unit (Y, M, D, H, M, S) and n is a positive integer, where T
+#     delimits the date series from the time series if any time units are
+#     used. n may also have a decimal (e.g. PT5.5M) part for a unit
+#     provided no smaller units are supplied. It is not necessary to
+#     specify zero values for units. If OFFSET is negative, prefix a "-".
+#     For example:
 #         P6D - 6 day offset
 #         PT6H - 6 hour offset
 #         PT1M - 1 minute offset
@@ -56,51 +109,55 @@
 #         P2W - 2 week offset (note no other units may be combined with weeks)
 #         P2DT5.5H - 2 day, 5.5 hour offset
 #         -P2YT4S - (negative) 2 year, 4 second offset
-#         The following deprecated syntax is supported:
-#         OFFSET in the form nU where U is the unit (w for weeks, d for days,
-#         h for hours, m for minutes and s for seconds) and n is a positive or
-#         negative integer. Multiple offsets can be specified with multiple
-#         --offset=OFFSET options.
-#     --parse-format=FORMAT, -p FORMAT
-#         Specify a format for parsing DATE-TIME, which should
-#         be compatible with the POSIX strptime template format (see
-#         the strptime command help), with the following subset supported
-#         across all date/time ranges: %F, %H, %M, %S, %Y, %d, %j, %m, %s, %z.
-#         If not specified, the system will attempt to parse DATE-TIME using
-#         the following formats:
-#         * ctime: "%a %b %d %H:%M:%S %Y"
-#         * Unix date: "%a %b %d %H:%M:%S %Z %Y"
-#         * ISO8601: "%Y-%m-%dT%H:%M:%S", "%Y%m%dT%H%M%S"
-#         * Cylc: "%Y%m%d%H"
-#         If none of these match, DATE-TIME will be parsed according to the
-#         ISO 8601 date/time standard.
-#     --print-format=FORMAT, --format=FORMAT, -f FORMAT
-#         Specify a format for printing the result. For non diff operations 
-#         this will default to the same format as the parse format. Also 
-#         supports the isodatetime library dump syntax for these operations 
-#         which follows ISO 8601 example syntax - for example:
+#
+#     The following deprecated syntax is supported:
+#     OFFSET in the form nU where U is the unit (w for weeks, d for days,
+#     h for hours, m for minutes and s for seconds) and n is a positive or
+#     negative integer.
+#
+# PARSE FORMAT
+#     The format for parsing a date time point should be compatible with the
+#     POSIX strptime template format (see the strptime command help), with the
+#     following subset supported across all date/time ranges:
+#         %F, %H, %M, %S, %Y, %d, %j, %m, %s, %z
+#
+#     If not specified, the system will attempt to parse DATE-TIME using
+#     the following formats:
+#         ctime: "%a %b %d %H:%M:%S %Y"
+#         Unix date: "%a %b %d %H:%M:%S %Z %Y"
+#         Basic ISO8601: "%Y-%m-%dT%H:%M:%S", "%Y%m%dT%H%M%S"
+#         Cylc: "%Y%m%d%H"
+#
+#     If none of these match, the date time point will be parsed according to
+#     the full ISO 8601 date/time standard.
+#
+# PRINT FORMAT
+#     For printing a date time point, the print format will default to the same
+#     format as the parse format. Also supports the isodatetime library dump
+#     syntax for these operations which follows ISO 8601 example syntax - for
+#     example:
 #         'CCYY-MM-DDThh:mm:ss' -> '1955-11-05T09:28:00',
 #         'CCYY' -> '1955',
 #         'CCYY-DDD' -> '1955-309',
 #         'CCYY-Www-D' -> '1955-W44-6'.
-#         Usage of this ISO 8601-like syntax should be as ISO 8601-compliant
-#         as possible.
-#         Note that specifying an explicit timezone in this format (e.g.
-#         'CCYY-MM-DDThh:mm:ss+0100' or 'CCYYDDDThhmmZ' will automatically
-#         adapt the date/time to that timezone i.e. apply the correct
-#         hour/minute UTC offset.
-#         For diffs, the following can be used in format statements:
-#         y : years
-#         m : months
-#         d : days
-#         h : hours
-#         M : minutes
-#         s : seconds
-#         For example, for a time interval P57DT12H:
+#
+#     Usage of this ISO 8601-like syntax should be as ISO 8601-compliant
+#     as possible.
+#
+#     Note that specifying an explicit timezone in this format (e.g.
+#     'CCYY-MM-DDThh:mm:ss+0100' or 'CCYYDDDThhmmZ' will automatically
+#     adapt the date/time to that timezone i.e. apply the correct
+#     hour/minute UTC offset.
+#
+#     For printing a date time interval, the following can be used in format
+#     statements:
+#         y: years
+#         m: months
+#         d: days
+#         h: hours
+#         M: minutes
+#         s: seconds
+#     For example, for a time interval P57DT12H:
 #         'y,m,d,h' -> '0,0,57,12'
-#     --use-task-cycle-time, -c
-#         Shorthand for `rose date $ROSE_TASK_CYCLE_TIME`.
-#     --utc, -u
-#         Parse/print date time in UTC instead of local or other time zones.
 #-------------------------------------------------------------------------------
 exec python -m rose.date "$@"

@@ -25,7 +25,7 @@ import isodatetime.parsers
 import os
 import pwd
 import re
-from rose.date import RoseDateShifter, OffsetValueError
+from rose.date import RoseDateTimeOperator, OffsetValueError
 from rose.env import env_var_process
 from rose.fs_util import FileSystemUtil
 from rose.popen import RosePopener
@@ -331,7 +331,7 @@ class SuiteEngineProcessor(object):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        self.date_shifter = RoseDateShifter()
+        self.date_time_oper = RoseDateTimeOperator()
 
     def check_global_conf_compat(self):
         """Raise exception on suite engine specific incompatibity.
@@ -686,9 +686,11 @@ class SuiteEngineProcessor(object):
         at the moment.
 
         """
-        offset_string = str(cycle_offset.to_interval())
+        offset_str = str(cycle_offset.to_interval())
         try:
-            return self.date_shifter.date_shift(cycle, offset_string)
+            time_point, parse_format = self.date_time_oper.date_parse(cycle)
+            time_point = self.date_time_oper.date_shift(time_point, offset_str)
+            return self.date_time_oper.date_format(parse_format, time_point)
         except OffsetValueError:
             raise
         except ValueError:

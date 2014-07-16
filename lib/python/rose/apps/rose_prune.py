@@ -21,7 +21,7 @@
 
 import os
 from rose.app_run import BuiltinApp, ConfigValueError
-from rose.date import RoseDateShifter
+from rose.date import RoseDateTimeOperator
 from rose.env import env_var_process, UnboundEnvironmentVariableError
 from rose.fs_util import FileSystemEvent
 from rose.popen import RosePopenError
@@ -143,14 +143,20 @@ class RosePruneApp(BuiltinApp):
         except UnboundEnvironmentVariableError as exc:
             raise ConfigValueError([self.SECTION, key], items_str, exc)
         items = []
-        dshift = RoseDateShifter(task_cycle_time_mode=True)
+        ref_time_point = os.getenv(
+            RoseDateTimeOperator.TASK_CYCLE_TIME_MODE_ENV)
+        date_time_oper = RoseDateTimeOperator(ref_time_point=ref_time_point)
         for item_str in shlex.split(items_str):
             args = item_str.split(":", max_args)
-            item = args.pop(0)
-            cycle = item
-            if dshift.is_task_cycle_time_mode():
+            offset = args.pop(0)
+            cycle = offset
+            if ref_time_point:
                 try:
-                    cycle = dshift.date_shift(offset=item)
+                    time_point, parse_format = date_time_oper.date_parse()
+                    time_point = date_time_oper.date_shift(time_point, offset)
+                    cycle = date_time_oper.date_format(
+                        parse_format,
+                        time_point)
                 except ValueError:
                     pass
             if max_args:
