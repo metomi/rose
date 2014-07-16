@@ -1136,7 +1136,7 @@ class ConfigPage(gtk.VBox):
             info = rose.config_editor.PAGE_WARNING_NO_CONTENT
             tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
             error_button = rose.gtk.util.CustomButton(
-                                stock_id=gtk.STOCK_DIALOG_WARNING,
+                                stock_id=gtk.STOCK_INFO,
                                 as_tool=True,
                                 tip_text=tip)
             error_label = gtk.Label()
