@@ -285,8 +285,7 @@ PAGE_WARNING = "Error ({0}): {1}"
 PAGE_WARNING_IGNORED_SECTION = "Ignored section: {0}"
 PAGE_WARNING_IGNORED_SECTION_TIP = "Ignored section"
 PAGE_WARNING_LATENT = "Latent page - no data"
-PAGE_WARNING_NO_CONTENT = ("Data may not exist or it may be a hidden " +
-                           "option at present.")
+PAGE_WARNING_NO_CONTENT = "Blank page - no data"
 PAGE_WARNING_NO_CONTENT_TIP = ("No associated configuration or summary data " +
                                "for this page.")
 WARNING_APP_CONFIG_CREATE = "Cannot create another configuration here."
