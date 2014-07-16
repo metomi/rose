@@ -822,6 +822,11 @@ class TestSuite(unittest.TestCase):
         pool = multiprocessing.Pool(processes=4)
         pool.map_async(test_timepoint_at_year, range(1801, 2403)).get()
 
+    def test_timepoint_plus_float_time_interval_day_of_month_type(self):
+        """Test (TimePoint + TimeInterval).day_of_month is an int."""
+        time_point = data.TimePoint(year=2000) + data.TimeInterval(seconds=1.0)
+        self.assertEqual(type(time_point.day_of_month), int)
+
     def test_timepoint_time_zone(self):
         """Test the time zone handling of timepoint instances."""
         year = 2000
