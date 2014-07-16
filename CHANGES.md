@@ -16,8 +16,14 @@ This release of Rose will work best with the upcoming
 
 ### Noteworthy Changes
 
+[#1335](https://github.com/metomi/rose/pull/1335):
+rose config-edit: fix warning on empty namespace/pages.
+
 [#1327](https://github.com/metomi/rose/pull/1327):
 rose app-upgrade: better output macro name.
+
+[#1325](https://github.com/metomi/rose/pull/1325):
+rosie copy: print full source ID in logs and suite info.
 
 [#1320](https://github.com/metomi/rose/pull/1320):
 rose config-edit, rose macro: check id usage in `fail-if`, `warn-if`.
@@ -25,8 +31,9 @@ rose config-edit, rose macro: check id usage in `fail-if`, `warn-if`.
 [#1317](https://github.com/metomi/rose/pull/1317):
 rose stem: configurable autmatic options.
 
+[#1332](https://github.com/metomi/rose/pull/1332),
 [#1316](https://github.com/metomi/rose/pull/1316):
-rose date --diff: new option, print interval between 2 date-times.
+rose date: new usage to print interval between 2 date time points.
 
 [#1306](https://github.com/metomi/rose/pull/1306):
 rose app-upgrade: better error message for upgrade to same version.
