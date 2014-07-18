@@ -305,14 +305,45 @@ class PageLatentTable(gtk.Table):
                     if variable.metadata['id'] == var_id:
                         is_ghost = True
                         break
-            variable_widget = rose.config_editor.variable.VariableWidget(
+            variable_widget = self.get_variable_widget(
+                variable, is_ghost=is_ghost)
+            variable_widget.insert_into(self, self.MAX_COLS, r + 1)
+            variable_widget.set_sensitive(not is_ghost)
+            r = r + 1
+
+    def get_variable_widget(self, variable, is_ghost=False):
+        """Create a variable widget for this variable."""
+        return rose.config_editor.variable.VariableWidget(
                                                 variable,
                                                 self.var_ops,
                                                 is_ghost=is_ghost,
                                                 show_modes=self.show_modes)
-            variable_widget.insert_into(self, self.MAX_COLS, r + 1)
-            variable_widget.set_sensitive(not is_ghost)
-            r = r + 1
+
+    def reload_variable_widget(self, variable):
+        """Reload the widgets for the given variable."""
+        is_ghost = variable in self.ghost_data
+        new_variable_widget = self.get_variable_widget(variable, is_ghost)
+        new_variable_widget.set_sensitive(not is_ghost)
+        focus_dict = {"had_focus": False}
+        variable_row = None
+        for child in self.get_children():
+            variable_widget = child.get_parent()
+            if (variable_widget.variable.name == variable.name and
+                variable_widget.variable.metadata.get('id') ==
+                variable.metadata.get('id')):
+                if "index" not in focus_dict:
+                    focus_dict["index"] = variable_widget.get_focus_index()
+                if getattr(self, 'focus_child') == child:
+                    focus_dict["had_focus"] = True
+                top_row = self.child_get(child, 'top_attach')[0]
+                variable_row = top_row
+                self.remove(child)
+                child.destroy()
+        if variable_row is None:
+            return False
+        new_variable_widget.insert_into(self, self.MAX_COLS, variable_row)
+        if focus_dict["had_focus"]:
+            new_variable_widget.grab_focus(index=focus_dict.get("index"))
 
     def show_mode_change(self, mode, mode_on=False):
         done_variable_widgets = []
