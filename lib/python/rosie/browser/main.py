@@ -45,6 +45,7 @@ import rose.gtk.dialog
 import rose.gtk.run
 import rose.gtk.splash
 import rose.gtk.util
+import rose.macro
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopenError
 import rose.reporter
@@ -131,6 +132,8 @@ class MainWindow(gtk.Window):
                                             rosie.browser.PROGRAM_NAME))
         self.suite_engine_proc = SuiteEngineProcessor.get_processor(
                 event_handler=self.handle_view_output_event)
+        rose.macro.add_site_meta_paths()
+        rose.macro.add_env_meta_paths()
         self.show()
 
     def setup_window(self):
