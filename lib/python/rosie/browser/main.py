@@ -278,9 +278,9 @@ class MainWindow(gtk.Window):
             attempts += 1
             time.sleep(0.1)
 
-        self.repeat_last_request()
-
         self.handle_checkout(id_=new_id)
+
+        self.repeat_last_request()
 
     def display_local_suites(self, a_widget=None, navigate=True, user=None):
         """Get and display the locally stored suites."""
