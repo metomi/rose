@@ -16,6 +16,9 @@ This release of Rose will work best with the upcoming
 
 ### Noteworthy Changes
 
+[#1342](https://github.com/metomi/rose/pull/1342):
+rosie go: fix appearance of new suite in local suites.
+
 [#1335](https://github.com/metomi/rose/pull/1335):
 rose config-edit: fix warning on empty namespace/pages.
 
