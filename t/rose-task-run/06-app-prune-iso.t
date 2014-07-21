@@ -22,6 +22,9 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
+JOB_HOST=$(rose config --default= 't' 'job-host')
+JOB_HOST=$(rose host-select "$JOB_HOST")
+#-------------------------------------------------------------------------------
 # Test the suite.
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
@@ -35,42 +38,21 @@ if (($? != 0)); then
     exit 0
 fi
 #-------------------------------------------------------------------------------
-tests 9
-#-------------------------------------------------------------------------------
-JOB_HOST=$(rose config --default= 't' 'job-host')
-if [[ -z $JOB_HOST ]]; then
-    skip 3 '[t]job-host not defined'
-else
-    JOB_HOST=$(rose host-select $JOB_HOST)
-fi
+tests 7
 #-------------------------------------------------------------------------------
 # Run the suite.
 if [[ -n ${JOB_HOST:-} ]]; then
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
         --no-gcontrol --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\""
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --debug
 else
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost
-fi
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
+    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+        --no-gcontrol --host=localhost -- --debug
 fi
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-prune-log
 sed '/^\[INFO\] \(create\|delete\|update\)/!d;
+     /^\[INFO\] create.*share\/data/d;
      /^\[INFO\] delete: \.rose-suite-log.lock/d;
      /\.json/d;
      /[0-9a-h]\{8\}\(-[0-9a-h]\{4\}\)\{3\}-[0-9a-h]\{12\}$/d' \
@@ -103,6 +85,8 @@ if [[ -n $JOB_HOST ]]; then
         $TEST_SOURCE_DIR/$TEST_KEY.out >expected-host-ls.out
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out" expected-host-ls.out
     file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+else
+    skip 3 '[t]job-host not defined'
 fi
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
