@@ -36,7 +36,8 @@ cat >src/rose-suite.conf <<'__CONF__'
 ROSE_TASK_RUN_ARGS="-O earth"
 __CONF__
 run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
-sed '1,/export ROSE_VERSION=/d' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
+sed '1,/export ROSE_VERSION=/d; /^\[INFO\] delete: .*\/.cylc\//d' \
+    "$TEST_KEY.out" >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] delete: suite.rc
 [INFO] install: suite.rc

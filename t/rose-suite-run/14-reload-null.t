@@ -31,7 +31,8 @@ poll ! test -e "$SUITE_RUN_DIR/log/job/t1.2013010100.1.status"
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-0"
 run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
-sed '1,/export ROSE_VERSION=/d' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
+sed '1,/export ROSE_VERSION=/d; /^\[INFO\] delete: .*\/.cylc\//d' \
+    "$TEST_KEY.out" >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] $NAME: reload complete. "suite.rc" unchanged
 __OUT__
