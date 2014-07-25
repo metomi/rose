@@ -29,6 +29,7 @@ Functions:
 """
 
 
+import ast
 import os
 import re
 import requests
@@ -38,6 +39,8 @@ from rosie.ws_client_auth import (RosieWSClientAuthManager,
 from rose.opt_parse import RoseOptionParser
 from rose.popen import RosePopener, RosePopenError
 from rose.reporter import Reporter, Event
+from rose.resource import ResourceLocator
+import shlex
 import simplejson
 import sys
 import time
@@ -81,6 +84,23 @@ class RosieWSClient(object):
         self.auth_manager = RosieWSClientAuthManager(
                         self.prefix, popen=popen, prompt_func=prompt_func)
         self.root = self.auth_manager.root
+        self.requests_kwargs = {}
+        res_loc = ResourceLocator.default()
+        https_ssl_verify_mode_str = res_loc.get_value([
+            "rosie-id",
+            "prefix-https-ssl-verify." + prefix])
+        if https_ssl_verify_mode_str:
+            https_ssl_verify_mode = ast.literal_eval(https_ssl_verify_mode_str)
+            self.requests_kwargs["verify"] = bool(https_ssl_verify_mode)
+        https_ssl_cert_str = res_loc.get_value([
+            "rosie-id",
+            "prefix-https-ssl-cert." + prefix])
+        if https_ssl_cert_str:
+            https_ssl_cert = shlex.split(https_ssl_cert_str)
+            if len(https_ssl_cert) == 1:
+                self.requests_kwargs["cert"] = https_ssl_cert[0]
+            else:
+                self.requests_kwargs["cert"] = tuple(https_ssl_cert[0:2])
 
     def _get(self, method, **kwargs):
         """Send a JSON object to the web server and retrieve results."""
@@ -94,7 +114,10 @@ class RosieWSClient(object):
         while True:
             auth = self.auth_manager.get_auth(is_retry)
             try:
-                response = requests.get(url, params=kwargs, auth=auth)
+                requests_kwargs = dict(self.requests_kwargs)
+                requests_kwargs["params"] = kwargs
+                requests_kwargs["auth"] = auth
+                response = requests.get(url, **requests_kwargs)
             except requests.exceptions.ConnectionError as exc:
                 raise QueryError("%s: %s: %s" % (url, method, str(exc)))
             except requests.exceptions.MissingSchema as exc:

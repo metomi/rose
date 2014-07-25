@@ -47,6 +47,7 @@
 [external]
 
 ## LDAP settings are only relevant if "[rosa-svn]user-tool=ldap".
+#
 ## The attributes for UID, common name and email in the LDAP directory.
 ## (default=uid cn mail)
 #  attrs=uid cn mail
@@ -54,14 +55,17 @@
 #  basedn=BASEDN
 ## The DN in the LDAP server to bind with to search the directory
 #  binddn=BINDDN
+## If specified, use the value as extra (AND) filters to an LDAP search
+#  filter-more=
 ## The file containing the password to the LDAP server, if required.
 ## (default=~/.ldappw)
-#  password-file=PASSWORD
+#  password-file=
 ## The URI of the LDAP server
 #  uri=ldap://my-ldap.my-domain
 [rosa-ldap]
 
 # Configuration for "rosa svn-pre-commit" and "rosa svn-post-commit".
+#
 ## Admin users allowed to write to the trunk of any suite.
 #  super-users=USER1 ...
 ## E.g.
@@ -248,6 +252,13 @@
 #  prefix-default=PREFIX
 ## E.g.:
 #  prefix-default=foo
+## For HTTPS requests, verify SSL certificates? (default=True)
+#  prefix-https-ssl-verify.PREFIX=True|False
+## E.g.:
+#  prefix-https-ssl-verify.foo=False
+## For HTTPS requests, location(s) of certificate + private key files
+#  prefix-https-ssl-cert.PREFIX=/path/to/server.pem
+#  prefix-https-ssl-cert.PREFIX=/path/to/server.crt /path/to/key
 ## URL of the repository of an ID prefix, no trailing slash
 #  prefix-location.PREFIX=URL
 ## E.g.:
@@ -277,6 +288,12 @@
 ## E.g.:
 #  port=8080
 [rosie-ws]
+
+# Configuration related to Rosie web service clients
+#
+## A boolean
+#  https-verify-ssl.PREFIX=True|False
+[rosie-ws-client-requests]
 
 # Test Battery Configuration
 #

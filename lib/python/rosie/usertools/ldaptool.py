@@ -78,6 +78,9 @@ class LDAPUserTool(object):
             passwd = open(os.path.expanduser(passwd_file)).read().strip()
         basedn = conf.get_value(["rosa-ldap", "basedn"], "")
         filter_str = "(|(uid=" + ")(uid=".join(users) + "))"
+        filter_more_str = conf.get_value(["rosa-ldap", "filter-more"], "")
+        if filter_more_str:
+            filter_str = "(&" + filter_str + filter_more_str + ")"
         user_attr_str = conf.get_value(["rosa-ldap", "attrs"], cls.USER_ATTRS)
         attr = user_attr_str.split()[attr_idx]
 
