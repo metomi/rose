@@ -120,7 +120,7 @@ fail-if=namelist:coffee=cup_volume &lt; namelist:coffee=machine_output_volume;
       (metadata section) id - e.g.:</p>
       <pre class="prettyprint lang-rose_conf">
 [namelist:coffee=daily_amount]
-fail-if=namelist:coffee=daily_min &lt;= this &lt;= namelist:coffee=daily_max;
+fail-if=this &lt; namelist:coffee=daily_min or this &gt;= namelist:coffee=daily_max;
 </pre>
 
       <p>There is also some array shorthand, which we'll demonstrate later.</p>
