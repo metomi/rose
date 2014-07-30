@@ -138,6 +138,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
 class RuleEvaluator(rose.macro.MacroBase):
 
     """Evaluate logical expressions in the metadata."""
+
     ARRAY_EXPR = "{0}({1}) {2} {3}"
     ARRAY_FUNC_LOGIC = {"all": " and ",
                         "any": " or "}
@@ -150,7 +151,7 @@ class RuleEvaluator(rose.macro.MacroBase):
     REC_CONFIG_ID = re.compile(r"""
                       (?:\W|^)        (?# Break or beginning)
                       (               (?# Begin ID capture)
-                       [\w:\.]+         (?# 1st part of section, including :)
+                       [\w:.]+         (?# 1st part of section, including :)
                        (?:\{.*?\})?   (?# Optional modifier for the section)
                        (?:\([^)]*\))? (?# Optional element for the section)
                        =              (?# Section-option delimiter)
@@ -163,7 +164,7 @@ class RuleEvaluator(rose.macro.MacroBase):
                      (?:\W|^)    (?# Break or beginning)
                      (           (?# Begin number capture)
                       [-+]?      (?# Optional sign)
-                      [\d]+     (?# Optional sign. Digit and dot)
+                      [\d.]+     (?# Optional sign. Digit and dot)
                       [ed][-+]?  (?# Exponent, [edED] with ignored case)
                       \d+        (?# Exponent number)
                      )           (?# End number capture)
