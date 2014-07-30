@@ -60,6 +60,8 @@
 ## The file containing the password to the LDAP server, if required.
 ## (default=~/.ldappw)
 #  password-file=
+## The location of the TLS CA certificate file
+#  tls-ca-file=
 ## The URI of the LDAP server
 #  uri=ldap://my-ldap.my-domain
 [rosa-ldap]

@@ -84,6 +84,9 @@ class LDAPUserTool(object):
         user_attr_str = conf.get_value(["rosa-ldap", "attrs"], cls.USER_ATTRS)
         attr = user_attr_str.split()[attr_idx]
 
+        tls_ca_file = conf.get_value(["rosa-ldap", "tls-ca-file"])
+        if tls_ca_file:
+            ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, tls_ca_file)
         conn = ldap.initialize(uri)
         conn.bind_s(binddn, passwd)
         results = conn.search_s(basedn, ldap.SCOPE_SUBTREE, filter_str, [attr])
