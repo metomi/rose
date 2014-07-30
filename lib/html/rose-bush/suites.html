@@ -25,7 +25,25 @@ rel="stylesheet" media="screen" />
 <div class="container-fluid">
 {% for entry in entries -%}
 <div class="row-fluid entry">
-<div class="span2">{{entry.name}}</div>
+{% set span=2 -%}
+{% set maxlen=25 -%}
+<div class="span{{span}}">
+{% if entry.name|length > maxlen -%}
+{% set new_name=entry.name.split('_') -%}
+{% set shortname=new_name[0] -%}
+{% for part in new_name[1:-1] -%}
+{% if shortname|length < maxlen -%}
+{% set shortname=shortname + '_' + part -%}
+{% endif -%}
+{% if loop.last -%}
+{{shortname}}
+{% endif -%}
+{% endfor -%}
+<abbr title="{{entry.name}}">{{entry.name|truncate(maxlen)}}</abbr>
+{% else -%}
+{{entry.name}}
+{% endif -%}
+</div>
 <div class="span2">
 <a class="btn btn-mini" href="{{script}}/cycles/{{user}}/{{entry.name}}">
 <i class="icon icon-tasks" title="cycles list"></i>
@@ -43,10 +61,20 @@ jobs list
 title="{{entry.last_activity_time}}">{{entry.last_activity_time}}</abbr></span>
 {% endif -%}{# entry.last_activity_time #}
 </div>
-{% for key, icon, span, maxlen in [("project", "tag", "2", 32), ("title", "comment", "4", 80)] -%}
+{% for key, icon, span, maxlen in [("project", "tag", "2", 20), ("title", "comment", "4", 80)] -%}
 <div class="span{{span}}">
 <i class="icon-{{icon}}" title="{{key}}"></i>
 {% if entry.info[key]|length > maxlen -%}
+{% set new_name=entry.info[key].split('_') -%}
+{% set shortname=new_name[0] -%}
+{% for part in new_name[1:-1] -%}
+{% if shortname|length < maxlen -%}
+{% set shortname=shortname + '_' + part -%}
+{% endif -%}
+{% if loop.last -%}
+{{shortname}}
+{% endif -%}
+{% endfor -%}
 <abbr title="{{entry.info[key]}}">{{entry.info[key]|truncate(maxlen)}}</abbr>
 {% else -%}
 {{entry.info[key]}}
