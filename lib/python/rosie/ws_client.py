@@ -86,13 +86,13 @@ class RosieWSClient(object):
         self.root = self.auth_manager.root
         self.requests_kwargs = {}
         res_loc = ResourceLocator.default()
-        https_ssl_verify_mode_str = res_loc.get_value([
+        https_ssl_verify_mode_str = res_loc.default().get_conf().get_value([
             "rosie-id",
             "prefix-https-ssl-verify." + prefix])
         if https_ssl_verify_mode_str:
             https_ssl_verify_mode = ast.literal_eval(https_ssl_verify_mode_str)
             self.requests_kwargs["verify"] = bool(https_ssl_verify_mode)
-        https_ssl_cert_str = res_loc.get_value([
+        https_ssl_cert_str = res_loc.default().get_conf().get_value([
             "rosie-id",
             "prefix-https-ssl-cert." + prefix])
         if https_ssl_cert_str:
