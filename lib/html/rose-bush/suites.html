@@ -25,9 +25,8 @@ rel="stylesheet" media="screen" />
 <div class="container-fluid">
 {% for entry in entries -%}
 <div class="row-fluid entry">
-{% set span=2 -%}
 {% set maxlen=23 -%}
-<div class="span{{span}}">
+<div class="span2">
 {% if entry.name|length > maxlen -%}
 <abbr title="{{entry.name}}">{{entry.name|truncate(maxlen,true)}}</abbr>
 {% else -%}
