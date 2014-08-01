@@ -43,7 +43,8 @@ class RoseDateTimeOperator(object):
 
     """A class to parse and print date string with an offset."""
 
-    DUMP_FORMAT_CURRENT = u"CCYY-MM-DDThh:mm:ss±hh:mm"
+    CURRENT_TIME_DUMP_FORMAT = u"CCYY-MM-DDThh:mm:ss+hh:mm"
+    CURRENT_TIME_DUMP_FORMAT_Z = u"CCYY-MM-DDThh:mm:ssZ"
 
     NEGATIVE = "-"
 
@@ -139,7 +140,10 @@ class RoseDateTimeOperator(object):
         if time_point_str is None or time_point_str == self.STR_NOW:
             time_point = get_timepoint_for_now()
             time_point.set_time_zone_to_local()
-            parse_format = self.DUMP_FORMAT_CURRENT
+            if self.utc_mode or time_point.get_time_zone_utc():  # is in UTC
+                parse_format = self.CURRENT_TIME_DUMP_FORMAT_Z
+            else:
+                parse_format = self.CURRENT_TIME_DUMP_FORMAT
         elif self.custom_parse_format is not None:
             parse_format = self.custom_parse_format
             time_point = self.strptime(time_point_str, parse_format)

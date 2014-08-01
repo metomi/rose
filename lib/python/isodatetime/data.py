@@ -36,6 +36,8 @@ class Calendar(object):
     DAYS_IN_MONTHS_LEAP = None  # This is set up in the set_* methods
     ROUGH_DAYS_IN_MONTH = 30  # Used for duration conversion, nowhere else.
 
+    LEAP_YEAR_FACTOR_TRUTHS = [(4, True), (100, False), (400, True)]
+
     MODE_360 = "360day"
     MODE_365 = "365day"
     MODE_366 = "366day"
@@ -174,8 +176,8 @@ class TimeRecurrence(object):
             end_year, end_days = self.end_point.get_ordinal_date()
             end_seconds = self.end_point.get_second_of_day()
             diff_days = end_days - start_days
-            for year in range(start_year, end_year):
-                diff_days += get_days_in_year(year)
+            if end_year > start_year:
+                diff_days += get_days_in_year_range(start_year, end_year - 1)
             diff_seconds = end_seconds - start_seconds
             if diff_seconds < 0:
                 diff_days -= 1
@@ -1334,11 +1336,9 @@ class TimePoint(object):
             diff_year = my_year - other_year
             diff_day = my_day_of_year - other_day_of_year
             if my_year > other_year:
-                for year in range(other_year, my_year):
-                    diff_day += get_days_in_year(year)
+                diff_day += get_days_in_year_range(other_year, my_year - 1)
             else:
-                for year in range(my_year, other_year):
-                    diff_day += get_days_in_year(year)
+                diff_day += get_days_in_year_range(my_year, other_year - 1)
             my_time = self.get_hour_minute_second()
             other_time = other.get_hour_minute_second()
             diff_hour = my_time[0] - other_time[0]
@@ -1587,7 +1587,7 @@ class TimePoint(object):
             if self.time_zone.hours == 0 and self.time_zone.minutes == 0:
                 time_string += "Z"
             else:
-                time_string += u"±hh:mm"
+                time_string += u"+hh:mm"
         return date_string + time_string
 
     def _get_truncated_dump_format(self):
@@ -1660,7 +1660,7 @@ class TimePoint(object):
             if self.time_zone.hours == 0 and self.time_zone.minutes == 0:
                 time_string += "Z"
             else:
-                time_string += u"±hh:mm"
+                time_string += u"+hh:mm"
         if date_string == "YY":
             date_string = "-YY"
             time_string = time_string.replace(":", "")
@@ -1681,14 +1681,59 @@ def _format_remainder(float_time_number):
 
 @util.cache_results
 def get_is_leap_year(year):
-    """Return if year is a leap year in the proleptic Gregorian calendar."""
-    if year % 4 == 0:
-        # A multiple of 4.
-        if year % 100 == 0 and year % 400 != 0:
-            # A centennial leap year must be a multiple of 400.
-            return False
-        return True
-    return False
+    """Return if year is a leap year."""
+    year_is_leap = False
+    for factor, is_leap_factor in CALENDAR.LEAP_YEAR_FACTOR_TRUTHS:
+        if year % factor == 0:
+            year_is_leap = is_leap_factor
+    return year_is_leap 
+
+
+def get_days_in_year_range(start_year, end_year):
+    """Return the number of days within this year range (inclusive)."""
+    return _get_days_in_year_range(start_year, end_year,
+                                   calendar_mode=CALENDAR.mode)
+
+@util.cache_results
+def _get_days_in_year_range(start_year, end_year, calendar_mode=None):
+    """Return the number of days within this year range (inclusive).
+
+    If end_year > start_year, return the days in start_year plus
+    the days in the intervening years before end_year, plus the
+    days in end_year.
+
+    If end_year == start_year, return the days in start_year.
+
+    If end_year < start_year, return 0.
+
+    """
+    # Get the number of days discounting leap years.
+    if start_year == end_year:
+        return get_days_in_year(start_year)
+    if start_year > end_year:
+        return 0
+    days = (end_year + 1 - start_year) * CALENDAR.DAYS_IN_YEAR
+    diff_days_leap = (CALENDAR.DAYS_IN_YEAR_LEAP - CALENDAR.DAYS_IN_YEAR)
+    for factor, is_leap_factor in CALENDAR.LEAP_YEAR_FACTOR_TRUTHS:
+        num_corrections = 0
+        if start_year % factor == 0:
+            num_corrections += 1
+        if end_year != start_year and end_year % factor == 0:
+            num_corrections += 1
+        factor_start_year = start_year + 1
+        while (factor_start_year % factor != 0 and
+               factor_start_year < end_year):
+            factor_start_year += 1
+        if factor_start_year < end_year:
+            num_corrections += 1
+            num_corrections += (
+                end_year - (factor_start_year + 1)) / factor
+        if is_leap_factor:
+            days += num_corrections * diff_days_leap
+        else:
+            days -= num_corrections * diff_days_leap
+    return days
+    
 
 
 def get_days_in_year(year):
@@ -1716,7 +1761,7 @@ def _get_weeks_in_year(year, calendar_mode=None):
     cal_year_next, cal_ord_days_next = get_ordinal_date_week_date_start(
         year + 1)
     diff_days = cal_ord_days_next - cal_ord_days
-    for intervening_year in range(cal_year, cal_year_next):
+    for intervening_year in xrange(cal_year, cal_year_next):
         diff_days += get_days_in_year(intervening_year)
     return diff_days / CALENDAR.DAYS_IN_WEEK
 
@@ -1916,14 +1961,14 @@ def _get_calendar_date_week_date_start(year, calendar_mode=None):
     if year == ref_year:
         return ref_year, ref_month, ref_day
     # Calculate the weekday for 1 January in this calendar year.
+    days_diff = 0
     if year > ref_year:
-        years = range(ref_year, year)
         days_diff = 1 - ref_ordinal_day
-    else:
-        years = range(ref_year - 1, year - 1, -1)
+        days_diff += get_days_in_year_range(ref_year, year - 1)
+    elif ref_year > year:
         days_diff = ref_ordinal_day - 2
-    for intervening_year in years:
-        days_diff += get_days_in_year(intervening_year)
+        days_diff += get_days_in_year_range(year, ref_year - 1)
+   
     weekdays_diff = (days_diff) % CALENDAR.DAYS_IN_WEEK
     if year > ref_year:
         day_of_week_start_year = weekdays_diff + 1
@@ -1955,11 +2000,7 @@ def _get_days_since_1_ad(year, calendar_mode=None):
         return get_days_in_year(year)
     elif year < 1:
         return 0
-    start_year = 0
-    days = 0
-    for intervening_year in range(start_year + 1, year + 1):
-        days += get_days_in_year(intervening_year)
-    return days
+    return get_days_in_year_range(1, year)
 
 
 def get_ordinal_date_week_date_start(year):
