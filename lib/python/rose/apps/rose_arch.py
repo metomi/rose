@@ -23,7 +23,9 @@ import errno
 from glob import glob
 import os
 import re
-from rose.app_run import (BuiltinApp, ConfigValueError,
+from rose.app_run import (
+    BuiltinApp,
+    ConfigValueError,
     CompulsoryConfigValueError)
 from rose.checksum import get_checksum, get_checksum_func
 from rose.env import env_var_process, UnboundEnvironmentVariableError
@@ -70,7 +72,7 @@ class RoseArchEvent(Event):
             for source in sorted(target.sources.values(),
                                  lambda s1, s2: cmp(s1.name, s2.name)):
                 ret += "\n%s\t%s (%s)" % (
-                            target.status, source.name, source.orig_name)
+                    target.status, source.name, source.orig_name)
         return ret
 
 
@@ -81,7 +83,7 @@ class RoseArchApp(BuiltinApp):
     SCHEME = "rose_arch"
     SECTION = "arch"
 
-    def run(self, app_runner, conf_tree, *args, **kwargs):
+    def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Transform and archive suite files.
 
         This application is designed to work under "rose task-run" in a suite.
@@ -106,10 +108,10 @@ class RoseArchApp(BuiltinApp):
         This application is designed to work under "rose task-run" in a suite.
 
         """
-        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        path = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         compress_manager = SchemeHandlersManager(
-                [p], "rose.apps.rose_arch_compressions", ["compress_sources"],
-                None, app_runner)
+            [path], "rose.apps.rose_arch_compressions", ["compress_sources"],
+            None, app_runner)
         # Set up the targets
         cycle = os.getenv("ROSE_TASK_CYCLE_TIME")
         targets = []
@@ -120,97 +122,98 @@ class RoseArchApp(BuiltinApp):
             if s_key_head != self.SECTION or not s_key_tail:
                 continue
             target_prefix = self._get_conf(
-                        config, t_node, "target-prefix", default="")
+                config, t_node, "target-prefix", default="")
             try:
                 s_key_tail = env_var_process(s_key_tail)
-            except UnboundEnvironmentVariableError as e:
-                raise ConfigValueError([t_key, ""], "", e)
+            except UnboundEnvironmentVariableError as exc:
+                raise ConfigValueError([t_key, ""], "", exc)
             target_name = target_prefix + s_key_tail
             target = RoseArchTarget(target_name)
             target.command_format = self._get_conf(
-                        config, t_node, "command-format", compulsory=True)
+                config, t_node, "command-format", compulsory=True)
             try:
                 target.command_format % {"sources": "", "target": ""}
-            except KeyError as e:
+            except KeyError as exc:
                 target.status = target.ST_BAD
                 app_runner.handle_event(
                     RoseArchValueError(
                         target.name,
                         "command-format",
                         target.command_format,
-                        type(e).__name__,
-                        e
+                        type(exc).__name__,
+                        exc
                     )
                 )
             source_str = self._get_conf(
-                        config, t_node, "source", compulsory=True)
+                config, t_node, "source", compulsory=True)
             source_prefix = self._get_conf(
-                        config, t_node, "source-prefix", default="")
+                config, t_node, "source-prefix", default="")
             target.source_edit_format = self._get_conf(
-                        config, t_node, "source-edit-format", default="")
+                config, t_node, "source-edit-format", default="")
             try:
                 target.source_edit_format % {"in": "", "out": ""}
-            except KeyError as e:
+            except KeyError as exc:
                 target.status = target.ST_BAD
                 app_runner.handle_event(
                     RoseArchValueError(
                         target.name,
                         "source-edit-format",
                         target.source_edit_format,
-                        type(e).__name__,
-                        e
+                        type(exc).__name__,
+                        exc
                     )
                 )
             update_check_str = self._get_conf(
-                        config, t_node, "update-check", default="md5sum")
+                config, t_node, "update-check", default="md5sum")
             try:
                 checksum_func = get_checksum_func(update_check_str)
-            except KeyError as e:
+            except KeyError as exc:
                 raise RoseArchValueError(
                     target.name,
                     "update-check",
                     update_check_str,
-                    type(e).__name__,
-                    e
+                    type(exc).__name__,
+                    exc
                 )
             for source_glob in shlex.split(source_str):
                 paths = glob(source_prefix + source_glob)
                 if not paths:
-                    e = OSError(errno.ENOENT, os.strerror(errno.ENOENT),
-                                source_glob)
+                    exc = OSError(errno.ENOENT, os.strerror(errno.ENOENT),
+                                  source_glob)
                     app_runner.handle_event(ConfigValueError(
-                                [t_key, "source"], source_glob, e))
+                        [t_key, "source"], source_glob, exc))
                     target.status = target.ST_BAD
                     continue
                 for path in paths:
                     # N.B. source_prefix may not be a directory
                     name = path[len(source_prefix):]
-                    for p, checksum in get_checksum(path, checksum_func):
-                        if checksum is None: # is directory
+                    for path_, checksum, _ in get_checksum(
+                            path, checksum_func):
+                        if checksum is None:  # is directory
                             continue
-                        if p:
+                        if path_:
                             target.sources[checksum] = RoseArchSource(
-                                            checksum,
-                                            os.path.join(name, p),
-                                            os.path.join(path, p))
-                        else: # path is a file
+                                checksum,
+                                os.path.join(name, path_),
+                                os.path.join(path, path_))
+                        else:  # path is a file
                             target.sources[checksum] = RoseArchSource(
-                                            checksum, name, path)
+                                checksum, name, path)
             target.compress_scheme = self._get_conf(config, t_node, "compress")
             if target.compress_scheme:
                 if (compress_manager.get_handler(target.compress_scheme) is
-                    None):
+                        None):
                     app_runner.handle_event(ConfigValueError(
-                                [t_key, "compress"],
-                                target.compress_scheme,
-                                KeyError(target.compress_scheme)))
+                        [t_key, "compress"],
+                        target.compress_scheme,
+                        KeyError(target.compress_scheme)))
                     target.status = target.ST_BAD
             else:
                 target_base = target.name
                 if "/" in target.name:
-                    target_head, target_base = target.name.rsplit("/", 1)
+                    target_base = target.name.rsplit("/", 1)[1]
                 if "." in target_base:
-                    head, tail = target_base.split(".", 1)
+                    tail = target_base.split(".", 1)[1]
                     if compress_manager.get_handler(tail):
                         target.compress_scheme = tail
             rename_format = self._get_conf(config, t_node, "rename-format")
@@ -220,31 +223,31 @@ class RoseArchApp(BuiltinApp):
                 if rename_parser_str:
                     try:
                         rename_parser = re.compile(rename_parser_str)
-                    except re.error as e:
+                    except re.error as exc:
                         raise RoseArchValueError(
                             target.name,
                             "rename-parser",
                             rename_parser_str,
-                            type(e).__name__,
-                            e
+                            type(exc).__name__,
+                            exc
                         )
                 else:
                     rename_parser = None
                 for source in target.sources.values():
-                    d = {"cycle": cycle, "name": source.name}
+                    dict_ = {"cycle": cycle, "name": source.name}
                     if rename_parser:
                         match = rename_parser.match(source.name)
                         if match:
-                            d.update(match.groupdict())
+                            dict_.update(match.groupdict())
                     try:
-                        source.name = rename_format % d
-                    except (KeyError, ValueError) as e:
+                        source.name = rename_format % dict_
+                    except (KeyError, ValueError) as exc:
                         raise RoseArchValueError(
                             target.name,
                             "rename-format",
                             rename_format,
-                            type(e).__name__,
-                            e
+                            type(exc).__name__,
+                            exc
                         )
             old_target = dao.select(target.name)
             if old_target is None or old_target != target:
@@ -292,8 +295,9 @@ class RoseArchApp(BuiltinApp):
                                                        source.path)
                 # Compress sources
                 if target.compress_scheme:
-                    c = compress_manager.get_handler(target.compress_scheme)
-                    c.compress_sources(target, work_dir)
+                    handler = compress_manager.get_handler(
+                        target.compress_scheme)
+                    handler.compress_sources(target, work_dir)
                 t_tran = time()
                 # Run archive command
                 sources = []
@@ -306,37 +310,38 @@ class RoseArchApp(BuiltinApp):
                 target_str = app_runner.popen.list_to_shell_str([target.name])
                 command = target.command_format % {"sources": sources_str,
                                                    "target": target_str}
-                rc, out, err = app_runner.popen.run(command, shell=True)
+                ret_code, out, err = app_runner.popen.run(command, shell=True)
                 t_arch = time()
-                if rc:
+                if ret_code:
                     app_runner.handle_event(
-                                RosePopenError([command], rc, out, err))
+                        RosePopenError([command], ret_code, out, err))
                 else:
                     target.status = target.ST_NEW
                     app_runner.handle_event(err, kind=Event.KIND_ERR)
                 app_runner.handle_event(out)
-                target.command_rc = rc
+                target.command_rc = ret_code
                 dao.update_command_rc(target)
             finally:
                 app_runner.fs_util.delete(work_dir)
                 app_runner.handle_event(
-                        RoseArchEvent(
-                                target, [t_init, t_tran, t_arch]))
+                    RoseArchEvent(target, [t_init, t_tran, t_arch]))
 
-        return [t.status for t in targets].count(RoseArchTarget.ST_BAD)
+        return [target.status for target in targets].count(
+            RoseArchTarget.ST_BAD)
 
     def _get_conf(self, r_node, t_node, key, compulsory=False, default=None):
+        """Return the value of a configuration."""
         value = t_node.get_value(
-                        [key],
-                        r_node.get_value([self.SECTION, key], default=default))
+            [key],
+            r_node.get_value([self.SECTION, key], default=default))
         if compulsory and not value:
             raise CompulsoryConfigValueError([key], None,
                                              KeyError(key))
         if value:
             try:
                 value = env_var_process(value)
-            except UnboundEnvironmentVariableError as e:
-                raise ConfigValueError([key], value, e)
+            except UnboundEnvironmentVariableError as exc:
+                raise ConfigValueError([key], value, exc)
         return value
 
 
@@ -353,7 +358,7 @@ class RoseArchTarget(object):
         self.compress_scheme = None
         self.command_format = None
         self.command_rc = 0
-        self.sources = {} # checksum: RoseArchSource
+        self.sources = {}  # checksum: RoseArchSource
         self.source_edit_format = None
         self.status = None
         self.work_source_path = None
@@ -421,34 +426,31 @@ class RoseArchDAO(object):
         """Create the database file if it does not exist."""
         if not os.path.exists(self.file_name):
             conn = self.get_conn()
-            c = conn.cursor()
-            c.execute("""CREATE TABLE """ + self.T_TARGETS + """ (
-                          target_name TEXT,
-                          compress_scheme TEXT,
-                          command_format TEXT,
-                          command_rc INT,
-                          source_edit_format TEXT,
-                          PRIMARY KEY(target_name))""")
-            c.execute("""CREATE TABLE """ + self.T_SOURCES + """ (
-                          target_name TEXT,
-                          source_name TEXT,
-                          checksum TEXT,
-                          UNIQUE(target_name, checksum))""")
+            conn.execute("""CREATE TABLE """ + self.T_TARGETS + """ (
+                            target_name TEXT,
+                            compress_scheme TEXT,
+                            command_format TEXT,
+                            command_rc INT,
+                            source_edit_format TEXT,
+                            PRIMARY KEY(target_name))""")
+            conn.execute("""CREATE TABLE """ + self.T_SOURCES + """ (
+                            target_name TEXT,
+                            source_name TEXT,
+                            checksum TEXT,
+                            UNIQUE(target_name, checksum))""")
             conn.commit()
 
     def delete(self, target):
         """Remove target from the database."""
         conn = self.get_conn()
-        c = conn.cursor()
-        for t in [self.T_TARGETS, self.T_SOURCES]:
-            c.execute("DELETE FROM " + t + " WHERE target_name==?",
-                      [target.name])
+        for name in [self.T_TARGETS, self.T_SOURCES]:
+            conn.execute("DELETE FROM " + name + " WHERE target_name==?",
+                         [target.name])
         conn.commit()
 
     def delete_all(self, filter_targets):
         """Remove all but those matching filter_targets from the database."""
         conn = self.get_conn()
-        c = conn.cursor()
         where = ""
         stmt_args = []
         if filter_targets:
@@ -457,23 +459,22 @@ class RoseArchDAO(object):
                 stmt_fragments.append("target_name != ?")
                 stmt_args.append(filter_target.name)
             where += " WHERE " + " AND ".join(stmt_fragments)
-        for t in [self.T_TARGETS, self.T_SOURCES]:
-            c.execute("DELETE FROM " + t + where, stmt_args)
+        for name in [self.T_TARGETS, self.T_SOURCES]:
+            conn.execute("DELETE FROM " + name + where, stmt_args)
         conn.commit()
 
     def insert(self, target):
         """Insert a target in the database."""
         conn = self.get_conn()
-        c = conn.cursor()
         t_stmt = "INSERT INTO " + self.T_TARGETS + " VALUES (?, ?, ?, ?, ?)"
         t_stmt_args = [target.name, target.compress_scheme,
                        target.command_format, target.command_rc,
                        target.source_edit_format]
-        c.execute(t_stmt, t_stmt_args)
+        conn.execute(t_stmt, t_stmt_args)
         sh_stmt = r"INSERT INTO " + self.T_SOURCES + " VALUES (?, ?, ?)"
         sh_stmt_args = [target.name]
         for checksum, source in target.sources.items():
-            c.execute(sh_stmt, sh_stmt_args + [source.name, checksum])
+            conn.execute(sh_stmt, sh_stmt_args + [source.name, checksum])
         conn.commit()
 
     def select(self, target_name):
@@ -486,7 +487,6 @@ class RoseArchDAO(object):
 
         """
         conn = self.get_conn()
-        c = conn.cursor()
         t_stmt = (
             "SELECT " +
             "compress_scheme,command_format,command_rc,source_edit_format " +
@@ -495,29 +495,26 @@ class RoseArchDAO(object):
             " WHERE target_name==?"
         )
         t_stmt_args = [target_name]
-        for row in c.execute(t_stmt, t_stmt_args):
-            t = RoseArchTarget(target_name)
-            (
-                t.compress_scheme,
-                t.command_format,
-                t.command_rc,
-                t.source_edit_format,
-            ) = row
+        for row in conn.execute(t_stmt, t_stmt_args):
+            target = RoseArchTarget(target_name)
+            (target.compress_scheme,
+                target.command_format,
+                target.command_rc,
+                target.source_edit_format) = row
             break
         else:
             return None
         s_stmt = ("SELECT source_name,checksum FROM " + self.T_SOURCES +
                   " WHERE target_name==?")
         s_stmt_args = [target_name]
-        for s_row in c.execute(s_stmt, s_stmt_args):
+        for s_row in conn.execute(s_stmt, s_stmt_args):
             source_name, checksum = s_row
-            t.sources[checksum] = RoseArchSource(checksum, source_name)
-        return t
+            target.sources[checksum] = RoseArchSource(checksum, source_name)
+        return target
 
     def update_command_rc(self, target):
         """Update the command return code of a target in the database."""
         conn = self.get_conn()
-        c = conn.cursor()
-        c.execute("UPDATE " + self.T_TARGETS + " SET command_rc=?" +
-                  " WHERE target_name==?", [target.command_rc, target.name])
+        conn.execute("UPDATE " + self.T_TARGETS + " SET command_rc=?" +
+                     " WHERE target_name==?", [target.command_rc, target.name])
         conn.commit()

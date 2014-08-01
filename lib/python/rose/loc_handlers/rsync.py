@@ -19,10 +19,9 @@
 #-----------------------------------------------------------------------------
 """A handler of locations on remote hosts."""
 
-import os
-from rose.checksum import get_checksum
 import socket
 from tempfile import TemporaryFile
+
 
 class RsyncLocHandler(object):
     """Handler of locations on remote hosts."""
@@ -37,9 +36,10 @@ class RsyncLocHandler(object):
             pass
 
     def can_pull(self, loc):
+        """Return true if loc.name looks like a path on a remote host."""
         if self.rsync is None:
             return False
-        host, path = loc.name.split(":", 1)
+        host = loc.name.split(":", 1)[0]
         try:
             address = socket.gethostbyname(host)
         except IOError:
@@ -47,42 +47,63 @@ class RsyncLocHandler(object):
         else:
             return self.bad_address is None or address != self.bad_address
 
-    def parse(self, loc, conf_tree):
+    def parse(self, loc, _):
         """Set loc.scheme, loc.loc_type, loc.paths."""
         loc.scheme = "rsync"
         # Attempt to obtain the checksum(s) via "ssh"
         host, path = loc.name.split(":", 1)
-        cmd = self.manager.popen.get_cmd("ssh", host, "bash")
-        f = TemporaryFile()
-        f.write("""
-        set -eu
-        if [[ -d %(path)s ]]; then
-            echo '%(tree)s'
-            cd %(path)s
-            find . -type d | sed '/^\.$/d; /\/\./d; s/^\.\/*/- /'
-            md5sum $(find . -type f | sed '/\/\./d; s/^\.\///')
-        elif [[ -f %(path)s ]]; then
-            echo '%(blob)s'
-            md5sum %(path)s
-        fi
-        """ % {"path": path, "blob": loc.TYPE_BLOB, "tree": loc.TYPE_TREE})
-        f.seek(0)
-        out, err = self.manager.popen(*cmd, stdin=f)
+        cmd = self.manager.popen.get_cmd(
+            "ssh", host, "python", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE)
+        temp_file = TemporaryFile()
+        temp_file.write(r"""
+import os
+import sys
+path, str_blob, str_tree = sys.argv[1:]
+if os.path.isdir(path):
+    print str_tree
+    os.chdir(path)
+    for dirpath, dirnames, filenames in os.walk(path):
+        good_dirnames = []
+        for dirname in dirnames:
+            if not dirname.startswith("."):
+                good_dirnames.append(dirname)
+                name = os.path.join(dirpath, dirname)
+                print "-", "-", "-", name
+        dirnames[:] = good_dirnames
+        for filename in filenames:
+            if filename.startswith("."):
+                continue
+            name = os.path.join(dirpath, filename)
+            stat = os.stat(name)
+            print oct(stat.st_mode), stat.st_mtime, stat.st_size, name
+elif os.path.isfile(path):
+    print str_blob
+    stat = os.stat(path)
+    print oct(stat.st_mode), stat.st_mtime, stat.st_size, path
+""")
+        temp_file.seek(0)
+        out = self.manager.popen(*cmd, stdin=temp_file)[0]
         lines = out.splitlines()
         if not lines or lines[0] not in [loc.TYPE_BLOB, loc.TYPE_TREE]:
             raise ValueError(loc.name)
         loc.loc_type = lines.pop(0)
         if loc.loc_type == loc.TYPE_BLOB:
             line = lines.pop(0)
-            checksum, name = line.split(None, 1)
-            loc.add_path(loc.BLOB, checksum)
-        for line in lines:
-            checksum, name = line.split(None, 1)
-            if checksum == "-":
-                checksum = None
-            loc.add_path(name, checksum)
+            access_mode, mtime, size, name = line.split(None, 3)
+            fake_sum = "source=%s:mtime=%s:size=%s" % (
+                name, mtime, size)
+            loc.add_path(loc.BLOB, fake_sum, int(access_mode))
+        else:  # if loc.loc_type == loc.TYPE_TREE:
+            for line in lines:
+                access_mode, mtime, size, name = line.split(None, 3)
+                if mtime == "-" or size == "-":
+                    fake_sum = None
+                else:
+                    fake_sum = "source=%s:mtime=%s:size=%s" % (
+                        name, mtime, size)
+                loc.add_path(name, fake_sum, int(access_mode))
 
-    def pull(self, loc, conf_tree):
+    def pull(self, loc, _):
         """Run "rsync" to pull files or directories of loc to its cache."""
         name = loc.name
         if loc.loc_type == loc.TYPE_TREE:

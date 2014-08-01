@@ -34,12 +34,12 @@ def get_checksum(name, checksum_func=None):
 
         checksum_str = checksum_func(source_str)
 
-    Return a list of 2-element tuples. Each tuple represents a path in "name"
-    and the checksum of that path. If the path is a directory, the checksum is
-    None.
+    Return a list of 3-element tuples. Each tuple represents a path in "name",
+    the checksum, and the access mode. If the path is a directory, the checksum
+    and the access mode will both be set to None.
 
-    If "name" is a file, it returns a one-element list with a ("", checksum)
-    tuple.
+    If "name" is a file, it returns a one-element list with a
+    ("", checksum, mode) tuple.
 
     If "name" does not exist, raise OSError.
 
@@ -52,17 +52,20 @@ def get_checksum(name, checksum_func=None):
     path_and_checksum_list = []
     if os.path.isfile(name):
         checksum = checksum_func(name, "")
-        path_and_checksum_list.append(("", checksum))
-    else: # if os.path.isdir(path):
+        path_and_checksum_list.append(
+            ("", checksum, os.stat(os.path.realpath(name)).st_mode))
+    else:  # if os.path.isdir(path):
         name = os.path.normpath(name)
         path_and_checksum_list = []
-        for dirpath, dirnames, filenames in os.walk(name):
+        for dirpath, _, filenames in os.walk(name):
             path = dirpath[len(name) + 1:]
-            path_and_checksum_list.append((path, None))
+            path_and_checksum_list.append((path, None, None))
             for filename in filenames:
                 filepath = os.path.join(path, filename)
-                checksum = checksum_func(os.path.join(name, filepath), name)
-                path_and_checksum_list.append((filepath, checksum))
+                source = os.path.join(name, filepath)
+                checksum = checksum_func(source, name)
+                mode = os.stat(os.path.realpath(source)).st_mode
+                path_and_checksum_list.append((filepath, checksum, mode))
     return path_and_checksum_list
 
 
@@ -83,18 +86,18 @@ def get_checksum_func(key=None):
         raise KeyError(key)
 
 
-def _md5_hexdigest(source, root):
+def _md5_hexdigest(source, _):
     """Load content of source into an md5 object, and return its hexdigest."""
-    m = md5()
-    s = open(source)
+    md5sum = md5()
+    handle = open(source)
     f_bsize = os.statvfs(source).f_bsize
     while True:
-        bytes = s.read(f_bsize)
-        if not bytes:
+        bytes_ = handle.read(f_bsize)
+        if not bytes_:
             break
-        m.update(bytes)
-    s.close()
-    return m.hexdigest()
+        md5sum.update(bytes_)
+    handle.close()
+    return md5sum.hexdigest()
 
 
 def _mtime_and_size(source, root):
