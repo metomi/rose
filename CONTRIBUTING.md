@@ -33,6 +33,7 @@ below:
 * Matt Shin (Met Office, UK)
 * Stuart Whitehouse (Met Office, UK)
 * Steve Wardle (Met Office, UK)
+* Matt Pryor (Met Office, UK)
 
 (All contributors are identifiable with email addresses in the version control
 logs or otherwise.)
