@@ -104,6 +104,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
                             if id_rules[setting_id]:
                                 id_rules[setting_id][-1][-1] = message
         for rule_type in rule_data:
+            
             is_warning = (rule_type == self.RULE_WARNING_NAME)
             if is_warning:
                 f_type = self.WARNING_RULE_FAILED
@@ -150,7 +151,7 @@ class RuleEvaluator(rose.macro.MacroBase):
     REC_CONFIG_ID = re.compile(r"""
                       (?:\W|^)        (?# Break or beginning)
                       (               (?# Begin ID capture)
-                       [\w:]+         (?# 1st part of section, including :)
+                       [\w:.]+         (?# 1st part of section, including :)
                        (?:\{.*?\})?   (?# Optional modifier for the section)
                        (?:\([^)]*\))? (?# Optional element for the section)
                        =              (?# Section-option delimiter)
