@@ -248,10 +248,11 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def sort_tree_items(self, row_item_1, row_item_2):
         """Sort tree items according to name and sort key."""
-        sort_key_1 = row_item_1[1][1].get(rose.META_PROP_SORT_KEY, '')
-        sort_key_2 = row_item_2[1][1].get(rose.META_PROP_SORT_KEY, '')
+        sort_key_1 = row_item_1[1][1].get(rose.META_PROP_SORT_KEY, '~')
+        sort_key_2 = row_item_2[1][1].get(rose.META_PROP_SORT_KEY, '~')
         if sort_key_1 == sort_key_2:
-            return rose.config.sort_element(row_item_1[0], row_item_2[0])
+            return rose.config_editor.util.null_cmp(row_item_1[0],
+                                                    row_item_2[0])
         sort_key_1 = sort_key_1 + '~' + row_item_1[0]
         sort_key_2 = sort_key_2 + '~' + row_item_2[0]
         return cmp(sort_key_1, sort_key_2)

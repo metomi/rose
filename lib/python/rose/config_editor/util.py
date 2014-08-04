@@ -197,6 +197,18 @@ def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
     return "\n".join(lines)
 
 
+def null_cmp(x, y):
+    x_sort_key = x[0]
+    x_id = x[1]
+    y_sort_key = y[0]
+    y_id = y[1]
+    if x_id == '' or y_id == '':
+        return (x_id == '') - (y_id == '')
+    if x_sort_key == y_sort_key:
+        return rose.config.sort_settings(x_id, y_id)
+    return cmp(x_sort_key, y_sort_key)
+
+
 def _pretty_format_data(data, global_indent=0, indent=4, width=60):
     sub_name = rose.config_editor.DIALOG_NODE_INFO_SUB_ATTRIBUTE
     safe_str = rose.gtk.util.safe_str

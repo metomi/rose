@@ -25,6 +25,7 @@ pygtk.require('2.0')
 import gtk
 
 import rose.config
+import rose.config_editor.util
 import rose.config_editor.variable
 import rose.formats
 import rose.variable
@@ -150,11 +151,11 @@ class PageTable(gtk.Table):
     def _get_sorted_variables(self):
         sort_key_vars = []
         for v in self.panel_data + self.ghost_data:
-            sort_key = v.metadata.get("sort-key", "") + "~" + v.metadata["id"]
+            sort_key = ((v.metadata.get("sort-key", "~")), v.metadata["id"])
             is_ghost = v in self.ghost_data
             sort_key_vars.append((sort_key, v, is_ghost))
         sort_key_vars.sort(
-               lambda x, y: rose.config.sort_settings(x[0], y[0]))
+               lambda x, y: rose.config_editor.util.null_cmp(x, y))
         sort_key_vars.sort(lambda x, y: cmp("=null" in x[1].metadata["id"],
                                             "=null" in y[1].metadata["id"]))
         return [(x[1], x[2]) for x in sort_key_vars]
