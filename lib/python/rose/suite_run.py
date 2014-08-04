@@ -206,8 +206,9 @@ class SuiteRunner(Runner):
                 raise NewModeError("--run", opts.run_mode)
             self.suite_run_cleaner.clean(suite_name)
         if os.getcwd() != suite_dir:
-            self._run_init_dir(opts, suite_name, conf_tree,
-                               locs_conf=locs_conf)
+            if opts.run_mode == "run":
+                self._run_init_dir(opts, suite_name, conf_tree,
+                                   locs_conf=locs_conf)
             os.chdir(suite_dir)
 
         # Housekeep log files
@@ -582,7 +583,8 @@ class SuiteRunner(Runner):
             self.handle_event("/" + r_opts["uuid"] + "\n", level=0)
         elif opts.new_mode:
             self.fs_util.delete(suite_dir_rel)
-        self._run_init_dir(opts, suite_name, r_opts=r_opts)
+        if opts.run_mode == "run":
+            self._run_init_dir(opts, suite_name, r_opts=r_opts)
         os.chdir(suite_dir_rel)
         for name in ["share", "work"]:
             uuid_file = os.path.join(name, r_opts["uuid"])
