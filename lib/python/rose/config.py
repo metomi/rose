@@ -65,6 +65,8 @@ from tempfile import NamedTemporaryFile
 
 CHAR_ASSIGN = "="
 CHAR_COMMENT = "#"
+CHAR_SECTION_OPEN = "["
+CHAR_SECTION_CLOSE = "]"
 
 OPT_CONFIG_DIR = "opt"
 REC_SETTING_ELEMENT = re.compile(r"^(.+?)\(([^)]+)\)$")
@@ -112,9 +114,10 @@ class ConfigNode(object):
         return self.value.items()
 
     def is_ignored(self):
+        """Return true if current node is in the "ignored" state."""
         return self.state != self.STATE_NORMAL
 
-    def walk(self, keys=[], no_ignore=False):
+    def walk(self, keys=None, no_ignore=False):
         """Return all keylist - sub-node pairs below keys.
 
         keys is a list defining a hierarchy of node.value
@@ -126,6 +129,8 @@ class ConfigNode(object):
         prepended to the returned keylist.
 
         """
+        if keys is None:
+            keys = []
         start_node = self.get(keys, no_ignore)
         stack = [(keys, start_node)]
         if start_node is None:
@@ -146,7 +151,7 @@ class ConfigNode(object):
             else:
                 yield (node_keys, node)
 
-    def get(self, keys=[], no_ignore=False):
+    def get(self, keys=None, no_ignore=False):
         """Return a node at the position of keys, if any.
 
         keys is a list defining a hierarchy of node.value
@@ -161,22 +166,28 @@ class ConfigNode(object):
         if not keys:
             return self
         keys = list(keys)
-        def filter_func(node):
-            if no_ignore and node.state:
-                return None
-            return node
-        node = filter_func(self)
+        node = self.get_filter(no_ignore)
         while node is not None and keys and keys[0] is not None:
             key = keys.pop(0)
             if not key:
                 continue
-            if isinstance(node.value, dict) and node.value.has_key(key):
-                node = filter_func(node.value[key])
+            if isinstance(node.value, dict) and key in node.value:
+                node = node.value[key].get_filter(no_ignore)
             else:
                 node = None
         return node
 
-    def get_value(self, keys=[], default=None):
+    def get_filter(self, no_ignore):
+        """Return None if no_ignore and node is in ignored state.
+
+        Return self otherwise.
+
+        """
+        if no_ignore and self.state:
+            return None
+        return self
+
+    def get_value(self, keys=None, default=None):
         """Return the value of a normal node at the position of keys, if any.
 
         If the node does not exist or is ignored, return None.
@@ -217,7 +228,7 @@ class ConfigNode(object):
                 continue
             if not isinstance(node.value, dict):
                 node.value = {}
-            if not node.value.has_key(key):
+            if key not in node.value:
                 node.value[key] = ConfigNode()
             node = node.value[key]
         node.value = value
@@ -243,7 +254,7 @@ class ConfigNode(object):
             key = keys.pop()
         try:
             return self.get(keys).value.pop(key)
-        except:
+        except (KeyError, AttributeError):
             return None
 
 
@@ -284,19 +295,19 @@ class ConfigDumper(object):
             sort_sections = sort_settings
         if sort_option_items is None:
             sort_option_items = sort_settings
-        f = target
+        handle = target
         if not hasattr(target, "write") or not hasattr(target, "close"):
             target_dir = os.path.dirname(target)
             if not target_dir:
                 target_dir = "."
             if not os.path.isdir(target_dir):
                 os.makedirs(target_dir)
-            f = NamedTemporaryFile(prefix=os.path.basename(target),
-                                   dir=target_dir, delete=False)
+            handle = NamedTemporaryFile(prefix=os.path.basename(target),
+                                        dir=target_dir, delete=False)
         blank = ""
         if root.comments:
             for comment in root.comments:
-                f.write(self._comment_format(comment))
+                handle.write(self._comment_format(comment))
             blank = "\n"
         root_keys = root.value.keys()
         root_keys.sort(sort_sections)
@@ -308,51 +319,63 @@ class ConfigDumper(object):
             else:
                 section_keys.append(key)
         if root_option_keys:
-            f.write(blank)
+            handle.write(blank)
             blank = "\n"
             if concat_mode:
-                f.write("[]\n")
+                handle.write(CHAR_SECTION_OPEN + CHAR_SECTION_CLOSE + "\n")
             for key in root_option_keys:
-                self._string_node_dump(key, root.value[key], f, env_escape_ok)
+                self._string_node_dump(
+                    key, root.value[key], handle, env_escape_ok)
         for section_key in section_keys:
             section_node = root.value[section_key]
-            f.write(blank)
+            handle.write(blank)
             blank = "\n"
             for comment in section_node.comments:
-                f.write(self._comment_format(comment))
-            f.write("[%s%s]\n" % (section_node.state, section_key))
+                handle.write(self._comment_format(comment))
+            handle.write("%(open)s%(state)s%(key)s%(close)s\n" % {
+                "open": CHAR_SECTION_OPEN,
+                "state": section_node.state,
+                "key": section_key,
+                "close": CHAR_SECTION_CLOSE})
             keys = section_node.value.keys()
             keys.sort(sort_option_items)
             for key in keys:
                 value = section_node.value[key]
-                self._string_node_dump(key, value, f, env_escape_ok)
-        if f is not target:
-            f.close()
+                self._string_node_dump(key, value, handle, env_escape_ok)
+        if handle is not target:
+            handle.close()
             if not os.path.exists(target):
                 open(target, "a").close()
-            os.chmod(f.name, os.stat(target).st_mode)
-            os.rename(f.name, target)
+            os.chmod(handle.name, os.stat(target).st_mode)
+            os.rename(handle.name, target)
 
     __call__ = dump
 
-    def _string_node_dump(self, key, node, f, env_escape_ok):
+    def _string_node_dump(self, key, node, handle, env_escape_ok):
+        """Helper for self.dump().
+
+        Return text representation of a string node.
+
+        """
         state = node.state
         values = node.value.split("\n")
         for comment in node.comments:
-            f.write(self._comment_format(comment))
+            handle.write(self._comment_format(comment))
         value0 = values.pop(0)
         if env_escape_ok:
             value0 = env_var_escape(value0)
-        f.write(state + key + self.char_assign + value0)
-        f.write("\n")
+        handle.write(state + key + self.char_assign + value0)
+        handle.write("\n")
         if values:
             indent = " " * len(state + key)
-            for v in values:
+            for value in values:
                 if env_escape_ok:
-                    v = env_var_escape(v)
-                f.write(indent + self.char_assign + v + "\n")
+                    value = env_var_escape(value)
+                handle.write(indent + self.char_assign + value + "\n")
 
-    def _comment_format(self, comment):
+    @classmethod
+    def _comment_format(cls, comment):
+        """Return text representation of a configuration comment."""
         return "#%s\n" % (comment)
 
 
@@ -360,7 +383,8 @@ class ConfigLoader(object):
 
     """Loader of an INI format configuration into a Config object."""
 
-    RE_SECTION = re.compile(r"^\s*\[(?P<state>!?!?)(?P<section>[^\]]*)\]\s*$")
+    RE_SECTION = re.compile(
+        r"^(?P<head>\s*\[(?P<state>!?!?))(?P<section>.*)\]\s*$")
     TYPE_SECTION = "TYPE_SECTION"
     TYPE_OPTION = "TYPE_OPTION"
     UNKNOWN_NAME = "<???>"
@@ -420,7 +444,7 @@ class ConfigLoader(object):
         for key in opt_conf_keys:
             opt_conf_file_name_base = source_root + "-" + key + source_ext
             opt_conf_file_name = os.path.join(
-                    source_dir, OPT_CONFIG_DIR, opt_conf_file_name_base)
+                source_dir, OPT_CONFIG_DIR, opt_conf_file_name_base)
             if os.access(opt_conf_file_name, os.F_OK | os.R_OK):
                 self.load(opt_conf_file_name, node)
                 if used_keys is not None and key not in used_keys:
@@ -444,14 +468,14 @@ class ConfigLoader(object):
         """
         if node is None:
             node = ConfigNode()
-        f, file_name = self._get_file_and_name(source)
+        handle, file_name = self._get_file_and_name(source)
         keys = []
         type_ = None
         comments = None
         line_num = 0
-        # Note: "for line in f:" hangs for sys.stdin
+        # Note: "for line in handle:" hangs for sys.stdin
         while True:
-            line = f.readline()
+            line = handle.readline()
             if not line:
                 break
             line_num += 1
@@ -476,11 +500,18 @@ class ConfigLoader(object):
             # Match a section header?
             match = self.RE_SECTION.match(line)
             if match:
-                section, state = match.group("section", "state")
+                head, section, state = match.group("head", "section", "state")
+                for char in [CHAR_SECTION_OPEN, CHAR_SECTION_CLOSE]:
+                    index = section.find(char)
+                    if index >= 0:
+                        raise ConfigSyntaxError(
+                            ConfigSyntaxError.BAD_CHAR,
+                            file_name, line_num, len(head) + index, line)
                 if type_ == self.TYPE_OPTION:
                     keys.pop()
                 if keys:
                     keys.pop()
+                section = section.strip()
                 if section:
                     keys.append(section)
                     type_ = self.TYPE_SECTION
@@ -499,7 +530,8 @@ class ConfigLoader(object):
             # Match the start of an option setting
             match = self.re_option.match(line)
             if not match:
-                raise ConfigSyntaxError(file_name, line_num, line)
+                raise ConfigSyntaxError(
+                    ConfigSyntaxError.BAD_SYNTAX, file_name, line_num, 0, line)
             option, value, state = match.group("option", "value", "state")
             if type_ == self.TYPE_OPTION:
                 keys.pop()
@@ -512,30 +544,61 @@ class ConfigLoader(object):
 
     __call__ = load
 
-    def _comment_strip(self, line):
+    @classmethod
+    def _comment_strip(cls, line):
+        """Strip comment character and whitespace from a comment."""
         return line.strip()[1:]
 
-    def _get_file_and_name(self, f):
-        if hasattr(f, "readline"):
+    def _get_file_and_name(self, file_):
+        """Return file handle and file name of "file_"."""
+        if hasattr(file_, "readline"):
             try:
-                file_name = f.name
+                file_name = file_.name
             except AttributeError:
                 file_name = self.UNKNOWN_NAME
         else:
-            file_name = os.path.abspath(f)
-            f = open(file_name, "r")
-        return (f, file_name)
+            file_name = os.path.abspath(file_)
+            file_ = open(file_name, "r")
+        return (file_, file_name)
 
 
 class ConfigSyntaxError(Exception):
 
-    """Exception raised for syntax error loading a configuration file."""
+    """Exception raised for syntax error loading a configuration file.
 
-    E = """Expecting "[SECTION]" or "KEY=VALUE" at column 1."""
+    It has the following attributes:
+        exc.code -- Error code. Can be one of:
+            ConfigSyntaxError.BAD_CHAR (bad characters in a name)
+            ConfigSyntaxError.BAD_SYNTAX (general syntax error)
+        exc.file_name -- The name of the file that triggers the error.
+        exc.line_num -- The line number (from 1) in the file with the error.
+        exc.col_num -- The column number (from 0) in the line with the error.
+        exc.line -- The content of the line that contains the error.
+    """
+
+    BAD_CHAR = "BAD_CHAR"
+    BAD_SYNTAX = "BAD_SYNTAX"
+
+    MESSAGES = {
+        BAD_CHAR: """Unexpected character in name""",
+        BAD_SYNTAX: """Expecting "[SECTION]" or "KEY=VALUE\"""",
+    }
+
+    def __init__(self, code, file_name, line_num, col_num, line):
+        Exception.__init__(self, code, file_name, line_num, col_num, line)
+        self.code = code
+        self.file_name = file_name
+        self.line_num = line_num
+        self.col_num = col_num
+        self.line = line
 
     def __str__(self):
-        file_name, line_number, line = self.args
-        return "%s(%d): %s\n%s^" % (file_name, line_number, self.E, line)
+        return "%s(%d): %s\n%s%s^" % (
+            self.file_name,
+            self.line_num,
+            self.MESSAGES[self.code],
+            self.line,
+            " " * self.col_num)
 
 
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,
