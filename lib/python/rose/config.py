@@ -65,6 +65,8 @@ from tempfile import NamedTemporaryFile
 
 CHAR_ASSIGN = "="
 CHAR_COMMENT = "#"
+CHAR_SECTION_OPEN = "["
+CHAR_SECTION_CLOSE = "]"
 
 OPT_CONFIG_DIR = "opt"
 REC_SETTING_ELEMENT = re.compile(r"^(.+?)\(([^)]+)\)$")
@@ -311,7 +313,7 @@ class ConfigDumper(object):
             f.write(blank)
             blank = "\n"
             if concat_mode:
-                f.write("[]\n")
+                f.write(CHAR_SECTION_OPEN + CHAR_SECTION_CLOSE + "\n")
             for key in root_option_keys:
                 self._string_node_dump(key, root.value[key], f, env_escape_ok)
         for section_key in section_keys:
@@ -320,7 +322,11 @@ class ConfigDumper(object):
             blank = "\n"
             for comment in section_node.comments:
                 f.write(self._comment_format(comment))
-            f.write("[%s%s]\n" % (section_node.state, section_key))
+            f.write("%(open)s%(state)s%(key)s%(close)s\n" % {
+                "open": CHAR_SECTION_OPEN,
+                "state": section_node.state,
+                "key": section_key,
+                "close": CHAR_SECTION_CLOSE})
             keys = section_node.value.keys()
             keys.sort(sort_option_items)
             for key in keys:
@@ -360,7 +366,8 @@ class ConfigLoader(object):
 
     """Loader of an INI format configuration into a Config object."""
 
-    RE_SECTION = re.compile(r"^\s*\[(?P<state>!?!?)(?P<section>[^\]]*)\]\s*$")
+    RE_SECTION = re.compile(
+        r"^(?P<head>\s*\[(?P<state>!?!?))(?P<section>.*)\]\s*$")
     TYPE_SECTION = "TYPE_SECTION"
     TYPE_OPTION = "TYPE_OPTION"
     UNKNOWN_NAME = "<???>"
@@ -476,11 +483,18 @@ class ConfigLoader(object):
             # Match a section header?
             match = self.RE_SECTION.match(line)
             if match:
-                section, state = match.group("section", "state")
+                head, section, state = match.group("head", "section", "state")
+                for char in [CHAR_SECTION_OPEN, CHAR_SECTION_CLOSE]:
+                    index = section.find(char)
+                    if index >= 0:
+                        raise ConfigSyntaxError(
+                            ConfigSyntaxError.BAD_CHAR,
+                            file_name, line_num, len(head) + index, line)
                 if type_ == self.TYPE_OPTION:
                     keys.pop()
                 if keys:
                     keys.pop()
+                section = section.strip()
                 if section:
                     keys.append(section)
                     type_ = self.TYPE_SECTION
@@ -499,7 +513,8 @@ class ConfigLoader(object):
             # Match the start of an option setting
             match = self.re_option.match(line)
             if not match:
-                raise ConfigSyntaxError(file_name, line_num, line)
+                raise ConfigSyntaxError(
+                    ConfigSyntaxError.BAD_SYNTAX, file_name, line_num, 0, line)
             option, value, state = match.group("option", "value", "state")
             if type_ == self.TYPE_OPTION:
                 keys.pop()
@@ -529,13 +544,41 @@ class ConfigLoader(object):
 
 class ConfigSyntaxError(Exception):
 
-    """Exception raised for syntax error loading a configuration file."""
+    """Exception raised for syntax error loading a configuration file.
 
-    E = """Expecting "[SECTION]" or "KEY=VALUE" at column 1."""
+    It has the following attributes:
+        exc.code -- Error code. Can be one of:
+            ConfigSyntaxError.BAD_CHAR (bad characters in a name)
+            ConfigSyntaxError.BAD_SYNTAX (general syntax error)
+        exc.file_name -- The name of the file that triggers the error.
+        exc.line_num -- The line number (from 1) in the file with the error.
+        exc.col_num -- The column number (from 0) in the line with the error.
+        exc.line -- The content of the line that contains the error.
+    """
+
+    BAD_CHAR = "BAD_CHAR"
+    BAD_SYNTAX = "BAD_SYNTAX"
+
+    MESSAGES = {
+        BAD_CHAR: """Unexpected character in name""",
+        BAD_SYNTAX: """Expecting "[SECTION]" or "KEY=VALUE\"""",
+    }
+
+    def __init__(self, code, file_name, line_num, col_num, line):
+        Exception.__init__(self, code, file_name, line_num, col_num, line)
+        self.code = code
+        self.file_name = file_name
+        self.line_num = line_num
+        self.col_num = col_num
+        self.line = line
 
     def __str__(self):
-        file_name, line_number, line = self.args
-        return "%s(%d): %s\n%s^" % (file_name, line_number, self.E, line)
+        return "%s(%d): %s\n%s%s^" % (
+            self.file_name,
+            self.line_num,
+            self.MESSAGES[self.code],
+            self.line,
+            " " * self.col_num)
 
 
 def dump(root, target=sys.stdout, sort_sections=None, sort_option_items=None,

@@ -167,6 +167,11 @@
         </ul>
       </li>
 
+      <li>The open square bracket (<kbd>[</kbd>) and close square bracket
+      (<kbd>]</kbd>) characters cannot be used within a section declaration.
+      E.g. <code>[[hello]</code>, <code>[hello]]</code>, <code>[hello [world]
+      and beyond]</code> should all be errors on parsing.</li>
+
       <li>If a section is declared twice in a file, the later section will
       append settings to the earlier one. If the same key in the same section
       is declared twice, the later value will override the earlier one. This
