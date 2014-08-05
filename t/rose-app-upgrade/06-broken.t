@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 10
+tests 11
 
 #-------------------------------------------------------------------------------
 # Check complex upgrading
@@ -107,4 +107,5 @@ import some_broken_import
 __MACRO__
 run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config
+file_grep "$TEST_KEY.out.grep" "ImportError" "$TEST_KEY.err"
 teardown
