@@ -81,7 +81,7 @@ class Root(object):
             traceback.print_exc(e)
 
     @cherrypy.expose
-    def cycles(self, user, suite, page=1, per_page=CYCLES_PER_PAGE, form=None):
+    def cycles(self, user, suite, page=1, per_page=None, form=None):
         """List cycles of a running or completed suite."""
         user_suite_dir = self._get_user_suite_dir(user, suite)
         if not os.path.isdir(user_suite_dir):
@@ -90,7 +90,9 @@ class Root(object):
             if per_page:
                 per_page = int(per_page)
             else:
-                per_page = self.JOBS_PER_PAGE
+                conf = ResourceLocator.default().get_conf()
+                per_page = int(conf.get_value(
+                    ["rose-bush", "cycles-per-page"], self.CYCLES_PER_PAGE))
         if page and per_page:
             page = int(page)
         else:
@@ -132,7 +134,7 @@ class Root(object):
 
     @cherrypy.expose
     def jobs(self, user, suite, page=1, cycles=None, tasks=None,
-             no_status=None, order=None, per_page=JOBS_PER_PAGE, form=None):
+             no_status=None, order=None, per_page=None, form=None):
         """List jobs of a running or completed suite.
 
         user -- A string containing a valid user ID
@@ -162,11 +164,16 @@ class Root(object):
         user_suite_dir = self._get_user_suite_dir(user, suite)
         if not os.path.isdir(user_suite_dir):
             raise cherrypy.HTTPError(400)
+        conf = ResourceLocator.default().get_conf()
+        per_page_default = int(conf.get_value(
+            ["rose-bush", "jobs-per-page"], self.JOBS_PER_PAGE))
+        per_page_max = int(conf.get_value(
+            ["rose-bush", "jobs-per-page-max"], self.JOBS_PER_PAGE_MAX))
         if not isinstance(per_page, int):
             if per_page:
                 per_page = int(per_page)
             else:
-                per_page = self.JOBS_PER_PAGE
+                per_page = per_page_default
         if page and per_page:
             page = int(page)
         else:
@@ -183,8 +190,8 @@ class Root(object):
             "no_statuses": no_statuses,
             "order": order,
             "per_page": per_page,
-            "per_page_default": self.JOBS_PER_PAGE,
-            "per_page_max": self.JOBS_PER_PAGE_MAX,
+            "per_page_default": per_page_default,
+            "per_page_max": per_page_max,
             "page": page,
             "rose_version": self.rose_version,
             "script": cherrypy.request.script_name,
@@ -222,7 +229,7 @@ class Root(object):
 
     @cherrypy.expose
     def list(self, user, suite, page=1, cycles=None, tasks=None,
-             no_status=None, order=None, per_page=JOBS_PER_PAGE, form=None):
+             no_status=None, order=None, per_page=None, form=None):
         return self.jobs(user, suite, page, cycles, tasks, no_status, order,
                          per_page, form)
 
@@ -285,6 +292,9 @@ class Root(object):
         f_name = self._get_user_suite_dir(user, suite, path)
         if not os.access(f_name, os.F_OK | os.R_OK):
             raise cherrypy.HTTPError(404)
+        conf = ResourceLocator.default.get_conf()
+        view_size_max = conf.get_value(
+            ["rose-bush", "view-size-max"], self.VIEW_SIZE_MAX)
         if path_in_tar:
             tar_f = tarfile.open(f_name, 'r:gz')
             try:
@@ -300,7 +310,7 @@ class Root(object):
                             urllib.pathname2url(path_in_tar))[0]
             f.seek(0)
             if (mode == "download" or
-                f_size > self.VIEW_SIZE_MAX or
+                f_size > view_size_max or
                 mime and (not mime.startswith("text/") or
                 mime.endswith("html"))):
                 t = NamedTemporaryFile()
@@ -324,7 +334,7 @@ class Root(object):
             else:
                 mime = mimetypes.guess_type(urllib.pathname2url(f_name))[0]
             if (mode == "download" or
-                f_size > self.VIEW_SIZE_MAX or
+                f_size > view_size_max or
                 mime and (not mime.startswith("text/") or
                 mime.endswith("html"))):
                 cherrypy.response.headers["Content-Type"] = mime
