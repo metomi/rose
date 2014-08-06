@@ -293,8 +293,8 @@ class Root(object):
         if not os.access(f_name, os.F_OK | os.R_OK):
             raise cherrypy.HTTPError(404)
         conf = ResourceLocator.default().get_conf()
-        view_size_max = conf.get_value(
-            ["rose-bush", "view-size-max"], self.VIEW_SIZE_MAX)
+        view_size_max = int(conf.get_value(
+            ["rose-bush", "view-size-max"], self.VIEW_SIZE_MAX))
         if path_in_tar:
             tar_f = tarfile.open(f_name, 'r:gz')
             try:
