@@ -292,7 +292,7 @@ class Root(object):
         f_name = self._get_user_suite_dir(user, suite, path)
         if not os.access(f_name, os.F_OK | os.R_OK):
             raise cherrypy.HTTPError(404)
-        conf = ResourceLocator.default.get_conf()
+        conf = ResourceLocator.default().get_conf()
         view_size_max = conf.get_value(
             ["rose-bush", "view-size-max"], self.VIEW_SIZE_MAX)
         if path_in_tar:
