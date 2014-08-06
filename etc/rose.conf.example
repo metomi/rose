@@ -82,6 +82,18 @@
 #  user-tool=ldap
 [rosa-svn]
 
+# Configuration for Rose Bush server. (Examples are default values.)
+#
+## Cycles list view: default number of cycles per page
+#  cycles-per-page=100
+## Job list view: default number of jobs per page
+#  jobs-per-page=15
+## Job list view: maximum number of jobs per page
+#  jobs-per-page-max=300
+## File view: maximum viewable file size in bytes
+#  view-size-max=10485760
+[rose-bush]
+
 # Configuration specific to "rose config-edit".
 # See the $ROSE_HOME/lib/python/rose/config_editor/__init__.py for detail.
 #
