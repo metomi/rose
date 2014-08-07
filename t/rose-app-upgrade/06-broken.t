@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 9
+tests 11
 
 #-------------------------------------------------------------------------------
 # Check complex upgrading
@@ -94,4 +94,18 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 = other whatever
 __OUTPUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-----------------------------------------------------------------------------
+# Check that an error is reported if there is a broken import in versions.py
+TEST_KEY=$TEST_KEY_BASE-broken-import
+# Overwrite versions.py with something with a broken import
+init_macro test-app-upgrade <<'__MACRO__'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import rose.upgrade
+import some_broken_import
+__MACRO__
+run_fail "$TEST_KEY" rose app-upgrade --non-interactive \
+ --meta-path=../rose-meta/ -C ../config
+file_grep "$TEST_KEY.out.grep" "ImportError" "$TEST_KEY.err"
 teardown

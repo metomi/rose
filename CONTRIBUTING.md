@@ -30,6 +30,7 @@ below:
 * Dave Matthews (Met Office, UK)
 * Hilary Oliver (National Institute of Water and Atmospheric Research, New Zealand)
 * Stephen Oxley (Met Office, UK)
+* Matt Pryor (Met Office, UK)
 * Matt Shin (Met Office, UK)
 * Stuart Whitehouse (Met Office, UK)
 * Steve Wardle (Met Office, UK)

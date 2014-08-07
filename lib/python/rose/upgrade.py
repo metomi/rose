@@ -274,14 +274,13 @@ class MacroUpgradeManager(object):
             node_meta = os.path.join(meta_path, node, rose.META_CONFIG_NAME)
             if os.path.exists(node_meta):
                 self.named_tags.append(node)
-        sys.path.append(os.path.abspath(meta_path))
-        try:
-            self.version_module = __import__(MACRO_UPGRADE_MODULE)
-        except ImportError:
+        if not os.path.exists(os.path.join(meta_path, MACRO_UPGRADE_MODULE + ".py")):
             # No versions.py.
-            sys.path.pop()
             self._load_version_macros([])
             return
+        sys.path.append(os.path.abspath(meta_path))
+        # Let ImportErrors bubble up so they can be reported
+        self.version_module = __import__(MACRO_UPGRADE_MODULE)
         sys.path.pop()
         macro_info_tuples = rose.macro.get_macro_class_methods(
                                            [self.version_module])
