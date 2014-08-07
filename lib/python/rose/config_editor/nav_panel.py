@@ -248,13 +248,15 @@ class PageNavigationPanel(gtk.ScrolledWindow):
 
     def sort_tree_items(self, row_item_1, row_item_2):
         """Sort tree items according to name and sort key."""
-        sort_key_1 = row_item_1[1][1].get(rose.META_PROP_SORT_KEY, '')
-        sort_key_2 = row_item_2[1][1].get(rose.META_PROP_SORT_KEY, '')
-        if sort_key_1 == sort_key_2:
-            return rose.config.sort_element(row_item_1[0], row_item_2[0])
-        sort_key_1 = sort_key_1 + '~' + row_item_1[0]
-        sort_key_2 = sort_key_2 + '~' + row_item_2[0]
-        return cmp(sort_key_1, sort_key_2)
+        sort_key_1 = row_item_1[1][1].get(rose.META_PROP_SORT_KEY, '~')
+        sort_key_2 = row_item_2[1][1].get(rose.META_PROP_SORT_KEY, '~')
+        var_id_1 = row_item_1[0]
+        var_id_2 = row_item_2[0]
+
+        x_key = (sort_key_1, var_id_1)
+        y_key = (sort_key_2, var_id_2)
+
+        return rose.config_editor.util.null_cmp(x_key, y_key)
 
     def set_row_icon(self, names, ind_count=0, ind_type='changed'):
         """Set the icons for row status on or off. Check parent icons.

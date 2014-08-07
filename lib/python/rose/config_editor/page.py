@@ -1055,16 +1055,16 @@ class ConfigPage(gtk.VBox):
         for variable in datavars:
             title = variable.metadata.get(rose.META_PROP_TITLE, variable.name)
             var_id = variable.metadata.get('id', variable.name)
-            key = (variable.metadata.get(rose.META_PROP_SORT_KEY, '') +
-                   '~' + var_id)
+            key = ((variable.metadata.get(rose.META_PROP_SORT_KEY, '~')),
+                                                                     var_id)
             if variable.name == '':
-                key = ''
+                key = '~'
             sorted_data.append((key, title, variable.name,
                                 variable.value, variable))
-        ascending_cmp = lambda x, y: self._null_cmp(x[column_index], x[2],
-                                                    y[column_index], y[2])
-        descending_cmp = lambda x, y: self._null_cmp(y[column_index], x[2],
-                                                     x[column_index], y[2])
+        ascending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x[0],
+                                                                      y[0])
+        descending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x[0], 
+                                                                       y[0])
         if ascending:
             sorted_data.sort(ascending_cmp)
         else:
@@ -1074,11 +1074,6 @@ class ConfigPage(gtk.VBox):
         for i, (key, title, name, value, variable) in enumerate(sorted_data):
             datavars[i] = variable
         return True
-
-    def _null_cmp(self, x, x_name, y, y_name):
-        if x_name == '' or y_name == '':
-            return (x_name == '') - (y_name == '')
-        return rose.config.sort_settings(x, y)
 
     def _macro_menu_launch(self, widget, event):
         # Create a menu below the widget for macro actions.
