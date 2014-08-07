@@ -198,6 +198,7 @@ def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
 
 
 def null_cmp(x, y):
+    """Compares sort_key and then id of the tuple x and y to be sorted."""
     x_sort_key = x[0]
     x_id = x[1]
     y_sort_key = y[0]
