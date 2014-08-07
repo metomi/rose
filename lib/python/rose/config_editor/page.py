@@ -1061,8 +1061,10 @@ class ConfigPage(gtk.VBox):
                 key = '~'
             sorted_data.append((key, title, variable.name,
                                 variable.value, variable))
-        ascending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x, y)
-        descending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x, y)
+        ascending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x[0],
+                                                                      y[0])
+        descending_cmp = lambda x, y: rose.config_editor.util.null_cmp(x[0], 
+                                                                       y[0])
         if ascending:
             sorted_data.sort(ascending_cmp)
         else:
