@@ -18,6 +18,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
+import copy
+
 import pygtk
 pygtk.require("2.0")
 import gtk
@@ -109,12 +111,13 @@ class SuiteDirector():
         return False
 
     def _edit_config(self, config, window, back_function, finish_function):
-        window.set_modal(False)
         project = config.get(["project"]).value
         config.set(["project"], project)
         meta_config = rose.macro.load_meta_config(config)
         fixer_macro = rose.macros.DefaultTransforms()
-        config, change_list = fixer_macro.transform(config, meta_config)
+        config_copy = copy.deepcopy(config)
+        config_copy, change_list = fixer_macro.transform(config_copy,
+                                                         meta_config)
         for child in window.action_area:
             window.action_area.remove(child)
         for child in window.vbox:
@@ -122,7 +125,7 @@ class SuiteDirector():
                 break
             window.vbox.remove(child)
         editor = rose.config_editor.main.MainController(
-                             config_objs={"discovery": config},
+                             config_objs={"discovery": config_copy},
                              config_obj_types={"discovery":
                                                rose.INFO_CONFIG_NAME},
                              pluggable=True)
@@ -160,6 +163,7 @@ class SuiteDirector():
         window.vbox.pack_start(hbox, expand=False, fill=False)
         window.vbox.pack_start(vbox, expand=True, fill=True)
         vbox.grab_focus()
+        window.resize(*rosie.browser.SIZE_WINDOW_NEW_SUITE_EDIT)
 
     def _finish_config(self, page_container, window, editor, finish_function):
         page = page_container.get_children()[0]
@@ -187,7 +191,10 @@ class SuiteDirector():
             window = gtk.Dialog(title=rosie.browser.TITLE_NEW_SUITE_WIZARD,
                                 parent=parent_window)
             window.set_default_size(*rosie.browser.SIZE_WINDOW_NEW_SUITE)
+            window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
             window.set_modal(False)
+        else:
+            window.resize(*rosie.browser.SIZE_WINDOW_NEW_SUITE)
         project = self._select_project(config.get(["project"]).value, window)
         if project is None:
             window.destroy()
@@ -244,4 +251,3 @@ class SuiteDirector():
         if response == gtk.RESPONSE_ACCEPT:
             return project_text
         return None
-
