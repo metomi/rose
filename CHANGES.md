@@ -16,8 +16,22 @@ This release of Rose will work best with the upcoming
 
 ### Noteworthy Changes
 
+[#1359](https://github.com/metomi/rose/pull/1359):
+rose.config: the open and close square brace characters can no longer be used
+in section names.
+
+[#1354](https://github.com/metomi/rose/pull/1354):
+rose bush: suites list: long strings in column 1 now truncated, but visible on
+hover over.
+
+[#1351](https://github.com/metomi/rose/pull/1351):
+rose metatdata, rose macro -V: recognise `.` id.
+
 [#1342](https://github.com/metomi/rose/pull/1342):
 rosie go: fix appearance of new suite in local suites.
+
+[#1336](https://github.com/metomi/rose/pull/1336):
+rose suite-run: ensure that run directory is only initialised in run mode.
 
 [#1335](https://github.com/metomi/rose/pull/1335):
 rose config-edit: fix warning on empty namespace/pages.
