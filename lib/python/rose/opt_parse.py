@@ -377,6 +377,12 @@ class RoseOptionParser(OptionParser):
                        {"metavar": "MODE",
                         "choices": ["brace", "default"],
                         "help": "Specify an alternate match mode."}],
+               "only_items": [
+                       ["--only"],
+                       {"action": "append",
+                        "dest": "only_items",
+                        "metavar": "ITEM",
+                        "help": "Only operate on the specified items."}],
                "prefix": [
                        ["--prefix"],
                        {"metavar": "PREFIX",

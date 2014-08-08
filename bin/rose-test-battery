@@ -31,7 +31,8 @@
 #        With no arguments:
 #        * If "rose config t prove-options" returns 0,
 #          exec "prove $(rose config t prove-options) -r t".
-#        * Otherwise, exec "prove -j 9 -s -r t".
+#        * Otherwise, exec "prove -j ${NPROC} -s -r t", where NPROC is an
+#          intelligent guess of the number of processors.
 #
 # SEE ALSO
 #     prove(1)
@@ -40,11 +41,17 @@
 . $(dirname $0)/../lib/bash/rose_log
 rose_init
 if [[ $ROSE_HOME != $(rose_readlink_canonicalize .) ]]; then
-    info 1 cd $ROSE_HOME
-    cd $ROSE_HOME
+    info 1 cd "$ROSE_HOME"
+    cd "$ROSE_HOME"
 fi
 if PROVE_OPTIONS=$(rose config t prove-options); then
     exec prove $PROVE_OPTIONS -r "${@:-t}"
 else
-    exec prove -j 9 -s -r "${@:-t}"
+    if [[ -f /proc/cpuinfo ]]; then
+        NPROC=$(grep -ic processor /proc/cpuinfo)
+    else
+        NPROC=$(python -c \
+            'import multiprocessing; print multiprocessing.cpu_count()')
+    fi
+    exec prove -j "$NPROC" -s -r "${@:-t}"
 fi

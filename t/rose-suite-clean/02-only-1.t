@@ -17,75 +17,88 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose suite-clean", normal mode.
+# Test "rose suite-clean", simple --only= modes.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
-install_suite() {
+run_suite() {
     set -e
     if [[ -n "$JOB_HOST" ]]; then
         rose suite-run --new -q \
-            -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol \
-            -S "HOST=\"$JOB_HOST\""
+            -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" -i --name="$NAME" \
+            --no-gcontrol -S "HOST=\"$JOB_HOST\"" -- --debug
         ssh "$JOB_HOST" "ls -d cylc-run/$NAME 1>/dev/null"
     else
         rose suite-run --new -q \
-            -C $TEST_SOURCE_DIR/$TEST_KEY_BASE -i --name=$NAME --no-gcontrol
+            -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" -i --name=$NAME \
+            --no-gcontrol -- --debug
     fi
     ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME} 1>/dev/null
     set +e
 }
+
+#-------------------------------------------------------------------------------
+N_TESTS=6
+tests "$N_TESTS"
 #-------------------------------------------------------------------------------
 JOB_HOST=$(rose config --default= 't' 'job-host')
 if [[ -n $JOB_HOST ]]; then
     JOB_HOST=$(rose host-select $JOB_HOST)
-    tests 15
-else
-    tests 10
 fi
 #-------------------------------------------------------------------------------
 export ROSE_CONF_PATH=
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
+SUITE_RUN_DIR=$(readlink -f "$SUITE_RUN_DIR")
 NAME=$(basename $SUITE_RUN_DIR)
-install_suite
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-ans-empty
-run_fail "$TEST_KEY" rose suite-clean $NAME <<<''
-run_pass "$TEST_KEY.locahost.ls" ls -d $HOME/cylc-run/$NAME
+TEST_KEY="$TEST_KEY_BASE-share"
+run_suite
+run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=share
+sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 if [[ -n "$JOB_HOST" ]]; then
-    run_pass "$TEST_KEY.job-host.ls" ssh "$JOB_HOST" "ls -d cylc-run/$NAME"
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $SUITE_RUN_DIR/share/
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share
+__OUT__
+else
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $SUITE_RUN_DIR/share/
+__OUT__
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-ans-n
-run_fail "$TEST_KEY" rose suite-clean $NAME <<<'n'
-run_pass "$TEST_KEY.locahost.ls" ls -d $HOME/cylc-run/$NAME
+TEST_KEY="$TEST_KEY_BASE-work"
+run_suite
+run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=work
+sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 if [[ -n "$JOB_HOST" ]]; then
-    run_pass "$TEST_KEY.job-host.ls" ssh "$JOB_HOST" "ls -d cylc-run/$NAME"
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $SUITE_RUN_DIR/work/
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/work
+__OUT__
+else
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $SUITE_RUN_DIR/work/
+__OUT__
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE--name-ans-n
-run_fail "$TEST_KEY" rose suite-clean --name=$NAME <<<'n'
-run_pass "$TEST_KEY.locahost.ls" ls -d $HOME/cylc-run/$NAME
+TEST_KEY="$TEST_KEY_BASE-both"
+run_suite
+run_pass "$TEST_KEY" rose suite-clean -y -n "$NAME" --only=share --only=work
+sed -i '/\/\.cylc\//d' "$TEST_KEY.out"
 if [[ -n "$JOB_HOST" ]]; then
-    run_pass "$TEST_KEY.job-host.ls" ssh "$JOB_HOST" "ls -d cylc-run/$NAME"
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $SUITE_RUN_DIR/share/
+[INFO] delete: $SUITE_RUN_DIR/work/
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/share
+[INFO] delete: $JOB_HOST:cylc-run/$NAME/work
+__OUT__
+else
+    file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+[INFO] delete: $SUITE_RUN_DIR/share/
+[INFO] delete: $SUITE_RUN_DIR/work/
+__OUT__
 fi
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-ans-y
-run_pass "$TEST_KEY" rose suite-clean -v -v $NAME <<<'y'
-run_fail "$TEST_KEY.locahost.ls" \
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME}
-if [[ -n "$JOB_HOST" ]]; then
-    run_fail "$TEST_KEY.job-host.ls" ssh "$JOB_HOST" "ls -d cylc-run/$NAME"
-fi
-#-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE--name-ans-y
-install_suite
-run_pass "$TEST_KEY" rose suite-clean -v -v -n $NAME <<<'y'
-run_fail "$TEST_KEY.locahost.ls" \
-    ls -d $HOME/cylc-run/$NAME $HOME/.cylc/{$NAME,REGDB/$NAME}
-if [[ -n "$JOB_HOST" ]]; then
-    run_fail "$TEST_KEY.job-host.ls" ssh "$JOB_HOST" "ls -d cylc-run/$NAME"
-fi
-#-------------------------------------------------------------------------------
+rose suite-clean -q -y --name="$NAME"
 exit 0
