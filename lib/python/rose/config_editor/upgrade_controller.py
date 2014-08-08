@@ -153,8 +153,8 @@ class UpgradeController(object):
                 manager.set_new_tag(next_version)
                 macro_config = copy.deepcopy(config)
                 try:
-                    new_config, change_list = manager.transform(macro_config,
-                        custom_inspector=upgrade_inspector)
+                    new_config, change_list = manager.transform(
+                        macro_config, custom_inspector=upgrade_inspector)
                 except Exception as e:
                     rose.gtk.dialog.run_dialog(
                         rose.gtk.dialog.DIALOG_TYPE_ERROR,

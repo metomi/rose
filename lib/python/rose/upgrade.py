@@ -362,7 +362,7 @@ class MacroUpgradeManager(object):
                     else:
                         break
 
-                if optionals: 
+                if optionals:
                     if custom_inspector:
                         res = custom_inspector(optionals, "upgrade_macro")
                     else:

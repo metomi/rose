@@ -972,9 +972,9 @@ class MainMenuHandler(object):
                     "directory": config_data.directory
                 }
         rose.config_editor.upgrade_controller.UpgradeController(
-                           config_dict, self.handle_macro_transforms,
-                           parent_window=self.mainwindow.window,
-                           upgrade_inspector=self.override_macro_defaults)
+            config_dict, self.handle_macro_transforms,
+            parent_window=self.mainwindow.window,
+            upgrade_inspector=self.override_macro_defaults)
 
     def help(self, *args):
         # Handle a GUI help request.
