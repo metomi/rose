@@ -650,15 +650,18 @@ class CylcProcessor(SuiteEngineProcessor):
         return self.popen.run("cylc", "get-directory", suite_name)[0] == 0
 
     def is_suite_running(self, user_name, suite_name, hosts=None):
-        """Return the port file path if it looks like suite is running.
+        """Return the reasons if it looks like suite is running.
 
-        If pgrep "cylc-{run,restart} suite_name",
-        return (host, "process", pid).
+        return [
+            {
+                "host": host,
+                "reason_key": reason_key,
+                "reason_value": reason_value
+            },
+            # ...
+        ]
 
-        If port file exists,
-        return (host, "port-file", "/path/to/.cylc/ports/suite_name").
-
-        Return () otherwise.
+        If not running, return an empty list.
 
         """
         if not hosts:
@@ -671,11 +674,15 @@ class CylcProcessor(SuiteEngineProcessor):
                  "python.*cylc-(run|restart).*\\<" + suite_name + "\\>"]
         ret_code, out, _ = self.popen.run(*pgrep)
         if ret_code == 0:
+            proc_reasons = []
             for line in out.splitlines():
                 if suite_name in line.split():
-                    return [{"host": "localhost",
-                             "reason_key": self.REASON_KEY_PROC,
-                             "reason_value": line}]
+                    proc_reasons.append({
+                        "host": "localhost",
+                        "reason_key": self.REASON_KEY_PROC,
+                        "reason_value": line})
+            if proc_reasons:
+                return proc_reasons
 
         # remote hosts pgrep and ls port file
         host_proc_dict = {}
@@ -720,7 +727,6 @@ class CylcProcessor(SuiteEngineProcessor):
                                         "host": host,
                                         "reason_key": self.REASON_KEY_FILE,
                                         "reason_value": line})
-                        break
             if host_proc_dict:
                 sleep(0.1)
 

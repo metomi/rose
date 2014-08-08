@@ -97,5 +97,5 @@ for CYCLE in 20130101T0000Z 20130101T1200Z 20130102T0000Z; do
     PREV_CYCLE=$CYCLE
 done
 #-------------------------------------------------------------------------------
-#rose suite-clean -q -y $NAME
+rose suite-clean -q -y $NAME
 exit 0

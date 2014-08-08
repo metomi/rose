@@ -69,14 +69,14 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 <i class="icon-play icon-white" title="running"></i></span>
 {% if states.last_activity_time -%}
 <abbr class="livestamp" title=
-"{{states.last_activity_time}}Z">{{states.last_activity_time}}Z</abbr>
+"{{states.last_activity_time}}">{{states.last_activity_time}}</abbr>
 {% endif -%}
 </a></li>
 {% elif states.last_activity_time -%}
 <li><a>
 <i class="icon-stop" title="last active"></i>
 <abbr class="livestamp" title=
-"{{states.last_activity_time}}Z">{{states.last_activity_time}}Z</abbr>
+"{{states.last_activity_time}}">{{states.last_activity_time}}</abbr>
 </a></li>
 {% endif -%}
 </ul>

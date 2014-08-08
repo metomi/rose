@@ -47,10 +47,8 @@ TIME_OUT=$(($(date +%s) + 120))
 GREP="grep -q CYLC_JOB_EXIT= ~/cylc-run/$NAME/log/job/my_task_1.1.1.status"
 if [[ -n $HOST ]]; then
     CMD_PREFIX="ssh -oBatchMode=yes $HOST"
-    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run.*\\<$NAME\\>'")
 else
     CMD_PREFIX=eval
-    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>")
 fi
 while ! $CMD_PREFIX "$GREP" 2>/dev/null; do
     if (($(date +%s) > $TIME_OUT)); then
@@ -60,13 +58,19 @@ while ! $CMD_PREFIX "$GREP" 2>/dev/null; do
 done
 $CMD_PREFIX "mv ~/.cylc/ports/$NAME $NAME.port"
 ERR_HOST=${HOST:-localhost}
+if [[ -n $HOST ]]; then
+    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run.*\\<$NAME\\>'")
+else
+    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>")
+fi
+SUITE_PROC=$(awk '{print "[FAIL]     " $0}' <<<"$SUITE_PROC")
 run_fail "$TEST_KEY" \
     rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     $OPT_HOST --no-gcontrol
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERR__
 [FAIL] Suite "$NAME" may still be running.
 [FAIL] Host "${HOST:-localhost}" has process:
-[FAIL]     $SUITE_PROC
+$SUITE_PROC
 [FAIL] Try "rose suite-shutdown --name=$NAME" first?
 __ERR__
 run_pass "$TEST_KEY.NAME1" \

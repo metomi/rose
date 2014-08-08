@@ -7,8 +7,8 @@
         timeout = 4320 # 3 days
     # End Rose required event hook block
 [scheduling]
-    initial cycle time = 2013010100 # The first cycle of the suite is at 00:00 on Jan 1 2013
-    final cycle time   = 2013010200 # The last cycle of the suite is at 00:00 on Jan 2 2013
+    initial cycle point = 2013010100 # The first cycle of the suite is at 00:00 on Jan 1 2013
+    final cycle point   = 2013010200 # The last cycle of the suite is at 00:00 on Jan 2 2013
     [[special tasks]]
         cold-start = fcm_make # This task is only run at the beginning of the suite
     [[dependencies]]

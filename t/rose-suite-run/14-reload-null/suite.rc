@@ -5,8 +5,8 @@ UTC mode=True
 timeout handler=rose suite-hook --shutdown
 timeout=2
 [scheduling]
-initial cycle time=2013010100
-final cycle time=2013010112
+initial cycle point=2013010100
+final cycle point=2013010112
 [[dependencies]]
 [[[0,12]]]
 graph="""t1[T-12]=>t1"""

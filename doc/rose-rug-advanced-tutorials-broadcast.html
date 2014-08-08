@@ -114,8 +114,8 @@
         timeout handler = rose suite-hook --mail --shutdown
         timeout = 4320 # 3 days
 [scheduling]
-    initial cycle time = 2013010100
-    final cycle time = 2013010500
+    initial cycle point = 2013010100
+    final cycle point = 2013010500
     [[special tasks]]
         cold-start = startup
     [[dependencies]]
@@ -226,7 +226,7 @@ rose suite-log
       <p>We should make the suite run a bit longer by increasing <samp>final
       cycle time</samp>:</p>
       <pre class="prettyprint lang-cylc">
-    final cycle time = 2013012500
+    final cycle point = 2013012500
 </pre>
     </div>
 

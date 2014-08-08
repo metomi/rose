@@ -5,8 +5,8 @@
         timeout handler=rose suite-hook --shutdown
         timeout=2
 [scheduling]
-    initial cycle time=2013010100
-    final cycle time=2013010212
+    initial cycle point=2013010100
+    final cycle point=2013010212
     [[dependencies]]
         [[[ 0, 12 ]]]
             graph=my_task_1
