@@ -17,19 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
+"""Implement "rosie go"."""
 
 import ast
 import functools
-import gobject
 import os
-import re
-import shlex
 import subprocess
 import sys
 import threading
 import time
 import traceback
-import urllib
 import warnings
 import webbrowser
 
@@ -78,7 +75,7 @@ class MainWindow(gtk.Window):
         try:
             self.search_manager = rosie.browser.search.SearchManager(
                                                        opts.prefix)
-        except rosie.ws_client.UnknownRootError:
+        except rosie.ws_client.UndefinedRosiePrefixWS:
             splash_updater.stop()
             rose.gtk.dialog.run_dialog(
                           rose.gtk.dialog.DIALOG_TYPE_ERROR,
@@ -96,7 +93,7 @@ class MainWindow(gtk.Window):
         else:
             try:
                 self.sched_icon_path = locator.locate(
-                                               rosie.browser.ICON_PATH_SCHEDULER)
+                    rosie.browser.ICON_PATH_SCHEDULER)
             except ResourceError:
                 self.sched_icon_path = None
         self.query_rows = None
@@ -184,6 +181,7 @@ class MainWindow(gtk.Window):
 
         # if the url string doesn't begin with a valid prefix
         if not (address_url.startswith("http://") or
+                address_url.startswith("https://") or
                 address_url.startswith("search?s=") or
                 address_url.startswith("query?q=") or
                 (address_url.startswith("roses:") and
@@ -242,9 +240,9 @@ class MainWindow(gtk.Window):
                                                      address_url,
                                                      self.search_history)
 
-            except rosie.ws_client.QueryError as e:
+            except rosie.ws_client.QueryError as exc:
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                           str(e),
+                                           str(exc),
                                            rosie.browser.TITLE_INVALID_QUERY)
                 results = []
             self.display_maps_result(results)
@@ -266,9 +264,9 @@ class MainWindow(gtk.Window):
         try:
             new_id = self.suite_director.vc_client.create(config, from_id,
                                          self.search_manager.ws_client.prefix)
-        except Exception as e:
+        except Exception as exc:
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       type(e).__name__ + ": " + str(e),
+                                       type(exc).__name__ + ": " + str(exc),
                                        title=rosie.browser.TITLE_ERROR)
             return None
 
@@ -373,11 +371,11 @@ class MainWindow(gtk.Window):
                                            instant=True)
         elif is_local and len(results) > 0:
             self.statusbar.set_status_text(
-                           rosie.browser.STATUS_LOCAL_GOT.format(
-                           len(results),str(now)), instant=True)
+               rosie.browser.STATUS_LOCAL_GOT.format(len(results), str(now)),
+               instant=True)
         elif is_local and len(results) == 0:
             if user is None:
-                user="~"
+                user = "~"
             path = os.path.expanduser(user)
             self.statusbar.set_status_text(
                  rosie.browser.STATUS_NO_LOCAL_SUITES.format(path, str(now)),
@@ -477,24 +475,24 @@ class MainWindow(gtk.Window):
     def generate_toolbar(self):
         """Generate the toolbar."""
         self.toolbar = rose.gtk.util.ToolBar(
-                       widgets=[(rosie.browser.TIP_TOOLBAR_NEW,
-                                 "gtk.STOCK_NEW"),
-                                (rosie.browser.TIP_TOOLBAR_EDIT,
-                                 "gtk.STOCK_EDIT"),
-                                (rosie.browser.TIP_TOOLBAR_CHECKOUT,
-                                 "gtk.STOCK_GO_DOWN"),
-                                (rosie.browser.TIP_TOOLBAR_COPY,
-                                 "gtk.STOCK_COPY"),
-                                (rosie.browser.TIP_TOOLBAR_VIEW_WEB,
-                                 "gtk.STOCK_ABOUT"),
-                                (rosie.browser.TIP_TOOLBAR_VIEW_OUTPUT,
-                                 "gtk.STOCK_DIRECTORY"),
-                                (rosie.browser.TIP_TOOLBAR_LAUNCH_TERMINAL,
-                                 "gtk.STOCK_EXECUTE"),
-                                (rosie.browser.TIP_TOOLBAR_LAUNCH_SUITE_GCONTROL,
-                                 self.get_sched_toolitem)],
-                       sep_on_name=[rosie.browser.TIP_TOOLBAR_COPY,
-                                    rosie.browser.TIP_TOOLBAR_LAUNCH_TERMINAL])
+            widgets=[(rosie.browser.TIP_TOOLBAR_NEW,
+                      "gtk.STOCK_NEW"),
+                     (rosie.browser.TIP_TOOLBAR_EDIT,
+                      "gtk.STOCK_EDIT"),
+                     (rosie.browser.TIP_TOOLBAR_CHECKOUT,
+                      "gtk.STOCK_GO_DOWN"),
+                     (rosie.browser.TIP_TOOLBAR_COPY,
+                      "gtk.STOCK_COPY"),
+                     (rosie.browser.TIP_TOOLBAR_VIEW_WEB,
+                      "gtk.STOCK_ABOUT"),
+                     (rosie.browser.TIP_TOOLBAR_VIEW_OUTPUT,
+                      "gtk.STOCK_DIRECTORY"),
+                     (rosie.browser.TIP_TOOLBAR_LAUNCH_TERMINAL,
+                      "gtk.STOCK_EXECUTE"),
+                     (rosie.browser.TIP_TOOLBAR_LAUNCH_SUITE_GCONTROL,
+                      self.get_sched_toolitem)],
+            sep_on_name=[rosie.browser.TIP_TOOLBAR_COPY,
+                         rosie.browser.TIP_TOOLBAR_LAUNCH_TERMINAL])
         self.toolbar.set_widget_function(rosie.browser.TIP_TOOLBAR_NEW,
                                          self.handle_create)
         self.toolbar.set_widget_function(rosie.browser.TIP_TOOLBAR_EDIT,
@@ -565,12 +563,13 @@ class MainWindow(gtk.Window):
         return self.advanced_search_widget.display_columns
 
     def _get_sched_image(self, size=gtk.ICON_SIZE_MENU):
+        """Return icon image for suite engine."""
         if self.sched_icon_path is None:
             image = gtk.image_new_from_stock(gtk.STOCK_MISSING_IMAGE, size)
         else:
-            w, h = gtk.icon_size_lookup(size)
+            width, height = gtk.icon_size_lookup(size)
             pix = gtk.gdk.pixbuf_new_from_file(self.sched_icon_path)
-            pix = pix.scale_simple(w, h, gtk.gdk.INTERP_BILINEAR)
+            pix = pix.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR)
             image = gtk.image_new_from_pixbuf(pix)
         return image
 
@@ -593,7 +592,7 @@ class MainWindow(gtk.Window):
         titles = [t for t in self.advanced_search_widget.display_columns]
         return titles
 
-    def _get_treeview_drag_data(self, widget, context, selection, info, time):
+    def _get_treeview_drag_data(self, widget, context, selection, info, _):
         """Set the drag data for the search treeview."""
         selection.set_text(self.get_selected_suite_id())
 
@@ -714,8 +713,9 @@ class MainWindow(gtk.Window):
             q_hist = self.history_pane.treestore_hist.get_value(this_iter, 2)
             self.set_search_details(q_type, q_par, q_hist)
             if q_type == "search":
-                self.handle_search(None)# could set record to false if this new
-                                        # run shouldn't be recorded
+                # could set record to False if this new run shouldn't be
+                # recorded
+                self.handle_search(None)
             elif q_type == "query":
                 self.handle_query(None)
             elif q_type == "url":
@@ -739,17 +739,16 @@ class MainWindow(gtk.Window):
         id_text = self.get_selected_suite_id()
         try:
             rose.external.launch_terminal(cwd=SuiteId(id_text).to_local_copy())
-        except RosePopenError as e:
+        except RosePopenError as exc:
             rose.gtk.dialog.run_dialog(
                                 rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                str(e),
+                                str(exc),
                                 rosie.browser.TITLE_ERROR)
-
 
     def handle_next_search(self, *args):
         """Handles trying to run next search."""
         if self.nav_bar.next_search_button.get_property('sensitive'):
-            self.handle_search_navigation(next=True)
+            self.handle_search_navigation(is_next=True)
 
     def _handle_display_change(self, menuitem):
         """Handles changing view options."""
@@ -770,9 +769,9 @@ class MainWindow(gtk.Window):
     def handle_previous_search(self, *args):
         """Handles trying to run the previous search."""
         if self.nav_bar.previous_search_button.get_property('sensitive'):
-            self.handle_search_navigation(next=False)
+            self.handle_search_navigation(is_next=False)
 
-    def handle_query(self, widget = None, record = True, *args):
+    def handle_query(self, widget=None, record=True, *args):
         """Retrieve filters from widgets and apply."""
         self.local_updater.update_now()
         filters, proceed = self.advanced_search_widget.get_query()
@@ -792,18 +791,18 @@ class MainWindow(gtk.Window):
                     recorded = self.hist.record_search("query", repr(filters),
                                                         self.search_history)
                     if recorded == True:
-                        for h in filters: # Hacky but needed otherwise
-                                          # entries in history menu appear
-                                          # with unicode marker
+                        # Hacky but needed otherwise entries in history menu
+                        # appear with unicode marker
+                        for _ in filters:
                             msg = "["
-                            for m in range(len(filters)-1):
-                                msg = msg + "'" + filters[m] + "', "
+                            for i in range(len(filters) - 1):
+                                msg = msg + "'" + filters[i] + "', "
                             msg = msg + "'" + filters[-1] + "']"
                         self.handle_record_search_ui("query", msg,
                                                      self.search_history)
-            except rosie.ws_client.QueryError as e:
+            except rosie.ws_client.QueryError as exc:
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                           str(e),
+                                           str(exc),
                                            rosie.browser.TITLE_INVALID_QUERY)
                 results = []
             self.statusbar.set_progressbar_pulsing(False)
@@ -826,7 +825,7 @@ class MainWindow(gtk.Window):
         if self.nav_bar.address_box.child.get_text() == "roses:/":
             self.display_local_suites()
         else:
-             self.address_bar_lookup(None, False)
+            self.address_bar_lookup(None, False)
 
     def handle_run(self, *args):
         """Run a checked-out suite."""
@@ -879,20 +878,20 @@ class MainWindow(gtk.Window):
                 if recorded == True:
                     self.handle_record_search_ui("search", search_text,
                                                  self.search_history)
-        except rosie.ws_client.QueryError as e:
+        except rosie.ws_client.QueryError as exc:
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       str(e),
+                                       str(exc),
                                        rosie.browser.TITLE_INVALID_QUERY)
             results = []
         self.display_maps_result(results)
         self.repeat_last_request = self.handle_search
         self.statusbar.set_progressbar_pulsing(False)
 
-    def handle_search_navigation(self, next=None, *args):
+    def handle_search_navigation(self, is_next=None, *args):
         """Handle running either previous or next search in session history"""
 
-        if next is not None:
-            if next:
+        if is_next is not None:
+            if is_next:
                 self.nav_bar.previous_search_button.set_sensitive(True)
                 search, enable = self.hist.get_next()
                 self.nav_bar.next_search_button.set_sensitive(enable)
@@ -927,13 +926,14 @@ class MainWindow(gtk.Window):
                     self.nav_bar.address_box.child.set_text("roses:/")
                     user = None
                 else:
-                    user = search.details[:-1].replace("roses:","")
+                    user = search.details[:-1].replace("roses:", "")
                     if not user.startswith("~"):
                         user = "~" + user
                     self.nav_bar.address_box.child.set_text(search.details)
-                self.display_local_suites(navigate=False, user=user) #need to do something with this...
+                # need to do something with this...
+                self.display_local_suites(navigate=False, user=user)
             else:
-                if next:
+                if is_next:
                     msg = rosie.browser.ERROR_UNRECOGNISED_NEXT_SEARCH
                 else:
                     msg = rosie.browser.ERROR_UNRECOGNISED_LAST_SEARCH
@@ -942,7 +942,7 @@ class MainWindow(gtk.Window):
                                 msg,
                                 rosie.browser.TITLE_HISTORY_NAVIGATION_ERROR)
         else:
-            if next:
+            if is_next:
                 err = rosie.browser.ERROR_NO_NEXT_SEARCH
             else:
                 err = rosie.browser.ERROR_NO_PREVIOUS_SEARCH
@@ -994,9 +994,10 @@ class MainWindow(gtk.Window):
                                                             str(id_))
 
     def handle_view_output_event(self, event, *args, **kwargs):
+        """Event handler for "rose.suite_engine_proc"."""
         if isinstance(event, WebBrowserEvent):
-            s = rosie.browser.STATUS_OPENING_LOG.format(event.url)
-            self.statusbar.set_status_text(s, instant=True)
+            text = rosie.browser.STATUS_OPENING_LOG.format(event.url)
+            self.statusbar.set_status_text(text, instant=True)
 
     def handle_view_web(self, *args):
         """View a suite's web source URL."""
@@ -1016,7 +1017,7 @@ class MainWindow(gtk.Window):
             self.advanced_search_widget.add_filter()
             return
         elif not opts.query and not opts.search and not opts.url:
-            if args[0].startswith("http"):
+            if args[0].startswith("http://") or args[0].startswith("https://"):
                 opts.url = True
             else:
                 opts.search = True
@@ -1037,9 +1038,9 @@ class MainWindow(gtk.Window):
             self.nav_bar.expander.child.toggle(False)
             try:
                 args = [rose.env.env_var_process(arg) for arg in args]
-            except rose.env.UnboundEnvironmentVariableError as e:
+            except rose.env.UnboundEnvironmentVariableError as exc:
                 rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                           str(e),
+                                           str(exc),
                                            rosie.browser.TITLE_INVALID_QUERY)
                 self.advanced_search_widget.add_filter()
                 return
@@ -1079,7 +1080,8 @@ class MainWindow(gtk.Window):
         this_iter = model.get_iter(path)
         idx = model.get_value(this_iter, suite_col_index)
         col_index = self.display_box.treeview.get_columns().index(col)
-        col_widget = self.display_box.treeview.get_columns()[col_index].get_widget()
+        col_widget = (
+            self.display_box.treeview.get_columns()[col_index].get_widget())
         col_name = col_widget.get_text()
         ui_config_string = """<ui> <popup name='Popup'>
                               <menuitem action="Info"/>
@@ -1136,8 +1138,8 @@ class MainWindow(gtk.Window):
         uimanager.insert_action_group(actiongroup, pos=0)
         uimanager.add_ui_from_string(ui_config_string)
         status = self.display_box._get_treeview_path_status(path)
-        can_edit =  (status not in [rosie.ws_client.STATUS_CR,
-                                    rosie.ws_client.STATUS_NO])
+        can_edit = (status not in [rosie.ws_client.STATUS_CR,
+                                   rosie.ws_client.STATUS_NO])
         can_checkout = (status == rosie.ws_client.STATUS_NO)
         info_item = uimanager.get_widget("/Popup/Info")
         info_item.connect("activate", self.handle_info)
@@ -1215,8 +1217,8 @@ class MainWindow(gtk.Window):
         try:
             items = {}
             results, url = self.search_manager.ws_query(filters, **items)
-        except Exception as e:
-            rose.reporter.Reporter()(e)
+        except Exception as exc:
+            rose.reporter.Reporter()(exc)
             results = []
         if len(results) == 0:
             return False
@@ -1233,8 +1235,8 @@ class MainWindow(gtk.Window):
         self.advanced_search_widget.remove_filter()
         self.nav_bar.expander.child.toggle(False)
         filters = " ".join(filters).split(" ")
-        for f in rosie.ws_client.query_split(filters):
-            self.advanced_search_widget.add_filter(f)
+        for filter_ in rosie.ws_client.query_split(filters):
+            self.advanced_search_widget.add_filter(filter_)
 
     def set_search_details(self, s_type, s_params, s_use_hist):
         """Set the front end search and query details."""
@@ -1281,7 +1283,7 @@ class MainWindow(gtk.Window):
         self.nav_bar.search_button.child.connect("clicked",
                                                  self.handle_search)
 
-    def show_search_history(self,widget):
+    def show_search_history(self, widget):
         """Toggle the display of the search history."""
         search_history = widget.get_active()
         if search_history:
@@ -1346,8 +1348,8 @@ class MainWindow(gtk.Window):
             self.run_button.set_sensitive(can_edit)
 
 
-if __name__ == "__main__":
-
+def main():
+    """Implement "rosie go"."""
     opt_parser = RoseOptionParser().add_my_options("all_revs",
                                                    "prefix", "query",
                                                    "search", "url")
@@ -1370,16 +1372,16 @@ if __name__ == "__main__":
         warnings.filterwarnings('ignore')
     try:
         MainWindow(opts, args, splash_screen)
-    except BaseException as e:
+    except BaseException as exc:
         splash_screen.stop()
         gtk.gdk.threads_leave()
         for thread in threading.enumerate():
             if hasattr(thread, "stop"):
                 thread.stop()
-        if opts.debug_mode and isinstance(e, Exception):
+        if opts.debug_mode and isinstance(exc, Exception):
             # Write out origin information - this is otherwise lost.
             traceback.print_exc()
-        raise e
+        raise exc
     gtk.settings_get_default().set_long_property("gtk-button-images",
                                                  True, "main")
     gtk.settings_get_default().set_long_property("gtk-menu-images",
@@ -1394,3 +1396,7 @@ if __name__ == "__main__":
         for thread in threading.enumerate():
             if hasattr(thread, "stop"):
                 thread.stop()
+
+
+if __name__ == "__main__":
+    main()
