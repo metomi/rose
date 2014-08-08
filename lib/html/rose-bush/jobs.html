@@ -69,14 +69,14 @@ role="dialog" aria-labelledby="suite-info-label" aria-hidden="true">
 <i class="icon-play icon-white" title="running"></i></span>
 {% if states.last_activity_time -%}
 <abbr class="livestamp" title=
-"{{states.last_activity_time}}Z">{{states.last_activity_time}}Z</abbr>
+"{{states.last_activity_time}}">{{states.last_activity_time}}</abbr>
 {% endif -%}
 </a></li>
 {% elif states.last_activity_time -%}
 <li><a>
 <i class="icon-stop" title="last active"></i>
 <abbr class="livestamp" title=
-"{{states.last_activity_time}}Z">{{states.last_activity_time}}Z</abbr>
+"{{states.last_activity_time}}">{{states.last_activity_time}}</abbr>
 </a></li>
 {% endif -%}
 </ul>
@@ -379,17 +379,17 @@ title="{{log.size}} bytes">{{key}}</a>
 <div class="span4 text-right"><!-- entry: time -->
 <small>
 <i class="icon-info-sign" title="Submitted"></i> <abbr class="t_submit livestamp"
-title="{{entry.events[0]}}Z">{{entry.events[0]}}Z</abbr>
+title="{{entry.events[0]}}">{{entry.events[0]}}</abbr>
 <!-- entry: submit time -->
 <!-- entry: init time -->
 {% if entry.events[1] -%}
 <i class="icon-play" title="Started"></i> <abbr class="t_init"
-title="{{entry.events[1]}}Z">{{entry.events[1]}}Z</abbr>
+title="{{entry.events[1]}}">{{entry.events[1]}}</abbr>
 {% endif -%}
 <!-- entry: exit time -->
 {% if entry.events[2] -%}
 <i class="icon-stop" title="Exited"></i> <abbr class="t_exit"
-title="{{entry.events[2]}}Z">{{entry.events[2]}}Z</abbr>
+title="{{entry.events[2]}}">{{entry.events[2]}}</abbr>
 {% endif -%}
 <!-- entry: exit time -->
 </small>
