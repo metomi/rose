@@ -36,7 +36,7 @@ class UpgradeController(object):
     """Configure the upgrade of configurations."""
 
     def __init__(self, app_config_dict, handle_transform_func,
-                 parent_window=None):
+                 parent_window=None, upgrade_inspector=None):
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                    gtk.STOCK_APPLY, gtk.RESPONSE_ACCEPT)
         self.window = gtk.Dialog(buttons=buttons)
@@ -153,7 +153,8 @@ class UpgradeController(object):
                 manager.set_new_tag(next_version)
                 macro_config = copy.deepcopy(config)
                 try:
-                    new_config, change_list = manager.transform(macro_config)
+                    new_config, change_list = manager.transform(macro_config,
+                        custom_inspector=upgrade_inspector)
                 except Exception as e:
                     rose.gtk.dialog.run_dialog(
                         rose.gtk.dialog.DIALOG_TYPE_ERROR,

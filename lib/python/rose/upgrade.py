@@ -341,7 +341,8 @@ class MacroUpgradeManager(object):
             return []
         return self.version_macros[start_index: end_index + 1]
 
-    def transform(self, config, meta_config=None, opt_non_interactive=False):
+    def transform(self, config, meta_config=None, opt_non_interactive=False,
+                  custom_inspector=False):
         """Transform a configuration by looping over upgrade macros."""
         self.reports = []
         for macro in self.get_macros():
@@ -361,7 +362,12 @@ class MacroUpgradeManager(object):
                         defaultlist = defaultlist[0:-1]
                     else:
                         break
-                res = rose.macro.get_user_values(optionals)
+
+                if optionals: 
+                    if custom_inspector:
+                        res = custom_inspector(optionals, "upgrade_macro")
+                    else:
+                        res = rose.macro.get_user_values(optionals)
             upgrade_macro_result = func(config, meta_config, **res)
             config, i_changes = upgrade_macro_result
             self.reports += i_changes
