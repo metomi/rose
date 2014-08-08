@@ -120,7 +120,7 @@ class RoseDateTimeOperator(object):
         """
         if print_format is None:
             return str(time_point)
-        if print_format and "%" in print_format:
+        if "%" in print_format:
             try:
                 return time_point.strftime(print_format)
             except ValueError:
