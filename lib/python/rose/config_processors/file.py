@@ -47,9 +47,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
     def __init__(self, *args, **kwargs):
         ConfigProcessorBase.__init__(self, *args, **kwargs)
         self.loc_handlers_manager = PullableLocHandlersManager(
-                event_handler=self.manager.event_handler,
-                popen=self.manager.popen,
-                fs_util=self.manager.fs_util)
+            event_handler=self.manager.event_handler,
+            popen=self.manager.popen,
+            fs_util=self.manager.fs_util)
 
     def handle_event(self, *args):
         """Invoke event handler with *args, if there is one."""
@@ -86,8 +86,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
         cwd = os.getcwd()
         file_install_root = conf_tree.node.get_value(
-                ["file-install-root"],
-                os.getenv("ROSE_FILE_INSTALL_ROOT", None))
+            ["file-install-root"],
+            os.getenv("ROSE_FILE_INSTALL_ROOT", None))
         if file_install_root:
             file_install_root = env_var_process(file_install_root)
             self.manager.fs_util.makedirs(file_install_root)
@@ -97,7 +97,6 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         finally:
             if cwd != os.getcwd():
                 self.manager.fs_util.chdir(cwd)
-
 
     def _process(self, conf_tree, nodes, loc_dao, **kwargs):
         """Helper for self.process."""
@@ -138,7 +137,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 for raw_source_glob in shlex.split(source_str):
                     source_glob = raw_source_glob
                     if (raw_source_glob.startswith("(") and
-                        raw_source_glob.endswith(")")):
+                            raw_source_glob.endswith(")")):
                         source_glob = raw_source_glob[1:-1]
                     names = glob(source_glob)
                     if names:
@@ -159,7 +158,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                             raise ConfigProcessError([key, k], source_str)
                         targets[name].real_name = source_name
                     else:
-                        if not sources.has_key(source_name):
+                        if source_name not in sources:
                             sources[source_name] = Loc(source_name)
                             sources[source_name].action_key = Loc.A_SOURCE
                             sources[source_name].is_optional = is_optional
@@ -169,7 +168,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
         # Determine the scheme of the location from configuration.
         config_schemes_str = conf_tree.node.get_value(["schemes"])
-        config_schemes = [] # [(pattern, scheme), ...]
+        config_schemes = []  # [(pattern, scheme), ...]
         if config_schemes_str:
             for line in config_schemes_str.splitlines():
                 pattern, scheme = line.split("=", 1)
@@ -198,16 +197,16 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     continue
                 else:
                     raise ConfigProcessError(
-                            ["file:" + source.used_by_names[0], "source"],
-                            source.name)
+                        ["file:" + source.used_by_names[0], "source"],
+                        source.name)
             prev_source = loc_dao.select(source.name)
             source.is_out_of_date = (
-                    not prev_source or
-                    (not source.key and not source.paths) or
-                    prev_source.scheme != source.scheme or
-                    prev_source.loc_type != source.loc_type or
-                    prev_source.key != source.key or
-                    sorted(prev_source.paths) != sorted(source.paths))
+                not prev_source or
+                (not source.key and not source.paths) or
+                prev_source.scheme != source.scheme or
+                prev_source.loc_type != source.loc_type or
+                prev_source.key != source.key or
+                sorted(prev_source.paths) != sorted(source.paths))
 
         # Inspect each target to see if it is out of date:
         # * Target does not already exist.
@@ -217,25 +216,27 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         for target in targets.values():
             if target.real_name:
                 target.is_out_of_date = (
-                        not os.path.islink(target.name) or
-                        target.real_name != os.readlink(target.name))
+                    not os.path.islink(target.name) or
+                    target.real_name != os.readlink(target.name))
             elif target.mode == target.MODE_MKDIR:
-                target.is_out_of_date = (os.path.islink(target.name) or
-                                         not os.path.isdir(target.name))
+                target.is_out_of_date = (
+                    os.path.islink(target.name) or
+                    not os.path.isdir(target.name))
             else:
                 # See if target is modified compared with previous record
                 if (os.path.exists(target.name) and
-                    not os.path.islink(target.name)):
-                    for path, checksum in get_checksum(target.name):
-                        target.add_path(path, checksum)
+                        not os.path.islink(target.name)):
+                    for path, checksum, access_mode in get_checksum(
+                            target.name):
+                        target.add_path(path, checksum, access_mode)
                     target.paths.sort()
                 prev_target = loc_dao.select(target.name)
                 target.is_out_of_date = (
-                        os.path.islink(target.name) or
-                        not os.path.exists(target.name) or
-                        prev_target is None or
-                        prev_target.mode != target.mode or
-                        len(prev_target.paths) != len(target.paths))
+                    os.path.islink(target.name) or
+                    not os.path.exists(target.name) or
+                    prev_target is None or
+                    prev_target.mode != target.mode or
+                    len(prev_target.paths) != len(target.paths))
                 if not target.is_out_of_date:
                     for prev_path, path in zip(
                             prev_target.paths, target.paths):
@@ -266,13 +267,13 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 self.manager.fs_util.makedirs(target.name)
                 loc_dao.update(target)
                 target.loc_type = target.TYPE_TREE
-                target.add_path(target.BLOB, None)
+                target.add_path(target.BLOB, None, None)
             elif target.dep_locs:
                 if os.path.islink(target.name):
                     self.manager.fs_util.delete(target.name)
                 jobs[target.name] = JobProxy(target)
                 for source in target.dep_locs:
-                    if not jobs.has_key(source.name):
+                    if source.name not in jobs:
                         jobs[source.name] = JobProxy(source)
                         jobs[source.name].event_level = Event.V
                     job = jobs[source.name]
@@ -286,8 +287,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             else:
                 self.manager.fs_util.install(target.name)
                 target.loc_type = target.TYPE_BLOB
-                for path, checksum in get_checksum(target.name):
-                    target.add_path(path, checksum)
+                for path, checksum, access_mode in get_checksum(target.name):
+                    target.add_path(path, checksum, access_mode)
                 loc_dao.update(target)
 
         if jobs:
@@ -301,11 +302,12 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 job_runner = JobRunner(self, nproc)
                 job_runner(JobManager(jobs), conf_tree, loc_dao, work_dir)
             except ValueError as exc:
-                if exc.args and jobs.has_key(exc.args[0]):
+                if exc.args and exc.args[0] in jobs:
                     job = jobs[exc.args[0]]
                     if job.context.action_key == Loc.A_SOURCE:
                         source = job.context
-                        keys = [self.PREFIX + source.used_by_names[0], "source"]
+                        keys = [self.PREFIX + source.used_by_names[0],
+                                "source"]
                         raise ConfigProcessError(keys, source.name)
                 raise exc
             finally:
@@ -313,7 +315,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
         # Target checksum compare and report
         for target in targets.values():
-            if not target.is_out_of_date or target.loc_type == target.TYPE_TREE:
+            if (not target.is_out_of_date or
+                    target.loc_type == target.TYPE_TREE):
                 continue
             keys = [self.PREFIX + target.name, "checksum"]
             checksum_expected = conf_tree.node.get_value(keys)
@@ -386,7 +389,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     mod_bits = os.stat(source.cache).st_mode
                 else:
                     mod_bits |= os.stat(source.cache).st_mode
-            else: # target.loc_type == target.TYPE_TREE
+            else:  # target.loc_type == target.TYPE_TREE
                 args = []
                 if is_first:
                     self.manager.fs_util.makedirs(target.name)
@@ -402,8 +405,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # TODO: auto decompression of tar, gzip, etc?
 
         # Calculate target checksum(s)
-        for path, checksum in get_checksum(target.name):
-            target.add_path(path, checksum)
+        for path, checksum, access_mode in get_checksum(target.name):
+            target.add_path(path, checksum, access_mode)
 
 
 class ChecksumError(Exception):
@@ -473,7 +476,7 @@ class Loc(object):
         self.key = None
         self.cache = None
         self.used_by_names = []
-        self.is_out_of_date = None # boolean
+        self.is_out_of_date = None  # boolean
         self.is_optional = False
 
     def __str__(self):
@@ -518,15 +521,22 @@ class LocTypeError(Exception):
 class LocSubPath(object):
     """Represent a sub-path in a location."""
 
-    def __init__(self, name, checksum=None):
+    def __init__(self, name, checksum=None, access_mode=None):
         self.name = name
         self.checksum = checksum
+        self.access_mode = access_mode
 
     def __cmp__(self, other):
-        return cmp(self.name, other.name) or cmp(self.checksum, other.checksum)
+        return (
+            cmp(self.name, other.name) or
+            cmp(self.checksum, other.checksum) or
+            cmp(self.access_mode, other.access_mode))
 
     def __eq__(self, other):
-        return (self.name == other.name and self.checksum == other.checksum)
+        return (
+            self.name == other.name and
+            self.checksum == other.checksum and
+            self.access_mode == other.access_mode)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -563,13 +573,13 @@ class LocDAO(object):
         """Create the database file if it does not exist."""
         conn = self.get_conn()
         cur = conn.execute(
-                    """SELECT name FROM sqlite_master
-                       WHERE type="table"
-                       ORDER BY name""")
+            """SELECT name FROM sqlite_master WHERE type="table"
+               ORDER BY name""")
         names = [str(row[0]) for row in cur.fetchall()]
-        for name, schema in [("locs", self.SCHEMA_LOCS),
-                             ("paths", self.SCHEMA_PATHS),
-                             ("dep_names", self.SCHEMA_DEP_NAMES),]:
+        for name, schema in [
+                ("locs", self.SCHEMA_LOCS),
+                ("paths", self.SCHEMA_PATHS),
+                ("dep_names", self.SCHEMA_DEP_NAMES)]:
             if name not in names:
                 conn.execute("CREATE TABLE " + name + "(" + schema + ")")
         conn.commit()
@@ -597,15 +607,23 @@ class LocDAO(object):
         loc.real_name, loc.scheme, loc.mode, loc.loc_type, loc.key = row
 
         for row in conn.execute(
-                    """SELECT path,checksum FROM paths WHERE name=?""",
-                    [name]):
-            path, checksum = row
+                """SELECT path,checksum FROM paths WHERE name=?""",
+                [name]):
+            path, checksum_str = row
+            checksum = None
+            access_mode = None
+            if checksum_str:
+                checksum_items = checksum_str.rsplit(":", 1)
+                checksum = checksum_items.pop(0)
+                access_mode = None
+                if checksum_items:
+                    access_mode = int(checksum_items.pop(0))
             if loc.paths is None:
                 loc.paths = []
-            loc.add_path(path, checksum)
+            loc.add_path(path, checksum, access_mode)
 
         for row in conn.execute(
-                    """SELECT dep_name FROM dep_names WHERE name=?""", [name]):
+                """SELECT dep_name FROM dep_names WHERE name=?""", [name]):
             dep_name, = row
             if loc.dep_locs is None:
                 loc.dep_locs = []
@@ -616,17 +634,31 @@ class LocDAO(object):
     def update(self, loc):
         """Insert or update settings related to loc to the database."""
         conn = self.get_conn()
-        conn.execute("""INSERT OR REPLACE INTO locs VALUES(?,?,?,?,?,?)""",
-                     [loc.name, loc.real_name, loc.scheme, loc.mode,
-                      loc.loc_type, loc.key])
+        conn.execute(
+            """INSERT OR REPLACE INTO locs VALUES(?,?,?,?,?,?)""",
+            [
+                loc.name,
+                loc.real_name,
+                loc.scheme,
+                loc.mode,
+                loc.loc_type,
+                loc.key
+            ])
         if loc.paths:
             for path in loc.paths:
-                conn.execute("""INSERT OR REPLACE INTO paths VALUES(?,?,?)""",
-                             [loc.name, path.name, path.checksum])
+                if path.checksum and path.access_mode:
+                    checksum_str = ":".join(
+                        [path.checksum, str(path.access_mode)])
+                else:
+                    checksum_str = None
+                conn.execute(
+                    """INSERT OR REPLACE INTO paths VALUES(?,?,?)""",
+                    [loc.name, path.name, checksum_str])
         if loc.dep_locs:
             for dep_loc in loc.dep_locs:
-                conn.execute("""INSERT OR REPLACE INTO dep_names VALUES(?,?)""",
-                             [loc.name, dep_loc.name])
+                conn.execute(
+                    """INSERT OR REPLACE INTO dep_names VALUES(?,?)""",
+                    [loc.name, dep_loc.name])
         conn.commit()
 
 
@@ -650,8 +682,8 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         self.fs_util = fs_util
         path = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         SchemeHandlersManager.__init__(
-                self, [path], ns="rose.loc_handlers", attrs=["parse", "pull"],
-                can_handle="can_pull")
+            self, [path], ns="rose.loc_handlers", attrs=["parse", "pull"],
+            can_handle="can_pull")
 
     def handle_event(self, *args, **kwargs):
         """Call self.event_handler with given arguments if possible."""

@@ -31,7 +31,6 @@ import shlex
 import sys
 from time import localtime, sleep, strftime, time
 import traceback
-from uuid import uuid4
 
 
 class ConfigValueError(Exception):
@@ -42,15 +41,17 @@ class ConfigValueError(Exception):
     ERROR_FORMAT = "%s=%s: configuration value error: %s"
 
     def __str__(self):
-        keys, value, e = self.args
+        keys, value, exc = self.args
         keys = list(keys)
         key = keys.pop()
         if keys:
             key = "[" + "][".join(keys) + "]" + key
-        return self.ERROR_FORMAT % (key, value, str(e))
+        return self.ERROR_FORMAT % (key, value, str(exc))
 
 
 class CompulsoryConfigValueError(ConfigValueError):
+
+    """An exception raised if a compulsory configuration is missing."""
 
     ERROR_FORMAT = "%s=%s: missing configuration error: %s"
 
@@ -68,12 +69,12 @@ class PollTimeoutError(Exception):
     """An exception raised when time is out for polling."""
 
     def __str__(self):
-        t, dt, items = self.args
+        sec, delay, items = self.args
         items_str = ""
         for item in items:
             items_str += "\n* " + item
         return "%s poll timeout after %ds:%s" % (
-                strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), dt, items_str)
+            strftime("%Y-%m-%dT%H:%M:%S", localtime(sec)), delay, items_str)
 
 
 class UnknownBuiltinAppError(Exception):
@@ -101,12 +102,12 @@ class PollEvent(Event):
     LEVEL = Event.V
 
     def __str__(self):
-        t, test, ok = self.args
+        sec, test, is_ok = self.args
         ok_str = "ATTEMPT"
-        if ok:
+        if is_ok:
             ok_str = "OK"
         return "[POLL %s] %s %s" % (
-                ok_str, strftime("%Y-%m-%dT%H:%M:%S", localtime(t)), test)
+            ok_str, strftime("%Y-%m-%dT%H:%M:%S", localtime(sec)), test)
 
 
 class BuiltinApp(object):
@@ -125,13 +126,14 @@ class BuiltinApp(object):
         self.manager = manager
 
     def can_handle(self, key):
+        """Can this built-in application handle the "key" scheme?"""
         return key.startswith(self.SCHEME)
 
     def get_app_key(self, name):
         """Return the application key for a given (task) name."""
         return None
 
-    def run(self, conf_tree, opts, args, uuid, work_files):
+    def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Run the logic of a builtin application.
 
         conf_tree -- ConfigTree of the application configuration.
@@ -153,24 +155,24 @@ class AppRunner(Runner):
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
-        p = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
+        path = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         self.builtins_manager = SchemeHandlersManager(
-                [p], "rose.apps", ["run"], None, *args, **kwargs)
+            [path], "rose.apps", ["run"], None, *args, **kwargs)
 
     def run_impl(self, opts, args, uuid, work_files):
         """The actual logic for a run."""
 
         # Preparation.
         conf_tree = self.config_load(opts)
-        self._prep(conf_tree, opts, args, uuid, work_files)
-        self._poll(conf_tree, opts, args, uuid, work_files)
+        self._prep(conf_tree, opts)
+        self._poll(conf_tree)
 
         # Run the application or the command.
         app_mode = conf_tree.node.get_value(["mode"])
         if app_mode is None:
             app_mode = opts.app_mode
         if app_mode in [None, "command"]:
-            return self._command(conf_tree, opts, args, uuid, work_files)
+            return self._command(conf_tree, opts, args)
         else:
             builtin_app = self.builtins_manager.get_handler(app_mode)
             if builtin_app is None:
@@ -178,7 +180,7 @@ class AppRunner(Runner):
             return builtin_app.run(self, conf_tree, opts, args, uuid,
                                    work_files)
 
-    def _poll(self, conf_tree, opts, args, uuid, work_files):
+    def _poll(self, conf_tree):
         """Poll for prerequisites of applications."""
         # Poll configuration
         poll_test = conf_tree.node.get_value(["poll", "test"])
@@ -187,19 +189,19 @@ class AppRunner(Runner):
         if poll_all_files_value:
             try:
                 poll_all_files = shlex.split(
-                        env_var_process(poll_all_files_value))
-            except UnboundEnvironmentVariableError as e:
+                    env_var_process(poll_all_files_value))
+            except UnboundEnvironmentVariableError as exc:
                 raise ConfigValueError(["poll", "all-files"],
-                                       poll_all_files_value, e)
+                                       poll_all_files_value, exc)
         poll_any_files_value = conf_tree.node.get_value(["poll", "any-files"])
         poll_any_files = []
         if poll_any_files_value:
             try:
                 poll_any_files = shlex.split(
-                        env_var_process(poll_any_files_value))
-            except UnboundEnvironmentVariableError as e:
+                    env_var_process(poll_any_files_value))
+            except UnboundEnvironmentVariableError as exc:
                 raise ConfigValueError(["poll", "any-files"],
-                                       poll_any_files_value, e)
+                                       poll_any_files_value, exc)
         poll_file_test = None
         if poll_all_files or poll_any_files:
             poll_file_test = conf_tree.node.get_value(["poll", "file-test"])
@@ -225,7 +227,7 @@ class AppRunner(Runner):
                         repeat, value = value.split("*", 1)
                         try:
                             repeat = int(repeat)
-                        except ValueError as e:
+                        except ValueError as exc:
                             raise ConfigValueError(["poll", "delays"],
                                                    poll_delays_value,
                                                    ConfigValueError.SYNTAX)
@@ -235,16 +237,15 @@ class AppRunner(Runner):
                         value = value[:-1]
                     try:
                         value = float(value)
-                    except ValueError as e:
+                    except ValueError as exc:
                         raise ConfigValueError(["poll", "delays"],
                                                poll_delays_value,
                                                ConfigValueError.SYNTAX)
                     if unit:
                         value *= unit
-                    for i in range(repeat):
-                        poll_delays.append(value)
+                    poll_delays += [value] * repeat
             else:
-                poll_delays = [0] # poll once without a delay
+                poll_delays = [0]  # poll once without a delay
 
         # Poll
         t_init = time()
@@ -253,22 +254,22 @@ class AppRunner(Runner):
             if poll_delay:
                 sleep(poll_delay)
             if poll_test:
-                rc, out, err = self.popen.run(poll_test, shell=True,
-                                              stdout=sys.stdout,
-                                              stderr=sys.stderr)
-                self.handle_event(PollEvent(time(), poll_test, rc == 0))
-                if rc == 0:
+                ret_code = self.popen.run(
+                    poll_test, shell=True,
+                    stdout=sys.stdout, stderr=sys.stderr)[0]
+                self.handle_event(PollEvent(time(), poll_test, ret_code == 0))
+                if ret_code == 0:
                     poll_test = None
             any_files = list(poll_any_files)
-            for file in any_files:
-                if self._poll_file(file, poll_file_test):
+            for file_ in any_files:
+                if self._poll_file(file_, poll_file_test):
                     self.handle_event(PollEvent(time(), "any-files", True))
                     poll_any_files = []
                     break
             all_files = list(poll_all_files)
-            for file in all_files:
-                if self._poll_file(file, poll_file_test):
-                    poll_all_files.remove(file)
+            for file_ in all_files:
+                if self._poll_file(file_, poll_file_test):
+                    poll_all_files.remove(file_)
             if all_files and not poll_all_files:
                 self.handle_event(PollEvent(time(), "all-files", True))
         failed_items = []
@@ -283,28 +284,28 @@ class AppRunner(Runner):
             now = time()
             raise PollTimeoutError(now, now - t_init, failed_items)
 
-    def _poll_file(self, file, poll_file_test):
-        ok = False
+    def _poll_file(self, file_, poll_file_test):
+        """Poll for existence of a file."""
+        is_done = False
         if poll_file_test:
             test = poll_file_test.replace(
-                    "{}", self.popen.list_to_shell_str([file]))
-            rc, out, err = self.popen.run(test, shell=True,
-                                          stdout=sys.stdout, stderr=sys.stderr)
-            ok = rc == 0
+                "{}", self.popen.list_to_shell_str([file_]))
+            is_done = self.popen.run(
+                test, shell=True, stdout=sys.stdout, stderr=sys.stderr)[0] == 0
         else:
-            ok = os.path.exists(file)
-        self.handle_event(PollEvent(time(), "file:" + file, ok))
-        return ok
+            is_done = os.path.exists(file_)
+        self.handle_event(PollEvent(time(), "file:" + file_, is_done))
+        return is_done
 
-    def _prep(self, conf_tree, opts, args, uuid, work_files):
+    def _prep(self, conf_tree, opts):
         """Prepare to run the application."""
 
         if opts.new_mode:
             conf_dir = opts.conf_dir
             if not conf_dir or os.path.abspath(conf_dir) == os.getcwd():
                 raise NewModeError(os.getcwd())
-            for p in os.listdir("."):
-                self.fs_util.delete(p)
+            for path in os.listdir("."):
+                self.fs_util.delete(path)
 
         # Dump the actual configuration as rose-app-run.conf
         ConfigDumper()(conf_tree.node, "rose-app-run.conf")
@@ -351,7 +352,7 @@ class AppRunner(Runner):
         self.config_pm(conf_tree, "file",
                        no_overwrite_mode=opts.no_overwrite_mode)
 
-    def _command(self, conf_tree, opts, args, uuid, work_files):
+    def _command(self, conf_tree, opts, args):
         """Run the command."""
 
         command = self.popen.list_to_shell_str(args)
@@ -371,7 +372,6 @@ class AppRunner(Runner):
         self.handle_event("command: %s" % command)
         if opts.install_only_mode:
             return
-        # TODO: allow caller of app_run to specify stdout and stderr?
         self.popen(command, shell=True, stdout=sys.stdout, stderr=sys.stderr)
 
 
@@ -385,12 +385,12 @@ def main():
     runner = AppRunner(event_handler)
     try:
         sys.exit(runner(opts, args))
-    except Exception as e:
-        runner.handle_event(e)
+    except Exception as exc:
+        runner.handle_event(exc)
         if opts.debug_mode:
-            traceback.print_exc(e)
-        if isinstance(e, RosePopenError):
-            sys.exit(e.rc)
+            traceback.print_exc(exc)
+        if isinstance(exc, RosePopenError):
+            sys.exit(exc.rc)
         else:
             sys.exit(1)
 

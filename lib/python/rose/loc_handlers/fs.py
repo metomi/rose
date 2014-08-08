@@ -23,30 +23,36 @@ import errno
 from rose.checksum import get_checksum
 import os
 
+
 class FileSystemLocHandler(object):
+
     """Handler of file system locations."""
 
     def __init__(self, manager):
         self.manager = manager
 
-    def can_pull(self, loc):
+    @classmethod
+    def can_pull(cls, loc):
+        """Return true if loc.name exists in the file system."""
         return os.path.exists(loc.name)
 
-    def parse(self, loc, conf_tree):
+    @classmethod
+    def parse(cls, loc, _):
         """Set loc.scheme, loc.loc_type, loc.paths."""
         loc.scheme = "fs"
         name = os.path.expanduser(loc.name)
         if not os.path.exists(name):
             raise ValueError(loc.name)
         paths_and_checksums = get_checksum(name)
-        for path, checksum in paths_and_checksums:
-            loc.add_path(path, checksum)
+        for path, checksum, access_mode in paths_and_checksums:
+            loc.add_path(path, checksum, access_mode)
         if len(paths_and_checksums) == 1 and paths_and_checksums[0][0] == "":
             loc.loc_type = loc.TYPE_BLOB
         else:
             loc.loc_type = loc.TYPE_TREE
 
-    def pull(self, loc, conf_tree):
+    @classmethod
+    def pull(cls, loc, _):
         """If loc is in the file system, sets loc.cache to loc.name.
 
         Otherwise, raise an OSError.
