@@ -17,23 +17,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Test "rose date" usage 2, print time intervals.
+# Test "rose date" usage 2, print durations.
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 tests 10
 #-------------------------------------------------------------------------------
-# Positive interval
+# Positive duration
 TEST_KEY=$TEST_KEY_BASE-pos
 run_pass "$TEST_KEY" rose date 20130101T12 20130301
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'P58DT12H'
 #-------------------------------------------------------------------------------
-# Negative interval
+# Negative duration
 TEST_KEY=$TEST_KEY_BASE-neg
 run_pass "$TEST_KEY" rose date 20150101T12 20130301
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'-P671DT12H'
 #-------------------------------------------------------------------------------
-# Print format for time interval
+# Print format for duration
 TEST_KEY=$TEST_KEY_BASE-formatting
 run_pass "$TEST_KEY" rose date 20130101T12 20130301 -f "y,m,d,h,M,s"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'0,0,58,12,0,0'

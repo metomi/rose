@@ -54,8 +54,7 @@
 #         relative to the current cycle time. ???? is a duration:
 #             * A "__" (double underscore) prefix denotes a cycle time in the
 #               future.  Otherwise, it is a cycle time in the past.
-#             * The rest should be an ISO 8601 interval or duration
-#               representation, such as:
+#             * The rest should be an ISO 8601 duration, such as:
 #               * P2W - 2 weeks
 #               * PT12H - 12 hours
 #               * P1DT6H - 1 day, 6 hours

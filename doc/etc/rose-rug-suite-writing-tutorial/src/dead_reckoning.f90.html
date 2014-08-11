@@ -90,7 +90,7 @@ IF (code == 0) THEN
   CLOSE(1)
 END IF
 
-! Read in our time interval input
+! Read in our duration input
 CALL get_environment_variable("TIME_INTERVAL_HRS",value=dt_hr_env,status=code)
 IF (code /= 0) THEN
   WRITE(0,*) "$TIME_INTERVAL_HRS: not set"

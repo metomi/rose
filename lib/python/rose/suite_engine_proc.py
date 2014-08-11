@@ -20,8 +20,8 @@
 """Suite engine processor management."""
 
 from datetime import datetime, timedelta
-import isodatetime.data
-import isodatetime.parsers
+from isodatetime.data import Duration
+from isodatetime.parsers import DurationParser
 import os
 import pwd
 import re
@@ -86,8 +86,8 @@ class BaseCycleOffset(object):
 
     """Represent a cycle time offset."""
 
-    def to_interval(self):
-        """Convert to a TimeInterval."""
+    def to_duration(self):
+        """Convert to a Duration."""
         raise NotImplementedError()
 
 
@@ -104,7 +104,7 @@ class OldFormatCycleOffset(BaseCycleOffset):
     SIGN_DEFAULT = ""
 
     def __init__(self, offset_text):
-        """Parse offset_text into a TimeInterval-convertible form.
+        """Parse offset_text into a Duration-convertible form.
 
         Expect offset_text in this format:
         * A __ double underscore denotes an offset to the future.
@@ -137,8 +137,8 @@ class OldFormatCycleOffset(BaseCycleOffset):
     def __str__(self):
         return "%s%s%d%s" % (self.sign, self.is_time, self.amount, self.unit)
 
-    def to_interval(self):
-        """Convert to a TimeInterval."""
+    def to_duration(self):
+        """Convert to a Duration."""
         KEYS = {"W": ("days", 7),
                 "D": ("days", 1),
                 "H": ("hours", 1),
@@ -147,39 +147,36 @@ class OldFormatCycleOffset(BaseCycleOffset):
         amount = self.amount
         if self.sign == self.SIGN_DEFAULT: # negative
             amount = -amount
-        return isodatetime.data.TimeInterval(
-            **{date_time_unit: multiplier * amount})
+        return Duration(**{date_time_unit: multiplier * amount})
 
 
 class ISOCycleOffset(BaseCycleOffset):
 
     def __init__(self, offset_text):
-        """Parse offset_text into a TimeInterval-convertible form.
+        """Parse offset_text into a Duration-convertible form.
 
         Expect offset_text in this format:
         * A __ double underscore denotes an offset to the future.
           Otherwise, it is an offset to the past.
-        * For the rest, use an ISO 8601 compatible interval/duration
-          representation.
+        * For the rest, use an ISO 8601 compatible duration.
 
         """
         if offset_text.startswith("__"):
             self.sign_factor = 1
         else:
             self.sign_factor = -1
-        self.interval = isodatetime.parsers.TimeIntervalParser().parse(
-            offset_text)
-        self.interval *= self.sign_factor
+        self.duration = DurationParser().parse(offset_text)
+        self.duration *= self.sign_factor
 
     def __str__(self):
-        interval_str = str(self.interval)
-        if interval_str.startswith("-"):
-            return interval_str[1:]
-        return "__" + interval_str
+        duration_str = str(self.duration)
+        if duration_str.startswith("-"):
+            return duration_str[1:]
+        return "__" + duration_str
 
-    def to_interval(self):
-        """Convert to a TimeInterval."""
-        return self.interval
+    def to_duration(self):
+        """Convert to a Duration."""
+        return self.duration
 
 
 class SuiteEngineGlobalConfCompatError(Exception):
@@ -694,7 +691,7 @@ class SuiteEngineProcessor(object):
         at the moment.
 
         """
-        offset_str = str(cycle_offset.to_interval())
+        offset_str = str(cycle_offset.to_duration())
         try:
             time_point, parse_format = self.date_time_oper.date_parse(cycle)
             time_point = self.date_time_oper.date_shift(time_point, offset_str)
