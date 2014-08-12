@@ -14,16 +14,20 @@ This release of Rose will work best with
 
 [#1323](https://github.com/metomi/rose/pull/1323),
 [#1365](https://github.com/metomi/rose/pull/1365):
-Rephrase *cycle time* to *cycle point* for cylc 6.
-Improve reporting of running cylc suite processes.
-Handle `log/job/` and `work/` directory restructure.
+* Rephrase *cycle time* to *cycle point* for cylc 6.
+* Improve reporting of running cylc suite processes.
+* Handle `log/job/` and `work/` directory restructure.
+  N.B. This change is **NOT backward compatible**.  Existing suites with
+  applications that assumes the old directory structure will not work
+  correctly, and will require some minor modifications. See
+  [cylc/cylc#1069](https://github.com/cylc/cylc/pull/1069) for detail.
 
 [#1367](https://github.com/metomi/rose/pull/1367):
 [isodatetime](https://github.com/metomi/isodatetime/) upgraded to 2014.08.0.
 
 [#1332](https://github.com/metomi/rose/pull/1332),
 [#1316](https://github.com/metomi/rose/pull/1316):
-rose date: new usage to print interval between 2 date time points.
+rose date: new usage to print the duration between 2 date time points.
 
 [#1283](https://github.com/metomi/rose/pull/1283),
 [#1352](https://github.com/metomi/rose/pull/1352):
