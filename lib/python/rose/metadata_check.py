@@ -70,7 +70,8 @@ def _check_duplicate(value):
 
 def _check_rule(value, setting_id, meta_config):
     evaluator = rose.macros.rule.RuleEvaluator()
-    ids_used = evaluator.evaluate_rule_id_usage(value, setting_id)
+    ids_used = evaluator.evaluate_rule_id_usage(
+        value, setting_id, meta_config)
     ids_not_found = []
     for id_ in sorted(ids_used):
         id_to_find = rose.macro.REC_ID_STRIP.sub("", id_)
@@ -131,10 +132,11 @@ def _check_range(value):
         test_config = rose.config.ConfigNode()
         test_id = "env=A"
         test_config.set(["env", "A"], "0")
+        test_meta_config = rose.config.ConfigNode()
         evaluator =  rose.macros.rule.RuleEvaluator()
         try:
             check_ok = evaluator.evaluate_rule(
-                                          value, test_id, test_config)
+                value, test_id, test_config, test_meta_config)
         except rose.macros.rule.RuleValueError as e:
             return INVALID_RANGE_RULE_IDS.format(e)
         except Exception as e:

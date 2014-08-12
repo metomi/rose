@@ -85,6 +85,14 @@ control_len_array = 0, 1, 2, 3, 4
 test_var_1 = 1
 test_var_2 = 50
 test_var_3 = -1
+
+[simple:duplicate(1)]
+test_var_1 = 2
+test_var_2 = -1
+
+[simple:duplicate(2)]
+test_var_1 = -1
+test_var_2 = 2
 __CONFIG__
 #-------------------------------------------------------------------------------
 tests 3
@@ -265,6 +273,15 @@ description=Fail if element 2 is not '0A' and element 4 is '0A'
 fail-if=this(2) != "'0A'" and this(4) == "'0A'"
 length=:
 
+[simple:duplicate]
+duplicate=true
+
+[simple:duplicate=test_var_1]
+fail-if=this == 2
+
+[simple:duplicate=test_var_2]
+fail-if=this < simple:duplicate=test_var_1
+
 [simple:scalar_test]
 
 [simple:scalar_test=control_less_than]
@@ -354,7 +371,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[V] rose.macros.DefaultValidators: issues: 19
+[V] rose.macros.DefaultValidators: issues: 21
     complex:array_test=test_array_len_fail=0, 1, 2
         failed because: len(this) > len(complex:array_test=control_len_array) or len(this) < len(complex:array_test=control_len_array)
     complex:array_test=test_var_all_ne_fail=6
@@ -383,6 +400,10 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
         failed because: this(2) != "'0A'" and this(4) == "'0A'"
     simple:array_test=test_array_len_fail=0, 1, 2
         failed because: len(this) != 5
+    simple:duplicate(1)=test_var_1=2
+        failed because: this == 2
+    simple:duplicate(1)=test_var_2=-1
+        failed because: this < simple:duplicate=test_var_1
     simple:scalar_test=test_substring_fail="ABCDEFG"
         failed because: "D" in this
     simple:scalar_test=test_var_div_zero_fail=0
