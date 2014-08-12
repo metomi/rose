@@ -559,6 +559,8 @@ class MainMenuHandler(object):
 
     def override_macro_defaults(self, optionals, methname):
         """Launch a dialog to handle capture of any override args to macro"""
+        if not optionals:
+            return {}
         res = {}
         #create the text input field
         entries = {}
@@ -970,8 +972,9 @@ class MainMenuHandler(object):
                     "directory": config_data.directory
                 }
         rose.config_editor.upgrade_controller.UpgradeController(
-                           config_dict, self.handle_macro_transforms,
-                           parent_window=self.mainwindow.window)
+            config_dict, self.handle_macro_transforms,
+            parent_window=self.mainwindow.window,
+            upgrade_inspector=self.override_macro_defaults)
 
     def help(self, *args):
         # Handle a GUI help request.
