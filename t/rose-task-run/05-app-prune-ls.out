@@ -3,30 +3,8 @@ $SUITE_RUN_DIR/log/job-2013010112.tar.gz
 $SUITE_RUN_DIR/log/job-2013010200.tar.gz
 
 $SUITE_RUN_DIR/log/job:
-my_task_1.2013010212.1
-my_task_1.2013010212.1.err
-my_task_1.2013010212.1.out
-my_task_1.2013010212.1.status
-my_task_1.2013010300.1
-my_task_1.2013010300.1.err
-my_task_1.2013010300.1.out
-my_task_1.2013010300.1.status
-my_task_2.2013010212.1
-my_task_2.2013010212.1.err
-my_task_2.2013010212.1.out
-my_task_2.2013010212.1.status
-my_task_2.2013010300.1
-my_task_2.2013010300.1.err
-my_task_2.2013010300.1.out
-my_task_2.2013010300.1.status
-rose_prune.2013010212.1
-rose_prune.2013010212.1.err
-rose_prune.2013010212.1.out
-rose_prune.2013010212.1.status
-rose_prune.2013010300.1
-rose_prune.2013010300.1.err
-rose_prune.2013010300.1.out
-rose_prune.2013010300.1.status
+2013010212
+2013010300
 
 $SUITE_RUN_DIR/share/data:
 2013010200
@@ -34,5 +12,4 @@ $SUITE_RUN_DIR/share/data:
 2013010300
 
 $SUITE_RUN_DIR/work:
-my_task_1.2013010300
-rose_prune.2013010300
+2013010300

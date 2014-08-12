@@ -79,32 +79,32 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 for CYCLE in $CYCLES; do
     TEST_KEY="$TEST_KEY_BASE-after-$CYCLE"
     file_test "$TEST_KEY-after-log-1.out" \
-        $SUITE_RUN_DIR/log/job/my_task_1.$CYCLE.1.out
+        $SUITE_RUN_DIR/log/job/$CYCLE/my_task_1/01/job.out
     file_test "$TEST_KEY-after-log-2.out" \
-        $SUITE_RUN_DIR/log/job/my_task_2.$CYCLE.1.out
+        $SUITE_RUN_DIR/log/job/$CYCLE/my_task_2/01/job.out
 done
 TEST_KEY="$TEST_KEY_BASE-db-after"
 sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-log/job/my_task_1.2013010100.1|00-script
-log/job/my_task_1.2013010100.1.err|02-err
-log/job/my_task_1.2013010100.1.out|01-out
-log/job/my_task_1.2013010112.1|00-script
-log/job/my_task_1.2013010112.1.err|02-err
-log/job/my_task_1.2013010112.1.out|01-out
-log/job/my_task_1.2013010200.1|00-script
-log/job/my_task_1.2013010200.1.err|02-err
-log/job/my_task_1.2013010200.1.out|01-out
-log/job/my_task_2.2013010100.1|00-script
-log/job/my_task_2.2013010100.1.err|02-err
-log/job/my_task_2.2013010100.1.out|01-out
-log/job/my_task_2.2013010112.1|00-script
-log/job/my_task_2.2013010112.1.err|02-err
-log/job/my_task_2.2013010112.1.out|01-out
-log/job/my_task_2.2013010200.1|00-script
-log/job/my_task_2.2013010200.1.err|02-err
-log/job/my_task_2.2013010200.1.out|01-out
+log/job/2013010100/my_task_1/01/job|00-script
+log/job/2013010100/my_task_1/01/job.err|02-err
+log/job/2013010100/my_task_1/01/job.out|01-out
+log/job/2013010100/my_task_2/01/job|00-script
+log/job/2013010100/my_task_2/01/job.err|02-err
+log/job/2013010100/my_task_2/01/job.out|01-out
+log/job/2013010112/my_task_1/01/job|00-script
+log/job/2013010112/my_task_1/01/job.err|02-err
+log/job/2013010112/my_task_1/01/job.out|01-out
+log/job/2013010112/my_task_2/01/job|00-script
+log/job/2013010112/my_task_2/01/job.err|02-err
+log/job/2013010112/my_task_2/01/job.out|01-out
+log/job/2013010200/my_task_1/01/job|00-script
+log/job/2013010200/my_task_1/01/job.err|02-err
+log/job/2013010200/my_task_1/01/job.out|01-out
+log/job/2013010200/my_task_2/01/job|00-script
+log/job/2013010200/my_task_2/01/job.err|02-err
+log/job/2013010200/my_task_2/01/job.out|01-out
 __OUT__
 #-------------------------------------------------------------------------------
 # Test --prune-remote.
@@ -114,35 +114,12 @@ if [[ -n ${JOB_HOST:-} ]]; then
         rose suite-log -U -n $NAME --prune-remote 2013010100 2013010112
     grep "\[INFO\] delete: $JOB_HOST:" "$TEST_KEY.out" >"$TEST_KEY.out.expected"
     file_cmp "$TEST_KEY.out" "$TEST_KEY.out.expected" <<__OUT__
-[INFO] delete: $JOB_HOST:my_task_1.2013010100.1
-[INFO] delete: $JOB_HOST:my_task_1.2013010100.1.err
-[INFO] delete: $JOB_HOST:my_task_1.2013010100.1.out
-[INFO] delete: $JOB_HOST:my_task_1.2013010100.1.status
-[INFO] delete: $JOB_HOST:my_task_2.2013010100.1
-[INFO] delete: $JOB_HOST:my_task_2.2013010100.1.err
-[INFO] delete: $JOB_HOST:my_task_2.2013010100.1.out
-[INFO] delete: $JOB_HOST:my_task_2.2013010100.1.status
-[INFO] delete: $JOB_HOST:my_task_1.2013010112.1
-[INFO] delete: $JOB_HOST:my_task_1.2013010112.1.err
-[INFO] delete: $JOB_HOST:my_task_1.2013010112.1.out
-[INFO] delete: $JOB_HOST:my_task_1.2013010112.1.status
-[INFO] delete: $JOB_HOST:my_task_2.2013010112.1
-[INFO] delete: $JOB_HOST:my_task_2.2013010112.1.err
-[INFO] delete: $JOB_HOST:my_task_2.2013010112.1.out
-[INFO] delete: $JOB_HOST:my_task_2.2013010112.1.status
+[INFO] delete: $JOB_HOST:log/job/2013010100/
+[INFO] delete: $JOB_HOST:log/job/2013010112/
 __OUT__
     ssh -oBatchMode=yes $JOB_HOST ls "~/cylc-run/$NAME/log/job" \
         | sort >"$TEST_KEY.ls"
-    file_cmp "$TEST_KEY.ls" "$TEST_KEY.ls" <<'__LIST__'
-my_task_1.2013010200.1
-my_task_1.2013010200.1.err
-my_task_1.2013010200.1.out
-my_task_1.2013010200.1.status
-my_task_2.2013010200.1
-my_task_2.2013010200.1.err
-my_task_2.2013010200.1.out
-my_task_2.2013010200.1.status
-__LIST__
+    file_cmp "$TEST_KEY.ls" "$TEST_KEY.ls" <<<'2013010200'
 else
     skip 3 "$TEST_KEY: [t]job-host not defined"
 fi

@@ -59,7 +59,7 @@ run_pass "$TEST_KEY" \
              --source=$WORKINGCOPY --source=fcm:foo_tr@head --no-gcontrol \
              --name $SUITENAME -- --debug
 #Test output
-OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-basic-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[earl_grey, milk, sugar, spoon, cup, milk\]" \
           $OUTPUT
@@ -76,7 +76,7 @@ run_pass "$TEST_KEY" \
    rose stem --group=lapsang -C $WORKINGCOPY/rose-stem --source=fcm:foo_tr@head\
              --no-gcontrol --name $SUITENAME -- --debug
 #Test output
-OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-suite-redirection-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[lapsang\]" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-suite-redirection-source
@@ -92,7 +92,7 @@ run_pass "$TEST_KEY" \
    rose stem --group=assam --source=$WORKINGCOPY/rose-stem --no-gcontrol \
              --name $SUITENAME -- --debug
 #Test output
-OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-subdirectory-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[assam\]" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-subdirectory-source
@@ -109,7 +109,7 @@ run_pass "$TEST_KEY" \
    rose stem --group=ceylon -C rose-stem \
              --no-gcontrol --name $SUITENAME -- --debug
 #Test output
-OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-relative-path-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[ceylon\]" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-relative-path-source
@@ -135,7 +135,7 @@ run_pass "$TEST_KEY" \
              --source=$WORKINGCOPY --source=fcm:foo_tr@head --no-gcontrol \
              --name $SUITENAME -- --debug
 #Test output
-OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-check-with-config-groups-to-run
 file_grep $TEST_KEY "RUN_NAMES=\[earl_grey, milk, sugar, spoon, cup, milk\]" \
           $OUTPUT
@@ -159,7 +159,7 @@ run_pass "$TEST_KEY" \
    rose stem --group=assam --source=$WORKINGCOPY/rose-stem --no-gcontrol \
              --name $SUITENAME -- --debug
 #Test output
-OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/my_task_1.1.1.out
+OUTPUT=$HOME/cylc-run/$SUITENAME/log/job/1/my_task_1/01/job.out
 TEST_KEY=$TEST_KEY_BASE-multi-auto-config-first
 file_grep $TEST_KEY "MILK=true\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-multi-auto-config-second

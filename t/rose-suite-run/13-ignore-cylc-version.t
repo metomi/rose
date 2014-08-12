@@ -29,7 +29,7 @@ SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 rose suite-run -q -n $NAME --no-gcontrol
 # Wait for the only task to fail, before reload
-ST_FILE=$SUITE_RUN_DIR/log/job/t1.1.1.status
+ST_FILE=$SUITE_RUN_DIR/log/job/1/t1/01/job.status
 TIMEOUT=$(($(date +%s) + 60)) # wait 1 minute
 while (($(date +%s) < TIMEOUT)) \
     && ! grep -q 'CYLC_JOB_EXIT_TIME=' $ST_FILE 2>/dev/null

@@ -32,37 +32,22 @@ fi
 HOST=$(rose host-select $HOST)
 export ROSE_CONF_PATH=
 #-------------------------------------------------------------------------------
-tests 5
+tests 3
 #-------------------------------------------------------------------------------
 # Run the suite.
 TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
     --no-gcontrol --host=localhost \
-    "--define=[jinja2:suite.rc]HOST=\"$HOST\""
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-ok
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
-fi
-sleep 1
+    "--define=[jinja2:suite.rc]HOST=\"$HOST\"" -- --debug
 #-------------------------------------------------------------------------------
 # Test for local copy of remote job logs.
 TEST_KEY=$TEST_KEY_BASE-log
 cd $SUITE_RUN_DIR/log/job
-file_test "$TEST_KEY-my_task_1.out" "my_task_1.1.1.out"
-file_test "$TEST_KEY-my_task_1.err" "my_task_1.1.1.txt"
-file_cmp "$TEST_KEY-my_task_1.txt" "my_task_1.1.1.txt" <<'__CONTENT__'
+file_test "$TEST_KEY-my_task_1-out" "1/my_task_1/01/job.out"
+file_test "$TEST_KEY-my_task_1-err" "1/my_task_1/01/job.err"
+file_cmp "$TEST_KEY-my_task_1.txt" "1/my_task_1/01/job.txt" <<'__CONTENT__'
 Hello World
 __CONTENT__
 cd $OLDPWD

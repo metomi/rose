@@ -23,28 +23,13 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 43
+tests 44
 #-------------------------------------------------------------------------------
 # Run the suite.
-TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
-fi
+rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+    --no-gcontrol --host=localhost -- --debug
 #-------------------------------------------------------------------------------
 MY_PATH=
 for P in $(ls -d $SUITE_RUN_DIR/etc/my-path/*); do
@@ -65,7 +50,7 @@ PREV_CYCLE=
 for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
     TASK=my_task_1
-    FILE=$HOME/cylc-run/$NAME/log/job/$TASK.$CYCLE.1.txt
+    FILE=$HOME/cylc-run/$NAME/log/job/$CYCLE/$TASK/01/job.txt
     file_test "$TEST_KEY" $FILE
     file_grep "$TEST_KEY-ROSE_SUITE_DIR" "ROSE_SUITE_DIR=$SUITE_RUN_DIR" $FILE
     file_grep "$TEST_KEY-ROSE_SUITE_DIR_REL" \
@@ -74,8 +59,10 @@ for CYCLE in 2013010100 2013010112 2013010200; do
     file_grep "$TEST_KEY-ROSE_TASK_NAME" "ROSE_TASK_NAME=$TASK" $FILE
     file_grep "$TEST_KEY-ROSE_TASK_CYCLE_TIME" \
         "ROSE_TASK_CYCLE_TIME=$CYCLE" $FILE
+    file_grep "$TEST_KEY-ROSE_TASK_LOG_DIR" \
+        "ROSE_TASK_LOG_DIR=${FILE%/job.txt}" $FILE
     file_grep "$TEST_KEY-ROSE_TASK_LOG_ROOT" \
-        "ROSE_TASK_LOG_ROOT=${FILE%.txt}" $FILE
+        "ROSE_TASK_LOG_ROOT=${FILE%/job.txt}/job" $FILE
     file_grep "$TEST_KEY-ROSE_DATA" "ROSE_DATA=$SUITE_RUN_DIR/share/data" $FILE
     file_grep "$TEST_KEY-ROSE_DATAC" \
         "ROSE_DATAC=$SUITE_RUN_DIR/share/data/$CYCLE" $FILE

@@ -1,8 +1,5 @@
 cylc-run/$NAME/log/job:
-my_task_2.2013010300.1
-my_task_2.2013010300.1.err
-my_task_2.2013010300.1.out
-my_task_2.2013010300.1.status
+2013010300
 
 cylc-run/$NAME/share/data:
 2013010200
@@ -10,4 +7,4 @@ cylc-run/$NAME/share/data:
 2013010300
 
 cylc-run/$NAME/work:
-my_task_2.2013010300
+2013010300

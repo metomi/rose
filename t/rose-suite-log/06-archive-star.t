@@ -65,11 +65,12 @@ fi
 TEST_KEY="$TEST_KEY_BASE"
 
 set -e
-ls $SUITE_RUN_DIR/log/job/* >"$TEST_KEY-list-job-logs-before.out"
+(cd $SUITE_RUN_DIR/log/job; ls */*/01/{job,job.err,job.out}) \
+    >"$TEST_KEY-list-job-logs-before.out"
 if [[ -n ${JOB_HOST:-} ]]; then
     ssh -oBatchMode=yes $JOB_HOST \
-        test -f cylc-run/$NAME/log/job/my_task_2.*.1.out
-    ! test -f $SUITE_RUN_DIR/log/job/my_task_2.*.1.out
+        test -f cylc-run/$NAME/log/job/*/my_task_2/01/job.out
+    ! test -f $SUITE_RUN_DIR/log/job/*/my_task_2/01/job.out
 fi
 set +e
 
@@ -77,25 +78,25 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,path_in_tar,key FROM log_files ORDER BY path,path_in_tar ASC;' \
     >"$TEST_KEY-db-1.out"
 file_cmp "$TEST_KEY-db-1.out" "$TEST_KEY-db-1.out" <<'__OUT__'
-log/job/my_task_1.2013010100.1||00-script
-log/job/my_task_1.2013010100.1.err||02-err
-log/job/my_task_1.2013010100.1.out||01-out
-log/job/my_task_1.2013010112.1||00-script
-log/job/my_task_1.2013010112.1.err||02-err
-log/job/my_task_1.2013010112.1.out||01-out
-log/job/my_task_1.2013010200.1||00-script
-log/job/my_task_1.2013010200.1.err||02-err
-log/job/my_task_1.2013010200.1.out||01-out
+log/job/2013010100/my_task_1/01/job||00-script
+log/job/2013010100/my_task_1/01/job.err||02-err
+log/job/2013010100/my_task_1/01/job.out||01-out
+log/job/2013010112/my_task_1/01/job||00-script
+log/job/2013010112/my_task_1/01/job.err||02-err
+log/job/2013010112/my_task_1/01/job.out||01-out
+log/job/2013010200/my_task_1/01/job||00-script
+log/job/2013010200/my_task_1/01/job.err||02-err
+log/job/2013010200/my_task_1/01/job.out||01-out
 __OUT__
 N_JOB_LOGS=$(wc -l "$TEST_KEY-list-job-logs-before.out" | cut -d' ' -f1)
 (cd $SUITE_RUN_DIR/log && ls job/*) | sort >foo
 run_pass "$TEST_KEY-command" rose suite-log -n $NAME --archive '*' --debug
 run_fail "$TEST_KEY-list-job-logs-after" ls $SUITE_RUN_DIR/log/job/*
 if [[ -n ${JOB_HOST:-} ]]; then
-    ((N_JOB_LOGS += 3)) # script, out and err files
+    ((N_JOB_LOGS += 2)) # script, out and err files
     run_fail "$TEST_KEY-job-log.out-after-jobhost" \
         ssh -oBatchMode=yes $JOB_HOST \
-        test -f cylc-run/$NAME/log/job/my_task_2.*.1.out
+        test -f cylc-run/$NAME/log/job/*/my_task_2/01/job.out
 else
     pass "$TEST_KEY-job-log.out-after-jobhost"
 fi
@@ -113,7 +114,7 @@ __LIST__
         ALL_JOB_LOGS_ARCH="$JOB_LOGS_ARCH"
     fi
     run_pass "$TEST_KEY-$CYCLE-after-log.out" \
-        grep -q "job/my_task_2.$CYCLE.1.out" <<<"$JOB_LOGS_ARCH"
+        grep -q "job/$CYCLE/my_task_2/01/job.out" <<<"$JOB_LOGS_ARCH"
 done
 N_JOB_LOGS_ARCH=$(echo "$ALL_JOB_LOGS_ARCH" | wc -l | cut -d' ' -f1)
 echo "$ALL_JOB_LOGS_ARCH" | sort >bar
@@ -128,24 +129,24 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,path_in_tar,key FROM log_files ORDER BY path,path_in_tar ASC;' \
     >"$TEST_KEY-db-2.out"
 file_cmp "$TEST_KEY-db-2.out" "$TEST_KEY-db-2.out" <<'__OUT__'
-log/job-2013010100.tar.gz|job/my_task_1.2013010100.1|00-script
-log/job-2013010100.tar.gz|job/my_task_1.2013010100.1.err|02-err
-log/job-2013010100.tar.gz|job/my_task_1.2013010100.1.out|01-out
-log/job-2013010100.tar.gz|job/my_task_2.2013010100.1|00-script
-log/job-2013010100.tar.gz|job/my_task_2.2013010100.1.err|02-err
-log/job-2013010100.tar.gz|job/my_task_2.2013010100.1.out|01-out
-log/job-2013010112.tar.gz|job/my_task_1.2013010112.1|00-script
-log/job-2013010112.tar.gz|job/my_task_1.2013010112.1.err|02-err
-log/job-2013010112.tar.gz|job/my_task_1.2013010112.1.out|01-out
-log/job-2013010112.tar.gz|job/my_task_2.2013010112.1|00-script
-log/job-2013010112.tar.gz|job/my_task_2.2013010112.1.err|02-err
-log/job-2013010112.tar.gz|job/my_task_2.2013010112.1.out|01-out
-log/job-2013010200.tar.gz|job/my_task_1.2013010200.1|00-script
-log/job-2013010200.tar.gz|job/my_task_1.2013010200.1.err|02-err
-log/job-2013010200.tar.gz|job/my_task_1.2013010200.1.out|01-out
-log/job-2013010200.tar.gz|job/my_task_2.2013010200.1|00-script
-log/job-2013010200.tar.gz|job/my_task_2.2013010200.1.err|02-err
-log/job-2013010200.tar.gz|job/my_task_2.2013010200.1.out|01-out
+log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job|00-script
+log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job.err|02-err
+log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job.out|01-out
+log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job|00-script
+log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job.err|02-err
+log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job.out|01-out
+log/job-2013010112.tar.gz|job/2013010112/my_task_1/01/job|00-script
+log/job-2013010112.tar.gz|job/2013010112/my_task_1/01/job.err|02-err
+log/job-2013010112.tar.gz|job/2013010112/my_task_1/01/job.out|01-out
+log/job-2013010112.tar.gz|job/2013010112/my_task_2/01/job|00-script
+log/job-2013010112.tar.gz|job/2013010112/my_task_2/01/job.err|02-err
+log/job-2013010112.tar.gz|job/2013010112/my_task_2/01/job.out|01-out
+log/job-2013010200.tar.gz|job/2013010200/my_task_1/01/job|00-script
+log/job-2013010200.tar.gz|job/2013010200/my_task_1/01/job.err|02-err
+log/job-2013010200.tar.gz|job/2013010200/my_task_1/01/job.out|01-out
+log/job-2013010200.tar.gz|job/2013010200/my_task_2/01/job|00-script
+log/job-2013010200.tar.gz|job/2013010200/my_task_2/01/job.err|02-err
+log/job-2013010200.tar.gz|job/2013010200/my_task_2/01/job.out|01-out
 __OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

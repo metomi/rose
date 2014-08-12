@@ -23,34 +23,19 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 5
+tests 3
 #-------------------------------------------------------------------------------
 # Run the suite.
-TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-    --no-gcontrol --host=localhost
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
-fi
+rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+    --no-gcontrol --host=localhost -- --debug
 #-------------------------------------------------------------------------------
 PREV_CYCLE=
 for CYCLE in 2013010100 2013010112 2013010200; do
     TEST_KEY=$TEST_KEY_BASE-file-$CYCLE
     TASK=my_task_1
-    FILE=$HOME/cylc-run/$NAME/log/job/$TASK.$CYCLE.1.txt
+    FILE=$HOME/cylc-run/$NAME/log/job/$CYCLE/$TASK/01/job.txt
     file_grep "$TEST_KEY-PATH" \
         "PATH=$SUITE_RUN_DIR/app/$TASK/bin:$SUITE_RUN_DIR/etc/your-path" $FILE
     PREV_CYCLE=$CYCLE

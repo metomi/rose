@@ -29,7 +29,7 @@ if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
-tests 8
+tests 6
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
@@ -37,59 +37,43 @@ TEST_KEY=$TEST_KEY_BASE
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 if [[ -n ${JOB_HOST:-} ]]; then
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
         --no-gcontrol --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\""
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --debug
 else
-    run_pass "$TEST_KEY" \
-        rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost
+    rose suite-run -q -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
+        --no-gcontrol --host=localhost -- --debug
 fi
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete, test shutdown on fail
-TEST_KEY="$TEST_KEY_BASE-complete"
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
-fi
-sleep 1
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-db-before"
 sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-log/job/my_task_1.1.1|00-script
-log/job/my_task_1.1.1.err|02-err
-log/job/my_task_1.1.1.out|01-out
+log/job/1/my_task_1/01/job|00-script
+log/job/1/my_task_1/01/job.err|02-err
+log/job/1/my_task_1/01/job.out|01-out
 __OUT__
 TEST_KEY=$TEST_KEY_BASE-before-log.out
 if [[ -n ${JOB_HOST:-} ]]; then
     run_fail "$TEST_KEY-log.out" \
-        test -f $SUITE_RUN_DIR/log/job/my_task_2.1.1.out
+        test -f $SUITE_RUN_DIR/log/job/1/my_task_2/01/job.out
 else
     pass "$TEST_KEY-log.out"
 fi
 TEST_KEY=$TEST_KEY_BASE-command
 run_pass "$TEST_KEY" rose suite-log -n $NAME -U 'my_task_2' --debug
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-file_test "$TEST_KEY-log.out" $SUITE_RUN_DIR/log/job/my_task_2.1.1.out
+file_test "$TEST_KEY-log.out" $SUITE_RUN_DIR/log/job/1/my_task_2/01/job.out
 TEST_KEY="$TEST_KEY_BASE-db-after"
 sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-log/job/my_task_1.1.1|00-script
-log/job/my_task_1.1.1.err|02-err
-log/job/my_task_1.1.1.out|01-out
-log/job/my_task_2.1.1|00-script
-log/job/my_task_2.1.1.err|02-err
-log/job/my_task_2.1.1.out|01-out
+log/job/1/my_task_1/01/job|00-script
+log/job/1/my_task_1/01/job.err|02-err
+log/job/1/my_task_1/01/job.out|01-out
+log/job/1/my_task_2/01/job|00-script
+log/job/1/my_task_2/01/job.err|02-err
+log/job/1/my_task_2/01/job.out|01-out
 __OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME
