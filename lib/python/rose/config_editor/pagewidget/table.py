@@ -106,7 +106,7 @@ class PageTable(gtk.Table):
             variable_widget = self.get_variable_widget(variable, is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, r + 1)
             variable_widget.set_sensitive(not is_ghost)
-            r = r + 1
+            r += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
@@ -225,7 +225,7 @@ class PageArrayTable(PageTable):
             variable_widget = self.get_variable_widget(variable, is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, r + 1)
             variable_widget.set_sensitive(not is_ghost)
-            r = r + 1
+            r += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
@@ -309,7 +309,7 @@ class PageLatentTable(gtk.Table):
                 variable, is_ghost=is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, r + 1)
             variable_widget.set_sensitive(not is_ghost)
-            r = r + 1
+            r += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
