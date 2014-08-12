@@ -7,18 +7,60 @@ for a full listing of issues for each release.
 
 ## Next Release (2014-Q3)
 
-This release of Rose will work best with the upcoming
-[Cylc](https://github.com/cylc/cylc/) 6.0.0.
+This release of Rose will work best with
+[Cylc](https://github.com/cylc/cylc/) 6.0.0alpha2.
 
 ### Highlighted Changes
 
--none yet-
+[#1323](https://github.com/metomi/rose/pull/1323),
+[#1365](https://github.com/metomi/rose/pull/1365):
+Rephrase *cycle time* to *cycle point* for cylc 6.
+Improve reporting of running cylc suite processes.
+Handle `log/job/` and `work/` directory restructure.
+
+[#1367](https://github.com/metomi/rose/pull/1367):
+[isodatetime](https://github.com/metomi/isodatetime/) upgraded to 2014.08.0.
+
+[#1332](https://github.com/metomi/rose/pull/1332),
+[#1316](https://github.com/metomi/rose/pull/1316):
+rose date: new usage to print interval between 2 date time points.
+
+[#1283](https://github.com/metomi/rose/pull/1283),
+[#1352](https://github.com/metomi/rose/pull/1352):
+rosie go, rosie lookup, rosie ls, etc: will now attempt to use
+[Gnome Keyring](https://wiki.gnome.org/GnomeKeyring) to store passwords for
+Rosie web services that require authentication.
 
 ### Noteworthy Changes
+
+[#1368](https://github.com/metomi/rose/pull/1368):
+rose metadata: fail-if/warn-if: now work for duplicate sections.
+
+[#1366](https://github.com/metomi/rose/pull/1366):
+rose config-edit: handle custom keyword arguments in upgrade macros.
+
+[#1364](https://github.com/metomi/rose/pull/1364):
+rosie go: address bar now support HTTPS protocol correctly.
+
+[#1362](https://github.com/metomi/rose/pull/1362):
+rose bush: support server side configurations for:
+* cycles list: cycles per page.
+* jobs list: jobs per page, maximum jobs per page.
+* file view: maximum renderable file size.
+
+[#1361](https://github.com/metomi/rose/pull/1361):
+rose config-edit: improve `sort-key` logic.
+
+[#1360](https://github.com/metomi/rose/pull/1360):
+Run time file install: incremental install handles file access mode changes
+correctly.
 
 [#1359](https://github.com/metomi/rose/pull/1359):
 rose.config: the open and close square brace characters can no longer be used
 in section names.
+
+[#1356](https://github.com/metomi/rose/pull/1356):
+rose app-upgrade: report import errors from `versions.py` files.
 
 [#1354](https://github.com/metomi/rose/pull/1354):
 rose bush: suites list: long strings in column 1 now truncated, but visible on
@@ -29,6 +71,9 @@ rose metatdata, rose macro -V: recognise `.` id.
 
 [#1342](https://github.com/metomi/rose/pull/1342):
 rosie go: fix appearance of new suite in local suites.
+
+[#1338](https://github.com/metomi/rose/pull/1338):
+rosie go: improve new suite wizard behaviour.
 
 [#1336](https://github.com/metomi/rose/pull/1336):
 rose suite-run: ensure that run directory is only initialised in run mode.
@@ -48,17 +93,8 @@ rose config-edit, rose macro: check id usage in `fail-if`, `warn-if`.
 [#1317](https://github.com/metomi/rose/pull/1317):
 rose stem: configurable autmatic options.
 
-[#1332](https://github.com/metomi/rose/pull/1332),
-[#1316](https://github.com/metomi/rose/pull/1316):
-rose date: new usage to print interval between 2 date time points.
-
 [#1306](https://github.com/metomi/rose/pull/1306):
 rose app-upgrade: better error message for upgrade to same version.
-
-[#1283](https://github.com/metomi/rose/pull/1283):
-rosie go, rosie lookup, rosie ls, etc: will now attempt to use
-[Gnome Keyring](https://wiki.gnome.org/GnomeKeyring) to store passwords for
-Rosie web services that require authentication.
 
 --------------------------------------------------------------------------------
 
