@@ -489,8 +489,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             section, option = self._get_section_option_from_id(setting_id)
             tiny_config = rose.config.ConfigNode()
             tiny_config.set([section, option], value)
+            tiny_meta_config = rose.config.ConfigNode()
             check_failed = self.evaluator.evaluate_rule(
-                                        rule, setting_id, tiny_config)
+                rule, setting_id, tiny_config, tiny_meta_config)
             if len(self._evaluated_rule_checks) > self.MAX_STORED_RULE_CHECKS:
                 self._evaluated_rule_checks.popitem()
             self._evaluated_rule_checks[(rule, value)] = check_failed

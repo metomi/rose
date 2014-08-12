@@ -262,10 +262,11 @@ class ValueChecker(rose.macro.MacroBase):
                 break
             if is_range_complex:
                 tiny_config.set([sect, key], val)
+                tiny_meta_config = rose.config.ConfigNode()
                 evaluator = rose.macros.rule.RuleEvaluator()
                 try:
                     check_ok = evaluator.evaluate_rule(
-                                            range_pat, var_id, tiny_config)
+                        range_pat, var_id, tiny_config, tiny_meta_config)
                 except rose.macros.rule.RuleValueError:
                     pass
             else:

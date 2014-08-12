@@ -81,30 +81,34 @@ class FailureRuleChecker(rose.macro.MacroBase):
         self.reports = []
         rule_data = {self.RULE_ERROR_NAME: {}, self.RULE_WARNING_NAME: {}}
         evaluator = RuleEvaluator()
-        for setting_id, sect_node in meta_config.value.items():
+        for node_keys, node in config.walk(no_ignore=True):
+            if isinstance(node.value, dict):
+                continue
+            sect, opt = node_keys
+            value = node.value
+            setting_id = self._get_id_from_section_option(sect, opt)
+            metadata = rose.macro.get_metadata_for_config_id(setting_id,
+                                                             meta_config)
             for rule_opt in [self.RULE_ERROR_NAME, self.RULE_WARNING_NAME]:
-                if rule_opt in sect_node.value:
-                    sect, opt = self._get_section_option_from_id(setting_id)
-                    node = config.get([sect, opt], no_ignore=True)
-                    if node is not None:
-                        rule = sect_node.get([rule_opt]).value
-                        id_rules = rule_data[rule_opt]
-                        id_rules.setdefault(setting_id, [])
-                        rule_lines = rule.splitlines()
-                        for rule_line in rule_lines:
-                            message = None
-                            if "#" in rule_line:
-                                rule_line, message = rule_line.split("#", 1)
-                                message = message.strip()
-                            rule_line = rule_line.strip()
-                            for rule_item in self.REC_RULE_SPLIT.split(rule_line):
-                                if not rule_item:
-                                    continue
-                                id_rules[setting_id].append([rule_item, None])
-                            if id_rules[setting_id]:
-                                id_rules[setting_id][-1][-1] = message
+               if rule_opt in metadata:
+                    rule = metadata.get(rule_opt)
+                    id_rules = rule_data[rule_opt]
+                    id_rules.setdefault(setting_id, [])
+                    rule_lines = rule.splitlines()
+                    for rule_line in rule_lines:
+                        message = None
+                        if "#" in rule_line:
+                            rule_line, message = rule_line.split("#", 1)
+                            message = message.strip()
+                        rule_line = rule_line.strip()
+                        for rule_item in self.REC_RULE_SPLIT.split(rule_line):
+                            if not rule_item:
+                                continue
+                            id_rules[setting_id].append([rule_item, None])
+                        if id_rules[setting_id]:
+                            id_rules[setting_id][-1][-1] = message
+
         for rule_type in rule_data:
-            
             is_warning = (rule_type == self.RULE_WARNING_NAME)
             if is_warning:
                 f_type = self.WARNING_RULE_FAILED
@@ -115,7 +119,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
                 for (rule, message) in rule_msg_list:
                     try:
                         test_failed = evaluator.evaluate_rule(
-                                                rule, setting_id, config)
+                            rule, setting_id, config, meta_config)
                     except (ZeroDivisionError, TypeError, 
                             ValueError,IndexError) as e:
                         test_failed = True
@@ -176,32 +180,35 @@ class RuleEvaluator(rose.macro.MacroBase):
                              (?:\W|$)        (?# Break or end)""", re.X)
     REC_VALUE = re.compile(r'("[^"]*")')
 
-    def evaluate_rule(self, rule, setting_id, config):
+    def evaluate_rule(self, rule, setting_id, config, meta_config):
         """Evaluate the logic in the provided rule based on config values."""
         rule_template_str, rule_id_values = self._process_rule(
-                                   rule, setting_id, config)
+                                   rule, setting_id, config, meta_config)
         template = jinja2.Template(rule_template_str)
         return_string = template.render(rule_id_values)
         return ast.literal_eval(return_string)
 
-    def evaluate_rule_id_usage(self, rule, setting_id):
+    def evaluate_rule_id_usage(self, rule, setting_id, meta_config):
         """Return a set of setting ids referenced in the provided rule."""
         log_ids = set([])
-        self._process_rule(rule, setting_id, None,
+        self._process_rule(rule, setting_id, None, meta_config,
                            log_ids=log_ids)
         return log_ids
 
-    def _process_rule(self, rule, setting_id, config, log_ids=None):
+    def _process_rule(self, rule, setting_id, config, meta_config,
+                      log_ids=None):
         """Pre-process the provided rule into valid jinja2."""
         if log_ids is None:
             get_value_from_id = self._get_value_from_id
         else:
             get_value_from_id = (
-                lambda id_, conf: self._log_id_usage(id_, conf, log_ids)
+                lambda id_, conf, m_conf, p_id: self._log_id_usage(
+                    id_, conf, m_conf, p_id, log_ids)
             )
         if not (rule.startswith('{%') or rule.startswith('{-%')):
             rule = "{% if " + rule + " %}True{% else %}False{% endif %}"
-        local_map = {"this": get_value_from_id(setting_id, config)}
+        local_map = {"this": get_value_from_id(
+            setting_id, config, meta_config, setting_id)}
         value_id_count = -1
         sci_num_count = -1
         for array_func_key, rec_regex in self.REC_ARRAY.items():
@@ -209,7 +216,8 @@ class RuleEvaluator(rose.macro.MacroBase):
                 start, var_id, operator, value, end = search_result
                 if var_id == "this":
                     var_id = setting_id
-                setting_value = get_value_from_id(var_id, config)
+                setting_value = get_value_from_id(
+                    var_id, config, meta_config, setting_id)
                 array_value = rose.variable.array_split(str(setting_value))
                 new_string = start + "("
                 for elem_num in range(1, len(array_value) + 1):
@@ -223,7 +231,8 @@ class RuleEvaluator(rose.macro.MacroBase):
             start, var_id, end = search_result
             if var_id == "this":
                 var_id = setting_id
-            setting_value = get_value_from_id(var_id, config)
+            setting_value = get_value_from_id(
+                var_id, config, meta_config, setting_id)
             array_value = rose.variable.array_split(str(setting_value))
             new_string = start + str(len(array_value)) + end
             rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
@@ -244,7 +253,8 @@ class RuleEvaluator(rose.macro.MacroBase):
             rule = rule.replace(search_result, key, 1)
         for search_result in self.REC_THIS_ELEMENT_ID.findall(rule):
             proper_id = search_result.replace("this", setting_id)
-            value_string = get_value_from_id(proper_id, config)
+            value_string = get_value_from_id(
+                proper_id, config, meta_config, setting_id)
             for key, value in local_map.items():
                 if value == value_string:
                     break
@@ -255,7 +265,8 @@ class RuleEvaluator(rose.macro.MacroBase):
             rule = rule.replace(search_result, key, 1)
         config_id_count = -1
         for search_result in self.REC_CONFIG_ID.findall(rule):
-            value_string = get_value_from_id(search_result, config)
+            value_string = get_value_from_id(
+                search_result, config, meta_config, setting_id)
             for key, value in local_map.items():
                 if value == value_string:
                     break
@@ -266,16 +277,34 @@ class RuleEvaluator(rose.macro.MacroBase):
             rule = rule.replace(search_result, key, 1)
         return rule, local_map
 
-    def _log_id_usage(self, variable_id, config, id_set):
+    def _log_id_usage(self, variable_id, config, meta_config, parent_id,
+                      id_set):
         """Wrap _get_value_from_id, storing variable_id in id_set."""
         id_set.add(variable_id)
         if config is None:
             return "None"
-        return self._get_value_from_id(variable_id, config)
+        return self._get_value_from_id(variable_id, config, meta_config,
+                                       parent_id)
 
-    def _get_value_from_id(self, variable_id, config):
+    def _get_value_from_id(self, variable_id, config, meta_config, parent_id):
         """Extract a value for variable_id from config, or fail."""
         section, option = self._get_section_option_from_id(variable_id)
+        if variable_id != parent_id:
+            # We may need to de-duplicate the section in the variable_id.
+            dupl_section = rose.macro.REC_ID_STRIP.sub("", section)
+            dupl_node = meta_config.get(
+                [dupl_section, rose.META_PROP_DUPLICATE], no_ignore=True)
+            if (dupl_node is not None and
+                    dupl_node.value == rose.META_PROP_VALUE_TRUE):
+                # This is an id in a duplicate namelist.
+                parent_section = self._get_section_option_from_id(
+                    parent_id)[0]
+                parent_dupl_section = rose.macro.REC_ID_STRIP.sub(
+                    "", parent_section)
+                if parent_dupl_section != dupl_section:
+                    raise RuleValueError(variable_id)
+                # Set section to be the same as the parent id's section.
+                section = parent_section
         value = None
         opt_node = config.get([section, option], no_ignore=True)
         if opt_node is not None:
