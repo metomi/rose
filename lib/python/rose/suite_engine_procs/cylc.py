@@ -876,7 +876,7 @@ class CylcProcessor(SuiteEngineProcessor):
                             includes = ["/" + cycle, "/" + cycle + "/" + name]
                             excludes = ["/*", "/*/*"]
                         auths_filters.append((auths, includes, excludes))
-            # FIXME: more efficient if auth is key?
+
             for auths, includes, excludes in auths_filters:
                 for auth in auths:
                     data = {"auth": auth,
