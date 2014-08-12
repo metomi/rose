@@ -16,4 +16,4 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
 
-__version__ = "2014.07.0-3-geceb80b"
+__version__ = "2014.08.0"

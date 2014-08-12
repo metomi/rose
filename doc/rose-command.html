@@ -758,7 +758,7 @@ rose date -c ref [--offset=OFFSET]
 # 1.3 A specific date time with an optional offset
 rose date 20380119T031407Z [--offset=OFFSET]
 
-# 2. Print date time interval
+# 2. Print duration
 # 2.1 Between now (+ OFFSET1) and a future date time (+ OFFSET2)
 rose date now [--offset1=OFFSET1] 20380119T031407Z [--offset2=OFFSET2]
 # 2.2 Between a date time in the past and now
@@ -778,13 +778,13 @@ rose date 19700101T000000Z 20380119T031407Z
 
     <h3>DESCRIPTION</h3>
 
-    <p>Parse and print a date time point or a date time interval.</p>
+    <p>Parse and print a date time point or a duration.</p>
 
     <ol>
       <li>With 0 or 1 argument. Print the current or the specified date time
       point with an optional offset.</li>
 
-      <li>With 2 arguments. Print the time interval between the 2
+      <li>With 2 arguments. Print the duration between the 2
       arguments.</li>
     </ol>
 
@@ -943,7 +943,7 @@ rose date 19700101T000000Z 20380119T031407Z
     automatically adapt the date/time to that timezone i.e. apply the correct
     hour/minute UTC offset.</p>
 
-    <p>For printing a date time interval, the following can be used in format
+    <p>For printing a duration, the following can be used in format
     statements:</p>
 
     <ul>
@@ -955,7 +955,7 @@ rose date 19700101T000000Z 20380119T031407Z
       <li>s: seconds</li>
     </ul>
 
-    <p>For example, for a time interval <samp>P57DT12H</samp>:</p>
+    <p>For example, for a duration <samp>P57DT12H</samp>:</p>
 
     <pre>
 'y,m,d,h' -&gt; '0,0,57,12'
@@ -2206,7 +2206,7 @@ launcher-preopts.mpiexec=-n $NPROC
 
           <li>The rest should be an <a href=
           "http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>
-          interval or duration representation, such as:
+          duration, such as:
 
             <ul>
               <li><samp>P2W</samp> - 2 weeks</li>

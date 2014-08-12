@@ -20,9 +20,9 @@
 """Parse and format date and time."""
 
 from datetime import datetime
-from isodatetime.data import Calendar, TimeInterval, get_timepoint_for_now
+from isodatetime.data import Calendar, Duration, get_timepoint_for_now
 from isodatetime.dumpers import TimePointDumper
-from isodatetime.parsers import TimePointParser, TimeIntervalParser
+from isodatetime.parsers import TimePointParser, DurationParser
 import os
 import re
 from rose.env import UnboundEnvironmentVariableError
@@ -107,7 +107,7 @@ class RoseDateTimeOperator(object):
         self.time_point_dumper = TimePointDumper()
         self.time_point_parser = TimePointParser(
             assumed_time_zone=assumed_time_zone)
-        self.time_interval_parser = TimeIntervalParser()
+        self.duration_parser = DurationParser()
 
         self.ref_time_point = ref_time_point
 
@@ -197,13 +197,13 @@ class RoseDateTimeOperator(object):
             if offset.startswith("P"):
                 # Parse and apply.
                 try:
-                    interval = self.time_interval_parser.parse(offset)
+                    duration = self.duration_parser.parse(offset)
                 except ValueError:
                     raise OffsetValueError(offset)
                 if sign == "-":
-                    time_point -= interval
+                    time_point -= duration
                 else:
-                    time_point += interval
+                    time_point += duration
             else:
                 # Backwards compatibility for e.g. "-1h"
                 if not self.is_offset(offset):
@@ -213,14 +213,14 @@ class RoseDateTimeOperator(object):
                     if sign == "-":
                         num = -num
                     key = self.UNITS[unit]
-                    time_point += TimeInterval(**{key: num})
+                    time_point += Duration(**{key: num})
 
         return time_point
 
     def date_diff(self, time_point_1=None, time_point_2=None):
-        """Return (time_interval, is_negative) between two TimePoint objects.
+        """Return (duration, is_negative) between two TimePoint objects.
 
-        time_interval -- is a TimeInterval instance.
+        duration -- is a Duration instance.
         is_negative -- is a RoseDateTimeOperator.NEGATIVE if time_point_2 is
                        in the past of time_point_1.
         """
@@ -230,15 +230,15 @@ class RoseDateTimeOperator(object):
             return (time_point_2 - time_point_1, "")
 
     @classmethod
-    def date_diff_format(cls, print_format, time_interval, sign):
-        """Format a time interval."""
+    def date_diff_format(cls, print_format, duration, sign):
+        """Format a duration."""
         if print_format:
-            delta_lookup = {"y": time_interval.years,
-                            "m": time_interval.months,
-                            "d": time_interval.days,
-                            "h": time_interval.hours,
-                            "M": time_interval.minutes,
-                            "s": time_interval.seconds}
+            delta_lookup = {"y": duration.years,
+                            "m": duration.months,
+                            "d": duration.days,
+                            "h": duration.hours,
+                            "M": duration.minutes,
+                            "s": duration.seconds}
             expression = ""
             for item in print_format:
                 if item in delta_lookup:
@@ -247,7 +247,7 @@ class RoseDateTimeOperator(object):
                     expression += item
             return sign + expression
         else:
-            return sign + str(time_interval)
+            return sign + str(duration)
 
     def is_offset(self, offset):
         """Return True if the string offset can be parsed as an offset."""
@@ -325,7 +325,7 @@ def main():
         if len(args) < 2:
             _print_time_point(date_time_oper, opts, args)
         else:
-            _print_time_interval(date_time_oper, opts, args)
+            _print_duration(date_time_oper, opts, args)
     except OffsetValueError as exc:
         report(exc)
         if opts.debug_mode:
@@ -351,8 +351,8 @@ def _print_time_point(date_time_oper, opts, args):
         print str(time_point)
 
 
-def _print_time_interval(date_time_oper, opts, args):
-    """Implement usage 2 of "rose date", print time interval."""
+def _print_duration(date_time_oper, opts, args):
+    """Implement usage 2 of "rose date", print duration."""
     time_point_str_1, time_point_str_2 = args
     time_point_1 = date_time_oper.date_parse(time_point_str_1)[0]
     time_point_2 = date_time_oper.date_parse(time_point_str_2)[0]
@@ -362,9 +362,8 @@ def _print_time_interval(date_time_oper, opts, args):
     if opts.offsets2:
         for offset in opts.offsets2:
             time_point_2 = date_time_oper.date_shift(time_point_2, offset)
-    time_interval, sign = date_time_oper.date_diff(time_point_1, time_point_2)
-    print date_time_oper.date_diff_format(opts.print_format, time_interval,
-                                          sign)
+    duration, sign = date_time_oper.date_diff(time_point_1, time_point_2)
+    print date_time_oper.date_diff_format(opts.print_format, duration, sign)
 
 
 if __name__ == "__main__":

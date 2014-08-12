@@ -33,7 +33,7 @@
 #     # 1.3 A specific date time with an optional offset
 #     rose date 20380119T031407Z [--offset=OFFSET]
 #
-#     # 2. Print date time interval
+#     # 2. Print duration
 #     # 2.1 Between now (+ OFFSET1) and a future date time (+ OFFSET2)
 #     rose date now [--offset1=OFFSET1] 20380119T031407Z [--offset2=OFFSET2]
 #     # 2.2 Between a date time in the past and now
@@ -51,12 +51,12 @@
 #     rose date 19700101T000000Z 20380119T031407Z
 #
 # DESCRIPTION
-#     Parse and print 1. a date time point or 2. a date time interval.
+#     Parse and print 1. a date time point or 2. a duration.
 #
 #     1. With 0 or 1 argument. Print the current or the specified date time
 #        point with an optional offset.
 #
-#     2. With 2 arguments. Print the time interval between the 2 arguments.
+#     2. With 2 arguments. Print the duration between the 2 arguments.
 #
 # OPTIONS
 #     --calendar=gregorian|360day|365day|366day
@@ -149,7 +149,7 @@
 #     adapt the date/time to that timezone i.e. apply the correct
 #     hour/minute UTC offset.
 #
-#     For printing a date time interval, the following can be used in format
+#     For printing a duration, the following can be used in format
 #     statements:
 #         y: years
 #         m: months
@@ -157,7 +157,7 @@
 #         h: hours
 #         M: minutes
 #         s: seconds
-#     For example, for a time interval P57DT12H:
+#     For example, for a duration P57DT12H:
 #         'y,m,d,h' -> '0,0,57,12'
 #-------------------------------------------------------------------------------
 exec python -m rose.date "$@"
