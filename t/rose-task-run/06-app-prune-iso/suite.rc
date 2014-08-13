@@ -2,11 +2,11 @@
 [cylc]
     UTC mode = True
     [[event hooks]]
-        timeout handler = "rose suite-hook --shutdown"
-        timeout = 1
+        timeout handler = rose suite-hook --shutdown
+        timeout = PT1M
 [scheduling]
     initial cycle point = 20130101T0000Z
-    final cycle point   = 20130103T0000Z
+    final cycle point = 20130103T0000Z
     [[dependencies]]
         [[[ PT12H ]]]
             graph = """
@@ -19,17 +19,17 @@ WARM[-PT12H]:finish-all => rose_prune
 
 [runtime]
     [[root]]
-        command scripting = "rose task-run"
+        command scripting = rose task-run
         [[[event hooks]]]
-            succeeded handler = "rose suite-hook"
-            failed handler = "rose suite-hook"
-            submission failed handler = "rose suite-hook --shutdown"
-            submission timeout handler = "rose suite-hook"
-            execution timeout handler = "rose suite-hook"
-            submission timeout = 1
-            execution timeout  = 1
+            succeeded handler = rose suite-hook
+            failed handler = rose suite-hook
+            submission failed handler = rose suite-hook --shutdown
+            submission timeout handler = rose suite-hook
+            execution timeout handler = rose suite-hook
+            submission timeout = PT1M
+            execution timeout  = PT1M
     [[cold]]
-        command scripting = "true"
+        command scripting = true
     [[WARM]]
     [[my_task_1]]
         inherit = WARM
