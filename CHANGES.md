@@ -1,6 +1,6 @@
 # Rose Changes
 
-Go to https://github.com/metomi/rose/issues/milestones?state=closed
+Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
