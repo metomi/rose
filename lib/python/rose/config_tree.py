@@ -18,9 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------------
+"""Rose configuration directory inheritance."""
 
 import os
-from rose.c3 import mro, MROError
+from rose.c3 import mro
 from rose.config import ConfigNode, ConfigLoader
 import shlex
 
@@ -46,7 +47,7 @@ class ConfigTree(object):
 
     def __init__(self):
         self.node = ConfigNode()
-        self.files = {} # {relative path: root, ...}
+        self.files = {}  # {relative path: root, ...}
         self.conf_dirs = []
 
 
@@ -75,7 +76,7 @@ class ConfigTreeLoader(object):
         if not conf_dir_paths:
             conf_dir_paths = []
         conf_dir = self._search(conf_dir, [os.getcwd()] + conf_dir_paths)
-        nodes = {} # {conf_dir: node, ...}
+        nodes = {}  # {conf_dir: node, ...}
         conf_file_name = os.path.join(conf_dir, conf_name)
         used_keys = []
         nodes[conf_dir] = self.node_loader.load_with_opts(
@@ -103,7 +104,7 @@ class ConfigTreeLoader(object):
                     config_tree.node.set(keys, sub_node.value, sub_node.state,
                                          sub_node.comments)
             for dir_path, dir_names, file_names in os.walk(t_conf_dir):
-                names = [d for d in dir_names if d.startswith(".")]
+                names = [dir_ for dir_ in dir_names if dir_.startswith(".")]
                 for name in names:
                     dir_names.remove(name)
                 for file_name in file_names:
@@ -111,7 +112,7 @@ class ConfigTreeLoader(object):
                         continue
                     path = os.path.join(dir_path, file_name)
                     rel_path = os.path.relpath(path, t_conf_dir)
-                    if not config_tree.files.has_key(rel_path):
+                    if rel_path not in config_tree.files:
                         config_tree.files[rel_path] = t_conf_dir
 
         return config_tree
@@ -120,6 +121,7 @@ class ConfigTreeLoader(object):
 
     def _get_base_names(self, my_conf_dir, conf_name, conf_dir_paths, opt_keys,
                         used_keys, nodes):
+        """Return a list of configuration directories to import."""
         values = shlex.split(nodes[my_conf_dir].get_value(["import"], ""))
         i_conf_dirs = []
         for value in values:
@@ -133,13 +135,15 @@ class ConfigTreeLoader(object):
             i_conf_dirs.append(i_conf_dir)
         return i_conf_dirs
 
-    def _search(self, conf_dir, conf_dir_paths):
+    @classmethod
+    def _search(cls, conf_dir, conf_dir_paths):
+        """Search for named a configuration directory from a list of paths."""
         if os.path.isabs(conf_dir):
             return os.path.abspath(conf_dir)
         for conf_dir_path in conf_dir_paths:
-            d = os.path.join(conf_dir_path, conf_dir)
-            if os.path.isdir(d):
-                return os.path.abspath(d)
+            dir_ = os.path.join(conf_dir_path, conf_dir)
+            if os.path.isdir(dir_):
+                return os.path.abspath(dir_)
         return os.path.abspath(os.path.join(conf_dir_paths[0], conf_dir))
 
 
@@ -153,21 +157,19 @@ class _Test(object):
         self.test_num = 0
         self.test_plan = "1..13"
 
-    def ok(self, key, cond):
+    def test(self, key, actual, expect):
+        """Test if actual == expect."""
         self.test_num += 1
-        if cond:
+        if actual == expect:
             print "ok %d - %s" % (self.test_num, key)
         else:
             print "not ok %d - %s" % (self.test_num, key)
 
-    def test(self, key, actual, expect):
-        self.ok(key, actual == expect)
-
-    def t1(self):
+    def test1(self):
         """Test: configuration file only."""
         os.mkdir("t1")
-        f = open("t1/rose-t.conf", "wb")
-        f.write(r"""title=breakfast
+        handle = open("t1/rose-t.conf", "wb")
+        handle.write(r"""title=breakfast
 type=fried up
 
 [bacon]
@@ -178,7 +180,7 @@ type=streaky
 number=2
 type=fried
 """)
-        f.close()
+        handle.close()
         config_tree = self.config_tree_loader("t1", "rose-t.conf")
 
         string_io = StringIO()
@@ -199,11 +201,11 @@ type=fried
         conf_dir = os.path.join(os.getcwd(), "t1")
         self.test("t1.conf_dirs", config_tree.conf_dirs, [conf_dir])
 
-    def t2(self):
+    def test2(self):
         """Test: configuration file and some other files."""
         os.mkdir("t2")
-        f = open("t2/rose-t.conf", "wb")
-        f.write(r"""title=all day breakfast
+        handle = open("t2/rose-t.conf", "wb")
+        handle.write(r"""title=all day breakfast
 
 [sausage]
 number=3
@@ -218,21 +220,22 @@ type=brown
 number=1
 type=grilled
 """)
-        f.close()
+        handle.close()
         os.mkdir("t2/bin")
-        f = open("t2/bin/make-breakfast", "wb")
-        f.write(r"""#!/bin/sh
+        handle = open("t2/bin/make-breakfast", "wb")
+        handle.write(r"""#!/bin/sh
 echo "Making breakfast $@"
 """)
-        f.close()
+        handle.close()
         os.chmod("t2/bin/make-breakfast", 0755)
         os.mkdir("t2/etc")
-        for k, v in (("sausage", "10 fat sausages"),
-                     ("bread", "slice bread"),
-                     ("tomato", "a red tomato")):
-            f = open(os.path.join("t2/etc", k), "wb")
-            f.write(v + "\n")
-            f.close()
+        for key, val in (
+                ("sausage", "10 fat sausages"),
+                ("bread", "slice bread"),
+                ("tomato", "a red tomato")):
+            handle = open(os.path.join("t2/etc", key), "wb")
+            handle.write(val + "\n")
+            handle.close()
         config_tree = self.config_tree_loader("t2", "rose-t.conf")
 
         string_io = StringIO()
@@ -261,18 +264,18 @@ type=grilled
                    "etc/tomato": conf_dir})
         self.test("t2.conf_dirs", config_tree.conf_dirs, [conf_dir])
 
-    def t3(self):
+    def test3(self):
         """Test: configuration that imports t1 and t2."""
         os.mkdir("t3")
-        f = open("t3/rose-t.conf", "wb")
-        f.write(r"""import=t2 t1
+        handle = open("t3/rose-t.conf", "wb")
+        handle.write(r"""import=t2 t1
 size=large
 """)
-        f.close()
+        handle.close()
         os.mkdir("t3/etc")
-        f = open("t3/etc/bread", "wb")
-        f.write("50/50 slice bread\n")
-        f.close()
+        handle = open("t3/etc/bread", "wb")
+        handle.write("50/50 slice bread\n")
+        handle.close()
         config_tree = self.config_tree_loader("t3", "rose-t.conf")
 
         string_io = StringIO()
@@ -314,23 +317,23 @@ type=grilled
         self.test("t3.conf_dirs", config_tree.conf_dirs,
              [t3_conf_dir, t2_conf_dir, t1_conf_dir])
 
-    def t3_opt(self):
+    def test3_opt(self):
         """Test: configuration that imports t1 and t2, with opt conf."""
         os.mkdir("t1/opt")
-        f = open("t1/opt/rose-t-go-large.conf", "wb")
-        f.write(r"""[bacon]
+        handle = open("t1/opt/rose-t-go-large.conf", "wb")
+        handle.write(r"""[bacon]
 number=4
 
 [egg]
 number=3
 """)
-        f.close()
+        handle.close()
         os.mkdir("t3/opt")
-        f = open("t3/opt/rose-t-go-large.conf", "wb")
-        f.write(r"""[bean]
+        handle = open("t3/opt/rose-t-go-large.conf", "wb")
+        handle.write(r"""[bean]
 type=baked
 """)
-        f.close()
+        handle.close()
         config_tree = self.config_tree_loader("t3", "rose-t.conf",
                                          opt_keys=["go-large"])
 
@@ -366,19 +369,19 @@ type=grilled
 """)
         string_io.close()
 
-    def t4(self):
+    def test4(self):
         """Test: as t3, but use an alternate path."""
         os.chdir("../b")
         os.mkdir("t4")
-        f = open("t4/rose-t.conf", "wb")
-        f.write(r"""import=t2 t1
+        handle = open("t4/rose-t.conf", "wb")
+        handle.write(r"""import=t2 t1
 size=large
 """)
-        f.close()
+        handle.close()
         os.mkdir("t4/etc")
-        f = open("t4/etc/bread", "wb")
-        f.write("50/50 slice bread\n")
-        f.close()
+        handle = open("t4/etc/bread", "wb")
+        handle.write("50/50 slice bread\n")
+        handle.close()
         config_tree = self.config_tree_loader("t4", "rose-t.conf",
                                          conf_dir_paths=["../a"])
 
@@ -424,6 +427,7 @@ type=grilled
              [t4_conf_dir, t2_conf_dir, t1_conf_dir])
 
     def run(self):
+        """Run the tests."""
         print self.test_plan
 
         cwd = os.getcwd()
@@ -434,11 +438,11 @@ type=grilled
         os.mkdir(b_dir)
         os.chdir(a_dir)
         try:
-            self.t1()
-            self.t2()
-            self.t3()
-            self.t3_opt()
-            self.t4()
+            self.test1()
+            self.test2()
+            self.test3()
+            self.test3_opt()
+            self.test4()
         finally:
             os.chdir(cwd)
             rmtree(work_dir)
