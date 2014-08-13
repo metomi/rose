@@ -5,9 +5,24 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q3)
+## Next Release (2014-Q3?)
 
-This release of Rose will work best with
+This release of Rose will work best with the upcoming
+[Cylc](https://github.com/cylc/cylc/) 6.0.0.
+
+### Highlighted Changes
+
+-none yet-
+
+### Noteworthy Changes
+
+-none yet-
+
+--------------------------------------------------------------------------------
+
+## 2014.08.0alpha1 (2014-08-13)
+
+This is a pre-release of Rose. It works best with
 [Cylc](https://github.com/cylc/cylc/) 6.0.0alpha2.
 
 ### Highlighted Changes
@@ -75,6 +90,9 @@ rose metatdata, rose macro -V: recognise `.` id.
 
 [#1342](https://github.com/metomi/rose/pull/1342):
 rosie go: fix appearance of new suite in local suites.
+
+[#1339](https://github.com/metomi/rose/pull/1339):
+rose config-edit, rosie go: no jumping focus on valuewidget errors.
 
 [#1338](https://github.com/metomi/rose/pull/1338):
 rosie go: improve new suite wizard behaviour.
