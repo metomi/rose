@@ -45,7 +45,8 @@ hello world
 hello earth
 __TXT__
 run_pass "$TEST_KEY" rose suite-run --run=reload -n $NAME --no-gcontrol -C src
-sed '1,/export ROSE_VERSION=/d' "$TEST_KEY.out" >"$TEST_KEY.out.tail"
+sed '1,/export ROSE_VERSION=/d; /\/.cylc\//d' "$TEST_KEY.out" \
+    >"$TEST_KEY.out.tail"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out.tail" <<__OUT__
 [INFO] install: hello.txt
 [INFO]     source: $PWD/src/hello.txt

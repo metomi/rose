@@ -3,7 +3,7 @@
     UTC mode = True
     [[event hooks]]
         timeout handler = rose suite-hook --shutdown
-        timeout = 2
+        timeout = PT2M
 [scheduling]
     initial cycle point = 20130101T0000Z
     final cycle point = 20130102T0000Z
@@ -23,6 +23,6 @@ eval $(rose task-env --cycle-offset=PT12H --path=MY_PATH='etc/my-path/*')
            submission failed handler = rose suite-hook --shutdown
            submission timeout handler = rose suite-hook
            execution timeout handler = rose suite-hook
-           submission timeout = 1
-           execution timeout = 1
+           submission timeout = PT1M
+           execution timeout = PT1M
     [[my_task_1]]

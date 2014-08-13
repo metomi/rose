@@ -3,7 +3,7 @@
     UTC mode=True
     [[event hooks]]
         timeout handler=rose suite-hook --shutdown
-        timeout=1
+        timeout=PT1M
 [scheduling]
     initial cycle point=20130101T0000Z
     final cycle point=20130101T0000Z
@@ -20,5 +20,5 @@
            submission failed handler=rose suite-hook --shutdown
            submission timeout handler=rose suite-hook
            execution timeout handler=rose suite-hook
-           submission timeout=1
-           execution timeout=1
+           submission timeout=PT1M
+           execution timeout=PT1M
