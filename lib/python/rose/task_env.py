@@ -29,7 +29,9 @@ from rose.suite_engine_proc import SuiteEngineProcessor
 import sys
 import traceback
 
-PATH_GLOBS = {"PATH": ["share/fcm[_-]make*/*/bin", "work/fcm[_-]make*/*/bin"]}
+PATH_GLOBS = {
+    "PATH": ["share/fcm[_-]make*/*/bin", "work/1/fcm[_-]make*/*/bin"],
+}
 
 
 def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=[],

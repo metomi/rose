@@ -47,7 +47,7 @@
     # Timeout handlers
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 1410 # 23.5 hours
+        timeout = PT23H30M
 
 # This links a name specified on the command in rose-stem with a
 # set of cylc task dependencies
@@ -108,9 +108,9 @@ export ROSE_VERSION={{ROSE_VERSION}}
             failed handler = rose suite-hook
             retry handler = rose suite-hook --mail
             submission failed handler = rose suite-hook --mail
-            submission timeout = 720 # 12 hours
+            submission timeout = PT12H
             submission timeout handler = rose suite-hook --mail
-            execution timeout  =  180 # 3 hours
+            execution timeout = PT3H
             execution timeout handler = rose suite-hook --mail
 
     [[fcm_make_spaceship]]

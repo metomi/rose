@@ -383,7 +383,7 @@ root-dir=hpc*=$WORKDIR
     UTC mode=True
     [[event hooks]]
         timeout handler=rose suite-hook --mail --shutdown
-        timeout=4320 # 3 days
+        timeout=P3D
 [runtime]
     [[root]]
         [[[event hooks]]]
@@ -393,8 +393,8 @@ root-dir=hpc*=$WORKDIR
            submission failed handler=rose suite-hook --shutdown
            submission timeout handler=rose suite-hook --mail
            execution timeout handler=rose suite-hook --mail
-           submission timeout=1440 # 24 hours
-           execution timeout=180 # 3 hours
+           submission timeout=P1D
+           execution timeout=PT3H
 </pre>
 
     <p>See <a href="rose-command.html#rose-suite-hook">Rose Reference Guide:

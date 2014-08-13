@@ -125,11 +125,11 @@
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 [scheduling]
     initial cycle point = <span id="cylc-time"></span>
     [[dependencies]]
-        [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
+        [[[PT1H]]]
             graph = bell
 
 [runtime]
@@ -227,7 +227,7 @@ rose suite-run
     [[special tasks]]
         clock-triggered = bell(0), quarter_past(0.25), half_past(0.5), quarter_to(0.75)
     [[dependencies]]
-        [[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]]]
+        [[[PT1H]]]
             graph = bell =&gt; quarter_past =&gt; half_past =&gt; quarter_to
 </pre>
 

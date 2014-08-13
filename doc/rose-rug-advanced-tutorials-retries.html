@@ -116,7 +116,7 @@
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 [scheduling]
     [[dependencies]]
         graph = start =&gt; roll_doubles =&gt; win
@@ -181,24 +181,24 @@ rose suite-run
       <samp>[[roll_doubles]]</samp> in the <samp>suite.rc</samp> file with:</p>
       <pre class="prettyprint lang-cylc">
     [[roll_doubles]]
-        retry delays = 5*0.1
+        retry delays = 5*PT6S
 </pre>
 
       <p>This means that if the <samp>roll_doubles</samp> task fails, Cylc
       expects to retry it 5 times before finally failing. Each retry will have
-      a delay of <samp>0.1</samp> minutes.</p>
+      a delay of <samp>6</samp> seconds.</p>
     </div>
 
     <div class="slide">
       <h3 class="alwayshidden">Explanation</h3>
 
       <p><samp>retry delays</samp> can have varying amounts (e.g. <samp>retry
-      delays = 0.25, 10, 60, 180</samp> to perform the first retry after 15
-      seconds, the second after 10 minutes, then an hour, then three
+      delays = PT15S, PT10M, PT1H, PT3H</samp> to perform the first retry after
+      15 seconds, the second after 10 minutes, then an hour, then three
       hours).</p>
 
-      <p>We've chosen 0.1 minutes (6 seconds) because it's relatively easy to
-      observe for this example.</p>
+      <p>We've chosen (6 seconds) because it's relatively easy to observe for
+      this example.</p>
     </div>
 
     <div class="slide">

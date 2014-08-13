@@ -739,14 +739,14 @@ rosie lookup --all-revs -Q title contains 'Case Study' and \
           <samp>scheduling</samp> section:</p>
           <pre class="prettyprint lang-cylc">
 [scheduling]
-    initial cycle point = 2014010500
-    final cycle point = 2014010700
+    initial cycle point = 20140105T00Z
+    final cycle point = 20140107T00Z
     [[dependencies]]
-        [[[0, 12]]]
+        [[[T00, T12]]]
             graph = """
                 a =&gt; b
             """
-        [[[6]]]
+        [[[T06]]]
             graph = """
                 b
             """
@@ -760,10 +760,10 @@ rosie lookup --all-revs -Q title contains 'Case Study' and \
             <input type="radio" value="C" /><label for="C">6</label><br />
             <input type="radio" value="D" /><label for="D">7</label>
 
-            <p class="answers D"><em>7</em>: at <samp>2014010500</samp>,
-            <samp>2014010506</samp>, <samp>2014010512</samp>,
-            <samp>2014010600</samp>, <samp>2014010606</samp>,
-            <samp>2014010612</samp>, <samp>2014010700</samp></p>
+            <p class="answers D"><em>7</em>: at <samp>20140105T0000Z</samp>,
+            <samp>20140105T0600Z</samp>, <samp>20140105T1200Z</samp>,
+            <samp>20140106T0000Z</samp>, <samp>20140106T0600Z</samp>,
+            <samp>20140106T1200Z</samp>, <samp>20140107T0000Z</samp></p>
           </div>
         </li>
 
@@ -897,8 +897,8 @@ graph = """
                 <td class="noborder">
                   <pre class="prettyprint lang-cylc">
 [scheduling]
-    initial cycle point = 2013060100
-    final cycle point   = 2013060300
+    initial cycle point = 20130601T00Z
+    final cycle point   = 20130603T00Z
 </pre>
                 </td>
               </tr>
@@ -924,7 +924,7 @@ graph = """
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 </pre>
                 </td>
               </tr>

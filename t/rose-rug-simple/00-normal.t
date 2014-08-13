@@ -23,46 +23,33 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 4
+tests 3
 #-------------------------------------------------------------------------------
 # Run the suite
 TEST_KEY=$TEST_KEY_BASE-suite-run
 mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
-run_pass "$TEST_KEY" \
-    rose suite-run --name=$NAME --no-gcontrol -C $ROSE_HOME/etc/rose-rug-simple
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
-fi
+run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol \
+    -C $ROSE_HOME/etc/rose-rug-simple -- --debug
 #-------------------------------------------------------------------------------
 file_cmp "$TEST_KEY_BASE.hello.log" \
     $SUITE_RUN_DIR/share/data/hello.log <<'__LOG__'
-[2013010100] Hello World
-[2013010106] Hello World
-[2013010112] Hello World
-[2013010118] Hello World
-[2013010200] Hello World
+[20130101T0000Z] Hello World
+[20130101T0600Z] Hello World
+[20130101T1200Z] Hello World
+[20130101T1800Z] Hello World
+[20130102T0000Z] Hello World
 __LOG__
 sqlite3 $SUITE_RUN_DIR/cylc-suite.db \
     'select cycle,name,status from task_states where status=="succeeded";' \
     | sort >"$TEST_KEY_BASE.db"
 file_cmp "$TEST_KEY_BASE.db" "$TEST_KEY_BASE.db" <<'__DB__'
-2013010100|hello|succeeded
-2013010106|hello|succeeded
-2013010112|hello|succeeded
-2013010118|hello|succeeded
-2013010200|hello|succeeded
+20130101T0000Z|hello|succeeded
+20130101T0600Z|hello|succeeded
+20130101T1200Z|hello|succeeded
+20130101T1800Z|hello|succeeded
+20130102T0000Z|hello|succeeded
 __DB__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

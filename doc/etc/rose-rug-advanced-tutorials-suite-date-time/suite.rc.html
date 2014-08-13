@@ -49,16 +49,16 @@
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 [scheduling]
-    initial cycle point = 2013060100
-    final cycle point   = 2013060300
+    initial cycle point = 20130601T00Z
+    final cycle point = 20130603T00Z
     [[special tasks]]
         cold-start = startup
     [[dependencies]]
-        [[[8, 20]]]
+        [[[T08, T20]]]
             graph = """
-                startup | arrival[T-12] =&gt; boarding
+                startup | arrival[-PT12H] =&gt; boarding
                 boarding =&gt; departure =&gt; wait_return
                 wait_return =&gt; assign_gate =&gt; arrival
             """

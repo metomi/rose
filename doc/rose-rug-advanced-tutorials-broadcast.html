@@ -112,16 +112,16 @@
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 [scheduling]
-    initial cycle point = 2013010100
-    final cycle point = 2013010500
+    initial cycle point = 20130101T00Z
+    final cycle point = 20130105T00Z
     [[special tasks]]
         cold-start = startup
     [[dependencies]]
-        [[[0]]]
+        [[[T00]]]
             graph = """
-                startup | print_colour[T-24] =&gt; print_colour
+                startup | print_colour[-PT24H] =&gt; print_colour
             """
 </pre>
     </div>
@@ -163,8 +163,8 @@
 [runtime]
     [[startup]]
         command scripting = """
-            cylc broadcast -t 2013010200 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
-            cylc broadcast -t 2013010400 -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
+            cylc broadcast -t 20130102T0000Z -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
+            cylc broadcast -t 20130104T0000Z -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
             cylc broadcast -d $CYLC_SUITE_REG_NAME
         """
 </pre>
@@ -175,8 +175,8 @@
 
       <p>The <samp>startup</samp> task will change the
       <samp>[[[environment]]]</samp> setting <samp>COLOUR</samp> of
-      <samp>print_colour</samp> for the <samp>2013010200</samp> and the
-      <samp>2013010400</samp> cycle times.</p>
+      <samp>print_colour</samp> for the <samp>20130102T00Z</samp> and the
+      <samp>20130104T00Z</samp> cycle times.</p>
 
       <p>The <code>cylc broadcast -d</code> command will list the current
       broadcast settings.</p>
@@ -198,9 +198,9 @@ rose suite-log
 </pre>
 
       <p>The output (<samp>out</samp>) of the <samp>print_colour</samp> tasks
-      should have some green text, except for the <samp>2013010200</samp> cycle
-      time where it should be blue and <samp>2013010400</samp> where it should
-      be red.</p>
+      should have some green text, except for the <samp>20130102T0000Z</samp>
+      cycle time where it should be blue and <samp>20130104T0000Z</samp> where
+      it should be red.</p>
     </div>
 
     <div class="slide">
@@ -213,8 +213,8 @@ rose suite-log
       of:</p>
       <pre class="prettyprint lang-cylc">
         command scripting = """
-            cylc broadcast -t 2013010200 -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
-            cylc broadcast -t 2013010400 -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
+            cylc broadcast -t 20130102T0000Z -n print_colour -s [environment]COLOUR=blue $CYLC_SUITE_REG_NAME
+            cylc broadcast -t 20130104T0000Z -n print_colour -s [environment]COLOUR=red $CYLC_SUITE_REG_NAME
             cylc broadcast -d $CYLC_SUITE_REG_NAME
         """
 </pre>
@@ -226,7 +226,7 @@ rose suite-log
       <p>We should make the suite run a bit longer by increasing <samp>final
       cycle time</samp>:</p>
       <pre class="prettyprint lang-cylc">
-    final cycle point = 2013012500
+    final cycle point = 20130125T00Z
 </pre>
     </div>
 

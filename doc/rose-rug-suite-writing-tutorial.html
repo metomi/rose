@@ -510,7 +510,7 @@ touch suite.rc
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 [scheduling]
 [runtime]
     [[root]]
@@ -521,8 +521,8 @@ touch suite.rc
            submission failed handler = rose suite-hook --shutdown
            submission timeout handler = rose suite-hook --mail
            execution timeout handler = rose suite-hook --mail
-           submission timeout = 1440 # 24 hours
-           execution timeout  =  180 # 3 hours
+           submission timeout = P1D
+           execution timeout = PT3H
 </pre>
     </div>
 
@@ -557,12 +557,12 @@ touch suite.rc
       <p>Replace <samp>[scheduling]</samp> with the following lines:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
-    initial cycle point = 2013060100
-    final cycle point   = 2013060300
+    initial cycle point = 20130601T00Z
+    final cycle point = 20130603T00Z
     [[special tasks]]
         cold-start = fcm_make_navigate
     [[dependencies]]
-        [[[ 0, 3, 6, 9, 12, 15, 18, 21 ]]]
+        [[[ PT3H ]]]
             graph = """
                 fcm_make_navigate | navigate[T-3] =&gt; navigate
             """
@@ -910,8 +910,8 @@ chmod +x bin/sun_sight
 rose suite-run
 </pre>
 
-      <p>Our extra task should run at <samp>2013060112</samp> and
-      <samp>2013060212</samp>.</p>
+      <p>Our extra task should run at <samp>20130601T1200Z</samp> and
+      <samp>20130602T1200Z</samp>.</p>
     </div>
 
     <div class="slide">

@@ -4,29 +4,32 @@
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
     # End Rose required event hook block
 [scheduling]
-    initial cycle point = 2013010100 # The first cycle of the suite is at 00:00 on Jan 1 2013
-    final cycle point   = 2013010200 # The last cycle of the suite is at 00:00 on Jan 2 2013
-    [[special tasks]]
-        cold-start = fcm_make # This task is only run at the beginning of the suite
+    initial cycle point = 20130101T0000Z # The first cycle of the suite is at 00:00 on Jan 1 2013
+    final cycle point = 20130102T0000Z # The last cycle of the suite is at 00:00 on Jan 2 2013
     [[dependencies]]
 
-        [[[ 0, 6, 12, 18 ]]] # Each day at 00:00, 06:00, 12:00, 18:00:
+        [[[R1]]]
+            graph = fcm_make
+        [[[PT6H]]] # Each day at 00:00, 06:00, 12:00, 18:00:
             graph = """
                 # my_hello_world is run after fcm_make or after the previous one finishes
-                fcm_make | my_hello_world[T-6] => my_hello_world
+                fcm_make[^] => my_hello_world
+                my_hello_world[-PT6H] => my_hello_world
 
                 # locate_fred is run after fcm_make or after the previous one finishes
                 # fred_hello_world is run after locate_fred
-                fcm_make | locate_fred[T-6] => locate_fred => fred_hello_world
+                fcm_make[^] => locate_fred
+                locate_fred[-PT6H] => locate_fred => fred_hello_world
             """
 
-        [[[ 0, 12 ]]] # Each day at 00:00 and 12:00:
+        [[[PT12H]]] # Each day at 00:00 and 12:00:
             graph = """
                 # my_hello_mars is run after fcm_make or after the previous one finishes
-                fcm_make | my_hello_mars[T-12] => my_hello_mars
+                fcm_make[^] => my_hello_mars
+                my_hello_mars[-PT12H] => my_hello_mars
             """
 
 [runtime]
@@ -42,8 +45,8 @@
            submission failed handler = rose suite-hook --shutdown
            submission timeout handler = rose suite-hook --mail
            execution timeout handler = rose suite-hook --mail
-           submission timeout = 1440 # 24 hours
-           execution timeout  =  180 # 3 hours
+           submission timeout = P1D # 24 hours
+           execution timeout = PT3H # 3 hours
         # End Rose recommended event hook block
     [[locate_fred]]
         command scripting = """
