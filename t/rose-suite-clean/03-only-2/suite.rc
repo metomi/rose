@@ -1,0 +1,37 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+[scheduling]
+    initial cycle point = 2000
+    final cycle point = 2020
+    [[dependencies]]
+        [[[P5Y]]]
+            graph = """
+my_task_1[-P5Y] => my_task_1
+{% if HOST is defined %}
+my_task_2
+{% endif %}
+"""
+
+[runtime]
+    [[root]]
+        environment scripting = eval $(rose task-env)
+        command scripting = """
+mkdir -p "$ROSE_SUITE_DIR/etc" || true
+mkdir -p "$ROSE_SUITE_DIR/etc/$ROSE_TASK_CYCLE_TIME" || true
+for ITEM in 'hello-world.out:Hello World' 'greet-earth.out:Greet Earth'; do
+    FILE=${ITEM%:*}
+    CONTENT=${ITEM#*:}
+    tee \
+        "$FILE" \
+        "$ROSE_DATAC/$FILE" \
+        "$ROSE_SUITE_DIR/etc/$ROSE_TASK_CYCLE_TIME/$FILE" \
+        <<<"$CONTENT"
+done
+"""
+    [[my_task_1]]
+{% if HOST is defined %}
+    [[my_task_2]]
+        [[[remote]]]
+            host = {{HOST}}
+{% endif %}
