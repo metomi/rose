@@ -50,6 +50,7 @@ class CylcProcessor(SuiteEngineProcessor):
     EVENTS = {"submission succeeded": "submit",
               "submission failed": "fail(submit)",
               "submitting now": "submit-init",
+              "incrementing submit number": "submit-init",
               "started": "init",
               "succeeded": "success",
               "failed": "fail",
@@ -283,11 +284,12 @@ class CylcProcessor(SuiteEngineProcessor):
         of_n_entries = 0
         stmt = ("SELECT COUNT(*) FROM"
                 " task_events JOIN task_states USING (name,cycle)"
-                " WHERE event==?")
+                " WHERE event==? OR event==?")
         if where:
             stmt += " " + where
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
-                                 ["submitting now"] + stmt_args):
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name, stmt,
+                ["submitting now", "incrementing submit number"] + stmt_args):
             of_n_entries = row[0]
             break
         if not of_n_entries:
@@ -302,13 +304,14 @@ class CylcProcessor(SuiteEngineProcessor):
                 " task_events JOIN task_states USING (cycle,name)" +
                 " WHERE" +
                 " (event==? OR event==? OR event==? OR" +
-                "  event==? OR event==? OR event==?)" +
+                "  event==? OR event==? OR event==? OR event==?)" +
                 where +
                 " GROUP BY cycle, name, task_events.submit_num" +
                 " ORDER BY " +
                 self.ORDERS.get(order, self.ORDERS["time_desc"]))
-        stmt_args_head = ["submitting now", "submission failed", "started",
-                          "succeeded", "failed", "signaled"]
+        stmt_args_head = [
+            "submitting now", "incrementing submit number",
+            "submission failed", "started", "succeeded", "failed", "signaled"]
         stmt_args_tail = []
         if limit:
             stmt += " LIMIT ? OFFSET ?"
