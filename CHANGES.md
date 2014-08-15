@@ -20,7 +20,7 @@ This release of Rose will work best with the upcoming
 
 --------------------------------------------------------------------------------
 
-## 2014.08.0alpha1 (2014-08-13)
+## 2014.08.0alpha2 (2014-08-15)
 
 This is a pre-release of Rose. It works best with
 [Cylc](https://github.com/cylc/cylc/) 6.0.0alpha2.
@@ -28,14 +28,20 @@ This is a pre-release of Rose. It works best with
 ### Highlighted Changes
 
 [#1323](https://github.com/metomi/rose/pull/1323),
-[#1365](https://github.com/metomi/rose/pull/1365):
+[#1365](https://github.com/metomi/rose/pull/1365),
+[#1369](https://github.com/metomi/rose/pull/1369),
+[#1372](https://github.com/metomi/rose/pull/1372):
 * Rephrase *cycle time* to *cycle point* for cylc 6.
+* Handle new runtime database states.
 * Improve reporting of running cylc suite processes.
 * Handle `log/job/` and `work/` directory restructure.
   N.B. This change is **NOT backward compatible**.  Existing suites with
   applications that assumes the old directory structure will not work
   correctly, and will require some minor modifications. See
   [cylc/cylc#1069](https://github.com/cylc/cylc/pull/1069) for detail.
+
+[#1371](https://github.com/metomi/rose/pull/1371):
+rose suite-clean: new `--only=GLOBS` option to restrict items to be cleaned.
 
 [#1367](https://github.com/metomi/rose/pull/1367):
 [isodatetime](https://github.com/metomi/isodatetime/) upgraded to 2014.08.0.
