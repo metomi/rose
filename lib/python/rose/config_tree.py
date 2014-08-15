@@ -36,19 +36,41 @@ class BadOptionalConfigurationKeysError(Exception):
 
 class ConfigTree(object):
 
-    """Represent a (runtime) Rose configuration (directory) with inheritance.
+    """A run time Rose configuration with linearised inheritance.
 
-    config_tree.node -- The ConfigNode object of the configuration tree.
-    config_tree.files -- A dict of the files in the configuration tree
-                         in {file-rel-path: config-dir, ...}
-    config_tree.conf_dirs -- A lineralised list containing the source
-                             directories of this configuration tree.
+    conf_tree.node -- The ConfigNode object of the configuration tree.
+    conf_tree.files -- A dict of the top files in the configuration tree
+                       in {rel_path: conf_dir_0, ...}
+    conf_tree.files_locs -- A dict of all files in the configuration tree
+                            in {rel_path: [config_dir_0, ...], ...}
+    conf_tree.conf_dirs -- A lineralised list containing the source
+                           directories of this configuration tree.
     """
 
     def __init__(self):
         self.node = ConfigNode()
-        self.files = {}  # {relative path: root, ...}
+        self.files = {}  # {rel path: root, ...}
+        self.file_locs = {}  # {rel path: [root0, ...], ...}
         self.conf_dirs = []
+
+    def get_file_name_of(self, key):
+        """Return the full name of the file indexed by "key".
+
+        A short hand of:
+        os.path.join(conf_tree.files[key], key)
+        
+        """
+        return os.path.join(self.files[key], key)
+
+    def get_file_locs_of(self, key):
+        """Return the full names of all files indexed by "key".
+
+        Short hand for:
+        [os.path.join(file_loc, key) for file_loc in conf_tree.file_locs[key]]
+        
+        """
+        return [
+            os.path.join(file_loc, key) for file_loc in self.file_locs[key]]
 
 
 class ConfigTreeLoader(object):
@@ -80,11 +102,12 @@ class ConfigTreeLoader(object):
         conf_file_name = os.path.join(conf_dir, conf_name)
         used_keys = []
         nodes[conf_dir] = self.node_loader.load_with_opts(
-                conf_file_name, more_keys=opt_keys, used_keys=used_keys)
+            conf_file_name, more_keys=opt_keys, used_keys=used_keys)
 
-        config_tree = ConfigTree()
-        config_tree.conf_dirs = mro(conf_dir, self._get_base_names, conf_name,
-                                    conf_dir_paths, opt_keys, used_keys, nodes)
+        conf_tree = ConfigTree()
+        conf_tree.conf_dirs = mro(
+            conf_dir, self._get_base_names, conf_name, conf_dir_paths,
+            opt_keys, used_keys, nodes)
 
         if opt_keys:
             bad_keys = []
@@ -94,14 +117,14 @@ class ConfigTreeLoader(object):
             if bad_keys:
                 raise BadOptionalConfigurationKeysError(bad_keys)
 
-        config_tree.node = ConfigNode()
-        for t_conf_dir in config_tree.conf_dirs:
+        conf_tree.node = ConfigNode()
+        for t_conf_dir in conf_tree.conf_dirs:
             node = nodes[t_conf_dir]
             for keys, sub_node in node.walk(no_ignore=no_ignore):
                 if keys == ["", "import"]:
                     continue
-                if config_tree.node.get(keys) is None:
-                    config_tree.node.set(keys, sub_node.value, sub_node.state,
+                if conf_tree.node.get(keys) is None:
+                    conf_tree.node.set(keys, sub_node.value, sub_node.state,
                                          sub_node.comments)
             for dir_path, dir_names, file_names in os.walk(t_conf_dir):
                 names = [dir_ for dir_ in dir_names if dir_.startswith(".")]
@@ -112,10 +135,13 @@ class ConfigTreeLoader(object):
                         continue
                     path = os.path.join(dir_path, file_name)
                     rel_path = os.path.relpath(path, t_conf_dir)
-                    if rel_path not in config_tree.files:
-                        config_tree.files[rel_path] = t_conf_dir
+                    if rel_path not in conf_tree.files:
+                        conf_tree.files[rel_path] = t_conf_dir
+                    if rel_path not in conf_tree.file_locs:
+                        conf_tree.file_locs[rel_path] = []
+                    conf_tree.file_locs[rel_path].append(t_conf_dir)
 
-        return config_tree
+        return conf_tree
 
     __call__ = load
 
@@ -181,10 +207,10 @@ number=2
 type=fried
 """)
         handle.close()
-        config_tree = self.config_tree_loader("t1", "rose-t.conf")
+        conf_tree = self.config_tree_loader("t1", "rose-t.conf")
 
         string_io = StringIO()
-        self.config_dumper(config_tree.node, string_io)
+        self.config_dumper(conf_tree.node, string_io)
         self.test("t1.node", string_io.getvalue(), r"""title=breakfast
 type=fried up
 
@@ -197,9 +223,9 @@ number=2
 type=fried
 """)
         string_io.close()
-        self.test("t1.files", config_tree.files, {})
+        self.test("t1.files", conf_tree.files, {})
         conf_dir = os.path.join(os.getcwd(), "t1")
-        self.test("t1.conf_dirs", config_tree.conf_dirs, [conf_dir])
+        self.test("t1.conf_dirs", conf_tree.conf_dirs, [conf_dir])
 
     def test2(self):
         """Test: configuration file and some other files."""
@@ -236,10 +262,10 @@ echo "Making breakfast $@"
             handle = open(os.path.join("t2/etc", key), "wb")
             handle.write(val + "\n")
             handle.close()
-        config_tree = self.config_tree_loader("t2", "rose-t.conf")
+        conf_tree = self.config_tree_loader("t2", "rose-t.conf")
 
         string_io = StringIO()
-        self.config_dumper(config_tree.node, string_io)
+        self.config_dumper(conf_tree.node, string_io)
         self.test("t2.node", string_io.getvalue(), r"""title=all day breakfast
 
 [sausage]
@@ -257,12 +283,12 @@ type=grilled
 """)
         string_io.close()
         conf_dir = os.path.join(os.getcwd(), "t2")
-        self.test("t2.files", config_tree.files,
+        self.test("t2.files", conf_tree.files,
                   {"bin/make-breakfast": conf_dir,
                    "etc/sausage": conf_dir,
                    "etc/bread": conf_dir,
                    "etc/tomato": conf_dir})
-        self.test("t2.conf_dirs", config_tree.conf_dirs, [conf_dir])
+        self.test("t2.conf_dirs", conf_tree.conf_dirs, [conf_dir])
 
     def test3(self):
         """Test: configuration that imports t1 and t2."""
@@ -276,10 +302,10 @@ size=large
         handle = open("t3/etc/bread", "wb")
         handle.write("50/50 slice bread\n")
         handle.close()
-        config_tree = self.config_tree_loader("t3", "rose-t.conf")
+        conf_tree = self.config_tree_loader("t3", "rose-t.conf")
 
         string_io = StringIO()
-        self.config_dumper(config_tree.node, string_io)
+        self.config_dumper(conf_tree.node, string_io)
         self.test("t3.node", string_io.getvalue(), r"""size=large
 title=all day breakfast
 type=fried up
@@ -309,12 +335,12 @@ type=grilled
         t3_conf_dir = os.path.join(os.getcwd(), "t3")
         t2_conf_dir = os.path.join(os.getcwd(), "t2")
         t1_conf_dir = os.path.join(os.getcwd(), "t1")
-        self.test("t3.files", config_tree.files,
+        self.test("t3.files", conf_tree.files,
                   {"bin/make-breakfast": t2_conf_dir,
                    "etc/sausage": t2_conf_dir,
                    "etc/bread": t3_conf_dir,
                    "etc/tomato": t2_conf_dir})
-        self.test("t3.conf_dirs", config_tree.conf_dirs,
+        self.test("t3.conf_dirs", conf_tree.conf_dirs,
              [t3_conf_dir, t2_conf_dir, t1_conf_dir])
 
     def test3_opt(self):
@@ -334,11 +360,11 @@ number=3
 type=baked
 """)
         handle.close()
-        config_tree = self.config_tree_loader("t3", "rose-t.conf",
+        conf_tree = self.config_tree_loader("t3", "rose-t.conf",
                                          opt_keys=["go-large"])
 
         string_io = StringIO()
-        self.config_dumper(config_tree.node, string_io)
+        self.config_dumper(conf_tree.node, string_io)
         self.test("t3_opt.node", string_io.getvalue(), r"""size=large
 title=all day breakfast
 type=fried up
@@ -382,11 +408,11 @@ size=large
         handle = open("t4/etc/bread", "wb")
         handle.write("50/50 slice bread\n")
         handle.close()
-        config_tree = self.config_tree_loader("t4", "rose-t.conf",
+        conf_tree = self.config_tree_loader("t4", "rose-t.conf",
                                          conf_dir_paths=["../a"])
 
         string_io = StringIO()
-        self.config_dumper(config_tree.node, string_io)
+        self.config_dumper(conf_tree.node, string_io)
         self.test("t4.node", string_io.getvalue(), r"""size=large
 title=all day breakfast
 type=fried up
@@ -417,13 +443,13 @@ type=grilled
         os.chdir("../a")
         t2_conf_dir = os.path.join(os.getcwd(), "t2")
         t1_conf_dir = os.path.join(os.getcwd(), "t1")
-        self.test("t4.files", config_tree.files,
+        self.test("t4.files", conf_tree.files,
              {"bin/make-breakfast": t2_conf_dir,
               "etc/sausage": t2_conf_dir,
               "etc/bread": t4_conf_dir,
               "etc/tomato": t2_conf_dir,
               "opt/rose-t-go-large.conf": t1_conf_dir})
-        self.test("t4.conf_dirs", config_tree.conf_dirs,
+        self.test("t4.conf_dirs", conf_tree.conf_dirs,
              [t4_conf_dir, t2_conf_dir, t1_conf_dir])
 
     def run(self):
