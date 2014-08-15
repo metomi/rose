@@ -24,12 +24,13 @@ import re
 import sys
 
 import rose.config
+from rose.config_tree import ConfigTreeLoader
 import rose.formats.namelist
 import rose.macro
 import rose.macros
 import rose.opt_parse
 import rose.reporter
-import rose.resource
+from rose.resource import ResourceLocator, import_object
 
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
@@ -104,9 +105,8 @@ def _check_macro(value, module_files=None, meta_dir=None):
             macro.endswith("." + rose.macro.TRANSFORM_METHOD)):
             macro_name, method = macro.rsplit(".", 1)
         try:
-            macro_obj = rose.resource.import_object(macro_name,
-                                                    module_files,
-                                                    _import_err_handler)
+            macro_obj = import_object(
+                macro_name, module_files, _import_err_handler)
         except Exception as e:
             return INVALID_IMPORT.format(
                                   macro,
@@ -195,9 +195,7 @@ def _check_widget(value, module_files=None, meta_dir=None):
         return
     widget_name = value.split()[0]
     try:
-        widget = rose.resource.import_object(widget_name,
-                                             module_files,
-                                             _import_err_handler)
+        widget = import_object(widget_name, module_files, _import_err_handler)
     except Exception as e:
         return INVALID_IMPORT.format(widget_name,
                                      type(e).__name__ + ": " + str(e))
@@ -333,10 +331,18 @@ def main():
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
-    meta_conf_file_path = os.path.join(opts.conf_dir, rose.META_CONFIG_NAME)
-    if not os.path.isfile(meta_conf_file_path):
+    conf = ResourceLocator.default().get_conf()
+    meta_path_list = []
+    meta_path_str = conf.get_value(["meta-path"])
+    if meta_path_str:
+        meta_path_list = meta_path_str.split(":")
+    try:
+        meta_config = ConfigTreeLoader().load(
+            opts.conf_dir,
+            rose.META_CONFIG_NAME,
+            meta_path_list).node
+    except IOError:
         sys.exit(ERROR_LOAD_META_CONFIG_DIR.format(opts.conf_dir))
-    meta_config = rose.config.load(meta_conf_file_path)
     sections = None
     if args:
         sections = args
