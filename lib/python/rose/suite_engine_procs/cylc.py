@@ -468,13 +468,17 @@ class CylcProcessor(SuiteEngineProcessor):
         Return (entries, of_n_entries), where entries is a data structure that
         looks like:
             [   {   "cycle": cycle,
-                    "n_states": {"active": N, "success": M, "fail": L}},
+                    "n_states": {
+                        "active": N, "success": M, "fail": L, "job_fails": K,
+                    },
+                    "max_time_updated": T2,
                 },
                 # ...
             ]
         where:
         * cycle is a date-time cycle label
-        * N, M, L are the numbers of tasks in given states
+        * N, M, L, K are the numbers of tasks in given states
+        * T2 is the time when last update time of (a task in) the cycle
 
         and of_n_entries is the total number of entries.
 
@@ -487,12 +491,14 @@ class CylcProcessor(SuiteEngineProcessor):
         if not of_n_entries:
             return ([], 0)
         stmt_args = self.state_of.keys()
-        stmt = ("SELECT cycle, fail_count, group_concat(status)"
-                " FROM task_states"
-                " LEFT JOIN (SELECT cycle, count(*) AS fail_count"
-                " FROM task_events"
-                " WHERE event=='failed' OR event='submission failed'"
-                " GROUP BY cycle) USING (cycle) WHERE (")
+        stmt = (
+            "SELECT cycle, fail_count, max(time_updated), group_concat(status)"
+            " FROM task_states"
+            " LEFT JOIN (SELECT cycle, count(*) AS fail_count"
+            " FROM task_events"
+            " WHERE event=='failed' OR event='submission failed'"
+            " GROUP BY cycle) USING (cycle) WHERE ("
+        )
         for i in range(len(stmt_args)):
             if i:
                 stmt += " OR"
@@ -502,14 +508,18 @@ class CylcProcessor(SuiteEngineProcessor):
             stmt += " LIMIT ? OFFSET ?"
             stmt_args += [limit, offset]
         entries = []
-        for row in self._db_exec(self.SUITE_DB, user_name, suite_name, stmt,
-                                 stmt_args):
-            cycle, job_fails, statuses_str = row
-            entry = {"cycle": cycle,
-                     "n_states": {"active": 0, "success": 0, "fail": 0,
-                                  "job_fails": 0}}
-            if job_fails is not None:
-                entry["n_states"]["job_fails"] = job_fails
+        for row in self._db_exec(
+                self.SUITE_DB, user_name, suite_name, stmt, stmt_args):
+            cycle, n_job_fails, max_time_updated, statuses_str = row
+            entry = {
+                "cycle": cycle,
+                "n_states": {
+                    "active": 0, "success": 0, "fail": 0, "job_fails": 0,
+                },
+                "max_time_updated": max_time_updated,
+            }
+            if n_job_fails is not None:
+                entry["n_states"]["job_fails"] = n_job_fails
             entries.append(entry)
             for status in statuses_str.split(","):
                 entry["n_states"][self.state_of[status]] += 1
