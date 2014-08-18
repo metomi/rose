@@ -116,13 +116,11 @@
 [scheduling]
     initial cycle point = 20130101T00Z
     final cycle point = 20130105T00Z
-    [[special tasks]]
-        cold-start = startup
     [[dependencies]]
+        [[[R1]]]
+            graph=startup =&gt; print_colour
         [[[T00]]]
-            graph = """
-                startup | print_colour[-PT24H] =&gt; print_colour
-            """
+            graph = print_colour[-P1D] =&gt; print_colour
 </pre>
     </div>
 

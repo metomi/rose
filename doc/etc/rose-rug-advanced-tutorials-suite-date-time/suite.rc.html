@@ -51,14 +51,14 @@
         timeout handler = rose suite-hook --mail --shutdown
         timeout = P3D
 [scheduling]
-    initial cycle point = 20130601T00Z
-    final cycle point = 20130603T00Z
-    [[special tasks]]
-        cold-start = startup
+    initial cycle point = 20130601T08Z
+    final cycle point = 20130603T20Z
     [[dependencies]]
+        [[[R1]]]
+            startup =&gt; boarding
         [[[T08, T20]]]
             graph = """
-                startup | arrival[-PT12H] =&gt; boarding
+                arrival[-PT12H] =&gt; boarding
                 boarding =&gt; departure =&gt; wait_return
                 wait_return =&gt; assign_gate =&gt; arrival
             """

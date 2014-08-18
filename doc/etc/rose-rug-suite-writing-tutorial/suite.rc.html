@@ -52,14 +52,14 @@
 [scheduling]
     initial cycle point = 20130601T00Z
     final cycle point = 20130603T00Z
-    [[special tasks]]
-        cold-start = fcm_make_navigate, write_start_position
     [[dependencies]]
-        [[[ T00, T03, T06, T09, T12, T15, T18, T21 ]]]
-            graph = """
-                write_start_position &amp; \
-                fcm_make_navigate | navigate[-PT03H] =&gt; navigate
+        [[[R1]]]
+            graph="""
+                fcm_make_navigate =&gt; navigate
+                write_start_position =&gt; navigate
             """
+        [[[PT3H]]]
+            graph = navigate[-PT3H] =&gt; navigate
 [runtime]
     [[root]]
         command scripting = rose task-run --verbose

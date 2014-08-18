@@ -12,25 +12,21 @@
     [[dependencies]]
 
         [[[R1]]]
-            graph = fcm_make
+            graph = """
+                fcm_make => my_hello_world
+                fcm_make => locate_fred
+                fcm_make => my_hello_mars
+            """
         [[[PT6H]]] # Each day at 00:00, 06:00, 12:00, 18:00:
             graph = """
-                # my_hello_world is run after fcm_make or after the previous one finishes
-                fcm_make[^] => my_hello_world
                 my_hello_world[-PT6H] => my_hello_world
 
-                # locate_fred is run after fcm_make or after the previous one finishes
                 # fred_hello_world is run after locate_fred
-                fcm_make[^] => locate_fred
                 locate_fred[-PT6H] => locate_fred => fred_hello_world
             """
 
         [[[PT12H]]] # Each day at 00:00 and 12:00:
-            graph = """
-                # my_hello_mars is run after fcm_make or after the previous one finishes
-                fcm_make[^] => my_hello_mars
-                my_hello_mars[-PT12H] => my_hello_mars
-            """
+            graph = my_hello_mars[-PT12H] => my_hello_mars
 
 [runtime]
     [[root]]

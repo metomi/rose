@@ -142,8 +142,8 @@
       start up. It can also be used to install files that are used on the
       majority of remote task hosts. <em>For large files used only on specific
       tasks hosts, we would recommend against using this functionality. Instead,
-      the suite should have a start-up task to install those files on the
-      intended task hosts.</em></li>
+      the suite should have a run-once (R1) task at the initial cycle point to
+      install those files on the intended task hosts.</em></li>
 
       <li>For suites with tasks running on an alternate host (or as a different
       user on <var>localhost</var>), <code>rose suite-run</code> will <code>cylc
