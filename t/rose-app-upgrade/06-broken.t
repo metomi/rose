@@ -98,6 +98,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 # Check that an error is reported if there is a broken import in versions.py
 TEST_KEY=$TEST_KEY_BASE-broken-import
 # Overwrite versions.py with something with a broken import
+rm "../rose-meta/test-app-upgrade/versions.pyc"
 init_macro test-app-upgrade <<'__MACRO__'
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
