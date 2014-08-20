@@ -563,7 +563,7 @@ touch suite.rc
         [[[R1]]]
             graph = fcm_make_navigate =&gt; navigate
         [[[PT3H]]]
-            graph = navigate[T-3] =&gt; navigate
+            graph = navigate[-PT3H] =&gt; navigate
 </pre>
     </div>
 
@@ -795,7 +795,7 @@ rose suite-log
       <p>Add these lines below <samp>[[dependencies]]</samp> in your
       <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
-        [[[ 12 ]]]
+        [[[T12]]]
             graph = """
                 navigate =&gt; take_sun_sight
             """
@@ -811,11 +811,11 @@ rose suite-log
       <p>In order to make the <samp>navigate</samp> task wait for our new
       <samp>take_sun_sight</samp> task, we'll need to add some extra
       configuration for the <samp>15</samp> hour cycle - add the following
-      lines in the same way as you did for <samp>[[[ 12 ]]]</samp>:</p>
+      lines in the same way as you did for <samp>[[[T12]]]</samp>:</p>
       <pre class="prettyprint lang-cylc">
-        [[[ 15 ]]]
+        [[[T15]]]
             graph = """
-                take_sun_sight[T-3] =&gt; navigate
+                take_sun_sight[-PT3H] =&gt; navigate
             """
 </pre>
     </div>
