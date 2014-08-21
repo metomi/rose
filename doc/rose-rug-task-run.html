@@ -76,7 +76,7 @@
     <p>The working directory of a task is dependent on the suite engine. For a
     task running under Cylc, the working directory of a task is normally
     <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_CYCLE_TIME/$ROSE_TASK_NAME/</var>, (or
-    <var>$ROSE_SUITE_DIR/work/1/$ROSE_TASK_NAME.1</var> for a non-cycling
+    <var>$ROSE_SUITE_DIR/work/1/$ROSE_TASK_NAME/</var> for a non-cycling
     task.)</p>
 
     <p>The <code>rose task-run</code> (or the <code>rose app-run</code>)
@@ -650,11 +650,6 @@ mode=rose_prune
 [prune]
 prune-remote-logs-at=-PT6H
 archive-logs-at=-P1D
-# N.B.: -PT18H:task_y*:* can also be written as -PT18H:task_y*:
-#       For "task_y*" to be recognised as a set of "task-globs",
-#       the trailing ":" is essential.
-#       Otherwise, it will be recognised as a set of "globs"
-#       (under "work/cycle/task/").
 prune-work-at=-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H
 prune-datac-at=-PT6H:foo* -PT12H:'bar* *.baz*' -P1D
 </pre>
