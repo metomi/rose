@@ -58,7 +58,8 @@ class CylcProcessor(SuiteEngineProcessor):
               "execution succeeded": "success",
               "execution failed": "fail",
               "signaled": "fail(%s)"}
-    EVENT_TIME_INDICES = {"submit-init": 0, "init": 1, "success": 2, "fail": 2}
+    EVENT_TIME_INDICES = {
+        "submit-init": 0, "init": 1, "success": 2, "fail": 2, "fail(%s)": 2}
     EVENT_RANKS = {"submit-init": 0, "submit": 1, "fail(submit)": 1, "init": 2,
                    "success": 3, "fail": 3, "fail(%s)": 4}
     JOB_LOGS_DB = "log/rose-job-logs.db"
@@ -92,6 +93,7 @@ class CylcProcessor(SuiteEngineProcessor):
     REC_CYCLE_TIME = re.compile(
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z") # Good enough?
     REC_SEQ_LOG = re.compile(r"\A(.*\.)(\d+)(\.html)?\Z")
+    REC_SIGNALLED = re.compile(r"Task\sjob\sscript\sreceived\ssignal\s(\S+)")
     SCHEME = "cylc"
     STATUSES = {"active": ["ready", "queued", "submitting", "submitted",
                            "submit-retrying", "running", "retrying"],
@@ -331,17 +333,20 @@ class CylcProcessor(SuiteEngineProcessor):
             else:
                 messages = events
             event_rank = -1
-            for event, time_, message in zip(events, times, messages):
+            for event, time_ in zip(events, times):
                 my_event = self.EVENTS.get(event)
                 if self.EVENT_TIME_INDICES.get(my_event) is not None:
                     entry["events"][self.EVENT_TIME_INDICES[my_event]] = time_
                 if (self.EVENT_RANKS.get(my_event) is not None and
-                    self.EVENT_RANKS[my_event] > event_rank):
+                        self.EVENT_RANKS[my_event] > event_rank):
                     entry["status"] = my_event
                     event_rank = self.EVENT_RANKS[my_event]
                     if my_event == "fail(%s)":
-                        signal = message.rsplit(None, 1)[-1]
-                        entry["status"] = "fail(%s)" % signal
+                        match = self.REC_SIGNALLED.search(messages_str)
+                        if match:
+                            entry["status"] = "fail(%s)" % match.group(1)
+                        else:
+                            entry["status"] = "fail(SIGNAL)"
 
         other_info_of = {}
         for entry in entries:
