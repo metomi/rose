@@ -178,7 +178,7 @@ rose suite-run
       section of your <var>suite.rc</var>:</p>
       <pre class="prettyprint lang-cylc">
     [[special tasks]]
-        clock-triggered = bell(0)
+        clock-triggered = bell(PT0M)
 </pre>
 
       <p>This tells the suite to clock trigger the <var>bell</var> task with
@@ -225,7 +225,7 @@ rose suite-run
       follows:</p>
       <pre class="prettyprint lang-cylc">
     [[special tasks]]
-        clock-triggered = bell(0), quarter_past(0.25), half_past(0.5), quarter_to(0.75)
+        clock-triggered = bell(PT0M), quarter_past(PT15M), half_past(PT30M), quarter_to(PT45M)
     [[dependencies]]
         [[[PT1H]]]
             graph = bell =&gt; quarter_past =&gt; half_past =&gt; quarter_to
