@@ -74,7 +74,7 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This part of the Rose user guide walks you through using Cylc
+      <p>This part of the Rose user guide walks you through using cylc
       retries.</p>
 
       <p>This allows tasks to be automatically resubmitted after failure, after
@@ -89,7 +89,7 @@
       would be a task that is dependent on a system that experiences temporary
       outages.</p>
 
-      <p>If a task fails, the Cylc retry mechanism can resubmit it after a
+      <p>If a task fails, the cylc retry mechanism can resubmit it after a
       pre-determined delay. An environment variable,
       <code>$CYLC_TASK_TRY_NUMBER</code> is incremented and passed into the
       task - this means you can write your task script so that it changes
@@ -179,14 +179,14 @@ rose suite-run
       <p>Unless you're lucky, the suite should fail at the
       <samp>roll_doubles</samp> task.</p>
 
-      <p>We need to tell Cylc to retry it a few times - replace the line
+      <p>We need to tell cylc to retry it a few times - replace the line
       <samp>[[roll_doubles]]</samp> in the <samp>suite.rc</samp> file with:</p>
       <pre class="prettyprint lang-cylc">
     [[roll_doubles]]
         retry delays = 5*PT6S
 </pre>
 
-      <p>This means that if the <samp>roll_doubles</samp> task fails, Cylc
+      <p>This means that if the <samp>roll_doubles</samp> task fails, cylc
       expects to retry it 5 times before finally failing. Each retry will have
       a delay of <samp>6</samp> seconds.</p>
     </div>
@@ -215,7 +215,7 @@ rose suite-run
     <div class="slide">
       <h2 id="results-retries">Results</h2>
 
-      <p>What you should see is Cylc retrying the <samp>roll_doubles</samp>
+      <p>What you should see is cylc retrying the <samp>roll_doubles</samp>
       task. Hopefully, it will succeed (about a 1 in 3 <a href=
       "http://en.wikipedia.org/wiki/E_%28mathematical_constant%29">chance of
       every task failing</a>) and the suite will continue.</p>
@@ -265,7 +265,7 @@ rose suite-run
       <h2 id="further">Further Reading</h2>
 
       <p>For more information, see the <a href=
-      "http://cylc.github.io/cylc/html/single/cug-html.html">Cylc User
+      "http://cylc.github.io/cylc/html/single/cug-html.html">cylc User
       Guide</a>.</p>
     </div>
   </div>

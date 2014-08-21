@@ -315,8 +315,8 @@ accel-find-next=F3
     <h2 id="suite">Suite Configuration</h2>
 
     <p>The configuration and functionality of a suite will usually be covered
-    by the use of <a href="http://cylc.github.io/cylc/">Cylc</a>. In which
-    case, most of the suite configuration will live in the Cylc
+    by the use of <a href="http://cylc.github.io/cylc/">cylc</a>. In which
+    case, most of the suite configuration will live in the cylc
     <samp>suite.rc</samp> file. Otherwise, a suite is just a directory of
     files.</p>
 
@@ -351,7 +351,7 @@ accel-find-next=F3
       Configuration</a>.</li>
 
       <li>Other items, as long as they do not clash with the scheduler's
-      working directories. E.g. for a Cylc suite, <samp>log*/</samp>,
+      working directories. E.g. for a cylc suite, <samp>log*/</samp>,
       <samp>share/</samp>, <samp>state/</samp> and <samp>work/</samp> should be
       avoided.</li>
     </ul>
@@ -382,14 +382,14 @@ accel-find-next=F3
           <li><var>ROSE_VERSION</var>: If specified, the version of Rose that
           starts the suite run must match the specified version.</li>
 
-          <li><var>CYLC_VERSION</var>: If specified for a Cylc suite, the Rose
-          suite runner will attempt to use this version of Cylc.</li>
+          <li><var>CYLC_VERSION</var>: If specified for a cylc suite, the Rose
+          suite runner will attempt to use this version of cylc.</li>
         </ul>
       </dd>
 
       <dt><code>[jinja2:suite.rc]</code></dt>
 
-      <dd>For a Cylc suite, if <a href=
+      <dd>For a cylc suite, if <a href=
       "http://jinja.pocoo.org/docs/">jinja2</a> assignments are required for
       <samp>suite.rc</samp>, they may be defined as key=value pairs in the
       <code>[jinja2:suite.rc]</code> section. The assignments will be inserted

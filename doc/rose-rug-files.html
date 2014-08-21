@@ -98,7 +98,7 @@
       <p>A Rose suite hierarchy can look a bit like this:</p>
       <pre class="prettyprint">
 rose-suite.conf         # Rose suite configuration file
-suite.rc                # Cylc suite configuration file
+suite.rc                # cylc suite configuration file
 app/                    # App configurations:
   hello_world/          #   hello_world app:
     rose-app.conf       #     App configuration file
@@ -136,10 +136,10 @@ meta/                   # Metadata for the Rose suite configuration:
     </div>
 
     <div class="slide">
-      <h3 class="alwayshidden">Suite Files (Cylc)</h3>
+      <h3 class="alwayshidden">Suite Files (cylc)</h3>
 
-      <p>There is also a Cylc file, which is in a slightly different INI-based
-      format - <samp>suite.rc</samp>. This holds Cylc suite dependencies and
+      <p>There is also a cylc file, which is in a slightly different INI-based
+      format - <samp>suite.rc</samp>. This holds cylc suite dependencies and
       configuration.</p>
     </div>
 
@@ -305,11 +305,11 @@ should-show-ignored=True
     </div>
 
     <div class="slide">
-      <h3 id="suite-rc">Cylc suite.rc</h3>
+      <h3 id="suite-rc">cylc suite.rc</h3>
 
       <p><em>(Different format)</em></p>
 
-      <p>This is the Cylc configuration file - we'll discuss it properly in a
+      <p>This is the cylc configuration file - we'll discuss it properly in a
       <a href="rose-rug-suites.html">later part</a> of the documentation.</p>
       <pre class="prettyprint lang-cylc">
 #!jinja2
@@ -610,7 +610,7 @@ rosie lookup -Q owner eq bob and title contains test
       <p>Points covered:</p>
 
       <ul>
-        <li>5 different Rose configuration files + 1 Cylc file</li>
+        <li>5 different Rose configuration files + 1 cylc file</li>
 
         <li>Running a suite - see also <a href="rose-quick-ref.html">Quick
         Reference</a></li>
