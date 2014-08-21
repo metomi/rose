@@ -310,7 +310,7 @@ touch app/navigate/rose-app.conf
 default=dead_reckoning.exe
 
 [file:report.nl]
-source=namelist:report_nl
+source = namelist:report_nl
 
 [namelist:report_nl]
 l_verbose=.true.
@@ -344,7 +344,8 @@ rose config-dump
 </pre>
 
       <p>This prettifies the format by handling whitespace and sorting in a
-      consistent way.</p>
+      consistent way. For example, the extra spaces around the <samp>=</samp>
+      in the line <samp>source = namelist:report_nl</samp> will be removed.</p>
     </div>
 
     <div class="slide">
@@ -425,7 +426,7 @@ build.target{task} = link
     </div>
 
     <div class="slide">
-      <h3 id="content">Suite Contents So Far</h3>
+      <h3 id="content-so-far">Suite Contents So Far</h3>
 
       <p>We should now have the following suite contents:</p>
       <pre class="shell">
@@ -483,7 +484,7 @@ dead_reckoning.f90
       executable via the <samp>navigate</samp> app config.</p>
 
       <p>We now need to link them together and handle the rest of the inputs,
-      via Cylc.</p>
+      via cylc.</p>
     </div>
 
     <div class="slide">
@@ -586,7 +587,7 @@ touch suite.rc
       <h3 class="alwayshidden">suite.rc Explanation Continued</h3>
 
       <ul class="incremental">
-        <li>We've made <samp>navigate</samp> run every 3 hours</li>
+        <li>We've made <samp>navigate</samp> run every 3 hours.</li>
 
         <li>We've configured the dependency between
         <samp>fcm_make_navigate</samp> and <samp>navigate</samp>.</li>
@@ -597,7 +598,7 @@ touch suite.rc
       <h3 id="clock">clock triggering</h3>
 
       <p>If we were writing a real suite, we'd use the
-      <samp>clock-triggered</samp> <samp>special tasks</samp> setting in Cylc
+      <samp>clock-triggered</samp> <samp>special tasks</samp> setting in cylc
       to make <samp>navigate</samp> trigger off the system wallclock time, and
       adjust the start/end dates to be more current. However, this doesn't
       matter for our example - and we don't want to wait 2 days for the suite
@@ -621,7 +622,7 @@ touch suite.rc
 
       <p>It's important to note that without runtime for each task, our suite
       will fail validation in <code>rose suite-run</code>. This is because
-      <code>rose suite-run</code> uses strict Cylc validation to make sure the
+      <code>rose suite-run</code> uses strict cylc validation to make sure the
       dependency tasks are actually the tasks you intended to run.</p>
 
       <p>You can switch this behaviour off by using the
@@ -660,7 +661,7 @@ touch suite.rc
       <h3 class="alwayshidden">suite.rc Runtime Results</h3>
 
       <p>This sets the environment for the app <samp>navigate</samp>.
-      <var>POS_FPATH</var> is using an environment variable that Cylc provides,
+      <var>POS_FPATH</var> is using an environment variable that cylc provides,
       <var>CYLC_SUITE_SHARE_PATH</var> to define the file path to the lat/long
       position file.</p>
 
@@ -674,7 +675,7 @@ touch suite.rc
       <p>We need to add something that makes our <samp>$POS_FPATH</samp>
       position file in the first place.</p>
 
-      <p>We won't bother with an app for this - we'll just write a little Cylc
+      <p>We won't bother with an app for this - we'll just write a little cylc
       task.</p>
 
       <p>We'll add a task called <samp>write_start_position</samp>. Add it as a
@@ -752,11 +753,18 @@ rose suite-run
 
       <p>If everything has been setup successfully, <code>cylc gui</code> will
       launch with your running suite.</p>
+    </div>
+
+    <div class="slide">
+      <h2 id="output">Finished Output</h2>
 
       <p>You can look at the finished output by running:</p>
       <pre class="shell">
 rose suite-log
 </pre>
+
+      <p>The position will be written in the out file for each
+      <samp>navigate</samp> task.</p>
     </div>
 
     <div class="slide">
@@ -777,7 +785,8 @@ rose suite-log
         "+to+",new_lat,"+",new_long,"'&gt;Ye chart!&lt;/a&gt;"
 </pre>
 
-      <p>You'll now get a useful link in your navigate task output.</p>
+      <p>You'll now get a useful link in your navigate task output. Expect a
+      wiggly course!</p>
     </div>
 
     <div class="slide">
@@ -826,7 +835,7 @@ rose suite-log
       <p>It isn't necessary to put all scripting in an app or in the
       <samp>command scripting</samp> in the <samp>suite.rc</samp> - you can put
       scripts in the <samp>bin/</samp> directory of a suite, and they will be
-      added to Cylc's path.</p>
+      added to cylc's path.</p>
     </div>
 
     <div class="slide">
@@ -920,11 +929,11 @@ rose suite-run
     <div class="slide">
       <h2 id="further">Further Reading</h2>
 
-      <p>For examples of more advanced Cylc suite functionality, see the
+      <p>For examples of more advanced cylc suite functionality, see the
       <a href="rose.html#advanced">Advanced Suite Tutorials</a>.</p>
 
       <p>For more information about suites, see the <a href=
-      "http://cylc.github.io/cylc/html/single/cug-html.html">Cylc User
+      "http://cylc.github.io/cylc/html/single/cug-html.html">cylc User
       Guide</a>.</p>
     </div>
   </div>

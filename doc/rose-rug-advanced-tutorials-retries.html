@@ -110,7 +110,6 @@
 
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
-
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
@@ -149,7 +148,10 @@
         command scripting = """
 sleep 10
 RANDOM=$$  # Seed $RANDOM
-if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
+DIE_1=$((RANDOM%6 + 1))
+DIE_2=$((RANDOM%6 + 1))
+echo "Rolled $DIE_1 and $DIE_2..."
+if [[ $DIE_1 -eq $DIE_2 ]]; then
     echo "doubles!"
 else
     exit 1
@@ -218,9 +220,9 @@ rose suite-run
       "http://en.wikipedia.org/wiki/E_%28mathematical_constant%29">chance of
       every task failing</a>) and the suite will continue.</p>
 
-      <p>If you go to the suite output (run <code>rose suite-log</code> in
-      your root suite directory), you can see the separate retry instances of
-      the task.</p>
+      <p>If you go to the suite output (run <code>rose suite-log</code> in your
+      root suite directory), you can see the separate retry instances of the
+      task.</p>
     </div>
 
     <div class="slide">
@@ -231,13 +233,15 @@ rose suite-run
       <pre class="prettyprint lang-cylc">
         command scripting = """
 sleep 10
-if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
-   echo "doubles!"  # Cheat!
-   exit 0
-fi
-RANDOM=$$
-if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
+RANDOM=$$  # Seed $RANDOM
+DIE_1=$((RANDOM%6 + 1))
+DIE_2=$((RANDOM%6 + 1))
+echo "Rolled $DIE_1 and $DIE_2..."
+if [[ $DIE_1 -eq $DIE_2 ]]; then
     echo "doubles!"
+elif [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
+    echo "look over there! ..."
+    echo "doubles!"  # Cheat!
 else
     exit 1
 fi
