@@ -48,18 +48,18 @@
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 [scheduling]
-    initial cycle point = 2013060100
-    final cycle point   = 2013060300
-    [[special tasks]]
-        cold-start = fcm_make_navigate, write_start_position
+    initial cycle point = 20130601T00Z
+    final cycle point = 20130603T00Z
     [[dependencies]]
-        [[[ 0, 3, 6, 9, 12, 15, 18, 21 ]]]
+        [[[R1]]]
             graph = """
-                write_start_position &amp; \
-                fcm_make_navigate | navigate[T-3] =&gt; navigate
+                fcm_make_navigate =&gt; navigate
+                write_start_position =&gt; navigate
             """
+        [[[PT3H]]]
+            graph = navigate[-PT3H] =&gt; navigate
 [runtime]
     [[root]]
         command scripting = rose task-run --verbose
@@ -69,8 +69,8 @@
            submission failed handler = rose suite-hook --shutdown
            submission timeout handler = rose suite-hook --mail
            execution timeout handler = rose suite-hook --mail
-           submission timeout = 1440 # 24 hours
-           execution timeout  =  180 # 3 hours
+           submission timeout = P1D
+           execution timeout = PT3H
     [[fcm_make_navigate]]
     [[navigate]]
         [[[environment]]]

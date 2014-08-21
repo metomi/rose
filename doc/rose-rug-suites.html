@@ -517,10 +517,10 @@ default=echo 'Hello World'
       <p>We can make this run as a cycling suite, repeating every 12 hours:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
-    initial cycle point = 2013010500  # 00:00, 5/1/2013
-    final cycle point = 2013010600    # 00:00, 6/1/2013
+    initial cycle point = 20130105T00Z  # 00:00, 5/1/2013
+    final cycle point = 20130106T00Z    # 00:00, 6/1/2013
     [[dependencies]]
-        [[[0, 12]]]  # run each day at 00:00 and 12:00
+        [[[T00, T12]]]  # run each day at 00:00 and 12:00
             graph = hello_pluto =&gt; hello_eris
 </pre>
     </div>
@@ -661,7 +661,7 @@ type=boolean
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 </pre>
     </div>
 
@@ -688,8 +688,8 @@ type=boolean
            submission failed handler = rose suite-hook --shutdown
            submission timeout handler = rose suite-hook --mail
            execution timeout handler = rose suite-hook --mail
-           submission timeout = 1440 # 24 hours
-           execution timeout  =  180 # 3 hours
+           submission timeout = P1D
+           execution timeout = PT3H
 </pre>
 
       <p>The <samp>[runtime]</samp> and <samp>[cylc]</samp> event hooks should

@@ -128,7 +128,7 @@
     <div class="slide">
       <h3 class="alwayshidden">Startup</h3>
 
-      <p>We need a special <q>cold start</q> task (<samp>startup</samp>). This
+      <p>We need a run-once (R1) task (<samp>startup</samp>). This
       sets our initial gate number - add this to your <samp>[[startup]]</samp>
       runtime section of the <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
@@ -259,7 +259,7 @@
     [[departure]]
         command scripting = """
             NOW=$(rose date --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
-            ETA=$(rose date --offset=-1d --offset=2h --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
+            ETA=$(rose date --offset=-P1D --offset=PT2H --print-format="%H:%M %p on %A %d %B" $CYLC_TASK_CYCLE_TIME)
             echo "Welcome to the aircraft. The current time and date is $NOW."
             echo "Since we're crossing the International Date Line, our ETA is $ETA."
         """

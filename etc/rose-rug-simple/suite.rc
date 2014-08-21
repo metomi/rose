@@ -3,14 +3,14 @@
     UTC mode=True
     [[event hooks]]
         timeout handler=rose suite-hook --shutdown
-        timeout=2 # minutes
+        timeout=PT2M
 
 [scheduling]
-    initial cycle point=2013010100 # 2013-01-01T00:00:00Z
-    final cycle point=2013010200 # 2013-01-02T00:00:00Z
+    initial cycle point=20130101T0000Z
+    final cycle point=20130102T0000Z
     [[dependencies]]
-        [[[0, 6, 12, 18]]]
-            graph=hello[T-6]=>hello
+        [[[PT6H]]]
+            graph=hello[-PT6H]=>hello
 
 [runtime]
     [[root]]

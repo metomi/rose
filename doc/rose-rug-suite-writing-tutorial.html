@@ -510,7 +510,7 @@ touch suite.rc
     UTC mode = True # Ignore DST
     [[event hooks]]
         timeout handler = rose suite-hook --mail --shutdown
-        timeout = 4320 # 3 days
+        timeout = P3D
 [scheduling]
 [runtime]
     [[root]]
@@ -521,8 +521,8 @@ touch suite.rc
            submission failed handler = rose suite-hook --shutdown
            submission timeout handler = rose suite-hook --mail
            execution timeout handler = rose suite-hook --mail
-           submission timeout = 1440 # 24 hours
-           execution timeout  =  180 # 3 hours
+           submission timeout = P1D
+           execution timeout = PT3H
 </pre>
     </div>
 
@@ -547,8 +547,8 @@ touch suite.rc
       <h3 id="setup">Setup the suite.rc</h3>
 
       <p>We need a <strong>cycling</strong> suite that repeats every 3 hours,
-      with a <strong>cold start</strong> task (<samp>fcm_make_navigate</samp>)
-      at the beginning.</p>
+      with a <strong>repeat once (R1)</strong> task
+      (<samp>fcm_make_navigate</samp>) at the beginning.</p>
     </div>
 
     <div class="slide">
@@ -557,15 +557,13 @@ touch suite.rc
       <p>Replace <samp>[scheduling]</samp> with the following lines:</p>
       <pre class="prettyprint lang-cylc">
 [scheduling]
-    initial cycle point = 2013060100
-    final cycle point   = 2013060300
-    [[special tasks]]
-        cold-start = fcm_make_navigate
+    initial cycle point = 20130601T00Z
+    final cycle point = 20130603T00Z
     [[dependencies]]
-        [[[ 0, 3, 6, 9, 12, 15, 18, 21 ]]]
-            graph = """
-                fcm_make_navigate | navigate[T-3] =&gt; navigate
-            """
+        [[[R1]]]
+            graph = fcm_make_navigate =&gt; navigate
+        [[[PT3H]]]
+            graph = navigate[-PT3H] =&gt; navigate
 </pre>
     </div>
 
@@ -579,8 +577,8 @@ touch suite.rc
         3 June 2013. This is just a model time - not anything to do with real
         time.</li>
 
-        <li>We've set the <samp>cold-start</samp> task to
-        <samp>fcm_make_navigate</samp>.</li>
+        <li>We've set the <samp>fcm_make_navigate</samp> task to run once at
+        the initial cycle point (i.e. midnight, 1 June 2013).</li>
       </ul>
     </div>
 
@@ -680,30 +678,15 @@ touch suite.rc
       task.</p>
 
       <p>We'll add a task called <samp>write_start_position</samp>. Add it as a
-      cold start task by replacing the <samp>cold-start =
-      fcm_make_navigate</samp> line with:</p>
+      run-once (R1) task by replacing the graph for the <code>[[[R1]]]</code>
+      section with:</p>
       <pre class="prettyprint lang-cylc">
-        cold-start = fcm_make_navigate, write_start_position
+        [[[R1]]]
+            graph = """
+                fcm_make_navigate =&gt; navigate
+                write_start_position =&gt; navigate
+            """
 </pre>
-    </div>
-
-    <div class="slide">
-      <h3 class="alwayshidden">suite.rc Special Task Dependency</h3>
-
-      <p>Replace the</p>
-      <pre class="prettyprint lang-cylc">
-               fcm_make_navigate | navigate[T-3] =&gt; navigate
-</pre>
-
-      <p>line with:</p>
-      <pre class="prettyprint lang-cylc">
-                write_start_position &amp; \
-                fcm_make_navigate | navigate[T-3] =&gt; navigate
-</pre>
-
-      <p>This is because we need both <samp>fcm_make_navigate</samp> and
-      <samp>write_start_position</samp> to run before Cylc runs
-      <samp>navigate</samp>.</p>
     </div>
 
     <div class="slide">
@@ -812,7 +795,7 @@ rose suite-log
       <p>Add these lines below <samp>[[dependencies]]</samp> in your
       <samp>suite.rc</samp> file:</p>
       <pre class="prettyprint lang-cylc">
-        [[[ 12 ]]]
+        [[[T12]]]
             graph = """
                 navigate =&gt; take_sun_sight
             """
@@ -828,11 +811,11 @@ rose suite-log
       <p>In order to make the <samp>navigate</samp> task wait for our new
       <samp>take_sun_sight</samp> task, we'll need to add some extra
       configuration for the <samp>15</samp> hour cycle - add the following
-      lines in the same way as you did for <samp>[[[ 12 ]]]</samp>:</p>
+      lines in the same way as you did for <samp>[[[T12]]]</samp>:</p>
       <pre class="prettyprint lang-cylc">
-        [[[ 15 ]]]
+        [[[T15]]]
             graph = """
-                take_sun_sight[T-3] =&gt; navigate
+                take_sun_sight[-PT3H] =&gt; navigate
             """
 </pre>
     </div>
@@ -910,8 +893,8 @@ chmod +x bin/sun_sight
 rose suite-run
 </pre>
 
-      <p>Our extra task should run at <samp>2013060112</samp> and
-      <samp>2013060212</samp>.</p>
+      <p>Our extra task should run at <samp>20130601T1200Z</samp> and
+      <samp>20130602T1200Z</samp>.</p>
     </div>
 
     <div class="slide">

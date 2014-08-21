@@ -75,8 +75,8 @@
 
     <p>The working directory of a task is dependent on the suite engine. For a
     task running under Cylc, the working directory of a task is normally
-    <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_NAME.$ROSE_TASK_CYCLE_TIME/</var>, (or
-    <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_NAME.1</var> for a non-cycling
+    <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_CYCLE_TIME/$ROSE_TASK_NAME/</var>, (or
+    <var>$ROSE_SUITE_DIR/work/1/$ROSE_TASK_NAME/</var> for a non-cycling
     task.)</p>
 
     <p>The <code>rose task-run</code> (or the <code>rose app-run</code>)
@@ -619,27 +619,19 @@ source=stuffing-*.txt
       <dd>Archive all job logs at these cycles. Remove remote job logs on
       success.</dd>
 
-      <dt><kbd>prune-work-at=cycle[[:task-globs]:globs] ...</kbd></dt>
+      <dt><kbd>prune-work-at=cycle[:globs] ...</kbd></dt>
 
       <dd>
         Remove the work directories of the specified cycles. E.g. In Cylc, if
-        current cycle is <samp>2014122512</samp>,
-        <kbd>prune-work-at=-PT12H</kbd> will clear out all items matching
-        <var>work/*.2014122500/</var>.
+        current cycle is <samp>20141225T1200Z</samp>,
+        <kbd>prune-work-at=-PT12H</kbd> will clear out
+        <var>work/20141225T0000Z/</var>.
 
         <p>If <var>globs</var> are specified for a cycle, it will attempt to
-        prune only items matching <var>work/*.CYCLE/GLOBS</var>. E.g. In Cylc,
-        if current cycle is <samp>2014122512</samp>,
-        <kbd>prune-work-at=-PT12H:*.dat</kbd> will clear out all items matching
-        <var>work/*.2014122500/*.dat</var>.</p>
-
-        <p>If <var>task-globs</var> are specified, it will attempt to prune
-        only items matching <var>work/TASKS-GLOBS.CYCLE/GLOBS</var>. E.g. In
-        Cylc, if current cycle is <samp>2014122512</samp>,
-        <kbd>prune-work-at=-PT12H:foo*:*.dat</kbd> will clear out all items
-        matching <var>work/foo*.2014122500/*.dat</var>, and
-        <kbd>prune-work-at=-PT12H:ba[rz]:</kbd> will clear out all items
-        matching <var>work/ba[rz].2014122500/</var>.</p>
+        prune only items matching <var>work/CYCLE/GLOBS</var>. E.g. In Cylc,
+        if current cycle is <samp>20141225T1200Z</samp>,
+        <kbd>prune-work-at=-PT12H:wild*</kbd> will clear out all items matching
+        <var>work/20141225T0000Z/wild*</var>.</p>
       </dd>
 
       <dt><kbd>prune-datac-at=cycle[:globs] ...</kbd></dt>
@@ -658,12 +650,7 @@ mode=rose_prune
 [prune]
 prune-remote-logs-at=-PT6H
 archive-logs-at=-P1D
-# N.B.: -PT18H:task_y*:* can also be written as -PT18H:task_y*:
-#       For "task_y*" to be recognised as a set of "task-globs",
-#       the trailing ":" is essential.
-#       Otherwise, it will be recognised as a set of "globs"
-#       (under "work/task.cycle/").
-prune-work-at=-PT6H:task_x*:big.dat -PT12H:other*.dat -PT18H:task_y*:* -PT24H
+prune-work-at=-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H
 prune-datac-at=-PT6H:foo* -PT12H:'bar* *.baz*' -P1D
 </pre>
 

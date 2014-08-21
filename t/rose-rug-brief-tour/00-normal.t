@@ -23,7 +23,7 @@
 export ROSE_CONF_PATH=
 
 #-------------------------------------------------------------------------------
-tests 4
+tests 3
 #-------------------------------------------------------------------------------
 # Run rose rug-brief-tour command
 TEST_KEY=$TEST_KEY_BASE
@@ -35,20 +35,8 @@ mkdir -p $HOME/cylc-run
 SUITE_RUN_DIR=$(mktemp -d --tmpdir=$HOME/cylc-run 'rose-test-battery.XXXXXX')
 NAME=$(basename $SUITE_RUN_DIR)
 # N.B. SLEEP=\":\" means run the ":" command instead of "sleep $((RANDOM % 10))"
-run_pass "$TEST_KEY" rose suite-run --name=$NAME --no-gcontrol -S SLEEP=\":\"
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete
-TEST_KEY=$TEST_KEY_BASE-suite-run-wait
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
-fi
+run_pass "$TEST_KEY" \
+    rose suite-run --name=$NAME --no-gcontrol -S SLEEP=\":\" -- --debug
 #-------------------------------------------------------------------------------
 # Check that the suite runs to success
 TEST_KEY=$TEST_KEY_BASE-db
@@ -57,25 +45,25 @@ sqlite3 $SUITE_RUN_DIR/cylc-suite.db \
      WHERE event=="succeeded" ORDER BY cycle,name ASC;' \
     >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
-2013010100|fcm_make
-2013010100|fred_hello_world
-2013010100|locate_fred
-2013010100|my_hello_mars
-2013010100|my_hello_world
-2013010106|fred_hello_world
-2013010106|locate_fred
-2013010106|my_hello_world
-2013010112|fred_hello_world
-2013010112|locate_fred
-2013010112|my_hello_mars
-2013010112|my_hello_world
-2013010118|fred_hello_world
-2013010118|locate_fred
-2013010118|my_hello_world
-2013010200|fred_hello_world
-2013010200|locate_fred
-2013010200|my_hello_mars
-2013010200|my_hello_world
+20130101T0000Z|fcm_make
+20130101T0000Z|fred_hello_world
+20130101T0000Z|locate_fred
+20130101T0000Z|my_hello_mars
+20130101T0000Z|my_hello_world
+20130101T0600Z|fred_hello_world
+20130101T0600Z|locate_fred
+20130101T0600Z|my_hello_world
+20130101T1200Z|fred_hello_world
+20130101T1200Z|locate_fred
+20130101T1200Z|my_hello_mars
+20130101T1200Z|my_hello_world
+20130101T1800Z|fred_hello_world
+20130101T1800Z|locate_fred
+20130101T1800Z|my_hello_world
+20130102T0000Z|fred_hello_world
+20130102T0000Z|locate_fred
+20130102T0000Z|my_hello_mars
+20130102T0000Z|my_hello_world
 __OUT__
 #-------------------------------------------------------------------------------
 rose suite-clean -q -y $NAME

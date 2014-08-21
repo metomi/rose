@@ -199,8 +199,8 @@ class CylcProcessor(SuiteEngineProcessor):
         """Return a glob to match named items created for a given cycle.
 
         E.g.:
-        suite_engine_proc.get_cycle_items_globs("datac", "2013010100")
-        # return "share/data/2013010100"
+        suite_engine_proc.get_cycle_items_globs("datac", "20130101T0000Z")
+        # return "share/data/20130101T0000Z"
 
         Return None if named item not supported.
 
