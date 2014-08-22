@@ -16,7 +16,14 @@ This release of Rose will work best with the upcoming
 
 ### Noteworthy Changes
 
--none yet-
+[#1378](https://github.com/metomi/rose/pull/1378):
+rose bush jobs: handle status for retried jobs under cylc 6.
+
+[#1374](https://github.com/metomi/rose/pull/1374):
+Documentation updates for cylc 6.
+
+[#1370](https://github.com/metomi/rose/pull/1370):
+rose bush cycles: print each cycle's last activity.
 
 --------------------------------------------------------------------------------
 
