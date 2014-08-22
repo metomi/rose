@@ -151,7 +151,7 @@ RANDOM=$$  # Seed $RANDOM
 DIE_1=$((RANDOM%6 + 1))
 DIE_2=$((RANDOM%6 + 1))
 echo "Rolled $DIE_1 and $DIE_2..."
-if [[ $DIE_1 -eq $DIE_2 ]]; then
+if (($DIE_1 == $DIE_2)); then
     echo "doubles!"
 else
     exit 1
@@ -237,9 +237,9 @@ RANDOM=$$  # Seed $RANDOM
 DIE_1=$((RANDOM%6 + 1))
 DIE_2=$((RANDOM%6 + 1))
 echo "Rolled $DIE_1 and $DIE_2..."
-if [[ $DIE_1 -eq $DIE_2 ]]; then
+if (($DIE_1 == $DIE_2)); then
     echo "doubles!"
-elif [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
+elif (($CYLC_TASK_TRY_NUMBER &gt;= 2)); then
     echo "look over there! ..."
     echo "doubles!"  # Cheat!
 else
