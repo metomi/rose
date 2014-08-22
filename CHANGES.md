@@ -16,28 +16,23 @@ This release of Rose will work best with the upcoming
 
 ### Noteworthy Changes
 
-[#1378](https://github.com/metomi/rose/pull/1378):
-rose bush jobs: handle status for retried jobs under cylc 6.
-
-[#1374](https://github.com/metomi/rose/pull/1374):
-Documentation updates for cylc 6.
-
-[#1370](https://github.com/metomi/rose/pull/1370):
-rose bush cycles: print each cycle's last activity.
+-none yet-
 
 --------------------------------------------------------------------------------
 
-## 2014.08.0alpha2 (2014-08-15)
+## 2014.08.0beta1 (2014-08-22)
 
 This is a pre-release of Rose. It works best with
-[Cylc](https://github.com/cylc/cylc/) 6.0.0alpha2.
+[cylc](https://github.com/cylc/cylc/) 6.0.0beta1.
 
 ### Highlighted Changes
 
 [#1323](https://github.com/metomi/rose/pull/1323),
 [#1365](https://github.com/metomi/rose/pull/1365),
 [#1369](https://github.com/metomi/rose/pull/1369),
-[#1372](https://github.com/metomi/rose/pull/1372):
+[#1372](https://github.com/metomi/rose/pull/1372),
+[#1374](https://github.com/metomi/rose/pull/1374),
+[#1378](https://github.com/metomi/rose/pull/1378):
 * Rephrase *cycle time* to *cycle point* for cylc 6.
 * Handle new runtime database states.
 * Improve reporting of running cylc suite processes.
@@ -46,6 +41,7 @@ This is a pre-release of Rose. It works best with
   applications that assumes the old directory structure will not work
   correctly, and will require some minor modifications. See
   [cylc/cylc#1069](https://github.com/cylc/cylc/pull/1069) for detail.
+* Rose Bush updated to work correctly with cylc 6.
 
 [#1371](https://github.com/metomi/rose/pull/1371):
 rose suite-clean: new `--only=GLOBS` option to restrict items to be cleaned.
@@ -64,6 +60,9 @@ rosie go, rosie lookup, rosie ls, etc: will now attempt to use
 Rosie web services that require authentication.
 
 ### Noteworthy Changes
+
+[#1370](https://github.com/metomi/rose/pull/1370):
+rose bush cycles: print each cycle's last activity.
 
 [#1368](https://github.com/metomi/rose/pull/1368):
 rose metadata: fail-if/warn-if: now work for duplicate sections.
