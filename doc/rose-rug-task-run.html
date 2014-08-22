@@ -74,7 +74,7 @@
     <h3 id="rose-task-run.work-dir">Working Directory</h3>
 
     <p>The working directory of a task is dependent on the suite engine. For a
-    task running under Cylc, the working directory of a task is normally
+    task running under cylc, the working directory of a task is normally
     <var>$ROSE_SUITE_DIR/work/$ROSE_TASK_CYCLE_TIME/$ROSE_TASK_NAME/</var>, (or
     <var>$ROSE_SUITE_DIR/work/1/$ROSE_TASK_NAME/</var> for a non-cycling
     task.)</p>
@@ -622,13 +622,13 @@ source=stuffing-*.txt
       <dt><kbd>prune-work-at=cycle[:globs] ...</kbd></dt>
 
       <dd>
-        Remove the work directories of the specified cycles. E.g. In Cylc, if
+        Remove the work directories of the specified cycles. E.g. In cylc, if
         current cycle is <samp>20141225T1200Z</samp>,
         <kbd>prune-work-at=-PT12H</kbd> will clear out
         <var>work/20141225T0000Z/</var>.
 
         <p>If <var>globs</var> are specified for a cycle, it will attempt to
-        prune only items matching <var>work/CYCLE/GLOBS</var>. E.g. In Cylc,
+        prune only items matching <var>work/CYCLE/GLOBS</var>. E.g. In cylc,
         if current cycle is <samp>20141225T1200Z</samp>,
         <kbd>prune-work-at=-PT12H:wild*</kbd> will clear out all items matching
         <var>work/20141225T0000Z/wild*</var>.</p>

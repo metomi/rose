@@ -83,7 +83,7 @@
       <h3 class="alwayshidden">Requirements</h3>
 
       <p>This guide assumes that Rose, <a href=
-      "http://cylc.github.io/cylc/">Cylc</a> and <a href=
+      "http://cylc.github.io/cylc/">cylc</a> and <a href=
       "http://www.metoffice.gov.uk/research/collaboration/fcm/">FCM</a> are
       already installed and configured correctly on your system.</p>
 
@@ -157,7 +157,7 @@ rose rug-brief-tour # Rose command to set up the tour suite
 
       <ul>
         <li>A <kbd>rose-suite.conf</kbd> file: This is used to define suite
-        configurations outside of Cylc. E.g. inputs to the Cylc suite
+        configurations outside of cylc. E.g. inputs to the cylc suite
         configuration file, files to install at run time, etc. It is left empty
         in this example suite.</li>
 
@@ -171,7 +171,7 @@ rose rug-brief-tour # Rose command to set up the tour suite
 
       <ul>
         <li>A <kbd>suite.rc</kbd> file: This is used to define configurations
-        in a Cylc suite. In this example, we are running:
+        in a cylc suite. In this example, we are running:
 
           <ul class="incremental">
             <li><code>fcm_make</code>: a special Rose application to build an
@@ -276,8 +276,8 @@ rose suite-run
       Try experimenting with different viewing options using the toolbar.</p>
 
       <p>The suite should run successfully to completion and shutdown (the
-      status bar should indicate <samp>stopped with 'held'</samp>). You can now
-      quit the <code>cylc gui</code>.</p>
+      status bar should indicate <samp>stopped with 'succeeded'</samp>). You
+      can now quit the <code>cylc gui</code>.</p>
 
       <p>Note: If you quit <code>cylc gui</code> by mistake, you can restart it
       by typing <code>rose suite-gcontrol --name=$ID</code> on the command
@@ -301,9 +301,9 @@ rose suite-run
     <div class="slide">
       <h3 class="alwayshidden">Run the Suite: log viewer</h3>
 
-      <p>You can type <code>rose suite-log --name=$ID</code> to
-      launch your browser and view the output of your suite without having to
-      navigate to its folder and look at the individual files.</p>
+      <p>You can type <code>rose suite-log --name=$ID</code> to launch your
+      browser and view the output of your suite without having to navigate to
+      its folder and look at the individual files.</p>
     </div>
 
     <div class="slide">

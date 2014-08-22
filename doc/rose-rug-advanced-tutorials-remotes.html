@@ -3,7 +3,6 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-
   <title>Rose Advanced Tutorial: remote hosts</title>
   <meta name="author" content="Rose Team, Met Office, UK" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -89,7 +88,7 @@
       <p>Remote names can either be hard coded or automatically selected for
       you via <samp>rose host-select</samp>. Remote settings should be used to
       send tasks off to be run on remote machines rather than running on your
-      Cylc server.</p>
+      cylc server.</p>
     </div>
 
     <div class="slide">
@@ -103,7 +102,6 @@
 
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
-
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
@@ -180,8 +178,8 @@ default=echo "scale=$NUM; 4*a(1)" | bc -l -q
       Notice the different lengths of time it takes for each of the tasks to
       run.</p>
 
-      <p>View the suite output using <samp>rose suite-log</samp> and
-      inspect the output of the <samp>short</samp>, <samp>medium</samp> and
+      <p>View the suite output using <samp>rose suite-log</samp> and inspect
+      the output of the <samp>short</samp>, <samp>medium</samp> and
       <samp>long</samp> tasks. You should see pi printed to different numbers
       of decimal places.</p>
 
@@ -213,10 +211,10 @@ default=echo "scale=$NUM; 4*a(1)" | bc -l -q
             host = my-desktop
 </pre>
 
-      <p>where <em>"my-desktop"</em> is the name of your desktop machine in
-      quotes. This will result in all tasks running on your desktop
-      machine. If you don't know the name of your desktop, type
-      <samp>hostname</samp> into your terminal.</p>
+      <p>where <var>my-desktop</var> is the name of your desktop machine. This
+      will result in all tasks running on your desktop machine. If you don't
+      know the name of your desktop, type <samp>hostname</samp> into your
+      terminal.</p>
     </div>
 
     <div class="slide">
@@ -281,9 +279,9 @@ group{hpc}=node01 node02 node03
       <h3 class="alwayshidden">Automating host selection (3)</h3>
 
       <p>In your terminal, experiment with <samp>rose host-select</samp> and
-      the names of the groups listed earlier to see what hostnames are
-      returned e.g. if you discovered a group called "linux-servers" see what
-      is returned when you run <samp>rose host-select linux-servers</samp>.</p>
+      the names of the groups listed earlier to see what hostnames are returned
+      e.g. if you discovered a group called "linux-servers" see what is
+      returned when you run <samp>rose host-select linux-servers</samp>.</p>
     </div>
 
     <div class="slide">

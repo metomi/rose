@@ -74,7 +74,7 @@
     <div class="slide">
       <h2 id="intro">Introduction</h2>
 
-      <p>This part of the Rose user guide walks you through using Cylc
+      <p>This part of the Rose user guide walks you through using cylc
       retries.</p>
 
       <p>This allows tasks to be automatically resubmitted after failure, after
@@ -89,7 +89,7 @@
       would be a task that is dependent on a system that experiences temporary
       outages.</p>
 
-      <p>If a task fails, the Cylc retry mechanism can resubmit it after a
+      <p>If a task fails, the cylc retry mechanism can resubmit it after a
       pre-determined delay. An environment variable,
       <code>$CYLC_TASK_TRY_NUMBER</code> is incremented and passed into the
       task - this means you can write your task script so that it changes
@@ -110,7 +110,6 @@
 
     <div class="slide">
       <h3 class="alwayshidden">Example suite.rc</h3>
-
       <pre class="prettyprint lang-cylc">
 [cylc]
     UTC mode = True # Ignore DST
@@ -149,7 +148,10 @@
         command scripting = """
 sleep 10
 RANDOM=$$  # Seed $RANDOM
-if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
+DIE_1=$((RANDOM%6 + 1))
+DIE_2=$((RANDOM%6 + 1))
+echo "Rolled $DIE_1 and $DIE_2..."
+if (($DIE_1 == $DIE_2)); then
     echo "doubles!"
 else
     exit 1
@@ -177,14 +179,14 @@ rose suite-run
       <p>Unless you're lucky, the suite should fail at the
       <samp>roll_doubles</samp> task.</p>
 
-      <p>We need to tell Cylc to retry it a few times - replace the line
+      <p>We need to tell cylc to retry it a few times - replace the line
       <samp>[[roll_doubles]]</samp> in the <samp>suite.rc</samp> file with:</p>
       <pre class="prettyprint lang-cylc">
     [[roll_doubles]]
         retry delays = 5*PT6S
 </pre>
 
-      <p>This means that if the <samp>roll_doubles</samp> task fails, Cylc
+      <p>This means that if the <samp>roll_doubles</samp> task fails, cylc
       expects to retry it 5 times before finally failing. Each retry will have
       a delay of <samp>6</samp> seconds.</p>
     </div>
@@ -213,14 +215,14 @@ rose suite-run
     <div class="slide">
       <h2 id="results-retries">Results</h2>
 
-      <p>What you should see is Cylc retrying the <samp>roll_doubles</samp>
+      <p>What you should see is cylc retrying the <samp>roll_doubles</samp>
       task. Hopefully, it will succeed (about a 1 in 3 <a href=
       "http://en.wikipedia.org/wiki/E_%28mathematical_constant%29">chance of
       every task failing</a>) and the suite will continue.</p>
 
-      <p>If you go to the suite output (run <code>rose suite-log</code> in
-      your root suite directory), you can see the separate retry instances of
-      the task.</p>
+      <p>If you go to the suite output (run <code>rose suite-log</code> in your
+      root suite directory), you can see the separate retry instances of the
+      task.</p>
     </div>
 
     <div class="slide">
@@ -231,13 +233,15 @@ rose suite-run
       <pre class="prettyprint lang-cylc">
         command scripting = """
 sleep 10
-if [[ $CYLC_TASK_TRY_NUMBER -ge 2 ]]; then
-   echo "doubles!"  # Cheat!
-   exit 0
-fi
-RANDOM=$$
-if [[ $((RANDOM%6 + 1)) -eq $((RANDOM%6 + 1)) ]]; then
+RANDOM=$$  # Seed $RANDOM
+DIE_1=$((RANDOM%6 + 1))
+DIE_2=$((RANDOM%6 + 1))
+echo "Rolled $DIE_1 and $DIE_2..."
+if (($DIE_1 == $DIE_2)); then
     echo "doubles!"
+elif (($CYLC_TASK_TRY_NUMBER &gt;= 2)); then
+    echo "look over there! ..."
+    echo "doubles!"  # Cheat!
 else
     exit 1
 fi
@@ -261,7 +265,7 @@ rose suite-run
       <h2 id="further">Further Reading</h2>
 
       <p>For more information, see the <a href=
-      "http://cylc.github.io/cylc/html/single/cug-html.html">Cylc User
+      "http://cylc.github.io/cylc/html/single/cug-html.html">cylc User
       Guide</a>.</p>
     </div>
   </div>

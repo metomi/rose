@@ -51,13 +51,13 @@
     <h2 id="intro">Introduction</h2>
 
     <p>This chapter of the user guide discusses the Rose utilities for
-    controlling and monitoring Rose/Cylc suites.</p>
+    controlling and monitoring Rose/cylc suites.</p>
 
     <h2 id="rose-suite-run">rose suite-run</h2>
 
     <p>If you have been following this user guide, you will have used the
     <code>rose suite-run</code> command in previous chapters. In normal usage,
-    the command sets up the environment of a Rose/Cylc suite, installs and runs
+    the command sets up the environment of a Rose/cylc suite, installs and runs
     it. We shall discuss the detail in this section.</p>
 
     <p>See <a href="rose-command.html#rose-suite-run">Rose Reference Guide: CLI
@@ -192,7 +192,7 @@
     <p>Settings defined in each <var>[jinja2:FILE]</var> section of the
     <var>rose-suite.conf</var> file are added to the header of the named
     <var>FILE</var> at installation time. The main use of this functionality is
-    to modify the behaviour of a Cylc's <var>suite.rc</var> file with settings
+    to modify the behaviour of cylc's <var>suite.rc</var> file with settings
     in the <var>[jinja2:suite.rc]</var> section at installation time.</p>
 
     <p>In addition, the following settings are automatically exported to the
@@ -201,7 +201,7 @@
     <dl>
       <dt><var>CYLC_VERSION</var></dt>
 
-      <dd>The current version of Cylc.</dd>
+      <dd>The current version of cylc.</dd>
 
       <dt><var>ROSE_ORIG_HOST</var></dt>
 
@@ -251,8 +251,8 @@ WORLDS=["Earth", "Moon", "Mars"]
     is already running on one of these hosts.</p>
 
     <p>In run and restart mode, <code>rose suite-run</code> will ensure that
-    the suite is registered with Cylc. In all modes, it will then attempt to
-    validate Cylc's <var>suite.rc</var> file using <code>cylc validate
+    the suite is registered with cylc. In all modes, it will then attempt to
+    validate cylc's <var>suite.rc</var> file using <code>cylc validate
     --strict</code>. The <code>--no-strict</code> option can be used to
     switch off the <code>--strict</code> option to <code>cylc
     validate</code>.</p>
@@ -360,8 +360,8 @@ root-dir=hpc*=$WORKDIR
     <h2 id="rose-suite-hook">rose suite-hook</h2>
 
     <p>This command provide a common way to handle the suite and task events of
-    a Cylc suite. The command is normally called as a handler in the event hooks
-    section of a Cylc suite's <var>suite.rc</var> file. For a task event of a
+    a cylc suite. The command is normally called as a handler in the event hooks
+    section of a cylc suite's <var>suite.rc</var> file. For a task event of a
     remote task, it will attempt to <code>rsync</code> the task logs back from
     the remote host running the task. For all other events, it will update the
     database for Rose Bush.</p>
