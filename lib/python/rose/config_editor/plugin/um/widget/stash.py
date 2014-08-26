@@ -404,6 +404,8 @@ class BaseStashSummaryDataPanelv1(
                 menuitem.show()
                 return [menuitem]
             return []
+        if value not in self._profile_location_map[col_title]:
+            return []
         location = self._profile_location_map[col_title][value]
         profile_id = self._profile_location_map[col_title][value]
         profile_string = ""
