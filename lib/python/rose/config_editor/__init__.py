@@ -39,6 +39,15 @@ will be cast to an integer, but:
 bar="100"
 will be cast to a string.
 
+Generate the user config example help by extracting the 'User-relevant'
+flagged blocks of text, e.g. via:
+
+sed -n '/User-relevant:/,/^$/; ' __init__.py | \
+    sed "s/#/##/g; s/## User-relevant:/#/g; s/^\([A-Z_]\+\) = /\L\1=/g;"
+
+Use this text to update the doc/etc/rose-rug-config-edit/rose.conf.html
+text, remembering to add the [rose-config-edit] section.
+
 """
 
 import ast
@@ -194,7 +203,6 @@ EVENT_LOAD_STATUSES = "{0} - checking   "
 LOAD_NUMBER_OF_EVENTS = 2
 
 # Other event strings
-EVENT_ERR_MARKUP = "<span color='red'>{0}</span>"
 EVENT_FOUND_ID = "Found {0}"
 EVENT_INVALID_TRIGGERS = "{0}: triggers disabled"
 EVENT_LOAD_ATTEMPT = "Attempting to load {0}"
@@ -221,7 +229,7 @@ EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND = (
 EVENT_REDO = "{0}"
 EVENT_REVERT = "Reverted {0}"
 EVENT_TIME = "%H:%M:%S"
-EVENT_TIME_LONG = "%a %H:%M:%S"
+EVENT_TIME_LONG = "%Y-%m-%dT%H:%M:%S"
 EVENT_UNDO = "{0}"
 EVENT_UNDO_ACTION_ID = "{0} {1}"
 
@@ -342,42 +350,70 @@ SHOW_MODE_NO_DESCRIPTION = "description"
 SHOW_MODE_NO_HELP = "help"
 SHOW_MODE_NO_TITLE = "title"
 
-# Defaults for the view and layout modes.
+# User-relevant: Defaults for the view and layout modes.
+# Control showing a custom variable description format.
 SHOULD_SHOW_CUSTOM_DESCRIPTION = False
+# Control showing a custom variable help format.
 SHOULD_SHOW_CUSTOM_HELP = False
+# Control showing a custom variable title format.
 SHOULD_SHOW_CUSTOM_TITLE = False
+# Control flagging no-metadata variables.
 SHOULD_SHOW_FLAG_NO_META_VARS = False
+# Control flagging optional configuration variables.
 SHOULD_SHOW_FLAG_OPT_CONF_VARS = True
+# Control flagging non-compulsory variables.
 SHOULD_SHOW_FLAG_OPTIONAL_VARS = False
+# Control showing all comment text.
 SHOULD_SHOW_ALL_COMMENTS = False
+# Control showing fixed variables on a page.
 SHOULD_SHOW_FIXED_VARS = False
+# Control showing ! or !! ignored pages.
 SHOULD_SHOW_IGNORED_PAGES = False
+# Control showing ! or !! ignored variables on a page.
 SHOULD_SHOW_IGNORED_VARS = False
+# Control showing ! ignored pages.
 SHOULD_SHOW_USER_IGNORED_PAGES = True
+# Control showing ! ignored variables on a page.
 SHOULD_SHOW_USER_IGNORED_VARS = True
+# Control showing latent (potential) pages.
 SHOULD_SHOW_LATENT_PAGES = False
+# Control showing latent (potential) variables on a page.
 SHOULD_SHOW_LATENT_VARS = False
+# Control hiding the description text for variables on a page.
 SHOULD_SHOW_NO_DESCRIPTION = False
+# Control hiding the help text for variables on a page.
 SHOULD_SHOW_NO_HELP = True
+# Control hiding the title text for variables on a page.
 SHOULD_SHOW_NO_TITLE = False
+# Control showing the status bar.
 SHOULD_SHOW_STATUS_BAR = True
 
+# User-relevant: Custom format strings for variable metadata display.
 # Metadata representation strings:
 #     {name} gets replaced with the data/metadata property name.
 # For example, you may want to have the description format as:
 #     "{name} - {description}"
-
+# Configure the override custom format used for description.
 CUSTOM_FORMAT_DESCRIPTION = "{name}: {description}"
+# Configure the override custom format used for help.
 CUSTOM_FORMAT_HELP = "{title}\n\n{help}"
+# Configure the override custom format used for title.
 CUSTOM_FORMAT_TITLE = "{title} ({name})"
 
-# Window sizes
+# User-relevant: Window sizing
+# Configure the width of the LHS page tree in pixels.
 WIDTH_TREE_PANEL = 256
+# Configure the width and height of the macro dialog in pixels (as a tuple).
 SIZE_MACRO_DIALOG_MAX = (800, 600)
+# Configure the width and height of the stack viewer in pixels (as a tuple).
 SIZE_STACK = (800, 600)
+# Configure the width and height of a detached tab in pixels (as a tuple).
 SIZE_PAGE_DETACH = (650, 600)
+# Configure the width and height of the config editor in pixels (as a tuple).
 SIZE_WINDOW = (900, 600)
+# Configure the pixel padding/spacing between config editor major items.
 SPACING_PAGE = 10
+# Configure the pixel padding/spacing between config editor minor items.
 SPACING_SUB_PAGE = 5
 
 # Status bar configuration
@@ -402,15 +438,26 @@ STACK_ACTION_ENABLED = "Enabled"
 STACK_ACTION_IGNORED = "Ignored"
 STACK_ACTION_REMOVED = "Removed"
 
+# User-relevant: Undo/Redo Stack Viewer Colours
+# Configure the colour for 'added' action.
 COLOUR_STACK_ADDED = "green"
+# Configure the colour for 'changed' action.
 COLOUR_STACK_CHANGED = "blue"
+# Configure the colour for 'changed comments' action.
 COLOUR_STACK_CHANGED_COMMENTS = "dark blue"
+# Configure the colour for 'light green' action.
 COLOUR_STACK_ENABLED = "light green"
+# Configure the colour for 'grey' action.
 COLOUR_STACK_IGNORED = "grey"
+# Configure the colour for 'red' action.
 COLOUR_STACK_REMOVED = "red"
 
+# User-relevant: Macro Dialog Colours
+# Configure the colour for 'changed' action.
 COLOUR_MACRO_CHANGED = "blue"
+# Configure the colour for an error.
 COLOUR_MACRO_ERROR = "red"
+# Configure the colour for a warning.
 COLOUR_MACRO_WARNING = "orange"
 
 STACK_COL_NS = "Namespace"
@@ -419,10 +466,16 @@ STACK_COL_NAME = "Name"
 STACK_COL_VALUE = "Value"
 STACK_COL_OLD_VALUE = "Old Value"
 
+# User-relevant: Variable Widget Colours.
+# Configure the background colour for the currently-selected variable widget.
 COLOUR_VALUEWIDGET_BASE_SELECTED = "GhostWhite"
+# Configure the modified-status variable widget colour.
 COLOUR_VARIABLE_CHANGED = "blue"
+# Configure the error-state variable widget colour.
 COLOUR_VARIABLE_TEXT_ERROR = "dark red"
+# Configure the irrelevant-value variable widget colour.
 COLOUR_VARIABLE_TEXT_IRRELEVANT = "light grey"
+# Configure the environment-variable-value variable widget colour.
 COLOUR_VARIABLE_TEXT_VAL_ENV = "purple4"
 
 # Dialog text
@@ -509,7 +562,11 @@ STACK_VIEW_TITLE = "Undo and Redo Stack Viewer"
 
 TITLE_PAGE_IGNORED_MARKUP = "<b>{0}</b> {1}"
 TITLE_PAGE_INFO = "suite info"
+
+# User-relevant: Latent Page Colour
+# Configure the colour used to indicate a latent page in the page tree.
 TITLE_PAGE_LATENT_COLOUR = "grey"
+
 TITLE_PAGE_LATENT_MARKUP = ("<span foreground='" +
                             TITLE_PAGE_LATENT_COLOUR +
                             "'><i>{0}</i>" + "</span>")
@@ -518,8 +575,13 @@ TITLE_PAGE_PREVIEW_MARKUP = ("<span foreground='" +
                             "'><u>{0}</u>" + "</span>")
 TITLE_PAGE_ROOT_MARKUP = "<b>{0}</b>"
 TITLE_PAGE_SUITE = "suite conf"
+
+# User-relevant: Page Tree Expansion
+# Configure the maximum number of configurations loaded at startup.
 TREE_PANEL_MAX_EXPANDED_ROOTS = 5
+# Configure the depth to which the page tree will expand itself.
 TREE_PANEL_MAX_EXPANDED_DEPTH = 2
+# Configure a regex for pages whose children should not be expanded.
 TREE_PANEL_NO_EXPAND_LEAVES_REGEX = "/file$"
 
 # File panel names
@@ -531,14 +593,19 @@ TITLE_FILE_PANEL = "Other files"
 # Summary (sub) data panel names
 
 SUMMARY_DATA_PANEL_ERROR_TIP = "Error ({0}): {1}\n"
+
+# User-relevant: Summary Data Panel Colours
+# Configure the Pango markup used to indicate an error.
 SUMMARY_DATA_PANEL_ERROR_MARKUP = "<span color='red'>X</span>"
+# Configure the Pango markup used to indicate modified state.
+SUMMARY_DATA_PANEL_MODIFIED_MARKUP = "<span color='blue'>*</span>"
+
 SUMMARY_DATA_PANEL_FILTER_LABEL = "Filter:"
 SUMMARY_DATA_PANEL_FILTER_MAX_CHAR = 8
 SUMMARY_DATA_PANEL_GROUP_LABEL = "Group:"
 SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP = "<b>^</b>"
 SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP = "<b>!!</b>"
 SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP = "<b>!</b>"
-SUMMARY_DATA_PANEL_MODIFIED_MARKUP = "<span color='blue'>*</span>"
 SUMMARY_DATA_PANEL_MAX_LEN = 15
 SUMMARY_DATA_PANEL_MENU_ADD = "Add new section"
 SUMMARY_DATA_PANEL_MENU_COPY = "Clone this section"
