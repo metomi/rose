@@ -39,6 +39,15 @@ will be cast to an integer, but:
 bar="100"
 will be cast to a string.
 
+Generate the user config example help by extracting the 'User-relevant'
+flagged blocks of text, e.g. via:
+
+sed -n '/User-relevant:/,/^$/p' __init__.py | \
+    sed "s/#/##/g; s/## User-relevant:/#/g; s/^\([A-Z_]\+\) = /\L\1=/g;"
+
+Use this text to update the doc/etc/rose-rug-rosie-go/rose.conf.html
+text, remembering to add the [rosie-go] section.
+
 """
 
 import ast
@@ -193,14 +202,24 @@ TIP_TOOLBAR_VIEW_WEB = "View Web"
 
 # Window settings
 
-COLUMNS_SHOWN = ["local", "idx", "revision", "owner", "title"]
 PREFIX_LEN = 5
-SIZE_WINDOW = (900, 600)
-SIZE_WINDOW_NEW_SUITE = (400, 180)
-SIZE_WINDOW_NEW_SUITE_EDIT = (800, 500)
-SIZE_TOP_TREES = 100
-SIZE_LEFT_TREE = 600
 TITLEBAR = "{0} - rosie go"
+
+# User-relevant: Generic Settings
+# Configure a list of columns that should be shown at startup.
+COLUMNS_SHOWN = ["local", "idx", "revision", "owner", "title"]
+# Configure the width and height of rosie go in pixels (as a tuple).
+SIZE_WINDOW = (900, 600)
+# Configure the width and height of the suite wizard in pixels (as a tuple).
+SIZE_WINDOW_NEW_SUITE = (400, 180)
+# Configure the width and height of the info editor in pixels (as a tuple).
+SIZE_WINDOW_NEW_SUITE_EDIT = (800, 500)
+# Configure the height in pixels of the advanced search panel.
+SIZE_TOP_TREES = 100
+# Show or hide the advanced search controls (bracketed queries).
+SHOULD_SHOW_ADVANCED_CONTROLS = False
+# Configure the maximum number of searches or queries to keep in the history.
+SIZE_HISTORY = 100
 
 # Window titles and text
 
@@ -230,9 +249,7 @@ ICON_PATH_SCHEDULER = None
 LOGO_PATH = "etc/images/rose-logo.png"
 PROGRAM_NAME = "rosie go"
 PROJECT_URL = "http://github.com/metomi/rose/"
-SHOULD_SHOW_ADVANCED_CONTROLS = False
 SIZE_ADDRESS = 10
-SIZE_HISTORY = 100
 SPLASH_CONFIG = "configuration"
 SPLASH_DIRECTOR = "suite director"
 SPLASH_HISTORY = "search history"

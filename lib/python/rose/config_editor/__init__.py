@@ -42,7 +42,7 @@ will be cast to a string.
 Generate the user config example help by extracting the 'User-relevant'
 flagged blocks of text, e.g. via:
 
-sed -n '/User-relevant:/,/^$/; ' __init__.py | \
+sed -n '/User-relevant:/,/^$/p' __init__.py | \
     sed "s/#/##/g; s/## User-relevant:/#/g; s/^\([A-Z_]\+\) = /\L\1=/g;"
 
 Use this text to update the doc/etc/rose-rug-config-edit/rose.conf.html
