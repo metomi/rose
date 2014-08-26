@@ -819,6 +819,8 @@ class MainMenuHandler(object):
         sections = self.data.config[config_name].sections
         for item in sect_changes:
             sect = item.section
+            if sect is None:
+                continue
             changed_ids.append(sect)
             macro_node = macro_config.get([sect])
             if macro_node is None:
@@ -869,7 +871,8 @@ class MainMenuHandler(object):
             var = self.data.helper.get_variable_by_id(var_id, config_name)
             macro_node = macro_config.get([sect, opt])
             if macro_node is None:
-                self.var_ops.remove_var(var)
+                if var is not None:
+                    self.var_ops.remove_var(var)
                 continue
             if var is None:
                 value = macro_node.value
