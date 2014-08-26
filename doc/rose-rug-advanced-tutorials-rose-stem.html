@@ -204,9 +204,12 @@ thrust(3,:) =  0.0,  1.0, 0.0, 1.0, -1.0,  1.0, -1.5, 0.0, 0.0, -0.5
       <p>We now need to provide the instructions for <samp>fcm make</samp> to
       build the Fortran executable. Create an
       <code>app/fcm_make_spaceship</code> directory with an empty
-      <code>rose-app.conf</code> file. Then create a directory named
-      <code>file</code> with the file <code>fcm-make.cfg</code> inside. Put the
-      following contents in that file:</p>
+      <code>rose-app.conf</code> file. </p>
+      
+      <p>Then, inside <code>app/fcm_make_spaceship</code>, create a 
+      sub-directory named       <code>file</code> with the file 
+      <code>fcm-make.cfg</code> inside. Put the following contents in that 
+      file:</p>
       <pre>
 steps = build
 build.source = $SOURCE_SPACESHIP/src
