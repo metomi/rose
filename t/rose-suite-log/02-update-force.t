@@ -31,7 +31,7 @@ if [[ $TEST_KEY_BASE == *-remote* ]]; then
     JOB_HOST=$(rose host-select $JOB_HOST)
 fi
 #-------------------------------------------------------------------------------
-tests 18
+tests 17
 #-------------------------------------------------------------------------------
 # Run the suite.
 export ROSE_CONF_PATH=
@@ -42,24 +42,11 @@ if [[ -n ${JOB_HOST:-} ]]; then
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
         --no-gcontrol --host=localhost \
-        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\""
+        -D "[jinja2:suite.rc]HOST=\"$JOB_HOST\"" -- --debug
 else
     run_pass "$TEST_KEY" \
         rose suite-run -C $TEST_SOURCE_DIR/$TEST_KEY_BASE --name=$NAME \
-        --no-gcontrol --host=localhost
-fi
-#-------------------------------------------------------------------------------
-# Wait for the suite to complete, test shutdown on fail
-TEST_KEY="$TEST_KEY_BASE-complete"
-TIMEOUT=$(($(date +%s) + 300)) # wait 5 minutes
-while [[ -e $HOME/.cylc/ports/$NAME ]] && (($(date +%s) < TIMEOUT)); do
-    sleep 1
-done
-if [[ -e $HOME/.cylc/ports/$NAME ]]; then
-    fail "$TEST_KEY"
-    exit 1
-else
-    pass "$TEST_KEY"
+        --no-gcontrol --host=localhost -- --debug
 fi
 #-------------------------------------------------------------------------------
 # Test --force.
@@ -88,21 +75,27 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 log/job/2013010100/my_task_1/01/job|00-script
+log/job/2013010100/my_task_1/01/job-submit.out|job-submit.out
 log/job/2013010100/my_task_1/01/job.err|02-err
 log/job/2013010100/my_task_1/01/job.out|01-out
 log/job/2013010100/my_task_2/01/job|00-script
+log/job/2013010100/my_task_2/01/job-submit.out|job-submit.out
 log/job/2013010100/my_task_2/01/job.err|02-err
 log/job/2013010100/my_task_2/01/job.out|01-out
 log/job/2013010112/my_task_1/01/job|00-script
+log/job/2013010112/my_task_1/01/job-submit.out|job-submit.out
 log/job/2013010112/my_task_1/01/job.err|02-err
 log/job/2013010112/my_task_1/01/job.out|01-out
 log/job/2013010112/my_task_2/01/job|00-script
+log/job/2013010112/my_task_2/01/job-submit.out|job-submit.out
 log/job/2013010112/my_task_2/01/job.err|02-err
 log/job/2013010112/my_task_2/01/job.out|01-out
 log/job/2013010200/my_task_1/01/job|00-script
+log/job/2013010200/my_task_1/01/job-submit.out|job-submit.out
 log/job/2013010200/my_task_1/01/job.err|02-err
 log/job/2013010200/my_task_1/01/job.out|01-out
 log/job/2013010200/my_task_2/01/job|00-script
+log/job/2013010200/my_task_2/01/job-submit.out|job-submit.out
 log/job/2013010200/my_task_2/01/job.err|02-err
 log/job/2013010200/my_task_2/01/job.out|01-out
 __OUT__
