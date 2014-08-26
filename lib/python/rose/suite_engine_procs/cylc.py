@@ -63,10 +63,6 @@ class CylcProcessor(SuiteEngineProcessor):
     EVENT_RANKS = {"submit-init": 0, "submit": 1, "fail(submit)": 1, "init": 2,
                    "success": 3, "fail": 3, "fail(%s)": 4}
     JOB_LOGS_DB = "log/rose-job-logs.db"
-    JOB_LOG_TAIL_KEYS = {
-        "job": "00-script",
-        "job.out": "01-out",
-        "job.err": "02-err"}
     ORDERS = {
             "time_desc":
             "time DESC, task_events.submit_num DESC, name DESC, cycle DESC",
@@ -809,16 +805,13 @@ class CylcProcessor(SuiteEngineProcessor):
                     cycle, task, s_n, ext = self._parse_job_log_base_name(name)
                     if s_n == "NN" or ext == "job.status":
                         continue
-                    key = ext
-                    if ext in self.JOB_LOG_TAIL_KEYS:
-                        key = self.JOB_LOG_TAIL_KEYS[ext]
                     stmt_args = [
                         os.path.join(archive_file_name),
                         name.replace("log/", "", 1),
                         cycle,
                         task,
                         int(s_n),
-                        key]
+                        ext]
                     self._db_exec(self.JOB_LOGS_DB, None, suite_name,
                                   stmt, stmt_args, commit=True)
         finally:
@@ -963,10 +956,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     rel_f_name)
                 if s_n == "NN":
                     continue
-                key = ext
-                if ext in self.JOB_LOG_TAIL_KEYS:
-                    key = self.JOB_LOG_TAIL_KEYS[ext]
-                stmt_args = [cycle, task, int(s_n), key, rel_f_name, "",
+                stmt_args = [cycle, task, int(s_n), ext, rel_f_name, "",
                              stat.st_mtime, stat.st_size]
                 dao.execute(stmt, stmt_args)
         dao.commit()
