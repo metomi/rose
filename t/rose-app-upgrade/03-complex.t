@@ -113,6 +113,27 @@ opt_with_content=.true.
 [namelist:remove_trig_ignore_opt]
 !!remove_this_trig_ignore_opt=.true.
 
+[namelist:rename_opt]
+# Rename me!
+rename_this_opt=.true.
+!rename_this_ignored_opt=.true.
+rename_opt_alt_sect=.true.
+
+[namelist:rename_opt_dest]
+
+[namelist:rename_opt_dest_exists]
+rename_this_opt=.true.
+rename_this_opt_dest=.true.
+
+[namelist:rename_sect]
+rename_this_opt_via_sect=.true.
+
+[namelist:rename_sect_dest_exists]
+rename_this_opt_via_sect=.true.
+
+[namelist:rename_sect_dest_exists_dest]
+remove_this_opt_via_rename=.true.
+
 [namelist:change_opt_if_value]
 change_opt_if_true=.true.
 
@@ -140,6 +161,8 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
     AFTER_TAG = "fig"
 
     def upgrade(self, config, meta_config=None):
+
+        # Add settings.
         self.add_setting(config, ["namelist:add_sect", "new_opt"],
                          ".true.")
         self.add_setting(config, ["namelist:add_sect_only"])
@@ -149,6 +172,8 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
                                   "opt_override"], ".false.")
         self.add_setting(config, ["namelist:add_force_opt_override",
                                   "opt_has_changed"], ".true.")
+
+        # Enable/Ignore settings.
         self.enable_setting(config, ["namelist:missing_sect"])
         self.enable_setting(config, ["namelist:standard_sect",
                                      "missing_option"])
@@ -194,6 +219,8 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
         self.ignore_setting(config, ["namelist:trig_ignore_opt_ignored",
                                      "already_ignored"],
                             state=config.STATE_SYST_IGNORED)
+
+        # Change setting values.
         self.change_setting_value(config, ["namelist:standard_sect",
                                            "missing_opt"], "5")
         self.change_setting_value(config, ["namelist:change_opt",
@@ -205,6 +232,8 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
         self.change_setting_value(config, ["namelist:change_opt",
                                            "trig_ignore_opt_has_changed"],
                                   ".true.")
+
+        # Remove settings.
         self.remove_setting(config, ["namelist:missing_sect"])
         self.remove_setting(config, ["namelist:missing_sect", "missing_opt"])
         self.remove_setting(config, ["namelist:standard_sect", "missing_opt"])
@@ -223,6 +252,28 @@ class UpgradeAppletoFig(rose.upgrade.MacroUpgrade):
         self.remove_setting(config,
                             ["namelist:remove_trig_ignore_opt",
                              "remove_this_trig_ignore_opt"])
+
+        # Rename settings.
+        self.rename_setting(config,
+                            ["namelist:rename_opt", "rename_this_opt"],
+                            ["namelist:rename_opt", "rename_dest"])
+        self.rename_setting(config,
+                            ["namelist:rename_opt", "rename_this_ignored_opt"],
+                            ["namelist:rename_opt", "rename_ignored_dest"])
+        self.rename_setting(config,
+                            ["namelist:rename_opt", "rename_opt_alt_sect"],
+                            ["namelist:rename_opt_dest", "rename_opt_alt_sect_dest"])
+        self.rename_setting(config,
+                            ["namelist:rename_opt_dest_exists",
+                             "rename_this_opt"],
+                            ["namelist:rename_opt_dest_exists",
+                             "rename_this_opt_dest"])
+        self.rename_setting(config, ["namelist:rename_sect"],
+                            ["namelist:rename_sect_dest"])
+        self.rename_setting(config, ["namelist:rename_sect_dest_exists"],
+                            ["namelist:rename_sect_dest_exists_dest"])
+
+        # Get setting values.
         if self.get_setting_value(config,
                                   ["namelist:change_opt_if_value",
                                    "change_opt_if_true"]) == ".true.":
@@ -252,7 +303,7 @@ TEST_KEY=$TEST_KEY_BASE-upgrade
 run_pass "$TEST_KEY" rose app-upgrade --non-interactive \
  --meta-path=../rose-meta/ -C ../config fig
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
-[U] Upgrade_apple-fig: changes: 33
+[U] Upgrade_apple-fig: changes: 50
     namelist:add_sect=new_opt=.true.
         Added with value '.true.'
     namelist:add_sect_only=None=None
@@ -313,6 +364,40 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
         Removed
     namelist:remove_trig_ignore_opt=remove_this_trig_ignore_opt=None
         Removed
+    namelist:rename_opt=rename_dest=.true.
+        Renamed namelist:rename_opt=rename_this_opt -> namelist:rename_opt=rename_dest
+    namelist:rename_opt=rename_this_opt=None
+        Removed
+    namelist:rename_opt=rename_ignored_dest=.true.
+        Renamed namelist:rename_opt=rename_this_ignored_opt -> namelist:rename_opt=rename_ignored_dest
+    namelist:rename_opt=rename_this_ignored_opt=None
+        Removed
+    namelist:rename_opt_dest=rename_opt_alt_sect_dest=.true.
+        Renamed namelist:rename_opt=rename_opt_alt_sect -> namelist:rename_opt_dest=rename_opt_alt_sect_dest
+    namelist:rename_opt=rename_opt_alt_sect=None
+        Removed
+    namelist:rename_opt_dest_exists=rename_this_opt=None
+        Removed
+    namelist:rename_sect_dest=None=None
+        Renamed namelist:rename_sect -> namelist:rename_sect_dest
+    namelist:rename_sect_dest=rename_this_opt_via_sect=.true.
+        Renamed namelist:rename_sect -> namelist:rename_sect_dest
+    namelist:rename_sect=rename_this_opt_via_sect=None
+        Removed
+    namelist:rename_sect=None=None
+        Removed
+    namelist:rename_sect_dest_exists_dest=remove_this_opt_via_rename=None
+        Removed
+    namelist:rename_sect_dest_exists_dest=None=None
+        Removed
+    namelist:rename_sect_dest_exists_dest=None=None
+        Renamed namelist:rename_sect_dest_exists -> namelist:rename_sect_dest_exists_dest
+    namelist:rename_sect_dest_exists_dest=rename_this_opt_via_sect=.true.
+        Renamed namelist:rename_sect_dest_exists -> namelist:rename_sect_dest_exists_dest
+    namelist:rename_sect_dest_exists=rename_this_opt_via_sect=None
+        Removed
+    namelist:rename_sect_dest_exists=None=None
+        Removed
     namelist:change_opt_if_value=change_opt_if_true=.false.
         Value: '.true.' -> '.false.'
     namelist:change_ign_opt_if_value=change_opt_if_true=.false.
@@ -320,9 +405,9 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
     =meta=test-app-upgrade/fig
         Upgraded from apple to fig
 [T] UpgradeTriggerFixing: changes: 7
-    namelist:trig_ignore_sect_trig_ignored=None=None
-        trig-ignored -> enabled     
     namelist:change_opt=trig_ignore_opt_has_changed=.true.
+        trig-ignored -> enabled     
+    namelist:trig_ignore_sect_trig_ignored=None=None
         trig-ignored -> enabled     
     namelist:trig_ignore_opt_trig_ignored=starts_off_trig_ignored=.true.
         trig-ignored -> enabled     
@@ -402,6 +487,23 @@ starts_off_trig_ignored=.true.
 [namelist:remove_opt]
 
 [namelist:remove_trig_ignore_opt]
+
+[namelist:rename_opt]
+# Rename me!
+rename_dest=.true.
+!rename_ignored_dest=.true.
+
+[namelist:rename_opt_dest]
+rename_opt_alt_sect_dest=.true.
+
+[namelist:rename_opt_dest_exists]
+rename_this_opt_dest=.true.
+
+[namelist:rename_sect_dest]
+rename_this_opt_via_sect=.true.
+
+[namelist:rename_sect_dest_exists_dest]
+rename_this_opt_via_sect=.true.
 
 [namelist:standard_sect]
 standard_opt=.true.
