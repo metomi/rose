@@ -50,7 +50,7 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 log/job/1/my_task_1/01/job|00-script
-log/job/1/my_task_1/01/job-submit.out|job-submit.out
+log/job/1/my_task_1/01/job-activity.log|job-activity.log
 log/job/1/my_task_1/01/job.err|02-err
 log/job/1/my_task_1/01/job.out|01-out
 __OUT__
@@ -70,11 +70,11 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     'SELECT path,key FROM log_files ORDER BY path ASC;' >"$TEST_KEY.out"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUT__'
 log/job/1/my_task_1/01/job|00-script
-log/job/1/my_task_1/01/job-submit.out|job-submit.out
+log/job/1/my_task_1/01/job-activity.log|job-activity.log
 log/job/1/my_task_1/01/job.err|02-err
 log/job/1/my_task_1/01/job.out|01-out
 log/job/1/my_task_2/01/job|00-script
-log/job/1/my_task_2/01/job-submit.out|job-submit.out
+log/job/1/my_task_2/01/job-activity.log|job-activity.log
 log/job/1/my_task_2/01/job.err|02-err
 log/job/1/my_task_2/01/job.out|01-out
 __OUT__

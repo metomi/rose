@@ -52,7 +52,7 @@ fi
 # Test --archive.
 CYCLE=2013010100
 TEST_KEY="$TEST_KEY_BASE-archive-$CYCLE"
-(cd $SUITE_RUN_DIR/log; ls job/$CYCLE/*/01/{job,job-submit.out,job.err,job.out}) \
+(cd $SUITE_RUN_DIR/log; ls job/$CYCLE/*/01/{job,job-activity.log,job.err,job.out}) \
     >"$TEST_KEY-list-job-logs-before.out"
 if [[ -n ${JOB_HOST:-} ]]; then
     ssh -oBatchMode=yes $JOB_HOST \
@@ -64,15 +64,15 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     >"$TEST_KEY-db-1.out"
 file_cmp "$TEST_KEY-db-1.out" "$TEST_KEY-db-1.out" <<'__OUT__'
 log/job/2013010100/my_task_1/01/job||00-script
-log/job/2013010100/my_task_1/01/job-submit.out||job-submit.out
+log/job/2013010100/my_task_1/01/job-activity.log||job-activity.log
 log/job/2013010100/my_task_1/01/job.err||02-err
 log/job/2013010100/my_task_1/01/job.out||01-out
 log/job/2013010112/my_task_1/01/job||00-script
-log/job/2013010112/my_task_1/01/job-submit.out||job-submit.out
+log/job/2013010112/my_task_1/01/job-activity.log||job-activity.log
 log/job/2013010112/my_task_1/01/job.err||02-err
 log/job/2013010112/my_task_1/01/job.out||01-out
 log/job/2013010200/my_task_1/01/job||00-script
-log/job/2013010200/my_task_1/01/job-submit.out||job-submit.out
+log/job/2013010200/my_task_1/01/job-activity.log||job-activity.log
 log/job/2013010200/my_task_1/01/job.err||02-err
 log/job/2013010200/my_task_1/01/job.out||01-out
 __OUT__
@@ -100,19 +100,19 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     >"$TEST_KEY-db-2.out"
 file_cmp "$TEST_KEY-db-2.out" "$TEST_KEY-db-2.out" <<'__OUT__'
 log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job|00-script
-log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job-submit.out|job-submit.out
+log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job-activity.log|job-activity.log
 log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job.err|02-err
 log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job.out|01-out
 log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job|00-script
-log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job-submit.out|job-submit.out
+log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job-activity.log|job-activity.log
 log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job.err|02-err
 log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job.out|01-out
 log/job/2013010112/my_task_1/01/job||00-script
-log/job/2013010112/my_task_1/01/job-submit.out||job-submit.out
+log/job/2013010112/my_task_1/01/job-activity.log||job-activity.log
 log/job/2013010112/my_task_1/01/job.err||02-err
 log/job/2013010112/my_task_1/01/job.out||01-out
 log/job/2013010200/my_task_1/01/job||00-script
-log/job/2013010200/my_task_1/01/job-submit.out||job-submit.out
+log/job/2013010200/my_task_1/01/job-activity.log||job-activity.log
 log/job/2013010200/my_task_1/01/job.err||02-err
 log/job/2013010200/my_task_1/01/job.out||01-out
 __OUT__
@@ -130,27 +130,27 @@ sqlite3 "$HOME/cylc-run/$NAME/log/rose-job-logs.db" \
     >"$TEST_KEY_BASE-db-final.out"
 file_cmp "$TEST_KEY_BASE-db-final.out" "$TEST_KEY_BASE-db-final.out" <<'__OUT__'
 log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job|00-script
-log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job-submit.out|job-submit.out
+log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job-activity.log|job-activity.log
 log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job.err|02-err
 log/job-2013010100.tar.gz|job/2013010100/my_task_1/01/job.out|01-out
 log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job|00-script
-log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job-submit.out|job-submit.out
+log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job-activity.log|job-activity.log
 log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job.err|02-err
 log/job-2013010100.tar.gz|job/2013010100/my_task_2/01/job.out|01-out
 log/job/2013010112/my_task_1/01/job||00-script
-log/job/2013010112/my_task_1/01/job-submit.out||job-submit.out
+log/job/2013010112/my_task_1/01/job-activity.log||job-activity.log
 log/job/2013010112/my_task_1/01/job.err||02-err
 log/job/2013010112/my_task_1/01/job.out||01-out
 log/job/2013010112/my_task_2/01/job||00-script
-log/job/2013010112/my_task_2/01/job-submit.out||job-submit.out
+log/job/2013010112/my_task_2/01/job-activity.log||job-activity.log
 log/job/2013010112/my_task_2/01/job.err||02-err
 log/job/2013010112/my_task_2/01/job.out||01-out
 log/job/2013010200/my_task_1/01/job||00-script
-log/job/2013010200/my_task_1/01/job-submit.out||job-submit.out
+log/job/2013010200/my_task_1/01/job-activity.log||job-activity.log
 log/job/2013010200/my_task_1/01/job.err||02-err
 log/job/2013010200/my_task_1/01/job.out||01-out
 log/job/2013010200/my_task_2/01/job||00-script
-log/job/2013010200/my_task_2/01/job-submit.out||job-submit.out
+log/job/2013010200/my_task_2/01/job-activity.log||job-activity.log
 log/job/2013010200/my_task_2/01/job.err||02-err
 log/job/2013010200/my_task_2/01/job.out||01-out
 __OUT__
