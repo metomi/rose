@@ -1450,7 +1450,10 @@ class MainController(object):
                 meta_config = self.data.load_meta_config(config, directory,
                     config_type=config_data.config_type)
                 meta_files = self.data.load_meta_files(config, directory)
-                macros = rose.macro.load_meta_macro_modules(meta_files)
+                macro_module_prefix = (
+                    self.data.helper.get_macro_module_prefix(config_name))
+                macros = rose.macro.load_meta_macro_modules(
+                    meta_files, module_prefix=macro_module_prefix)
             config_data.meta = meta_config
             self.data.load_builtin_macros(config_name)
             self.data.load_file_metadata(config_name)
