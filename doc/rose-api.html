@@ -1060,6 +1060,54 @@ class Upgrade272to273(rose.upgrade.MacroUpgrade):
 </pre>
       </dd>
 
+      <dt><code>def rename_setting(self, config, keys, new_keys,
+      info=None):</code></dt>
+
+      <dd>
+        <p>A method that attempts to rename the setting defined by the list
+        <samp>keys</samp> (<samp>[section]</samp> or <samp>[section,
+        option]</samp> strings) to the new name defined by
+        <samp>new_keys</samp>. The arguments mostly follow
+        <code>rose.config.ConfigNode</code> attributes, and are as follows:</p>
+
+        <dl>
+          <dt><samp>config</samp></dt>
+
+          <dd>The application configuration object
+          (<code>rose.config.ConfigNode</code> instance)</dd>
+
+          <dt><samp>keys</samp></dt>
+
+          <dd>A list of strings denoting config settings -
+          <code>[section_name]</code> for a section, <code>[section_name,
+          option_name]</code> for an option. For example, it might be
+          <code>["namelist:foo", "bar_old"]</code>.</dd>
+
+          <dt><samp>new_keys</samp></dt>
+
+          <dd>A list of strings denoting config settings -
+          <code>[section_name]</code> for a section, <code>[section_name,
+          option_name]</code> for an option. For example, it might be
+          <code>["namelist:foo", "bar_new"]</code>.</dd>
+
+          <dt><samp>info</samp> (optional)</dt>
+
+          <dd>A short string containing no new lines, describing the renaming
+          of the setting.</dd>
+        </dl>
+      </dd>
+
+      <dd>
+        <p>Example usage:</p>
+        <pre class="prettyprint">
+    def upgrade(self, config, meta_config=None):
+        self.rename_setting(config, ["namelist:breakfast_nl", "bad_coffee"],
+                            ["namelist:breakfast_nl", "good_coffee"],
+                            info="Mmmm... nicer coffee...")
+        return config, self.reports
+</pre>
+      </dd>
+
       <dt><code>def enable_setting(self, config, keys, info=None):</code></dt>
 
       <dd>

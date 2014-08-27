@@ -72,11 +72,15 @@ class MacroUpgrade(rose.macro.MacroBase):
 
     """Class derived from MacroBase to aid upgrade functionality."""
 
+    ERROR_RENAME_OPT_TO_SECT = "Error: cannot rename {0}={1} to {2}"
+    ERROR_RENAME_SECT_TO_OPT = "Error: cannot rename {0} to {1}={2}"
     INFO_ADDED_SECT = "Added"
     INFO_ADDED_VAR = "Added with value {0}"
     INFO_CHANGED_VAR = "Value: {0} -> {1}"
     INFO_STATE = "{0} -> {1}"
     INFO_REMOVED = "Removed"
+    INFO_RENAMED_SECT = "Renamed {0} -> {1}"
+    INFO_RENAMED_VAR = "Renamed {0}={1} -> {2}={3}"
     UPGRADE_RESOURCE_DIR = MACRO_UPGRADE_RESOURCE_DIR
 
     def act_from_files(self, config, downgrade=False):
@@ -142,8 +146,8 @@ class MacroUpgrade(rose.macro.MacroBase):
             self.add_setting(config, [section])
         if config.get([section, option]) is not None:
             if forced:
-                return self.change_setting(config, keys, value, state,
-                                           comments, info)
+                return self.change_setting_value(config, keys, value, state,
+                                                 comments, info)
             return False
         if value is not None and not isinstance(value, basestring):
             text = "New value {0} for {1} is not a string"
@@ -196,6 +200,44 @@ class MacroUpgrade(rose.macro.MacroBase):
                 opt = opt_keys[1]
                 self._remove_setting(config, [section, opt], info)
         return self._remove_setting(config, [section, option], info)
+
+    def rename_setting(self, config, keys, new_keys, info=None):
+        """Rename a setting in the configuration."""
+        section, option = self._get_section_option_from_keys(keys)
+        new_section, new_option = self._get_section_option_from_keys(new_keys)
+        if option is None:
+            if new_option is not None:
+                raise TypeError(self.ERROR_RENAME_SECT_TO_OPT.format(
+                    section, new_section, new_option))
+        elif new_option is None:
+            raise TypeError(self.ERROR_RENAME_OPT_TO_SECT.format(
+                section, option, new_section))
+        node = config.get(keys)
+        if node is None:
+            return
+        if info is None:
+            if option is None:
+                info = self.INFO_RENAMED_SECT.format(section, new_section)
+            else:
+                info = self.INFO_RENAMED_VAR.format(section, option,
+                                                    new_section, new_option)
+        if option is None:
+            if config.get([new_section]) is not None:
+                self.remove_setting(config, [new_section])
+            self.add_setting(config, [new_section], value=None, forced=True,
+                             state=node.state, comments=node.comments,
+                             info=info)
+            for option_keys, opt_node in config.walk([section]):
+                renamed_option = option_keys[1]
+                self.add_setting(config, [new_section, renamed_option],
+                                 value=opt_node.value, forced=True,
+                                 state=opt_node.state,
+                                 comments=opt_node.comments, info=info)
+        else:
+            self.add_setting(config, new_keys, value=node.value, forced=True,
+                             state=node.state, comments=node.comments,
+                             info=info)
+        self.remove_setting(config, keys)
 
     def enable_setting(self, config, keys, info=None):
         """Enable a setting in the configuration."""
