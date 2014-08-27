@@ -1,0 +1,21 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    [[event hooks]]
+        timeout handler = rose suite-hook --shutdown
+        timeout = PT1M
+[scheduling]
+    [[dependencies]]
+        graph = t1
+[runtime]
+    [[t1]]
+        environment scripting = eval $(rose task-env)
+        command scripting = rose task-run -v
+        [[[event hooks]]]
+           succeeded handler = rose suite-hook
+           failed handler = rose suite-hook --shutdown
+           submission failed handler = rose suite-hook --shutdown
+           submission timeout handler = rose suite-hook --shutdown
+           execution timeout handler = rose suite-hook --shutdown
+           submission timeout = PT10S
+           execution timeout = PT30S
