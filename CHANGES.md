@@ -20,10 +20,10 @@ This release of Rose will work best with the upcoming
 
 --------------------------------------------------------------------------------
 
-## 2014.08.0beta1 (2014-08-22)
+## 2014.08.0beta2 (2014-08-27)
 
 This is a pre-release of Rose. It works best with
-[cylc](https://github.com/cylc/cylc/) 6.0.0beta1.
+[cylc](https://github.com/cylc/cylc/) 6.0.0beta2.
 
 ### Highlighted Changes
 
@@ -49,17 +49,27 @@ rose suite-clean: new `--only=GLOBS` option to restrict items to be cleaned.
 [#1367](https://github.com/metomi/rose/pull/1367):
 [isodatetime](https://github.com/metomi/isodatetime/) upgraded to 2014.08.0.
 
+[#1316](https://github.com/metomi/rose/pull/1316),
 [#1332](https://github.com/metomi/rose/pull/1332),
-[#1316](https://github.com/metomi/rose/pull/1316):
+[#1390](https://github.com/metomi/rose/pull/1390):
 rose date: new usage to print the duration between 2 date time points.
 
-[#1283](https://github.com/metomi/rose/pull/1283),
-[#1352](https://github.com/metomi/rose/pull/1352):
+[#1352](https://github.com/metomi/rose/pull/1352),
+[#1283](https://github.com/metomi/rose/pull/1283):
 rosie go, rosie lookup, rosie ls, etc: will now attempt to use
 [Gnome Keyring](https://wiki.gnome.org/GnomeKeyring) to store passwords for
 Rosie web services that require authentication.
 
 ### Noteworthy Changes
+
+[#1387](https://github.com/metomi/rose/pull/1387):
+rose.upgrade: new `rename_setting` function.
+
+[#1384](https://github.com/metomi/rose/pull/1384):
+rose config-edit: fix macro running after metadata refresh.
+
+[#1383](https://github.com/metomi/rose/pull/1383):
+rose config-edit: stash: fix null profile lookup.
 
 [#1370](https://github.com/metomi/rose/pull/1370):
 rose bush cycles: print each cycle's last activity.
