@@ -39,11 +39,13 @@ will be cast to an integer, but:
 bar="100"
 will be cast to a string.
 
-Generate the user config example help by extracting the 'User-relevant'
+Generate the user config options help by extracting the 'User-relevant'
 flagged blocks of text, e.g. via:
 
-sed -n '/User-relevant:/,/^$/p' __init__.py | \
-    sed "s/#/##/g; s/## User-relevant:/#/g; s/^\([A-Z_]\+\) = /\L\1=/g;"
+sed -n '/^# User-relevant: /,/^$/p' __init__.py | \
+    sed -n '/User-relevant/d; /^$/d; N; '\
+'s/^# \(.*\)\n\(^[^#].*\) = \(.*\)/'\
+'\<h4 id="\L\2"\>\2\E=\3\<\/h4\>\<p\>\1\<\/p\>\n/p;' | sort
 
 Use this text to update the doc/etc/rose-rug-config-edit/rose.conf.html
 text, remembering to add the [rose-config-edit] section.

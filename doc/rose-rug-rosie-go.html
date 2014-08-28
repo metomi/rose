@@ -314,9 +314,6 @@ rosie go
 
     <h2 id="customisation">Customising Rosie Go</h2>
 
-    <p>Some site/user configuration settings that you may want to alter are
-    shown <a href="etc/rose-rug-rosie-go/rose.conf.html">here</a>.</p>
-
     <h3 id="themes">Customising Themes</h3>
 
     <p>The default style, font, and some colours of <code>rosie go</code> are
@@ -327,19 +324,43 @@ rosie go
 
     <h3 id="general">General Customisation</h3>
 
-    <p>Constants used in <code>rosie go</code> are located in a <a href=
-    "https://github.com/metomi/rose/blob/master/lib/python/rosie/browser/__init__.py">
-    rosie/browser/__init__.py</a> file. They can be overridden by creating a
-    <a href="rose-configuration.html#site">user configuration</a> file
-    <samp>~/.metomi/rose.conf</samp> in your home directory, if it doesn't
-    already exist, and adding text such as this:</p>
-    <pre class="prettyprint lang-rose_conf">
-[rosie-go]
-accel_previous_search="&lt;Ctrl&gt;G"
-</pre>
+    <p>The following are potentially useful options that you may want to set in
+    your site or user configuration under a <samp>[rosie go]</samp>
+    section.</p>
 
-    <p>Option names here should be lowercase translations of the constants in
-    the <samp>__init__.py</samp> file.</p>
+    <h4 id="columns_shown">columns_shown=["local", "idx", "revision", "owner",
+    "title"]</h4>
+
+    <p>Configure a list of columns that should be shown at startup.</p>
+
+    <h4 id="should_show_advanced_controls">
+    should_show_advanced_controls=False</h4>
+
+    <p>Show or hide the advanced search controls (bracketed queries).</p>
+
+    <h4 id="size_history">size_history=100</h4>
+
+    <p>Configure the maximum number of searches or queries to keep in the
+    history.</p>
+
+    <h4 id="size_top_trees">size_top_trees=100</h4>
+
+    <p>Configure the height in pixels of the advanced search panel.</p>
+
+    <h4 id="size_window">size_window=(900, 600)</h4>
+
+    <p>Configure the width and height of rosie go in pixels (as a tuple).</p>
+
+    <h4 id="size_window_new_suite">size_window_new_suite=(400, 180)</h4>
+
+    <p>Configure the width and height of the suite wizard in pixels (as a
+    tuple).</p>
+
+    <h4 id="size_window_new_suite_edit">size_window_new_suite_edit=(800,
+    500)</h4>
+
+    <p>Configure the width and height of the info editor in pixels (as a
+    tuple).</p>
   </div>
 </body>
 </html>
