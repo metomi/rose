@@ -25,7 +25,7 @@ import threading
 import gobject
 import multiprocessing
 
-import rosie.ws_client
+from rosie.suite_id import SuiteId
 
 
 class LocalStatusUpdater(threading.Thread):
@@ -100,7 +100,7 @@ class LocalStatusGetter(multiprocessing.Process):
 
     def update(self):
         """Get info and communicate any change."""
-        local_suites = rosie.ws_client.get_local_suites()
+        local_suites = SuiteId.suite_ids_with_local_copies()
         if local_suites == self.local_suites:
             return
         self.local_suites = local_suites

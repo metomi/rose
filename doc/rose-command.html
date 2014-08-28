@@ -2621,56 +2621,60 @@ environment scripting = "eval $(rose task-env)"
 
     <p>Launch the Rosie client GTK+ GUI.</p>
 
-    <p>By default rosie go will display a list of all your locally checked out
-    suites. This initial search displayed by rosie go can be set through the
-    <var>[SEARCH]</var> argument using either a query, search keyword or
-    url.</p>
+    <p>If arguments are specified, rosie go will perform an initial lookup based
+    on the arguments, which can be an address, a query, or search words. See
+    <a href="#rosie-lookup">rosie lookup</a> for detail.</p>
 
-    <p>Unless an option is used to specify the initial search type the input is
-    interpreted by default as follows:</p>
+    <p>Unless an option is used to specify the initial search type the argument
+    is interpreted as follows:</p>
 
     <ul>
-      <li>string beginning with "http": url</li>
-
-      <li>string not beginning with "http": keyword search</li>
+      <li>A string beginning with <em>http</em> - an address</li>
+      <li>A string not beginning with <em>http</em> - search words</li>
     </ul>
 
-    <p>If using a url remember to put it in quotes.</p>
+    <p>An address URL may contain shell meta characters, so remember to put it
+    in quotes.</p>
+
+    <p>If no argument is specified, <code>rosie go</code> will display a list of
+    all your locally checked out suites.</p>
 
     <h3>OPTIONS</h3>
 
     <dl>
-      <dt><kbd>--prefix=PREFIX</kbd></dt>
+      <dt><kbd>--address-mode</kbd>, <kbd>--url</kbd>, <kbd>-A</kbd>,
+      <kbd>-U</kbd></dt>
 
-      <dd>An alias specifying a different suite repository.</dd>
+      <dd>Shorthand for <kbd>--lookup-mode=address</kbd>.</dd>
 
       <dt><kbd>--all-revs</kbd></dt>
 
       <dd>Specify whether to search deleted suites and superceded suites.</dd>
 
+      <dt><kbd>--lookup-mode=MODE</kbd></dt>
+
+      <dd>Specify the initial lookup mode. <var>MODE</var> can be
+      <code>address</code>, <code>query</code> or <code>search</code>.</dd>
+
+      <dt><kbd>--prefix=PREFIX</kbd></dt>
+
+      <dd>Specify the name of a Rosie web service to use. This option can be
+      used multiple times.</dd>
+
       <dt><kbd>--query, -Q</kbd></dt>
 
-      <dd>Run the suite search specified by <var>[SEARCH]</var> as a
-      query.</dd>
+      <dd>Shorthand for <kbd>--lookup-mode=query</kbd>.</dd>
 
       <dt><kbd>--search, -S</kbd></dt>
 
-      <dd>Run the suite search specified by <var>[SEARCH]</var> as a keyword
-      search.</dd>
-
-      <dt><kbd>--url, -U</kbd></dt>
-
-      <dd>Run the suite search specified by <var>[SEARCH]</var> as a url
-      search.</dd>
+      <dd>Shorthand for <kbd>--lookup-mode=search</kbd>.</dd>
     </dl>
 
-    <h3>ARGUMENTS</h3>
+    <h3>SEE ALSO</h3>
 
-    <dl>
-      <dt>QUERY</dt>
+    <p><a href="#rosie-lookup">rosie lookup</a></p>
 
-      <dd>An optional search to be executed on startup.</dd>
-    </dl>
+    <p><a href="#rosie-ls">rosie ls</a></p>
 
     <h2 id="rosie-hello">rosie hello</h2>
 
@@ -2691,7 +2695,8 @@ environment scripting = "eval $(rose task-env)"
     <dl>
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
-      <dd>An alias specifying a different suite repository.</dd>
+      <dd>Specify the name of a Rosie web service to use. This option can be
+      used multiple times.</dd>
     </dl>
 
     <h2 id="rosie-id">rosie id</h2>
@@ -2790,8 +2795,16 @@ environment scripting = "eval $(rose task-env)"
 
     <p>Find suites in the suite discovery database.</p>
 
-    <p>Search for suites using either a query, search keyword or url and
+    <p>Search for suites using either an address, a query, or search words and
     display the information of the matching suites.</p>
+
+    <p>Unless an option is used to specify the initial search type the argument
+    is interpreted as follows:</p>
+
+    <ul>
+      <li>A string beginning with <em>http</em> - an address</li>
+      <li>A string not beginning with <em>http</em> - search words</li>
+    </ul>
 
     <p>Unless an option is used to specify the lookup type the input is
     interpreted by default as follows:</p>
@@ -2802,7 +2815,8 @@ environment scripting = "eval $(rose task-env)"
       <li>string not beginning with "http": search</li>
     </ul>
 
-    <p>If using a url remember to put it in quotes.</p>
+    <p>An address URL may contain shell meta characters, so remember to put it
+    in quotes.</p>
 
     <p>The default output format includes a local working copy status field
     (<kbd>%local</kbd>) in the first column. A blank field means there is no
@@ -2816,6 +2830,11 @@ environment scripting = "eval $(rose task-env)"
     <h3>OPTIONS</h3>
 
     <dl>
+      <dt><kbd>--address-mode</kbd>, <kbd>--url</kbd>, <kbd>-A</kbd>,
+      <kbd>-U</kbd></dt>
+
+      <dd>Shorthand for <kbd>--lookup-mode=address</kbd>.</dd>
+
       <dt><kbd>--all-revs</kbd></dt>
 
       <dd>Specify whether to search deleted suites and superceded suites.</dd>
@@ -2824,9 +2843,15 @@ environment scripting = "eval $(rose task-env)"
 
       <dd>Do not print column headers.</dd>
 
+      <dt><kbd>--lookup-mode=MODE</kbd></dt>
+
+      <dd>Specify the initial lookup mode. <var>MODE</var> can be
+      <code>address</code>, <code>query</code> or <code>search</code>.</dd>
+
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
-      <dd>Specify the name of the suite repository to use.</dd>
+      <dd>Specify the name of a Rosie web service to use. This option can be
+      used multiple times.</dd>
 
       <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT, -f
       FORMAT</kbd></dt>
@@ -2844,7 +2869,7 @@ abc01 from daisy
 
       <dt><kbd>--query, -Q</kbd></dt>
 
-      <dd>Run the lookup as a query.</dd>
+      <dd>Shorthand for <kbd>--lookup-mode=query</kbd>.</dd>
 
       <dt><kbd>--quiet, -q</kbd></dt>
 
@@ -2856,15 +2881,11 @@ abc01 from daisy
 
       <dt><kbd>--search, -S</kbd></dt>
 
-      <dd>Run the lookup as a keyword search.</dd>
+      <dd>Shorthand for <kbd>--lookup-mode=search</kbd>.</dd>
 
       <dt><kbd>--sort=FIELD, -s FIELD</kbd></dt>
 
       <dd>Sort results by the field <var>FIELD</var> instead of revision.</dd>
-
-      <dt><kbd>--url, -U</kbd></dt>
-
-      <dd>Use a url for the lookup.</dd>
 
       <dt><kbd>--verbose, -v</kbd></dt>
 
@@ -2907,7 +2928,7 @@ abc01 from daisy
       <dt><kbd>--prefix=PREFIX</kbd></dt>
 
       <dd>Display locally checked out suites from the specified suite
-      repository.</dd>
+      repository. This option can be used multiple times.</dd>
 
       <dt><kbd>--print-format=FORMAT</kbd>, <kbd>--format=FORMAT, -f
       FORMAT</kbd></dt>

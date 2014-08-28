@@ -35,21 +35,6 @@ for S in $SIGNALS; do
     trap "finally $S" $S
 done
 #-------------------------------------------------------------------------------
-HOSTNAME=$(hostname)
-if ! host $HOSTNAME 1>/dev/null 2>&1; then
-    HOSTNAME=localhost # Handle computer no domain name
-fi
-function port_is_busy() {
-    local PORT=$1
-    if type -P netcat 1>/dev/null; then
-        netcat -z $HOSTNAME $PORT
-        return $?
-    else
-        netstat -atun | grep -q "127.0.0.1:$PORT"
-        return $?
-    fi
-}
-#-------------------------------------------------------------------------------
 tests 21
 #-------------------------------------------------------------------------------
 mkdir svn

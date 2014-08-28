@@ -21,39 +21,45 @@
 #     rosie go
 #
 # SYNOPSIS
-#     rosie go [OPTIONS] [SEARCH]
+#     rosie go [OPTIONS] [...]
 #
 # DESCRIPTION
 #     Launch the Rosie client GTK+ GUI.
 #
-#     By default rosie go will display a list of all your locally checked out
-#     suites. This initial search displayed by rosie go can be set through the
-#     [SEARCH] argument using either a query, search keyword or url.
+#     If arguments are specified, rosie go will perform an initial lookup based
+#     on the arguments, which can be an address, a query, or search words. See
+#     "rosie lookup" for detail.
 #
-#     Unless an option is used to specify the initial search type the input is
-#     interpreted by default as follows:
-#     - string beginning with "http": url
-#     - string not beginning with "http": keyword search
+#     Unless an option is used to specify the initial search type the argument
+#     is interpreted as follows:
+#     * A string beginning with "http": an address
+#     * A string not beginning with "http": search words
+#
+#     An address URL may contain shell meta characters, so remember to put it
+#     in quotes.
+#
+#     If no argument is specified, rosie go will display a list of all your
+#     locally checked out suites.
 #
 # OPTIONS
-#     --prefix=PREFIX
-#         An alias specifying a different suite repository.
-#
+#     --address-mode, --url, -A, -U
+#         Shorthand for "--lookup-mode=address".
 #     --all-revs
 #         Specify whether to search deleted suites and superceded suites.
-#
+#     --lookup-mode=MODE
+#         Specify the initial lookup mode. MODE can be "address", "query" or
+#         "search".
+#     --prefix=PREFIX
+#         Specify the name of a Rosie web service to use. This option can be
+#         used multiple times.
 #     --query, -Q
-#         Run the suite search specified by [SEARCH] as a query.
-#
+#         Shorthand for "--lookup-mode=query".
 #     --search, -S
-#         Run the suite search specified by [SEARCH] as a keyword search.
+#         Shorthand for "--lookup-mode=search".
 #
-#     --url, -U
-#         Run the suite search specified by [SEARCH] as a url search.
-#
-# ARGUMENTS
-#     QUERY
-#         An optional search to be executed on startup.
+# SEE ALSO
+#     rosie lookup
+#     rosie ls
 #-------------------------------------------------------------------------------
 exec python -m rosie.browser.main "$@"
 
