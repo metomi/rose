@@ -626,6 +626,9 @@ def sort_element(elem_1, elem_2):
 
 def sort_settings(setting_1, setting_2):
     """Sort sections and options, by numeric element if possible."""
+    if (not isinstance(setting_1, basestring) or
+            not isinstance(setting_2, basestring)):
+        return cmp(setting_1, setting_2)
     match_1 = REC_SETTING_ELEMENT.match(setting_1)
     match_2 = REC_SETTING_ELEMENT.match(setting_2)
     if match_1 and match_2:
