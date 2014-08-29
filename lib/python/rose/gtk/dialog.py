@@ -230,6 +230,7 @@ class DialogProcess(object):
                         child.show()
                 self.dialog.run()
         self.dialog.destroy()
+        print "This is being run"
         return self.p.exitcode
 
     def _handle_dialog_process_destroy(self, dialog):

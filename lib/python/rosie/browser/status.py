@@ -51,7 +51,7 @@ class LocalStatusUpdater(threading.Thread):
         # Main while loop to fetch and distribute suite info.
         while not self.should_quit:
             self.update()
-            time.sleep(0.5)
+            time.sleep(1.0)
         # Trigger a stop for the getter process.
         self.stop_event.set()
 

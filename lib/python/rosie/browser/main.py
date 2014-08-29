@@ -630,6 +630,7 @@ class MainWindow(gtk.Window):
             id_text = self.get_selected_suite_id()
             kwargs['id_'] = SuiteId(id_text=id_text)
         self.suite_director.checkout(*args, **kwargs)
+        time.sleep(1.0)
         self.local_updater.update_now()
 
     def handle_clear_history(self, *args):
