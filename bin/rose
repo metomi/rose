@@ -64,8 +64,9 @@ help_util() {
     local ALIAS=$(get_alias $NAME)
     if [[ -n $ALIAS ]]; then
         COMMAND=$ROSE_HOME_BIN/$ROSE_NS-$ALIAS
+        COMMAND=${COMMAND%% *}
     fi
-    case $(head -1 $COMMAND) in
+    case $(head -1 -- $COMMAND) in
     *bash*)
         awk '{
             if (/^# NAME/) {
