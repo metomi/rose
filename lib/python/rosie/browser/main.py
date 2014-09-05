@@ -630,7 +630,6 @@ class MainWindow(gtk.Window):
             id_text = self.get_selected_suite_id()
             kwargs['id_'] = SuiteId(id_text=id_text)
         self.suite_director.checkout(*args, **kwargs)
-        time.sleep(1.0)
         self.local_updater.update_now()
 
     def handle_clear_history(self, *args):
@@ -968,8 +967,8 @@ class MainWindow(gtk.Window):
         """Update the local status column in the main tree model."""
         self.display_box.update_treemodel_local_status(local_suites,
                                                        self.search_manager,
-                                                       self.format_suite_id,
-                                                       )
+                                                       self.format_suite_id)
+
         self.update_toolbar_sensitivity(
              self.display_box.treeview.get_cursor()[0])
 

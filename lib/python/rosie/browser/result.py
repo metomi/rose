@@ -217,27 +217,16 @@ class DisplayBox(gtk.VBox):
         local_status = rosie.ws_client.get_local_status(
                              local_suites, search_manager.get_datasource(),
                              idx, branch, revision)
-
-
+        old_results = self._result_info[idx, branch, revision] 
         loc = STATUS_TIP[local_status]
         id_text = id_formatter(idx, branch, revision)
-        self._result_info[idx, branch, revision] = id_text + "\n" + loc + "\n\n"
-
-#        for key in sorted(result_map):
-#            if key in ["idx", "branch", "revision"]:
-#                continue
-#            value = result_map[key]
-#            if value is None:
-#                continue
-#            if isinstance(value, list):
-#                value = " ".join(value)
-#            if key == "date":
-#                value = datetime.datetime.fromtimestamp(float(value))
-#            line = key + rosie.browser.DELIM_KEYVAL + str(value)
-#            self._result_info[idx, branch, revision] += line + "\n"
-#        self._result_info[idx, branch, revision] = self._result_info[idx, branch, revision].rstrip()
-
-
+        new_results = ""
+        for line in old_results.split("\n"):
+            if line == id_text or ":" in line or line == "":
+                new_results += line + "\n"
+            else:
+                new_results += loc + "\n"
+        self._result_info[idx, branch, revision] = new_results
         model.set_value(r_iter, index_map["local"], local_status)
         return False
 
@@ -248,7 +237,6 @@ class DisplayBox(gtk.VBox):
         id_text = id_formatter(idx, branch, revision)
         loc = STATUS_TIP[local_status]
         self._result_info[id_tuple] = id_text + "\n" + loc + "\n\n"
-        print "result map", result_map
         for key in sorted(result_map):
             if key in ["idx", "branch", "revision"]:
                 continue
