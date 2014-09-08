@@ -204,7 +204,7 @@ class RosieVCClient(object):
         local_copy_dir = os.path.dirname(local_copy)
         if not os.path.isdir(local_copy_dir):
             self.fs_util.makedirs(os.path.dirname(local_copy))
-        origin = id.to_origin() + "/" + id.branch + "@" + id.revision
+        origin = "%s/%s@%s" % (id.to_origin(), id.branch, id.revision)
         self.popen("svn", "checkout", "-q", origin, local_copy)
         self.event_handler(LocalCopyCreateEvent(id))
         return id

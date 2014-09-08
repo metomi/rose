@@ -754,6 +754,7 @@ class MainWindow(gtk.Window):
         if menuitem.get_active():
             if menuitem.prefix_text not in prefixes:
                 prefixes.append(menuitem.prefix_text)
+                prefixes.sort()
         else:
             if menuitem.prefix_text in prefixes:
                 prefixes.remove(menuitem.prefix_text)

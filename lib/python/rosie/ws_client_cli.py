@@ -38,6 +38,7 @@ PRINT_FORMAT_DEFAULT = "%local %suite %owner %project %title"
 PRINT_FORMAT_QUIET = "%suite"
 
 REC_COL_IN_FORMAT = re.compile("(?:^|[^%])%([\w-]+)")
+DATE_TIME_FORMAT = "%FT%H:%M:%SZ"
 
 
 class URLEvent(Event):
@@ -74,7 +75,6 @@ class SuiteInfo(Event):
 
     def __str__(self):
 
-        time_format = "%Y-%m-%dT%H:%M:%S %Z"
         dict_row = dict(self.args[0].items())
         out = ""
         out = out + "id: %s\n" % dict_row["idx"]
@@ -85,8 +85,8 @@ class SuiteInfo(Event):
                     value = " ".join(value)
                 if key == "date" and isinstance(value, int):
                     out = (out + "\t" + key + ": " +
-                           time.strftime(time_format,
-                                         time.localtime(value)) + "\n")
+                           time.strftime(DATE_TIME_FORMAT,
+                                         time.gmtime(value)) + "\n")
                 else:
                     out = out + "\t" + key + ": " + str(value) + "\n"
         return out
@@ -159,11 +159,10 @@ def _align(rows, keys):
         return rows
     for key in keys:
         if key == "date":
-            time_format = "%Y-%m-%d %H:%M:%S %z"  # possibly put a T in
             for row in rows:
                 try:
                     row[key] = time.strftime(
-                        time_format, time.localtime(row.get(key)))
+                        DATE_TIME_FORMAT, time.gmtime(row.get(key)))
                 except (TypeError):
                     pass
         else:
