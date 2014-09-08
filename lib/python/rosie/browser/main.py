@@ -966,7 +966,9 @@ class MainWindow(gtk.Window):
     def handle_update_treemodel_local_status(self, local_suites):
         """Update the local status column in the main tree model."""
         self.display_box.update_treemodel_local_status(local_suites,
-                                                       self.search_manager)
+                                                       self.search_manager,
+                                                       self.format_suite_id)
+
         self.update_toolbar_sensitivity(
              self.display_box.treeview.get_cursor()[0])
 

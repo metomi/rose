@@ -210,13 +210,23 @@ class DisplayBox(gtk.VBox):
 
     def _update_local_status_row(self, model, path, r_iter, data):
         """Update the status for a row of the treeview"""
-        (index_map, local_suites, search_manager) = data
+        (index_map, local_suites, search_manager, id_formatter) = data
         idx = model.get_value(r_iter, index_map["idx"])
         branch = model.get_value(r_iter, index_map["branch"])
         revision = int(model.get_value(r_iter, index_map["revision"]))
         local_status = rosie.ws_client.get_local_status(
                              local_suites, search_manager.get_datasource(),
                              idx, branch, revision)
+        old_results = self._result_info[idx, branch, revision] 
+        loc = STATUS_TIP[local_status]
+        id_text = id_formatter(idx, branch, revision)
+        new_results = ""
+        for line in old_results.split("\n"):
+            if line == id_text or ":" in line or line == "":
+                new_results += line + "\n"
+            else:
+                new_results += loc + "\n"
+        self._result_info[idx, branch, revision] = new_results
         model.set_value(r_iter, index_map["local"], local_status)
         return False
 
@@ -280,14 +290,16 @@ class DisplayBox(gtk.VBox):
                 path = self.treestore.get_path(row_iter)
                 self.treeview.expand_to_path(path)
 
-    def update_treemodel_local_status(self, local_suites, search_manager):
+    def update_treemodel_local_status(self, local_suites, search_manager,
+                                      id_formatter):
         """Update the local status column in the main tree model."""
         keys = ["local", "idx", "branch", "revision"]
         index_map = {}
         for key in keys:
             index_map.update({key: self.get_column_index_by_name(key)})
         self.treestore.foreach(self._update_local_status_row,
-                               (index_map, local_suites, search_manager))
+                               (index_map, local_suites, search_manager,
+                                id_formatter))
 
     def update_treeview(self, activation_handler, visibility_getter,
                         query_rows=None, sort_title=None, descending=False):
