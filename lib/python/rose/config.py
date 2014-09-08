@@ -441,19 +441,24 @@ class ConfigLoader(object):
             return node
         source_dir = os.path.dirname(source)
         source_root, source_ext = os.path.splitext(os.path.basename(source))
-        for key in opt_conf_keys:
+        for opt_conf_key in opt_conf_keys:
+            key = opt_conf_key
+            is_optional = (key.startswith("(") and key.endswith(")"))
+            if is_optional:
+                key = opt_conf_key[1:-1]
             opt_conf_file_name_base = source_root + "-" + key + source_ext
             opt_conf_file_name = os.path.join(
                 source_dir, OPT_CONFIG_DIR, opt_conf_file_name_base)
-            if os.access(opt_conf_file_name, os.F_OK | os.R_OK):
+            try:
                 self.load(opt_conf_file_name, node)
+            except IOError:
+                if is_optional or (
+                        used_keys is not None and opt_conf_key in more_keys):
+                    continue
+                raise
+            else:
                 if used_keys is not None and key not in used_keys:
                     used_keys.append(key)
-            else:
-                if used_keys is not None and key in more_keys:
-                    continue
-                raise OSError(errno.ENOENT, os.strerror(errno.ENOENT),
-                              opt_conf_file_name)
         return node
 
     def load(self, source, node=None):
