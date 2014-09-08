@@ -249,6 +249,16 @@ opts=ketchup mayonnaise
     <var>rose-app-mayonnaise.conf</var>, which may override the previous
     one.</p>
 
+    <p>By default, a Rose command will fail if an optional configuration file is
+    missing. However, if you put the optional configuration key in brackets,
+    then the optional configuration file is allowed to be missing. E.g.:</p>
+    <pre class="prettyprint lang-rose_conf">
+opts=ketchup (mayonnaise)
+</pre>
+
+    <p>In the above example, <var>rose-app-mayonnaise.conf</var> can be
+    missing.</p>
+
     <p>Some Rose utilities (e.g. <a href=
     "rose-command.html#rose-suite-run">rose suite-run</a>, <a href=
     "rose-command.html#rose-task-run">rose task-run</a>, <a href=
