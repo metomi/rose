@@ -16,7 +16,22 @@ This release of Rose will work best with the upcoming
 
 ### Noteworthy Changes
 
--none yet-
+[#1399](https://github.com/metomi/rose/pull/1399):
+rosie go: fix incorrect hover tooltip following a checkout.
+
+[#1398](https://github.com/metomi/rose/pull/1398):
+rose_ana: fix an issue where it incorrectly thinks that files in the app's file
+directory are tests.
+
+[#1397](https://github.com/metomi/rose/pull/1397):
+Bracket syntax to allow optional configuration keys to point to missing
+optional configuration files.
+
+[#1396](https://github.com/metomi/rose/pull/1396):
+Fix `rose help suite-restart`.
+
+[#1381](https://github.com/metomi/rose/pull/1381):
+rose config-edit: fix macro report handling for null or generic settings.
 
 --------------------------------------------------------------------------------
 
