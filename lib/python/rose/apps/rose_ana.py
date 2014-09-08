@@ -276,6 +276,8 @@ class Analyse(object):
         for task in self.config.value.keys():
             if task is "env":
                 continue
+            if task.startswith("file:"):
+                continue
             newtask = AnalysisTask()
             newtask.name = task
             value = self.config.get_value([task, "resultfile"])
