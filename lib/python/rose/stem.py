@@ -88,10 +88,10 @@ class RoseStemVersionException(Exception):
         if version == None:
             self.suite_version = "not rose-stem compatible"
         else:
-            self.suite_version = "at version %s"%(version)
+            self.suite_version = "at version %s" % (version)
 
     def __repr__(self):
-        return "Running rose-stem version %s but suite is %s"%(
+        return "Running rose-stem version %s but suite is %s" % (
               ROSE_STEM_VERSION, self.suite_version)
 
     __str__ = __repr__
