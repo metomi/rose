@@ -47,6 +47,9 @@ Rosie web services that require authentication.
 
 ### Noteworthy Changes
 
+[#1400](https://github.com/metomi/rose/pull/1400):
+rose stem: now requires a specific version number in `rose-suite.conf`.
+
 [#1399](https://github.com/metomi/rose/pull/1399):
 rosie go: fix incorrect hover tooltip following a checkout.
 
