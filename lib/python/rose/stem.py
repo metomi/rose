@@ -33,6 +33,7 @@ from rose.suite_run import SuiteRunner
 
 DEFAULT_TEST_DIR = 'rose-stem'
 OPTIONS = ['group', 'source', 'task', ]
+ROSE_STEM_VERSION = 1
 SUITE_RC_PREFIX = '[jinja2:suite.rc]'
 
 
@@ -75,6 +76,23 @@ class ProjectNotFoundException(Exception):
         else:
             return "Cannot ascertain project for source tree %s"%(
                     self.source)
+
+    __str__ = __repr__
+
+
+class RoseStemVersionException(Exception):
+
+    """Exception class when running the wrong rose-stem version."""
+    
+    def __init__(self, version):
+        if version == None:
+            self.suite_version = "not rose-stem compatible"
+        else:
+            self.suite_version = "at version %s" % (version)
+
+    def __repr__(self):
+        return "Running rose-stem version %s but suite is %s" % (
+              ROSE_STEM_VERSION, self.suite_version)
 
     __str__ = __repr__
 
@@ -263,6 +281,9 @@ class StemRunner(object):
 
         if not os.path.isfile(suitefile):
             raise RoseSuiteConfNotFoundException(suitedir)
+
+        self._check_suite_version(suitefile)
+
         return suitedir
 
     def _read_site_config_and_return_options(self):
@@ -270,6 +291,19 @@ class StemRunner(object):
         return ResourceLocator.default().get_conf().get_value(["rose-stem", 
                 "automatic-options"])
 
+    def _check_suite_version(self, fname):
+        """Check the suite is compatible with this version of rose-stem."""
+        if not os.path.isfile(fname):
+            raise RoseSuiteConfNotFoundException(os.path.dirname(fname))
+        config = rose.config.load(fname)
+        suite_rose_stem_version = config.get(['ROSE_STEM_VERSION'])
+        if suite_rose_stem_version:
+            suite_rose_stem_version = int(suite_rose_stem_version.value)
+        else:
+            suite_rose_stem_version = None
+        if not suite_rose_stem_version == ROSE_STEM_VERSION:
+            raise RoseStemVersionException(suite_rose_stem_version)
+        
     def process(self):
         """Process STEM options into 'rose suite-run' options."""
 
@@ -320,6 +354,8 @@ class StemRunner(object):
         # Change into the suite directory
         if self.opts.conf_dir:
             self.reporter(SuiteSelectionEvent(self.opts.conf_dir))
+            self._check_suite_version(os.path.join(self.opts.conf_dir,
+                                        'rose-suite.conf'))
         else:
             thissuite = self._this_suite()
             self.fs_util.chdir(thissuite)

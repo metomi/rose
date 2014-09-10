@@ -46,10 +46,11 @@ fcm checkout -q fcm:foo_tr $WORKINGCOPY
 #-------------------------------------------------------------------------------
 #Copy suite into working copy
 cp $TEST_SOURCE_DIR/00-run-basic/suite.rc $WORKINGCOPY/rose-stem
+cp $TEST_SOURCE_DIR/00-run-basic/rose-suite.conf $WORKINGCOPY/rose-stem
 touch $WORKINGCOPY/rose-stem/rose-suite.conf
 #We should now have a valid rose-stem suite.
 #-------------------------------------------------------------------------------
-N_TESTS=29
+N_TESTS=31
 tests $N_TESTS
 #-------------------------------------------------------------------------------
 #Test for successful execution
@@ -164,6 +165,17 @@ TEST_KEY=$TEST_KEY_BASE-multi-auto-config-first
 file_grep $TEST_KEY "MILK=true\$" $OUTPUT
 TEST_KEY=$TEST_KEY_BASE-multi-auto-config-second
 file_grep $TEST_KEY "TEA=darjeeling\$" $OUTPUT
+#-------------------------------------------------------------------------------
+# Seventh test - check incompatible rose-stem versions
+cp $TEST_SOURCE_DIR/00-run-basic/rose-suite2.conf $WORKINGCOPY/rose-stem/rose-suite.conf
+TEST_KEY=$TEST_KEY_BASE-incompatible_versions
+run_fail "$TEST_KEY" \
+   rose stem --group=earl_grey --task=milk,sugar --group=spoon,cup,milk \
+             --source=$WORKINGCOPY --source=fcm:foo_tr@head --no-gcontrol \
+             --name $SUITENAME -- --debug 
+OUTPUT=$TEST_DIR/${TEST_KEY}.err
+TEST_KEY=$TEST_KEY_BASE-incompatible-versions-correct_error
+file_grep $TEST_KEY "Running rose-stem version 1 but suite is at version 0" $OUTPUT
 #-------------------------------------------------------------------------------
 #Clean suite
 rose suite-clean -q -y $SUITENAME
