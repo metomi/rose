@@ -34,7 +34,8 @@ import rose.gtk.dialog
 import rose.gtk.util
 import rose.reporter
 
-import rose.config_editor.plugin.um.widget.stash_add
+import rose.config_editor.plugin.um.widget.stash_add as stash_add
+import rose.config_editor.plugin.um.widget.stash_util as stash_util
 
 
 class BaseStashSummaryDataPanelv1(
@@ -323,10 +324,17 @@ class BaseStashSummaryDataPanelv1(
     def set_tree_tip(self, view, row_iter, col_index, tip):
         """(Override) Set the TreeView Tooltip."""
         sect_index = self.get_section_column_index()
-        section = view.get_model().get_value(row_iter, sect_index)
+        model = view.get_model()
+        section = model.get_value(row_iter, sect_index)
         if section is None:
             return False
         col_name = self.column_names[col_index]
+        stash_section_index = self.column_names.index(
+            self.STREQ_NL_SECT_OPT)
+        stash_item_index = self.column_names.index(
+            self.STREQ_NL_ITEM_OPT)
+        stash_section = model.get_value(row_iter, stash_section_index)
+        stash_item = model.get_value(row_iter, stash_item_index)
         if (col_index == sect_index or
             col_name in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]):
             option = None
@@ -336,13 +344,14 @@ class BaseStashSummaryDataPanelv1(
             if col_index == sect_index:
                 tip_text = section
             elif col_name in [self.DESCRIPTION_TITLE, self.INCLUDED_TITLE]:
-                tip_text = str(view.get_model().get_value(row_iter,
-                                                          col_index))
+                tip_text = str(model.get_value(row_iter, col_index))
                 tip_text += "\n" + section
             if col_name == self.DESCRIPTION_TITLE:
-                value = view.get_model().get_value(row_iter, col_index)
-                meta_key = self.STASH_PARSE_DESC_OPT + "=" + str(value)
-                metadata = self._stashmaster_meta_lookup.get(meta_key, {})
+                value = str(model.get_value(row_iter, col_index))
+                metadata = stash_util.get_metadata_for_stash_section_item(
+                    self._stashmaster_meta_lookup, stash_section, stash_item,
+                    value
+                )
                 help = metadata.get(rose.META_PROP_HELP)
                 if help is not None:
                     tip_text += "\n\n" + help
@@ -351,10 +360,10 @@ class BaseStashSummaryDataPanelv1(
             id_ = self.util.get_id_from_section_option(section, option)
             if (id_ not in self.var_id_map):
                 tip.set_text(str(
-                        view.get_model().get_value(row_iter, col_index)))
+                    model.get_value(row_iter, col_index)))
                 return True
             id_data = self.var_id_map[id_]
-            value = str(view.get_model().get_value(row_iter, col_index))
+            value = str(model.get_value(row_iter, col_index))
             tip_text = rose.CONFIG_DELIMITER.join([section, option, value]) + "\n"
             if option in self.OPTION_NL_MAP and option in self._profile_location_map.keys():
                 profile_id = self._profile_location_map[option].get(value)
@@ -619,19 +628,19 @@ class BaseStashSummaryDataPanelv1(
         # Launch the "new STASH request" dialog.
         window = gtk.Window()
         window.set_title(self.ADD_NEW_STASH_WINDOW_TITLE)
-        add_module = rose.config_editor.plugin.um.widget.stash_add
         request_lookup = self._get_request_lookup()
         request_changes = self._get_request_changes()
         add_new_func = lambda s, i: (
                 self.add_new_stash_request(s, i, launch_dialog=True))
-        self._diag_panel = add_module.AddStashDiagnosticsPanelv1(
-                                              self._stash_lookup,
-                                              request_lookup,
-                                              request_changes,
-                                              self._stashmaster_meta_lookup,
-                                              add_new_func,
-                                              self.scroll_to_section,
-                                              self._refresh_diagnostic_window)
+        self._diag_panel = stash_add.AddStashDiagnosticsPanelv1(
+            self._stash_lookup,
+            request_lookup,
+            request_changes,
+            self._stashmaster_meta_lookup,
+            add_new_func,
+            self.scroll_to_section,
+            self._refresh_diagnostic_window
+        )
         window.add(self._diag_panel)
         window.set_default_size(900, 800)
         window.connect("destroy", self._handle_close_diagnostic_window)

@@ -27,6 +27,8 @@ import rose.config
 import rose.config_editor
 import rose.gtk.util
 
+import rose.config_editor.plugin.um.widget.stash_util as stash_util
+
 
 class AddStashDiagnosticsPanelv1(gtk.VBox):
 
@@ -246,6 +248,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             stash_request_num = "None"
         name = self.column_names[col_index]
         value = model.get_value(row_iter, col_index)
+        help = None
         if value is None:
             return False
         if name == "?":
@@ -267,12 +270,17 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         if name == "Section":
             meta_key = self.STASH_PARSE_SECT_OPT + "=" + value
         elif name == "Description":
+            metadata = stash_util.get_metadata_for_stash_section_item(
+                self.stash_meta_lookup, stash_section, stash_item, value
+            )
+            help = metadata.get(rose.META_PROP_HELP)
             meta_key = self.STASH_PARSE_DESC_OPT + "=" + value
         else:
             meta_key = name + "=" + value
         value_meta = self.stash_meta_lookup.get(meta_key, {})
         title = value_meta.get(rose.META_PROP_TITLE, "")
-        help = value_meta.get(rose.META_PROP_HELP, "")
+        if help is None:
+            help = value_meta.get(rose.META_PROP_HELP, "")
         if title and not help:
             value += "\n" + title
         if help:
