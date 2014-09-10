@@ -110,7 +110,7 @@ rose bush: suites list: long strings in column 1 now truncated, but visible on
 hover over.
 
 [#1351](https://github.com/metomi/rose/pull/1351):
-rose metatdata, rose macro -V: recognise `.` id.
+rose metadata: recognise `.` in id.
 
 [#1342](https://github.com/metomi/rose/pull/1342):
 rosie go: fix appearance of new suite in local suites.
