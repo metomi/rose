@@ -22,7 +22,7 @@ for a full listing of issues for each release.
 * Improve reporting of running cylc suite processes.
 * Handle `log/job/` and `work/` directory restructure.
   N.B. This change is **NOT backward compatible**.  Existing suites with
-  applications that assumes the old directory structure will not work
+  applications that assume the old directory structure will not work
   correctly, and will require some minor modifications. See
   [cylc/cylc#1069](https://github.com/cylc/cylc/pull/1069) for detail.
 * Rephrase *cycle time* to *cycle point* for cylc 6.
