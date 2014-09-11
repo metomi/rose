@@ -50,6 +50,9 @@ echo "Freddie" >hello/stranger1.1.txt
 mkdir hello/stranger2
 echo "Bob" >hello/stranger2/person1.txt
 echo "Alice" >hello/stranger2/person2.txt
+mkdir hello/stranger2/persons
+echo "Holly" >hello/stranger2/persons/person3.txt
+echo "Alex" >hello/stranger2/persons/person4.txt
 # mode=auto, source is a list of files
 mkdir hello/plants
 echo "Heather" >hello/plants/heather.txt
