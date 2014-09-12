@@ -5,6 +5,24 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
+## Next Release (2014-Q4?)
+
+19th release of Rose. This release will work best with
+[Cylc](https://github.com/cylc/cylc/) 6.0.0.
+
+### Highlighted Changes
+
+-none-
+
+### Noteworthy Changes
+
+[#1403](https://github.com/metomi/rose/pull/1403),
+file install: rsync: fix sub-dir handling. File install rsync mode was failing
+if source is a directory with sub-directories. This change fixes the problem by
+removing an incorrect integer cast of the access mode.
+
+--------------------------------------------------------------------------------
+
 ## 2014-09.0 (2014-09-10)
 
 18th release of Rose. This release works best with
