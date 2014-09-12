@@ -99,9 +99,10 @@ elif os.path.isfile(path):
                 if mtime == "-" or size == "-":
                     fake_sum = None
                 else:
+                    access_mode = int(access_mode)
                     fake_sum = "source=%s:mtime=%s:size=%s" % (
                         name, mtime, size)
-                loc.add_path(name, fake_sum, int(access_mode))
+                loc.add_path(name, fake_sum, access_mode)
 
     def pull(self, loc, _):
         """Run "rsync" to pull files or directories of loc to its cache."""
