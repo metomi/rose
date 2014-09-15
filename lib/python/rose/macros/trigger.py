@@ -21,11 +21,11 @@
 import copy
 import os
 
-from rose.config import ConfigNode
-from rose.config_tree import ConfigTreeLoader
+import rose.config
+import rose.config_tree
 import rose.macro
 import rose.macros.rule
-from rose.resource import ResourceLocator
+import rose.resource
 
 
 class TriggerMacro(rose.macro.MacroBaseRoseEdit):
@@ -73,9 +73,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         self._setup_triggers(meta_config)
         self.enabled_dict = {}
         self.ignored_dict = {}
-        enabled = ConfigNode.STATE_NORMAL
-        trig_ignored = ConfigNode.STATE_SYST_IGNORED
-        user_ignored = ConfigNode.STATE_USER_IGNORED
+        enabled = rose.config.ConfigNode.STATE_NORMAL
+        trig_ignored = rose.config.ConfigNode.STATE_SYST_IGNORED
+        user_ignored = rose.config.ConfigNode.STATE_USER_IGNORED
         state_map = {enabled: 'enabled     ',
                      trig_ignored: 'trig-ignored',
                      user_ignored: 'user-ignored'}
@@ -258,24 +258,24 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
 
     def validate(self, config, meta_config=None):
         self.reports = []
-        if (not isinstance(meta_config, ConfigNode) and
+        if (not isinstance(meta_config, rose.config.ConfigNode) and
                 meta_config is not None):
-            conf = ResourceLocator.default().get_conf()
+            conf = rose.resource.ResourceLocator.default().get_conf()
             meta_path_list = []
             meta_path_str = conf.get_value(["meta-path"])
             if meta_path_str:
                 meta_path_list = meta_path_str.split(":")
-            meta_config = ConfigTreeLoader().load(
+            meta_config = rose.config_tree.ConfigTreeLoader().load(
                 os.path.dirname(meta_config),
                 os.path.basename(meta_config),
                 meta_path_list).node
         elif meta_config is None:
-            meta_config = ConfigNode()
+            meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
-        enabled = ConfigNode.STATE_NORMAL
-        trig_ignored = ConfigNode.STATE_SYST_IGNORED
-        user_ignored = ConfigNode.STATE_USER_IGNORED
+        enabled = rose.config.ConfigNode.STATE_NORMAL
+        trig_ignored = rose.config.ConfigNode.STATE_SYST_IGNORED
+        user_ignored = rose.config.ConfigNode.STATE_USER_IGNORED
         state_map = {enabled: 'enabled     ',
                      trig_ignored: 'trig-ignored',
                      user_ignored: 'user-ignored'}
@@ -304,19 +304,19 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
     def validate_dependencies(self, config, meta_config):
         """Validate the trigger setup - e.g. check for cyclic dependencies."""
         self.reports = []
-        if (not isinstance(meta_config, ConfigNode) and
+        if (not isinstance(meta_config, rose.config.ConfigNode) and
             meta_config is not None):
-            conf = ResourceLocator.default().get_conf()
+            conf = rose.resource.ResourceLocator.default().get_conf()
             meta_path_list = []
             meta_path_str = conf.get_value(["meta-path"])
             if meta_path_str:
                 meta_path_list = meta_path_str.split(":")
-            meta_config = ConfigTreeLoader().load(
+            meta_config = rose.config_tree.ConfigTreeLoader().load(
                 os.path.dirname(meta_config),
                 os.path.basename(meta_config),
                 meta_path_list).node
         elif meta_config is None:
-            meta_config = ConfigNode()
+            meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
         config_sections = config.value.keys()
@@ -502,9 +502,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             return self._evaluated_rule_checks[(rule, value)]
         except KeyError:
             section, option = self._get_section_option_from_id(setting_id)
-            tiny_config = ConfigNode()
+            tiny_config = rose.config.ConfigNode()
             tiny_config.set([section, option], value)
-            tiny_meta_config = ConfigNode()
+            tiny_meta_config = rose.config.ConfigNode()
             check_failed = self.evaluator.evaluate_rule(
                 rule, setting_id, tiny_config, tiny_meta_config)
             if len(self._evaluated_rule_checks) > self.MAX_STORED_RULE_CHECKS:

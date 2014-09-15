@@ -30,11 +30,11 @@ import gtk
 
 import rose.config
 import rose.config_editor.panelwidget.summary_data
-from rose.config_tree import ConfigTreeLoader
+import rose.config_tree
 import rose.gtk.dialog
 import rose.gtk.util
 import rose.reporter
-from rose.resource import ResourceLocator
+import rose.resource
 
 import rose.config_editor.plugin.um.widget.stash_add
 
@@ -282,13 +282,13 @@ class BaseStashSummaryDataPanelv1(
         """
         if self.STASHMASTER_META_PATH is None:
             return {}
-        conf = ResourceLocator.default().get_conf()
+        conf = rose.resource.ResourceLocator.default().get_conf()
         meta_path_list = []
         meta_path_str = conf.get_value(["meta-path"])
         if meta_path_str:
             meta_path_list = meta_path_str.split(":")
         try:
-            config = ConfigTreeLoader().load(
+            config = rose.config_tree.ConfigTreeLoader().load(
                 self.STASHMASTER_META_PATH,
                 self.STASHMASTER_META_FILENAME,
                 meta_path_list).node

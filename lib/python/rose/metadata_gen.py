@@ -25,13 +25,13 @@ import os
 import sys
 
 import rose.config
-from rose.config_tree import ConfigTreeLoader
+import rose.config_tree
 import rose.formats.namelist
 import rose.macro
 import rose.macros.value
 import rose.meta_type
 import rose.opt_parse
-from rose.resource import ResourceLocator
+import rose.resource
 
 
 def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
@@ -145,14 +145,14 @@ def main():
         sys.exit(opt_parser.get_usage())
     source_config = rose.config.load(path)
     meta_dir = os.path.join(opts.conf_dir, rose.CONFIG_META_DIR)
-    conf = ResourceLocator.default().get_conf()
+    conf = rose.resource.ResourceLocator.default().get_conf()
     meta_path_list = []
     meta_path_str = conf.get_value(["meta-path"])
     if meta_path_str:
         meta_path_list = meta_path_str.split(":")
     metadata_config = rose.config.ConfigNode()
     try:
-        metadata_config = ConfigTreeLoader().load(
+        metadata_config = rose.config_tree.ConfigTreeLoader().load(
             meta_dir, rose.META_CONFIG_NAME, meta_path_list).node
     except IOError:
         pass

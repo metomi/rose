@@ -24,13 +24,13 @@ import re
 import sys
 
 import rose.config
-from rose.config_tree import ConfigTreeLoader
+import rose.config_tree
 import rose.formats.namelist
 import rose.macro
 import rose.macros
 import rose.opt_parse
 import rose.reporter
-from rose.resource import ResourceLocator, import_object
+import rose.resource
 
 
 ERROR_LOAD_META_CONFIG_DIR = "{0}: not a configuration metadata directory."
@@ -105,7 +105,7 @@ def _check_macro(value, module_files=None, meta_dir=None):
             macro.endswith("." + rose.macro.TRANSFORM_METHOD)):
             macro_name, method = macro.rsplit(".", 1)
         try:
-            macro_obj = import_object(
+            macro_obj = rose.resource.import_object(
                 macro_name, module_files, _import_err_handler)
         except Exception as e:
             return INVALID_IMPORT.format(
@@ -195,7 +195,8 @@ def _check_widget(value, module_files=None, meta_dir=None):
         return
     widget_name = value.split()[0]
     try:
-        widget = import_object(widget_name, module_files, _import_err_handler)
+        widget = rose.resource.import_object(
+            widget_name, module_files, _import_err_handler)
     except Exception as e:
         return INVALID_IMPORT.format(widget_name,
                                      type(e).__name__ + ": " + str(e))
@@ -331,13 +332,13 @@ def main():
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
-    conf = ResourceLocator.default().get_conf()
+    conf = rose.resource.ResourceLocator.default().get_conf()
     meta_path_list = []
     meta_path_str = conf.get_value(["meta-path"])
     if meta_path_str:
         meta_path_list = meta_path_str.split(":")
     try:
-        meta_config = ConfigTreeLoader().load(
+        meta_config = rose.config_tree.ConfigTreeLoader().load(
             opts.conf_dir,
             rose.META_CONFIG_NAME,
             meta_path_list).node
