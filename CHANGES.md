@@ -16,7 +16,18 @@ for a full listing of issues for each release.
 
 ### Noteworthy Changes
 
-[#1403](https://github.com/metomi/rose/pull/1403),
+[#1408](https://github.com/metomi/rose/pull/1408):
+SSH `-oConnectTimeout=10` as default. This should fix any hang up problems when
+hosts not available. The `[rose-host-select]timeout` setting in site/user
+configuration is removed. SSH connection timeout should be configured as part
+of the `[external]ssh` setting.
+
+[#1407](https://github.com/metomi/rose/pull/1407):
+rosa svn-post-commit: fix owner and access-list notification. It should only
+send notification on changes on a trunk and should no longer send notification
+on changes on a branch.
+
+[#1403](https://github.com/metomi/rose/pull/1403):
 file install: rsync: fix sub-dir handling. File install rsync mode was failing
 if source is a directory with sub-directories. This change fixes the problem by
 removing an incorrect integer cast of the access mode.
