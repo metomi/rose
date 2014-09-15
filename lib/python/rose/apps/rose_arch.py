@@ -64,10 +64,15 @@ class RoseArchEvent(Event):
                 t_tran - t_init,
                 t_arch - t_tran
             )
-        ret = "%s %s [compress=%s%s]" % (target.status,
-                                         target.name,
-                                         target.compress_scheme,
-                                         t_info)
+        ret_code_str = ""
+        if len(self.args) > 2 and self.args[2] is not None:
+            ret_code_str = ", ret-code=%d" % self.args[2]
+        ret = "%s %s [compress=%s%s%s]" % (
+            target.status,
+            target.name,
+            target.compress_scheme,
+            t_info,
+            ret_code_str)
         if target.status != target.ST_OLD:
             for source in sorted(target.sources.values(),
                                  lambda s1, s2: cmp(s1.name, s2.name)):
@@ -272,6 +277,7 @@ class RoseArchApp(BuiltinApp):
             work_dir = mkdtemp()
             t_init = time()
             t_tran, t_arch = t_init, t_init
+            ret_code = None
             try:
                 # Rename/edit sources
                 target.status = target.ST_BAD
@@ -318,13 +324,14 @@ class RoseArchApp(BuiltinApp):
                 else:
                     target.status = target.ST_NEW
                     app_runner.handle_event(err, kind=Event.KIND_ERR)
+                    app_runner.handle_event(out)
                 app_runner.handle_event(out)
                 target.command_rc = ret_code
                 dao.update_command_rc(target)
             finally:
                 app_runner.fs_util.delete(work_dir)
                 app_runner.handle_event(
-                    RoseArchEvent(target, [t_init, t_tran, t_arch]))
+                    RoseArchEvent(target, [t_init, t_tran, t_arch], ret_code))
 
         return [target.status for target in targets].count(
             RoseArchTarget.ST_BAD)
