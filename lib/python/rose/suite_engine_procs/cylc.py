@@ -711,7 +711,6 @@ class CylcProcessor(SuiteEngineProcessor):
             if host == "localhost":
                 continue
             cmd = self.popen.get_cmd("ssh",
-                                     "-oConnectTimeout=%d" % self.TIMEOUT,
                                      host,
                                      "pgrep -f -l " + opt_user +
                                      " 'python.*cylc-(run|restart).*\\<" +
@@ -1071,7 +1070,7 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         if not hosts:
             hosts = ["localhost"]
-        if not timeout:
+        if timeout is None:
             timeout = self.TIMEOUT
         procs = {}
         for host in sorted(hosts):
@@ -1083,8 +1082,7 @@ class CylcProcessor(SuiteEngineProcessor):
             if host == "localhost":
                 cmd = ["bash", "-c", sh_cmd]
             else:
-                cmd = self.popen.get_cmd(
-                        "ssh", "-oConnectTimeout=%s" % timeout, host, sh_cmd)
+                cmd = self.popen.get_cmd("ssh", host, sh_cmd)
             proc = self.popen.run_bg(*cmd)
             procs[(host, _PORT_FILE, tuple(cmd))] = proc
         results = {}

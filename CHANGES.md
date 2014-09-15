@@ -5,25 +5,39 @@ for a full listing of issues for each release.
 
 --------------------------------------------------------------------------------
 
-## Next Release (2014-Q3?)
+## Next Release (2014-Q4?)
 
-This release of Rose will work best with the upcoming
+19th release of Rose. This release will work best with
 [Cylc](https://github.com/cylc/cylc/) 6.0.0.
 
 ### Highlighted Changes
 
--none yet-
+-none-
 
 ### Noteworthy Changes
 
--none yet-
+[#1408](https://github.com/metomi/rose/pull/1408):
+SSH `-oConnectTimeout=10` as default. This should fix any hang up problems when
+hosts not available. The `[rose-host-select]timeout` setting in site/user
+configuration is removed. SSH connection timeout should be configured as part
+of the `[external]ssh` setting.
+
+[#1407](https://github.com/metomi/rose/pull/1407):
+rosa svn-post-commit: fix owner and access-list notification. It should only
+send notification on changes on a trunk and should no longer send notification
+on changes on a branch.
+
+[#1403](https://github.com/metomi/rose/pull/1403):
+file install: rsync: fix sub-dir handling. File install rsync mode was failing
+if source is a directory with sub-directories. This change fixes the problem by
+removing an incorrect integer cast of the access mode.
 
 --------------------------------------------------------------------------------
 
-## 2014.08.0beta2 (2014-08-27)
+## 2014-09.0 (2014-09-10)
 
-This is a pre-release of Rose. It works best with
-[cylc](https://github.com/cylc/cylc/) 6.0.0beta2.
+18th release of Rose. This release works best with
+[Cylc](https://github.com/cylc/cylc/) 6.0.0.
 
 ### Highlighted Changes
 
@@ -33,26 +47,26 @@ This is a pre-release of Rose. It works best with
 [#1372](https://github.com/metomi/rose/pull/1372),
 [#1374](https://github.com/metomi/rose/pull/1374),
 [#1378](https://github.com/metomi/rose/pull/1378):
-* Rephrase *cycle time* to *cycle point* for cylc 6.
 * Handle new runtime database states.
 * Improve reporting of running cylc suite processes.
 * Handle `log/job/` and `work/` directory restructure.
   N.B. This change is **NOT backward compatible**.  Existing suites with
-  applications that assumes the old directory structure will not work
+  applications that assume the old directory structure will not work
   correctly, and will require some minor modifications. See
   [cylc/cylc#1069](https://github.com/cylc/cylc/pull/1069) for detail.
+* Rephrase *cycle time* to *cycle point* for cylc 6.
 * Rose Bush updated to work correctly with cylc 6.
 
 [#1371](https://github.com/metomi/rose/pull/1371):
 rose suite-clean: new `--only=GLOBS` option to restrict items to be cleaned.
 
-[#1367](https://github.com/metomi/rose/pull/1367):
-[isodatetime](https://github.com/metomi/isodatetime/) upgraded to 2014.08.0.
-
 [#1316](https://github.com/metomi/rose/pull/1316),
 [#1332](https://github.com/metomi/rose/pull/1332),
+[#1367](https://github.com/metomi/rose/pull/1367):
 [#1390](https://github.com/metomi/rose/pull/1390):
 rose date: new usage to print the duration between 2 date time points.
+* [isodatetime](https://github.com/metomi/isodatetime/) upgraded to
+  2014.08.0-8-ga7f42b1.
 
 [#1352](https://github.com/metomi/rose/pull/1352),
 [#1283](https://github.com/metomi/rose/pull/1283):
@@ -62,6 +76,23 @@ Rosie web services that require authentication.
 
 ### Noteworthy Changes
 
+[#1400](https://github.com/metomi/rose/pull/1400):
+rose stem: now requires a specific version number in `rose-suite.conf`.
+
+[#1399](https://github.com/metomi/rose/pull/1399):
+rosie go: fix incorrect hover tooltip following a checkout.
+
+[#1398](https://github.com/metomi/rose/pull/1398):
+rose_ana: fix an issue where it incorrectly thinks that files in the app's file
+directory are tests.
+
+[#1397](https://github.com/metomi/rose/pull/1397):
+Bracket syntax to allow optional configuration keys to point to missing
+optional configuration files.
+
+[#1396](https://github.com/metomi/rose/pull/1396):
+Fix `rose help suite-restart`.
+
 [#1387](https://github.com/metomi/rose/pull/1387):
 rose.upgrade: new `rename_setting` function.
 
@@ -70,6 +101,9 @@ rose config-edit: fix macro running after metadata refresh.
 
 [#1383](https://github.com/metomi/rose/pull/1383):
 rose config-edit: stash: fix null profile lookup.
+
+[#1381](https://github.com/metomi/rose/pull/1381):
+rose config-edit: fix macro report handling for null or generic settings.
 
 [#1370](https://github.com/metomi/rose/pull/1370):
 rose bush cycles: print each cycle's last activity.
@@ -108,7 +142,7 @@ rose bush: suites list: long strings in column 1 now truncated, but visible on
 hover over.
 
 [#1351](https://github.com/metomi/rose/pull/1351):
-rose metatdata, rose macro -V: recognise `.` id.
+rose metadata: recognise `.` in id.
 
 [#1342](https://github.com/metomi/rose/pull/1342):
 rosie go: fix appearance of new suite in local suites.
