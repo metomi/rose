@@ -84,14 +84,16 @@ class RosePopener(object):
 
     """Wrap Python's subprocess.Popen."""
 
-    CMDS = {"editor": ["vi"],
-            "fs_browser": ["nautilus"],
-            "geditor": ["gedit"],
-            "image_viewer": ["eog", "--new-instance"],
-            "rsync": ["rsync", "-a", "--exclude=.*", "--timeout=1800",
-                      "--rsh=ssh -oBatchMode=yes"],
-            "ssh": ["ssh", "-oBatchMode=yes"],
-            "terminal": ["xterm"]}
+    CMDS = {
+        "editor": ["vi"],
+        "fs_browser": ["nautilus"],
+        "geditor": ["gedit"],
+        "image_viewer": ["eog", "--new-instance"],
+        "rsync": ["rsync", "-a", "--exclude=.*", "--timeout=1800",
+                  "--rsh=ssh -oBatchMode=yes"],
+        "ssh": ["ssh", "-oBatchMode=yes", "-oConnectTimeout=10"],
+        "terminal": ["xterm"],
+    }
     ENVS_OF_CMDS = {"editor": ["VISUAL", "EDITOR"]}
 
     @classmethod
