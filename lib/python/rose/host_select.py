@@ -266,19 +266,12 @@ class HostSelector(object):
                                   "value": value}
                 threshold_confs.append(threshold_conf)
 
-        # Timeout
-        conf = ResourceLocator.default().get_conf()
-        timeout = conf.get_value(["rose-host-select", "timeout"])
-
         # ssh to each host to return its score(s).
         host_proc_dict = {}
         for host_name in sorted(host_names):
             command = []
             if host_name != "localhost":
                 command_args = []
-                if timeout:
-                    command_args.append("-oConnectTimeout=%d" %
-                                        int(float(timeout)))
                 command_args.append(host_name)
                 command = self.popen.get_cmd("ssh", *command_args)
             command.append("bash")
@@ -294,11 +287,10 @@ class HostSelector(object):
             host_proc_dict[host_name] = proc
 
         # Retrieve score for each host name
-        time0 = time()
         host_score_list = []
         while host_proc_dict:
             for host_name, proc in host_proc_dict.items():
-                if timeout and proc.poll() is None:
+                if proc.poll() is None:
                     score = None
                 elif proc.wait():
                     self.handle_event(DeadHostEvent(host_name))
@@ -323,15 +315,6 @@ class HostSelector(object):
                         score = scorer.command_out_parser(out, method_arg)
                         host_score_list.append((host_name, score))
                         self.handle_event(HostSelectScoreEvent(host_name, score))
-            if timeout:
-                dt = time() - time0
-                if host_proc_dict:
-                    if dt >= float(timeout):
-                        break
-                    if float(timeout) - dt > self.TIMEOUT_DELAY:
-                        sleep(self.TIMEOUT_DELAY)
-                    else:
-                        sleep(float(timeout) - dt)
 
         # Report timed out hosts
         for host_name, proc in sorted(host_proc_dict.items()):

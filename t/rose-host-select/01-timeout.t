@@ -30,15 +30,15 @@ TEST_KEY=$TEST_KEY_BASE
 run_fail "$TEST_KEY" rose host-select sleepy1 sleepy2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[WARN] sleepy1: (timed out)
-[WARN] sleepy2: (timed out)
+[WARN] sleepy1: (ssh failed)
+[WARN] sleepy2: (ssh failed)
 [FAIL] No hosts selected.
 __ERR__
 cut -f2- mock-ssh.out | sort >mock-ssh.out.sorted
 # N.B. Tab between 1 and sleepy?
 file_cmp "$TEST_KEY.mock-ssh.out" mock-ssh.out.sorted <<'__OUT__'
-1	sleepy1
-1	sleepy2
+sleepy1	bash
+sleepy2	bash
 __OUT__
 # Make sure there is no lingering processes
 run_fail "$TEST_KEY.ps" ps $(cut -f1 mock-ssh.out)

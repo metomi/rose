@@ -41,7 +41,7 @@
 ## The rsync command.
 #  rsync=rsync -a --exclude=.* --timeout=1800 --rsh='ssh -oBatchMode=yes'
 ## The ssh command.
-#  ssh=ssh -oBatchMode=yes
+#  ssh=ssh -oBatchMode=yes -oConnectTimeout=10
 ## Launch terminal (default=xterm).
 #  terminal=konsole
 [external]
@@ -125,10 +125,6 @@
 ## E.g.:
 #  thresholds{hpc}=fs:/var/tmp:75 fs:/tmp:75
 #  thresholds{linux}=mem:8000
-## Time out (in number of seconds) for SSH connection to hosts
-#  timeout=T
-## E.g.:
-#  timeout=5
 [rose-host-select]
 
 # Configuration related to "rose stem".
