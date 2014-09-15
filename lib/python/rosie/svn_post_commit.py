@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # (C) British Crown Copyright 2012-4 Met Office.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 """A post-commit hook on a Rosie Subversion repository.
 
 Update the Rosie discovery database on changes.
@@ -57,7 +57,7 @@ class RosieWriteDAO(object):
 
     def _get_table(self, key):
         """(Create and) return table of a given key."""
-        if not self.tables.has_key(key):
+        if key not in self.tables:
             self.tables[key] = al.Table(key, self.metadata, autoload=True)
         return self.tables[key]
 
@@ -109,6 +109,7 @@ class RosieSvnPostCommitHook(object):
     ST_DELETED = "D"
     ST_MODIFIED = "M"
     ST_UPDATED = "U"
+    TRUNK = "trunk"
 
     def __init__(self, event_handler=None, popen=None):
         if event_handler is None:
@@ -119,7 +120,7 @@ class RosieSvnPostCommitHook(object):
         self.popen = popen
         path = os.path.dirname(os.path.dirname(sys.modules["rosie"].__file__))
         self.usertools_manager = SchemeHandlersManager(
-                [path], "rosie.usertools", ["get_emails"])
+            [path], "rosie.usertools", ["get_emails"])
 
     def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
@@ -170,7 +171,7 @@ class RosieSvnPostCommitHook(object):
                 path_copies[path_num] = copy_match.groups()[0]
             else:
                 path_num += 1
-        
+
         changes = self._svnlook("changed", "-r", revision, repos)
         suite_statuses = {}
         path_statuses = []
@@ -199,9 +200,9 @@ class RosieSvnPostCommitHook(object):
                 for line in out.splitlines()[1:]:
                     del_branch = line.strip().rstrip("/")
                     path_statuses.append((path_status, path.rstrip("/") +
-                                            "/" + del_branch, None))
-            if (sid == "ROSIE" and branch == "trunk" and
-                path == branch_path + "/" + self.KNOWN_KEYS_FILE):
+                                          "/" + del_branch, None))
+            if (sid == "ROSIE" and branch == self.TRUNK and
+                    path == branch_path + "/" + self.KNOWN_KEYS_FILE):
                 # The known keys in the special R/O/S/I/E/ suite have changed.
                 keys_str = self._svnlook("cat", "-r", revision, repos, path)
                 keys_str = " ".join(shlex.split(keys_str))
@@ -215,13 +216,13 @@ class RosieSvnPostCommitHook(object):
             status_0 = " "
             from_idx = None
             if (path_num in path_copies and
-                self._check_path_is_sid(path_copies[path_num])):
+                    self._check_path_is_sid(path_copies[path_num])):
                 copy_names = path_copies[path_num].split("/")
                 copy_sid = "".join(copy_names[:self.LEN_ID])
                 if copy_sid != sid and branch:
                     # This has been copied from a different suite.
                     from_idx = prefix + "-" + copy_sid
-            
+
             # Figure out our status information.
             if path.rstrip("/") == branch_path:
                 if path_status[0] == self.ST_DELETED:
@@ -229,7 +230,7 @@ class RosieSvnPostCommitHook(object):
                 if path_status[0] == self.ST_ADDED:
                     status_0 = self.ST_ADDED
             if (len(path.rstrip("/")) > len(branch_path) and
-                path != info_file_path and status_0.isspace()):
+                    path != info_file_path and status_0.isspace()):
                 status_0 = self.ST_MODIFIED
             suite_statuses.setdefault((idx, branch, revision),
                                       {0: status_0, 1: " "})
@@ -257,16 +258,17 @@ class RosieSvnPostCommitHook(object):
 
             if (idx, branch, revision) not in configs:
                 new_config = self._get_config_node(
-                                repos, info_file_path, revision)
+                    repos, info_file_path, revision)
                 old_config = self._get_config_node(
-                                repos, info_file_path, str(int(revision) - 1))
+                    repos, info_file_path, str(int(revision) - 1))
                 configs[(idx, branch, revision)] = (new_config, old_config)
 
-                self._notify_access_changes(
-                                    "%s/%s@%s" % (idx, branch, revision),
-                                    suite_info["author"],
-                                    old_config,
-                                    new_config)
+                if branch == self.TRUNK:
+                    self._notify_access_changes(
+                        "%s/%s@%s" % (idx, branch, revision),
+                        suite_info["author"],
+                        old_config,
+                        new_config)
 
             new_config, old_config = configs[(idx, branch, revision)]
 
@@ -336,7 +338,7 @@ class RosieSvnPostCommitHook(object):
             if type(node1) != type(node2):
                 return True
             if (not isinstance(node1.value, dict) and
-                node1.value != node2.value):
+                    node1.value != node2.value):
                 return True
             if node1.comments != node2.comments:
                 return True
@@ -402,10 +404,11 @@ class RosieSvnPostCommitHook(object):
                                     "notications@" + socket.getfqdn())
 
         text = ""
-        for key, status in [("owner", "-"),
-                    ("owner", "+"),
-                    ("access-list", "-"),
-                    ("access-list", "+")]:
+        for key, status in [
+                ("owner", "-"),
+                ("owner", "+"),
+                ("access-list", "-"),
+                ("access-list", "+")]:
             if (key, status) in changes:
                 text += "%s %s=%s\n" % (status, key, changes[(key, status)])
         msg = MIMEText(text)
