@@ -267,7 +267,7 @@ class RosieWSClient(object):
 
         """
         suite_ids = []
-        for suite_id in SuiteId.suite_ids_with_local_copies(user=user):
+        for suite_id in SuiteId.get_checked_out_suite_ids(user=user):
             if suite_id.prefix in self.prefixes:
                 suite_ids.append(suite_id)
         if not suite_ids:

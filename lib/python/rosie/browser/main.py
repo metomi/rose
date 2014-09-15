@@ -361,7 +361,7 @@ class MainWindow(gtk.Window):
             results[-1].insert(0, local_status)
         self.handle_update_treeview(results)
         self.last_search_historical = self.search_history
-        now = time.strftime("%F %H:%M:%S %z", time.localtime())
+        now = time.strftime("%FT%H:%M:%SZ", time.gmtime())
         if not is_local:
             self.statusbar.set_status_text(rosie.browser.STATUS_GOT.format(
                                            len(results), str(now)),

@@ -186,7 +186,7 @@ class SuiteId(object):
         return cls(id_text=cls.FORMAT_IDX % (prefix, state["idx-sid"]))
 
     @classmethod
-    def suite_ids_with_local_copies(cls, prefix=None, user=None):
+    def get_checked_out_suite_ids(cls, prefix=None, user=None):
         """Returns a list of suite IDs with local copies."""
         local_copies = []
         local_copy_root = cls.get_local_copy_root(user)
@@ -251,7 +251,7 @@ class SuiteId(object):
         """Return the default prefix."""
         config = ResourceLocator.default().get_conf()
         value = config.get_value(["rosie-id", "prefix-default"])
-        if not value.strip():
+        if not value or not value.strip():
             raise SuiteIdPrefixError()
         return shlex.split(value)[0]
 

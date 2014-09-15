@@ -100,7 +100,7 @@ class LocalStatusGetter(multiprocessing.Process):
 
     def update(self):
         """Get info and communicate any change."""
-        local_suites = SuiteId.suite_ids_with_local_copies()
+        local_suites = SuiteId.get_checked_out_suite_ids()
         if local_suites == self.local_suites:
             return
         self.local_suites = local_suites
