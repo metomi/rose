@@ -68,7 +68,7 @@ chmod +x repos/foo/hooks/post-commit
 export LANG=C
 $ROSE_HOME/sbin/rosa db-create -q
 
-tests 26
+tests 27
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-new"
 cat >rose-suite.info <<__ROSE_SUITE_INFO
@@ -105,6 +105,12 @@ file_grep "$TEST_KEY-smtpd.log.text" \
     "$TEST_SMTPD_LOG"
 file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
 #-------------------------------------------------------------------------------
+TEST_KEY="${TEST_KEY_BASE}-branch"
+cat '/dev/null' >"${TEST_SMTPD_LOG}"
+svn cp -m 'create a branch' \
+    "${SVN_URL}/a/a/0/0/1/trunk" "${SVN_URL}/a/a/0/0/1/whatever"
+file_cmp "$TEST_KEY-smtpd.log" "$TEST_SMTPD_LOG" </dev/null
+#-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-mod-owner"
 rosie checkout -q foo-aa000
 cat >$PWD/roses/foo-aa000/rose-suite.info <<__ROSE_SUITE_INFO
@@ -122,7 +128,7 @@ file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
 RECIPS=$(sort_recips "'$USER'" "'root'")
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa000/trunk@3\\] owner/access-list change" \
+    "^Data: '.*Subject: \\[foo-aa000/trunk@4\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
     "^Data: '.*- owner=$USER.*+ owner=root'$" \
@@ -146,7 +152,7 @@ file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
 RECIPS=$(sort_recips "'$USER'" "'root'")
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa001/trunk@4\\] owner/access-list change" \
+    "^Data: '.*Subject: \\[foo-aa001/trunk@5\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
     "^Data: '.*- access-list=root.*+ access-list=\\*'$" \
@@ -170,7 +176,7 @@ file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
 RECIPS=$(sort_recips "'bin'" "'$USER'" "'root'")
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa001/trunk@5\\] owner/access-list change" \
+    "^Data: '.*Subject: \\[foo-aa001/trunk@6\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
     "^Data: '.*- access-list=\\*.*+ access-list=root bin'$" \
@@ -185,7 +191,7 @@ file_grep "$TEST_KEY-smtpd.log.sender" "^sender: notifications@nowhere.org" \
 RECIPS=$(sort_recips "'bin'" "'$USER'" "'root'")
 file_grep "$TEST_KEY-smtpd.log.recips" "^recips: \[$RECIPS\]" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
-    "^Data: '.*Subject: \\[foo-aa001/trunk@6\\] owner/access-list change" \
+    "^Data: '.*Subject: \\[foo-aa001/trunk@7\\] owner/access-list change" \
     "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
     "^Data: '.*- owner=$USER.*- access-list=root bin'$" \
