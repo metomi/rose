@@ -392,6 +392,8 @@ class DAO(object):
                     if column.key not in ["name", "value"]:
                         results[-1].update({column.key: value})
             name = row[col_keys.index("name")]
+            if name is None:
+                continue
             value = row[col_keys.index("value")]
             if name.endswith("-list") and value is not None:
                 value = value.split()
