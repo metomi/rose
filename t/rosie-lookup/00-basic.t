@@ -120,6 +120,16 @@ rosie create -q -y --info-file=rose-suite.info || exit 1
 echo "2009-02-13T23:31:34.000000Z" >foo-date-5.txt
 svnadmin setrevprop $PWD/repos/foo -r 5 svn:date foo-date-5.txt
 
+# Setup repository - create another suite.
+cat >rose-suite.info <<'__ROSE_SUITE_INFO'
+owner=bill
+project=sonnet 54
+title=The rose looks fair...
+__ROSE_SUITE_INFO
+rosie create -q -y --info-file=rose-suite.info || exit 1
+echo "2009-02-13T23:31:35.000000Z" >foo-date-6.txt
+svnadmin setrevprop $PWD/repos/foo -r 6 svn:date foo-date-6.txt
+
 # Setup db.
 $ROSE_HOME/sbin/rosa db-create -q
 
@@ -185,6 +195,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
+=     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
 url: http://$HOSTNAME:$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -198,6 +209,7 @@ local suite             owner  project   title
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
+=     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
 url: http://$HOSTNAME:$PORT/foo/search?all_revs=1&s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -233,6 +245,7 @@ run_pass "$TEST_KEY" rosie lookup -Q revision gt 3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
+=     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
 url: http://$HOSTNAME:$PORT/foo/query?q=and+revision+gt+3
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -246,6 +259,7 @@ local suite             owner  project   title
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
+=     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
 url: http://$HOSTNAME:$PORT/foo/query?q=and+title+contains+a&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -267,6 +281,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
+=     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
 url: http://$HOSTNAME:$PORT/foo/query?q=and+revision+gt+3&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -311,6 +326,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite
 foo-aa001/trunk@3
 foo-aa002/trunk@5
+foo-aa003/trunk@6
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -320,6 +336,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             with status
 foo-aa001/trunk@3 with  M
 foo-aa002/trunk@5 with A
+foo-aa003/trunk@6 with A
 url: http://$HOSTNAME:$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -331,6 +348,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             local description       access-list
 foo-aa001/trunk@3 =     %description      [u'roses', u'violets']
 foo-aa002/trunk@5 =     Nom nom nom roses [u'allthebugs']
+foo-aa003/trunk@6 =     %description      %access-list
 url: http://$HOSTNAME:$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -345,6 +363,7 @@ foo-aa001/trunk@2 >     Violets are Blue...       [u'*']
 foo-aa001/trunk@3 =     %description              [u'roses', u'violets']
 foo-aa000/trunk@4       Bad corn ear and pew pull [u'*']
 foo-aa002/trunk@5 =     Nom nom nom roses         [u'allthebugs']
+foo-aa003/trunk@6 =     %description              %access-list
 url: http://$HOSTNAME:$PORT/foo/search?all_revs=1&s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -355,6 +374,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             by owner  at date
 foo-aa001/trunk@3 by roses  at 2009-02-13T23:31:32Z
 foo-aa002/trunk@5 by aphids at 2009-02-13T23:31:34Z
+foo-aa003/trunk@6 by bill   at 2009-02-13T23:31:35Z
 url: http://$HOSTNAME:$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -365,6 +385,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             by owner  at date
 foo-aa001/trunk@3 by roses  at 2009-02-13T23:31:32Z
 foo-aa002/trunk@5 by aphids at 2009-02-13T23:31:34Z
+foo-aa003/trunk@6 by bill   at 2009-02-13T23:31:35Z
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
