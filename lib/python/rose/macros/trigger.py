@@ -258,18 +258,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
 
     def validate(self, config, meta_config=None):
         self.reports = []
-        if (not isinstance(meta_config, rose.config.ConfigNode) and
-                meta_config is not None):
-            conf = rose.resource.ResourceLocator.default().get_conf()
-            meta_path_list = []
-            meta_path_str = conf.get_value(["meta-path"])
-            if meta_path_str:
-                meta_path_list = meta_path_str.split(":")
-            meta_config = rose.config_tree.ConfigTreeLoader().load(
-                os.path.dirname(meta_config),
-                os.path.basename(meta_config),
-                meta_path_list).node
-        elif meta_config is None:
+        if meta_config is None:
             meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
@@ -304,18 +293,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
     def validate_dependencies(self, config, meta_config):
         """Validate the trigger setup - e.g. check for cyclic dependencies."""
         self.reports = []
-        if (not isinstance(meta_config, rose.config.ConfigNode) and
-            meta_config is not None):
-            conf = rose.resource.ResourceLocator.default().get_conf()
-            meta_path_list = []
-            meta_path_str = conf.get_value(["meta-path"])
-            if meta_path_str:
-                meta_path_list = meta_path_str.split(":")
-            meta_config = rose.config_tree.ConfigTreeLoader().load(
-                os.path.dirname(meta_config),
-                os.path.basename(meta_config),
-                meta_path_list).node
-        elif meta_config is None:
+        if meta_config is None:
             meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)

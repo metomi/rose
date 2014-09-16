@@ -81,7 +81,7 @@ class ConfigTreeLoader(object):
         self.node_loader = ConfigLoader(*args, **kwargs)
 
     def load(self, conf_dir, conf_name, conf_dir_paths=None, opt_keys=None,
-             no_ignore=False):
+             conf_node=None, no_ignore=False):
         """Load a (runtime) configuration directory with inheritance.
 
         Return a ConfigTree object that represents the result.
@@ -92,6 +92,9 @@ class ConfigTreeLoader(object):
         conf_dir_paths -- A list of directories to locate relative paths to
                           configurations.
         opt_keys -- Optional configuration keys.
+        conf_node -- A rose.config.ConfigNode to extend, or None to use a
+                     fresh one.
+        no_ignore -- If True, skip loading ignored config settings.
 
         """
 
@@ -117,7 +120,10 @@ class ConfigTreeLoader(object):
             if bad_keys:
                 raise BadOptionalConfigurationKeysError(bad_keys)
 
-        conf_tree.node = ConfigNode()
+        if conf_node is None:
+            conf_tree.node = ConfigNode()
+        else:
+            conf_tree.node = conf_node
         for t_conf_dir in conf_tree.conf_dirs:
             node = nodes[t_conf_dir]
             for keys, sub_node in node.walk(no_ignore=no_ignore):

@@ -282,16 +282,10 @@ class BaseStashSummaryDataPanelv1(
         """
         if self.STASHMASTER_META_PATH is None:
             return {}
-        conf = rose.resource.ResourceLocator.default().get_conf()
-        meta_path_list = []
-        meta_path_str = conf.get_value(["meta-path"])
-        if meta_path_str:
-            meta_path_list = meta_path_str.split(":")
         try:
             config = rose.config_tree.ConfigTreeLoader().load(
                 self.STASHMASTER_META_PATH,
-                self.STASHMASTER_META_FILENAME,
-                meta_path_list).node
+                self.STASHMASTER_META_FILENAME).node
         except (rose.config.ConfigSyntaxError, IOError, OSError) as e:
             rose.reporter.Reporter()(
                 "Error loading STASHmaster metadata resource: " +

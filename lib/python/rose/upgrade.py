@@ -37,6 +37,7 @@ ERROR_UPGRADE_VERSION = "{0}: invalid version."
 INFO_DOWNGRADED = "Downgraded from {0} to {1}"
 INFO_UPGRADED = "Upgraded from {0} to {1}"
 MACRO_UPGRADE_MODULE = "versions"
+MACRO_UPGRADE_MODULE_PATH = MACRO_UPGRADE_MODULE + ".py"
 MACRO_UPGRADE_RESOURCE_DIR = "etc"
 MACRO_UPGRADE_RESOURCE_FILE_ADD = "rose-macro-add.conf"
 MACRO_UPGRADE_RESOURCE_FILE_REMOVE = "rose-macro-remove.conf"
@@ -472,6 +473,30 @@ class MacroUpgradeManager(object):
             else:
                 # No more macros found.
                 break
+
+
+def get_meta_upgrade_module(meta_key):
+    """Import and return the versions.py module for a given meta_key.
+
+    The meta_key should not contain a version, just the category.
+    For example, it should be 'my-command' rather than
+    'my-command/vn9.1'.
+
+    """
+    config = rose.config.ConfigNode()
+    config.set([rose.CONFIG_SECT_TOP, rose.CONFIG_OPT_META_TYPE],
+               meta_key)
+    meta_path, warning = rose.macro.load_meta_path(config, is_upgrade=True)
+    if meta_path is None:
+        return None
+    meta_path = os.path.abspath(meta_path)
+    print meta_path
+    if not os.path.isfile(os.path.join(meta_path, MACRO_UPGRADE_MODULE_PATH)):
+        return None
+    sys.path.insert(0, os.path.abspath(meta_path))
+    version_module = __import__(MACRO_UPGRADE_MODULE)
+    sys.path.pop(0)
+    return version_module
 
 
 def main():

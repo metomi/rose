@@ -32,7 +32,6 @@ class DuplicateChecker(rose.macro.MacroBase):
 
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
-        meta_config = self._load_meta_config(config, meta_config)
         self.reports = []
         sect_error_no_dupl = {}
         sect_keys = config.value.keys()

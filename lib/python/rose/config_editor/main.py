@@ -1442,14 +1442,16 @@ class MainController(object):
             del config_data.macros
             meta_config = config_data.meta
             if metadata_off:
-                meta_config = self.data.load_meta_config(
+                meta_config_tree = self.data.load_meta_config_tree(
                     config_type=config_data.config_type)
-                meta_files = []
+                meta_config = meta_config_tree.node
+                meta_files = self.data.load_meta_files(meta_config_tree)
                 macros = []
             else:
-                meta_config = self.data.load_meta_config(config, directory,
-                    config_type=config_data.config_type)
-                meta_files = self.data.load_meta_files(config, directory)
+                meta_config_tree = self.data.load_meta_config_tree(
+                    config, directory, config_type=config_data.config_type)
+                meta_config = meta_config_tree.node
+                meta_files = self.data.load_meta_files(meta_config_tree)
                 macro_module_prefix = (
                     self.data.helper.get_macro_module_prefix(config_name))
                 macros = rose.macro.load_meta_macro_modules(

@@ -327,21 +327,19 @@ def _import_err_handler(exception):
 def main():
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "property")
+    rose.macro.add_site_meta_paths()
+    rose.macro.add_env_meta_paths()
     opts, args = opt_parser.parse_args()
     reporter = rose.reporter.Reporter(opts.verbosity - opts.quietness)
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
-    conf = rose.resource.ResourceLocator.default().get_conf()
-    meta_path_list = []
-    meta_path_str = conf.get_value(["meta-path"])
-    if meta_path_str:
-        meta_path_list = meta_path_str.split(":")
     try:
         meta_config = rose.config_tree.ConfigTreeLoader().load(
             opts.conf_dir,
             rose.META_CONFIG_NAME,
-            meta_path_list).node
+            list(sys.path)
+        ).node
     except IOError:
         sys.exit(ERROR_LOAD_META_CONFIG_DIR.format(opts.conf_dir))
     sections = None
