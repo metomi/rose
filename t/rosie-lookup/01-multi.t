@@ -108,7 +108,7 @@ if ! port_is_busy "${PORT}"; then
     exit 1
 fi
 
-set +x
+set +e
 
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-search-both"
