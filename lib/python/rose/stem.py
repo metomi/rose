@@ -221,6 +221,8 @@ class StemRunner(object):
                 if kpresult:
                     project = kpresult.group(1)
                     break
+        # Remove anything after a point
+        project = re.sub(r'\..*', r'', project)
         return project
 
     def _ascertain_project(self, item):
