@@ -134,7 +134,7 @@
       <li>Declarations are case sensitive. When dealing with case-insensitive
       inputs such as Fortran logicals or numbers in scientific notation,
       lowercase values should be used.</li>
-      
+
       <li>When writing namelist inputs, keys should be lowercase.</li>
 
       <li>Declarations start at column 1. Continuations start at column &gt;1.
@@ -249,8 +249,8 @@ opts=ketchup mayonnaise
     <var>rose-app-mayonnaise.conf</var>, which may override the previous
     one.</p>
 
-    <p>By default, a Rose command will fail if an optional configuration file is
-    missing. However, if you put the optional configuration key in brackets,
+    <p>By default, a Rose command will fail if an optional configuration file
+    is missing. However, if you put the optional configuration key in brackets,
     then the optional configuration file is allowed to be missing. E.g.:</p>
     <pre class="prettyprint lang-rose_conf">
 opts=ketchup (mayonnaise)
@@ -264,14 +264,24 @@ opts=ketchup (mayonnaise)
     "rose-command.html#rose-task-run">rose task-run</a>, <a href=
     "rose-command.html#rose-app-run">rose app-run</a>, etc) allows optional
     configuration to be selected at run time using:</p>
-    
+
     <ol>
       <li>Environment variables. (See reference of individual commands for
       detail.)</li>
 
-      <li>The command line option <code>--opt-conf-key=KEY</code> or
-      <code>-O KEY</code>.</li>
+      <li>The command line option <code>--opt-conf-key=KEY</code> or <code>-O
+      KEY</code>.</li>
     </ol>
+
+    <h2 id="import">Import Configuration</h2>
+
+    <p>A root level <var>import=PATH1 PATH2...</var> setting in the main
+    configuration will tell Rose utilities to search for configurations at
+    <samp>PATH1</samp>, <samp>PATH2</samp> (and so on) and inherit
+    configuration and files from them if found.</p>
+
+    <p>At the moment, use of this is only encouraged for configuration
+    metadata.</p>
 
     <h2 id="defines">Re-define Configuration at Run Time</h2>
 
@@ -284,7 +294,6 @@ opts=ketchup (mayonnaise)
     [SECTION]NAME=VALUE</code> options on the command line. This would add new
     settings or override any settings defined in the main and optional
     configurations. E.g.:</p>
-
     <pre class="shell">
 # Set [env]FOO=foo, and [env]BAR=bar
 # (Overriding any original settings of [env]FOO or [env]BAR)
@@ -432,19 +441,21 @@ accel-find-next=F3
 
       <dt><code>root-dir=LIST</code></dt>
 
-      <dd>A new line delimited list of <var>PATTERN=DIR</var> pairs. The
-      <var>PATTERN</var> should be a glob-like pattern for matching a host
-      name. The <var>DIR</var> should be the root directory to install a suite
-      run directory. E.g.:
+      <dd>
+        A new line delimited list of <var>PATTERN=DIR</var> pairs. The
+        <var>PATTERN</var> should be a glob-like pattern for matching a host
+        name. The <var>DIR</var> should be the root directory to install a
+        suite run directory. E.g.:
         <pre class="prettyprint lang-rose_conf">
 root-dir=hpc*=$WORKDIR
         =*=$DATADIR
 </pre>
+
         <p>In this example, <code>rose suite-run</code> of a suite with name
         <var>$NAME</var> will create <var>~/cylc-run/$NAME</var> as a symbolic
-        link to <var>$DATADIR/cylc-run/$NAME/</var> on any machine, except those
-        with their hostnames matching <var>hpc*</var>. In which case, it will
-        create <var>~/cylc-run/$NAME</var> as a symbolic link to
+        link to <var>$DATADIR/cylc-run/$NAME/</var> on any machine, except
+        those with their hostnames matching <var>hpc*</var>. In which case, it
+        will create <var>~/cylc-run/$NAME</var> as a symbolic link to
         <var>$WORKDIR/cylc-run/$NAME/</var>.</p>
       </dd>
 
@@ -744,15 +755,16 @@ delays=0,6*10s,60*1m,1h
     <dl>
       <dt><code>source</code></dt>
 
-      <dd>A space delimited list of sources for generating this file. A source
-      can be the path to a regular file or directory in the file system
-      (globbing is also supported - e.g. using "*.conf" to mean all .conf
-      files), or it may be a URI to a resource. If a source is a URI, it may
-      point to a section with a supported scheme in the current configuration,
-      e.g. a <samp>namelist:NAME</samp> section. Otherwise the URI must be in a
-      supported scheme or be given sufficient information for the system to
-      determine its scheme, e.g. via the root level <code>schemes</code> setting
-      described below.
+      <dd>
+        A space delimited list of sources for generating this file. A source
+        can be the path to a regular file or directory in the file system
+        (globbing is also supported - e.g. using "*.conf" to mean all .conf
+        files), or it may be a URI to a resource. If a source is a URI, it may
+        point to a section with a supported scheme in the current
+        configuration, e.g. a <samp>namelist:NAME</samp> section. Otherwise the
+        URI must be in a supported scheme or be given sufficient information
+        for the system to determine its scheme, e.g. via the root level
+        <code>schemes</code> setting described below.
 
         <p>Normally, a source that does not exist would trigger an error in run
         time. However, it may be useful to have an optional source for a file
@@ -807,10 +819,10 @@ delays=0,6*10s,60*1m,1h
     <p>The root level <code>schemes</code> setting: While the system would
     attempt to automatically detect the scheme of a source, the name of the
     source can sometimes be ambiguous. E.g. A URL with a <samp>http</samp>
-    scheme can be a path in a version control system, or a path to a plain file.
-    The root level <code>schemes</code> setting can be used to help the system
-    to do the right thing. The general syntax of the value of the root level
-    <code>schemes</code> setting looks like:</p>
+    scheme can be a path in a version control system, or a path to a plain
+    file. The root level <code>schemes</code> setting can be used to help the
+    system to do the right thing. The general syntax of the value of the root
+    level <code>schemes</code> setting looks like:</p>
     <pre class="prettyprint lang-rose_conf">
 schemes=PATTERN-1=SCHEME-1
        =PATTERN-2=SCHEME-2
