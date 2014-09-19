@@ -30,6 +30,7 @@ init <<'__CONFIG__'
 meta=baked-alaska/vn1.0
 
 [env]
+ICECREAM_FLAVOUR=vanilla
 ICECREAM_TEMPERATURE=-1
 MERINGUE_NICENESS=0
 SPONGE_DENSITY=0.1
@@ -44,6 +45,9 @@ import=rose-demo-baked-alaska-icecream/vn1.0 rose-demo-baked-alaska-sponge/vn1.0
 title=Meringue Niceness (version 1)
 range=-20:20
 type=integer
+
+[env=ICECREAM_FLAVOUR]
+values=vanilla
 __META_CONFIG__
 
 # Set up imported metadata (1)
@@ -53,6 +57,10 @@ init_rose_meta_content baked-alaska-icecream vn1.0 <<'__META_CONFIG__'
 range=-20:0
 title=Icecream Temperature (celsius) (version 1)
 type=integer
+
+[env=ICECREAM_FLAVOUR]
+title=Icecream Flavour
+values=chocolate,vanilla,strawberry
 __META_CONFIG__
 
 # Set up imported metadata (2)
@@ -76,6 +84,7 @@ init <<'__CONFIG__'
 meta=baked-alaska/vn1.0
 
 [env]
+ICECREAM_FLAVOUR=chocolate
 ICECREAM_TEMPERATURE=1
 MERINGUE_NICENESS=50
 SPONGE_DENSITY=20.0
@@ -83,7 +92,9 @@ __CONFIG__
 run_fail "$TEST_KEY" rose macro -M $TEST_DIR/rose-meta --config=../config rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_xxdiff "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-[V] rose.macros.DefaultValidators: issues: 3
+[V] rose.macros.DefaultValidators: issues: 4
+    env=ICECREAM_FLAVOUR=chocolate
+        Value chocolate should be vanilla
     env=ICECREAM_TEMPERATURE=1
         Value 1 is not in the range criteria: -20:0
     env=MERINGUE_NICENESS=50
