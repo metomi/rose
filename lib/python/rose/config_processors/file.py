@@ -257,7 +257,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         jobs = {}
         for name, target in sorted(targets.items()):
             if not target.is_out_of_date:
-                self.handle_event(Event(target, level=Event.V))
+                self.handle_event(FileUnchangedEvent(target, level=Event.V))
                 continue
             if target.mode == target.MODE_SYMLINK:
                 self.manager.fs_util.symlink(target.real_name, target.name)
@@ -431,6 +431,12 @@ class FileOverwriteError(Exception):
     def __str__(self):
         return ("%s: file already exists (and in no-overwrite mode)" %
                 self.args[0])
+
+
+class FileUnchangedEvent(Event):
+    """Report an unchanged file."""
+    def __str__(self):
+        return str(self.args[0])
 
 
 class Loc(object):
