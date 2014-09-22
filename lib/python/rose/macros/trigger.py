@@ -19,10 +19,13 @@
 #-----------------------------------------------------------------------------
 
 import copy
+import os
 
 import rose.config
+import rose.config_tree
 import rose.macro
 import rose.macros.rule
+import rose.resource
 
 
 class TriggerMacro(rose.macro.MacroBaseRoseEdit):
@@ -255,13 +258,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
 
     def validate(self, config, meta_config=None):
         self.reports = []
-        if (not isinstance(meta_config, rose.config.ConfigNode) and
-            meta_config is not None):
-            meta_config_source = meta_config
-            meta_config = rose.config.ConfigNode()
-            rose.config.ConfigLoader().load_with_opts(meta_config_source,
-                                                      meta_config)
-        elif meta_config is None:
+        if meta_config is None:
             meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
@@ -296,11 +293,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
     def validate_dependencies(self, config, meta_config):
         """Validate the trigger setup - e.g. check for cyclic dependencies."""
         self.reports = []
-        if (not isinstance(meta_config, rose.config.ConfigNode) and
-            meta_config is not None):
-            meta_config = rose.config.ConfigLoader().load_with_opts(
-                    meta_config)
-        elif meta_config is None:
+        if meta_config is None:
             meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)

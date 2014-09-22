@@ -39,6 +39,7 @@ import tempfile
 
 import rose.config
 import rose.config_editor.data_helper
+import rose.config_tree
 import rose.gtk.dialog
 import rose.macro
 import rose.metadata_check
@@ -334,20 +335,21 @@ class ConfigDataManager(object):
 
 
         if config_directory != self.top_level_directory and preview:
-            meta_config = rose.config.ConfigNode()
-            meta_files = []
+            meta_config_tree = rose.config_tree.ConfigTree()
         elif metadata_off:
-            meta_config = self.load_meta_config(config_type=config_type)
-            meta_files = []
+            meta_config_tree = self.load_meta_config_tree(
+                config_type=config_type)
         else:
-            meta_config = self.load_meta_config(config, config_directory,
-                                                config_type=config_type)
-            meta_files = self.load_meta_files(config, config_directory)
-
+            meta_config_tree = self.load_meta_config_tree(
+                config, config_directory,
+                config_type=config_type
+            )
+        meta_config = meta_config_tree.node
         opt_conf_lookup = self.load_optional_configs(config_directory)
 
 
         macro_module_prefix = self.helper.get_macro_module_prefix(name)
+        meta_files = self.load_meta_files(meta_config_tree)
         macros = rose.macro.load_meta_macro_modules(
                       meta_files, module_prefix=macro_module_prefix)
         meta_id = self.helper.get_config_meta_flag(
@@ -814,33 +816,22 @@ class ConfigDataManager(object):
         if config_name in self._config_section_namespace_lookup:
             self._config_section_namespace_lookup.pop(config_name)
 
-    def load_meta_config(self, config=None, directory=None, config_type=None):
+    def load_meta_config_tree(self, config=None, directory=None,
+                              config_type=None):
         """Load the main metadata, and any specified in 'config'."""
         if config is None:
             config = rose.config.ConfigNode()
         error_handler = rose.config_editor.util.launch_error_dialog
-        return rose.macro.load_meta_config(config, directory,
-                                           config_type=config_type,
-                                           error_handler=error_handler)
+        return rose.macro.load_meta_config_tree(config, directory,
+                                                config_type=config_type,
+                                                error_handler=error_handler)
 
-    def load_meta_files(self, config=None, directory=None):
+    def load_meta_files(self, config_tree):
         """Load the file paths of files within the metadata directory."""
-        if config is None:
-            config = rose.config.ConfigNode()
-        meta_filepaths = []
-        meta_path, warning = self.load_meta_path(config, directory)
-        if meta_path is None:
-            return []
-        try:
-            file_tuples = os.walk(meta_path)
-        except OSError:
-            return []
-        for dirpath, dirnames, filenames in file_tuples:
-            if '/.' in dirpath:
-                continue
-            for fname in filenames:
-                meta_filepaths.append(os.path.join(dirpath, fname))
-        return meta_filepaths
+        meta_files = []
+        for rel_path, conf_dir in config_tree.files.items():
+            meta_files.append(os.path.join(conf_dir, rel_path))
+        return meta_files
 
     def filter_meta_config(self, config_name):
         """Filter out invalid metadata."""

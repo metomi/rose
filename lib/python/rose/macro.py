@@ -34,6 +34,7 @@ import sys
 import traceback
 
 import rose.config
+import rose.config_tree
 import rose.formats.namelist
 from rose.opt_parse import RoseOptionParser
 import rose.reporter
@@ -472,12 +473,11 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
     return None, warning
 
 
-def load_meta_config(config, directory=None, config_type=None,
-                     error_handler=None, ignore_meta_error=False):
-    """Return the metadata config for a configuration."""
+def load_meta_config_tree(config, directory=None, config_type=None,
+                          error_handler=None, ignore_meta_error=False):
+    """Return the metadata config tree for a configuration."""
     if error_handler is None:
         error_handler = _report_error
-    meta_config = rose.config.ConfigNode()
     meta_list = ["rose-all/" + rose.META_CONFIG_NAME]
     if config_type is not None:
         default_meta_dir = config_type.replace(".", "-")
@@ -485,27 +485,55 @@ def load_meta_config(config, directory=None, config_type=None,
     config_meta_path, warning = load_meta_path(config, directory)
     if warning is not None and not ignore_meta_error:
         error_handler(text=warning)
-    if config_meta_path is not None:
-        path = os.path.join(config_meta_path, rose.META_CONFIG_NAME)
-        if path not in meta_list:
-            meta_list.append(path)
     locator = rose.resource.ResourceLocator(paths=sys.path)
     opt_node = config.get([rose.CONFIG_SECT_TOP,
                            rose.CONFIG_OPT_META_TYPE], no_ignore=True)
     ignore_meta_error = ignore_meta_error or opt_node is None
-    config_loader = rose.config.ConfigLoader()
+    meta_config_tree = None
+    meta_config = rose.config.ConfigNode()
     for meta_key in meta_list:
         try:
             meta_path = locator.locate(meta_key)
-        except rose.resource.ResourceError as e:
+        except rose.resource.ResourceError:
             if not ignore_meta_error:
                 error_handler(text=ERROR_LOAD_META_PATH.format(meta_key))
+            continue
+        try:
+            meta_config_tree = rose.config_tree.ConfigTreeLoader().load(
+                os.path.dirname(meta_path),
+                rose.META_CONFIG_NAME,
+                conf_dir_paths=list(sys.path),
+                conf_node=meta_config
+            )
+        except rose.config.ConfigSyntaxError as exc:
+            error_handler(text=str(exc))
         else:
-            try:
-                config_loader.load_with_opts(meta_path, meta_config)
-            except rose.config.ConfigSyntaxError as e:
-                error_handler(text=str(e))
-    return meta_config
+            meta_config = meta_config_tree.node
+    if config_meta_path is None:
+        return meta_config_tree
+    # Try and get a proper non-default meta config tree.
+    try:
+        meta_config_tree = rose.config_tree.ConfigTreeLoader().load(
+            config_meta_path,
+            rose.META_CONFIG_NAME,
+            conf_dir_paths=list(sys.path),
+            conf_node=meta_config
+        )
+    except rose.resource.ResourceError:
+        if not ignore_meta_error:
+            error_handler(text=ERROR_LOAD_META_PATH.format(meta_key))
+    except rose.config.ConfigSyntaxError as exc:
+        error_handler(text=str(exc))
+    return meta_config_tree
+
+
+def load_meta_config(config, directory=None, config_type=None,
+                     error_handler=None, ignore_meta_error=False):
+    """Return the metadata config for a configuration."""
+    config_tree = load_meta_config_tree(
+        config, directory=directory, config_type=config_type,
+        error_handler=error_handler, ignore_meta_error=ignore_meta_error)
+    return config_tree.node
 
 
 def load_meta_macro_modules(meta_files, module_prefix=None):
@@ -558,15 +586,12 @@ def get_macros_for_config(app_config=None,
     """Driver function to return macro names for a config object."""
     if app_config is None:
         app_config = rose.config.ConfigNode()
-    meta_path, warning = load_meta_path(app_config, config_directory)
-    if meta_path is None:
-        sys.exit(ERROR_LOAD_METADATA.format(""))
-    meta_filepaths = []
-    for dirpath, dirnames, filenames in os.walk(meta_path):
-        if "/.svn" in dirpath:
-            continue
-        for fname in filenames:
-            meta_filepaths.append(os.path.join(dirpath, fname))
+    meta_config_tree = load_meta_config_tree(
+        app_config, directory=config_directory)
+    if meta_config_tree is None:
+        return []
+    meta_filepaths = [
+        os.path.join(v, k) for k, v in meta_config_tree.files.items()]
     modules = load_meta_macro_modules(meta_filepaths)
     if include_system:
         import rose.macros  # Done to avoid cyclic top-level imports.

@@ -121,8 +121,57 @@
     namespace set in the metadata is <code>ns=NAME</code>, e.g.
     <samp>ns=env/MyFavouriteEnvironmentVars</samp>.</p>
 
-    <p>The metadata for a configuration fall into 4 categories: sorting,
-    values, behaviour and help. They are be described separated below:</p>
+    <h3 id="meta.conf.import">Metadata Inheritance (Import)</h3>
+
+    <p>A root level <var>import=MY_COMMAND1/VERSION1 MY_COMMAND2/VERSION2
+    ...</var> setting in the <samp>rose-meta.conf</samp> file will tell Rose
+    metadata utilities to locate the meta keys
+    <samp>MY_COMMAND1/VERSION1</samp>, <samp>MY_COMMAND2/VERSION2</samp> (and
+    so on) and inherit their configuration and files if found.</p>
+
+    <p>For example, you might have a <samp>rose-meta</samp> directory that
+    contains the following files and directories:</p>
+    <pre>
+cheese_sandwich/
+    vn1.5/
+        rose-meta.conf
+    vn2.0/
+        rose-meta.conf
+cheese/
+    vn1.0/
+        rose-meta.conf
+</pre>
+
+    <p>and write an app referencing this <samp>rose-meta</samp> directory that
+    looks like this:</p>
+    <pre class="prettyprint lang-rose_conf">
+meta=cheese_sandwich/vn2.0
+
+[env]
+CHEESE=camembert
+SANDWICH_BREAD=brown
+</pre>
+
+    <p>This will reference the metadata at
+    <samp>rose-meta/cheese_sandwich/vn2.0</samp>.</p>
+
+    <p>Now, we can write the <samp>rose-meta.conf</samp> file using an
+    import:</p>
+    <pre class="prettyprint lang-rose_conf">
+import=cheese/vn1.0
+
+[env=SANDWICH_BREAD]
+values=white,brown,seeded
+</pre>
+
+    <p>which will inherit metadata from metadata from
+    <samp>rose-meta/cheese/vn1.0/rose-meta.conf</samp>.</p>
+
+    <h3 id="meta.conf.categories">Metadata Options</h3>
+
+    <p>The metadata options for a configuration fall into 4 categories:
+    sorting, values, behaviour and help. They are be described separated
+    below:</p>
 
     <h3 id="meta.conf.sorting">Metadata for Sorting</h3>
 

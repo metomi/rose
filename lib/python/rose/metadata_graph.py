@@ -267,7 +267,8 @@ def main():
     meta_config_file_path = os.path.join(opts.conf_dir, rose.META_CONFIG_NAME)
     config_tree_loader = rose.config_tree.ConfigTreeLoader()
     if os.path.exists(config_file_path):
-        config = config_tree_loader(opts.conf_dir, rose.SUB_CONFIG_NAME).node
+        config = config_tree_loader(opts.conf_dir, rose.SUB_CONFIG_NAME,
+                                    conf_dir_paths=sys.path).node
         meta_path, warning = rose.macro.load_meta_path(
             config, opts.conf_dir)
         if meta_path is None:

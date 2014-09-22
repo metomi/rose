@@ -25,11 +25,13 @@ import os
 import sys
 
 import rose.config
+import rose.config_tree
 import rose.formats.namelist
 import rose.macro
 import rose.macros.value
 import rose.meta_type
 import rose.opt_parse
+import rose.resource
 
 
 def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
@@ -124,7 +126,8 @@ def main():
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("auto_type", "conf_dir", "output_dir")
     opts, args = opt_parser.parse_args()
-
+    rose.macro.add_site_meta_paths()
+    rose.macro.add_env_meta_paths()
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
@@ -142,18 +145,19 @@ def main():
     else:
         sys.exit(opt_parser.get_usage())
     source_config = rose.config.load(path)
-    meta_path = os.path.join(opts.conf_dir,
-                             rose.CONFIG_META_DIR,
-                             rose.META_CONFIG_NAME)
+    meta_dir = os.path.join(opts.conf_dir, rose.CONFIG_META_DIR)
     metadata_config = rose.config.ConfigNode()
-    if os.path.isfile(meta_path):
-        rose.config.ConfigLoader().load_with_opts(meta_path, metadata_config)
+    try:
+        metadata_config = rose.config_tree.ConfigTreeLoader().load(
+            meta_dir, rose.META_CONFIG_NAME, list(sys.path)).node
+    except IOError:
+        pass
     metadata_config = metadata_gen(source_config,
                                    metadata_config,
                                    auto_type=opts.type,
                                    prop_map=prop_val_map)
     if opts.output_dir is None:
-        dest = os.path.dirname(meta_path)
+        dest = meta_dir
     else:
         dest = opts.output_dir
     if not os.path.isdir(dest):
