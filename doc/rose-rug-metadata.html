@@ -118,7 +118,8 @@ meta=rose-demo-upgrade/27.1
     <div class="slide">
       <h3 id="metadata-decentral">Specifying Other Locations</h3>
 
-      <p>You can store metadata in other locations and override where the <samp>meta</samp> flag points to, using:</p>
+      <p>You can store metadata in other locations and override where the
+      <samp>meta</samp> flag points to, using:</p>
 
       <ul class="incremental">
         <li>The <code>--meta-path=PATH</code> option of relevant commands.</li>
@@ -130,9 +131,23 @@ meta=rose-demo-upgrade/27.1
       </ul>
 
       <p>Alternatively, you can store metadata in a <samp>meta/</samp>
-      subdirectory in a suite or an application, which will override the
-      others (e.g. as in the <a href="rose-rug-metadata-tutorial">Metadata
+      subdirectory in a suite or an application, which will override the others
+      (e.g. as in the <a href="rose-rug-metadata-tutorial">Metadata
       Tutorial</a>).</p>
+    </div>
+
+    <div class="slide">
+      <h3 class="alwayshidden">Metadata Import</h3>
+
+      <p>Metadata can also inherit from other metadata, using a top-level
+      <samp>import</samp> option. For example, if you had a
+      <samp>rose-meta.conf</samp> file that began like this:</p>
+      <pre class="prettyprint lang-rose_conf">
+import=salt-and-vinegar/vn2.0 cheese-and-onion/vn3.0
+</pre>
+
+      <p>then the metadata would include content from those two meta
+      locations.</p>
     </div>
 
     <div class="slide">
@@ -245,11 +260,11 @@ warn-if=this &gt;= namelist:run_snow=max_ok_ice_fraction or this &lt; 0.2
         <dt><code>compulsory</code></dt>
 
         <dd>The most controversial metadata option! Setting it to
-        <code>true</code> for a section means that the section should always
-        be in the configuration, ignored or not. Setting it to
-        <code>true</code> for an option in a section means that the option
-        is required to be in the configuration, ignored or not, if and only
-        if its section is in the configuration.</dd>
+        <code>true</code> for a section means that the section should always be
+        in the configuration, ignored or not. Setting it to <code>true</code>
+        for an option in a section means that the option is required to be in
+        the configuration, ignored or not, if and only if its section is in the
+        configuration.</dd>
       </dl>
     </div>
 
