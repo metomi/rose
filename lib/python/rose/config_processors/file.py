@@ -257,6 +257,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         jobs = {}
         for name, target in sorted(targets.items()):
             if not target.is_out_of_date:
+                self.handle_event(FileUnchangedEvent(target, level=Event.V))
                 continue
             if target.mode == target.MODE_SYMLINK:
                 self.manager.fs_util.symlink(target.real_name, target.name)
@@ -432,6 +433,12 @@ class FileOverwriteError(Exception):
                 self.args[0])
 
 
+class FileUnchangedEvent(Event):
+    """Report an unchanged file."""
+    def __str__(self):
+        return str(self.args[0])
+
+
 class Loc(object):
 
     """Represent a location.
@@ -456,6 +463,7 @@ class Loc(object):
 
     A_SOURCE = "source"
     A_INSTALL = "install"
+    A_INSTALL_UNC = "unchanged"
     BLOB = ""
     MODE_AUTO = "auto"
     MODE_MKDIR = "mkdir"
@@ -486,7 +494,9 @@ class Loc(object):
         if self.dep_locs:
             for dep_loc in self.dep_locs:
                 ret += "\n    %s" % str(dep_loc)
-        if self.action_key is not None:
+        if self.action_key == self.A_INSTALL and not self.is_out_of_date:
+            ret = "%s: %s" % (self.A_INSTALL_UNC, ret)
+        elif self.action_key is not None:
             ret = "%s: %s" % (self.action_key, ret)
         return ret
 

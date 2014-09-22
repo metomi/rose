@@ -177,6 +177,17 @@ function file_grep() {
     fail $TEST_KEY
 }
 
+function file_grep_fail() {
+    local TEST_KEY=$1
+    local PATTERN=$2
+    local FILE=$3
+    if grep -q -e "$PATTERN" $FILE; then
+        fail $TEST_KEY
+        return
+    fi
+    pass $TEST_KEY
+}
+
 function mock_smtpd_init() {
     local SMTPD_PORT=
     for SMTPD_PORT in 8025 8125 8225 8325 8425 8525 8625 8725 8825 8925; do 
