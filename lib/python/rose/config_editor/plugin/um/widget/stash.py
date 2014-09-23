@@ -30,9 +30,11 @@ import gtk
 
 import rose.config
 import rose.config_editor.panelwidget.summary_data
+import rose.config_tree
 import rose.gtk.dialog
 import rose.gtk.util
 import rose.reporter
+import rose.resource
 
 import rose.config_editor.plugin.um.widget.stash_add as stash_add
 import rose.config_editor.plugin.um.widget.stash_util as stash_util
@@ -282,9 +284,9 @@ class BaseStashSummaryDataPanelv1(
         if self.STASHMASTER_META_PATH is None:
             return {}
         try:
-            config = rose.config.load(os.path.join(
-                                         self.STASHMASTER_META_PATH,
-                                         self.STASHMASTER_META_FILENAME))
+            config = rose.config_tree.ConfigTreeLoader().load(
+                self.STASHMASTER_META_PATH,
+                self.STASHMASTER_META_FILENAME).node
         except (rose.config.ConfigSyntaxError, IOError, OSError) as e:
             rose.reporter.Reporter()(
                 "Error loading STASHmaster metadata resource: " +

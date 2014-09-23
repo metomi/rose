@@ -24,6 +24,7 @@ import re
 import sys
 
 import rose.config
+import rose.config_tree
 import rose.formats.namelist
 import rose.macro
 import rose.macros
@@ -104,9 +105,8 @@ def _check_macro(value, module_files=None, meta_dir=None):
             macro.endswith("." + rose.macro.TRANSFORM_METHOD)):
             macro_name, method = macro.rsplit(".", 1)
         try:
-            macro_obj = rose.resource.import_object(macro_name,
-                                                    module_files,
-                                                    _import_err_handler)
+            macro_obj = rose.resource.import_object(
+                macro_name, module_files, _import_err_handler)
         except Exception as e:
             return INVALID_IMPORT.format(
                                   macro,
@@ -195,9 +195,8 @@ def _check_widget(value, module_files=None, meta_dir=None):
         return
     widget_name = value.split()[0]
     try:
-        widget = rose.resource.import_object(widget_name,
-                                             module_files,
-                                             _import_err_handler)
+        widget = rose.resource.import_object(
+            widget_name, module_files, _import_err_handler)
     except Exception as e:
         return INVALID_IMPORT.format(widget_name,
                                      type(e).__name__ + ": " + str(e))
@@ -328,15 +327,21 @@ def _import_err_handler(exception):
 def main():
     opt_parser = rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "property")
+    rose.macro.add_site_meta_paths()
+    rose.macro.add_env_meta_paths()
     opts, args = opt_parser.parse_args()
     reporter = rose.reporter.Reporter(opts.verbosity - opts.quietness)
     if opts.conf_dir is None:
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
-    meta_conf_file_path = os.path.join(opts.conf_dir, rose.META_CONFIG_NAME)
-    if not os.path.isfile(meta_conf_file_path):
+    try:
+        meta_config = rose.config_tree.ConfigTreeLoader().load(
+            opts.conf_dir,
+            rose.META_CONFIG_NAME,
+            list(sys.path)
+        ).node
+    except IOError:
         sys.exit(ERROR_LOAD_META_CONFIG_DIR.format(opts.conf_dir))
-    meta_config = rose.config.load(meta_conf_file_path)
     sections = None
     if args:
         sections = args

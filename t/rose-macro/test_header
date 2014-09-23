@@ -31,9 +31,34 @@ function init_meta() {
     cat >$TEST_DIR/config/meta/rose-meta.conf
 }
 
+function init_rose_meta() {
+    category=$1
+    mkdir -p $TEST_DIR/rose-meta/$category/
+    shift
+    for version; do
+        mkdir -p $TEST_DIR/rose-meta/$category/$version/
+        touch $TEST_DIR/rose-meta/$category/$version/rose-meta.conf
+    done
+}
+
+function init_rose_meta_content() {
+    category=$1
+    version=$2
+    cat >$TEST_DIR/rose-meta/$category/$version/rose-meta.conf
+}
+
 function init_macro() {
     mkdir -p $TEST_DIR/config/meta/lib/python/macros/
     cat >$TEST_DIR/config/meta/lib/python/macros/$1
+}
+
+function init_rose_meta_macro() {
+    category=$1
+    version=$2
+    macro_filename=$3
+    mkdir -p "$TEST_DIR/rose-meta/$category/$version/lib/python/macros/"
+    touch "$TEST_DIR/rose-meta/$category/$version/lib/python/macros/__init__.py"
+    cat >"$TEST_DIR/rose-meta/$category/$version/lib/python/macros/$macro_filename"
 }
 
 function setup() {

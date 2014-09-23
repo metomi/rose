@@ -12,9 +12,18 @@ for a full listing of issues for each release.
 
 ### Highlighted Changes
 
--none-
+[#1415](https://github.com/metomi/rose/pull/1415):
+Support configuration metadata inheritance. A configuration metadata can now
+import settings from other configuration metadata locations.
 
 ### Noteworthy Changes
+
+[#1416](https://github.com/metomi/rose/pull/1416):
+file install: notify skipped file installs in verbose mode.
+
+[#1409](https://github.com/metomi/rose/pull/1409):
+rosie db: fix lookup failure when the results contain a suite with no optional
+information properties.
 
 [#1408](https://github.com/metomi/rose/pull/1408):
 SSH `-oConnectTimeout=10` as default. This should fix any hang up problems when
@@ -26,6 +35,9 @@ of the `[external]ssh` setting.
 rosa svn-post-commit: fix owner and access-list notification. It should only
 send notification on changes on a trunk and should no longer send notification
 on changes on a branch.
+
+[#1406](https://github.com/metomi/rose/pull/1406):
+rose config-edit: UM stash widget: stash record help input change.
 
 [#1403](https://github.com/metomi/rose/pull/1403):
 file install: rsync: fix sub-dir handling. File install rsync mode was failing
