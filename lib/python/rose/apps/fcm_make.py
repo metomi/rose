@@ -81,8 +81,10 @@ class FCMMakeApp(BuiltinApp):
         cmd += ["-j", cmd_opt_jobs]
         cmd_args = conf_tree.node.get_value(["args"],
                                             os.getenv("ROSE_TASK_OPTIONS"))
-        cmd += shlex.split(cmd_args)
-        cmd += args
+        if cmd_args:
+            cmd += shlex.split(cmd_args)
+        if args:
+            cmd += args
         app_runner.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
 
     def _run2(self, app_runner, conf_tree, opts, args, uuid, work_files, t):
@@ -98,6 +100,8 @@ class FCMMakeApp(BuiltinApp):
         cmd += ["-j", cmd_opt_jobs]
         cmd_args = conf_tree.node.get_value(["args"],
                                             os.getenv("ROSE_TASK_OPTIONS"))
-        cmd += shlex.split(cmd_args)
-        cmd += args
+        if cmd_args:
+            cmd += shlex.split(cmd_args)
+        if args:
+            cmd += args
         app_runner.popen(*cmd, stdout=sys.stdout, stderr=sys.stderr)
