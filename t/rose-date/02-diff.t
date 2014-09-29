@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 10
+tests 12
 #-------------------------------------------------------------------------------
 # Positive duration
 TEST_KEY=$TEST_KEY_BASE-pos
@@ -48,5 +48,10 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'P12D'
 TEST_KEY=$TEST_KEY_BASE-offset2
 run_pass "$TEST_KEY" rose date 20100101T00 20100201T00 -2 P1D
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'P32D'
+#-------------------------------------------------------------------------------
+# Offset 3
+TEST_KEY=$TEST_KEY_BASE-offset3
+run_pass "$TEST_KEY" rose date 0000 0000 -s -PT2M -f y,m,d,h,M,s
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<<'0,0,0,0,2,0'
 #-------------------------------------------------------------------------------
 exit 0
