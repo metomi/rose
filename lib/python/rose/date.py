@@ -242,11 +242,10 @@ class RoseDateTimeOperator(object):
             expression = ""
             for item in print_format:
                 if item in delta_lookup:
-                    entry = delta_lookup[item]
-                    if isinstance(entry, float):
-                        if entry.is_integer():
-                            entry = int(entry)
-                    expression += str(entry)
+                    if float(delta_lookup[item]).is_integer():
+                        expression += str(int(delta_lookup[item]))
+                    else:
+                        expression += str(delta_lookup[item])
                 else:
                     expression += item
             return sign + expression
