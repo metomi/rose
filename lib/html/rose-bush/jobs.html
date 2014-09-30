@@ -331,11 +331,11 @@ title="submit {{entry.submit_num}}">{{entry.submit_num}}</span>
 {% if log.exists and log.size -%}
 {% if log.path_in_tar -%}
 <a
-href="{{script}}/view/{{user}}/{{suite}}?path={{log.path}}&amp;path_in_tar={{log.path_in_tar}}"
+href="{{script}}/view/{{user}}/{{suite}}?path={{log.path|replace('+', '%2B')}}&amp;path_in_tar={{log.path_in_tar}}"
 title="{{log.size}} bytes">{{key}}</a>
 {% else -%}
 <a
-href="{{script}}/view/{{user}}/{{suite}}?path={{log.path}}"
+href="{{script}}/view/{{user}}/{{suite}}?path={{log.path|replace('+', '%2B')}}"
 title="{{log.size}} bytes">{{key}}</a>
 {% endif -%}
 {% elif log.exists -%}
