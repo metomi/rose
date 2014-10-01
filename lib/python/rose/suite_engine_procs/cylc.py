@@ -88,6 +88,7 @@ class CylcProcessor(SuiteEngineProcessor):
             "name ASC, cycle DESC, task_events.submit_num DESC",
             "name_desc_cycle_desc":
             "name DESC, cycle DESC, task_events.submit_num DESC"}
+    PGREP_CYLC_RUN = r"python.*cylc-(run|restart) .*\<%s\>"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
     REC_CYCLE_TIME = re.compile(
@@ -685,16 +686,15 @@ class CylcProcessor(SuiteEngineProcessor):
         if user_name is None:
             user_name = pwd.getpwuid(os.getuid()).pw_name
         pgrep = ["pgrep", "-f", "-l", "-u", user_name,
-                 "python.*cylc-(run|restart).*\\<" + suite_name + "\\>"]
+                 self.PGREP_CYLC_RUN % (suite_name)]
         ret_code, out, _ = self.popen.run(*pgrep)
         if ret_code == 0:
             proc_reasons = []
             for line in out.splitlines():
-                if suite_name in line.split():
-                    proc_reasons.append({
-                        "host": "localhost",
-                        "reason_key": self.REASON_KEY_PROC,
-                        "reason_value": line})
+                proc_reasons.append({
+                    "host": "localhost",
+                    "reason_key": self.REASON_KEY_PROC,
+                    "reason_value": line})
             if proc_reasons:
                 return proc_reasons
 
@@ -710,11 +710,10 @@ class CylcProcessor(SuiteEngineProcessor):
         for host in sorted(hosts):
             if host == "localhost":
                 continue
-            cmd = self.popen.get_cmd("ssh",
-                                     host,
-                                     "pgrep -f -l " + opt_user +
-                                     " 'python.*cylc-(run|restart).*\\<" +
-                                     suite_name + "\\>' || ls " + port_file)
+            r_cmd_tmpl = (
+                r"pgrep -f -l %s '" + self.PGREP_CYLC_RUN + r"' || ls '%s'")
+            r_cmd = r_cmd_tmpl % (opt_user, suite_name, port_file)
+            cmd = self.popen.get_cmd("ssh", host, r_cmd)
             host_proc_dict[host] = self.popen.run_bg(*cmd)
         proc_reasons = []
         file_reasons = []
@@ -729,17 +728,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 out = proc.communicate()[0]
                 for line in out.splitlines():
                     cols = line.split()
-                    if suite_name in cols:
-                        if cols[0].isdigit():
-                            proc_reasons.append({
-                                        "host": host,
-                                        "reason_key": self.REASON_KEY_PROC,
-                                        "reason_value": line})
-                        else:
-                            file_reasons.append({
-                                        "host": host,
-                                        "reason_key": self.REASON_KEY_FILE,
-                                        "reason_value": line})
+                    if cols[0].isdigit():
+                        proc_reasons.append({
+                                    "host": host,
+                                    "reason_key": self.REASON_KEY_PROC,
+                                    "reason_value": line})
+                    else:
+                        file_reasons.append({
+                                    "host": host,
+                                    "reason_key": self.REASON_KEY_FILE,
+                                    "reason_value": line})
             if host_proc_dict:
                 sleep(0.1)
 
