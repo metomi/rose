@@ -18,6 +18,9 @@ import settings from other configuration metadata locations.
 
 ### Noteworthy Changes
 
+[#1427](https://github.com/metomi/rose/pull/1427):
+isodatetime: update to release 2014.10.0.
+
 [#1423](https://github.com/metomi/rose/pull/1423):
 rose date: don't display unecessary float in a duration format.
 
