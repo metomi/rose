@@ -18,6 +18,17 @@ import settings from other configuration metadata locations.
 
 ### Noteworthy Changes
 
+[#1423](https://github.com/metomi/rose/pull/1423):
+rose date: don't display unecessary float in a duration format.
+
+[#1422](https://github.com/metomi/rose/pull/1422):
+rose suite-* commands: improve the pattern used in `pgrep` to detect whether
+a suite is still running or not.
+
+[#1421](https://github.com/metomi/rose/pull/1421):
+rose bush: fix job log links for suites on `+` time zones. The `+` sign in
+the time zone is now escaped for URLs.
+
 [#1416](https://github.com/metomi/rose/pull/1416):
 file install: notify skipped file installs in verbose mode.
 
@@ -43,6 +54,11 @@ rose config-edit: UM stash widget: stash record help input change.
 file install: rsync: fix sub-dir handling. File install rsync mode was failing
 if source is a directory with sub-directories. This change fixes the problem by
 removing an incorrect integer cast of the access mode.
+
+[#1391](https://github.com/metomi/rose/pull/1391):
+rose suite-hook, rose bush: no longer record job script, job standard out
+and job standard error in any special way. This will modify slightly the display
+of job file links in Rose Bush jobs listing.
 
 --------------------------------------------------------------------------------
 
