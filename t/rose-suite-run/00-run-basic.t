@@ -42,10 +42,10 @@ run_pass "$TEST_KEY" \
 HOST=$(<$SUITE_RUN_DIR/log/rose-suite-run.host)
 poll ! test -e $SUITE_RUN_DIR/log/job/my_task_1.2013010100.1
 if [[ $HOST == 'localhost' ]]; then
-    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>")
+    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>")
 else
     CMD_PREFIX="ssh -oBatchMode=yes $HOST"
-    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run.*\\<$NAME\\>'")
+    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run .*\\<$NAME\\>'")
 fi
 SUITE_PROC=$(awk '{print "[FAIL]     " $0}' <<<"$SUITE_PROC")
 #-------------------------------------------------------------------------------

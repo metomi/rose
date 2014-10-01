@@ -63,10 +63,6 @@ class CylcProcessor(SuiteEngineProcessor):
     EVENT_RANKS = {"submit-init": 0, "submit": 1, "fail(submit)": 1, "init": 2,
                    "success": 3, "fail": 3, "fail(%s)": 4}
     JOB_LOGS_DB = "log/rose-job-logs.db"
-    JOB_LOG_TAIL_KEYS = {
-        "job": "00-script",
-        "job.out": "01-out",
-        "job.err": "02-err"}
     ORDERS = {
             "time_desc":
             "time DESC, task_events.submit_num DESC, name DESC, cycle DESC",
@@ -88,6 +84,7 @@ class CylcProcessor(SuiteEngineProcessor):
             "name ASC, cycle DESC, task_events.submit_num DESC",
             "name_desc_cycle_desc":
             "name DESC, cycle DESC, task_events.submit_num DESC"}
+    PGREP_CYLC_RUN = r"python.*cylc-(run|restart) .*\<%s\>"
     REASON_KEY_PROC = "process"
     REASON_KEY_FILE = "port-file"
     REC_CYCLE_TIME = re.compile(
@@ -685,16 +682,15 @@ class CylcProcessor(SuiteEngineProcessor):
         if user_name is None:
             user_name = pwd.getpwuid(os.getuid()).pw_name
         pgrep = ["pgrep", "-f", "-l", "-u", user_name,
-                 "python.*cylc-(run|restart).*\\<" + suite_name + "\\>"]
+                 self.PGREP_CYLC_RUN % (suite_name)]
         ret_code, out, _ = self.popen.run(*pgrep)
         if ret_code == 0:
             proc_reasons = []
             for line in out.splitlines():
-                if suite_name in line.split():
-                    proc_reasons.append({
-                        "host": "localhost",
-                        "reason_key": self.REASON_KEY_PROC,
-                        "reason_value": line})
+                proc_reasons.append({
+                    "host": "localhost",
+                    "reason_key": self.REASON_KEY_PROC,
+                    "reason_value": line})
             if proc_reasons:
                 return proc_reasons
 
@@ -710,11 +706,10 @@ class CylcProcessor(SuiteEngineProcessor):
         for host in sorted(hosts):
             if host == "localhost":
                 continue
-            cmd = self.popen.get_cmd("ssh",
-                                     host,
-                                     "pgrep -f -l " + opt_user +
-                                     " 'python.*cylc-(run|restart).*\\<" +
-                                     suite_name + "\\>' || ls " + port_file)
+            r_cmd_tmpl = (
+                r"pgrep -f -l %s '" + self.PGREP_CYLC_RUN + r"' || ls '%s'")
+            r_cmd = r_cmd_tmpl % (opt_user, suite_name, port_file)
+            cmd = self.popen.get_cmd("ssh", host, r_cmd)
             host_proc_dict[host] = self.popen.run_bg(*cmd)
         proc_reasons = []
         file_reasons = []
@@ -729,17 +724,16 @@ class CylcProcessor(SuiteEngineProcessor):
                 out = proc.communicate()[0]
                 for line in out.splitlines():
                     cols = line.split()
-                    if suite_name in cols:
-                        if cols[0].isdigit():
-                            proc_reasons.append({
-                                        "host": host,
-                                        "reason_key": self.REASON_KEY_PROC,
-                                        "reason_value": line})
-                        else:
-                            file_reasons.append({
-                                        "host": host,
-                                        "reason_key": self.REASON_KEY_FILE,
-                                        "reason_value": line})
+                    if cols[0].isdigit():
+                        proc_reasons.append({
+                                    "host": host,
+                                    "reason_key": self.REASON_KEY_PROC,
+                                    "reason_value": line})
+                    else:
+                        file_reasons.append({
+                                    "host": host,
+                                    "reason_key": self.REASON_KEY_FILE,
+                                    "reason_value": line})
             if host_proc_dict:
                 sleep(0.1)
 
@@ -809,16 +803,13 @@ class CylcProcessor(SuiteEngineProcessor):
                     cycle, task, s_n, ext = self._parse_job_log_base_name(name)
                     if s_n == "NN" or ext == "job.status":
                         continue
-                    key = ext
-                    if ext in self.JOB_LOG_TAIL_KEYS:
-                        key = self.JOB_LOG_TAIL_KEYS[ext]
                     stmt_args = [
                         os.path.join(archive_file_name),
                         name.replace("log/", "", 1),
                         cycle,
                         task,
                         int(s_n),
-                        key]
+                        ext]
                     self._db_exec(self.JOB_LOGS_DB, None, suite_name,
                                   stmt, stmt_args, commit=True)
         finally:
@@ -963,10 +954,7 @@ class CylcProcessor(SuiteEngineProcessor):
                     rel_f_name)
                 if s_n == "NN":
                     continue
-                key = ext
-                if ext in self.JOB_LOG_TAIL_KEYS:
-                    key = self.JOB_LOG_TAIL_KEYS[ext]
-                stmt_args = [cycle, task, int(s_n), key, rel_f_name, "",
+                stmt_args = [cycle, task, int(s_n), ext, rel_f_name, "",
                              stat.st_mtime, stat.st_size]
                 dao.execute(stmt, stmt_args)
         dao.commit()

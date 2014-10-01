@@ -59,9 +59,9 @@ done
 $CMD_PREFIX "mv ~/.cylc/ports/$NAME $NAME.port"
 ERR_HOST=${HOST:-localhost}
 if [[ -n $HOST ]]; then
-    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run.*\\<$NAME\\>'")
+    SUITE_PROC=$($CMD_PREFIX "pgrep -u\$USER -fl 'python.*cylc-run .*\\<$NAME\\>'")
 else
-    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run.*\\<$NAME\\>")
+    SUITE_PROC=$(pgrep -u$USER -fl "python.*cylc-run .*\\<$NAME\\>")
 fi
 SUITE_PROC=$(awk '{print "[FAIL]     " $0}' <<<"$SUITE_PROC")
 run_fail "$TEST_KEY" \
