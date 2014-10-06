@@ -491,10 +491,10 @@ opt.jobs=8
       <dd>Compulsory for each <kbd>[arch:TARGET]</kbd> section. Specify a list
       of space delimited source file names and/or globs for matching source
       file names. (File names with space or quote characters can be escaped
-      using quotes or backslashes, like in a shell.) Paths are assumed to be
-      relative to <var>$ROSE_SUITE_DIR</var> or to
-      <var>$ROSE_SUITE_DIR/PREFIX</var> if <kbd>source-prefix=PREFIX</kbd> is
-      specified.</dd>
+      using quotes or backslashes, like in a shell.)  Paths, if not absolute
+      (beginning with a <var>/</var>), are assumed to be relative to
+      <var>$ROSE_SUITE_DIR</var> or to <var>$ROSE_SUITE_DIR/PREFIX</var> if
+      <kbd>source-prefix=PREFIX</kbd> is specified.</dd>
 
       <dt><kbd>source-edit-format=FORMAT</kbd></dt>
 
